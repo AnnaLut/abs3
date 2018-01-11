@@ -1,37 +1,46 @@
-create or replace procedure DDRAPS
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/DDRAPS.sql =========*** Run *** ==
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure DDRAPS ***
+
+  CREATE OR REPLACE PROCEDURE BARS.DDRAPS 
 ( dat_    in      DATE
 , mode_   in      SMALLINT DEFAULT 0
 ) IS
   /**
   <b>CREATE_DAILY_SNAPSHOT</b> - процедура створення денних знімків балансу
-  %param 
-  
+  %param
+
   %version 1.8 (13.09.2017)
   %usage   створення денних знімків балансу.
   */
   l_errmsg          varchar2(500);
-  
+
   dat#              DATE;
   l_mode            SMALLINT := mode_;
-  
+
   l_pvp_uid         NUMBER(38);
   uid#              NUMBER := gl.aUID;
   l_bank_dt         DATE   := gl.bDATE;
-  
+
   dlta_             accounts.ostc%type;
   ost1_             accounts.ostc%type;
   ost2_             accounts.ostc%type;
   dosq_             accounts.dos%type;
   kosq_             accounts.kos%type;
-  
+
   l_acc             accounts.acc%type;
   l_ref             NUMBER;
   l_allowed_dt      DATE; -- Дата раніше якої заборонено формування
   l_kf              snap_balances.kf%type;
-  l_condition       varchar2(200); 
-  
+  l_condition       varchar2(200);
+
   x                 SYS_REFCURSOR;
-  
+
   -- тип для вичитки вхідних даних
   TYPE imp_rec IS RECORD( kf    char(6)
                         , acc   NUMBER
@@ -44,7 +53,7 @@ create or replace procedure DDRAPS
                         , dos   NUMBER(24)
                         , kos   NUMBER(24) );
   c imp_rec;
-  
+
   -- типы для накопления вешалок в Нових драпсах
   TYPE ves_rec IS RECORD( kf   char(6),
                           acc  NUMBER,     rnk  NUMBER,
@@ -52,10 +61,10 @@ create or replace procedure DDRAPS
                           ost0 NUMBER(24), dos0 NUMBER(24), kos0 NUMBER(24),
                           ostq NUMBER(24), dosq NUMBER(24), kosq NUMBER(24) );
   TYPE ves_tab IS TABLE OF ves_rec INDEX BY BINARY_INTEGER;
-  
+
   ves  ves_tab;
   i                   BINARY_INTEGER;
-  
+
   -- Вирахування еквівалентів
   TYPE rat_rec IS RECORD( dig  SMALLINT
                         , rat1 NUMBER
@@ -79,7 +88,7 @@ create or replace procedure DDRAPS
         q(x.kv).rat2 := NVL(x.rat2,0);
      END LOOP;
   END;
-   
+
    -- Еквівалент по курсу1
    FUNCTION eqv1
    ( kv_    SMALLINT
@@ -91,7 +100,7 @@ create or replace procedure DDRAPS
      s := ROUND(q(kv_).rat1*s_*POWER(10,2-q(kv_).dig));
      RETURN CASE s WHEN 0 THEN SIGN(s_) ELSE s END;
    END;
-   
+
    -- Еквівалент по курсу2
    FUNCTION eqv2
    ( kv_    SMALLINT
@@ -105,81 +114,81 @@ create or replace procedure DDRAPS
    END;
 
 BEGIN
-  
+
   bars_audit.info( $$PLSQL_UNIT||': Start running with (dat_='||to_char(dat_,'dd.mm.yyyy')||', mode_='||to_char(mode_)||').' );
-  
+
   IF ( sys_context('bars_global','application_name') = 'BARSWEB_JOBS' )
   THEN -- При запуску з ВЕБ формування драпсів не виконуємо (мовчки)
     RETURN;
   END IF;
-  
+
   if ( dat_ Is Null )
   then
     raise_application_error( -20666, 'Не вказано дату для формування знімку!' );
   end if;
-  
+
   l_kf := sys_context('bars_context','user_mfo');
-  
+
   if ( l_kf Is Null )
   then
     raise_application_error( -20666, 'Не вказано МФО ( l_kf Is Null ) для формування знімку!' );
   end if;
-  
+
   begin
-    
+
     select to_date(val,'DDMMYYYY')
-      into l_allowed_dt 
-      from PARAMS 
+      into l_allowed_dt
+      from PARAMS
      where PAR = 'DATRAPS';
-    
+
     if ( l_allowed_dt > dat_ )
     then
       raise_application_error( -20666, 'Заборонено формування знімків за дату меншу ніж '||to_char(l_allowed_dt,'dd.mm.yyyy') );
     end if;
-    
+
   exception
-    when NO_DATA_FOUND then 
+    when NO_DATA_FOUND then
       NULL;
   end;
-  
+
   -- Перевірка на операційну дату
   begin
-    select FDAT 
+    select FDAT
       into l_allowed_dt
-      from FDAT 
+      from FDAT
      where FDAT = dat_;
   exception
     when NO_DATA_FOUND then
      raise_application_error( -20666,'Заборонено формування знімків за неопераційну дату '||to_char(dat_,'dd.mm.yyyy') );
   end;
-  
+
   -- Перевірка наявності активного процесу формування знімку
   l_errmsg := BARS_UTL_SNAPSHOT.CHECK_SNP_RUNNING( 'DAYBALS' );
-  
+
   if (l_errmsg is Not Null)
   then
     raise_application_error( -20666, 'формування денного знімку балансу вже запущено користувачем ' || l_errmsg );
   else -- Блокування від декількох запусків
     BARS_UTL_SNAPSHOT.SET_RUNNING_FLAG( 'DAYBALS' );
   end if;
-  
+
   dbms_application_info.set_client_info( 'Формування денного знімку балансу за ' || F_MONTH_LIT(dat_,0,0) );
-  
+
   -- Отримати дату попередніх драпсів для прискореного режиму mode=1
   IF ( l_mode = 1 )
   THEN
-    
+
     SELECT MAX(FDAT)
       INTO dat#
       FROM FDAT
      WHERE FDAT < dat_;
-    
+
     l_mode := CASE WHEN dat# IS NULL THEN 0 ELSE 1 END;
-    
+
   END IF;
-  
+
   bars_audit.info( $$PLSQL_UNIT||': dat#='||to_char(dat#,'dd.mm.yyyy')||', mode='||to_char(l_mode)||'.' );
-  
+
   -- --
   -- -- Превентивно прибити переоцінку з цей день
   -- --
@@ -189,14 +198,14 @@ BEGIN
   -- END LOOP;
   --
   -- bars_audit.info( $$PLSQL_UNIT||': gl.bck -> Ok.' );
-  
+
   -- Превентивно доплатити пакетні проводки
   bc.subst_mfo( gl.aMFO );
   gl.paysos0;
   commit;
-  
+
   bars_audit.info( $$PLSQL_UNIT||': gl.paysos0 -> Ok.' );
-  
+
   -- Вибрати підходящий курсор
   IF ( l_mode = 0 )
   THEN
@@ -207,7 +216,7 @@ BEGIN
               , NVL(s.dos, 0) dos
               , NVL(s.kos, 0) kos
            from ACCOUNTS a
-           left 
+           left
            join ( SELECT sa1.KF,
                          sa1.ACC,
                          DECODE(sa1.fdat, :1, sa1.ostf,
@@ -224,13 +233,13 @@ BEGIN
                      AND sa1.acc  = sa2.acc
                 ) s
              on ( s.KF = a.KF and s.ACC = a.ACC )
-          WHERE a.KF = :p_kf 
+          WHERE a.KF = :p_kf
             and a.DAOS <= :1
             AND ( a.dazs is null OR a.dazs >= :1 )'
     USING dat_,dat_,dat_,dat_,l_kf,dat_,dat_;
-    
+
   ELSE -- ( l_mode = 1 )
-    
+
     OPEN x FOR
           'SELECT a.KF, a.acc, a.rnk, a.nbs, a.nls, a.kv, a.tip
                 , NVL(s.ostf,0) OSTF
@@ -243,44 +252,44 @@ BEGIN
                           NVL(c.ostf, b.ost) as OSTF,
                           NVL(c.dos,  0    ) as DOS,
                           NVL(c.kos,  0    ) as KOS
-                     from ( select * 
+                     from ( select *
                               from SNAP_BALANCES
                              where FDAT = :1
                           ) b
-                     full 
-                     join ( select * 
+                     full
+                     join ( select *
                               from SALDOA
                              where FDAT = :2
-                          ) c 
+                          ) c
                        on ( c.KF = b.KF and c.ACC = b.ACC )
                 ) s
              on ( s.KF = a.KF and s.ACC = a.ACC )
-            WHERE a.KF = :p_kf 
+            WHERE a.KF = :p_kf
               and a.DAOS <= :3
               and ( a.dazs is null OR a.dazs >= :4 )'
     USING dat#,dat_,l_kf,dat_,dat_;
-    
+
   END IF;
-  
+
   execute immediate 'truncate table SNAP_BALANCES_EXCHANGE';
-  
+
   l_condition := to_char(dat_,'ddmmyyyy');
-  
+
   if ( dat_ < GL.GBD() )
   then
-    execute immediate 'lock table SALDOA partition for( to_date('''||l_condition||''',''ddmmyyyy'') ) IN EXCLUSIVE MODE NOWAIT';
+    execute immediate 'lock table SALDOA partition for( to_date('''||l_condition||''',''ddmmyyyy'') ) IN EXCLUSIVE MODE ';
   end if;
-  
+
   GET_RAT(dat_);
-  
+
   LOOP
-    
+
     FETCH x INTO c;
-    
+
     EXIT WHEN x%NOTFOUND;
-    
+
     -- Вычисление эквивалента остатка и обортов
-    
+
     IF ( c.kv = 980 )
     THEN
       ost1_ := c.ostf;
@@ -291,29 +300,29 @@ BEGIN
          ost2_ := eqv2 (c.kv, c.ostf - c.dos + c.kos);
          dosq_ := eqv2 (c.kv, c.dos);
          kosq_ := eqv2 (c.kv, c.kos);
-         
+
          dlta_ := ost2_ - (ost1_ - dosq_ + kosq_);
-         
+
          IF dlta_ < 0 THEN
             dosq_ := dosq_ - dlta_;
          ELSE
             kosq_ := kosq_ + dlta_;
          END IF;
-         
+
     END IF;
-    
+
     -- Опеределение номера вешалки
-    i := CASE 
-           WHEN c.nbs BETWEEN '1000' and '7999' 
+    i := CASE
+           WHEN c.nbs BETWEEN '1000' and '7999'
            THEN c.kv*10+1
            WHEN c.nbs BETWEEN '9000' and '9599' OR c.nbs IN ('9900','9920')
            THEN c.kv*10+2
-           WHEN c.nbs BETWEEN '9600' and '9899' OR c.nbs ='9910' 
-           THEN c.kv*10+3 ELSE 9999 
+           WHEN c.nbs BETWEEN '9600' and '9899' OR c.nbs ='9910'
+           THEN c.kv*10+3 ELSE 9999
          END;
-    
+
     -- Накопление вешалок
-    IF ves.EXISTS(i) 
+    IF ves.EXISTS(i)
     THEN
        ves(i).ostq:=ves(i).ostq - (ost1_-dosq_+kosq_);
        ves(i).dosq:=ves(i).dosq+kosq_;
@@ -323,9 +332,9 @@ BEGIN
        ves(i).dosq:= kosq_;
        ves(i).kosq:= dosq_;
     END IF;
-    
+
     -- Запомнить счет вешалки (tip VE1-3)
-    IF c.tip LIKE 'VE_' 
+    IF c.tip LIKE 'VE_'
     THEN
       ves(i).acc  := c.acc;
       ves(i).kf   := c.kf;
@@ -337,9 +346,9 @@ BEGIN
       ves(i).dos0 := dosq_;
       ves(i).kos0 := kosq_;
     ELSE
-      
-      
---    IF c.ostf <> 0 OR 
+
+
+--    IF c.ostf <> 0 OR
 --       c.dos  <> 0 OR
 --       c.kos  <> 0 OR
 --       ost1_  <> 0 OR
@@ -355,23 +364,23 @@ BEGIN
         , c.ostf-c.dos+c.kos, c.dos, c.kos
         , ost1_ -dosq_+kosq_, dosq_, kosq_ );
 --    END IF;
-      
+
     END IF;
-    
+
   END LOOP;
-  
+
   -- Теперь повесить ошибки округления на вешалки4
   i := ves.FIRST;
-  
+
   WHILE i IS NOT NULL
   LOOP
     IF i > 2 AND TRUNC(i/10) NOT IN (980,999)
              AND (ves(i).ost<>0  OR ves(i).dos<>0  OR ves(i).kos<>0  OR
                   ves(i).ost0<>0 OR ves(i).dos0<>0 OR ves(i).kos0<>0 OR
-                  ves(i).ostq<>0 OR ves(i).dosq<>0 OR ves(i).kosq<>0) 
+                  ves(i).ostq<>0 OR ves(i).dosq<>0 OR ves(i).kosq<>0)
     THEN
-      
-      IF ves(i).acc IS NOT NULL 
+
+      IF ves(i).acc IS NOT NULL
       THEN
         insert -- вставка вешалок
           into SNAP_BALANCES_EXCHANGE
@@ -385,32 +394,32 @@ BEGIN
       ELSE
         raise_application_error(-20666, 'Не знайдно рахунок "вішалки" VE'||MOD(i,10)||' для вал. '||TRUNC(i/10));
       END IF;
-      
+
     END IF;
-    
+
     i := ves.NEXT(i);
-    
+
   END LOOP;
-  
+
   --
   -- переоцінка валютних позицій (коригуючі проводки + корекція даних в AGG_MONBALS_EXCHANGE)
   -- BARS_SNAPSHOT.DAILY_CURRENCY_REVALUATION;
   --
-  
+
   -- Код юзера для проведень переоцінки ВП
   begin
-    select trim(VAL) 
-      into l_pvp_uid 
-      from PARAMS 
+    select trim(VAL)
+      into l_pvp_uid
+      from PARAMS
      where PAR = 'PVPUSER';
   exception
-    when NO_DATA_FOUND then 
+    when NO_DATA_FOUND then
       l_pvp_uid := gl.aUID;
   end;
-  
+
   gl.bDATE := dat_;
   gl.aUID  := l_pvp_uid;
-  
+
   FOR v IN ( SELECT /*+ LEADING(vp b0) FULL(vp) INDEX(b1 UK_SNAP_BALANCES_EXCHANGE) */
                     vp.acc3800, (SELECT nls||'/'||LPAD(kv,3,'0') FROM accounts WHERE acc=acc3800) nls3800,
                     vp.acc3801, (SELECT RPAD(nls,14)||nms        FROM accounts WHERE acc=acc3801) nls3801,
@@ -427,12 +436,12 @@ BEGIN
               WHERE vp.KF = l_kf
                 AND b0.ostq + NVL(b1.ostq,0) <> 0 )
   LOOP
-    
+
     bars_audit.info( $$PLSQL_UNIT||': ВП '||v.nls3800||', DK='||v.DK||', S='||v.s );
-    
+
     GL.REF( l_ref );
 
-    insert 
+    insert
       into OPER
       ( REF,  TT,   VOB,   ND,  DK, PDAT
       , VDAT, DATD, USERID
@@ -448,18 +457,18 @@ BEGIN
     GL.PAYV( 1, l_ref, dat_, 'PVP', v.dk
            , 980, TRIM(SUBSTR(v.nls3801,1,14)), v.s
            , 980, TRIM(SUBSTR(v.nls6204,1,14)), v.s );
-    
-    FOR i IN 0..1 
+
+    FOR i IN 0..1
     LOOP
-      
-      if i=0 
-      then 
-        l_acc:= v.acc3801; 
-      else 
+
+      if i=0
+      then
+        l_acc:= v.acc3801;
+      else
         v.dk := 1-v.dk;
-        l_acc:= v.acc6204; 
+        l_acc:= v.acc6204;
       end if;
-      
+
       update BARS.SNAP_BALANCES_EXCHANGE
          set OST  = OST  + CASE WHEN v.dk = 1 THEN 0-v.s ELSE v.s END
            , OSTQ = OSTQ + CASE WHEN v.dk = 1 THEN 0-v.s ELSE v.s END
@@ -470,13 +479,13 @@ BEGIN
        where FDAT = dat_
          and KF   = v.KF
          and ACC  = l_acc;
-      
+
       if ( sql%rowcount = 0 )
       then
-        insert 
+        insert
           into BARS.SNAP_BALANCES_EXCHANGE
           ( FDAT, KF, ACC, RNK, OST, DOS, KOS, OSTQ, DOSQ, KOSQ )
-        values 
+        values
           ( dat_, v.KF, l_acc, v.rnk,
             CASE WHEN v.dk=1 THEN 0-v.s ELSE v.s END,
             CASE WHEN v.dk=1 THEN v.s   ELSE 0   END,
@@ -485,68 +494,78 @@ BEGIN
             CASE WHEN v.dk=1 THEN v.s   ELSE 0   END,
             CASE WHEN v.dk=1 THEN 0     ELSE v.s END);
       END IF;
-      
+
     END LOOP;
-    
+
   END LOOP;
-  
+
   COMMIT;
-  
-  -- Back to 
+
+  -- Back to
   gl.bDATE := l_bank_dt;
   gl.aUID  := uid#;
-  
+
   q.delete;
   ves.delete;
-  
+
   if ( dat_ = DAT_NEXT_U( GL.GBD(), -1 ) )
   then -- Доплата проводок переоцінки породжених при формуванні знімків балансу
     GL.OVERPAY_PVP;
     commit;
   end if;
-  
+
   -- Фіксуємо SCN на якому формуємо знімок балансу по табл. SALDOA
   BARS_UTL_SNAPSHOT.SET_TABLE_SCN( 'SALDOA', dat_, l_kf, DBMS_FLASHBACK.GET_SYSTEM_CHANGE_NUMBER() );
-  
+
   if ( l_kf Is Null )
   then -- for all
-    
+
     l_condition := replace( q'[ (to_date('%dt','ddmmyyyy')) ]', '%dt', l_condition );
-    
+
     -- bypass the RLS policies
     DM_UTL.EXCHANGE_PARTITION_FOR( p_source_table_nm => 'SNAP_BALANCES_EXCHANGE_KF'
                                  , p_target_table_nm => 'SNAP_BALANCES'
                                  , p_condition       => l_condition );
-    
+
     execute immediate 'TRUNCATE TABLE BARS.SNAP_BALANCES_EXCHANGE_KF';
-    
+
   else -- for one
-    
+
     l_condition := replace( q'[ (to_date('%dt','ddmmyyyy'),'%kf') ]', '%dt', l_condition );
     l_condition := replace( l_condition, '%kf', l_kf );
-    
+
     -- bypass the RLS policies
     DM_UTL.EXCHANGE_SUBPARTITION_FOR( p_source_table_nm => 'SNAP_BALANCES_EXCHANGE'
                                     , p_target_table_nm => 'SNAP_BALANCES'
                                     , p_condition       => l_condition );
-    
+
     execute immediate 'TRUNCATE TABLE BARS.SNAP_BALANCES_EXCHANGE';
-    
+
   end if;
-  
+
   BARS_UTL_SNAPSHOT.PURGE_RUNNING_FLAG();
-  
+
   bars_audit.info( $$PLSQL_UNIT||': Exit.' );
-  
-EXCEPTION 
+
+EXCEPTION
   WHEN OTHERS THEN
     gl.bDATE:=l_bank_dt;          -- Back to
-    gl.aUID :=uid#;               -- 
+    gl.aUID :=uid#;               --
     BARS_UTL_SNAPSHOT.PURGE_RUNNING_FLAG();
     bars_audit.error( $$PLSQL_UNIT|| ': ' || dbms_utility.format_error_stack() ||
                                   chr(10) || dbms_utility.format_error_backtrace() );
     raise;
 END DDRAPS;
 /
+show err;
 
-show errors
+PROMPT *** Create  grants  DDRAPS ***
+grant EXECUTE                                                                on DDRAPS          to BARSUPL;
+grant EXECUTE                                                                on DDRAPS          to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on DDRAPS          to UPLD;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/DDRAPS.sql =========*** End *** ==
+PROMPT ===================================================================================== 

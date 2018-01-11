@@ -30,7 +30,7 @@ begin
         else
           update operw set value=l.kod_n_ru where tag='KOD_N' and ref=l.ref_ca;            
         end if;
-        update cim_1pb_ru_doc set changed=1, md=null where ref_ca=l.ref_ca;
+        update cim_1pb_ru_doc set changed=1, md=null, kod_n_ca=l.kod_n_ru where ref_ca=l.ref_ca;
       end loop;   
     elsif p_sync='2' then
       for l in ( select d.ref_ca, d.kod_n_ru from v_cim_1pb_doc d 
@@ -42,7 +42,7 @@ begin
         else
           update operw set value=l.kod_n_ru where tag='KOD_N' and ref=l.ref_ca;            
         end if;
-        update cim_1pb_ru_doc set changed=1, md=null where ref_ca=l.ref_ca;
+        update cim_1pb_ru_doc set changed=1, md=null, kod_n_ca=l.kod_n_ru where ref_ca=l.ref_ca;
       end loop;   
     end if;  
     commit;

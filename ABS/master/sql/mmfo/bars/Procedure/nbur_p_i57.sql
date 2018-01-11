@@ -129,7 +129,8 @@ BEGIN
        THEN
           logger.info ('NBUR_P_I57 error: ' || SQLERRM);
     END;
-
+    commit;
+    
     -- формирование показателей файла  в  nbur_agg_protocols
     INSERT INTO nbur_agg_protocols (report_date,
                                     kf,

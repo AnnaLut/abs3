@@ -45,7 +45,7 @@ for c in(select o.* from komis_non_cash k, oper o
 	     logger.financial('p_job_komis_non_cash: REF='||to_char(c.ref)||' COMIS2620 CUSTOMER_SEGMENT_FINANCIAL='||bars.list_utl.get_item_name ('CUSTOMER_SEGMENT_FINANCIAL',l_segment) );
          if NEWNBS.GET_STATE = 0 then
             gl.payv(0, c.ref, c.vdat, l_tt, 1, 980, c.nlsb, l_s, 980, nbs_ob22_null ('6110','17', l_branch), l_s);
-         else 
+         else
             gl.payv(0, c.ref, c.vdat, l_tt, 1, 980, c.nlsb, l_s, 980, nbs_ob22_null ('6510','17', l_branch), l_s);
          end if;
          gl.pay2(2, c.ref, gl.bd);

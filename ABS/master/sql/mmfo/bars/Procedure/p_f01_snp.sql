@@ -46,7 +46,7 @@ BEGIN
   --   условная: отрабатывает только при изменении данных в SALDOA, SALDOB за отчетную дату
   --bars_accm_sync.sync_snap('BALANCE', p_DAT);
   -- новый вариант страховочной синхронизации
-  BARS_UTL_SNAPSHOT.SYNC_SNAP(p_DAT);
+--  BARS_UTL_SNAPSHOT.SYNC_SNAP(p_DAT);
 
   --3) Очистка протокола форм.файлa (по aн.счетам)
   EXECUTE IMMEDIATE 'TRUNCATE TABLE RNBU_TRACE';

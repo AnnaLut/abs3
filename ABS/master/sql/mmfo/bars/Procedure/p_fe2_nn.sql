@@ -1,11 +1,20 @@
-CREATE OR REPLACE PROCEDURE BARS.P_FE2_NN (dat_      DATE,
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_FE2_NN.sql =========*** Run *** 
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure P_FE2_NN ***
+
+  CREATE OR REPLACE PROCEDURE BARS.P_FE2_NN (dat_      DATE,
                                            sheme_    VARCHAR2 DEFAULT 'G')
 IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #E2 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.17.004   05/01/2018 (03.01.2018)
+% VERSION     : v.17.003      03.01.2018 (02.01.2018, 07.11.2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -114,7 +123,7 @@ IS
    adr_       VARCHAR2 (70);
    k040_      VARCHAR2 (3);
    k110_      VARCHAR2 (5);
-   val_       VARCHAR2 (200);
+   val_       VARCHAR2 (70);
    a1_        VARCHAR2 (70);
    a2_        VARCHAR2 (70);
    a3_        VARCHAR2 (70);
@@ -167,7 +176,7 @@ IS
    kol_61     number;
    DC1#E2_    VARCHAR2 (70);
    DE#E2_     VARCHAR2 (3);
-   D53#E2_    VARCHAR2 (2000) := null;
+   D53#E2_    VARCHAR2 (70) := null;
    D54#E2_    VARCHAR2 (2) := null;
    D55#E2_    VARCHAR2 (1) := null;
    nazn_      VARCHAR2 (160);
@@ -188,9 +197,6 @@ IS
 
    name_sp_        varchar2(30);
    exist_trans     NUMBER                 := 0;
-   
-   cont_num_     varchar2(100);
-   cont_dat_     varchar2(100);
 
 --курсор по контрагентам
    CURSOR c_main
@@ -234,8 +240,8 @@ IS
 
    PROCEDURE p_ins (p_np_ IN NUMBER, p_kodp_ IN VARCHAR2, p_znap_ IN VARCHAR2)
    IS
-      l_kodp_   VARCHAR2 (1000);
-      p_znap1_  VARCHAR2 (250);
+      l_kodp_   VARCHAR2 (10);
+      p_znap1_  VARCHAR2 (70);
    BEGIN
 
       if p_kodp_ in ('31','64') and length(trim(p_znap_)) < 3 and trim(p_znap_) != '0' then
@@ -389,8 +395,8 @@ IS
       THEN
          p_kodp_ := '51';
 
-         if cont_num_ is not null then
-            p_value_ := NVL (SUBSTR (TRIM (cont_num_), 1, 70), 'N контр.');
+         if TRIM (p_value_) is null and d2#E2_ is not null then
+            p_value_ := NVL (SUBSTR (TRIM (d2#E2_), 1, 70), 'N контр.');
          else
             p_value_ := NVL (SUBSTR (TRIM (p_value_), 1, 70), 'N контр.');
          end if;
@@ -402,12 +408,11 @@ IS
       THEN
          p_kodp_ := '52';
 
-         if cont_dat_ is not null then
-            p_value_ := NVL (SUBSTR (TRIM (cont_dat_), 1, 70), 'дата контр.');
+         if TRIM (p_value_) is null and d3#E2_ is not null then
+            p_value_ := NVL (SUBSTR (TRIM (d3#E2_), 1, 70), 'дата контр.');
          else
             p_value_ := NVL (SUBSTR (TRIM (p_value_), 1, 70), 'дата контр.');
          end if;
-         
          -- для продажи валюты и межбанковских кредитов
          if mbkOK_ or d1#E2_='30' then
             p_value_ := '';
@@ -645,20 +650,10 @@ IS
             p_kodp_ := '53';
             -- з 29.12.2017 новий показник
             --  назва Бенефіціару
-            
-            if D2#E2_ is not null and D3#E2_ is not null then
-               select substr(MAX(trim(benef_name)), 1,135)
-               into d53#E2_
-               from v_cim_all_contracts
-               where num = cont_num_ and
-                     open_date = to_date(cont_dat_, 'ddmmyyyy')  and
-                     status_id = 0;        
-            end if;
-            
-            if d53#E2_ is not null then
-               p_value_ := NVL (SUBSTR (TRIM (d53#E2_), 1, 135), 'назва Бенефіціару');
+            if TRIM (p_value_) is null and d53#E2_ is not null then
+               p_value_ := NVL (SUBSTR (TRIM (de#E2_), 1, 3), 'назва Бенефіціару');
             else
-               p_value_ := NVL (SUBSTR (TRIM (p_value_), 1, 135), 'назва Бенефіціару');
+               p_value_ := NVL (SUBSTR (TRIM (p_value_), 1, 70), 'назва Бенефіціару');
             end if;
          END IF;
       ELSIF p_i_ = 16
@@ -669,9 +664,9 @@ IS
             -- з 29.12.2017 новий показник
             --  код ідентифікатора - F027 (доп.параметр 12_2C)
             if TRIM (p_value_) is null and d54#E2_ is not null then
-               p_value_ := NVL (SUBSTR (lpad(TRIM (d54#E2_), 1, 2), 2, '0'), '00');
+               p_value_ := NVL (SUBSTR (TRIM (d54#E2_), 1, 3), 'код індекатора');
             else
-               p_value_ := NVL (SUBSTR (lpad(TRIM (p_value_), 1, 2), 2, '0'), '00');
+               p_value_ := NVL (SUBSTR (TRIM (p_value_), 1, 70), 'код індекатора');
             end if;
          END IF;
       ELSIF p_i_ = 17
@@ -761,16 +756,15 @@ BEGIN
 
    IF mfou_=300465 and mfo_ != mfou_ and Dat_ > to_date('28072009','ddmmyyyy')
    THEN
-      select /*+ index(a, XIE_DAT_A_ARC_RRP) */ count(*)
+      select count(*)
          INTO kol_ref_
-      from arc_rrp a
+      from arc_rrp
       where trunc(dat_a) >= Dat_
         and dk = 3
         and nlsb like '2909%'
         and nazn like '#E2;%'
         and trim(d_rec) is not null
-        and d_rec like '%D' || to_char(Dat_, 'yymmdd') || '%'
-        and kf = to_char(mfo_);
+        and d_rec like '%D' || to_char(Dat_, 'yymmdd') || '%';
    END IF;
 
    if ( (mfou_ = 300465 and mfou_ = mfo_) OR mfou_ <> 300465 ) and kol_ref_ = 0 then
@@ -911,7 +905,7 @@ BEGIN
                      o.s * 100 s_nom,
                      gl.p_icurval (o.kv, o.s * 100, dat_) s_eqv
             FROM provodki_otc o,
-               ( select /*+ index(a, XIE_DAT_A_ARC_RRP) */ o.ref
+               ( select o.ref
                   from arc_rrp a, oper o
                   where trunc(a.dat_a) >= Dat_
                     and a.dk = 3
@@ -1413,9 +1407,9 @@ BEGIN
                         if mfo_ = 300465 and
                           (nlsk_ like '1500%' and  nls_ like '1600%')
                         then
-                           p_ins (nnnn_, '31', lpad('0',  10, '0'));
+                           p_ins (nnnn_, '31', '0');
                         else
-                           p_ins (nnnn_, '31', lpad(trim (okpo_), 10, '0'));
+                           p_ins (nnnn_, '31', TRIM (okpo_));
                         end if;
 
                         if dat_ >= dat_izm3_
@@ -1523,9 +1517,9 @@ BEGIN
                                  END;
                               END;
 
-                              if i=2 and D2#E2_ is null then
+                              if i=2 and val_ is null and D2#E2_ is null then
                                  begin
-                                    select trim(value)
+                                    select value
                                        into D2#E2_
                                     from operw
                                     where ref=refd_
@@ -1535,33 +1529,19 @@ BEGIN
                                      null;
                                  end;
                               end if;
-                              
-                              cont_num_ := D2#E2_;
-                              
-                              if i=3 and D3#E2_ is null then
+
+                              if i=3 and val_ is null and D3#E2_ is null then
                                  begin
-                                    select trim(value)
+                                    select value
                                        into D3#E2_
                                     from operw
                                     where ref=refd_
                                       and tag='D3#70';
-                                    
-                                    if instr(D3#E2_, '/') > 0 then
-                                       D3#E2_ := to_char(to_date(D3#E2_, 'dd/mm/yyyy'), 'ddmmyyyy');
-                                    elsif instr(D3#E2_, '.') > 0 then
-                                       D3#E2_ := to_char(to_date(D3#E2_, 'dd.mm.yyyy'), 'ddmmyyyy');
-                                    else 
-                                       D3#E2_ := to_char(to_date(D3#E2_), 'ddmmyyyy');
-                                    end if;
                                  exception
                                     when no_data_found then
-                                        null;
-                                    when others then
-                                        null;
+                                     null;
                                  end;
                               end if;
-                              
-                              cont_dat_ := D3#E2_;
 
                               if i=6 and val_ is null and D6#E2_ is null then
                                  begin
@@ -1678,3 +1658,15 @@ BEGIN
     logger.info ('P_FE2_NN: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 END p_fe2_nn;
 /
+show err;
+
+PROMPT *** Create  grants  P_FE2_NN ***
+grant EXECUTE                                                                on P_FE2_NN        to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on P_FE2_NN        to RPBN002;
+grant EXECUTE                                                                on P_FE2_NN        to WR_ALL_RIGHTS;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_FE2_NN.sql =========*** End *** 
+PROMPT ===================================================================================== 

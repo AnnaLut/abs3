@@ -24,53 +24,53 @@ IS
                                       2 - надходження вiд нерезидентiв
                                       3 - всi операцii
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-23/03/2016 будут включаться суммы документов строго больше 1000$ 
-23/02/2016 протокол формирования будет сохраняться в таблицу 
+23/03/2016 будут включаться суммы документов строго больше 1000$
+23/02/2016 протокол формирования будет сохраняться в таблицу
            OTCN_TRACE_70
 12/10/2015 Откоментарил формирование пок-ля 99 в зависимости от кода меты
 11/08/2015 для всех РУ СБ при формировании #70, #D3
            будут включаться проводки
            #70 - Дт 2900  Кт 2520,2530,2541,2542,2544,2545
-           #D3 - Дт 2520,2530,2541,2544  Кт 2900  
+           #D3 - Дт 2520,2530,2541,2544  Кт 2900
 02/07/2015 Будут включаться проводки Дт 2620,2625 Кт 3800  (замечание СБ)
            Закоментарил формирование пок-ля 99 в зависимости от кода меты
-22/06/2015 для 300465 показатель 99 (відомості про операцію) будем 
-           формировать в зависимости от кода меты покупки 
+22/06/2015 для 300465 показатель 99 (відомості про операцію) будем
+           формировать в зависимости от кода меты покупки
            (службова Рощиної 52-18/773 від 12.06.2015)
 12/06/2015 для Сбербанка(300465) для продажи будем включать проводки
-           Дт 2603  Кт 3739 и назначение "перерахування кошт_в на продаж" 
-29/05/2015 Будут включаться проводки Дт 2610,2615,2630,2635 Кт 3800 
+           Дт 2603  Кт 3739 и назначение "перерахування кошт_в на продаж"
+29/05/2015 Будут включаться проводки Дт 2610,2615,2630,2635 Кт 3800
            (замечание СБ)
 26/05/2015 Будут включаться проводки Дт 2900 Кт 2602 (замечание СБ)
-02/03/2015 Удалила дубли проводок, включаются проводки вида 2600 - 2900, а 
+02/03/2015 Удалила дубли проводок, включаются проводки вида 2600 - 2900, а
            затем 2900 - 3739. Вторую часть удаляєм.
 13/02/2015 для продажи валюты код мети продажу дополнительно определяем из
            таблицы ZAYAVKA поле "aims_code"
 02/10/2014 для 300120 показатель 71NNNN всегда будет '01'
 01/09/2014 для покупки будут включаться док-ты с суммой не менее 100000.00$
-17/07/2014 для Сбербанка(300465) и пока только для Харькова (351823) 
-           для продажи будем удалять проводки 
+17/07/2014 для Сбербанка(300465) и пока только для Харькова (351823)
+           для продажи будем удалять проводки
            Дт 2600,2620,2650  Кт 2900 которые есть в табл. ZAYAVKA
 14/07/2014 для Сбербанка(300465) для продажи будем включать проводки
-           Дт 2900,2600,2620,2650  Кт 3739 и назначение "перерахування 
+           Дт 2900,2600,2620,2650  Кт 3739 и назначение "перерахування
            коштів на продаж"
 25/06/2014 для Сбербанка(300465) для продажи будем включать проводки
            Дт 2603  Кт 3739 и назначение "перерахування кошт_в для
-           обов_язкового продажу" 
-28/05/2014 исключаем проводки по конверсии (после внедрения модуля  
-           конвертации валют) эти проволдки существуют в табл. ZAYAVKA и 
+           обов_язкового продажу"
+28/05/2014 исключаем проводки по конверсии (после внедрения модуля
+           конвертации валют) эти проволдки существуют в табл. ZAYAVKA и
            для них DK=3
-09/04/2014 включались суммы док-тов >=1001$ а необходимо 1000.01$ и больше 
-03/04/2014 будут отбираться суммы документов строго больше 1000$ 
+09/04/2014 включались суммы док-тов >=1001$ а необходимо 1000.01$ и больше
+03/04/2014 будут отбираться суммы документов строго больше 1000$
 26/02/2014 не включаем проводки Дт 2900 Кт 2900 и D#39 in (110,120,131,132)
-25/02/2014 для продажи не включались суммы которые в эквиваленте больше 
-           1000.00$  
+25/02/2014 для продажи не включались суммы которые в эквиваленте больше
+           1000.00$
 19/02/2014 для физлиц резидентов не имеющих ОКРО определяем серию и номер
            паспорта
-17/02/2014 для продажи включались суммы которые в эквиваленте меньше 
-           1000.00$ но общая сумма для клиента в эквиваленте больше 
+17/02/2014 для продажи включались суммы которые в эквиваленте меньше
+           1000.00$ но общая сумма для клиента в эквиваленте больше
            1000.00$ (было в ГОУ)
-14/02/2014 для продажи не включались суммы которые в эквиваленте больше 
+14/02/2014 для продажи не включались суммы которые в эквиваленте больше
            1000.00$ (750.00 евро)
 13/02/2014 для продажи будут включаться док-ты с суммой не менее 1000.00$
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
@@ -107,7 +107,7 @@ IS
    rnk_       NUMBER;
    okpo_      VARCHAR2 (14);
    ourOKPO_   varchar2(14);
-   ourGLB_    varchar2(3); 
+   ourGLB_    varchar2(3);
    nmk_       VARCHAR2 (70);
    adr_       VARCHAR2 (70);
    k040_      VARCHAR2 (3);
@@ -157,38 +157,38 @@ IS
    ser_       person.ser%TYPE;
    numdoc_    person.numdoc%TYPE;
    kod_obl_   varchar2 (2);
-   dat_Izm1_  DATE := TO_DATE('21032016','ddmmyyyy'); -- новая сумма отбора 1000.00 
+   dat_Izm1_  DATE := TO_DATE('21032016','ddmmyyyy'); -- новая сумма отбора 1000.00
 
 --курсор по контрагентам
    CURSOR c_main
    IS
-      SELECT   t.ko, 
-               nvl(decode(substr(b.b040,9,1),'2',substr(b.b040,15,2),substr(b.b040,10,2)),nbuc_), 
+      SELECT   t.ko,
+               nvl(decode(substr(b.b040,9,1),'2',substr(b.b040,15,2),substr(b.b040,10,2)),nbuc_),
                c.rnk, c.okpo, c.nmk, TO_CHAR (c.country), c.adr,
-               NVL (c.ved, '00000'), c.codcagent, 
-               1, 
+               NVL (c.ved, '00000'), c.codcagent,
+               1,
                SUM (t.s_eqv),
                SUM (gl.p_icurval (t.kv, t.s_kom, dat_))
                                                     --сумма в формате грн.коп
           FROM OTCN_PROV_TEMP t, customer c, tobo b  --branch b
          WHERE t.rnk = c.rnk
-           and c.tobo = b.tobo(+)  --c.branch = b.branch 
+           and c.tobo = b.tobo(+)  --c.branch = b.branch
       GROUP BY t.ko,
-               nvl(decode(substr(b.b040,9,1),'2',substr(b.b040,15,2),substr(b.b040,10,2)),nbuc_), 
+               nvl(decode(substr(b.b040,9,1),'2',substr(b.b040,15,2),substr(b.b040,10,2)),nbuc_),
                c.rnk,
                c.okpo,
                c.nmk,
                TO_CHAR (c.country),
                c.adr,
                NVL (c.ved, '00000'),
-               c.codcagent, 
-               1 
+               c.codcagent,
+               1
       ORDER BY 2;
 
 --- Покупка/Продаж безготiвковоi валюти i надходження вiд нерезидентiв
    CURSOR opl_dok
    IS
-      SELECT   t.ko, t.REF, t.acck, t.nlsk, t.kv, t.accd, t.nlsd, t.nazn, 
+      SELECT   t.ko, t.REF, t.acck, t.nlsk, t.kv, t.accd, t.nlsd, t.nazn,
                SUM (t.s_nom),
                SUM (t.s_kom)
           FROM OTCN_PROV_TEMP t
@@ -325,9 +325,9 @@ IS
 
             if nls_ like '2900205%' and nlsk_ like '29003%' or
                --nls_ like '2909%' and nlsk_ like '2900%' or
-               nls_ like '2625%' and nlsk_ like '2900%' 
+               nls_ like '2625%' and nlsk_ like '2900%'
             then
-               p_value_ := '16';     
+               p_value_ := '16';
             end if;
          END IF;
 
@@ -335,14 +335,14 @@ IS
          THEN
             p_value_ := NVL (SUBSTR (TRIM (p_value_), 1, 2), '00');
          END IF;
-         
+
          d1#70_ := p_value_;
       ELSIF p_i_ = 2
       THEN
          p_kodp_ := '51';
          p_value_ := NVL (SUBSTR (TRIM (p_value_), 1, 70), 'N контр.');
 
-         if ko_ = 2 and (trim(p_value_) is null or trim(p_value_)='N контр.') 
+         if ko_ = 2 and (trim(p_value_) is null or trim(p_value_)='N контр.')
          then
             a2_ := ' ';
             IF pr_s3_ >= 1
@@ -356,7 +356,7 @@ IS
                      INTO p_value_, a2_
                   USING ref_ ;
                EXCEPTION WHEN NO_DATA_FOUND THEN
-                 a2_ := ' ';  
+                 a2_ := ' ';
                END;
             END IF;
 
@@ -369,7 +369,7 @@ IS
          p_kodp_ := '52';
          p_value_ := NVL (SUBSTR (TRIM (p_value_), 1, 70), 'DDMMYYYY');
 
-         if ko_ = 2 and (trim(p_value_) is null or trim(p_value_)='DDMMYYYY') 
+         if ko_ = 2 and (trim(p_value_) is null or trim(p_value_)='DDMMYYYY')
          then
             a3_ := ' ';
             IF pr_s3_ >= 1
@@ -383,7 +383,7 @@ IS
                      INTO p_value_, a3_
                   USING ref_ ;
                EXCEPTION WHEN NO_DATA_FOUND THEN
-                  a3_ := ' ';  
+                  a3_ := ' ';
                END;
             END IF;
 
@@ -628,7 +628,7 @@ IS
 
       ELSIF p_i_ = 11
       THEN
-         IF dat_ >= TO_DATE ('03-07-2006','dd-mm-yyyy') and dat_ <= TO_DATE ('01-01-2012','dd-mm-yyyy') 
+         IF dat_ >= TO_DATE ('03-07-2006','dd-mm-yyyy') and dat_ <= TO_DATE ('01-01-2012','dd-mm-yyyy')
          THEN
             p_kodp_ := '70';
             p_value_ :=
@@ -638,7 +638,7 @@ IS
             p_value_:='0';
          end if;
 
-         IF dat_ >= TO_DATE ('01-09-2014','dd-mm-yyyy')  
+         IF dat_ >= TO_DATE ('01-09-2014','dd-mm-yyyy')
          THEN
             p_kodp_ := '71';
             p_value_ :=
@@ -648,7 +648,7 @@ IS
                p_value_ := '01';
             end if;
          END IF;
-     ELSIF p_i_ = 13 
+     ELSIF p_i_ = 13
      THEN
         --для продажу валюти i надходження вiд нерезидентiв новий показник
         IF dat_ >= TO_DATE('13082007','ddmmyyyy') AND ko_ = 2 then
@@ -656,33 +656,33 @@ IS
            p_value_ :=NVL (SUBSTR (TRIM (p_value_), 1, 70), '');
            if trim(p_value_) is null then
               BEGIN
-                 select DECODE(substr(lower(txt),1,13), 'продано вир.в', 'продаж валютної виручки',txt) 
+                 select DECODE(substr(lower(txt),1,13), 'продано вир.в', 'продаж валютної виручки',txt)
                     into p_value_
-                 from kod_d3_1 
+                 from kod_d3_1
                  where p40 = d1#D3_;
               EXCEPTION WHEN NO_DATA_FOUND THEN
                  null;
-              END;  
+              END;
            end if;
         END IF;
 
-        IF trim(p_value_) is NULL and mfo_ in (300465,333368) 
-        THEN 
+        IF trim(p_value_) is NULL and mfo_ in (300465,333368)
+        THEN
            p_value_ := substr(nazn_,1,70);
         END IF;
 
-        if mfo_ = 300465 and nlsk_ like '2900%' and nls_ like '2909%' 
+        if mfo_ = 300465 and nlsk_ like '2900%' and nls_ like '2909%'
         then
-           p_value_ := '555';     
+           p_value_ := '555';
         end if;
 
-        if nls_ like '2900205%' and nlsk_ like '29003%' 
+        if nls_ like '2900205%' and nlsk_ like '29003%'
         then
-           p_value_ := 'вiльний продаж';     
+           p_value_ := 'вiльний продаж';
         end if;
 
-        IF mfou_ = 300465 and ko_ = 2 
-        THEN 
+        IF mfou_ = 300465 and ko_ = 2
+        THEN
            case
               when d1#D3_ = '11' then p_value_ := 'Виручка';
               when d1#D3_ = '12' then p_value_ := 'Інвестиційні кошти';
@@ -695,7 +695,7 @@ IS
               when d1#D3_ = '20' then p_value_ := 'Продаж повернутої передоплати';
               when d1#D3_ = '37' then p_value_ := 'Продаж переказів';
               when d1#D3_ = '38' then p_value_ := 'Повернення вкладів';
-            else 
+            else
                null;
             end case;
         END IF;
@@ -792,27 +792,27 @@ BEGIN
 
    -- з 11.02.2014 для продажу валюти включаються всi операцii >=100000 долларов
    IF dat_>= to_date('11022014','ddmmyyyy') then
-      gr_sumn_ := 100000;  
+      gr_sumn_ := 100000;
    END IF;
 
    -- з 01.09.2014 для купівлі валюти включаються всi операцii >=10000000 долларов
-   IF dat_>= to_date('01092014','ddmmyyyy') and dat_ < dat_Izm1_ 
+   IF dat_>= to_date('01092014','ddmmyyyy') and dat_ < dat_Izm1_
    then
-      gr_sum_ := 10000000;  
+      gr_sum_ := 10000000;
    END IF;
 
    -- з 21.03.2016 для купівлі валюти включаються всi операцii >=100000 долларов
    IF dat_>= dat_Izm1_ then
-      gr_sum_ := 100000;  
+      gr_sum_ := 100000;
    END IF;
-    
+
    -- отбор проводок, удовлетворяющих условию
    INSERT INTO OTCN_PROV_TEMP
                (ko, rnk, REF, acck, nlsk, kv, accd, nlsd, nazn, s_nom, s_eqv)
       SELECT *
         FROM ( 		--купівля валюти
 			  SELECT   '1' ko, ca.rnk, o.REF, o.acck, o.nlsk,
-			           o.kv, o.accd, o.nlsd, o.nazn, 
+			           o.kv, o.accd, o.nlsd, o.nazn,
                        SUM (o.s * 100) s_nom,
                        SUM (gl.p_icurval (o.kv, o.s * 100, dat_)) s_eqv
                   FROM provodki o, cust_acc ca
@@ -820,8 +820,8 @@ BEGIN
                    AND o.kv not in (959, 961, 962, 964, 980)
                    AND (   (    SUBSTR (o.nlsd, 1, 4) = '2900'
                             AND SUBSTR (o.nlsk, 1, 4) IN
-                                     ('1600', '1602', '2520', '2530', 
-                                      '2541', '2542', '2544', '2545', 
+                                     ('1600', '1602', '2520', '2530',
+                                      '2541', '2542', '2544', '2545',
                                       '2600', '2602', '2620', '2650')
                             AND LOWER (TRIM (o.nazn)) not like '%конверс%'
                             AND LOWER (TRIM (o.nazn)) not like '%конверт%'
@@ -831,12 +831,12 @@ BEGIN
                             AND SUBSTR (o.nlsk, 1, 4) = '2900'
                            )
                         OR (    SUBSTR (o.nlsd, 1, 4) = '3540'
-                            AND SUBSTR (o.nlsk, 1, 4) = '1819' 
+                            AND SUBSTR (o.nlsk, 1, 4) = '1819'
                             AND LOWER (TRIM (o.nazn)) like '%куп_вля%'
                             AND mfou_ = 380764
                            )
                         OR (    SUBSTR (o.nlsd, 1, 4) = '3540'
-                            AND SUBSTR (o.nlsk, 1, 4) = '3800' 
+                            AND SUBSTR (o.nlsk, 1, 4) = '3800'
                             AND LOWER (TRIM (o.nazn)) like '%закриття forex%'
                             AND mfou_ = 300205
                            )
@@ -850,18 +850,18 @@ BEGIN
                            )
                        )
                    AND o.acck = ca.acc
-              GROUP BY '1', ca.rnk, o.REF, o.acck, o.nlsk, o.kv, o.accd, o.nlsd, o.nazn 
+              GROUP BY '1', ca.rnk, o.REF, o.acck, o.nlsk, o.kv, o.accd, o.nlsd, o.nazn
               UNION ALL -- продаж валюти
-              SELECT   '2' ko, ca.rnk, o.REF, o.accd, o.nlsd, o.kv, o.acck, o.nlsk, o.nazn, 
+              SELECT   '2' ko, ca.rnk, o.REF, o.accd, o.nlsd, o.kv, o.acck, o.nlsk, o.nazn,
                        SUM (o.s * 100) s_nom,
                        SUM (gl.p_icurval (o.kv, o.s * 100, dat_)) s_eqv
                   FROM provodki o, cust_acc ca
                  WHERE o.fdat = dat_
                    AND o.kv not in (959, 961, 962, 964, 980)
                    AND (   (    SUBSTR (o.nlsk, 1, 4) = '2900'
-                            AND                     
+                            AND
                                 SUBSTR (o.nlsd, 1, 4) IN
-                                     ('1600', '1602', '2520', '2530', 
+                                     ('1600', '1602', '2520', '2530',
                                       '2541', '2544', '2600', '2603',
                                       '2620', '2650', '3640')
                             AND LOWER (TRIM (o.nazn)) not like '%конверс%'
@@ -876,110 +876,110 @@ BEGIN
                         OR (    SUBSTR (o.nlsk, 1, 4) = '2900'  -- 14.12.2012 было сделано только для Сбербанка
                             AND SUBSTR (o.nlsd, 1, 4) = '2909'  -- 28.12.2012 для Всех (убрал МФО)
                            )
-                        OR (    SUBSTR (o.nlsd, 1, 4) in ('2625', '3570')  
-                            AND SUBSTR (o.nlsk, 1, 4) = '2900'  
-                            AND mfo_ <> 300465 
+                        OR (    SUBSTR (o.nlsd, 1, 4) in ('2625', '3570')
+                            AND SUBSTR (o.nlsk, 1, 4) = '2900'
+                            AND mfo_ <> 300465
                            )
                         OR (    SUBSTR (o.nlsd, 1, 4) = '3800'
                             AND SUBSTR (o.nlsk, 1, 4) in ('1819', '2900')
-                            AND (mfou_ not in (300465, 300120, 380764) or    
-                                 (mfou_ = 380764 and 
-                                  LOWER (TRIM (o.nazn)) not like '%рефинан%' and  
+                            AND (mfou_ not in (300465, 300120, 380764) or
+                                 (mfou_ = 380764 and
+                                  LOWER (TRIM (o.nazn)) not like '%рефинан%' and
                                   LOWER (TRIM (o.nazn)) not like '%згортання%') )
                             AND SUBSTR (LOWER (TRIM (o.nazn)), 1, 4) <> 'конв'
                            )
                         OR (    SUBSTR (o.nlsd, 1, 4) = '3800'
                             AND SUBSTR (o.nlsk, 1, 4) = '3640'
-                            AND mfou_ = 380764 
-                            AND LOWER (TRIM (o.nazn)) like '%продаж%' 
+                            AND mfou_ = 380764
+                            AND LOWER (TRIM (o.nazn)) like '%продаж%'
                            )
                         OR (    SUBSTR (o.nlsd, 1, 4) = '3800'
-                            AND SUBSTR (o.nlsk, 1, 4) = '3640' 
+                            AND SUBSTR (o.nlsk, 1, 4) = '3640'
                             AND LOWER (TRIM (o.nazn)) like '%forex swap%'
                             AND mfou_ = 300205
                            )
                         OR (    SUBSTR (o.nlsd, 1, 4) = '3640'
                             AND SUBSTR (o.nlsk, 1, 4) = '1919'
-                            AND mfou_ = 380764 
-                            AND LOWER (TRIM (o.nazn)) like '%продаж%' 
+                            AND mfou_ = 380764
+                            AND LOWER (TRIM (o.nazn)) like '%продаж%'
                            )
                         OR (    SUBSTR (o.nlsd, 1, 4) = '1919'
                             AND SUBSTR (o.nlsk, 1, 4) = '2900'
-                            AND mfou_ = 380764 
-                            AND (LOWER (TRIM (o.nazn)) like '%продажа валют_%' or 
-                                 LOWER (TRIM (o.nazn)) like '%продаж валют_%') 
+                            AND mfou_ = 380764
+                            AND (LOWER (TRIM (o.nazn)) like '%продажа валют_%' or
+                                 LOWER (TRIM (o.nazn)) like '%продаж валют_%')
                            )
                         OR (    SUBSTR (o.nlsd, 1, 4) = '2900'
                             AND SUBSTR (o.nlsk, 1, 4) = '2900'
-                            AND mfou_ = 300465 AND mfou_ <> mfo_ 
-                            AND LOWER (TRIM (o.nazn)) like '%продаж%'                            
+                            AND mfou_ = 300465 AND mfou_ <> mfo_
+                            AND LOWER (TRIM (o.nazn)) like '%продаж%'
                           )
                         OR (    SUBSTR (o.nlsd, 1, 4) = '2924'
                             AND SUBSTR (o.nlsk, 1, 4) = '2900'
-                            AND mfou_ = 380764 
-                            AND LOWER (TRIM (o.nazn)) like '%перерахування кошт_в для в_льного продажу%' 
+                            AND mfou_ = 380764
+                            AND LOWER (TRIM (o.nazn)) like '%перерахування кошт_в для в_льного продажу%'
                            )
                         OR (    SUBSTR (o.nlsd, 1, 4) = '2924'
                             AND SUBSTR (o.nlsk, 1, 4) = '2900'
-                            AND mfou_ = 300120 
+                            AND mfou_ = 300120
                            )
-                        OR (    o.nlsd LIKE '2900205%'    -- по письму Уманец от 16.04.2013 
+                        OR (    o.nlsd LIKE '2900205%'    -- по письму Уманец от 16.04.2013
                             AND o.nlsk LIKE '29003%'
-                            AND mfo_ = 300465 
+                            AND mfo_ = 300465
                            )
                         OR (    SUBSTR (o.nlsd, 1, 4) = '2603'
                             AND SUBSTR (o.nlsk, 1, 4) = '3739'
-                            AND mfou_ = 300465 
-                            AND ( LOWER (TRIM (o.nazn)) like '%перерахування кошт_в для обов_язкового продажу%' OR 
+                            AND mfou_ = 300465
+                            AND ( LOWER (TRIM (o.nazn)) like '%перерахування кошт_в для обов_язкового продажу%' OR
                                   LOWER (TRIM (o.nazn)) like '%перерахування кошт_в на продаж%'
                                 )
                            )
                         OR (    SUBSTR (o.nlsd, 1, 4) in ('2900', '2600', '2620', '2650')
                             AND SUBSTR (o.nlsk, 1, 4) = '3739'
-                            AND mfou_ = 300465 
-                            AND LOWER (TRIM (o.nazn)) like '%перерахування кошт_в на продаж%' 
+                            AND mfou_ = 300465
+                            AND LOWER (TRIM (o.nazn)) like '%перерахування кошт_в на продаж%'
                            )
                         OR (    SUBSTR (o.nlsd, 1, 4) in ('2610', '2615', '2620', '2625', '2630', '2635')
                             AND SUBSTR (o.nlsk, 1, 4) = '3800'
-                            AND mfou_ = 300465 
+                            AND mfou_ = 300465
                            )
                         OR (    SUBSTR (o.nlsd, 1, 4) in ('2625','2909','2600')
-                            AND SUBSTR (o.nlsk, 1, 4) = '2900' 
+                            AND SUBSTR (o.nlsk, 1, 4) = '2900'
                             AND mfou_ = 300120
                            )
                         OR (    SUBSTR (o.nlsd, 1, 4) in ('2800','2900')
-                            AND SUBSTR (o.nlsk, 1, 4) = '3800' 
+                            AND SUBSTR (o.nlsk, 1, 4) = '3800'
                             AND mfou_ = 300120
                            )
-                       ) 
+                       )
                    AND o.accd = ca.acc
               GROUP BY '2', ca.rnk, o.REF, o.accd, o.nlsd, o.kv, o.acck, o.nlsk, o.nazn );
 
    -- для РУ Ощадбанку видаляємо проводки виду Дт 2600/2620/2650 Кт 2900
    -- якщо наявна заявка на продаж валюти на цю суму по цьому клієнту в найближчі +/- 3 дні
-   if mfou_ = 300465 and mfo_ = 351823 
-   then 
+   if mfou_ = 300465 and mfo_ = 351823
+   then
       DELETE FROM otcn_prov_temp a
-      WHERE 
-        (select max(id) from zayavka z 
+      WHERE
+        (select max(id) from zayavka z
            where z.dk=2 and z.s2=a.s_nom and z.kv2=a.kv and abs(z.fdat-dat_)<4 and z.acc1=a.accd) is not null
         and SUBSTR (a.nlsk, 1, 4) in ('2600', '2620', '2650')
         and a.nlsd like '2900%';
    end if;
-   
+
    -- удаляем проводки вида Дт 2900 Кт 2900 для продажи если это не ЦБ
-   if mfou_ <> 380764 and mfo_ <> 300465 
-   then 
+   if mfou_ <> 380764 and mfo_ <> 300465
+   then
       DELETE FROM otcn_prov_temp a
-      WHERE a.nlsd like '2900%' 
-        and a.nlsk like '2900%' 
-        and a.ko = 2 
-        and a.ref not in (SELECT ref 
-                          FROM provodki 
+      WHERE a.nlsd like '2900%'
+        and a.nlsk like '2900%'
+        and a.ko = 2
+        and a.ref not in (SELECT ref
+                          FROM provodki
                           WHERE ref=a.ref
                             and (nlsd like '2901%' or nlsk like '2901%'))
-        and a.ref not in (SELECT ref 
-                          FROM operw 
+        and a.ref not in (SELECT ref
+                          FROM operw
                           WHERE ref=a.ref
                             and tag ='D#39'
                             and trim(value) is not null
@@ -987,60 +987,60 @@ BEGIN
    end if;
 
    -- удаляем проводки вида Дт 2900 Кт 2900 для продажи если это назн.плат. не "вiльний продаж валютних коштiв"
-   if mfou_ = 380764 
+   if mfou_ = 380764
    then
       DELETE FROM otcn_prov_temp a
-      WHERE a.nlsd like '2900%' 
-        and a.nlsk like '2900%' 
-        and a.ko = 2 
-        and LOWER (a.nazn) not like '%в_льний продаж валютних кошт_в%'; 
+      WHERE a.nlsd like '2900%'
+        and a.nlsk like '2900%'
+        and a.ko = 2
+        and LOWER (a.nazn) not like '%в_льний продаж валютних кошт_в%';
    end if;
 
    -- 10.12.2012
    -- удаляем проводки вида Дт 2603 Кт 2900 внутрибанковские операции
-   if mfou_=300120 
+   if mfou_=300120
    then
       DELETE FROM otcn_prov_temp a
-      WHERE a.nlsd like '2603%' 
-        and a.nlsk like '2900%' 
-        and a.ko = 2 
-        and a.ref in (SELECT ref 
-                      FROM operw 
+      WHERE a.nlsd like '2603%'
+        and a.nlsk like '2900%'
+        and a.ko = 2
+        and a.ref in (SELECT ref
+                      FROM operw
                       WHERE ref=a.ref
                         and tag like 'D#27%'
                         and trim(value) <> '01');
    end if;
 
    -- удаляем все проводки Дт 2909 Кт 2900 кроме Дт 2909 (OB22=56) Кт 2900 (OB22=01) Cбербанк
-   if mfou_ = 300465 
+   if mfou_ = 300465
    then
       delete from otcn_f70_temp a
-      where a.nlsd like '2900%' 
+      where a.nlsd like '2900%'
         and a.nlsk like '2909%'
-        and a.accd in ( select acc 
-                        from specparam_int 
-                        where acc in (select acc 
-                                      from accounts 
-                                      where nbs='2900') 
+        and a.accd in ( select acc
+                        from specparam_int
+                        where acc in (select acc
+                                      from accounts
+                                      where nbs='2900')
                           and NVL(trim(ob22),'00') <> '01'
                       );
    end if;
 
-   if mfou_ = 300465 and pr_op_ = 3 
+   if mfou_ = 300465 and pr_op_ = 3
    then
       delete from otcn_prov_temp a
-      where a.nlsk like '2900%' 
-        and a.nlsd like '3739%' 
-        and exists ( select 1 
+      where a.nlsk like '2900%'
+        and a.nlsd like '3739%'
+        and exists ( select 1
                      from otcn_prov_temp b
-                     where b.accd = a.acck 
+                     where b.accd = a.acck
                        and b.s_nom = a.s_nom
-                   ) 
+                   )
         and a.ref in ( select ref_sps
                        from zayavka
-                     );     
+                     );
    end if;
-   
+
    IF pr_s3_ >= 1
    THEN
       sql_z :=
@@ -1053,7 +1053,7 @@ BEGIN
 
    -- 28.05.2014 для 300465 исключаем проводки по конверсии
    -- c 26.05.2014 установлен модуль по конверсии
-   IF mfou_ = 300465 
+   IF mfou_ = 300465
    THEN
       sql_z :=
             'UPDATE OTCN_PROV_TEMP t '
@@ -1074,41 +1074,41 @@ BEGIN
       sum1_ := sum1_ - NVL (sumk1_, 0);
       rez_ := MOD (codc_, 2);
 
-      -- 10.06.2009 изменил на следующее         
-      if length(trim(okpo_)) <= 8 
+      -- 10.06.2009 изменил на следующее
+      if length(trim(okpo_)) <= 8
       then
          okpo_:=lpad(trim(okpo_),8,'0');
-      else 
+      else
          okpo_:=lpad(trim(okpo_),10,'0');
       end if;
 
-      -- для банков по коду ОКПО из RCUKRU(IKOD) 
+      -- для банков по коду ОКПО из RCUKRU(IKOD)
       -- определяем код банка поле GLB
-      if codc_ in (1,2) 
+      if codc_ in (1,2)
       then
          BEGIN
-            select glb 
+            select glb
                into okpo_
             from rcukru
             where trim(ikod)=trim(okpo_)
               and rownum=1;
-         EXCEPTION WHEN NO_DATA_FOUND THEN 
+         EXCEPTION WHEN NO_DATA_FOUND THEN
             null;
          END;
       end if;
 
-      -- для физлиц резидентов не имеющих OKPO 
+      -- для физлиц резидентов не имеющих OKPO
       --определяем серию и номер паспорта из PERSON
       if codc_ = 5 and trim(okpo_) in ('99999','999999999','00000','000000000','0000000000')
       then
          BEGIN
-            select ser, numdoc 
+            select ser, numdoc
                into ser_, numdoc_
             from person
             where rnk = rnk_
               and rownum=1;
-            okpo_ := trim(ser_) || ' ' || trim(numdoc_);               
-         EXCEPTION WHEN NO_DATA_FOUND THEN 
+            okpo_ := trim(ser_) || ' ' || trim(numdoc_);
+         EXCEPTION WHEN NO_DATA_FOUND THEN
             null;
          END;
       end if;
@@ -1131,9 +1131,9 @@ BEGIN
 
             EXIT WHEN opl_dok%NOTFOUND;
 
-            IF ko_ = ko_1 and ( (kodf_='D3' AND ROUND (GL.P_ICURVAL(kv_, sum0_, dat_) / kurs1_, 0) > gr_sumn_) OR 
-                                (kodf_<>'D3' AND ROUND (GL.P_ICURVAL(kv_, sum0_, dat_) / kurs_, 0) > gr_sum_) 
-                              )  
+            IF ko_ = ko_1 and ( (kodf_='D3' AND ROUND (GL.P_ICURVAL(kv_, sum0_, dat_) / kurs1_, 0) > gr_sumn_) OR
+                                (kodf_<>'D3' AND ROUND (GL.P_ICURVAL(kv_, sum0_, dat_) / kurs_, 0) > gr_sum_)
+                              )
             THEN
                IF typ_ > 0
                THEN
@@ -1147,7 +1147,7 @@ BEGIN
                nnnn_ := nnnn_ + 1;
                sum0_ := sum0_ - NVL (sumk0_, 0);
 
-               if ko_ = 2 
+               if ko_ = 2
                then
                    BEGIN
                       SELECT SUBSTR (VALUE, 1, 70)
@@ -1158,9 +1158,9 @@ BEGIN
                       WHEN NO_DATA_FOUND
                       THEN
                       BEGIN
-                         SELECT  aims_code 
+                         SELECT  aims_code
                             INTO d1#D3_
-                         FROM zayavka 
+                         FROM zayavka
                          WHERE ref_sps = ref_;
                       EXCEPTION
                          WHEN NO_DATA_FOUND
@@ -1171,18 +1171,18 @@ BEGIN
                else
                   d1#D3_ := NULL;
                end if;
-                   
+
                -- проверка есть ли для данной проводки доп. реквизиты
                SELECT count(*)
                   INTO koldop_
                FROM operw
                WHERE REF = ref_ AND tag like 'D_#70';
 
-               if koldop_ > 0 
+               if koldop_ > 0
                then
                   refd_ := ref_;
                else
-                  if ko_ = 2 and nls_ like '2600%' and nlsk_ like '2900%' 
+                  if ko_ = 2 and nls_ like '2600%' and nlsk_ like '2900%'
                   then
                      begin
                         select ref
@@ -1241,7 +1241,7 @@ BEGIN
                   end if;
 
                   if nls_ like '2900205%' and nlsk_ like '29003%' then
-                     okpo_ := '0';     
+                     okpo_ := '0';
                   end if;
 
 	          p_ins (nnnn_, '31', TRIM (okpo_));
@@ -1258,7 +1258,7 @@ BEGIN
                END IF;
 
                IF dat_ >=TO_DATE('13082007','ddmmyyyy') and
-                  pr_op_ = 3 AND ko_ = 2 
+                  pr_op_ = 3 AND ko_ = 2
                THEN
                   -- код резидентностi
                   p_ins (nnnn_, '35', to_char(2-mod(codc_,2)));
@@ -1309,7 +1309,7 @@ BEGIN
 
                      if dat_ <= to_date('01012013', 'ddmmyyyy') OR
                         (dat_ between to_date('01012013', 'ddmmyyyy') and
-                                      to_date('31082014', 'ddmmyyyy') and 
+                                      to_date('31082014', 'ddmmyyyy') and
                                       i <> 11) OR
                         dat_ >= to_date('01092014', 'ddmmyyyy')
                      then
@@ -1326,8 +1326,8 @@ BEGIN
                       dat_ < TO_DATE('13082007','ddmmyyyy') and
                       pr_op_ = 3 AND ko_ = 2 AND i=1) OR
                       (dat_ >=TO_DATE('13082007','ddmmyyyy') and
-                       dat_ < TO_DATE('01062009','ddmmyyyy') and 
-                       pr_op_ = 3 AND ko_ = 2 AND i in (1, 2, 3, 13) OR 
+                       dat_ < TO_DATE('01062009','ddmmyyyy') and
+                       pr_op_ = 3 AND ko_ = 2 AND i in (1, 2, 3, 13) OR
                       (dat_ >=TO_DATE('01062009','ddmmyyyy') and
                        pr_op_ = 3 AND ko_ = 2 AND i in (1, 13))) --AND ROUND (sum0_ / dig_, 0) >= 1
                   THEN
@@ -1360,7 +1360,7 @@ BEGIN
                       pr_op_ = 2 AND ko_ = 3 AND i IN (1,2,3,4,6,11,12))
                   THEN
                      -- 16.06.06 OAB добавил условие, если Украина, то не формируем
-                     IF d6#70_ IS NULL OR TRIM (d6#70_) <> '804' 
+                     IF d6#70_ IS NULL OR TRIM (d6#70_) <> '804'
                      THEN
                         BEGIN
                            SELECT SUBSTR (VALUE, 1, 70)
@@ -1394,8 +1394,8 @@ BEGIN
          WHERE kodf = kodf_ AND datf = dat_;
 
 ---------------------------------------------------
-   INSERT INTO tmp_nbu 
-   (kodf, datf, kodp, znap, nbuc) 
+   INSERT INTO tmp_nbu
+   (kodf, datf, kodp, znap, nbuc)
       SELECT kodf_, dat_, kodp, znap, nbuc
         FROM rnbu_trace
        WHERE userid = userid_;

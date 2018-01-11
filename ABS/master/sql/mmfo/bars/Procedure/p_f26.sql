@@ -7,12 +7,12 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_F26 ***
 
-CREATE OR REPLACE PROCEDURE BARS.p_f26 (Dat_ DATE )  IS
+  CREATE OR REPLACE PROCEDURE BARS.P_F26 (Dat_ DATE )  IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Процедура формирование файла #26 для КБ
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 %
-% VERSION     :   v.16.006 10/01/2018 (28.12.2017, 14.11.2017) 
+% VERSION     :   v.16.005  (28.12.2017, 14.11.2017) 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
      параметры:  Dat_ - отчетная дата
 
@@ -81,7 +81,6 @@ nbs_o    Varchar2(4);
 nls_     Varchar2(15);
 dat1_    Date;
 data_    Date;
-datr_    date;
 kv_      SMALLINT;
 dk_      Varchar2(2);
 se_      DECIMAL(24);
@@ -128,7 +127,6 @@ s580a_   Varchar2(1);
 kod_j_   Varchar2(1);
 
 rnk_     Number;
-userid_    NUMBER;
 
 comm_           rnbu_trace.comm%TYPE;
 l_znak          smallint;
@@ -163,7 +161,6 @@ CURSOR SALDO IS
         customer c, custbank cb, kl_k040 l, kod_r020 k, 
         rcukru rc, specparam sp 
    WHERE a.nbs=k.r020                   AND
-         a.nbs not in ('1509','1519','1529')  AND 
          trim(k.prem) = 'КБ'            AND
          k.a010 = '26'                  AND
          (k.d_close is null OR 
@@ -278,11 +275,8 @@ order by kodp;
 BEGIN
 -------------------------------------------------------------------
 EXECUTE IMMEDIATE 'truncate table rnbu_trace';
-
-userid_ := user_id;
 -------------------------------------------------------------------
 EXECUTE IMMEDIATE 'alter session set NLS_NUMERIC_CHARACTERS=''.,''';
-
 
 -- свой МФО
 mfob_:=f_ourmfo();
@@ -306,8 +300,6 @@ elsif to_number(den_)<=20 then
 else
    Dat1_ := to_date('21'||to_char(Dat_,'MM')||to_char(Dat_,'YYYY'),'ddmmyyyy');
 end if;
-
-datr_ := trunc(Dat_, 'MM');
 
 sump_ := 0 ;
 znap1_ := '0' ;
@@ -428,6 +420,7 @@ LOOP
       end if;
 
       s240_ := s240s_;
+      s580_ := s580s_;
 
       begin
          select S580
@@ -453,10 +446,6 @@ LOOP
          else
             s580a_ := '9';
          end if;
-      end if;
-
-      if s580s_ <> '0' then
-         s580a_ := s580s_;
       end if;
 
       kod_j_ := '0';
@@ -681,7 +670,7 @@ LOOP
          THEN
             kodp_ := '97' || LPAD(to_char(cs_),3,'0') || kb_ || '00000000' ;
          ELSE
-            kodp_ := '97' || LPAD(to_char(cs_),3,'0') || kb_ || '000000000000'||s580a_ ;
+            kodp_ := '97' || LPAD(to_char(cs_),3,'0') || kb_ || '0000000000009' ;
          END IF;
             INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, acc, rnk) VALUES
                                 (nls_, kv_, data_, kodp_, invk_, acc_, rnk_);
@@ -710,7 +699,7 @@ LOOP
          THEN
             kodp_ := '98' || LPAD(to_char(cs_),3,'0') || kb_ || '00000000' ;
          ELSE
-            kodp_ := '98' || LPAD(to_char(cs_),3,'0') || kb_ || '000000000000'||s580a_ ;
+            kodp_ := '98' || LPAD(to_char(cs_),3,'0') || kb_ || '0000000000009' ;
          END IF;
 
          INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, acc, rnk) VALUES
@@ -720,7 +709,7 @@ LOOP
          THEN
             kodp_ := '99' || LPAD(to_char(cs_),3,'0') || kb_ || '00000000' ;
          ELSE
-            kodp_ := '99' || LPAD(to_char(cs_),3,'0') || kb_ || '000000000000'||s580a_ ;
+            kodp_ := '99' || LPAD(to_char(cs_),3,'0') || kb_ || '0000000000009' ;
          END IF;
 
          INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, acc, rnk) VALUES
@@ -730,85 +719,7 @@ LOOP
    END IF;
 END LOOP;
 CLOSE SALDO;
----------------------------------------------------
--- розшифровка рахунків резерву
-   for k in ( select /*+index(t PK_NBU23REZ_ID) */
-                t.acc, t.nls, t.kv, t.rnk, t.isp, 
-                t.nd, nvl(nvl(t.nls_rez, t.nls_rezn), t.nls_rez_30) nls_rez, 
-                t.rez*100 rez, 
-                gl.p_icurval(t.kv, t.rez*100, dat_) rezq, 
-                NVL(sp.r013,'0') r013
-              from nbu23_rez t, specparam sp
-              where t.fdat = datr_ 
-                and t.id not like 'NLO%' 
-                and t.id not like 'CAC%' 
-                and (nvl(nvl(t.nls_rez, t.nls_rezn), t.nls_rez_30) like '1509%'  OR
-                     nvl(nvl(t.nls_rez, t.nls_rezn), t.nls_rez_30) like '1519%'  OR 
-                      nvl(nvl(t.nls_rez, t.nls_rezn), t.nls_rez_30) like '1529%'  
-                    ) 
-                and (t.rez <> 0 or t.rezq <> 0)
-                and nvl(nvl(t.acc_rez, t.acc_rezn), t.acc_rez_30) = sp.acc(+) 
-            )
-   loop
 
-      nbs_ := substr(k.nls_rez, 1, 4);
-      r013_ := k.r013;
-
-      begin
-         select max(kodp) 
-            into kodp_
-         from rnbu_trace
-         where acc = k.acc
-           and substr(kodp,1,6) not in ( '201509','211509',
-                                         '201519','211519',
-                                         '201529','211529'
-                                       ) 
-           and substr(kodp,1,2) in ( '10','11', '20', '21');
-                                       
-      exception 
-         when no_data_found then
-         null;
-      end;
-
-      znap_ := to_char(k.rezq);
-      comm_ := ' розшифровка рахунку резерву ';
-
-      kodp_ := '20' || substr(kodp_,3,13) || nbs_ || substr(kodp_,20,1) || 
-                    r013_ || substr(kodp_,22);
-
-      INSERT INTO rnbu_trace
-                       ( recid, userid,
-                         nls, kv, odate, kodp,
-                         znap, acc,
-                         rnk, isp, 
-                         comm, nd
-                       )
-           VALUES (s_rnbu_record.NEXTVAL, userid_,
-                  k.nls, k.kv, dat_, kodp_,
-                  znap_, k.acc, k.rnk, k.isp, 
-                  comm_, k.nd );
-  
-      if k.kv <> 980 
-      then
-         kodp_ := '21' || substr(kodp_,3,13) || nbs_ || substr(kodp_,20,1) || 
-                    r013_ || substr(kodp_,22);
-
-         znap_ := to_char(k.rez);
-
-         INSERT INTO rnbu_trace
-                          ( recid, userid,
-                            nls, kv, odate, kodp,
-                            znap, acc,
-                            rnk, isp, 
-                            comm, nd
-                          )
-           VALUES (s_rnbu_record.NEXTVAL, userid_,
-                  k.nls, k.kv, dat_, kodp_,
-                  znap_, k.acc, k.rnk, k.isp, 
-                  comm_, k.nd);
-      end if;
-
-   end loop;
 ---------------------------------------------------
 DELETE FROM tmp_nbu where kodf='26' and datf= dat_;
 ---------------------------------------------------

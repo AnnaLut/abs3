@@ -142,7 +142,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.DR IS
   G_BODY_VERSION constant varchar2(64)  := 'version 2.04 31/05/2017';
 
   G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := ''
-  ;  
+  ;
 
   ----
   -- header_version - возвращает версию заголовка пакета
@@ -178,14 +178,14 @@ begin
      INSERT into deb_reg_rnk (rnk, sumd )
      SELECT a.rnk RNK, -sum(gl.p_icurval(a.kv, fost(a.acc, DAT_) , DAT_)) SUMD
      FROM accounts a, nbs_ob22_tip n
-     WHERE n.tip in ('SP ','SPN','SK9') and a.nbs||nvl(a.ob22,'00')=n.nbs||N.OB22 and (a.dazs is null or a.dazs > DAT_) 
+     WHERE n.tip in ('SP ','SPN','SK9') and a.nbs||nvl(a.ob22,'00')=n.nbs||N.OB22 and (a.dazs is null or a.dazs > DAT_)
      GROUP BY a.rnk
      HAVING -sum(gl.p_icurval(a.kv, fost(a.acc, DAT_) , DAT_)) > 1000000;
   else
      INSERT into deb_reg_rnk (rnk, sumd )
      SELECT a.rnk RNK, -sum(gl.p_icurval(a.kv, fost(a.acc, DAT_) , DAT_)) SUMD
      FROM accounts a, deb_reg_nbs b
-     WHERE a.nbs=b.nbs and (a.dazs is null or a.dazs > DAT_) 
+     WHERE a.nbs=b.nbs and (a.dazs is null or a.dazs > DAT_)
      GROUP BY a.rnk
      HAVING -sum(gl.p_icurval(a.kv, fost(a.acc, DAT_) , DAT_)) > 1000000;
   end if;
@@ -203,7 +203,7 @@ begin
      INSERT into deb_reg_rnk (rnk, sumd )
      SELECT a.rnk RNK, -sum(gl.p_icurval(a.kv, fost(a.acc, DAT_), DAT_)) SUMD
      FROM accounts a, deb_reg_nbs b
-     WHERE a.acc=a.acc and a.nbs=b.nbs  
+     WHERE a.acc=a.acc and a.nbs=b.nbs
            and a.rnk not in (select rnk from deb_reg_rnk)
            and a.acc in (select unique debnum from debreg_res_s  )
      GROUP BY a.rnk;
@@ -219,13 +219,13 @@ begin
 --NMK,     - наименование должника   | NMK
 --ADR,     - адрес должника          | ADR
 --CUSTTYPE - тип должника            | CUSTTYPE (1-Юр,0-Физ)
---PRINSIDER- инсайдер                | PRINSIDER 
+--PRINSIDER- инсайдер                | PRINSIDER
 --KV       - вал долга               | KV
 --SUM      - сумма просрочки по сч   | --SUMM
 --DEBDATE, - дата возникнов просрочки| DEBDATE
 --          (открытие счета просрочки)
 --day      - количество просроч дней |
---rezid    - резидентность           | REZID  
+--rezid    - резидентность           | REZID
 --CRDAGRNUM-номер договора/счета     | CRDAGRNUM
 --sumd     - общая сумма долга по кл |
 --CRDDATE  - дата договора           | CRDDATE
@@ -236,55 +236,55 @@ begin
             PRINSIDER, KV, SUM, DEBDATE, day, rezid, CRDAGRNUM, CRDDATE, sumd,
             OSN,EVENTDATE)
      --новые
-     SELECT 1, a.acc, a.nls, c.okpo, c.nmk, c.ADR, decode(c.CUSTTYPE,3,0,1), nvl(c.PRINSIDER,99), a.kv, -(fost(a.acc, DAT_)), 
+     SELECT 1, a.acc, a.nls, c.okpo, c.nmk, c.ADR, decode(c.CUSTTYPE,3,0,1), nvl(c.PRINSIDER,99), a.kv, -(fost(a.acc, DAT_)),
             nvl(to_date(cck_app.Get_ND_TXT (n.nd, 'DATSP'),'dd/mm/yyyy'),sd.fdat), DAT_ - sd.fdat, g.rezid, a.nls, to_date(null), r.sumd,
             substr(nvl2(k.ruk,'Директор: '||k.ruk,NULL)|| nvl2(w.value,'. Засновник: '||w.value,NULL), 1,250), sd.fdat
      FROM  customer  C, accounts A, deb_reg_rnk R, nbs_ob22_tip n, codcagent G, corps K, customerw W, saldoa sd,
            nd_acc n
-     WHERE C.rnk=R.rnk and C.rnk=a.rnk and fost(a.acc, DAT_) <0 and    
-           n.tip in ('SP ','SPN','SK9') and a.nbs||nvl(a.ob22,'00')=n.nbs||N.OB22 and 
-           A.acc not in (select debnum from debreg_res_s where eventtype in (1,2,3)) and 
-           a.acc=n.acc (+) and G.codcagent=C.codcagent and 
+     WHERE C.rnk=R.rnk and C.rnk=a.rnk and fost(a.acc, DAT_) <0 and
+           n.tip in ('SP ','SPN','SK9') and a.nbs||nvl(a.ob22,'00')=n.nbs||N.OB22 and
+           A.acc not in (select debnum from debreg_res_s where eventtype in (1,2,3)) and
+           a.acc=n.acc (+) and G.codcagent=C.codcagent and
            nvl(c.okpo,0)<>nvl(F_OUROKPO,0) and  -- исключаем со своим ОКПО
-           a.daos <= DAT_ 
+           a.daos <= DAT_
            -- ищем основателя и директора
            and c.rnk=k.rnk(+) and c.rnk=w.rnk(+) and w.tag(+)='OSN'
            -- определяем дату возникновения просрочки
            and a.acc=sd.acc
-           and (exists(select acc,max(fdat) mfdat from saldoa where acc=A.acc and fdat<=DAT_ and ostf=0 and dos>0 group by acc) 
-           and (sd.acc,sd.fdat)=(select acc,max(fdat) mfdat from saldoa 
+           and (exists(select acc,max(fdat) mfdat from saldoa where acc=A.acc and fdat<=DAT_ and ostf=0 and dos>0 group by acc)
+           and (sd.acc,sd.fdat)=(select acc,max(fdat) mfdat from saldoa
                                  where acc=A.acc and fdat<=DAT_ and ostf=0 and dos>0
-                                 group by acc) 
-           or   not exists(select acc,max(fdat) mfdat from saldoa where acc=A.acc and fdat<=DAT_ and ostf=0 and dos>0 group by acc) 
+                                 group by acc)
+           or   not exists(select acc,max(fdat) mfdat from saldoa where acc=A.acc and fdat<=DAT_ and ostf=0 and dos>0 group by acc)
            and (sd.acc,sd.fdat)=(select acc,min(fdat) mfdat from saldoa where acc=A.acc group by acc));
   else
      INSERT INTO deb_reg_tmp (EVENTTYPE, acc, nls, OKPO, NMK, ADR, CUSTTYPE,
             PRINSIDER, KV, SUM, DEBDATE, day, rezid, CRDAGRNUM, CRDDATE, sumd,
             OSN,EVENTDATE)
      --новые
-     SELECT 1, a.acc, a.nls, c.okpo, c.nmk, c.ADR, decode(c.CUSTTYPE,3,0,1), nvl(c.PRINSIDER,99), a.kv, -(fost(a.acc, DAT_)), 
+     SELECT 1, a.acc, a.nls, c.okpo, c.nmk, c.ADR, decode(c.CUSTTYPE,3,0,1), nvl(c.PRINSIDER,99), a.kv, -(fost(a.acc, DAT_)),
             nvl(to_date(cck_app.Get_ND_TXT (n.nd, 'DATSP'),'dd/mm/yyyy'),sd.fdat), DAT_ - sd.fdat, g.rezid, a.nls, to_date(null), r.sumd,
             substr(nvl2(k.ruk,'Директор: '||k.ruk,NULL)|| nvl2(w.value,'. Засновник: '||w.value,NULL), 1,250), sd.fdat
      FROM  customer  C, accounts A, deb_reg_rnk R, deb_reg_nbs B, codcagent G, corps K, customerw W, saldoa sd,
            nd_acc n
-     WHERE C.rnk=R.rnk and C.rnk=a.rnk and fost(a.acc, DAT_) <0 and    
-           A.nbs=B.nbs and A.acc not in (select debnum from debreg_res_s where eventtype in (1,2,3)) and 
-           a.acc=n.acc (+) and G.codcagent=C.codcagent and 
+     WHERE C.rnk=R.rnk and C.rnk=a.rnk and fost(a.acc, DAT_) <0 and
+           A.nbs=B.nbs and A.acc not in (select debnum from debreg_res_s where eventtype in (1,2,3)) and
+           a.acc=n.acc (+) and G.codcagent=C.codcagent and
            nvl(c.okpo,0)<>nvl(F_OUROKPO,0) and  -- исключаем со своим ОКПО
-           a.daos <= DAT_ 
+           a.daos <= DAT_
            -- ищем основателя и директора
            and c.rnk=k.rnk(+) and c.rnk=w.rnk(+) and w.tag(+)='OSN'
            -- определяем дату возникновения просрочки
            and a.acc=sd.acc
            and (exists(select acc,max(fdat) mfdat from saldoa where acc=A.acc and fdat<=DAT_
                     and ostf=0 and dos>0
-                    group by acc) 
+                    group by acc)
 		       and (sd.acc,sd.fdat)=(select acc,max(fdat) mfdat from saldoa where acc=A.acc and fdat<=DAT_
                     and ostf=0 and dos>0
-                    group by acc) 
+                    group by acc)
 		  or   not exists(select acc,max(fdat) mfdat from saldoa where acc=A.acc and fdat<=DAT_
                     and ostf=0 and dos>0
-                    group by acc) 
+                    group by acc)
 		       and (sd.acc,sd.fdat)=(select acc,min(fdat) mfdat from saldoa where acc=A.acc group by acc)
 		 );
   end if;
@@ -293,24 +293,24 @@ begin
 INSERT INTO deb_reg_tmp (EVENTTYPE, acc, nls, OKPO, NMK, ADR, CUSTTYPE,
          PRINSIDER, KV, SUM, DEBDATE, day, rezid, CRDAGRNUM, CRDDATE, sumd,
          OSN,EVENTDATE)
-   SELECT 1, D.debnum, a.nls, d.okpo, d.nmk,  d.ADR, d.CUSTTYPE, d.PRINSIDER,  D.kv, -(fost(a.acc, DAT_)), d.DEBDATE, DAT_ - D.DEBDATE, 
+   SELECT 1, D.debnum, a.nls, d.okpo, d.nmk,  d.ADR, d.CUSTTYPE, d.PRINSIDER,  D.kv, -(fost(a.acc, DAT_)), d.DEBDATE, DAT_ - D.DEBDATE,
           D.rezid, D.CRDAGRNUM, D.CRDDATE, r.sumd, d.osn, null
    FROM   debreg_res_s D, deb_reg_rnk R, accounts A
-   WHERE d.eventtype=3 AND fost(a.acc, DAT_) <0 AND D.debnum=a.acc and a.rnk=R.rnk AND  D.DEBDATE < DAT_ 
+   WHERE d.eventtype=3 AND fost(a.acc, DAT_) <0 AND D.debnum=a.acc and a.rnk=R.rnk AND  D.DEBDATE < DAT_
          and a.acc not in (select acc from deb_reg_tmp)
          and a.acc not in (select debnum from  debreg_res_s where eventtype in  (1,2)) ;
-          
-  --UNION   
+
+  --UNION
 -- старые, но еще должники=2( RNK есть в deb_reg_rnk) и не повторно (eventtype<>3)
 INSERT INTO deb_reg_tmp (EVENTTYPE, acc, nls, OKPO, NMK, ADR, CUSTTYPE,
          PRINSIDER, KV, SUM, DEBDATE, day, rezid, CRDAGRNUM, CRDDATE, sumd,
          OSN,EVENTDATE)
-   SELECT 2, D.debnum, a.nls, d.okpo, d.nmk,  d.ADR, d.CUSTTYPE, d.PRINSIDER, 
-          D.kv, -(fost(a.acc, DAT_)), d.DEBDATE, DAT_ - D.DEBDATE, 
+   SELECT 2, D.debnum, a.nls, d.okpo, d.nmk,  d.ADR, d.CUSTTYPE, d.PRINSIDER,
+          D.kv, -(fost(a.acc, DAT_)), d.DEBDATE, DAT_ - D.DEBDATE,
           D.rezid, D.CRDAGRNUM, D.CRDDATE, r.sumd, d.osn, null
    FROM   debreg_res_s D, deb_reg_rnk R, accounts A
    WHERE d.eventtype<3 AND fost(a.acc, DAT_) <0 AND  D.debnum=a.acc and a.rnk=R.rnk AND
-         D.DEBDATE < DAT_  and a.acc not in (select acc from deb_reg_tmp);                                      
+         D.DEBDATE < DAT_  and a.acc not in (select acc from deb_reg_tmp);
 --  UNION
 -- старые, но уже не должн=3
 INSERT INTO deb_reg_tmp (EVENTTYPE, acc, nls, OKPO, NMK, ADR, CUSTTYPE,
@@ -320,7 +320,7 @@ INSERT INTO deb_reg_tmp (EVENTTYPE, acc, nls, OKPO, NMK, ADR, CUSTTYPE,
           D.kv, 0, d.DEBDATE, DAT_ - D.DEBDATE,
           D.rezid, D.CRDAGRNUM, D.CRDDATE, 0, d.osn, null
    FROM   debreg_res_s D, accounts A
-   WHERE  D.debnum=A.acc and A.ostc=0 
+   WHERE  D.debnum=A.acc and A.ostc=0
           and D.DEBDATE < DAT_  and D.debnum not in (select acc from deb_reg_man)
           and d.eventtype<3     and a.acc    not in (select acc from deb_reg_tmp);
 --UNION
@@ -328,10 +328,10 @@ INSERT INTO deb_reg_tmp (EVENTTYPE, acc, nls, OKPO, NMK, ADR, CUSTTYPE,
 INSERT INTO deb_reg_tmp (EVENTTYPE, acc, nls, OKPO, NMK, ADR, CUSTTYPE,
          PRINSIDER, KV, SUM, DEBDATE, day, rezid, CRDAGRNUM, CRDDATE, sumd,
          OSN,EVENTDATE)
-   SELECT 2, D.debnum, null, d.okpo, d.nmk,  d.ADR, d.CUSTTYPE, d.PRINSIDER, 
-          D.kv, d.summ, d.DEBDATE, DAT_ - D.DEBDATE, 
+   SELECT 2, D.debnum, null, d.okpo, d.nmk,  d.ADR, d.CUSTTYPE, d.PRINSIDER,
+          D.kv, d.summ, d.DEBDATE, DAT_ - D.DEBDATE,
           D.rezid, D.CRDAGRNUM, D.CRDDATE, 0, d.osn, null
-   FROM   debreg_res_s D 
+   FROM   debreg_res_s D
    WHERE  D.debnum<0 and D.DEBDATE < DAT_
              and D.debnum not in (select acc from deb_reg_tmp);
 
@@ -343,12 +343,12 @@ INSERT INTO deb_reg_tmp (EVENTTYPE, acc, nls, OKPO, NMK, ADR, CUSTTYPE,
          select substr(cc_id,1,16), sdate INTO CC_ID_, SDATE_
          from cc_deal d, nd_acc n
          where n.acc=k.acc and n.nd=d.nd and rownum=1 order by d.nd desc;
-      EXCEPTION WHEN NO_DATA_FOUND THEN 
+      EXCEPTION WHEN NO_DATA_FOUND THEN
          begin
             select substr(nvl(ndoc,nd),1,16), datd INTO CC_ID_, SDATE_
             from acc_over where acc=k.acc and rownum=1 order by datd desc;
-         EXCEPTION WHEN NO_DATA_FOUND THEN 
-            begin              
+         EXCEPTION WHEN NO_DATA_FOUND THEN
+            begin
               select substr(nvl(ndoc,nd),1,16), datd into cc_id_, sdate_
               from acc_over where (acc_2067=k.acc or acc_2069=k.acc) and rownum=1;
             exception when no_data_found then
@@ -356,7 +356,7 @@ INSERT INTO deb_reg_tmp (EVENTTYPE, acc, nls, OKPO, NMK, ADR, CUSTTYPE,
                   select nd, sdate into cc_id_, sdate_ from rez_w4_bpk where acc= k.acc and  TIP_KART = 42; -- COBUMMFO-3871
                EXCEPTION WHEN NO_DATA_FOUND THEN
                   cc_id_:= null; sdate_ :=null;
-               end; 
+               end;
             end;
          end;
       END;
@@ -495,10 +495,10 @@ BEGIN
         END;
         -- если задан параметр DEB_SAB, используем его для формирования имен файлов
         begin
-            select val 
+            select val
               into l_dpa_sab
               from params
-             where par='DEB_SAB'; 
+             where par='DEB_SAB';
             --
             ownSAB := substr(ownSAB,1,1)||l_dpa_sab;
         exception when no_data_found then
@@ -794,7 +794,7 @@ EXCEPTION
 END update_request;
 -----
 
-PROCEDURE refresh_debreg 
+PROCEDURE refresh_debreg
   (acc_        NUMBER,
    adr_        VARCHAR2,
    crdagrnum_  VARCHAR2,
@@ -807,19 +807,19 @@ PROCEDURE refresh_debreg
    summ_       NUMBER,
    rezid_      NUMBER,
    debdate_    DATE,
-   osn_        VARCHAR2) 
+   osn_        VARCHAR2)
 IS
 BEGIN
   BEGIN
-    INSERT INTO debreg 
-     (debnum, adr, crdagrnum, crddate, custtype, kv, 
+    INSERT INTO debreg
+     (debnum, adr, crdagrnum, crddate, custtype, kv,
       nmk, okpo, prinsider, summ, rezid, debdate, osn)
-    VALUES 
-     (acc_, substr(adr_,1,70), substr(crdagrnum_,1,16), 
+    VALUES
+     (acc_, substr(adr_,1,70), substr(crdagrnum_,1,16),
       crddate_, custtype_, kv_,
-      substr(nmk_,1,70), substr(okpo_,1,14), prinsider_, 
+      substr(nmk_,1,70), substr(okpo_,1,14), prinsider_,
       summ_, rezid_, debdate_, substr(osn_,1,250));
-  EXCEPTION 
+  EXCEPTION
     WHEN DUP_VAL_ON_INDEX THEN
          UPDATE debreg SET
                 adr  = substr(adr_,1,70),
@@ -828,10 +828,10 @@ BEGIN
 				custtype = custtype_,
 				kv = kv_,
 				nmk = substr(nmk_,1,70),
-				okpo = substr(okpo_,1,14),                
+				okpo = substr(okpo_,1,14),
 				prinsider = prinsider_,
 				summ = summ_,
-				rezid = rezid_,                       
+				rezid = rezid_,
                 debdate = debdate_,
                 osn = substr(osn_,1,250)
           WHERE debnum=acc_;

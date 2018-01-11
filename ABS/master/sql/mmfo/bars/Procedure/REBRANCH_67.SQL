@@ -1,14 +1,23 @@
-CREATE OR REPLACE PROCEDURE BARS.REBRANCH_67
- ( p_mode int, p_branch_OLD accounts.branch%type, p_branch_NEW accounts.branch%type, p_nazn oper.nazn%type ) is 
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/REBRANCH_67.sql =========*** Run *
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure REBRANCH_67 ***
+
+  CREATE OR REPLACE PROCEDURE BARS.REBRANCH_67 
+ ( p_mode int, p_branch_OLD accounts.branch%type, p_branch_NEW accounts.branch%type, p_nazn oper.nazn%type ) is
  OO OPER%ROWTYPE;
  l_datz date ;
  l_branch_OLD accounts.branch%type;
  l_branch_NEW accounts.branch%type;
 
-/* 
-  23.05.2017 Сухова Т.А 
-             процедура перенесення зал.рах 6-7 кл одного Бранч-2(old) на інший Бранч-2 (new) 
-             та їх наступне закриття 
+/*
+  23.05.2017 Сухова Т.А
+             процедура перенесення зал.рах 6-7 кл одного Бранч-2(old) на інший Бранч-2 (new)
+             та їх наступне закриття
              використовуэться при закритті Бранч-2
 */
 
@@ -23,7 +32,7 @@ begin
  l_datz := DAT_NEXT_U ( gl.bdate , 1);
 
  for k in (select acc, NLS NLSa, Substr(nms,1,38) nam_a, ostc, nbs_ob22_bra (nbs, ob22, l_branch_NEW) nlsb, KV
-           from accounts A 
+           from accounts A
            where dazs is null and branch = l_branch_OLD and substr(nbs,1,1) in ('6','7')
            )
  loop
@@ -56,4 +65,11 @@ end REBRANCH_67 ;
 /
 show err;
 
-grant execute on REBRANCH_67 to  BARS_ACCESS_DEFROLE ;
+PROMPT *** Create  grants  REBRANCH_67 ***
+grant EXECUTE                                                                on REBRANCH_67     to BARS_ACCESS_DEFROLE;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/REBRANCH_67.sql =========*** End *
+PROMPT ===================================================================================== 

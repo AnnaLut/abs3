@@ -1,4 +1,10 @@
-create or replace package sto_all is
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/sto_all.sql =========*** Run *** ===
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.STO_ALL is
 /*
     06-02-2012 Sta Регулярные платежи.
     Разрозненные процедуры собраны в один пакедж.
@@ -189,7 +195,7 @@ create or replace package sto_all is
 
 END STO_ALL;
 /
-create or replace package body sto_all is
+CREATE OR REPLACE PACKAGE BODY BARS.STO_ALL is
 /*
     06-02-2012 Sta Регулярные платежи.
     Разрозненные процедуры собраны в один пакедж.
@@ -1149,15 +1155,15 @@ create or replace package body sto_all is
              THEN
                 p_status := 0;                                           --(новий)
                 p_status_text := '';
-                
-                /*COBUMMFO-4178 підтвердження(акцепт) ф.190 - ДТ 2625 ,2620 на поповнення рах. КТ 2630, 2635, 2620, 2625 
+
+                /*COBUMMFO-4178 підтвердження(акцепт) ф.190 - ДТ 2625 ,2620 на поповнення рах. КТ 2630, 2635, 2620, 2625
                 та комунальні платежі має проводитися автоматично.*/
-                if      substr(case when l_sto_det.dk = 0 then l_sto_det.nlsa else l_sto_det.nlsb end, 1, 4) in ('2620', '2625') 
-                    and substr(case when l_sto_det.dk = 0 then l_sto_det.nlsb else l_sto_det.nlsa end, 1, 4) in ('2620', '2625', '2630', '2635') 
+                if      substr(case when l_sto_det.dk = 0 then l_sto_det.nlsa else l_sto_det.nlsb end, 1, 4) in ('2620', '2625')
+                    and substr(case when l_sto_det.dk = 0 then l_sto_det.nlsb else l_sto_det.nlsa end, 1, 4) in ('2620', '2625', '2630', '2635')
                 then
                     l_sto_det.status_id := 1;
                 end if;
-                
+
               begin
                 INSERT INTO sto_det
                      VALUES l_sto_det;
@@ -1566,7 +1572,15 @@ create or replace package body sto_all is
 
 end STO_ALL;
 /
-show err;
+ show err;
+ 
+PROMPT *** Create  grants  STO_ALL ***
+grant EXECUTE                                                                on STO_ALL         to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on STO_ALL         to STO;
 
-grant execute on sto_all to bars_access_defrole;
-grant execute on sto_all to sto;
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/sto_all.sql =========*** End *** ===
+ PROMPT ===================================================================================== 
+ 

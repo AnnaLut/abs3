@@ -1,4 +1,13 @@
-create or replace procedure get_ri
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/GET_RI.sql =========*** Run *** ==
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure GET_RI ***
+
+  CREATE OR REPLACE PROCEDURE BARS.GET_RI 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FILE NAME   :    GET_RI.sql
 % DESCRIPTION :    Заповнення інформації про інсайдерів з XML
@@ -32,7 +41,7 @@ begin
 
               union all
               -- для физ.лиц с кодом (по коду и документу) для випадку, коли документ має номер, але немає серії (наприклад, паспорт-ID картка)
-              select c.rnk, c.branch, c.custtype, c.okpo, p.passp, p.ser, p.numdoc, r.k060 as prinsider, r.insform as insfo, c.prinsider as prinsider_before, to_number(w.value) as insfo_before 
+              select c.rnk, c.branch, c.custtype, c.okpo, p.passp, p.ser, p.numdoc, r.k060 as prinsider, r.insform as insfo, c.prinsider as prinsider_before, to_number(w.value) as insfo_before
               from customer c
               left join person p on c.rnk = p.rnk
               left join customerw w on c.rnk = w.rnk and w.tag = 'INSFO'
@@ -148,3 +157,13 @@ begin
 end get_ri;
 /
 show err;
+
+PROMPT *** Create  grants  GET_RI ***
+grant EXECUTE                                                                on GET_RI          to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on GET_RI          to TECH005;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/GET_RI.sql =========*** End *** ==
+PROMPT ===================================================================================== 

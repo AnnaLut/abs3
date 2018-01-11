@@ -1,4 +1,10 @@
-create or replace package  VIP_ADM is
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/vip_adm.sql =========*** Run *** ===
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.VIP_ADM is
 
 type row_VIP_PARAMS_TEMPLATE is record(
 l_day VIP_PARAMS_TEMPLATE.day%TYPE
@@ -12,8 +18,7 @@ FUNCTION VIP_PARAMS (P_ID_PAR VARCHAR2 )
 procedure add_flags;
 end VIP_ADM;
 /
-
-create or replace package body VIP_ADM is
+CREATE OR REPLACE PACKAGE BODY BARS.VIP_ADM is
 
 
 FUNCTION VIP_PARAMS (P_ID_PAR VARCHAR2 )
@@ -22,7 +27,7 @@ FUNCTION VIP_PARAMS (P_ID_PAR VARCHAR2 )
    IS
 
 BEGIN
-     
+
          FOR curr
             IN (select  substr(a, instr(a, ',', 1, level) + 1, instr(a, ',', 1, level + 1) - instr(a, ',', 1, level) - 1) a_i
                     from ( select ',' ||  day || ',' a from VIP_PARAMS_TEMPLATE where ID_PAR = P_ID_PAR)
@@ -31,7 +36,7 @@ BEGIN
          LOOP
             PIPE ROW (curr);
          END LOOP;
-     
+
 END VIP_PARAMS;
 
 procedure add_flags is
@@ -41,10 +46,10 @@ procedure add_flags is
 
 begin
       --l_mfo := sys_context('bars_context', 'user_mfo');
-      
+
 	for k in (select kf from mv_kf where kf <> '324805')
-	 loop 
-      bc.go(k.kf);	 
+	 loop
+      bc.go(k.kf);
       for cur in (SELECT *
               FROM customer c
              WHERE     bars.attribute_utl.get_number_value (c.rnk,
@@ -72,6 +77,14 @@ end add_flags;
 
 end VIP_ADM;
 /
+ show err;
+ 
+PROMPT *** Create  grants  VIP_ADM ***
+grant EXECUTE                                                                on VIP_ADM         to BARS_ACCESS_DEFROLE;
 
-
-grant execute on VIP_ADM to bars_access_defrole;
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/vip_adm.sql =========*** End *** ===
+ PROMPT ===================================================================================== 
+ 

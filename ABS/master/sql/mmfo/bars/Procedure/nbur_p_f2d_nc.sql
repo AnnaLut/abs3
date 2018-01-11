@@ -15,12 +15,18 @@ PROMPT *** Create  procedure NBUR_P_F2D_NC ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Процедура формирования #2D для схема "C"
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 13.08.2016
+% VERSION     : 02/06/2017 (13.08.2016)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: p_report_date - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 begin
-   NBUR_P_F2D (p_kod_filii, p_report_date, p_form_id, 'C');
+   if p_kod_filii = '300465' then
+      NBUR_P_F2D (p_kod_filii, p_report_date, p_form_id, 'C');
+   else
+      p_f2D_nn (p_report_date, 'C');
+        
+      p_nbu_save_rezult(p_report_date, p_kod_filii, '#2D'); 
+   end if;
 end;
 /
 show err;

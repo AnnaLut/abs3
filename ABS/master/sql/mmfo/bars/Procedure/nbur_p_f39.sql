@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure NBUR_P_F39 ***
 
-CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F39 (p_kod_filii        varchar2,
+  CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F39 (p_kod_filii        varchar2,
                                              p_report_date      date,
                                              p_form_id          number,
                                              p_scheme           varchar2 default 'C',
@@ -83,7 +83,7 @@ BEGIN
                NULL nd,
                branch
         FROM (select  report_date, kf, ref, tt, cust_id, acc_id, acc_num,
-                      cust_id2, acc_id2, acc_num2, branch, nbuc, 
+                      cust_id2, acc_id2, acc_num2, branch, nbuc,
                       kv, type_op ,
                       bal s1,
                       bal * round(kurs * div, 4) / dig s3,
@@ -106,10 +106,10 @@ BEGIN
                         (case when s.kurs is not null
                               then (case when is_number(s.kurs) = 1 then ' курс введений в док-тi ' else null end)
                               else (case when s.kf = '300465' and nvl(s.bal, 0) <> 0 and nvl(s.bal_uah_cent, 0) <> 0
-                                         then ' курс розрахований ' 
+                                         then ' курс розрахований '
                                          else ' курс вибраний iз таблицi курсiв '
                                     end)
-                        end) comm                        
+                        end) comm
                     from
                        (select t.report_date, t.kf, t.ref, t.tt,
                                (case when t.acc_num_db like '100%' then t.cust_id_db else t.cust_id_cr end) cust_id,
@@ -251,9 +251,9 @@ BEGIN
     WHERE datf = p_report_date;
 
     insert into OTCN_TRACE_39(DATF, USERID, NLS, KV, ODATE, KODP, ZNAP, NBUC, ISP, RNK, ACC, REF, COMM, ND, MDATE, TOBO)
-    select report_date, user_id, acc_num, kv, report_date, field_code, field_value, nbuc, null, 
+    select report_date, user_id, acc_num, kv, report_date, field_code, field_value, nbuc, null,
         cust_id, acc_id, REF, description, nd, maturity_date, branch
-    from nbur_detail_protocols 
+    from nbur_detail_protocols
     where report_date = p_report_date and
           kf = p_kod_filii and
           report_code = p_file_code;

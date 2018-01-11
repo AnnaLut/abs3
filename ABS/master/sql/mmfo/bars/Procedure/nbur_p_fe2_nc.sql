@@ -15,12 +15,18 @@ PROMPT *** Create  procedure NBUR_P_FE2_NC ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Процедура формирования #E2 для схема "C"
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 13.08.2016
+% VERSION     : 26/05/2017 (13.08.2016)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: p_report_date - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 begin
-   NBUR_P_FE2 (p_kod_filii, p_report_date, p_form_id, 'C');
+   if p_kod_filii = '300465' then
+      NBUR_P_FE2 (p_kod_filii, p_report_date, p_form_id, 'C');
+   else
+      p_fe2_nn (p_report_date, 'C');
+        
+      p_nbu_save_rezult(p_report_date, p_kod_filii, '#E2'); 
+   end if;
 end;
 /
 show err;

@@ -1,4 +1,13 @@
-create or replace procedure make_int
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/MAKE_INT.sql =========*** Run *** 
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure MAKE_INT ***
+
+  CREATE OR REPLACE PROCEDURE BARS.MAKE_INT 
 ( p_dat2      in date,             -- граничная дата начисления процентов
   p_runmode   in number default 0, -- режим запуска (0 - начисление,1 - оплата)
   p_runid     in number default 0, -- № запуска
@@ -50,7 +59,7 @@ create or replace procedure make_int
   l_tax_mil_sq_soc        number := 0;
 
   type t_tax_settings is record(
-    tax_type          number, -- 
+    tax_type          number, --
     tax_int           number, -- % налога;
     tax_date_begin    date,   -- начало действия периода налогообложения;
     tax_date_end      date    -- конец  действия периода налогообложения пост 4110; если дата конца действия постановы не установлена, то принимаем, +1 месяц от сегодня
@@ -191,7 +200,7 @@ create or replace procedure make_int
                   then p_acrdat + 1
                   when (p_intid in (0, 2))
                   then p_opendat
-                  when (p_amount is null) 
+                  when (p_amount is null)
                   then p_opendat
                   else p_opendat + 1
                   end;
@@ -199,7 +208,7 @@ create or replace procedure make_int
       p_stpdat := case
                   when (p_stpdat is null)
                   then p_dat2
-                  when (p_dat2 < p_stpdat) 
+                  when (p_dat2 < p_stpdat)
                   then p_dat2
                   else p_stpdat
                   end;
@@ -303,7 +312,7 @@ create or replace procedure make_int
     end if;
 
     p_docrec.vob := case
-                    when p_docrec.kv = p_docrec.kv2 
+                    when p_docrec.kv = p_docrec.kv2
                     then 6
                     else 16
                     end;
@@ -548,7 +557,7 @@ create or replace procedure make_int
 --  bars_audit.info( title || ' INIT_TAXNLS_LIST(MILITARY): exit with ' ||
 --                   to_char(g_taxnls_list_military.count) || ' accounts.');
   end INIT_TAXNLS_LIST;
-  
+
   --
   --
   --
@@ -557,7 +566,7 @@ create or replace procedure make_int
   ) return accounts.nls%type
   is
   begin
-    
+
     if ( g_taxnls_list.exists( p_branch ) )
     then
       return g_taxnls_list( p_branch );
@@ -569,9 +578,9 @@ create or replace procedure make_int
         raise_application_error( -20666, 'Не знадено рахунок утримання прибуткового податку для відділення '||p_branch, true );
       end if;
     end if;
-    
+
   end GET_TAXNLS;
-  
+
   --
   --
   --
@@ -580,7 +589,7 @@ create or replace procedure make_int
   ) return accounts.nls%type
   is
   begin
-    
+
     if ( g_taxnls_list_military.exists( p_branch ) )
     then
       return g_taxnls_list_military( p_branch );
@@ -592,7 +601,7 @@ create or replace procedure make_int
         raise_application_error( -20666, 'Не знадено рахунок утримання прибуткового податку для відділення '||p_branch, true );
       end if;
     end if;
-    
+
   end GET_MILNLS;
 
   function get_content_of_tax_accounts
@@ -866,7 +875,7 @@ begin
 
         -- прогнозный расчет суммы начисленных процентов выполнен.
         -- начинается формирование документов по начислению процентов
-        if (p_runmode = 1) 
+        if (p_runmode = 1)
         then -- чтение ведомости начисленных процентов по счету
           for acr_list in (select acc,
                                   id,
@@ -1031,7 +1040,7 @@ begin
                                   ', l_intlist(i).acc_id=' ||to_char(l_intlist(i).acc_id)    ||
                                   ', l_tax_socfactor='     ||to_char(l_tax_socfactor), title );
 
-                if (l_tax_required = 1) 
+                if (l_tax_required = 1)
                 then -- расчет суммы для налогообложения по дфл (налогом облагаются начисленные проценты позднее 01/08/2014)
                   l_taxrow.tax_s      := 0;
                   l_taxrow.tax_sq     := 0;
@@ -1493,12 +1502,12 @@ begin
                   end loop;
 
                   l_taxrow.tax_s := case
-                                    when (l_tax_s + l_tax_s_soc) >= 0 
+                                    when (l_tax_s + l_tax_s_soc) >= 0
                                     then l_tax_s + l_tax_s_soc
                                     else 0
                                     end;
                   l_taxrow.tax_sq := case
-                                     when (l_tax_sq + l_tax_sq_soc) >= 0 
+                                     when (l_tax_sq + l_tax_sq_soc) >= 0
                                      then l_tax_sq + l_tax_sq_soc
                                      else 0
                                      end;
@@ -1735,7 +1744,7 @@ begin
             end if; -- (l_docrec.s != 0)
 
             -- протоколирование автоматических операций
-            if (p_runid > 0 and l_intlist(i).deal_id > 0 and l_intlist(i).mod_code in ('DPT', 'DPU')) 
+            if (p_runid > 0 and l_intlist(i).deal_id > 0 and l_intlist(i).mod_code in ('DPT', 'DPU'))
             then
               fill_log(p_intrec => l_intlist(i),
                        p_runid  => p_runid,
@@ -1796,7 +1805,14 @@ begin
 
 end MAKE_INT;
 /
+show err;
 
-show errors;
+PROMPT *** Create  grants  MAKE_INT ***
+grant EXECUTE                                                                on MAKE_INT        to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on MAKE_INT        to WR_ALL_RIGHTS;
 
-grant EXECUTE on MAKE_INT to BARS_ACCESS_DEFROLE;
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/MAKE_INT.sql =========*** End *** 
+PROMPT ===================================================================================== 

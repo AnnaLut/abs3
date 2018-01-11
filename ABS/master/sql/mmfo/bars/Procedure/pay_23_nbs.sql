@@ -1,10 +1,13 @@
+
+
 PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/PAY_23_nbs.sql =========*** Run *** ==
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/PAY_23_NBS.sql =========*** Run **
 PROMPT ===================================================================================== 
 
-PROMPT *** Create  procedure PAY_23 ***
 
-CREATE OR REPLACE PROCEDURE BARS.PAY_23_nbs (P_dat01_ DATE, mode_ NUMBER DEFAULT 0, p_user number default null, nal_ number)  IS
+PROMPT *** Create  procedure PAY_23_NBS ***
+
+  CREATE OR REPLACE PROCEDURE BARS.PAY_23_NBS (P_dat01_ DATE, mode_ NUMBER DEFAULT 0, p_user number default null, nal_ number)  IS
 
 /* Версия 3.0 19-06-2017 20-01-2017   26-07-2016  18-05-2016 (24-02-2016, 04-01-2016, 18-09-2015)
 
@@ -53,7 +56,7 @@ l_finevare   NUMBER ;  l_row_id14   NUMBER ;  l_row_id13   NUMBER ;  l_row_id18 
 l_user_err   NUMBER ;  l_kat        NUMBER ;  l_rez        NUMBER ;  l_fl         NUMBER ;  l_rez_pay    NUMBER ;  l_pay        NUMBER ;
 l_rnk        NUMBER ;  l_ref        INT    ;
 
-dat31_       date   ;  dat01_       date   ;  l_dat        date   ; 
+dat31_       date   ;  dat01_       date   ;  l_dat        date   ;
 
 
 ---------------------------------------
@@ -110,7 +113,7 @@ begin
             select r020_new, ob_new into k.nbs_new,  k.ob22_new from transfer_2017 where r020_old=k.nbs and ob_old=k.ob22_new;
          EXCEPTION WHEN NO_DATA_FOUND THEN NULL;
          end;
-      end if;     
+      end if;
       update nbu23_rez set nls = k.nls_new, ob22=k.ob22_new, nbs = k.nbs_new, kat = 1, kat23 = 1 where rowid = k.ri;
    end LOOP;
    commit;
@@ -220,7 +223,7 @@ end;
       update rez_protocol set crc = null where dat=dat31_;
    END IF;
    -- определение параметров
-   if nal_ = 0 THEN  -- Рассформирование 
+   if nal_ = 0 THEN  -- Рассформирование
       rezerv_23(dat01_);
       -- налоговый/не налоговый
       PAY_23_ob22_nbs(dat01_, mode_, p_user,'0',nal_);
@@ -239,8 +242,8 @@ end;
       -- заполнение счетов резерва
       P_2400_23(dat01_);
 
-   else 
-      rezerv_23_f(dat01_); --Формирование 
+   else
+      rezerv_23_f(dat01_); --Формирование
       PAY_23_ob22_nbs(dat01_, mode_, p_user,'0',nal_);
       PAY_23_ob22_nbs(dat01_, mode_, p_user,'1',nal_);
       PAY_23_ob22_nbs(dat01_, mode_, p_user,'5',nal_);
@@ -251,7 +254,7 @@ end;
       PAY_23_ob22_nbs(dat01_, mode_, p_user,'3',nal_);
       PAY_23_ob22_nbs(dat01_, mode_, p_user,'4',nal_);
       PAY_23_ob22_nbs(dat01_, mode_, p_user,'7',nal_);
-      -- заполнение счетов резерва             
+      -- заполнение счетов резерва
       P_2400_23_nbs(dat01_);
 
    end if;
@@ -298,11 +301,13 @@ end;
 /
 show err;
 
-PROMPT *** Create  grants  PAY_23_nbs ***
-grant EXECUTE                                                                on PAY_23_nbs          to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on PAY_23_nbs          to RCC_DEAL;
-grant EXECUTE                                                                on PAY_23_nbs          to START1;
+PROMPT *** Create  grants  PAY_23_NBS ***
+grant EXECUTE                                                                on PAY_23_NBS      to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on PAY_23_NBS      to RCC_DEAL;
+grant EXECUTE                                                                on PAY_23_NBS      to START1;
+
+
 
 PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/PAY_23_nbs.sql =========*** End *** ==
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/PAY_23_NBS.sql =========*** End **
 PROMPT ===================================================================================== 

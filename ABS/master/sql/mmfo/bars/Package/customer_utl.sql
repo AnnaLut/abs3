@@ -1,4 +1,10 @@
-create or replace package customer_utl is
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/customer_utl.sql =========*** Run **
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.CUSTOMER_UTL is
 
     TAG_MAIN_MOBILE_PHONE          constant varchar2(5 char) := 'MPNO ';
 
@@ -67,7 +73,7 @@ create or replace package customer_utl is
     return varchar2;
 end;
 /
-create or replace package body customer_utl as
+CREATE OR REPLACE PACKAGE BODY BARS.CUSTOMER_UTL as
 
     function read_customer(
         p_customer_id in integer,
@@ -290,3 +296,11 @@ create or replace package body customer_utl as
     end;
 end;
 /
+ show err;
+ 
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/customer_utl.sql =========*** End **
+ PROMPT ===================================================================================== 
+ 

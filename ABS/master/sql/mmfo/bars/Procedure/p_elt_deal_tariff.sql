@@ -5,7 +5,9 @@ PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_ELT_DEAL_TARIFF.sql 
 PROMPT ===================================================================================== 
 
 
-create or replace procedure bars.p_elt_deal_tariff(
+PROMPT *** Create  procedure P_ELT_DEAL_TARIFF ***
+
+  CREATE OR REPLACE PROCEDURE BARS.P_ELT_DEAL_TARIFF (
   p_otm      e_tar_nd.otm%type,
   p_nd       e_deal$base.nd%type,
   p_id       e_tarif.id%type,
@@ -39,6 +41,7 @@ begin
 
 end;
 /
+show err;
 
 PROMPT *** Create  grants  P_ELT_DEAL_TARIFF ***
 grant EXECUTE                                                                on P_ELT_DEAL_TARIFF to BARS_ACCESS_DEFROLE;

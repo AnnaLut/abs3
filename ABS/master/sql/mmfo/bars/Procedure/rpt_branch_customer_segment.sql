@@ -1,3 +1,5 @@
+
+
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/RPT_BRANCH_CUSTOMER_SEGMENT.sql ==
 PROMPT ===================================================================================== 
@@ -12,7 +14,7 @@ PROMPT *** Create  procedure RPT_BRANCH_CUSTOMER_SEGMENT ***
     p_behavior_segment_id in varchar2,
     p_social_vip_segment_id in varchar2)
 is
---  version 2.1  01.10.2017;
+--  version 2.0  17.07.2017;
     l_branch varchar2(30 char) default p_branch;
 
     l_activity_segment_id integer;
@@ -183,44 +185,40 @@ select /*+  parallel(6) */ record_level, branch, client_name, activity_segment,
                             and av_act.value_date <= const.bankdate
                             and attribute_id = const.CUSTOMER_SEGMENT_ACTIVITY
                             and number_value = nvl(l_activity_segment_id, number_value))
-              left outer join (select attribute_id, object_id, number_value, value_date
-                                from bars.attribute_value_by_date
-                                join const on value_date <= const.bankdate
-                                 and (attribute_id in
-                                     (const.CUSTOMER_SEGMENT_ACTIVITY,
-                                      const.CUSTOMER_SEGMENT_TRANSACTIONS,
-                                      const.CUSTOMER_SEGMENT_PRODUCTS_AMNT)
-                                      or (attribute_id = const.CUSTOMER_SEGMENT_FINANCIAL and number_value = nvl(l_financial_segment_id, number_value))
-                                      or (attribute_id = const.CUSTOMER_SEGMENT_BEHAVIOR and number_value = nvl(l_behavior_segment_id, number_value)))
-                              union all
-                              select attribute_id, object_id, number_value, sysdate
-                                from bars.attribute_value join const
-                                  on attribute_id in (const.CUSTOMER_PRDCT_AMNT_DPT,
-                                                      const.CUSTOMER_PRDCT_AMNT_CREDITS,
-                                                      const.CUSTOMER_PRDCT_AMNT_CRDCARDS,
-                                                      const.CUSTOMER_PRDCT_AMNT_CRD_GARANT,
-                                                      const.CUSTOMER_PRDCT_AMNT_CRDENERGY,
-                                                      const.CUSTOMER_PRDCT_AMNT_CARDS,
-                                                      const.CUSTOMER_PRDCT_AMNT_ACC)) av
-                on c.rnk = av.object_id
-          left join vip_flags vf on vf.rnk = c.rnk and vf.kvip = nvl(l_social_vip_segment_id, vf.kvip)                           
+          left outer join bars.attribute_value_by_date av
+            on c.rnk = av.object_id
+           and av.value_date <= const.bankdate
+           and (av.attribute_id in (const.CUSTOMER_SEGMENT_ACTIVITY,
+                                   const.CUSTOMER_SEGMENT_TRANSACTIONS,
+                                   const.CUSTOMER_SEGMENT_PRODUCTS_AMNT,
+                                   const.CUSTOMER_PRDCT_AMNT_DPT,
+                                   const.CUSTOMER_PRDCT_AMNT_CREDITS,
+                                   const.CUSTOMER_PRDCT_AMNT_CRDCARDS,
+                                   const.CUSTOMER_PRDCT_AMNT_CRD_GARANT,
+                                   const.CUSTOMER_PRDCT_AMNT_CRDENERGY,
+                                   const.CUSTOMER_PRDCT_AMNT_CARDS,
+                                   const.CUSTOMER_PRDCT_AMNT_ACC)
+                or (av.attribute_id = const.CUSTOMER_SEGMENT_FINANCIAL and av.number_value = nvl(l_financial_segment_id, av.number_value))
+                or (av.attribute_id = const.CUSTOMER_SEGMENT_BEHAVIOR and av.number_value = nvl(l_behavior_segment_id, av.number_value))
+                   )
+          left join vip_flags vf on vf.rnk = c.rnk and vf.kvip = nvl(l_social_vip_segment_id, vf.kvip)
          where 1 = 1
            and c.custtype = 3
            and c.date_off is null
---           and c.rnk = 37737011
+--           and c.rnk = 7453711
            and c.branch = l_branch
         )
  where value_date = max_value_date
 
 model
       -->cell_reference_options (optional)
-      keep nav 
+      keep nav
 --      ignore nav
 
-      unique dimension -- unique single reference         
+      unique dimension -- unique single reference
       -->return_rows_clause (optional)
-      return updated rows         
---      return all rows         
+      return updated rows
+--      return all rows
 
       -->reference_model (optional)
       reference const on ( select * from const )
@@ -305,10 +303,10 @@ exception
          raise;
 end rpt_branch_customer_segment;
 /
-show errors
+show err;
 
 PROMPT *** Create  grants  RPT_BRANCH_CUSTOMER_SEGMENT ***
-grant EXECUTE on RPT_BRANCH_CUSTOMER_SEGMENT to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on RPT_BRANCH_CUSTOMER_SEGMENT to BARS_ACCESS_DEFROLE;
 
 
 

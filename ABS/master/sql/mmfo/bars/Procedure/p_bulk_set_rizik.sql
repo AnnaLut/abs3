@@ -5,9 +5,11 @@ PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_BULK_SET_RIZIK.sql =
 PROMPT ===================================================================================== 
 
 
-create or replace procedure p_bulk_set_rizik(p_filter in varchar2)
+PROMPT *** Create  procedure P_BULK_SET_RIZIK ***
+
+  CREATE OR REPLACE PROCEDURE BARS.P_BULK_SET_RIZIK (p_filter in varchar2)
   is
-/*author: lypskykh 
+/*author: lypskykh
 ‘ћ. массовое подтверждение уровн€ риска клиентов
 v.2.0 12.06.2017 уходим от пр€мой вставки в update-таблицу*/
 
@@ -18,9 +20,9 @@ begin
   l_get_statement := q'[select T_DICTIONARY_ITEM(to_char(rnk), rizik) from V_CUSTOMER_RIZIK where ]' || p_filter;
   execute immediate l_get_statement bulk collect into val_custw;
   -- удал€ем существующие по списку - чтобы сработал триггер
-  delete from customerw where rnk in (select to_number(key) from table(val_custw)) and tag = 'RIZIK'; 
+  delete from customerw where rnk in (select to_number(key) from table(val_custw)) and tag = 'RIZIK';
   -- вставл€ем новые данные
-  insert into bars.customerw (rnk, tag, value, isp) 
+  insert into bars.customerw (rnk, tag, value, isp)
   select to_number(w.key), 'RIZIK', w.value, 0 from table(val_custw) w;
 end;
 /

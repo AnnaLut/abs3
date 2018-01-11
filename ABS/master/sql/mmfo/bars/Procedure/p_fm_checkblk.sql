@@ -1,6 +1,13 @@
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_FM_CHECKBLK.sql =========*** Run
+PROMPT ===================================================================================== 
+
+
 PROMPT *** Create  procedure P_FM_CHECKBLK ***
 
-create or replace procedure p_fm_checkblk
+  CREATE OR REPLACE PROCEDURE BARS.P_FM_CHECKBLK 
 is
 /* author: unknown
 v. 1.0.1 19.07.2017
@@ -65,3 +72,9 @@ show err;
 PROMPT *** Create  grants  P_FM_CHECKBLK ***
 grant EXECUTE                                                                on P_FM_CHECKBLK   to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on P_FM_CHECKBLK   to FINMON01;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_FM_CHECKBLK.sql =========*** End
+PROMPT ===================================================================================== 

@@ -1,4 +1,10 @@
-create or replace package BARS_DWHCCK 
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_dwhcck.sql =========*** Run ***
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.BARS_DWHCCK 
 is
     -------------------------------------------------------------------
     --                                                               --
@@ -116,10 +122,7 @@ is
 
 end bars_dwhcck;
 /
-
-show err
-
-create or replace package body BARS_DWHCCK 
+CREATE OR REPLACE PACKAGE BODY BARS.BARS_DWHCCK 
 is
     -------------------------------------------------------------------
     --                                                               --
@@ -464,7 +467,14 @@ is
 
 end bars_dwhcck;
 /
+ show err;
+ 
+PROMPT *** Create  grants  BARS_DWHCCK ***
+grant EXECUTE                                                                on BARS_DWHCCK     to BARSDWH_ACCESS_USER;
 
-show err;
-
-grant EXECUTE on BARS_DWHCCK to BARSDWH_ACCESS_USER;
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_dwhcck.sql =========*** End ***
+ PROMPT ===================================================================================== 
+ 

@@ -1,9 +1,10 @@
+
  
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/skrn.sql =========*** Run *** ======
  PROMPT ===================================================================================== 
  
- CREATE OR REPLACE PACKAGE SKRN
+  CREATE OR REPLACE PACKAGE BARS.SKRN 
 IS
 /*
 
@@ -120,7 +121,7 @@ IS
 
 END skrn;
 /
-CREATE OR REPLACE PACKAGE BODY SKRN
+CREATE OR REPLACE PACKAGE BODY BARS.SKRN 
 -- *******************************************************************************
 IS
    version_   constant  varchar2(30)   := 'version 6.15 24/05/2017';

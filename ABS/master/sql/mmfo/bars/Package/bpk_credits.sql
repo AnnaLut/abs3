@@ -1,4 +1,10 @@
-create or replace package BPK_CREDITS
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bpk_credits.sql =========*** Run ***
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.BPK_CREDITS 
 is
 
   --
@@ -40,10 +46,7 @@ is
 
 end BPK_CREDITS;
 /
-
-show errors;
-
-create or replace package body BPK_CREDITS
+CREATE OR REPLACE PACKAGE BODY BARS.BPK_CREDITS 
 is
   --
   -- constants
@@ -346,10 +349,17 @@ BEGIN
 
 END BPK_CREDITS;
 /
+ show err;
+ 
+PROMPT *** Create  grants  BPK_CREDITS ***
+grant EXECUTE                                                                on BPK_CREDITS     to BARSUPL;
+grant EXECUTE                                                                on BPK_CREDITS     to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on BPK_CREDITS     to OW;
+grant EXECUTE                                                                on BPK_CREDITS     to UPLD;
 
-show errors;
-
-grant EXECUTE on BPK_CREDITS to BARSUPL;
-grant EXECUTE on BPK_CREDITS to BARS_ACCESS_DEFROLE;
-grant EXECUTE on BPK_CREDITS to OW;
-grant EXECUTE on BPK_CREDITS to UPLD;
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/bpk_credits.sql =========*** End ***
+ PROMPT ===================================================================================== 
+ 

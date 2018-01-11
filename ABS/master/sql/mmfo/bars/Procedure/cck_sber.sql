@@ -1,6 +1,15 @@
-create or replace procedure cck_sber(tip_     in Varchar2,
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/CCK_SBER.sql =========*** Run *** 
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure CCK_SBER ***
+
+  CREATE OR REPLACE PROCEDURE BARS.CCK_SBER (tip_     in Varchar2,
                                      vid_     in varchar2,
-                                     p_branch in varchar2  default sys_context('bars_context','mfo')) is
+                                     p_branch in varchar2  default sys_context('bars_context','user_mfo')) is
 
   -- tip клиента 2 ЮЛ 3 ФЛ
 
@@ -10,13 +19,13 @@ create or replace procedure cck_sber(tip_     in Varchar2,
                          VID=1 -  день погашения вычисляется по ГПК . Запрос красивый но при построении КД через ГЛК не будут созданы даты погашения процентов из за чего не будет работать перенос на прострочку по ГПК
                          VID=4 -(КП S38)  день погашения вычисляется по дню погашения   ОЧЕНЬ ХОРОША ДЛЯ НОВЫХ МИГРИРОВАНЫХ банков когда есть проблемы с ГПК.
                         VID=5  - Используется  только в Киевском РУ Ощадбанка по некоторым старым КД  (где платежный день 25 но проценты уплачиваются по 31 текущего месяца)
-  
-  
+
+
   24.04.2014 DAV После волевого решения ОБ и для согласования с логикой процедуры STA CCK.CC_ASPN_DOG  задолженность по процентам
                  для старых договоров и класики если платежный день попадает на праздник или на выходной смещаем только вперед на
                  ближайший банковский день.
-  
-  
+
+
   !!!! sos !!!!
   18.07.2013 Sta процедура переноса процентов на просрочку.
                  Специально для ОБ
@@ -34,16 +43,16 @@ create or replace procedure cck_sber(tip_     in Varchar2,
   l_max number; -- l_max > 0  - max допусимая сумма для переноса на просрочку (из ГПК) - используется в новом ануитете
   -- l_max = Null - по остатку
 begin
- 
-  
-  l_dat1 := dat_next_u(gl.bdate, -1); -- прошлый раб день
-  l_dat2 := dat_next_u(gl.bdate, -2); -- поза-прошлый раб день
+
+
+  l_dat1 := dat_next_u(gl.bd, -1); -- прошлый раб день
+  l_dat2 := dat_next_u(gl.bd, -2); -- поза-прошлый раб день
 
   -- Перенос на прострочку где день погашения % долга определяется по ГПК (на 01.04.2015 - нигде не используется)
   if vid_ = '1' then
-  
+
     for k in (
-              
+
               -- STA
               --- Возвращаем старый запрос по платежным дням
               -- Функция переноса на просрочку процентного долга.
@@ -53,7 +62,7 @@ begin
               -- Для кредитов у которых указан тип погашения "за прошлый месяц" будет вынесена сумма начисленных процентов за прошлый месяц, (2 вариант)
               -- а также в первый рабочий день функция вынесет на просрочку КД за позапрошлый месяц у которых дата погашения последнй день месяца.
               -- Для новых ануитетов заскакиеваем в ветку Ануитетов по новой (1 вариант)
-              
+
               select d.ND,
                       d.rnk,
                       d.CC_ID,
@@ -95,7 +104,7 @@ begin
                  and (nvl(to_number(cck_app.get_nd_txt(d.ND, 'FREQP'),
                                     '99999999999D99',
                                     'NLS_NUMERIC_CHARACTERS = ''. '''),
-                          da.freq) != 400 or d.wdate < gl.bdate)
+                          da.freq) != 400 or d.wdate < gl.bd)
                     -- узнаем платежный ли день
                  and exists
                (select 1
@@ -108,7 +117,8 @@ begin
                  and nvl(nvl(to_date(cck_app.get_nd_txt(d.ND, 'DATSN'),
                                      'dd/mm/yyyy'),
                              i.apl_dat),
-                         d.sdate) <= cck_app.correctDate2(980, gl.bd - 1, 0)) loop
+                         d.sdate) <= cck_app.correctDate2(980, gl.bd - 1, 0)
+                    and d.kf=p_branch  ) loop
       -- новый (жесткий ) аннуитет
       If k.vidd = 11 and k.basem = 1 and k.basey = 2 then
         begin
@@ -116,7 +126,7 @@ begin
           l_max     := null;
           l_ostc_sn := null;
           l_acc_sn  := null;
-        
+
           -- Есть ли проц карточка % ?
           select nvl(MAX(i.acr_dat), k.pl_dat - 1), max(i.acra)
             into l_Acr_dat, l_acc_sn
@@ -138,7 +148,7 @@ begin
              and a.tip = 'SN '
              and a.kv = k.kv;
           -- Если это ануитет по-новому, то д.б. сумма нач проц >= сумме из ГПК , т.к. переносу подлежит не более суммы из ГПК
-        
+
           If k.pl_DAT <= l_Acr_dat then
             l_max := greatest(l_ostc_sn -
                               cck.FINT(k.ND, k.pl_DAT, l_Acr_dat),
@@ -146,14 +156,14 @@ begin
           else
             l_max := trunc(l_ostc_sn);
           End if;
-        
+
           cck.CC_ASPN_DOG(k.nd, k.cc_id, k.okpo, k.nmk, -3, l_max);
-        
+
         EXCEPTION
           WHEN NO_DATA_FOUND THEN
             goto NexRec;
         end;
-      
+
       elsif k.DP = 0 then
         -- за прошлый день (когда % платяться по предыдущий день)
         cck.CC_ASPN_DOG(k.nd, k.cc_id, k.okpo, k.nmk, -3, null);
@@ -161,18 +171,18 @@ begin
         -- за прошлый месяц
         cck.CC_ASPN_DOG(k.nd, k.cc_id, k.okpo, k.nmk, -2, null);
       end if;
-    
+
       <<NexRec>>
       null;
-    
+
     end loop;
-  
+
     Return;
   end if;
 
   -- Перенос на прострочку где день погашения %  определяется по ДНЮ погашения (аннуитет )
   if vid_ = '4' then
-  
+
     for k in (select d.ND,
                      d.rnk,
                      d.CC_ID,
@@ -241,7 +251,8 @@ begin
                  and nvl(nvl(to_date(cck_app.get_nd_txt(d.ND, 'DATSN'),
                                      'dd/mm/yyyy'),
                              i.apl_dat),
-                         d.sdate) <= cck_app.correctDate2(980, gl.bd - 1, 0)) loop
+                         d.sdate) <= cck_app.correctDate2(980, gl.bd - 1, 0)
+                         and d.kf=sys_context('bars_context','user_mfo')) loop
       -- новый (жесткий ) аннуитет
       If k.vidd = 11 and k.basem = 1 and k.basey = 2 then
         begin
@@ -249,7 +260,7 @@ begin
           l_max     := null;
           l_ostc_sn := null;
           l_acc_sn  := null;
-        
+
           -- Есть ли проц карточка % ?
           select nvl(MAX(i.acr_dat), k.pl_dat - 1), max(i.acra)
             into l_Acr_dat, l_acc_sn
@@ -271,7 +282,7 @@ begin
              and a.tip = 'SN '
              and a.kv = k.kv;
           -- Если это ануитет по-новому, то д.б. сумма нач проц >= сумме из ГПК , т.к. переносу подлежит не более суммы из ГПК
-        
+
           If k.pl_DAT <= l_Acr_dat then
             l_max := greatest(l_ostc_sn -
                               cck.FINT(k.ND, k.pl_DAT, l_Acr_dat),
@@ -281,12 +292,12 @@ begin
           End if;
           bars_audit.info('CCK_SBER 0 in ND = '||k.nd);
           cck.CC_ASPN_DOG(k.nd, k.cc_id, k.okpo, k.nmk, -3, l_max);
-        
+
         EXCEPTION
           WHEN NO_DATA_FOUND THEN
             goto NexRec;
         end;
-      
+
       elsif k.DP = 0 then
         -- за прошлый день (когда % платяться по предыдущий день)
         bars_audit.info('CCK_SBER 1 in ND = '||k.nd);
@@ -296,12 +307,12 @@ begin
         bars_audit.info('CCK_SBER 2 in ND = '||k.nd);
         cck.CC_ASPN_DOG(k.nd, k.cc_id, k.okpo, k.nmk, -2, null);
       end if;
-    
+
       <<NexRec>>
       null;
-    
+
     end loop;
-  
+
     Return;
   end if;
 
@@ -339,7 +350,8 @@ begin
                            from nd_txt
                           where nd = d.nd
                             and tag = 'DAYSN'),
-                         to_char(lpad(i.s, 2, '0')))) loop
+                         to_char(lpad(i.s, 2, '0')))
+                         and d.kf=sys_context('bars_context','user_mfo')) loop
       if k.DP = 0 then
         cck.CC_ASPN_DOG(k.nd, k.cc_id, k.okpo, k.nmk, -3, null);
       else
@@ -353,22 +365,33 @@ begin
   Варианты определения платежного дня
   1   от Лесняка (0 - не платежный день  1 - платежный )
   Х - плат день  , min_dat - мин плат дата  max_dat пл дата
-  
+
   select case when a.m=0 then case when :x between a.n1 and a.n2 then 1 else 0 end
                          else case when :x<=a.n2 or :x>=a.n1 then 1 else 0 end end as res
     from (select to_number(to_char(:min_dat,'dd')) as n1, to_number(to_char(:max_dat,'dd')) as n2,
           case when to_char(:min_dat,'mmyyyy')=to_char(:max_dat,'mmyyyy') then 0 else 1 end as m from dual) a
-  
+
   2. от Новикова
-  
+
   5 in
   (
   select to_char(:min_dat+level,'dd') num from dual
   connect by :min_dat+level <= :max_dat)
-  
-  
+
+
   */
   ---
 
 end CCK_SBER;
 /
+show err;
+
+PROMPT *** Create  grants  CCK_SBER ***
+grant EXECUTE                                                                on CCK_SBER        to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on CCK_SBER        to RCC_DEAL;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/CCK_SBER.sql =========*** End *** 
+PROMPT ===================================================================================== 

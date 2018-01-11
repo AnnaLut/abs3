@@ -1,4 +1,10 @@
-create or replace package bars_release_mgr
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_release_mgr.sql =========*** Ru
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.BARS_RELEASE_MGR 
 is
 
 g_version varchar2(50) := '4.0.0';
@@ -64,19 +70,15 @@ function get_hash_object(p_owner all_objects.OWNER%type,
 -- возвращает мд5-сумму по объектам на состояние инсталляции (ид в brm_install_log)
 function get_install_hash(p_install_id brm_objects_hash.install_id%type)
     return varchar2;
-    
+
 ----------------------------------------------------------------------------------------
 -- выдает отчет об изменениях по объектам между записями инсталляций
-function diff_report(p_install_id_start in brm_objects_hash.install_id%type, 
+function diff_report(p_install_id_start in brm_objects_hash.install_id%type,
                       p_install_id_end in brm_objects_hash.install_id%type) return clob;
-    
+
 end bars_release_mgr;
 /
-grant execute on bars_release_mgr to public;
-/
-create or replace public synonym brm for bars.bars_release_mgr;
-/
-create or replace package body bars_release_mgr
+CREATE OR REPLACE PACKAGE BODY BARS.BARS_RELEASE_MGR 
 is
 
 g_r_type varchar2(15) := 'release';
@@ -133,7 +135,7 @@ procedure install_log(p_type varchar2, p_version varchar2, p_message varchar2)
 begin
     select s_brm_install_log.nextval into l_install_id from dual;
     select v.name into l_dbname from v$database v;
-        
+
     -- objects
     insert into brm_objects_hash (install_id,
                                   object_id,
@@ -160,24 +162,24 @@ begin
                              'TABLE',
                              'VIEW',
                              'MATERIALIZED VIEW');
-                             
+
     -- main log
-    insert into brm_install_log (rec_id, 
-                                 rec_date, 
-                                 inst_type, 
-                                 inst_name, 
-                                 rec_message, 
+    insert into brm_install_log (rec_id,
+                                 rec_date,
+                                 inst_type,
+                                 inst_name,
+                                 rec_message,
                                  bars_hash,
                                  dbname,
                                  mfo,
                                  glbname,
                                  username,
                                  machine_name,
-                                 machine_ip) 
-    values (l_install_id, 
-            sysdate, 
-            p_type, 
-            p_version, 
+                                 machine_ip)
+    values (l_install_id,
+            sysdate,
+            p_type,
+            p_version,
             p_message,
             get_install_hash(l_install_id),
             l_dbname,
@@ -186,8 +188,8 @@ begin
             user_name,
             sys_context('userenv', 'terminal'),
             sys_context('userenv', 'ip_address'));
-    
-    commit;    
+
+    commit;
 end;
 
 -- отправка сообщения о результатах установки
@@ -196,18 +198,18 @@ procedure send_logs(p_install_name varchar2)
     l_body clob;
     id_list number_list;
 begin
-    for rec in (select to_char(g.rec_id) || chr(9) 
-                        || g.rec_date || chr(9) 
-                        || g.inst_type || chr(9) 
-                        || g.inst_name || chr(9) 
-                        || g.rec_message || chr(9) 
+    for rec in (select to_char(g.rec_id) || chr(9)
+                        || g.rec_date || chr(9)
+                        || g.inst_type || chr(9)
+                        || g.inst_name || chr(9)
+                        || g.rec_message || chr(9)
                         || g.bars_hash || chr(9)
                         || g.dbname || chr(9)
                         || g.mfo || chr(9)
                         || g.glbname || chr(9)
                         || g.username || chr(9)
                         || g.machine_name || chr(9)
-                        || g.machine_ip as line 
+                        || g.machine_ip as line
                 from brm_install_log g
                 where g.inst_name = p_install_name
                 order by g.rec_id)
@@ -215,7 +217,7 @@ begin
         l_body := l_body || rec.line || chr(10);
     end loop;
     begin
-        select rec_id 
+        select rec_id
         bulk collect into id_list
         from
         (
@@ -223,15 +225,15 @@ begin
             from brm_install_log
             order by rec_id desc
         )
-        where rownum<=3;    
+        where rownum<=3;
             l_body := l_body || chr(10) || 'DIFF BEFORE' || chr(10) || diff_report(id_list(3), id_list(2)) || chr(10);
-            
+
             l_body := l_body || chr(10) || 'DIFF AFTER' || chr(10) || diff_report(id_list(2), id_list(1)) || chr(10);
     exception
         when others then
             dbms_output.put_line('BRM: Ошибка построения отчета');
     end;
-    
+
     begin
         bars_mail.to_mail(p_to_addr => g_tech_email,
                           p_to_name => g_tech_name,
@@ -239,7 +241,7 @@ begin
                           p_body    => l_body);
     exception
         when others then
-            dbms_output.put_line('BRM: Не налаштовано поштовий сервіс, листа про завершення інсталляції не надіслано.');    
+            dbms_output.put_line('BRM: Не налаштовано поштовий сервіс, листа про завершення інсталляції не надіслано.');
     end;
 end send_logs;
 
@@ -331,7 +333,7 @@ function get_hash_schema_objects
     is
     l_md5_hash raw(32000);
 begin
-    for programs in (select s.TEXT 
+    for programs in (select s.TEXT
                     from all_objects ao
                     join all_source s on ao.OBJECT_TYPE in ('FUNCTION',
                                                             'PACKAGE',
@@ -349,17 +351,17 @@ begin
         l_md5_hash := dbms_crypto.Hash(l_md5_hash || dbms_crypto.Hash(utl_raw.cast_to_raw(programs.text), dbms_crypto.HASH_MD5), dbms_crypto.HASH_MD5);
     end loop;
 
-    for tables in (select dbms_crypto.Hash(utl_raw.cast_to_raw(atc.COLUMN_NAME || atc.DATA_TYPE || atc.DATA_LENGTH), dbms_crypto.HASH_MD5) as md5hash 
+    for tables in (select dbms_crypto.Hash(utl_raw.cast_to_raw(atc.COLUMN_NAME || atc.DATA_TYPE || atc.DATA_LENGTH), dbms_crypto.HASH_MD5) as md5hash
                     from all_objects ao
-                    join all_tab_columns atc on  ao.OBJECT_TYPE in ('TABLE', 'VIEW', 'MATERIALIZED VIEW') 
-                                            and ao.owner = atc.owner 
+                    join all_tab_columns atc on  ao.OBJECT_TYPE in ('TABLE', 'VIEW', 'MATERIALIZED VIEW')
+                                            and ao.owner = atc.owner
                                             and ao.OBJECT_NAME = atc.TABLE_NAME
                     where ao.owner = 'BARS'
                     order by ao.object_id, atc.COLUMN_ID)
     loop
         l_md5_hash := dbms_crypto.Hash(l_md5_hash || tables.md5hash, dbms_crypto.HASH_MD5);
     end loop;
-    
+
     return rawtohex(l_md5_hash);
 end get_hash_schema_objects;
 
@@ -375,7 +377,7 @@ begin
       into l_type
       from ALL_OBJECTS t
      where t.OBJECT_ID = p_object_id;
-     
+
      if l_type in ('FUNCTION',
                    'PACKAGE',
                    'PACKAGE BODY',
@@ -384,11 +386,11 @@ begin
                    'TYPE',
                    'TYPE BODY')
      then
-         for rec in (select s.TEXT 
+         for rec in (select s.TEXT
                      from ALL_OBJECTS ao
-                     join ALL_SOURCE s on ao.OWNER = s.OWNER 
-                                       and ao.OBJECT_NAME = s.name 
-                                       and ao.OBJECT_TYPE = s.TYPE 
+                     join ALL_SOURCE s on ao.OWNER = s.OWNER
+                                       and ao.OBJECT_NAME = s.name
+                                       and ao.OBJECT_TYPE = s.TYPE
                                        and ao.OBJECT_TYPE = l_type
                      where ao.OBJECT_ID = p_object_id
                      order by s.LINE
@@ -397,10 +399,10 @@ begin
              l_md5_hash := dbms_crypto.Hash(l_md5_hash || dbms_crypto.Hash(utl_raw.cast_to_raw(rec.text), dbms_crypto.HASH_MD5), dbms_crypto.HASH_MD5);
          end loop;
      elsif l_type in ('TABLE', 'VIEW', 'MATERIALIZED VIEW') then
-         for rec in (select dbms_crypto.Hash(utl_raw.cast_to_raw(atc.COLUMN_NAME || atc.DATA_TYPE || atc.DATA_LENGTH), dbms_crypto.HASH_MD5) as md5hash 
+         for rec in (select dbms_crypto.Hash(utl_raw.cast_to_raw(atc.COLUMN_NAME || atc.DATA_TYPE || atc.DATA_LENGTH), dbms_crypto.HASH_MD5) as md5hash
                     from ALL_OBJECTS ao
                     join ALL_TAB_COLUMNS atc on  ao.OBJECT_TYPE = l_type
-                                            and ao.OWNER = atc.OWNER 
+                                            and ao.OWNER = atc.OWNER
                                             and ao.OBJECT_NAME = atc.TABLE_NAME
                     where ao.OBJECT_ID = p_object_id
                     order by atc.COLUMN_ID)
@@ -431,7 +433,7 @@ begin
     exception
         when no_data_found then return null;
     end;
-    
+
     return get_hash_object(p_object_id => l_obj_id);
 end get_hash_object;
 
@@ -442,9 +444,9 @@ function get_install_hash(p_install_id brm_objects_hash.install_id%type)
 is
 l_md5_hash varchar2(32);
 begin
-    for rec in (select bars_hash 
-                from brm_objects_hash t 
-                where t.install_id = p_install_id 
+    for rec in (select bars_hash
+                from brm_objects_hash t
+                where t.install_id = p_install_id
                 order by t.object_id)
     loop
         l_md5_hash := dbms_crypto.Hash(l_md5_hash || rec.bars_hash, dbms_crypto.HASH_MD5);
@@ -454,7 +456,7 @@ end get_install_hash;
 
 ----------------------------------------------------------------------------------------
 -- выдает отчет об изменениях по объектам между записями инсталляций
-function diff_report(p_install_id_start in brm_objects_hash.install_id%type, 
+function diff_report(p_install_id_start in brm_objects_hash.install_id%type,
                       p_install_id_end in brm_objects_hash.install_id%type)
                       return clob
 is
@@ -530,4 +532,14 @@ end diff_report;
 
 end bars_release_mgr;
 /
-show errors;
+ show err;
+ 
+PROMPT *** Create  grants  BARS_RELEASE_MGR ***
+grant EXECUTE                                                                on BARS_RELEASE_MGR to PUBLIC;
+
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_release_mgr.sql =========*** En
+ PROMPT ===================================================================================== 
+ 

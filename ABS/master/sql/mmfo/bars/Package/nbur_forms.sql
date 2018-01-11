@@ -58,7 +58,7 @@ end;
 CREATE OR REPLACE PACKAGE BODY BARS.NBUR_FORMS 
 is
 
-g_body_version  constant varchar2(64)  := 'version 3.9 2017.04.09';
+g_body_version  constant varchar2(64)  := 'version 4.2 2017.07.13';
 g_body_defs     constant varchar2(512) := '';
 
 MODULE_PREFIX   constant varchar2(10)   := 'NBUR';
@@ -134,11 +134,11 @@ BEGIN
   IF r_type_ in (1, 2, 4) -- коды областей
   THEN                                                            -- тип 1
      sql_ :=
-           'select ku nbuc '||
+           'select lpad(ku, 2, ''0'') nbuc '||
            'from spr_b040 '||
            'where (d_open is null or d_open <= :dat_) and  '||
             '     (d_close is null or d_close > :dat_)   '||
-           'group by ku '||
+           'group by lpad(ku, 2, ''0'') '||
            'order by 1';
   ELSIF r_type_ IN (3, 5)
   THEN                                                            -- тип 2
@@ -238,6 +238,8 @@ is
     l_nMonthN       numeric;
     l_nI            numeric;
     l_dDatf         date;
+   
+    l_report_date    date := p_report_date;    
 begin
     if p_version_id <= 35 then
        l_sCQNum := nvl(f_ret_lit_code(p_version_id), '1');
@@ -262,21 +264,26 @@ begin
 
     l_nDayN   := to_number(to_char(sysdate, 'dd'));
     l_nMonthN := to_number(to_char(sysdate, 'mm'));
+    
+    if l_NumFile = '2C' then
+       l_report_date := DAT_PREV_U(l_report_date, 1);
+       l_dtExtDate := l_report_date;
+    end if;
 
     if l_nPeriod = 84 -- декада
     then
-        if p_report_date between to_date('21'||to_char(p_report_date,'MM') || to_char(p_report_date,'YYYY'),'ddmmyyyy')
-                         and to_date(to_char(last_day(p_report_date),'DD')||to_char(p_report_date,'MM') || to_char(p_report_date,'YYYY'),'ddmmyyyy')
+        if l_report_date between to_date('21'||to_char(l_report_date,'MM') || to_char(l_report_date,'YYYY'),'ddmmyyyy')
+                         and to_date(to_char(last_day(l_report_date),'DD')||to_char(l_report_date,'MM') || to_char(l_report_date,'YYYY'),'ddmmyyyy')
         then
-           l_dtExtDate := to_date('21' || to_char(p_report_date,'MM') || to_char(p_report_date,'YYYY'),'ddmmyyyy');
-        ElsIf p_report_date between to_date('11'||to_char(p_report_date,'MM') || to_char(p_report_date,'YYYY'),'ddmmyyyy')
-                            and to_date('20'||to_char(p_report_date,'MM') || to_char(p_report_date,'YYYY'),'ddmmyyyy')
+           l_dtExtDate := to_date('21' || to_char(l_report_date,'MM') || to_char(l_report_date,'YYYY'),'ddmmyyyy');
+        ElsIf l_report_date between to_date('11'||to_char(l_report_date,'MM') || to_char(l_report_date,'YYYY'),'ddmmyyyy')
+                            and to_date('20'||to_char(l_report_date,'MM') || to_char(l_report_date,'YYYY'),'ddmmyyyy')
            then
-              l_dtExtDate := to_date('11' || to_char(p_report_date,'MM') || to_char(p_report_date,'YYYY'),'ddmmyyyy');
-        ElsIf p_report_date between to_date('01'||to_char(p_report_date,'MM') || to_char(p_report_date,'YYYY'),'ddmmyyyy')
-                            and to_date('10'||to_char(p_report_date,'MM') || to_char(p_report_date,'YYYY'),'ddmmyyyy')
+              l_dtExtDate := to_date('11' || to_char(l_report_date,'MM') || to_char(l_report_date,'YYYY'),'ddmmyyyy');
+        ElsIf l_report_date between to_date('01'||to_char(l_report_date,'MM') || to_char(l_report_date,'YYYY'),'ddmmyyyy')
+                            and to_date('10'||to_char(l_report_date,'MM') || to_char(l_report_date,'YYYY'),'ddmmyyyy')
            then
-              l_dtExtDate := trunc( p_report_date , 'mm');
+              l_dtExtDate := trunc(l_report_date , 'mm');
         else
            null;
         end if;
@@ -288,8 +295,8 @@ begin
                   '.'||
                   Upper(substr(l_sGCode, 1, 1));
 
-    l_nDayN   := to_number(to_char(p_report_date, 'dd'));
-    l_nMonthN := to_number(to_char(p_report_date, 'mm'));
+    l_nDayN   := to_number(to_char(l_report_date, 'dd'));
+    l_nMonthN := to_number(to_char(l_report_date, 'mm'));
 
     case l_nPeriod
         when 53 then -- Once in 5 day
@@ -377,6 +384,8 @@ is
 
    l_file_code      varchar2(3);
    l_ParamCount     number;
+   
+   l_report_date    date := p_report_date;
 begin
     begin
         select a.file_code, a.UNIT_CODE, a.PERIOD_TYPE, a.SCHEME_NUMBER,
@@ -401,14 +410,18 @@ begin
     where report_date = p_report_date and
           kf = p_kf and
           report_code = l_FileCode;
+    
+    l_FileName := f_createfilename(p_file_id, l_report_date, p_kf, p_version_id);
 
-    l_FileName := f_createfilename(p_file_id, p_report_date, p_kf, p_version_id);
-
+    if l_NumFile = '2C' then
+       l_report_date := DAT_PREV_U(l_report_date, 1);
+    end if;
+    
     l_PeriodCode := ascii(l_Period);
-    l_dtRDate := trunc(p_report_date);
+    l_dtRDate := trunc(l_report_date);
 
-    l_DayN   := to_number(to_char(p_report_date, 'dd'));
-    l_MonthN := to_number(to_char(p_report_date, 'mm'));
+    l_DayN   := to_number(to_char(l_report_date, 'dd'));
+    l_MonthN := to_number(to_char(l_report_date, 'mm'));
 
     l_StopDate := to_char(l_dtRDate, 'ddmmyyyy');
 
@@ -641,17 +654,31 @@ begin
       close l_cursor;
       
       -- формуємо пусті рядки для тих підрозділів, по яких немає даних
-      if p_kf in ('324805', '322669') and (l_type_cons <> '0' or l_cnt = 0) then
-        FOR k IN (SELECT nbuc
-                  FROM TABLE (f_ret_empt_nbuc (l_type_cons, p_report_date, l_report_code, p_kf)))
-        LOOP
-           l_row := f_createheadlineex (p_file_id, p_report_date, p_kf, p_version_id, k.nbuc);
-           l_filebody := l_filebody||l_row||chr(13)||chr(10);
-        END LOOP;
-      end if;
+      if p_kf in ('324805', '322669') then
+         if (l_type_cons <> '0' or l_cnt = 0) and 
+             not (p_kf = '322669' and l_report_code = '#E9') then
+             FOR k IN (SELECT nbuc
+                      FROM TABLE (f_ret_empt_nbuc (l_type_cons, p_report_date, l_report_code, p_kf)))
+             LOOP
+               l_row := f_createheadlineex (p_file_id, p_report_date, p_kf, p_version_id, k.nbuc);
+               l_filebody := l_filebody||l_row||chr(13)||chr(10);
+             END LOOP;
+             
+             if l_type_cons = '0' and l_cnt = 0 then
+                l_row := f_createheadlineex (p_file_id, p_report_date, p_kf, p_version_id, l_nbuc_set);
+                l_filebody := l_filebody||l_row||chr(13)||chr(10);
+             end if;
+         elsif p_kf = '322669' and l_report_code = '#E9' then
+             if l_cnt = 0 then
+                l_row := f_createheadlineex (p_file_id, p_report_date, p_kf, p_version_id, l_nbuc_set);
+                l_filebody := l_filebody||l_row||chr(13)||chr(10);
+             end if;
 
+             l_row := f_createheadlineex (p_file_id, p_report_date, p_kf, p_version_id, '320069');
+             l_filebody := l_filebody||l_row||chr(13)||chr(10);
+         end if;
       -- якщо файл пустий, то підзаголовний рядок все одно потрібен
-      if p_kf not in ('324805', '322669') and l_cnt = 0 then
+      elsif p_kf not in ('324805', '322669') and l_cnt = 0 then
          l_row := f_createheadlineex (p_file_id, p_report_date, p_kf, p_version_id, l_nbuc_set);
          l_filebody := l_filebody||l_row||chr(13)||chr(10);
       end if;

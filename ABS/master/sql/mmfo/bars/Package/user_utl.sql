@@ -1,4 +1,10 @@
-create or replace package user_utl is
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/user_utl.sql =========*** Run *** ==
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.USER_UTL is
 
     OBJ_TYPE_USER                  constant varchar2(30 char) := 'STAFF_USER';
 
@@ -225,7 +231,7 @@ create or replace package user_utl is
     return integer;
 end;
 /
-create or replace package body user_utl as
+CREATE OR REPLACE PACKAGE BODY BARS.USER_UTL as
 
     user_doesnt_exists exception;
     pragma exception_init(user_doesnt_exists, -1918);
@@ -1460,3 +1466,11 @@ create or replace package body user_utl as
     end;
 end;
 /
+ show err;
+ 
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/user_utl.sql =========*** End *** ==
+ PROMPT ===================================================================================== 
+ 

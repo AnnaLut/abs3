@@ -1,8 +1,10 @@
+
+ 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/safe_deposit.sql =========*** Run **
  PROMPT ===================================================================================== 
-
-create or replace package safe_deposit is
+ 
+  CREATE OR REPLACE PACKAGE BARS.SAFE_DEPOSIT is
 
   g_header_version  constant varchar2(64) := 'version 3.2 01/08/2017';
   g_awk_header_defs constant varchar2(512) := '';
@@ -139,7 +141,7 @@ create or replace package safe_deposit is
 
 end safe_deposit;
 /
-create or replace package body safe_deposit is
+CREATE OR REPLACE PACKAGE BODY BARS.SAFE_DEPOSIT is
   g_body_version  constant varchar2(64) := 'version 3.11 02/10/2017';
   g_awk_body_defs constant varchar2(512) := '' || 'OBU' || chr(10);
   /*-------------------------------------------------------------------------------------------------------------------------------------*/
@@ -160,16 +162,16 @@ create or replace package body safe_deposit is
     dep_isp branch_parameters.val%type; --  виконавець
     dep_grp branch_parameters.val%type; --  група рахунків
     our_rnk branch_parameters.val%type; --  рнк банку
-  
+
     l_count    skrynka_tip.cell_count%type;
     l_count_nd skrynka_tip.cell_count%type;
-  
+
     macc   accounts.acc%type; --  код рахунку
     ntmp   integer; --  не використовується
     m_n_sk skrynka.n_sk%type; --
     m_snum skrynka.snum%type; --
     m_mfo  accounts.kf%type;
-  
+
   begin
     begin
       select snum
@@ -177,42 +179,42 @@ create or replace package body safe_deposit is
         from skrynka
        where snum = p_safe_id
          and branch = sys_context('bars_context', 'user_branch')
-      
+
       ;
-    
+
       bars_error.raise_nerror(modcode,
                               'SKRYNKA_ALREADY_EXISTS',
                               to_char(p_safe_id));
-    
+
     exception
       when no_data_found then
         null;
     end;
-  
+
     select nvl(max(cell_count), 0)
       into l_count
       from skrynka_tip
      where o_sk = p_safe_type_id;
-  
+
     select count(n_sk)
       into l_count_nd
       from skrynka
      where o_sk = p_safe_type_id;
-  
+
     if l_count <= l_count_nd then
       raise_application_error(- (20777),
                               '\\' ||
                               '     Створення нової чарунки не можливо. Перевищено кількість чарунок.',
                               true);
     end if;
-  
+
     begin
       select acc
         into macc
         from accounts
        where nls = p_nls
          and kv = 980;
-    
+
       bars_error.raise_nerror(modcode,
                               'ACCOUNT_ALREADY_EXISTS',
                               to_char(p_nls));
@@ -220,7 +222,7 @@ create or replace package body safe_deposit is
       when no_data_found then
         null;
     end;
-  
+
     select val
       into dep_isp
       from branch_parameters
@@ -236,7 +238,7 @@ create or replace package body safe_deposit is
       from branch_parameters
      where tag = 'DEP_GRP'
        and branch = sys_context('bars_context', 'user_branch');
-  
+
     op_reg_ex(99,
               0,
               0,
@@ -266,7 +268,7 @@ create or replace package body safe_deposit is
               null,
               sys_context('bars_context', 'user_branch'),
               null);
-  
+
     insert into skrynka
       (snum, o_sk, branch)
     values
@@ -275,11 +277,11 @@ create or replace package body safe_deposit is
        sys_context('bars_context', 'user_branch'))
     returning n_sk into m_n_sk;
     insert into skrynka_acc (acc, n_sk, tip) values (macc, m_n_sk, 'M');
-  
+
     -- вставка показника ОБ22
     select ob22 into ob22_ from skrynka_acc_tip where tip = 'M';
     accreg.setaccountsparam(macc, 'OB22', ob22_);
-  
+
   end create_safe;
 
   /*-------------------------------------------------------------------------------------------------------------------------------------*/
@@ -297,7 +299,7 @@ create or replace package body safe_deposit is
        where s.n_sk = n.n_sk
          and n.sos = 0
          and s.n_sk = p_safe_id;
-    
+
       bars_error.raise_nerror(modcode,
                               'SKRYNKA_HAS_ND',
                               to_char(p_safe_id),
@@ -306,7 +308,7 @@ create or replace package body safe_deposit is
       when no_data_found then
         null;
     end;
-  
+
     begin
       select a.acc
         into p_acc
@@ -325,14 +327,14 @@ create or replace package body safe_deposit is
                                 'CANNOT_CLOSE_ACCOUNT',
                                 to_char(p_acc));
     end;
-  
+
     delete from skrynka_nd_ref
      where nd in (select n.nd
                     from skrynka s, skrynka_nd n
                    where s.n_sk = n.n_sk
                      and n.sos = 15
                      and s.n_sk = p_safe_id);
-  
+
     -- Ощадбанк доручення
     delete from bars.skrynka_attorney
      where nd in (select n.nd
@@ -340,14 +342,14 @@ create or replace package body safe_deposit is
                    where s.n_sk = n.n_sk
                      and n.sos = 15
                      and s.n_sk = p_safe_id);
-  
+
     delete from skrynka_nd
      where nd in (select n.nd
                     from skrynka s, skrynka_nd n
                    where s.n_sk = n.n_sk
                      and n.sos = 15
                      and s.n_sk = p_safe_id);
-  
+
     delete from skrynka_acc where n_sk = p_safe_id;
     delete from skrynka where n_sk = p_safe_id;
     update accounts set dazs = bankdate where acc = p_acc;
@@ -402,11 +404,11 @@ create or replace package body safe_deposit is
     l_creat  int := 0; --  0 - вже відкритий 1 - відкриваєм
     err_phonecheck exception;
   begin
-  
+
     if p_phone is null then
       raise err_phonecheck;
     end if;
-  
+
     begin
       select nd
         into l_nd
@@ -419,20 +421,20 @@ create or replace package body safe_deposit is
         -- відкриваємо новий
         skrn.p_dep_skrn(bankdate, bankdate, p_safe_id, 0, 0, '');
         l_creat := 1;
-      
+
         if p_deal_id is not null then
           l_nd := p_deal_id;
         else
           select bars_sqnc.get_nextval('S_CC_DEAL') into l_nd from dual;
         end if;
-      
+
         select a.*
           into mainacc_
           from skrynka_acc s, accounts a
          where s.n_sk = p_safe_id
            and s.acc = a.acc
            and s.tip = 'M';
-      
+
         insert into skrynka_nd
           (nd,
            n_sk,
@@ -507,7 +509,7 @@ create or replace package body safe_deposit is
            mainacc_.nls,
            p_is_import,
            p_rnk);
-      
+
         begin
           select a.acc
             into nacc
@@ -515,7 +517,7 @@ create or replace package body safe_deposit is
            where s.nd = l_nd
              and s.acc = a.acc
              and s.tip = 'D';
-        
+
           select (case
                    when p_custtype = 3 then
                     ob22
@@ -525,16 +527,16 @@ create or replace package body safe_deposit is
             into ob22_
             from skrynka_acc_tip
            where tip = 'D';
-        
+
           accreg.setaccountsparam(nacc, 'OB22', ob22_);
-        
+
         exception
           when no_data_found then
             null;
         end;
-      
+
     end;
-  
+
     begin
       select nd
         into l_nd
@@ -551,7 +553,7 @@ create or replace package body safe_deposit is
     if p_deal_id is not null then
       l_nd := p_deal_id;
     end if;
-  
+
     update skrynka_nd
        set keycount  = p_key_count,
            isp_dov   = p_bank_trustee_id,
@@ -585,14 +587,14 @@ create or replace package body safe_deposit is
            dov_dat2  = p_trustee_deal_end,
            rnk       = p_rnk
      where nd = l_nd;
-  
+
     update skrynka
        set keyused   = p_key_used,
            keynumber = p_key_number,
            isp_mo    = p_safe_man_id,
            o_sk      = p_safe_type_id
      where n_sk = p_safe_id;
-  
+
     update accounts
        set mdate = p_deal_end_date
      where acc in (select acc
@@ -600,21 +602,21 @@ create or replace package body safe_deposit is
                     where a.n_sk = s.n_sk
                       and s.n_sk = p_safe_id
                       and a.tip = 'M');
-  
+
     -- проставляємо r011
     set_r011(l_nd);
-  
+
     if p_is_import != 1 and l_creat = 1 then
       skrn.p_calc_tariff(p_safe_id, l_nd);
     end if;
-  
+
     -- не вказаний номер телефона кліента
   exception
     when err_phonecheck then
       bars_error.raise_nerror(modcode,
                               'NOT_PHONE_CLIENT',
                               to_char(p_safe_id));
-    
+
   end deal;
 
   /*-------------------------------------------------------------------------------------------------------------------------------------*/
@@ -672,7 +674,7 @@ create or replace package body safe_deposit is
        set txt = p_val
      where nd = p_nd
        and tag = p_tag;
-  
+
     if sql%rowcount = 0 then
       insert into nd_txt (nd, tag, txt) values (p_nd, p_tag, p_val);
     end if;
@@ -705,9 +707,9 @@ create or replace package body safe_deposit is
     p_state cc_docs.state%type;
     p_adds  cc_docs.adds%type;
   begin
-  
+
     select nvl(max(adds), -1) + 1 into p_adds from cc_docs where nd = p_nd;
-  
+
     /*
     UPDATE cc_docs
        SET text = p_text,
@@ -715,7 +717,7 @@ create or replace package body safe_deposit is
        STATE = 1
     WHERE id = P_TEMPLATE
        AND nd = p_nd;
-    
+
     IF SQL%ROWCOUNT = 0 THEN
     */
     insert into cc_docs
@@ -744,7 +746,7 @@ create or replace package body safe_deposit is
         from accounts
        where nls = p_nls
          and kv = 980;
-    
+
       bars_error.raise_nerror(modcode,
                               'ACCOUNT_ALREADY_EXISTS',
                               to_char(p_nls));
@@ -752,7 +754,7 @@ create or replace package body safe_deposit is
       when no_data_found then
         null;
     end;
-  
+
     select val
       into dep_isp
       from branch_parameters
@@ -768,7 +770,7 @@ create or replace package body safe_deposit is
       from branch_parameters
      where tag = 'DEP_GRP'
        and branch = sys_context('bars_context', 'user_branch');
-  
+
     op_reg_ex(99,
               0,
               0,
@@ -795,13 +797,13 @@ create or replace package body safe_deposit is
               null,
               sys_context('bars_context', 'user_branch'),
               null);
-  
+
     insert into skrynka_nd_acc (acc, nd, tip) values (macc, p_nd, 'D');
-  
+
     -- вставка показника ОБ22
     --   select ob22 into ob22_ from SKRYNKA_ACC_TIP where tip = 'D';
     --   accreg.setAccountSParam (macc, 'OB22', ob22_);
-  
+
   end open_3600;
 
   /*-------------------------------------------------------------------------------------------------------------------------------------*/
@@ -826,7 +828,7 @@ create or replace package body safe_deposit is
         raise_application_error(-20101,
                                 'Не знайдено договір!');
     end;
-  
+
     if (l_date_from > to_date(p_date_from, 'DD/MM/YYYY')) then
       raise_application_error(-20102,
                               'Дата початку дії довіреності не може бути меншою за дату початку договору!');
@@ -841,7 +843,7 @@ create or replace package body safe_deposit is
     else
       null;
     end if;
-  
+
   end check_attorney_dates;
 
   /*-------------------------------------------------------------------------------------------------------------------------------------*/
@@ -855,7 +857,7 @@ create or replace package body safe_deposit is
                                    p_cancel_date in varchar2) is
   begin
     check_attorney_dates(p_nd, p_date_from, p_date_to, p_cancel_date);
-  
+
     merge into skrynka_attorney t1
     using (select p_nd          as nd,
                   p_rnk         as rnk,
@@ -878,7 +880,7 @@ create or replace package body safe_deposit is
          to_date(t2.date_from, 'DD/MM/YYYY'),
          to_date(t2.date_to, 'DD/MM/YYYY'),
          to_date(t2.cancel_date, 'DD/MM/YYYY'));
-  
+
   end merge_skrynka_attorney;
 
   /*-------------------------------------------------------------------------------------------------------------------------------------*/
@@ -894,13 +896,13 @@ create or replace package body safe_deposit is
       into l_okpo, l_custtype
       from skrynka_nd
      where nd = p_nd;
-  
+
     select acc
       into l_acc
       from skrynka_acc
      where n_sk in (select n_sk from skrynka_nd where nd = p_nd)
        and tip = 'M';
-  
+
     -- якщо customer.sed = '91'
     begin
       select 1
@@ -918,16 +920,16 @@ create or replace package body safe_deposit is
         -- r011 : 1 - юр, 2 - фіз
         l_r011 := l_custtype - 1;
     end;
-  
+
     accreg.setaccountsparam(l_acc, 'R011', l_r011);
-  
+
   end set_r011;
 
   /*-------------------------------------------------------------------------------------------------------------------------------------*/
   /*        Процедура відправки SMS повідомлення по сейфам у яких дата закінчення настаєчерез 5 днів      */
   /*-------------------------------------------------------------------------------------------------------------------------------------*/
   procedure skrn_send_sms is
-  
+
     l_msgid  msg_submit_data.msg_id%type := null;
     l_crtime date := sysdate;
     l_encode varchar2(3);
@@ -941,9 +943,9 @@ create or replace package body safe_deposit is
     o_errmsg varchar2(254);
     l_title  varchar2(60) := 'dpt_web.skrn_send_sms: ';
   begin
-  
+
     bars_audit.trace('%s started', l_title);
-  
+
     -- пошук номеру договору та мобільного телефону
     for skrn in (select n.nd, f_get_cust_tel(n.rnk) tel, n.dat_end, n.kf
                    from skrynka_nd n, customer c
@@ -951,41 +953,41 @@ create or replace package body safe_deposit is
                     and c.rnk = n.rnk
                     and c.custtype = 3
                     and n.dat_end = trunc(sysdate) + 5)
-    
+
      loop
-    
+
       bars_audit.trace('%s loop nd = %s tel = %s ',
                        l_title,
                        to_char(skrn.nd),
                        to_char(skrn.tel));
-    
+
       g_type_sms := 1; -- СМС за закрытие;
-    
+
       begin
-      
+
         savepoint sp1;
-      
+
         select count(1)
           into l_cnt
           from skrn_msg sm
          where sm.branch = skrn.kf
            and sm.nd = skrn.nd
            and sm.type_sms = g_type_sms;
-      
+
         if l_cnt = 0 then
-        
+
           --  сохраняем информацию по отправке СМС в таблицу skrn_msg
           insert into skrn_msg
             (msg_id, change_time, branch, nd, type_sms, state, error)
           values
             (null, sysdate, skrn.kf, skrn.nd, g_type_sms, 0, null);
-        
+
           bars_audit.trace('%s insert nd = %s state = 0',
                            l_title,
                            to_char(skrn.nd));
-        
+
         end if;
-      
+
       exception
         when others then
           rollback to sp1;
@@ -996,7 +998,7 @@ create or replace package body safe_deposit is
                                   0,
                                   2000));
       end;
-    
+
       begin
         savepoint sp3;
         -- проверяем есть ли запись в таблице skrn_msg
@@ -1006,27 +1008,27 @@ create or replace package body safe_deposit is
          where sm.branch = skrn.kf
            and sm.nd = skrn.nd
            and sm.type_sms = g_type_sms;
-      
+
         -- если запись есть, идем дальше смотрим на состояние
         if l_cnt_s <> 0 then
-        
+
           select sm.state
             into l_state
             from skrn_msg sm
            where sm.branch = skrn.kf
              and sm.nd = skrn.nd
              and sm.type_sms = g_type_sms;
-        
+
           --если состояние <> 1, то пытаемся обработать запись
           if l_state <> 1 then
-          
+
             l_msgid  := null;
             l_encode := 'lat'; --'cyr';
             l_phone  := skrn.tel;
             l_kf     := skrn.kf;
             l_datend := to_date(skrn.dat_end, 'dd.mm.yyyy');
             l_msg    := 'Termin orendy safe zakinchuetsya ';
-          
+
             case length(l_phone)
               when 9 then
                 l_phone := '+380' || l_phone;
@@ -1037,11 +1039,11 @@ create or replace package body safe_deposit is
               else
                 null;
             end case;
-          
+
             -- отправляем данные на создание сообщения
             begin
               savepoint sp2;
-            
+
               bars_sms.create_msg(p_msgid           => l_msgid,
                                   p_creation_time   => l_crtime,
                                   p_expiration_time => l_crtime + 1,
@@ -1052,9 +1054,9 @@ create or replace package body safe_deposit is
                                                               1,
                                                               160),
                                   p_kf              => l_kf);
-            
+
               o_errmsg := null;
-            
+
               update bars.skrn_msg
                  set msg_id      = l_msgid,
                      change_time = sysdate,
@@ -1064,22 +1066,22 @@ create or replace package body safe_deposit is
                  and nd = skrn.nd
                  and state <> 1
                  and type_sms = g_type_sms;
-            
+
               bars_audit.trace('%s update: Processed nd = %s ',
                                l_title,
                                to_char(skrn.nd));
-            
+
             exception
               when others then
                 rollback to sp2;
-              
+
                 -- записіваем ошибку в таблицу skrn_msg
                 o_errmsg := substr(skrn.nd || sqlerrm || chr(10) ||
                                    dbms_utility.format_error_backtrace ||
                                    dbms_utility.format_call_stack(),
                                    0,
                                    254);
-              
+
                 update bars.skrn_msg
                    set msg_id      = l_msgid,
                        change_time = sysdate,
@@ -1089,18 +1091,18 @@ create or replace package body safe_deposit is
                    and nd = skrn.nd
                    and state <> 1
                    and type_sms = g_type_sms;
-              
+
                 bars_audit.error(l_title || ' insert: Error => ' ||
                                  substr(skrn.nd || sqlerrm || chr(10) ||
                                         dbms_utility.format_error_backtrace ||
                                         dbms_utility.format_call_stack(),
                                         0,
                                         2000));
-              
+
             end;
           end if;
         end if;
-      
+
       exception
         when others then
           rollback to sp3;
@@ -1111,12 +1113,12 @@ create or replace package body safe_deposit is
                                   0,
                                   2000));
       end;
-    
+
     end loop;
     bars_audit.trace('%s end_loop', l_title);
-  
+
     bars_audit.trace('%s exit', l_title);
-  
+
   exception
     when others then
       bars_audit.error(l_title || ' insert: Error => ' ||
@@ -1125,7 +1127,7 @@ create or replace package body safe_deposit is
                               dbms_utility.format_call_stack(),
                               0,
                               2000));
-    
+
   end skrn_send_sms;
 
   /*-------------------------------------------------------------------------------------------------------------------------------------*/
@@ -1152,9 +1154,9 @@ create or replace package body safe_deposit is
       into tel_
       from customer c
      where c.rnk = rnk_;
-  
+
     return tel_;
-  
+
   exception
     when no_data_found then
       tel_ := ' ';
@@ -1191,5 +1193,4 @@ grant EXECUTE                                                                on 
  PROMPT ===================================================================================== 
  PROMPT *** End *** ========== Scripts /Sql/BARS/package/safe_deposit.sql =========*** End **
  PROMPT ===================================================================================== 
-
-
+ 

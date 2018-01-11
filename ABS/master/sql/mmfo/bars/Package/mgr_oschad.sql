@@ -15,7 +15,7 @@
   ----
 
   -- global consts
-  G_HEADER_VERSION constant varchar2(64)  := 'version 1.2.0 08/04/2017';
+  G_HEADER_VERSION constant varchar2(64)  := 'version 2.1.7 16/06/2017';
 
   USER_STATE_DELETED   constant number        :=  0;
 
@@ -789,6 +789,7 @@
   procedure  fill_dpt_deposit_clos;
 
   procedure  fill_dpt_payments;
+  procedure  fill_dpt_payments_old;
 
   procedure  fill_dpt_accounts;
 
@@ -997,7 +998,7 @@
   ----
   -- Друковані звіти та каталогізовані запити
   --
-  procedure fill_zapros;
+  --procedure fill_zapros;
 
   procedure fill_zapros_attr;
 
@@ -1148,7 +1149,7 @@
   procedure fill_cim_acts;
   procedure fill_cim_act_bound;
   procedure fill_cim_ape_link;
-  procedure fill_cim_beneficiaries;
+  procedure fill_CIM_BENEFICIARIES(p_schema varchar2 default null,  p_dblink varchar2 default null);
   procedure fill_cim_borg_message;
   procedure fill_cim_bound_data;
   procedure fill_cim_conclusion;
@@ -1225,8 +1226,11 @@
   procedure fill_ins_add_agreements;
   procedure fill_ins_attrs;
   procedure fill_ins_deals;
+  procedure fill_ins_deal_attrs;
+  procedure fill_ins_deal_scans;
   procedure fill_ins_deal_sts_hist;
   procedure fill_ins_partners;
+  procedure fill_ins_partner_types;
   procedure fill_ins_partner_branch_rnk;
   procedure fill_ins_partner_type_attrs;
   procedure fill_ins_partner_type_br;
@@ -1299,6 +1303,7 @@
   procedure fill_batch_immobile;
   ------------------FINEWARE-----------------
   procedure fill_prvn_fin_deb;
+  procedure fill_PRVN_FIN_DEB_ARCH;
   procedure fill_prvn_flow_details;
   procedure fill_prvn_flow_deals_const;
   procedure fill_prvn_flow_deals_var;
@@ -1359,9 +1364,8 @@
   procedure fill_cin_kom1;
   procedure fill_alegro;
   procedure fill_mos_operw;
-  procedure fill_ins_deal_scans;
   ---------------------------------------
-  procedure fill_e_tar_nd;
+  procedure fill_E_TAR_ND(p_schema varchar2 default null,  p_dblink varchar2 default null);
   procedure fill_branch_obu;
   procedure fill_acr_docs;
   procedure fill_e_deal$base_update(p_schema varchar2 default null,  p_dblink varchar2 default null);
@@ -1437,7 +1441,63 @@
   procedure fill_CIM_F504_DETAIL;
   procedure fill_cim_f504_detail2;
   procedure fill_FM_TURN_ARC;
+  procedure fill_rnk2nls;
+  procedure fill_rnk2tbl;
+  procedure fill_insu_acc;
+  procedure fill_insu_rnk;
+  procedure fill_w4_subproduct;
+  procedure fill_arc_an_kl;
+  procedure update_customer_update_doneby;
+  procedure fill_ead_docs_part(   p_schema varchar2 default null
+                                , p_dblink varchar2 default null
+                                , min_id number default 1
+                                , max_id number default 10000000000);
+  procedure fill_cc_docs_part(    p_schema varchar2 default null
+                                , p_dblink varchar2 default null
+                                , min_nd number default 1
+                                , max_nd number default 10000000000);
+  procedure fill_oper_visa_part(  p_schema varchar2 default null
+                                , p_dblink varchar2 default null
+                                , min_sqnc number default 1
+                                , max_sqnc number default 10000000000);
+  procedure  fill_CUSTOMER_IMAGES_part(   p_schema varchar2 default null
+                                , p_dblink varchar2 default null
+                                , min_rnk number default 1
+                                , max_rnk number default 10000000000);
+  procedure fill_vip_flags;
+  procedure fill_rnbu_trace_arch_part(  p_schema varchar2 default null
+                                      , p_dblink varchar2 default null
+                                      , min_datf date default to_date('01.01.2016', 'dd.mm.yyyy')
+                                      , max_datf date default to_date('01.01.2018', 'dd.mm.yyyy'));
+  procedure fill_rez_spn;
+  procedure fill_zapros;
+  procedure fill_dpt_file_row_accum(p_schema varchar2 default null,  p_dblink varchar2 default null);
+  procedure fill_SW_BANKS(p_schema varchar2 default null,  p_dblink varchar2 default null);
+  procedure fill_RKO_SIGNATORY(p_schema varchar2 default null,  p_dblink varchar2 default null);
+  procedure fill_e_tarif;
+  procedure fill_ope_lot;
     
+  procedure fill_mf1;
+  procedure fill_pfu_ca_files(p_schema varchar2 default null,  p_dblink varchar2 default null);
+  procedure fill_zay_splitting_amount;
+  procedure fill_biznespr_nazn(p_schema varchar2 default null,  p_dblink varchar2 default null);
+  procedure fill_lines_f(p_schema varchar2 default null,  p_dblink varchar2 default null);
+  procedure fill_lines_ca(p_schema varchar2 default null,  p_dblink varchar2 default null);
+  procedure fill_lines_i(p_schema varchar2 default null,  p_dblink varchar2 default null);
+  procedure fill_lines_r(p_schema varchar2 default null,  p_dblink varchar2 default null);
+  procedure fill_W4_PRODUCT_DOC(p_schema varchar2 default null,  p_dblink varchar2 default null);
+  procedure fill_part_zvt_doc(p_schema varchar2 default null,  p_dblink varchar2 default null);
+  procedure fill_W4_NBS_OB22(p_schema varchar2 default null,  p_dblink varchar2 default null);
+  procedure fill_ACC_MSG(p_schema varchar2 default null,  p_dblink varchar2 default null);
+  procedure fill_PS_SPARAM(p_schema varchar2 default null,  p_dblink varchar2 default null);
+  procedure fill_SKRYNKA_ACC_ARC;
+  procedure fill_SKRYNKA_ALL;
+  procedure fill_SKRYNKA_ARC;
+  procedure fill_params_dpa_reg;
+  procedure fill_OW_REBRANCH_DATA(p_schema varchar2 default null,  p_dblink varchar2 default null);
+  procedure fill_SKRYNKA_STAFF(p_schema varchar2 default null,  p_dblink varchar2 default null);
+  procedure fill_REE_TMP(p_schema varchar2 default null,  p_dblink varchar2 default null);
+     
 end mgr_oschad;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
@@ -1451,7 +1511,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
   ----
 
   -- global consts
-  G_BODY_VERSION constant varchar2(64 char)  := 'version 1.2.0 08/04/2017';
+  G_BODY_VERSION constant varchar2(64 char)  := 'version 2.1.8 21/10/2017';
 
   G_PKG constant varchar2(30 char) := 'mgr_oschad';
 
@@ -1539,7 +1599,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
   ----
   -- pkf - облочка над mgr_utl.pkf()
   --
-  function pkf(p_object varchar2, p_schema varchar2 default null,  p_dblink varchar2 default null) 
+  function pkf(p_object varchar2, p_schema varchar2 default null,  p_dblink varchar2 default null)
     return varchar2
   is
   begin
@@ -1638,9 +1698,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
   is
     l_max_idupd  number;
   begin
-    execute immediate 'select trunc(nvl(max(idupd / 100), 0)) + 1 
+    execute immediate 'select trunc(nvl(max(idupd / 100), 0)) + 1
                          from bars.'||p_table||'
-                        where mod(idupd, 100) = mgr_utl.get_ru()' 
+                        where mod(idupd, 100) = mgr_utl.get_ru()'
                        into l_max_idupd ;
     --
     return l_max_idupd;
@@ -2116,7 +2176,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
           for rec in cur loop
           v_counter := v_counter + 1;
           l_cur_ut(v_counter) := rec.table_name;
-          
+
               --mgr_utl.p_triggers_disable            (l_cur_ut(v_counter));
               mgr_utl.p_constraints_disable         (l_cur_ut(v_counter));
               mgr_utl.p_ref_constraints_disable     (l_cur_ut(v_counter));
@@ -2132,7 +2192,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
               begin
                 mgr_utl.mantain_error_table           (l_cur_ut(v_counter));
                       exception when others then
-                      -- ORA-20069: Unsupported column type(s) found:  
+                      -- ORA-20069: Unsupported column type(s) found:
                         if sqlcode in (-20069) then mgr_utl.save_error();
                           else raise;
                         end if;
@@ -2387,7 +2447,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                  t.branch_code like ''' || l_mfo_mask || '''',
           'mgr_oschad.fill_params : перекодировка (''RNK_CP'')',
           'BRANCH_ATTRIBUTE_VALUE', 'N');
-          
+
           execute_statement('
           update branch_attribute_value t
           set    t.attribute_value = rukey(t.attribute_value)
@@ -2395,7 +2455,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                  t.branch_code like ''' || l_mfo_mask || '''',
           'mgr_oschad.fill_params : перекодировка (''AVTO_ISP'')',
           'BRANCH_ATTRIBUTE_VALUE', 'N');
-          
+
           execute_statement('
           update branch_attribute_value t
           set    t.attribute_value = rukey(t.attribute_value)
@@ -2403,7 +2463,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                  t.branch_code like ''' || l_mfo_mask || '''',
           'mgr_oschad.fill_params : перекодировка (''RNK'')',
           'BRANCH_ATTRIBUTE_VALUE', 'N');
-          
+
           execute_statement('
           update branch_attribute_value t
           set    t.attribute_value = ''1''
@@ -2543,7 +2603,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     --
     mgr_utl.finalize();
     --
-    dbms_mview.refresh('mv_kf');
+    begin
+        execute immediate 'alter table ACCOUNTS_RSRV modify constraint FK_ACCRSRV_MVKF disable';
+        dbms_mview.refresh('mv_kf');
+        execute immediate 'alter table ACCOUNTS_RSRV modify constraint FK_ACCRSRV_MVKF enable novalidate';
+    exception when others then null;
+    end;
     --
     trace('%s: finished', p);
     --
@@ -2579,6 +2644,20 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
       mgr_utl.save_error();
     end;
     --
+    -- по непонятной причине вставляет нулл вместо date_closed
+    -- апдейтим єто поле руками ниже
+    --
+    execute immediate '
+            merge into BRANCH t using
+            (select
+            BRANCH
+            ,DATE_CLOSED
+            from ' ||pkf('branch')||'
+            where DATE_CLOSED is not null) tt
+            ON( t.BRANCH = tt.BRANCH
+            )when matched then update set
+               t.DATE_CLOSED =   tt.DATE_CLOSED'
+    ;
     commit;
     --
     mgr_utl.finalize();
@@ -5740,9 +5819,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     --execute immediate 'ALTER SESSION FORCE parallel QUERY parallel 8';
     --
     execute_statement(
-              'insert /*+ append parallel(8) */
+              'insert /*+ append paral_lel(8) */
                   into bars.customer
-              select /*+ parallel(8) */
+              select /*+ paral_lel(8) */
                      rukey(rnk) as rnk
                      ,tgr
                      ,custtype
@@ -5836,16 +5915,16 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
   mgr_utl.mantain_error_table(l_tab);
 
     begin
-    --      
+    --
     l_max_idupd := get_max_idupd(l_tab);
     --
     --execute immediate 'ALTER SESSION FORCE parallel DML parallel 8';
     --execute immediate 'ALTER SESSION FORCE parallel QUERY parallel 8';
     --
     execute_statement(
-              'insert /*+ append parallel(8) */
+              'insert /*+ append paral_lel(8) */
                   into bars.customer_update
-              select /*+ parallel(8) */
+              select /*+ paral_lel(8) */
                      rukey(rnk) as rnk
                      ,custtype
                      ,country
@@ -5944,9 +6023,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     --execute immediate 'ALTER SESSION FORCE parallel QUERY parallel 8';
     --
     execute_statement(
-              'insert /*+ append parallel(8) */
+              'insert /*+ append paral_lel(8) */
                   into bars.customerw
-              select /*+ parallel(8) */
+              select /*+ paral_lel(8) */
                     rukey(rnk) as rnk, tag, value, ruuser(isp) as isp
               from '||pkf('customerw'), 'insert into '||l_tab);
     --
@@ -5986,16 +6065,16 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     mgr_utl.mantain_error_table(l_tab);
     --
     begin
-    --      
+    --
     l_max_idupd := get_max_idupd(l_tab);
     --
     --execute immediate 'ALTER SESSION FORCE parallel DML parallel 8';
     --execute immediate 'ALTER SESSION FORCE parallel QUERY parallel 8';
     --
     execute_statement(
-                'insert /*+ append parallel(8) */
+                'insert /*+ append paral_lel(8) */
                     into bars.customerw_update
-                select /*+ parallel(8) */
+                select /*+ paral_lel(8) */
                          rukey(rnk) as rnk
                          ,tag
                          ,value
@@ -6228,7 +6307,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
   mgr_utl.mantain_error_table(l_tab);
   --
     begin
-    --      
+    --
     l_max_idupd := get_max_idupd(l_tab);
     --
     execute_statement(
@@ -6290,16 +6369,16 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     mgr_utl.mantain_error_table(l_tab);
     --
     begin
-    --      
+    --
     l_max_idupd := get_max_idupd(l_tab);
     --
     --execute immediate 'ALTER SESSION FORCE parallel DML parallel 8';
     --execute immediate 'ALTER SESSION FORCE parallel QUERY parallel 8';
     --
     execute_statement(
-              'insert /*+ append parallel(8) */
+              'insert /*+ append paral_lel(8) */
                   into bars.corps_update
-              select  /*+ parallel(8) */
+              select  /*+ paral_lel(8) */
                     rukey(idupd) as idupd
                     ,chgaction
                     ,effectdate
@@ -6323,7 +6402,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                     ,seal_id
                     ,nmk
                     ,'''||g_kf||''' as kf
-                    ,global_bdate 
+                    ,global_bdate
               from '||pkf(l_tab, p_schema, p_dblink)||' where idupd >= '||l_max_idupd, 'insert into '||l_tab);
     --
     --execute immediate 'ALTER SESSION DISABLE parallel DML';
@@ -6426,15 +6505,15 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     mgr_utl.mantain_error_table(l_tab);
     --
     begin
-    --      
+    --
     l_max_idupd := get_max_idupd(l_tab);
     --
     --execute immediate 'ALTER SESSION FORCE parallel DML parallel 8';
     --execute immediate 'ALTER SESSION FORCE parallel QUERY parallel 8';
     --
     execute_statement(
-              'insert /*+ append parallel(8) */  into bars.person_update
-              select /*+ parallel(8) */
+              'insert /*+ append paral_lel(8) */  into bars.person_update
+              select /*+ paral_lel(8) */
                      rukey(idupd) as idupd
                      ,chgaction
                      ,effectdate
@@ -6458,7 +6537,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                      ,actual_date
                      ,eddr_id
                      ,'''||g_kf||''' as kf
-                     ,global_bdate 
+                     ,global_bdate
               from '||pkf(l_tab, p_schema, p_dblink)||' where idupd >= '||l_max_idupd, 'insert into '||l_tab);
 
     --
@@ -6504,8 +6583,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     --execute immediate 'ALTER SESSION FORCE parallel QUERY parallel 8';
     --
     execute_statement(
-              'insert /*+ append parallel(8) */  into bars.customer_address
-              select /*+ parallel(8) */
+              'insert /*+ append paral_lel(8) */  into bars.customer_address
+              select /*+ paral_lel(8) */
                       to_number(rukey(rnk)) as rnk
                       ,type_id
                       ,country
@@ -6525,6 +6604,16 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                       ,room_type
                       ,room
                       ,comm
+                      ,change_dt
+                      ,koatuu
+                      ,region_id
+                      ,area_id
+                      ,settlement_id
+                      ,street_id
+                      ,house_id
+                      ,null as locality_type_n
+                      ,null as street_type_n
+
               from '||pkf('customer_address'), 'insert into '||l_tab);
 
     --
@@ -6564,15 +6653,15 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
 
     --
     begin
-    --      
+    --
     l_max_idupd := get_max_idupd(l_tab);
     --
     --execute immediate 'ALTER SESSION FORCE parallel DML parallel 8';
     --execute immediate 'ALTER SESSION FORCE parallel QUERY parallel 8';
     --
     execute_statement(
-              'insert /*+ append parallel(8) */ into bars.customer_address_update
-              select /*+ parallel(8) */
+              'insert /*+ append paral_lel(8) */ into bars.customer_address_update
+              select /*+ paral_lel(8) */
                      rukey(idupd) as idupd
                     ,chgaction
                     ,effectdate
@@ -6737,7 +6826,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     mgr_utl.mantain_error_table(l_tab);
     --
         begin
-         --      
+         --
          l_max_idupd := get_max_idupd(l_tab);
          --
          execute_statement(
@@ -6867,7 +6956,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     mgr_utl.mantain_error_table(l_tab);
         --
         begin
-         --      
+         --
          l_max_idupd := get_max_idupd(l_tab);
          --
              execute_statement(
@@ -7033,7 +7122,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
    init();
    --bpa.disable_policies(l_tab);
    --
-   select trunc(nvl(max(rnk / 100), 0)) + 1 
+   select trunc(nvl(max(rnk / 100), 0)) + 1
      into l_max_rnk
      from bars.CUSTOMER_IMAGES
     where mod(rnk, 100) = mgr_utl.get_ru();
@@ -7043,7 +7132,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                                      select rukey(rnk) as rnk, type_img, date_img, image
                                      from '||pkf(l_tab)||' where rnk >= '||l_max_rnk,
                           p_delete => false);
-   --bpa.enable_policies(l_tab);                      
+   --bpa.enable_policies(l_tab);
   end fill_customer_images;
 
 ----------------------------- end customer----------------------------
@@ -7406,7 +7495,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
 
     mgr_oschad.execute_statement(
     'insert into brates(name, inuse, formula, comm, br_type, br_id)
-     select name,  inuse, formula, comm, br_type, br_id 
+     select name,  inuse, formula, comm, br_type, br_id
        from ' || mgr_utl.pkf('BRATES') || ' kb where not exists (select 1 from bars.brates bb where kb.br_id = bb.br_id)
      log errors reject limit unlimited',
     'Завантаження даних базових ставок '||l_tab);
@@ -7445,12 +7534,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
            where (br_id, bdate, kv, s, branch) in
                  (select br_id, bdate, kv, s, substr(branch, 1,8) from ' || pkf('br_tier_edit') || ')',
           'Очистка налаштувань значень ставок залежних від суми для МФО ' || g_kf ||' таблиця '||l_tab,  null, 'N');*/
-        
+
         execute_statement(
           'delete br_tier_edit
            where kf = '''||g_kf||'''',
           'Очистка налаштувань значень ставок залежних від суми для МФО ' || g_kf ||' таблиця '||l_tab,  null, 'N');
-      
+
       mgr_utl.finalize();
       mgr_utl.before_fill('br_tier_edit');
 
@@ -7483,8 +7572,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
         execute_statement( p_statement         => 'delete br_normal_edit where kf = '''||g_kf||'''',
                            p_log_label         => 'Очистка налаштувань значень ставок залежних від дати для МФО ' || g_kf ||' таблиця '||l_tab,
                            p_table_name        => l_tab,
-                           p_mgr_log_label     => 'N'   
-                         );              
+                           p_mgr_log_label     => 'N'
+                         );
         mgr_utl.finalize();
         mgr_utl.before_fill(l_tab);
 
@@ -7530,7 +7619,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     --
     init();
     --
-    --      
+    --
     l_max_idupd := get_max_idupd(l_tab);
     --
         mgr_utl.mantain_error_table(l_tab);
@@ -7666,7 +7755,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
          ,rukey(idupd) as idupd
          ,'''||g_kf||''' as kf
          ,effectdate
-         ,global_bdate 
+         ,global_bdate
        from '||pkf('int_ratn_arc');
       --
      LOOP
@@ -9305,9 +9394,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     --execute immediate 'ALTER SESSION FORCE parallel QUERY parallel 8';
     --
     execute_statement(
-             p_statement =>'insert /*+ append parallel(8) */
+             p_statement =>'insert /*+ append paral_lel(8) */
                             into bars.accounts
-                            select /*+ parallel(8) */
+                            select /*+ paral_lel(8) */
                                   rukey(acc) as acc
                                  ,kf
                                  ,nls
@@ -9394,7 +9483,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     p                       CONSTANT VARCHAR2(62) := G_PKG||'.fill_'||l_tab;
     l_max_acc               accounts.acc%TYPE;
     v_count                 PLS_INTEGER := 0;
-    c_limit                 PLS_INTEGER := 50000;
+    c_limit                 PLS_INTEGER := 200000;
     l_cur                   SYS_REFCURSOR;
     c_n                     PLS_INTEGER := 0;
     l_migration_start_time  date default sysdate;
@@ -9599,16 +9688,16 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     mgr_utl.mantain_error_table(l_tab);
     --
     begin
-    --      
+    --
     l_max_idupd := get_max_idupd(l_tab);
     --
     --execute immediate 'ALTER SESSION FORCE parallel DML parallel 8';
     --execute immediate 'ALTER SESSION FORCE parallel QUERY parallel 8';
     --
     execute_statement(
-             p_statement =>'insert /*+ append parallel(8) */
+             p_statement =>'insert /*+ append paral_lel(8) */
                            into bars.accounts_update
-                           select /*+ parallel(8) */
+                           select /*+ paral_lel(8) */
                                  rukey(acc) as acc
                                 ,nls
                                 ,nlsalt
@@ -9701,9 +9790,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     --execute immediate 'ALTER SESSION FORCE parallel QUERY parallel 8';
     --
     execute_statement(
-             p_statement =>'insert /*+ append parallel(8) */
+             p_statement =>'insert /*+ append paral_lel(8) */
                             into bars.accountsw
-                            select /*+ parallel(8) */
+                            select /*+ paral_lel(8) */
                                   rukey(acc) as acc
                                  ,tag
                                  ,case when tag = ''PK_PRCT'' and regexp_like(value,''^[0-9]+$'') and value <>''0''
@@ -9752,15 +9841,15 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     mgr_utl.mantain_error_table(l_tab);
     --
     begin
-    --      
+    --
     l_max_idupd := get_max_idupd(l_tab);
     --
     --execute immediate 'ALTER SESSION FORCE parallel DML parallel 8';
     --execute immediate 'ALTER SESSION FORCE parallel QUERY parallel 8';
     --
               execute_statement(
-              'insert /*+ append parallel(8) */  into bars.accountsw_update
-              select /*+ parallel(8) */
+              'insert /*+ append paral_lel(8) */  into bars.accountsw_update
+              select /*+ paral_lel(8) */
                      rukey(idupd) as idupd
                     ,chgaction
                     ,effectdate
@@ -9816,8 +9905,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     --execute immediate 'ALTER SESSION FORCE parallel QUERY parallel 8';
     --
     execute_statement(
-              'insert /*+ append parallel(8) */  into bars.specparam
-              select /*+ parallel(8) */
+              'insert /*+ append paral_lel(8) */  into bars.specparam
+              select /*+ paral_lel(8) */
                     rukey(acc) as acc
                    ,r011
                    ,r013
@@ -9902,15 +9991,15 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     mgr_utl.mantain_error_table(l_tab);
     --
     begin
-    --      
+    --
     l_max_idupd := get_max_idupd(l_tab);
     --
     --execute immediate 'ALTER SESSION FORCE parallel DML parallel 8';
     --execute immediate 'ALTER SESSION FORCE parallel QUERY parallel 8';
     --
     execute_statement(
-              'insert /*+ append parallel(8) */  into bars.specparam_update
-              select /*+ parallel(8) */
+              'insert /*+ append paral_lel(8) */  into bars.specparam_update
+              select /*+ paral_lel(8) */
                      rukey(acc) as acc
                      ,r011
                      ,r013
@@ -9946,7 +10035,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                      ,istval
                      ,chgaction
                      ,global_bdate
-                     ,s130
+                     ,null as s130
               from '||pkf(l_tab, p_schema, p_dblink)||' where idupd >= '||l_max_idupd, 'insert into '||l_tab);
     --
     --execute immediate 'ALTER SESSION DISABLE parallel DML';
@@ -9995,8 +10084,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     --execute immediate 'ALTER SESSION FORCE parallel QUERY parallel 8';
     --
     execute_statement(
-              'insert /*+ append parallel(8) */  into bars.specparam_int
-              select /*+ parallel(8) */
+              'insert /*+ append paral_lel(8) */  into bars.specparam_int
+              select /*+ paral_lel(8) */
                       rukey(acc) as acc
                     ,p080
                     ,ob22
@@ -10070,15 +10159,15 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     mgr_utl.mantain_error_table(l_tab);
     --
     begin
-    --      
+    --
     l_max_idupd := get_max_idupd(l_tab);
     --
     --execute immediate 'ALTER SESSION FORCE parallel DML parallel 8';
     --execute immediate 'ALTER SESSION FORCE parallel QUERY parallel 8';
     --
     execute_statement(
-              'insert /*+ append parallel(8) */ into bars.specparam_int_update
-              select /*+ parallel(8) */
+              'insert /*+ append paral_lel(8) */ into bars.specparam_int_update
+              select /*+ paral_lel(8) */
                      rukey(acc) as acc
                     ,p080
                     ,ob22
@@ -10390,22 +10479,22 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
 
     begin
        --
-     /* select nvl(max(fdat), to_date('01.01.1975', 'dd.mm.yyyy')) 
+     /* select nvl(max(fdat), to_date('01.01.1975', 'dd.mm.yyyy'))
         into l_min_fdat
         from SALDOA
        where kf = G_KF;
-       -- 
+       --
       if l_min_fdat = to_date('01.01.1975', 'dd.mm.yyyy')
         then l_max_fdat := add_months(trunc(sysdate, 'mm'), -3);
         else l_max_fdat := sysdate + 100;
       end if;*/
-       -- 
+       --
     --execute immediate 'ALTER SESSION FORCE parallel DML parallel 8';
     --execute immediate 'ALTER SESSION FORCE parallel QUERY parallel 8';
     --
     execute_statement(
-              'insert /*+ append parallel(8) */  into bars.saldoa
-               select /*+ parallel(8) */
+              'insert /*+ append paral_lel(8) */  into bars.saldoa
+               select /*+ paral_lel(8) */
                        rukey(acc) as acc
                       ,fdat
                       ,pdat
@@ -10417,7 +10506,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                       ,dosq
                       ,kosq
                       ,'''||g_kf||''' as kf
-                 from '||pkf(l_tab, p_schema, p_dblink)||' 
+                 from '||pkf(l_tab, p_schema, p_dblink)||'
                 --where fdat > '''||l_min_fdat||'''
                 --  and fdat < '''||l_max_fdat||''''
              ,'insert into '||l_tab);
@@ -10832,11 +10921,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
         l_migration_start_time := sysdate;
         l_start_time := current_timestamp;
        --
-      select nvl(max(fdat), to_date('31.12.2015', 'dd.mm.yyyy')) 
+      select nvl(max(fdat), to_date('31.12.2015', 'dd.mm.yyyy'))
         into l_max_fdat
         from SNAP_BALANCES
        where kf = G_KF;
-       -- 
+       --
        if l_max_fdat = to_date('31.12.2015', 'dd.mm.yyyy')
          then l_fdat_to := trunc(sysdate - 15);
        else l_fdat_to := to_date('31.12.2025', 'dd.mm.yyyy');
@@ -10845,9 +10934,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     --execute immediate 'ALTER SESSION FORCE parallel QUERY parallel 8';
     --
     execute immediate
-              'insert /*+ append parallel(8) */
+              'insert /*+ append paral_lel(8) */
               into bars.snap_balances(fdat,acc, rnk, ost, dos, kos, ostq, dosq, kosq, kf)
-              select /*+ parallel(8) */
+              select /*+ paral_lel(8) */
                      fdat,
                      rukey(acc) as acc,
                      rukey(rnk) as rnk,
@@ -10858,7 +10947,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                      dosq,
                      kosq,
                      '''||g_kf||''' as kf
-                from '||pkf(l_tab, p_schema, p_dblink)||' 
+                from '||pkf(l_tab, p_schema, p_dblink)||'
                where fdat > '''||l_max_fdat||'''
                  and fdat < '''||l_fdat_to||'''
                log errors reject limit unlimited';
@@ -11228,7 +11317,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                     CUDOS	,
                     CUDOSQ	,
                     CUKOS	,
-                    CUKOSQ	
+                    CUKOSQ
               from '||pkf(l_tab, p_schema,  p_dblink)||' where fdat between to_date('''||l_date||''', ''dd.mm.yyyy'') and  to_date('''||l_date_end||''', ''dd.mm.yyyy'')';
                 --
          LOOP
@@ -11334,7 +11423,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
         l_migration_start_time := sysdate;
         l_start_time := current_timestamp;
     --
-        select nvl(max(add_months(fdat, 1)), to_date('01.01.2016', 'dd.mm.yyyy')) 
+        select nvl(max(add_months(fdat, 1)), to_date('01.01.2016', 'dd.mm.yyyy'))
           into l_min_fdat
           from bars.AGG_MONBALS
          where kf = G_KF  ;
@@ -11342,13 +11431,13 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     --execute immediate 'ALTER SESSION FORCE parallel DML parallel 8';
     --execute immediate 'ALTER SESSION FORCE parallel QUERY parallel 8';
     execute immediate 'ALTER SESSION SET NLS_DATE_FORMAT = ''DD.MM.YYYY''';
-      
+
     if p_dblink is null then
     execute immediate
-              'insert /*+ append parallel(8) */
+              'insert /*+ append paral_lel(8) */
                       into '||l_tab||'( fdat, kf, acc, rnk, OST		,OSTQ	,DOS		,DOSQ	, KOS		,KOSQ	,CRDOS	,
                      CRDOSQ	, CRKOS	,CRKOSQ	,CUDOS	,CUDOSQ	,CUKOS	, CUKOSQ)
-              select /*+ parallel(8) */
+              select /*+ paral_lel(8) */
                      fdat,
                      '''||g_kf||''' as kf,
                      rukey(acc) as acc,
@@ -11366,8 +11455,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                      CUDOS	,
                      CUDOSQ	,
                      CUKOS	,
-                     CUKOSQ	                     
-                from '||pkf(l_tab, p_schema,  p_dblink)||' 
+                     CUKOSQ
+                from '||pkf(l_tab, p_schema,  p_dblink)||'
                where fdat between to_date(''01.01.2016'', ''dd.mm.yyyy'') and  to_date(''01.01.2049'', ''dd.mm.yyyy'')
                  and fdat >= '''||l_min_fdat||''' log errors reject limit unlimited';
     else
@@ -11393,12 +11482,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                      CUDOS	,
                      CUDOSQ	,
                      CUKOS	,
-                     CUKOSQ	
-                from '||pkf(l_tab, p_schema,  p_dblink)||' 
+                     CUKOSQ
+                from '||pkf(l_tab, p_schema,  p_dblink)||'
                where fdat between to_date(''01.01.2016'', ''dd.mm.yyyy'') and  to_date(''01.01.2049'', ''dd.mm.yyyy'')
                  and fdat >= '''||l_min_fdat||''' log errors reject limit unlimited';
     end if;
-     
+
     l_rowcount        := l_rowcount + sql%rowcount;
     l_end_time        := current_timestamp;
     l_time_duration   := (l_end_time - l_start_time);
@@ -12119,64 +12208,64 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     is
     l_tab         VARCHAR2(30) DEFAULT 'OP_FIELD';
     begin
-        --      
+        --
         init();
         --
         case when g_kf = g_glb_mfo then
          execute_statement(
-              'merge into '||l_tab||' a using (select tag, 
-                                                      name, 
-                                                      fmt, 
-                                                      browser, 
-                                                      nomodify, 
-                                                      vspo_char, 
-                                                      chkr, 
-                                                      default_value, 
-                                                      type, 
+              'merge into '||l_tab||' a using (select tag,
+                                                      name,
+                                                      fmt,
+                                                      browser,
+                                                      nomodify,
+                                                      vspo_char,
+                                                      chkr,
+                                                      default_value,
+                                                      type,
                                                       use_in_arch
-                                                 from '||pkf(l_tab)||') s on (a.tag = s.tag) 
-                         when matched then update set a.name = s.name, 
-                                                      a.fmt = s.fmt, 
-                                                      a.browser = s.browser, 
-                                                      a.nomodify = s.nomodify, 
-                                                      a.vspo_char = s.vspo_char, 
-                                                      a.chkr = s.chkr, 
-                                                      a.default_value = s.default_value, 
-                                                      a.type = s.type, 
+                                                 from '||pkf(l_tab)||') s on (a.tag = s.tag)
+                         when matched then update set a.name = s.name,
+                                                      a.fmt = s.fmt,
+                                                      a.browser = s.browser,
+                                                      a.nomodify = s.nomodify,
+                                                      a.vspo_char = s.vspo_char,
+                                                      a.chkr = s.chkr,
+                                                      a.default_value = s.default_value,
+                                                      a.type = s.type,
                                                       a.use_in_arch = s.use_in_arch
-              when not matched then insert values    (s.tag, 
-                                                      s.name, 
-                                                      s.fmt, 
-                                                      s.browser, 
-                                                      s.nomodify, 
-                                                      s.vspo_char, 
-                                                      s.chkr, 
-                                                      s.default_value, 
-                                                      s.type, 
+              when not matched then insert values    (s.tag,
+                                                      s.name,
+                                                      s.fmt,
+                                                      s.browser,
+                                                      s.nomodify,
+                                                      s.vspo_char,
+                                                      s.chkr,
+                                                      s.default_value,
+                                                      s.type,
                                                       s.use_in_arch)',
                     'Доповнення новими значеннями '||l_tab);
-        else 
+        else
          execute_statement(
-              'merge into '||l_tab||' a using (select tag, 
-                                                      name, 
-                                                      fmt, 
-                                                      browser, 
-                                                      nomodify, 
-                                                      vspo_char, 
-                                                      chkr, 
-                                                      default_value, 
-                                                      type, 
+              'merge into '||l_tab||' a using (select tag,
+                                                      name,
+                                                      fmt,
+                                                      browser,
+                                                      nomodify,
+                                                      vspo_char,
+                                                      chkr,
+                                                      default_value,
+                                                      type,
                                                       use_in_arch
-                                                 from '||pkf(l_tab)||') s on (a.tag = s.tag) 
-              when not matched then insert values    (s.tag, 
-                                                      s.name, 
-                                                      s.fmt, 
-                                                      s.browser, 
-                                                      s.nomodify, 
-                                                      s.vspo_char, 
-                                                      s.chkr, 
-                                                      s.default_value, 
-                                                      s.type, 
+                                                 from '||pkf(l_tab)||') s on (a.tag = s.tag)
+              when not matched then insert values    (s.tag,
+                                                      s.name,
+                                                      s.fmt,
+                                                      s.browser,
+                                                      s.nomodify,
+                                                      s.vspo_char,
+                                                      s.chkr,
+                                                      s.default_value,
+                                                      s.type,
                                                       s.use_in_arch)',
                     'Доповнення новими значеннями '||l_tab);
         end case;
@@ -12445,8 +12534,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     --execute immediate 'ALTER SESSION FORCE parallel QUERY parallel 8';
     --
        execute_statement(
-                 'insert /*+ append parallel(8) */  into bars.OPERW
-                 select /*+ parallel(8) */
+                 'insert /*+ append paral_lel(8) */  into bars.OPERW
+                 select /*+ paral_lel(8) */
                      rukey(ref) as ref
                     ,tag
                     ,case when tag = ''NOS_A'' and regexp_like(value,''^[0-9]+$'') and value <>''0''
@@ -12502,8 +12591,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                                     )op'
                               into l_min_ref using g_kf;
        execute_statement(
-                 'insert /*+ append parallel(12) */  into bars.OPERW
-                 select /*+ parallel(12) */
+                 'insert /*+ append paral_lel(12) */  into bars.OPERW
+                 select /*+ paral_lel(12) */
                      rukey(ref) as ref
                     ,tag
                     ,case when tag = ''NOS_A'' and regexp_like(value,''^[0-9]+$'') and value <>''0''
@@ -12681,7 +12770,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                    ,check_msg
                    ,'''||g_kf||''' as kf
                    ,passive_reasonid
-              from '||pkf('oper_visa');
+               from '||pkf('oper_visa');
                   --
            LOOP
              FETCH l_cur BULK COLLECT INTO vv_cur_oper_visa LIMIT c_limit;
@@ -12772,8 +12861,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     mgr_utl.mantain_error_table(l_tab);
 
     --
-    select trunc(nvl(max(sqnc / 100), 0)) + 1 
-      into l_min_sqnc 
+    select trunc(nvl(max(sqnc / 100), 0)) + 1
+      into l_min_sqnc
       from bars.oper_visa
      where kf = G_KF ;
     --
@@ -12784,23 +12873,23 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
       from '||pkf(l_tab, p_schema, p_dblink)||' t
      --where t.dat < trunc( add_months(sysdate, - 3), ''mm'')
      '
-      into l_max_sqnc; 
-    else 
+      into l_max_sqnc;
+    else
     execute immediate '
     select max(sqnc)
-      from '||pkf(l_tab, p_schema, p_dblink) 
-      into l_max_sqnc; 
-    end if;   
-     
+      from '||pkf(l_tab, p_schema, p_dblink)
+      into l_max_sqnc;
+    end if;
+
     commit;
-    
+
     begin
               --execute immediate 'ALTER SESSION FORCE parallel DML parallel 12';
               --execute immediate 'ALTER SESSION FORCE parallel QUERY parallel 12';
 
               execute_statement(
-              'insert /*+ append parallel(12) */  into bars.oper_visa
-               select /*+ parallel(12) */
+              'insert /*+ append paral_lel(12) */  into bars.oper_visa
+               select /*+ paral_lel(12) */
                      rukey(ref) as ref
                      ,dat
                      ,ruuser(userid) as userid
@@ -12819,10 +12908,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                      ,check_msg
                      ,'''||g_kf||''' as kf
                      ,passive_reasonid
-                from '||pkf(l_tab, p_schema, p_dblink)||' 
+                from '||pkf(l_tab, p_schema, p_dblink)||'
                where sqnc >= '||l_min_sqnc||'
                  and sqnc <= '||l_max_sqnc
-                  
+
               , 'insert into '||l_tab);
 
     commit;
@@ -15381,7 +15470,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
   begin
     --mgr_utl.sync_table_auto('perekr_b_update', true,
     --    'idr, "nvl(idr, 1)", polu, "nvl(polu, ''Не задано'')", nazn, "nvl(nazn, ''Не задано'')", idupd, "rukey(idupd)"');
-    --      
+    --
     l_max_idupd := get_max_idupd(l_tab);
     --
     mgr_utl.sync_table(l_tab,
@@ -15422,7 +15511,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                         , user_name
                         , rukey(idupd) as idupd
                         , chaction
-                        , '''||g_kf||''' as kf 
+                        , '''||g_kf||''' as kf
                         FROM '
                         ||pkf(l_tab, p_schema, p_dblink)||' where idupd >= '||l_max_idupd,
                          false);
@@ -15440,14 +15529,52 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
   procedure fill_banks$settings
   is
   begin
-    mgr_utl.sync_table('BANKS$SETTINGS',
+    /*mgr_utl.sync_table('BANKS$SETTINGS',
     'insert
        into banks$settings (
             mfo, fmi, fmo, pm, kodn, mfop)
      select mfo, fmi, fmo, pm, kodn, mfop
        from '||pkf('banks')||'
       where kodn is not null',
-    true);
+    true);*/
+    mgr_utl.sync_table('BANKS$SETTINGS',
+    'merge into BANKS$SETTINGS t using
+            (select
+            KF
+            ,MFO
+            ,FMI
+            ,FMO
+            ,PM
+            ,KODN
+            ,MFOP
+            from '||pkf('BANKS$SETTINGS')||' ) tt
+            ON( t.KF = tt.KF
+            AND t.MFO = tt.MFO
+            )when matched then update set
+              t.FMI =   tt.FMI
+            ,   t.FMO =   tt.FMO
+            ,   t.PM =   tt.PM
+            ,   t.KODN =   tt.KODN
+            ,   t.MFOP =   tt.MFOP
+
+            when not matched then insert values (
+              tt.KF,
+              tt.MFO,
+              tt.FMI,
+              tt.FMO,
+              tt.PM,
+              tt.KODN,
+              tt.MFOP
+            )',
+                false);
+                
+    mgr_utl.sync_table('BANKS$SETTINGS',
+    'delete from bars.banks$settings t
+      where t.mfop = ''300465'' 
+        and t.kodn = 3
+        and t.mfo = ''321024''
+        and t.kf = ''300465'' ',
+                false);                
   end fill_banks$settings;
 
   ----
@@ -15517,7 +15644,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     mantain_error_table('STAFFTIP_TTS');
 
 
-    bpa.disable_policies('TTS');        
+    bpa.disable_policies('TTS');
     bpa.disable_policies('CHKLIST_TTS');
     bpa.disable_policies('FOLDERS_TTS');
     bpa.disable_policies('OP_RULES');
@@ -15537,7 +15664,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
               'merge into TTS a using (select tt, name, dk, nlsm, kv, nlsk, kvk, nlss,
            nlsa, nlsb, mfob, flc, fli, flv, flr,
            s, s2, sk, proc, s3800, s6201, s7201, rang, flags, nazn
-                                                 from '||pkf('TTS')||') s on (a.tt = s.tt) 
+                                                 from '||pkf('TTS')||') s on (a.tt = s.tt)
                          when matched then update set a.name = substr(s.name,1,70)
                                                     , a.dk = s.dk
                                                     , a.nlsm = s.nlsm
@@ -15590,7 +15717,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                                                       , s.nazn
                                                       , s_tts.nextval)',
                     'Доповнення новими значеннями TTS');
-        else 
+        else
         begin
             execute immediate
            'insert
@@ -15608,10 +15735,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
             trace('TTS: %s строк вставлено %s', to_char(l_inscnt), get_errinfo('err$_tts'));
             --
             commit;
-            
+
         end;
         end case;
-        
+
     --
     -- CHKLIST_TTS
     --
@@ -15716,7 +15843,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                                             , kdoc
                                             , rep_prefix_fr
                                             , kod
-                                         from '||pkf('VOB')||') s on (a.VOB = s.VOB) 
+                                         from '||pkf('VOB')||') s on (a.VOB = s.VOB)
                  when matched then update set a.name = s.name
                                             , a.flv = s.flv
                                             , a.rep_prefix = s.rep_prefix
@@ -15733,7 +15860,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                                             , s.rep_prefix_fr
                                             , s.kod)',
                     'Доповнення новими значеннями VOB');
-        else 
+        else
         begin
          execute_statement(
               'merge into VOB a using (select vob
@@ -15744,7 +15871,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                                             , kdoc
                                             , rep_prefix_fr
                                             , kod
-                                         from '||pkf('VOB')||') s on (a.VOB = s.VOB) 
+                                         from '||pkf('VOB')||') s on (a.VOB = s.VOB)
               when not matched then insert values    (  s.vob
                                             , s.name
                                             , s.flv
@@ -15755,7 +15882,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                                             , s.kod)',
                     'Доповнення новими значеннями VOB');
         end;
-        end case;        
+        end case;
     --
     -- TTS_VOB
     --
@@ -15791,7 +15918,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
 
     bc.home();
     --
-    bpa.enable_policies('TTS');        
+    bpa.enable_policies('TTS');
     bpa.enable_policies('CHKLIST_TTS');
     bpa.enable_policies('FOLDERS_TTS');
     bpa.enable_policies('OP_RULES');
@@ -16047,7 +16174,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                             d.from_clause,
                             d.where_clause,
                             d.pkey,
-                            case when pkey is null then '''||'/'||g_kf||'/'||''' else ''/'' end branch 
+                            case when pkey is null then '''||'/'||g_kf||'/'||''' else ''/'' end branch
                      from '||pkf('dyn_filter')||' d , '||pkf('meta_tables')||'  km, meta_tables m
                      where d.where_clause is not null
                      and d.tabid=km.tabid
@@ -16057,6 +16184,23 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
       --
       trace('%s', get_errinfo('ERR$_'||l_tab));
       --
+   delete from dyn_filter t
+    where t.branch = '/'
+      and t.condition_list is null
+      and t.rowid not in (select min(rowid) as rid
+                            from dyn_filter t
+                           where t.branch = '/'
+                             and t.condition_list is null
+                           group by tabid,
+                                 userid,
+                                 semantic,
+                                 from_clause,
+                                 where_clause,
+                                 pkey,
+                                 branch)
+  ;
+  commit;
+
   end fill_dyn_filter;
 
   ----
@@ -16131,12 +16275,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                              select otd, ruuser(userid) as userid, pr
                              from '||mgr_utl.pkf('OTD_USER'),
                              true);
-
-       --
-        mgr_utl.finalize();
-       --
-        trace('%s: finished', p);
-       --
 
   end fill_otd_user;
 
@@ -16775,7 +16913,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     --bpa.disable_policies(l_tab);
     mgr_utl.disable_table_triggers(l_tab);
     mgr_utl.disable_foreign_keys(l_tab);
-    --      
+    --
     l_max_idupd := get_max_idupd(l_tab);
     --
     mgr_utl.sync_table('NLK_REF_UPDATE',
@@ -16810,7 +16948,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
      mgr_utl.sync_table('ALIEN',
     --
     'insert into alien(mfo, nls, nlsalt, kv, okpo, name, crisk, notesec, id, rec_id)
-         select mfo, nls, nlsalt, kv, okpo, name, crisk, notesec, id, s_alien.nextval from '||pkf('alien')||' ',false);
+         select mfo, nls, nlsalt, kv, okpo, name, crisk, notesec, ruuser(id), s_alien.nextval from '||pkf('alien')||' ',false);
     --
   end fill_alien;
 
@@ -16941,15 +17079,17 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     init();
     --
     bars_policy_adm.disable_policies('KL_F00$LOCAL');
+    mgr_utl.mantain_error_table('KL_F00$LOCAL');
     mgr_utl.sync_table('KL_F00$LOCAL',
                         'insert into bars.kl_f00$local(policy_group, branch, kodf, a017, uuu, zzz, path_o, datf, nom, kf)
                         select ''FILIAL'', '''||'/' ||g_kf||'/'||''' branch,
                                kodf, a017, uuu, zzz, path_o, datf, nom, '''||g_kf||''' as kf
-                        from '||pkf('kl_f00$local')||' where (a017, kodf) in (select a017, kodf from kl_f00$global) and branch<>''/''',true);
+                        from '||pkf('kl_f00$local')||' where (a017, kodf) in (select a017, kodf from kl_f00$global) and branch<>''/''
+                        log errors reject limit unlimited
+                        ',true);
     --
     bars_policy_adm.enable_policies('KL_F00$LOCAL');
   end fill_klf00;
-
   procedure fill_sw_nostro_que
     is
   begin
@@ -16970,15 +17110,15 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     l_max_ref number;
   begin
     init();
-    
+
     select trunc(max(t.ref)/100)
       into l_max_ref
       from bars.sos_track t
      where kf = g_kf;
-     
-    if l_max_ref is null 
+
+    if l_max_ref is null
     then
-      begin                    
+      begin
       -- было  -- смотрели на загруженный в ММФО ОПЕР
       -- оставляем этот кусок, работает, если собрать статистику
          execute immediate 'select trunc(nvl(op.ref/100, 1))
@@ -16997,7 +17137,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                            into l_min_ref;
       --
          commit;*/
-      
+
         mgr_utl.sync_table('sos_track',
 
             'insert into sos_track(ref, sos_tracker, old_sos, new_sos, change_time, userid, kf)
@@ -17008,8 +17148,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
       --
       end;
     else
-      begin        
-                    
+      begin
+
         mgr_utl.sync_table('sos_track',
       --
             'insert into sos_track(ref, sos_tracker, old_sos, new_sos, change_time, userid, kf)
@@ -17018,7 +17158,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
 
       --
       end;
-    end if;        
+    end if;
   end fill_sos_track;
 
   procedure fill_sos0que
@@ -17128,7 +17268,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
       l_max_idupd   bars.FIN_FM_UPDATE.idupd%type;
      begin
        init();
-      --      
+      --
       l_max_idupd := get_max_idupd(l_tab);
       --
        --mgr_utl.sync_table_auto('FIN_FM_UPDATE',false, 'doneby,"ruuser(doneby)",idupd,"rukey(idupd)"');
@@ -17145,7 +17285,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                          ,idupd
                          ,kf
                        )
-                        SELECT 
+                        SELECT
                           okpo
                          ,fdat
                          ,fm
@@ -17155,7 +17295,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                          ,chgaction
                          ,ruuser(doneby) as doneby
                          ,rukey(idupd) as idupd
-                         , '''||g_kf||''' as kf 
+                         , '''||g_kf||''' as kf
                         FROM '
                         ||pkf(l_tab, p_schema, p_dblink)||' where idupd >= '||l_max_idupd,
                          false);       --
@@ -17184,7 +17324,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
      begin
        init();
        --mgr_utl.sync_table_auto('FIN_ND_UPDATE',false, 'nd,"rukey(nd)",rnk,"rukey(rnk)",doneby,"ruuser(doneby)",idupd,"rukey(idupd)"');
-       --      
+       --
        l_max_idupd := get_max_idupd(l_tab);
        --
        mgr_utl.sync_table(l_tab,
@@ -17201,7 +17341,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                          ,rnk
                          ,kf
                        )
-                        SELECT 
+                        SELECT
                           fdat
                          ,idf
                          ,kod
@@ -17212,10 +17352,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                          ,ruuser(doneby) as doneby
                          ,rukey(idupd) as idupd
                          ,rukey(rnk) as rnk
-                        , '''||g_kf||''' as kf 
+                        , '''||g_kf||''' as kf
                         FROM '
                         ||pkf(l_tab, p_schema, p_dblink)||' where idupd >= '||l_max_idupd,
-                         false);       
+                         false);
        --
        bc.home();
        --
@@ -17233,10 +17373,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
      begin
        init();
 
+    mgr_utl.mantain_error_table('FIN_RNK');
+
        mgr_utl.sync_table('FIN_RNK','insert into fin_rnk(fdat, idf, kod, s, okpo, branch, ss)
                                     select fdat, idf, kod, s, okpo, branch, ss
-                                 from '||pkf('FIN_RNK')||' where (okpo, fdat)
-                                 not in (select okpo, fdat from fin_fm)', false);
+                                 from '||mgr_utl.pkf('FIN_RNK')||' where (okpo, fdat)
+                                 not in (select okpo, fdat from fin_fm) log errors reject limit unlimited', false);
   end fill_fin_rnk;
 
 --********************DPT*****************************--
@@ -17258,14 +17400,14 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     --
     bpa.disable_policies('DPT_DEPOSIT');
     begin
-    execute immediate '   
-       select count(wb) from '|| mgr_utl.pkf('DPT_DEPOSIT')||' t 
+    execute immediate '
+       select count(wb) from '|| mgr_utl.pkf('DPT_DEPOSIT')||' t
         where rownum = 1'
          into wb_exist;
     exception when others then
            if sqlcode = -00904 then wb_exist := 0; else raise; end if;
     end;
-    if wb_exist = 1 then        
+    if wb_exist = 1 then
        mgr_utl.sync_table('DPT_DEPOSIT',
                           'INSERT INTO DPT_DEPOSIT
                           SELECT rukey(deposit_id) deposit_id,
@@ -17307,7 +17449,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                                  forbid_extension,
                                  wb
                            FROM '|| mgr_utl.pkf('DPT_DEPOSIT'), false);
-    else 
+    else
        mgr_utl.sync_table('DPT_DEPOSIT',
                           'INSERT INTO DPT_DEPOSIT
                           SELECT rukey(deposit_id) deposit_id,
@@ -17349,7 +17491,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                                  forbid_extension,
                                  ''N'' as wb
                            FROM '|| mgr_utl.pkf('DPT_DEPOSIT'), false);
-        
+
     end if;
     bpa.enable_policies('DPT_DEPOSIT');
   end  fill_dpt_deposit;
@@ -17357,20 +17499,21 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
   procedure  fill_dpt_deposit_clos
     is
     wb_exist number;
+    max_idupd integer;
    begin
     --
     init();
     --
     bpa.disable_policies('DPT_DEPOSIT_CLOS');
     begin
-    execute immediate '   
-       select count(wb) from '|| mgr_utl.pkf('DPT_DEPOSIT_CLOS')||' t 
+    execute immediate '
+       select count(wb) from '|| mgr_utl.pkf('DPT_DEPOSIT_CLOS')||' t
         where rownum = 1'
          into wb_exist;
     exception when others then
            if sqlcode = -00904 then wb_exist := 0; else raise; end if;
     end;
-    if wb_exist = 1 then        
+    if wb_exist = 1 then
         mgr_utl.sync_table('DPT_DEPOSIT_CLOS',
                            'INSERT INTO DPT_DEPOSIT_CLOS
                            SELECT  rukey(deposit_id) deposit_id,
@@ -17409,7 +17552,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                                    cnt_ext_int,
                                    dat_ext_int,
                                    ruuser(userid),
-                                   case when archdoc_id = -1 then to_number(archdoc_id)
+                                   case when archdoc_id in (-1, 0) then to_number(archdoc_id)
                                         when archdoc_id > 0  then to_number(rukey(archdoc_id))
                                           end archdoc_id,
                                    forbid_extension,
@@ -17454,17 +17597,198 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                                    cnt_ext_int,
                                    dat_ext_int,
                                    ruuser(userid),
-                                   case when archdoc_id = -1 then to_number(archdoc_id)
+                                   case when archdoc_id in (-1, 0) then to_number(archdoc_id)
                                         when archdoc_id > 0  then to_number(rukey(archdoc_id))
                                           end archdoc_id,
                                    forbid_extension,
                                    ''N'' as wb
                            FROM '|| mgr_utl.pkf('DPT_DEPOSIT_CLOS'), true);
     end if;
+    --------------
+
+    bc.home();
+
+          select nvl(max(t.idupd/100),0) + 1
+          into max_idupd
+          from bars.DPT_DEPOSIT_CLOS t;
+        --
+        mgr_utl.reset_sequence('s_dpt_deposit_clos', max_idupd);
+
      bpa.enable_policies('DPT_DEPOSIT_CLOS');
+
   end  fill_dpt_deposit_clos;
 
   procedure  fill_dpt_payments
+  is
+    l_tab                    VARCHAR2(50) DEFAULT 'DPT_PAYMENTS';
+    p                        CONSTANT VARCHAR2(62) := 'mrg_utl.fill_'||l_tab;
+    v_count                  PLS_INTEGER := 0;
+    c_limit                  PLS_INTEGER := 200000;
+    l_cur                    SYS_REFCURSOR;
+    c_n                      PLS_INTEGER := 0;
+    l_min_ref                NUMBER;
+    l_migration_start_time   DATE DEFAULT SYSDATE;
+    l_start_time             timestamp default current_timestamp;
+    l_end_time               timestamp default current_timestamp;
+    l_rowcount               number default 0;
+    l_time_duration          interval day(3) to second(3);
+
+   /* "Exceptions encountered in FORALL" exception... */
+     bulk_exceptions   EXCEPTION;
+     PRAGMA EXCEPTION_INIT (bulk_exceptions, -24381);
+
+  /*
+   * Source data record and associative array type. Needed to
+   * enable LIMIT-based fetching...
+  */
+
+  TYPE t_dpt_payments_row IS TABLE OF dpt_payments%ROWTYPE;
+
+  v_curs t_dpt_payments_row;
+  ---------------------------------------------------------------------------------
+        /*local procedure for save error to err$table*/
+     PROCEDURE error_logging IS
+        /* Associative array type of the exceptions table... */
+        TYPE t_cur_exception IS TABLE OF ERR$_DPT_PAYMENTS%ROWTYPE INDEX BY PLS_INTEGER;
+
+        v_cur_exceptions   t_cur_exception;
+
+        v_indx          PLS_INTEGER;
+
+        /* Emulate DML error logging behaviour... */
+        PRAGMA AUTONOMOUS_TRANSACTION;
+     BEGIN
+        FOR i IN 1 .. SQL%BULK_EXCEPTIONS.COUNT LOOP
+           v_indx := SQL%BULK_EXCEPTIONS (i).ERROR_INDEX;
+
+           /* Populate as many values as available... */
+           v_cur_exceptions (i).ora_err_number$        := SQL%BULK_EXCEPTIONS (i).ERROR_CODE;
+           v_cur_exceptions (i).ora_err_mesg$          := SQLERRM (SQL%BULK_EXCEPTIONS (i).ERROR_CODE * -1);
+           v_cur_exceptions (i).ora_err_tag$           := 'FORALL ERROR LOGGING';
+           v_cur_exceptions (i).ora_err_optyp$         := 'I';
+           v_cur_exceptions (i).dpt_id                 := v_curs (v_indx).dpt_id;
+           v_cur_exceptions (i).rnk                    := v_curs (v_indx).rnk;
+           v_cur_exceptions (i).kf                     := v_curs (v_indx).kf;
+           --v_cur_exceptions (i).effectdate             := v_curs (v_indx).effectdate;
+           --v_cur_exceptions (i).acc                    := v_curs (v_indx).acc;
+        END LOOP;
+
+        /* Load the exceptions into the exceptions table... */
+        FORALL i IN INDICES OF v_cur_exceptions
+           INSERT INTO ERR$_DPT_PAYMENTS
+                VALUES v_cur_exceptions (i);
+
+        COMMIT;
+     END error_logging;
+
+   BEGIN
+    trace('%s: entry point', p);
+
+    --ребилд индексов из-за ora-00600
+    execute immediate 'ALTER SESSION ENABLE PARALLEL DDL';
+    execute immediate 'alter index  I1_DPTPAYMENTS rebuild parallel 24';
+    execute immediate 'alter index  PK_DPTPAYMENTS rebuild parallel 24';
+    execute immediate 'ALTER SESSION DISABLE PARALLEL DDL';
+
+    --переход в импортируемое МФО
+    bc.go(g_kf);
+    --
+    mgr_utl.mantain_error_table(l_tab);
+    mgr_utl.before_fill(l_tab);
+    bpa.disable_policies(l_tab);
+
+    -- переводим индекс в состояние unusable, после заливки сделаем ребилд
+    --execute immediate 'ALTER INDEX i1_dptpayments UNUSABLE';
+
+         /*execute immediate 'select trunc(nvl(op.ref/100, 1))
+                           from (select min(ref) as ref
+                                 from bars.oper
+                                 where ref > 0
+                                 and kf=:g_kf
+                                 )op'
+                           into l_min_ref using g_kf;*/
+
+   BEGIN
+    l_migration_start_time := sysdate;
+    l_start_time := current_timestamp;
+
+      OPEN l_cur FOR
+          'select
+            rukey(dpt_id)
+           ,rukey(ref)
+           ,kf
+           ,branch
+           ,rukey(rnk) as rnk
+         from '||pkf('dpt_payments')--||' where ref>='||l_min_ref
+         ;
+              --
+       LOOP
+         FETCH l_cur BULK COLLECT INTO v_curs LIMIT c_limit;
+           EXIT WHEN v_curs.COUNT = 0;
+
+       BEGIN
+        FORALL indx IN INDICES OF v_curs SAVE EXCEPTIONS
+          INSERT INTO bars.DPT_PAYMENTS
+                                    VALUES v_curs(indx);
+
+        EXCEPTION
+               WHEN bulk_exceptions THEN
+                  c_n := c_n + SQL%ROWCOUNT;
+                  error_logging ();
+       END;
+        COMMIT;
+          v_count := v_count + c_limit;
+            dbms_application_info.set_action('INS: ' || to_char(v_count)||'/'||to_char(sql%rowcount)||'/ TBL: '||l_tab||' ERR: ' || to_char(c_n));
+            dbms_application_info.set_client_info('INS: ' || to_char(v_count)||'/'||to_char(sql%rowcount)||'/ TBL: '||l_tab||' ERR: ' || to_char(c_n));
+
+       END LOOP;
+       l_rowcount := l_cur%rowcount;
+       CLOSE l_cur;
+         l_end_time := current_timestamp;
+         l_time_duration:= (l_end_time - l_start_time);
+         mgr_log.p_save_log_info_mesg(ip_migration_id                   => g_kf
+                                      ,ip_migration_start_time          => l_migration_start_time
+                                      ,ip_table_name                    => l_tab
+                                      ,ip_operation                     => p
+                                      ,ip_row_count                     => l_rowcount
+                                      ,ip_task_start_time               => l_start_time
+                                      ,ip_task_end_time                 => l_end_time
+                                      ,ip_time_duration                 => l_time_duration
+                                      ,ip_log_message                   => 'Done'
+                                       );
+        EXCEPTION
+              WHEN OTHERS THEN
+                   --mgr_utl.save_error();
+          mgr_log.p_save_log_error(ip_migration_id                      => g_kf
+                                  ,ip_migration_start_time              => l_migration_start_time
+                                  ,ip_table_name                        => l_tab
+                                  ,ip_operation                         => p
+                                  ,ip_row_count                         => l_rowcount
+                                  ,ip_task_start_time                   => l_start_time
+                                  ,ip_task_end_time                     => l_end_time
+                                  ,ip_time_duration                     => l_time_duration
+                                  ,ip_log_message                       => 'Error'
+                                  );
+     -- Clear collection for v_curs
+    v_curs.delete;
+    END;
+
+    --execute immediate 'ALTER INDEX i1_dptpayments REBUILD';
+    bpa.enable_policies(l_tab);
+    --
+    bc.home();
+    --
+    mgr_utl.finalize();
+    --
+    --trace('собираем статистику');
+
+    -- mgr_utl.gather_table_stats (ownname => 'BARS', tabname => l_tab,  cascade=>true);
+
+    trace('%s: finished', p);
+
+  end  fill_dpt_payments;
+
+  procedure  fill_dpt_payments_old
   is
     l_tab                    VARCHAR2(50) DEFAULT 'DPT_PAYMENTS';
     p                        CONSTANT VARCHAR2(62) := 'mrg_utl.fill_'||l_tab;
@@ -17558,7 +17882,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
            ,kf
            ,branch
            ,rukey(rnk) as rnk
-         from '||pkf('dpt_payments')||' where ref>='||l_min_ref;
+         from '||pkf('dpt_payments')||' where ref<'||l_min_ref;
               --
        LOOP
          FETCH l_cur BULK COLLECT INTO v_curs LIMIT c_limit;
@@ -17624,7 +17948,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
 
     trace('%s: finished', p);
 
-  end  fill_dpt_payments;
+  end  fill_dpt_payments_old;
 
  procedure  fill_dpt_accounts
   is
@@ -17775,53 +18099,53 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
    execute immediate 'alter table '||l_tab||' disable constraint СС_EADDOCS_TYPEID';
    bpa.disable_policies(l_tab);
    --
-   select trunc(nvl(max(id / 100), 0)) + 1 
-     into l_max_id 
+   select trunc(nvl(max(id / 100), 0)) + 1
+     into l_max_id
      from bars.EAD_DOCS
     where kf = G_KF ;
 
    --
    mgr_utl.sync_table(p_table => l_tab,
-                      p_stmt => 
+                      p_stmt =>
                       'Insert --+ append
                          into '||l_tab||'
-                             (id, 
-                              crt_date, 
-                              crt_staff_id, 
-                              crt_branch, 
-                              type_id, 
-                              template_id, 
-                              scan_data, 
-                              ea_struct_id, 
-                              sign_date, 
-                              rnk, 
-                              agr_id, 
-                              page_count, 
+                             (id,
+                              crt_date,
+                              crt_staff_id,
+                              crt_branch,
+                              type_id,
+                              template_id,
+                              scan_data,
+                              ea_struct_id,
+                              sign_date,
+                              rnk,
+                              agr_id,
+                              page_count,
                               kf
                              )
-                       select 
-                              rukey(id) as id, 
-                              crt_date, 
-                              ruuser(crt_staff_id) as crt_staff_id, 
-                              crt_branch, 
-                              type_id, 
-                              template_id, 
-                              scan_data, 
-                              ea_struct_id, 
-                              sign_date, 
-                              rukey(rnk) as rnk, 
-                              rukey(agr_id) as agr_id, 
-                              page_count, 
+                       select
+                              rukey(id) as id,
+                              crt_date,
+                              ruuser(crt_staff_id) as crt_staff_id,
+                              crt_branch,
+                              type_id,
+                              template_id,
+                              scan_data,
+                              ea_struct_id,
+                              sign_date,
+                              rukey(rnk) as rnk,
+                              rukey(agr_id) as agr_id,
+                              page_count,
                               '''||G_KF||'''
                          from '||pkf(l_tab, p_schema, p_dblink)||'
                         where id >= '||l_max_id
                       ,p_delete => false
-                     );                             
+                     );
     bpa.disable_policies('EAD_DOCS');
    execute immediate 'alter table EAD_DOCS modify constraint СС_EADDOCS_TYPEID enable novalidate';
    bpa.enable_policies(l_tab);
   end fill_ead_docs;
-   
+
   procedure  fill_acc_balance_changes
   is
   begin
@@ -17874,7 +18198,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                          select rukey(run_id) as run_id, job_id, start_date, finish_date, bank_date, ruuser(user_id) as user_id, status, errmsg, branch, deleted, kf
                          from '||pkf('DPT_JOBS_JRNL', p_schema, p_dblink), false);
       bpa.enable_policies('DPT_JOBS_JRNL');
-        
+
         select trunc(nvl(max(run_id / 100), 0)) + 1
           into l_max_run_id
           from dpt_jobs_jrnl;
@@ -18068,7 +18392,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
   is
     begin
     bpa.disable_policies('CUST_REQUESTS');
-    mgr_utl.sync_table_auto('CUST_REQUESTS', false, 'req_id,"rukey(req_id)"');
+    mgr_utl.sync_table_auto('CUST_REQUESTS', false, 'req_id,"rukey(req_id)",trustee_rnk,"rukey(trustee_rnk)"');
     bpa.enable_policies('CUST_REQUESTS');
   end fill_cust_requests;
 
@@ -18153,7 +18477,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
           into l_max_did
           from ead_docs;
 
-    select trunc(nvl(max(id / 100), 0)) + 1
+    select trunc(nvl(max(id /*/ 100*/), 0)) + 1
           into l_max_sid
           from ead_sync_queue;
 
@@ -18216,54 +18540,54 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     l_max_idu     number(30);
   begin
     init();
-     
+
          mgr_utl.sync_table( l_tab
-                            ,'insert into '||l_tab||'(idu, useru, dateu, typeu, dpu_id, 
-                                                      nd, vidd, rnk, acc, user_id, freqv, 
-                                                      sum, dat_begin, dat_end, datz, 
-                                                      datv, mfo_d, nls_d, nms_d, mfo_p, 
-                                                      nls_p, nms_p, comments, closed, 
-                                                      comproc, dpu_gen, dpu_add, min_sum, 
-                                                      id_stop, branch, trustee_id, 
-                                                      acc2, kf, bdate, cnt_dubl, 
+                            ,'insert into '||l_tab||'(idu, useru, dateu, typeu, dpu_id,
+                                                      nd, vidd, rnk, acc, user_id, freqv,
+                                                      sum, dat_begin, dat_end, datz,
+                                                      datv, mfo_d, nls_d, nms_d, mfo_p,
+                                                      nls_p, nms_p, comments, closed,
+                                                      comproc, dpu_gen, dpu_add, min_sum,
+                                                      id_stop, branch, trustee_id,
+                                                      acc2, kf, bdate, cnt_dubl,
                                                       okpo_p, effectdate
                                                      )
-                                              select  rukey(IDU) as idu, 
-                                                      ruuser(USERU) as useru, 
-                                                      dateu, 
-                                                      typeu, 
-                                                      ruuser(DPU_ID) as dpu_id, 
-                                                      nd, 
-                                                      vidd, 
-                                                      rukey(rnk) as rnk, 
-                                                      rukey(acc) as acc, 
-                                                      ruuser(user_id) as userid, 
-                                                      freqv, 
-                                                      sum, 
-                                                      dat_begin, 
-                                                      dat_end, 
-                                                      datz, 
-                                                      datv, 
-                                                      mfo_d, 
-                                                      nls_d, 
-                                                      nms_d, 
-                                                      mfo_p, 
-                                                      nls_p, 
-                                                      nms_p, 
-                                                      comments, 
-                                                      closed, 
-                                                      comproc, 
-                                                      rukey(DPU_GEN) as dpu_gen, 
-                                                      dpu_add, 
-                                                      min_sum, 
-                                                      id_stop, 
-                                                      branch, 
-                                                      rukey(TRUSTEE_ID) as trustee_id, 
-                                                      acc2, 
-                                                      '''||g_kf||''' as kf, 
-                                                      bdate, 
-                                                      cnt_dubl, 
-                                                      okpo_p, 
+                                              select  rukey(IDU) as idu,
+                                                      ruuser(USERU) as useru,
+                                                      dateu,
+                                                      typeu,
+                                                      ruuser(DPU_ID) as dpu_id,
+                                                      nd,
+                                                      vidd,
+                                                      rukey(rnk) as rnk,
+                                                      rukey(acc) as acc,
+                                                      ruuser(user_id) as userid,
+                                                      freqv,
+                                                      sum,
+                                                      dat_begin,
+                                                      dat_end,
+                                                      datz,
+                                                      datv,
+                                                      mfo_d,
+                                                      nls_d,
+                                                      nms_d,
+                                                      mfo_p,
+                                                      nls_p,
+                                                      nms_p,
+                                                      comments,
+                                                      closed,
+                                                      comproc,
+                                                      rukey(DPU_GEN) as dpu_gen,
+                                                      dpu_add,
+                                                      min_sum,
+                                                      id_stop,
+                                                      branch,
+                                                      rukey(TRUSTEE_ID) as trustee_id,
+                                                      acc2,
+                                                      '''||g_kf||''' as kf,
+                                                      bdate,
+                                                      cnt_dubl,
+                                                      okpo_p,
                                                       effectdate
                                                  from '||pkf(l_tab)  ,false);
          --
@@ -18272,9 +18596,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
         --
         select nvl(max(idu), 0)+ 1 into l_max_idu from BARS.DPU_DEAL_UPDATE;
 
-        mgr_utl.reset_sequence('s_dpu_deal_update', l_max_idu); 
+        mgr_utl.reset_sequence('s_dpu_deal_update', l_max_idu);
         --
-                           
+
   end fill_dpu_deal_upd;
 
   procedure fill_dpu_jobs_jrnl(p_schema varchar2 default null,  p_dblink varchar2 default null)
@@ -18290,10 +18614,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
         select trunc(nvl(max(run_id / 100), 0)) + 1
           into l_max_run_id
           from dpu_jobs_jrnl;
-          
+
      mgr_utl.reset_sequence('s_dpu_jobs_jrnl',       l_max_run_id);--забрали в процедуру миграции
   end fill_dpu_jobs_jrnl;
-  
+
   procedure  fill_dpu_jobs_log
   is
   begin
@@ -18335,7 +18659,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
       mgr_utl.finalize();
       bars_policy_adm.enable_policies('dpu_jobs_log');
   end;
-  
+
   procedure  fill_dpu_deal_swtags
   is
   begin
@@ -18356,7 +18680,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     l_tab         VARCHAR2(30) DEFAULT 'DPU_DEALW_UPDATE';
     l_max_idupd   bars.DPU_DEALW_UPDATE.idupd%type;
   begin
-    --      
+    --
     l_max_idupd := get_max_idupd(l_tab);
     --
 --   mgr_utl.sync_table_auto('DPU_DEALW_UPDATE', false,
@@ -18373,7 +18697,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                         , value
                         , kf
                        )
-                        SELECT 
+                        SELECT
                           rukey(IDUPD) as idupd
                         , chgaction
                         , chgdate
@@ -18382,13 +18706,13 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                         , rukey(DPU_ID) as dpu_id
                         , tag
                         , value
-                        , '''||g_kf||''' as kf 
+                        , '''||g_kf||''' as kf
                         FROM '
                         ||pkf(l_tab, p_schema, p_dblink)||' where idupd >= '||l_max_idupd,
                          false);
     --
     bc.home();
-    --    
+    --
     select trunc(nvl(max(idupd / 100), 0)) + 1 into l_max_idupd from bars.DPU_DEALW_UPDATE;
     --
     mgr_utl.reset_sequence('S_DPU_DEALW_UPDATE', l_max_idupd);
@@ -18510,10 +18834,18 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
           mgr_utl.disable_table_triggers(l_tab);
           mgr_utl.disable_foreign_keys(l_tab);
           mgr_utl.sync_table('STO_DET',
-                             'INSERT INTO STO_DET
+                             'INSERT INTO STO_DET (ids, vob, dk, tt, nlsa, kva, nlsb, kvb, mfob, polu, nazn, fsum, okpo, dat1, dat2, freq, dat0,
+                             wend, stmp, idd, ord, kf, dr, branch, userid_made, branch_made, datetimestamp, branch_card, userid, status_id, disclaim_id,
+                             status_date, status_uid )
                              SELECT rukey(ids), vob, dk, tt, nlsa, kva, nlsb, kvb, mfob, polu, nazn, fsum, okpo, dat1, dat2,
                                      freq, dat0, wend, stmp, rukey(idd), ord, kf, dr, branch, ruUSER(userid_made), branch_made,
-                                     datetimestamp, branch_card,  ruUSER(userid), null as status_id, null as disclaim_id, null as status_date, null as status_uid
+                                     datetimestamp, branch_card,  ruUSER(userid)
+                                     ,1 as status_id
+                                     ,0 as disclaim_id
+                                     ,trunc(datetimestamp) as status_date
+                                     ,1 as status_uid
+                                     --,null, null, null, null
+                                     --, status_id, disclaim_id, status_date, rukey(status_uid) as status_uid
                               FROM ' ||pkf('STO_DET'), true);
           mgr_utl.enable_table_triggers(l_tab);
           mgr_utl.enable_foreign_keys(l_tab);
@@ -18553,7 +18885,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
       init();
       mgr_utl.disable_table_triggers(l_tab);
       mgr_utl.disable_foreign_keys(l_tab);
-      --      
+      --
       l_max_idupd := get_max_idupd(l_tab);
       --
       mgr_utl.sync_table(l_tab,
@@ -18565,7 +18897,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                          FROM ' ||pkf(l_tab, p_schema, p_dblink)||' where idupd >= '||l_max_idupd, false);
     --
     bc.home();
-    --    
+    --
     select trunc(nvl(max(idupd / 100), 0)) + 1 into l_max_idupd from bars.STO_DET_UPDATE;
     --
     mgr_utl.reset_sequence('S_STO_DET_UPDATE', l_max_idupd);
@@ -18582,7 +18914,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     l_max_idupd   bars.STO_DAT_UPDATE.idupd%type;
     begin
       init();
-      --      
+      --
       l_max_idupd := get_max_idupd(l_tab);
       --
       mgr_utl.sync_table(l_tab,
@@ -18593,7 +18925,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                          false);
     --
     bc.home();
-    --    
+    --
     select trunc(nvl(max(idupd / 100), 0)) + 1 into l_max_idupd from bars.STO_DAT_UPDATE;
     --
     mgr_utl.reset_sequence('S_STO_DAT_UPDATE', l_max_idupd);
@@ -18606,11 +18938,13 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
   procedure fill_zayavka
    is
       begin
+        execute immediate 'alter table ZAYAVKA disable constraint CC_ZAYAVKA_CODE2C';
         --execute immediate 'alter table ZAYAVKA disable constraint CC_ZAYAVKA_P122C';
         mgr_utl.sync_table_auto('ZAYAVKA',
                                 false,
                                 'RNK,"rukey(RNK)",ACC0,"rukey(ACC0)",ACC1,"rukey(ACC1)",RNK_PF,"rukey(RNK_PF)",REF,"rukey(REF)",ID,"rukey(ID)",IDENTKB,"rukey(IDENTKB)",REF_SPS,"rukey(REF_SPS)",REF_PF,"rukey(REF_PF)",REFOPER,"rukey(REFOPER)"');
         --execute immediate 'alter table ZAYAVKA enable constraint CC_ZAYAVKA_P122C';
+        execute immediate 'alter table ZAYAVKA enable novalidate constraint CC_ZAYAVKA_CODE2C';
   end fill_zayavka;
 
   procedure fill_zayavka_ru
@@ -18694,7 +19028,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     begin
            mgr_utl.sync_table('ZAY_DEBT',
                              'insert into bars.ZAY_DEBT(ref, refd, tip, sos, zay_sum, kf)
-                             select rukey(REF) as ref, rukey(REFD) as refd, tip, sos, zay_sum, '''||g_kf||''' as kf 
+                             select rukey(REF) as ref, rukey(REFD) as refd, tip, sos, zay_sum, '''||g_kf||''' as kf
                              from '||mgr_utl.pkf('ZAY_DEBT'),
                              false);
   end fill_zay_debt;
@@ -18752,7 +19086,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
         then
             mgr_utl.tabsync(l_tab);
             trace('%s rows inserted (by /)', to_char(sql%rowcount));
-        end if; 
+        end if;
        execute_statement(
       'update zay_mfo_nls29 set nls29ca = (select nlsb from ' || pkf('tts') ||' where tt = ''GO2'')
       where mfo = ' || g_kf,
@@ -19005,13 +19339,22 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
   --************************************end meta*********************************************--
   procedure fill_skrynka
     is
+    l_max_n_sk bars.skrynka.n_sk%type;
     begin
       init();
       mgr_utl.sync_table('SKRYNKA',
                          'insert into skrynka(o_sk, n_sk, snum, keyused, isp_mo, keynumber, branch, kf)
-                         select  o_sk, n_sk, snum, keyused, isp_mo, keynumber, branch, kf
+                         select  o_sk, rukey(n_sk) as n_sk, snum, keyused, isp_mo, keynumber, branch, kf
                          from ' ||pkf('skrynka'),
                          false);
+
+      bc.home();
+
+      select trunc(nvl(max(n_sk/100), 0) + 1)
+        into l_max_n_sk
+      from  SKRYNKA;
+      mgr_utl.reset_sequence(seq_name => 'S_SKRYNKA_N_SK',startvalue =>  l_max_n_sk);
+
   end fill_skrynka;
 
   procedure fill_skrynka_acc
@@ -19020,7 +19363,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
       init();
       mgr_utl.sync_table('SKRYNKA_ACC',
                          'insert into skrynka_acc(acc, n_sk, tip, branch, kf)
-                          select rukey(acc) as acc, n_sk, tip, branch, kf
+                          select rukey(acc) as acc, rukey(n_sk) as n_sk, tip, branch, kf
                             from ' ||pkf('skrynka_acc'),
                          false);
 
@@ -19029,7 +19372,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
   procedure fill_skrynka_nd
     is
     begin
-      mgr_utl.sync_table_auto('SKRYNKA_ND',false,'ND,"rukey(ND)",ISP_DOV,"ruuser(ISP_DOV)",RNK,"rukey(RNK)"');
+      mgr_utl.sync_table_auto('SKRYNKA_ND',false,'N_SK,"rukey(N_SK)",ND,"rukey(ND)",ISP_DOV,"ruuser(ISP_DOV)",RNK,"rukey(RNK)"');
   end fill_skrynka_nd;
 
   procedure fill_skrynka_nd_upd(p_schema varchar2 default null,  p_dblink varchar2 default null)
@@ -19038,7 +19381,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     l_max_idupd   bars.skrynka_nd_update.idupd%type;
     begin
     --mgr_utl.sync_table_auto('SKRYNKA_ND_UPDATE',false,'ND,"rukey(ND)",ISP_DOV,"ruuser(ISP_DOV)",IDUPD,"rukey(IDUPD)"');
-    --      
+    --
     l_max_idupd := get_max_idupd(l_tab);
     --
     mgr_utl.sync_table(l_tab,
@@ -19095,9 +19438,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                          , idupd
                          , rnk
                        )
-                        SELECT 
+                        SELECT
                            rukey(ND) as nd
-                         , n_sk
+                         , rukey(n_sk) as n_sk
                          , sos
                          , fio
                          , dokum
@@ -19141,12 +19484,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                          , addnd
                          , amort_date
                          , branch
-                         , '''||g_kf||''' as kf 
+                         , '''||g_kf||''' as kf
                          , chgdate
                          , chgaction
                          , doneby
                          , rukey(IDUPD) as idupd
-                         , rukey(rnk) as rnk                      
+                         , rukey(rnk) as rnk
                         FROM '
                         ||pkf(l_tab, p_schema, p_dblink)||' where idupd >= '||l_max_idupd,
                          false);
@@ -19168,7 +19511,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
   procedure fill_skrynka_nd_arc
     is
     begin
-      mgr_utl.sync_table_auto('SKRYNKA_ND_ARC',false,'ND,"rukey(ND)",ISP_DOV,"ruuser(ISP_DOV)",RNK,"rukey(RNK)"');
+      mgr_utl.sync_table_auto('SKRYNKA_ND_ARC',false,'N_SK,"rukey(N_SK)",ND,"rukey(ND)",ISP_DOV,"ruuser(ISP_DOV)",RNK,"rukey(RNK)"');
   end fill_skrynka_nd_arc;
 
   procedure fill_skrynka_nd_ref
@@ -19266,7 +19609,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     --bpa.disable_policies(l_tab);
     mgr_utl.disable_table_triggers(l_tab);
     mgr_utl.disable_foreign_keys(l_tab);
-    --      
+    --
     l_max_idupd := get_max_idupd(l_tab);
     --
     mgr_utl.sync_table(l_tab,
@@ -19597,10 +19940,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     is
     begin
       init();
-      mgr_utl.sync_table('XML_IMPFILES',
+       mgr_utl.mantain_error_table('XML_IMPFILES');
+       mgr_utl.sync_table('XML_IMPFILES',
                          'insert into bars.xml_impfiles(userid, kf, fn, dat, branch)
                           select ruuser(userid) as userid, kf, fn, dat, '''||'/' ||g_kf||'/'||''' branch
-                          from ' ||pkf('xml_impfiles'),
+                          from ' ||mgr_utl.pkf('xml_impfiles')||' log errors reject limit unlimited',
                           false);
   end fill_xml_impfiles;
 
@@ -19645,7 +19989,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
   ----
   -- fill_zapros - наполнение zapros
   --
-  procedure fill_zapros
+  /*procedure fill_zapros
   is
   l_kodz  zapros.kodz%type;
 
@@ -19746,7 +20090,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
        commit;
     end;';
 
-  end fill_zapros;
+  end fill_zapros;*/
 
   procedure fill_zapros_attr
     is
@@ -19850,10 +20194,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
    is
     begin
       init();
+      mgr_utl.mantain_error_table(p_table => 'WCS_BIDS');
       mgr_utl.sync_table(p_table => 'WCS_BIDS',
                          p_stmt => 'insert into WCS_BIDS (id, subproduct_id, crt_date, inn, rnk, mgr_id, branch, last_date)
                                     select id, subproduct_id, crt_date, inn, rukey(rnk) as rnk, mgr_id, branch, last_date
-                                    from '||PKF('WCS_BIDS'),
+                                    from '||PKF('WCS_BIDS')||' log errors reject limit unlimited',
                          p_delete => false);
   end fill_wcs_bids;
 
@@ -19944,7 +20289,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     l_tab         VARCHAR2(30) DEFAULT 'CP_DAT_UPDATE';
     l_max_idupd   bars.CP_DAT_UPDATE.idupd%type;
   begin
-    --      
+    --
     l_max_idupd := get_max_idupd(l_tab);
     --
       --mgr_utl.sync_table_auto('CP_DAT_UPDATE', false, 'DONEBY,"ruuser(DONEBY)"');
@@ -19965,7 +20310,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                          ,ir
                          ,kf
                        )
-                        SELECT 
+                        SELECT
                          id
                          ,npp
                          ,dok
@@ -19978,13 +20323,13 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                          ,effectdate
                          ,expiry_date
                          ,ir
-                         , '''||g_kf||''' as kf 
+                         , '''||g_kf||''' as kf
                         FROM '
                         ||pkf(l_tab, p_schema, p_dblink)||' where idupd >= '||l_max_idupd,
                          false);
     --
     bc.home();
-    --    
+    --
     select trunc(nvl(max(idupd / 100), 0)) + 1 into l_max_idupd from bars.CP_DAT_UPDATE;
     --
     mgr_utl.reset_sequence('S_CP_DAT_UPDATE', l_max_idupd);
@@ -19999,14 +20344,15 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     begin
       bars_policy_adm.disable_policies('CP_KOD');
       init();
+      mgr_utl.mantain_error_table(p_table => 'CP_KOD');
       mgr_utl.sync_table(p_table => 'CP_KOD',
                          p_stmt => 'insert into cp_kod (id, emi, dox, cp_id, kv, name, country, datp, ir, tip, dat_em, amort, dcp, cena, basey, cena_kup, ky, dok, dnk,
                                                         rnk, period_kup, idt, dat_rr, pr1_kup, pr_amr, fin23, kat23, k23, vncrr, pr_akt, metr, gs, cena_kup0,
-                                                        cena_start, quot_sign, datzr, datvk, io, riven, in_br, expiry, vncrp, zal_cp, pawn, hierarchy_id)
+                                                        cena_start, quot_sign, datzr, datvk, io, riven, in_br, expiry, vncrp, zal_cp, pawn, hierarchy_id, FIN_351, PD, KF, FAIR_METHOD_ID)
                                     select id, nvl(emi,0) as emi, nvl(dox,0) as dox, cp_id, kv, name, country, datp, ir, nvl(tip,0) as tip, dat_em, amort, dcp, cena, basey, cena_kup, ky, dok, dnk,
                                                         nvl(rukey(rnk),0) as rnk, period_kup, idt, dat_rr, pr1_kup, pr_amr, fin23, kat23, k23, vncrr, pr_akt, metr, gs, cena_kup0,
-                                                        cena_start, quot_sign, datzr, datvk, io, riven, in_br, expiry, vncrp, zal_cp, pawn, hierarchy_id
-                                    from '||PKF('CP_KOD'),
+                                                        cena_start, quot_sign, datzr, datvk, io, riven, in_br, expiry, vncrp, zal_cp, pawn, hierarchy_id, FIN_351, PD, '''||g_kf||''' as kf, null as FAIR_METHOD_ID
+                                    from '||PKF('CP_KOD')||' log errors reject limit unlimited',
                          p_delete => false);
 
       bars_policy_adm.enable_policies('CP_KOD');
@@ -20754,7 +21100,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     l_tab         VARCHAR2(30) DEFAULT 'cp_deal_update';
     l_max_idupd   bars.cp_deal_update.idupd%type;
   begin
-    --      
+    --
     l_max_idupd := get_max_idupd(l_tab);
     --
     --mgr_utl.sync_table_auto('cp_deal_update', false,
@@ -20794,7 +21140,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                          ,accunrec
                          ,kf
                        )
-                        SELECT 
+                        SELECT
                          rukey(idupd) as idupd
                          ,chgaction
                          ,effectdate
@@ -20826,12 +21172,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                          ,rukey(accs6) as accs6
                          ,rukey(accr3) as accr3
                          ,rukey(accunrec) as accunrec
-                         , '''||g_kf||''' as kf 
+                         , '''||g_kf||''' as kf
                         FROM '
                         ||pkf(l_tab, p_schema, p_dblink)||' where idupd >= '||l_max_idupd,
                          false);    --
     bc.home();
-    --    
+    --
     select trunc(nvl(max(idupd / 100), 0)) + 1 into l_max_idupd from bars.cp_deal_update;
     --
     mgr_utl.reset_sequence('s_cpdeal_update', l_max_idupd);
@@ -20844,7 +21190,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
   procedure fill_pawn_acc
      is
      begin
-      mgr_utl.sync_table_auto('pawn_acc', false,'acc,"rukey(acc)",ndz,"rukey(ndz)",IDZ,"ruuser(IDZ)"');
+      mgr_utl.sync_table_auto('pawn_acc', false,'acc,"rukey(acc)",ndz,"rukey(ndz)",IDZ,"ruuser(IDZ)",DEPOSIT_ID,"rukey(DEPOSIT_ID)"');
   end fill_pawn_acc;
 
   procedure fill_cp_arch
@@ -20856,7 +21202,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                                                          stiket, sn, ref_repo, vd, vp, ref_main, t, nom, tq, dat_sn, sn_1, dat_sn_1, kf)
                                     select  rukey(ref) ref, id, dat_ug, dat_opl, dat_roz, rukey(acc) acc, sumb, n,d,p,r,s,z,
                                             rukey(replace(str_ref,'','',substr(rukey(1),2,2)||'','')),
-                                            op,stiket,sn, rukey(ref_repo) ref_repo,
+                                            op,null as stiket,sn, rukey(ref_repo) ref_repo,
                                             vd,vp, rukey(ref_main) ref_main, t,nom,tq,dat_sn,sn_1,dat_sn_1, '||g_kf||'
                                     from '||PKF('CP_ARCH'),
                          p_delete => false);
@@ -20922,7 +21268,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
      --
      --mgr_utl.sync_table_auto('CP_MANY_UPDATE', false,'idupd,"rukey(idupd)",doneby,"ruuser(doneby)",REF,"rukey(REF)"');
      --
-     --      
+     --
      l_max_idupd := get_max_idupd(l_tab);
      --
      mgr_utl.sync_table(l_tab,
@@ -20939,7 +21285,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                          ,sn2
                          ,kf
                        )
-                        SELECT 
+                        SELECT
                          rukey(idupd) as idupd
                          ,chgaction
                          ,effectdate
@@ -20950,7 +21296,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                          ,ss1
                          ,sdp
                          ,sn2
-                         , '''||g_kf||''' as kf 
+                         , '''||g_kf||''' as kf
                         FROM '
                         ||pkf(l_tab, p_schema, p_dblink)||' where idupd >= '||l_max_idupd,
                          false);
@@ -21029,7 +21375,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     begin
      mgr_utl.mantain_error_table('CP_KOD_UPDATE');
      init();
-     --      
+     --
      l_max_idupd := get_max_idupd(l_tab);
      --
      mgr_utl.sync_table(l_tab,
@@ -21100,7 +21446,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
             rollback;
             mgr_utl.save_error();
           end;
-      
+
   end fill_fx_deal_acc;
 
   procedure fill_mb_plan
@@ -21144,7 +21490,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     --bpa.disable_policies(l_tab);
     mgr_utl.disable_table_triggers(l_tab);
     mgr_utl.disable_foreign_keys(l_tab);
-    --      
+    --
     l_max_idupd := get_max_idupd(l_tab);
     --
     mgr_utl.sync_table('ACC_OVER_UPDATE',
@@ -21153,7 +21499,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                                day, sos, datd, sd, ndoc, vidd, datd2, krl, useostf, uselim, rukey(acc_9129) as acc_9129, rukey(acc_8000) as acc_8000,
                                obs, txt, userid, deleted, pr_2600a, pr_komis, pr_9129, pr_2069, rukey(acc_2067) as acc_2067, rukey(acc_2069) as acc_2069,
                                rukey(acc_2096) as acc_2096, '''||g_kf||''' as kf, rukey(acc_3739) as acc_3739, kat23, fin23, obs23, k23, fin, rukey(acc_3600) as acc_3600, s_3600, flag_3600,
-                               global_bdate  
+                               global_bdate
                         FROM '||pkf(l_tab, p_schema, p_dblink)||' where idupd >= '||l_max_idupd,
                         false);
     --
@@ -21201,7 +21547,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     l_tab         VARCHAR2(30) DEFAULT 'CC_TRANS_UPDATE';
     l_max_idupd   bars.cc_trans_update.idupd%type;
     begin
-    --      
+    --
     l_max_idupd := get_max_idupd(l_tab);
     --
       --MGR_UTL.SYNC_TABLE_AUTO('cc_trans_update', false,'npp,"rukey(npp)",acc,"rukey(acc)",ref,"rukey(ref)",refp,"rukey(refp)",doneby,"ruuser(doneby)",idupd,"rukey(idupd)"');
@@ -21227,7 +21573,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                          ,kf
 
                        )
-                        SELECT 
+                        SELECT
                           rukey(idupd) as idupd
                          ,chgaction
                          ,effectdate
@@ -21245,16 +21591,16 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                          ,rukey(refp) as refp
                          ,comm
                          ,id0
-                        , '''||g_kf||''' as kf 
+                        , '''||g_kf||''' as kf
                         FROM '
                         ||pkf(l_tab, p_schema, p_dblink)||' where idupd >= '||l_max_idupd,
-                         false);     
+                         false);
     bc.home();
     --
     select trunc(nvl(max(idupd / 100), 0)) + 1 into l_max_idupd from bars.cc_trans_update;
     --
     mgr_utl.reset_sequence('s_cctrans_update', l_max_idupd);
-    
+
     mgr_utl.enable_table_triggers(l_tab);
     mgr_utl.p_constraints_enable('CC_TRANS_UPDATE');
     --
@@ -21265,8 +21611,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
      max_npp  bars.cc_trans.npp%type;
      begin
        MGR_UTL.SYNC_TABLE_AUTO('cc_trans', false,'npp,"rukey(npp)",acc,"rukey(acc)",ref,"rukey(ref)",refp,"rukey(refp)"');
-       
-       select trunc(nvl(greatest(count(*), max(npp/ 100)), 0))+ 1 into max_npp from cc_trans;  
+
+       select trunc(nvl(greatest(count(*), max(npp/ 100)), 0))+ 1 into max_npp from cc_trans;
        --
        mgr_utl.reset_sequence('s_cc_trans', max_npp);
   end fill_cc_trans;
@@ -21356,7 +21702,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
      l_tab         VARCHAR2(30) DEFAULT 'CC_SOB_UPDATE';
      l_max_idupd   bars.CC_SOB_UPDATE.idupd%type;
      begin
-     --      
+     --
      l_max_idupd := get_max_idupd(l_tab);
      --
        --MGR_UTL.SYNC_TABLE_AUTO('cc_sob_update', false,'nd,"rukey(nd)",isp,"ruuser(isp)",id,"rukey(id)",doneby,"ruuser(doneby)",idupd,"rukey(idupd)"');
@@ -21378,7 +21724,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                         ,fact_date
 
                        )
-                        SELECT 
+                        SELECT
                           rukey(nd) as nd
                         ,fdat
                         ,rukey(id) as id
@@ -21391,7 +21737,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                         ,chgaction
                         ,ruuser(doneby) as doneby
                         ,rukey(idupd) as idupd
-                        , '''||g_kf||''' as kf 
+                        , '''||g_kf||''' as kf
                         ,fact_date
                         FROM '
                         ||pkf(l_tab, p_schema, p_dblink)||' where idupd >= '||l_max_idupd,
@@ -21470,7 +21816,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
       init();
       --
       bpa.disable_policies('CC_LIM_UPDATE');
-      --      
+      --
       l_max_idupd := get_max_idupd(l_tab);
       --
       mgr_utl.sync_table(p_table => l_tab,
@@ -21509,12 +21855,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     begin
       ----execute immediate 'ALTER SESSION FORCE parallel DML parallel 8';
       ----execute immediate 'ALTER SESSION FORCE parallel QUERY parallel 8';
-      
+
      --
-     select trunc(nvl(max(nd / 100), 0)) + 1 
+     select trunc(nvl(max(nd / 100), 0)) + 1
        into l_max_nd
        from bars.CC_DOCS
-      where kf = G_KF;  
+      where kf = G_KF;
      --
      /*mgr_utl.sync_table(p_table => l_tab,
                          p_stmt => 'insert \*+ APPEND *\ into '||l_tab||'(id, nd, adds, version, state, text, comm, doneby)
@@ -21529,7 +21875,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
        ----execute immediate 'ALTER SESSION DISABLE parallel DML';
        ----execute immediate 'ALTER SESSION DISABLE parallel QUERY';
   end fill_cc_docs;
-  
+
   procedure fill_cc_deal_update(p_schema varchar2 default null,  p_dblink varchar2 default null)
     is
     l_tab         VARCHAR2(30) DEFAULT 'CC_DEAL_UPDATE';
@@ -21540,7 +21886,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
      --
      bpa.disable_policies(l_tab);
      --
-     --      
+     --
      l_max_idupd := get_max_idupd(l_tab);
      --
      mgr_utl.sync_table(l_tab,
@@ -21567,7 +21913,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
      begin
         bpa.disable_policies(l_tab);
         --MGR_UTL.SYNC_TABLE_AUTO('CC_ADD_UPDATE', false,'nd,"rukey(nd)",doneby,"ruuser(doneby)",idupd,"rukey(idupd)",accs,"rukey(accs)",accp,"rukey(accp)"');
-        --      
+        --
         l_max_idupd := get_max_idupd(l_tab);
         --
         mgr_utl.sync_table(l_tab,
@@ -21616,7 +21962,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                          ,nls_1819
                          ,field_58d
                        )
-                        SELECT 
+                        SELECT
                          rukey(idupd) as idupd
                          ,chgaction
                          ,effectdate
@@ -21654,7 +22000,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                          ,int_interma
                          ,int_intermb
                          ,ssuda
-                         , '''||g_kf||''' as kf 
+                         , '''||g_kf||''' as kf
                          ,okpokred
                          ,namkred
                          ,naznkred
@@ -21697,7 +22043,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     p                        constant varchar2(62) := G_PKG||'.fill_cc_accp_update';
     l_tab                    VARCHAR2(50) DEFAULT 'CC_ACCP_UPDATE';
     v_count                  PLS_INTEGER := 0;
-    c_limit                  PLS_INTEGER := 50000;
+    c_limit                  PLS_INTEGER := 200000;
     l_cur                    SYS_REFCURSOR;
     c_n                      PLS_INTEGER := 0;
     l_max_sqnc               cc_accp_update.idupd%TYPE;
@@ -21766,7 +22112,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
          --execute immediate 'ALTER INDEX xai_ccaccp_updatepk UNUSABLE';
 
           BEGIN
-          --      
+          --
           l_max_sqnc := get_max_idupd(l_tab);
           --
                OPEN l_cur FOR
@@ -21880,7 +22226,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     l_tab         VARCHAR2(30) DEFAULT 'CCK_RESTR_UPDATE';
     l_max_idupd   bars.CCK_RESTR_UPDATE.idupd%type;
     begin
-      --      
+      --
       l_max_idupd := get_max_idupd(l_tab);
       --
       --MGR_UTL.SYNC_TABLE_AUTO('CCK_RESTR_UPDATE', false,'nd,"rukey(nd)",rnk,"rukey(rnk)",doneby,"ruuser(doneby)",idupd,"rukey(idupd)"');
@@ -21906,7 +22252,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                          ,kf
 
                        )
-                        SELECT 
+                        SELECT
                          rukey(idupd) as idupd
                          ,chgaction
                          ,effectdate
@@ -21923,10 +22269,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                          ,s_restr
                          ,n_dodatok
                          ,qty_pay
-                         , '''||g_kf||''' as kf 
+                         , '''||g_kf||''' as kf
                         FROM '
                         ||pkf(l_tab, p_schema, p_dblink)||' where idupd >= '||l_max_idupd,
-                         false);      
+                         false);
       bc.home();
       --
       select trunc(nvl(max(idupd / 100), 0)) + 1 into l_max_idupd from bars.cck_restr_update;
@@ -21978,32 +22324,32 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
       bpa.disable_policies('cc_grt_update');
       --
       --mgr_utl.sync_table_auto(p_table => 'cc_grt_update', p_delete => false, p_column_replace => 'nd,"rukey(nd)",doneby,"ruuser(doneby)",idupd,"rukey(idupd)"');
-      --      
+      --
       l_max_idupd := get_max_idupd(l_tab);
       --
       mgr_utl.sync_table(l_tab,
                        'INSERT INTO '||l_tab||'
-                       ( idupd, 
-                         chgaction, 
-                         effectdate, 
-                         chgdate, 
-                         doneby, 
-                         nd, 
-                         grt_deal_id, 
+                       ( idupd,
+                         chgaction,
+                         effectdate,
+                         chgdate,
+                         doneby,
+                         nd,
+                         grt_deal_id,
                          kf
                        )
-                        SELECT 
-                         rukey(idupd) as idupd, 
-                         chgaction, 
-                         effectdate, 
-                         chgdate, 
-                         ruuser(doneby) as doneby, 
-                         rukey(nd) as nd, 
-                         grt_deal_id 
-                        , '''||g_kf||''' as kf 
+                        SELECT
+                         rukey(idupd) as idupd,
+                         chgaction,
+                         effectdate,
+                         chgdate,
+                         ruuser(doneby) as doneby,
+                         rukey(nd) as nd,
+                         grt_deal_id
+                        , '''||g_kf||''' as kf
                         FROM '
                         ||pkf(l_tab, p_schema, p_dblink)||' where idupd >= '||l_max_idupd,
-                         false);      
+                         false);
       bc.home();
       --
       select trunc(nvl(max(idupd / 100), 0)) + 1 into l_max_idupd from bars.cc_grt_update;
@@ -22125,7 +22471,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     --bpa.disable_policies(l_tab);
     mgr_utl.disable_table_triggers(l_tab);
     mgr_utl.disable_foreign_keys(l_tab);
-    --      
+    --
     l_max_idupd := get_max_idupd(l_tab);
     --
     mgr_utl.sync_table(l_tab,
@@ -22296,11 +22642,33 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
       MGR_UTL.SYNC_TABLE_AUTO('CIM_APE_LINK',false,'PAYMENT_ID,"rukey(PAYMENT_ID)",FANTOM_ID,"rukey(FANTOM_ID)",APE_ID,"rukey(APE_ID)",DELETE_UID,"ruuser(DELETE_UID)"');
   end fill_cim_ape_link;
 
-  procedure fill_cim_beneficiaries
-    is
-    begin
-      MGR_UTL.SYNC_TABLE_AUTO('CIM_BENEFICIARIES',false,'BENEF_ID,"rukey(BENEF_ID)"');
-  end fill_cim_beneficiaries;
+  procedure fill_CIM_BENEFICIARIES(p_schema varchar2 default null,  p_dblink varchar2 default null)
+  is
+      l_tab         VARCHAR2(30) DEFAULT 'CIM_BENEFICIARIES';
+  begin
+      mgr_utl.mantain_error_table(l_tab);
+      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||'
+                                       (
+                                        benef_id, 
+                                        benef_name, 
+                                        country_id, 
+                                        benef_adr, 
+                                        comments, 
+                                        delete_date
+
+                                        )
+                                select  
+                                        rukey(BENEF_ID) as BENEF_ID, 
+                                        benef_name, 
+                                        country_id, 
+                                        benef_adr, 
+                                        comments, 
+                                        delete_date
+                                  from '||mgr_utl.pkf(l_tab, p_schema,  p_dblink)||'
+                                   log errors reject limit unlimited'
+
+                                  , false );
+  end fill_CIM_BENEFICIARIES;    
 
   procedure fill_cim_borg_message
     is
@@ -22469,60 +22837,60 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     begin
       MGR_UTL.SYNC_TABLE('CUSTOMS_DECL','
       insert into CUSTOMS_DECL
-                                     select fn, 
-                                            dat, 
-                                            n, 
-                                            len, 
-                                            cdat, 
-                                            isnull, 
-                                            ndat, 
-                                            mdat, 
-                                            ctype, 
-                                            cnum_cst, 
-                                            cnum_year, 
-                                            cnum_num, 
-                                            mvm_feat, 
-                                            s_okpo, 
-                                            s_name, 
-                                            s_adres, 
-                                            s_type, 
-                                            s_taxid, 
-                                            r_okpo, 
-                                            r_name, 
-                                            r_adres, 
-                                            r_type, 
-                                            r_taxid, 
-                                            f_okpo, 
-                                            f_name, 
-                                            f_adres, 
-                                            f_type, 
-                                            f_taxid, 
-                                            f_country, 
-                                            uah_nls, 
-                                            uah_mfo, 
-                                            ccy_nls, 
-                                            ccy_mfo, 
-                                            kv, 
-                                            kurs, 
-                                            s, 
-                                            allow_dat, 
-                                            cmode_code, 
-                                            reserv, 
-                                            doc, 
-                                            sdate, 
-                                            fdate, 
-                                            sign_key, 
-                                            sign, 
-                                            character, 
-                                            reserve2, 
-                                            fl_eik, 
-                                            idt, 
-                                            datj, 
-                                            '''||g_kf||''' as kf, 
-                                            rukey(CIM_ID) as CIM_ID, 
-                                            cim_branch, 
-                                            cim_date, 
-                                            cim_boundsum, 
+                                     select fn,
+                                            dat,
+                                            n,
+                                            len,
+                                            cdat,
+                                            isnull,
+                                            ndat,
+                                            mdat,
+                                            ctype,
+                                            cnum_cst,
+                                            cnum_year,
+                                            cnum_num,
+                                            mvm_feat,
+                                            s_okpo,
+                                            s_name,
+                                            s_adres,
+                                            s_type,
+                                            s_taxid,
+                                            r_okpo,
+                                            r_name,
+                                            r_adres,
+                                            r_type,
+                                            r_taxid,
+                                            f_okpo,
+                                            f_name,
+                                            f_adres,
+                                            f_type,
+                                            f_taxid,
+                                            f_country,
+                                            uah_nls,
+                                            uah_mfo,
+                                            ccy_nls,
+                                            ccy_mfo,
+                                            kv,
+                                            kurs,
+                                            s,
+                                            allow_dat,
+                                            cmode_code,
+                                            reserv,
+                                            doc,
+                                            sdate,
+                                            fdate,
+                                            sign_key,
+                                            sign,
+                                            character,
+                                            reserve2,
+                                            fl_eik,
+                                            idt,
+                                            datj,
+                                            '''||g_kf||''' as kf,
+                                            rukey(CIM_ID) as CIM_ID,
+                                            cim_branch,
+                                            cim_date,
+                                            cim_boundsum,
                                             cim_original
                                      from '||pkf('CUSTOMS_DECL')||' log errors reject limit unlimited
        ',false);
@@ -22903,7 +23271,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
           into l_stmt_exist;
         --
          if l_stmt_exist > 0 then
-         
+
               mgr_utl.sync_table('OTCN_F13_ZBSK',
                                  'insert into  BARS.OTCN_F13_ZBSK(ref, tt, fdat, accd, nlsd, kv, acck, nlsk, s, sq, nazn, isp, sk_zb, recid, ko, tobo, kf, stmt)
                                  select rukey(ref) as ref, tt, fdat, rukey(accd) as accd, nlsd, kv, rukey(acck) as acck, nlsk, s, sq, nazn,
@@ -23008,7 +23376,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
         l_start_time           := current_timestamp;
         l_date                 := coalesce(to_char(p_date, 'dd.mm.yyyy'), '01.01.1970');
         l_date_end             := coalesce(to_char(p_date_end, 'dd.mm.yyyy'), '31.12.2049');
-        
+
       /*  execute immediate '
         select count(*) from all_tab_cols'||p_dblink||' t
          where t.OWNER = ''BARS''
@@ -23023,7 +23391,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
           into l_stmt_exist;
         --
          if l_stmt_exist > 0 then
-         
+
                OPEN l_cur FOR
                 'select rukey(ref) as ref, tt, fdat, rukey(accd) as accd, nlsd, kv, rukey(acck) as acck, nlsk, s, sq, nazn,
                         ruuser(isp) as isp, sk_zb, rukey(recid) as recid, ko, tobo, '''||g_kf||''' as kf, stmt
@@ -23184,50 +23552,50 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
    --
     execute immediate 'alter session set nls_date_format = ''dd.mm.yyyy''';
     --
-    execute immediate 'select nvl(max(datf), to_date(''31.12.2015 23:59:59'', ''dd.mm.yyyy hh24:mi:ss'')) 
+    execute immediate 'select nvl(max(datf), to_date(''31.12.2015 23:59:59'', ''dd.mm.yyyy hh24:mi:ss''))
                          from RNBU_TRACE_ARCH
                         where kf = :G_KF'
        into l_max_datf
       using G_KF;
       init();
-      
+
       mgr_utl.sync_table('RNBU_TRACE_ARCH',
                          'insert into  BARS.RNBU_TRACE_ARCH
-                           (kf, 
-                            datf, 
-                            kodf, 
-                            kodp, 
-                            znap, 
-                            nbuc, 
-                            isp, 
-                            rnk, 
-                            acc, 
-                            nls, 
-                            kv, 
-                            odate, 
-                            ref, 
-                            comm, 
-                            nd, 
-                            mdate, 
+                           (kf,
+                            datf,
+                            kodf,
+                            kodp,
+                            znap,
+                            nbuc,
+                            isp,
+                            rnk,
+                            acc,
+                            nls,
+                            kv,
+                            odate,
+                            ref,
+                            comm,
+                            nd,
+                            mdate,
                             tobo
                             )
                          select
-                            '''||g_kf||''' as kf, 
-                            datf, 
-                            kodf, 
-                            kodp, 
-                            znap, 
-                            nbuc, 
-                            ruuser(isp) as isp, 
-                            rukey(rnk) as rnk, 
-                            rukey(acc) as acc, 
-                            nls, 
-                            kv, 
-                            odate, 
-                            ref, 
-                            comm, 
-                            rukey(nd) as nd, 
-                            mdate, 
+                            '''||g_kf||''' as kf,
+                            datf,
+                            kodf,
+                            kodp,
+                            znap,
+                            nbuc,
+                            ruuser(isp) as isp,
+                            rukey(rnk) as rnk,
+                            rukey(acc) as acc,
+                            nls,
+                            kv,
+                            odate,
+                            ref,
+                            comm,
+                            rukey(nd) as nd,
+                            mdate,
                             tobo
                from '||pkf(l_tab)||' where datf > to_date('''||l_max_datf||''', ''dd.mm.yyyy'')',
                          false);
@@ -23247,7 +23615,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     l_rowcount               number default 0;
     l_time_duration          interval day(3) to second(3);
     l_max_datf               bars.Rnbu_Trace_Arch.datf%type;
-    -- 
+    --
 
    /* "Exceptions encountered in FORALL" exception... */
    bulk_exceptions   EXCEPTION;
@@ -23317,32 +23685,32 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     --
     execute immediate 'alter session set nls_date_format = ''dd.mm.yyyy''';
     --
-    execute immediate 'select nvl(max(datf), to_date(''31.12.2015 23:59:59'', ''dd.mm.yyyy hh24:mi:ss'')) 
+    execute immediate 'select nvl(max(datf), to_date(''31.12.2015 23:59:59'', ''dd.mm.yyyy hh24:mi:ss''))
                          from RNBU_TRACE_ARCH
                         where kf = :G_KF'
        into l_max_datf
       using G_KF;
 
       BEGIN
-        
+
       OPEN l_cur FOR
               'select
-                    '''||g_kf||''' as kf, 
-                    datf, 
-                    kodf, 
-                    kodp, 
-                    znap, 
-                    nbuc, 
-                    ruuser(isp) as isp, 
-                    rukey(rnk) as rnk, 
-                    rukey(acc) as acc, 
-                    nls, 
-                    kv, 
-                    odate, 
-                    ref, 
-                    comm, 
-                    rukey(nd) as nd, 
-                    mdate, 
+                    '''||g_kf||''' as kf,
+                    datf,
+                    kodf,
+                    kodp,
+                    znap,
+                    nbuc,
+                    ruuser(isp) as isp,
+                    rukey(rnk) as rnk,
+                    rukey(acc) as acc,
+                    nls,
+                    kv,
+                    odate,
+                    ref,
+                    comm,
+                    rukey(nd) as nd,
+                    mdate,
                     tobo
                from '||pkf(l_tab, p_schema, p_dblink)||' where datf > to_date('''||l_max_datf||''', ''dd.mm.yyyy'')';
                   --
@@ -23492,29 +23860,29 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
 
       BEGIN
        --
-      select nvl(max(datf), to_date('01.01.2016', 'dd.mm.yyyy')) 
+      select nvl(max(datf), to_date('01.01.2016', 'dd.mm.yyyy'))
         into l_max_datf
         from RNBU_TRACE_INT_ARCH
        where kf = G_KF;
-       -- 
+       --
       OPEN l_cur FOR
               'select
-                    '''||g_kf||''' as kf , 
-                    datf, 
-                    kodf, 
-                    kodp, 
-                    znap, 
-                    nbuc, 
-                    ruuser(isp) as isp, 
-                    rukey(rnk) as rnk, 
-                    rukey(acc) as acc, 
-                    nls, 
-                    kv, 
-                    odate, 
-                    ref, 
-                    comm, 
-                    rukey(nd) as nd, 
-                    mdate, 
+                    '''||g_kf||''' as kf ,
+                    datf,
+                    kodf,
+                    kodp,
+                    znap,
+                    nbuc,
+                    ruuser(isp) as isp,
+                    rukey(rnk) as rnk,
+                    rukey(acc) as acc,
+                    nls,
+                    kv,
+                    odate,
+                    ref,
+                    comm,
+                    rukey(nd) as nd,
+                    mdate,
                     tobo
                from '||pkf(l_tab, p_schema, p_dblink)||' where datf > '''||l_max_datf||'''';
                   --
@@ -23584,7 +23952,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     begin
     init();
      bars_policy_adm.disable_policies('BPK_PARAMETERS_UPDATE');
-     --      
+     --
      l_max_idupd := get_max_idupd(l_tab);
      --
      mgr_utl.sync_table(l_tab,  'INSERT INTO '||l_tab||'
@@ -23759,6 +24127,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                     ,rukey(ref) as ref
                     ,doc_orn
                     ,'''||g_kf||''' as kf
+                    , null as trans_info
                from '||pkf('OW_OIC_ATRANSFERS_HIST')||' where doc_localdate >= to_date(''01.01.2016'', ''DD.MM.YYYY'') ';
                   --
            LOOP
@@ -23899,7 +24268,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     mgr_utl.mantain_error_table(l_tab);
     --
     bars_policy_adm.disable_policies(l_tab);
-    -- 
+    --
     open c_max_ref;
     fetch c_max_ref  into l_max_ref;
 
@@ -23911,9 +24280,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                      rukey(owr.id) as id
                     ,rukey(owr.ref) as ref
                     ,'''||g_kf||''' as kf
+                    , 0 as sign_state
                from '||mgr_utl.pkf('OW_OIC_REF', p_schema,  p_dblink)||' owr, '||mgr_utl.pkf('OW_FILES', p_schema,  p_dblink)||' owf
                where owr.id = owf.id
-               and owf.file_date >= to_date(''01.01.2016'', ''DD.MM.YYYY'') 
+               and owf.file_date >= to_date(''01.01.2016'', ''DD.MM.YYYY'')
                and owr.ref > '||l_max_ref;
                   --
            LOOP
@@ -23989,7 +24359,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     mgr_utl.disable_foreign_keys(l_tab);
 
     --mgr_utl.sync_table_auto('W4_ACC_UPDATE',false,'idupd,"rukey(idupd)",nd,"rukey(nd)",acc_pk,"rukey(acc_pk)",acc_ovr,"ruuser(acc_ovr)",acc_9129,"rukey(acc_9129)",acc_3570,"rukey(acc_3570)",acc_2208,"rukey(acc_2208)",acc_2627,"rukey(acc_2627)",acc_2207,"rukey(acc_2207)",acc_3579,"rukey(acc_3579)",acc_2209,"rukey(acc_2209)",acc_2625x,"rukey(acc_2625x)",acc_2627x,"rukey(acc_2627x)",acc_2625d,"rukey(acc_2625d)",acc_2628,"rukey(acc_2628)",acc_2203,"rukey(acc_2203)"');
-    --      
+    --
     l_max_idupd := get_max_idupd(l_tab);
     --
     mgr_utl.sync_table(l_tab,
@@ -24031,12 +24401,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                          ,global_bdate
                          ,kf
                        )
-                        SELECT 
+                        SELECT
                          rukey(idupd) as idupd
                          ,chgaction
                          ,effectdate
                          ,chgdate
-                         ,doneby
+                         ,ruuser(doneby) as doneby
                          ,rukey(nd) as nd
                          ,rukey(acc_pk) as acc_pk
                          ,ruuser(acc_ovr) as acc_ovr
@@ -24051,8 +24421,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                          ,rukey(acc_2625x) as  acc_2625x
                          ,rukey(acc_2627x) as  acc_2627x
                          ,rukey(acc_2625d) as  acc_2625d
-                         ,rukey(acc_2628 ) as  acc_2628 
-                         ,rukey(acc_2203 ) as  acc_2203 
+                         ,rukey(acc_2628 ) as  acc_2628
+                         ,rukey(acc_2203 ) as  acc_2203
                          ,fin
                          ,fin23
                          ,obs23
@@ -24067,7 +24437,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                          ,s250
                          ,grp
                          ,global_bdate
-                         , '''||g_kf||''' as kf 
+                         , '''||g_kf||''' as kf
                         FROM '
                         ||pkf(l_tab, p_schema, p_dblink)||' where idupd >= '||l_max_idupd,
                          false);
@@ -24093,13 +24463,13 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     bpa.disable_policies(l_tab);
     mgr_utl.disable_table_triggers(l_tab);
     mgr_utl.disable_foreign_keys(l_tab);
-    --      
+    --
     l_max_idupd := get_max_idupd(l_tab);
     --
     mgr_utl.sync_table(l_tab,
                         'INSERT INTO '||l_tab||'
                         SELECT rukey(IDUPD) as idupd, chgaction, effectdate, chgdate, ruuser(DONEBY) as doneby, rukey(ACC_PK) as acc_pk, rukey(ACC_OVR) as acc_ovr, rukey(ACC_9129) as acc_9129, rukey(ACC_TOVR)as acc_tovr, '''||g_kf||''' as kf,
-                               rukey(ACC_3570) as acc_3570, rukey(ACC_2208) as acc_2208, rukey(ND) as nd, product_id, rukey(ACC_2207) as acc_2207, rukey(ACC_3579) as acc_3579, acc_2209, rukey(ACC_W4) as acc_w4, fin, fin23,
+                               rukey(ACC_3570) as acc_3570, rukey(ACC_2208) as acc_2208, rukey(ND) as nd, product_id, rukey(ACC_2207) as acc_2207, rukey(ACC_3579) as acc_3579, rukey(acc_2209) as acc_2209, rukey(ACC_W4) as acc_w4, fin, fin23,
                                obs23, kat23, k23, dat_end, kol_sp, s250, grp, global_bdate, dat_close
                         FROM '
                         ||pkf(l_tab, p_schema, p_dblink)||' where idupd >= '||l_max_idupd,
@@ -24195,7 +24565,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     l_tab         VARCHAR2(30) DEFAULT 'RKO_LST_UPDATE';
     l_max_idupd   bars.RKO_LST_UPDATE.idupd%type;
     begin
-    --      
+    --
     l_max_idupd := get_max_idupd(l_tab);
     --
     --mgr_utl.sync_table_auto('RKO_LST_UPDATE',false,'IDUPD,"rukey(IDUPD)",DONEBY,"ruuser(DONEBY)",ND,"rukey(ND)",ACC,"rukey(ACC)",ACCD,"rukey(ACCD)",ACC1,"rukey(ACC1)",ACC2,"rukey(ACC2)"');
@@ -24228,14 +24598,14 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
                          ,sos
 
                        )
-                        SELECT 
+                        SELECT
                          rukey(IDUPD) as idupd
                          ,chgaction
                          ,chgdate
                          ,effectdate
                          ,global_bdate
                          ,ruuser(DONEBY) as doneby
-                         , '''||g_kf||''' as kf 
+                         , '''||g_kf||''' as kf
                          ,rukey(ND) as nd
                          ,rukey(ACC) as acc
                          ,rukey(ACCD) as accd
@@ -24398,7 +24768,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     l_max_nd  number;
     begin
       bpa.disable_policies(l_tab);
+      mgr_utl.p_constraints_chk_disable(l_tab);
       mgr_utl.sync_table_auto('W4_ACC',false,'nd,"rukey(nd)",acc_pk,"rukey(acc_pk)",acc_ovr,"ruuser(acc_ovr)",acc_9129,"rukey(acc_9129)",acc_3570,"rukey(acc_3570)",acc_2208,"rukey(acc_2208)",acc_2627,"rukey(acc_2627)",acc_2207,"rukey(acc_2207)",acc_3579,"rukey(acc_3579)",acc_2209,"rukey(acc_2209)",acc_2625x,"rukey(acc_2625x)",acc_2627x,"rukey(acc_2627x)",acc_2625d,"rukey(acc_2625d)",acc_2628,"rukey(acc_2628)",acc_2203,"rukey(acc_2203)"');
+      mgr_utl.p_constraints_chk_en_novalid(l_tab);
       --
       bc.home();
       --
@@ -24427,7 +24799,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
     l_tab     VARCHAR2(30) DEFAULT 'CM_CREDITS';
     l_max_id  NUMBER;
     begin
-        begin
+        /*begin
         bc.home();
         select trunc(nvl(max(id / 100), 0)) + 1 into l_max_id from bars.cf_log;
         bc.go(g_kf);
@@ -24435,7 +24807,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
         exception when others then
             rollback;
             mgr_utl.save_error();
-        end;
+        end;*/
     bpa.disable_policies(l_tab);
     mgr_utl.sync_table_auto('CM_CREDITS',false,'nd,"rukey(nd)"');
     bpa.enable_policies(l_tab);
@@ -24478,6 +24850,18 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
           end;
    end fill_ins_deals;
 
+  procedure fill_ins_deal_attrs
+    is
+      begin
+      mgr_utl.sync_table_auto('INS_DEAL_ATTRS',false,'deal_id ,"rukey(deal_id)"');
+   end fill_ins_deal_attrs;
+
+  procedure fill_ins_deal_scans
+    is
+      begin
+      mgr_utl.sync_table_auto('INS_DEAL_SCANS',false,'deal_id ,"rukey(deal_id)"');
+   end fill_ins_deal_scans;
+
   procedure fill_ins_deal_sts_hist
     is
       begin
@@ -24487,35 +24871,54 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
   procedure fill_ins_partners
     is
       begin
-      mgr_utl.mantain_error_table('INS_PARTNERS');  
+      mgr_utl.mantain_error_table('INS_PARTNERS');
       mgr_utl.sync_table('INS_PARTNERS','insert into INS_PARTNERS
-                                            (id, 
-                                            name, 
-                                            rnk, 
-                                            agr_no, 
-                                            agr_sdate, 
-                                            agr_edate, 
-                                            tariff_id, 
-                                            fee_id, 
-                                            limit_id, 
-                                            active, 
+                                            (id,
+                                            name,
+                                            rnk,
+                                            agr_no,
+                                            agr_sdate,
+                                            agr_edate,
+                                            tariff_id,
+                                            fee_id,
+                                            limit_id,
+                                            active,
                                             custtype)
-                                            select 
-                                            rukey(id), 
-                                            name, 
-                                            rukey(rnk), 
-                                            agr_no, 
-                                            agr_sdate, 
-                                            agr_edate, 
-                                            tariff_id, 
-                                            fee_id, 
-                                            limit_id, 
-                                            active, 
+                                            select
+                                            id,
+                                            name,
+                                            rukey(rnk),
+                                            agr_no,
+                                            agr_sdate,
+                                            agr_edate,
+                                            tariff_id,
+                                            fee_id,
+                                            limit_id,
+                                            active,
                                             custtype
                                              from '||pkf('INS_PARTNERS')||' log errors reject limit unlimited'
                                              , false);
-                                            
+
   end fill_ins_partners;
+
+  procedure fill_ins_partner_types
+    is
+      begin
+      mgr_utl.mantain_error_table('INS_PARTNER_TYPES');
+      mgr_utl.sync_table('INS_PARTNER_TYPES','insert into INS_PARTNER_TYPES
+                                              select
+                                              partner_id,
+                                              type_id,
+                                              tariff_id,
+                                              fee_id,
+                                              limit_id,
+                                              active,
+                                              '''||g_kf||''' as kf
+
+                                             from '||pkf('INS_PARTNER_TYPES')||' log errors reject limit unlimited'
+                                             , false);
+
+  end fill_ins_partner_types;
 
   procedure fill_ins_partner_branch_rnk
     is
@@ -24561,7 +24964,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_OSCHAD is
   procedure fill_ins_payments_schedule
     is
       begin
-      mgr_utl.sync_table_auto('INS_PAYMENTS_SCHEDULE',false,'DEAL_ID,"rukey(DEAL_ID)"');
+      mgr_utl.sync_table_auto('INS_PAYMENTS_SCHEDULE',false,'ID,"rukey(ID)",DEAL_ID,"rukey(DEAL_ID)"');
   end fill_ins_payments_schedule;
 
   procedure fill_branch_country_rnk
@@ -24731,7 +25134,7 @@ BEGIN
                  ,ob22_rezn
                  ,ir0
                  ,irr0
-                 ,nd_cp
+                 ,rukey(nd_cp) as nd_cp
                  ,sum_imp
                  ,sumq_imp
                  ,pv_zal
@@ -24797,8 +25200,8 @@ BEGIN
                  ,ddd_6b
                  ,NULL AS fin_p
                  ,NULL AS fin_d
-                 ,NULL AS z    
-                 ,NULL AS pd 
+                 ,NULL AS z
+                 ,NULL AS pd
          from '||pkf('NBU23_REZ')||' where fdat between to_date('''||l_date||''', ''dd.mm.yyyy'') and  to_date('''||l_date_end||''', ''dd.mm.yyyy'')';
               --
        LOOP
@@ -24807,7 +25210,7 @@ BEGIN
 
        BEGIN
        FORALL indx IN INDICES OF v_curs SAVE EXCEPTIONS
-          INSERT INTO bars.nbu23_rez 
+          INSERT INTO bars.nbu23_rez
                     (FDAT
                     ,KF
                     ,ID
@@ -24952,10 +25355,10 @@ BEGIN
                     ,DDD_6B
                     ,fin_p
                     ,fin_d
-                    ,z    
-                    ,pd   
+                    ,z
+                    ,pd
                     )
-          VALUES 
+          VALUES
                     (v_curs(indx).FDAT
                     ,v_curs(indx).KF
                     ,v_curs(indx).ID
@@ -25100,8 +25503,8 @@ BEGIN
                     ,v_curs(indx).DDD_6B
                     ,v_curs(indx).fin_p
                     ,v_curs(indx).fin_d
-                    ,v_curs(indx).z    
-                    ,v_curs(indx).pd   
+                    ,v_curs(indx).z
+                    ,v_curs(indx).pd
                     );
         EXCEPTION
                WHEN bulk_exceptions THEN
@@ -25381,7 +25784,7 @@ BEGIN
               , ddd_6b
               ,NULL AS fin_p
               ,NULL AS fin_d
-              ,NULL AS z    
+              ,NULL AS z
               ,NULL AS pd
          from '||pkf('NBU23_REZ_OTCN')||' where fdat between to_date('''||l_date||''', ''dd.mm.yyyy'') and  to_date('''||l_date_end||''', ''dd.mm.yyyy'')';
               --
@@ -26290,10 +26693,22 @@ BEGIN
       mgr_utl.sync_table_auto('MWAY_LOG',false,'ID,"rukey(ID)",USERRNK,"rukey(USERRNK)"');
   end fill_mway_log;
 
-  procedure fill_mway_match
+  /*procedure fill_mway_match
     is
       begin
       mgr_utl.sync_table_auto('MWAY_MATCH',false,'ID,"rukey(ID)",REF_TR,"rukey(REF_TR)",REF_FEE_TR,"rukey(REF_FEE_TR)"');
+  end fill_mway_match;*/
+    procedure fill_mway_match
+    is
+
+    l_max_id bars.mway_match.id%type;
+
+      begin
+      select trunc(nvl(max(id), 0)) + 1 into l_max_id from bars.mway_match;
+      mgr_utl.reset_sequence('S_MWAYMATCH', l_max_id);
+      mgr_utl.sync_table_auto('MWAY_MATCH',false,'ID,"S_MWAYMATCH.nextval",REF_TR,"rukey(REF_TR)",REF_FEE_TR,"rukey(REF_FEE_TR)"');
+      select trunc(nvl(max(id), 0)) + 1 into l_max_id from bars.mway_match;
+    mgr_utl.reset_sequence('S_MWAYMATCH', l_max_id);
   end fill_mway_match;
 
     procedure fill_cig_customers
@@ -26307,6 +26722,7 @@ BEGIN
       begin
       init();
       --
+      mgr_utl.p_constraints_chk_disable('CIG_CUST_INDIVIDUAL');
       mgr_utl.sync_table('CIG_CUST_INDIVIDUAL',
                          'insert into  BARS.CIG_CUST_INDIVIDUAL(cust_id, role_id, first_name, surname, fathers_name, gender, classification, birth_surname, date_birth, place_birth,
                                                                 residency, citizenship, neg_status, education, marital_status, position, cust_key, passp_ser, passp_num,
@@ -26318,6 +26734,7 @@ BEGIN
                                 fact_street_buildnum, fact_post_index, reg_territory_id, reg_street_buildnum, reg_post_index, branch
                          from ' ||pkf('CIG_CUST_INDIVIDUAL')||' where fact_territory_id is not null ',
                          false);
+      mgr_utl.p_constraints_chk_en_novalid('CIG_CUST_INDIVIDUAL');
   end fill_cig_cust_individual;
 
   procedure fill_cig_dog_general
@@ -26356,8 +26773,8 @@ BEGIN
           end;
           mgr_utl.sync_table('CIG_EVENTS',
                               'INSERT INTO CIG_EVENTS
-                              SELECT S_CIG_EVENTS.nextval evt_id, evt_date, evt_uname, evt_state_id, evt_message, evt_oraerr, 
-                                     rukey(EVT_ND) evt_nd, rukey(EVT_RNK) evt_rnk, branch, evt_dtype, evt_custtype                       
+                              SELECT S_CIG_EVENTS.nextval evt_id, evt_date, evt_uname, evt_state_id, evt_message, evt_oraerr,
+                                     rukey(EVT_ND) evt_nd, rukey(EVT_RNK) evt_rnk, branch, evt_dtype, evt_custtype
                               FROM '||pkf('CIG_EVENTS')||' WHERE evt_date >= ADD_MONTHS(TRUNC(sysdate, ''MM''), -3) + 1/86400', false);
    end fill_cig_events;
 
@@ -26443,8 +26860,8 @@ BEGIN
         l_date_end             := coalesce(to_char(p_date_end, 'dd.mm.yyyy'), '31.12.2049');
         --
          OPEN l_cur FOR
-          'SELECT S_CIG_EVENTS.nextval evt_id, evt_date, evt_uname, evt_state_id, evt_message, evt_oraerr, 
-                  rukey(EVT_ND) evt_nd, rukey(EVT_RNK) evt_rnk, branch, evt_dtype, evt_custtype                       
+          'SELECT S_CIG_EVENTS.nextval evt_id, evt_date, evt_uname, evt_state_id, evt_message, evt_oraerr,
+                  rukey(EVT_ND) evt_nd, rukey(EVT_RNK) evt_rnk, branch, evt_dtype, evt_custtype
            from '||pkf(l_tab, p_schema, p_dblink)||' where evt_date between to_date('''||l_date||''', ''dd.mm.yyyy'') and  to_date('''||l_date_end||''', ''dd.mm.yyyy'')';
               --
        LOOP
@@ -26513,22 +26930,69 @@ BEGIN
 
   procedure fill_asvo_immobile
     is
+      l_max_id bars.asvo_immobile.id%type;
       begin
       mgr_utl.sync_table_auto('ASVO_IMMOBILE',false,'ID,"rukey(ID)",REF,"rukey(REF)",REFOUT,"rukey(REFOUT)",DPTID,"rukey(DPTID)"');
+      select trunc(nvl(max(id / 100), 0)) + 1
+      into l_max_id
+      from ASVO_IMMOBILE;
+  -- выставляем последовательность S_ASVO_IMMOBILE
+  mgr_utl.reset_sequence('S_ASVO_IMMOBILE', l_max_id);
+
   end fill_asvo_immobile;
 
   procedure fill_batch_immobile
     is
+       l_max_id bars.batch_immobile.id%type;
       begin
       mgr_utl.sync_table_auto('BATCH_IMMOBILE',false,'ID,"rukey(ID)",USERID,"ruuser(USERID)"');
+
+      select trunc(nvl(max(id / 100), 0)) + 1
+      into l_max_id
+      from BATCH_IMMOBILE;
+  -- выставляем последовательность S_ASVO_IMMOBILE
+  mgr_utl.reset_sequence('S_BATCH_IMMOBILE', l_max_id);
+
   end fill_batch_immobile;
 
   procedure fill_prvn_fin_deb
     is
       begin
-      mgr_utl.sync_table_auto('PRVN_FIN_DEB',false,'ACC_SS,"rukey(ACC_SS)",ACC_SP,"rukey(ACC_SP)"');
+      mgr_utl.sync_table_auto('PRVN_FIN_DEB',false,'ACC_SS,"rukey(ACC_SS)",ACC_SP,"rukey(ACC_SP)",AGRM_ID,"rukey(AGRM_ID)"');
   end fill_prvn_fin_deb;
 
+  procedure fill_PRVN_FIN_DEB_ARCH
+    is
+    l_tab                   VARCHAR2(30 CHAR) DEFAULT 'PRVN_FIN_DEB_ARCH';
+      begin
+      mgr_utl.mantain_error_table(l_tab);
+      init();
+      mgr_utl.sync_table('PRVN_FIN_DEB_ARCH',
+                         'insert into  BARS.PRVN_FIN_DEB_ARCH
+                                       (chg_id, 
+                                        chg_dt, 
+                                        cls_dt, 
+                                        kf, 
+                                        acc_ss, 
+                                        acc_sp, 
+                                        effectdate, 
+                                        agrm_id
+                                        )
+                         select s_prvn_fin_deb_arch.nextval as chg_id, 
+                                        chg_dt, 
+                                        cls_dt, 
+                                        '''||g_kf||''' as kf, 
+                                        rukey(acc_ss) as acc_ss, 
+                                        rukey(acc_sp) as acc_sp, 
+                                        effectdate, 
+                                        rukey(agrm_id) as agrm_id
+                         from ' ||pkf('PRVN_FIN_DEB_ARCH')||' log errors reject limit unlimited',
+                         false);
+      --
+      trace('%s', get_errinfo('ERR$_'||l_tab));
+      --
+  end fill_PRVN_FIN_DEB_ARCH;
+  
   procedure fill_prvn_flow_details
     is
       begin
@@ -26593,7 +27057,7 @@ BEGIN
                          'insert into  BARS.BPK_ACC(acc_pk, acc_ovr, acc_9129, acc_tovr, kf, acc_3570, acc_2208, nd, product_id,
                                                     acc_2207, acc_3579, acc_2209, acc_w4, fin, fin23, obs23, kat23, k23, dat_end, kol_sp, s250, grp, dat_close)
                          select rukey(ACC_PK) as acc_pk, rukey(ACC_OVR) as acc_ovr, rukey(ACC_9129) as acc_9129, rukey(ACC_TOVR) as acc_tovr, '''||g_kf||''' as kf, rukey(ACC_3570) as acc_3570, rukey(ACC_2208) as acc_2208, rukey(ND) as nd, product_id,
-                                rukey(ACC_2207) as acc_2207, rukey(ACC_3579) as acc_3579, acc_2209, rukey(ACC_W4) as acc_w4, fin, fin23, obs23, kat23, k23, dat_end, kol_sp, s250, grp, dat_close
+                                rukey(ACC_2207) as acc_2207, rukey(ACC_3579) as acc_3579, rukey(acc_2209) as acc_2209, rukey(ACC_W4) as acc_w4, fin, fin23, obs23, kat23, k23, dat_end, kol_sp, s250, grp, dat_close
                          from ' ||pkf('BPK_ACC')||' log errors reject limit unlimited',
                          false);
       --
@@ -26810,7 +27274,7 @@ BEGIN
     l_tab     VARCHAR2(30) DEFAULT 'W4_ACC_INSTANT';
       begin
       bpa.disable_policies(l_tab);
-      mgr_utl.sync_table_auto('W4_ACC_INSTANT',false,'ACC,"rukey(ACC)"');
+      mgr_utl.sync_table_auto('W4_ACC_INSTANT',false,'ACC,"rukey(ACC)",RNK,"rukey(RNK)"');
       bpa.enable_policies(l_tab);
   end fill_w4_acc_instant;
 
@@ -26950,7 +27414,7 @@ BEGIN
     begin
       init();
       --
-      
+
       bpa.disable_policies('ND_TXT');
       mgr_utl.disable_table_triggers('ND_TXT');
       mgr_utl.disable_foreign_keys('ND_TXT');
@@ -26961,7 +27425,7 @@ BEGIN
                             from ' ||pkf('MOS_OPERW')|| ' m,
                               ' || pkf('CC_DEAL') || ' d ' ||
                          ' where d.nd = m.nd
-                             and  not exists (select 1 from bars.nd_txt n where n.tag = m.tag and substr(n.nd,1,length(n.nd)-2) = m.nd)', 
+                             and  not exists (select 1 from bars.nd_txt n where n.tag = m.tag and substr(n.nd,1,length(n.nd)-2) = m.nd)',
                              'Завантаження додаткових атрибутів кредитних угод для МФО ' || g_kf ||' таблиця '||l_tab);
       --
       mgr_utl.enable_table_triggers('ND_TXT');
@@ -26969,27 +27433,65 @@ BEGIN
       bpa.enable_policies('ND_TXT');
       --
   end fill_mos_operw;
-  
-  procedure fill_ins_deal_scans
-    is
-      begin
-      mgr_utl.sync_table_auto('INS_DEAL_SCANS',false,'DEAL_ID,"rukey(DEAL_ID)"');
-  end fill_ins_deal_scans;
 
-  procedure fill_e_tar_nd
-    is
-      begin
-      mgr_utl.sync_table_auto('E_TAR_ND',false,'ND,"rukey(ND)"');
-  end fill_e_tar_nd;
+  procedure fill_E_TAR_ND(p_schema varchar2 default null,  p_dblink varchar2 default null)
+  is
+      l_tab         VARCHAR2(30) DEFAULT 'E_TAR_ND';
+  begin
+      mgr_utl.mantain_error_table(l_tab);
+      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||'
+                                       (
+                                        nd, 
+                                        id, 
+                                        otm, 
+                                        dat_beg, 
+                                        dat_end, 
+                                        dat_opl, 
+                                        sumt, 
+                                        sumt1, 
+                                        dat_lb, 
+                                        dat_le, 
+                                        kf, 
+                                        s_progn, 
+                                        dat_progn, 
+                                        s_porog, 
+                                        s_tar_por1, 
+                                        s_tar_por2
+
+                                        )
+                                select  
+                                        rukey(ND) as nd, 
+                                        id, 
+                                        otm, 
+                                        dat_beg, 
+                                        dat_end, 
+                                        dat_opl, 
+                                        sumt, 
+                                        sumt1, 
+                                        dat_lb, 
+                                        dat_le, 
+                                        '''||G_KF||''' as kf, 
+                                        s_progn, 
+                                        dat_progn, 
+                                        s_porog, 
+                                        s_tar_por1, 
+                                        s_tar_por2
+
+                                  from '||mgr_utl.pkf(l_tab, p_schema,  p_dblink)||'
+                                   log errors reject limit unlimited'
+
+                                  , false );
+  end fill_E_TAR_ND;    
 
   procedure fill_branch_obu
     is
     begin
       init();
+      mgr_utl.mantain_error_table('BRANCH_OBU');
       mgr_utl.sync_table('BRANCH_OBU',
                          'insert into  BARS.BRANCH_OBU(branch, rid, ru, name, opendate, closedate)
                          select branch, rid, ru, name, to_date(opendate,''dd.mm.yyyy''), to_date(closedate,''dd.mm.yyyy'')
-                         from ' ||pkf('BRANCH_OBU'),
+                         from ' ||pkf('BRANCH_OBU')||' log errors reject limit unlimited',
                          false);
   end fill_branch_obu;
 
@@ -27026,7 +27528,7 @@ BEGIN
     --bpa.disable_policies(l_tab);
     mgr_utl.disable_table_triggers(l_tab);
     mgr_utl.disable_foreign_keys(l_tab);
-    --      
+    --
     l_max_idupd := get_max_idupd(l_tab);
     --
     mgr_utl.sync_table(l_tab,
@@ -27057,8 +27559,8 @@ BEGIN
     l_dblink      VARCHAR2(30) := p_dblink;
     l_sys_guid    VARCHAR2(255) := sys_guid;*/
       begin
-        --mgr_utl.sync_table_auto('ND_TXT_UPDATE', false, 'ND,"rukey(ND)", DONEBY,"ruuser(DONEBY)", IDUPD,"rukey(IDUPD)"');  
-        --      
+        --mgr_utl.sync_table_auto('ND_TXT_UPDATE', false, 'ND,"rukey(ND)", DONEBY,"ruuser(DONEBY)", IDUPD,"rukey(IDUPD)"');
+        --
         l_max_idupd := get_max_idupd(l_tab);
         --execute immediate l_stmt;
         --
@@ -27075,7 +27577,7 @@ BEGIN
                          ,effectdate
                          ,global_bdate
                        )
-                        SELECT 
+                        SELECT
                          rukey(ND) as nd
                          ,tag
                          ,txt
@@ -27083,7 +27585,7 @@ BEGIN
                          ,chgaction
                          ,ruuser(DONEBY) as doneby
                          ,rukey(IDUPD) as idupd
-                         , '''||g_kf||''' as kf 
+                         , '''||g_kf||''' as kf
                          ,effectdate
                          ,global_bdate
                         FROM '
@@ -27099,23 +27601,59 @@ BEGIN
         mgr_utl.enable_foreign_keys(l_tab);
         mgr_utl.p_constraints_enable(l_tab);
     end fill_nd_txt_update;
- 
-  procedure fill_fin_cust
+
+ procedure fill_fin_cust
     is
+    l_tab                   VARCHAR2(30) DEFAULT 'FIN_CUST';
       begin
-        mgr_utl.sync_table_auto('FIN_CUST', false, 'isp,"ruuser(isp)"');  
+
+        mgr_utl.sync_table(l_tab,
+                       'INSERT INTO '||l_tab||'
+                       (  nmk,
+                          okpo,
+                          custtype,
+                          fz,
+                          branch,
+                          isp,
+                          ved,
+                          datea
+
+                       )
+                        SELECT
+                          nmk,
+                          okpo,
+                          custtype,
+                          fz,
+                          branch,
+                          ruuser(isp) as isp,
+                          ved,
+                          datea
+                        FROM '
+                        ||mgr_utl.pkf(l_tab)||' log errors reject limit unlimited',
+                         false);        --
+        bc.home;
+
+
         mgr_utl.p_constraints_enable('FIN_CUST');
          --
          bc.home;
          --
       end fill_fin_cust;
 
-  procedure fill_dpt_vidd_upd 
+  procedure fill_dpt_vidd_upd
     is
     l_tab         VARCHAR2(30) DEFAULT 'DPT_VIDD_UPDATE';
     l_max_idupd   bars.dpt_vidd_update.idu%type;
       begin
-        mgr_utl.sync_table_auto('DPT_VIDD_UPDATE', false, 'IDU,"rukey(IDU)", USERU,"ruuser(USERU)"');  
+        mgr_utl.before_fill('DPT_VIDD_UPDATE');
+
+        update DPT_VIDD_UPDATE t
+           set t.idu = t.idu*100+99
+         where mod (t.idu, 100) = mgr_utl.get_ru()
+         ;
+         commit;
+
+        mgr_utl.sync_table_auto('DPT_VIDD_UPDATE', false, 'IDU,"rukey(IDU)", USERU,"ruuser(USERU)"');
         mgr_utl.p_constraints_enable('DPT_VIDD_UPDATE');
          --
          --bc.home;
@@ -27127,19 +27665,19 @@ BEGIN
     --
     end fill_dpt_vidd_upd;
 
-  procedure fill_tarif_scale_upd(p_schema varchar2 default null,  p_dblink varchar2 default null) 
+  procedure fill_tarif_scale_upd(p_schema varchar2 default null,  p_dblink varchar2 default null)
     is
     l_tab         VARCHAR2(30) DEFAULT 'TARIF_SCALE_UPDATE';
     l_max_idupd   bars.TARIF_SCALE_UPDATE.idupd%type;
       begin
-      --      
+      --
       l_max_idupd := get_max_idupd(l_tab);
       --
         mgr_utl.sync_table('TARIF_SCALE_UPDATE'
                            ,'insert into TARIF_SCALE_UPDATE(IDUPD, CHGACTION, CHGDATE, GLOBAL_BDATE, EFFECTDATE, DONEBY, KOD, SUM_LIMIT, SUM_TARIF, PR, KF, SMIN, SMAX)
                              select rukey(IDUPD), CHGACTION, CHGDATE, GLOBAL_BDATE, EFFECTDATE, ruuser(DONEBY), KOD, SUM_LIMIT, SUM_TARIF, PR, '''||g_kf||''' as kf, SMIN, SMAX
                                from '||pkf(l_tab, p_schema, p_dblink)||' where idupd >= '||l_max_idupd
-                           ,false);  
+                           ,false);
         mgr_utl.p_constraints_enable('TARIF_SCALE_UPDATE');
          --
          --bc.home;
@@ -27150,20 +27688,20 @@ BEGIN
     mgr_utl.reset_sequence('s_tfscale_update', l_max_idupd);
     --
     end fill_tarif_scale_upd;
- 
+
   procedure fill_sh_tarif_scale_upd (p_schema varchar2 default null,  p_dblink varchar2 default null)
     is
     l_tab         VARCHAR2(30) DEFAULT 'SH_TARIF_SCALE_UPDATE';
     l_max_idupd   bars.SH_TARIF_SCALE_UPDATE.idupd%type;
       begin
-        --      
+        --
         l_max_idupd := get_max_idupd(l_tab);
         --
         mgr_utl.sync_table('SH_TARIF_SCALE_UPDATE'
                            ,'insert into SH_TARIF_SCALE_UPDATE(idupd, chgaction, chgdate, global_bdate, effectdate, doneby, ids, kod, sum_limit, sum_tarif, pr, kf, smin, smax)
                              select rukey(IDUPD) as idupd, chgaction, chgdate, global_bdate, effectdate, ruuser(DONEBY) as DONEBY, ids, kod, sum_limit, sum_tarif, pr, '''||g_kf||''' as kf, SMIN, SMAX
                                from '||pkf(l_tab, p_schema, p_dblink)||' where idupd >= '||l_max_idupd
-                           ,false);  
+                           ,false);
         mgr_utl.p_constraints_enable('SH_TARIF_SCALE_UPDATE');
          --
          --bc.home;
@@ -27174,7 +27712,7 @@ BEGIN
     mgr_utl.reset_sequence('s_shtfscale_update', l_max_idupd);
     --
     end fill_sh_tarif_scale_upd;
- 
+
   procedure fill_pawn_acc_update
     is
     l_tab         VARCHAR2(30) DEFAULT 'PAWN_ACC_UPDATE';
@@ -27201,9 +27739,9 @@ BEGIN
                          ,kf
                          ,sv
                          ,cc_idz
-                         ,sdatz                       
+                         ,sdatz
                        )
-                        SELECT 
+                        SELECT
                           rukey(idupd) as idupd
                          ,chgaction
                          ,effectdate
@@ -27227,7 +27765,7 @@ BEGIN
         --
         select trunc(nvl(max(idupd / 100), 0)) + 1 into l_max_idupd from bars.PAWN_ACC_UPDATE;
 
-        mgr_utl.reset_sequence('s_pawnacc_update', l_max_idupd); 
+        mgr_utl.reset_sequence('s_pawnacc_update', l_max_idupd);
         --
         mgr_utl.enable_table_triggers(l_tab);
         mgr_utl.enable_foreign_keys(l_tab);
@@ -27349,12 +27887,12 @@ BEGIN
         end loop;
 
     end map_staff_ad_user;
-    
-  procedure fill_cim_f36 
+
+  procedure fill_cim_f36
     is
     l_tab         VARCHAR2(30) DEFAULT 'CIM_F36';
       begin
-        --      
+        --
         init();
         mantain_error_table(l_tab);
         --
@@ -27419,19 +27957,19 @@ BEGIN
                                                       ,p27
                                                       ,'''||'/'||g_kf||'/'||''' as branch
                                                  from '||pkf(l_tab)||' log errors reject limit unlimited'
-                           ,false);  
+                           ,false);
          --
         bc.home;
        --mgr_utl.p_constraints_enable(l_tab);
      --
     end fill_cim_f36;
-    
-  procedure sync_dpu_vidd 
+
+  procedure sync_dpu_vidd
     is
     l_tab         VARCHAR2(30) DEFAULT 'DPU_VIDD';
     l_max_vidd   bars.dpu_vidd.vidd%type;
       begin
-        --      
+        --
         init();
         --
          execute_statement(
@@ -27470,7 +28008,7 @@ BEGIN
                                                       ,term_add
                                                       ,irrevocable
                                                       ,null as exn_mth_id
-                                                 from '||pkf(l_tab)||' where dpu_type is not null) s on (a.vidd = s.vidd) 
+                                                 from '||pkf(l_tab)||' where dpu_type is not null) s on (a.vidd = s.vidd)
               when not matched then insert values    ( s.vidd
                                                       ,s.name
                                                       ,s.kv
@@ -27513,18 +28051,18 @@ BEGIN
         --
         select max(vidd)+ 1 into l_max_vidd from BARS.DPU_VIDD;
 
-        mgr_utl.reset_sequence('s_dpu_vidd', l_max_vidd); 
+        mgr_utl.reset_sequence('s_dpu_vidd', l_max_vidd);
         --
          exception when others then
          rollback;
      --
     end sync_dpu_vidd;
-    
-  procedure sync_dpu_types 
+
+  procedure sync_dpu_types
     is
     l_tab         VARCHAR2(30) DEFAULT 'DPU_TYPES';
       begin
-        --      
+        --
         init();
         --
          execute_statement(
@@ -27546,7 +28084,7 @@ BEGIN
                                                       ,term_min
                                                       ,term_max
                                                       ,term_add
-                                                 from '||pkf(l_tab)||') s on (a.type_id = s.type_id) 
+                                                 from '||pkf(l_tab)||') s on (a.type_id = s.type_id)
               when not matched then insert values    ( s.type_id
                                                       ,s.type_name
                                                       ,s.type_code
@@ -27574,19 +28112,19 @@ BEGIN
          rollback;
      --
     end sync_dpu_types;
-    
-  procedure sync_dpu_vidd_rate 
+
+  procedure sync_dpu_vidd_rate
     is
     l_tab         VARCHAR2(30) DEFAULT 'DPU_VIDD_RATE';
     l_max_id   bars.DPU_VIDD_RATE.id%type;
       begin
-        --      
+        --
         init();
         --
         mgr_utl.mantain_error_table(l_tab);
         select nvl(greatest(count(*), max(id)), 0)+ 1 into l_max_id from BARS.dpu_vidd_rate;
 
-        mgr_utl.reset_sequence('s_dpu_vidd_rate', l_max_id); 
+        mgr_utl.reset_sequence('s_dpu_vidd_rate', l_max_id);
 
         bpa.disable_policies(l_tab);
          execute_statement(
@@ -27602,8 +28140,8 @@ BEGIN
                                                       ,type_id
                                                       ,kv
                                                       ,'||G_KF||' as kf
-                                                 from '||pkf(l_tab)||') s on (a.vidd = s.vidd) 
-              when not matched then insert values    ( s_dpu_vidd_rate.nextval 
+                                                 from '||pkf(l_tab)||') s on (a.vidd = s.vidd)
+              when not matched then insert values    ( s_dpu_vidd_rate.nextval
                                                       ,s.vidd
                                                       ,s.term
                                                       ,s.limit
@@ -27614,7 +28152,7 @@ BEGIN
                                                       ,s.max_rate
                                                       ,s.type_id
                                                       ,s.kv
-                                                      ,s.kf) log errors reject limit unlimited                                        
+                                                      ,s.kf) log errors reject limit unlimited
                                                       ',
                     'Доповнення новими значеннями '||l_tab);
          --
@@ -27623,20 +28161,20 @@ BEGIN
         --
         /*select max(id)+ 1 into l_max_id from BARS.dpu_vidd_rate;
 
-        mgr_utl.reset_sequence('s_dpu_vidd_rate', l_max_id);*/ 
-        
+        mgr_utl.reset_sequence('s_dpu_vidd_rate', l_max_id);*/
+
         bpa.enable_policies(l_tab);
         --
          exception when others then
          rollback;
      --
     end sync_dpu_vidd_rate;
-    
-  procedure sync_tabval$global 
+
+  procedure sync_tabval$global
     is
     l_tab         VARCHAR2(30) DEFAULT 'TABVAL$GLOBAL';
       begin
-        --      
+        --
         init();
         --
         bpa.disable_policies(l_tab);
@@ -27659,7 +28197,7 @@ BEGIN
                                                       ,coin
                                                       ,fx_base
 
-                                                 from '||pkf(l_tab)||') s on (a.kv = s.kv) 
+                                                 from '||pkf(l_tab)||') s on (a.kv = s.kv)
                        when matched then update set    a.grp = s.grp
                                                       ,a.name = s.name
                                                       ,a.lcv = s.lcv
@@ -27697,7 +28235,7 @@ BEGIN
          --
         bc.home;
        --mgr_utl.p_constraints_enable(l_tab);
-        
+
         bpa.enable_policies(l_tab);
         --
          exception when others then
@@ -27714,10 +28252,10 @@ BEGIN
     mgr_utl.mantain_error_table(l_tab);
     --
       mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||' (kf, rnk, gcif, cust_type, insert_date)
-                                   select '||G_KF||' as kf, 
-                                          rukey(RNK) as rnk, 
-                                          gcif, 
-                                          cust_type, 
+                                   select '||G_KF||' as kf,
+                                          rukey(RNK) as rnk,
+                                          gcif,
+                                          cust_type,
                                           insert_date
                                      from '||pkf(l_tab, p_schema,  p_dblink)||' log errors reject limit unlimited'
                                    , false);
@@ -27732,10 +28270,10 @@ BEGIN
     mgr_utl.mantain_error_table(l_tab);
     --
       mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||' (rnk, status, insert_date, branch, cust_type, kf)
-                                   select rukey(RNK) as rnk, 
-                                          status, 
-                                          insert_date, 
-                                          branch, 
+                                   select rukey(RNK) as rnk,
+                                          status,
+                                          insert_date,
+                                          branch,
                                           cust_type,
                                           '||G_KF||' as kf
                                      from '||pkf(l_tab, p_schema,  p_dblink)||' log errors reject limit unlimited'
@@ -27751,9 +28289,9 @@ BEGIN
     mgr_utl.mantain_error_table(l_tab);
     --
       mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||' (kf, rcif, send, cust_type)
-                                   select '||G_KF||' as kf, 
-                                          rukey(rcif) as rcif, 
-                                          send, 
+                                   select '||G_KF||' as kf,
+                                          rukey(rcif) as rcif,
+                                          send,
                                           cust_type
                                      from '||pkf(l_tab, p_schema,  p_dblink)||' log errors reject limit unlimited'
                                    , false);
@@ -27771,10 +28309,10 @@ BEGIN
                                        select  gcif
                                               ,slave_kf
                                               ,cust_type
-                                              ,concat(slave_rnk, k2.ru) as slave_rnk 
+                                              ,concat(slave_rnk, k2.ru) as slave_rnk
                                          from '||pkf(l_tab, p_schema,  p_dblink)||'
                                          left join kf_ru k2
-                                           on k2.kf = slave_kf log errors reject limit unlimited'     
+                                           on k2.kf = slave_kf log errors reject limit unlimited'
                                               ,false);
   end fill_ebkc_slave;
 
@@ -27787,7 +28325,7 @@ BEGIN
     mgr_utl.mantain_error_table('EBKC_GCIF');
     --
     -- данные записываем не в EBK_GCIF, а в EBKC_GCIF
-      mgr_utl.sync_table('EBKC_GCIF','insert into EBKC_GCIF (kf, rnk, gcif, CUST_TYPE, insert_date)                                              
+      mgr_utl.sync_table('EBKC_GCIF','insert into EBKC_GCIF (kf, rnk, gcif, CUST_TYPE, insert_date)
                                        select t.kf
                                               ,concat(t.rnk, k1.ru) rnk
                                               ,t.gcif
@@ -27795,12 +28333,12 @@ BEGIN
                                               ,t.insert_date
                                          from '||pkf(l_tab, p_schema,  p_dblink)||' t
                                          left join kf_ru k1
-                                           on k1.kf = t.kf 
+                                           on k1.kf = t.kf
                                          left join bars.EBKC_GCIF e
                                            on (t.kf = e.kf and concat(t.rnk, k1.ru) = e.rnk)
-                                           or t.gcif = e.gcif                                          
-                                        where e.kf is null                                       
-                                           log errors reject limit unlimited'     
+                                           or t.gcif = e.gcif
+                                        where e.kf is null
+                                           log errors reject limit unlimited'
                                               ,false);
   end fill_ebk_gcif;
 
@@ -27809,8 +28347,8 @@ BEGIN
     l_tab         VARCHAR2(30) DEFAULT 'EBK_RCIF';
   begin
       mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||' (kf, rcif, send)
-                                   select '||G_KF||' as kf, 
-                                          rukey(rcif) as rcif, 
+                                   select '||G_KF||' as kf,
+                                          rukey(rcif) as rcif,
                                           send
                                      from '||pkf(l_tab, p_schema,  p_dblink)||' log errors reject limit unlimited'
                                    , false);
@@ -27825,14 +28363,14 @@ BEGIN
     mgr_utl.mantain_error_table('EBKC_SLAVE');
     --
     -- данные записываем не в EBK_SLAVE_CLIENT, а в EBKC_SLAVE
-      mgr_utl.sync_table('EBKC_SLAVE','insert into EBKC_SLAVE (gcif, slave_kf, cust_type, slave_rnk)                                               
+      mgr_utl.sync_table('EBKC_SLAVE','insert into EBKC_SLAVE (gcif, slave_kf, cust_type, slave_rnk)
                                        select  gcif
                                               ,slave_kf
                                               , ''I''
-                                              ,concat(slave_rnk, k2.ru) as slave_rnk 
+                                              ,concat(slave_rnk, k2.ru) as slave_rnk
                                          from '||pkf(l_tab, p_schema,  p_dblink)||'
                                          left join kf_ru k2
-                                           on k2.kf = slave_kf log errors reject limit unlimited'     
+                                           on k2.kf = slave_kf log errors reject limit unlimited'
                                               ,false);
   end fill_ebk_slave_client;
 
@@ -27840,26 +28378,26 @@ BEGIN
   is
       l_tab         VARCHAR2(30) DEFAULT 'P_L_2C';
   begin
-      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||' 
+      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||'
                                 select id
                                      , name
                                      , delete_date
                                   from '||pkf(l_tab)||'
                                  where regexp_like(id,''^[0-9]+$'')', true );
   end;
-  
-  procedure fill_acc_sob 
+
+  procedure fill_acc_sob
     is
     l_tab         VARCHAR2(30) DEFAULT 'ACC_SOB';
     l_max_id   bars.ACC_SOB.id%type;
       begin
-        select nvl(max(id),0) + 1 
+        select nvl(max(id),0) + 1
           into l_max_id
           from bars.acc_sob;
-        --   
+        --
         mgr_utl.reset_sequence('s_acc_sob', l_max_id);
         --
-        mgr_utl.sync_table_auto(l_tab, false, 'ID,"s_acc_sob.nextval", ACC,"rukey(ACC)", ISP,"rukey(ISP)"');  
+        mgr_utl.sync_table_auto(l_tab, false, 'ID,"s_acc_sob.nextval", ACC,"rukey(ACC)", ISP,"rukey(ISP)"');
         mgr_utl.p_constraints_enable(l_tab);
         bc.home;
     --
@@ -27869,37 +28407,37 @@ BEGIN
       l_tab              VARCHAR2(30) DEFAULT 'SOCIAL_AGENCY';
       l_max_agency_id    bars.SOCIAL_AGENCY.agency_id%type;
   begin
-      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||' 
+      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||'
                                        (
-                                        agency_id, 
-                                        name, 
-                                        branch, 
-                                        debit_acc, 
-                                        credit_acc, 
-                                        card_acc, 
-                                        contract, 
-                                        date_on, 
-                                        date_off, 
-                                        address, 
-                                        phone, 
-                                        details, 
-                                        type_id, 
+                                        agency_id,
+                                        name,
+                                        branch,
+                                        debit_acc,
+                                        credit_acc,
+                                        card_acc,
+                                        contract,
+                                        date_on,
+                                        date_off,
+                                        address,
+                                        phone,
+                                        details,
+                                        type_id,
                                         comiss_acc
                                        )
-                                select 
-                                        rukey(agency_id), 
-                                        name, 
-                                        branch, 
-                                        rukey(debit_acc), 
-                                        rukey(credit_acc), 
-                                        rukey(card_acc), 
-                                        contract, 
-                                        date_on, 
-                                        date_off, 
-                                        address, 
-                                        phone, 
-                                        details, 
-                                        type_id, 
+                                select
+                                        rukey(agency_id),
+                                        name,
+                                        branch,
+                                        rukey(debit_acc),
+                                        rukey(credit_acc),
+                                        rukey(card_acc),
+                                        contract,
+                                        date_on,
+                                        date_off,
+                                        address,
+                                        phone,
+                                        details,
+                                        type_id,
                                         rukey(comiss_acc)
                                   from '||pkf(l_tab, p_schema,  p_dblink), false );
     --
@@ -27907,200 +28445,224 @@ BEGIN
     into l_max_agency_id
     from SOCIAL_AGENCY;
     --
-    mgr_utl.reset_sequence('s_social_agency', l_max_agency_id); 
+    mgr_utl.reset_sequence('s_social_agency', l_max_agency_id);
 
-  end fill_social_agency;  
+  end fill_social_agency;
   procedure fill_dpt_file_row(p_schema varchar2 default null,  p_dblink varchar2 default null)
   is
       l_tab         VARCHAR2(30) DEFAULT 'DPT_FILE_ROW';
+      l_max_info_id    bars.DPT_FILE_ROW.info_id%type;
   begin
-      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||' 
+      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||'
                                        (
-                                        info_id, 
-                                        filename, 
-                                        dat, 
-                                        nls, 
-                                        branch_code, 
-                                        dpt_code, 
-                                        sum, 
-                                        fio, 
-                                        pasp, 
-                                        branch, 
-                                        ref, 
-                                        incorrect, 
-                                        closed, 
-                                        excluded, 
-                                        header_id, 
-                                        agency_id, 
-                                        agency_name, 
-                                        id_code, 
-                                        file_payoff_date, 
-                                        payoff_date, 
-                                        marked4payment, 
-                                        deal_created, 
-                                        acc_type
+                                        info_id,
+                                        filename,
+                                        dat,
+                                        nls,
+                                        branch_code,
+                                        dpt_code,
+                                        sum,
+                                        fio,
+                                        pasp,
+                                        branch,
+                                        ref,
+                                        incorrect,
+                                        closed,
+                                        excluded,
+                                        header_id,
+                                        agency_id,
+                                        agency_name,
+                                        id_code,
+                                        file_payoff_date,
+                                        payoff_date,
+                                        marked4payment,
+                                        deal_created,
+                                        acc_type,
+                                        kf
 
                                        )
-                                select 
-                                        info_id, 
-                                        filename, 
-                                        dat, 
-                                        nls, 
-                                        branch_code, 
-                                        dpt_code, 
-                                        sum, 
-                                        fio, 
-                                        pasp, 
-                                        branch, 
-                                        ref, 
-                                        incorrect, 
-                                        closed, 
-                                        excluded, 
-                                        header_id, 
-                                        rukey(agency_id), 
-                                        agency_name, 
-                                        id_code, 
-                                        file_payoff_date, 
-                                        payoff_date, 
-                                        marked4payment, 
-                                        deal_created, 
-                                        acc_type
+                                select
+                                        rukey(info_id) as info_id,
+                                        filename,
+                                        dat,
+                                        nls,
+                                        branch_code,
+                                        dpt_code,
+                                        sum,
+                                        fio,
+                                        pasp,
+                                        branch,
+                                        rukey(ref) as ref,
+                                        incorrect,
+                                        closed,
+                                        excluded,
+                                        rukey(header_id) as header_id,
+                                        rukey(agency_id) as agency_id,
+                                        agency_name,
+                                        id_code,
+                                        file_payoff_date,
+                                        payoff_date,
+                                        marked4payment,
+                                        deal_created,
+                                        acc_type,
+                                        '''||g_kf||'''
 
                                   from '||pkf(l_tab, p_schema,  p_dblink), false );
-  end fill_dpt_file_row;  
+    --
+    select nvl(max(trunc(info_id/100) + 1), 1)
+    into l_max_info_id
+    from DPT_FILE_ROW;
+    --
+    mgr_utl.reset_sequence('s_file_info', l_max_info_id);
+  end fill_dpt_file_row;
 
   procedure fill_social_contracts(p_schema varchar2 default null,  p_dblink varchar2 default null)
   is
       l_tab         VARCHAR2(30) DEFAULT 'SOCIAL_CONTRACTS';
   begin
-      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||' 
+      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||'
                                        (
-                                        contract_id, 
-                                        type_id, 
-                                        agency_id, 
-                                        branch, 
-                                        rnk, 
-                                        acc, 
-                                        contract_num, 
-                                        contract_date, 
-                                        closed_date, 
-                                        card_account, 
-                                        pension_num, 
+                                        contract_id,
+                                        type_id,
+                                        agency_id,
+                                        branch,
+                                        rnk,
+                                        acc,
+                                        contract_num,
+                                        contract_date,
+                                        closed_date,
+                                        card_account,
+                                        pension_num,
                                         details
                                        )
-                                select 
-                                        contract_id, 
-                                        type_id, 
-                                        rukey(agency_id), 
-                                        branch, 
-                                        rukey(rnk), 
-                                        rukey(acc), 
-                                        contract_num, 
-                                        contract_date, 
-                                        closed_date, 
-                                        card_account, 
-                                        pension_num, 
+                                select
+                                        contract_id,
+                                        type_id,
+                                        rukey(agency_id),
+                                        branch,
+                                        rukey(rnk),
+                                        rukey(acc),
+                                        contract_num,
+                                        contract_date,
+                                        closed_date,
+                                        card_account,
+                                        pension_num,
                                         details
                                   from '||pkf(l_tab, p_schema,  p_dblink), false );
-  end fill_social_contracts;   
+  end fill_social_contracts;
 
   procedure fill_dpt_file_agency(p_schema varchar2 default null,  p_dblink varchar2 default null)
   is
       l_tab         VARCHAR2(30) DEFAULT 'DPT_FILE_AGENCY';
   begin
-      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||' 
+      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||'
                                        (
-                                        header_id, 
-                                        branch, 
+                                        header_id,
+                                        branch,
                                         agency_id
                                        )
-                                select 
-                                        rukey(header_id) as header_id, 
-                                        branch, 
+                                select
+                                        rukey(header_id) as header_id,
+                                        branch,
                                         rukey(agency_id) as agency_id
                                   from '||pkf(l_tab, p_schema,  p_dblink), false );
- 
-  end fill_dpt_file_agency; 
-  
+
+  end fill_dpt_file_agency;
+
   procedure fill_dpt_file_header(p_schema varchar2 default null,  p_dblink varchar2 default null)
   is
       l_tab         VARCHAR2(30) DEFAULT 'DPT_FILE_HEADER';
+      l_max_id   bars.dpt_file_header.header_id%type;
+
   begin
-      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||' 
+      mgr_utl.p_constraints_chk_disable(l_tab);
+      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||'
                                        (
-                                        filename, header_length, dat, info_length, mfo_a, nls_a, mfo_b, nls_b, dk, sum, type, num, has_add, 
+                                        filename, header_length, dat, info_length, mfo_a, nls_a, mfo_b, nls_b, dk, sum, type, num, has_add,
                                         name_a, name_b, nazn, branch_code, dpt_code, exec_ord, ks_ep, branch, type_id, header_id, agency_type, file_version, recheck_agency
+                                        , kf, usr_id
                                        )
-                                select 
-                                        filename, header_length, dat, info_length, mfo_a, nls_a, mfo_b, nls_b, dk, sum, type, num, has_add, 
-                                        name_a, name_b, nazn, branch_code, dpt_code, exec_ord, ks_ep, branch, type_id, 
+                                select
+                                        filename, header_length, dat, info_length, mfo_a, nls_a, mfo_b, nls_b, dk, sum, type, num, has_add,
+                                        name_a, name_b, nazn, branch_code, dpt_code, exec_ord, ks_ep, branch, type_id,
                                         rukey(header_id) as header_id, agency_type, file_version, recheck_agency
+                                        , '''||g_kf||''', null as usr_id
                                   from '||pkf(l_tab, p_schema,  p_dblink), false );
- 
-  end fill_dpt_file_header;  
+
+      mgr_utl.p_constraints_chk_en_novalid(l_tab);
+
+      select nvl(max(header_id/100),0) + 1
+                  into l_max_id
+        from bars.dpt_file_header;
+                --
+      mgr_utl.reset_sequence('s_file_header', l_max_id);
+
+  end fill_dpt_file_header;
 
   procedure fill_fm_stable_partner_arc(p_schema varchar2 default null,  p_dblink varchar2 default null)
   is
       l_tab         VARCHAR2(30) DEFAULT 'FM_STABLE_PARTNER_ARC';
   begin
     -- переливаем таблицу FM_PARTNER_ARC в FM_STABLE_PARTNER_ARC
-    
-      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||' 
+
+      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||'
                                        (
-                                        dat, 
-                                        rnk, 
-                                        partner_list, 
+                                        dat,
+                                        rnk,
+                                        partner_list,
                                         kf
                                        )
-                                select 
-                                        dat, 
-                                        okpo, 
-                                        partner_list, 
+                                select
+                                        dat,
+                                        okpo,
+                                        partner_list,
                                         '''||g_kf||'''
                                   from '||pkf('FM_PARTNER_ARC', p_schema,  p_dblink), false );
- 
-  end fill_fm_stable_partner_arc;  
+
+  end fill_fm_stable_partner_arc;
 
   procedure fill_zapros_users
   is
       l_tab         VARCHAR2(30) DEFAULT 'ZAPROS_USERS';
   begin
       mgr_utl.mantain_error_table(l_tab);
-      mgr_utl.sync_table(l_tab, 'insert into '||l_tab||' 
+      mgr_utl.sync_table(l_tab, 'insert into '||l_tab||'
                                   select KODZ
                                        , ruuser(USER_ID) as USER_ID
                                     from '||pkf(l_tab)||' log errors reject limit unlimited
                                        ', false);
   end fill_zapros_users;
-  
+
   procedure fill_xoz_ref
   is
       l_tab         VARCHAR2(30) DEFAULT 'XOZ_REF';
   begin
-      mgr_utl.sync_table_auto(l_tab, false, 'REF1,"rukey(REF1)",REF2,"rukey(REF2)",SMTP1,"rukey(SMTP1)",ACC,"rukey(ACC)"');
+      mgr_utl.p_constraints_chk_disable(l_tab);
+      mgr_utl.sync_table_auto(l_tab, false, 'REF1,"rukey(REF1)",REF2,"rukey(REF2)",SMTP1,"rukey(SMTP1)",ACC,"rukey(ACC)",ID,"rukey(ID)",STMT1,"rukey(STMT1)"');
+      mgr_utl.p_constraints_chk_en_novalid(l_tab);
   end fill_xoz_ref;
-  
+
   procedure fill_fin_rnk_okpo
   is
   l_tab varchar2(30) default 'FIN_RNK_OKPO';
   begin
     mgr_utl.sync_table_auto(l_tab, false, 'RNK,"rukey(RNK)"');
   end fill_fin_rnk_okpo;
-  
+
   procedure fill_nbu23_cck_ul_kor
   is
   l_tab varchar2(30) default 'NBU23_CCK_UL_KOR';
   l_max_id   bars.NBU23_CCK_UL_KOR.id%type;
       begin
-        select nvl(max(id),0) + 1 
+        select nvl(max(id),0) + 1
           into l_max_id
           from bars.NBU23_CCK_UL_KOR;
-        --   
+        --
         mgr_utl.reset_sequence('s_nbu23_cck_ul_kor', l_max_id);
         --
     mgr_utl.sync_table_auto(l_tab, false, 'ID,"s_nbu23_cck_ul_kor.nextval",ND,"rukey(ND)"');
   end fill_nbu23_cck_ul_kor;
- 
+
   procedure fill_rez_cr
   is
   l_tab varchar2(30) default 'REZ_CR';
@@ -28127,11 +28689,11 @@ BEGIN
   l_tab varchar2(30) default 'FIN_KVED';
   begin
     mantain_error_table(l_tab);
-    
+
     mgr_utl.sync_table(l_tab,'
-    
+
     insert into '||l_tab||'(okpo, dat, kved, volme_sales, weight, flag)
-    select t.okpo, t.dat, t.kved, t.volme_sales, t.weight, t.flag 
+    select t.okpo, t.dat, t.kved, t.volme_sales, t.weight, t.flag
     from '||pkf(l_tab)||' t log errors reject limit unlimited ', false );
   end fill_fin_kved;
 
@@ -28139,115 +28701,119 @@ BEGIN
   is
   l_tab varchar2(30) default 'DOC_SCHEME';
   begin
-    
+
    case when g_kf = g_glb_mfo then
     execute_statement (
-              'merge into '||l_tab||' a using (select id, 
-                                              name, 
-                                              print_on_blank, 
-                                              template, 
-                                              header, 
-                                              footer, 
-                                              header_ex, 
-                                              d_close, 
-                                              fr, 
+              'merge into '||l_tab||' a using (select id,
+                                              name,
+                                              print_on_blank,
+                                              template,
+                                              header,
+                                              footer,
+                                              header_ex,
+                                              d_close,
+                                              fr,
                                               file_name
 
-                                         from '||pkf(l_tab)||') s on (a.id = s.id) 
-                 when matched then update set a.name = s.name, 
-                                              a.print_on_blank = s.print_on_blank, 
-                                              a.template = s.template, 
-                                              a.header = s.header, 
-                                              a.footer = s.footer, 
-                                              a.header_ex = s.header_ex, 
-                                              a.d_close = s.d_close, 
-                                              a.fr = s.fr, 
+                                         from '||pkf(l_tab)||') s on (a.id = s.id)
+                 when matched then update set a.name = s.name,
+                                              a.print_on_blank = s.print_on_blank,
+                                              a.template = s.template,
+                                              a.header = s.header,
+                                              a.footer = s.footer,
+                                              a.header_ex = s.header_ex,
+                                              a.d_close = s.d_close,
+                                              a.fr = s.fr,
                                               a.file_name = s.file_name
-              when not matched then insert values    (  s.id, 
-                                              s.name, 
-                                              s.print_on_blank, 
-                                              s.template, 
-                                              s.header, 
-                                              s.footer, 
-                                              s.header_ex, 
-                                              s.d_close, 
-                                              s.fr, 
+              when not matched then insert values    (  s.id,
+                                              s.name,
+                                              s.print_on_blank,
+                                              s.template,
+                                              s.header,
+                                              s.footer,
+                                              s.header_ex,
+                                              s.d_close,
+                                              s.fr,
                                               s.file_name)','Доповнення новими значеннями '||l_tab);
-   else 
+   else
     execute_statement (
-              'merge into '||l_tab||' a using (select id, 
-                                              name, 
-                                              print_on_blank, 
-                                              template, 
-                                              header, 
-                                              footer, 
-                                              header_ex, 
-                                              d_close, 
-                                              fr, 
+              'merge into '||l_tab||' a using (select id,
+                                              name,
+                                              print_on_blank,
+                                              template,
+                                              header,
+                                              footer,
+                                              header_ex,
+                                              d_close,
+                                              fr,
                                               file_name
 
-                                         from '||pkf(l_tab)||') s on (a.id = s.id) 
-              when not matched then insert values    (  s.id, 
-                                              s.name, 
-                                              s.print_on_blank, 
-                                              s.template, 
-                                              s.header, 
-                                              s.footer, 
-                                              s.header_ex, 
-                                              s.d_close, 
-                                              s.fr, 
+                                         from '||pkf(l_tab)||') s on (a.id = s.id)
+              when not matched then insert values    (  s.id,
+                                              s.name,
+                                              s.print_on_blank,
+                                              s.template,
+                                              s.header,
+                                              s.footer,
+                                              s.header_ex,
+                                              s.d_close,
+                                              s.fr,
                                               s.file_name)','Доповнення новими значеннями '||l_tab);
    end case;
-  
+
+    execute_statement ('update doc_scheme t
+     set t.template = (select r.template from '||pkf(l_tab)||' r where r.id = t.id)
+   where t.template is null','Доповнення новими значеннями нулових значень '||l_tab);
+
   end fill_doc_scheme;
-  
+
   procedure fill_doc_attr
   is
   l_tab varchar2(30) default 'DOC_ATTR';
   begin
-    
+
    case when g_kf = g_glb_mfo then
     execute_statement (
-              'merge into '||l_tab||' a using (select 
+              'merge into '||l_tab||' a using (select
                                                 id,
                                                 name,
                                                 field,
                                                 ssql
-                                         from '||pkf(l_tab)||') s on (a.id = s.id) 
-               when matched then update set a.name = s.name, 
-                                            a.field = s.field, 
+                                         from '||pkf(l_tab)||') s on (a.id = s.id)
+               when matched then update set a.name = s.name,
+                                            a.field = s.field,
                                             a.ssql = s.ssql
-               when not matched then insert values    (  s.id, 
-                                                         s.name, 
-                                                         s.field, 
+               when not matched then insert values    (  s.id,
+                                                         s.name,
+                                                         s.field,
                                                          s.ssql
                )','Доповнення новими значеннями '||l_tab);
-   else 
+   else
     execute_statement (
-              'merge into '||l_tab||' a using (select 
+              'merge into '||l_tab||' a using (select
                                                 id,
                                                 name,
                                                 field,
                                                 ssql
-                                            from '||pkf(l_tab)||') s on (a.id = s.id) 
-              when not matched then insert values    (  s.id, 
+                                            from '||pkf(l_tab)||') s on (a.id = s.id)
+              when not matched then insert values    (  s.id,
                                                         s.name,
                                                         s.field,
                                                         s.ssql
                        )','Доповнення новими значеннями '||l_tab);
    end case;
-  
+
   end fill_doc_attr;
 
   procedure fill_repvp_nolimitusr
   is
   l_tab varchar2(30) default 'REPVP_NOLIMITUSR';
   begin
-    mgr_utl.sync_table(l_tab,'    
+    mgr_utl.sync_table(l_tab,'
     insert into '||l_tab||'(USERID)
-    select ruuser(t.userid) 
-      from '||pkf(l_tab)||' t 
-      left join '||l_tab||' tt 
+    select ruuser(t.userid)
+      from '||pkf(l_tab)||' t
+      left join '||l_tab||' tt
         on ruuser(t.userid) = tt.userid
      where tt.userid is null', false );
   end fill_repvp_nolimitusr;
@@ -28258,8 +28824,8 @@ BEGIN
   l_max_id number(30);
   begin
   l_tab := 'MBM_ACSK_CERTIFICATE_REQ';
-    
-    mgr_utl.sync_table(l_tab,'    
+
+    mgr_utl.sync_table(l_tab,'
     insert into '||l_tab||'( id
                             ,rel_cust_id
                             ,request_time
@@ -28288,61 +28854,46 @@ BEGIN
                             ,token_sn
                             ,token_name
       from '||pkf(l_tab), false );
-      
+
   l_tab := 'MBM_ACSK_REGISTRATION';
-    mgr_utl.sync_table(l_tab,'    
+    mgr_utl.sync_table(l_tab,'
     insert into '||l_tab||'(
                              registration_id
                             ,rel_cust_id
                             ,acsk_user_id
-                            ,registration_date   
+                            ,registration_date
                             )
-                    select  
+                    select
                              registration_id
                             ,rukey(rel_cust_id) as rel_cust_id
                             ,acsk_user_id
                             ,registration_date
- 
+
       from '||pkf(l_tab), false );
-      
+
   l_tab := 'MBM_ACSK_REQUESTS_HISTORY';
-    mgr_utl.sync_table(l_tab,'    
-    insert into '||l_tab||'( nonce
-                            ,request_date
-                            ,request_body
-                            ,response_date
-                            ,response_code
-                            ,response_message
-                            )
-                    select   nonce
-                            ,request_date
-                            ,request_body
-                            ,response_date
-                            ,response_code
-                            ,response_message
- 
-      from '||pkf(l_tab), false );
-      
+  mgr_utl.merge_table_auto(p_table => l_tab ,p_matched => false,p_not_matched => true);
+
   l_tab := 'MBM_CUST_REL_USERS_MAP';
-    mgr_utl.sync_table(l_tab,'    
-    insert into '||l_tab||'(cust_id, 
-                            rel_cust_id, 
-                            sign_number, 
-                            user_id, 
-                            is_approved, 
+    mgr_utl.sync_table(l_tab,'
+    insert into '||l_tab||'(cust_id,
+                            rel_cust_id,
+                            sign_number,
+                            user_id,
+                            is_approved,
                             approved_type
                             )
-                    select  rukey(cust_id) as cust_id, 
-                            rukey(rel_cust_id) as rel_cust_id, 
-                            sign_number, 
-                            user_id, 
-                            is_approved, 
+                    select  rukey(cust_id) as cust_id,
+                            rukey(rel_cust_id) as rel_cust_id,
+                            sign_number,
+                            user_id,
+                            is_approved,
                             approved_type
- 
+
       from '||pkf(l_tab), false );
-      
+
   l_tab := 'MBM_REL_CUSTOMERS';
-    mgr_utl.sync_table(l_tab,'    
+    mgr_utl.sync_table(l_tab,'
     insert into '||l_tab||'( id
                             ,tax_code
                             ,first_name
@@ -28374,7 +28925,7 @@ BEGIN
                             ,cell_phone
                             ,address
                             ,email
- 
+
       from '||pkf(l_tab), false );
 
   execute immediate '
@@ -28382,9 +28933,9 @@ BEGIN
   into l_max_id ;
   mgr_utl.reset_sequence(seq_name => 'mbm_rel_cust_seq', startvalue => l_max_id);
 
-      
+
   l_tab := 'MBM_REL_CUSTOMERS_ADDRESS';
-    mgr_utl.sync_table(l_tab,'    
+    mgr_utl.sync_table(l_tab,'
     insert into '||l_tab||'( rel_cust_id
                             ,region_id
                             ,city
@@ -28398,11 +28949,11 @@ BEGIN
                             ,street
                             ,house_number
                             ,addition
- 
+
       from '||pkf(l_tab), false );
 
   l_tab := 'MBM_REL_CUST_VISA_STAMPS';
-    mgr_utl.sync_table(l_tab,'    
+    mgr_utl.sync_table(l_tab,'
     insert into '||l_tab||'(
                              rel_cust_id
                             ,visa_id
@@ -28410,7 +28961,7 @@ BEGIN
                             ,visa_date
                             ,key_id
                             ,signature
-    
+
                             )
                     select   rukey(rel_cust_id) as rel_cust_id
                             ,visa_id
@@ -28418,9 +28969,9 @@ BEGIN
                             ,visa_date
                             ,key_id
                             ,signature
- 
+
       from '||pkf(l_tab), false );
-      
+
   end fill_mbm;
 
   procedure fill_cp_accc
@@ -28432,11 +28983,11 @@ BEGIN
     mgr_utl.disable_table_triggers(l_tab);
 
     execute_statement (
-              'merge into '||l_tab||' a using (select vidd, ryn, nlsa, nlsd, nlsp, nlsr, nlss, nlsz, nlsn1, nlsn2, nlsn3, 
-                                                      nlsn4, nlse, nlsg, nlsr2, emi, pf, idb, nlszf, nls_fxp, nlssn, nls71, s605, s605p, nls_pr, nls_fxr, 
-                                                      s2vd, s2vp, s2vd0, s2vp0, s2vd1, s2vp1, b4621r, s6499, s7499, nlss5, nls_5040, s2vd2, s2vp2, nls_5040_2, 
+              'merge into '||l_tab||' a using (select vidd, ryn, nlsa, nlsd, nlsp, nlsr, nlss, nlsz, nlsn1, nlsn2, nlsn3,
+                                                      nlsn4, nlse, nlsg, nlsr2, emi, pf, idb, nlszf, nls_fxp, nlssn, nls71, s605, s605p, nls_pr, nls_fxr,
+                                                      s2vd, s2vp, s2vd0, s2vp0, s2vd1, s2vp1, b4621r, s6499, s7499, nlss5, nls_5040, s2vd2, s2vp2, nls_5040_2,
                                                       nls_5040_3, nlsexpn, nlsexpr, nlsr3, nls_1819, nls_1919, unrec, nlsfd
-              from '||pkf(l_tab)||') s on (a.vidd = s.vidd and a.emi = s.emi and a.pf = s.pf and a.ryn = s.ryn) 
+              from '||pkf(l_tab)||') s on (a.vidd = s.vidd and a.emi = s.emi and a.pf = s.pf and a.ryn = s.ryn)
               when matched then update
                    set  a.nlsa = s.nlsa
                        ,a.nlsd = s.nlsd
@@ -28482,14 +29033,14 @@ BEGIN
                        ,a.nls_1919 = s.nls_1919
                        ,a.unrec = s.unrec
                        ,a.nlsfd = s.nlsfd
-              when not matched then insert values ( s.vidd, s.ryn, s.nlsa, s.nlsd, s.nlsp, s.nlsr, s.nlss, s.nlsz, s.nlsn1, s.nlsn2, s.nlsn3, 
-                      s.nlsn4, s.nlse, s.nlsg, s.nlsr2, s.emi, s.pf, s.idb, s.nlszf, s.nls_fxp, s.nlssn, s.nls71, 
-                      s.s605, s.s605p, s.nls_pr, s.nls_fxr, s.s2vd, s.s2vp, s.s2vd0, s.s2vp0, s.s2vd1, s.s2vp1, 
-                      s.b4621r, s.s6499, s.s7499, s.nlss5, s.nls_5040, s.s2vd2, s.s2vp2, s.nls_5040_2, s.nls_5040_3, 
+              when not matched then insert values ( s.vidd, s.ryn, s.nlsa, s.nlsd, s.nlsp, s.nlsr, s.nlss, s.nlsz, s.nlsn1, s.nlsn2, s.nlsn3,
+                      s.nlsn4, s.nlse, s.nlsg, s.nlsr2, s.emi, s.pf, s.idb, s.nlszf, s.nls_fxp, s.nlssn, s.nls71,
+                      s.s605, s.s605p, s.nls_pr, s.nls_fxr, s.s2vd, s.s2vp, s.s2vd0, s.s2vp0, s.s2vd1, s.s2vp1,
+                      s.b4621r, s.s6499, s.s7499, s.nlss5, s.nls_5040, s.s2vd2, s.s2vp2, s.nls_5040_2, s.nls_5040_3,
                       s.nlsexpn, s.nlsexpr, s.nlsr3, s.nls_1819, s.nls_1919, s.unrec, s.nlsfd)','Доповнення новими значеннями '||l_tab);
 
-    mgr_utl.enable_table_triggers(l_tab);             
-    bpa.enable_policies(l_tab); 
+    mgr_utl.enable_table_triggers(l_tab);
+    bpa.enable_policies(l_tab);
 
   end fill_cp_accc;
 
@@ -28533,19 +29084,19 @@ BEGIN
   l_tab varchar2(30) default 'FIN_KOD';
   begin
     mgr_utl.mantain_error_table(l_tab);
-    mgr_utl.sync_table(l_tab,'    
-    insert into '||l_tab||'(name, 
-                            ord, 
-                            kod, 
+    mgr_utl.sync_table(l_tab,'
+    insert into '||l_tab||'(name,
+                            ord,
+                            kod,
                             idf
                            )
-                    select  name, 
-                            ord, 
-                            kod, 
-                            idf 
+                    select  name,
+                            ord,
+                            kod,
+                            idf
       from '||pkf(l_tab)||'   log errors reject limit unlimited', true );
   end fill_fin_kod;
-  
+
   procedure fill_acc262005
   is
   l_tab varchar2(30) default 'ACC262005';
@@ -28562,7 +29113,7 @@ BEGIN
                              'insert into bars.DPT_EXTREFUSALS
                              select rukey(DPTID) as dptid, branch, ruuser(req_userid) as req_userid, req_bnkdat, req_sysdat, req_machine, req_state, ruuser(VRF_USERID) as vrf_userid, vrf_bnkdat, vrf_sysdat, vrf_machine, vrf_reason, '''||g_kf||''' as kf
                              from '||mgr_utl.pkf('DPT_EXTREFUSALS'),
-                             true);  
+                             true);
   end fill_dpt_extrefusals;
 
   procedure fill_per_que
@@ -28593,18 +29144,18 @@ BEGIN
 
           mgr_utl.sync_table('RNKP_KOD_ACC',
                              'insert into bars.RNKP_KOD_ACC
-                             select rukey(rnk) as rnk, kodk, rukey(ACC) as acc 
+                             select rukey(rnk) as rnk, kodk, rukey(ACC) as acc
                              from '||mgr_utl.pkf('RNKP_KOD_ACC'),
                              false);
   end fill_rnkp_kod_acc;
-  
+
   procedure fill_cust_zay
   is
     begin
 
           mgr_utl.sync_table('CUST_ZAY',
                              'insert into bars.CUST_ZAY
-                             select rukey(rnk) as rnk, nls29, nls26, mfop, nlsp, kom, mfo26, okpop, okpo26, dk, nal_note, nal_date, tel, fio, 
+                             select rukey(rnk) as rnk, nls29, nls26, mfop, nlsp, kom, mfo26, okpop, okpo26, dk, nal_note, nal_date, tel, fio,
                              nazn_pf, rnk_pf, kom2, fl_pf, mfov, nlsv, nls_kom, nls_kom2, kf, custacc4cms, kom3, nls_pf
                              from '||mgr_utl.pkf('CUST_ZAY'),
                              false);
@@ -28616,7 +29167,7 @@ BEGIN
       begin
       mgr_utl.sync_table('DEAL',
                          'insert into DEAL
-                          select rukey(d_kf.id) as id, ot.id, d_kf.deal_number, rukey(d_kf.customer_id) as customer_id, d_kf.product_id, d_kf.start_date, 
+                          select rukey(d_kf.id) as id, ot.id, d_kf.deal_number, rukey(d_kf.customer_id) as customer_id, d_kf.product_id, d_kf.start_date,
                                 d_kf.expiry_date, d_kf.close_date, d_kf.state_id, d_kf.branch_id, rukey(d_kf.curator_id) as curator_id
                           from ' || mgr_utl.pkf('DEAL') ||' d_kf, ' ||
                                    mgr_utl.pkf('OBJECT_TYPE') || ' ot_kf, ' ||
@@ -28626,11 +29177,11 @@ BEGIN
                            false);
     --
     bc.home();
-    --    
+    --
     select trunc(nvl(max(id / 100), 0)) + 1 into l_max_id from bars.DEAL;
     --
     mgr_utl.reset_sequence('deal_seq', l_max_id);
-  
+
   end fill_deal;
 
   procedure fill_prvn_automatic_event
@@ -28638,53 +29189,53 @@ BEGIN
   begin
     mgr_utl.sync_table_auto('prvn_automatic_event',true,'ID,"rukey(ID)",REF_AGR,"rukey(REF_AGR)",RNK,"rukey(RNK)"');
   end;
-  
+
   procedure fill_FINMON_QUE
     is
-    
-    begin 
+
+    begin
       mgr_utl.mantain_error_table('FINMON_QUE');
       mgr_utl.sync_table('FINMON_QUE', 'insert into FINMON_QUE
-                                        select  t.id, 
-                                                rukey(t.ref) as ref, 
-                                                t.rec, 
-                                                t.status, 
-                                                t.opr_vid1, 
-                                                t.opr_vid2, 
-                                                t.comm_vid2, 
-                                                t.opr_vid3, 
-                                                t.comm_vid3, 
-                                                t.agent_id, 
-                                                t.in_date, 
-                                                t.monitor_mode, 
-                                                t.rnk_a, 
-                                                t.rnk_b, 
-                                                t.comments, 
-                                                ''' || g_kf || ''' as kf, 
+                                        select  rukey(t.id) as id,
+                                                rukey(t.ref) as ref,
+                                                rukey(t.rec) as rec,
+                                                t.status,
+                                                t.opr_vid1,
+                                                t.opr_vid2,
+                                                t.comm_vid2,
+                                                t.opr_vid3,
+                                                t.comm_vid3,
+                                                rukey(t.agent_id) as agent_id,
+                                                t.in_date,
+                                                t.monitor_mode,
+                                                rukey(t.rnk_a) as rnk_a,
+                                                rukey(t.rnk_b) as rnk_b,
+                                                t.comments,
+                                                ''' || g_kf || ''' as kf,
                                                 t.dat_i
 
                                           from '||mgr_utl.pkf('FINMON_QUE')||' t
                                           left join FINMON_QUE tt on t.id = tt.id
-                                         where (tt.id is null) 
+                                         where (tt.id is null)
                                            and t.in_date >= to_date(''01.01.2016'', ''dd.mm.yyyy'')
-                                           
+
                                           log errors reject limit unlimited ', false);
 
   end;
- 
+
 
   procedure fill_FINMON_QUE_MODIFICATION
     is
-    
-  begin 
+
+  begin
     mgr_utl.sync_table('FINMON_QUE_MODIFICATION', 'insert into FINMON_QUE_MODIFICATION
-                                      select  t.id, 
-                                              t.mod_date, 
-                                              t.mod_type, 
-                                              t.user_id, 
-                                              t.user_name, 
-                                              t.mod_value, 
-                                              ''' || g_kf || ''' as kf 
+                                      select  rukey(t.id) as id,
+                                              t.mod_date,
+                                              t.mod_type,
+                                              rukey(t.user_id) as user_id,
+                                              t.user_name,
+                                              t.mod_value,
+                                              ''' || g_kf || ''' as kf
 
                                         from '||mgr_utl.pkf('FINMON_QUE_MODIFICATION')||' t
                                         left join FINMON_QUE_MODIFICATION tt on t.id = tt.id
@@ -28692,62 +29243,63 @@ BEGIN
   end;
 
   procedure fill_FINMON_QUE_VID2
-   is    
-   begin 
+   is
+   begin
      mgr_utl.sync_table('FINMON_QUE_VID2', 'insert into FINMON_QUE_VID2
-                                      select  t.id, 
-                                              t.vid, 
-                                              t.comm, 
-                                              ''' || g_kf || ''' as kf 
+                                      select  rukey(t.id) as id,
+                                              t.vid,
+                                              t.comm,
+                                              ''' || g_kf || ''' as kf
                                         from '||mgr_utl.pkf('FINMON_QUE_VID2')||' t
                                         left join FINMON_QUE_VID2 tt on t.id = tt.id
                                        where tt.id is null', false);
 
-   
+
   end;
 
   procedure fill_OTCN_TRACE_12
-   is    
-   begin 
+   is
+   begin
       mgr_utl.mantain_error_table('OTCN_TRACE_12');
      mgr_utl.sync_table('OTCN_TRACE_12', 'insert into OTCN_TRACE_12
-                                      select 
-                                        datf, 
-                                        ruuser(userid) as userid, 
-                                        nls, 
-                                        kv, 
-                                        odate, 
-                                        kodp, 
-                                        znap, 
-                                        nbuc, 
-                                        rukey(isp), 
-                                        rukey(rnk), 
-                                        rukey(acc), 
-                                        rukey(ref), 
-                                        comm, 
-                                        nd, 
-                                        mdate, 
-                                        tobo
+                                      select
+                                        datf,
+                                        ruuser(userid) as userid,
+                                        nls,
+                                        kv,
+                                        odate,
+                                        kodp,
+                                        znap,
+                                        nbuc,
+                                        rukey(isp),
+                                        rukey(rnk),
+                                        rukey(acc),
+                                        rukey(ref),
+                                        comm,
+                                        nd,
+                                        mdate,
+                                        tobo,
+                                         ''' || g_kf || ''' as kf
                                         from '||mgr_utl.pkf('OTCN_TRACE_12')||' t
-                                       where t.datf  >= to_date(''01.01.2016'', ''dd.mm.yyyy'') 
+                                       where t.datf  >= to_date(''01.01.2016'', ''dd.mm.yyyy'')
                                         log errors reject limit unlimited', false);
 
    end;
 
   procedure fill_notary_profit
-   is    
-   begin 
+   is
+   begin
       mgr_utl.mantain_error_table('notary_profit');
       mgr_utl.sync_table('notary_profit',
       'insert into notary_profit
-      select 
-      s_notary_profit.nextval as id, 
-      notary_id, 
-      accr_id, 
-      branch, 
-      nbsob22, 
-      ref_oper, 
-      dat_oper, 
+      select
+      s_notary_profit.nextval as id,
+      notary_id,
+      accr_id,
+      branch,
+      nbsob22,
+      ref_oper,
+      dat_oper,
       profit
 
       from '||mgr_utl.pkf('notary_profit')||'
@@ -28755,195 +29307,195 @@ BEGIN
    end;
 
   procedure fill_ACCC
-   is    
-   begin 
+   is
+   begin
      mgr_utl.sync_table_auto(p_table => 'ACCC', p_delete => true, p_column_replace => 'ACC,"rukey(ACC)"');
    end;
 
   procedure fill_ACCE
-   is    
-   begin 
+   is
+   begin
      mgr_utl.sync_table_auto(p_table => 'ACCE', p_delete => true, p_column_replace => 'ACC,"rukey(ACC)"');
    end;
 
   procedure fill_ACCI
-   is    
-   begin 
+   is
+   begin
      mgr_utl.sync_table_auto(p_table => 'ACCI', p_delete => true, p_column_replace => 'ACC,"rukey(ACC)"');
    end;
 
   procedure fill_KLPACC
-   is    
-   begin 
+   is
+   begin
      mgr_utl.sync_table_auto(p_table => 'KLPACC', p_delete => true, p_column_replace => 'ACC,"rukey(ACC)"');
    end;
 
   procedure fill_ref_koddz
-   is    
+   is
   begin
     mgr_utl.mantain_error_table('REF_KODDZ');
     mgr_utl.sync_table(p_table => 'REF_KODDZ', p_stmt => '
     insert into REF_KODDZ( ref, kf)
     select rukey(ref) as ref,
-           '''||g_kf||''' as  kf 
-      from '||pkf('REF_KODDZ')||' t 
+           '''||g_kf||''' as  kf
+      from '||pkf('REF_KODDZ')||' t
        log errors reject limit unlimited', p_delete =>  false);
   end fill_ref_koddz;
 
   procedure fill_cim_f503
-    is 
+    is
     l_max_id number;
   begin
       mgr_utl.mantain_error_table('CIM_F503');
-      mgr_utl.sync_table(p_table => 'CIM_F503',p_stmt => 
+      mgr_utl.sync_table(p_table => 'CIM_F503',p_stmt =>
       'insert into cim_f503(
-        f503_id, 
-        contr_id, 
-        p_date_to, 
-        date_reg, 
-        user_reg, 
-        date_ch, 
-        user_ch, 
-        branch, 
-        kf, 
-        p1000, 
-        z, 
-        p0100, 
-        p1300, 
-        p0300, 
-        p1400, 
-        p1900, 
-        pval, 
-        p1500, 
-        m, 
-        p1600, 
-        p9800, 
-        p1700, 
-        p0200, 
-        r_agree_no, 
-        p1200, 
-        p1800, 
-        t, 
-        p9500, 
-        p9600, 
-        p3100, 
-        p9900, 
-        p0400, 
-        p0800_1, 
-        p0800_2, 
-        p0800_3, 
-        p0700, 
-        p0900, 
-        p0500, 
-        p0600, 
-        p2010, 
-        p2011, 
-        p2012, 
-        p2013, 
-        p2014, 
-        p2016, 
-        p2017, 
-        p2018, 
-        p2020, 
-        p2021, 
-        p2022, 
-        p2023, 
-        p2024, 
-        p2025, 
-        p2026, 
-        p2027, 
-        p2028, 
-        p2029, 
-        p2030, 
-        p2031, 
-        p2032, 
-        p2033, 
-        p2034, 
-        p2035, 
-        p2036, 
-        p2037, 
-        p2038, 
-        p2042, 
+        f503_id,
+        contr_id,
+        p_date_to,
+        date_reg,
+        user_reg,
+        date_ch,
+        user_ch,
+        branch,
+        kf,
+        p1000,
+        z,
+        p0100,
+        p1300,
+        p0300,
+        p1400,
+        p1900,
+        pval,
+        p1500,
+        m,
+        p1600,
+        p9800,
+        p1700,
+        p0200,
+        r_agree_no,
+        p1200,
+        p1800,
+        t,
+        p9500,
+        p9600,
+        p3100,
+        p9900,
+        p0400,
+        p0800_1,
+        p0800_2,
+        p0800_3,
+        p0700,
+        p0900,
+        p0500,
+        p0600,
+        p2010,
+        p2011,
+        p2012,
+        p2013,
+        p2014,
+        p2016,
+        p2017,
+        p2018,
+        p2020,
+        p2021,
+        p2022,
+        p2023,
+        p2024,
+        p2025,
+        p2026,
+        p2027,
+        p2028,
+        p2029,
+        p2030,
+        p2031,
+        p2032,
+        p2033,
+        p2034,
+        p2035,
+        p2036,
+        p2037,
+        p2038,
+        p2042,
         p3000
       )
-      select 
-        rukey(t.f503_id) as f503_id, 
-        rukey(t.contr_id) as contr_id, 
-        t.p_date_to, 
-        t.date_reg, 
-        t.user_reg, 
-        t.date_ch, 
-        t.user_ch, 
-        t.branch, 
-        t.kf, 
-        t.p1000, 
-        t.z, 
-        t.p0100, 
-        t.p1300, 
-        t.p0300, 
-        t.p1400, 
-        t.p1900, 
-        t.pval, 
-        t.p1500, 
-        t.m, 
-        t.p1600, 
-        t.p9800, 
-        t.p1700, 
-        t.p0200, 
-        t.r_agree_no, 
-        t.p1200, 
-        t.p1800, 
-        t.t, 
-        t.p9500, 
-        t.p9600, 
-        t.p3100, 
-        t.p9900, 
-        t.p0400, 
-        t.p0800_1, 
-        t.p0800_2, 
-        t.p0800_3, 
-        t.p0700, 
-        t.p0900, 
-        t.p0500, 
-        t.p0600, 
-        t.p2010, 
-        t.p2011, 
-        t.p2012, 
-        t.p2013, 
-        t.p2014, 
-        t.p2016, 
-        t.p2017, 
-        t.p2018, 
-        t.p2020, 
-        t.p2021, 
-        t.p2022, 
-        t.p2023, 
-        t.p2024, 
-        t.p2025, 
-        t.p2026, 
-        t.p2027, 
-        t.p2028, 
-        t.p2029, 
-        t.p2030, 
-        t.p2031, 
-        t.p2032, 
-        t.p2033, 
-        t.p2034, 
-        t.p2035, 
-        t.p2036, 
-        t.p2037, 
-        t.p2038, 
-        t.p2042, 
+      select
+        rukey(t.f503_id) as f503_id,
+        rukey(t.contr_id) as contr_id,
+        t.p_date_to,
+        t.date_reg,
+        t.user_reg,
+        t.date_ch,
+        t.user_ch,
+        t.branch,
+        t.kf,
+        t.p1000,
+        t.z,
+        t.p0100,
+        t.p1300,
+        t.p0300,
+        t.p1400,
+        t.p1900,
+        t.pval,
+        t.p1500,
+        t.m,
+        t.p1600,
+        t.p9800,
+        t.p1700,
+        t.p0200,
+        t.r_agree_no,
+        t.p1200,
+        t.p1800,
+        t.t,
+        t.p9500,
+        t.p9600,
+        t.p3100,
+        t.p9900,
+        t.p0400,
+        t.p0800_1,
+        t.p0800_2,
+        t.p0800_3,
+        t.p0700,
+        t.p0900,
+        t.p0500,
+        t.p0600,
+        t.p2010,
+        t.p2011,
+        t.p2012,
+        t.p2013,
+        t.p2014,
+        t.p2016,
+        t.p2017,
+        t.p2018,
+        t.p2020,
+        t.p2021,
+        t.p2022,
+        t.p2023,
+        t.p2024,
+        t.p2025,
+        t.p2026,
+        t.p2027,
+        t.p2028,
+        t.p2029,
+        t.p2030,
+        t.p2031,
+        t.p2032,
+        t.p2033,
+        t.p2034,
+        t.p2035,
+        t.p2036,
+        t.p2037,
+        t.p2038,
+        t.p2042,
         t.p3000
        from '||mgr_utl.pkf('cim_f503')||' t
       left join cim_contracts_credit c
-        on c.contr_id = rukey(t.contr_id) 
+        on c.contr_id = rukey(t.contr_id)
       where c.contr_id is null
       log errors reject limit unlimited
       ',p_delete => false);
     --
     bc.home();
-    --    
+    --
     select trunc(nvl(max(f503_id / 100), 0)) + 1 into l_max_id from bars.cim_f503;
     --
     mgr_utl.reset_sequence('s_cim_f503', l_max_id);
@@ -28951,202 +29503,202 @@ BEGIN
   end fill_cim_f503;
 
   procedure fill_CIM_F503_AUTO_CHANGE_HIST
-   is    
-   begin 
+   is
+   begin
      mgr_utl.sync_table_auto(p_table => 'CIM_F503_AUTO_CHANGE_HIST', p_delete => true, p_column_replace => 'F503_ID,"rukey(F503_ID)"');
    end;
 
   procedure fill_cim_f504
-    is 
+    is
     l_max_id number;
   begin
       mgr_utl.mantain_error_table('CIM_F504');
-      mgr_utl.sync_table(p_table => 'CIM_F504',p_stmt => 
+      mgr_utl.sync_table(p_table => 'CIM_F504',p_stmt =>
       'insert into cim_f504(
-      f504_id, 
-      contr_id, 
-      p_date_to, 
-      date_reg, 
-      user_reg, 
-      date_ch, 
-      user_ch, 
-      branch, 
-      kf, 
-      p101, 
-      z, 
-      r_agree_no, 
-      p103, 
-      pval, 
-      t, 
-      m, 
-      p107, 
-      p108, 
-      p184, 
-      p140, 
-      p142, 
-      p141, 
-      p020, 
-      p143, 
-      p050, 
-      p060, 
-      p090, 
-      p960, 
-      p310, 
-      p999, 
-      p212, 
-      p213, 
-      p201, 
-      p222, 
-      p223, 
-      p292, 
+      f504_id,
+      contr_id,
+      p_date_to,
+      date_reg,
+      user_reg,
+      date_ch,
+      user_ch,
+      branch,
+      kf,
+      p101,
+      z,
+      r_agree_no,
+      p103,
+      pval,
+      t,
+      m,
+      p107,
+      p108,
+      p184,
+      p140,
+      p142,
+      p141,
+      p020,
+      p143,
+      p050,
+      p060,
+      p090,
+      p960,
+      p310,
+      p999,
+      p212,
+      p213,
+      p201,
+      p222,
+      p223,
+      p292,
       p293
       )
-      select 
-      rukey(t.f504_id) as f504_id, 
-      rukey(t.contr_id) as contr_id, 
-      t.p_date_to, 
-      t.date_reg, 
-      t.user_reg, 
-      t.date_ch, 
-      t.user_ch, 
-      t.branch, 
-      t.kf, 
-      t.p101, 
-      t.z, 
-      t.r_agree_no, 
-      t.p103, 
-      t.pval, 
-      t.t, 
-      t.m, 
-      t.p107, 
-      t.p108, 
-      t.p184, 
-      t.p140, 
-      t.p142, 
-      t.p141, 
-      t.p020, 
-      t.p143, 
-      t.p050, 
-      t.p060, 
-      t.p090, 
-      t.p960, 
-      t.p310, 
-      t.p999, 
-      t.p212, 
-      t.p213, 
-      t.p201, 
-      t.p222, 
-      t.p223, 
-      t.p292, 
+      select
+      rukey(t.f504_id) as f504_id,
+      rukey(t.contr_id) as contr_id,
+      t.p_date_to,
+      t.date_reg,
+      t.user_reg,
+      t.date_ch,
+      t.user_ch,
+      t.branch,
+      t.kf,
+      t.p101,
+      t.z,
+      t.r_agree_no,
+      t.p103,
+      t.pval,
+      t.t,
+      t.m,
+      t.p107,
+      t.p108,
+      t.p184,
+      t.p140,
+      t.p142,
+      t.p141,
+      t.p020,
+      t.p143,
+      t.p050,
+      t.p060,
+      t.p090,
+      t.p960,
+      t.p310,
+      t.p999,
+      t.p212,
+      t.p213,
+      t.p201,
+      t.p222,
+      t.p223,
+      t.p292,
       t.p293
 
        from '||mgr_utl.pkf('cim_f504')||' t
       left join cim_contracts_credit c
-        on c.contr_id = rukey(t.contr_id) 
+        on c.contr_id = rukey(t.contr_id)
       where c.contr_id is null
       log errors reject limit unlimited
       ',p_delete => false);
     --
     bc.home();
-    --    
+    --
     select trunc(nvl(max(f504_id / 100), 0)) + 1 into l_max_id from bars.cim_f504;
     --
     mgr_utl.reset_sequence('s_cim_f504', l_max_id);
-  
+
   end fill_cim_f504;
-  
+
   procedure fill_CIM_F504_AUTO_CHANGE_HIST
-   is    
-   begin 
+   is
+   begin
      mgr_utl.sync_table_auto(p_table => 'CIM_F504_AUTO_CHANGE_HIST', p_delete => true, p_column_replace => 'F503_ID,"rukey(F503_ID)"');
    end;
 
   procedure fill_cim_f504_detail
-    is 
+    is
   begin
       mgr_utl.mantain_error_table('CIM_F504_DETAIL');
-      mgr_utl.sync_table(p_table => 'CIM_F504_DETAIL',p_stmt => 
+      mgr_utl.sync_table(p_table => 'CIM_F504_DETAIL',p_stmt =>
       'insert into CIM_F504_DETAIL(
-      f504_det_id, 
-      f504_id, 
-      indicator_id, 
-      indicator_name, 
-      noprognosis, 
-      rrrr, 
-      w, 
-      val, 
-      date_reg, 
-      user_reg, 
-      date_ch, 
+      f504_det_id,
+      f504_id,
+      indicator_id,
+      indicator_name,
+      noprognosis,
+      rrrr,
+      w,
+      val,
+      date_reg,
+      user_reg,
+      date_ch,
       user_ch
 
       )
-      select 
-      rukey(t.f504_det_id) as f504_det_id, 
-      rukey(t.f504_id) as f504_id, 
-      t.indicator_id, 
-      t.indicator_name, 
-      t.noprognosis, 
-      t.rrrr, 
-      t.w, 
-      t.val, 
-      t.date_reg, 
-      t.user_reg, 
-      t.date_ch, 
+      select
+      rukey(t.f504_det_id) as f504_det_id,
+      rukey(t.f504_id) as f504_id,
+      t.indicator_id,
+      t.indicator_name,
+      t.noprognosis,
+      t.rrrr,
+      t.w,
+      t.val,
+      t.date_reg,
+      t.user_reg,
+      t.date_ch,
       t.user_ch
     from '||mgr_utl.pkf('CIM_F504_DETAIL')||' t
       log errors reject limit unlimited
       ',p_delete => false);
-     
+
   end fill_CIM_F504_DETAIL;
 
   procedure fill_cim_f504_detail2
-    is 
+    is
   begin
       mgr_utl.mantain_error_table('CIM_F504_DETAIL2');
-      mgr_utl.sync_table(p_table => 'CIM_F504_DETAIL2',p_stmt => 
+      mgr_utl.sync_table(p_table => 'CIM_F504_DETAIL2',p_stmt =>
       'insert into CIM_F504_DETAIL2(
-      f504_det_id, 
-      f504_id, 
-      indicator_id, 
-      indicator_name, 
-      rrrr, 
-      w, 
-      val, 
-      date_reg, 
-      user_reg, 
-      date_ch, 
+      f504_det_id,
+      f504_id,
+      indicator_id,
+      indicator_name,
+      rrrr,
+      w,
+      val,
+      date_reg,
+      user_reg,
+      date_ch,
       user_ch
       )
-      select 
-      rukey(t.f504_det_id) as f504_det_id, 
-      rukey(t.f504_id) as f504_id, 
-      t.indicator_id, 
-      t.indicator_name, 
-      t.rrrr, 
-      t.w, 
-      t.val, 
-      t.date_reg, 
-      t.user_reg, 
-      t.date_ch, 
+      select
+      rukey(t.f504_det_id) as f504_det_id,
+      rukey(t.f504_id) as f504_id,
+      t.indicator_id,
+      t.indicator_name,
+      t.rrrr,
+      t.w,
+      t.val,
+      t.date_reg,
+      t.user_reg,
+      t.date_ch,
       t.user_ch
     from '||mgr_utl.pkf('CIM_F504_DETAIL2')||' t
       log errors reject limit unlimited
       ',p_delete => false);
-     
+
   end fill_CIM_F504_DETAIL2;
 
   procedure fill_FM_TURN_ARC
-   is    
-   begin 
+   is
+   begin
          /* mgr_utl.merge_table_auto(  p_table => 'FM_TURN_ARC'
                                    , p_matched => false
                                    , p_not_matched => true
                                    , p_column_replace => 'RNK,"rukey(RNK)"'
                                    );*/
        mgr_utl.sync_table( p_table => 'FM_TURN_ARC'
-                          ,p_stmt =>  'merge into FM_TURN_ARC t using 
-                                        (select 
+                          ,p_stmt =>  'merge into FM_TURN_ARC t using
+                                        (select
                                         DAT
                                         ,RUKEY(RNK) as RNK
                                         ,KV
@@ -29154,22 +29706,1432 @@ BEGIN
                                         ,TURN_INQ
                                         ,TURN_OUT
                                         ,TURN_OUTQ
-                                        from KF300465.FM_TURN_ARC ) tt 
+                                        from KF300465.FM_TURN_ARC ) tt
                                         ON( t.DAT = tt.DAT
                                         AND t.RNK = tt.RNK
                                         AND t.KV = tt.KV
                                         )
                                         when not matched then insert values (
-                                          tt.DAT, 
-                                          tt.RNK, 
-                                          tt.KV, 
-                                          tt.TURN_IN, 
-                                          tt.TURN_INQ, 
-                                          tt.TURN_OUT, 
+                                          tt.DAT,
+                                          tt.RNK,
+                                          tt.KV,
+                                          tt.TURN_IN,
+                                          tt.TURN_INQ,
+                                          tt.TURN_OUT,
                                           tt.TURN_OUTQ
-                                        )',p_delete => false);                           
+                                        )',p_delete => false);
    end fill_FM_TURN_ARC;
 
+   procedure fill_rnk2nls
+        is
+        begin
+          mgr_utl.sync_table_auto('RNK2NLS', false,'RNKFROM,"rukey(RNKFROM)", RNKTO,"rukey(RNKTO)", ID,"ruuser(ID)"');
+      end fill_rnk2nls;
+
+   procedure fill_rnk2tbl
+        is
+        begin
+          mgr_utl.sync_table_auto('RNK2TBL', false,'RNKFROM,"rukey(RNKFROM)", RNKTO,"rukey(RNKTO)", ID,"ruuser(ID)"');
+
+      end fill_rnk2tbl;
+
+  procedure fill_insu_acc
+    is
+    l_tab          VARCHAR2(30) DEFAULT 'INSU_ACC';
+
+   begin
+        --init();
+
+        mgr_utl.before_clean(l_tab);
+
+        --bars_policy_adm.disable_policies(l_tab);
+
+        mgr_oschad.execute_statement( p_statement         => 'delete INSU_ACC where KF = '''||g_kf||'''',
+                           p_log_label         => 'Очистка значень для МФО ' || g_kf ||' таблиця '||l_tab,
+                           p_table_name        => l_tab,
+                           p_mgr_log_label     => 'N'
+                         );
+        mgr_utl.finalize();
+        mgr_utl.before_fill(l_tab);
+
+        mgr_oschad.execute_statement( p_statement         => 'insert into INSU_ACC(acc, rnki, vid, dat, s, sp, dats, dogs, datp, sf, kf)
+                                                              select rukey(acc) as acc, rukey(rnki) as rnki, vid, dat, s, sp, dats, dogs, datp, sf, kf
+                                                              from '||pkf(l_tab),
+                           p_log_label         => 'Заповнення для МФО ' || g_kf ||' таблиця '||l_tab,
+                           p_table_name        => l_tab,
+                           p_mgr_log_label     => 'Y'
+                         );
+        mgr_utl.finalize();
+
+        --bars_policy_adm.enable_policies(l_tab);
+   end fill_insu_acc;
+
+  procedure fill_insu_rnk
+    is
+    l_tab          VARCHAR2(30) DEFAULT 'INSU_RNK';
+
+   begin
+        --init();
+
+        mgr_utl.before_clean(l_tab);
+
+        --bars_policy_adm.disable_policies(l_tab);
+
+        mgr_oschad.execute_statement( p_statement         => 'delete INSU_RNK where KF = '''||g_kf||'''',
+                           p_log_label         => 'Очистка значень для МФО ' || g_kf ||' таблиця '||l_tab,
+                           p_table_name        => l_tab,
+                           p_mgr_log_label     => 'N'
+                         );
+        mgr_utl.finalize();
+        mgr_utl.before_fill(l_tab);
+
+        mgr_oschad.execute_statement( p_statement         => 'insert into INSU_RNK(rnk, rnki, vid, dat, s, sp, dats, dogs, datp, sf, kf)
+                                                              select rukey(rnk) as rnk, rukey(rnki) as rnki, vid, dat, s, sp, dats, dogs, datp, sf, kf
+                                                              from '||pkf(l_tab),
+                           p_log_label         => 'Заповнення для МФО ' || g_kf ||' таблиця '||l_tab,
+                           p_table_name        => l_tab,
+                           p_mgr_log_label     => 'Y'
+                         );
+        mgr_utl.finalize();
+
+        --bars_policy_adm.enable_policies(l_tab);
+   end fill_insu_rnk;
+
+  procedure fill_w4_subproduct
+  is
+    begin
+          mgr_utl.mantain_error_table('W4_SUBPRODUCT');
+          mgr_utl.sync_table('W4_SUBPRODUCT',
+                             'insert into bars.W4_SUBPRODUCT
+                             select code, name, flag_kk, flag_instant, date_instant
+                             from '||mgr_utl.pkf('W4_SUBPRODUCT')||' log errors reject limit unlimited',
+                             false);
+  end fill_w4_subproduct;
+
+  procedure fill_arc_an_kl
+  is
+  l_tab varchar2(30) default 'ARC_AN_KL';
+  begin
+    mgr_utl.sync_table_auto(l_tab, false, 'RNK,"rukey(RNK)",ISP,"rukey(ISP)"');
+  end fill_arc_an_kl;
+
+  procedure update_customer_update_doneby
+  is
+  begin
+        bpa.disable_policies(p_table_name => 'CUSTOMER_UPDATE');
+
+        merge into customer_update t
+        using
+              (select t.idupd, substr(a.ad_login, 12,300) as ad_login
+                 from customer_update t
+                 left join staff$base s
+                   on t.doneby = s.logname
+                 join kf_ru k
+                   on t.kf = k.kf
+                 left join staff_ad_user_mapping a
+                   on t.doneby = concat(a.bars_login, k.ru)
+                where s.logname is null
+                  and a.bars_login is not null
+                  and k.kf = substr(a.branch, 2, 6)) a
+
+        on (t.idupd = a.idupd)
+
+        when matched then update set t.doneby = a.ad_login
+        ;
+        commit;
+
+        bpa.enable_policies(p_table_name => 'CUSTOMER_UPDATE');
+  end update_customer_update_doneby;
+
+
+  procedure  fill_ead_docs_part(  p_schema varchar2 default null
+                                , p_dblink varchar2 default null
+                                , min_id number default 1
+                                , max_id number default 10000000000)
+  is
+    l_tab         VARCHAR2(30) DEFAULT 'EAD_DOCS';
+    l_max_id   bars.EAD_DOCS.id%type;
+  begin
+
+  /*select min(id), max(id)
+    from bars.EAD_DOCS@mgrs_322669.grc.ua t
+    group by trunc(id/200000)*/
+
+  /*select min(id), max(id), count(*)
+    from bars.EAD_DOCS@mgrs_304665.grc.ua t
+    group by trunc(id/50000)*/
+
+   mgr_oschad.execute_statement(p_statement =>
+                       'Insert
+                         into '||l_tab||'
+                             (id,
+                              crt_date,
+                              crt_staff_id,
+                              crt_branch,
+                              type_id,
+                              template_id,
+                              scan_data,
+                              ea_struct_id,
+                              sign_date,
+                              rnk,
+                              agr_id,
+                              page_count,
+                              kf
+                             )
+                       select
+                              rukey(id) as id,
+                              crt_date,
+                              ruuser(crt_staff_id) as crt_staff_id,
+                              crt_branch,
+                              type_id,
+                              template_id,
+                              scan_data,
+                              ea_struct_id,
+                              sign_date,
+                              rukey(rnk) as rnk,
+                              rukey(agr_id) as agr_id,
+                              page_count,
+                              '''||G_KF||'''
+                         from '||pkf(l_tab, p_schema, p_dblink)||'
+                        where id >= '||min_id||'
+                          and id <= '||max_id
+                      ,p_log_label => 'mgr_oschad.fill_ead_docs_part_'||min_id||''||'_'||max_id
+                      ,p_table_name => l_tab
+                     );
+  end fill_ead_docs_part;
+
+  procedure  fill_cc_docs_part(   p_schema varchar2 default null
+                                , p_dblink varchar2 default null
+                                , min_nd number default 1
+                                , max_nd number default 10000000000)
+  is
+    l_tab         VARCHAR2(30) DEFAULT 'CC_DOCS';
+    l_max_nd   bars.CC_DOCS.nd%type;
+  begin
+    /*select min(nd), max(nd), count(*), trunc(rn/ 50000)
+      from
+      (select ID, ND, ADDS, VERSION,
+             row_number() over ( order by  ND, ADDS, VERSION, ID) as rn
+      from bars.CC_DOCS@mgrs_322669.grc.ua t
+      group by ID, ND, ADDS, VERSION)
+      group by trunc(rn/ 50000)*/
+
+   mgr_oschad.execute_statement(p_statement =>
+                       'insert
+                          into '||l_tab||'(id, nd, adds, version, state, text, comm, doneby, kf)
+                        select id, rukey(nd), adds, version, state, text, comm, ruuser(doneby),
+                              '''||G_KF||'''
+                          from '||pkf(l_tab, p_schema, p_dblink)||'
+                         where nd >= '||min_nd||'
+                           and nd <= '||max_nd
+                      ,p_log_label => 'mgr_oschad.fill_cc_docs_part_'||min_nd||''||'_'||max_nd
+                      ,p_table_name => l_tab
+                     );
+  end fill_cc_docs_part;
+
+  ----
+  -- fill_oper_visa_part - импорт oper_visa parallel wey
+  --
+  procedure fill_oper_visa_part(  p_schema varchar2 default null
+                                , p_dblink varchar2 default null
+                                , min_sqnc number default 1
+                                , max_sqnc number default 10000000000)
+  is
+    l_tab                   VARCHAR2(30) DEFAULT 'OPER_VISA';
+    p                       CONSTANT VARCHAR2(62) := G_PKG||'.fill_'||l_tab;
+    l_min_sqnc              NUMBER;
+    l_max_sqnc              NUMBER;
+    l_sqnc                  NUMBER;
+
+  begin
+    trace('%s: entry point', p);
+    --
+    begin
+
+      l_min_sqnc := min_sqnc;
+      l_max_sqnc := max_sqnc;
+
+      execute_statement(
+              'insert  into bars.oper_visa
+               select
+                     rukey(ref) as ref
+                     ,dat
+                     ,ruuser(userid) as userid
+                     ,groupid
+                     ,status
+                     ,rukey(sqnc) as sqnc
+                     ,passive
+                     ,keyid
+                     ,sign
+                     ,substr(username,1,60) as username
+                     ,usertabn
+                     ,groupname
+                     ,f_in_charge
+                     ,check_ts
+                     ,check_code
+                     ,check_msg
+                     ,'''||g_kf||''' as kf
+                     ,passive_reasonid
+                from '||pkf(l_tab, p_schema, p_dblink)||'
+               where sqnc >= '||l_min_sqnc||'
+                 and sqnc <= '||l_max_sqnc
+              ,p_log_label => 'mgr_oschad.fill_oper_visa_part_'||l_min_sqnc||'_'||l_max_sqnc
+              ,p_table_name => l_tab
+              );
+
+    commit;
+    end;
+  --
+  trace('%s: finished', p);
+  --
+  end fill_oper_visa_part;
+
+
+  procedure  fill_CUSTOMER_IMAGES_part(   p_schema varchar2 default null
+                                , p_dblink varchar2 default null
+                                , min_rnk number default 1
+                                , max_rnk number default 10000000000)
+  is
+    l_tab         VARCHAR2(30) DEFAULT 'CUSTOMER_IMAGES';
+    l_max_rnk   bars.CUSTOMER_IMAGES.rnk%type;
+  begin
+    /*select min(rnk), max(rnk), count(*), trunc(rn/ 20000)
+      from
+      (select rnk,
+             row_number() over ( order by  rnk) as rn
+      from bars.CUSTOMER_IMAGES@mgrs_304665.grc.ua t
+      group by rnk)
+      group by trunc(rn/ 20000)  */
+
+   mgr_oschad.execute_statement(p_statement =>
+                       'insert
+                          into '||l_tab||'(rnk, type_img, date_img, image)
+                        select rukey(rnk), type_img, date_img, image
+                          from '||pkf(l_tab, p_schema, p_dblink)||'
+                         where rnk >= '||min_rnk||'
+                           and rnk <= '||max_rnk
+                      ,p_log_label => 'mgr_oschad.fill_CUSTOMER_IMAGES_part_'||min_rnk||''||'_'||max_rnk
+                      ,p_table_name => l_tab
+                     );
+  end fill_CUSTOMER_IMAGES_part;
+
+
+  procedure fill_vip_flags
+    is
+    l_tab          VARCHAR2(30) DEFAULT 'VIP_FLAGS';
+
+   begin
+        --init();
+
+        mgr_utl.before_clean(l_tab);
+
+        --bars_policy_adm.disable_policies(l_tab);
+
+        mgr_oschad.execute_statement( p_statement         => 'delete VIP_FLAGS where mfo = '''||g_kf||'''',
+                           p_log_label         => 'Очистка VIP значень для МФО ' || g_kf ||' таблиця '||l_tab,
+                           p_table_name        => l_tab,
+                           p_mgr_log_label     => 'N'
+                         );
+        mgr_utl.finalize();
+        mgr_utl.before_fill(l_tab);
+
+        mgr_oschad.execute_statement( p_statement         => 'insert into VIP_FLAGS(mfo, rnk, vip, kvip, datbeg, datend, comments, cm_flag, cm_try, fio_manager, phone_manager, mail_manager, account_manager) 
+                                                              select mfo, rukey(rnk) as rnk, vip, kvip, datbeg, datend, comments, cm_flag, cm_try, fio_manager, phone_manager, mail_manager
+                                                                   , ruuser(account_manager) as account_manager from '||pkf(l_tab),
+                           p_log_label         => 'Заповнення VIP для МФО ' || g_kf ||' таблиця '||l_tab,
+                           p_table_name        => l_tab,
+                           p_mgr_log_label     => 'Y'
+                         );
+        mgr_utl.finalize();
+
+        --bars_policy_adm.enable_policies(l_tab);
+   end fill_vip_flags;
+
+  procedure fill_rnbu_trace_arch_part(  p_schema varchar2 default null
+                                      , p_dblink varchar2 default null
+                                      , min_datf date default to_date('01.01.2016', 'dd.mm.yyyy')
+                                      , max_datf date default to_date('01.01.2018', 'dd.mm.yyyy'))
+    is
+    l_tab                   VARCHAR2(30 CHAR) DEFAULT 'RNBU_TRACE_ARCH';
+    l_min_datf               bars.RNBU_TRACE_ARCH.datf%type;
+    l_max_datf               bars.RNBU_TRACE_ARCH.datf%type;
+  begin
+    --
+    execute immediate 'alter session set nls_date_format = ''dd.mm.yyyy''';
+    --
+
+    l_min_datf := min_datf;
+    l_max_datf := max_datf;
+
+   mgr_oschad.execute_statement(p_statement =>
+                         'insert into '||l_tab||'
+                           (kf,
+                            datf,
+                            kodf,
+                            kodp,
+                            znap,
+                            nbuc,
+                            isp,
+                            rnk,
+                            acc,
+                            nls,
+                            kv,
+                            odate,
+                            ref,
+                            comm,
+                            nd,
+                            mdate,
+                            tobo
+                            )
+                         select
+                            '''||g_kf||''' as kf,
+                            datf,
+                            kodf,
+                            kodp,
+                            znap,
+                            nbuc,
+                            ruuser(isp) as isp,
+                            rukey(rnk) as rnk,
+                            rukey(acc) as acc,
+                            nls,
+                            kv,
+                            odate,
+                            ref,
+                            comm,
+                            rukey(nd) as nd,
+                            mdate,
+                            tobo
+                         from '||pkf(l_tab, p_schema, p_dblink)||'
+                        where datf >= to_date('''||l_min_datf||''', ''dd.mm.yyyy'')
+                          and datf <  to_date('''||l_max_datf||''', ''dd.mm.yyyy'')'
+                      ,p_log_label => 'mgr_oschad.fill_rnbu_trace_arch_part'
+                     );
+  end fill_rnbu_trace_arch_part;
+
+  procedure fill_rez_spn
+   is
+   begin
+      mgr_utl.sync_table('rez_spn',
+      'merge into REZ_SPN t using
+      (select
+      RUKEY(ACC) as ACC
+      ,NLS
+      ,KV
+      ,S
+      from '||mgr_utl.pkf('REZ_SPN')||' ) tt
+      ON( t.ACC = tt.ACC
+      )when matched then update set
+        t.NLS =   tt.NLS
+      ,   t.KV =   tt.KV
+      ,   t.S =   tt.S
+      ,   t.KF = '''||g_kf||'''
+
+      when not matched then insert values (
+        tt.ACC,
+        tt.NLS,
+        tt.KV,
+        tt.S,
+      '''||g_kf||'''
+      )
+      ', false);
+    end fill_rez_spn;
+
+procedure fill_zapros
+  is
+      l_tab          VARCHAR2(30) DEFAULT 'ZAPROS';
+      ex_already_exists exception;
+      pragma exception_init(ex_already_exists, -955);
+      p_kf VARCHAR(20);
+ begin
+        --init();
+        begin
+            execute immediate 'create table tmp_zapros_'||g_kf||' as select * from '||mgr_utl.pkf(l_tab);
+          exception
+          when ex_already_exists then null;
+          when others then raise;
+        end;
+
+        begin
+          execute immediate 'create table tmp_reports_'||g_kf||' as select * from '||mgr_utl.pkf('REPORTS');
+          exception
+          when ex_already_exists then null;
+          when others then raise;
+        end;
+
+        delete from ZAPROS_MGR where branch = '/'||g_kf||'/';
+
+        execute immediate '
+        insert into ZAPROS_MGR (BRANCH, PKEY, KODZ_OLD, KODZ_NEW)
+        select ''/'||g_kf||'/'' as branch, PKEY, KODZ as KODZ_OLD, null as KODZ_NEW
+        from '||mgr_utl.pkf(l_tab)||' --where branch = ''/'||g_kf||'/''
+        ';
+
+        commit;
+
+        mgr_utl.before_clean(l_tab);
+
+        --bars_policy_adm.disable_policies(l_tab);
+
+        mgr_oschad.execute_statement( p_statement         => 'delete '||l_tab||' where branch = ''/'||g_kf||'/''',
+                           p_log_label         => 'Очистка ZAPROS значень для МФО ' || g_kf ||' таблиця '||l_tab,
+                           p_table_name        => l_tab,
+                           p_mgr_log_label     => 'N'
+                         );
+        mgr_utl.finalize();
+        mgr_utl.before_fill(l_tab);
+
+        --mgr_utl.mantain_error_table(l_tab);
+
+        mgr_oschad.execute_statement( p_statement         =>
+           'insert into ZAPROS(kodz,
+                        id,
+                        name,
+                        namef,
+                        bindvars,
+                        create_stmt,
+                        rpt_template,
+                        kodr,
+                        form_proc,
+                        default_vars,
+                        creator,
+                        bind_sql,
+                        xsl_data,
+                        txt,
+                        xsd_data,
+                        xml_encoding,
+                        pkey,
+                        branch,
+                        last_updated
+                        )
+                 select s_zapros.nextval as kodz,
+                        t.id,
+                        t.name,
+                        t.namef,
+                        t.bindvars,
+                        t.create_stmt,
+                        t.rpt_template,
+                        t.kodr,
+                        t.form_proc,
+                        t.default_vars,
+                        t.creator,
+                        t.bind_sql,
+                        t.xsl_data,
+                        t.txt,
+                        t.xsd_data,
+                        t.xml_encoding,
+                        t.pkey,
+                        ''/'||g_kf||'/'' as branch,
+                        null as last_updated
+                   from tmp_zapros_'||g_kf||'--'||mgr_utl.pkf(l_tab)||'
+                   t
+                   left join '||l_tab||' tt on t.pkey = tt.pkey
+                  where tt.pkey is null
+                   --log errors reject limit unlimited
+                   ' ,
+                           p_log_label         => 'Заповнення ZAPROS для МФО ' || g_kf ||' таблиця '||l_tab,
+                           p_table_name        => l_tab,
+                           p_mgr_log_label     => 'Y'
+                         );
+
+       execute immediate 'drop table tmp_zapros_'||g_kf;
+
+       merge into ZAPROS_MGR t using
+       (select branch, PKEY, KODZ
+        from ZAPROS where branch = '/'||g_kf||'/'
+                       or branch = '/'
+        ) a
+          on (t.pkey = a.pkey)
+        when matched then update
+         set t.kodz_new = a.kodz
+       ;
+       commit;
+
+
+       l_tab := 'ZAPROS_USERS';
+
+        mgr_utl.before_clean(l_tab);
+
+        --bars_policy_adm.disable_policies(l_tab);
+         bc.go(p_branch => g_kf);
+
+        SELECT t.code
+          INTO p_kf
+          FROM regions t
+         WHERE t.kf = (SELECT getglobaloption('MFO') FROM dual);
+
+
+        mgr_oschad.execute_statement( p_statement         => 'delete '||l_tab||' where mod(user_id, 100)  = ' || p_kf,
+                           p_log_label         => 'Очистка ZAPROS_USERS значень для МФО ' || g_kf ||' таблиця '||l_tab,
+                           p_table_name        => l_tab,
+                           p_mgr_log_label     => 'N'
+                         );
+        mgr_utl.finalize();
+        mgr_utl.before_fill(l_tab);
+
+        mgr_oschad.execute_statement( p_statement         =>
+           'insert into ZAPROS_USERS(kodz,USER_ID)
+                 select t.kodz, ruuser(t.USER_ID) as USER_ID
+                   from '||mgr_utl.pkf(l_tab)||' t
+                   left join '||l_tab||' tt
+                     on t.kodz = tt.kodz
+                    and ruuser(t.USER_ID) = tt.USER_ID
+                  where tt.kodz is null and tt.USER_ID is null',
+                           p_log_label         => 'Заповнення ZAPROS для МФО ' || g_kf ||' таблиця '||l_tab,
+                           p_table_name        => l_tab,
+                           p_mgr_log_label     => 'Y'
+                         );
+
+     for rec in (select t.kodz, z.kodz_new, t.user_id from ZAPROS_USERS t
+                                             join ZAPROS_MGR z on z.kodz_old = t.kodz )
+     loop
+       begin
+          update ZAPROS_USERS t
+             set t.kodz = rec.kodz_new
+           where t.kodz = rec.kodz;
+       exception when others then null;
+       end;
+      end loop;
+      commit;
+
+        mgr_utl.finalize();
+
+  end fill_zapros;
+
+  procedure fill_dpt_file_row_accum(p_schema varchar2 default null,  p_dblink varchar2 default null)
+  is
+      l_tab         VARCHAR2(30) DEFAULT 'DPT_FILE_ROW_ACCUM';
+  begin
+      mgr_utl.mantain_error_table(l_tab);
+      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||'
+                                       (
+                                        filename,
+                                        dat,
+                                        info_length,
+                                        sum,
+                                        branch,
+                                        header_id
+                                       )
+                                select
+                                        filename,
+                                        dat,
+                                        info_length,
+                                        sum,
+                                        branch,
+                                        rukey(header_id) as header_id
+                                  from '||pkf(l_tab, p_schema,  p_dblink)||' log errors reject limit unlimited'
+
+                                  , true );
+  end fill_dpt_file_row_accum;
+
+  procedure fill_SW_BANKS(p_schema varchar2 default null,  p_dblink varchar2 default null)
+  is
+      l_tab         VARCHAR2(30) DEFAULT 'SW_BANKS';
+  begin
+      mgr_utl.mantain_error_table(l_tab);
+      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||'
+                                       (
+                                        bic,
+                                        name,
+                                        office,
+                                        city,
+                                        country,
+                                        chrset,
+                                        transback
+
+                                       )
+                                select
+                                        bic,
+                                        name,
+                                        office,
+                                        city,
+                                        country,
+                                        chrset,
+                                        transback
+                                  from '||pkf(l_tab, p_schema,  p_dblink)||' log errors reject limit unlimited'
+
+                                  , false );
+  end fill_SW_BANKS;
+
+
+  procedure fill_RKO_SIGNATORY(p_schema varchar2 default null,  p_dblink varchar2 default null)
+  is
+      l_tab         VARCHAR2(30) DEFAULT 'RKO_SIGNATORY';
+      l_max_id    integer;
+  begin
+      mgr_utl.mantain_error_table(l_tab);
+      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||'
+                                       (
+                                        ID,
+                                        full_nm_nom,
+                                        full_nm_gen,
+                                        short_nm_nom,
+                                        position_prsn_nom,
+                                        division_prsn_gen,
+                                        position_prsn_gen,
+                                        doc_nm_gen,
+                                        notary_nm_gen,
+                                        notary_tp_gen,
+                                        attorney_dt,
+                                        attorney_num,
+                                        notarial_district_gen,
+                                        active_f,
+                                        branch,
+                                        kf
+                                       )
+                                select
+                                        rukey(ID) as ID,
+                                        full_nm_nom,
+                                        full_nm_gen,
+                                        short_nm_nom,
+                                        position_prsn_nom,
+                                        division_prsn_gen,
+                                        position_prsn_gen,
+                                        doc_nm_gen,
+                                        notary_nm_gen,
+                                        notary_tp_gen,
+                                        to_date(replace(attorney_dt, ''/'', ''.''), ''dd.mm.yyyy'') attorney_dt,
+                                        attorney_num,
+                                        notarial_district_gen,
+                                        active_f,
+                                        branch,
+                                        kf
+                                  from '||pkf(l_tab, p_schema,  p_dblink)||' log errors reject limit unlimited'
+                                  , false );
+    --
+    select nvl(max(id/100), 0) + 1
+      into l_max_id
+      from RKO_SIGNATORY
+    ;
+    --
+      mgr_utl.reset_sequence('s_rko_signatory', l_max_id);
+    --
+  end fill_RKO_SIGNATORY;
+
+
+   procedure fill_e_tarif
+    is
+      begin
+      bpa.disable_policies('E_TARIF');
+      mgr_utl.sync_table_auto(p_table => 'E_TARIF', p_delete => false, p_column_replace => 'KF,"mgr_utl.get_kf()"');
+      bpa.enable_policies('E_TARIF');
+  end fill_e_tarif;
+
+  procedure fill_ope_lot
+    is
+      begin
+      bpa.disable_policies('OPE_LOT');
+      mgr_utl.sync_table_auto(p_table => 'OPE_LOT', p_delete => false, p_column_replace => 'KF,"mgr_utl.get_kf()"');
+      bpa.enable_policies('OPE_LOT');
+  end fill_ope_lot;
+
+  procedure fill_mf1
+    is
+      begin
+      bpa.disable_policies('MF1');
+      mgr_utl.sync_table_auto(p_table => 'MF1', p_delete => false, p_column_replace => 'KF,"mgr_utl.get_kf()"');
+      bpa.enable_policies('MF1');
+  end fill_mf1;
+
+   procedure fill_pfu_ca_files(p_schema varchar2 default null,  p_dblink varchar2 default null)
+  is
+      l_tab         VARCHAR2(30) DEFAULT 'PFU_CA_FILES';
+      l_max_id    integer;
+  begin
+
+     /*select id from PFU_CA_FILES@MGRS_351823.GRC.UA t--24824--24686
+intersect
+select id from PFU_CA_FILES;*/
+     execute immediate 'create table tmp_4_migr_'||l_tab||' as select * from '||mgr_utl.pkf(l_tab, p_schema,  p_dblink);
+
+      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||'
+                                       (
+                                        id,
+                                        file_type,
+                                        file_data,
+                                        state,
+                                        message,
+                                        sign,
+                                        resp_data,
+                                        kf
+
+                                       )
+                                 select
+                                        t.id,
+                                        t.file_type,
+                                        t.file_data,
+                                        t.state,
+                                        t.message,
+                                        t.sign,
+                                        t.resp_data,
+                                        '''||g_kf||'''
+
+                                  from tmp_4_migr_'||l_tab||' t
+                                  left join '||l_tab||'  tt
+                                    on t.id = tt.id
+                                 where tt.id is null'
+                                  , false );
+
+      execute immediate 'drop table tmp_4_migr_'||l_tab;
+
+  end fill_pfu_ca_files;
+
+
+  procedure fill_zay_splitting_amount
+    is
+      l_tab         VARCHAR2(30) DEFAULT 'ZAY_SPLITTING_AMOUNT';
+      begin
+      --mgr_utl.sync_table_auto(p_table => 'ZAY_SPLITTING_AMOUNT', p_delete => false, p_column_replace => 'ID,"s_zay_splitting_amount.nextval",ref,"rukey(ref)",KF,"mgr_utl.get_kf()"');
+      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||'
+                                       (
+                                        ID, KF, REF, SALE_TP, AMNT
+                                       )
+                                select
+                                        s_zay_splitting_amount.nextval
+                                        , '''||G_KF||'''
+                                        , rukey(ref)
+                                        , SALE_TP
+                                        , AMNT
+                                  from '||pkf(l_tab)
+
+                                  , false );
+
+  end fill_zay_splitting_amount;
+
+  procedure fill_biznespr_nazn(p_schema varchar2 default null,  p_dblink varchar2 default null)
+  is
+      l_tab         VARCHAR2(30) DEFAULT 'BIZNESPR_NAZN';
+  begin
+      mgr_utl.mantain_error_table(l_tab);
+      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||'
+                                       (
+                                        slovo,
+                                        comm
+
+                                       )
+                                select
+                                        slovo,
+                                        comm
+                                  from '||pkf(l_tab, p_schema,  p_dblink)||' log errors reject limit unlimited'
+
+                                  , false );
+  end fill_biznespr_nazn;
+
+    procedure fill_lines_f(p_schema varchar2 default null,  p_dblink varchar2 default null)
+  is
+      l_tab         VARCHAR2(30) DEFAULT 'LINES_F';
+  begin
+      mgr_utl.mantain_error_table(l_tab);
+      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||'
+                                       (
+     fn,
+    dat,
+    n,
+    mfo,
+    okpo,
+    rtype,
+    otype,
+    odate,
+    nls,
+    nlsm,
+    kv,
+    resid,
+    nmkk,
+    c_reg,
+    ntax,
+    id_o,
+    sign,
+    err,
+    dat_in_dpa,
+    dat_acc_dpa,
+    id_pr,
+    id_dpa,
+    id_dps,
+    id_rec,
+    fn_r,
+    date_r,
+    n_r,
+    kf,
+    adr
+
+
+                                       )
+                                select
+     fn,
+    dat,
+    n,
+    mfo,
+    okpo,
+    rtype,
+    otype,
+    odate,
+    nls,
+    nlsm,
+    kv,
+    resid,
+    nmkk,
+    c_reg,
+    ntax,
+    id_o,
+    sign,
+    err,
+    dat_in_dpa,
+    dat_acc_dpa,
+    id_pr,
+    id_dpa,
+    id_dps,
+    id_rec,
+    fn_r,
+    date_r,
+    n_r,
+    kf,
+    adr
+
+                                  from '||pkf(l_tab, p_schema,  p_dblink)||' log errors reject limit unlimited'
+
+                                  , false );
+  end fill_lines_f;
+
+  procedure fill_lines_ca(p_schema varchar2 default null,  p_dblink varchar2 default null)
+  is
+      l_tab         VARCHAR2(30) DEFAULT 'LINES_CA';
+  begin
+      mgr_utl.mantain_error_table(l_tab);
+      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||'
+                                       (
+     fn,
+    dat,
+    n,
+    mfo,
+    nb,
+    nls,
+    vid,
+    num_tvo,
+    name_blok,
+    daos,
+    fio_blok,
+    fio_isp,
+    inf_isp,
+    id_o,
+    sign,
+    err,
+    kf
+
+                                       )
+                                select
+     fn,
+    dat,
+    n,
+    mfo,
+    nb,
+    nls,
+    vid,
+    num_tvo,
+    name_blok,
+    daos,
+    fio_blok,
+    fio_isp,
+    inf_isp,
+    id_o,
+    sign,
+    err,
+    kf
+
+                                  from '||pkf(l_tab, p_schema,  p_dblink)||' log errors reject limit unlimited'
+
+                                  , false );
+  end fill_lines_ca;
+
+  procedure fill_lines_i(p_schema varchar2 default null,  p_dblink varchar2 default null)
+  is
+      l_tab         VARCHAR2(30) DEFAULT 'LINES_I';
+  begin
+      mgr_utl.mantain_error_table(l_tab);
+      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||'
+                                       (
+     fn,
+    dat,
+    n,
+    err,
+    kf
+
+                                       )
+                                select
+     fn,
+    dat,
+    n,
+    err,
+    kf
+    from '||pkf(l_tab, p_schema,  p_dblink)||' log errors reject limit unlimited'
+
+                                  , false );
+  end fill_lines_i;
+
+  procedure fill_lines_r(p_schema varchar2 default null,  p_dblink varchar2 default null)
+  is
+      l_tab         VARCHAR2(30) DEFAULT 'LINES_R';
+  begin
+      mgr_utl.mantain_error_table(l_tab);
+      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||'
+                                       (
+      fn,
+      dat,
+      n,
+      mfo,
+      bank_okpo,
+      okpo,
+      rtype,
+      nmkk,
+      odate,
+      nls,
+      kv,
+      resid,
+      dat_in_dpa,
+      dat_acc_dpa,
+      id_pr,
+      id_dpa,
+      id_dps,
+      id_rec,
+      fn_f,
+      n_f,
+      err,
+      kf
+
+                                       )
+                                select
+      fn,
+      dat,
+      n,
+      mfo,
+      bank_okpo,
+      okpo,
+      rtype,
+      nmkk,
+      odate,
+      nls,
+      kv,
+      resid,
+      dat_in_dpa,
+      dat_acc_dpa,
+      id_pr,
+      id_dpa,
+      id_dps,
+      id_rec,
+      fn_f,
+      n_f,
+      err,
+      kf
+
+    from '||pkf(l_tab, p_schema,  p_dblink)||' log errors reject limit unlimited'
+
+                                  , false );
+  end fill_lines_r;
+
+  procedure fill_W4_PRODUCT_DOC(p_schema varchar2 default null,  p_dblink varchar2 default null)
+  is
+      l_tab         VARCHAR2(30) DEFAULT 'W4_PRODUCT_DOC';
+  begin
+      mgr_utl.mantain_error_table(l_tab);
+      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||'
+                                       (
+                                        grp_code, doc_id
+                                       )
+                                select
+                                        grp_code, doc_id
+                                  from '||pkf(l_tab, p_schema,  p_dblink)||' log errors reject limit unlimited'
+
+                                  , false );
+  end fill_W4_PRODUCT_DOC;
+
+  procedure fill_part_zvt_doc(p_schema varchar2 default null,  p_dblink varchar2 default null)
+  is
+      l_tab         VARCHAR2(30) DEFAULT 'PART_ZVT_DOC';
+  begin
+      mgr_utl.mantain_error_table(l_tab);
+      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||'
+                                       (
+                                        fdat,
+                                        branch,
+                                        tema,
+                                        isp,
+                                        kv,
+                                        tt,
+                                        ref,
+                                        stmt,
+                                        nlsd,
+                                        nlsk,
+                                        s,
+                                        sq,
+                                        kf
+
+                                       )
+                                select
+                                        fdat,
+                                        branch,
+                                        tema,
+                                        ruuser(isp) as isp,
+                                        kv,
+                                        tt,
+                                        rukey(ref) as ref,
+                                        rukey(stmt) as stmt,
+                                        nlsd,
+                                        nlsk,
+                                        s,
+                                        sq,
+                                        '''||g_kf||''' as kf
+                                  from '||mgr_utl.pkf(l_tab, p_schema,  p_dblink)||'
+                                  log errors reject limit unlimited'
+
+                                  , false );
+  end fill_part_zvt_doc;
+
+  procedure fill_W4_NBS_OB22(p_schema varchar2 default null,  p_dblink varchar2 default null)
+  is
+      l_tab         VARCHAR2(30) DEFAULT 'W4_NBS_OB22';
+  begin
+      mgr_utl.mantain_error_table(l_tab);
+      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||'
+                   (
+                    nbs,
+                    ob22,
+                    ob_9129,
+                    ob_ovr,
+                    ob_2207,
+                    ob_2208,
+                    ob_2209,
+                    ob_3570,
+                    ob_3579,
+                    tip,
+                    ob_2627,
+                    ob_2625x,
+                    ob_2627x,
+                    ob_2625d,
+                    ob_2628,
+                    ob_6110
+                   )
+            select nbs,
+                    ob22,
+                    ob_9129,
+                    ob_ovr,
+                    ob_2207,
+                    ob_2208,
+                    ob_2209,
+                    ob_3570,
+                    ob_3579,
+                    tip,
+                    ob_2627,
+                    ob_2625x,
+                    ob_2627x,
+                    ob_2625d,
+                    ob_2628,
+                    null as ob_6110
+               from
+                      (select nbs,
+                              ob22,
+                              ob_9129,
+                              ob_ovr,
+                              ob_2207,
+                              ob_2208,
+                              ob_2209,
+                              ob_3570,
+                              ob_3579,
+                              tip,
+                              ob_2627,
+                              ob_2625x,
+                              ob_2627x,
+                              ob_2625d,
+                              ob_2628
+                         from '||mgr_utl.pkf(l_tab, p_schema,  p_dblink)||' t
+                        minus
+                       select nbs,
+                              ob22,
+                              ob_9129,
+                              ob_ovr,
+                              ob_2207,
+                              ob_2208,
+                              ob_2209,
+                              ob_3570,
+                              ob_3579,
+                              tip,
+                              ob_2627,
+                              ob_2625x,
+                              ob_2627x,
+                              ob_2625d,
+                              ob_2628
+                         from '||l_tab||' tt )
+                          log errors reject limit unlimited'
+
+                                  , false );
+  end fill_W4_NBS_OB22;
+
+  procedure fill_ACC_MSG(p_schema varchar2 default null,  p_dblink varchar2 default null)
+    is
+      l_max_id    integer;
+      l1 varchar2(10) := 'NEW';
+      l2 varchar2(10) := 'SUBMITTED';
+      l_tab         VARCHAR2(30) DEFAULT 'ACC_MSG';
+      begin
+
+      select nvl(max(MSG_ID) + 1, 1)
+      into l_max_id
+      from ACC_MSG;
+
+      mgr_utl.sync_table_auto('ACC_MSG', false, 'MSG_ID,"'||l_max_id||'+MSG_ID",RNK,"rukey(RNK)",ACC,"rukey(ACC)"');
+
+      l_tab  := 'MSG_SUBMIT_DATA';
+
+
+      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||'
+                                       (
+                                        msg_id,
+                                        creation_time,
+                                        expiration_time,
+                                        phone,
+                                        encode,
+                                        msg_text,
+                                        status,
+                                        status_time,
+                                        submit_code,
+                                        last_error,
+                                        smpp_error_msg,
+                                        payedref,
+                                        ref,
+                                        kf
+
+                                       )
+                                select
+                                        '||l_max_id||'+MSG_ID as MSG_ID,
+                                        creation_time,
+                                        expiration_time,
+                                        phone,
+                                        encode,
+                                        msg_text,
+                                        --decode(status,'''||l1||''','''||l2||''',status) as status,
+                                        status,
+                                        status_time,
+                                        submit_code,
+                                        last_error,
+                                        smpp_error_msg,
+                                        payedref,
+                                        ref,
+                                        '''||g_kf||''' as kf
+                                  from '||mgr_utl.pkf(l_tab, p_schema,  p_dblink)
+                                  , false );
+
+      select nvl(max(MSG_ID) + 1, 1)
+      into l_max_id
+      from ACC_MSG;
+
+      mgr_utl.reset_sequence('s_msgid', l_max_id);
+
+  end fill_ACC_MSG;
+
+  procedure fill_PS_SPARAM(p_schema varchar2 default null,  p_dblink varchar2 default null)
+  is
+      l_tab         VARCHAR2(30) DEFAULT 'PS_SPARAM';
+  begin
+      mgr_utl.mantain_error_table(l_tab);
+      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||'
+                                       (
+                                        nbs,
+                                        spid,
+                                        opt,
+                                        sqlval
+                                        )
+                                select
+                                        nbs,
+                                        spid,
+                                        opt,
+                                        sqlval
+                                  from '||mgr_utl.pkf(l_tab, p_schema,  p_dblink)||'
+                                  log errors reject limit unlimited'
+
+                                  , false );
+  end fill_PS_SPARAM;
+
+  procedure fill_SKRYNKA_ACC_ARC
+    is
+    begin
+      mgr_utl.sync_table_auto('SKRYNKA_ACC_ARC',false,'N_SK,"rukey(N_SK)"');
+  end fill_SKRYNKA_ACC_ARC;
+
+  procedure fill_SKRYNKA_ALL
+    is
+    begin
+      mgr_utl.sync_table_auto('SKRYNKA_ALL',false,'N_SK,"rukey(N_SK)"');
+  end fill_SKRYNKA_ALL;
+
+  procedure fill_SKRYNKA_ARC
+    is
+    begin
+      mgr_utl.sync_table_auto('SKRYNKA_ARC',false,'N_SK,"rukey(N_SK)"');
+  end fill_SKRYNKA_ARC;
+
+
+  procedure fill_params_dpa_reg
+    is
+    --l_tab     VARCHAR2(30) DEFAULT 'PARAMS';
+
+    begin
+      
+    bars.branch_attribute_utl.set_attribute_value('/'||g_kf||'/', 'DPA_REG', '5');--select * from spr_obl
+  commit;
+
+  end fill_params_dpa_reg;
+
+
+  procedure fill_OW_REBRANCH_DATA(p_schema varchar2 default null,  p_dblink varchar2 default null)
+  is
+      l_tab         VARCHAR2(30) DEFAULT 'OW_REBRANCH_DATA';
+  begin
+      mgr_utl.mantain_error_table(l_tab);
+      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||'
+                                       (
+                                        id,
+                                        fileid,
+                                        idn,
+                                        rnk,
+                                        nls,
+                                        branch,
+                                        state,
+                                        msg,
+                                        kf
+
+                                        )
+                                select
+                                        bars_sqnc.get_nextval(''s_ow_rebranch_data'') as id,
+                                        rukey(FILEID) as fileid,
+                                        idn,
+                                        rukey(RNK) as rnk,
+                                        nls,
+                                        branch,
+                                        state,
+                                        msg,
+                                        '''||g_kf||''' as kf
+                                  from '||mgr_utl.pkf(l_tab, p_schema,  p_dblink)||'
+                                  log errors reject limit unlimited'
+
+                                  , false );
+  end fill_OW_REBRANCH_DATA;
+
+  procedure fill_SKRYNKA_STAFF(p_schema varchar2 default null,  p_dblink varchar2 default null)
+  is
+      l_tab         VARCHAR2(30) DEFAULT 'SKRYNKA_STAFF';
+  begin
+      mgr_utl.mantain_error_table(l_tab);
+      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||'
+                                       (
+                                        userid,
+                                        tip,
+                                        fio,
+                                        fio_r,
+                                        dover,
+                                        posada,
+                                        posada_r,
+                                        town,
+                                        adress,
+                                        mfo,
+                                        telefon,
+                                        branch,
+                                        kf,
+                                        mode_time,
+                                        weekend,
+                                        approved,
+                                        id,
+                                        activ
+                                        )
+                                select
+                                        ruuser(userid) as userid,
+                                        tip,
+                                        fio,
+                                        fio_r,
+                                        dover,
+                                        posada,
+                                        posada_r,
+                                        town,
+                                        adress,
+                                        mfo,
+                                        telefon,
+                                        branch,
+                                        '''||g_kf||''' as kf,
+                                        mode_time,
+                                        weekend,
+                                        approved,
+                                        s_skrynka_staff.nextval as id,
+                                        activ
+                                  from '||mgr_utl.pkf(l_tab, p_schema,  p_dblink)||'
+                                  log errors reject limit unlimited'
+
+                                  , false );
+  end fill_SKRYNKA_STAFF;
+
+
+  procedure fill_REE_TMP(p_schema varchar2 default null,  p_dblink varchar2 default null)
+  is
+      l_tab         VARCHAR2(30) DEFAULT 'REE_TMP';
+  begin
+      mgr_utl.mantain_error_table(l_tab);
+      mgr_utl.sync_table(l_tab,'INSERT INTO '||l_tab||'
+                                       (
+                                        mfo, 
+                                        id_a, 
+                                        rt, 
+                                        ot, 
+                                        odat, 
+                                        nls, 
+                                        prz, 
+                                        kv, 
+                                        c_ag, 
+                                        nmk, 
+                                        nmkw, 
+                                        c_reg, 
+                                        c_dst, 
+                                        id_o, 
+                                        sign, 
+                                        fn_i, 
+                                        dat_i, 
+                                        rec_i, 
+                                        fn_o, 
+                                        dat_o, 
+                                        rec_o, 
+                                        errk, 
+                                        rec, 
+                                        otm, 
+                                        kf
+
+                                        )
+                                select  
+                                        mfo, 
+                                        id_a, 
+                                        rt, 
+                                        ot, 
+                                        odat, 
+                                        nls, 
+                                        prz, 
+                                        kv, 
+                                        c_ag, 
+                                        nmk, 
+                                        nmkw, 
+                                        c_reg, 
+                                        c_dst, 
+                                        id_o, 
+                                        sign, 
+                                        fn_i, 
+                                        dat_i, 
+                                        rec_i, 
+                                        fn_o, 
+                                        dat_o, 
+                                        rec_o, 
+                                        errk, 
+                                        rec, 
+                                        otm,
+                                        '''||g_kf||''' as kf
+                                  from '||mgr_utl.pkf(l_tab, p_schema,  p_dblink)||'
+                                 where odat >= sysdate - 3       
+                                   and fn_o is null
+                                   log errors reject limit unlimited'
+
+                                  , false );
+  end fill_REE_TMP;  
   
 begin
     init;
@@ -29219,7 +31181,7 @@ begin
 
         exec mgr_utl.enable_foreign_keys();
         --exec mgr_utl.validate_foreign_keys();
-        exec mgr_utl.validate_cons_in_parallel('CONS2VALID');
+        exec mgr_utl.validate_cons_in_paral_lel('CONS2VALID');
 
         Если остаются невалидированные ссылки, обязательно разобраться !!!
         ------------------------------------------------------------

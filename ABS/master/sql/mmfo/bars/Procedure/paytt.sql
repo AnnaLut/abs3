@@ -1,4 +1,13 @@
-create or replace procedure PAYTT
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/PAYTT.sql =========*** Run *** ===
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure PAYTT ***
+
+  CREATE OR REPLACE PROCEDURE BARS.PAYTT 
 ( flg_ SMALLINT,  -- флаг оплаты
   ref_ INTEGER,   -- референция
  datv_ DATE,      -- дата валютировния
@@ -16,7 +25,7 @@ create or replace procedure PAYTT
 --             Точка пользователя для программы оплаты
 --                    Version 7.8  10/06/2014
 
---             OSC - Для ОщадБанка 
+--             OSC - Для ОщадБанка
 --                   С КОМПЕНСАЦИЕЙ ВКЛАДОВ СССР + КОМПЕНСАЦИЯ НА ПОГРЕБЕНИЕ
 --             BRANCH - Для схемы с полем 'branch'
 --             ZAY - Для модуля "Биржевые операции" (подмена счета комиссии)
@@ -26,7 +35,7 @@ create or replace procedure PAYTT
 --             OVR - с авто-овердрафтом
 
 --             RU - Рег.Упр. Ощадного Банку України:
---             2009:Рiвне,Луцьк,Житомир,Херсон, 
+--             2009:Рiвне,Луцьк,Житомир,Херсон,
 --             2010:IВ.Фр,Вiнниця,Черкаси,Чернiвцi,Запорiжжя,Крим,Харкiв
 --             2011:Днепропетровск, Донецк, Николаев, Одесса, Полтава, ...
 --             2012: Банк Надра
@@ -136,7 +145,7 @@ EXCEPTION WHEN NO_DATA_FOUND THEN -- AutoOpening
       IF BITAND(flg_,1)=1 THEN nms_:=nmk_; END IF;
 
       BEGIN
-         SELECT tip INTO tip_ FROM nbs_tips 
+         SELECT tip INTO tip_ FROM nbs_tips
           WHERE nbs=SUBSTR(nls_,1,4) AND BITAND(opt,1)=1 AND rownum=1;
       EXCEPTION WHEN NO_DATA_FOUND THEN tip_:='ODB';
       END;
@@ -146,15 +155,15 @@ EXCEPTION WHEN NO_DATA_FOUND THEN -- AutoOpening
       update accounts set sec=sec_
            ,branch=branch_,tobo=tobo_
        where acc=acc_;
-      IF BITAND(flg_,8)=8 THEN  -- specparam_int 
+      IF BITAND(flg_,8)=8 THEN  -- specparam_int
       	 BEGIN
             update specparam_int
                set ob22=
               case when substr(nls0_,1,4)='1602' and ob22_='03' then '05'
                    when substr(nls0_,1,4)='2600' and ob22_='10' then '06'
                    when substr(nls0_,1,4)='2650' and ob22_='09' then '06'
-                   when substr(nls0_,1,4)='2610' and ob22_='19' then '07' 
-               end	
+                   when substr(nls0_,1,4)='2610' and ob22_='19' then '07'
+               end
              where acc=acc_;
 
             if sql%rowcount=0 then
@@ -162,10 +171,10 @@ EXCEPTION WHEN NO_DATA_FOUND THEN -- AutoOpening
                values (acc_, case when substr(nls0_,1,4)='1602' and ob22_='03' then '05'
                                   when substr(nls0_,1,4)='2600' and ob22_='10' then '06'
                                   when substr(nls0_,1,4)='2650' and ob22_='09' then '06'
-                                  when substr(nls0_,1,4)='2610' and ob22_='19' then '07' 
+                                  when substr(nls0_,1,4)='2610' and ob22_='19' then '07'
                              end );
-            end if; 
-         END; 
+            end if;
+         END;
       END IF;
 
    EXCEPTION  WHEN OTHERS THEN
@@ -214,7 +223,7 @@ BEGIN
 
   IF sa_=0 THEN RETURN; END IF;  -- SUB
 
-  -- Для работы с кассой в операционном дне - нужно проверить открыта ли 
+  -- Для работы с кассой в операционном дне - нужно проверить открыта ли
   -- смена в операционном дне
   if bars_cash.G_ISUSECASH = 1 and bars_cash.G_CURRSHIFT = 0 then
      -- змiну ще не було відкрито
@@ -396,7 +405,7 @@ BEGIN
   --
   -- Конец обработки документов Реестра вкладчиков ССР (ЦРВ)
   --
-        
+
 -- Подмена переменной dk_ перед всеми проводками
    dk_  := dk0_;
 
@@ -404,7 +413,7 @@ BEGIN
       SELECT flv, kv, trim(nlsm), kvk, trim(nlsk),
              SUBSTR(flags,19,1), SUBSTR(flags,20,1),
              SUBSTR(flags,21,1), SUBSTR(flags,22,1),
-             SUBSTR(flags,23,1), SUBSTR(flags,24,1), 
+             SUBSTR(flags,23,1), SUBSTR(flags,24,1),
              SUBSTR(flags,25,1), SUBSTR(flags,38,1)
         INTO flv_,kv_,nlsm_,kvk_,nlsk_,
              flg19_,flg20_,flg21_,flg22_,flg23_,flg24_,flg25_,flg38_
@@ -498,7 +507,7 @@ BEGIN
                       TRIM(SUBSTR(suf_||nmk_,1,70)),'ODB',isp_,acc_);
                p_setAccessByAccmask(acc_,accmask_);
             END IF;
---  Hаследование кода ТОБО: 
+--  Hаследование кода ТОБО:
             UPDATE Accounts set TOBO=tobo_ where ACC=acc_;
          END;
 
@@ -581,8 +590,8 @@ begin
   VDAT_ := datv_;
 --++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     -- Пока только для Ощ.Банка
-    --If ( getglobaloption('MFOP')='300465' or gl.aMfo='300465') then  
-       EXECUTE IMMEDIATE 
+    --If ( getglobaloption('MFOP')='300465' or gl.aMfo='300465') then
+       EXECUTE IMMEDIATE
          'begin PAY_S36 (:flg_,:ref_, :VDAT_, :tt_,:dk_,:kv_,:nlsm_,:sa_,:kvk_,:nlsk_,:ss_); end;'
        USING flg_,ref_, VDAT_, tt_,dk_,kv_,nlsm_,sa_,kvk_,nlsk_,ss_;
     --end if;
@@ -598,38 +607,38 @@ If nvl(sa_,0) <> 0  OR  nvl(ss_,0) <>0  then
      If nlsm_ = nlsk_ and kv_=kvk_ then
         l_s4 := substr(nlsm_,1,4);
         If Not ( l_s4 like '8%'   OR
-                 l_s4 in ( '1001', '1002', '9819' , '9820','9821') ) 
+                 l_s4 in ( '1001', '1002', '9819' , '9820','9821') )
         then
           raise_application_error( -(20203), '\9358 - Заборонено кореспонденцію рахунків # "сам на себе"', TRUE );
         end if;
      end if;
 
-     If kv_<> kvk_ and (nlsm_ like '3739%' OR nlsk_ like '3739%') then 
+     If kv_<> kvk_ and (nlsm_ like '3739%' OR nlsk_ like '3739%') then
         null;
-     else 
-       select n.nbsd, n.nbsk, n.tt 
-         into l_nbsd, l_nbsk, l_ttx  
+     else
+       select n.nbsd, n.nbsk, n.tt
+         into l_nbsd, l_nbsk, l_ttx
          from PAYTT_NO n
         where  rownum=1
           and TT_ = Nvl(n.TT,TT_)
           and (dk_=1 and nlsm_ like trim(NBSD)||'%' AND nlsk_ like trim(NBSK)||'%'
-               OR 
+               OR
                dk_=0 and nlsk_ like trim(NBSD)||'%' AND nlsm_ like trim(NBSK)||'%'
               );
        raise_application_error( -(20203), '\9358 - Заборонено кореспонденцію рахунків #' ||TRIM(l_nbsd)||' на '||TRIM(l_nbsk)||
                                           CASE WHEN l_ttx IS NULL THEN '' ELSE ' через операцію '||l_ttx END, TRUE );
      end if;
-    
+
    EXCEPTION
      WHEN NO_DATA_FOUND THEN null;
    end;
 
 /*
-   -- 21-02-2011 Sta проверка лимита 
-   If kv_ = kvk_ and kv_<> gl.baseval AND 
+   -- 21-02-2011 Sta проверка лимита
+   If kv_ = kvk_ and kv_<> gl.baseval AND
      (substr(nlsm_,1,4) in ('2809','2909') and substr(nlsk_,1,2)='10'
-      OR 
-      substr(nlsk_,1,4) in ('2809','2909') and substr(nlsm_,1,2)='10' 
+      OR
+      substr(nlsk_,1,4) in ('2809','2909') and substr(nlsm_,1,2)='10'
      )
       then
       PAY_MONEY(flg_,ref_, VDAT_, tt_,dk_,kv_,nlsm_,sa_,kvk_,nlsk_,ss_);
@@ -637,33 +646,33 @@ If nvl(sa_,0) <> 0  OR  nvl(ss_,0) <>0  then
 */
 
 /*
-    Відповідно до вимог Порядку проведення у 2012 році виплат громадянам України компенсації втрат 
-    від знецінення грошових заощаджень, вкладених до 02.01.1992 року в установи Ощадного банку СРСР, 
-    що діяли на території україни, та в облігації Державної цільової безпроцентної позики 1990 року, 
+    Відповідно до вимог Порядку проведення у 2012 році виплат громадянам України компенсації втрат
+    від знецінення грошових заощаджень, вкладених до 02.01.1992 року в установи Ощадного банку СРСР,
+    що діяли на території україни, та в облігації Державної цільової безпроцентної позики 1990 року,
     державні казначейські зобов'язання СРСР і сертифікати Ощадного банку СРСР, придбані на території
-    Української РСР, затвердженого головою правління від 08.05.2012 № 31/-04/33 та погодженого 
-    Міністерством фінансів України від 23.05.2012 №31-11020-09/13030, виплата компенсації на поховання 
-    вкладників, які померли у 2005-2012 роках, здійснюються шляхом зарахування коштів на поточні 
+    Української РСР, затвердженого головою правління від 08.05.2012 № 31/-04/33 та погодженого
+    Міністерством фінансів України від 23.05.2012 №31-11020-09/13030, виплата компенсації на поховання
+    вкладників, які померли у 2005-2012 роках, здійснюються шляхом зарахування коштів на поточні
     рахунки спадкоємців.
-    
+
     Заборона - Дебет 2906(09) Кредит 1001(1002) - Згідно заявки АТ "Ощадбанк" 03.07.2012 р. № 14/2-1/1563
-*/ 
-     
+*/
+
      Declare
        l_acc_ob22 accounts.ob22%type := null;
      begin
        If dk_ = 1 and Substr(nlsm_,1,4) = '2906' THEN
          begin
          select ob22 into l_acc_ob22 from accounts where nls=nlsm_ and  kv=kv_;
-         exception WHEN NO_DATA_FOUND then null; 
-         end; 
-       ElsIf   dk_ = 0 and Substr(nlsk_,1,4) = '2906' THEN 
+         exception WHEN NO_DATA_FOUND then null;
+         end;
+       ElsIf   dk_ = 0 and Substr(nlsk_,1,4) = '2906' THEN
          begin
          select ob22 into l_acc_ob22 from accounts where nls=nlsk_ and  kv=kvk_;
-         exception WHEN NO_DATA_FOUND then null; 
+         exception WHEN NO_DATA_FOUND then null;
          end;
        end If;
-       If l_acc_ob22='09' and ((dk_ = 1 and Substr(nlsk_,1,3) = '100') or (dk_ = 0 and Substr(nlsm_,1,3) = '100')) 
+       If l_acc_ob22='09' and ((dk_ = 1 and Substr(nlsk_,1,3) = '100') or (dk_ = 0 and Substr(nlsm_,1,3) = '100'))
        then
          raise_application_error( -(20203), '\9350 - Заборонено кореспонденцію рахунків 2906(09) на касу '||(case when dk_=0 then Substr(nlsm_,1,4) else Substr(nlsK_,1,4) end), TRUE );
        end if;
@@ -672,49 +681,70 @@ If nvl(sa_,0) <> 0  OR  nvl(ss_,0) <>0  then
 
 end if;
 
-    If tt_ NOT in ('ARE','AR*') and (nlsm_ like '77%' OR nlsk_ like '77%' ) then  -- 15-02-2012 Sta+Марценюк Люда  Контроль Ручных проводок по рез.фонду
-       pay_REZ(flg_,ref_, VDAT_, tt_,dk_,kv_,nlsm_,sa_,kvk_,nlsk_,ss_);
+
+    If tt_ NOT in ('ARE','AR*') and (nlsm_ like '77%' OR nlsk_ like '77%' )
+    then  -- 15-02-2012 Sta+Марценюк Люда  Контроль Ручных проводок по рез.фонду
+      pay_REZ(flg_,ref_, VDAT_, tt_,dk_,kv_,nlsm_,sa_,kvk_,nlsk_,ss_);
     end if;
 
     --------- маркировка кодами тарифов
-    if nlsm_ like '61%' or nlsk_ like '61%' and gl.doc.DEAL_TAG is not null and  gl.aRef = gl.doc.ref then
-       update operw set value = to_char ( gl.doc.DEAL_TAG ) where ref = gl.aRef and tag = 'KTAR ';
-       if SQL%rowcount = 0 then  insert into operw (ref,tag, value) values (gl.aRef, 'KTAR ', to_char ( gl.doc.DEAL_TAG ) ) ;    end if;
+    if nlsm_ like '61%' or nlsk_ like '61%' and gl.doc.DEAL_TAG is not null and  gl.aRef = gl.doc.ref
+    then
+      update operw set value = to_char ( gl.doc.DEAL_TAG ) where ref = gl.aRef and tag = 'KTAR ';
+      if SQL%rowcount = 0
+      then
+        insert into operw (ref,tag, value) values (gl.aRef, 'KTAR ', to_char ( gl.doc.DEAL_TAG ) );
+      end if;
     end if;
 
-    ------------######    Спец бизнес-логика  #########################################################################################-----------------------------
-    if TT_='CCK' then    -- ВЭБ-функция - <<Погаш.кредиту готiвкою>>
-       EXECUTE IMMEDIATE 'begin PAY_CCK_UPB(:flg_,:ref_, :VDAT_, :tt_,:dk_,:kv_,:nlsm_,:sa_,:kvk_,:nlsk_,:ss_); end;'  USING flg_, ref_, VDAT_, tt_, dk_, kv_, nlsm_, sa_, kvk_, nlsk_, ss_ ;
-    -----------------------------------------------------------------------------------------------------------------------------
-    Elsif TT_ in ('KK1','KK2' ) and dk_ = 1 and nlsm_ like '22%' then   --- 21.03.2016 Сухова COBUSUPABS-4313
-       EXECUTE IMMEDIATE 'begin PAY_KK(:flg_,:ref_, :VDAT_, :tt_,:dk_,:kv_,:nlsm_,:sa_,:kvk_,:nlsk_,:ss_); end;'       USING flg_, ref_, VDAT_, tt_, dk_, kv_, nlsm_, sa_, kvk_, nlsk_, ss_ ;
-    -----------------------------------------------------------------------------------------------------------------------------
-    elsIF dk_=1 and kv_= kvk_ and sa_= ss_ and kv_= gl.baseval and nlsk_ like '3739_05' and gl.aMfo <> '300465' then --- 05.04.2016 Sta  АВТО-ОБРОБКА надходжень на 3739.05 по відшкодуванню коштів на погшашення кредитів (Енергозбереження)
-       EXECUTE IMMEDIATE 'begin ESCR.PAY1(:flg_,:ref_, :VDAT_, :tt_,:dk_,:kv_,:nlsm_,:sa_,:kvk_,:nlsk_,:ss_); end;'    USING flg_, ref_, VDAT_, tt_, dk_, kv_, nlsm_, sa_, kvk_, nlsk_, ss_ ;
-    -----------------------------------------------------------------------------------------------------------------------------
-    elsIF TT_='HPX' and dk_=1  then     -- ВЭБ-"перевертыш" - <<НЕРУХОМI>>
-       EXECUTE IMMEDIATE 'begin PAY_HPX(:flg_,:ref_, :VDAT_, :tt_,:dk_,:kv_,:nlsm_,:sa_,:kvk_,:nlsk_,:ss_); end;'      USING flg_, ref_, VDAT_, tt_, dk_, kv_, nlsm_, sa_, kvk_, nlsk_, ss_ ;
-    -----------------------------------------------------------------------------------------------------------------------------
-    elsIf kv_<>gl.baseval and (nlsm_ like '26_8%' and nlsk_ like '3800%' OR nlsk_ like '26_8%' and  nlsm_ like '3800%') and tt_ not like 'OW%'  then    -- Для подмены счета 3800 на 7 кл при нач.%% (или штрафов) в АСВО
-       EXECUTE IMMEDIATE 'begin PAY_ASVO(:flg_,:ref_, :VDAT_, :tt_,:dk_,:kv_,:nlsm_,:sa_,:kvk_,:nlsk_,:ss_); end;'     USING flg_, ref_, VDAT_,  tt_, dk_, kv_, nlsm_, sa_, kvk_, nlsk_, ss_ ;
-    -----------------------------------------------------------------------------------------------------------------------------
-    elsif  KV_ = GL.BASEVAL  and gl.doc.NLSA  LIKE '2620%' and   gl.doc.MFOA  =  gL.aMfo  and  gl.doc.MFOB  <> gl.aMfo THEN   --  23.08.2017 Sta COBUSUPABS-6338 Может надо (или нет) взять комиссию    
-       EXECUTE IMMEDIATE 'begin PAY_2620(:flg_,:ref_, :VDAT_, :tt_,:dk_,:kv_,:nlsm_,:sa_,:kvk_,:nlsk_,:ss_); end;'     USING flg_, ref_, VDAT_,  tt_, dk_, kv_, nlsm_, sa_, kvk_, nlsk_, ss_ ;
-    -----------------------------------------------------------------------------------------------------------------------------
-    elsif kv_=gl.baseval and dk_= 1 and nlsm_ not like '2900%' and gl.aMFO <> '380764'  then -- Sta 11-05-2011 Вiдповiдно до вимог п. 3.10 роздiлу 3 постанови Правлiння НБУ вiд 10.08.2005 р. №280 "Про врегулювання питань iноземного iнвестування в Україну", ... :
-       EXECUTE IMMEDIATE 'begin PAY_NLN(:flg_,:ref_, :VDAT_, :tt_,:dk_,:kv_,:nlsm_,:sa_,:kvk_,:nlsk_,:ss_); end;'      USING flg_, ref_, VDAT_,  tt_, dk_, kv_, nlsm_, sa_, kvk_, nlsk_, ss_ ;
-    -----------------------------------------------------------------------------------------------------------------------------
-    else                         gl.payv(flg_,ref_ , VDAT_ ,  tt_, dk_, kv_, nlsm_, sa_, kvk_, nlsk_, ss_);
+    if TT_='CCK'
+    then    -- ВЭБ-функция - <<Погаш.кредиту готiвкою>>
+      EXECUTE IMMEDIATE 'begin PAY_CCK_UPB(:flg_,:ref_, :VDAT_, :tt_,:dk_,:kv_,:nlsm_,:sa_,:kvk_,:nlsk_,:ss_); end;'
+        USING flg_,ref_, VDAT_, tt_,dk_,kv_,nlsm_,sa_,kvk_,nlsk_,ss_;
+
+    Elsif TT_ in ('KK1','KK2' ) and dk_ = 1 and nlsm_ like '22%'
+    then   --- 21.03.2016 Сухова COBUSUPABS-4313
+/*
+1. за КД ФО  в частині видачі кредиту з позичкового рахунку на поточний рахунок 2620 (який використовується для обслуговування кредиту)
+2. для випадків КК2 стягується комісія  (п.1.1.2.1. діючих Тарифів за послуги установ АТ «Ощадбанк»)
+*/
+      EXECUTE IMMEDIATE 'begin PAY_KK(:flg_,:ref_, :VDAT_, :tt_,:dk_,:kv_,:nlsm_,:sa_,:kvk_,:nlsk_,:ss_); end;'
+        USING flg_,ref_, VDAT_, tt_,dk_,kv_,nlsm_,sa_,kvk_,nlsk_,ss_;
+
+    elsIF TT_='HPX' and dk_=1 and gl.aMFO <> '380764'  then     -- ВЭБ-"перевертыш" - <<НЕРУХОМI>>
+      EXECUTE IMMEDIATE 'begin PAY_HPX(:flg_,:ref_, :VDAT_, :tt_,:dk_,:kv_,:nlsm_,:sa_,:kvk_,:nlsk_,:ss_); end;'
+        USING flg_,ref_, VDAT_, tt_,dk_,kv_,nlsm_,sa_,kvk_,nlsk_,ss_;
+
+    elsIf kv_<>gl.baseval       and gl.aMFO <> '380764'
+      and   (nlsm_ like '26_8%' and nlsk_ like '3800%' OR
+             nlsk_ like '26_8%' and nlsm_ like '3800%')
+      and tt_ not like 'OW%'
+    then    -- Для подмены счета 3800 на 7 кл при нач.%% (или штрафов) в АСВО
+      EXECUTE IMMEDIATE 'begin PAY_ASVO(:flg_,:ref_, :VDAT_, :tt_,:dk_,:kv_,:nlsm_,:sa_,:kvk_,:nlsk_,:ss_); end;'
+        USING flg_,ref_, VDAT_, tt_,dk_,kv_,nlsm_,sa_,kvk_,nlsk_,ss_;
+
+    elsif kv_=gl.baseval and dk_= 1 and nlsm_ not like '2900%' and gl.aMFO <> '380764'  then
+
+/*  Sta 11-05-2011
+Вiдповiдно до вимог п. 3.10 роздiлу 3 постанови Правлiння Нацiонального банку України
+вiд 10.08.2005 р. №280 "Про врегулювання питань iноземного iнвестування в Україну",
+зареєстрованої в Мiнiстерствi юстицiї України 29.08.2005р. за №947/11227 (iз змiнами) :
+*/
+      EXECUTE IMMEDIATE 'begin PAY_NLN(:flg_,:ref_, :VDAT_, :tt_,:dk_,:kv_,:nlsm_,:sa_,:kvk_,:nlsk_,:ss_); end;'
+        USING flg_,ref_, VDAT_, tt_,dk_,kv_,nlsm_,sa_,kvk_,nlsk_,ss_;
+
+    else
+       gl.payv(flg_,ref_, VDAT_, tt_,dk_,kv_,nlsm_,sa_,kvk_,nlsk_,ss_);
     end if;
-    ------------############################################################################################################################-----------------------------
+
 end;
 
 /* ************************************************************** */
 -- 10.03.2011 Олег М.
-If tt_ not like 'GO%' 
+If tt_ not like 'GO%'
 then
-  If kva_ = gl.baseval and kvb_ <> gl.baseval OR kvb_ = gl.baseval and kva_ <> gl.baseval 
-  then 
+  If kva_ = gl.baseval and kvb_ <> gl.baseval OR kvb_ = gl.baseval and kva_ <> gl.baseval
+  then
     declare
        w_ref operw.ref%type;
        w_tag operw.tag%type;
@@ -723,9 +753,9 @@ then
        If kva_ in (959,961,962) or kvb_ in (959,961,962) then w_tag := 'MKURS';
        else                                                   w_tag := 'KURS' ;
        end if;
-    
-       select  ref into w_ref from operw where ref=REF_ and tag = w_tag ; 
-    
+
+       select  ref into w_ref from operw where ref=REF_ and tag = w_tag ;
+
     EXCEPTION  WHEN NO_DATA_FOUND THEN
        If kva_   = gl.baseval and sb_<>0 then w_val :=to_char(round(sa_/sb_,4));
        elsIf kvb_= gl.baseval and sa_<>0 then w_val :=to_char(round(sb_/sa_,4));
@@ -738,7 +768,7 @@ end if;
 ---------------------BEGIN: SPM НБУ---------------------
 -- с расчетом Реализ.рез. SPM по методике НБУ (Для КБ и НБУ)
 -- Описание  в doc\Modules Manual\SPM\Den_0.doc,
---26.03.2008 Сухова Заменила С УЧЕТОМ ПОКУПКИ-ПРОДАЖИ БАНК.СЛИТКОВ 
+--26.03.2008 Сухова Заменила С УЧЕТОМ ПОКУПКИ-ПРОДАЖИ БАНК.СЛИТКОВ
  IF kv_ <>kvk_            AND
     SUBSTR(nlsm_,1,1)<'8' AND
     SUBSTR(nlsk_,1,1)<'8' AND
@@ -759,31 +789,41 @@ end if;
 ---------------------END: SPM НБУ---------------------
 
   -- создание MT200 по документу CVE
-  If gl.aMFO  = '300465' and tt_ = 'CVE' 
+  If gl.aMFO  = '300465' and tt_ = 'CVE'
   then
     execute immediate 'begin sw_200(:p_REF); end;' using ref_;
   end if;
 
   ---Вставка в чергу для передачі в ЦБД по валютообміну
-  if instr(getglobaloption('TTLST'),tt_)>0 
+  if instr(getglobaloption('TTLST'),tt_)>0
   then
     execute immediate 'insert into val_queue(ref, tt) values(:ref, :tt)' using ref_, tt_;
   end if;
 
 end PAYTT;
 /
-
 show err;
 
-grant EXECUTE on PAYTT to ABS_ADMIN;
-grant EXECUTE on PAYTT to BARS_ACCESS_DEFROLE;
-grant EXECUTE on PAYTT to CP_ROLE;
-grant EXECUTE on PAYTT to INSPECTOR;
-grant EXECUTE on PAYTT to OPER000;
-grant EXECUTE on PAYTT to OPERKKK;
-grant EXECUTE on PAYTT to PYOD001;
-grant EXECUTE on PAYTT to RCC_DEAL;
-grant EXECUTE on PAYTT to START1;
-grant EXECUTE on PAYTT to WR_ALL_RIGHTS;
-grant EXECUTE on PAYTT to WR_DOC_INPUT;
-grant EXECUTE on PAYTT to WR_IMPEXP;
+PROMPT *** Create  grants  PAYTT ***
+grant EXECUTE                                                                on PAYTT           to ABS_ADMIN;
+grant EXECUTE                                                                on PAYTT           to BARS009;
+grant EXECUTE                                                                on PAYTT           to BARS010;
+grant EXECUTE                                                                on PAYTT           to BARS014;
+grant EXECUTE                                                                on PAYTT           to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on PAYTT           to CP_ROLE;
+grant EXECUTE                                                                on PAYTT           to INSPECTOR;
+grant EXECUTE                                                                on PAYTT           to OPER000;
+grant EXECUTE                                                                on PAYTT           to OPERKKK;
+grant EXECUTE                                                                on PAYTT           to PYOD001;
+grant EXECUTE                                                                on PAYTT           to RCC_DEAL;
+grant EXECUTE                                                                on PAYTT           to START1;
+grant EXECUTE                                                                on PAYTT           to TEST;
+grant EXECUTE                                                                on PAYTT           to WR_ALL_RIGHTS;
+grant EXECUTE                                                                on PAYTT           to WR_DOC_INPUT;
+grant EXECUTE                                                                on PAYTT           to WR_IMPEXP;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/PAYTT.sql =========*** End *** ===
+PROMPT ===================================================================================== 

@@ -1,3 +1,5 @@
+
+ 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/tools.sql =========*** Run *** =====
  PROMPT ===================================================================================== 
@@ -339,10 +341,10 @@
     return number;
 end;
 /
-create or replace package body tools as
+CREATE OR REPLACE PACKAGE BODY BARS.TOOLS as
 
    -- Version 2.0   01.10.2017
-    
+
     ANNO_FIRST_DAY constant date := date '0001-01-01';
 
     procedure hide_hint(p_bool in boolean)
@@ -1713,3 +1715,15 @@ create or replace package body tools as
     end;
 end;
 /
+ show err;
+ 
+PROMPT *** Create  grants  TOOLS ***
+grant EXECUTE                                                                on TOOLS           to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on TOOLS           to PFU;
+
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/tools.sql =========*** End *** =====
+ PROMPT ===================================================================================== 
+ 

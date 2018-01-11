@@ -88,7 +88,7 @@ procedure init is
 begin
 	select val
       into G_GMSU_DMN
-      from params
+      from params$base
      where par = 'GMSU_DMN';
 end init;
 

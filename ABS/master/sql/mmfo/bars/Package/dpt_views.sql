@@ -4,8 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/dpt_views.sql =========*** Run *** =
  PROMPT ===================================================================================== 
  
- 
-CREATE OR REPLACE PACKAGE DPT_VIEWS
+  CREATE OR REPLACE PACKAGE BARS.DPT_VIEWS 
 IS
    g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.2 07.03.2017';
 
@@ -79,7 +78,7 @@ TYPE r_portfolio IS record (DPT_ID NUMBER (38),
                   p_dptid    in  tmp_dptrpt.dptid%type) return t_tmp_dptrpt pipelined;
 END;
 /
-CREATE OR REPLACE PACKAGE BODY DPT_VIEWS
+CREATE OR REPLACE PACKAGE BODY BARS.DPT_VIEWS 
 IS
    g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.10 27.05.2017';
 
@@ -112,7 +111,7 @@ IS
     l_portfolio r_portfolio;
    begin
     l_stmt_str := 'select * from (WITH cust AS (SELECT c1.rnk,c1.nmk,c1.okpo,p.bday,p.ser,p.numdoc,p.organ,p.pdate FROM customer c1, person p WHERE c1.rnk = p.rnk AND canilookclient (c1.rnk) = 1 AND c1.rnk = '||to_char(p_rnk)||'),
-               accmainlst as (select a.acc, da.dptid dpt_id,a.nls,a.nms,a.kv,a.ostc,a.ostb,SIGN (a.blkd) blk, a.daos from accounts a, cust, dpt_accounts da where a.rnk = cust.rnk and 
+               accmainlst as (select a.acc, da.dptid dpt_id,a.nls,a.nms,a.kv,a.ostc,a.ostb,SIGN (a.blkd) blk, a.daos from accounts a, cust, dpt_accounts da where a.rnk = cust.rnk and
                ((a.nbs in (''2620'',''2630'') and newnbs.get_state = 1) or (a.nbs in (''2620'',''2630'',''2635'') and newnbs.get_state = 0)) and da.accid = a.acc),
                accintlst  as (select a.acc, da.dptid dpt_id,a.nls,a.nms,a.kv,a.ostc,a.ostb,SIGN (a.blkd) blk, a.daos from accounts a, cust, dpt_accounts da where a.rnk = cust.rnk and a.nbs in (''2628'',''2638'') and da.accid = a.acc),
                lst AS (SELECT dc.rnk,
@@ -143,14 +142,14 @@ IS
                            lst.DPT_DAT,
 						   coalesce(d.dat_begin, (select max(dat_begin) from dpt_deposit_clos where deposit_id = d.deposit_id))DAT_BEGIN,
                            coalesce(d.dat_end, (select max(dat_end) from dpt_deposit_clos where deposit_id = d.deposit_id))DAT_END,
-                           (select b.vidd from dpt_deposit_clos b where b.deposit_id =  D.DEPOSIT_ID and b.idupd in (select max( a.idupd ) 
+                           (select b.vidd from dpt_deposit_clos b where b.deposit_id =  D.DEPOSIT_ID and b.idupd in (select max( a.idupd )
                                                                                                                      from dpt_deposit_clos a
                                                                                                                      where a.deposit_id = b.deposit_id)) VIDD_CODE,
-                                                                                                               
-                           (SELECT type_name FROM dpt_vidd WHERE vidd in (select b.vidd from dpt_deposit_clos b where b.deposit_id =  D.DEPOSIT_ID and b.idupd in (select max( a.idupd ) 
+
+                           (SELECT type_name FROM dpt_vidd WHERE vidd in (select b.vidd from dpt_deposit_clos b where b.deposit_id =  D.DEPOSIT_ID and b.idupd in (select max( a.idupd )
                                                                                                                                                                    from dpt_deposit_clos a
                                                                                                                                                                    where a.deposit_id = b.deposit_id)) ) VIDD_NAME,
-                           
+
                            /*lst.VIDD_CODE,
                            lst.VIDD_NAME,*/
                            dpt_web.get_dptrate (accmainlst.acc,
@@ -330,14 +329,13 @@ IS
 end;
 /
  show err;
-
+ 
 PROMPT *** Create  grants  DPT_VIEWS ***
 grant DEBUG,EXECUTE                                                          on DPT_VIEWS       to BARS_ACCESS_DEFROLE;
 
-
-
- PROMPT =====================================================================================
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/dpt_views.sql =========*** End *** =
- PROMPT =====================================================================================
  
-/
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/dpt_views.sql =========*** End *** =
+ PROMPT ===================================================================================== 
+ 
