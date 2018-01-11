@@ -49,12 +49,14 @@ PROMPT *** Create  view V_CIM_CREDIT_CONTRACTS ***
           ccd.creditor_type,
           (SELECT name
              FROM cim_creditor_type
-            WHERE id = ccd.creditor_type),
+            WHERE id = ccd.creditor_type
+              and delete_date is null),
           ccd.borrower,
           ccd.credit_type,
           (SELECT name
              FROM cim_credit_type
-            WHERE id = ccd.credit_type),
+            WHERE id = ccd.credit_type
+              and delete_date is null),
           --ccd.credit_period, (select name from cim_credit_period where id=ccd.credit_period),
           ccd.credit_term,
           (SELECT name
@@ -126,9 +128,7 @@ PROMPT *** Create  view V_CIM_CREDIT_CONTRACTS ***
           AND c.contr_type = 2;
 
 PROMPT *** Create  grants  V_CIM_CREDIT_CONTRACTS ***
-grant SELECT                                                                 on V_CIM_CREDIT_CONTRACTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_CREDIT_CONTRACTS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CIM_CREDIT_CONTRACTS to UPLD;
 
 
 
