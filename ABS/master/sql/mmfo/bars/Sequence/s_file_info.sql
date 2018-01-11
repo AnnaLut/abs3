@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  sequence S_FILE_INFO ***
 
-   CREATE SEQUENCE  BARS.S_FILE_INFO  MINVALUE 1 MAXVALUE 999999999999999999 INCREMENT BY 1 START WITH 366497 CACHE 20 NOORDER  NOCYCLE ;
+   CREATE SEQUENCE  BARS.S_FILE_INFO  MINVALUE 0 MAXVALUE 999999999999999999 INCREMENT BY 1 START WITH 43206182 CACHE 20 NOORDER  NOCYCLE ;
 
 PROMPT *** Create  grants  S_FILE_INFO ***
 grant SELECT                                                                 on S_FILE_INFO     to BARS_ACCESS_DEFROLE;
