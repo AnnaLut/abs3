@@ -90,6 +90,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  IMPORT_ACTIVITY ***
+grant SELECT                                                                 on IMPORT_ACTIVITY to BARSREADER_ROLE;
 grant SELECT                                                                 on IMPORT_ACTIVITY to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on IMPORT_ACTIVITY to START1;
 grant SELECT                                                                 on IMPORT_ACTIVITY to WR_REFREAD;

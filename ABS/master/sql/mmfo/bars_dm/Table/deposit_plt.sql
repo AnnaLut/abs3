@@ -53,7 +53,7 @@ begin
 	ROSP_M NUMBER(1,0), 
 	MAL NUMBER(1,0), 
 	BEN NUMBER(1,0), 
-	VIDD_NAME VARCHAR2(50),
+	VIDD_NAME VARCHAR2(50), 
 	WB CHAR(1)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
@@ -64,15 +64,9 @@ exception when others then
 end; 
 /
 
-begin   
- execute immediate '
-  ALTER TABLE BARS_DM.DEPOSIT_PLT ADD WB char(1)';
-exception when others then
-  if  sqlcode=-1430 then null; else raise; end if;
- end;
-/
 
 COMMENT ON TABLE BARS_DM.DEPOSIT_PLT IS '';
+COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.WB IS '';
 COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.PER_ID IS '';
 COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.DEPOSIT_ID IS '';
 COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.BRANCH IS '';
@@ -170,7 +164,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DEPOSIT_PLT ***
+grant SELECT                                                                 on DEPOSIT_PLT     to BARSREADER_ROLE;
 grant SELECT                                                                 on DEPOSIT_PLT     to BARSUPL;
+grant SELECT                                                                 on DEPOSIT_PLT     to UPLD;
 
 
 

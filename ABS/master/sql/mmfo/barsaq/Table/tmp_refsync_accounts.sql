@@ -123,10 +123,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0010365 ***
+PROMPT *** Create  constraint SYS_C0010367 ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.TMP_REFSYNC_ACCOUNTS MODIFY (OSTB NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.TMP_REFSYNC_ACCOUNTS MODIFY (OSTF NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -363,10 +363,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0010367 ***
+PROMPT *** Create  constraint SYS_C0010365 ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.TMP_REFSYNC_ACCOUNTS MODIFY (OSTF NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.TMP_REFSYNC_ACCOUNTS MODIFY (OSTB NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -376,6 +376,7 @@ exception when others then
 
 PROMPT *** Create  grants  TMP_REFSYNC_ACCOUNTS ***
 grant DELETE,INSERT,SELECT                                                   on TMP_REFSYNC_ACCOUNTS to BARS;
+grant SELECT                                                                 on TMP_REFSYNC_ACCOUNTS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT                                                   on TMP_REFSYNC_ACCOUNTS to KLBX;
 grant SELECT                                                                 on TMP_REFSYNC_ACCOUNTS to REFSYNC_USR;
 

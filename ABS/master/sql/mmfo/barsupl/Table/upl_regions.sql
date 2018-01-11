@@ -63,6 +63,10 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  UPL_REGIONS ***
+grant SELECT                                                                 on UPL_REGIONS     to BARSREADER_ROLE;
+grant SELECT                                                                 on UPL_REGIONS     to UPLD;
+
 
 
 PROMPT ===================================================================================== 

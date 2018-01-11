@@ -35,8 +35,7 @@ begin
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 5 PCTUSED 0 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
-  TABLESPACE BRSUPLD 
-  PARALLEL ';
+  TABLESPACE BRSUPLD ';
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 
 end; 
@@ -77,58 +76,6 @@ begin
   ALTER TABLE BARSUPL.UPL_STATS_ARCHIVE ADD CONSTRAINT PK_UPLSTATSARCHIVE PRIMARY KEY (ID)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSUPLD  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_UPLSTATSARCHIVE_STATUSID ***
-begin   
- execute immediate '
-  ALTER TABLE BARSUPL.UPL_STATS_ARCHIVE ADD CONSTRAINT FK_UPLSTATSARCHIVE_STATUSID FOREIGN KEY (STATUS_ID)
-	  REFERENCES BARSUPL.UPL_PROCESS_STATUS (STATUS_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_STATSARC_UPLREGIONS ***
-begin   
- execute immediate '
-  ALTER TABLE BARSUPL.UPL_STATS_ARCHIVE ADD CONSTRAINT FK_STATSARC_UPLREGIONS FOREIGN KEY (KF)
-	  REFERENCES BARSUPL.UPL_REGIONS (KF) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_UPLSTATSARCHIVE_PARENTID ***
-begin   
- execute immediate '
-  ALTER TABLE BARSUPL.UPL_STATS_ARCHIVE ADD CONSTRAINT FK_UPLSTATSARCHIVE_PARENTID FOREIGN KEY (PARENT_ID)
-	  REFERENCES BARSUPL.UPL_STATS_ARCHIVE (ID) ON DELETE CASCADE ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_UPLSTATSARCHIVE_RECORDTYPE ***
-begin   
- execute immediate '
-  ALTER TABLE BARSUPL.UPL_STATS_ARCHIVE ADD CONSTRAINT FK_UPLSTATSARCHIVE_RECORDTYPE FOREIGN KEY (REC_TYPE)
-	  REFERENCES BARSUPL.UPL_STATS_RECORDTYPE (REC_TYPE) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -180,6 +127,7 @@ exception when others then
 
 PROMPT *** Create  grants  UPL_STATS_ARCHIVE ***
 grant DELETE,INSERT,SELECT                                                   on UPL_STATS_ARCHIVE to BARS;
+grant SELECT                                                                 on UPL_STATS_ARCHIVE to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT                                                   on UPL_STATS_ARCHIVE to UPLD;
 
 

@@ -62,7 +62,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DM_OBJ ***
+grant SELECT                                                                 on DM_OBJ          to BARSREADER_ROLE;
 grant SELECT                                                                 on DM_OBJ          to BARSUPL;
+grant SELECT                                                                 on DM_OBJ          to UPLD;
 
 
 

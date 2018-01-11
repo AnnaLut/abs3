@@ -32,10 +32,10 @@ COMMENT ON COLUMN BARSAQ.DOC_CUREX_PARAMS.BANK_ID IS '';
 
 
 
-PROMPT *** Create  constraint CC_DOCCUREXPARAMS_VALUE_NN ***
+PROMPT *** Create  constraint CC_DOCCUREXPARAMS_PARID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.DOC_CUREX_PARAMS MODIFY (PAR_VALUE CONSTRAINT CC_DOCCUREXPARAMS_VALUE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.DOC_CUREX_PARAMS MODIFY (PAR_ID CONSTRAINT CC_DOCCUREXPARAMS_PARID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -44,10 +44,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DOCCUREXPARAMS_PARID_NN ***
+PROMPT *** Create  constraint CC_DOCCUREXPARAMS_VALUE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.DOC_CUREX_PARAMS MODIFY (PAR_ID CONSTRAINT CC_DOCCUREXPARAMS_PARID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.DOC_CUREX_PARAMS MODIFY (PAR_VALUE CONSTRAINT CC_DOCCUREXPARAMS_VALUE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -106,6 +106,9 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  DOC_CUREX_PARAMS ***
+grant SELECT                                                                 on DOC_CUREX_PARAMS to BARSREADER_ROLE;
 
 
 

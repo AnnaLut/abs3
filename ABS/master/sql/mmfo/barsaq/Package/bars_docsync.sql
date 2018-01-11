@@ -597,9 +597,10 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
         l_d_rec := '';
         for s in (select w.tag, w.value, f.vspo_char from bars.operw w, bars.op_field f
                     where w.ref=l_ref and w.tag=f.tag
-                    and f.vspo_char is not null and f.vspo_char not in ('f','F','C','П')
+                    and f.vspo_char is not null and f.vspo_char not in ('F','C','П')
                   )
         loop
+            if s.vspo_char = 'f' and d.mfo_a = '300465' then continue; end if; 
             l_d_rec := l_d_rec || '#'||s.vspo_char||s.value;
         end loop;
         if l_d_rec is not null and length(l_d_rec)>0 then
@@ -694,7 +695,8 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
                 if d.tt in ('IBB','IBO','IBS') then
                     delete from bars.sw_template where doc_id=d.ext_ref;
                 end if;
-                bars.bars_audit.error('DOCSYNC: '||substr(dbms_utility.format_error_stack(), 1, 3900));
+                bars.bars_audit.error('DOCSYNC: '||substr(dbms_utility.format_error_stack()||chr(10)
+        ||dbms_utility.format_error_backtrace(), 1, 3900));
                 -- сохраняем информацию об ошибке
                 l_err_code := SQLCODE;
                 l_err_msg  := substr(dbms_utility.format_error_stack()||chr(10)

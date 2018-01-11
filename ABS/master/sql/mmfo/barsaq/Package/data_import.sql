@@ -1,8 +1,10 @@
+
+ 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARSAQ/package/data_import.sql =========*** Run *
  PROMPT ===================================================================================== 
  
-CREATE OR REPLACE PACKAGE BARSAQ.data_import is
+  CREATE OR REPLACE PACKAGE BARSAQ.DATA_IMPORT is
 
   -- global consts
   G_HEADER_VERSION constant varchar2(64)  := 'version 1.32 15/07/2015';
@@ -451,7 +453,7 @@ CREATE OR REPLACE PACKAGE BARSAQ.data_import is
   -- sync_acctariffs - Синхронизация тарифов между схемами BANK -> CORE
   --
   procedure sync_acctariffs;
-  
+
 
 procedure sync_acc_transactions2_TEST(
     p_startdate in date    default null,
@@ -464,8 +466,7 @@ procedure sync_acc_transactions2_TEST(
 
 end data_import;
 /
-
-CREATE OR REPLACE PACKAGE BODY BARSAQ.data_import is
+CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
 
   -- global consts
   G_BODY_VERSION constant varchar2(64)  := 'version 1.97 14/03/2017';
@@ -1879,7 +1880,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.data_import is
                         );
                 l_cnt := sql%rowcount;
             else
-                if l_bankid = f.kf then 
+                if l_bankid = f.kf then
                 -- по одному счету
                 insert
                   into acc_turnovers (
@@ -2051,7 +2052,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.data_import is
                 l_cnt := sql%rowcount;
             else
                 -- по одному счету
-                if l_bankid = f.kf then 
+                if l_bankid = f.kf then
                 insert
                   into acc_turnovers (
                           bank_id, acc_num, cur_id, turns_date, prev_turns_date,
@@ -2177,7 +2178,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.data_import is
                and bank_id = f.kf;
             l_cnt := sql%rowcount;
         else
-            if l_bankid = f.kf then 
+            if l_bankid = f.kf then
             delete
               from acc_transactions
              where bank_id = l_bankid
@@ -2529,7 +2530,7 @@ procedure sync_acc_transactions2_TEST(
            and v.groupid (+) not in (77, 80, 81, 30, 130)
            and v.status (+) = 2)
            loop
-dbms_application_info.set_action(cur_r.rn||'/'||cur_r.cnt||' Parent'); 
+dbms_application_info.set_action(cur_r.rn||'/'||cur_r.cnt||' Parent');
         l_ref92_bank_id := null;
         l_ref92_cust_code := null;
         l_ref92_acc_num := null;
@@ -2608,7 +2609,7 @@ dbms_application_info.set_action(cur_r.rn||'/'||cur_r.cnt||' Parent');
           )
           loop
 
-dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld'); 
+dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         l_ref92_bank_id := null;
         l_ref92_cust_code := null;
         l_ref92_acc_num := null;
@@ -2652,7 +2653,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     --
   end sync_acc_transactions2_TEST;
 
-  
+
   ----
   -- sync_acc_period_transactions2 - синхронизирует проводки в АБС для передачи в систему
   --
@@ -4482,9 +4483,9 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     -- чтение общих атрибутов
     l_doc.dk       := get_attr_number(l_body, 'BUY_SELL_FLAG');
     -- кількість доданих документів до заявки
-    if is_attr_exists(l_body, 'ATTACHMENT_MAILID') then 
+    if is_attr_exists(l_body, 'ATTACHMENT_MAILID') then
         l_attachments_count := 1;
-    end if;    
+    end if;
 
     -- получим валюту которая покупается
     l_doc.kv2      := get_attr_number(l_body, 'DOC_CURRENCY');
@@ -6234,7 +6235,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
           select ca.rnk, ca.type_id, ca.country, ca.zip, ca.domain, ca.region, ca.locality, ca.address, c.kf
             from bars.customer_address as of scn l_scn ca where rnk in (select rnk from ibank_rnk where kf = c.kf);
         end loop;
-  
+
         write_sync_status(TAB_CUST_ADDRESSES, JOB_STATUS_INPROGRESS, 'вставка даних в БД corp2');
         --
         rpc_sync.fill_cust_addresses;
@@ -6706,8 +6707,8 @@ end data_import;
  show err;
  
 PROMPT *** Create  grants  DATA_IMPORT ***
-grant EXECUTE                                                                on BARSAQ.DATA_IMPORT     to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on BARSAQ.DATA_IMPORT     to IBANK_ADMIN;
+grant EXECUTE                                                                on DATA_IMPORT     to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on DATA_IMPORT     to IBANK_ADMIN;
 
  
  

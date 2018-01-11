@@ -55,6 +55,9 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  AQ_SUBSCRIBERS ***
+grant SELECT                                                                 on AQ_SUBSCRIBERS  to BARSREADER_ROLE;
+
 
 
 PROMPT ===================================================================================== 

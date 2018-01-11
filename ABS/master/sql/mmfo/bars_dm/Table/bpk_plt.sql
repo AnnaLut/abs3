@@ -57,8 +57,8 @@ begin
 	DOS NUMBER(24,0), 
 	W4_ARSUM VARCHAR2(254), 
 	W4_KPROC VARCHAR2(254), 
-	W4_SEC VARCHAR2(254),
-	acc number
+	W4_SEC VARCHAR2(254), 
+	ACC NUMBER
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -70,6 +70,7 @@ end;
 
 
 COMMENT ON TABLE BARS_DM.BPK_PLT IS '';
+COMMENT ON COLUMN BARS_DM.BPK_PLT.ACC IS '';
 COMMENT ON COLUMN BARS_DM.BPK_PLT.PER_ID IS '';
 COMMENT ON COLUMN BARS_DM.BPK_PLT.BRANCH IS '';
 COMMENT ON COLUMN BARS_DM.BPK_PLT.KF IS '';
@@ -120,13 +121,6 @@ COMMENT ON COLUMN BARS_DM.BPK_PLT.W4_ARSUM IS '';
 COMMENT ON COLUMN BARS_DM.BPK_PLT.W4_KPROC IS '';
 COMMENT ON COLUMN BARS_DM.BPK_PLT.W4_SEC IS '';
 
-begin   
- execute immediate '
-  ALTER TABLE BARS_DM.BPK_PLT ADD ACC number';
-exception when others then
-  if  sqlcode=-1430 then null; else raise; end if;
- end;
-/
 
 
 
@@ -202,10 +196,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BPKPLT_RNK_NN ***
+PROMPT *** Create  constraint CC_BPKPLT_PERID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS_DM.BPK_PLT ADD CONSTRAINT CC_BPKPLT_RNK_NN CHECK (RNK IS NOT NULL) ENABLE';
+  ALTER TABLE BARS_DM.BPK_PLT ADD CONSTRAINT CC_BPKPLT_PERID_NN CHECK (PER_ID IS NOT NULL) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -214,10 +208,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BPKPLT_PERID_NN ***
+PROMPT *** Create  constraint CC_BPKPLT_RNK_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS_DM.BPK_PLT ADD CONSTRAINT CC_BPKPLT_PERID_NN CHECK (PER_ID IS NOT NULL) ENABLE';
+  ALTER TABLE BARS_DM.BPK_PLT ADD CONSTRAINT CC_BPKPLT_RNK_NN CHECK (RNK IS NOT NULL) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -240,7 +234,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  BPK_PLT ***
+grant SELECT                                                                 on BPK_PLT         to BARSREADER_ROLE;
 grant SELECT                                                                 on BPK_PLT         to BARSUPL;
+grant SELECT                                                                 on BPK_PLT         to UPLD;
 
 
 

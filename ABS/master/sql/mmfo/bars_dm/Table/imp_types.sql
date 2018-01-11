@@ -76,7 +76,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  IMP_TYPES ***
+grant SELECT                                                                 on IMP_TYPES       to BARSREADER_ROLE;
 grant SELECT                                                                 on IMP_TYPES       to BARSUPL;
+grant SELECT                                                                 on IMP_TYPES       to UPLD;
 
 
 

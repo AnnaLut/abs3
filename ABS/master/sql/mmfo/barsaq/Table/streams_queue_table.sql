@@ -114,6 +114,9 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  STREAMS_QUEUE_TABLE ***
+grant SELECT                                                                 on STREAMS_QUEUE_TABLE to BARSREADER_ROLE;
+
 
 
 PROMPT ===================================================================================== 

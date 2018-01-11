@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure CALCULATE_PROVISION ***
 
- CREATE OR REPLACE procedure BARSUPL.CALCULATE_PROVISION
+  CREATE OR REPLACE PROCEDURE BARSUPL.CALCULATE_PROVISION 
 ( p_date  in   bars.nbu23_rez.fdat%type,
   p_kf    in   varchar2
 ) is
@@ -21,12 +21,21 @@ PROMPT *** Create  procedure CALCULATE_PROVISION ***
 begin
   l_calc_dt := nvl(p_date,trunc(sysdate,'MM'));
   l_calc    := to_char(l_calc_dt,'dd-mm-yyyy');
+    select CODE_CHR
+     into l_region_code
+      from barsupl.UPL_REGIONS
+     where kf = p_kf;
+
   l_stmt := 'BEGIN'||chr(10);
 --l_stmt := l_stmt || '  execute immediate ''ALTER SESSION ENABLE PARALLEL DML'';'                   ||chr(10);
-  l_stmt := l_stmt || '  dbms_application_info.set_action(''CALCULATE_PROVISION_' || l_region_code || ''');'                 ||chr(10);
+  l_stmt := l_stmt || '  dbms_application_info.set_action(''CALCULATE_PROVISION_' || l_region_code || ''');'                ||chr(10);
+  l_stmt := l_stmt || '  bars.bars_login.login_user(p_sessionid => substr(sys_guid(), 1, 32),'       ||chr(10);
+  l_stmt := l_stmt || '                             p_userid    => '|| bars.gl.aUID ||','            ||chr(10);
+  l_stmt := l_stmt || '                             p_hostname  => null,'                            ||chr(10);
+  l_stmt := l_stmt || '                             p_appname   => ''UPLD:CALCULATE_PROVISION_'|| l_region_code ||''');'    ||chr(10);
   l_stmt := l_stmt || '  BARS.BC.GO('''|| p_kf ||'''); '                                             ||chr(10);
-  l_stmt := l_stmt || '  BARS.GL.SETP(''RESERVE'',SYS_CONTEXT(''USERENV'',''SID''),NULL);'           ||chr(10);
-  l_stmt := l_stmt || '  BARS.BARS_UTL_SNAPSHOT.START_RUNNING;'                                      ||chr(10);
+  --l_stmt := l_stmt || '  BARS.GL.SETP(''RESERVE'',SYS_CONTEXT(''USERENV'',''SID''),NULL);'           ||chr(10);
+  --l_stmt := l_stmt || '  BARS.BARS_UTL_SNAPSHOT.START_RUNNING;'                                      ||chr(10);
   l_stmt := l_stmt || '  --- '                                                                       ||chr(10);
   l_stmt := l_stmt || '  dbms_application_info.set_client_info(''Z23.ZALOG('||l_calc ||');'');'      ||chr(10);
   l_stmt := l_stmt || '  BARS.Z23.ZALOG(to_date(''' || l_calc ||''',''dd-mm-yyyy''));'               ||chr(10);  -- 05.Ðîçðàõóíîê ÇÀÁÅÇÏÅ×ÅÍÍß
@@ -36,12 +45,12 @@ begin
   l_stmt := l_stmt || '  dbms_application_info.set_client_info(NULL);'                               ||chr(10);
   l_stmt := l_stmt || '  dbms_application_info.set_action(NULL);'                                    ||chr(10);
   l_stmt := l_stmt || '  -- '                                                                        ||chr(10);
-  l_stmt := l_stmt || '  BARS.BARS_UTL_SNAPSHOT.STOP_RUNNING;'                                       ||chr(10);
-  l_stmt := l_stmt || '  BARS.GL.SETP(''RESERVE'','''',NULL);'                                       ||chr(10);
+  --l_stmt := l_stmt || '  BARS.BARS_UTL_SNAPSHOT.STOP_RUNNING;'                                       ||chr(10);
+  --l_stmt := l_stmt || '  BARS.GL.SETP(''RESERVE'','''',NULL);'                                       ||chr(10);
   l_stmt := l_stmt || 'EXCEPTION'                                                                    ||chr(10);
   l_stmt := l_stmt || '  when OTHERS then'                                                           ||chr(10);
-  l_stmt := l_stmt || '    BARS.BARS_UTL_SNAPSHOT.STOP_RUNNING;'                                     ||chr(10);
-  l_stmt := l_stmt || '    BARS.GL.SETP(''RESERVE'','''',NULL);'                                     ||chr(10);
+  --l_stmt := l_stmt || '    BARS.BARS_UTL_SNAPSHOT.STOP_RUNNING;'                                     ||chr(10);
+  --l_stmt := l_stmt || '    BARS.GL.SETP(''RESERVE'','''',NULL);'                                     ||chr(10);
   l_stmt := l_stmt || '    dbms_application_info.set_action(NULL);'                                  ||chr(10);
   l_stmt := l_stmt || '    dbms_application_info.set_client_info(NULL);'                             ||chr(10);
   l_stmt := l_stmt || '    BARS.BARS_AUDIT.INFO( ''CALCULATE_PROVISION_' || l_region_code || ' ERROR: ''||'                  ||chr(10);

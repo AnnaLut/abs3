@@ -99,6 +99,7 @@ COMMENT ON COLUMN BARSAQ.TOAD_PLAN_TABLE.OTHER_XML IS '';
 
 
 PROMPT *** Create  grants  TOAD_PLAN_TABLE ***
+grant SELECT                                                                 on TOAD_PLAN_TABLE to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TOAD_PLAN_TABLE to PUBLIC;
 
 

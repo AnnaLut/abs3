@@ -83,6 +83,9 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  SYNC_TABLES ***
+grant SELECT                                                                 on SYNC_TABLES     to BARSREADER_ROLE;
+
 
 
 PROMPT ===================================================================================== 

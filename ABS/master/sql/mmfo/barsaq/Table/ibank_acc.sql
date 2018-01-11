@@ -66,19 +66,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_IBANKACC_BANKS ***
-begin   
- execute immediate '
-  ALTER TABLE BARSAQ.IBANK_ACC ADD CONSTRAINT FK_IBANKACC_BANKS FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_IBANKACC ***
 begin   
  execute immediate '
@@ -91,6 +78,9 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  IBANK_ACC ***
+grant SELECT                                                                 on IBANK_ACC       to BARSREADER_ROLE;
 
 
 

@@ -52,6 +52,7 @@ COMMENT ON COLUMN BARSAQ.TMP_REFSYNC_CUR_RATES$BASE.SYSTEM_CHANGE_NUMBER IS '';
 
 PROMPT *** Create  grants  TMP_REFSYNC_CUR_RATES$BASE ***
 grant DELETE,INSERT,SELECT                                                   on TMP_REFSYNC_CUR_RATES$BASE to BARS;
+grant SELECT                                                                 on TMP_REFSYNC_CUR_RATES$BASE to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT                                                   on TMP_REFSYNC_CUR_RATES$BASE to KLBX;
 grant SELECT                                                                 on TMP_REFSYNC_CUR_RATES$BASE to REFSYNC_USR;
 
