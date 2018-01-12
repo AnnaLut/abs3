@@ -5,7 +5,6 @@ CREATE OR REPLACE PROCEDURE REZ_ND_VAL_1200(p_dat01 date, p_mode integer) IS
 */
 nv    nd_val%rowtype; l_s080   specparam.s080%type   ; l_tip_fin  rez_cr.tip_fin%type; l_fin  rez_cr.fin%type;
 l_pd  number; l_vkr varchar2(3);
-
 fl_  integer; l_dat31  date; l_time    number; l_d1   date ; 
 
 begin
