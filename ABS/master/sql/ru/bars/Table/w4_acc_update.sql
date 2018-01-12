@@ -67,7 +67,14 @@ exception when others then
 end; 
 /
 
-
+PROMPT *** Add column KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.W4_ACC_UPDATE add KF VARCHAR2(6)';
+exception when others then
+  if  sqlcode=-01430 or sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
 
 
 PROMPT *** ALTER_POLICIES to W4_ACC_UPDATE ***
@@ -123,8 +130,14 @@ exception when others then
  end;
 /
 
-
-
+PROMPT *** Create  constraint CC_W4ACCUPD_KF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.W4_ACC_UPDATE MODIFY (KF CONSTRAINT CC_W4ACCUPD_KF_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
 
 PROMPT *** Create  constraint PK_W4ACC_UPDATE ***
 begin   
@@ -136,8 +149,6 @@ exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
-
-
 
 
 PROMPT *** Create  constraint SYS_C002125076 ***
