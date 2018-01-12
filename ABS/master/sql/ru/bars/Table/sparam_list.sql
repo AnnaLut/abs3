@@ -38,7 +38,8 @@ begin
 	TABCOLUMN_CHECK VARCHAR2(30), 
 	CODE VARCHAR2(30) DEFAULT ''OTHERS'', 
 	HIST NUMBER(1,0), 
-	MAX_CHAR NUMBER(10,0)
+	MAX_CHAR NUMBER(10,0),
+	DEF_FLAG varchar2(1) default ''N''
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -48,7 +49,14 @@ exception when others then
 end; 
 /
 
-
+prompt add def_flag column
+begin
+	execute immediate q'[alter table bars.sparam_list add def_flag varchar2(1) default 'N']';
+exception
+	when others then
+		if sqlcode = -1430 then null; else raise; end if;
+end;
+/
 
 
 PROMPT *** ALTER_POLICIES to SPARAM_LIST ***
@@ -72,6 +80,7 @@ COMMENT ON COLUMN BARS.SPARAM_LIST.DELONNULL IS 'Флаг: удалять строку из справоч
 COMMENT ON COLUMN BARS.SPARAM_LIST.NSISQLWHERE IS 'Условие фильтра для справочника';
 COMMENT ON COLUMN BARS.SPARAM_LIST.SQLCONDITION IS 'Условие для отбора параметра';
 COMMENT ON COLUMN BARS.SPARAM_LIST.TAG IS 'Наименование поля';
+COMMENT ON COLUMN BARS.SPARAM_LIST.DEF_FLAG IS 'Признак установки значения по-умолчанию (acc_reg.set_default_sparams)';
 
 
 
@@ -247,6 +256,15 @@ exception when others then
  end;
 /
 
+prompt Create index I_SPARAM_LIST_NAME (on upper(SPARAM_LIST.NAME))
+begin
+    execute immediate '
+    create index I_SPARAM_LIST_NAME on bars.sparam_list(upper(name)) tablespace brssmli compute statistics';
+exception
+    when others then
+        if sqlcode = -955 then null; else raise; end if;
+end;
+/
 
 
 PROMPT *** Create  grants  SPARAM_LIST ***

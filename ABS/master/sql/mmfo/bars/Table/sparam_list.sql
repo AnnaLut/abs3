@@ -1,9 +1,7 @@
 
 
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/SPARAM_LIST.sql =========*** Run *** =
-PROMPT ===================================================================================== 
 
+PROMPT BARS/Table/SPARAM_LIST.sql
 
 PROMPT *** ALTER_POLICY_INFO to SPARAM_LIST ***
 
@@ -40,7 +38,8 @@ begin
 	CODE VARCHAR2(30) DEFAULT ''OTHERS'', 
 	HIST NUMBER(1,0), 
 	MAX_CHAR NUMBER(10,0), 
-	BRANCH VARCHAR2(30) DEFAULT sys_context(''bars_context'',''user_branch'')
+	BRANCH VARCHAR2(30) DEFAULT sys_context(''bars_context'',''user_branch''),
+	DEF_FLAG varchar2(1) default ''N''
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -50,7 +49,14 @@ exception when others then
 end; 
 /
 
-
+prompt add def_flag column
+begin
+	execute immediate q'[alter table bars.sparam_list add def_flag varchar2(1) default 'N']';
+exception
+	when others then
+		if sqlcode = -1430 then null; else raise; end if;
+end;
+/
 
 
 PROMPT *** ALTER_POLICIES to SPARAM_LIST ***
@@ -75,6 +81,7 @@ COMMENT ON COLUMN BARS.SPARAM_LIST.CODE IS '';
 COMMENT ON COLUMN BARS.SPARAM_LIST.HIST IS 'ѕризнак: используетс€ в историзированной таблице параметров';
 COMMENT ON COLUMN BARS.SPARAM_LIST.MAX_CHAR IS 'Max кол-во символов';
 COMMENT ON COLUMN BARS.SPARAM_LIST.BRANCH IS 'Hierarchical Branch Code';
+COMMENT ON COLUMN BARS.SPARAM_LIST.DEF_FLAG IS 'ѕризнак установки значени€ по-умолчанию (acc_reg.set_default_sparams)';
 
 
 
@@ -236,6 +243,16 @@ exception when others then
  end;
 /
 
+prompt Create index I_SPARAM_LIST_NAME (on upper(SPARAM_LIST.NAME))
+begin
+    execute immediate '
+    create index I_SPARAM_LIST_NAME on bars.sparam_list(upper(name)) tablespace brssmli compute statistics';
+exception
+    when others then
+        if sqlcode = -955 then null; else raise; end if;
+end;
+/
+
 
 
 PROMPT *** Create  grants  SPARAM_LIST ***
@@ -250,9 +267,3 @@ grant SELECT                                                                 on 
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SPARAM_LIST     to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SPARAM_LIST     to WR_REFREAD;
 grant SELECT                                                                 on SPARAM_LIST     to WR_VIEWACC;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Table/SPARAM_LIST.sql =========*** End *** =
-PROMPT ===================================================================================== 

@@ -1,10 +1,5 @@
+CREATE OR REPLACE PACKAGE cck IS
 
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/cck.sql =========*** Run *** =======
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.CCK IS
   g_header_version CONSTANT VARCHAR2(64) := 'ver.3.24  10/11/2017 ';
 
   /*
@@ -1171,9 +1166,11 @@
 
 END cck;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
+
+CREATE OR REPLACE PACKAGE BODY cck IS
+
   -------------------------------------------------------------------
-  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.2.7  16/12/2017 ';
+  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.2.8  12/01/2018 ';
   ------------------------------------------------------------------
 
   /*
@@ -3598,7 +3595,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
                        END)
          WHERE acc = k.acc
         RETURNING mdate INTO wdatl_;
-        bars.cck_specparam(k.acc,
+        pul.PUT('MODULE', 'CCK');
+        pul.PUT('ND', nd_);
+
+        accreg.set_default_sparams(p_acc => k.acc);
+        /* bars.cck_specparam(k.acc,
                            k.nls,
                            k.kv,
                            k.tip,
@@ -3607,7 +3608,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
                            dat1_,
                            wdatl_,
                            nvidd_,
-                           nd_);
+        nd_);*/
       END LOOP;
     END IF;
 
@@ -7673,7 +7674,12 @@ end if;
     END IF;
 
     -- Заполнение спецпараметров
-    bars.cck_specparam(acc_,
+    -- заміняємо на новий механізм
+    pul.PUT('MODULE', 'CCK');
+    pul.PUT('ND', nd_);
+
+    accreg.set_default_sparams(p_acc => acc_);
+    /*bars.cck_specparam(acc_,
                        nls_,
                        kv_,
                        tip_,
@@ -7682,7 +7688,7 @@ end if;
                        sdatl_,
                        nvl(mda_, mdate_),
                        vidd_,
-                       nd_);
+    nd_);*/
 
     -- привязать к залогам
     IF tip_ IN ('SS ', 'SL ', 'SP ', 'CR9', 'SN ', 'SNO', 'SPN') THEN
@@ -16015,18 +16021,11 @@ BEGIN
 
 END cck;
 /
- show err;
- 
+show err;
+
 PROMPT *** Create  grants  CCK ***
 grant EXECUTE                                                                on CCK             to BARS009;
 grant EXECUTE                                                                on CCK             to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on CCK             to RCC_DEAL;
 grant EXECUTE                                                                on CCK             to WR_ALL_RIGHTS;
 grant EXECUTE                                                                on CCK             to WR_CREDIT;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/cck.sql =========*** End *** =======
- PROMPT ===================================================================================== 
- 
