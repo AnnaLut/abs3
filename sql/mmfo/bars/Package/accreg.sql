@@ -1,17 +1,12 @@
 
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/accreg.sql =========*** Run *** ====
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.ACCREG 
+create or replace package ACCREG
 is
 
 --***************************************************************************--
 -- (C) BARS. Accounts
 --***************************************************************************--
 
-g_head_version constant varchar2(64)  := 'Version 2.9  24/10/2017';
+g_head_version constant varchar2(64)  := 'Version 2.10  12/01/2018';
 g_head_defs    constant varchar2(512) := '';
 
 /* header_version - возвращает версию заголовка пакета */
@@ -266,9 +261,25 @@ procedure DUPLICATE_ACC
 , p_errmsg      out varchar2          -- Error message
 );
 
+--
+-- Получить умолчательное значение для спецпараметра
+-- Алгоритм расчета зависит от модуля, определяется контекстом 'MODULE'; Необходимые переменные также берутся из контекста
+--
+function get_default_spar_value(p_acc    in accounts.acc%type,
+                                p_spid in sparam_list.spid%type) return varchar2;
+
+--
+-- Проставить умолчательные значения для спецпараметров (по флагу sparam_list.def_flag = 'Y')
+--
+procedure set_default_sparams(p_acc in accounts.acc%type);
+
 end accreg;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.ACCREG 
+
+show err
+
+----------------------------------------------------------------------------------------------------
+create or replace package body ACCREG
 is
 
   --***************************************************************************--
@@ -276,7 +287,7 @@ is
   --***************************************************************************--
   g_modcode       constant varchar2(3) := 'CAC';
 
-  g_body_version  constant varchar2(64)  := 'version 2.0  12/12/2017';
+  g_body_version  constant varchar2(64)  := 'version 2.1  12/01/2018';
   g_body_defs     constant varchar2(512) := ''
 $if ACC_PARAMS.KOD_D6
 $then
@@ -541,6 +552,15 @@ $end
 
 $if ACC_PARAMS.MMFO
 $then
+  bars_audit.info( 'DPA_ACCREG: l_nbs - ' || l_nbs 
+                          || '; nls_ - ' || nls_
+                          || '; accR_ - ' || accR_
+                          || '; rnk_ - ' || rnk_
+                          || '; nms_ - ' || nms_
+                          || '; ob22_ - ' || ob22_
+                          || '; BARS_DPA.DPA_NBS - ' || BARS_DPA.DPA_NBS( l_nbs, ob22_ )
+                   );
+
   if ( BARS_DPA.DPA_NBS( l_nbs, ob22_ ) = 1 )
   then -- COBUMMFO-4028
     BARS_DPA.ACCOUNTS_TAX( p_acc  => accr_
@@ -728,6 +748,16 @@ $end
 
 $if ACC_PARAMS.MMFO
 $then
+  bars_audit.info( 'DPA_ACCREG: l_nbs - ' || l_nbs 
+                          || '; p_acc - ' || p_acc
+                          || '; p_nls - ' || p_nls
+                          || '; p_nbs - ' || p_nbs
+                          || '; p_rnk - ' || p_rnk                          
+                          || '; p_ob22 - ' || p_ob22
+                          || '; p_ob22 - ' || p_mode
+                          || '; BARS_DPA.DPA_NBS - ' || BARS_DPA.DPA_NBS( l_nbs, p_ob22 )
+                          || '; BARS_DPA.DPA_NBS - ' || BARS_DPA.DPA_NBS( p_nbs, p_ob22 )
+                  );
   if ( BARS_DPA.DPA_NBS( l_nbs, p_ob22 ) = 1 and p_mode <> 9)
   then -- COBUMMFO-4028
     BARS_DPA.ACCOUNTS_TAX( p_acc  => p_acc
@@ -2735,10 +2765,125 @@ begin
 
 end DUPLICATE_ACC;
 
-
-
+--
+-- Получить умолчательное значение для спецпараметра
+-- Алгоритм расчета зависит от модуля, определяется контекстом 'MODULE'; Необходимые переменные также берутся из контекста
+--
+function get_default_spar_value(p_acc    in accounts.acc%type,
+                                p_spid in sparam_list.spid%type)
+return varchar2
+is
+title     constant   varchar2(64) := $$PLSQL_UNIT||'.GET_DEFAULT_SPAR_VALUE';
+l_module  varchar2(32);
+l_acc_row accounts%rowtype;
+l_result  varchar2(500);
 begin
+    l_module := pul.get('MODULE');
+    bars_audit.trace(title||': start for acc #'||p_acc||', module ('||l_module||')'||' spid = '||p_spid);
+    select * into l_acc_row from accounts where acc = p_acc;
+
+    if p_spid = 1 then -- R011
+
+        bars_audit.trace(title||': R011. Tip = '||l_acc_row.tip||', nbs='||l_acc_row.nbs);
+        /* общее */
+        if l_acc_row.nbs = '3578' and l_acc_row.tip in ('SK0', 'SK9') then
+            l_result := '1';
+            return l_result;
+        elsif l_acc_row.nbs = '9129' and l_acc_row.tip = 'CR9' then
+            l_result := '4';
+            return l_result;
+        end if;
+        
+        if l_module = 'CCK' then
+            bars_audit.trace(title||': CCK. Tip = '||l_acc_row.tip);
+            
+            /* COBUMMFO-6175 автоматически определяем R011 при открытии счета */
+            if trim(l_acc_row.tip) in ('SS', 'SDI', 'SN') then
+                bars_audit.trace(title||': CCK. Ищем r011 по справочнику');
+begin
+                    select r011
+                    into l_result
+                    from cck_r011
+                    where nbs = l_acc_row.nbs;
+                exception
+                    when no_data_found then
+                        bars_audit.error(title || ': не найдено значение r011 в справочнике для балансового #'||l_acc_row.nbs);
+                end;
+                
+            elsif l_acc_row.tip in ('SNO', 'SNA', 'SP ', 'SPN') then
+                bars_audit.trace(title||': CCK. ND = '||pul.get('ND'));
+                
+                select s.r011
+                into l_result
+                from accounts a
+                join nd_acc n on a.acc = n.acc and a.kf = n.kf and n.nd = pul.get('ND')
+                join specparam s on a.acc = s.acc
+                where
+                (
+                    l_acc_row.tip in ('SNO', 'SNA') and a.tip = 'SN '
+                    or
+                    l_acc_row.tip in ('SP ', 'SPN') and a.tip in ('SS ', 'SN ')
+                )
+                and (dazs is null or dazs > gl.bd)
+                and rownum = 1;
+            end if;
+        elsif l_module = 'BPK' then
   null;
+        end if;
+    elsif p_spid = 2 then -- R013
+        if l_module = 'CCK' then
+            /* COBUMMFO-6282 автоматически определяем R013 при открытии счета */
+            bars_audit.trace(title||': CCK. Tip = '||l_acc_row.tip);
+
+            if l_acc_row.tip in ('SN ', 'SK0') then
+                l_result := '2';
+            elsif l_acc_row.tip in ('SPN', 'SK9', 'OFR') then
+                l_result := '3';
+            else
+                begin
+                    select r013
+                    into l_result
+                    from cck_r013
+                    where nbs = l_acc_row.nbs
+                    and   ob22 = case when ob22 = '-' then '-' else l_acc_row.ob22 end;
+                exception
+                    when no_data_found then
+                        bars_audit.error(title || ': не найдено значение r013 в справочнике для балансового #'||l_acc_row.nbs||', ob22='||l_acc_row.ob22);
+                end;
+            end if;
+        end if;
+    end if;
+
+    bars_audit.trace(title||': Result = '||l_result);
+    return l_result;
+end get_default_spar_value;
+
+--
+-- Проставить умолчательные значения для спецпараметров (по флагу sparam_list.def_flag = 'Y')
+--
+procedure set_default_sparams(p_acc in accounts.acc%type)
+    is
+title       constant   varchar2(64) := $$PLSQL_UNIT||'.SET_DEFAULT_SPARAMS';
+begin
+    bars_audit.trace(title||': start for acc #'||p_acc);
+    for spar in (select *
+                 from sparam_list s
+                 where s.def_flag = 'Y')
+    loop
+        begin
+            if spar.tabname in ('ACCOUNTSW') then
+                setAccountwParam(p_acc, spar.tag, get_default_spar_value(p_acc, spar.spid));
+            else
+                setAccountSParam(p_acc, spar.name, get_default_spar_value(p_acc, spar.spid));
+            end if;
+        exception
+            when others then
+                bars_audit.error(title||': '||SubStr(sqlerrm,12)||' : '||dbms_utility.format_error_stack);
+        end;
+    end loop;
+    bars_audit.trace(title||': finish for acc #'||p_acc);
+end set_default_sparams;
+
 end ACCREG;
 /
  show err;
@@ -2748,10 +2893,3 @@ grant EXECUTE                                                                on 
 grant EXECUTE                                                                on ACCREG          to CUST001;
 grant EXECUTE                                                                on ACCREG          to WR_ALL_RIGHTS;
 grant EXECUTE                                                                on ACCREG          to WR_VIEWACC;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/accreg.sql =========*** End *** ====
- PROMPT ===================================================================================== 
- 
