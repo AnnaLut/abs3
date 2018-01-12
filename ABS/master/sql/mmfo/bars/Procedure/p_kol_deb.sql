@@ -17,11 +17,9 @@
  3) 09-03-2017 - Поиск по РНК в др.активах
  2) 15-02-2017 - Вставила дату закрытия в курсор
  1) 24-01-2017 - Добавлен параметр S080 в p_get_nd_val
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_KOL_DEB.sql =========*** Run ***
 PROMPT ===================================================================================== 
-
 
  l_del     number; l_tip    number; l_fin  number; l_kol number ; l_del_kv  number ; l_fin23 number ; l_xoz_new number  ;
  l_fin_cls number; l_tip_30 number; l_time number; l_nd  integer; fl_       integer; l_f     integer; l_commit  Integer := 0;

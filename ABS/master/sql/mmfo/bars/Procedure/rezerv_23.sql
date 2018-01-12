@@ -37,8 +37,7 @@ CREATE OR REPLACE PROCEDURE BARS.rezerv_23 (dat01_   in date) is
     Групповой метод (2401) в НАДРА
 */
 
-l_oschad   BOOLEAN;  
-l_commit   number:=  0 ;
+l_oschad   BOOLEAN;  l_commit   number:=  0 ;
 IDR_       number;   ost_nal    number;   s_kos      number;   n_n        number;   ARJK_      number;   r013_      number;   
 rez_       number;   pv_        number;   pv_z       number;   pvz_       number;   mfo_       NUMBER;   mfou_      NUMBER;   
 freq_      number;   l_rez      number;   l_rez_30   number;   l_rezq_30  number;   l_rez_0    number;   l_rezq_0   number;   
