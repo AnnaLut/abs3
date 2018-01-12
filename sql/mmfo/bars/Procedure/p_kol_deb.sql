@@ -1,3 +1,4 @@
+CREATE OR REPLACE PROCEDURE p_kol_deb(p_dat01 date, p_mode integer, p_deb integer) IS 
 
 /* Версия 7.5  28-12-2017  25-10-2017  25-09-2017  18-09-2017  04-08-2017  11-07-2017   26-04-2017  09-03-2017   15-02-2017  24-01-2017   05-10-2016
    Визначення Кількості днів прострочки та фін. стану по дебіторці
@@ -17,19 +18,57 @@
  3) 09-03-2017 - Поиск по РНК в др.активах
  2) 15-02-2017 - Вставила дату закрытия в курсор
  1) 24-01-2017 - Добавлен параметр S080 в p_get_nd_val
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_KOL_DEB.sql =========*** Run ***
-PROMPT ===================================================================================== 
+*/
 
+ cd     cc_deal%rowtype; ov  acc_over%rowtype; w4  rez_w4_bpk%rowtype; bpk  v_bbpk_acc%rowtype; l_s080 specparam.s080%type;
  l_del     number; l_tip    number; l_fin  number; l_kol number ; l_del_kv  number ; l_fin23 number ; l_xoz_new number  ;
  l_fin_cls number; l_tip_30 number; l_time number; l_nd  integer; fl_       integer; l_f     integer; l_commit  Integer := 0;
 
-PROMPT *** Create  grants  P_KOL_DEB ***
-grant EXECUTE                                                                on P_KOL_DEB       to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on P_KOL_DEB       to RCC_DEAL;
-grant EXECUTE                                                                on P_KOL_DEB       to START1;
+ l_txt  varchar2(1000); l_deb_bez varchar2(1) := '0'; l_s180 varchar2(1); l_tx  varchar2(30);  l_dat31   date  ; l_d1      date  ; 
 
+ TYPE CurTyp IS REF CURSOR;
+ c0   CurTyp;
 
+begin
+   if p_mode = 0 THEN 
+      begin
+         select 1 into fl_ from rez_log 
+         where fdat = p_dat01 and chgdate > to_date('17-10-2016','dd-mm-yyyy') and kod=351 and  txt like 'Конец Кол-во дней прострочки (дебиторка) 351%' 
+           and rownum=1;
+         return;
+      EXCEPTION WHEN NO_DATA_FOUND THEN  NULL;
+      END;
+   end if;
+   l_xoz_new := nvl(F_Get_Params('XOZ_NEW', 0) ,0);
+   if p_deb = 1 and l_xoz_new = 0 THEN 
+      z23.to_log_rez (user_id , 351 , p_dat01 ,'Конец Кол-во дней прострочки (дебиторка) 351 - l_xoz_new = 0' || l_time || ' мин.');
+      RETURN; 
+   end if;
+   if p_deb = 0 THEN l_tx := ' (фін.+госп.звичайна) ';
+   else              l_tx := ' (госп.з модуля) ';
+   end if;
+   l_d1 := sysdate; 
+   z23.to_log_rez (user_id , 351 , p_dat01 ,'Начало Кол-во дней прострочки (дебиторка) 351' || l_tx);
+   l_dat31 := Dat_last_work (p_dat01 - 1);  -- последний рабочий день месяца
+   pul_dat(to_char(p_dat01,'dd-mm-yyyy'),'');
+   --logger.info('XOZ -1 : p_dat01 = ' || p_dat01 || 'l_xoz_new = ' || l_xoz_new  || 'l_dat31 = ' || l_dat31) ;                          
+   DECLARE
+      TYPE r0Typ IS RECORD 
+         ( TIP       accounts.tip%type,
+           custtype  customer.custtype%type,
+           cus       customer.custtype%type,
+           nbs       accounts.nbs%type,
+           NLS       accounts.nls%type,
+           kv        accounts.kv%type,
+           acc       accounts.acc%type,
+           rnk       accounts.rnk%type,
+           branch    accounts.branch%type,
+           bv        rez_cr.bv%type,
+           deb       rez_deb.deb%type,
+           mdate     accounts.mdate%type,
+           nd        accounts.acc%type
+          );
+   k r0Typ;
 
    begin 
       begin
