@@ -1,5 +1,3 @@
-
- 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/z23.sql =========*** Run *** =======
  PROMPT ===================================================================================== 
@@ -235,11 +233,13 @@ END Z23;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.Z23 IS
 
-  G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 23.4 26-10-2017';
+  G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 23.6 27-11-2017'; 
 
 /*
 
-112) 26-10-2017(23.4) - финансовый лизинг (207*) - обеспечение само на себя по параметру кредитного договора ZAL_LIZ
+114) 27-11-2017(23.6) - Убрала перепривязку задогов по ЦБ
+113) 20-11-2017(23.5) - добавлено в START_REZ - REZ_PAR_9200   убрала (01-12-2017)
+112) 26-10-2017(23.4) - финансовый лизинг (207*) - обеспечение само на себя по параметру кредитного договора ZAL_LIZ 
 111) 11-09-2017 -    Очистка  errors_351 в start_rez
 110) 08-08-2017 -    При отметка закрытых W4 - остатки с корректирующими
 109) 31-07-2017 -    ОВЕР из CC_DEAL по условию VIDD = 110
@@ -1904,8 +1904,8 @@ PROCEDURE start_rez
 
   -- переменные
   aa        accounts%rowtype;
-  kol_max   int    ;  dat31_    date  ; s_dat01  varchar2(10);
-  nd_       number ;  accs_    number ;
+  kol_max   int    ;  dat31_    date  ; l_d1    date  ;  s_dat01  varchar2(10);
+  nd_       number ;  accs_    number ; l_time  number;
 
 begin
 
@@ -1999,7 +1999,25 @@ begin
      from xoz_ref t
      where not exists (select 1 from xoz_ref_arc cl where cl.mdat= p_dat01 and rownum=1);
      commit;
-
+     /*
+     -- формування 
+     begin
+        delete from rez_par_9200 where fdat = p_dat01; 
+        l_d1 := sysdate; 
+        z23.to_log_rez (user_id , 351 , p_dat01 ,'Начало rez_par_9200');
+        for k in ( select p_dat01 fdat,c.custtype,substr(c.nmk,1,35) nmk, 'NEW/' || acc id, - ost_korr(a.acc,dat31_,null,a.nbs) bv, 1 fin, 1 kat, 
+                          c.OKPO, DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, case when d.tipa in (12, 93) then 1 else 0 end PD_0,
+                          d.tipa, a.*, d.tipa_FV  
+                   from accounts a, customer c, rez_deb d 
+                   where d.tipa in (30, 92, 93) and ost_korr(a.acc,dat31_,null,a.nbs) < 0 and a.rnk = c.rnk and a.nbs = d.nbs and (a.dazs is null or  a.dazs>= p_dat01)
+                 )
+        LOOP
+           insert into rez_par_9200 (RNK, ND, FDAT) values (k.rnk,k.acc,P_dat01);
+        end LOOP;                                                                                             
+        l_time := round((sysdate - l_d1) * 24 * 60 , 2 ); 
+        z23.to_log_rez (user_id , 351 , p_dat01 ,'Конец rez_par_9200 - ' || l_time || ' мин.');
+    end;
+    */
   end if;
 --------------------------------------
 
@@ -2050,10 +2068,10 @@ begin
      end;
        z23.to_log_rez (user_id , 351 , p_dat01 ,' допривязка счетов нач процентов+9129 к залогам по КП ');
      -- допривязка счетов нач процентов+9129 к залогам по КП
-     for K1 in (select n.*, a.ostc from accounts a, nd_acc n
-                where a.acc = n.acc
-                 and a.tip not in ('SS ','DEP','DIU','SDI','SNA')
-                 and (a.nls <'3' or a.nbs='9129') and (a.dazs is null or a.dazs >=p_dat01)
+     for K1 in (select n.*, ost_korr(a.acc,dat31_,null,a.nbs) ostc from accounts a, nd_acc n 
+                where a.acc = n.acc 
+                 and a.tip not in ('SS ','DEP','DIU','SDI','SNA') 
+                 and (a.nls <'3' or a.nbs='9129') and (a.dazs is null or a.dazs >=p_dat01) 
                  and not exists (select 1 from cc_accp where accs = a.acc)
               )
      loop
@@ -2134,8 +2152,9 @@ begin
      end loop; -- KO
      z23.to_log_rez (user_id , 351 , p_dat01 ,'Допривязка обеспечения по ЦБ ');
      --Допривязка обеспечения по ЦП
-     for KO in ( select distinct b.ref, z.acc, z.pr_12, z.idz from cp_deal b, cc_accp z
-                 where  z.accs in (b.acc,b.accs,b.accr,accexpn , accexpr, accp, accr2 , accr3)
+/*
+     for KO in ( select distinct b.ref, z.acc, z.pr_12, z.idz from cp_deal b, cc_accp z  
+                 where  z.accs in (b.acc,b.accs,b.accr,accexpn , accexpr, accp, accr2 , accr3) 
                 )
      loop
         FOR O in ( select acc  acc    from cp_deal b where ref = KO.ref and acc     is not null union all
@@ -2151,7 +2170,7 @@ begin
            Z23.ins_accp ( p_ACC => KO.ACC, p_ACCS => O.acc, p_ND => KO.ref, p_PR_12 => KO.pr_12, p_IDZ => KO.idz);
         end loop; -- O
      end loop; -- KO
-
+ */
   end if;
   z23.to_log_rez (user_id , 351 , p_dat01 ,'  delete from acc_nlo;  ');
   If nvl(p_mode ,0) = 0 then

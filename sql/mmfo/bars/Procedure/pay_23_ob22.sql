@@ -211,7 +211,7 @@ BEGIN
    userid_ := user_id;
 
    s_new_ := 0;
-   if nal_='0' and l_user is null THEN
+   if nal_='1' and l_user is null THEN
       --выбираем не оплаченные документы
       --проверка, есть ли за текущую дату расчета непроведенные проводки по резервам
       SELECT count(*) INTO s_new_ FROM oper
@@ -222,7 +222,7 @@ BEGIN
       end if;
    end if;
 
-   if nal_='0' THEN
+   if nal_='1' THEN
 --      DELETE FROM srezerv_errors;
       DELETE FROM rez_doc_maket;
    end if;
@@ -288,7 +288,7 @@ BEGIN
       k r0Typ;
    begin
 
-      if nal_ in ('0','1','5','6','A','B','C','D') THEN
+      if nal_ in ('1','5','7','B','C') THEN
 
          OPEN c0 FOR
          select t.country, t.NBS_REZ, t.OB22_REZ, t.NBS_7f, t.OB22_7f, t.NBS_7r, t.OB22_7r, t.kv   , t.rz    , t.branch, t.sz,
@@ -301,14 +301,15 @@ BEGIN
                        sum(nvl(r.rez_30*100,0)) sz_30   , decode(r.kat,1,1,9,9,2) s080, r.kat r_s080
                 from nbu23_rez r
                 join customer     c on (r.rnk = c.rnk)
-                join srezerv_ob22 o on (r.nbs = o.nbs and o.nal=nal_ AND r.arjk=decode(o.nal,'2','1','0') AND
+                join srezerv_ob22 o on (r.nbs = o.nbs and o.nal=nal_ AND 
                                         r.s250=decode(nal_,'A','8','B','8','C','8','D','8',decode(r.s250,'8','Z',r.s250)) and
                                         nvl(r.ob22,0)= decode(o.ob22,'0',nvl(r.ob22,0),o.ob22) and
                                         decode(r.kat,1,1,2) = decode(o.s080,'0',decode(r.kat,1,1,2),o.s080) and
                                         nvl(r.custtype,0)= decode(o.custtype,'0',nvl(r.custtype,0),o.custtype) and
                                         r.kv = decode(o.kv,'0',r.kv,o.kv) )
-                where fdat = dat01_  and substr(r.id,1,4) <> 'CACP' and r.nd = decode(l_user,null,r.nd,-1,r.nd,l_user)
-                      and nvl(decode(nal_,'0',rezn,'A',rezn,2,rezn,5,rez_30,'C',rez_30,6,rez_30,'D',rez_30,8,r.rez,rez_0),0) <> 0
+                where fdat = dat01_  and substr(r.id,1,4) <> 'CACP' 
+                      and r.nd = decode(l_user,null,r.nd,-1,r.nd,l_user)
+                      and nvl(decode(nal_,'5',rez_30,'C',rez_30,'D',rez_30,'8',r.rez,rez_0),0) <> 0
                 group by c.country,o.NBS_REZ, o.OB22_REZ, o.NBS_7f, o.OB22_7f, o.NBS_7r, o.OB22_7r, o.pr, o.r013, r.KV, r.rz,
                          rtrim(substr(r.branch||'/',1,instr(r.branch||'/','/',1,3)-1),'/')||'/',decode(r.kat,1,1,9,9,2),r.kat
               ) t
@@ -337,12 +338,12 @@ BEGIN
                        decode(r.kat,1,1,9,9,2) s080,r.kat r_s080
                 from nbu23_rez r
                 join customer     c on (r.rnk = c.rnk)
-                join srezerv_ob22 o on (r.nbs = o.nbs and o.nal=decode(nal_,'3','0',nal_) AND r.arjk=decode(o.nal,'2',1,0) AND
+                join srezerv_ob22 o on (r.nbs = o.nbs and o.nal=decode(nal_,'3','1',nal_) AND 
                                         nvl(r.ob22,0)= decode(o.ob22,'0',nvl(r.ob22,0),o.ob22) and
                                         decode(r.kat,1,1,2) = decode(o.s080,'0',decode(r.kat,1,1,2),o.s080) and
                                         nvl(r.custtype,0)= decode(o.custtype,'0',nvl(r.custtype,0),o.custtype) and
                                         r.kv = decode(o.kv,'0',r.kv,o.kv) )
-                where fdat = dat01_ and nvl(decode(nal_,'3',rezn-rez_30,rez_30),0) <> 0 and id like 'CACP%' AND
+                where fdat = dat01_ and nvl(decode(nal_,'3',rez-rez_30,rez_30),0) <> 0 and id like 'CACP%' AND
                       r.nls NOT in ('31145020560509','31145020560510','31141039596966','31148011314426')
                       and r.nd = decode(l_user,null,r.nd,-1,r.nd,l_user)
                 group by c.country, o.NBS_REZ, o.OB22_REZ, o.NBS_7f, o.OB22_7f, o.NBS_7r, o.OB22_7r,o.pr, o.r013,'1', r.KV, r.rz,0,
@@ -372,12 +373,12 @@ BEGIN
                        sum(nvl(r.rez*100,0)) sz,sum(nvl(r.rezn*100,0)) szn,0 sz_30, decode(r.kat,1,1,9,9,2) s080, r.kat r_s080
                 from nbu23_rez r
                 join customer     c on (r.rnk = c.rnk)
-                join srezerv_ob22 o on (r.nbs = o.nbs and o.nal=decode(nal_,'3',0,4,1,nal_) AND r.arjk=decode(o.nal,'2',1,0) AND
+                join srezerv_ob22 o on (r.nbs = o.nbs and o.nal=decode(nal_,'3','1','4','1',nal_) AND 
                                         nvl(r.ob22,0)= decode(o.ob22,'0',nvl(r.ob22,0),o.ob22) and
                                         decode(r.kat,1,1,2) = decode(o.s080,'0',decode(r.kat,1,1,2),o.s080) and
                                         nvl(r.custtype,0)= decode(o.custtype,'0',nvl(r.custtype,0),o.custtype) and
                                         r.kv = decode(o.kv,'0',r.kv,o.kv) )
-                where fdat = dat01_ and nvl(decode(nal_,'0',rezn,2,rezn,3,rezn,r.rez),0) <> 0 and
+                where fdat = dat01_ and nvl(r.rez,0) <> 0 and
                       r.nls in ('31145020560509','31145020560510','31141039596966','31148011314426')
                       and r.nd = decode(l_user,null,r.nd,-1,r.nd,l_user)
                 group by C.COUNTRY,o.NBS_REZ, o.OB22_REZ, o.NBS_7f, o.OB22_7f, o.NBS_7r, o.OB22_7r, o.pr, o.r013, r.nd, r.cc_id,
@@ -395,7 +396,6 @@ BEGIN
                                    t.branch = a7_r.BRANCH  and a7_r.dazs is null)
          group by t.country,t.NBS_REZ, t.OB22_REZ, t.NBS_7f, t.OB22_7f, t.NBS_7r, t.OB22_7r, t.kv, t.rz, t.branch, t.sz, t.szn,
                   t.sz_30  , t.s080  , t.pr      , t.nd    , t.cc_id  , t.nd_cp , t.r_s080 , t.r013;
-
       end if;
 
       loop
@@ -541,13 +541,7 @@ BEGIN
                nls_ := f_newnls2 (NULL, 'REZ' ,k.NBS_REZ, RNK_b, S080_, k.kv, maska_);
                nls_ := vkrzn( substr(gl.aMfo,1,5), NLS_);
                k.r_nls := nls_;
-               select substr(trim('('||k.ob22_rez||')'|| decode(mode_,3,trim(k.CC_ID),'')||
-                            (case when k.r_s080 ='1' then ' 1 кат.'
-                                  when k.r_s080 ='2' then ' 2 кат.'
-                                  when k.r_s080 ='3' then ' 3 кат.'
-                                  when k.r_s080 ='4' then ' 4 кат.'
-                                  else ' 5 кат.' end)
-                     || nmk_ || substr(k.branch,8,8)),1,70) into nms_ from dual;
+               select substr(trim('('||k.ob22_rez||')'|| decode(mode_,3,trim(k.CC_ID),'') || nmk_ || substr(k.branch,8,8)),1,70) into nms_ from dual;
                begin
                   select isp into isp_  from v_gl
                   where kv = k.kv and branch = k.branch and nbs = k.NBS_REZ and dazs is null and isp <> l_absadm and rownum = 1;
@@ -561,7 +555,7 @@ BEGIN
                END;
                if isp_ = 20094 THEN isp_ := l_absadm; end if;
                logger.info('PAY1 : nbs_rez= ' || k.nbs_rez||' ob22_rez='||k.ob22_rez || ' isp_=' || isp_ || ' NLS_=' || nls_ || ' KV=' || k.kv) ;
-               op_reg(99,0,0,GRP_,p4_,rnk_b,nls_,k.kv,nms_,'ODB',isp_,acc_);
+               op_reg(99,0,0,GRP_,p4_,rnk_b,nls_,k.kv,nms_,'REZ',isp_,acc_);
                --logger.info('PAY55 : nls_= ' || nls_||' '||acc_) ;
                k.r_acc:=acc_;
                update accounts set                 daos=dat31_ where acc= acc_ and daos > dat31_ ;
@@ -593,7 +587,9 @@ BEGIN
             else
                s080_:=k.r_s080;
             end if;
-
+         end if;
+         if k.r_acc is not null and fl = 0 THEN
+            update accounts set tip='REZ'         where acc= k.r_acc and tip<>'REZ'; 
          end if;
          -- Для отчетности заполнение R013 для 2400
          --logger.info('PAY6 : acc_= ' || acc_) ;
@@ -733,16 +729,13 @@ BEGIN
                   END IF;
                end if;
                --новая сумма резерва
-               if    nal_ in ('0','A','2')      THEN  s_new_ := k.szn;
-               elsif nal_ ='3'                  THEN  s_new_ := k.szn;
-               elsif nal_ in ('4','8')          THEN  s_new_ := k.sz;
-               elsif nal_ in ('5','C')          THEN  s_new_ := k.sz_30;
-               elsif nal_ in ('6','D')          THEN  s_new_ := k.sz_30;
+               if    nal_  in ('3','4','8')      THEN  s_new_ := k.sz;
+               elsif nal_  in ('5','C')          THEN  s_new_ := k.sz_30;
+               elsif nal_  in ('6','D')          THEN  s_new_ := k.sz_30;
                elsif nal_ ='7'                  THEN  s_new_ := k.sz_30;
                else
-                  if    k.sz_30<>0 and k.szn<>0 THEN  s_new_ := k.sz-k.sz_30-k.szn;
-                  elsif k.sz_30<>0              THEN  s_new_ := k.sz-k.sz_30;
-                  else                                s_new_ := k.sz-k.szn;
+                  if    k.sz_30<>0              THEN  s_new_ := k.sz-k.sz_30;
+                  else                                s_new_ := k.sz;
                   end if;
                end if;
 
@@ -892,7 +885,7 @@ BEGIN
       k r0Typ;
    begin
    if l_user is null THEN
-      if nal_ in ('0','1','2','5','6','A','B','C','D') THEN
+      if nal_ in ('1','5','B','C') THEN
 
          OPEN c0 FOR
          select a.acc r_acc, a.ob22 OB22_REZ, a.nbs NBS_REZ, rtrim(substr(a.branch||'/',1,instr(a.branch||'/','/',1,3)-1),'/')||'/' branch,
@@ -901,10 +894,8 @@ BEGIN
          left join srezerv_ob22 o on a.nbs = o.nbs_rez and a.ob22 = o.ob22_rez
          left join v_gl a7 on (o.NBS_7R = a7.nbs and a7.nbs like '77%'  and o.OB22_7R = a7.ob22 and '980' = a7.kv and
                                rtrim(substr(a.branch||'/',1,instr(a.branch||'/','/',1,3)-1),'/')||'/' = a7.BRANCH and a7.dazs is null )
-         where a.nbs in ('1590','1592',               -- Операцiї на мiжбанкiвському ринку
-                         '1890','2890','3590','3599', -- Дебiторська заборгованнiсть
-                         '2400','2401','3690') and
-               o.nal=decode(nal_,'3','0',nal_) and a.dazs is null and ost_korr(a.acc,dat31_,null,a.nbs) <> 0
+         where a.nbs in (select distinct nbs_rez from srezerv_ob22 where substr(nbs_rez,1,2) not in ('14','31','32')) and
+               o.nal = decode(nal_, '3', '1', '4', '1', nal_) and a.dazs is null and ost_korr(a.acc,dat31_,null,a.nbs) <> 0
                --не формировались проводки
                and not exists (select 1 from rez_doc_maket r  where r.userid = userid_ and r.nlsa = a.nls and  r.kv = a.kv)
                --нет ошибок
@@ -921,9 +912,8 @@ BEGIN
          left join srezerv_ob22 o on a.nbs = o.nbs_rez and a.ob22 = o.ob22_rez
          left join v_gl a7 on (o.NBS_7R = a7.nbs and a7.nbs like '77%'  and o.OB22_7R = a7.ob22 and '980' = a7.kv and
                                rtrim(substr(a.branch||'/',1,instr(a.branch||'/','/',1,3)-1),'/')||'/' = a7.BRANCH and a7.dazs is null )
-         where a.nbs in ('1490','1492','3190','3191', -- ЦП в портфелi на продаж
-                         '1491','1493','3290','3291'  -- ЦП в портфелi до погашення
-                         ) and o.nal=decode(nal_,'3','0','4','1',nal_) and a.dazs is null and ost_korr(a.acc,dat31_,null,a.nbs) <> 0
+         where a.nbs in (select distinct nbs_rez from srezerv_ob22 where substr(nbs_rez,1,2) in ('14','31','32')) 
+           and o.nal=decode(nal_,'3','1','4','1',nal_) and a.dazs is null and ost_korr(a.acc,dat31_,null,a.nbs) <> 0
          --не формировались проводки
          and not exists (select 1 from rez_doc_maket r  where r.userid = userid_ and r.nlsa = a.nls and  r.kv = a.kv)
          --нет ошибок
@@ -932,7 +922,6 @@ BEGIN
                                r.branch = rtrim(substr(a.branch||'/',1,instr(a.branch||'/','/',1,3)-1),'/')||'/' )
          group by a.acc, a.ob22, a.nbs, rtrim(substr(a.branch||'/',1,instr(a.branch||'/','/',1,3)-1),'/')||'/' ,
                   a.nls, a.kv, o.NBS_7R, o.OB22_7R,o.pr;
-
       end if;
 
       loop
@@ -954,6 +943,43 @@ BEGIN
 
          --счета не найдены
          elsif k.r7_acc is null then
+            acc_:=null;
+            nls_ := k.NBS_7R || '0' || substr(k.branch,9,6) || k.OB22_7R ||'0';
+            nls_ := vkrzn( substr(gl.aMfo,1,5), NLS_);
+            nms_ := 'Формир.рез. ' || ',об22=' || k.OB22_7R || ',бранч=' || k.branch;
+            k.r7_nls := nls_;
+
+            begin
+               select isp, rnk into isp_,rnk_b  from v_gl
+               where kv=980 and branch = k.branch and nbs =k.NBS_7R and ostc<>0 and dazs is null and isp<>l_absadm and rownum=1;
+            EXCEPTION WHEN NO_DATA_FOUND THEN isp_ := l_absadm; rnk_b :=to_number('1' || l_code);
+            end;
+            bars_audit.error('222 счет='|| nls_);
+
+            begin
+               select acc into l_acc from accounts where nls=nls_ and kv=980 and dazs is not null;
+               -- или закрыт или поменяли БРАНЧ
+               update accounts set dazs=null, tobo=k.branch where acc=l_acc;
+               update specparam_int set ob22=k.OB22_7R where acc=l_acc;
+               if sql%rowcount=0 then
+                  insert into specparam_int(acc,ob22) values(l_acc, k.OB22_7R);
+               end if;
+               update accounts set ob22 = k.OB22_7R where acc=l_acc and (ob22 <> k.OB22_7R or ob22 is null);
+               k.r7_acc:=l_acc;
+            EXCEPTION WHEN NO_DATA_FOUND THEN
+               op_reg(99,0,0,GRP_,p4_,rnk_b,nls_,980,nms_,'ODB',isp_,acc_);
+               k.r7_acc:=acc_;
+               --update accounts set tobo = k.branch,daos=dat31_ where acc= acc_;
+               update accounts set                 daos=dat31_ where acc= acc_ and daos > dat31_ ;
+               update accounts set tobo = k.branch             where acc= acc_ and tobo <> k.branch ;
+               update specparam_int set ob22=k.OB22_7R where acc=acc_;
+               if sql%rowcount=0 then
+                  insert into specparam_int(acc,ob22) values(acc_, k.OB22_7R);
+               end if;
+               update accounts set ob22 = k.OB22_7R where acc=acc_ and (ob22 <> k.OB22_7R or ob22 is null);
+            end;
+
+/*
             begin
                select acc into l_acc from accounts
                where nbs=k.nbs_7r and ob22 = k.ob22_7r and kv=980 and branch=k.branch and dazs is not null;
@@ -964,6 +990,7 @@ BEGIN
                         k.kv, null,  k.sz, k.NBS_7r||'/'|| k.OB22_7r, 'Рахунок резерву - '||k.r_nls);
                fl := 5;
             end;
+*/
          end if;
          --logger.info('PAY1 : nbs_rez/ob22= ' || k.nbs_rez||'/'||k.ob22_rez|| ' NLS='||k.r_nls) ;
          begin

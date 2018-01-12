@@ -40,44 +40,8 @@ exception when others then
 end; 
 /
 
-
-
-
-PROMPT *** ALTER_POLICIES to REZ_PAR_9200 ***
- exec bpa.alter_policies('REZ_PAR_9200');
-
-
-COMMENT ON TABLE BARS.REZ_PAR_9200 IS 'Параметри рахунків';
-COMMENT ON COLUMN BARS.REZ_PAR_9200.KF IS '';
-COMMENT ON COLUMN BARS.REZ_PAR_9200.COMM IS 'Підстава';
-COMMENT ON COLUMN BARS.REZ_PAR_9200.FDAT IS 'Звітна дата';
-COMMENT ON COLUMN BARS.REZ_PAR_9200.RNK IS 'РНК';
-COMMENT ON COLUMN BARS.REZ_PAR_9200.ND IS 'Реф договора';
-COMMENT ON COLUMN BARS.REZ_PAR_9200.FIN IS 'Клас контрагента';
-COMMENT ON COLUMN BARS.REZ_PAR_9200.VKR IS 'ВКР';
-COMMENT ON COLUMN BARS.REZ_PAR_9200.PD IS 'Значення коефіцієнту імовірності дефолту ';
-
-
-
-
-PROMPT *** Create  constraint PK_REZ_PAR_9200 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.REZ_PAR_9200 ADD CONSTRAINT PK_REZ_PAR_9200 PRIMARY KEY (FDAT, RNK, ND)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_REZPAR9200_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.REZ_PAR_9200 MODIFY (KF CONSTRAINT CC_REZPAR9200_KF_NN NOT NULL ENABLE)';
+begin
+ execute immediate   'alter table REZ_PAR_9200 add (COMM  varchar2(254)) ';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -97,6 +61,14 @@ exception when others then
  end;
 /
 
+begin
+  EXECUTE IMMEDIATE 
+ 'ALTER TABLE REZ_PAR_9200 ADD (CONSTRAINT PK_REZ_PAR_9200 PRIMARY KEY (fdat,RNK,ND))';
+exception when others then
+  -- ORA-02260: table can have only one primary key
+  if SQLCODE = -02260 then null;   else raise; end if; 
+end;
+/
 
 
 PROMPT *** Create  grants  REZ_PAR_9200 ***

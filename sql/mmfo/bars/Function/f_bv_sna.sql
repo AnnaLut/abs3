@@ -6,10 +6,11 @@
  
   CREATE OR REPLACE FUNCTION BARS.F_BV_SNA (p_dat01 date, p_nd integer, p_acc integer, p_kv integer) RETURN number is
 
-/* Версия 1.0 28-10-2016
+/* Версия 1.1 01-12-2017  28-10-2016
    РАСПРЕДЕЛЕНИЕ SNA (невизнанні доходи)
    -------------------------------------
-   28-10-2016 Убрала SDI  EAD не уменьшается на SDI
+   01-12-2017(1.1) Добавила 9129
+   28-10-2016(1.0) Убрала SDI  EAD не уменьшается на SDI
 */
 
 L_dat31  date;
@@ -24,7 +25,7 @@ begin
                                         and  ost_korr(a.acc,l_dat31,null,a.nbs) >0) ss
                           from   nd_acc n, accounts a
                           where  n.nd = p_nd and a.kv = p_kv and n.acc = a.acc and nls not like '3%' and a.nbs<>'2620' and
-                                 ( a.tip in  ('SN ','SL ','SLN','SPN','SNO','SS ','SP ','SK9','SK0') or a.nbs like '15%' or a.nbs in ('2600','2607')) and
+                                 ( a.tip in  ('SN ','SL ','SLN','SPN','SNO','SS ','SP ','SK9','SK0') or a.nbs like '15%' or a.nbs in ('2600','2607','9129')) and
                                  ost_korr(a.acc,l_dat31,null,a.nbs) < 0))
              )
 

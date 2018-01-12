@@ -161,7 +161,7 @@ begin
                   SELECT r013 INTO l_r013 FROM specparam p  WHERE  s.acc = p.acc (+);
                EXCEPTION WHEN NO_DATA_FOUND THEN l_r013 := NULL;
                END;
-               if l_r013 = '2' THEN l_pd := 0; end if;
+               if l_r013 in ('2','V') THEN l_pd := 0; end if;
             end if;
 
             if l_pawn = 11 THEN l_pd := 0; l_pd_0 := 1; l_fin := 1; end if;

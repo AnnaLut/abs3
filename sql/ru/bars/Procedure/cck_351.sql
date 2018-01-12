@@ -196,7 +196,7 @@ begin
 
             end if; 
 
-            if s.nbs in ('9129','9122','9023','9003') THEN
+            if s.nbs in ('9129','9122','9023','9003','9000') THEN 
                begin 
                   SELECT R013 INTO l_r013 FROM specparam p  WHERE  s.acc = p.acc (+);
                EXCEPTION WHEN NO_DATA_FOUND THEN l_r013:= NULL;  
@@ -276,6 +276,8 @@ begin
                      else                     L_CCF := 100;
                      end if;
                   end if;
+               elsif s.nbs in ('9000') and s.rnk = 274267401 and d.nd in (18023180901,18023181501,18023182001) THEN
+                  l_CCF :=  50;
                end if;
                    
                --logger.info('REZ_351 4 : nd = ' || d.nd || ' s.rnk=' || s.rnk ||  ' l_fin=' || l_fin || ' VKR = ' || VKR_  ||' l_idf='|| l_idf ) ;
@@ -316,7 +318,7 @@ begin
                   l_EAD  := nvl(z.bv_all,z.bv02);
                end if;
                l_EAD     := greatest(l_EAD,0);
-               l_s       := z.osta/100;
+               l_s       := z.osta*(l_CCF/100)/100;
                --logger.info('REZ_351 4 : nd = ' || d.nd || ' l_zal_lgd =' || l_zal_lgd || ' l_s =' || l_s ) ;
                l_EAD     := l_EAD * l_CCF/100;
                l_EAD     := round(l_EAD / 100,2);
