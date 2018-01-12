@@ -1582,7 +1582,7 @@ end;
 	begin
 
 	 n_rnk := load_rnk (p_rnk);
-
+     
      Select RZ, kol, kv, custtype, nbs, fin , tipa, idf, pd_0
 		 into l_rz, l_kol , l_kv, l_custtype, l_nbs, l_fin, l_tipa, l_idf, l_pd_0
 		 from rez_cr
@@ -1596,13 +1596,14 @@ end;
 					  goto  get_update;
 			  end if;
 		end loop;
-
+   
 	   --trace(L_MOD, ' Вичитуємо дані ND='||p_nd);
 	   n_nd :=t_deal.rnk(n_rnk).nd.count()+1;
 	   t_deal.rnk(n_rnk).nd(n_nd).nd := p_nd;
 
-
-
+   
+    
+	   
 	 Begin
 
 
@@ -1683,7 +1684,7 @@ end;
 		  and s != -99
 		group by nd, rnk;
 
-
+        
 		--t_deal.rnk(n_rnk).nd(n_nd).kol25 := '['||l_25||']';
 		-- NOT!!!
 		-- функціонування боржника – юридичної особи менше одного року з дати державної реєстрації (не застосовується в разі реорганізації боржника; належності боржника до групи; оцінки боржника за кредитом під інвестиційний проект);
@@ -1826,7 +1827,7 @@ end;
 		end if;
 
 
-		if l_tipa = 3 then
+		if l_tipa in(3,9,10,4) then
 
 	/*
 		t_deal.rnk(n_rnk).nd(n_nd).kol23 :='['||l_.p161_1||l_.p161_2||l_.p161_3||'/'||
@@ -1890,14 +1891,14 @@ end;
 		 l_tmp := null;
 		 l_tmp :=   f_conct('164100000',l_.p164_1)
 		          ||f_conct('164216501',l_.p165_1)
-				  ||f_conct(case when l_fdat>= to_date('01-07-2017','dd-mm-yyyy') then '164216502' else '164216520' end,l_.p165_2)
-				  ||f_conct('164216530',l_.p165_3)
-				  ||f_conct('164216540',l_.p165_4)
-				  ||f_conct('164216550',l_.p165_5)
-				  ||f_conct('164216560',l_.p165_6)
-				  ||f_conct('164216570',l_.p165_7)
-				  ||f_conct('164216580',l_.p165_8)
-				  ||f_conct('164216590',l_.p165_9)
+				  ||f_conct('164216502',l_.p165_2)
+				  ||f_conct('164216503',l_.p165_3)
+				  ||f_conct('164216504',l_.p165_4)
+				  ||f_conct('164216505',l_.p165_5)
+				  ||f_conct('164216506',l_.p165_6)
+				  ||f_conct('164216507',l_.p165_7)
+				  ||f_conct('164216508',l_.p165_8)
+				  ||f_conct('164216509',l_.p165_9)
 				  ||f_conct('164216510',l_.p165_10)
 				  ||f_conct('164216511',l_.p165_11)
 				  ||f_conct('164216512',l_.p165_12)
@@ -2153,20 +2154,25 @@ as
 			end;
 
 
-		 case    when l_c0(i).tipa in (4)  then l_idf := 76;
-			 when l_c0(i).custtype = 2 then l_idf := 56;
-                                                   else l_idf := 60;
+		 case    
+		    when l_c0(i).tipa in (4)  then l_idf := 76;
+			when l_c0(i).custtype = 2 then l_idf := 56;
+                                      else l_idf := 60;
 		 end case;
 
-		 case    when l_c0(i).tipa in (17,21,12,15,6, 5,92,93,30) then l_fin_p := NULL;
-                                                                          else l_fin_p := fin_nbu.zn_p_nd('CLSP', l_idf, p_dat, l_c0(i).nd, l_c0(i).rnk);
-                 end case;
+		case    when l_c0(i).tipa in (17,21,12,15,6, 5,92,93,30) 
+		     then l_fin_p := NULL;
+             else l_fin_p := fin_nbu.zn_p_nd('CLSP', l_idf, p_dat, l_c0(i).nd, l_c0(i).rnk);
+        end case;
 
-	         case    when l_c0(i).tipa in (17,21,12,15,6, 5,92,93,30) then l_fin_d := NULL;
-                                                                          else l_fin_d := fin_nbu.zn_p_nd('CLS', l_idf, p_dat, l_c0(i).nd, l_c0(i).rnk);
-		 end case;
-                 if l_fin_p = 0 THEN l_fin_p := NULL; end if;
-                 if l_fin_d = 0 THEN l_fin_d := NULL; end if;
+	    case    when l_c0(i).tipa in (17,21,12,15,6, 5,92,93,30) 
+		    then l_fin_d := NULL;
+            else l_fin_d := fin_nbu.zn_p_nd('CLS', l_idf, p_dat, l_c0(i).nd, l_c0(i).rnk);
+		end case;
+                 
+		if l_fin_p = 0 THEN l_fin_p := NULL; end if;
+        if l_fin_d = 0 THEN l_fin_d := NULL; end if;
+				 
 	 fin_rep.get_nd_fin_param (P_RNK    => l_c0(i).rnk,
 							   P_ND     => l_c0(i).nd,
 							   P_RW     => l_c0(i).RoW_id,
@@ -2786,7 +2792,7 @@ g_601.nd  :=  p_nd;
 		  from fin_fm
 		 where okpo = l_okpo_grp;
 
-		 dbms_output.put_line('OkpoGrp='||l_okpo_grp||' ZdatGrp='||to_char(z_dat));
+		-- dbms_output.put_line('OkpoGrp='||l_okpo_grp||' ZdatGrp='||to_char(z_dat));
 
 
 		g_601.column17  :=  get_indicator(l_okpo_grp,z_dat,'SALES');
