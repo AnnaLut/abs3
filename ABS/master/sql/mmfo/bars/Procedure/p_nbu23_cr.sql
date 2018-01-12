@@ -9,11 +9,12 @@ PROMPT *** Create  procedure P_NBU23_CR ***
 
   CREATE OR REPLACE PROCEDURE BARS.P_NBU23_CR (p_dat01 date) IS
 
-/* Версия 6.1  13-09-2017  14-07-2017  14-03-2017  03-03-2017  07-02-2017  01-02-2017   21-12-2016
+/* Версия 6.1  28-12-2017  14-07-2017  14-03-2017  03-03-2017  07-02-2017  01-02-2017   21-12-2016  
    Заполнение данных в NBU23_REZ
    -------------------------------------
  8) 14-09-2017 - S180 из ND_VAL
  7) 13-09-2017 - Z из REZ_CR в NBU23_REZ
+ 7) 28-12-2017(6.1) - Дополнительные параметры
  6) 14-07-2017 - Хоз.дебиторка из модуля tipa = 21 в ID nd вместо acc
  5) 14-03-2017 - Убрала условие при удалении из NBU23_REZ
  4) 03-03-2017 specparam
@@ -76,7 +77,45 @@ BEGIN
       end if;
 
    end loop;
-
+   z23.to_log_rez (user_id , 351 , p_dat01   ,'Новые параметры' );
+   for k in (select r.rowid RI,nls,nd,rnk,kol26,
+             fin_nbu.zn_p('PIPB',6,(Select max(fdat) 
+                                    from fin_fm 
+                                    where okpo = (Select okpo 
+                                                  from   fin_cust
+                                                  where  okpo like '_'||lpad(lpad(FIN_NBU.ZN_P_ND_HIST('NUMG', 51, p_dat01, nd, rnk),10,'0'),11,'9') 
+                                                         and  custtype = 5 and rownum = 1)),
+                                   (Select okpo l_okpo_grp 
+                                    from   fin_cust
+                                    where  okpo like '_'||lpad(lpad(FIN_NBU.ZN_P_ND_HIST('NUMG', 51, p_dat01, nd, rnk),10,'0'),11,'9') 
+                                           and  custtype = 5 and rownum = 1)) Z_GRP,
+             fin_nbu.zn_p('CLAS',6,(Select max(fdat) 
+                                    from fin_fm 
+                                    where okpo = (Select okpo 
+                                                  from   fin_cust
+                                                  where  okpo like '_'||lpad(lpad(FIN_NBU.ZN_P_ND_HIST('NUMG', 51, p_dat01, nd, rnk),10,'0'),11,'9') 
+                                                         and  custtype = 5 and rownum = 1)),
+                                   (Select okpo l_okpo_grp 
+                                    from   fin_cust
+                                    where  okpo like '_'||lpad(lpad(FIN_NBU.ZN_P_ND_HIST('NUMG', 51, p_dat01, nd, rnk),10,'0'),11,'9') 
+                                           and  custtype = 5 and rownum = 1)) FIN_GRP,          
+              FIN_NBU.ZN_P_ND_HIST('GRKL',51,p_dat01, nd, rnk) FIN_GRP_KOR, 
+              FIN_NBU.ZN_P_ND_HIST('CLS1',56,p_dat01, nd, rnk) FIN_RNK_KOR,
+              FIN_NBU.ZN_P_ND_HIST('CLS2',56,p_dat01, nd, rnk) FIN_RNK,
+              rez_oznaka (kol26,1) oz_165_not,
+              FIN_NBU.ZN_P_ND_date_hist('VDD1',56,p_dat01, nd, rnk) dat_165_not ,
+              rez_oznaka (kol26,2) oz_166_not,
+              FIN_NBU.ZN_P_ND_date_hist('ZDD1',56,p_dat01, nd, rnk) dat_166_not,
+              rez_oznaka (kol26,3) oz_165,
+              FIN_NBU.ZN_P_ND_date_hist('VDD1',56,p_dat01, nd, rnk) dat_165 
+      from rez_cr r
+      where fdat = p_dat01 and kol24 = '100' )
+   LOOP
+      update rez_cr set z_grp     = k.z_grp     , FIN_GRP    = k.FIN_GRP   , FIN_GRP_KOR = k.FIN_GRP_KOR, FIN_RNK_KOR = k.FIN_RNK_KOR, FIN_RNK     = k.FIN_RNK_KOR,
+                        oz_165_not= k.oz_165_not, oz_166_not = k.oz_166_not, oz_165      = k.oz_165     , dat_165_not = k.dat_165_not, dat_166_not = k.dat_166_not, 
+                        dat_165   = k.dat_165  where rowid = k.RI;
+   end LOOP;
+   z23.to_log_rez (user_id , 351 , p_dat01   ,'Новые параметры' );
    p_bv_balans(p_dat01);
    p_sna_pd(p_dat01);
 
@@ -158,27 +197,27 @@ BEGIN
       dd_ := f_rnk_custtype ( k.rnk );
 
       l_spec   := rez.id_specrez(k.sdate, k.istval, k.kv, l_idr, k.custtype);
-      p_par_23(to_date('01-01-2017','dd-mm-yyyy'), k.acc, k.nd, l_ta, p_fin, p_obs, p_kat, p_k, p_irr);
+      --p_par_23(to_date('01-01-2017','dd-mm-yyyy'), k.acc, k.nd, l_ta, p_fin, p_obs, p_kat, p_k, p_irr);
       p_par_accounts(k.acc, p_isp, p_branch, p_ob22);
       p_par_zalog(p_dat01, k.acc, p_zal_bl, p_zal_blq, p_zal, p_zalQ, p_SUM_IMP, p_SUMQ_IMP, p_zal_sv, p_zal_svq);
 
       begin
-      INSERT INTO NBU23_REZ
-           ( FDAT    , ID       , RNK    , NBS      , KV        , ND       , CC_ID    , ACC       , NLS    , BRANCH    , FIN    , KAT   ,
-             ZAL     , BV       , REZ    , REZQ     , DD        , DDD      , BVQ      , CUSTTYPE  , IDR    , WDATE     , OKPO   , NMK   ,
-             RZ      , ISTVAL   , R013   , ZALQ     , SDATE     , R011     , S180     , S250      , ISP    , OB22      , TIP    , SPEC  ,
-             ZAL_BL  , ZAL_BLQ  , ND_CP  , SUM_IMP  , SUMQ_IMP  , VKR      , ZAL_SV   , ZAL_SVQ   , GRP    , REZ23     , REZQ23 , KAT23 ,
-             S250_23 , EAD      , EADQ   , CR       , CRQ       , KOL_351  , FIN_351  , KPZ       , LGD    , OVKR      , P_DEF  , OVD   ,
-             OPD     , RC       , RCQ    , ZAL_351  , ZALQ_351  , CCF      , TIP_351  , PD_0      , FIN_Z  , ISTVAL_351, RPB    , S080  ,
-             DDD_6B  , PVZ      , PVZQ   , tipa     , S080_z    , FIN_P    , FIN_D    , Z         )
-      values
-           ( k.FDAT  , l_ID     , k.RNK  , k.NBS    , k.kv      , k.ND     , k.CC_ID  , k.ACC     , k.NLS  , P_BRANCH  , k.FIN  , p_kat ,
-             P_ZAL   , k.BV     , k.CR   , k.CRQ    , DD_       , DDD_     , k.BVQ    , k.CUSTTYPE, l_IDR  , k.WDATE   , l_OKPO , k.NMK ,
-             k.RZ    , k.ISTVAL , l_R013 , P_ZALQ   , k.SDATE   , l_r011   , l_S180   , k.S250    , P_ISP  , k.OB22    , k.TIP  , l_SPEC,
-             P_ZAL_BL, P_ZAL_BLQ, L_ND_CP, P_SUM_IMP, P_SUMQ_IMP, k.VKR    , P_ZAL_SV , P_ZAL_SVQ , k.GRP  , k.CR      , k.CRQ  , P_KAT ,
-             k.s250  , k.EAD    , k.EADQ , k.CR     , k.CRQ     , k.KOL    , k.FIN    , k.KPZ     , k.LGD  , k.OVKR    , k.P_DEF, k.OVD ,
-             k.OPD   , k.RC     , k.RCQ  , k.ZAL_BV , k.ZAL_BVQ , k.CCF    , k.TIPA   , k.PD_0    , k.FIN_Z, k.ISTVAL  , k.RPB  , k.s080,
-             k.DDD_6B, k.zal    , k.zalq , l_ta     , k.s080_z  , k.FIN_KOL, k.FIN_KOR, k.Z       );
+      INSERT INTO NBU23_REZ 
+           ( FDAT    , ID       , RNK    , NBS      , KV        , ND       , CC_ID    , ACC       , NLS    , BRANCH    , FIN    , KAT   , 
+             ZAL     , BV       , REZ    , REZQ     , DD        , DDD      , BVQ      , CUSTTYPE  , IDR    , WDATE     , OKPO   , NMK   , 
+             RZ      , ISTVAL   , R013   , ZALQ     , SDATE     , R011     , S180     , S250      , ISP    , OB22      , TIP    , SPEC  , 
+             ZAL_BL  , ZAL_BLQ  , ND_CP  , SUM_IMP  , SUMQ_IMP  , VKR      , ZAL_SV   , ZAL_SVQ   , GRP    , REZ23     , REZQ23 , KAT23 , 
+             S250_23 , EAD      , EADQ   , CR       , CRQ       , KOL_351  , FIN_351  , KPZ       , LGD    , OVKR      , P_DEF  , OVD   , 
+             OPD     , RC       , RCQ    , ZAL_351  , ZALQ_351  , CCF      , TIP_351  , PD_0      , FIN_Z  , ISTVAL_351, RPB    , S080  , 
+             DDD_6B  , PVZ      , PVZQ   , tipa     , S080_z    , FIN_P    , FIN_D    )                                                           
+      values                                                                                                       
+           ( k.FDAT  , l_ID     , k.RNK  , k.NBS    , k.kv      , k.ND     , k.CC_ID  , k.ACC     , k.NLS  , P_BRANCH  , k.FIN  , 1     , 
+             P_ZAL   , k.BV     , k.CR   , k.CRQ    , DD_       , DDD_     , k.BVQ    , k.CUSTTYPE, l_IDR  , k.WDATE   , l_OKPO , k.NMK , 
+             k.RZ    , k.ISTVAL , l_R013 , P_ZALQ   , k.SDATE   , l_r011   , l_S180   , k.S250    , P_ISP  , k.OB22    , k.TIP  , l_SPEC, 
+             P_ZAL_BL, P_ZAL_BLQ, L_ND_CP, P_SUM_IMP, P_SUMQ_IMP, k.VKR    , P_ZAL_SV , P_ZAL_SVQ , k.GRP  , k.CR      , k.CRQ  , P_KAT , 
+             k.s250  , k.EAD    , k.EADQ , k.CR     , k.CRQ     , k.KOL    , k.FIN    , k.KPZ     , k.LGD  , k.OVKR    , k.P_DEF, k.OVD , 
+             k.OPD   , k.RC     , k.RCQ  , k.ZAL_BV , k.ZAL_BVQ , k.CCF    , k.TIPA   , k.PD_0    , k.FIN_Z, k.ISTVAL  , k.RPB  , k.s080, 
+             k.DDD_6B, k.zal    , k.zalq , l_ta     , k.s080_z  , k.FIN_KOL, k.FIN_KOR);
       exception when others then
            --ORA-00001: unique constraint (BARS.PK_NBU23REZ_ID) violated
            if SQLCODE = -00001 then NULL;

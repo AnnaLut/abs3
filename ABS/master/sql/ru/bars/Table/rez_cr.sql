@@ -300,6 +300,104 @@ exception when others then
  end;
 /
 
+begin
+ execute immediate   'alter table REZ_CR add (z_grp number) ';
+exception when others then
+  -- ORA-01430: column being added already exists in table
+  if SQLCODE = - 01430 then null;   else raise; end if; 
+end;
+/
+COMMENT ON COLUMN REZ_CR.Z_GRP  IS 'інтегральний показник групи';
+
+begin
+ execute immediate   'alter table REZ_CR add (FIN_GRP number) ';
+exception when others then
+  -- ORA-01430: column being added already exists in table
+  if SQLCODE = - 01430 then null;   else raise; end if; 
+end;
+/
+COMMENT ON COLUMN REZ_CR.FIN_GRP  IS 'Клас групи, визначений на підставі оцінки фінансового стану';
+
+begin
+ execute immediate   'alter table REZ_CR add (FIN_GRP_KOR number) ';
+exception when others then
+  -- ORA-01430: column being added already exists in table
+  if SQLCODE = - 01430 then null;   else raise; end if; 
+end;
+/
+COMMENT ON COLUMN REZ_CR.FIN_GRP_KOR  IS 'скоригований клас групи';
+
+begin
+ execute immediate   'alter table REZ_CR add (FIN_RNK_KOR number) ';
+exception when others then
+  -- ORA-01430: column being added already exists in table
+  if SQLCODE = - 01430 then null;   else raise; end if; 
+end;
+/
+COMMENT ON COLUMN REZ_CR.FIN_RNK_KOR  IS 'скоригований клас контрагента, який належить до групи пов"язаних контрагентів';
+
+begin
+ execute immediate   'alter table REZ_CR add (FIN_RNK number) ';
+exception when others then
+  -- ORA-01430: column being added already exists in table
+  if SQLCODE = - 01430 then null;   else raise; end if; 
+end;
+/
+COMMENT ON COLUMN REZ_CR.FIN_RNK  IS 'клас контрагента, який належить до групи пов"язаних контрагентів';
+
+begin
+ execute immediate   'alter table REZ_CR add (oz_165_not VARCHAR2(500)) ';
+exception when others then
+  -- ORA-01430: column being added already exists in table
+  if SQLCODE = - 01430 then null;   else raise; end if; 
+end;
+/
+COMMENT ON COLUMN REZ_CR.oz_165_not  IS 'порядковий номер ознак п. 165 Положення №351 за останнім припиненням визнання дефолту за подіями, визначеними в п. 165 за якими не має винятків';
+
+begin
+ execute immediate   'alter table REZ_CR add (Dat_165_not date) ';
+exception when others then
+  -- ORA-01430: column being added already exists in table
+  if SQLCODE = - 01430 then null;   else raise; end if; 
+end;
+/
+COMMENT ON COLUMN REZ_CR.Dat_165_not  IS 'дата останнього припинення визнання дефолту ';
+
+begin
+ execute immediate   'alter table REZ_CR add (oz_166_not VARCHAR2(500)) ';
+exception when others then
+  -- ORA-01430: column being added already exists in table
+  if SQLCODE = - 01430 then null;   else raise; end if; 
+end;
+/
+COMMENT ON COLUMN REZ_CR.oz_166_not  IS 'порядковий номер ознак п. 166 Положення №351 за останнім припиненням визнання дефолту за подіями, визначеними в п. 166 за якими не має винятків';
+
+begin
+ execute immediate   'alter table REZ_CR add (Dat_166_not date) ';
+exception when others then
+  -- ORA-01430: column being added already exists in table
+  if SQLCODE = - 01430 then null;   else raise; end if; 
+end;
+/
+COMMENT ON COLUMN REZ_CR.Dat_166_not  IS 'дата останнього припинення визнання дефолту ';
+
+begin
+ execute immediate   'alter table REZ_CR add (oz_165 VARCHAR2(500)) ';
+exception when others then
+  -- ORA-01430: column being added already exists in table
+  if SQLCODE = - 01430 then null;   else raise; end if; 
+end;
+/
+COMMENT ON COLUMN REZ_CR.oz_165  IS 'порядковий номер ознак п. 165 Положення №351 за останнім припиненням визнання дефолту за подіями, визначеними в п. 165 за якими є виняткі';
+
+begin
+ execute immediate   'alter table REZ_CR add (Dat_165 date) ';
+exception when others then
+  -- ORA-01430: column being added already exists in table
+  if SQLCODE = - 01430 then null;   else raise; end if; 
+end;
+/
+COMMENT ON COLUMN REZ_CR.Dat_165_not  IS 'дата останнього припинення визнання дефолту ';
 
 
 PROMPT *** Create  grants  REZ_CR ***

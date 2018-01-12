@@ -205,15 +205,15 @@ begin
    -- определение параметров
    rezerv_23(dat01_);
    -- налоговый/не налоговый
-   PAY_23_ob22(dat01_, mode_, p_user,'0');
+   --PAY_23_ob22(dat01_, mode_, p_user,'0');
    PAY_23_ob22(dat01_, mode_, p_user,'1');
    PAY_23_ob22(dat01_, mode_, p_user,'5');
-   PAY_23_ob22(dat01_, mode_, p_user,'6');
+   --PAY_23_ob22(dat01_, mode_, p_user,'6');
    -- портфельный метод
-   PAY_23_ob22(dat01_, mode_, p_user,'A');
+   --PAY_23_ob22(dat01_, mode_, p_user,'A');
    PAY_23_ob22(dat01_, mode_, p_user,'B');
    PAY_23_ob22(dat01_, mode_, p_user,'C');
-   PAY_23_ob22(dat01_, mode_, p_user,'D');
+   --PAY_23_ob22(dat01_, mode_, p_user,'D');
    -- ценные бумаги
    PAY_23_ob22(dat01_, mode_, p_user,'3');
    PAY_23_ob22(dat01_, mode_, p_user,'4');

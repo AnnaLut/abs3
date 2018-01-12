@@ -1,6 +1,8 @@
 CREATE OR REPLACE PROCEDURE BARS.rezerv_23 (dat01_   in date) is
-/* Версия 3.1  30-08-2017  14-07-2017  06-06-2017  11-04-2017  03-02-2017
+/* Версия 3.2  05-10-2017  30-08-2017  14-07-2017  06-06-2017  11-04-2017  03-02-2017
    Рівчачок з проміжними комітами
+
+14) 05-10-2017(3.2) - Разделение фин.дебиторки (номер договора из табдицы PRVN_FIN_DEB 
 13) 30-08-2017  -   Резерв брать по хоз.дебиторке  из REZ39 , если прислал FV
 12) 14-07-2017  -   tipa по хоз. дебиторки (21)
 11) 06-06-2017  -   При определении ND в prvn_fin_deb не учитывать EFFECTDATE;  COBUSUPABS-6044
@@ -37,11 +39,10 @@ CREATE OR REPLACE PROCEDURE BARS.rezerv_23 (dat01_   in date) is
 
 l_oschad   BOOLEAN;  
 l_commit   number:=  0 ;
-IDR_       number;   ost_nal    number;   szn_       number;   sznq_      number;   s_kos      number;   n_n        number;
-ARJK_      number;   r013_      number;   rez_       number;   pv_        number;   pv_z       number;   pvz_       number;
-mfo_       NUMBER;   mfou_      NUMBER;   freq_      number;   l_rez      number;   l_rez_30   number;   l_rezq_30  number;
-l_rez_0    number;   l_rezq_0   number;   l_koef     number;   l_tipa     number;   l_diskont  number;   se1_       DECIMAL (24);
-l_xoz_fv   number; 
+IDR_       number;   ost_nal    number;   s_kos      number;   n_n        number;   ARJK_      number;   r013_      number;   
+rez_       number;   pv_        number;   pv_z       number;   pvz_       number;   mfo_       NUMBER;   mfou_      NUMBER;   
+freq_      number;   l_rez      number;   l_rez_30   number;   l_rezq_30  number;   l_rez_0    number;   l_rezq_0   number;   
+l_koef     number;   l_tipa     number;   l_diskont  number;   se1_       DECIMAL (24);  l_xoz_fv   number := 1; 
 -- ДО 30 ДНЕЙ
 o_r013_1   VARCHAR2 (1); o_se_1     DECIMAL (24); o_comm_1   rnbu_trace.comm%TYPE;
 -- ПОСЛЕ 30 ДНЕЙ
@@ -90,8 +91,8 @@ begin
    z23.to_log_rez (user_id , 33 , dat01_ ,'Рівчачок - Початок ');
    l_mfo := gl.aMfo;
    If (getglobaloption('MFOP') = '300465' ) or l_mfo = '300465' THEN l_oschad := true; else l_oschad := false; end if; -- ОЩАД
-   for k in (select substr(n.id,1,4) ID, n.id idkod, n.nd    , n.acc     , n.bvu bv    , a.tip     , a.ob22  , n.rz  , n.cc_id   , n.rnk, a.accc, nd_cp,
-                    n.kv, n.nbs, n.nls , n.r013    , n.branch, n.ROWID RI, nvl(n.kat23 ,n.kat ) kat, s.istval, n.tipa, n.custtype,
+   for k in (select substr(n.id,1,4) ID, n.id idkod, n.nd    , n.acc     , n.bvu bv, a.tip     , n.ob22  , n.rz  , n.cc_id   , n.rnk, a.accc, nd_cp,
+                    n.kv, n.nbs, n.nls , n.r013    , n.branch, n.ROWID RI, 1 kat   , s.istval, n.tipa, n.custtype,
                     -- Если FINEVARE в резерв берется рез.39, только по DEBH - REZ23
                     -- (Совещание в Делойте 12-01-2016, Костенко Г.С.)
                     decode( l_finevare, 1, nvl(n.rez39 ,0), NVL(n.rez23 ,0) ) rez ,
@@ -132,9 +133,8 @@ begin
          ELSif substr(k.id,1,2)<>'RU' and (k.s250<>'8' or k.s250 is null)      THEN k.s250:='7';
          end if;
 
-         ARJK_    := 0    ; szn_      := 0 ; sznq_    := 0    ; s_kos     := 0     ; ND_CP_   := k.nd ; freq_     := NULL;
-         o_r013_1 := null ; o_se_1    := 0 ; o_comm_1 := null ; o_r013_2  := null  ; o_se_2   := 0    ; o_comm_2  := null;
-         l_rez_30 := 0    ; l_rezq_30 := 0 ; l_rez_0  := k.rez; l_rezq_0  := k.rezq; 
+         ARJK_    := 0    ; s_kos     := 0 ; ND_CP_   := k.nd ; freq_    := NULL; o_r013_1  := null ; o_se_1  := 0    ; o_comm_1 := null  ; 
+         o_r013_2 := null ; o_se_2    := 0 ; o_comm_2 := null ; l_rez_30 := 0   ; l_rezq_30 := 0    ; l_rez_0 := k.rez; l_rezq_0 := k.rezq; 
 
          If l_oschad then  -- только ОЩАДБАНК
             --Тип актива
@@ -145,6 +145,7 @@ begin
             elsif k.id like 'OVER%'                   THEN  l_tipa := 10;
             end if;
 
+/*
             if k.id = 'CCK2' THEN
                N_N:= cck_app.Get_ND_TXT (k.nd,'N_NAL');
 
@@ -218,18 +219,20 @@ begin
 
             if szn_ > k.rez Then      szn_  := k.rez;         sznq_ := k.rezq;
             end if;
-
-            if k.nbs in ('3570','3578','3579') THEN
+*/
+            if k.nbs in ('3570','3578') THEN
                begin
-                  select nd into k.nd from nd_acc where acc=k.acc;
+                  select nd into k.nd from nd_acc where acc = k.acc and rownum = 1;
                EXCEPTION WHEN NO_DATA_FOUND THEN null;
                end;
             end if;
 
             -- определение по начисленным процентам не погашенные до 30 дней и более 30 дней
-            if k.nbs in ('1508','1528','2068','2078','2088','2108','2118','2128','2138',
-                         '2208','2238','2607','2627','2657','3118','3570','3578')
-                         and k.rez<>0 THEN
+            if (k.tip in ('SN ','SNO') or 
+               (k.nbs in ('3570') and k.ob22 in ('01','02','03','04','09','11','13','14','15','16','17','18','19','20','21','22',
+                                               '23','24','25','26','27','28','29','30','31','32','33','34','35','36')) or 
+               (k.nbs in ('3578') and k.ob22 in ('01','05','09','15','17','19','21','24','26','28','30','32','33','34','35','36',
+                                               '37','38'))) and k.rez<>0 THEN
                se1_ := -k.bv*100;
 
                begin
@@ -248,13 +251,13 @@ begin
                   if k.bv = -o_se_2/100 THEN
                      l_rez_30 := k.rez; l_rezq_30:= k.rezq;
                      l_rez_0  := 0    ; l_rezq_0 := 0     ;
-                     szn_     := 0    ; sznq_    := 0     ;
                   else
                      l_koef   := -o_se_2/k.bv/100;   l_rez_30 := round(k.rez * l_koef,2);
                      l_rezq_30:= gl.p_icurval (k.kv, l_rez_30*100, dat31_)/100;
-                     l_rez_0  := greatest(k.rez  - l_rez_30  - szn_ , 0);
-                     l_rezq_0 := greatest(k.rezq - l_rezq_30 - sznq_, 0);
+                     l_rez_0  := greatest(k.rez  - l_rez_30  , 0);
+                     l_rezq_0 := greatest(k.rezq - l_rezq_30 , 0);
                   end if;
+/*
                   if k.nbs in ('3570','3578','3118') THEN
                      szn_     := greatest(szn_ - l_rez_30,0);
                      sznq_    := gl.p_icurval (k.kv, szn_*100, dat31_)/100;
@@ -263,26 +266,21 @@ begin
                      l_rez_30 := greatest(l_rez_30-szn_,0);
                      l_rezq_30:= gl.p_icurval (k.kv, l_rez_30*100, dat31_)/100;
                   end if;
-
+*/
                end if;
 
-            elsif k.nbs in ('1509','1529','2029','2039','2069','2079','2089','2109','2119',
-                            '2129','2139','2209','2239','3119') and k.rez<>0 THEN   --and k.s250 <> '8'
-                  o_se_2   := -k.bv*100;
+             elsif k.tip='SPN' and k.rez<>0 THEN 
 
-                  l_rez_30 := k.rez-szn_;
-                  l_rezq_30:= gl.p_icurval (k.kv, (k.rez-szn_)*100, dat31_)/100;
+                  o_se_2   := -k.bv*100;
+                  l_rez_30 := k.rez;
+                  l_rezq_30:= gl.p_icurval (k.kv, (k.rez)*100, dat31_)/100;
                   l_rez_0  := 0;  l_rezq_0 := 0;
 
-            elsif k.nbs in ('3579') and k.rez<>0  THEN
+            elsif (k.tip in ('SK9','OFR') or k.nbs in ('3570','3578')) and k. nbs not in ('3548') and k.rez<>0  THEN 
                   o_se_2   := -k.bv*100; l_rez_30 := k.rez; l_rezq_30:= k.rezq;
-                  l_rez_0  := 0        ; l_rezq_0 := 0    ; szn_     := 0     ;
-                  sznq_    := 0        ;
-            elsif szn_<>0 THEN
-                  l_rez_0  := 0        ; l_rezq_0 := 0;
+                  l_rez_0  := 0        ; l_rezq_0 := 0    ; 
 
-            else
-                  o_se_2   := 0        ; l_rez_30 := 0; l_rezq_30:= 0;
+            else                   o_se_2   := 0; l_rez_30 := 0; l_rezq_30:= 0;
 
             end if;
 
@@ -316,39 +314,38 @@ begin
                   EXCEPTION WHEN NO_DATA_FOUND THEN k.nd := k.acc; l_tipa := 17;
                   end;
                else
-                  --begin
-                  --   select acc_ss into k.nd from prvn_fin_deb where k.acc in (acc_ss,acc_sp) and rownum=1; --acc_ss = k.nd ???
-                  --   l_tipa := 17;
-                  --EXCEPTION WHEN NO_DATA_FOUND THEN
-                     begin
-                        select nd into k.nd from nd_acc where acc=k.acc and rownum=1;
-                        begin
-                           select nd into k.nd from acc_over where nd=k.nd and rownum=1;
-                           l_tipa := 10;
-                        EXCEPTION WHEN NO_DATA_FOUND THEN
-                           l_tipa := 3;
-                        end;
-                     EXCEPTION WHEN NO_DATA_FOUND THEN
-
-                        begin
-                           select nd into k.nd from rez_w4_bpk where acc= k.acc;
-                           l_tipa := 4;
-                        EXCEPTION WHEN NO_DATA_FOUND THEN
-                           l_tipa := 17;
-                           begin
-                              select acc_ss into k.nd from prvn_fin_deb where acc_sp=k.acc;  --and EFFECTDATE < dat01_; COBUSUPABS-6044
-                           EXCEPTION WHEN NO_DATA_FOUND THEN k.nd := k.acc;
-                           end;
-                        end;
-                    end;
+                  begin
+                     select acc_ss into k.nd from prvn_fin_deb where k.acc in (acc_ss,acc_sp) and rownum=1; --acc_ss = k.nd ???
+                     --l_tipa := 17;
+                  EXCEPTION WHEN NO_DATA_FOUND THEN
+                     k.nd := k.acc;
+                     --begin
+                     --   select nd into k.nd from nd_acc where acc=k.acc and rownum=1;
+                     --   begin
+                     --      select nd into k.nd from acc_over where nd=k.nd and rownum=1;
+                     --      l_tipa := 10;
+                     --   EXCEPTION WHEN NO_DATA_FOUND THEN
+                     --      l_tipa := 3;
+                     --   end;
+                     --EXCEPTION WHEN NO_DATA_FOUND THEN
+                        --begin
+                        --   select nd into k.nd from rez_w4_bpk where acc= k.acc;
+                        --   l_tipa := 4;
+                        --EXCEPTION WHEN NO_DATA_FOUND THEN
+                           --l_tipa := 17;
+                           --begin
+                           --   select acc_ss into k.nd from prvn_fin_deb where acc_sp=k.acc;  --and EFFECTDATE < dat01_; COBUSUPABS-6044
+                           --EXCEPTION WHEN NO_DATA_FOUND THEN k.nd := k.acc;
+                           --end;
+                        --end;
+                    --end;
+                  end;
+                  l_tipa := 17;
                end if;
             end if;
-         else  szn_ := 0; sznq_:= 0;
          end if;
 
          idr_ := nvl(rez1.id_nbs(k.nbs),0);
-         if szn_>k.rez Then      szn_  := k.rez;         sznq_ := k.rezq;
-         end if;
 
          if length(k.branch) = 8 THEN
            k.branch := k.branch||'000000/';
@@ -362,9 +359,9 @@ begin
             end;
          end if;
 
-         update nbu23_rez set idr    = idr_ , ARJK  = ARJK_  , rz      = k.rz , cc_id = k.cc_id    , rez    = k.rez      , rezq     = k.rezq  ,
-                              kat    = k.kat, s250  = k.s250 , nd      = k.nd , nd_cp = nd_cp_     , id     = k.idkod    , branch   = k.branch,
-                              rezn   = decode(k.rez,0,0,szn_),reznq    = decode(k.rez,0,0,sznq_)   , bv_30  = -o_se_2/100, custtype = k. custtype,
+         update nbu23_rez set idr    = idr_ , ARJK  = ARJK_  , rz      = k.rz       , cc_id    = k.cc_id    , rez    = k.rez      , rezq     = k.rezq  ,
+                              kat    = k.kat, s250  = k.s250 , nd      = k.nd       , nd_cp    = nd_cp_     , id     = k.idkod    , branch   = k.branch,
+                              rezn   = 0    , reznq = 0      , bv_30   = -o_se_2/100, custtype = k. custtype,
                               bvq_30 = -gl.p_icurval (k.kv, o_se_2 , dat31_)/100, rez_30 = l_rez_30,rezq_30 = l_rezq_30  , tipa     = l_tipa  ,
                               rez_0  = l_rez_0               ,rezq_0  = l_rezq_0
          where rowid = k.RI ;
@@ -385,15 +382,6 @@ begin
             update nbu23_rez set custtype=2 where rowid = k.RI and  fdat=dat01_;
          End LOOP;
       end;
-   end if;
-
-   If l_mfo = '380764'  then  -- только НАДРА
-      for k in ( select n.*,n.ROWID RI from nbu23_rez n where id like('RU%') and n.fdat=dat01_ and trim(s250)='8'
-                               )
-      LOOP
-         update nbu23_rez set  rezn  = decode(rez,0,0,rez), reznq = decode(rez,0,0,rezq) where rowid = k.RI ;
-      eND LOOP;
-
    end if;
 
    begin -- заполнение по счетам дисконта для портфельного метода s250='8'

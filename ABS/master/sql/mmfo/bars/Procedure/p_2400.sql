@@ -53,7 +53,7 @@ DECLARE
 
 begin
 
-      if nal_ in ('0','1','2','5','6','A','B','C','D') THEN
+      if nal_ in ('1','5','7','B','C','D') THEN
 
       OPEN c0 FOR
          select t.ri, t.country, t.id   , t.NBS_REZ, t.OB22_REZ, t.NBS_7f, t.OB22_7f, t.NBS_7r, t.OB22_7r, t.kv   , t.rz   , t.branch,
@@ -65,7 +65,7 @@ begin
                         nvl(r.rez*100,0) sz,nvl(r.rezn*100,0) szn,nvl(r.rez_30*100,0) sz_30, decode(r.kat,1,1,9,9,2) s080,r.kat r_s080
                 from nbu23_rez r
                 join customer     c on (r.rnk = c.rnk)
-                join srezerv_ob22 o on (r.nbs = o.nbs and o.nal=nal_ AND r.arjk=decode(o.nal,'2',1,0) AND
+                join srezerv_ob22 o on (r.nbs = o.nbs and o.nal=nal_  AND
                                         nvl(r.ob22,0) = decode(o.ob22,'0', nvl(r.ob22,0),o.ob22) and
                                         decode(r.kat,1,1,2) = decode(o.s080,'0',decode(r.kat,1,1,2),o.s080) and
                                         r.custtype = decode(o.custtype,'0',r.custtype,o.custtype) and r.kv = decode(o.kv,'0',r.kv,o.kv) )
@@ -91,12 +91,12 @@ begin
                       nvl(r.rez*100,0) sz,nvl(r.rezn*100,0) szn,nvl(r.rez_30*100,0) sz_30, decode(r.kat,1,1,9,9,2) s080,r.kat r_s080
                from nbu23_rez r
                join customer     c on (r.rnk = c.rnk)
-               join srezerv_ob22 o on (r.nbs = o.nbs and o.nal = decode(nal_,'3','0',nal_) AND r.arjk = decode(o.nal,'2',1,0) AND
+               join srezerv_ob22 o on (r.nbs = o.nbs and o.nal = decode(nal_,'3','1',nal_) and
                                        nvl(r.ob22,0) = decode(o.ob22,'0',nvl(r.ob22,0),o.ob22) and
                                        decode(r.kat,1,1,2) = decode(o.s080,'0',decode(r.kat,1,1,2),o.s080) and
                                        nvl(r.custtype,0) = decode(o.custtype,'0',nvl(r.custtype,0),o.custtype) and
                                       r.kv = decode(o.kv,'0',r.kv,o.kv) )
-               where fdat = dat01_ and nvl(decode(nal_,'3',rezn-rez_30,rez_30),0) <> 0 and id like 'CACP%'  and
+               where fdat = dat01_ and nvl(decode(nal_,'3',rez-rez_30,rez_30),0) <> 0 and id like 'CACP%'  and
                      r.nls NOT in ('31145020560509','31145020560510')
               ) t
          --счет резерва
@@ -116,13 +116,12 @@ begin
                       nvl(r.rez*100,0) sz,nvl(r.rezn*100,0) szn,0 sz_30, decode(r.kat,1,1,9,9,2) s080,r.kat r_s080
                from nbu23_rez r
                join customer     c on (r.rnk = c.rnk)
-               join srezerv_ob22 o on (r.nbs = o.nbs and o.nal=decode(nal_,'3','0','4','1',nal_) AND r.arjk=decode(o.nal,'2',1,0) AND
+               join srezerv_ob22 o on (r.nbs = o.nbs and o.nal=decode(nal_,'3','0','4','1',nal_) AND 
                                        nvl(r.ob22,0)= decode(o.ob22,'0',nvl(r.ob22,0),o.ob22) and
                                        decode(r.kat,1,1,2) = decode(o.s080,'0',decode(r.kat,1,1,2),o.s080) and
                                        nvl(r.custtype,0)= decode(o.custtype,'0',nvl(r.custtype,0),o.custtype) and
                                        r.kv = decode(o.kv,'0',r.kv,o.kv) )
-               where fdat = dat01_ and nvl(decode(nal_,'0',greatest(0,rezn-rez_30),2,rezn,3,rezn,4,rezn,rez-rezn),0) <> 0 and
-                     r.nls in ('31145020560509','31145020560510')
+               where fdat = dat01_ and nvl(rez,0) <> 0 and r.nls in ('31145020560509','31145020560510')
               ) t
          --счет резерва
          left join v_gls080 ar on (t.NBS_REZ = ar.nbs    and t.OB22_REZ = ar.ob22 and ar.rz    = t.rz    and t.KV      = ar.kv and
@@ -143,7 +142,7 @@ begin
          elsif nal_ IN ('5','6','7','C','D') and k.sz_30<> 0     THEN
             update nbu23_rez set nls_rez_30= substr(k.r_nls,1,15), acc_rez_30= k.r_acc, ob22_rez_30= k.ob22_rez  where ROWID = K.RI;
          else
-            update nbu23_rez set nls_rezn  = substr(k.r_nls,1,15), acc_rezn  = k.r_acc, ob22_rezn  = k.ob22_rez  where ROWID = K.RI;
+            update nbu23_rez set nls_rez   = substr(k.r_nls,1,15), acc_rez   = k.r_acc, ob22_rez   = k.ob22_rez  where ROWID = K.RI;
          end if;
       end if;
 
