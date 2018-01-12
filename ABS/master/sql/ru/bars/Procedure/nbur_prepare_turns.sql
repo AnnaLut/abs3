@@ -1,12 +1,3 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/NBUR_PREPARE_TURNS.sql =========*** Run **
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure NBUR_PREPARE_TURNS *** 
-
 CREATE OR REPLACE PROCEDURE BARS.NBUR_PREPARE_TURNS (p_kod_filii        varchar2,
                                                      p_report_date      date)
 is
@@ -14,10 +5,12 @@ is
 % DESCRIPTION : Процедурадял підготовки оборотів при зміні плану рахунків
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.01.001  30.10.2017
+% VERSION     :  v.01.002  18.12.2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.01.001  30.10.2017';
+  ver_          char(30)  := 'v.01.002  18.12.2017';
+
 /*
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
    l_nbuc          varchar2(20);
    l_type          number;
@@ -60,7 +53,7 @@ BEGIN
        sum(s.kosq) + decode(sgn, -1, -t.ostqf, 0) kosq_repm
     from temp_sel t, snap_balances s
     where t.acc = s.acc and
-        s.fdat = any(select fdat from fdat where fdat between trunc(p_report_date, 'mm') and p_report_date) 
+        s.fdat = any(select fdat from fdat where fdat between trunc(p_report_date, 'mm') and p_report_date - 1) 
     group by t.fdat, t.kf, t.rnk, t.acc, t.nlsalt, t.kv, t.ob22alt, t.dos, t.dosq, t.kos, t.kosq,
        t.ost, t.ostq,  decode(sgn, 1, t.ostf, 0), decode(sgn, 1, t.ostqf, 0), 
        decode(sgn, -1, -t.ostf, 0), decode(sgn, -1, -t.ostqf, 0)  
@@ -80,10 +73,3 @@ BEGIN
 
 END NBUR_PREPARE_TURNS;
 /
-show err;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/NBUR_PREPARE_TURNS.sql =========*** End **
-PROMPT ===================================================================================== 
