@@ -1,0 +1,31 @@
+﻿using System;
+
+namespace Areas.Mcp.Models
+{
+    public class FileRecordsErr
+    {
+        public decimal ID { get; set; }
+        public decimal FILE_ID { get; set; }
+        public string CHECK_DATE { get; set; }
+        public string BRANCH_CODE { get; set; }
+        public decimal? DEPOSIT_ACC { get; set; }
+        public int? FILIA_NUM { get; set; }
+        public short? DEPOSIT_CODE { get; set; }
+        public decimal? PAY_SUM { get; set; }
+        public string FULL_NAME { get; set; }
+        public string NUMIDENT { get; set; }
+        public string PAY_DAY { get; set; }
+        public string DISPLACED { get; set; }
+        public short? STATE_ID { get; set; }
+        public string STATE_NAME { get; set; }
+        public short? BLOCK_TYPE_ID { get; set; }
+        public string BLOCK_COMMENT { get; set; }
+        public decimal ENVELOPE_FILE_ID { get; set; }
+        public int? RECEIVER_MFO { get; set; }
+        public string KF_BANK { get; set; }
+        public string ACC_BANK { get; set; }
+        public string NMK_BANK { get; set; }
+        public string OKPO_BANK { get; set; }
+        public decimal? RNK { get; set; }
+    }
+}

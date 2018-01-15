@@ -1,0 +1,19 @@
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+
+<script src="~/lib/jsZip/jszip.js"></script>
+<script src="~/Scripts/respond.min.js"></script>
+<script src="~/Scripts/Angular/kendoservice.js?v1.0"></script>
+<script src="~/Scripts/Angular/utilsservice.js?v1.0"></script>
+<script src="~/Scripts/Angular/baseController.js?v1.0"></script>
+<script src="~/Areas/Mcp/Scripts/Mcp/recblockfm.js?v1.0"></script>
+
+<link rel="stylesheet" href="~/Areas/Mcp/Css/Mcp/Main.css" />
+
+<div ng-controller="McpRecBlockFmCtrl">
+    <div class="page-header"><h1>{{Title}}</h1></div>
+
+    <div kendo-grid="filesGrid" k-options="filesGridOptions"></div>
+
+</div>

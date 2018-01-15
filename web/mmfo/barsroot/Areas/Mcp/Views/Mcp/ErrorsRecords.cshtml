@@ -1,0 +1,57 @@
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+
+<script src="~/lib/jsZip/jszip.js"></script>
+<script src="~/Scripts/respond.min.js"></script>
+<script src="~/Scripts/Angular/kendoservice.js?v1.0"></script>
+<script src="~/Scripts/Angular/utilsservice.js?v1.0"></script>
+<script src="~/Scripts/Angular/baseController.js?v1.0"></script>
+<script src="~/Areas/Mcp/Scripts/Mcp/errors_records.js?v1.0"></script>
+
+<link rel="stylesheet" href="~/Areas/Mcp/Css/Mcp/Main.css" />
+
+<div ng-controller="McpErrorCtrl">
+    <div class="page-header"><h1>{{Title}}</h1></div>
+
+    <div class="well">
+        <div class="row">
+            <div class="col-md-1">
+                <div class="form-group">
+                    <label><b>МФО:</b></label>
+                    <input type="text" class="form-control" style="display: inline;width: 120px"
+                           ng-model="filterModel.KF_BANK" />
+                </div>
+            </div>
+            <div class="col-md-1">
+                <div class="form-group">
+                    <label><b>ID реєстру:</b></label>
+                    <input type="text" class="form-control" style="display: inline;width: 120px"
+                           ng-model="filterModel.FILE_ID" />
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label><b>Статус інформаційного рядка:</b></label>
+                    <select kendo-drop-down-list style="width: 200px"
+                            k-data-source="stateRegisterDS"
+                            k-options="stateRegisterOptions">
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-1">
+                <button type="button" ng-click="Search()" class="btn btn-primary" >
+                    <i class="fa fa-search"></i> Пошук
+                </button>
+            </div>
+            <div class="col-md-1">
+                <button type="button" ng-click="Set2Pay()" class="btn btn-primary">
+                    <i class="fa fa-paper-plane-o"></i> Позначити до сплати
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div kendo-grid="filesGrid" k-options="filesGridOptions"></div>
+
+</div>

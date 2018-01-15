@@ -1,0 +1,102 @@
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+
+<script src="~/lib/jsZip/jszip.js"></script>
+<script src="~/Scripts/respond.min.js"></script>
+<script src="~/Scripts/Angular/kendoservice.js?v1.0"></script>
+<script src="~/Scripts/Angular/utilsservice.js?v1.0"></script>
+<script src="~/Scripts/Angular/baseController.js?v1.0"></script>
+<script src="~/Areas/Mcp/Scripts/Mcp/validationConstants.js?v1.0"></script>
+<script src="~/Areas/Mcp/Scripts/Mcp/validationService.js?v1.0"></script>
+<script src="~/Areas/Mcp/Scripts/Mcp/Main.js?v1.0"></script>
+
+<link rel="stylesheet" href="~/Areas/Mcp/Css/Mcp/Main.css" />
+
+<div ng-controller="McpCtrl">
+    <div class="page-header"><h1>{{Title}}</h1></div>
+
+    <div class="well">
+        <div class="row">
+            <div class="col-sm-2">
+                <div class="form-group">
+                    <label class="col-sm-5" style="width:120px"><b>Дата реєстру:</b></label>
+                    <input type="text" class="form-control" style="width:120px"
+                           ng-model="filterModel.DateRegister" kendo-masked-date-picker="" k-options="dateOptions" />
+                </div>
+            </div>
+            <div class="col-sm-2">
+                <div class="form-group">
+                    <label class="col-sm-4" style="width:100px"><b>ID реєстру:</b></label>
+                    <input type="text" class="form-control" style="display: inline;width: 120px"
+                           ng-model="filterModel.IDRegister" />
+                </div>
+            </div>
+            <div class="col-sm-2 col-md-3">
+                <div class="form-group">
+                    <label class="col-sm-4" style="width:130px"><b>Назва реєстру:</b></label>
+                    <input type="text" class="form-control" style="display: inline;width: 170px"
+                           ng-model="filterModel.FileNameRegister" />
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">
+                <div class="form-group">
+                    <label class="col-sm-5" style="width:120px"><b>Тип виплат:</b></label>
+                    <input type="text" class="form-control" style="display: inline;width: 120px"
+                           ng-model="filterModel.PaymentType" />
+                </div>
+            </div>
+            <div class="col-sm-2">
+                <div class="form-group">
+                    <label class="col-sm-4" style="width:100px"><b>МФО:</b></label>
+                    <input type="text" class="form-control" style="display: inline;width: 120px"
+                           ng-model="filterModel.ReceiverMFO" />
+                </div>
+            </div>
+            <div class="col-sm-2 col-md-3">
+                <div class="form-group">
+                    <label class="col-sm-4" style="width:130px"><b>Статус реєстру:</b></label>
+                    <select kendo-drop-down-list style="width: 170px; padding:0px"
+                            k-data-source="stateRegisterDS"
+                            k-options="stateRegisterOptions">
+                    </select>
+                </div>
+            </div>
+            <div class="col-sm-1">
+                <button type="button" ng-click="Search()" class="btn btn-primary" >
+                    <i class="fa fa-search"></i> Пошук
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <span class="label label-danger" ng-show="alertGridFiles_getBalanceRu !== ''">{{alertGridFiles_getBalanceRu}}</span>
+    <span class="label label-danger" ng-show="alertGridFiles_createPay !== ''">{{alertGridFiles_createPay}}</span>
+    <span class="label label-danger" ng-show="alertGridFiles_pay !== ''">{{alertGridFiles_pay}}</span>
+
+    <div kendo-tab-strip="tabStrip" k-options="tabStripOptions" k-content-urls="[ null, null]">
+        <!-- tab list -->
+        <ul>
+            <li class="k-state-active">Файли</li>
+            <li>Інформаційні рядки</li>
+        </ul>
+
+        <div style="padding: 1em">
+            <div kendo-grid="filesGrid" k-options="filesGridOptions"></div>
+        </div>
+
+        <div style="padding: 1em">
+            <div kendo-grid="infoLinesGrid" k-options="infoLinesGridOptions"></div>
+        </div>
+    </div>
+
+    <div data-kendo-window="removeWindow" data-options="removeWindowOptions" style="display: none">
+        <div kendo-grid="infoLinesRemoveGrid" k-options="infoLinesRemoveGridOptions"></div>
+        <div style="margin-top: 4px;text-align: center;">
+            <button class="k-button k-primary" ng-click="onRemoveInfoLines()" ng-disabled="isRemoveInfoLines()">ОК</button>
+        </div>
+    </div>
+
+</div>
