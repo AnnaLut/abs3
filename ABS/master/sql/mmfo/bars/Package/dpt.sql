@@ -97,8 +97,8 @@ procedure p_open_vklad_ex
    p_nlsdep          out accounts.nls%type,                -- номер депозитного счета
    p_nlsint          out accounts.nls%type,                -- номер счета начисленных %%
    p_nlsamr          out accounts.nls%type,                -- номер счета амортизации
-   p_errmsg          out varchar2,						   -- сообщение об ошибке
-   p_wb			  in 	 dpt_deposit.wb%type default 'N'); -- признак открытия через веббанкинг
+   p_errmsg          out varchar2,               -- сообщение об ошибке
+   p_wb       in   dpt_deposit.wb%type default 'N'); -- признак открытия через веббанкинг
 --
 -- Открытие депозитного договора ФЛ
 --
@@ -126,8 +126,8 @@ procedure p_open_vklad
    p_nlsdep          out accounts.nls%type,             -- номер депозитного счета
    p_nlsint          out accounts.nls%type,             -- номер счета начисленных %%
    p_nlsamr          out accounts.nls%type,             -- номер счета амортизации
-   p_errmsg          out varchar2,						-- сообщение об ошибке
-   p_wb			  in 	 dpt_deposit.wb%type default 'N'); -- признак открытия через веббанкинг
+   p_errmsg          out varchar2,            -- сообщение об ошибке
+   p_wb       in   dpt_deposit.wb%type default 'N'); -- признак открытия через веббанкинг
 --
 -- Изменение вида вклада
 --
@@ -270,11 +270,11 @@ function f_dpt_reminder
 -- Прогноз начисленнных процентов за весь срок договора
 --
 function get_forecast_int
-  (p_dpttype    	in  dpt_vidd.vidd%type,       					-- код вида вклада
-   p_dptamount  	in  dpt_vidd.min_summ%type,   					-- сумма вклада в коп.
-   p_opendate   	in  date default bankdate,    					-- дата открытия вклада
-   p_term_months 	in  dpt_vidd.duration%type default null,	  	-- длительность(мес.)
-   p_term_days		in  dpt_vidd.duration_days%type default null)
+  (p_dpttype      in  dpt_vidd.vidd%type,                 -- код вида вклада
+   p_dptamount    in  dpt_vidd.min_summ%type,             -- сумма вклада в коп.
+   p_opendate     in  date default bankdate,              -- дата открытия вклада
+   p_term_months  in  dpt_vidd.duration%type default null,      -- длительность(мес.)
+   p_term_days    in  dpt_vidd.duration_days%type default null)
    return number;
 --
 -- создание / редактирование доп.параметра вида вклада
@@ -402,7 +402,7 @@ end dpt;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.DPT IS
 
-g_body_version  CONSTANT VARCHAR2(64)  := 'version 71.5 22.02.2017';
+g_body_version  CONSTANT VARCHAR2(64)  := 'version 71.7 10.01.2018';
 g_awk_body_defs CONSTANT VARCHAR2(512) := ''
     ||'СБЕРБАНК' ||chr(10)
     ||'BRANCH - схема с иерарх.отделениями и мульти-МФО'||chr(10)
@@ -542,10 +542,9 @@ begin
   begin
 
    /*accreg.SetAccountAttr(99, 0, 0, p1_grp, l_tmp, p1_custid, l_tmpacc.acc_num, l_tmpacc.acc_cur,l_tmpacc.acc_name, p1_type,p1_isp,l_tmpacc.acc_id,'1',p1_ob22);*/
-     /* op_reg_exfl(99, 0, 0, p1_grp, l_tmp, p1_custid, l_tmpacc.acc_num, l_tmpacc.acc_cur,
-           l_tmpacc.acc_name, p1_type, p1_isp, l_tmpacc.acc_id, 1, 2); */
- 	accreg.SetAccountAttr( 99, 0, 0, p1_grp, l_tmp, p1_custid, l_tmpacc.acc_num, l_tmpacc.acc_cur
-                        , l_tmpacc.acc_name, p1_type, p1_isp, l_tmpacc.acc_id, '1', p1_ob22, 2 );
+   /* op_reg_exfl(99, 0, 0, p1_grp, l_tmp, p1_custid, l_tmpacc.acc_num, l_tmpacc.acc_cur, l_tmpacc.acc_name, p1_type, p1_isp, l_tmpacc.acc_id, 1, 2); */
+  accreg.SetAccountAttr( 99, 0, 0, p1_grp, l_tmp, p1_custid, l_tmpacc.acc_num, l_tmpacc.acc_cur, l_tmpacc.acc_name, p1_type, p1_isp, l_tmpacc.acc_id, '1', p1_ob22, 2 );
+
   exception
     when others then
       bars_audit.info('OPENACC_FAILED' || dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace());
@@ -612,7 +611,10 @@ begin
    into l_dep_ob22, l_int_ob22, l_amr_ob22
    from dpt_vidd_params
    where vidd = p_typeid;
-  exception when no_data_found then l_dep_ob22:='00'; l_int_ob22:='00'; l_amr_ob22:='00';
+  exception when no_data_found then 
+    l_dep_ob22:='00'; 
+    l_int_ob22:='00'; 
+    l_amr_ob22:='00';
   end;
 
   open1acc (p1_dptid    =>  p_dptid,
@@ -799,7 +801,7 @@ begin
       when no_data_found then
         l_r011 := null;
       when too_many_rows then
-        l_r011 := case when (p_depnbs = '2620') then '9' else null end;
+        l_r011 := case when (p_depnbs = '2620') then '1' else null end; -- bugfix for task 6172
     end;
 
   end if;
@@ -884,7 +886,7 @@ begin
        and prem    = 'КБ'
        and d_open <= l_bdate
        and nvl(d_close, l_bdate) >= l_bdate
-       and ((r020 = '2630' and newnbs.g_state = 1) or (newnbs.g_state = 0 and r020 in ('2630', '2635')));
+       and ((r020 = '2630' and newnbs.get_state = 1) or (newnbs.get_state = 0 and r020 in ('2630', '2635')));
   exception
     when no_data_found then
       l_s181et := null;
@@ -941,7 +943,8 @@ begin
   end if;
 
   -- заполнение спецпараметра OB22 для деп.счета
-    UPDATE accounts
+  -- commented by Livshyts. Reason - данные параметры заполняются в процедуре open_accounts
+    /*UPDATE accounts
        SET ob22 =
               (SELECT SUBSTR (val, 1, 2)
                  FROM dpt_vidd_params
@@ -962,7 +965,7 @@ begin
                  FROM dpt_vidd_params
                 WHERE vidd = p_dpttype AND tag = 'AMR_OB22')
      WHERE acc = p_amraccid;
-
+     */
   begin
     insert into specparam_int (acc, ob22)
     select p_depaccid, substr(val, 1, 2)
@@ -1719,8 +1722,8 @@ procedure p_open_vklad_ex
    p_nlsdep          out  accounts.nls%type,
    p_nlsint          out  accounts.nls%type,
    p_nlsamr          out  accounts.nls%type,
-   p_errmsg          out  varchar2,						   -- сообщение об ошибке
-   p_wb			  in 	  dpt_deposit.wb%type) 			   -- признак открытия через веббанкинг
+   p_errmsg          out  varchar2,              -- сообщение об ошибке
+   p_wb       in    dpt_deposit.wb%type)         -- признак открытия через веббанкинг
 is
   l_title       varchar2(60)       := 'dptopenex:';
   l_mfo         banks.mfo%type     := gl.amfo;
@@ -1763,7 +1766,7 @@ begin
   bars_audit.trace('%s запуск, вид вклада -%s, № %s от %s на сумму %s, тип откр. - %s',
                    l_title, to_char(p_vidd), p_nd, to_char(p_datz,'dd.mm.yy'),
                             to_char(p_sum), to_char(p_chgtype));
-	-- код відділення демозиту
+  -- код відділення демозиту
   l_branch := nvl(sys_context ('bars_context', 'user_branch'), nvl(tobopack.gettobo, 0));
 
   -- идентификационный код клиента
@@ -1911,7 +1914,7 @@ begin
                    p_amraccid  =>  l_amracc.acc_id,
                    p_amrnbs    =>  l_viddrow.bsa,
                    p_migr      =>  p_migr
-				  );
+          );
   bars_audit.trace('%s заполнены спецпараметры', l_title);
 
   -- заполнение счетов консолидации
@@ -2104,7 +2107,7 @@ begin
                       p_nlsint       => l_nlsn_dmnd,
                       p_nlsamr       => l_nlsa_dmnd,
                       p_errmsg       => l_erm_dmnd,
-   					  p_wb			 => p_wb);
+              p_wb       => p_wb);
 
      l_mfo_dmnd := l_mfo;
 
@@ -2342,7 +2345,7 @@ procedure p_open_vklad
    p_nlsint          out  accounts.nls%type,
    p_nlsamr          out  accounts.nls%type,
    p_errmsg          out  varchar2,
-   p_wb			  in 	  dpt_deposit.wb%type default 'N')
+   p_wb       in    dpt_deposit.wb%type default 'N')
 is
 begin
 
@@ -2370,7 +2373,7 @@ begin
                    p_nlsint       => p_nlsint,
                    p_nlsamr       => p_nlsamr,
                    p_errmsg       => p_errmsg,
-				   p_wb			  => p_wb);
+           p_wb       => p_wb);
 
 end p_open_vklad;
 
@@ -2843,7 +2846,7 @@ begin
      (select dpt_id, vidd, acc, kv, nls, nms, okpo, ost, accn,
              dat_start, dat_begin_old datbeg0, dat_end_old datend0,
              dat_begin_new datbeg1, nvl(p_datend, dat_end_new) datend1,
-	     extension_id, cnt_dubl, cnt_ext_int, dat_ext_int,
+       extension_id, cnt_dubl, cnt_ext_int, dat_ext_int,
              term_m, term_d
         from dpt_auto_extend
        where dpt_id = decode(p_dptid, 0, dpt_id, p_dptid)
@@ -3612,7 +3615,7 @@ BEGIN
         ( l_acc, 3, l_apl_dat, l_sh_rate );
 
     WHEN l_termtype = 1
-    THEN -- Розрахуноквий період	(Штраф розраховується за останній розрахунковий період)
+    THEN -- Розрахуноквий період  (Штраф розраховується за останній розрахунковий період)
 
       bars_audit.trace('DPT.P_SHTRAF: расчетный период '||to_char(l_sh_term));
       p_Comment := p_Comment||'     расчетный период '||l_sh_term||CHR(13)||CHR(10);
@@ -3823,19 +3826,19 @@ BEGIN
               c.nls,       substr(c.nms,1,38)
          INTO nlsa_, kva_, nmsa_, ostn_, nlsb_, kvb_, nmsb_, nlsc_, nmsc_
          FROM accounts a, accounts b, accounts c
-	WHERE a.acc=k.acra AND b.acc=k.acrb AND c.acc=k.acc;
+  WHERE a.acc=k.acra AND b.acc=k.acrb AND c.acc=k.acc;
 
        gl.x_rat(ratO_, ratB_, ratS_, kva_, kvb_, gl.bdate);
        deltaQ_ := delta_ * ratO_;
 
        INSERT INTO oper
            (ref, tt, vob, nd, dk, pdat, vdat, datd,
-	    nam_a, nlsa, mfoa, id_a, nam_b, nlsb, mfob, id_b,
-	    kv, s, kv2, s2, nazn, userid, sos)
+      nam_a, nlsa, mfoa, id_a, nam_b, nlsb, mfob, id_b,
+      kv, s, kv2, s2, nazn, userid, sos)
        VALUES
            (ref_, tt_, vob_, ref_, 1, sysdate, gl.bdate, gl.bdate,
-	    nmsa_, nlsa_, mfo_, k.okpo, nmsb_, nlsb_, mfo_, okpob_,
-	    kva_, delta_, kvb_, deltaQ_, nazn_, user_id, 1);
+      nmsa_, nlsa_, mfo_, k.okpo, nmsb_, nlsb_, mfo_, okpob_,
+      kva_, delta_, kvb_, deltaQ_, nazn_, user_id, 1);
 
        rest_ := greatest(delta_ - ostn_ ,0);
 
@@ -4314,11 +4317,11 @@ BEGIN
        k_mfob  := nvl(k_mfob,  l_mfo);
        k_okpob := nvl(k_okpob, k_okpoa);
 
-	-- вид тікета для документів в нац.вал.
-	-- внутрішні
+  -- вид тікета для документів в нац.вал.
+  -- внутрішні
        IF k_mfob = l_mfo THEN
           l_vob := CASE WHEN k_kva = l_baseval THEN 6 ELSE l_vobFC END;
-	-- зовнішні (VOB береться з картки операції DP6)
+  -- зовнішні (VOB береться з картки операції DP6)
        ELSE
          BEGIN
            SELECT vob INTO l_vob
@@ -4592,14 +4595,14 @@ BEGIN
 
        BEGIN
          SELECT nvl(ir,0) INTO ir_
-	   FROM int_ratn WHERE acc=d.acc AND id=1 AND bdat=dat_ AND br=v.br_id;
+     FROM int_ratn WHERE acc=d.acc AND id=1 AND bdat=dat_ AND br=v.br_id;
        EXCEPTION WHEN NO_DATA_FOUND THEN
          ir_:=1;
        END;
 
        IF ir_ = 0 THEN
           UPDATE int_ratn SET
-    	         br = to_number(NULL),
+               br = to_number(NULL),
                  ir = d.rate
            WHERE acc=d.acc AND id=1 AND bdat=dat_;
        END IF;
@@ -4872,11 +4875,11 @@ END f_dpt_reminder;
 -- Прозноз начисленнных процентов за весь срок договора
 --
 function get_forecast_int
-  (p_dpttype    	in  dpt_vidd.vidd%type,
-   p_dptamount  	in  dpt_vidd.min_summ%type,
-   p_opendate   	in  date default bankdate,
-   p_term_months 	in  dpt_vidd.duration%type default null,
-   p_term_days		in  dpt_vidd.duration_days%type default null)
+  (p_dpttype      in  dpt_vidd.vidd%type,
+   p_dptamount    in  dpt_vidd.min_summ%type,
+   p_opendate     in  date default bankdate,
+   p_term_months  in  dpt_vidd.duration%type default null,
+   p_term_days    in  dpt_vidd.duration_days%type default null)
    return number
 is
    title        varchar2(60) := 'dpt.getforecastint: ';
@@ -4894,8 +4897,8 @@ begin
 
   if l_dptyperow.term_type != 1 and p_term_months is not null and p_term_days is not null
   then
-  		l_dptyperow.duration := p_term_months;
-  		l_dptyperow.duration_days := p_term_days;
+      l_dptyperow.duration := p_term_months;
+      l_dptyperow.duration_days := p_term_days;
   end if;
 
   l_dealterm := get_datend_uni (p_opendate, l_dptyperow.duration, l_dptyperow.duration_days, p_dpttype)
