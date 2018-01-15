@@ -110,21 +110,6 @@ COMMENT ON COLUMN BARS.CIG_CUST_INDIVIDUAL.REG_POST_INDEX IS 'Почтовий індекс(не
 COMMENT ON COLUMN BARS.CIG_CUST_INDIVIDUAL.BRANCH IS '';
 
 
-
-
-PROMPT *** Create  constraint FK_CIGCUSTIND_REGTERRIT ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CIG_CUST_INDIVIDUAL ADD CONSTRAINT FK_CIGCUSTIND_REGTERRIT FOREIGN KEY (REG_TERRITORY_ID)
-	  REFERENCES BARS.TERRITORY (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint FK_CIGCUSTIND_FACRTERRIT ***
 begin   
  execute immediate '
