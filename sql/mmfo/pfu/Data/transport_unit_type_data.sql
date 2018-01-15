@@ -22,6 +22,24 @@ values (14, ''GET_CLEAR_ACC'', ''Получение счетов без оборотов'', 1)';
 end;
 / 
 
+begin
+    execute immediate 'insert into pfu.transport_unit_type (ID, TRANSPORT_TYPE_CODE, TRANSPORT_TYPE_NAME, DIRECTION)
+values (18, ''MSP_GET_ACC_REST'', ''Получение остатка по счету(МСП)'', null)';
+ exception when others then 
+    if sqlcode = -1 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
+    execute immediate 'insert into pfu.transport_unit_type (ID, TRANSPORT_TYPE_CODE, TRANSPORT_TYPE_NAME, DIRECTION)
+values (19, ''MSP_CHECKPAYMSTATE'', ''Опитування статусу платежу(МСП)'', null)';
+ exception when others then 
+    if sqlcode = -1 then null; else raise; 
+    end if; 
+end;
+/ 
 
 
 commit;

@@ -29,43 +29,45 @@
   TRANS_TYPE_SET_CARD_BLOCK   constant varchar2(30) := 'SET_CARD_BLOCK';
   TRANS_TYPE_SET_CARD_UNBLOCK constant varchar2(30) := 'SET_CARD_UNBLOCK';
   TRANS_TYPE_SET_DESTRUCT     constant varchar2(30) := 'SET_DESTRUCT';
+  TRANS_TYPE_MSP_GET_ACC_RST  constant varchar2(30) := 'MSP_GET_ACC_REST';
+  TRANS_TYPE_CHECKSTATE_MSP   constant varchar2(30) := 'MSP_CHECKPAYMSTATE';
   TRANS_TYPE_CHECKBACKSTATE   constant varchar2(30) := 'CHECKBACKSTATE';
-
+  
   function create_transport_unit(p_unit_type_id in number,
                                  p_kf           in varchar2,
                                  p_receiver_url in varchar2,
                                  p_request_data in clob)
   return number;
-
+  
   function create_transport_unit(p_unit_type_code in varchar2,
-                                 p_kf           in varchar2,
+                                 p_kf           in varchar2,    
                                  p_receiver_url   in varchar2,
                                  p_request_data   in clob)
   return number;
-
+  
   procedure set_transport_state(p_id               in integer,
                                 p_state_id         in integer,
                                 p_tracking_comment in varchar2,
                                 p_stack_trace      in clob);
-
+  
   function read_unit(
       p_unit_id in integer)
   return transport_unit%rowtype;
-
+  
   function get_receiver_url(
       p_mfo in varchar2)
   return varchar2;
-
+  
   procedure send_data(
       p_unit_row in transport_unit%rowtype);
-
+  
   procedure check_unit_state(
       p_unit_row in transport_unit%rowtype);
-
+  
   function get_unit_type_id(
       p_unit_type_code in varchar2)
   return number;
-
+  
   procedure perform_transport_activities;
 
 end;
