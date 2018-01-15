@@ -4,7 +4,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
 % DESCRIPTION : Процедура формирования #E2 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.17.004      10.01.2018 (03.01.2017, 02.01.2018)
+% VERSION     : v.17.005      12.01.2018 (10.01.2018, 03.01.2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -15,6 +15,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
    NNN        условный порядковый номер
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+12.01.2018 изменено формирование показателя 53NNN
 03.01.2018 добавлено формирование показателя 32NNN и 
            изменено формирование показателя 54NNN
 02.01.2018 на 01.01.2018 добавляются показатели 51, 52, 53, 54, 55
@@ -646,13 +647,13 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
                select substr(MAX(trim(benef_name)), 1,135)
                into d53#E2_
                from v_cim_all_contracts
-               where num = cont_num_ and
+               where num = upper(cont_num_) and
                      open_date = to_date(cont_dat_, 'ddmmyyyy')  and
-                     status_id = 0;        
+                     status_id in ( 0, 8);        
             end if;
 
             if d53#E2_ is not null then
-               p_value_ := NVL (SUBSTR (TRIM (de#E2_), 1, 70), 'назва Бенефіціару');
+               p_value_ := NVL (SUBSTR (TRIM (d53#E2_), 1, 70), 'назва Бенефіціару');
             else
                p_value_ := NVL (SUBSTR (TRIM (p_value_), 1, 70), 'назва Бенефіціару');
             end if;
