@@ -1,0 +1,63 @@
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+
+<script src="~/lib/jsZip/jszip.js"></script>
+<script src="~/Scripts/respond.min.js"></script>
+<script src="~/Scripts/Angular/signservice.js?v1.0"></script>
+<script src="~/Scripts/Angular/kendoservice.js?v1.0"></script>
+<script src="~/Scripts/Angular/utilsservice.js?v1.0"></script>
+<script src="~/Scripts/Angular/baseController.js?v1.0"></script>
+<script src="~/Areas/Mcp/Scripts/Mcp/pay_accept.js?v1.0"></script>
+
+<link rel="stylesheet" href="~/Areas/Mcp/Css/Mcp/Main.css" />
+
+<div ng-controller="McpPayAcceptCtrl">
+    <div class="page-header"><h1>{{Title}}</h1></div>
+
+    <div class="well">
+        <div class="row">
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label><b>Тип квитанції:</b></label>
+                    <select kendo-drop-down-list style="width: 190px"
+                            k-options="kvitTypeOptions">
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div kendo-tab-strip="tabStrip" k-options="tabStripOptions" k-content-urls="[ null, null]">
+        <!-- tab list -->
+        <ul>
+            <li class="k-state-active">Перелік конвертів УПСЗН</li>
+            <li>Відправлені конверти в УПСЗН</li>
+        </ul>
+
+        <div style="padding: 1em">
+            <div kendo-grid="filesGrid" k-options="filesGridOptions"></div>
+        </div>
+
+        <div style="padding: 1em">
+            <div kendo-grid="filesHistoryGrid" k-options="filesHistoryGridOptions"></div>
+        </div>
+    </div>
+
+    <div kendo-tab-strip="registryTabStrip" k-options="registryTabStripOptions" k-content-urls="[ null, null]">
+        <!-- tab list -->
+        <ul>
+            <li class="k-state-active">Перелік реєстрів УПСЗН</li>
+            <li>Інформаційні рядки реєстру</li>
+        </ul>
+
+        <div style="padding: 1em">
+            <div kendo-grid="registryGrid" k-options="registryGridOptions"></div>
+        </div>
+
+        <div style="padding: 1em">
+            <div kendo-grid="infoLinesreRistryGrid" k-options="infoLinesreRistryGridOptions"></div>
+        </div>
+    </div>
+
+</div>
