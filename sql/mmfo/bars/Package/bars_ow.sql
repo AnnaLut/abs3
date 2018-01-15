@@ -433,7 +433,7 @@ is
 --
 -- constants
 --
-g_body_version    constant varchar2(64)  := 'version 6.015_nb 14/11/2017';
+g_body_version    constant varchar2(64)  := 'version 6.020 15/01/2018';
 g_body_defs       constant varchar2(512) := '';
 
 g_modcode         constant varchar2(3)   := 'BPK';
@@ -752,9 +752,15 @@ begin
          min(decode(tt.tag, 'SN_FN', substr(tt.value, 1, 30), null)) first_name,
          min(decode(tt.tag, 'SN_MN', substr(tt.value, 1, 30), null)) midle_name,
          t.okpo, p.ser, p.numdoc, p.pdate, p.bday,
-         coalesce(cw.value, p.cellphone, p.teld), t.adr, iw.deal_id,
+         '+380'||case when regexp_like(substr(coalesce(cw.value, p.cellphone, p.teld),-9), '[0-9]') then 
+                           substr(coalesce(cw.value, p.cellphone, p.teld),-9) 
+                      else '000000000'
+                 end, 
+         t.adr, iw.deal_id,
          decode(iw.date_from, null, trunc(sysdate), iw.date_from) dateform,
-         decode(iw.date_to, null, add_months(w.dat_begin, least(nvl(to_number(aw.value), 0), 36)) - 1, iw.date_to),
+         case when iw.date_to is null then  add_months(trunc(sysdate), case when months_between(w.dat_end, trunc(sysdate)) < 12 then 12 
+                                                                       when months_between(w.dat_end, trunc(sysdate)) < 24 and  months_between(w.dat_end, trunc(sysdate)) > 12 then 24 
+                                                                       else  least(nvl(to_number(aw.value), 0), 36) end ) - 1 else iw.date_to end,
          case
            when iw.ins_ext_id is not null and
                 iw.ins_ext_id in (wd.ins_ukr_id, wd.ins_wrd_id) then
@@ -798,10 +804,16 @@ begin
     left join accountsw aw
       on a.acc = aw.acc and aw.tag = 'PK_TERM'
     left join customerw cw on t.rnk = cw.rnk and cw.tag = 'MPNO'
-   group by w.nd, t.okpo, p.ser, p.numdoc, p.pdate, p.bday, coalesce(cw.value, p.cellphone, p.teld),
+   group by w.nd, t.okpo, p.ser, p.numdoc, p.pdate, p.bday,
+           '+380'||case when regexp_like(substr(coalesce(cw.value, p.cellphone, p.teld),-9), '[0-9]') then 
+                             substr(coalesce(cw.value, p.cellphone, p.teld),-9) 
+                        else '000000000'
+                   end,
             t.adr, iw.deal_id,
             decode(iw.date_from, null, trunc(sysdate), iw.date_from),
-            decode(iw.date_to, null, add_months(w.dat_begin, least(nvl(to_number(aw.value), 0), 36)) - 1, iw.date_to),
+            case when iw.date_to is null then  add_months(trunc(sysdate), case when months_between(w.dat_end, trunc(sysdate)) < 12 then 12 
+                                                                       when months_between(w.dat_end, trunc(sysdate)) < 24 and  months_between(w.dat_end, trunc(sysdate)) > 12 then 24 
+                                                                       else  least(nvl(to_number(aw.value), 0), 36) end ) - 1 else iw.date_to end,
             case
               when iw.ins_ext_id is not null and
                    iw.ins_ext_id in (wd.ins_ukr_id, wd.ins_wrd_id) then
@@ -6804,7 +6816,7 @@ begin
                l_tt := 'OWI';
             end if;
             ipay_doc (l_tt, l_vob, l_dk, l_sk,
-               l_nam_a, l_nlsb, null, l_id_a,
+               l_nam_b, l_nlsb, null, l_id_b,
                l_insurance.ins_name, l_insurance.ins_nls, l_insurance.ins_mfo, l_insurance.ins_okpo,
                l_kv1, l_s1, l_kv2, l_s2, l_nazn, l_ref_add, 5) ;
 
