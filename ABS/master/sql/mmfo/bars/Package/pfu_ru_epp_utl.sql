@@ -1719,7 +1719,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
       if (l_kf is not null and l_kf != i.kf) or (l_kf is null) then
         l_kf := i.kf;
         bars.bc.go(i.kf);
-        bars_ow.ow_init;
+        bars.bars_ow.ow_init;
       end if;
       if i.file_type = 1 then
         epp_processing(i.file_data, i.id);
@@ -1727,7 +1727,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
         issuecard_processing(i.file_data, i.id);
       elsif i.file_type = 3 then
         activateacc_procesing(i.file_data, i.id);
-      elsif i.file_type in ( 4, 13) then
+      elsif i.file_type in ( 4, 13,19) then
         pfu_ru_file_utl.ref_state_processing(i.file_data, i.id);
       elsif i.file_type = 5 then
         pfu_ru_file_utl.get_ebp_processing(i.file_data, i.id);
@@ -1737,7 +1737,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
         pfu_ru_file_utl.get_cardkill_processing(i.file_data, i.id);
       elsif i.file_type = 8 then
         pfu_ru_file_utl.get_cm_error_processing(i.file_data, i.id);
-      elsif i.file_type = 9 then
+      elsif i.file_type in (9,18) then
         pfu_ru_file_utl.get_acc_rest_processing(i.file_data, i.id);
       elsif i.file_type = 10 then
         pfu_ru_file_utl.get_epp_state_processing(i.file_data, i.id);
@@ -1748,11 +1748,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
       elsif i.file_type = 14 then
         pfu_ru_file_utl.get_report_processing(i.file_data, i.id);
       elsif i.file_type = 15 then
- 	pfu_ru_file_utl.set_card_block_processing(i.file_data, i.id);
+        pfu_ru_file_utl.set_card_block_processing(i.file_data, i.id);
       elsif i.file_type = 16 then
         pfu_ru_file_utl.set_destruct_processing(i.file_data, i.id);
       elsif i.file_type = 17 then
- 	pfu_ru_file_utl.set_card_unblock_processing(i.file_data, i.id);
+       	pfu_ru_file_utl.set_card_unblock_processing(i.file_data, i.id);
       else
         set_file_state(i.id, 99, 'Невірний тип файлу');
       end if;
@@ -1764,6 +1764,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
                          dbms_utility.format_error_stack() || chr(10) ||
                          dbms_utility.format_error_backtrace());
       end;
+      --commit;
     end loop;
   end;
 

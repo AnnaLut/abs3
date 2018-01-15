@@ -42,6 +42,25 @@ values (17, ''Разблокировка счета по запросу ПЦ'', ''SET_CARD_UNBLOCK'')';
 end;
 / 
 
+begin
+    execute immediate 'insert into pfu_filetypes (ID, NAME, CODE)
+values (18, ''Получение остатка по счету(МСП)'', ''MSP_GET_ACC_REST'')';
+ exception when others then 
+    if sqlcode = -1 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
+    execute immediate 'insert into pfu_filetypes (ID, NAME, CODE)
+values (19, ''Опитування статусу платежу(МСП)'', ''MSP_CHECKPAYMSTATE'')';
+ exception when others then 
+    if sqlcode = -1 then null; else raise; 
+    end if; 
+end;
+/ 
+
 
 commit;
 
