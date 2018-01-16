@@ -13,9 +13,10 @@ namespace BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Abstract
         RegNewValue GetCardValue(decimal rnk, decimal proectId, string cardCode, bool isIns);
         RegExternal GetExternal(decimal rnk);
         RespOpenCard OpenCard(RegNewValue par);
+        decimal GetInsType(decimal nd, string code, OracleConnection con);
         ParamsIns GetIsIns(string cardCode);
         void SetInsId(decimal nd, decimal ins_id, decimal tmp_id);
         ParamsBpkIns GetBpkInsParams(decimal nd, string deal_id, string table);
-        ParamsEwa GetParamsEwa(decimal nd, decimal typeIns, OracleCommand cmd);
+        ParamsEwa GetParamsEwa(decimal nd, decimal typeIns, OracleConnection con);
     }
 }

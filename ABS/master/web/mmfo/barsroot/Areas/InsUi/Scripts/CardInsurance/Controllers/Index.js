@@ -89,7 +89,7 @@
                 },
                 columns: [
                     {
-                        template: '<button class="k-button" name="Create" title="Створити договір в системі EWA" ng-click="createDeal(#= ND #)" style="width:35px;min-width:0px"><i class="pf-icon pf-16 pf-accept_doc"></i></button>' +
+                        template: '<button class="k-button" name="Create" title="Створити договір в системі EWA" ng-click="createDeal(#= ND #, \'#= CARD_CODE#\')" style="width:35px;min-width:0px"><i class="pf-icon pf-16 pf-accept_doc"></i></button>' +
                                   '<button class="k-button" name="Print" title="Роздрукувати СД" ng-click="printDeal(#= ND #, \'#= DEAL_ID #\')" style="width:35px;min-width:0px"><i class="pf-icon pf-16 pf-print"></i></button>',
                         headerTemplate: '<label>Дії</label>',
                         width: "100px"
@@ -210,8 +210,9 @@
                 };
             };
 
-            $scope.createDeal = function (nd) {
-                var url = '/BpkW4/RegisteringNewCard/CreateDealsEWA?nd=' + nd;
+            $scope.createDeal = function (nd, card_code) {
+                debugger;
+                var url = '/BpkW4/RegisteringNewCard/CreateDealsEWA?nd=' + nd + "&code=" + card_code;
                 $http.get(bars.config.urlContent(url)).then(function (request) {
                     var grid = $scope.gridCardInsur;
                     if (request.data == '"Ok"') {
@@ -221,6 +222,7 @@
                         grid.dataSource.read();
                     }
                     else {
+                        debugger;
                         bars.ui.error({
                             text: "Помилка: " + request.data,
                         });
