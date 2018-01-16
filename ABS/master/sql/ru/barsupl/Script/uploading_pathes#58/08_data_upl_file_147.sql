@@ -1,5 +1,6 @@
 -- ***************************************************************************
 set verify off
+set define on
 -- sfile_id идентификатор файла выгрузки
 -- ssql_id идентификаторы запросов для файла выгрузки (список через запятую, без пробелов)
 define sfile_id = 147
@@ -43,7 +44,7 @@ Insert into BARSUPL.UPL_COLUMNS (file_id, col_id, col_name, col_desc, col_type, 
 Insert into BARSUPL.UPL_COLUMNS (file_id, col_id, col_name, col_desc, col_type, col_length, col_scale, col_format, pk_constr, nullable, null_values, repl_chars_with, skeleton_values, pk_constr_id, prefun)
  Values (147, 4, 'KF', 'Код филиала', 'VARCHAR2', 6, NULL, NULL, 'Y', 'N', NULL, NULL, '-', 4, NULL);
 Insert into BARSUPL.UPL_COLUMNS (file_id, col_id, col_name, col_desc, col_type, col_length, col_scale, col_format, pk_constr, nullable, null_values, repl_chars_with, skeleton_values, pk_constr_id, prefun)
- Values (147, 5, 'ND_TYPE', 'Тип договора (кредиты = 3)', 'NUMBER', 1, 0, NULL, 'Y', 'N', NULL, NULL, NULL, 3, NULL);
+ Values (147, 5, 'ND_TYPE', 'Тип договора (кредиты = 3)', 'NUMBER', 2, 0, NULL, 'Y', 'N', NULL, NULL, NULL, 3, NULL);
 Insert into BARSUPL.UPL_COLUMNS (file_id, col_id, col_name, col_desc, col_type, col_length, col_scale, col_format, pk_constr, nullable, null_values, repl_chars_with, skeleton_values, pk_constr_id, prefun)
  Values (147, 6, 'CHGACTION', 'Код обновления (I/U/D)', 'CHAR', 1, NULL, NULL, NULL, 'Y', NULL, NULL, '-', NULL, NULL);
 

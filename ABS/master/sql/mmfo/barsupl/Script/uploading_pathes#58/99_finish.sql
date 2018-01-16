@@ -5,7 +5,6 @@
 -- ======================================================================================
 
 SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
-
 SET FEEDBACK OFF
 
 -- UPL_FILES -> UPL_SQL

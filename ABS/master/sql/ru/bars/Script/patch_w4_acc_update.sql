@@ -1,58 +1,45 @@
 -- ======================================================================================
--- Author : BAA
--- Date   : 24.11.2016
+-- Author : KVA
+-- Date   : 09.01.2018
 -- ===================================== <Comments> =====================================
--- add column KF
+-- update column KF if is null
 -- ======================================================================================
 
-SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
-SET FEEDBACK     ON
-SET DEFINE       OFF
-SET LINES        300
-SET PAGES        500
-SET TERMOUT      ON
-SET TIMING       OFF
-SET TRIMSPOOL    ON
-set VERIFY       OFF
-
+declare
+  l_kf                   varchar2(6);
 begin
-  
-  bpa.disable_policies('W4_ACC_UPDATE');
-  
-  bc.subst_mfo(F_OURMFO_G);
-  
-  execute immediate q'[alter table W4_ACC_UPDATE add KF VARCHAR2(6) DEFAULT sys_context('bars_context','user_mfo') CONSTRAINT CC_W4ACCUPD_KF_NN NOT NULL]';
-  
-  dbms_output.put_line('Table altered.');
-  
-  bc.set_context;
-  
-  bpa.enable_policies('W4_ACC_UPDATE');
-  
-exception
-  when OTHERS then
+
+  l_kf := F_OURMFO_G;
+
+  begin
+
+    bpa.disable_policies('W4_ACC_UPDATE');
+
+    bc.subst_mfo( l_kf );
+
+    update W4_ACC_UPDATE
+       set KF = l_kf
+     where KF is Null;
+    dbms_output.put_line( to_char(sql%rowcount)||' row(s) updated.' );
+    commit;
+
+    begin   
+     execute immediate '
+      ALTER TABLE BARS.W4_ACC_UPDATE MODIFY (KF CONSTRAINT CC_W4ACCUPD_KF_NN NOT NULL ENABLE)';
+    exception when others then
+      if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+     end;
+
     bc.set_context;
+
     bpa.enable_policies('W4_ACC_UPDATE');
-    if ( sqlcode = -01430 )
-    then dbms_output.put_line('Column KF already exists in table.');
-    else raise;
-    end if;
+
+  exception
+    when others
+    then bc.set_context;
+         bpa.enable_policies('W4_ACC_UPDATE');
+         raise;
+  end;
 end;
 /
 
-begin
-  bpa.alter_policy_info( 'W4_ACC_UPDATE', 'WHOLE' , NULL, 'E', 'E', 'E' );
-  bpa.alter_policy_info( 'W4_ACC_UPDATE', 'FILIAL',  'M', 'M', 'M', 'M' );
-end;
-/
-
-commit;
-
-begin
-  bpa.alter_policies('W4_ACC_UPDATE');
-end;
-/
-
-commit;
-
-COMMENT ON COLUMN W4_ACC_UPDATE.KF IS ' Ó‰ ÙiÎi‡ÎÛ (Ã‘Œ)';
