@@ -18,6 +18,7 @@ using Newtonsoft.Json.Linq;
 using Oracle.DataAccess.Client;
 using Bars.Classes;
 using BarsWeb.Areas.InsUi.Models.Transport;
+using System.Xml;
 
 namespace BarsWeb.Areas.InsUi.Infrastructure.DI.Implementation
 {
@@ -354,6 +355,7 @@ namespace BarsWeb.Areas.InsUi.Infrastructure.DI.Implementation
             login.password = GetParameter("EWAHASH");
 
             var param = parameters.param;
+            string errorMessage = String.Empty;
             try
             {
                 var response = RemoteLogin(login, "POST", "user/login");
@@ -395,20 +397,40 @@ namespace BarsWeb.Areas.InsUi.Infrastructure.DI.Implementation
                 SetState(parameters.nd, "DONE", null, connection);
 
                 var doc = JsonConvert.DeserializeXmlNode(result, "root");
+
                 string code = resultres.SelectToken(@"code").Value<string>();
                 DateTime dateFrom = resultres.SelectToken(@"dateFrom").Value<DateTime>();
                 DateTime dateTo = resultres.SelectToken(@"dateTo").Value<DateTime>();
                 SetRquRes(parameters.nd, doc.OuterXml, 1, code, dateFrom, dateTo, connection);
 
-                var logout = Send(null, "PUT", "user/logout");
-
                 return "Ok";
+            }
+            catch (WebException ex)
+            {
+                if (ex.Response != null)
+                {
+                    using (var rdr = new StreamReader(ex.Response.GetResponseStream()))
+                    {
+                        XmlDocument doc = JsonConvert.DeserializeXmlNode(rdr.ReadToEnd(), "root");
+                        errorMessage = doc.OuterXml;
+                    }
+                }
+                else
+                {
+                    errorMessage = "ERROR: " + ex.Message;
+                }
+                SetState(parameters.nd, "ERROR", errorMessage, connection);
+                throw new Exception(errorMessage);
             }
             catch (Exception e)
             {
-                SetState(parameters.nd, "ERROR", e.Message + "\n" + e.StackTrace, connection);
-                var logout = Send(null, "PUT", "user/logout");
+                errorMessage = "ERROR: " + e.Message + "\n" + e.StackTrace;
+                SetState(parameters.nd, "ERROR", errorMessage, connection);
                 throw;
+            }
+            finally
+            {
+                var logout = Send(null, "PUT", "user/logout");
             }
         }
 
