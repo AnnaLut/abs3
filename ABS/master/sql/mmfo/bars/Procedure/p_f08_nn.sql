@@ -1,5 +1,3 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_F08_NN.sql =========*** Run *** 
 PROMPT ===================================================================================== 
@@ -7,16 +5,20 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_F08_NN ***
 
+
   CREATE OR REPLACE PROCEDURE BARS.P_F08_NN (Dat_ DATE,
                                       sheme_ varchar2 default 'G')  IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : ѕроцедура формирование файла #08 дл€  Ѕ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 16/10/2017 (12/05/2017)
+% VERSION     : 11/01/2018 (16/10/2017. 12/05/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетна€ дата
            sheme_ - схема формировани€
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+11.01.2018 нова€ структура показател€ добавлено 3-х значный код страны
+20.03.2017 объеденнены некоторые блоки дл€ присвоени€ переменной S_  
+           значени€ 'I'
 07.06.2016 дл€ групп бал.счетов 602,604,605 и  т оборотов в кореспонденции
            со счетами дискрнта формируем показатель со знаком плюс
 03.06.2016 при разбивке остатка по R013 не формировалс€ код бал.счета
@@ -85,10 +87,10 @@ r013_    varchar2(1);
 s130_    Varchar2(2);
 s180_    Varchar2(1);
 s183_    Varchar2(1);
-k072_    varchar2(1);
-s_       char(1);
-s1_      char(1);
-s2_      char(1);
+k072_    varchar2(2);
+s_       char(2);
+s1_      char(2);
+s2_      char(2);
 r_       char(1);
 r1_      char(1);
 userid_  number;
@@ -124,21 +126,26 @@ o_r013_2   VARCHAR2 (1);
 o_se_2     DECIMAL (24);
 o_comm_2   rnbu_trace.comm%TYPE;
 tip_       accounts.tip%type;
+country_   varchar2(3);
+dat_Izm1  date := to_date('29/12/2017','dd/mm/yyyy');
+
 
 CURSOR Saldo IS
    select a.*, n.nd, i.freq
    from (
      SELECT s.rnk, s.acc, s.nls, s.kv, s.fdat, s.nbs,
               NVL(cc.r011,'0') r011, NVL(cc.r013,'0') r013,
-              NVL(trim(cc.k072),'X') k072,
+              NVL(lpad (trim(cc.k072), 2, 'X'),'XX') k072,
               s.ost, s.ostq, s.dos96, s.kos96, s.dosq96, s.kosq96,
               s.dos99, s.kos99, s.dosq99, s.kosq99,
-              s.doszg, s.koszg, a.isp, a.tobo, a.nms, a.tip, NVL(cc.s130,'90') S130
-       FROM  otcn_saldo s, specparam cc, otcn_acc a
-       WHERE (s.ost-s.dos96+s.kos96+s.doszg-s.koszg<>0 OR
-              s.ostq-s.dosq96+s.kosq96<>0)
-         and s.acc=a.acc
-         and s.acc=cc.acc(+)) a
+              s.doszg, s.koszg, a.isp, a.tobo, a.nms, a.tip, 
+              NVL(cc.s130,'90') S130, lpad (to_char(c.country), 3, '0')
+       FROM  otcn_saldo s, specparam cc, otcn_acc a, customer c 
+       WHERE (s.ost-s.dos96+s.kos96+s.doszg-s.koszg <> 0 OR
+              s.ostq-s.dosq96+s.kosq96 <> 0)
+         and s.acc = a.acc
+         and s.acc = cc.acc(+)
+         and s. rnk = c.rnk) a
     left outer join (select n.acc, max(n.nd) nd
                       from nd_acc n, cc_deal e
                       WHERE e.sdate <= Dat_
@@ -159,78 +166,80 @@ procedure p_ins(p_dat_ date, p_tp_ varchar2, p_rnk_ number, p_nls_ varchar2,
                 p_nbs_ varchar2, p_kv_ smallint, p_r011_ varchar2,
                 p_r013_ varchar2, p_k072_ varchar2,
                 p_s183_ varchar2, p_s130_ varchar2,
+                p_country_ varchar2, 
                 p_znap_ varchar2, p_isp_ number, p_nbuc_ varchar2) IS
 
-kod_ varchar2(14);
+kod_ varchar2(18);
 
 begin
    BEGIN
-      SELECT NVL(trim(k.k072),'0'), to_char(2 - MOD(c.codcagent,2))
+      SELECT NVL(trim(k.k072),'00'), to_char(2 - MOD(c.codcagent,2))
       INTO s_, r_
       FROM customer c, kl_k070 k
       WHERE c.rnk=p_rnk_ AND c.ise=k.k070(+) and k.d_close is null;
    EXCEPTION WHEN NO_DATA_FOUND THEN
-      s_:='0';
+      s_:='00';
       r_:='1';
    END;
 
-   if p_k072_ is not null and p_k072_<>'X' then
+   if p_k072_ is not null and p_k072_<>'XX' then
       s_:= p_k072_;
    end if;
 
-   if substr(p_nbs_,1,1) in ('6','7') and 353575 in (mfo_, mfou_) then
-      s_:='X';
-   end if;
-
    if (substr(p_nbs_,1,3) in ('600','700') OR p_nbs_ in ('6054','6055')) and
-       s_<>'4'
+       s_<>'20'
    then
-      s_:= '4';
+      s_:= '20';
    end if;
 
    if substr(p_nbs_,1,3) in ('601','608','701','708') and r_='1' and
-       s_ not in ('5','6','7')
+       s_ not in ('21','22','23')
    then
-      s_:= '6';
+      s_:= '22';
    end if;
 
-   if substr(p_nbs_,1,3) in ('601','608','701','708') and r_='2' and s_<>'0' then
-      s_:= '0';
+   if substr(p_nbs_,1,3) in ('601','608','701','708') and r_='2' and 
+      s_ not in ('N1','N2','N3','N4','N5','N6','N7','N8') 
+   then
+      s_:= 'N2';
    end if;
 
-   if p_nbs_ in ('6030','6032') and s_<>'H' then
-      s_:='H';
+   if p_nbs_ in ('6030','6032') and s_<>'30' then
+      s_:='30';
    end if;
 
-   if p_nbs_ in ('6031','6033') and s_<>'I' then
-      s_:='I';
+   if p_nbs_ in ('6031','6033','7030') and s_<>'31' then
+      s_:='31';
    end if;
 
-   if substr(p_nbs_,1,3) in ('604','704') and r_='1' and s_<>'N' then
-      s_:= 'N';
+   if substr(p_nbs_,1,3) in ('604','704') and r_='1' and 
+      s_ not in ('41','42','43') 
+   then
+      s_:= '42';
    end if;
 
-   if substr(p_nbs_,1,3) in ('604','704') and r_='2' and s_<>'0' then
-      s_:= '0';
+   if substr(p_nbs_,1,3) in ('604','704') and r_='2' and 
+      s_ not in ('N1','N2','N3','N4','N5','N6','N7','N8') 
+   then
+      s_:= 'N2';
    end if;
 
-   if p_nbs_ in ('7030') and s_<>'I' then
-      s_:='I';
-   end if;
-
-   if r_ = 2 then
-      s_ := '0';
+   if r_ = 2 and s_ = '00' 
+   then
+      s_ := 'N2';
    end if;
 
    -- только дл€ резидентов
-   if mfo_ <> 300120 and p_nbs_ in ('2902','2903','2909') and r_<>2 and p_r011_='1' and s_<>'2'
+   if mfo_ <> 300120 and p_nbs_ in ('2902','2903','2909') and 
+      r_<>2 and p_r011_='1' and s_<>'12'
    then
-      s_:='2';
+      s_:='12';
    end if;
 
-   if mfo_ <> 300120 and p_nbs_ in ('2902','2903','2909') and r_<>2 and p_r011_='2' and s_<>'N'
+   if mfo_ <> 300120 and p_nbs_ in ('2902','2903','2909') and 
+      r_<>2 and p_r011_='2' and s_ not in ('41','42','43')
    then
-      s_:='N';
+      s_:='42';
    end if;
 
    Ostn_:= to_number(p_znap_);
@@ -253,7 +262,7 @@ begin
       loop
 
          if substr(k.nlsd,1,1) in ('1','2','3') then
-            select NVL(p.k072,'0'), 2-mod(c.codcagent,2), nvl(trim(s.k072),'0'),
+            select NVL(p.k072,'00'), 2-mod(c.codcagent,2), nvl(lpad(trim(s.k072), 2, 'X'),'00'),
                    ca.tobo, ca.nms
               into s1_, r1_, s2_, tobo_, nms_
             from accounts ca, customer c, kl_k070 p, specparam s --cust_acc ca,
@@ -263,12 +272,12 @@ begin
                   c.ise = p.k070(+) and
                   p.d_close is null ;
          else
-            s1_:='X';
+            s1_:='XX';
             r1_:='1';
             s2_:=s_ ;
          end if;
 
-         if s2_ <> '0' then  -- s1_ = 'X' and s2_<>'0' then
+         if s2_ <> '00' then  -- s1_ = 'X' and s2_<>'0' then
             s1_ := s2_;
          end if;
 
@@ -281,11 +290,17 @@ begin
 
          if mfo_ = 324805
          then
-            s1_ := '0';
+            s1_ := 'N2';
             r1_ := '2';
          end if;
 
-         kod_:= p_tp_ || p_nbs_ || p_r013_ || s1_ || r1_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
+         if dat_ < dat_Izm1 
+         then
+            kod_:= p_tp_ || p_nbs_ || p_r013_ || s1_ || r1_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
+         else
+            kod_:= p_tp_ || p_nbs_ || p_r011_ || s1_ || r1_ || lpad(p_kv_,3,'0') || 
+                   p_s183_ || p_s130_ || p_country_;
+         end if;
 
          if se_ <> 0 then
             if k.nlsd like '6%' then
@@ -327,7 +342,7 @@ begin
       loop
 
          if substr(k.nlsk,1,1) in ('1','2','3') then
-            select NVL(p.k072,'0'), 2-mod(c.codcagent,2), nvl(trim(s.k072),'0'),
+            select NVL(p.k072,'00'), 2-mod(c.codcagent,2), nvl(lpad(trim(s.k072), 2, 'X'),'00'),
                    ca.tobo, ca.nms
               into s1_, r1_, s2_, tobo_, nms_
             from accounts ca, customer c, kl_k070 p, specparam s
@@ -337,12 +352,12 @@ begin
                   c.ise = p.k070(+) and
                   p.d_close is null;
          else
-            s1_:='X';
+            s1_:='XX';
             r1_:='1';
             s2_:=s_ ;
          end if;
 
-         if s2_<>'0' then
+         if s2_<>'00' then
             s1_:=s2_;
          end if;
 
@@ -355,14 +370,19 @@ begin
 
          if mfo_ = 324805
          then
-            s_ := '0';
+            s_ := 'N2';
             r_ := '2';
-            s1_ := '0';
+            s1_ := 'N2';
             r1_ := '2';
          end if;
 
-         kod_:= p_tp_ || p_nbs_ || p_r013_ || s1_ || r1_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
-
+         if dat_ < dat_Izm1
+         then
+            kod_:= p_tp_ || p_nbs_ || p_r013_ || s1_ || r1_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
+         else
+            kod_:= p_tp_ || p_nbs_ || p_r011_ || s1_ || r1_ || lpad(p_kv_,3,'0') || 
+                   p_s183_ || p_s130_ || p_country_;
+         end if;
 
          if se_ <> 0 and k.nlsk not like '6%'  --se_ - k.s > 0 and k.nlsk not like '6%'
          then
@@ -377,7 +397,14 @@ begin
 
          if se_ <> 0 and k.nlsk like '6%'  -- k.s > 0 and k.nlsk like '6%'
          then
-            kod_:= p_tp_ || p_nbs_ || p_r013_ || s_ || r_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
+            if dat_ < dat_Izm1
+            then
+               kod_:= p_tp_ || p_nbs_ || p_r013_ || s_ || r_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
+            else 
+               kod_:= p_tp_ || p_nbs_ || p_r011_ || s_ || r_ || lpad(p_kv_,3,'0') || 
+                      p_s183_ || p_s130_ || p_country_;
+            end if;
+
             INSERT INTO rnbu_trace
                     (nls, kv, odate, kodp, znap, nbuc, rnk, isp, comm)
             VALUES  (k.nlsd, k.kv, dat_, kod_, to_char(se_), p_nbuc_, rnk_, isp_, comm_);
@@ -388,8 +415,12 @@ begin
       end loop;
    end if;
 
-   if (substr(p_nbs_,1,3) in ('702','707','709') and mfo_<>300465) OR
-      (substr(p_nbs_,1,3) in ('702','707','709') and mfo_=300465 and p_k072_ in ('X','5') ) then
+   if ( substr(p_nbs_,1,3) in ('702','707','709') and mfo_<>300465) OR
+       ( substr(p_nbs_,1,3) in ('702','707','709') and mfo_=300465 and 
+         p_k072_ in ('XX','21'
+       ) 
+      ) 
+   then
 
       for k in (select accd, nlsd, kv, decode(kv,980,sum(s*100),sum(sq*100)) s,
                        acck, nlsk
@@ -411,7 +442,7 @@ begin
 
          if substr(k.nlsk,1,1) in ('2','3','8') then
             if k.nlsk like '2%' OR k.nlsk like '3%' then
-               select NVL(p.k072,'0'), 2-mod(c.codcagent,2), nvl(trim(s.k072),'0'),
+               select NVL(p.k072,'00'), 2-mod(c.codcagent,2), nvl(lpad(trim(s.k072), 2, 'X'),'00'),
                       ca.tobo, ca.nms
                  into s1_, r1_, s2_, tobo_, nms_
                from accounts ca, customer c, kl_k070 p, specparam s  --cust_acc ca,
@@ -424,7 +455,7 @@ begin
                comm1_ := substr(comm1_ || tobo_ || '  ' || nms_, 1, 200);
             end if;
             if k.nlsk like '8%' then
-               select NVL(p.k072,'0'), 2-mod(c.codcagent,2), nvl(trim(s.k072),'0'),
+               select NVL(p.k072,'00'), 2-mod(c.codcagent,2), nvl(lpad(trim(s.k072), 2, 'X'),'00'),
                       ca.tobo, ca.nms
                  into s1_, r1_, s2_, tobo_, nms_
                from accounts ca, customer c, kl_k070 p, specparam s  --cust_acc ca,
@@ -438,14 +469,14 @@ begin
                comm1_ := substr(comm1_ || tobo_ || '  ' || nms_, 1, 200);
             end if;
          else
-            s1_:='X';
+            s1_:='XX';
             r1_:='1';
             s2_:=s_ ;
          end if;
 
          se_:= 0;  -- 09.06.2013 ниже есть блок дл€ обратных проводок
 
-         if s2_ <> '0' then  --s1_ = 'X' and s2_<>'0' then
+         if s2_ <> '00' then  --s1_ = 'X' and s2_<>'0' then
             s1_ := s2_;
          end if;
 
@@ -458,11 +489,17 @@ begin
 
          if mfo_ = 324805
          then
-            s1_ := '0';
+            s1_ := 'N2';
             r1_ := '2';
          end if;
 
-         kod_:= p_tp_ || p_nbs_ || p_r013_ || s1_ || r1_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
+         if dat_ < dat_Izm1
+         then
+            kod_:= p_tp_ || p_nbs_ || p_r013_ || s1_ || r1_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
+         else 
+            kod_:= p_tp_ || p_nbs_ || p_r011_ || s1_ || r1_ || lpad(p_kv_,3,'0') || 
+                   p_s183_ || p_s130_ || p_country_;
+         end if;
 
          if se_ <> 0 then
             INSERT INTO rnbu_trace
@@ -497,7 +534,7 @@ begin
 
          if substr(k.nlsd,1,1) in ('2','3','8') then
             if k.nlsd like '2%' OR k.nlsd like '3%' then
-               select NVL(p.k072,'0'), 2-mod(c.codcagent,2), nvl(trim(s.k072),'0'),
+               select NVL(p.k072,'00'), 2-mod(c.codcagent,2), nvl(lpad(trim(s.k072), 2, 'X'),'00'),
                       ca.tobo, ca.nms
                  into s1_, r1_, s2_, tobo_, nms_
                from accounts ca, customer c, kl_k070 p, specparam s
@@ -512,7 +549,7 @@ begin
             end if;
 
             if k.nlsd like '8%' then
-               select NVL(p.k072,'0'), 2-mod(c.codcagent,2), nvl(trim(s.k072),'0'),
+               select NVL(p.k072,'00'), 2-mod(c.codcagent,2), nvl(lpad(trim(s.k072), 2, 'X'),'00'),
                       ca.tobo, ca.nms
                  into s1_, r1_, s2_, tobo_, nms_
                from accounts ca, customer c, kl_k070 p, specparam s
@@ -531,7 +568,7 @@ begin
             s2_:=s_ ;  --'0';
          end if;
 
-         if s2_ <> '0' then
+         if s2_ <> '00' then
             s1_ := s2_;
          end if;
 
@@ -544,13 +581,19 @@ begin
 
          if mfo_ = 324805
          then
-            s_ := '0';
+            s_ := 'N2';
             r_ := '2';
-            s1_ := '0';
+            s1_ := 'N2';
             r1_ := '2';
          end if;
 
-         kod_:= p_tp_ || p_nbs_ || p_r013_ || s1_ || r1_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
+         if dat_ < dat_Izm1
+         then
+            kod_:= p_tp_ || p_nbs_ || p_r013_ || s1_ || r1_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
+         else
+            kod_:= p_tp_ || p_nbs_ || p_r011_ || s1_ || r1_ || lpad(p_kv_,3,'0') || 
+                   p_s183_ || p_s130_ || p_country_;
+         end if;
 
          if se_ <> 0 and k.nlsd not like '7%' then
             INSERT INTO rnbu_trace
@@ -561,7 +604,15 @@ begin
          end if;
 
          if se_ <> 0 and k.nlsd like '7%' then
-            kod_:= p_tp_ || p_nbs_ || p_r013_ || s_ || r_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
+
+            if dat_ < dat_Izm1
+            then
+               kod_:= p_tp_ || p_nbs_ || p_r013_ || s_ || r_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
+            else
+               kod_:= p_tp_ || p_nbs_ || p_r011_ || s_ || r_ || lpad(p_kv_,3,'0') || 
+                      p_s183_ || p_s130_ || p_country_; 
+            end if;
+  
             INSERT INTO rnbu_trace
                     (nls, kv, odate, kodp, znap, nbuc, rnk, isp, comm)
             VALUES  (k.nlsk, k.kv, dat_, kod_, to_char(se_), p_nbuc_, rnk_, isp_, comm_);
@@ -591,7 +642,7 @@ begin
          comm1_ := comm_;
 
          if substr(k.nlsk,1,1) in ('2','8') then
-            select NVL(p.k072,'0'), 2-mod(c.codcagent,2), nvl(trim(s.k072),'0'),
+            select NVL(p.k072,'00'), 2-mod(c.codcagent,2), nvl(lpad(trim(s.k072), 2, 'X'),'00'),
                    ca.tobo, ca.nms
                  into s1_, r1_, s2_, tobo_, nms_
             from accounts ca, customer c, kl_k070 p, specparam s
@@ -604,16 +655,17 @@ begin
             comm1_ := '';
             comm1_ := substr(comm1_ || tobo_ || '  ' || nms_, 1, 200);
          else
-            s1_:='X';
+            s1_:='XX';
             r1_:='1';
             s2_:=s_ ;
          end if;
 
-         if s1_ = 'X' and s2_<>'0' then
+         if s1_ = 'XX' and s2_<>'00' then
             s1_:=s2_;
          end if;
 
-         if s1_='0' then
+         if s1_ in ('N1','N2','N3','N4','N5','N6','N7','N8') 
+         then
             r1_:='2';
          end if;
 
@@ -626,11 +678,17 @@ begin
 
          if mfo_ = 324805
          then
-            s1_ := '0';
+            s1_ := 'N2';
             r1_ := '2';
          end if;
 
-         kod_:= p_tp_ || p_nbs_ || p_r013_ || s1_ || r1_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
+         if dat_ < dat_Izm1
+         then
+            kod_:= p_tp_ || p_nbs_ || p_r013_ || s1_ || r1_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
+         else
+            kod_:= p_tp_ || p_nbs_ || p_r013_ || s1_ || r1_ || lpad(p_kv_,3,'0') || 
+                   p_s183_ || p_s130_ || p_country_;
+         end if;
 
          if se_ <> 0 then  --  -se_
             INSERT INTO rnbu_trace
@@ -662,7 +720,7 @@ begin
          comm1_ := comm_;
 
          if substr(k.nlsd,1,1) in ('2','8') then
-            select NVL(p.k072,'0'), 2-mod(c.codcagent,2), nvl(trim(s.k072),'0'),
+            select NVL(p.k072,'00'), 2-mod(c.codcagent,2), nvl(lpad(trim(s.k072), 2, 'X'),'00'),
                    ca.tobo, ca.nms
                  into s1_, r1_, s2_, tobo_, nms_
             from accounts ca, customer c, kl_k070 p, specparam s
@@ -673,16 +731,17 @@ begin
             comm1_ := '';
             comm1_ := substr(comm1_ || tobo_ || '  ' || nms_, 1, 200);
          else
-            s1_:='X';
+            s1_:='XX';
             r1_:='1';
             s2_:=s_ ;
          end if;
 
-         if s1_ = 'X' and s2_<>'0' then
+         if s1_ = 'XX' and s2_<>'00' then
             s1_:=s2_;
          end if;
 
-         if s1_='0' then
+         if s1_ in ('N1','N2','N3','N4','N5','N6','N7','N8') 
+         then
             r1_:='2';
          end if;
 
@@ -695,13 +754,19 @@ begin
 
          if mfo_ = 324805
          then
-            s_ := '0';
+            s_ := 'N2';
             r_ := '2';
-            s1_ := '0';
+            s1_ := 'N2';
             r1_ := '2';
          end if;
 
-         kod_:= p_tp_ || p_nbs_ || p_r013_ || s1_ || r1_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
+         if dat_ < dat_Izm1
+         then
+            kod_:= p_tp_ || p_nbs_ || p_r013_ || s1_ || r1_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
+         else
+            kod_:= p_tp_ || p_nbs_ || p_r011_ || s1_ || r1_ || lpad(p_kv_,3,'0') || 
+                   p_s183_ || p_s130_ || p_country_;
+         end if;
 
          if se_ <> 0 then   -- k.s-se_
             INSERT INTO rnbu_trace
@@ -721,7 +786,13 @@ begin
 
    if Ostn_ <> 0 then
 
-      kod_:= p_tp_ || p_nbs_ || p_r013_ || s_ || r_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
+      if dat_ < dat_Izm1
+      then
+         kod_:= p_tp_ || p_nbs_ || p_r013_ || s_ || r_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
+      else
+         kod_:= p_tp_ || p_nbs_ || p_r011_ || s_ || r_ || lpad(p_kv_,3,'0') || 
+                p_s183_ || p_s130_ || p_country_;         
+      end if;
 
       INSERT INTO rnbu_trace
                (nls, kv, odate, kodp, znap, nbuc, rnk, isp, comm)
@@ -951,10 +1022,11 @@ LOOP
    FETCH SALDO INTO rnk_, acc_, nls_, kv_, data_, nbs1_, r011_, r013_, k072_,
                     Ostn_, Ostq_, Dos96_, Kos96_, Dosq96_, Kosq96_,
                     Dos99_, Kos99_, Dosq99_, Kosq99_,
-                    Doszg_, Koszg_, isp_, tobo_, nms_, tip_, s130_, nd_, freq_;
+                    Doszg_, Koszg_, isp_, tobo_, nms_, tip_, s130_, country_, 
+                    nd_, freq_;
    EXIT WHEN SALDO%NOTFOUND;
 
-   comm_ := 'R013='||r013_;
+   comm_ := 'R011=' || r011_ || '   R013='||r013_;
    nd_:=null;
 
    --- обороты по перекрытию 6,7 классов на 5040,5041
@@ -1097,7 +1169,8 @@ LOOP
       END;
 
       -- счета начисленных процентов
-      IF fa7p_ > 0 and se_ < 0 THEN
+      IF dat_ < dat_Izm1 and fa7p_ > 0 and se_ < 0 
+      THEN
 
          freq_:= NULL;
 
@@ -1122,7 +1195,7 @@ LOOP
                      dk_:=IIF_N(dose_,0,'1','2','2');
                      r013_:='1';
                      p_ins(data_, dk_, rnk_, nls_, nbs1_, kv_, r011_, r013_,
-                           k072_, s183_, s130_, TO_CHAR(ABS(dose_)), isp_, nbuc_);
+                           k072_, s183_, s130_, country_, TO_CHAR(ABS(dose_)), isp_, nbuc_);
                   END IF;
 
                   se_ := se_ - dose_;
@@ -1176,7 +1249,7 @@ LOOP
                THEN
                   r013_ := '3';
                   p_ins(data_, dk_, rnk_, nls_, nbs1_, kv_, r011_, r013_,
-                        k072_, s183_, s130_, TO_CHAR(ABS(o_se_1)), isp_, nbuc_);
+                        k072_, s183_, s130_, country_, TO_CHAR(ABS(o_se_1)), isp_, nbuc_);
 
                   se_ := se_ - o_se_1;
                END IF;
@@ -1186,7 +1259,7 @@ LOOP
                THEN
                   r013_ := '4';
                   p_ins(data_, dk_, rnk_, nls_, nbs1_, kv_, r011_, r013_,
-                        k072_, s183_, s130_, TO_CHAR(ABS(o_se_2)), isp_, nbuc_);
+                        k072_, s183_, s130_, country_, TO_CHAR(ABS(o_se_2)), isp_, nbuc_);
 
                   se_ := se_ - o_se_2;
                END IF;
@@ -1198,7 +1271,7 @@ LOOP
       dk_:=IIF_N(se_,0,'1','2','2');
       if se_ <> 0 then
          p_ins(data_, dk_, rnk_, nls_, nbs1_, kv_, r011_, r013_,
-               k072_, s183_, s130_, TO_CHAR(ABS(se_)), isp_, nbuc_);
+               k072_, s183_, s130_, country_, TO_CHAR(ABS(se_)), isp_, nbuc_);
       end if;
    END IF;
 
@@ -1220,8 +1293,7 @@ END p_f08_NN;
 show err;
 
 PROMPT *** Create  grants  P_F08_NN ***
-grant EXECUTE                                                                on P_F08_NN        to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on P_F08_NN        to RPBN002;
+grant EXECUTE                                                                on P_F08_NN        to WR_ALL_RIGHTS;
 
 
 
