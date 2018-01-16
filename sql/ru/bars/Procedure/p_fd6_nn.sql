@@ -1,5 +1,3 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_FD6_NN.sql =========*** Run *** 
 PROMPT ===================================================================================== 
@@ -13,8 +11,10 @@ CREATE OR REPLACE PROCEDURE BARS.P_FD6_NN (Dat_ DATE,
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	#D6 for KB
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 22/11/2017 (09/07/2015)
+% VERSION     : 12/01/2018 (22/11/2017, 09/07/2015)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 12/01/2018 - новая структура показателя 
+%              (параметр K072 2-х значный вместо однозначного) 
 % 08/04/2014 - для МФО=300465 и бал.счета 2602 и S180_='1' будем формировать
 %              S180_ := '6'
 % 27/11/2013 - еквівалент по визнаним процентним доходам по валюті будуть
@@ -59,6 +59,7 @@ kv_        SMALLINT;
 kv2_       SMALLINT;
 isp_       NUMBER;
 re_        SMALLINT;
+codcagent_ SMALLINT;
 sn1_       DECIMAL(24);
 se_        DECIMAL(24);
 Ostn_      DECIMAL(24);
@@ -87,8 +88,8 @@ r013_      VARCHAR2(1);
 r013_1     VARCHAR2(1);
 ob22_      VARCHAR2(2);
 k071_      CHAR(1);
-k072_      CHAR(1);
-k072p_      CHAR(1);
+k072_      CHAR(2);
+k072p_     CHAR(2);
 k081_      CHAR(1);
 k111_      CHAR(2);
 r031_      CHAR(1);
@@ -118,6 +119,7 @@ dat_kl_    date;
 
 dat_izm1   date := to_date('01072011','ddmmyyyy');
 dat_izm2   date := to_date('31082012','ddmmyyyy');
+dat_izm3   date := to_date('29122017','ddmmyyyy');
 
 b_yea      number;
 accr_      NUMBER;
@@ -159,14 +161,15 @@ type rec_type is record
      k051_      CHAR(2),
      country_   CHAR(3),
      k111_      CHAR(2),
-     k072_      CHAR(1),
+     k072_      CHAR(2),
      k081_      CHAR(1),
-     k072p_     CHAR(1),
+     k072p_     CHAR(2),
      acc1_      number,
      r011_      CHAR(1),
      r013_      CHAR(1),
      s180_      CHAR(1),
-     acc2_      number);
+     acc2_      number,
+     codcagent_ SMALLINT);
 
 TYPE rec_t IS TABLE OF rec_type;
 l_rec_t      rec_t := rec_t();
@@ -265,7 +268,7 @@ BEGIN
    end if;
 
    if p_type_ in (1, 2) then
-       if nbs2_ in ('2601','2625','3652') and k072p_ <> '0' then
+       if nbs2_ in ('2601','2625','3652') and k072p_ <> '00' then
           k072_ := k072p_;
        end if;
 
@@ -281,12 +284,29 @@ BEGIN
              s180_ := Fs180(acc_, SUBSTR(nbs2_,1,1), dat_);
           end if;
        end if;
+
+       IF re_=0 THEN
+          if dat_ >= dat_Izm3 
+          then   
+             if codcagent_ = 2 then
+                k072_ := 'N3';
+             elsif codcagent_ = 4 then
+                k072_ := 'N7';
+             elsif codcagent_ = 6 then
+                k072_ := 'N8';
+             else 
+                null;
+             end if;
+          end if;
+          k051_:='00';
+          k111_:='00';
+       END IF;
    else
        BEGIN
           sql_ := 'SELECT MOD(b.codcagent ,2), nvl(d.k111,''00''), '||
-                         'nvl(trim(e.k071),''0''), nvl(trim(e.k072),''0''), '||
+                         'nvl(trim(e.k071),''0''), nvl(trim(e.k072),''00''), '||
                          'nvl(f.k081,''0''), nvl(substr(ltrim(rtrim(b.sed)),1,2),''00''), '||
-                         'nvl(b.country,804), nvl(trim(e.d_close),NULL) '||
+                         'nvl(b.country,804), nvl(trim(e.d_close),NULL), b.codcagent '||
                   'FROM  customer b, '||
                     '(select K110, K111, decode(D_CLOSE, to_date(''30042007'',''ddmmyyyy''), null, D_CLOSE) D_CLOSE '||
                     'from kl_k110 where d_open <= :dat_ and '||
@@ -305,25 +325,25 @@ BEGIN
                        ' b.fs=f.k080(+) ';
 
           EXECUTE IMMEDIATE sql_
-          INTO re_, k111_, k071_, k072_, k081_, k051_, country_, d_close_
+          INTO re_, k111_, k071_, k072_, k081_, k051_, country_, d_close_, codcagent_ 
           USING dat_spr_, dat_spr_, dat_spr_, dat_spr_, dat_spr_, dat_spr_, rnk_;
 		  
-		  countryh_ := f_country_hist(rnk_, dat_);
+          countryh_ := f_country_hist(rnk_, dat_);
           
           if countryh_ is not null then
              country_ := countryh_;
           end if;
 		  
-		  if country_ = '804' then
-			 re_ := 1;
-		  else
-			 re_ := 0;
-		  end if;      
+          if country_ = '804' then
+             re_ := 1;
+          else
+             re_ := 0;
+          end if;      
        END ;
 
        if (d_close_ is not null and d_close_ <= Dat_) OR nbs2_ in ('2601','2625','3652') then
           BEGIN
-             SELECT NVL(trim(k072),k072_)
+             SELECT NVL(lpad(trim(k072), 2, 'X'), k072_)
                 INTO k072_
              FROM specparam
              WHERE acc=acc_ ;
@@ -351,10 +371,10 @@ BEGIN
    end if;
 --------------------------------------------------------------------------
 --   телеграмма НБУ от 23.03.2007 №62-212/324 - 3062
-   IF nbs2_ in ('1600','1602','1608','2603','2604',        -- убрал 2601,2602 ОАВ 08.02.2011
-               '2606','2622','2625','2640',                      -- убрал 2608
-               '2641','2642','2643','2655','3650','3651','3652',
-               '3659') THEN
+   IF nbs2_ in ('1600','1602','1608','2603','2604',        
+               '2606','2622','2625','2640',                
+               '2641','2642','2643','2655',
+               '3650','3651','3652','3659') THEN
       s180_:='1';
    END IF;
 
@@ -394,7 +414,6 @@ BEGIN
    END ;
 
 --------------------------------------------------------------------------
-   --   телеграмма НБУ от 23.03.2007 №62-212/324 - 3062
    if newnbs.g_state = 0 then
        --   телеграмма НБУ от 23.03.2007 №62-212/324 - 3062
        IF nbs2_ in ('1610','1612','2610','2630','2651') THEN
@@ -406,17 +425,28 @@ BEGIN
 -------------------------------------------------------------------------
 
    IF re_=0 THEN
-      k072_:='0';
+      if dat_ >= dat_Izm3 
+      then   
+         if codcagent_ = 2 then
+            k072_ := 'N3';
+         elsif codcagent_ = 4 then
+            k072_ := 'N7';
+         elsif codcagent_ = 6 then
+            k072_ := 'N8';
+         else 
+            null;
+         end if;
+      end if;
       k051_:='00';
       k111_:='00';
    END IF;
 
-   IF SUBSTR(nbs_,1,3) IN ('262','263','365','704') AND k072_='N' THEN
+   IF SUBSTR(nbs_,1,3) IN ('262','263','365','704') AND k072_='42' THEN
       k051_:='00';
       k111_:='00';
    END IF;
 
-   IF nbs_='2638' or nbs_ like '7%' THEN
+   IF nbs_ like '7%' THEN
       r011_:='0';
    END IF;
 
@@ -439,6 +469,25 @@ BEGIN
             nvl(D_CLOSE,dat_) >= dat_;
    end if;
 
+   if nbs_ = '2615' then
+      nbs_ := '2610';
+   elsif nbs_ = '2635' then
+      nbs_ := '2630';
+   elsif nbs_ = '2652' then
+      nbs_ := '2651';
+   else
+      null;
+   end if;
+
+   if nbs_ in ('2610','2630') and r011_ = '0'
+   then
+      r011_ := '1';
+   end if;
+   if nbs_ = '2651' 
+   then
+      r011_ := '4';
+   end if;
+
    --- c 31.08.2007 вместо кода K081 будет формироваться код '9'
    if dat_ >= to_date('28082007','ddmmyyyy') then
       kodp_:= dk_ || nbs_ || r011_ || k111_ || k072_ || '9' || s183_ ||
@@ -448,9 +497,10 @@ BEGIN
               TO_CHAR(2-re_) || k051_ || LPAD(kv_, 3, '0') || LPAD(country_, 3, '0');
    end if;
 
-   if nbs_ in ('2600', '2620', '2650')
+   if nbs_ in ('2600', '2605', '2620', '2625', '2650', '2655') and 
+      r011_ not in ('1', '2', '3') 
    then
-      kodp_:= dk_ || nbs_ || '9' || k111_ || k072_ || '9' || s183_ ||
+      kodp_:= dk_ || nbs_ || '1' || k111_ || k072_ || '9' || s183_ ||
               TO_CHAR(2-re_) || k051_ || LPAD(kv_, 3, '0') || LPAD(country_, 3, '0');
    end if;
 
@@ -484,7 +534,7 @@ BEGIN
 
       lim_ := GL.P_ICURVAL(kv_, lim_, Dat_);
 
-      kodp_:= dk_ || nbs_ || '1' || k111_ || k072_ || '9' || s183_ ||
+      kodp_:= dk_ || nbs_ || '3' || k111_ || k072_ || '9' || s183_ ||
               TO_CHAR(2-re_) || k051_ || LPAD(kv_, 3, '0') || LPAD(country_, 3, '0');
 
       if dat_ >= to_date('01082011','ddmmyyyy') and dat_ <= dat_izm2 then
@@ -598,7 +648,7 @@ BEGIN
 
       if ABS(se_) < ABS(lim_) and abs(lim_) != 0
       then
-         kodp_:= dk_ || nbs_ || '1' || k111_ || k072_ || '9' || s183_ ||
+         kodp_:= dk_ || nbs_ || '3' || k111_ || k072_ || '9' || s183_ ||
                  TO_CHAR(2-re_) || k051_ || LPAD(kv_, 3, '0') || LPAD(country_, 3, '0');
          if dat_ >= to_date('01082011','ddmmyyyy') and dat_ <= dat_izm2 then
             kodp_ :=  kodp_ || iif_n(spcnt_, 0, '1', '0', '1') ;
@@ -654,7 +704,7 @@ BEGIN
       if ABS(se_) >= ABS(lim_) and abs(lim_) != 0
       then
 
-         kodp_:= dk_ || nbs_ || '1' || k111_ || k072_ || '9' || s183_ ||
+         kodp_:= dk_ || nbs_ || '3' || k111_ || k072_ || '9' || s183_ ||
                  TO_CHAR(2-re_) || k051_ || LPAD(kv_, 3, '0') || LPAD(country_, 3, '0');
          if dat_ >= to_date('01082011','ddmmyyyy') and dat_ <= dat_izm2 then
             kodp_ :=  kodp_ || iif_n(spcnt_, 0, '1', '0', '1') ;
@@ -706,7 +756,7 @@ BEGIN
          end if;
 
          -- 27.07.2010 вместо переменной S183_ заносим значение '1'
-         kodp_:= dk_ || nbs_ || '2' || k111_ || k072_ || '9' || '1' ||
+         kodp_:= dk_ || nbs_ || '3' || k111_ || k072_ || '9' || '1' ||
                  TO_CHAR(2-re_) || k051_ || LPAD(kv_, 3, '0') || LPAD(country_, 3, '0');
 
          if dat_ >= to_date('01082011','ddmmyyyy') and dat_ <= dat_izm2 then
@@ -732,7 +782,7 @@ BEGIN
       if ABS(se_) >= ABS(lim_) and abs(lim_) = 0
       then
          -- параметр R011 до 13.12.2010 устанавливали в "1" после консультаций будем формировать "2"
-         kodp_:= dk_ || nbs_ || '2' || k111_ || k072_ || '9' || s183_ ||
+         kodp_:= dk_ || nbs_ || '3' || k111_ || k072_ || '9' || s183_ ||
                  TO_CHAR(2-re_) || k051_ || LPAD(kv_, 3, '0') || LPAD(country_, 3, '0');
 
          if dat_ >= to_date('01082011','ddmmyyyy') and dat_ <= dat_izm2 then
@@ -751,7 +801,7 @@ BEGIN
          -- c 13.12.2010 не будем изменять параметр R011 c "1" на "9" т.к. парамтер R011="2"
          -- a будем изменять парамтер S183 с любого значения на "1"
          if s183_ != '1' then
-            kodp_:= dk_ || nbs_ || '2' || k111_ || k072_ || '9' || '1' ||
+            kodp_:= dk_ || nbs_ || '3' || k111_ || k072_ || '9' || '1' ||
                     TO_CHAR(2-re_) || k051_ || LPAD(kv_, 3, '0') || LPAD(country_, 3, '0');
 
             if dat_ >= to_date('01082011','ddmmyyyy') and dat_ <= dat_izm2 then
@@ -839,7 +889,7 @@ BEGIN
 
             lim_ := GL.P_ICURVAL(kv_, lim_, Dat_);
 
-            if lim_ <> 0 then
+            if sn1_ <> 0 then
                koef_ := ABS(lim_/sn1_);
             end if;
 
@@ -884,13 +934,13 @@ BEGIN
 
             if abs(sn1_) >= abs(lim_) and abs(lim_) != 0 then
                if nbs_ = '2608' then
-                  kodp_:= dk_ || nbs_ || '7' || k111_ || k072_ || '9' || s183_ ||
+                  kodp_:= dk_ || nbs_ || '3' || k111_ || k072_ || '9' || s183_ ||
                           TO_CHAR(2-re_) || k051_ || LPAD(kv_, 3, '0') || LPAD(country_, 3, '0');
                elsif nbs_ = '2628' then
-                  kodp_:= dk_ || nbs_ || '5' || k111_ || k072_ || '9' || s183_ ||
+                  kodp_:= dk_ || nbs_ || '3' || k111_ || k072_ || '9' || s183_ ||
                           TO_CHAR(2-re_) || k051_ || LPAD(kv_, 3, '0') || LPAD(country_, 3, '0');
                elsif nbs_ = '2658' then
-                  kodp_:= dk_ || nbs_ || '6' || k111_ || k072_ || '9' || s183_ ||
+                  kodp_:= dk_ || nbs_ || '3' || k111_ || k072_ || '9' || s183_ ||
                           TO_CHAR(2-re_) || k051_ || LPAD(kv_, 3, '0') || LPAD(country_, 3, '0');
                else
                   null;
@@ -922,13 +972,13 @@ BEGIN
 
                -- 27.07.2010 вместо переменной S183_ заносим значение '1'
                if nbs_ = '2608' then
-                  kodp_:= dk_ || nbs_ || '8' || k111_ || k072_ || '9' || '1' ||
+                  kodp_:= dk_ || nbs_ || '3' || k111_ || k072_ || '9' || '1' ||
                           TO_CHAR(2-re_) || k051_ || LPAD(kv_, 3, '0') || LPAD(country_, 3, '0');
                elsif nbs_ = '2628' then
-                  kodp_:= dk_ || nbs_ || '6' || k111_ || k072_ || '9' || '1' ||
+                  kodp_:= dk_ || nbs_ || '3' || k111_ || k072_ || '9' || '1' ||
                           TO_CHAR(2-re_) || k051_ || LPAD(kv_, 3, '0') || LPAD(country_, 3, '0');
                elsif nbs_ = '2658' then
-                  kodp_:= dk_ || nbs_ || '7' || k111_ || k072_ || '9' || '1' ||
+                  kodp_:= dk_ || nbs_ || '3' || k111_ || k072_ || '9' || '1' ||
                           TO_CHAR(2-re_) || k051_ || LPAD(kv_, 3, '0') || LPAD(country_, 3, '0');
                else
                   null;
@@ -956,15 +1006,15 @@ BEGIN
             if abs(sn1_) >= abs(lim_) and abs(lim_) = 0 then
                if nbs_ = '2608' then
                   -- параметр R011 до 13.12.2010 устанавливали в "7" после консультаций будем формировать "8"
-                  kodp_:= dk_ || nbs_ || '8' || k111_ || k072_ || '9' || '1' ||
+                  kodp_:= dk_ || nbs_ || '3' || k111_ || k072_ || '9' || '1' ||
                           TO_CHAR(2-re_) || k051_ || LPAD(kv_, 3, '0') || LPAD(country_, 3, '0');
                elsif nbs_ = '2628' then
                   -- параметр R011 до 13.12.2010 устанавливали в "5" после консультаций будем формировать "6"
-                  kodp_:= dk_ || nbs_ || '6' || k111_ || k072_ || '9' || '1' ||
+                  kodp_:= dk_ || nbs_ || '3' || k111_ || k072_ || '9' || '1' ||
                           TO_CHAR(2-re_) || k051_ || LPAD(kv_, 3, '0') || LPAD(country_, 3, '0');
                elsif nbs_ = '2658' then
                   -- параметр R011 до 13.12.2010 устанавливали в "6" после консультаций будем формировать "7"
-                  kodp_:= dk_ || nbs_ || '7' || k111_ || k072_ || '9' || '1' ||
+                  kodp_:= dk_ || nbs_ || '3' || k111_ || k072_ || '9' || '1' ||
                           TO_CHAR(2-re_) || k051_ || LPAD(kv_, 3, '0') || LPAD(country_, 3, '0');
                else
                   null;
@@ -1053,7 +1103,7 @@ BEGIN
     dat_kl_ := add_months(trunc(dat_, 'mm'), 1);
 
     if prnk_ is null then
-        sql_acc_ := ' SELECT  /*+ parallel(a) */ * FROM ACCOUNTS a where nvl(a.nbs, SUBSTR (a.nls, 1, 4)) in (';
+        sql_acc_ := ' SELECT  /*+ parallel(a, 8) */ * FROM ACCOUNTS a where nvl(a.nbs, SUBSTR (a.nls, 1, 4)) in (';
         sql_acc_ := sql_acc_ || 'select r020 from kod_r020 where trim(prem)=''КБ'' and a010=''D6'' and r020 not like ''7%'' ';
         sql_acc_ := sql_acc_ || 'and d_open<=to_date('''||to_char(dat_kl_, 'ddmmyyyy')||''',''ddmmyyyy'') ';
         sql_acc_ := sql_acc_ || 'and (d_close is null or d_close>to_date('''||to_char(dat_kl_, 'ddmmyyyy')||''',''ddmmyyyy''))) ';
@@ -1061,11 +1111,11 @@ BEGIN
         if FL_D8_ = '8' then
            sql_acc_ := sql_acc_ || ' and a.acc not in (SELECT GEN_ACC FROM V_DPU_REL_ACC_ALL) '; 
            sql_acc_ := sql_acc_ || ' UNION ALL '; 
-           sql_acc_ := sql_acc_ || ' SELECT  /*+ parallel(v) */ s.ACC, s.KF, s.NLS, s.KV, s.BRANCH, s.NLSALT, '||
+           sql_acc_ := sql_acc_ || ' SELECT  /*+ parallel(v, 8) */ s.ACC, s.KF, s.NLS, s.KV, s.BRANCH, s.NLSALT, '||
                             'substr(s.NLSALT,1,4) NBS, s.NBS2, s.DAOS, s.DAPP, s.ISP, s.NMS,
                              s.LIM, s.OSTB, s.OSTC, s.OSTF, s.OSTQ, s.DOS, s.KOS, s.DOSQ, s.KOSQ, s.PAP, s.TIP, s.VID, s.TRCN, 
                              s.MDATE, s.DAZS, s.SEC, s.ACCC, s.BLKD, s.BLKK, s.POS, s.SECI, s.SECO, s.GRP, s.OSTX, s.RNK, 
-                             s.NOTIFIER_REF, s.TOBO, s.BDATE, s.OPT, s.OB22, s.DAPPQ, s.SEND_SMS
+                             s.NOTIFIER_REF, s.TOBO, s.BDATE, s.OPT, s.OB22, s.DAPPQ, s.SEND_SMS, s.DAT_ALT
                      FROM ACCOUNTS a, V_DPU_REL_ACC_ALL v, accounts s
                      where a.nbs IN (
                         SELECT r020
@@ -1111,17 +1161,17 @@ BEGIN
                         b.dos96, b.kos96, b.dosq96, b.kosq96, b.isp, b.lim, b.blkd,
                         b.blkk, b.ob22, b.tobo, b.nms, b.prc, b.mdate,
                         b.codc, b.sed, b.country,
-                        nvl(d.k111,''00'') k111, nvl(e.k072,''0'') k072, nvl(g.k081,''0'') k081,
-                        nvl(trim(p.k072), ''0'') k072p, p.acc acc1, NVL(Trim(p.r011),''0'') r011,
-                        NVL(Trim(p.r013),''0'') r013, Trim(p.s180) s180, null acc2
+                        nvl(d.k111,''00'') k111, nvl(e.k072,''00'') k072, nvl(g.k081,''0'') k081,
+                        nvl(trim(p.k072), ''00'') k072p, p.acc acc1, NVL(Trim(p.r011),''0'') r011,
+                        NVL(Trim(p.r013),''0'') r013, Trim(p.s180) s180, null acc2, b.codcagent
                     from (
-                       SELECT  /*+ PARALLEL(a) */
+                       SELECT  /*+ ordered */
                                a.rnk, a.acc, a.nls, a.kv, a.fdat, a.nbs, a.ost, a.ostq,
                                a.dos96, a.kos96, a.dosq96, a.kosq96, s.isp, NVL(s.lim,0) lim,
                                NVL(s.blkd,0) blkd, NVL(s.blkk,0) blkk, NVL(s.ob22,''00'') ob22, s.tobo, s.nms,
                                0 prc, s.mdate, c.ved k110, c.ise k070, c.fs k080, MOD(c.codcagent ,2) codc,
                                nvl(substr(ltrim(rtrim(c.sed)),1,2),''00'') sed,
-                               nvl(c.country,804) country
+                               nvl(c.country,804) country, c.codcagent codcagent
                        FROM otcn_saldo a, accounts s, customer c
                        WHERE a.acc=s.acc
                          AND ((a.nbs NOT IN (''1500'',''2600'',''2605'',''2620'',''2625'',''2650'',''2655'') AND
@@ -1193,11 +1243,12 @@ BEGIN
            r013_     := l_rec_t(i).r013_;
            s180_     := l_rec_t(i).s180_;
            acc2_     := l_rec_t(i).acc2_;
+           codcagent_  := l_rec_t(i).codcagent_;
            
            comm_ := '';
 
            if dat_ <= dat_izm2 then
-              spcnt_ := Acrn.fproc (acc_, dat_);
+              spcnt_ := acrn_otc.fproc (acc_, dat_);
            end if;
 
            IF kv_ <> 980 THEN
@@ -1280,7 +1331,7 @@ BEGIN
                 sum(z.sumh) over (partition by z.acc) sh
            from (
                select acc, nls, kv, rnk, isp, accc, tip, 0, iacc, 0 sumh
-               from (select /*+ PARALLEL(a) */
+               from (select /*+ PARALLEL(a, 8) */
                         a.acc, a.nls, a.kv, a.rnk, a.isp, a.accc, a.tip, i.acc iacc
                      from accounts a, int_accn i
                      where a.nbs in ('1608','1618','2518','2528','2538','2548','2558','2568','2618','2608','2628','2638','2658') and
@@ -1323,7 +1374,7 @@ BEGIN
                                          s.kos <> 0))) z;
 
            insert into OTCN_FD5_DOCS (ACC, NBS, REF, FDAT, S, NAZN)
-           select /*+PARALLEL(o)*/
+           select /*+ ordered */
             o.acc, decode(r.dk, 1, substr(r.nlsa,1,4), substr(r.nlsb,1,4)) nbs,
             o.REF, o.fdat, nvl(o.s, 0) s, r.NAZN
            from saldoa s, opldok o, opldok p, accounts a, oper r
@@ -1345,7 +1396,8 @@ BEGIN
                 r.vob = 96 and  o.fdat > dat2_);
 
            insert into OTCN_FD5_DOCS (ACC, NBS, REF, FDAT, S, NAZN)
-           select o.acc, decode(r.dk, 1, substr(r.nlsa,1,4), substr(r.nlsb,1,4)) nbs, o.REF, o.fdat,
+           select /*+ ordered*/
+                o.acc, decode(r.dk, 1, substr(r.nlsa,1,4), substr(r.nlsb,1,4)) nbs, o.REF, o.fdat,
                 decode(r.kv, 980, r.s, r.s2), r.NAZN
            from saldoa s, opldok o, opldok p, accounts a, oper r
            where s.fdat between datr1_ and dat_kor_ and
@@ -1377,7 +1429,7 @@ BEGIN
            
            -- вибираэмо рахунки, де один процентний рахунок выдповыдаэ рахунку активу
            for k in (select *
-                     from (select /*+parallel(b) */
+                     from (select /*+parallel(b, 8) */
                                 distinct b.ACC, b.NLS, b.KV, b.RNK, b.ISP, b.ACCC, b.TIP, b.DOS, b.IACC, b.ND,
                                 ot_sumh (b.iacc, datr1_, datr2_, 1, dat_, b.kv) SUMH,
                                 a.acc acca, a.nls nlsa, a.kv kva, a.isp ispa, a.rnk rnka, a.tip tipa, a.accc accca,
@@ -1420,7 +1472,7 @@ BEGIN
                          fl_ := 1;
 
                           if k.kodp is not null then
-                             kodp_ := '15'||k1.nbs||'0'||substr(k.kodp, 8, 8)||'980'||substr(k.kodp, 19, 3)||'4';
+                             kodp_ := '15'||k1.nbs||'0'||substr(k.kodp, 8, 9)||'980'||substr(k.kodp, 20, 3)||'4';
                              znap_ := to_char(k1.dob);
 
                              comm_ := 'Визнані процентні витрати ';
@@ -1448,7 +1500,7 @@ BEGIN
                   -- якщо є визнані проценті витрати, то формуємо середні залишки
                   if fl_ = 1 then
                       if k.kodpa is not null then
-                         kodp_ := substr(k.kodpa, 1, 21)||'3';
+                         kodp_ := substr(k.kodpa, 1, 22)||'3';
                          znap_ := to_char(abs(k.sumh));
 
                          comm_ := 'Середні залишки ';
@@ -1521,7 +1573,7 @@ BEGIN
                      fl_ := 1;
 
                       if k.kodp is not null then
-                         kodp_ := '15'||k.nbs||'0'||substr(k.kodp, 8, 8)||'980'||substr(k.kodp, 19, 3)||'4';
+                         kodp_ := '15'||k.nbs||'0'||substr(k.kodp, 8, 9)||'980'||substr(k.kodp, 20, 3)||'4';
 
                          znap_ := to_char(k.s1);
 
@@ -1550,7 +1602,7 @@ BEGIN
                      fl_ := 1;
 
                       if k.kodp is not null then
-                         kodp_ := '15'||k.nbs||'0'||substr(k.kodp, 8, 8)||'980'||substr(k.kodp, 19, 3)||'4';
+                         kodp_ := '15'||k.nbs||'0'||substr(k.kodp, 8, 9)||'980'||substr(k.kodp, 20, 3)||'4';
 
                          znap_ := to_char(ROUND(k.zal_sum * (K.sumh / K.sh)));
 
@@ -1578,7 +1630,7 @@ BEGIN
                   -- якщо є визнані проценті доходи, то формуємо середні залишки
                   if fl_ = 1 then
                       if k.kodpa is not null then
-                         kodp_ := substr(k.kodpa, 1, 21)||'3';
+                         kodp_ := substr(k.kodpa, 1, 22)||'3';
                          znap_ := to_char(abs(k.sumh));
 
                          comm_ := 'Середні залишки ';
@@ -1767,7 +1819,7 @@ BEGIN
 
     if prnk_ is null then
       --------------------------------------------------------
-      P_Ch_Filed5(kodf_,dat_,userid_);
+      --P_Ch_Filed5(kodf_,dat_,userid_);
       --------------------------------------------------------
 
       otc_del_arch(kodf_, dat_, 0);
