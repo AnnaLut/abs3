@@ -173,6 +173,5 @@ begin
 end;
 /
 
-
 -- DOMAINCODE
 alter table UPL_FILES DISABLE constraint FK_DOMAINCODE;
