@@ -126,7 +126,7 @@ show errors
 
 CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
 
-   g_body_version   constant varchar2 (64) := 'version 2.13  01.12.2017';
+   g_body_version   constant varchar2 (64) := 'version 2.14  16.01.2018';
 
    function body_version return varchar2 is
    begin
@@ -665,15 +665,15 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
     for cur in (select a.agrmnt_id,
                        a.dpt_id,
 --                       (SELECT DISTINCT FIRST_VALUE (dds.rnk) OVER (ORDER BY idupd DESC) FROM dpt_deposit_clos dds WHERE dds.deposit_id = a.dpt_id and nvl(dds.archdoc_id, 0) > 0) AS rnk
-                       (select min(rnk) keep(dense_rank last order by idupd) from bars.dpt_deposit_clos dds where dds.deposit_id = a.dpt_id AND nvl(dds.archdoc_id, 0) > 0) as rnk   -- последний владелец счета, причем в ЕБП archdoc_id >= 0
-                  from dpt_agreements a
-                 where a.agrmnt_id > l_cdc_lastkey_agr
-		   AND a.agrmnt_type != 25 -- lypskykh #COBUMMFO-5263
-                   and exists (select 1
-                          from dpt_deposit_clos dc join dpt_deposit d using (deposit_id)
-                         where deposit_id = a.dpt_id
-                           and nvl(dc.archdoc_id, 0) > 0
-                           and d.wb = 'N')
+                       (select min(rnk) keep(dense_rank last order by idupd) from dpt_deposit_clos dds where dds.deposit_id = a.dpt_id AND nvl(dds.archdoc_id, 0) > 0) as rnk   -- последний владелец счета, причем в ЕБП archdoc_id >= 0
+                from dpt_agreements a
+                where a.agrmnt_id > l_cdc_lastkey_agr
+		          AND a.agrmnt_type != 25 -- lypskykh #COBUMMFO-5263
+                  and exists (select 1
+                              from dpt_deposit_clos dc join dpt_deposit d using (deposit_id)
+                              where deposit_id = a.dpt_id
+                                and nvl(dc.archdoc_id, 0) > 0
+                                and d.wb = 'N')
                  order by a.agrmnt_id) loop
       -- клиент
       l_sync_id := ead_pack.msg_create('CLIENT', to_char(cur.rnk));
@@ -766,11 +766,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
 
     l_sync_id     ead_sync_queue.id%type;
     l_cdc_lastkey ead_docs.id%type;
+    l_cdc_last_time ead_sync_sessions.sync_end%type;
   begin
     -- находим ключ захвата изменений
     begin
-      select to_number(ss.cdc_lastkey)
-        into l_cdc_lastkey
+      select to_number(ss.cdc_lastkey), ss.sync_end
+        into l_cdc_lastkey, l_cdc_last_time
         from ead_sync_sessions ss
        where ss.type_id = l_type_id;
     exception
@@ -781,8 +782,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
     -- берем все документы
     for cur in (select d.id, d.rnk, agr_id
                   from ead_docs d
-                 where d.id > l_cdc_lastkey
-                   and (d.sign_date IS NOT NULL OR d.type_id = 'SCAN') --отбираем только подписанные документы или сканкопии.
+                 where 1=1
+--                   and d.id > l_cdc_lastkey
+--                   and (d.sign_date IS NOT NULL OR d.type_id = 'SCAN') --отбираем только подписанные документы или сканкопии.
+                   and (d.type_id = 'SCAN' and d.id > l_cdc_lastkey
+                     or d.type_id = 'DOC' and d.sign_date > (l_cdc_last_time - interval '15' minute)
+                       and not exists (select 1 from ead_sync_queue where obj_id = to_char(d.id) and type_id = 'DOC' and CRT_DATE > trunc(sysdate))) --отбираем только подписанные документы или сканкопии.
                    and lnnvl(d.template_id = 'WB_CREATE_DEPOSIT')  -- все кроме онлайн-депозитов
                  order by d.id) loop
       --насильно отправляем клиента
