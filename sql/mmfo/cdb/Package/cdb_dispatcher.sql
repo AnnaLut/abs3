@@ -710,7 +710,7 @@ CREATE OR REPLACE PACKAGE BODY CDB.CDB_DISPATCHER as
 
         l_lending_document_id := cdb_bars_object.create_bars_document(l_deal_id,
                                                                       'KV7',
-                                                                      1,
+                                                                      6,
                                                                       l_lender_account_id,
                                                                       l_borrower_account_id,
                                                                       l_claim_new_deal_row.amount,
@@ -800,7 +800,7 @@ CREATE OR REPLACE PACKAGE BODY CDB.CDB_DISPATCHER as
         if (l_amount_delta > 0) then
             l_sender_document_id := cdb_bars_object.create_bars_document(l_deal_row.id,
                                                                          'KV7',
-                                                                         1,
+                                                                         6,
                                                                          l_loan_deal_row.main_account_id,
                                                                          l_deposit_deal_row.main_account_id,
                                                                          l_amount_delta,
@@ -823,7 +823,7 @@ CREATE OR REPLACE PACKAGE BODY CDB.CDB_DISPATCHER as
         else
             l_sender_document_id := cdb_bars_object.create_bars_document(l_deal_row.id,
                                                                          'WD7',
-                                                                         1,
+                                                                         6,
                                                                          l_deposit_deal_row.main_account_id,
                                                                          l_loan_deal_row.main_account_id,
                                                                          abs(l_amount_delta),
@@ -1086,7 +1086,7 @@ CREATE OR REPLACE PACKAGE BODY CDB.CDB_DISPATCHER as
         if (l_loan_rest <> 0) then
             l_main_debt_payment_doc_id := cdb_bars_object.create_bars_document(l_deal_row.id,
                                                                                'WD7',
-                                                                               1,
+                                                                               6,
                                                                                l_deposit_row.main_account_id,
                                                                                l_loan_row.main_account_id,
                                                                                l_loan_rest,
