@@ -287,7 +287,7 @@ is
   --***************************************************************************--
   g_modcode       constant varchar2(3) := 'CAC';
 
-  g_body_version  constant varchar2(64)  := 'version 2.1  11/01/2018';
+  g_body_version  constant varchar2(64)  := 'version 2.2  17/01/2018';
   g_body_defs     constant varchar2(512) := ''
 $if ACC_PARAMS.KOD_D6
 $then
@@ -2760,26 +2760,30 @@ l_acc_row accounts%rowtype;
 l_result  varchar2(500);
 begin
     l_module := pul.get('MODULE');
-    bars_audit.trace(title||': start for acc #'||p_acc||', module ('||l_module||')'||' spid = '||p_spid);
+    bars_audit.trace(title||': start for acc #'||p_acc||', module ('||nvl(l_module, 'GENERAL')||')'||' spid = '||p_spid);
     select * into l_acc_row from accounts where acc = p_acc;
     
     if p_spid = 1 then -- R011
         
         bars_audit.trace(title||': R011. Tip = '||l_acc_row.tip||', nbs='||l_acc_row.nbs);
-        /* общее */
-        if l_acc_row.nbs = '3578' and l_acc_row.tip in ('SK0', 'SK9') then
-            l_result := '1';
-            return l_result;
-        elsif l_acc_row.nbs = '9129' and l_acc_row.tip = 'CR9' then
-            l_result := '4';
-            return l_result;
-        end if;
         
+        /* ищем умолчательное значение, если нет специфической для модуля логики заполнения */
+        begin
+            select r011
+            into l_result
+            from cck_r011
+            where nbs = l_acc_row.nbs
+            and module_specific = 'N';
+            return l_result;
+        exception
+            when no_data_found then null;
+        end;
+
         if l_module = 'CCK' then
             bars_audit.trace(title||': CCK. Tip = '||l_acc_row.tip);
             
             /* COBUMMFO-6175 автоматически определяем R011 при открытии счета */
-            if l_acc_row.tip in ('SS', 'SDI', 'SN') then
+            if trim(l_acc_row.tip) in ('SS', 'SDI', 'SN') then
                 bars_audit.trace(title||': CCK. Ищем r011 по справочнику');
                 begin
                     select r011
@@ -2791,7 +2795,7 @@ begin
                         bars_audit.error(title || ': не найдено значение r011 в справочнике для балансового #'||l_acc_row.nbs);
                 end;
                 
-            elsif l_acc_row.tip in ('SNO', 'SNA', 'SP', 'SPN') then
+            elsif l_acc_row.tip in ('SNO', 'SNA', 'SP ', 'SPN') then
                 bars_audit.trace(title||': CCK. ND = '||pul.get('ND'));
                 
                 select s.r011
@@ -2807,11 +2811,30 @@ begin
                 )
                 and (dazs is null or dazs > gl.bd)
                 and rownum = 1;
+            elsif l_acc_row.tip in ('SK0', 'SK9', 'CR9') then
+                l_result := case 
+                                when l_acc_row.nbs = '3528' and l_acc_row.tip in ('SK0', 'SK9') then '1' 
+                                when l_acc_row.nbs = '9129' and l_acc_row.tip = 'CR9' then '4' 
+                            end;
             end if;
         elsif l_module = 'BPK' then
             null;
         end if;
     elsif p_spid = 2 then -- R013
+        
+        /* ищем умолчательное значение, если нет специфической для модуля логики заполнения */
+        begin
+            select r013
+            into l_result
+            from cck_r013
+            where nbs = l_acc_row.nbs
+            and module_specific = 'N'
+            and   ob22 = case when ob22 = '-' then '-' else l_acc_row.ob22 end;
+            return l_result;
+        exception
+            when no_data_found then null;
+        end;
+    
         if l_module = 'CCK' then
             /* COBUMMFO-6282 автоматически определяем R013 при открытии счета */
             bars_audit.trace(title||': CCK. Tip = '||l_acc_row.tip);
