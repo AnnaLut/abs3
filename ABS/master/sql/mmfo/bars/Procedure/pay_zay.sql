@@ -197,7 +197,7 @@ begin
 
 
        ipay_doc (p_tt => 'GOR',
-                 p_vob => 1,
+                 p_vob => 6,
                  p_dk => 1,
                  p_sk => null,
                  p_nam_a => l_nam_a,
