@@ -358,7 +358,7 @@ show errors
 
 CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION
 IS
-   g_body_version   CONSTANT VARCHAR2 (64) := 'version 2.3   01.12.2017';
+   g_body_version   CONSTANT VARCHAR2 (64) := 'version 2.4   16.01.2018';
 
    FUNCTION body_version
       RETURN VARCHAR2
@@ -545,6 +545,7 @@ IS
    is
     l_MergedRNK_Rec MergedRNK_Rec;
    begin
+/*
     for i in (  SELECT DISTINCT rnkfrom AS mrg_rnk
                   FROM (SELECT rn.rnkfrom, rn.rnkto
                           FROM rnk2nls rn
@@ -552,6 +553,11 @@ IS
                         SELECT rt.rnkfrom, rt.rnkto
                           FROM rnk2tbl rt)
                  WHERE rnkfrom != p_rnk and rnkto = p_rnk order by rnkfrom desc)
+*/
+    for i in (select rnk as mrg_rnk from customer
+               where rnk in (select rnkfrom from rnk2nls where rnkfrom != p_rnk and rnkto = p_rnk)
+                 and rnk in (select rnkfrom from rnk2tbl where rnkfrom != p_rnk and rnkto = p_rnk)
+                 and date_off is not null)
     loop
         l_MergedRNK_Rec.mrg_rnk := i.mrg_rnk;
         PIPE ROW (l_MergedRNK_Rec);
