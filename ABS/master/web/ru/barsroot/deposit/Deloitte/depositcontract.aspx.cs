@@ -65,6 +65,7 @@ public partial class DepositContract : Bars.BarsPage
             /// 
 
             Deposit dpt = (Deposit)Session["DepositInfo"];
+            dpt.wb = 'N';
 
             // ФИО клиента
             textClientName.Text = dpt.Client.Name;
