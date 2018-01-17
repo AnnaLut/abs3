@@ -34,86 +34,19 @@ procedure SET_SPARAM_LIST
 );
 
 --
--- OPEN_ACCOUNT
+-- Получить умолчательное значение для спецпараметра
+-- Алгоритм расчета зависит от модуля, определяется контекстом 'MODULE'; Необходимые переменные также берутся из контекста
 --
-procedure OPN_ACC
-( p_acc               out accounts.acc%type  -- Account id
-, p_rnk            in     accounts.rnk%type  -- Customer number
-, p_nbs            in     accounts.nbs%type  -- R020
-, p_ob22           in     accounts.ob22%type -- OB22
-, p_nls            in     accounts.nls%type  -- Account number
-, p_nms            in     accounts.nms%type  -- Account name
-, p_kv             in     accounts.kv%type   -- Currency code
-, p_isp            in     accounts.isp%type  -- User id
-, p_nlsalt         in     accounts.nlsalt%type default Null --
-, p_pap            in     accounts.pap%type    default Null -- T020
-, p_tip            in     accounts.tip%type    default 'ODB'
-, p_pos            in     accounts.pos%type    default Null -- Account Characteristic
-, p_vid            in     accounts.vid%type    default Null
-, p_branch         in     accounts.branch%type default Null
-, p_lim            in     accounts.lim%type    default Null
-, p_ostx           in     accounts.ostx%type   default Null
-, p_blkd           in     accounts.blkd%type   default Null
-, p_blkk           in     accounts.blkk%type   default Null
-, p_grp            in     accounts.GRP%type    default Null
-, p_accc           in     accounts.accc%type   default Null -- Parent Account id
-, p_mdate          in     accounts.mdate%type  default Null --
-, p_mode           in     integer              default 77   -- Opening mode
-);
+function get_default_spar_value(p_acc    in accounts.acc%type,
+                                p_spid in sparam_list.spid%type) return varchar2;
 
 --
--- CHANGE_ACCOUNT_ATTRIBUTE
+-- Проставить умолчательные значения для спецпараметров (по флагу sparam_list.def_flag = 'Y')
 --
-procedure CHG_ACC_ATTR
-( p_acc            in     accounts.acc%type
-, p_nms            in     accounts.nms%type
-, p_isp            in     accounts.isp%type
-, p_nlsalt         in     accounts.nlsalt%type
-, p_pap            in     accounts.pap%type
-, p_tip            in     accounts.tip%type
-, p_pos            in     accounts.pos%type
-, p_vid            in     accounts.vid%type
-, p_branch         in     accounts.branch%type
-, p_lim            in     accounts.lim%type
-, p_ostx           in     accounts.ostx%type
-, p_blkd           in     accounts.blkd%type
-, p_blkk           in     accounts.blkk%type
-, p_grp            in     accounts.GRP%type
-, p_mdate          in     accounts.mdate%type  default Null
-);
+procedure set_default_sparams(p_acc in accounts.acc%type);
 
---
---
---
-procedure SetAccountAttr
-( mod_              integer,            -- Opening mode : 1, 2, 3, 4, 5, 6, 9, 99, 77
-  p1_               integer,            -- 1st Par      : 1-nd, 2-nd, 3-main acc, 4-mfo, 5-mfo, 6-acc
-  p2_               integer,            -- 2nd Par      : 2-pawn, 4-acc
-  p3_               integer,            -- 3rd Par (Grp): 2-mpawn, others-grp
-  p4_        in out integer,            -- 4th Par      : 2-ndz(O)
-  rnk_              accounts.rnk%type,  -- Customer number
-  nls_              accounts.nls%type,  -- Account  number
-  kv_               accounts.kv%type,   -- Currency code
-  nms_              accounts.nms%type,  -- Account name
-  tip_              accounts.tip%type,  -- Account type
-  isp_              accounts.isp%type,
-  accR_         out accounts.acc%type,
-  nbsnull_          varchar2             default '1',
-  ob22_             accounts.ob22%type,
-  pap_              accounts.pap%type    default Null,
-  vid_              accounts.vid%type    default Null,
-  pos_              accounts.pos%type    default Null,
-  sec_              number               default Null,
-  seci_             accounts.seci%type   default Null,
-  seco_             accounts.seco%type   default Null,
-  blkd_             accounts.blkd%type   default Null,
-  blkk_             accounts.blkk%type   default Null,
-  lim_              accounts.lim%type    default Null,
-  ostx_             varchar2             default Null, -- 'NULL' for update
-  nlsalt_           accounts.nlsalt%type default Null, -- 'NULL' for update
-  branch_           accounts.branch%type default Null,  --
-  accc_             accounts.accc%type   default Null  -- 'NULL' for update
-);
+end accreg;
+/
 
 -- for sparam_list
 procedure setAccountSParam (
@@ -187,10 +120,10 @@ procedure RSRV_ACC_NUM
 ( p_nls      in     accounts_rsrv.nls%type            -- Account  number
 , p_kv       in     accounts_rsrv.kv%type             -- Currency code
 , p_nms      in     accounts_rsrv.nms%type            -- Account name
-, p_branch   in     accounts_rsrv.branch%type         --
-, p_isp      in     accounts_rsrv.isp%type            --
+, p_branch   in     accounts_rsrv.branch%type         -- 
+, p_isp      in     accounts_rsrv.isp%type            -- 
 , p_rnk      in     accounts_rsrv.rnk%type            -- Customer number
-, p_agrm_num in     accountsw.value%type default null --
+, p_agrm_num in     accountsw.value%type default null -- 
 --, p_errmsg      out varchar2
 );
 
@@ -212,17 +145,17 @@ procedure P_RESERVE_ACC
 , p_kv       in     accounts.kv%type                  -- Currency code
 , p_nms      in     accounts.nms%type                 -- Account name
 , p_tip      in     accounts.tip%type                 -- Account type
-, p_grp      in     accounts.grp%type                 --
-, p_isp      in     accounts.isp%type                 --
-, p_pap      in     accounts.pap%type    default null --
-, p_vid      in     accounts.vid%type    default null --
-, p_pos      in     accounts.pos%type    default null --
-, p_blkd     in     accounts.blkd%type   default null --
-, p_blkk     in     accounts.blkk%type   default null --
-, p_lim      in     accounts.lim%type    default null --
-, p_ostx     in     accounts.ostx%type   default null --
-, p_nlsalt   in     accounts.nlsalt%type default null --
-, p_branch   in     accounts.branch%type default null --
+, p_grp      in     accounts.grp%type                 -- 
+, p_isp      in     accounts.isp%type                 -- 
+, p_pap      in     accounts.pap%type    default null -- 
+, p_vid      in     accounts.vid%type    default null -- 
+, p_pos      in     accounts.pos%type    default null -- 
+, p_blkd     in     accounts.blkd%type   default null -- 
+, p_blkk     in     accounts.blkk%type   default null -- 
+, p_lim      in     accounts.lim%type    default null -- 
+, p_ostx     in     accounts.ostx%type   default null -- 
+, p_nlsalt   in     accounts.nlsalt%type default null -- 
+, p_branch   in     accounts.branch%type default null -- 
 , p_ob22     in     accounts.ob22%type   default null -- OB22
 , p_agrm_num in     accountsw.value%type default null -- номер договору банківського обслуговування
 , p_trf_id   in     sh_tarif.ids%type    default null -- код тарифного пакету
@@ -287,7 +220,7 @@ is
   --***************************************************************************--
   g_modcode       constant varchar2(3) := 'CAC';
 
-  g_body_version  constant varchar2(64)  := 'version 2.1  12/01/2018';
+  g_body_version  constant varchar2(64)  := 'version 2.2  17/01/2018';
   g_body_defs     constant varchar2(512) := ''
 $if ACC_PARAMS.KOD_D6
 $then
@@ -488,9 +421,9 @@ $then
             end;
         end;
       else -- перевірка на допустимість типу рахунка
-
+        
         null;
-
+        
 --       begin
 --         select TIP
 --           into l_tip
@@ -512,7 +445,7 @@ $then
 --               bars_error.raise_nerror( g_modcode, 'GENERAL_ERROR_CODE', 'Недопустимий тип '||tip_||' для балансового рахунку '||l_nbs  );
 --           end;
 --       end;
-
+        
       end if;
 
 $end
@@ -549,7 +482,7 @@ $end
   then
     SetAccountSParam( accR_, 'OB22', ob22_ );
   end if;
-
+  
 $if ACC_PARAMS.MMFO
 $then
   bars_audit.info( 'DPA_ACCREG: l_nbs - ' || l_nbs 
@@ -2884,12 +2817,203 @@ begin
     bars_audit.trace(title||': finish for acc #'||p_acc);
 end set_default_sparams;
 
+    -- наслідуємо додаткові реквізити рахунка
+    insert
+      into ACCOUNTSW
+         ( KF, ACC, TAG, VALUE )
+    select KF, l_acc_id, TAG, VALUE
+      from ACCOUNTSW
+     where ACC = p_acc;
+
+    -- наслідуємо спецпараметри рахунка
+    begin
+
+      select *
+        into r_specparam
+        from SPECPARAM
+       where ACC = p_acc;
+
+      r_specparam.ACC := l_acc_id;
+
+      update SPECPARAM
+         set ROW = r_specparam
+       where ACC = r_specparam.ACC;
+
+      if ( sql%rowcount = 0 )
+      then
+        insert
+          into SPECPARAM
+        values r_specparam;
+      end if;
+
+    exception
+      when NO_DATA_FOUND then
+        null;
+    end;
+
+  exception
+    when NO_DATA_FOUND then
+      p_errmsg := 'Не знайдено рахунок #'||to_char(p_acc);
+    when OTHERS then
+      p_errmsg := SubStr(sqlerrm,12);
+      l_acc_id := null;
+      bars_audit.error( title || ': ' || p_errmsg || chr(10)|| dbms_utility.format_error_stack() );
+      rollback;
+  end;
+
+  p_acc := l_acc_id;
+
+  bars_audit.trace( '%s: Exit with ( p_acc=%s, p_errmsg=%s  ).', title, to_char(p_acc), p_errmsg );
+
+end DUPLICATE_ACC;
+
+--
+-- Получить умолчательное значение для спецпараметра
+-- Алгоритм расчета зависит от модуля, определяется контекстом 'MODULE'; Необходимые переменные также берутся из контекста
+--
+function get_default_spar_value(p_acc    in accounts.acc%type,
+                                p_spid in sparam_list.spid%type)
+return varchar2
+is
+title     constant   varchar2(64) := $$PLSQL_UNIT||'.GET_DEFAULT_SPAR_VALUE';
+l_module  varchar2(32);
+l_acc_row accounts%rowtype;
+l_result  varchar2(500);
+begin
+    l_module := pul.get('MODULE');
+    bars_audit.trace(title||': start for acc #'||p_acc||', module ('||nvl(l_module, 'GENERAL')||')'||' spid = '||p_spid);
+    select * into l_acc_row from accounts where acc = p_acc;
+    
+    if p_spid = 1 then -- R011
+        
+        bars_audit.trace(title||': R011. Tip = '||l_acc_row.tip||', nbs='||l_acc_row.nbs);
+        
+        /* ищем умолчательное значение, если нет специфической для модуля логики заполнения */
+        begin
+            select r011
+            into l_result
+            from cck_r011
+            where nbs = l_acc_row.nbs
+            and module_specific = 'N';
+            return l_result;
+        exception
+            when no_data_found then null;
+        end;
+
+        if l_module = 'CCK' then
+            bars_audit.trace(title||': CCK. Tip = '||l_acc_row.tip);
+            
+            /* COBUMMFO-6175 автоматически определяем R011 при открытии счета */
+            if trim(l_acc_row.tip) in ('SS', 'SDI', 'SN') then
+                bars_audit.trace(title||': CCK. Ищем r011 по справочнику');
+                begin
+                    select r011
+                    into l_result
+                    from cck_r011
+                    where nbs = l_acc_row.nbs;
+                exception
+                    when no_data_found then
+                        bars_audit.error(title || ': не найдено значение r011 в справочнике для балансового #'||l_acc_row.nbs);
+                end;
+                
+            elsif l_acc_row.tip in ('SNO', 'SNA', 'SP ', 'SPN') then
+                bars_audit.trace(title||': CCK. ND = '||pul.get('ND'));
+                
+                select s.r011
+                into l_result
+                from accounts a
+                join nd_acc n on a.acc = n.acc and a.kf = n.kf and n.nd = pul.get('ND')
+                join specparam s on a.acc = s.acc
+                where
+                (
+                    l_acc_row.tip in ('SNO', 'SNA') and a.tip = 'SN '
+                    or
+                    l_acc_row.tip in ('SP ', 'SPN') and a.tip in ('SS ', 'SN ')
+                )
+                and (dazs is null or dazs > gl.bd)
+                and rownum = 1;
+            elsif l_acc_row.tip in ('SK0', 'SK9', 'CR9') then
+                l_result := case 
+                                when l_acc_row.nbs = '3528' and l_acc_row.tip in ('SK0', 'SK9') then '1' 
+                                when l_acc_row.nbs = '9129' and l_acc_row.tip = 'CR9' then '4' 
+                            end;
+            end if;
+        elsif l_module = 'BPK' then
+            null;
+        end if;
+    elsif p_spid = 2 then -- R013
+        
+        /* ищем умолчательное значение, если нет специфической для модуля логики заполнения */
+        begin
+            select r013
+            into l_result
+            from cck_r013
+            where nbs = l_acc_row.nbs
+            and module_specific = 'N'
+            and   ob22 = case when ob22 = '-' then '-' else l_acc_row.ob22 end;
+            return l_result;
+        exception
+            when no_data_found then null;
+        end;
+    
+        if l_module = 'CCK' then
+            /* COBUMMFO-6282 автоматически определяем R013 при открытии счета */
+            bars_audit.trace(title||': CCK. Tip = '||l_acc_row.tip);
+
+            if l_acc_row.tip in ('SN ', 'SK0') then
+                l_result := '2';
+            elsif l_acc_row.tip in ('SPN', 'SK9', 'OFR') then
+                l_result := '3';
+            else
+                begin
+                    select r013
+                    into l_result
+                    from cck_r013
+                    where nbs = l_acc_row.nbs
+                    and   ob22 = case when ob22 = '-' then '-' else l_acc_row.ob22 end;
+                exception
+                    when no_data_found then
+                        bars_audit.error(title || ': не найдено значение r013 в справочнике для балансового #'||l_acc_row.nbs||', ob22='||l_acc_row.ob22);
+                end;
+            end if;
+        end if;
+    end if;
+
+    bars_audit.trace(title||': Result = '||l_result);
+    return l_result;
+end get_default_spar_value;
+
+--
+-- Проставить умолчательные значения для спецпараметров (по флагу sparam_list.def_flag = 'Y')
+--
+procedure set_default_sparams(p_acc in accounts.acc%type)
+    is
+title       constant   varchar2(64) := $$PLSQL_UNIT||'.SET_DEFAULT_SPARAMS';
+begin
+    bars_audit.trace(title||': start for acc #'||p_acc);
+    for spar in (select *
+                 from sparam_list s
+                 where s.def_flag = 'Y')
+    loop
+        begin
+            if spar.tabname in ('ACCOUNTSW') then
+                setAccountwParam(p_acc, spar.tag, get_default_spar_value(p_acc, spar.spid));
+            else
+                setAccountSParam(p_acc, spar.name, get_default_spar_value(p_acc, spar.spid));
+            end if;
+        exception
+            when others then
+                bars_audit.error(title||': '||SubStr(sqlerrm,12)||' : '||dbms_utility.format_error_stack);
+        end;
+    end loop;
+    bars_audit.trace(title||': finish for acc #'||p_acc);
+end set_default_sparams;
+
+begin
+  null;
 end ACCREG;
 /
- show err;
- 
-PROMPT *** Create  grants  ACCREG ***
-grant EXECUTE                                                                on ACCREG          to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on ACCREG          to CUST001;
-grant EXECUTE                                                                on ACCREG          to WR_ALL_RIGHTS;
-grant EXECUTE                                                                on ACCREG          to WR_VIEWACC;
+
+show errors
+
+grant execute on ACCREG to BARS_ACCESS_DEFROLE;
