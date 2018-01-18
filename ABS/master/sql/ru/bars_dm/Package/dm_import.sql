@@ -1,10 +1,4 @@
- PROMPT ===================================================================================== 
-
- PROMPT *** Run *** ========== Scripts /Sql/BARS_DM/package/dm_import.sql =========*** Run **
-
- PROMPT ===================================================================================== 
-
- 
+PROMPT package/dm_import.sql
 
 CREATE OR REPLACE PACKAGE DM_IMPORT
 is
@@ -251,7 +245,7 @@ show errors
 
 CREATE OR REPLACE PACKAGE BODY DM_IMPORT is
 
-  g_body_version constant varchar2(64) := 'Version 3.3.1 18/12/2017';
+  g_body_version constant varchar2(64) := 'Version 3.3.4 18/01/2018';
   g_body_defs    constant varchar2(512) := null;
   G_TRACE        constant varchar2(20) := 'dm_import.';
 
@@ -4545,12 +4539,12 @@ end deposits_plt_imp;
                        decode(to_number(p.sex),1,1,2,2,0) as sex,--стать
                        (select prinsiderlv1 from bars.prinsider where prinsider = nvl(c.prinsider,2)) as insider,--признак інсайдера
                        decode(vipk,'1',1,0) vipk,--значення параметру
-                       decode(vipk,'1', (select max(fio_manager) from bars.vip_flags where rnk=c.rnk),'') vip_fio_manager,--піб працівника по віп
-                       decode(vipk,'1', (select max(phone_manager) from bars.vip_flags where rnk=c.rnk),'') vip_phone_manager,--телефон працівника по віп
-                       decode(vipk,'1', (select s.active_directory_name
-                                        from bars.vip_flags v
-                                        join bars.staff_ad_user s on v.account_manager = s.user_id
-                                        where rnk=c.rnk),'') vip_account_manager,--аккаунт працівника по віп в форматі АД
+                       (select max(fio_manager) from bars.vip_flags where rnk=c.rnk) vip_fio_manager,--піб працівника по віп
+                       (select max(phone_manager) from bars.vip_flags where rnk=c.rnk) vip_phone_manager,--телефон працівника по віп
+                       (select s.active_directory_name
+                        from bars.vip_flags v
+                        join bars.staff_ad_user s on v.account_manager = s.user_id
+                        where rnk=c.rnk) vip_account_manager,--аккаунт працівника по віп в форматі АД
                        date_on,--дата відкриття клієнта
                        date_off,--дата закриття
                        p.eddr_id,
@@ -5048,12 +5042,12 @@ end deposits_plt_imp;
                        decode(to_number(p.sex),1,1,2,2,0) as sex,--стать
                        (select prinsiderlv1 from bars.prinsider where prinsider = nvl(c.prinsider,2)) as insider,--признак інсайдера
                        decode(vipk,'1',1,0) vipk,--значення параметру
-                       decode(vipk,'1', (select max(fio_manager) from bars.vip_flags where rnk=c.rnk),'') vip_fio_manager,--піб працівника по віп
-                       decode(vipk,'1', (select max(phone_manager) from bars.vip_flags where rnk=c.rnk),'') vip_phone_manager,--телефон працівника по віп
-                       decode(vipk,'1', (select s.active_directory_name
-                                        from bars.vip_flags v
-                                        join bars.staff_ad_user s on v.account_manager = s.user_id
-                                        where rnk=c.rnk),'') vip_account_manager,--аккаунт працівника по віп в форматі АД
+                       (select max(fio_manager) from bars.vip_flags where rnk=c.rnk) vip_fio_manager,--піб працівника по віп
+                       (select max(phone_manager) from bars.vip_flags where rnk=c.rnk) vip_phone_manager,--телефон працівника по віп
+                       (select s.active_directory_name
+                        from bars.vip_flags v
+                        join bars.staff_ad_user s on v.account_manager = s.user_id
+                        where rnk=c.rnk) vip_account_manager,--аккаунт працівника по віп в форматі АД
                        date_on,--дата відкриття клієнта
                        date_off,--дата закриття
                        p.eddr_id,
@@ -6142,23 +6136,15 @@ end deposits_plt_imp;
               bars.bars_audit.error(l_errmsg);
 
         end;
-
         l_id_event := null;
-
         end loop;
-
     end imp_run;
 
 end;
 /
 show errors
 
-
-
 PROMPT *** Create  grants  DM_IMPORT ***
 
-
 grant EXECUTE                                                                on DM_IMPORT       to BARSUPL;
-
-
 grant EXECUTE                                                                on DM_IMPORT       to BARS_SUP; 
