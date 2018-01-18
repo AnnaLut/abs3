@@ -15,8 +15,11 @@ IS
 % FILE NAME   : otcn.sql
 % DESCRIPTION : ќтчетность —берЅанка: формирование файлов
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 2001.  All Rights Reserved.
-% VERSION     : 13/11/2017 (16/02/2016, 13/01/2016)
+% VERSION     : 18/01/2018 (13/11/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 18.01.2018 - при выдбор≥ бал.рахунк≥в ≥з SB_R020 додано перев≥рку на
+%              дату закритт€ бал. рахунку (поле D_CLOSE)
+%              параметр OB22 будем выбирать из ACCOUNTS вместо SPECPARAM_INT
 % 13/11/2017 - удалил ненужные строки и изменил некоторые блоки формировани€ 
 % 16/02/2016 - дл€ декабр€ мес€ца будут включатьс€ годовые корректирующие
 %              обороты
@@ -79,12 +82,11 @@ k_sum_   DECIMAL(24);
 
 --ќстатки номиналы (грн.+валюта)
 CURSOR SALDO IS
-   SELECT a.acc, a.nls, a.kv, a.nbs, s.fdat, NVL(trim(sp.ob22),'00'),
+   SELECT a.acc, a.nls, a.kv, a.nbs, s.fdat, NVL(trim(a.ob22),'00'),
           s.ost, s.ostq, s.dos96, s.kos96, s.dosq96, s.kosq96, 
           s.dos99, s.kos99, s.dosq99, s.kosq99, a.tobo, a.nms
-   FROM  otcn_saldo s, otcn_acc a, specparam_int sp
-   WHERE s.acc=a.acc
-     and a.acc=sp.acc(+);
+   FROM  otcn_saldo s, otcn_acc a
+   WHERE s.acc=a.acc;
 -----------------------------------------------------------------------
 BEGIN
 -------------------------------------------------------------------
@@ -98,7 +100,8 @@ Dat2_ := TRUNC(Dat_ + 28);
 P_Proc_Set_Int(kodf_, sheme_, nbuc1_, typ_);
 ---------------------  орректирующие проводки ---------------------
 -- используем классификатор SB_R020
-sql_acc_ := 'select r020 from sb_r020 where f_67=''1'' ';
+sql_acc_ := 'select r020 from sb_r020 where f_67=''1'' and ' || 
+            '(d_close is null or d_close > to_date('''||to_char(dat_, 'ddmmyyyy')||''',''ddmmyyyy'')) ';
 
 -- если процедура вызываетс€ из отчетности, то формируем по данным из SNAP
 if tp_ = 0 then
