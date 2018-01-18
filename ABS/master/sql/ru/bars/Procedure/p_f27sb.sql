@@ -11,12 +11,15 @@ PROMPT *** Create  procedure P_F27SB ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Процедура формирование файла @27 для КБ
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 2009.All Rights Reserved.
-% VERSION     : 05/12/2017 (13/11/2017, 18/02/2016)
+% VERSION     : 18/01/2018 (05/12/2017, 13/11/2017)
 %             :             Версия для Сбербанка)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+18.01.2018 - при выдборі бал.рахунків із SB_R020 додано перевірку на
+             дату закриття бал. рахунку (поле D_CLOSE)
+             параметр OB22 будем выбирать из ACCOUNTS вместо SPECPARAM_INT
 05.12.2017 - добавлен блок для формирования виртуальных оборотов для бал.
              счетов перехода на новый план счетов 
 13.11.2017 - удалил ненужные строки и изменил некоторые блоки формирования 
@@ -109,12 +112,11 @@ CURSOR Saldo IS
           s.dos96, s.dosq96, s.kos96, s.kosq96,
           s.dos99, s.dosq99, s.kos99, s.kosq99,
           s.doszg, s.koszg, s.dos96zg, s.kos96zg,
-          nvl(l.k041,'1'), a.tobo, a.nms, NVL(trim(sp.ob22),'00') 
-   FROM  otcn_saldo s, otcn_acc a, customer cc, kl_k040 l, specparam_int sp
+          nvl(l.k041,'1'), a.tobo, a.nms, NVL(trim(a.ob22),'00') 
+   FROM  otcn_saldo s, otcn_acc a, customer cc, kl_k040 l
    WHERE s.acc=a.acc      
      and s.rnk=cc.rnk   
      and NVL(lpad(to_char(cc.country),3,'0'),'804')=l.k040(+) 
-     and a.acc=sp.acc(+)
      and trunc(nvl(a.dat_alt, dat_ - 1), 'mm') <> trunc(dat_, 'mm')
          union all
    SELECT s.rnk, s.acc, a.nls, s.kv, s.fdat, substr(d.acc_num, 1, 4) nbs, 
@@ -140,13 +142,11 @@ CURSOR Saldo IS
           (case when d.acc_type = 'OLD' then 0 else s.koszg end) koszg,
           (case when d.acc_type = 'OLD' then 0 else s.dos96zg end) dos96zg,
           (case when d.acc_type = 'OLD' then 0 else s.kos96zg end) kos96zg,
-          nvl(l.k041,'1'), a.tobo, a.nms, NVL(trim(sp.ob22),'00')
-   FROM  otcn_saldo s, otcn_acc a, nbur_kor_balances d, customer cc, kl_k040 l, 
-         specparam_int sp
+          nvl(l.k041,'1'), a.tobo, a.nms, NVL(trim(a.ob22),'00')
+   FROM  otcn_saldo s, otcn_acc a, nbur_kor_balances d, customer cc, kl_k040 l 
    WHERE a.acc=s.acc    and
          a.rnk=cc.rnk   and
          NVL(lpad(to_char(cc.country),3,'0'),'804')=l.k040(+)  and
-         a.acc=sp.acc(+) and 
          d.report_date between trunc(dat_, 'mm') and dat_ and 
          s.acc = d.acc_id and
          trunc(nvl(a.dat_alt, dat_ - 1), 'mm') = trunc(dat_, 'mm')  ;
@@ -188,7 +188,8 @@ p_proc_set_int(kodf_,sheme_,nbuc1_,typ_);
 --- все эти действия выполняются в функции F_POP_OTCN
 
 -- используем классификатор SB_R020 
-sql_acc_ := 'select r020 from sb_r020 where f_27=''1'' ';
+sql_acc_ := 'select r020 from sb_r020 where f_27=''1'' and ' || 
+            '(d_close is null or d_close > to_date('''||to_char(dat_, 'ddmmyyyy')||''',''ddmmyyyy'')) ';
 
 if to_char(Dat_,'MM') in ('12','01','02','03','04','05','06') then
    ret_ := f_pop_otcn(Dat_, 4, sql_acc_, null, 1);

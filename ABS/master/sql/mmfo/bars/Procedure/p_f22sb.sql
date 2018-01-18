@@ -11,24 +11,27 @@ PROMPT *** Create  procedure P_F22SB ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Процедура формирование файла @22 для Сбербанк
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 2009.All Rights Reserved.
-% VERSION     : 13/05/2017 (17/02/2016)
+% VERSION     : 18/01/2018 (17/02/2016, 13/01/2016)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+18.01.2018 при выдборі бал.рахунків із SB_R020 додано перевірку на
+           дату закриття бал. рахунку (поле D_CLOSE)
+           параметр OB22 будем выбирать из ACCOUNTS вместо SPECPARAM_INT
 17/02/2016 для декабря месяца будут включаться годовые корректирующие
            обороты
 13/01/2016 убрал мусор
            исключаем проводки перекрытия корректирующих за декабрь
 03/07/2014 внес изменения выполненные для Донецка т.к. версия в эталоне
            не соответствовала последним изменениям выполненным для Сумм
-13/09/2013 заменил over (partition by sign(s.ost), на 
+13/09/2013 заменил over (partition by sign(s.ost), на
            over (partition by sign(s.ost-s.dos96+s.kos96),
            т.к. сумма коректировки (9900,9910) из поля SKOR табл.
            OTCN_ARCH_PEREOC формировалась по нескольким счетам
-05/09/2013 для 9900, 9910 коректируем остатки из OTCN_ARCH_PEREOC только 
+05/09/2013 для 9900, 9910 коректируем остатки из OTCN_ARCH_PEREOC только
            если сумма меньше 100 (проявилось в РУ Полтавы)
-05/06/2013 поправила копійки для 9910  
+05/06/2013 поправила копійки для 9910
 13/09/2012 формируем в разрезе кодов территорий
 05/09/2012 перенос по OTCN_ARCH_PEREOC (доработка)
 04/02/2012 добавлены годовые корректирующие проводки
@@ -65,10 +68,10 @@ Kos99_   DECIMAL(24);
 Kosq99_  DECIMAL(24);
 Doszg_   DECIMAL(24);
 Koszg_   DECIMAL(24);
-Dos96zg_ DECIMAL(24) := 0;
-Kos96zg_ DECIMAL(24) := 0;
-Dos99zg_ DECIMAL(24) := 0;
-Kos99zg_ DECIMAL(24) := 0;
+Dos96zg_ DECIMAL(24);
+Kos96zg_ DECIMAL(24);
+Dos99zg_ DECIMAL(24);
+Kos99zg_ DECIMAL(24);
 se_      DECIMAL(24);
 Ostn_    DECIMAL(24);
 Ostq_    DECIMAL(24);
@@ -106,14 +109,13 @@ CURSOR Saldo IS
           s.dos96, s.dosq96, s.kos96, s.kosq96,
           s.dos99, s.dosq99, s.kos99, s.kosq99,
           s.doszg, s.koszg, s.dos96zg, s.kos96zg,
-          a.tobo, a.nms, NVL(trim(sp.ob22),'00'),
+          a.tobo, a.nms, NVL(trim(a.ob22),'00'),
           substr(F_K041 (c.country),1,1) K041,
           lag(s.acc, 1) over (partition by sign(s.ost-s.dos96+s.kos96), substr(s.nls,1,4),s.kv, substr(F_K041 (c.country),1,1) order by s.acc) pacc
-    FROM  otcn_saldo s, otcn_acc a, specparam_int sp, customer c
+    FROM  otcn_saldo s, otcn_acc a, customer c
     WHERE s.acc = a.acc
-      and s.acc = sp.acc(+)
       and s.rnk = c.rnk
-      and (s.ost - s.dos96 + s.kos96 - s.dos99 + s.kos99 <> 0 or 
+      and (s.ost - s.dos96 + s.kos96 - s.dos99 + s.kos99 <> 0 or
            s.ostq - s.dosq96 + s.kosq96 - s.dosq99 + kosq99 <> 0);
 -------------------------------------------------------------------------------
 procedure p_ins(p_dat_ date, p_tp_ varchar2, p_acc_ number, p_nls_ varchar2,
@@ -132,7 +134,7 @@ end;
 BEGIN
 -------------------------------------------------------------------
 commit;
-   
+
 EXECUTE IMMEDIATE 'ALTER SESSION ENABLE PARALLEL DML';
 -------------------------------------------------------------------
 logger.info ('P_F22SB: Begin ');
@@ -143,9 +145,9 @@ mfo_:=F_OURMFO();
 
 EXECUTE IMMEDIATE 'TRUNCATE TABLE RNBU_TRACE';
 -------------------------------------------------------------------
-
 -- используем классификатор SB_R020
-sql_acc_ := 'select r020 from sb_r020 where f_22=''1'' ';
+sql_acc_ := 'select r020 from sb_r020 where f_22=''1'' and ' || 
+            '(d_close is null or d_close > to_date('''||to_char(dat_, 'ddmmyyyy')||''',''ddmmyyyy'')) ';
 
 if to_char(Dat_,'MM') = '12' then
    ret_ := f_pop_otcn(Dat_, 4, sql_acc_, null, 1);
@@ -179,18 +181,18 @@ OPEN Saldo;
 
    -- добавив 13.01.2014
    --- обороты по перекрытию 6,7 классов на 5040,5041
-   IF to_char(Dat_,'MM') = '12' and 
-      (nls_ like '6%' or nls_ like '7%' or nls_ like '504%' or nls_ like '390%') 
+   IF to_char(Dat_,'MM') = '12' and
+      (nls_ like '6%' or nls_ like '7%' or nls_ like '504%' or nls_ like '390%')
    THEN
       SELECT NVL(SUM(decode(dk,0,1,0)*s),0),
              NVL(SUM(decode(dk,1,1,0)*s),0)
           INTO d_sum_, k_sum_
-      FROM opldok 
+      FROM opldok
       WHERE fdat  between Dat_  AND Dat_+29 AND
             acc  = acc_   AND
             (tt like 'ZG8%'  or tt like 'ZG9%');
 
-      IF Dos96_ <> 0 then 
+      IF Dos96_ <> 0 then
          Dos96_ := Dos96_ - d_sum_;
       END IF;
       IF Kos96_ <> 0 THEN

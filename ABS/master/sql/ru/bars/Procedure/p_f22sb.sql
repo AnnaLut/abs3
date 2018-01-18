@@ -11,11 +11,14 @@ PROMPT *** Create  procedure P_F22SB ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Процедура формирование файла @22 для Сбербанк
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 2009.All Rights Reserved.
-% VERSION     : 17/02/2016 (13/01/2016, 03/07/2014)
+% VERSION     : 18/01/2018 (17/02/2016, 13/01/2016)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+18.01.2018 при выдборі бал.рахунків із SB_R020 додано перевірку на
+           дату закриття бал. рахунку (поле D_CLOSE)
+           параметр OB22 будем выбирать из ACCOUNTS вместо SPECPARAM_INT
 17/02/2016 для декабря месяца будут включаться годовые корректирующие
            обороты
 13/01/2016 убрал мусор
@@ -106,12 +109,11 @@ CURSOR Saldo IS
           s.dos96, s.dosq96, s.kos96, s.kosq96,
           s.dos99, s.dosq99, s.kos99, s.kosq99,
           s.doszg, s.koszg, s.dos96zg, s.kos96zg,
-          a.tobo, a.nms, NVL(trim(sp.ob22),'00'),
+          a.tobo, a.nms, NVL(trim(a.ob22),'00'),
           substr(F_K041 (c.country),1,1) K041,
           lag(s.acc, 1) over (partition by sign(s.ost-s.dos96+s.kos96), substr(s.nls,1,4),s.kv, substr(F_K041 (c.country),1,1) order by s.acc) pacc
-    FROM  otcn_saldo s, otcn_acc a, specparam_int sp, customer c
+    FROM  otcn_saldo s, otcn_acc a, customer c
     WHERE s.acc = a.acc
-      and s.acc = sp.acc(+)
       and s.rnk = c.rnk
       and (s.ost - s.dos96 + s.kos96 - s.dos99 + s.kos99 <> 0 or
            s.ostq - s.dosq96 + s.kosq96 - s.dosq99 + kosq99 <> 0);
@@ -143,9 +145,9 @@ mfo_:=F_OURMFO();
 
 EXECUTE IMMEDIATE 'TRUNCATE TABLE RNBU_TRACE';
 -------------------------------------------------------------------
-
 -- используем классификатор SB_R020
-sql_acc_ := 'select r020 from sb_r020 where f_22=''1'' ';
+sql_acc_ := 'select r020 from sb_r020 where f_22=''1'' and ' || 
+            '(d_close is null or d_close > to_date('''||to_char(dat_, 'ddmmyyyy')||''',''ddmmyyyy'')) ';
 
 if to_char(Dat_,'MM') = '12' then
    ret_ := f_pop_otcn(Dat_, 4, sql_acc_, null, 1);

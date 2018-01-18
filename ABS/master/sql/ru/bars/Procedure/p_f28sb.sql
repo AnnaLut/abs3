@@ -12,8 +12,11 @@ PROMPT *** Create  procedure P_F28SB ***
 % FILE NAME   : otcn.sql
 % DESCRIPTION : Отчетность НБУ: формирование файлов
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 2001.  All Rights Reserved.
-% VERSION     : 13/11/2017 (16/02/2016) 
+% VERSION     : 18/01/2018 (13/11/2017) 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+18.01.2018 - при выдборі бал.рахунків із SB_R020 додано перевірку на
+             дату закриття бал. рахунку (поле D_CLOSE)
+             параметр OB22 будем выбирать из ACCOUNTS вместо SPECPARAM_INT
 13.11.2017 - удалил ненужные строки и изменил некоторые блоки формирования 
 16.02.2016 - для декабря месяца будут включаться годовые корректирующие
              обороты
@@ -113,7 +116,8 @@ Dat2_ := TRUNC(Dat_ + 28);
 P_Proc_Set_Int(kodf_,sheme_,nbuc1_,typ_);
 
 -- используем классификатор SB_R020 
-sql_acc_ := 'select r020 from sb_r020 where f_28=''1'' ';
+sql_acc_ := 'select r020 from sb_r020 where f_28=''1''  and ' || 
+            '(d_close is null or d_close > to_date('''||to_char(dat_, 'ddmmyyyy')||''',''ddmmyyyy'')) ';
 
 logger.info ('P_F28SB: Begin ');
 

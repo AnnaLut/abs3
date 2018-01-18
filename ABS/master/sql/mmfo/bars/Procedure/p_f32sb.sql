@@ -12,8 +12,10 @@ PROMPT *** Create  procedure P_F32SB ***
 % FILE NAME   :    otcn.sql
 % DESCRIPTION :    ќтчетность —берЅанка: формирование файлов
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 2001.  All Rights Reserved.
-% VERSION     :    08/06/2017 (13/05/2017)
+% VERSION     :    18/01/2018 (13/05/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 18.01.2018 - при выдбор≥ бал.рахунк≥в ≥з SB_R020 додано перев≥рку на
+%              дату закритт€ бал. рахунку (поле D_CLOSE)
 % 08,02.2016 - вместо пол€ MFO из SPECPARAM_INT будем использовать поле
 %              MFO из таблицы CUSTBANK
 % 13.01.2016 - убрал мусор
@@ -94,7 +96,7 @@ CURSOR Saldo IS
           s.dos99, s.dosq99, s.kos99, s.kosq99,
           s.doszg, s.koszg, s.dos96zg, s.kos96zg,
           a.tobo, a.nms, NVL(trim(a.ob22),'00'),
-          nvl(nvl(trim(sp.mfo), trim(cb.mfo)), '000000')
+          nvl(trim(sp.mfo), nvl(trim(cb.mfo),'000000'))
     FROM  otcn_saldo s, accounts a, specparam_int sp, custbank cb
     WHERE s.acc = a.acc
       and a.rnk = cb.rnk(+)
@@ -120,7 +122,8 @@ where mfo = mfo_;
 P_Proc_Set_Int(kodf_, sheme_, nbuc1_, typ_);
 
 -- используем классификатор SB_R020
-sql_acc_ := 'select r020 from sb_r020 where f_33=''1'' ';
+sql_acc_ := 'select r020 from sb_r020 where f_33=''1'' and ' || 
+            '(d_close is null or d_close > to_date('''||to_char(dat_, 'ddmmyyyy')||''',''ddmmyyyy'')) ';
 
 ret_ := f_pop_otcn(Dat_, 3, sql_acc_);
 -----------------------------------------------------------------------------------------
@@ -206,20 +209,20 @@ OPEN Saldo;
 
    IF pr_ = 0 and se_ <> 0 THEN
       dk_ := IIF_N(se_,0,'1','2','2');
-
+      
       kodp_ := dk_ || '0' || nbs_ || zz_ || mfo_fa_ || lpad(kv_,3,'0');
       znap_ := TO_CHAR(ABS(se_)) ;
-
+      
       INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, acc, comm, tobo, nbuc, rnk) VALUES
                              (nls_, kv_, data_, kodp_,znap_, acc_, comm_, tobo_, nbuc_, rnk_) ;
    END IF ;
 
    IF pr_ = 0 and sn_ <> 0 THEN
       dk_ := IIF_N(sn_,0,'1','2','2');
-
+      
       kodp_ := dk_ || '1' || nbs_ || zz_ || mfo_fa_ || lpad(kv_,3,'0');
       znap_ := TO_CHAR(ABS(sn_)) ;
-
+      
       INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, acc, comm, tobo, nbuc, rnk) VALUES
                              (nls_, kv_, data_, kodp_,znap_, acc_, comm_, tobo_, nbuc_, rnk_) ;
    END IF ;
