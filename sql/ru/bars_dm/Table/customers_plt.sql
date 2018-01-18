@@ -1,10 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS_DM/Table/CUSTOMERS_PLT.sql =========*** Run 
-PROMPT ===================================================================================== 
-
-
+
 PROMPT *** Create  table CUSTOMERS_PLT ***
 begin 
   execute immediate '
@@ -61,7 +55,7 @@ begin
 	MONTH_INCOME NUMBER(10,0), 
 	SUBJECT_ROLE VARCHAR2(10), 
 	REZIDENT VARCHAR2(10), 
-	MERRIED VARCHAR2(10), 
+	MERRIED VARCHAR2(500), 
 	EMP_STATUS VARCHAR2(10), 
 	SUBJECT_CLASS VARCHAR2(10), 
 	INSIDER VARCHAR2(10), 
@@ -274,127 +268,34 @@ begin
 	P_SETTLEMENT_ID NUMBER(10,0), 
 	P_STREET_ID NUMBER(10,0), 
 	P_HOUSE_ID NUMBER(10,0),
-        VIP_ACCOUNT_MANAGER VARCHAR2(4000)
+    VIP_ACCOUNT_MANAGER VARCHAR2(4000)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
-  TABLESPACE BRSDYND ';
-exception when others then       
-  if sqlcode=-955 then null; else raise; end if; 
-end; /
-
-
-PROMPT *** add column vip_account_manager ***
-begin    execute immediate '
+  TABLESPACE BRSDYND ';exception when others then         if sqlcode=-955 then null; else raise; end if; end; /prompt alter column MERRIED varchar2(500)alter table bars_dm.customers_plt modify merried varchar2(500);
+PROMPT *** add column vip_account_manager ***begin    execute immediate '
   ALTER TABLE BARS_DM.CUSTOMERS_PLT ADD vip_account_manager varchar2(4000)';exception when others then  if  sqlcode=-1430 then null; else raise; end if; end;/
-PROMPT *** rename column MFO to KF ***begin    execute immediate '  ALTER TABLE BARS_DM.CUSTOMERS_PLT RENAME COLUMN MFO TO KF';exception when others then  if  sqlcode=-957 then null; else raise; end if; end;/
-
-PROMPT *** Create  constraint PK_CUSTOMERS_PLT ***
-begin   
- execute immediate '
+PROMPT *** rename column MFO to KF ***begin    execute immediate '  ALTER TABLE BARS_DM.CUSTOMERS_PLT RENAME COLUMN MFO TO KF';exception when others then  if  sqlcode=-957 then null; else raise; end if; end;/
+PROMPT *** Create  constraint PK_CUSTOMERS_PLT ***begin    execute immediate '
   ALTER TABLE BARS_DM.CUSTOMERS_PLT ADD CONSTRAINT PK_CUSTOMERS_PLT PRIMARY KEY (ID)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYNI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERS_PLT_RNK_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS_DM.CUSTOMERS_PLT ADD CONSTRAINT CC_CUSTOMERS_PLT_RNK_NN CHECK (RNK IS NOT NULL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERS_PLT_PERID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS_DM.CUSTOMERS_PLT ADD CONSTRAINT CC_CUSTOMERS_PLT_PERID_NN CHECK (PER_ID IS NOT NULL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERS_PLT_MFO_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS_DM.CUSTOMERS_PLT ADD CONSTRAINT CC_CUSTOMERS_PLT_MFO_NN CHECK (KF IS NOT NULL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERS_PLT_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS_DM.CUSTOMERS_PLT ADD CONSTRAINT CC_CUSTOMERS_PLT_BRANCH_NN CHECK (BRANCH IS NOT NULL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C003232547 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS_DM.CUSTOMERS_PLT MODIFY (ID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  index I_CUSTOMERS_PLT_PERID ***
-begin   
- execute immediate '
+  TABLESPACE BRSDYNI  ENABLE';exception when others then  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;end;/
+PROMPT *** Create  constraint CC_CUSTOMERS_PLT_RNK_NN ***begin    execute immediate '
+  ALTER TABLE BARS_DM.CUSTOMERS_PLT ADD CONSTRAINT CC_CUSTOMERS_PLT_RNK_NN CHECK (RNK IS NOT NULL) ENABLE';exception when others then  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if; end;/
+PROMPT *** Create  constraint CC_CUSTOMERS_PLT_PERID_NN ***begin    execute immediate '
+  ALTER TABLE BARS_DM.CUSTOMERS_PLT ADD CONSTRAINT CC_CUSTOMERS_PLT_PERID_NN CHECK (PER_ID IS NOT NULL) ENABLE';exception when others then  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;end;/
+PROMPT *** Create  constraint CC_CUSTOMERS_PLT_MFO_NN ***begin    execute immediate '
+  ALTER TABLE BARS_DM.CUSTOMERS_PLT ADD CONSTRAINT CC_CUSTOMERS_PLT_MFO_NN CHECK (KF IS NOT NULL) ENABLE';exception when others then  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;end;/
+PROMPT *** Create  constraint CC_CUSTOMERS_PLT_BRANCH_NN ***begin    execute immediate '
+  ALTER TABLE BARS_DM.CUSTOMERS_PLT ADD CONSTRAINT CC_CUSTOMERS_PLT_BRANCH_NN CHECK (BRANCH IS NOT NULL) ENABLE';exception when others then  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;end;/PROMPT *** Create  constraint SYS_C003232547 ***begin    execute immediate '
+  ALTER TABLE BARS_DM.CUSTOMERS_PLT MODIFY (ID NOT NULL ENABLE)';exception when others then  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;end;/
+PROMPT *** Create  index I_CUSTOMERS_PLT_PERID ***begin    execute immediate '
   CREATE INDEX BARS_DM.I_CUSTOMERS_PLT_PERID ON BARS_DM.CUSTOMERS_PLT (PER_ID) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYNI ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  index PK_CUSTOMERS_PLT ***
-begin   
- execute immediate '
+  TABLESPACE BRSDYNI ';exception when others then  if  sqlcode=-955  then null; else raise; end if;end;/
+PROMPT *** Create  index PK_CUSTOMERS_PLT ***begin    execute immediate '
   CREATE UNIQUE INDEX BARS_DM.PK_CUSTOMERS_PLT ON BARS_DM.CUSTOMERS_PLT (ID) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYNI ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
+  TABLESPACE BRSDYNI ';exception when others then  if  sqlcode=-955  then null; else raise; end if;end;/
 PROMPT *** Create  grants  CUSTOMERS_PLT ***
-grant SELECT                                                                 on CUSTOMERS_PLT   to BARSUPL;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS_DM/Table/CUSTOMERS_PLT.sql =========*** End 
-PROMPT ===================================================================================== 
+grant SELECT                                                                 on CUSTOMERS_PLT   to BARSUPL;

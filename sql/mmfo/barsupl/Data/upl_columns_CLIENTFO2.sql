@@ -152,7 +152,7 @@ begin
   values (l_file_id, 48, 'REZIDENT', 'Резидент', 'VARCHAR2', 10, null, null, null, 'Y', null, null, null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
-  values (l_file_id, 49, 'MERRIED', 'Сімейний стан', 'VARCHAR2', 10, null, null, null, 'Y', null, null, null, null, null);
+  values (l_file_id, 49, 'MERRIED', 'Сімейний стан', 'VARCHAR2', 500, null, null, null, 'Y', null, null, null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
   values (l_file_id, 50, 'EMP_STATUS', 'Статус зайнятості особи', 'VARCHAR2', 10, null, null, null, 'Y', null, null, null, null, null);
