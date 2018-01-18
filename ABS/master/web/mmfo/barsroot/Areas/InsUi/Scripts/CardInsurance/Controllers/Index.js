@@ -1,4 +1,4 @@
-﻿angular.module('BarsWeb.Controllers')
+angular.module('BarsWeb.Controllers')
     .controller('CardInsurCtrl', ['$scope', '$http',
         function ($scope, $http) {
             $scope.dateFrom = null;
@@ -11,6 +11,14 @@
             $scope.dpFormatOptions = {
                 format: "{0:dd.MM.yyyy}",
                 mask: "##.##.####"
+            };
+
+            $scope.params = {
+                isIns: false,
+                insUkrId: null,
+                insWrdId: null,
+                tmpUkrId: null,
+                tmpWrdId: null
             };
 
             $scope.$watch('dateFrom', function () {
@@ -210,24 +218,79 @@
                 };
             };
 
-            $scope.createDeal = function (nd, card_code) {
-                debugger;
-                var url = '/BpkW4/RegisteringNewCard/CreateDealsEWA?nd=' + nd + "&code=" + card_code;
-                $http.get(bars.config.urlContent(url)).then(function (request) {
-                    var grid = $scope.gridCardInsur;
-                    if (request.data == '"Ok"') {
+            $scope.createDeal = function (dealND, card_code) {
+                var urlIsIns = bars.config.urlContent('/Bpkw4/RegisteringNewCard/GetIsIns?cardCode=' + card_code);
+                $http.get(urlIsIns).then(function (request) {
+
+                    if (request.data.ERROR_MSG !== "" && request.data.ERROR_MSG !== null) {
+                        bars.ui.error({ text: request.data.ERROR_MSG });
+                        return;
+                    }
+
+                    if (!request.data.haveins || !request.data.insUkrId) {
                         bars.ui.alert({
-                            text: "Створено договір у зовнішній системі EWA",
+                            text: "Дана картка не передбачає страхування у системі EWA",
                         });
-                        grid.dataSource.read();
+                        return;
                     }
-                    else {
-                        debugger;
-                        bars.ui.error({
-                            text: "Помилка: " + request.data,
-                        });
-                        grid.dataSource.read();
+
+                    //if not error:
+                    $scope.params.isIns = request.data.haveins;
+                    $scope.params.insUkrId = request.data.insUkrId;
+                    $scope.params.insWrdId = request.data.insWrdId;
+                    $scope.params.tmpUkrId = request.data.tmpUkrId;
+                    $scope.params.tmpWrdId = request.data.tmpWrdId;
+                });
+
+                var urlInsType = bars.config.urlContent('/Bpkw4/RegisteringNewCard/GetInsType?nd=' + dealND + "&code=" + card_code);
+                $http.get(urlInsType).then(function (request) {
+
+                    var requestData = request.data;
+                    if (requestData.status == "error") {
+                        bars.ui.error({ text: requestData.message });
+                        return;
                     }
+
+                    var insType = requestData.data;
+
+                    var url = '/BpkW4/RegisteringNewCard/CreateDealsEWA?nd=' + dealND + "&code=" + card_code + "&insType=" + insType;
+                    $http.get(bars.config.urlContent(url)).then(function (request) {
+                        var grid = $scope.gridCardInsur;
+                        if (request.data == '"Ok"') {
+
+                            var newCardData = null;
+                            if ($scope.params.isIns && $scope.params.insUkrId) {
+                                if ($scope.params.insWrdId) {
+                                    newCardData = {
+                                        nd: dealND,
+                                        ins_id: insType === 0 ? $scope.params.insWrdId : $scope.params.insUkrId,
+                                        tmp_id: insType === 0 ? $scope.params.tmpWrdId : $scope.params.tmpUkrId
+                                    };
+                                }
+                                else {
+                                    newCardData = {
+                                        nd: dealND,
+                                        ins_id: $scope.params.insUkrId,
+                                        tmp_id: $scope.params.tmpUkrId
+                                    };
+                                }
+
+                                $http.post(bars.config.urlContent('/Bpkw4/RegisteringNewCard/SetInsId'), newCardData)
+                                    .then(function (request) {
+                                        bars.ui.alert({
+                                            text: "Створено договір у зовнішній системі EWA",
+                                        });
+                                        grid.dataSource.read();
+                                    });
+                            }
+                        }
+                        else {
+                            bars.ui.error({
+                                text: "Помилка: " + request.data,
+                            });
+                            grid.dataSource.read();
+                        }
+                    });
                 });
             };
 

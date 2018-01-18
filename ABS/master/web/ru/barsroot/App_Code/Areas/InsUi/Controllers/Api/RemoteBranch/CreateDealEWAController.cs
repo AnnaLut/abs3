@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -42,22 +42,6 @@ namespace Areas.InsUi.Controllers.Api.RemoteBranch
             {
                 res = _insRepo.CreateDealEWA(parameters, connection);
                 return Request.CreateResponse(HttpStatusCode.OK, res);
-            }
-            catch (WebException ex)
-            {
-                if (ex.Response != null)
-                {
-                    var tmp = ex;
-                    using (var rdr = new StreamReader(ex.Response.GetResponseStream()))
-                    {
-                        XmlDocument doc = JsonConvert.DeserializeXmlNode(rdr.ReadToEnd());
-                        return Request.CreateErrorResponse(HttpStatusCode.BadRequest, doc.OuterXml);
-                    }
-                }
-                else
-                {
-                    return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ex.Message); 
-                }
             }
             catch (Exception e)
             {

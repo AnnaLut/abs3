@@ -27,6 +27,10 @@ angular.module("BarsWeb.Areas")
 
         $http.get(bars.config.urlContent('/bpkw4/RegisteringNewCard/GetIsIns?cardCode=' + cardCode))
             .then(function (request) {
+                if (request.data.ERROR_MSG !== "" && request.data.ERROR_MSG !== null) {
+                    bars.ui.error({ text: request.data.ERROR_MSG });
+                    return;
+                }
 
                 $scope.params.isIns = request.data.haveins;
                 $scope.params.insUkrId = request.data.insUkrId;

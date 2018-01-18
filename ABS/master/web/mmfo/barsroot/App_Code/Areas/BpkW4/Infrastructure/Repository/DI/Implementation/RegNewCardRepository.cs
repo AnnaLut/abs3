@@ -495,55 +495,57 @@ namespace BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation
             return resp;
         }
 
-        public decimal GetInsType(decimal nd, string code,  OracleConnection con)
+        public decimal GetInsType(decimal nd, string code)
         {
             decimal insType = 1; //1 = ukr, 0 - zakordon
             string request = String.Empty;
             decimal insWrdId=0, insUkrId=0;
 
-            using (OracleCommand com = con.CreateCommand())
+            using (OracleConnection con = OraConnector.Handler.UserConnection)
             {
-                com.CommandType = System.Data.CommandType.Text;
-                com.CommandText = "select request from ins_w4_deals where nd=:p_nd";
-                com.Parameters.Add("p_nd", OracleDbType.Decimal, nd, ParameterDirection.Input);
-
-                using (OracleDataReader reader = com.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        request = String.IsNullOrEmpty(reader.GetValue(0).ToString()) ? String.Empty : reader.GetString(0);
-                    }
-                }
-            }
-
-            if (request != String.Empty)
-            {
-                JavaScriptSerializer jsonSerializer = new JavaScriptSerializer();
-                ParamsEwa paramsEwa = jsonSerializer.Deserialize<ParamsEwa>(request);
-
                 using (OracleCommand com = con.CreateCommand())
                 {
                     com.CommandType = System.Data.CommandType.Text;
-                    com.CommandText = "select ins_wrd_id, ins_ukr_id from w4_card where code=:p_code";
-                    com.Parameters.Add("p_code", OracleDbType.Varchar2, code, ParameterDirection.Input);
+                    com.CommandText = "select request from ins_w4_deals where nd=:p_nd";
+                    com.Parameters.Add("p_nd", OracleDbType.Decimal, nd, ParameterDirection.Input);
 
                     using (OracleDataReader reader = com.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            insWrdId = reader.IsDBNull(0) ? 0 : reader.GetDecimal(0);
-                            insUkrId = reader.IsDBNull(1) ? 0 : reader.GetDecimal(1);
+                            request = String.IsNullOrEmpty(reader.GetValue(0).ToString()) ? String.Empty : reader.GetString(0);
                         }
                     }
                 }
-                if (paramsEwa.param.tariff.id == insWrdId)
-                    insType = 0; // zakordonne strahuvannya
-            }
-            else
-            {
-                throw new Exception("Не знайдено об'єкту попереднього запиту за даним параметром nd = " + nd);
-            }
 
+                if (request != String.Empty)
+                {
+                    JavaScriptSerializer jsonSerializer = new JavaScriptSerializer();
+                    ParamsEwa paramsEwa = jsonSerializer.Deserialize<ParamsEwa>(request);
+
+                    using (OracleCommand com = con.CreateCommand())
+                    {
+                        com.CommandType = System.Data.CommandType.Text;
+                        com.CommandText = "select ins_wrd_id, ins_ukr_id from w4_card where code=:p_code";
+                        com.Parameters.Add("p_code", OracleDbType.Varchar2, code, ParameterDirection.Input);
+
+                        using (OracleDataReader reader = com.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                insWrdId = reader.IsDBNull(0) ? 0 : reader.GetDecimal(0);
+                                insUkrId = reader.IsDBNull(1) ? 0 : reader.GetDecimal(1);
+                            }
+                        }
+                    }
+                    if (paramsEwa.param.tariff.id == insWrdId)
+                        insType = 0; // zakordonne strahuvannya
+                }
+                else
+                {
+                    throw new Exception("Не знайдено об'єкт попереднього запиту за даним параметром nd = " + nd);
+                }
+            }
             return insType;
         }
 
@@ -755,6 +757,10 @@ namespace BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation
                     res.tmpUkrId = String.IsNullOrEmpty(reader.GetValue(3).ToString()) ? (decimal?)null : reader.GetDecimal(3);
                     res.tmpWrdId = String.IsNullOrEmpty(reader.GetValue(4).ToString()) ? (decimal?)null : reader.GetDecimal(4);
                 }
+            }
+            catch (Exception ex)
+            {
+                res.ERROR_MSG = ex.Message;
             }
             finally
             {

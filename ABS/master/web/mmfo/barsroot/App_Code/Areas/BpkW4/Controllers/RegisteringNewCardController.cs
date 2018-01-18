@@ -67,17 +67,33 @@ namespace BarsWeb.Areas.BpkW4.Controllers
             _cardRepository.SetInsId(nd, ins_id, tmp_id);
         }
 
-        public ActionResult CreateDealsEWA(decimal nd, string code)
+        public ActionResult GetInsType(decimal nd, string code)
+        {
+            JsonResponse response = new JsonResponse();
+            try
+            {
+                decimal insType = _cardRepository.GetInsType(nd, code);
+                response.data = insType;
+                response.status = JsonResponseStatus.Ok;
+            }
+            catch (Exception ex)
+            {
+                response.status = JsonResponseStatus.Error;
+                response.message = ex.Message;
+            }
+            return Json(response, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult CreateDealsEWA(decimal nd, string code, decimal insType)
         {
             ParamsBpkIns param = _cardRepository.GetBpkInsParams(nd, code, "ins_w4_deals");
             JavaScriptSerializer jsonSerializer = new JavaScriptSerializer();
             OracleConnection connection = OraConnector.Handler.UserConnection;
 
-            decimal insType = _cardRepository.GetInsType(nd, code, connection);
-            ParamsEwa objCustomer = _cardRepository.GetParamsEwa(nd, insType, connection);//jsonSerializer.Deserialize<ParamsEwa>(param.request);
-
             try
             {
+                ParamsEwa objCustomer = _cardRepository.GetParamsEwa(nd, insType, connection);
+
                 var result = _insRepository.CreateDealEWA(objCustomer, connection);
                 return Json(result, JsonRequestBehavior.AllowGet);
             }
