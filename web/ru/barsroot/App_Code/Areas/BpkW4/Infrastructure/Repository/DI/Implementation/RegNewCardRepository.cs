@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -15,6 +15,7 @@ using System.Drawing;
 using BarsWeb.Models;
 using Kendo.Mvc.UI;
 using Bars.Classes;
+using System.Web.Script.Serialization;
 
 namespace BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation
 {
@@ -495,181 +496,240 @@ namespace BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation
             return resp;
         }
 
-        public ParamsEwa GetParamsEwa(decimal nd, decimal typeIns, OracleCommand cmd)
+        public decimal GetInsType(decimal nd, string code)
         {
-            string doc = (typeIns == 1 ?
-                                       @"decode(p.passp, 1, 'PASSPORT', 'EXTERNAL_PASSPORT') as docType, --15
-                                               p.ser as docSeries, --16
-                                               p.numdoc as docNumber, --17
-                                               to_char(p.pdate, 'yyyy-mm-dd') as docDate, /*18*/" :
-                                       @"'EXTERNAL_PASSPORT' as docType, --15
-                                               (select value
-                                                  from customerw
-                                                 where rnk = c.rnk
-                                                   and tag = 'PC_Z1') as docSeries, --16
-                                               (select value
-                                                  from customerw
-                                                 where rnk = c.rnk
-                                                   and tag = 'PC_Z2') as docNumber, --17
-                                               to_char(to_date((select value
-                                                  from customerw
-                                                 where rnk = c.rnk
-                                                   and tag = 'PC_Z5')), 'yyyy-mm-dd') as docDate, /*18*/");
+            decimal insType = 1; //1 = ukr, 0 - zakordon
+            string request = String.Empty;
+            decimal insWrdId = 0, insUkrId = 0;
 
-            ParamsEwa p = new ParamsEwa();
-            cmd.CommandType = System.Data.CommandType.Text;
-            cmd.CommandText = @"select dw.nd, --0
-                                               dw.branch, --1
-                                               (case when wp.ins_ukr_id is not null and wp.ins_wrd_id is null then 'custom' else 'tourism' end) as type, --2
-                                               to_char(sysdate, 'yyyy-mm-dd') as date_, --3
-                                               to_char(a.dat_begin, 'yyyy-mm-dd') || 'T' ||
-                                               to_char(SYSTIMESTAMP, 'hh24:mi:ss') || '.000' ||
-                                               to_char(SYSTIMESTAMP, 'TZHTZM') as dateFrom, --4
-                                               to_char(a.dat_end, 'yyyy-mm-dd') as dateTo, --5
-                                               c.okpo as code, --6
-                                               (case
-                                                 when c.okpo = '0000000000' or c.okpo = '9999999999' then
-                                                  'true'
-                                                 else
-                                                  'false'
-                                               end) as dontHaveCode, --7
-                                               initcap(c.nmk) as name, --8
-                                               (select value
-                                                  from customerw
-                                                 where rnk = c.rnk
-                                                   and tag = 'SN_LN') as nameLast, --9
-                                               (select value
-                                                  from customerw
-                                                 where rnk = c.rnk
-                                                   and tag = 'SN_FN') as nameFirst, --10
-                                               (select value
-                                                  from customerw
-                                                 where rnk = c.rnk
-                                                   and tag = 'SN_MN') as nameMiddle, --11
-                                               c.adr as address, --12
-                                               nvl((select case
-                                                         when regexp_like(substr(trim(regexp_replace(upper(value),
-                                                                                                     '[ -]',
-                                                                                                     '')),
-                                                                                 -9),
-                                                                          '[0-9]') then
-                                                          '+380' ||
-                                                          substr(trim(regexp_replace(upper(value), '[ -]', '')), -9)
-                                                         else
-                                                          '+380000000000'
-                                                       end
-                                                  from customerw
-                                                 where tag = 'MPNO' and rnk = c.rnk), '+380000000000') as phone, --13
-                                               to_char(p.bday, 'yyyy-mm-dd') as birthDate, /*14*/ " + doc +
-                                       @" 'person' as insType, --19
-                                               decode(c.custtype, 3, 'false', 'true') as legal, --20
-                                               'DRAFT' as state, --21
-                                               wp.ins_ukr_id as tariffUkr, --22
-                                               wp.ins_wrd_id as tariffWrd, --23
-                                               dw.acc_nls as card_number, --24
-                                               'БПК_' || dw.nd as card_doc, --25
-                                               wp.haveins, --26
-                                               trim(substr(c.nmkv,0,instr(c.nmkv, ' '))) as f, --27
-                                               trim(substr(c.nmkv,instr(c.nmkv, ' '),instr(c.nmkv, ' ',1,1))) as n, --28
-                                               a.dat_end - a.dat_begin as coverage_days --29
-                                          from w4_deal_web dw, w4_acc a, customer c, person p, w4_card wp
-                                         where dw.nd = a.nd
-                                           and dw.cust_rnk = c.rnk
-                                           and c.rnk = p.rnk
-                                           and dw.card_code = wp.code
-                                           and dw.nd = :p_nd";
-            cmd.Parameters.Clear();
-            cmd.Parameters.Add("p_nd", OracleDbType.Decimal, nd, System.Data.ParameterDirection.Input);
-
-            OracleDataReader reader = cmd.ExecuteReader();
-
-            while (reader.Read())
+            using (OracleConnection con = OraConnector.Handler.UserConnection)
             {
-                p.nd = reader.GetDecimal(0);
-                p.branch = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? String.Empty : reader.GetString(1);
-                DealEwa param = new DealEwa();
-                param.type = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? String.Empty : reader.GetString(2);
-                param.date = String.IsNullOrEmpty(reader.GetValue(3).ToString()) ? String.Empty : reader.GetString(3);
-                param.dateFrom = String.IsNullOrEmpty(reader.GetValue(4).ToString()) ? String.Empty : reader.GetString(4);
-
-                /*if (Convert.ToDateTime(param.dateFrom) < Convert.ToDateTime(param.date))
+                using (OracleCommand com = con.CreateCommand())
                 {
-                    resp.ERR_CODE = -99;
-                    resp.ERR_MSG = "Дата вступу в дію договору меньша за поточну банківську дату!";
-                    if (!txCommited) tx.Rollback();
-                    return resp;
-                }*/
+                    com.CommandType = System.Data.CommandType.Text;
+                    com.CommandText = "select request from ins_w4_deals where nd=:p_nd";
+                    com.Parameters.Add("p_nd", OracleDbType.Decimal, nd, ParameterDirection.Input);
 
-                param.dateTo = String.IsNullOrEmpty(reader.GetValue(5).ToString()) ? String.Empty : reader.GetString(5);
-                CustomerEwa customer = new CustomerEwa();
-                customer.code = String.IsNullOrEmpty(reader.GetValue(6).ToString()) ? String.Empty : reader.GetString(6);
-                customer.dontHaveCode = reader.GetString(7) == "true" ? true : false;
-                customer.name = String.IsNullOrEmpty(reader.GetValue(8).ToString()) ? String.Empty : reader.GetString(8);
-                customer.nameLast = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? String.Empty : reader.GetString(9);
-                customer.nameFirst = String.IsNullOrEmpty(reader.GetValue(10).ToString()) ? String.Empty : reader.GetString(10);
-                customer.nameMiddle = String.IsNullOrEmpty(reader.GetValue(11).ToString()) ? String.Empty : reader.GetString(11);
-                customer.address = String.IsNullOrEmpty(reader.GetValue(12).ToString()) ? String.Empty : reader.GetString(12);
-                customer.phone = String.IsNullOrEmpty(reader.GetValue(13).ToString()) ? String.Empty : reader.GetString(13);
-                customer.birthDate = String.IsNullOrEmpty(reader.GetValue(14).ToString()) ? String.Empty : reader.GetString(14);
-                DocumentEwa document = new DocumentEwa();
-                document.type = String.IsNullOrEmpty(reader.GetValue(15).ToString()) ? String.Empty : reader.GetString(15);
-                document.series = String.IsNullOrEmpty(reader.GetValue(16).ToString()) ? String.Empty : reader.GetString(16);
-                document.number = String.IsNullOrEmpty(reader.GetValue(17).ToString()) ? String.Empty : reader.GetString(17);
-                document.date = String.IsNullOrEmpty(reader.GetValue(18).ToString()) ? String.Empty : reader.GetString(18);
-                customer.legal = reader.GetString(20) == "true" ? true : false;
-                customer.document = document;
-                param.customer = customer;
-                InsuranceObjEwa insuranceObject = new InsuranceObjEwa();
-                insuranceObject.type = String.IsNullOrEmpty(reader.GetValue(19).ToString()) ? String.Empty : reader.GetString(19);
-                insuranceObject.document = document;
-                insuranceObject.code = String.IsNullOrEmpty(reader.GetValue(6).ToString()) ? String.Empty : reader.GetString(6);
-                insuranceObject.phone = String.IsNullOrEmpty(reader.GetValue(13).ToString()) ? String.Empty : reader.GetString(13);
-                insuranceObject.birthDate = String.IsNullOrEmpty(reader.GetValue(14).ToString()) ? String.Empty : reader.GetString(14);
-                if (typeIns == 1)
+                    using (OracleDataReader reader = com.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            request = String.IsNullOrEmpty(reader.GetValue(0).ToString()) ? String.Empty : reader.GetString(0);
+                        }
+                    }
+                }
+
+                if (request != String.Empty)
                 {
-                    insuranceObject.nameLast = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? String.Empty : reader.GetString(9);
-                    insuranceObject.nameFirst = String.IsNullOrEmpty(reader.GetValue(10).ToString()) ? String.Empty : reader.GetString(10);
-                    insuranceObject.nameMiddle = String.IsNullOrEmpty(reader.GetValue(11).ToString()) ? String.Empty : reader.GetString(11);
+                    JavaScriptSerializer jsonSerializer = new JavaScriptSerializer();
+                    ParamsEwa paramsEwa = jsonSerializer.Deserialize<ParamsEwa>(request);
+
+                    using (OracleCommand com = con.CreateCommand())
+                    {
+                        com.CommandType = System.Data.CommandType.Text;
+                        com.CommandText = "select ins_wrd_id, ins_ukr_id from w4_card where code=:p_code";
+                        com.Parameters.Add("p_code", OracleDbType.Varchar2, code, ParameterDirection.Input);
+
+                        using (OracleDataReader reader = com.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                insWrdId = reader.IsDBNull(0) ? 0 : reader.GetDecimal(0);
+                                insUkrId = reader.IsDBNull(1) ? 0 : reader.GetDecimal(1);
+                            }
+                        }
+                    }
+                    if (paramsEwa.param.tariff.id == insWrdId)
+                        insType = 0; // zakordonne strahuvannya
                 }
                 else
                 {
-                    insuranceObject.nameLast = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? String.Empty : reader.GetString(27);
-                    insuranceObject.nameFirst = String.IsNullOrEmpty(reader.GetValue(10).ToString()) ? String.Empty : reader.GetString(28);
-                    insuranceObject.nameMiddle = String.Empty;
+                    throw new Exception("Не знайдено об'єкт попереднього запиту за даним параметром nd = " + nd);
                 }
-                insuranceObject.dontHaveCode = reader.GetString(7) == "true" ? true : false;
-                insuranceObject.name = String.IsNullOrEmpty(reader.GetValue(8).ToString()) ? String.Empty : reader.GetString(8);
-                insuranceObject.address = String.IsNullOrEmpty(reader.GetValue(12).ToString()) ? String.Empty : reader.GetString(12);
-                param.insuranceObject = insuranceObject;
-                param.state = String.IsNullOrEmpty(reader.GetValue(21).ToString()) ? String.Empty : reader.GetString(21);
-                UserEwa user = new UserEwa();
-                user.id = Convert.ToDecimal(_insRepo.GetParameter("EWAID"));
-                param.user = user;
-                TariffEwa tariff = new TariffEwa();
-                tariff.type = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? String.Empty : reader.GetString(2);
-                tariff.id = typeIns == 1 ? reader.GetDecimal(22) : reader.GetDecimal(23);
-                param.tariff = tariff;
-                if (typeIns == 1 && String.IsNullOrEmpty(reader.GetValue(23).ToString()))
-                {
-                    List<CustomFields> customFields = new List<CustomFields>();
-                    CustomFields customField = new CustomFields();
-                    customField.code = "card_doc";
-                    customField.value = String.IsNullOrEmpty(reader.GetValue(8).ToString()) ? String.Empty : reader.GetString(25);
-                    customFields.Add(customField);
-                    customField = new CustomFields();
-                    customField.code = "card_number";
-                    customField.value = String.IsNullOrEmpty(reader.GetValue(8).ToString()) ? String.Empty : reader.GetString(24);
-                    customFields.Add(customField);
-                    param.customFields = customFields;
-                    
-                }
-                else if (typeIns == 1 && !String.IsNullOrEmpty(reader.GetValue(23).ToString()))
-                {
-                    param.coverageDays = String.IsNullOrEmpty(reader.GetValue(29).ToString()) ? (decimal?)null : reader.GetDecimal(29);
-                }
-                p.param = param;
             }
-            return p;
+            return insType;
+        }
+
+        public ParamsEwa GetParamsEwa(decimal nd, decimal typeIns, OracleConnection con)
+        {
+            using (OracleCommand cmd = con.CreateCommand())
+            {
+				string doc = (typeIns == 1 ?
+										   @"decode(p.passp, 1, 'PASSPORT', 'EXTERNAL_PASSPORT') as docType, --15
+												   p.ser as docSeries, --16
+												   p.numdoc as docNumber, --17
+												   to_char(p.pdate, 'yyyy-mm-dd') as docDate, /*18*/" :
+										   @"'EXTERNAL_PASSPORT' as docType, --15
+												   (select value
+													  from customerw
+													 where rnk = c.rnk
+													   and tag = 'PC_Z1') as docSeries, --16
+												   (select value
+													  from customerw
+													 where rnk = c.rnk
+													   and tag = 'PC_Z2') as docNumber, --17
+												   to_char(to_date((select value
+													  from customerw
+													 where rnk = c.rnk
+													   and tag = 'PC_Z5')), 'yyyy-mm-dd') as docDate, /*18*/");
+
+				ParamsEwa p = new ParamsEwa();
+				cmd.CommandType = System.Data.CommandType.Text;
+				cmd.CommandText = @"select dw.nd, --0
+												   dw.branch, --1
+												   (case when wp.ins_ukr_id is not null and wp.ins_wrd_id is null then 'custom' else 'tourism' end) as type, --2
+												   to_char(sysdate, 'yyyy-mm-dd') as date_, --3
+												   to_char(a.dat_begin, 'yyyy-mm-dd') || 'T' ||
+												   to_char(SYSTIMESTAMP, 'hh24:mi:ss') || '.000' ||
+												   to_char(SYSTIMESTAMP, 'TZHTZM') as dateFrom, --4
+												   to_char(a.dat_end, 'yyyy-mm-dd') as dateTo, --5
+												   c.okpo as code, --6
+												   (case
+													 when c.okpo = '0000000000' or c.okpo = '9999999999' then
+													  'true'
+													 else
+													  'false'
+												   end) as dontHaveCode, --7
+												   initcap(c.nmk) as name, --8
+												   (select value
+													  from customerw
+													 where rnk = c.rnk
+													   and tag = 'SN_LN') as nameLast, --9
+												   (select value
+													  from customerw
+													 where rnk = c.rnk
+													   and tag = 'SN_FN') as nameFirst, --10
+												   (select value
+													  from customerw
+													 where rnk = c.rnk
+													   and tag = 'SN_MN') as nameMiddle, --11
+												   c.adr as address, --12
+												   nvl((select case
+															 when regexp_like(substr(trim(regexp_replace(upper(value),
+																										 '[ -]',
+																										 '')),
+																					 -9),
+																			  '[0-9]') then
+															  '+380' ||
+															  substr(trim(regexp_replace(upper(value), '[ -]', '')), -9)
+															 else
+															  '+380000000000'
+														   end
+													  from customerw
+													 where tag = 'MPNO' and rnk = c.rnk), '+380000000000') as phone, --13
+												   to_char(p.bday, 'yyyy-mm-dd') as birthDate, /*14*/ " + doc +
+										   @" 'person' as insType, --19
+												   decode(c.custtype, 3, 'false', 'true') as legal, --20
+												   'DRAFT' as state, --21
+												   wp.ins_ukr_id as tariffUkr, --22
+												   wp.ins_wrd_id as tariffWrd, --23
+												   dw.acc_nls as card_number, --24
+												   'БПК_' || dw.nd as card_doc, --25
+												   wp.haveins, --26
+												   trim(substr(c.nmkv,0,instr(c.nmkv, ' '))) as f, --27
+												   trim(substr(c.nmkv,instr(c.nmkv, ' '),instr(c.nmkv, ' ',1,1))) as n, --28
+												   a.dat_end - a.dat_begin as coverage_days --29
+											  from w4_deal_web dw, w4_acc a, customer c, person p, w4_card wp
+											 where dw.nd = a.nd
+											   and dw.cust_rnk = c.rnk
+											   and c.rnk = p.rnk
+											   and dw.card_code = wp.code
+											   and dw.nd = :p_nd";
+				cmd.Parameters.Clear();
+				cmd.Parameters.Add("p_nd", OracleDbType.Decimal, nd, System.Data.ParameterDirection.Input);
+
+				 using (OracleDataReader reader = cmd.ExecuteReader())
+				{
+
+					while (reader.Read())
+					{
+						p.nd = reader.GetDecimal(0);
+						p.branch = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? String.Empty : reader.GetString(1);
+						DealEwa param = new DealEwa();
+						param.type = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? String.Empty : reader.GetString(2);
+						param.date = String.IsNullOrEmpty(reader.GetValue(3).ToString()) ? String.Empty : reader.GetString(3);
+						param.dateFrom = String.IsNullOrEmpty(reader.GetValue(4).ToString()) ? String.Empty : reader.GetString(4);
+
+						/*if (Convert.ToDateTime(param.dateFrom) < Convert.ToDateTime(param.date))
+						{
+							resp.ERR_CODE = -99;
+							resp.ERR_MSG = "Дата вступу в дію договору меньша за поточну банківську дату!";
+							if (!txCommited) tx.Rollback();
+							return resp;
+						}*/
+
+						param.dateTo = String.IsNullOrEmpty(reader.GetValue(5).ToString()) ? String.Empty : reader.GetString(5);
+						CustomerEwa customer = new CustomerEwa();
+						customer.code = String.IsNullOrEmpty(reader.GetValue(6).ToString()) ? String.Empty : reader.GetString(6);
+						customer.dontHaveCode = reader.GetString(7) == "true" ? true : false;
+						customer.name = String.IsNullOrEmpty(reader.GetValue(8).ToString()) ? String.Empty : reader.GetString(8);
+						customer.nameLast = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? String.Empty : reader.GetString(9);
+						customer.nameFirst = String.IsNullOrEmpty(reader.GetValue(10).ToString()) ? String.Empty : reader.GetString(10);
+						customer.nameMiddle = String.IsNullOrEmpty(reader.GetValue(11).ToString()) ? String.Empty : reader.GetString(11);
+						customer.address = String.IsNullOrEmpty(reader.GetValue(12).ToString()) ? String.Empty : reader.GetString(12);
+						customer.phone = String.IsNullOrEmpty(reader.GetValue(13).ToString()) ? String.Empty : reader.GetString(13);
+						customer.birthDate = String.IsNullOrEmpty(reader.GetValue(14).ToString()) ? String.Empty : reader.GetString(14);
+						DocumentEwa document = new DocumentEwa();
+						document.type = String.IsNullOrEmpty(reader.GetValue(15).ToString()) ? String.Empty : reader.GetString(15);
+						document.series = String.IsNullOrEmpty(reader.GetValue(16).ToString()) ? String.Empty : reader.GetString(16);
+						document.number = String.IsNullOrEmpty(reader.GetValue(17).ToString()) ? String.Empty : reader.GetString(17);
+						document.date = String.IsNullOrEmpty(reader.GetValue(18).ToString()) ? String.Empty : reader.GetString(18);
+						customer.legal = reader.GetString(20) == "true" ? true : false;
+						customer.document = document;
+						param.customer = customer;
+						InsuranceObjEwa insuranceObject = new InsuranceObjEwa();
+						insuranceObject.type = String.IsNullOrEmpty(reader.GetValue(19).ToString()) ? String.Empty : reader.GetString(19);
+						insuranceObject.document = document;
+						insuranceObject.code = String.IsNullOrEmpty(reader.GetValue(6).ToString()) ? String.Empty : reader.GetString(6);
+						insuranceObject.phone = String.IsNullOrEmpty(reader.GetValue(13).ToString()) ? String.Empty : reader.GetString(13);
+						insuranceObject.birthDate = String.IsNullOrEmpty(reader.GetValue(14).ToString()) ? String.Empty : reader.GetString(14);
+						if (typeIns == 1)
+						{
+							insuranceObject.nameLast = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? String.Empty : reader.GetString(9);
+							insuranceObject.nameFirst = String.IsNullOrEmpty(reader.GetValue(10).ToString()) ? String.Empty : reader.GetString(10);
+							insuranceObject.nameMiddle = String.IsNullOrEmpty(reader.GetValue(11).ToString()) ? String.Empty : reader.GetString(11);
+						}
+						else
+						{
+							insuranceObject.nameLast = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? String.Empty : reader.GetString(27);
+							insuranceObject.nameFirst = String.IsNullOrEmpty(reader.GetValue(10).ToString()) ? String.Empty : reader.GetString(28);
+							insuranceObject.nameMiddle = String.Empty;
+						}
+						insuranceObject.dontHaveCode = reader.GetString(7) == "true" ? true : false;
+						insuranceObject.name = String.IsNullOrEmpty(reader.GetValue(8).ToString()) ? String.Empty : reader.GetString(8);
+						insuranceObject.address = String.IsNullOrEmpty(reader.GetValue(12).ToString()) ? String.Empty : reader.GetString(12);
+						param.insuranceObject = insuranceObject;
+						param.state = String.IsNullOrEmpty(reader.GetValue(21).ToString()) ? String.Empty : reader.GetString(21);
+						UserEwa user = new UserEwa();
+						user.id = Convert.ToDecimal(_insRepo.GetParameter("EWAID"));
+						param.user = user;
+						TariffEwa tariff = new TariffEwa();
+						tariff.type = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? String.Empty : reader.GetString(2);
+						tariff.id = typeIns == 1 ? reader.GetDecimal(22) : reader.GetDecimal(23);
+						param.tariff = tariff;
+						if (typeIns == 1 && String.IsNullOrEmpty(reader.GetValue(23).ToString()))
+						{
+							List<CustomFields> customFields = new List<CustomFields>();
+							CustomFields customField = new CustomFields();
+							customField.code = "card_doc";
+							customField.value = String.IsNullOrEmpty(reader.GetValue(8).ToString()) ? String.Empty : reader.GetString(25);
+							customFields.Add(customField);
+							customField = new CustomFields();
+							customField.code = "card_number";
+							customField.value = String.IsNullOrEmpty(reader.GetValue(8).ToString()) ? String.Empty : reader.GetString(24);
+							customFields.Add(customField);
+							param.customFields = customFields;
+							
+						}
+						else if (typeIns == 1 && !String.IsNullOrEmpty(reader.GetValue(23).ToString()))
+						{
+							param.coverageDays = String.IsNullOrEmpty(reader.GetValue(29).ToString()) ? (decimal?)null : reader.GetDecimal(29);
+						}
+						p.param = param;
+					}
+				}
+				return p;
+			}
         }
 
         public ParamsIns GetIsIns(string cardCode)

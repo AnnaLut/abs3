@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Linq;
 using System.Text;
@@ -411,8 +411,17 @@ namespace BarsWeb.Areas.InsUi.Infrastructure.DI.Implementation
                 {
                     using (var rdr = new StreamReader(ex.Response.GetResponseStream()))
                     {
-                        XmlDocument doc = JsonConvert.DeserializeXmlNode(rdr.ReadToEnd(), "root");
-                        errorMessage = doc.OuterXml;
+                        try
+                        {
+                            XmlDocument doc = JsonConvert.DeserializeXmlNode(rdr.ReadToEnd(), "root");
+                            errorMessage = doc.OuterXml;
+                        }
+                        //answer is not an xml, for example, forbidden access
+                        catch (Exception xmlParseEx)
+                        {
+                            errorMessage = "ERROR: " + ex.Message;
+                            SetState(parameters.nd, "ERROR", errorMessage, connection);
+                        }
                     }
                 }
                 else

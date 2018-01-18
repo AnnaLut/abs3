@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -18,6 +18,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Oracle.DataAccess.Client;
 using Bars.Classes;
+using BarsWeb.Models;
 
 namespace BarsWeb.Areas.BpkW4.Controllers
 {
@@ -66,16 +67,38 @@ namespace BarsWeb.Areas.BpkW4.Controllers
             _cardRepository.SetInsId(nd, ins_id, tmp_id);
         }
 
-        public ActionResult CreateDealsEWA(decimal nd, decimal type)
+        public ActionResult GetInsType(decimal nd, string code)
         {
-            ParamsBpkIns param = _cardRepository.GetBpkInsParams(nd, "", "ins_w4_deals");
-            JavaScriptSerializer jsonSerializer = new JavaScriptSerializer();
-            OracleConnection connection = OraConnector.Handler.UserConnection;
-            OracleCommand cmd = connection.CreateCommand();
-            ParamsEwa objCustomer = _cardRepository.GetParamsEwa(nd, type, cmd);//jsonSerializer.Deserialize<ParamsEwa>(param.request);
+            JsonResponse response = new JsonResponse();
             try
             {
+                decimal insType = _cardRepository.GetInsType(nd, code);
+                response.data = insType;
+                response.status = JsonResponseStatus.Ok;
+            }
+            catch (Exception ex)
+            {
+                response.status = JsonResponseStatus.Error;
+                response.message = ex.Message;
+            }
+            return Json(response, JsonRequestBehavior.AllowGet);
+        }
+        public ActionResult CreateDealsEWA(decimal nd, string code, decimal insType)
+        {
+            ParamsBpkIns param = _cardRepository.GetBpkInsParams(nd, code, "ins_w4_deals");
+            JavaScriptSerializer jsonSerializer = new JavaScriptSerializer();
+            OracleConnection connection = OraConnector.Handler.UserConnection;
+
+            try
+            {
+                ParamsEwa objCustomer = _cardRepository.GetParamsEwa(nd, insType, connection);
+
                 var result = _insRepository.CreateDealEWA(objCustomer, connection);
+                return Json(result, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                var result = ex.Message;
                 return Json(result, JsonRequestBehavior.AllowGet);
             }
             finally
