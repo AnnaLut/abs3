@@ -50,7 +50,7 @@ COMMENT ON TABLE BARS.CP_ZAL IS '';
 COMMENT ON COLUMN BARS.CP_ZAL.REF IS 'Реф-с угоди куп_вл_ пакета';
 COMMENT ON COLUMN BARS.CP_ZAL.ID IS 'Код ЦП (ID)';
 COMMENT ON COLUMN BARS.CP_ZAL.KOLZ IS 'К_льк_сть в застав_ (пакет або доля пакета )';
-COMMENT ON COLUMN BARS.CP_ZAL.DATZ IS 'Дата включення в заставу';
+
 COMMENT ON COLUMN BARS.CP_ZAL.RNK IS 'Код Контрагента';
 COMMENT ON COLUMN BARS.CP_ZAL.ID_CP_ZAL IS 'Код CP_ZAL';
 
