@@ -1,15 +1,3 @@
-=========  svn diff --summarize -r 45265:45399 D:\SVN\master\web\ru
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.148\ru\web\barsroot\App_Code\Areas\InsUi\Controllers\Api\RemoteBranch\CreateDealEWAController.cs
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.148\ru\web\barsroot\App_Code\Areas\InsUi\Infrastructure\DI\Implementation\InsRepository.cs
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.148\ru\web\barsroot\App_Code\Areas\BpkW4\Infrastructure\Repository\DI\Implementation\RegNewCardRepository.cs
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.148\ru\web\barsroot\App_Code\Areas\BpkW4\Infrastructure\Repository\DI\Abstract\IRegNewCardRepository.cs
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.148\ru\web\barsroot\App_Code\Areas\BpkW4\Models\ParamsIns.cs
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.148\ru\web\barsroot\App_Code\Areas\BpkW4\Controllers\RegisteringNewCardController.cs
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.148\ru\web\barsroot\App_Code\Areas
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.148\ru\web\barsroot\version.abs
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.148\ru\web\barsroot\Areas\InsUi\Scripts\CardInsurance\Controllers\Index.js
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.148\ru\web\barsroot\Areas\BpkW4\Scripts\RegNewCardCtrl.js
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.148\ru\web\barsroot\Areas
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.148\ru\web\barsroot
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.148\ru\web
-Bugfix_2.0.35.5.148 (Rev:45265-45399
+=========  svn diff --summarize -r 45399:45499 D:\SVN\master\web\ru
+---web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.149\ru\web\barsroot\version.abs
+Bugfix_2.0.35.5.149 (Rev:45399-45499
