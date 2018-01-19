@@ -180,7 +180,7 @@ nls_clearance_exp
                                     AND T11.STATUS = 'SUBMITTED'
                                     AND T11.PAYEDREF IS NULL
                                     AND t12.acc = t4.acc))
-		where acc_clearance_exp not in(540108513)
+		where (acc_clearance_exp not in(540108513) or  acc_clearance_exp is null)
 group by
 KF,
 NMK,
