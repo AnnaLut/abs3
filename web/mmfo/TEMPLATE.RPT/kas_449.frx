@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="11/04/2014 15:18:48" ReportInfo.Modified="04/25/2017 11:03:36" ReportInfo.CreatorVersion="2014.3.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="11/04/2014 15:18:48" ReportInfo.Modified="01/12/2018 15:12:49" ReportInfo.CreatorVersion="2014.1.2.0">
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqD6nWZEExUJ9MEhdFZpB1A+RsALYQnkrx1bqUugr9bZmM+vm2A2A73LUw+BfeY2K41MJRLPBvMFywsU6BCXvY5g==">
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqD6nWZEExUJ9MEhdFZpB1A+RsALYQnkrx1bqUugr9bZmM+vm2A2A73LUw+BfeY2K4ZU6xysY0XrXIFRqwYWvSbQ==" CommandTimeout="500">
       <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select o.ref, &#13;&#10;       o.pdat, &#13;&#10;       o.vdat, &#13;&#10;       o.tt, &#13;&#10;       (select s.fio &#13;&#10;          from staff$base s &#13;&#10;         where s.id = o.userid) fio,&#13;&#10;       to_char(o.pdat,'hh24:mi:ss') time_v,&#13;&#10;       to_char(v.dat,'hh24:mi:ss') time_o,&#13;&#10;       o.s/100 s,&#13;&#10;       (SELECT p.sq/100&#13;&#10;          FROM opldok p, accounts a, oper t&#13;&#10;         WHERE p.REF = o.REF&#13;&#10;           AND p.acc = a.acc&#13;&#10;           AND p.REF = t.REF&#13;&#10;           AND a.nls = t.nlsa&#13;&#10;           AND a.kv = t.kv) sq,&#13;&#10;       (select b.name from branch b where b.branch = o.branch) br_name&#13;&#10;  from oper o left join oper_visa v on v.ref = o.ref and v.status = 2&#13;&#10; where o.pdat between :sFdat1 and :sFdat2+1&#13;&#10;   and ((v.dat-o.pdat)*1440)&gt;15&#13;&#10;   and o.tt in ('AA3','AA5','AA7','AA9','AAB','AAC','AAK','AAM','AAN')">
         <Column Name="REF" DataType="System.Decimal"/>
         <Column Name="PDAT" DataType="System.DateTime"/>
@@ -38,13 +38,13 @@
     <ReportTitleBand Name="ReportTitle1" Width="1047.06" Height="75.6">
       <TextObject Name="Text1" Width="718.2" Height="66.15" Text="Звіт по касовим документам, &#13;&#10;що завізовано із затримкою більше 15 хв.&#13;&#10;за період з [sFdat1] р. по [sFdat2] р." HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
     </ReportTitleBand>
-    <DataBand Name="Data1" Top="79.6" Width="1047.06" Height="18.9">
+    <DataBand Name="Data1" Top="78.8" Width="1047.06" Height="18.9">
       <SubreportObject Name="Subreport1" Left="9.45" Width="94.5" Height="18.9" ReportPage="Page2"/>
     </DataBand>
-    <DataBand Name="Data2" Top="102.5" Width="1047.06" Height="46.25">
+    <DataBand Name="Data2" Top="100.9" Width="1047.06" Height="46.25">
       <SubreportObject Name="Subreport2" Left="9.45" Top="27.35" Width="94.5" Height="18.9" ReportPage="Page3"/>
     </DataBand>
-    <PageFooterBand Name="PageFooter1" Top="152.75" Width="1047.06" Height="18.9"/>
+    <PageFooterBand Name="PageFooter1" Top="150.35" Width="1047.06" Height="18.9"/>
   </ReportPage>
   <ReportPage Name="Page2" Landscape="true" PaperWidth="331" PaperHeight="210" FirstPageSource="15" OtherPagesSource="15">
     <DataBand Name="Data3" Top="70.15" Width="1175.58" Height="18.9" CanGrow="true" DataSource="Table">

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="01/27/2014 08:49:30" ReportInfo.Modified="07/31/2017 16:34:53" ReportInfo.CreatorVersion="2014.3.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="01/27/2014 08:49:30" ReportInfo.Modified="01/12/2018 15:13:12" ReportInfo.CreatorVersion="2014.1.2.0">
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqJOsxPO45Mfc7mc0tWCiv9R+LArR6Vu/4+69t/DeoCTtsqLdccDxV87RKeUsHcRjgF38k5DdimDVKHvrnZVz8tA==">
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqJOsxPO45Mfc7mc0tWCiv9R+LArR6Vu/4+69t/DeoCTtsqLdccDxV87RKeUsHcRjgYr795hadhInLMaY6veeysw==" CommandTimeout="500">
       <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="  SELECT ac.kf, &#13;&#10;         ac.branch,&#13;&#10;         ac.kv,&#13;&#10;         c.nmk,&#13;&#10;         substr(m.phone,4,3)||'XXXXX'|| substr(m.phone,6,2) phone,&#13;&#10;         c.rnk,&#13;&#10;         c.OKPO,&#13;&#10;         ac.nls,&#13;&#10;         CASE&#13;&#10;            WHEN m.status = 'SUBMITTED'&#13;&#10;            THEN 'Надіслано'&#13;&#10;            WHEN m.status = 'EXPIRED'&#13;&#10;            THEN 'Закінчився термін дії'&#13;&#10;            WHEN m.status = 'ERROR'&#13;&#10;            THEN 'Помилкових'&#13;&#10;         END status,&#13;&#10;         COUNT (*)&#13;&#10;    FROM bars.acc_msg a,&#13;&#10;         bars.accounts ac,&#13;&#10;         bars.msg_submit_data m,&#13;&#10;         bars.customer c&#13;&#10;   WHERE     m.msg_id = a.msg_id&#13;&#10;         AND ac.acc = a.acc&#13;&#10;         -- and change_time between  to_date('01/01/2015_00:00','DD/MM/YYYY_HH24:MI')  AND to_date('31/03/2015_23:59','DD/MM/YYYY_HH24:MI')&#13;&#10;         AND change_time BETWEEN :Dat1 AND :Dat2 + 1&#13;&#10;         AND ac.rnk = c.rnk&#13;&#10;         AND ac.branch LIKE DECODE ( :branch, '%', ac.branch, NULL, ac.branch, :branch) || '%'&#13;&#10;         AND c.rnk = DECODE ( :rnk,  '%', c.rnk,  NULL, c.rnk,  :rnk)&#13;&#10;         AND c.custtype = DECODE ( :ctype, '%', c.custtype, NULL, c.custtype, 4, 3, :ctype)&#13;&#10;         AND c.sed = DECODE ( :ctype, 4, 91, c.sed)&#13;&#10;GROUP BY ac.nls,&#13;&#10;         c.rnk,&#13;&#10;         ac.branch,&#13;&#10;         c.OKPO,&#13;&#10;         ac.kv,&#13;&#10;         status,&#13;&#10;         m.phone,&#13;&#10;         c.nmk,ac.kf&#13;&#10;ORDER BY 6&#13;&#10;&#13;&#10;">
         <Column Name="RNK" DataType="System.Decimal"/>
         <Column Name="NMK" DataType="System.String"/>
@@ -47,9 +47,9 @@
         </Formats>
       </TextObject>
     </ReportTitleBand>
-    <GroupHeaderBand Name="GroupHeader10" Top="79.6" Width="718.2" Height="30.24" KeepWithData="true" RepeatOnEveryPage="true" Condition="[Table.KF]">
+    <GroupHeaderBand Name="GroupHeader10" Top="78.8" Width="718.2" Height="30.24" KeepWithData="true" RepeatOnEveryPage="true" Condition="[Table.KF]">
       <TextObject Name="Text12" Left="11.34" Top="11.34" Width="453.6" Height="18.9" Text="[Table.KF]" Font="Times New Roman, 10pt"/>
-      <ChildBand Name="Child1" Top="113.84" Width="718.2" Height="37.8">
+      <ChildBand Name="Child1" Top="112.24" Width="718.2" Height="37.8">
         <TextObject Name="Text11" Left="7.56" Top="1.89" Width="94.5" Height="18.9" Text="Відділення:" Font="Times New Roman, 10pt"/>
         <TextObject Name="Text10" Left="102.06" Top="1.89" Width="453.6" Height="18.9" Text="[Table.BRANCH]" Font="Times New Roman, 10pt"/>
         <TableObject Name="Table1" Left="9.45" Top="18.9" Width="549.99" Height="18.9">
@@ -63,7 +63,7 @@
           </TableRow>
         </TableObject>
       </ChildBand>
-      <GroupHeaderBand Name="GroupHeader11" Top="155.64" Width="718.2" Height="94.5" CanGrow="true" CanShrink="true" Guides="0,66.15,66.15" Condition="[Table.RNK]" SortOrder="Descending">
+      <GroupHeaderBand Name="GroupHeader11" Top="153.24" Width="718.2" Height="94.5" CanGrow="true" CanShrink="true" Guides="0,66.15,66.15" Condition="[Table.RNK]" SortOrder="Descending">
         <TableObject Name="Table1" Left="9.45" Top="56.7" Width="549.99" Height="37.8">
           <TableColumn Name="Column59" Width="105.84"/>
           <TableColumn Name="Column60" Width="94.5"/>
@@ -92,8 +92,8 @@
             <TableCell Name="Cell88" Border.Lines="All" Text="[Table.OKPO]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
           </TableRow>
         </TableObject>
-        <GroupHeaderBand Name="GroupHeader12" Top="254.14" Width="718.2" Condition="[Table.STATUS]">
-          <DataBand Name="Data3" Top="258.14" Width="718.2" Height="18.9" CanGrow="true" CanShrink="true" DataSource="Table">
+        <GroupHeaderBand Name="GroupHeader12" Top="250.94" Width="718.2" Condition="[Table.STATUS]">
+          <DataBand Name="Data3" Top="254.14" Width="718.2" Height="18.9" CanGrow="true" CanShrink="true" DataSource="Table">
             <TableObject Name="Table1" Left="9.45" Width="549.99" Height="18.9" GrowToBottom="true">
               <TableColumn Name="Column64" Width="105.84"/>
               <TableColumn Name="Column65" Width="94.5"/>
@@ -109,7 +109,7 @@
               </TableRow>
             </TableObject>
           </DataBand>
-          <GroupFooterBand Name="GroupFooter12" Top="281.04" Width="718.2" Height="18.9" CanGrow="true" CanShrink="true" KeepWithData="true">
+          <GroupFooterBand Name="GroupFooter12" Top="276.24" Width="718.2" Height="18.9" CanGrow="true" CanShrink="true" KeepWithData="true">
             <TableObject Name="Table1" Left="9.45" Width="549.99" Height="18.9">
               <TableColumn Name="Column69" Width="105.84"/>
               <TableColumn Name="Column70" Width="94.5"/>
@@ -126,7 +126,7 @@
             </TableObject>
           </GroupFooterBand>
         </GroupHeaderBand>
-        <GroupFooterBand Name="GroupFooter11" Top="303.94" Width="718.2" Height="28.35" CanGrow="true" CanShrink="true">
+        <GroupFooterBand Name="GroupFooter11" Top="298.34" Width="718.2" Height="28.35" CanGrow="true" CanShrink="true">
           <TableObject Name="Table1" Left="9.45" Width="549.99" Height="18.9">
             <TableColumn Name="Column79" Width="105.84"/>
             <TableColumn Name="Column80" Width="94.5"/>
@@ -143,7 +143,7 @@
           </TableObject>
         </GroupFooterBand>
       </GroupHeaderBand>
-      <GroupFooterBand Name="GroupFooter10" Top="336.29" Width="718.2" Height="43.47" CanGrow="true" CanShrink="true">
+      <GroupFooterBand Name="GroupFooter10" Top="329.89" Width="718.2" Height="43.47" CanGrow="true" CanShrink="true">
         <TableObject Name="Table1" Left="9.45" Top="18.9" Width="549.99" Height="18.9">
           <TableColumn Name="Column74" Width="105.84"/>
           <TableColumn Name="Column75" Width="94.5"/>
