@@ -447,9 +447,9 @@ namespace Bars
             if (startPos < 0) return sort;
             int endPosComa = query.IndexOf(",", startPos);
             int endPosFrom = query.ToLower().IndexOf("from", startPos);
-            int endPos = endPosComa < endPosFrom ? endPosComa : endPosFrom;
+            int endPos = endPosComa < endPosFrom && endPosComa > 0 ? endPosComa : endPosFrom;
             string orderParamsStr = query.Substring(startPos, endPos - startPos);
-            string[] orderParams = orderParamsStr.Split(' ');
+            string[] orderParams = orderParamsStr.Split(' ').Where(p=>!string.IsNullOrWhiteSpace(p)).ToArray();
             string orderParam = string.Empty;
             if (orderParams.Length > 1)
             {
