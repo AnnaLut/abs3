@@ -1,3 +1,10 @@
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_FA7_NN.sql =========*** Run *** 
+PROMPT ===================================================================================== 
+
+
 CREATE OR REPLACE PROCEDURE BARS.p_fa7_nn (
    pdat_    DATE,
    pmode_   NUMBER DEFAULT 0,
@@ -9,7 +16,7 @@ IS
 % DESCRIPTION :  Процедура формирования #A7 для КБ (универсальная)
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.18.001  10.01.2018
+% VERSION     :  v.18.001  11.01.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%/%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                pmode_ = режим (0 - для отчетности, 1 - для ANI-отчетов, 2 - для @77)
@@ -438,14 +445,14 @@ IS
       END IF;
 
       -- 11/07/2012 Притуп + 20/06/2013 УПБ Корецька
-      if substr(nls_, 1, 4) in ('1410', '1420', '1430', '1435', '1436', '1437', '1440', '1446', '1447', '3040') or
-         substr(nls_, 1, 4) in ('1415', '1416', '1417', '1426', '1427') and
+--      if substr(nls_, 1, 4) in ('1410', '1420', '1430', '1435', '1436', '1437', '1440', '1446', '1447', '3040') or
+--         substr(nls_, 1, 4) in ('1415', '1416', '1417', '1426', '1427') and
 --         r013_ in ('2', '4', '5', '6', '7')     до 26.12.2017
-         r011_ in ('2', 'D')
-      THEN                           
-         x_ := '1';
-         s242_ := '1';
-      END IF;
+--         r011_ in ('2', 'D')
+--      THEN                           
+--         x_ := '1';
+--         s242_ := '1';
+--      END IF;
 
       -- для Одеського СБЕРа 21/08/2012
       IF mfo_ = 328845
@@ -969,6 +976,15 @@ BEGIN
       end if;
    end;
 
+      select count(*)   into kol_nd_
+        from kol_nd_dat
+       where dat =pdat_;
+
+      if kol_nd_ =0  then
+           P_KOL_ND_OTC(pdat_);    -- заполнение табл. дней просрочки по дате
+           commit; 
+      end if;
+
    p_upd_r012('A7', mfou_);
 
    cursor_sql := 'select t.*
@@ -1132,15 +1148,6 @@ BEGIN
              END IF;
           END IF;
 --------------------------------------- S190
-      select count(*)   into kol_nd_
-        from kol_nd_dat
-       where dat =pdat_;
-
-      if kol_nd_ =0  then
-           P_KOL_ND_OTC(pdat_);    -- заполнение табл. дней просрочки по дате
-           commit; 
-      end if;
-
       begin
           select nvl(kol,0)  into kol_351_
             from kol_nd_dat
@@ -3393,15 +3400,6 @@ insert into OTCN_FA7_REZ1
       end if;
 
 --------------------------------------- S190
-      select count(*)   into kol_nd_
-        from kol_nd_dat
-       where dat =pdat_;
-
-      if kol_nd_ =0  then
-           P_KOL_ND_OTC(pdat_);    -- заполнение табл. дней просрочки по дате
-           commit; 
-      end if;
-
       begin
           select nvl(kol,0)  into kol_351_
             from kol_nd_dat
@@ -3810,6 +3808,115 @@ insert into OTCN_FA7_REZ1
           end if;
        end loop;
    end;
+   else
+
+      declare
+          over_    number := 0;
+          rizn_    number := 0;
+      begin
+          -- розбиваємо дисконти/премії на коди C та D в залежності від активу
+          for k in (select /* PARALLEL(8) */ s.*,
+                       s.znap sumdp_k,
+                       s.suma / s.suma_all koef,
+                       nvl((count(*) over (partition by s.acc, s.nd, s.kv)), 0) cnt,
+                       row_number() over (partition by s.acc, s.nd, s.kv order by s.acca, s.kodp) rnum
+                    from (
+                       select a.tp, a.nd, a.acc, a.nls, a.kv, a.kodp, a.znap, a.comm, a.tobo,
+                           a.rnk, a.mdate, a.isp, a.nbuc,
+                           substr(a.kodp, 8,2) s181_s240, substr(a.kodp,11,1) s190,
+                           b.ACC acca, b.NLS nlsa, substr(b.kodp, 8,2) s181_s240_a,
+                           decode(a.tp, 1, b.SUMD, b.SUMP) sumdp,
+                           substr(b.kodp,11,1) s190_a, b.suma, b.sumk,
+                           nvl((sum(b.suma) over (partition by a.acc, a.nd, a.kv)), 0) suma_all
+                       from
+                           (-- дисконти
+                            select 1 tp, nd, acc, nls, kv, rnk, mdate, isp, nbuc, kodp, znap, comm, tobo
+                            from rnbu_trace
+                            where acc in (select acc
+                                            from OTCN_FA7_REZ2
+                                           where pr = 1)
+                           union
+                           -- премії
+                           select 2 tp, nd, acc, nls, kv, rnk, mdate, isp, nbuc, kodp, znap, comm, tobo
+                            from rnbu_trace
+                            where acc in (select acc
+                                            from OTCN_FA7_REZ2
+                                           where pr = 2)
+                           ) a
+                       join
+                           (select ND, ACC, NLS, KV, KODP,
+                               to_number(ZNAP) suma,
+                               SUMA sumk, SUMD, SUMP
+                            from OTCN_FA7_REZ1
+                            where suma <> 0 and
+                               substr(nls, 4, 1) not in ('7', '8', '9')) b
+                        on (a.nd = b.nd and
+                            substr(a.nls,1,3) = substr(b.nls,1,3) and
+                            a.kv = b.kv)) s)
+          loop
+             if k.rnum = 1 then
+                if k.znap > k.suma_all then
+                   over_ :=  k.znap - k.suma_all;
+                else
+                   over_ := 0;
+                end if;
+             end if;
+      
+             k.sumdp_k := round((k.znap - over_) * k.koef);
+      
+             if k.rnum = 1 then
+                sumc_ := k.sumdp_k + over_;
+             else
+                sumc_ := sumc_ + k.sumdp_k;
+             end if;
+      
+             if k.rnum = k.cnt then
+                rizn_ := to_number(k.znap) - sumc_;
+             end if;
+
+             kodp_ := substr(k.kodp, 1,7) || k.s181_s240_a || substr(k.kodp, 10,1) || k.s190_a || substr(k.kodp, 12,3);
+      
+             if k.rnum = 1 then
+                znap_ := to_char(k.sumdp_k);
+                comm_ := substr(k.comm || ' заміна по рахунку '||k.nlsa||'('||to_char(k.kv)||')',1,255);
+      
+                update rnbu_trace
+                set kodp = kodp_,
+                    znap = znap_,
+                    comm = comm_
+                where acc = k.acc and
+                   nd = k.nd and
+                   kodp =k.kodp;
+      
+                if over_ <> 0 then
+
+                    kodp_ := substr(k.kodp, 1,7) || substr(k.s181_s240_a,1,1) || '1' || substr(k.kodp, 10,1) || k.s190_a || substr(k.kodp, 12,3);
+      
+                    znap_ := to_char(over_);
+                    comm_ := substr(k.comm || ' перевищення дисконту (> ніж залишок по рахунку '||k.nlsa||'('||to_char(k.kv)||') )',1,255);
+      
+                    insert into rnbu_trace(recid, userid, nls, kv, odate, kodp,
+                              znap, acc,rnk, isp, mdate, comm, nd, nbuc, tobo)
+                    values(s_rnbu_record.NEXTVAL, userid_, k.nls, k.kv, data_, kodp_,
+                        znap_, k.acc, k.rnk, k.isp, k.mdate, comm_, k.nd, k.nbuc, k.tobo);
+                end if;
+             else
+                if k.rnum = k.cnt then
+                   znap_ := to_char(k.sumdp_k + rizn_);
+                else
+                   znap_ := to_char(k.sumdp_k);
+                end if;
+      
+                comm_ := substr(k.comm || ' розбивка дисконту на частини по рахунку '||k.nlsa||'('||to_char(k.kv)||')',1,255);
+      
+                insert into rnbu_trace(recid, userid, nls, kv, odate, kodp,
+                          znap, acc,rnk, isp, mdate, comm, nd, nbuc, tobo )
+                values(s_rnbu_record.NEXTVAL, userid_, k.nls, k.kv, data_, kodp_,
+                    znap_, k.acc, k.rnk, k.isp, k.mdate, comm_, k.nd, k.nbuc, k.tobo);
+             end if;
+          end loop;
+      end;
+
    end if;
 
    -- рахунки SNA
@@ -3851,6 +3958,7 @@ insert into OTCN_FA7_REZ1
                         a.rnk, a.mdate, a.isp, a.nbuc,
                         substr(a.kodp, 8,2) s181_s240, '0' r012,
                         b.ACC acca, b.NLS nlsa, substr(b.kodp, 8,2) s181_s240_a,
+                        substr(b.kodp, 11,1) s190_a,
                         decode(a.tp, 1, b.SUMD, b.SUMP) sumdp,
                         '4' r012_a,
                         b.suma, b.sumk, to_number(a.znap) sumd,
@@ -3896,7 +4004,7 @@ insert into OTCN_FA7_REZ1
                 substr(k.s181_s240_a, 1,1) ||
                 (case when k.suma = '0' then 'Z' else substr(k.s181_s240_a, 2,1) end)||
                 substr(k.kodp, 10,1) ||
-                (case when k.suma = '0' then 'B' else substr(k.kodp,11,1) end)||
+                (case when k.suma = '0' then 'B' else k.s190_a end)||
                 substr(k.kodp, 12,3);
           end if;
 
@@ -4500,4 +4608,10 @@ insert into OTCN_FA7_REZ1
 --        logger.info ('P_FA7_NN: Error: '||sqlerrm);
 END p_fa7_nn;
 /
+show err;
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_FA7_NN.sql =========*** End *** 
+PROMPT ===================================================================================== 
 
