@@ -693,7 +693,7 @@ is
   --
   -- глобальные переменные и константы
   -- 
-  g_body_version  constant varchar2(64)          := 'version 44.13  29.12.2017';
+  g_body_version  constant varchar2(64)          := 'version 44.15  19.01.2018';
   
   modcode         constant varchar2(3)           := 'DPU';
   accispparam     constant varchar2(16)          := 'DPU_ISP';
@@ -1140,24 +1140,24 @@ begin
   
   if ( p_intr011 is null )
   then
-    p_intr011 := case 
+    p_intr011 := case
                  when ( p_depnbs = '2525' and p_intnbs = '2528' ) then '3'
                  when ( p_depnbs = '2546' and p_intnbs = '2548' ) then '5'
                  when ( p_depnbs = '2600' and p_intnbs = '2608' ) then '3'
                  when ( p_depnbs = '2650' and p_intnbs = '2658' ) then '3'
                  end;
   end if;
-  
+
   -- R013 for deposit accounts
   p_depr013 := case
-               when (p_depnbs = '2600') then 7
-               when (p_depnbs = '2650') then 8
-               when (p_depnbs in ('2610', '2615', '2651', '2652')) then 9
+               when ( p_depnbs = '2600' ) then '1'
+               when ( p_depnbs = '2650' ) then '1'
+               else null
                end;
-  
+
   -- R013 for interest accounts
   p_intr013 := null;
-  
+
 end get_r011_r013;
 
 --
@@ -8941,33 +8941,33 @@ begin
   -- банківська дата
   if (p_bdate is Null) 
   then
-    l_bdate := glb_bankdate;
+    l_bdate := GL.GBD();
   else
     l_bdate := p_bdate;
   end if;
   
-  l_mindatend := dat_next_u(l_bdate, -1);
+  l_mindatend := DAT_NEXT_U( l_bdate, -1 );
   l_maxdatend := l_bdate;
 
   l_jobid := 281;
-  
+
   -- фіксація старту виконання автоматичного завдання в журналі виконання
   dpt_jobs_audit.p_start_job( p_modcode => modcode,
                               p_jobid   => l_jobid,
                               p_branch  => sys_context('bars_context','user_branch'),
                               p_bdate   => l_bdate,
                               p_run_id  => l_runid );
-  
+
   for d in 
   ( select d.DPU_ID, d.ND as DPU_NUM, d.RNK as CUST_ID, d.BRANCH, d.DAT_BEGIN
          , a.NLS as ACC_NUM, a.KV as CUR_ID, a.OSTC, a.OSTB, a.BLKD
          , g.END_DATE, g.RATE
-      from BARS.DPU_DEAL d
-      join BARS.DPU_VIDD v
+      from DPU_DEAL d
+      join DPU_VIDD v
         on ( v.VIDD = d.VIDD )
-      join BARS.ACCOUNTS a
+      join ACCOUNTS a
         on ( a.ACC = d.ACC )
-      join BARS.DPU_AGREEMENTS g
+      join DPU_AGREEMENTS g
 $if DPU_PARAMS.SBER
 $then
         on ( g.DPU_ID = d.DPU_ID and g.BEGIN_DATE = d.DATV ) -- Для Ощадбанку нова дата початку = дата ПОВЕРНЕННЯ
@@ -8976,7 +8976,7 @@ $else
         on ( g.DPU_ID = d.DPU_ID and g.BEGIN_DATE = d.DAT_END )
      where d.DAT_END between l_mindatend and l_maxdatend
 $end
-       and d.CLOSED = 0
+       and d.CLOSED        = 0
        and v.FL_AUTOEXTEND = 0       -- продукт без авто лонгації
        and g.AGRMNT_TYPE   = 7       -- наявна ДУ про лонгацію
        and g.AGRMNT_STATE  = 1       -- активна ДУ
@@ -8985,12 +8985,17 @@ $end
     select d.dpu_id, d.nd, d.rnk, d.branch, d.DAT_BEGIN
          , a.NLS as ACC_NUM, a.KV as CUR_ID, a.OSTC, a.OSTB, a.BLKD
          , null, null
-      from BARS.DPU_DEAL d
-      join BARS.DPU_VIDD v
+      from DPU_DEAL d
+      join DPU_VIDD v
         on ( v.VIDD = d.VIDD )
-      join BARS.ACCOUNTS a
+      join ACCOUNTS a
         on ( a.ACC = d.ACC )
+$if DPU_PARAMS.SBER
+$then
+     where d.DATV    between l_mindatend and l_maxdatend
+$else
      where d.DAT_END between l_mindatend and l_maxdatend
+$end
        and d.CLOSED = 0
        and v.FL_AUTOEXTEND = 1 -- продукт з авто лонгацією
   )
@@ -9081,7 +9086,7 @@ end AUTO_EXTENSION;
 --
 --
 --
-function get_parameters
+function GET_PARAMETERS
 ( p_dpuid    dpu_dealw.dpu_id%type,  -- ід. депозитного договору
   p_tag      dpu_dealw.tag%type      -- код додаткового параметру
 ) return     dpu_dealw.value%type
