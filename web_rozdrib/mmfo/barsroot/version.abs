@@ -1,13 +1,13 @@
-=========  svn diff --summarize -r 45399:45499 D:\SVN\master\web\mmfo
----web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.111\mmfo\web\TEMPLATE.RPT\OW_ERROR.FRX
+=========  svn diff --summarize -r 45400:45512 D:\SVN\master\web\mmfo
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.111\mmfo\web\TEMPLATE.RPT\PROVNOT.QRP
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.111\mmfo\web\TEMPLATE.RPT\sms542.frx
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.111\mmfo\web\TEMPLATE.RPT\kas_449.frx
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.111\mmfo\web\TEMPLATE.RPT\EBP103.frx
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.111\mmfo\web\TEMPLATE.RPT\dptclose.frx
+---web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.111\mmfo\web\TEMPLATE.RPT\OW_ERROR.FRX
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.111\mmfo\web\TEMPLATE.RPT
----web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.111\mmfo\web\barsroot\App_Code\Bars.WebService\WebService.cs
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.111\mmfo\web\barsroot\version.abs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.111\mmfo\web\barsroot\App_Code\Bars.WebService\WebService.cs
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.111\mmfo\web\barsroot
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.111\mmfo\web
-Bugfix_2.0.36.5.111 (Rev:45399-45499
+Bugfix_2.0.36.5.111 (Rev:45400-45512
