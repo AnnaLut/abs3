@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="04/23/2014 14:35:45" ReportInfo.Modified="09/23/2014 19:14:37" ReportInfo.CreatorVersion="2013.2.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="04/23/2014 14:35:45" ReportInfo.Modified="01/12/2018 15:12:34" ReportInfo.CreatorVersion="2014.1.2.0">
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqD6nWZEExUJ9MEhdFZpB1A6ZfSeiTM+6WLeB8pW5aURqkGwhV134I2SUIQGUGXcXimsNg/xVKr6tVVSp/6VVvtw==">
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqD6nWZEExUJ9MEhdFZpB1A6ZfSeiTM+6WLeB8pW5aURqkGwhV134I2SUIQGUGXcXiIK88K3oydtamgd3HfDT1yQ==" CommandTimeout="500">
       <TableDataSource Name="Table" Alias="LST_DPT" DataType="System.Int32" Enabled="true" SelectCommand="select distinct  &#13;&#10;        t.type_name,&#13;&#10;        to_char(dd.datz,'dd.mm.yyyy') as DATZ,&#13;&#10;        dd.nd, &#13;&#10;        dd.rnk,&#13;&#10;        c.nmk,&#13;&#10;        c.okpo,&#13;&#10;        S.FIO,&#13;&#10;        T0.NAME,&#13;&#10;        dd.branch,        &#13;&#10;        S.LOGNAME,&#13;&#10;        to_char(dd.datz,'YYYYMMDD')&#13;&#10;from dpt_deposit_clos dd,&#13;&#10;        dpt_vidd v, &#13;&#10;        dpt_types t, &#13;&#10;        customer c, &#13;&#10;        staff$base s,&#13;&#10;        tobo t0&#13;&#10;where  DD.VIDD= V.VIDD   &#13;&#10;and T.TYPE_ID = V.TYPE_ID&#13;&#10;and c.rnk = dd.rnk&#13;&#10;and S.ID = Dd.USERID&#13;&#10;and t0.TOBO =DD.BRANCH &#13;&#10;and dd.action_id = 0&#13;&#10;and dd.datz  between :sFdat1 and :sFdat2&#13;&#10;and dd.branch like decode(:BRANCH, 'Поточне',  sys_context ('bars_context', 'user_branch'),:BRANCH)||'%'&#13;&#10;and exists (select 1 from ead_docs where agr_id = dd.deposit_id and sign_date is not null and page_count &gt;0)&#13;&#10;order by to_char(dd.datz,'YYYYMMDD')">
         <Column Name="TYPE_NAME" DataType="System.String"/>
         <Column Name="DATZ" DataType="System.String"/>
@@ -36,7 +36,7 @@
       <TextObject Name="Text2" Left="11.34" Top="9.45" Width="824.04" Height="18.9" Text="Звіт по вкладах фізичних осіб, відкритих за період" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt"/>
       <TextObject Name="Text3" Left="11.34" Top="34.02" Width="824.04" Height="18.9" Text="з [FormatDateTime([sFdat1])] по [FormatDateTime([sFdat2])] " HorzAlign="Center" VertAlign="Center"/>
     </ReportTitleBand>
-    <GroupHeaderBand Name="GroupHeader1" Top="62.77" Width="1047.06" Height="75.6" Condition="[LST_DPT.NAME]">
+    <GroupHeaderBand Name="GroupHeader1" Top="63.68" Width="1047.06" Height="75.6" Condition="[LST_DPT.NAME]">
       <TableObject Name="Table2" Left="7.56" Top="28.35" Width="939.33" Height="45.36">
         <TableColumn Name="Column11" Width="32.13"/>
         <TableColumn Name="Column12" Width="209.79"/>
@@ -58,7 +58,7 @@
         </TableRow>
       </TableObject>
       <TextObject Name="Text1" Left="7.56" Top="7.56" Width="476.28" Height="18.9" Text="[LST_DPT.NAME]"/>
-      <DataBand Name="Data1" Top="140.65" Width="1047.06" Height="18.9" DataSource="Table">
+      <DataBand Name="Data1" Top="142.48" Width="1047.06" Height="18.9" DataSource="Table">
         <TableObject Name="Table1" Left="7.56" Width="939.65" Height="18.9">
           <TableColumn Name="Column1" Width="32.17"/>
           <TableColumn Name="Column2" Width="209.83"/>
@@ -80,9 +80,9 @@
           </TableRow>
         </TableObject>
       </DataBand>
-      <GroupFooterBand Name="GroupFooter1" Top="161.84" Width="1047.06" Height="15.12"/>
+      <GroupFooterBand Name="GroupFooter1" Top="164.58" Width="1047.06" Height="15.12"/>
     </GroupHeaderBand>
-    <DataBand Name="Data2" Top="179.24" Width="1047.06" Height="18.9" DataSource="Table3">
+    <DataBand Name="Data2" Top="182.9" Width="1047.06" Height="18.9" DataSource="Table3">
       <TableObject Name="Table4" Left="7.56" Width="737.1" Height="18.9" Border.Lines="All" Border.Width="0.25">
         <TableColumn Name="Column19" Width="266.49"/>
         <TableColumn Name="Column20" Width="192.78"/>
@@ -96,6 +96,6 @@
         </TableRow>
       </TableObject>
     </DataBand>
-    <PageFooterBand Name="PageFooter1" Top="200.43" Width="1047.06" Height="94.5"/>
+    <PageFooterBand Name="PageFooter1" Top="205" Width="1047.06" Height="94.5"/>
   </ReportPage>
 </Report>
