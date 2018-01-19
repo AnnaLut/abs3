@@ -1,12 +1,13 @@
-=========  svn diff --summarize -r 45266:45399 D:\SVN\master\web\mmfo
----web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.110\mmfo\web\barsroot\App_Code\Areas\InsUi\Infrastructure\DI\Implementation\InsRepository.cs
----web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.110\mmfo\web\barsroot\App_Code\Areas\BpkW4\Infrastructure\Repository\DI\Abstract\IRegNewCardRepository.cs
----web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.110\mmfo\web\barsroot\App_Code\Areas\BpkW4\Infrastructure\Repository\DI\Implementation\RegNewCardRepository.cs
----web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.110\mmfo\web\barsroot\App_Code\Areas\BpkW4\Models\ParamsIns.cs
----web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.110\mmfo\web\barsroot\App_Code\Areas\BpkW4\Controllers\RegisteringNewCardController.cs
----web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.110\mmfo\web\barsroot\version.abs
----web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.110\mmfo\web\barsroot\Areas\BpkW4\Scripts\RegNewCardCtrl.js
----web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.110\mmfo\web\barsroot\Areas\InsUi\Scripts\CardInsurance\Controllers\Index.js
----web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.110\mmfo\web\barsroot
----web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.110\mmfo\web
-Bugfix_2.0.36.5.110 (Rev:45266-45399
+=========  svn diff --summarize -r 45399:45499 D:\SVN\master\web\mmfo
+---web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.111\mmfo\web\TEMPLATE.RPT\OW_ERROR.FRX
+---web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.111\mmfo\web\TEMPLATE.RPT\PROVNOT.QRP
+---web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.111\mmfo\web\TEMPLATE.RPT\sms542.frx
+---web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.111\mmfo\web\TEMPLATE.RPT\kas_449.frx
+---web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.111\mmfo\web\TEMPLATE.RPT\EBP103.frx
+---web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.111\mmfo\web\TEMPLATE.RPT\dptclose.frx
+---web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.111\mmfo\web\TEMPLATE.RPT
+---web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.111\mmfo\web\barsroot\App_Code\Bars.WebService\WebService.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.111\mmfo\web\barsroot\version.abs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.111\mmfo\web\barsroot
+---web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.111\mmfo\web
+Bugfix_2.0.36.5.111 (Rev:45399-45499
