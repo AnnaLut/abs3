@@ -12,8 +12,10 @@ PROMPT *** Create  procedure P_F28SB ***
 % FILE NAME   : otcn.sql
 % DESCRIPTION : Отчетность НБУ: формирование файлов
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 2001.  All Rights Reserved.
-% VERSION     : 18/01/2018 (13/11/2017) 
+% VERSION     : 19/01/2018 (18/01/2018, 13/11/2017) 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+19.01.2018 - параметр OB22 будем выбирать из ACCOUNTS вместо SPECPARAM_INT
+             (не изменил в предыдущей версии)
 18.01.2018 - при выдборі бал.рахунків із SB_R020 додано перевірку на
              дату закриття бал. рахунку (поле D_CLOSE)
              параметр OB22 будем выбирать из ACCOUNTS вместо SPECPARAM_INT
@@ -98,10 +100,9 @@ CURSOR Saldo IS
           s.dos96, s.dosq96, s.kos96, s.kosq96,
           s.dos99, s.dosq99, s.kos99, s.kosq99,
           s.doszg, s.koszg, s.dos96zg, s.kos96zg,
-          a.tobo, a.nms, NVL(trim(sp.ob22),'00')  
-    FROM  otcn_saldo s, otcn_acc a, specparam_int sp
-    WHERE s.acc = a.acc
-      and s.acc = sp.acc(+);
+          a.tobo, a.nms, NVL(trim(a.ob22),'00')  
+    FROM  otcn_saldo s, otcn_acc a
+    WHERE s.acc = a.acc;
 -----------------------------------------------------------------------
 BEGIN
 
