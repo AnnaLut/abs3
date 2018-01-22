@@ -287,7 +287,7 @@ is
   --***************************************************************************--
   g_modcode       constant varchar2(3) := 'CAC';
 
-  g_body_version  constant varchar2(64)  := 'version 2.2  17/01/2018';
+  g_body_version  constant varchar2(64)  := 'version 2.3  22/01/2018';
   g_body_defs     constant varchar2(512) := ''
 $if ACC_PARAMS.KOD_D6
 $then
@@ -2836,8 +2836,17 @@ begin
                                 when l_acc_row.nbs = '9129' and l_acc_row.tip = 'CR9' then '4' 
                             end;
             end if;
-        elsif l_module = 'BPK' then
-            null;
+        elsif l_module = 'DPT' then
+            bars_audit.trace(title||': CCK. Ищем r011 по справочнику');
+            begin
+                select r011
+                into l_result
+                from cck_r011
+                where nbs = l_acc_row.nbs;
+            exception
+                when no_data_found then
+                    bars_audit.error(title || ': не найдено значение r011 в справочнике для балансового #'||l_acc_row.nbs);
+            end;
         end if;
     elsif p_spid = 2 then -- R013
         

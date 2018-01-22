@@ -121,6 +121,7 @@ begin
   -- добавл€ем описание полей
   bars_metabase.add_column(l_tabid, 1, 'R020', 'C', 'Ѕал.~рах.', 1, 4, 1, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 2, 'R011', 'C', ' од~R011', 1, 1, 2, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'MODULE_SPECIFIC', 'C', 'Залежність~від модуля (Y/N)', 1, 1, 3, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);
