@@ -11,8 +11,9 @@ CREATE OR REPLACE PROCEDURE BARS.P_FD6_NN (Dat_ DATE,
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	#D6 for KB
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 12/01/2018 (22/11/2017, 09/07/2015)
+% VERSION     : 22/01/2018 (12/01/2018, 22/11/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 22/01/2018 - выполнены изменения для параметров K071 и S180
 % 12/01/2018 - новая структура показателя 
 %              (параметр K072 2-х значный вместо однозначного) 
 % 08/04/2014 - для МФО=300465 и бал.счета 2602 и S180_='1' будем формировать
@@ -378,31 +379,21 @@ BEGIN
       s180_:='1';
    END IF;
 
-   IF nbs2_ in ('2600') AND r013_ != '7' THEN
+   IF nbs2_ in ('2600','2605','2650','2655') AND r011_ = '1' THEN
       s180_:='1';
    END IF;
 
-   IF nbs2_ = '2601' AND r013_ != '4' AND (s180_ is null or s180_ = '0') THEN
+   IF nbs2_ in ('2620','2625')  AND r011_ in ('1', '2') THEN
       s180_:='1';
    END IF;
 
-   IF nbs2_ = '2602' AND r011_ != '2' THEN
+   IF nbs2_ = '2601' AND r011_ = '4' THEN
       s180_:='1';
    END IF;
 
-   if mfo_ = 300465 and nbs2_ = '2602' and s180_ = '1'
-   then
-      s180_ := '6';
-   end if;
-
-   IF nbs2_ in ('2605','2620') AND r013_ != '1' THEN
+   IF nbs2_ = '2602' AND r011_ = '6' THEN
       s180_:='1';
    END IF;
-
-   IF nbs2_ in ('2650') AND r013_ != '8' THEN
-      s180_:='1';
-   END IF;
-
 --------------------------------------------------------------------------
    BEGIN
       SELECT NVL(s183,'0')
@@ -441,6 +432,13 @@ BEGIN
       k111_:='00';
    END IF;
 
+   IF re_ <> 0 and codcagent_ = 5 and 
+      SUBSTR(nbs_,1,3) IN ('262','263','365','704') AND 
+      k072_ not in ('42','43') 
+   THEN
+      k072_:='42';
+   END IF;
+
    IF SUBSTR(nbs_,1,3) IN ('262','263','365','704') AND k072_='42' THEN
       k051_:='00';
       k111_:='00';
@@ -448,11 +446,6 @@ BEGIN
 
    IF nbs_ like '7%' THEN
       r011_:='0';
-   END IF;
-
-   IF mfo_ = 300120 and nbs_ in ('2600', '2620', '2650') and r011_ in ('0', '9')
-   THEN
-      s183_:='1';
    END IF;
 
    dk_:=(case when nbs_ like '7%' then '5' else Iif_N(se_,0,'1','2','2') end);
@@ -640,9 +633,8 @@ BEGIN
 
    end if;
 
-   if ((nbs_='2600' and r013_='7') or (nbs_='2650' and r013_='8') or  --(nbs_='2605' and r013_='1') or
-       (nbs_='2620' and r013_='1' and ob22_ != '23') ) and
-       (mfo_ <> 300120 or mfo_ = 300120 and r011_ in ('1', '2'))
+   if  (nbs_='2600' and r013_='7') or (nbs_='2650' and r013_='8')  --or  --(nbs_='2605' and r013_='1') or
+       --(nbs_='2620' and r013_='1' and ob22_ != '23')  
    then
       lim_ := GL.P_ICURVAL(kv_, lim_, Dat_);
 
@@ -828,7 +820,10 @@ BEGIN
 
    if nbs_ in ('2608', '2628', '2658')
    then
-      IF (nbs_ = '2658' and r011_ != '5') or nbs_ != '2658' then
+      IF (nbs_ = '2608' and r011_ in ('1','4','6','8','9','A')) OR  
+         (nbs_ = '2628' and r011_ in ('1','2','4'))             OR
+         (nbs_ = '2658' and r011_ in ('1','5')) 
+      then
          kodp_:= dk_ || nbs_ || r011_ || k111_ || k072_ || '9' || '1' ||
                  TO_CHAR(2-re_) || k051_ || LPAD(kv_, 3, '0') || LPAD(country_, 3, '0');
 
