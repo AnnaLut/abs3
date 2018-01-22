@@ -11,12 +11,14 @@ PROMPT *** Create  procedure P_F27SB ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Процедура формирование файла @27 для КБ
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 2009.All Rights Reserved.
-% VERSION     : 18/01/2018 (05/12/2017, 13/11/2017)
+% VERSION     : 19/01/2018 (18/01/2018, 05/12/2017)
 %             :             Версия для Сбербанка)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+19.01.2018 - в курсоре SALDO вместо union all оставил только   union
+             (не включались все бал.счета) 
 18.01.2018 - при выдборі бал.рахунків із SB_R020 додано перевірку на
              дату закриття бал. рахунку (поле D_CLOSE)
              параметр OB22 будем выбирать из ACCOUNTS вместо SPECPARAM_INT
@@ -117,7 +119,7 @@ CURSOR Saldo IS
    WHERE s.acc=a.acc      
      and s.rnk=cc.rnk   
      and NVL(lpad(to_char(cc.country),3,'0'),'804')=l.k040(+) 
-     and trunc(nvl(a.dat_alt, dat_ - 1), 'mm') <> trunc(dat_, 'mm')
+     and a.dat_alt is null
          union all
    SELECT s.rnk, s.acc, a.nls, s.kv, s.fdat, substr(d.acc_num, 1, 4) nbs, 
           (case when d.acc_type = 'OLD' then 0 else s.ost end) ost,
@@ -149,7 +151,7 @@ CURSOR Saldo IS
          NVL(lpad(to_char(cc.country),3,'0'),'804')=l.k040(+)  and
          d.report_date between trunc(dat_, 'mm') and dat_ and 
          s.acc = d.acc_id and
-         trunc(nvl(a.dat_alt, dat_ - 1), 'mm') = trunc(dat_, 'mm')  ;
+         a.dat_alt = to_date('18122017', 'ddmmyyyy');
 -------------------------------------------------------------------------------
 procedure p_ins(p_dat_ date, p_tp_ varchar2, p_acc_ number, p_nls_ varchar2,
                 p_nbs_ varchar2, p_ob22_ varchar2, p_kv_ smallint, p_k041_ varchar2, 
