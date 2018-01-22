@@ -202,7 +202,7 @@ begin
 
    l_dat31 := p_dat01-1 ;
    PRVN_FLOW.SeND_MSG (p_txt => 'BEG DRAPS:'||l_dat31||l_msg );
-   --MDRAPS ( l_dat31 ) ;
+   MDRAPS ( l_dat31 ) ;
    PRVN_FLOW.SeND_MSG (p_txt => 'END DRAPS:'||l_dat31||l_msg );
 
    -------------------------
