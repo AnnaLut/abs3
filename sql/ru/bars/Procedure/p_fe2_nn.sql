@@ -4,7 +4,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
 % DESCRIPTION : Процедура формирования #E2 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.17.005      12.01.2018 (10.01.2018, 03.01.2017)
+% VERSION     : v.17.005      22.01.2018 (12.01.2018, 10.01.2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -15,6 +15,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
    NNN        условный порядковый номер
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+22.01.2018 изменено формирование показателя 54NNN
 12.01.2018 изменено формирование показателя 53NNN
 03.01.2018 добавлено формирование показателя 32NNN и 
            изменено формирование показателя 54NNN
@@ -666,9 +667,9 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
             -- з 29.12.2017 новий показник
             --  код ідентифікатора - F027 (доп.параметр 12_2C)
             if TRIM (p_value_) is null and d54#E2_ is not null then
-               p_value_ := NVL (SUBSTR (lpad(TRIM (d54#E2_), 1, 2), 2, '0'), '00');
+               p_value_ := NVL (lpad(SUBSTR(TRIM (d54#E2_), 1, 2), 2, '0'), '00');
             else
-               p_value_ := NVL (SUBSTR (lpad(TRIM (p_value_), 1, 2), 2, '0'), '00');
+               p_value_ := NVL (lpad(SUBSTR(TRIM (p_value_), 1, 2), 2, '0'), '00');
             end if;
          END IF;
       ELSIF p_i_ = 17
@@ -1517,12 +1518,12 @@ BEGIN
                                ko_ = 3 AND i IN (1, 2, 3, 4, 6, 9, 10, 11, 12, 13)) 
                                   OR
                                (dat_ >= to_date('01062009','ddmmyyyy') and
-                               ko_ = 3 AND i IN (1, 6, 9, 10, 13, 14)) and
-                                dat_ < dat_izm3_ 
+                               ko_ = 3 AND i IN (1, 6, 9, 10, 13, 14) and
+                                dat_ < dat_izm3_) 
                                   OR  
                                (dat_ >= dat_izm3_ and
                                ko_ = 3 AND i IN (1, 2, 3, 6, 9, 10, 13, 15, 16, 17)) 
-                        )
+                               )
                            THEN
                               BEGIN
                                  SELECT trim(SUBSTR (VALUE, 1, 70))
@@ -1538,6 +1539,12 @@ BEGIN
                                     tag_ := 'D8#E2';
                                  elsif i=13 then
                                     tag_ := 'DD#70';
+                                 elsif i=15 then
+                                    tag_ := '59F';
+                                 elsif i=16 then
+                                   tag_ := '12_2C';
+                                 elsif i=17 then
+                                   tag_ := 'F089';
                                  else
                                     tag_ := substr(tag_,1,3)||'E2';
                                  end if;
@@ -1546,7 +1553,7 @@ BEGIN
                                     SELECT trim(SUBSTR (VALUE, 1, 70))
                                        INTO val_
                                     FROM operw
-                                    WHERE REF = refd_ AND tag = tag_ ;
+                                    WHERE REF = refd_ AND tag = tag_;
                                  EXCEPTION
                                            WHEN NO_DATA_FOUND
                                  THEN
