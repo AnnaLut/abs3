@@ -43,3 +43,4 @@ begin
 end p_cck_update_sparams;
 /
 Show errors;
+grant execute on bars.p_cck_update_sparams to start1;
