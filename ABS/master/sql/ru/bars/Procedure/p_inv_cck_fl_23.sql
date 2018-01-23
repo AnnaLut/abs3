@@ -1208,7 +1208,9 @@ execute immediate
 '  declare
    Di_       number :=to_number('||to_char(Di_)||') ;
    l_dat     date := to_date('''||to_char(p_dat,fd_)||''','''||fd_||''');
+   l_newnbs number;
    begin
+   l_newnbs := NEWNBS.GET_STATE;
     for nn in
     -- кред.счета, которые не попали в ведомость, но есть в снапах
        (select b.name G01, a.kf G02, a.branch G03,  substr(''Iншi ''||c.nmk,1,70) G04, a.kv G07,
