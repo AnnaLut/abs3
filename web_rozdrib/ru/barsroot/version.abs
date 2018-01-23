@@ -1,3 +1,3 @@
-=========  svn diff --summarize -r 45635:45667 D:\SVN\master\web\ru
+=========  svn diff --summarize -r 45635:45677 D:\SVN\master\web\ru
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.151\ru\web\barsroot\version.abs
-Bugfix_2.0.35.5.151 (Rev:45635-45667
+Bugfix_2.0.35.5.151 (Rev:45635-45677
