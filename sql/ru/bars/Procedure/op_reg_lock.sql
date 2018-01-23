@@ -650,8 +650,6 @@ BEGIN
 
    accR_ := acc_;
    
-   accreg.set_default_sparams(acc_);
-
    execute immediate 'begin p_after_open_acc(:accR_); end;' using accR_;
 
 <<nowarn>> null;

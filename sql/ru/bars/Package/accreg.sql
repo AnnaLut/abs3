@@ -287,7 +287,7 @@ is
   --***************************************************************************--
   g_modcode       constant varchar2(3) := 'CAC';
 
-  g_body_version  constant varchar2(64)  := 'version 2.3  22/01/2018';
+  g_body_version  constant varchar2(64)  := 'version 2.4  23/01/2018';
   g_body_defs     constant varchar2(512) := ''
 $if ACC_PARAMS.KOD_D6
 $then
@@ -736,6 +736,8 @@ $end
   then
     SetAccountSParam( p_acc, 'MDATE', to_char(p_mdate,'dd/MM/yyyy') );
   end if;
+  
+  set_default_sparams( p_acc); -- проставляем умолчательные значения спецпараметров
 
 $if ACC_PARAMS.MMFO
 $then
@@ -2877,6 +2879,7 @@ end get_default_spar_value;
 procedure set_default_sparams(p_acc in accounts.acc%type)
     is
 title       constant   varchar2(64) := $$PLSQL_UNIT||'.SET_DEFAULT_SPARAMS';
+l_sparam	varchar2(500);
 begin
     bars_audit.trace(title||': start for acc #'||p_acc);
     for spar in (select *
@@ -2884,10 +2887,14 @@ begin
                  where s.def_flag = 'Y')
     loop
         begin
+			l_sparam := get_default_spar_value(p_acc, spar.spid);
+			if l_sparam is null then 
+				continue; /* дефолтное значение по-умолчанию не-пустое */
+			end if;
             if spar.tabname in ('ACCOUNTSW') then
-                setAccountwParam(p_acc, spar.tag, get_default_spar_value(p_acc, spar.spid));
+                setAccountwParam(p_acc, spar.tag, l_sparam);
             else
-                setAccountSParam(p_acc, spar.name, get_default_spar_value(p_acc, spar.spid));
+                setAccountSParam(p_acc, spar.name, l_sparam);
             end if;
         exception
             when others then
