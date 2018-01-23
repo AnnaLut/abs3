@@ -11,11 +11,15 @@ PROMPT *** Create  procedure P_F08_NN ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирование файла #08 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 11/01/2018 (16/10/2017. 12/05/2017)
+% VERSION     : 22/01/2018 (18/01/2018, 11/01/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+22.01.2018 изменено формирование параметра K072 для ФЛ и для некотріх
+           бал.счетов
+18.01.2018 для таблицы KL_K070 изменео условие p.D_CLOSE is null на 
+           p.D_CLOSE(+) is null (возникала ошибка) 
 11.01.2018 новая структура показателя добавлено 3-х значный код страны
 20.03.2017 объеденнены некоторые блоки для присвоения переменной S_  
            значения 'I'
@@ -128,7 +132,8 @@ o_comm_2   rnbu_trace.comm%TYPE;
 tip_       accounts.tip%type;
 country_   varchar2(3);
 dat_Izm1  date := to_date('29/12/2017','dd/mm/yyyy');
-
+custtype_  Number;
+codcagent_ Number;
 
 CURSOR Saldo IS
    select a.*, n.nd, i.freq
@@ -173,75 +178,130 @@ kod_ varchar2(18);
 
 begin
    BEGIN
-      SELECT NVL(trim(k.k072),'00'), to_char(2 - MOD(c.codcagent,2))
-      INTO s_, r_
+      SELECT NVL(trim(k.k072),'00'), to_char(2 - MOD(c.codcagent,2)),
+             c.custtype, c.codcagent
+      INTO s_, r_, custtype_, codcagent_
       FROM customer c, kl_k070 k
-      WHERE c.rnk=p_rnk_ AND c.ise=k.k070(+) and k.d_close is null;
+      WHERE c.rnk=p_rnk_ AND c.ise=k.k070(+) and k.d_close(+) is null;
    EXCEPTION WHEN NO_DATA_FOUND THEN
       s_:='00';
       r_:='1';
+
+      SELECT c.custtype, c.codcagent
+         INTO custtype_, codcagent_
+      FROM customer c
+      WHERE c.rnk=p_rnk_;
    END;
 
    if p_k072_ is not null and p_k072_<>'XX' then
       s_:= p_k072_;
    end if;
 
-   if (substr(p_nbs_,1,3) in ('600','700') OR p_nbs_ in ('6054','6055')) and
+   if (substr(p_nbs_,1,3) in ('600','700') OR p_nbs_ in ('6126','6127','6128')) and
        s_<>'20'
    then
       s_:= '20';
    end if;
 
-   if substr(p_nbs_,1,3) in ('601','608','701','708') and r_='1' and
+   if substr(p_nbs_,1,3) in ('601','608','701','708') and r_=1 and
        s_ not in ('21','22','23')
    then
       s_:= '22';
    end if;
 
-   if substr(p_nbs_,1,3) in ('601','608','701','708') and r_='2' and 
+   if substr(p_nbs_,1,3) in ('601','608','701','708') and r_=2 and 
       s_ not in ('N1','N2','N3','N4','N5','N6','N7','N8') 
    then
       s_:= 'N2';
    end if;
 
-   if p_nbs_ in ('6030','6032') and s_<>'30' then
+   if p_nbs_ in ('3623') and s_<>'30' then
       s_:='30';
    end if;
 
-   if p_nbs_ in ('6031','6033','7030') and s_<>'31' then
-      s_:='31';
-   end if;
+   --if p_nbs_ in ('6031','6033','7030') and s_<>'31' then
+   --   s_:='31';
+   --end if;
 
-   if substr(p_nbs_,1,3) in ('604','704') and r_='1' and 
-      s_ not in ('41','42','43') 
+   if p_nbs_ in ('3653','3658') or 
+      substr(p_nbs_,1,3) in ('355','605','606','610','611','704') and 
+      r_=1 and s_ not in ('42','43') 
    then
       s_:= '42';
    end if;
 
-   if substr(p_nbs_,1,3) in ('604','704') and r_='2' and 
-      s_ not in ('N1','N2','N3','N4','N5','N6','N7','N8') 
+   if p_nbs_ in ('3653','3658') or 
+      substr(p_nbs_,1,3) in ('355','605','606','610','611','704') and 
+      r_=2 and s_ not in ('N8') 
    then
-      s_:= 'N2';
+      s_:= 'N8';
    end if;
 
-   if r_ = 2 and s_ = '00' 
+   if p_nbs_ in ('6140') or 
+      substr(p_nbs_,1,3) in ('601','613','701','713') and 
+      r_=2 and s_ not in ('N3') 
    then
-      s_ := 'N2';
+      s_:= 'N3';
    end if;
+
+   --if substr(p_nbs_,1,3) in ('604','704') and r_=2 and 
+   --   s_ not in ('N1','N2','N3','N4','N5','N6','N7','N8') 
+   --then
+   --   s_:= 'N2';
+   --end if;
 
    -- только для резидентов
-   if mfo_ <> 300120 and p_nbs_ in ('2902','2903','2909') and 
-      r_<>2 and p_r011_='1' and s_<>'12'
+   if p_nbs_ in ('2902','2903','2909','6020','6025') and r_<>2 and s_='00'
    then
       s_:='12';
    end if;
 
-   if mfo_ <> 300120 and p_nbs_ in ('2902','2903','2909') and 
-      r_<>2 and p_r011_='2' and s_ not in ('41','42','43')
+   -- только для резидентов
+   if p_nbs_ in ('2809','2920','2924','3522','3621','3622') and r_<>2 and s_='00'
    then
       s_:='42';
    end if;
 
+   --if mfo_ <> 300120 and p_nbs_ in ('2902','2903','2909') and 
+   --   r_<>2 and p_r011_='1' and s_<>'12'
+   --then
+   --   s_:='12';
+   --end if;
+
+   --if mfo_ <> 300120 and p_nbs_ in ('2902','2903','2909') and 
+   --   r_<>2 and p_r011_='2' and s_ not in ('41','42','43')
+   --then
+   --   s_:='42';
+   --end if;
+
+   if ( p_nbs_ in ('6090','6091','6092','6093','6094','6095',
+                  '6120','6121','6122','6123','6124','6125',
+                  '7140') OR substr(p_nbs_,1,3) in ('602','603','607','630','702')
+      ) and custtype_ = 2 and r_ = 2 and s_ = '00'
+   then
+      s_ := 'N6';
+   end if;
+
+   if custtype_ = 2 and codcagent_ = 3 and s_ = '00' 
+   then
+      s_ := '12';
+   end if;
+
+   if custtype_ = 2 and codcagent_ = 4 and s_ = '00' 
+   then
+      s_ := 'N6';
+   end if;
+
+   if custtype_ = 3 and codcagent_ = 5 and s_ not in ('42','43')
+   then
+      s_ := '42';
+   end if;
+
+   if custtype_ = 3 and codcagent_ = 6 and s_ not in ('N8')
+   then
+      s_ := 'N8';
+   end if;
+    
    Ostn_:= to_number(p_znap_);
 
    if substr(p_nbs_,1,3) in ('602','605','609') then
@@ -265,19 +325,19 @@ begin
             select NVL(p.k072,'00'), 2-mod(c.codcagent,2), nvl(lpad(trim(s.k072), 2, 'X'),'00'),
                    ca.tobo, ca.nms
               into s1_, r1_, s2_, tobo_, nms_
-            from accounts ca, customer c, kl_k070 p, specparam s --cust_acc ca,
+            from accounts ca, customer c, specparam s, kl_k070 p
             where ca.acc=k.accd and
                   ca.rnk=c.rnk  and
                   ca.acc=s.acc(+) and
                   c.ise = p.k070(+) and
-                  p.d_close is null ;
+                  p.d_close(+) is null ;
          else
             s1_:='XX';
             r1_:='1';
             s2_:=s_ ;
          end if;
 
-         if s2_ <> '00' then  -- s1_ = 'X' and s2_<>'0' then
+         if s2_ <> '00' then  
             s1_ := s2_;
          end if;
 
@@ -316,7 +376,6 @@ begin
                     (nls, kv, odate, kodp, znap, nbuc, rnk, isp, comm)
             VALUES  (nls1_, k.kv, dat_, kod_, to_char(se_), p_nbuc_, rnk_, isp_, comm1_);
 
-            --Ostn_:= Ostn_ - (k.s - se_);
             Ostn_:= Ostn_ - se_;
          end if;
 
@@ -328,7 +387,6 @@ begin
                 from otcn_f08_history
                 where fdat between Datng_ and  Dat_
                   and nlsd=trim(p_nls_)
-                  --and nlsd not in (select trim(nls) from rnbu_trace)
                 group by accd, nlsd, kv, acck, nlsk
                 union
                 select accd, nlsd, kv, decode(kv,980,sum(s*100),sum(sq*100)) s,
@@ -337,7 +395,6 @@ begin
                 where fdat between Dat_+1 and Dat_+29 and
                       vob=96 and
                       nlsd=trim(p_nls_)
-                  --and nlsd not in (select trim(nls) from rnbu_trace)
                 group by accd, nlsd, kv, acck, nlsk )
       loop
 
@@ -345,12 +402,12 @@ begin
             select NVL(p.k072,'00'), 2-mod(c.codcagent,2), nvl(lpad(trim(s.k072), 2, 'X'),'00'),
                    ca.tobo, ca.nms
               into s1_, r1_, s2_, tobo_, nms_
-            from accounts ca, customer c, kl_k070 p, specparam s
+            from accounts ca, customer c, specparam s, kl_k070 p
            where ca.acc=k.acck and
                   ca.rnk=c.rnk  and
                   ca.acc=s.acc(+) and
                   c.ise = p.k070(+) and
-                  p.d_close is null;
+                  p.d_close(+) is null;
          else
             s1_:='XX';
             r1_:='1';
@@ -384,7 +441,7 @@ begin
                    p_s183_ || p_s130_ || p_country_;
          end if;
 
-         if se_ <> 0 and k.nlsk not like '6%'  --se_ - k.s > 0 and k.nlsk not like '6%'
+         if se_ <> 0 and k.nlsk not like '6%'  
          then
             comm1_ := '';
             comm1_ := substr(comm1_ || tobo_ || '  ' || nms_, 1, 200);
@@ -395,7 +452,7 @@ begin
             Ostn_:= Ostn_ - se_;
          end if;
 
-         if se_ <> 0 and k.nlsk like '6%'  -- k.s > 0 and k.nlsk like '6%'
+         if se_ <> 0 and k.nlsk like '6%'  
          then
             if dat_ < dat_Izm1
             then
@@ -445,12 +502,12 @@ begin
                select NVL(p.k072,'00'), 2-mod(c.codcagent,2), nvl(lpad(trim(s.k072), 2, 'X'),'00'),
                       ca.tobo, ca.nms
                  into s1_, r1_, s2_, tobo_, nms_
-               from accounts ca, customer c, kl_k070 p, specparam s  --cust_acc ca,
+               from accounts ca, customer c, specparam s, kl_k070 p
                where ca.acc=k.acck and
                      ca.rnk=c.rnk  and
                      ca.acc=s.acc(+) and
                      c.ise = p.k070(+) and
-                     p.d_close is null ;
+                     p.d_close(+) is null ;
                comm1_ := '';
                comm1_ := substr(comm1_ || tobo_ || '  ' || nms_, 1, 200);
             end if;
@@ -458,12 +515,12 @@ begin
                select NVL(p.k072,'00'), 2-mod(c.codcagent,2), nvl(lpad(trim(s.k072), 2, 'X'),'00'),
                       ca.tobo, ca.nms
                  into s1_, r1_, s2_, tobo_, nms_
-               from accounts ca, customer c, kl_k070 p, specparam s  --cust_acc ca,
+               from accounts ca, customer c, specparam s, kl_k070 p
                where ca.acc=k.acck  and
                      ca.rnk=c.rnk  and
                      ca.acc=s.acc(+) and
                      c.ise = p.k070(+) and
-                     p.d_close is null;
+                     p.d_close(+) is null;
 
                comm1_ := '';
                comm1_ := substr(comm1_ || tobo_ || '  ' || nms_, 1, 200);
@@ -476,7 +533,7 @@ begin
 
          se_:= 0;  -- 09.06.2013 ниже есть блок для обратных проводок
 
-         if s2_ <> '00' then  --s1_ = 'X' and s2_<>'0' then
+         if s2_ <> '00' then  
             s1_ := s2_;
          end if;
 
@@ -517,7 +574,6 @@ begin
                 from otcn_f08_history
                 where fdat  between Datng_ and Dat_ and
                       nlsk=trim(p_nls_)
-                  --and nlsk not in (select trim(nls) from rnbu_trace)
                 group by accd, nlsd, kv, acck, nlsk
                 union
                 select accd, nlsd, kv, decode(kv,980,sum(s*100),sum(sq*100)) s,
@@ -526,7 +582,6 @@ begin
                 where fdat between Dat_+1 and Dat_+29 and
                       vob = 96 and
                       nlsk=trim(p_nls_)
-                  --and nlsk not in (select trim(nls) from rnbu_trace)
                 group by accd, nlsd, kv, acck, nlsk )
       loop
 
@@ -537,12 +592,12 @@ begin
                select NVL(p.k072,'00'), 2-mod(c.codcagent,2), nvl(lpad(trim(s.k072), 2, 'X'),'00'),
                       ca.tobo, ca.nms
                  into s1_, r1_, s2_, tobo_, nms_
-               from accounts ca, customer c, kl_k070 p, specparam s
+               from accounts ca, customer c, specparam s, kl_k070 p
                where ca.acc=k.accd and
                      ca.rnk=c.rnk  and
                      ca.acc=s.acc(+) and
                      c.ise = p.k070(+) and
-                     p.d_close is null;
+                     p.d_close(+) is null;
 
                comm1_ := '';
                comm1_ := substr(comm1_ || tobo_ || '  ' || nms_, 1, 200);
@@ -552,12 +607,12 @@ begin
                select NVL(p.k072,'00'), 2-mod(c.codcagent,2), nvl(lpad(trim(s.k072), 2, 'X'),'00'),
                       ca.tobo, ca.nms
                  into s1_, r1_, s2_, tobo_, nms_
-               from accounts ca, customer c, kl_k070 p, specparam s
+               from accounts ca, customer c, specparam s, kl_k070 p
                where ca.acc=k.accd  and
                      ca.rnk=c.rnk  and
                      ca.acc=s.acc(+) and
                      c.ise = p.k070(+) and
-                     p.d_close is null;
+                     p.d_close(+) is null;
 
                comm1_ := '';
                comm1_ := substr(comm1_ || tobo_ || '  ' || nms_, 1, 200);
@@ -565,7 +620,7 @@ begin
          else
             s1_:='X';
             r1_:='1';
-            s2_:=s_ ;  --'0';
+            s2_:=s_ ;  
          end if;
 
          if s2_ <> '00' then
@@ -645,12 +700,12 @@ begin
             select NVL(p.k072,'00'), 2-mod(c.codcagent,2), nvl(lpad(trim(s.k072), 2, 'X'),'00'),
                    ca.tobo, ca.nms
                  into s1_, r1_, s2_, tobo_, nms_
-            from accounts ca, customer c, kl_k070 p, specparam s
+            from accounts ca, customer c, specparam s, kl_k070 p
             where ca.acc=k.acck and
                   ca.rnk=c.rnk  and
                   ca.acc=s.acc(+) and
                   c.ise = p.k070(+) and
-                  p.d_close is null;
+                  p.d_close(+) is null;
 
             comm1_ := '';
             comm1_ := substr(comm1_ || tobo_ || '  ' || nms_, 1, 200);
@@ -690,7 +745,7 @@ begin
                    p_s183_ || p_s130_ || p_country_;
          end if;
 
-         if se_ <> 0 then  --  -se_
+         if se_ <> 0 then  
             INSERT INTO rnbu_trace
                     (nls, kv, odate, kodp, znap, nbuc, rnk, isp, comm)
             VALUES  (k.nlsk, k.kv, dat_, kod_, to_char(se_), p_nbuc_, rnk_, isp_, comm1_);
@@ -723,11 +778,13 @@ begin
             select NVL(p.k072,'00'), 2-mod(c.codcagent,2), nvl(lpad(trim(s.k072), 2, 'X'),'00'),
                    ca.tobo, ca.nms
                  into s1_, r1_, s2_, tobo_, nms_
-            from accounts ca, customer c, kl_k070 p, specparam s
+            from accounts ca, customer c, specparam s, kl_k070 p
             where ca.acc=k.accd and
                   ca.rnk=c.rnk  and
                   ca.acc=s.acc(+) and
-                  c.ise = p.k070(+) ;
+                  c.ise = p.k070(+) and 
+                  p.d_close(+) is null;
+
             comm1_ := '';
             comm1_ := substr(comm1_ || tobo_ || '  ' || nms_, 1, 200);
          else
@@ -768,7 +825,7 @@ begin
                    p_s183_ || p_s130_ || p_country_;
          end if;
 
-         if se_ <> 0 then   -- k.s-se_
+         if se_ <> 0 then   
             INSERT INTO rnbu_trace
                     (nls, kv, odate, kodp, znap, nbuc, rnk, isp, comm)
             VALUES  (k.nlsk, k.kv, dat_, kod_, to_char(se_), p_nbuc_, rnk_, isp_, comm1_);
@@ -780,7 +837,7 @@ begin
 
    end if;
 
-   if substr(p_nbs_,1,3) in ('702','707','709') and s_='0' and mfo_=300465 then
+   if substr(p_nbs_,1,3) in ('702','707','709') and s_='00' and mfo_=300465 then
       r_:='2';
    end if;
 
@@ -838,7 +895,7 @@ p_proc_set(kodf_,sheme_,nbuc1_,typ_);
 sql_acc_ := 'select r020 from kod_r020 where trim(prem)=''КБ'' and a010=''08'' ';
 
    if mfou_ <> 300465 and to_char(Dat_,'MM')='12' then
-      ret_ := f_pop_otcn(Dat_, 4, sql_acc_, null, 1);   --ret_ := f_pop_otcn(Dat_, 4, sql_acc_);
+      ret_ := f_pop_otcn(Dat_, 4, sql_acc_, null, 1);   
    else
       if to_char(Dat_,'MM') in ('01','02','03','04','05','06') then
          ret_ := f_pop_otcn(Dat_, 4, sql_acc_, null, 1);
@@ -889,13 +946,13 @@ commit;
                        (case when ad.nls like '3801%' or ak.nls like '3801%' then decode(p.kv, 980, p.s2, p.s) else o.s end)/100 s,
                      p.vob
                 FROM oper p, tts t, accounts ad,   accounts ak,
-                     (SELECT /*leading(a) */
+                     (SELECT /*+ leading(a) */
                              p.fdat, p.REF, p.stmt, p.tt, p.s, p.sq, p.txt,
                              DECODE (p.dk,0,p.acc,z.acc) accd,
                              DECODE (p.dk,1,p.acc,z.acc) acck
-                      FROM opldok p, accounts a, opldok z
+                      FROM  accounts a, opldok p, opldok z
                       WHERE p.fdat = any (select fdat from fdat where fdat between Dat1_ and Dat_)
-                        and p.sos >= 4
+                        and p.sos >= 5
                         and p.acc = a.acc
                         and regexp_like(A.NLS, '^((602)|(605)|(609)|(702)|(704)|(707)|(709))')
                         and p.ref = z.ref
@@ -928,13 +985,13 @@ commit;
                        (case when ad.nls like '3801%' or ak.nls like '3801%' then decode(p.kv, 980, p.s2, p.s) else o.s end)/100 s,
                      p.vob
                 FROM oper p, tts t, accounts ad, accounts ak,
-                     (SELECT /*leading(a) */
+                     (SELECT /*+ leading(a) */
                              p.fdat, p.REF, p.stmt, p.tt, p.s, p.sq, p.txt,
                              DECODE (p.dk,0,p.acc,z.acc) accd,
                              DECODE (p.dk,1,p.acc,z.acc) acck
-                      FROM opldok p, accounts a, opldok z
+                      FROM accounts a, opldok p, opldok z
                       WHERE p.fdat = any (select fdat from fdat where fdat between Dat_+1 and Dat_+29)
-                        and p.sos >= 4
+                        and p.sos >= 5
                         and p.acc = a.acc
                         and regexp_like(A.NLS, '^((602)|(605)|(609)|(702)|(704)|(707)|(709))')
                         and p.ref = z.ref
@@ -1113,7 +1170,7 @@ LOOP
    end if;
 
    IF se_<>0 THEN
-      if typ_>0 then  --sheme_ = 'G' and (tips_<>'T00' and tips_<>'T0D') and typ_>0 then
+      if typ_ > 0 then  
          nbuc_ := nvl(f_codobl_tobo(acc_,typ_),nbuc1_);
       else
          nbuc_ := nbuc1_;
@@ -1277,6 +1334,16 @@ LOOP
 
 END LOOP;
 CLOSE SALDO;
+
+update rnbu_trace set kodp = substr(kodp,1,6) || '42' || substr(kodp,9,10)
+where substr(kodp,2,4) in ('3653','3658') 
+and substr(kodp,7,2)='00'
+and substr(kodp,9,1)='1';
+
+update rnbu_trace set kodp = substr(kodp,1,6) || '42' || substr(kodp,9,10)
+where substr(kodp,2,3) in ('355','605','606','610','611','704')
+and substr(kodp,7,2)='00'
+and substr(kodp,9,1)='1';
 ---------------------------------------------------
 DELETE FROM tmp_nbu where kodf=kodf_ and datf= dat_;
 ---------------------------------------------------
