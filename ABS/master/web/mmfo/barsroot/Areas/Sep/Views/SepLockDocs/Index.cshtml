@@ -1019,8 +1019,11 @@
             serverSorting: true
         },
         pageable: {
+            messages: {
+                allPages: "Всі"
+            },
             refresh: true,
-            pageSizes: [100, 200, 500],
+            pageSizes: [100, 1000, "All"],
             buttonCount: 5
         },
         sortable: { allowUnsort: false },
