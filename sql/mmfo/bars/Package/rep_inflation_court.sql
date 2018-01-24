@@ -254,13 +254,14 @@ select count(*)  into l_count
      RAISE_APPLICATION_ERROR (-20999,'Тип договору вказан не вірно TYP='||nvl(to_char(P_TYP_KOD),'null')||' (повинен бути 1-Кредит 2-БПК 0-рах)');
   end if;
    -- Проверяем кор-ть реф (асс) счета
-  if  P_TYP_KOD=0    then select count(acc) into l_on from accounts where acc=P_ND;
+  --if  P_TYP_KOD=0    then select count(acc) into l_on from accounts where acc=P_ND; Не находился счет, поиск идет через nls VL 01.17.2018
+  if    P_TYP_KOD=0    then select count(nls) into l_on from accounts where nls=P_ND;
   elsif P_TYP_KOD=1  then select count(nd)  into l_on from cc_deal  where nd=P_ND;
   elsif P_TYP_KOD=2  then select count(nd)  into l_on from w4_acc   where nd=P_ND;
   end if;
 
   if l_on<1 then
-     RAISE_APPLICATION_ERROR (-20999, (case when P_TYP_KOD=1 then 'Кредитний договір' when P_TYP_KOD=2 then 'Договір БПК' else 'Рахунок АСС = ' end)||to_char(P_ND)||' не знайден.');
+     RAISE_APPLICATION_ERROR (-20999, (case when P_TYP_KOD=1 then 'Кредитний договір' when P_TYP_KOD=2 then 'Договір БПК' else 'Рахунок NLS = ' end)||to_char(P_ND)||' не знайден.');
   end if ;
 
     -- для случаев когда из КД будет выведен счет после расчета
