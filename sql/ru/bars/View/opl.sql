@@ -1,30 +1,71 @@
+create or replace force view OPL
+( ACC
+, TT
+, REF
+, NBS
+, OB22
+, KV
+, NLS
+, NMS
+, DK
+, S
+, SQ
+, FDAT
+, SOS
+, NAZN
+, STMT
+, TIP
+)as
+select o.ACC
+     , o.TT
+     , o.REF
+     , a.NBS
+     , a.OB22
+     , a.KV
+     , a.NLS
+     , a.NMS
+     , o.DK
+     , o.S
+     , o.SQ
+     , o.FDAT
+     , o.SOS
+     , p.NAZN
+     , o.STMT
+     , a.TIP
+  from ACCOUNTS a
+     , OPLDOK o
+     , OPER p
+ where A.ACC = O.ACC
+   and O.REF = P.REF;
+
+show errors;
+
+COMMENT ON TABLE  OPL      IS 'Банковские проводки';
+
+comment on column OPL.ACC  is 'Внутренний номер счета';
+comment on column OPL.TT   is 'Тип операции';
+comment on column OPL.REF  is 'Референс документа';
+comment on column OPL.NBS  is 'R020';
+comment on column OPL.OB22 is 'ОБ22';
+comment on column OPL.KV   is 'Валюта документа';
+comment on column OPL.NLS  is 'Номер счета';
+comment on column OPL.NMS  is 'Наименование счета';
+comment on column OPL.DK   is 'Дебет/Кредит';
+comment on column OPL.S    is 'Сумма';
+comment on column OPL.SQ   is 'Эквивалент суммы';
+comment on column OPL.FDAT is 'Дата документа';
+comment on column OPL.SOS  is 'Состояние оплаты';
+comment on column OPL.NAZN is 'Назначенгие платежа';
+comment on column OPL.STMT is 'Идентификатор транзакции';
+comment on column OPL.TIP  is 'Тип счета';
 
 
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/OPL.sql =========*** Run *** ==========
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view OPL ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.OPL ("ACC", "TT", "REF", "KV", "NLS", "NMS", "DK", "S", "SQ", "FDAT", "SOS", "NAZN", "STMT", "TIP") AS 
-  SELECT
-   o.acc,o.tt,o.ref,a.kv,a.nls,a.nms,o.dk,o.s,
-o.sq,o.fdat,o.sos,p.nazn,o.stmt,a.tip
-  FROM accounts a, opldok o, oper p
-  WHERE a.acc=o.acc and o.ref=p.ref;
-
-PROMPT *** Create  grants  OPL ***
-grant DELETE,INSERT,SELECT,UPDATE                                            on OPL             to ABS_ADMIN;
-grant DELETE,INSERT,SELECT,UPDATE                                            on OPL             to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on OPL             to PYOD001;
-grant SELECT                                                                 on OPL             to RPBN001;
-grant SELECT                                                                 on OPL             to START1;
-grant SELECT                                                                 on OPL             to TEST;
-grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OPL             to WR_ALL_RIGHTS;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/OPL.sql =========*** End *** ==========
-PROMPT ===================================================================================== 
+GRANT SELECT ON OPL TO ABS_ADMIN;
+GRANT SELECT ON OPL TO BARS_ACCESS_DEFROLE;
+GRANT SELECT ON OPL TO INSPECTOR;
+GRANT SELECT ON OPL TO PYOD001;
+GRANT SELECT ON OPL TO RPBN001;
+GRANT SELECT ON OPL TO START1;
+GRANT SELECT ON OPL TO TEST;
+GRANT SELECT ON OPL TO UPLD;
+GRANT SELECT ON OPL TO WR_ALL_RIGHTS;

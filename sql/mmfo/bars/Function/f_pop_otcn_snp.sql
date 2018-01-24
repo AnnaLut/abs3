@@ -1,20 +1,16 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_pop_otcn_snp.sql =========*** Run
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE FUNCTION BARS.F_POP_OTCN_SNP (Dat_ DATE,
-                                           type_ NUMBER,
-                                           sql_acc_ VARCHAR2,
-                                           datp_ IN DATE DEFAULT NULL,
-                                           tp_sql_ in number default 0,
-                                           add_KP_ in number default 0  )
-RETURN NUMBER IS
+create or replace function F_POP_OTCN_SNP
+( Dat_     DATE
+, type_    NUMBER
+, sql_acc_ VARCHAR2
+, datp_    DATE   default null
+, tp_sql_  number default 0
+, add_KP_  number default 0
+) RETURN NUMBER
+IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Функция наполнения таблиц для формирования отчетности
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :    14/12/2017 (15/11/2017)
+% VERSION     :    24.01.2018 (14.12.2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 06/02/2015 - в таблице OTCN_SALDO не формировались годовые Кт обороты
              Исправлено.
@@ -48,28 +44,16 @@ RETURN NUMBER IS
  tp_sql_  - тип запроса в sql_acc_ (=0 - отбор по NBS, = 1 - по ACC)
  add_KP_  - наполнение таблиц REF_KOR и KOR_PROV (0 - нет, 1 - да)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-dat1_    DATE; -- начало отчетного периода (для type_ >= 2)
-dat2_    DATE; -- дата окончания периода корр. проводок для отчетного периода
-dat3_    DATE; -- дата окончания периода корр. проводок для предыдущего отчетного периода
-dat1_kor_    DATE;
-dat2_kor_    DATE;
-datn_    DATE; -- дата, след. за отчетной
-datv_    DATE; -- дата окончания предыд. периода
-dat99_   DATE; -- дата окончания годовых корр. проводок
-Dos96_   DECIMAL(24);
-Dosq96_  DECIMAL(24);
-Kos96_   DECIMAL(24);
-Kosq96_  DECIMAL(24);
-tips_    VARCHAR2(3);
-acc_     NUMBER;
-
-dati_    number;
-dats_    date;
-
-god_    Varchar2(4);
-sql_doda_ clob:='';
+dat1_     DATE; -- начало отчетного периода (для type_ >= 2)
+dat2_     DATE; -- дата окончания периода корр. проводок для отчетного периода
+dat3_     DATE; -- дата окончания периода корр. проводок для предыдущего отчетного периода
+dat1_kor_ DATE;
+dat2_kor_ DATE;
+datn_     DATE; -- дата, след. за отчетной
+dat99_    DATE; -- дата окончания годовых корр. проводок
+god_      Varchar2(4);
+sql_doda_ clob;
 type_kor_ NUMBER;
-ln_SNP_RUN  NUMBER;
 ---------------------------------------------------------------------------
 BEGIN
 --- удаление информации из табл. за отчетный день
@@ -115,12 +99,6 @@ ELSE
    dat99_ := dat_;
 END IF;
 
---if nvl(BARS_UTL_SNAPSHOT.GET_SNP_RUNNING, 0) = 1 THEN
---   raise_application_error(-20001, 'В іншій процедурі оновлюються знімки! Зачекайте, будь-ласка!');
---end if;
-
---BARS_UTL_SNAPSHOT.start_running;
-
 DatN_ := TRUNC(Dat_ + 1); -- дата наступна за зв_тною
 
 -- отбор только нужных счетов
@@ -164,12 +142,12 @@ if add_KP_ >= 1 then
              'and (nlsb LIKE ''5040%'' OR nlsb LIKE ''5041%'')) or ' ||
              '((nlsa LIKE ''5040%'' OR nlsa LIKE ''5041%'') and '||
              '(nlsb LIKE ''3902%'' OR nlsb LIKE ''3903%'')))';
-
-      type_kor_ := (case when add_KP_ = 1
-                         then 1
+             
+      type_kor_ := (case when add_KP_ = 1 
+                         then 1 
                          when add_KP_ = 3
                          then 2
-                         else 0
+                         else 0 
                     end);
    ELSE
       sql_doda_ := '';
@@ -178,44 +156,79 @@ if add_KP_ >= 1 then
 
 -- для рiчних коригуючих оборотiв берем останнiй вiдкритий банкiвський день
 -- (файлы #81, #A4)
-   IF type_ = 4 THEN
+    IF type_ = 4 THEN
       P_Populate_Kor(Dat1_,glb_bankdate(),sql_doda_,type_kor_);
-   ELSE
+    ELSE
       P_Populate_Kor(dat1_kor_,dat2_kor_,sql_doda_,type_kor_);
-   END IF;
-end if;
+    END IF;
+   
+  end if;
 
-if type_ = 1 then
+  if type_ = 1 then
+
     INSERT /*+APPEND PARALLEL(8) */
-    INTO OTCN_SALDO (ODATE, FDAT, ACC, NLS, KV, NBS, RNK,
+    INTO OTCN_SALDO (ODATE, FDAT, ACC, NLS, KV, NBS, OB22, RNK,
            VOST, VOSTQ,
            OST, OSTQ,
            DOS, DOSQ,
            KOS, KOSQ,
            DOS96P, DOSQ96P, KOS96P, KOSQ96P, DOS96, DOSQ96, KOS96, KOSQ96,
            DOS99, DOSQ99, KOS99, KOSQ99, DOSZG, KOSZG, DOS96ZG, KOS96ZG, DOS99ZG, KOS99ZG)
-    select dat_, dat_, a.acc, a.NLS,  a.KV, a.NBS, A.RNK,
+    select dat_, dat_, a.acc, a.NLS,  a.KV, a.NBS, a.OB22, a.RNK,
            b.ost - b.kos + b.dos, decode(a.kv, 980, 0, b.ostq  - b.kosq + b.dosq),
            b.ost, decode(a.kv, 980, 0, b.ostq),
            b.dos, decode(a.kv, 980, 0, b.dosq),
            b.Kos, decode(a.kv, 980, 0, b.Kosq),
            0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-    from snap_balances b, OTCN_ACC a
+    from SNAP_BALANCES b, OTCN_ACC a
     where b.fdat = dat_
       and b.acc = a.acc
-      and (b.ostq <> 0 or b.ost <> 0 or
-           b.kosq <> 0 or b.kos <> 0 or
-           b.dosq <> 0 or b.dos <> 0
+      and ( b.ostq <> 0 or b.ost <> 0 or
+            b.kosq <> 0 or b.kos <> 0 or
+            b.dosq <> 0 or b.dos <> 0
           );
-elsif type_ in (2, 3, 5) then
+  elsif type_ in (2, 3, 5) then
+
     INSERT /*+APPEND  */
-    INTO OTCN_SALDO (ODATE, FDAT, ACC, NLS, KV, NBS, RNK,
+    INTO OTCN_SALDO (ODATE, FDAT, ACC, NLS, KV, NBS, OB22, RNK,
            VOST, VOSTQ, OST, OSTQ,
            DOS, DOSQ, KOS, KOSQ,
            DOS96, DOSQ96, KOS96, KOSQ96,
            DOS96P, DOSQ96P, KOS96P, KOSQ96P,
            DOS99, DOSQ99, KOS99, KOSQ99, DOSZG, KOSZG, DOS96ZG, KOS96ZG, DOS99ZG, KOS99ZG)
-    select dat_, dat_, a.acc, a.NLS,  a.KV, a.NBS, A.RNK,
+    select dat_, dat_, a.acc, a.NLS,  a.KV, a.NBS, a.OB22, a.RNK,
+           b.ost - (b.kos - b.dos),
+           decode(a.kv, 980, 0, b.ostq  - (b.kosq - b.dosq)),
+           b.ost,
+           decode(a.kv, 980, 0, b.ostq),
+           b.dos,
+           decode(a.kv, 980, 0, b.dosq),
+           b.Kos,
+           decode(a.kv, 980, 0, b.Kosq),
+           b.CRdos, decode(a.kv, 980, 0, b.CRdosq),
+           b.CRKos, decode(a.kv, 980, 0, b.CRKosq),
+           b.CUdos, decode(a.kv, 980, 0, b.CUdosq),
+           b.CUKos, decode(a.kv, 980, 0, b.CUKosq),
+           0,0,0,0,0,0,0,0,0,0
+      from AGG_MONBALS b, OTCN_ACC a
+     where b.fdat = trunc(dat_,'mm')
+       and b.ACC = a.acc
+       and ( b.ostq   <> 0 or b.ost <> 0 or
+             b.kosq   <> 0 or b.kos <> 0 or
+             b.dosq   <> 0 or b.dos <> 0 or
+             b.CRdosq + b.CRkosq <> 0 or b.CRdos + b.CRkos <> 0 or
+             b.CUdosq + b.CUkosq <> 0 or b.CUdos + b.CUkos <> 0
+           );
+  elsif type_ in (4) then
+
+    INSERT /*+APPEND  */
+      INTO OTCN_SALDO (ODATE, FDAT, ACC, NLS, KV, NBS, OB22, RNK,
+           VOST, VOSTQ, OST, OSTQ,
+           DOS, DOSQ, KOS, KOSQ,
+           DOS96, DOSQ96, KOS96, KOSQ96,
+           DOS96P, DOSQ96P, KOS96P, KOSQ96P,
+           DOS99, DOSQ99, KOS99, KOSQ99, DOSZG, KOSZG, DOS96ZG, KOS96ZG, DOS99ZG, KOS99ZG)
+    select dat_, dat_, a.acc, a.NLS,  a.KV, a.NBS, a.OB22, a.RNK,
            b.ost - (b.kos - b.dos),
            decode(a.kv, 980, 0, b.ostq  - (b.kosq - b.dosq)),
            b.ost,
@@ -230,74 +243,40 @@ elsif type_ in (2, 3, 5) then
            b.CUKos, decode(a.kv, 980, 0, b.CUKosq),
            0,0,0,0,0,0,0,0,0,0
     from AGG_MONBALS b, OTCN_ACC a
-    where b.fdat = trunc(dat_, 'mm')
-      and b.ACC = a.acc
-      and (b.ostq   <> 0 or b.ost <> 0 or
-           b.kosq   <> 0 or b.kos <> 0 or
-           b.dosq   <> 0 or b.dos <> 0 or
-           b.CRdosq + b.CRkosq <> 0 or b.CRdos + b.CRkos <> 0 or
-           b.CUdosq + b.CUkosq <> 0 or b.CUdos + b.CUkos <> 0
-          );
-elsif type_ in (4) then
-
-    INSERT /*+APPEND  */
-    INTO OTCN_SALDO (ODATE, FDAT, ACC, NLS, KV, NBS, RNK,
-           VOST, VOSTQ, OST, OSTQ,
-           DOS, DOSQ, KOS, KOSQ,
-           DOS96, DOSQ96, KOS96, KOSQ96,
-           DOS96P, DOSQ96P, KOS96P, KOSQ96P,
-           DOS99, DOSQ99, KOS99, KOSQ99, DOSZG, KOSZG, DOS96ZG, KOS96ZG, DOS99ZG, KOS99ZG)
-    select dat_, dat_, a.acc, a.NLS,  a.KV, a.NBS, A.RNK,
-           b.ost - (b.kos - b.dos),
-           decode(a.kv, 980, 0, b.ostq  - (b.kosq - b.dosq)),
-           b.ost,
-           decode(a.kv, 980, 0, b.ostq),
-           b.dos,
-           decode(a.kv, 980, 0, b.dosq),
-           b.Kos,
-           decode(a.kv, 980, 0, b.Kosq),
-           b.CRdos, decode(a.kv, 980, 0, b.CRdosq),
-           b.CRKos, decode(a.kv, 980, 0, b.CRKosq),
-           b.CUdos, decode(a.kv, 980, 0, b.CUdosq),
-           b.CUKos, decode(a.kv, 980, 0, b.CUKosq),
-           0,0,0,0,0,0,0,0,0,0
-    from AGG_MONBALS b, OTCN_ACC a
-    where b.fdat = trunc(dat_, 'mm')
-      and b.ACC = a.acc;
-
+    where b.fdat = trunc(dat_,'mm')
+      and b.ACC = a.acc;    
+      
     commit;
-
-
+    
     INSERT /*+APPEND */
-    INTO OTCN_SALDO (ODATE, FDAT, ACC, NLS, KV, NBS, RNK,
+      INTO OTCN_SALDO (ODATE, FDAT, ACC, NLS, KV, NBS, OB22, RNK,
            VOST, VOSTQ, OST, OSTQ,
            DOS, DOSQ, KOS, KOSQ,
            DOS96, DOSQ96, KOS96, KOSQ96,
            DOS96P, DOSQ96P, KOS96P, KOSQ96P,
            DOS99, DOSQ99, KOS99, KOSQ99, DOSZG, KOSZG, DOS96ZG, KOS96ZG, DOS99ZG, KOS99ZG)
-    select distinct dat_, dat_, s.acc, s.NLS,  s.KV, s.NBS, s.RNK,
+    select distinct dat_, dat_, s.acc, s.NLS,  s.KV, s.NBS, s.OB22, s.RNK,
            0, 0, 0, 0,
            0, 0, 0, 0,
            0, 0, 0, 0,
            0, 0, 0, 0,
            0,0,0,0,0,0,0,0,0,0
-    FROM  KOR_PROV a, OTCN_ACC s
-   WHERE s.nls like '504%'
-     AND a.FDAT BETWEEN Dat1_ AND dat99_
-     AND a.acc=s.acc
-     AND s.acc not in (select acc from otcn_saldo);
-
+      FROM KOR_PROV a, OTCN_ACC s
+     WHERE s.nls like '504%'
+       AND a.FDAT BETWEEN Dat1_ AND dat99_
+       AND a.acc=s.acc
+       AND s.acc not in (select acc from otcn_saldo);
 
    commit;
 
-    INSERT /*+APPEND */
-    INTO OTCN_SALDO (ODATE, FDAT, ACC, NLS, KV, NBS, RNK,
+    INSERT /*+APPEND */ 
+      INTO OTCN_SALDO (ODATE, FDAT, ACC, NLS, KV, NBS, OB22, RNK,
            VOST, VOSTQ, OST, OSTQ,
            DOS, DOSQ, KOS, KOSQ,
            DOS96, DOSQ96, KOS96, KOSQ96,
            DOS96P, DOSQ96P, KOS96P, KOSQ96P,
            DOS99, DOSQ99, KOS99, KOSQ99, DOSZG, KOSZG, DOS96ZG, KOS96ZG, DOS99ZG, KOS99ZG)
-    select distinct dat_, dat_, s.acc, s.NLS,  s.KV, s.NBS, s.RNK,
+    select distinct dat_, dat_, s.acc, s.NLS,  s.KV, s.NBS, s.OB22, s.RNK,
            0, 0, 0, 0,
            0, 0, 0, 0,
            0, 0, 0, 0,
@@ -313,13 +292,13 @@ elsif type_ in (4) then
 commit;
 
     INSERT /*+APPEND */
-    INTO OTCN_SALDO (ODATE, FDAT, ACC, NLS, KV, NBS, RNK,
+    INTO OTCN_SALDO (ODATE, FDAT, ACC, NLS, KV, NBS, OB22, RNK,
            VOST, VOSTQ, OST, OSTQ,
            DOS, DOSQ, KOS, KOSQ,
            DOS96, DOSQ96, KOS96, KOSQ96,
            DOS96P, DOSQ96P, KOS96P, KOSQ96P,
            DOS99, DOSQ99, KOS99, KOSQ99, DOSZG, KOSZG, DOS96ZG, KOS96ZG, DOS99ZG, KOS99ZG)
-    select distinct dat_, dat_, s.acc, s.NLS,  s.KV, s.NBS, s.RNK,
+    select distinct dat_, dat_, s.acc, s.NLS,  s.KV, s.NBS, s.OB22, s.RNK,
            0, 0, 0, 0,
            0, 0, 0, 0,
            0, 0, 0, 0,
@@ -339,7 +318,7 @@ commit;
     -- обработка корректирующих проводок
     merge into otcn_saldo o
     using (
-        select  k.acc, a.NLS,  a.KV, a.NBS, A.RNK,
+        select  k.acc, a.NLS,  a.KV, a.NBS, a.OB22, a.RNK,
             nvl(sum(DECODE(k.tips,'3',k.Dos96, 0)),0) dos99,
             nvl(sum(DECODE(k.tips,'3',k.Dosq96,0)),0) dosq99,
             nvl(sum(DECODE(k.tips,'3',k.kos96, 0)),0) kos99,
@@ -419,32 +398,26 @@ commit;
            o.dos99zg = o.dos99zg + p.dos99zg,
            o.kos99zg = o.kos99zg + p.kos99zg
     WHEN NOT MATCHED THEN
-        INSERT (o.ODATE, o.FDAT, o.ACC, o.NLS, o.KV, o.NBS, o.RNK,
+        INSERT (o.ODATE, o.FDAT, o.ACC, o.NLS, o.KV, o.NBS, o.OB22, o.RNK,
                 o.VOST, o.VOSTQ, o.OST, o.OSTQ, o.DOS, o.DOSQ, o.KOS, o.KOSQ,
                 o.DOS96, o.DOSQ96, o.KOS96, o.KOSQ96, o.DOS96P, o.DOSQ96P,
                 o.KOS96P, o.KOSQ96P, o.DOS99, o.DOSQ99, o.KOS99, o.KOSQ99,
                 o.DOSZG, o.KOSZG, o.DOS96ZG, o.KOS96ZG, o.DOS99ZG, o.KOS99ZG)
-        VALUES (dat_, dat_, p.acc, p.NLS,  p.KV, p.NBS, p.RNK,
+        VALUES (dat_, dat_, p.acc, p.NLS,  p.KV, p.NBS, p.OB22, p.RNK,
                 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,
                 p.dos99, p.dosq99,p.kos99, p.kosq99,
                 p.doszg, p.koszg,
                 p.dos96zg, p.kos96zg, p.dos99zg, p.kos99zg);
 
-else
+  else
     null;
-end if;
+  end if;
 
-commit;
+  commit;
 
-RETURN 0;
+  RETURN 0;
 
-END;
+END F_POP_OTCN_SNP;
 /
- show err;
- 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/function/f_pop_otcn_snp.sql =========*** End
- PROMPT ===================================================================================== 
- 
+
+show err;

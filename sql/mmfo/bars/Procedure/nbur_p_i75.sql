@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/NBUR_P_I75.sql =========*** Run **
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure NBUR_P_I75 ***
-
-  CREATE OR REPLACE PROCEDURE BARS.NBUR_P_I75 
+create or replace procedure NBUR_P_I75 
 ( p_kod_filii        in     varchar2
 , p_report_date      in     date
 , p_form_id          in     number   default null
@@ -19,7 +10,7 @@ PROMPT *** Create  procedure NBUR_P_I75 ***
   % DESCRIPTION : Процедура формирования @75 для Ощадного банку
   % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
   %
-  % VERSION     : v.1.3  10.04.2017
+  % VERSION     : v.1.4  24.01.2018
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
   l_nbuc          varchar2(20);
   l_type          number;
@@ -91,13 +82,14 @@ BEGIN
        , acc.ACC_ID
        , acc.ACC_NUM
        , acc.KV
-    from BARS.NBUR_DM_ACCOUNTS         acc
-    join BARS.NBUR_DM_BALANCES_MONTHLY bal
+    from NBUR_DM_ACCOUNTS         acc
+    join NBUR_DM_BALANCES_MONTHLY bal
       on ( bal.KF = acc.KF and bal.ACC_ID = acc.ACC_ID )
    where acc.KF = p_kod_filii
-     and acc.NBS in ( select R020 
-                        from BARS.SB_R020 
-                       where F_75 = '1' 
+     and acc.NBS in ( select R020
+                        from SB_R020
+                       where F_75 = '1'
+                         and D_CLOSE is Null
                     )
      and ( ADJ_BAL <> 0 or ADJ_BAL_UAH <> 0 )
   ;
@@ -215,12 +207,16 @@ BEGIN
            when rdb.F_75 in ('1','5') 
            then
              case
-               when txn.R020_DB = '7702' and txn.OB22_DB in ('11','12','13','20','21','22','23','24','25','44','46','47','49','50','51','52')
-               then '01'
-               when txn.R020_DB = '7702' and txn.OB22_DB in ('14','15','16','38','39','40','45','48','57','58','59','60','61','62','63','64')
-               then '12'
-               when txn.R020_DB = '7702' and txn.OB22_DB in ('17','18','19','53','54','55','56')
-               then '14'
+               when txn.R020_DB = '7702'
+               then case
+                    when txn.OB22_DB in ('11','12','13','20','21','22','23','24','25','44','46','47','49','50','51','52')
+                    then '01'
+                    when txn.OB22_DB in ('14','15','16','38','39','40','45','48','57','58','59','60','61','62','63','64')
+                    then '12'
+                    when txn.OB22_DB in ('17','18','19','53','54','55','56')
+                    then '14'
+                    else '01'
+                    end
                when txn.R020_DB = '7706' and txn.OB22_DB in ('01','03','05','07','09','11','13','15','17')
                then '01'
                when txn.R020_DB = '7706' and txn.OB22_DB in ('02','04','06','08','10','12','14','16','18')
@@ -286,12 +282,16 @@ BEGIN
            when rcr.F_75 in ('1','6') 
            then
              case
-               when txn.R020_CR = '7702' and txn.OB22_CR in ('11','12','13','20','21','22','23','24','25','44','46','47','49','50','51','52') 
-               then '11'
-               when txn.R020_CR = '7702' and txn.OB22_CR in ('14','15','16','38','39','40','45','48','57','58','59','60','61','62','63','64')
-               then '02'
-               when txn.R020_CR = '7702' and txn.OB22_CR in ('17','18','19','53','54','55','56')
-               then '04'
+               when txn.R020_CR = '7702'
+               then case 
+                    when txn.OB22_CR in ('11','12','13','20','21','22','23','24','25','44','46','47','49','50','51','52') 
+                    then '11'
+                    when txn.OB22_CR in ('14','15','16','38','39','40','45','48','57','58','59','60','61','62','63','64')
+                    then '02'
+                    when txn.OB22_CR in ('17','18','19','53','54','55','56')
+                    then '04'
+                    else '01'
+                    end
                when txn.R020_CR = '7706' and txn.OB22_CR in ('01','03','05','07','09','11','13','15','17')
                then '11'
                when txn.R020_CR = '7706' and txn.OB22_CR in ('02','04','06','08','10','12','14','16','18')
@@ -377,20 +377,21 @@ BEGIN
              end
            else '00'
          end as Ind4_CHK
-    from BARS.NBUR_DM_TRANSACTIONS_CNSL txn
-    join BARS.NBUR_DM_ACCOUNTS acd
+    from NBUR_DM_TRANSACTIONS_CNSL txn
+    join NBUR_DM_ACCOUNTS acd
       on ( acd.KF = txn.KF and acd.ACC_ID = txn.ACC_ID_DB )
-    join BARS.NBUR_DM_ACCOUNTS ack
+    join NBUR_DM_ACCOUNTS ack
       on ( ack.KF = txn.KF and ack.ACC_ID = txn.ACC_ID_CR )
     left 
-    join BARS.SB_R020 rdb
+    join SB_R020 rdb
       on ( rdb.R020 = txn.R020_DB )
     left 
-    join BARS.SB_R020 rcr
+    join SB_R020 rcr
       on ( rcr.R020 = txn.R020_CR )
    where txn.KF = p_kod_filii
      and txn.TT Not like 'ZG_'
-     and ( rdb.F_75 = '1' or rcr.F_75 = '1' )
+     and ( rdb.F_75 = '1' and rdb.D_CLOSE is Null or
+           rcr.F_75 = '1' and rcr.D_CLOSE is Null )
   ;
   
   commit;
@@ -399,7 +400,7 @@ BEGIN
   insert all
     when ( Ind_DB Is Not Null ) 
     then
-      into BARS.NBUR_DETAIL_PROTOCOLS 
+      into NBUR_DETAIL_PROTOCOLS 
          ( REPORT_DATE, KF, REPORT_CODE, NBUC
          , FIELD_CODE, FIELD_VALUE, ACC_ID, ACC_NUM, KV, DESCRIPTION )
       values
@@ -408,7 +409,7 @@ BEGIN
          , ACC_ID, ACC_NUM, CCY_ID, DESCRIPTION )
     when ( Ind_CR Is Not Null ) 
     then
-      into BARS.NBUR_DETAIL_PROTOCOLS 
+      into NBUR_DETAIL_PROTOCOLS 
          ( REPORT_DATE, KF, REPORT_CODE, NBUC
          , FIELD_CODE, FIELD_VALUE, ACC_ID, ACC_NUM, KV, DESCRIPTION )
       values
@@ -452,11 +453,11 @@ BEGIN
                   end as NBUC
                 , nvl(b.DOSQ - b.CUDOSQ,0) - nvl(p.DOS,0) as OUTCOME_DB
                 , nvl(b.KOSQ - b.CUKOSQ,0) - nvl(p.KOS,0) as OUTCOME_CR
-             from BARS.NBUR_DM_ACCOUNTS a
-             join BARS.SB_R020 r
+             from NBUR_DM_ACCOUNTS a
+             join SB_R020 r
                on ( r.R020 = a.NBS )
              left
-             join BARS.NBUR_DM_BALANCES_MONTHLY b
+             join NBUR_DM_BALANCES_MONTHLY b
                on ( b.KF = a.KF and b.ACC_ID = a.ACC_ID )
              left
              join ( select KF, ACC_ID, ACC_NUM, KV
@@ -465,7 +466,7 @@ BEGIN
                          , substr(FIELD_CODE,9,3) as KVP
                          , sum( case when (substr(FIELD_CODE,1,2)='50') then to_number(FIELD_VALUE) else 0 end ) as DOS
                          , sum( case when (substr(FIELD_CODE,1,2)='60') then to_number(FIELD_VALUE) else 0 end ) as KOS
-                      from BARS.NBUR_DETAIL_PROTOCOLS  
+                      from NBUR_DETAIL_PROTOCOLS  
                      where kv != 980
                      group 
                         by KF, ACC_ID, ACC_NUM, KV
@@ -477,6 +478,7 @@ BEGIN
             where a.KF = p_kod_filii
               and a.KV != 980
               and r.F_75 = '1'
+              and r.D_CLOSE is Null
               and lnnvl( a.CLOSE_DATE < trunc(p_report_date,'MM') )
           ) t 
     where ( t.DOSQ <> t.DOS AND t.DOSQ <> 0 and t.DOS >=0 )
@@ -485,10 +487,10 @@ BEGIN
   
   -- OPEN BaseL;
   insert 
-    into BARS.NBUR_AGG_PROTOCOLS
+    into NBUR_AGG_PROTOCOLS
        ( REPORT_DATE, KF, REPORT_CODE, NBUC, FIELD_CODE, FIELD_VALUE )
   select REPORT_DATE, KF, REPORT_CODE, NBUC, FIELD_CODE, sum(to_number(FIELD_VALUE))
-    from BARS.NBUR_DETAIL_PROTOCOLS
+    from NBUR_DETAIL_PROTOCOLS
    where REPORT_DATE = p_report_date
      and KF          = p_kod_filii
      and REPORT_CODE = p_file_code
