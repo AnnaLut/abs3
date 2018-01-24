@@ -5,7 +5,9 @@ PROMPT *** Run *** ========== Scripts /Sql/BARS/Trigger/TBU_CCDEAL_EIB10.sql ===
 PROMPT ===================================================================================== 
 
 
-PROMPT *** CREATE OR REPLACE TRIGGER TBU_CCDEAL_EIB10
+PROMPT *** Create  trigger TBU_CCDEAL_EIB10 ***
+
+CREATE OR REPLACE TRIGGER TBU_CCDEAL_EIB10
   before update of sos ON CC_DEAL
   for each row
   WHEN (old.sos < 10 and new.sos = 10 and new.vidd in (1,2,3))
@@ -99,6 +101,7 @@ begin
   end if;
 
 end tbu_ccdeal_eib10;
+
 /
 ALTER TRIGGER BARS.TBU_CCDEAL_EIB10 ENABLE;
 
