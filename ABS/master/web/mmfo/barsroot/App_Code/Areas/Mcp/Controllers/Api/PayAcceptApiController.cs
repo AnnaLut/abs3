@@ -77,11 +77,17 @@ namespace BarsWeb.Areas.Mcp.Controllers.Api
         }
 
         [HttpGet]
-        public HttpResponseMessage SearchFileForMatch([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request)
+        public HttpResponseMessage SearchFileForMatch([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request, decimal? envelopeFileId)
         {
             try
             {
-                var sql = SqlCreator.SearchFile4Match();
+                if (!envelopeFileId.HasValue)
+                {
+                    var d = new List<File4Match>();
+                    return Request.CreateResponse(HttpStatusCode.OK, new { Data = d, Total = 0 });
+                }
+
+                var sql = SqlCreator.SearchFile4Match(envelopeFileId.Value);
                 var data = _repo.SearchGlobal<File4Match>(request, sql);
                 var dataCount = _repo.CountGlobal(request, sql);
 

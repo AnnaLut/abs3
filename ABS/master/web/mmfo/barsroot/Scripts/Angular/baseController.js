@@ -122,6 +122,12 @@ mainApp.controller("KendoMainController", function ($controller, $scope, $http) 
             var headerColl = header.cells[headerCellIndex];
             headerColl.value = headerColl.value.replace(/<br>/g, ' ');
         }
+
+        var counter = 0;
+        sheet.columns.forEach(function (col, index) {
+            if (!col.hidden)
+                sheet.columns[counter++].autoWidth = true;
+        });
     };
 
     $scope.window = function (o) {

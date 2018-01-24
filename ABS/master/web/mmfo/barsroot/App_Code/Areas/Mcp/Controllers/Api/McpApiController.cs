@@ -193,5 +193,32 @@ namespace BarsWeb.Areas.Mcp.Controllers.Api
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+
+        [HttpPost]
+        public HttpResponseMessage RemoveFromPay(List<RemoveFromPayData> o)
+        {
+            try
+            {
+                var errors = new List<string>();
+                foreach (var v in o)
+                {
+                    try
+                    {
+                        var sql = SqlCreator.RemoveFromPay(v.id, v.comment, v.block_type);
+                        _repo.ExecuteStoreCommand(sql.SqlText, sql.SqlParams);
+                    }
+                    catch (Exception e)
+                    {
+                        errors.Add(string.Format("{0} : {1}", v.id, e.InnerException != null ? e.InnerException.Message : e.Message));
+                    }
+                }
+
+                return Request.CreateResponse(HttpStatusCode.OK, new { Errors = errors });
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
     }
 }
