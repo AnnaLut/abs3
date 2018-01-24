@@ -5,7 +5,7 @@ CREATE OR REPLACE PROCEDURE BARS.P_FD5_NN (Dat_   DATE,
 % DESCRIPTION :    #D5 for KB
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.17.007      12/01/2017 (08/12/2017, 21/09/2017)
+% VERSION     : v.17.007      24/01/2018 (12/01/2017, 08/12/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетна€ дата
            sheme_ - схема формировани€
@@ -33,6 +33,10 @@ CREATE OR REPLACE PROCEDURE BARS.P_FD5_NN (Dat_   DATE,
  27     I          S190 код строку простроченн€ погашенн€ боргу
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 24/01/2018 - дл€ показател€ р≥зниц€ заокруглень изменил символ 'N' на 
+              '42'
+              дл€ формировани€ средних остатков по основным счетам 
+              добавил гр. признанных доходов 605 (переброска с гр.604)
  12/01/2018 - нова€ структура показател€ 
               (параметр K072 2-х значный вместо однозначного) 
  08.12.2017 -дл€ блока списани€ за счет резерва изменено формирование
@@ -762,7 +766,7 @@ BEGIN
 
    if nbs_ in ('6014', '6015') then
       s183_ := 'B';
-   elsif nbs_ in ('6020', '6040', '6050') then
+   elsif nbs_ in ('6016','6020','6021','6050') then
       s183_ := '1';
    end if;
 
@@ -1282,7 +1286,7 @@ BEGIN
                      and rownum=1;
                 EXCEPTION WHEN NO_DATA_FOUND THEN
                    recid_ := null;
-                   kodp_:= '1' || '2' || k.nbs || '0' || '00' || 'N' || '9' ||
+                   kodp_:= '1' || '2' || k.nbs || '0' || '00' || '42' || '9' ||
                            'B' || k.rez || '00' || '9' ||
                            LPAD(k.kv,3,'0') || '804' || 'A' || '08';
           
@@ -1557,7 +1561,14 @@ BEGIN
                (a.nbs in ('6013', '6014', '6015', '6016', '6017', '6018', '8029')
                 or a.nbs like '602%'
                 or a.nbs like '603%'
-                or a.nbs like  '604%') and
+                or a.nbs like '604%'
+                or a.nbs like '605%'
+                or a.nbs like '606%'
+                or a.nbs like '607%'
+                or a.nbs like '608%'
+                or a.nbs like '609%'
+                or a.nbs like '610%'
+                or a.nbs like '611%') and
                o.tt not in ('BAK', '515') and
                o.ref = r.ref and
                r.sos = 5 and
@@ -1598,7 +1609,14 @@ BEGIN
                            (a1.nbs in ('6013', '6014', '6015', '6016', '6017', '6018', '8029')
                             or a1.nbs like '602%'
                             or a1.nbs like '603%'
-                            or a1.nbs like  '604%'));
+                            or a1.nbs like '604%'
+                            or a1.nbs like '605%'
+                            or a1.nbs like '606%'
+                            or a1.nbs like '607%'
+                            or a1.nbs like '608%'
+                            or a1.nbs like '609%'
+                            or a1.nbs like '610%'
+                            or a1.nbs like '611%'));
 
            -- вибираЇмо рахунки, де один процентний рахунок в≥дпов≥даЇ рахунку активу
            for k in (select 
@@ -1642,7 +1660,7 @@ BEGIN
                       if k.kodp is not null then
                          if k1.nbs in ('6013', '6014', '6015') then
                             s183_ := 'B';
-                         elsif k1.nbs in ('6020', '6040', '6050') then
+                         elsif k1.nbs in ('6016','6020','6021','6050') then
                             s183_ := '1';
                          else
                             s183_ := substr(k.kodp, 12, 1);
@@ -1756,7 +1774,7 @@ BEGIN
                   if k.kodp is not null then
                      if k.nbs in ('6013', '6014', '6015') then
                         s183_ := 'B';
-                     elsif k.nbs in ('6020', '6040', '6050') then
+                     elsif k.nbs in ('6016','6020','6021','6050') then
                         s183_ := '1';
                      else
                         s183_ := substr(k.kodp, 12, 1);
@@ -1798,7 +1816,7 @@ BEGIN
                   if k.kodp is not null then
                      if k.nbs in ('6013', '6014', '6015') then
                         s183_ := 'B';
-                     elsif k.nbs in ('6040', '6050') then
+                     elsif k.nbs in ('6016','6020','6021','6050') then
                         s183_ := '1';
                      else
                         s183_ := substr(k.kodp, 12, 1);
@@ -1932,7 +1950,7 @@ BEGIN
                   if k.kodp is not null then
                      if k.nbs in ('6013', '6014', '6015') then
                         s183_ := 'B';
-                     elsif k.nbs in ('6040', '6050') then
+                     elsif k.nbs in ('6016','6020','6021','6050') then
                         s183_ := '1';
                      else
                         s183_ := substr(k.kodp, 12, 1);

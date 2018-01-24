@@ -94,7 +94,7 @@ begin
          nbsr_ := '2890';
          r013r_ := '0';
       elsif substr(nlsa_,1,1) not in ('1', '3')
-         and substr(nlsa_,1,4) not in ('9001', '9020', '9023','9100', '9122','9129')
+         and substr(nlsa_,1,4) not in ('9000', '9001', '9020', '9023','9100', '9122','9129')
       then
          if id_ like 'RU%' then
             nbsr_ := '2401';
@@ -122,6 +122,11 @@ begin
                  end if;
              end if;
          end if;
+      elsif substr(nlsa_,1,4) in ('9000')  then
+         nbsr_ := '3690';
+
+         r013r_ := '0';
+
       elsif substr(nlsa_,1,4) in ('9001', '9020', '9023','9100', '9122','9129')  then
          nbsr_ := '3692';
 
