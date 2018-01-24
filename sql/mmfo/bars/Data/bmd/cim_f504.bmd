@@ -159,7 +159,10 @@ begin
   bars_metabase.add_column(l_tabid, 39, 'P010', 'N', 'Вид ~позичальника', null, 2, 24, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 40, 'P320', 'N', 'Код ~типу ~реорганізації', null, 2, 24, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 41, 'P040', 'N', 'Тип ~процентної ~ставки', null, 2, 24, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-
+  bars_metabase.add_column(l_tabid, 42, 'P330', 'C', 'Код ~валюти~розрахунків', null, 3, 24, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 43, 'P080', 'C', 'База~ для обчислення~ плаваючої ставки', null, 15, 24, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 44, 'P070', 'N', 'Розмір ~маржі ~процентної ~ставки', null, 4, 24, 0, 0, 0, 0, '', '#0.0000', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 45, 'P950', 'N', 'Величина ~процентної ~ставки', null, 3, 24, 0, 0, 0, 0, '', '#0.000', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('v_cim_kl_r030');
@@ -269,6 +272,15 @@ begin
     dbms_output.put_line('В БМД не описана таблица V_CIM_KOD_6A_3 для описания сложного поля таблицы CIM_F504.');
   end if;
 
+  -- добавляем описание сложного поля
+  l_newtabid := bars_metabase.get_tabid('v_cim_kl_r030');
+  l_newcolid := bars_metabase.get_colid(l_newtabid, 'KV');
+  if (l_newtabid is not null and l_newcolid is not null) then
+    bars_metabase.add_extrnval(l_tabid, 42, l_newtabid, l_newcolid, 'p', '', '', '');
+  else
+    dbms_output.put_line('В БМД не описана таблица v_cim_kl_r030 для описания сложного поля таблицы CIM_F504.');
+  end if;
+
 
   -- добавляем описание процедур
   bars_metabase.add_actiontbl(l_tabid, 'INSERT', 'cim_reports.add_f504_row(:P101,:Z,:R_AGREE_NO,:P103,:PVAL,:T,:M,:P107,:P108,:P184,:P140,:P142,:P020,:p141,:p143,:p960,:p310,:p050,:p060,:p090,:P999)');
@@ -283,7 +295,7 @@ begin
   bars_metabase.add_nsifunction(l_tabid, 2, 'Синхронізувати з модулем ВК', 'cim_reports.sync_f504', '', 'ONCE', 'Ви дійсно бажаєте змінити данні згідно значень у ВК?', 'Данні синхронізовано з ВК', '', '', '', null);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 3, 'Історія змін при синхронізаціях контракту', '', '', 'ONCE', '', '', '', '', 'sPar=cim_f504_auto_change_hist[CONDITIONS=> F504_ID=:F504_ID][DESCR=>Історія змін при синхронізаціях][ACCESSCODE=>1][showDialogWindow=>false][OpenInWindow]', null);
+  bars_metabase.add_nsifunction(l_tabid, 3, 'Історія змін при синхронізаціях контракту', '', '', 'ONCE', '', '', '', '', 'sPar=CIM_F504_AUTO_CHANGE_HIST[CONDITIONS=> F504_ID=:F504_ID][DESCR=>Історія змін при синхронізаціях][ACCESSCODE=>1][showDialogWindow=>false][OpenInWindow]', null);
 
   -- восстанавливаем ссылки сложных полей других таблиц
   for i in 1..l_extrnval.count loop

@@ -178,9 +178,46 @@ end;
 / 
 COMMENT ON COLUMN bars.cim_f504.p040 IS 'Тип процентної ставки';
 
+begin
+    execute immediate 'alter table bars.cim_f504 add (p330  VARCHAR2(3))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN bars.cim_f504.p330 IS 'Код валюти розрахунків';
+
+begin
+    execute immediate 'alter table bars.cim_f504 add (p080  VARCHAR2(15))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN bars.cim_f504.p080 IS 'База для обчислення плаваючої ставки за кредитом';
+
+begin
+    execute immediate 'alter table bars.cim_f504 add (p070  NUMBER(9,4))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN bars.cim_f504.p070 IS 'Розмір маржі процентної ставки за кредитом';
+
+
+begin
+    execute immediate 'alter table bars.cim_f504 add (P950 NUMBER(6,3))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN bars.cim_f504.p950 IS 'Величина процентної ставки за кредитом боргу';
 
 PROMPT *** Create  grants  CIM_F504 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_F504        to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on CIM_F504        to UPLD;
 
 
 
