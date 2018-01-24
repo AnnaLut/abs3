@@ -11,7 +11,6 @@ PROMPT *** ALTER_POLICY_INFO to CIM_CREDIT_REORGANIZATION ***
 BEGIN 
         execute immediate  
           'begin  
-               bpa.alter_policy_info(''CIM_CREDIT_REORGANIZATION'', ''CENTER'' , null, null, null, null);
                bpa.alter_policy_info(''CIM_CREDIT_REORGANIZATION'', ''FILIAL'' , null, null, null, null);
                bpa.alter_policy_info(''CIM_CREDIT_REORGANIZATION'', ''WHOLE'' , null, null, null, null);
                null;

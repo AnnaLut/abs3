@@ -11,7 +11,6 @@ PROMPT *** ALTER_POLICY_INFO to cim_credit_state_calc ***
 BEGIN 
         execute immediate  
           'begin  
-               bpa.alter_policy_info(''cim_credit_state_calc'', ''CENTER'' , null, null, null, null);
                bpa.alter_policy_info(''cim_credit_state_calc'', ''FILIAL'' , null, null, null, null);
                bpa.alter_policy_info(''cim_credit_state_calc'', ''WHOLE'' , null, null, null, null);
                null;

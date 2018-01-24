@@ -11,7 +11,6 @@ PROMPT *** ALTER_POLICY_INFO to CIM_CREDIT_TYPE ***
 BEGIN 
         execute immediate  
           'begin  
-               bpa.alter_policy_info(''CIM_CREDIT_TYPE'', ''CENTER'' , null, null, null, null);
                bpa.alter_policy_info(''CIM_CREDIT_TYPE'', ''FILIAL'' , null, ''E'', ''E'', ''E'');
                bpa.alter_policy_info(''CIM_CREDIT_TYPE'', ''WHOLE'' , null, null, null, null);
                null;

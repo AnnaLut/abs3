@@ -11,7 +11,6 @@ PROMPT *** ALTER_POLICY_INFO to CIM_CREDIT_BORROWER ***
 BEGIN 
         execute immediate  
           'begin  
-               bpa.alter_policy_info(''CIM_CREDIT_BORROWER'', ''CENTER'' , null, null, null, null);
                bpa.alter_policy_info(''CIM_CREDIT_BORROWER'', ''FILIAL'' , null, null, null, null);
                bpa.alter_policy_info(''CIM_CREDIT_BORROWER'', ''WHOLE'' , null, null, null, null);
                null;
@@ -51,7 +50,7 @@ COMMENT ON COLUMN BARS.CIM_CREDIT_BORROWER.DELETE_DATE IS 'Дата видалення';
 
 
 
-/*PROMPT *** Create  constraint PK_CIMCREDITBORROWER ***
+/*
 begin   
  execute immediate '
   ALTER TABLE BARS.CIM_CREDIT_BORROWER ADD CONSTRAINT PK_CIMCREDITBORROWER PRIMARY KEY (ID)
@@ -65,7 +64,7 @@ exception when others then
 
 
 
-PROMPT *** Create  index PK_CIMCREDITBORROWER ***
+
 begin   
  execute immediate '
   CREATE UNIQUE INDEX BARS.PK_CIMCREDITBORROWER ON BARS.CIM_CREDIT_BORROWER (ID) 
