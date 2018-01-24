@@ -25,7 +25,7 @@ create or replace package msp_pays is
 
   -- установка подписей на документ
   procedure put_doc_sign(p_ref in integer, p_key in varchar2, p_int_sign in varchar2, p_sep_sign in varchar2);
-  
+
    -- получение буферов для подписи
   procedure get_doc_buffers2(p_ref     in integer, p_key     in varchar2, p_buf_int out varchar2, p_buf_ext out varchar2);
 
@@ -399,10 +399,10 @@ create or replace package body msp_pays is
                 where r.id = p_id;
              end if;
          end if;
-          
+
       end;
      
-      
+
   end pay_social;
 
   procedure get_doc_buffers2(p_ref     in integer,
@@ -461,7 +461,7 @@ create or replace package body msp_pays is
     sign_  OPER.SIGN%TYPE; -- Signature
     datA_  DATE;           -- Input file date/time
     d_rec_ VARCHAR2(80);   -- Additional parameters
-    
+
      l_rec_id    number;
 
   begin
@@ -525,7 +525,7 @@ create or replace package body msp_pays is
         when others then
           commit;*/
   end;
-  
+
   procedure get_doc_buffers(p_ref     in integer,
                             p_key     in varchar2,
                             p_int_buf out varchar2,
@@ -625,14 +625,14 @@ create or replace package body msp_pays is
 --     chk.put_visa(p_ref, l_tt, 5, 2, p_key, p_int_sign, p_sep_sign);
        gl.pay( 2,p_ref,datp_);
     end if;
-    
+
     update msp.msp_file_records r
        set r.state_id=20
      where r.ref = p_ref;
 
-   /* exception
+    exception
         when others then
-          commit;*/
+          commit;
   end;
 
 
