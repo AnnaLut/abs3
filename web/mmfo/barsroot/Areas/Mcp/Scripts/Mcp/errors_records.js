@@ -16,7 +16,8 @@ mainApp.controller("McpErrorCtrl", function ($controller, $scope, $http, kendoSe
     };
 
     var filesGridToolbar = [
-        { template: '<a class="k-button" ng-click="onClickToolbarGrid(\'files\', \'excel\')" ng-disabled="disabledToolbarGrid(\'files\', \'excel\')"><i class="pf-icon pf-16 pf-exel"></i>Файли в Excel</a>' }
+        { template: '<a class="k-button" ng-click="onClickToolbarGrid(\'files\', \'excel\')" ng-disabled="disabledToolbarGrid(\'files\', \'excel\')"><i class="pf-icon pf-16 pf-exel"></i>Файли в Excel</a>' },
+        { template: '<a class="k-button" ng-click="onClickToolbarGrid(\'files\', \'set2pay\')" ng-disabled="disabledToolbarGrid(\'files\', \'set2pay\')"><i class="pf-icon pf-16 pf-bookmark-ok"></i>Позначити до сплати</a>' }
     ];
 
     $scope.disabledToolbarGrid = function (id, op){
@@ -25,6 +26,9 @@ mainApp.controller("McpErrorCtrl", function ($controller, $scope, $http, kendoSe
         switch (op){
             case 'excel':
                 return grid._data === undefined ? true : grid._data.length <= 0;
+
+            case 'set2pay':
+                return kendoService.findCheckedGrid(grid).length <= 0;
         }
         return false;
     };
@@ -35,6 +39,10 @@ mainApp.controller("McpErrorCtrl", function ($controller, $scope, $http, kendoSe
         switch (op){
             case 'excel':
                 grid.saveAsExcel();
+                break;
+
+            case 'set2pay':
+                $scope.Set2Pay();
                 break;
         }
     };
@@ -154,7 +162,7 @@ mainApp.controller("McpErrorCtrl", function ($controller, $scope, $http, kendoSe
             },
             {
                 field: "FULL_NAME",
-                title: "ПІБ<br>пенсіонера",
+                title: "ПІБ<br>пенсіонера УПСЗН",
                 width: "16%"
             },
             {
@@ -204,23 +212,20 @@ mainApp.controller("McpErrorCtrl", function ($controller, $scope, $http, kendoSe
         var grid = $scope.filesGrid;
         var checkedArr = kendoService.findCheckedGrid(grid);
 
-        if(checkedArr.length > 0){
-            var ids = [];
-            for(var i = 0; i < checkedArr.length; i++){ ids.push(checkedArr[i].ID); }
-            $http.post(bars.config.urlContent('/api/Mcp/ErrorsRecordsApi/Set2Pay'), ids)
-                .success(function (response) {
-                    $scope.filesGridAll = false;
-                    angular.element(".chkFormolsAll").prop("checked", $scope.filesGridAll);
-                    grid.dataSource.read();
+        var ids = [];
+        for(var i = 0; i < checkedArr.length; i++){ ids.push(checkedArr[i].ID); }
+        bars.ui.loader("body", true);
+        $http.post(bars.config.urlContent('/api/Mcp/ErrorsRecordsApi/Set2Pay'), ids)
+            .success(function (response) {
+                bars.ui.loader("body", false);
+                $scope.filesGridAll = false;
+                angular.element(".chkFormolsAll").prop("checked", $scope.filesGridAll);
+                grid.dataSource.read();
 
-                    $scope.resultMulty(response, "Дані успішно оброблено");
-                }).error(function (response) {
-
-            });
-        }
-        else{
-            bars.ui.error({ text: "Дані не відмічено" });
-        }
+                $scope.resultMulty(response, "Дані успішно оброблено");
+            }).error(function (response) {
+            bars.ui.loader("body", false);
+        });
     };
 
     $scope.filesGridAll = false;

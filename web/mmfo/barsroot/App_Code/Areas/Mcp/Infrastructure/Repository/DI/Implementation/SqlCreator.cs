@@ -280,12 +280,14 @@ namespace BarsWeb.Areas.Mcp.Infrastructure.DI.Implementation {
             };
         }
 
-        public static BarsSql SearchFile4Match()
+        public static BarsSql SearchFile4Match(decimal envelope_file_id)
         {
             return new BarsSql()
             {
-                SqlText = @"select * from msp.v_msp_file_for_match",
-                SqlParams = new object[] { }
+                SqlText = @"select * from msp.v_msp_file_for_match where envelope_file_id = :p_envelope_file_id",
+                SqlParams = new object[] {
+                    new OracleParameter("p_envelope_file_id", OracleDbType.Decimal) { Value = envelope_file_id }
+                }
             };
         }
 

@@ -75,8 +75,10 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
                 for(i = 0; i < checkedArr.length; i++){
                     data.push({id: checkedArr[i].ID, kvitId: $scope.kvitId});
                 }
+                bars.ui.loader("body", true);
                 $http.post(bars.config.urlContent('/api/Mcp/PayAcceptApi/Send'), data)
                     .success(function (response) {
+                        bars.ui.loader("body", false);
                         // $scope.filesGridAll = false;
                         // angular.element(".chkFormolsAllFiles").prop("checked", $scope.filesGridAll);
                         grid.dataSource.read();
@@ -84,7 +86,7 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
                         $scope.resultMulty(response, "Відправку виконано успішно");
 
                     }).error(function (response) {
-
+                    bars.ui.loader("body", false);
                 });
 
 
@@ -159,6 +161,8 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
             $scope.kvitId = this.value();
             $scope.filesGrid.dataSource.read();
             $scope.filesHistoryGrid.dataSource.read();
+            $scope.registryGrid.dataSource.read();
+            $scope.infoLinesreRistryGrid.dataSource.read();
         }
     };
 
@@ -194,6 +198,12 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
         excel: $scope.excelGridOptions(),
         excelExport: $scope.excelExport,
         toolbar: filesGridToolbar,
+        change: function () {
+            $scope.registryGrid.dataSource.read();
+        },
+        // dataBound: function () {
+        //     $scope.registryGrid.dataSource.read();
+        // },
         columns: [
             {
                 field: "block",
@@ -280,6 +290,12 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
         excel: $scope.excelGridOptions(),
         excelExport: $scope.excelExport,
         toolbar: filesHistoryGridToolbar,
+        change: function () {
+            $scope.registryGrid.dataSource.read();
+        },
+        // dataBound: function () {
+        //     $scope.registryGrid.dataSource.read();
+        // },
         columns: [
             {
                 field: "block",
@@ -336,7 +352,20 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
 
     var registryGridDataSource = $scope.createDataSource({
         type: "webapi",
-        transport: { read: { url: bars.config.urlContent("/api/Mcp/PayAcceptApi/SearchFileForMatch") } },
+        transport: { read: { url: bars.config.urlContent("/api/Mcp/PayAcceptApi/SearchFileForMatch"),
+            data: function () {
+                var curTabIndex = $scope.tabStrip.select().index();
+
+                var envelopeFileId = null;
+                if(curTabIndex === 0){
+                    envelopeFileId = $scope.filesGridInfo("ID");
+                }
+                else{
+                    envelopeFileId = $scope.filesHistoryGridInfo("ID");
+                }
+                return {envelopeFileId: envelopeFileId};
+        }
+        } },
         schema: {
             model: {
                 fields: {
@@ -523,6 +552,11 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
         return _getGridValue(grid, fieldId);
     };
 
+    $scope.filesHistoryGridInfo = function (fieldId) {
+        var grid = $scope.filesHistoryGrid;
+        return _getGridValue(grid, fieldId);
+    };
+
     $scope.Set2Pay = function () {
         var grid = $scope.filesGrid;
         var checkedArr = kendoService.findCheckedGrid(grid);
@@ -530,15 +564,17 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
         if(checkedArr.length > 0){
             var ids = [];
             for(var i = 0; i < checkedArr.length; i++){ ids.push(checkedArr[i].ID); }
+            bars.ui.loader("body", true);
             $http.post(bars.config.urlContent('/api/Mcp/PayAcceptApi/Set2Pay'), ids)
                 .success(function (response) {
+                    bars.ui.loader("body", false);
                     $scope.filesGridAll = false;
                     angular.element(".chkFormolsAll").prop("checked", $scope.filesGridAll);
                     grid.dataSource.read();
 
                     $scope.resultMulty(response, "Дані успішно оброблено");
                 }).error(function (response) {
-
+                bars.ui.loader("body", false);
             });
         }
         else{
@@ -554,6 +590,9 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
 
             if(curTabIndex === 0){
                 $scope.filesHistoryGrid.dataSource.read();
+            }
+            else {
+                $scope.filesGrid.dataSource.read();
             }
         }
     };
@@ -584,7 +623,7 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
         $scope.infoLinesGridAll = !$scope.infoLinesGridAll;
         var grid = $scope.filesHistoryGrid;
         kendoService.setCheckedGrid(grid, $scope.infoLinesGridAll);
-    }
+    };
 
     $scope.onClick = function(e){ kendoService.setCheckedElemGrid(e); };
 

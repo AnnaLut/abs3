@@ -63,7 +63,7 @@ public class MinSocPol : Bars.BarsWebService
         }
         catch (Exception e)
         {
-            dbLogger.Error(string.Format("DateTime: {0}; Message: {1}; StackTrace: {2}", DateTime.Now, e.Message, e.StackTrace));
+            dbLogger.Error(string.Format("MinSocPol service. DateTime: {0}; Message: {1}; StackTrace: {2}", DateTime.Now, e.Message, e.StackTrace));
 
             Context.Response.Status = "500 Internal Server Error";
             Context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;

@@ -108,13 +108,15 @@ mainApp.controller("McpCtrl", function ($controller, $scope, $http, $timeout, ke
                 break;
 
             case 'pay':
+                bars.ui.loader("body", true);
                 $http.post(bars.config.urlContent('/api/Mcp/Mcp/Pay'), {id: row.ID})
                 .success(function (response) {
+                    bars.ui.loader("body", false);
                     grid.dataSource.read();
                     bars.ui.notify("До відома", "Документ " + row.ID + " успішно оплачено",
                         "info", {autoHideAfter: 5*1000});
                 }).error(function (response) {
-
+                    bars.ui.loader("body", false);
                 });
                 break;
 
@@ -148,14 +150,16 @@ mainApp.controller("McpCtrl", function ($controller, $scope, $http, $timeout, ke
                                             // если оптата прошла успешно (в окне оплаты получили ref) - меняем статус файла
                                             if (!utilsService.isEmpty(OutRef) && OutRef.value) {
                                                 //todo: fix 'stateId: 6'
+                                                bars.ui.loader("body", true);
                                                 $http.post(bars.config.urlContent('/api/Mcp/Mcp/SetFileState'), {id: row.ID, stateId: 6})
                                                     .success(function (response) {
                                                         win.close();
+                                                        bars.ui.loader("body", false);
                                                         grid.dataSource.read();
                                                         bars.ui.notify("До відома", "Платіж " + row.ID + " успішно створено",
                                                             "info", {autoHideAfter: 5*1000});
                                                     }).error(function (response) {
-
+                                                        bars.ui.loader("body", false);
                                                 });
                                             }
                                             else {
@@ -184,8 +188,10 @@ mainApp.controller("McpCtrl", function ($controller, $scope, $http, $timeout, ke
                 for(i = 0; i < checkedArr.length; i++){
                     data.push({ id: checkedArr[i].ID, accNum2560: checkedArr[i].ACC_NUM_2560, receiverMfo: checkedArr[i].RECEIVER_MFO});
                 }
+                bars.ui.loader("body", true);
                 $http.post(bars.config.urlContent('/api/Mcp/Mcp/BalanceRu'), data)
                     .success(function (response) {
+                        bars.ui.loader("body", false);
                         // $scope.filesGridAll = false;
                         // angular.element(".chkFormolsAllFiles").prop("checked", $scope.filesGridAll);
                         grid.dataSource.read();
@@ -193,7 +199,7 @@ mainApp.controller("McpCtrl", function ($controller, $scope, $http, $timeout, ke
                         $scope.resultMulty(response, "Запити залишків РУ виконано успішно");
 
                     }).error(function (response) {
-
+                        bars.ui.loader("body", false);
                 });
                 break;
         }
@@ -651,8 +657,10 @@ mainApp.controller("McpCtrl", function ($controller, $scope, $http, $timeout, ke
             res.push({id: item.id, comment: item.comment, block_type: item.block_type});
         }
 
+        bars.ui.loader("body", true);
         $http.post(bars.config.urlContent('/api/Mcp/Mcp/RemoveFromPay'), res)
             .success(function (response) {
+                bars.ui.loader("body", false);
                 $scope.infoLinesGridAll = false;
                 angular.element(".chkFormolsAll").prop("checked", $scope.infoLinesGridAll);
                 $scope.infoLinesGrid.dataSource.read();
@@ -662,7 +670,7 @@ mainApp.controller("McpCtrl", function ($controller, $scope, $http, $timeout, ke
                 $scope.resultMulty(response, "Записи виключено з платежу успішно");
 
             }).error(function (response) {
-
+            bars.ui.loader("body", false);
         });
     };
 
