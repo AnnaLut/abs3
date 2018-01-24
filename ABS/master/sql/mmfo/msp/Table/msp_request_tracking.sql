@@ -82,6 +82,29 @@ end;
 / 
 
 
+begin 
+  execute immediate 'alter table msp_request_tracking add state number(1)';
+exception when others then 
+  if sqlcode in (-904, -6512, -1430) then 
+    null; 
+  else 
+    raise; 
+  end if;
+end;
+/
+
+comment on column msp_request_tracking.state is 'Стан відповіді (1 - помилковий, null - ОК!)';
+
+begin
+    execute immediate 'create index i_msp_request_tracking_state on msp_request_tracking (state)';
+exception when others then 
+  if sqlcode in (-955, -1408) then 
+    null; 
+  else 
+    raise; 
+  end if; 
+end;
+/ 
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /sql/msp/table/msp_request_tracking.sql =========*** End

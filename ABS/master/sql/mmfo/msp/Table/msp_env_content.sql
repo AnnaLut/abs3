@@ -101,6 +101,17 @@ exception when others then
 end;
 /
 
+begin 
+  execute immediate 'alter table msp_env_content add cvalue clob';
+exception when others then 
+  if sqlcode in (-904, -6512, -1430) then 
+    null; 
+  else 
+    raise; 
+  end if;
+end;
+/
+
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /sql/msp/table/msp_env_content.sql =========*** End
 PROMPT ===================================================================================== 
