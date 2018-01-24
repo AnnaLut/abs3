@@ -179,7 +179,7 @@ begin
   bars_metabase.add_column(l_tabid, 58, 'P2037', 'N', '(2037)~Фактично ~сплачено ~пені за ~прострочені ~платежі', null, 10, 58, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 59, 'P2038', 'N', '(2038)~Прострочена ~заборгов. за ~основною ~сумою боргу', null, 10, 59, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 60, 'P2042', 'N', '(2042)~Прострочені ~процентні ~платежі', null, 10, 60, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 61, 'P3000', 'N', 'Код стану ~розрахунків ~за кредитом', null, 2, 61, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 61, 'P3000', 'N', '(3000)~Код стану ~розрахунків ~за кредитом', null, 2, 61, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 63, 'P_DATE_TO', 'D', 'Сформовано ~на дату', null, null, 63, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 64, 'DATE_REG', 'D', 'Створено', 3, null, 64, 0, 0, 0, 0, '', 'dd/MM/yyyy hhhh:mm:ss', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 65, 'USER_REG', 'C', 'Користувач ~додав у ~звіт', null, 30, 65, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
@@ -187,7 +187,8 @@ begin
   bars_metabase.add_column(l_tabid, 67, 'USER_CH', 'C', 'Користувач ~редагування', null, 30, 67, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 68, 'BRANCH', 'C', 'Відділення', null, 30, 68, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 69, 'KF', 'C', 'МФО', null, 6, 69, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 70, 'P3200', 'N', 'Код ~типу ~реорганізації', null, 2, 61, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 70, 'P3200', 'N', '(3200)~Код ~типу ~реорганізації', null, 2, 61, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 71, 'P3300', 'C', '(3300)~Код ~валюти~розрахунків', null, 3, 61, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('v_cim_kod_51_1');
@@ -351,6 +352,15 @@ begin
     dbms_output.put_line('В БМД не описана таблица V_CIM_KOD_6A_3 для описания сложного поля таблицы CIM_F503.');
   end if;
 
+  -- добавляем описание сложного поля
+  l_newtabid := bars_metabase.get_tabid('v_cim_kl_r030');
+  l_newcolid := bars_metabase.get_colid(l_newtabid, 'KV');
+  if (l_newtabid is not null and l_newcolid is not null) then
+    bars_metabase.add_extrnval(l_tabid, 71, l_newtabid, l_newcolid, 'z', '', '', '');
+  else
+    dbms_output.put_line('В БМД не описана таблица v_cim_kl_r030 для описания сложного поля таблицы CIM_F503.');
+  end if;
+
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);
@@ -362,7 +372,7 @@ begin
   bars_metabase.add_nsifunction(l_tabid, 2, 'Синхронізувати з модулем ВК', 'cim_reports.sync_f503', '', 'ONCE', 'Ви дійсно бажаєте змінити данні згідно значень у ВК?', 'Данні синхронізовано з ВК', '', '', '', null);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 3, 'Історія змін при синхронізаціях контракту', '', '', 'ONCE', '', '', '', '', 'sPar=cim_f503_auto_change_hist[CONDITIONS=> F503_ID=:F503_ID][DESCR=>Історія змін при синхронізаціях][ACCESSCODE=>1][showDialogWindow=>false][OpenInWindow]', null);
+  bars_metabase.add_nsifunction(l_tabid, 3, 'Історія змін при синхронізаціях контракту', '', '', 'ONCE', '', '', '', '', 'sPar=CIM_F503_AUTO_CHANGE_HIST[CONDITIONS=> F503_ID=:F503_ID][DESCR=>Історія змін при синхронізаціях][ACCESSCODE=>1][showDialogWindow=>false][OpenInWindow]', null);
 
   -- восстанавливаем ссылки сложных полей других таблиц
   for i in 1..l_extrnval.count loop

@@ -216,9 +216,20 @@ end;
 / 
 COMMENT ON COLUMN bars.cim_f503.p3200 IS 'Код типу реорганізації';
 
+begin
+    execute immediate 'alter table bars.cim_f503 add (p3300  VARCHAR2(3))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN bars.cim_f503.p3300 IS 'Код валюти розрахунків';
+
+
 
 PROMPT *** Create  grants  CIM_F503 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_F503        to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on CIM_F503        to UPLD;
 
 
 

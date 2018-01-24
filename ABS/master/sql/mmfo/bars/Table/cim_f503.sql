@@ -90,8 +90,7 @@ begin
 	P2037 NUMBER, 
 	P2038 NUMBER, 
 	P2042 NUMBER, 
-	P3000 NUMBER(2,0), 
-	P3200 NUMBER(1,0)
+	P3000 NUMBER(2,0)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -109,7 +108,6 @@ PROMPT *** ALTER_POLICIES to CIM_F503 ***
 
 
 COMMENT ON TABLE BARS.CIM_F503 IS 'Дані для звіту f503';
-COMMENT ON COLUMN BARS.CIM_F503.P3200 IS 'Код типу реорганізації';
 COMMENT ON COLUMN BARS.CIM_F503.F503_ID IS 'Ідентифікатор унікальний';
 COMMENT ON COLUMN BARS.CIM_F503.CONTR_ID IS 'Внутрішній код контракту';
 COMMENT ON COLUMN BARS.CIM_F503.P_DATE_TO IS 'Звіт сформований на дату';
@@ -206,6 +204,26 @@ exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
 /
+
+
+
+begin
+    execute immediate 'alter table bars.cim_f503 add (p3200  number(1))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN bars.cim_f503.p3200 IS 'Код типу реорганізації';
+
+begin
+    execute immediate 'alter table bars.cim_f503 add (p3300  VARCHAR2(3))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN bars.cim_f503.p3300 IS 'Код валюти розрахунків';
 
 
 

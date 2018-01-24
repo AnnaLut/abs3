@@ -108,7 +108,7 @@ is
 -- g_body_version      constant varchar2 (64) := 'version 1.00.03 04/04/2016';
 -- g_body_version      constant varchar2 (64) := 'version 1.00.04 08/08/2016';
 -- g_body_version      constant varchar2 (64) := 'version 1.00.05 20/09/2016';
-   g_body_version      constant varchar2 (64) := 'version 1.01.04 26/06/2017 ru';
+   g_body_version      constant varchar2 (64) := 'version 1.01.05 24/01/2018 ru';
    g_awk_body_defs     constant varchar2 (512) := '';
 
    type t_indicators_f503 is record (
@@ -583,16 +583,16 @@ begin
           if l_p212 != 0 then l_txt:=l_txt||l_c.m||'212'||l_c.z||l_y_txt||l_c.e||round(l_p212/100,0)||chr(13)||chr(10); l_n:=l_n+1; end if;
           if l_p213 != 0 then l_txt:=l_txt||l_c.m||'213'||l_c.z||l_y_txt||l_c.e||round(l_p213/100,0)||chr(13)||chr(10); l_n:=l_n+1; end if;
           if l_prognoz=0 and l.dat = l_maxdat then l_p222:=l_p222+l_spt; end if;
-    /*--COBUSUPABS-6031           
+    /*--COBUSUPABS-6031
           if l_p222 != 0 and l_f_incom>0
             then l_txt:=l_txt||l_c.m||'222'||l_c.z||l_y_txt||l_c.e||round(l_p222/100,0)||chr(13)||chr(10); l_n:=l_n+1; end if;
-             
+
           if l_prognoz=1 then
             if l_p223 != 0 and l_f_incom>0
               then l_txt:=l_txt||l_c.m||'223'||l_c.z||l_y_txt||l_c.e||round(l_p223/100,0)||chr(13)||chr(10); l_n:=l_n+1; end if;
             if l_p201 != 0 then l_txt:=l_txt||l_c.m||'201'||l_c.z||l_y_txt||l_c.e||round(l_p201/100,0)||chr(13)||chr(10); l_n:=l_n+1; end if;
           end if;
-    */      
+    */
           l_p212:=l.xpspt; l_p213:=l.xsp; l_p201:=l.psnt; l_p222:=l.pspt; l_p223:=l.sp;
           l_act_m:=to_number(to_char(l.dat,'MM')); l_act_y:=to_char(l.dat,'YYYY');
           if l_act_y-to_number(to_char(l_date_z_begin,'YYYY'))>1 then l_rm:=1; else l_rm:=0; end if; --1 - річний
@@ -606,13 +606,13 @@ begin
   /*--COBUSUPABS-6031    if l_p222 != 0 and l_f_incom>0 then
         l_txt:=l_txt||l_c.m||'222'||l_c.z||l_y_txt||l_c.e||round(l_p222/100,0)||chr(13)||chr(10); l_n:=l_n+1;
       end if;
-      
+
       if l_prognoz=1 then
          if l_p223 != 0 and l_f_incom>0
            then l_txt:=l_txt||l_c.m||'223'||l_c.z||l_y_txt||l_c.e||round(l_p223/100,0)||chr(13)||chr(10); l_n:=l_n+1; end if;
          if l_p201 != 0 then l_txt:=l_txt||l_c.m||'201'||l_c.z||l_y_txt||l_c.e||round(l_p201/100,0)||chr(13)||chr(10); l_n:=l_n+1; end if;
       end if;
- */   
+ */
       select round(nvl(sum(xpspt),0)/100,0), round(nvl(sum(xsp),0)/100,0), round(nvl(sum(psnt),0)/100,0), round(nvl(sum(pspt),0)/100,0),
              round(nvl(sum(sp),0)/100,0)  into l_p212, l_p213, l_p201, l_p222, l_p223
         from cim_credgraph_tmp where dat>=to_date('01/01/'||to_char(l_b_y+10,'fm9999'),'DD/MM/YYYY') and dat != to_date('01/01/3000','DD/MM/YYYY');
@@ -923,7 +923,7 @@ end  p_f531;
         ||cur.m||'1200'||l_znyvt||to_char(cur.p1200,'DDMMYYYY')||chr(13)||chr(10)
         ||cur.m||'1300'||l_znyvt||translatewin2dos(cur.p1300)||chr(13)||chr(10)
         ||cur.m||'1400'||l_znyvt||cur.p1400||chr(13)||chr(10)
-        ||cur.m||'0100'||l_znyvt||cur.p0100||chr(13)||chr(10)
+        ||cur.m||'0100'||l_znyvt||num_code(cur.p0100)||chr(13)||chr(10)
         ||cur.m||'1500'||l_znyvt||cur.p1500||chr(13)||chr(10)
         ||cur.m||'1600'||l_znyvt||cur.p1600||chr(13)||chr(10)
         ||cur.m||'1700'||l_znyvt||cur.p1700||chr(13)||chr(10)
@@ -1001,6 +1001,8 @@ end  p_f531;
       l_txt:=l_txt||cur.m||'9800'||l_znyvt||cur.p9800||chr(13)||chr(10); l_n:=l_n+1;
       if cur.p9900 is not null then l_txt:=l_txt||cur.m||'9900'||l_znyvt||translatewin2dos(cur.p9900)||chr(13)||chr(10); l_n:=l_n+1; end if;
       l_txt:=l_txt||cur.m||'3000'||l_znyvt||cur.p3000||chr(13)||chr(10); l_n:=l_n+1;
+      l_txt:=l_txt||cur.m||'3200'||l_znyvt||cur.p3200||chr(13)||chr(10); l_n:=l_n+1;
+      l_txt:=l_txt||cur.m||'3300'||l_znyvt||lpad(cur.p3300,3,'0')||chr(13)||chr(10); l_n:=l_n+1;
 
       dbms_lob.append(l_txt_clob, l_txt); l_txt:=null;
 
@@ -1085,6 +1087,8 @@ end  p_f531;
            ||cur.m||'103'||l_zn0yvt||to_char(cur.p103,'DDMMYYYY')||chr(13)||chr(10)
            ||cur.m||'107'||l_zn0yvt||translatewin2dos(cur.p107)||chr(13)||chr(10)
 
+           ||cur.m||'010'||l_zn0yvt||num_code(cur.p010)||chr(13)||chr(10)
+
            ||cur.m||'108'||l_zn0yvt||cur.p108||chr(13)||chr(10)
            ||cur.m||'140'||l_zn0yvt||cur.p140||chr(13)||chr(10)
            ||cur.m||'141'||l_zn0yvt||cur.p141||chr(13)||chr(10)
@@ -1092,8 +1096,18 @@ end  p_f531;
            ||cur.m||'143'||l_zn0yvt||cur.p143||chr(13)||chr(10)
            ||cur.m||'184'||l_zn0yvt||cur.p184||chr(13)||chr(10)
            ||cur.m||'020'||l_zn0yvt||cur.p020||chr(13)||chr(10)
-           ||cur.m||'310'||l_zn0yvt||to_char(cur.p310,'DDMMYYYY')||chr(13)||chr(10);
-       l_n:=l_n+8+6;
+           ||cur.m||'310'||l_zn0yvt||to_char(cur.p310,'DDMMYYYY')||chr(13)||chr(10)
+
+           ||cur.m||'320'||l_zn0yvt||cur.p320||chr(13)||chr(10)
+
+           ||cur.m||'040'||l_zn0yvt||cur.p040||chr(13)||chr(10)
+           
+           ||cur.m||'330'||l_zn0yvt||lpad(cur.p330,3,'0')||chr(13)||chr(10)
+           ||cur.m||'080'||l_zn0yvt||cur.p080||chr(13)||chr(10)           
+           ||cur.m||'070'||l_zn0yvt||cur.p070||chr(13)||chr(10)           
+           ||cur.m||'950'||l_zn0yvt||cur.p950||chr(13)||chr(10)           
+           ;
+       l_n:=l_n+8+1+6+1+1+4;
 
       if cur.p960 is not null then
          l_txt:=l_txt||cur.m||'960'||l_zn0yvt||to_char(cur.p960,'fm99')||chr(13)||chr(10); l_n:=l_n+1;
@@ -1176,7 +1190,7 @@ end  p_f531;
          l_txt:=l_txt||cur.m||'213'||l_zn||'88888'||l_yvt||l_88888||chr(13)||chr(10); l_n:=l_n+1;
        end if;
 
-       /*--COBUSUPABS-6031 
+       /*--COBUSUPABS-6031
        l_88888 := 0;
        l_rrrr0.delete;
        for cur_detail in (select * from cim_f504_detail d
@@ -1796,7 +1810,10 @@ end  p_f531;
                              P141, P020, P143,
                              P050, P060, P090, P960,
                              P310,
-                             P999
+                             P999,
+                             p010,
+                             p040,
+                             p070, p950
                               )
               values (c.contr_id, l_date_to, substr(c.nmkk,1,27) /*as p101*/, lpad(substr(c.okpo,1,10),10,'0'), lpad(substr(c.r_agree_no,1,5),5,'0') /*r_agree_no*/,
                c.r_agree_date /*as p103*/, lpad(c.kv,3,'0') /*as pval*/, '0' /*as t*/, case when c.credit_type=0 then 1 when c.creditor_type=11 then 3 else 2 end /*as m*/,
@@ -1809,7 +1826,10 @@ end  p_f531;
                substr(c.num, 1, 16) /*as p050*/, c.open_date /*as p060*/, c.s /*as p090*/, c.f503_purpose /*as p960*/,
                --nvl2(c.close_date, c.close_date-c.open_date, '') /*as p970*/, --має бути різниця між датою підписання і здійснення останнього платежу
                c.close_date /*as p310*/,
-               c.f504_note /*as p999*/)
+               c.f504_note /*as p999*/,
+               c.borrower_id /*as p010*/,
+               decode(c.f503_percent_type, 1, 3, c.f503_percent_type) /*as p040*/,
+               c.f503_percent_margin /*as p070*/, c.f503_percent /*as p950*/)
                returning f504_id into l_f504_id;
 
         --розрахунок незаповнених показників
@@ -2314,7 +2334,10 @@ end  p_f531;
                          c.close_date as p310_vk,                                                            f.p310 as p310_r,
                          substr(c.num, 1, 16) as p050_vk,                                                    f.p050 as p050_r,
                          c.open_date as p060_vk,                                                             f.p060 as p060_r,
-                         c.s as p090_vk,                                                                     f.p090 as p090_r
+                         c.s as p090_vk,                                                                     f.p090 as p090_r,
+                         c.borrower_id as p010_vk,                                                           f.p010 as p010_r,
+                         c.f503_percent_margin as p070_vk,                                                   f.p070 as p070_r,
+                         c.f503_percent as p950_vk,                                                          f.p950 as p950_r                         
                   from v_cim_credit_contracts c, cim_f504 f where c.contr_id = f.contr_id
                    and f.kf = sys_context('bars_context','user_mfo'))
       loop
@@ -2335,7 +2358,10 @@ end  p_f531;
             p310 = cur.p310_vk,
             p050 = cur.p050_vk,
             p060 = cur.p060_vk,
-            p090 = cur.p090_vk
+            p090 = cur.p090_vk,
+            p010 = cur.p010_vk,
+            p070 = cur.p070_vk,
+            p950 = cur.p950_vk            
         where f504_id = cur.f504_id;
 
         if nvl(cur.m_r,-1)        != nvl(cur.m_vk,-1)  then
@@ -2390,6 +2416,15 @@ end  p_f531;
         if nvl(cur.p090_r,-1)     != nvl(cur.p090_vk,-1) then
           add_auto_change_hist(cur.f504_id, '090', 'загальна сума кредиту', cur.p090_r, cur.p090_vk);
         end if;
+        if nvl(cur.p010_r,'-1')    != nvl(cur.p010_vk,'-1') then
+          add_auto_change_hist(cur.f504_id, '010', 'вид позичальника', cur.p010_r, cur.p010_vk);
+        end if;
+        if nvl(cur.p070_r,-1)     != nvl(cur.p070_vk,-1) then
+          add_auto_change_hist(cur.f504_id, '070', 'розмір маржі про-центної ставки', cur.p070_r, cur.p070_vk);
+        end if;
+        if nvl(cur.p950_r,-1)     != nvl(cur.p950_vk,-1) then
+          add_auto_change_hist(cur.f504_id, '950', 'величина процентної ставки', cur.p950_r, cur.p950_vk);
+        end if;        
 
       end loop;
 
