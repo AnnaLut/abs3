@@ -381,7 +381,8 @@ create or replace package body msp_pays is
             end if;*/
 
             update msp.msp_file_records r
-              set r.ref=l_ref
+              set r.ref=l_ref,
+				  r.state_id=20
             where id = p_id;
             p_ref := l_ref;
 
@@ -585,6 +586,7 @@ create or replace package body msp_pays is
   begin
 
     select o.tt, o.mfob into l_tt, mfob_ from oper o where o.ref = p_ref;
+	
     if (mfob_ != 300465 and l_tt not in ('PKX','024')) then
        chk.put_visa(p_ref, l_tt, null, 0, p_key, p_int_sign, p_sep_sign);
 
@@ -626,9 +628,9 @@ create or replace package body msp_pays is
        gl.pay( 2,p_ref,datp_);
     end if;
 
-    update msp.msp_file_records r
-       set r.state_id=20
-     where r.ref = p_ref;
+   -- update msp.msp_file_records r
+   --    set r.state_id=20
+   --  where r.ref = p_ref;
 
     exception
         when others then
