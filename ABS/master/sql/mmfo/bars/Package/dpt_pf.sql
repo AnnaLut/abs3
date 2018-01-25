@@ -56,7 +56,7 @@ IS
 
     --  / constants /
     --
-    g_body_version  CONSTANT VARCHAR2(64)  := 'version 1.16 22.11.2017';
+    g_body_version  CONSTANT VARCHAR2(64)  := 'version 1.17 25.01.2018';
     g_modcode       CONSTANT varchar2(6)   := 'DPT_PF';
     g_errmsg        VARCHAR2(4000);
 
@@ -470,7 +470,7 @@ IS
                     FROM customer c
                    WHERE c.rnk = pf.rnk),
               (dat_reg_d, dat_end_d) =
-                 (SELECT date_begin, date_end
+                 (SELECT AGRMNT_DATE, /*date_begin,*/ date_end
                     FROM dpt_agreements da
                    WHERE da.agrmnt_id = pf.id),
               DAT_1 = l_dat_beg,
