@@ -1,76 +1,27 @@
 BEGIN
-   FOR k IN (SELECT kf
-               FROM mv_kf)
-   LOOP
-      bc.go (k.kf);
 
-      BEGIN
-         INSERT INTO BR_NORMAL_EDIT (BR_ID,
-                                     BDATE,
-                                     KV,
-                                     RATE)
-              VALUES (100,
-                      TO_DATE ('27/10/2017', 'DD/MM/YYYY'),
-                      980,
-                      13.5);
-      EXCEPTION
-         WHEN DUP_VAL_ON_INDEX
-         THEN
-            NULL;
-      END;
+ 
 
-      BEGIN
-         INSERT INTO BR_NORMAL_EDIT (BR_ID,
-                                     BDATE,
-                                     KV,
-                                     RATE)
-              VALUES (100,
-                      TO_DATE ('27/10/2017', 'DD/MM/YYYY'),
-                      840,
-                      13.5);
-      EXCEPTION
-         WHEN DUP_VAL_ON_INDEX
-         THEN
-            NULL;
-      END;
+FOR k IN (SELECT kf FROM BARS.mv_kf)
 
-      BEGIN
-         INSERT INTO BR_NORMAL_EDIT (BR_ID,
-                                     BDATE,
-                                     KV,
-                                     RATE)
-              VALUES (100,
-                      TO_DATE ('27/10/2017', 'DD/MM/YYYY'),
-                      978,
-                      13.5);
-      EXCEPTION
-         WHEN DUP_VAL_ON_INDEX
-         THEN
-            NULL;
-      END;
+ 
 
-      BEGIN
-         INSERT INTO BR_NORMAL_EDIT (BR_ID,
-                                     BDATE,
-                                     KV,
-                                     RATE)
-              VALUES (100,
-                      TO_DATE ('27/10/2017', 'DD/MM/YYYY'),
-                      643,
-                      13.5);
-      EXCEPTION
-         WHEN DUP_VAL_ON_INDEX
-         THEN
-            NULL;
-      END;
-   END LOOP;
+loop
 
-   bc.home;
-END;
+bc.go(k.kf);
+
+insert into br_normal_edit (br_id, bdate, rate, kf, kv)
+
+ 
+
+select 100, to_date('26012018','ddmmyyyy'),16.0,k.kf,  kv from tabval$global  where kv in  (980,978,643,840);
+
+bc.home;
+
+end loop;
+
+ 
+
+end;
 /
-
-COMMIT;
-
-
-
--
+commit;  
