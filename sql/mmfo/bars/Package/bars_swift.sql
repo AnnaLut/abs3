@@ -1578,7 +1578,7 @@ is
 --**************************************************************--
 
 
-    g_bodyVersion   constant varchar2(64)  := 'version 3.81 23.01.2017';
+    g_bodyVersion   constant varchar2(64)  := 'version 3.82 28.11.2017';
     g_bodyDefs      constant varchar2(512) := ''
               || '          для всех банков'           || chr(10)
               || '    3XX - с формированием MT300/320' || chr(10)
@@ -1803,7 +1803,7 @@ is
         --
         -- Получаем префикс для референса
         --
-        l_trn := nvl(substr(get_param_value('SWFTID'), 1, 3), 'BRS');
+        -- l_trn := nvl(substr(get_param_value('SWFTID'), 1, 3), 'BRS'); -- delete pref COBUMMFO-5564
 
         --
         -- Получаем код используемое перекодировки
@@ -1819,9 +1819,13 @@ is
         -- в референсе должен быть "+"
         --
         if (l_charset = 'RUR6') then
-            l_trn := '+' || l_trn || '-' || substr(p_receiver, 1, 4) || '-';
+		   --COBUMMFO-5564
+           -- l_trn := '+' || l_trn || '-' || substr(p_receiver, 1, 4) || '-';
+		   l_trn := '+' || substr(p_receiver, 1, 4) || '-';
         else
-            l_trn := l_trn || '-' || substr(p_receiver, 1, 4) || '-';
+		    --COBUMMFO-5564
+            --l_trn := l_trn || '-' || substr(p_receiver, 1, 4) || '-';
+			l_trn := substr(p_receiver, 1, 4) || '-';
         end if;
         l_trn := l_trn || substr('0000000000' || to_char(p_swref), -16+length(l_trn));
 
