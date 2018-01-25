@@ -1,9 +1,10 @@
-create or replace package msp.msp_const is
+create or replace package msp_const is
 
   -- msp_requests.act_type
   req_PAYMENT_DATA     constant number := 1;
   req_DATA_STATE       constant number := 3;
   req_VALIDATION_STATE constant number := 4;
+  req_PAYMENT_STATE    constant number := 5;
 
   -- msp_requests.state
   st_req_NEW_REQUEST             constant number := -1; -- Новий запит

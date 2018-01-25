@@ -656,8 +656,6 @@ create or replace package body msp_utl is
     select filedata into l_filedata from msp_envelope_files t where id = p_envelope_file_id;
     bars.import_flat_file(l_filedata);
     
-    insert into tmp_imp_file select * from bars.tmp_imp_file;
-
     delete from msp_file_records where file_id = p_id_file;
     delete from msp_files where id = p_id_file;
 
