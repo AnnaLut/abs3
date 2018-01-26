@@ -163,7 +163,7 @@ procedure import_tick (p_filename in varchar2);
 
 end;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.BARS_SV is
+
 create or replace package body bars_sv is
 -- #101: Иванава Ирина, изменения в соответствии с техническими условиями 4_1
 -- Перегружены процедуры import_file,import_tick  для импорта файлов из веба
