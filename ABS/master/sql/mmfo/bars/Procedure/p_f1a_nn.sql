@@ -1,18 +1,11 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_F1A_NN.sql =========*** Run *** 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_F1A_NN ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_F1A_NN (Dat_ DATE,
-                                      sheme_ varchar2 default 'D') IS
+create or replace procedure P_F1A_NN
+( Dat_    DATE
+, sheme_  varchar2 default 'D'
+) IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Процедура формирования файла #1A для КБ
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :    16.08.2017 (07/03/2017)
+% VERSION     :    26.01.2018 (07/03/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -186,40 +179,41 @@ BEGIN
     end if;
 
     -- наповнення проводок за зв_тну дату
-   insert /*+ APPEND*/ into tmp_file03
-   select *
-   from (SELECT /*+ leading(a) */
-            (case when o.dk = 0 then o.acc else z.acc end) ACCD,
-             o.TT,
-             o.REF,
-             p.KV,
-             (case when o.dk = 0 then a.nls else b.nls end) NLSD,
-             o.S,
-             o.SQ,
-             o.FDAT,
-             p.nazn,
-             (case when o.dk = 1 then o.acc else z.acc end) ACCK,
-             (case when o.dk = 1 then a.nls else b.nls end) NLSK,
-             p.userid ISP
-         FROM opldok o
-         join accounts a
-         on (o.acc = a.acc)
-         join opldok z
-         on (O.REF = z.ref and
-             o.stmt = z.stmt and
-             o.dk <> z.dk)
-         join accounts b 
-         on (z.acc = b.acc)
-         join oper p
-         on (o.ref = p.ref)
-        WHERE o.FDAT BETWEEN Datnp_ and dat_
-              and p.sos = 5
-              AND a.nbs IN (SELECT R020
-                              FROM KL_F3_29
-                             WHERE KF = '1A'))
-   where not (nlsd like '___8%' and 
-              nlsk not like '___8%' and 
-              substr(nlsd,1,3) = substr(nlsk,1,3));    
+   insert /*+ APPEND*/ 
+     into TMP_FILE03
+        ( ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP )
+   select ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP
+     from ( SELECT /*+ leading(a) */
+                   (case when o.dk = 0 then o.acc else z.acc end) ACCD,
+                   o.TT,
+                   o.REF,
+                   p.KV,
+                   (case when o.dk = 0 then a.nls  else b.nls  end) NLSD,
+                   o.S,
+                   o.SQ,
+                   o.FDAT,
+                   p.nazn,
+                   (case when o.dk = 1 then o.acc  else z.acc  end) ACCK,
+                   (case when o.dk = 1 then a.nls  else b.nls  end) NLSK,
+                   p.userid ISP
+              FROM opldok o
+              join accounts a
+                on ( o.acc = a.acc )
+              join opldok z
+                on ( o.REF = z.ref and o.stmt = z.stmt and o.dk <> z.dk )
+              join accounts b 
+                on ( z.acc = b.acc )
+              join oper p
+                on ( o.ref = p.ref )
+             WHERE o.FDAT BETWEEN Datnp_ and dat_
+               and p.sos = 5
+               AND a.nbs IN ( SELECT R020
+                                FROM KL_F3_29
+                              WHERE KF = '1A' ) )
+    where not ( nlsd like '___8%' and 
+                nlsk not like '___8%' and 
+                substr(nlsd,1,3) = substr(nlsk,1,3)
+              );
     
     -------------------------------------------------------------------
     --- остатки
@@ -603,43 +597,40 @@ BEGIN
        end if;
 
     END LOOP;
+
     CLOSE SALDO;
-    ---------------------------------------------------------------------------
-    -----------------------------------------------------------------------------
-    DELETE FROM tmp_nbu where kodf=kodf_ and datf= dat_;
-    ---------------------------------------------------
 
-    mm1_ := to_number(to_char(dat_,'MM'));
-    w1_ := f_chr36(mm1_);
-    god1_ := to_char(Dat_,'YYYY');
-    -- прогноз только на текущий и последующий годы
-    if dat_ > to_date('31032014','ddmmyyyy')
-    then
-       delete from rnbu_trace
-       where substr(kodp,1,2) = '31'
-         and ( substr(kodp,10,5) <= god1_ || w1_ OR
-               substr(kodp,10,4) > to_char( to_number(god1_) + 1)
-             );
-    end if;
+  -----------------------------------------------------------------------------
+  DELETE FROM tmp_nbu where kodf = kodf_ and datf = dat_;
+  ---------------------------------------------------
 
+  mm1_  := to_number(to_char(dat_,'MM'));
+  w1_   := f_chr36(mm1_);
+  god1_ := to_char(Dat_,'YYYY');
 
-    INSERT INTO tmp_nbu(kodf, datf, kodp, znap, nbuc)
-    SELECT kodf_, Dat_, kodp, SUM(znap), nbuc
+  -- прогноз только на текущий и последующий годы
+  if dat_ > to_date('31032014','ddmmyyyy')
+  then
+     delete from rnbu_trace
+     where substr(kodp,1,2) = '31'
+       and ( substr(kodp,10,5) <= god1_ || w1_ OR
+             substr(kodp,10,4) > to_char( to_number(god1_) + 1)
+           );
+  end if;
+
+  INSERT INTO tmp_nbu(kodf, datf, kodp, znap, nbuc)
+  SELECT kodf_, Dat_, kodp, SUM(znap), nbuc
     FROM rnbu_trace
-    WHERE znap <> 0
-    GROUP BY kodf_, Dat_, kodp, nbuc;
-    ----------------------------------------
-    logger.info ('P_F1A_NN: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));
+   WHERE znap <> 0
+   GROUP BY kodf_, Dat_, kodp, nbuc;
+  ----------------------------------------
+  logger.info ('P_F1A_NN: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));
+
 END p_f1a_nn;
 /
+
 show err;
 
-PROMPT *** Create  grants  P_F1A_NN ***
-grant EXECUTE                                                                on P_F1A_NN        to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on P_F1A_NN        to RPBN002;
 
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_F1A_NN.sql =========*** End *** 
-PROMPT ===================================================================================== 
+grant EXECUTE on P_F1A_NN to BARS_ACCESS_DEFROLE;
+grant EXECUTE on P_F1A_NN to RPBN002;
