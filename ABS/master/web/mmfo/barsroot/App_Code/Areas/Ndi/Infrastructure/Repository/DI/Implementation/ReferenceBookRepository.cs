@@ -29,6 +29,10 @@ using MvcContrib.EnumerableExtensions;
 using WebGrease.Css.Extensions;
 using Bars.Oracle;
 using BarsWeb.Areas.Ndi.Models.DbModels;
+using BarsWeb.Areas.Ndi.Infrastructure.Repository.Helpers;
+using BarsWeb.Areas.Ndi.Infrastructure.Helpers;
+using BarsWeb.Areas.Ndi.Infrastructure.Constants;
+using BarsWeb.Areas.Ndi.Infrastructure.Helpers.ViewModels;
 
 namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
 {
@@ -516,8 +520,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                     return "немає назви процедури";
                 procText = SqlStatementParamsParser.ReplaceCenturaNullConstants(procText);
                 //callFunctionCmd.CommandText = procText;
-
-                foreach (var par in funcParams.Where(x => x.Type != "CLOB"))
+                string logAddParamsMessage = "add parameters in: " + procText + " ";
+                foreach (var par in funcParams.Where(x => x.Type != "CLOB" && x.Type != "BLOB"))
                 {
                     if (procText.Contains(":" + par.Name))
                     {
@@ -527,12 +531,14 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                         var paramValue = par.Value == null
                             ? null
                             : Convert.ChangeType(par.Value, SqlStatementParamsParser.GetCsTypeCode(par.Type));
-                        Logger.Info("add parameter in: " + procText + "parameter name:  " + paramName + "Value:  " + paramValue);
+                        logAddParamsMessage += "parameter name:  " + paramName + "Value:  " + paramValue;
+                       
                         var param = new OracleParameter(paramName, paramValue);
                         callFunctionCmd.Parameters.Add(param);
                         callFunctionCmd.BindByName = true;
                     }
                 }
+                Logger.Info(logAddParamsMessage);
                 List<ParamMetaInfo> outParameters = null;
                 ParamMetaInfo outMessageParam = null;
                 string funcOutMessage = string.Empty;
@@ -574,7 +580,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                         funcOutMessage = Convert.ToString(res) == "null" ? "" : Convert.ToString(res);
                         successMessage += "</br>" + funcOutMessage;
                     }
-                    catch (Exception e) { throw new Exception(e.Message); }
+                    catch (Exception e) { throw e; }
                 }
 
                 return successMessage;
@@ -698,6 +704,10 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
             OracleConnection connection = OraConnector.Handler.UserConnection;
             CallFunctionMetaInfo callFunction = null;
             OracleClob clob = null;
+            Encoding windows = Encoding.GetEncoding("windows-1251");
+            Encoding unicode = Encoding.Unicode;
+            byte[] unicodeBytes;
+            byte[] asciiBytes;
             try
             {
                 //List<FieldProperties> sqlSelectRowParams = string.IsNullOrEmpty(stringJsonSqlProcParams) || stringJsonSqlProcParams == "undefined" ? new List<FieldProperties>() : JsonConvert.DeserializeObject<List<FieldProperties>>(stringJsonSqlProcParams) as List<FieldProperties>;
@@ -750,7 +760,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 if (callFunction != null && !string.IsNullOrEmpty(callFunction.OutParams))
                 {
                     outParameters = SqlStatementParamsParser.GetSqlFuncCallParamsDescription<OutParamsInfo>(callFunction.PROC_NAME, callFunction.OutParams).Where(x => x.ColType != null).ToList();
-                    OutParamsInfo param = outParameters.FirstOrDefault(x => x.ColType.ToUpper() == "CLOB");
+                    OutParamsInfo param = outParameters.FirstOrDefault(x => x.ColType.ToUpper() == "CLOB" || x.ColType.ToUpper() == "BLOB");
                     if (param == null)
                         return null;
                     clobParamName = param.ColName;
@@ -769,7 +779,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                     }
                 }
 
-
+                callFunctionCmd.BindByName = true;
                 //вызвать процедуру
                 callFunctionCmd.CommandText = string.Format(
                     "begin " +
@@ -793,7 +803,11 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 if (clob != null)
                 {
                     string clobRes = clob.IsNull ? string.Empty : clob.Value;
-                    result = new GetFileResult() { FileBody = clobRes, FileName = !string.IsNullOrEmpty(name) ? name : "file.txt", Result = "ok" };
+                    unicodeBytes = unicode.GetBytes(clobRes.ToString());
+                    asciiBytes = Encoding.Convert(unicode, windows, unicodeBytes);
+                   
+                   
+                    result = new GetFileResult() { FileBytesBody = asciiBytes, FileName = !string.IsNullOrEmpty(name) ? name : "file.txt", Result = "ok" };
 
                 }
 
@@ -1370,7 +1384,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 List<CallFunctionMetaInfo> callFunctions = new List<CallFunctionMetaInfo>();
                 List<CallFunctionMetaInfo> onlineFunctions = new List<CallFunctionMetaInfo>();
 
-                SaveInPageParams saveInPageParams = new SaveInPageParams();
+                BarsWeb.Areas.Ndi.Models.Params.SaveInPageParams saveInPageParams = new BarsWeb.Areas.Ndi.Models.Params.SaveInPageParams();
 
                 string defInsertString = FormatConverter.ConvertFromUrlBase64UTF8(data.Base64InsertDefParamsString);
                 List<FieldProperties> defInsertParams = string.IsNullOrEmpty(defInsertString) ? new List<FieldProperties>() : JsonConvert.DeserializeObject<List<FieldProperties>>(defInsertString) as List<FieldProperties>;
@@ -1769,7 +1783,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 isFuncOnly = true;
                 function = new FunNSIEditFParams(searchparamValue).BuildToCallFunctionMetaInfo(function);
                 function.TABID = nativeTabelId;
-                function.PROC_EXEC = "ON_ROW_CLICK";
+                function.PROC_EXEC = "SELECTED_ONE";
                 function.ColumnId = Convert.ToInt32(sParColumn);
             }
             res = UrlTamplates.MainUrlTemplate + "?" + "sParColumn" + "=" + sParColumn + "&" + "nativeTabelId" + "=" + nativeTabelId;
@@ -2119,7 +2133,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
         /// <param name="tableId"></param>
         /// <param name="funcid">Код процедуры</param>
         /// <returns></returns>
-        private CallFunctionMetaInfo GetCallFunction(int tableId, int funcid)
+        public CallFunctionMetaInfo GetCallFunction(int tableId, int funcid)
         {
             try
             {
@@ -2321,10 +2335,19 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
         }
 
 
-        public CallFunctionMetaInfo GetFunctionsMetaInfo(int? codeOper)
+        public CallFunctionMetaInfo GetFunctionsMetaInfo(int? codeOper, string code = "")
         {
             CallFunctionMetaInfo funcInfo = null;
-            string funNsiEditFParamsString = GetFunNSIEditFParamsString(null, codeOper, null, null, null);
+            string funNsiEditFParamsString = string.Empty;
+            if (!string.IsNullOrEmpty(code))
+            {
+                MetaCallSettings settings = GetMetaCallSettingsByCode(code);
+                if (settings == null)
+                    throw new Exception(string.Format("в таблиці meta_call_settings відсутній запис з ідентифікатором   {0}", code));
+                funNsiEditFParamsString = settings.WEB_FORM_NAME;
+            }
+            else
+                funNsiEditFParamsString = GetFunNSIEditFParamsString(null, codeOper, null, null, null);
             if (!string.IsNullOrEmpty(funNsiEditFParamsString))
             {
                 FunNSIEditFParams par = new FunNSIEditFParams(funNsiEditFParamsString);
@@ -2439,8 +2462,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
 
             }
 
-            string sfds = GetFilterDbInfo.UpdateFilter(editFilterModel);
-            return sfds;
+            string filterDbInfo = GetFilterDbInfo.UpdateFilter(editFilterModel);
+            return filterDbInfo;
         }
 
         public string InsertFilters(List<CreateFilterModel> filterModels)
@@ -2448,27 +2471,29 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
             return null;
         }
 
-        public string GetFilterStructure(int dynFilterId)
-        {
-            OracleCommand sqlfilterCommand = this.GetOracleConnector.GetCommandOrCreate;
-            string getFilterStructureString = string.Format("SELECT condition_list from dyn_filter WHERE  filter_id = {0} ", dynFilterId);
-            sqlfilterCommand.CommandText = getFilterStructureString;
-            //String OutXmlData = String.Empty;
-            //OracleDataReader rdr = sqlfilterCommand.ExecuteReader();
-            //while (rdr.Read())
-            //{
-            //    OutXmlData += rdr["condition_list"] as string; 
-            //}
-            //rdr.Close();
-            object filterStructure = _entities.ExecuteStoreQuery<OracleClob>(getFilterStructureString).FirstOrDefault();
-            Oracle.DataAccess.Types.OracleClob clob = filterStructure as Oracle.DataAccess.Types.OracleClob;
-            string structureString = string.Empty;
-            if (clob != null)
-            {
-                structureString = clob.Value;
-            }
-            return structureString;
-        }
+        //public string GetFilterStructure(int dynFilterId)
+        //{
+        //    OracleCommand sqlfilterCommand = this.GetOracleConnector.GetCommandOrCreate;
+        //    string getFilterStructureString = string.Format("SELECT condition_list from dyn_filter WHERE  filter_id = {0} ", dynFilterId);
+        //    sqlfilterCommand.CommandText = getFilterStructureString;
+        //    //String OutXmlData = String.Empty;
+        //    //OracleDataReader rdr = sqlfilterCommand.ExecuteReader();
+        //    //while (rdr.Read())
+        //    //{
+        //    //    OutXmlData += rdr["condition_list"] as string; 
+        //    //}
+        //    //rdr.Close();
+        //    object filterStructure = _entities.ExecuteStoreQuery<OracleClob>(getFilterStructureString).FirstOrDefault();
+        //    Oracle.DataAccess.Types.OracleClob clob = filterStructure as Oracle.DataAccess.Types.OracleClob;
+        //    string structureString = string.Empty;
+        //    if (clob != null)
+        //    {
+        //        structureString = clob.Value;
+        //        clob.Close();
+        //        clob.Dispose();
+        //    }
+        //    return structureString;
+        //}
 
 
         //public DataSet ArchiveGrid(string kodf)

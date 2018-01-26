@@ -11,7 +11,7 @@
              return Base64;
          },
          buildSaveInPageParamsByAddUse: function (additionalUseNames,saveInPageParams,param){
-            debugger;
+            
              thisUtils = this;
             if(!additionalUseNames  ||  !additionalUseNames.length || !saveInPageParams)
                 return;
@@ -110,7 +110,7 @@
                 formField.mouseWheelEnabled = false;
             }
 
-    if (colMetaInfo.COLTYPE == 'CLOB') {
+            if (colMetaInfo.COLTYPE == 'CLOB' || colMetaInfo.COLTYPE == 'BLOB') {
                 {
                     formField.xtype = 'filefield';
                     //formField.name = 'document';
@@ -144,7 +144,7 @@
         },
 
         formatDataValue: function (value,type,format) {
-             debugger;
+             
             thisUtils = this;
             if (type == "D") {
                 var dateFormat = thisUtils.defaults.dateFormat;

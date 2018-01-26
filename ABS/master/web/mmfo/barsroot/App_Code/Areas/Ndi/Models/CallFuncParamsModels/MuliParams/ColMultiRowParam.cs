@@ -6,14 +6,16 @@ using BarsWeb.Areas.Ndi.Models;
 /// <summary>
 /// Summary description for ColMultiRowParam
 /// </summary>
-
-public class ColMultiRowParam : ParamMetaInfo
+namespace BarsWeb.Areas.Ndi.Models
 {
-    public ColMultiRowParam()
+    public class ColMultiRowParam : ParamMetaInfo
     {
-        this.Kind = "ColMultiRowParam";
-        this.IsInput = false;
+        public ColMultiRowParam()
+        {
+            this.Kind = "ColMultiRowParam";
+            this.IsInput = false;
+        }
+
+
     }
-
-
 }

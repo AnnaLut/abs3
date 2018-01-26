@@ -18,6 +18,7 @@ namespace BarsWeb.Areas.Ndi.Models
         /// </summary>
         public string Value { get; set; }
 
+        public byte[] ByteBody { get; set; }
         /// <summary>
         /// Значение знака сопоставления <= / = / => / < / >
         /// </summary>

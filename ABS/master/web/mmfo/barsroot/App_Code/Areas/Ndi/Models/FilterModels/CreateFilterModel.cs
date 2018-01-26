@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using BarsWeb.Areas.Ndi.Infrastructure.Repository.Helpers;
+using System.Collections.Generic;
 
 namespace BarsWeb.Areas.Ndi.Models.FilterModels
 {

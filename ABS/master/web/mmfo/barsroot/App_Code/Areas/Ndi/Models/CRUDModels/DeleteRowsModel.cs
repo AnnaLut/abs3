@@ -6,14 +6,17 @@ using System.Web;
 /// <summary>
 /// Summary description for DeleteRowsModel
 /// </summary>
-public class DeleteRowsModel
+namespace BarsWeb.Areas.Ndi.Models
 {
-	public DeleteRowsModel()
-	{
-		//
-		// TODO: Add constructor logic here
-		//
-	}
+    public class DeleteRowsModel
+    {
+        public DeleteRowsModel()
+        {
+            //
+            // TODO: Add constructor logic here
+            //
+        }
 
-    public List<DeleteRowModel> RowsArray { get; set; } 
+        public List<DeleteRowModel> RowsArray { get; set; }
+    }
 }

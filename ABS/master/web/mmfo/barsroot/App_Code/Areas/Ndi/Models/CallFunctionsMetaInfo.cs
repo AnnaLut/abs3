@@ -49,7 +49,7 @@ namespace BarsWeb.Areas.Ndi.Models
         public bool HasFileResult { get; set; }
         public string LinkWebFormName { get; set; }
         public bool OpenInWindow { get; set; }
-
+        public string Base64ProcParams { get; set; }
         public ThrowParams ThrowNsiParams { get; set; }
         public List<string> InputParamsNames { get; set; }
 
