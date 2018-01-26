@@ -40,3 +40,11 @@ end;
 COMMENT ON COLUMN BARS.OTC_FF8_HISTORY_ACC.R011 IS 'Параметр R011';
 COMMENT ON COLUMN BARS.OTC_FF8_HISTORY_ACC.S245 IS 'Параметр S245';
 
+
+begin
+    execute immediate 'ALTER TABLE BARS.otcn_ff8_migr_nd ADD VID NUMBER';
+exception
+    when others then null;
+end;
+/    
+

@@ -11,8 +11,8 @@ PROMPT *** ALTER_POLICY_INFO to OTC_FF8_HISTORY_ACC ***
 BEGIN 
         execute immediate  
           'begin  
-               bpa.alter_policy_info(''OTC_FF8_HISTORY_ACC'', ''FILIAL'' , ''F'', ''F'', ''F'', null);
-               bpa.alter_policy_info(''OTC_FF8_HISTORY_ACC'', ''WHOLE'' , ''C'', ''C'', ''C'', null);
+               bpa.alter_policy_info(''OTC_FF8_HISTORY_ACC'', ''FILIAL'' , null, null, null, null);
+               bpa.alter_policy_info(''OTC_FF8_HISTORY_ACC'', ''WHOLE'' , null, null, null, null);
                null;
            end; 
           '; 
