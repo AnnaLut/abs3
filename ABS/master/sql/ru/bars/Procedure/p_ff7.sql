@@ -3,10 +3,13 @@ CREATE OR REPLACE PROCEDURE BARS.p_ff7 (Dat_ DATE, p_sheme_ varchar2 default 'G'
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования файла #F7 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION      :12/09/2017 (12/07/2017)
+%
+% VERSION      :  v.18.001     23.01.2018    (12/09/2017)
 %%%%%%%%%%%%%%%%/%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+23.01.2018 новый сегмент в показателе для #F8
+               -расширена рабочая таблица otc_ff7_history_acc
 10/03/2017 для карточных счетов овердрафтов 2605 наполняем табл.
            OTCN_F71_TEMP из W4_ACC (не включались 2605 в файл)
 01/02/2017 не удаляем счета овердрафтов которые пассивные и которые есть
@@ -117,7 +120,7 @@ Dos96zg_ DECIMAL(24);
 Kos96zg_ DECIMAL(24);
 Dos99zg_ DECIMAL(24);
 Kos99zg_ DECIMAL(24);
-kodp_    Varchar2(14);
+kodp_    Varchar2(16);
 znap_    Varchar2(30);
 cc_      Varchar(3);
 userid_  Number;
@@ -221,14 +224,14 @@ delete from otc_ff7_history_acc where datf=dat_ ;
 --для ГОУ Сбербанка выбираются ВСЕ СЧЕТА
 insert into otc_ff7_history_acc(DATF, ACC, ACCC, NBS, SGN, NLS, KV, NMS, DAOS, DAZS, OST,
        OSTQ, DOSQ, KOSQ, ND, NKD, SDATE, WDATE, SOS, RNK, STAFF, TOBO, s260, k110, s031
-       ,tip, ostq_kd, r_dos, cc_id)
+       ,tip, ostq_kd, r011, r_dos, cc_id, s245)
 select distinct 
        dat_, tt.ACC, tt.ACCC, tt.NBS, tt.SGN, tt.NLS, tt.KV, tt.NMS, tt.DAOS, tt.DAZS, tt.OST,
        tt.OSTQ, tt.DOSQ, tt.KOSQ, tt.ND, tt.NKD, tt.SDATE, tt.WDATE, tt.SOS, tt.RNK, tt.u_id, tt.TOBO, tt.s260, tt.ved, tt.s031
-       ,tt.tip, tt.ostq_kd,
+       ,tt.tip, tt.ostq_kd, tt.r011,
       --Для оверов r.ost, для остальных - r.dos
        nvl(rr.r_dos, 0) --суммы выдачи
-       ,tt.cc_id
+       ,tt.cc_id, '1'
 from (
 select /*+ leading(s) hash(s) full(o) */
        s.acc, o.isp accc, substr(o.nls,1,4) nbs, decode(sign(s.ost-s.dos96+s.kos96),-1,'1',1,'2','0') sgn,
@@ -240,7 +243,7 @@ select /*+ leading(s) hash(s) full(o) */
        null nkd, -- якщо немає ND, то підставляємо ACC
        c.sdate, c.wdate, c.sos, s.rnk, user_id u_id, o.tobo,
        f_get_s260(c.nd, s.acc, p.s260, s.rnk, o.nbs,default_) s260,
-       z.ved, p.s031, nvl(c.tip, o.tip) tip,
+       z.ved, p.s031, nvl(c.tip, o.tip) tip, nvl(trim(p.r011), '0') r011,
        --в сумму по договору включаем остатки с учетом знака по таблице kl_f3_29
        --например для 2625 только активные остатки
        sum(decode(decode(sign(decode(o.kv, 980, s.ost-s.dos96+s.kos96, s.ostq-s.dosq96+s.kosq96)),-1,'1','2'),n.r012,
@@ -269,7 +272,7 @@ from OTCN_SALDO s, OTCN_ACC o,
    ) c,
       specparam p, customer z, kl_f3_29 n
 where s.acc = o.acc and
-     not (substr(o.nls,1,4) in ('1508','1509') and nvl(trim(p.r011),1) = '1') and
+     not (substr(o.nls,1,4) in ('1508') and nvl(trim(p.r011),'1') !='6') and
      s.acc=c.acc(+) and
      s.acc=p.acc(+) and
      s.rnk=z.rnk and
@@ -337,11 +340,11 @@ where vv.acc_pk = a.acc
 -- овердрафты
 insert into otc_ff7_history_acc(DATF, ACC, ACCC, NBS, SGN, NLS, KV, NMS, DAOS, DAZS, OST,
        OSTQ, DOSQ, KOSQ, ND, NKD, SDATE, WDATE, SOS, RNK, STAFF, TOBO, s260, k110, s031
-       ,tip, ostq_kd, r_dos,cc_id)
+       ,tip, ostq_kd, r_dos, cc_id, r011)
 select *
 from (
 with sel_over as (select value acc, sdate, sos, wdate, nd, lim, lim_hist, deldate, ndoc
-from (   
+                    from (   
    select v.acco, v.acc_9129, v.acc_2067,v.acc_2069, datd sdate, v.sos, datd2 wdate  , v.nd,
                                          decode(a.nbs,'8021',a.lim,0) lim --У Демарка лимит овердрафта живет в поле accounts.lim
                                           ,  null lim_hist, to_date('01014999','ddmmyyyy') deldate, v.NDOC
@@ -398,7 +401,7 @@ select dat_ fdat,
        -- для остальных договоров = 0
        decode(nvl('-'||to_char(max_nd), tt.nd), tt.nd, tt.ostq_kd , 0) ostq_kd
        , sum( nvl(decode(instr('1600,2600,2605,2620,2625,2650,2655,8025,',tt.nbs||','), 0 ,r.dos, decode(r.dos+r.kos, 0, r.ost, 0)),0))  r_dos
-       ,tt.ndoc
+       ,tt.ndoc, tt.r011
 from (
 select t.*,
        sum(decode(decode(sign(t.ostq),-1,'1','2'), r012, abs(t.ostq), 0))
@@ -420,7 +423,7 @@ select  /*+ leading(c) full(o) */
        f_get_s260(null, s.acc, p.s260, s.rnk, o.nbs,default_) s260,
        z.ved, p.s031
        ,'OVR' tip
-       ,c.deldate, n.r012, c.ndoc
+       ,c.deldate, n.r012, c.ndoc, nvl(trim(p.r011), '0') r011
 from sel_over c, OTCN_SALDO s, OTCN_ACC o, 
       specparam p, customer z,
        kl_f3_29 n
@@ -442,7 +445,7 @@ group by   t.acc, t.accc,t.nbs, t.sgn,
        t.nls, t.kv, t.nms, t.daos, t.dazs,
        t.ost,t.ostq, t.dosq, t.kosq,t.nd, t.nkd,
        t.sdate, t.wdate, t.sos, t.rnk, t.tobo,
-       t.s260, t.ved, t.s031 ,t.tip,  t.u_id ,hi.ostq ,t.deldate, t.r012, t.ndoc,max_nd
+       t.s260, t.ved, t.s031 ,t.tip,  t.u_id ,hi.ostq ,t.deldate, t.r012, t.ndoc, t.r011, max_nd
 ) tt
 left join  (select '-'||ttt.nd nd, rr.acc, sum(rr.dos) dos, sum(rr.kos) kos, sum(rr.ost) ost
             from rnbu_history rr, sel_over ttt 
@@ -457,20 +460,21 @@ group by   tt.acc, tt.accc,tt.nbs, tt.sgn,
        tt.nls, tt.kv, tt.nms, tt.daos, tt.dazs,
        tt.ost,tt.ostq, tt.dosq, tt.kosq,tt.nd, tt.nkd,
        tt.sdate, tt.wdate, tt.sos, tt.rnk, tt.tobo,
-       tt.s260, tt.ved, tt.s031 ,tt.tip, tt.ostq_kd , tt.u_id ,tt.h_ostq ,tt.deldate, tt.ndoc, max_nd)
+       tt.s260, tt.ved, tt.s031 ,tt.tip, tt.ostq_kd,
+       tt.u_id ,tt.h_ostq ,tt.deldate, tt.ndoc, tt.r011, max_nd)
 ;
 --для правильної кількості договорів (показник 20)
 insert into otc_ff7_history_acc(
        DATF, ACC, ACCC, NBS,
        SGN, NLS, KV, NMS, DAOS, DAZS, OST, OSTQ, ND, NKD,
        SDATE, WDATE, SOS, RNK, STAFF, TOBO, s260, k110, s031, 
-       OSTQ_KD, R_DOS, TPA, S080, tip)
+       OSTQ_KD, R_DOS, TPA, S080, tip, r011)
 select dat_, o.acc, o.accc, substr(o.nls,1,4),
        '0',  o.nls, o.kv, o.nms, o.daos, o.dazs, 0 ost,0 ostq,
        nvl(c.nd, -o.acc) nd, (case when c.nd is null then trim(p.nkd) else null end), -- якщо немає ND, то підставляємо ACC
        c.sdate, c.wdate, c.sos, o.rnk, userid_, o.tobo,
        f_get_s260(c.nd, o.acc, p.s260, o.rnk, o.nbs, default_) s260,
-       z.ved, p.s031, 0, 0, k.tpa, nvl(p.s080,0), o.tip
+       z.ved, p.s031, 0, 0, k.tpa, nvl(p.s080,0), o.tip, nvl(trim(p.r011), '0')
 from   OTCN_ACC          o,
        (select a.acc, a.nd, b.sdate, b.wdate, b.sos
         from   (select n.acc, max(n.nd) nd
@@ -981,6 +985,24 @@ end loop;
 
 logger.info ('P_FF7: etap 15 for datf = '||to_char(dat_, 'dd/mm/yyyy'));                         
 
+update otc_ff7_history_acc o
+   set cc ='33'
+   where datf=dat_
+     and nbs in ('2246','2248','2456','2457','2458')
+     and r011 in ('3');
+
+update otc_ff7_history_acc o
+   set cc ='32'
+   where datf=dat_
+     and nbs in ('2246','2248','2456','2457','2458')
+     and r011 in ('2');
+
+update otc_ff7_history_acc o
+   set cc ='31'
+   where datf=dat_
+     and nbs in ('2246','2248','2456','2457','2458')
+     and r011 in ('1');
+
 -- изменение S080 на новые значения "A" или "M" в соответствии с KL_S080
 if dat_ >= to_date('31012017','ddmmyyyy') then
     update otc_ff7_history_acc o
@@ -1007,6 +1029,9 @@ where o.s260='00'
   and o.cc in ('31', '35')
   and o.datf = dat_;
 
+update otc_ff7_history_acc
+   set s245 ='2'
+ where tip in ('SK9','SP ','SPN','OFR','KSP','KK9','KPN','SNA');
 
 logger.info ('P_FF7: etap 14 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 
@@ -1076,7 +1101,16 @@ if isf8_=0 then -- формирование только наполнения otc_ff7_history_acc
     -- блок для формирования показателя 18 для списания сумм по безнадежным кредитам за счет резерва
     for k in (select acck, nlsk, kv, NVL(sum(gl.p_icurval(o.kv, o.s*100, dat_ /*o.fdat*/)), 0) kos
               from provodki_otc o, kl_f3_29 k   --specparam s
-              where (o.nlsd like '1590%' OR o.nlsd like '2400%')
+              where ( (o.nlsd like '1590%' or 
+                               o.nlsd like '15_9%' and 
+                              o.fdat > to_date('20171218','yyyymmdd') )
+                  OR  (o.nlsd like '2400%' or
+                                (   o.nlsd like '20_9%'
+                                 or o.nlsd like '21_9%'
+                                 or o.nlsd like '22_9%'
+                                 or o.nlsd like '26_9%' ) and
+                              o.fdat > to_date('20171218','yyyymmdd') )
+                    )
                 and o.nlsk like k.r020 || '%'
                 and k.kf='F7'
                 and ((o.fdat between datb_ and Dat_
@@ -1094,7 +1128,7 @@ if isf8_=0 then -- формирование только наполнения otc_ff7_history_acc
           INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nd, rnk, comm, nbuc, userid, isp)
           select f.nls, nvl(f.kv_dog, f.kv), dat_, '18' || NVL(f.cc,'00') || NVL(f.k111,'00') ||
                           NVL(f.s260,'00') || NVL(f.s032,'0') ||
-                          lpad(nvl(f.kv_dog, f.kv),3,'0'),
+                          lpad(nvl(f.kv_dog, f.kv),3,'0')||s245,
                          to_char(0-k.kos),  -- погашение
                          (case substr(f.nd,1,1) when '№' then null when '-' then null else f.nd end),
                           f.rnk,
@@ -1115,7 +1149,7 @@ if isf8_=0 then -- формирование только наполнения otc_ff7_history_acc
     select *
     from (
         with kred as (select min(nls) nls, nvl(kv_dog, kv) kv, dat_ dt, cc||k111 k1,
-                             max(f.s260) k2, max(s032) k3, lpad(nvl(kv_dog, kv),3,'0') k4,
+                             max(f.s260) k2, max(s032) k3, lpad(nvl(kv_dog, kv),3,'0') k4, s245,
                              max((case substr(nd,1,1) when '№' then null when '-' then null else nd end)) nd, rnk,
                              nvl(nkd, nd) comm,
                              decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_) ) nbuc,
@@ -1139,14 +1173,14 @@ if isf8_=0 then -- формирование только наполнения otc_ff7_history_acc
                                             f1.ostq_kd = 0 and f1.r_dos <> 0
                                             )
                               )
-                        group by nvl(kv_dog, kv), cc,k111, lpad(nvl(kv_dog, kv),3,'0'), nvl(nkd,nd), rnk,
+                        group by nvl(kv_dog, kv), cc,k111, lpad(nvl(kv_dog, kv),3,'0'), s245, nvl(nkd,nd), rnk,
                                  decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_))
                         order by 1)
-        select nls, kv, dt, '07'||k1||k2||k3||k4 kodp, cnt  znap, nd, rnk, comm, nbuc, userid_, isp
+        select nls, kv, dt, '07'||k1||k2||k3||k4||s245 kodp, cnt  znap, nd, rnk, comm, nbuc, userid_, isp
         from kred
         where nvl(ost,0) <> 0
         union all
-        select nls, kv, dt, '12'||k1||k2||k3||k4 kodp, abs(ost) znap, nd, rnk, comm, nbuc, userid_,isp
+        select nls, kv, dt, '12'||k1||k2||k3||k4||s245 kodp, abs(ost) znap, nd, rnk, comm, nbuc, userid_,isp
         from kred
         where nvl(ost,0) <> 0);
 
@@ -1156,7 +1190,7 @@ if isf8_=0 then -- формирование только наполнения otc_ff7_history_acc
     from (
         with kred as (select min(nls) nls, nvl(kv_dog, kv) kv, dat_ dt, cc||k111 k1,
                              max(f.s260) k2 ,
-                             max(s032) k3, lpad(nvl(kv_dog, kv),3,'0') k4,
+                             max(s032) k3, lpad(nvl(kv_dog, kv),3,'0') k4, s245,
                              max((case substr(nd,1,1) when '№' then null when '-' then null else nd end)) nd, rnk,
                              nvl(nkd,nd) comm,
                              decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_) ) nbuc,
@@ -1182,13 +1216,13 @@ if isf8_=0 then -- формирование только наполнения otc_ff7_history_acc
                                         from rnbu_trace
                                         where to_char(nd) = f.nd and
                                               kodp like '07%'))
-                        group by nvl(kv_dog, kv), cc,k111, lpad(nvl(kv_dog, kv),3,'0'), tobo, nvl(nkd,nd), rnk,
+                        group by nvl(kv_dog, kv), cc,k111, lpad(nvl(kv_dog, kv),3,'0'), s245, tobo, nvl(nkd,nd), rnk,
                                  decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_))
                       )
-        select nls, kv, dt, '08'||k1||k2||k3||k4 kodp, cnt  znap, nd, rnk, comm, nbuc, userid_,isp
+        select nls, kv, dt, '08'||k1||k2||k3||k4||s245 kodp, cnt  znap, nd, rnk, comm, nbuc, userid_,isp
         from kred
         union all
-        select nls, kv, dt, '14'||k1||k2||k3||k4 kodp,
+        select nls, kv, dt, '14'||k1||k2||k3||k4||s245 kodp,
                --decode(qnt,0, kos,1,kos, greatest(0, kos-kos1)) znap,--Для столицы : погашение = сумма кредитовых - сумма дебетовых по всем счетам SS
                --если нет счета SS берется кредитовый оборот по счету
                --ести счета SS один, то береться Кт и Дт обороты с учетом переноса на просрочку (по счетам SS SP)
@@ -1204,7 +1238,7 @@ if isf8_=0 then -- формирование только наполнения otc_ff7_history_acc
     select *
     from (
         with kred as (select min(nls) nls, nvl(kv_dog, kv) kv, dat_ dt,
-                             cc||k111||max(f.s260)||max(s032)||lpad(nvl(kv_dog, kv),3,'0') kodp,
+                             cc||k111||max(f.s260)||max(s032)||lpad(nvl(kv_dog, kv),3,'0')||s245 kodp,
                             max((case substr(nd,1,1) when '№' then null when '-' then null else nd end)) nd, rnk,
                             nvl(nkd,nd) comm,
                             decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_) ) nbuc,
@@ -1230,7 +1264,7 @@ if isf8_=0 then -- формирование только наполнения otc_ff7_history_acc
                                   )
                                 )
                             and f.tpa in (1, 3, 4)
-                      group by nvl(kv_dog, kv), cc,k111,lpad(nvl(kv_dog, kv),3,'0'), nvl(nkd,nd), rnk,
+                      group by nvl(kv_dog, kv), cc,k111,lpad(nvl(kv_dog, kv),3,'0'), s245, nvl(nkd,nd), rnk,
                                decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_))
                       )
         select nls, kv, dt, '03'||kodp, cnt  znap, nd, rnk, comm, nbuc, userid_,isp
@@ -1245,7 +1279,7 @@ if isf8_=0 then -- формирование только наполнения otc_ff7_history_acc
     select *
     from (
         with kred as (select min(nls) nls, nvl(kv_dog, kv) kv, dat_ dt,
-                             cc||k111||max(f.s260)||max(s032)||lpad(nvl(kv_dog, kv),3,'0') kodp,
+                             cc||k111||max(f.s260)||max(s032)||lpad(nvl(kv_dog, kv),3,'0')||s245 kodp,
                             max((case substr(nd,1,1) when '№' then null when '-' then null else nd end)) nd, rnk,
                             nvl(nkd,nd) comm,
                             decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_) ) nbuc,
@@ -1255,7 +1289,7 @@ if isf8_=0 then -- формирование только наполнения otc_ff7_history_acc
                       from OTC_FF7_HISTORY_ACC f
                       where f.datf=dat_
                              and f.tpa = 1
-                      group by nvl(kv_dog, kv), cc,k111,lpad(nvl(kv_dog, kv),3,'0'), nvl(nkd,nd),
+                      group by nvl(kv_dog, kv), cc,k111,lpad(nvl(kv_dog, kv),3,'0'), s245, nvl(nkd,nd),
                                nbs, rnk,
                                decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_))
                       )
@@ -1301,7 +1335,7 @@ if isf8_=0 then -- формирование только наполнения otc_ff7_history_acc
         select *
         from (
         with kred as (select min(nls) nls, nvl(kv_dog, kv) kv, dat_ dt, cc||k111 k1,
-                             max(f.s260) k2, max(s032) k3, lpad(nvl(kv_dog, kv),3,'0') k4,
+                             max(f.s260) k2, max(s032) k3, lpad(nvl(kv_dog, kv),3,'0') k4, s245,
                              max((case substr(nd,1,1) when '№' then null when '-' then null else nd end)) nd, rnk,
                              nvl(nkd,nd) comm,
                              decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_) ) nbuc,
@@ -1317,10 +1351,10 @@ if isf8_=0 then -- формирование только наполнения otc_ff7_history_acc
                                          OR (f1.nbs in ('2202','2203') and f1.ostq_kd = 0 ) )
 
                           )
-                        group by nvl(kv_dog, kv), cc,k111, lpad(nvl(kv_dog, kv),3,'0'), nvl(nkd,nd), rnk,
+                        group by nvl(kv_dog, kv), cc,k111, lpad(nvl(kv_dog, kv),3,'0'), s245, nvl(nkd,nd), rnk,
                                  decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_))
                         order by 1)
-        select nls, kv, dt, '12'||k1||k2||k3||k4 kodp, dos znap, nd, rnk, comm, nbuc, userid_,isp
+        select nls, kv, dt, '12'||k1||k2||k3||k4||s245 kodp, dos znap, nd, rnk, comm, nbuc, userid_,isp
         from kred
         where nvl(dos,0) <> 0);
 
@@ -1328,7 +1362,7 @@ if isf8_=0 then -- формирование только наполнения otc_ff7_history_acc
         select *
         from (
             with kred as (select min(nls) nls, nvl(kv_dog, kv) kv, dat_ dt, cc||k111 k1,
-                                 max(f.s260) k2, max(s032) k3, lpad(nvl(kv_dog, kv),3,'0') k4,
+                                 max(f.s260) k2, max(s032) k3, lpad(nvl(kv_dog, kv),3,'0') k4, s245,
                                  max((case substr(nd,1,1) when '№' then null when '-' then null else nd end)) nd, rnk,
                                  nvl(nkd,nd) comm,
                                  decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_) ) nbuc,
@@ -1338,10 +1372,10 @@ if isf8_=0 then -- формирование только наполнения otc_ff7_history_acc
                             from OTC_FF7_HISTORY_ACC f
                             where f.datf=dat_
                                   and f.tpa in (2, 3)
-                            group by nvl(kv_dog, kv), cc,k111, lpad(nvl(kv_dog, kv),3,'0'), nvl(nkd,nd), rnk,
+                            group by nvl(kv_dog, kv), cc,k111, lpad(nvl(kv_dog, kv),3,'0'), s245, nvl(nkd,nd), rnk,
                                      decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_) )
                             order by 1)
-            select nls, kv, dt, '13'||k1||k2||k3||k4 kodp, dos znap, nd, rnk, comm, nbuc, userid_,isp
+            select nls, kv, dt, '13'||k1||k2||k3||k4||s245 kodp, dos znap, nd, rnk, comm, nbuc, userid_,isp
             from kred kk
             where nvl(dos,0) <> 0
                   --существующие договора - это действующие (есть в 03 показателе), но не новые (нет в 07 показателе) и не закрытые (нет в 08 показателе)
@@ -1353,7 +1387,7 @@ if isf8_=0 then -- формирование только наполнения otc_ff7_history_acc
         select *
         from (
             with kred as (select min(nls) nls, nvl(kv_dog, kv) kv, dat_ dt, cc||k111 k1,
-                                 max(f.s260) k2, max(s032) k3, lpad(nvl(kv_dog, kv),3,'0') k4,
+                                 max(f.s260) k2, max(s032) k3, lpad(nvl(kv_dog, kv),3,'0') k4, s245,
                                  max((case substr(nd,1,1) when '№' then null when '-' then null else nd end)) nd, rnk,
                                  nvl(nkd,nd) comm,
                                  decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_) ) nbuc,
@@ -1366,10 +1400,10 @@ if isf8_=0 then -- формирование только наполнения otc_ff7_history_acc
                               and f.tpa in (2, 3)
                               and not exists
                               (select 1 from OTC_FF7_HISTORY_ACC f1 where nvl(f.nkd, f.nd) = nvl(f1.nkd, f1.nd) and f1.datf=datp_ and f1.ostq_kd = 0)
-                             group by nvl(kv_dog, kv), cc,k111, lpad(nvl(kv_dog, kv),3,'0'), nvl(nkd,nd), rnk,
+                             group by nvl(kv_dog, kv), cc,k111, lpad(nvl(kv_dog, kv),3,'0'), s245, nvl(nkd,nd), rnk,
                                       decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_))
                             order by 1)
-            select nls, kv, dt, '14'||k1||k2||k3||k4 kodp, kos znap, nd, rnk, comm, nbuc, userid_,isp
+            select nls, kv, dt, '14'||k1||k2||k3||k4||s245 kodp, kos znap, nd, rnk, comm, nbuc, userid_,isp
             from kred
             where nvl(kos,0) <> 0
               and exists (select 1 from rnbu_trace r where (r.kodp like '08%') and r.comm = comm));
@@ -1378,7 +1412,7 @@ if isf8_=0 then -- формирование только наполнения otc_ff7_history_acc
         select *
         from (
         with kred as (select min(nls) nls, nvl(kv_dog, kv) kv, dat_ dt, cc||k111 k1,
-                             max(f.s260) k2, max(s032) k3, lpad(nvl(kv_dog, kv),3,'0') k4,
+                             max(f.s260) k2, max(s032) k3, lpad(nvl(kv_dog, kv),3,'0') k4, s245,
                              max((case substr(nd,1,1) when '№' then null when '-' then null else nd end)) nd, rnk,
                              nvl(nkd,nd) comm,
                              decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_) ) nbuc,
@@ -1388,10 +1422,10 @@ if isf8_=0 then -- формирование только наполнения otc_ff7_history_acc
                         from OTC_FF7_HISTORY_ACC f
                         where f.datf=dat_
                               and f.tpa in (2, 3)
-                        group by nvl(kv_dog, kv), cc,k111, lpad(nvl(kv_dog, kv),3,'0'), nvl(nkd,nd), rnk,
+                        group by nvl(kv_dog, kv), cc,k111, lpad(nvl(kv_dog, kv),3,'0'), s245, nvl(nkd,nd), rnk,
                                  decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_))
                         order by 1)
-        select nls, kv, dt, '15'||k1||k2||k3||k4 kodp, abs(kos) znap, nd, rnk, comm, nbuc, userid_,isp
+        select nls, kv, dt, '15'||k1||k2||k3||k4||s245 kodp, abs(kos) znap, nd, rnk, comm, nbuc, userid_,isp
         from kred kk
         where nvl(kos,0) <> 0
               --существующие договора - это действующие (есть в 03 показателе), но не новые (нет в 07 показателе) и не закрытые (нет в 08 показателе)
@@ -1459,7 +1493,7 @@ if isf8_=0 then -- формирование только наполнения otc_ff7_history_acc
         select *
         from (
         with kred as (select min(nls) nls, nvl(kv_dog, kv) kv, dat_ dt, cc||k111 k1,
-                             max(f.s260) k2, max(s032) k3, lpad(nvl(kv_dog, kv),3,'0') k4,
+                             max(f.s260) k2, max(s032) k3, lpad(nvl(kv_dog, kv),3,'0') k4, s245,
                              max((case substr(nd,1,1) when '№' then null when '-' then null else nd end)) nd, rnk,
                               /*'Кількість рахунків - '||to_char(count(*))*/nvl(nkd,nd) comm,
                               decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_) ) nbuc,
@@ -1469,10 +1503,10 @@ if isf8_=0 then -- формирование только наполнения otc_ff7_history_acc
                               ,min (accc)  isp
                         from OTC_FF7_HISTORY_ACC f
                         where f.datf=dat_ and f.tpa in (2, 3)
-                        group by nvl(kv_dog, kv), cc,k111, lpad(nvl(kv_dog, kv),3,'0'), nvl(nkd,nd), rnk,
+                        group by nvl(kv_dog, kv), cc,k111, lpad(nvl(kv_dog, kv),3,'0'), s245, nvl(nkd,nd), rnk,
                                  decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_))
                         order by 1)
-        select nls, kv, dat_, '18'||k1||k2||k3||k4 kodp, dos-kos  znap, nd, rnk, comm, nbuc, userid_ ,isp
+        select nls, kv, dat_, '18'||k1||k2||k3||k4||s245 kodp, dos-kos  znap, nd, rnk, comm, nbuc, userid_ ,isp
         from kred
         where dos-kos<>0);
     end if;
