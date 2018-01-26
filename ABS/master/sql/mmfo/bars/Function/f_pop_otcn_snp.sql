@@ -10,7 +10,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    ‘ункци€ наполнени€ таблиц дл€ формировани€ отчетности
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :    24.01.2018 (14.12.2017)
+% VERSION     :    26.01.2018 (14.12.2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 06/02/2015 - в таблице OTCN_SALDO не формировались годовые  т обороты
              »справлено.
@@ -244,7 +244,7 @@ if add_KP_ >= 1 then
            0,0,0,0,0,0,0,0,0,0
     from AGG_MONBALS b, OTCN_ACC a
     where b.fdat = trunc(dat_,'mm')
-      and b.ACC = a.acc;    
+      and b.ACC = a.acc;
       
     commit;
     
@@ -292,7 +292,7 @@ if add_KP_ >= 1 then
 commit;
 
     INSERT /*+APPEND */
-    INTO OTCN_SALDO (ODATE, FDAT, ACC, NLS, KV, NBS, OB22, RNK,
+      INTO OTCN_SALDO (ODATE, FDAT, ACC, NLS, KV, NBS, OB22, RNK,
            VOST, VOSTQ, OST, OSTQ,
            DOS, DOSQ, KOS, KOSQ,
            DOS96, DOSQ96, KOS96, KOSQ96,
@@ -311,80 +311,82 @@ commit;
      AND a.FDAT BETWEEN Dat1_ AND Dat2_
      AND a.acc=s.acc
      AND s.acc not in (select acc from otcn_saldo);
---     and fost(s.acc, glb_bankdate()) <> 0;
+--   and fost(s.acc, glb_bankdate()) <> 0;
 
    commit;
 
     -- обработка корректирующих проводок
-    merge into otcn_saldo o
-    using (
-        select  k.acc, a.NLS,  a.KV, a.NBS, a.OB22, a.RNK,
-            nvl(sum(DECODE(k.tips,'3',k.Dos96, 0)),0) dos99,
-            nvl(sum(DECODE(k.tips,'3',k.Dosq96,0)),0) dosq99,
-            nvl(sum(DECODE(k.tips,'3',k.kos96, 0)),0) kos99,
-            nvl(sum(DECODE(k.tips,'3',k.kosq96,0)),0) kosq99,
-            nvl(sum(DECODE(k.tips,'4',k.Dos96, 0)),0) doszg,
-            nvl(sum(DECODE(k.tips,'4',k.Kos96, 0)),0) koszg,
-            nvl(sum(DECODE(k.tips,'5',k.Dos96, 0)),0) dos96zg,
-            nvl(sum(DECODE(k.tips,'5',k.Kos96, 0)),0) kos96zg,
-            nvl(sum(DECODE(k.tips,'6',k.Dos96, 0)),0) dos99zg,
-            nvl(sum(DECODE(k.tips,'6',k.Kos96, 0)),0) kos99zg
-        from (
-           -- и годовые корректирующие проводки
-           SELECT '3' tips, s.acc,
-                  NVL(SUM(DECODE(a.DK, 0, a.s, 0)),0) dos96,
-                  NVL(SUM(DECODE(s.kv,980,0,DECODE(a.DK, 0, Gl.P_Icurval(s.kv, a.s, a.vDat),0))),0) dosq96,
-                  NVL(SUM(DECODE(a.DK, 1, a.s, 0)),0) kos96,
-                  NVL(SUM(DECODE(s.kv,980,0,DECODE(a.DK, 1, Gl.P_Icurval(s.kv, a.s, a.vDat),0))),0) kosq96
-           FROM  KOR_PROV a, OTCN_ACC s
-           WHERE type_ > 1
-             AND a.VOB=99
-             AND a.FDAT BETWEEN Dat1_ AND dat99_
-             AND a.acc=s.acc
-           GROUP BY '3', s.acc
-        UNION ALL
-           -- обороти по перекриттю на к_нець року
-           SELECT '4', s.acc,
-                  NVL(SUM(DECODE(a.DK, 0, a.s, 0)),0),
-                  NVL(SUM(DECODE(s.kv,980,0,DECODE(a.DK, 0, Gl.P_Icurval(s.kv, a.s, a.vDat),0))),0),
-                  NVL(SUM(DECODE(a.DK, 1, a.s, 0)),0),
-                  NVL(SUM(DECODE(s.kv,980,0,DECODE(a.DK, 1, Gl.P_Icurval(s.kv, a.s, a.vDat),0))),0)
-           FROM  KOR_PROV a, OTCN_ACC s
-           WHERE type_ > 1
-             AND a.VOB>100
-             AND a.VOB NOT IN (196, 199)
-             AND a.FDAT BETWEEN Dat1_ AND Dat2_
-             AND a.acc=s.acc
-           GROUP BY '4', s.acc
-        UNION ALL
-           -- обороти по перекриттю м_с€чних коригуючих проводок
-           SELECT '5', s.acc,
-                  NVL(SUM(DECODE(a.DK, 0, a.s, 0)),0),
-                  NVL(SUM(DECODE(s.kv,980,0,DECODE(a.DK, 0, Gl.P_Icurval(s.kv, a.s, a.vDat),0))),0),
-                  NVL(SUM(DECODE(a.DK, 1, a.s, 0)),0),
-                  NVL(SUM(DECODE(s.kv,980,0,DECODE(a.DK, 1, Gl.P_Icurval(s.kv, a.s, a.vDat),0))),0)
-           FROM  KOR_PROV a, OTCN_ACC s
-           WHERE type_ > 1
-             AND a.VOB=196
-             AND a.FDAT BETWEEN Datn_ AND Dat2_
-             AND a.acc=s.acc
-           GROUP BY '5', s.acc
-        UNION ALL
-           -- обороти по перекриттю р_чних коригуючих проводок
-           SELECT '6', s.acc,
-                  NVL(SUM(DECODE(a.DK, 0, a.s, 0)),0),
-                  NVL(SUM(DECODE(s.kv,980,0,DECODE(a.DK, 0, Gl.P_Icurval(s.kv, a.s, a.vDat),0))),0),
-                  NVL(SUM(DECODE(a.DK, 1, a.s, 0)),0),
-                  NVL(SUM(DECODE(s.kv,980,0,DECODE(a.DK, 1, Gl.P_Icurval(s.kv, a.s, a.vDat),0))),0)
-           FROM  KOR_PROV a, OTCN_ACC s
-           WHERE type_ > 1
-             AND a.VOB=199
-             AND a.FDAT BETWEEN Dat1_ AND dat99_
-             AND a.acc=s.acc
-           GROUP BY '6', s.acc) k, accounts a
-           where k.acc = a.acc
-           group by k.acc, a.NLS,  a.KV, a.NBS, A.RNK) p
-    on (o.acc = p.acc)
+    merge
+     into otcn_saldo o
+    using ( select k.ACC, a.NLS, a.KV, a.NBS, a.OB22, a.RNK,
+                   nvl(sum(DECODE(k.tips,'3',k.Dos96, 0)),0) dos99,
+                   nvl(sum(DECODE(k.tips,'3',k.Dosq96,0)),0) dosq99,
+                   nvl(sum(DECODE(k.tips,'3',k.kos96, 0)),0) kos99,
+                   nvl(sum(DECODE(k.tips,'3',k.kosq96,0)),0) kosq99,
+                   nvl(sum(DECODE(k.tips,'4',k.Dos96, 0)),0) doszg,
+                   nvl(sum(DECODE(k.tips,'4',k.Kos96, 0)),0) koszg,
+                   nvl(sum(DECODE(k.tips,'5',k.Dos96, 0)),0) dos96zg,
+                   nvl(sum(DECODE(k.tips,'5',k.Kos96, 0)),0) kos96zg,
+                   nvl(sum(DECODE(k.tips,'6',k.Dos96, 0)),0) dos99zg,
+                   nvl(sum(DECODE(k.tips,'6',k.Kos96, 0)),0) kos99zg
+             from ( -- и годовые корректирующие проводки
+                   SELECT '3' tips, s.acc,
+                          NVL(SUM(DECODE(a.DK, 0, a.s, 0)),0) dos96,
+                          NVL(SUM(DECODE(s.kv,980,0,DECODE(a.DK, 0, Gl.P_Icurval(s.kv, a.s, a.vDat),0))),0) dosq96,
+                          NVL(SUM(DECODE(a.DK, 1, a.s, 0)),0) kos96,
+                          NVL(SUM(DECODE(s.kv,980,0,DECODE(a.DK, 1, Gl.P_Icurval(s.kv, a.s, a.vDat),0))),0) kosq96
+                     FROM KOR_PROV a, OTCN_ACC s
+                    WHERE type_ > 1
+                      AND a.VOB=99
+                      AND a.FDAT BETWEEN Dat1_ AND dat99_
+                      AND a.acc=s.acc
+                    GROUP BY '3', s.acc
+                    UNION ALL 
+                   -- обороти по перекриттю на к_нець року
+                   SELECT '4', s.acc,
+                          NVL(SUM(DECODE(a.DK, 0, a.s, 0)),0),
+                          NVL(SUM(DECODE(s.kv,980,0,DECODE(a.DK, 0, Gl.P_Icurval(s.kv, a.s, a.vDat),0))),0),
+                          NVL(SUM(DECODE(a.DK, 1, a.s, 0)),0),
+                          NVL(SUM(DECODE(s.kv,980,0,DECODE(a.DK, 1, Gl.P_Icurval(s.kv, a.s, a.vDat),0))),0)
+                     FROM KOR_PROV a, OTCN_ACC s
+                    WHERE type_ > 1
+                      AND a.VOB>100
+                      AND a.VOB NOT IN (196, 199)
+                      AND a.FDAT BETWEEN Dat1_ AND Dat2_
+                      AND a.acc=s.acc
+                    GROUP BY '4', s.acc
+                    UNION ALL
+                   -- обороти по перекриттю м_с€чних коригуючих проводок
+                   SELECT '5', s.acc,
+                          NVL(SUM(DECODE(a.DK, 0, a.s, 0)),0),
+                          NVL(SUM(DECODE(s.kv,980,0,DECODE(a.DK, 0, Gl.P_Icurval(s.kv, a.s, a.vDat),0))),0),
+                          NVL(SUM(DECODE(a.DK, 1, a.s, 0)),0),
+                          NVL(SUM(DECODE(s.kv,980,0,DECODE(a.DK, 1, Gl.P_Icurval(s.kv, a.s, a.vDat),0))),0)
+                     FROM KOR_PROV a, OTCN_ACC s
+                    WHERE type_ > 1
+                      AND a.VOB=196
+                      AND a.FDAT BETWEEN Datn_ AND Dat2_
+                      AND a.acc=s.acc
+                    GROUP BY '5', s.acc
+                    UNION ALL
+                   -- обороти по перекриттю р_чних коригуючих проводок
+                  SELECT '6', s.acc,
+                         NVL(SUM(DECODE(a.DK, 0, a.s, 0)),0),
+                         NVL(SUM(DECODE(s.kv,980,0,DECODE(a.DK, 0, Gl.P_Icurval(s.kv, a.s, a.vDat),0))),0),
+                         NVL(SUM(DECODE(a.DK, 1, a.s, 0)),0),
+                         NVL(SUM(DECODE(s.kv,980,0,DECODE(a.DK, 1, Gl.P_Icurval(s.kv, a.s, a.vDat),0))),0)
+                    FROM KOR_PROV a, OTCN_ACC s
+                   WHERE type_ > 1
+                     AND a.VOB=199
+                     AND a.FDAT BETWEEN Dat1_ AND dat99_
+                     AND a.acc=s.acc
+                   GROUP BY '6', s.acc
+                 ) k
+                , accounts a
+            where k.acc = a.acc
+            group by k.ACC, a.NLS, a.KV, a.NBS, a.OB22, a.RNK
+          ) p
+       on ( p.acc = o.acc)
     WHEN MATCHED THEN
         UPDATE SET
            o.dos99 = o.dos99 + p.dos99,
