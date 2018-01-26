@@ -7,12 +7,12 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_F6B_NN ***
 
-  CREATE OR REPLACE PROCEDURE BARS.P_F6B_NN (Dat_ DATE, sheme_ Varchar2 DEFAULT 'G' )
+ CREATE OR REPLACE PROCEDURE BARS.P_F6B_NN (Dat_ DATE, sheme_ Varchar2 DEFAULT 'G' )
 IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  % DESCRIPTION : процедура #6B
  %
- % VERSION     :   v.17.010      15.11.2017
+ % VERSION     :   v.18.001      25.01.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 /*
    Структура показателя    GGG CC N H I OO R VVV
@@ -28,6 +28,7 @@ IS
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+25.01.2018  изменение распределения счетов для сегмента GGG
 15.11.2017  переход на новый план счетов
 27.10.2017  сегмент N равен 5 при установленном доп.параметре клиента "юр.лицо SPE"
 10.10.2017  код контрагента дополнительно определяется по customer.CUSTTYPE
@@ -65,6 +66,8 @@ OO_         VARCHAR2 (2);
 I_          VARCHAR2 (1);
 N_          VARCHAR2 (1);
 H_          VARCHAR2 (1);
+
+r011_          VARCHAR2 (1);
 
 userid_     NUMBER;
 typ_        number;
@@ -200,7 +203,7 @@ BEGIN
 
        if k.codcagent in (1, 2)               -- банки
        then
-          N_ := '3';
+          N_ := '3';                          
        elsif k.codcagent in (3, 4)            -- юр.лица
        then
 
@@ -223,7 +226,7 @@ BEGIN
              if k.nls like '21%'    or
                 k.nls like '236%'   or
                 k.nls like '237%'   or
-                k.nls like '238%'
+                k.nls like '238%'   
              then
                      is_budg_ := 1;
              else    is_budg_ := 0;
@@ -322,20 +325,27 @@ BEGIN
        end if;
 
        if    k.pd_0 =1  and
-             k.nbs in ('1400','1401','1402','1405','1408',
-                       '1410','1411','1412','1415','1418',
-                       '1420','1421','1422','1428',
-                       '3002','3007','3008','3102','3107','3108')
-       then
-           ddd_ :='130';
+             k.nbs in ('1500','1502','1508','1600','1607') 
+       then  
+           ddd_ :='120';   
+           H_ := '0';
+
+       end if;
+
+       if    k.pd_0 =1  and
+             k.nbs in ('1402','1403','1405','1408', '3012','3015','3018',
+                       '1412','1413','1415','1418', '3112','3115','3118',
+                       '1422','1423','1428', '3212','3218')
+       then  
+           ddd_ :='130';   
            H_ := '0';
 
        end if;
 
 -- отдельная обработка  счетов 3-го класса -могут быть в ggg=130
-
+ 
        if  ddd_ in('133','135','138') and k.nbs like '3%'   then
-
+                 
           select count(*)  into pr_
             from nbu23_rez
            where fdat = z.fdat1
@@ -344,12 +354,42 @@ BEGIN
 
           if pr_ !=0  then
 
-              ddd_ :='130';
+              ddd_ :='130';   
               H_ := '0';
           else
 
               H_ := '1';
           end if;
+       end if;
+
+       if k.nbs in ('3005','3007','3008')  then
+
+          r011_ :='0';
+          begin
+             select r011  into r011_
+               from specparam
+              where acc =k.acc;
+
+          exception
+              when others  then  r011_ :='0';
+          end;
+
+          if r011_ ='A'  then   ddd_ :='131';   end if;
+       end if;
+
+       if k.nbs in ('3105','3107','3108')  then
+
+          r011_ :='0';
+          begin
+             select r011  into r011_
+               from specparam
+              where acc =k.acc;
+
+          exception
+              when others  then  r011_ :='0';
+          end;
+
+          if r011_ ='8'  then   ddd_ :='131';   end if;
        end if;
 
        -- вся балансова вартiсть
@@ -383,7 +423,7 @@ BEGIN
              VALUES (k.nls, k.kv, dat_, ddd_||kodp_, znap_, nbuc_, k.rnk, k.nd, comm_, k.acc);
 
              if ddd_ = '121' and k.pd_0 =1 then
-
+     
                 INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, rnk, nd, comm, acc)
                 VALUES (k.nls, k.kv, dat_, '120'||kodp_, znap_, nbuc_, k.rnk, k.nd, comm_, k.acc);
              end if;
@@ -531,15 +571,18 @@ BEGIN
     end loop;
    end loop;
 
-   -- для бал. рахунків 1405, 1415, 1435, 3007, 3015, 3107, 3115
-   -- і пасивних залишків код CC замінюємо з 11 на 40
+   -- для балансовых рахунків з пасивними залишками
+   --   змінюємо код CC  3 11 на 40
 
    for u in (
       select r.*, m.ostq-m.crdosq+m.crkosq ost_k
         from ( select *
                  from rnbu_trace
-                where substr(nls, 1, 4) in ( '1405', '1415', '1435',
-                                             '3007', '3015', '3107', '3115' )
+                where substr(nls, 1, 4) in (
+                       '2307','2317','2327','2337','2347','2367','2377',
+                       '2387','2397','2407','2417','2427','2437','2457',
+                       '1535','1545','1405','1415','1435','1455',
+                       '3007','3015','3107','3115' )
              ) r, accounts a, agg_monbals m
        where r.acc = a.acc
          and a.accc = m.acc
