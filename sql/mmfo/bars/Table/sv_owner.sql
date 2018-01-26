@@ -72,7 +72,9 @@ begin
 	GROUP_DOC_DATE DATE, 
 	CONDITION VARCHAR2(250), 
 	COND_DOC_NUM VARCHAR2(100), 
-	COND_DOC_DATE DATE
+	COND_DOC_DATE DATE,
+	PASS varchar(256),
+	NAT_COD varchar(3)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -264,7 +266,40 @@ exception when others then
  end;
 /
 
+PROMPT *** add  column pass ***
+begin
+    execute immediate 'alter table sv_owner add pass varchar(256)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+PROMPT *** add  column nat_cod ***
+begin
+    execute immediate 'alter table sv_owner add nat_cod varchar(3)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+PROMPT *** modify  column pruch_vidsotok ***
 
+begin
+    execute immediate 'alter table sv_owner modify  pruch_vidsotok NUMBER(9,6)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+PROMPT *** modify  column opruch_vidsotok ***
+begin
+    execute immediate 'alter table sv_owner modify  opruch_vidsotok NUMBER(9,6)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/
 
 PROMPT *** Create  grants  SV_OWNER ***
 grant SELECT                                                                 on SV_OWNER        to BARSREADER_ROLE;

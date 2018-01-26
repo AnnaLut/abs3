@@ -175,57 +175,12 @@ begin
   end if;
 
   -- добавляем описание вложенных таблиц
-  l_newtabid := bars_metabase.get_tabid('V_SV_OWNERDOC');
+  l_newtabid := bars_metabase.get_tabid('V_SV_BANK');
   if (l_newtabid is not null) then
-    bars_metabase.change_filter('ID', 'Фильтр по ID', '$~~ALIAS~~$.ID=:ID');
-    bars_metabase.add_filtertbl(l_tabid, 9, l_newtabid, 'ID', 0, 0, 1);
+    bars_metabase.change_filter('MANAGER', 'Фільтр керівник', '1=1');
+    bars_metabase.add_filtertbl(l_tabid, 23, l_newtabid, 'MANAGER', 1, 1, 1);
   else
-    dbms_output.put_line('В БМД не описана таблица V_SV_OWNERDOC для описания вложенности таблицы V_SV_OWNER.');
-  end if;
-
-  -- добавляем описание вложенных таблиц
-  l_newtabid := bars_metabase.get_tabid('V_SV_OWNERADR');
-  if (l_newtabid is not null) then
-    bars_metabase.change_filter('ID', 'Фильтр по ID', '$~~ALIAS~~$.ID=:ID');
-    bars_metabase.add_filtertbl(l_tabid, 10, l_newtabid, 'ID', 0, 0, 1);
-  else
-    dbms_output.put_line('В БМД не описана таблица V_SV_OWNERADR для описания вложенности таблицы V_SV_OWNER.');
-  end if;
-
-  -- добавляем описание вложенных таблиц
-  l_newtabid := bars_metabase.get_tabid('V_SV_OWNERUCH');
-  if (l_newtabid is not null) then
-    bars_metabase.change_filter('ID', 'Фильтр по ID', '$~~ALIAS~~$.ID=:ID');
-    bars_metabase.add_filtertbl(l_tabid, 11, l_newtabid, 'ID', 0, 0, 1);
-  else
-    dbms_output.put_line('В БМД не описана таблица V_SV_OWNERUCH для описания вложенности таблицы V_SV_OWNER.');
-  end if;
-
-  -- добавляем описание вложенных таблиц
-  l_newtabid := bars_metabase.get_tabid('V_SV_OPRUCH_REL');
-  if (l_newtabid is not null) then
-    bars_metabase.change_filter('ID', 'Фильтр по ID', '$~~ALIAS~~$.ID=:ID');
-    bars_metabase.add_filtertbl(l_tabid, 15, l_newtabid, 'ID', 1, 1, 1);
-  else
-    dbms_output.put_line('В БМД не описана таблица V_SV_OPRUCH_REL для описания вложенности таблицы V_SV_OWNER.');
-  end if;
-
-  -- добавляем описание вложенных таблиц
-  l_newtabid := bars_metabase.get_tabid('V_SV_OWNER_GROUP');
-  if (l_newtabid is not null) then
-    bars_metabase.change_filter('ID', 'Фильтр по ID', '$~~ALIAS~~$.ID=:ID');
-    bars_metabase.add_filtertbl(l_tabid, 16, l_newtabid, 'ID', 0, 0, 1);
-  else
-    dbms_output.put_line('В БМД не описана таблица V_SV_OWNER_GROUP для описания вложенности таблицы V_SV_OWNER.');
-  end if;
-
-  -- добавляем описание вложенных таблиц
-  l_newtabid := bars_metabase.get_tabid('V_SV_VOICE');
-  if (l_newtabid is not null) then
-    bars_metabase.change_filter('ID', 'Фильтр по ID', '$~~ALIAS~~$.ID=:ID');
-    bars_metabase.add_filtertbl(l_tabid, 19, l_newtabid, 'ID', 1, 1, 1);
-  else
-    dbms_output.put_line('В БМД не описана таблица V_SV_VOICE для описания вложенности таблицы V_SV_OWNER.');
+    dbms_output.put_line('В БМД не описана таблица V_SV_BANK для описания вложенности таблицы V_SV_OWNER.');
   end if;
 
   -- добавляем описание вложенных таблиц
@@ -238,12 +193,57 @@ begin
   end if;
 
   -- добавляем описание вложенных таблиц
-  l_newtabid := bars_metabase.get_tabid('V_SV_BANK');
+  l_newtabid := bars_metabase.get_tabid('V_SV_VOICE');
   if (l_newtabid is not null) then
-    bars_metabase.change_filter('MANAGER', 'Фільтр керівник', '1=1');
-    bars_metabase.add_filtertbl(l_tabid, 23, l_newtabid, 'MANAGER', 1, 1, 1);
+    bars_metabase.change_filter('ID', 'Фильтр по ID', '$~~ALIAS~~$.ID=:ID');
+    bars_metabase.add_filtertbl(l_tabid, 19, l_newtabid, 'ID', 1, 1, 1);
   else
-    dbms_output.put_line('В БМД не описана таблица V_SV_BANK для описания вложенности таблицы V_SV_OWNER.');
+    dbms_output.put_line('В БМД не описана таблица V_SV_VOICE для описания вложенности таблицы V_SV_OWNER.');
+  end if;
+
+  -- добавляем описание вложенных таблиц
+  l_newtabid := bars_metabase.get_tabid('V_SV_OWNER_GROUP');
+  if (l_newtabid is not null) then
+    bars_metabase.change_filter('ID', 'Фильтр по ID', '$~~ALIAS~~$.ID=:ID');
+    bars_metabase.add_filtertbl(l_tabid, 16, l_newtabid, 'ID', 0, 0, 1);
+  else
+    dbms_output.put_line('В БМД не описана таблица V_SV_OWNER_GROUP для описания вложенности таблицы V_SV_OWNER.');
+  end if;
+
+  -- добавляем описание вложенных таблиц
+  l_newtabid := bars_metabase.get_tabid('V_SV_OPRUCH_REL');
+  if (l_newtabid is not null) then
+    bars_metabase.change_filter('ID', 'Фильтр по ID', '$~~ALIAS~~$.ID=:ID');
+    bars_metabase.add_filtertbl(l_tabid, 15, l_newtabid, 'ID', 1, 1, 1);
+  else
+    dbms_output.put_line('В БМД не описана таблица V_SV_OPRUCH_REL для описания вложенности таблицы V_SV_OWNER.');
+  end if;
+
+  -- добавляем описание вложенных таблиц
+  l_newtabid := bars_metabase.get_tabid('V_SV_OWNERUCH');
+  if (l_newtabid is not null) then
+    bars_metabase.change_filter('ID', 'Фильтр по ID', '$~~ALIAS~~$.ID=:ID');
+    bars_metabase.add_filtertbl(l_tabid, 11, l_newtabid, 'ID', 0, 0, 1);
+  else
+    dbms_output.put_line('В БМД не описана таблица V_SV_OWNERUCH для описания вложенности таблицы V_SV_OWNER.');
+  end if;
+
+  -- добавляем описание вложенных таблиц
+  l_newtabid := bars_metabase.get_tabid('V_SV_OWNERADR');
+  if (l_newtabid is not null) then
+    bars_metabase.change_filter('ID', 'Фильтр по ID', '$~~ALIAS~~$.ID=:ID');
+    bars_metabase.add_filtertbl(l_tabid, 10, l_newtabid, 'ID', 0, 0, 1);
+  else
+    dbms_output.put_line('В БМД не описана таблица V_SV_OWNERADR для описания вложенности таблицы V_SV_OWNER.');
+  end if;
+
+  -- добавляем описание вложенных таблиц
+  l_newtabid := bars_metabase.get_tabid('V_SV_OWNERDOC');
+  if (l_newtabid is not null) then
+    bars_metabase.change_filter('ID', 'Фильтр по ID', '$~~ALIAS~~$.ID=:ID');
+    bars_metabase.add_filtertbl(l_tabid, 9, l_newtabid, 'ID', 0, 0, 1);
+  else
+    dbms_output.put_line('В БМД не описана таблица V_SV_OWNERDOC для описания вложенности таблицы V_SV_OWNER.');
   end if;
 
   -- добавляем описание сортировки
@@ -268,28 +268,28 @@ begin
   bars_metabase.delete_nsifunction(l_tabid);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 1, 'Iнформацiя про Набуття права голосу', '', '', '', '', '', 'FunNSIEditF(''SV_GOLOS'', 0)', '', '', null);
+  bars_metabase.add_nsifunction(l_tabid, 1, 'Iнформацiя про Набуття права голосу', '', '', '', '', '', 'FunNSIEditF(''SV_GOLOS'', 0)', '', 'sPar=SV_GOLOS[ACCESSCODE=>0][DESCR=>Iнформацiя про Набуття права голосу ][EXEC=>BEFORE]', 36);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 2, 'Iнформацiя про Вiдсотки статутного капiталу, кiлькiсть голосiв, керiвника банку', '', '', '', '', '', 'FunNSIEditF(''SV_BANK'', 0)', '', '', null);
+  bars_metabase.add_nsifunction(l_tabid, 2, 'Iнформацiя про Вiдсотки статутного капiталу, кiлькiсть голосiв, керiвника банку', '', '', '', '', '', 'FunNSIEditF(''SV_BANK'', 0)', '', 'sPar=SV_BANK[ACCESSCODE=>0][DESCR=>Iнформацiя про Вiдсотки статутного капiталу, кiлькiсть голосiв, керiвника банку ][EXEC=>BEFORE]', 26);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 3, 'Iмпорт файлу Iнформацiя про власникiв iстотної участi', '', '', '', '', '', 'GeneralImpExp(hWndMDI, 3, 3, ''bars_sv.import_file(sFileName, 1)'', '''')', '', '', null);
+  bars_metabase.add_nsifunction(l_tabid, 3, 'Iмпорт файлу Iнформацiя про власникiв iстотної участi', '', '', '', '', '', 'GeneralImpExp(hWndMDI, 3, 3, ''bars_sv.import_file(sFileName, 1)'', '''')', '', 'sPar=[EXEC=>ONCE][PROC=>bars_sv.import_file (:p_filename, 1, :p_filebody)][UPLOAD_PARAMS=>:p_filebody(SEM=Виберіть файл,TYPE=BLOB),:p_filename(KIND=UPLOAD_FILE_NAME,WITHOUT_EXT=TRUE))]', 16);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 4, 'Iмпорт файлу Схематичне зображення структури власностi банку', '', '', '', '', '', 'GeneralImpExp(hWndMDI, 3, 3, ''bars_sv.import_file(sFileName, 2)'', '''')', '', '', null);
+  bars_metabase.add_nsifunction(l_tabid, 4, 'Iмпорт файлу Схематичне зображення структури власностi банку', '', '', '', '', '', 'GeneralImpExp(hWndMDI, 3, 3, ''bars_sv.import_file(sFileName, 2)'', '''')', '', 'sPar=[EXEC=>ONCE][PROC=>bars_sv.import_file (:p_filename, 2, :p_filebody)][UPLOAD_PARAMS=>:p_filebody(SEM=Виберіть файл,TYPE=BLOB),:p_filename(KIND=UPLOAD_FILE_NAME,WITHOUT_EXT=TRUE))]', 110);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 5, 'Формування файлу P7', '', '', '', '', '', 'GeneralImpExp(hWndMDI, 3, 2, ''bars_sv.form_p7(sFileName)'', '''')', '', '', null);
+  bars_metabase.add_nsifunction(l_tabid, 5, 'Формування файлу P7', '', '', '', '', '', 'GeneralImpExp(hWndMDI, 3, 2, ''bars_sv.form_p7(sFileName)'', '''')', '', 'sPar=[DESCR=>Зформувати файл P7][EXEC=>GET_FILE_ONCE][PROC=>bars_sv.form_p7(:p_namefile, :p_clob)][OUT_PARAMS=>:p_namefile(SEM=ИМЯ ФАЙЛА,TYPE=fileName), :p_clob(SEM=ФАЙЛ,TYPE=CLOB)]', 7);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 6, 'Iмпорт квитанцiї P8', '', '', '', '', '', 'GeneralImpExp(hWndMDI, 3, 1, ''bars_sv.import_tick(sFileName)'', '''')', '', '', null);
+  bars_metabase.add_nsifunction(l_tabid, 6, 'Iмпорт квитанцiї P8', '', '', '', '', '', 'GeneralImpExp(hWndMDI, 3, 1, ''bars_sv.import_tick(sFileName)'', '''')', '', 'sPar=[EXEC=>ONCE][PROC=>bars_sv.import_tick (:p_filename, :p_filebody)][UPLOAD_PARAMS=>:p_filebody(SEM=Виберіть файл,TYPE=CLOB),:p_filename(KIND=UPLOAD_FILE_NAME,WITHOUT_EXT=TRUE))]', 4);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 7, 'Файли та квитанцiї', '', '', '', '', '', 'FunNSIEditF(''SV_FILES'', 1)', '', '', null);
+  bars_metabase.add_nsifunction(l_tabid, 7, 'Файли та квитанцiї', '', '', '', '', '', 'FunNSIEditF(''SV_FILES'', 1)', '', 'sPar=SV_FILES[ACCESSCODE=>1][DESCR=>Файли та квитанцiї ][EXEC=>BEFORE]', 52);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 8, 'Довiдник параметрiв', '', '', '', '', '', 'FunNSIEditF(''SV_PARAMS'', 0)', '', '', null);
+  bars_metabase.add_nsifunction(l_tabid, 8, 'Довiдник параметрiв', '', '', '', '', '', 'FunNSIEditF(''SV_PARAMS'', 0)', '', 'sPar=SV_PARAMS[ACCESSCODE=>0][DESCR=>Довiдник параметрiв ][EXEC=>BEFORE]', 53);
 
   -- восстанавливаем ссылки сложных полей других таблиц
   for i in 1..l_extrnval.count loop
