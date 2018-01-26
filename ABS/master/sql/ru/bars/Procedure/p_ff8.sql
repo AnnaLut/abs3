@@ -1223,7 +1223,6 @@ for k in (select acck, nlsk, kv,
                             o1.tt not in ('096', 'ZG8', 'ZG9') and
                             o1.acc = a.acc and
                             a.nls LIKE '159%'  and
-                        and
                             o1.sos >= 4
                       union
                       select /*+parallel(8)*/ o1.fdat, o1.ref, o1.stmt, o1.dk, o1.tt,
@@ -1234,7 +1233,6 @@ for k in (select acck, nlsk, kv,
                             o1.tt not in ('096', 'ZG8', 'ZG9') and
                             o1.acc = a.acc and
                             a.nls LIKE '240%'  and
-                        and
                             o1.sos >= 4
                       union
                       select /*+parallel(8)*/ o1.fdat, o1.ref, o1.stmt, o1.dk, o1.tt,
@@ -1245,8 +1243,7 @@ for k in (select acck, nlsk, kv,
                             o1.tt not in ('096', 'ZG8', 'ZG9') and
                             o1.acc = a.acc and
                                a.nls like '15_9%' and 
-                              o1.fdat > to_date('20171218','yyyymmdd')  
-                        and
+                              o1.fdat > to_date('20171218','yyyymmdd')  and
                             o1.sos >= 4
                       union
                       select /*+parallel(8)*/ o1.fdat, o1.ref, o1.stmt, o1.dk, o1.tt,
@@ -1260,8 +1257,7 @@ for k in (select acck, nlsk, kv,
                                  or a.nls like '21_9%'
                                  or a.nls like '22_9%'
                                  or a.nls like '26_9%' ) and
-                              o1.fdat > to_date('20171218','yyyymmdd')  
-                        and
+                              o1.fdat > to_date('20171218','yyyymmdd') and
                             o1.sos >= 4
                     ) a, opldok b, accounts d, oper c
                 where a.ref = b.ref and
@@ -1950,3 +1946,4 @@ logger.info ('P_FF8: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 --        logger.info ('P_FF8: errors '||sqlerrm||' for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 END;
 /
+
