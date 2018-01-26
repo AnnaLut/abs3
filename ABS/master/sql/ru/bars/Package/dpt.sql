@@ -13,7 +13,7 @@ g_awk_header_defs constant varchar2(512) := ''
 --
 -- constants
 --
-r013_actdep   constant char(1) := '9'; -- спецпараметр R013 для активных вкладов
+r013_actdep   constant char(1) := '0'; -- спецпараметр R013 для активных вкладов -- c 27/12/2017 по требованию НБУ стал 0 (было 9)
 r013_clsdep   constant char(1) := '1'; -- спецпараметр R013 для истекших вкладов
 r013_tchacc   constant char(1) := '9'; -- спецпараметр R013 для техн.счетов
 
