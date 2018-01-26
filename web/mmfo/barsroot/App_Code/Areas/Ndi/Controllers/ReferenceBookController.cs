@@ -14,10 +14,12 @@ using Ninject;
 using System.Web;
 using BarsWeb.Areas.Ndi.Models.ViewModels;
 using BarsWeb.Areas.Ndi.Models.FilterModels;
+using BarsWeb.Areas.Ndi.Infrastructure.Repository.Helpers;
+using BarsWeb.Areas.Ndi.Infrastructure.Helpers.ViewModels;
 
 namespace BarsWeb.Areas.Ndi.Controllers
 {
-    [AuthorizeUser]
+    [Authorize]
     public class ReferenceBookController : Controller
     {
         private readonly IReferenceBookRepository _repository;
@@ -45,52 +47,69 @@ namespace BarsWeb.Areas.Ndi.Controllers
         public ActionResult UploadTemplateFile(string fieldFileName, int? tableId, int? funcId, int? codeOper, string jsonFuncParams = "", string procName = "", string msg = "",
                   string web_form_name = "", string sPar = "", string jsonSqlProcParams = "")
         {
-            string[] supportedTypes = new string[]{
-                "png", "gif", "tiff", "bmp", "jpg", "jpeg", "htm" ,"rtf", "xml", "txt", "doc"
-            };
-            List<FieldProperties> additionalParams = new List<FieldProperties>();
-            List<FieldProperties> funcParams = FormatConverter.JsonToObject<List<FieldProperties>>(jsonFuncParams) ?? new List<FieldProperties>();
-            //if (!string.IsNullOrEmpty(jsonSqlProcParams))
-            //{
-            //    jsonSqlProcParameter = JsonConvert.DeserializeObject<List<FieldProperties>>(jsonSqlProcParams);
-            //    funcParams.AddRange(jsonSqlProcParameter.Where(x => !funcParams.Select(c => c.Name).Contains(x.Name)));
-            //}
-
-            HttpPostedFileBase postedFile = Request.Files[fieldFileName];
-            if (postedFile != null)
+            //string[] supportedTypes = new string[]{
+            //    "png", "gif", "tiff", "bmp", "jpg", "jpeg", "htm" ,"rtf", "xml", "txt", "doc"
+            //};
+            try
             {
-                string x = Path.GetExtension(postedFile.FileName);
 
-                if (supportedTypes.Contains(x.TrimStart('.')))
+                List<FieldProperties> additionalParams = new List<FieldProperties>();
+                List<FieldProperties> funcParams = FormatConverter.JsonToObject<List<FieldProperties>>(jsonFuncParams) ?? new List<FieldProperties>();
+                //if (!string.IsNullOrEmpty(jsonSqlProcParams))
+                //{
+                //    jsonSqlProcParameter = JsonConvert.DeserializeObject<List<FieldProperties>>(jsonSqlProcParams);
+                //    funcParams.AddRange(jsonSqlProcParameter.Where(x => !funcParams.Select(c => c.Name).Contains(x.Name)));
+                //}
+
+                HttpPostedFileBase postedFile = Request.Files[fieldFileName];
+                if (postedFile != null)
                 {
+                    string x = Path.GetExtension(postedFile.FileName);
+
+                    //if (supportedTypes.Contains(x.TrimStart('.')))
+                    //{
                     BinaryReader b = new BinaryReader(postedFile.InputStream);
                     byte[] binData = b.ReadBytes(Convert.ToInt32(postedFile.ContentLength));
                     string fileName = postedFile.FileName;
                     if (fileName.Contains('\\'))
                         fileName = fileName.Substring(fileName.LastIndexOf('\\') + 1);
-                    if (fileName.Contains('.'))
-                        fileName = fileName.Substring(0, fileName.LastIndexOf('.'));
-                    string result = Encoding.UTF8.GetString(binData);
+                  
+
+                    //string result = Encoding.UTF8.GetString(binData);
+                    
                     if (funcParams.Count() > 0 && funcParams.FirstOrDefault(c => c.Type == "CLOB") != null)
-                        funcParams.FirstOrDefault(c => c.Type == "CLOB").Value = result;
-                    additionalParams.Add(new FieldProperties { Name = "FileName", Value = fileName, Type = "S" });
+                        funcParams.FirstOrDefault(c => c.Type == "CLOB").Value = Encoding.UTF8.GetString(binData);
+                    else
+                        if (funcParams.Count() > 0 && funcParams.FirstOrDefault(c => c.Type == "BLOB") != null)
+                        funcParams.FirstOrDefault(c => c.Type == "BLOB").ByteBody = binData;
+                    additionalParams.Add(new FieldProperties { Name = "FileName", Value = fileName, Type = "BLOB" });
+
+
+
+
+
                     string res = _repository.CallRefFunction(tableId, funcId, codeOper, null, funcParams, procName, msg, web_form_name, null, additionalParams);
                     //_repository.ExecProcWithClobParam(result, fileName, null, 0);
                     //to do sth with the file
                     return Json(new { success = "true", resultMessage = res });
+                    //}
+                    //else
+                    //{
+                    //    return new JsonResult()
+                    //    {
+                    //        ContentType = "text/html",
+                    //        Data = new { success = false, error = "Unsupported file type" }
+                    //    };
+                    //   // return Content("{success:false, error:\"Unsupported file type\"}");
+                    //}
                 }
-                else
-                {
-                    //unsupported file type
-                    return Content("{success:false, error:\"Unsupported file type\"}");
-                }
-            }
+                return Json(new { success = "false", resultMessage =  "файл не було завантажено"});
 
-            return new JsonResult()
+            }
+            catch (Exception e)
             {
-                ContentType = "text/html",
-                Data = new { success = false, error = "File uploaded error" }
-            };
+                return Json(new { success = "false", errorMessage = e.Message });
+            }
         }
 
 
@@ -236,14 +255,14 @@ namespace BarsWeb.Areas.Ndi.Controllers
         {
             try
             {
-                
+
                 if (string.IsNullOrEmpty(tableName))
                     throw new Exception("значення вьюшки порожне");
 
                 List<Dictionary<string, object>> allData;
                 var metaTable = _repository.GetMetaTableByName(tableName);
                 ParamMetaInfo refParam = _repository.GetDefaultRelatedData(metaTable);
-                if ( (string.IsNullOrEmpty(fieldForId) || fieldForId == "undefined") && (string.IsNullOrEmpty(fieldForName) || fieldForName == "undefined"))
+                if ((string.IsNullOrEmpty(fieldForId) || fieldForId == "undefined") && (string.IsNullOrEmpty(fieldForName) || fieldForName == "undefined"))
                     allData = _repository.GetRelatedReferenceData(nativeTableId, refParam.SrcTableName, refParam.SrcColName, refParam.SrcTextColName, query, refParam.SrcTextColName2, start, limit);
                 else
                 {
@@ -584,8 +603,8 @@ namespace BarsWeb.Areas.Ndi.Controllers
                 //    funcParams.AddRange(jsonSqlProcParameter.Where(x => !funcParams.Select(c => c.Name).Contains(x.Name)));
                 //}
                 GetFileResult res = _repository.CallFunctionWithFileResult(tableId, funcId, codeOper, funcParams, procName, msg, web_form_name);
-                if (res.Result == "ok" && res.FileBody != null && !string.IsNullOrEmpty(res.FileName))
-                    return File(Encoding.Default.GetBytes(res.FileBody), "text/html", HttpUtility.UrlEncode(res.FileName));
+                if (res.Result == "ok" && (res.FileBytesBody != null) && !string.IsNullOrEmpty(res.FileName))
+                    return File(res.FileBytesBody, "text/html", HttpUtility.UrlEncode(res.FileName));
                 else
                     return Json(new { status = "error", message = res.Result });
 
@@ -620,11 +639,11 @@ namespace BarsWeb.Areas.Ndi.Controllers
         }
 
 
-        public JsonResult GetFuncOnlyMetaData(int? codeOper)
+        public JsonResult GetFuncOnlyMetaData(int? codeOper, string code = "")
         {
             try
             {
-                CallFunctionMetaInfo funcInfo = _repository.GetFunctionsMetaInfo(codeOper);
+                CallFunctionMetaInfo funcInfo = _repository.GetFunctionsMetaInfo(codeOper, code);
                 var result = new { success = true, funcMetaInfo = funcInfo };
                 return Json(result);
 

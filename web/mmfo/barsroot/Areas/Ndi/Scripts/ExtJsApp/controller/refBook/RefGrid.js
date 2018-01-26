@@ -1150,15 +1150,15 @@
         var thisController = this;
         var referenceGrid = thisController.getGrid();
         //получаем выбранную строку грида и загружаем в форму данные этой строки
-        var selectedRow = referenceGrid.getSelectionModel().getSelection()[0];
+       // var selectedRow = referenceGrid.getSelectionModel().getSelection()[0];
 
         var formPanel = Ext.create('ExtApp.view.refBook.UploadForm');//  Ext.create('ExtApp.view.refBook.FormPanel', referenceGrid.editForm);
         // formPanel.form.loadRecord(selectedRow);
-        var winTitle = selectedRow.phantom ? "Додавання нового рядка" : "Редагування рядка";
+       // var winTitle = selectedRow.phantom ? "Додавання нового рядка" : "Редагування рядка";
         //создаем диалог редактирования формы, в который передаем заголовок и форму с данными
         Ext.create('ExtApp.view.refBook.refShowparamWindow', {
             itemId: "refEditWindow",
-            title: winTitle,
+            title: 'winTitle',
             items: formPanel /*, btnOkProps: { handler: thisController.onEditWindowSaveClick }*/
         });
     },
@@ -1267,6 +1267,7 @@
     //menu - кнопка с выпадающим меню
     //item - конкретный пункт меню который нажали
     onCallFunctionMenuClick: function (menu, item) {
+        
         var thisController = this;
         //каждый пункт меню содержит свойство metaInfo с информацией о вызываемой процедуре
         var funcMetaInfo = item.metaInfo;
@@ -1291,6 +1292,7 @@
     },
 
     onToolBtnclick: function (button) {
+        
         var thisController = this;
         var referenceGrid = thisController.getGrid();
         //каждый пункт меню содержит свойство metaInfo с информацией о вызываемой процедуре
@@ -2294,8 +2296,16 @@
                 }
             },
             failure: function (conn, response) {
+                if(conn && conn.request)
+                {
+                    if(conn.request.responseText === '')
+                        return;
+                    Ext.Msg.show({ title: "Виникли проблеми при з'єднанні з сервером", msg: conn.request.responseText + '</br> </br>', icon: Ext.Msg.ERROR, buttons: Ext.Msg.OK });
+                }
+                else
+                    return;
                 //обработка при неудачном запросе на сервер
-                Ext.Msg.show({ title: "Виникли проблеми при з'єднанні з сервером", msg: conn.responseText + '</br> </br>', icon: Ext.Msg.ERROR, buttons: Ext.Msg.OK });
+
             }
         });
     },   
@@ -2321,9 +2331,10 @@
 
     },
     onExportToExcelBtnClick: function (menu, item) {
+
         var grid = menu.up('referenceGrid');
-        debugger;
         
+
         var columnsHiddenNames = ExtApp.utils.RefBookUtils.getHiddenColumnsFromLocalSrorage(grid.metadata.localStorageModel);
         
            
@@ -2772,7 +2783,7 @@
 
                         });
 
-                    var emptyParam = Ext.Array.findBy(params, function (param) { return param.Value == "" });
+                    var emptyParam = Ext.Array.findBy(params, function (param) { return param.Value === "" || param.Value == undefined});
                     if (emptyParam) {
                         if (emptyParam.Name)
                             Ext.MessageBox.show({
@@ -3013,10 +3024,12 @@
             Ext.each(func.paramsInfo, function (par) {
 
                 if (par.IsInput == false) {
+                    var colParam = Ext.Array.findBy(referenceGrid.metadata.columnsInfo, function (i) { return i.COLNAME == par.Name; });
+                    if(colParam)
                     currentParams.rowParams.push({
                         Name: par.Name,
                         //для невводимых параметров тип параметра берем из метаданных колонки, с которой берем значение
-                        Type: Ext.Array.findBy(referenceGrid.metadata.columnsInfo, function (i) { return i.COLNAME == par.Name; }).COLTYPE,
+                        Type: colParam.COLTYPE,
                         //присваиваем значению параметра значение с выбранной строки грида
                         Value: selectedRow.data[par.Name]
                     });
@@ -3040,6 +3053,7 @@
                 //заполняем параметры функции значения которых нужно взять из текущей строки грида
 
                 Ext.each(multiParam.ListColumnNames, function (name) {
+ 
                         currentParams.rowParams.push({
                             Name: par.Name,
                             //для невводимых параметров тип параметра берем из метаданных колонки, с которой берем значение
@@ -3114,11 +3128,11 @@
                             param.rowParams = param.rowParams.concat(inputParams);
                         });
                     }
-
+                    
                     formWindow.closeAction = 'destroy';
                     var ProcParams = func.params[0].rowParams;
                     if (ProcParams && ProcParams.length > 0 &&
-                        Ext.Array.findBy(ProcParams, function (param) { return param.Type == "CLOB"; })) {
+                        Ext.Array.findBy(ProcParams, function (param) { return param.Type == "CLOB" || param.Type == "BLOB"; })) {
                         thisController.executeCurrentSqlFunctionWithUploadFile(func, formWindow);
                         return true;
                     }
@@ -3329,19 +3343,26 @@
     executeCurrentSqlFunctionWithUploadFile: function (functi, formWindow) {
         var form = formWindow.down('form').getForm();
         var thisController = this;
-
+        
         var func = thisController.currentCalledSqlFunction;
         var params = func.params[0].rowParams;
-        var fileParam = Ext.Array.findBy(params, function (param) { return param.Type == "CLOB"; })
+        var fileParam = Ext.Array.findBy(params, function (param) { return param.Type == "CLOB" || param.Type == "BLOB"; });
         if (fileParam && fileParam.Value && form.isValid()) {
             form.submit({
                 url: '/barsroot/ndi/ReferenceBook/UploadTemplateFile?fieldFileName=' + fileParam.Name + '&tableId=' + func.tableId + '&funcId=' + func.funcId + '&codeOper=' + func.CodeOper +
             '&jsonFuncParams=' + Ext.JSON.encode(params) + '&procName=' + func.funcName,
                 waitMsg: 'завантаження...',
-                success: function (fp, o) {
-
-                    formWindow.close();
-                    Ext.Msg.alert('Загрузка прошла успешно', o.result.resultMessage);
+   success: function (conn, response) {
+                    debugger;
+                    var result = response.result;
+                    if (result.success == 'true')
+                        Ext.Msg.alert('Загрузка прошла успешно', result.resultMessage);
+                    else
+                         Ext.Msg.show({
+                            title: "Не вдалося завантажити файл",
+                            msg: result.errorMessage + '</br> </br>', icon: Ext.Msg.ERROR, buttons: Ext.Msg.OK
+                        });
+                        formWindow.close();
                 }
             });
         }

@@ -6,17 +6,20 @@ using System.Web;
 /// <summary>
 /// Summary description for LocalStorageModel
 /// </summary>
-public class LocalStorageModel
+namespace BarsWeb.Areas.Ndi.Models.ViewModels
 {
-	public LocalStorageModel()
-	{
-		//
-		// TODO: Add constructor logic here
-		//
-	}
-    public  const string HiddenColumnsKeyPrefix = "hiddenColumnsKey";
-    public string FiltersStorageKey { get; set; }
+    public class LocalStorageModel
+    {
+        public LocalStorageModel()
+        {
+            //
+            // TODO: Add constructor logic here
+            //
+        }
+        public const string HiddenColumnsKeyPrefix = "hiddenColumnsKey";
+        public string FiltersStorageKey { get; set; }
 
-    public string HiddenColumnsKey { get; set; }
+        public string HiddenColumnsKey { get; set; }
 
+    }
 }

@@ -13,6 +13,7 @@
         }
         public string Result { get; set; }
         public string FileBody { get; set; }
+        public byte[] FileBytesBody { get; set; }
         public string FileName { get; set; }
     }
 }

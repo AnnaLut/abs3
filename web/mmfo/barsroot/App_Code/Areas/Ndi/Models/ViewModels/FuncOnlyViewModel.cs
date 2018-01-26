@@ -17,6 +17,6 @@ namespace BarsWeb.Areas.Ndi.Models.ViewModels
             //
             this.IsFuncOnly = true;
         }
-        
+        public bool ExternelFuncOnly { get; set; }
     }
 }

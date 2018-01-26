@@ -91,13 +91,13 @@
                     CodeOper: codeOper
                 },
                 success: function (conn, response) {
-
+                    
                     //обработка при удачном запросе на сервер
                     var result = Ext.JSON.decode(conn.responseText);
                     if (result.success) {
                         var funcMetaInfo = result.funcMetaInfo;
                         var titleMsg = 'Виконання процедури' + funcMetaInfo.DESCR;
-
+                        funcMetaInfo.Base64ProcParams = Base64jsonSqlProcParams;
                         if (funcMetaInfo.QST) {
                             Ext.MessageBox.confirm(titleMsg, funcMetaInfo.QST, function (btn) {
                                 if (btn == 'yes') {

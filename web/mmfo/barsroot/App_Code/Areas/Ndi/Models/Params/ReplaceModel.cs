@@ -7,16 +7,19 @@ using System.Web;
 /// <summary>
 /// Summary description for ReplaceModel
 /// </summary>
-public class ReplaceModel
+namespace BarsWeb.Areas.Ndi.Models.Params
 {
-    public ReplaceModel()
+    public class ReplaceModel
     {
-        this.ReplaceSemanticFields = new List<FieldProperties>();
-        //
-        // TODO: Add constructor logic here
-        //
+        public ReplaceModel()
+        {
+            this.ReplaceSemanticFields = new List<FieldProperties>();
+            //
+            // TODO: Add constructor logic here
+            //
+        }
+
+        public List<FieldProperties> ReplaceSemanticFields { get; set; }
+
     }
-
-    public List<FieldProperties> ReplaceSemanticFields { get; set; }
-
 }

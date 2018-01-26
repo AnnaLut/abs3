@@ -59,7 +59,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
             }
 
             requestModel.TableName = nsiEditParams == null || string.IsNullOrEmpty(nsiEditParams.TableName) ? requestModel.TableName : nsiEditParams.TableName;
-            if (string.IsNullOrEmpty(requestModel.TableName) && nsiEditParams != null && nsiEditParams.IsFuncOnly)
+            if (string.IsNullOrEmpty(requestModel.TableName) && nsiEditParams != null &&
+               nsiEditParams.IsFuncOnly || (requestModel.ExternalFuncOnly && requestModel.Code != null))
             {
                 return BuildFunctionOnlyRequest(requestModel);
             }
@@ -111,7 +112,13 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
         public FuncOnlyViewModel BuildFunctionOnlyRequest(RequestMolel requestModel)
         {
             FuncOnlyViewModel funcOnlyViewModel = new  FuncOnlyViewModel();
-            funcOnlyViewModel.CodeOper = requestModel.Spar;
+            if(!string.IsNullOrEmpty(requestModel.Code))
+                funcOnlyViewModel.Code = requestModel.Code;
+            else
+                funcOnlyViewModel.CodeOper = requestModel.Spar;
+
+            funcOnlyViewModel.ExternelFuncOnly = requestModel.ExternalFuncOnly;
+            funcOnlyViewModel.DefParamModel.Base64ProcParams = FormatConverter.ConvertToUrlBase4UTF8(requestModel.ExternalParams);
             return funcOnlyViewModel;
         }
 

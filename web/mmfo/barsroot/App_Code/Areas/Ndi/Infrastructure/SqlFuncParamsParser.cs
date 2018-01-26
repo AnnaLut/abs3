@@ -8,6 +8,7 @@ using BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation;
 using System;
 using System.Data;
 using BarsWeb.Areas.Ndi.Models.DbModels;
+using BarsWeb.Areas.Ndi.Infrastructure.Helpers.BarsWeb.Areas.Ndi.Infrastructure.Helpers;
 
 namespace BarsWeb.Areas.Ndi.Infrastructure
 {
@@ -282,12 +283,24 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                     FieldProperties clobProp = funcParams.FirstOrDefault(x => x.Name == item.ColName);
                     command.Parameters.Add(new OracleParameter(item.ColName, OracleDbType.Clob, clobProp.Value, ParameterDirection.Input));
                 }
+                if(item.ColType == "BLOB")
+                {
+                    FieldProperties blobProp = funcParams.FirstOrDefault(x => x.Name == item.ColName);
+                    command.Parameters.Add(new OracleParameter(item.ColName, OracleDbType.Blob, blobProp.ByteBody, ParameterDirection.Input));
+                }
+
 
                 if (item.ColType == "S" && item.GetFrom == "FILE_NAME")
                 {
+                    UploadFileName fileName = item as UploadFileName;
                     FieldProperties fileNameProp = additionalParams.FirstOrDefault(x => x.Name == "FileName");
                     if (fileNameProp != null && !string.IsNullOrEmpty(fileNameProp.Value))
+                    {
+                        if (fileNameProp.Value.Contains('.') && fileName != null && fileName.WithoutExt)
+                            fileNameProp.Value = fileNameProp.Value.Substring(0, fileNameProp.Value.LastIndexOf('.'));
                         command.Parameters.Add(new OracleParameter(item.ColName, OracleDbType.Varchar2, 4000, fileNameProp.Value, ParameterDirection.Input));
+                    }
+                        
                 }
 
 

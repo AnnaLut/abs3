@@ -6,17 +6,20 @@ using System.Web;
 /// <summary>
 /// Summary description for GetDataModel
 /// </summary>
-public class GetDataModel
+namespace BarsWeb.Areas.Ndi.Models.ViewModels
 {
-	public GetDataModel()
-	{
-		//
-		// TODO: Add constructor logic here
-		//
-	}
-    public bool isReserPages = false;
-    public  string startFilter;
-    public  string dynamicFilter;
-    public string jsonSqlProcParams = "";
-    public string base64jsonSqlProcParams = "";
+    public class GetDataModel
+    {
+        public GetDataModel()
+        {
+            //
+            // TODO: Add constructor logic here
+            //
+        }
+        public bool isReserPages = false;
+        public string startFilter;
+        public string dynamicFilter;
+        public string jsonSqlProcParams = "";
+        public string base64jsonSqlProcParams = "";
+    }
 }
