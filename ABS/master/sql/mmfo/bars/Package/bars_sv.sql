@@ -164,7 +164,6 @@ procedure import_tick (p_filename in varchar2);
 end;
 /
 
-create or replace package body bars_sv is
 -- #101: Иванава Ирина, изменения в соответствии с техническими условиями 4_1
 -- Перегружены процедуры import_file,import_tick  для импорта файлов из веба
 g_body_version constant varchar2(64)  := 'Version 2.5 24/01/2018';
@@ -1043,7 +1042,7 @@ begin
                /*case when w.nat is null then
                     XmlElement("MEMBER_NAT", XmlAttributes('true' "xsi:nil")) else
                     XmlElement("MEMBER_NAT", w.nat) end,*/  -- need delete from TZ
-               XmlElement("MEMBER_PASS", w.pass), -- NEW 
+               XmlElement("MEMBER_PASS", w.pass), -- NEW
               XmlElement("MEMBER_NAT_COD", w.nat_cod), -- NEW
               XmlElement("MEMBER_ADR",
                   XmlElement("ADR_COD_KR", lpad(w.cod_kr,3,'0')),
@@ -1190,7 +1189,8 @@ begin
                XmlElement("OWNER_TYPE", w.type),
                XmlElement("OWNER_NAZVA",
                   XmlElement("NT_COD", w.cod),
-                  XmlElement("MEMBER_PASS", w.pass), -- NEW 
+                  XmlElement("OWNER_PASS", w.pass), -- NEW
+                  XmlElement("OWNER_NAT_COD", w.nat_cod), -- NEW
                   --#101:
                   /*XmlElement("NT_NM1", w.nm1),
                   XmlElement("NT_NM2", w.nm2),
@@ -1607,14 +1607,14 @@ procedure import_file (p_filename in varchar2, p_id in number, p_filebody in blo
 is
 begin
     begin
-      insert into imp_file(file_name, file_blob) 
+      insert into imp_file(file_name, file_blob)
       values (p_filename, p_filebody);
-    exception when dup_val_on_index then 
+    exception when dup_val_on_index then
      raise_application_error(-20000, p_filename || ' - файл з данним ім`ям вже заімпортовано, переназвіть файл.');
     end;
-    
+
     import_file (p_filename, p_id);
-    
+
 end import_file;
 -------------------------------------------------------------------------------
 procedure import_tick (p_filename in varchar2)
@@ -1683,9 +1683,9 @@ procedure import_tick (p_filename in varchar2, p_filebody in clob)
 is
 begin
     begin
-      insert into imp_file(file_name, file_clob) 
+      insert into imp_file(file_name, file_clob)
       values (p_filename, p_filebody);
-    exception when dup_val_on_index then 
+    exception when dup_val_on_index then
      raise_application_error(-20000, p_filename || ' - файл з данним ім`ям вже заімпортовано, переназвіть файл.');
     end;
     import_tick (p_filename);
