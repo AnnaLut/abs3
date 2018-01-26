@@ -35,7 +35,8 @@ begin
 	ISP_FIO_NM1 VARCHAR2(100), 
 	ISP_FIO_NM2 VARCHAR2(50), 
 	ISP_FIO_NM3 VARCHAR2(50), 
-	ISP_MB_TLF VARCHAR2(50)
+	ISP_MB_TLF VARCHAR2(50),
+	email varchar(100)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -186,6 +187,14 @@ exception when others then
  end;
 /
 
+PROMPT *** add column email***
+begin
+    execute immediate 'alter table sv_bank add email varchar(100)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
 
 
 PROMPT *** Create  grants  SV_BANK ***

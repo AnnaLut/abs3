@@ -164,9 +164,10 @@ procedure import_tick (p_filename in varchar2);
 end;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.BARS_SV is
+create or replace package body bars_sv is
 -- #101: Иванава Ирина, изменения в соответствии с техническими условиями 4_1
-
-g_body_version constant varchar2(64)  := 'Version 2.4 28/08/2015';
+-- Перегружены процедуры import_file,import_tick  для импорта файлов из веба
+g_body_version constant varchar2(64)  := 'Version 2.5 24/01/2018';
 g_body_defs    constant varchar2(512) := '';
 
 g_date_format varchar2(10) := 'dd.mm.yyyy';
@@ -1039,10 +1040,12 @@ begin
                        XmlElement("NT_NM_UA", w.nm_ua) end
                ),
                XmlElement("MEMBER_OZN", w.ozn),
-               case when w.nat is null then
+               /*case when w.nat is null then
                     XmlElement("MEMBER_NAT", XmlAttributes('true' "xsi:nil")) else
-                    XmlElement("MEMBER_NAT", w.nat) end,
-               XmlElement("MEMBER_ADR",
+                    XmlElement("MEMBER_NAT", w.nat) end,*/  -- need delete from TZ
+               XmlElement("MEMBER_PASS", w.pass), -- NEW 
+              XmlElement("MEMBER_NAT_COD", w.nat_cod), -- NEW
+              XmlElement("MEMBER_ADR",
                   XmlElement("ADR_COD_KR", lpad(w.cod_kr,3,'0')),
                   XmlElement("ADR_INDEX", w.indx),
                   XmlElement("ADR_PUNKT", w.punkt),
@@ -1130,7 +1133,8 @@ begin
                XmlElement("MB_ISP_NAZVA", Substr(w.isp_fio_nm1||' '||
                                                  w.isp_fio_nm2||' '||
                                                  w.isp_fio_nm3, 1, 100)),
-               XmlElement("MB_TLF", w.isp_mb_tlf)
+               XmlElement("MB_TLF", w.isp_mb_tlf),
+                XmlElement("MB_EMAIL", w.email)
             )
        into l_xml
        from sv_bank w where id = 1; --такое условие перенесено из предыдущей версии
@@ -1149,6 +1153,9 @@ is
   l_xml  xmltype := null;
 begin
 
+--додано елемент «MB_EMAIL» до структур «MEMBER_BANKIR» та «OWNER_BANKIR»
+
+
   select XmlElement("OWNER_BANKIR",
                XmlElement("MB_NAME", Substr(w.man_fio_nm1||' '||
                                             w.man_fio_nm2||' '||
@@ -1158,7 +1165,8 @@ begin
                XmlElement("MB_ISP_NAZVA", Substr(w.isp_fio_nm1||' '||
                                                  w.isp_fio_nm2||' '||
                                                  w.isp_fio_nm3, 1, 100)),
-               XmlElement("MB_TLF", w.isp_mb_tlf)
+               XmlElement("MB_TLF", w.isp_mb_tlf),
+               XmlElement("OWNER_BANKIR", w.email)
             )
        into l_xml
        from sv_bank w where id = 1; --такое условие перенесено из предыдущей версии
@@ -1182,6 +1190,7 @@ begin
                XmlElement("OWNER_TYPE", w.type),
                XmlElement("OWNER_NAZVA",
                   XmlElement("NT_COD", w.cod),
+                  XmlElement("MEMBER_PASS", w.pass), -- NEW 
                   --#101:
                   /*XmlElement("NT_NM1", w.nm1),
                   XmlElement("NT_NM2", w.nm2),
@@ -1594,6 +1603,19 @@ begin
 exception when no_data_found then null;
 end import_file;
 
+procedure import_file (p_filename in varchar2, p_id in number, p_filebody in blob)
+is
+begin
+    begin
+      insert into imp_file(file_name, file_blob) 
+      values (p_filename, p_filebody);
+    exception when dup_val_on_index then 
+     raise_application_error(-20000, p_filename || ' - файл з данним ім`ям вже заімпортовано, переназвіть файл.');
+    end;
+    
+    import_file (p_filename, p_id);
+    
+end import_file;
 -------------------------------------------------------------------------------
 procedure import_tick (p_filename in varchar2)
 is
@@ -1657,6 +1679,17 @@ begin
 exception when no_data_found then null;
 end import_tick;
 
+procedure import_tick (p_filename in varchar2, p_filebody in clob)
+is
+begin
+    begin
+      insert into imp_file(file_name, file_clob) 
+      values (p_filename, p_filebody);
+    exception when dup_val_on_index then 
+     raise_application_error(-20000, p_filename || ' - файл з данним ім`ям вже заімпортовано, переназвіть файл.');
+    end;
+    import_tick (p_filename);
+end import_tick;
 end;
 /
  show err;
