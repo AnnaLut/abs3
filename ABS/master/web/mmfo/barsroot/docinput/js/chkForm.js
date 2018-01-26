@@ -782,7 +782,7 @@ function selectDopReq(evt, name, fl) {
         if (result != null) {
             if (name === "reqv_INK_I") 
                 BindIncasatorsData(result[0]);
-            elem.value = result[0];
+            elem.value = result[1];
             elem.fireEvent("onchange");
             // COBUSUPABS-4641 
             var reqvDA70 = document.getElementById("reqv_DA#70");
