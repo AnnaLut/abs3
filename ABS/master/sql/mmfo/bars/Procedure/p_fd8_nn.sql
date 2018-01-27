@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_FD8_NN.sql =========*** Run *** 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_FD8_NN ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_FD8_NN (
+CREATE OR REPLACE PROCEDURE BARS.p_fd8_nn (
    dat_     DATE,
    sheme_   VARCHAR2 DEFAULT 'G',
    prnk_    NUMBER DEFAULT NULL
@@ -16,7 +7,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #D8 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 13/12/2017 (17/11/2017)
+% VERSION     : 26/01/2018 (13/12/2017, 17/11/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                sheme_ - схема формирования
@@ -27,6 +18,10 @@ IS
     содержиться в поле RNKA (в RNKB участвующие клиенты нашего банка или
     пустое значение для не клиентов банка)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%26/01/2018 - на 01.01.2018 новая структура показателя 
+              для показателя 083 выбтраем только некоторые бал.счета
+              с параметром R013
+              1602/1,2602/1,2622/1,9030/1,9031/1,9036/1,9500/1,3   
 %16/11/2017 - включались клиенты у которых был 9129 с R013='9' 
 %08/11/2017 - изменено формирование показателя 161 вид реструктуризации
               (новые значения 4, 5, 6)
@@ -291,6 +286,7 @@ IS
    fmt2_        VARCHAR2 (20)         := '999990D000';
    fmtkap_      VARCHAR2 (30)         := '999G999G999G990D99';
    dfmt_        VARCHAR2 (8)          := 'ddmmyyyy';
+   ise_         customer.ise%TYPE;
    ved_         customer.ved%TYPE;
    k110_        VARCHAR2 (5);
    reg_         customer.c_reg%TYPE;
@@ -350,6 +346,7 @@ IS
    p083_        NUMBER;
    p085_        VARCHAR2 (70);
    p085_p       VARCHAR2 (70);
+   ccf_         Number;
    p090k_       specparam.nkd%TYPE;  --VARCHAR2 (20);
    p090_        specparam.nkd%TYPE;  --VARCHAR2 (20);
    p100_        VARCHAR2 (1);
@@ -404,6 +401,7 @@ IS
    lgd_         NUMBER;
    pd_          NUMBER;
    fin_         VARCHAR2 (1);
+   s250_23_     VARCHAR2 (1);
    r013_        VARCHAR2 (1);
    kol_dz       NUMBER;
    pr_          NUMBER (10, 2);
@@ -443,6 +441,9 @@ IS
    stp_dat1_    DATE;
    k021_        Varchar2(1);
    w_           varchar2(1);
+   k140_        Varchar2(1);
+   H_           Varchar2(1);
+   pd_0_        Number;
 
    TYPE ref_type_curs IS REF CURSOR;
 
@@ -467,6 +468,7 @@ IS
    dat_izm3     date := to_date('31/03/2016','dd/mm/yyyy');
    dat_izm4     date := to_date('31/10/2016','dd/mm/yyyy');
    dat_izm5     date := to_date('30/12/2016','dd/mm/yyyy');
+   dat_izm6     date := to_date('29/12/2017','dd/mm/yyyy');
    n_trans      number;
    kod_mm       Varchar2(2);
    nls_9129_9   VARCHAR2 (15);
@@ -478,6 +480,7 @@ IS
    tr_end       number;
    freq_        NUMBER;
    comm_        rnbu_trace.comm%TYPE;
+   isspe_       Varchar2(1);
    
    -- ДО 30 ДНЕЙ
    o_r013_1     VARCHAR2 (1);
@@ -685,6 +688,8 @@ IS
       p_K021    IN   VARCHAR2 DEFAULT '0',
       p_W       IN   VARCHAR2 DEFAULT '0',
       p_OO      IN   VARCHAR2 DEFAULT '00',
+      p_s083    IN   VARCHAR2 DEFAULT '0',
+      p_k140    IN   VARCHAR2 DEFAULT '0',
       p_comm    IN   VARCHAR2 DEFAULT ''
    )
    IS
@@ -715,13 +720,24 @@ IS
                       SUBSTR (p_kodp_ || l_trans  || TO_CHAR (rnk_), 1, 35), p_znap_, nd_
                      );
       else 
-         INSERT INTO rnbu_trace
-                     (acc, nls, kv, odate, isp, rnk,
-                      kodp, znap, nd, comm
-                     )
-              VALUES (l_acc_, p_nls_, kv_, data_, l_isp_, rnk_,
-                      SUBSTR (p_kodp_ || l_trans || p_K021 || p_W || p_OO || TO_CHAR (rnk_), 1, 35), p_znap_, nd_, p_comm
-                     );
+         if dat_ < dat_izm6 
+         then
+            INSERT INTO rnbu_trace
+                        (acc, nls, kv, odate, isp, rnk,
+                         kodp, znap, nd, comm
+                        )
+                 VALUES (l_acc_, p_nls_, kv_, data_, l_isp_, rnk_,
+                         SUBSTR (p_kodp_ || l_trans || p_K021 || p_W || p_OO || TO_CHAR (rnk_), 1, 35), p_znap_, nd_, p_comm
+                        );
+         else
+            INSERT INTO rnbu_trace
+                        (acc, nls, kv, odate, isp, rnk,
+                         kodp, znap, nd, comm
+                        )
+                 VALUES (l_acc_, p_nls_, kv_, data_, l_isp_, rnk_,
+                         SUBSTR (p_kodp_ || l_trans || p_K021 || p_W || p_OO || p_s083 || p_k140 || TO_CHAR (rnk_), 1, 35), p_znap_, nd_, p_comm
+                        );
+         end if;
       end if;
    END;
 
@@ -729,7 +745,7 @@ IS
    PROCEDURE p_ins_contr
    IS
 --- запись реквизитов контрагента
-      kodp_   VARCHAR2 (30);
+      kodp_   VARCHAR2 (35);
    BEGIN
       -- для банк?в резидент?в
       IF rez_ = 1 then
@@ -771,8 +787,9 @@ IS
             THEN
                kod_okpo := TRIM(kod_okpo);
             ELSE
-               ncontr_ := ncontr_ + 1;
-               kod_okpo := 'IN' || LPAD (TO_CHAR (ncontr_), 8, '0');
+               --ncontr_ := ncontr_ + 1;
+               --kod_okpo := 'IN' || LPAD (TO_CHAR (ncontr_), 8, '0');
+               kod_okpo := 'I' || LPAD (TO_CHAR (rnk_), 9, '0');
             END IF;
             k021_ := '9';
          ELSE
@@ -791,17 +808,27 @@ IS
                   THEN
                      kod_okpo := 'RNK' || LPAD (SUBSTR (rnk_, 1, 7), 7, '0');
                END;
-               k021_ := '9';
+               k021_ := '6';
             ELSE
                kod_okpo := 'RNK' || LPAD (SUBSTR (rnk_, 1, 7), 7, '0');
-               k021_ := '9';
+               k021_ := 'E';
             END IF;
          END IF;
       ELSE
          kod_okpo := LPAD (kod_okpo, 10, '0');
          if rez_ = 3 then 
+            select ise 
+                into ise_
+            from customer 
+            where rnk = rnk_;
+
             k021_ := '1';
+            if ise_ in ('13110','13120','13131','13132') 
+            then 
+               k021_ := 'G';
+            end if;
          end if;
+
          if rez_ = 5 then
             k021_ := '2';
          end if;
@@ -3358,6 +3385,19 @@ BEGIN
       sum_d_ := 0;
       nd_ := null;
 
+      if dat_ >= dat_izm6 
+      then
+         begin
+            select NVL(substr(trim(value),1,1), '9')
+                into k140_
+            from customerw
+            where rnk = rnk_
+              and tag like 'K140%';
+         exception when no_data_found then
+            k140_ := '9';
+         end;
+      end if;         
+
       if rez_ in (4,6) and substr(kod_okpo,1,2) != 'IN' then
          okpo_nerez := trim(kod_okpo);
          kod_okpo := 'IN'||LPAD (substr(trim(kod_okpo),1,8), 8, '0');
@@ -3365,13 +3405,13 @@ BEGIN
          if length(okpo_nerez) > 8 then
             kodp_ := kod_okpo || '0000' || '0000' || '000';
             -- код ОКПО нерезидента
-            p_ins ('019' || kodp_, okpo_nerez, null, '00', k021_, '0', '00');
+            p_ins ('019' || kodp_, okpo_nerez, null, '00', k021_, '0', '00', '0', '0');
          end if;
       end if;
 
       kodp_ := kod_okpo || '0000' || '0000' || '000';
       -- название контрагента
-      p_ins ('010' || kodp_, p010_, null, '00', k021_, '0', '00');
+      p_ins ('010' || kodp_, p010_, null, '00', k021_, '0', '00', '0', '0');
 
       if rez_ in (2, 4, 6) then
          p021_ := '2';
@@ -3381,32 +3421,33 @@ BEGIN
       -- на 01.10.2014 снова будет формироваться
       if dat_ <= dat_izm1 OR dat_ > to_date('29092014','ddmmyyyy')
       then
-         p_ins ('021' || kodp_, p021_, null, '00', k021_, '0', '00');         --включили. начиная с 01.09.2007
+         --включили. начиная с 01.09.2007
+         p_ins ('021' || kodp_, p021_, null, '00', k021_, '0', '00', '0', '0');         
       end if;
       -- вид экономической деятельности
-      p_ins ('025' || kodp_, k110_, null, '00', k021_, '0', '00');
+      p_ins ('025' || kodp_, k110_, null, '00', k021_, '0', '00', '0', '0');
 
       -- количество участников, участие которых 20 и больше %% статутного фонда
       If dat_ < dat_izm4 
       then
-         p_ins ('040' || kodp_, lpad(p040_,3,'0'), null, '00', k021_, '0', '00');
+         p_ins ('040' || kodp_, lpad(p040_,3,'0'), null, '00', k021_, '0', '00', '0', '0');
       end if;
 
       -- на 01.04.2016 два нових коди 041, 042
       -- порядковий номер группы повязаних контрагентів
       If dat_ >= dat_izm3
       then
-         p_ins ('041' || kodp_, p041_, null, '00', k021_, '0', '00');
+         p_ins ('041' || kodp_, p041_, null, '00', k021_, '0', '00', '0', '0');
       end if;
 
       -- порядковий номер контрагента в групі повязаних осіб
       If dat_ >= dat_izm3 and dat_ < dat_izm4 
       then
-         p_ins ('042' || kodp_, '1', null, '00', k021_, '0', '00');
+         p_ins ('042' || kodp_, '1', null, '00', k021_, '0', '00', '0', '0');
       end if;
 
       -- код страны
-      p_ins ('050' || kodp_, lpad(TO_CHAR (p050_),3,'0'), null, '00', k021_, '0', '00');
+      p_ins ('050' || kodp_, lpad(TO_CHAR (p050_),3,'0'), null, '00', k021_, '0', '00', '0', '0');
 
       -- исключается на 01.03.2014
       -- будем формировать на 01.02.2017 
@@ -3414,7 +3455,7 @@ BEGIN
       then
          if rez_ not in (2, 4, 6) then
             -- код региона
-            p_ins ('055' || kodp_, lpad(TO_CHAR (NVL (reg_, our_reg_)), 3, '0'), null, '00', k021_, '0', '00');
+            p_ins ('055' || kodp_, lpad(TO_CHAR (NVL (reg_, our_reg_)), 3, '0'), null, '00', k021_, '0', '00', '0', '0');
          end if;
       end if;
 
@@ -3423,7 +3464,38 @@ BEGIN
       p060_1 := p060_;
 
       -- признак инсайдера
-      p_ins ('060' || kodp_, LPAD(TO_CHAR (p060_1),2,'0'), null, '00', k021_, '0', '00');
+      p_ins ('060' || kodp_, LPAD(TO_CHAR (p060_1),2,'0'), null, '00', k021_, '0', '00', '0', '0');
+
+      -- новий код 085 код належності до SPE (значення 0 або B або A)
+      if Dat_ >= dat_izm6
+      then
+         if rez_ = 3 
+         then
+            begin
+               select substr(trim(value),1,1)
+                  into isspe_
+               from customerw
+               where rnk = rnk_
+                 and tag like 'ISSPE%';
+            exception when no_data_found then
+               isspe_ := '0';
+            end;
+         end if;
+
+         p085_ := 'B';
+
+         if rez_ = 5 or p060_1 = 1
+         then
+            p085_ := '0';
+         elsif rez_ = 3 and isspe_ = '1' then
+            p085_ := 'A';
+         else
+            null;
+         end if;
+
+         p_ins ('085' || kodp_, p085_, null, '00', k021_, '0', '00', '0', '0');
+      end if;
+
 
       OPEN c_cust_dg;
 
@@ -3492,8 +3564,9 @@ BEGIN
 
                 if Dat_ >= to_date('29122012','ddmmyyyy') then
                    BEGIN
-                      select NVL(max(fin), p085_p)
-                        into p085_p
+                      select NVL(to_char(max(fin)), p085_p), 
+                             NVL(to_char(max(ccf)), 0)
+                        into p085_p, ccf_ 
                    from nbu23_rez
                    where fdat = dat23_
                      and rnk = rnk_
@@ -3501,8 +3574,8 @@ BEGIN
                      and rownum =1;
                    EXCEPTION WHEN NO_DATA_FOUND THEN
                       BEGIN
-                         select NVL(max(fin), p085_p)
-                            into p085_p
+                         select NVL(to_char(max(fin)), p085_p)
+                            into p085_p 
                          from nbu23_rez
                          where fdat = dat23_
                            and rnk = rnk_;
@@ -3585,7 +3658,7 @@ BEGIN
                 end if;
 
                 -- _дентиф_катор договору
-                p_ins ('090' || kod_okpo || kod_nnnn || '0000' || '000', p090_, null, '00', k021_, '0', '00');
+                p_ins ('090' || kod_okpo || kod_nnnn || '0000' || '000', p090_, null, '00', k021_, '0', '00', '0', '0');
    
                 IF dat_ > TO_DATE ('01012008', 'ddmmyyyy')
                 THEN
@@ -3607,14 +3680,14 @@ BEGIN
 
                    -- 12 значний код п_дрозд_лу
                    p_ins ('091' || kod_okpo || kod_nnnn || '0000' || '000',
-                          nbuc_, null, '00', k021_, '0', '00');
+                          nbuc_, null, '00', k021_, '0', '00', '0', '0');
                 END IF;
 
                 IF dat_ > TO_DATE ('01012010', 'ddmmyyyy')
                 THEN
                    -- дата договору
                    p_ins ('092' || kod_okpo || kod_nnnn || '0000' || '000',
-                          TO_CHAR (p113_, dfmt_), null, '00', k021_, '0', '00'
+                          TO_CHAR (p113_, dfmt_), null, '00', k021_, '0', '00', '0', '0'
                          );
                 END IF;
 
@@ -3630,6 +3703,22 @@ BEGIN
              END IF;
 
              if rnum_ >= 1 then
+
+                if dat_ >= dat_izm6 and p070_ in ('1510','1513','1520','1521','1524', 
+                                                  '2020','2030','2063','2071','2083', 
+                                                  '2103','2113','2123','2133','2203', 
+                                                  '2211','2220','2233','3570','3578' ) 
+                then
+               
+                   begin
+                      select a.tip 
+                         into tip_ 
+                      from accounts a  
+                      where a.acc = acc_;
+                   exception when no_data_found then
+                      tip_  := 'SN';
+                   end;
+                end if;
 
                 -- на 01.04.2016 формируется показатель сумм обеспечения по видам
                 -- на 01.02.2017 показетели 081, 083, 084, 086 будут формироваться 
@@ -3691,7 +3780,7 @@ BEGIN
                                      --p_p081_ := '0'; 
                                   end if;
                                   -- сума забеспечення
-                                  p_ins ('081' || kod_okpo || kod_nnnn || '0000' || '000', p_p081_, nls_, '00', k021_, '0', p080_);
+                                  p_ins ('081' || kod_okpo || kod_nnnn || '0000' || '000', p_p081_, nls_, '00', k021_, '0', p080_, '0', '0');
                                end if;
    
                          end loop;
@@ -3707,7 +3796,7 @@ BEGIN
                             p080_ := '00';
                          end if;
                          -- сума забеспечення
-                         p_ins ('081' || kod_okpo || kod_nnnn || '0000' || '000', '0', nls_, '00', k021_, '0', p080_);
+                         p_ins ('081' || kod_okpo || kod_nnnn || '0000' || '000', '0', nls_, '00', k021_, '0', p080_, '0', '0');
                       end if;
                    end if;
                 end if;
@@ -3837,8 +3926,8 @@ BEGIN
                                    and z.accs = acc_
                                    and z.accz = a.acc
                                    and a.acc = sp.acc(+) 
-                                   and substr(a.nls,1,4) || NVL(sp.r013,'0') in ('16021', '26021', '26221', '90101', 
-                                                                                 '90151', '90301', '90311', '90361',
+                                   and substr(a.nls,1,4) || NVL(sp.r013,'0') in ('16021', '26021', '26221',  
+                                                                                 '90301', '90311', '90361',
                                                                                  '95001', '95003'
                                                                                 )                       
                                  group by DECODE(c.s031,'26','33','29','33','30','33','31','33','32','33','56','33',c.s031) 
@@ -3861,7 +3950,7 @@ BEGIN
                                end if;
                    
                                -- сума забеспечення
-                               p_ins ('083' || kod_okpo || kod_nnnn || '0000' || '000', p083_, null, '00', k021_, '0', p080_);
+                               p_ins ('083' || kod_okpo || kod_nnnn || '0000' || '000', p083_, null, '00', k021_, '0', p080_, '0', '0');
                             end if;
    
                       end loop;
@@ -3881,14 +3970,14 @@ BEGIN
                 then
                    -- код класса контрагента/инсайдера
                    p_ins ('085' || kod_okpo || kod_nnnn || '0000' || p140_, p085_p,
-                           nls_, '00', k021_, '0', '00'
+                           nls_, '00', k021_, '0', '00', '0', '0'
                           );
                 end if;
 
                 -- дата виникнення заборгованост_
                 p_ins ('111' || kod_okpo || kod_nnnn || '0000' || p140_,
                        TO_CHAR (p111_, dfmt_),
-                       nls_, '00', k021_, '0', '00'
+                       nls_, '00', k021_, '0', '00', '0', '0'
                       );
 
                 -- дата погашення заборгованост_ зг_дно з договором
@@ -3898,7 +3987,7 @@ BEGIN
                     mfo_ not in (300120, 300465) then
                    p_ins ('112' || kod_okpo || kod_nnnn || '0000' || p140_,
                           TO_CHAR (p112_, dfmt_),
-                          nls_, '00', k021_, '0', '00'
+                          nls_, '00', k021_, '0', '00', '0', '0'
                          );
                 end if;
 
@@ -3933,9 +4022,11 @@ BEGIN
 
                 if Dat_ >= to_date('29122012','ddmmyyyy') then
                    BEGIN
-                      select NVL(s080_z, s080), 
-                      decode(NVL(s250_23,'0'), '8', '0', s080)
-                        into s080_, fin_ 
+                      select pd_0, NVL(s080_z, s080), 
+                      --decode(NVL(s250_23,'0'), '8', '0', s080),
+                      s080, 
+                      NVL(s250_23,'0')   
+                        into pd_0_, s080_, fin_, s250_23_ 
                    from nbu23_rez
                    where fdat = dat23_
                      and rnk = rnk_
@@ -3946,9 +4037,11 @@ BEGIN
                      and rownum =1;
                    EXCEPTION WHEN NO_DATA_FOUND THEN
                       BEGIN
-                         select NVL(s080_z, s080), 
-                                decode(NVL(s250_23,'0'), '8', '0', s080)
-                            into s080_, fin_ 
+                         select pd_0, NVL(s080_z, s080), 
+                                --decode(NVL(s250_23,'0'), '8', '0', s080),
+                                s080, 
+                                NVL(s250_23,'0')   
+                            into pd_0_, s080_, fin_, s250_23_  
                          from nbu23_rez
                          where fdat = dat23_
                            and rnk = rnk_
@@ -3958,9 +4051,11 @@ BEGIN
                            and rownum = 1;
                       EXCEPTION WHEN NO_DATA_FOUND THEN
                          BEGIN
-                            select NVL(s080_z, s080), 
-                                   decode(NVL(s250_23,'0'), '8', '0', s080)
-                               into s080_, fin_ 
+                            select pd_0, NVL(s080_z, s080), 
+                                   --decode(NVL(s250_23,'0'), '8', '0', s080),
+                                   s080, 
+                                   NVL(s250_23,'0')   
+                               into pd_0_, s080_, fin_, s250_23_ 
                             from nbu23_rez
                             where fdat = dat23_
                               and rnk = rnk_
@@ -3969,8 +4064,10 @@ BEGIN
                               and nls like '9129%'
                               and rownum = 1;
                          EXCEPTION WHEN NO_DATA_FOUND THEN
+                            pd_0_ := 0;
                             s080_ := '0';
                             fin_ := '0';
+                            s250_23_ := '0';
                          END;
                       END;
                    END;
@@ -3979,9 +4076,10 @@ BEGIN
                 if fin_ = '0' 
                 then
                    BEGIN
-                      select NVL(s080_z, s080), 
-                             decode(NVL(s250_23,'0'), '8', '0', s080)
-                         into s080_, fin_ 
+                      select pd_0, NVL(s080_z, s080), 
+                             --decode(NVL(s250_23,'0'), '8', '0', s080)
+                             s080
+                         into pd_0_, s080_, fin_ 
                       from nbu23_rez
                       where fdat = dat23_
                         and acc = acc_
@@ -3994,9 +4092,20 @@ BEGIN
                 if p070_ like '351%' 
                 OR p070_ like '355%' 
                 then
+                   pd_0_ := 0;
                    fin_ := '0';
+                   s250_23_ := '0';
                 end if;
                 
+                H_ := '0';
+
+                if pd_0_ != 1 and s250_23_ = '8' then
+                   H_ := '2';
+                elsif pd_0_ != 1  then
+                   H_ := '1';
+                else
+                   H_ := '0';
+                end if;
                 
                 if nls_ like '3105%'
                 then
@@ -4015,13 +4124,28 @@ BEGIN
                    s080_ := '0';
                    pd_ := '';
                 end if;
+
+                if pd_0_ = 1  and substr(p070_,1,3) in ('140','141','142',
+                                                        '300','301','310',
+                                                        '311','312')
+                then
+                   H_ := '0';
+                end if;
+
+                -- коефіцієнт CCF
+                if dat_ >= dat_izm6 then
+                   p_ins ('150' || kod_okpo || kod_nnnn || '0000' || p140_, 
+                          TO_CHAR (ccf_ / 100, fmtkap_), 
+                          nls_, '00', k021_, '0', '00', '0', '0'
+                         );
+                end if;
                 
                 -- стан заборгованост_
                 if dat_ <= to_date('30112012','ddmmyyyy') then
-                   p_ins ('160' || kod_okpo || kod_nnnn || '0000' || '000', s080_);
+                   p_ins ('160' || kod_okpo || kod_nnnn || '0000' || '000', s080_, '0', '0');
                 else 
                    p_ins ('160' || kod_okpo || kod_nnnn || '0000' || p140_, to_char(s080_),
-                          nls_, '00', k021_, '0', '00'
+                          nls_, '00', k021_, '0', '00', '0', '0'
                          );
                 end if;
 
@@ -4052,7 +4176,7 @@ BEGIN
                          IF dat_ >= to_date('31102017','ddmmyyyy')
                          THEN
                             if vid_ in (1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 15, 17)
-                               and (zamina_a is null or nvl(zamina_a, '0') not in ('5','6'))
+                               and NVL(zamina_a, '0') not in ('0','5','6')
                             then  
                                vid_ := 4; -- реструктуризована без заміни активу
                             elsif vid_ in (1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 15, 17)
@@ -4117,14 +4241,14 @@ BEGIN
 
                    -- стан заборгованост_ щодо реструктуризац?ї
                    p_ins ('161' || kod_okpo || kod_nnnn || '0000' || p140_, to_char(vid_),
-                          nls_, '00', k021_, '0', '00'
+                          nls_, '00', k021_, '0', '00', '0', '0'
                          );
 
                    if Dat_ < dat_izm5
                    then
                       -- ризик невиконання своїх зобовязань перед банком
                       p_ins ('162' || kod_okpo || kod_nnnn || '0000' || p140_, LTRIM (TO_CHAR (TO_NUMBER(p150_), fmt1_)),
-                            nls_, '00', k021_, '0', '00'
+                            nls_, '00', k021_, '0', '00', '0', '0'
                            );
                    end if;
                 end if;
@@ -4135,53 +4259,53 @@ BEGIN
              then
                 -- коефіцієнт LGD
                 p_ins ('162' || kod_okpo || kod_nnnn || '0000' || p140_, LTRIM (TO_CHAR (lgd_)), --fmt1_),
-                       nls_, '00', k021_, '0', '00'
+                       nls_, '00', k021_, '0', '00', '0', '0'
                       );
 
                 -- коефіцієнт PD
                 p_ins ('163' || kod_okpo || kod_nnnn || '0000' || p140_, LTRIM (TO_CHAR (pd_)), -- fmt2_),
-                       nls_, '00', k021_, '0', '00'
+                       nls_, '00', k021_, '0', '00', '0', '0'
                       );
 
                 -- код скоригованого класу
                 p_ins ('164' || kod_okpo || kod_nnnn || '0000' || p140_, TO_CHAR (fin_),
-                       nls_, '00', k021_, '0', '00'
+                       nls_, '00', k021_, '0', '00', '0', '0'
                       );
 
                 -- код фактору на підставі якого скоригованого клас контрагента
                 p_ins ('170' || kod_okpo || kod_nnnn || '0000' || p140_, p170_,
-                       nls_, '00', k021_, '0', '00'
+                       nls_, '00', k021_, '0', '00', '0', '0'
                       );
 
                 -- код фактору щодо належності до групи юросіб
                 p_ins ('171' || kod_okpo || kod_nnnn || '0000' || p140_, p171_,
-                       nls_, '00', k021_, '0', '00'
+                       nls_, '00', k021_, '0', '00', '0', '0'
                       );
                 -- код фактору щодо наявності ознаки що свідчить про високий кредитний ризик
                 p_ins ('172' || kod_okpo || kod_nnnn || '0000' || p140_, p172_,
-                       nls_, '00', k021_, '0', '00'
+                       nls_, '00', k021_, '0', '00', '0', '0'
                       );
                 -- код фактору щожо події дефолту
                 p_ins ('173' || kod_okpo || kod_nnnn || '0000' || p140_, p173_,
-                       nls_, '00', k021_, '0', '00'
+                       nls_, '00', k021_, '0', '00', '0', '0'
                       );
 
                 -- код фактору щодо своєчасної сплати боргу
                 p_ins ('174' || kod_okpo || kod_nnnn || '0000' || p140_, p174_,
-                       nls_, '00', k021_, '0', '00'
+                       nls_, '00', k021_, '0', '00', '0', '0'
                       );
 
                 if p175_ <> '00000'
                 then
                    -- код фактору щодо додаткових характеристик
                    p_ins ('175' || kod_okpo || kod_nnnn || '0000' || p140_, p175_,
-                          nls_, '00', k021_, '0', '00'
+                          nls_, '00', k021_, '0', '00', '0', '0'
                          );
                 end if;
 
                 -- код ознаки дефолту контрагента
                 p_ins ('179' || kod_okpo || kod_nnnn || '0000' || p140_, p179_,
-                       nls_, '00', k021_, '0', '00'
+                       nls_, '00', k021_, '0', '00', '0', '0'
                       );
 
              end if;
@@ -4230,7 +4354,7 @@ BEGIN
                 else
                    p_ins ('130' || kod_okpo || kod_nnnn || '0000' || p140_,
                           LTRIM (TO_CHAR (p130_, fmt_)),
-                          nls_, '00', k021_, '0', '00'
+                          nls_, '00', k021_, '0', '00', '0', '0'
                          );
                 end if;
              end if;
@@ -4254,7 +4378,7 @@ BEGIN
 
                    p_ins ('118' || kod_okpo || kod_nnnn || p070_ || p140_,
                                 TO_CHAR (ABS (p120_)),
-                                nls_, '00', k021_, w_, '00'
+                                nls_, '00', k021_, w_, '00', H_, K140_
                          );
                 end if;
  
@@ -4272,7 +4396,7 @@ BEGIN
 
                       p_ins (ddd_ || kod_okpo || kod_nnnn || p070_ || p140_,
                              TO_CHAR (ABS (p120_)),
-                             nls_, '00', k021_, w_, '00'
+                             nls_, '00', k021_, w_, '00', H_, K140_
                             );
                       sum_d_ := sum_d_ + ABS(p120_);
                    end if;
@@ -4297,7 +4421,7 @@ BEGIN
                    -- дисконт та прем_ю показуємо з_ знаком
                    p_ins (ddd_ || kod_okpo || kod_nnnn || p070_ || p140_,
                           TO_CHAR (0 - p120_),
-                          nls_, '00', k021_, w_, '00'
+                          nls_, '00', k021_, w_, '00', H_, K140_
                          );
                 ELSE
                    if (ddd_ = '123' and p120_ != 0) or ddd_ not in ('119','123') then
@@ -4465,7 +4589,7 @@ BEGIN
                                           p_ins ('111' || kod_okpo || kod_nnnn || '0000' || p140_,
                                                   TO_CHAR (p111_, dfmt_),
                                                   nls_,
-                                                  kod_mm, k021_, '0', '00'
+                                                  kod_mm, k021_, '0', '00', '0', '0'
                                                 );
 
                                           -- первая дата для транша которая будет формироваться в код 111
@@ -4481,7 +4605,7 @@ BEGIN
                                           p_ins ('112' || kod_okpo || kod_nnnn || '0000' || p140_,
                                                   TO_CHAR (k.p112, dfmt_),
                                                   nls_,
-                                                  kod_mm, k021_, '0', '00', 
+                                                  kod_mm, k021_, '0', '00', '0', '0',  
                                                   'ntr='||to_char(n_trans)||' '||to_char(p120_)||' '||to_char(sum_tr_)||' '||to_char(s_tr_)||' '||tr_end
                                                 );
 
@@ -4494,7 +4618,7 @@ BEGIN
                                           p_ins (ddd_ || kod_okpo || kod_nnnn || p070_ || p140_,
                                                  TO_CHAR (ABS (s_tr_)),
                                                  nls_,
-                                                 kod_mm, k021_, w_, '00'
+                                                 kod_mm, k021_, w_, '00', H_, K140_
                                                 );
 
                                           if p070_ = '2067' 
@@ -4503,7 +4627,7 @@ BEGIN
                                              p_ins ('126' || kod_okpo || kod_nnnn || p070_ || p140_,
                                                     TO_CHAR (ABS (s_tr_)),
                                                     nls_,
-                                                    kod_mm, k021_, w_, '00'
+                                                    kod_mm, k021_, w_, '00', H_, K140_
                                                    );
 
                                              if s190_ > 90     
@@ -4511,7 +4635,7 @@ BEGIN
                                                 p_ins ('131' || kod_okpo || kod_nnnn || p070_ || p140_,
                                                        TO_CHAR (ABS (s_tr_)),
                                                        nls_,
-                                                       kod_mm, k021_, w_, '00'
+                                                       kod_mm, k021_, w_, '00', H_, K140_
                                                       );                                            
                                              end if;
                                           end if; 
@@ -4520,37 +4644,37 @@ BEGIN
                                           p_ins ('130' || kod_okpo || kod_nnnn || '0000' || p140_,
                                                  LTRIM (TO_CHAR (p130_, fmt_)),
                                                  nls_,
-                                                 kod_mm, k021_, '0', '00' 
+                                                 kod_mm, k021_, '0', '00', '0', '0' 
                                                 );
 
                                           -- стан заборгованост_
                                           p_ins ('160' || kod_okpo || kod_nnnn || '0000' || p140_ , to_char (s080_),
                                                  nls_,
-                                                 kod_mm, k021_, '0', '00'
+                                                 kod_mm, k021_, '0', '00', '0', '0'
                                                 );
 
                                           -- стан заборгованост_ щодо реструктуризац?ї
                                           p_ins ('161' || kod_okpo || kod_nnnn || '0000' || p140_, to_char (vid_),
                                                  nls_,
-                                                 kod_mm, k021_, '0', '00'
+                                                 kod_mm, k021_, '0', '00', '0', '0'
                                                 );
 
                                           -- коефіцієнт (LGD)
                                           p_ins ('162' || kod_okpo || kod_nnnn || '0000' || p140_, LTRIM (TO_CHAR (lgd_)), --fmt1_),
                                                  nls_,
-                                                 kod_mm, k021_, '0', '00'
+                                                 kod_mm, k021_, '0', '00', '0', '0'
                                                 );
 
                                           -- коефіцієнт (PD)
                                           p_ins ('163' || kod_okpo || kod_nnnn || '0000' || p140_, LTRIM (TO_CHAR (pd_)), --fmt2_),
                                                  nls_,
-                                                 kod_mm, k021_, '0', '00'
+                                                 kod_mm, k021_, '0', '00', '0', '0'
                                                 );
 
                                           -- код скоригованого класу контрагента
                                           p_ins ('164' || kod_okpo || kod_nnnn || '0000' || p140_, TO_CHAR (fin_),
                                                  nls_,
-                                                 kod_mm, k021_, '0', '00'
+                                                 kod_mm, k021_, '0', '00', '0', '0'
                                                 );
 
                                        else
@@ -4561,19 +4685,21 @@ BEGIN
                                p_ins (ddd_ || kod_okpo || kod_nnnn || p070_ || p140_,
                                       TO_CHAR (ABS (p120_)),
                                       nls_,
-                                      null, k021_, w_, '00'
+                                      null, k021_, w_, '00', H_, K140_
                                      );
 
                                -- новий код на 01.04.2016
-                               if dat_ >= dat_izm3 and p070_ in ('1517', '1527', '2027', '2037',
-                                                                 '2067', '2077', '2087', '2107',
-                                                                 '2117', '2127', '2137', '2207', 
-                                                                 '2217', '2227', '2237', '3579')
+                               if dat_ >= dat_izm3 and 
+                                  p070_ in ('1510','1513','1520','1521','1524',  
+                                            '2020','2030','2063','2071','2083', 
+                                            '2103','2113','2123','2133','2203', 
+                                            '2211','2220','2233','3570','3578' ) and 
+                                  tip_ in ('SP','SK9','OFR')
                                then   
                                   p_ins ('126' || kod_okpo || kod_nnnn || p070_ || p140_,
                                          TO_CHAR (ABS (p120_)),
                                          nls_,
-                                         null, k021_, w_, '00'
+                                         null, k021_, w_, '00', H_, K140_
                                         );
    
                                   -- на 01.11.2016 новый показатель 131 
@@ -4622,7 +4748,7 @@ BEGIN
                                         p_ins ('131' || kod_okpo || kod_nnnn || p070_ || p140_,
                                                TO_CHAR (ABS (p120_)),
                                                nls_,
-                                               null, k021_, w_, '00'
+                                               null, k021_, w_, '00', H_, K140_
                                               );                                            
                                      end if;
                                   end if;
@@ -4630,32 +4756,43 @@ BEGIN
                             end if;
                          else
                             if ddd_ = '123' then
-                               if (p070_ in ('1408', '1418', '1428',
-                                             '1508', '1518', '1528', '1607',
-                                             '2018', '2028', '2038', '2068',
-                                             '2078', '2088', '2108', '2118', 
-                                             '2128', '2138', '2208', '2218',
-                                             '2228', '2238', '2607', '2627',
-                                             '2657', '3008', '3018', '3118', 
-                                             '3218', '9600', '9601'
-                                            ) and p120_ > 0 ) OR p070_ like '___9%'
+                               if (p070_ in ('1408', '1418', '1428', '1508',
+                                             '1518', '1528', '1538', '1548', 
+                                             '1607', '2018', '2028', '2038', 
+                                             '2048', '2068', '2078', '2088',  
+                                             '2108', '2118', '2128', '2138',  
+                                             '2148', '2208', '2218', '2228', 
+                                             '2238', '2248', '2308', '2318',  
+                                             '2328', '2338', '2348', '2358',  
+                                             '2368', '2378', '2388', '2398', 
+                                             '2408', '2418', '2428', '2438', 
+                                             '2458', '2607', '2627', '2657',
+                                             '3008', '3018', '3108', '3118', 
+                                             '3218', '3418', '3428', '3568'
+                                            ) and p120_ > 0 ) 
                                then
                                   w_ := '2';
                                   p_ins (ddd_ || kod_okpo || kod_nnnn || p070_ || p140_,
                                          TO_CHAR (-1*p120_),
                                          nls_,
-                                         null, k021_, w_, '00'
+                                         null, k021_, w_, '00', H_, K140_
                                         );
                                end if;
 
                                if dat_ >= dat_izm5 and 
-                                  (p070_ in ('1419', '1429', '1509', '1519', 
-                                             '1529', '2029', '2039', '2069',
-                                             '2079', '2089', '2109', '2119', 
-                                             '2129', '2139', '2209', '2219',
-                                             '2229', '2239', '3008', '3018',
-                                             '3108', '3119', '3128', '3138',
-                                             '3219'
+                                  (p070_ in ('1408', '1418', '1428', '1508',   
+                                             '1518', '1528', '1538', '1548',   
+                                             '1607', '2018', '2028', '2038',   
+                                             '2048', '2068', '2078', '2088',   
+                                             '2108', '2118', '2128', '2138',   
+                                             '2148', '2208', '2218', '2228',   
+                                             '2238', '2248', '2308', '2318',   
+                                             '2328', '2338', '2348', '2358',   
+                                             '2368', '2378', '2388', '2398',   
+                                             '2408', '2418', '2428', '2438',   
+                                             '2458', '2607', '2627', '2657',   
+                                             '3008', '3018', '3108', '3118',   
+                                             '3218', '3418', '3428', '3568'    
                                             ) and p120_ < 0 ) 
                                then
 
@@ -4697,21 +4834,21 @@ BEGIN
                                            END;
                                         END;
                                      END;
-                                     if p070_ = '3119' 
-                                     then
-                                        begin
-                                           select NVL(s190, '1')
-                                              into s190s_ 
-                                           from specparam 
-                                           where acc = acc_;
-                                        exception when no_data_found then 
-                                           s190s_ := '1';
-                                        end;
-                                        if s190s_ in ('4', '5', 'E', 'F', 'G') 
-                                        then
-                                           s190_ := 91;
-                                        end if;
-                                     end if; 
+                                     --if p070_ = '3119' 
+                                     --then
+                                     --   begin
+                                     --      select NVL(s190, '1')
+                                     --         into s190s_ 
+                                     --      from specparam 
+                                     --      where acc = acc_;
+                                     --   exception when no_data_found then 
+                                     --      s190s_ := '1';
+                                     --   end;
+                                     --   if s190s_ in ('4', '5', 'E', 'F', 'G') 
+                                     --   then
+                                     --      s190_ := 91;
+                                     --   end if;
+                                     --end if; 
                                      -- по  просьбе Мищенко изменяем OBS с "3" на "4"
                                      if mfo_ = 300465 and rnk_ in (940143, 946362) 
                                      then
@@ -4722,7 +4859,7 @@ BEGIN
                                         p_ins ('132' || kod_okpo || kod_nnnn || p070_ || p140_,
                                                TO_CHAR (ABS (p120_)),
                                                nls_,
-                                               null, k021_, w_, '00'
+                                               null, k021_, w_, '00', H_, K140_ 
                                               );                                            
                                      end if;
 
@@ -4732,20 +4869,22 @@ BEGIN
                                p_ins (ddd_ || kod_okpo || kod_nnnn || p070_ || p140_,
                                       TO_CHAR (ABS (p120_)),
                                       nls_,
-                                      null, k021_, w_, '00' 
+                                      null, k021_, w_, '00', H_, K140_  
                                      );
 
                                -- новий код на 01.04.2016
-                               if dat_ >= dat_izm3 and p070_ in ('1517', '1527', '2027', '2037',
-                                                                 '2067', '2077', '2087', '2107',
-                                                                 '2117', '2127', '2137', '2207', 
-                                                                 '2217', '2227', '2237', '3579'
-                                                                )
+                               if dat_ >= dat_izm3 and 
+                                  p070_ in ('1510','1513','1520','1521','1524',  
+                                            '2020','2030','2063','2071','2083', 
+                                            '2103','2113','2123','2133','2203', 
+                                            '2211','2220','2233','3570','3578' ) and 
+                                  tip_ in ('SP','SK9','OFR')
                                then 
+
                                   p_ins ('126' || kod_okpo || kod_nnnn || p070_ || p140_,
                                             TO_CHAR (ABS (p120_)),
                                             nls_,
-                                            null, k021_, w_, '00'
+                                            null, k021_, w_, '00', H_, K140_ 
                                            );
 
                                   -- на 01.11.2016 новый показатель 131 
@@ -4796,7 +4935,7 @@ BEGIN
                                         p_ins ('131' || kod_okpo || kod_nnnn || p070_ || p140_,
                                                TO_CHAR (ABS (p120_)),
                                                nls_,
-                                               null, k021_, w_, '00'
+                                               null, k021_, w_, '00', H_, K140_ 
                                               );                                            
                                      end if;
                                   end if;         
@@ -4830,7 +4969,7 @@ BEGIN
                                        p_ins ('126' || kod_okpo || kod_nnnn || p070_ || p140_,
                                               TO_CHAR (ABS (p120_)),
                                               nls_,
-                                              null, k021_, w_, '00'
+                                              null, k021_, w_, '00', H_, K140_
                                              );
 
                                        -- на 01.11.2016 новый показатель 131 
@@ -4904,7 +5043,7 @@ BEGIN
                                              p_ins ('131' || kod_okpo || kod_nnnn || p070_ || p140_,
                                                     TO_CHAR (ABS (p120_)),
                                                     nls_,
-                                                    null, k021_, w_, '00'
+                                                    null, k021_, w_, '00', H_, K140_ 
                                                    );                                            
                                           end if;
                                        end if; 
@@ -4940,7 +5079,7 @@ BEGIN
                                           p_ins ('131' || kod_okpo || kod_nnnn || p070_ || p140_,
                                                  TO_CHAR (ABS (p120_)),
                                                  nls_,
-                                                 null, k021_, w_, '00'
+                                                 null, k021_, w_, '00', H_, K140_
                                                 );                                            
                                        end if;
                                   end loop;  
@@ -4984,27 +5123,23 @@ BEGIN
              -- сума резерв_в
              IF p125_ <> 0
              THEN
-                if (p070_rez_ in ('2400','2401') and 
-                    substr(nbs_r013_, 5, 1)  in ('4','6','7','8')
+                if (( p070_rez_ like '14_9%' OR
+                      p070_rez_ like '15_9%' OR 
+                      p070_rez_ like '20_9%' OR
+                      p070_rez_ like '21_9%' OR
+                      p070_rez_ like '22_9%' OR
+                      p070_rez_ like '23_9%' OR
+                      p070_rez_ like '24_9%' OR
+                      p070_rez_ like '26_9%' 
+                    ) and substr(nbs_r013_, 5, 1)  in ('2','4')
                    ) OR
-                   (p070_rez_ in ('1490','1491') and 
-                    substr(nbs_r013_, 5, 1)  in ('3','4')
+                   ((p070_rez_ = '3119' or p070_rez_ = '3219') and 
+                    substr(nbs_r013_, 5, 1)  in ('2','4')
                    ) OR
-
-                   (p070_rez_ = '1590' and 
-                    substr(nbs_r013_, 5, 1) in ('1','4','6','7')
-                   ) OR
-                   (p070_rez_ = '3190' and 
-                    substr(nbs_r013_, 5, 1)  in ('5','7','9','A')
-                   ) OR
-                   (p070_rez_ = '3290' and 
-                    substr(nbs_r013_, 5, 1)  in ('3','4')
-                   ) OR
-
                    (p070_rez_ = '3599' and 
-                    substr(nbs_r013_, 5, 1) = '4'
+                    substr(nbs_r013_, 5, 1) in ('2','9')
                    ) OR 
-                   p070_rez_ in ('1890','2890','3590','3690')
+                   p070_rez_ in ('1890','2890','3590','3690','3692')
                 then
                    w_ := '1';
                 else 
@@ -5021,17 +5156,20 @@ BEGIN
                       );
              END IF;
 
-             -- новий код на 01.04.2016 бал.рах. 3578 виключено по змінах 
-             -- НБУ від 12.04.2016
-             if dat_ >= dat_izm3 and p070_ in ('1408', '1418', '1428', 
-                                               '1508', '1518', '1528', '1607',
-                                               '2018', '2028', '2038', '2068',
-                                               '2078', '2088', '2108', '2118', 
-                                               '2128', '2138', '2208', '2218',
-                                               '2228', '2238', '2607', '2627',
-                                               '2657', '3008', '3018', '3118', 
-                                               '3128', '3138', '3218'
-                                              ) and p120_ < 0 
+             if  p070_ in ('1408', '1418', '1428', '1508',
+                           '1518', '1528', '1538', '1548', 
+                           '1607', '2018', '2028', '2038', 
+                           '2048', '2068', '2078', '2088',  
+                           '2108', '2118', '2128', '2138',  
+                           '2148', '2208', '2218', '2228', 
+                           '2238', '2248', '2308', '2318',  
+                           '2328', '2338', '2348', '2358',  
+                           '2368', '2378', '2388', '2398', 
+                           '2408', '2418', '2428', '2438', 
+                           '2458', '2607', '2627', '2657',
+                           '3008', '3018', '3108', '3118', 
+                           '3218', '3418', '3428', '3568'
+                          )  
              then   
                 begin
                    select a.tip, NVL(sp.r013,'3') 
@@ -5043,6 +5181,26 @@ BEGIN
                    tip_  := 'SN';
                    r013_ := '3';
                 end;
+             end if;
+
+             -- новий код на 01.04.2016 бал.рах. 3578 виключено по змінах 
+             -- НБУ від 12.04.2016
+             if dat_ >= dat_izm3 and 
+                   p070_ in ('1408', '1418', '1428', '1508',
+                             '1518', '1528', '1538', '1548', 
+                             '1607', '2018', '2028', '2038', 
+                             '2048', '2068', '2078', '2088',  
+                             '2108', '2118', '2128', '2138',  
+                             '2148', '2208', '2218', '2228', 
+                             '2238', '2248', '2308', '2318',  
+                             '2328', '2338', '2348', '2358',  
+                             '2368', '2378', '2388', '2398', 
+                             '2408', '2418', '2428', '2438', 
+                             '2458', '2607', '2627', '2657',
+                             '3008', '3018', '3108', '3118', 
+                             '3218', '3418', '3428', '3568'
+                           ) and p120_ < 0 and tip_ <> 'SNP'
+             then   
 
                 BEGIN 
                    SELECT i.freq 
@@ -5094,13 +5252,13 @@ BEGIN
                    p_ins ('123' || kod_okpo || kod_nnnn || p070_ || LPAD (to_char(kv_), 3, '0'),
                        TO_CHAR (ABS (o_se_1)),
                        nls_,
-                       null, k021_, w_, '00', comm_
+                       null, k021_, w_, '00', H_, K140_, comm_
                       );
 
                    p_ins ('127' || kod_okpo || kod_nnnn || p070_ || LPAD (to_char(kv_), 3, '0'),
                        TO_CHAR (ABS (o_se_1)),
                        nls_,
-                       null, k021_, w_, '00', comm_
+                       null, k021_, w_, '00', H_, K140_, comm_
                       );
                 end if;
 
@@ -5114,7 +5272,7 @@ BEGIN
                    p_ins ('123' || kod_okpo || kod_nnnn || p070_ || LPAD (to_char(kv_), 3, '0'),
                        TO_CHAR (ABS (o_se_2)),
                        nls_,
-                       null, k021_, w_, '00', comm_
+                       null, k021_, w_, '00', H_, K140_, comm_
                       );
                 end if;
              end if;
@@ -5135,7 +5293,7 @@ BEGIN
                    p_ins ('128' || kod_okpo || kod_nnnn || '0000' || p140_,
                        TO_CHAR (ABS (round(sum_rez_, 0))),
                        nls_,
-                       null, k021_, '0', '00'
+                       null, k021_, '0', '00', H_, K140_ 
                       );
                 end if;
 
@@ -5156,7 +5314,7 @@ BEGIN
                    p_ins ('128' || kod_okpo || kod_nnnn || '0000' || p140_,
                        TO_CHAR (ABS (round(sum_rez_, 0))),
                        nls_,
-                       null, k021_, '0', '00'
+                       null, k021_, '0', '00', H_, K140_ 
                       );
                 end if;
 
@@ -5167,7 +5325,7 @@ BEGIN
                 p_ins ('125' || kod_okpo || kod_nnnn || '3190' || p140_,
                        p125_,
                        nls_,
-                       null, k021_, w_, '00'
+                       null, k021_, w_, '00', H_, K140_
                       );
 
              END IF;
@@ -5176,7 +5334,7 @@ BEGIN
                 p_ins ('125' || kod_okpo || kod_nnnn || '3590' || p140_,
                        p125_,
                        nls_,
-                       null, k021_, w_, '00'
+                       null, k021_, w_, '00', H_, K140_
                       );
 
              END IF;
@@ -5517,7 +5675,18 @@ for z in ( select r.acc, r.nls, r.kv, r.nd, r.kodp
   end loop;
 
    logger.info ('P_FD8_NN: End etap 5 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
+----------------------------------------------------------------------------
+-- замена кода DDD со значения 121 или 123 на 133
+update rnbu_trace set kodp = '133' || substr(kodp,4)
+where substr(kodp,1,3) in ('121','123')
+  and substr(18,4) in ('9610','9611','9613','9615',
+                       '9617','9618','9600','9601'
+                      );
 
+update rnbu_trace set kodp = '125' || substr(kodp,4)
+where substr(kodp,1,3) in ('123')
+  and substr(18,4) in ('3119');
+----------------------------------------------------------------------------
 delete from rnbu_trace r
 where substr(r.kodp,1,3) = '081' 
   and substr(r.kodp,29,2) in ('00','90') 
@@ -5754,13 +5923,3 @@ end if;
 
 END p_fd8_nn;
 /
-show err;
-
-PROMPT *** Create  grants  P_FD8_NN ***
-grant EXECUTE                                                                on P_FD8_NN        to BARS_ACCESS_DEFROLE;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_FD8_NN.sql =========*** End *** 
-PROMPT ===================================================================================== 
