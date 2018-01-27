@@ -1,30 +1,23 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_FD9_NN.sql =========*** Run *** 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_FD9_NN ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_FD9_NN (Dat_ DATE ,
+CREATE OR REPLACE PROCEDURE BARS.p_fd9_NN (Dat_ DATE ,
                                       sheme_ varchar2 default 'G') IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #D9 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 13/10/2017 (13/09/2017, 18/08/2017)
+% VERSION     : 25/01/2018 (13/10/2017, 13/09/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-13.10.2017 - якщо код ОКПО сформований як серія и номер паспорта тоді
-             K021 будемо заповнювати значенням '9'
-13.09.2017 - для ОКРО учасника у якого значення похоже на "D00000000_"
+25.01.2018 - змінено формування кодів ZZZZZZZZZZ і ЗЗЗЗЗЗЗЗЗЗ а також
+             код K021
+13.10.2017 - якщо код ОКПО сформований як серія и номер паспорта тоді  
+             K021 будемо заповнювати значенням '9' 
+13.09.2017 - для ОКРО учасника у якого значення похоже на "D00000000_" 
              K021 будемо заповнювати значенням '9'
 18.08.2017 - если для клиентов участников органов государственной власти
              (ISE=13110,13120,13131,13132) и поле OKPO_U имеет значение
-             '00000000' или '000000000' или '0000000000' или '99999' или
-             '999999999' или '9999999999'
+             '00000000' или '000000000' или '0000000000' или '99999' или 
+             '999999999' или '9999999999' 
              то тогда для таких клиентов будет заполнено "D"||<номер п/п>
 14.08.2017 - для органів державної влади параметр K021 будемо заповнювати
              значенням '9'
@@ -327,27 +320,28 @@ BEGIN
        then
           -- для ЮЛ резидентов
           if k.codc in (3) then
-             okpo_k := lpad(trim(k.okpo),10,'0');
+             okpo_k := lpad(trim(k.rnk),10,'0');
              -- органи державної влади
-             if k.ise in ('13110','13120','13131','13132') then
-                kol2_ := kol2_+1;
-                okpo_k := 'D'||lpad(to_char(kol2_), 9, '0');
-             end if;
-             k021_k := '1';
+             --if k.ise in ('13110','13120','13131','13132') then
+             --   kol2_ := kol2_+1;
+             --   okpo_k := 'D'||lpad(to_char(kol2_), 9, '0');
+             --end if;
+             k021_k := 'E';
           end if;
           -- для ФЛ резидентов
           if k.codc in (5) then
              okpo_k := lpad(substr(ser_k||numdoc_k, 1, 10), 10, '0');
-             k021_k := '9';
+             k021_k := '6';
           end if;
           -- для ФЛ нерезидентов
           if k.codc = 6 and ser_k not in ('','00') and numdoc_k <> '000000' then
-             okpo_k := 'CC' || lpad(substr(trim(ser_k)||numdoc_k, 1, 8), 8, '0');
+             --okpo_k := 'CC' || lpad(substr(trim(ser_k)||numdoc_k, 1, 8), 8, '0');
+             okpo_k := 'I' || lpad(to_char(k.rnk), 9, '0');
              k021_k := '9';
           end if;
           if k.codc = 6 and ser_k in ('','00') and numdoc_k = '000000'then
              kol_ := kol_+1;
-             okpo_k := 'IN' || lpad(to_char(kol_), 8, '0');
+             okpo_k := 'I' || lpad(to_char(k.rnk), 9, '0');
              k021_k := '9';
           end if;
        end if;
@@ -355,7 +349,8 @@ BEGIN
                               '999999999','9999999999') and k.codc not in (1,2)
        then
           if k.codc in (4,6) then
-             okpo_k := 'IN' || substr(lpad(NVL(trim(k.okpo),'0'), 8, '0'), 1, 8);
+             --okpo_k := 'IN' || substr(lpad(NVL(trim(k.okpo),'0'), 8, '0'), 1, 8);
+             okpo_k := 'I' || lpad(to_char(k.rnk), 9, '0');
              k021_k := '9';
           else
              if k.codc not in (1,2,4,6) then
@@ -365,11 +360,14 @@ BEGIN
                 k021_k := '2';
              else
                 k021_k := '1';
+                if k.ise in ('13110','13120','13131','13132') then
+                   k021_k := 'G';
+                end if;
              end if;
           end if;
        end if;
 
-       if trim(k.okpo_u) in ('00000000','000000000','0000000000',
+       if trim(k.okpo_u) in ('00000000','000000000','0000000000', 
                              '99999','999999999','9999999999'
                             )
        then
@@ -377,34 +375,34 @@ BEGIN
              okpo_ := lpad(substr(ser_ || numdoc_, 1, 10), 10, '0');
              okpo_u := ser_ || numdoc_;
              if k.tk = 2 then
-                k021_u := '9';
+                k021_u := '6';
              else
-                k021_u := '1';
+                k021_u := 'E';
              end if;
              if k.tk = 1 then
                 kol1_ := kol1_+1;
-                okpo_ := 'IN' || lpad(to_char(kol1_), 8, '0');
+                okpo_ := lpad(to_char(kol1_), 10, '0');
                 -- органи державної влади
-                if k.ise_u in ('13110','13120','13131','13132') then
-                   kol3_ := kol3_ + 1;
-                   okpo_ := 'D' || lpad(to_char(kol3_), 9, '0');
-                end if;
-                k021_u := '9';
+                --if k.ise_u in ('13110','13120','13131','13132') then
+                --   kol3_ := kol3_ + 1;
+                --   okpo_ := 'D' || lpad(to_char(kol3_), 9, '0');
+                --end if;
+                --k021_u := '9';
              end if;
           else
-             if k.tk = 2 and trim(k.ser) is not null then
-                okpo_ := 'CC' || lpad(substr(trim(k.ser) || k.numdoc, 1, 8), 8, '0');
-                okpo_u := trim(k.ser) || k.numdoc;
-                k021_u := '9';
-             end if;
-             if k.tk = 2 and trim(k.ser) is null then
+             --if k.tk = 2 and trim(k.ser) is not null then
+             --   okpo_ := 'CC' || lpad(substr(trim(k.ser) || k.numdoc, 1, 8), 8, '0');
+             --   okpo_u := trim(k.ser) || k.numdoc;
+             --   k021_u := '9';
+             --end if;
+             if k.tk = 2  then  -- and trim(k.ser) is null then
                 kol1_ := kol1_+1;
-                okpo_ := 'IN' || lpad(to_char(kol1_), 8, '0');
+                okpo_ := 'I' || lpad(to_char(kol1_), 9, '0');
                 k021_u := '9';
              end if;
              if k.tk = 1 then
                 kol1_ := kol1_+1;
-                okpo_ := 'IN' || lpad(to_char(kol1_), 8, '0');
+                okpo_ := 'I' || lpad(to_char(kol1_), 9, '0');
                 -- органи державної влади
                 if k.ise_u in ('13110','13120','13131','13132') then
                    kol3_ := kol3_ + 1;
@@ -416,7 +414,7 @@ BEGIN
        end if;
 
        if trim(k.okpo_u) not in ('00000000','000000000','0000000000',
-                                 '99999','999999999','9999999999'
+                                 '99999','999999999','9999999999' 
                                 )
        then
           if k040_ <> '804' then
@@ -424,13 +422,13 @@ BEGIN
              into is_foreign_bank
              from rc_bnk
              where b010 = trim(k.okpo_u);
-
+             
              if is_foreign_bank <> 0 then
                 okpo_ := lpad(substr(NVL(trim(okpo_u),'0'), 1, 10), 10, '0');
                 k021_u := '4';
              else
-                okpo_ := 'IN' || lpad(substr(NVL(trim(okpo_u),'0'), 1, 8), 8, '0');
-                k021_u := '9';
+                okpo_ := 'I' || lpad(substr(NVL(trim(okpo_u),'0'), 1, 8), 9, '0');
+                k021_u := '8';
              end if;
           else
              okpo_ := substr(lpad(trim(k.okpo_u), 10, '0'), 1, 10);
@@ -440,23 +438,9 @@ BEGIN
                 k021_u := '1';
              end if;
 
-             if k.okpo_u like 'D%'
-             then
-                okpo_ := substr(lpad(trim(k.okpo_u), 10, '0'), 1, 10);
-                k021_u := '9';
-             end if;
-
              -- органи державної влади
              if k.ise_u in ('13110','13120','13131','13132') then
-                if k.okpo_u like 'D%'
-                then
-                   okpo_ := substr(lpad(trim(k.okpo_u), 10, '0'), 1, 10);
-                   k021_u := '9';
-                else
-                   kol3_ := kol3_ + 1;
-                   okpo_ := 'D' || lpad(to_char(kol3_), 9, '0');
-                   k021_u := '9';
-                end if;
+                k021_u := 'G';
              end if;
 
           end if;
@@ -623,14 +607,3 @@ BEGIN
   ----------------------------------------
 END p_fd9_NN;
 /
-show err;
-
-PROMPT *** Create  grants  P_FD9_NN ***
-grant EXECUTE                                                                on P_FD9_NN        to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on P_FD9_NN        to RPBN002;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_FD9_NN.sql =========*** End *** 
-PROMPT ===================================================================================== 

@@ -4,11 +4,12 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe8_nn (dat_     DATE,
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #E8 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 2008.  All Rights Reserved.
-% VERSION     : 11/10/2017 (12/09/2017, 02/08/2017)
+% VERSION     : 26/01/2018 (11/10/2017, 12/09/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+25.01.2018 - змінено формування кодів ZZZZZZZZZZ та K021
 11.10.2017 - для групп бал.счетоа 270, 366 дату начала договора вибираем из
              поля SDATE табл. CC_DEAL  вместо bdate табл. CC_ADD
 12.09.2017 - для групп бал.счетоа 270, 366 номер договора, идентификатор
@@ -307,26 +308,28 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe8_nn (dat_     DATE,
       IF custtype_ in (1, 3)  and kod_okpo in ('00000','000000000','0000000000','99999','999999999')
       THEN
          IF custtype_ = 1 and rez_ = 2
-         THEN
-            BEGIN
-               SELECT 'CC' || LPAD (SUBSTR (TRIM (ser) || TRIM (numdoc), 1, 8),
-                                    8,
-                                    '0'
-                                   )
-                  INTO kod_okpo
-               FROM person
-               WHERE rnk = rnk_;
-            EXCEPTION
-               WHEN NO_DATA_FOUND
-               THEN
-               ncontr_ := ncontr_ + 1;
-               if mfo_ = 300465
-               then
-                  kod_okpo := 'IN' || LPAD (TO_CHAR (ncontr_), 8, '0');
-               else
-                  kod_okpo := 'IN' || LPAD (TO_CHAR(our_reg_) || substr(TO_CHAR (100+ncontr_), 2, 2), 8, '0');
-               end if;
-            END;
+         THEN                                                 
+            kod_okpo := 'I' || LPAD (to_char(rnk_), 9,'0');
+
+            --BEGIN
+            --   SELECT 'CC' || LPAD (SUBSTR (TRIM (ser) || TRIM (numdoc), 1, 8),
+            --                        8,
+            --                        '0'
+            --                       )
+            --      INTO kod_okpo
+            --   FROM person
+            --   WHERE rnk = rnk_;
+            --EXCEPTION
+            --   WHEN NO_DATA_FOUND
+            --   THEN
+            --   ncontr_ := ncontr_ + 1;
+            --   if mfo_ = 300465
+            --   then
+            --      kod_okpo := 'IN' || LPAD (TO_CHAR (ncontr_), 8, '0');
+            --   else
+            --      kod_okpo := 'IN' || LPAD (TO_CHAR(our_reg_) || substr(TO_CHAR (100+ncontr_), 2, 2), 8, '0');
+            --   end if;
+            --END;
             k021_ := '9';
          END IF;
 
@@ -340,12 +343,13 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe8_nn (dat_     DATE,
                   INTO kod_okpo
                FROM person
                WHERE rnk = rnk_;
+               k021_ := '6';
             EXCEPTION
-               WHEN NO_DATA_FOUND
+               WHEN NO_DATA_FOUND 
                THEN
                   kod_okpo := 'RNK' || LPAD (SUBSTR (rnk_, 1, 7), 7, '0');
+                  k021_ := 'E'; 
             END;
-            k021_ := '2';
          END IF;
       END IF;
 
@@ -353,25 +357,26 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe8_nn (dat_     DATE,
       THEN
          IF mfo_ <> 324805 and custtype_ = 1 and rez_ = 2
          THEN
-            BEGIN
-               SELECT 'CC' || LPAD (SUBSTR (TRIM (ser) || TRIM (numdoc), 1, 8),
-                                    8,
-                                    '0'
-                                   )
-                  INTO kod_okpo
-               FROM person
-               WHERE rnk = rnk_;
-            EXCEPTION
-               WHEN NO_DATA_FOUND
-               THEN
-               ncontr_ := ncontr_ + 1;
-               if mfo_ = 300465
-               then
-                  kod_okpo := 'IN' || LPAD (TO_CHAR (ncontr_), 8, '0');
-               else
-                  kod_okpo := 'IN' || LPAD (TO_CHAR(our_reg_) || substr(TO_CHAR (100+ncontr_), 2, 2), 8, '0');
-               end if;
-            END;
+            --BEGIN
+            --   SELECT 'CC' || LPAD (SUBSTR (TRIM (ser) || TRIM (numdoc), 1, 8),
+            --                        8,
+            --                        '0'
+            --                       )
+            --      INTO kod_okpo
+            --   FROM person
+            --   WHERE rnk = rnk_;
+            --EXCEPTION
+            --   WHEN NO_DATA_FOUND
+            --   THEN
+            --   ncontr_ := ncontr_ + 1;
+            --   if mfo_ = 300465
+            --   then
+            --      kod_okpo := 'IN' || LPAD (TO_CHAR (ncontr_), 8, '0');
+            --   else
+            --      kod_okpo := 'IN' || LPAD (TO_CHAR(our_reg_) || substr(TO_CHAR (100+ncontr_), 2, 2), 8, '0');
+            --   end if;
+            --END;
+            kod_okpo := 'I' || LPAD (to_char(rnk_), 9,'0');
             k021_ := '9';
          END IF;
 
@@ -403,9 +408,11 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe8_nn (dat_     DATE,
             ncontr_ := ncontr_ + 1;
             if mfo_ = 300465
             then
-               kod_okpo := 'IN' || LPAD (TO_CHAR (ncontr_), 8, '0');
+               --kod_okpo := 'IN' || LPAD (TO_CHAR (ncontr_), 8, '0');
+               kod_okpo := 'I' || LPAD (TO_CHAR (rnk_), 9, '0');
             else
-               kod_okpo := 'IN' || LPAD (TO_CHAR(our_reg_) || substr(TO_CHAR (100+ncontr_), 2, 2), 8, '0');
+               --kod_okpo := 'IN' || LPAD (TO_CHAR(our_reg_) || substr(TO_CHAR (100+ncontr_), 2, 2), 8, '0');
+               kod_okpo := 'I' || LPAD (TO_CHAR(rnk_), 9, '0');
             end if;
             k021_ := '9';
          END IF;
@@ -414,8 +421,9 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe8_nn (dat_     DATE,
          IF custtype_ = 2 and rez_ = 1 and glb_ = 0 and kb_ = '0'
          THEN
             ncontr_ := ncontr_ + 1;
-            kod_okpo := 'D' || LPAD (TO_CHAR (ncontr_), 9, '0');
-            k021_ := '1';
+            --kod_okpo := 'D' || LPAD (TO_CHAR (ncontr_), 9, '0');
+            kod_okpo :=  LPAD (TO_CHAR (rnk_), 10, '0');
+            k021_ := 'E';
          END IF;
       END IF;
 
@@ -431,9 +439,11 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe8_nn (dat_     DATE,
             ncontr_ := ncontr_ + 1;
             if mfo_ = 300465
             then
-               kod_okpo := 'IN' || LPAD (TO_CHAR (ncontr_), 8, '0');
+               --kod_okpo := 'IN' || LPAD (TO_CHAR (ncontr_), 8, '0');
+               kod_okpo := 'I' || LPAD (TO_CHAR (rnk_), 9, '0');
             else
-               kod_okpo := 'IN' || LPAD (TO_CHAR(our_reg_) || substr(TO_CHAR (100+ncontr_), 2, 2), 8, '0');
+               --kod_okpo := 'IN' || LPAD (TO_CHAR(our_reg_) || substr(TO_CHAR (100+ncontr_), 2, 2), 8, '0');
+               kod_okpo := 'I' || LPAD (TO_CHAR(rnk_), 9, '0');
             end if;
             k021_ := '9';
          END IF;
@@ -475,7 +485,6 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe8_nn (dat_     DATE,
        
       -- определение вида экономической деятельности
       k110_ := NVL (ved_, '00000');
-
 
       -- определение кода региона
       IF NVL (reg_, 0) > 0
