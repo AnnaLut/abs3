@@ -780,7 +780,7 @@ function selectDopReq(evt, name, fl) {
 			window,
 			"dialogWidth:600px;dialogHeight:600px;center:yes;edge:sunken;help:no;status:no;");
         if (result != null) {
-            elem.value = result[1];
+            elem.value = result[0];
             elem.fireEvent("onchange");
             // COBUSUPABS-4641 
             var reqvDA70 = document.getElementById("reqv_DA#70");
