@@ -1,11 +1,13 @@
-CREATE OR REPLACE PROCEDURE BARS.p_f75sb (Dat_ DATE, sheme_ VARCHAR2 DEFAULT 'C' ) IS
+create or replace procedure P_F75SB
+( Dat_   DATE
+, sheme_ VARCHAR2 DEFAULT 'C'
+) IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Процедура формирование файла @75 для СБ
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 2009.All Rights Reserved.
 %                                                 Версия для Сбербанка
-% VERSION     :    24.01.2018 (09.06.2017)
+% VERSION     :    29.01.2018 (09.06.2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-24.01.2018 - 
 09.06.2017 - в курсоре SEL выбирались документы только после отчетной даты
              (добавлен период с начала месяца)
 19.01.2017 - заполнение tmp_file03 разбито на два периода: отчетный месяц
@@ -95,7 +97,7 @@ days_     number;
        , sb_r020 sb1
        , oper o
    WHERE substr(t.nlsd,1,4)=sb.r020
-     and sb.f_75='1' and sb.D_CLOSE is Null
+     and sb.f_75='1' and lnnvl( sb.D_CLOSE <= Dat_ )
      and substr(t.nlsk,1,4)=sb1.r020(+)
      and not exists (select 1 from ref_kor where ref=t.ref and vob in (96, 99))
      and t.ref = o.ref
@@ -112,7 +114,7 @@ days_     number;
        , sb_r020 sb1
        , ref_kor r
    WHERE substr(t.nlsd,1,4)=sb.r020
-     and sb.f_75='1' and sb.D_CLOSE is Null
+     and sb.f_75='1' and lnnvl( sb.D_CLOSE <= Dat_ )
      and substr(t.nlsk,1,4)=sb1.r020(+)
      and t.ref=r.ref
      and r.vob in (96, 99)
@@ -131,7 +133,7 @@ days_     number;
        , sb_r020 sb1
        , oper o
    WHERE substr(t.nlsk,1,4)=sb1.r020
-     and sb1.f_75='1' and sb1.D_CLOSE is Null
+     and sb1.f_75='1' and lnnvl( sb1.D_CLOSE <= Dat_ )
      and substr(t.nlsd,1,4)=sb.r020(+)
      and not exists (select 1 from ref_kor where ref=t.ref and vob in (96, 99))
      and t.ref = o.ref
@@ -148,20 +150,15 @@ days_     number;
        , sb_r020 sb1
        , ref_kor r
    WHERE substr(t.nlsk,1,4)=sb1.r020
-     and sb1.f_75='1' and sb1.D_CLOSE is Null
+     and sb1.f_75='1' and lnnvl( sb1.D_CLOSE <= Dat_ )
      and substr(t.nlsd,1,4)=sb.r020(+)
      and t.ref=r.ref
      and r.vob in (96,99)
      and r.vdat >= DECODE(Dat_, to_date('31052011','ddmmyyyy'), to_date('31122010','ddmmyyyy'), vdatr_);
 
-CURSOR BaseL IS
-    SELECT kodp, nbuc, SUM (znap)
-    FROM rnbu_trace
-    GROUP BY kodp, nbuc;
-
 BEGIN
   
-  logger.info ('P_F75SB: BEGIN ');
+  bars_audit.info( $$PLSQL_UNIT||': BEGIN' );
   -------------------------------------------------------------------
   userid_ := user_id;
   EXECUTE IMMEDIATE 'TRUNCATE TABLE RNBU_TRACE';
@@ -171,7 +168,8 @@ BEGIN
   P_Proc_Set_Int(kodf_,sheme_,nbuc1_,typ_);
   
   -- используем классификатор SB_R020
-  sql_acc_ := 'select R020 from SB_R020 where F_75=''1'' and D_CLOSE is Null';
+  sql_acc_ := q'[select R020 from SB_R020 where F_75='1' and lnnvl( D_CLOSE <= to_date('%rptdt','dd.mm.yyyy') )]';
+  sql_acc_ := replace( sql_acc_, '%rptdt', to_char(Dat_,'dd.mm.yyyy') );
 
   if to_char(dat_, 'mm') in ('12', '01')
   then
@@ -217,7 +215,8 @@ BEGIN
                and a.nbs in ( select R020
                                 from SB_R020
                                where F_75 = '1'
-                                 and D_CLOSE is Null )
+                                 and lnnvl( D_CLOSE <= Dat_ )
+                            )
                and p.sos >= 4
                and p.ref = o.ref
                and o.sos = 5
@@ -227,54 +226,54 @@ BEGIN
       from sel a
          , opl b
      where a.fdat between datb_ and Dat_ and
-         a.dk = 0 and
-         a.ref = b.ref and
-         b.fdat between datb_ and Dat_ and
-         a.stmt = b.stmt and
-         a.s = b.s/100 and
-         a.sq = b.sq/100 and
-         b.dk = 1
-      union
-      select b.acc ACCD, a.tt TT, a.ref REF, a.kv KV, b.nls NLSD, a.s, a.SQ,
-         a.FDAT, a.NAZN, a.acc ACCK, a.nls NLSK, a.ISP
+           a.dk = 0 and
+           a.ref = b.ref and
+           b.fdat between datb_ and Dat_ and
+           a.stmt = b.stmt and
+           a.s = b.s/100 and
+           a.sq = b.sq/100 and
+           b.dk = 1
+     union
+    select b.acc ACCD, a.tt TT, a.ref REF, a.kv KV, b.nls NLSD, a.s, a.SQ,
+           a.FDAT, a.NAZN, a.acc ACCK, a.nls NLSK, a.ISP
       from sel a
          , opl b
-      where a.fdat between datb_ and Dat_ and
-         a.dk = 1 and
-         a.ref = b.ref and
-         b.fdat between datb_ and Dat_ and
-         a.stmt = b.stmt and
-         a.s = b.s/100 and
-         a.sq = b.sq/100 and
-         b.dk = 0
-      union --  период корректирующих проводок ДТ
-      select a.acc ACCD, a.tt TT, a.ref REF, a.kv KV, a.nls NLSD, a.s, a.SQ,
-             a.FDAT, a.NAZN, b.acc ACCK, b.nls NLSK, a.ISP
+     where a.fdat between datb_ and Dat_ and
+           a.dk = 1 and
+           a.ref = b.ref and
+           b.fdat between datb_ and Dat_ and
+           a.stmt = b.stmt and
+           a.s = b.s/100 and
+           a.sq = b.sq/100 and
+           b.dk = 0
+     union --  период корректирующих проводок ДТ
+    select a.acc ACCD, a.tt TT, a.ref REF, a.kv KV, a.nls NLSD, a.s, a.SQ,
+           a.FDAT, a.NAZN, b.acc ACCK, b.nls NLSK, a.ISP
       from sel a
          , opl b
-      where a.fdat between Dat_+1 and trunc(Dat_+days_) and
-         a.vob in (96,99) and
-         a.dk = 0 and
-         a.ref = b.ref and
-         b.fdat between Dat_+1 and trunc(Dat_+days_) and
-         a.stmt = b.stmt and
-         a.s = b.s/100 and
-         a.sq = b.sq/100 and
-         b.dk = 1
-      union --  период корректирующих проводок КТ
-      select b.acc ACCD, a.tt TT, a.ref REF, a.kv KV, b.nls NLSD, a.s, a.SQ,
-             a.FDAT, a.NAZN, a.acc ACCK, a.nls NLSK, a.ISP
-        from sel a
-           , opl b
-      where a.fdat between Dat_+1 and trunc(Dat_+days_) and
-         a.vob in (96,99) and
-         a.dk = 1 and
-         a.ref = b.ref and
-         b.fdat between Dat_+1 and trunc(Dat_+days_) and
-         a.stmt = b.stmt and
-         a.s = b.s/100 and
-         a.sq = b.sq/100 and
-         b.dk = 0
+     where a.fdat between Dat_+1 and trunc(Dat_+days_) and
+           a.vob in (96,99) and
+           a.dk = 0 and
+           a.ref = b.ref and
+           b.fdat between Dat_+1 and trunc(Dat_+days_) and
+           a.stmt = b.stmt and
+           a.s = b.s/100 and
+           a.sq = b.sq/100 and
+           b.dk = 1
+     union --  период корректирующих проводок КТ
+    select b.acc ACCD, a.tt TT, a.REF, a.kv KV, b.nls NLSD, a.s, a.SQ,
+           a.FDAT, a.NAZN, a.acc ACCK, a.nls NLSK, a.ISP
+      from sel a
+         , opl b
+     where a.fdat between Dat_+1 and trunc(Dat_+days_) and
+           a.vob in (96,99) and
+           a.dk = 1 and
+           a.ref = b.ref and
+           b.fdat between Dat_+1 and trunc(Dat_+days_) and
+           a.stmt = b.stmt and
+           a.s = b.s/100 and
+           a.sq = b.sq/100 and
+           b.dk = 0
     );
 
     commit;
@@ -298,96 +297,208 @@ BEGIN
                      o.vdat <> vdatr_*/));
 
   OPEN Saldo;
-  
+
   LOOP
+  
     FETCH Saldo 
-     INTO rnk_, acc_, nls_, kv_, data_, Nbs_, Ostn_, Ostq_,
+     INTO rnk_, acc_, nls_, kv_, data_, Nbs_, ob22_, Ostn_, Ostq_,
           Dos96_, Dosq96_, Kos96_, Kosq96_,
-          Dos99_, Dosq99_, Kos99_, Kosq99_, ob22_;
+          Dos99_, Dosq99_, Kos99_, Kosq99_;
     
     EXIT WHEN Saldo%NOTFOUND;
 
     kk_ := '00';
 
-   IF typ_>0 THEN
-      nbuc_ := NVL(F_Codobl_Tobo(acc_,typ_),nbuc1_);
-   ELSE
-      nbuc_ := nbuc1_;
-   END IF;
+    IF typ_>0 THEN
+       nbuc_ := NVL(F_Codobl_Tobo(acc_,typ_),nbuc1_);
+    ELSE
+       nbuc_ := nbuc1_;
+    END IF;
 
-   --- обороты по перекрытию 6,7 классов на 5040,5041
-   IF to_char(Dat_,'MM')='12' and (nls_ like '6%' or nls_ like '7%' or nls_ like '504%') THEN
-    SELECT NVL(SUM(decode(dk,0,1,0)*s),0),
-                    NVL(SUM(decode(dk,1,1,0)*s),0)
-             INTO d_sum_, k_sum_
-             FROM opldok
-             WHERE fdat  between Dat_  AND Dat_+29 AND
-                   acc  = acc_   AND
-                   (tt like 'ZG8%'  or tt like 'ZG9%');
+    -- обороты по перекрытию 6,7 классов на 5040,5041
+    IF to_char(Dat_,'MM')='12' and (nls_ like '6%' or nls_ like '7%' or nls_ like '504%')
+    THEN
+
+      SELECT NVL(SUM(decode(dk,0,1,0)*s),0),
+             NVL(SUM(decode(dk,1,1,0)*s),0)
+        INTO d_sum_, k_sum_
+        FROM opldok
+       WHERE fdat between Dat_ AND Dat_+29
+         AND acc = acc_
+         AND tt in ( 'ZG8', 'ZG9%' );
 
       Dos96_:=Dos96_-d_sum_;
       Kos96_:=Kos96_-k_sum_;
-   END IF;
 
-   Ostn_:=Ostn_-Dos96_+Kos96_-Dos99_+Kos99_;
+    END IF;
 
-   IF Ostn_<>0 THEN
-      dk_:=IIF_N(Ostn_,0,'1','2','2');
-      dk_:=dk_ || IIF_N(kv_, 980, '1', '0', '1');
+    Ostn_:=Ostn_-Dos96_+Kos96_-Dos99_+Kos99_;
 
-      kodp_:=dk_ || Nbs_ || ob22_ || lpad(kv_, 3, '0') || kk_;
-      znap_:=TO_CHAR(ABS(Ostn_));
+    IF ( Ostn_ <> 0 )
+    then
+
+      dk_ := case when ( Ostn_ < 0 ) then '1' else '2' end
+          || case when ( kv_ = 980 ) then '0' else '1' end;
+
+      kodp_:= dk_ || Nbs_ || ob22_ || lpad(kv_, 3, '0') || kk_;
+
+      znap_:= to_char(abs(Ostn_));
 
       INSERT INTO rnbu_trace(nls, kv, odate, kodp, znap, acc, nbuc)
-        VALUES  (nls_, kv_, data_, kodp_, znap_, acc_, nbuc_) ;
-   END IF;
+      VALUES ( nls_, kv_, data_, kodp_, znap_, acc_, nbuc_ );
+
+    END IF;
 
     Ostq_:=Ostq_-Dosq96_+Kosq96_-Dosq99_+Kosq99_;
 
-    IF Ostq_<>0 THEN
-      dk_:=IIF_N(Ostq_,0,'1','2','2')||'0';
-      kodp_:=dk_ || Nbs_ || ob22_ || lpad(kv_, 3, '0') || kk_;
-      znap_:=TO_CHAR(ABS(Ostq_));
+    IF ( Ostq_ <> 0 )
+    THEN
+
+      dk_ := case when ( Ostq_ < 0 ) then '1' else '2' end || '0';
+
+      kodp_:= dk_ || Nbs_ || ob22_ || lpad(kv_, 3, '0') || kk_;
+      
+      znap_:= to_char(abs(Ostq_));
 
       INSERT INTO rnbu_trace(nls, kv, odate, kodp, znap, acc, nbuc)
-        VALUES  (nls_, kv_, data_, kodp_, znap_, acc_, nbuc_) ;
+      VALUES ( nls_, kv_, data_, kodp_, znap_, acc_, nbuc_ );
+
     END IF;
 
   END LOOP;
-  
+
   CLOSE Saldo;
 -----------------------------------------------------------------------------
   OPEN OBOROTY;
+
   LOOP
-    FETCH OBOROTY INTO data_, ref_, accd_, nlsd_, kv_, Nbs_, acck_, nlsk_, nbsk_,
-                       Dos_, Dosq_, nazn_, pr_d, pr_k, ob22_d, ob22_k;
+
+    FETCH OBOROTY
+     INTO data_, ref_, accd_, nlsd_, kv_, Nbs_, acck_, nlsk_, nbsk_,
+          Dos_, Dosq_, nazn_, pr_d, pr_k, ob22_d, ob22_k;
+    
     EXIT WHEN OBOROTY%NOTFOUND;
 
-   comm_ := substr('Дт рах. = ' || nlsd_ || ' Кт рах. = ' || nlsk_ || '  ' || nazn_, 1, 200);
+    comm_ := substr('Дт рах. = ' || nlsd_ || ' Кт рах. = ' || nlsk_ || '  ' || nazn_, 1, 200);
 
-   kk_ := '00';
+    kk_ := '00';
 
-   IF pr_d in ('1','5') THEN
+    IF pr_d in ('1','5') THEN
    
-      if ( nbs_ = '7702' )
+      if ( nbs_ = '7700' )
       then
         
         case
-        when ob22_d in ('11','12','13','20','21','22','23','24','25','44','46','47','49','50','51','52') 
+        when ob22_d in ('02','07')
         then kk_ := '01';
-        when ob22_d in ('14','15','16','38','39','40','45','48','57','58','59','60','61','62','63','64')
+        when ob22_d in ('04','09')
         then kk_ := '12';
-        when ob22_d in ('17','18','19','53','54','55','56')
+        when ob22_d in ('06')
         then kk_ := '14';
-        else kk_ := '01';
+        else kk_ := '__';
         end case;
         
       end if;
 
-      if nbs_ = '7706' and ob22_d in ('01','03','05','07','09','11','13','15','17') then
-         kk_ := '01';
-      elsif nbs_ = '7706' and ob22_d in ('02','04','06','08','10','12','14','16','18') then
-         kk_ := '12';
+      if ( nbs_ = '7701' )
+      then
+        
+        case
+        when ob22_d in ('02','09','23','24')
+        then kk_ := '01';
+        when ob22_d in ('04','11','26','27')
+        then kk_ := '12';
+        when ob22_d in ('07','25')
+        then kk_ := '14';
+        else kk_ := '__';
+        end case;
+        
+      end if;
+
+      if ( nbs_ = '7702' )
+      then
+        
+        case
+        when ob22_d in ('11','12','22','65','66','75','79','83','85','92','94','96')
+        then kk_ := '01';
+        when ob22_d in ('14','15','62','67','68','77','81','84','86','93','95','97')
+        then kk_ := '12';
+        when ob22_d in ('17','18','19','53','54','55')
+        then kk_ := '14';
+        else kk_ := '__';
+        end case;
+        
+      end if;
+
+      if ( nbs_ = '7703' )
+      then
+
+        case
+        when ob22_d in ('01','03','07','09')
+        then kk_ := '01';
+        when ob22_d in ('06','08','13','16')
+        then kk_ := '12';
+        when ob22_d in ('12','23')
+        then kk_ := '14';
+        else kk_ := '__';
+        end case;
+
+      end if;
+
+      if ( nbs_ = '7704' )
+      then
+
+        case
+        when ob22_d in ('02','05','10','13')
+        then kk_ := '01';
+        when ob22_d in ('03','07','11','14')
+        then kk_ := '12';
+        when ob22_d in ('06','15')
+        then kk_ := '14';
+        else kk_ := '__';
+        end case;
+
+      end if;
+
+      if ( nbs_ = '7705' )
+      then
+
+        case
+        when ob22_d in ('02')
+        then kk_ := '01';
+        when ob22_d in ('06')
+        then kk_ := '12';
+        else kk_ := '__';
+        end case;
+
+      end if;
+
+      if ( nbs_ = '7706' )
+      then
+
+        case
+        when ob22_d in ('01','07','11','19')
+        then kk_ := '01';
+        when ob22_d in ('02','08','12','18')
+        then kk_ := '12';
+        else kk_ := '__';
+        end case;
+
+      end if;
+
+      if ( nbs_ = '7707' )
+      then
+
+        case
+        when ob22_d in ('01','04','06','13','14','17','19','21','25')
+        then kk_ := '01';
+        when ob22_d in ('02','05','07','15','16','18','20','22')
+        then kk_ := '12';
+        when ob22_d in ('03,08')
+        then kk_ := '14';
+        else kk_ := '__';
+        end case;
+
       end if;
 
       -- кошти направленi на формування резерву
@@ -446,16 +557,9 @@ BEGIN
       end if;
 
       -- виправнi обороти щодо коду 01
-      if nbs_ = nbsk_ then
-         if nbs_ = '7720' and ob22_d in ('13','14','15','16','17','23','25','27') then
-            kk_ := '01';
-         elsif nbs_ = '7720' and ob22_d in ('18','19','20','21','22','24','26','28') then
-            kk_ := '12';
-         elsif nbs_ = '7720' and ob22_d in ('12') then
-            kk_ := '14';
-         else
-            kk_ := '11';
-         end if;
+      if ( nbs_ = nbsk_ )
+      then
+        kk_ := '11';
       end if;
 
       -- зменшення резервiв за рахунок прибутку банку
@@ -464,142 +568,243 @@ BEGIN
          kk_ := '12';
       end if;
 
-      IF Dos_ > 0 THEN
-         if kv_ != 980 then
-            dk_ := '51';
-         else
-            dk_ := '50';
-         end if;
+      IF Dos_ > 0 
+      THEN
+      
+        if ( kv_ = 980 )
+        then dk_ := '50';
+        else dk_ := '51';
+        end if;
+      
+        IF ( typ_ > 0 )
+        THEN nbuc_ := NVL(F_Codobl_Tobo(accd_,typ_),nbuc1_);
+        ELSE nbuc_ := nbuc1_;
+        END IF;
+      
+        kodp_:= dk_ || Nbs_ || ob22_d || lpad(kv_, 3, '0') || kk_;
+        znap_:= to_char(Dos_);
+        
+        INSERT INTO rnbu_trace(nls, kv, odate, kodp, znap, ref, comm, acc, nbuc)
+        VALUES ( nlsd_, kv_, data_, kodp_, znap_, ref_, comm_, accd_, nbuc_ );
+        
+      END IF;
 
-         IF typ_>0 THEN
-            nbuc_ := NVL(F_Codobl_Tobo(accd_,typ_),nbuc1_);
-         ELSE
-            nbuc_ := nbuc1_;
+      IF kv_ != 980 and Dosq_ > 0 
+      THEN
+         
+         dk_ := '50';
+         
+         IF ( typ_ > 0 )
+         THEN nbuc_ := NVL(F_Codobl_Tobo(accd_,typ_),nbuc1_);
+         ELSE nbuc_ := nbuc1_;
          END IF;
 
          kodp_:= dk_ || Nbs_ || ob22_d || lpad(kv_, 3, '0') || kk_ ;
-         znap_:=TO_CHAR(Dos_);
-         INSERT INTO rnbu_trace(nls, kv, odate, kodp, znap, ref, comm, acc, nbuc)
-         VALUES  (nlsd_, kv_, data_, kodp_, znap_, ref_, comm_, accd_, nbuc_) ;
-      END IF;
-
-      IF kv_ != 980 and Dosq_ > 0 THEN
-         kodp_:= '50' || Nbs_ || ob22_d || lpad(kv_, 3, '0') || kk_ ;
-         znap_:=TO_CHAR(Dosq_);
-
-         IF typ_>0 THEN
-            nbuc_ := NVL(F_Codobl_Tobo(accd_,typ_),nbuc1_);
-         ELSE
-            nbuc_ := nbuc1_;
-         END IF;
+         znap_:= to_char(Dosq_);
 
          INSERT INTO rnbu_trace(nls, kv, odate, kodp, znap, ref, comm, acc, nbuc)
-         VALUES  (nlsd_, kv_, data_, kodp_, znap_, ref_, comm_, accd_, nbuc_) ;
+         VALUES ( nlsd_, kv_, data_, kodp_, znap_, ref_, comm_, accd_, nbuc_ );
+
       END IF;
 
       if pr_k in ('1', '6') then
 
-         -- при формировании новых счетов для резерва
-         if nlsd_ like '3739%' and nlsk_ like '7%' then
-            kk_ := '07';
-         end if;
+        -- при формировании новых счетов для резерва
+        if nlsd_ like '3739%' and nlsk_ like '7%' 
+        then
+          kk_ := '07';
+        end if;
 
-         if ( nbsk_ = '7702' )
-         then
+        if ( nbsk_ = '7700' )
+        then
+          
+          case
+          when ob22_k in ('02','07')
+          then kk_ := '11';
+          when ob22_k in ('04','09')
+          then kk_ := '02';
+          when ob22_k in ('06')
+          then kk_ := '04';
+          else kk_ := '__';
+          end case;
+          
+        end if;
 
-           case
-           when ob22_k in ('11','12','13','20','21','22','23','24','25','44','46','47','49','50','51','52')
-           then kk_ := '11';
-           when ob22_k in ('14','15','16','38','39','40','45','48','57','58','59','60','61','62','63','64')
-           then kk_ := '02';
-           when ob22_k in ('17','18','19','53','54','55','56')
-           then kk_ := '04';
-           else kk_ := '01';
-           end case;
+        if ( nbsk_ = '7701' )
+        then
+          
+          case
+          when ob22_k in ('02','09','23','24')
+          then kk_ := '11';
+          when ob22_k in ('04','11','26','27')
+          then kk_ := '02';
+          when ob22_k in ('07','25')
+          then kk_ := '04';
+          else kk_ := '__';
+          end case;
+          
+        end if;
+        
+        if ( nbsk_ = '7702' )
+        then
+          
+          case
+          when ob22_k in ('11','12','22','65','66','75','79','83','85','92','94','96')
+          then kk_ := '11';
+          when ob22_k in ('14','15','62','67','68','77','81','84','86','93','95','97')
+          then kk_ := '02';
+          when ob22_k in ('17','18','19','53','54','55')
+          then kk_ := '04';
+          else kk_ := '__';
+          end case;
+          
+        end if;
+        
+        if ( nbsk_ = '7703' )
+        then
+        
+          case
+          when ob22_k in ('01','03','07','09')
+          then kk_ := '11';
+          when ob22_k in ('06','08','13','16')
+          then kk_ := '02';
+          when ob22_k in ('12','23')
+          then kk_ := '04';
+          else kk_ := '__';
+          end case;
+        
+        end if;
+        
+        if ( nbsk_ = '7704' )
+        then
+        
+          case
+          when ob22_k in ('02','05','10','13')
+          then kk_ := '11';
+          when ob22_k in ('03','07','11','14')
+          then kk_ := '02';
+          when ob22_k in ('06','15')
+          then kk_ := '04';
+          else kk_ := '__';
+          end case;
+        
+        end if;
+        
+        if ( nbsk_ = '7705' )
+        then
+        
+          case
+          when ob22_k in ('02')
+          then kk_ := '11';
+          when ob22_k in ('06')
+          then kk_ := '02';
+          else kk_ := '__';
+          end case;
+        
+        end if;
+        
+        if ( nbsk_ = '7706' )
+        then
+        
+          case
+          when ob22_k in ('01','07','11','19')
+          then kk_ := '11';
+          when ob22_k in ('02','08','12','18')
+          then kk_ := '02';
+          else kk_ := '__';
+          end case;
+        
+        end if;
+        
+        if ( nbsk_ = '7707' )
+        then
+        
+          case
+          when ob22_k in ('01','04','06','13','14','17','19','21','25')
+          then kk_ := '11';
+          when ob22_k in ('02','05','07','15','16','18','20','22')
+          then kk_ := '02';
+          when ob22_k in ('03,08')
+          then kk_ := '04';
+          else kk_ := '__';
+          end case;
+        
+        end if;
 
-         end if;
+        -- кошти направленi на формування резерву
+        if nlsd_ like '7%' and nlsk_ not like '7%' then
+           kk_ := '01';
+        end if;
 
-         if nbsk_ = '7706' and ob22_k in ('01','03','05','07','09','11','13','15','17') then
-            kk_ := '11';
-         elsif nbsk_ = '7706' and ob22_k in ('02','04','06','08','10','12','14','16','18') then
-            kk_ := '02';
-         end if;
+        -- виправнi обороти щодо коду 01
+        if ( nbs_ = nbsk_ )
+        then
+          kk_ := '01';
+        end if;
+        
+        -- при формировании новых счетов для резерва
+        if nlsd_ like '3739%' and
+           (nlsk_ like '149%' or nlsk_ like '159%' or
+            nlsk_ like '189%' or nlsk_ like '240%' or
+            nlsk_ like '289%' or
+            nlsk_ like '319%' or nlsk_ like '329%' or
+            nlsk_ like '359%' or nlsk_ like '369%')
+        then
+           kk_ := '07';
+        end if;
+        
+        -- зменшення резервiв за рахунок прибутку банку
+        if kv_ = 980 and (nlsd_ like '7%' and ob22_d='06') and (nlsk_ like '3590%' and ob22_k='03')
+        then
+           kk_ := '12';
+        end if;
+        
+        IF Dos_ > 0 
+        THEN
+        
+          if ( kv_ = 980 )
+          then dk_ := '60';
+          else dk_ := '61';
+          end if;
 
-         -- кошти направленi на формування резерву
-         if nlsd_ like '7%' and nlsk_ not like '7%' then
-            kk_ := '01';
-         end if;
+          if ( typ_ > 0 )
+          then nbuc_ := NVL(F_Codobl_Tobo(acck_,typ_),nbuc1_);
+          else nbuc_ := nbuc1_;
+          end if;
 
-         -- виправнi обороти щодо коду 01
-         if nbs_ = nbsk_ then
-             if nbs_ = '7720' and ob22_k in ('13','14','15','16','17','23','25','27') then
-                kk_ := '11';
-             elsif nbs_ = '7720' and ob22_k in ('18','19','20','21','22','24','26','28') then
-                kk_ := '02';
-             elsif nbs_ = '7720' and ob22_k in ('12') then
-                kk_ := '04';
-             else
-                kk_ := '01';
-             end if;
-         end if;
+          kodp_:= dk_ || Nbsk_ || ob22_k || lpad(kv_, 3, '0') || kk_ ;
+          znap_:= to_char(Dos_);
 
-         -- при формировании новых счетов для резерва
-         if nlsd_ like '3739%' and
-            (nlsk_ like '149%' or nlsk_ like '159%' or
-             nlsk_ like '189%' or nlsk_ like '240%' or
-             nlsk_ like '289%' or
-             nlsk_ like '319%' or nlsk_ like '329%' or
-             nlsk_ like '359%' or nlsk_ like '369%')
-         then
-            kk_ := '07';
-         end if;
+          INSERT INTO rnbu_trace(nls, kv, odate, kodp, znap, ref, comm, acc, nbuc)
+          VALUES ( nlsk_, kv_, data_, kodp_, znap_, ref_, comm_, acck_, nbuc_ );
 
-         -- зменшення резервiв за рахунок прибутку банку
-         if kv_ = 980 and (nlsd_ like '7%' and ob22_d='06') and (nlsk_ like '3590%' and ob22_k='03')
-         then
-            kk_ := '12';
-         end if;
+        END IF;
 
-         IF Dos_ > 0 THEN
-            if kv_ != 980 then
-               dk_ := '61';
-            else
-               dk_ := '60';
-            end if;
+        IF kv_ != 980 and Dosq_ > 0 
+        THEN
 
-            IF typ_>0 THEN
-               nbuc_ := NVL(F_Codobl_Tobo(acck_,typ_),nbuc1_);
-            ELSE
-               nbuc_ := nbuc1_;
-            END IF;
+          dk_ := '60';
 
-            kodp_:= dk_ || Nbsk_ || ob22_k || lpad(kv_, 3, '0') || kk_ ;
-            znap_:=TO_CHAR(Dos_);
+          IF ( typ_ > 0 )
+          then nbuc_ := NVL(F_Codobl_Tobo(acck_,typ_),nbuc1_);
+          else nbuc_ := nbuc1_;
+          END IF;
 
-            INSERT INTO rnbu_trace(nls, kv, odate, kodp, znap, ref, comm, acc, nbuc)
-            VALUES  (nlsk_, kv_, data_, kodp_, znap_, ref_, comm_, acck_, nbuc_) ;
-         END IF;
+          kodp_:= dk_ || Nbsk_ || ob22_k || lpad(kv_, 3, '0') || kk_ ;
+          znap_:= to_char(Dosq_);
 
-         IF kv_ != 980 and Dosq_ > 0 THEN
-            kodp_:= '60' || Nbsk_ || ob22_k || lpad(kv_, 3, '0') || kk_ ;
-            znap_:=TO_CHAR(Dosq_);
+          INSERT INTO rnbu_trace(nls, kv, odate, kodp, znap, ref, comm, acc, nbuc)
+          VALUES ( nlsk_, kv_, data_, kodp_, znap_, ref_, comm_, acck_, nbuc_ );
 
-            IF typ_>0 THEN
-               nbuc_ := NVL(F_Codobl_Tobo(acck_,typ_),nbuc1_);
-            ELSE
-               nbuc_ := nbuc1_;
-            END IF;
+        END IF;
 
-            INSERT INTO rnbu_trace(nls, kv, odate, kodp, znap, ref, comm, acc, nbuc)
-            VALUES  (nlsk_, kv_, data_, kodp_, znap_, ref_, comm_, acck_, nbuc_) ;
-         END IF;
       end if;
 
-   END IF;
+    END IF;
 
-   kk_ := '00';
+    kk_ := '00';
 
-   IF pr_k in ('1', '6') and pr_d = '0' THEN
+    IF pr_k in ('1','6') and pr_d = '0' THEN
 
       comm_ := substr(comm_ || '   !!! Проверка !!!', 1, 200);
 
@@ -691,61 +896,64 @@ BEGIN
   -- розрахунок показникыв курсової р?зниц? (код 06)
   comm_ := 'формирование показетелей переоценки';
 
-  for k in (select acc, nls, kv, substr(kodp,3,4) nbs,
-                 substr(kodp,7,2) ob22, substr(kodp,9,3) kvp,
-                 NVL(sum(decode(substr(kodp,1,2),'50',to_number(znap),0)),0) dos,
-                 NVL(sum(decode(substr(kodp,1,2),'60',to_number(znap),0)),0) kos
-          from rnbu_trace
-          where kv != 980
-           and odate <= Dat_
-           and substr(kodp,-2) not in ('06')
-          group by acc, nls, kv, substr(kodp,3,4), substr(kodp,7,2), substr(kodp,9,3)
-         UNION
-         select acc, nls, kv, nbs,
-                ob22, lpad(to_char(kv),3,'0') kvp,
-                 0 dos,
-                 0 kos
-          from accounts
-         where kv != 980
-           and nbs in ( select R020 
-                          from SB_R020
-                         where F_75='1' 
-                           and D_CLOSE is Null
-                      )
-           and acc not in ( select t.acc
-                              from rnbu_trace t
-                             where t.kv != 980
-                               and t.odate <= Dat_) )
+  for k in ( select acc, nls, kv, substr(kodp,3,4) nbs,
+                    substr(kodp,7,2) ob22, substr(kodp,9,3) kvp,
+                    NVL(sum(decode(substr(kodp,1,2),'50',to_number(znap),0)),0) dos,
+                    NVL(sum(decode(substr(kodp,1,2),'60',to_number(znap),0)),0) kos
+               from rnbu_trace
+              where kv != 980
+                and odate <= Dat_
+                and substr(kodp,-2) not in ('06')
+              group by acc, nls, kv, substr(kodp,3,4), substr(kodp,7,2), substr(kodp,9,3)
+              UNION
+             select acc, nls, kv, nbs,
+                    ob22, lpad(to_char(kv),3,'0') kvp,
+                    0 dos,
+                    0 kos
+               from accounts
+              where kv != 980
+                and nbs in ( select R020 
+                               from SB_R020
+                              where F_75='1' 
+                                and lnnvl( D_CLOSE <= Dat_ )
+                           )
+                and acc not in ( select t.acc
+                                   from RNBU_TRACE t
+                                  where t.kv != 980
+                                    and t.odate <= Dat_ ) )
   loop
-     IF typ_>0 THEN
-        nbuc_ := NVL(F_Codobl_Tobo(k.acc,typ_),nbuc1_);
-     ELSE
-        nbuc_ := nbuc1_;
-     END IF;
+    IF typ_>0 THEN
+       nbuc_ := NVL(F_Codobl_Tobo(k.acc,typ_),nbuc1_);
+    ELSE
+       nbuc_ := nbuc1_;
+    END IF;
 
-     begin
-         select NVL(dosq - cudosq, 0), NVL(kosq - cukosq,0)
-            into dos_, kos_
-         from agg_monbals
-         where fdat = trunc(Dat_, 'mm')
-           and acc=k.acc;
+    begin
+      select NVL(dosq - cudosq, 0), NVL(kosq - cukosq,0)
+        into dos_, kos_
+        from agg_monbals
+       where fdat = trunc(Dat_, 'mm')
+         and acc=k.acc;
      exception
-        when no_data_found then
-            dos_ := 0;
-            kos_ := 0;
-     end;
+       when no_data_found then
+         dos_ := 0;
+         kos_ := 0;
+    end;
 
-    if dos_ != k.dos and dos_ != 0 and k.dos >= 0 then
-        if dos_ -  k.dos > 0 then
-           kodp_:= '50' || k.nbs || k.ob22 || lpad(k.kvp, 3, '0') || '06' ;
-           znap_:= TO_CHAR(dos_ - k.dos);
-        elsif dos_ -  k.dos < 0 then
-           kodp_:= '60' || k.nbs || k.ob22 || lpad(k.kvp, 3, '0') || '06' ;
-           znap_:= TO_CHAR(abs(dos_ - k.dos));
-        end if;
-
-        INSERT INTO rnbu_trace(nls, kv, odate, kodp, znap, ref, comm, acc, nbuc)
-        VALUES  (k.nls, k.kv, dat_, kodp_, znap_, 0, comm_, k.acc, nbuc_) ;
+    if dos_ != k.dos and dos_ != 0 and k.dos >= 0 
+    then
+    
+      if dos_ -  k.dos > 0 then
+         kodp_:= '50' || k.nbs || k.ob22 || lpad(k.kvp, 3, '0') || '06' ;
+         znap_:= TO_CHAR(dos_ - k.dos);
+      elsif dos_ -  k.dos < 0 then
+         kodp_:= '60' || k.nbs || k.ob22 || lpad(k.kvp, 3, '0') || '06' ;
+         znap_:= TO_CHAR(abs(dos_ - k.dos));
+      end if;
+   
+      INSERT INTO rnbu_trace(nls, kv, odate, kodp, znap, ref, comm, acc, nbuc)
+      VALUES  (k.nls, k.kv, dat_, kodp_, znap_, 0, comm_, k.acc, nbuc_) ;
+      
     end if;
 
      if kos_ != k.kos and kos_ != 0 and k.kos >= 0 then
@@ -760,38 +968,23 @@ BEGIN
         INSERT INTO rnbu_trace(nls, kv, odate, kodp, znap, ref, comm, acc, nbuc)
         VALUES  (k.nls, k.kv, dat_, kodp_, znap_, 0, comm_, k.acc, nbuc_) ;
      end if;
+     
   end loop;
 
   -- удалаяем коректирующие проводки предыдущего месяца
-  if dat_ = to_date('31052011','ddmmyyyy') then
-     delete from rnbu_trace
-     where odate < Dat_
-       and ref in (select ref
-                   from oper
-                   where vob=96
-                     and vdat >= to_date('31122010','ddmmyyyy')
-                     and vdat < to_date('28012011','ddmmyyyy'));
-  else
-     delete from rnbu_trace
-     where odate < Dat_
-       and ref in (select ref from ref_kor where vob=96);
-  end if;
+  delete from rnbu_trace
+   where odate < Dat_
+     and ref in ( select ref from REF_KOR where vob=96 );
 
   ------------------------------------------------------------------
-  DELETE FROM tmp_irep where kodf='75' and datf= dat_;
+  delete from TMP_IREP where KODF = kodf_ and DATF = dat_;
   ------------------------------------------------------------------
-  OPEN BaseL;
-  LOOP
-     FETCH BaseL INTO  kodp_, nbuc_, znap_;
-     EXIT WHEN BaseL%NOTFOUND;
-     INSERT INTO tmp_irep
-          (kodf, datf, kodp, znap, nbuc)
-     VALUES
-          ('75', Dat_, kodp_, znap_, nbuc_);
-  END LOOP;
-  CLOSE BaseL;
+  insert into TMP_IREP ( KODF, DATF, KODP, ZNAP, NBUC )
+  select kodf_, Dat_, KODP, sum(ZNAP), NBUC
+    from RNBU_TRACE
+   group by KODP, NBUC;
   ------------------------------------------------------------------
-  logger.info ('P_F75SB: END ');
+  bars_audit.info( $$PLSQL_UNIT||': END' );
   
 end P_F75SB;
 /
