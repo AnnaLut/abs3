@@ -1,4 +1,4 @@
-prompt CLIENTFO2 columns
+prompt re-create upl_columns for CLIENTFO2
 declare
 l_file_id number;
 begin
@@ -122,7 +122,7 @@ begin
   values (l_file_id, 38, 'ADR_WORK_LOC', 'Населений пункт', 'VARCHAR2', 30, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
-  values (l_file_id, 39, 'ADR_WORK_ADR', 'Вулиця, будинок, квартира', 'VARCHAR2', 55, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null, null);
+  values (l_file_id, 39, 'ADR_WORK_ADR', 'Вулиця, будинок, квартира', 'VARCHAR2', 100, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
   values (l_file_id, 40, 'ADR_WORK_ZIP', 'Поштовий індекс', 'VARCHAR2', 20, null, null, null, 'Y', null, null, null, null, null);

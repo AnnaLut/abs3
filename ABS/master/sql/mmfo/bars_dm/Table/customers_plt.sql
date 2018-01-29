@@ -46,7 +46,7 @@ begin
 	ADR_WORK_DOMAIN VARCHAR2(30), 
 	ADR_WORK_REGION VARCHAR2(30), 
 	ADR_WORK_LOC VARCHAR2(30), 
-	ADR_WORK_ADR VARCHAR2(55), 
+	ADR_WORK_ADR VARCHAR2(100), 
 	ADR_WORK_ZIP VARCHAR2(20), 
 	NEGATIV_STATUS VARCHAR2(10), 
 	REESTR_MOB_BANK VARCHAR2(10), 
@@ -281,6 +281,8 @@ end;
 prompt alter column MERRIED varchar2(500)
 alter table bars_dm.customers_plt modify merried varchar2(500);
 
+prompt alter column adr_work_adr modify varchar2(100)
+alter table bars_dm.customers_plt modify ADR_WORK_ADR VARCHAR2(100);
 
 PROMPT *** Create  constraint SYS_C00120070 ***
 begin   
