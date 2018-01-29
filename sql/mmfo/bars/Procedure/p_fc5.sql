@@ -13,7 +13,7 @@ IS
 % DESCRIPTION : Процедура формирования #С5 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.17.011  03/01/2018
+% VERSION     : v.17.013  29/01/2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
 
@@ -147,6 +147,10 @@ IS
    nbuc1_     VARCHAR2 (20);
    nbuc_      VARCHAR2 (20);
    t020_      VARCHAR2 (1);
+   
+   dathb_   date;
+   dathe_   date;
+   s240_    varchar2(1);
 
    TYPE ref_type_curs IS REF CURSOR;
 
@@ -174,12 +178,12 @@ IS
          r012_  varchar2(1),
          s580_  varchar2(1),
          t020_  varchar2(1),
+         s240_  varchar2(1),
          nd1_   number,
          nd2_   number,
          nd3_   number,
          nd4_   number,
          nd_    number,
-         s580r_ varchar2(1),
          fa7p_  number,
          freq_  number,
          k077_  varchar2(1) );
@@ -195,7 +199,9 @@ IS
    table_R013    t_otcn;
 
    datz_        date := Dat_Next_U(dat_, 1);
+
    sql_acc_     clob;
+
    ret_         number;
    in_acc_      varchar2(255);
 
@@ -273,121 +279,41 @@ IS
          AND a.acc = p.acc(+)
          and a.rnk = c.rnk;
 
-function f_get_r012_for_1508( p_acc in number )
-     return varchar2
-is
-   l_r011     varchar2(1);
-begin
-
-    begin
-       select nvl(trim(r011),'1')    into l_r011
-         from specparam
-        where acc =p_acc;
-
-    exception
-       when no_data_found  then  l_r011 :='1';
-    end;
-
-    if l_r011 ='1'  then
-            return 'K';
-    else
-            return 'L';
-    end if;
-
-end;
-
-    procedure P_Set_S580_Def(r020_ in varchar2, r013_ in varchar2) is
+    procedure P_Set_S580_Def(r020_ in varchar2, t020_ in varchar2, r011_ in varchar2, s245_ in varchar2) is
        invk_ varchar2(1);
     begin
-       if r020_ = '9500' then
-          if r013_ in ('1','3') then
-             s580_ := '5';
-          end if;
+       if s580_ = '0' or r020_ = '2625' then
 
-          if r013_ = '9' then
-             s580_ := '9';
-          end if;
+           select nvl(max(s580), '9')
+           into s580r_
+           from nbur_ref_risk_s580
+           where r020 = r020_ and 
+                (t020 = t020_ or t020 = '*') and
+                (r011 = r011_ or r011 = '*') and
+                (S245 = s245_ or S245 = '*');
+           
+           s580_ := s580r_;
        end if;
-
-       if r020_ in ('3570','3578')  then
-          if r013_ in ('3','4')  then   s580_ :='5';  end if;
-          if r013_ in ('5','6')  then   s580_ :='1';  end if;
-       end if;
-
-       if mfou_ = 353575 and r020_ in ('1518', '1520', '1521') or
-          mfou_ <> 353575 and r020_ in ('1500','1502','1508','1509',
-                                        '1510','1512','1513','1515','1516','1517','1518','1519',
-                                        '1520','1521','1523','1524','1525','1526','1528')
-       then
-           begin
-             select nvl(trim(VALUE), '2')
-             into invk_
-             from customerw
-             where rnk = rnk_ and
-                   tag = 'INVCL';
-           exception
-                when no_data_found then
-                    invk_:= null;
-           end;
-       else
-           invk_:= null;
-       end if;
-
-       invk_:= nvl(invk_, '2');
-
-       s580_ := (case
-                   when r020_||invk_ in ('15003','15083','15103','15123') then '1'
-                   when r020_||invk_ in ('15001','15081','15101','15121') then '3'
-                   when r020_||invk_ in ('15002','15082','15102','15122') then '4'
-                   ---
-                   when r020_||r013_ in ('15023') then '1'
-                   when r020_||r013_ in ('15021','15022','15029') and invk_ ='3'  then '1'
-                   when r020_||r013_ in ('15021')         and invk_ in ('1','2')  then '4'
-                   when r020_||r013_ in ('15022','15029') and invk_ in ('1','2')  then '5'
-                   ---
-                   when r020_||invk_ in ('15133') then '1'
-                   when r020_||invk_ in ('15131','15132') then '5'
-                   ---
-                   when r020_||r013_ in ('15185','15186','15187','15188') and invk_ ='3'  then '1'
-                   when r020_||r013_ in ('15185','15187') and invk_ ='1'  then '3'
-                   when r020_||r013_ in ('15186','15188') and invk_ ='2'  then '5'
-                   when r020_||invk_ in ('15182') then '5'
-                   when r020_ in ('1509','1519')  then '5'
-                   ---
-                   when r020_||r013_ in ('15151','15154','15161','15164') and invk_ ='3'  then '1'
-                   when r020_||r013_ in ('15151','15154','15161','15164') and invk_ ='1'  then '3'
-                   when r020_||r013_ in ('15151','15154','15161','15164') and invk_ ='2'  then '4'
-                   when r020_||r013_ in ('15152','15162')  and invk_ ='3'          then '1'
-                   when r020_||r013_ in ('15152','15162')  and invk_ in ('1','2')  then '5'
-                   ---
-                   when r020_||invk_ in ('15203', '15213', '15223','15233') then '1'
-                   when r020_||invk_ in ('15201', '15202', '15221', '15222') then '5'
-                   when r020_||invk_ in ('15211', '15231') then '3'
-                   when r020_||invk_ in ('15212') then '4'
-                   when r020_||invk_ in ('15232') then '5'
-                   ---
-                   when r020_||r013_||invk_ in ('152433') then '1'
-                   when r020_||r013_||invk_ in ('152411', '152412') then '5'
-                   ---
-                   when r020_||invk_ in ('15253') and r013_ in ('1','2','3','4','5','7') then '1'
-                   when r020_||invk_ in ('15251') and r013_ in ('1','4') then '3'
-                   when r020_||invk_ in ('15251') and r013_ in ('2','3','5','7') then '5'
-                   when r020_||r013_ in ('15254') then '4'
-                   when r020_||r013_ in ('15251','15252','15253','15255','15257') and invk_ = '2' then '5'
-                   ---
-                   when r020_||invk_ in ('15263') and r013_ in ('1','2','3','4','5','7')  then '1'
-                   when r020_||invk_ in ('15261') and r013_ in ('1','4') then '3'
-                   when r020_||invk_ in ('15261') and r013_ in ('2','3','5','7')  then '5'
-                   when r020_||r013_ in ('15264') then '4'
-                   when r020_||r013_ in ('15261','15262','15263','15265','15267') and invk_ = '2' then '5'
-                   ---
-                   when r020_||invk_ in ('15283') then '1'
-                   when r020_||invk_ in ('15281') then '3'
-                   when r020_||r013_ in ('15285','15287') then '4'
-                   when r020_||r013_ in ('15286','15288') and invk_ = '2' then '5'
-                     else
-                         s580_
-                   end);
+        
+--       if r020_ in ('1500','1502','1508','1509',
+--                    '1510','1512','1513','1515','1516','1517','1518','1519',
+--                    '1520','1521','1523','1524','1525','1526','1528')
+--       then
+--           begin
+--             select nvl(trim(VALUE), '2')
+--             into invk_
+--             from customerw
+--             where rnk = rnk_ and
+--                   tag = 'INVCL';
+--           exception
+--                when no_data_found then
+--                    invk_:= null;
+--           end;
+--       else
+--           invk_:= null;
+--       end if;
+--
+--       invk_:= nvl(invk_, '2');
     end;
 
     procedure p_add_rec(p_recid rnbu_trace.recid%type, p_userid rnbu_trace.userid%type, p_nls rnbu_trace.nls%type,
@@ -489,7 +415,47 @@ BEGIN
    P_Proc_Set (kodf_, sheme_, nbuc1_, typ_);
 
 -------------------------------------------------------------------
+   declare
+      cnt_ number;
+   begin
+       select count(*)
+       into cnt_
+       from holiday
+       where holiday = dat_;
 
+       dathb_ := null;
+       dathe_ := null;
+
+       if cnt_ > 0 then
+          select max(fdat) + 1
+          into dathb_
+          from fdat
+          where fdat < dat_;
+
+          select min(fdat) - 1
+          into dathe_
+          from fdat
+          where fdat > dat_;
+       else
+          select max(fdat) + 1
+          into dathe_
+          from fdat
+          where fdat < dat_;
+
+          if dat_ <> dathe_ then
+             dathb_ := dathe_;
+
+             select max(holiday)
+             into dathe_
+             from holiday
+             where holiday < dat_;
+          else
+             dathb_ := null;
+             dathe_ := null;
+          end if;
+       end if;
+   end;
+   
    -- дата розрахунку резервiв
    select  max(dat)
    into datb_
@@ -584,7 +550,7 @@ BEGIN
 --   p_upd_r012('C5', mfou_);
 
    cursor_sql := 'select a.*, n.nd nd1, null nd2, null nd3, null nd4, n.nd nd,
-                         nvl(r.s580, ''0'') s580r, decode(t.r020, null, 0, 1) fa7p, i.freq,
+                         decode(t.r020, null, 0, 1) fa7p, i.freq,
                          decode(k.k077,null,decode(substr(a.nbs,1,1),''1'',''1'',''3''),k.k077) k077
                     from (SELECT   /*+ ordered full(s) */
                                    a.acc, a.nls, a.kv, a.daos, :dat_, a.nbs,
@@ -592,8 +558,9 @@ BEGIN
                                    NVL(trim(cc.r013), ''0'') r013, NVL (cc.s080, ''1'') s080,
                                    decode(a.kv, 980, s.ost, s.ostq) ostq, s.ost, a.rnk,
                                    a.isp, a.mdate, a.tip, a.tobo, a.nms,
-                                   nvl(cc.r012, ''0'') r012, nvl(cc.s580, ''9'') s580,
-                                   decode(sign(s.ost),-1,''1'', ''2'') t020
+                                   nvl(cc.r012, ''0'') r012, nvl(trim(cc.s580), ''0'') s580,
+                                   decode(sign(s.ost),-1,''1'', ''2'') t020,
+                                   nvl(trim(cc.s240),''0'') s240
                           FROM otcn_saldo s, otcn_acc a, specparam cc
                           WHERE s.ost <> 0 and
                                 s.acc = a.acc and
@@ -626,13 +593,6 @@ BEGIN
                                                    AND i.ID = 0
                                                 group by n8.nd) i
                          on (i.nd = n.nd)
-                         left outer join (select R020, T020, R013, S580
-                                          from otc_risk_s580
-                                          where s580 <> ''R'') r
-                         on (a.nbs = r.r020 and
-                             (a.t020 = r.t020 or r.t020 = ''3'') and
-                             (a.r013 = r.r013 or r.r013 = ''0'')
-                             )
                          left outer join otcn_fa7_temp t
                          on (a.nls like t.r020||''%'' )
                   ORDER BY 6, 3, 2 ';
@@ -662,18 +622,19 @@ BEGIN
           nms_      := l_rec_t(i).nms_;
           s580_     := l_rec_t(i).s580_;
           t020_     := l_rec_t(i).t020_;
+          s240_     := l_rec_t(i).s240_;
           nd1_      := l_rec_t(i).nd1_;
           nd2_      := l_rec_t(i).nd2_;
           nd3_      := l_rec_t(i).nd3_;
           nd4_      := l_rec_t(i).nd4_;
           nd_       := l_rec_t(i).nd_;
-          s580r_    := l_rec_t(i).s580r_;
           fa7p_     := l_rec_t(i).fa7p_;
           freq_     := l_rec_t(i).freq_;
           k077_     := l_rec_t(i).k077_;
           comm_ :=' ';
-
+          
           s245_ :='1';
+          
           if     tips_ in ('SK9','SP ','SPN','OFR','KSP','KK9','KPN', 'SNA')
           then
                s245_ :='2';
@@ -683,7 +644,15 @@ BEGIN
              or  nbs_ like '9___'
              or  nbs_ in ('2920','3500')
           then
-               s245_ :='0';
+              s245_ :='0';
+          else
+              if s240_ = '0' or mdate_ is not null then
+                 s240_ := fs240 (dat_, acc_, null, null, mdate_, s240_);
+              end if;
+              
+              if s240_ = 'Z' then
+                 s245_ :='2';
+              end if;
           end if;
 
           IF typ_ > 0 THEN
@@ -702,10 +671,6 @@ BEGIN
           segm_WWW := LPAD (kv_, 3,'0');
 
           pr_accc := 0;
-
-          if s580r_ <> '0' then
-             s580_ := s580r_;
-          end if;
 
           IF     mfou_ IN (300205, 300465)
              AND SUBSTR (nls_, 1, 3) IN
@@ -782,7 +747,9 @@ BEGIN
                     ELSE
                        nbuc_ := nbuc1_;
                     END IF;
-
+                   
+                    p_set_s580_def(nbs_, dk_, r011_, s245_);
+                    
                     p_analiz_r013_calc (1,
                                    mfo_,
                                    mfou_,
@@ -809,13 +776,10 @@ BEGIN
                     IF o_se_1 <> 0
                     THEN
                        IF dat_ >= dat_zmin4 then
-
-                          p_set_s580_def(nbs_, o_r013_1);
-                          kodp_ := dk_ || nbs_ || r011_||o_r013_1 || LPAD (kv_,3,'0') || s580_||r017_||segm_WWW||s245_||k077_;
+                          kodp_ := dk_ || nbs_ || r011_||o_r013_1 || LPAD (kv_,3,'0') || s580_||r017_||segm_WWW||'1'||k077_;
 
                        else
 
-                          p_set_s580_def(nbs_, o_r013_1);
                           kodp_ := dk_ || nbs_ || o_r013_1 || LPAD (kv_, 3, '0') || r012_|| s580_||r017_||segm_WWW;
 
                        END IF;
@@ -831,12 +795,10 @@ BEGIN
                     THEN
                        IF dat_ >= dat_zmin4 then
 
-                          p_set_s580_def(nbs_, o_r013_2);
-                          kodp_ := dk_ || nbs_ || r011_||o_r013_2 || LPAD (kv_,3,'0') || s580_||r017_||segm_WWW||s245_||k077_;
+                          kodp_ := dk_ || nbs_ || r011_||o_r013_2 || LPAD (kv_,3,'0') || s580_||r017_||segm_WWW||'2'||k077_;
 
                        else
 
-                          p_set_s580_def(nbs_, o_r013_2);
                           kodp_ := dk_ || nbs_ || o_r013_2 || LPAD (kv_, 3, '0') || r012_|| s580_||r017_||segm_WWW;
 
                        END IF;
@@ -878,17 +840,17 @@ BEGIN
                     else
                         sum_zal := 0;
                     end if;
-
+                    
+                    p_set_s580_def(nbs_, dk_, r011_, s245_);
+                    
                     IF dat_ >= dat_zmin4  then
 
-                       p_set_s580_def(nbs_, r013_);
                        kodp_ := dk_ || nbs_ || r011_||r013_ || LPAD (kv_,3,'0') || s580_||r017_||segm_WWW||s245_||k077_;                    
                        
                        znap_ := TO_CHAR (ABS (se_ - sum_zal));
 
                     else
 
-                       p_set_s580_def(nbs_, r013_);
                        kodp_ := dk_ || nbs_ || r013_ || LPAD (kv_, 3, '0') || r012_|| s580_||r017_||segm_WWW;
                        
                        znap_ := TO_CHAR (ABS (se_));
@@ -1045,13 +1007,13 @@ BEGIN
                       values(acc_, k.accs, sz0_, 1, kv_);
 
                       begin
-                        select nvl(s580, '0')
+                        select max(s580)
                         into s580a_
-                        from OTC_RISK_S580
-                        where r020 = k.nbs and
-                            t020 in ('1','3') and
-                            (r013 = k.r013 or r013 = '0') and
-                            s580 <> 'R';
+                          from nbur_ref_risk_s580
+                          where r020 = k.nbs and 
+                                t020 = (case when k.ost<0 then '1' else '2' end) and
+                                (r011 = substr(p.kodp,6,1) or r011 = '*') and
+                                (S245 = substr(p.kodp,16,1) or S245 = '*'); 
                       exception
                         when no_data_found then
                             s580a_ := '9';
@@ -1190,6 +1152,7 @@ BEGIN
              else
                 kodp_ := '2'||nbs_||substr(k.kodp,6,1)||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12);
              end if;
+             
              comm_ := SUBSTR (' резерв під прострочені відсотки відносимо до R012='||r012_||' sumc='||to_char(sumc_) , 1, 200);
 
              srez_ := k.szq;
@@ -1211,7 +1174,7 @@ BEGIN
 
              if nbs_ in ('2609','2629','2659') then
                 kodp_ := '2'||nbs_||'0'||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12);
-             elsif nbs_ = '3599' and k.nls like '3710%' then
+             elsif nbs_ = '3599' and substr(k.nls, 1, 4) in ('3710', '3548') then
                 kodp_ := '2'||nbs_||'2'||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12);
              else
                 kodp_ := '2'||nbs_||substr(k.kodp,6,1)||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12);
@@ -1276,6 +1239,8 @@ BEGIN
 
                 if nbs_ in ('2609','2629','2659') then
                 kodp_ := '2'||nbs_||'0'||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12);
+                elsif nbs_ = '3599' and substr(k.nls, 1, 4) in ('3710', '3548') then
+                kodp_ := '2'||nbs_||'2'||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12);
                 else
                 kodp_ := '2'||nbs_||substr(k.kodp,6,1)||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12);
                 end if;
@@ -1298,6 +1263,8 @@ BEGIN
 
          if nbs_ in ('2609','2629','2659') then
           kodp_ := '2'||nbs_||'0'||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12);
+         elsif nbs_ = '3599' and substr(k.nls, 1, 4) in ('3710', '3548') then
+          kodp_ := '2'||nbs_||'2'||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12);
          else
           kodp_ := '2'||nbs_||substr(k.kodp,6,1)||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12);
          end if;
@@ -1416,15 +1383,18 @@ BEGIN
 
       s245_ :='1';
       r011_ := k.r011;
+      
 --   проверка наличия для счета значений R011
-              if not table_r011.exists(nbs_)
-              then
-                  r011_ :='0';
-              end if;
+      if not table_r011.exists(nbs_)
+      then
+          r011_ :='0';
+      end if;
 
       if      nbs_ in ('2029','2039','2079','2209','2219','2229')
       then 
             r011_ :='1';
+      elsif nbs_ = '3599' and substr(k.nls, 1, 4) in ('3710', '3548') then
+            r011_ :='2';
       end if;
 
       if r011_ ='0' then
@@ -1472,36 +1442,22 @@ BEGIN
          s580a_ := k.s580;
       else
           begin
-             select S580
-             into s580a_
-             from otc_risk_s580
-             where s580 <> 'R' and
-                   R020 = k.nbs and
-                   T020 in ('1', '3') and
-                   (r013 = k.r013 or r013 = '0');
+            select max(s580)
+            into s580a_
+              from nbur_ref_risk_s580
+              where r020 = nbs_ and 
+                    t020 = '2' and
+                    (r011 = r011_ or r011 = '*') and
+                    (S245 = s245_ or S245 = '*');
           exception
             when no_data_found then
-                s580a_ := '0';
-          end;
-
-          if s580a_ = '0' then
-             s580_ := null;
-
-             p_set_s580_def(substr(k.nls, 1, 4), k.r013);
-
-             if s580_ is not null then
-                s580a_ := s580_;
-             else
                 s580a_ := '9';
-             end if;
-          end if;
+          end;
       end if;
 
---      s580a_ := (case when nbs_||r013_ in ('15904','15921','24006','24016') then '9' else s580a_ end);
-
  --  сегмент Q + сегмент WWW : умолчания
-          r017_ := '3';
-          segm_WWW := LPAD (k.kv, 3,'0');
+      r017_ := '3';
+      segm_WWW := LPAD (k.kv, 3,'0');
 
       select count( * ) into cnt_ from otcn_fa7_temp where r020 = k.nbs;
 
@@ -1517,16 +1473,6 @@ BEGIN
           if TP_SND then
 
              r012_:='B';
---             if nbs_='1592'  and k.nls like '1508%'  then
---                r012_ :=f_get_r012_for_1508(k.acc);
---             end if;
-
-             -- прострочені відсотки
---             if sakt_ = 0 then
---                comm_ := SUBSTR(' резерв під погашені проценти (залишок = 0) відносимо до R012='||r012_, 1,100);
---             else
---                comm_ := SUBSTR(' резерв під прострочені проценти відносимо до R012='||r012_, 1,100);
---             end if;
 
              kodp_ := '2'||nbs_||r011_||r013_||k.r030||s580a_||r017_||segm_WWW||s245_||k077_;
              znap_ := to_char(k.szq);
@@ -1542,11 +1488,6 @@ BEGIN
                 comm_ := SUBSTR (' резерв під прострочку по осн. борг відносимо до R012=B ' , 1, 200);
              else
                 r012_:='A';
---                if nbs_='1592'  and  k.nls like '1500%'  then  r012_:='I';  end if;
---                if nbs_='1592'  and  k.nls like '1502%'  then  r012_:='J';  end if;
---                if nbs_='1592'  and  k.nls like '1508%'  then
---                    r012_ :=f_get_r012_for_1508(k.acc);
---                end if;
 
                 kodp_ := '2'||nbs_||r011_||r013_||k.r030||s580a_||r017_||segm_WWW||s245_||k077_;
                 znap_ := to_char(srez_);
@@ -1557,12 +1498,6 @@ BEGIN
              discont_ := k.discont;
              premiy_ := k.prem;
 
---             if discont_ <> 0 or premiy_ <> 0 then
---                se_ := nvl(abs(fostq_new(k.acc, dat_, dati_)), 0); -- залишок по кредиту
---
---                insert into OTCN_FA7_REZ1(ND, ACC, nls, kv, KODP, ZNAP, SUMA, SUMD, SUMP)
---                values(k.nd, k.acc, k.nls, k.kv, kodp_, se_, se_, discont_, premiy_);
---             end if;
           end if;
 
           if znap_ <> '0' then
@@ -1587,20 +1522,10 @@ BEGIN
 
           if srezp_ <> 0 and not TP_SND then
              r012_ :='B';
---             if nbs_='1592'  and  k.nls like '1500%'  then  r012_:='I';  end if;
---             if nbs_='1592'  and  k.nls like '1502%'  then  r012_:='J';  end if;
---             if nbs_='1592'  and  k.nls like '1508%'  then
---                 r012_ :=f_get_r012_for_1508(k.acc);
---             end if;
 
              kodp_ := '2'||nbs_||r011_||r013_||k.r030||s580a_||r017_||segm_WWW||s245_||k077_;
              znap_ := srezp_;
 
---             if sakt_ = 0 then
---                comm_ := SUBSTR (' резерв за осн.боргом, у якого залишок = 0, відносимо до R012='||r012_ , 1,100);
---             else
---                comm_ := SUBSTR (' перевищення резерву над осн. боргом до R012='||r012_||' R013R='||r013_ , 1,100);
---             end if;
 
              INSERT INTO rnbu_trace
                           (recid, userid,
@@ -1616,23 +1541,12 @@ BEGIN
           end if;
       else
          r012_ := 'B';
---         if nbs_='1592' and  k.nls like '1500%'  then  r012_:='I';  end if;
---         if nbs_='1592' and  k.nls like '1502%'  then  r012_:='J';  end if;
---         if nbs_='1592' and  k.nls like '1508%'  then
---            r012_ :=f_get_r012_for_1508(k.acc);
---         end if;
 
          kodp_ := '2'||nbs_||r011_||r013_||k.r030||s580a_||r017_||segm_WWW||s245_||k077_;
 
          discont_ := k.discont;
          premiy_ := k.prem;
 
---         if discont_ <> 0 or premiy_ <> 0 then
---            se_ := nvl(abs(fostq_new(k.acc, dat_, dati_)), 0);
---
---            insert into OTCN_FA7_REZ1(ND, ACC, nls, kv, KODP, ZNAP, SUMA, SUMD, SUMP)
---            values(k.nd, k.acc, k.nls, k.kv, kodp_, se_, se_, discont_, premiy_);
---         end if;
       end if;
    end loop;
 
@@ -1657,10 +1571,6 @@ BEGIN
       END IF;
 
       r013_ := NVL (TRIM (r013_), '0');
-
---      if nvl(trim(r012_),'0') = '0' then
---         r012_ := 'B';
---      end if;
 
  --  сегмент Q + сегмент WWW : умолчания
           r017_ := '3';
@@ -1701,7 +1611,7 @@ BEGIN
    begin
       for k in (select fdat, ref, acc, nls, kv, sq, nbs, acca, nlsa,
                        sum(sq) over (partition by acc) sum_all
-                from (select /*+ ordered index(o, IDX_OPLDOK_KF_FDAT_ACC)  */
+                from (select /*+ leading(a) index(o,IDX_OPLDOK_KF_FDAT_ACC)  */
                              o.fdat, o.ref, o.acc, a.nls, a.kv,
                              decode(o.dk, 0, -1, 1) * gl.p_icurval(a.kv, o.s, dat_) sq,
                              a.nbs, z.acc acca, x.nls nlsa
@@ -1717,7 +1627,7 @@ BEGIN
                          a.nls like '329%' or
                          a.nls like '359%' or
                          a.nls like '369%' or
-              o.fdat > to_date('20171218','yyyymmdd') and
+              dat_ > to_date('20171218','yyyymmdd') and
                               (      a.nls like '15_9%'
                                 or   a.nls like '20_9%'
                                 or   a.nls like '21_9%'
