@@ -164,6 +164,7 @@ procedure import_tick (p_filename in varchar2);
 end;
 /
 
+CREATE OR REPLACE PACKAGE BODY BARS.BARS_SV is
 -- #101: Иванава Ирина, изменения в соответствии с техническими условиями 4_1
 -- Перегружены процедуры import_file,import_tick  для импорта файлов из веба
 g_body_version constant varchar2(64)  := 'Version 2.5 24/01/2018';
