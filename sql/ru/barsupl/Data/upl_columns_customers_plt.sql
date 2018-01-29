@@ -1,3 +1,4 @@
+prompt re-create upl_columns for CLIENTFO2
 begin 
  execute immediate 'insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
 values (10053, 1, ''LAST_NAME'', ''Прізвище'', ''VARCHAR2'', 50, null, null, null, ''Y'', null, null, null, null)'; 
@@ -342,7 +343,7 @@ values (10053, 38, ''ADR_WORK_LOC'', ''Населений пункт'', ''VARCHAR2'', 30, null
 
 begin 
  execute immediate 'insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-values (10053, 39, ''ADR_WORK_ADR'', ''Вулиця, будинок, квартира'', ''VARCHAR2'', 55, null, null, null, ''Y'', null, null, null, null)'; 
+values (10053, 39, ''ADR_WORK_ADR'', ''Вулиця, будинок, квартира'', ''VARCHAR2'', 100, null, null, null, ''Y'', null, null, null, null)'; 
  exception 
  when dup_val_on_index then null; 
  end; 

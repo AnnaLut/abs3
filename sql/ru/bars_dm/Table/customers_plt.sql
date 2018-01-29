@@ -46,7 +46,7 @@ begin
 	ADR_WORK_DOMAIN VARCHAR2(30), 
 	ADR_WORK_REGION VARCHAR2(30), 
 	ADR_WORK_LOC VARCHAR2(30), 
-	ADR_WORK_ADR VARCHAR2(55), 
+	ADR_WORK_ADR VARCHAR2(100), 
 	ADR_WORK_ZIP VARCHAR2(20), 
 	NEGATIV_STATUS VARCHAR2(10), 
 	REESTR_MOB_BANK VARCHAR2(10), 
@@ -273,6 +273,9 @@ begin
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
   TABLESPACE BRSDYND ';exception when others then         if sqlcode=-955 then null; else raise; end if; end; /prompt alter column MERRIED varchar2(500)alter table bars_dm.customers_plt modify merried varchar2(500);
+prompt alter column adr_work_adr modify varchar2(100)
+alter table bars_dm.customers_plt modify ADR_WORK_ADR VARCHAR2(100);
+
 PROMPT *** add column vip_account_manager ***begin    execute immediate '
   ALTER TABLE BARS_DM.CUSTOMERS_PLT ADD vip_account_manager varchar2(4000)';exception when others then  if  sqlcode=-1430 then null; else raise; end if; end;/
 PROMPT *** rename column MFO to KF ***begin    execute immediate '  ALTER TABLE BARS_DM.CUSTOMERS_PLT RENAME COLUMN MFO TO KF';exception when others then  if  sqlcode=-957 then null; else raise; end if; end;/
