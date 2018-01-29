@@ -4,9 +4,9 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_sv.sql =========*** Run *** ===
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BARS.BARS_SV is
+  CREATE OR REPLACE package BARS.bars_sv is
 
-g_head_version constant varchar2(64)  := 'Version 2.1 10/09/2015';
+g_head_version constant varchar2(64)  := 'Version 2.3 25/01/2018';
 g_head_defs    constant varchar2(512) := '';
 
 --#101:
@@ -156,13 +156,17 @@ function get_rel_txt (
 --:#101
 
 procedure form_p7 (p_filename out varchar2);
+procedure form_p7 (p_filename out varchar2, p_filebody out clob);
 
 procedure import_file (p_filename in varchar2, p_id in number);
+procedure import_file (p_filename in varchar2, p_id in number, p_filebody in blob);
 
 procedure import_tick (p_filename in varchar2);
+procedure import_tick (p_filename in varchar2, p_filebody in clob);
 
 end;
 /
+
 
 CREATE OR REPLACE PACKAGE BODY BARS.BARS_SV is
 -- #101: Иванава Ирина, изменения в соответствии с техническими условиями 4_1
@@ -1557,7 +1561,8 @@ begin
 
   insert into sv_files (file_name, file_date) values (l_filename, sysdate);
 
-  p_filename := p_filepath || '\' || l_filename;
+  --p_filename := p_filepath || '\' || l_filename;
+  p_filename := l_filename;
   p_fileclob := l_clob_data;
 
 end get_file_body;
@@ -1571,14 +1576,14 @@ is
   l_fileclob  clob;
 begin
 
-  begin
+/*  begin
      select val into l_filepath from sv_params where par = 'SV_OUT';
   exception when no_data_found then
      l_filepath := null;
   end;
   if l_filepath is null then
      raise_application_error(-20000, 'Не вказано каталог експорту файлу P7');
-  end if;
+  end if;*/
 
   get_file_body (l_filepath, l_filename, l_fileclob);
 
@@ -1591,6 +1596,25 @@ begin
 
   p_filename := l_filename;
 
+end form_p7;
+
+procedure form_p7 (p_filename out varchar2, p_filebody out clob)
+is
+  l_filename  varchar2(100);
+  l_fileclob  clob;
+begin
+   form_p7 (l_filename);
+   begin
+     select file_name, file_clob  into l_filename, l_fileclob 
+      from imp_file where file_name = l_filename;
+   exception when no_data_found then 
+      l_filename := null;
+      l_fileclob := null;
+   end;
+   
+   p_filename := l_filename;
+   p_filebody := l_fileclob;
+   --bars_audit.info('BARS_SV.FORM_P7 l_filename = '||l_filename);
 end form_p7;
 
 -------------------------------------------------------------------------------
