@@ -4,7 +4,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_ff7 (Dat_ DATE, p_sheme_ varchar2 default 'G'
 % DESCRIPTION : Процедура формирования файла #F7 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 %
-% VERSION      :  v.18.001     23.01.2018    (12/09/2017)
+% VERSION      :  v.18.001     29.01.2018    (12/09/2017)
 %%%%%%%%%%%%%%%%/%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -279,6 +279,7 @@ where s.acc = o.acc and
      o.nls like n.r020 || '%' and
      n.kf='F7'
      and s.acc not in (select vv.acc_pk from w4_acc vv)
+     and s.acc not in (select vc.acco from acc_over vc)
      and nvl(o.dazs, to_date('01014999','ddmmyyyy')) >= trunc(dat_,'mm')
     --было сделано для ГОУ Сбербанка - не уитывать счета 9603 для юр лиц
     and not (o.nls like '9603%' and z.custtype = 2)
@@ -340,7 +341,7 @@ where vv.acc_pk = a.acc
 -- овердрафты
 insert into otc_ff7_history_acc(DATF, ACC, ACCC, NBS, SGN, NLS, KV, NMS, DAOS, DAZS, OST,
        OSTQ, DOSQ, KOSQ, ND, NKD, SDATE, WDATE, SOS, RNK, STAFF, TOBO, s260, k110, s031
-       ,tip, ostq_kd, r_dos, cc_id, r011)
+       ,tip, ostq_kd, r_dos, cc_id, r011, s245)
 select *
 from (
 with sel_over as (select value acc, sdate, sos, wdate, nd, lim, lim_hist, deldate, ndoc
@@ -401,7 +402,7 @@ select dat_ fdat,
        -- для остальных договоров = 0
        decode(nvl('-'||to_char(max_nd), tt.nd), tt.nd, tt.ostq_kd , 0) ostq_kd
        , sum( nvl(decode(instr('1600,2600,2605,2620,2625,2650,2655,8025,',tt.nbs||','), 0 ,r.dos, decode(r.dos+r.kos, 0, r.ost, 0)),0))  r_dos
-       ,tt.ndoc, tt.r011
+       ,tt.ndoc, tt.r011, '1'
 from (
 select t.*,
        sum(decode(decode(sign(t.ostq),-1,'1','2'), r012, abs(t.ostq), 0))
@@ -468,13 +469,13 @@ insert into otc_ff7_history_acc(
        DATF, ACC, ACCC, NBS,
        SGN, NLS, KV, NMS, DAOS, DAZS, OST, OSTQ, ND, NKD,
        SDATE, WDATE, SOS, RNK, STAFF, TOBO, s260, k110, s031, 
-       OSTQ_KD, R_DOS, TPA, S080, tip, r011)
+       OSTQ_KD, R_DOS, TPA, S080, tip, r011, s245)
 select dat_, o.acc, o.accc, substr(o.nls,1,4),
        '0',  o.nls, o.kv, o.nms, o.daos, o.dazs, 0 ost,0 ostq,
        nvl(c.nd, -o.acc) nd, (case when c.nd is null then trim(p.nkd) else null end), -- якщо немає ND, то підставляємо ACC
        c.sdate, c.wdate, c.sos, o.rnk, userid_, o.tobo,
        f_get_s260(c.nd, o.acc, p.s260, o.rnk, o.nbs, default_) s260,
-       z.ved, p.s031, 0, 0, k.tpa, nvl(p.s080,0), o.tip, nvl(trim(p.r011), '0')
+       z.ved, p.s031, 0, 0, k.tpa, nvl(p.s080,0), o.tip, nvl(trim(p.r011), '0'), '1'
 from   OTCN_ACC          o,
        (select a.acc, a.nd, b.sdate, b.wdate, b.sos
         from   (select n.acc, max(n.nd) nd
@@ -873,6 +874,13 @@ where o.datf = dat_ and
       trim(o.cc) is null and
       o.nbs in ('2600','2605','2607','2620','2625','2627','2650','2655','2657');
 
+update otc_ff7_history_acc o
+set o.cc = (select max(trim(f.ddd)) from kl_f3_29 f
+            where f.kf='F7' and f.r020 = o.nbs
+              and f.r012 <> decode(o.sgn, 0 ,f.r012, o.sgn)
+            )
+where o.datf = dat_ and
+      trim(o.cc) is null and o.tip ='SNA';
 
 if  mfou_ = 300465 then
     merge into otc_ff7_history_acc o
