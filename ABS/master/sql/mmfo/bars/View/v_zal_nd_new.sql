@@ -58,7 +58,7 @@ PROMPT *** Create  view V_ZAL_ND_NEW ***
           and cp.pawn=sz.pawn
           and  az.acc = sz.acc
            AND az.acc = p.acc(+)
-		   AND p.pr_12 is not null --COBUMMFO-6284
+		   --AND p.pr_12 is not null --COBUMMFO-6284 commented cause cut values
            AND p.accs IN
                (SELECT column_value
                   FROM TABLE(tools.string_to_words(pul.get_mas_ini_val('ACC_LIST')
