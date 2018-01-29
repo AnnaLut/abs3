@@ -24,7 +24,7 @@ BEGIN
   l_file_code := substr(p_file_code,2,2);
   
   -- определение начальных параметров (код области или МФО или подразделение)
-  BARS.NBUR_FILES.P_PROC_SET( p_kod_filii, p_file_code, p_scheme, l_datez, 0, l_file_code, l_nbuc, l_type );
+  NBUR_FILES.P_PROC_SET( p_kod_filii, p_file_code, p_scheme, l_datez, 0, l_file_code, l_nbuc, l_type );
   
   bars_audit.trace( '%s: nbuc=%s, type=%s, first_dt=%s, last_dt=%s.', $$PLSQL_UNIT, l_nbuc, to_char(l_type) );
   
@@ -34,16 +34,16 @@ BEGIN
   insert all
     when ( R034 = 1 ) 
     then -- нацювалюта
-      into BARS.NBUR_DETAIL_PROTOCOLS 
+      into NBUR_DETAIL_PROTOCOLS 
         ( REPORT_DATE, KF, REPORT_CODE, NBUC, FIELD_CODE, FIELD_VALUE, ACC_ID, ACC_NUM, KV )
       values
         ( p_report_date, p_kod_filii, p_file_code, NBUC, FIELD_CODE, FIELD_VALUE, ACC_ID, ACC_NUM, KV )
     else -- інвалюта
-      into BARS.NBUR_DETAIL_PROTOCOLS 
+      into NBUR_DETAIL_PROTOCOLS 
         ( REPORT_DATE, KF, REPORT_CODE, NBUC, FIELD_CODE, FIELD_VALUE, ACC_ID, ACC_NUM, KV )
       values
         ( p_report_date, p_kod_filii, p_file_code, NBUC, FIELD_CODE, FIELD_VALUE, ACC_ID, ACC_NUM, KV )
-      into BARS.NBUR_DETAIL_PROTOCOLS 
+      into NBUR_DETAIL_PROTOCOLS 
         ( REPORT_DATE, KF, REPORT_CODE, NBUC, FIELD_CODE, FIELD_VALUE, ACC_ID, ACC_NUM, KV )
       values
         ( p_report_date, p_kod_filii, p_file_code, NBUC, FIELD_CODE_UAH, FIELD_VALUE_UAH, ACC_ID, ACC_NUM, KV )
@@ -89,7 +89,7 @@ BEGIN
      and acc.NBS in ( select R020
                         from SB_R020
                        where F_75 = '1'
-                         and D_CLOSE is Null
+                         and lnnvl( D_CLOSE <= p_report_date )
                     )
      and ( ADJ_BAL <> 0 or ADJ_BAL_UAH <> 0 )
   ;
@@ -100,7 +100,7 @@ BEGIN
   insert all
     when ( Ind1 = '5' and Ind2 = '0' ) 
     then -- Дт. (нацювалюта) 
-      into BARS.NBUR_DETAIL_PROTOCOLS 
+      into NBUR_DETAIL_PROTOCOLS 
          ( REPORT_DATE, KF, REPORT_CODE, NBUC
          , FIELD_CODE, FIELD_VALUE, ACC_ID, ACC_NUM, KV, REF, DESCRIPTION )
       values
@@ -109,7 +109,7 @@ BEGIN
          , ACC_ID_DB, ACC_NUM_DB, CCY_ID, REF, DESCRIPTION )
     when ( Ind1 = '6' and Ind2 = '0' ) 
     then -- Кт. (нацювалюта)
-      into BARS.NBUR_DETAIL_PROTOCOLS 
+      into NBUR_DETAIL_PROTOCOLS 
          ( REPORT_DATE, KF, REPORT_CODE, NBUC
          , FIELD_CODE, FIELD_VALUE, ACC_ID, ACC_NUM, KV, REF, DESCRIPTION )
       values
@@ -118,14 +118,14 @@ BEGIN
          , ACC_ID_CR, ACC_NUM_CR, CCY_ID, REF, DESCRIPTION )
     when ( Ind1 = '5' and Ind2 = '1' ) 
     then -- Дт. (інвалюта + еквівалент) 
-      into BARS.NBUR_DETAIL_PROTOCOLS 
+      into NBUR_DETAIL_PROTOCOLS 
          ( REPORT_DATE, KF, REPORT_CODE, NBUC
          , FIELD_CODE, FIELD_VALUE, ACC_ID, ACC_NUM, KV, REF, DESCRIPTION )
       values
          ( p_report_date, KF, p_file_code, NBUC_DB
          , Ind1 || Ind2 || R020_DB || OB22_DB || Ind3 || Ind4_DB, FIELD_VALUE
          , ACC_ID_DB, ACC_NUM_DB, CCY_ID, REF, DESCRIPTION )
-      into BARS.NBUR_DETAIL_PROTOCOLS 
+      into NBUR_DETAIL_PROTOCOLS 
          ( REPORT_DATE, KF, REPORT_CODE, NBUC
          , FIELD_CODE, FIELD_VALUE, ACC_ID, ACC_NUM, KV, REF, DESCRIPTION )
       values
@@ -134,14 +134,14 @@ BEGIN
          , ACC_ID_DB, ACC_NUM_DB, CCY_ID, REF, DESCRIPTION )
     when ( Ind1 = '6' and Ind2 = '1' ) 
     then -- Кт. (інвалюта + еквівалент)
-      into BARS.NBUR_DETAIL_PROTOCOLS 
+      into NBUR_DETAIL_PROTOCOLS 
          ( REPORT_DATE, KF, REPORT_CODE, NBUC
          , FIELD_CODE, FIELD_VALUE, ACC_ID, ACC_NUM, KV, REF, DESCRIPTION )
       values
          ( p_report_date, KF, p_file_code, NBUC_CR
          , Ind1 || Ind2 || R020_CR || OB22_CR || Ind3 || Ind4_CR, FIELD_VALUE
          , ACC_ID_CR, ACC_NUM_CR, CCY_ID, REF, DESCRIPTION )
-      into BARS.NBUR_DETAIL_PROTOCOLS 
+      into NBUR_DETAIL_PROTOCOLS 
          ( REPORT_DATE, KF, REPORT_CODE, NBUC
          , FIELD_CODE, FIELD_VALUE, ACC_ID, ACC_NUM, KV, REF, DESCRIPTION )
       values
@@ -150,7 +150,7 @@ BEGIN
          , ACC_ID_CR, ACC_NUM_CR, CCY_ID, REF, DESCRIPTION )
     when ( CHK_F = 1 and Ind2 = '0' ) 
     then -- Кт. (нацювалюта)
-      into BARS.NBUR_DETAIL_PROTOCOLS 
+      into NBUR_DETAIL_PROTOCOLS 
          ( REPORT_DATE, KF, REPORT_CODE, NBUC
          , FIELD_CODE, FIELD_VALUE, ACC_ID, ACC_NUM, KV, REF, DESCRIPTION )
       values
@@ -159,14 +159,14 @@ BEGIN
          , ACC_ID_CR, ACC_NUM_CR, CCY_ID, REF, DESCRIPTION )
     when ( CHK_F = 1 and Ind2 = '1' ) 
     then -- Кт. (інвалюта + еквівалент)
-      into BARS.NBUR_DETAIL_PROTOCOLS 
+      into NBUR_DETAIL_PROTOCOLS 
          ( REPORT_DATE, KF, REPORT_CODE, NBUC
          , FIELD_CODE, FIELD_VALUE, ACC_ID, ACC_NUM, KV, REF, DESCRIPTION )
       values
          ( p_report_date, KF, p_file_code, NBUC_CR
          , Ind1 || Ind2 || R020_CR || OB22_CR || Ind3 || Ind4_CHK, FIELD_VALUE
          , ACC_ID_CR, ACC_NUM_CR, CCY_ID, REF, CHK_DSC )
-      into BARS.NBUR_DETAIL_PROTOCOLS 
+      into NBUR_DETAIL_PROTOCOLS 
          ( REPORT_DATE, KF, REPORT_CODE, NBUC
          , FIELD_CODE, FIELD_VALUE, ACC_ID, ACC_NUM, KV, REF, DESCRIPTION )
       values
@@ -204,25 +204,87 @@ BEGIN
          end as Ind2
        , to_char(txn.CCY_ID,'FM000') as Ind3
        , case
-           when rdb.F_75 in ('1','5') 
+           when rdb.F_75 in ('1','5')
            then
              case
+               when txn.R020_DB = '7700'
+               then case
+                    when txn.OB22_DB in ('02','07')
+                    then '01'
+                    when txn.OB22_DB in ('04','09')
+                    then '12'
+                    when txn.OB22_DB in ('06')
+                    then '14'
+                    else '__'
+                    end
+               when txn.R020_DB = '7701'
+               then case
+                    when txn.OB22_DB in ('02','09','23','24')
+                    then '01'
+                    when txn.OB22_DB in ('04','11','26','27')
+                    then '12'
+                    when txn.OB22_DB in ('07','25')
+                    then '14'
+                    else '__'
+                    end
                when txn.R020_DB = '7702'
                then case
-                    when txn.OB22_DB in ('11','12','13','20','21','22','23','24','25','44','46','47','49','50','51','52')
+                    when txn.OB22_DB in ('11','12','22','65','66','75','79','83','85','92','94','96')
                     then '01'
-                    when txn.OB22_DB in ('14','15','16','38','39','40','45','48','57','58','59','60','61','62','63','64')
+                    when txn.OB22_DB in ('14','15','62','67','68','77','81','84','86','93','95','97')
                     then '12'
-                    when txn.OB22_DB in ('17','18','19','53','54','55','56')
+                    when txn.OB22_DB in ('17','18','19','53','54','55')
                     then '14'
-                    else '01'
+                    else '__'
                     end
-               when txn.R020_DB = '7706' and txn.OB22_DB in ('01','03','05','07','09','11','13','15','17')
-               then '01'
-               when txn.R020_DB = '7706' and txn.OB22_DB in ('02','04','06','08','10','12','14','16','18')
-               then '12'
+               when txn.R020_DB = '7703'
+               then case
+                    when txn.OB22_DB in ('01','03','07','09')
+                    then '01'
+                    when txn.OB22_DB in ('06','08','13','16')
+                    then '12'
+                    when txn.OB22_DB in ('12','23')
+                    then '14'
+                    else '__'
+                    end
+               when txn.R020_DB = '7704'
+               then case
+                    when txn.OB22_DB in ('02','05','10','13')
+                    then '01'
+                    when txn.OB22_DB in ('03','07','11','14')
+                    then '12'
+                    when txn.OB22_DB in ('06','15')
+                    then '14'
+                    else '__'
+                    end
+               when txn.R020_DB = '7705'
+               then case
+                    when txn.R020_DB in ('02')
+                    then '01'
+                    when txn.R020_DB in ('06')
+                    then '12'
+                    else '__'
+                    end
+               when txn.R020_DB = '7706'
+               then case
+                    when txn.OB22_DB in ('01','07','11','19')
+                    then '01'
+                    when txn.OB22_DB in ('02','08','12','18')
+                    then '12'
+                    else '__'
+                    end
+               when txn.R020_DB = '7707'
+               then case
+                    when txn.OB22_DB in ('01','04','06','13','14','17','19','21','25')
+                    then '01'
+                    when txn.OB22_DB in ('02','05','07','15','16','18','20','22')
+                    then '12'
+                    when txn.OB22_DB in ('03,08')
+                    then '14'
+                    else '__'
+                    end
                -- кошти направленi на формування резерву
-               when txn.R020_DB like '7%' and txn.R020_CR like '380%' 
+               when txn.R020_DB like '7%' and txn.R020_CR like '380%'
                then '01'
                --
                when txn.CCY_ID = 980 and txn.R020_DB like '7%' and 
@@ -251,23 +313,14 @@ BEGIN
                then '05'
                when txn.CCY_ID = 980 and txn.R020_DB like '7%' and txn.R020_CR = '3739' 
                then '07'
-               when ( txn.R020_DB like '149%' or txn.R020_DB like '159%' or txn.R020_DB like '189%' or  
+               when ( txn.R020_DB like '149%' or txn.R020_DB like '159%' or txn.R020_DB like '189%' or
                       txn.R020_DB like '240%' or txn.R020_DB like '289%' or txn.R020_DB like '319%' or 
                       txn.R020_DB like '329%' or txn.R020_DB like '359%' or txn.R020_DB like '369%' 
-                    ) and txn.R020_CR = '3739'  
+                    ) and txn.R020_CR = '3739'
                then '07'
                -- виправнi обороти щодо коду 01
-               when txn.R020_DB = txn.R020_CR 
-               then
-                 case
-                   when txn.R020_DB = '7720' and txn.OB22_DB in ('13','14','15','16','17','23','25','27') 
-                   then '01'
-                   when txn.R020_DB = '7720' and txn.OB22_DB in ('18','19','20','21','22','24','26','28') 
-                   then '12'
-                   when txn.R020_DB = '7720' and txn.OB22_DB in ('12')
-                   then '14'
-                   else '11'
-                 end
+               when txn.R020_DB = txn.R020_CR
+               then '11'
                -- зменшення резервiв за рахунок прибутку банку
                when txn.CCY_ID = 980 and 
                   ( txn.R020_DB like '7%' and txn.OB22_DB = '06' ) and 
@@ -279,38 +332,91 @@ BEGIN
          end as Ind4_DB
        ----------------
        , case
-           when rcr.F_75 in ('1','6') 
+           when rcr.F_75 in ('1','6')
            then
              case
+               when txn.R020_CR = '7700'
+               then case
+                    when txn.OB22_CR in ('02','07')
+                    then '11'
+                    when txn.OB22_CR in ('04','09')
+                    then '02'
+                    when txn.OB22_CR in ('06')
+                    then '04'
+                    else '__'
+                    end
+               when txn.R020_CR = '7701'
+               then case
+                    when txn.OB22_CR in ('02','09','23','24')
+                    then '11'
+                    when txn.OB22_CR in ('04','11','26','27')
+                    then '02'
+                    when txn.OB22_CR in ('07','25')
+                    then '04'
+                    else '__'
+                    end
                when txn.R020_CR = '7702'
                then case 
-                    when txn.OB22_CR in ('11','12','13','20','21','22','23','24','25','44','46','47','49','50','51','52') 
+                    when txn.OB22_CR in ('11','12','22','65','66','75','79','83','85','92','94','96')
                     then '11'
-                    when txn.OB22_CR in ('14','15','16','38','39','40','45','48','57','58','59','60','61','62','63','64')
+                    when txn.OB22_CR in ('14','15','62','67','68','77','81','84','86','93','95','97')
                     then '02'
-                    when txn.OB22_CR in ('17','18','19','53','54','55','56')
+                    when txn.OB22_CR in ('17','18','19','53','54','55')
                     then '04'
-                    else '01'
+                    else '__'
                     end
-               when txn.R020_CR = '7706' and txn.OB22_CR in ('01','03','05','07','09','11','13','15','17')
-               then '11'
-               when txn.R020_CR = '7706' and txn.OB22_CR in ('02','04','06','08','10','12','14','16','18')
-               then '02'
+               when txn.R020_CR = '7703'
+               then case
+                    when txn.OB22_CR in ('01','03','07','09')
+                    then '11'
+                    when txn.OB22_CR in ('06','08','13','16')
+                    then '02'
+                    when txn.OB22_CR in ('12','23')
+                    then '04'
+                    else '__'
+                    end
+               when txn.R020_CR = '7704'
+               then case
+                    when txn.OB22_CR in ('02','05','10','13')
+                    then '11'
+                    when txn.OB22_CR in ('03','07','11','14')
+                    then '02'
+                    when txn.OB22_CR in ('06','15')
+                    then '04'
+                    else '__'
+                    end
+               when txn.R020_CR = '7705'
+               then case
+                    when txn.OB22_CR in ('02')
+                    then '11'
+                    when txn.OB22_CR in ('06')
+                    then '02'
+                    else '__'
+                    end
+               when txn.R020_CR = '7706'
+               then case 
+                    when txn.OB22_CR in ('01','07','11','19')
+                    then '11'
+                    when txn.OB22_CR in ('02','08','12','18')
+                    then '02'
+                    else '__'
+                    end
+               when txn.R020_CR = '7707'
+               then case 
+                    when txn.OB22_CR in ('01','04','06','13','14','17','19','21','25')
+                    then '11'
+                    when txn.OB22_CR in ('02','05','07','15','16','18','20','22')
+                    then '02'
+                    when txn.OB22_CR in ('03,08')
+                    then '04'
+                    else '__'
+                    end
                -- кошти направленi на формування резерву
                when txn.R020_DB like '7%' and txn.R020_CR not like '7%'
                then '01'
                -- виправнi обороти щодо коду 01
                when txn.R020_DB = txn.R020_CR
-               then
-                 case
-                   when txn.R020_CR = '7720' and txn.OB22_CR in ('13','14','15','16','17','23','25','27')
-                   then '11'
-                   when txn.R020_CR = '7720' and txn.OB22_CR in ('18','19','20','21','22','24','26','28')
-                   then '02'
-                   when txn.R020_CR = '7720' and txn.OB22_CR in ('12') 
-                   then '04'
-                   else '01'
-                 end
+               then '01'
                -- при формировании новых счетов для резерва
                when txn.R020_DB = '3739' and txn.R020_CR like '7%'
                then '07'
@@ -390,8 +496,8 @@ BEGIN
       on ( rcr.R020 = txn.R020_CR )
    where txn.KF = p_kod_filii
      and txn.TT Not like 'ZG_'
-     and ( rdb.F_75 = '1' and rdb.D_CLOSE is Null or
-           rcr.F_75 = '1' and rcr.D_CLOSE is Null )
+     and ( rdb.F_75 = '1' and lnnvl( rdb.D_CLOSE <= p_report_date ) or
+           rcr.F_75 = '1' and lnnvl( rcr.D_CLOSE <= p_report_date ) )
   ;
   
   commit;
@@ -478,7 +584,7 @@ BEGIN
             where a.KF = p_kod_filii
               and a.KV != 980
               and r.F_75 = '1'
-              and r.D_CLOSE is Null
+              and lnnvl( r.D_CLOSE <= p_report_date )
               and lnnvl( a.CLOSE_DATE < trunc(p_report_date,'MM') )
           ) t 
     where ( t.DOSQ <> t.DOS AND t.DOSQ <> 0 and t.DOS >=0 )
@@ -495,15 +601,12 @@ BEGIN
      and KF          = p_kod_filii
      and REPORT_CODE = p_file_code
    group by REPORT_DATE, KF, REPORT_CODE, NBUC, FIELD_CODE;
-    
+
   bars_audit.info( $$PLSQL_UNIT||' end for date = '||TO_CHAR(p_report_date, 'dd.mm.yyyy') );
   
 end NBUR_P_I75;
 /
+
 show err;
 
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/NBUR_P_I75.sql =========*** End **
-PROMPT ===================================================================================== 
+grant EXECUTE on NBUR_P_I75 to BARS_ACCESS_DEFROLE;
