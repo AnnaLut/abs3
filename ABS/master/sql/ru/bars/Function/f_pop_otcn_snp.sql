@@ -10,7 +10,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Функция наполнения таблиц для формирования отчетности
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 24.01.2018 (14.12.2017)
+% VERSION     : 26.01.2018 (14.12.2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 06/02/2015 - в таблице OTCN_SALDO не формировались годовые Кт обороты
              Исправлено.
@@ -310,9 +310,9 @@ elsif type_ in (2, 3, 5) then
    commit;
 
     -- обработка корректирующих проводок
-    merge into OTCN_SALDO o
-    using (
-        select  k.acc, a.NLS,  a.KV, a.NBS, a.OB22, a.RNK,
+    merge
+     into OTCN_SALDO o
+    using ( select  k.acc, a.NLS,  a.KV, a.NBS, a.OB22, a.RNK,
             nvl(sum(DECODE(k.tips,'3',k.Dos96, 0)),0) dos99,
             nvl(sum(DECODE(k.tips,'3',k.Dosq96,0)),0) dosq99,
             nvl(sum(DECODE(k.tips,'3',k.kos96, 0)),0) kos99,
@@ -323,8 +323,7 @@ elsif type_ in (2, 3, 5) then
             nvl(sum(DECODE(k.tips,'5',k.Kos96, 0)),0) kos96zg,
             nvl(sum(DECODE(k.tips,'6',k.Dos96, 0)),0) dos99zg,
             nvl(sum(DECODE(k.tips,'6',k.Kos96, 0)),0) kos99zg
-        from (
-           -- и годовые корректирующие проводки
+        from ( -- и годовые корректирующие проводки
            SELECT '3' tips, s.acc,
                   NVL(SUM(DECODE(a.DK, 0, a.s, 0)),0) dos96,
                   NVL(SUM(DECODE(s.kv,980,0,DECODE(a.DK, 0, Gl.P_Icurval(s.kv, a.s, a.vDat),0))),0) dosq96,
@@ -375,10 +374,13 @@ elsif type_ in (2, 3, 5) then
              AND a.VOB=199
              AND a.FDAT BETWEEN Dat1_ AND dat99_
              AND a.acc=s.acc
-           GROUP BY '6', s.acc) k, accounts a
+           GROUP BY '6', s.acc
+           ) k
+           , accounts a
            where k.acc = a.acc
-           group by k.acc, a.NLS,  a.KV, a.NBS, A.RNK) p
-    on (o.acc = p.acc)
+           group by k.acc, a.NLS,  a.KV, a.NBS, a.OB22, a.RNK
+       ) p
+    on ( p.acc = o.acc)
     WHEN MATCHED THEN
         UPDATE SET
            o.dos99   = o.dos99   + p.dos99,
