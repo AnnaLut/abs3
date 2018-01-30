@@ -39,19 +39,24 @@ public partial class vip : Bars.BarsPage
         sdsVipNew.ConnectionString = OraConnector.Handler.IOraConnection.GetUserConnectionString();
         sdsKvipNew.ConnectionString = OraConnector.Handler.IOraConnection.GetUserConnectionString();
 
-        String SelectCommand = @"select rnk,
-                                    nmk,
-                                    branch,
-                                    customer_segment_financial,
-                                    customer_segment_activity,
-                                    customer_segment_products_amnt,
-                                    rlvip,
-                                    fio_manager,
-                                    phone_manager,
-                                    mail_manager,
-                                    account_manager from V_VIP_DEAL  where branch  like sys_context('bars_context','user_branch_mask') ";
-        SelectCommand += " and upper(nmk) like  upper('%" + tbNMK.Text + "%') ";
-        SelectCommand += " and rnk  like '%" + tbRNK.Text + "%' ";
+        String SelectCommand = @"SELECT DISTINCT d.rnk
+										 ,d.NMK 
+										 ,a.BRANCH 
+										 ,d.customer_segment_financial
+										 ,d.customer_segment_activity
+										 ,d.customer_segment_products_amnt
+										 ,d.rlvip
+										 ,d.fio_manager
+										 ,d.phone_manager
+										 ,d.mail_manager
+										 ,d.account_manager
+								  FROM bars.V_VIP_DEAL d
+									,bars.accounts   a
+								 WHERE d.RNK = a.rnk
+								   AND a.branch LIKE sys_context('bars_context'
+												,'user_branch_mask') ";
+        SelectCommand += " and upper(d.nmk) like  upper('%" + tbNMK.Text + "%') ";
+        SelectCommand += " and d.rnk  like '%" + tbRNK.Text + "%' ";
         //if (rbAll.Checked)
         //{
         //    SelectCommand += " and kvip like '%'";
