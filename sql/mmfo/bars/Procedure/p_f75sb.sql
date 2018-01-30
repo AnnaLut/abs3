@@ -93,28 +93,28 @@ days_     number;
        , NVL(t.OB22D,'00') ob22_d
        , NVL(t.OB22K,'00') ob22_k
     FROM tmp_file03 t
-       , sb_r020 sb
-       , sb_r020 sb1
+       , SB_R020 sb
+       , SB_R020 sb1
        , oper o
    WHERE substr(t.nlsd,1,4)=sb.r020
-     and sb.f_75='1' and lnnvl( sb.D_CLOSE <= Dat_ )
+     and sb.f_75='1' and sb.D_OPEN <= Dat_ and lnnvl( sb.D_CLOSE <= Dat_ )
      and substr(t.nlsk,1,4)=sb1.r020(+)
      and not exists (select 1 from ref_kor where ref=t.ref and vob in (96, 99))
      and t.ref = o.ref
    UNION
   SELECT t.fdat, t.ref, t.accd, t.nlsd, t.kv, substr(t.nlsd,1,4) nbs, t.acck,
          t.nlsk, substr(t.nlsk,1,4) nbsk,
-         t.s*100, DECODE(t.s*100, 0, t.sq*100, gl.p_icurval (t.kv, t.s*100, r.vdat/*t.fdat*/)), t.nazn
+         t.s*100, DECODE(t.s*100, 0, t.sq*100, gl.p_icurval( t.kv, t.s*100, r.vdat/*t.fdat*/)), t.nazn
        , NVL(sb.f_75, '0') pr_d
        , NVL(sb1.f_75,'0') pr_k
        , NVL(t.OB22D,'00') ob22_d
        , NVL(t.OB22K,'00') ob22_k
     FROM tmp_file03 t
-       , sb_r020 sb
-       , sb_r020 sb1
+       , SB_R020 sb
+       , SB_R020 sb1
        , ref_kor r
    WHERE substr(t.nlsd,1,4)=sb.r020
-     and sb.f_75='1' and lnnvl( sb.D_CLOSE <= Dat_ )
+     and sb.f_75='1' and sb.D_OPEN <= Dat_ and lnnvl( sb.D_CLOSE <= Dat_ )
      and substr(t.nlsk,1,4)=sb1.r020(+)
      and t.ref=r.ref
      and r.vob in (96, 99)
@@ -129,11 +129,11 @@ days_     number;
        , NVL(t.OB22D,'00') ob22_d
        , NVL(t.OB22K,'00') ob22_k
     FROM tmp_file03 t
-       , sb_r020 sb
-       , sb_r020 sb1
+       , SB_R020 sb
+       , SB_R020 sb1
        , oper o
    WHERE substr(t.nlsk,1,4)=sb1.r020
-     and sb1.f_75='1' and lnnvl( sb1.D_CLOSE <= Dat_ )
+     and sb1.f_75='1' and sb1.D_OPEN <= Dat_ and lnnvl( sb1.D_CLOSE <= Dat_ )
      and substr(t.nlsd,1,4)=sb.r020(+)
      and not exists (select 1 from ref_kor where ref=t.ref and vob in (96, 99))
      and t.ref = o.ref
@@ -146,29 +146,30 @@ days_     number;
        , NVL(t.OB22D,'00') OB22_D
        , NVL(t.ob22K,'00') OB22_K
     FROM tmp_file03 t
-       , sb_r020 sb
-       , sb_r020 sb1
+       , SB_R020 sb
+       , SB_R020 sb1
        , ref_kor r
    WHERE substr(t.nlsk,1,4)=sb1.r020
-     and sb1.f_75='1' and lnnvl( sb1.D_CLOSE <= Dat_ )
+     and sb1.f_75='1' and sb1.D_OPEN <= Dat_ and lnnvl( sb1.D_CLOSE <= Dat_ )
      and substr(t.nlsd,1,4)=sb.r020(+)
      and t.ref=r.ref
      and r.vob in (96,99)
      and r.vdat >= vdatr_;
 
 BEGIN
-  
+
   bars_audit.info( $$PLSQL_UNIT||': BEGIN' );
-  -------------------------------------------------------------------
+
   userid_ := user_id;
+
   EXECUTE IMMEDIATE 'TRUNCATE TABLE RNBU_TRACE';
   EXECUTE IMMEDIATE 'TRUNCATE TABLE TMP_FILE03';
-  -------------------------------------------------------------------
+
   -- определение начальных параметров
   P_Proc_Set_Int(kodf_,sheme_,nbuc1_,typ_);
-  
+
   -- используем классификатор SB_R020
-  sql_acc_ := q'[select R020 from SB_R020 where F_75='1' and lnnvl( D_CLOSE <= to_date('%rptdt','dd.mm.yyyy') )]';
+  sql_acc_ := q'[select R020 from SB_R020 where F_75='1' and D_OPEN<=to_date('%rptdt','dd.mm.yyyy') and lnnvl(D_CLOSE<=to_date('%rptdt','dd.mm.yyyy'))]';
   sql_acc_ := replace( sql_acc_, '%rptdt', to_char(Dat_,'dd.mm.yyyy') );
 
   if to_char(dat_, 'mm') in ('12', '01')
@@ -205,7 +206,7 @@ BEGIN
                          o.nazn,
                          o.userid isp, o.vob,
                          p.ref, p.stmt, p.dk, p.tt,
-                         p.fdat, p.s/100 s, p.sq/100 sq
+                         p.FDAT, p.s/100 s, p.sq/100 sq
                     from OPLDOK p
                     join ACCOUNTS a
                       on ( a.ACC = p.ACC )
@@ -214,6 +215,7 @@ BEGIN
                     join ( select R020, min(D_OPEN) as OPN_DT
                              from SB_R020
                             where F_75 = '1'
+                              and D_OPEN <= Dat_
                               and lnnvl( D_CLOSE <= Dat_ )
                             group by R020
                          ) r
@@ -221,7 +223,7 @@ BEGIN
                    WHERE p.FDAT between Datb_ and Dat_ + days_
                      and p.SOS >= 4
                      and o.sos = 5
-                     and a.DAOS >= r.OPN_DT
+                     and p.FDAT >= r.OPN_DT
                 )
   select a.acc ACCD, a.TT, a.REF, a.KV, a.nls NLSD, a.OB22 OB22D, a.S, a.SQ,
          a.FDAT, a.NAZN, b.acc ACCK, b.nls NLSK, b.OB22 OB22K, a.ISP
@@ -327,7 +329,7 @@ BEGIN
         FROM opldok
        WHERE fdat between Dat_ AND Dat_+29
          AND acc = acc_
-         AND tt in ( 'ZG8', 'ZG9%' );
+         AND tt in ('ZG8','ZG9');
 
       Dos96_:=Dos96_-d_sum_;
       Kos96_:=Kos96_-k_sum_;
@@ -508,12 +510,16 @@ BEGIN
          kk_ := '01';
       end if;
 
-      if kv_=980 and nlsd_ like '7%' and
-         (nlsk_ like '149%' or nlsk_ like '159%' or
-          nlsk_ like '189%' or nlsk_ like '240%' or
-          nlsk_ like '289%' or
-          nlsk_ like '319%' or nlsk_ like '329%' or
-          nlsk_ like '359%' or nlsk_ like '369%')
+      if ( kv_ = 980 and 
+           nlsd_ like '7%' and
+           nbsk_ in ('1090','1190','1419','1429','1509','1529','1549','1609','1890'
+                    ,'2019','2029','2039','2049','2069','2079','2089'
+                    ,'2109','2119','2129','2139','2149'
+                    ,'2209','2219','2229','2239','2249'
+                    ,'2309','2319','2329','2339','2349','2359','2369','2379'
+                    ,'2409','2419','2429','2439','2609','2629','2659','2890'
+                    ,'3119','3219','3569','3590','3599','3690','3692','3699')
+         )
       then
          kk_ := '01';
       end if;
@@ -549,11 +555,15 @@ BEGIN
          kk_ := '07';
       end if;
 
-      if (nlsd_ like '149%' or nlsd_ like '159%' or
-          nlsd_ like '189%' or nlsd_ like '240%' or
-          nlsd_ like '289%' or
-          nlsd_ like '319%' or nlsd_ like '329%' or
-          nlsd_ like '359%' or nlsd_ like '369%') and nlsk_ like '3739%'
+      if ( nlsk_ like '3739%' and 
+           nbs_ in ('1090','1190','1419','1429','1509','1529','1549','1609','1890'
+                   ,'2019','2029','2039','2049','2069','2079','2089'
+                   ,'2109','2119','2129','2139','2149'
+                   ,'2209','2219','2229','2239','2249'
+                   ,'2309','2319','2329','2339','2349','2359','2369','2379'
+                   ,'2409','2419','2429','2439','2609','2629','2659','2890'
+                   ,'3119','3219','3569','3590','3599','3690','3692','3699')
+         )
       then
          kk_ := '07';
       end if;
@@ -745,14 +755,15 @@ BEGIN
         end if;
         
         -- при формировании новых счетов для резерва
-        if nlsd_ like '3739%' and
-           nbsk_ in ('1090','1190','1419','1429','1509','1529','1549','1609','1890'
-                     ,'2019','2029','2039','2049','2069','2079','2089'
-                     ,'2109','2119','2129','2139','2149'
-                     ,'2209','2219','2229','2239','2249'
-                     ,'2309','2319','2329','2339','2349','2359','2369','2379'
-                     ,'2409','2419','2429','2439','2609','2629','2659','2890'
-                     ,'3119','3219','3569','3590','3599','3690','3692','3699')
+        if ( nlsd_ like '3739%' and
+             nbsk_ in ('1090','1190','1419','1429','1509','1529','1549','1609','1890'
+                      ,'2019','2029','2039','2049','2069','2079','2089'
+                      ,'2109','2119','2129','2139','2149'
+                      ,'2209','2219','2229','2239','2249'
+                      ,'2309','2319','2329','2339','2349','2359','2369','2379'
+                      ,'2409','2419','2429','2439','2609','2629','2659','2890'
+                      ,'3119','3219','3569','3590','3599','3690','3692','3699')
+           )
         then
            kk_ := '07';
         end if;
@@ -838,27 +849,29 @@ BEGIN
       end if;
 
       -- при формировании новых счетов для резерва
-      if nlsd_ like '3739%' and
-         nbsk_ in ('1090','1190','1419','1429','1509','1529','1549','1609','1890'
-                   ,'2019','2029','2039','2049','2069','2079','2089'
-                   ,'2109','2119','2129','2139','2149'
-                   ,'2209','2219','2229','2239','2249'
-                   ,'2309','2319','2329','2339','2349','2359','2369','2379'
-                   ,'2409','2419','2429','2439','2609','2629','2659','2890'
-                   ,'3119','3219','3569','3590','3599','3690','3692','3699')
+      if ( nlsd_ like '3739%' and
+           nbsk_ in ('1090','1190','1419','1429','1509','1529','1549','1609','1890'
+                    ,'2019','2029','2039','2049','2069','2079','2089'
+                    ,'2109','2119','2129','2139','2149'
+                    ,'2209','2219','2229','2239','2249'
+                    ,'2309','2319','2329','2339','2349','2359','2369','2379'
+                    ,'2409','2419','2429','2439','2609','2629','2659','2890'
+                    ,'3119','3219','3569','3590','3599','3690','3692','3699')
+         )
       then
          kk_ := '07';
       end if;
 
       -- списання резерву
-      if nlsd_ like '3903%' and
-         nbsk_ in ('1090','1190','1419','1429','1509','1529','1549','1609','1890'
-                   ,'2019','2029','2039','2049','2069','2079','2089'
-                   ,'2109','2119','2129','2139','2149'
-                   ,'2209','2219','2229','2239','2249'
-                   ,'2309','2319','2329','2339','2349','2359','2369','2379'
-                   ,'2409','2419','2429','2439','2609','2629','2659','2890'
-                   ,'3119','3219','3569','3590','3599','3690','3692','3699')
+      if ( nlsd_ like '3903%' and
+           nbsk_ in ('1090','1190','1419','1429','1509','1529','1549','1609','1890'
+                    ,'2019','2029','2039','2049','2069','2079','2089'
+                    ,'2109','2119','2129','2139','2149'
+                    ,'2209','2219','2229','2239','2249'
+                    ,'2309','2319','2329','2339','2349','2359','2369','2379'
+                    ,'2409','2419','2429','2439','2609','2629','2659','2890'
+                    ,'3119','3219','3569','3590','3599','3690','3692','3699')
+         )
       then
          kk_ := '07';
       end if;
@@ -923,6 +936,7 @@ BEGIN
                 and nbs in ( select R020 
                                from SB_R020
                               where F_75 = '1'
+                                and D_OPEN <= Dat_ 
                                 and lnnvl( D_CLOSE <= Dat_ )
                            )
                 and acc not in ( select t.acc
@@ -984,16 +998,17 @@ BEGIN
    where odate < Dat_
      and ref in ( select ref from REF_KOR where vob=96 );
 
-  ------------------------------------------------------------------
-  delete from TMP_IREP where KODF = kodf_ and DATF = dat_;
-  ------------------------------------------------------------------
+  delete from TMP_IREP
+   where KODF = kodf_
+     and DATF = dat_;
+
   insert into TMP_IREP ( KODF, DATF, KODP, ZNAP, NBUC )
   select kodf_, Dat_, KODP, sum(ZNAP), NBUC
     from RNBU_TRACE
    group by KODP, NBUC;
-  ------------------------------------------------------------------
+
   bars_audit.info( $$PLSQL_UNIT||': END' );
-  
+
 end P_F75SB;
 /
 
