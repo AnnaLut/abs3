@@ -199,82 +199,84 @@ BEGIN
     into TMP_FILE03
        ( ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP, OB22D, OB22K )
   select ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP, OB22D, OB22K
-    from (
-     with sel
-       as ( select /*+parallel(a)*/
-                   a.acc, a.nls, a.kv, a.NBS, a.OB22,
-                   o.nazn,
-                   o.userid isp, o.vob,
-                   p.ref, p.stmt, p.dk, p.tt,
-                   p.fdat, p.s/100 s, p.sq/100 sq
-              FROM opldok p
-                 , accounts a
-                 , oper o
-             WHERE p.fdat between Datb_ and Dat_ + days_
-               and p.acc = a.acc
-               and a.nbs in ( select R020
-                                from SB_R020
-                               where F_75 = '1'
-                                 and lnnvl( D_CLOSE <= Dat_ )
-                            )
-               and p.sos >= 4
-               and p.ref = o.ref
-               and o.sos = 5
-          )
-    select a.acc ACCD, a.TT, a.REF, a.KV, a.nls NLSD, a.OB22 OB22D, a.S, a.SQ,
-           a.FDAT, a.NAZN, b.acc ACCK, b.nls NLSK, b.OB22 OB22K, a.ISP
-      from sel a
-         , opl b
-     where a.fdat between datb_ and Dat_ and
-           a.dk = 0 and
-           a.ref = b.ref and
-           b.fdat between datb_ and Dat_ and
-           a.stmt = b.stmt and
-           a.s = b.s/100 and
-           a.sq = b.sq/100 and
-           b.dk = 1
-     union
-    select b.acc ACCD, a.TT, a.REF, a.KV, b.nls NLSD, b.OB22 OB22D, a.S, a.SQ,
-           a.FDAT, a.NAZN, a.acc ACCK, a.nls NLSK, a.OB22 OB22K, a.ISP
-      from sel a
-         , opl b
-     where a.fdat between datb_ and Dat_ and
-           a.dk = 1 and
-           a.ref = b.ref and
-           b.fdat between datb_ and Dat_ and
-           a.stmt = b.stmt and
-           a.s = b.s/100 and
-           a.sq = b.sq/100 and
-           b.dk = 0
-     union --  период корректирующих проводок ДТ
-    select a.acc ACCD, a.TT, a.REF, a.KV, a.nls NLSD, a.OB22 OB22D, a.S, a.SQ,
-           a.FDAT, a.NAZN, b.acc ACCK, b.nls NLSK, b.OB22 OB22K, a.ISP
-      from sel a
-         , opl b
-     where a.fdat between Dat_+1 and trunc(Dat_+days_) and
-           a.vob in (96,99) and
-           a.dk = 0 and
-           a.ref = b.ref and
-           b.fdat between Dat_+1 and trunc(Dat_+days_) and
-           a.stmt = b.stmt and
-           a.s = b.s/100 and
-           a.sq = b.sq/100 and
-           b.dk = 1
-     union --  период корректирующих проводок КТ
-    select b.acc ACCD, a.TT, a.REF, a.KV, b.nls NLSD, b.OB22 OB22D, a.S, a.SQ,
-           a.FDAT, a.NAZN, a.acc ACCK, a.nls NLSK, a.OB22 OB22K, a.ISP
-      from sel a
-         , opl b
-     where a.fdat between Dat_+1 and trunc(Dat_+days_) and
-           a.vob in (96,99) and
-           a.dk = 1 and
-           a.ref = b.ref and
-           b.fdat between Dat_+1 and trunc(Dat_+days_) and
-           a.stmt = b.stmt and
-           a.s = b.s/100 and
-           a.sq = b.sq/100 and
-           b.dk = 0
-    );
+    from ( with sel
+             as ( select /*+parallel(a)*/
+                         a.acc, a.nls, a.kv, a.NBS, a.OB22,
+                         o.nazn,
+                         o.userid isp, o.vob,
+                         p.ref, p.stmt, p.dk, p.tt,
+                         p.fdat, p.s/100 s, p.sq/100 sq
+                    from OPLDOK p
+                    join ACCOUNTS a
+                      on ( a.ACC = p.ACC )
+                    join OPER o
+                      on ( o.ref = p.ref )
+                    join ( select R020, min(D_OPEN) as OPN_DT
+                             from SB_R020
+                            where F_75 = '1'
+                              and lnnvl( D_CLOSE <= Dat_ )
+                            group by R020
+                         ) r
+                      on ( r.R020 = a.NBS )
+                   WHERE p.FDAT between Datb_ and Dat_ + days_
+                     and p.SOS >= 4
+                     and o.sos = 5
+                     and a.DAOS >= r.OPN_DT
+                )
+  select a.acc ACCD, a.TT, a.REF, a.KV, a.nls NLSD, a.OB22 OB22D, a.S, a.SQ,
+         a.FDAT, a.NAZN, b.acc ACCK, b.nls NLSK, b.OB22 OB22K, a.ISP
+    from sel a
+       , opl b
+   where a.fdat between datb_ and Dat_ and
+         a.dk = 0 and
+         a.ref = b.ref and
+         b.fdat between datb_ and Dat_ and
+         a.stmt = b.stmt and
+         a.s = b.s/100 and
+         a.sq = b.sq/100 and
+         b.dk = 1
+   union
+  select b.acc ACCD, a.TT, a.REF, a.KV, b.nls NLSD, b.OB22 OB22D, a.S, a.SQ,
+         a.FDAT, a.NAZN, a.acc ACCK, a.nls NLSK, a.OB22 OB22K, a.ISP
+    from sel a
+       , opl b
+   where a.fdat between datb_ and Dat_ and
+         a.dk = 1 and
+         a.ref = b.ref and
+         b.fdat between datb_ and Dat_ and
+         a.stmt = b.stmt and
+         a.s = b.s/100 and
+         a.sq = b.sq/100 and
+         b.dk = 0
+   union --  период корректирующих проводок ДТ
+  select a.acc ACCD, a.TT, a.REF, a.KV, a.nls NLSD, a.OB22 OB22D, a.S, a.SQ,
+         a.FDAT, a.NAZN, b.acc ACCK, b.nls NLSK, b.OB22 OB22K, a.ISP
+    from sel a
+       , opl b
+   where a.fdat between Dat_+1 and trunc(Dat_+days_) and
+         a.vob in (96,99) and
+         a.dk = 0 and
+         a.ref = b.ref and
+         b.fdat between Dat_+1 and trunc(Dat_+days_) and
+         a.stmt = b.stmt and
+         a.s = b.s/100 and
+         a.sq = b.sq/100 and
+         b.dk = 1
+   union --  период корректирующих проводок КТ
+  select b.acc ACCD, a.TT, a.REF, a.KV, b.nls NLSD, b.OB22 OB22D, a.S, a.SQ,
+         a.FDAT, a.NAZN, a.acc ACCK, a.nls NLSK, a.OB22 OB22K, a.ISP
+    from sel a
+       , opl b
+   where a.fdat between Dat_+1 and trunc(Dat_+days_) and
+         a.vob in (96,99) and
+         a.dk = 1 and
+         a.ref = b.ref and
+         b.fdat between Dat_+1 and trunc(Dat_+days_) and
+         a.stmt = b.stmt and
+         a.s = b.s/100 and
+         a.sq = b.sq/100 and
+         b.dk = 0
+  );
 
     commit;
 
