@@ -3,6 +3,7 @@ CREATE OR REPLACE PROCEDURE BARS.CP_351 (p_dat01 date, p_mode integer  default 0
 /* Версия 12.4  03-01-2018 27-09-2017  21-09-2017  18-09-2017 31-07-2017   19-05-2017  26-04-2017  05-04-2017  06-03-2017  03-03-2017  
    Розрахунок кредитного ризику по ЦП
 
+21) 26-01-2018(12.5) - PD_0 - для пассивных = l_PD_0, было =0!
 20) 03-01-2018(12.4) - R013='' - символьный
 19) 27-09-2017 - уточнила таблиці для опредлеления PD
 18) 21-09-2017 - Проверять 'UUDV' по всем (было по custtype=2)
@@ -248,7 +249,7 @@ begin
                               VALUES (p_dat01 , d.RNK , d.NMK, d.ref , i.kv   , i.nls    , i.acc, 0      , 0      , l_fin, l_pd      ,
                                       0       , 0     , l_bv , l_bvq , D.vncrr, l_idf    , l_kol, d.fin23, l_tipa , null , d.CUSTTYPE, 
                                       l_nbs   , l_dv  , l_bv , l_s080, l_ddd  , l_tip_fin, i.tip, l_bvq  , l_sdate, d.RZ , d.cp_id   , 
-                                      l_istval, d.datp, 0    , nvl(i.ob22,'01') ) ;  
+                                      l_istval, d.datp, l_pd_0, nvl(i.ob22,'01') ) ;  
                END IF;
             END LOOP;
          end if;

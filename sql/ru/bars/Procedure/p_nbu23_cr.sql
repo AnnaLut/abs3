@@ -7,9 +7,10 @@ PROMPT *** Create  procedure P_NBU23_CR ***
 
   CREATE OR REPLACE PROCEDURE BARS.P_NBU23_CR (p_dat01 date) IS
 
-/* Версия 6.1  28-12-2017  14-07-2017  14-03-2017  03-03-2017  07-02-2017  01-02-2017   21-12-2016  
+/* Версия 6.2  29-01-2018  28-12-2017  14-07-2017  14-03-2017  03-03-2017  07-02-2017  01-02-2017   21-12-2016  
    Заполнение данных в NBU23_REZ
    -------------------------------------
+10) 29-01-2018(6.2) - s080 Для клиентов SPE 
  9) 28-12-2017(6.1) - Дополнительные параметры
  8) 14-09-2017 - S180 из ND_VAL
  7) 13-09-2017 - Z из REZ_CR в NBU23_REZ
@@ -65,6 +66,12 @@ BEGIN
       else                              l_s080 := f_get_s080 (p_dat01,k.tip_fin, k.fin_z);
       end if; 
       update rez_cr set s080_z = l_s080, fin_z = k.fin_z where rowid=k.RI;
+   end loop;
+   for k in (select r.rowid RI ,r.* from rez_cr r where fdat = p_dat01 and rnk in (select rnk from customerw where tag='ISSPE'))
+   LOOP
+      k.tip_fin :=1;
+      k.s080 := f_get_s080 (k.fdat,k.tip_fin, k.fin);
+      update rez_cr set s080 = k.s080, tip_fin = k.tip_fin where rowid=k.RI;
    end loop;
    z23.to_log_rez (user_id , 351 , p_dat01   ,'Заполнение таблицы NBU23_REZ' );
    for D in (select r020, ddd, r012 from kl_f3_29 where kf='1B' )

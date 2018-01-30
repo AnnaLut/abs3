@@ -11,8 +11,9 @@ PROMPT *** Create  procedure DEB_351 ***
 
 /*   Розрахунок кредитного ризику по дебіторці
      -----------------------------------------
-    Версия 7.5      25-10-2017  03-10-2017  28-09-2017  25-09-2017  18-09-2017 11-07-2017  16-05-2017   27-04-2017   21-03-2017  15-02-2017
+    Версия 7.6      29-01-2018  25-10-2017  03-10-2017  28-09-2017  25-09-2017  18-09-2017 11-07-2017  16-05-2017   
 
+12) 29-01-2018(7.6) - Определение типа XOZ через ф-цию f_tip_xoz (если нет в картотеке заносится в таблицу rez_xoz_tip)
 11) 25-10-2017(7.5) - Хоз.дебиторка из архива XOZ_REF ==> XOZ_REF_ARC
 10) 03-10-2017(7.4) - Группа s250=8, всегда fin=1
  9) 28-09-2017(7.3) - LGD = 1
@@ -99,7 +100,7 @@ begin
                    DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, a.mdate wdate, a.acc nd, null sdate,d.deb
             from   accounts a,customer c, rez_deb d
             where  a.nbs = d.nbs and d.deb in (1,2) and d.deb is not null and a.nbs is not null and (a.dazs is null or a.dazs >= p_dat01)
-                   and a.acc not in ( select accc from accounts where nbs is null and substr(nls,1,4)='3541' and accc is not null) and a.rnk = c.rnk and  ( a.tip not in ('XOZ','W4X')  or l_xoz_new != 1 )
+                   and a.acc not in ( select accc from accounts where nbs is null and substr(nls,1,4)='3541' and accc is not null) and a.rnk = c.rnk and  ( f_tip_xoz(p_dat01, a.acc, a.tip) not in ('XOZ','W4X')   or l_xoz_new != 1 )
             union  all
             select 17 tipa,decode(c.custtype,3,3,2) custtype, c.custtype cus, substr( decode(c.custtype,3, c.nmk, nvl(c.nmkk,c.nmk) ) , 1,35) NMK,
                    c.PRINSIDER, c.COUNTRY, c.ISE, nvl(nbs,substr(nls,1,4)) nbs, a.tip, a.nls, a.kv, a.acc, a.ob22, -ost_korr(a.acc,l_dat31,null,a.nbs) bv,
@@ -114,7 +115,7 @@ begin
                    DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, a.mdate wdate, x.id nd, x.fdat sdate, d.deb
             from   xoz_ref_arc x, accounts a, customer c, rez_deb d
             where  x.mdat = p_dat01 and a.nbs = d.nbs and d.deb in (2) and d.deb is not null and x.fdat < p_dat01 and (x.datz >= p_dat01 or x.datz is null) and s0<>0 and s<>0 and x.acc=a.acc
-                   and  ( a.tip  in ('XOZ','W4X')  and  l_xoz_new = 1 ) and a.rnk=c.rnk;
+                   and  ( f_tip_xoz(p_dat01, a.acc, a.tip) in ('XOZ','W4X')  and  l_xoz_new = 1 ) and a.rnk=c.rnk;
       end if;
       loop
          FETCH c0 INTO k;

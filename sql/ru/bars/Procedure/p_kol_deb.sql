@@ -1,10 +1,11 @@
 CREATE OR REPLACE PROCEDURE p_kol_deb(p_dat01 date, p_mode integer, p_deb integer) IS 
 
-/* Версия 7.5  28-12-2017  25-10-2017  25-09-2017  18-09-2017  04-08-2017  11-07-2017   26-04-2017  09-03-2017   15-02-2017  24-01-2017   05-10-2016
+/* Версия 7.6  29-01-2018  28-12-2017  25-10-2017  25-09-2017  18-09-2017  04-08-2017  11-07-2017   26-04-2017  09-03-2017
    Визначення Кількості днів прострочки та фін. стану по дебіторці
    p_deb = 0 - Звичайна дебіторка 
            1 - Нова хоз.дебіторка 
    ------------------------------------
+14) 29-01-2018(7.6) - Определение типа XOZ через ф-цию f_tip_xoz (если нет в картотеке заносится в таблицу rez_xoz_tip)
 13) 28-12-2017(7.5) - Худший фин.клас по дею > 3 мес (по кол.дней и по др. активу)
 12) 25-10-2017(7.4) - Хоз.дебиторка из архива XOZ_REF ==> XOZ_REF_ARC
 11) 17-10-2017(7.3) - При поиске других активов исключила сам счет 
@@ -18,11 +19,9 @@ CREATE OR REPLACE PROCEDURE p_kol_deb(p_dat01 date, p_mode integer, p_deb intege
  3) 09-03-2017 - Поиск по РНК в др.активах
  2) 15-02-2017 - Вставила дату закрытия в курсор
  1) 24-01-2017 - Добавлен параметр S080 в p_get_nd_val
-
 */
 
  cd     cc_deal%rowtype; ov  acc_over%rowtype; w4  rez_w4_bpk%rowtype; bpk  v_bbpk_acc%rowtype; l_s080 specparam.s080%type;
-
  l_del     number; l_tip    number; l_fin  number; l_kol number ; l_del_kv  number ; l_fin23 number ; l_xoz_new number  ;
  l_fin_cls number; l_tip_30 number; l_time number; l_nd  integer; fl_       integer; l_f     integer; l_commit  Integer := 0;
 
@@ -53,6 +52,7 @@ begin
    z23.to_log_rez (user_id , 351 , p_dat01 ,'Начало Кол-во дней прострочки (дебиторка) 351' || l_tx);
    l_dat31 := Dat_last_work (p_dat01 - 1);  -- последний рабочий день месяца
    pul_dat(to_char(p_dat01,'dd-mm-yyyy'),'');
+   delete from rez_XOZ_TIP where fdat = p_dat01;
    --logger.info('XOZ -1 : p_dat01 = ' || p_dat01 || 'l_xoz_new = ' || l_xoz_new  || 'l_dat31 = ' || l_dat31) ;                          
    DECLARE
       TYPE r0Typ IS RECORD 
@@ -75,12 +75,13 @@ begin
    begin 
       begin
          for k in ( select * from   (select  a.*, x.acc1, x.s --count(*)  count_Err
-                                     from (select acc, OST_KORR(acc, l_dat31, null,nbs) OST, nls, kv  from accounts where  tip in ('XOZ','W4X')) a,
+                                     from (select acc, OST_KORR(acc, l_dat31, null,nbs) OST, nls, kv, tip  from accounts where  tip in ('XOZ','W4X')) a,
                                           (select acc acc1, -sum(s0) S ,null nls1, null kv1  from xoz_ref_arc  where mdat = p_dat01 and  ( ref2 is null  OR  datz > l_dat31)  group by acc ) x
                                     where a.acc = x.acc1 (+) and a.OST < 0 and a.ost <> nvl(x.S,0) order by a.acc    )
                    where acc1 is null )
          loop
-            UPDATE  ACCOUNTS SET TIP ='ODB'  WHERE ACC = K.ACC ;
+            insert into rez_xoz_tip (fdat, acc, tip) values (p_dat01, k.acc, k.tip);
+            --UPDATE  ACCOUNTS SET TIP ='ODB'  WHERE ACC = K.ACC ;
          end loop;
       end;
       if  p_deb = 0   THEN
@@ -88,7 +89,8 @@ begin
             select 17 tip, decode(c.custtype,3,3,2) custtype, c.custtype cus, a.nbs, a.nls, a.kv, a.acc, a.rnk, a.branch, -ost_korr(a.acc,l_dat31,null,a.nbs) bv, d.deb, a.mdate, a.acc nd
             from   accounts a,customer c, rez_deb d 
             where  a.nbs = d.nbs and d.deb in (1,2) and d.deb is not null and a.nbs is not null and (a.dazs is null or a.dazs >= p_dat01) 
-                   and a.acc not in ( select accc from accounts where nbs is null and substr(nls,1,4)='3541' and accc is not null) and a.rnk = c.rnk and  ( a.tip not in ('XOZ','W4X')  or l_xoz_new != 1 )
+                   and a.acc not in ( select accc from accounts where nbs is null and substr(nls,1,4)='3541' and accc is not null) and a.rnk = c.rnk and  
+                 ( f_tip_xoz(p_dat01, a.acc, a.tip) not in ('XOZ','W4X')  or l_xoz_new != 1 )
             union  all 
             select 17 tip,decode(c.custtype,3,3,2) custtype, c.custtype cus, nvl(nbs,substr(nls,1,4)) nbs, a.nls, a.kv, a.acc, a.rnk, a.branch,  -ost_korr(a.acc,l_dat31,null,a.nbs) bv,
                    1 deb, a.mdate, a.acc nd
@@ -102,7 +104,7 @@ begin
                    x.id nd 
             from   xoz_ref_arc x, accounts a, customer c, rez_deb d 
             where  mdat = p_dat01 and a.nbs = d.nbs and d.deb in (2) and d.deb is not null and x.fdat < p_dat01 and (datz >= p_dat01 or datz is null) and s0<>0 and s<>0 and x.acc=a.acc  
-                   and  ( a.tip in ('W4X', 'XOZ')  and  l_xoz_new = 1 ) and a.rnk=c.rnk;
+                   and  ( f_tip_xoz(p_dat01, a.acc, a.tip) in ('W4X', 'XOZ')  and  l_xoz_new = 1 ) and a.rnk=c.rnk;
       end if;       
       loop
          FETCH c0 INTO k;
