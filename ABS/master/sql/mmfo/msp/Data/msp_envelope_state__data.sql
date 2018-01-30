@@ -1,6 +1,14 @@
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /sql/msp/data/table/msp_envelope_state__data.sql ==========*** Run ***
 PROMPT ===================================================================================== 
+begin
+  insert into msp_envelope_state (id, name, state)
+  values (-2, 'Конверт в процесі розшифрування', 'ENVLIST_PROCESSING');
+exception 
+  when dup_val_on_index then 
+    null;
+end;
+/
 
 begin
   insert into msp_envelope_state (id, name, state)

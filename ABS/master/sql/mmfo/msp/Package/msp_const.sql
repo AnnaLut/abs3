@@ -16,6 +16,7 @@ create or replace package msp_const is
   st_req_ERROR_UNIQUE_ENVELOPE   constant number :=  5; -- Помилка унікальності конверту
 
   -- msp_envelopes.state
+  st_env_ENVLIST_PROCESSING      constant number := -2; -- Конверт в процесі розшифрування
   st_env_ENVLIST_RECEIVED        constant number := -1; -- Новий конверт
   st_env_PARSED                  constant number :=  0; -- Конверт розібраний
   st_env_ERROR_ECP_ENVELOPE      constant number :=  1; -- Помилка ЕЦП для файлу

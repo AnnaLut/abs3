@@ -259,7 +259,7 @@ end msp_utl;
 /
 create or replace package body msp_utl is
 
-  gc_body_version constant varchar2(64) := 'version 1.2 18.01.2018';
+  gc_body_version constant varchar2(64) := 'version 1.31 30.01.2018';
   gc_mod_code     constant varchar2(3)  := 'MSP';
   -----------------------------------------------------------------------------------------
 
@@ -581,6 +581,7 @@ create or replace package body msp_utl is
     begin
       select * into l_pensacc_row from pfu.pfu_pensacc pa
       where pa.nls = to_char(p_deposit_acc) and pa.kf = to_char(p_receiver_mfo);
+            --and pa.id = 62249993;
     exception
       when no_data_found then
         l_err_code    := 4;
@@ -1189,9 +1190,15 @@ create or replace package body msp_utl is
                                     p_comment        in msp_file_records.comm%type,
                                     p_block_type_id  in msp_file_records.block_type_id%type)
   is
+    l_new_state msp_file_record_state.id%type;
   begin
+    if p_block_type_id in (5) then 
+      l_new_state := 14;
+    else 
+      raise_application_error(-20000, 'Хибна причина блокування оплати');
+    end if;
     set_file_record_state(p_file_record_id => p_file_record_id,
-                          p_state_id       => case p_block_type_id when 5 then 14 else 0 end,
+                          p_state_id       => l_new_state,
                           p_comment        => p_comment);
   end set_file_record_blocked;
 
@@ -1981,7 +1988,7 @@ create or replace package body msp_utl is
         raise;
     end;
 
-    if l_req_state = msp_const.st_req_PARSED and l_env_state not in (-1,1,2,3,4) then
+    if l_req_state = msp_const.st_req_PARSED and l_env_state not in (-2,-1,1,2,3,4) then
       if l_file_state = 0 then
         -- 0 –- запит оброблено успішно
         raise ex_s;
@@ -2722,6 +2729,7 @@ create or replace package body msp_utl is
     l_sup_node          dbms_xmldom.domnode;
     l_supp_tnode        dbms_xmldom.domnode;
   begin
+    --bars.bars_audit.info('msp_utl.create_envelope_file start');
     dbms_lob.createtemporary(l_clob, true, 12);
 
     merge into msp_envelopes e
@@ -2739,16 +2747,19 @@ create or replace package body msp_utl is
                  e.state       = -1,
                  e.filename    = null
     when not matched then
-      insert values (p_id, p_idenv, p_code, p_sender, p_recipient, p_part_number, p_part_total, p_ecp, p_data, p_data_decode, -1, null, sysdate, null);
+      insert values (p_id, p_idenv, p_code, p_sender, p_recipient, p_part_number, p_part_total, p_ecp, p_data, p_data_decode, -2, null, sysdate, null);
 
     /*insert into msp_envelopes (id, id_msp_env, code, sender, recipient, partnumber, parttotal, ecp, data, data_decode, state, comm)
     values(p_id, p_idenv, p_code, p_sender, p_recipient, p_part_number, p_part_total, p_ecp, p_data, p_data_decode, -1, null);*/
 
     msp_utl.set_state_request(p_id, 0);
+    commit;
+    --bars.bars_audit.info('msp_utl.create_envelope_file start finish');
   exception
     when others then
       if sqlcode in (-1) then -- ORA-00001: unique constraint
         msp_utl.set_state_request(p_id, 5, sqlerrm);
+        commit;
       else
         raise_application_error(-20000, 'Помилка реєстрації конверту. '|| chr(10) || dbms_utility.format_error_backtrace || ' ' || sqlerrm);
       end if;
@@ -2756,17 +2767,28 @@ create or replace package body msp_utl is
 
   procedure create_envelope_file(p_id in number, p_id_msp in number, p_filedata in clob, p_filename in varchar2, p_filedate in varchar2, p_filepath in varchar2)
    is
+   l_state number;
   begin
-    insert into msp_envelope_files_info(id, id_msp, filename, filedate, state, comm, filepath,id_file)
-    values (p_id, p_id_msp, p_filename, to_date(p_filedate,'ddmmyyyyhh24miss'), -1, null, p_filepath, msp_file_seq.nextval);
+    --bars.bars_audit.info('msp_utl.create_envelope_file start');
+    select state into l_state from msp_envelopes where id = p_id;
+    
+    if l_state in (-1) then
+      insert into msp_envelope_files_info(id, id_msp, filename, filedate, state, comm, filepath,id_file)
+      values (p_id, p_id_msp, p_filename, to_date(p_filedate,'ddmmyyyyhh24miss'), -1, null, p_filepath, msp_file_seq.nextval);
 
-    insert into msp_envelope_files(id, filedata)
-    values (p_id, p_filedata);
+      insert into msp_envelope_files(id, filedata)
+      values (p_id, p_filedata);
 
-    update msp_envelopes set filename = p_filename where id = p_id;
+      update msp_envelopes set filename = p_filename where id = p_id;
 
-    msp_utl.set_state_envelope(p_id, 0);
-
+      msp_utl.set_state_envelope(p_id, 0);
+      commit;
+    --bars.bars_audit.info('msp_utl.create_envelope_file finish');
+    end if;
+  exception
+    when others then
+      --bars.bars_audit.info('msp_utl.create_envelope_file error '||dbms_utility.format_error_backtrace || ' ' || sqlerrm);
+      raise_application_error(-20000, 'msp_utl.create_envelope_file error '||dbms_utility.format_error_backtrace || ' ' || sqlerrm);
   end create_envelope_file;
 
 
