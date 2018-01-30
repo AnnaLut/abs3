@@ -91,9 +91,6 @@ exception when others then
  end;
 /
 
-
-
-
 PROMPT *** Create  constraint CC_REZW4BPK_KF_NN ***
 begin   
  execute immediate '
@@ -102,9 +99,6 @@ exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
-
-
-
 
 PROMPT *** Create  index PK_REZ_W4_BPK ***
 begin   
@@ -117,9 +111,6 @@ exception when others then
  end;
 /
 
-
-
-
 PROMPT *** Create  index I1_REZ_W4_BPK ***
 begin   
  execute immediate '
@@ -130,9 +121,6 @@ exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
 /
-
-
-
 
 PROMPT *** Create  index I2_REZ_W4_BPK ***
 begin   
@@ -145,7 +133,27 @@ exception when others then
  end;
 /
 
+PROMPT *** Create  index I3_REZ_W4_BPK ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.I3_REZ_W4_BPK ON BARS.REZ_W4_BPK (ACC,NBS,S250) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
 
+PROMPT *** Create  index I4_REZ_W4_BPK ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.I4_REZ_W4_BPK ON BARS.REZ_W4_BPK (ACC,RNK,NBS) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
 
 PROMPT *** Create  grants  REZ_W4_BPK ***
 grant SELECT                                                                 on REZ_W4_BPK      to BARSREADER_ROLE;

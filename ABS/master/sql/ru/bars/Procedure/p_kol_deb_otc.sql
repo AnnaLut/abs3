@@ -1,8 +1,9 @@
 CREATE OR REPLACE PROCEDURE p_kol_deb_otc(p_dat01 date, p_mode integer, p_deb integer) IS 
 
-/* Версия 1.0 10-01-2018
+/* Версия 1.1  29-01-2019  10-01-2018
    Кількість днів прострочки по договору на дату (дебіторка)- звітність
    -------------------------------------
+ 1) 29-01-2018(1.1) - Определение типа XOZ через ф-цию f_tip_xoz (если нет в картотеке заносится в таблицу rez_xoz_tip)
 */
 
    l_del  number      ;  l_kol     number ; l_del_kv  number ;  l_xoz_new number ; l_time number ;  l_commit  integer :=0;
@@ -65,7 +66,7 @@ begin
             from   accounts a,customer c, rez_deb d 
             where  a.nbs = d.nbs and d.deb in (1,2) and d.deb is not null and a.nbs is not null and (a.dazs is null or a.dazs >= p_dat01) 
                    and a.acc not in ( select accc from accounts where nbs is null and substr(nls,1,4)='3541' and accc is not null) and a.rnk = c.rnk 
-                   and  ( a.tip not in ('XOZ','W4X')  or l_xoz_new != 1 )
+                   and  ( decode(l_kor,1, f_tip_xoz(p_dat01, a.acc, a.tip) , a.tip) not in ('XOZ','W4X')  or l_xoz_new != 1 )
             union  all 
             select 17 tip,decode(c.custtype,3,3,2) custtype, c.custtype cus, nvl(nbs,substr(nls,1,4)) nbs, a.nls, a.kv, a.acc, a.rnk, a.branch,  
                    - decode(l_kor,1,ost_korr(a.acc,l_dat31,null,a.nbs),2, a.ostc, fost(a.acc,p_dat01) ) bv, 1 deb, a.mdate, a.acc nd
@@ -79,7 +80,7 @@ begin
                    - decode(l_kor,1,ost_korr(a.acc,l_dat31,null,a.nbs),2, a.ostc, fost(a.acc,p_dat01) ) bv, 3 deb, x.fdat mdate, x.id nd 
             from   xoz_ref x, accounts a, customer c, rez_deb d 
             where  a.nbs = d.nbs and d.deb in (2) and d.deb is not null and x.fdat < p_dat01 and (datz >= p_dat01 or datz is null) and s0<>0 
-                   and s<>0 and x.acc=a.acc and  ( a.tip in ('W4X', 'XOZ')  and  l_xoz_new = 1 ) and a.rnk=c.rnk;
+                   and s<>0 and x.acc=a.acc and  ( decode(l_kor,1, f_tip_xoz(p_dat01, a.acc, a.tip) , a.tip) in ('W4X', 'XOZ')  and  l_xoz_new = 1 ) and a.rnk=c.rnk;
       end if;       
       loop
          FETCH c0 INTO k;
