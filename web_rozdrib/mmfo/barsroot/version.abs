@@ -1,5 +1,5 @@
-=========  svn diff --summarize -r 46241:46295 D:\SVN\master\web\mmfo
----web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.122\mmfo\web\barsroot\Areas\Ndi\Scripts\ReferenceGrid.js
----web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.122\mmfo\web\barsroot
----web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.122\mmfo\web
-Bugfix_2.0.36.5.122 (Rev:46241-46295
+=========  svn diff --summarize -r 46296:46344 D:\SVN\master\web\mmfo
+---web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.123\mmfo\web\barsroot\clientregister\vip.aspx.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.123\mmfo\web\barsroot
+---web_release----: D:\SVN\Releases\Bugfix_2.0.36.5.123\mmfo\web
+Bugfix_2.0.36.5.123 (Rev:46296-46344
