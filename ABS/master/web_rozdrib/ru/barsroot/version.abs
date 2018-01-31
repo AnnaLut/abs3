@@ -1,6 +1,3 @@
-=========  svn diff --summarize -r 46296:46344 D:\SVN\master\web\ru
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.160\ru\web\barsroot\version.abs
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.160\ru\web\barsroot\clientregister\vip.aspx.cs
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.160\ru\web\barsroot
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.160\ru\web
-Bugfix_2.0.35.5.160 (Rev:46296-46344
+=========  svn diff --summarize -r 46345:46471 D:\SVN\master\web\ru
+---web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.161\ru\web\barsroot\version.abs
+Bugfix_2.0.35.5.161 (Rev:46345-46471
