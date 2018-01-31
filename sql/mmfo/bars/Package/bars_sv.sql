@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_sv.sql =========*** Run *** ===
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE package BARS.bars_sv is
+ CREATE OR REPLACE package BARS.bars_sv is
 
 g_head_version constant varchar2(64)  := 'Version 2.3 25/01/2018';
 g_head_defs    constant varchar2(512) := '';
@@ -135,8 +135,8 @@ procedure set_golos (
 procedure set_bank (
   p_id           number,
   --#101:
-  --p_vidsotok     sv_bank.vidsotok%type,
-  --p_golos        sv_bank.golos%type,
+  p_vidsotok     sv_bank.vidsotok%type,
+  p_golos        sv_bank.golos%type,
   --:#101
   p_man_fio_nm1  sv_bank.man_fio_nm1%type,
   p_man_fio_nm2  sv_bank.man_fio_nm2%type,
@@ -166,9 +166,7 @@ procedure import_tick (p_filename in varchar2, p_filebody in clob);
 
 end;
 /
-
-
-CREATE OR REPLACE PACKAGE BODY BARS.BARS_SV is
+CREATE OR REPLACE PACKAGE BODY BARS_SV is
 -- #101: Иванава Ирина, изменения в соответствии с техническими условиями 4_1
 -- Перегружены процедуры import_file,import_tick  для импорта файлов из веба
 g_body_version constant varchar2(64)  := 'Version 2.5 24/01/2018';
@@ -738,8 +736,8 @@ end  set_voice;
 procedure set_bank (
   p_id           number,
   --#101:
-  --p_vidsotok     sv_bank.vidsotok%type,
-  --p_golos        sv_bank.golos%type,
+  p_vidsotok     sv_bank.vidsotok%type,
+  p_golos        sv_bank.golos%type,
   --:#101
   p_man_fio_nm1  sv_bank.man_fio_nm1%type,
   p_man_fio_nm2  sv_bank.man_fio_nm2%type,
@@ -828,9 +826,9 @@ begin
 
   delete from sv_bank;
   if p_id = 1 or p_id is null and p_man_fio_nm1 != 'DELETE' then
-     insert into sv_bank (id, /*vidsotok, golos,*/ man_fio_nm1, man_fio_nm2, man_fio_nm3, man_mb_pos, man_mb_dt,
+     insert into sv_bank (id, vidsotok, golos, man_fio_nm1, man_fio_nm2, man_fio_nm3, man_mb_pos, man_mb_dt,
         isp_fio_nm1, isp_fio_nm2, isp_fio_nm3, isp_mb_tlf)
-     values (1, /*p_vidsotok, p_golos,*/ p_man_fio_nm1, p_man_fio_nm2, p_man_fio_nm3, p_man_mb_pos, p_man_mb_dt,
+     values (1, p_vidsotok, p_golos, p_man_fio_nm1, p_man_fio_nm2, p_man_fio_nm3, p_man_mb_pos, p_man_mb_dt,
         p_isp_fio_nm1, p_isp_fio_nm2, p_isp_fio_nm3, p_isp_mb_tlf);
   end if;
 
@@ -874,14 +872,14 @@ function get_rel_txt (
                                 || ' від ' || to_char(l_owner_row.nbu_doc_date, 'dd.mm.yyyy') || ' р. ');
     end if;
 
-    --1)	якщо особа має  пряму участь у банку, зазначається,
+    --1)  якщо особа має  пряму участь у банку, зазначається,
     --    що особа є акціонером (учасником) банку,
     --    та наводиться її частка в статутному капіталі банку
     if l_owner_row.rel_type = 10 --
       then
          dbms_lob.append(l_rel_txt, 'Особа є акціонером (учасником) банку, '
                                  || 'частка в статутному капіталі банку ' || l_owner_row.pruch_vidsotok || '%');
-    --2)	якщо особа має опосередковану істотну участь у банку зазначаються всі особи,
+    --2)  якщо особа має опосередковану істотну участь у банку зазначаються всі особи,
     --    через яких особа має опосередковану участь у банку, - щодо кожної ланки в ланцюгу володіння
     --    корпоративними правами в банку із зазначенням відсотка володіння корпоративними правами кожної з юридичних осіб у цьому ланцюгу;
     elsif l_owner_row.rel_type = 20
@@ -898,7 +896,7 @@ function get_rel_txt (
        end loop;
        --Убираются последние ", " и добавляется ". "
        l_rel_txt := substr(l_rel_txt, 1, length(l_rel_txt) - 2) || '. ';
-    --3)	якщо особа спільно з іншими особами як група осіб є власником істотної участі в банку,
+    --3)  якщо особа спільно з іншими особами як група осіб є власником істотної участі в банку,
     --    зазначаються всі особи, що входять до такої групи, та підстави,
     --    у зв'язку з якими такі особи належать до однієї групи;
     elsif l_owner_row.rel_type = 30 then
@@ -925,7 +923,7 @@ function get_rel_txt (
        end loop;
        --Убираются последние ", " и добавляется ". "
        l_rel_txt := substr(l_rel_txt, 1, length(l_rel_txt) - 2) || '. ';
-    --4)	якщо особа є власником істотної участі незалежно від формального володіння,
+    --4)  якщо особа є власником істотної участі незалежно від формального володіння,
     --    зазначаються обставини, у зв'язку з якими особа має можливість значного або
     --    вирішального впливу на управління та діяльність банку / юридичної особи;
     elsif l_owner_row.rel_type = 40 then
@@ -940,7 +938,7 @@ function get_rel_txt (
                                       else ''
                                  end
                               || '. ');
-    --5)	якщо особа є власником істотної участі у зв'язку з передаванням їй
+    --5)  якщо особа є власником істотної участі у зв'язку з передаванням їй
     --    прав голосу за дорученням, зазначається документ, яким оформлене таке доручення.
     elsif l_owner_row.rel_type = 50 then
       for l_row in (select g.doc_num
@@ -1047,7 +1045,6 @@ begin
                /*case when w.nat is null then
                     XmlElement("MEMBER_NAT", XmlAttributes('true' "xsi:nil")) else
                     XmlElement("MEMBER_NAT", w.nat) end,*/  -- need delete from TZ
-               XmlElement("MEMBER_PASS", w.pass), -- NEW
               XmlElement("MEMBER_NAT_COD", w.nat_cod), -- NEW
               XmlElement("MEMBER_ADR",
                   XmlElement("ADR_COD_KR", lpad(w.cod_kr,3,'0')),
@@ -1067,7 +1064,13 @@ begin
                   case when w.off is null then
                        XmlElement("ADR_OFF", XmlAttributes('true' "xsi:nil")) else
                        XmlElement("ADR_OFF", w.off) end
-               ),
+               ),               
+               XmlElement("MEMBER _PASS",   -- new 
+                       XmlElement("PS_VID", w.ps_vid),
+                       XmlElement("PS_SR", w.ps_sr),
+                       XmlElement("PS_NM", w.ps_nm),
+                       XmlElement("PS_DT", w.ps_dt),
+                       XmlElement("PS_ORG", w.ps_org)),
                case when w.pruch_vidsotok is null then
                     XmlElement("PR_UCH_PROC", XmlAttributes('true' "xsi:nil")) else
                     XmlElement("PR_UCH_PROC", w.pruch_vidsotok) end,
@@ -1194,8 +1197,6 @@ begin
                XmlElement("OWNER_TYPE", w.type),
                XmlElement("OWNER_NAZVA",
                   XmlElement("NT_COD", w.cod),
-                  XmlElement("OWNER_PASS", w.pass), -- NEW
-                  XmlElement("OWNER_NAT_COD", w.nat_cod), -- NEW
                   --#101:
                   /*XmlElement("NT_NM1", w.nm1),
                   XmlElement("NT_NM2", w.nm2),
@@ -1238,6 +1239,14 @@ begin
                        XmlElement("ADR_OFF", XmlAttributes('true' "xsi:nil")) else
                        XmlElement("ADR_OFF", w.off) end
                ),
+               XmlElement("OWNER_PASS",  -- NEW
+                       XmlElement("PS_VID", w.ps_vid),
+                       XmlElement("PS_SR", w.ps_sr),
+                       XmlElement("PS_NM", w.ps_nm),
+                       XmlElement("PS_DT", to_char(w.ps_dt,g_date_format)),
+                       XmlElement("PS_ORG", w.ps_org)
+                    ),
+               
                --#101:
                NVL((SELECT   Xmlagg(Xmlelement("REL_TXT", rt.rel))
                      FROM   table(get_rel_txt(w.id)) rt
@@ -1605,13 +1614,13 @@ is
 begin
    form_p7 (l_filename);
    begin
-     select file_name, file_clob  into l_filename, l_fileclob 
+     select file_name, file_clob  into l_filename, l_fileclob
       from imp_file where file_name = l_filename;
-   exception when no_data_found then 
+   exception when no_data_found then
       l_filename := null;
       l_fileclob := null;
    end;
-   
+
    p_filename := l_filename;
    p_filebody := l_fileclob;
    --bars_audit.info('BARS_SV.FORM_P7 l_filename = '||l_filename);
