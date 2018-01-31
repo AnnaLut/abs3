@@ -1132,7 +1132,7 @@ IS
       logger.info ('find_clearance_exp. Для счета ACC=' || p_acc_parent);
 
       BEGIN
-         SELECT t1.acc, NVL (fost (t1.acc, SYSDATE), 0)
+		 SELECT t3.ACC_CLEARANCE_EXP, NVL (fost (t3.ACC_CLEARANCE_EXP, SYSDATE), 0)
            INTO p_acc_clearance_exp, p_clearance_exp
           FROM accounts t1, SMS_ACC_CLEARANCE t2, sms_acc_clearance_exp t3
           WHERE t1.acc = T2.ACC_CLEARANCE AND T3.ACC_CLEARANCE = T2.ACC_CLEARANCE and t2.acc = p_acc_parent;
