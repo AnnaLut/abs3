@@ -30,10 +30,10 @@ begin
 	POS VARCHAR2(254), 
 	NAT_COD_KR NUMBER(3,0), 
 	NAT_DT DATE, 
-	PRUCH_VIDSOTOK NUMBER(7,4), 
+	PRUCH_VIDSOTOK NUMBER(9,6), 
 	PRUCH_NOMINAL NUMBER(16,2), 
 	PRUCH_GOLOSI NUMBER(16,0), 
-	OPRUCH_VIDSOTOK NUMBER(7,4), 
+	OPRUCH_VIDSOTOK NUMBER(9,6), 
 	OPRUCH_NOMINAL NUMBER(16,2), 
 	OPRUCH_GOLOSI NUMBER(16,0), 
 	GOLUCH_VIDSOTOK NUMBER(7,4), 
@@ -266,9 +266,9 @@ exception when others then
  end;
 /
 
-PROMPT *** add  column pass ***
+PROMPT *** add  column ps_vid ***
 begin
-    execute immediate 'alter table sv_owner add pass varchar(256)';
+    execute immediate 'alter table sv_owner add ps_vid number(1)';
  exception when others then 
     if sqlcode = -1430 then null; else raise; 
     end if; 
@@ -300,6 +300,15 @@ begin
     end if; 
 end;
 /
+PROMPT *** modify  column ZAGUCH_VIDSOTOK ***
+begin
+    execute immediate 'alter table sv_owner modify  ZAGUCH_VIDSOTOK NUMBER(9,6)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/
+
 
 PROMPT *** Create  grants  SV_OWNER ***
 grant SELECT                                                                 on SV_OWNER        to BARSREADER_ROLE;
