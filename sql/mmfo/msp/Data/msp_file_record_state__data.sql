@@ -120,6 +120,15 @@ exception
 end;
 /
 
+begin
+  insert into msp_file_record_state (id, name)
+  values (99, 'Помилка при оплаті');
+exception 
+  when dup_val_on_index then 
+    null;
+end;
+/
+
 commit;
 
 PROMPT ===================================================================================== 
