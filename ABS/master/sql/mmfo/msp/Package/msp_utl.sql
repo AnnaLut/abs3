@@ -567,8 +567,12 @@ create or replace package body msp_utl is
     l_block_type_id     msp_file_records.block_type_id%type;
   begin
     -- наявність пенсіонера
-    select count(1) into l_c_pens from pfu.pfu_pensioner p
-    where p.okpo = p_numident and p.kf   = to_char(p_receiver_mfo) and p.date_off is null;
+    select count(1) 
+    into l_c_pens 
+    from pfu.pfu_pensioner p
+    where p.okpo = p_numident and p.kf = to_char(p_receiver_mfo) 
+          and p.date_off is null and rownum = 1;
+
     if (p_numident is not null) then
       if (l_c_pens = 0) then
          l_err_code := 5;
@@ -656,7 +660,7 @@ create or replace package body msp_utl is
     -- отримаємо вихідний файл для парсингу
     select filedata into l_filedata from msp_envelope_files t where id = p_envelope_file_id;
     bars.import_flat_file(l_filedata);
-    
+
     delete from msp_file_records where file_id = p_id_file;
     delete from msp_files where id = p_id_file;
 
@@ -984,7 +988,7 @@ create or replace package body msp_utl is
           rpad(coalesce(c_rec.pay_day,' '),2,' ')||
           coalesce(c_rec.displaced,' ')||
           to_char(c_rec.pers_acc_num,'FM000000')||
-          to_char(case c_rec.state_id 
+          to_char(case c_rec.state_id
                     when 10 then 0
                     when 14 then 4
                     when 17 then 6
@@ -1192,9 +1196,9 @@ create or replace package body msp_utl is
   is
     l_new_state msp_file_record_state.id%type;
   begin
-    if p_block_type_id in (5) then 
+    if p_block_type_id in (5) then
       l_new_state := 14;
-    else 
+    else
       raise_application_error(-20000, 'Хибна причина блокування оплати');
     end if;
     set_file_record_state(p_file_record_id => p_file_record_id,
@@ -1525,16 +1529,16 @@ create or replace package body msp_utl is
       elsif p_stage = 2 and r.state in (12,17) then --(12,15,17,20) then
         l_msp_env_content := read_env_content(p_id      => r.id,
                                               p_type_id => r.matching_tp);
-        select count(1) count_total, 
-               case when r.matching_tp in (1) then 
-                 sum(case when fr.state_id between 1 and 6 then 1 else 0 end) 
+        select count(1) count_total,
+               case when r.matching_tp in (1) then
+                 sum(case when fr.state_id between 1 and 6 then 1 else 0 end)
                  else 0 end count_error,
                sum(case when r.matching_tp in (1) and fr.state_id not in (-1,1,2,3,4,5,6) /*in (0,19,20)*/  then 1 -- (1) Кількість рядків файлу, що опрацьовано успішно. Оплата здійснюватиметься по даним рядкам
                         when r.matching_tp in (2) and fr.state_id in (10,17,14) then 1 -- (2) Кількість рядків файлу, по яким здійснювалась оплата
-                   else 0 end) count_verified, 
+                   else 0 end) count_verified,
                case when r.matching_tp in (2) then sum(case when fr.state_id in (10) then 1 else 0 end) else 0 end count_paid
-        into l_count_total, 
-             l_count_error, 
+        into l_count_total,
+             l_count_error,
              l_count_verified,
              l_count_paid
         from msp_envelope_files_info fi
@@ -1892,10 +1896,10 @@ create or replace package body msp_utl is
     l_parser dbms_xmlparser.parser;
     l_doc    dbms_xmldom.domdocument;
     l_rows   dbms_xmldom.domnodelist;
-    l_root_node varchar2(30) := case p_act_type when msp_const.req_PAYMENT_DATA     then 'request' 
-                                                when msp_const.req_DATA_STATE       then 'data_state_ask' 
-                                                when msp_const.req_VALIDATION_STATE then 'validation_state_ask' 
-                                                                                    else 'root' 
+    l_root_node varchar2(30) := case p_act_type when msp_const.req_PAYMENT_DATA     then 'request'
+                                                when msp_const.req_DATA_STATE       then 'data_state_ask'
+                                                when msp_const.req_VALIDATION_STATE then 'validation_state_ask'
+                                                                                    else 'root'
                                 end;
   begin
     l_parser := dbms_xmlparser.newparser;
@@ -2172,14 +2176,14 @@ create or replace package body msp_utl is
     is
       l_cnt number;
     begin
-      select count(1) 
-      into l_cnt 
-      from msp_env_content c 
+      select count(1)
+      into l_cnt
+      from msp_env_content c
       where id = p_id_env and type_id = 2;
-      
+
       if l_cnt > 0 then
         return 'D';
-      else 
+      else
         return 'R';
       end if;
     end get_match_rq_st;
@@ -2227,9 +2231,9 @@ create or replace package body msp_utl is
           -- підготовка xml відповіді
           --dbms_output.put_line('p_envelope_id='||to_char(p_envelope_id));
           select cvalue
-                 --bars.lob_utl.blob_to_clob(bvalue) 
-          into l_buff 
-          from msp_env_content c 
+                 --bars.lob_utl.blob_to_clob(bvalue)
+          into l_buff
+          from msp_env_content c
           where id = l_envelope_id and type_id = 1;
 
           p_env_rq_st  := 'S';
@@ -2243,8 +2247,8 @@ create or replace package body msp_utl is
           select id into l_envelope_id from msp_envelopes e where e.id_msp_env = p_id_env;
           -- підготовка xml відповіді
           select cvalue
-          into l_buff 
-          from msp_env_content c 
+          into l_buff
+          from msp_env_content c
           where id = l_envelope_id and type_id = 2;
 
           p_env_rq_st  := 'S';
@@ -2258,7 +2262,7 @@ create or replace package body msp_utl is
       when others then
         raise;
     end;
-    dbms_output.put_line(l_buff);
+    --dbms_output.put_line(l_buff);
     -- перетворення в base64
     if l_buff is not null and l_isencode64 then
       encode_data(l_buff);
@@ -2566,7 +2570,7 @@ create or replace package body msp_utl is
                   p_response    => p_xml,
                   p_stack_trace => l_errmsg);
     commit;
-    
+
     if l_errmsg is not null then
       raise_application_error(-20001, l_errmsg);
     end if;
@@ -2771,7 +2775,7 @@ create or replace package body msp_utl is
   begin
     --bars.bars_audit.info('msp_utl.create_envelope_file start');
     select state into l_state from msp_envelopes where id = p_id;
-    
+
     if l_state in (-1) then
       insert into msp_envelope_files_info(id, id_msp, filename, filedate, state, comm, filepath,id_file)
       values (p_id, p_id_msp, p_filename, to_date(p_filedate,'ddmmyyyyhh24miss'), -1, null, p_filepath, msp_file_seq.nextval);
@@ -2792,7 +2796,7 @@ create or replace package body msp_utl is
   end create_envelope_file;
 
 
-  
+
   procedure set_file_rest(p_file_data in clob,
                                       p_file_id   in number) is
       l_parser   dbms_xmlparser.parser;
@@ -2843,7 +2847,7 @@ create or replace package body msp_utl is
                                         p_stack_trace      => dbms_utility.format_error_backtrace());
 
     end;
-    
+
     procedure check_state          (p_file_data in clob,
                                    p_file_id   in number) is
       l_parser   dbms_xmlparser.parser;
