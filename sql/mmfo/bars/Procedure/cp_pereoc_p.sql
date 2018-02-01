@@ -7,9 +7,9 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure CP_PEREOC_P ***
 
-  CREATE OR REPLACE PROCEDURE BARS.CP_PEREOC_P (mode_ in INT, p_vob in oper.vob%type)
+CREATE OR REPLACE PROCEDURE CP_PEREOC_P (mode_ in INT, p_vob in oper.vob%type)
 IS
-   -- v.1.13 19/04/2017
+   -- v.1.14 31/01/2018
    title   CONSTANT VARCHAR2 (20) := 'CP_PEREOC_P:';
    --ce               cp_deal%ROWTYPE;  -- реквизиты сделки с ЦП
    l_accs           cp_deal.accs%type; -- счет переоценки /уценки/дооценки
@@ -29,13 +29,13 @@ IS
    l_valdate        DATE;             -- для корр проводок курс брать на дату последнего дня месяца
    l_can3800_branch branch.branch%type;
 BEGIN
-   bars_audit.info('%s Начало работы. Инициализация.'|| title);
+   bars_audit.info(title||' Начало работы. Инициализация.');
 
    if nvl(p_vob, 0) = 96
    then
-    l_valdate := DAT_NEXT_U(last_day(add_months(gl.bd,-1)),-1);
+    l_valdate := DAT_NEXT_U(DAT_NEXT_U(last_day(add_months(gl.bd,-1)), 1),-1); --DAT_NEXT_U(дата, 0) - якщо на вихідний, то плюсує. А якщо туди-сюди (+1, -1) то у разі якщо на вихідний, верне попередній робочий.
     op.vob := p_vob;
-    bars_audit.info('%s gl.bdate = %s, op.vob = %s'|| title|| to_char(gl.bdate)|| to_char(op.vob));
+    bars_audit.info(title||' gl.bdate = %s, op.vob = %s ' || to_char(gl.bdate)|| to_char(op.vob));
     op.tt := '096'; -- на случай припадка у Ф.
    else
     op.tt := 'FXP';
@@ -147,7 +147,7 @@ BEGIN
          THEN l_err := l_err||CHR(10)||CHR(13)||'Не найдены реквизиты консолидированного счета переоценки ('||ca.NLS_FXP||') для ref='|| k.REF || ' ' || l_msg;
       END;
 
-      bars_audit.info( title|| '%s Поиск предыдущей переоценки');
+      bars_audit.info( title|| ' Поиск предыдущей переоценки');
       BEGIN                                                 --COBUSUPABS-3715
          SELECT MAX (o.fdat)
            INTO l_prev_vdat
@@ -249,6 +249,13 @@ BEGIN
                        op.tt,       DK_,
                        k.kv,        ad.NLS,     S_,
                        gl.baseval,  a6.nls,     SQ_);
+                       
+                --при kk22=0 в опері залишиться з 0, потрібно виправити
+                bars_audit.info(title|| ' Переоценка - ref =' || to_char(op.ref)||' коригування oper:  s='||S_||' s2='||SQ_);
+                update oper o
+                set o.s = S_,
+                    o.s2 = SQ_
+                where o.ref = op.REF;           
              END IF;
       else
         bars_audit.info(title|| 'ca.pf = 1 ');
