@@ -1041,7 +1041,7 @@ update otc_ff7_history_acc
    set s245 ='2'
  where tip in ('SK9','SP ','SPN','OFR','KSP','KK9','KPN','SNA');
 
-logger.info ('P_FF7: etap 14 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
+logger.info ('P_FF7: etap 16 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 
 --------- Ќаполнение tmp_file03 и корректировка оборотов в otc_ff7_history_acc
 begin
@@ -1072,7 +1072,7 @@ begin
       group by ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK;
     commit;
 
-    logger.info ('P_FF7: etap 16 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
+    logger.info ('P_FF7: etap 17 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 
     for k in
         (SELECT acc, SUM (dos) dos, SUM (kos) kos
@@ -1102,7 +1102,7 @@ begin
 
 end;
 
-logger.info ('P_FF7: etap 17 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
+logger.info ('P_FF7: etap 18 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 
 ---------
 if isf8_=0 then -- формирование только наполнени€ otc_ff7_history_acc
