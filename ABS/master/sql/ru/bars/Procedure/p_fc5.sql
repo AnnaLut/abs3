@@ -1,10 +1,10 @@
-CREATE OR REPLACE PROCEDURE BARS.p_fc5 (dat_ DATE, pnd_ NUMBER DEFAULT NULL)
+CREATE OR REPLACE PROCEDURE BARS.P_FC5 (dat_ DATE, pnd_ NUMBER DEFAULT NULL)
 IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #С5 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.17.013  29/01/2018
+% VERSION     : v.17.014  31/01/2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
 
@@ -242,38 +242,10 @@ IS
    
    sum_zal  number:=0;
    
-   CURSOR saldo_cp
-   IS
-      SELECT a.acc, a.nls, a.kv, a.fdat, a.nbs, a.tip,
-             c.k077, nvl(trim(p.r011), '0'),
-             nvl(trim(p.r013), '0'), a.mdate, a.ost, a.rnk, a.isp,
-             a.tobo, nvl(p.r012, '0'), lpad(l.r030, 3, '0'), NVL(p.s580,'9')
-        FROM (SELECT s.acc, s.nls, s.kv, s.mdate, aa.fdat, s.nbs, s.tip,
-                     aa.dos, aa.kos, s.rnk, s.isp, s.pap, s.daos,
-                     aa.ost, s.dapp, s.tobo
-                FROM otcn_saldo aa, otcn_acc s
-               WHERE aa.acc = s.acc and
-                     (nvl(aa.nbs, substr(aa.nls,1,4)) in ('1490','1491','1492','1493') or
-                      fl_cp_ = 0 and nvl(aa.nbs, substr(aa.nls,1,4)) in ('3190','3290'))
-             ) a,
-             kl_r030 l,
-             specparam p,
-             ( select l.rnk, nvl(k.k077,'3') k077
-                 from customer l,
-                     ( select *  from kl_k070
-                        where d_open <= dat_
-                          and d_close is null or d_close > dat_ ) k
-                where l.ise = k.k070 (+)
-             ) c
-       WHERE a.ost <> 0
-         AND a.kv = TO_NUMBER (l.r030)
-         AND a.acc = p.acc(+)
-         and a.rnk = c.rnk;
-
     procedure P_Set_S580_Def(r020_ in varchar2, t020_ in varchar2, r011_ in varchar2, s245_ in varchar2) is
        invk_ varchar2(1);
     begin
-       if s580_ = '0' or r020_ = '2625' then
+       if s580_ = '0' or r020_ in ('2233', '2238', '2625', '3114', '3570') then
 
            select nvl(max(s580), '9')
            into s580r_
@@ -556,11 +528,7 @@ BEGIN
                           WHERE s.ost <> 0 and
                                 s.acc = a.acc and
                                 s.acc = cc.acc(+) and
-                                nvl(s.nbs, substr(s.nls,1,4)) not in (''1490'',''1491'',''1492'',''1493'',
-                                            ''1590'',''1592'',''1890'',''2400'',''2401'',''2890'',''3190'',''3290'',
-                                            ''1429'',''1509'',''1519'',''1529'',''2019'',''2029'',''2039'',''2069'',''2079'',''2089'',
-                                            ''2109'',''2119'',''2129'',''2139'',''2209'',''2239'',''2609'',''2629'',''2659'',''3119'',''3219'',''3107'',
-                                            ''3590'',''3599'',''3690'',''3692'')
+                                a.tip <> ''REZ''
                          ) a
                          join customer c
                              ON (a.rnk = c.rnk)
@@ -786,7 +754,7 @@ BEGIN
                     THEN
                        IF dat_ >= dat_zmin4 then
 
-                          kodp_ := dk_ || nbs_ || r011_||o_r013_2 || LPAD (kv_,3,'0') || s580_||r017_||segm_WWW||s245_||k077_;
+                          kodp_ := dk_ || nbs_ || r011_||o_r013_2 || LPAD (kv_,3,'0') || s580_||r017_||segm_WWW||'2'||k077_;
 
                        else
 
@@ -998,11 +966,11 @@ BEGIN
                       values(acc_, k.accs, sz0_, 1, kv_);
 
                       begin
-                        select max(s580)
+                        select nvl(max(s580), '9')
                         into s580a_
                           from nbur_ref_risk_s580
                           where r020 = k.nbs and 
-                                t020 = (case when k.ost<0 then '1' else '2' end) and
+                                (t020 = (case when k.ost<0 then '1' else '2' end) or t020 = '*')  and
                                 (r011 = substr(p.kodp,6,1) or r011 = '*') and
                                 (S245 = substr(p.kodp,16,1) or S245 = '*'); 
                       exception
@@ -1432,18 +1400,13 @@ BEGIN
       if k.s580 <> '0' then
          s580a_ := k.s580;
       else
-          begin
-            select max(s580)
-            into s580a_
-              from nbur_ref_risk_s580
-              where r020 = nbs_ and 
-                    t020 = '2' and
-                    (r011 = r011_ or r011 = '*') and
-                    (S245 = s245_ or S245 = '*');
-          exception
-            when no_data_found then
-                s580a_ := '9';
-          end;
+        select nvl(max(s580), '9')
+        into s580a_
+          from nbur_ref_risk_s580
+          where r020 = k.nbs and 
+                (t020 = '1' or t020 = '*') and
+                (r011 = r011_ or r011 = '*') and
+                (S245 = s245_ or S245 = '*');
       end if;
 
  --  сегмент Q + сегмент WWW : умолчания
@@ -1541,58 +1504,6 @@ BEGIN
       end if;
    end loop;
 
-   select count( * )
-   into fl_cp_
-   from rnbu_trace
-   where kodp like '23119%' or
-         kodp like '23219%';
-
-   OPEN saldo_cp;
-
-   LOOP
-      FETCH saldo_cp
-       INTO acc_, nls_, kv_, data_, nbs_, tips_, k077_, r011_,
-            r013_, mdate_, sn_, rnk_, isp_, tobo_, r012_, r030_, s580_;
-      EXIT WHEN saldo_cp%NOTFOUND;
-
-      IF typ_ > 0 THEN
-         nbuc_ := NVL (F_Codobl_Tobo (acc_, typ_), nbuc1_);
-      ELSE
-         nbuc_ := nbuc1_;
-      END IF;
-
-      r013_ := NVL (TRIM (r013_), '0');
-
- --  сегмент Q + сегмент WWW : умолчания
-          r017_ := '3';
-          segm_WWW := LPAD (kv_, 3,'0');
-
-     IF kv_ <> 980 THEN
-         se_ := gl.p_icurval (kv_, sn_, dat_);
-      ELSE
-         se_ := sn_;
-      END IF;
-
-      dk_ := iif_n (se_, 0, '1', '2', '2');
-
-      kodp_ := dk_ || nbs_|| r011_||r013_|| r030_|| s580_||r017_||segm_WWW||'1'||k077_;
-
-      znap_ := to_char(abs(se_));
-
-      INSERT INTO rnbu_trace
-                  (recid, userid, nls, kv, odate, kodp,
-                   znap, acc, rnk, isp, mdate,
-                   comm, nbuc, tobo
-                  )
-           VALUES (s_rnbu_record.NEXTVAL, userid_,
-                   nls_, kv_, data_, kodp_,
-                   znap_, acc_, rnk_, isp_, mdate_,
-                   null, nbuc_, tobo_
-                  );
-   end loop;
-
-   close saldo_cp;
-
 --------------------------------------------------
 -- списання за рахунок резерву
    declare
@@ -1610,24 +1521,8 @@ BEGIN
                       where o.fdat = any (select fdat from fdat
                                            where fdat between datp_ and dat_
                                              and fdat !=to_date('20171218','yyyymmdd')  ) and
-                        o.acc = a.acc and
-                        (a.nls like '159%' or
-                         a.nls like '189%' or
-                         a.nls like '240%' or
-                         a.nls like '289%' or
-                         a.nls like '329%' or
-                         a.nls like '359%' or
-                         a.nls like '369%' or
-              dat_ > to_date('20171218','yyyymmdd') and
-                              (      a.nls like '15_9%'
-                                or   a.nls like '20_9%'
-                                or   a.nls like '21_9%'
-                                or   a.nls like '22_9%'
-                                or   a.nls like '26_9%'
-                                or   a.nls like '3107%'
-                                or   a.nls like '3119%'
-                                or   a.nls like '3219%' )
-                         )
+                        o.acc = a.acc 
+                        and a.tip = 'REZ' 
                         and o.tt not like 'AR%'
                         and o.ref = z.ref
                         and o.fdat = z.fdat
