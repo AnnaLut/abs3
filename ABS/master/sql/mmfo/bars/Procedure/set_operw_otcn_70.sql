@@ -60,7 +60,7 @@ begin
             SELECT txt
               INTO l_NAME_DD#70
               FROM  kod_d3_1
-             WHERE p40 = p_value;
+             WHERE p40 = p_value and data_c is null;
           EXCEPTION
              WHEN NO_DATA_FOUND THEN return;
           end;
@@ -79,7 +79,7 @@ begin
             SELECT txt
               INTO l_NAME_DA#E2
               FROM kod_e2_1
-             WHERE p40 = p_value;
+             WHERE p40 = p_value and data_c is null;
           EXCEPTION
              WHEN NO_DATA_FOUND THEN return;
           end;
@@ -98,7 +98,7 @@ begin
             SELECT txt
               INTO l_NAME_DD#70
               from kod_c9_1
-             WHERE p40 = p_value;
+             WHERE p40 = p_value and data_c is null;
           EXCEPTION
              WHEN NO_DATA_FOUND THEN return;
           end;
