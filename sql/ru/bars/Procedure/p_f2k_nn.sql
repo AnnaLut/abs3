@@ -4,7 +4,7 @@ CREATE OR REPLACE PROCEDURE BARS.P_F2K_NN (dat_ DATE ,
 % DESCRIPTION : Процедура формирование файла #2K
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 %
-% VERSION     : v.18.002     10.01.2018
+% VERSION     : v.18.003     31.01.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: dat_ - отчетная дата
            sheme_ - схема формирования
@@ -18,6 +18,7 @@ CREATE OR REPLACE PROCEDURE BARS.P_F2K_NN (dat_ DATE ,
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+ 31.01.2018  отсекаем закрытых клиентов 
  10.01.2018  ограничение по отбору операций по типу оплаты SOS
  05.01.2018  добавлено формирование DDD=351
  04.01.2018  исключены операции по счетам КТ=65__
@@ -296,6 +297,7 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
                               )
                      ) re
                where c.rnk = re.rnk
+                 and c.date_off is null
                  and trim(re.rnbor) is not null
                group by c.okpo
             )
