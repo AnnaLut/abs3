@@ -3,7 +3,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_ff8 (Dat_ DATE) IS
 DESCRIPTION : ѕроцедура формировани€ файла #F8 дл€  Ѕ
 COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 
-VERSION     :   v.18.001    23.01.2018
+VERSION     :   v.18.001    31.01.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетна€ дата
 
@@ -323,6 +323,52 @@ update otc_ff8_history_acc o
      and nbs in ('2246','2248','2456','2457','2458')
      and r011 in ('1');
 
+--                          счета просроченных процентов
+     for u in ( select o.nls
+                   from otc_ff8_history_acc o, otcn_acc a
+                  where o.tip !='SPN'
+                    and o.nls = a.nls
+                    and length(trim(a.nls_alt)) >10
+                    and ( a.nls_alt like '1509%'   or a.nls_alt like '1519%'
+                       or a.nls_alt like '1529%'   or a.nls_alt like '2029%'
+                       or a.nls_alt like '2039%'   or a.nls_alt like '2069%'
+                       or a.nls_alt like '2079%'   or a.nls_alt like '2089%'
+                       or a.nls_alt like '2209%'   or a.nls_alt like '2219%'
+                       or a.nls_alt like '2229%'   or a.nls_alt like '2239%'  
+                       or a.nls_alt like '2109%'   or a.nls_alt like '2119%'
+                       or a.nls_alt like '2129%'   or a.nls_alt like '2139%' )
+     ) loop
+          update otc_ff8_history_acc
+             set tip='SPN'
+           where nls = u.nls;
+     end loop;
+--                          счета просроченного тела
+     for u in ( select o.nls
+                   from otc_ff8_history_acc o, otcn_acc a
+                  where o.tip !='SP '
+                    and o.nls = a.nls
+                    and length(trim(a.nls_alt)) >10
+                    and ( a.nls_alt like '1517%'   or a.nls_alt like '1527%'
+                       or a.nls_alt like '2027%'   or a.nls_alt like '2037%'
+                       or a.nls_alt like '2067%'   or a.nls_alt like '2077%'
+                       or a.nls_alt like '2087%'   or a.nls_alt like '2207%'
+                       or a.nls_alt like '2217%'   or a.nls_alt like '2227%'
+                       or a.nls_alt like '2237%'   or a.nls_alt like '2107%'
+                       or a.nls_alt like '2117%'   or a.nls_alt like '2127%'
+                       or a.nls_alt like '2137%' )
+     ) loop
+          update otc_ff8_history_acc
+             set tip='SP '
+           where nls = u.nls;
+     end loop;
+--                          счета процентов
+          update otc_ff8_history_acc
+             set tip='SN '
+           where tip !='SN ' and tip !='SPN'
+             and (  nbs like '2__8'
+                 or nbs like '15_8'
+                 or nbs in ('1607','2607','2627','2657','3568') );
+
 -- изменение S080 на новые значени€ "A" или "M" в соответствии с KL_S080
 if dat_ >= to_date('31012017','ddmmyyyy') then
     update otc_ff8_history_acc o
@@ -498,8 +544,6 @@ logger.info ('P_FF8: etap 9 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 -- показник 04 - к≥льк≥сть чинних кредитних договор≥в, щодо €ких прийн€то
 --               р≥шенн€ про реструктуризац≥ю - щодо сплати основного боргу
 --               та сплати в≥дсотк≥в/ком≥с≥й
-        if dat_ <to_date('20171229','yyyymmdd')  then
-
 INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nd, rnk, comm, nbuc, tobo)
 select *
 from (
@@ -513,7 +557,7 @@ from (
                          s080               ||
                          '00'               ||
 --                         max(s270)          ||
-                         lpad(nvl(kv_dog,kv),3,'0') kodp,
+                         lpad(nvl(kv_dog,kv),3,'0')||s245 kodp,
                          (case when f.nd<0 then
                            null
                          else
@@ -550,13 +594,12 @@ from (
                                              vid_restr = 1 -- одновременно реструктуризаци€ осн.долга и %%-в
                                        )
                                )  and
-                         (length(trim(f.cc))=2 or f.cc like '__2')-- счета осн. задож-сти и прострочки по осн. задолж-ти
-                  group by nvl(kv_dog,kv), substr(cc,1,2), k111, s080, lpad(nvl(kv_dog,kv),3,'0'),
+                         (length(trim(f.cc))=2 or f.tip='SP ')-- счета осн. задож-сти и прострочки по осн. задолж-ти
+                  group by nvl(kv_dog,kv), substr(cc,1,2), k111, s080, lpad(nvl(kv_dog,kv),3,'0'), s245,
                            f.nd, rnk, decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_)), tobo)
     select nls, kv, dt, '04'||kodp, cnt znap, nd, rnk, comm, nbuc, tobo
     from kred
 );
-        end if;
 
 -- показник 05 - к≥льк≥сть чинних кредитних договор≥в, щодо €ких прийн€то
 --               р≥шенн€ про реструктуризац≥ю - щодо сплати основного боргу
@@ -606,7 +649,7 @@ from (
                                                             c.vid_restr in (1, 3, 16)) -- нет реструктуризаци€ %%-в и всего
                                        )
                                 ) and
-                         (length(trim(f.cc))=2 or f.cc like '__2')-- счета осн. задож-сти и прострочки по осн. задолж-ти
+                         (length(trim(f.cc))=2 or f.tip='SP ')-- счета осн. задож-сти и прострочки по осн. задолж-ти
                   group by nvl(kv_dog,kv), substr(cc,1,2), k111, s080, lpad(nvl(kv_dog,kv),3,'0'), s245,
                            f.nd, rnk, decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_)), tobo)
     select nls, kv, dt, '05'||kodp, cnt znap, nd, rnk, comm, nbuc, tobo
@@ -662,7 +705,7 @@ from (
                                                             c.vid_restr in (3, 16)) -- есть реструктуризаци€ %%-в
                                        )
                                  ) and
-                           (length(trim(f.cc))=2 or f.cc like '__2')-- счета осн. задож-сти и прострочки по осн. задолж-ти
+                           (length(trim(f.cc))=2 or f.tip='SP ')-- счета осн. задож-сти и прострочки по осн. задолж-ти
                   group by nvl(kv_dog,kv), substr(cc,1,2), k111, s080, lpad(nvl(kv_dog,kv),3,'0'), s245,
                            f.nd, rnk, decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_)), tobo)
     select nls, kv, dt, '06'||kodp, cnt znap, nd, rnk, comm, nbuc, tobo
@@ -708,7 +751,7 @@ from (
                                  b.PR_NO = 1
                            group by nd) p
                   where  f.datf=dat_ and
-                         (length(trim(f.cc))=2 or f.cc like '__2') and -- счета осн. задож-сти и прострочки по осн. задолж-ти
+                         (length(trim(f.cc))=2 or f.tip='SP ') and -- счета осн. задож-сти и прострочки по осн. задолж-ти
                          f.nd = p.nd
                   group by nvl(kv_dog,kv), substr(cc,1,2), k111, s080, lpad(nvl(kv_dog,kv),3,'0'), s245, 
                            f.nd, rnk, decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_)), tobo, p.sumr)
@@ -757,7 +800,7 @@ from (
                                  b.PR_NO = 1
                           group by nd) p
                   where  f.datf=dat_ and
-                         (f.cc like '__1' or f.cc like '__3') and -- счета начисл. %% -в и простроченных %% -в
+                         f.tip in ('SN ','SPN') and -- счета начисл. %% -в и простроченных %% -в
                          f.nd = p.nd
                   group by nvl(kv_dog,kv), substr(cc,1,2), k111, s080, lpad(nvl(kv_dog,kv),3,'0'), s245,
                            f.nd, rnk, decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_)), tobo, p.sumr)
@@ -797,7 +840,7 @@ from (
                          sum(ostq)                  ost
                   from   OTC_ff8_HISTORY_ACC f
                   where  f.datf=dat_ and
-                         (length(trim(f.cc))=2 or f.cc like '__2') and -- счета осн. задож-сти и прострочки по осн. задолж-ти
+                         (length(trim(f.cc))=2 or f.tip ='SP ') and -- счета осн. задож-сти и прострочки по осн. задолж-ти
                          exists (select nd
                                   from v_cck_restr v
                                   where v.nd = f.nd and
@@ -860,7 +903,7 @@ from (
                                  v.PR_NO = 1
                           group by nd) p
                   where  f.datf=dat_ and
-                         (length(trim(f.cc))=2 or f.cc like '__2') and -- счета осн. задож-сти и прострочки по осн. задолж-ти
+                         (length(trim(f.cc))=2 or f.tip ='SP ') and -- счета осн. задож-сти и прострочки по осн. задолж-ти
                          f.nd = p.nd and
                          p.p1 = 0 and
                          p.p2 >= 1 and
@@ -919,7 +962,7 @@ from (
                                  v.PR_NO = 1
                           group by nd) p
                   where  f.datf=dat_ and
-                         (f.cc like '__1' or f.cc like '__3') and -- счета начисл. %% -в и простроченных %% -в
+                         f.tip in ('SN ','SPN') and -- счета начисл. %% -в и простроченных %% -в
                          f.nd = p.nd and
                          p.p1 = 0 and
                          p.p2 >= 1 and
@@ -966,7 +1009,7 @@ from (
                          sum(ostq)                  ost
                   from   OTC_ff8_HISTORY_ACC f
                   where  f.datf=dat_                  and
-                         (length(trim(f.cc))=2 or f.cc like '__2') and  -- счета осн. задож-сти и прострочки по осн. задолж-ти
+                         (length(trim(f.cc))=2 or f.tip ='SP ') and  -- счета осн. задож-сти и прострочки по осн. задолж-ти
                          f.nd in (select nd
                                   from   v_cck_restr b
                                   where  b.vid_restr not in (3, 16) and -- in (1,2,4,5,7,8) and -- ¬ирко 11/08/2010 --18/01/2010
@@ -1012,7 +1055,7 @@ from (
                          sum(f.ostq)                  ost
                   from   OTC_ff8_HISTORY_ACC f
                   where  f.datf=dat_                  and
-                         (f.cc like '__1' or f.cc like '__3') and -- счета начисл. %% -в и простроченных %% -в
+                         f.tip in ('SN ','SPN') and -- счета начисл. %% -в и простроченных %% -в
                          f.nd in (select nd
                                   from   v_cck_restr b
                                   where  b.vid_restr in (1, 3, 16) and -- ¬ирко 11/08/2010 --18/01/2010
@@ -1020,10 +1063,10 @@ from (
                                          b.PR_NO = 1
                                   ) and
                           f.s080 in ('Q', 'J') and
-                         (f.cc like '__1' and f.r013 is not null  or  -- nvl(f.r013,'0') not in ('0', '3')
-                          f.cc like '__3' and f.r013 is not null  or  -- nvl(f.r013,'0') not in ('0', '1')
-                          f.cc like '__1' and f.s270 = '08' or
-                          f.cc like '__3' and f.s370 = 'J')
+                         (f.tip ='SN ' and f.r013 is not null  or  -- nvl(f.r013,'0') not in ('0', '3')
+                          f.tip ='SPN' and f.r013 is not null  or  -- nvl(f.r013,'0') not in ('0', '1')
+                          f.tip ='SN ' and f.s270 = '08' or
+                          f.tip ='SPN' and f.s370 = 'J')
                   group by nvl(f.kv_dog,kv), substr(f.cc,1,2), f.k111, f.s080, lpad(nvl(f.kv_dog,f.kv),3,'0'), s245,
                            f.nd, f.rnk, decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_)), f.tobo)
     select nls, kv, dt, '16'||kodp, -ost znap, nd, rnk, comm, nbuc, tobo
@@ -1044,7 +1087,7 @@ from (
                          s080               ||
                          '00'               ||
 --                         max(s270)          ||
-                         lpad(nvl(kv_dog,kv),3,'0')||s245 kodp,
+                         lpad(nvl(kv_dog,kv),3,'0')||'2' kodp,
                         (case when f.nd<0 then
                            null
                          else
@@ -1059,7 +1102,7 @@ from (
                          sum(ostq)                  ost
                   from   OTC_ff8_HISTORY_ACC f
                   where  f.datf=dat_                  and
-                         (f.cc like '__2') and -- счета прострочки по осн. задож-сти
+                         f.tip ='SP ' and -- счета прострочки по осн. задож-сти
                          f.nd in (select nd
                                   from   v_cck_restr b
                                   where  b.vid_restr not in (3, 16) and -- in (1,2,4,5,7,8) and -- ¬ирко 11/08/2010 --18/01/2010
@@ -1067,8 +1110,8 @@ from (
                                          b.PR_NO = 1
                                   ) and
 --                         f.s080 in ('2', '3', '4', '5')  and
-                         f.s270 in ('07', '08')  and s245='2'
-                  group by nvl(kv_dog,kv), substr(cc,1,2), k111, s080, lpad(nvl(kv_dog,kv),3,'0'), s245,
+                         f.s270 in ('07', '08')  
+                  group by nvl(kv_dog,kv), substr(cc,1,2), k111, s080, lpad(nvl(kv_dog,kv),3,'0'),
                            f.nd, rnk, decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_)), tobo)
     select nls, kv, dt, '18'||kodp, -ost znap, nd, rnk, comm, nbuc, tobo
     from kred);
@@ -1089,7 +1132,7 @@ from (
                          NVL(s080,'0')      ||
                          '00'               ||
 --                         max(s270)          ||
-                         lpad(nvl(kv_dog,kv),3,'0')||s245 kodp,
+                         lpad(nvl(kv_dog,kv),3,'0')||'2' kodp,
                         (case when f.nd<0 then
                            null
                          else
@@ -1104,14 +1147,14 @@ from (
                          sum(ostq)                  ost
                   from   OTC_ff8_HISTORY_ACC f
                   where  f.datf=dat_                  and
-                         (f.cc like '__3') and -- счета простроч. начисл. %% -в
+                         f.tip ='SPN' and -- счета простроч. начисл. %% -в
                          f.nd in (select nd
                                   from   v_cck_restr b
                                   where  b.vid_restr in (1, 3, 16) and -- ¬ирко 11/08/2010 --18/01/2010
                                          dat_ between b.fdat and nvl(b.FDAT_END, dat_)  and
                                          b.PR_NO = 1
-                                  ) and s245='2'
-                  group by nvl(kv_dog,kv), substr(cc,1,2), k111, s080, lpad(nvl(kv_dog,kv),3,'0'), s245,
+                                  ) 
+                  group by nvl(kv_dog,kv), substr(cc,1,2), k111, s080, lpad(nvl(kv_dog,kv),3,'0'),
                            f.nd, rnk, decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_)), tobo)
     select nls, kv, dt, '19'||kodp, -ost znap, nd, rnk, comm, nbuc, tobo
     from kred);
