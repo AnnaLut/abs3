@@ -1424,10 +1424,10 @@ BEGIN
             glb_ := 0;
          END;
 
-          if rez_ in (2,4,6) then  --and substr(kod_okpo,1,2) != 'IN' then
+          if rez_ in (2,4,6) then  --and substr(kod_okpo,1,1) != 'I' then
              okpo_nerez := trim(kod_okpo);
-             if mfo_ = 324805 and substr(kod_okpo,1,2) <> 'IN' then
-                kod_okpo := 'IN'||LPAD (substr(trim(kod_okpo),1,8), 8, '0');
+             if mfo_ = 324805 and substr(kod_okpo,1,1) <> 'I' then
+                kod_okpo := 'I'||LPAD (to_char(rnk_), 9, '0');
              end if;
 
              if length(okpo_nerez) > 8 then
