@@ -1,4 +1,3 @@
-SET ESCAPE ON;
 declare
     l_app_code varchar2(10 char) := 'OPFU';
     l_funcname varchar2(250 Byte);
