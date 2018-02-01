@@ -4,7 +4,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
 % DESCRIPTION : Процедура формирования #E2 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.17.005      22.01.2018 (12.01.2018, 10.01.2018)
+% VERSION     : v.17.005      29.01.2018 (22.01.2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -15,6 +15,11 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
    NNN        условный порядковый номер
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+29.01.2018 для формирования переменной D3#E2_ (дата контракта) добавил
+           еще одно условие для формата даты 'DD-MM-YYYY'
+           (доп.параметр D3#70 был заполнен в таком виде и 
+            и возникала ошибка).
+           Изменено формирование показателя 61NNN 
 22.01.2018 изменено формирование показателя 54NNN
 12.01.2018 изменено формирование показателя 53NNN
 03.01.2018 добавлено формирование показателя 32NNN и 
@@ -168,7 +173,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
    kol_61     number;
    DC1#E2_    VARCHAR2 (70);
    DE#E2_     VARCHAR2 (3);
-   D53#E2_    VARCHAR2 (70) := null;
+   D53#E2_    VARCHAR2 (135) := null;
    D54#E2_    VARCHAR2 (2) := null;
    D55#E2_    VARCHAR2 (1) := null;
    nazn_      VARCHAR2 (160);
@@ -589,6 +594,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
                when d1#E2_ = '21' then p_value_ := 'Імпорт товарів, робіт, послуг';
                when d1#E2_ = '23' then p_value_ := 'Погашення клієнтом кредиту від нерезидента (не банку)';
                when d1#E2_ = '24' then p_value_ := 'Погашення банком кредиту від банку-нерезидента';
+               when d1#E2_ = '25' then p_value_ := 'Імпорт товарів(продукції, робіт, послуг) без ввезення';
                when d1#E2_ = '26' then p_value_ := 'Надання кредиту нерезиденту';
                when d1#E2_ = '27' then p_value_ := 'Розміщення депозиту в нерезидента';
                when d1#E2_ = '28' then p_value_ := 'Конвертація';
@@ -608,6 +614,9 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
                when d1#E2_ = '42' then p_value_ := 'Державне фінансування';
                when d1#E2_ = '43' then p_value_ := 'Платежі за судовими рішеннями';
                when d1#E2_ = '44' then p_value_ := 'За операціями з купівлі банківських металів';
+               when d1#E2_ = '45' then p_value_ := 'Імпорт товарів(продукції, робіт, послуг) на умовах поперед.оплати';
+               when d1#E2_ = '46' then p_value_ := 'Повернення дивідентів';
+
             else 
                null;
             end case;
@@ -648,9 +657,11 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
                select substr(MAX(trim(benef_name)), 1,135)
                into d53#E2_
                from v_cim_all_contracts
-               where num = upper(cont_num_) and
+               where upper(num) = upper(cont_num_) and
                      open_date = to_date(cont_dat_, 'ddmmyyyy')  and
-                     status_id in ( 0, 8);        
+                     status_id in (0, 8) and
+                     lpad(okpo, 10, '0') = lpad(okpo_, 10, '0') and
+                     contr_type = 1;        
             end if;
 
             if d53#E2_ is not null then
@@ -1588,6 +1599,8 @@ BEGIN
                                        D3#E2_ := to_char(to_date(D3#E2_, 'dd/mm/yyyy'), 'ddmmyyyy');
                                     elsif instr(D3#E2_, '.') > 0 then
                                        D3#E2_ := to_char(to_date(D3#E2_, 'dd.mm.yyyy'), 'ddmmyyyy');
+                                    elsif instr(D3#E2_, '-') > 0 then
+                                       D3#E2_ := to_char(to_date(D3#E2_, 'dd-mm-yyyy'), 'ddmmyyyy');
                                     else 
                                        D3#E2_ := to_char(to_date(D3#E2_), 'ddmmyyyy');
                                     end if;
