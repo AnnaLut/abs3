@@ -723,6 +723,7 @@
 
                                 SumC_t: sum.toFixed(2),
                                 nazn: 'Док ' + record.ND.trim() + ' від ' + kendo.toString(record.DATD, 'dd/MM/yyyy') + ' ' + record.NAZN,
+								BPROC: encodeURI("set role bars_access_defrole@begin sep.check_t902_dok(" + record.REF + "); end;"),
                                 APROC: encodeURI("set role bars_access_defrole@begin sep.del_ref_t902(" + record.REF + "); end;")
                             };
                             //if (record.DK === 1) {
@@ -804,6 +805,7 @@
 
                                         SumC_t: sum.toFixed(2),
                                         nazn: 'Док ' + record.ND + 'від ' + kendo.toString(record.DATD, 'dd/MM/yyyy') + ' ' + record.NAZN,
+										BPROC: encodeURI("set role bars_access_defrole@begin sep.check_t902_dok(" + record.REF + "); end;"),
                                         APROC: encodeURI("set role bars_access_defrole@begin sep.del_ref_t902(" + record.REF + "); end;")
                                     };
 
