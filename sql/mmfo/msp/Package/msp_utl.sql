@@ -585,7 +585,6 @@ create or replace package body msp_utl is
     begin
       select * into l_pensacc_row from pfu.pfu_pensacc pa
       where pa.nls = to_char(p_deposit_acc) and pa.kf = to_char(p_receiver_mfo);
-            --and pa.id = 62249993;
     exception
       when no_data_found then
         l_err_code    := 4;
@@ -1988,6 +1987,9 @@ create or replace package body msp_utl is
         where f.id = l_req_id
         ) t where rn = 1;
     exception
+      when no_data_found then
+        -- R Ц- в≥дпов≥дь не готова
+        raise ex_r;
       when others then
         raise;
     end;
@@ -2262,7 +2264,6 @@ create or replace package body msp_utl is
       when others then
         raise;
     end;
-    --dbms_output.put_line(l_buff);
     -- перетворенн€ в base64
     if l_buff is not null and l_isencode64 then
       encode_data(l_buff);
@@ -2652,7 +2653,7 @@ create or replace package body msp_utl is
 
           end loop;
           --TRANS_TYPE_CHECKSTATE проставл€Їмо тип  4    CHECKPAYMSTATE  ќпитуванн€ статусу платежу
-          l_transport_unit_id := pfu.transport_utl.create_transport_unit(pfu.transport_utl.TRANS_TYPE_CHECKSTATE,
+          l_transport_unit_id := pfu.transport_utl.create_transport_unit(pfu.transport_utl.TRANS_TYPE_CHECKSTATE_MSP,
                                                                      rec_mfo.mfo,
                                                                      pfu.transport_utl.get_receiver_url(rec_mfo.mfo),
                                                                      dbms_xmldom.getXmlType(l_doc)
