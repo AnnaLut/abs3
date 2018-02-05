@@ -18,6 +18,7 @@ PROMPT *** Create  procedure RETURN_TRANFER ***
 is
 
 /*
+ 02.02.2018 Исправление Ошибки "Обратные проводки с асинхронным stmt" - Нашел ММ - спс.
  23.11.2017 Трансфер-2017 7109.02 ===> 7509.02	за операціями з клієнтами
 
  Заявка .....
@@ -126,8 +127,16 @@ begin
               nam_b_ => oo.nam_b , nlsb_ => oo.nlsb , mfob_ => oo.mfob , nazn_ => oo.nazn ,
               d_rec_ => oo.d_rec , id_a_ => oo.id_a , id_b_ => oo.id_b , id_o_ => null    ,
               sign_  => null     , sos_  => 1       , prty_ => null    , uid_  => null  ) ;
-      for k in (select * from opldok where ref =p_ref1 order by stmt, dk )
-      loop  gl.pay2 (NULL, oo.ref, gl.bdate, k.tt, null, 1-k.dk, to_char(k.acc), k.s, k.sq, 1, pp.txt );  end loop;
+          -- 02.02.2018 Исправление Ошибки "Обратные проводки с асинхронным stmt" - Нашел ММ - спс.
+----- for k in (select * from opldok where ref =p_ref1 order by stmt, dk )
+----- loop  gl.pay2 (NULL, oo.ref, gl.bdate, k.tt, null, 1-k.dk, to_char(k.acc), k.s, k.sq, 1, pp.txt );  end loop;
+       for k in (select od.acc ACCD, ok.acc ACCK, od.s , od.sq , od.tt
+                from opldok od, opldok ok 
+                where od.ref = p_ref1 and od.dk = 0 and ok.ref = od.ref and ok.dk = 1 and od.stmt = ok.stmt 
+               )
+      loop gl.pay2 (NULL, oo.ref, gl.bdate, k.tt, null, 1, to_char(k.accD), k.s, k.sq, 1, pp.txt );  
+           gl.pay2 (NULL, oo.ref, gl.bdate, k.tt, null, 0, to_char(k.accK), k.s, k.sq, 0, pp.txt );  
+      end loop;
 
    end if;
 
