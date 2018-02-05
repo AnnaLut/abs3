@@ -7,15 +7,19 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_F1A_NN ***
 
-  CREATE OR REPLACE PROCEDURE BARS.P_F1A_NN (Dat_ DATE,
-                                      sheme_ varchar2 default 'G') IS
+CREATE OR REPLACE PROCEDURE BARS.p_f1a_nn (Dat_ DATE,
+                                      sheme_ varchar2 default 'D') IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Процедура формирования файла #1A для КБ
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 05/06/2015 (10/03/2015, 15/12/2014, 13/10/2014)
+% VERSION     : 05/02/2018 (10/05/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+10/05/2017 - после наполнения TMP_FILE03 добавил COMMIT
+07/03/2017 - для февраля месяца 2017, 2018, 2019 годов переменная
+             Dat1_ := last_day(dat_)
+             (возникала ошибка для to_char(dat_, 'MMYYYY') ='022015')
 05/06/2015 - на 01.06.2015 не будут формироваться коды 41,51
 10/03/2015 - для февраля месяца день месяца не всегда формировался верно
 15/12/2014 - не будет формироваться прогноз за предыдущий месяц и
@@ -26,47 +30,6 @@ PROMPT *** Create  procedure P_F1A_NN ***
              Дт 26_8 Кт 3800 и код операции "%15"
 22/04/2014 - прогноз (показатель 31) предоставляется на отчетный
              и следующий за ним годы
-03/08/2012 - на 01.08.2012 не должны формироваться показатели 410,421,422,
-             430,440,450
-11/10/2011 - неправильно расчитывалась последняя сумма, если мы не "попадали"
-             на месяц последнего начисления процентов (в сучае не ежемесячного
-             начисления)
-09/06/2011 - убрада умножение и деление для кодов 41,51 и поправила алгоритм
-             расчета этих показателей, а также учла некоторые нюансы
-09.02.2011 - для кодов 41,51 не всегда определяся код "DDD"
-08.02.2011 - для кодов 41,51 не всегда определяся код области или
-             код подразделения. Для переменных NBUC, NBUC1 будет
-             VARCHAR2(20) вместо VARCHAR2(12).
-07.02.2011 - изменил формирование показателей 41VVVKKKZ00000 и
-             51VVVKKKZ00000. В показатель 41VVVKKKZ00000 будет включаться
-             вся сумма списания и 51VVVKKKZ00000 только сумма погашенная
-             досрочно
-01.02.2011 - добавлено формирование двух новых показателей 41VVVKKKZ00000 -
-             сума фактичного погашення заборгованост? за зв?тний м?сяць
-             и 51VVVKKKZ00000 - сума фактичного дострокового погашення
-04.06.2010 - для просроченных депозитов и процентов формируем показатель
-             "21" и не будем формировать прогноз.
-             Для непросроченных депозитов и процентов формируем показатель
-             "31" и будем формировать прогноз.
-03.06.2010 - для просроченных депозитов дополнительно формируем показатель
-             "21" и не будем формировать прогноз.
-             Для счетов начисленных %% формируем код "21" вместо "31"
-05.02.2010 - для табл. INT_ACCN добавил условие ID=0 and ROWNUM=1
-27.01.2010 - выполняем расчет прогноза для кодов 271,272,273 ранее было
-             для кода 270 (с 01.02.2010 код 270 разбивается на эти три кода)
-24.11.2009 - для 2628 оставляем только те счета для которых в основном счете
-             R013=''1'
-19.11.2009 - для freq_=0 mdater_=mdate_ и для расчета суммы прогноза за посл.
-             месяц кол-во дней уменьшаем на 1 (mdate-1)
-11.11.2009 - для ЮЛ начальная дата для прогноза всегда 1-ое число нового
-             месяца и конечная дата последний день месяца
-             для ФЛ начальная дата это дата открытия счета и конечная дата
-             это начальна дата + периодичность выплаты процентов
-06.11.2009 - не обнулялись некоторые переменные
-04.11.2009 - добавила обработку счета 2628
-03.08.2009 - для Петрокоммерца и показателей прогноза начисленных процентов
-             для клиентов банков и ЮЛ нерезидентов (CODCAGENT in (2,4)) и
-             имеющих код страны  643 вычитаем 10% налога (МФО=300120)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 kodf_    varchar2(2):='1A';
 k_       Number;
@@ -224,31 +187,63 @@ BEGIN
     end if;
 
     -- наповнення проводок за зв_тну дату
-    insert into tmp_file03
-       (ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP)
-       select ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP
-       from provodki_otc p
-       where p.fdat between Datnp_ and dat_
-         and substr(p.NLSD,1,4) in (select r020 from kl_f3_29 where kf='1A')
-       union
-       select ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP
-       from provodki_otc p
-       where p.fdat between Datnp_ and dat_
-         and substr(p.NLSK,1,4) in (select r020 from kl_f3_29 where kf='1A');
+    insert /*+ APPEND*/ 
+    into tmp_file03(ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP)
+    select ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP
+    from (SELECT /*+ parallel(4) */
+             (case when o.dk = 0 then o.acc else z.acc end) ACCD,
+              o.TT,
+              o.REF,
+              p.KV,
+              (case when o.dk = 0 then a.nls else b.nls end) NLSD,
+              o.S,
+              o.SQ,
+              o.FDAT,
+              p.nazn,
+              (case when o.dk = 1 then o.acc else z.acc end) ACCK,
+              (case when o.dk = 1 then a.nls else b.nls end) NLSK,
+              p.userid ISP
+          FROM opldok o
+          join accounts a
+          on (o.acc = a.acc)
+          join opldok z
+          on (O.REF = z.ref and
+              o.stmt = z.stmt and
+              o.dk <> z.dk)
+          join accounts b
+          on (z.acc = b.acc)
+          join oper p
+          on (o.ref = p.ref)
+         WHERE o.FDAT BETWEEN Datnp_ and dat_
+           and p.sos = 5
+           AND a.nbs IN (SELECT R020
+                         FROM KL_F3_29
+                         WHERE KF = '1A'))
+    where not (nlsd like '___8%' and
+               nlsk not like '___8%' and
+               substr(nlsd,1,3) = substr(nlsk,1,3));
 
-    -- исключаем проводки по капитализации процентов
-    delete from tmp_file03
-    where nlsd like '___8%'
-      and nlsk not like '___8%'
-      and substr(nlsd,1,3) = substr(nlsk,1,3);
+--    insert /*+ APPEND*/ into tmp_file03
+--       (ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP)
+--       select  /*+ PARALLEL(4)*/
+--            ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP
+--       from provodki_otc p
+--       where p.fdat between Datnp_ and dat_
+--         and substr(p.NLSD,1,4) in (select r020 from kl_f3_29 where kf='1A')
+--       union
+--       select  /*+ PARALLEL(4)*/
+--            ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP
+--       from provodki_otc p
+--       where p.fdat between Datnp_ and dat_
+--         and substr(p.NLSK,1,4) in (select r020 from kl_f3_29 where kf='1A');
 
-    -- исключаем проводки по уплате налога на доходы по депозиту
-    -- 10.10.2014 закоментарил этот блок по письму Семеновой
-    --delete from tmp_file03
-    --where nlsd like '___8%'
-    --  and nlsk like '3800%'
-    --  and tt = '%15';
+    commit;
 
+--    -- исключаем проводки по капитализации процентов
+--    delete from tmp_file03
+--    where nlsd like '___8%'
+--      and nlsk not like '___8%'
+--      and substr(nlsd,1,3) = substr(nlsk,1,3);
 
     -------------------------------------------------------------------
     --- остатки
@@ -261,8 +256,6 @@ BEGIN
        EXIT WHEN SALDO%NOTFOUND;
 
        if mdate_ is NULL then
-          --mm_ := 0;
-          --god_ := 'YYYY';
           mm_  := to_number(to_char(add_months(Dat_,1),'MM'));
           god_ := to_char(add_months(Dat_,1),'YYYY');
        else
@@ -277,7 +270,8 @@ BEGIN
        IF se_ <> 0  THEN
 
           if typ_>0 then
-             nbuc_ := nvl(f_codobl_tobo(acc_,typ_),nbuc1_);
+             nbuc_ := nvl(F_Codobl_Tobo_new (acc_, dat_, typ_), nbuc1_);
+             --nbuc_ := nvl(f_codobl_tobo(acc_,typ_),nbuc1_);
           else
              nbuc_ := nbuc1_;
           end if;
@@ -448,14 +442,14 @@ BEGIN
 
              if codcagent_ = 6 then
                 if freq_ = 400 then
-                   if to_char(NVL(apl_dat_, daos_),'DD') in ('29','30','31') and
-                      to_char(dat_,'MM') = '02'
-                   then
-                      Dat1_:= last_day(dat_);
-                   else
-                      Dat1_:= to_date(to_char(NVL(apl_dat_, daos_),'DD')||
-                                      to_char(dat_,'MMYYYY'),'ddmmyyyy');
-                   end if;
+                   Dat1_:= (case when NVL(apl_dat_, daos_) = last_day(NVL(apl_dat_, daos_))
+                                 then last_day(dat_)
+                                 when to_char(NVL(apl_dat_, daos_), 'DD') in ('29','30','31') and
+                                      to_char(dat_, 'MMYYYY') in ('022017', '022018', '022019')
+                                 then last_day(dat_)
+                            else
+                               to_date(to_char(NVL(apl_dat_, daos_),'DD')||to_char(dat_,'MMYYYY'), 'ddmmyyyy')
+                            end);
                 else
                    Dat1_:= add_months(mdateR_,-add_);
                 end if;
@@ -589,8 +583,6 @@ BEGIN
              EXCEPTION WHEN NO_DATA_FOUND THEN
                 s51_ := 0;
              END;
-          --else
-          --   s51_ := s41_;
           end if;
 
           if nbs_ like '___8%' and nbs_ != '3548' then
@@ -602,7 +594,8 @@ BEGIN
           -- в показник 41 включаеться вся сума погашення
           if s41_ != 0 then
              if typ_>0 then
-                nbuc_ := nvl(f_codobl_tobo(acc_,typ_),nbuc1_);
+                nbuc_ := nvl(F_Codobl_Tobo_new (acc_, dat_, typ_), nbuc1_);
+                --nbuc_ := nvl(f_codobl_tobo(acc_,typ_),nbuc1_);
              else
                 nbuc_ := nbuc1_;
              end if;
@@ -641,10 +634,6 @@ BEGIN
     -----------------------------------------------------------------------------
     DELETE FROM tmp_nbu where kodf=kodf_ and datf= dat_;
     ---------------------------------------------------
-    --if mfo_ = 324805 then
-    --   delete from rnbu_trace
-    --   where (substr(kodp,10,5)='2014B' or substr(kodp,10,4)='2016');
-    --end if;
 
     mm1_ := to_number(to_char(dat_,'MM'));
     w1_ := f_chr36(mm1_);
@@ -669,7 +658,7 @@ BEGIN
     logger.info ('P_F1A_NN: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 END p_f1a_nn;
 /
-show err;
+Show errors;
 
 PROMPT *** Create  grants  P_F1A_NN ***
 grant EXECUTE                                                                on P_F1A_NN        to BARS_ACCESS_DEFROLE;
