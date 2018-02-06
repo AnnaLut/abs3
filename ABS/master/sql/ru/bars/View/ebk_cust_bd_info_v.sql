@@ -1,7 +1,7 @@
 -- ======================================================================================
 -- Module : CDM (ЄБК)
 -- Author : BAA
--- Date   : 07.10.2016
+-- Date   : 21.09.2017
 -- ======================================================================================
 -- create view EBK_CUST_BD_INFO_V ( contains data for send to EBK )
 -- ======================================================================================
@@ -17,11 +17,7 @@ prompt -- ======================================================
 
 create or replace view EBK_CUST_BD_INFO_V
 as
-with ru as ( select VAL as MFO
-               from BARS.PARAMS$GLOBAL
-              where PAR = 'GLB-MFO' 
-           ) 
-select ru.MFO as kf,
+select c.KF as kf,
        c.rnk as rnk,           -- Реєстр. № (РНК)
        c.date_on as date_on,   -- дата  реєстрації
        c.date_off as date_off, -- дата закриття
@@ -62,7 +58,7 @@ select ru.MFO as kf,
        ad.street        as ur_street, --Юр.адр:Улица
        ad.home_type     as ur_home_type, --Юр.адр:Тип дома
        ad.home          as ur_home, --Юр.адр:№ дома
-       ad.homepart_type as ur_homepart_type, --Юр.адр:Тип дел.дома    
+       ad.homepart_type as ur_homepart_type, --Юр.адр:Тип дел.дома
        ad.homepart      as ur_home_part, --Юр.адр:№ типа дел.дома
        ad.room_type     as ur_room_type, --Юр.адр:Тип жилого помещения
        ad.room          as ur_room, -- Юр.адр:№ жилого помещения
@@ -93,18 +89,19 @@ select ru.MFO as kf,
        (select cw.value from customerw cw  where cw.tag='SPMRK' and c.rnk=cw.rnk) as spmrk,     -- Код Особливої Вiдмiтки нестандартного клієнта ФО
        (select cw.value from customerw cw  where cw.tag='WORKB' and c.rnk=cw.rnk) as workb,     -- Приналежнiсть до працiвникiв банку
        (select cw.value from customerw cw  where cw.tag='EXCLN' and c.rnk=cw.rnk) as okpo_exclusion,
-       ( case when exists (select * from w4_acc w, bars.accounts a  where w.acc_pk = a.acc and a.dazs is null  and a.rnk = c.rnk ) then 1 else 0 end ) as bank_card,
-       ( case when exists (select * from cc_deal cc where cc.rnk = c.rnk and cc.sos not in (0,2,14,15) ) then 1 else 0 end ) as credit , 
-       ( case when exists (select * from dpt_deposit dd where dd.rnk = c.rnk) then 1 else 0 end) as deposit,   
+       ( case when exists (select * from w4_acc w, accounts a where w.acc_pk = a.acc and a.dazs is null and a.rnk = c.rnk ) then 1 else 0 end ) as bank_card,
+       ( case when exists (select * from cc_deal cc where cc.rnk = c.rnk and cc.sos not in (0,2,14,15) ) then 1 else 0 end ) as credit,
+       ( case when exists (select * from dpt_deposit dd where dd.rnk = c.rnk) then 1 else 0 end) as deposit,
        ( case when exists (select * from accounts ac where ac.rnk = c.rnk and ac.dazs is null and nbs='2620') then 1 else 0 end) as current_account,
        0 as other
-  from bars.customer c
-     , bars.person   p
-     , bars.customer_address ad
-     , bars.ru
- where c.rnk = p.rnk(+)
-   and c.rnk = ad.rnk(+)
-   and ad.type_id(+) = 1;
+  from CUSTOMER c
+  left
+  join PERSON p
+    on ( p.RNK = c.RNK )
+  left
+  join CUSTOMER_ADDRESS ad
+    on ( ad.RNK = c.RNK and ad.TYPE_ID = 1 )
+;
 
 show err
 
@@ -112,4 +109,4 @@ prompt =========================================
 prompt Grants
 prompt ==========================================
 
-grant select on BARS.EBK_CUST_BD_INFO_V to bars_access_defrole;
+grant select on EBK_CUST_BD_INFO_V to BARS_ACCESS_DEFROLE;
