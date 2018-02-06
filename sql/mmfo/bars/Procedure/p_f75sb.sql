@@ -6,7 +6,7 @@ create or replace procedure P_F75SB
 % DESCRIPTION :    Процедура формирование файла @75 для СБ
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 2009.All Rights Reserved.
 %                                                 Версия для Сбербанка
-% VERSION     :    30.01.2018 (09.06.2017)
+% VERSION     :    06.02.2018 (30.01.2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 09.06.2017 - в курсоре SEL выбирались документы только после отчетной даты
              (добавлен период с начала месяца)
@@ -835,12 +835,6 @@ BEGIN
       -- зменшення резервiв за рахунок уточнень
       if kv_ = 980 and nlsd_ like '3801%' and nlsk_ like '7%' then
          kk_ := '02';
-      end if;
-
-      -- повернення заборгованностi
-      if (nlsd_ like '1%' or nlsd_ like '2%' or nlsd_ like '3%') and nlsd_ not like '3801%' and
-         nlsk_ like '7%' then
-         kk_ := '04';
       end if;
 
       -- при формировании новых счетов для резерва
