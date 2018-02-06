@@ -917,7 +917,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.OW_FILES_PROC is
       for n in 0 .. dbms_xmldom.getlength(l_doclist) - 1 loop
 
         -- счетчик транзакций
-        l_idn      := n + 1;
+        l_idn      := l_idn + 1;
         l_doc_item := dbms_xmldom.item(l_doclist, n);
 
         l_recs.extend;
@@ -948,6 +948,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.OW_FILES_PROC is
 
       end loop;
       bulk_insert_doc(l_recs);
+      l_recs.delete;
     end loop;
 
     if l_check_n <> l_file_n then
@@ -2040,6 +2041,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.OW_FILES_PROC is
               b_kvt := false;
               -- успешная квитовка
               if l_payflag = 1 and l_resp_code = '0' then
+                 begin
                 bars_ow.final_payment(l_srn, l_dk, b_kvt);
                 -- квитовка документа
                 if b_kvt then
@@ -2052,6 +2054,19 @@ CREATE OR REPLACE PACKAGE BODY BARS.OW_FILES_PROC is
                   -- удаление из очереди на отправку/квитовку
                   bars_ow.del_pkkque(l_srn, l_dk);
                 end if;
+                 exception
+                   when others then
+                    l_err := substr('Квитовка док.' || l_srn || '-ошибка:'||sqlerrm,1,254);
+                    bars_audit.info(h ||'Err:' || p_file_name|| ' Ref:'||l_srn||' '|| dbms_utility.format_error_stack() || chr(10) ||
+                                    dbms_utility.format_error_backtrace());
+                    l_msg := substr(l_msg || l_err, 1, 254);
+                    update ow_pkk_que
+                       set resp_text  = l_err
+                    where f_n = l_iic_filename
+                       and ref = l_srn
+                       and dk = l_dk
+                    returning acc into l_acc;
+                 end;
               end if;
               -- ошибка квитовки
               if l_payflag in (1, 2) and l_resp_code <> '0' then
@@ -2083,7 +2098,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.OW_FILES_PROC is
                     p_back_dok(l_srn, 5, null, l_p1, l_p2);
                   end if;
                   update operw
-                     set value = 'Повернено по квитанції ПЦ ' || p_file_name
+                     set value = substr('Повернено по квитанції ПЦ ' ||
+                                        p_file_name || '(' || l_resp_code || '#' ||
+                                        l_resp_text || ')',
+                                        1,
+                                        220)
                    where ref = l_srn
                      and tag = 'BACKR';
                   insert into oper_visa
@@ -2503,15 +2522,14 @@ CREATE OR REPLACE PACKAGE BODY BARS.OW_FILES_PROC is
         l_expiredate   := null;
     end;
 
-    -- Для ATRANSFERS намагаємось проплатити в дату постінгу
     if nvl(l_offset, 0) <> 0 and l_filetype <>  g_filetype_atrn then
       if l_offsetexpire is null or sysdate <= l_expiredate then
         l_paydate := dat_next_u(gl.bd, l_offset);
         gl.pl_dat(l_paydate);
         l_changbd := true;
       end if;
-    else
-      if l_offsetexpire is null or sysdate <= l_expiredate or (f_workday(trunc(sysdate)) is null) then
+    elsif l_filetype = g_filetype_atrn and (l_offsetexpire is null or sysdate <= l_expiredate or (f_workday(trunc(sysdate)) is null))then
+    -- Для ATRANSFERS намагаємось проплатити в дату постінгу
         begin
           select t.anl_postingdate
             into l_paydate
@@ -2527,7 +2545,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.OW_FILES_PROC is
           l_changbd := true;
         end if;
       end if;
-    end if;
 
     bars_ow.pay_oic_file(p_fileid);
 
