@@ -1,10 +1,19 @@
-CREATE OR REPLACE PROCEDURE BARS.P_F2K_NN (dat_ DATE ,
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_F2K_NN.sql =========*** Run *** 
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure P_F2K_NN ***
+
+ CREATE OR REPLACE PROCEDURE BARS.P_F2K_NN (dat_ DATE ,
                                       sheme_ varchar2 default 'С')  IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирование файла #2K
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 %
-% VERSION     : v.18.003     31.01.2018
+% VERSION     : v.18.004     06.02.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: dat_ - отчетная дата
            sheme_ - схема формирования
@@ -18,6 +27,7 @@ CREATE OR REPLACE PROCEDURE BARS.P_F2K_NN (dat_ DATE ,
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+ 06.02.2018  обязательное заполнение кода DDD=310 при  отсутствии операций
  31.01.2018  отсекаем закрытых клиентов 
  10.01.2018  ограничение по отбору операций по типу оплаты SOS
  05.01.2018  добавлено формирование DDD=351
@@ -529,6 +539,10 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
                       u.c_daos, u.c_dazs,
                       p_260, u.p_270, u.p_280 );
 
+--    310  код виду фiнансовоi операцii
+             insert into rnbu_trace
+                       ( rnk, kodp, znap )
+                values ( k.rnk, '310'||kodp_, '5' );
 --    380  код валюти фiнансовоi операцii при вiдсутностi операцiй
              insert into rnbu_trace
                        ( rnk, kodp, znap )
@@ -566,3 +580,8 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
 
 END P_F2K_NN;
 /
+show err;
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_F2K_NN.sql =========*** End ***
+PROMPT ===================================================================================== 
