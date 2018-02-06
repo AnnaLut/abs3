@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/ebkc_pack.sql =========*** Run *** =
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.EBKC_PACK 
+create or replace package EBKC_PACK
 is
 
   g_header_version constant varchar2(64) := 'version 1.00 31/04/2016';
@@ -81,11 +75,14 @@ is
 
 end EBKC_PACK;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.EBKC_PACK 
+
+show errors;
+
+create or replace package body EBKC_PACK
 is
 
   -- Версія пакету
-  g_body_version constant varchar2(64) := 'version 1.01 15/02/2017';
+  g_body_version constant varchar2(64) := 'version 1.02 19/01/2018';
   g_dbgcode constant varchar2(20)      := 'ebkc_pack';
 
   -- header_version - возвращает версию заголовка пакета
@@ -346,7 +343,7 @@ $end
   --
   -- gcif по ЮО,ФОП отримані від ЕГАРа
   --
-  procedure request_gcif_mass
+  procedure REQUEST_GCIF_MASS
   ( p_batchId          in     varchar2,
     p_kf               in     varchar2,
     p_rnk              in     number,
@@ -354,6 +351,7 @@ $end
     p_custtype         in     varchar2,
     p_slave_client_ebk in     t_slave_client_ebk
   ) is
+    title          constant   varchar2(64) := $$PLSQL_UNIT||'.REQUEST_GCIF_MASS';
     l_sysdate                 date;
     l_rnk                     customer.rnk%type;
   begin
@@ -361,6 +359,7 @@ $end
     l_sysdate := sysdate;
 
 $if EBK_PARAMS.CUT_RNK $then
+    bc.set_policy_group('WHOLE');
     l_rnk := EBKC_WFORMS_UTL.GET_RNK(p_rnk,p_kf);
 $else
     l_rnk := p_rnk;
@@ -370,11 +369,11 @@ $end
     -- необходимо очистить старую загрузку подчиненных карточек по этой же мастер карточке,
     -- т.к. могли быть добавлены или уделены некоторые
 
-    delete from ebkc_slave
-    where gcif = p_gcif
-       or gcif = (select gcif from ebkc_gcif where kf = p_kf and rnk = l_rnk) ;
+    delete EBKC_SLAVE
+     where gcif = p_gcif
+        or gcif = (select gcif from ebkc_gcif where kf = p_kf and rnk = l_rnk) ;
 
-    delete from ebkc_gcif
+    delete EBKC_GCIF
      where (kf = p_kf and rnk = l_rnk)
         or (gcif = p_gcif);
 
@@ -386,19 +385,30 @@ $end
      into ebkc_slave
         ( gcif, slave_kf, slave_rnk, cust_type )
    select p_gcif, sce.kf, sce.rnk, p_custtype
-    from table (p_slave_client_ebk) sce
-   where not exists ( select null from ebkc_slave
-                       where gcif = p_gcif
-                         and slave_kf = sce.kf
-                         and slave_rnk = sce.rnk
-                         and cust_type = p_custtype );
-    commit;
+     from table( p_slave_client_ebk ) sce
+    where not exists ( select null from ebkc_slave
+                        where gcif = p_gcif
+                          and slave_kf = sce.kf
+                          and slave_rnk = sce.rnk
+                          and cust_type = p_custtype );
+   commit;
+
+$if EBK_PARAMS.CUT_RNK $then
+    bc.set_context;
+$end
+
+    bars_audit.trace( '%s: Exit.', title );
 
   exception
     when others then
       rollback;
-      raise;
-  end request_gcif_mass;
+$if EBK_PARAMS.CUT_RNK $then
+      bc.set_context;
+$end
+      bars_audit.error( title || ': p_batch='||p_batchid||', p_kf='||p_kf||', p_rnk='||to_char(p_rnk)||', p_gcif='||p_gcif );
+      bars_audit.error( title || ': ' || dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace() );
+      raise_application_error( -20666, title || ': ' || SQLERRM, true );
+  end REQUEST_GCIF_MASS;
 
   --
   --
@@ -692,14 +702,7 @@ begin
   null;
 end EBKC_PACK;
 /
- show err;
- 
-PROMPT *** Create  grants  EBKC_PACK ***
-grant EXECUTE                                                                on EBKC_PACK       to BARS_ACCESS_DEFROLE;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/ebkc_pack.sql =========*** End *** =
- PROMPT ===================================================================================== 
- 
+show errors;
+
+grant EXECUTE on EBKC_PACK to BARS_ACCESS_DEFROLE;
