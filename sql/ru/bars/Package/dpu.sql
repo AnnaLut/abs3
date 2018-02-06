@@ -693,7 +693,7 @@ is
   --
   -- глобальные переменные и константы
   -- 
-  g_body_version  constant varchar2(64)          := 'version 44.15  19.01.2018';
+  g_body_version  constant varchar2(64)          := 'version 44.16  06.02.2018';
   
   modcode         constant varchar2(3)           := 'DPU';
   accispparam     constant varchar2(16)          := 'DPU_ISP';
@@ -5845,6 +5845,7 @@ procedure PAY_DOC_EXT
   p_ref     in out  oper.ref%type
 )
 is
+  l_nd              varchar2(16);
   l_tt              oper.tt%type;         -- 
   l_acc             accounts.acc%type;    -- 
   l_nls8            accounts.nls%type;    -- 
@@ -5958,22 +5959,36 @@ $then
 $end
     
     begin
+
       GL.ref( p_ref );
-      GL.in_doc3( ref_    => p_ref,                           mfoa_   => gl.amfo,
-                  tt_     => l_tt,                            nlsa_   => l_rec_A.acc_num,
-                  vob_    => 6,                               kv_     => l_rec_A.acc_cur,
-                  dk_     => 1,                               nam_a_  => l_rec_A.acc_name,
-                  nd_     => SubStr(to_char(p_ref),-10),      id_a_   => l_rec_A.cust_idcode,
-                  pdat_   => sysdate,                         s_      => p_sum,
-                  vdat_   => p_bdat,                          mfob_   => l_mfo_B,
-                  data_   => p_bdat,                          nlsb_   => l_nls_B,
-                  datp_   => p_bdat,                          kv2_    => l_rec_A.acc_cur,
-                  sk_     => null,                            nam_b_  => l_nms_B,
-                  d_rec_  => null,                            id_b_   => nvl( l_okpo_B, l_rec_A.cust_idcode ),
-                  id_o_   => null,                            s2_     => p_sum,
-                  sign_   => null,                            nazn_   => p_nazn,
-                  sos_    => null,                            uid_    => null,
-                  prty_   => 0 );
+
+      l_nd := to_char(p_ref);
+
+      if ( length( l_nd ) > 10 )
+      then
+$if DPU_PARAMS.MMFO
+$then
+        l_nd := SubStr(l_nd,-12,10);
+$else
+        l_nd := SubStr(l_nd,-10);
+$end
+      end if;
+
+      GL.in_doc3( ref_    => p_ref  , mfoa_   => gl.amfo
+                , tt_     => l_tt   , nlsa_   => l_rec_A.acc_num
+                , vob_    => 6      , kv_     => l_rec_A.acc_cur
+                , dk_     => 1      , nam_a_  => l_rec_A.acc_name
+                , nd_     => l_nd   , id_a_   => l_rec_A.cust_idcode
+                , pdat_   => sysdate, s_      => p_sum
+                , vdat_   => p_bdat , mfob_   => l_mfo_B
+                , data_   => p_bdat , nlsb_   => l_nls_B
+                , datp_   => p_bdat , kv2_    => l_rec_A.acc_cur
+                , sk_     => null   , nam_b_  => l_nms_B
+                , d_rec_  => null   , id_b_   => nvl( l_okpo_B, l_rec_A.cust_idcode )
+                , id_o_   => null   , s2_     => p_sum
+                , sign_   => null   , nazn_   => p_nazn
+                , sos_    => null   , uid_    => null
+                , prty_   => 0 );
       
       paytt( null, p_ref, p_bdat, l_tt, 1,
                    l_rec_A.acc_cur, l_rec_A.acc_num, p_sum,
