@@ -14,7 +14,8 @@
 0000: 6F00000001000000 FFFF01000D004347 5458566965775374 6174650400010000
 0020: 0000000000390100 002C000000030000 0003000000010000 0061020000F8FFFF
 0040: FFE1FFFFFFFFFFFF FFFFFFFFFF1E0300 00C4010000010000 0001000000010000
-0060: 000F4170706C6963 6174696F6E497465 6D00000000
+0060: 000F4170706C6963 6174696F6E497465 6D02000000075769 6E646F77730B4672
+0080: 6D5F4163636F756E 74
 .enddata
 .data DT_MAKERUNDLG
 0000: 02000000001A513A 5C4241525339385C 42494E5C63757374 61636E742E657865
@@ -41413,6 +41414,9 @@ AND SqlFetchNext(hSql(), nFetchRes)
 .head 7 +  If sErrPar = 'NBS'
 .head 8 -  Call picTabs.BringToTop(cTabAccGeneral.TabNum, TRUE)
 .head 8 -  Call SalSetFocus(cTabAccGeneral.hWnd.Dlg_AccGeneral.dfNbs)
+.head 7 +  If sErrPar = 'OB22'
+.head 8 -  Call picTabs.BringToTop(cTabAccGeneral.TabNum, TRUE)
+.head 8 -  Call SalSetFocus(cTabAccGeneral.hWnd.Dlg_AccGeneral.dfOB22)
 .head 7 +  If sErrPar = 'NLS'
 .head 8 -  Call picTabs.BringToTop(cTabAccGeneral.TabNum, TRUE)
 .head 8 -  Call SalSetFocus(cTabAccGeneral.hWnd.Dlg_AccGeneral.dfNls)
@@ -44172,9 +44176,12 @@ or cTabAccFinancial.EditMode = TAB_Edit
 .head 7 -  Call SalDisableWindow(pbAccountPlan)
 .head 7 -  Call SalDisableWindow(dfNameNbs)
 .head 7 -  Call SalDisableWindow(dfNls)
-.head 7 -  Call SalDisableWindow(pbAccountOB22)
-.head 7 -  Call SalDisableWindow(dfNameOB22)
-.head 7 -  Call SalDisableWindow(dfOB22)
+.head 7 +  If SalIsNull(dfOB22)
+.head 8 -  Call f_chk_ob22()
+.head 7 +  Else
+.head 8 -  Call SalDisableWindow(pbAccountOB22)
+.head 8 -  Call SalDisableWindow(dfNameOB22)
+.head 8 -  Call SalDisableWindow(dfOB22)
 .head 4 -  !
 .head 4 -  Set hWndObject = SalGetFirstChild(hWndForm, TYPE_Any)
 .head 4 +  While hWndObject != hWndNULL
