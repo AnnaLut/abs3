@@ -3,7 +3,7 @@ is
   --
   -- constants
   --
-  g_header_version        constant varchar2(64) := 'version 1.2 06.02.2018';
+  g_header_version        constant varchar2(64) := 'version 1.2 06.02.2017';
 
   --
   -- HEADER_VERSION
@@ -58,14 +58,14 @@ is
 end BARS_SNAPSHOT;
 /
 
-show err;
+show errors;
 
-create or replace package body BARS_SNAPSHOT 
+create or replace package body BARS_SNAPSHOT
 is
   --
   -- constants
   --
-  g_body_version          constant varchar2(64)  := 'version 1.7  06.02.2018';
+  g_body_version          constant varchar2(64)  := 'version 1.8  06.02.2018';
 
   --
   -- types
@@ -81,7 +81,7 @@ is
   l_condition             varchar2(300);
   l_first_day             date;
   l_bank_dt               date;
-  l_vdat                  bars.oper.vdat%type;
+  l_vdat                  oper.vdat%type;
 
   --
   -- повертає версію заголовка пакета
@@ -117,12 +117,12 @@ is
   %usage   переоцінка валютних позицій коригуючими проводками.
   */
     title  constant  varchar2(64) := $$PLSQL_UNIT||'.DAILY_CURRENCY_REVALUATION';
-    l_ref            bars.oper.ref%type;
-    l_dk             bars.oper.dk%type;
-    l_nd             bars.oper.nd%type;
-    l_amnt           bars.oper.s%type;
-    l_tt             bars.oper.tt%type   := 'PVP';
-    l_vob            bars.oper.vob%type  := 6;
+    l_ref            oper.ref%type;
+    l_dk             oper.dk%type;
+    l_nd             oper.nd%type;
+    l_amnt           oper.s%type;
+    l_tt             oper.tt%type   := 'PVP';
+    l_vob            oper.vob%type  := 6;
   BEGIN
 
     bars_audit.trace( '%s: Start running.', title );
@@ -143,16 +143,16 @@ is
   <b>CURRENCY_REVALUATION</b> - процедура переоцінки валютних позицій
   %param
 
-  %version 1.2
+  %version 1.1
   %usage   переоцінка валютних позицій коригуючими проводками.
   */
     title  constant  varchar2(64) := $$PLSQL_UNIT||'.CURRENCY_REVALUATION';
-    l_ref            bars.oper.ref%type;
-    l_dk             bars.oper.dk%type;
-    l_nd             bars.oper.nd%type;
-    l_amnt           bars.oper.s%type;
-    l_tt             bars.oper.tt%type   := 'PVP';
-    l_vob            bars.oper.vob%type  := 96;
+    l_ref            oper.ref%type;
+    l_dk             oper.dk%type;
+    l_nd             oper.nd%type;
+    l_amnt           oper.s%type;
+    l_tt             oper.tt%type   := 'PVP';
+    l_vob            oper.vob%type  := 96;
   begin
 
     bars_audit.trace( '%s: Entry with ( kf=%s ).', title, p_kf );
@@ -165,26 +165,26 @@ is
                       , t.ACC3801, a3.NLS as NLS_A, a3.KV as KV_A, SubStr(a3.NMS,1,38) as NAME_A
                       , t.ACC6204, a6.NLS as NLS_B, a6.KV as KV_B, SubStr(a6.NMS,1,38) as NAME_B
                       , (ADJ_AMNT_3800_UAH - ADJ_AMNT_3801) as DIFF_AMNT
-                   from ( select /*+ LEADING(v b0) FULL(v) */
+                   from ( select /*+ ORDERED FULL(v) FULL(b0) FULL(b1) USE_HASH( b0 ) USE_HASH( b1 )*/
                                  v.KF, v.ACC3801, v.ACC6204
                                , a.NLS, a.KV, a.BRANCH
                                , b0.OSTQ - b0.CRDOSQ + b0.CRKOSQ as ADJ_AMNT_3800_UAH
                                , b1.OST  - b1.CRDOS  + b1.CRKOS  as ADJ_AMNT_3801
                             from VP_LIST  v
-                            join ACCOUNTS a
-                              on ( a.acc = v.ACC3800 )
                             join AGG_MONBALS_EXCHANGE b0
                               on ( b0.FDAT = l_first_day and b0.KF = v.KF and b0.ACC = v.ACC3800 )
                             join AGG_MONBALS_EXCHANGE b1
                               on ( b1.FDAT = l_first_day and b1.KF = v.KF and b1.ACC = v.ACC3801 )
+                            join ACCOUNTS a
+                              on ( a.acc = v.ACC3800 )
                            where v.KF = p_kf
                              and v.ACC6204 Is Not Null
                              and a.DAZS Is Null
                              and ((b0.OSTQ - b0.CRDOSQ + b0.CRKOSQ) + (b1.OST - b1.CRDOS + b1.CRKOS)) <> 0
                         ) t
-                   join BARS.ACCOUNTS a3
+                   join ACCOUNTS a3
                      on ( a3.KF = t.KF and a3.ACC = t.ACC3801 )
-                   join BARS.ACCOUNTS a6
+                   join ACCOUNTS a6
                      on ( a6.KF = t.KF and a6.ACC = t.ACC6204 )
                )
     loop
@@ -217,7 +217,7 @@ is
              , cur.KV_B, cur.NLS_B, l_amnt );
 
       -- 3801
-      update BARS.AGG_MONBALS_EXCHANGE
+      update AGG_MONBALS_EXCHANGE
          set CRDOS  = CRDOS  + case when l_dk = 0 then l_amnt else 0 end
            , CRDOSQ = CRDOSQ + case when l_dk = 0 then l_amnt else 0 end
            , CRKOS  = CRKOS  + case when l_dk = 1 then l_amnt else 0 end
@@ -227,7 +227,7 @@ is
          and ACC  = cur.ACC3801;
 
       -- 6204
-      update BARS.AGG_MONBALS_EXCHANGE
+      update AGG_MONBALS_EXCHANGE
          set CRDOS  = CRDOS  + case when l_dk = 0 then 0 else l_amnt end
            , CRDOSQ = CRDOSQ + case when l_dk = 0 then 0 else l_amnt end
            , CRKOS  = CRKOS  + case when l_dk = 1 then 0 else l_amnt end
@@ -342,7 +342,7 @@ is
 
     dbms_application_info.set_client_info( 'Формування денного знімку балансу за ' || F_MONTH_LIT(p_snapshot_dt,0,0) );
 
-    -- execute immediate 'TRUNCATE TABLE BARS.AGG_MONBALS_EXCHANGE';
+    -- execute immediate 'TRUNCATE TABLE AGG_MONBALS_EXCHANGE';
 
     -- gl.setp('MONBAL','',NULL); -- deprecated (for compatibility)
 
@@ -415,9 +415,9 @@ is
       then -- автоматичне доформування денних знімків балансу
 
         for f in ( select k.FDAT
-                     from BARS.FDAT k
+                     from FDAT k
                     where k.FDAT between dat1_ and dat2_
-                      and not exists ( select 1 from BARS.SNAP_BALANCES where FDAT = k.FDAT )
+                      and not exists ( select 1 from SNAP_BALANCES where FDAT = k.FDAT )
                     order by k.FDAT )
         loop
 
@@ -432,9 +432,9 @@ is
 
         select LISTAGG(to_char(k.FDAT,'dd-mm-yyyy'),', ') WITHIN GROUP (order by k.FDAT)
           into l_errmsg
-          from BARS.FDAT k
+          from FDAT k
          where k.FDAT between dat1_ and dat2_
-           and not exists ( select 1 from BARS.SNAP_BALANCES where FDAT = k.FDAT );
+           and not exists ( select 1 from SNAP_BALANCES where FDAT = k.FDAT );
 
         if ( l_errmsg Is Not Null )
         then
@@ -445,7 +445,7 @@ is
 
       select max(FDAT)
         into dat0_
-        from BARS.SNAP_BALANCES
+        from SNAP_BALANCES
        where FDAT between dat1_ and dat2_;
 
       IF ( dat0_ Is Null )
@@ -465,13 +465,13 @@ is
 
       dbms_application_info.set_client_info( 'Формування місячного знімку балансу за ' || F_MONTH_LIT(dat1_,1,2) || 'міс.' );
 
-      execute immediate 'TRUNCATE TABLE BARS.AGG_MONBALS_EXCHANGE';
+      execute immediate 'TRUNCATE TABLE AGG_MONBALS_EXCHANGE';
 
       -- Фіксуємо SCN на якому формуємо знімок балансу по табл. SALDOZ
       BARS_UTL_SNAPSHOT.SET_TABLE_SCN( 'SALDOZ', dat1_, l_kf, dbms_flashback.get_system_change_number() );
 
       insert /*+ APPEND */
-        into BARS.AGG_MONBALS_EXCHANGE
+        into AGG_MONBALS_EXCHANGE
            ( FDAT, KF, ACC, RNK, OST, OSTQ, DOS, KOS, DOSQ, KOSQ,
              CRDOS, CRKOS, CRDOSQ, CRKOSQ, CUDOS, CUKOS, CUDOSQ, CUKOSQ )
       select dat1_,                 NVL(b.KF,z.KF) as KF,
@@ -489,7 +489,7 @@ is
                     , sum(dos) dos, sum(dosq) dosq
                     , sum(kos) kos, sum(kosq) kosq,
                       abs(max(decode(fdat, dat0_, rnk, -rnk))) rnk
-                 from BARS.SNAP_BALANCES
+                 from SNAP_BALANCES
                 where FDAT between dat1_ and dat2_
                 group by KF, ACC
              ) b
@@ -500,9 +500,9 @@ is
                     , r.kos as RKOS, r.kosq as RKOSQ
                     , u.dos as UDOS, u.dosq as UDOSQ
                     , u.kos as UKOS, u.kosq as UKOSQ
-                 from ( select * from BARS.SALDOZ where FDAT = dat1_ ) r
+                 from ( select * from SALDOZ where FDAT = dat1_ ) r
                  full
-                 join ( select * from BARS.SALDOZ where FDAT = dat3_ ) u
+                 join ( select * from SALDOZ where FDAT = dat3_ ) u
                    on ( u.ACC = r.ACC )
              ) z
           on ( z.ACC = b.ACC );
@@ -630,7 +630,7 @@ is
     BARS_UTL_SNAPSHOT.SET_TABLE_SCN( 'SALDOY', l_jan_01_dt, l_kf, dbms_flashback.get_system_change_number() );
 
     insert /*+ APPEND */
-      into BARS.AGG_YEARBALS_EXCHANGE
+      into AGG_YEARBALS_EXCHANGE
          ( FDAT, KF, ACC, RNK, OST, OSTQ
          , DOS,   DOSQ,   KOS,   KOSQ
          , CRDOS, CRDOSQ, CRKOS, CRKOSQ
@@ -667,7 +667,7 @@ is
                   , sum(KOS ) as KOS
                   , sum(KOSQ) as KOSQ
                   , abs(max(decode(FDAT, l_dec_01_dt, rnk, -rnk))) as RNK
-               from BARS.AGG_MONBALS
+               from AGG_MONBALS
               where FDAT between l_jan_01_dt and l_dec_01_dt
               group by KF, ACC
            ) b
@@ -679,12 +679,12 @@ is
                     , u.dos as UDOS, u.dosq as UDOSQ
                     , u.kos as UKOS, u.kosq as UKOSQ
                  from ( select KF, FDAT, ACC, DOS, DOSQ, KOS, KOSQ
-                          from BARS.SALDOY
+                          from SALDOY
                          where FDAT = l_jan_01_dt
                       ) r -- корегуючі обороти виконані за звітний рік
                  full
                  join ( select KF, FDAT, ACC, DOS, DOSQ, KOS, KOSQ
-                          from BARS.SALDOY
+                          from SALDOY
                          where FDAT = l_dat3
                       ) u -- корегуючі обороти виконані в звітному році (за попередній)
                    on ( u.ACC = r.ACC )
@@ -702,14 +702,14 @@ is
 
     /*
     -- partition is first locked to ensure that the partition is created
-    execute immediate 'LOCK TABLE BARS.AGG_YEARBALS PARTITION FOR (to_date('''
+    execute immediate 'LOCK TABLE AGG_YEARBALS PARTITION FOR (to_date('''
                       || to_char(l_jan_01_dt,'ddmmyyyy') || ''',''DDMMYYYY'')) IN SHARE MODE';
 
-    execute immediate 'ALTER TABLE BARS.AGG_YEARBALS EXCHANGE PARTITION FOR (to_date('''
-                      || to_char(l_jan_01_dt,'ddmmyyyy') || ''',''DDMMYYYY'')) WITH TABLE BARS.AGG_YEARBALS_EXCHANGE '
+    execute immediate 'ALTER TABLE AGG_YEARBALS EXCHANGE PARTITION FOR (to_date('''
+                      || to_char(l_jan_01_dt,'ddmmyyyy') || ''',''DDMMYYYY'')) WITH TABLE AGG_YEARBALS_EXCHANGE '
                       || 'INCLUDING INDEXES WITHOUT VALIDATION';
 
-    execute immediate 'ALTER TABLE BARS.AGG_YEARBALS RENAME PARTITION FOR (to_date('''
+    execute immediate 'ALTER TABLE AGG_YEARBALS RENAME PARTITION FOR (to_date('''
                       || to_char(l_jan_01_dt,'ddmmyyyy') || ''',''ddmmyyyy'')) TO P_'
                       || to_char(l_jan_01_dt,'YYYYMMDD');
     */
@@ -865,6 +865,6 @@ begin
 END BARS_SNAPSHOT;
 /
 
-show err;
+show errors;
 
-grant EXECUTE on BARS_SNAPSHOT   to BARS_ACCESS_DEFROLE;
+grant EXECUTE on BARS_SNAPSHOT to BARS_ACCESS_DEFROLE;
