@@ -2,15 +2,17 @@
 .head 1 -  Outline Version - 4.0.26
 .head 1 +  Design-time Settings
 .data VIEWINFO
-0000: 6F00000003000000 FFFF01000D004347 5458566965775374 6174650400010000
-0020: 0000000000FE0000 002C000000020000 0003000000FFFFFF FFFFFFFFFFF8FFFF
-0040: FFE1FFFFFFFEFFFF FFFDFFFFFF0A0400 00C2010000010000 0000000000010000
-0060: 000F4170706C6963 6174696F6E497465 6D02000000075769 6E646F77730F6672
-0080: 6D5F566964644465 7461696C73000001 8002000200000000 000000000000002C
-00A0: 0000000000000001 000000FFFFFFFFFF FFFFFFF8FFFFFFE2 FFFFFF3200000032
-00C0: 0000001F0400009D 0200000000000000 000000050000000F 4170706C69636174
-00E0: 696F6E4974656D07 57696E646F777308 66726D5F4F70656E 0D4368696C642057
-0100: 696E646F77730564 66524E4B00000000
+0000: 6F00000004000000 FFFF01000D004347 5458566965775374 6174650400010000
+0020: 0000000000230100 002C000000020000 0003000000FFFFFF FFFFFFFFFFF8FFFF
+0040: FFE1FFFFFFFEFFFF FFFDFFFFFF0A0400 00C2010000010000 0001000000010000
+0060: 000F4170706C6963 6174696F6E497465 6D00000000000001 8004000100000000
+0080: 000000750000002C 0000000000000001 000000FFFFFFFFFF FFFFFFF8FFFFFFE1
+00A0: FFFFFF3400000034 0000001604000093 0200000000000000 000000030000000F
+00C0: 4170706C69636174 696F6E4974656D07 436C617373657304 63446F6300000000
+00E0: 0180040001000000 00000000BD000000 2C00000000000000 01000000FFFFFFFF
+0100: FFFFFFFFF8FFFFFF E1FFFFFF4E000000 4E00000030040000 AD02000000000000
+0120: 0100000003000000 0F4170706C696361 74696F6E4974656D 07436C6173736573
+0140: 0763446F63447075 00000000
 .enddata
 .data DT_MAKERUNDLG
 0000: 02000000001B443A 5C4241525339385C 42494E5C42415261 72733030362E6170
@@ -237,7 +239,7 @@
 .head 3 +  System
 .head 3 +  User
 .head 4 -  ! << Версія бібліотеки >>
-.head 4 -  String: sLibraryVersion =  '2.83 від 13.12.2017'
+.head 4 -  String: sLibraryVersion =  '2.86 від 06.02.2018'
 .head 4 -  Number: nNegativeValue = -1
 .head 2 +  Resources
 .head 2 +  Variables
@@ -1323,6 +1325,44 @@ AND NOT SqlFetchNext(hSql(), nFetchRes)
                      'Робота з деплініями: ' || get_OneStringValue("select decode(VAL,'8','Y','N') INTO :sResult from BARS.PARAMS$GLOBAL where PAR = 'DPULINE8'") || Chr(10) ||
                      'PL/SQL: ' || Chr(10) ||  sPackageVersion,
                      'About', MB_Ok )
+.head 3 +  Function: get_SwiftDetails
+.head 4 -  Description:
+.head 4 +  Returns
+.head 5 -  Boolean:
+.head 4 +  Parameters
+.head 5 -  ! Ід. депозиту
+.head 5 -  Number: nID
+.head 5 -  Receive String: sSwtAttr[1:10]
+.head 4 -  Static Variables
+.head 4 +  Local variables
+.head 5 -  Number: nFetchRes
+.head 4 +  Actions
+.head 5 -  ! SWIFT
+.head 5 +  If SqlPrepareAndExecute( hSql(),
+"select TAG56_CODE, TAG57_CODE, TAG59_ACC, TAG59_NAME, TAG59_ADR
+   into :sSwtAttr[1], :sSwtAttr[2], :sSwtAttr[3], :sSwtAttr[4], :sSwtAttr[5]
+   from BARS.DPU_DEAL_SWTAGS
+  where DPU_ID = :nID" )
+.head 6 -  Call SqlFetchNext( hSql(), nFetchRes ) 
+.head 5 -  ! Contract details
+.head 5 +  If SqlPrepareAndExecute( hSql(),
+"select d.RNK, d.ND, to_char(d.DATZ,'dd.mm.yyyy')
+   into :sSwtAttr[8], :sSwtAttr[9], :sSwtAttr[10]
+   from BARS.DPU_DEAL d
+  where d.DPU_ID = :nID
+" ) AND SqlFetchNext( hSql(),nFetchRes ) 
+.head 6 -  ! Address
+.head 6 +  If NOT SqlPrepareAndExecute( hSql(),
+"select SubStr(F_TRANSLATE_KMU(LOCALITY),1,35)
+      , SubStr(F_TRANSLATE_KMU(ADDRESS), 1,35)
+   into :sSwtAttr[6], :sSwtAttr[7]
+   from BARS.CUSTOMER_ADDRESS
+  where TYPE_ID = 1
+    and RNK = " || sSwtAttr[8]
+) OR NOT SqlFetchNext( hSql(),nFetchRes )
+.head 7 -  Set sSwtAttr[6] = '___'     !! City
+.head 7 -  Set sSwtAttr[7] = sSwtAttr[5] !! Street and House Number
+.head 5 -  Return TRUE
 .head 3 +  Function: DptCorrectDate
 .head 4 -  Description: Вычисление ближайшей рабочей даты в модуле
 .head 4 +  Returns
@@ -3622,7 +3662,7 @@ OR NOT SqlFetchNext( hSql(), nFetchRes )
 .head 8 -  Return TRUE
 .head 7 -  Return FALSE
 .head 5 +  Function: iDoc
-.head 6 -  Description:
+.head 6 -  Description: Вставка документа в OPER
 .head 6 -  Returns
 .head 6 -  Parameters
 .head 6 -  Static Variables
@@ -3633,6 +3673,7 @@ OR NOT SqlFetchNext( hSql(), nFetchRes )
 .head 7 -  Set B.Nls = sNlsB_
 .head 7 -  Set B.Nam = sNamB_
 .head 7 -  Set m_sDrec = iVspReq()
+.head 7 -  ! Call Debug( m_sDrec )
 .head 7 -  Return cDoc.iDoc()
 .head 5 +  Function: iDop
 .head 6 -  Description: Вставить доп реквизиты
@@ -3644,6 +3685,7 @@ OR NOT SqlFetchNext( hSql(), nFetchRes )
 .head 7 -  String: sTmp1
 .head 7 -  String: sTmp2
 .head 7 -  Number: i
+.head 7 -  Number: nSqlError
 .head 6 +  Actions
 .head 7 +  If not SalArrayIsEmpty( aTag )
 .head 8 -  Call SalArrayGetUpperBound( aTag, 1, i )
@@ -3651,6 +3693,10 @@ OR NOT SqlFetchNext( hSql(), nFetchRes )
 .head 9 +  If SalStrTrimX(aVal[i])
 .head 10 -  Set sTmp1=aTag[i]
 .head 10 -  Set sTmp2=aVal[i]
+.head 10 +  When SqlError
+.head 11 -  Return FALSE
+.head 11 -  Set nSqlError = SqlError ( hSql() )
+.head 11 -  Call SalMessageBox ( SalNumberToStrX( nSqlError, 0 ), 'SQL Error', MB_Ok )
 .head 10 +  If not SqlPrepareAndExecute( hSql(),T("INSERT INTO Operw (ref,tag,value ) VALUES  (:m_nRef, :sTmp1, :sTmp2 ) " )  )
 .head 11 -  Return FALSE
 .head 9 -  Set i=i-1
@@ -3665,6 +3711,7 @@ OR NOT SqlFetchNext( hSql(), nFetchRes )
 .head 7 -  String: sTmp
 .head 7 -  String: strMT
 .head 6 +  Actions
+.head 7 -  ! Call Debug( 'strMT='||strMT )
 .head 7 -  Set sTmp=''
 .head 7 +  If strMT   ! Default SWIFT MT
 .head 8 -  Set sTmp='#f'||SalStrTrimX(strMT)
@@ -3677,6 +3724,11 @@ OR NOT SqlFetchNext( hSql(), nFetchRes )
 .head 9 -  Set i=i-1
 .head 7 +  If sTmp
 .head 8 -  Set sTmp=sTmp||'#'
+.head 7 +  Else
+.head 8 +  If ( m_sTT = 'DU6')
+.head 9 -  Set sTmp = '#fMT 103#N8444053#nО804#'
+.head 8 +  If ( m_sTT = 'DU7')
+.head 9 -  Set sTmp = '#fMT 103#N8444054#nО804#'
 .head 7 -  Return sTmp
 .head 5 +  ! Function: sDoc
 .head 6 -  Description: 
@@ -10398,6 +10450,7 @@ OR NOT SqlFetchNext( hSql(), nFetchRes )
 .head 3 -  String: s1    !! МФО получателя
 .head 3 -  String: s2    !! Счет получателя
 .head 3 -  String: s3    !! Наим получателя
+.head 3 -  String: s4    !! ОКПО получателя
 .head 3 -  String: nazn  
 .head 2 +  Window Variables
 .head 3 -  String: sA
@@ -10419,7 +10472,7 @@ OR NOT SqlFetchNext( hSql(), nFetchRes )
 .head 3 +  On SAM_Create
 .head 4 -  Call SalWaitCursor(TRUE) 
 .head 4 +  If SqlPrepareAndExecute(hSql(), 
-  "SELECT lcv INTO :sISO FROM tabval WHERE kv = :nKv2")
+"SELECT lcv INTO :sISO FROM tabval WHERE kv = :nKv2")
 .head 5 -  Call SqlFetchNext(hSql(), nFetchRes)
 .head 4 -  Call SalSendClassMessage(SAM_Create,0,0)
 .head 3 +  On UM_Choose
@@ -10475,16 +10528,17 @@ and SqlFetchNext(hSql(),nFetchRes)
 .head 4 -  Call SalWaitCursor(FALSE)
 .head 4 -  Call SalSendMsg(frm_Dog.pbRefresh, SAM_Click, 0, 0)
 .head 3 +  On SAM_CreateComplete
-.head 4 +  If SalIsNull(dfOkpoB)  OR dfOkpoB = '99999' 
+.head 4 +  If s3 != STRING_Null
+.head 5 -  Set CB_VVOD1.dfNamB = s3
+.head 5 -  Call SalDisableWindow(CB_VVOD1.dfNamB)
+.head 4 +  If s4 != STRING_Null
+.head 5 -  Set CB_VVOD1.dfOkpoB = s4
+.head 5 -  Call SalDisableWindow(CB_VVOD1.dfOkpoB)
+.head 4 +  If SalIsNull(dfOkpoB) OR dfOkpoB = '99999' 
 .head 5 -  Set dfOkpoB = dfOkpoA
 .head 4 +  If SalIsNull(dfNazn)
 .head 5 -  Set CB_VVOD1.dfNazn = SalStrTrimX(nazn)
 .head 4 -  Call SalWaitCursor(FALSE)
-.head 4 +  If s3 != STRING_Null
-.head 5 -  Set CB_VVOD1.dfNamB = s3
-.head 5 -  Call SalDisableWindow(CB_VVOD1.dfNamB)
-.head 4 +  If dfOkpoB !=  STRING_Null
-.head 5 -  Call SalDisableWindow(CB_VVOD1.dfOkpoB)
 .head 4 -  Set CB_VVOD1.nDPUID = nDPT
 .head 4 -  Call SalSendClassMessage(SAM_CreateComplete, 0, 0)
 .head 4 -  ! Call SalSendMsg(CB_VVOD1.dfNazn, SAM_SetFocus, 0, 0)
@@ -23822,7 +23876,7 @@ WHERE  d.dpu_id = " || Str( nDPU_ID ) ) And SqlFetchNext(hSql(), nFetchRes)
             frm_Dog.DPU_ID, sTT, 0, 
             frm_Dog.KV, STRING_Null, frm_Dog.SUM, frm_Dog.MIN_SUM, 0, 
             STRING_Null, frm_Dog.NLS,
-            GetBankMfo(), STRING_Null, STRING_Null, sNAZN)
+            GetBankMfo(), STRING_Null, STRING_Null, STRING_Null, sNAZN )
 .head 3 -  ! Пополнение депозита
 .head 3 +  Pushbutton: pb1
 .head 4 -  Class Child Ref Key: 0
@@ -23859,7 +23913,7 @@ WHERE  d.dpu_id = " || Str( nDPU_ID ) ) And SqlFetchNext(hSql(), nFetchRes)
             frm_Dog.DPU_ID, sTT, 1, 
             frm_Dog.KV, STRING_Null, 0, 0, 0, 
             STRING_Null, frm_Dog.NLS,
-            GetBankMfo(), STRING_Null, STRING_Null, sNAZN)
+            GetBankMfo(), STRING_Null, STRING_Null, STRING_Null, sNAZN)
 .head 3 -  ! Начисление процентов
 .head 3 +  Pushbutton: pb3
 .head 4 -  Class Child Ref Key: 0
@@ -23946,7 +24000,7 @@ WHERE  d.dpu_id = " || Str( nDPU_ID ) ) And SqlFetchNext(hSql(), nFetchRes)
             frm_Dog.DPU_ID, sTT, 4, 
             frm_Dog.KV, STRING_Null, frm_Dog.OSTN_PL, 0, 0,  
             frm_Dog.NLSN,  frm_Dog.sNlsP,
-            frm_Dog.sMfoP, frm_Dog.sNlsP, frm_Dog.sNmsP, sNAZN)
+            frm_Dog.sMfoP, frm_Dog.sNlsP, frm_Dog.sNmsP, frm_Dog.sOkpoP, sNAZN)
 .head 7 +  Else
 .head 8 +  ! If not IsWindow(hWinWW)
 .head 9 -  Set hWinWW = SalCreateWindow(CB_VVOD1, hWndMDI, 
@@ -23959,7 +24013,7 @@ WHERE  d.dpu_id = " || Str( nDPU_ID ) ) And SqlFetchNext(hSql(), nFetchRes)
             frm_Dog.DPU_ID, sTT, 4, 
             frm_Dog.KV, STRING_Null, frm_Dog.OSTN_PL, 0, 0, 
             frm_Dog.NLSN,  STRING_Null,
-            STRING_Null, STRING_Null, STRING_Null, sNAZN )
+            STRING_Null, STRING_Null, STRING_Null, STRING_Null, sNAZN )
 .head 6 +  Else
 .head 7 -  Call SalCreateWindow(AcrPay, hWndMDI, nMode, frm_Dog.DPU_ID, STRING_Null)
 .head 3 -  ! Погашение депозита
@@ -24000,7 +24054,7 @@ WHERE  d.dpu_id = " || Str( nDPU_ID ) ) And SqlFetchNext(hSql(), nFetchRes)
             frm_Dog.DPU_ID, sTT, 2, 
             frm_Dog.KV, STRING_Null, IifN( ( ID_STOP = 0 ), NUMBER_Null, frm_Dog.OST_PL ), frm_Dog.MIN_SUM, 0,  
             frm_Dog.NLS, frm_Dog.ACCD,
-            frm_Dog.MFOD, frm_Dog.ACCD, frm_Dog.NMSD, sNAZN)
+            frm_Dog.MFOD, frm_Dog.ACCD, frm_Dog.NMSD, STRING_Null, sNAZN)
 .head 7 +  Else
 .head 8 +  If not IsWindow( hWinW )
 .head 9 +  If ( F_USE_VPS( frm_Dog.MFOD ) )
@@ -24009,13 +24063,13 @@ WHERE  d.dpu_id = " || Str( nDPU_ID ) ) And SqlFetchNext(hSql(), nFetchRes)
             frm_Dog.DPU_ID, sTT, 2, 
             frm_Dog.KV, STRING_Null, frm_Dog.OST_PL, frm_Dog.MIN_SUM, 0,  
             frm_Dog.NLS, frm_Dog.ACCD,
-            frm_Dog.MFOD, frm_Dog.ACCD, frm_Dog.NMSD, sNAZN )
+            frm_Dog.MFOD, frm_Dog.ACCD, frm_Dog.NMSD, STRING_Null, sNAZN )
 .head 9 +  Else
 .head 10 -  Set hWinW = SalCreateWindow( CB_VVOD1, hWndMDI, 
             frm_Dog.DPU_ID, sTT, 2, 
             frm_Dog.KV, STRING_Null, frm_Dog.OST_PL, frm_Dog.MIN_SUM, 0, 
             frm_Dog.NLS, STRING_Null,
-            STRING_Null, STRING_Null, STRING_Null, sNAZN )
+            STRING_Null, STRING_Null, STRING_Null, STRING_Null, sNAZN )
 .head 3 -  ! Досрочное разорвание договора
 .head 3 +  Pushbutton: pb5
 .head 4 -  Class Child Ref Key: 0
@@ -24200,7 +24254,7 @@ WHERE  d.dpu_id = " || Str( nDPU_ID ) ) And SqlFetchNext(hSql(), nFetchRes)
             frm_Dog.DPU_ID, sTT, 2, 
             frm_Dog.KV, STRING_Null, frm_Dog.dfAMOUNT, 0, 0,  
             frm_Dog.NLS, frm_Dog.ACCD,
-            frm_Dog.MFOD, frm_Dog.ACCD, frm_Dog.NMSD, sNAZN)
+            frm_Dog.MFOD, frm_Dog.ACCD, frm_Dog.NMSD, STRING_Null, sNAZN )
 .head 11 -  Call SalSendMsg(pbRefresh, SAM_Click, 0, 0)
 .head 8 +  Else
 .head 9 -  ! Для зняття із штрафом автоматично породжуєм всі операції 
@@ -24429,9 +24483,9 @@ WHERE  d.dpu_id = " || Str( nDPU_ID ) ) And SqlFetchNext(hSql(), nFetchRes)
 .head 5 -  !
 .head 5 +  If SqlPrepareAndExecute (hSql (),
   "SELECT a.acc, a.nls, a.ostb, b.acc, b.nls, b.ostb, i.acrb, i.acr_dat, i.stp_dat, 
-          d.closed, d.mfo_p, d.nls_p, d.nms_p
+          d.closed, d.mfo_p, d.nls_p, d.nms_p, d.OKPO_P
      INTO :ACC, :NLS, :OST_PL, :ACCN, :NLSN, :OSTN_PL, :ACC7, :dfAcrDate, :STP_DAT,
-          :CLOSED, :sMfoP, :sNlsP, :sNmsP
+          :CLOSED, :sMfoP, :sNlsP, :sNmsP, :sOkpoP
      FROM accounts a, dpu_deal d, int_accn i, accounts b 
     WHERE d.acc = a.acc 
       AND a.acc = i.acc 
@@ -24880,6 +24934,7 @@ And nQty > 0
 .head 3 -  String: sMfoP
 .head 3 -  String: sNlsP
 .head 3 -  String: sNmsP
+.head 3 -  String: sOkpoP
 .head 3 -  ! Штраф
 .head 3 -  Number: nPenyaDone
 .head 3 -  String: sTmpND
@@ -32806,12 +32861,44 @@ AND SqlFetchNext(hSql(), nFetchRes)
                  NLS,  NMS,  MFOA, '', KVA, SR100, OKPO,
                  NLSB, NMKB, MFOB, '', KVB, SR100, OKPOB,
                  NAZN, '', GetIdOper(), '', NUMBER_Null, 0)
-.head 8 -  ! << iDop() >>
 .head 8 -  Call SalArraySetUpperBound( cDoc.aTag, 1, -1 )
 .head 8 -  Call SalArraySetUpperBound( cDoc.aVal, 1, -1 )
 .head 8 -  Set cDoc.aTag[0]= 'ND'
 .head 8 -  Set cDoc.aVal[0]= SalNumberToStrX( ID, 0 )
-.head 8 -  ! << cDocDpu.f_set_REF2HISTORY() >>
+.head 8 -  ! << SWIFT start >>
+.head 8 +  If ( TT = 'DU7' )
+.head 9 -  Call get_SwiftDetails( ID, sSwift )
+.head 9 -  ! 50F
+.head 9 -  Set cDoc.aTag[1] = '50F'
+.head 9 -  Set cDoc.aVal[1] = '/'    || NLS                || PutCrLf() ||
+      SalStrMidX( '1/'    || sSwift[4], 0, 35 ) || PutCrLf() ||
+      SalStrMidX( '2/'    || sSwift[7], 0, 35 ) || PutCrLf() ||
+      SalStrMidX( '3/UA/' || sSwift[6], 0, 35 ) || PutCrLf() || 
+                  '6/UA/' || OKPO
+.head 9 -  ! 52A
+.head 9 -  Set cDoc.aTag[1] = '52A'
+.head 9 -  Set cDoc.aVal[1] = 'COSBUAUKKIE'
+.head 9 -  ! 56A
+.head 9 -  Set cDoc.aTag[3] = '56A'
+.head 9 -  Set cDoc.aVal[3] = SalStrTrimX( sSwift[1] )
+.head 9 -  ! 57A
+.head 9 -  Set cDoc.aTag[4] = '57A'
+.head 9 -  Set cDoc.aVal[4] = SalStrTrimX( sSwift[2] )
+.head 9 -  ! 59
+.head 9 -  Set cDoc.aTag[5] = '59'
+.head 9 -  Set cDoc.aVal[5] = '/' || sSwift[3]          || PutCrLf() ||
+              SalStrMidX( sSwift[4], 0, 35 ) || PutCrLf() ||
+              SalStrMidX( sSwift[5], 0, 35 ) 
+.head 9 -  ! 70
+.head 9 -  Set cDoc.aTag[6] = '70'
+.head 9 -  Set cDoc.aVal[6] = 'ACCRUED INTEREST OF A DEPOSIT'
+   || PutCrLf() || 'IN ACCORD TO CONTRACT'
+   || PutCrLf() || SalStrMidX( 'N '||sSwift[9], 0, 35 )
+   || PutCrLf() || 'OF ' || sSwift[10]
+.head 9 -  ! NOS_A
+.head 9 -  ! Set cDoc.aTag[8] = 'NOS_A'
+.head 9 -  ! Set cDoc.aVal[8] = '0'
+.head 8 -  ! < SWIFT finish >
 .head 8 -  Set cDoc.nDPUID = AcrPay.ID
 .head 8 +  If not cDoc.oDoc()
 .head 9 -  Call SqlRollback(hSql())
@@ -33533,6 +33620,7 @@ AND SqlFetchNext(hSql(), nFetchRes)
 .head 3 -  String: sCorAcc
 .head 3 -  String: sCorNls
 .head 3 -  String: sCorNms
+.head 3 -  String: sSwift[1:10]
 .head 2 +  Message Actions
 .head 3 +  On SAM_Create
 .head 4 -  Call SalWaitCursor(TRUE)
@@ -55893,7 +55981,7 @@ SalMessageBox(CurrentLangTable.GetAtomTitle('_cTMessAccRnk'),
 .head 6 -  ! Return XSalTooltipSetText( lParam, CurrentLangTable.GetAtomTitle( 'frm_Open.cFTipBranchName' ) )
 .head 5 +  On SAM_Click
 .head 6 +  If FunNSIGet( "SW_BANKS", "NAME", dfSW56_Code, dfSW56_Name )
-.head 7 -  Set dfSW56_Adr = get_OneStringValue("select SubStr(OFFICE,1,50) into :sResult from SW_BANKS where BIC = :dfSW57_Code")
+.head 7 -  Set dfSW56_Adr = get_OneStringValue("select SubStr(OFFICE,1,50) into :sResult from SW_BANKS where BIC = :dlg_DealPayOutSwiftDetails.dfSW57_Code")
 .head 6 +  Else
 .head 7 -  ! << Не вибрано жодного значення з довідника >>
 .head 7 -  ! Set dfSW56_Code = STRING_Null
@@ -56190,7 +56278,7 @@ SalMessageBox(CurrentLangTable.GetAtomTitle('_cTMessAccRnk'),
 .head 6 -  ! Return XSalTooltipSetText( lParam, CurrentLangTable.GetAtomTitle( 'frm_Open.cFTipBranchName' ) )
 .head 5 +  On SAM_Click
 .head 6 -  If FunNSIGet( "SW_BANKS", "NAME", dfSW57_Code, dfSW57_Name )
-.head 6 -  Set dfSW57_Adr = get_OneStringValue("select SubStr(OFFICE,1,50) into :sResult from SW_BANKS where BIC = :dfSW57_Code")
+.head 6 -  Set dfSW57_Adr = get_OneStringValue("select SubStr(OFFICE,1,50) into :sResult from SW_BANKS where BIC = :dlg_DealPayOutSwiftDetails.dfSW57_Code")
 .head 3 -  Background Text: Банк-Бенефициар (57)
 .data CLASSPROPSSIZE
 0000: 1600
