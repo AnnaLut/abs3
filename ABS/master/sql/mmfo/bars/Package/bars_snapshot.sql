@@ -1,15 +1,9 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_snapshot.sql =========*** Run *
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.BARS_SNAPSHOT 
+create or replace package BARS_SNAPSHOT
 is
   --
   -- constants
   --
-  g_header_version        constant varchar2(64) := 'version 1.1 30.03.2016';
+  g_header_version        constant varchar2(64) := 'version 1.2 06.02.2018';
 
   --
   -- HEADER_VERSION
@@ -53,15 +47,25 @@ is
   procedure CREATE_ANNUAL_SNAPSHOT
   ( p_snapshot_dt  in     date );
 
+  --
+  -- REMOVING_OBSOLETE_SNAPSHOTS
+  --
+  --   Видалення застарілих знімків балансу
+  --
+  procedure REMOVING_OBSOLETE_SNAPSHOTS;
+
 
 end BARS_SNAPSHOT;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.BARS_SNAPSHOT 
+
+show err;
+
+create or replace package body BARS_SNAPSHOT 
 is
   --
   -- constants
   --
-  g_body_version          constant varchar2(64)  := 'version 1.6  01.11.2017';
+  g_body_version          constant varchar2(64)  := 'version 1.7  06.02.2018';
 
   --
   -- types
@@ -139,7 +143,7 @@ is
   <b>CURRENCY_REVALUATION</b> - процедура переоцінки валютних позицій
   %param
 
-  %version 1.1
+  %version 1.2
   %usage   переоцінка валютних позицій коригуючими проводками.
   */
     title  constant  varchar2(64) := $$PLSQL_UNIT||'.CURRENCY_REVALUATION';
@@ -159,10 +163,10 @@ is
 
     for cur in ( select /*+ NO_PARALLEL */ t.BRANCH, 'Finis/Реал.Курс.Рiзниця для рах.'||t.NLS||'/'||t.KV as PAYMENT_DESC
                       , t.ACC3801, a3.NLS as NLS_A, a3.KV as KV_A, SubStr(a3.NMS,1,38) as NAME_A
-                      , t.ACC_RRR, a6.NLS as NLS_B, a6.KV as KV_B, SubStr(a6.NMS,1,38) as NAME_B
+                      , t.ACC6204, a6.NLS as NLS_B, a6.KV as KV_B, SubStr(a6.NMS,1,38) as NAME_B
                       , (ADJ_AMNT_3800_UAH - ADJ_AMNT_3801) as DIFF_AMNT
                    from ( select /*+ LEADING(v b0) FULL(v) */
-                                 v.KF, v.ACC3801, v.ACC_RRR
+                                 v.KF, v.ACC3801, v.ACC6204
                                , a.NLS, a.KV, a.BRANCH
                                , b0.OSTQ - b0.CRDOSQ + b0.CRKOSQ as ADJ_AMNT_3800_UAH
                                , b1.OST  - b1.CRDOS  + b1.CRKOS  as ADJ_AMNT_3801
@@ -174,14 +178,14 @@ is
                             join AGG_MONBALS_EXCHANGE b1
                               on ( b1.FDAT = l_first_day and b1.KF = v.KF and b1.ACC = v.ACC3801 )
                            where v.KF = p_kf
-                             and v.ACC_RRR Is Not Null
+                             and v.ACC6204 Is Not Null
                              and a.DAZS Is Null
                              and ((b0.OSTQ - b0.CRDOSQ + b0.CRKOSQ) + (b1.OST - b1.CRDOS + b1.CRKOS)) <> 0
                         ) t
                    join BARS.ACCOUNTS a3
                      on ( a3.KF = t.KF and a3.ACC = t.ACC3801 )
                    join BARS.ACCOUNTS a6
-                     on ( a6.KF = t.KF and a6.ACC = t.ACC_RRR )
+                     on ( a6.KF = t.KF and a6.ACC = t.ACC6204 )
                )
     loop
 
@@ -230,10 +234,10 @@ is
            , CRKOSQ = CRKOSQ + case when l_dk = 1 then 0 else l_amnt end
        where FDAT = l_first_day
          and KF   = p_kf
-         and ACC  = cur.ACC_RRR;
+         and ACC  = cur.ACC6204;
 
-      bars_audit.trace( '%s: ACC_3801=%s, ACC_RRR=%s, AMNT=%s.', title,
-                        to_char(cur.ACC3801), to_char(cur.ACC_RRR), to_char(l_amnt) );
+      bars_audit.trace( '%s: ACC_3801=%s, ACC6204=%s, AMNT=%s.', title,
+                        to_char(cur.ACC3801), to_char(cur.ACC6204), to_char(l_amnt) );
 
     end loop;
 
@@ -772,24 +776,82 @@ is
   --
   --
   --
-  procedure REMOVING_OBSOLETE_DM
+  procedure REMOVING_OBSOLETE_SNAPSHOTS
   is
   /**
   <b>REMOVING_OBSOLETE_SNAPSHOTS</b> - процедура видалення застарілих
   знімків балансу (заміна проц. DROP_OBSOLETE_PARTITIONS з пакету BARS_ACCM_SNAP)
   %param
 
-  %version 1.0
+  %version 1.1
   %usage   видалення застарілих знімків балансу.
   */
-    title   constant  varchar2(64) := $$PLSQL_UNIT||'.REMOVING_OBSOLETE_DM';
+    title         constant varchar2(64) := $$PLSQL_UNIT||'.REMOVING_OBSOLETE_DM';
+    l_min_dt               date;
+    l_lmt_dt               date;
+    PART_NOT_EXISTS        exception;
+    pragma exception_init( PART_NOT_EXISTS, -2149 );
   begin
 
     bars_audit.trace( '%s: Entry.', title );
 
+    -- залишаємо щоденні знімки за поточний і попередній місяць
+    l_lmt_dt := add_months( trunc(gl.gbd(),'MM'), -1 );
+
+    select min(FDAT)
+      into l_min_dt
+      from SNAP_BALANCES
+     where FDAT < l_lmt_dt;
+
+    bars_audit.trace( '%s: l_lmt_dt=%s, l_min_dt=%s.', title, to_char(l_lmt_dt,'dd.mm.yyyy'), to_char(l_min_dt,'dd.mm.yyyy') );
+
+    for c in ( select FDAT
+                 from FDAT
+                where FDAT >= l_min_dt
+                  and FDAT < l_lmt_dt )
+    loop
+      begin
+        execute immediate 'alter table SNAP_BALANCES drop partition for (to_date('''||TO_CHAR(c.FDAT,'ddmmyyyy')||''',''ddmmyyyy''))';
+        bars_audit.trace( '%s: partition dropped for %.', title, to_char(c.FDAT,'dd.mm.yyyy') );
+      exception
+        when PART_NOT_EXISTS
+        then null;
+        when OTHERS
+        then bars_audit.error( title || ': ' || dbms_utility.format_error_stack() ||
+                                     chr(10) || dbms_utility.format_error_backtrace() );
+      end;
+    end loop;
+
+    -- залишаємо місячні знімки за поточний та попередній рік
+    l_lmt_dt := add_months( trunc(gl.gbd(),'YY'), -12 );
+
+    select min(FDAT)
+      into l_min_dt
+      from AGG_MONBALS
+     where FDAT < l_lmt_dt;
+
+    bars_audit.trace( '%s: l_lmt_dt=%s, l_min_dt=%s.', title, to_char(l_lmt_dt,'dd.mm.yyyy'), to_char(l_min_dt,'dd.mm.yyyy') );
+
+    while ( l_lmt_dt > l_min_dt )
+    loop
+      begin
+        execute immediate 'alter table AGG_MONBALS drop partition for (to_date('''||TO_CHAR(l_min_dt,'ddmmyyyy')||''',''ddmmyyyy''))';
+        bars_audit.trace( '%s: partition dropped for %.', title, to_char(l_min_dt,'dd.mm.yyyy') );
+      exception
+        when PART_NOT_EXISTS
+        then null;
+        when OTHERS
+        then bars_audit.error( title || ': ' || dbms_utility.format_error_stack() ||
+                                     chr(10) || dbms_utility.format_error_backtrace() );
+      end;
+
+      l_lmt_dt := add_months( l_lmt_dt, 1 );
+
+    end loop;
+
     bars_audit.trace( '%s: Exit.', title );
 
-  end REMOVING_OBSOLETE_DM;
+  end REMOVING_OBSOLETE_SNAPSHOTS;
 
 
 
@@ -802,14 +864,7 @@ begin
 
 END BARS_SNAPSHOT;
 /
- show err;
- 
-PROMPT *** Create  grants  BARS_SNAPSHOT ***
-grant EXECUTE                                                                on BARS_SNAPSHOT   to BARS_ACCESS_DEFROLE;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_snapshot.sql =========*** End *
- PROMPT ===================================================================================== 
- 
+show err;
+
+grant EXECUTE on BARS_SNAPSHOT   to BARS_ACCESS_DEFROLE;
