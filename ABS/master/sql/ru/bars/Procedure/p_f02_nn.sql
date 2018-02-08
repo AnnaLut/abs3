@@ -12,7 +12,7 @@ CREATE OR REPLACE PROCEDURE BARS.P_F02_NN (Dat_ DATE,
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Процедура формирование файла #02 для КБ
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :    01/02/2018 (10/01/2018)
+% VERSION     :    06/02/2018 (01/02/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -126,6 +126,8 @@ dats_    Date;
 d_sum_   DECIMAL(24);
 k_sum_   DECIMAL(24);
 l_acc_type    varchar2(3);
+d_kor_   number;
+k_kor_   number;
 -------------------------------------------------------------------------------
 CURSOR Saldo IS
    SELECT s.rnk, s.acc, s.nls, s.kv, s.fdat, s.nbs, s.ost, s.ostq,
@@ -153,6 +155,7 @@ begin
          kod_:='1' ;
       END IF ;
    else
+
       kod_:= '';
    end if;
 
@@ -246,7 +249,7 @@ THEN
                                   kosq96 = kosq96 + decode(tt.kv, 980, 0, tt.CRkosq)
             where acc = tt.accc;
         end if;
-        
+
         -- коригуючі за минулий місяць добавляємо по "родительским" рахункам
         IF to_char(dats_,'MM') = to_char(Dat_,'MM') then
             if tt.cudos+tt.cudosq+tt.cukos+tt.cukosq<>0 then
@@ -287,7 +290,7 @@ OPEN Saldo;
       WHERE fdat  between Dat_  AND Dat_+29 AND
             acc  = acc_   AND
             (tt like 'ZG8%'  or tt like 'ZG9%');
-            
+
       Dos96_:=Dos96_-d_sum_;
       Kos96_:=Kos96_-k_sum_;
    END IF;
@@ -356,13 +359,8 @@ OPEN Saldo;
       Kosq99_ := Kosq99_ - sk_;
    END IF;
 
-   Dos_  := Dos_ - Dos96p_ - Dos99_;
-   Dosq_ := Dosq_ - Dosq96p_ - Dosq99_;
-   Kos_  := Kos_ - Kos96p_ - Kos99_;
-   Kosq_ := Kosq_ - Kosq96p_ - Kosq99_;
-
    --- обороты по перекрытию 6,7 классов на 5040,5041
-   IF to_char(Dat_,'MM')='01' and (nls_ like '6%' or nls_ like '7%' or nls_ like '504%') THEN
+   IF to_char(Dat_,'MM')='01' and (nls_ like '6%' or nls_ like '7%' or nls_ like '390%' or nls_ like '504%') THEN
        SELECT NVL(SUM(decode(dk,0,1,0)*s),0),
               NVL(SUM(decode(dk,1,1,0)*s),0)
          INTO d_sum_, k_sum_
@@ -373,7 +371,62 @@ OPEN Saldo;
 
       Dos_ := Dos_ - d_sum_;
       Kos_ := Kos_ - k_sum_;
+
+      SELECT NVL(SUM(decode(o.dk,0,1,0)*o.s),0),
+                NVL(SUM(decode(o.dk,1,1,0)*o.s),0)
+       INTO d_sum_, k_sum_
+       FROM opldok o, oper p
+      WHERE o.fdat = any(select fdat from fdat where fdat between trunc(Dat_, 'mm')  AND  Dat_)
+        AND o.acc  = acc_
+        AND (o.tt like 'ZG8%'  or o.tt like 'ZG9%')
+        and o.ref = p.ref
+        --and p.vdat = dat_
+        and p.sos = 5
+        and p.vob = 96;
+
+       SELECT NVL(SUM(decode(k.dk,0,1,0)*k.s),0),
+              NVL(SUM(decode(k.dk,1,1,0)*k.s),0)
+       INTO d_kor_, k_kor_
+          FROM kor_prov k, oper p
+         WHERE k.fdat  = any(select fdat from fdat where fdat between trunc(Dat_, 'mm')  AND  Dat_) and
+               k.acc  = acc_ AND
+               k.vob = 96 and
+               k.ref = p.ref and
+               p.tt not like 'ZG%';
+
+      if Dos_ >0 then
+         Dos_ := Dos_ - d_sum_;
+      end if;
+
+      if nls_ like '504%' 
+      then
+         Dos96p_ := 0;
+      end if;
+
+      if Dos96p_ >= d_sum_ and d_kor_ <> Dos96p_
+      then
+         Dos96p_ := Dos96p_ - d_sum_;
+      end if;
+      
+      if Kos_ >0 then
+         Kos_ := Kos_ - k_sum_;
+      end if;
+
+      if nls_ like '504%'
+      then
+         Kos96p_ := 0;
+      end if;
+
+      if Kos96p_ >= k_sum_ and k_kor_ <> Kos96p_
+      then
+         Kos96p_ := Kos96p_ - k_sum_;
+      end if;   
    END IF;
+
+   Dos_  := Dos_ - Dos96p_ - Dos99_;
+   Dosq_ := Dosq_ - Dosq96p_ - Dosq99_;
+   Kos_  := Kos_ - Kos96p_ - Kos99_;
+   Kosq_ := Kosq_ - Kosq96p_ - Kosq99_;
 
    IF substr(nls_,1,4)='3929' AND Kv_=980 then
       IF Dos_=Kos_ THEN
