@@ -7,38 +7,37 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_F27SB ***
 
-  CREATE OR REPLACE PROCEDURE BARS.P_F27SB (Dat_ DATE, sheme_ VARCHAR2 DEFAULT 'C')  IS
+CREATE OR REPLACE PROCEDURE BARS.P_F27SB (Dat_ DATE, sheme_ VARCHAR2 DEFAULT 'C')  IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Процедура формирование файла @27 для КБ
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 2009.All Rights Reserved.
-% VERSION     : 23/01/2018 (19/01/2018, 18/01/2018)
-%             :             Версия для Сбербанка)
+% VERSION     :07/02/2018 (23/01/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-23.01.2018 - в курсоре SALDO изменены условия для отбора (аналогично как 
+23.01.2018 - в курсоре SALDO изменены условия для отбора (аналогично как
              для файла #02)
 19.01.2018 - в курсоре SALDO вместо union all оставил только   union
-             (не включались все бал.счета) 
+             (не включались все бал.счета)
 18.01.2018 - при выдборі бал.рахунків із SB_R020 додано перевірку на
              дату закриття бал. рахунку (поле D_CLOSE)
              параметр OB22 будем выбирать из ACCOUNTS вместо SPECPARAM_INT
 05.12.2017 - добавлен блок для формирования виртуальных оборотов для бал.
-             счетов перехода на новый план счетов 
-13.11.2017 - удалил ненужные строки и изменил некоторые блоки формирования 
-18.02.2016 - для файла за последний рабочий день года 
-             из оборотов за месяц коды 50,51,60,61 не будут вычитаться 
+             счетов перехода на новый план счетов
+13.11.2017 - удалил ненужные строки и изменил некоторые блоки формирования
+18.02.2016 - для файла за последний рабочий день года
+             из оборотов за месяц коды 50,51,60,61 не будут вычитаться
              годовые корретирующие обороты
 17.02.2016 - для декабря месяца будут включаться годовые корректирующие
              обороты
 08.02.2016 изменения для успешного формирования кодов показателей 50, 51,
-           60, 61, 90, 91, 00, 01 
+           60, 61, 90, 91, 00, 01
 26.05.2012 формируем в разрезе кодов территорий
 07.09.2011 поменяла f_pop_otcn на f_pop_otcn_snp
 30.04.2011 добавил acc,tobo в протокол
 01.03.2011 в поле комментарий вносим код TOBO и название счета
-10.07.2009 убрал ORDER BY для табл. RNBU_TRACE	
+10.07.2009 убрал ORDER BY для табл. RNBU_TRACE
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 kodf_    varchar2(2):='27';
 rnk_     number;
@@ -104,63 +103,27 @@ comm_    rnbu_trace.comm%TYPE;
 sk_      number;
 d_sum_   number;
 k_sum_   number;
-l_acc_type    varchar2(3);
+d_kor_   number;
+k_kor_   number;
 -------------------------------------------------------------------------------
 CURSOR Saldo IS
-   SELECT s.rnk, s.acc, s.nls, s.kv, s.fdat, s.nbs, 
+   SELECT s.rnk, s.acc, s.nls, s.kv, s.fdat, s.nbs,
           s.ost, s.ostq,
-          s.dos, s.dosq, 
+          s.dos, s.dosq,
           s.kos, s.kosq,
-          s.dos96p, s.dosq96p, 
+          s.dos96p, s.dosq96p,
           s.kos96p, s.kosq96p,
           s.dos96, s.dosq96, s.kos96, s.kosq96,
           s.dos99, s.dosq99, s.kos99, s.kosq99,
           s.doszg, s.koszg, s.dos96zg, s.kos96zg,
-          nvl(l.k041,'1'), a.tobo, a.nms, NVL(trim(a.ob22),'00'), 
-         'NOT' acc_type 
+          nvl(l.k041,'1'), a.tobo, a.nms, NVL(trim(a.ob22),'00')
    FROM  otcn_saldo s, otcn_acc a, customer cc, kl_k040 l
-   WHERE s.acc=a.acc      
-     and s.rnk=cc.rnk   
-     and NVL(lpad(to_char(cc.country),3,'0'),'804')=l.k040(+) 
-     and a.dat_alt is null
-         union all
-   SELECT s.rnk, s.acc, d.acc_num nls, s.kv, s.fdat, substr(d.acc_num, 1, 4) nbs,
-          (case when d.acc_type = 'OLD' then 0 else s.ost end) ost,
-          (case when d.acc_type = 'OLD' then 0 else s.ostq end) ostq,
-          --
-          (case when d.acc_type = 'OLD' then d.dos_repm  else s.dos + d.dos_repm end) dos,
-          (case when d.kv = 980 then 0 else (case when d.acc_type = 'OLD' then d.dosq_repm  else s.dosq + d.dosq_repm end) end) dosq,
-          (case when d.acc_type = 'OLD' then d.kos_repm  else s.kos + d.kos_repm end) kos,
-          (case when d.kv = 980 then 0 else (case when d.acc_type = 'OLD' then d.kosq_repm  else s.kosq + d.kosq_repm end) end) kosq,
-          --
-          s.dos96p,
-          s.dosq96p,
-          s.kos96p,
-          s.kosq96p,
-          (case when d.acc_type = 'OLD' then 0 else s.dos96 end) dos96,
-          (case when d.acc_type = 'OLD' then 0 else s.dosq96 end) dosq96,
-          (case when d.acc_type = 'OLD' then 0 else s.kos96 end) kos96,
-          (case when d.acc_type = 'OLD' then 0 else s.kosq96 end) kosq96,
-          (case when d.acc_type = 'OLD' then 0 else s.dos99 end) dos99,
-          (case when d.acc_type = 'OLD' then 0 else s.dosq99 end) dosq99,
-          (case when d.acc_type = 'OLD' then 0 else s.kos99 end) kos99,
-          (case when d.acc_type = 'OLD' then 0 else s.kosq99 end) kosq99,
-          (case when d.acc_type = 'OLD' then 0 else s.doszg end) doszg,
-          (case when d.acc_type = 'OLD' then 0 else s.koszg end) koszg,
-          (case when d.acc_type = 'OLD' then 0 else s.dos96zg end) dos96zg,
-          (case when d.acc_type = 'OLD' then 0 else s.kos96zg end) kos96zg,
-          nvl(l.k041,'1'), a.tobo, a.nms, NVL(trim(d.acc_ob22),'00'),
-          d.acc_type
-   FROM  otcn_saldo s, otcn_acc a, nbur_kor_balances d, customer cc, kl_k040 l 
-   WHERE a.acc=s.acc    and
-         a.rnk=cc.rnk   and
-         NVL(lpad(to_char(cc.country),3,'0'),'804')=l.k040(+)  and
-         d.report_date between trunc(dat_, 'mm') and dat_ and 
-         s.acc = d.acc_id and
-         a.dat_alt = to_date('18122017', 'ddmmyyyy');
+   WHERE s.acc=a.acc
+     and s.rnk=cc.rnk
+     and NVL(lpad(to_char(cc.country),3,'0'),'804')=l.k040(+);
 -------------------------------------------------------------------------------
 procedure p_ins(p_dat_ date, p_tp_ varchar2, p_acc_ number, p_nls_ varchar2,
-                p_nbs_ varchar2, p_ob22_ varchar2, p_kv_ smallint, p_k041_ varchar2, 
+                p_nbs_ varchar2, p_ob22_ varchar2, p_kv_ smallint, p_k041_ varchar2,
   		p_znap_ varchar2, p_comm_ varchar2, p_tobo_ varchar2, p_nbuc_ varchar2) IS
                 kod_ varchar2(12);
 
@@ -195,8 +158,8 @@ p_proc_set_int(kodf_,sheme_,nbuc1_,typ_);
 --- их остатков (номиналы+эквиваленты)+обороты+корректирующие обороты
 --- все эти действия выполняются в функции F_POP_OTCN
 
--- используем классификатор SB_R020 
-sql_acc_ := 'select r020 from sb_r020 where f_27=''1'' and ' || 
+-- используем классификатор SB_R020
+sql_acc_ := 'select r020 from sb_r020 where f_27=''1'' and ' ||
             '(d_close is null or d_close > to_date('''||to_char(dat_, 'ddmmyyyy')||''',''ddmmyyyy'')) ';
 
 if to_char(Dat_,'MM') in ('12','01','02','03','04','05','06') then
@@ -215,169 +178,164 @@ OPEN Saldo;
                     Dos96_, Dosq96_, Kos96_, Kosq96_,
                     Dos99_, Dosq99_, Kos99_, Kosq99_,
                     Doszg_, Koszg_, Dos96zg_, Kos96zg_,
-                    k041_, tobo_, nms_, ob22_, l_acc_type;
+                    k041_, tobo_, nms_, ob22_;
    EXIT WHEN Saldo%NOTFOUND;
 
    comm_ := '';
 
-   IF typ_ > 0 
+   IF typ_ > 0
    THEN
       nbuc_ := NVL(F_Codobl_Tobo(acc_,typ_),nbuc1_);
    ELSE
       nbuc_ := nbuc1_;
    END IF;
 
-   if l_acc_type in ('NEW', 'NOT') then
-      --- обороты по перекрытию 6,7 классов на 5040,5041
-      IF to_char(Dat_,'MM') = '12' and (nls_ like '6%' or nls_ like '7%' or nls_ like '504%') 
-      THEN
-         SELECT NVL(SUM(decode(dk,0,1,0)*s),0),
-                NVL(SUM(decode(dk,1,1,0)*s),0)
-            INTO d_sum_, k_sum_
-         FROM opldok 
-         WHERE fdat  between Dat_  AND Dat_+29 AND
+   --- обороты по перекрытию 6,7 классов на 5040,5041
+   IF to_char(Dat_,'MM')='12' and (nls_ like '6%' or nls_ like '7%' or nls_ like '390%' or nls_ like '504%') THEN
+      SELECT NVL(SUM(decode(dk,0,1,0)*s),0),
+             NVL(SUM(decode(dk,1,1,0)*s),0)
+         INTO d_sum_, k_sum_
+      FROM opldok
+      WHERE fdat  between Dat_  AND Dat_+29 AND
+            acc  = acc_   AND
+            (tt like 'ZG8%'  or tt like 'ZG9%');
+
+      Dos96_:=Dos96_-d_sum_;
+      Kos96_:=Kos96_-k_sum_;
+   END IF;
+
+   IF Dos99_ > 0 THEN
+      BEGIN
+        select NVL(sum(s),0)
+           into sk_
+        from kor_prov
+        where vob=99
+          and dk=0
+          and acc=acc_
+          and fdat between Dat_+1 and Dat_+28;
+      EXCEPTION WHEN NO_DATA_FOUND THEN
+         sk_ := 0;
+      END;
+
+      Dos99_ := Dos99_ - sk_;
+   END IF;
+
+   IF Kos99_ > 0 THEN
+      BEGIN
+        select NVL(sum(s),0)
+           into sk_
+        from kor_prov
+        where vob=99
+          and dk=1
+          and acc=acc_
+          and fdat between Dat_+1 and Dat_+28;
+      EXCEPTION WHEN NO_DATA_FOUND THEN
+         sk_ := 0;
+      END;
+
+      Kos99_ := Kos99_ - sk_;
+   END IF;
+
+   IF Dosq99_ > 0 THEN
+      BEGIN
+        select NVL(sum(gl.p_icurval(kv_, s, vdat)), 0)
+           into sk_
+        from kor_prov
+        where vob=99
+          and dk=0
+          and acc=acc_
+          and fdat between Dat_+1 and Dat_+28;
+      EXCEPTION WHEN NO_DATA_FOUND THEN
+         sk_ := 0;
+      END;
+
+      Dosq99_ := Dosq99_ - sk_;
+   END IF;
+
+   IF Kosq99_ > 0 THEN
+      BEGIN
+        select NVL( sum(gl.p_icurval(kv_, s, vdat)), 0)
+           into sk_
+        from kor_prov
+        where vob=99
+          and dk=1
+          and acc=acc_
+          and fdat between Dat_+1 and Dat_+28;
+      EXCEPTION WHEN NO_DATA_FOUND THEN
+         sk_ := 0;
+      END;
+
+      Kosq99_ := Kosq99_ - sk_;
+   END IF;
+
+   --- обороты по перекрытию 6,7 классов на 5040,5041
+   IF to_char(Dat_,'MM')='01' and (nls_ like '6%' or nls_ like '7%' or nls_ like '504%') THEN
+       SELECT NVL(SUM(decode(dk,0,1,0)*s),0),
+              NVL(SUM(decode(dk,1,1,0)*s),0)
+         INTO d_sum_, k_sum_
+         FROM opldok
+         WHERE fdat  = trunc(Dat_, 'mm') AND
                acc  = acc_   AND
-               (tt like 'ZG8%'  or tt like 'ZG9%');
+               (tt like 'ZG1%' OR tt like 'ZG2%');
 
-         if Dos96_ > 0 then
-            Dos96_ := Dos96_ - d_sum_;
-         end if;
-         if Kos96_ > 0 then
-            Kos96_ := Kos96_ - k_sum_;
-         end if;
-      END IF;
+      Dos_ := Dos_ - d_sum_;
+      Kos_ := Kos_ - k_sum_;
 
-      IF Dos99_ > 0 and to_char(Dat_,'MM') <> '12' THEN
-         BEGIN
-            select NVL(sum(s),0)
-               into sk_
-            from kor_prov
-            where vob = 99
-              and dk = 0
-              and acc = acc_
-              and fdat between Dat_+1 and Dat_+28;
-         EXCEPTION WHEN NO_DATA_FOUND THEN
-            sk_ := 0;
-         END;
-         Dos99_ := Dos99_ - sk_;
-         --Dos96_ := Dos96_ - sk_;
-      END IF;
+      SELECT NVL(SUM(decode(o.dk,0,1,0)*o.s),0),
+                NVL(SUM(decode(o.dk,1,1,0)*o.s),0)
+       INTO d_sum_, k_sum_
+       FROM opldok o, oper p
+      WHERE o.fdat = any(select fdat from fdat where fdat between trunc(Dat_, 'mm')  AND  Dat_)
+        AND o.acc  = acc_
+        AND (o.tt like 'ZG8%'  or o.tt like 'ZG9%')
+        and o.ref = p.ref
+        --and p.vdat = dat_
+        and p.sos = 5
+        and p.vob = 96;
 
-      IF Kos99_ > 0 and to_char(Dat_,'MM') <> '12' THEN
-         BEGIN
-            select NVL(sum(s),0)
-               into sk_
-            from kor_prov
-            where vob = 99
-              and dk = 1
-              and acc = acc_
-              and fdat between Dat_+1 and Dat_+28;
-         EXCEPTION WHEN NO_DATA_FOUND THEN
-            sk_ := 0;
-         END;
-         Kos99_ := Kos99_ - sk_;
-         --Kos96_ := Kos96_ - sk_;
-      END IF;
+       SELECT NVL(SUM(decode(k.dk,0,1,0)*k.s),0),
+              NVL(SUM(decode(k.dk,1,1,0)*k.s),0)
+       INTO d_kor_, k_kor_
+          FROM kor_prov k, oper p
+         WHERE k.fdat  = any(select fdat from fdat where fdat between trunc(Dat_, 'mm')  AND  Dat_) and
+               k.acc  = acc_ AND
+               k.vob = 96 and
+               k.ref = p.ref and
+               p.tt not like 'ZG%';
 
-      IF Dosq99_ > 0 and to_char(Dat_,'MM') <> '12' THEN
-         BEGIN
-            select NVL( sum(gl.p_icurval(kv_, s, vdat)), 0)
-               into sk_
-            from kor_prov
-            where vob = 99
-              and dk = 0
-              and acc = acc_
-              and fdat between Dat_+1 and Dat_+28;
-         EXCEPTION WHEN NO_DATA_FOUND THEN
-            sk_ := 0;
-         END;
-         Dosq99_ := Dosq99_ - sk_;
-         --Dosq96_ := Dosq96_ - sk_;
-      END IF;
-
-      IF Kosq99_ > 0 and to_char(Dat_,'MM') <> '12' THEN
-         BEGIN
-            select NVL( sum(gl.p_icurval(kv_, s, vdat)), 0)
-               into sk_
-            from kor_prov
-            where vob = 99
-              and dk = 1
-              and acc = acc_
-              and fdat between Dat_+1 and Dat_+28;
-         EXCEPTION WHEN NO_DATA_FOUND THEN
-            sk_ := 0;
-         END;
-         Kosq99_ := Kosq99_ - sk_;
-         --Kosq96_ := Kosq96_ - sk_;
-      END IF;
-
-      -- для файла за год не вычитаем годовые корректирующие из оборотов за месяц
-      if to_char(Dat_,'MM') = '12' then
-         Dos_ := Dos_ - Dos96p_;
-         Dosq_:= Dosq_ - Dosq96p_;
-         Kos_ := Kos_ - Kos96p_;
-         Kosq_:= Kosq_ - Kosq96p_;
-      else    
-         Dos_ := Dos_ - Dos96p_ - Dos99_;
-         Dosq_:= Dosq_ - Dosq96p_ - Dosq99_;
-         Kos_ := Kos_ - Kos96p_ - Kos99_;
-         Kosq_:= Kosq_ - Kosq96p_ - Kosq99_;
+      if Dos_ >0 then
+         Dos_ := Dos_ - d_sum_;
       end if;
 
-      --- обороты по перекрытию 6,7 классов на 5040,5041
-      IF to_char(Dat_,'MM')='01' and (nls_ like '6%' or nls_ like '7%' or nls_ like '504%') THEN
-         SELECT NVL(SUM(decode(dk,0,1,0)*s),0),
-                    NVL(SUM(decode(dk,1,1,0)*s),0)
-             INTO d_sum_, k_sum_
-             FROM opldok
-             WHERE fdat  = trunc(Dat_, 'mm') AND
-                   acc  = acc_   AND
-                   (tt like 'ZG1%' OR tt like 'ZG2%');
-   
-         Dos_ := Dos_ - d_sum_;
+      if nls_ like '504%' 
+      then
+         Dos96p_ := 0;
+      end if;
+
+      if Dos96p_ >= d_sum_ and d_kor_ <> Dos96p_
+      then
+         Dos96p_ := Dos96p_ - d_sum_;
+      end if;
+      
+      if Kos_ >0 then
          Kos_ := Kos_ - k_sum_;
-      END IF;
-   end if;
+      end if;
 
-   if l_acc_type  = 'NEW' then
-      declare
-         dosn_kor number;
-         kosn_kor number;
-         dosq_kor number;
-         kosq_kor number;
-       begin
-          SELECT nvl(DOS_REPM, 0) - nvl(DOS_REPD, 0),
-                 nvl(DOSQ_REPM, 0) - nvl(DOSQ_REPD, 0),
-                 nvl(KOS_REPM, 0) - nvl(KOS_REPD, 0),
-                 nvl(KOSQ_REPM, 0) - nvl(KOSQ_REPD, 0)
-             INTO dosn_kor, dosq_kor, kosn_kor, kosq_kor
-          FROM nbur_kor_balances
-          WHERE report_date = to_date('18122017','ddmmyyyy') AND
-                acc_id  = acc_   AND
-                acc_type = 'OLD';
+      if nls_ like '504%'
+      then
+         Kos96p_ := 0;
+      end if;
 
-          Dos_ := Dos_ - (dosn_kor - Dos96p_);
-          Kos_ := Kos_ - (kosn_kor - Kos96p_);
+      if Kos96p_ >= k_sum_ and k_kor_ <> Kos96p_
+      then
+         Kos96p_ := Kos96p_ - k_sum_;
+      end if;   
+   END IF;
 
-          if kv_ <> 980 then
-             Dosq_ := Dosq_ - (dosq_kor - Dosq96p_);
-             Kosq_ := Kosq_ - (kosq_kor - Kosq96p_);
-          end if;
-       exception
-            when no_data_found then
-                null;
-       end;
-   end if;
-
-   if l_acc_type  = 'OLD' then
-          Dos_ := Dos_ - Dos96p_;
-          Kos_ := Kos_ - Kos96p_;
-
-          if kv_ <> 980 then
-             Dosq_ := Dosq_ - Dosq96p_;
-             Kosq_ := Kosq_ - Kosq96p_;
-          end if;
-   end if;
+   Dos_  := Dos_ - Dos96p_ - Dos99_;
+   Dosq_ := Dosq_ - Dosq96p_ - Dosq99_;
+   Kos_  := Kos_ - Kos96p_ - Kos99_;
+   Kosq_ := Kosq_ - Kosq96p_ - Kosq99_;
 
 -- начало ** вставил 28.09.2005
    IF Dos_ < 0 THEN
@@ -450,10 +408,8 @@ OPEN Saldo;
       p_ins(data_, '00', acc_, nls_, nbs_, ob22_, kv_, k041_, TO_CHAR(Kosq99_), comm_, tobo_, nbuc_);
    END IF;
 
-   if l_acc_type <> 'OLD' then
-      Ostn_:=Ostn_-Dos96_+Kos96_;
-      Ostq_:=Ostq_-Dosq96_+Kosq96_;
-   end if;
+   Ostn_:=Ostn_-Dos96_+Kos96_;
+   Ostq_:=Ostq_-Dosq96_+Kosq96_;
 
    IF Ostn_<>0 THEN
       dk_:=IIF_N(Ostn_,0,'1','2','2');
@@ -465,34 +421,9 @@ OPEN Saldo;
       p_ins(data_, dk_ , acc_, nls_, nbs_, ob22_, kv_ , k041_, TO_CHAR(ABS(Ostq_)), comm_, tobo_, nbuc_);
    END IF;
 
-   --if to_char(Dat_,'MM') = '12' then
-   --   Ostn_ := Ostn_ - Dos96_ + Kos96_ - Dos99_ + Kos99_;
-   --else
-   --   Ostn_ := Ostn_ - Dos96_ + Kos96_;
-   --end if;
-
-   --IF Ostn_ <> 0 THEN
-   --   dk_ := IIF_N(Ostn_,0,'1','2','2');
-   --   p_ins(data_, dk_, acc_, nls_, nbs_, ob22_, kv_, k041_, TO_CHAR(ABS(Ostn_)), comm_, tobo_, nbuc_);
-   --END IF;
-
-   --if to_char(Dat_,'MM') = '12' then
-   --   Ostq_ := Ostq_ - Dosq96_ + Kosq96_ - Dosq99_ + Kosq99_;
-   --else 
-   --   Ostq_ := Ostq_-Dosq96_+Kosq96_;
-   --end if;
-
-   --IF Ostq_ <> 0 THEN
-   --   dk_ := IIF_N(Ostq_,0,'1','2','2')||'0';
-   --   p_ins(data_, dk_ , acc_, nls_, nbs_, ob22_, kv_ , k041_, TO_CHAR(ABS(Ostq_)), comm_, tobo_, nbuc_);
-   --END IF;
-
 END LOOP;
 CLOSE Saldo;
 ---------------------------------------------------------------------------
---6) Манипуляции с вешалками
---  P_OTC_VE9 (DAT_, KODF_);
----------------------------------------------------
 DELETE FROM tmp_irep where kodf=kodf_ and datf=dat_;
 ---------------------------------------------------
 INSERT INTO tmp_irep (kodf, datf, kodp, znap, nbuc)
