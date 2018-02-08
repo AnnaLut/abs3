@@ -90,15 +90,6 @@ namespace Bars.FNVR
             this.IRC = IRC;
         }
 
-        public void DeleteRows(OracleConnection con, decimal id)
-        {
-            OracleCommand cmd = con.CreateCommand();
-            cmd.CommandType = CommandType.Text;
-            cmd.CommandText = "delete from PRVN_FV_REZ where ID_CALC_SET=:p_ID_CALC_SET";
-            cmd.Parameters.Add(new OracleParameter("p_ID_CALC_SET", OracleDbType.Decimal, id, ParameterDirection.Input));
-            cmd.ExecuteNonQuery();
-        }
-
         public void WriteRow(OracleConnection con)
         {
             OracleCommand cmd = con.CreateCommand();
@@ -216,17 +207,19 @@ namespace Bars.FNVR
                 if (con.State != ConnectionState.Open)
                     con.Open();
 
-                decimal idForDel = -1;
+                int i = 0;
                 // Начинаем сессию взаимодействия и вычитываем сообщение і пишемо в таблицю
                 foreach (FNVRDataRow inputData in FNVRData)
                 {
-                    if (idForDel != inputData.ID_CALC_SET)
+                    //  Bars.Logger.DBLogger.Info("FNVRDataRow.inputData" + inputData.ToString() );
+                    if (i % 1000 == 0)
                     {
-                        idForDel = inputData.ID_CALC_SET;
-                        inputData.DeleteRows(con, idForDel);
+                        //  Bars.Logger.DBLogger.Info("FNVRCounter =" + i.ToString());
                     }
                     inputData.WriteRow(con);
+                    i++;
                 }
+
             }
             finally
             {
