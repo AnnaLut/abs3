@@ -196,7 +196,6 @@ IS
    ret_         number;
    in_acc_      varchar2(255);
 
-   s190_        varchar2(1);
    r012_        specparam.r012%type;
    s580_        specparam.s580%type;
    s580a_       specparam.s580%type;
@@ -1511,15 +1510,15 @@ BEGIN
       granica_  number := 100;
       mask_     varchar2(100);
    begin
-      for k in (select fdat, ref, acc, nls, kv, sq, nbs, acca, nlsa,
+      for k in (select fdat, ref, acc, nls, kv, sq, nbs, acca, nlsa, rnka,
                        sum(sq) over (partition by acc) sum_all
                 from (select /*+ leading(a) index(o,IDX_OPLDOK_KF_FDAT_ACC)  */
-                             o.fdat, o.ref, o.acc, a.nls, a.kv,
+                             o.fdat, o.ref, o.acc, a.nls, a.kv, 
                              decode(o.dk, 0, -1, 1) * gl.p_icurval(a.kv, o.s, dat_) sq,
-                             a.nbs, z.acc acca, x.nls nlsa
+                             a.nbs, z.acc acca, x.nls nlsa, x.rnk rnka
                       from accounts a, opldok o, opldok z, accounts x, oper p
                       where o.fdat = any (select fdat from fdat
-                                           where fdat between datp_ and dat_
+                                           where fdat between datb_+1 and dat_
                                              and fdat !=to_date('20171218','yyyymmdd')  ) and
                         o.acc = a.acc 
                         and a.tip = 'REZ' 
@@ -1579,6 +1578,13 @@ BEGIN
                end;
 
                if recid_ is not null then
+              
+                  if abs(k.sq) > znap_ then
+                     znap_ := -1 * znap_;
+                  else 
+                     znap_ := k.sq;
+                  end if;
+                  
                   INSERT INTO rnbu_trace
                               (recid, userid, nls, kv, odate, kodp,
                                znap, acc, rnk, isp, mdate, ref,
@@ -1586,7 +1592,7 @@ BEGIN
                               )
                    select s_rnbu_record.NEXTVAL recid,
                           userid, nls, kv, odate, kodp,
-                          to_char(k.sq), acc,
+                          to_char(znap_), acc,
                           rnk, isp, mdate, k.ref,
                           'Списання за рахунок резерву РЕФ = '||to_char(k.ref) comm,
                           nbuc, tobo

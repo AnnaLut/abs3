@@ -758,7 +758,7 @@ BEGIN
                                 WHERE     NVL (nbs, SUBSTR (nls, 1, 4)) IN (SELECT r020
                                                                               FROM kl_f3_29
                                                                              WHERE kf = ''E8'')
-                                      AND (nls, kv) NOT IN (SELECT nls, kv FROM kf91)) 
+                                      AND (nls, kv) NOT IN (SELECT nls, kv FROM kf91))
                     ';
 
        if FL_D8_ = '8' then
@@ -766,7 +766,7 @@ BEGIN
                                     from tab
                                     where acc NOT IN (SELECT gen_acc
                                                       FROM v_dpu_rel_acc_all
-                                                      WHERE gen_acc IS NOT NULL)   
+                                                      WHERE gen_acc IS NOT NULL)
                                     union all
                                     select *
                                     from tab

@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_ret_nbsr_rez.sql =========*** Run
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE FUNCTION BARS.F_RET_NBSR_REZ (nlsa_ varchar2,
+CREATE OR REPLACE FUNCTION BARS.F_RET_NBSR_REZ (nlsa_ varchar2,
                                                r013a_ varchar2,
                                                s080a_ varchar2,
                                                id_ in varchar2,
@@ -236,7 +230,7 @@ begin
 --
 --
 --            if (substr(nbsr_,1,4) like '159%' or
---                nbsr_ in ('3599') or 
+--                nbsr_ in ('3599') or
 --                substr(nbsr_,1,4) like '3690%') and
 --                r013r_ = '0'
 --            then
@@ -261,11 +255,3 @@ begin
   return nbsr_ || r013r_;
 end;
 /
- show err;
- 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/function/f_ret_nbsr_rez.sql =========*** End
- PROMPT ===================================================================================== 
-

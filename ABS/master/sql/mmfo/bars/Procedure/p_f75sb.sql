@@ -590,7 +590,6 @@ BEGIN
          kk_ := '05';
       end if;
 
-      -- Перерахування до інших установ
       if kv_=980 and nlsd_ like '7%' and nlsk_ like '3739%'
       then
          kk_ := '07';
@@ -609,7 +608,7 @@ BEGIN
          kk_ := '07';
       end if;
 
-      -- виправнi обороти (щодо коду 01)
+      -- виправнi обороти щодо коду 01
       if ( nbs_ = nbsk_ )
       then
         kk_ := '11';
@@ -844,7 +843,7 @@ BEGIN
           IF ( typ_ > 0 )
           then nbuc_ := NVL(F_Codobl_Tobo(acck_,typ_),nbuc1_);
           else nbuc_ := nbuc1_;
-          end if;
+          END IF;
 
           kodp_:= dk_ || Nbsk_ || ob22_k || lpad(kv_, 3, '0') || kk_ ;
           znap_:= to_char(Dosq_);
@@ -862,35 +861,32 @@ BEGIN
 
     IF pr_k in ('1','6') and pr_d = '0' THEN
 
-      comm_ := SubStr( comm_ || '   !!! Проверка !!!', 1, 200 );
+      comm_ := substr(comm_ || '   !!! Проверка !!!', 1, 200);
 
       -- кошти направленi на формування резерву
-      if nlsd_ like '380%' and nlsk_ NOT like '770%'
-      then
-        kk_ := '01';
+      if nlsd_ like '380%' and nlsk_ not like '770%' then
+         kk_ := '01';
       end if;
 
-      if nlsd_ like '770%' and nlsk_ NOT like '770%'
-      then
-        kk_ := '01';
+      if nlsd_ like '7%' and nlsk_ not like '77%' then
+         kk_ := '01';
       end if;
 
       -- зменшення резервiв за рахунок уточнень
-      if kv_ = 980 and nlsd_ like '3801%' and nlsk_ like '770%'
-      then
-        kk_ := '02';
+      if kv_ = 980 and nlsd_ like '3801%' and nlsk_ like '7%' then
+         kk_ := '02';
       end if;
 
---    -- повернення заборгованностi
---    if (nlsd_ like '1%' or nlsd_ like '2%' or nlsd_ like '3%') and nlsd_ not like '3801%' and
---       nlsk_ like '7%' then
---       kk_ := '04';
---    end if;
+--      -- повернення заборгованностi
+--      if (nlsd_ like '1%' or nlsd_ like '2%' or nlsd_ like '3%') and nlsd_ not like '3801%' and
+--         nlsk_ like '7%' then
+--         kk_ := '04';
+--      end if;
 
---    -- при формировании новых счетов для резерва
---    if nlsd_ like '3739%' and nlsk_ like '7%' then
---       kk_ := '07';
---    end if;
+      -- при формировании новых счетов для резерва
+      if nlsd_ like '3739%' and nlsk_ like '770%' then
+         kk_ := '07';
+      end if;
 
       -- при формировании новых счетов для резерва
       if ( nlsd_ like '3739%' and
@@ -903,7 +899,7 @@ BEGIN
                     ,'3119','3219','3569','3590','3599','3690','3692','3699')
          )
       then
-        kk_ := '07';
+         kk_ := '07';
       end if;
 
       -- списання резерву
@@ -917,52 +913,45 @@ BEGIN
                     ,'3119','3219','3569','3590','3599','3690','3692','3699')
          )
       then
-        kk_ := '07';
+         kk_ := '07';
       end if;
 
-      IF Dos_ > 0 
-      THEN
+      IF Dos_ > 0 THEN
+         if kv_ != 980 then
+            dk_ := '61';
+         else
+            dk_ := '60';
+         end if;
 
-        if ( kv_ = 980 )
-        then dk_ := '60';
-        else dk_ := '61';
-        end if;
+         kodp_:= dk_ || Nbsk_ || ob22_k || lpad(kv_, 3, '0') || kk_ ;
+         znap_:=TO_CHAR(Dos_);
 
-        if ( typ_ > 0 )
-        then nbuc_ := NVL(F_Codobl_Tobo(acck_,typ_),nbuc1_);
-        else nbuc_ := nbuc1_;
-        end if;
-
-        kodp_ := dk_ || Nbsk_ || ob22_k || lpad(kv_, 3, '0') || kk_;
-        znap_ := TO_CHAR(Dos_);
+         IF typ_>0 THEN
+            nbuc_ := NVL(F_Codobl_Tobo(acck_,typ_),nbuc1_);
+         ELSE
+            nbuc_ := nbuc1_;
+         END IF;
 
          INSERT INTO rnbu_trace(nls, kv, odate, kodp, znap, ref, comm, acc, nbuc)
-         VALUES ( nlsk_, kv_, data_, kodp_, znap_, ref_, comm_, acck_, nbuc_ );
-
+         VALUES  (nlsk_, kv_, data_, kodp_, znap_, ref_, comm_, acck_, nbuc_) ;
       END IF;
 
-      IF kv_ != 980 and Dosq_ > 0 
-      THEN
+      IF kv_ != 980 and Dosq_ > 0 THEN
+         kodp_:= '60' || Nbsk_ || ob22_k || lpad(kv_, 3, '0') || kk_ ;
+         znap_:=TO_CHAR(Dosq_);
 
-        dk_ := '60'
+         IF typ_>0 THEN
+            nbuc_ := NVL(F_Codobl_Tobo(acck_,typ_),nbuc1_);
+         ELSE
+            nbuc_ := nbuc1_;
+         END IF;
 
-        if ( typ_ > 0 )
-        then nbuc_ := NVL(F_Codobl_Tobo(acck_,typ_),nbuc1_);
-        else nbuc_ := nbuc1_;
-        end if;
-
-        kodp_ := dk_ || Nbsk_ || ob22_k || lpad(kv_, 3, '0') || kk_;
-        znap_ := TO_CHAR(Dosq_);
-
-        INSERT INTO rnbu_trace(nls, kv, odate, kodp, znap, ref, comm, acc, nbuc)
-        VALUES ( nlsk_, kv_, data_, kodp_, znap_, ref_, comm_, acck_, nbuc_ );
-
+         INSERT INTO rnbu_trace(nls, kv, odate, kodp, znap, ref, comm, acc, nbuc)
+         VALUES  (nlsk_, kv_, data_, kodp_, znap_, ref_, comm_, acck_, nbuc_) ;
       END IF;
-
     END IF;
-
   END LOOP;
-
+  
   CLOSE OBOROTY;
 
   -- розрахунок показникыв курсової р?зниц? (код 06)
