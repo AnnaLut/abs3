@@ -5,6 +5,7 @@ CREATE OR REPLACE PROCEDURE BARS.cck_OSBB (p_mode int, p_nd1 number) is
 -- p_mode = 2 Фініш       первинного КД ОСББ + Авто-Старт вторинного КД ОСББ
 -- p_mode = 3 Авторизація вторинного КД ОСББ - як самостійного КД
 /*
+08/02/2018 LitvinSO COBUSUPABS-7041 При створенні нового договору необхідно автоматично згенерувати параметр CIG_D13 зі значенням 1
 10/11/2017 LitvinSO Для p_mode = 2 с учетом на переход новый план счетов так как мы не меняем cc_deal.PROD анализируем продукт 
 26/05/2017 Pivanova додано заміну коми на крапку при вичитуванні тагу S_SDI
 18.11.2015 LitvinSO Реалізовано у перевіркі РНК пропускало клієнтів які відносяться до ЖБК з кодом K050 = 320 і K051 = 62.
@@ -279,6 +280,15 @@ If p_mode = 2 then
       CCK_APP.SET_ND_TXT(dd2.nd,'S_SDI',to_char(sd1.ostb/100)            );
    end if ;
    ------------??????????? TRIGGER tbu_ccdeal_eib10
+   -- COBUSUPABS-7041 Після оновлення трігера TBU_CCDEAL_EIB10 по контролю за заповненням параметра CIG_D13 перестала працювати функція Додаткова щоденна бізнес-логіка продуктів КП
+    BEGIN
+      INSERT INTO mos_operw (ND, TAG, VALUE)
+           VALUES (dd2.nd, 'CIG_D13', '1');
+    EXCEPTION
+      WHEN DUP_VAL_ON_INDEX
+      THEN
+          NULL;
+    END;
    CCK_APP.SET_ND_TXT(dd2.nd,'CPROD',CCK_APP.Get_ND_TXT (dd1.ND,'CPROD') );
    CCK_APP.SET_ND_TXT(dd2.nd,'EIBIS',CCK_APP.Get_ND_TXT (dd1.ND,'EIBIS') );
    CCK_APP.SET_ND_TXT(dd2.nd,'EIBCW',CCK_APP.Get_ND_TXT (dd1.ND,'EIBCW') );
