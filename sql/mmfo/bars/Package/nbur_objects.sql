@@ -4,7 +4,7 @@ is
   --
   -- constants
   --
-  g_header_version  constant varchar2(64)  := 'version 17.3  2017.10.23';
+  g_header_version  constant varchar2(64)  := 'version 17.4  2018.02.07';
 
   --
   -- types
@@ -387,15 +387,17 @@ is
   );
 
   --
-  -- REMOVE_INVALID_VERSIONS
-  --
-  --  p_report_date - Звітна дата
-  --  p_kf          - Код фiлiалу (МФО)
+  -- Видалення інвалідних версій вітрин
   --
   procedure REMOVE_INVALID_VERSIONS
   ( p_report_date  in     nbur_lst_objects.report_date%type
   , p_kf           in     nbur_lst_objects.kf%type
   );
+
+  --
+  -- Видалення застарілих версій вітрин
+  --
+  procedure REMOVE_OBSOLETE_VERSIONS;
 
   --
   --
@@ -5988,9 +5990,9 @@ is
   %param p_kf          - Код фiлiалу (МФО)
 
   %version 1.2 (07/02/2018)
-  %usage   Видалення даних з архіву версій вітрин даних
+  %usage   Видалення інвалідних версій даних з архівних вітрин даних
   */
-    title        constant varchar2(64)  := $$PLSQL_UNIT||'.RETRIEVE_VERSION_BY_ID';
+    title        constant varchar2(64)  := $$PLSQL_UNIT||'.REMOVE_INVALID_VERSIONS';
     l_lmt_dt              date;
     l_kf                  varchar2(6);
   begin
@@ -6014,8 +6016,12 @@ is
 
     else -- for one KF
 
-      l_lmt_dt := nvl(p_report_date,trunc(sysdate,'Q'));
-      l_lmt_dt := DAT_NEXT_U( l_lmt_dt, -1 );
+      if ( p_report_date Is Null )
+      then -- залишаємо вітрини за поточний і попередній місяць
+        l_lmt_dt := add_months( trunc(GL.GBD(),'MM'), -1 );
+      else
+        l_lmt_dt := DAT_NEXT_U( p_report_date, -1 );
+      end if;
 
       for o in ( select o.ID          as OBJ_ID
                       , o.OBJECT_NAME as OBJ_NM
@@ -6042,11 +6048,10 @@ is
                         , v.KF
                         , v.VERSION_ID  as VRSN_ID
                      from NBUR_LST_OBJECTS v
-                    where v.REPORT_DATE < l_lmt_dt
-                      and v.KF          = l_kf
-                      and v.OBJECT_ID   = o.OBJ_ID
-                      and v.VLD         > 0 -- Neither 'FINISHED' nor 'BLOCKED'
-                   -- and v.ROW_COUNT   > 0
+                    where v.REPORT_DATE   < l_lmt_dt
+                      and v.KF            = l_kf
+                      and v.OBJECT_ID     = o.OBJ_ID
+                      and v.OBJECT_STATUS = 'INVALID'
                       for update of OBJECT_STATUS nowait
                  )
         loop
@@ -6097,7 +6102,7 @@ is
                    from NBUR_LST_FILES f
                   where f.REPORT_DATE < l_lmt_dt
                     and f.KF          = l_kf
-                    and f.FILE_STATUS not in ('FINISHED','BLOCKED')
+                    and f.FILE_STATUS = 'INVALID'
                     for update of FILE_STATUS nowait
                )
       loop
@@ -6121,6 +6126,8 @@ is
 
           update NBUR_LST_FILES
              set FILE_STATUS = 'DELETED'
+--             , FILE_BODY   = null
+--             , FILE_HASH   = null
            where ROWID = f.ROW_ID;
 
           commit;
@@ -6138,6 +6145,99 @@ is
     bars_audit.trace( '%s: Exit.', title );
 
   end REMOVE_INVALID_VERSIONS;
+
+  --
+  --
+  --
+  procedure REMOVE_OBSOLETE_VERSIONS
+  is
+  /**
+  <b>REMOVE_OBSOLETE_VERSIONS</b> - Видалення застарілих версій з вітрин
+
+  %version 1.1 (07/02/2018)
+  %usage   Видалення застарілих версій даних з архівних вітрин даних
+  */
+    title        constant varchar2(64)  := $$PLSQL_UNIT||'.REMOVE_OBSOLETE_VERSIONS';
+    l_lmt_dt              date;
+  begin
+
+    bars_audit.trace( '%s: Entry.', title );
+
+    -- залишаємо вітрини за рік
+    l_lmt_dt := add_months( trunc(GL.GBD(),'MM'), -12 );
+
+    for o in ( select distinct
+                      v.REPORT_DATE as RPT_DT
+                    , t.TABLE_NAME  as TBL_NM
+                 from NBUR_REF_OBJECTS o
+                 join NBUR_LST_OBJECTS v
+                   on ( v.OBJECT_ID = o.ID )
+                 join ALL_TABLES t
+                   on ( t.OWNER = 'BARS' and t.TABLE_NAME = o.OBJECT_NAME||'_ARCH' )
+                where v.REPORT_DATE < l_lmt_dt
+                order by v.REPORT_DATE
+             )
+    loop
+
+      bars_audit.trace( '%s: tbl_nm=%s, rpt_dt=%s.', title, o.TBL_NM, to_char(o.RPT_DT,'dd.mm.yyyy') );
+
+      begin
+
+        execute immediate 'alter table '||o.TBL_NM||' drop partition for ( to_date('''||to_char(o.RPT_DT,'YYYYMMDD')||''',''YYYYMMDD'') )';
+        bars_audit.trace( '%s: partition dropped for %.', title, to_char(o.RPT_DT,'dd.mm.yyyy') );
+
+        update NBUR_LST_OBJECTS
+           set OBJECT_STATUS = 'DELETED'
+         where REPORT_DATE   = o.RPT_DT;
+
+      exception
+        when e_ptsn_not_exsts then
+          null;
+        when others then
+          bars_audit.error( title || ': ' || dbms_utility.format_error_stack()
+                               || CHR(10) || dbms_utility.format_error_backtrace() );
+      end;
+
+    end loop;
+
+    for f in ( select distinct
+                      f.REPORT_DATE as RPT_DT
+                 from NBUR_LST_FILES f
+                where f.REPORT_DATE < l_lmt_dt
+             )
+    loop
+
+      begin
+
+        bars_audit.trace( '%s: rpt_dt=%s, tbl_nm=NBUR_DETAIL_PROTOCOLS_ARCH.', title, to_char(f.RPT_DT,'dd.mm.yyyy') );
+
+        execute immediate 'alter table NBUR_DETAIL_PROTOCOLS_ARCH drop partition for ( to_date('''||to_char(f.RPT_DT,'YYYYMMDD')||''',''YYYYMMDD'') )';
+
+        bars_audit.trace( '%s: rpt_dt=%s, tbl_nm=NBUR_AGG_PROTOCOLS_ARCH.', title, to_char(f.RPT_DT,'dd.mm.yyyy') );
+
+        execute immediate 'alter table NBUR_AGG_PROTOCOLS_ARCH drop partition for ( to_date('''||to_char(f.RPT_DT,'YYYYMMDD')||''',''YYYYMMDD'') )';
+
+        update NBUR_LST_FILES
+           set FILE_STATUS = 'DELETED'
+             , FILE_BODY   = null
+             , FILE_HASH   = null
+         where REPORT_DATE = f.RPT_DT;
+
+      exception
+        when e_ptsn_not_exsts then
+          null;
+        when others then
+          bars_audit.error( title || ': ' || dbms_utility.format_error_stack()
+                               || CHR(10) || dbms_utility.format_error_backtrace() );
+      end;
+
+    end loop;
+
+--  commit;
+
+    bars_audit.trace( '%s: Exit.', title );
+
+  end REMOVE_OBSOLETE_VERSIONS;
 
   --
   --
