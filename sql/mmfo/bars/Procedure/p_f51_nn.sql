@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE P_F51_NN( Dat_ DATE,
+CREATE OR REPLACE PROCEDURE BARS.P_F51_NN( Dat_ DATE,
                                       sheme_ varchar2 default 'G',
                                       tipost_ varchar2 default 'S') IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -90,7 +90,7 @@ CURSOR BaseL IS
   IS
     kod_ varchar2(11);
   begin
-  
+
     if length(trim(p_tp_)) = 1
     then
       IF p_kv_ = 980 THEN
@@ -107,14 +107,14 @@ CURSOR BaseL IS
     INSERT INTO rnbu_trace
             ( nls, kv, odate, kodp, znap, nbuc, comm, acc )
     VALUES  ( p_nls_, p_kv_, p_dat_, kod_, p_znap_, nbuc_, comm_, acc_);
-    
+
 end p_ins;
 -----------------------------------------------------------------------------
 BEGIN
   bars_audit.info( $$PLSQL_UNIT||': BEGIN' );
   -------------------------------------------------------------------
   userid_ := user_id;
-  
+
   EXECUTE IMMEDIATE 'TRUNCATE TABLE RNBU_TRACE';
   -------------------------------------------------------------------
   mfo_ := F_OURMFO();
@@ -137,7 +137,7 @@ BEGIN
          tips_, ob22_, Dos96_, Dosq96_, Kos96_, Kosq96_,
          Dos99_, Dosq99_, Kos99_, Kosq99_,
          Doszg_, Koszg_, Dos96zg_, Kos96zg_ , k041_, pacc_;
-    
+
     EXIT WHEN SALDO%NOTFOUND;
 
    if sheme_  in ('C','G') and (tips_<>'T00' and tips_<>'T0D') and typ_>0 then
@@ -151,7 +151,7 @@ BEGIN
       SELECT NVL(SUM(decode(dk,0,1,0)*s),0),
              NVL(SUM(decode(dk,1,1,0)*s),0)
          INTO d_sum_, k_sum_
-      FROM opldok 
+      FROM opldok
       WHERE fdat  between Dat_  AND Dat_+29 AND
             acc  = acc_   AND
             (tt like 'ZG8%'  or tt like 'ZG9%');
@@ -159,7 +159,7 @@ BEGIN
       Dos96_:=Dos96_-d_sum_;
       Kos96_:=Kos96_-k_sum_;
    END IF;
-   
+
    Ostn_ := Ostn_ - Dos96_ + Kos96_;
    Ostq_ := Ostq_ - Dosq96_ + Kosq96_;
 
@@ -214,7 +214,7 @@ DELETE FROM tmp_nbu WHERE kodf = kodf_ AND datf = Dat_;
 OPEN BaseL;
 LOOP
    FETCH BaseL INTO  kodp_, nbuc_, znap_;
-   
+
    EXIT WHEN BaseL%NOTFOUND;
 
    if substr(kodp_,9,3) = '980' or substr(kodp_,2,1) <> '1' then
@@ -228,22 +228,18 @@ LOOP
         (kodf, datf, kodp, znap, nbuc)
    VALUES
         (kodf_, Dat_, kodp_, b_, nbuc_);
-  
+
 END LOOP;
-  
+
   CLOSE BaseL;
 
   OTC_DEL_ARCH( kodf_, dat_, 0);
-  
+
   OTC_SAVE_ARCH( kodf_, dat_, 0);
-  
+
   commit;
-  
+
   bars_audit.info( $$PLSQL_UNIT||': END' );
 
 END p_f51_NN;
 /
-
-show errors;
-
-grant EXECUTE on P_F51_NN to BARS_ACCESS_DEFROLE;

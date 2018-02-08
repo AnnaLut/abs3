@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_F07_NN.sql =========*** Run *** 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_F07_NN ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_F07_NN (Dat_ DATE,
+CREATE OR REPLACE PROCEDURE BARS.P_F07_NN (Dat_ DATE,
                                       sheme_ varchar2 default 'G')  IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Процедура формирование файла #07 для КБ
@@ -809,13 +800,3 @@ logger.info ('P_F07_NN: End ');
 
 END p_f07_nn;
 /
-show err;
-
-PROMPT *** Create  grants  P_F07_NN ***
-grant EXECUTE                                                                on P_F07_NN        to WR_ALL_RIGHTS;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_F07_NN.sql =========*** End *** 
-PROMPT ===================================================================================== 

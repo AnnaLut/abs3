@@ -5,7 +5,7 @@ CREATE OR REPLACE PROCEDURE BARS.P_FD5_NN (Dat_   DATE,
 % DESCRIPTION :    #D5 for KB
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.17.007      24/01/2018 (12/01/2017, 08/12/2017)
+% VERSION     : v.17.008      06/02/2018 (24/01/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетна€ дата
            sheme_ - схема формировани€
@@ -33,6 +33,7 @@ CREATE OR REPLACE PROCEDURE BARS.P_FD5_NN (Dat_   DATE,
  27     I          S190 код строку простроченн€ погашенн€ боргу
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 06/02/2018 - в коде показател€ бал.счет 6046 замен€ем на 6055  
  24/01/2018 - дл€ показател€ р≥зниц€ заокруглень изменил символ 'N' на 
               '42'
               дл€ формировани€ средних остатков по основным счетам 
@@ -782,7 +783,9 @@ BEGIN
             k072_ := 'N3';
          elsif codcagent_ = 4 then
             k072_ := 'N7';
-         elsif codcagent_ = 6 then
+         elsif codcagent_ = 6 and k051_ = '91' then
+            k072_ := 'N7';
+         elsif codcagent_ = 6 and k051_ <> '91' then
             k072_ := 'N8';
          else 
             null;
@@ -2075,6 +2078,9 @@ BEGIN
 
     logger.info ('P_FD5_NN: etap 5 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 
+    update rnbu_trace set kodp = substr(kodp,1,2) || '6055' || substr(kodp,7)
+    where substr(kodp,3,4)='6046';
+
     ---------------------------------------------------
     DELETE FROM tmp_nbu WHERE kodf=kodf_ AND datf= dat_;
     ---------------------------------------------------
@@ -2541,5 +2547,3 @@ BEGIN
     logger.info ('P_FD5_NN: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));    
 END P_Fd5_Nn;
 /
-
-show err;

@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_F32SB.sql =========*** Run *** =
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_F32SB ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_F32SB (Dat_ DATE, sheme_ VARCHAR2 DEFAULT 'C' )  IS
+CREATE OR REPLACE PROCEDURE BARS.P_F32SB (Dat_ DATE, sheme_ VARCHAR2 DEFAULT 'C' )  IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FILE NAME   :    otcn.sql
 % DESCRIPTION :    Отчетность СберБанка: формирование файлов
@@ -239,15 +230,3 @@ GROUP BY kodp, nbuc;
 ------------------------------------------------------------------
 END p_f32sb;
 /
-show err;
-
-PROMPT *** Create  grants  P_F32SB ***
-grant EXECUTE                                                                on P_F32SB         to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on P_F32SB         to RPBN002;
-grant EXECUTE                                                                on P_F32SB         to WR_ALL_RIGHTS;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_F32SB.sql =========*** End *** =
-PROMPT ===================================================================================== 

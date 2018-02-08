@@ -1,12 +1,3 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_F27SB.sql =========*** Run *** =
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_F27SB ***
-
 CREATE OR REPLACE PROCEDURE BARS.P_F27SB (Dat_ DATE, sheme_ VARCHAR2 DEFAULT 'C')  IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Процедура формирование файла @27 для КБ
@@ -191,7 +182,7 @@ OPEN Saldo;
    END IF;
 
    --- обороты по перекрытию 6,7 классов на 5040,5041
-   IF to_char(Dat_,'MM')='12' and (nls_ like '6%' or nls_ like '7%' or nls_ like '390%' or nls_ like '504%') THEN
+   IF to_char(Dat_,'MM')='12' and (nls_ like '6%' or nls_ like '7%' or nls_ like '504%') THEN
       SELECT NVL(SUM(decode(dk,0,1,0)*s),0),
              NVL(SUM(decode(dk,1,1,0)*s),0)
          INTO d_sum_, k_sum_
@@ -433,15 +424,3 @@ GROUP BY kodp, nbuc;
 ------------------------------------------------------------------
 END p_f27sb;
 /
-show err;
-
-PROMPT *** Create  grants  P_F27SB ***
-grant EXECUTE                                                                on P_F27SB         to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on P_F27SB         to RPBN002;
-grant EXECUTE                                                                on P_F27SB         to WR_ALL_RIGHTS;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_F27SB.sql =========*** End *** =
-PROMPT ===================================================================================== 

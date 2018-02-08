@@ -7,10 +7,12 @@ PROMPT =========================================================================
 
 PROMPT *** ALTER_POLICY_INFO to OTCN_F71_CUST ***
 
-
 BEGIN 
         execute immediate  
           'begin  
+               bpa.alter_policy_info(''OTCN_F71_CUST'', ''CENTER'' , null, null, null, null);
+               bpa.alter_policy_info(''OTCN_F71_CUST'', ''FILIAL'' , null, null, null, null);
+               bpa.alter_policy_info(''OTCN_F71_CUST'', ''WHOLE'' , null, null, null, null);
                null;
            end; 
           '; 
@@ -21,26 +23,24 @@ PROMPT *** Create  table OTCN_F71_CUST ***
 begin 
   execute immediate '
   CREATE GLOBAL TEMPORARY TABLE BARS.OTCN_F71_CUST 
-   (	RNK NUMBER, 
-	OKPO VARCHAR2(10), 
-	REZ NUMBER, 
-	CUSTTYPE NUMBER, 
-	P010 VARCHAR2(200), 
-	P020 VARCHAR2(10), 
-	P025 VARCHAR2(10), 
-	P040 VARCHAR2(10), 
-	P050 VARCHAR2(10), 
-	P055 VARCHAR2(10), 
-	P060 VARCHAR2(10), 
-	P085 VARCHAR2(10)
+   (  RNK       NUMBER,
+  OKPO      VARCHAR2(10 BYTE),
+  REZ       NUMBER,
+  CUSTTYPE  NUMBER,
+  P010      VARCHAR2(200 BYTE),
+  P020      VARCHAR2(10 BYTE),
+  P025      VARCHAR2(10 BYTE),
+  P040      VARCHAR2(10 BYTE),
+  P050      VARCHAR2(10 BYTE),
+  P055      VARCHAR2(10 BYTE),
+  P060      VARCHAR2(10 BYTE),
+  P085      VARCHAR2(10 BYTE),
+  K021      VARCHAR2(1 BYTE)
    ) ON COMMIT PRESERVE ROWS ';
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 
 end; 
 /
-
-
-
 
 PROMPT *** ALTER_POLICIES to OTCN_F71_CUST ***
  exec bpa.alter_policies('OTCN_F71_CUST');

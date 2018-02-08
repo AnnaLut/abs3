@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_F2K_NN.sql =========*** Run *** 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_F2K_NN ***
-
- CREATE OR REPLACE PROCEDURE BARS.P_F2K_NN (dat_ DATE ,
+CREATE OR REPLACE PROCEDURE BARS.P_F2K_NN (dat_ DATE ,
                                       sheme_ varchar2 default '—')  IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : ѕроцедура формирование файла #2K
@@ -28,7 +19,7 @@ PROMPT *** Create  procedure P_F2K_NN ***
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
  06.02.2018  об€зательное заполнение кода DDD=310 при  отсутствии операций
- 31.01.2018  отсекаем закрытых клиентов 
+ 31.01.2018  отсекаем закрытых клиентов
  10.01.2018  ограничение по отбору операций по типу оплаты SOS
  05.01.2018  добавлено формирование DDD=351
  04.01.2018  исключены операции по счетам  “=65__
@@ -100,7 +91,7 @@ begin
                  ( rnk, kodp, znap )
           values ( p_rnk, '020'||p_kodp, p_adr );
 
---    030  примiтка    
+--    030  примiтка
        if p_prim is not null  then
 
           insert into rnbu_trace
@@ -125,7 +116,7 @@ begin
 --    120  номер указу
           insert into rnbu_trace
                     ( rnk, kodp, znap )
-             values ( p_rnk, '120'||p_kodp, 
+             values ( p_rnk, '120'||p_kodp,
                      (case when p_rnbou is null  then 'немае даних'
                           else p_rnbou end)
                     );
@@ -143,7 +134,7 @@ end;
 --    операции DDD начинающиес€ с 2..
 procedure p_ins_2( p_rnk number, p_kodp varchar2,
                    p_210 number, p_nls varchar2, p_kv number,
-                   p_daos varchar2, p_dazs varchar2, 
+                   p_daos varchar2, p_dazs varchar2,
                    p_260 varchar2, p_270 varchar2, p_280 varchar2 )
    is
 begin
@@ -195,7 +186,7 @@ end;
 --    операции DDD начинающиес€ с 3..
 procedure p_ins_3( p_rnk number, p_kodp varchar2,
                    p_310 varchar2, p_320 varchar2, p_330 varchar2,
-                   p_340 varchar2, p_350 varchar2, p_351 varchar2, p_360 varchar2, 
+                   p_340 varchar2, p_350 varchar2, p_351 varchar2, p_360 varchar2,
                    p_ostf number, p_kv number, p_390 varchar2, p_391 varchar2 )
    is
 begin
@@ -214,7 +205,7 @@ begin
           insert into rnbu_trace
                     ( rnk, kodp, znap )
              values ( p_rnk, '330'||p_kodp, p_330 );
-                                                
+
 --    340  наiменуванн€ отримувача/платника
           insert into rnbu_trace
                     ( rnk, kodp, znap )
@@ -286,7 +277,7 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
    nnno_ := nnnn_;
 
    dats_ := trunc(dat_, 'mm');
-   
+
    for k in ( select c.okpo, max(c.codcagent) codcagent, max(ise) ise,
                              max(c.nmk) nmk, max(c.adr) adr, max(c.rnk) rnk,
                              max(re.rnbor) rnbor, max(re.rnbou) rnbou,
@@ -299,7 +290,7 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
                                                 where p.tag like 'RNBOS'
        and instr(p.value,'01')+instr(p.value,'02')+instr(p.value,'03')+
            instr(p.value,'04')+instr(p.value,'05')+instr(p.value,'99') >0
-                                                  and p.rnk=u.rnk) 
+                                                  and p.rnk=u.rnk)
                               ) pivot
                               ( max(trim(value))
                                 for tag in ('RNBOR' as RNBOR, 'RNBOU' as RNBOU,
@@ -334,8 +325,8 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
                            dat_rnbo_ :=dat_;
               end;
        end;
-       
---  правильна€ дата в dat_rnbo_ 
+
+--  правильна€ дата в dat_rnbo_
     if is_dat_exist_ =1  then
 
        flag_acc_ := 0;
@@ -349,7 +340,7 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
                          to_char( round(fostq(a.acc,dat_)) ) p_280,
                          nvl(a.blkd,0)+nvl(a.blkk,0) acc_blk
                     from accounts a
-                   where a.rnk = k.rnk 
+                   where a.rnk = k.rnk
                      and a.nbs in (
             '2512', '2513', '2520', '2523', '2525', '2530', '2541', '2542',
             '2544', '2545', '2546', '2550', '2551', '2553', '2555', '2556',
@@ -362,7 +353,7 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
                 )
        loop
           flag_acc_ := 1;
-          
+
           p_210 := 1;
           if u.dazs is not null and u.dazs<dat_  then
               p_210 :=2;
@@ -410,7 +401,7 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
                                      accounts ad, accounts ak,
                                      (SELECT o1.fdat, o1.REF, o1.stmt, o1.tt, o1.s,
                                              o1.sq, o1.txt,
-                                             (case when o1.dk = 0 then o1.acc else o2.acc end) accd, 
+                                             (case when o1.dk = 0 then o1.acc else o2.acc end) accd,
                                              (case when o1.dk = 1 then o1.acc else o2.acc end) acck
                                       FROM opldok o1
                                       JOIN opldok o2
@@ -419,7 +410,7 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
                                               AND o1.stmt= o2.stmt
                                               AND o1.dk <> o2.dk)
                                       WHERE o1.fdat between dats_ and dat_ AND
-                                            o1.acc = u.acc 
+                                            o1.acc = u.acc
                                        ) o
                                WHERE p.REF = o.REF
                                  and p.sos <0
@@ -433,7 +424,7 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
                    )
           loop
              flag_opp_ := 1;
-             
+
              nnnn_ :=nnnn_+1;
 
              if u.acc = v.accd  then
@@ -505,14 +496,14 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
                 end;
 
              end if;
-             
+
              p_391 := p_260;
 
              segm_n := lpad(to_char(nnnn_),4,'0');
              kodp_ := segm_z||segm_a||segm_n;
 
              p_ins_0( k.rnk, kodp_, k.nmk, k.adr, p_030 );
-   
+
              p_ins_1( k.rnk, kodp_, k.rnbor, k.rnbou, k.rnbos );
 
              p_ins_2( k.rnk, kodp_, p_210, u.nls, u.kv,
@@ -532,7 +523,7 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
              kodp_ := segm_z||segm_a||segm_n;
 
              p_ins_0( k.rnk, kodp_, k.nmk, k.adr, p_030 );
-   
+
              p_ins_1( k.rnk, kodp_, k.rnbor, k.rnbou, k.rnbos );
 
              p_ins_2( k.rnk, kodp_, p_210, u.nls, u.kv,
@@ -559,7 +550,7 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
           kodp_ := segm_z||segm_a||segm_n;
 
           p_ins_0( k.rnk, kodp_, k.nmk, k.adr, p_030 );
-    
+
           p_ins_1( k.rnk, kodp_, k.rnbor, k.rnbou, k.rnbos );
        end if;
 
@@ -580,8 +571,3 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
 
 END P_F2K_NN;
 /
-show err;
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_F2K_NN.sql =========*** End ***
-PROMPT ===================================================================================== 

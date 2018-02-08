@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_F22SB.sql =========*** Run *** =
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_F22SB ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_F22SB (Dat_ DATE, sheme_ VARCHAR2 DEFAULT 'C')  IS
+CREATE OR REPLACE PROCEDURE BARS.P_F22SB (Dat_ DATE, sheme_ VARCHAR2 DEFAULT 'C')  IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Процедура формирование файла @22 для Сбербанк
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 2009.All Rights Reserved.
@@ -146,7 +137,7 @@ mfo_:=F_OURMFO();
 EXECUTE IMMEDIATE 'TRUNCATE TABLE RNBU_TRACE';
 -------------------------------------------------------------------
 -- используем классификатор SB_R020
-sql_acc_ := 'select r020 from sb_r020 where f_22=''1'' and ' || 
+sql_acc_ := 'select r020 from sb_r020 where f_22=''1'' and ' ||
             '(d_close is null or d_close > to_date('''||to_char(dat_, 'ddmmyyyy')||''',''ddmmyyyy'')) ';
 
 if to_char(Dat_,'MM') = '12' then
@@ -240,15 +231,3 @@ logger.info ('P_F22SB: End ');
 ------------------------------------------------------------------
 END p_f22sb;
 /
-show err;
-
-PROMPT *** Create  grants  P_F22SB ***
-grant EXECUTE                                                                on P_F22SB         to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on P_F22SB         to RPBN002;
-grant EXECUTE                                                                on P_F22SB         to WR_ALL_RIGHTS;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_F22SB.sql =========*** End *** =
-PROMPT ===================================================================================== 
