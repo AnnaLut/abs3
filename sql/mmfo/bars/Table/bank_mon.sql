@@ -11,10 +11,9 @@ PROMPT *** ALTER_POLICY_INFO to BANK_MON ***
 BEGIN 
         execute immediate  
           'begin  
-               bpa.alter_policy_info(''BANK_MON'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''BANK_MON'', ''FILIAL'' , null, null, null, null);
-               bpa.alter_policy_info(''BANK_MON'', ''WHOLE'' , null, null, null, null);
-               null;
+               bpa.alter_policy_info(''BANK_MON'', ''CENTER'' ,''F'',''F'',''F'',''F'');
+               bpa.alter_policy_info(''BANK_MON'',''WHOLE'',null,''E'',''E'',null);
+			   bpa.alter_policy_info(''BANK_MON'',''FILIAL'',''F'',''F'',''F'',''F'');
            end; 
           '; 
 END; 
