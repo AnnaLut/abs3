@@ -9938,7 +9938,8 @@ begin
        update ow_locpay_match t
           set t.state = 1,
               t.revfile_name = l_file_name
-       where t.revflag in(1, 2) and t.state = 0;
+       where t.revflag in(1, 2) and (t.state = 0 or (t.state = 10 AND t.revfile_name IS NULL));
+
     end if;
   elsif p_mode in(0, 1, 2) or p_mode is null then
     -- FileHeader
