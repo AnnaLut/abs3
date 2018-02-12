@@ -1,10 +1,3 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/DPT_DEPOSIT_CLOS.sql =========*** Run 
-PROMPT ===================================================================================== 
-
-
 PROMPT *** ALTER_POLICY_INFO to DPT_DEPOSIT_CLOS ***
 
 
@@ -12,7 +5,7 @@ BEGIN
         execute immediate  
           'begin  
                bpa.alter_policy_info(''DPT_DEPOSIT_CLOS'', ''CENTER'' , ''E'', ''E'', ''E'', ''E'');
-               bpa.alter_policy_info(''DPT_DEPOSIT_CLOS'', ''FILIAL'' , null, ''M'', ''M'', ''M'');
+               bpa.alter_policy_info(''DPT_DEPOSIT_CLOS'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
                bpa.alter_policy_info(''DPT_DEPOSIT_CLOS'', ''WHOLE'' , null, ''E'', ''E'', ''E'');
                null;
            end; 
@@ -473,9 +466,3 @@ grant SELECT                                                                 on 
 grant SELECT                                                                 on DPT_DEPOSIT_CLOS to START1;
 grant SELECT                                                                 on DPT_DEPOSIT_CLOS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_DEPOSIT_CLOS to WR_ALL_RIGHTS;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Table/DPT_DEPOSIT_CLOS.sql =========*** End 
-PROMPT ===================================================================================== 

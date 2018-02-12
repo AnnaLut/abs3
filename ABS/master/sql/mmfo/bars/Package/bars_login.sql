@@ -1,9 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_login.sql =========*** Run *** 
- PROMPT ===================================================================================== 
- 
+prompt create package BARS_LOGIN 
   CREATE OR REPLACE PACKAGE BARS.BARS_LOGIN 
 is
 
@@ -1413,10 +1408,4 @@ grant EXECUTE                                                                on 
 grant EXECUTE                                                                on BARS_LOGIN      to USER100101;
 grant EXECUTE                                                                on BARS_LOGIN      to WCS_SYNC_USER;
 grant EXECUTE                                                                on BARS_LOGIN      to WR_ALL_RIGHTS;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_login.sql =========*** End *** 
- PROMPT ===================================================================================== 
- 
+grant EXECUTE                                                                on BARS_LOGIN      to BARS_DM;

@@ -1,25 +1,8 @@
-PROMPT *** Create  table CUSTOMERS_SEGMENT ***
-begin 
-  execute immediate '
-  CREATE TABLE BARS_DM.CUSTOMERS_SEGMENT 
-   (	PER_ID NUMBER, 
-	KF VARCHAR2(6), 
-	RNK NUMBER(15,0), 
-	SEGMENT_ACT VARCHAR2(100), 
-	SEGMENT_FIN VARCHAR2(100), 
-	SEGMENT_BEH VARCHAR2(100), 
-	SOCIAL_VIP VARCHAR2(100), 
-	SEGMENT_TRANS NUMBER(5,0), 
-	PRODUCT_AMOUNT NUMBER(32,12), 
-	DEPOSIT_AMMOUNT NUMBER(32,12), 
-	CREDITS_AMMOUNT NUMBER(32,12), 
-	GARANTCREDITS_AMMOUNT NUMBER(32,12), 
-	CARDCREDITS_AMMOUNT NUMBER(32,12), 
-	ENERGYCREDITS_AMMOUNT NUMBER(32,12), 
-	CARDS_AMMOUNT NUMBER(32,12), 
-	ACCOUNTS_AMMOUNT NUMBER(32,12), 
-	LASTCHANGEDT DATE
-   ) PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+prompt bars_dm/scripts/partition_customer_segments.sql
+prompt create temp table
+begin
+    execute immediate '
+create table BARS_DM.TEST_CUSTOMERS_SEGMENT
 tablespace BRSDMIMP
 PARTITION BY LIST (PER_ID) SUBPARTITION by list (KF)
 SUBPARTITION TEMPLATE
@@ -51,13 +34,49 @@ SUBPARTITION TEMPLATE
             SUBPARTITION KF_356334 VALUES (''356334'')
           )
 (PARTITION INITIAL_PARTITION VALUES (0))
-  ';
-exception when others then       
-  if sqlcode=-955 then null; else raise; end if; 
-end; 
+as
+select * from BARS_DM.CUSTOMERS_SEGMENT
+where 1 = 0';
+exception
+    when others then    
+        if sqlcode = -955 then null; else raise; end if;
+end;
 /
 
+prompt copy data to temp table
+begin
+    for rec in (select distinct per_id from bars_dm.CUSTOMERS_SEGMENT order by per_id)
+        loop
+            execute immediate 'alter table bars_dm.test_CUSTOMERS_SEGMENT add partition P'||rec.per_id||' values ('||rec.per_id||')';
+            insert into bars_dm.test_CUSTOMERS_SEGMENT select * from bars_dm.CUSTOMERS_SEGMENT where per_id = rec.per_id;
+            commit;
+        end loop;
+end;
+/
 
+prompt drop original table and rename temp to original
+declare
+l_orig_cnt number;
+l_tmp_cnt number;
+begin
+    select count(*) into l_orig_cnt from bars_dm.CUSTOMERS_SEGMENT;
+    select count(*) into l_tmp_cnt from bars_dm.test_CUSTOMERS_SEGMENT;
+    dbms_output.put_line('CUSTOMERS_SEGMENT COUNT = ' || l_orig_cnt);
+    dbms_output.put_line('TEST_CUSTOMERS_SEGMENT COUNT = ' || l_tmp_cnt);
+    if l_orig_cnt = l_tmp_cnt then
+        execute immediate 'drop table bars_dm.CUSTOMERS_SEGMENT';
+        execute immediate 'rename test_CUSTOMERS_SEGMENT to CUSTOMERS_SEGMENT';
+        execute immediate 'alter package bars_dm.dm_import compile';
+    end if;
+end;
+/
+
+prompt recreate grants
+GRANT SELECT ON "BARS_DM"."CUSTOMERS_SEGMENT" TO "BARSUPL";
+GRANT SELECT ON "BARS_DM"."CUSTOMERS_SEGMENT" TO "BARS_ACCESS_DEFROLE";
+GRANT SELECT ON "BARS_DM"."CUSTOMERS_SEGMENT" TO "BARS";
+
+prompt recreate comments
 COMMENT ON TABLE BARS_DM.CUSTOMERS_SEGMENT IS 'Сегментація';
 COMMENT ON COLUMN BARS_DM.CUSTOMERS_SEGMENT.PER_ID IS '';
 COMMENT ON COLUMN BARS_DM.CUSTOMERS_SEGMENT.KF IS '';
@@ -77,10 +96,5 @@ COMMENT ON COLUMN BARS_DM.CUSTOMERS_SEGMENT.CARDS_AMMOUNT IS 'Прод. навантаження
 COMMENT ON COLUMN BARS_DM.CUSTOMERS_SEGMENT.ACCOUNTS_AMMOUNT IS 'Прод. навантаження поточний рахунок';
 COMMENT ON COLUMN BARS_DM.CUSTOMERS_SEGMENT.LASTCHANGEDT IS 'Дата останнього редагування картки клієнта';
 
-
-
-PROMPT *** Create  grants  CUSTOMERS_SEGMENT ***
-grant SELECT                                                                 on CUSTOMERS_SEGMENT to BARS;
-grant SELECT                                                                 on CUSTOMERS_SEGMENT to BARSREADER_ROLE;
-grant SELECT                                                                 on CUSTOMERS_SEGMENT to BARSUPL;
-grant SELECT                                                                 on CUSTOMERS_SEGMENT to UPLD;
+prompt nologging mode; We do not need this data to be recoverable - although, DBA can override it with database force_logging parameter.
+alter table bars_dm.CUSTOMERS_SEGMENT nologging;

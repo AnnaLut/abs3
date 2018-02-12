@@ -1,10 +1,10 @@
 PROMPT package/dm_import.sql
-  CREATE OR REPLACE PACKAGE BARS_DM.DM_IMPORT 
+CREATE OR REPLACE PACKAGE DM_IMPORT
 is
     --
-    -- for import from BARS scheme
+    -- Наполнение витрин для файловых выгрузок в CRM
     --
-    g_header_version  constant varchar2(64)  := 'version 3.0.0 13/09/2017';
+    g_header_version  constant varchar2(64)  := 'version 4.0.0 07/02/2018'; -- DIY-parallel
     g_header_defs     constant varchar2(512) := '';
 
     C_FULLIMP         constant period_type.id%TYPE  := 'MONTH';
@@ -201,6 +201,15 @@ is
     FUNCTION add38phone (p_phone IN VARCHAR2, p_kf in varchar2)
        RETURN VARCHAR2;
 
+    ---
+    --- Запуск выгрузки по объекту в контексте указанного МФО (для параллели).
+    ---
+    procedure imp_run_by_mfo(p_mfo          in     varchar2,
+                             p_obj_proc     in     varchar2,
+                             p_dat          in     date,
+                             p_periodtype   in     varchar2,
+                             p_id_event     in     number
+                             );
     --
     -- import data
     --
@@ -209,19 +218,16 @@ is
 
 end;
 /
-CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT 
+
+CREATE OR REPLACE PACKAGE BODY DM_IMPORT
  is
 
-    g_body_version constant varchar2(64) := 'Version 3.3.4 18/01/2018';
+    g_body_version constant varchar2(64) := 'Version 4.0.0 06/02/2018'; 
     g_body_defs    constant varchar2(512) := null;
     G_TRACE        constant varchar2(20) := 'dm_import.';
-  -- 26.09.2017 изменена выгрузка сегментов
-
-
+    -- DIY - parallel
+    -- partitioned: segments, credits_stat
     c_cntdays constant number := 40; -- кількість днів, за які зберігаємо дані у вітринах
-
-    --g_kf        varchar2(6);
-    --g_phonecode varchar2(3);
 
     /** header_version -  */
     function header_version return varchar2 is
@@ -238,7 +244,52 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
     end body_version;
 
     --
-    -- log statistic info
+    -- Очищаем существующую партицию или добавляем новую
+    --
+    procedure add_partition(p_table_name in varchar2, p_period_id in periods.id%type)
+        is
+        partition_doesnt_exist exception;
+        partition_invalid_number exception;
+        pragma exception_init (partition_doesnt_exist, -2149);
+        pragma exception_init (partition_invalid_number, -14702);
+    begin
+        execute immediate 'alter table '||p_table_name||' truncate partition for ('||p_period_id||')';
+        bars_audit.info('Вивантаження даних для CRM - попередні дані з вітрини '|| p_table_name ||' за період з ідентифікатором {' || p_period_id || '} видалено');
+    exception
+        when partition_doesnt_exist or partition_invalid_number then 
+            execute immediate 'alter table '||p_table_name||' add partition P'||p_period_id||' values ('||p_period_id||')';
+            bars_audit.info('Вивантаження даних для CRM - створена нова секція в вітрині '|| p_table_name ||' за період з ідентифікатором {' || p_period_id || '}');
+    end add_partition;
+    
+    --
+    -- Очищаем субпартицию по ИД периода и КФ - или вызываем add_partition() Предполагаем, что субпартиции созданы автоматически в соответствии с шаблоном
+    --
+    procedure truncate_kf_subpartition(p_table_name in varchar2, p_period_id in periods.id%type, p_kf in varchar2)
+        is
+        subpartition_doesnt_exist exception;
+        pragma exception_init(subpartition_doesnt_exist, -14251);
+    begin
+        execute immediate 'alter table '||p_table_name||' truncate subpartition '||'P'||p_period_id||'_KF_'||p_kf; -- e.g. P995_KF_300465
+    exception
+        when subpartition_doesnt_exist then
+            add_partition(p_table_name, p_period_id);
+    end truncate_kf_subpartition;
+
+    --
+    -- Удаляем записи из errlog-таблицы за указанный период
+    --
+    procedure clear_err_log(p_table_name in varchar2, p_per_id in periods.id%type)
+        is
+        l_err_log_name varchar2(64) := 'ERR$_'||p_table_name;
+        l_ourmfo varchar2(6) := sys_context('bars_context', 'user_mfo');
+    begin
+        execute immediate 'delete from '||l_err_log_name||' where per_id = :p_per_id and kf = nvl(:l_ourmfo, kf)' using p_per_id, l_ourmfo;
+        commit;
+    end clear_err_log;
+
+    --
+    -- Логгирование статистики
+    -- Не автономная транзакция, чтобы не было проблем с параллелью
     --
     procedure log_stat_event(p_id_session number default null,
                              p_start_time date default null,
@@ -249,7 +300,6 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
                              p_rows_err   number default null,
                              p_status     varchar2 default null,
                              p_id         in out number) is
-      pragma autonomous_transaction;
     begin
       if (p_id is null) then
         insert into bars_dm.dm_stats
@@ -275,10 +325,10 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
         returning id into p_id;
       else
         update dm_stats
-           set stop_time = p_stop_time,
-               rows_ok   = p_rows_ok,
-               rows_err  = p_rows_err,
-               status    = p_status
+           set stop_time = nvl(p_stop_time, stop_time),
+               rows_ok   = nvl(p_rows_ok, rows_ok),
+               rows_err  = nvl(p_rows_err, rows_err),
+               status    = nvl(p_status, status)
          where id = p_id;
       end if;
 
@@ -304,7 +354,7 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
     end imp_day;
 
         --
-        -- import customers
+        -- Выгрузка клиентов-физлиц
         --
         procedure customers_imp(p_dat        in date default trunc(sysdate),
                                 p_periodtype in varchar2 default C_FULLIMP,
@@ -312,7 +362,6 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
                                 p_rows_err   out number,
                                 p_state      out varchar2)
         is
-            -- todo: оптимізація - підготовка даних триває близько 4-х годин
             l_trace  varchar2(500) := G_TRACE || 'customers_imp: ';
             l_per_id periods.id%type;
             l_row    customers%rowtype;
@@ -461,8 +510,6 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
                 q_str := q_str_main || q_str_full_suf;
                 open c for q_str ;
             end if;
-            -- test q_str
-            -- insert into t_clob values(sysdate,q_str);
 
             l_row.per_id := l_per_id;
     --        l_row.mfo := bars.f_ourmfo_g;
@@ -507,7 +554,8 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
         end customers_imp;
 
     --
-    -- import credits
+    -- Выгрузка "статических" данных по кредитам
+    -- Всегда выгружаем полный объем
     --
     procedure credits_stat_imp(p_dat        in date default trunc(sysdate),
                                p_periodtype in varchar2 default C_FULLIMP,
@@ -517,20 +565,12 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
     is
         l_trace  varchar2(500) := G_TRACE || 'credits_stat_imp: ';
         l_per_id periods.id%type;
-        l_row    credits_stat%rowtype;
-        l_errmsg varchar2(512);
 
         l_rows     pls_integer := 0;
         l_rows_err pls_integer := 0;
-
-        l_cnt     pls_integer := 0;
-
-        l_count_s031 int;
-        l_bpkterm    pls_integer;
-        l_acc8       number(38);
-
-        l_partn      pls_integer;
-        l_par_n      number;
+        l_ourmfo   varchar2(6) := sys_context('bars_context', 'user_mfo');
+        
+        l_insert_target varchar2(64);
     begin
         bars.bars_audit.info(l_trace||' start');
       -- отримання id періоду
@@ -540,394 +580,297 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
             return;
         end if;
 
-        delete from credits_stat where per_id=l_per_id;
-
+        truncate_kf_subpartition('CREDITS_STAT', l_per_id, l_ourmfo);
         -- стандартні кредитні договора
-        for cur in (select ccd.cc_id, ccd.nd, ccd.RNK, ccd.kf, ccd.BRANCH, c.OKPO,
-                            ccd.sdate, ccd.WDATE, ccd.vidd, ccd.prod, ccd.sdog, ccv.custtype as vidd_custtype
-                       from bars.cc_deal ccd
-                            join bars.customer c on ccd.rnk = c.rnk
-                            join bars.cc_vidd ccv on ccd.vidd = ccv.vidd
-                      where c.CUSTTYPE in (2, 3) and ccd.vidd in (1, 2, 3, 11, 12, 13)
-    --                    and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов -- 20.03.2017  COBUSUPABS-5659
-                   )
-         loop
-           begin
+        
+        -- удаляем данные о предыдущих ошибках периода
+        clear_err_log(p_table_name => 'CREDITS_STAT', p_per_id => l_per_id);
+        
+        -- e.g. partition (P1164) or subpartition (P1164_KF_300465)
+        l_insert_target := case when l_ourmfo is null then 'partition (P'||l_per_id||')' else 'subpartition (P'||l_per_id||'_KF_'||l_ourmfo||')' end;
+        bars.bars_audit.info(l_trace||' insert target: '||l_insert_target);
+        
+        begin
+            execute immediate q'[
+            insert /*+ APPEND */ into credits_stat ]'||l_insert_target||q'[
+            (
+                                     id,
+                                     per_id,
+                                     nd,
+                                     rnk,
+                                     kf,
+                                     branch,
+                                     okpo,
+                                     cc_id,
+                                     sdate,
+                                     wdate,
+                                     wdate_fact,
+                                     vidd,
+                                     prod,
+                                     prod_clas,
+                                     pawn,
+                                     sdog,
+                                     term,
+                                     kv,
+                                     pog_plan,
+                                     pog_fact,
+                                     borg_sy,
+                                     borgproc_sy,
+                                     bpk_nls,
+                                     intrate,
+                                     ptn_name,
+                                     ptn_okpo,
+                                     ptn_mother_name,
+                                     open_date_bal22,
+                                     es000,
+                                     es003,
+                                     vidd_custtype)
+            select  s_credits.nextval,
+                    :l_per_id,
+                    ccd.nd, 
+                    ccd.rnk, 
+                    ccd.kf, 
+                    ccd.branch, 
+                    c.okpo,
+                    ccd.cc_id,
+                    ccd.sdate, 
+                    ccd.wdate,
+                    SQ8.wdate_fact,
+                    ccd.vidd,
+                    null as prod,
+                    substr(ccd.prod,1,6) as prod_class,
+                    (select case R.cnt when 0 then null when 1 then R.s031 else '40' end as pawn
+                     from
+                        (
+                            select z.kf, ad.nd, max(p.s031) as s031, count(*) as cnt --into l_t_row.pawn
+                            from bars.cc_add ad, bars.accounts a, bars.cc_accp z, bars.cc_pawn p, bars.pawn_acc pa
+                            where z.accs = ad.ACCS  and z.acc = a.acc and a.nbs like '9%' and (a.dazs is null or a.dazs>sysdate) and a.daos <= sysdate
+                            and a.acc = pa.acc and pa.pawn = p.pawn
+                            group by z.kf, ad.nd
+                        ) R
+                     where r.kf = ccd.kf and r.nd = ccd.nd
+                     ) as pawn,
+                    ccd.sdog,
+                    trunc(MONTHS_BETWEEN(ccd.WDATE+1, ccd.sdate)) as term,
+                    (select kv from bars.cc_add where nd = ccd.nd and kf = ccd.kf) as kv,
+                    (select nvl(sum(sumg)/100,0)
+                     from bars.cc_lim g
+                     where nd = ccd.nd
+                       and (g.nd, g.fdat) = (select nd, max(fdat)
+                                             from bars.cc_lim
+                                            where nd = g.nd
+                                              and fdat >= trunc(trunc(:p_dat,'MONTH')-1,'MONTH') and fdat <= trunc(:p_dat,'MONTH')-1
+                                              and sumg > 0
+                                            group by nd)) as pog_plan,
+                    (select nvl(sum(sa.kos),0)/100
+                      from bars.saldoa sa, bars.accounts a, bars.nd_acc na
+                     where a.acc = sa.acc and a.acc=na.ACC and na.nd=ccd.nd and na.kf = ccd.kf and a.TIP='LIM' and sa.dos - sa.kos < 0
+                       and fdat >= trunc(trunc(:p_dat,'MONTH')-1,'MONTH') and fdat<= trunc(:p_dat,'MONTH')-1) as pog_fact, -- фактично погашено за минулий місяць
+                     abs(nvl(BRG.borg, 0)) as borg_sy,
+                     abs(nvl(BRG.borgproc, 0)) as borgproc_sy,
+                     null as bpk_nls,
+                     acrn.fprocn(SQ8.acc8, 0, :p_dat) as intrate,
+                     PARTNER.ptn_name,
+                     PARTNER.ptn_okpo,
+                     PARTNER.ptn_mother_name,
+                     (select max(daos)
+                         from bars.accounts a, bars.nd_acc n
+                        where n.nd = ccd.nd and n.kf = ccd.kf and a.acc = n.acc and a.kf = n.kf and a.nbs in ('2202', '2203', '2232', '2233')) as open_date_bal22,
+                     (select n.TXT
+                         from nd_txt n
+                         where n.nd = ccd.nd
+                         and tag = 'ES000'
+                         and kf = ccd.kf) as ES000,
+                     (select n.TXT
+                         from nd_txt n
+                         where n.nd = ccd.nd
+                         and tag = 'ES003'
+                         and kf = ccd.kf) as ES003,
+                      case when (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') then 2 else ccv.custtype end as vidd_custtype -- #COBUSUPABS-6567
+            from bars.cc_deal ccd
+            join bars.customer c on ccd.rnk = c.rnk
+            join bars.cc_vidd ccv on ccd.vidd = ccv.vidd
+            left join 
+            (select na.kf, na.nd, a.acc as acc8, dazs as wdate_fact
+             from bars.accounts a, bars.nd_acc na
+             where a.acc = na.acc and a.tip='LIM') SQ8 on SQ8.nd = ccd.nd and SQ8.kf = ccd.kf
+            left join
+            (
+                       -- Сума залишку заборгованості на початок року, грн
+                       -- беремо з місяних снапів
+                       -- по снапах дані на 01.12.2014 це вхідний залишок на 01.01.2015
+            select na.kf, na.nd,
+                    sum(case when a.tip in ('SS ','SP ','SL ')   then b.ost end)/100 as borg,
+                    sum(case when a.tip in ('SN ', 'SPN', 'SLN') then b.ost end)/100 as borgproc
+               from bars.nd_acc na, bars.accounts a, bars.agg_monbals b
+              where na.ACC=a.acc
+                and a.tip in ('SS ','SP ','SL ', 'SN ', 'SPN', 'SLN')
+                and a.acc=b.acc
+                and b.kf = a.kf
+                and b.fdat = trunc(trunc(:p_dat,'YEAR')-1,'MONTH')
+                and (a.dazs is null or a.dazs>trunc(:p_dat,'YEAR'))
+                and a.daos <= trunc(:p_dat,'YEAR')
+                group by na.kf, na.nd) BRG on ccd.nd = BRG.nd and ccd.kf = BRG.kf
+            left join
+            (select d.nd, d.kf, d2.txt,
+                    case when d2.txt = 'Taк' then nvl(w.ptn_name, w.name) else '' end as ptn_name,
+                    case when d2.txt = 'Taк' then w.ptn_okpo else '' end as ptn_okpo,
+                    case when d2.txt = 'Taк' then (select nvl(m.ptn_name, m.name) from bars.wcs_partners_all m where m.id = w.id_mather) else '' end ptn_mother_name
+             from bars.nd_txt d
+             left join bars.nd_txt d2 on d.nd = d2.nd and d.kf = d2.kf and d2.tag = 'PARTN'
+             join bars.wcs_partners_all w on to_number(regexp_replace(trim(d.txt), '\D')) = w.id
+              where d.tag = 'PAR_N'
+                and regexp_replace(trim(d.txt), '\D') = trim(d.txt)) PARTNER on ccd.nd = PARTNER.nd and ccd.kf = PARTNER.KF
+            where c.CUSTTYPE in (2, 3) and ccd.vidd in (1, 2, 3, 11, 12, 13)
+            -- and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов -- 20.03.2017  COBUSUPABS-5659
+            LOG ERRORS into ERR$_CREDITS_STAT ('STANDARD') reject limit unlimited 
+            ]' using l_per_id, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat;
 
-            l_row.id := s_credits.nextval;
-            l_row.per_id := l_per_id;
-            -- id договору
-            l_row.nd  := cur.nd;
-            l_row.rnk := cur.rnk;
-            l_row.kf  := cur.kf;
-            l_row.branch := cur.branch;
-            l_row.okpo  := cur.okpo;
-            -- Номер договору
-            l_row.cc_id := cur.cc_id;
-            l_row.sdate  := cur.sdate;
-            l_row.wdate  := cur.wdate;
-
-            -- Дата закінчення договору (фактична)
-            -- Беремо як дату закриття р.8999
-            select a.acc, dazs
-              into l_acc8, l_row.wdate_fact
-              from bars.accounts a, bars.nd_acc na
-             where a.acc = na.acc and na.ND=cur.nd and a.tip='LIM' and rownum=1;
-
-            -- Тип договору (11,12,13)
-            l_row.vidd := cur.vidd;
-            -- Тип клиєнта по виду договора
-            l_row.VIDD_CUSTTYPE := cur.VIDD_CUSTTYPE;
-
-            -- !Вид продукту, в Барсі не ведеться!
-            l_row.prod := null;
-
-            -- Класифікація кредитного продукту (OB22)
-            -- беремо перших 6 символів
-            l_row.prod_clas  := substr(cur.prod,1,6);
-
-            -- Код забезпечення
-            -- порахуємо к-сть видів забезпечення по договору
-            begin
-               select count(coun) into l_count_s031
-                 from (select count(z.acc) coun, c.s031 vid
-                    from bars.cc_add ad, bars.accounts a, bars.cc_accp z, bars.cc_pawn c, bars.pawn_acc pa
-                  where ad.nd=cur.nd and z.accs = ad.ACCS  and z.acc = a.acc and a.nbs like '9%' and (a.dazs is null or a.dazs>p_dat) and a.daos <= p_dat
-                    and a.acc = pa.acc and pa.pawn = c.pawn
-                        group by c.s031 );
-               if l_count_s031  = 0 then l_row.pawn:= null;
-               -- если вид один - берем его s031
-               elsif l_count_s031 = 1 then
-                  begin
-                    select c.s031 into l_row.pawn
-                      from bars.cc_add ad, bars.accounts a, bars.cc_accp z, bars.cc_pawn c, bars.pawn_acc pa
-                     where ad.nd=cur.nd and z.accs = ad.ACCS  and z.acc = a.acc and a.nbs like '9%' and (a.dazs is null or a.dazs>p_dat) and a.daos <= p_dat
-                       and a.acc = pa.acc and pa.pawn = c.pawn
-                       and rownum = 1;
-                  exception when no_data_found then l_row.pawn := null;
-                  end;
-               -- если видов несколько - пишем 40
-               else l_row.pawn := '40';
-               end if;
-               EXCEPTION WHEN NO_DATA_FOUND THEN l_row.pawn:= null;
-             end;
-
-            -- Сума договору
-            l_row.sdog := cur.sdog;
-
-            -- Строк кредиту (в місяцях)
-            l_row.term := trunc(MONTHS_BETWEEN(cur.WDATE+1,cur.sdate));
-
-            -- Валюта кредиту
-            select kv into l_row.kv from bars.cc_add where nd = cur.nd;
-
-            -- планова сума погашення за минулий місяць
-            select nvl(sum(sumg)/100,0)
-              into l_row.pog_plan
-              from bars.cc_lim g
-             where nd = cur.nd
-               and (g.nd, g.fdat) = (select nd, max(fdat)
-                                     from bars.cc_lim
-                                    where nd = g.nd
-                                      and fdat >= trunc(trunc(p_dat,'MONTH')-1,'MONTH') and fdat <= trunc(p_dat,'MONTH')-1
-                                      and sumg > 0
-                                    group by nd);
-
-            -- фактично погашено за минулий місяць
-            select nvl(sum(sa.kos),0)/100
-              into l_row.pog_fact
-              from bars.saldoa sa, bars.accounts a, bars.nd_acc na
-             where a.acc = sa.acc and a.acc=na.ACC and na.nd=cur.nd and a.TIP='LIM' and sa.dos - sa.kos < 0
-               and fdat >= trunc(trunc(p_dat,'MONTH')-1,'MONTH') and fdat<= trunc(p_dat,'MONTH')-1;
-
-           -- Сума залишку заборгованості на початок року, грн
-           -- беремо з місяних снапів
-           -- по снапах дані на 01.12.2014 це вхідний залишок на 01.01.2015
-          select sum(case when a.tip in ('SS ','SP ','SL ')   then b.ost end)/100 as borg,
-                 sum(case when a.tip in ('SN ', 'SPN', 'SLN') then b.ost end)/100 as borgproc
-            into l_row.borg_sy, l_row.borgproc_sy
-           from bars.nd_acc na, bars.accounts a, bars.agg_monbals b
-          where na.ND = cur.nd
-            and na.ACC=a.acc
-            and a.tip in ('SS ','SP ','SL ', 'SN ', 'SPN', 'SLN')
-            and a.acc=b.acc
-            and b.kf = a.kf
-            and b.fdat = trunc(trunc(p_dat,'YEAR')-1,'MONTH')
-            and (a.dazs is null or a.dazs>trunc(p_dat,'YEAR'))
-            and a.daos <= trunc(p_dat,'YEAR');
-
-           l_row.borg_sy     := abs(nvl(l_row.borg_sy, 0));
-           l_row.borgproc_sy := abs(nvl(l_row.borgproc_sy, 0));
-
-           -- для Стандартних КД відсутній 2625
-           l_row.bpk_nls := null;
-
-           -- відсоткова ставка
-           l_row.intrate := acrn.fprocn(l_acc8, 0, p_dat);
-
-           -- партнерська компанія
-           l_row.ptn_name := null;
-           l_row.ptn_okpo := null;
-           l_row.ptn_mother_name := null;
-           -- наявність партнера
-           select count(1) into l_partn from bars.nd_txt d
-            where d.nd = cur.nd
-              and tag = 'PARTN'
-              and txt ='Taк'
-              and kf = cur.kf
-              and rownum=1;
-           -- id партнера
-           if l_partn > 0 then
-             select to_number(max(d.txt)) into l_par_n from bars.nd_txt d
-              where d.nd = cur.nd
-                and d.tag = 'PAR_N'
-                and regexp_replace(trim(d.txt), '\D') = trim(d.txt)
-                and d.kf = cur.kf
-                and rownum = 1;
-             -- партнер
-             begin
-                 select
-                    nvl(p.ptn_name, p.name),
-                    p.ptn_okpo,
-                    (select nvl(m.ptn_name, m.name) from bars.wcs_partners_all m where m.id = p.id_mather) mother_name
-                  into l_row.ptn_name, l_row.ptn_okpo, l_row.ptn_mother_name
-                  from bars.wcs_partners_all p where p.id = l_par_n;
-              exception when no_data_found then null;
-              end;
-           end if;
-
-           -- дата відкриття 2202/03, 2232/33
-           select max(daos)
-             into l_row.open_date_bal22
-             from bars.accounts a, bars.nd_acc n
-            where n.nd = cur.nd and a.acc = n.acc and a.nbs in ('2202', '2203', '2232', '2233');
-           -- Статус КД в реєстрі
-           begin
-             select n.TXT into l_row.ES000
-             from nd_txt n
-             where n.nd = cur.nd
-             and tag = 'ES000'
-             and kf = cur.kf;
-           exception
-             when no_data_found then null;
-           end;
-           -- дата отримання відшкодування
-           begin
-             select n.TXT into l_row.ES003
-             from nd_txt n
-             where n.nd = cur.nd
-             and tag = 'ES003'
-             and kf = cur.kf;
-           exception
-             when no_data_found then null;
-           end;
-
-           insert into credits_stat values l_row;
-
-           l_rows:=l_rows + 1;
-           l_cnt := l_cnt + 1;
-           dbms_application_info.set_client_info(l_trace||to_char(l_cnt)|| ' processed (std credits)');
-
-          exception
+            l_rows := l_rows + sql%rowcount;
+            commit;
+        exception
             when others then
-              l_rows_err:=l_rows_err + 1;
-              l_errmsg :=substr(l_trace||' Error: nd='|| cur.nd || ', '
-                                       ||dbms_utility.format_error_stack()||chr(10)
-                                       ||dbms_utility.format_error_backtrace()
-                                       , 1, 512);
-              bars.bars_audit.error(l_errmsg);
-          end;
-          /*logging*/
-         end loop;
-
-         bars.bars_audit.info(l_trace||' std crd count='||l_cnt);
-         l_cnt := 0;
-
+                rollback; 
+                raise;
+        end;
+        bars.bars_audit.info(l_trace||' std crd finished');
         ------------------------
         -- договора по БПК
         ------------------------
-            -- тип договору (для БПК = 19)
-            l_row.vidd  := 19;
-            -- Тип клиєнта по виду договора
-            begin
-                select custtype into l_row.VIDD_CUSTTYPE from bars.cc_vidd where vidd = l_row.vidd;
-            exception
-                when no_data_found then l_row.vidd_custtype := null;
-            end;
+        
+        begin
+            execute immediate q'[
+            insert /*+ APPEND */ into credits_stat ]'||l_insert_target||q'[
+            (
+                                     id,
+                                     per_id,
+                                     nd,
+                                     rnk,
+                                     kf,
+                                     branch,
+                                     okpo,
+                                     cc_id,
+                                     sdate,
+                                     wdate,
+                                     wdate_fact,
+                                     vidd,
+                                     prod,
+                                     prod_clas,
+                                     pawn,
+                                     sdog,
+                                     term,
+                                     kv,
+                                     pog_plan,
+                                     pog_fact,
+                                     borg_sy,
+                                     borgproc_sy,
+                                     bpk_nls,
+                                     intrate,
+                                     ptn_name,
+                                     ptn_okpo,
+                                     ptn_mother_name,
+                                     open_date_bal22,
+                                     es000,
+                                     es003,
+                                     vidd_custtype)
+            with cur as
+            (select ba.nd, ba.acc_pk, ba.acc_ovr, ba.acc_2208, c.rnk, a.branch, a.kf, a.nbs, a.ob22, a.daos, a.dazs, a.kv, c.okpo,
+                                           aa.lim, aa.nls nls2625, aa.daos daos2625, AA.DAZS dazs2625, a.ostc ost_ovr, A9129.OSTC ost_9129, a9129.daos daos9129,
+                                           (select sp.nkd from bars.specparam sp where sp.acc=ba.acc_ovr) nkd
+            from bars.bpk_all_accounts ba, bars.accounts a, bars.customer c, bars.accounts aa, bars.accounts a9129
+            where ba.acc_ovr is not null
+                and ba.acc_ovr = a.acc
+                and a.nbs in ('2202','2203')
+                and a.rnk      = c.rnk
+                and c.custtype in (2, 3)
+            --  and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов -- 20.03.2017  COBUSUPABS-5659
+                and ba.acc_pk = aa.acc and aa.nbs = '2625'
+                and ba.acc_9129 = a9129.acc(+)
 
-        for cur in (select ba.nd, ba.acc_pk, ba.acc_ovr, ba.acc_2208, c.rnk, a.branch, a.kf, a.nbs, a.ob22, a.daos, a.dazs, a.kv, c.okpo,
-                               aa.lim, aa.nls nls2625, aa.daos daos2625, AA.DAZS dazs2625, a.ostc ost_ovr, A9129.OSTC ost_9129, a9129.daos daos9129,
-                               (select sp.nkd from bars.specparam sp where sp.acc=ba.acc_ovr) nkd
-                        from bars.bpk_all_accounts ba, bars.accounts a, bars.customer c, bars.accounts aa, bars.accounts a9129
-                        where ba.acc_ovr is not null
-                            and ba.acc_ovr = a.acc
-                            and a.nbs in ('2202','2203')
-                            and a.rnk      = c.rnk
-                            and c.custtype in (2, 3)
-    --                        and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов -- 20.03.2017  COBUSUPABS-5659
-                            and ba.acc_pk = aa.acc and aa.nbs = '2625'
-                            and ba.acc_9129 = a9129.acc(+)
-                     union
-                       select ba.nd, ba.acc_pk, ba.acc_ovr, ba.acc_2208, c.rnk, a9129.branch, a9129.kf, a9129.nbs, a9129.ob22, a9129.daos, a9129.dazs, a9129.kv, c.okpo,
-                               a.lim, a.nls nls2625, a.daos daos2625, A.DAZS dazs2625, 0 ost_ovr, A9129.OSTC ost_9129, a9129.daos daos9129,
-                               (select sp.nkd from bars.specparam sp where sp.acc=ba.acc_9129) nkd
-                        from bars.bpk_all_accounts ba, bars.accounts a, bars.customer c, bars.accounts a9129
-                        where ba.acc_ovr is null
-                            and ba.acc_pk = a.acc and a.nbs = '2625'
-                            and a.rnk = c.rnk
-                            and c.custtype in (2, 3) -- and nvl(trim(c.sed),'00')<>'91'
-    --                        and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов -- 20.03.2017  COBUSUPABS-5659
-                            and ba.acc_9129 is not null
-                            and ba.acc_9129 = a9129.acc
-                   )
-         loop
-           begin
-                      /*logging*/
-            l_row.id := s_credits.nextval;
-            l_row.per_id := l_per_id;
-            -- id договору (для БПК id дог. = nd дог.)
-            l_row.nd  := cur.nd;
-            l_row.rnk := cur.rnk;
-            l_row.kf  := cur.kf;
-            l_row.branch := cur.branch;
-            l_row.okpo  := cur.okpo;
-            -- Номер договору
-            l_row.cc_id := cur.nkd;
-
-            -- Дата укладання договору
-            -- беремо, як дату відкриття 9129
-            -- !до 15.12.2015 брали дату відкриття рах.овердрафту
-            l_row.sdate := cur.daos9129;
-
-            -- Дата закінчення договору (очікувана)
-            -- отримаємо термін дії карточки в місяцях
-            -- todo реалізувати, якщо PK_TERM незаповнений
-            select max(aw.value)
-              into l_bpkterm
-              from bars.accountsw aw
-             where AW.ACC=cur.acc_pk and aw.tag = 'PK_TERM';
-
-            -- дата завершення беремо як
-            -- дата відкриття 2625 + термін дії БПК
-            select add_months(cur.daos2625,l_bpkterm) into l_row.wdate from dual;
-
-            -- Дата закінчення договору (фактична)
-            -- беремо дату закриття рах. овердрафту
-            l_row.wdate_fact := cur.dazs;
-    /*
-            -- тип договору (для БПК = 19)
-            l_row.vidd  := 19;
-            -- Тип клиєнта по виду договора
-            begin
-                select custtype into l_row.VIDD_CUSTTYPE from bars.cc_vidd where vidd = l_row.vidd;
-            exception
-                when no_data_found then l_row.vidd_custtype := null;
-            end;
-    */
-            -- !Вид продукту, в Барсі не ведеться!
-            l_row.prod := null;
-
-            -- Класифікація кредитного продукту (OB22)
-            l_row.prod_clas  := cur.nbs || cur.ob22;
-
-            -- Вид застави/Поручительства
-            l_row.pawn:= null;
-
-            -- Сума договору
-            -- сума дог.= зал по рах.овер(2202,2203)+зал.по рах.9129
-            l_row.sdog := abs(cur.ost_ovr + nvl(cur.ost_9129,0))/100;
-
-            -- Строк кредиту (в місяцях)
-            l_row.term := trunc(MONTHS_BETWEEN(l_row.wdate, l_row.sdate));
-
-            -- Валюта кредиту
-            l_row.kv   := cur.kv;
-
-            -- планова сума погашення за минулий місяць
-            l_row.pog_plan := 0;
-
-            -- фактично погашено за минулий місяць
-            select nvl(sum(sa.kos),0)/100
-              into l_row.pog_fact
-              from bars.saldoa sa
-             where sa.acc = cur.acc_ovr
-               and fdat >= trunc(trunc(p_dat,'MONTH')-1,'MONTH') and fdat<= trunc(p_dat,'MONTH')-1;
-
-           -- Сума залишку заборгованості на початок року, грн
-             select nvl(abs(sum(b.ost))/100, 0)
-               into l_row.borg_sy
-               from bars.agg_monbals b
-              where b.acc=cur.acc_ovr
-                and b.fdat = trunc(trunc(p_dat,'YEAR')-1,'MONTH')
-                and b.kf = cur.kf;
-
-           -- Сума залишку заборгованості за відсотками на початок року, грн.
-             select nvl(abs(sum(b.ost))/100, 0)
-               into l_row.borgproc_sy
+            union all
+            select ba.nd, ba.acc_pk, ba.acc_ovr, ba.acc_2208, c.rnk, a9129.branch, a9129.kf, a9129.nbs, a9129.ob22, a9129.daos, a9129.dazs, a9129.kv, c.okpo,
+                                           a.lim, a.nls nls2625, a.daos daos2625, A.DAZS dazs2625, 0 ost_ovr, A9129.OSTC ost_9129, a9129.daos daos9129,
+                                           (select sp.nkd from bars.specparam sp where sp.acc=ba.acc_9129) nkd
+            from bars.bpk_all_accounts ba, bars.accounts a, bars.customer c, bars.accounts a9129
+            where ba.acc_ovr is null
+                and ba.acc_pk = a.acc and a.nbs = '2625'
+                and a.rnk = c.rnk
+                and c.custtype in (2, 3) -- and nvl(trim(c.sed),'00')<>'91'
+            --  and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов -- 20.03.2017  COBUSUPABS-5659
+                and ba.acc_9129 is not null
+                and ba.acc_9129 = a9129.acc
+            )
+            select 
+            s_credits.nextval,
+            :l_per_id,
+            nd,
+            rnk,
+            kf,
+            branch,
+            okpo,
+            nkd as cc_id,
+            daos9129 as sdate,
+            add_months(cur.daos2625, BPK_AW_TERM.bpk_term) as wdate,
+            dazs as wdate_fact,
+            19 as vidd,
+            null as prod,
+            cur.nbs || cur.ob22 as prod_class,
+            null as pawn,
+            abs(cur.ost_ovr + nvl(cur.ost_9129,0))/100 as sdog,
+            trunc(MONTHS_BETWEEN(add_months(cur.daos2625, BPK_AW_TERM.bpk_term), daos9129)) as term,
+            cur.kv,
+            0 as pog_plan,
+            (select nvl(sum(sa.kos),0)/100
+               from bars.saldoa sa
+              where sa.acc = cur.acc_ovr
+                and fdat >= trunc(trunc(:p_dat,'MONTH')-1,'MONTH') and fdat<= trunc(:p_dat,'MONTH')-1) as pog_fact,
+            (select nvl(abs(sum(b.ost))/100, 0)
+              from bars.agg_monbals b
+             where b.acc=cur.acc_ovr
+               and b.fdat = trunc(trunc(:p_dat,'YEAR')-1,'MONTH')
+               and b.kf = cur.kf) as borg_sy,
+            (select nvl(abs(sum(b.ost))/100, 0)
                from bars.agg_monbals b
               where b.acc=cur.acc_2208
-                and b.fdat = trunc(trunc(p_dat,'YEAR')-1,'MONTH')
-                and b.kf = cur.kf;
-
-           -- Рах. 2625
-           l_row.bpk_nls := cur.nls2625;
-
-           -- відсоткова ставка
-           l_row.intrate := acrn.fprocn(cur.acc_ovr, 0, p_dat);
-
-           -- партнерська компанія
-           l_row.ptn_name := null;
-           l_row.ptn_okpo := null;
-           l_row.ptn_mother_name := null;
-
-           -- дата відкриття 2202/03
-           if (cur.acc_ovr is not null) then
-             l_row.open_date_bal22 := cur.daos;
-           else
-             l_row.open_date_bal22 := null;
-           end if;
-
-           -- Статус КД в реєстрі
-           begin
-             select n.TXT into l_row.ES000
+                and b.fdat = trunc(trunc(:p_dat,'YEAR')-1,'MONTH')
+                and b.kf = cur.kf) as borgproc_sy,
+            nls2625 as bpk_nls,
+            acrn.fprocn(cur.acc_ovr, 0, :p_dat) as intrate,
+            null as ptn_name,
+            null as ptn_okpo,
+            null as ptn_mother_name,
+            case when cur.acc_ovr is not null then cur.daos end as open_date_bal22,
+            (select n.TXT 
              from nd_txt n
              where n.nd = cur.nd
              and tag = 'ES000'
-             and kf = cur.kf;
-           exception
-             when no_data_found then null;
-           end;
-           -- дата отримання відшкодування
-           begin
-             select n.TXT into l_row.ES003
+             and kf = cur.kf) as ES000,
+            (select n.TXT
              from nd_txt n
              where n.nd = cur.nd
-             and tag = 'ES003'
-             and kf = cur.kf;
-           exception
-             when no_data_found then null;
-           end;
+             and tag = 'ES000'
+             and kf = cur.kf) as ES003,
+            3 as vidd_custtype -- хардкод по #COBUSUPABS-6567
+            from cur
+            left join 
+            (select acc, nvl(to_number(aw.value), 0) as bpk_term
+               from bars.accountsw aw
+              where aw.tag = 'PK_TERM') BPK_AW_TERM on cur.acc_pk = BPK_AW_TERM.acc
+            LOG ERRORS into ERR$_CREDITS_STAT ('BPK') reject limit unlimited
+            ]' using l_per_id, p_dat, p_dat, p_dat, p_dat, p_dat;
 
-           insert into credits_stat values l_row;
-
-           l_rows:=l_rows + 1;
-           l_cnt := l_cnt + 1;
-           dbms_application_info.set_client_info(l_trace||to_char(l_cnt)|| ' processed (bpk credits)');
-
-          exception
+            l_rows := l_rows + sql%rowcount;
+            commit;
+        exception
             when others then
-              l_rows_err:=l_rows_err + 1;
-              l_errmsg :=substr(l_trace||' Error: nd='|| cur.nd || ', '
-                                       ||dbms_utility.format_error_stack()||chr(10)
-                                       ||dbms_utility.format_error_backtrace()
-                                       , 1, 512);
-              bars.bars_audit.error(l_errmsg);
-          end;
-
-         end loop;
-
-        bars.bars_audit.info(l_trace||' bpk crd count='||l_cnt);
-
+                rollback;
+                raise;
+        end;
+        bars.bars_audit.info(l_trace||' bpk crd finished');
+        
+        -- считаем кол-во ошибочных строк
+        select count(*) into l_rows_err from ERR$_CREDITS_STAT where PER_ID = l_per_id;
+        
         p_rows := l_rows;
         p_rows_err := l_rows_err;
         p_state := 'SUCCESS';
@@ -937,7 +880,8 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
     end credits_stat_imp;
 
     --
-    -- import credits dynamic
+    -- Выгрузка "динамических" данных по кредитам
+    -- Всегда выгружается полный объем
     --
     procedure credits_dyn_imp (p_dat in date default trunc(sysdate), p_periodtype in varchar2 default C_FULLIMP, p_rows out number, p_rows_err out number, p_state out varchar2)
     is
@@ -955,7 +899,6 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
         l_cnt     pls_integer := 0;
 
         type   saldoa_tt is table of bars.saldoa%rowtype;
-        --l_rs   saldoa_tt;
 
     begin
         bars.bars_audit.info(l_trace||' start');
@@ -1634,14 +1577,10 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
 
             -- тип договору (для БПК = 19)
             l_row.vidd  := 19;
+
             -- Тип клиєнта по виду договора
-			/* Для БПК не ведется
-            begin
-                select custtype into l_row.VIDD_CUSTTYPE from bars.cc_vidd where vidd = l_row.vidd;
-            exception
-                when no_data_found then l_row.vidd_custtype := null;
-            end;
-			*/
+            l_row.vidd_custtype := 3; -- #COBUSUPABS-6567
+
             -- Дата укладання договору
             -- беремо, як дату відкриття 9129
             -- !до 15.12.2015 брали дату відкриття рах.овердрафту
@@ -2032,8 +1971,6 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
 
         end loop;
 
-        bars.suda;
-
         p_rows := l_rows;
         p_rows_err := l_rows_err;
         p_state := 'SUCCESS';
@@ -2053,7 +1990,7 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
     end credits_dyn_imp;
 
     --
-    -- import deposits
+    -- Выгрузка депозитов
     --
     procedure deposits_imp (p_dat in date default trunc(sysdate), p_periodtype in varchar2 default C_FULLIMP, p_rows out number, p_rows_err out number, p_state out varchar2)
     is
@@ -2278,8 +2215,6 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
         end if;
 
         delete from deposits where per_id=l_per_id;
-        --
-        bars.tuda;
 
         -- відкриті договора
         if (p_periodtype = 'DAY') then
@@ -2365,7 +2300,6 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
         p_rows_err := l_rows_err;
         p_state := 'SUCCESS';
 
-        bars.suda;
         bars.bars_audit.info(l_trace||' deposits count='||l_rows);
         bars.bars_audit.info(l_trace||' finish');
 
@@ -2373,7 +2307,7 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
 
 
     --
-    -- import accounts
+    -- Выгрузка клиентских счетов
     --
     procedure accounts_imp (p_dat in date default trunc(sysdate), p_periodtype in varchar2 default C_FULLIMP, p_rows out number, p_rows_err out number, p_state out varchar2)
     is
@@ -2457,8 +2391,7 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
         end if;
 
         delete from dm_accounts where per_id=l_per_id;
-        --
-        bars.tuda;
+
         -- денні зміни
         -- ! додати аналіз змін залишку
         if (p_periodtype = C_INCRIMP) then
@@ -2470,8 +2403,6 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
         end if;
 
         l_row.per_id := l_per_id;
-        -- test
-        --insert into t_clob values(sysdate,q_str);
 
         loop
           begin
@@ -2503,7 +2434,6 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
 
         close c;
 
-        bars.suda;
         p_rows := l_rows;
         p_rows_err := l_rows_err;
         p_state := 'SUCCESS';
@@ -2513,7 +2443,7 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
     end accounts_imp;
 
     --
-    -- import bpk
+    -- Выгрузка БПК
     --
     procedure bpk_imp (p_dat in date default trunc(sysdate), p_periodtype in varchar2 default C_FULLIMP, p_rows out number, p_rows_err out number, p_state out varchar2)
     is
@@ -2601,8 +2531,7 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
         end if;
 
         delete from bpk where per_id=l_per_id;
-        --
-        bars.tuda;
+
         -- денні зміни
         if (p_periodtype = C_INCRIMP) then
             q_str := q_str_pre || q_str || q_str_postinc;
@@ -2613,8 +2542,6 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
         end if;
 
         l_row.per_id := l_per_id;
-        -- test
-        --insert into t_clob values(sysdate,q_str);
 
         loop
           begin
@@ -2646,7 +2573,6 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
 
         close c;
 
-        bars.suda;
         p_rows := l_rows;
         p_rows_err := l_rows_err;
         p_state := 'SUCCESS';
@@ -2656,7 +2582,7 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
     end bpk_imp;
 
     --
-    -- import corps customers
+    -- Выгрузка клиентов-юрлиц
     --
     procedure custur_imp  (p_dat in date default trunc(sysdate), p_periodtype in varchar2 default C_FULLIMP, p_rows out number, p_rows_err out number, p_state out varchar2)
     is
@@ -2843,20 +2769,13 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
 
         if (p_periodtype = C_INCRIMP) then
             q_str := q_str_inc_pre || q_str_main || q_str_inc_suf;
-            -- test q_str
-            -- insert into t_clob values(sysdate,q_str);
 
             open c for q_str using p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat;
         else
             q_str := q_str_main || q_str_full_suf;
-            -- test q_str
-            -- insert into t_clob values(sysdate,q_str);
 
             open c for q_str ;
         end if;
-
-        -- test q_str
-        -- insert into t_clob values(sysdate,q_str);
 
         loop
           begin
@@ -2906,7 +2825,8 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
     end custur_imp;
 
     --
-    -- import corps rel customers
+    -- Выгрузка связей клиентов
+    -- Инкрементная и "полная" (+ удаленные связи за месяц)
     --
     procedure custur_rel_imp(p_dat        in date default trunc(sysdate),
                          p_periodtype in varchar2 default C_FULLIMP,
@@ -3031,8 +2951,6 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
         p_period_id in integer)
     is
     begin
-        lock table customers_segment in exclusive mode;
-
         declare
             partition_doesnt_exist exception;
             pragma exception_init(partition_doesnt_exist, -2149);
@@ -3046,6 +2964,7 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
         bars_audit.info('Сегментація клієнтів для XRM - попередні дані за період з ідентифікатором {' || p_period_id || '} видалено');
     end;
 
+    -- Сегменты: разворачивание (pivot) и сохранение
     procedure store_customer_segments_data(
         p_period_id in integer,
         p_attribute_values in bars.t_attribute_values,
@@ -3056,15 +2975,15 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
         l_lastchangedate date := trunc(sysdate);
         l_cursor sys_refcursor;
         l_errors_count integer;
-        l_user_mfo varchar2(256) := sys_context('bars_context', 'user_mfo');
+        
+        l_user_mfo varchar2(6) := sys_context('bars_context', 'user_mfo');
         dml_errors exception;
         pragma exception_init(dml_errors, -24381);
 		l_limit number := 10000;
     begin
         p_rows_count := 0;
         p_errors_count := 0;
-        bars.tuda;
-        l_user_mfo := sys_context('bars_context', 'user_mfo');
+
         open l_cursor for
         select TR_CUST_SEGMENT(p_period_id,
                l_user_mfo,
@@ -3128,7 +3047,7 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
             begin
                 merge into customers_segment c
                 using (select * from table( cast (l_customer_segments as T_CUST_SEGMENTS))) lc
-                on (c.per_id = p_period_id and c.rnk = lc.RNK)
+                on (c.per_id = p_period_id and c.rnk = lc.RNK /*and c.kf = lc.KF*/)
                 when matched then
                   update
                   set c.SEGMENT_ACT = coalesce(lc.SEGMENT_ACT, c.SEGMENT_ACT),
@@ -3168,6 +3087,7 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
         close l_cursor;
     end;
 
+    -- Сегменты: выгрузка дельты
     procedure customer_segment_changes(
         p_date_from in date,
         p_date_to in date,
@@ -3183,6 +3103,7 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
         l_errors_count integer;
         l_trace varchar2(500) := G_TRACE||'customer_segment_changes: ';
         l_limit number := 10000;
+        l_ourmfo varchar2(6) := sys_context('bars_context', 'user_mfo');
     begin
         p_rows_count := 0;
         p_errors_count := 0;
@@ -3192,9 +3113,10 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
         if (l_period_id is null) then
             return;
         end if;
-        clear_segmentation_data(l_period_id);
-
-        for lc_kf in (select kf from bars.mv_kf)
+        --clear_segmentation_data(l_period_id);
+        truncate_kf_subpartition('CUSTOMERS_SEGMENT', l_period_id, l_ourmfo);
+        /* если контекст МФО указан - представляемся им, нет - бежим по всем kf */
+        for lc_kf in (select m.kf from bars.mv_kf m where m.kf = nvl(l_ourmfo, m.kf))
         loop
             bars.bc.go(lc_kf.kf);
             open l_cursor for
@@ -3237,7 +3159,7 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
                 exit when l_cursor%notfound;
             end loop;
         end loop;
-        bars.bc.home;
+        bars.bc.go(nvl(l_ourmfo, '/'));
 
         select count(*) into p_rows_count from customers_segment t where t.per_id = l_period_id;
 
@@ -3246,8 +3168,9 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
                         'помилок вставки: ' || p_errors_count);
 
         p_state_code := 'SUCCESS';
-    end;
+    end customer_segment_changes;
 
+    -- Сегменты: полная выгрузка
     procedure customer_segment_snapshot(
         p_snapshot_value_date in date,
         p_rows_count out integer,
@@ -3272,7 +3195,8 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
         end if;
 
         bars_audit.info('Сегментація клієнтів для XRM - початок підготовки даних за дату ' || p_snapshot_value_date);
-        clear_segmentation_data(l_period_id);
+        --clear_segmentation_data(l_period_id);
+        truncate_kf_subpartition('CUSTOMERS_SEGMENT', l_period_id, sys_context('bars_context', 'user_mfo'));
 
         for lc_kf in (select kf from bars.mv_kf)
         loop
@@ -3326,10 +3250,10 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
                         'помилок вставки: ' || p_errors_count);
 
         p_state_code := 'SUCCESS';
-    end;
+    end customer_segment_snapshot;
 
     --
-    -- import FO segmentation
+    -- Сегментация физлиц - общий метод
     --
     procedure cust_segm_imp(
         p_dat        in date default trunc(sysdate),
@@ -3346,7 +3270,7 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
         end if;
     end;
 
-    --
+    -- TODO: К УДАЛЕНИЮ
     -- import assurances
     -- 18/04/2016 only for GOUK
     -- вивантаження не проводиться (уточнюються умови)
@@ -3468,7 +3392,7 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
 
 
     --
-    -- import zalogov
+    -- Выгрузка залогов
     --
     procedure zastava_imp  (p_dat in date default trunc(sysdate), p_periodtype in varchar2 default C_FULLIMP, p_rows out number, p_rows_err out number, p_state out varchar2)
     is
@@ -3483,8 +3407,6 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
         c        sys_refcursor;
     begin
         bars.bars_audit.info(l_trace||' start');
-        -- todo
-        -- справедлива вартість?
 
         -- get period id
         l_per_id := get_period_id (p_periodtype, p_dat);
@@ -3626,7 +3548,7 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
 
 
     --
-    -- import deposits_plt
+    -- Расширенная выгрузка депозитов
     --
     procedure deposits_plt_imp (p_dat in date default trunc(sysdate), p_periodtype in varchar2 default C_FULLIMP, p_rows out number, p_rows_err out number, p_state out varchar2)
     is
@@ -3647,8 +3569,6 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
         end if;
 
         delete from deposit_plt where per_id=l_per_id;
-        --
-        bars.tuda;
 
         l_row.per_id := l_per_id;
 
@@ -4125,7 +4045,6 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
         p_rows_err := l_rows_err;
         p_state := 'SUCCESS';
 
-        bars.suda;
         bars.bars_audit.info(l_trace||' deposits count='||l_rows);
         bars.bars_audit.info(l_trace||' finish');
 
@@ -4133,7 +4052,7 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
 
 
     --
-    -- import bpk_plt
+    -- Расширенная выгрузка БПК
     --
     procedure bpk_plt_imp (p_dat in date default trunc(sysdate), p_periodtype in varchar2 default C_FULLIMP, p_rows out number, p_rows_err out number, p_state out varchar2)
     is
@@ -4155,13 +4074,10 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
         end if;
 
         delete from bpk_plt where per_id=l_per_id;
-        --
-        bars.tuda;
         -- денні зміни
 
         l_row.per_id := l_per_id;
-        -- test
-        --insert into t_clob values(sysdate,q_str);
+
         for c in (with dapp as
                  (select a.acc
                     from bars.accounts a
@@ -4435,7 +4351,6 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
 
         end loop;
 
-        bars.suda;
         p_rows := l_rows;
         p_rows_err := l_rows_err;
         p_state := 'SUCCESS';
@@ -4447,7 +4362,7 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
 
 
     --
-    -- import customers_plt
+    -- Расширенная выгрузка клиентов-физлиц
     --
     procedure customers_plt_imp(p_dat        in date default trunc(sysdate),
                             p_periodtype in varchar2 default C_FULLIMP,
@@ -5877,7 +5792,6 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
           bars.bars_audit.error(l_errmsg);
      end;
 
-        bars.suda;
         p_rows := l_rows;
         p_rows_err := 0;
         bars.bars_audit.info(l_trace||' finish');
@@ -5885,7 +5799,7 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
     end credits_zal_imp;
 
     --
-    -- clear old data
+    -- Очистка старых данных в витринах
     --
     procedure clear_data (p_dat in date default trunc(sysdate))
     is
@@ -5962,7 +5876,7 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
     end clear_data;
 
     --
-    -- get period id
+    -- Получение периода выгрузки
     --
     function get_period_id (p_period_type in period_type.id%type,
                             p_period_date in date)
@@ -6037,8 +5951,50 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
        RETURN l_phone;
     END add38phone;
 
+    ---
+    --- Запуск выгрузки по объекту в контексте указанного МФО (для параллели).
+    ---
+    procedure imp_run_by_mfo(p_mfo          in     varchar2,
+                             p_obj_proc     in     varchar2,
+                             p_dat          in     date,
+                             p_periodtype   in     varchar2,
+                             p_id_event     in     number
+                             )
+        is
+        l_trace  varchar2(500) := G_TRACE||'imp_run_by_mfo: ';
+        l_stats_current_row dm_stats%rowtype;
+        l_errmsg varchar2(512);
+        l_rows_ok number;
+        l_rows_err number;
+        l_status varchar2(32);
+    begin
+        -- представляемся и запускаем выгрузку
+        bars.bc.go(p_mfo);
+        execute immediate 'begin ' || p_obj_proc || '(:p1, :p2, :p3, :p4, :p5); end;' 
+        using in p_dat, in p_periodtype, in out l_rows_ok, in out l_rows_err, in out l_status;
+
+        commit;
+
+        -- лочим строку статистики и обновляем статус (кроме ERROR) и инкрементно выгруженные строки
+        select * into l_stats_current_row from dm_stats where id = p_id_event for update;
+        log_stat_event(p_rows_ok    => nvl(l_stats_current_row.rows_ok, 0) + l_rows_ok,
+                       p_rows_err   => nvl(l_stats_current_row.rows_err, 0) + l_rows_err,
+                       p_status     => case when l_stats_current_row.status in ('ERROR', 'INPROCESS') and l_status != 'ERROR' then l_stats_current_row.status else l_status end,
+                       p_id         => l_stats_current_row.id);
+    exception
+        when others then
+            -- лочим строку статистики и ставим статус ошибки
+            select * into l_stats_current_row from dm_stats where id = p_id_event for update;
+            log_stat_event(p_id => l_stats_current_row.id, p_status => 'ERROR');
+            l_errmsg :=substr(l_trace||' Error: '
+                                     ||dbms_utility.format_error_stack()||chr(10)
+                                     ||dbms_utility.format_error_backtrace()
+                                     , 1, 512);
+            bars.bars_audit.error(l_errmsg);
+    end imp_run_by_mfo;
+
     --
-    -- import data
+    -- Общая процедура запуска выгрузки
     --
     procedure imp_run (p_dat in date default sysdate, p_periodtype in varchar2 default C_FULLIMP)
     is
@@ -6046,71 +6002,116 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
         l_per_id    number;
         l_id_session  number;
         l_id_event  number;
-        l_rows      number;
-        l_rows_err  number;
-        l_status    varchar2(20);
         l_errmsg    varchar2(512);
+        
+        -- parallel stuff
+        c_task_name  constant varchar2(32) := 'IMP_' || p_periodtype;
+        l_chunk_stmt varchar2(128) := q'[select kf as START_ID, kf as END_ID from bars.mv_kf]';
+        l_mfo_cnt    number;
+        l_task_statement varchar2(4000) := q'[
+        begin
+            bars_login.login_user(sys_guid, :usr_id, null, null);
+            bars.bc.go(:START_ID);
+            bars_dm.dm_import.imp_run_by_mfo(p_mfo => to_char(:END_ID),
+                                             p_obj_proc => ':obj_proc',
+                                             p_dat => to_date(']' || to_char(p_dat, 'dd.mm.yyyy') || q'[', 'dd.mm.yyyy'),
+                                             p_periodtype => ']' || p_periodtype || q'[',
+                                             p_id_event => :id_event);
+            commit;
+            bars.bars_login.logout_user;
+        end;
+        ]';
+        l_usr_id number;
+        l_final_status varchar2(32);
+        task_doesnt_exist exception;
+        pragma exception_init(task_doesnt_exist, -29498);
+        -- drop task if exists
+        procedure drop_import_task
+            is
+        begin
+            DBMS_PARALLEL_EXECUTE.DROP_TASK (c_task_name);
+        exception
+            when task_doesnt_exist then null;
+        end drop_import_task;
 
     begin
-            -- get period id
+        -- получаем период
         l_per_id := get_period_id (p_periodtype, p_dat);
-
+        -- получаем id сессии
         select nvl(max(id_session),1) + 1 into l_id_session from dm_stats;
+        -- получаем число МФО для паралеллизма
+        select count(*) into l_mfo_cnt from bars.mv_kf;
+        -- кем логинимся
+        select id into l_usr_id from bars.staff$base t where t.logname = 'BARS_DM';
+        l_task_statement := replace(l_task_statement, ':usr_id', l_usr_id);
 
-        for cur in (select obj_name, obj_proc from dm_obj where imp_type = p_periodtype and active = 1 order by imp_order)
+        for cur in (select obj_name, obj_proc, parallel_flag from dm_obj where imp_type = p_periodtype and active = 1 order by imp_order)
         loop
-        begin
-              log_stat_event (p_id_session => l_id_session,
-                              p_start_time => sysdate,
-                              p_stop_time => null,
-                               p_obj => cur.obj_name,
-                               p_perid => l_per_id,
-                               p_rows_ok => null,
-                               p_rows_err => null,
-                               p_status => 'INPROCESS',
-                               p_id => l_id_event );
+            begin
+                -- лог начала задачи
+                log_stat_event (p_id_session => l_id_session,
+                                p_start_time => sysdate,
+                                p_stop_time => null,
+                                p_obj => cur.obj_name,
+                                p_perid => l_per_id,
+                                p_rows_ok => null,
+                                p_rows_err => null,
+                                p_status => 'INPROCESS',
+                                p_id => l_id_event );
 
-              l_rows := 0;
-              l_rows_err  := 0;
-
-              execute immediate 'begin ' || cur.obj_proc || '(:p1, :p2, :p3, :p4, :p5); end;' using p_dat, p_periodtype, in out l_rows, in out l_rows_err,  in out l_status;
-
-              log_stat_event (p_start_time => null,
-                              p_stop_time => sysdate,
-                               p_obj => cur.obj_name,
-                               p_perid => l_per_id,
-                               p_rows_ok => l_rows,
-                               p_rows_err => l_rows_err,
-                               p_status => l_status,
-                               p_id => l_id_event );
-              commit;
-        exception
-          when others then
-          log_stat_event (p_start_time => null,
-                          p_stop_time => sysdate,
-                           p_obj => cur.obj_name,
-                           p_perid => l_per_id,
-                           p_rows_ok => l_rows,
-                           p_rows_err => l_rows_err,
-                           p_status => 'ERROR',
-                           p_id => l_id_event );
-              l_errmsg :=substr(l_trace||' Error: '
-                                       ||dbms_utility.format_error_stack()||chr(10)
-                                       ||dbms_utility.format_error_backtrace()
-                                       , 1, 512);
-              bars.bars_audit.error(l_errmsg);
-
-        end;
-
-        l_id_event := null;
-
+                if cur.parallel_flag='Y' then
+                    -- удаляем предыдущую задачу
+                    drop_import_task;
+                    dbms_parallel_execute.create_task(c_task_name);
+                    -- создаем чанки по МФО
+                    dbms_parallel_execute.create_chunks_by_sql(task_name => c_task_name, 
+                                                               sql_stmt  => l_chunk_stmt, 
+                                                               by_rowid  => false);
+                    -- запуск задачи по всем МФО
+                    dbms_parallel_execute.run_task(task_name      => c_task_name, 
+                                                   sql_stmt       => replace(replace(l_task_statement, ':obj_proc', cur.obj_proc), ':id_event', l_id_event), 
+                                                   language_flag  => dbms_sql.native, 
+                                                   parallel_level => l_mfo_cnt);
+                    
+                else
+                    -- запускаем со '/', без параллели
+                    imp_run_by_mfo(p_mfo        => '/',
+                                   p_obj_proc   => cur.obj_proc,
+                                   p_dat        => p_dat,
+                                   p_periodtype => p_periodtype,
+                                   p_id_event   => l_id_event);
+                end if;
+                -- лог окончания
+                select case when status = 'ERROR' then 'ERROR' else 'SUCCESS' end into l_final_status from dm_stats where id = l_id_event;
+                log_stat_event(p_stop_time => sysdate,
+                               p_id        => l_id_event,
+                               p_status    => l_final_status);
+                commit;
+            exception
+                when others then
+                    /* если что-то случилось с паралеллизмом - удаляем задачу и логируем ошибку */
+                    drop_import_task;
+                    
+                    log_stat_event(p_stop_time  => sysdate,
+                                   p_status => 'ERROR',
+                                   p_id => l_id_event);
+                                   
+                    l_errmsg :=substr(l_trace||' Error: '
+                                             ||dbms_utility.format_error_stack()||chr(10)
+                                             ||dbms_utility.format_error_backtrace()
+                                             , 1, 512);
+                    bars.bars_audit.error(l_errmsg);
+            end;
+            -- обнуляем id выгрузки объекта
+            l_id_event := null;
+            l_final_status := null;
         end loop;
 
     end imp_run;
 
 end;
 /
- show err;
+show err;
  
 PROMPT *** Create  grants  DM_IMPORT ***
 grant EXECUTE                                                                on DM_IMPORT       to BARSUPL;
