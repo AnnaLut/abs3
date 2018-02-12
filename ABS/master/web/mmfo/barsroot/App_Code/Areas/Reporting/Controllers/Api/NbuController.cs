@@ -126,6 +126,23 @@ namespace BarsWeb.Areas.Reporting.Controllers.Api
             }
         }
 
+        [GET("api/reporting/nbu/getchklog")]
+        public HttpResponseMessage GetChkLog(string fileCodeBase64, string kf, string reportDate, string schemeCode, decimal? versionId)
+        {
+            try
+            {
+                string fileCode = ConvertFileCode(fileCodeBase64);
+
+                string log = _repository.GetChkLog(fileCode, reportDate, kf, schemeCode, versionId);
+
+                return Request.CreateResponse(HttpStatusCode.OK, new { Data = log });
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
         [GET("api/reporting/nbu/getdetailedrepdata")]
         public HttpResponseMessage GetDetaledRepData(
             [ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request,

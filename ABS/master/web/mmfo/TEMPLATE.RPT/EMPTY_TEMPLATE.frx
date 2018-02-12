@@ -42,7 +42,7 @@
         <Column Name="CRT_BRANCH" DataType="System.String"/>
         <Column Name="CRT_STAFF_LOGNAME" DataType="System.String"/>
         <Column Name="CRT_STAFF_FIO" DataType="System.String"/>
-        <Column Name="EA_STRUCT_ID" DataType="System.Decimal"/>
+        <Column Name="EA_STRUCT_ID" DataType="System.String"/>
         <CommandParameter Name="p_doc_id" DataType="113" Expression="[p_doc_id]" DefaultValue="-1"/>
       </TableDataSource>
       <TableDataSource Name="Table4" Alias="CLIENT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select c.nmk as fio,&#13;&#10;       fio(c.nmk, 1) || ' ' || substr(fio(c.nmk, 2), 1, 1) || '. ' ||&#13;&#10;       substr(fio(c.nmk, 3), 1, 1) || '.' as fio_short,&#13;&#10;       c.okpo as okpo,&#13;&#10;       decode(c.codcagent,&#13;&#10;              5,&#13;&#10;              'резидент',&#13;&#10;              6,&#13;&#10;              'нерезидент',&#13;&#10;              '--') as codcagent,&#13;&#10;       p.passp as doc_id,&#13;&#10;       ps.name as doc_name,&#13;&#10;       p.ser || ' ' || p.numdoc as pasp_no,&#13;&#10;       f_dat_lit(p.pdate) as pasp_date,&#13;&#10;       p.organ as pasp_atrt,&#13;&#10;       c.adr as address,&#13;&#10;       nvl(p.teld, nvl(p.telw, '________')) as phone&#13;&#10;  from customer c, person p, passp ps&#13;&#10; where c.rnk = p.rnk(+)&#13;&#10;   and p.passp = ps.passp&#13;&#10;   and c.rnk = (select da.cust_id&#13;&#10;                  from dpt_agreements da&#13;&#10;                 where da.agrmnt_id = :p_agrmnt_id)">

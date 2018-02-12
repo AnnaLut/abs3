@@ -1,0 +1,31 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Портфель ЗП";
+}
+<meta charset="utf-8" />
+
+<script src="~/Scripts/respond.min.js?20_12_2017__14_02_24"></script>
+<script src="~/Areas/SalaryBag/Scripts/SlaryBagCommon.js?20_12_2017__14_02_24"></script>
+<script src="~/Areas/SalaryBag/Scripts/Accounts2625/Acc2625Main.js?20_12_2017__14_02_24"></script>
+
+<link rel="stylesheet" href="~/Areas/SalaryBag/Content/SBstyle.css?20_12_2017__14_02_24" />
+<link rel="stylesheet" href="~/Areas/SalaryBag/Content/Acc2625Style.css?20_12_2017__14_02_24" />
+
+
+<div class="page-header">
+    <h1 id="title"></h1>
+</div>
+
+<div class="row" style="margin-bottom:0px;margin-left:10px;">
+    <div class="btn-group">
+        <a class="btn custom-btn custom-btn-back" title="Повернутись назад">Назад</a>
+        <a class="btn custom-btn custom-btn-mirgate" title="Мігрувати дані"></a>
+        <a class="btn custom-btn custom-btn-delete-acc" title="Видалити рахунок"></a>
+        <a class="btn custom-btn custom-btn-lock" title="Заблокувати рахунок"></a>
+        <a class="btn custom-btn custom-btn-unlock" title="Розблокувати рахунок"></a>
+    </div>
+</div>
+
+<br />
+<div id="Acc2625MainGrid"></div>
+<div class="search-main"></div>

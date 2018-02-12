@@ -102,5 +102,6 @@ namespace BarsWeb.Areas.Reporting.Infrastructure.Repository.DI.Abstract
         List<TableInfo> GetTableInfo(string tableName);
         List<Dictionary<string, object>> GetDetailedReportDyn(DataSourceRequest request, string vn, string fileCode, string reportDate, string kf, string fieldCode, string schemeCode, string nbuc);
         string GetFileFmt(string fileCode, bool isDtl);
+        string GetChkLog(string fileCode, string reportDate, string kf, string schemeCode, decimal? versionId = null);
     }
 }

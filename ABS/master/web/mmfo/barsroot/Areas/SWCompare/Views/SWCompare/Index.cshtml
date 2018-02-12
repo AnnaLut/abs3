@@ -1,0 +1,110 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    //ViewBag.Title = "SWCompare";
+}
+<meta charset="utf-8" />
+
+<script src="~/Scripts/respond.min.js?15_12_2017__16_41_12"></script>
+<script src="~/Areas/SWCompare/Scripts/KendoCommon.js?15_12_2017__16_41_12"></script>
+<script src="~/Areas/SWCompare/Scripts/SWCompareCommon.js?15_12_2017__16_41_12"></script>
+<script src="~/Areas/SWCompare/Scripts/SWCompare/Main.js?15_12_2017__16_41_12"></script>
+<script src="~/Areas/SWCompare/Scripts/SWCompare/RequestsForm.js?15_12_2017__16_41_12"></script>
+<script src="~/lib/jsZip/jszip.min.js?15_12_2017__16_41_12"></script>
+<link rel="stylesheet" href="~/Areas/SWCompare/Css/SWCompare/Main.css?15_12_2017__16_41_12" />
+
+<div class="page-header">
+    <h1 id="title"></h1>
+</div>
+
+<div style="margin-top:1px; margin-bottom: 2px;">
+
+    <div class="inlineBlock">
+        <button id="today" class="btn custom-btn" title="За сьогодні" style="width: 100px;">За сьогодні</button>
+        <button id="week" class="btn custom-btn" title="За тиждень" style="width: 100px;">За тиждень</button>
+        <button id="month" class="btn custom-btn" title="За місяць" style="width: 100px;">За місяць</button>
+    </div>
+    @*<div class="inlineBlock">
+            <button id="year" class="btn custom-btn" title="За рік" style="width: 100px;">За рік</button>
+        </div>*@
+    <div class="inlineBlock">
+        <label class="k-label" for="date_from">З:</label>
+        <input id="date_from" />
+    </div>
+    <div class="inlineBlock">
+        <label class="k-label" for="date_to">По:</label>
+        <input id="date_to" />
+    </div>
+    <a class="btn custom-btn custom-btn-payroll-filter" title="Застосувати фільтр по періоду"></a>
+</div>
+
+<div id="mainToolBar"></div>
+<div id="gridMain"></div>
+<div id="reportWindow"></div>
+<div id="ticketsHeader" class="page-header invisible" style="margin-top: 7px; margin-bottom: 0.5px;">
+    <h2>Квитковка</h2>
+</div>
+<div id="ticketsGrid"></div>
+
+<div class="search-main"></div>
+
+<script id="RequestFormTemplate" type="text/x-kendo-template">
+    <div class="inlineBlock" id="dpDiv" style="margin-bottom:10px;">
+        <label id="dpLbl" class="k-label" for="datePicker" style="margin-right:22px;">Дата: </label>
+        <input id="datePicker" tabindex="100" />
+    </div>
+    <br />
+    <div class="inlineBlock" id="ddlDiv">
+        <label id="ddlLbl" class="k-label" for="dropDownList"></label>
+        <input id="dropDownList" style="width:248px;" />
+    </div>
+    <br />
+    <div class="row" style="margin:10px 5px 5px 5px; float: right;">
+        <div class="k-edit-buttons k-state-default">
+            <a id="btnCancel" class="k-button k-button-icontext k-grid-cancel modal-buttons" tabindex="102"><span class="k-icon k-cancel"></span>Закрити</a>
+            <a id="btnSave" class="k-button k-button-icontext k-primary k-grid-update modal-buttons" tabindex="103"><span class="k-icon k-update"></span>Ок</a>
+        </div>
+    </div>
+</script>
+
+<script type="text/x-kendo-template" id="ddlTemplate">
+    #if(KOD_NBU){#
+    <span style="font-size:12px;">#:data.KOD_NBU# | #:data.NAME#</span>
+    #}else{#
+    <span style="font-size:12px;">#:data.NAME#</span>
+    #}#
+</script>
+
+<script type="text/x-kendo-template" id="mainToolBarTemplate">
+    <button id='printEXCEL' type='button' class='k-button k-grid-excel' title='Роздрукувати у EXCEL'><i class='pf-icon pf-16 pf-print'></i></button>
+
+    <button id='ruRequest' type='button' class='k-button' title='Запит даних в РУ'>Запит даних в РУ</button>
+
+    <button id='ticketing' type='button' class='k-button' title='Квитування'>Квитування</button>
+
+    <button id='zsRequest' type='button' class='k-button ' title='Запит даних в ЗС'>Запит даних в ЗС</button>
+
+
+    <button id='greenBtn' type='button' class='fBtn color-button legend-green' title='Успішно зквитовано' data-value="[0]" data-selected="&\\#10004;"></button>
+
+    <button id='blueBtn' type='button' class='fBtn color-button legend-blue' title='Зквитовано вручну' data-value="[4,5]" data-selected="&\\#10004;"></button>
+
+    <button id='yellowBtn' type='button' class='fBtn color-button legend-yellow' title='Зквитовано з помилкою' data-value="[1]" data-selected="&\\#10004;"></button>
+
+    <button id='redBtn' type='button' class='fBtn color-button legend-red' title='переказ є в АБС – відсутній в ЄВ' data-value="[2]" data-selected="&\\#10004;"></button>
+
+    <button id='pinkBtn' type='button' class='fBtn color-button legend-pink' title='переказ є в ЄВ – відсутній в АБС' data-value="[3]" data-selected="&\\#10004;"></button>
+
+    <button id='errorTypes' type='button' class='fBtn color-button custom-btn-tricolor custom-btn-active' title='З помилками' style="margin-left: 10px; margin-right:10px;" data-value="[1,2,3]" data-selected="&\\#10004;">&\\#10004;</button>
+
+    <button id='allTypes' type='button' class='fBtn k-button' title='Всі типи' data-value="[0,1,2,3,4,5]" data-selected="&\\#10004; Всі">
+        Всі
+    </button>
+
+    <button id="clearFilter" type='button' class='k-button' disabled="disabled" style="float:right;">Очистити фільтри</button>
+</script>
+
+<script type="text/x-kendo-template" id="ticketsToolBarTemplate">
+    <button id='solveBtn' type='button' class='k-button' title='Вирішення розбіжності' style='display:none; width: 180px;'>Вирішення розбіжності</button>
+    <button id='deleteBtn' type='button' class='k-button' title='Вирішення розбіжності' style='display:none; width: 180px;'>Видалення квитовки</button>
+    <button id='handBtn' type='button' class='k-button' title='Вирішення розбіжності' style='display:none; width: 180px;'>Фіктивна квитовка</button>
+</script>

@@ -241,8 +241,8 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
             catch (Exception e)
             {
                 err = string.Format("{0} Невідома помилка надсилання картки РНК={2} онлайн:  {1}", _logMessagePrefix, (e.InnerException != null ? e.InnerException.Message : e.Message), rnk);
-                Logger.Error(err);
-                throw new Exception(string.Format("{0} Невідома помилка надсилання картки РНК={1} ", _logMessagePrefix, rnk));
+                decimal eventLogEntyId = Logger.Error(err);
+                throw new Exception(string.Format("{0} Невідома помилка надсилання картки РНК={1}<br />Код запису в журналі подій: {2}", _logMessagePrefix, rnk, eventLogEntyId));
             }
             return result;
         }

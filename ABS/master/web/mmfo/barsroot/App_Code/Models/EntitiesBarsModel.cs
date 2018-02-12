@@ -261,6 +261,11 @@ namespace BarsWeb.Models
     {
         public string Id { get; set; }
         public string Name { get; set; }
+
+        public decimal? State { get; set; }
+        public decimal? Struct_Code { get; set; }
+
+        public string DKBO_NUMBER { get; set; }
     }
 
     public static class Function

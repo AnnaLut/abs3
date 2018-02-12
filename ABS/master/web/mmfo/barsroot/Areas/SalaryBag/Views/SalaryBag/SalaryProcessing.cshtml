@@ -1,0 +1,64 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Обробка ЗП";
+}
+<meta charset="utf-8" />
+
+<script src="~/Scripts/respond.min.js?20_12_2017__14_02_24"></script>
+
+<script src="~/Areas/SalaryBag/Scripts/SlaryBagCommon.js?20_12_2017__14_02_24"></script>
+<script src="~/Areas/SalaryBag/Scripts/DocumentSigner.js?20_12_2017__14_02_24"></script>
+
+<script src="~/Areas/SalaryBag/Scripts/SalaryBag/ExplaineAndConfirm.js?20_12_2017__14_02_24"></script>
+<script src="~/Areas/SalaryBag/Scripts/SalaryProcessing/SalaryDealSelectForm.js?20_12_2017__14_02_24"></script>
+<script src="~/Areas/SalaryBag/Scripts/SalaryPayroll/PrintPayroll.js?20_12_2017__14_02_24"></script>
+<script src="~/Areas/SalaryBag/Scripts/SalaryProcessing/SalaryProcessingMain.js?20_12_2017__14_02_24"></script>
+
+<link rel="stylesheet" href="~/Areas/SalaryBag/Content/SBstyle.css?20_12_2017__14_02_24" />
+<link rel="stylesheet" href="~/Areas/SalaryBag/Content/SalaryProcessing.css?20_12_2017__14_02_24" />
+
+
+<div class="page-header">
+    <h1 id="title"></h1>
+</div>
+
+<div style="margin-left:10px !important;">
+    <div style="margin-bottom:6px;">
+        <a class="btn custom-btn custom-btn-payroll-create invisible" title="Створення відомості"></a>
+        <a class="btn custom-btn custom-btn-payroll-delete invisible" title="Видалити відомість"></a>
+        <a class="btn custom-btn custom-btn-payroll-edit invisible" title="Редагувати відомість"></a>
+        <a class="btn custom-btn custom-btn-payroll-view invisible" title="Переглянути відомість"></a>
+        <a class="btn custom-btn custom-btn-payroll-ok invisible" title="Підтвердження відомості"></a>
+        <a class="btn custom-btn custom-btn-payroll-enrollment invisible" title="Зарахувати відомість">Зарахувати</a>
+        <a class="btn custom-btn custom-btn-payroll-reject invisible" title="Відхилити відомість"></a>
+        <a class="btn custom-btn custom-btn-print" title="Друкувати відомість"></a>
+    </div>
+
+    <div style="margin-top:6px;">
+        <div class="inlineBlock">
+            <label class="k-label" for="date_from">З</label>
+            <input id="date_from" maxlength="10" />
+        </div>
+        <div class="inlineBlock">
+            <label class="k-label" for="date_to">По</label>
+            <input id="date_to" maxlength="10" />
+        </div>
+        <a class="btn custom-btn custom-btn-payroll-filter" title="Застосувати фільтр по періоду"></a>
+        <a class="btn custom-btn custom-btn-clear-filter" title="Очистити фільтр" disabled></a>
+    </div>
+</div>
+
+<hr class="modal-hr" />
+
+<div id="sp_tabstrip">
+    <ul>
+        <li id="accepted">Прийняті</li>
+        <li id="processed">Оброблені</li>
+        <li id="draft">Чернетки</li>
+    </ul>
+    <div data-type="accepted" class="sp-tabs"><div id="accepted_grid"></div></div>
+    <div data-type="processed" class="sp-tabs"><div id="processed_grid"></div></div>
+    <div data-type="draft" class="sp-tabs"><div id="draft_grid"></div></div>
+</div>
+
+<br />

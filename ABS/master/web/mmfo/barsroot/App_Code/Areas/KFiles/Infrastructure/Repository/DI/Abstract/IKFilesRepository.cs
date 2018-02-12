@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Kendo.Mvc.UI;
 //using BarsWeb.Areas.CreditFactory.Models;
 using Areas.KFiles.Models;
+using System;
 
 namespace BarsWeb.Areas.KFiles.Infrastructure.Repository.DI.Abstract
 {
@@ -37,5 +38,12 @@ namespace BarsWeb.Areas.KFiles.Infrastructure.Repository.DI.Abstract
         IEnumerable<V_SYNC_SESSION> GetSyncData(DataSourceRequest request);
         decimal GetSyncDataCount(DataSourceRequest request);
         IQueryable<V_OB_CORPORATION_DATA> GetCorporationDataFiles(decimal sessionID);
+
+        IQueryable<Region> GetDropDownRegions();
+        IQueryable<V_OB_CORPORATION_SALDO> GetDataViewData([DataSourceRequest]DataSourceRequest request, SaldoFilters filters);
+        Decimal GetDataViewDataCount(DataSourceRequest request, SaldoFilters filters);
+        IList<V_OB_CORPORATION_DATA_DOCS> GetTurnoverbalanceData(DataSourceRequest request, String FILE_DATE, Decimal? KV, String NLS, String TT);
+        Decimal GetTurnoverbalanceDataCount(DataSourceRequest request, String FILE_DATE, Decimal? KV, String NLS, String TT);
+        IQueryable<Corporation_SALDO> GetDropDownCorporations();
     }
 }

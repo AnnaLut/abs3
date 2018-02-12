@@ -20,5 +20,7 @@ namespace BarsWeb.Areas.ReserveAccs.Models
         public string Ob22 { get; set; }
         public decimal? Tarriff { get; set; }
         public string ND { get; set; }
-    }
+		public int ddVid { get; set; }
+		public string mainCurr { get; set; }
+	}
 }

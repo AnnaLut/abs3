@@ -3,6 +3,8 @@
         function ($scope, $http, reportingNbuService, base64Helper, $timeout) {
             //ReportingModule.controller('NbuCtrl', function ($scope, $http) {
 
+            $scope.ChkLogText = "";
+
             $scope.loading = false;
             $scope.detailedReportWindowOpened = false;
 
@@ -454,6 +456,16 @@
                                         return;
                                     }
                                     showControlPointsMessages();
+                                }
+                            },{
+                                //enable: false,
+                                id: "ChkLogBtn",
+                                text: '<i class="pf-icon pf-16 pf-business_report"  title="Переглянути протокол перевірки файлу"></i>',
+                                click: function () {
+                                    if (!$scope.selectedFileVersionInfo) {
+                                        return;
+                                    }
+                                    $scope.ChkLogInit();
                                 }
                             }
                             // , {
@@ -1113,24 +1125,56 @@
 
             }
 
-            $scope.VersionWindowOptions = {
-                animation: false,
-                visible: false,
-                width: '1000px',
-                height: '600px',
-                actions: ["Maximize", "Minimize", "Close"],
-                draggable: true,
-                modal: true,
-                pinned: false,
-                resizable: true,
-                title: 'Список версій по файлу',
-                position: 'center',
-                /*close: function () {
-                    $scope.advertising = $scope.getNewAdvertising();
-                },*/
-                iframe: false
+            $scope.VersionWindowOptions = createWindowOptions({ title: 'Список версій по файлу' });
 
+            $scope.ChkLogWindowOptions = createWindowOptions({ title: 'Протокол перевірки файлу' });
+            
+            $scope.ChkLogInit = function () {
+                var _ID = $scope.FileCodeBase64;
+                var _reportDate = $scope.report.date;
+                var _KF = $scope.report.KF;
+                var _schemeCode = $scope.report.SCHEME_CODE;
+                var _versionId = $scope.selectedFileVersionInfo.VERSION_ID || 'null';
+                var url = bars.config.urlContent('api/reporting/nbu/getchklog?fileCodeBase64='+_ID+"&kf="+_KF +
+                    "&reportDate="+_reportDate+"&schemeCode="+_schemeCode+"&versionId="+_versionId);
+                $scope.loading = true;
+                $http.get(url)
+                    .then(function (response) {
+                        $scope.loading = false;
+                        if(response.data.Data != null){
+                            $scope.ChkLogWindow.center().open();
+                            $scope.ChkLogText = response.data.Data;
+                        }
+                        else{
+                            bars.ui.error({ text: 'Протокол відсутній' })
+                        }
+                    }, function () {
+                        $scope.loading = false;
+                    });
             };
+            
+            function createWindowOptions(settings) {
+                var o = {
+                    animation: false,
+                    visible: false,
+                    width: '1000px',
+                    height: '600px',
+                    actions: ["Maximize", "Minimize", "Close"],
+                    draggable: true,
+                    modal: true,
+                    pinned: false,
+                    resizable: true,
+                    title: '',
+                    position: 'center',
+                    /*close: function () {
+                     $scope.advertising = $scope.getNewAdvertising();
+                     },*/
+                    iframe: false
+
+                };
+                reportingNbuService.extend(settings, o);
+                return o;
+            }
 
             $scope.reportGridOptions = function(url, columns, fields){
                 return {

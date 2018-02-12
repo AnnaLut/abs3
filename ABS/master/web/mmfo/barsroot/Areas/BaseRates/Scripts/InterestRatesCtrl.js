@@ -313,6 +313,7 @@
     }
 
     $scope.AddInterestBrate = function () {
+        angular.element("#addInterestBrateWin").data("kendoWindow").title('Додавання процентної ставки');
         if (angular.element("#tbBRNAME").val() !== "") {
             action = "insert";
             kvs = $scope.AjaxGetFunction(bars.config.urlContent("/api/baserates/baseratesapi/getkvs"));
@@ -432,8 +433,8 @@
                     data = angular.element("#rateOptionsEditGrid").data("kendoGrid").dataSource.data();
                     oldData = angular.element("#rateOptionsEditGrid").data("kendoGrid").dataSource._pristineData;
                     for (var i = 0; i < data.length; i++) {
-                        var newRow = { DATB: bd, KV: kv, IR: data[i].IR, S_STRING: data[i].S_STRING, BRANCH: null, BRANCH_NAME: null };
-                        var oldRow = { DATB: bd, KV: kv, IR: oldData[i].IR, S_STRING: oldData[i].S_STRING, BRANCH: null, BRANCH_NAME: null };
+                        var newRow = { DATB: bd, KV: kv, IR: data[i].IR, S: data[i].S, BRANCH: null, BRANCH_NAME: null };
+                        var oldRow = { DATB: selectedItem.DATB, KV: kv, IR: oldData[i].IR, S: oldData[i].S, BRANCH: null, BRANCH_NAME: null };
                         if (!$scope.IsInterestBrateRowsEquel(newRow, oldRow))
                             data_for_insert.push({
                                 NewRowInterestData: newRow,
@@ -455,17 +456,25 @@
             }
             else {
                 if (action === "update") {
-                    data = angular.element("#rateOptionsEditGrid").data("kendoGrid").dataSource.data();
+
+                    var newRow = { DATB: bd, KV: kv, IR: angular.element("#addRate_RATE").val(), S_STRING: null, BRANCH: null, BRANCH_NAME: null };
+                    var oldRow = { DATB: selectedItem.DATB, KV: kv, IR: selectedItem.IR, S_STRING: null, BRANCH: null, BRANCH_NAME: null };
+                    if (!$scope.IsInterestBrateRowsEquel(newRow, oldRow))
+                        data_for_insert.push({
+                            NewRowInterestData: newRow,
+                            OldRowInterestData: oldRow
+                        });
+
                     url = "/api/baserates/baseratesapi/EditInterestBrateToBD/";
                 }
                 else {
-                    data = angular.element("#rateOptionsAddGrid").data("kendoGrid").dataSource.data();
+                    //data = angular.element("#rateOptionsAddGrid").data("kendoGrid").dataSource.data();
+                    //bd = kendo.parseDate(angular.element("#addRate_DATE").val(), 'dd/MM/yyyy');
+                    //kv = angular.element("#addRate_KF_NUM").val();
+                    rate = angular.element("#addRate_RATE").val();
+                    data_for_insert.push({ DATB: bd, KV: kv, IR: rate, S: null, BRANCH: null, BRANCH_NAME: null });
                     url = "/api/baserates/baseratesapi/AddInterestBrateToBD/";
                 }
-                //bd = kendo.parseDate(angular.element("#addRate_DATE").val(), 'dd/MM/yyyy');
-                //kv = angular.element("#addRate_KF_NUM").val();
-                rate = angular.element("#addRate_RATE").val();
-                data_for_insert.push({ DATB: bd, KV: kv, IR: rate, S: null, BRANCH: null, BRANCH_NAME: null });
             }
             request = { InterestList: data_for_insert, br_id: brid };
             if (!data_for_insert || data_for_insert.length == 0)
@@ -713,6 +722,7 @@
     }
 
     $scope.editRow = function () {
+        angular.element("#addInterestBrateWin").data("kendoWindow").title('Редагування процентної ставки');
         grid = $("#interestRateGrid").data("kendoGrid");
         selectedItem = grid.dataItem(grid.select());
         if (selectedItem !== null) {
@@ -761,7 +771,12 @@
                 url: bars.config.urlContent("/api/baserates/baseratesapi/DeleteBrate"),
                 method: "POST",
                 dataType: "json",
-                data: JSON.stringify({ model: selectedItem, br_id: brid }),
+                data: JSON.stringify({
+                    KV: selectedItem.KV,
+                    DATB: selectedItem.DATB,
+                    S: selectedItem.S_STRING,
+                    br_id: brid
+                }),
                 contentType: "application/json",
                 async: false,
                 success:

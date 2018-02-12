@@ -19,7 +19,7 @@ function fnLoadRights()
 	  id = row.substring(0,row.indexOf(" "));
 	  val = row.substring(row.indexOf(" ")+1);
 	  
-	  if (data[2].text == "2605" || data[2].text == "2655") {
+	  if (data[2].text.substring(0, 2) == "26" || data[2].text.substring(0, 2) == "25") {
 	      row = "6 6. Кошти на вимогу юридичних осіб";
 	      id = "6";
 	      val = "6. Кошти на вимогу юридичних осіб";

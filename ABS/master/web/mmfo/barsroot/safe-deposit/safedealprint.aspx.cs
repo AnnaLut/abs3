@@ -143,4 +143,9 @@ public partial class safe_deposit_safedealprint : System.Web.UI.Page
         template.Value = String.Empty;
         adds.Value = String.Empty;
     }
+
+    protected void btAct_Click(object sender, EventArgs e)
+    {
+        Response.Redirect("dialog/createAct.aspx?nd="+ Convert.ToString(Request["nd"])+ "&safe_id="+ Convert.ToString(Request["safe_id"]));
+    }
 }

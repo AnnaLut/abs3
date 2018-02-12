@@ -21,6 +21,8 @@ namespace BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation
 {
     public class RegNewCardRepository: IRegNewCardRepository
     {
+		[Ninject.Inject]
+        public Core.Logger.IDbLogger Logger { get; set; }
         private readonly IInsRepository _insRepo;
         public RegNewCardRepository(IInsRepository insRepo)
         {
@@ -477,6 +479,9 @@ namespace BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation
             }
             catch (Exception e)
             {
+				string o = Newtonsoft.Json.JsonConvert.SerializeObject(par);
+                Logger.Error(o, "OpenCard");
+
                 resp.ERR_CODE = -99;
                 resp.ERR_MSG = e.Message.Substring(11, e.Message.Length - 11);
                 resp.ERR_MSG = resp.ERR_MSG.IndexOf("ORA") > 0 ? resp.ERR_MSG.Substring(0, resp.ERR_MSG.IndexOf("ORA")) : resp.ERR_MSG;

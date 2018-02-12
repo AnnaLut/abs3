@@ -116,6 +116,32 @@ namespace BarsWeb.Areas.Reporting.Infrastructure.Repository.DI.Implementation
             var res = listFromFinished.FirstOrDefault();
             return res;
         }
+
+        public string GetChkLog(string fileCode, string reportDate, string kf, string schemeCode, decimal? versionId = null)
+        {
+            DateTime reportDateTime = DateTime.Parse(reportDate, new CultureInfo("uk-UA"));
+
+            string sql = @"select a.chk_log from NBUR_LST_FILES a where
+                                REPORT_DATE = :p_report_date and 
+                                KF = :p_kf
+                                and a.file_id in (
+                                        select Distinct(FILE_ID) 
+                                        from V_NBUR_FORM_STRU 
+                                        where FILE_CODE = :p_file_code and SCHEME_CODE = :P_SCHEME_CODE)";
+
+            List<OracleParameter> p = new List<OracleParameter>();
+            p.Add(new OracleParameter("p_report_date", OracleDbType.Date) { Value = reportDateTime });
+            p.Add(new OracleParameter("p_kf", OracleDbType.Varchar2) { Value = kf });
+            p.Add(new OracleParameter("p_file_code", OracleDbType.Varchar2) { Value = fileCode });
+            p.Add(new OracleParameter("P_SCHEME_CODE", OracleDbType.Varchar2) { Value = schemeCode });
+            if (versionId != null)
+            {
+                p.Add(new OracleParameter("p_VERSION_ID", OracleDbType.Decimal) { Value = versionId });
+                sql += " and VERSION_ID = :p_VERSION_ID ";
+            }
+            return _entities.ExecuteStoreQuery<string>(sql, p.ToArray()).SingleOrDefault();
+        }
+
         public DataSet GetReportData(string fileCode,string schemeCode, string kf, string date, string isCon, decimal? verId = null)
         {
             var fromFinished = GetNburListFromFinished(fileCode, date, kf, verId);

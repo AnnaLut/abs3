@@ -104,9 +104,9 @@ namespace BarsWeb.Infrastructure.Repository.DI.Implementation
                     branch.BRANCH = String.IsNullOrEmpty(reader.GetValue(0).ToString()) ? String.Empty : reader.GetString(0);
                     branch.NAME = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? String.Empty : reader.GetString(1);
                     branch.CAN_SELECT = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? (decimal?)null : reader.GetDecimal(2);
-                    branch.BRANCH_PATH = String.IsNullOrEmpty(reader.GetValue(3).ToString()) ? String.Empty : reader.GetString(3);
+                    branch.BRANCH_PATH = String.IsNullOrEmpty(reader.GetValue(5).ToString()) ? String.Empty : reader.GetString(5);
                     branch.PARENT_BRANCH = String.IsNullOrEmpty(reader.GetValue(4).ToString()) ? String.Empty : reader.GetString(4);
-                    branch.HAS_CHILD = reader.GetDecimal(5) == 1 ? true : false;
+                    branch.HAS_CHILD = reader.GetDecimal(3) == 1 ? true : false;
                 }
             }
             finally
@@ -125,14 +125,30 @@ namespace BarsWeb.Infrastructure.Repository.DI.Implementation
             OracleCommand cmd = connection.CreateCommand();
             try
             {
+                if (String.IsNullOrEmpty(branchId) || branchId == "null")
+                    branchId = null;
+
                 cmd.CommandType = System.Data.CommandType.Text;
-                if (branchId != null && branchId != "" && branchId != "null")
+                cmd.BindByName = true;
+
+                if (branchId == "/")
                 {
-                    cmd.CommandText = @"select B.BRANCH, B.NAME, B.CAN_SELECT, B.BRANCH_PATH, B.PARENT_BRANCH, b.HAS_CHILD from v_user_branches_tree b where B.PARENT_BRANCH = :p_branch";
+                    cmd.CommandText = @"select 
+                                                B.BRANCH, B.NAME, B.CAN_SELECT, B.BRANCH_PATH, B.PARENT_BRANCH, B.HAS_CHILD 
+                                            from 
+                                                (select * from v_user_branches_tree t 
+                                                     where t.PARENT_BRANCH = '/') B";
+                }
+                else
+                {
+                    cmd.CommandText = @"select 
+                                                B.BRANCH, B.NAME, B.CAN_SELECT, B.BRANCH_PATH, B.PARENT_BRANCH, b.HAS_CHILD
+                                            from 
+                                                v_user_branches_tree b 
+                                            where 
+                                                (B.PARENT_BRANCH = :p_branch) OR (B.PARENT_BRANCH is null AND :p_branch is null)";
+
                     cmd.Parameters.Add("p_branch", OracleDbType.Varchar2, branchId, System.Data.ParameterDirection.Input);
-                } else
-                {
-                    cmd.CommandText = @"select B.BRANCH, B.NAME, B.CAN_SELECT, B.BRANCH_PATH, B.PARENT_BRANCH, b.HAS_CHILD from v_user_branches_tree b where B.PARENT_BRANCH is null";
                 }
 
                 OracleDataReader reader = cmd.ExecuteReader();
@@ -142,7 +158,7 @@ namespace BarsWeb.Infrastructure.Repository.DI.Implementation
                     var branch = new UserBranch();
 
                     branch.BRANCH = String.IsNullOrEmpty(reader.GetValue(0).ToString()) ? String.Empty : reader.GetString(0);
-                    branch.NAME = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? String.Empty : reader.GetString(1);
+                    branch.NAME = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? null : reader.GetString(1);
                     branch.CAN_SELECT = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? (decimal?)null : reader.GetDecimal(2);
                     branch.BRANCH_PATH = String.IsNullOrEmpty(reader.GetValue(3).ToString()) ? String.Empty : reader.GetString(3);
                     branch.PARENT_BRANCH = String.IsNullOrEmpty(reader.GetValue(4).ToString()) ? String.Empty : reader.GetString(4);
@@ -158,7 +174,6 @@ namespace BarsWeb.Infrastructure.Repository.DI.Implementation
                 connection.Close();
             }
             return list;
-        }       
-
+        }
     }
 }

@@ -1,55 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" DoublePass="true" ReportInfo.Created="05/17/2013 18:06:00" ReportInfo.Modified="07/11/2017 18:13:21" ReportInfo.CreatorVersion="2013.2.2.0">
-  <ScriptText>using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Windows.Forms;
-using System.Drawing;
-using System.Data;
-using FastReport;
-using FastReport.Data;
-using FastReport.Dialog;
-using FastReport.Barcode;
-using FastReport.Table;
-using FastReport.Utils;
-using Oracle.DataAccess.Client;
-
-
-
-namespace FastReport
-{
-  public class ReportScript
- 
-  {
-    private void _FinishReport(object sender, EventArgs e)
-    {
-      OracleDataConnection frxconn = (OracleDataConnection)Report.Dictionary.Connections[0];
-      OracleConnection connection = (OracleConnection)frxconn.GetConnection();
-      
-      OracleCommand command = connection.CreateCommand();
-      command.CommandType = CommandType.StoredProcedure;
-      command.CommandText = &quot;ead_pack.doc_page_count&quot;;
-      
-      Parameter DocID = Report.GetParameter(&quot;p_doc_id&quot;);
-      command.Parameters.Add(&quot;p_doc_id&quot;, DocID.Value);
-      command.Parameters.Add(&quot;p_page_count&quot;, Report.Engine.TotalPages);
-      
-      connection.Open();
-      try
-      {
-        command.ExecuteNonQuery();
-      }
-      finally
-      {
-        connection.Close();
-      }
-    }
-  }
- 
-}</ScriptText>
+<Report ScriptLanguage="CSharp" DoublePass="true" ReportInfo.Created="05/17/2013 18:06:00" ReportInfo.Modified="11/28/2016 14:35:50" ReportInfo.CreatorVersion="2013.3.2.0">
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqZLE460ApuhBq9nxfsVEDUjsnvJzXtSTPbWY4MKJi2yK6Cw7h6oGX20YJkb5YAkRnBmtBpDx/kyE9kBNqRNAcVA==">
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqZLE460ApuhBq9nxfsVEDUjsnvJzXtSTPbWY4MKJi2yK6Cw7h6oGX20YJkb5YAkRnXxwmfbvmyVWA+0NRbzl5qQ==">
       <TableDataSource Name="Table" Alias="DPT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select nvl(d.nd, to_char(d.deposit_id)) as id,&#13;&#10;       f_dat_lit(d.datz) as dealdate,&#13;&#10;       f_dat_lit(d.dat_end) as end_date,&#13;&#10;       a.nls as nlsd,&#13;&#10;       (select b.name from branch b where b.branch = a.branch) as branch_name,&#13;&#10;       fost(a.acc,to_date (sysdate))/100 as summ,&#13;&#10;       f_sumpr(fost(a.acc,to_date (sysdate)), d.kv, 'F') as sum_w,&#13;&#10;       decode(d.kv, 980, 'грн.', t.lcv) as kv,&#13;&#10;       f_doc_dpt(d.deposit_id, 3, 1) as term_calc,&#13;&#10;       f_doc_dpt(d.deposit_id, 3, 2) as term_calc_w,&#13;&#10;       dpt.fproc(d.acc, bankdate) as rate,&#13;&#10;       f_sumpr(dpt.fproc(d.acc, bankdate), '', 'M', 3) as rate_w,&#13;&#10;      decode(d.freq,&#13;&#10;              5,&#13;&#10;              'щомісячно',&#13;&#10;              7,&#13;&#10;              'щоквартально',&#13;&#10;              360,&#13;&#10;              'щорічно',&#13;&#10;              400,&#13;&#10;              'разом з поверненням Депозиту',&#13;&#10;              (select name from freq where freq = d.freq)) as freq_w,&#13;&#10;&#13;&#10;(select type_name from dpt_types t  where  t.type_id in (select type_id from dpt_vidd dd where dd.vidd=d.vidd))  as d_vidd,&#13;&#10;&#13;&#10;       nvl(trim(d.mfo_p), '_________________') as paym_mfo,&#13;&#10;       nvl(trim(b.nb), '____') as paym_nb,&#13;&#10;       nvl(trim(d.nls_p), '_________________') as paym_nls,&#13;&#10;       nvl (f_get_custw_h(c.rnk, 'SN_GC', sysdate),c.nmk) as fio_r&#13;&#10;       from dpt_deposit d, tabval t, accounts a, banks b, dpt_vidd v,customer c&#13;&#10; where c.rnk = d.rnk and&#13;&#10;   d.acc = a.acc&#13;&#10;   and d.kv = t.kv&#13;&#10;   and d.mfo_p = b.mfo(+)&#13;&#10;   and d.deposit_id = (select da.dpt_id&#13;&#10;                         from dpt_agreements da&#13;&#10;                        where da.agrmnt_id = :p_agrmnt_id)">
         <Column Name="ID" DataType="System.String"/>
         <Column Name="DEALDATE" DataType="System.String"/>
@@ -93,7 +45,7 @@ namespace FastReport
         <Column Name="CRT_BRANCH" DataType="System.String"/>
         <Column Name="CRT_STAFF_LOGNAME" DataType="System.String"/>
         <Column Name="CRT_STAFF_FIO" DataType="System.String"/>
-        <Column Name="EA_STRUCT_ID" DataType="System.Decimal"/>
+        <Column Name="EA_STRUCT_ID" DataType="System.String"/>
         <CommandParameter Name="p_doc_id" DataType="113" Expression="[p_doc_id]" DefaultValue="-1"/>
       </TableDataSource>
       <TableDataSource Name="Table4" Alias="CLIENT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select c.nmk as fio,&#13;&#10;       nvl (f_get_custw_h(c.rnk, 'SN_GC', sysdate),c.nmk) as fio_r,&#13;&#10;       c.okpo as okpo,&#13;&#10;       case c.codcagent&#13;&#10;         when 5 then 'резидент'&#13;&#10;         when 6 then 'нерезидент'&#13;&#10;         else '--'&#13;&#10;       end as codcagent,&#13;&#10;       p.ser || ' ' || p.numdoc as pasp_no,&#13;&#10;       f_dat_lit(p.pdate) as pasp_date,&#13;&#10;       p.organ as pasp_atrt,&#13;&#10;       f_customer_address(c.rnk, 1) as address_registration,&#13;&#10;       f_customer_address(c.rnk, 2) as address_residence,&#13;&#10;       coalesce(p.cellphone, p.teld, p.telw, '________') as phone,&#13;&#10;       (select VALUE from CUSTOMERW where RNK = c.rnk and TAG = 'EMAIL') as EMAIL&#13;&#10;  from customer c&#13;&#10;  left join person p on (p.rnk = c.rnk)&#13;&#10;&#13;&#10;where c.rnk = &#13;&#10;(case when exists (select di.INHERIT_CUSTID from DPT_INHERITORS di, dpt_deposit d where &#13;&#10;                        di.dpt_id=d.deposit_id and d.deposit_id = (select da.dpt_id&#13;&#10;                                                                   from dpt_agreements da&#13;&#10;                                                                  where da.agrmnt_id = :p_agrmnt_id)) &#13;&#10;then &#13;&#10;(select di.INHERIT_CUSTID from DPT_INHERITORS di, dpt_deposit d where &#13;&#10;                        di.dpt_id=d.deposit_id and d.deposit_id = (select da.dpt_id&#13;&#10;                                                                   from dpt_agreements da&#13;&#10;                                                                  where da.agrmnt_id = :p_agrmnt_id) and rownum=1)&#13;&#10;else  :p_rnk end)">
@@ -143,7 +95,7 @@ namespace FastReport
     <Parameter Name="p_agr_id" DataType="System.Int64" Expression="5585926"/>
     <Parameter Name="p_agrmnt_id" DataType="System.Int32" Expression="396752"/>
   </Dictionary>
-  <ReportPage Name="Page1" FinishPageEvent="_FinishReport">
+  <ReportPage Name="Page1">
     <DataBand Name="Data1" Width="718.2" Height="614.25" CanGrow="true" CanShrink="true" CanBreak="true" DataSource="Table4">
       <TableObject Name="Table1" Left="9.45" Top="9.45" Width="698.42" Height="599.13">
         <TableColumn Name="Column1" Width="160.62"/>

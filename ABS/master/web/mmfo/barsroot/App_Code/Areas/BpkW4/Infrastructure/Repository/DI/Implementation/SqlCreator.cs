@@ -1,4 +1,5 @@
-﻿using BarsWeb.Areas.Kernel.Models;
+﻿using BarsWeb.Areas.BpkW4.Models;
+using BarsWeb.Areas.Kernel.Models;
 using Oracle.DataAccess.Client;
 using System;
 using System.Collections.Generic;

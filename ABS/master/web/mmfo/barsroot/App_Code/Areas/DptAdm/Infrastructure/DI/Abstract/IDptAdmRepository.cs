@@ -68,6 +68,7 @@ namespace BarsWeb.Areas.DptAdm.Infrastructure.Repository.DI.Abstract
         decimal? GetRate(decimal br_id, int kv);
         string GetRateDate(decimal br_id, int kv);
         IQueryable<pipe_BR_TIER> GetDpBrTier(decimal BR_ID, decimal kv);
+        void NewPF(System.DateTime date_p);
 
     }
 }

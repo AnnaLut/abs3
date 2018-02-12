@@ -1,0 +1,1 @@
+<%@ WebService Language="C#" CodeBehind="~/App_Code/webservices/MakeFRX.cs" Class="Bars.WebServices.MakeFRX" %>

@@ -50,14 +50,14 @@
 						align="left" border="0">
 						<TR>
 							<TD runat="server" meta:resourcekey="tdRNI" width="250">Областная НИ</TD>
-							<TD><SELECT class="tab_main_rekv_ed2_style" id="ddl_C_REG" tabIndex="2" onchange="GetC_dstList(); if(trim(parent.obj_Parameters['TGR']) != '3') document.getElementById('ddl_C_DST').remove(0);ToDoOnChange();"
+							<TD><SELECT class="tab_main_rekv_ed2_style" style="width:310px" id="ddl_C_REG" tabIndex="2" onchange="GetC_dstList();ToDoOnChange();"
 									runat="server">
 									<OPTION selected></OPTION>
 								</SELECT></TD>
 						</TR>
 						<TR>
 							<TD runat="server" meta:resourcekey="tdDNI">Районная НИ</TD>
-							<TD><SELECT class="tab_main_rekv_ed2_style" id="ddl_C_DST" tabIndex="3" onchange="ToDoOnChange();">
+							<TD><SELECT class="tab_main_rekv_ed2_style" style="width:310px" id="ddl_C_DST" tabIndex="3" onchange="ToDoOnChange();">
 									<OPTION selected></OPTION>
 								</SELECT></TD>
 						</TR>

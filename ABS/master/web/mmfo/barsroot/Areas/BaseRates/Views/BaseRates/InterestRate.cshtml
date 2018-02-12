@@ -1,7 +1,7 @@
 ﻿@{
 
 }
-<script src="~/Areas/BaseRates/Scripts/InterestRatesCtrl.js?v1.0.1"></script>
+<script src="~/Areas/BaseRates/Scripts/InterestRatesCtrl.js?v1.0.2"></script>
 <style>
     span.k-tooltip {
         position: absolute;
@@ -82,7 +82,7 @@
     </div>
 
 
-    <div id="addInterestBrateWin" kendo-window="addInterestBrateWin" k-title="'Додавання процентної ставки'" k-visible="false"
+    <div id="addInterestBrateWin" kendo-window="addInterestBrateWin" @*k-title="'Додавання процентної ставки'"*@ k-visible="false"
          k-modal="true" k-on-close="">
         <h3>{{branch_text}}</h3>
         <br />

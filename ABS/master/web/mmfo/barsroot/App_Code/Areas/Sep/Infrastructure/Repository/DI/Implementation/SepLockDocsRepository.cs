@@ -135,7 +135,7 @@ public class SepLockDocsRepository : ISepLockDocsRepository
     public decimal GetSepLockDocResource(DataSourceRequest request)
     {
         string query = "SELECT sum(decode(tip,'TNB',-ostc-lim,-ostc)) FROM v_accounts_proc " +
-        "    WHERE kv=980 and p_tip in ('N00', " +
+        "    WHERE kv=980 and kf = sys_context('bars_context','user_mfo') and p_tip in ('N00', " +
         "        NVL2((SELECT VAL from PARAMS where PAR = 'CLRTRN'),'','TNB'), " +
         "        NVL2((SELECT VAL from PARAMS where PAR = 'NUMMODEL'),'','L00'), " +
         "        NVL2((SELECT VAL from PARAMS where PAR = 'NUMMODEL'),'','TUR'))";

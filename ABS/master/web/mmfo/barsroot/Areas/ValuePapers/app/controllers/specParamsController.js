@@ -56,18 +56,24 @@ function specParamsController($scope, paramsService) {
         };
     }
 
+    $scope.mode = 1;
+    
     $scope.grid1Options = getGridOptions('GetCP_OB_INITIATOR');
     $scope.grid2Options = getGridOptions('GetCP_OB_MARKET');
+    $scope.grid3Options = getGridOptions('GetCP_OB_FORM_CALC');
 
     $scope.$on('loadChangeBillGrids', function () {
+        $scope.mode = document.getElementById('specParamsWindowMode').value;
         $scope.grid1.dataSource.read();
         $scope.grid2.dataSource.read();
+        $scope.grid3.dataSource.read();
     });
 
     $scope.setSpecparams = function () {
-        var COD_I = $scope.grid1.dataItem($scope.grid1.select()).CODE,
-            COD_M = $scope.grid2.dataItem($scope.grid2.select()).CODE;
-        paramsService.setSpecparams(paramsService.model.REF_MAIN || "", COD_I, COD_M).then(function (result) {
+        var COD_I = $scope.mode == 1 ? $scope.grid1.dataItem($scope.grid1.select()).CODE : null,
+            COD_M = $scope.mode == 1 ? $scope.grid2.dataItem($scope.grid2.select()).CODE : null,
+            COD_F = $scope.grid3.dataItem($scope.grid3.select()).CODE;
+        paramsService.setSpecparams(paramsService.model.REF_MAIN || "", COD_I, COD_M, COD_F).then(function (result) {
             if (result == "") {
                 bars.ui.success({ text: "Операцію виконано успішно!" });
                 $scope.specParamsWindow.close();

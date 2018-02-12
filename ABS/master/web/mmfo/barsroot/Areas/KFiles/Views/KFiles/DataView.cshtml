@@ -1,0 +1,125 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+
+@Styles.Render("~/bundles/KFiles/styles")
+@Scripts.Render("~/bundles/KFiles/scripts")
+<script src="~/Areas/KFiles/Scripts/DataKFilesCtrl.js"></script>
+<script src="~/Areas/KFiles/Scripts/DataViewCtrl.js"></script>
+
+<script src="~/lib/jsZip/jszip.min.js"></script>
+<style>
+    .inlineBlock {
+        display: inline-block;
+        margin-left: 3px;
+    }
+
+    k-label {
+        float: left;
+    }
+
+    #regionDropDown {
+        float: right;
+        right: 15px;
+    }
+
+    .k-grid-content{
+        max-height: 570px;
+        min-height: 200px;
+    }
+</style>
+<div ng-controller="KFiles.DataViewCtrl as Vie">
+
+    <h1>{{Vie.Title}}</h1>
+    <div kendo-window="Vie.filterWind" k-options="Vie.filterWindOptions">
+        <div class="form-group row">
+            <label for="fromDatepicker" class="col-md-3">З</label>
+            <div class="col-md-7">
+                <span class="asterisk_input"></span>
+                <input id="fromDatepicker" kendo-date-picker ng-model="Vie.fromDateString" data-k-format="'dd/MM/yyyy'" k-ng-model="Vie.fromDateObject" k-max="Vie.maxDate" k-rebind="Vie.maxDate" k-on-change="Vie.fromDateChanged()"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-md-3">По</label>
+            <div class="col-md-7">
+                <span class="asterisk_input"></span>
+                <input id="toDatepicker" kendo-date-picker ng-model="Vie.toDateString" data-k-format="'dd/MM/yyyy'" k-ng-model="Vie.toDateObject" k-min="Vie.minDate" k-rebind="Vie.minDate" k-on-change="Vie.toDateChanged()"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-md-3">Регіон:</label>
+            <div class="col-md-7">
+                <span></span>
+                <input ng-model="Vie.regionKod" type="text" class="k-textbox" style="width: 15%;" disabled />
+                <select id="regionDropDown" kendo-drop-down-list k-options="Vie.regionDropdownOptions" style="width: 79%;margin-left: 12px"></select>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-md-3">Установа:</label>
+            <div class="col-md-7">
+                <input ng-model="Vie.ustanKod" type="text" class="k-textbox" style="width:15%" disabled />
+                <select id="ustanDropDown" kendo-drop-down-list k-options="Vie.ustanDropDownOptions" style="width: 79%; margin-left: 12px"></select>
+                <input type="checkbox" ng-model="Vie.withStructure" id="withStructureId" />
+                <label for="withStructureId">разом зі структурними</label>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-md-3">Код ЄДРПОУ:</label>
+            <div class="col-md-7">
+                <input type="number" class="k-textbox" ng-model="Vie.okpo" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-md-3">Балансовий рахунок:</label>
+            <div class="col-md-7">
+                <input type="text" class="k-textbox" ng-model="Vie.balans" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-md-3">ТРКК:</label>
+            <div class="col-md-7">
+                <input type="text" class="k-textbox" ng-model="Vie.trkk" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-md-3">Розрахунковий рахунок:</label>
+            <div class="col-md-7">
+                <input type="text" class="k-textbox" ng-model="Vie.rozrah" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-md-3">Код операції</label>
+            <div class="col-md-7">
+                <input type="text" class="k-textbox" ng-model="Vie.tt" />
+            </div>
+        </div>
+        <div>
+            <button id="applyFiltersBtn" class="k-button col-md-3" ng-click="Vie.ShowRevisionDataGrid()" style="margin-left:100px">ОК</button>
+            <button id="cancelFiltersBtn" class="k-button col-md-3" ng-click="Vie.filterWind.close()" style="margin-left:20px">Відмовитись</button>
+        </div>
+    </div>
+
+    <div ng-show="Vie.ShowForm">
+        <div class="col-md-2">
+            <div kendo-grid="Vie.DateGrid" k-options="Vie.DateGridOptions" style="width:230px;margin-bottom:20px;" k-on-change="Vie.FilterByDate(data)"></div>
+            <div kendo-grid="Vie.RegionGrid" k-options="Vie.RegionGridOptions" style="width:230px" k-on-change="Vie.FilterByRegion(data)" ng-show="Vie.ShowRegionGrid"></div>
+        </div>
+        <div class="col-md-10" ng-show="Vie.ShowRevisionGrid">
+            <div kendo-grid="Vie.revisionDataGrid"
+                 k-options="Vie.revisionDataGridOptions">
+            </div>
+        </div>
+        <div class="col-md-10" ng-show="Vie.ShowTurnoverBalanceGrid">
+            <div kendo-grid="Vie.TurnovelBalanceGrid"
+                 k-options="Vie.TurnovelBalanceGridOptions"
+                 k-on-change="Vie.OpenTurnoverBalanceDataWindow(data)">
+            </div>
+        </div>
+    </div>
+
+    <div kendo-window="Vie.KfileDataWind" k-title="'Перегляд документу'"
+         k-width="1200" k-height="800" k-visible="false"
+         modal="true">
+    </div>
+
+</div>

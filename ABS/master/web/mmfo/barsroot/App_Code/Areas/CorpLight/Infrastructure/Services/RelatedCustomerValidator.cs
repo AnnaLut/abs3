@@ -71,29 +71,20 @@ namespace BarsWeb.Areas.CorpLight.Infrastructure.Services
             }
             return false;
         }
-
-        public bool IsEmailEdited(string email, decimal? id)
+        public bool IsExistByEmail(string email)
         {
             var sql = @"select 
-                            *
+                            count(*) 
                         from 
                             MBM_REL_CUSTOMERS
                         where 
-                            id = :id";
-            var result = _entities.ExecuteStoreQuery<RelatedCustomer>(sql, id).FirstOrDefault();
-            return result.Email != email ? true : false;
-        }
-
-        public bool IsPhoneEdited(string phone, decimal? id)
-        {
-            var sql = @"select 
-                            count(*)
-                        from 
-                            MBM_REL_CUSTOMERS
-                        where 
-                            id = :id and  CELL_PHONE = :phone";
-            var result = _entities.ExecuteStoreQuery<decimal>(sql, id, phone).FirstOrDefault();
-            return result > 0 ? false : true;
+                            email = :p_email";
+            var result = _entities.ExecuteStoreQuery<decimal>(sql, email).FirstOrDefault();
+            if (result > 0)
+            {
+                return true;
+            }
+            return false;
         }
     }
 
@@ -101,7 +92,6 @@ namespace BarsWeb.Areas.CorpLight.Infrastructure.Services
     {
         bool CustomerIsMapped(decimal id, decimal custId);
         bool IsExistByParameters(string taxCode, string phoneNumber, string email);
-        bool IsEmailEdited(string email, decimal? custId);
-        bool IsPhoneEdited(string phone, decimal? id);
+        bool IsExistByEmail(string email);
     }
 }

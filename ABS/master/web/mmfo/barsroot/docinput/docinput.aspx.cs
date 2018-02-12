@@ -480,7 +480,7 @@ namespace DocInput
             foreach (string js_nam in js_list)
             {
                 if (!ClientScript.IsClientScriptBlockRegistered(js_nam))
-                    ClientScript.RegisterClientScriptBlock(Page.GetType(), js_nam, "<script language=\"javascript\" src=\"js/" + js_nam + ".js?v1.9.64\"></script>");
+                    ClientScript.RegisterClientScriptBlock(Page.GetType(), js_nam, "<script language=\"javascript\" src=\"js/" + js_nam + ".js?v1.9.81\"></script>");
             }
             if ("1" == parSignMixedMode)
             {
@@ -1939,6 +1939,12 @@ namespace DocInput
             {
                 Nls_A.ReadOnly = false;
                 Nls_A.BackColor = Color.Empty;
+            }
+
+            if (Request["Nls_B_Editable"] == "1")
+            {
+                Nls_B.ReadOnly = false;
+                Nls_B.BackColor = Color.Empty;
             }
 
             if (Request["SumC"] != null)

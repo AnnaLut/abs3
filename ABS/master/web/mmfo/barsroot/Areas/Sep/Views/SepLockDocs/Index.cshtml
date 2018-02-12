@@ -504,7 +504,7 @@
                     else {
                         Docs.push(o);
                     }
-                });                
+                });
 
                 var params = {};
                 params.Docs = JSON.stringify(Docs);
@@ -1191,7 +1191,7 @@
 
     $('#tmlSelectCount').val('0');
 
-    $.get('@Url.Action("GetSepLockDocResource")').done(function (res) {
+    $.get('@Url.Action("GetSepLockDocResource")?' + $.now()).done(function (res) {
         $('#tmlResource').val(kendo.toString((res.Resource / 100), numberFormat));
     });
 

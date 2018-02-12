@@ -256,21 +256,26 @@
         bars.ui.loader('#sepTZGrid', true);
         $.get('@Url.Action("RowReply")', { dRec: row.D_REC }).done(function (result) {
             bars.ui.loader('#sepTZGrid', false);
-            if (result.data != null) {
-                s6 = result.data.NLSA;
-                s3 = result.data.MFOB;
-                s2 = result.data.NLSB;
-                nS = result.data.S;
-                strNAMa = result.data.NAM_A;
-                strOKPOa = result.data.ID_A;
-                strNAMb = result.data.NAM_B;
-                strOKPOb = result.data.ID_B;
-                s7 = result.data.ND;
-                nVob = result.data.VOB;
-                sNazn = result.data.NAZN;
+            if (result.data != null && result.data.length > 0) {
+                var _data = result.data[0];
+                s6 = _data.NLSA;
+                s3 = _data.MFOB;
+                s2 = _data.NLSB;
+                nS = (_data.S / 100).toFixed(2);
+                strNAMa = _data.NAM_A;
+                strOKPOa = _data.ID_A;
+                strNAMb = _data.NAM_B;
+                strOKPOb = _data.ID_B;
+                s7 = _data.ND;
+                nVob = _data.VOB;
+                sNazn = _data.NAZN;
                 dDatD = kendo.toString(row.DATD, 'dd/MM/yyyy');
                 dDatP = kendo.toString(row.DATP, 'dd/MM/yyyy');
-                if (nS == row.S && s3 == row.MFOA && s6 == row.NLSB && s7 == row.ND && dDatD == row.DATD && nVob == row.VOB/* && sepNum == 2*/) {
+
+                var _dATD = kendo.toString(kendo.parseDate(_data.DATD), 'dd/MM/yyyy');
+                var _dATP = kendo.toString(kendo.parseDate(_data.DATP), 'dd/MM/yyyy');
+
+                if (nS == row.S && s3 == row.MFOA && s6 == row.NLSB && s7 == row.ND && dDatD == _dATD && nVob == row.VOB/* && sepNum == 2*/) {
                     s4 = 'Уточнення реквізитів документа';
                     sDrec = row.D_REC;
                     nDk = 3;
@@ -279,6 +284,19 @@
                     ss2 = "Буде сформировано інформаційне повідомлення";
                 }
                 else {
+                    if (sepNum == 2) {
+                        ss1 = "Не співпадають реквізити запиту і первинного документу<br/>" +
+                            "ЗАП: № " + row.ND + ", від " + kendo.toString(row.DATD, 'dd/MM/yyyy') + ", Сума " + parseFloat(row.S).toFixed(2) + "<br/>" +
+                            "ДОК: № " + s7 + ", від " + _dATD + ", Сума " + parseFloat(nS).toFixed(2) + "<br/>" +
+                        "ЗАП: МФО-А " + row.MFOA + ", Рах.-Б " + row.NLSB + ", Код " + row.VOB + "<br/>" +
+                        "ДОК: МФО-А " + s3 + ", Рах.-Б " + s6 + ", Код " + nVob + "<br/>"
+                    }
+                    else {
+                        ss1 = "Не співпадають реквізити запиту і первинного документу" + "<br/>" +
+                            " Док " + row.ND + ", від " + kendo.toString(row.DATD, 'dd/MM/yyyy') + ", Сума " + parseFloat(row.S).toFixed(2) + "<br/>" +
+                            " Док " + s7 + ", від " + _dATD + ", Сума " + parseFloat(nS).toFixed(2) + "<br/>"
+                    }
+                    ss2 = "СФОРМУВАТИ відповідь, що платежу немає в банку-відправнику ?";
                     nDk = 3;
                     nKv = row.KV;
                     dDatD = kendo.toString(row.DATD, 'dd/MM/yyyy');
@@ -290,25 +308,14 @@
                     strOKPOb = row.OKPOA;
                     s3 = row.MFOA;
                     s2 = row.NLSA;
-                    s6 = s902;
-                    strNAMa = nms902;
+                    s6 = row.NLSB
+                    //s6 = s902;
+                    //strNAMa = nms902;
+                    strNAMa = row.NAM_B;
                     strNAMb = row.NAMA;
                     nVob = row.VOB;
                     nS = row.S;
                     s7 = row.ND;
-                    if (sepNum == 2) {
-                        ss1 = "Не співпадають реквізити запиту і первинного документу<br/>" +
-                        "ЗАП: № " + row.ND + ", від " + kendo.toString(row.DATD, 'dd/MM/yyyy') + ", Сума " + row.S.toFixed(2) + "<br/>" +
-                        "ДОК: № " + s7 + ", від " + kendo.toString(row.DATD, 'dd/MM/yyyy') + ", Сума " + nS.toFixed(2) + "<br/>" +
-                        "ЗАП: МФО-А " + row.MFOA + ", Рах.-Б " + row.NLSB + ", Код " + row.VOB + "<br/>" +
-                        "ДОК: МФО-А " + s3 + ", Рах.-Б " + s6 + ", Код " + nVob + "<br/>"
-                    }
-                    else {
-                        ss1 = "Не співпадають реквізити запиту і первинного документу" + "<br/>" +
-                        " Док " + row.ND + ", від " + kendo.toString(row.DATD, 'dd/MM/yyyy') + ", Сума " + row.S.toFixed(2) + "<br/>" +
-                        " Док " + s7 + ", від " + kendo.toString(row.DATD, 'dd/MM/yyyy') + ", Сума " + nS.toFixed(2) + "<br/>"
-                    }
-                    ss2 = "СФОРМУВАТИ відповідь, що платежу немає в банку-відправнику ?";
                 }
             }
             else {
@@ -322,7 +329,8 @@
                 strOKPOb = row.OKPOA;
                 s3 = row.MFOA;
                 s2 = row.NLSA;
-                s6 = s902;
+                //s6 = s902;
+                s6 = row.NLSB;
                 strNAMb = row.NAMA;
                 nVob = row.VOB;
                 nS = row.S;
@@ -333,6 +341,21 @@
             }
             bars.ui.confirm({ text: row.OTM > 0 ? ss1 + ss2 + " Повторно." : ss1 + ss2 },
             function () {
+                //var formParams = {
+                //    tt: '014',
+                //    Nls_A: s2,
+                //    Nam_A: strNAMb,
+                //    //mode_nam_a: 1,
+                //    Id_A: strOKPOb,
+                //    SumC_t: (nS * 100).toFixed(2),
+                //    Nls_B: s6,
+                //    Nam_B: strNAMa,
+                //    Kv_B: nKv,
+                //    Id_B: strOKPOa,
+                //    Mfo_A: row.MFOA,
+                //    Nazn: sNazn,
+                //    Nls_A_Editable: 1
+                //}
                 var formParams = {
                     tt: '014',
                     Nls_A: s6,
@@ -345,9 +368,9 @@
                     Kv_B: nKv,
                     Id_B: strOKPOb,
                     Mfo_B: s3,
-                    Nazn: sNazn
+                    Nazn: sNazn,
+                    Nls_B_Editable: 1
                 }
-
                 $("#SepTZWindow").kendoWindow({
                     width: "630px",
                     height: "630px",

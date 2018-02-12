@@ -1039,7 +1039,7 @@ public class safe_deposit
     /// </summary>
     /// <param name="m_nd"></param>
     /// <param name="template"></param>
-    public void InsertNewDoc(Decimal m_nd, String template)
+    public void InsertNewDoc(Decimal m_nd, String template, DateTime? datefrom = null, DateTime? dateto = null)
     {
         OracleConnection connect = new OracleConnection();
 
@@ -1111,8 +1111,12 @@ public class safe_deposit
                     FrxParameters pars = new FrxParameters();
 
                     pars.Add(new FrxParameter("p_nd", TypeCode.Decimal, m_nd));
-                    
 
+                    if (datefrom.HasValue && dateto.HasValue)
+                    {
+                        pars.Add(new FrxParameter("date_from", TypeCode.String, datefrom.Value.ToShortDateString().Replace('/','.')));
+                        pars.Add(new FrxParameter("date_to", TypeCode.String, dateto.Value.ToShortDateString().Replace('/', '.')));
+                    }
 
                     FrxDoc doc = new FrxDoc(
                       FrxDoc.GetTemplatePathByFileName(FrxDoc.GetTemplateFileNameByID(p_file_name)) + p_file_name, pars, null);

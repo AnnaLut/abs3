@@ -3,6 +3,20 @@ function isqdoc() {
     return "" != getParamFromUrl("qdoc", location.search) && "" != getParamFromUrl("rrp_rec", location.search);
 };
 
+function GetPublicFlag(rnk) {
+    $.ajax({
+        type: "POST",
+        url: encodeURI("/barsroot/clientregister/defaultWebService.asmx/GetPublicFlagByRnk"),
+        data: { rnk: rnk },
+        async: false,
+        success: function (result) {
+            if (result && result.text && result.text != '') {
+                alert(result.text);
+            }
+        }
+    })
+}
+
 function Validate(form) {
     if (!chkMandDrec(form)) return false;
     if (!chkQDoc(form)) return false;
@@ -17,6 +31,10 @@ function Validate(form) {
     if (!isFilledOkpo(form.Id_B)) return false;
     if (!isFilled(3, form.Nazn)) return false;
     NaznCalc();
+
+    if (typeof form !== "undefined" && typeof form.__RNK_A !== "undefined" && typeof form.__RNK_A.value !== "undefined") GetPublicFlag(form.__RNK_A.value);
+    if (typeof form !== "undefined" && typeof form.__RNK_B !== "undefined" && typeof form.__RNK_B.value !== "undefined") GetPublicFlag(form.__RNK_B.value);
+
     // Провека курса валют (что не поменялся за момент первой загрузки формы)
     var l_flags = document.getElementById("__FLAGS").value;
     if (l_flags.substr(65, 1) == "1" && l_flags.substr(11, 1) == "1")
@@ -67,6 +85,23 @@ function Validate(form) {
             if (!result){
                 return;
             }
+        }
+    }
+
+    //    Перевірка на блокування рахунків 2625, 2605     (COBUMMFO-3907)
+    var nls = form.__DK.value != 0 ? form.Nls_A.value : form.Nls_B.value;
+    var maskAcc = nls.slice(0, 4);
+    if(maskAcc == "2625" || maskAcc == "2605"){
+        if (null == webService.Doc) webService.useService("DocService.asmx?wsdl", "Doc");
+        var callObj = webService.createCallOptions();
+        callObj.async = false;
+        callObj.funcName = "checkAcc";
+        callObj.params = new Array();
+        callObj.params.acc = nls;
+        var result = webService.Doc.callService(callObj);
+        if (result.error || result.value[0] == "1") {
+            alert(result.value[1] == "" || result.value[1] == null ? "Рахунок " + nls + " заблоковано" : result.value[1]);
+            return false;
         }
     }
 
@@ -782,13 +817,15 @@ function selectDopReq(evt, name, fl) {
         if (result != null) {
             if (name === "reqv_INK_I") 
                 BindIncasatorsData(result[0]);
-            elem.value = result[1];
+            elem.value = result[0];
             elem.fireEvent("onchange");
-            // COBUSUPABS-4641 
-            var reqvDA70 = document.getElementById("reqv_DA#70");
-            if (reqvDA70) {
-                reqvDA70.value = result[1];
-                //reqvDA70.disabled = true;
+            // COBUSUPABS-4641
+            if ("reqw_D9#70" === name) {
+                var reqvDA70 = document.getElementById("reqv_DA#70");
+                if (reqvDA70) {
+                    reqvDA70.value = result[1];
+                    //reqvDA70.disabled = true;
+                }
             }
         }
     }

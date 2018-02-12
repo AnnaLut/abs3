@@ -90,8 +90,8 @@
         }
     }
 
-    function statusOpen(ref) {
-        var dialogStatusReturn = window.showModalDialog('/barsroot/finmon/docstatus.aspx?ref=' + ref, window, 'center:{yes};dialogheight:200px;dialogwidth:600px');;
+    function statusOpen() {
+        var dialogStatusReturn = window.showModalDialog('/barsroot/finmon/docstatus.aspx?', window, 'center:{yes};dialogheight:200px;dialogwidth:600px');;
         if ("ok" == dialogStatusReturn.close) {
             ShowProgress();
             <%= ClientScript.GetPostBackEventReference(this, "PostBack") %>;
@@ -140,14 +140,28 @@
         var dialogParamsReturn = window.showModalDialog('/barsroot/finmon/changeHistory.aspx?ref=' + ref + '&id=' + id, window, 'center:{yes};dialogheight:400px;dialogwidth:650px;status:yes');
     };
     function openFilters() {
-        bars.ui.getFiltersByMetaTable(function (response) {
+        bars.ui.getFiltersByMetaTable(function (response, success) {
+            if (!success) return;
+
             if (response.length > 0) {
                 ShowProgress();
                 var params = response.join(' and ');
                 //PageMethods.GetMetaFilterParams(params);
-                finmonFilterService.SetMetaFilterParams(params);
-                <%= ClientScript.GetPostBackEventReference(this, "PostBack") %>;
+                finmonFilterService.SetMetaFilterParams(params);  
+            } else {
+                finmonFilterService.SetMetaFilterParams("");
             }
+
+            $.ajax({
+                type: "POST",
+                url: "/barsroot/finmon/doc.aspx/SetFilterApplyed",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    <%= ClientScript.GetPostBackEventReference(this, "PostBack") %>;
+                }
+            });
+            
         }, { tableName: "V_FINMON_QUE_OPER" });
 
     };
@@ -243,6 +257,11 @@
     $(document).ready(function () {
         $("#btnExcelExport")[0].onmouseover = function () { delСatalogRows(); }
         $("#btnExcelExport")[0].onmouseleave = function () { addСatalogRows(); }
+
+        var label = document.getElementById('lblOperCount');
+        label.innerText = "Виконується операція відбору";
+        label.style.color = 'Black';
+
         setTimeout(function () { addСatalogRows(); }, 2000);
 
         setTimeout(function () { 
@@ -259,8 +278,10 @@
                         label.innerText = "Увага! Стоїть обмеження на відображення даних (до 100 тис. записів). Для пошуку використовуйте додаткові фільтри";
                         label.style.color = 'Red';
                     }
-                    else{
-                        label.innerText = "Всього документів: " + count;
+                    else {
+                        var FinmonFilterApplyed = "<%= FinmonFilterApplyed %>";
+                        label.innerHTML = FinmonFilterApplyed == "1" ? "Всього відібрано документів: <span style=\"color: red;\">" + count + "</span>. Для відображення списку документів натисніть кнопку \"Перечитати дані\"" : "Всього документів: <span style=\"color: red\">" + count + "</span>";
+                        <% FinmonFilterApplyed = "";%>
                         label.style.color = 'Black';
                     }
                 }

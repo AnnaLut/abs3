@@ -23,7 +23,20 @@ namespace BarsWeb.Areas.CustAcc.Controllers.Api
             }
             catch (Exception ex)
             {
-                return Request.CreateResponse(HttpStatusCode.OK, ex.Message);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+		[HttpGet]
+        public HttpResponseMessage BackOfficeCheck()
+        {
+            try
+            {
+                var res = _execute.IsUserBackOffice();
+                return Request.CreateResponse(HttpStatusCode.OK, res);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
     }

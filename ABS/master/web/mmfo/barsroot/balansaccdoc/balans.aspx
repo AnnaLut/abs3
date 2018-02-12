@@ -25,10 +25,10 @@
                     <select style="width: 150px" id="ddFDat" onclick="dlgFDat()">
                         <option value=''></option>
                     </select>
-                    <img src="/Common/Images/REFRESH.gif" onclick="PopulateTable()" title="Перечитать" id="IMG1" runat="server" meta:resourcekey="IMG1">
-                    <img src="/Common/Images/FILTER_.gif" onclick="fnFilter()" title="Фильтр" id="IMG2" runat="server" meta:resourcekey="IMG2">
+                    <img src="/Common/Images/REFRESH.gif" onclick="PopulateTable()" title="Перечитать" id="IMG1" runat="server" meta:resourcekey="IMG1" />
+                    <img src="/Common/Images/FILTER_.gif" onclick="fnFilter()" title="Фильтр" id="IMG2" runat="server" meta:resourcekey="IMG2" />
                     <INPUT id="cbTobo" onclick="SetTobo()"
-						tabIndex="1" type="checkbox" CHECKED runat="server">
+                           tabIndex="1" type="checkbox" CHECKED runat="server" />
 					<DIV id="DIV1" runat="server" class="simpleTextStyle" style="DISPLAY: inline">По отделению</DIV>
                     <select style="width: 250px" id="ddTobo" onclick="dlgTobo()">
                         <option value=''></option>

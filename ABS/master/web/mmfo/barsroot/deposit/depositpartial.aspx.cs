@@ -11,6 +11,7 @@ using System.Web.UI.HtmlControls;
 using Bars.Oracle;
 using Oracle.DataAccess.Client;
 using System.Globalization;
+using System.Drawing;
 
 public partial class deposit_depositpartial : System.Web.UI.Page
 {
@@ -148,7 +149,12 @@ public partial class deposit_depositpartial : System.Web.UI.Page
     /// </summary>
     protected void btFinish_ServerClick(object sender, EventArgs e)
     {
-		OracleConnection connect = new OracleConnection();
+        if (String.IsNullOrEmpty(Convert.ToString(Request["inherit_id"])))
+        {
+            ClientScript.RegisterClientScriptBlock(this.GetType(), "Alert", "alert('Виберіть рядок для активації!');", true);
+            return;
+        }
+        OracleConnection connect = new OracleConnection();
 
 		try
 		{
@@ -185,6 +191,7 @@ public partial class deposit_depositpartial : System.Web.UI.Page
 			if ( connect.State != ConnectionState.Closed )
 			{connect.Close();connect.Dispose();}
 		}
+        btFinish.Disabled = InheritorsAllRegistered() && InheritorsAreActive();
     }
     /// <summary>
     /// 
@@ -287,7 +294,9 @@ public partial class deposit_depositpartial : System.Web.UI.Page
             GridViewRow row = e.Row;
             row.Attributes.Add("id", row_id);
             String inherit = (String.IsNullOrEmpty(row.Cells[0].Text) ? row.Cells[1].Text : row.Cells[0].Text);
-            row.Attributes.Add("onclick", "S_A('" + row_counter + "','" + inherit + "')"); 
+            row.Attributes.Add("onclick", "S_A('" + row_counter + "','" + inherit + "')");
+            if (((Label)row.FindControl("State")).Text == "Неактивний")
+                row.CssClass = "NoActive";
         }
     }
     /// <summary>
@@ -359,6 +368,7 @@ public partial class deposit_depositpartial : System.Web.UI.Page
     protected void fvInheritor_ItemInserted(object sender, FormViewInsertedEventArgs e)
     {
         gridInheritors.SelectedIndex = -1;
+        btFinish.Disabled = InheritorsAllRegistered() && InheritorsAreActive();
     }
     /// <summary>
     /// 
@@ -368,6 +378,7 @@ public partial class deposit_depositpartial : System.Web.UI.Page
     protected void fvInheritor_ItemUpdated(object sender, FormViewUpdatedEventArgs e)
     {
         gridInheritors.SelectedIndex = -1;
+        btFinish.Disabled = InheritorsAllRegistered() && InheritorsAreActive();
     }
     /// <summary>
     /// 

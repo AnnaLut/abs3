@@ -28,7 +28,7 @@ namespace BarsWeb.Areas.Kernel.Infrastructure.DI.Implementation
 
         public IQueryable<BankViewModel> GetBankList()
         {
-            return _entities.ExecuteStoreQuery<BankViewModel>("SELECT * FROM BANKS").AsQueryable();
+            return _entities.ExecuteStoreQuery<BankViewModel>("SELECT * FROM BANKS WHERE MFO IN (SELECT KF FROM KF_RU) ORDER BY MFO").AsQueryable();
         }
 
         public string GetOurSab()

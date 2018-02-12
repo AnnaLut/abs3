@@ -55,6 +55,7 @@ namespace BarsWeb.Areas.BpkW4
             ninjectKernel.Bind<IInstantCardRepository>().To<InstantCardRepository>();
             ninjectKernel.Bind<IActivationReservedAccountsRepository>().To<ActivationReservedAccountsRepository>();
             ninjectKernel.Bind<ICheckdkboRepository>().To<CheckdkboRepository>();
+			ninjectKernel.Bind<IAcceptAccRepository>().To<AcceptAccRepository>();
         }
 
         private void RegisterBundles(BundleCollection bundles)

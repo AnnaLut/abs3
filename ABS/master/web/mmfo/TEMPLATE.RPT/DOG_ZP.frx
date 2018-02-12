@@ -1,0 +1,1089 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="06/20/2017 15:55:37" ReportInfo.Modified="10/13/2017 13:44:36" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoWN0HWRv5NgSW2TEYI2W7WcDbVIPt4Iwfi7ZyevUTXxnA==">
+      <TableDataSource Name="Table" Alias="rep" DataType="System.Int32" Enabled="true" SelectCommand="select decode((select bav.attribute_value from  BRANCH_ATTRIBUTE_VALUE bav where bav.attribute_code = 'NAME_BRANCH' and bav.branch_code  = zp.branch), null, &#13;&#10;'_________________________', (select bav.attribute_value from  BRANCH_ATTRIBUTE_VALUE bav where bav.attribute_code = 'NAME_BRANCH' and bav.branch_code  = zp.branch) ) BRANCH_NAME,&#13;&#10;decode( (select bav.attribute_value from branch_attribute_value bav where bav.attribute_code = 'ADR_BRANCH' and bav.branch_code = zp.branch), null, &#13;&#10;'_________________________', (select bav.attribute_value from branch_attribute_value bav where bav.attribute_code = 'ADR_BRANCH' and bav.branch_code = zp.branch) ) ADR_BRANCH,&#13;&#10;decode((select bav.attribute_value from branch_attribute_value bav where bav.attribute_code = 'LOCATION' and bav.branch_code = zp.branch), null, '_________________________', (select bav.attribute_value from branch_attribute_value bav where bav.attribute_code = 'LOCATION' and bav.branch_code = zp.branch) ) BRANCH_CITY,&#13;&#10;decode( (select bav.attribute_value from branch_attribute_value bav where bav.attribute_code = 'OKPO' and bav.branch_code = zp.branch), null, '_________________________', (select bav.attribute_value from branch_attribute_value bav where bav.attribute_code = 'OKPO' and bav.branch_code = zp.branch) ) BRANCH_OKPO,&#13;&#10;decode((select bav.attribute_value from BRANCH_ATTRIBUTE_VALUE bav where bav.attribute_code = 'BPK_BOSS_FIOR' and bav.branch_code = zp.branch), null, '_________________________',&#13;&#10;       (select bav.attribute_value from BRANCH_ATTRIBUTE_VALUE bav where bav.attribute_code = 'BPK_BOSS_FIOR' and bav.branch_code = zp.branch)) BPK_BOSS_FIOR,&#13;&#10;(select bav.attribute_value from BRANCH_ATTRIBUTE_VALUE bav where bav.attribute_code = 'BPK_BOSS_FIO' and bav.branch_code = zp.branch) BPK_BOSS_FIO,&#13;&#10;decode((select bav.attribute_value from BRANCH_ATTRIBUTE_VALUE bav where bav.attribute_code = 'BPK_POSADAR' and bav.branch_code = zp.branch), null, '_________________________', &#13;&#10;        (select bav.attribute_value from BRANCH_ATTRIBUTE_VALUE bav where bav.attribute_code = 'BPK_POSADAR' and bav.branch_code = zp.branch)) BPK_POSADAR,&#13;&#10;        (select bav.attribute_value from BRANCH_ATTRIBUTE_VALUE bav where bav.attribute_code = 'BPK_POSADA' and bav.branch_code  = zp.branch) BPK_POSADA,&#13;&#10;decode((select bav.attribute_value from BRANCH_ATTRIBUTE_VALUE bav where bav.attribute_code = 'BPK_DOVER' and bav.branch_code = zp.branch), null, '_________________________',&#13;&#10;(select bav.attribute_value from BRANCH_ATTRIBUTE_VALUE bav where bav.attribute_code = 'BPK_DOVER' and bav.branch_code = zp.branch)) BPK_DOVER,&#13;&#10;(select bav.attribute_value from BRANCH_ATTRIBUTE_VALUE bav where bav.attribute_code = 'BPK_PHONE' and bav.branch_code = zp.branch) BPK_PHONE,&#13;&#10;(select bav.attribute_value from BRANCH_ATTRIBUTE_VALUE bav where bav.attribute_code = 'FAX' and bav.branch_code = zp.branch) FAX,&#13;&#10;(select b.name from branch b where b.branch = zp.branch) BANK_NAME,&#13;&#10;(select cz.FIO from BARS.CUST_ZAY cz where cz.rnk = zp.rnk ) FIO, zp.OKPO, c.NMK,  c.ADR, ZP.KF KF,&#13;&#10;ZP.ID,&#13;&#10;ZP.DEAL_ID, &#13;&#10;to_char(EXTRACT(DAY FROM ZP.START_DATE))||' '||decode(to_char(ZP.START_DATE, 'MM'), '01', 'січня', '02', 'лютого', '03', 'березня', '04', 'квітня', '05', 'травня', '06', 'червня', '07', 'липня', '08', 'серпня', '09', 'вересня', '10', 'жовтня', '11', 'листопада', '12', 'грудня', null)||' '||to_char(EXTRACT(YEAR FROM ZP.START_DATE)) START_DATE_TXT,&#13;&#10; to_char(ZP.START_DATE,'dd.mm.yyyy') START_DATE, &#13;&#10;ZP.NLS_2909, &#13;&#10;ZP.NLS_3570, &#13;&#10;ZP.MAX_TARIF,&#13;&#10;trim(f_sumpr(trim(substr(ZP.MAX_TARIF, instr(ZP.MAX_TARIF, 'до')+2, instr(ZP.MAX_TARIF, '%')-3)),null,'M')) MAX_TARIF_TXT&#13;&#10;from BARS.V_ZP_DEALS ZP, BARS.CUSTOMER c where zp.sos &gt;= 0 and zp.rnk = c.rnk and ZP.RNK = :p_rnk">
+        <Column Name="BRANCH_NAME" DataType="System.String"/>
+        <Column Name="BRANCH_CITY" DataType="System.String"/>
+        <Column Name="BRANCH_OKPO" DataType="System.String"/>
+        <Column Name="BPK_BOSS_FIOR" DataType="System.String"/>
+        <Column Name="BPK_POSADAR" DataType="System.String"/>
+        <Column Name="BPK_BOSS_FIO" DataType="System.String"/>
+        <Column Name="BPK_POSADA" DataType="System.String"/>
+        <Column Name="BPK_PHONE" DataType="System.String"/>
+        <Column Name="FAX" DataType="System.String"/>
+        <Column Name="BANK_NAME" DataType="System.String"/>
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="NMK" DataType="System.String"/>
+        <Column Name="KF" DataType="System.String"/>
+        <Column Name="ID" DataType="System.String"/>
+        <Column Name="DEAL_ID" DataType="System.String"/>
+        <Column Name="START_DATE" DataType="System.String"/>
+        <Column Name="START_DATE_TXT" DataType="System.String"/>
+        <Column Name="NLS_2909" DataType="System.String"/>
+        <Column Name="NLS_3570" DataType="System.String"/>
+        <Column Name="MAX_TARIF" DataType="System.String"/>
+        <Column Name="MAX_TARIF_TXT" DataType="System.String"/>
+        <Column Name="BPK_DOVER" DataType="System.String"/>
+        <Column Name="ADR_BRANCH" DataType="System.String"/>
+        <Column Name="ADR" DataType="System.String"/>
+        <CommandParameter Name="p_rnk" DataType="112" Expression="[p_rnk]" DefaultValue="0"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_rnk" DataType="System.Int32"/>
+  </Dictionary>
+  <ReportPage Name="Page1" PaperWidth="214" PaperHeight="287" LeftMargin="15" BottomMargin="15" FirstPageSource="15" OtherPagesSource="15" Guides="982.8,982.8">
+    <DataBand Name="Data1" Width="714.42" Height="12568.5" Guides="6907.95" DataSource="Table">
+      <TextObject Name="Text4" Top="255.15" Width="718.2" Height="37.8" Text="1.	ПРЕДМЕТ ДОГОВОРУ" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text5" Top="359.1" Width="718.2" Height="113.4" Text="1.1.	 ОРГАНІЗАЦІЯ замовляє та оплачує, а БАНК бере на себе зобов’язання здійснювати відкриття поточних рахунків, операції за якими здійснюються з використанням платіжних карток, на користь визначених ОРГАНІЗАЦІЄЮ працівників на підставі отриманих від Організації документів в порядку, визначеному чинним законодавством, а також здійснювати зарахування на поточні рахунки, операції за якими здійснюються з використанням платіжних карток, відкриті в БАНКУ працівникам ОРГАНІЗАЦІЇ/студентам, на умовах та в строки, визначені цим Договором, заробітної плати/стипендії та інших виплат працівникам ОРГАНІЗАЦІЇ/студентам.»&#13;&#10;" HorzAlign="Justify"/>
+      <TextObject Name="Text6" Top="774.9" Width="718.2" Height="37.8" Text="2.	ЗОБОВ`ЯЗАННЯ СТОРІН" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text7" Top="1993.95" Width="718.2" Height="614.25" Text="“та здійснювати оплату відповідно до п. 2.1.3 цього Договору”).&#13;&#10;&#13;&#10;2.1.7. Інформувати БАНК в письмовій формі за адресою [rep.ADR_BRANCH] /факсимільним зв’язком за номером [rep.FAX]:&#13;&#10;- не пізніше наступного робочого дня, з дати подання заяви про звільнення до відділу кадрів про звільнених працівників ОРГАНІЗАЦІЇ /студентів;&#13;&#10;- не пізніше наступного дня з моменту, коли ОРГАНІЗАЦІЇ стало відомо про смерть його працівника/студента, оголошення працівника/студента померлим або безвісно відсутнім, таким, що знаходиться у розшуку або засудженим до позбавлення волі та в інших випадках передбачених законодавством України; &#13;&#10;- про внесення змін в реквізити ОРГАНІЗАЦІЇ;&#13;&#10;- врегульовувати з БАНКОМ інші питання, щодо кількості відкритих та закритих рахунків.&#13;&#10;&#13;&#10;2.1.8. Впродовж п`яти робочих днів з моменту отримання від Банку переліку рахунків, карток, термін дії яких закінчується в письмовій формі (офіційним листом) надати список карток термін дії яких необхідно подовжити.&#13;&#10;2.1.8.1. У разі виявлення працівниками ОРГАНІЗАЦІЇ бажання отримати переоформлені на новий строк платіжні картки за адресою місцезнаходження ОРГАНІЗАЦІЇ:&#13;&#10;1) оформити належним чином Лист від Організації з переліком працівників, яким необхідно переоформити картки на новий строк їх дії (Додаток 4 до цього Договору, далі – Лист);&#13;&#10;2) попередити працівників Організації, перелік яких зазначено в Листі, про необхідність звернення до установи Банку для отримання Зарплатної платіжної картки у разі, якщо за результатами перевірки Банком даних працівника Організації буде виявлено, що наявна в Банку інформація, яка подавалась для ідентифікації та верифікації, є неактуальною;  &#13;&#10;2) забезпечити передачу/направлення до Банку оригіналу Листа. У разі нарочної передачі Листа факт отримання Банком листа підтверджується підписом уповноваженого працівника Банку;&#13;&#10;3) після отримання переоформлених на новий строк дії платіжних карток, кожна з яких запакована в окремий іменний конверт як кореспонденція, що надійшла від Банку та адресована відповідному працівнику ОРГАНІЗАЦІЇ, та Відомості про доставку карток на адресу ОРГАНІЗАЦІЇ (відокремленого підрозділу Організації) та вручення їх працівникам (Додаток 5 до цього Договору, надалі - Відомість), забезпечити вручення відповідним працівникам ОРГАНІЗАЦІЇ належних їм конвертів з проставленням  підписів такими працівниками ОРГАНІЗАЦІЇ у Відомості;&#13;&#10;4) повідомити працівників Організації, яким не були перевипущені платіжні картки на новий строк дії про причини такого неперевипуску та необхідність звернутись до установи Банку.   &#13;&#10;5) повернути до Банку оригінал Відомості з підписами працівників ОРГАНІЗАЦІЇ, які означають їх письмову згоду на отримання платіжної картки з доставкою на адресу ОРГАНІЗАЦІЇ та підтверджують фізичне отримання працівником ОРГАНІЗАЦІЇ платіжної картки у зазначений спосіб. Факт отримання працівниками платіжних карток також підтверджується підписом уповноваженої особи Організації у Відомості, відповідальної за передачу конвертів з перевипущеними на новий строк платіжними картками зазначеним у Відомості працівникам ОГРАНІЗАЦІЇ. &#13;&#10;6) Кореспонденція, яка не може бути вручена  працівнику ОРГАНІЗАЦІЇ, повертається до Банку разом з Відомістю із зазначенням причин невручення конвертів з платіжними картками в окремій графі Відомості.      " HorzAlign="Justify"/>
+      <TextObject Name="Text8" Top="3553.2" Width="718.2" Height="37.8" Text="3.	ВІДПОВІДАЛЬНІСТЬ СТОРІН" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text9" Top="3591" Width="718.2" Height="264.6" Text="3.1. У разі ненадходження комісійної винагороди, передбаченої в пункті 2.1.5 цього Договору за послуги, одночасно з перерахованою сумою заробітної плати/стипендії для зарахування на рахунки працівникам/студентам БАНК повертає ОРГАНІЗАЦІЇ перераховані кошти. В цьому випадку ОРГАНІЗАЦІЯ згодна з тим, що БАНК звільняється від відповідальності за невиконання доручення ОРГАНІЗАЦІЇ на перерахування коштів на рахунки її працівників/студентів.&#13;&#10;3.2. У разі неподання або невчасного подання ОРГАНІЗАЦІЄЮ інформації згідно п. 2.1.7 цього Договору, остання зобов’язується відшкодувати збитки завдані БАНКУ звільненим/померлим працівником/студентом та не відшкодовані ним у встановлений термін.&#13;&#10;3.3. БАНК відповідає за своєчасне зарахування коштів, перерахованих йому ОРГАНІЗАЦІЄЮ за умовами цього Договору, згідно з законодавством України.&#13;&#10;3.4. БАНК не несе відповідальності перед ОРГАНІЗАЦІЄЮ за несвоєчасне зарахування коштів на рахунки його працівників/студентів у разі порушення ОРГАНІЗАЦІЄЮ п. 2.1.3, 2.1.4, 2.1.5 цього Договору.&#13;&#10;3.5. ОРГАНІЗАЦІЯ відповідає за дотримання вимог з оподаткуванням сум заробітної плати та інших виплат працівників ОРГАНІЗАЦІЇ /студентів відповідно до законодавства України, а також  за строки виплати заробітної плати/стипендії.&#13;&#10;3.6. БАНК несе повну майнову відповідальність за зберігання коштів, перерахованих йому ОРГАНІЗАЦІЄЮ за умовами цього Договору, згідно з законодавством України." HorzAlign="Justify"/>
+      <TextObject Name="Text10" Top="4025.7" Width="718.2" Height="37.8" Text="4.	ФОРС-МАЖОР" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text11" Top="4063.5" Width="718.2" Height="236.25" Text="4.1. Сторони звільняються від відповідальності за повне чи часткове невиконання будь-якого з положень цього Договору, якщо це невиконання відбулося внаслідок дії обставин непереборної сили, що знаходяться поза сферою контролю Сторони, яка не виконала зобов’язання. Такі обставини включають: стихійне лихо, екстремальні погодні умови, пожежі, війни, страйки, прийняття органами державної влади та управління актів нормативного або ненормативного характеру, воєнні дії, масові безладдя і т. п. (далі – форс-мажор), але не обмежуються ними. Період звільнення від відповідальності починається з моменту оповіщення Стороною, що не виконала зобов'язання, про дію обставин форс-мажору і закінчується моментом припинення дії форс–мажорних обставин (ліквідації їх наслідків), за умови, що Сторона, яка не виконала зобов’язання до вищевказаного моменту, здійснила всі дії, які вона могла зробити і зробила для виходу з форс-мажору. Форс-мажор автоматично продовжує строк виконання зобов’язань на весь період його дії і ліквідації наслідків. &#13;&#10;4.2. Про настання форс-мажорних обставин Сторони повинні інформувати письмово одна одну невідкладно з наступним наданням документів встановлених в п.4.3. цього Договору.&#13;&#10;4.3. Факти існування і тривалості форс-мажорних обставин підтверджуються документами компетентних державних органів, які уповноважені згідно з законодавством України підтверджувати настання та припинення дій обставин форс-мажору. &#13;&#10;" HorzAlign="Justify"/>
+      <TextObject Name="Text12" Top="4299.75" Width="718.2" Height="37.8" Text="5.	ПОРЯДОК ВИРІШЕННЯ СПОРІВ" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text13" Top="4337.55" Width="718.2" Height="85.05" Text="5.1. Всі спори, що виникають у зв’язку з цим Договором, вирішуються шляхом переговорів між Сторонами.&#13;&#10;5.2. Якщо Сторони не досягнуть згоди шляхом переговорів протягом 20 календарних днів, такі спори повинні бути врегульовані в судовому порядку згідно з вимогами законодавства України.&#13;&#10;5.3. Всі питання, які не врегульовані Договором, підлягають врегулюванню згідно з вимогами законодавства України.&#13;&#10;" HorzAlign="Justify"/>
+      <TextObject Name="Text14" Top="4422.6" Width="718.2" Height="37.8" Text="6.	СТРОК ДІЇ ДОГОВОРУ ТА ПОРЯДОК ЙОГО РОЗІРВАННЯ" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text15" Top="4460.4" Width="718.2" Height="132.3" Text="6.1.Договір набуває чинності з моменту його підписання обома Сторонами і діє протягом одного року.&#13;&#10;6.2. Дія Договору автоматично продовжується на кожний наступний рік і на тих самих умовах, якщо жодна із Сторін не попередить у письмовій формі іншу Сторону про припинення його дії не пізніше ніж за один місяць до закінчення строку дії цього Договору. &#13;&#10;6.3. У разі неналежного виконання Сторонами своїх зобов’язань або за домовленістю Сторін цей Договір може бути розірваний достроково за умови письмового повідомлення про це іншої Сторони за один місяць. &#13;&#10;6.4. Розірвання Договору не звільняє ОРГАНІЗАЦІЮ від зобов’язань повного розрахунку по ньому перед БАНКОМ за фактично надані послуги.&#13;&#10;" HorzAlign="Justify"/>
+      <TextObject Name="Text16" Top="4592.7" Width="718.2" Height="37.8" Text="7.	УМОВИ ЗВ`ЯЗКУ МІЖ СТОРОНАМИ" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text17" Top="4630.5" Width="718.2" Height="75.6" Text="7.1. Уповноважена особа від ОРГАНІЗАЦІЇ: посада___________________________ прізвище, ім’я, по батькові ___________________________________________________. Телефон _____________&#13;&#10;7.2. Уповноважена особа від БАНКУ: посада_____________________________ прізвище, ім’я, по батькові ____________________________________________________. Телефон _____________&#13;&#10;&#13;&#10;" HorzAlign="Justify"/>
+      <TextObject Name="Text18" Top="4706.1" Width="718.2" Height="37.8" Text="8.	КОНФІДЕНЦІЙНІСТЬ" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text19" Top="4743.9" Width="718.2" Height="359.1" Text="8.1.Кожна з Сторін повинна суворо зберігати конфіденційність цього Договору та одержаної на підставі цього Договору інформації, в тому числі яка становить банківську таємницю, та вживати всіх можливих заходів для запобігання можливого розголошення такої інформації.&#13;&#10;8.2. Зобов’язання Сторін по дотриманню режиму конфіденційності щодо інформації, отриманої в цілях виконання умов цього Договору від іншої Сторони, зберігаються протягом строку дії цього Договору та протягом 5 (п’яти) років після припинення дії цього Договору (в тому числі дострокового). Строк зберігання конфіденційної інформації, яка становить банківську таємницю, визначається згідно законодавства України.&#13;&#10;8.3. Передача інформації будь-яким третім особам, опублікування, розголошення або розкриття будь-яким іншим чином такої інформації може здійснюватися тільки за взаємною письмовою згодою Сторін.&#13;&#10;8.4. Умови зберігання конфіденційної інформації не поширюються на загальнодоступну інформацію або інформацію, що надається за офіційним запитом державних органів, яким Сторони зобов’язані надавати необхідні їм відомості, відповідно до вимог законодавства України.&#13;&#10;8.5. Уповноважені представники Сторін, які підписують цей Договір від імені Сторін, керуючись Законом України „Про захист персональних даних”, своїми підписами підтверджують надання беззастережної згоди (дозволу) на обробку своїх персональних даних, зокрема, їх збирання, реєстрацію, накопичення, зберігання, адаптування, зміну (в тому числі за зверненням третіх осіб), поновлення, використання і поширення (розповсюдження, реалізацію, передачу), знеособлення, знищення, у тому числі з використанням інформаційних (автоматизованих) систем,  виключно з метою виконання умов даного Договору на строк, що є необхідним та достатнім для виконання Сторонами своїх зобов’язань за цим Договором і дотримання положень законодавства України, якщо інший строк не передбачено законодавством України.&#13;&#10;8.6. ОРГАНІЗАЦІЯ надає беззастережну згоду на розкриття БАНКОМ будь-якої інформації стосовно ОРГАНІЗАЦІЇ, умов договорів з ОРГАНІЗАЦІЄЮ  та порядку виконання обов’язків за ними аудиторам, які надають БАНКУ послуги, пов’язані з основною діяльністю.&#13;&#10;" HorzAlign="Justify"/>
+      <TextObject Name="Text20" Top="5103" Width="718.2" Height="37.8" Text="9.	ДОДАТКОВІ УМОВИ" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text21" Top="5140.8" Width="718.2" Height="359.1" Text="9.1. Всі додатки до цього Договору є його невід’ємною частиною:&#13;&#10;&#13;&#10;     Додаток № 1: Форма “Списку № ___________ працівників/студентів __________________ на поточні рахунки яких будуть надходити кошти для зарахування”;&#13;&#10;&#13;&#10;     Додаток № 2: Форма “Зведеної відомості сум для зарахування на рахунки”;&#13;&#10;&#13;&#10;     Додаток № 3 :Форма електронної копії Зведеної відомості сум для зарахування на рахунки;&#13;&#10;	&#13;&#10;     Додаток № 4: Форма Листа від Організації до Банку з переліком працівників, яким необхідно переоформити платіжні картки на новий строк їх дії та направити на адресу місцезнаходження Організації; &#13;&#10;&#13;&#10;     Додаток № 5: Форма Відомості про доставку карток на адресу Організації (філії/представництва) та вручення їх працівникам. &#13;&#10;&#13;&#10;9.2. Внесення змін та доповнень до цього Договору здійснюється шляхом укладення додаткових договорів, які підписуються обома Сторонами, за винятком випадків прямо передбачених цим Договором. &#13;&#10;9.3. Всі повідомлення за цим Договором будуть вважатися зробленими належним чином, у випадку, якщо вони здійсненні у письмовій формі та надіслані рекомендованим листом, кур’єром, або вручені особисто за зазначеними в цьому Договорі адресами Сторін. Датою отримання таких повідомлень буде вважатися дата їх особистого вручення або дата поштового штемпеля відділу зв'язку одержувача.&#13;&#10;9.4. Цей Договір складено в двох примірниках українською мовою, по одному для кожної Сторони, кожен з яких має однакову юридичну силу. &#13;&#10;" HorzAlign="Justify"/>
+      <TextObject Name="Text22" Top="5499.9" Width="718.2" Height="37.8" Text="10.	Адреси та банківські реквізити Сторін" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TableObject Name="Table1" Left="0.16" Top="5537.7" Width="718.04" Height="226.8">
+        <TableColumn Name="Column1" Width="179.51"/>
+        <TableColumn Name="Column2" Width="179.51"/>
+        <TableColumn Name="Column3" Width="179.51"/>
+        <TableColumn Name="Column5" Width="179.51"/>
+        <TableRow Name="Row1" Height="45.36">
+          <TableCell Name="Cell1" Text="БАНК&#13;&#10;&#13;&#10;публічне акціонерне товариство &#13;&#10;“Державний ощадний банк України”&#13;&#10;&#13;&#10;[rep.BRANCH_NAME]&#13;&#10;[rep.ADR_BRANCH]&#13;&#10;Код в ЄДРПОУ [rep.BRANCH_OKPO] &#13;&#10;Код банку [rep.KF]&#13;&#10;&#13;&#10;[rep.BPK_POSADA]&#13;&#10;[rep.BPK_BOSS_FIO]&#13;&#10;&#13;&#10;_______________________/_________________/&#13;&#10;" HorzAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="2" RowSpan="5"/>
+          <TableCell Name="Cell2"/>
+          <TableCell Name="Cell3" Text="ОРГАНІЗАЦІЯ&#13;&#10;&#13;&#10;&#13;&#10;&#13;&#10;[rep.NMK] &#13;&#10;Україна, [rep.ADR],&#13;&#10;Код в ЄДРПОУ [rep.OKPO]&#13;&#10;п/р [rep.NLS_2909] в [rep.BANK_NAME] &#13;&#10;Код банку [rep.KF]&#13;&#10;&#13;&#10;[rep.FIO]&#13;&#10;&#13;&#10;&#13;&#10;______________________/_________________/&#13;&#10;" HorzAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="2" RowSpan="5"/>
+          <TableCell Name="Cell5"/>
+        </TableRow>
+        <TableRow Name="Row2" Height="45.36">
+          <TableCell Name="Cell6"/>
+          <TableCell Name="Cell7"/>
+          <TableCell Name="Cell8"/>
+          <TableCell Name="Cell10"/>
+        </TableRow>
+        <TableRow Name="Row3" Height="45.36">
+          <TableCell Name="Cell11"/>
+          <TableCell Name="Cell12"/>
+          <TableCell Name="Cell13"/>
+          <TableCell Name="Cell15"/>
+        </TableRow>
+        <TableRow Name="Row4" Height="45.36">
+          <TableCell Name="Cell16"/>
+          <TableCell Name="Cell17"/>
+          <TableCell Name="Cell18"/>
+          <TableCell Name="Cell20"/>
+        </TableRow>
+        <TableRow Name="Row5" Height="45.36">
+          <TableCell Name="Cell21"/>
+          <TableCell Name="Cell22"/>
+          <TableCell Name="Cell23"/>
+          <TableCell Name="Cell25"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text23" Left="604.8" Top="5821.2" Width="113.4" Height="18.9" Text="Додаток №1" HorzAlign="Center" Font="Arial, 12pt, style=Bold"/>
+      <TextObject Name="Text24" Left="387.45" Top="5849.55" Width="330.75" Height="122.85" Text="до Договору&#13;&#10;між БАНКОМ та ОРГАНІЗАЦІЄЮ про надання&#13;&#10;послуг по зарахуванню та виплаті &#13;&#10;заробітної плати та інших виплат &#13;&#10;через поточні рахунки фізичних осіб &#13;&#10;(працівників Організації/ студентів)&#13;&#10;з використанням платіжних карток&#13;&#10;від “____”  20 ___ р. № _________&#13;&#10;" HorzAlign="Right" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text25" Top="6010.2" Width="718.2" Height="37.8" Text="Форма Списку № _______ працівників/студентів __________________ на поточні рахунки&#13;&#10;яких будуть надходити кошти для зарахування&#13;&#10;" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TableObject Name="Table2" Left="-7.21" Top="6057.45" Width="725.41" Height="264.6">
+        <TableColumn Name="Column6" Width="75.04"/>
+        <TableColumn Name="Column7" Width="235.69"/>
+        <TableColumn Name="Column8" Width="178.99"/>
+        <TableColumn Name="Column9" Width="235.69"/>
+        <TableRow Name="Row6" Height="26.46">
+          <TableCell Name="Cell26" Border.Lines="All" Text="Заповнюється ОРГАНІЗАЦІЄЮ" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="4"/>
+          <TableCell Name="Cell27" Border.Lines="All"/>
+          <TableCell Name="Cell28" Border.Lines="All"/>
+          <TableCell Name="Cell29" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row7" Height="130.41">
+          <TableCell Name="Cell31" Border.Lines="All" Text="№п/п" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell32" Border.Lines="All" Text="П.І.Б.&#13;&#10;Працівника/студента (латинськими літерами)&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell33" Border.Lines="All" Text="Розмір  нарахованої середньомісячної заробітної плати/стипендії,  що буде зараховуватись на рахунок (з розрахунку за останні 6 місяців), грн." HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell34" Border.Lines="All" Text="Інша службова інформація необхідна для відкриття рахунків та випуску платіжних карток – серія та номер паспорту, ідентифікаційний номер, тощо (надається за наявності в електронному вигляді)." HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row8" Height="35.91">
+          <TableCell Name="Cell36" Border.Lines="All"/>
+          <TableCell Name="Cell37" Border.Lines="All"/>
+          <TableCell Name="Cell38" Border.Lines="All"/>
+          <TableCell Name="Cell39" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row9" Height="35.91">
+          <TableCell Name="Cell41" Border.Lines="All"/>
+          <TableCell Name="Cell42" Border.Lines="All"/>
+          <TableCell Name="Cell43" Border.Lines="All"/>
+          <TableCell Name="Cell44" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row10" Height="35.91">
+          <TableCell Name="Cell46" Border.Lines="All"/>
+          <TableCell Name="Cell47" Border.Lines="All"/>
+          <TableCell Name="Cell48" Border.Lines="All"/>
+          <TableCell Name="Cell49" Border.Lines="All"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table3" Left="0.01" Top="6378.75" Width="737.41" Height="226.8">
+        <TableColumn Name="Column10" Width="26.6"/>
+        <TableColumn Name="Column11" Width="45.5"/>
+        <TableColumn Name="Column12" Width="45.5"/>
+        <TableColumn Name="Column13" Width="64.38"/>
+        <TableColumn Name="Column14" Width="73.83"/>
+        <TableColumn Name="Column15" Width="36.05"/>
+        <TableColumn Name="Column16" Width="36.05"/>
+        <TableColumn Name="Column17" Width="54.95"/>
+        <TableColumn Name="Column18" Width="45.5"/>
+        <TableColumn Name="Column19" Width="45.5"/>
+        <TableColumn Name="Column20" Width="26.6"/>
+        <TableColumn Name="Column21" Width="54.95"/>
+        <TableColumn Name="Column22" Width="45.5"/>
+        <TableColumn Name="Column23" Width="45.5"/>
+        <TableColumn Name="Column24" Width="45.5"/>
+        <TableColumn Name="Column25" Width="45.5"/>
+        <TableRow Name="Row11">
+          <TableCell Name="Cell50" Border.Lines="All" Text="Заповнюється ОРГАНІЗАЦІЄЮ" HorzAlign="Center" Font="Arial, 9pt, style=Bold" ColSpan="9"/>
+          <TableCell Name="Cell51" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell52" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell53" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell54" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell75" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell80" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell85" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell90" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell95" Border.Lines="All" Text="Заповнюється БАНКОМ" HorzAlign="Center" Font="Arial, 9pt, style=Bold" ColSpan="7"/>
+          <TableCell Name="Cell100" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell105" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell110" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell115" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell120" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell125" Border.Lines="All" Font="Arial, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row12" Height="170.1">
+          <TableCell Name="Cell55" Border.Lines="All" Text="№ п/п" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell56" Border.Lines="All" Text="П.І.Б.&#13;&#10;працівника&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell57" Border.Lines="All" Text="Табельний номер" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell58" Border.Lines="All" Text="Розмір нарахованої середньомісячної заробітної плати, грн(з розрахунку за останні 6 місяців)" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell59" Border.Lines="All" Text="Реєстраційний номер облікової картки платника податків (ідентифікаційний номер)працівника Організації" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell76" Border.Lines="All" Text="Область України де розташована філія/представництво" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell81" Border.Lines="All" Text="Адреса філії/представництва організації" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell86" Border.Lines="All" Text="Контактний телефон філії/представництва організації" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell91" Border.Lines="All" Text="Контактна особа філії Організації (П.І.Б)" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell96" Border.Lines="All" Text="Тип відкритої платіжної картки" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell101" Border.Lines="All" Text="Термін дії платіжної картки" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell106" Border.Lines="All" Text="Номер відкритого рахунку" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell111" Border.Lines="All" Text="Контактна особа установи банку, що супроводжує проект (П.І.Б)" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell116" Border.Lines="All" Text="Назва/ номер установи банку, що супроводжує проект" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell121" Border.Lines="All" Text="Код установи банку-емітента" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell126" Border.Lines="All" Text="Контактний телефон філії" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row13">
+          <TableCell Name="Cell60" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell61" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell62" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell63" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell64" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell77" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell82" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell87" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell92" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell97" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell102" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell107" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell112" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell117" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell122" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell127" Border.Lines="All" Font="Arial, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row14">
+          <TableCell Name="Cell65" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell66" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell67" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell68" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell69" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell78" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell83" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell88" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell93" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell98" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell103" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell108" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell113" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell118" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell123" Border.Lines="All" Font="Arial, 9pt"/>
+          <TableCell Name="Cell128" Border.Lines="All" Font="Arial, 9pt"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text26" Top="6331.5" Width="718.2" Height="37.8" Text="(даний формат Списку використовується при централізованому обслуговуванні зарплатного проекту через ГУОК АТ «Ощадбанк»)" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold, Italic"/>
+      <TableObject Name="Table4" Left="0.04" Top="7474.95" Width="718.16" Height="141.75">
+        <TableColumn Name="Column26" Width="179.54"/>
+        <TableColumn Name="Column27" Width="179.54"/>
+        <TableColumn Name="Column28" Width="179.54"/>
+        <TableColumn Name="Column29" Width="179.54"/>
+        <TableRow Name="Row15" Height="28.35">
+          <TableCell Name="Cell129" Text="БАНК&#13;&#10;&#13;&#10;публічне акціонерне товариство&#13;&#10; “Державний ощадний банк України”&#13;&#10;&#13;&#10;_______________________/_________________/&#13;&#10;&#13;&#10;" HorzAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="2" RowSpan="5"/>
+          <TableCell Name="Cell130"/>
+          <TableCell Name="Cell131" Text="ОРГАНІЗАЦІЯ&#13;&#10;&#13;&#10;_________________________________________&#13;&#10;&#13;&#10;_________________________________________&#13;&#10;&#13;&#10;______________________/_________________/&#13;&#10;" HorzAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="2" RowSpan="5"/>
+          <TableCell Name="Cell132"/>
+        </TableRow>
+        <TableRow Name="Row16" Height="28.35">
+          <TableCell Name="Cell134"/>
+          <TableCell Name="Cell135"/>
+          <TableCell Name="Cell136"/>
+          <TableCell Name="Cell137"/>
+        </TableRow>
+        <TableRow Name="Row17" Height="28.35">
+          <TableCell Name="Cell139"/>
+          <TableCell Name="Cell140"/>
+          <TableCell Name="Cell141"/>
+          <TableCell Name="Cell142"/>
+        </TableRow>
+        <TableRow Name="Row18" Height="28.35">
+          <TableCell Name="Cell144"/>
+          <TableCell Name="Cell145"/>
+          <TableCell Name="Cell146"/>
+          <TableCell Name="Cell147"/>
+        </TableRow>
+        <TableRow Name="Row19" Height="28.35">
+          <TableCell Name="Cell149"/>
+          <TableCell Name="Cell150"/>
+          <TableCell Name="Cell151"/>
+          <TableCell Name="Cell152"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text29" Left="595.35" Top="7749" Width="122.85" Height="18.9" Text="Додаток № 2" HorzAlign="Right" Font="Arial, 12pt, style=Bold"/>
+      <TextObject Name="Text31" Top="7919.1" Width="718.2" Height="18.9" Text="Форма „Зведеної відомості сум для зарахування на рахунки”" HorzAlign="Center" Font="Arial, 12pt, style=Bold"/>
+      <TableObject Name="Table5" Left="0.16" Top="7956.9" Width="708.59" Height="103.95" Border.Lines="All">
+        <TableColumn Name="Column30" Width="217.31"/>
+        <TableColumn Name="Column31" Width="56.66"/>
+        <TableColumn Name="Column32" Width="217.31"/>
+        <TableColumn Name="Column33" Width="217.31"/>
+        <TableRow Name="Row20" Height="17.01">
+          <TableCell Name="Cell153" Border.Lines="All" Text="Номер списку" VertAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell154" Border.Lines="All" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell155" Border.Lines="All" ColSpan="2"/>
+          <TableCell Name="Cell156" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row21" Height="17.01">
+          <TableCell Name="Cell158" Border.Lines="All" Text="Дата" VertAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell159" Border.Lines="All" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell160" Border.Lines="All" ColSpan="2"/>
+          <TableCell Name="Cell161" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row22" Height="17.01">
+          <TableCell Name="Cell163" Border.Lines="All" Text="Назва організації" VertAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell164" Border.Lines="All" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell165" Border.Lines="All" ColSpan="2"/>
+          <TableCell Name="Cell166" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row23" Height="17.01">
+          <TableCell Name="Cell168" Border.Lines="All" Text="Назва  та № установи АТ «Ощадбанк»" VertAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell169" Border.Lines="All" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell170" Border.Lines="All" ColSpan="2"/>
+          <TableCell Name="Cell171" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row24" Height="17.01">
+          <TableCell Name="Cell173" Border.Lines="All" Text="Додаткова інформація" VertAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell174" Border.Lines="All" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell175" Border.Lines="All" ColSpan="2"/>
+          <TableCell Name="Cell176" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row84">
+          <TableCell Name="Cell499" ColSpan="2"/>
+          <TableCell Name="Cell500"/>
+          <TableCell Name="Cell501" Border.Lines="Left" ColSpan="2"/>
+          <TableCell Name="Cell502" Border.Lines="Left"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table6" Top="8079.75" Width="708.75" Height="160.65" Border.Lines="All">
+        <TableColumn Name="Column34" Width="75.6"/>
+        <TableColumn Name="Column35" Width="198.45"/>
+        <TableColumn Name="Column36" Width="151.2"/>
+        <TableColumn Name="Column37" Width="141.75"/>
+        <TableColumn Name="Column38" Width="141.75"/>
+        <TableRow Name="Row25" Height="34.02">
+          <TableCell Name="Cell177" Border.Lines="All" Text="№ п\п" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell178" Border.Lines="All" Text="Прізвище, ім’я  по-батькові  працівника/студента" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell179" Border.Lines="All" Text="№ рахунку" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell180" Border.Lines="All" Text="Ідентифікаційний номер" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell181" Border.Lines="All" Text="Сума" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row26" Height="24.57">
+          <TableCell Name="Cell182" Border.Lines="All"/>
+          <TableCell Name="Cell183" Border.Lines="All"/>
+          <TableCell Name="Cell184" Border.Lines="All"/>
+          <TableCell Name="Cell185" Border.Lines="All"/>
+          <TableCell Name="Cell186" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row27" Height="24.57">
+          <TableCell Name="Cell187" Border.Lines="All"/>
+          <TableCell Name="Cell188" Border.Lines="All"/>
+          <TableCell Name="Cell189" Border.Lines="All"/>
+          <TableCell Name="Cell190" Border.Lines="All"/>
+          <TableCell Name="Cell191" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row28" Height="24.57">
+          <TableCell Name="Cell192" Border.Lines="All"/>
+          <TableCell Name="Cell193" Border.Lines="All"/>
+          <TableCell Name="Cell194" Border.Lines="All"/>
+          <TableCell Name="Cell195" Border.Lines="All"/>
+          <TableCell Name="Cell196" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row29" Height="24.57">
+          <TableCell Name="Cell197" Border.Lines="All"/>
+          <TableCell Name="Cell198" Border.Lines="All"/>
+          <TableCell Name="Cell199" Border.Lines="All"/>
+          <TableCell Name="Cell200" Border.Lines="All"/>
+          <TableCell Name="Cell201" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row30" Height="28.35">
+          <TableCell Name="Cell202" Text="ВСЬОГО:" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="3"/>
+          <TableCell Name="Cell203"/>
+          <TableCell Name="Cell204"/>
+          <TableCell Name="Cell205" Border.Lines="All"/>
+          <TableCell Name="Cell206" Border.Lines="All"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text33" Top="8401.05" Width="94.5" Height="18.9" Text="М.П." HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text34" Top="8438.85" Width="756" Height="132.3" Text="Відмітки Банку:&#13;&#10;Дата прийому Зведеної відомості на паперовому носії та на магнітному носії «___» _______________ 20 __ р.&#13;&#10;Посада та прізвище, ім’я. по батькові працівника Банку, який прийняв Зведену відомість&#13;&#10;________________________________________________&#13;&#10;&#13;&#10;________________________________________________&#13;&#10;&#13;&#10;підпис __________________________________________&#13;&#10;" HorzAlign="Justify" Font="Arial, 10pt, style=Bold"/>
+      <TableObject Name="Table7" Left="0.04" Top="8590.05" Width="718.16" Height="113.4">
+        <TableColumn Name="Column39" Width="179.54"/>
+        <TableColumn Name="Column40" Width="179.54"/>
+        <TableColumn Name="Column41" Width="179.54"/>
+        <TableColumn Name="Column42" Width="179.54"/>
+        <TableRow Name="Row31" Height="22.68">
+          <TableCell Name="Cell207" Text="БАНК&#13;&#10;&#13;&#10;публічне акціонерне товариство &#13;&#10;“Державний ощадний банк України”&#13;&#10;&#13;&#10;_______________________/_________________/&#13;&#10;&#13;&#10;" HorzAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="2" RowSpan="5"/>
+          <TableCell Name="Cell208"/>
+          <TableCell Name="Cell209" Text="ОРГАНІЗАЦІЯ&#13;&#10;&#13;&#10;_________________________________________&#13;&#10;&#13;&#10;_________________________________________&#13;&#10;&#13;&#10;______________________/_________________/&#13;&#10;" HorzAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="2" RowSpan="5"/>
+          <TableCell Name="Cell210"/>
+        </TableRow>
+        <TableRow Name="Row32" Height="22.68">
+          <TableCell Name="Cell211"/>
+          <TableCell Name="Cell212"/>
+          <TableCell Name="Cell213"/>
+          <TableCell Name="Cell214"/>
+        </TableRow>
+        <TableRow Name="Row33" Height="22.68">
+          <TableCell Name="Cell215"/>
+          <TableCell Name="Cell216"/>
+          <TableCell Name="Cell217"/>
+          <TableCell Name="Cell218"/>
+        </TableRow>
+        <TableRow Name="Row34" Height="22.68">
+          <TableCell Name="Cell219"/>
+          <TableCell Name="Cell220"/>
+          <TableCell Name="Cell221"/>
+          <TableCell Name="Cell222"/>
+        </TableRow>
+        <TableRow Name="Row35" Height="22.68">
+          <TableCell Name="Cell223"/>
+          <TableCell Name="Cell224"/>
+          <TableCell Name="Cell225"/>
+          <TableCell Name="Cell226"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text37" Top="8883" Width="718.2" Height="37.8" Text="Форма електронної копії&#13;&#10;Зведеної відомості сум для зарахування на рахунки&#13;&#10;" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text38" Top="8920.8" Width="718.2" Height="18.9" Text="Електронна копія Зведеної відомості сум для зарахування на рахунки подається в будь-якому з двох виглядів:&#13;&#10;" HorzAlign="Justify" VertAlign="Center"/>
+      <TableObject Name="Table8" Top="9450" Width="774.9" Height="94.55">
+        <TableColumn Name="Column43" Width="160.65"/>
+        <TableColumn Name="Column44" Width="94.5"/>
+        <TableColumn Name="Column45" Width="132.3"/>
+        <TableColumn Name="Column46" Width="387.45"/>
+        <TableRow Name="Row36" Height="15.75">
+          <TableCell Name="Cell227" Border.Lines="All" Text="найменування поля" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell228" Border.Lines="All" Text="тип даних" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell229" Border.Lines="All" Text="розмірність" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell230" Border.Lines="All" Text="опис" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row37" Height="15.76">
+          <TableCell Name="Cell232" Border.Lines="All" Text="TAB"/>
+          <TableCell Name="Cell233" Border.Lines="All" Text="numeric"/>
+          <TableCell Name="Cell234" Border.Lines="All" Text="5&#13;&#10;&#13;&#10;"/>
+          <TableCell Name="Cell235" Border.Lines="All" Text="№ п\п"/>
+        </TableRow>
+        <TableRow Name="Row38" Height="15.76">
+          <TableCell Name="Cell237" Border.Lines="All" Text="FIO"/>
+          <TableCell Name="Cell238" Border.Lines="All" Text="character"/>
+          <TableCell Name="Cell239" Border.Lines="All" Text="50"/>
+          <TableCell Name="Cell240" Border.Lines="All" Text="прізвище, ім’я. по батькові працівника/студента"/>
+        </TableRow>
+        <TableRow Name="Row39" Height="15.76">
+          <TableCell Name="Cell242" Border.Lines="All" Text="ACCT_CARD"/>
+          <TableCell Name="Cell243" Border.Lines="All" Text="character"/>
+          <TableCell Name="Cell244" Border.Lines="All" Text="14"/>
+          <TableCell Name="Cell245" Border.Lines="All" Text="№ рахунку"/>
+        </TableRow>
+        <TableRow Name="Row40" Height="15.76">
+          <TableCell Name="Cell247" Border.Lines="All" Text="TIN"/>
+          <TableCell Name="Cell248" Border.Lines="All" Text="character"/>
+          <TableCell Name="Cell249" Border.Lines="All" Text="12"/>
+          <TableCell Name="Cell250" Border.Lines="All" Text="ідентіфікаційний номер"/>
+        </TableRow>
+        <TableRow Name="Row41" Height="15.76">
+          <TableCell Name="Cell251" Border.Lines="All" Text="SUMMA"/>
+          <TableCell Name="Cell252" Border.Lines="All" Text="numeric"/>
+          <TableCell Name="Cell253" Border.Lines="All" Text="10,2"/>
+          <TableCell Name="Cell254" Border.Lines="All" Text="Сума"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table9" Left="0.04" Top="9563.4" Width="718.16" Height="113.4">
+        <TableColumn Name="Column47" Width="179.54"/>
+        <TableColumn Name="Column48" Width="179.54"/>
+        <TableColumn Name="Column49" Width="179.54"/>
+        <TableColumn Name="Column50" Width="179.54"/>
+        <TableRow Name="Row42" Height="22.68">
+          <TableCell Name="Cell255" Text="БАНК&#13;&#10;&#13;&#10;публічне акціонерне товариство&#13;&#10; “Державний ощадний банк України”&#13;&#10;&#13;&#10;_______________________/_________________/&#13;&#10;" HorzAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="2" RowSpan="5"/>
+          <TableCell Name="Cell256"/>
+          <TableCell Name="Cell257" Text="ОРГАНІЗАЦІЯ&#13;&#10;&#13;&#10;_________________________________________&#13;&#10;&#13;&#10;_________________________________________&#13;&#10;&#13;&#10;______________________/_________________/&#13;&#10;" HorzAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="2" RowSpan="5"/>
+          <TableCell Name="Cell258"/>
+        </TableRow>
+        <TableRow Name="Row43" Height="22.68">
+          <TableCell Name="Cell259"/>
+          <TableCell Name="Cell260"/>
+          <TableCell Name="Cell261"/>
+          <TableCell Name="Cell262"/>
+        </TableRow>
+        <TableRow Name="Row44" Height="22.68">
+          <TableCell Name="Cell263"/>
+          <TableCell Name="Cell264"/>
+          <TableCell Name="Cell265"/>
+          <TableCell Name="Cell266"/>
+        </TableRow>
+        <TableRow Name="Row45" Height="22.68">
+          <TableCell Name="Cell267"/>
+          <TableCell Name="Cell268"/>
+          <TableCell Name="Cell269"/>
+          <TableCell Name="Cell270"/>
+        </TableRow>
+        <TableRow Name="Row46" Height="22.68">
+          <TableCell Name="Cell271"/>
+          <TableCell Name="Cell272"/>
+          <TableCell Name="Cell273"/>
+          <TableCell Name="Cell274"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table10" Left="-0.86" Top="8958.6" Width="719.06" Height="453.47">
+        <TableColumn Name="Column51" Width="45.82"/>
+        <TableColumn Name="Column52" Width="64.72"/>
+        <TableColumn Name="Column53" Width="282.07"/>
+        <TableColumn Name="Column54" Width="102.52"/>
+        <TableColumn Name="Column55" Width="121.42"/>
+        <TableColumn Name="Column56" Width="102.51"/>
+        <TableRow Name="Row47" Height="17.35">
+          <TableCell Name="Cell275"/>
+          <TableCell Name="Cell276" Fill.Color="Gainsboro" Text="A" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell277" Fill.Color="Gainsboro" Text="B" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell278" Fill.Color="Gainsboro" Text="C" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell279" Fill.Color="Gainsboro" Text="D" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell390" Fill.Color="Gainsboro" Text="E" HorzAlign="Center" VertAlign="Center"/>
+        </TableRow>
+        <TableRow Name="Row48" Height="17.35">
+          <TableCell Name="Cell280" Fill.Color="Gainsboro" Text="1" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell281" Text="Зведена відомість сум для зарахування на рахунки" HorzAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="5"/>
+          <TableCell Name="Cell282"/>
+          <TableCell Name="Cell283"/>
+          <TableCell Name="Cell284"/>
+          <TableCell Name="Cell391"/>
+        </TableRow>
+        <TableRow Name="Row83" Height="17.76">
+          <TableCell Name="Cell477" Fill.Color="Gainsboro" Text="2" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell472" ColSpan="5"/>
+          <TableCell Name="Cell473"/>
+          <TableCell Name="Cell474"/>
+          <TableCell Name="Cell475"/>
+          <TableCell Name="Cell476"/>
+        </TableRow>
+        <TableRow Name="Row49" Height="17.35">
+          <TableCell Name="Cell478" Fill.Color="Gainsboro" Text="3" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell286" Border.Lines="Right, Top, Bottom" Text="Номер списку" ColSpan="2"/>
+          <TableCell Name="Cell287" Border.Lines="Top, Bottom"/>
+          <TableCell Name="Cell288" Border.Lines="Top, Bottom" ColSpan="3"/>
+          <TableCell Name="Cell289" Border.Lines="Top, Bottom"/>
+          <TableCell Name="Cell392" Border.Lines="Top, Bottom"/>
+        </TableRow>
+        <TableRow Name="Row50" Height="17.35">
+          <TableCell Name="Cell479" Fill.Color="Gainsboro" Text="4" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell291" Border.Lines="Right, Top, Bottom" Text="Дата" ColSpan="2"/>
+          <TableCell Name="Cell292" Border.Lines="Top, Bottom"/>
+          <TableCell Name="Cell293" Border.Lines="Top, Bottom" ColSpan="3"/>
+          <TableCell Name="Cell294" Border.Lines="Top, Bottom"/>
+          <TableCell Name="Cell393" Border.Lines="Top, Bottom"/>
+        </TableRow>
+        <TableRow Name="Row51" Height="17.35">
+          <TableCell Name="Cell480" Fill.Color="Gainsboro" Text="5" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell296" Border.Lines="Right, Top, Bottom" Text="Назва організації" ColSpan="2"/>
+          <TableCell Name="Cell297" Border.Lines="Top, Bottom"/>
+          <TableCell Name="Cell298" Border.Lines="Top, Bottom" ColSpan="3"/>
+          <TableCell Name="Cell299" Border.Lines="Top, Bottom"/>
+          <TableCell Name="Cell394" Border.Lines="Top, Bottom"/>
+        </TableRow>
+        <TableRow Name="Row52" Height="17.35">
+          <TableCell Name="Cell481" Fill.Color="Gainsboro" Text="6" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell301" Border.Lines="Right, Top, Bottom" Text="Назва та № установи АТ «Ощадбанк»" ColSpan="2"/>
+          <TableCell Name="Cell302" Border.Lines="Top, Bottom"/>
+          <TableCell Name="Cell303" Border.Lines="Top, Bottom" ColSpan="3"/>
+          <TableCell Name="Cell304" Border.Lines="Top, Bottom"/>
+          <TableCell Name="Cell395" Border.Lines="Top, Bottom"/>
+        </TableRow>
+        <TableRow Name="Row53" Height="17.35">
+          <TableCell Name="Cell482" Fill.Color="Gainsboro" Text="7" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell306" Border.Lines="Right, Top, Bottom" Text="Додаткова інформація" ColSpan="2"/>
+          <TableCell Name="Cell307" Border.Lines="Top, Bottom"/>
+          <TableCell Name="Cell308" Border.Lines="Top, Bottom"/>
+          <TableCell Name="Cell309" Border.Lines="Top, Bottom"/>
+          <TableCell Name="Cell396" Border.Lines="Top, Bottom"/>
+        </TableRow>
+        <TableRow Name="Row54" Height="17.35">
+          <TableCell Name="Cell483" Fill.Color="Gainsboro" Text="8" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell311" ColSpan="5"/>
+          <TableCell Name="Cell312"/>
+          <TableCell Name="Cell313"/>
+          <TableCell Name="Cell314"/>
+          <TableCell Name="Cell397"/>
+        </TableRow>
+        <TableRow Name="Row55" Height="36.25">
+          <TableCell Name="Cell484" Fill.Color="Gainsboro" Text="9" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell316" Border.Lines="Top, Bottom" Text="№ п\п" HorzAlign="Center"/>
+          <TableCell Name="Cell317" Border.Lines="Left, Top, Bottom" Text="прізвище, ім’я. по батькові працівника/студента" HorzAlign="Center"/>
+          <TableCell Name="Cell318" Border.Lines="Left, Top, Bottom" Text=" № рахунку" HorzAlign="Center"/>
+          <TableCell Name="Cell319" Border.Lines="Left, Top, Bottom" Text="ідентіфікаційний номер" HorzAlign="Center"/>
+          <TableCell Name="Cell398" Border.Lines="Left, Top, Bottom" Text=" Сума" HorzAlign="Center"/>
+        </TableRow>
+        <TableRow Name="Row56" Height="17.35">
+          <TableCell Name="Cell485" Fill.Color="Gainsboro" Text="10" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell321" Border.Lines="Top, Bottom"/>
+          <TableCell Name="Cell322" Border.Lines="Left, Top, Bottom"/>
+          <TableCell Name="Cell323" Border.Lines="Left, Top, Bottom"/>
+          <TableCell Name="Cell324" Border.Lines="Left, Top, Bottom"/>
+          <TableCell Name="Cell399" Border.Lines="Left, Top, Bottom" Text="00 000.00"/>
+        </TableRow>
+        <TableRow Name="Row57" Height="17.35">
+          <TableCell Name="Cell486" Fill.Color="Gainsboro" Text="11" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell326" Border.Lines="Top, Bottom"/>
+          <TableCell Name="Cell327" Border.Lines="Left, Top, Bottom"/>
+          <TableCell Name="Cell328" Border.Lines="Left, Top, Bottom"/>
+          <TableCell Name="Cell329" Border.Lines="Left, Top, Bottom"/>
+          <TableCell Name="Cell400" Border.Lines="Left, Top, Bottom" Text="00 000.00"/>
+        </TableRow>
+        <TableRow Name="Row58" Height="17.35">
+          <TableCell Name="Cell487" Fill.Color="Gainsboro" Text="12" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell331" Border.Lines="Top, Bottom" Text="ВСЬОГО:" ColSpan="4"/>
+          <TableCell Name="Cell332" Border.Lines="Top, Bottom"/>
+          <TableCell Name="Cell333" Border.Lines="Top, Bottom"/>
+          <TableCell Name="Cell334" Border.Lines="Top, Bottom"/>
+          <TableCell Name="Cell401" Border.Lines="Left, Top, Bottom" Text="00 000.00"/>
+        </TableRow>
+        <TableRow Name="Row59" Height="17.35">
+          <TableCell Name="Cell488" Fill.Color="Gainsboro" Text="13" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell336"/>
+          <TableCell Name="Cell337"/>
+          <TableCell Name="Cell338"/>
+          <TableCell Name="Cell339"/>
+          <TableCell Name="Cell402"/>
+        </TableRow>
+        <TableRow Name="Row60" Height="17.35">
+          <TableCell Name="Cell489" Fill.Color="Gainsboro" Text="14" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell341"/>
+          <TableCell Name="Cell342" Text="Керівник організації" HorzAlign="Right"/>
+          <TableCell Name="Cell343" Border.Lines="Bottom"/>
+          <TableCell Name="Cell344" Border.Lines="Bottom"/>
+          <TableCell Name="Cell403" Border.Lines="Bottom"/>
+        </TableRow>
+        <TableRow Name="Row61" Height="17.35">
+          <TableCell Name="Cell490" Fill.Color="Gainsboro" Text="15" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell346"/>
+          <TableCell Name="Cell347"/>
+          <TableCell Name="Cell348" Text="(прізвище) (підпис)" HorzAlign="Center" ColSpan="3"/>
+          <TableCell Name="Cell349" HorzAlign="Center"/>
+          <TableCell Name="Cell404" HorzAlign="Center"/>
+        </TableRow>
+        <TableRow Name="Row62" Height="17.35">
+          <TableCell Name="Cell491" Fill.Color="Gainsboro" Text="16" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell351"/>
+          <TableCell Name="Cell352"/>
+          <TableCell Name="Cell353"/>
+          <TableCell Name="Cell354"/>
+          <TableCell Name="Cell405"/>
+        </TableRow>
+        <TableRow Name="Row63" Height="17.35">
+          <TableCell Name="Cell492" Fill.Color="Gainsboro" Text="17" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell356"/>
+          <TableCell Name="Cell357" Text="Головний бухгалтер" HorzAlign="Right"/>
+          <TableCell Name="Cell358" Border.Lines="Bottom"/>
+          <TableCell Name="Cell359" Border.Lines="Bottom"/>
+          <TableCell Name="Cell406" Border.Lines="Bottom"/>
+        </TableRow>
+        <TableRow Name="Row64" Height="17.35">
+          <TableCell Name="Cell493" Fill.Color="Gainsboro" Text="18" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell361" Text="М.П." HorzAlign="Right"/>
+          <TableCell Name="Cell362"/>
+          <TableCell Name="Cell363" Text="(прізвище) (підпис)&#13;&#10;&#13;&#10;" HorzAlign="Center" ColSpan="3"/>
+          <TableCell Name="Cell364"/>
+          <TableCell Name="Cell407"/>
+        </TableRow>
+        <TableRow Name="Row65" Height="17.35">
+          <TableCell Name="Cell494" Fill.Color="Gainsboro" Text="19" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell366"/>
+          <TableCell Name="Cell367"/>
+          <TableCell Name="Cell368"/>
+          <TableCell Name="Cell369"/>
+          <TableCell Name="Cell408"/>
+        </TableRow>
+        <TableRow Name="Row66" Height="17.35">
+          <TableCell Name="Cell495" Fill.Color="Gainsboro" Text="20" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell371" Text="Відмітки Банку:" ColSpan="2"/>
+          <TableCell Name="Cell372"/>
+          <TableCell Name="Cell373"/>
+          <TableCell Name="Cell374"/>
+          <TableCell Name="Cell409"/>
+        </TableRow>
+        <TableRow Name="Row67" Height="17.35">
+          <TableCell Name="Cell496" Fill.Color="Gainsboro" Text="21" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell376" Text="Дата прийому Зведеної відомості на паперовому носії та на магнітному носії ____________________ р." ColSpan="5"/>
+          <TableCell Name="Cell377"/>
+          <TableCell Name="Cell378"/>
+          <TableCell Name="Cell379"/>
+          <TableCell Name="Cell410"/>
+        </TableRow>
+        <TableRow Name="Row68" Height="17.35">
+          <TableCell Name="Cell497" Fill.Color="Gainsboro" Text="22" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell381" Text="Посада та прізвище, ім’я, по батькові працівника Банку, який прийняв Зведену відомість" ColSpan="5"/>
+          <TableCell Name="Cell382"/>
+          <TableCell Name="Cell383"/>
+          <TableCell Name="Cell384"/>
+          <TableCell Name="Cell411"/>
+        </TableRow>
+        <TableRow Name="Row69" Height="17.35">
+          <TableCell Name="Cell498" Fill.Color="Gainsboro" Text="23" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell386" Border.Lines="Bottom" ColSpan="5"/>
+          <TableCell Name="Cell387"/>
+          <TableCell Name="Cell388"/>
+          <TableCell Name="Cell389"/>
+          <TableCell Name="Cell412"/>
+        </TableRow>
+        <TableRow Name="Row70" Height="17.76">
+          <TableCell Name="Cell413" Fill.Color="Gainsboro" Text="24" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell414" Text="підпис" HorzAlign="Center" ColSpan="5"/>
+          <TableCell Name="Cell415"/>
+          <TableCell Name="Cell416"/>
+          <TableCell Name="Cell417"/>
+          <TableCell Name="Cell418"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text40" Left="595.35" Top="9705.15" Width="122.85" Height="18.9" Text="Додаток № 4" HorzAlign="Right" Font="Arial, 12pt, style=Bold"/>
+      <TextObject Name="Text42" Top="9875.25" Width="718.2" Height="18.9" Text="ФОРМА" HorzAlign="Center" Font="Arial, 12pt, style=Bold"/>
+      <TextObject Name="Text43" Top="9903.6" Width="718.2" Height="37.8" Text="Лист від Організації до Банку з переліком працівників, яким необхідно переоформити платіжні картки на новий строк їх дії та направити на адресу місцезнаходження Організації " HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TableObject Name="Table11" Left="0.19" Top="9960.3" Width="709.51" Height="85.05" Border.Lines="All">
+        <TableColumn Name="Column57" Width="217.27"/>
+        <TableColumn Name="Column58" Width="57.7"/>
+        <TableColumn Name="Column59" Width="217.27"/>
+        <TableColumn Name="Column60" Width="217.27"/>
+        <TableRow Name="Row71" Height="17.01">
+          <TableCell Name="Cell419" Border.Lines="Right" Text="Реквізити Організації" HorzAlign="Center" VertAlign="Center" ColSpan="2" RowSpan="5"/>
+          <TableCell Name="Cell420"/>
+          <TableCell Name="Cell421" Text="_____________________________________________&#13;&#10;(зазначається назва установи Банку)&#13;&#10;&#13;&#10;_____________________________________________&#13;&#10;(ПІБ уповноваженої особи)&#13;&#10;" HorzAlign="Right" VertAlign="Center" ColSpan="2" RowSpan="5"/>
+          <TableCell Name="Cell422"/>
+        </TableRow>
+        <TableRow Name="Row72" Height="17.01">
+          <TableCell Name="Cell424"/>
+          <TableCell Name="Cell425"/>
+          <TableCell Name="Cell426"/>
+          <TableCell Name="Cell427"/>
+        </TableRow>
+        <TableRow Name="Row73" Height="17.01">
+          <TableCell Name="Cell429"/>
+          <TableCell Name="Cell430"/>
+          <TableCell Name="Cell431"/>
+          <TableCell Name="Cell432"/>
+        </TableRow>
+        <TableRow Name="Row74" Height="17.01">
+          <TableCell Name="Cell434"/>
+          <TableCell Name="Cell435"/>
+          <TableCell Name="Cell436"/>
+          <TableCell Name="Cell437"/>
+        </TableRow>
+        <TableRow Name="Row75" Height="17.01">
+          <TableCell Name="Cell439"/>
+          <TableCell Name="Cell440"/>
+          <TableCell Name="Cell441"/>
+          <TableCell Name="Cell442"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table12" Left="0.16" Top="10054.8" Width="708.59" Height="124.74" Border.Lines="All">
+        <TableColumn Name="Column61" Width="217.31"/>
+        <TableColumn Name="Column62" Width="56.66"/>
+        <TableColumn Name="Column63" Width="217.31"/>
+        <TableColumn Name="Column64" Width="217.31"/>
+        <TableRow Name="Row76" Height="17.01">
+          <TableCell Name="Cell443" Border.Lines="All" Text="Назва Організації" VertAlign="Center" ColSpan="2"/>
+          <TableCell Name="Cell444" Border.Lines="All" VertAlign="Center"/>
+          <TableCell Name="Cell445" Border.Lines="All" ColSpan="2"/>
+          <TableCell Name="Cell446" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row81">
+          <TableCell Name="Cell463" Text="Адреса місцезнаходження Організації" VertAlign="Center" ColSpan="2"/>
+          <TableCell Name="Cell464" VertAlign="Center"/>
+          <TableCell Name="Cell465" Border.Lines="Left" ColSpan="2"/>
+          <TableCell Name="Cell466"/>
+        </TableRow>
+        <TableRow Name="Row82">
+          <TableCell Name="Cell467" Border.Lines="Top" Text="Реквізити договору (№ та дата )" VertAlign="Center" ColSpan="2"/>
+          <TableCell Name="Cell468" Border.Lines="Top" VertAlign="Center"/>
+          <TableCell Name="Cell469" Border.Lines="Left, Top" ColSpan="2"/>
+          <TableCell Name="Cell470" Border.Lines="Top"/>
+        </TableRow>
+        <TableRow Name="Row77" Height="17.01">
+          <TableCell Name="Cell447" Border.Lines="All" Text="Дата" VertAlign="Center" ColSpan="2"/>
+          <TableCell Name="Cell448" Border.Lines="All" VertAlign="Center"/>
+          <TableCell Name="Cell449" Border.Lines="All" ColSpan="2"/>
+          <TableCell Name="Cell450" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row79" Height="17.01">
+          <TableCell Name="Cell455" Border.Lines="All" Text="Назва та № установи АТ «Ощадбанк»" VertAlign="Center" ColSpan="2"/>
+          <TableCell Name="Cell456" Border.Lines="All" VertAlign="Center"/>
+          <TableCell Name="Cell457" Border.Lines="All" ColSpan="2"/>
+          <TableCell Name="Cell458" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row80" Height="17.01">
+          <TableCell Name="Cell459" Border.Lines="All" Text="Додаткова інформація" VertAlign="Center" ColSpan="2"/>
+          <TableCell Name="Cell460" Border.Lines="All" VertAlign="Center"/>
+          <TableCell Name="Cell461" Border.Lines="All" ColSpan="2"/>
+          <TableCell Name="Cell462" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row85">
+          <TableCell Name="Cell503" Border.Lines="Right" ColSpan="2"/>
+          <TableCell Name="Cell504"/>
+          <TableCell Name="Cell505" ColSpan="2"/>
+          <TableCell Name="Cell506"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text44" Top="10187.1" Width="718.2" Height="207.9" Text="	Відповідно до умов Договору між банком та Організацією про надання послуг по зарахуванню та виплаті заробітної плати/стипендії та інших виплат через поточні рахунки фізичних осіб (працівників організації/студентів) з використанням платіжних карток просимо:&#13;&#10;1.	Переоформити платіжні картки на новий строк їх дії працівникам Організації згідно з переліком, наведеним в Додатку 1 до цього листа. &#13;&#10;2.	Враховуючи заявлене працівниками Організації бажання отримати переоформлені на новий строк платіжні картки за адресою місцезнаходження Організації, направити (засобами поштового/спецзв’язку) переоформлені платіжні картки на адресу місцезнаходження Організації: _________________________ (вказується адреса Організації для направлення платіжних карток) в окремих іменних конвертах, на яких зазначається прізвище та ініціали відповідного працівника Організації. У разі наявності працівників ОРГАНІЗАЦІЇ з ідентичними прізвищем та ініціалами, додатково просимо зазначити на конверті реєстраційний номер облікової картки платника податків такого працівника Організації.  &#13;&#10;" HorzAlign="Justify" VertAlign="Center"/>
+      <TextObject Name="Text46" Left="28.35" Top="10498.95" Width="94.5" Height="18.9" Text="М.П." HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text47" Left="28.35" Top="10546.2" Width="718.2" Height="47.25" Text="Відмітки Банку:&#13;&#10;Дата прийому Листа «___» _______________ 20 __ р &#13;&#10;" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text48" Left="359.1" Top="7777.35" Width="359.1" Height="122.85" Text="до Договору&#13;&#10;між БАНКОМ  та ОРГАНІЗАЦІЄЮ про надання&#13;&#10;послуг по зарахуванню та виплаті &#13;&#10;заробітної плати та інших виплат &#13;&#10;через поточні рахунки фізичних осіб &#13;&#10;(працівників Організації /студентів)&#13;&#10;з використанням платіжних карток&#13;&#10;від “____”  20 ___ р. № _________&#13;&#10;" HorzAlign="Right" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text49" Left="387.45" Top="8750.7" Width="330.75" Height="122.85" Text="до Договору&#13;&#10;між БАНКОМ  та ОРГАНІЗАЦІЄЮ про надання&#13;&#10;послуг по зарахуванню та виплаті &#13;&#10;заробітної плати та інших виплат &#13;&#10;через поточні рахунки фізичних осіб &#13;&#10;(працівників Організації/ студентів)&#13;&#10;з використанням платіжних карток&#13;&#10;від “____”  20 ___ р. № _________&#13;&#10;" HorzAlign="Right" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text50" Left="387.45" Top="9733.5" Width="330.75" Height="122.85" Text="до Договору&#13;&#10;між БАНКОМ  та ОРГАНІЗАЦІЄЮ про надання&#13;&#10;послуг по зарахуванню та виплаті &#13;&#10;заробітної плати та інших виплат &#13;&#10;через поточні рахунки фізичних осіб &#13;&#10;(працівників Організації/ студентів)&#13;&#10;з використанням платіжних карток&#13;&#10;від [rep.START_DATE_TXT] р. № [rep.DEAL_ID]&#13;&#10;" HorzAlign="Right" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text3" Top="132.3" Width="718.2" Height="122.85" Text="	Публічне акціонерне товариство “Державний ощадний банк України” (далі - БАНК), в особі [rep.BPK_POSADAR] [rep.BPK_BOSS_FIOR], який діє на підставі [rep.BPK_DOVER], з однієї сторони, і [rep.NMK] (далі - ОРГАНІЗАЦІЯ), в особі [rep.FIO], який діє на підставі ___________________________________, з другої сторони, уклали цей Договір № [rep.DEAL_ID] між БАНКОМ та ОРГАНІЗАЦІЄЮ про надання  послуг  по зарахуванню та виплаті  заробітної плати та інших  виплат  через поточні рахунки фізичних осіб (працівників ОРГАНІЗАЦІЇ/студентів) з використанням платіжних карток  (далі – Договір) між БАНКОМ та ОРГАНІЗАЦІЄЮ про наступне:" HorzAlign="Justify"/>
+      <TextObject Name="Text2" Top="94.5" Width="510.3" Height="18.9" Text="[rep.BRANCH_CITY]                                                                                                     " Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text1" Width="718.2" Height="75.6" Text="ДОГОВІР № [rep.DEAL_ID] &#13;&#10;МІЖ БАНКОМ ТА ОРГАНІЗАЦІЄЮ &#13;&#10;ПРО НАДАННЯ ПОСЛУГ ПО ЗАРАХУВАННЮ ТА ВИПЛАТІ ЗАРОБІТНОЇ &#13;&#10;ПЛАТИ/СТИПЕНДІЇ ТА ІНШИХ ВИПЛАТ ЧЕРЕЗ ПОТОЧНІ РАХУНКИ ФІЗИЧНИХ ОСІБ (ПРАЦІВНИКІВ ОРГАНІЗАЦІЇ/СТУДЕНТІВ) З ВИКОРИСТАННЯМ ПЛАТІЖНИХ КАРТОК&#13;&#10;" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text35" Left="585.9" Top="8722.35" Width="132.3" Height="18.9" Text="Додаток № 3 " HorzAlign="Right" Font="Arial, 12pt, style=Bold"/>
+      <TextObject Name="Text30" Top="3912.3" Width="718.2" Height="113.4" Text="3.7. ОРГАНІЗАЦІЯ відповідає за правильність та повноту (належність) наданих даних при проведенні операцій формування платіжних документів за допомогою системи дистанційного обслуговування “Клієнт-Банк” / “Інтернет Клієнт-Банк” / “Корпоративний Клієнт-Банк”. &#13;&#10;3.8. Шляхом направлення до Банку Листа та Відомості ОРГАНІЗАЦІЯ підтверджує волевиявлення відповідних працівників ОРГАНІЗАЦІЇ на отримання платіжної картки з доставкою на адресу ОРГАНІЗАЦІЇ, а також несе відповідальність за передачу та фізичне отримання працівниками ОРГАНІЗАЦІЇ конвертів з платіжними картками як кореспонденції, що надійшла від Банку та адресована відповідним працівникам ОРГАНІЗАЦІЇ.&#13;&#10;" HorzAlign="Justify"/>
+      <TextObject Name="Text36" Top="3855.6" Width="718.2" Height="56.7" Text="       у разі використання системи дистанційного обслуговування“Клієнт-Банк” / “Інтернет Клієнт-Банк” / “Корпоративний Клієнт-Банк” для обслуговування Організації цей розділ Договору доповнюється пунктом наступного змісту: " HorzAlign="Justify" VertAlign="Center" Font="Arial, 10pt, style=Italic"/>
+      <TextObject Name="Text41" Left="510.3" Top="94.5" Width="207.9" Height="18.9" Text="[rep.START_DATE_TXT] р." HorzAlign="Right" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text51" Top="292.95" Width="718.2" Height="66.15" Text="у разі відкриття ОРГАНІЗАЦІЄЮ рахунків на користь працівників ОРГАНІЗАЦІЇ згідно з п. 6.7 Інструкції про порядок відкриття, використання і закриття рахунків у національній та іноземних валютах, затвердженої постановою правління Національного банку України № 492 від 12.11.2003, використовується речення наступного змісту:" HorzAlign="Justify" VertAlign="Center" Font="Arial, 10pt, style=Italic"/>
+      <TextObject Name="Text52" Top="472.5" Width="718.2" Height="37.8" Text="у разі якщо поточні рахунки відкриваються працівниками Організації самостійно, використовується речення наступного змісту:" HorzAlign="Justify" VertAlign="Center" Font="Arial, 10pt, style=Italic"/>
+      <TextObject Name="Text53" Top="510.3" Width="718.2" Height="66.15" Text="«1.1.	ОРГАНІЗАЦІЯ замовляє та оплачує, а БАНК бере на себе зобов’язання здійснювати зарахування на поточні рахунки, операції за якими здійснюються з використанням платіжних карток, відкриті в БАНКУ працівникам ОРГАНІЗАЦІЇ/студентам, на умовах та в строки, визначені цим Договором, заробітної плати/стипендії та інших виплат працівникам ОРГАНІЗАЦІЇ/студентам.»" HorzAlign="Justify"/>
+      <TextObject Name="Text54" Top="576.45" Width="718.2" Height="37.8" Text="у разі обслуговування бюджетних Організацій пункт 1.1. Договору доповнюється формулюванням наступного змісту: " HorzAlign="Justify" VertAlign="Center" Font="Arial, 10pt, style=Italic"/>
+      <TextObject Name="Text55" Top="614.25" Width="718.2" Height="37.8" Text="«за тарифами, встановленими відповідно до умов конкурсного відбору, проведеного Міністерством фінансів України по визначенню уповноважених банків з виплати заробітної плати працівникам бюджетних установ».&#13;&#10;" HorzAlign="Justify"/>
+      <TextObject Name="Text56" Top="652.05" Width="718.2" Height="56.7" Text="у разі використання системи дистанційного обслуговування Банку “Клієнт-банк” / “Інтернет Клієнт-Банк” / “Корпоративний Клієнт-Банк” (вибирається в залежності від обраної модифікації) для обслуговування Організації Розділ 1 Договору доповнюється пунктом 1.2 наступного змісту: " HorzAlign="Justify" VertAlign="Center" Font="Arial, 10pt, style=Italic"/>
+      <TextObject Name="Text57" Top="708.75" Width="718.2" Height="66.15" Text="1.2.	Сторони визнають, що документи, створені в електронному вигляді системою дистанційного обслуговування  “Клієнт-Банк”/ “Інтернет Клієнт-Банк”/ “Корпоративний Клієнт-Банк” і підписані електронним цифровим підписом, мають однакову юридичну силу з іншими платіжними документами, оформленими на паперовому носії, і є підставою для виконання розрахункових операцій." HorzAlign="Justify"/>
+      <TextObject Name="Text58" Top="812.7" Width="718.2" Height="28.35" Text="2.1. ОРГАНІЗАЦІЯ зобов’язується:" HorzAlign="Justify" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text59" Top="841.05" Width="718.2" Height="66.15" Text="у разі відкриття ОРГАНІЗАЦІЄЮ рахунків на користь працівників ОРГАНІЗАЦІЇ згідно з п. 6.7 Інструкції про порядок відкриття, використання і закриття рахунків у національній та іноземних валютах, затвердженої постановою правління Національного банку України № 492 від 12.11.2003, використовується речення наступного змісту:" HorzAlign="Justify" VertAlign="Center" Font="Arial, 10pt, style=Italic"/>
+      <TextObject Name="Text61" Top="907.2" Width="718.2" Height="94.5" Text="2.1.1. Надати Банку всі документи та інформацію, необхідні для відкриття рахунків на користь працівників ОРГАНІЗАЦІЇ згідно з п. 6.7 Інструкції про порядок відкриття, використання і закриття рахунків у національній та іноземних валютах, затвердженої постановою правління Національного банку України № 492 від 12.11.2003, та створити необхідні умови для уповноважених працівників БАНКУ, які будуть надавати працівникам ОРГАНІЗАЦІЇ /студентам  консультації та оформлювати документи для відкриття поточних рахунків та випуску платіжних карток. " HorzAlign="Justify"/>
+      <TextObject Name="Text62" Top="1001.7" Width="718.2" Height="37.8" Text="у разі якщо поточні рахунки відкриваються працівниками Організації самостійно, використовується речення наступного змісту:" HorzAlign="Justify" VertAlign="Center" Font="Arial, 10pt, style=Italic"/>
+      <TextObject Name="Text63" Top="1039.5" Width="718.2" Height="179.55" Text="2.1.1. Створити необхідні умови для уповноважених працівників БАНКУ, які будуть надавати працівникам ОРГАНІЗАЦІЇ /студентам  консультації та оформлювати документи для відкриття поточних рахунків та випуску платіжних карток.&#13;&#10;&#13;&#10; 2.1.2. Надати БАНКУ в строк до ___.___.20 ___ р. “Список № ___________ працівників/студентів __________________, на поточні рахунки яких будуть надходити кошти для зарахування” (далі - Список), підписаний керівником і головним бухгалтером та завірений печаткою ОРГАНІЗАЦІЇ, у двох примірниках за формою, наведеною в Додатку № 1 до цього Договору.&#13;&#10;2.1.3. Перерахувати на рахунок, вказаний у п.2.1.5 цього Договору, плату за оформлення платіжних карток, розраховану відповідно до кількості працівників ОРГАНІЗАЦІЇ/студентів, включених до Списку. Перерахування здійснюється одночасно з наданням БАНКУ Списку." HorzAlign="Justify"/>
+      <TextObject Name="Text64" Top="1219.05" Width="718.2" Height="37.8" Text="(пункт 2.1.3. включається до Договору у випадку, коли плата за оформлення платіжних карток сплачується ОРГАНІЗАЦІЄЮ)." HorzAlign="Justify" VertAlign="Center" Font="Arial, 10pt, style=Italic"/>
+      <TextObject Name="Text65" Top="1256.85" Width="718.2" Height="113.4" Text="2.1.4. Надавати БАНКУ не пізніше ніж за _______ робочих днів до встановленого терміну виплати заробітної плати/стипендії Зведену відомість сум для зарахування на рахунки (далі - Відомість) (Додаток № 2 до цього Договору) електронними засобами (системи дистанційного обслуговування “Клієнт-Банк” / “Інтернет Клієнт-Банк” / “Корпоративний Клієнт-Банк”) або через уповноважену особу на паперовому носії у двох примірниках, підписаних керівником та головним бухгалтером і завірених печаткою ОРГАНІЗАЦІЇ. Відомість надається одночасно з платіжним дорученням на перерахування коштів, вказаних у Відомості сум для зарахування на рахунки. " HorzAlign="Justify"/>
+      <TextObject Name="Text66" Top="1370.25" Width="718.2" Height="56.7" Text="у разі використання системи дистанційного обслуговування Банку“Клієнт-Банк”/“Інтернет Клієнт-Банк” / “Корпоративний Клієнт-Банк” для обслуговування Організації пункт 2.1.4 Договору  доповнюється главами наступного змісту:" HorzAlign="Justify" VertAlign="Center" Font="Arial, 10pt, style=Italic"/>
+      <TextObject Name="Text67" Top="1426.95" Width="718.2" Height="529.2" Text="При проведенні операцій формування електронних платіжних документів за допомогою системи дистанційного обслуговування“Клієнт-Банк” / “ІнтернетКлієнт-Банк” / “КорпоративнийКлієнт-Банк”:&#13;&#10;-	сформувати в системі дистанційного обслуговування платіжне доручення на загальну суму коштів відповідно до Списку для перерахування коштів з поточного/транзитного рахунку на окремий аналітичний рахунок балансового рахунку №2909, відкритий для зарплатного проекту. В реквізитах електронних платіжних документів зазначаються відповідні значення рахунків: Дт- (рахунок ОРГАНІЗАЦІЇ/транзитний рахунок)  Кт – 2909;&#13;&#10;-	сформувати список на зарахування суми заробітної плати/стипендії на рахунки працівників/студентів у форматі, погодженому з установою БАНКУ *.dbf, *.xls або *.txt (структура файлу включає такі обов’язкові поля: номер рахунку 2625, сума, ПІБ, реєстраційний номер облікової картки платника податків (ідентифікаційний номер) за формою, наведеною в Додатку № 3 до цього Договору;  &#13;&#10;-	виконати конвертацію підготовленого файлу списку на зарахування суми заробітної плати/стипендії  на рахунки працівників/студентів у файл спеціального формату ($B);  &#13;&#10;-	імпортувати файл спеціального формату ($B) в системі дистанційного обслуговування за допомогою функції „Імпорт документів”, після чого сформувати електронні платіжні документи по працівниках ОРГАНІЗАЦІЇ/студентах за списком, для їх подальшої відправки до установи БАНКУ. В реквізитах електронних платіжних документів автоматизовано проставляються відповідні значення аналітичних рахунків за балансовими рахунками №2909 та № 2625 для проведення операції на зарахування коштів в установі БАНКУ;&#13;&#10;-	відправити до установи БАНКУ підготовлені електронні платіжні документи як звичайні платіжні документи за допомогою системи дистанційного обслуговування. На сформовані електронні платіжні документи накладаються цифрові підписи бухгалтера, що формував платежі, та керівника ОРГАНІЗАЦІЇ, надалі пакет електронних платіжних документів шифрується для відправки до БАНКУ.&#13;&#10;&#13;&#10;2.1.5. Перераховувати в БАНК такі грошові кошти:&#13;&#10;-	загальну суму заробітної плати, авансів та інших виплат, що призначаються для зарахування на рахунки  працівників ОРГАНІЗАЦІЇ/студентів (далі - заробітна плата/стипендія) на рахунок № [rep.NLS_2909];&#13;&#10;-	комісійну винагороду за безготівкове зарахування коштів у розмірі [rep.MAX_TARIF] ([rep.MAX_TARIF_TXT]) відсотків від загальної суми, що перераховується на рахунок № [rep.NLS_2909]. &#13;&#10;Оплату проводити одночасно з перерахуванням сум заробітної плати/стипендії окремим платіжним дорученням або одним платіжним дорученням, виділяючи її окремим рядком.&#13;&#10;-	плату за оформлення платіжних карток на рахунок № [rep.NLS_2909].&#13;&#10;2.1.6. При прийманні на роботу/ на навчання нових працівників/студентів, які отримуватимуть заробітну плату/стипендію шляхом її зарахування на рахунки операції, за якими здійснюються з використанням платіжних карток, надавати БАНКУ додатковий список, згідно з вимогами п. 2.1.2 цього Договору" HorzAlign="Justify"/>
+      <TextObject Name="Text68" Top="1956.15" Width="718.2" Height="37.8" Text="(у випадку, коли плата за оформлення платіжних карток сплачується ОРГАНІЗАЦІЄЮ, даний пункт доповнюється формулюванням такого змісту: " HorzAlign="Justify" VertAlign="Center" Font="Arial, 10pt, style=Italic"/>
+      <TextObject Name="Text69" Top="2608.2" Width="718.2" Height="37.8" Text="(у випадку, коли плата за оформлення платіжних карток сплачується ОРГАНІЗАЦІЄЮ пункт доповнюється абзацем наступного змісту)." HorzAlign="Justify" VertAlign="Center" Font="Arial, 10pt, style=Italic"/>
+      <TextObject Name="Text70" Top="2910.6" Width="718.2" Height="349.65" Text="2.2.2. Виготовити платіжні картки за цим Договором протягом 14  робочих днів з моменту виконання  ОРГАНІЗАЦІЄЮ  умов,  вказаних  в п.п. 2.1.2, 2.1.3, 2.1.8. цього Договору.&#13;&#10;2.2.2.1. У разі отримання від ОРГАНІЗАЦІЇ Листа, передбаченого абз. 1) п.п. 2.1.8.1 п. 2.1.8 цього Договору забезпечити:&#13;&#10;1) переоформлення зазначеним у Листі працівникам  платіжних карток на новий строк їх дії, за умови наявності у них відкритих у Банку поточних рахунків, відсутності простроченої заборгованості за кредитом (кредитною лінією), встановленими за поточними рахунками працівників Організації та/або інших підстав, які визначених Банком підстав, які унеможливлюють перевипуск картки. При перевипуску платіжних карток ПІН-код не змінюється, тому друкування та відправка ПІН – конверту разом з платіжною карткою не здійснюється;&#13;&#10;2) пакування кожної платіжної картки в окремий конверт, на якому зазначається прізвище та ініціали працівника Організації. У разі наявності працівників ОРГАНІЗАЦІЇ з ідентичними прізвищем та ініціалами, додатково зазначається реєстраційний номер облікової картки платника податків такого працівника ОРГАНІЗАЦІЇ; &#13;&#10;3) відправлення конвертів з платіжними картками, перевипущеними на новий строк дії, на адресу місцезнаходження ОРГАНІЗАЦІЇ (відокремленого підрозділу ОРГАНІЗАЦІЇ), як кореспонденції, що надійшла від Банку та адресована відповідним працівниками ОРГАНІЗАЦІЇ, перелік яких наведено ОРГАНІЗАЦІЄЮ у Листі, а також Відомості, передбаченої абз. 3) п.п. 2.1.8.1 п. 2.1.8 цього Договору, із зазначенням .  &#13;&#10;&#13;&#10;2.2.3.Здійснювати зарахування грошових коштів, вказаних ОРГАНІЗАЦІЄЮ у Відомості (Додаток № 2), на рахунки працівників/студентів не пізніше наступного операційного дня після надходження (зарахування) грошових коштів від ОРГАНІЗАЦІЇ на рахунок, зазначений у п.2.1.5 цього Договору, та надання Відомості згідно з п.2.1.4 цього Договору. " HorzAlign="Justify"/>
+      <TextObject Name="Text71" Top="2646" Width="718.2" Height="113.4" Text="Плата за оформлення основної платіжної картки після закінчення строку дії попередньої розраховується відповідно до кількості працівників ОРГАНІЗАЦІЇ /студентів, включених до Списку/Листа, та перераховується ОРГАНІЗАЦІЄЮ на рахунок, зазначений в пункті 2.1.5 цього Договору, одночасно з наданням списків/Листа до БАНКУ. &#13;&#10;&#13;&#10;2.1.9. Надавати додаткову інформацію за запитом Банку, щодо своїх працівників/студентів з метою їх ідентифікації." HorzAlign="Justify"/>
+      <TextObject Name="Text72" Top="2759.4" Width="718.2" Height="28.35" Text="2.2.БАНК зобов’язується:" HorzAlign="Justify" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text73" Top="2787.75" Width="718.2" Height="85.05" Text="2.2.1. Відкрити працівникам ОРГАНІЗАЦІЇ /студентам поточні рахунки, випустити та видати платіжні картки з ПІН-кодами після отримання від  ОРГАНІЗАЦІЇ:&#13;&#10;-	документів та файлів з особистими даними працівників ОРГАНІЗАЦІЇ /студентів, що  вказані в п.2.1.2 цього Договору;&#13;&#10;-	сум зарахувань, вказаних у п.2.1.3 цього Договору." HorzAlign="Justify"/>
+      <TextObject Name="Text74" Top="2872.8" Width="718.2" Height="37.8" Text="(підпункт включається до Договору у випадку, коли плату за оформлення платіжних карток сплачує ОРГАНІЗАЦІЯ)." HorzAlign="Justify" VertAlign="Center" Font="Arial, 10pt, style=Italic"/>
+      <TextObject Name="Text75" Top="3260.25" Width="718.2" Height="56.7" Text="у разі використання системи дистанційного обслуговування “Клієнт-Банк” / “Інтернет Клієнт-Банк” / “Корпоративний Клієнт-Банк”  для обслуговування Організації  пункт 2.2.3 викладається в наступній редакції: " HorzAlign="Justify" VertAlign="Center" Font="Arial, 10pt, style=Italic"/>
+      <TextObject Name="Text76" Top="3316.95" Width="718.2" Height="236.25" Text="2.2.3.Здійснювати зарахування грошових коштів, перерахованих ОРГАНІЗАЦІЄЮ через систему дистанційного обслуговування “Клієнт-Банк” / “Інтернет Клієнт-Банк” / “Корпоративний Клієнт-Банк”, на рахунки операції за якими здійснюються з використанням платіжних карток працівників/студентів не пізніше  наступного операційного дня після їх надходження (зарахування) від ОРГАНІЗАЦІЇ на відповідний рахунок в БАНКУ. Зарахування коштів підтверджується квитанціями про обробку платіжного документу на кожного працівника/ студента.  &#13;&#10;&#13;&#10;2.2.4. Здійснювати обслуговування платіжних карток працівників ОРГАНІЗАЦІЇ /студентів в мережі установ БАНКУ згідно Тарифів БАНКУ.&#13;&#10;&#13;&#10;2.2.5. Не пізніше як за один місяць сповіщати ОРГАНІЗАЦІЮ про введення в дію нових тарифів Банку.&#13;&#10;&#13;&#10;2.2.6. Здійснювати моніторинг строку дії платіжних карток, випущених працівникам Організацій /студентам та щомісячно до ____ числа, за необхідності, надавати список працівників ОРГАНІЗАЦІЇ /студентів, яким необхідно випустити платіжні картки з новим строком дії." HorzAlign="Justify"/>
+      <TableObject Name="Table13" Left="198.45" Top="10404.45" Width="396.9" Height="75.6">
+        <TableColumn Name="Column65" Width="81.27"/>
+        <TableColumn Name="Column66" Width="71.82"/>
+        <TableColumn Name="Column67" Width="81.27"/>
+        <TableColumn Name="Column68" Width="81.27"/>
+        <TableColumn Name="Column69" Width="81.27"/>
+        <TableRow Name="Row86">
+          <TableCell Name="Cell507" Text="Керівник організації " HorzAlign="Right" VertAlign="Bottom" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell508"/>
+          <TableCell Name="Cell509" Border.Lines="Bottom" ColSpan="3"/>
+          <TableCell Name="Cell510"/>
+          <TableCell Name="Cell511"/>
+        </TableRow>
+        <TableRow Name="Row87">
+          <TableCell Name="Cell512" ColSpan="2"/>
+          <TableCell Name="Cell513"/>
+          <TableCell Name="Cell514" Text=" (прізвище, ім’я, по батькові)" HorzAlign="Center" Font="Arial, 7pt" ColSpan="3"/>
+          <TableCell Name="Cell515"/>
+          <TableCell Name="Cell516"/>
+        </TableRow>
+        <TableRow Name="Row88">
+          <TableCell Name="Cell517" ColSpan="2" RowSpan="2"/>
+          <TableCell Name="Cell518"/>
+          <TableCell Name="Cell519" Border.Lines="Bottom" ColSpan="3"/>
+          <TableCell Name="Cell520"/>
+          <TableCell Name="Cell521"/>
+        </TableRow>
+        <TableRow Name="Row89">
+          <TableCell Name="Cell522"/>
+          <TableCell Name="Cell523"/>
+          <TableCell Name="Cell524" Text=" (підпис)" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" ColSpan="3"/>
+          <TableCell Name="Cell525"/>
+          <TableCell Name="Cell526"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table14" Top="6993" Width="718.3" Height="453.6">
+        <TableColumn Name="Column70" Width="359.15"/>
+        <TableColumn Name="Column71" Width="359.15"/>
+        <TableRow Name="Row90" Height="24.57">
+          <TableCell Name="Cell527" Border.Lines="All" Text="Організація:" VertAlign="Bottom" Font="Arial, 9pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell528" Border.Lines="Left, Right"/>
+        </TableRow>
+        <TableRow Name="Row91" Height="15.12">
+          <TableCell Name="Cell532" Border.Lines="Left, Right" Text="(назва організації)" HorzAlign="Center" Font="Arial, 7pt" ColSpan="2"/>
+          <TableCell Name="Cell533" Border.Lines="Left, Right"/>
+        </TableRow>
+        <TableRow Name="Row92" Height="24.57">
+          <TableCell Name="Cell537" Border.Lines="Left, Right, Bottom" Text="Керівник" VertAlign="Bottom" Font="Arial, 9pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell538" Border.Lines="Left, Right"/>
+        </TableRow>
+        <TableRow Name="Row93" Height="15.12">
+          <TableCell Name="Cell542" Border.Lines="Left, Right" Text="(посада керівника)" HorzAlign="Center" Font="Arial, 7pt" ColSpan="2"/>
+          <TableCell Name="Cell543" Border.Lines="Left, Right"/>
+        </TableRow>
+        <TableRow Name="Row94" Height="24.57">
+          <TableCell Name="Cell547" Border.Lines="Left, Right, Bottom" ColSpan="2"/>
+          <TableCell Name="Cell548" Border.Lines="Left, Right"/>
+        </TableRow>
+        <TableRow Name="Row95">
+          <TableCell Name="Cell549" Border.Lines="Left, Right" Text="  (прізвище, ім’я, по батькові)" HorzAlign="Center" Font="Arial, 7pt" ColSpan="2"/>
+          <TableCell Name="Cell550" Border.Lines="Left, Right"/>
+        </TableRow>
+        <TableRow Name="Row96" Height="28.35">
+          <TableCell Name="Cell551" Border.Lines="Left" Text="Підпис _________________________________________" VertAlign="Bottom" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell552" Border.Lines="Right"/>
+        </TableRow>
+        <TableRow Name="Row99" Height="28.35">
+          <TableCell Name="Cell557" Border.Lines="Left, Right, Bottom" Text="Головний бухгалтер" VertAlign="Bottom" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell558" Border.Lines="Left, Right"/>
+        </TableRow>
+        <TableRow Name="Row100">
+          <TableCell Name="Cell559" Border.Lines="Left, Right" Text="  (прізвище, ім’я, по батькові)" HorzAlign="Center" Font="Arial, 7pt" ColSpan="2"/>
+          <TableCell Name="Cell560" Border.Lines="Left, Right"/>
+        </TableRow>
+        <TableRow Name="Row97" Height="47.25">
+          <TableCell Name="Cell553" Border.Lines="Left" Text="Підпис _______________________________________&#13;&#10;                                                                          М. П." VertAlign="Bottom" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell554" Border.Lines="Right"/>
+        </TableRow>
+        <TableRow Name="Row98" Height="28.35">
+          <TableCell Name="Cell555" Border.Lines="Left" Text="  «_____»  ___________________ 2_____ р." VertAlign="Bottom" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell556" Border.Lines="Right"/>
+        </TableRow>
+        <TableRow Name="Row101" Height="179.55">
+          <TableCell Name="Cell561" Border.Lines="Left, Right, Bottom" ColSpan="2">
+            <TextObject Name="Text28" Left="18.9" Top="28.35" Width="151.2" Height="132.3" Border.Lines="All" Text="Відмітки БАНКУ:&#13;&#10;Дата приймання списку _____________________________&#13;&#10;Посада та прізвище&#13;&#10;________________________________________________" HorzAlign="Justify" Font="Arial, 9pt, style=Bold"/>
+          </TableCell>
+          <TableCell Name="Cell562" Border.Lines="Left, Right"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table15" Left="94.5" Top="8259.3" Width="472.52" Height="132.33">
+        <TableColumn Name="Column72" Width="153.56"/>
+        <TableColumn Name="Column73" Width="106.32"/>
+        <TableColumn Name="Column74" Width="106.32"/>
+        <TableColumn Name="Column75" Width="106.32"/>
+        <TableRow Name="Row102" Height="17.25">
+          <TableCell Name="Cell563" Text="Керівник організації " HorzAlign="Right" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell564" Border.Lines="Bottom" ColSpan="3"/>
+          <TableCell Name="Cell565"/>
+          <TableCell Name="Cell566"/>
+        </TableRow>
+        <TableRow Name="Row103" Height="17.25">
+          <TableCell Name="Cell568"/>
+          <TableCell Name="Cell569" Text="(прізвище, ім’я, по батькові)" HorzAlign="Center" Font="Arial, 7pt" ColSpan="3"/>
+          <TableCell Name="Cell570"/>
+          <TableCell Name="Cell571"/>
+        </TableRow>
+        <TableRow Name="Row104" Height="17.25">
+          <TableCell Name="Cell573"/>
+          <TableCell Name="Cell574" Border.Lines="Bottom" ColSpan="3"/>
+          <TableCell Name="Cell575" Border.Lines="Bottom"/>
+          <TableCell Name="Cell576" Border.Lines="Bottom"/>
+        </TableRow>
+        <TableRow Name="Row105" Height="17.25">
+          <TableCell Name="Cell578"/>
+          <TableCell Name="Cell579" Text=" (пiдпис) " HorzAlign="Center" Font="Arial, 7pt" ColSpan="3"/>
+          <TableCell Name="Cell580"/>
+          <TableCell Name="Cell581"/>
+        </TableRow>
+        <TableRow Name="Row106" Height="17.25">
+          <TableCell Name="Cell583" Text="Головний бухгалтер" HorzAlign="Right" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell584" Border.Lines="Bottom" ColSpan="3"/>
+          <TableCell Name="Cell585" Border.Lines="Bottom"/>
+          <TableCell Name="Cell586" Border.Lines="Bottom"/>
+        </TableRow>
+        <TableRow Name="Row107" Height="15.36">
+          <TableCell Name="Cell587"/>
+          <TableCell Name="Cell588" Text="(прізвище, ім’я, по батькові)" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" ColSpan="3"/>
+          <TableCell Name="Cell589"/>
+          <TableCell Name="Cell590"/>
+        </TableRow>
+        <TableRow Name="Row108" Height="15.36">
+          <TableCell Name="Cell591"/>
+          <TableCell Name="Cell592" Border.Lines="Bottom" ColSpan="3"/>
+          <TableCell Name="Cell593" Border.Lines="Bottom"/>
+          <TableCell Name="Cell594" Border.Lines="Bottom"/>
+        </TableRow>
+        <TableRow Name="Row109" Height="15.36">
+          <TableCell Name="Cell595"/>
+          <TableCell Name="Cell596" Text=" (пiдпис) " HorzAlign="Center" Font="Arial, 7pt" ColSpan="3"/>
+          <TableCell Name="Cell597"/>
+          <TableCell Name="Cell598"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text39" Top="9412.2" Width="718.2" Height="18.9" Text="Примітки: комірки А3:В3, А4:В4, А5:В5, А6:В6, А7:В7, С3:Е3, С4:Е4, С5:Е5, С6:Е6, С7:Е7 – поєднані.&#13;&#10;" HorzAlign="Justify" VertAlign="Center"/>
+      <TextObject Name="Text27" Top="9431.1" Width="718.2" Height="18.9" Text="2. Файл в форматі dBase 4–5" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text32" Top="8939.7" Width="718.2" Height="18.9" Text="1. Файл в форматі MicrosoftExcel 97-XP&#13;&#10;" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text45" Left="179.55" Top="10706.85" Width="538.65" Height="66.15" Text="Додаток 1 &#13;&#10;до Листа від Організації до Банку з переліком працівників, яким необхідно &#13;&#10;переоформити платіжні картки на новий строк їх дії&#13;&#10; та направити на адресу місцезнаходження Організації&#13;&#10;" HorzAlign="Right" Font="Arial, 10pt, style=Bold"/>
+      <TableObject Name="Table16" Top="10810.8" Width="718.2" Height="179.55">
+        <TableColumn Name="Column76" Width="45.9"/>
+        <TableColumn Name="Column77" Width="112.05"/>
+        <TableColumn Name="Column78" Width="140.4"/>
+        <TableColumn Name="Column79" Width="93.15"/>
+        <TableColumn Name="Column80" Width="121.5"/>
+        <TableColumn Name="Column81" Width="102.6"/>
+        <TableColumn Name="Column82" Width="102.6"/>
+        <TableRow Name="Row110" Height="63">
+          <TableCell Name="Cell599" Border.Lines="All" Text="№ п/п" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell600" Border.Lines="All" Text="Реєстраційний номер облікової картки платника податків (ідентифікаційний номер) працівника Організації" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell601" Border.Lines="All" Text="ПІБ" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell602" Border.Lines="All" Text="Дата народження " HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell603" Border.Lines="All" Text="Серія, номер та дата видачі паспорту" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell624" Border.Lines="All" Text="Дата вклеювання у паспорт фотокартки у " HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell629" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row111" Height="91.35">
+          <TableCell Name="Cell604" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell605" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell606" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell607" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell608" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell625" Border.Lines="All" Text="25 років" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell630" Border.Lines="All" Text="45 років" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row112" Height="25.2">
+          <TableCell Name="Cell609" Border.Lines="All"/>
+          <TableCell Name="Cell610" Border.Lines="All"/>
+          <TableCell Name="Cell611" Border.Lines="All"/>
+          <TableCell Name="Cell612" Border.Lines="All"/>
+          <TableCell Name="Cell613" Border.Lines="All"/>
+          <TableCell Name="Cell626" Border.Lines="All"/>
+          <TableCell Name="Cell631" Border.Lines="All"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table1" Left="198.45" Top="11056.5" Width="396.9" Height="75.6">
+        <TableColumn Name="Column83" Width="81.27"/>
+        <TableColumn Name="Column84" Width="71.82"/>
+        <TableColumn Name="Column85" Width="81.27"/>
+        <TableColumn Name="Column86" Width="81.27"/>
+        <TableColumn Name="Column87" Width="81.27"/>
+        <TableRow Name="Row113">
+          <TableCell Name="Cell632" Text="Керівник організації " HorzAlign="Right" VertAlign="Bottom" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell633"/>
+          <TableCell Name="Cell634" Border.Lines="Bottom" ColSpan="3"/>
+          <TableCell Name="Cell635"/>
+          <TableCell Name="Cell636"/>
+        </TableRow>
+        <TableRow Name="Row114">
+          <TableCell Name="Cell637" ColSpan="2"/>
+          <TableCell Name="Cell638"/>
+          <TableCell Name="Cell639" Text=" (прізвище, ім’я, по батькові)" HorzAlign="Center" Font="Arial, 7pt" ColSpan="3"/>
+          <TableCell Name="Cell640"/>
+          <TableCell Name="Cell641"/>
+        </TableRow>
+        <TableRow Name="Row115">
+          <TableCell Name="Cell642" ColSpan="2" RowSpan="2"/>
+          <TableCell Name="Cell643"/>
+          <TableCell Name="Cell644" Border.Lines="Bottom" ColSpan="3"/>
+          <TableCell Name="Cell645"/>
+          <TableCell Name="Cell646"/>
+        </TableRow>
+        <TableRow Name="Row116">
+          <TableCell Name="Cell647"/>
+          <TableCell Name="Cell648"/>
+          <TableCell Name="Cell649" Text=" (підпис)" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" ColSpan="3"/>
+          <TableCell Name="Cell650"/>
+          <TableCell Name="Cell651"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text77" Left="217.35" Top="11642.4" Width="500.85" Height="132.3" Text="Додаток 5 до Договору&#13;&#10;між БАНКОМ  та ОРГАНІЗАЦІЄЮ про надання&#13;&#10;послуг по зарахуванню та виплаті &#13;&#10;заробітної плати та інших виплат &#13;&#10;через поточні рахунки фізичних осіб &#13;&#10;(працівників Організації /студентів)&#13;&#10;з використанням платіжних карток&#13;&#10;від [rep.START_DATE_TXT] р. № [rep.DEAL_ID]&#13;&#10;" HorzAlign="Right" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text78" Left="56.7" Top="11812.5" Width="595.35" Height="75.6" Text="ФОРМА&#13;&#10; &#13;&#10;Відомість №_____ про доставку карток на адресу Організації (філії/представництва) та вручення їх працівникам&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt, style=Bold"/>
+      <TableObject Name="Table17" Top="11963.7" Width="718.2" Height="245.7">
+        <TableColumn Name="Column88" Width="43.2"/>
+        <TableColumn Name="Column89" Width="147.15"/>
+        <TableColumn Name="Column90" Width="156.6"/>
+        <TableColumn Name="Column91" Width="71.55"/>
+        <TableColumn Name="Column92" Width="71.55"/>
+        <TableColumn Name="Column93" Width="128.25"/>
+        <TableColumn Name="Column94" Width="99.9"/>
+        <TableRow Name="Row117" Height="34.65">
+          <TableCell Name="Cell652" Border.Lines="All" Text="№ п/п" HorzAlign="Center" VertAlign="Center" Font="Arial, 11pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell653" Border.Lines="All" Text="Підтверджую отримання мною кореспонденції (картки)*" HorzAlign="Center" VertAlign="Center" Font="Arial, 11pt, style=Bold" ColSpan="6"/>
+          <TableCell Name="Cell654" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 11pt, style=Bold"/>
+          <TableCell Name="Cell655" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 11pt, style=Bold"/>
+          <TableCell Name="Cell656" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 11pt, style=Bold"/>
+          <TableCell Name="Cell677" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 11pt, style=Bold"/>
+          <TableCell Name="Cell682" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 11pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row118" Height="185.85">
+          <TableCell Name="Cell657" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 11pt, style=Bold"/>
+          <TableCell Name="Cell658" Border.Lines="All" Text="Реєстраційний номер облікової картки платника податків (ідентифікаційний номер)працівника Організації" HorzAlign="Center" VertAlign="Center" Font="Arial, 11pt, style=Bold"/>
+          <TableCell Name="Cell659" Border.Lines="All" Text="ПІБ" HorzAlign="Center" VertAlign="Center" Font="Arial, 11pt, style=Bold"/>
+          <TableCell Name="Cell660" Border.Lines="All" Text="Дата" HorzAlign="Center" VertAlign="Center" Font="Arial, 11pt, style=Bold"/>
+          <TableCell Name="Cell661" Border.Lines="All" Text="Підпис" HorzAlign="Center" VertAlign="Center" Font="Arial, 11pt, style=Bold"/>
+          <TableCell Name="Cell678" Border.Lines="All" Text="Причини неперевипуску картки або не доставлення її на адресу Організації" HorzAlign="Center" VertAlign="Center" Font="Arial, 11pt, style=Bold"/>
+          <TableCell Name="Cell683" Border.Lines="All" Text="Причина невручення&#13;&#10;конверту з платіжною карткою&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Arial, 11pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row119" Height="25.2">
+          <TableCell Name="Cell662" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell663" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell664" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell665" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell666" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell679" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell684" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text79" Top="12209.4" Width="718.2" Height="28.35" Text="* Заповнюється після отримання картки працівником ОРГАНІЗАЦІЇ" VertAlign="Center" Font="Arial, 10pt, style=Bold, Italic"/>
+      <TableObject Name="Table18" Top="12266.1" Width="718.22" Height="283.5">
+        <TableColumn Name="Column95" Width="316.61"/>
+        <TableColumn Name="Column96" Width="401.61"/>
+        <TableRow Name="Row120" Height="37.8">
+          <TableCell Name="Cell685" Text="ОРГАНІЗАЦІЯ&#13;&#10;&#13;&#10;" HorzAlign="Center" Font="Arial, 11pt, style=Bold"/>
+          <TableCell Name="Cell686" Text="Відмітки Банку:&#13;&#10;Дата прийому Відомості на паперовому носії «___» _______________ 20 __ р.&#13;&#10;Посада та прізвище, ім’я. по батькові працівника Банку, який прийняв Відомість&#13;&#10;________________________________________________&#13;&#10;&#13;&#10;________________________________________________&#13;&#10;&#13;&#10;підпис __________ дата______________________________&#13;&#10;" HorzAlign="Justify" Font="Arial, 10pt, style=Bold" RowSpan="5"/>
+        </TableRow>
+        <TableRow Name="Row124" Height="85.05">
+          <TableCell Name="Cell693" Text="Уповноважена особа Організації, відповідальна  за передачу та фізичне отримання працівниками Організації переоформлених на новий строк платіжних карток " HorzAlign="Justify" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell694"/>
+        </TableRow>
+        <TableRow Name="Row121" Height="37.8">
+          <TableCell Name="Cell687" Text="(прізвище, ім’я, по батькові)________________&#13;&#10;________________________________________&#13;&#10;" HorzAlign="Justify"/>
+          <TableCell Name="Cell688"/>
+        </TableRow>
+        <TableRow Name="Row122" Height="47.25">
+          <TableCell Name="Cell689" Text="підпис ________&#13;&#10;&#13;&#10;Керівник Організації " Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell690"/>
+        </TableRow>
+        <TableRow Name="Row123" Height="75.6">
+          <TableCell Name="Cell691" Text="_____________________________________   &#13;&#10;(прізвище, ім’я, по батькові) М.П.&#13;&#10;&#13;&#10;______________________/_________________/&#13;&#10;"/>
+          <TableCell Name="Cell692"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="12572.5" Width="714.42" Height="18.9">
+      <TextObject Name="Text60" Left="661.5" Width="56.7" Height="18.9" Text="[Page#]" HorzAlign="Right"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

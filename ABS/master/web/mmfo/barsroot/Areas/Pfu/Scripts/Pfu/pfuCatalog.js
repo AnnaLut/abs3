@@ -902,6 +902,7 @@ function CheckBalancePaymentBtn(selectedCatalog) {
             info.push("Повторний запит залишку неможливий. Залишок на 2560 є актуальним.");
             $('#balanceReq').prop("disabled", true);
             $('#payCommonBtn').prop("disabled", false);
+
         }
         var type = bars.extension.getParamFromUrl('type');
         if (type == "envelop") {
@@ -1085,10 +1086,7 @@ function renderDropDown(container, options) {
             dataSource: { data: g_dropDownData }
         });
 }
-
-// оплата на общую сумму реестра (кнопка "Створити загальний платіж")
-function payCommon() {
-     
+openPayWindowdow = function () {
     var gview = $("#gridFiles").data("kendoGrid");
     selectedRow = gview.dataItem(gview.select());
     if (selectedRow !== null) {
@@ -1109,6 +1107,13 @@ function payCommon() {
     } else {
         bars.ui.error({ title: 'Помилка!', text: 'Необхідно вибрати реестр!' });
     }
+}
+// оплата на общую сумму реестра (кнопка "Створити загальний платіж")
+function payCommon() {
+
+    bars.ui.alert({ text: "До проведення оплати необхідно здійснити відправлення Квитанції 1 в ПФУ.<br />" +
+    "Відправлення Квитанції 1 здійснюється в функції \"Підтвердження відправлення даних в ПФУ\".",title: "Увага!" },openPayWindowdow);
+
 }
 
 // окно оплаты на общую сумму реестра

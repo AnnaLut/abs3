@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="04/11/2017 16:48:57" ReportInfo.Modified="05/25/2017 10:41:09" ReportInfo.CreatorVersion="2014.1.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="04/11/2017 16:48:57" ReportInfo.Modified="02/09/2018 16:28:04" ReportInfo.CreatorVersion="2014.1.2.0">
   <Dictionary>
-    <OracleDataConnection Name="sberdev1111" ConnectionString="rijcmlqEjIkLfv5KVDVMQxm1pETYi2439uNkJphU7VV/DPLnHyLDt7PXXdlAdyT9WtYUl5m/cgOLdcg6j3QiRm4m0Jf/w==">
+    <OracleDataConnection Name="sberdev1111" ConnectionString="rijcmlqEjIkLfv5KVDVMQxm1pETYi2439uNkJphU7VV/DPLnHyLDt7PXXdlAdyT9WtYUl5mqCKgCpDeh59TZaC7loffqg==">
       <TableDataSource Name="Table" Alias="ByRec" DataType="System.Int32" Enabled="true" SelectCommand="SELECT r.rec,&#13;&#10;       r.mfoa,&#13;&#10;       r.mfob,&#13;&#10;       r.nlsa,&#13;&#10;       r.nlsb,&#13;&#10;       r.nam_a,&#13;&#10;       r.nam_b,&#13;&#10;       TO_CHAR (r.s / 100,&#13;&#10;                'FM999G999G999G999G990D00',&#13;&#10;                'NLS_NUMERIC_CHARACTERS = ''. ''')&#13;&#10;          AS s,&#13;&#10;       substr( BARS.f_sumpr (r.s, r.kv, 'F'),1,70) AS sprop1,&#13;&#10;       substr( BARS.f_sumpr (r.s, r.kv, 'F'),71,200) AS sprop2,&#13;&#10;       t.lcv,&#13;&#10;       substr( r.nazn,1, 60) nazn1,&#13;&#10;       substr( r.nazn,61, 200) nazn2,&#13;&#10;       r.dat_a,&#13;&#10;       r.datp,&#13;&#10;       r.fn_a,&#13;&#10;       r.id_a,&#13;&#10;       r.id_b,&#13;&#10;       r.nd,&#13;&#10;       f_dat_lit (r.dat_a) AS dat_prop,&#13;&#10;       (SELECT substr(nb,1,30)&#13;&#10;          FROM banks&#13;&#10;         WHERE mfo = r.mfoa)&#13;&#10;          AS bank_a,&#13;&#10;       (SELECT nb&#13;&#10;          FROM banks&#13;&#10;         WHERE mfo = r.mfob)&#13;&#10;          AS bank_b,&#13;&#10;       CASE&#13;&#10;          WHEN r.dk IN (0, 1)&#13;&#10;          THEN&#13;&#10;             UPPER (v.name)&#13;&#10;          WHEN r.dk IN (2, 3)&#13;&#10;          THEN&#13;&#10;             'ІНФОРМАЦІЙНЕ ПОВІДОМЛЕННЯ'&#13;&#10;       END&#13;&#10;          AS vob_name,&#13;&#10;       a.DAT_2,&#13;&#10;       f_dat_lit (a.DATK) AS DATK&#13;&#10;  --a.*,                                     --b.*&#13;&#10;  FROM arc_rrp r,&#13;&#10;       rec_que q,&#13;&#10;       tabval t,&#13;&#10;       vob v,&#13;&#10;       zag_a a,&#13;&#10;       zag_b b&#13;&#10; WHERE     r.kv = t.kv&#13;&#10;       AND r.s &gt; 0&#13;&#10;       AND r.rec = q.rec(+)&#13;&#10;       AND r.vob = v.vob&#13;&#10;       AND r.REF IS NULL&#13;&#10;       AND r.rec = :p_rec&#13;&#10;       AND r.fn_a = A.FN(+)&#13;&#10;       AND R.DAT_A = a.dat(+)&#13;&#10;       AND r.fn_b = b.FN(+)&#13;&#10;       AND R.DAT_B = b.dat(+)">
         <Column Name="REC" DataType="System.Decimal"/>
         <Column Name="MFOA" DataType="System.String"/>
@@ -155,7 +155,7 @@
           <TableCell Name="Cell118"/>
         </TableRow>
         <TableRow Name="Row4">
-          <TableCell Name="Cell16" Text="Платник [ByRec.NAM_B]" ColSpan="26"/>
+          <TableCell Name="Cell16" Text="Платник [ByRec.NAM_A]" ColSpan="26"/>
           <TableCell Name="Cell17"/>
           <TableCell Name="Cell18"/>
           <TableCell Name="Cell19"/>
@@ -215,7 +215,7 @@
         <TableRow Name="Row6">
           <TableCell Name="Cell121" Text="Код" VertAlign="Center" ColSpan="2" RowSpan="2"/>
           <TableCell Name="Cell122" VertAlign="Center"/>
-          <TableCell Name="Cell123" Border.Lines="All" Text="[ByRec.ID_B]" HorzAlign="Center" VertAlign="Center" ColSpan="4" RowSpan="2"/>
+          <TableCell Name="Cell123" Border.Lines="All" Text="[ByRec.ID_A]" HorzAlign="Center" VertAlign="Center" ColSpan="4" RowSpan="2"/>
           <TableCell Name="Cell124" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell125" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell126" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
@@ -329,7 +329,7 @@
           <TableCell Name="Cell216" HorzAlign="Right"/>
         </TableRow>
         <TableRow Name="Row10">
-          <TableCell Name="Cell217" Border.Lines="Bottom" Text="[ByRec.BANK_B]" ColSpan="12"/>
+          <TableCell Name="Cell217" Border.Lines="Bottom" Text="[ByRec.BANK_A]" ColSpan="12"/>
           <TableCell Name="Cell218" Border.Lines="Bottom"/>
           <TableCell Name="Cell219" Border.Lines="Bottom"/>
           <TableCell Name="Cell220" Border.Lines="Bottom"/>
@@ -342,10 +342,10 @@
           <TableCell Name="Cell806"/>
           <TableCell Name="Cell227" Border.Lines="Bottom"/>
           <TableCell Name="Cell836" Border.Lines="Bottom"/>
-          <TableCell Name="Cell228" Border.Lines="Left, Top, Bottom" Text="[ByRec.MFOB]" HorzAlign="Center" ColSpan="3"/>
+          <TableCell Name="Cell228" Border.Lines="Left, Top, Bottom" Text="[ByRec.MFOA]" HorzAlign="Center" ColSpan="3"/>
           <TableCell Name="Cell229" Border.Lines="Left, Top, Bottom" HorzAlign="Center"/>
           <TableCell Name="Cell230" Border.Lines="Left, Top, Bottom" HorzAlign="Center"/>
-          <TableCell Name="Cell231" Border.Lines="Left, Top, Bottom" Text="[ByRec.NLSB]" ColSpan="5"/>
+          <TableCell Name="Cell231" Border.Lines="Left, Top, Bottom" Text="[ByRec.NLSA]" ColSpan="5"/>
           <TableCell Name="Cell232" Border.Lines="Left, Top, Bottom"/>
           <TableCell Name="Cell514"/>
           <TableCell Name="Cell233" Border.Lines="Left, Top, Bottom"/>
@@ -358,7 +358,7 @@
           <TableCell Name="Cell240" Border.Lines="Right, Top, Bottom"/>
         </TableRow>
         <TableRow Name="Row11">
-          <TableCell Name="Cell241" Text="Одержувач [ByRec.NAM_A]" ColSpan="20"/>
+          <TableCell Name="Cell241" Text="Одержувач [ByRec.NAM_B]" ColSpan="20"/>
           <TableCell Name="Cell242"/>
           <TableCell Name="Cell243"/>
           <TableCell Name="Cell244"/>
@@ -389,7 +389,7 @@
         <TableRow Name="Row12">
           <TableCell Name="Cell265" Text="Код" VertAlign="Center" ColSpan="2" RowSpan="2"/>
           <TableCell Name="Cell266" VertAlign="Center"/>
-          <TableCell Name="Cell267" Border.Lines="All" Text="[ByRec.ID_A]" HorzAlign="Center" VertAlign="Center" ColSpan="4" RowSpan="2"/>
+          <TableCell Name="Cell267" Border.Lines="All" Text="[ByRec.ID_B]" HorzAlign="Center" VertAlign="Center" ColSpan="4" RowSpan="2"/>
           <TableCell Name="Cell268" Border.Lines="All"/>
           <TableCell Name="Cell269" Border.Lines="All"/>
           <TableCell Name="Cell270" Border.Lines="All"/>
@@ -461,7 +461,7 @@
           <TableCell Name="Cell324" Text="Код банку " ColSpan="3"/>
           <TableCell Name="Cell325"/>
           <TableCell Name="Cell326"/>
-          <TableCell Name="Cell327" Border.Lines="Left, Top" Text="[ByRec.NLSA]" ColSpan="5"/>
+          <TableCell Name="Cell327" Border.Lines="Left, Top" Text="[ByRec.NLSB]" ColSpan="5"/>
           <TableCell Name="Cell328" Border.Lines="Left, Top"/>
           <TableCell Name="Cell518" Border.Lines="Left, Top"/>
           <TableCell Name="Cell329" Border.Lines="Left, Top"/>
@@ -474,7 +474,7 @@
           <TableCell Name="Cell336" Border.Lines="Right, Bottom"/>
         </TableRow>
         <TableRow Name="Row15">
-          <TableCell Name="Cell337" Border.Lines="Bottom" Text="[ByRec.BANK_A]" ColSpan="12"/>
+          <TableCell Name="Cell337" Border.Lines="Bottom" Text="[ByRec.BANK_B]" ColSpan="12"/>
           <TableCell Name="Cell338" Border.Lines="Bottom"/>
           <TableCell Name="Cell339" Border.Lines="Bottom"/>
           <TableCell Name="Cell340" Border.Lines="Bottom"/>
@@ -487,7 +487,7 @@
           <TableCell Name="Cell811"/>
           <TableCell Name="Cell347" Border.Lines="Bottom"/>
           <TableCell Name="Cell841" Border.Lines="Bottom"/>
-          <TableCell Name="Cell348" Border.Lines="Left, Top, Bottom" Text="[ByRec.MFOA]" HorzAlign="Center" ColSpan="3"/>
+          <TableCell Name="Cell348" Border.Lines="Left, Top, Bottom" Text="[ByRec.MFOB]" HorzAlign="Center" ColSpan="3"/>
           <TableCell Name="Cell349" Border.Lines="Top, Bottom"/>
           <TableCell Name="Cell350" Border.Lines="Right, Top, Bottom"/>
           <TableCell Name="Cell351" Border.Lines="Left, Top, Bottom"/>
@@ -939,14 +939,14 @@
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="Data2" Top="640.05" Width="869.4" Height="18.9" DataSource="Table2">
+    <DataBand Name="Data2" Top="637.3" Width="869.4" Height="18.9" DataSource="Table2">
       <TableObject Name="Table3" Left="9.45" Width="500" Height="18.9">
         <TableColumn Name="Column26" Width="500"/>
         <TableRow Name="Row31">
           <TableCell Name="Cell742" Text="[bis.BIS]"/>
         </TableRow>
       </TableObject>
-      <DataHeaderBand Name="DataHeader1" Top="617.7" Width="869.4" Height="18.9">
+      <DataHeaderBand Name="DataHeader1" Top="616.32" Width="869.4" Height="18.9">
         <TextObject Name="Text1" Left="9.45" Width="680.4" Height="18.9" Text="БІРи" VertAlign="Center"/>
       </DataHeaderBand>
     </DataBand>

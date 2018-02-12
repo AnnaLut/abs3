@@ -1,6 +1,6 @@
 ﻿
 .notaDlg label{
-    width: 420px;
+    width: 430px;
     text-align: right;
 }
 
@@ -8,9 +8,9 @@
     width: 180px;
 }
 
-.notaDlg .k-floatwrap {
+/*.notaDlg .k-floatwrap {
     display: inline-block;
-}
+}*/
 
 button.k-state-default {
     background-color: #74b1df;
@@ -24,4 +24,14 @@ button.k-state-default {
 
 span.k-tooltip {
     position: absolute;
+}
+
+.k-required {
+    color: red;
+    position: absolute;
+}
+legend {
+    padding-left:10px;
+    font-size:14px;
+    color:grey;
 }

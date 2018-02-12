@@ -1,5 +1,45 @@
 ﻿var FREE_ECONOMIC_ZONE_KRYM_CODE = "900";
 
+function openWindowAddress() {
+
+    var win;
+
+    if (window.parent && window.parent.parent) {
+        win = window.parent.parent;
+    } else {
+        win = window.parent;
+    }
+
+    if (!win.bars.ui) {
+        win = window;
+    }
+
+    win.customerAddress = parent.obj_Parameters['fullADR'];
+
+    win.bars.ui.dialog({
+        //bars.ui.dialog({
+        iframe: true,
+        actions: ["Close"],
+        width: '850px',
+        height: '590px',
+        id: 'winClientAddress',
+        title: 'Повна адреса клієнта',
+        content: {
+            url: bars.config.urlContent('/clients/ClientAddress/ClientAddress'),
+            modal: true
+        },
+        close: function () {
+            if (win.customerAddress.type1.filled == true) {
+                window.parent.$('#bt_reg').prop("disabled", false);
+                $('#ed_ADR')
+                    .val(parent.obj_Parameters['fullADR'].type1.locality +
+                    ', ' +
+                    parent.obj_Parameters['fullADR'].type1.address);
+            }
+        }
+    });
+}
+
 $(document).ready(function () {
     $('#ed_NMK').change(function () { $(this).removeClass('err').attr('title', ''); });
     $('#ed_NMKK').change(function () { $(this).removeClass('err').attr('title', ''); });
@@ -35,11 +75,11 @@ $(document).ready(function () {
         $('#lSign').hide();
     }
 
-    if (parent.obj_Parameters['CUSTTYPE'] === 'person' && getParamFromUrl('spd', document.location.href) == 0) {
-        $('#btRegisterDbo').hide();
-        $('#btSignDbo').hide();
-        $('#lSign').hide();
-    }  
+	if (parent.obj_Parameters['CUSTTYPE'] === 'person' && getParamFromUrl('spd', document.location.href) == 0) {
+		$('#btRegisterDbo').hide();
+		$('#btSignDbo').hide();
+		$('#lSign').hide();
+	}
 });
 //заборона вводу нічого крім цифр 
 //назначається на подію onkeyup (onkeyup="return maskInt(this);")
@@ -730,12 +770,33 @@ function getParamFromUrl(param, url) {
 
 // cформувати ДБО
 function registerDbo() {
-    var result = ExecSync('RegisterDbo', { rnk: parent.obj_Parameters['ID'] }).d;
-    if (result.Code == "0") {
-        parent.bars.ui.success({ text: result.Message, width: 400, height: 100 });
-    } else {
-        parent.bars.ui.error({ text: result.Message, width: 400, height: 100 });
-    }
+    function startRegisterDbo() {
+		var result = ExecSync('RegisterDbo', { rnk: parent.obj_Parameters['ID'] }).d;
+		if (result.Code == "0") {
+			parent.bars.ui.success({ text: result.Message, width: 400, height: 100 });
+		} else {
+			parent.bars.ui.error({ text: result.Message, width: 400, height: 100 });
+		}
+	};
+	var rnk = parent.obj_Parameters['ID'];
+	if (!!rnk) {
+		var targetCode = "BUSSL";
+		$.ajax({
+			url: "/barsroot/clientregister/defaultWebService.asmx/GetCustomerSpvalByCode",
+			data: JSON.stringify({ "key": { "Rnk": rnk, "Code": targetCode } }),
+			type: "POST",
+			async: false,
+			contentType: "application/json; charset=utf-8",
+			dataType: "json",
+			success: function (data) {
+				if (data.d === '1') {
+					bars.ui.alert({ text: 'Заборонено. Клієнт належить до бізнес-напрямку "Великий корпоративний бізнес"' });
+				} else {
+					startRegisterDbo();
+				}
+			}
+		});
+	}
 }
 
 // підписати ДБО для відправки до ЕА

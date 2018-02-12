@@ -148,8 +148,8 @@
     <table style="width:100%;" class="table">
         <tr class="well">
             <td><b>Отримано у файлі: </b></td>
-            <td>#=FN_B#</td>
-            <td>#=DAT_B ? kendo.toString(kendo.parseDate(DAT_A),'dd.MM.yyyy HH:mm:ss') : ''#</td>
+            <td>#=FN_A ? FN_A : ''#</td>
+            <td>#=DAT_A ? kendo.toString(kendo.parseDate(DAT_A),'dd.MM.yyyy HH:mm:ss') : ''#</td>
         </tr>
         <tr class="well">
             <td><b>Надійшов до нашого РЦ: </b></td>
@@ -162,7 +162,7 @@
         <tr>
             <td><b>Відправлений: </b></td>
             <td>#=FN_B ? FN_B : ''#</td>
-            <td>#=FN_B ? kendo.toString(kendo.parseDate(FN_B),'dd.MM.yyyy HH:mm:ss') : ''#</td>
+            <td>#=DAT_B ? kendo.toString(kendo.parseDate(DAT_B),'dd.MM.yyyy HH:mm:ss') : ''#</td>
         </tr>
         <tr>
             <td><b>Зквитований: </b></td>

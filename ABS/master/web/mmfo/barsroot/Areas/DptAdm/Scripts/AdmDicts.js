@@ -79,6 +79,13 @@
                         text: "Синхронізація % ставок по змігрованим депозитам",
                         click: openSynchronizeDeposits,
                         overflow: "never"
+                    },
+                    {
+                        type: "button",
+                        imageUrl: "/barsroot/Content/images/PureFlat/16/Hot/document_header_footer-ok2.png",
+                        text: "Підготовка даних для звіту для ПФ (повний) + довіреність",
+                        click: openReportPFnew,
+                        overflow: "never"
                     }
 
                 ]
@@ -257,7 +264,36 @@
 
 
         function openExportsBaseInterestRates() {
+            modalWinExportsBaseInterestRates.title("Експорт базових відсоткових ставок:");
+            $('#mdWinExportBaseInsRates legend').text("Оберіть дату експорту:");
+            $('#sendToNewPF').attr('id', 'confirmSendDateToBratesExport');
             modalWinExportsBaseInterestRates.center().open();
+        };
+
+        function openReportPFnew() {
+            modalWinExportsBaseInterestRates.title("Підготовка даних для звіту для ПФ");
+            $('#mdWinExportBaseInsRates legend').text("Оберіть дату для звіту ПФ");
+            $('#confirmSendDateToBratesExport').attr('id', 'sendToNewPF');
+            modalWinExportsBaseInterestRates.center().open();
+        };
+
+        function newPF() {
+            bars.ui.loader('body', true);
+            $.ajax({
+                type: "POST",
+                url: bars.config.urlContent("/DptAdm/DptAdm/NewPF"),
+                data: { date:  $("#BratesExportData").val() },
+                success: function (data) {
+                    if (data.message != null) {
+                        bars.ui.loader('body', false);
+                        bars.ui.error({ text: data.message });
+                    } else {
+                        bars.ui.loader('body', false);
+                        bars.ui.success({ text: "Підготовка даних успішно здійснена!" });
+                        modalWinExportsBaseInterestRates.close();
+                    }
+                }
+            });
         };
 
         $("#cnclSendDateToBratesExport")
@@ -275,14 +311,16 @@
             });
 
         function sendDateBrateExpWin(e) {
-            var sendDate = $("#BratesExportData").val();
-
-            window.open("/barsroot/DptAdm/DptAdm/DptBratesExport?" +
-                "date=" +
-                sendDate
-            );
-
-            modalWinExportsBaseInterestRates.close();
+            if (e.sender.element.context.id !== "sendToNewPF") {
+                var sendDate = $("#BratesExportData").val();
+                window.open("/barsroot/DptAdm/DptAdm/DptBratesExport?" +
+                    "date=" +
+                    sendDate
+                );
+                modalWinExportsBaseInterestRates.close();
+            }
+            else
+                newPF();
         };
 
 

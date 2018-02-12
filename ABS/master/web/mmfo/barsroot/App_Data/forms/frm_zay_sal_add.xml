@@ -178,30 +178,28 @@
               l_cnt number;
               l_cnt2 number;
               begin
-               if sys_context('bars_context','user_mfo')!='300465'
+              if sys_context('bars_context','user_mfo')!='300465'
               then
               begin
-              select 1 into l_cnt from zayavka where sos = 1 and nvl(ref_sps,0)=0 and id = :ID;
+              select 1 into l_cnt from zayavka z where z.id =:ID and z.sos != 1;
+              bars_error.raise_error('ZAY',63, to_char(:ID));
+              exception when no_data_found then null;
+              end;
+
               begin
-              select 1 into l_cnt2 from zayavka where sos between -1000 and 0 and id = :ID;
-              raise_application_error(-20000, 'Заборонено проводити списання в непідтвердженній заявці!');
+              select z.ref_sps into l_ref from zayavka z where z.id =:ID and z.ref_sps is not null;
+              bars_error.raise_error('ZAY',64, to_char(:ID),to_char(l_ref));
               exception when no_data_found then null;
               end;
-              begin
-              select 1 into l_cnt2 from zayavka where sos = 1 and nvl(ref_sps,0)!=0 and id = :ID;
-              raise_application_error(-20000, 'Заборонено проводити повторне списання !');
-              exception when no_data_found then null;
-              end;
-              exception when no_data_found then null;
-              end;
+
               begin
               select tabn into l_operid from staff$base where id=user_id;
               exception when no_data_found then l_operid:=null;
               end;
               bars_zay.pay_selling_sps (:ID, null, l_ref);
               update oper set id_o = l_operid where ref=l_ref;
-               else
-                raise_application_error(-20000, 'Можливо виконання тільки на рівні РУ!');
+              else
+              raise_application_error(-20000, 'Можливо виконання тільки на рівні РУ!');
               end if;
               end;
             </sql>

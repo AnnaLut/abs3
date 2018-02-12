@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="06/14/2017 18:09:48" ReportInfo.Modified="12/04/2017 12:34:27" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQJyCmLqjuiCzO0BgfovZEF8=">
+      <TableDataSource Name="Table" Alias="rep" DataType="System.Int32" Enabled="true" SelectCommand="select * from table(zp_rpt.fill_akt1(:p_rnk, :sFdat1, :sFdat2))">
+        <Column Name="TAX" DataType="System.Int32"/>
+        <Column Name="TAXTXT" DataType="System.String"/>
+        <Column Name="S" DataType="System.Int32"/>
+        <Column Name="SUMTXT" DataType="System.String"/>
+        <CommandParameter Name="p_rnk" DataType="112" Expression="[p_rnk]" DefaultValue="1"/>
+        <CommandParameter Name="sFdat1" DataType="126" Expression="[sFdat1]"/>
+        <CommandParameter Name="sFdat2" DataType="126" Expression="[sFdat2]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table3" Alias="rep1" DataType="System.Int32" Enabled="true" SelectCommand="select (select    c.nmk&#13;&#10;               || ' '&#13;&#10;               || (select tt.name&#13;&#10;                     from country tt&#13;&#10;                    where tt.country = c.country)&#13;&#10;               || ', '&#13;&#10;               || c.adr&#13;&#10;          from customer c, branch_country_rnk tt&#13;&#10;         where c.rnk=zp.rnk and c.custtype = 1 and c.rnk = tt.rnk and tt.branch = zp.branch)&#13;&#10;          branch_name,&#13;&#10;       (select c.okpo&#13;&#10;          from customer c, branch_country_rnk tt&#13;&#10;         where c.rnk=zp.rnk and c.custtype = 1 and c.rnk = tt.rnk and tt.branch = zp.branch)&#13;&#10;          branch_okpo,&#13;&#10;       (select bav.attribute_value&#13;&#10;          from branch_attribute_value bav&#13;&#10;         where     bav.attribute_code = 'BPK_BOSS_FIO'&#13;&#10;               and bav.branch_code = zp.branch)&#13;&#10;          bpk_boss_fio,&#13;&#10;       (select bav.attribute_value&#13;&#10;          from branch_attribute_value bav&#13;&#10;         where     bav.attribute_code = 'BPK_POSADA'&#13;&#10;               and bav.branch_code = zp.branch)&#13;&#10;          bpk_posada,&#13;&#10;       (select b.name&#13;&#10;          from branch b&#13;&#10;         where b.branch = zp.branch)&#13;&#10;          bank_name,&#13;&#10;       c.adr ca,&#13;&#10;       zp.fio,&#13;&#10;       zp.okpo,&#13;&#10;       c.nmk,&#13;&#10;       zp.nls_2909,&#13;&#10;       zp.deal_name,&#13;&#10;       zp.branch kf&#13;&#10;  from v_zp_deals zp, customer c&#13;&#10; where zp.sos &gt;= 0 and zp.rnk = c.rnk and zp.rnk = :p_rnk">
+        <Column Name="BRANCH_NAME" DataType="System.String"/>
+        <Column Name="BRANCH_OKPO" DataType="System.String"/>
+        <Column Name="BPK_POSADA" DataType="System.String"/>
+        <Column Name="BPK_BOSS_FIO" DataType="System.String"/>
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="NMK" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="NLS_2909" DataType="System.String"/>
+        <Column Name="BANK_NAME" DataType="System.String"/>
+        <Column Name="DEAL_NAME" DataType="System.String"/>
+        <Column Name="KF" DataType="System.String"/>
+        <Column Name="CA" DataType="System.String"/>
+        <CommandParameter Name="p_rnk" DataType="112" Expression="[p_rnk]"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_rnk" DataType="System.Int32"/>
+    <Parameter Name="sFdat1" DataType="System.String"/>
+    <Parameter Name="sFdat2" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="9.45"/>
+    <DataBand Name="Data3" Top="13.45" Width="718.2" Height="189" DataSource="Table3">
+      <TableObject Name="Table1" Width="727.18" Height="189">
+        <TableColumn Name="Column46" Width="186.52"/>
+        <TableColumn Name="Column47" Width="167.62"/>
+        <TableColumn Name="Column48" Width="186.52"/>
+        <TableColumn Name="Column49" Width="186.52"/>
+        <TableRow Name="Row50" Height="37.8">
+          <TableCell Name="Cell237" Text="Сторона 1.&#13;&#10;&#13;&#10;&#13;&#10;&#13;&#10;&#13;&#10;" HorzAlign="Center" Font="Arial, 11pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell238"/>
+          <TableCell Name="Cell239" Text="Сторона 2.&#13;&#10;&#13;&#10;&#13;&#10;&#13;&#10;" HorzAlign="Center" Font="Arial, 11pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell240"/>
+        </TableRow>
+        <TableRow Name="Row51" Height="37.8">
+          <TableCell Name="Cell241" Text="БАНК&#13;&#10;	" HorzAlign="Center" Font="Arial, 11pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell242"/>
+          <TableCell Name="Cell243" Text="УСТАНОВА&#13;&#10;" HorzAlign="Center" Font="Arial, 11pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell244"/>
+        </TableRow>
+        <TableRow Name="Row52" Height="37.8">
+          <TableCell Name="Cell245" Text="&lt;b&gt;Філія – [rep1.BRANCH_NAME]&lt;/b&gt;&#13;&#10;Код ЄДРПОУ [rep1.BRANCH_OKPO]&#13;&#10;МФО банку [rep1.KF]&#13;&#10;" HorzAlign="Center" HtmlTags="true" ColSpan="2" RowSpan="3"/>
+          <TableCell Name="Cell246"/>
+          <TableCell Name="Cell247" Text="&lt;b&gt;[rep1.NMK]&lt;/b&gt;&#13;&#10;[rep1.CA]&#13;&#10;Код ЄДРПОУ [rep1.OKPO]&#13;&#10;р/р № [rep1.NLS_2909]&#13;&#10;[rep1.BANK_NAME]&#13;&#10; МФО банку [rep1.KF]" HorzAlign="Center" HtmlTags="true" ColSpan="2" RowSpan="3"/>
+          <TableCell Name="Cell248"/>
+        </TableRow>
+        <TableRow Name="Row53" Height="37.8">
+          <TableCell Name="Cell249"/>
+          <TableCell Name="Cell250"/>
+          <TableCell Name="Cell251"/>
+          <TableCell Name="Cell252"/>
+        </TableRow>
+        <TableRow Name="Row54" Height="37.8">
+          <TableCell Name="Cell253"/>
+          <TableCell Name="Cell254"/>
+          <TableCell Name="Cell255"/>
+          <TableCell Name="Cell256"/>
+        </TableRow>
+      </TableObject>
+      <DataBand Name="Data1" Top="206.45" Width="718.2" Height="491.4" DataSource="Table">
+        <TextObject Name="Text101" Top="122.85" Width="718.2" Height="198.45" Text="      Ми, що нижче підписалися, представник Банку, [rep1.BPK_POSADA] філії -[rep1.BRANCH_NAME] [rep1.BPK_BOSS_FIO], з однієї сторони, і представник Установи, [rep1.NMK] [rep1.FIO], з другої сторони, склали цей АКТ про те, що банком в період з [sFdat1] по [sFdat2] р. перераховані кошти на виплату працівникам Установи заробітної плати та інших виплат в сумі [rep.S] ([rep.SUMTXT]) були зараховані на рахунки працівників Установи, згідно наданих списків. У відповідності до договору № [rep1.DEAL_NAME] ПРО НАДАННЯ ПОСЛУГ ПО ЗАРАХУВАННЮ ТА ВИПЛАТІ ЗАРОБІТНОЇ ПЛАТИ ТА ІНШИХ ВИПЛАТ ЧЕРЕЗ ПОТОЧНІ РАХУНКИ ФІЗИЧНИХ ОСІБ (ПРАЦІВНИКІВ ОРГАНІЗАЦІЙ) З ВИКОРИСТАННЯМ ПЛАТІЖНИХ КАРТОК, комісійна винагорода Банку становить [rep.TAX] ([rep.TAXTXT])" HorzAlign="Justify"/>
+        <TextObject Name="Text100" Left="-9.45" Top="66.15" Width="727.65" Height="18.9" Text="Акт виконаних робіт" HorzAlign="Center" Font="Arial, 12pt, style=Bold"/>
+        <TableObject Name="Table2" Top="340.2" Width="723.58" Height="151.2">
+          <TableColumn Name="Column50" Width="335.36"/>
+          <TableColumn Name="Column51" Width="70.76"/>
+          <TableColumn Name="Column52" Width="1"/>
+          <TableColumn Name="Column53" Width="316.46"/>
+          <TableRow Name="Row55" Height="30.24">
+            <TableCell Name="Cell257" Text="Від Банку&#13;&#10;&#13;&#10;&#13;&#10;&#13;&#10;&#13;&#10;" HorzAlign="Center" Font="Arial, 11pt, style=Bold"/>
+            <TableCell Name="Cell258" ColSpan="2" RowSpan="5"/>
+            <TableCell Name="Cell259" HorzAlign="Center" Font="Arial, 12pt, style=Bold"/>
+            <TableCell Name="Cell260" Text="Від Установи&#13;&#10;" HorzAlign="Center" Font="Arial, 11pt, style=Bold"/>
+          </TableRow>
+          <TableRow Name="Row56" Height="30.24">
+            <TableCell Name="Cell261" Border.Lines="Bottom" Text="[rep1.BPK_POSADA]&#13;&#10;філії [rep1.BRANCH_NAME]" HorzAlign="Center" Font="Arial, 11pt" RowSpan="3"/>
+            <TableCell Name="Cell262"/>
+            <TableCell Name="Cell263" Border.Lines="Bottom" HorzAlign="Center" Font="Arial, 11pt"/>
+            <TableCell Name="Cell264" Border.Lines="Bottom" Text="[rep1.NMK]&#13;&#10;[rep1.BANK_NAME]&#13;&#10;МФО банку [rep1.KF]" HorzAlign="Center" RowSpan="3"/>
+          </TableRow>
+          <TableRow Name="Row57" Height="30.24">
+            <TableCell Name="Cell265"/>
+            <TableCell Name="Cell266"/>
+            <TableCell Name="Cell267"/>
+            <TableCell Name="Cell268" HorzAlign="Center"/>
+          </TableRow>
+          <TableRow Name="Row58" Height="20.79">
+            <TableCell Name="Cell269"/>
+            <TableCell Name="Cell270"/>
+            <TableCell Name="Cell271"/>
+            <TableCell Name="Cell272" HorzAlign="Center"/>
+          </TableRow>
+          <TableRow Name="Row59" Height="39.69">
+            <TableCell Name="Cell273" Text="[rep1.BPK_BOSS_FIO]" HorzAlign="Center" Font="Arial, 11pt"/>
+            <TableCell Name="Cell274"/>
+            <TableCell Name="Cell275" HorzAlign="Center" Font="Arial, 11pt"/>
+            <TableCell Name="Cell276" Text="[rep1.FIO]" HorzAlign="Center"/>
+          </TableRow>
+        </TableObject>
+      </DataBand>
+    </DataBand>
+    <PageFooterBand Name="PageFooter3" Top="701.85" Width="718.2" Height="18.9"/>
+  </ReportPage>
+</Report>

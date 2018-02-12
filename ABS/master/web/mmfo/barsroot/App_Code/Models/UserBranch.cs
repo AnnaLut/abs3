@@ -8,5 +8,6 @@
         public bool HAS_CHILD { get; set; }
         public string PARENT_BRANCH { get; set; }
         public string BRANCH_PATH { get; set; }
+        public bool SHOW_REGIONAL_NAME { get; set; }
     }
 }

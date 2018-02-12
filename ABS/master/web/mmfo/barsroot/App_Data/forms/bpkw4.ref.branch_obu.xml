@@ -9,7 +9,7 @@
       </filters>
       <datasource>
         <sql>
-          select branch, name, ru_code, ru_name from v_branch_obu where length(branch)>=15 order by branch
+          select branch, name, ru_code, ru_name from v_branch_obu  order by branch
         </sql>
       </datasource>
       <fields>

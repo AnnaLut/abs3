@@ -58,7 +58,7 @@ function BacktoPortfolioAll() {
 
 function GetNewTemplate()
 {
-    var url = 'dialog.aspx?type=metatab&role=wr_metatab&tabname=DOC_SCHEME&tail="ID LIKE \'%SKRN%\'"';
+    var url = 'dialog.aspx?type=metatab&role=wr_metatab&tabname=DOC_SCHEME&tail="ID LIKE \'SKRN%\'"';
     url +="&code=" + Math.random();
     
     var result = window.showModalDialog(url,"",

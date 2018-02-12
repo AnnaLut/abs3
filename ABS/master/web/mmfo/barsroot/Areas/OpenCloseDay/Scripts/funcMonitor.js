@@ -190,11 +190,11 @@ $(document).ready(function () {
             field: "BRANCH_NAME",
             title: "Назва Бранча",
         }, {
-            template: "#= (START_TIME == null) ? ' ' : kendo.toString(kendo.parseDate(START_TIME), 'dd.MM.yyyy hh:mm:ss') #",
+            template: "#= (START_TIME == null) ? ' ' : kendo.toString(kendo.parseDate(START_TIME), 'dd.MM.yyyy HH:mm:ss') #",
             field: "START_TIME",
             title: "Час Старту",
         }, {
-            template: "#= (FINISH_TIME == null) ? ' ' : kendo.toString(kendo.parseDate(FINISH_TIME), 'dd.MM.yyyy hh:mm:ss') #",
+            template: "#= (FINISH_TIME == null) ? ' ' : kendo.toString(kendo.parseDate(FINISH_TIME), 'dd.MM.yyyy HH:mm:ss') #",
             field: "FINISH_TIME",
             title: "Час Фінішу",
         }, {

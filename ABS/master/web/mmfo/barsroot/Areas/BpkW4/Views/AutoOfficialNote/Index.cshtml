@@ -1,0 +1,59 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Формування службової записки для закриття тікета.";
+}
+
+<script src="~/Scripts/respond.min.js"></script>
+<script src="~/Areas/BpkW4/Scripts/KendoCommon.js"></script>
+<script src="~/Areas/BpkW4/Scripts/AutoOfficialNote.js"></script>
+
+<link rel="stylesheet" href="~/Areas/BpkW4/Content/Main.css" />
+
+<style>
+    #fieldlist {
+        margin: 0 0 -1.5em;
+        padding: 30px;
+    }
+
+        #fieldlist li {
+            list-style: none;
+            padding-bottom: 1.5em;
+            width: 20%;
+        }
+
+        #fieldlist label {
+            display: block;
+            padding-bottom: .6em;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+</style>
+
+<h1>@ViewBag.Title</h1>
+
+<div class="well" id="">
+    <ul id="fieldlist">
+        <li>
+            <h4>
+                <label>
+                    № тікета:
+                    <input id="txtTicketNum" type="text" maxlength="11" title="№ тікета" style="width: 100%;" />
+                    <span id="txtTicketNumSpan" style="color:red">*</span>
+                </label></h4>
+        </li>
+        <li>
+            <h4>
+                <label>
+                    Причина видалення:
+                    <input id="ddlReason" required="required" title="Причина видалення" value="0" style="width: 100%;" />
+                    <span id="ddlReasonSpan" style="color:red">*</span>
+                </label>
+            </h4>
+        </li>
+    </ul>
+    <br>
+    <button id="btnGetNote">Отримати</button>
+</div>
+
+<div class="search-main"></div>

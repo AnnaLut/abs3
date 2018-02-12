@@ -31,7 +31,7 @@ namespace BarsWeb.Areas.ReserveAccs
 
             context.Routes.MapHttpRoute(
                 name: AreaName + "_api",
-                routeTemplate: "api/" + AreaName + "/{controller}/{id}",
+                routeTemplate: "api/" + AreaName + "/{controller}/{action}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
 

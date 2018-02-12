@@ -1,0 +1,269 @@
+.search-catalog {
+    background-color: rgba(20,53,80,0.038);
+    border: 1px solid rgba(20,53,80,0.05);
+    border-radius: 2px;
+}
+
+#tabstrip .k-content {
+    min-height: 10px !important;
+}
+
+#tabstrip h2 {
+    margin-left: 20px;
+    margin-top: 10px;
+}
+
+#gridFiles th.k-header {
+    text-align: center;
+}
+
+.page-header {
+    margin: 5px 5px 5px 5px;
+}
+
+.k-grid tr td {
+    border-bottom: 1px solid white;
+}
+
+.legend-yellow {
+    vertical-align: middle;
+    display: inline-block;
+    margin-left: 10px;
+    width: 20px;
+    height: 20px;
+    background-color: #ffc21c;
+    margin-left: 10px !important;
+}
+
+    .legend-yellow:hover {
+        background-color: #ff9900
+    }
+
+.legend-blue {
+    vertical-align: middle;
+    display: inline-block;
+    margin-left: 10px;
+    width: 20px;
+    height: 20px;
+    background-color: #0094ff;
+    margin-left: 10px !important;
+}
+
+.legend-green {
+    vertical-align: middle;
+    display: inline-block;
+    margin-left: 10px;
+    width: 20px;
+    height: 20px;
+    background-color: #3cb371;
+    margin-left: 10px !important;
+}
+
+    .legend-green:hover {
+        background-color: #00cc00
+    }
+
+.legend-red {
+    vertical-align: middle;
+    display: inline-block;
+    margin-left: 10px;
+    width: 20px;
+    height: 20px;
+    background-color: #f08080;
+    margin-left: 10px !important;
+}
+
+    .legend-red:hover {
+        background-color: #e41b1b
+    }
+
+.legend-pink {
+    vertical-align: middle;
+    display: inline-block;
+    margin-left: 10px;
+    width: 20px;
+    height: 20px;
+    background-color: #dda0dd;
+    margin-left: 10px !important;
+}
+
+    .legend-pink:hover {
+        background-color: #bb44bb
+    }
+
+.k-label {
+    text-align: left;
+}
+
+.typeGreen {
+    background: #3cb371;
+}
+
+.typeYellow {
+    background: #ffc21c;
+}
+
+.typeRed {
+    background: #f08080;
+}
+
+.typePink {
+    background: #dda0dd;
+}
+
+.typeBlue {
+    background: #0094ff;
+}
+
+.k-grid td {
+    border-bottom: 1px;
+}
+
+.color-button {
+    border: none;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 4px;
+    margin: 4px 2px;
+    cursor: pointer;
+    /*padding: 1px 1px;*/
+    padding: 0px;
+    width: 20px;
+    height: 20px;
+}
+
+    .color-button:focus {
+        border-style: solid;
+        border-color: #428bca;
+        border-width: 0.5px;
+    }
+
+.custom-btn {
+    background-size: 80%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: #428bca;
+    border-color: #428bca;
+    border-radius: 4px;
+    margin-left: 3px;
+    height: 30px;
+    width: 30px;
+    text-align: center;
+    color: white;
+    line-height: 15px;
+}
+
+    .custom-btn:hover {
+        background-color: #336896;
+    }
+
+    .custom-btn:active {
+        background-color: #336896;
+        color: #428bca;
+    }
+
+    .custom-btn:focus {
+        background-color: #336896;
+    }
+
+.inlineBlock {
+    display: inline-block;
+    margin-left: 3px;
+}
+
+.custom-btn-payroll-filter {
+    background-image: url(/barsroot/Areas/SWCompare/Content/Images/filter.png);
+}
+
+.custom-btn-tricolor {
+    border: none;
+    vertical-align: middle;
+    display: inline-block;
+    margin-left: 10px;
+    width: 20px;
+    height: 20px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    border: none;
+    background-image: url(/barsroot/Areas/SWCompare/Content/Images/tricolor.png);
+}
+
+    .custom-btn-tricolor:hover {
+        background-image: url(/barsroot/Areas/SWCompare/Content/Images/tricolor_reverse.png);
+    }
+
+.k-picker-wrap, .k-numeric-wrap, .k-dropdown-wrap, .k-textbox, .borders {
+    border: 1px solid #428bca !important;
+    height: 25px !important;
+    color: black;
+}
+
+#datesFromTo {
+    display: inline-block;
+}
+
+input.k-input.k-readonly {
+    width: 290px !important;
+    padding-left: 5px;
+}
+
+.k-picker-wrap .k-input:hover, .k-picker-wrap:hover {
+    background-color: #ccc !important;
+    color: black !important;
+    border-radius: 0px !important;
+}
+
+.k-picker-wrap span.k-select {
+    border: none;
+}
+
+.k-i-calendar {
+    background-image: url(/barsroot/Areas/SWCompare/Content/Images/calendar.png) !important;
+    height: 25px !important;
+    width: 21px !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-position-y: 1px !important;
+}
+
+.widerMenu .k-combobox,
+.widerMenu .k-datepicker,
+.widerMenu .k-timepicker,
+.widerMenu .k-datetimepicker,
+.widerMenu .k-numerictextbox,
+.widerMenu .k-dropdown,
+.widerMenu .k-textbox {
+    width: 200px;
+}
+
+.custom-btn-active {
+    border: 1px solid black !important;
+    font-size: 15px;
+    text-align: center;
+}
+
+.clear-filter-btn-active {
+    border: 1px solid black !important;
+    text-align: center;
+}
+
+#allTypes.custom-btn-active {
+    width: auto !important;
+    font-size: 12.5px !important;
+}
+
+.k-filter-menu [type="submit"] {
+    width: 54% !important;
+    margin-right: 1% !important;
+}
+
+.k-filter-menu [type="reset"] {
+    width: 44% !important;
+    margin-left: 1% !important;
+}
+
+a.k-grid-filter.k-state-active {
+    background-color: lightgray !important;
+}

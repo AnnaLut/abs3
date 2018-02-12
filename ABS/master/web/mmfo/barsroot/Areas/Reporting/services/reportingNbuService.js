@@ -88,8 +88,21 @@
                 });
 
                 return deferred.promise;
-            }
+            };
 
+            var _extend = function(src, dst) {
+                for(var key in src){
+                    if(src[key] == null || src[key] instanceof Array || ["number", "boolean", "string", "function", "undefined"].indexOf(typeof src[key]) != -1){
+                        dst[key] = src[key];
+                    }
+                    else{
+                        if(!dst.hasOwnProperty(key)){ dst[key] = {}; }
+                        arguments.callee(src[key], dst[key]);
+                    }
+                }
+            };
+
+            factory.extend = _extend;
             factory.getFileInfo = _getFileInfo;
             factory.blockFile = _blockFile;
             factory.startGenerateReport = _startGenerateReport;

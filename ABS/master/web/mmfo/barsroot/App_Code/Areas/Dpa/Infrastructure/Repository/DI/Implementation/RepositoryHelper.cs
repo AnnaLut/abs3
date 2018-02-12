@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using Oracle.DataAccess.Client;
 
 public class RepositoryHelper
 {
@@ -26,23 +27,28 @@ public class RepositoryHelper
         List<FileResponse> fileList = new List<FileResponse>();
         for (int j = 1; j < count + 1; j++)
         {
-            var p = new DynamicParameters();
+            var  p = new  OracleParameter[4];
             FileResponse file = new FileResponse();
 
-            p.Add("p_filetype", dbType: DbType.String, size: 4000, value: fileType, direction: ParameterDirection.Input);
-            p.Add("p_file_number", dbType: DbType.Int32, value: j, direction: ParameterDirection.Input);
-            p.Add("p_filename", dbType: DbType.String, size: 4000, direction: ParameterDirection.Output);
-            p.Add("l_clob", dbType: DbType.String, size: 4000, direction: ParameterDirection.ReturnValue);
+            p[0] = new OracleParameter("p_filetype", OracleDbType.Varchar2,  4000,  fileType,  ParameterDirection.Input);
+            p[1] = new OracleParameter("p_file_number", OracleDbType.Int32,  j, direction: ParameterDirection.Input);
+            p[2] = new OracleParameter("p_filename", OracleDbType.Varchar2,  4000,  ParameterDirection.Output);
+            p[3] = new OracleParameter("l_clob", OracleDbType.Clob,    ParameterDirection.ReturnValue);
 
-            var sql = @"bars_dpa.get_cvk_file";
+            //var sql = @"bars_dpa.get_cvk_file";
 
             using (var connection = OraConnector.Handler.UserConnection)
             {
-                connection.Execute(sql, p, commandType: CommandType.StoredProcedure);
+                OracleCommand oraCommand = connection.CreateCommand();
+                oraCommand.CommandText = "bars_dpa.get_cvk_file";
+                oraCommand.CommandType = CommandType.StoredProcedure;
+                oraCommand.Parameters.AddRange(p);
+                oraCommand.ExecuteNonQuery();
             }
+        
+            file.fileName = p[2].Value.ToString();// p.Get<string>("p_filename");
+            file.fileBody = p[3].Value.ToString();// p.Get<string>("l_clob");
 
-            file.fileName = p.Get<string>("p_filename");
-            file.fileBody = p.Get<string>("l_clob");
         }
         return fileList;
     }

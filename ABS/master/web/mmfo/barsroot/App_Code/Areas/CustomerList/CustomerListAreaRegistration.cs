@@ -41,5 +41,6 @@ public class CustomerListAreaRegistration : AreaRegistration
         var controllerFactory = ((NinjectControllerFactory)ControllerBuilder.Current.GetControllerFactory());
         var ninjectKernel = controllerFactory.NinjectKernel;
         ninjectKernel.Bind<ICustomerListRepository>().To<CustomerListRepository>();
+		ninjectKernel.Bind<IAccountsSpecparamRepository>().To<AccountsSpecparamRepository>();
     }
 }

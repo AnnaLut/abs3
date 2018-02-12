@@ -1,0 +1,19 @@
+/*.custom-btn-mirgate, .custom-btn-delete-acc, .custom-btn-lock, .custom-btn-unlock, .custom-btn-back {
+    width: auto !important;
+}*/
+
+.custom-btn-mirgate {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/migrate.png);
+}
+
+.custom-btn-delete-acc {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/delete_acc.png);
+}
+
+.custom-btn-lock {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/lock.png);
+}
+
+.custom-btn-unlock {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/unlock.png);
+}

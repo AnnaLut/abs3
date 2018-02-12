@@ -74,7 +74,7 @@ public partial class UserControls_dialogs_EADocsView : System.Web.UI.Page
             string KF = Convert.ToString(cmd.ExecuteScalar());
             if (this.EAStructID == 1)
             {
-                short[] do_list = new short[] { 111, 112, 113, 114, 115, 116, 117, 118, 119, 1110, 1111, 121, 122, 13, 142, 145, 147, 401, 148, 1319, 1115 };
+                string[] do_list = new string[] { "111", "112", "113", "114", "115", "116", "117", "118", "119", "1110", "1111", "121", "122", "13", "142", "145", "147", "401", "148", "1319", "1115" };
                 
                 List<Bars.EAD.Structs.Result.DocumentData> docs_ea = Bars.EAD.EADService.GetDocumentData(null, this.RNK, this.AgrID, this.EAStructID, this.ReqID, KF);
                 List<Bars.EAD.Structs.Result.DocumentData> docs = new List<Bars.EAD.Structs.Result.DocumentData>();

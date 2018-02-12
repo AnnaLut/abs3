@@ -147,11 +147,11 @@ function homeController($scope, paramsService, $window, LS) {
             { field: "CP_ID", title: "Код<br>ЦП", width: 110, template: "<div style='text-align:center;'>#=CP_ID#</div>" },
             { field: "KV", title: "Вал", width: 50, template: "<div style='text-align:center;'>#=KV#</div>" },
             { field: "VIDD", title: "Вид<br>угод", width: 65, template: "<div style='text-align:center;'>#=VIDD#</div>" },
-            { field: "PFNAME", title: "Потрфель" },
+            { field: "PFNAME", title: "Потрфель", width: 150 },
             { field: "RYN", title: "Суб<br>портфель", width: 150 },
             { field: "DATP", title: "Дата<br>погашення", template: "<div style='text-align:center;'>#=DATP!=null ? kendo.toString(DATP,'dd.MM.yyyy') : ''#</div>", width: 85 },
             { field: "NO_PR", title: "Ном.<br>%ст.<br>річна", width: 60, template: "<div style='text-align:center;'>#=NO_PR#</div>" },
-            { field: "BAL_VAR", title: "Бал-варт.факт<br>N+D+P+R+R2<br>+S+2VD+2VP" },
+            { field: "BAL_VAR", title: "Бал-варт.факт<br>N+D+P+R+R2<br>+S+2VD+2VP", width: 150 },
             { field: "KIL", title: "Кіль-ть<br>ЦП-факт.<br>в пакеті", width: 90, template: "<div style='text-align:center;'>#=KIL#</div>" },
             { field: "ZAL", title: "в.т.ч.<br>в<br>заставі", width: 100, template: "<div style='text-align:center;'>#=ZAL#</div>" },
             { field: "CENA", title: "Ціна<br>1 шт.<br>ЦП", width: 70 },
@@ -416,6 +416,7 @@ function homeController($scope, paramsService, $window, LS) {
     }
 
     $scope.openSpecparamsWindow = function () {
+        document.getElementById('specParamsWindowMode').value = $scope.p_nOp;
         $scope.specParamsWindow.open().center();
         $scope.$broadcast('loadChangeBillGrids');
     }

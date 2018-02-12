@@ -6,7 +6,7 @@
     var theme = Session["theme"] != null ? Session["theme"].ToString() : "bootstrap";
     var isBkackTheme = BarsWeb.Infrastructure.Constants.ThemesList.FirstOrDefault(i => i.Pattern == "Kendo" && i.Name == theme && i.IsBlack) != null;
     var btTheme = isBkackTheme ? "inverse" : "default";
-    var logo = isBkackTheme ? "_white": "";
+    var logo = isBkackTheme ? "_white" : "";
     var sessionId = Session.SessionID;
 
     System.Globalization.DateTimeFormatInfo cultureInfo = System.Globalization.CultureInfo.GetCultureInfo("uk-UA").DateTimeFormat;
@@ -28,13 +28,15 @@
 
 @if (barsroot.ServicesClass.GetGlobalParam("ENABLE_COMET_JS") == "1")
 {
-  <script src="@Url.Content("~/comet/js/comet.js")"></script>
+    <script src="@Url.Content("~/comet/js/comet.js")"></script>
 }
 else
 {
-  <script type="text/javascript" src="/barsroot/Scripts/crypto/barsCrypto.js?v1.0.4"></script>
-  <script type="text/javascript" src="/barsroot/Scripts/jquery/jquery.iecors.js"></script>
-  <script>
+    <script type="text/javascript" src="/barsroot/Scripts/crypto/barsCrypto.js?v1.0.4"></script>
+    <script type="text/javascript" src="/barsroot/Scripts/jquery/jquery.iecors.js"></script>
+    <script>
+      var initCheckTimeout = 10 * 1000; // wait for first check
+      var checkTimeout = 120 * 1000; // check messages timeout
       function startNewSession() {
           var data = { "url": location.href };
           barsCrypto.startIe(data,
@@ -44,15 +46,16 @@ else
               })
       }
       $(function() {
-          getMessCount();
+          window.setTimeout(function () { getMessCount(); }, initCheckTimeout);
       });
+
       function getMessCount() {
           var url = '/barsroot/messagesctrl/count/';
           $.ajax({
               type: 'POST',
               url: url,
               success: function (data) {
-                  var count = parseInt(data,10);
+                  var count = parseInt(data, 10);
                   if (count != NaN) {
                       var buttMess = $('#btnMessage');
                       var messCount = buttMess.find('.count');
@@ -74,7 +77,7 @@ else
                           messCount.html(count);
                       }
                   }
-                  window.setTimeout(function () { getMessCount(); },60000);
+                  window.setTimeout(function () { getMessCount(); }, checkTimeout);
               },
               error: function() {
 
@@ -84,7 +87,7 @@ else
 
       var _CurrentBranchInfo = "@ViewBag.CurrentBranchInfo";
 
-  </script>
+    </script>
 }
 <script src="@Url.Content("~/Scripts/Views/Home/header.js")"></script>
 
@@ -97,23 +100,26 @@ else
             right: 0;
             width: 28px;
         }
-         .progress {
-             border-radius: 4px;
-             margin-top: 5px;
-             position: relative;
-             width: 100%;
-             height: 20px;
-             background-color: #edf1f2;
-         }
-        .progress .progress-bar {
-            border-bottom-left-radius: 4px;
-            border-top-left-radius: 4px;
+
+        .progress {
+            border-radius: 4px;
+            margin-top: 5px;
+            position: relative;
+            width: 100%;
             height: 20px;
-            background-color: #27c24c;
+            background-color: #edf1f2;
         }
-        .progress .progress-label {
-            text-align: center;
-        }
+
+            .progress .progress-bar {
+                border-bottom-left-radius: 4px;
+                border-top-left-radius: 4px;
+                height: 20px;
+                background-color: #27c24c;
+            }
+
+            .progress .progress-label {
+                text-align: center;
+            }
     </style>
     <link href="~/Content/Themes/ModernUI/css/popbox.css" rel="stylesheet" />
     <link href="~/Content/Themes/Kendo/kendo.bootstrap.min.css" rel="stylesheet" />
@@ -122,43 +128,52 @@ else
         #userProfile {
             font-family: arial, sans-serif;
             font-size: small;
+        }
 
-        }
-        #userProfile .user-data {
-            margin: 10px;
-        }
-        #userProfile .user-control {
-            margin: 0;
-            background-color: #f4f4f4;
-            border-top: 1px solid #ccc;
-            padding: 7px 0;
-        }
-        #userProfile a {
-            font-size: small;
-        }
-        #userProfile a:hover {
-            text-decoration: underline;
-        }
+            #userProfile .user-data {
+                margin: 10px;
+            }
+
+            #userProfile .user-control {
+                margin: 0;
+                background-color: #f4f4f4;
+                border-top: 1px solid #ccc;
+                padding: 7px 0;
+            }
+
+            #userProfile a {
+                font-size: small;
+            }
+
+                #userProfile a:hover {
+                    text-decoration: underline;
+                }
+
         .bf_bold {
             font-weight: bold;
         }
+
         .bf_w {
             color: #666;
         }
+
         #userGatges .toolbar a {
             background-color: #ffffff;
             margin: 10px;
         }
-        #userGatges .toolbar a:hover {
-            background-color: #dbdbdb;
-        }
+
+            #userGatges .toolbar a:hover {
+                background-color: #dbdbdb;
+            }
+
         #userToolkit .toolbar a {
             background-color: #ffffff;
             margin: 10px;
         }
-        #userToolkit .toolbar a:hover {
-            background-color: #bdbdbd;
-        }
+
+            #userToolkit .toolbar a:hover {
+                background-color: #bdbdbd;
+            }
     </style>
     <div>
 
@@ -199,7 +214,7 @@ else
                 </div>
             </a>
         </div>
-  
+
         <div class="logo">
             <a href="@Url.Content("~/")">
                 <img alt="logo" id="imgCompanyLogo" src="@Url.Content("~/Content/logo/logo.png")" style="margin-left: 5px;" />
@@ -211,7 +226,7 @@ else
             <div style="width: 55px; height: 16px; font-size: 12px; color: #195e8d; text-align: center; font-weight: bold;padding-top: 6px;">@bdate.ToString("yyyy")</div>
         </div>
         <div style="float: left; margin: 9px 9px 0 9px; background: #DBDBDB;">
-            @Html.Action("Branches", "Home", new {selectedBranch = Model.TOBO, selectedBranchName = Model.TOBONAME, selectedRoles = Model.ROLES})
+            @Html.Action("Branches", "Home", new { selectedBranch = Model.TOBO, selectedBranchName = Model.TOBONAME, selectedRoles = Model.ROLES })
         </div>
 
         @if (!string.IsNullOrWhiteSpace(Bars.Configuration.ConfigurationSettings.AppSettings["Product.Title"]))
@@ -219,12 +234,12 @@ else
             <div style="float: left; margin: 6px 0 0 10px; font-weight: 600; color: #465371; overflow: hidden;">
                 @Html.Raw(Bars.Configuration.ConfigurationSettings.AppSettings["Product.Title"])
             </div>
-        }  
+        }
     </div>
 
 
 
-    <div  style="display: none" id="userProfile">
+    <div style="display: none" id="userProfile">
         <div class="user-data">
             <table style="text-align: left;">
                 <tr>
@@ -238,16 +253,16 @@ else
                 <tr>
                     <td><span class="bf_w">Ідентифікатор:</span></td>
                     <td><span class="bf_bold">@Model.USER_ID</span></td>
-                </tr>    
+                </tr>
                 <tr>
                     <td><span class="bf_w">Ключ:</span></td>
                     <td><span class="bf_bold">@Model.IDOPER</span></td>
                     <td><a href="#" onclick="showVerifyKey();return false;">Перевірка ключа</a></td>
-                </tr>     
+                </tr>
                 <tr>
                     <td><span class="bf_w">Відділення:</span></td>
                     <td><span class="bf_bold" title="@Model.TOBONAME">@Model.TOBO</span></td>
-                </tr>    
+                </tr>
                 <tr>
                     <td><span class="bf_w">Ролі:</span></td>
                     @if (ROLES_LIST.Length > 2)
@@ -258,7 +273,7 @@ else
                     {
                         <td><span class="bf_bold">@Model.ROLES</span></td>
                     }
-                </tr>     
+                </tr>
             </table>
             <div style="background-color: #f4f4f4; border: 1px solid #ccc; margin-top: 10px;">
                 <div style="text-align: center">Технічна іформація</div>
@@ -288,7 +303,7 @@ else
         </div>
     </div>
 
-    <div  id="userMessage" style="width: 300px; height: 400px; padding: 0; display: none;"></div>
+    <div id="userMessage" style="width: 300px; height: 400px; padding: 0; display: none;"></div>
 
     <div id="userAudit" style="width: 350px; height: 400px; padding: 0; display: none;"></div>
 
@@ -296,7 +311,7 @@ else
 
     <div id="userGatges" style="width: 235px; height: 80px; display: none; margin-right: 60px">
         <div class="toolbar">
-            <a id="btnCalc"  class="btn_calc" href="#" onclick=" showCalc();return false; ">
+            <a id="btnCalc" class="btn_calc" href="#" onclick=" showCalc();return false; ">
                 <div>
                     <span class="label">Кальк...</span>
                 </div>
@@ -328,7 +343,7 @@ else
         </div>
     </div>
 
-    <div id="userBranches" style="width: 350px; height: 400px; padding: 0; display: none;overflow-y: scroll;">        
+    <div id="userBranches" style="width: 350px; height: 400px; padding: 0; display: none;overflow-y: scroll;">
         <div class="branchPanel">
             <h4>Доступні відділення</h4>
             <div id="treeview"></div>
@@ -353,24 +368,27 @@ else
             width: 100%;
             z-index: 2;
         }
-        #navBar .container-fluid {
-            padding-right: 0;
-            padding-left: 0;
-        }
-        #navBar .container-fluid > .navbar-header {
-            margin-right: 0;
-            margin-left: 0;
-        }
 
-        #navBar .nav-bar-image-button {
-            padding: 5px 10px 0 10px;
-            text-align: center;
-        }
-        #navBar .nav-bar-image-button-text {
-            font-size: 10px;
-            display: block;
-            line-height: 15px;
-        }
+            #navBar .container-fluid {
+                padding-right: 0;
+                padding-left: 0;
+            }
+
+                #navBar .container-fluid > .navbar-header {
+                    margin-right: 0;
+                    margin-left: 0;
+                }
+
+            #navBar .nav-bar-image-button {
+                padding: 5px 10px 0 10px;
+                text-align: center;
+            }
+
+            #navBar .nav-bar-image-button-text {
+                font-size: 10px;
+                display: block;
+                line-height: 15px;
+            }
 
         .userProfile-controls {
             border-width: 1px 0 0 0;
@@ -383,48 +401,53 @@ else
         .bf-w {
             font-size: 12px;
         }
+
         .bf-bold {
             font-weight: bold;
         }
+
         .bf-block {
             margin: 0 0 5px 10px;
         }
 
         .bank-date-button {
             text-align: center;
-            display: inline-block; 
-            width: 60px; 
+            display: inline-block;
+            width: 60px;
             height: 50px;
             margin: 0;
             padding: 0;
             background-color: #fff;
-            float: left; 
-            border:1px solid #ccc; 
+            float: left;
+            border: 1px solid #ccc;
             border-radius: 4px
         }
+
         .bank-date-button-month {
             line-height: 1;
-            height: 14px; 
-            background-color: #485e87; 
-            color: #fff; 
-            font-size: 12px; 
+            height: 14px;
+            background-color: #485e87;
+            color: #fff;
+            font-size: 12px;
             border-radius: 4px;
             border-bottom-left-radius: 0 4px;
-            border-bottom-right-radius:4px 0;
+            border-bottom-right-radius: 4px 0;
         }
+
         .bank-date-button-day {
-            height: 18px; 
-            line-height: 1; 
-            font-size: 20px; 
-            color: #05b7f9; 
+            height: 18px;
+            line-height: 1;
+            font-size: 20px;
+            color: #05b7f9;
             text-align: center;
         }
+
         .bank-date-button-year {
             margin: 2px 4px 0 4px;
             border-top: 1px dotted #ccc;
             line-height: 1;
-            font-size: 12px; 
-            color: #485e87; 
+            font-size: 12px;
+            color: #485e87;
             font-weight: bold;
         }
     </style>
@@ -445,37 +468,37 @@ else
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav navbar-left">
                     @*<li>
-                        <a href="#" style="padding:0 5px 0 10px;">
-                            <div title="Банківська дата @Model.BANKDATE" class="bank-date-button">
-                                <div class="bank-date-button-month">@bdate.ToString("MMMM", _cultureInfo)</div>
-                                <div class="bank-date-button-day">
-                                    @bdate.ToString("dd")@*<span class="bank-date-button-year">/@bdate.ToString("yyyy")</span>* @
+                            <a href="#" style="padding:0 5px 0 10px;">
+                                <div title="Банківська дата @Model.BANKDATE" class="bank-date-button">
+                                    <div class="bank-date-button-month">@bdate.ToString("MMMM", _cultureInfo)</div>
+                                    <div class="bank-date-button-day">
+                                        @bdate.ToString("dd")@*<span class="bank-date-button-year">/@bdate.ToString("yyyy")</span>* @
+                                    </div>
+                                    <div class="bank-date-button-year" style="">@bdate.ToString("yyyy")</div>
                                 </div>
-                                <div class="bank-date-button-year" style="">@bdate.ToString("yyyy")</div>
-                            </div>
-                        </a>
-                    </li>*@
+                            </a>
+                        </li>*@
                     <li>
                         <div id="branchesList" style="margin-top: 5px;width: 250px"></div>
                     </li>
                 </ul>
                 @*<ul class="nav navbar-nav">
-                              <li class="active"><a href="#">Link</a></li>
-                              <li><a href="#">Link</a></li>
-                              <li><a href="#">Link</a></li>
-                              <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <span class="caret"></span></a>
-                                <ul class="dropdown-menu" role="menu">
-                                  <li><a href="#">Action</a></li>
-                                  <li><a href="#">Another action</a></li>
-                                  <li><a href="#">Something else here</a></li>
-                                  <li class="divider"></li>
-                                  <li class="dropdown-header">Nav header</li>
-                                  <li><a href="#">Separated link</a></li>
-                                  <li><a href="#">One more separated link</a></li>
-                                </ul>
-                              </li>
-                            </ul>*@
+                      <li class="active"><a href="#">Link</a></li>
+                      <li><a href="#">Link</a></li>
+                      <li><a href="#">Link</a></li>
+                      <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">
+                          <li><a href="#">Action</a></li>
+                          <li><a href="#">Another action</a></li>
+                          <li><a href="#">Something else here</a></li>
+                          <li class="divider"></li>
+                          <li class="dropdown-header">Nav header</li>
+                          <li><a href="#">Separated link</a></li>
+                          <li><a href="#">One more separated link</a></li>
+                        </ul>
+                      </li>
+                    </ul>*@
                 <ul class="nav navbar-nav navbar-right">
                     <li>
                         <a href="#" style="padding:0 5px 0 10px;">
@@ -563,87 +586,87 @@ else
         </div>
     </div>
 
-@*    @(Html.Kendo().Window()
-          .Name("profileWindow1")
-          .Title(false)
-          .Resizable()
-          .Visible(false)
-          .Modal(false)
-          .Draggable(true)
-          .Width(350).Height(327)
-          .Content(ProfileWindowContent().ToHtmlString())
-          .Position(position => position.Top(50).Left(100))
-          .Animation(animation =>
-          {
-              animation.Open(open =>
-              {
-                  open.Expand(ExpandDirection.Vertical);
-                  open.Fade(FadeDirection.In);
-              });
-              animation.Close(close =>
-              {
-                  close.Reverse(true);
-                  close.Expand(ExpandDirection.Vertical);
-                  close.Fade(FadeDirection.In);
-              });
-          }))
-    
-@helper ProfileWindowContent()
-{
-    <div id="userProfile" >
-        <table>
-            <tr>
-                <td style="vertical-align: top;">
-                    <div style="width: 64px; height: 64px; border: 1px solid red;border-radius: 50%;overflow: hidden">
-                        <div class="pf-icon pf-64 pf-user_symbol_blue-picture"></div>
-                    </div>
-                </td>
-                <td style="vertical-align: top;">
-                    <div class="bf-block">
-                        <div class="bf-w">Користувач:</div>
-                        <div class="bf-bold">@User.Identity.Name</div>          
-                    </div>
-                    <div class="bf-block">
-                        <div class="bf-w">ПІБ:</div>
-                        <div class="bf-bold">@Model.USER_FULLNAME</div>
-                    </div>
-                    <div class="bf-block">
-                        <div class="bf-w">Ідентифікатор:</div>
-                        <div class="bf-bold">@Model.USER_ID</div>
-                    </div>        
-                    <div class="bf-block">
-                        <div class="bf-w">Ключ:</div>
-                        <div class="bf-bold">@Model.IDOPER</div>
-                    </div>   
-                    <div class="bf-block">
-                        <div class="bf-w">Відділення:</div>
-                        <div class="bf-bold" title="@Model.TOBONAME">@Model.TOBO</div>
-                    </div>   
-                </td>
-            </tr>
-        </table>
-        <div class="well" style="padding: 5px;">
-            <div style="text-align: center">Технічна іформація</div>
-            <table>
-                <tr>
-                    <td><span class="bf-w">WEB-сервер:</span></td>
-                    <td><span class="bf-bold">@Server.MachineName (@Dns.GetHostAddresses(Server.MachineName).FirstOrDefault(i => i.AddressFamily.ToString() == "InterNetwork"))</span></td>
-                </tr>
-                <tr>
-                    <td><span class="bf-w">База даних:</span></td>
-                    <td><span class="bf-bold">@ViewBag.DbName</span></td>
-                </tr>
-            </table>
-        </div>    
+    @*    @(Html.Kendo().Window()
+                  .Name("profileWindow1")
+                  .Title(false)
+                  .Resizable()
+                  .Visible(false)
+                  .Modal(false)
+                  .Draggable(true)
+                  .Width(350).Height(327)
+                  .Content(ProfileWindowContent().ToHtmlString())
+                  .Position(position => position.Top(50).Left(100))
+                  .Animation(animation =>
+                  {
+                      animation.Open(open =>
+                      {
+                          open.Expand(ExpandDirection.Vertical);
+                          open.Fade(FadeDirection.In);
+                      });
+                      animation.Close(close =>
+                      {
+                          close.Reverse(true);
+                          close.Expand(ExpandDirection.Vertical);
+                          close.Fade(FadeDirection.In);
+                      });
+                  }))
 
-        <div class="userProfile-controls well" style="text-align: center;">
-            <a href="@Url.Content("~/account/changepassword/")" style="margin-right: 30px;">редагувати профіль</a>      
-            <a href="@Url.Content("~/account/changepassword/")" style="margin-right: 30px;">змінити пароль</a>
-            <a href="@Url.Content("~/account/logout/")" onclick=" $('body').loader();$('#btnProfile').click(); ">вихід</a>
-        </div>
+        @helper ProfileWindowContent()
+        {
+            <div id="userProfile" >
+                <table>
+                    <tr>
+                        <td style="vertical-align: top;">
+                            <div style="width: 64px; height: 64px; border: 1px solid red;border-radius: 50%;overflow: hidden">
+                                <div class="pf-icon pf-64 pf-user_symbol_blue-picture"></div>
+                            </div>
+                        </td>
+                        <td style="vertical-align: top;">
+                            <div class="bf-block">
+                                <div class="bf-w">Користувач:</div>
+                                <div class="bf-bold">@User.Identity.Name</div>
+                            </div>
+                            <div class="bf-block">
+                                <div class="bf-w">ПІБ:</div>
+                                <div class="bf-bold">@Model.USER_FULLNAME</div>
+                            </div>
+                            <div class="bf-block">
+                                <div class="bf-w">Ідентифікатор:</div>
+                                <div class="bf-bold">@Model.USER_ID</div>
+                            </div>
+                            <div class="bf-block">
+                                <div class="bf-w">Ключ:</div>
+                                <div class="bf-bold">@Model.IDOPER</div>
+                            </div>
+                            <div class="bf-block">
+                                <div class="bf-w">Відділення:</div>
+                                <div class="bf-bold" title="@Model.TOBONAME">@Model.TOBO</div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+                <div class="well" style="padding: 5px;">
+                    <div style="text-align: center">Технічна іформація</div>
+                    <table>
+                        <tr>
+                            <td><span class="bf-w">WEB-сервер:</span></td>
+                            <td><span class="bf-bold">@Server.MachineName (@Dns.GetHostAddresses(Server.MachineName).FirstOrDefault(i => i.AddressFamily.ToString() == "InterNetwork"))</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="bf-w">База даних:</span></td>
+                            <td><span class="bf-bold">@ViewBag.DbName</span></td>
+                        </tr>
+                    </table>
+                </div>
 
-    </div>
-}*@
+                <div class="userProfile-controls well" style="text-align: center;">
+                    <a href="@Url.Content("~/account/changepassword/")" style="margin-right: 30px;">редагувати профіль</a>
+                    <a href="@Url.Content("~/account/changepassword/")" style="margin-right: 30px;">змінити пароль</a>
+                    <a href="@Url.Content("~/account/logout/")" onclick=" $('body').loader();$('#btnProfile').click(); ">вихід</a>
+                </div>
+
+            </div>
+        }*@
 
     <script>
         var userParameters = @Html.Raw(JsonConvert.SerializeObject(Model)) ;
@@ -763,6 +786,6 @@ else
                 });
             }
         }
-        
+
     </script>
 }

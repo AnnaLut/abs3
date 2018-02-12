@@ -1,0 +1,864 @@
+/** {
+    transition: all .5s;
+}*/
+
+.search-catalog {
+    background-color: rgba(20,53,80,0.038);
+    border: 1px solid rgba(20,53,80,0.05);
+    border-radius: 2px;
+}
+
+#tabstrip .k-content {
+    min-height: 10px !important;
+}
+
+#tabstrip h2 {
+    margin-left: 20px;
+    margin-top: 10px;
+}
+
+#gridFiles th.k-header {
+    text-align: center;
+}
+
+.search-box {
+    background-color: rgba(20,53,80,0.038);
+    border: 1px solid rgba(20,53,80,0.05);
+    border-radius: 2px;
+    padding: 10px;
+    max-width: 1111px;
+    position: relative;
+}
+
+.widerMenu .k-combobox,
+.widerMenu .k-datepicker,
+.widerMenu .k-timepicker,
+.widerMenu .k-datetimepicker,
+.widerMenu .k-numerictextbox,
+.widerMenu .k-dropdown,
+.widerMenu .k-textbox {
+    width: 200px;
+}
+
+.page-header {
+    margin: 5px 5px 5px 5px;
+}
+
+.k-header .k-link {
+    text-align: center;
+    max-height: 50px !important;
+}
+
+.k-grid-header .k-header {
+    white-space: pre-wrap !important;
+    text-align: center !important;
+}
+
+textarea.k-textbox {
+    overflow: auto;
+    white-space: pre-wrap;
+    padding: 10px;
+    width: 100% !important;
+    height: 200px !important;
+    resize: none;
+}
+
+    textarea.k-textbox:hover {
+        border: 1px solid #336896 !important;
+        background-color: white !important;
+        box-shadow: 5px 5px 10px #888888;
+    }
+
+.k-edit-buttons {
+    right: 0;
+    margin: 5px 5px 5px 5px;
+    bottom: 0;
+}
+
+.modal-buttons {
+    float: right;
+    margin: 5px;
+}
+
+.modal-buttons-left {
+    float: left;
+    margin: 5px;
+}
+
+.k-window div.k-window-content {
+    overflow: hidden;
+}
+
+div.k-window-content {
+    padding: 1.6em;
+}
+
+.invisible {
+    display: none;
+}
+
+.k-label {
+    text-align: left;
+}
+
+.bold-lbl {
+    font-weight: bold;
+    white-space: pre-wrap !important;
+}
+
+.colored-box {
+    float: left;
+    width: 20px;
+    height: 20px;
+    margin: 5px;
+    border: 0.5px solid rgb(0, 0, 0);
+    border: 1px solid rgba(0, 0, 0, .5);
+}
+
+.green-tr {
+    background: #b8e091;
+}
+
+.yellow-tr {
+    background: #fdec9d;
+}
+
+.red-tr {
+    background: #f2bcaf;
+}
+
+.white-tr {
+    background: #ffffff;
+}
+
+.k-state-selected {
+    background-color: #336896 !important;
+    color: white !important;
+}
+
+.k-grid tr.k-state-selected {
+    background-color: #336896 !important;
+}
+
+    .k-grid tr.k-state-selected:hover {
+        background-color: #336896 !important;
+    }
+
+.k-grid tr {
+    height: auto !important;
+}
+
+.k-grid td {
+    text-overflow: unset;
+    line-height: 1.5em !important;
+    padding-top: 3px !important;
+    padding-bottom: 3px !important;
+    text-align: center;
+    white-space: pre-line !important;
+}
+
+.k-grid th a.k-state-active {
+    background-color: lightblue;
+}
+
+.k-hidden-button {
+    display: none;
+}
+/*---------------------------------------------------------------------------*/
+
+.k-multiselect {
+    border: 1px solid #428bca !important;
+    height: 30px;
+    width: 350px;
+    text-align: center;
+    background-color: white;
+}
+
+.k-multiselect-wrap .k-input {
+    margin-top: 5px;
+}
+
+.k-multiselect-wrap .k-button {
+    color: black !important;
+    border: none;
+    background-color: #8db8dd;
+    margin-top: 5px !important;
+    font-size: 100% !important;
+}
+
+    .k-multiselect-wrap .k-button:hover {
+        background-color: #bdb4af !important;
+        color: white !important;
+    }
+
+.btn, .k-multiselect-wrap {
+    color: black !important;
+    background: none;
+}
+
+    .btn:hover:active:focus {
+        background-color: #336896;
+    }
+
+.btn-primary.disabled, [disabled].btn-primary {
+    color: black !important;
+    border: none;
+}
+
+    .btn-primary.disabled, [disabled].btn-primary:hover {
+        background-color: #717070;
+        cursor: not-allowed;
+    }
+
+.custom-btn {
+    background-size: 85% !important;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: #428bca;
+    border-color: #428bca;
+    border-radius: 4px !important;
+    margin-left: 3px !important;
+    height: 30px !important;
+    width: 30px;
+    text-align: center !important;
+    color: white !important;
+    line-height: 15px;
+}
+
+    .custom-btn:hover {
+        background-color: #336896 !important;
+    }
+
+    .custom-btn:active {
+        background-color: #336896 !important;
+        color: #428bca !important;
+    }
+
+    .custom-btn:focus {
+        background-color: #336896 !important;
+    }
+
+.custom-btn-add {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/new.png);
+    margin-left: 0px !important;
+}
+
+.custom-btn-submit {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/ok.png);
+}
+
+.custom-btn-client-card {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/userCard.png);
+}
+
+.custom-btn-goto-way4 {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/bag.png);
+}
+
+.custom-btn-close {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/close.png);
+}
+
+.custom-btn-edit {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/edit.png);
+}
+
+.custom-btn-view {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/document_view.png);
+}
+
+.custom-btn-delete {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/delete.png);
+}
+
+.custom-btn-print {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/print.png);
+}
+
+.custom-btn-history {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/history.png);
+}
+
+.custom-btn-visa {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/ok.png);
+}
+
+.custom-btn-reject {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/visa_back.png);
+}
+
+.custom-btn-2625 {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/2625_1.png);
+}
+
+.custom-btn-3570, .custom-btn-accounts-bind, .custom-btn-watch {
+    width: auto !important;
+}
+
+.custom-btn-back {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/back.png);
+    background-position: left;
+    background-size: auto !important;
+    width: auto !important;
+    padding-left: 35px;
+    font-size: 15px;
+}
+
+.custom-btn-clear-filter {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/clear_filter.png);
+    background-color: white;
+    border: 1px solid #428bca !important;
+}
+
+[disabled].custom-btn-clear-filter {
+    background-color: #8db8dd;
+}
+
+.search-btn {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/find.png) !important;
+    height: 25px !important;
+    width: 25px !important;
+    padding: 0px 0px 0px 0px !important;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: #428bca;
+    border-color: #428bca;
+    border-radius: 10% !important;
+    margin-left: 5px !important;
+}
+
+    .search-btn:hover {
+        background-color: #336896;
+        color: black !important;
+    }
+
+    .search-btn:active {
+        background-image: none !important;
+        background-color: #336896;
+        color: black !important;
+    }
+
+    .search-btn:focus {
+        background-color: #336896;
+        color: black !important;
+    }
+
+.details-btn {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/help.png) !important;
+}
+
+.details-small-btn {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/help_small.png) !important;
+}
+
+.k-i-calendar {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/calendar.png) !important;
+    height: 25px !important;
+    width: 21px !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-position-y: 1px !important;
+}
+
+.k-dropdown-wrap .k-select .k-i-arrow-s {
+    /*.k-dropdown-wrap .k-select .k-i-arrow-s {*/
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/arrow_down.png) !important;
+    height: 10px !important;
+    width: 16px !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    vertical-align: middle !important;
+    padding-bottom: 5px;
+}
+
+.k-picker-wrap, .k-numeric-wrap, .k-dropdown-wrap, .k-textbox, .borders {
+    border: 1px solid #428bca !important;
+    height: 25px !important;
+    color: black;
+}
+
+    .k-picker-wrap span.k-select {
+        border: none;
+    }
+
+.k-textbox {
+    height: 27px !important;
+}
+/*---------------------------------------------------------------------------*/
+.k-list-container ul li.k-item {
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: ellipsis;
+}
+
+    .k-list-container ul li.k-item:hover {
+        color: white !important;
+        background-color: #336896 !important;
+    }
+
+input.k-input.k-readonly {
+    width: 290px !important;
+    padding-left: 5px;
+}
+
+.modal-hr {
+    margin: 7px;
+}
+
+#SalaryBagMainGrid.k-grid tr td, #accepted_grid.k-grid tr td, #processed_grid.k-grid tr td, #draft_grid.k-grid tr td {
+    border-bottom: 1px solid #ccc;
+}
+
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+input[readonly="readonly"], input[readonly], input[disabled="disabled"] {
+    color: black !important;
+    background-color: rgb(245, 245, 245) !important;
+}
+
+    input[disabled="disabled"]:active {
+        color: black !important;
+        background-color: rgb(245, 245, 245) !important;
+    }
+/*AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA*/
+ul#ddm_mb {
+    height: 30px !important;
+    margin-top: -1px !important;
+    margin-left: 5px !important;
+}
+
+.k-dropdown-wrap .k-menu .k-i-arrow-s {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/arrow_down.png) !important;
+    height: 10px !important;
+    width: 16px !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    vertical-align: middle !important;
+    padding-bottom: 5px;
+    color: white !important;
+}
+
+.k-state-hover:not(span, span.k-link) {
+    background-color: #336896 !important;
+}
+
+.k-textbox:hover {
+    background-color: #ccc !important;
+    color: black !important;
+    border-radius: 0px !important;
+}
+
+.k-textbox:active, .k-textbox:focus {
+    background-color: white !important;
+}
+
+.k-dropdown-wrap:hover, .k-formatted-value:hover {
+    background-color: #ccc !important;
+    color: black !important;
+    border-radius: 0px !important;
+}
+
+.k-picker-wrap .k-input:hover, .k-picker-wrap:hover {
+    background-color: #ccc !important;
+    color: black !important;
+    border-radius: 0px !important;
+}
+/*====================-=-=---------------------------------------------------------------*/
+a:link {
+    text-decoration: none;
+    color: blue;
+}
+
+a:visited {
+    text-decoration: none;
+    color: blue;
+}
+
+a:hover {
+    text-decoration: underline;
+    color: black;
+}
+
+a:active {
+    text-decoration: underline;
+    color: black;
+}
+/******************************************************/
+
+#_report {
+    overflow-y: auto;
+    height: 80% !important;
+    text-align: center !important;
+    /*padding-left: 15%;*/
+}
+
+.custom-btn-report-download, .custom-btn-report-show, .modal-back {
+    width: auto !important;
+    height: 15px !important;
+}
+
+#datesFromTo {
+    display: inline-block;
+}
+
+#rnkModalGrid .k-loading-color, #tsModalGrid .k-loading-color {
+    opacity: 0;
+}
+
+
+.k-filter-menu [type="submit"] {
+    width: 54% !important;
+    margin-right: 1% !important;
+}
+
+.k-filter-menu [type="reset"] {
+    width: 44% !important;
+    margin-left: 1% !important;
+}
+
+.lbl-tab {
+    margin-left: 10px;
+    width: 100%;
+    text-align: right;
+}
+
+.l-lbl {
+    text-align: left;
+    width: 100%;
+}
+
+.tarif-details-row-div {
+    border-right: 1px solid rgb(238, 238, 238);
+}
+
+.h3-modal {
+    margin-top: 2px !important;
+}
+
+.view-tarif-20x20 {
+    height: 20px !important;
+    width: 20px !important;
+}
+
+.inlineBlock {
+    display: inline-block;
+    margin-left: 3px;
+}
+
+.SB_edit_form_table {
+    width: 100%;
+}
+
+    .SB_edit_form_table td {
+        padding-left: 3px;
+        padding-right: 3px;
+        width: 33%;
+    }
+
+        .SB_edit_form_table td label:not(#tarif_not_found_lbl):not(#rnk_not_found_lbl) {
+            padding-top: 6px;
+        }
+
+.lbl-padding {
+    padding-top: 6px !important;
+}
+
+#rnkModalGrid .k-loading-image, #tsModalGrid .k-loading-image, #historySearchModalGrid .k-loading-image {
+    background-image: none;
+}
+/*BEGIN ========================= DROP DOWN MENU*/
+.custom-btn-ea-view, .custom-btn-ea-before-scan, .custom-btn-ea-upload-file {
+    width: auto;
+}
+
+.custom-btn-watch-archive {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/EA.png);
+}
+
+.custom-btn-separated-watch-archive {
+    width: 30px;
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/EA.png);
+}
+
+.dropdown-content .custom-btn-ea-view, .dropdown-content .custom-btn-ea-before-scan, .dropdown-content .custom-btn-ea-upload-file {
+    width: 120px;
+}
+
+.dropdown-content .custom-btn-payroll-history, .dropdown-content .custom-btn-edit-history {
+    width: 160px;
+}
+
+.dropbtn {
+    cursor: pointer;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    border: none;
+    padding: 0px;
+    margin: 0px;
+}
+
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+
+.dropdown-content {
+    padding: 0px !important;
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    z-index: 1;
+}
+
+    .dropdown-content a {
+        margin: 1px;
+    }
+
+.show {
+    display: block;
+}
+/*END ========================= DROP DOWN MENU*/
+
+
+#eaViewTable {
+    height: auto;
+    width: 100%;
+}
+
+    #eaViewTable td {
+        border: none;
+        padding: 3px;
+    }
+
+    #eaViewTable tr td:first-child {
+        text-align: right;
+        width: 50px;
+    }
+
+.eaDocHref {
+    height: 25px;
+    width: 25px;
+    background-color: red;
+}
+
+.custom-btn-ea-view-doc {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/document_view.png);
+    padding: 6px 12px 6px 12px !important;
+    height: 16px !important;
+    width: 4px !important;
+}
+
+.eaViewTitle {
+    width: 100%;
+    text-align: center;
+}
+
+.aeViewFormContainer {
+    overflow: scroll;
+    height: 80%;
+    overflow-x: hidden;
+    border: 1px solid rgb(238, 238, 238);
+}
+
+    .aeViewFormContainer:hover {
+        box-shadow: 5px 5px 10px #888888;
+    }
+
+/*scnaner upload files*/
+.custom-btn-import-add-file {
+    height: 16px !important;
+    width: 155px !important;
+}
+
+.k-upload-status {
+    display: none !important;
+}
+
+/*#fileUploaderDiv > div > div,*/
+#fileUploaderDiv > div, .k-dropzone {
+    width: 0px !important;
+    /*height: 16px !important;*/
+}
+
+.k-dropzone {
+    padding-left: 0px;
+}
+
+#fileUploaderDiv {
+    width: 0px !important;
+    height: 0px !important;
+}
+
+
+.custom-btn-ea-scan {
+    padding: 6px 12px 6px 12px !important;
+    height: 16px !important;
+    width: auto !important;
+}
+
+
+[id^="struct_codes"] > li {
+    border-bottom: 1px solid rgb(222, 222, 222) !important;
+}
+/*Popup for sign*/
+.k-grid-filter {
+    z-index: initial !important;
+}
+
+#popupTotalResults {
+    margin-bottom: 35px;
+    height: 120px;
+    overflow-wrap: break-word;
+    overflow-y: auto;
+    scrollbar-base-color: transparent;
+    scrollbar-face-color: transparent;
+    scrollbar-3dlight-color: transparent;
+    scrollbar-highlight-color: transparent;
+    scrollbar-track-color: transparent;
+    scrollbar-arrow-color: transparent;
+    scrollbar-shadow-color: transparent;
+    scrollbar-dark-shadow-color: transparent;
+}
+
+.b-popup {
+    width: 100%;
+    min-height: 100%;
+    background-color: #ababab;
+    filter: alpha(opacity=80);
+    opacity: .8;
+    overflow: hidden;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    z-index: 100 !important;
+}
+
+.b-popup-content {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    position: fixed;
+    width: 350px;
+    height: 300px;
+    /*height: auto;*/
+    padding: 10px;
+    /*background-color: rgb(113, 112, 112);*/
+    background-color: #cbb0b0;
+    color: black !important;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px #000;
+    text-align: center;
+    z-index: 20001;
+}
+
+    .b-popup-content button {
+        /*background-color: rgb(113, 112, 112);*/
+        background-color: #cbb0b0;
+        border: solid 0.5px rgb(140, 127, 127);
+        border-radius: 4px;
+        width: 330px;
+        height: 25px;
+        bottom: 5px;
+        right: 5px;
+        margin: 5px 5px 5px 5px;
+        position: absolute;
+    }
+
+        .b-popup-content button:hover {
+            background-color: rgb(140, 127, 127);
+        }
+
+.popUpHr {
+    border-top: 1px solid rgb(98, 91, 91);
+    margin-bottom: 3px;
+    margin-top: 3px;
+}
+/*Popup for sign*/
+
+.signed-cell {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/signed.gif);
+    /*background-size: 80% !important;*/
+    background-repeat: no-repeat;
+    background-position: center;
+    border: none;
+    height: 21px;
+    width: 21px;
+}
+
+.red-text {
+    color: red;
+    text-decoration: underline;
+}
+
+.k-tooltip {
+    background: rgb(66, 139, 202) !important;
+    background: rgba(66, 139, 202, .8) !important;
+}
+
+.k-list-filter .k-textbox {
+    font-size: 12px !important;
+}
+
+#dontShowEver {
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+/*ddddddddddddddddddddddddddddddd*/
+
+
+/*#dealChangeHistoriGrid tr td:nth-child(2n) {
+    border-top: none !important;
+    border-bottom: none !important;
+}*/
+
+.custom-btn-test {
+    width: auto !important;
+}
+
+#dealChangeHistoriGrid .k-grid-header-wrap th {
+    border-right: none;
+    border-left: none;
+    font-weight: bold;
+}
+
+
+#dealChangeHistoriGrid .k-grid-header {
+    padding: 0 !important;
+}
+
+#dealChangeHistoriGrid .k-grid-content {
+    overflow-y: visible;
+}
+
+/* grouping styles */
+
+.k-grouping-row td {
+    text-align: left;
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+}
+
+#changeDetailsGrid th {
+    vertical-align: middle;
+    font-weight: bold;
+}
+/********************************************************************************************************************************/
+
+
+.k-icon.k-i-collapse, .k-icon.k-i-expand {
+    display: none;
+    /*pointer-events: none !important;*/
+}
+
+.k-grouping-row.k-state-selected p {
+    text-decoration: underline !important;
+}

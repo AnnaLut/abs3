@@ -553,7 +553,7 @@ public partial class DepositContractInfo : Page
     /// <param name="sum">Сумма на счету</param>
     private void EnableButtons(Deposit dpt, Decimal sum)
     {
-    
+        
         if (sum > 0)
         {
             btFirstPayment.Enabled = false;
@@ -713,6 +713,7 @@ public partial class DepositContractInfo : Page
 
         if (dpt.IsCashSum == false)
             btFirstPayment.Enabled = false;
+        eadPrintContract.Enabled = dpt.wb == 'N';
     }
 
     /// <summary>

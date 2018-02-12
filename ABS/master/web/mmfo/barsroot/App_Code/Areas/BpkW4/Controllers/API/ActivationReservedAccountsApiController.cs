@@ -26,17 +26,17 @@ namespace BarsWeb.Areas.BpkW4.Controllers.Api
         {
             try
             {
-                decimal[] data = acc.Data != null ? acc.Data.ToArray() : new decimal[0];
-
-                for (int i = 0; i<data.Length; i++)
-                {
-                    BarsSql sql = SqlCreatorBPK.Active(data[i], acc.Confirm);
-                    _repo.ExecuteStoreCommand(sql.SqlText, sql.SqlParams);
-                }
-                
+                //decimal[] data = acc.Data != null ? acc.Data.ToArray() : new decimal[0];
+                //
+                //for (int i = 0; i<data.Length; i++)
+                //{
+                //    BarsSql sql = SqlCreatorBPK.Active(data[i], acc.Confirm);
+                //    _repo.ExecuteStoreCommand(sql.SqlText, sql.SqlParams);
+                //}
+                //
                 //BarsSql sql = SqlCreatorBPK.Active(data, acc.Confirm);
                 //_repo.ExecuteStoreCommand(sql.SqlText, sql.SqlParams);
-
+				_repo.Activate(acc.Data, acc.Confirm);
                 return Request.CreateResponse(HttpStatusCode.OK, new { });
             }
             catch (Exception ex)

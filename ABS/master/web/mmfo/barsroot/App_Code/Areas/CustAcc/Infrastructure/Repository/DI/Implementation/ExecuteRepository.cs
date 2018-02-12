@@ -5,6 +5,7 @@ using System.Data;
 using Oracle.DataAccess.Types;
 using System;
 using BarsWeb.Areas.Ndi.Infrastructure;
+using Bars.WebServices.GercPayModels.OracleHelper;
 
 namespace BarsWeb.Areas.CustAcc.Infrastructure.Repository.DI.Implementation
 {
@@ -43,6 +44,35 @@ namespace BarsWeb.Areas.CustAcc.Infrastructure.Repository.DI.Implementation
             {
                 connection.Close();   
             }
+		}
+        public int IsUserBackOffice()
+        {
+            int group_cnt = 0;
+			using (OracleConnection connection = OraConnector.Handler.UserConnection)
+			{
+				using (OracleCommand cmd = new OracleCommand())
+				{
+					cmd.CommandText = @"select count(*) idgs 
+											from GROUPS_staff 
+												where idu = ( select bars.user_id user_id
+																	from params$base
+																		where par = 'REGNCODE'
+																				and rownum =1 )				
+													  and idg in (1018, 1020, 1044, 1025)";		//1044 WAY4-АБС
+																								//1018 Підрозділ бек-офісу
+																								//1020 Група технологів
+					cmd.CommandType = CommandType.Text;
+					cmd.Connection = connection;
+					using (OracleDataReader reader = cmd.ExecuteReader())
+					{
+						while (reader.Read())
+						{
+							group_cnt += Convert.ToInt32(reader["idgs"].ToString());
+						}
+					}
+				}
+			}
+			return group_cnt;
         }
     }
 }
