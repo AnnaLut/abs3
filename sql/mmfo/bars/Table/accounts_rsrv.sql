@@ -35,6 +35,7 @@ begin
 , NMS        VARCHAR2(70)
 , BRANCH     VARCHAR2(30)  default SYS_CONTEXT('BARS_CONTEXT','USER_BRANCH')
 , ISP        NUMBER(38)
+, VID        NUMBER(2)
 , RNK        NUMBER(38)
 , AGRM_NUM   VARCHAR2(40)
 , TRF_ID     NUMBER
@@ -91,6 +92,18 @@ begin
 exception
   when e_col_exists 
   then dbms_output.put_line( 'Column "RSRV_ID" already exists in table.' );
+end;
+/
+
+declare
+  e_col_exists           exception;
+  pragma exception_init( e_col_exists, -01430 );
+begin
+  execute immediate 'alter table ACCOUNTS_RSRV add VID number(2)';
+  dbms_output.put_line( 'Table altered.' );
+exception
+  when e_col_exists 
+  then dbms_output.put_line( 'Column "VID" already exists in table.' );
 end;
 /
 

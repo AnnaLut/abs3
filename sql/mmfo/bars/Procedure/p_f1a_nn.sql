@@ -1,4 +1,4 @@
-create or replace procedure P_F1A_NN
+create or replace procedure BARS.P_F1A_NN
 ( Dat_    DATE
 , sheme_  varchar2 default 'D'
 ) IS
@@ -9,10 +9,10 @@ create or replace procedure P_F1A_NN
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-07/03/2017 - для февраля месяца 2017, 2018, 2019 годов переменная 
-             Dat1_ := last_day(dat_) 
+07/03/2017 - для февраля месяца 2017, 2018, 2019 годов переменная
+             Dat1_ := last_day(dat_)
              (возникала ошибка для to_char(dat_, 'MMYYYY') ='022015')
-05/06/2015 - на 01.06.2015 не будут формироваться коды 41,51 
+05/06/2015 - на 01.06.2015 не будут формироваться коды 41,51
 10/03/2015 - для февраля месяца день месяца не всегда формировался верно
 15/12/2014 - не будет формироваться прогноз за предыдущий месяц и
              прогноз (показатель 31) предоставляется на отчетный
@@ -179,7 +179,7 @@ BEGIN
     end if;
 
     -- наповнення проводок за зв_тну дату
-   insert /*+ APPEND*/ 
+   insert /*+ APPEND*/
      into TMP_FILE03
         ( ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP )
    select ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP
@@ -201,7 +201,7 @@ BEGIN
                 on ( o.acc = a.acc )
               join opldok z
                 on ( o.REF = z.ref and o.stmt = z.stmt and o.dk <> z.dk )
-              join accounts b 
+              join accounts b
                 on ( z.acc = b.acc )
               join oper p
                 on ( o.ref = p.ref )
@@ -210,11 +210,11 @@ BEGIN
                AND a.nbs IN ( SELECT R020
                                 FROM KL_F3_29
                               WHERE KF = '1A' ) )
-    where not ( nlsd like '___8%' and 
-                nlsk not like '___8%' and 
+    where not ( nlsd like '___8%' and
+                nlsk not like '___8%' and
                 substr(nlsd,1,3) = substr(nlsk,1,3)
               );
-    
+
     -------------------------------------------------------------------
     --- остатки
     OPEN SALDO;
@@ -413,8 +413,8 @@ BEGIN
                 if freq_ = 400 then
                    Dat1_:= (case when NVL(apl_dat_, daos_) = last_day(NVL(apl_dat_, daos_))
                                  then last_day(dat_)
-                                 when to_char(NVL(apl_dat_, daos_), 'DD') in ('29','30','31') and  
-                                      to_char(dat_, 'MMYYYY') in ('022017', '022018', '022019') 
+                                 when to_char(NVL(apl_dat_, daos_), 'DD') in ('29','30','31') and
+                                      to_char(dat_, 'MMYYYY') in ('022017', '022018', '022019')
                                  then last_day(dat_)
                             else
                                to_date(to_char(NVL(apl_dat_, daos_),'DD')||to_char(dat_,'MMYYYY'), 'ddmmyyyy')
@@ -529,7 +529,7 @@ BEGIN
 
        -- формирование новых кодов 41, 51 с 01.02.2011
        -- на 01.06.2015 закрыто формирование кодов 41, 51
-       if Dat_ >= to_date('31012011','ddmmyyyy') and Dat_ <= to_date('30042015','ddmmyyyy') 
+       if Dat_ >= to_date('31012011','ddmmyyyy') and Dat_ <= to_date('30042015','ddmmyyyy')
        then
           BEGIN
              select NVL(sum(S),0)
@@ -633,4 +633,4 @@ show err;
 
 
 grant EXECUTE on P_F1A_NN to BARS_ACCESS_DEFROLE;
-grant EXECUTE on P_F1A_NN to RPBN002;
+

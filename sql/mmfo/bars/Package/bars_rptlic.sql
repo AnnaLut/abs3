@@ -1268,8 +1268,7 @@ is
                  begin
                     select t.value into l_value from operw t where t.ref = c1.ref
                                                                and t.kf  = c1.kf
-                                                               and t.tag = 'OWTRI'
-                                                               and c1.tt in (select tt.tt from obpc_trans_out tt);
+                                                               and t.tag = 'OWTRI';
                  exception when no_data_found then l_value := '';
                  end;
 

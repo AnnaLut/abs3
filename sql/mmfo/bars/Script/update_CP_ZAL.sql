@@ -1,3 +1,28 @@
+begin
+    execute immediate 'drop index IND_U_CP_ZAL_DF';
+exception
+    when others then
+      if sqlcode = -1418 then
+        null;
+      else
+        raise;
+      end if;
+end;
+/
+
+
+begin
+    execute immediate 'alter table CP_ZAL  drop constraint CC_CP_ZAL_RNK_NN';
+exception
+    when others then
+      if sqlcode = -2443 then
+        null;
+      else
+        raise;
+      end if;
+end;
+/
+
   begin
     execute immediate 'drop trigger TR_SQNC_CP_ZAL';
   exception
@@ -124,10 +149,12 @@ begin
   if l_cnt > 0 then --у нас проблеми хьюстон
     dbms_output.put_line('Не можу відпрацювати скрипт по зміні принципу історізації в заставних ЦП табл. cp_zal. Потрібно ручне втручання');
     bars_audit.error('Не можу відпрацювати скрипт по зміні принципу історізації в заставних ЦП табл. cp_zal. Потрібно ручне втручання');
+    raise_application_error(-20001, 'Не можу відпрацювати скрипт по зміні принципу історізації в заставних ЦП табл. cp_zal. Потрібно ручне втручання');
     else
+/*
       insert into cp_zal_old(ref, id, kolz, datz,      rnk, back_date)   
                       select ref, id, kolz, datz_from, rnk, sysdate from cp_zal;                       
-    
+*/    
       l_cnt := 0;
       for cur in (select a.acc, a.dat1, a.dat2, a.val, c.ref, c.id from ACCOUNTSP a, cp_deal c 
                   where a.acc = c.acc 

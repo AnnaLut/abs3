@@ -12,7 +12,7 @@ CREATE OR REPLACE PACKAGE BARS.ins_ewa_mgr is
   -- Public type declarations
 
   -- Public constant declarations
-  g_header_version  constant varchar2(64)  := 'version 3.1 26/01/2018';
+  g_header_version  constant varchar2(64)  := 'version 3.2 09/02/2018';
 
   -- Public function and procedure declarations
 
@@ -173,6 +173,7 @@ type gt_paydat is record(id                 number,
                          cust_phone         varchar2(255),
                          cust_address       varchar2(255),
                          external_id        varchar2(255),
+                         cu_external_id     varchar2(255),
                          external_id_tariff varchar2(255),
                          email              varchar2(255),
                          ref                number(38),
@@ -194,7 +195,7 @@ type gt_response is record(
 
   -- Private constant declarations
   g_package_name constant varchar2(160) := 'ins_ewa_mgr';
-  g_body_version  constant varchar2(64)  := 'version 3.01 26/07/2017';
+  g_body_version  constant varchar2(64)  := 'version 3.2 09/02/2018';
 
   --3.0
 --исправлены мелкие ошибки при создании договоров страхования (формат полей таблиц модуля страхования, проверкуи на корректность данных и и.п.)
@@ -372,7 +373,8 @@ end get_branch;
                     if l_paydat.cust_address is null then
                     l_paydat.cust_address:=l_xml_extract(p_xml, l_contr_path||'insuranceObject/address/text()'); --адреса клієнта
                     end if;
-                l_paydat.external_id:=l_xml_extract(p_xml, l_contr_path||'user/externalId/text()'); --логін касика
+                l_paydat.external_id:=l_xml_extract(p_xml, l_contr_path||'user/externalId/text()'); --логін касира
+                l_paydat.cu_external_id:=l_xml_extract(p_xml, 'root/currentUserExternalId/text()'); --логін користувача від якого створюється документ
                 l_paydat.external_id_tariff:=l_xml_extract(p_xml, l_contr_path||'tariff/externalId/text()'); --тип страховки EWA
                 l_paydat.email:=l_xml_extract(p_xml, l_contr_path||'user/email/text()');  --email касика
                 ----для create_deal
@@ -1074,7 +1076,7 @@ end get_purpose;
         select id, branch
           into l_uid, l_branch
           from staff$base
-         where logname = upper(l_paydat.external_id);
+         where logname = upper(l_paydat.cu_external_id);
       exception
         when no_data_found then
           rollback to savepoint sp_paystart;
