@@ -499,6 +499,7 @@ function gridControlCheckDocNumber(element) {
         return true;
     }
 
+
     var paramType = element.getAttribute('paramtype');
 
     var val = String.fromCharCode(event.keyCode);
@@ -508,12 +509,16 @@ function gridControlCheckDocNumber(element) {
     if (document.selection.type == "Text") valFull = val;
     if (0 === val.length) return true;
 
-    var rexp = new RegExp(/[0-9]/);
-    var length = element.getAttribute('maxlength');
+	var rexp = new RegExp(/[0-9]/);
+	var rexpNumFull = new RegExp(/^[0-9]*(\.[0-9]{0,2})?$/);
+	var length = element.getAttribute('maxlength');
 
-    if (paramType ==='N' && !rexp.test(val) || (length && valFull.length > length)) {
-        return false;
-    }
+	if (paramType === 'N' && valFull.indexOf(".") > -1) {
+		return rexpNumFull.test(valFull);
+	}
+	if (paramType === 'N' && !rexp.test(val) || (length && valFull.length > length)) {
+		return false;
+	}
 
     return true;
 }

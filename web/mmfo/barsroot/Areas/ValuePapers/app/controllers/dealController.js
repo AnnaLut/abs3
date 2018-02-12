@@ -11,7 +11,7 @@ function dealController($scope, paramsService) {
             response;
             $scope.naznEditWindow.close();
             $scope.$emit('updateGrid');
-            if ($scope.p_nOp == 1 && $scope.p_fl_END == 0)
+            if (($scope.p_nOp == 1 || $scope.p_nOp == 2) && $scope.p_fl_END == 0)
                 $scope.openSpecparamsWindow();
         })
     }

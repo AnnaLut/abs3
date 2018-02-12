@@ -1,0 +1,200 @@
+﻿#cblbl {
+    display: inline-block;
+    padding-left: 5px;
+}
+
+#premial_cb {
+    width: 17px;
+    height: 17px;
+    padding: 0 !important;
+    margin: 0 !important;
+    margin-left: 5px !important;
+    vertical-align: middle;
+    *overflow: hidden;
+}
+
+.k-textbox {
+    height: 27px !important;
+}
+
+.k-dirty-clear {
+    border-width: 0;
+}
+
+.k-dirty {
+    border-color: transparent transparent transparent transparent;
+}
+
+.custom-btn-file-import, .custom-btn-payroll-history, .custom-btn-payroll-ok {
+    /*background-position: left;*/
+    background-position: 4% 50%;
+    background-size: 22px 20px !important;
+    width: auto !important;
+    padding-left: 35px;
+    height: 30px !important;
+}
+
+.custom-btn-file-import,
+.custom-btn-import-add-file {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/import.png);
+    /*background-position-x: 5px;*/
+}
+
+.custom-btn-payroll-history {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/payroll_history.png);
+    /*background-position-x: 5px;*/
+}
+
+.custom-btn-outside-bank, .custom-btn-accept-payroll, .custom-btn-payroll-enrollment {
+    width: auto;
+}
+
+.custom-btn-import-add-file {
+    background-position: 4% 50%;
+    background-size: 22px 20px !important;
+    width: auto !important;
+    padding-left: 35px;
+}
+
+.k-grid-import-view, .k-grid-import-delete {
+    padding: 6px 12px 6px 12px !important;
+    height: 16px !important;
+    width: 4px !important;
+}
+
+.k-grid-import-view {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/document_view.png);
+}
+
+.k-grid-import-delete {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/delete.png);
+}
+
+
+.custom-btn-payroll-reject {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/visa_back.png);
+}
+
+.logo-td {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/logo.png);
+    background-size: 90% !important;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.logo-td-ie8 {
+    filter: progid:DXImageTransform.Microsoft.AlphaImageLoader( src='/barsroot/Areas/SalaryBag/Content/Images/logo.png', sizingMethod='scale');
+}
+
+.backgroundpic {
+    background-image: url('img/home.jpg');
+    background-size: cover;
+    filter: progid:DXImageTransform.Microsoft.AlphaImageLoader( src='img/home.jpg', sizingMethod='scale');
+}
+
+
+.custom-btn-payroll-ok {
+    background-image: url(/barsroot/Areas/SalaryBag/Content/Images/ok.png);
+    background-size: 20px 16px !important;
+}
+
+#noGrid td {
+    padding-left: 10px;
+    padding-bottom: 5px;
+    text-align: right;
+}
+
+    #noGrid td .k-input {
+        text-align: left !important;
+    }
+
+    #noGrid td label {
+        text-align: right;
+    }
+
+#dealInfo td {
+    text-align: center !important;
+    padding: 5px;
+}
+
+    /*------------------------------------------------------------------------------------*/
+
+    #dealInfo td:not(.noBorderTd) {
+        border-collapse: collapse;
+        border: 1px solid rgb(238, 238, 238);
+    }
+/*------------------------------------------------------------------------------------*/
+
+.lineTd {
+    background-color: rgb(238, 238, 238);
+    padding: 0px !important;
+    width: 1px !important;
+}
+
+.lineTr {
+    background-color: rgb(238, 238, 238);
+    padding: 0px !important;
+    height: 1px !important;
+    width: 100% !important;
+}
+
+.custom-btn {
+    margin-left: 0px !important;
+}
+
+.margined-lbl {
+    margin-left: 0px;
+    margin-right: 15px;
+}
+
+.td-text-middle {
+    text-align: left !important;
+}
+
+.fullWidth {
+    width: 100%;
+}
+
+#payrollDocumentsEditFormTbl td {
+    padding: 5px;
+    margin: 5px;
+}
+
+    #payrollDocumentsEditFormTbl td .k-label {
+        text-align: right !important;
+    }
+
+/*--------------------------------------------------------------------------------------------------*/
+.custom-btn-import-add-file {
+    height: 16px !important;
+}
+
+.k-upload-status {
+    display: none !important;
+}
+
+#fileUploaderDiv > div > div, #fileUploaderDiv > div, .k-dropzone {
+    width: 0px !important;
+    /*height: 16px !important;*/
+}
+
+.k-dropzone {
+    padding-left: 0px;
+}
+
+#fileUploaderDiv {
+    width: 0px !important;
+    height: 0px !important;
+}
+
+#importFilesGrid .k-loading-image, #modaFileDetailsGrid .k-loading-image, #clientSearchModalGrid .k-loading-image {
+    background-image: none;
+}
+
+#comission_debt_value_lbl {
+    color: red;
+}
+
+.custom-btn-change-encoding {
+    width: auto;
+}

@@ -1040,5 +1040,23 @@ namespace BarsWeb.Areas.DptAdm.Controllers
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
+        public ActionResult NewPF(DateTime date)
+        {
+
+            var result = new JsonResponse(JsonResponseStatus.Ok);
+
+            try
+            {
+                _repository.NewPF(date);
+
+            }
+            catch (Exception e)
+            {
+                result.status = JsonResponseStatus.Error;
+                result.message = e.InnerException == null ? e.Message : e.InnerException.Message;
+            }
+            return Json(result);
+        }
+
     }
 }

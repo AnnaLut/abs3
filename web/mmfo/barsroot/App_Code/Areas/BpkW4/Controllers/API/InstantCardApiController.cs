@@ -1,6 +1,7 @@
 ﻿using AttributeRouting.Web.Http;
 using BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Abstract;
 using BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation;
+using BarsWeb.Areas.BpkW4.Models;
 using BarsWeb.Areas.Kernel.Models;
 using BarsWeb.Core.Models;
 using BarsWeb.Core.Models.Binders.Api;

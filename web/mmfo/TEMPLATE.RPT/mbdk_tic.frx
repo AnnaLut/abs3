@@ -86,7 +86,7 @@
       <TextObject Name="Text2" Left="37.8" Top="47.25" Width="567" Height="18.9" Text="на міжбанківські кредитно-депозитні операції" HorzAlign="Center"/>
       <TextObject Name="Text3" Left="37.8" Top="66.15" Width="567" Height="18.9" Text="[data.VIDD_NAME]" HorzAlign="Center"/>
     </ReportTitleBand>
-    <DataBand Name="Data1" Top="98.35" Width="661.5" Height="567">
+    <DataBand Name="Data1" Top="98.5" Width="661.5" Height="567">
       <TableObject Name="Table1" Width="642.6" Height="94.5">
         <TableColumn Name="Column1" Width="75.6"/>
         <TableColumn Name="Column2" Width="189"/>
@@ -228,7 +228,7 @@
         </TableRow>
       </TableObject>
     </DataBand>
-    <ColumnFooterBand Name="ColumnFooter1" Top="669.19" Width="661.5" Height="160.65">
+    <ColumnFooterBand Name="ColumnFooter1" Top="669.5" Width="661.5" Height="160.65">
       <TextObject Name="Text14" Width="226.8" Height="18.9" Text="Начальник управління"/>
       <TextObject Name="Text15" Top="37.8" Width="226.8" Height="18.9" Text="Головний бухгалтер"/>
       <TextObject Name="Text16" Top="75.6" Width="226.8" Height="18.9" Text="Начальник відділу"/>

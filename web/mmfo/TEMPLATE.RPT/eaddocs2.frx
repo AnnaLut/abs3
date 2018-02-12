@@ -1,19 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" DoublePass="true" ReportInfo.Created="04/15/2011 18:11:20" ReportInfo.Modified="04/05/2017 18:59:56" ReportInfo.CreatorVersion="2013.3.2.0">
+<Report ScriptLanguage="CSharp" DoublePass="true" ReportInfo.Created="04/15/2011 18:11:20" ReportInfo.Modified="08/02/2016 17:38:27" ReportInfo.CreatorVersion="2013.2.2.0">
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqvvbGhv0rJ/ulNhGM40hQI8rRVU/LZjE15ygJUr+OHFgVsiqzuKDzCoTnfGQTEJo4RJokwArI+Z9wGc7AO+dQpA==">
-      <TableDataSource Name="Table" Alias="DOCS_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select rownum as rwn, t.*&#13;&#10;  from (select d.id,&#13;&#10;               d.crt_branch,&#13;&#10;               b.name as branch_name,&#13;&#10;               d.rnk,&#13;&#10;               c.nmk as fio,&#13;&#10;               d.ea_struct_id,&#13;&#10;               sc.name as ea_struct_name,&#13;&#10;               d.crt_date,&#13;&#10;               d.crt_staff_id,&#13;&#10;               sb.fio as crt_staff_fio,&#13;&#10;               nvl(d.page_count, 0) as page_count&#13;&#10;          from (select *&#13;&#10;                  from ead_docs&#13;&#10;                 where type_id = 'DOC'&#13;&#10;                   and template_id not in ('DPT_AGRMREG', 'DPT_REGULAR_PAYMENTS')&#13;&#10;                   and to_char(ea_struct_id) in&#13;&#10;                       ('211',&#13;&#10;                        '212',&#13;&#10;                        '213',&#13;&#10;                        '214',&#13;&#10;                        '215',&#13;&#10;                        '216',&#13;&#10;                        '217',&#13;&#10;                        '218',&#13;&#10;                        '219',&#13;&#10;                        '222',&#13;&#10;                        '223',&#13;&#10;                        '224',&#13;&#10;                        '225',&#13;&#10;                        '226','2110','2111','2112')&#13;&#10;                   and :sFdat1 &lt;= crt_date&#13;&#10;                   and crt_date &lt; :sFdat2 + 1 &#13;&#10;                   and crt_staff_id =&#13;&#10;                       decode(:Param0, '%', crt_staff_id, to_number(:Param0))&#13;&#10;                  and crt_branch like   decode(:BRANCH, 'Поточне',  sys_context ('bars_context', 'user_branch'),:BRANCH)||'%'        &#13;&#10;                       ) d,&#13;&#10;               branch b,&#13;&#10;               customer c,&#13;&#10;               ead_struct_codes sc,&#13;&#10;               staff$base sb&#13;&#10;         where d.crt_branch = b.branch&#13;&#10;           and d.sign_date is not null&#13;&#10;           and nvl(d.page_count,0) != 0&#13;&#10;           and d.rnk = c.rnk&#13;&#10;           and d.ea_struct_id = sc.id&#13;&#10;           and d.crt_staff_id = sb.id&#13;&#10;         order by d.id desc) t">
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXawgQMNksAJZokM+/w71MdthAChJFyVf5MHBEM5l1AiA==">
+      <TableDataSource Name="Table" Alias="DOCS_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select rownum as rwn, t.*&#13;&#10;  from (select d.id,&#13;&#10;               d.crt_branch,&#13;&#10;               b.name as branch_name,&#13;&#10;               d.rnk,&#13;&#10;               c.nmk as fio,&#13;&#10;               d.ea_struct_id,&#13;&#10;               sc.name as ea_struct_name,&#13;&#10;               d.crt_date,&#13;&#10;               d.crt_staff_id,&#13;&#10;               sb.fio as crt_staff_fio,&#13;&#10;               nvl(d.page_count, 0) as page_count&#13;&#10;          from (select *&#13;&#10;                  from ead_docs&#13;&#10;                 where type_id = 'DOC'&#13;&#10;                   and to_char(ea_struct_id) in&#13;&#10;                       ('211',&#13;&#10;                        '212',&#13;&#10;                        '213',&#13;&#10;                        '214',&#13;&#10;                        '215',&#13;&#10;                        '216',&#13;&#10;                        '217',&#13;&#10;                        '218',&#13;&#10;                        '219',&#13;&#10;                        '222',&#13;&#10;                        '223',&#13;&#10;                        '224',&#13;&#10;                        '225',&#13;&#10;                       '2110',&#13;&#10;                       '2111',&#13;&#10;                        '226')&#13;&#10;                   and :sFdat1 &lt;= crt_date&#13;&#10;                   and crt_date &lt; :sFdat2 + 1&#13;&#10;                   and crt_staff_id =&#13;&#10;                       decode(:Param0, '%', crt_staff_id, to_number(:Param0))&#13;&#10;                  and crt_branch like   decode(:BRANCH, 'Поточне',  sys_context ('bars_context', 'user_branch'),:BRANCH)||'%'        &#13;&#10;                       ) d,&#13;&#10;               branch b,&#13;&#10;               customer c,&#13;&#10;               ead_struct_codes sc,&#13;&#10;               staff$base sb&#13;&#10;         where d.crt_branch = b.branch&#13;&#10;           and d.sign_date is not null&#13;&#10;           and d.rnk = c.rnk&#13;&#10;           and d.ea_struct_id = sc.id&#13;&#10;           and d.crt_staff_id = sb.id&#13;&#10;         order by d.id desc) t">
+        <Column Name="RWN" DataType="System.Decimal"/>
         <Column Name="ID" DataType="System.Decimal"/>
         <Column Name="CRT_BRANCH" DataType="System.String"/>
         <Column Name="BRANCH_NAME" DataType="System.String"/>
         <Column Name="RNK" DataType="System.Decimal"/>
-        <Column Name="EA_STRUCT_ID" DataType="System.Decimal"/>
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="EA_STRUCT_ID" DataType="System.String"/>
         <Column Name="EA_STRUCT_NAME" DataType="System.String"/>
         <Column Name="CRT_DATE" DataType="System.DateTime"/>
         <Column Name="CRT_STAFF_ID" DataType="System.Decimal"/>
         <Column Name="CRT_STAFF_FIO" DataType="System.String"/>
-        <Column Name="RWN" DataType="System.Decimal"/>
-        <Column Name="FIO" DataType="System.String"/>
         <Column Name="PAGE_COUNT" DataType="System.Decimal"/>
         <CommandParameter Name="sFdat1" DataType="106" Expression="[sFdat1]" DefaultValue="01.01.0001"/>
         <CommandParameter Name="sFdat2" DataType="106" Expression="[sFdat2]" DefaultValue="01.01.0001"/>
@@ -45,15 +45,15 @@
         <TableColumn Name="Column37" Width="78.42"/>
         <TableColumn Name="Column38" Width="158.76"/>
         <TableRow Name="Row43" Height="37.8">
-          <TableCell Name="Cell198" Border.Lines="All" Text="[DOCS_DATA.RWN]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
-          <TableCell Name="Cell199" Border.Lines="All" Text="[DOCS_DATA.CRT_BRANCH]" VertAlign="Center" Font="Times New Roman, 8pt"/>
-          <TableCell Name="Cell200" Border.Lines="All" Text="[DOCS_DATA.RNK]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
-          <TableCell Name="Cell208" Border.Lines="All" Text="[DOCS_DATA.FIO]" VertAlign="Center" Font="Times New Roman, 8pt"/>
-          <TableCell Name="Cell201" Border.Lines="All" Text="[DOCS_DATA.EA_STRUCT_NAME]" VertAlign="Center" Font="Times New Roman, 8pt"/>
-          <TableCell Name="Cell220" Border.Lines="All" Text="[DOCS_DATA.PAGE_COUNT]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt"/>
-          <TableCell Name="Cell240" Border.Lines="All" Text="[DOCS_DATA.ID]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt"/>
-          <TableCell Name="Cell203" Border.Lines="All" Text="[FormatDateTime([DOCS_DATA.CRT_DATE],&quot;Short Date&quot;)]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
-          <TableCell Name="Cell204" Border.Lines="All" Text="[DOCS_DATA.CRT_STAFF_FIO]" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell198" Border.Lines="All" Text="[DOCS_DATA.RWN]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell199" Border.Lines="All" Text="[DOCS_DATA.CRT_BRANCH]" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell200" Border.Lines="All" Text="[DOCS_DATA.RNK]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell208" Border.Lines="All" Text="[DOCS_DATA.FIO]" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell201" Border.Lines="All" Text="[DOCS_DATA.EA_STRUCT_NAME]" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell220" Border.Lines="All" Text="[DOCS_DATA.PAGE_COUNT]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell240" Border.Lines="All" Text="[DOCS_DATA.ID]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell203" Border.Lines="All" Text="[FormatDateTime([DOCS_DATA.CRT_DATE],&quot;Short Date&quot;)]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell204" Border.Lines="All" Text="[DOCS_DATA.CRT_STAFF_FIO]" VertAlign="Center" Font="Times New Roman, 10pt"/>
         </TableRow>
       </TableObject>
       <DataHeaderBand Name="DataHeader1" Width="1047.06" Height="141.75">
@@ -79,7 +79,13 @@
             <TableCell Name="Cell215"/>
           </TableRow>
           <TableRow Name="Row40" Height="37.8">
-            <TableCell Name="Cell177" Text="Документи сформовані [COMMON_DATA.NAME_BRANCH] &#13;&#10;за період з[sFdat1] по [sFdat2]" HorzAlign="Center" Font="Times New Roman, 11pt, style=Bold" ColSpan="9"/>
+            <TableCell Name="Cell177" Text="Документи сформовані [COMMON_DATA.NAME_BRANCH] за період з [sFdat1] по [sFdat2]" HorzAlign="Center" Font="Times New Roman, 11pt, style=Bold" ColSpan="9">
+              <Formats>
+                <GeneralFormat/>
+                <DateFormat/>
+                <DateFormat/>
+              </Formats>
+            </TableCell>
             <TableCell Name="Cell178" Font="Times New Roman, 10pt"/>
             <TableCell Name="Cell179" Font="Times New Roman, 10pt"/>
             <TableCell Name="Cell205"/>

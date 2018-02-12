@@ -119,6 +119,12 @@ namespace BarsWeb.Areas.ValuePapers.Infrastructure.DI.Implementation
             string sqlText = @"select code,txt  from CP_OB_MARKET   order by 1 ";
             return _entity.ExecuteStoreQuery<ChangeBillGrid>(sqlText);
         }
+        
+        public IEnumerable<ChangeBillGrid> CP_OB_FORM_CALC()
+        {
+            string sqlText = @"select code,txt  from CP_OB_FORM_CALC   order by 1 ";
+            return _entity.ExecuteStoreQuery<ChangeBillGrid>(sqlText);
+        }
 
         public IEnumerable<Params> GetContractSaleWindowFixedParams()
         {
@@ -653,7 +659,7 @@ namespace BarsWeb.Areas.ValuePapers.Infrastructure.DI.Implementation
 
         }
 
-        public string SetSpecparam(string REF_MAIN, string COD_I, string COD_M)
+        public string SetSpecparam(string REF_MAIN, string COD_I, string COD_M, string COD_F)
         {
             OracleConnection connection = OraConnector.Handler.UserConnection;
             try
@@ -665,13 +671,14 @@ namespace BarsWeb.Areas.ValuePapers.Infrastructure.DI.Implementation
                 command.Parameters.Add(new OracleParameter { ParameterName = "FL_END", Direction = ParameterDirection.Input, OracleDbType = OracleDbType.Decimal, Value = REF_MAIN });
                 command.Parameters.Add(new OracleParameter { ParameterName = "RB_K_P", Direction = ParameterDirection.Input, OracleDbType = OracleDbType.Decimal, Value = COD_I });
                 command.Parameters.Add(new OracleParameter { ParameterName = "NOP", Direction = ParameterDirection.Input, OracleDbType = OracleDbType.Decimal, Value = COD_M });
+                command.Parameters.Add(new OracleParameter { ParameterName = "COD_F", Direction = ParameterDirection.Input, OracleDbType = OracleDbType.Decimal, Value = COD_F });
                 command.Parameters.Add(new OracleParameter { ParameterName = "SERR", Direction = ParameterDirection.Output, Size = 4000, OracleDbType = OracleDbType.Varchar2});
                
                 #endregion
 
                 command.ExecuteNonQuery();
 
-                return command.Parameters[3].Value.ToString();
+                return command.Parameters[4].Value.ToString();
             }
             finally
             {

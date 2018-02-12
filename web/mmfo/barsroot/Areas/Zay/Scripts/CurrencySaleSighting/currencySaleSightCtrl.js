@@ -43,7 +43,6 @@
      * повертає значення фільтру у вигляді стринга
      */
     function getFilterParam() {
-        debugger;
         var result = '';
         var paramType = typeof filterParam;
         if (filterParam && paramType === "string") {
@@ -57,14 +56,11 @@
 
     $("#btnFilter").kendoButton({
         click: function () {
-            debugger;
             bars.ui.getFiltersByMetaTable(function (response) {
-                debugger;
                 if (response.length > 0) {
                     var grid = $("#grid").data("kendoGrid");
                     filterParam = response[0];
                     var res = getFilterParam();
-                    debugger;
                     grid.dataSource.read({
                         flt: res
                     });
@@ -219,7 +215,7 @@
             var grid = $("#grid").data("kendoGrid"),
                 row = grid.dataItem(grid.select());
             if (row) {
-                if (row.TXT) {
+                if (row.AIMS_CODE) {
                     bars.visaCtrl.runCheckData(row);
                 } else {
                     bars.ui.error({ text: "Необхідно вказати опис коду цілі!" });
@@ -303,7 +299,7 @@
                         DIG: { type: "number", editable: false },
                         KOM: { type: "number", editable: false },
                         SKOM: { type: "number", editable: false },
-                        META_AIM_NAME: { type: "string", editable: false },
+                        META_AIM_NAME: { type: "string", editable: true },
                         VIZA: { type: "number", editable: false },
                         PRIORITY: { type: "number", editable: false },
                         PRIORNAME: { type: "string" },
@@ -479,6 +475,7 @@
                         /*valueTemplate: '<span>#:PRIORNAME#</span>',
                         template: '<span class="k-state-default"></span>' +
                                                   '<span class="k-state-default">#:PRIORNAME#</span>',*/
+                        template: '<span style="font-size:0.8em">#:PRIORNAME#</span>',
                         dataSource: {
                             transport: {
                                 read: {
@@ -507,7 +504,53 @@
             }, {
                 field: "META_AIM_NAME",
                 title: "Мета",
-                width: 150
+                width: 150,
+                editor: function(container, options) {
+                    var input = $('<input data-text-field="AIM_NAME" data-value-field="AIM_CODE" data-bind="value:' + options.field + '"/>');
+                    input.appendTo(container);
+
+                    input.kendoDropDownList({
+                        autobind: true,
+                        width:300,
+                        dataTextField: "AIM_NAME",
+                        dataValueField: "AIM_CODE",
+                        optionLabel: "Змінити на...",
+                        valueTemplate: '<span>#:AIM_CODE + " " + AIM_NAME#</span>',
+                        template: '<span style="font-size:0.8em">#:AIM_CODE + " " + AIM_NAME#</span>',
+                        dataSource: {
+                            transport: {
+                                read: {
+                                    type: "GET",
+                                    dataType: "json",
+                                    url:bars.config.urlContent("/api/zay/aims/get")
+                                }
+                            },
+                            schema: {
+                                data: "Data",
+                                total:"Total"
+                            },
+                            requestEnd: function(e) {
+                                e.response.Data.sort(function(a, b) {
+                                    if (a.AIM_CODE > b.AIM_CODE) return 1;
+                                    if (a.AIM_CODE < b.AIM_CODE) return -1;
+                                });
+                                e.response.Data = e.response.Data.filter(function(elem) { return elem.AIM_CODE > 0 });
+                            }
+                        },
+                        change: function(e) {
+                            var metaAimCode = this.value(),
+                                metaAimName = this.text(),
+                                grid = $("#grid").data("kendoGrid"),
+                                row = grid.dataItem(grid.select());
+
+                            row.META_AIM_NAME = metaAimName;
+                            row.AIMS_CODE = metaAimCode;
+                        }
+                    }).appendTo(container);
+
+                    var dropdownlist = input.data("kendoDropDownList");
+                    dropdownlist.list.width(340);
+                }
             }, {
                 field: "AIMS_CODE",
                 title: "Цифровий код<br/>цілі продажу",
@@ -516,6 +559,7 @@
             }, {
                 field: "TXT",
                 title: "Опис коду<br/>цілі продажу",
+                hidden:true,
                 width: 300,
                 editor: function (container, options) {
                     var input = $('<input data-text-field="TXT" data-value-field="P40" data-bind="value:' + options.field + '"/>');

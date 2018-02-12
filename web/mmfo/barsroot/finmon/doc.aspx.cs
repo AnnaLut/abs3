@@ -26,6 +26,7 @@ public partial class finmon_doc : Bars.BarsPage
     const string FILTER_PARAMS_KEY = "FilterParams";
     const string SELECTEDROWS_KEY = "SELECTEDROWS";
     const string FINMIN_RELOAD_KEY = "FinminReload"; //нужно ли перечитывать данные из БД: 0/1
+    const string FINMON_FILTER_APPLYED_KEY = "FinmonFilterApplyed";
     const string RULE_ID_KEY = "rule_id";
     const string PARAMS_REF_KEY = "ParamsRef"; //референс, по которому проставляются параметры ФМ
     const int refFieldidx = 2;
@@ -81,6 +82,21 @@ public partial class finmon_doc : Bars.BarsPage
         set
         {
             Session[FINMIN_RELOAD_KEY] = value;
+        }
+    }
+
+    public string FinmonFilterApplyed
+    {
+        get
+        {
+            if (Session[FINMON_FILTER_APPLYED_KEY] != null)
+                return Session[FINMON_FILTER_APPLYED_KEY].ToString();
+            else
+                return "";
+        }
+        set
+        {
+            Session[FINMON_FILTER_APPLYED_KEY] = value;
         }
     }
 
@@ -232,6 +248,15 @@ public partial class finmon_doc : Bars.BarsPage
             updateRowRendering();
         }
 
+        if(FinmonFilterApplyed == "1")
+        {
+            gvFmDocs.DataSourceID = string.Empty;
+            gvFmDocs.DataBind();
+        } else
+        {
+            gvFmDocs.DataSourceID = "odsFmDocs";
+        }
+
         if (FinminReload == "1")
         {
             FillData();            
@@ -274,12 +299,7 @@ public partial class finmon_doc : Bars.BarsPage
     /// </summary>
     private void FillGrid()
     {
-        if(Session["Finmon_DropPageIndex"].ToString() == "1")
-        {
-            gvFmDocs.PageIndex = 0;
-            Session["Finmon_DropPageIndex"] = "";
-        }
-        
+        gvFmDocs.PageIndex = 0;
 
         decimal? selectParam;
         string selectCommand = null;
@@ -515,7 +535,7 @@ public partial class finmon_doc : Bars.BarsPage
                     cell_.ForeColor = Color.Black;
                 }
 
-                if(nlsa.StartsWith("3720") || nlsb.StartsWith("3720"))
+                if((nlsa.StartsWith("3720") || nlsb.StartsWith("3720")) && sos != 5)
                 {
                     cell_.ForeColor = Color.Green;
                 }
@@ -586,8 +606,8 @@ public partial class finmon_doc : Bars.BarsPage
 
         if (p_count > 0)
         {
-            string p_par = p_count + ":" + p_ref;
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "document", "statusOpen('" + p_count + ":" + p_ref + "');", true);
+            Session["statusOpen_par"] = p_count + ":" + p_ref;
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "document", "statusOpen();", true);
         }
         else
         {
@@ -601,42 +621,53 @@ public partial class finmon_doc : Bars.BarsPage
     /// <param name="e"></param>
     protected void btUnblock_Click(object sender, EventArgs e)
     {
-        if (gvFmDocs.SelectedRows.Count != 0)
-        {
-            if (Convert.ToString(gvFmDocs.DataKeys[gvFmDocs.SelectedRows[0]].Value) != null)
-            {
-                var record = gvFmDocs.DataKeys[gvFmDocs.SelectedRows[0]];
-                if (record["OTM"].ToString().Length > 0)
-                {
-                    otm = Convert.ToDecimal(record["OTM"]);
-                }
-                else
-                {
-                    otm = 0;
-                }
+        int counter = 0;
+        var ids = GetChecked();
 
-                if (otm != 0)
-                {
-                    InitOraConnection();
-                    try
-                    {
-                        ClearParameters();
-                        var pRef = Convert.ToDecimal(gvFmDocs.DataKeys[gvFmDocs.SelectedRows[0]]["REF"]);
-                        SetParameters("p_ref", DB_TYPE.Decimal, pRef, DIRECTION.Input);
-                        SQL_NONQUERY("begin p_fm_unblock(:p_ref,null); end;");
-                    }
-                    finally
-                    {
-                        DisposeOraConnection();
-                    }
-                    FillGrid();
-                    FillData();
-                }
-            }
+        if (ids.Length != 0)
+        {
+            foreach (int row in ids)
+                Unblock(row, ref counter);
         }
+        else if (gvFmDocs.SelectedRows.Count != 0)
+            Unblock(gvFmDocs.SelectedRows[0], ref counter);
         else
         {
             ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", "alert('Не вибрано жодного рядка');", true);
+            return;
+        }
+
+        if (counter > 0)
+        {
+            FillGrid();
+            FillData();
+        }        
+    }
+
+    protected void Unblock(int row, ref int counter)
+    {
+        if (Convert.ToString(gvFmDocs.DataKeys[row].Value) != null)
+        {
+            var record = gvFmDocs.DataKeys[row];
+
+            otm = record["OTM"].ToString().Length > 0 ? Convert.ToDecimal(record["OTM"]) : 0;
+
+            if (otm != 0)
+            {
+                InitOraConnection();
+                try
+                {
+                    ClearParameters();
+                    var pRef = Convert.ToDecimal(gvFmDocs.DataKeys[row]["REF"]);
+                    SetParameters("p_ref", DB_TYPE.Decimal, pRef, DIRECTION.Input);
+                    SQL_NONQUERY("begin p_fm_unblock(:p_ref,null); end;");
+                }
+                finally
+                {
+                    DisposeOraConnection();
+                }
+                counter++;
+            }
         }
     }
 
@@ -846,6 +877,12 @@ public partial class finmon_doc : Bars.BarsPage
             FillData();
 
         }
+    }
+
+    [WebMethod]
+    public static void SetFilterApplyed()
+    {
+        HttpContext.Current.Session[FINMON_FILTER_APPLYED_KEY] = "1";
     }
 
     [WebMethod]

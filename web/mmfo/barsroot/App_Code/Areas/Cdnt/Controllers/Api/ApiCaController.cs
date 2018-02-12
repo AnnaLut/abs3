@@ -144,7 +144,11 @@ namespace BarsWeb.Areas.Cdnt.Controllers
                 Address = n.ADDRESS,
                 PhoneNumber = n.PHONE_NUMBER,
                 MobilePhoneNumber = n.MOBILE_PHONE_NUMBER,
-                Email = n.EMAIL
+                Email = n.EMAIL,
+                DocumentType = n.DOCUMENT_TYPE,
+                IdcardDocumentNumber = n.IDCARD_DOCUMENT_NUMBER,
+                IdcardNotationNumber = n.IDCARD_NOTATION_NUMBER,
+                PassportExpiry = n.PASSPORT_EXPIRY
             }).ToList();
 
             foreach (var resItem in result)

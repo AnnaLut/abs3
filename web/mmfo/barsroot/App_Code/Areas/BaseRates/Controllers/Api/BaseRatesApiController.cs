@@ -145,18 +145,16 @@ namespace BarsWeb.Areas.BaseRates.Controllers.Api
         }
 
         [HttpPost]
-        public HttpResponseMessage DeleteBrate([FromBody] dynamic request)
+        public HttpResponseMessage DeleteBrate(TbBrateDelete model)
         {
             try
             {
-                TbBrates model = request["model"].ToObject<TbBrates>();
-                decimal br_id = request["br_id"];
-                _repository.DeleteBrate(model, br_id);
+                _repository.DeleteBrate(model);
                 return Request.CreateResponse(HttpStatusCode.OK, "Дані виделені");
             }
             catch (Exception ex)
             {
-                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ex.Message);
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
 

@@ -568,6 +568,7 @@ where c.rnk = :p_rnk";
                 KV.DataSource = dtKV;
                 KV.DataValueField = "ID";
                 KV.DataTextField = "NAME";
+                KV.SelectedIndex = 6;
                 KV.DataBind();
             }
 
@@ -581,6 +582,7 @@ where c.rnk = :p_rnk";
                 BASEY.DataSource = dtBASEY;
                 BASEY.DataValueField = "ID";
                 BASEY.DataTextField = "NAME";
+                BASEY.SelectedIndex = 1;
                 BASEY.DataBind();
             }
 
@@ -604,6 +606,7 @@ where c.rnk = :p_rnk";
                 GPK.DataSource = dtGPK;
                 GPK.DataValueField = "ID";
                 GPK.DataTextField = "NAME";
+                GPK.SelectedIndex = 1;
                 GPK.DataBind();
             }
 
@@ -630,6 +633,7 @@ where c.rnk = :p_rnk";
                 NFREQ.DataSource = dtNFREQ;
                 NFREQ.DataValueField = "ID";
                 NFREQ.DataTextField = "NAME";
+                NFREQ.SelectedIndex = 4;
                 NFREQ.DataBind();
             }
 
@@ -641,7 +645,7 @@ where c.rnk = :p_rnk";
             if (!IsPostBack)
             {
                 DataTable dtMETR = new DataTable();
-                cmd.CommandText = "select metr as id, metr || ' - ' || name as name from int_metr where metr > 94";
+                cmd.CommandText = "select metr as id, metr || ' - ' || name as name from int_metr where metr > 94 or metr=0";
                 adr.Fill(dtMETR);
 
                 METR.DataSource = dtMETR;

@@ -49,7 +49,7 @@ function addToSaveTags(elem) {
             alert("Значення реквізиту має бути числовим в межах від 0 до 100.");
             elem.value = "";
         } else
-            elem.value = +x.toFixed(4);
+            elem.value = +x.toFixed(10);
     }
     // проверка типа
     var type = elem.getAttribute("TAGTYPE");

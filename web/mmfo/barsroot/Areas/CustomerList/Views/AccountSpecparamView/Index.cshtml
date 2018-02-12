@@ -1,0 +1,83 @@
+﻿<script src="~/Areas/CustomerList/Scripts/AccountSpecparamView/AccountSpecparamViewCtrl.js"></script>
+<style>
+	.closedAcc {
+		color: #74baf7 !important;
+	}
+</style>
+<div id="content" ng-app="BarsWeb.Controllers" ng-controller="accSpecCtr" ng-init="Init()">
+	<h1>{{Title}}</h1>
+	<div class="jumbotron container" style="margin:0px !important">
+		<div class="col-md-12 col-xs-12">
+			<div class="col-md-4 col-xs-3">
+				<div class="form-group">
+					<label for="inputNls" class="control-label col-xs-3">Рахунок:</label>
+					<div class="col-xs-9">
+						<input id="inputNls" style="width:220px;" kendo-masked-text-box ng-model="gridParams.nls" />
+					</div>
+				</div>
+				<br>
+				<div class="form-group">
+					<label for="inputBranch" class="control-label col-xs-3">Відділення:</label>
+					<div class="col-xs-9">
+						<select id="inputBranch"
+								ng-model="gridParams.branch"
+								kendo-drop-down-list
+								k-data-text-field="'NAME'"
+								k-data-value-field="'BRANCH'"
+								k-data-source="BranchDatasource"
+								style="width:220px;"></select>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-4 col-xs-4">
+				<div class="form-group">
+					<label for="inputNms" class="control-label col-xs-3">Найменування рах:</label>
+					<div class="col-xs-9">
+						<input id="inputNms" kendo-masked-text-box ng-model="gridParams.nms" />
+					</div>
+				</div>
+				<div class="form-group" style="margin-top: 50px;">
+					<label for="inputOb22" class="control-label col-xs-3">OB22:</label>
+					<div class="col-xs-9">
+						<input id="inputOb22" kendo-masked-text-box ng-model="gridParams.ob22" />
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-2 col-xs-2">
+				<div class="form-group">
+					<label for="inputRnk" style="width: 50px;" class="control-label col-xs-3">RNK:</label>
+					<div class="col-xs-9">
+						<input id="inputRnk" kendo-masked-text-box ng-model="gridParams.rnk" />
+					</div>
+				</div>
+				<br>
+				<div class="form-group">
+					<label for="inputKV" style="width: 50px;" class="control-label col-xs-3">Код.Вал.:</label>
+					<div class="col-xs-9">
+						<input id="inputKV" kendo-masked-text-box ng-model="gridParams.kv" />
+					</div>
+				</div>
+			</div>
+			<div class="col-md-2 col-xs-2">
+				<div class="form-group">
+					<div class="col-xs-9">
+						<label for="inputOpen" class="control-label col-xs-8">Закриті</label>
+						<input id="inputOpen" type="checkbox" ng-model="gridParams.showClosed" ng-change="commonMethods.doRefreshGrid()"/>
+					</div>
+				</div>			
+			</div>
+			<div class="col-md-1 col-xs-1">
+				<button type="button" class="btn btn-default btn-large" style="width:60px;height:60px;margin-left: 30px;" ng-click="commonMethods.doRefreshGrid()">Ok</button>
+			</div>
+		</div>
+	</div>
+	<br>
+	<div kendo-toolbar k-options="accTools">
+	</div>
+
+	<kendo-grid id="accGrid" options="accGrid">
+	</kendo-grid>
+
+</div>

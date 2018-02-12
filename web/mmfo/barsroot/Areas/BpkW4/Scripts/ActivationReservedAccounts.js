@@ -89,8 +89,22 @@ function OpenACC(NLS) {
     else{ bars.ui.error({ title: 'Помилка', text: "Неправильний рахунок клієнта!" }); }
 }
 
-function ApplyActivation() { Activation(1); }
-function CanselActivation() { Activation(0); }
+function ApplyActivation() { isBackoficceCkeck(Activation, 1); }
+function CanselActivation() { isBackoficceCkeck(Activation, 0); }
+
+function isBackoficceCkeck(func, param) {
+	$.ajax({
+		type: "GET",
+		url: bars.config.urlContent("/api/custacc/start/"),
+		success: function (result) {
+			if (result > 0) {
+				func(param);
+			} else {
+				bars.ui.alert({ text: "Поточний користувач не нележить \"Підрозділу бек-офісу\"" });
+			}
+		}
+	});
+}
 
 // confirm<number> [0, 1]
 function Activation(confirm) {

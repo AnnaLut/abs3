@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-/// <summary>
-/// Summary description for CardTypeResult
-/// </summary>
-public class CardTypeResult
+﻿namespace BarsWeb.Areas.BpkW4.Models
 {
-    public string card_code { get; set; }
-    public string sub_name { get; set; }
+	public class CardTypeResult
+	{
+		public string card_code { get; set; }
+		public string sub_name { get; set; }
+	}
 }

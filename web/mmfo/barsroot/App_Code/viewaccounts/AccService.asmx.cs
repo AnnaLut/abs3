@@ -995,28 +995,46 @@ namespace ViewAccounts
             return result;
         }
         [WebMethod(EnableSession = true)]
-        public string getFioFromId(string id)
-        {
-            string result = string.Empty;
-            try
-            {
-                InitOraConnection(Context);
-                SetRole(base_role);
-                SetParameters("ID", DB_TYPE.Decimal, id, DIRECTION.Input);
-                result = Convert.ToString(SQL_SELECT_scalar("SELECT fio FROM staff WHERE type=1 AND id=:ID"));
-            }
-            catch (System.Exception ex)
-            {
-                SaveExeption(ex);
-                throw ex;
-            }
-            finally
-            {
-                DisposeOraConnection();
-            }
-            return result;
-        }
-        [WebMethod(EnableSession = true)]
+        public string currentUserId()
+		{
+			using (var connection = Bars.Classes.OraConnector.Handler.UserConnection)
+			{
+				string sql = @"select user_id from dual";
+				return connection.Query<string>(sql).SingleOrDefault();
+			}
+		}
+		[WebMethod(EnableSession = true)]
+		public string getFioFromId(string id)
+		{
+			return getGeneralFioFronId(id, "SELECT fio FROM staff WHERE type=1 AND id=:ID");
+		}
+		[WebMethod(EnableSession = true)]
+		public string getFioFromAllstaffById(string id)
+		{
+			return getGeneralFioFronId(id, "SELECT fio FROM staff$base WHERE type=1 AND id=:ID");
+		}
+		private string getGeneralFioFronId(string id, string query)
+		{
+			string result = string.Empty;
+			try
+			{
+				InitOraConnection(Context);
+				SetRole(base_role);
+				SetParameters("ID", DB_TYPE.Decimal, id, DIRECTION.Input);
+				result = Convert.ToString(SQL_SELECT_scalar(query));
+			}
+			catch (System.Exception ex)
+			{
+				SaveExeption(ex);
+				throw ex;
+			}
+			finally
+			{
+				DisposeOraConnection();
+			}
+			return result;
+		}
+		[WebMethod(EnableSession = true)]
         public string getMfo(string id)
         {
             string result = string.Empty;
@@ -1789,12 +1807,12 @@ namespace ViewAccounts
             {
                 ClearParameters();
                 SetRole(base_role);
-                string ProcMfoOld = data[21];
-                string ProcMfo = data[0];
+                decimal? ProcMfoOld = data[21] == "" ? (decimal?)null : Convert.ToDecimal(data[21]);
+                decimal? ProcMfo = data[0] == "" ? (decimal?)null : Convert.ToDecimal(data[0]);
                 decimal Ostx = (data[1] == "") ? (0) : Convert.ToDecimal(data[1]);
                 string NlsAlt = data[2];
-                string Grp = data[3];
-                string Rnk = data[4];
+                decimal? Grp = (data[3] == "") ? (decimal?)null : Convert.ToDecimal(data[3]);
+                decimal Rnk = Convert.ToDecimal(data[4]);
                 string Nls = data[5];
                 string Kv = data[6];
                 if (Kv.Length > 3)
@@ -1805,17 +1823,16 @@ namespace ViewAccounts
                 string newacc = "";
                 string Nbs = data[10];
                 string Pap = data[11];
-                string Vid = data[12];
+                decimal Vid = (data[12] == "") ? (0) : Convert.ToDecimal(data[12]);
                 string Pos = data[13];
-                string Seci = (data[14] == "") ? (null) : (data[14]);
-                string Seco = (data[15] == "") ? (null) : (data[15]);
-                string Blkd = data[16];
-                string Blkk = data[17];
+                decimal? Seci= data[14] == "" ? (decimal?)null : Convert.ToDecimal(data[14]);
+                decimal? Seco = data[15] == "" ? (decimal?)null : Convert.ToDecimal(data[15]);
+                decimal Blkd = (data[16] == "") ? (0) : Convert.ToDecimal(data[16]);
+                decimal Blkk = (data[17] == "") ? (0) : Convert.ToDecimal(data[17]);
                 decimal Lim = (data[18] == "") ? (0) : Convert.ToDecimal(data[18]);
                 string Tobo = data[19];
-                decimal mode = (ProcMfo != "" || ProcMfoOld != "") ? (4) : (77);
-                string ostx = (Ostx == 0) ? ("NULL") : (Ostx.ToString());
-                string nlsalt = (NlsAlt == "") ? ("NULL") : (NlsAlt);
+                decimal mode = (ProcMfo.HasValue || ProcMfoOld.HasValue) ? (4) : (77);
+                string ostx = (Ostx == 0) ? ("") : (Ostx.ToString());
 
                 string ob22 = data[26];
                 decimal P4 = 0;
@@ -1865,22 +1882,22 @@ namespace ViewAccounts
 
 
                 SetParameters("mod_", DB_TYPE.Decimal, mode, DIRECTION.Input);
-                SetParameters("p1_", DB_TYPE.Varchar2, ProcMfo, DIRECTION.Input);
+                SetParameters("p1_", DB_TYPE.Decimal, ProcMfo, DIRECTION.Input);
                 SetParameters("p2_", DB_TYPE.Decimal, 0, DIRECTION.Input);
                 SetParameters("p3_", DB_TYPE.Decimal, Grp, DIRECTION.Input);
                 SetParameters("p4_", DB_TYPE.Decimal, P4, DIRECTION.InputOutput);
                 SetParameters("rnk_", DB_TYPE.Decimal, Rnk, DIRECTION.Input);
                 SetParameters("nls_", DB_TYPE.Varchar2, Nls, DIRECTION.Input);
-                SetParameters("kv_", DB_TYPE.Decimal, Kv, DIRECTION.Input);
+                SetParameters("kv_", DB_TYPE.Decimal, Convert.ToDecimal(Kv), DIRECTION.Input);
                 SetParameters("nms_", DB_TYPE.Varchar2, Nms, DIRECTION.Input);
                 SetParameters("tip_", DB_TYPE.Varchar2, Tip, DIRECTION.Input);
-                SetParameters("isp_", DB_TYPE.Decimal, Isp, DIRECTION.Input);
-                SetParameters("accR_", DB_TYPE.Decimal, newacc, DIRECTION.Output);
+                SetParameters("isp_", DB_TYPE.Decimal, Convert.ToDecimal(Isp), DIRECTION.Input);
+                SetParameters("accR_", DB_TYPE.Decimal, null, DIRECTION.Output);
                 SetParameters("nbsnull_", DB_TYPE.Varchar2, "1", DIRECTION.Input);
                 SetParameters("ob22_", DB_TYPE.Varchar2, ob22, DIRECTION.Input);
-                SetParameters("pap_", DB_TYPE.Decimal, Pap, DIRECTION.Input);
+                SetParameters("pap_", DB_TYPE.Decimal, Convert.ToDecimal(Pap), DIRECTION.Input);
                 SetParameters("vid_", DB_TYPE.Decimal, Vid, DIRECTION.Input);
-                SetParameters("pos_", DB_TYPE.Decimal, Pos, DIRECTION.Input);
+                SetParameters("pos_", DB_TYPE.Decimal, Convert.ToDecimal(Pos), DIRECTION.Input);
                 SetParameters("sec_", DB_TYPE.Decimal, 0, DIRECTION.Input);
                 SetParameters("seci_", DB_TYPE.Decimal, Seci, DIRECTION.Input);
                 SetParameters("seco_", DB_TYPE.Decimal, Seco, DIRECTION.Input);
@@ -1888,8 +1905,8 @@ namespace ViewAccounts
                 SetParameters("blkk_", DB_TYPE.Decimal, Blkk, DIRECTION.Input);
                 SetParameters("lim_", DB_TYPE.Decimal, Lim, DIRECTION.Input);
                 SetParameters("ostx_", DB_TYPE.Varchar2, ostx, DIRECTION.Input);
-                SetParameters("nlsalt_", DB_TYPE.Varchar2, nlsalt, DIRECTION.Input);
-                SetParameters("tobo_", DB_TYPE.Varchar2, Tobo, DIRECTION.Input);
+                SetParameters("nlsalt_", DB_TYPE.Varchar2, NlsAlt, DIRECTION.Input);
+                SetParameters("branch_", DB_TYPE.Varchar2, Tobo, DIRECTION.Input);
                 SQL_PROCEDURE("accreg.SetAccountAttr");
 
                 result = Convert.ToString(GetParameter("accR_"));

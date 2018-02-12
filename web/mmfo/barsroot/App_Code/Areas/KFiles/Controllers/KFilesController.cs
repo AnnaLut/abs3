@@ -8,6 +8,7 @@ using Kendo.Mvc.Extensions;
 using System.Collections.Generic;
 using BarsWeb.Core.Models.Json;
 using Kendo.Mvc.UI;
+using System.Web.Script.Serialization;
 
 namespace BarsWeb.Areas.KFiles.Controllers
 {
@@ -322,10 +323,77 @@ namespace BarsWeb.Areas.KFiles.Controllers
 
         }
 
-        public ViewResult DataKFiles()
+        public ViewResult DataKFiles(V_OB_CORPORATION_DATA_DOCS data)
+        {
+            try
+            {
+                var serializer = new JavaScriptSerializer();
+                ViewBag.Data = serializer.Serialize(data);
+            }
+            catch
+            {
+                ViewBag.Data = null;
+            }
+            return View();
+        }
+
+        public JsonResult GetRegions()
+        {
+            try
+            {
+                var regions = _kfRepository.GetDropDownRegions();
+                return Json(regions, JsonRequestBehavior.AllowGet);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public ViewResult DataView()
         {
             return View();
         }
 
+        public JsonResult GetDataViewData([DataSourceRequest]DataSourceRequest request, SaldoFilters filterss)
+        {
+            try
+            {
+                IQueryable<V_OB_CORPORATION_SALDO> data = _kfRepository.GetDataViewData(request, filterss);
+                Decimal count = _kfRepository.GetDataViewDataCount(request, filterss);
+                return Json(new { Data = data, Total = count }, JsonRequestBehavior.AllowGet);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public JsonResult GetTurnoverbalanceData([DataSourceRequest]DataSourceRequest request, String FILE_DATE, Decimal? KV, String NLS, String TT)
+        {
+            try
+            {
+                var data = _kfRepository.GetTurnoverbalanceData(request, FILE_DATE, KV, NLS, TT);
+                var dataCount = _kfRepository.GetTurnoverbalanceDataCount(request, FILE_DATE, KV, NLS, TT);
+                return Json(new { Data = data, Total = dataCount }, JsonRequestBehavior.AllowGet);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public JsonResult GetDropDownCorporations()
+        {
+            try
+            {
+                IQueryable<Corporation_SALDO> corporations = _kfRepository.GetDropDownCorporations();
+                return Json(corporations, JsonRequestBehavior.AllowGet);
+            }
+            catch
+            {
+                return null;
+            }
+        }
     }
 }

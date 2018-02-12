@@ -28,7 +28,7 @@
         function getYesterdaysDate() {
             var date = new Date();
             date.setDate(date.getDate() - 1);
-            var dd = date.getDate() + '/',
+            var dd = (date.getDate() < 9 ? '0' + date.getDate() : date.getDate()) + '/',
                 MM = ((date.getMonth() + 1) < 9 ? '0' + (date.getMonth() + 1) : (date.getMonth() + 1)) + '/',
                 yyyy = date.getFullYear();
             return dd + MM + yyyy;
@@ -212,10 +212,10 @@
                     dataType: 'json',
                     data: {
                         dateFrom: function () {
-                            return kendo.toString(kendo.parseDate($scope.dateObj.dateFrom), 'dd/MM/yyyy') || dateFrom;
+                            return dateFrom;
                         },
                         dateTo: function () {
-                            return kendo.toString(kendo.parseDate($scope.dateObj.dateTo), 'dd/MM/yyyy') || dateTo;
+                            return dateTo;
                         },
                         condition:function () {
                             return $scope.base64Condition;

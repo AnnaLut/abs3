@@ -9,7 +9,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" >
 <head runat="server">
     <title>Депозитні сейфи: Друк документів</title>
-    <script type="text/javascript" src="js/JScript.js?v1.0"></script>
+    <script type="text/javascript" src="js/JScript.js?v1.1"></script>
     <link type="text/css" rel="stylesheet" href="style/style.css" />   
 </head>
 <body>
@@ -35,6 +35,10 @@
                             <td style="width:1%">
                                 <cc1:imagetextbutton id="btSign" runat="server" buttonstyle="Image" imageurl="/Common\Images\default\16\visa.png"
                                     tooltip="Підписати" OnClick="btSign_Click" OnClientClick="if (ckSelected()) return;" EnabledAfter="0" meta:resourcekey="btSignResource1"></cc1:imagetextbutton>
+                            </td>
+                           <td style="width:1%">
+                                <cc1:imagetextbutton id="btAct" runat="server" buttonstyle="Image" imageurl="/Common\Images\default\16\form_green.png"
+                                    tooltip="Новый акт держ. установ"  EnabledAfter="0" OnClick="btAct_Click" ></cc1:imagetextbutton>
                             </td>
                             <td style='width:1%'>
                                 <cc1:imagetextbutton id="btBack" runat="server" buttonstyle="Image" imageurl="/Common\Images\default\16\arrow_left.png"

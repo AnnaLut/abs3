@@ -7,6 +7,7 @@
     -o-text-overflow: clip;
     text-overflow: clip;
 }
+
 .cust-avatar {
     border-radius: 50%;
     border: 1px solid #ddd;
@@ -25,6 +26,13 @@
     color:#3471ae
 }
 
+        .cust-avatar .no-avatar {
+            font-size: 20px;
+            text-align: center;
+            padding: 4px;
+            color: #3471ae;
+        }
+
 
 
 .label-cust-id {
@@ -34,7 +42,7 @@
 
 .cust-show .form-group {
     margin-bottom: 5px;
-} 
+}
 
 .table.cust-search-panel {
     margin-bottom: 0;
@@ -55,18 +63,146 @@
     font-size: 64px;
     text-align: center;
 }
-.cust-photo .img-poster {
-    margin-top: 15px; 
-}
+
+    .cust-photo .img-poster {
+        margin-top: 15px;
+    }
 
 .cust-search-form .k-tooltip-validation.k-invalid-msg {
     display: none !important;
 }
+
+.containerActualAddress, .containerLegalAddress, .containerMailAddress, .blockBeforeButtons {
+    background-color: #23b7e5;
+    border-radius: 9px;
+
+}
+
 .btnAddSeparatedSubdivision {
     background-color: #25c24c;
     border-color: #25c24c;
 }
 
-.k-pager-info {
+.containerActualAddress, .containerMailAddress {
+    margin-top: 1%;
+}
+
+.textLegalAddress, .textActualAddress, .textMailAddress {
+    font-size: 18pt;
+    color: white;
+}
+
+.containerIndex, .containerRegion, .containerAreas, .containerSettlement, .containerStreet, .containerHouse, .containerSection, .containerRoom, .containerNote {
+    margin-top: 1%;
+}
+
+.txtIndex, .txtAreas {
+    margin-left: 20pt;
+}
+
+.txtRegion {
+    margin-left: 10pt;
+}
+
+input.txtIndex, .textBoxSize {
+    height: 32px !important;
+    width: 174px !important;
+}
+
+.k-state-hover, .k-state-border-down {
+    background-color: white !important;
+}
+
+.legalSettlemetDropDown, .legalStreetDropDown, .legalHouseDropDown, .legalSectionDropDown, .legalRoomDropDown, .actualSettlemetDropDown,
+.actualStreetDropDown, .actualHouseDropDown, .actualSectionDropDown, .actualRoomDropDown, .mailSettlemetDropDown, .mailStreetDropDown, .mailHouseDropDown,
+.mailSectionDropDown, .mailRoomDropDown {
+    width: 100px;
+}
+
+.txtSettlementRGST, .txtStreetRGST, .txtHouse, .txtSection, .txtRoom, .txtNote, .txtSettlement {
+    padding: 5pt;
+}
+
+.txtHouse, .txtSection, .txtRoom, .txtNote {
+    background-color: white;
+}
+
+.txtNote {
+    width: 235pt;
+}
+
+.txtInlbl {
+    width: 85pt;
+    display: inline-block;
+}
+
+.btnContainer {
+    margin-bottom: 5pt;
+}
+
+.blockBeforeButtons {
+    height: 35px;
+    margin-top: 10px;
+}
+
+.requiredField {
+    color: red;
+}
+
+.clrAdrTitleContainer {
+    margin-top: 1%;   
+    padding-left: 1%;
+    background-color: #23b7e5;
+    border-radius: 9px;
+    font-size: 18pt;
+    color: white;
+    cursor: pointer;
+}
+
+.readOnly {
+    background-color: #dbd6d6 !important;
+}
+
+.clearAdrDropDownReadOnly, .legalSettlemetEdit, .clearAdrDropDown, .clearAdrDropDown > .k-dropdown {
+    width: 13%;
+    height: 29px !important;
+}
+
+    .clearAdrDropDown > .k-dropdown-wrap {
+        height: 29px;
+    }
+
+.clearAdrTextArea {
+    width: 35%;
+}
+
+.btnSaveClearAddress {
+    margin-bottom: 1%;
+}
+
+#btnSaveAddress, #btnCloseAddress {
+    margin-top: 1%;
+}
+
+#anchor {
+    position: fixed;
+    bottom: 20px;
+    right: 30px;
+}
+
+.lblchkAll {
+    font-weight: bolder;
+}
+
+.k-loading-mask {
     display: none;
+}
+
+.k-item.k-state-hover {
+    background-color: #23b7e5 !important;
+    color: #fff !important;
+    cursor: pointer !important;
+}
+.btnFillActualAndMailContainer {
+    margin-top: 2%;
 }

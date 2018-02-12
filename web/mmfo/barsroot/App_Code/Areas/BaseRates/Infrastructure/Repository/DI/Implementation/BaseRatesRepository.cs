@@ -292,7 +292,12 @@ namespace BarsWeb.Areas.BaseRates.Infrastructure.Repository.DI.Implementation
 
         public void EditInterestBrateToBD(UpdatedRowInterestData rowInterest,decimal brId)
         {
-            DeleteBrate(rowInterest.OldRowInterestData, brId);
+            DeleteBrate(new TbBrateDelete {
+                br_id = brId,
+                DATB = rowInterest.OldRowInterestData.DATB,
+                KV = rowInterest.OldRowInterestData.KV,
+                S = rowInterest.OldRowInterestData.S.HasValue ? rowInterest.OldRowInterestData.S.Value : 0
+            });
             AddInterestBrateToBD(rowInterest.NewRowInterestData, brId);
         }
 
@@ -336,7 +341,7 @@ namespace BarsWeb.Areas.BaseRates.Infrastructure.Repository.DI.Implementation
             return list;
         }
 
-        public void DeleteBrate(TbBrates model, decimal br_id)
+        public void DeleteBrate(TbBrateDelete model)
         {
             string sql = @"begin
                         BARS.ACRN.DEL_BRATE_VAL(:p_br_id, :p_ccy_id, to_date(:p_eff_dt, 'dd/MM/yyyy'), :p_amnt, :p_err_msg);
@@ -346,7 +351,7 @@ namespace BarsWeb.Areas.BaseRates.Infrastructure.Repository.DI.Implementation
             OracleConnection conn = OraConnector.Handler.UserConnection;
             var trans = conn.BeginTransaction();
             p = new DynamicParameters();
-            p.Add("p_br_id", dbType: DbType.Decimal, value: br_id, direction: ParameterDirection.Input);
+            p.Add("p_br_id", dbType: DbType.Decimal, value: model.br_id, direction: ParameterDirection.Input);
             p.Add("p_ccy_id", dbType: DbType.Decimal, value: model.KV, direction: ParameterDirection.Input);
             p.Add("p_eff_dt", dbType: DbType.String, value: model.DATB.ToString("dd/MM/yyyy"), direction: ParameterDirection.Input);
             p.Add("p_amnt", dbType: DbType.Decimal, value: model.S*100, direction: ParameterDirection.Input);
@@ -364,7 +369,7 @@ namespace BarsWeb.Areas.BaseRates.Infrastructure.Repository.DI.Implementation
                         throw new Exception(error);
                     if (res > 1)
                         throw new Exception(string.Format("не вдалося виконати операцію для радка за кодом ставки  {0}  " +
-                            " виконується більше одного видалення", br_id));
+                            " виконується більше одного видалення", model.br_id));
                 }
             }
             catch (Exception ex)

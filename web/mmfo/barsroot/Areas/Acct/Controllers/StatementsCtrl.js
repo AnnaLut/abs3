@@ -252,6 +252,7 @@
             bars.ui.dialog({
                 content: '/barsroot/documentview/default.aspx?ref=' + id,
                 iframe: true,
+                maximize: true,
                 width: 720,
                 height: 504 //optimal size of window
             });
@@ -466,7 +467,7 @@
                     field: 'FactDate',
                     format: '{0:dd/MM/yyyy HH:mm:ss}',
                     exportFormat: "{0:dd/MM/yyyy HH:mm:ss}",
-                    title: 'Дата валютування',
+                    title: 'Фактична дата валютування',
                     width: '150px',
                     filterable: {
                         ui: function (element) {

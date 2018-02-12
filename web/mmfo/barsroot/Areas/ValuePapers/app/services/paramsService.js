@@ -205,8 +205,8 @@
                 });
     }
 
-    var _setSpecparams = function (REF_MAIN, COD_I, COD_M) {
-        return $http.post(baseUrl + 'PostSetSpecparam', JSON.stringify({ REF_MAIN: REF_MAIN, COD_I: COD_I, COD_M: COD_M }),
+    var _setSpecparams = function (REF_MAIN, COD_I, COD_M, COD_F) {
+        return $http.post(baseUrl + 'PostSetSpecparam', JSON.stringify({ REF_MAIN: REF_MAIN, COD_I: COD_I, COD_M: COD_M, COD_F: COD_F }),
                 {
                     headers: {
                         'Content-Type': 'application/json'

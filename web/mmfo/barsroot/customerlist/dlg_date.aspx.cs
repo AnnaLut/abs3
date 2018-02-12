@@ -21,7 +21,14 @@ public partial class customerlist_dlg_date : Bars.BarsPage
     {
         string date1 = Convert.ToDateTime(tbDat1.Value).ToString("dd.MM.yyyy");
         string date2 = Convert.ToDateTime(tbDat2.Value).ToString("dd.MM.yyyy");
-        Response.Redirect(String.Format("/barsroot/customerlist/custacc.aspx?type=8&Dat1={0}&Dat2={1}&rnk={2}", date1, date2, Request["rnk"]));
-        ScriptManager.RegisterStartupScript(this, this.GetType(), "close", "window.close();", true);
-    }
+		var nd = Request.QueryString["nd"];
+
+		var redirectTo = String.Format("/barsroot/customerlist/custacc.aspx?type=8&Dat1={0}&Dat2={1}&rnk={2}", date1, date2, Request["rnk"]);
+		if (!String.IsNullOrEmpty(nd))
+		{
+			redirectTo += String.Format("&nd={0}", nd);
+		}
+		Response.Redirect(redirectTo);
+		ScriptManager.RegisterStartupScript(this, this.GetType(), "close", "window.close();", true);
+	}
 }

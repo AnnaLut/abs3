@@ -18,6 +18,9 @@ namespace BarsWeb.Areas.Dcp.Infrastructure.Repository.DI.Implementation
 {
     public class DepositaryRepository : IDepositaryRepository
     {
+        const int HEADER_ROW_INDEX = 1;
+        const int DATA_ROW_INDEX = 2;
+
         public DepositaryRepository()
         {
         }
@@ -254,6 +257,41 @@ namespace BarsWeb.Areas.Dcp.Infrastructure.Repository.DI.Implementation
             }
         }
 
+        List<string> GetFileLines(string path)
+        {
+            byte[] bytes = File.ReadAllBytes(path);
+            List<List<byte>> bb = new List<List<byte>>();
+            int i = 0;
+            for (int j = 0; j < bytes.Length; j++)
+            {
+                byte b = bytes[j];
+
+                if (bb.Count == i)
+                    bb.Add(new List<byte>());
+
+                bool theEnd = false;
+                if (b == 13)    // CR
+                {
+                    if (j + 1 < bytes.Length - 1 && bytes[j + 1] == 10)     // LF
+                    {
+                        i++;
+                        j++;
+                        theEnd = true;
+                    }
+                }
+                if (!theEnd)
+                    bb[i].Add(b);
+            }
+
+            List<string> str = new List<string>();
+            foreach (List<byte> lb in bb)
+            {
+                str.Add(Encoding.GetEncoding("windows-1251").GetString(lb.ToArray()));
+            }
+
+            return str;
+        }
+
         /// <summary>
         /// Повертає об'єкт заголовку файла
         /// </summary>
@@ -262,7 +300,7 @@ namespace BarsWeb.Areas.Dcp.Infrastructure.Repository.DI.Implementation
         public HeaderData GetHeaderFromFile(string path)
         {
             HeaderData hd = new HeaderData();
-            string line = File.ReadAllLines(path, Encoding.GetEncoding("windows-1251")).Skip(1).ElementAt(0);
+            string line = GetFileLines(path)[HEADER_ROW_INDEX];
 
             try
             {
@@ -356,11 +394,10 @@ namespace BarsWeb.Areas.Dcp.Infrastructure.Repository.DI.Implementation
             CultureInfo cinfo = CultureInfo.CreateSpecificCulture("en-GB");
             cinfo.DateTimeFormat.ShortDatePattern = "dd\\MM\\yy";
             cinfo.DateTimeFormat.DateSeparator = "\\";
-            int counter = 0;
-            StreamReader file = new StreamReader(path);
-            string text = File.ReadAllText(path, Encoding.GetEncoding("windows-1251"));
-            var lines = File.ReadAllLines(path, Encoding.GetEncoding("windows-1251")).Skip(2).ToList();           
-            for (int i = 0; i < length; i++)
+
+            List<string> lines = GetFileLines(path);
+
+            for (int i = DATA_ROW_INDEX; i < length + DATA_ROW_INDEX; i++)
             {
                 PFileGridData grid_row = new PFileGridData();
                 try
@@ -508,7 +545,6 @@ namespace BarsWeb.Areas.Dcp.Infrastructure.Repository.DI.Implementation
                     grid_row.ACC = GetAcc(defacc, grid_row.OKPOA);
                 }
                 list.Add(grid_row);
-                counter++;
             }
             return list;
         }
@@ -716,8 +752,8 @@ namespace BarsWeb.Areas.Dcp.Infrastructure.Repository.DI.Implementation
                     }
 
                     d_rec = String.Format("#d{0}{1}{2}{3}{4}#", 
-                                            data[i].MFOA.PadLeft(9, ' '), 
-                                            data[i].MFOB.PadLeft(9, ' '), 
+                                            data[i].MDOA.PadLeft(9, ' '), 
+                                            data[i].MDOB.PadLeft(9, ' '), 
                                             data[i].ID_UG, 
                                             data[i].DAT_UG.ToString("yyyyMMdd"), 
                                             data[i].OZN_SP);

@@ -637,5 +637,15 @@ namespace BarsWeb.Areas.DptAdm.Infrastructure.Repository.DI.Implementation
             return _entities.ExecuteStoreQuery<pipe_BR_TIER>(query, parameters).AsQueryable();
         }
 
+        public void NewPF(DateTime date_p)
+        {
+            var sqlParams = new object[]
+                    {
+                        new OracleParameter("date_p", OracleDbType.Date, date_p, System.Data.ParameterDirection.Input)
+                    };
+            _entities.ExecuteStoreCommand("begin bars.dpt_pf.not_get_pension_w4(:date_p); end;", sqlParams);
+
+        }
+
     }   
 }

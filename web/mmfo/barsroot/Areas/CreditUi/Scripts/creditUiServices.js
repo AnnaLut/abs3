@@ -27,8 +27,7 @@ angular.module("BarsWeb.Areas").factory('dataService', function(){
                 icr9: save.listUnsedValue.id,
                 daysn: save.diffDaysValue ? save.dayPayDiffValue : null,
                 datsn: save.diffDaysValue ? kendo.toString(kendo.parseDate(save.firstPayDiffValue), 'dd.MM.yyyy') : null,
-                daynp: save.daynp.Key,
-                vidd: save.viddValue.VIDD
+                daynp: save.daynp.Key
             };
         },
         multiExtInt: function (nd, save){

@@ -19,7 +19,7 @@ namespace BarsWeb.Areas.BaseRates.Infrastructure.Repository.DI.Abstract
         void EditInterestBratesToBD(EditInterestBrateRequestModel request);
         void EditInterestBrateToBD(UpdatedRowInterestData rowInterest, decimal brId);
         List<RatesOptions> GetRateOptions(string branch, int brid, int kv, string bdate);
-        void DeleteBrate(TbBrates model, decimal br_id);
+        void DeleteBrate(TbBrateDelete model);
         List<DDKVs> GetRatesTypes();
         void AddBaseRateToBD(V_BRATES_KF model);
     }

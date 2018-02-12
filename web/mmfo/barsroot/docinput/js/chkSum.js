@@ -1,14 +1,21 @@
-﻿function rigthMult(operandA, operandB)
-{
-    var res = new Number(operandA*operandB);
-    return res.toFixed(6);
+﻿function isZero(v) { return v == undefined || v == null || v == "" || v == 0; }
+
+var _operations = {
+    "mul": function (operandA, operandB) { return operandA * operandB; },
+    "div": function (operandA, operandB) { return operandA / operandB; }
+};
+
+function operation(operandA, operandB, fractionDigits, oper) {
+    var res = 0;
+    if (!isZero(operandB)) {
+        res = new Number(_operations[oper](operandA, operandB));
+    }
+    return res.toFixed(fractionDigits);
 }
 
-function rigthDiv(operandA, operandB)
-{
-    var res = new Number(operandA/operandB);
-    return res.toFixed(2);
-}
+function rigthMult(operandA, operandB){    return operation(operandA, operandB, 6, "mul");}
+function rigthDiv(operandA, operandB){    return operation(operandA, operandB, 2, "div");}
+
 function SumA_Blur()
 { 
   var elemA = GetValue("SumA");

@@ -106,7 +106,7 @@ SELECT t.rowid AS idrow
                              ,'dd/mm/yyyy')
                    END) OR t.odat IS NULL)
    AND a.nbs = '2620'
-   AND a.ob22 = '07'
+   AND a.ob22 in ('07', '32')
    AND a.nls = t.nls
    AND a.kv = t.kv
    AND a.kf = t.mfo

@@ -27,12 +27,12 @@
 			</TR>
 			<TR>
 				<TD class="TD_Left"><span runat="server" id="lbNbs" meta:resourcekey="lbNbs" class="BarsLabel">Балансовый счет (R020):</span></TD>
-				<TD><a id="bAccountPlan" onclick="fnSelectNbs()" href="#" style="FONT-WEIGHT: bold; FONT-SIZE: 14pt; WIDTH: 17px; FONT-FAMILY: Arial">?</a><input type="text" id="tbNbs" class="BarsTextBox_ReadOnly" onchange="fnGetNbs()" style="WIDTH:78px"><input type="text" readonly id="tbNameNbs" class="BarsTextBox_ReadOnly" style="WIDTH:386px"></TD>
+				<TD><a id="bAccountPlan" onclick="fnSelectNbs()" href="#" style="FONT-WEIGHT: bold; FONT-SIZE: 14pt; WIDTH: 17px; FONT-FAMILY: Arial">?</a><input type="text" id="tbNbs" class="BarsTextBox_ReadOnly" onchange="fnGetNbs();" style="WIDTH:78px"><input type="text" readonly id="tbNameNbs" class="BarsTextBox_ReadOnly" style="WIDTH:386px"></TD>
 			</TR>
 			<TR>
 				<TD class="TD_Left"><span  id="ob22" class="BarsLabel">OB22:</span></TD>
                 <TD>                   
-                    <input type="text" readonly id="tbOb22" class="BarsTextBox_ReadOnly" style="WIDTH:68px"><select id="ddOb22" onclick="listOb22(this,tbOb22)" style="WIDTH:415px">
+                    <input type="text" readonly id="tbOb22" class="BarsTextBox_ReadOnly" style="WIDTH:68px"><select id="ddOb22" onclick="listOb22(this,tbOb22)" style="WIDTH:415px; background-color:white;">
 						<option value="" selected></option>
 					</select>
                     </TD>
@@ -52,7 +52,7 @@
 			<TR>
 				<TD class="TD_Left"><span runat="server" id="lbLcv" meta:resourcekey="lbLcv" class="BarsLabel">Валюта (R030):</span></TD>
 				<TD><input style="WIDTH: 68px; TEXT-ALIGN: center" type="text" id="tb_Lcv" class="BarsTextBox"
-						onchange="fnGetValuta()"><select id="ddValuta" onclick="d_dlg(this,tb_Lcv)" style="WIDTH:415px;BACKGROUND-COLOR:white">
+						onchange="fnGetValuta()"><select id="ddValuta" onclick="d_dlg(this,tb_Lcv);setddVidByNBS();" style="WIDTH:415px;BACKGROUND-COLOR:white">
 						<option value="" selected></option>
 					</select></TD>
 			</TR>

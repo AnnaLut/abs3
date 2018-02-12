@@ -355,6 +355,96 @@ where 1=1
             return result;
         }
 
+        public IQueryable<Region> GetDropDownRegions()
+        {
+            String query = @"select name, ord from bars.clim_mfo";
+            var result = _entities.ExecuteStoreQuery<Region>(query).AsQueryable();
+            return result;
+        }
 
+        public void InitViewData(SaldoFilters filters)
+        {
+            String query = "SELECT *" +
+                " FROM TABLE(KFILE_PACK.WEB_SALDO(TO_DATE(:P_DAT_FIRST,'dd/MM/yyyy'),TO_DATE(:P_DAT_LAST,'dd/MM/yyyy'), :P_KOD_KORP,:P_KOD_REG,:P_IZ_STRUKT,:P_OKPO,:P_BALANS_R,:P_TRKK,:P_ROZR_R,:P_KOD_OPER))";
+            Int32 isStruct = filters.P_IZ_STRUKT == true ? 1 : 0;
+            _getSql = new BarsSql
+            {
+                SqlText = query,
+                SqlParams = new object[]
+                {
+                    new OracleParameter("P_DAT_FIRST", OracleDbType.Varchar2){Value = filters.P_DAT_FIRST},
+                    new OracleParameter("P_DAT_LAST", OracleDbType.Varchar2){Value = filters.P_DAT_LAST},
+                    new OracleParameter("P_KOD_KORP", OracleDbType.Decimal){Value = filters.P_KOD_KORP},
+                    new OracleParameter("P_KOD_REG", OracleDbType.Decimal){Value = filters.P_KOD_REG},
+                    new OracleParameter("P_IZ_STRUKT", OracleDbType.Decimal){Value = isStruct},
+                    new OracleParameter("P_OKPO", OracleDbType.Varchar2){Value = filters.P_OKPO},
+                    new OracleParameter("P_BALANS_R", OracleDbType.Varchar2){Value = filters.P_BALANS_R},
+                    new OracleParameter("P_TRKK", OracleDbType.Varchar2){Value = filters.P_TRKK},
+                    new OracleParameter("P_ROZR_R", OracleDbType.Varchar2){Value = filters.P_ROZR_R},
+                    new OracleParameter("P_KOD_OPER", OracleDbType.Varchar2){Value = filters.P_KOD_OPER}
+                }
+            };
+        }
+
+        public IQueryable<V_OB_CORPORATION_SALDO> GetDataViewData(DataSourceRequest request, SaldoFilters filters)
+        {
+            InitViewData(filters);
+            var sql = _sqlTransformer.TransformSql(_getSql, request);
+            var data = _entities.ExecuteStoreQuery<V_OB_CORPORATION_SALDO>(sql.SqlText, sql.SqlParams).AsQueryable();
+            return data;
+        }
+
+        public Decimal GetDataViewDataCount(DataSourceRequest request, SaldoFilters filters)
+        {
+            InitViewData(filters);
+            var sql = _kendoSqlCounter.TransformSql(_getSql, request);
+            Decimal count = _entities.ExecuteStoreQuery<Decimal>(sql.SqlText, sql.SqlParams).Single();
+            return count;
+        }
+
+        private void InitTurnoverbalanceData(String FILE_DATE, Decimal? KV, String NLS, String TT)
+        {
+            List<Object> parameters = new List<Object>()
+                {
+                    new OracleParameter("nlss",OracleDbType.Varchar2){ Value = NLS},
+                    new OracleParameter("fileDate",OracleDbType.Varchar2){ Value = FILE_DATE},
+                    new OracleParameter("kvv",OracleDbType.Decimal){ Value = KV}
+                };
+            _getSql = new BarsSql
+            {
+                SqlText = String.Format(@"select * from BARS.V_OB_CORPORATION_DATA_DOCS where nls = :nlss AND FILE_DATE = TO_DATE(:fileDate,'dd/MM/yyyy') AND kv = :kvv"),
+                SqlParams = parameters.ToArray()
+            };
+            if (TT != null)
+            {
+                _getSql.SqlText += " AND TT = :ttt";
+                parameters.Add(new OracleParameter(":ttt", OracleDbType.Varchar2) { Value = TT });
+                _getSql.SqlParams = parameters.ToArray();
+            }
+        }
+
+        public IList<V_OB_CORPORATION_DATA_DOCS> GetTurnoverbalanceData(DataSourceRequest request, String FILE_DATE, Decimal? KV, String NLS, String TT)
+        {
+            InitTurnoverbalanceData(FILE_DATE, KV, NLS, TT);
+            var sql = _sqlTransformer.TransformSql(_getSql, request);
+            IList<V_OB_CORPORATION_DATA_DOCS> data = _entities.ExecuteStoreQuery<V_OB_CORPORATION_DATA_DOCS>(sql.SqlText, sql.SqlParams).ToList();
+
+            return data;
+        }
+
+        public Decimal GetTurnoverbalanceDataCount(DataSourceRequest request, String FILE_DATE, Decimal? KV, String NLS, String TT)
+        {
+            InitTurnoverbalanceData(FILE_DATE, KV, NLS, TT);
+            var sql = _kendoSqlCounter.TransformSql(_getSql, request);
+            Decimal count = _entities.ExecuteStoreQuery<Decimal>(sql.SqlText, sql.SqlParams).Single();
+            return count;
+        }
+
+        public IQueryable<Corporation_SALDO> GetDropDownCorporations()
+        {
+            String query = "SELECT ID, CORPORATION_NAME FROM BARS.V_ROOT_CORPORATION";
+            IQueryable<Corporation_SALDO> data = _entities.ExecuteStoreQuery<Corporation_SALDO>(query).AsQueryable();
+            return data;
+        }
     }
 }

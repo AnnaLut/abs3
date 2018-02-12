@@ -1,4 +1,4 @@
-﻿///*** GLOBALS
+///*** GLOBALS
 var PAGE_INITIAL_COUNT = 10;
 var g_gridRequestResultInited = false;
 var g_dictData = null;
@@ -269,7 +269,8 @@ function formatConvert(cell) {
     if (cell == null || cell.value == null) { return cell; }
     if (cell.value && isNaN(cell.value) && cell.value.indexOf("Date") != -1) {
         //return parseDate(cell.value, 'dd.MM.yyyy HH:mm:ss');
-        return parseDate(cell.value, 'dd.MM.yyyy');
+		cell.value = parseDate(cell.value, 'dd.MM.yyyy');
+        return cell;
     }
     if (!isNaN(cell.value))
         cell.format = '# ##0.00';

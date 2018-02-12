@@ -155,7 +155,7 @@ function InitCustAcc() {
     InitGrid(v_NotFill);
     if (v_NotFill) {
         LoadCustAcc();
-        alertify.alert("Для пошуку рахунків вкажіть параметри фільтрування.")
+        alertify.alert("Для пошуку рахунків вкажіть параметри фільтрування.");
     }
 }
 
@@ -269,54 +269,75 @@ function fnViewAcc() {
     }
 }
 
-//Закрыть текущий счет
-function fnCloseAcc() {
-    alertify.set({
-        labels: {
-            ok: "Продовжити",
-            cancel: "Відмінити"
-        },
-        modal: true
-    });
-
-    if (selectedRowId == null) {
-        alertify.alert("Не вибрано жодного рахунку");
-    } else {
-        var nls = document.getElementById("NLS_" + row_id).innerHTML;
-        var vid = document.getElementById("VID_" + row_id).innerHTML;
-        var flagEnhCheck = (ModuleSettings && ModuleSettings.Accounts && ModuleSettings.Accounts.EnhanceCloseCheck == true);
-        if (flagEnhCheck && vid != 0) {
-            var html = '<div><b>Вкажіть причину закриття рахунку ' + nls + ' (acc:' + selectedRowId + '):</b></div><br/>\
+//Запуск закрытия счета
+function fnRunCloseAcc(nls, vid) {
+	var flagEnhCheck = (ModuleSettings && ModuleSettings.Accounts && ModuleSettings.Accounts.EnhanceCloseCheck == true);
+	if (flagEnhCheck && vid != 0) {
+		var html = '<div><b>Вкажіть причину закриття рахунку ' + nls + ' (acc:' + selectedRowId + '):</b></div><br/>\
                     <div><label><input type="radio" id="closureReason3" name="closureReason" value="3" /> за ініциативою клієнта</label> </div>\
                     <div><label><input type="radio" id="closureReason5" name="closureReason" value="5" /> не за ініциативою клієнта</label> </div>\
                     ';
-            alertify.confirm(html, function (e) {
-                if (e) {
-                    var closureReason = null;
-                    if (document.getElementById('closureReason3').checked) {
-                        closureReason = document.getElementById('closureReason3').value;
-                    } else if (document.getElementById('closureReason5').checked) {
-                        closureReason = document.getElementById('closureReason5').value;
-                    }
+		alertify.confirm(html, function (e) {
+			if (e) {
+				var closureReason = null;
+				if (document.getElementById('closureReason3').checked) {
+					closureReason = document.getElementById('closureReason3').value;
+				} else if (document.getElementById('closureReason5').checked) {
+					closureReason = document.getElementById('closureReason5').value;
+				}
 
-                    if (closureReason == null) {
-                        alertify.alert("Не вказано причину. Закриття неможливе.");
-                    } else {
-                        closeAcc(selectedRowId, closureReason);
-                    }
+				if (closureReason == null) {
+					alertify.alert("Не вказано причину. Закриття неможливе.");
+				} else {
+					closeAcc(selectedRowId, closureReason);
+				}
 
-                } else { }
-            });
+			} else { }
+		});
 
-        } else {
-            var message = LocalizedString('Message6') + " " + nls + " (acc=" + selectedRowId + ")?";
-            var result = Dialog(message, 0);
-            if (result == 1) {
-                closeAcc(selectedRowId, null);
-            }
-        }
-    }
+	} else {
+		var message = LocalizedString('Message6') + " " + nls + " (acc=" + selectedRowId + ")?";
+		var result = Dialog(message, 0);
+		if (result == 1) {
+			closeAcc(selectedRowId, null);
+		}
+	}
 }
+
+//Закрыть текущий счет
+function fnCloseAcc() {
+	alertify.set({
+		labels: {
+			ok: "Продовжити",
+			cancel: "Відмінити"
+		},
+		modal: true
+	});
+
+	if (selectedRowId == null) {
+		alertify.alert("Не вибрано жодного рахунку");
+	} else {
+		var nls = document.getElementById("NLS_" + row_id).innerHTML;
+		var vid = document.getElementById("VID_" + row_id).innerHTML;
+		var ob22 = $("#r_" + row_id).children()[1].innerHTML;
+
+		//перевірка группи клієнта та рахунку до закриття
+		$.ajax({
+			type: "GET",
+			url: bars.config.urlContent("/api/custacc/start/"),
+			success: function (result) {
+				if (result !== 0) {
+					fnRunCloseAcc(nls, vid);
+				} else if (checkOperCloseRights.accCanBeClosed(nls, ob22)) {
+					fnRunCloseAcc(nls, vid);
+				} else {
+					alert("Відсутні права на закриття рахунку " + nls + ", ob22 " + ob22);
+				}
+			}
+		});
+	}
+}
+
 
 function fnExportToExcel() {
     webService.CustAcc.callService(onExportExcel, "ExportExcel", v_data, forceExecute);

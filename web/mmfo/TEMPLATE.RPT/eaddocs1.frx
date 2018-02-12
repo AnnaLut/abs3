@@ -7,7 +7,7 @@
         <Column Name="CRT_BRANCH" DataType="System.String"/>
         <Column Name="BRANCH_NAME" DataType="System.String"/>
         <Column Name="RNK" DataType="System.Decimal"/>
-        <Column Name="EA_STRUCT_ID" DataType="System.Decimal"/>
+        <Column Name="EA_STRUCT_ID" DataType="System.String"/>
         <Column Name="EA_STRUCT_NAME" DataType="System.String"/>
         <Column Name="CRT_DATE" DataType="System.DateTime"/>
         <Column Name="CRT_STAFF_ID" DataType="System.Decimal"/>

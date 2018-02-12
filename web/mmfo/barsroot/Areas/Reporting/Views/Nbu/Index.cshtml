@@ -19,8 +19,8 @@
 </style>
 
 <script src="@Url.Content("~/Areas/Reporting/services/base64HelperService.js?v1.0")"></script>
-<script src="@Url.Content("~/Areas/Reporting/services/reportingNbuService.js?v1.0")"></script>
-<script src="@Url.Content("~/Areas/Reporting/controllers/reportingNbuController.js?v1.0")"></script>
+<script src="@Url.Content("~/Areas/Reporting/services/reportingNbuService.js?v1.0.1")"></script>
+<script src="@Url.Content("~/Areas/Reporting/controllers/reportingNbuController.js?v1.1.3")"></script>
 <script src="@Url.Content("~/lib/jsZip/jszip.min.js")"></script>
 
 
@@ -135,6 +135,12 @@
         <div data-kendo-toolbar="detailedReportGridToolbar" data-options="detailedReportGridToolbarOptions"></div>
 
         <div id="detailedReportGrid"></div>
+
+
+        <div data-kendo-window="ChkLogWindow" id="ChkLogWindow" data-options="ChkLogWindowOptions" style="display: none">
+            <textarea ng-model="ChkLogText" class="k-textbox" style="height: 580px; width: 980px;" ng-disabled="true"></textarea>
+        </div>
+
 
         <!--<div id="detailedReportGrid"-->
              <!--data-kendo-grid="detailedReportGrid"-->

@@ -50,8 +50,10 @@ function fnLoadGeneral() {
         document.all.ddVid.disabled = true;
         document.all.ddMfo.disabled = true;
         document.all.ddTobo.disabled = true;
+		document.all.ddOb22.disabled = true;
     }
     else if (acc != 0) {
+        //document.all.ddOb22.disabled = true;
         document.all.bAccountPlan.disabled = true;
         document.all.bAccountMask.disabled = true;
         document.all.tbNameNbs.disabled = true;
@@ -74,7 +76,7 @@ function fnLoadGeneral() {
     document.all.tbTip.value = data[6].text;
     document.all.tbMfo.value = data[34].text;
     document.all.tbTobo.value = data[28].text;
-    document.all.tbOb22.value = data[63].text;
+	document.all.tbOb22.value = data[63].text;
 
     document.all.ddValuta.options[0].text = data[38].text;
     document.all.ddUser.options[0].text = data[39].text;
@@ -114,7 +116,7 @@ function fnLoadGeneral() {
 function listOb22(ddlist, control) {
     var url = url_dlg_mod + "v_sb_ob22&tail=";
     if (document.all.tbNbs.value)
-        url += "'R020 = " + document.all.tbNbs.value + "'";
+        url += "'R020 = " + document.all.tbNbs.value + " and CLS_DT is null" + "'";
     else
 		return;
     var result = window.showModalDialog(url, "", "dialogWidth:600px;center:yes;edge:sunken;help:no;status:no;");
@@ -173,12 +175,67 @@ function fnSelectNbs() {
         fnGetNbs();
     }
 }
+
+///document.all.tbNbs.value
+///IE8 doenst have method indexOf in Array
+Array.prototype.indexOf || (Array.prototype.indexOf = function (r, t) { var n; if (null == this) throw new TypeError('"this" is null or not defined'); var e = Object(this), i = e.length >>> 0; if (0 === i) return -1; var a = +t || 0; if (Math.abs(a) === 1 / 0 && (a = 0), a >= i) return -1; for (n = Math.max(a >= 0 ? a : i - Math.abs(a), 0); i > n;) { if (n in e && e[n] === r) return n; n++ } return -1 });
+function setddVidFields(index, line) {
+	document.all.ddVid.options[0].value = index;
+	document.all.ddVid.options[0].text = line;
+	document.all.ddVid.value = index;
+}
+function setddVidByNBS() {
+var s = document.all.tbNbs.value;
+	var currency = document.all.tb_Lcv.value;
+	var acc_nbs = document.all.tbNbs.value;
+	if (!acc_nbs)
+		return;
+
+	var item = document.all.ddVid;
+	var currency = document.all.tb_Lcv.value;
+	var nbs_arr = [2520, 2523, 2526, 2530, 2531, 2541, 2542, 2544, 2545, 2552, 2553, 2554, 2600, 2604, 2605, 2650, 2655];
+	var nbs_arr_new = [2512, 2513, 2520, 2523, 2525, 2526, 2530, 2531, 2541, 2542, 2544, 2545, 2546, 2551, 2552, 2553, 2554, 2555, 2556, 2561, 2562, 2565, 2570, 2571, 2572, 2600, 2604, 2620, 2622, 2640, 2641, 2642, 2643, 2644, 2650];
+
+	if (nbs_arr.indexOf(parseInt(s)) > -1 ||
+		nbs_arr_new.indexOf(parseInt(s)) > -1 ||
+		(parseInt(s) == 2603 && currency == "UAH")) {
+		document.all.ddVid.options[0].text = "Поточний";
+		document.all.ddVid.options[0].value = 3;
+		document.all.ddVid.value = 3;
+		SaveG(document.all.ddVid);
+
+		row = "6 6. Кошти на вимогу юридичних осіб";
+		id = "6";
+		val = "6. Кошти на вимогу юридичних осіб";
+		for (i = 0; i < parent.frames("Tab2").document.all.lsGroupsAcc.options.length; i++)
+			if (parent.frames("Tab2").document.all.lsGroupsAcc.options[i].value == id) return;
+		var oOption = document.createElement("OPTION");
+		
+		parent.frames("Tab2").document.all.lsGroupsAcc.options.add(oOption);
+		oOption.value = id;
+		oOption.innerText = id + ' ' + val;
+		parent.acc_obj.value[24].text = id;
+		data[61][data[61].length] = id + ";0";
+	}
+	if (nbs_arr.indexOf(parseInt(acc_nbs)) > -1) {
+		setddVidFields(3, "Поточний");
+	} else {
+		if (acc_nbs == 2603) {
+			if (currency == "UAH") {
+				setddVidFields(3, "Поточний");
+			} else {
+				setddVidFields(0, "Не використовується податковою");
+			}
+		}
+	}
+	SaveG(document.all.ddVid);
+}
 //Поиск по введеному Nbs
 function fnGetNbs() {
   webService.Acc.callService(onGetNbs, "getNbs", document.all.tbNbs.value, getParamFromUrl("rnk", parent.location.href));
 }
 function onGetNbs(result) {
-    if (!getError(result)) return;
+	if (!getError(result)) return;
     if (result.value[0] == "") {
         Dialog(document.all.tbNbs.value + " - " + LocalizedString('Message27'), 1);
         document.all.tbNbs.value = "";
@@ -198,8 +255,10 @@ function onGetNbs(result) {
         else {
             document.all.ddPap.options[0].value = result.value[2];
             document.all.ddPap.options[0].text = result.value[3];
-        }
-        SaveG(document.all.ddPap);
+		}
+		setddVidByNBS();
+		SaveG(document.all.ddPap);
+
     }
 }
 //Маска счета
@@ -207,6 +266,15 @@ function fnAccMask() {
     var data = parent.acc_obj.value;
     if (document.getElementById("tbNbs").value != "")
         webService.Acc.callService(onAccMask, "AccMask", document.getElementById("tbNbs").value, document.getElementById("tbTip").value, getParamFromUrl("rnk", parent.location.href), data[51].text);
+}
+function fnGetCurrentUser(userId) {
+	if (userId != "") {
+		document.getElementById("tbLspCode").value = userId.value;
+		webService.Acc.callService(onGetFioFromId, "getFioFromAllstaffById", userId.value);
+	}
+}
+function setCurrntUserId() {
+	webService.Acc.callService(fnGetCurrentUser, "currentUserId");
 }
 function onAccMask(result) {
     if (!getError(result)) return;
@@ -217,13 +285,15 @@ function onAccMask(result) {
     }
     else document.getElementById("tbNls").value = "";
     document.getElementById("tbNms").value = result.value[1];
-    SaveG(document.getElementById("tbNms"));
+	SaveG(document.getElementById("tbNms"));
+	setCurrntUserId();
 }
 //Key
 function fnKeyAcc() {
     var data = parent.acc_obj.value;
     if (document.getElementById("tbNls").value != "")
-        webService.Acc.callService(onKeyAccount, "GetKeyAccount", data[51].text, document.getElementById("tbNls").value);
+		webService.Acc.callService(onKeyAccount, "GetKeyAccount", data[51].text, document.getElementById("tbNls").value);
+	setCurrntUserId();
 }
 function onKeyAccount(result) {
     if (!getError(result)) return;
@@ -266,7 +336,8 @@ function onKeyAccount(result) {
             document.getElementById("ddPap").options[0].value = result.value[5];
         }
         SaveG(document.all.ddPap);
-    }
+	}
+
 }
 //Valuta
 function fnGetValuta() {
@@ -284,7 +355,8 @@ function onGetValuta(result) {
         document.getElementById("ddValuta").options[0].value = result.value.substr(0, result.value.indexOf(" "));
         document.getElementById("ddValuta").options[0].text = result.value;
         SaveG(document.getElementById("ddValuta"));
-    }
+	}
+	setddVidByNBS();
 }
 //User
 function fnGetUser() {

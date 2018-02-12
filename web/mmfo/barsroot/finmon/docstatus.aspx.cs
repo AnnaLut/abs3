@@ -20,13 +20,13 @@ public partial class finmon_docstatus : Bars.BarsPage
 
     protected void Page_Load(object sender, EventArgs e)
     {
-        string title = Request["ref"];
+        string title = Session["statusOpen_par"].ToString();
         lbTitle.Text = "Коментар до документів з реф= " + title.Substring(title.IndexOf(":") + 1, title.Length - title.IndexOf(":") - 2).Replace("-",",");       
     }
     
     protected void btSearch_Click(object sender, EventArgs e)
     {
-        string p_ref = Request["ref"];
+        string p_ref = Session["statusOpen_par"].ToString();
         int p_count = Convert.ToInt16(p_ref.Substring(0, p_ref.IndexOf(":")));
 
         int slenth = p_ref.Length;

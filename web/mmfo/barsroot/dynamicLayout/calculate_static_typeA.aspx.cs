@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
@@ -65,14 +66,12 @@ public partial class calculate_static_typeA : Bars.BarsPage
                     txt = ErrorText;
                 }
 
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", "alert('" + txt.Replace("ы", "і") + "');", true);
+                ErrorText = txt.Replace("ы", "і");
             }
-            else
-            {
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", "alert('" + ErrorText + "');", true);
-            }
+
             con.CloseConnection();
-            Server.Transfer("/barsroot/dynamicLayout/calculate_static_typeB.aspx?type=err");
+
+            Server.Transfer("/barsroot/dynamicLayout/calculate_static_typeB.aspx?type=err&errMsg=" + Server.UrlEncode(Regex.Replace(ErrorText, @"\t|\n|\r", " ")));
         }
         finally
         {
@@ -203,7 +202,7 @@ public partial class calculate_static_typeA : Bars.BarsPage
             ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", "alert('Набранна сума " + tbTypedSum.Text + " не дорівнює загальній сумі розподілу " + tbTotalSum.Text + "');", true);
             return;
         }
-        
+
         BbConnection con = new BbConnection();
         DynamicLayoutUi mgr = new DynamicLayoutUi(con);
         mgr.PAY_STATIC_LAYOUT(1);

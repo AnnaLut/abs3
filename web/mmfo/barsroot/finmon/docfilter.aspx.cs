@@ -109,7 +109,6 @@ public partial class finmon_docfilter : Bars.BarsPage
         }
         //Session["FinminReload"] = "1";
         Session["Finmon_Rules"] = p_rules;
-        Session["Finmon_DropPageIndex"] = "1";
 
         if (count == 0)
         {
@@ -152,6 +151,7 @@ public partial class finmon_docfilter : Bars.BarsPage
         }
         Session["FinmonDat1"] = diDat1.SelectedDate;
         Session["FinmonDat2"] = diDat2.SelectedDate;
+        Session["FinmonFilterApplyed"] = "1";
     }
 
 }

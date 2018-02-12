@@ -1,0 +1,184 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="06/14/2017 16:28:49" ReportInfo.Modified="12/04/2017 12:34:02" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="OBMMFO6_DEV" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoWN0HWRv5NgSW2TEYI2W7WcCCVMctugvyjd+HeobeXkyg==">
+      <TableDataSource Name="Table" Alias="Tab" DataType="System.Int32" Enabled="true" SelectCommand="select * from table(zp_rpt.fill_rahunk1(:p_rnk, :sFdat1, :sFdat2))">
+        <Column Name="S" DataType="System.String"/>
+        <Column Name="SUMTXT" DataType="System.String"/>
+        <Column Name="VDAT" DataType="System.String"/>
+        <Column Name="TARIF" DataType="System.String"/>
+        <Column Name="POSL" DataType="System.String"/>
+        <Column Name="NAME" DataType="System.String"/>
+        <Column Name="USERNAME" DataType="System.String"/>
+        <Column Name="NAME_BRANCH" DataType="System.String"/>
+        <Column Name="NLS_3570" DataType="System.String"/>
+        <Column Name="MFO" DataType="System.String"/>
+        <Column Name="BRANCH_OKPO" DataType="System.String"/>
+        <Column Name="ADDRESS" DataType="System.String"/>
+        <Column Name="PHONES" DataType="System.String"/>
+        <Column Name="NMK" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <CommandParameter Name="p_rnk" DataType="112" Expression="[p_rnk]" DefaultValue="0"/>
+        <CommandParameter Name="sFdat1" DataType="126" Expression="[sFdat1]"/>
+        <CommandParameter Name="sFdat2" DataType="126" Expression="[sFdat2]"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_rnk" DataType="System.Int32" Expression="[p_rnk]"/>
+    <Parameter Name="sFdat2" DataType="System.String" Expression="[sFdat2]"/>
+    <Parameter Name="sFdat1" DataType="System.String" Expression="[sFdat1]"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <DataBand Name="Data1" Width="718.2" Height="1795.5" DataSource="Table">
+      <TableObject Name="Table1" Top="198.45" Width="708.75" Height="292.95">
+        <TableColumn Name="Column1" Width="37.8"/>
+        <TableColumn Name="Column2" Width="189"/>
+        <TableColumn Name="Column3" Width="132.3"/>
+        <TableColumn Name="Column4"/>
+        <TableColumn Name="Column5" Width="113.4"/>
+        <TableColumn Name="Column6" Width="75.6"/>
+        <TableColumn Name="Column7" Width="94.5"/>
+        <TableRow Name="Row1" Height="47.25">
+          <TableCell Name="Cell1" Border.Lines="All" Text="№ з/п" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2" Border.Lines="All" Text="Назва наданих послуг" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell3" Border.Lines="All" Text="Сума зарахувань" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell4" Border.Lines="All" Text="Тариф" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell5" Border.Lines="All" Text="Вартість послуги, грн." HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell26" Border.Lines="All" Text="Сума ПДВ, грн." HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell31" Border.Lines="All" Text="Вартість послуги з ПДВ, грн." HorzAlign="Center" VertAlign="Center"/>
+        </TableRow>
+        <TableRow Name="Row2" Height="189">
+          <TableCell Name="Cell6" Border.Lines="All" Text="1" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell7" Border.Lines="All" Text="[Tab.NAME]" VertAlign="Center"/>
+          <TableCell Name="Cell8" Border.Lines="All" Text="[Tab.S]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell9" Border.Lines="All" Text="[Tab.TARIF]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell10" Border.Lines="All" Text="[Tab.POSL]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell27" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell32" Border.Lines="All" Text="[Tab.POSL]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row3">
+          <TableCell Name="Cell11" Border.Lines="Left, Top" Text="Вартість наданих послуг без ПДВ" Font="Arial, 10pt, style=Bold" ColSpan="4"/>
+          <TableCell Name="Cell12" Border.Lines="Left, Top, Bottom" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell13" Border.Lines="Left, Top, Bottom" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell14" Border.Lines="Left, Top, Bottom" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell15" Border.Lines="Top" Text="[Tab.POSL]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell28" Border.Lines="Right, Top" Text="грн" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell33" Border.Lines="Right, Top, Bottom" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row4">
+          <TableCell Name="Cell16" Border.Lines="Left" Text="ПДВ" Font="Arial, 10pt, style=Bold" ColSpan="4"/>
+          <TableCell Name="Cell17" Border.Lines="Left, Top, Bottom" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell18" Border.Lines="Left, Top, Bottom" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell19" Border.Lines="Left, Top, Bottom" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell20" Text="0,00" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell29" Border.Lines="Right" Text="грн" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell34" Border.Lines="Right, Top, Bottom" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row5">
+          <TableCell Name="Cell21" Border.Lines="Left, Bottom" Text="Всього до сплати " Font="Arial, 10pt, style=Bold" ColSpan="4"/>
+          <TableCell Name="Cell22" Border.Lines="Left, Top, Bottom" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell23" Border.Lines="Left, Top, Bottom" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell24" Border.Lines="Left, Top, Bottom" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell25" Border.Lines="Bottom" Text="[Tab.POSL]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell30" Border.Lines="Right, Bottom" Text="грн" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell35" Border.Lines="Right, Top, Bottom" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text8" Top="170.1" Width="132.3" Height="18.9" Text="П л а т н и к:" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text9" Left="132.3" Top="170.1" Width="576.45" Height="18.9" Text="[Tab.NMK] [Tab.OKPO]"/>
+      <TextObject Name="Text7" Left="132.3" Top="151.2" Width="576.45" Height="18.9" Text="[Tab.ADDRESS]. [Tab.PHONES]"/>
+      <TextObject Name="Text6" Top="113.4" Width="132.3" Height="18.9" Text="О т р и м у в а ч :  " Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text3" Left="132.3" Top="75.6" Width="311.85" Height="37.8" Text="на сплату банківських послуг, наданих &#13;&#10;за період з [sFdat1] по [sFdat2] р." Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text5" Left="217.35" Top="56.7" Width="226.8" Height="18.9" Text="[Tab.VDAT]" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text2" Left="217.35" Top="37.8" Width="179.55" Height="18.9" Text="Р А Х У Н О К   №" HorzAlign="Right" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text4" Left="396.9" Top="37.8" Width="122.85" Height="18.9" Border.Lines="Bottom" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text11" Left="198.45" Top="510.3" Width="425.25" Height="56.7" Text="[Tab.SUMTXT]" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text13" Left="321.3" Top="585.9" Width="302.4" Height="18.9" Text="[Tab.USERNAME]" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text12" Left="103.95" Top="585.9" Width="217.35" Height="18.9" Text="Виписав(-ла)" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text10" Top="510.3" Width="198.45" Height="28.35" Text="Сума сплати прописом:" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text1" Width="718.2" Height="37.8" Border.Lines="Bottom" Text="АТ &quot;Ощадбанк&quot;&#13;&#10;Філія-[Tab.NAME_BRANCH]" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text14" Top="661.5" Width="321.3" Height="18.9" Text="Заступник начальника Головного управління " Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text16" Left="321.3" Top="661.5" Width="217.35" Height="18.9" Border.Lines="Bottom" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text15" Top="718.2" Width="321.3" Height="18.9" Text="Заступник начальника  управління бек-офісу" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text17" Left="321.3" Top="718.2" Width="217.35" Height="18.9" Border.Lines="Bottom" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text18" Top="1219.05" Width="132.3" Height="18.9" Text="П л а т н и к:" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text19" Left="132.3" Top="1219.05" Width="576.45" Height="18.9" Text="[Tab.NMK] [Tab.OKPO]"/>
+      <TextObject Name="Text20" Left="132.3" Top="1200.15" Width="576.45" Height="18.9" Text="[Tab.ADDRESS]. [Tab.PHONES]"/>
+      <TextObject Name="Text21" Top="1162.35" Width="132.3" Height="18.9" Text="О т р и м у в а ч :  " Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text22" Left="132.3" Top="1124.55" Width="311.85" Height="37.8" Text="на сплату банківських послуг, наданих &#13;&#10;за період з [sFdat1] по [sFdat2] р." Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text23" Left="217.35" Top="1105.65" Width="226.8" Height="18.9" Text="[Tab.VDAT]" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text24" Left="217.35" Top="1086.75" Width="179.55" Height="18.9" Text="Р А Х У Н О К   №" HorzAlign="Right" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text25" Top="1048.95" Width="718.2" Height="37.8" Border.Lines="Bottom" Text="АТ &quot;Ощадбанк&quot;&#13;&#10;Філія-[Tab.NAME_BRANCH]" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TableObject Name="Table1" Top="1247.4" Width="708.75" Height="292.95">
+        <TableColumn Name="Column8" Width="37.8"/>
+        <TableColumn Name="Column9" Width="189"/>
+        <TableColumn Name="Column10" Width="132.3"/>
+        <TableColumn Name="Column11"/>
+        <TableColumn Name="Column12" Width="113.4"/>
+        <TableColumn Name="Column13" Width="75.6"/>
+        <TableColumn Name="Column14" Width="94.5"/>
+        <TableRow Name="Row6" Height="47.25">
+          <TableCell Name="Cell36" Border.Lines="Left, Right, Top" Text="№ з/п" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell37" Border.Lines="Left, Right, Top" Text="Назва наданих послуг" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell38" Border.Lines="Left, Right, Top" Text="Сума зарахувань" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell39" Border.Lines="Left, Right, Top" Text="Тариф" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell40" Border.Lines="Left, Right, Top" Text="Вартість послуги, грн." HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell41" Border.Lines="Left, Right, Top" Text="Сума ПДВ, грн." HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell42" Border.Lines="Left, Right, Top" Text="Вартість послуги з ПДВ, грн." HorzAlign="Center" VertAlign="Center"/>
+        </TableRow>
+        <TableRow Name="Row7" Height="189">
+          <TableCell Name="Cell43" Border.Lines="All" Text="1" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell44" Border.Lines="All" Text="[Tab.NAME]" VertAlign="Center"/>
+          <TableCell Name="Cell45" Border.Lines="All" Text="[Tab.S]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell46" Border.Lines="All" Text="[Tab.TARIF]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell47" Border.Lines="All" Text="[Tab.POSL]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell48" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell49" Border.Lines="All" Text="[Tab.POSL]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row8">
+          <TableCell Name="Cell50" Border.Lines="Left, Top" Text="Вартість наданих послуг без ПДВ" Font="Arial, 10pt, style=Bold" ColSpan="4"/>
+          <TableCell Name="Cell51" Border.Lines="Left, Top, Bottom" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell52" Border.Lines="Left, Top, Bottom" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell53" Border.Lines="Left, Top, Bottom" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell54" Border.Lines="Top" Text="[Tab.POSL]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell55" Border.Lines="Right, Top" Text="грн" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell56" Border.Lines="Right, Top, Bottom" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row9">
+          <TableCell Name="Cell57" Border.Lines="Left" Text="ПДВ" Font="Arial, 10pt, style=Bold" ColSpan="4"/>
+          <TableCell Name="Cell58" Border.Lines="Left, Top, Bottom" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell59" Border.Lines="Left, Top, Bottom" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell60" Border.Lines="Left, Top, Bottom" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell61" Text="0,00" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell62" Border.Lines="Right" Text="грн" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell63" Border.Lines="Right, Top, Bottom" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row10">
+          <TableCell Name="Cell64" Border.Lines="Left, Bottom" Text="Всього до сплати " Font="Arial, 10pt, style=Bold" ColSpan="4"/>
+          <TableCell Name="Cell65" Border.Lines="Left, Top, Bottom" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell66" Border.Lines="Left, Top, Bottom" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell67" Border.Lines="Left, Top, Bottom" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell68" Border.Lines="Bottom" Text="[Tab.POSL]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell69" Border.Lines="Right, Bottom" Text="грн" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell70" Border.Lines="Right, Top, Bottom" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text26" Left="198.45" Top="1559.25" Width="425.25" Height="56.7" Text="[Tab.SUMTXT]" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text27" Left="321.3" Top="1634.85" Width="302.4" Height="18.9" Text="[Tab.USERNAME]" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text28" Left="103.95" Top="1634.85" Width="217.35" Height="18.9" Text="Виписав(-ла)" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text29" Top="1559.25" Width="198.45" Height="18.9" Text="Сума сплати прописом:" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text30" Top="1710.45" Width="321.3" Height="18.9" Text="Заступник начальника Головного управління " Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text31" Left="321.3" Top="1710.45" Width="217.35" Height="18.9" Border.Lines="Bottom" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text32" Top="1767.15" Width="321.3" Height="18.9" Text="Заступник начальника управління бек-офісу" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text33" Left="321.3" Top="1767.15" Width="217.35" Height="18.9" Border.Lines="Bottom" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text34" Left="396.9" Top="1086.75" Width="132.3" Height="18.9" Border.Lines="Bottom" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text35" Left="132.3" Top="113.4" Width="576.45" Height="18.9" Text="Філія-[Tab.NAME_BRANCH] "/>
+      <TextObject Name="Text36" Left="132.3" Top="132.3" Width="47.25" Height="18.9" Text="р/р №"/>
+      <TextObject Name="Text37" Left="179.55" Top="132.3" Width="122.85" Height="18.9" Text="[Tab.NLS_3570]" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text38" Left="302.4" Top="132.3" Width="406.35" Height="18.9" Text="[Tab.MFO], [Tab.BRANCH_OKPO], "/>
+      <TextObject Name="Text39" Left="132.3" Top="1162.35" Width="576.45" Height="18.9" Text="Філія-[Tab.NAME_BRANCH] "/>
+      <TextObject Name="Text40" Left="132.3" Top="1181.25" Width="47.25" Height="18.9" Text="р/р №"/>
+      <TextObject Name="Text41" Left="179.55" Top="1181.25" Width="122.85" Height="18.9" Text="[Tab.NLS_3570]" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text42" Left="302.4" Top="1181.25" Width="406.35" Height="18.9" Text="[Tab.MFO], [Tab.BRANCH_OKPO], "/>
+    </DataBand>
+  </ReportPage>
+</Report>

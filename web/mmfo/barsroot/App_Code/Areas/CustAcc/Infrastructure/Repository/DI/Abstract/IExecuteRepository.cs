@@ -10,4 +10,5 @@ using BarsWeb.Areas.CustAcc.Models;
 public interface IExecuteRepository
 {
     CheckResult NbsReservCheck(decimal acc, string nbs);
+	int IsUserBackOffice();
 }

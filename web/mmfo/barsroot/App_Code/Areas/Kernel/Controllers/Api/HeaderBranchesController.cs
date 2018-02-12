@@ -8,6 +8,7 @@ using Kendo.Mvc.UI;
 using BarsWeb.Infrastructure.Repository.DI.Abstract;
 using AttributeRouting.Web.Http;
 using System;
+using System.Collections.Generic;
 
 namespace BarsWeb.Areas.Kernel.Controllers.Api
 {
@@ -32,7 +33,7 @@ namespace BarsWeb.Areas.Kernel.Controllers.Api
             }
             catch (Exception ex)
             {
-                return Request.CreateResponse(HttpStatusCode.OK, ex.Message);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
 
@@ -42,13 +43,32 @@ namespace BarsWeb.Areas.Kernel.Controllers.Api
         {
             try
             {
+                //We should get branch tree, showing Regional names only for "/XXXXXX/" level 
+                // only if user works in "/" or "/XXXXXX/" level
+                var currentUserBranch = _homeRpository.CurrentBranch();
+                // for branches of "/" and of "/XXXXXX/" level:
+                int currentBranchSegmentsLength = currentUserBranch.BRANCH.Split('/').Length;
+                bool showRegionalNames = (currentBranchSegmentsLength == 2 || currentBranchSegmentsLength == 3);
+
                 var data = _homeRpository.UsersBranches(id);
+                foreach (var branch in data)
+                {
+
+                    int branchSegmentsLength = branch.BRANCH.Split('/').Length;
+                    if (branchSegmentsLength == 3 && showRegionalNames)
+                    {
+                        branch.SHOW_REGIONAL_NAME = true;
+                    }
+                    else
+                        branch.SHOW_REGIONAL_NAME = false;
+                }
+
                 HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, data);
                 return response;
             }
             catch (Exception ex)
             {
-                return Request.CreateResponse(HttpStatusCode.OK, ex.Message);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
 
@@ -63,7 +83,7 @@ namespace BarsWeb.Areas.Kernel.Controllers.Api
             }
             catch (Exception ex)
             {
-                return Request.CreateResponse(HttpStatusCode.OK, ex.Message);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
     }

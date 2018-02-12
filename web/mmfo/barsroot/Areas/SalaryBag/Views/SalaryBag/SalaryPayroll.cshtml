@@ -1,0 +1,391 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Обробка ЗП відомостей";
+}
+<meta charset="utf-8" />
+
+<script src="~/Scripts/respond.min.js?20_12_2017__14_02_24"></script>
+
+<script src="~/Areas/SalaryBag/Scripts/SlaryBagCommon.js?20_12_2017__14_02_24"></script>
+<script src="~/Areas/SalaryBag/Scripts/DocumentSigner.js?20_12_2017__14_02_24"></script>
+<script src="~/Areas/SalaryBag/Scripts/SalaryPayroll/FileConstructorForm.js?20_12_2017__14_02_24"></script>
+
+<script src="~/Areas/SalaryBag/Scripts/SalaryBag/ExplaineAndConfirm.js?20_12_2017__14_02_24"></script>
+<script src="~/Areas/SalaryBag/Scripts/SalaryPayroll/SalaryPayrollMain.js?20_12_2017__14_02_24"></script>
+<script src="~/Areas/SalaryBag/Scripts/SalaryPayroll/AddOrEditForm.js?20_12_2017__14_02_24"></script>
+<script src="~/Areas/SalaryBag/Scripts/SalaryPayroll/HistoryForm.js?20_12_2017__14_02_24"></script>
+<script src="~/Areas/SalaryBag/Scripts/SalaryPayroll/ImportFilesForm.js?20_12_2017__14_02_24"></script>
+<script src="~/Areas/SalaryBag/Scripts/SalaryPayroll/PrintPayroll.js?20_12_2017__14_02_24"></script>
+<script src="~/Areas/SalaryBag/Scripts/SalaryPayroll/SelectExistingClientForm.js?20_12_2017__14_02_24"></script>
+
+<link rel="stylesheet" href="~/Areas/SalaryBag/Content/SBstyle.css?20_12_2017__14_02_24" />
+<link rel="stylesheet" href="~/Areas/SalaryBag/Content/SalaryPayroll.css?20_12_2017__14_02_24" />
+
+<div class="page-header">
+    <h1 id="title">Створення ЗП відомості</h1>
+</div>
+
+<div style="margin-left:10px !important;">
+    <table id="dealInfo">
+        <tbody>
+            <tr>
+                <td class="noBorderTd">
+                    <a class="btn custom-btn custom-btn-back" title="Повернутись назад">Назад</a>
+                </td>
+                <td>
+                    <label class="k-label" for="edrpou_code">ЄДРПОУ/ІПН</label>
+                </td>
+                <td>
+                    <label for="client_name">Назва клієнта</label>
+                </td>
+                <td>
+                    <label for="code_zp">Номер договору</label>
+                </td>
+                <td>
+                    <label for="deal_name">Назва договору</label>
+                </td>
+                <td>
+                    <label class="k-label" for="is_premial">Преміальний</label>
+                </td>
+            </tr>
+            <tr>
+                <td class="noBorderTd" id="td_with_logo" title="Hello from the unity-bars salary project team !!!"></td>
+                <td>
+                    <label id="edrpou_code" class="k-label bold-lbl"><b>Завантаження...</b></label>
+                </td>
+                <td>
+                    <label id="client_name" class="k-label bold-lbl">Завантаження...</label>
+                </td>
+                <td>
+                    <label id="code_zp" class="k-label bold-lbl">Завантаження...</label>
+                </td>
+                <td>
+                    <label id="deal_name" class="k-label bold-lbl">Завантаження...</label>
+                </td>
+                <td>
+                    <label id="is_premial" class="k-label bold-lbl">Завантаження...</label>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    @*</div>*@
+</div>
+
+<div style="margin-left:10px !important;margin-top:6px;" id="EditablePayrollDetails">
+    <div class="inlineBlock">
+        <label for="salary_payroll_name" class="k-label">Номер ЗП відомості</label><br />
+        <input id="salary_payroll_number" class="k-textbox k-input" placeholder="№" />
+    </div>
+
+    <div class="inlineBlock">
+        <label for="salary_payroll_date" class="k-label">Дата</label><br />
+        <input id="salary_payroll_date" />
+    </div>
+
+    <div class="inlineBlock">
+        <label class="k-label" for="payment_purpose">Призначення платежу </label><br />
+        <input id="payment_purpose" class="k-textbox k-input" style="width:350px;" />
+    </div>
+</div>
+
+<div style="margin-left:10px !important;margin-top:6px;" id="NotEditablePayrollDetails" class="invisible">
+    <div class="inlineBlock" style="margin:5px;">
+        <label for="lbl_salary_payroll_name" class="k-label">Номер ЗП відомості</label><br />
+        <label id="lbl_salary_payroll_number" class="k-label bold-lbl">Завантаження...</label>
+    </div>
+
+    <div class="inlineBlock" style="margin:5px;">
+        <label for="lbl_salary_payroll_date" class="k-label">Дата</label><br />
+        <label id="lbl_salary_payroll_date" class="k-label bold-lbl">Завантаження...</label>
+    </div>
+
+    <div class="inlineBlock" style="margin:5px;">
+        <label class="k-label" for="lbl_payment_purpose">Призначення платежу </label><br />
+        <label id="lbl_payment_purpose" class="k-label bold-lbl">Завантаження...</label>
+    </div>
+</div>
+
+@*<div class="inlineBlock" style="margin:5px;">
+        <label class="k-label" for="lbl_123123">Підпис</label><br />
+        <label class="inlineBlock signed-cell" style="margin:0px !important;" title="Підписав:&#013;хрен якийсь"></label>
+        <label id="lbl_123123" class="inlineBlock k-label bold-lbl">Завантаження...</label>
+    </div>*@
+
+
+<div style="margin-left:10px !important;margin-top:6px;">
+    <div class="inlineBlock" id="variable_block">
+        <div class="inlineBlock">
+            <a class="btn custom-btn custom-btn-add" title="Додати"></a>
+        </div>
+        <div class="inlineBlock">
+            <a class="btn custom-btn custom-btn-edit" title="Редагувати"></a>
+        </div>
+        <div class="inlineBlock">
+            <a class="btn custom-btn custom-btn-delete" title="Видалити"></a>
+        </div>
+
+        @*<div id="fileUploaderDiv" class="inlineBlock">
+                <input name="testFile" id="import_file_selector" type="file" />
+            </div>*@
+
+        <div class="inlineBlock" style="width:40px;">
+        </div>
+
+        <div class="inlineBlock">
+            <a class="btn custom-btn custom-btn-file-import" title="Імпортувати з файла">Імпорт файлів</a>
+        </div>
+
+        <div class="inlineBlock" id="payrollHistoryBtn">
+            <a class="btn custom-btn custom-btn-payroll-history" title="Перегляд історії відомостей">Історія відомостей</a>
+        </div>
+
+        <div class="inlineBlock" id="payrollPrintBtn">
+            <a class="btn custom-btn custom-btn-print" title="Друкувати відомість"></a>
+        </div>
+    </div>
+
+    <div class="inlineBlock" style="margin-left:50px;">
+        <label id="selectedInformation_lbl"></label>
+    </div>
+</div>
+
+<hr class="modal-hr" />
+
+<div id="SalarypayrollMainGrid"></div>
+
+<br />
+
+<div>
+    <table id="noGrid">
+        <tr>
+            <td>
+                <label for="total_count" class="k-label">Кількість записів</label>
+            </td>
+            <td>
+                <label id="total_count" class="k-label bold-lbl margined-lbl">0</label>
+            </td>
+            <td>
+                <label for="total_sum" class="k-label">Загальна сума</label>
+            </td>
+            <td>
+                <label id="total_sum" class="k-label bold-lbl margined-lbl">0,00 &#8372;</label>
+            </td>
+            <td class="comissionDebtColumn invisible"></td>
+            <td class="comissionDebtColumn invisible"></td>
+            <td>
+                <label for="nls_sum" class="k-label">Рахунок для списання : </label>
+            </td>
+            <td>
+                <label id="nls_sum" class="k-label bold-lbl margined-lbl">Завантаження...</label>
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td>
+                <label for="enrollment_commision" class="k-label">Комісія зарахування</label>
+            </td>
+            <td>
+                <label id="enrollment_commision" class="k-label bold-lbl margined-lbl">0,00 &#8372;</label>
+            </td>
+            <td class="comissionDebtColumn invisible">
+                <label for="comission_debt_value_lbl" class="k-label">Заборгованість по комісії</label>
+            </td>
+            <td class="comissionDebtColumn invisible">
+                <label id="comission_debt_value_lbl" class="k-label bold-lbl margined-lbl">0,00 &#8372;</label>
+            </td>
+            <td>
+                <label for="nls_sum" class="k-label">Залишок на рахунку : </label>
+            </td>
+            <td>
+                <label id="ost_2905_lbl" class="k-label bold-lbl margined-lbl">Завантаження...</label>
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td>
+                <label for="total_sum_plus_comission" class="k-label">Всього</label>
+            </td>
+            <td>
+                <label id="total_sum_plus_comission" class="k-label bold-lbl margined-lbl">0,00 &#8372;</label>
+            </td>
+            <td class="comissionDebtColumn invisible"></td>
+            <td class="comissionDebtColumn invisible"></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+</div>
+
+<hr class="modal-hr" />
+
+<div style="margin-left:10px !important;" id="payrollAcceptButtons">
+    <div class="inlineBlock">
+        <a class="btn custom-btn custom-btn-accept-payroll invisible" title="Зберегти внесені зміни">Зберегти</a>
+    </div>
+    <div class="inlineBlock">
+        <a class="btn custom-btn custom-btn-payroll-ok invisible" disabled="disabled" title="Підтвердити відомість">Підтвердити</a>
+    </div>
+
+    <div class="inlineBlock">
+        <a class="btn custom-btn custom-btn-payroll-enrollment invisible" title="Зарахувати відомість">Зарахувати</a>
+    </div>
+    <div class="inlineBlock">
+        <a class="btn custom-btn custom-btn-payroll-reject invisible" title="Відхилити відомість"></a>
+    </div>
+    @*payroll acceptance*@
+    <div class="inlineBlock" style="float:right;">
+        <label id="acceptanceLbl" class="k-label bold-lbl invisible"></label>
+    </div>
+</div>
+
+<script id="AddEditPayRollDocumentTemplate" type="text/x-kendo-template">
+    <input id="payrollDocumentId" value="#= data.id || '' #" style="display:none;" />
+    <table id="payrollDocumentsEditFormTbl">
+        <tbody>
+            <tr>
+                <td>
+                    <label class="k-label fullWidth" for="nls_editor">Рахунок одержувача</label>
+                </td>
+                <td>
+                    <input id="nls_editor" tabindex="1" class="k-textbox k-input fullWidth" value="#= checkValForEdit(data.nlsb, '') #">
+                </td>
+                <td>
+                    <label class="k-label fullWidth" for="mfo_editor">МФО</label>
+                </td>
+                <td>
+                    <input id="mfo_editor" maxlength="6" tabindex="2" class="k-textbox k-input fullWidth" value="#= checkValForEdit(data.mfob, '') || formCfg.ourMfo #">
+                </td>
+            </tr>
+
+
+            <tr>
+                <td>
+                    <label class="k-label fullWidth" for="client_pib_editor">ПІБ клієнта</label>
+                </td>
+                <td colspan="3">
+                    <input id="client_pib_editor" tabindex="3" class="k-textbox k-input fullWidth" value="#= checkValForEdit(data.namb, '') #">
+                </td>
+                <td></td>
+                <td>
+                    <a class="btn custom-btn search-btn" title="Вибрати існуючого клієнта" id="client_pib_editor_btn" tabindex="-1"></a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label class="k-label fullWidth" for="okpo_editor">ІПН</label>
+                </td>
+                <td>
+                    <input id="okpo_editor" tabindex="4" class="k-textbox k-input fullWidth" value="#= checkValForEdit(data.okpob, '') #" maxlength="10">
+                </td>
+                <td>
+                    <label class="k-label fullWidth" for="sum_editor">Сума</label>
+                </td>
+                <td>
+                    <input id="sum_editor" tabindex="5" class="fullWidth" value="#= checkValForEdit(data.s, 0) #">
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <label class="k-label fullWidth" for="payment_purpose_editor">Призначення платежу</label>
+                </td>
+                <td colspan="3">
+                    <input id="payment_purpose_editor" tabindex="6" class="k-textbox k-input fullWidth" value="#= checkValForEdit(data.nazn, '') || formCfg.curPurpose #" maxlength="160">
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr class="modal-hr" />
+
+    <div class="row" style="margin:5px 5px 5px 5px;">
+        <div class="k-edit-buttons k-state-default">
+            <a id="btnCancel" class="k-button k-button-icontext k-grid-cancel modal-buttons" tabindex="8"><span class="k-icon k-cancel"></span> Відмінити</a>
+            <a id="btnSave" class="k-button k-button-icontext k-primary k-grid-update modal-buttons" tabindex="7"><span class="k-icon k-update"></span> Зберегти</a>
+        </div>
+    </div>
+</script>
+
+<script id="ImportTemplate" type="text/x-kendo-template">
+    <div class="inlineBlock">
+        <label for="import_file_type">Тип файлу :</label><br />
+        <input id="import_file_type" style="width:80px;" />
+    </div>
+
+    <div class="inlineBlock" id="import_dbf_details">
+        @*<div class="inlineBlock">
+                <label for="import_encoding">Кодування :</label><br />
+                <input id="import_encoding" style="width:80px;" />
+            </div>*@
+        <div class="inlineBlock">
+            <label for="import_dbf_configuration">Шаблон завантаження</label><br />
+            <input id="import_dbf_configuration" style="width:350px;" />
+        </div>
+    </div>
+    <div class="inlineBlock">
+        <a class="invisible" id="downloadExelTemplate" href="\\#"> Завантажити приклад валідного шаблону для EXCEL </a>
+    </div>
+    <br />
+
+    <div class="inlineBlock">
+        <div id="fileUploaderDiv" class="inlineBlock" style="margin-left:0px !important;">
+            <input name="testFile" id="import_file_selector" type="file" title="Імпортувати новий файл" accept=".dbf" />
+        </div>
+
+        <div class="inlineBlock" style="width:155px;">
+        </div>
+    </div>
+
+    <a id="import_view" class="btn custom-btn k-grid-import-view" title="Перегляд помилок"></a>
+    <a id="import_delete" class="btn custom-btn k-grid-import-delete" title="Видалити"></a>
+
+    <br />
+
+    <hr class="modal-hr" />
+    <div id="importFilesGrid" tabindex="-1"></div>
+    <br />
+
+    <div class="row" style="margin:5px 5px 5px 5px;">
+        <div class="k-edit-buttons k-state-default">
+            <a id="btnCancel" class="k-button k-button-icontext k-grid-cancel modal-buttons" tabindex="105"><span class="k-icon k-cancel"></span>Закрити</a>
+        </div>
+    </div>
+</script>
+
+<script id="ConstructorTemplate" type="text/x-kendo-template">
+    <div class="inlineBlock">
+        <div id="encodingChangeDiv" class="inlineBlock" style="margin-bottom:5px;">
+            <a id="btnChange" style="height: 16px !important;" class="btn custom-btn custom-btn-change-encoding" title="Змінити кодування">Змінити кодування</a>
+        </div>
+    </div>
+    <div class="inlineBlock">
+        <label for="sum_delimiter">Сума в: </label>
+        <input id="sum_delimiter" style="width:100px;" />
+    </div>
+    <br />
+    <hr class="modal-hr" />
+    <div id="modalFileContentGrid" tabindex="-1"></div>
+    <br />
+    <div class="inlineBlock">
+        <label for="templateCheckbox">Зберегти шаблон </label>
+        <input id="templateCheckbox" type="checkbox" />
+    </div>
+    <div class="inlineBlock">
+        <label for="templateName" id="templateNameLbl" class="invisible">Введіть назву шаблону: </label>
+        <input type="text" id="templateName" class="k-textbox k-input; invisible" style="width:500px;" />
+    </div>
+    <hr class="modal-hr">
+    <div id="modalFileConstructorGrid" tabindex="-1"></div>
+    <label>Налаштуйте відповідність між полями ЗП відомості та полями файлу (<label style='color:red;'>*</label> - обов'язкові поля)</label>
+    <br />
+    <div class="row" style="margin:5px 5px 5px 5px;">
+        <div class="k-edit-buttons k-state-default">
+            <a id="btnCancel" class="k-button k-button-icontext k-grid-cancel modal-buttons" tabindex="105"><span class="k-icon k-cancel"></span>Закрити</a>
+            <a id="btnSave" class="k-button k-button-icontext k-primary k-grid-update modal-buttons" tabindex="8"><span class="k-icon k-update"></span>Зберегти</a>
+        </div>
+    </div>
+</script>

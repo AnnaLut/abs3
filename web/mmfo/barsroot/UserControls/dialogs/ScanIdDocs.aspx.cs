@@ -187,7 +187,7 @@ public partial class UserControls_dialogs_ScanIdDocs : System.Web.UI.Page
                 }
                 else
                 {
-                    scDoc.Value = GetDataFromEA(new[] { EAStructID_Doc });
+                    scDoc.Value = GetDataFromEA(new[] { EAStructID_Doc.ToString() });
                 }
                 break;
             case "cut_photo":
@@ -224,7 +224,7 @@ public partial class UserControls_dialogs_ScanIdDocs : System.Web.UI.Page
                 }
                 else
                 {   
-                    scInn.Value = GetDataFromEA(new[] { EAStructID_Inn });
+                    scInn.Value = GetDataFromEA(new[] { EAStructID_Inn.ToString() });
                 }
                 break;
             case "scan_SpecialDoc":
@@ -236,7 +236,7 @@ public partial class UserControls_dialogs_ScanIdDocs : System.Web.UI.Page
                 }
                 else
                 {
-                    byte[] scannedSpecialDoc = GetDataFromEA(new[] { EAStructID_SpecialDoc });
+                    byte[] scannedSpecialDoc = GetDataFromEA(new[] { EAStructID_SpecialDoc.ToString() });
                     scSpecialDoc.Value = scannedSpecialDoc;
                 }
                 break;
@@ -813,7 +813,7 @@ public partial class UserControls_dialogs_ScanIdDocs : System.Web.UI.Page
             con.Dispose();
         }
     }
-    private Byte[] GetDataFromEA(Int16[] DocCodes)
+    private Byte[] GetDataFromEA(string[] DocCodes)
     {
         OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
         Byte[] DocData = null;
@@ -865,13 +865,13 @@ public partial class UserControls_dialogs_ScanIdDocs : System.Web.UI.Page
     private Byte[] GetDocFromEA()
     {
         // Паспорт и прочее
-        Int16[] DocCodes = new Int16[8] { 111, 1111, 113, 114, 119, 112, 118, 148 };
+        string[] DocCodes = new string[8] { "111", "1111", "113", "114", "119", "112", "118", "148" };
         return GetDataFromEA(DocCodes);
     }
     private Byte[] GetInnFromEA()
     {
         // ИНН и прочее
-        Int16[] InnCodes = new Int16[2] { 121, 122 };
+        string[] InnCodes = new string[2] { "121", "122" };
         return GetDataFromEA(InnCodes);
     }
     # endregion

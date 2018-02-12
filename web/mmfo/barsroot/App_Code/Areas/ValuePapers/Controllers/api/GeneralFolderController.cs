@@ -95,6 +95,24 @@ namespace BarsWeb.Areas.ValuePapers.Controllers.Api
                 return Request.CreateResponse(HttpStatusCode.OK, ex.Message);
             }
         }
+
+        public HttpResponseMessage GetCP_OB_FORM_CALC([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))]DataSourceRequest request)
+        {
+            try
+            {
+                var data = _repo.CP_OB_FORM_CALC();
+
+                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK,
+                    data.ToList().ToDataSourceResult(request));
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, ex.Message);
+            }
+        }
+
         public HttpResponseMessage GetContractSaleWindowFixedParams()
         {
             try
@@ -111,6 +129,8 @@ namespace BarsWeb.Areas.ValuePapers.Controllers.Api
                 return Request.CreateResponse(HttpStatusCode.OK, ex.Message);
             }
         }
+
+
 
         public HttpResponseMessage GetPrepareWndDeal(decimal? p_nOp, decimal? p_fl_END, decimal? p_nGrp, string p_strPar02)
         {
@@ -435,7 +455,7 @@ namespace BarsWeb.Areas.ValuePapers.Controllers.Api
         {
             try
             {
-                var result = _repo.SetSpecparam(data.REF_MAIN, data.COD_I, data.COD_M);
+                var result = _repo.SetSpecparam(data.REF_MAIN, data.COD_I, data.COD_M, data.COD_F);
 
                 if (String.IsNullOrEmpty(result) || result == "null")
                     return Request.CreateResponse(HttpStatusCode.OK);

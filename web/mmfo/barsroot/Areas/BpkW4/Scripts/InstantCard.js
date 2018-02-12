@@ -10,7 +10,7 @@ function updateMainGrid() {
 
 function fillCards(p_cardcode, p_delivery_br, p_cardnum, cardName) {
     AJAX({ srcSettings: {
-        url: bars.config.urlContent("/api/BpkW4/InstantCardApi/createinstantcards"),
+        url: bars.config.urlContent("/api/instantcardapicreateinstantcards"),
         success: function (data) {
             bars.ui.notify("Миттєва картка", "Операція успішно виконана. ("+p_cardnum+" шт. Тип: "+cardName+")", 'success');
             updateMainGrid();
@@ -25,7 +25,7 @@ function fillCards(p_cardcode, p_delivery_br, p_cardnum, cardName) {
 function getCardtype(product_code) {
     fillDropDownList("#cardtype", {
         transport: {read: {
-            url: bars.config.urlContent("/api/BpkW4/InstantCardApi/cardtype"),
+            url: bars.config.urlContent("/api/instantcardapicardtype"),
             data: {product_code: product_code}
         }},
         schema: {model: {fields: { card_code: { type: "string" }, sub_name: { type: "string" } }}}
@@ -38,7 +38,7 @@ function getCardtype(product_code) {
 
 function getProduct() {
     fillDropDownList("#product", {
-        transport: {read: {url: bars.config.urlContent("/api/BpkW4/InstantCardApi/product")}},
+        transport: { read: { url: bars.config.urlContent("/api/instantcardapiproduct")}},
         schema: {model: {fields: { product_code: { type: "string" }, product_name: { type: "string" } }}}
     }, {
         // dataBinding: function (res) {
@@ -86,7 +86,7 @@ function initMainGrid() {
     fillKendoGrid("#gridMain", {
         type: "webapi",
         sort: [ { field: "ID", dir: "desc" } ],
-        transport: { read: { url: bars.config.urlContent("/api/BpkW4/InstantCardApi/batchesmmsb") } },
+        transport: { read: { url: bars.config.urlContent("/api/instantcardapibatchesmmsb") } },
         schema: {
             model: {
                 fields: {

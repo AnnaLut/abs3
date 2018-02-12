@@ -70,6 +70,7 @@ namespace Bars.EAD
             List<OracleParameter> parameters = new List<OracleParameter>();
             parameters.Add(new OracleParameter("P_SYNC_ID", OracleDbType.Decimal,P_SYNC_ID, ParameterDirection.Input));
             parameters.Add(new OracleParameter("P_KF", OracleDbType.Varchar2, kf, ParameterDirection.Input));
+            parameters.Add(new OracleParameter("P_FORCE", OracleDbType.Char, "F", ParameterDirection.Input));
             object ReturnValue = null;
             ExecuteNonQuery("EAD_PACK.MSG_PROCESS", parameters.ToArray(), CommandType.StoredProcedure, out ReturnValue);
         }
@@ -126,40 +127,36 @@ namespace Bars.EAD
             OracleDecimal res = (OracleDecimal)ReturnValue;
             return res.IsNull ? (Decimal?)null : res.Value;
         }
-        public Decimal? DOC_CREATE ( String P_TYPE_ID,  String P_TEMPLATE_ID,  Byte[] P_SCAN_DATA,  Decimal? P_EA_STRUCT_ID, Decimal? P_RNK,  Decimal? P_AGR_ID)
+
+        /// <summary>
+        /// DOC_CREATE  (Decimal P_EA_STRUCT_ID) - obsolete
+        /// </summary>
+        public Decimal? DOC_CREATE(String P_TYPE_ID, String P_TEMPLATE_ID, Byte[] P_SCAN_DATA, Decimal? P_EA_STRUCT_ID, Decimal? P_RNK, Decimal? P_AGR_ID = null, Decimal? P_ACC = null)
         {
-            List<OracleParameter> parameters = new List<OracleParameter>();
-            parameters.Add(new OracleParameter("P_TYPE_ID", OracleDbType.Varchar2,P_TYPE_ID, ParameterDirection.Input));
-            parameters.Add(new OracleParameter("P_TEMPLATE_ID", OracleDbType.Varchar2,P_TEMPLATE_ID, ParameterDirection.Input));
-            parameters.Add(new OracleParameter("P_SCAN_DATA", OracleDbType.Blob,P_SCAN_DATA, ParameterDirection.Input));
-            parameters.Add(new OracleParameter("P_EA_STRUCT_ID", OracleDbType.Decimal,P_EA_STRUCT_ID, ParameterDirection.Input));
-            parameters.Add(new OracleParameter("P_RNK", OracleDbType.Decimal,P_RNK, ParameterDirection.Input));
-            parameters.Add(new OracleParameter("P_AGR_ID", OracleDbType.Decimal,P_AGR_ID, ParameterDirection.Input));
-            parameters.Add(new OracleParameter("$$RETVAL$$", OracleDbType.Decimal, ParameterDirection.ReturnValue));
-            object ReturnValue = null;
-            ExecuteNonQuery("EAD_PACK.DOC_CREATE", parameters.ToArray(), CommandType.StoredProcedure, out ReturnValue);
-            OracleDecimal res = (OracleDecimal)ReturnValue;
-            return res.IsNull ? (Decimal?)null : res.Value;
+            return DOC_CREATE(P_TYPE_ID, P_TEMPLATE_ID, P_SCAN_DATA, Convert.ToString(P_EA_STRUCT_ID), P_RNK, P_AGR_ID, P_ACC);
         }
-        public Decimal? DOC_CREATE ( String P_TYPE_ID,  String P_TEMPLATE_ID,  Byte[] P_SCAN_DATA,  Decimal? P_EA_STRUCT_ID,  Decimal? P_RNK)
+        public Decimal? DOC_CREATE(String P_TYPE_ID, String P_TEMPLATE_ID, Byte[] P_SCAN_DATA, String P_EA_STRUCT_ID, Decimal? P_RNK, Decimal? P_AGR_ID = null, Decimal? P_ACC = null)
         {
             List<OracleParameter> parameters = new List<OracleParameter>();
-            parameters.Add(new OracleParameter("P_TYPE_ID", OracleDbType.Varchar2,P_TYPE_ID, ParameterDirection.Input));
-            parameters.Add(new OracleParameter("P_TEMPLATE_ID", OracleDbType.Varchar2,P_TEMPLATE_ID, ParameterDirection.Input));
-            parameters.Add(new OracleParameter("P_SCAN_DATA", OracleDbType.Blob,P_SCAN_DATA, ParameterDirection.Input));
-            parameters.Add(new OracleParameter("P_EA_STRUCT_ID", OracleDbType.Decimal,P_EA_STRUCT_ID, ParameterDirection.Input));
+            parameters.Add(new OracleParameter("P_TYPE_ID", OracleDbType.Varchar2, P_TYPE_ID, ParameterDirection.Input));
+            parameters.Add(new OracleParameter("P_TEMPLATE_ID", OracleDbType.Varchar2, P_TEMPLATE_ID, ParameterDirection.Input));
+            parameters.Add(new OracleParameter("P_SCAN_DATA", OracleDbType.Blob, P_SCAN_DATA, ParameterDirection.Input));
+            parameters.Add(new OracleParameter("P_EA_STRUCT_ID", OracleDbType.Varchar2, P_EA_STRUCT_ID, ParameterDirection.Input));
             parameters.Add(new OracleParameter("P_RNK", OracleDbType.Decimal, P_RNK, ParameterDirection.Input));
+            parameters.Add(new OracleParameter("P_AGR_ID", OracleDbType.Decimal, P_AGR_ID, ParameterDirection.Input));
+            parameters.Add(new OracleParameter("P_ACC", OracleDbType.Decimal, P_ACC, ParameterDirection.Input));
             parameters.Add(new OracleParameter("$$RETVAL$$", OracleDbType.Decimal, ParameterDirection.ReturnValue));
             object ReturnValue = null;
             ExecuteNonQuery("EAD_PACK.DOC_CREATE", parameters.ToArray(), CommandType.StoredProcedure, out ReturnValue);
             OracleDecimal res = (OracleDecimal)ReturnValue;
             return res.IsNull ? (Decimal?)null : res.Value;
         }
-        public Decimal? MSG_CREATE ( String P_TYPE_ID,  String P_OBJ_ID, String kf)
+        public Decimal? MSG_CREATE (String P_TYPE_ID,  String P_OBJ_ID, UInt64? P_RNK, String kf)
         {
             List<OracleParameter> parameters = new List<OracleParameter>();
             parameters.Add(new OracleParameter("P_TYPE_ID", OracleDbType.Varchar2,P_TYPE_ID, ParameterDirection.Input));
             parameters.Add(new OracleParameter("P_OBJ_ID", OracleDbType.Varchar2,P_OBJ_ID, ParameterDirection.Input));
+            parameters.Add(new OracleParameter("P_RNK", OracleDbType.Int64, P_RNK, ParameterDirection.Input));
             parameters.Add(new OracleParameter("P_KF", OracleDbType.Varchar2, kf, ParameterDirection.Input));
             parameters.Add(new OracleParameter("$$RETVAL$$", OracleDbType.Decimal, ParameterDirection.ReturnValue));
             object ReturnValue = null;

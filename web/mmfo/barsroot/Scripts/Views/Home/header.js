@@ -259,7 +259,7 @@ $(document).ready(function () {
 
     var branches = new kendo.data.HierarchicalDataSource({
         transport: {
-            read: function (options) {                
+            read: function (options) {
                 var id = options.data.BRANCH || 'null'; 
                 $.ajax({
                     url: '/barsroot/api/kernel/headerbranches/get',
@@ -304,7 +304,7 @@ $(document).ready(function () {
     $("#treeview").kendoTreeView({
         select: onSelect,
         dataSource: branches,
-        template: "<span #= item.CAN_SELECT === 1 ? '' : \"class='disabled'\" #> #= item.BRANCH # </span>",
+        template: "<span #= item.CAN_SELECT === 1 ? '' : \"class='disabled'\" #> #= item.BRANCH # </span> <span>  #= item.SHOW_REGIONAL_NAME ? '  - ' + item.NAME: ''# </span>",
         dataBound: function (e) {
             this.expandPath(['/']);
             // expand all

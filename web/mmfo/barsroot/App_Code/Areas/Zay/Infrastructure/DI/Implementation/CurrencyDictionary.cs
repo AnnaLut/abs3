@@ -22,7 +22,7 @@ namespace BarsWeb.Areas.Zay.Infrastructure.Repository.DI.Implementation
         public IEnumerable<ZAY_AIMS> ZayAimsDictionary()
         {
             const string query = @"select za.AIM AIM_CODE, za.DESCRIPTION DESCRIPTION, 
-                za.DESCRIPTION_ENG DESCRIPTION_ENG, za.NAME AIM_NAME, za.TYPE TYPE from ZAY_AIMS za";
+                za.DESCRIPTION_ENG DESCRIPTION_ENG, za.NAME AIM_NAME, za.TYPE TYPE from ZAY_AIMS za where za.TYPE=2";
             return _entities.ExecuteStoreQuery<ZAY_AIMS>(query);
         }
 

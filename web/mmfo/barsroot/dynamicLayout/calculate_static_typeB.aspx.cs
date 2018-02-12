@@ -23,7 +23,9 @@ public partial class calculate_static_typeA : Bars.BarsPage
         {
             if ("err" == Request["type"])
             {
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", "alert('Рахунок А не знайдено або він закритий');", true);
+                string errText = Server.UrlDecode(Request["errMsg"]);
+
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", "alert('" + errText + "');", true);
             }
 
             clearLayout();
