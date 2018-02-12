@@ -3,8 +3,7 @@
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/cp.sql =========*** Run *** ========
  PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.CP IS
+CREATE OR REPLACE PACKAGE CP IS
 
    -------------------------------------------------------
    --
@@ -12,7 +11,7 @@
    --
    -------------------------------------------------------
 
-   G_HEADER_VERSION    constant varchar2(64) := 'v.1.14.4  16.08.2017';
+   G_HEADER_VERSION    constant varchar2(64) := 'v.1.14.5  13.12.2017';
                                               --prv 'v.1.14.3 '
 
    CP_PAY_   char(1):='0'; --1) 0=Конс-сист., Угоди-несист, 1=Конс-несист., Угоди-сист
@@ -458,19 +457,29 @@ PROCEDURE awry_period (p_id       IN     cp_kod.id%TYPE,
                        p_awry_first  OUT INT,               -- количество дней в укороченном первом купонном периоде
                        p_awry_last   OUT INT);              -- количество дней в укороченном последнем купонном периоде
 
--- Сумирует общее количество Ценных бумаг по Контрагентам в рамках Пакета
-  FUNCTION sum_kolz(p_ref in number) return number;
-  FUNCTION cp_zal_dat(p_ref in number ) return date;
+-- Сумирует общее количество Ценных бумаг по Контрагентам в рамках Пакета (Функа ЦП (14) )
+  function get_from_cp_zal_kolz(p_ref number, p_dat date) return number;
+  function get_from_cp_zal_dat(p_ref number, p_dat date) return date;
+
+  --Процедура на БМД ЦП (14) - редагування заставної інформації в розрізі контрагентів
+  procedure cp_zal_change(p_ref          cp_zal.ref%type, 
+                          p_rnk          cp_zal.rnk%type, 
+                          p_id_cp_zal    cp_zal.id_cp_zal%type, 
+                          p_id           cp_zal.id%type, 
+                          p_kol_zal      cp_zal.kolz%type, 
+                          p_zal_from     cp_zal.datz_from%type, 
+                          p_zal_to       cp_zal.datz_to%type, 
+                          p_mode         int); --для функи ЦП (14)
 
 END CP;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.CP IS
+CREATE OR REPLACE PACKAGE body CP IS
 ----------------------------------------------------------------------
 --
 --  Пакет пр-р CP. Работа с цінними паперами
 --  Версія для КБ пізніше 05/2016
 ----------------------------------------------------------------------
-    G_BODY_VERSION      constant varchar2(64) := 'v.2.90.5  16/08/2017';
+    G_BODY_VERSION      constant varchar2(64) := 'v.2.90.8  27/12/2017';
     G_TRACE             constant varchar2(20) := 'cp.';  -- 'v.2.90.4'
     G_MODULE            constant varchar2(20) := 'CPN';
     G_PAY_CUPON         constant number(1):= 1;
@@ -2959,7 +2968,7 @@ begin
              exception when others then null;
              end;
 
-             GL.in_doc3  (ref_  => REF2_, tt_   => FXB_,   vob_ => vob_    , nd_   => substr(to_char(REF2_),1,10),pdat_=> sysdate,
+             GL.in_doc3  (ref_  => REF2_, tt_   => FXB_,   vob_ => nvl(vob_, 6)    , nd_   => substr(to_char(REF2_),1,10),pdat_=> sysdate,
                           vdat_ => vdat_, dk_   => DK_ ,   kv_  => kv_     , s_    => s_,      kv2_   => kv_,      s2_ => S_,
                           sk_   => null , data_ => greatest(VDAT_,gl.bDATE), datp_ => gl.bdate,
                           nam_a_=> coalesce(k.NMS2,k.NMS3),
@@ -3018,7 +3027,7 @@ begin
                  values (k.ref, REF_);
                exception when others then null;
                end;
-             GL.in_doc3  (ref_  =>REF_ , tt_   => FXB_,   vob_ =>vob_    , nd_   =>substr(to_char(REF_),1,10),pdat_=> sysdate,
+             GL.in_doc3  (ref_  =>REF_ , tt_   => FXB_,   vob_ =>nvl(vob_, 6)    , nd_   =>substr(to_char(REF_),1,10),pdat_=> sysdate,
                           vdat_ =>vdat_, dk_   => DK_ ,   kv_  =>kv_     , s_    =>s_,      kv2_  =>kv_,      s2_ => S_,
                           sk_   =>null , data_ =>greatest(VDAT_,gl.bDATE), datp_ =>gl.bdate,
                           nam_a_=>k.NMS, nlsa_ => k.NLSR, mfoa_=>gl.AMFO , nam_b_=>S_4621  , nlsb_=>B_4621K,  mfob_=> gl.AMFO,
@@ -3198,7 +3207,7 @@ begin
   END;
 
   INSERT INTO oper (ref,tt,vob,nd,dk,PDAT,VDAT,DATD, DATP, nam_a,nlsa,mfoa,kv,s,nam_b,nlsb,mfob,kv2,s2,nazn,userid,sign,id_a,id_b)
-  VALUES (ref_,FXB_,VOB_,substr(ref_,1,10),0, sysdate, VDAT_, greatest(VDAT_,gl.bDATE), gl.bDATE,NMS_,   NLSGA_,gl.AMFO,kk.KV,SN_,
+  VALUES (ref_,FXB_,nvl(VOB_, 6),substr(ref_,1,10),0, sysdate, VDAT_, greatest(VDAT_,gl.bDATE), gl.bDATE,NMS_,   NLSGA_,gl.AMFO,kk.KV,SN_,
      S_4621,  B_4621,  gl.AMFO,kk.KV,SN_,NAZN_,gl.aUid, GetAutoSign, gl.aOkpo, gl.aOkpo );
   NN_:= SN_;
 
@@ -3976,6 +3985,8 @@ IS
    -- l_ky        INT := 1;
    S_TRANS_DK_NMS varchar2(38);
    S_TRANS_DK_NLS varchar2(15);
+
+   l_vob          int := VOB_;
 ------------------------------------------------------------------------------
 begin
   bars_audit.trace('%s Start for ID = %s, tip = %s, nREPO_ = %s',
@@ -4192,6 +4203,9 @@ begin
    then VDAT_:= F_VDAT_ZO(ADD_MONTHS(gl.bdate, -1)); -- дата последнего рабочего дня предыдущего месяца
    else VDAT_:= DAT_ROZ;
   end if;
+  if l_vob is null then
+    if cpk.KV = gl.baseval then l_vob :=6; else l_vob:=16; end if;
+  end if;
 
   l_vdat    := VDAT_;
   l_datpm   := cpk.datp;
@@ -4249,7 +4263,7 @@ begin
 
        GL.in_doc3 (ref_     => REF_,
                    tt_      => FXB_,
-                   vob_     => vob_,
+                   vob_     => l_vob,
                    nd_      => SUBSTR(TO_CHAR(REF_), 1, 10),
                    pdat_    => SYSDATE,
                    vdat_    => vdat_,
@@ -5467,6 +5481,11 @@ begin
      WHERE REF = nREPO_;
    END IF;
   bars_audit.trace('%s Финиш (ID = %s, tip = %s)', title, to_char(nID_), to_char(TIPD_));
+  
+  exception
+    when others then
+      bars_audit.error(title||SQLERRM||','||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE); 
+      raise;
 end CP_PROD;
 ------------------------------------------------------------------------------
 
@@ -5811,6 +5830,8 @@ accS_  number; accS6_ number;  accS5_ number; CP_ID_R varchar2(25);
  l_tag             cp_tag.tag%type;
  l_portf           varchar2(3);
 
+ l_vob             int := VOB_;
+
 BEGIN
   bars_audit.info(title || ' Start with p_CP_AI = '||to_char(p_CP_AI)
                         || ', CP_METOD = ' || to_char(l_CP_METOD)
@@ -5955,11 +5976,16 @@ BEGIN
   END;
 
   if VOB_ = 96 then VDAT_:= F_VDAT_ZO( add_MONTHS(gl.BDATE, -1 ) );
-  else              VDAT_:= DAT_ROZ;
+  else
+    VDAT_:= DAT_ROZ;
+  end if;
+  if l_vob is null then
+    if kk.KV = gl.baseval then l_vob :=6; else l_vob:=16; end if;
   end if;
 
+
   GL.in_doc3
-       (ref_  =>REF_ , tt_   => FXB_,   vob_ =>vob_    , nd_   =>substr(to_char(REF_),1,10),pdat_=> sysdate,
+       (ref_  =>REF_ , tt_   => FXB_,   vob_ =>l_vob   , nd_   =>substr(to_char(REF_),1,10),pdat_=> sysdate,
         vdat_ =>vdat_, dk_   => 1   ,   kv_  =>kk.kv   , s_    =>s_,      kv2_   =>kk.kv,     s2_ => S_,
         sk_   =>null , data_ =>greatest(VDAT_,gl.bDATE), datp_ =>gl.bdate,
         nam_a_=>NMS_ , nlsa_ => NLSG_,  mfoa_=>gl.AMFO , nam_b_=>S_TRANS_DK_NMS, nlsb_ => S_TRANS_DK_NLS,   mfob_=> gl.AMFO ,
@@ -7691,44 +7717,128 @@ end CP_POG_NOM2;
 
 
   -- Сумирует общее количество Ценных бумаг по Контрагентам в рамках Пакета
-  -- Для формы ЦП (14*)
-  FUNCTION sum_kolz(p_ref in number) return number is
+  -- Для формы ЦП (14*) 
+  function get_from_cp_zal_kolz(p_ref number, p_dat date) return number is
+-- v.1.0 12.12.2017
+-- актуальне значення(сума по всім контрагентам) пар-ра на дату
+    l_kolz number := null;
 
-   l_kolz number;
   begin
-    begin
-      select sum(z.kolz)
-        into l_kolz
-        from cp_zal z
-            where z.ref = p_ref
-                                group by z.ref ;
 
-    EXCEPTION
-      WHEN OTHERS THEN
-        null;
-        /* Raise_Application_Error(-20001, SQLERRM);*/
-    END;
+    select sum(kolz) into l_kolz
+    from cp_zal where ref = p_ref
+                  and p_dat between datz_from and datz_to;
+
     return l_kolz;
-  end sum_kolz;
 
-  FUNCTION cp_zal_dat( p_ref number ) return date is
-   -- возвращает дату для вьюшки cp_v_zal_web
-   l_date  cp_zal.datz%type;
-   begin
+  end;
+
+  function get_from_cp_zal_dat(p_ref number, p_dat date) return date is
+-- v.1.0 від 12/12-17
+-- актуальне значення DAT2 (по мотивам застарілої f_get_from_accountspv_dat2)
+
+    l_dat cp_zal.datz_to%type:= null;
+
+  begin
+
     begin
-     select  max(z.datz)
-        into l_date
-       from cp_zal z
-          where z.ref = p_ref;
-
-    exception
-      when no_data_found then
-        null;
+      select max(dat) into l_dat
+        from (select rnk, min(datz_to) dat
+              from cp_zal where ref = p_ref
+               and datz_to >= p_dat
+               and nvl(kolz, 0) > 0
+              group by rnk
+              );
+      exception
+        when no_data_found then null;
     end;
 
-    return l_date;
+    return l_dat;
 
-  end cp_zal_dat;
+  end;
+  
+  --Процедура на БМД ЦП (14) - редагування заставної інформації в розрізі контрагентів
+  procedure cp_zal_change(p_ref          cp_zal.ref%type, 
+                          p_rnk          cp_zal.rnk%type, 
+                          p_id_cp_zal    cp_zal.id_cp_zal%type, 
+                          p_id           cp_zal.id%type, 
+                          p_kol_zal      cp_zal.kolz%type, 
+                          p_zal_from     cp_zal.datz_from%type, 
+                          p_zal_to       cp_zal.datz_to%type, 
+                          p_mode         int) --1 - add, 2 - upd, 3 - del
+  is
+    l_ref    cp_zal.ref%type   := nvl(p_ref,      PUL.get('CP_ref'));
+    l_id     cp_zal.id%type    := nvl(p_id,       PUL.get('CP_id'));
+ 
+    l_zal_from    cp_zal.datz_from%type  := p_zal_from; 
+    l_zal_to      cp_zal.datz_to%type    := p_zal_to;
+
+    l_dat         date;
+    l_id_cp_zal   cp_zal.id_cp_zal%type;
+  begin
+    if p_rnk is null then
+--      bars_error.raise_nerror(G_MODULE, 'NOT_CORRECT_PAYTYPE', 'ТЕСТ');
+      raise_application_error(-20001,  'Вкажіть RNK контрагента ' );
+    end if;  
+    if p_zal_from is null then
+      raise_application_error(-20001,  'Вкажіть дату Дії з ' );
+    end if;  
+    if p_zal_to is null then
+      raise_application_error(-20001,  'Вкажіть дату Дії по ' );
+    end if;  
+    if p_zal_to < p_zal_from then
+      raise_application_error(-20001,  'Дата Дії по повинна бути більша або ж така за дату Дії з' );
+    end if;  
+
+    case  p_mode 
+      when 1 then
+        select min(datz_to) 
+        into l_dat
+        from cp_zal 
+        where ref = p_ref and rnk = p_rnk and datz_from > p_zal_from and datz_to < p_zal_to;--якщо пересікаються періоди
+        
+        if l_dat >= l_zal_from then --підкоректувати дату _діє до_  першого періоду куди потрапляє дата _дії з_ нового запису
+--          raise_application_error(-20001,  'l_dat='||l_dat||' l_zal_from='||l_zal_from );
+          update cp_zal 
+           set   datz_to   = p_zal_from - 1 
+          where ref = p_ref and rnk = p_rnk and datz_from > p_zal_from and datz_to = l_dat;
+        end if; 
+        
+        insert into cp_zal(ref, id, kolz, datz_from, rnk, datz_to)
+        values (l_ref, l_id, p_kol_zal, l_zal_from, p_rnk, l_zal_to);
+      when 2 then 
+        update cp_zal 
+           set kolz      =  p_kol_zal,
+               datz_from = l_zal_from,
+               datz_to   = l_zal_to,
+               rnk       = p_rnk
+         where id_cp_zal = p_id_cp_zal; 
+      when 3 then
+        delete from cp_zal where id_cp_zal = p_id_cp_zal;        
+    end case;    
+  
+  
+    -- приводить періоди дій в розрізі rnk в непротерічність 
+    for c in ( select id_cp_zal,
+                      nvl(lead(datz_from, 1) over (order by datz_from), 
+                          (select max(datz_to) from cp_zal
+                            where ref = p_ref and (rnk = p_rnk or (rnk is null and p_rnk is null))) + 1) as datz_to
+                 from cp_zal
+                where ref = p_ref and (rnk = p_rnk or (rnk is null and p_rnk is null)) )
+    loop
+       update cp_zal set datz_to = c.datz_to-1 where id_cp_zal = c.id_cp_zal 
+                                                 and datz_to != c.datz_to-1; --немає смислу змінювати на туж дату;
+    end loop;  
+    
+    exception
+      when others then
+        if sqlcode = -1  and sqlerrm like '%IND_U_CP_ZAL_DF%' then
+            raise_application_error(-20001,  'Вкажіть іншу дату Діє з. Існує вже запис для rnk= '||p_rnk||', Діє з='||p_zal_from);
+          else 
+            raise;
+        end if;  
+  end;    
+    
 
 --------------------------------------
 BEGIN /* анонимный блок */
@@ -7939,17 +8049,12 @@ BEGIN /* анонимный блок */
    END IF;
 END CP;
 /
- show err;
- 
+
 PROMPT *** Create  grants  CP ***
-grant EXECUTE                                                                on CP              to BARS010;
 grant EXECUTE                                                                on CP              to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on CP              to CP_ROLE;
-grant EXECUTE                                                                on CP              to START1;
 
  
  
  PROMPT ===================================================================================== 
  PROMPT *** End *** ========== Scripts /Sql/BARS/package/cp.sql =========*** End *** ========
  PROMPT ===================================================================================== 
- 

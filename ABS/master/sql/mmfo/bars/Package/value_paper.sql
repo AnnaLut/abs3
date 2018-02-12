@@ -3,10 +3,9 @@
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/value_paper.sql =========*** Run ***
  PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.VALUE_PAPER 
+CREATE OR REPLACE PACKAGE VALUE_PAPER
 IS
-   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.14 31.08.2017';
+   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.16 02.11.2017';
 
    FUNCTION header_version
       RETURN VARCHAR2;
@@ -274,6 +273,7 @@ PROCEDURE F_SAVE (p_fl_END      IN     INT,
   procedure setSpecparam(p_REF_MAIN   IN     VARCHAR2,
                          p_COD_I      IN     VARCHAR2,
                          p_COD_M      IN     VARCHAR2,
+                         p_COD_F      IN     VARCHAR2,
                          p_sErr          OUT VARCHAR2);
 
 
@@ -521,11 +521,14 @@ TYPE r_many_grid
 
   procedure calc_many(p_ref cp_many.ref%type);
 
+  procedure change_spec_cond(p_id      cp_spec_cond.id%type,
+                             p_type_op number) ; --1 додати (бронь), 2-змінити (бронь), 3-видалити, 4-зняти помітку про видалення
+
 END value_paper;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.VALUE_PAPER 
+CREATE OR REPLACE PACKAGE BODY VALUE_PAPER
 IS
-   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.25 31.08.2017';
+   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.27 02.11.2017';
 
    g_newline constant varchar2(5) := CHR(10)||CHR(13);
    FUNCTION body_version
@@ -1880,18 +1883,28 @@ END;
   procedure setSpecparam(p_REF_MAIN   IN     VARCHAR2,
                          p_COD_I      IN     VARCHAR2,
                          p_COD_M      IN     VARCHAR2,
+                         p_COD_F      IN     VARCHAR2,
                          p_sErr          OUT VARCHAR2)
   is
   begin
+--         raise_application_error(-(20001),  'p_ref='||p_REF_MAIN||' p_COD_I='||p_COD_I||' p_COD_M='||p_COD_M);
         INSERT INTO SPECPARAM_CP_OB (ACC, INITIATOR, MARKET)
            SELECT a.cp_acc, p_COD_I, p_COD_M
              FROM cp_accounts a, cp_deal d
             WHERE a.cp_ref = d.REF
               AND d.REF = p_REF_MAIN;
-        insert into operw (ref, tag, value)
-         values (p_REF_MAIN, 'CP_IN', p_COD_I);
-        insert into operw (ref, tag, value)
-         values (p_REF_MAIN, 'CP_MR', p_COD_M);
+        if  p_COD_I is not null then     
+          insert into operw (ref, tag, value)
+           values (p_REF_MAIN, 'CP_IN', p_COD_I);
+        end if;   
+        if  p_COD_M is not null then     
+          insert into operw (ref, tag, value)
+           values (p_REF_MAIN, 'CP_MR', p_COD_M);
+        end if;             
+        if  p_COD_F is not null then                
+          insert into operw (ref, tag, value)
+           values (p_REF_MAIN, 'CP_FC', p_COD_F);         
+        end if;             
   exception when others then   p_sErr := sqlerrm;
   end;
 
@@ -2892,6 +2905,33 @@ END;
    --відпрацювати чергу(всю)
    cp.RMany_all(null);
    bars_audit.info(title || ' End');
+ end;
+
+
+ /*див. заявку COBUMMFO-5098
+ (існує дод. параметр в cp_kodw OS_UM , по ідеї він має відмерти)
+ фізичне видлаення з довідника заборонено трігером, так як користувачу надали можливість
+ через БМД маніпулювати даними в довіднику
+ */
+ procedure change_spec_cond(p_id      cp_spec_cond.id%type,
+                            p_type_op number) is --1 додати (бронь), 2-змінити (бронь), 3-видалити, 4-зняти помітку про видалення
+   l_r    cp_spec_cond%rowtype;
+ begin
+   select * into l_r from cp_spec_cond where id = p_id;
+   case p_type_op
+     when 3 then
+       if l_r.del_date is not null then
+         raise_application_error(-20001,  'Запис вже помічений як видалено');
+         else
+           update cp_spec_cond set del_date = sysdate where id = p_id;
+       end if;
+     when 4 then
+       if l_r.del_date is null then
+         raise_application_error(-20001,  'Запис існує та непомічений як видалений');
+         else
+           update cp_spec_cond set del_date = null where id = p_id;
+       end if;
+   end case;
  end;
 
 END value_paper;

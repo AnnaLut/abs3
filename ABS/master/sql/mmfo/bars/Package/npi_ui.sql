@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/npi_ui.sql =========*** Run *** ====
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.NPI_UI is
+create or replace package npi_ui is
 
     -- Author  : VITALII.KHOMIDA
     -- Created : 15.03.2017 19:41:12
@@ -52,9 +46,16 @@
     procedure remove_selected_reckoning(p_id in integer);
 
     procedure edit_selected_reckoning(p_id in integer, p_interest_amount in number, p_purpose in varchar2);
+
+    procedure recalculate_interest(
+        p_account_id in integer,
+        p_date_from in date,
+        p_date_through in date,
+        p_grouping_mode_id in integer);
+
 end;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.NPI_UI is
+create or replace package body npi_ui is
 
     procedure prepare_portfolio_interest(
         p_nbs         in varchar2, --NBS
@@ -230,7 +231,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.NPI_UI is
 
             interest_utl.reckon_interest(l_accounts, l_date_through);
 
-            interest_utl.group_reckonings(l_accounts, p_grouping_mode_id);
+            interest_utl.group_reckonings(l_accounts, p_grouping_mode_id, interest_utl.RECKONING_TYPE_ORDINARY_INT);
 
             exit when l_accounts_cursor%notfound;
         end loop;
@@ -392,7 +393,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.NPI_UI is
 
         interest_utl.reckon_interest(l_accounts, case when p_date_through is null then trunc(sysdate) - 1 else p_date_through end);
 
-        interest_utl.group_reckonings(l_accounts, p_grouping_mode_id);
+        interest_utl.group_reckonings(l_accounts, p_grouping_mode_id, interest_utl.RECKONING_TYPE_ORDINARY_INT);
     end;
 /*
     procedure reckon_interest(
@@ -458,7 +459,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.NPI_UI is
 
         l_reckoning_row := interest_utl.read_reckoning_row(p_reckoning_id, p_lock => true, p_raise_ndf => false);
 
-        interest_utl.clear_reckonings(l_reckoning_row.account_id, l_reckoning_row.interest_kind_id, l_reckoning_row.date_from);
+        if (l_reckoning_row.state_id = interest_utl.RECKONING_STATE_RECKONING_FAIL) then
+            interest_utl.clear_reckonings(l_reckoning_row);
+        else
+            interest_utl.clear_reckonings(l_reckoning_row.account_id, l_reckoning_row.interest_kind_id, l_reckoning_row.date_from);
+        end if;
     end;
 
     procedure pay_accrued_interest
@@ -517,16 +522,43 @@ CREATE OR REPLACE PACKAGE BODY BARS.NPI_UI is
         interest_utl.edit_reckoning_row(p_id, currency_utl.to_fractional_units(p_interest_amount, l_account_row.kv), p_purpose);
     end;
 
+    procedure recalculate_interest(
+        p_account_id in integer,
+        p_date_from in date,
+        p_date_through in date,
+        p_grouping_mode_id in integer)
+    is
+        l_reckoning_unit interest_utl.t_reckoning_unit;
+    begin
+        bars_audit.log_info('npi_ui.recalculate_interest',
+                            'p_account_id   : ' || p_account_id || chr(10) ||
+                            'p_date_from    : ' || p_date_from || chr(10) ||
+                            'p_date_through : ' || p_date_through);
+
+        select a.acc,
+               a.nls,
+               i.id,
+               i.metr,
+               i.basey,
+               null,
+               p_date_from,
+               p_date_through,
+               null,
+               null,
+               null
+        into   l_reckoning_unit
+        from   saldo a
+        join   int_accn i on i.acc = a.acc and
+                             i.id = a.pap - 1
+        where  a.acc = p_account_id;
+
+        interest_utl.recalculate_interest(l_reckoning_unit);
+
+        interest_utl.group_reckonings(number_list(p_account_id), p_grouping_mode_id, interest_utl.RECKONING_TYPE_CORRECTION);
+
+        pul.put('ACCOUNT_ID', p_account_id);
+    end;
+
 end npi_ui;
 /
- show err;
- 
-PROMPT *** Create  grants  NPI_UI ***
-grant EXECUTE                                                                on NPI_UI          to BARS_ACCESS_DEFROLE;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/npi_ui.sql =========*** End *** ====
- PROMPT ===================================================================================== 
- 
+show err

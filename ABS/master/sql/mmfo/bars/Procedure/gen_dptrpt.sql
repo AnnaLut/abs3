@@ -1,11 +1,7 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/GEN_DPTRPT.sql =========*** Run **
 PROMPT ===================================================================================== 
 
-
-PROMPT *** Create  procedure GEN_DPTRPT ***
 
   CREATE OR REPLACE PROCEDURE BARS.GEN_DPTRPT 
  (p_code     in  tmp_dptrpt.code%type,
@@ -34,6 +30,7 @@ is
                         custname    tmp_dptrpt.custname%type,
                         depaccid    accounts.acc%type,
                         depaccnum   tmp_dptrpt.depaccnum%type,
+                        depaltaccnum   tmp_dptrpt.depaltaccnum%type,
                         depaccname  tmp_dptrpt.depaccname%type,
                         intaccid    accounts.acc%type,
                         intaccnum   tmp_dptrpt.intaccnum%type,
@@ -85,7 +82,7 @@ begin
        begin
          select d.deposit_id, d.nd, d.datz, d.dat_begin, d.dat_end,
                 v.vidd, v.type_name, t.kv, t.lcv, t.name, c.rnk, c.nmk,
-                a1.acc, a1.nls, a1.nms, a2.acc, a2.nls, a2.nms,
+                a1.acc, a1.nls, a1.nlsalt, a1.nms, a2.acc, a2.nls, a2.nms,
                 s.id, s.fio, b.branch, b.name
            into l_dpt
            from dpt_deposit_clos d,
@@ -120,7 +117,7 @@ begin
        begin
          select s.contract_id, s.contract_num, s.contract_date, s.contract_date, s.closed_date,
                 v.type_id, substr(v.name, 1, 50), t.kv, t.lcv, t.name, c.rnk, c.nmk,
-                a1.acc, a1.nls, a1.nms, a2.acc, a2.nls, a2.nms,
+                a1.acc, a1.nls, a1.nlsalt, a1.nms, a2.acc, a2.nls, a2.nms,
                 f.id, f.fio, b.branch, b.name
            into l_dpt
            from social_contracts s,
@@ -212,7 +209,7 @@ begin
           insert into tmp_dptrpt
              (recid, code, dptid, dptnum, dptdat,
               datbeg, datend, custid, custname,
-              depaccnum, depaccname, intaccnum, intaccname,
+              depaccnum, depaltaccnum, depaccname, intaccnum, intaccname,
               curid, curcode, curname, typeid, typename,
               doctype, fdat, pdat, isal_dat, osal_dat,
               docref, docnum, doctt, docdk, docsum, docsk, docuser, docdtl,
@@ -221,7 +218,7 @@ begin
           values
              (l_recid, p_code, l_dpt.dptid, l_dpt.dptnum, l_dpt.dptdat,
               l_dpt.datbeg, l_dpt.datend, l_dpt.custid, l_dpt.custname,
-              l_dpt.depaccnum, l_dpt.depaccname, l_dpt.intaccnum, l_dpt.intaccname,
+              l_dpt.depaccnum, l_dpt.depaltaccnum, l_dpt.depaccname, l_dpt.intaccnum, l_dpt.intaccname,
               l_dpt.curid, l_dpt.curcode, l_dpt.curname, l_dpt.typeid, l_dpt.typename,
               l_type, trn.fdat, trn.pdat, trn.ostf, trn.ostp,
               doc.ref, doc.nd, doc.tt, doc.dk, doc.s, doc.sk, doc.userid, doc.nazn,
@@ -289,13 +286,13 @@ begin
          insert into tmp_dptrpt
                 (recid, code, dptid, dptnum, dptdat,
                  datbeg, datend, custid, custname,
-                 depaccnum, depaccname, intaccnum, intaccname,
+                 depaccnum, depaltaccnum, depaccname, intaccnum, intaccname,
                  curid, curcode, curname, typeid, typename,
                  doctype, fdat, isal_gen, osal_gen,
                  userid, username, brn4id, brn4name)
          values (l_recid, p_code, l_dpt.dptid, l_dpt.dptnum, l_dpt.dptdat,
                  l_dpt.datbeg, l_dpt.datend, l_dpt.custid, l_dpt.custname,
-                 l_dpt.depaccnum, l_dpt.depaccname, l_dpt.intaccnum, l_dpt.intaccname,
+                 l_dpt.depaccnum, l_dpt.depaltaccnum, l_dpt.depaccname, l_dpt.intaccnum, l_dpt.intaccname,
                  l_dpt.curid, l_dpt.curcode, l_dpt.curname, l_dpt.typeid, l_dpt.typename,
                  l_type, p_dat2, l_genisal, l_genosal,
                  l_dpt.userid, l_dpt.username, l_dpt.brn4id, l_dpt.brn4name);
@@ -333,7 +330,7 @@ begin
            insert into tmp_dptrpt
               (recid, code, dptid, dptnum, dptdat,
                datbeg, datend, custid, custname,
-               depaccnum, depaccname, intaccnum, intaccname,
+               depaccnum, depaltaccnum, depaccname, intaccnum, intaccname,
                curid, curcode, curname, typeid, typename,
                doctype, fdat, pdat, isal_dat, osal_dat, isal_gen, osal_gen,
                docref, docnum, doctt, docdk,
@@ -343,7 +340,7 @@ begin
            values
               (l_recid, p_code, l_dpt.dptid, l_dpt.dptnum, l_dpt.dptdat,
                l_dpt.datbeg, l_dpt.datend, l_dpt.custid, l_dpt.custname,
-               l_dpt.depaccnum, l_dpt.depaccname, l_dpt.intaccnum, l_dpt.intaccname,
+               l_dpt.depaccnum, l_dpt.depaltaccnum, l_dpt.depaccname, l_dpt.intaccnum, l_dpt.intaccname,
                l_dpt.curid, l_dpt.curcode, l_dpt.curname, l_dpt.typeid, l_dpt.typename,
                l_type,
                p_dat2,

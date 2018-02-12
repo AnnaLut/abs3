@@ -1,0 +1,107 @@
+exec bars.bpa.alter_policy_info( 'ZP_PAYROLL_DOC', 'WHOLE' , null, null, null, null ); 
+/
+exec bars.bpa.alter_policy_info( 'ZP_PAYROLL_DOC', 'FILIAL', null, null, null, null );
+/
+begin execute immediate'create table bars.zp_payroll_doc  (
+   id_pr         number                                              not null,
+   id            number                                              not null,
+   ref           number,
+   s             number(24),
+   okpob         varchar2(14),
+   namb          varchar2(38),
+   mfob          varchar2(12),
+   nlsb          varchar2(15),   
+   source        number,
+   nazn          varchar2(160),
+   crt_date      date,
+   id_file       number                                             default null,
+   key_id        varchar2(256), 
+   sign          varchar2(4000), 
+   signed        varchar2(1),
+   constraint xpk_zp_payroll_doc_id_pr      primary key (id,id_pr),
+   constraint cc_zp_payroll_doc_source      check (source in (1,2,3,4,5)),  
+   constraint fk_zp_payroll_doc_id_pr       foreign key (id_pr)  references bars.zp_payroll(id)
+  )';
+exception when others then  
+  if sqlcode = -00955 then null;   else raise; end if;   
+end;
+/
+begin
+    execute immediate 'create index idx_zp_payroll_doc_id_pr on BARS.zp_payroll_doc (id_pr)';
+ exception when others then 
+    if sqlcode = -955 or sqlcode = -1408 then null; else raise; 
+    end if; 
+end;
+/
+begin
+    execute immediate 'create index idx_zp_payroll_doc_ref on BARS.zp_payroll_doc (ref)';
+ exception when others then 
+    if sqlcode = -955 or sqlcode = -1408 then null; else raise; 
+    end if; 
+end;
+/
+begin
+    execute immediate 'alter table zp_payroll_doc add (key_id varchar2(256), sign varchar2(4000) , signed varchar2(1))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/
+begin
+    execute immediate 'alter table zp_payroll_doc add (id_file number)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/
+begin
+    execute immediate 'create index idx_zp_payroll_doc_id_file on BARS.zp_payroll_doc (id_file)';
+ exception when others then 
+    if sqlcode = -955 or sqlcode = -1408 then null; else raise; 
+    end if; 
+end;
+/
+begin
+    execute immediate 'alter table zp_payroll_doc add ( signed_user number)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/
+begin
+    execute immediate 'alter table zp_payroll_doc add ( corp2_id number)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/
+begin
+    execute immediate 'alter table zp_payroll_doc add ( corp2_nlsa varchar2(20))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/
+begin
+    execute immediate 'alter table zp_payroll_doc drop constraint cc_zp_payroll_doc_source';
+ exception when others then 
+    if sqlcode = -2443 then null; else raise; 
+    end if; 
+end;
+/
+begin
+    execute immediate 'alter table zp_payroll_doc add constraint cc_zp_payroll_doc_source  check (source in (1,2,3,4,5))';
+ exception when others then 
+    if sqlcode = -2264 then null; else raise; 
+    end if; 
+end;
+/
+exec  bars.bpa.alter_policies('ZP_PAYROLL_DOC'); 
+/
+comment on table  bars.ZP_PAYROLL_DOC is 'Документи  ЗП відомості';
+comment on column bars.ZP_PAYROLL_DOC.id_pr is 'id ЗП відомості';
+/
+grant select,delete,update,insert on bars.ZP_PAYROLL_DOC to bars_access_defrole;
+/
+
+

@@ -5,8 +5,6 @@ PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/MAKE_INT.sql =========
 PROMPT ===================================================================================== 
 
 
-PROMPT *** Create  procedure MAKE_INT ***
-
   CREATE OR REPLACE PROCEDURE BARS.MAKE_INT 
 ( p_dat2      in date,             -- граничная дата начисления процентов
   p_runmode   in number default 0, -- режим запуска (0 - начисление,1 - оплата)
@@ -1805,14 +1803,3 @@ begin
 
 end MAKE_INT;
 /
-show err;
-
-PROMPT *** Create  grants  MAKE_INT ***
-grant EXECUTE                                                                on MAKE_INT        to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on MAKE_INT        to WR_ALL_RIGHTS;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/MAKE_INT.sql =========*** End *** 
-PROMPT ===================================================================================== 

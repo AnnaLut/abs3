@@ -60,7 +60,7 @@ begin
 
   l_tabsemantic := 'Коди проводок для формування IIC';
   l_tablinesdef := '';
-  l_tabselect_statement := 'create or replace view V_OW_IIC_MSGCODE as SELECT TT, MFOA, NLSA, MSGCODE FROM OW_IIC_MSGCODE';
+  l_tabselect_statement := '';
   l_tabname     := 'V_OW_IIC_MSGCODE';
 
   -- получаем код таблицы
@@ -124,10 +124,10 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'TT', 'C', 'Код~операції', '', 3, 1, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'MFOA', 'C', 'МФО~відправника~коштів', '', 6, 2, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'NLSA', 'C', 'Рахунок~списання~коштів', '', 14, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'MSGCODE', 'C', 'Код~проводки', '', 100, 4, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'TT', 'C', 'Код операції', '', 3, 1, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'MFOA', 'C', 'МФО відправника коштів', '', 6, 2, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'NLSA', 'C', 'Рахунок списання коштів', '', 14, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'MSGCODE', 'C', 'Код проводки', '', 100, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 1, 2, 'ASC ');
@@ -195,4 +195,36 @@ begin
 end;
 /
 
+commit;
+--закидываем таблицу в справочники
+declare
+  l_tabid number:=get_tabid('V_OW_IIC_MSGCODE');
+begin   
+ Insert into BARS.REFERENCES
+   (TABID, TYPE, ROLE2EDIT)
+ Values
+   (l_tabid, 29, 'OW');
+exception when dup_val_on_index then null;
+End;
+/
+commit;
+
+--добавляем в арм
+declare
+  l_tabid number:=get_tabid('V_OW_IIC_MSGCODE');
+begin 
+Insert into BARS.REFAPP
+   (TABID, CODEAPP, ACODE, APPROVE, REVOKED, 
+    GRANTOR)
+ Values
+   (l_tabid, '$RM_WVIP', 'RW', 1, 0, 1);
+exception when dup_val_on_index then null;
+end;
+/
+commit;
+-- дропаем политики
+begin
+bpa.remove_policies('V_OW_IIC_MSGCODE');
+end;
+/
 commit;

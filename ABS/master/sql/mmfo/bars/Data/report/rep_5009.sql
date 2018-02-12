@@ -122,7 +122,7 @@ commit;
 begin 
   execute immediate 
     ' Insert into BARS.DWH_REPORT_LINKS (REPORT_ID, MODULE_ID)'||
-    '  Values (3052, ''$RM_DRU1'')';
+    '  Values (5009, ''$RM_DRU1'')';
 exception when dup_val_on_index then 
   null;
 end;

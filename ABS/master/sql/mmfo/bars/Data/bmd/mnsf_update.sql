@@ -39,14 +39,3 @@ UPDATE SET
 end;
 /
 COMMIT;
-begin
-
-  update meta_nsifunction t
-     set t.web_form_name = '/barsroot/CreditUi/NewCredit/Authorization/?nd=:ND'
-     ,t.proc_name='',t.proc_par='',t.qst='',t.msg=''
-   where t.tabid = get_tabid('V_CCK_NF')
-     and t.descr = 'КД: Авторизація КД';
-  commit;
-end;
-/
-COMMIT;

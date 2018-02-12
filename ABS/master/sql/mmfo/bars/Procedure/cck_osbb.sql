@@ -1,21 +1,11 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/CCK_OSBB.sql =========*** Run *** 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure CCK_OSBB ***
-
-  CREATE OR REPLACE PROCEDURE BARS.CCK_OSBB (p_mode int, p_nd1 number) is
+CREATE OR REPLACE PROCEDURE BARS.cck_OSBB (p_mode int, p_nd1 number) is
 
 -- p_mode = 0 Проверка условий для существующено КДВ
 -- p_mode = 1 Авторизація первинного КД ОСББ
 -- p_mode = 2 Фініш       первинного КД ОСББ + Авто-Старт вторинного КД ОСББ
 -- p_mode = 3 Авторизація вторинного КД ОСББ - як самостійного КД
 /*
-08/02/2018 LitvinSO COBUSUPABS-7041 При створенні нового договору необхідно автоматично згенерувати параметр CIG_D13 зі значенням 1
-10/11/2017 LitvinSO Для p_mode = 2 с учетом на переход новый план счетов так как мы не меняем cc_deal.PROD анализируем продукт
+10/11/2017 LitvinSO Для p_mode = 2 с учетом на переход новый план счетов так как мы не меняем cc_deal.PROD анализируем продукт 
 26/05/2017 Pivanova додано заміну коми на крапку при вичитуванні тагу S_SDI
 18.11.2015 LitvinSO Реалізовано у перевіркі РНК пропускало клієнтів які відносяться до ЖБК з кодом K050 = 320 і K051 = 62.
 17.11.2015 LitvinSO По зауваженням Мешко Ж. виправив по перевіркам умов не передавались данні з cc_deal і хибно впрацьовували помилки.
@@ -264,17 +254,17 @@ If p_mode = 2 then
                DATNP  => l_datnp,
                nFREQP => 5 ,
                nKom   => sd1.ostb ) ;
-
+   
    if newnbs.g_state= 1 then
-        begin
+        begin  
             SELECT r020_new||ob_new
               INTO dd1.prod
               FROM TRANSFER_2017
              WHERE r020_old||ob_old = dd1.prod and r020_old <> r020_new;
         EXCEPTION WHEN NO_DATA_FOUND THEN null;
-        end;
+        end;     
    end if;
-
+   
    update cc_deal set prod  =  dd1.prod  where nd = dd2.nd ;
    select *       into dd2 from cc_deal  where nd = dd2.nd ;
    --------Его доп.рекв.
@@ -289,15 +279,6 @@ If p_mode = 2 then
       CCK_APP.SET_ND_TXT(dd2.nd,'S_SDI',to_char(sd1.ostb/100)            );
    end if ;
    ------------??????????? TRIGGER tbu_ccdeal_eib10
-   -- COBUSUPABS-7041 Після оновлення трігера TBU_CCDEAL_EIB10 по контролю за заповненням параметра CIG_D13 перестала працювати функція Додаткова щоденна бізнес-логіка продуктів КП
-    BEGIN
-      INSERT INTO mos_operw (ND, TAG, VALUE)
-           VALUES (dd2.nd, 'CIG_D13', '1');
-    EXCEPTION
-      WHEN DUP_VAL_ON_INDEX
-      THEN
-          NULL;
-    END;
    CCK_APP.SET_ND_TXT(dd2.nd,'CPROD',CCK_APP.Get_ND_TXT (dd1.ND,'CPROD') );
    CCK_APP.SET_ND_TXT(dd2.nd,'EIBIS',CCK_APP.Get_ND_TXT (dd1.ND,'EIBIS') );
    CCK_APP.SET_ND_TXT(dd2.nd,'EIBCW',CCK_APP.Get_ND_TXT (dd1.ND,'EIBCW') );
@@ -349,7 +330,8 @@ If p_mode = 2 then
 end if;
 
     ----- Вычисление  эффективной ставки p_ND < 0 -- l_mode := 2; По текущему ГПК + по условиям КД
-    p_irr_BV (p_ND => - dd2.nd, R_DAT => dd2.sdate );
+    --p_irr_BV (p_ND => - dd2.nd, R_DAT => dd2.sdate );
+    cck_dop.calc_sdi( dd2.nd, null);  -- Взята процедура из авторизации для первоначального расчета эф.ставки
     --------открытие счетов
     cck_dop.open_account(p_nd => dd2.nd,  p_tip => 'SS ') ;
     cck_dop.open_account(p_nd => dd2.nd,  p_tip => 'SN ') ;
@@ -409,10 +391,3 @@ end if;
   RETURN;
 end  cck_OSBB;
 /
-show err;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/CCK_OSBB.sql =========*** End *** 
-PROMPT ===================================================================================== 

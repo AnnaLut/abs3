@@ -109,8 +109,8 @@ begin
   --------------------------------
   delete from ps_tts where tt='19B';
   begin
-    insert into ps_tts(nbs, tt, dk)
-    values ('1001', '19B', 0);
+    insert into ps_tts(nbs, tt, dk, ob22)
+    values ('1001', '19B', 0, '01');
   exception
     when dup_val_on_index then null;
     when others then
@@ -120,8 +120,8 @@ begin
       end if;
   end;
   begin
-    insert into ps_tts(nbs, tt, dk)
-    values ('1002', '19B', 0);
+    insert into ps_tts(nbs, tt, dk, ob22)
+    values ('1002', '19B', 0, '01');
   exception
     when dup_val_on_index then null;
     when others then
@@ -131,8 +131,8 @@ begin
       end if;
   end;
   begin
-    insert into ps_tts(nbs, tt, dk)
-    values ('3570', '19B', 1);
+    insert into ps_tts(nbs, tt, dk, ob22)
+    values ('3570', '19B', 1, '02');
   exception
     when dup_val_on_index then null;
     when others then
@@ -142,8 +142,8 @@ begin
       end if;
   end;
   begin
-    insert into ps_tts(nbs, tt, dk)
-    values ('3570', '19B', 1);
+    insert into ps_tts(nbs, tt, dk, ob22)
+    values ('3570', '19B', 1, '03');
   exception
     when dup_val_on_index then null;
     when others then
@@ -153,8 +153,8 @@ begin
       end if;
   end;
   begin
-    insert into ps_tts(nbs, tt, dk)
-    values ('3570', '19B', 1);
+    insert into ps_tts(nbs, tt, dk, ob22)
+    values ('3570', '19B', 1, '11');
   exception
     when dup_val_on_index then null;
     when others then
@@ -164,8 +164,20 @@ begin
       end if;
   end;
   begin
-    insert into ps_tts(nbs, tt, dk)
-    values ('3570', '19B', 1);
+    insert into ps_tts(nbs, tt, dk, ob22)
+    values ('3570', '19B', 1, '29');
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''3570'', ''19B'', 1) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+
+  begin
+    insert into ps_tts(nbs, tt, dk, ob22)
+    values ('3570', '19B', 1, '33');
   exception
     when dup_val_on_index then null;
     when others then
@@ -175,8 +187,8 @@ begin
       end if;
   end;
   begin
-    insert into ps_tts(nbs, tt, dk)
-    values ('3570', '19B', 1);
+    insert into ps_tts(nbs, tt, dk, ob22)
+    values ('3570', '19B', 1, '37');
   exception
     when dup_val_on_index then null;
     when others then
@@ -186,8 +198,63 @@ begin
       end if;
   end;
   begin
-    insert into ps_tts(nbs, tt, dk)
-    values ('3570', '19B', 1);
+    insert into ps_tts(nbs, tt, dk, ob22)
+    values ('3570', '19B', 1, '38');
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''3570'', ''19B'', 1) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into ps_tts(nbs, tt, dk, ob22)
+    values ('3570', '19B', 1, '39');
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''3570'', ''19B'', 1) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into ps_tts(nbs, tt, dk, ob22)
+    values ('3570', '19B', 1, '48');
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''3570'', ''19B'', 1) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into ps_tts(nbs, tt, dk, ob22)
+    values ('3579', '19B', 1, '07');
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''3579'', ''19B'', 1) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into ps_tts(nbs, tt, dk, ob22)
+    values ('3579', '19B', 1, '31');
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''3570'', ''19B'', 1) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into ps_tts(nbs, tt, dk, ob22)
+    values ('3579', '19B', 1, '90');
   exception
     when dup_val_on_index then null;
     when others then
@@ -247,29 +314,6 @@ begin
   --------------------------------
   -------- Группы контроля -------
   --------------------------------
-  delete from chklist_tts where tt='19B';
-  begin
-    insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (1, '19B', 2, null, null, null);
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 1, ''19B'', 2, null, null, null) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
-  begin
-    insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (5, '19B', 1, null, null, null);
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 5, ''19B'', 1, null, null, null) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
   --------------------------------
   ------------- Папки ------------
   --------------------------------

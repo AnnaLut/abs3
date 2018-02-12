@@ -1,12 +1,6 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/gerc_payments.sql =========*** Run *
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.GERC_PAYMENTS 
+CREATE OR REPLACE PACKAGE GERC_PAYMENTS
 IS
-   G_HEADER_VERSION   CONSTANT VARCHAR2 (64) := 'v.3.4 15.06.2017';
+   G_HEADER_VERSION   CONSTANT VARCHAR2 (64) := 'v.3.51 13.11.2017';
 
    TYPE tBranchData IS RECORD
    (
@@ -76,7 +70,9 @@ IS
                      p_our_buffer            IN     varchar2,
                      p_ref                      OUT oper.REF%TYPE,
                      p_errcode                  OUT NUMBER,
-                     p_errmsg                   OUT VARCHAR2);
+                     p_errmsg                   OUT VARCHAR2,
+                     p_operw                 in varchar2 default null
+                     );
 
     procedure CancelDocument (p_ExternalDocumentId    IN  gerc_orders.externaldocumentid%type,
                               p_ref                  OUT oper.ref%type,
@@ -192,12 +188,16 @@ PROCEDURE RegisterRefreshNonClient (p_isnew             IN     INTEGER DEFAULT 0
                                     p_NUMDOC            IN OUT VARCHAR2,
                                     p_OperationResult   IN OUT INTEGER,
                                     p_ErrorMessage      IN OUT VARCHAR2);
+                                    
+  procedure GetUserBranch ( p_UserLogin    IN varchar2,
+                            p_branch       OUT staff$base.branch%type,
+                            p_ErrorMessage OUT varchar2);
 
 END GERC_PAYMENTS;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.GERC_PAYMENTS IS
+CREATE OR REPLACE PACKAGE BODY GERC_PAYMENTS IS
 
-    G_BODY_VERSION      constant varchar2(64) := 'v.2.4 13.09.2017';
+    G_BODY_VERSION      constant varchar2(64) := 'v.2.63 23.11.2017';
     TYPE t_cursor   IS REF CURSOR;
     function header_version return varchar2
     is
@@ -369,12 +369,17 @@ PROCEDURE CreateDoc (p_nd                    IN     oper.nd%TYPE,
                      p_our_buffer            IN     varchar2,
                      p_ref                      OUT oper.REF%TYPE,
                      p_errcode                  OUT NUMBER,
-                     p_errmsg                   OUT VARCHAR2)
+                     p_errmsg                   OUT VARCHAR2,
+                     p_operw                 in varchar2 default null -- COBUMMFO-4956 -- масив додаткових реквізитів
+                     )
 IS
     title       constant   varchar2(25) := 'GERC_PAYMENTS.CreateDoc:';
     l_tt                   oper.tt%type;
     l_rec_id               sec_audit.rec_id%type;
+    
     l_impdoc               xml_impdocs%rowtype;
+    l_ref                  oper.ref%type;
+    
     l_doc                  bars_xmlklb_imp.t_doc;
     --l_dreclist             bars_xmlklb.array_drec;
     l_userid               staff.id%type;
@@ -385,11 +390,19 @@ IS
     l_tmp                  varchar2(32767);
     l_str                  varchar2(32767);
 
+    l_err                  number;    -- Return code
+    l_rec                  number;    -- Record number
+    -- COBUMMFO-4823    
+    l_datd                 date := gl.bdate;
+    l_vdat                 date := case when p_date < gl.bdate then gl.bdate else p_date end;
+    -- 
+    l_addparam             varchar2(8000) := p_drec || p_operw;
+
   begin
     bars_audit.INFO(title||': entry point');
 
     begin
-      try_ins(p_nd, p_externalDocId, p_date
+      try_ins(p_nd, p_externalDocId, l_datd/*p_date*/
       ,p_branch, p_mfoa, p_mfob
       ,p_nlsa, p_nlsb, p_okpoa, p_okpob, p_kv, p_s
       ,p_nama ,p_namb, p_nazn, p_sk, p_dk, p_vob, p_drec, p_sign
@@ -430,7 +443,8 @@ IS
                     ', p_sign=>'||p_sign||chr(13)||chr(10)||
                     ', p_CreatedByUserName=>'||p_CreatedByUserName||chr(13)||chr(10)||
                     ', p_ConfirmedByUserName=>'||p_ConfirmedByUserName||chr(13)||chr(10)||
-                    ', p_tt=>'||p_tt);
+                    ', p_tt=>'||p_tt||chr(13)||chr(10)||
+                    ', p_operw=>'||p_operw);
 
 
       -- точка отката
@@ -476,8 +490,8 @@ IS
         l_impdoc.ref_a  := null;
         l_impdoc.impref := null;
         l_impdoc.nd     := nvl(p_nd, substr(p_externalDocId,greatest(-length(p_externalDocId),-10)));--взяти 10 останніх символів при p_nd = null
-        l_impdoc.datd   := p_date;
-        l_impdoc.vdat   := gl.bdate;
+        l_impdoc.datd   := l_datd; --p_date;
+        l_impdoc.vdat   := l_vdat; --gl.bdate;
         l_impdoc.nam_a  := p_nama;
         l_impdoc.mfoa   := p_mfoa;
         l_impdoc.nlsa   := p_nlsa;
@@ -502,9 +516,9 @@ IS
         l_doc.doc  := l_impdoc;
         bars_audit.INFO(title||':  l_doc.doc  := l_impdoc. DONE');
         begin
-            if p_drec is not null then
-              l_length := length(p_drec) - length(replace(p_drec,';'));
-              l_str :=p_drec;
+            if l_addparam is not null then
+              l_length := length(l_addparam) - length(replace(l_addparam,';'));
+              l_str :=l_addparam;
               for i in 0..l_length - 1 loop
                 l_tmp := substr(l_str, 0, instr(l_str,';')-1);
                 l_str := substr(l_str, instr(l_str,';')+1);
@@ -516,16 +530,99 @@ IS
         exception when others then raise_application_error(-20000, 'Не коректно сформовано параметр D_REC!');
         end;
         bars_audit.INFO(title||':  p_drec. DONE');
-        bars_audit.INFO(title||':  bars_xmlklb_imp.pay_extern_doc. start');
-        bars_xmlklb_imp.pay_extern_doc( p_doc     => l_doc,
+
+        if l_tt = 'G07' then
+          gl.ref(l_ref);
+          gl.in_doc3 (ref_     => l_ref,
+                      tt_      => l_tt,
+                      vob_     => p_vob,
+                      nd_      => nvl(p_nd, substr(p_externalDocId,greatest(-length(p_externalDocId),-10))),--взяти 10 останніх символів при p_nd = null,
+                      pdat_    => l_datd,
+                      vdat_    => l_vdat,
+                      dk_      => p_dk,
+                      kv_      => p_kv,
+                      s_       => p_s,
+                      kv2_     => p_kv,
+                      s2_      => p_s,
+                      sk_      => p_sk,
+                      data_    => gl.bd,
+                      datp_    => gl.bd,
+                      nam_a_   => p_nama,
+                      nlsa_    => p_nlsa,
+                      mfoa_    => p_mfoa,
+                      nam_b_   => p_namb,
+                      nlsb_    => p_nlsb,
+                      mfob_    => p_mfob,
+                      nazn_    => p_nazn,
+                      d_rec_   => NULL,
+                      id_a_    => p_okpoa,
+                      id_b_    => p_okpob,
+                      id_o_    => NULL,
+                      sign_    => NULL,
+                      sos_     => 1,
+                      prty_    => NULL,
+                      uid_     => l_userid);
+                      
+          paytt( flg_  => 0,
+                 ref_  => l_ref,
+                 datv_ => l_vdat,
+                 tt_   => l_tt,
+                 dk0_  => p_dk,
+                 kva_  => p_kv,
+                 nls1_ => p_nlsa,
+                 sa_   => p_s,
+                 kvb_  => p_kv,
+                 nls2_ => p_nlsb,
+                 sb_   => p_s); 
+          gl.pay(2, l_ref, l_vdat);                 
+                      
+          bars.sep.in_sep(l_err,
+                          l_rec,
+                          p_mfoa,
+                          p_nlsa,
+                          p_mfob,
+                          p_nlsb,
+                          p_dk,
+                          p_s,
+                          p_vob,
+                          nvl(p_nd, substr(p_externalDocId,greatest(-length(p_externalDocId),-10))),--взяти 10 останніх символів при p_nd = null,,
+                          p_kv,
+                          l_datd, --p_date,
+                          trunc(l_datd), --p_date,
+                          p_nama,
+                          p_namb,
+                          p_nazn, 
+                          null,
+                          '10',
+                          p_okpoa,
+                          p_okpob,
+                          '******',
+                          l_ref,
+                          0,
+                          '0123',
+                          null,
+                          null,
+                          sysdate,
+                          null,--d_rec
+                          0,
+                          l_ref);
+            p_ref := l_ref;  
+            p_errmsg := l_err;       
+            p_errcode := l_rec;     
+          else
+            bars_audit.INFO(title||':  bars_xmlklb_imp.pay_extern_doc. start');
+            bars_xmlklb_imp.pay_extern_doc( p_doc     => l_doc,
                                         p_errcode => p_errcode,
                                         p_errmsg  => p_errmsg ) ;
-        bars_audit.INFO(title||':  bars_xmlklb_imp.pay_extern_doc. end');
-        log_gerc_audit(p_externalDocId,p_errmsg);
-        p_ref := to_char(l_doc.doc.ref);
-
-        bars_audit.trace('%s: pay_extern_doc done, l_errcode=%s, l_errmsg=%s',
-           title, to_char(p_errcode), p_errmsg);
+            bars_audit.INFO(title||':  bars_xmlklb_imp.pay_extern_doc. end');
+            log_gerc_audit(p_externalDocId,p_errmsg);
+            
+            p_ref := to_char(l_doc.doc.ref);
+        --                
+        end if;  
+        --
+        
+        bars_audit.trace('%s: pay_extern_doc done, l_errcode=%s, l_errmsg=%s', title, to_char(p_errcode), p_errmsg);
 
        -- возврат контекста
        bc.set_context;
@@ -589,7 +686,7 @@ IS
            into l_ref, p_statecode, l_branch
            from gerc_orders t, oper o
           where ExternalDocumentId = p_ExternalDocumentId
-            and trunc(DocumentDate) >= bankdate
+            --and trunc(DocumentDate) >= bankdate
             and o.ref = t.ref;
      exception when no_data_found then p_errorMessage := 'Документ '||to_char(p_ExternalDocumentId) ||' за дату >= '||to_char(bankdate,'yyyy.mm.dd') ||' не знайдено'; p_statecode := null;
                when too_many_rows then p_errorMessage := 'Документів за номером '||to_char(p_ExternalDocumentId) ||' за дату '||to_char(bankdate,'yyyy.mm.dd') ||' знайдено більше, ніж один'; p_statecode := null;
@@ -606,7 +703,8 @@ IS
        bc.subst_branch(l_branch);
        exception
          when others then
-           p_errorMessage :=substr(sqlerrm,1,1070); p_statecode := null;
+           p_errorMessage := substr(dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace(), 1, 1024); 
+           p_statecode := null;
            bars_audit.error(title||' '||p_errorMessage);
            return;
      end;
@@ -635,7 +733,8 @@ IS
             exception when others then bars_audit.info(title||':'||sqlcode||'/'||sqlerrm);
             end;
            exception when others then
-             p_errorMessage :=substr(sqlerrm,1,1070); p_statecode := null;
+             p_errorMessage := substr(dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace(), 1, 1024); 
+             p_statecode := null;
              bars_audit.error(title||' '||p_errorMessage);
            end;
        else
@@ -647,6 +746,7 @@ IS
 
      bars_audit.trace(title||' finised.');
     end CancelDocument;
+    
    procedure GetDocumentState ( p_ExternalDocumentID IN OUT varchar2,
                                 p_ref                   OUT oper.ref%type,
                                 p_StateCode             OUT oper.sos%type,
@@ -661,7 +761,7 @@ IS
           into p_StateCode, p_ref
           from oper o, gerc_orders g
          where g.ExternalDocumentID = p_ExternalDocumentID
-           and o.sos>0
+           --and o.sos>0
            and o.ref = G.REF;
     exception when no_data_found
               then l_ErrorMessage := 'Не знайдено документа за номером' || to_char(p_ExternalDocumentID); p_ref := -1;
@@ -1282,8 +1382,29 @@ begin
   exception when others then  p_ErrorMessage := sqlerrm;
 end;
 
+ procedure GetUserBranch ( p_UserLogin    IN varchar2,
+                           p_branch       OUT staff$base.branch%type,
+                           p_ErrorMessage OUT varchar2) is
+   title constant varchar2(40) := 'GERC_PAYMENTS.GetUserBranch:';                           
+ begin
+   select branch 
+   into p_branch
+   from staff$base 
+   where logname = upper(p_UserLogin);
+   exception
+     when NO_DATA_FOUND then 
+       p_branch := null; 
+       p_ErrorMessage := 'Користувач з логіном '||p_UserLogin||' не знайдено';
+       bars_audit.error(title || p_ErrorMessage);
+     when others then
+       p_branch := null; 
+       p_ErrorMessage := substr(dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace(), 1, 1024);
+       bars_audit.error(title || p_ErrorMessage);  
+ end;                               
+
 END GERC_PAYMENTS;
 /
+
  show err;
  
 PROMPT *** Create  grants  GERC_PAYMENTS ***

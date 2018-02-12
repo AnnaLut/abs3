@@ -1,14 +1,5 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_CURRENT_ACCOUNTS_INTEREST.sql =======
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_CURRENT_ACCOUNTS_INTEREST ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_CURRENT_ACCOUNTS_INTEREST ("ACCOUNT_ID", "INTEREST_KIND_ID", "CUSTOMER_ID", "CURRENCY_ID", "ACCOUNT_NUMBER", "ACCOUNT_NAME", "OKPO", "INTEREST_ACCOUNT_NUMBER", "INTEREST_RATE", "LAST_ACCRUAL_DATE", "LAST_PAYMENT_DATE", "LAST_RECKONING_DATE", "END_OF_ACCRUAL", "AMOUNT_TO_ACCRUAL", "AMOUNT_TO_PAYMENT", "PLANNED_INTEREST_REST", "CURRENT_INTEREST_REST", "RECEIVER_MFO", "RECEIVER_ACCOUNT", "RECEIVER_CURRENCY_ID", "USER_ID", "USER_NAME", "CORPORATION_CODE", "CORPORATION_NAME") AS 
-  select a.acc account_id,
+create or replace view v_current_accounts_interest as
+select a.acc account_id,
        i.id interest_kind_id,
        c.rnk customer_id,
        a.kv currency_id,
@@ -16,7 +7,7 @@ PROMPT *** Create  view V_CURRENT_ACCOUNTS_INTEREST ***
        a.nms account_name,
        c.okpo,
        ia.nls interest_account_number,
-       acrn.fproc(a.acc, gl.bd) interest_rate,
+       acrn.fprocn(a.acc, i.id, gl.bd) interest_rate,
        i.acr_dat last_accrual_date,
        i.apl_dat last_payment_date,
        (select max(r.date_through)
@@ -85,6 +76,4 @@ grant SELECT                                                                 on 
 
 
 
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_CURRENT_ACCOUNTS_INTEREST.sql =======
-PROMPT ===================================================================================== 
+grant select on v_current_accounts_interest to bars_access_defrole;

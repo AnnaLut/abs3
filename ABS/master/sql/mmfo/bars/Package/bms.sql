@@ -970,8 +970,6 @@ end bms;
  
 PROMPT *** Create  grants  BMS ***
 grant EXECUTE                                                                on BMS             to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on BMS             to NOSCHENKOOO;
-grant EXECUTE                                                                on BMS             to PODGORNAYALL06;
 grant EXECUTE                                                                on BMS             to START1;
 
  

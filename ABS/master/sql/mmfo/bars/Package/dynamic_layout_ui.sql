@@ -1,10 +1,8 @@
-
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/package/dynamic_layout_ui.sql =========*** R
+PROMPT ===================================================================================== 
  
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/dynamic_layout_ui.sql =========*** R
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.DYNAMIC_LAYOUT_UI is
+CREATE OR REPLACE PACKAGE BARS.dynamic_layout_ui is
 
   --
   -- Автор  : VIT
@@ -122,8 +120,9 @@
   procedure pay_Static_layout(p_mak number);
 
 end dynamic_layout_ui;
+
 /
-CREATE OR REPLACE PACKAGE BODY BARS.DYNAMIC_LAYOUT_UI is
+CREATE OR REPLACE PACKAGE BODY BARS.dynamic_layout_ui is
 
   --
   -- Автор : VIT
@@ -142,6 +141,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.DYNAMIC_LAYOUT_UI is
   RES_ERR constant number(1) := -1;
 
   /*  Список изменений
+  27.10.2017 Гриценя Додано уточнення по коду валюти http://jira.unity-bars.com.ua:11000/browse/COBUMMFO-5296
   24.05.2017 Гриценя для процедур create_dynamic_layout, create_dynamic_layout_detail, add_static_layout
   додано параметр flag для специфічної роботи функції Макети юридичних осіб.
   26.09.2016 Сухова  Добавлена проц оплаты для статических макетов pay_Static_layout
@@ -401,14 +401,55 @@ CREATE OR REPLACE PACKAGE BODY BARS.DYNAMIC_LAYOUT_UI is
     l_total_persents     number(5, 2);
     l_total_summ         number;
     l_parent_summ        number;
+    l_kv                 number;
+    l_sql                varchar2(4000);
   begin
-    --перевіряємо наявність рахунку А та чи він відкритий
+  /* logger.info ('DYN p_mode: '||p_mode);
+   logger.info ('DYN p_dk: '||p_dk);
+   logger.info ('DYN p_nls : '||p_nls);
+   logger.info ('DYN p_bs:  '||p_bs);
+   logger.info ('DYN p_ob:  '||p_ob);
+   logger.info ('DYN p_grp: '||p_grp);
+   logger.info ('DYN flag:  '||flag);*/
+   
+   --Додано уточнення по коду валюти http://jira.unity-bars.com.ua:11000/browse/COBUMMFO-5296
+   if p_mode <> 4 then 
+    begin   
+       l_sql := 'begin select kv into :l_kv from ope_lot where nls = '||p_nls;
+       
+         if p_ob is null then
+           l_sql := l_sql || ' and ob1 is null';
+         else
+           l_sql := l_sql || ' and ob1 = '|| p_ob;
+         end if;
+     
+         if p_bs is null then
+           l_sql := l_sql || ' and bs1 is null';
+         else
+           l_sql := l_sql || ' and bs1 = '|| p_bs;
+         end if;
+     
+         if p_grp is null then
+           l_sql := l_sql || ' and grp is null';
+         else
+           l_sql := l_sql || ' and grp = '|| p_grp ;
+         end if;
+     
+        l_sql := l_sql || '; end;';
+     
+        execute immediate l_sql using out l_kv;
+       end;
+      end if ;  
+     /*logger.info ('DYN l_kv:  '|| l_kv);
+     logger.info ('DYN -----------------------------------------');*/
+     --перевіряємо наявність рахунку А та чи він відкритий
     if p_mode != 4 then
       select count(a.nls)
         into l_count_nls
         from bars.accounts a
        where a.nls = p_nls
-         and a.dazs is null;
+       and a.kv  = l_kv
+       and a.dazs is null;
     end if;
 
     if l_count_nls = 1 or p_mode = 4 then
@@ -440,6 +481,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.DYNAMIC_LAYOUT_UI is
                l_tmp_dynamic_layout.kv_a
           from bars.accounts a
          where a.nls = p_nls
+           and a.kv  = l_kv
            and dazs is null;
       end if;
 
@@ -469,7 +511,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.DYNAMIC_LAYOUT_UI is
       end if;
     else
       raise_application_error(-20001,
-                              'Не знайдено рахунок А або вын закритий');
+                              'Не знайдено рахунок А або він закритий');
     end if;
 
   end create_dynamic_layout;
@@ -654,7 +696,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.DYNAMIC_LAYOUT_UI is
                      l.summ_b  = nvl(c.delta, 0)
               where l.id = c.id
               and l.userid = bars.user_id;
-   
+
         end if;
       end if;
     end loop;
@@ -762,17 +804,17 @@ CREATE OR REPLACE PACKAGE BODY BARS.DYNAMIC_LAYOUT_UI is
         raise_application_error(-20001,
                                 'Вказаний вид документу не знайдено');
     end;
-   ----------------------*******Для макетів юр осіб********** 
+   ----------------------*******Для макетів юр осіб**********
     l_okpo_a := p_okpo_a;
-   
+
     if ( flag = 1 and p_okpo_a is null) then
-        begin 
-        
-            select distinct okpo into l_okpo_a from customer 
+        begin
+
+            select distinct okpo into l_okpo_a from customer
             where rnk = (select rnk from accounts where nls=p_nlsa and kv = p_kv)
                   and date_off is null ;
-        end;         
-     end if;     
+        end;
+     end if;
     ------------------***************************************
     l_mf1.nd    := null;
     l_mf1.datd  := gl.bd;
@@ -1172,14 +1214,12 @@ begin
   null;
 end dynamic_layout_ui;
 /
+
  show err;
  
 PROMPT *** Create  grants  DYNAMIC_LAYOUT_UI ***
-grant EXECUTE                                                                on DYNAMIC_LAYOUT_UI to BARS_ACCESS_DEFROLE;
+grant EXECUTE on DYNAMIC_LAYOUT_UI to BARS_ACCESS_DEFROLE;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/dynamic_layout_ui.sql =========*** E
- PROMPT ===================================================================================== 
- 
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/package/dynamic_layout_ui.sql =========*** E
+PROMPT ===================================================================================== 

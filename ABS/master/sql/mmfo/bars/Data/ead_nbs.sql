@@ -1,4 +1,7 @@
+PROMPT *** Refresh data ead_nbs ***
+
 delete from EAD_NBS;
+
 Insert into BARS.EAD_NBS
    (NBS, CUSTTYPE)
  Values
@@ -167,4 +170,17 @@ Insert into BARS.EAD_NBS
    (NBS, CUSTTYPE)
  Values
    ('2625', 3);
+
+update EAD_NBS e set acc_type = 'kpk_uo'
+where (e.custtype = 2 and e.nbs in ('2655', '2605'));
+
+update EAD_NBS e set acc_type = 'pr_uo'
+where (e.custtype = 2 and e.nbs not in ('2655', '2605','2525', '2546', '2610', '2651'));
+
+update EAD_NBS e set acc_type = 'bpk_fo'
+where (e.custtype = 3 and e.nbs     in ('2625'));
+
+update EAD_NBS e set acc_type = 'dep_uo',agr_type = 'dep_uo'
+where (e.custtype = 2 and e.nbs in ('2525', '2546', '2610', '2651'));
+
 COMMIT;

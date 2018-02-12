@@ -66,7 +66,12 @@ INSERT  into ead_sync_queue   (id,
        RAISE;*/
 END;
 /
-ALTER TRIGGER BARS.EAD_DOCS_SIGN DISABLE;
+show errors
+
+--ALTER TRIGGER BARS.EAD_DOCS_SIGN DISABLE;
+-- 04.01.2018 дропаем ацкий триггер, но оставляем в назидание археологам скрипт
+DROP TRIGGER BARS.EAD_DOCS_SIGN;
+
 
 
 PROMPT ===================================================================================== 

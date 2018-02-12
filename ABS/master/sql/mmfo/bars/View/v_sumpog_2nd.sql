@@ -21,7 +21,7 @@ PROMPT *** Create  view V_SUMPOG_2ND ***
        FROM cck_Sum_POG_web g,
             cc_deal d,
             nd_txt nt,
-            staff st
+            staff$base st
       WHERE     g.g1 IS NOT NULL
             AND g.nd = d.nd
             AND nt.nd(+) = d.nd

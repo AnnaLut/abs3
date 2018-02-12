@@ -1,14 +1,5 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_INTEREST_TO_PAYMENT.sql =========*** 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_INTEREST_TO_PAYMENT ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_INTEREST_TO_PAYMENT ("ID", "ACCOUNT_ID", "INTEREST_KIND_ID", "ACCOUNT_NUMBER", "CURRENCY_ID", "OKPO", "ACCOUNT_NAME", "INTEREST_ACCOUNT_NUMBER", "DATE_FROM", "DATE_THROUGH", "INTEREST_AMOUNT", "RECEIVER_MFO", "RECEIVER_ACCOUNT", "RECEIVER_CURRENCY_ID", "PAYMENT_PURPOSE", "STATE_ID", "RECKONING_STATE", "STATE_COMMENT", "MANAGER_ID", "MANAGER_NAME", "CORPORATION_CODE", "CORPORATION_NAME") AS 
-  select r.id,
+create or replace view v_interest_to_payment as
+select r.id,
        r.account_id,
        r.interest_kind_id,
        a.nls account_number,
@@ -23,7 +14,7 @@ PROMPT *** Create  view V_INTEREST_TO_PAYMENT ***
        case when i.nlsb is null then a.nls else i.nlsb end receiver_account,
        case when i.kvb is null then a.kv else i.kvb end receiver_currency_id,
        case when trim(r.payment_purpose) is null then
-                 interest_utl.generate_payment_purpose(r.id, r.line_type_id, i.metr, a.nls, r.date_from, r.date_through, r.interest_rate)
+                 interest_utl.generate_payment_purpose(r.id, i.metr, a.nls, r.date_from, r.date_through, r.interest_rate, r.is_grouping_unit)
             else r.payment_purpose
        end payment_purpose,
        r.state_id,
@@ -43,6 +34,7 @@ left join rnkp_kod k on k.rnk = a.rnk
 left join rnkp_kod_acc w on w.acc = a.rnk
 left join kod_cli c on c.kod_cli = nvl(w.kodk, k.kodk)
 where  r.grouping_line_id is null and
+       r.line_type_id = 1 /*RECKONING_TYPE_ORDINARY_INT*/ and
        r.state_id in ( 5 /*RECKONING_STATE_ACCRUED*/,
                        9 /*RECKONING_STATE_PAYMENT_FAILED*/,
                       10 /*RECKONING_STATE_PAYM_DISCARDED*/) and

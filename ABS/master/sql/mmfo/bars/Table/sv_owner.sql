@@ -135,12 +135,12 @@ COMMENT ON COLUMN BARS.SV_OWNER.OWNER_OZN IS 'Тип істотної участі';
 COMMENT ON COLUMN BARS.SV_OWNER.NBU_DOC_NUM IS 'Номер рішення НБУ про надання згоди на набуття істотної участі в банку';
 COMMENT ON COLUMN BARS.SV_OWNER.NBU_DOC_DATE IS 'Дата рішення НБУ про надання згоди на набуття істотної участі в банку';
 COMMENT ON COLUMN BARS.SV_OWNER.GROUP_ID IS 'Група осіб, якщо особа спільно з іншими особами як група осіб є власником істотної участі в банку';
-COMMENT ON COLUMN BARS.SV_OWNER.GROUP_REASON IS 'Підстава, у зв'язку з якою особа належать до наведеної групи';
+COMMENT ON COLUMN BARS.SV_OWNER.GROUP_REASON IS 'Підстава, у зв''язку з якою особа належать до наведеної групи';
 COMMENT ON COLUMN BARS.SV_OWNER.GROUP_DOC_NUM IS '№ док-та на підставі якого особа належать до наведеної групи';
 COMMENT ON COLUMN BARS.SV_OWNER.GROUP_DOC_DATE IS 'Дата док-та на підставі якого особа належать до наведеної групи';
-COMMENT ON COLUMN BARS.SV_OWNER.CONDITION IS 'Обставини, у зв'язку з якими особа має можливість значного або вирішального впливу на управління та діяльність банку/юридичної особи';
-COMMENT ON COLUMN BARS.SV_OWNER.COND_DOC_NUM IS '№ док-та у зв'язку з яким особа має можливість значного або вирішального впливу на управління та діяльність банку/юридичної особи';
-COMMENT ON COLUMN BARS.SV_OWNER.COND_DOC_DATE IS 'Дата док-та у зв'язку з яким особа має можливість значного або вирішального впливу на управління та діяльність банку/юридичної особи';
+COMMENT ON COLUMN BARS.SV_OWNER.CONDITION IS 'Обставини, у зв''язку з якими особа має можливість значного або вирішального впливу на управління та діяльність банку/юридичної особи';
+COMMENT ON COLUMN BARS.SV_OWNER.COND_DOC_NUM IS '№ док-та у зв''язку з яким особа має можливість значного або вирішального впливу на управління та діяльність банку/юридичної особи';
+COMMENT ON COLUMN BARS.SV_OWNER.COND_DOC_DATE IS 'Дата док-та у зв''язку з яким особа має можливість значного або вирішального впливу на управління та діяльність банку/юридичної особи';
 
 
 
@@ -219,6 +219,18 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint CC_SVOWNER_OZN_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SV_OWNER MODIFY (OZN CONSTRAINT CC_SVOWNER_OZN_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_SVOWNER_NM2_NN ***
 begin   
  execute immediate '
@@ -235,18 +247,6 @@ PROMPT *** Create  constraint CC_SVOWNER_ID_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.SV_OWNER MODIFY (ID CONSTRAINT CC_SVOWNER_ID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SVOWNER_OZN_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SV_OWNER MODIFY (OZN CONSTRAINT CC_SVOWNER_OZN_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -311,11 +311,9 @@ end;
 
 
 PROMPT *** Create  grants  SV_OWNER ***
-grant SELECT                                                                 on SV_OWNER        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SV_OWNER        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SV_OWNER        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SV_OWNER        to RPBN002;
-grant SELECT                                                                 on SV_OWNER        to UPLD;
 
 
 

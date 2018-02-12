@@ -49,16 +49,15 @@ begin
     l_zpr.bind_sql     := '';
     l_zpr.xml_encoding := 'CL8MSWIN1251';
     l_zpr.txt          := 'select  :sFdat1 DATF,'||nlchr||
-                           '        substr(kodp,5,3) VAL ,'||nlchr||
-                           '        SUM(to_number(decode(substr(kodp,1,4),''4210'',znap,0))) KK,'||nlchr||
-                           '        SUM(to_number(decode(substr(kodp,1,4),''1210'',znap,0))) KS,'||nlchr||
-                           '        SUM(to_number(decode(substr(kodp,1,4),''4220'',znap,0))) PK,'||nlchr||
-                           '        SUM(to_number(decode(substr(kodp,1,4),''1220'',znap,0))) PS,'||nlchr||
-                           '        SUM(to_number(decode(substr(kodp,1,4),''1240'',znap,0))) OS        '||nlchr||
-                           '        '||nlchr||
-                           'from tmp_nbu '||nlchr||
-                           'where datf=:sFdat1 and kodf=''39'' and KF=sys_context(''bars_context'',''user_mfo'')'||nlchr||
-                           'group by substr(kodp,5,3)';
+                           '        substr(field_code,5,3) VAL ,'||nlchr||
+                           '        SUM(to_number(decode(substr(field_code,1,4),''4210'',field_value,0))) KK,'||nlchr||
+                           '        SUM(to_number(decode(substr(field_code,1,4),''1210'',field_value,0))) KS,'||nlchr||
+                           '        SUM(to_number(decode(substr(field_code,1,4),''4220'',field_value,0))) PK,'||nlchr||
+                           '        SUM(to_number(decode(substr(field_code,1,4),''1220'',field_value,0))) PS,'||nlchr||
+                           '        SUM(to_number(decode(substr(field_code,1,4),''1240'',field_value,0))) OS        '||nlchr||
+                           'from V_NBUR_#39 '||nlchr||
+                           'where report_date=:sFdat1 and KF=sys_context(''bars_context'',''user_mfo'')'||nlchr||
+                           'group by substr(field_code,5,3) ';
     l_zpr.xsl_data     := '';
     l_zpr.xsd_data     := '';
 

@@ -1,9 +1,18 @@
-CREATE OR REPLACE PROCEDURE BARS.P_F6B_NN (Dat_ DATE, sheme_ Varchar2 DEFAULT 'G' )
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_F6B_NN.sql =========*** Run *** 
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure P_F6B_NN ***
+
+ CREATE OR REPLACE PROCEDURE BARS.P_F6B_NN (Dat_ DATE, sheme_ Varchar2 DEFAULT 'G' )
 IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  % DESCRIPTION : процедура #6B
  %
- % VERSION     :   v.18.001      29.01.2018
+ % VERSION     :   v.18.001      25.01.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 /*
    Структура показателя    GGG CC N H I OO R VVV
@@ -155,7 +164,7 @@ BEGIN
                    and nb.kat = z.kat1
                    and nb.kv = z.kv1
                    and nvl(nb.rz,0) = z.rz1
-                   and ( NVL(nb.ddd_6b,'000') !='000' or nb.nbs='3119' ) 
+                   and NVL(nb.ddd_6b,'000') !='000'
                    and nb.rnk = c.rnk
                    and nb.acc = sp.acc(+)
               )
@@ -180,11 +189,6 @@ BEGIN
        end if;
        if ddd_ ='152' and k.s180 >'6'  then
           ddd_ := '151';
-       end if;
-
-       if k.nbs = '3119' then
-
-          ddd_ := '138';
        end if;
 
        IF typ_>0 THEN
@@ -269,10 +273,6 @@ BEGIN
           or  ddd_ like '15%' and k.nbs in ('3570','3578') )
        then
           CC_ := '12';
-       end if;
-
-       if k.nbs ='3119'  then
-          CC_ := '40';
        end if;
 
        H_ := '0';
@@ -361,14 +361,6 @@ BEGIN
               H_ := '1';
           end if;
        end if;
-                                     --  отдельная обработка клиента  90593701
-       if    mfo_ = 300465 and k.rnk in (90593701) and
-             k.nbs like '311%'
-       then  
-           ddd_ :='138';   
-           H_ := '1';
-
-       end if;
 
        if k.nbs in ('3005','3007','3008')  then
 
@@ -405,10 +397,6 @@ BEGIN
 
           kodp_:= CC_|| N_|| H_|| I_||'00'|| to_char(k.rez) || kv_;
           znap_:= TO_CHAR(k.BV);
-
-          if k.nbs = '3119' then
-             znap_ := to_char(0 - k.BV);
-          end if;
 
           if         ddd_ between '211' and '219'  then
 
@@ -635,3 +623,10 @@ BEGIN
   logger.info ('P_F6B_NN: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 END p_f6b_nn;
 /
+show err;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_F6B_NN.sql =========*** End *** 
+PROMPT ===================================================================================== 

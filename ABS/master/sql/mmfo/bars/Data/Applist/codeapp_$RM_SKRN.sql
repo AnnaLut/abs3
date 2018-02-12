@@ -36,6 +36,36 @@ begin
                                                   p_frontend => l_application_type_id
                                                   );
 
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Друк звітів ********** ');
+          --  Створюємо функцію Друк звітів
+      l := l +1;
+      l_function_ids.extend(l);
+      l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'Друк звітів',
+                                                  p_funcname => '/barsroot/cbirep/rep_list.aspx?codeapp=\S*',
+                                                  p_rolename => '' ,
+                                                  p_frontend => l_application_type_id
+                                                  );
+
+
+      --  Створюємо дочірню функцію Друк звітів
+                     l_function_deps  :=   abs_utils.add_func(
+															  p_name     => 'Друк звітів',
+															  p_funcname => '/barsroot/cbirep/rep_print.aspx?query_id=\d+\S*',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+      --  Створюємо дочірню функцію Друк звітів
+                     l_function_deps  :=   abs_utils.add_func(
+															  p_name     => 'Друк звітів',
+															  p_funcname => '/barsroot/cbirep/rep_query.aspx?repid=\d+\S*',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Амортизація ********** ');
           --  Створюємо функцію Амортизація

@@ -36,6 +36,13 @@ begin
     l_rec.HOMEPART      := :old.HOMEPART;
     l_rec.ROOM_TYPE     := :old.ROOM_TYPE;
     l_rec.ROOM          := :old.ROOM;
+    l_rec.REGION_ID     := :old.REGION_ID;
+    l_rec.AREA_ID       := :old.AREA_ID;
+    l_rec.SETTLEMENT_ID := :old.SETTLEMENT_ID;
+    l_rec.STREET_ID     := :old.STREET_ID;
+    l_rec.HOUSE_ID      := :old.HOUSE_ID;
+    l_rec.locality_type_n      := :old.locality_type_n ;
+    l_rec.street_type_n        := :old.street_type_n;
 
   else
 
@@ -65,6 +72,14 @@ begin
     l_rec.HOMEPART      := :new.HOMEPART;
     l_rec.ROOM_TYPE     := :new.ROOM_TYPE;
     l_rec.ROOM          := :new.ROOM;
+    l_rec.REGION_ID     := :new.REGION_ID;
+    l_rec.AREA_ID       := :new.AREA_ID;
+    l_rec.SETTLEMENT_ID := :new.SETTLEMENT_ID;
+    l_rec.STREET_ID     := :new.STREET_ID;
+    l_rec.HOUSE_ID      := :new.HOUSE_ID;
+    l_rec.locality_type_n     := :new.locality_type_n;
+    l_rec.street_type_n       := :new.street_type_n;
+
 
   end if;
 
@@ -75,18 +90,14 @@ begin
     l_rec.EFFECTDATE := glb_bankdate;
     l_rec.CHGDATE    := sysdate;
     l_rec.DONEBY     := gl.aUID;
-    l_rec.KF :=  sys_context('bars_context','user_mfo');
-    
+    l_rec.kf         := sys_context('bars_context','user_mfo');
+
     insert into BARS.CUSTOMER_ADDRESS_UPDATE
     values l_rec;
 
+
   End If;
 
-end;
+
+end TAIUD_CUSTOMERADDRESS_UPDATE;
 /
-ALTER TRIGGER BARS.TAIUD_CUSTOMERADDRESS_UPDATE ENABLE;
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Trigger/TAIUD_CUSTOMERADDRESS_UPDATE.sql ===
-PROMPT ===================================================================================== 

@@ -7,8 +7,8 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_CIG_CUST_INDIVIDUAL ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_CIG_CUST_INDIVIDUAL ("CUST_ID", "ROLE_ID", "FIRST_NAME", "SURNAME", "FATHERS_NAME", "GENDER", "CLASSIFICATION", "BIRTH_SURNAME", "DATE_BIRTH", "PLACE_BIRTH", "RESIDENCY", "CITIZENSHIP", "NEG_STATUS", "EDUCATION", "MARITAL_STATUS", "POSITION", "CUST_KEY", "PASSP_SER", "PASSP_NUM", "PASSP_ISS_DATE", "PASSP_EXP_DATE", "PASSP_ORGAN", "PHONE_OFFICE", "PHONE_MOBILE", "PHONE_FAX", "EMAIL", "WEBSITE", "FACT_TERRITORY_ID", "FACT_STREET_BUILDNUM", "FACT_POST_INDEX", "REG_TERRITORY_ID", "REG_STREET_BUILDNUM", "REG_POST_INDEX", "BRANCH") AS 
-  select cust_id,
+create or replace view V_CIG_CUST_INDIVIDUAL as
+select cust_id,
        role_id,
        first_name,
        surname,
@@ -42,9 +42,7 @@ PROMPT *** Create  view V_CIG_CUST_INDIVIDUAL ***
        reg_street_buildnum,
        reg_post_index,
        branch
-  from CIG_CUST_INDIVIDUAL -- РќР° СЃР°РјСѓ С‚Р°Р±Р»РёС†Сѓ РЅР°РєР»Р°РґС‹РІР°С‚СЊ РїРѕР»РёС‚РёРєРё РЅРµР»СЊР·СЏ. http://jira.unity-bars.com.ua:11000/browse/COBUMMFO-5354
-
-
+  from CIG_CUST_INDIVIDUAL -- На саму таблицу накладывать политики нельзя. http://jira.unity-bars.com.ua:11000/browse/COBUMMFO-5354      
 ;
 
 PROMPT *** Create  grants  V_CIG_CUST_INDIVIDUAL ***
@@ -53,6 +51,7 @@ grant SELECT                                                                 on 
 grant SELECT,UPDATE                                                          on V_CIG_CUST_INDIVIDUAL to CIG_ROLE;
 grant SELECT                                                                 on V_CIG_CUST_INDIVIDUAL to UPLD;
 
+exec bpa.alter_policies('V_CIG_CUST_INDIVIDUAL');
 
 
 PROMPT ===================================================================================== 

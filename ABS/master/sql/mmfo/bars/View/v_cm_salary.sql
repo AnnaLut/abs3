@@ -7,8 +7,8 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_CM_SALARY ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_CM_SALARY ("ID", "OKPO", "OKPO_N", "ORG_NAME", "PRODUCT_CODE", "CHG_DATE", "CHG_USER") AS 
-  select id, okpo, okpo_n, org_name, product_code, chg_date, chg_user
+  CREATE OR REPLACE FORCE VIEW BARS.V_CM_SALARY ("ID", "OKPO", "OKPO_N", "ORG_NAME", "PRODUCT_CODE", "CHG_DATE", "CHG_USER","RNK") AS 
+  select id, okpo, okpo_n, org_name, product_code, chg_date, chg_user,rnk
   from cm_salary;
 
 PROMPT *** Create  grants  V_CM_SALARY ***

@@ -24,14 +24,13 @@ PROMPT *** Create  table BPK_PROECT ***
 begin 
   execute immediate '
   CREATE TABLE BARS.BPK_PROECT 
-   (	ID NUMBER(22,0), 
-	NAME VARCHAR2(100), 
-	OKPO VARCHAR2(10), 
-	PRODUCT_CODE VARCHAR2(30), 
-	OKPO_N NUMBER(22,0), 
-	USED_W4 NUMBER(22,0), 
-	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo''), 
-	ID_CM NUMBER
+   (    ID NUMBER(22,0), 
+    NAME VARCHAR2(100), 
+    OKPO VARCHAR2(10), 
+    PRODUCT_CODE VARCHAR2(30), 
+    OKPO_N NUMBER(22,0), 
+    USED_W4 NUMBER(22,0), 
+    KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -55,7 +54,6 @@ COMMENT ON COLUMN BARS.BPK_PROECT.OKPO IS '';
 COMMENT ON COLUMN BARS.BPK_PROECT.PRODUCT_CODE IS '';
 COMMENT ON COLUMN BARS.BPK_PROECT.OKPO_N IS 'Код системной организациим';
 COMMENT ON COLUMN BARS.BPK_PROECT.USED_W4 IS 'Используется для Way4';
-COMMENT ON COLUMN BARS.BPK_PROECT.ID_CM IS '';
 COMMENT ON COLUMN BARS.BPK_PROECT.KF IS '';
 
 
@@ -87,6 +85,17 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_BPKPROECT_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BPK_PROECT ADD CONSTRAINT FK_BPKPROECT_KF FOREIGN KEY (KF)
+      REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
 PROMPT *** Create  constraint CC_BPKPROECT_ID_NN ***
 begin   
  execute immediate '
@@ -110,16 +119,23 @@ exception when others then
  end;
 /
 
+begin
+    execute immediate 'alter table bpk_proect add rnk number';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/
+
+
 
 
 PROMPT *** Create  grants  BPK_PROECT ***
-grant SELECT                                                                 on BPK_PROECT      to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BPK_PROECT      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BPK_PROECT      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BPK_PROECT      to CUST001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BPK_PROECT      to OBPC;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BPK_PROECT      to OW;
-grant SELECT                                                                 on BPK_PROECT      to UPLD;
 grant FLASHBACK,SELECT                                                       on BPK_PROECT      to WR_REFREAD;
 
 

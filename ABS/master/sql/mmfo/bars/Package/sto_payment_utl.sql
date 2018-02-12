@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/sto_payment_utl.sql =========*** Run
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.STO_PAYMENT_UTL is
+create or replace package sto_payment_utl is
 
     function get_version return varchar2;
 
@@ -99,9 +93,9 @@
     procedure complete_payments_withdrawal;
 end;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.STO_PAYMENT_UTL as
+create or replace package body sto_payment_utl as
 
-    G_VERSION constant varchar2(64) := 'version 2.2 19.10.2017';
+    G_VERSION constant varchar2(64) := 'version 2.3 20.11.2017';
 
     function get_version
     return varchar2
@@ -451,6 +445,16 @@ CREATE OR REPLACE PACKAGE BODY BARS.STO_PAYMENT_UTL as
                                                    i.kf);
                 end if;
             create_payment_que (l_payment_id, l_errmsg);
+        end loop;
+        -- сбрасываем статус платежам с нулевой суммой #COBUSUPABS-6340
+        for rec in (select t.id from sto_payment t
+                    where t.value_date = gl.bd + 1 
+                    and t.state = sto_payment_utl.STO_PM_STATE_READY_TO_WITHDRAW
+                    and nvl(t.payment_amount, 0) = 0)
+        loop
+            sto_payment_utl.set_payment_state(p_payment_id => rec.id,
+                                              p_state      => sto_payment_utl.STO_PM_STATE_NEW,
+                                              p_comment    => 'Нульова сумма. Повернено на доопрацювання');
         end loop;
     end;
 
@@ -996,7 +1000,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.STO_PAYMENT_UTL as
         bars_audit.trace('sto_payment_utl.pay_off_order_amounts' || chr(10) ||
                          'user_id      : ' || user_id || chr(10) ||
                          'session_user : ' || sys_context('USERENV', 'SESSION_USER'));
-
+						 
         for rec in (select kf from mv_kf)
 		loop
 			begin
@@ -1008,12 +1012,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.STO_PAYMENT_UTL as
 				when no_data_found then
 					 raise_application_error(-20000, 'Технологічний користувач СБОН з логіном {' || branch_attribute_utl.get_value('/'||rec.kf||'/', 'STO_USER') || '} не знайдений');
 			end;
-			bars_login.login_user(sys_guid(), l_sbon_user_id, '', '');
-
+			bars_login.login_user(sys_guid(), l_sbon_user_id, '', '');	
+			
 			bars_audit.info('sto_payment_utl.pay_off_order_amounts' || chr(10) ||
 							 'user_id      : ' || user_id || chr(10) ||
-							 'session_user : ' || sys_context('USERENV', 'SESSION_USER'));
-
+							 'session_user : ' || sys_context('USERENV', 'SESSION_USER'));			
+		
 			for i in (select * from sto_payment p
 					  where  p.state = sto_payment_utl.STO_PM_STATE_READY_TO_WITHDRAW and
 							 p.value_date <= l_bank_date and
@@ -1046,19 +1050,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.STO_PAYMENT_UTL as
     end;
 end;
 /
- show err;
- 
-PROMPT *** Create  grants  STO_PAYMENT_UTL ***
-grant DEBUG,EXECUTE                                                          on STO_PAYMENT_UTL to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on STO_PAYMENT_UTL to SBON;
-grant EXECUTE                                                                on STO_PAYMENT_UTL to SBON06;
-grant EXECUTE                                                                on STO_PAYMENT_UTL to SBON11;
-grant EXECUTE                                                                on STO_PAYMENT_UTL to SBON13;
-grant EXECUTE                                                                on STO_PAYMENT_UTL to SBON21;
+show err;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/sto_payment_utl.sql =========*** End
- PROMPT ===================================================================================== 
- 
+grant debug, execute on sto_payment_utl to bars_access_defrole;

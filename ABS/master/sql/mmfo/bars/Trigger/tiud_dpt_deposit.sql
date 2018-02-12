@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  trigger TIUD_DPT_DEPOSIT ***
 
-  CREATE OR REPLACE TRIGGER BARS.TIUD_DPT_DEPOSIT 
+CREATE OR REPLACE TRIGGER TIUD_DPT_DEPOSIT
 after insert or update or delete ON BARS.DPT_DEPOSIT for each row
 declare
   --------------------
@@ -39,7 +39,7 @@ begin
        dpt_d, acc_d, mfo_d, nls_d, nms_d, okpo_d,
        limit, deposit_cod, comments,
        action_id, actiion_author, "WHEN", bdate, stop_id,
-       cnt_dubl, cnt_ext_int, dat_ext_int, userid, archdoc_id, forbid_extension, branch, wb )
+       cnt_dubl, cnt_ext_int, dat_ext_int, userid, archdoc_id, forbid_extension, branch, wb)
     values
       (l_idupd,:old.deposit_id,:old.nd,:old.vidd,:old.acc,:old.kv,:old.rnk,
        :old.freq,:old.datz,:old.dat_begin,:old.dat_end,:old.dat_end_alt,
@@ -47,7 +47,7 @@ begin
        :old.dpt_d,:old.acc_d,:old.mfo_d,:old.nls_d,:old.nms_d,:old.okpo_d,
        :old.limit,:old.deposit_cod,:old.comments,
        l_actionid, l_userid, sysdate, l_bankdate, :old.stop_id,
-       :old.cnt_dubl, :old.cnt_ext_int, :old.dat_ext_int, :old.userid, :old.archdoc_id, :old.forbid_extension, :old.branch, :old.Wb);
+       :old.cnt_dubl, :old.cnt_ext_int, :old.dat_ext_int, :old.userid, :old.archdoc_id, :old.forbid_extension, :old.branch, :old.wb);
 
       DPT_WEB.CLOSE_STO_ARGMNT(P_DPTID    => :old.deposit_id,
                                P_ACCID    => :old.acc,
@@ -73,7 +73,7 @@ begin
        :new.dpt_d,:new.acc_d,:new.mfo_d,:new.nls_d,:new.nms_d,:new.okpo_d,
        :new.limit,:new.deposit_cod,:new.comments,
        l_actionid, l_userid, sysdate, l_bankdate, :new.stop_id,
-       :new.cnt_dubl, :new.cnt_ext_int, :new.dat_ext_int, :new.userid, :new.archdoc_id, :new.forbid_extension, :new.branch, :new.wb );
+       :new.cnt_dubl, :new.cnt_ext_int, :new.dat_ext_int, :new.userid, :new.archdoc_id, :new.forbid_extension, :new.branch, :new.wb);
 
   else
     -- проверим, действительно ли что-то менялось
@@ -115,7 +115,7 @@ begin
      or nvl(:old.dat_ext_int, to_date('10.11.4977','dd.mm.yyyy')) !=
         nvl(:new.dat_ext_int, to_date('10.11.4977','dd.mm.yyyy'))
      or nvl(:old.branch,    '_____')   != nvl(:new.branch,    '_____') -- ребранчинг
-     or nvl(:old.Wb,    '_____')   != nvl(:new.wb,    '_____')
+     or nvl(:old.wb, 'E') != nvl(:new.wb, 'E')
     then
 
       if (:old.vidd <> :new.vidd)
@@ -133,7 +133,7 @@ begin
       else
           l_actionid := 4;  -- изменение параметров
       end if;
-
+      
       select bars_sqnc.get_nextval('s_dpt_deposit_clos') into l_idupd from dual;
 
       insert into dpt_deposit_clos
@@ -151,11 +151,11 @@ begin
          :new.dpt_d,:new.acc_d,:new.mfo_d,:new.nls_d,:new.nms_d,:new.okpo_d,
          :new.limit,:new.deposit_cod,:new.comments,
          l_actionid, l_userid, sysdate, l_bankdate, :new.stop_id,
-         :new.cnt_dubl, :new.cnt_ext_int, :new.dat_ext_int, :new.userid, :new.archdoc_id,:new.forbid_extension, :new.branch, :new.Wb);
+         :new.cnt_dubl, :new.cnt_ext_int, :new.dat_ext_int, :new.userid, :new.archdoc_id,:new.forbid_extension, :new.branch, :new.wb);
 
 
     else
-
+    
       return; -- ничего не менялось, выходим
 
     end if;
@@ -163,7 +163,9 @@ begin
   end if;
 
 end;
+
 /
+
 ALTER TRIGGER BARS.TIUD_DPT_DEPOSIT ENABLE;
 
 

@@ -1,13 +1,14 @@
 
- 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/xoz.sql =========*** Run *** =======
  PROMPT ===================================================================================== 
  
   CREATE OR REPLACE PACKAGE BARS.XOZ IS
-  g_header_version   CONSTANT VARCHAR2 (64) := 'version 4  14.08.2017';
+  g_header_version   CONSTANT VARCHAR2 (64) := 'version 4.1  17.10.2017';
 --============ контроль деб.зажолженности по хоз.деятельности банка  ===============----------------
 /*
+17.10.2017 Sta ОДНА сума закриття призначена для закриття 2-х і більше виникнень,і тому вона більша кожної з них, перевірку на суму взагалі відмінити 
+29.09.2017 Авто-Закриття по закритим рахункам XOZ.CLS (0)
 14.08.2017 СУХОВА. Добавлен протокол квитовки. Удаление установленной связи
 27.07.2017 Sta Процедура довески "гири" при отрицательной разбалансировке procedure Balancing
 19.07.2017 СУХОВА. 1) Ввести новый тип счета W4X для бал.счетов 3550, 3551 ( хоз.деб для ПЦ)
@@ -25,6 +26,7 @@ OPER_XOZ     = Складні операціїї перерахування з рахунків XOZ
 OPER_XOZ_ADD = Збалансована розшифровкаі складної операціїї  XOZ
 */
 -----------------------------------------------
+procedure CLS  (p_acc number ) ; --- Авто-Закриття по закритим рахункам
 procedure Del_KWT   (p_REF1 number, p_STMT1 number, p_REF2 number ) ; --- Процедура Удаление установленной связи
 procedure Balancing (p_acc  number ) ; --- Процедура довески "гири" при отрицательной разбалансировке
 procedure NOT_RD    (p_acc  number, p_DV1 date, p_DV2 date ) ;
@@ -138,10 +140,10 @@ procedure REZ ( S_DAT01 IN  VARCHAR2, --:s(SEM=Зв_дата_01,TYPE=s),
 END XOZ;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.XOZ IS
-   g_body_version   CONSTANT VARCHAR2 (64) := 'version 4  29.08.2017-1';
+   g_body_version   CONSTANT VARCHAR2 (64) := 'version 4  29.09.2017-1';
 --------------------------------------------
 
-/*
+/*29.09.2017 Авто-Закриття по закритим рахункам XOZ.CLS (0)
   29.08.2017 Сухова  --простановка отметки о закрытии этим реф2 = oo.ref (от авто-квитовки отказались)
   18.08.2017 СУХОВА. БЕК частичногозакрытия из МОДУЛЯ
   14.08.2017 СУХОВА. Добавлен протокол квитовки. Удаление установленной связи
@@ -218,6 +220,16 @@ CREATE OR REPLACE PACKAGE BODY BARS.XOZ IS
 -------------------------------------
 nlchr char(2) := chr(13)||chr(10) ;
 --------------------------------------------------------------------
+procedure CLS  (p_acc number ) is --- Авто-Закриття по закритим рахункам
+begin
+  update xoz_ref x 
+     set x.ref2  = 0,
+         x.datz  = (select dazs from accounts where acc = x.acc )
+  where p_acc in ( 0, x.acc) 
+    and ref2  is   null
+    and exists   ( select 1 from accounts where acc = x.acc and dazs is not null) ;
+end  CLS;
+
 procedure Del_KWT   (p_REF1 number, p_STMT1 number, p_REF2 number ) is --- Процедура Удаление установленной связи
 begin
    update XOZ_ref set ref2=null, DATZ=NULL, s=s0 where ref1= p_REF1 and stmt1=p_STMT1 and ref2=p_REF2;
@@ -640,7 +652,7 @@ begin
 
    If p_REF2 > 0 then l_ref2 := P_ref2 ; -- проверить на допустимость этого реф-2 на закрытие
 
-      begin select o.vdat  into l_datz from oper o, opldok p where o.ref = p_ref2  and p.ref =o.ref and p.acc = p_acc and p.dk =1 and p.s <= p_SP*100 and rownum=1 ;
+      begin select o.vdat  into l_datz from oper o, opldok p where o.ref = p_ref2  and p.ref =o.ref and p.acc = p_acc and p.dk =1 and rownum=1 ;  --and p.s <= p_SP*100 
       EXCEPTION WHEN NO_DATA_FOUND THEN raise_application_error(-20000, 'XOZ/Реф.2=' || p_REF2 || ' не може закривати Реф.1='|| p_ref1 );
       end ;
 

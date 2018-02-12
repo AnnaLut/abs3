@@ -77,7 +77,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.FINMON_EXPORT IS
 /*
     03.01.2012 - Сменили при импорте для Надры простановку в реестр KL_ID при смене года!!!
 */
-g_body_version    constant varchar2(64)  := 'version 1.2 30/10/2015';
+g_body_version    constant varchar2(64)  := 'version 1.3 25/09/2017';
 G_TRACE  constant varchar2(10) := 'fmxy.';
 
 ALICENSE NUMBER := 0;
@@ -192,7 +192,7 @@ END;
 
 FUNCTION GETDOCUMENTCODE(INCODE IN NUMBER) RETURN VARCHAR2
 IS
-  RETCODE VARCHAR2( 1 );
+  RETCODE VARCHAR2( 2 );
   CURCODE NUMBER;
 BEGIN
   IF ISLICENSE THEN

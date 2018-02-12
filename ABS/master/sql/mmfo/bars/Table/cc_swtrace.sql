@@ -60,11 +60,23 @@ COMMENT ON COLUMN BARS.CC_SWTRACE.NLS IS '—чет партнера';
 
 
 
+PROMPT *** ADD COLUMN  ID***
+begin   
+ execute immediate q'[ALTER TABLE BARS.CC_SWTRACE ADD ID NUMBER]';
+ exception
+  when OTHERS then
+    if ( sqlcode = -01430 )
+    then dbms_output.put_line('Column "id" already exists in table.');
+    else raise;
+    end if;
+ end; 			
+/
+
 
 PROMPT *** Create  constraint XPK_CC_SWTRACE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CC_SWTRACE ADD CONSTRAINT XPK_CC_SWTRACE PRIMARY KEY (RNK, KV)
+  ALTER TABLE BARS.CC_SWTRACE ADD CONSTRAINT XPK_CC_SWTRACE PRIMARY KEY (ID,RNK)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYNI  ENABLE';
 exception when others then
@@ -72,8 +84,35 @@ exception when others then
  end;
 /
 
+PROMPT *** Create  constraint FK_CCSWTRACE_SWBANKS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CC_SWTRACE ADD CONSTRAINT FK_CCSWTRACE_SWBANKS FOREIGN KEY (SWO_BIC)
+	  REFERENCES BARS.SW_BANKS (BIC) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
 
+PROMPT *** Create  constraint FK_CCSWTRACE_CUSTOMER ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CC_SWTRACE ADD CONSTRAINT FK_CCSWTRACE_CUSTOMER FOREIGN KEY (RNK)
+	  REFERENCES BARS.CUSTOMER (RNK) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
 
+PROMPT *** Create  constraint FK_CCSWTRACE_KV ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CC_SWTRACE ADD CONSTRAINT FK_CCSWTRACE_KV FOREIGN KEY (KV)
+	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
 
 PROMPT *** Create  constraint CC_CCSWTRACE_RNK_NN ***
 begin   
@@ -85,8 +124,6 @@ exception when others then
 /
 
 
-
-
 PROMPT *** Create  constraint CC_CCSWTRACE_KV_NN ***
 begin   
  execute immediate '
@@ -95,9 +132,6 @@ exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
-
-
-
 
 PROMPT *** Create  index XPK_CC_SWTRACE ***
 begin   
@@ -111,14 +145,11 @@ exception when others then
 /
 
 
-
 PROMPT *** Create  grants  CC_SWTRACE ***
-grant SELECT                                                                 on CC_SWTRACE      to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_SWTRACE      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_SWTRACE      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_SWTRACE      to FOREX;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_SWTRACE      to START1;
-grant SELECT                                                                 on CC_SWTRACE      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_SWTRACE      to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on CC_SWTRACE      to WR_REFREAD;
 

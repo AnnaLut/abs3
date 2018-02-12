@@ -125,13 +125,14 @@ begin
 
   -- добавляем описание полей
   bars_metabase.add_column(l_tabid, 1, 'RNK', 'N', 'РНК~партнера', '1.2', 22, 1, 0, 1, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'KV', 'N', 'Код~валюты', '.8', 22, 2, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'KV', 'N', 'Код~валюты', '.8', 22, 2, 0, 1, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
   bars_metabase.add_column(l_tabid, 3, 'NLS', 'C', 'Счет~партнера~(58)', '2', 35, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 4, 'FIELD_58D', 'C', 'Поле 58D~для рублей~(58D)', '2', 250, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'SWO_BIC', 'C', 'BIC-код~банка-корреспондента~(57)', '2', 11, 5, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'SWO_BIC', 'C', 'BIC-код~банка-корреспондента~(57)', '2', 11, 5, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 6, 'SWO_ACC', 'C', 'Счет~в банке-корреспонденте~(57)', '2', 35, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 7, 'SWO_ALT', 'C', 'Альтернативное заполнение~исходящей трассы~(57D)', '3', 250, 7, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 8, 'INTERM_B', 'C', 'Реквизиты посредника~по стороне Б~(56A)', '3', 250, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'ID', 'N', 'Унікальний идентифікатор', '1', null, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CUSTOMER');
@@ -142,11 +143,38 @@ begin
     dbms_output.put_line('В БМД не описана таблица CUSTOMER для описания сложного поля таблицы CC_SWTRACE.');
   end if;
 
+  -- добавляем описание сложного поля
+  l_newtabid := bars_metabase.get_tabid('TABVAL');
+  l_newcolid := bars_metabase.get_colid(l_newtabid, 'KV');
+  if (l_newtabid is not null and l_newcolid is not null) then
+    bars_metabase.add_extrnval(l_tabid, 2, l_newtabid, l_newcolid, '', '', '', '');
+  else
+    dbms_output.put_line('В БМД не описана таблица TABVAL для описания сложного поля таблицы CC_SWTRACE.');
+  end if;
+
+  -- добавляем описание сложного поля
+  l_newtabid := bars_metabase.get_tabid('SW_BANKS');
+  l_newcolid := bars_metabase.get_colid(l_newtabid, 'BIC');
+  if (l_newtabid is not null and l_newcolid is not null) then
+    bars_metabase.add_extrnval(l_tabid, 5, l_newtabid, l_newcolid, '', '', '', '');
+  else
+    dbms_output.put_line('В БМД не описана таблица SW_BANKS для описания сложного поля таблицы CC_SWTRACE.');
+  end if;
+
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 1, 1, 'ASC ');
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 2, 2, 'ASC ');
+
+  -- добавляем описание процедур
+  bars_metabase.add_actiontbl(l_tabid, 'DELETE', 'P_EDIT_CC_SWTRACE(2,:id,:rnk,:kv,:swo_bic,:swo_acc,:swo_alt,:interm_b,:field_58d,:nls)');
+
+  -- добавляем описание процедур
+  bars_metabase.add_actiontbl(l_tabid, 'INSERT', 'P_EDIT_CC_SWTRACE(1,:id,:rnk,:kv,:swo_bic,:swo_acc,:swo_alt,:interm_b,:field_58d,:nls)');
+
+  -- добавляем описание процедур
+  bars_metabase.add_actiontbl(l_tabid, 'UPDATE', 'P_EDIT_CC_SWTRACE(0,:id,:rnk,:kv,:swo_bic,:swo_acc,:swo_alt,:interm_b,:field_58d,:nls)');
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

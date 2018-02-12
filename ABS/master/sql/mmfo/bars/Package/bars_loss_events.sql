@@ -46,6 +46,7 @@ create or replace package body BARS_LOSS_EVENTS
 is
   g_body_version  constant varchar2(64) := 'version 5.7  05.01.2018';
 /*
+  12.12.2017 KVA - COBUMMFO-5385 - дубль в файле lossdays (Киевское РУ) за 31.11.2017
   02.10.2017 KVA - COBUSUPABS-6451 - ... не для всех типов договоров учитывается признак корректирующих проводок
   11.07.2017 LSO - COBUPRVNIX-30 - Розрахунок подій дефолту для хоз.дебиторки
   14.03.2017 BAA - COBUPRVNIX-7 - "просрочка по ФДЗ не должна влиять на событие дефолта самого кредита"
@@ -517,7 +518,7 @@ is
             from ACCOUNTS a
             join ND_ACC   n
               on ( n.ACC = a.ACC )
-           where n.nd = p_nd
+            where n.nd = p_nd
              and ( a.nbs = '2063' and a.TIP = 'SP ' or
                    a.nbs = '2068' and a.TIP = 'SPN' );
         end if;
@@ -989,6 +990,7 @@ begin
               where o.ACC = o.ACCO
                 and o.DATD <= l_dat31
                 and ( a.DAZS is null or a.DAZS > l_dat31 )
+                and coalesce(sos, 0) <> 110
               UNION ALL
              select -- 6) Овердрафти (нові)
                     g_OVR as TIP, d.ND as GND, d.ND, d.RNK, d.SDATE, d.VIDD, nvl(a.MDATE, d.WDATE)
@@ -1091,23 +1093,23 @@ begin
 
     -- Шахрайство Госп. деб.
     dbms_application_info.set_client_info( 'FRAUD: start at '||to_char(sysdate,'dd/mm/yyyy hh24:mi:ss') );
---  по методологии событие "Шахрайство" возникает в случае наличия остатка на счете
---  НО, если разбалансировки между xoz_ref и остатками на счетах быть НЕ ДОЛЖНО
---  ТО, алгоритм определения остатка (ost_korr или FOST) можно заменить на проверку полей xoz_ref (s и s0)
---  это облегчит выборку. Но надо проверить.
+-- по методологии событие "Шахрайство" возникает в случае наличия остатка на счете
+--   НО, если разбалансировки между xoz_ref и остатками на счетах быть НЕ ДОЛЖНО
+--   ТО, алгоритм определения остатка (ost_korr или FOST) можно заменить на проверку полей xoz_ref (s и s0)
+--   это облегчит выборку. Но надо проверить.
     FOR c_f IN ( SELECT x.id, A.RNK, g_XOZ as OBJ, 21 as vidd
                   FROM xoz_ref x 
                   JOIN accounts a 
                     ON (a.acc = x.acc)
                  WHERE ( ( a.NBS = '3552' AND a.ob22 IN ('01','02','03','13') ) or
                          ( a.NBS = '3559' AND a.ob22 IN ('06','07','08')      ) )
-                   AND ( a.dazs IS NULL or a.dazs > l_dat31)              -- учитывать при расчете счета, не закрытые на отчетную дату
-                   AND a.daos <= l_dat31
-                   AND decode( l_ZO, 1,                                   -- брать остаток на конец дня
+                       AND (a.dazs IS NULL or a.dazs > l_dat31)                   -- учитывать при расчете счета, не закрытые на отчетную дату
+                       AND a.daos <= l_dat31
+                       AND decode(l_ZO, 1,                                        -- брать остаток на конец дня
                                OST_KORR(a.acc, l_dat31, 0, a.nbs),        -- c учетом корректирующих по AGG_MONBALS
                                FOST(a.acc, l_dat31) ) <> 0                -- либо без корректирующих по SALDOA
-                   AND (x.datz is null or x.datz > l_dat31)               -- необходимо исключить из расчета договора, закрытые до отчетной даты
-                   AND x.fdat <= l_dat31
+                       AND (x.datz is null or x.datz > l_dat31)                   -- необходимо исключить из расчета договора, закрытые до отчетной даты
+                       AND x.fdat <= l_dat31
                 )
      LOOP
        set_event( p_date, c_f.id, c_f.RNK, 5, p_date, c_f.OBJ, null, l_create_date, l_ZO, c_f.VIDD );

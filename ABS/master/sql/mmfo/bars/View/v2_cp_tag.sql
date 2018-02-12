@@ -7,8 +7,8 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V2_CP_TAG ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V2_CP_TAG ("TAG", "NAME") AS 
-  select tag, name from cp_tag where id=2;
+  CREATE OR REPLACE FORCE VIEW BARS.V2_CP_TAG AS 
+  select tag, name, dict_name from cp_tag where id=2;
 
 PROMPT *** Create  grants  V2_CP_TAG ***
 grant SELECT                                                                 on V2_CP_TAG       to BARSREADER_ROLE;

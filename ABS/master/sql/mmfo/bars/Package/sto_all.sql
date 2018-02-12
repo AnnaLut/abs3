@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/sto_all.sql =========*** Run *** ===
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.STO_ALL is
+create or replace package sto_all is
 /*
     06-02-2012 Sta Регулярные платежи.
     Разрозненные процедуры собраны в один пакедж.
@@ -195,14 +189,14 @@
 
 END STO_ALL;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.STO_ALL is
+create or replace package body sto_all is
 /*
     06-02-2012 Sta Регулярные платежи.
     Разрозненные процедуры собраны в один пакедж.
 */
 --------------------------------------------------------------
 -- используется как версия тела пакета. Название как-нибудь потом поменяем
-    G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :=  'version 1.8.2  24.07.2017';
+    G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :=  'version 1.8.6  12.12.2017';
 
     -- header_version - возвращает версию заголовка пакета STO_ALL
     FUNCTION header_version
@@ -1043,6 +1037,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.STO_ALL is
        l_valid_mobphone   NUMBER := 0;
        l_rnk              NUMBER;
        l_mfo              varchar2(6);
+	   l_nmk				  customer.nmk%type;
+	   l_okpo			  customer.okpo%type;
     BEGIN
        begin
        SELECT rnk
@@ -1155,18 +1151,32 @@ CREATE OR REPLACE PACKAGE BODY BARS.STO_ALL is
              THEN
                 p_status := 0;                                           --(новий)
                 p_status_text := '';
+				
 
-                /*COBUMMFO-4178 підтвердження(акцепт) ф.190 - ДТ 2625 ,2620 на поповнення рах. КТ 2630, 2635, 2620, 2625
-                та комунальні платежі має проводитися автоматично.*/
-                if      substr(case when l_sto_det.dk = 0 then l_sto_det.nlsa else l_sto_det.nlsb end, 1, 4) in ('2620', '2625')
-                    and substr(case when l_sto_det.dk = 0 then l_sto_det.nlsb else l_sto_det.nlsa end, 1, 4) in ('2620', '2625', '2630', '2635')
-                then
-                    l_sto_det.status_id := 1;
-                end if;
 
               begin
                 INSERT INTO sto_det
-                     VALUES l_sto_det;
+                     VALUES l_sto_det
+					 RETURNING idd into l_sto_det.idd;
+				begin
+					select upper(NMK), okpo into l_nmk, l_okpo
+					from customer 
+					where rnk = (select rnk from sto_lst where ids = l_sto_det.ids);
+				exception
+					when no_data_found then null;
+				end;
+
+                /* автопідтвердження ф.190 на погашення кредитів Дт2625-Кт2620
+				поповнення депозитів Дт2625-Кт2630/2635 #COBUMMFO-5328 */
+                if      substr(case when l_sto_det.dk = 1 then l_sto_det.nlsa else l_sto_det.nlsb end, 1, 4) in ('2625')
+                    and substr(case when l_sto_det.dk = 1 then l_sto_det.nlsb else l_sto_det.nlsa end, 1, 4) in ('2620', '2630', '2635')
+					and upper(l_sto_det.POLU) = l_nmk
+					and l_sto_det.okpo = l_okpo
+					and l_sto_det.mfob = l_sto_det.kf
+                then
+                    sto_all.claim_idd(l_sto_det.idd, 1, 0);
+                end if;
+				
               exception when others then
                if (sqlerrm like '%NLSB%') then
                 raise_application_error ( -20001, 'Не корректно введено рахунок отримувача!', false);
@@ -1466,55 +1476,58 @@ CREATE OR REPLACE PACKAGE BODY BARS.STO_ALL is
         l_doc.pdat := sysdate;
 
         gl.ref(l_doc.ref);
+        
+        /*COBUMMFO-5087 Если сумма нулевая - не создаем сам документ, только пишем референс*/
+        if l_doc.s != 0 then 
+            gl.in_doc3(l_doc.ref,
+                       l_doc.tt,
+                       l_doc.vob,
+                       l_doc.ref,
+                       l_doc.pdat,
+                       l_doc.vdat,
+                       l_doc.dk,
+                       l_doc.kv,
+                       l_doc.s,
+                       l_doc.kv2,
+                       l_doc.s2,
+                       null,
+                       gl.bd,
+                       gl.bd,
+                       l_doc.nam_a,
+                       l_doc.nlsa,
+                       l_doc.mfoa,
+                       l_doc.nam_b,
+                       l_doc.nlsb,
+                       l_doc.mfob,
+                       l_doc.nazn,
+                       null,
+                       l_doc.id_a,
+                       l_doc.id_b,
+                       null,
+                       null,
+                       1,
+                       null,
+                       null);
 
-        gl.in_doc3(l_doc.ref,
-                   l_doc.tt,
-                   l_doc.vob,
-                   l_doc.ref,
-                   l_doc.pdat,
-                   l_doc.vdat,
-                   l_doc.dk,
-                   l_doc.kv,
-                   l_doc.s,
-                   l_doc.kv2,
-                   l_doc.s2,
-                   null,
-                   gl.bd,
-                   gl.bd,
-                   l_doc.nam_a,
-                   l_doc.nlsa,
-                   l_doc.mfoa,
-                   l_doc.nam_b,
-                   l_doc.nlsb,
-                   l_doc.mfob,
-                   l_doc.nazn,
-                   null,
-                   l_doc.id_a,
-                   l_doc.id_b,
-                   null,
-                   null,
-                   1,
-                   null,
-                   null);
-
-        gl.dyntt2(sos_   => l_sos,
-                  mod1_  => 0,
-                  mod2_  => 0,
-                  ref_   => l_doc.ref,
-                  vdat1_ => l_doc.vdat,
-                  vdat2_ => null,
-                  tt0_   => l_doc.tt,
-                  dk_    => l_doc.dk,
-                  kva_   => l_doc.kv,
-                  mfoa_  => l_doc.mfoa,
-                  nlsa_  => l_doc.nlsa,
-                  sa_    => l_doc.s,
-                  kvb_   => l_doc.kv2,
-                  mfob_  => l_doc.mfob,
-                  nlsb_  => l_doc.nlsb,
-                  sb_    => l_doc.s2,
-                  sq_    => null,
-                  nom_   => null);
+            gl.dyntt2(sos_   => l_sos,
+                      mod1_  => 0,
+                      mod2_  => 0,
+                      ref_   => l_doc.ref,
+                      vdat1_ => l_doc.vdat,
+                      vdat2_ => null,
+                      tt0_   => l_doc.tt,
+                      dk_    => l_doc.dk,
+                      kva_   => l_doc.kv,
+                      mfoa_  => l_doc.mfoa,
+                      nlsa_  => l_doc.nlsa,
+                      sa_    => l_doc.s,
+                      kvb_   => l_doc.kv2,
+                      mfob_  => l_doc.mfob,
+                      nlsb_  => l_doc.nlsb,
+                      sb_    => l_doc.s2,
+                      sq_    => null,
+                      nom_   => null);
+        end if;
 /*
     paytt(0, l_doc.ref, l_doc.vdat, l_doc.tt, l_doc.dk,l_doc.kv, l_doc.nlsa,l_doc.s, l_doc.kv2, l_doc.nlsb,l_doc.s2);
    for k in (   SELECT a.ttap tt, a.dk
@@ -1572,15 +1585,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.STO_ALL is
 
 end STO_ALL;
 /
- show err;
- 
-PROMPT *** Create  grants  STO_ALL ***
-grant EXECUTE                                                                on STO_ALL         to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on STO_ALL         to STO;
+show err;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/sto_all.sql =========*** End *** ===
- PROMPT ===================================================================================== 
- 
+grant execute on sto_all to bars_access_defrole;
+grant execute on sto_all to sto;

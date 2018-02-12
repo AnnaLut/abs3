@@ -75,6 +75,7 @@ begin
        to_date(:sFdat2||'' 23:59:59'', ''dd.mm.yyyy HH24:MI:SS'')
    and oper.kv != 980
    and oper.tt = ''C14''
+   and oper.kf = sys_context(''bars_context'',''user_mfo'')
    and exists (select null from sw_oper sw where sw.ref = oper.ref)
    and substr(oper.nlsa, 1, 4) in (''1500'', ''1600'')
    and oper.nlsb in (''29090100010082'',
@@ -125,7 +126,7 @@ begin
                      ''29098100240000'',
                      ''29090100250000'',
                      ''29096100260000'')
-order by oper.kf';
+order by oper.mfob';
     l_zpr.xsl_data     := '';
     l_zpr.xsd_data     := '';
 

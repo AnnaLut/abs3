@@ -50,20 +50,6 @@ PROMPT *** ALTER_POLICIES to SWI_MTI_LIST ***
  exec bpa.alter_policies('SWI_MTI_LIST');
 
 
-COMMENT ON TABLE BARS.SWI_MTI_LIST IS 'Список систем грошових переказів';
-COMMENT ON COLUMN BARS.SWI_MTI_LIST.NUM IS 'Порядковий номер системи';
-COMMENT ON COLUMN BARS.SWI_MTI_LIST.ID IS 'Ідентифікатор системи';
-COMMENT ON COLUMN BARS.SWI_MTI_LIST.NAME IS 'Назва системи';
-COMMENT ON COLUMN BARS.SWI_MTI_LIST.DESCRIPTION IS 'Опис системи';
-COMMENT ON COLUMN BARS.SWI_MTI_LIST.OB22_2909 IS 'Код ob22 для прийому платежів';
-COMMENT ON COLUMN BARS.SWI_MTI_LIST.OB22_2809 IS 'Код ob22 для виплати платежів';
-COMMENT ON COLUMN BARS.SWI_MTI_LIST.OB22_KOM IS '';
-COMMENT ON COLUMN BARS.SWI_MTI_LIST.CDOG IS 'Номер договора банка с системой';
-COMMENT ON COLUMN BARS.SWI_MTI_LIST.DDOG IS 'Дата договора банка с системой';
-COMMENT ON COLUMN BARS.SWI_MTI_LIST.KOD_NBU IS '';
-
-
-
 
 PROMPT *** Create  constraint PK_SWIMTILIST ***
 begin   
@@ -162,13 +148,27 @@ exception when others then
  end;
 /
 
+begin EXECUTE IMMEDIATE 'alter TABLE SWI_MTI_LIST add ( kod_nbu varchar2(5) )' ;
+exception when others then   if SQLCODE = -01430 then null;   else raise; end if;   -- ORA-01430: column being added already exists in table
+end;
+/
 
+
+COMMENT ON TABLE BARS.SWI_MTI_LIST IS 'Список систем грошових переказів';
+COMMENT ON COLUMN BARS.SWI_MTI_LIST.NUM IS 'Порядковий номер системи';
+COMMENT ON COLUMN BARS.SWI_MTI_LIST.ID IS 'Ідентифікатор системи';
+COMMENT ON COLUMN BARS.SWI_MTI_LIST.NAME IS 'Назва системи';
+COMMENT ON COLUMN BARS.SWI_MTI_LIST.DESCRIPTION IS 'Опис системи';
+COMMENT ON COLUMN BARS.SWI_MTI_LIST.OB22_2909 IS 'Код ob22 для прийому платежів';
+COMMENT ON COLUMN BARS.SWI_MTI_LIST.OB22_2809 IS 'Код ob22 для виплати платежів';
+COMMENT ON COLUMN BARS.SWI_MTI_LIST.OB22_KOM IS '';
+COMMENT ON COLUMN BARS.SWI_MTI_LIST.CDOG IS 'Номер договора банка с системой';
+COMMENT ON COLUMN BARS.SWI_MTI_LIST.DDOG IS 'Дата договора банка с системой';
+COMMENT ON COLUMN BARS.SWI_MTI_LIST.KOD_NBU IS '';
 
 PROMPT *** Create  grants  SWI_MTI_LIST ***
-grant SELECT                                                                 on SWI_MTI_LIST    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SWI_MTI_LIST    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SWI_MTI_LIST    to START1;
-grant SELECT                                                                 on SWI_MTI_LIST    to UPLD;
 
 
 

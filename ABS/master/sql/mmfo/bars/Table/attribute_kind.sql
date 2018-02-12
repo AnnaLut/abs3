@@ -56,18 +56,21 @@ end;
 /
 
 
+-- Add/modify columns 
+alter table ATTRIBUTE_KIND modify attribute_code VARCHAR2(50 CHAR);
+
 
 
 PROMPT *** ALTER_POLICIES to ATTRIBUTE_KIND ***
  exec bpa.alter_policies('ATTRIBUTE_KIND');
 
 
-COMMENT ON TABLE BARS.ATTRIBUTE_KIND IS 'Довідник атрибутів об'єктів. Базова таблиця механізму атрибутів';
+COMMENT ON TABLE BARS.ATTRIBUTE_KIND IS 'Довідник атрибутів об''єктів. Базова таблиця механізму атрибутів';
 COMMENT ON COLUMN BARS.ATTRIBUTE_KIND.ID IS 'Ідентифікатор атрибуту';
 COMMENT ON COLUMN BARS.ATTRIBUTE_KIND.ATTRIBUTE_CODE IS 'Код атрибуту';
 COMMENT ON COLUMN BARS.ATTRIBUTE_KIND.ATTRIBUTE_NAME IS 'Назва атрибуту';
 COMMENT ON COLUMN BARS.ATTRIBUTE_KIND.ATTRIBUTE_TYPE_ID IS 'Тип атрибуту - стаціонарні атрибути зберігають свої значення в таблицях угод, динамічні атрибути зберігають значення по угоді в вертикальних таблицях, обчислювальні атрибути не зберігають значення, а завжди його вираховують для угоди';
-COMMENT ON COLUMN BARS.ATTRIBUTE_KIND.OBJECT_TYPE_ID IS 'Тип об'єктів, яким властивий даний атрибут';
+COMMENT ON COLUMN BARS.ATTRIBUTE_KIND.OBJECT_TYPE_ID IS 'Тип об''єктів, яким властивий даний атрибут';
 COMMENT ON COLUMN BARS.ATTRIBUTE_KIND.VALUE_TYPE_ID IS 'Тип значення атрибуту';
 COMMENT ON COLUMN BARS.ATTRIBUTE_KIND.VALUE_TABLE_OWNER IS '';
 COMMENT ON COLUMN BARS.ATTRIBUTE_KIND.VALUE_TABLE_NAME IS '';
@@ -82,90 +85,6 @@ COMMENT ON COLUMN BARS.ATTRIBUTE_KIND.SAVE_HISTORY_FLAG IS '';
 COMMENT ON COLUMN BARS.ATTRIBUTE_KIND.GET_VALUE_FUNCTION IS '';
 COMMENT ON COLUMN BARS.ATTRIBUTE_KIND.SET_VALUE_PROCEDURES IS '';
 COMMENT ON COLUMN BARS.ATTRIBUTE_KIND.STATE_ID IS 'Статус, в якому перебуває атрибут (режим конструювання, активний, закритий)';
-
-
-
-
-PROMPT *** Create  constraint SYS_C00138722 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ATTRIBUTE_KIND ADD CHECK (ATTRIBUTE_NAME IS NOT NULL) DEFERRABLE INITIALLY DEFERRED ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C00138723 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ATTRIBUTE_KIND ADD CHECK (VALUE_TYPE_ID IS NOT NULL) DEFERRABLE INITIALLY DEFERRED ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C00138724 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ATTRIBUTE_KIND ADD CHECK (SMALL_VALUE_FLAG IS NOT NULL) DEFERRABLE INITIALLY DEFERRED ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C00138725 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ATTRIBUTE_KIND ADD CHECK (VALUE_BY_DATE_FLAG IS NOT NULL) DEFERRABLE INITIALLY DEFERRED ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C00138726 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ATTRIBUTE_KIND ADD CHECK (MULTI_VALUES_FLAG IS NOT NULL) DEFERRABLE INITIALLY DEFERRED ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C00138727 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ATTRIBUTE_KIND ADD CHECK (SAVE_HISTORY_FLAG IS NOT NULL) DEFERRABLE INITIALLY DEFERRED ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C00138728 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ATTRIBUTE_KIND ADD CHECK (OBJECT_TYPE_ID IS NOT NULL) DEFERRABLE INITIALLY DEFERRED ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
 
 
 
@@ -244,12 +163,14 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0025704 ***
+PROMPT *** Create  constraint UNIQUE (SET_VALUE_PROCEDURES) ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ATTRIBUTE_KIND ADD CHECK (OBJECT_TYPE_ID IS NOT NULL) DEFERRABLE INITIALLY DEFERRED ENABLE';
+  ALTER TABLE BARS.ATTRIBUTE_KIND ADD UNIQUE (SET_VALUE_PROCEDURES)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLD  ENABLE';
 exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 or sqlcode=-2329 then null; else raise; end if;
  end;
 /
 
@@ -316,33 +237,14 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0025710 ***
+PROMPT *** Create  constraint SYS_C0025704 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ATTRIBUTE_KIND ADD UNIQUE (SET_VALUE_PROCEDURES)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLD  ENABLE';
+  ALTER TABLE BARS.ATTRIBUTE_KIND ADD CHECK (OBJECT_TYPE_ID IS NOT NULL) DEFERRABLE INITIALLY DEFERRED ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
-
-
-
-
-PROMPT *** Create  index SYS_C0025710 ***
-begin   
- execute immediate '
-  CREATE UNIQUE INDEX BARS.SYS_C0025710 ON BARS.ATTRIBUTE_KIND (SYS_NC0001800019$) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLD ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
 
 PROMPT *** Create  index UK_ATTRIBUTE_KIND_CODE ***
 begin   
@@ -372,11 +274,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  ATTRIBUTE_KIND ***
-grant SELECT                                                                 on ATTRIBUTE_KIND  to BARSR;
-grant SELECT                                                                 on ATTRIBUTE_KIND  to BARSREADER_ROLE;
 grant SELECT                                                                 on ATTRIBUTE_KIND  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ATTRIBUTE_KIND  to BARS_DM;
-grant SELECT                                                                 on ATTRIBUTE_KIND  to UPLD;
 
 
 

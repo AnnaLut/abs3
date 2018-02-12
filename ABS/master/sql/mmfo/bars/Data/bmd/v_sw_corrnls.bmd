@@ -161,10 +161,10 @@ begin
   end if;
 
   -- добавляем описание процедур
-  bars_metabase.add_actiontbl(l_tabid, 'DELETE', 'P_EDIT_BICACC(2,:KV,:NLS,:BIC,:ACC,:TRANSIT,:VOSTRO)');
+  bars_metabase.add_actiontbl(l_tabid, 'DELETE', 'P_EDIT_BICACC(2,:KV,:NLS,:BIC,:ACC,:TRANSIT,:THEIR_ACC)');
 
   -- добавляем описание процедур
-  bars_metabase.add_actiontbl(l_tabid, 'INSERT', 'P_EDIT_BICACC(1,:KV,:NLS,:BIC,:ACC,:TRANSIT,:VOSTRO)');
+  bars_metabase.add_actiontbl(l_tabid, 'INSERT', 'P_EDIT_BICACC(1,:KV,:NLS,:BIC,:ACC,:TRANSIT,:THEIR_ACC)');
 
   -- добавляем описание процедур
   bars_metabase.add_actiontbl(l_tabid, 'UPDATE', 'P_EDIT_BICACC(0,:KV,:NLS,:BIC,:ACC,:TRANSIT,:THEIR_ACC)');

@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/cig_mgr.sql =========*** Run *** ===
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.CIG_MGR is
+create or replace package cig_mgr is
 
   --
   -- Автор  : OLEG
@@ -61,12 +55,12 @@
   -- @p_interval - интервал
   --
   procedure job_interval(p_job_id in varchar2, p_interval in varchar2);
-
+  
   procedure create_job_cig_mmfo;
-
+  
 end cig_mgr;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.CIG_MGR is
+create or replace package body cig_mgr is
 
   --
   -- Автор  : OLEG
@@ -111,7 +105,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.CIG_MGR is
   G_DOG_NONINSTDATA constant number := 5;
 
   g_currbranch varchar2(30) := null;
-
+  g_newnbs          number := newnbs.get_state;  -- Признак перехода на новый план счетов. (1-перешли, 0-нет)
+  
   TYPE dog_general_rec_type IS RECORD(
     nd                cc_deal.nd%TYPE,
     rnk               accounts.rnk%TYPE,
@@ -1572,7 +1567,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CIG_MGR is
     l_pdate  := trunc(p_date);
     l_pdatel := trunc(p_date, 'mm') - 1;
     dbms_application_info.set_action('Query...');
-    if (p_dtype = 1) then
+ if (p_dtype = 1) then
       OPEN p_recordset FOR
          select q.nd,
                q.rnk,
@@ -2065,22 +2060,51 @@ CREATE OR REPLACE PACKAGE BODY BARS.CIG_MGR is
                AND n.acc = a.acc
                AND a.nbs in ('2600', '2650')
                AND cd.vidd in (10, 110)) q,
-               (select max(rnk) as rnk,
-                       max(fact_terr_id) as fact_terr_id,
-                       max(fact_addr) as fact_addr,
-                       max(fact_zip) as fact_zip,
-                       max(reg_terr_id) as reg_terr_id,
-                       max(reg_addr) as reg_addr,
-                       max(reg_zip) as reg_zip
-                  from (select rnk,
-                               decode(type_id, 2, territory_id, null) as fact_terr_id,
-                               decode(type_id, 2, address, null) as fact_addr,
-                               decode(type_id, 2, zip, null) as fact_zip,
-                               decode(type_id, 1, territory_id, null) as reg_terr_id,
-                               decode(type_id, 1, address, null) as reg_addr,
-                               decode(type_id, 1, zip, null) as reg_zip
-                          from customer_address)
-                 group by rnk) c2
+(SELECT rnk as rnk, --
+       nvl(fact_terr_id, reg_terr_id) as fact_terr_id, --
+       NVL(CASE WHEN fact_type_id = 2 AND fact_terr_id = -1 THEN
+                     DECODE(domain2,   NULL, '', trim(domain2) || ', ') ||
+                     DECODE(region2,   NULL, '', trim(region2) || ', ') ||
+                     DECODE(locality2, NULL, '', trim(locality2) || ', ') || trim(address2)
+                WHEN fact_type_id = 2 AND fact_terr_id > 0  THEN
+                     address2
+                ELSE NULL   END, --NVL-- Если нет адр.Рег. выводим Факт.адр.
+                     DECODE(domain1,   NULL, '', trim(domain1) || ', ') ||
+                     DECODE(region1,   NULL, '', trim(region1) || ', ') ||
+                     DECODE(locality1, NULL, '', trim(locality1) || ', ') || trim(address1)) as fact_addr, --
+       NVL(fact_zip, reg_zip) as fact_zip, --       
+       reg_terr_id            as reg_terr_id,--
+       NVL(CASE WHEN reg_type_id = 1 AND NVL(reg_terr_id, -1) = -1 THEN
+                     DECODE(domain1,   NULL, '', trim(domain1) || ', ') ||
+                     DECODE(region1,   NULL, '', trim(region1) || ', ') ||
+                     DECODE(locality1, NULL, '', trim(locality1) || ', ') || trim(address1)
+                WHEN reg_type_id = 1 AND reg_terr_id > 0           THEN
+                     address1
+                ELSE NULL END,  --NVL-- Если нет Факт.адр. выводим адр.Рег.
+                     DECODE(domain2,   NULL, '', trim(domain2) || ', ') ||
+                     DECODE(region2,   NULL, '', trim(region2) || ', ') ||
+                     DECODE(locality2, NULL, '', trim(locality2) || ', ') || trim(address2)) as reg_addr, --
+       NVL(reg_zip, fact_zip) as reg_zip --
+  FROM (SELECT rnk,
+               min(DECODE(territory_id, null, -1, territory_id)) as territory_id,
+               MAX(DECODE(type_id, 1,   type_id,  NULL)) AS reg_type_id,
+               MAX(DECODE(type_id, 2,   type_id,  NULL)) AS fact_type_id,
+               MAX(DECODE(type_id, 2,   nvl(territory_id, -1), -1)) AS fact_terr_id,
+               MAX(DECODE(type_id, 2,   zip,      NULL)) AS fact_zip,
+               MAX(DECODE(type_id, 2,   domain,   NULL)) AS domain2,
+               MAX(DECODE(type_id, 2,   region,   NULL)) AS region2,
+               MAX(DECODE(type_id, 2,   locality, NULL)) AS locality2,
+               MAX(DECODE(type_id, 2,   address,  NULL)) AS address2,
+               MAX(DECODE(type_id, 1,   zip,      NULL)) AS reg_zip,
+               MAX(DECODE(type_id, 1,   domain,   NULL)) AS domain1,
+               MAX(DECODE(type_id, 1,   region,   NULL)) AS region1,
+               MAX(DECODE(type_id, 1,   locality, NULL)) AS locality1,
+               MAX(DECODE(type_id, 1,   address,  NULL)) AS address1,
+               MAX(DECODE(type_id, 1,   nvl(territory_id, -1), -1)) AS reg_terr_id
+          FROM bars.customer_address
+         WHERE 1=1 /*rnk IN (16784021, 37853721, 95127921, 95497721, 151213521, 277793721)*/
+           AND type_id < 3
+         GROUP BY rnk) ) c2
          where q.rnk = c2.rnk(+);
     elsif (p_dtype = G_CONTRACT_BPK) then
       OPEN p_recordset FOR 'select tab.nd,
@@ -2503,26 +2527,52 @@ select
                    and w.tag(+) = ''CIGPO''
                    and aa.rnk = p.rnk(+)
                    and c.country = cty.k040(+)) tab,
-                       tabval$global t, (select max(rnk) as rnk,
-                   max(fact_terr_id) as fact_terr_id,
-                   max(fact_addr) as fact_addr,
-                   max(fact_zip) as fact_zip,
-                   nvl(max(decode(reg_terr_id,0,null,reg_terr_id)),-1) as reg_terr_id,
-                   case when max(reg_terr_id) is not null then max(reg_addr)
-                   else trim(max(domain) || '' '' || max(region) || '' '' || max(locality) || '' '' || max(reg_terr_id)) end as reg_addr,
-                   max(reg_zip) as reg_zip
-              from (select rnk,
-                           null as fact_terr_id,
-                           null as fact_addr,
-                           null as fact_zip,
-                           decode(type_id, 1, territory_id, null) as reg_terr_id,
-                           decode(type_id, 1, address, null) as reg_addr,
-                           decode(type_id, 1, zip, null) as reg_zip,
-                           decode(type_id, 1, domain, null) as domain,
-                           decode(type_id, 1, region, null) as region,
-                           decode(type_id, 1, locality, null) as locality
-                      from customer_address where type_id = 1)
-             group by rnk) c2
+                       tabval$global t,
+(SELECT rnk as rnk, --
+       nvl(fact_terr_id, reg_terr_id) as fact_terr_id, --
+       NVL(CASE WHEN fact_type_id = 2 AND fact_terr_id = -1 THEN
+                     DECODE(domain2,   NULL, '''', trim(domain2)   || '', '') ||
+                     DECODE(region2,   NULL, '''', trim(region2)   || '', '') ||
+                     DECODE(locality2, NULL, '''', trim(locality2) || '', '') || trim(address2)
+                WHEN fact_type_id = 2 AND fact_terr_id > 0  THEN
+                     address2
+                ELSE NULL   END, --NVL-- Если нет адр.Рег. выводим Факт.адр.
+                     DECODE(domain1,   NULL, '''', trim(domain1)   || '', '') ||
+                     DECODE(region1,   NULL, '''', trim(region1)   || '', '') ||
+                     DECODE(locality1, NULL, '''', trim(locality1) || '', '') || trim(address1)) as fact_addr, --
+       NVL(fact_zip, reg_zip) as fact_zip, --       
+       reg_terr_id            as reg_terr_id,--
+       NVL(CASE WHEN reg_type_id = 1 AND NVL(reg_terr_id, -1) = -1 THEN
+                     DECODE(domain1,   NULL, '''', trim(domain1)   || '', '') ||
+                     DECODE(region1,   NULL, '''', trim(region1)   || '', '') ||
+                     DECODE(locality1, NULL, '''', trim(locality1) || '', '') || trim(address1)
+                WHEN reg_type_id = 1 AND reg_terr_id > 0           THEN
+                     address1
+                ELSE NULL END,  --NVL-- Если нет Факт.адр. выводим адр.Рег.
+                     DECODE(domain2,   NULL, '''', trim(domain2)   || '', '') ||
+                     DECODE(region2,   NULL, '''', trim(region2)   || '', '') ||
+                     DECODE(locality2, NULL, '''', trim(locality2) || '', '') || trim(address2)) as reg_addr, --
+       NVL(reg_zip, fact_zip) as reg_zip --
+  FROM (SELECT rnk,
+               min(DECODE(territory_id, null, -1, territory_id)) as territory_id,
+               MAX(DECODE(type_id, 1,   type_id,  NULL)) AS reg_type_id,
+               MAX(DECODE(type_id, 2,   type_id,  NULL)) AS fact_type_id,
+               MAX(DECODE(type_id, 2,   nvl(territory_id, -1), -1)) AS fact_terr_id,
+               MAX(DECODE(type_id, 2,   zip,      NULL)) AS fact_zip,
+               MAX(DECODE(type_id, 2,   domain,   NULL)) AS domain2,
+               MAX(DECODE(type_id, 2,   region,   NULL)) AS region2,
+               MAX(DECODE(type_id, 2,   locality, NULL)) AS locality2,
+               MAX(DECODE(type_id, 2,   address,  NULL)) AS address2,
+               MAX(DECODE(type_id, 1,   zip,      NULL)) AS reg_zip,
+               MAX(DECODE(type_id, 1,   domain,   NULL)) AS domain1,
+               MAX(DECODE(type_id, 1,   region,   NULL)) AS region1,
+               MAX(DECODE(type_id, 1,   locality, NULL)) AS locality1,
+               MAX(DECODE(type_id, 1,   address,  NULL)) AS address1,
+               MAX(DECODE(type_id, 1,   nvl(territory_id, -1), -1)) AS reg_terr_id
+          FROM bars.customer_address
+         WHERE 1=1 -- rnk IN (16784021, 37853721, 95127921, 95497721, 151213521, 277793721)
+           AND type_id < 3
+         GROUP BY rnk) ) c2               
                        where tab.kv = t.kv and tab.rnk = c2.rnk(+)
                        and 1 = nvl((select cds.is_sync from cig_dog_sync_params cds where cds.nd = tab.nd and cds.data_type = 3),1)'
         using l_pdatef, l_pdate, l_pdate, l_pdatef, l_pdate, l_pdate;
@@ -2803,7 +2853,7 @@ select
                          from nd_acc na, accounts a2
                           where na.nd = o.nd
                                 and na.acc = a2.acc
-                                and a2.NBS = ''3579''
+                                and a2.NBS in (select distinct decode (g_newnbs,1,t.r020_new,''3579'' ) from transfer_2017 t where t.r020_old = ''3579'') -- потом можно удалить и прописать в in (''3570'',''3578'')
                                 and a2.dazs is null) as acc2
                           from (select nd, datd, datd2, acc, sd, acc_9129, acc_2067, acc_8000, null as deldate
                                 from acc_over ao
@@ -2962,7 +3012,7 @@ select           aa.nd,
                          from nd_acc na, accounts a2
                           where na.nd = o.nd
                                 and na.acc = a2.acc
-                                and a2.NBS = ''3579''
+                                and a2.NBS in (select distinct decode (g_newnbs,1,t.r020_new,''3579'' ) from transfer_2017 t where t.r020_old = ''3579'') -- потом можно удалить и прописать в in (''3570'',''3578'')
                                 and a2.dazs is null) as acc2
                           from (select nd, datd, datd2, acc, sd, acc_9129, acc_2067, acc_8000, null as deldate
                                 from acc_over ao
@@ -3000,22 +3050,52 @@ select           aa.nd,
    and c.country = cty.k040(+)
    and to_number(nvl(c.sed, 0)) = 91
 ) tab,
-                   tabval$global t, (select max(rnk) as rnk,
-                   max(fact_terr_id) as fact_terr_id,
-                   max(fact_addr) as fact_addr,
-                   max(fact_zip) as fact_zip,
-                   max(reg_terr_id) as reg_terr_id,
-                   max(reg_addr) as reg_addr,
-                   max(reg_zip) as reg_zip
-              from (select rnk,
-                           decode(type_id, 2, territory_id, null) as fact_terr_id,
-                           decode(type_id, 2, address, null) as fact_addr,
-                           decode(type_id, 2, zip, null) as fact_zip,
-                           decode(type_id, 1, territory_id, null) as reg_terr_id,
-                           decode(type_id, 1, address, null) as reg_addr,
-                           decode(type_id, 1, zip, null) as reg_zip
-                      from customer_address)
-             group by rnk) c2
+     tabval$global t,
+(SELECT rnk as rnk, --
+       nvl(fact_terr_id, reg_terr_id) as fact_terr_id, --
+       NVL(CASE WHEN fact_type_id = 2 AND fact_terr_id = -1 THEN
+                     DECODE(domain2,   NULL, '''', trim(domain2)   || '', '') ||
+                     DECODE(region2,   NULL, '''', trim(region2)   || '', '') ||
+                     DECODE(locality2, NULL, '''', trim(locality2) || '', '') || trim(address2)
+                WHEN fact_type_id = 2 AND fact_terr_id > 0  THEN
+                     address2
+                ELSE NULL   END, --NVL-- Если нет адр.Рег. выводим Факт.адр.
+                     DECODE(domain1,   NULL, '''', trim(domain1)   || '', '') ||
+                     DECODE(region1,   NULL, '''', trim(region1)   || '', '') ||
+                     DECODE(locality1, NULL, '''', trim(locality1) || '', '') || trim(address1)) as fact_addr, --
+       NVL(fact_zip, reg_zip) as fact_zip, --       
+       reg_terr_id            as reg_terr_id,--
+       NVL(CASE WHEN reg_type_id = 1 AND NVL(reg_terr_id, -1) = -1 THEN
+                     DECODE(domain1,   NULL, '''', trim(domain1)   || '', '') ||
+                     DECODE(region1,   NULL, '''', trim(region1)   || '', '') ||
+                     DECODE(locality1, NULL, '''', trim(locality1) || '', '') || trim(address1)
+                WHEN reg_type_id = 1 AND reg_terr_id > 0           THEN
+                     address1
+                ELSE NULL END,  --NVL-- Если нет Факт.адр. выводим адр.Рег.
+                     DECODE(domain2,   NULL, '''', trim(domain2)   || '', '') ||
+                     DECODE(region2,   NULL, '''', trim(region2)   || '', '') ||
+                     DECODE(locality2, NULL, '''', trim(locality2) || '', '') || trim(address2)) as reg_addr, --
+       NVL(reg_zip, fact_zip) as reg_zip --
+  FROM (SELECT rnk,
+               min(DECODE(territory_id, null, -1, territory_id)) as territory_id,
+               MAX(DECODE(type_id, 1,   type_id,  NULL)) AS reg_type_id,
+               MAX(DECODE(type_id, 2,   type_id,  NULL)) AS fact_type_id,
+               MAX(DECODE(type_id, 2,   nvl(territory_id, -1), -1)) AS fact_terr_id,
+               MAX(DECODE(type_id, 2,   zip,      NULL)) AS fact_zip,
+               MAX(DECODE(type_id, 2,   domain,   NULL)) AS domain2,
+               MAX(DECODE(type_id, 2,   region,   NULL)) AS region2,
+               MAX(DECODE(type_id, 2,   locality, NULL)) AS locality2,
+               MAX(DECODE(type_id, 2,   address,  NULL)) AS address2,
+               MAX(DECODE(type_id, 1,   zip,      NULL)) AS reg_zip,
+               MAX(DECODE(type_id, 1,   domain,   NULL)) AS domain1,
+               MAX(DECODE(type_id, 1,   region,   NULL)) AS region1,
+               MAX(DECODE(type_id, 1,   locality, NULL)) AS locality1,
+               MAX(DECODE(type_id, 1,   address,  NULL)) AS address1,
+               MAX(DECODE(type_id, 1,   nvl(territory_id, -1), -1)) AS reg_terr_id
+          FROM bars.customer_address
+         WHERE 1=1 -- rnk IN (16784021, 37853721, 95127921, 95497721, 151213521, 277793721)
+           AND type_id < 3
+         GROUP BY rnk) ) c2
                        where tab.kv = t.kv and tab.rnk = c2.rnk(+)
                        and 1 = nvl((select cds.is_sync from cig_dog_sync_params cds where cds.nd = tab.nd and cds.data_type = 4),1)'
         using l_pdatef, l_pdate, l_pdatef, l_pdate;
@@ -3452,22 +3532,51 @@ select           aa.nd,
                 and a8.ostc<0*/
                 --and not exists (select nd from cig_dog_general where nd = cd.nd)
                 ) q,
-               (select max(rnk) as rnk,
-                       max(fact_terr_id) as fact_terr_id,
-                       max(fact_addr) as fact_addr,
-                       max(fact_zip) as fact_zip,
-                       max(reg_terr_id) as reg_terr_id,
-                       max(reg_addr) as reg_addr,
-                       max(reg_zip) as reg_zip
-                  from (select rnk,
-                               decode(type_id, 2, territory_id, null) as fact_terr_id,
-                               decode(type_id, 2, address, null) as fact_addr,
-                               decode(type_id, 2, zip, null) as fact_zip,
-                               decode(type_id, 1, territory_id, null) as reg_terr_id,
-                               decode(type_id, 1, address, null) as reg_addr,
-                               decode(type_id, 1, zip, null) as reg_zip
-                          from customer_address)
-                 group by rnk) c2
+(SELECT rnk as rnk, --
+       nvl(fact_terr_id, reg_terr_id) as fact_terr_id, --
+       NVL(CASE WHEN fact_type_id = 2 AND fact_terr_id = -1 THEN
+                     DECODE(domain2,   NULL, '', trim(domain2) || ', ') ||
+                     DECODE(region2,   NULL, '', trim(region2) || ', ') ||
+                     DECODE(locality2, NULL, '', trim(locality2) || ', ') || trim(address2)
+                WHEN fact_type_id = 2 AND fact_terr_id > 0  THEN
+                     address2
+                ELSE NULL   END, --NVL-- Если нет адр.Рег. выводим Факт.адр.
+                     DECODE(domain1,   NULL, '', trim(domain1) || ', ') ||
+                     DECODE(region1,   NULL, '', trim(region1) || ', ') ||
+                     DECODE(locality1, NULL, '', trim(locality1) || ', ') || trim(address1)) as fact_addr, --
+       NVL(fact_zip, reg_zip) as fact_zip, --       
+       reg_terr_id            as reg_terr_id,--
+       NVL(CASE WHEN reg_type_id = 1 AND NVL(reg_terr_id, -1) = -1 THEN
+                     DECODE(domain1,   NULL, '', trim(domain1) || ', ') ||
+                     DECODE(region1,   NULL, '', trim(region1) || ', ') ||
+                     DECODE(locality1, NULL, '', trim(locality1) || ', ') || trim(address1)
+                WHEN reg_type_id = 1 AND reg_terr_id > 0           THEN
+                     address1
+                ELSE NULL END,  --NVL-- Если нет Факт.адр. выводим адр.Рег.
+                     DECODE(domain2,   NULL, '', trim(domain2) || ', ') ||
+                     DECODE(region2,   NULL, '', trim(region2) || ', ') ||
+                     DECODE(locality2, NULL, '', trim(locality2) || ', ') || trim(address2)) as reg_addr, --
+       NVL(reg_zip, fact_zip) as reg_zip --
+  FROM (SELECT rnk,
+               min(DECODE(territory_id, null, -1, territory_id)) as territory_id,
+               MAX(DECODE(type_id, 1,   type_id,  NULL)) AS reg_type_id,
+               MAX(DECODE(type_id, 2,   type_id,  NULL)) AS fact_type_id,
+               MAX(DECODE(type_id, 2,   nvl(territory_id, -1), -1)) AS fact_terr_id,
+               MAX(DECODE(type_id, 2,   zip,      NULL)) AS fact_zip,
+               MAX(DECODE(type_id, 2,   domain,   NULL)) AS domain2,
+               MAX(DECODE(type_id, 2,   region,   NULL)) AS region2,
+               MAX(DECODE(type_id, 2,   locality, NULL)) AS locality2,
+               MAX(DECODE(type_id, 2,   address,  NULL)) AS address2,
+               MAX(DECODE(type_id, 1,   zip,      NULL)) AS reg_zip,
+               MAX(DECODE(type_id, 1,   domain,   NULL)) AS domain1,
+               MAX(DECODE(type_id, 1,   region,   NULL)) AS region1,
+               MAX(DECODE(type_id, 1,   locality, NULL)) AS locality1,
+               MAX(DECODE(type_id, 1,   address,  NULL)) AS address1,
+               MAX(DECODE(type_id, 1,   nvl(territory_id, -1), -1)) AS reg_terr_id
+          FROM bars.customer_address
+         WHERE 1=1-- rnk IN (16784021, 37853721, 95127921, 95497721, 151213521, 277793721)
+           AND type_id < 3
+         GROUP BY rnk) ) c2
          where q.rnk = c2.rnk(+);
     elsif (p_dtype = 6) then
       OPEN p_recordset FOR 'select q.nd,
@@ -3775,27 +3884,52 @@ select           aa.nd,
                           ''1527'')
         --and not exists (select nd from V_CIG_DOG_GENERAL where nd = cd.nd)
         ) q,
-       (select max(rnk) as rnk,
-               nvl(max(decode(fact_terr_id,0,null,fact_terr_id)),-1) as fact_terr_id,
-               case when max(fact_terr_id) is not null then max(fact_addr)
-               else trim(max(domain) || '' '' || max(region) || '' '' || max(locality) || '' '' || max(fact_terr_id)) end as fact_addr,
-               max(fact_zip) as fact_zip,
-               nvl(max(decode(reg_terr_id,0,null,reg_terr_id)),-1) as reg_terr_id,
-               case when max(reg_terr_id) is not null then max(reg_addr)
-               else trim(max(domain) || '' '' || max(region) || '' '' || max(locality) || '' '' || max(reg_terr_id)) end as reg_addr,
-               max(reg_zip) as reg_zip
-          from (select rnk,
-                       decode(type_id, 2, territory_id, null) as fact_terr_id,
-                       decode(type_id, 2, address, null) as fact_addr,
-                       decode(type_id, 2, zip, null) as fact_zip,
-                       decode(type_id, 1, territory_id, null) as reg_terr_id,
-                       decode(type_id, 1, address, null) as reg_addr,
-                       decode(type_id, 1, zip, null) as reg_zip,
-                       decode(type_id, 1, domain, null) as domain,
-                       decode(type_id, 1, region, null) as region,
-                       decode(type_id, 1, locality, null) as locality
-                  from customer_address)
-         group by rnk) c2
+(SELECT rnk as rnk, --
+       nvl(fact_terr_id, reg_terr_id) as fact_terr_id, --
+       NVL(CASE WHEN fact_type_id = 2 AND fact_terr_id = -1 THEN
+                     DECODE(domain2,   NULL, '''', trim(domain2)   || '', '') ||
+                     DECODE(region2,   NULL, '''', trim(region2)   || '', '') ||
+                     DECODE(locality2, NULL, '''', trim(locality2) || '', '') || trim(address2)
+                WHEN fact_type_id = 2 AND fact_terr_id > 0  THEN
+                     address2
+                ELSE NULL   END, --NVL-- Если нет адр.Рег. выводим Факт.адр.
+                     DECODE(domain1,   NULL, '''', trim(domain1)   || '', '') ||
+                     DECODE(region1,   NULL, '''', trim(region1)   || '', '') ||
+                     DECODE(locality1, NULL, '''', trim(locality1) || '', '') || trim(address1)) as fact_addr, --
+       NVL(fact_zip, reg_zip) as fact_zip, --       
+       reg_terr_id            as reg_terr_id,--
+       NVL(CASE WHEN reg_type_id = 1 AND NVL(reg_terr_id, -1) = -1 THEN
+                     DECODE(domain1,   NULL, '''', trim(domain1)   || '', '') ||
+                     DECODE(region1,   NULL, '''', trim(region1)   || '', '') ||
+                     DECODE(locality1, NULL, '''', trim(locality1) || '', '') || trim(address1)
+                WHEN reg_type_id = 1 AND reg_terr_id > 0           THEN
+                     address1
+                ELSE NULL END,  --NVL-- Если нет Факт.адр. выводим адр.Рег.
+                     DECODE(domain2,   NULL, '''', trim(domain2)   || '', '') ||
+                     DECODE(region2,   NULL, '''', trim(region2)   || '', '') ||
+                     DECODE(locality2, NULL, '''', trim(locality2) || '', '') || trim(address2)) as reg_addr, --
+       NVL(reg_zip, fact_zip) as reg_zip --
+  FROM (SELECT rnk,
+               min(DECODE(territory_id, null, -1, territory_id)) as territory_id,
+               MAX(DECODE(type_id, 1,   type_id,  NULL)) AS reg_type_id,
+               MAX(DECODE(type_id, 2,   type_id,  NULL)) AS fact_type_id,
+               MAX(DECODE(type_id, 2,   nvl(territory_id, -1), -1)) AS fact_terr_id,
+               MAX(DECODE(type_id, 2,   zip,      NULL)) AS fact_zip,
+               MAX(DECODE(type_id, 2,   domain,   NULL)) AS domain2,
+               MAX(DECODE(type_id, 2,   region,   NULL)) AS region2,
+               MAX(DECODE(type_id, 2,   locality, NULL)) AS locality2,
+               MAX(DECODE(type_id, 2,   address,  NULL)) AS address2,
+               MAX(DECODE(type_id, 1,   zip,      NULL)) AS reg_zip,
+               MAX(DECODE(type_id, 1,   domain,   NULL)) AS domain1,
+               MAX(DECODE(type_id, 1,   region,   NULL)) AS region1,
+               MAX(DECODE(type_id, 1,   locality, NULL)) AS locality1,
+               MAX(DECODE(type_id, 1,   address,  NULL)) AS address1,
+               MAX(DECODE(type_id, 1,   nvl(territory_id, -1), -1)) AS reg_terr_id
+          FROM bars.customer_address
+         WHERE 1=1 -- rnk IN (16784021, 37853721, 95127921, 95497721, 151213521, 277793721)
+           AND type_id < 3
+         GROUP BY rnk)
+       ) c2
  where q.rnk = c2.rnk(+) and q.res_sum != 0'
         using l_pdatel, l_pdatef, l_pdatef;
     end if;
@@ -5140,6 +5274,7 @@ begin
   select '/' || GetGlobalOption('MFO') || '/' into g_currbranch from dual;
 end cig_mgr;
 /
+
  show err;
  
 PROMPT *** Create  grants  CIG_MGR ***

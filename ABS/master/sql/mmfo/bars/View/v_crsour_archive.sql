@@ -1,5 +1,3 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_CRSOUR_ARCHIVE.sql =========*** Run *
 PROMPT ===================================================================================== 
@@ -8,7 +6,7 @@ PROMPT =========================================================================
 PROMPT *** Create  view V_CRSOUR_ARCHIVE ***
 
   CREATE OR REPLACE FORCE VIEW BARS.V_CRSOUR_ARCHIVE ("ND", "DEAL_MFO", "DEAL_NUMBER", "CURRENCY_CODE", "PARTY_ID", "PARTY_MFO", "PARTY_NAME", "START_DATE", "EXPIRY_DATE", "DEAL_AMOUNT", "ACCOUNT_REST", "INTEREST_RATE", "MAIN_ACCOUNT", "INTEREST_ACCOUNT", "PARTY_MAIN_ACCOUNT", "PARTY_INTEREST_ACCOUNT", "STATE_CODE", "STATE_NAME", "ACC") AS 
-  select d.nd,
+	select d.nd,
        d.kf deal_mfo,
        d.cc_id deal_number,
        a.kv currency_code,
@@ -50,7 +48,8 @@ PROMPT *** Create  view V_CRSOUR_ARCHIVE ***
        end
   left join accounts aa
     on aa.acc = ia.acra
- where d.vidd in (3902,3903) and d.sos = 15;
+ where d.vidd in (3902,3903) and d.sos = 15;  
+
 
 PROMPT *** Create  grants  V_CRSOUR_ARCHIVE ***
 grant SELECT                                                                 on V_CRSOUR_ARCHIVE to BARSREADER_ROLE;

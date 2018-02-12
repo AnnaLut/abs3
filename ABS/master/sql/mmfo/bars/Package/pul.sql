@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/pul.sql =========*** Run *** =======
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.PUL IS
+CREATE OR REPLACE PACKAGE BARS.pul IS
 --***************************************************************************--
 --                      BARS Global Variables Pool
 --                   (C) Unity-BARS Version 2000-2006
@@ -27,31 +21,33 @@ G_AWK_HEADER_DEFS CONSTANT VARCHAR2(512) := '';
      NEXT_BDATE date;                -- ближайшая банковская дата (или она же)
                                      -- от текущей gl.BDATE согласно календарю
 
---процедура загрузки одного ini-параметра в массив
-procedure Set_Mas_Ini(tag_ varchar2, val_ varchar2, comm_ varchar2);
---функция получения значения одного ini-параметра из загруженного массива
-function Get_Mas_Ini_Val(tag_ varchar2) return varchar2;
---функция получения коментария одного ini-параметра из загруженного массиваprocedure Set_Mas_Ini(tag_ varchar2, val_ varchar2, comm_ varchar2 );
-function Get_Mas_Ini_Comm(tag_ varchar2) return varchar2;
---функция превращения бранча-2 в бранч-3 (ОПЧ).
-function Branch3 (Brahch2_ varchar2) return varchar2;
--- установить значение переменной strLimNarrative
-procedure SetLimNarrative(par_value varchar2);
--- вернуть значение переменной strLimNarrative
-function GetLimNarrative return varchar2;
--- вернуть значение переменной rck_hq
-function GetRckHQ return number;
--- 1(да)/0(нет) - является/нет филиал участником мультивал ВПС
-function mvps_fil(p_mfo varchar2, p_kv int) return int;
--- установить значение
-procedure put(tag_ varchar2, val_ varchar2);
--- получить значение
-function  get(tag_ varchar2) return varchar2;
--- получить версию пакета
-function ver return varchar2;
+    --процедура загрузки одного ini-параметра в массив
+    procedure Set_Mas_Ini(tag_ varchar2, val_ varchar2, comm_ varchar2);
+    --функция получения значения одного ini-параметра из загруженного массива
+    function Get_Mas_Ini_Val(tag_ varchar2) return varchar2;
+    --функция получения коментария одного ini-параметра из загруженного массиваprocedure Set_Mas_Ini(tag_ varchar2, val_ varchar2, comm_ varchar2 );
+    function Get_Mas_Ini_Comm(tag_ varchar2) return varchar2;
+    --функция превращения бранча-2 в бранч-3 (ОПЧ).
+    function Branch3 (Brahch2_ varchar2) return varchar2;
+    -- установить значение переменной strLimNarrative
+    procedure SetLimNarrative(par_value varchar2);
+    -- вернуть значение переменной strLimNarrative
+    function GetLimNarrative return varchar2;
+    -- вернуть значение переменной rck_hq
+    function GetRckHQ return number;
+    -- 1(да)/0(нет) - является/нет филиал участником мультивал ВПС
+    function mvps_fil(p_mfo varchar2, p_kv int) return int;
+    -- установить значение
+    procedure put(tag_ varchar2, val_ varchar2);
+    -- получить значение
+    function  get(tag_ varchar2) return varchar2;
+    -- Очистка глобального контекста для текущей сессии
+    procedure clear_session_context;
+    -- получить версию пакета
+    function ver return varchar2;
 END pul;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.PUL AS
+CREATE OR REPLACE PACKAGE BODY BARS.pul AS
 
 G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 2.4 04/12/2012';
 G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := '';
@@ -195,6 +191,18 @@ begin
        ||G_AWK_BODY_DEFS;
 end ver;
 
+    -----------------------------------------------------------------
+    -- CLEAR_SESSION_CONTEXT()
+    --
+    --     Очистка глобального контекста для текущей сессии
+    --
+    --
+    procedure clear_session_context
+    is
+    begin
+        sys.dbms_session.clear_context('bars_pul', sys_context('userenv', 'client_identifier'));
+    end clear_session_context;
+
 --анонимный блок--анонимный блок--анонимный блок--анонимный блок--анонимный блок
 
 /*BEGIN
@@ -248,9 +256,3 @@ grant EXECUTE                                                                on 
 grant EXECUTE                                                                on PUL             to START1;
 grant EXECUTE                                                                on PUL             to WR_ALL_RIGHTS;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/pul.sql =========*** End *** =======
- PROMPT ===================================================================================== 
- 

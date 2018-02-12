@@ -1,10 +1,8 @@
-
- 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_stop.sql =========*** Run *** ===
- PROMPT ===================================================================================== 
+ PROMPT =====================================================================================
  
-  CREATE OR REPLACE FUNCTION BARS.F_STOP (KOD_     INT,
+CREATE OR REPLACE FUNCTION F_STOP (KOD_     INT,
                                         KV_      INT,
                                         NLS_     VARCHAR2,
                                         S_       NUMERIC,
@@ -100,6 +98,7 @@ IS
   l_dat_po    date;
   l_sum_month oper.s%type;
   l_comproc   dpt_vidd.comproc%type;
+  l_is_bnal   number;
 
    p_value2       operw.VALUE%TYPE;
    n1_            NUMBER;
@@ -3141,39 +3140,39 @@ BEGIN
       l_kv := kv_;
 
       -- 1.вычисляем возможный срок пополения, если без срока = выходим
-      select dd.deposit_id, dd.acc, v.term_add, dd.dat_begin, dd.limit, v.comproc
-        into l_deposit, l_acc, l_term_add, l_dat_begin, l_limit, l_comproc
-        from dpt_payments p, oper o, dpt_deposit dd, dpt_vidd v
-       where o.ref = p_ref
-         and p.ref = o.ref
-         and dd.deposit_id = p.dpt_id
-         and dd.vidd = v.vidd;
+  select dd.deposit_id, dd.acc, v.term_add, dd.dat_begin, dd.limit, v.comproc
+      into l_deposit, l_acc, l_term_add, l_dat_begin, l_limit, l_comproc
+      from dpt_deposit dd, accounts a, dpt_vidd v
+     where dd.acc = a.acc
+       and a.nls = NLS_
+       and a.kv = l_kv
+       and dd.vidd = v.vidd;
 
       l_term_add1 := to_number(floor(l_term_add));
 
-      bars_audit.info('1478 ' || l_deposit || ' ' || l_term_add1 || ' ' ||
+      bars_audit.trace('1478 ' || l_deposit || ' ' || l_term_add1 || ' ' ||
                       l_dat_begin || ' ' || l_limit);
 
       --безсрочный вид вклада
       if nvl(l_term_add1, 0) = 0 then
-        bars_audit.info('1478 ' || 'безсрочный вид вклада');
+        bars_audit.trace('1478 ' || 'безсрочный вид вклада');
         return 0;
       end if;
 
       -- 2.вычислить вид вклада, является он пополняемым
       l_res := dpt_web.forbidden_amount(l_acc, s_);
-      bars_audit.info('1478 ' || 'l_res0: ' || l_res);
+      bars_audit.trace('1478 ' || 'l_res0: ' || l_res);
       if (l_res = 0) then
-        bars_audit.info('1478 ' || 'l_res1: ' || l_res);
+        bars_audit.trace('1478 ' || 'l_res1: ' || l_res);
         null;
       elsif (l_res = 1) then
-        bars_audit.info('1478 ' ||
+        bars_audit.trace('1478 ' ||
                         'Вклад не передбачає поповнення! l_res2: ' ||
                         l_res);
         erm := '******Вклад не передбачає поповнення!';
         raise err;
       else
-        bars_audit.info('1478 ' ||
+        bars_audit.trace('1478 ' ||
                         'Cума зарахування на депозитний рахунок');
         erm := '******Cума зарахування на депозитний рахунок #' ||
                to_char(l_acc) ||
@@ -3186,16 +3185,16 @@ BEGIN
       l_dat_start := l_dat_begin;
       l_dat_end   := add_months(l_dat_begin, l_term_add1) - 1;
 
-      bars_audit.info('1478 ' ||
+      bars_audit.trace('1478 ' ||
                       'проверить можно ли его пополнить в указанных сроках на виде вклада ' ||
                       l_dat_start || ' ' || l_dat_end);
 
       if --Все ОК, пополнять можно
        trunc(sysdate) between l_dat_start and l_dat_end then
-        bars_audit.info('1478 ' || 'Все ОК, пополнять можно ');
+        bars_audit.trace('1478 ' || 'Все ОК, пополнять можно ');
         null;
       else
-        bars_audit.info('1478 ' || 'Закончился срок пополнения');
+        bars_audit.trace('1478 ' || 'Закончился срок пополнения');
         -- Закончился срок пополнения
         erm := '******По вкладу закічився термін поповнення! Вклад можливо було поповнювати протягом ' ||
                to_char(l_term_add1) || ' міcяців.';
@@ -3207,12 +3206,12 @@ BEGIN
         into l_count_mm
         from dual;
 
-      bars_audit.info('1478 ' || 'l_count_mm ' || l_count_mm);
+      bars_audit.trace('1478 ' || 'l_count_mm ' || l_count_mm);
 
       l_dat_s  := add_months(l_dat_begin, l_count_mm);
       l_dat_po := add_months(l_dat_s, 1) - 1;
 
-      bars_audit.info('1478 ' || l_dat_s || ' - ' || l_dat_po);
+      bars_audit.trace('1478 ' || l_dat_s || ' - ' || l_dat_po);
 
       --5.вычислить за этот период сумму пополнений по вкладу
     if nvl(l_comproc, 0) = 0 then
@@ -3221,9 +3220,11 @@ BEGIN
       into l_sum_month
       from dpt_payments p, oper o
      where p.ref = o.ref
+       and o.ref !=  p_ref
        and p.dpt_id = l_deposit
-       and o.sos in (5) --....
-       and o.tt in ('PKD', 'OW4', 'PK!', '215', '015', '515', '013', 'R01', 'DP0', 'DP2', 'DP5', 'DPD', 'DPI', 'DPL', 'W2D', 'DBF', 'ALT')
+       and o.sos >= 0
+       and o.tt in ('PKD', 'OW4', 'PK!', '215', '015', '515', '013', 'R01', 'DP0', 'DP2', 'DP5', 'DPD', 'DPI', 'DPL', 'W2D', 'DBF', 'ALT',
+                   '24', '190', '191', '901', 'BAK', 'I00', 'IB1', 'IB1', 'OW1', 'OW5', 'SMO', 'ST2', 'PS1', 'ZMO')
        and o.pdat between l_dat_s and l_dat_po;
 
      else
@@ -3232,24 +3233,47 @@ BEGIN
       into l_sum_month
       from dpt_payments p, oper o
      where p.ref = o.ref
+       and o.ref !=  p_ref
        and p.dpt_id = l_deposit
-       and o.sos in (5) --....
-       and o.tt in ('PKD', 'OW4', 'PK!', '215', '015', '515', '013', 'R01', 'DP0', 'DP2', 'DPD', 'DPI', 'W2D', 'DBF', 'ALT')
+       and o.sos >=0
+       and o.tt in ('PKD', 'OW4', 'PK!', '215', '015', '515', '013', 'R01', 'DP0', 'DP2', 'DPD', 'DPI', 'W2D', 'DBF', 'ALT',
+                   '24', '190', '191', '901', 'BAK', 'I00', 'IB1', 'IB1', 'OW1', 'OW5', 'SMO', 'ST2', 'PS1', 'ZMO')
        and o.pdat between l_dat_s and l_dat_po;
 
     end if;
 
-      bars_audit.info('1478 ' || 'l_sum_month ' || l_sum_month);
+      bars_audit.trace('1478 ' || 'l_sum_month ' || l_sum_month);
 
       -- прибавить общую сумму к сумме документу
       l_sum := l_sum_month + s_;
 
       --6.сравнить лимит депозита с полученной суммой
       -- если общая сумма не превышает лимит = позволяем вставить документ, если нет = выдаем сообщение при вставке документа
-      bars_audit.info('1478 l_sum:' || l_sum || ' l_limit: ' || l_limit);
+      bars_audit.trace('1478 l_sum:' || l_sum || ' l_limit: ' || l_limit);
 
-      if l_sum > l_limit then
-        bars_audit.info('1478 ' || 'Перевищено сумму ліміту!');
+      select count(*)
+      into l_is_bnal
+      from bars.dpt_depositw dw
+      where dw.dpt_id = l_deposit
+        and dw.tag = 'NCASH'
+        and dw.value = 1;
+        
+      bars_audit.trace('1478 безнал: ' || l_is_bnal);
+        
+      if (l_count_mm = 0) and (l_is_bnal > 0) then -- первый месяц и безнал
+
+        if l_sum > l_limit * 2 then
+          bars_audit.trace('1478 ' || 'Перевищено сумму ліміту!');
+          erm := '******Перевищено сумму ліміту ' || to_char(l_limit) ||
+               ' за місць з ' || to_char(l_dat_s) || ' по ' ||
+               to_char(l_dat_po);
+          raise err;
+        else
+          null;  
+        end if;
+        
+      elsif l_sum > l_limit then
+        bars_audit.trace('1478 ' || 'Перевищено сумму ліміту!');
         erm := '******Перевищено сумму ліміту ' || to_char(l_limit) ||
                ' за місць з ' || to_char(l_dat_s) || ' по ' ||
                to_char(l_dat_po);
@@ -3257,8 +3281,8 @@ BEGIN
       else
         null;
       end if;
-
-    end;
+      
+    end; -- end of 1478
 
   end if;
 

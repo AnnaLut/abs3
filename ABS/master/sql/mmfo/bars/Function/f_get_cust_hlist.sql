@@ -11,7 +11,7 @@
 is
 -- ============================================================================
 --                    f_get_cust_hlist - для ФМ
---                      VERSION 16.7 (04/11/2016)
+--                      VERSION 16.8 (30/10/2017)
 -- ============================================================================
 /*
  Список параметров для AWK.exe или  AW.bat
@@ -592,7 +592,7 @@ begin
   elsif p_par = 31 then
      -- получение юридического адреса из расширеных адресов клиента
 
-     for k in ( select nvl(c.name,'') || decode(ca.zip,'','',', ') || ca.zip || decode(ca.domain,'','',', ') || ca.domain ||
+     for k in ( select nvl(c.name,'') || decode(ca.zip,'','',', ') || ca.zip || decode(ca.region,'','',', ') || ca.region || decode(ca.domain,'','',', ') || ca.domain ||
                        decode(ca.locality,'','',', ') || ca.locality || decode(ca.address,'','',', ') || ca.address   adru
                   from customer_address ca, country c
                  where ca.rnk  = p_rnk

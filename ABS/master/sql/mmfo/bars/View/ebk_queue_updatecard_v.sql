@@ -93,7 +93,6 @@ create or replace force view EBK_QUEUE_UPDATECARD_V
 , CURRENTACCOUNT
 , OTHER
 , LASTCHANGEDT
-, CUST_ID
 ) AS 
 select equ.KF,                          --  Ó‰ –” (ÍÓ‰ Ã‘Œ)
        case
@@ -175,8 +174,7 @@ select equ.KF,                          --  Ó‰ –” (ÍÓ‰ Ã‘Œ)
        ecbi.deposit,
        ecbi.current_account as CurrentAccount,
        ecbi.other,
-       equ.insert_date as lastChangeDt,
-       equ.RNK as CUST_ID
+       equ.insert_date as lastChangeDt
   from EBK_QUEUE_UPDATECARD equ
   join EBK_CUST_BD_INFO_V  ecbi
     on ( ecbi.RNK = equ.RNK )
@@ -185,5 +183,6 @@ select equ.KF,                          --  Ó‰ –” (ÍÓ‰ Ã‘Œ)
 ;
 
 show errors;
+grant SELECT                                                                 on EBK_QUEUE_UPDATECARD_V to UPLD;
 
 grant SELECT on EBK_QUEUE_UPDATECARD_V to BARS_ACCESS_DEFROLE;

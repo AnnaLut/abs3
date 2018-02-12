@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/wsm_mgr.sql =========*** Run *** ===
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.WSM_MGR is
+create or replace package wsm_mgr is
   --------------------------------------------------------------------------------
   --  Author : sergey.gorobets
   --  Created : 09.02.2015
@@ -154,7 +148,7 @@
 
 end wsm_mgr;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.WSM_MGR is
+create or replace package body wsm_mgr is
   ------------------------------------------------------------------------------
   --  Author : sergey.gorobets
   --  Created : 09.02.2015
@@ -748,7 +742,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.WSM_MGR is
                           name  => 'Content-Length',
                           value => utl_raw.length(l_tmp) );
 
-      dbms_output.put_line('l_tmp' || l_tmp);
       utl_http.write_raw(l_http_req, l_tmp);
 
     elsif (l_env_length > 32767) then
@@ -758,9 +751,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.WSM_MGR is
                           value => 'chunked');
 
       -- тело запроса по кусочкам
-
       while (l_offset < l_env_length) loop
-        dbms_lob.read(g_request.body, l_ammount, l_offset, l_buffer);
+        dbms_lob.read(l_env, l_ammount, l_offset, l_buffer);
         if l_db_charset = 'AL32UTF8' then
           l_tmp := utl_raw.cast_to_raw(l_buffer);
         else
@@ -1118,10 +1110,3 @@ end wsm_mgr;
  
 PROMPT *** Create  grants  WSM_MGR ***
 grant EXECUTE                                                                on WSM_MGR         to PFU;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/wsm_mgr.sql =========*** End *** ===
- PROMPT ===================================================================================== 
- 
