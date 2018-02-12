@@ -132,6 +132,107 @@ END;
 ALTER TRIGGER BARS.TAIU_CP_REFW_UPDATE ENABLE;
 
 
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Trigger/TAIU_CP_REFW_UPDATE.sql =========***
-PROMPT ===================================================================================== 
+   IF DELETING
+   THEN
+      l_chgaction := 'D';
+      l_idupd     := BARS_SQNC.GET_NEXTVAL('S_CP_REFW_UPDATE');
+      INSERT INTO cp_refw_update (idupd,
+                                    chgaction,
+                                    effectdate,
+                                    chgdate,
+                                    doneby,
+                                    ref,
+                                    tag,
+                                    VALUE)
+           VALUES (l_idupd,
+                   l_chgaction,
+                   l_bankdate,
+                   SYSDATE,
+                   user_id,
+                   :old.ref,
+                   :old.tag,
+                   :old.VALUE);
+   ELSIF INSERTING
+   THEN
+      l_chgaction := 'I';
+      l_idupd     := BARS_SQNC.GET_NEXTVAL('S_CP_REFW_UPDATE');
+      INSERT INTO cp_refw_update (idupd,
+                                    chgaction,
+                                    effectdate,
+                                    chgdate,
+                                    doneby,
+                                    ref,
+                                    tag,
+                                    VALUE)
+           VALUES (l_idupd,
+                   l_chgaction,
+                   l_bankdate,
+                   SYSDATE,
+                   user_id,
+                   :new.ref,
+                   :new.tag,
+                   :new.VALUE);
+   ELSIF UPDATING AND (:old.tag <> :new.tag OR :old.ref <> :new.ref)
+   THEN
+      l_chgaction := 'D';
+      l_idupd     := BARS_SQNC.GET_NEXTVAL('S_CP_REFW_UPDATE');
+      INSERT INTO cp_refw_update (idupd,
+                                    chgaction,
+                                    effectdate,
+                                    chgdate,
+                                    doneby,
+                                    ref,
+                                    tag,
+                                    VALUE)
+           VALUES (l_idupd,
+                   l_chgaction,
+                   l_bankdate,
+                   SYSDATE,
+                   user_id,
+                   :old.ref,
+                   :old.tag,
+                   :old.VALUE);
+
+      l_chgaction := 'I';
+      l_idupd     := BARS_SQNC.GET_NEXTVAL('S_CP_REFW_UPDATE');
+      INSERT INTO cp_refw_update (idupd,
+                                    chgaction,
+                                    effectdate,
+                                    chgdate,
+                                    doneby,
+                                    ref,
+                                    tag,
+                                    VALUE)
+           VALUES (l_idupd,
+                   l_chgaction,
+                   l_bankdate,
+                   SYSDATE,
+                   user_id,
+                   :new.ref,
+                   :new.tag,
+                   :new.VALUE);
+   ELSIF UPDATING AND :old.VALUE <> :new.VALUE
+   THEN
+      l_chgaction := 'U';
+      l_idupd     := BARS_SQNC.GET_NEXTVAL('S_CP_REFW_UPDATE');
+      INSERT INTO cp_refw_update (idupd,
+                                    chgaction,
+                                    effectdate,
+                                    chgdate,
+                                    doneby,
+                                    ref,
+                                    tag,
+                                    VALUE)
+           VALUES (l_idupd,
+                   l_chgaction,
+                   l_bankdate,
+                   SYSDATE,
+                   user_id,
+                   :new.ref,
+                   :new.tag,
+                   :new.VALUE);
+   END IF;
+END;
+/
+
+show errors;

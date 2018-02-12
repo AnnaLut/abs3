@@ -158,7 +158,7 @@ END dr_ch;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.DR_CH 
 IS
-G_BODY_VERSION  CONSTANT VARCHAR2(64)  :='ver.1.0 28.11.2016';
+G_BODY_VERSION  CONSTANT VARCHAR2(64)  :='ver.1.1 29.11.2017';
 
 
   ----
@@ -457,7 +457,7 @@ insert into debreg_query (
               p_eventtype,
              'F');
 
-dr.pf_name;
+--dr.pf_name; -- формирование файла вызывается отдельной кнопкой (META_NSIFUNCTION)
 commit;
 
 end p_nsi_deb_reg_tmp;

@@ -65,38 +65,6 @@ begin
      exception when dup_val_on_index then null;
      end; 
 
-      	    begin
-    	  	  SELECT CODEOPER
-       		    into L_CODEOPER
-       		   FROM operlist
-        	 WHERE funcname LIKE '%/barsroot/cbirep/rep_list.aspx?codeapp=\S*%';
-	    exception when no_data_found then  null;    
-	    end; 
-    
-     begin
-        insert into operapp (codeapp, codeoper, approve)
-        values ('$RM_STO', L_CODEOPER, 1);
-     exception when dup_val_on_index then null;
-     end; 
-
-     begin
-        insert into operapp (codeapp, codeoper, approve)
-        values ('$RM_STO1', L_CODEOPER, 1);
-     exception when dup_val_on_index then null;
-     end; 
-
-     begin
-        insert into applist_staff(id, codeapp, approve)
-        values (2009401 ,'$RM_STO', 1);
-     exception when dup_val_on_index then null;
-     end; 
-
-     begin
-        insert into applist_staff(id, codeapp, approve)
-        values (2009411 ,'$RM_STO', 1);
-     exception when dup_val_on_index then null;
-     end; 
-
      begin
         insert into applist_staff(id, codeapp, approve)
         values (2009401 ,'$RM_STO1', 1);
@@ -108,7 +76,6 @@ begin
         values (2009411 ,'$RM_STO1', 1);
      exception when dup_val_on_index then null;
      end; 
-               
 
 end;
 /

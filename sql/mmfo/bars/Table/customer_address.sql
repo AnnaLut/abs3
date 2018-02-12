@@ -12,13 +12,14 @@ BEGIN
         execute immediate  
           'begin  
                bpa.alter_policy_info(''CUSTOMER_ADDRESS'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''CUSTOMER_ADDRESS'', ''FILIAL'' , null, null, null, null);
-               bpa.alter_policy_info(''CUSTOMER_ADDRESS'', ''WHOLE'' , null, null, null, null);
+               bpa.alter_policy_info(''CUSTOMER_ADDRESS'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
+               bpa.alter_policy_info(''CUSTOMER_ADDRESS'', ''WHOLE'' , null, ''E'', ''E'', ''E'');
                null;
            end; 
           '; 
 END; 
 /
+
 
 PROMPT *** Create  table CUSTOMER_ADDRESS ***
 begin 
@@ -42,16 +43,7 @@ begin
 	HOMEPART VARCHAR2(100 CHAR), 
 	ROOM_TYPE NUMBER(22,0), 
 	ROOM VARCHAR2(100 CHAR), 
-	COMM VARCHAR2(4000), 
-	CHANGE_DT DATE, 
-	KOATUU VARCHAR2(15), 
-	REGION_ID NUMBER(10,0), 
-	AREA_ID NUMBER(10,0), 
-	SETTLEMENT_ID NUMBER(10,0), 
-	STREET_ID NUMBER(10,0), 
-	HOUSE_ID NUMBER(10,0), 
-	LOCALITY_TYPE_N NUMBER(10,0), 
-	STREET_TYPE_N NUMBER(10,0)
+	COMM VARCHAR2(4000)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -62,6 +54,14 @@ end;
 /
 
 
+begin 
+   execute immediate('alter table CUSTOMER_ADDRESS add "KF" VARCHAR2(6 BYTE  ) ');
+   execute immediate 'alter table CUSTOMER_ADDRESS MODIFY KF default sys_context(''bars_context'',''user_mfo'')';
+exception when others then 
+   null; 
+end;
+/
+
 
 
 PROMPT *** ALTER_POLICIES to CUSTOMER_ADDRESS ***
@@ -69,15 +69,6 @@ PROMPT *** ALTER_POLICIES to CUSTOMER_ADDRESS ***
 
 
 COMMENT ON TABLE BARS.CUSTOMER_ADDRESS IS '¿‰ÂÒ‡ ÍÎËÂÌÚÓ‚';
-COMMENT ON COLUMN BARS.CUSTOMER_ADDRESS.CHANGE_DT IS '';
-COMMENT ON COLUMN BARS.CUSTOMER_ADDRESS.KOATUU IS '';
-COMMENT ON COLUMN BARS.CUSTOMER_ADDRESS.REGION_ID IS '';
-COMMENT ON COLUMN BARS.CUSTOMER_ADDRESS.AREA_ID IS '';
-COMMENT ON COLUMN BARS.CUSTOMER_ADDRESS.SETTLEMENT_ID IS '';
-COMMENT ON COLUMN BARS.CUSTOMER_ADDRESS.STREET_ID IS '';
-COMMENT ON COLUMN BARS.CUSTOMER_ADDRESS.HOUSE_ID IS '';
-COMMENT ON COLUMN BARS.CUSTOMER_ADDRESS.LOCALITY_TYPE_N IS '';
-COMMENT ON COLUMN BARS.CUSTOMER_ADDRESS.STREET_TYPE_N IS '';
 COMMENT ON COLUMN BARS.CUSTOMER_ADDRESS.RNK IS '»‰ÂÌÚËÙËÍ‡ÚÓ ÍÎËÂÌÚ‡';
 COMMENT ON COLUMN BARS.CUSTOMER_ADDRESS.TYPE_ID IS '“ËÔ ‡‰ÂÒ‡';
 COMMENT ON COLUMN BARS.CUSTOMER_ADDRESS.COUNTRY IS ' Ó‰ ÒÚ‡Ì˚';
@@ -97,6 +88,45 @@ COMMENT ON COLUMN BARS.CUSTOMER_ADDRESS.HOMEPART IS 'π ÚËÔ‡ ‰ÂÎÂÌËˇ ‰ÓÏ‡';
 COMMENT ON COLUMN BARS.CUSTOMER_ADDRESS.ROOM_TYPE IS '“ËÔ ÊËÎÓ„Ó ÔÓÏÂ˘ÂÌËˇ';
 COMMENT ON COLUMN BARS.CUSTOMER_ADDRESS.ROOM IS 'π ÊËÎÓ„Ó ÔÓÏÂ˘ÂÌËˇ';
 COMMENT ON COLUMN BARS.CUSTOMER_ADDRESS.COMM IS 'ƒÓ‚≥Î¸ÌËÈ ÍÓÏÂÌÚ‡';
+
+
+
+
+PROMPT *** Create  constraint FK_CUSTOMERADR_COUNTRY ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER_ADDRESS ADD CONSTRAINT FK_CUSTOMERADR_COUNTRY FOREIGN KEY (COUNTRY)
+	  REFERENCES BARS.COUNTRY (COUNTRY) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CUSTOMERADR_CUSTOMERADRTYPE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER_ADDRESS ADD CONSTRAINT FK_CUSTOMERADR_CUSTOMERADRTYPE FOREIGN KEY (TYPE_ID)
+	  REFERENCES BARS.CUSTOMER_ADDRESS_TYPE (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CUSTOMERADR_CUSTOMER ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER_ADDRESS ADD CONSTRAINT FK_CUSTOMERADR_CUSTOMER FOREIGN KEY (RNK)
+	  REFERENCES BARS.CUSTOMER (RNK) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
 
 
 
@@ -167,13 +197,12 @@ exception when others then
 PROMPT *** Create  grants  CUSTOMER_ADDRESS ***
 grant FLASHBACK,SELECT                                                       on CUSTOMER_ADDRESS to BARSAQ;
 grant SELECT                                                                 on CUSTOMER_ADDRESS to BARSDWH_ACCESS_USER;
-grant SELECT                                                                 on CUSTOMER_ADDRESS to BARSREADER_ROLE;
 grant SELECT                                                                 on CUSTOMER_ADDRESS to BARSUPL;
 grant DELETE,SELECT,UPDATE                                                   on CUSTOMER_ADDRESS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUSTOMER_ADDRESS to BARS_DM;
+grant SELECT                                                                 on CUSTOMER_ADDRESS to FINMON;
 grant SELECT                                                                 on CUSTOMER_ADDRESS to CUST001;
 grant SELECT                                                                 on CUSTOMER_ADDRESS to RPBN001;
-grant SELECT                                                                 on CUSTOMER_ADDRESS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CUSTOMER_ADDRESS to WR_ALL_RIGHTS;
 grant SELECT                                                                 on CUSTOMER_ADDRESS to WR_CREDIT;
 grant DELETE,SELECT                                                          on CUSTOMER_ADDRESS to WR_CUSTREG;
@@ -183,3 +212,149 @@ grant DELETE,SELECT                                                          on 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/Table/CUSTOMER_ADDRESS.sql =========*** End 
 PROMPT ===================================================================================== 
+
+
+--
+-- add column CHANGE_DT
+--
+begin
+  execute immediate q'[alter table BARS.CUSTOMER_ADDRESS ADD CHANGE_DT DATE]';
+  dbms_output.put_line('Table altered.');
+exception
+  when OTHERS then
+    if ( sqlcode = -01430 )
+    then dbms_output.put_line('Column "CHANGE_DT" already exists in table.');
+    else raise;
+    end if;
+end;
+/
+--
+-- KOATUU
+--
+begin
+  execute immediate 'alter table BARS.CUSTOMER_ADDRESS ADD KOATUU VARCHAR2(15)';
+  dbms_output.put_line('Table altered.');
+exception
+  when OTHERS then
+    if ( sqlcode = -01430 )
+    then dbms_output.put_line('Column "KOATUU" already exists in table.');
+    else raise;
+    end if;
+end;
+/
+
+--
+-- REGION
+--
+begin
+  execute immediate q'[ALTER TABLE BARS.CUSTOMER_ADDRESS ADD REGION_ID NUMBER(10)]';
+  dbms_output.put_line('Table altered.');
+exception
+  when OTHERS then
+    if ( sqlcode = -01430 )
+    then dbms_output.put_line('Column "REGION_ID" already exists in table.');
+    else raise;
+    end if;
+end;
+/
+
+begin
+  execute immediate q'[ALTER TABLE BARS.CUSTOMER_ADDRESS ADD AREA_ID NUMBER(10)]';
+  dbms_output.put_line('Table altered.');
+exception
+  when OTHERS then
+    if ( sqlcode = -01430 )
+    then dbms_output.put_line('Column "AREA_ID" already exists in table.');
+    else raise;
+    end if;
+end;
+/
+
+begin
+  execute immediate q'[ALTER TABLE BARS.CUSTOMER_ADDRESS ADD SETTLEMENT_ID NUMBER(10)]';
+  dbms_output.put_line('Table altered.');
+exception
+  when OTHERS then
+    if ( sqlcode = -01430 )
+    then dbms_output.put_line('Column "SETTLEMENT_ID" already exists in table.');
+    else raise;
+    end if;
+end;
+/
+
+begin
+  execute immediate q'[ALTER TABLE BARS.CUSTOMER_ADDRESS ADD STREET_ID NUMBER(10)]';
+  dbms_output.put_line('Table altered.');
+exception
+  when OTHERS then
+    if ( sqlcode = -01430 )
+    then dbms_output.put_line('Column "STREET_ID" already exists in table.');
+    else raise;
+    end if;
+end;
+/
+
+
+
+begin
+  execute immediate q'[ALTER TABLE BARS.CUSTOMER_ADDRESS ADD HOUSE_ID NUMBER(10)]';
+  dbms_output.put_line('Table altered.');
+exception
+  when OTHERS then
+    if ( sqlcode = -01430 )
+    then dbms_output.put_line('Column "HOUSE_ID" already exists in table.');
+    else raise;
+    end if;
+end;
+/
+
+
+begin
+  execute immediate q'[ALTER TABLE BARS.CUSTOMER_ADDRESS ADD locality_type_n NUMBER(10)]';
+  dbms_output.put_line('Table altered.');
+exception
+  when OTHERS then
+    if ( sqlcode = -01430 )
+    then dbms_output.put_line('Column "locality_type_n" already exists in table.');
+    else raise;
+    end if;
+end;
+/
+
+begin
+  execute immediate q'[ALTER TABLE BARS.CUSTOMER_ADDRESS ADD street_type_n NUMBER(10)]';
+  dbms_output.put_line('Table altered.');
+exception
+  when OTHERS then
+    if ( sqlcode = -01430 )
+    then dbms_output.put_line('Column "street_type_n" already exists in table.');
+    else raise;
+    end if;
+end;
+/
+
+
+prompt ... 
+
+
+-- Create/Rebegin
+--begin
+--    execute immediate 
+--'create index I_TEMP on CUSTOMER_ADDRESS (TRANSLATE(TRIM( REGEXP_REPLACE ( REGEXP_REPLACE (UPPER("BARS"."STRTOK"(ADDRESS,'','',1)),''^(\,|\.|œÀ |œÀ\.|œ– |œ–\.|œ–Œ¬ |œ–Œ¬\.|œ≈– |œ≈–\.|\œ–-  |\œ–- .|œ–Œ¬”ÀŒ  |œ–Œ¬”ÀŒ \.|œ≈–≈”ÀŒ  |œ≈–≈”ÀŒ \.|¬”À\.|¬”À |”À |”À\.|¬”À»÷ﬂ |œ–Œ—œ≈ “ |œ–Œ—œ |œ–Œ—œ≈ “\.|œ–Œ—œ\.|œ–-“ |œ–-“\.|œ–“ |œ–“\.)'',''''),''(\,|\.|\*|\"|\\|\/| ¡ | ¡\.| ¡”ƒ | ¡”ƒ»ÕŒ  |\d)'','''',3)),''ETYUIOPAHKXCBM'',''≈“”»≤Œ–¿Õ ’—¬Ã''))
+--  tablespace BRSBIGI
+-- pctfree 10
+--  initrans 2
+--  maxtrans 167
+--  storage
+--  (
+--    initial 128K
+--    next 128K
+--    minextents 1
+--    maxextents unlimited
+--  )';
+-- exception when others then 
+--    if sqlcode = -955 or sqlcode = -1408 then null; else raise; 
+--    end if; 
+--end;
+--/ 
+

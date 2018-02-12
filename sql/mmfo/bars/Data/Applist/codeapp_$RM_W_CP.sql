@@ -1,3 +1,5 @@
+SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
+SET DEFINE OFF 
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/Applist/codeapp_$RM_W_CP.sql =========*
 PROMPT ===================================================================================== 
@@ -182,7 +184,11 @@ begin
                                                   p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-
+      /*ця функція вже давно існує, але чомусь тільки вона на проді з OPERLIST.runable is null
+        який не модифікуэться  abs_utils.add_func
+      */
+     update OPERLIST set runable = 1 where  codeoper = l_function_ids(l) and runable is null;
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП. Неотримані купони > 30 днів (WEB)  ********** ');
           --  Створюємо функцію ЦП. Неотримані купони > 30 днів (WEB) 
@@ -280,29 +286,49 @@ begin
                                                   );
 
 
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП: Формування Форми DGP_F007 за період (Y/H/Q/D) ********** ');
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП: (OLD)Формування Форми DGP_F007 за період (Y/H/Q/D) ********** ');
           --  Створюємо функцію ЦП: Формування Форми DGP_F007 за період (Y/H/Q/D)
       l := l +1;
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'ЦП: Формування Форми DGP_F007 за період (Y/H/Q/D)',
+                                                  p_name     => 'ЦП: (OLD)Формування Форми DGP_F007 за період (Y/H/Q/D)',
                                                   p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=V_CP_ZV7K[PROC=>CP_ZV_D(0,:B,:E,:Z,''7'',:P)][PAR=>:B(SEM=дата з <dd.mm.yyyy>,TYPE=D),:E(SEM=дата по <dd.mm.yyyy>,TYPE=D),:Z(SEM=ПереФормувати так/ні =1/0,TYPE=N),:P(SEM=період=Y/H/Q/D,TYPE=C)][EXEC=>BEFORE][QST=>Відкрити діалог для Форми DGP_F007 ?][MSG=>Виконано !]',
                                                   p_rolename => 'bars_access_defrole' ,
                                                   p_frontend => l_application_type_id
                                                   );
 
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП: Формування Форми DGP_007 за період ********** ');
+      l := l +1;
+      l_function_ids.extend(l);      
+      l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'ЦП: Формування Форми DGP_F007 за період',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=V_CP_DGP007[PROC=>cp_rep_dgp.prepare_dgp(:B,:E, 7)][PAR=>:B(SEM=дата з <dd.mm.yyyy>,TYPE=D),:E(SEM=дата по <dd.mm.yyyy>,TYPE=D)][EXEC=>BEFORE][QST=>Відкрити діалог для Форми DGP_F007 ("Ні" - показати данні з попереднього формуваня)?][MSG=>Виконано !][showDialogWindow=>false][CONDITIONS=>user_id = user_id()]',
+                                                  p_rolename => 'bars_access_defrole' ,    
+                                                  p_frontend => l_application_type_id
+                                                  );
 
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП: Формування Форми DGP_F008 за період (Y/H/Q/D) ********** ');
+
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП: (OLD)Формування Форми DGP_F008 за період (Y/H/Q/D) ********** ');
           --  Створюємо функцію ЦП: Формування Форми DGP_F008 за період (Y/H/Q/D)
       l := l +1;
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'ЦП: Формування Форми DGP_F008 за період (Y/H/Q/D)',
+                                                  p_name     => 'ЦП: (OLD)Формування Форми DGP_F008 за період (Y/H/Q/D)',
                                                   p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=V_CP_ZV8K[PROC=>CP_ZV_D(0,:B,:E,:Z,''8'',:P)][PAR=>:B(SEM=дата з <dd.mm.yyyy>,TYPE=D),:E(SEM=дата по <dd.mm.yyyy>,TYPE=D),:Z(SEM=ПереФормувати так/ні =1/0,TYPE=N),:P(SEM=період=Y/H/Q/D,TYPE=C)][EXEC=>BEFORE][QST=>Відкрити діалог для Форми DGP_F008 ?][MSG=>Виконано !]',
                                                   p_rolename => 'bars_access_defrole' ,
                                                   p_frontend => l_application_type_id
                                                   );
 
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП: Формування Форми DGP_008 за період ********** ');
+      l := l +1;
+      l_function_ids.extend(l);      
+      l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'ЦП: Формування Форми DGP_F008 за період',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=V_CP_DGP008[PROC=>cp_rep_dgp.prepare_dgp(:B,:E, 8)][PAR=>:B(SEM=дата з <dd.mm.yyyy>,TYPE=D),:E(SEM=дата по <dd.mm.yyyy>,TYPE=D)][EXEC=>BEFORE][NSIFUNCTION][QST=>Відкрити діалог для Форми DGP_F008 ("Ні" - показати данні з попереднього формуваня)?][MSG=>Виконано !][showDialogWindow=>false][CONDITIONS=>user_id = user_id()]',
+                                                  p_rolename => 'bars_access_defrole' ,    
+                                                  p_frontend => l_application_type_id
+                                                  );
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП: Формування Форми DGP_F009 за період (Y/H/Q/D) ********** ');
           --  Створюємо функцію ЦП: Формування Форми DGP_F009 за період (Y/H/Q/D)
@@ -471,14 +497,17 @@ begin
                                                   p_frontend => l_application_type_id
                                                   );
 
-
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП: Форма для розр-ку переоцінки (CP_PEREOC_V) ********** ');
           --  Створюємо функцію ЦП: Форма для розр-ку переоцінки (CP_PEREOC_V)
+      --дропнути стару версію (бо зміна p_funcname)
+      delete from operlist a where  a.funcname = '/barsroot/ndi/referencebook/GetRefBookData/?tableName=CP_PEREOC_V&accessCode=2&sPar=[PROC=>CP_PEREOC_P(0,:VOB)][PAR=>:VOB(SEM=Корректирующими VOB=96,TYPE=N)][DESCR=>Переоцінка][EXEC=>ONCE][QST=>Виконати Переоцiнку ?][MSG=>Виконано!]';
+      --кінець делітушмеліту
+
       l := l +1;
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'ЦП: Форма для розр-ку переоцінки (CP_PEREOC_V)',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?tableName=CP_PEREOC_V&accessCode=2&sPar=[PROC=>CP_PEREOC_P(0,:VOB)][PAR=>:VOB(SEM=Корректирующими VOB=96,TYPE=N)][DESCR=>Переоцінка][EXEC=>ONCE][QST=>Виконати Переоцiнку ?][MSG=>Виконано!]',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?tableName=CP_PEREOC_V&accessCode=2&sPar=[PROC=>CP_PEREOC_P(0,:VOB)][PAR=>:VOB(SEM=Корректирующими VOB=96,TYPE=N)][DESCR=>Переоцінка][EXEC=>ONCE][QST=>Виконати Переоцiнку ?][MSG=>Виконано!][SAVE_COLUMNS=>BY_DEFAULT]',
                                                   p_rolename => 'bars_access_defrole' ,
                                                   p_frontend => l_application_type_id
                                                   );

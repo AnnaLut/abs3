@@ -12,7 +12,7 @@ BEGIN
         execute immediate  
           'begin  
                bpa.alter_policy_info(''CP_DAT'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''CP_DAT'', ''FILIAL'' , null, null, null, null);
+               bpa.alter_policy_info(''CP_DAT'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
                bpa.alter_policy_info(''CP_DAT'', ''WHOLE'' , null, null, null, null);
                null;
            end; 
@@ -30,7 +30,8 @@ begin
 	KUP NUMBER, 
 	NOM NUMBER(12,2), 
 	EXPIRY_DATE DATE, 
-	IR NUMBER
+	IR NUMBER,
+        KF varchar2(6) default sys_context(''bars_context'',''user_mfo'')        
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -85,9 +86,26 @@ exception when others then
 /
 
 
+begin
+    execute immediate 'alter table CP_DAT add offer_date date';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+COMMENT ON COLUMN BARS.CP_DAT.offer_date IS 'Дата оферти';
+
+begin   
+ execute immediate 'ALTER TABLE BARS.CP_DAT ADD CONSTRAINT FK_CPDAT_ID_KF FOREIGN KEY (ID, KF)
+	  REFERENCES BARS.CP_KOD (ID, KF) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
 
 PROMPT *** Create  grants  CP_DAT ***
-grant SELECT                                                                 on CP_DAT          to BARSREADER_ROLE;
 grant SELECT                                                                 on CP_DAT          to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_DAT          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_DAT          to BARS_DM;

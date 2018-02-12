@@ -1,3 +1,6 @@
+SET SERVEROUTPUT ON 
+
+SET DEFINE OFF 
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/Applist/codeapp_$RM_W_W4.sql =========*
 PROMPT ===================================================================================== 
@@ -61,6 +64,45 @@ begin
                                                   );
 
 
+      --  Створюємо дочірню функцію Редактирование атрибутов счета
+                     l_function_deps  :=   abs_utils.add_func(
+                                                              p_name     => 'Редактирование атрибутов счета',
+                                                              p_funcname => '/barsroot/viewaccounts/accountform.aspx?type=\d+&acc=\d+&rnk=\d*&accessmode=1',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+      --  Створюємо дочірню функцію Редагування атрибутів рахунку
+                     l_function_deps  :=   abs_utils.add_func(
+                                                              p_name     => 'Редагування атрибутів рахунку',
+                                                              p_funcname => '/barsroot/viewaccounts/accountform.aspx?type=\d+&acc=\d+&rnk=\d*&accessmode=1\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+      --  Створюємо дочірню функцію Картка контрагента
+                     l_function_deps  :=   abs_utils.add_func(
+                                                              p_name     => 'Картка контрагента',
+                                                              p_funcname => '/barsroot/clientregister/registration.aspx?(readonly=\d+)*(client=\w+)|(rnk=\d+)',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Way4. Портфель БПК (ФО)********** ');
+          --  Створюємо функцію Way4. Портфель БПК (ФО)
+      l := l +1;
+      l_function_ids.extend(l);      
+      l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'Way4. Портфель БПК (ФО)',
+                                                  p_funcname => '/barsroot/Way4Bpk/Way4Bpk',
+                                                  p_rolename => 'OW' ,    
+                                                  p_frontend => l_application_type_id
+                                                  );
+     
+
       --  Створюємо дочірню функцію Реквізити картки киянина
                      l_function_deps  :=   abs_utils.add_func(
 															  p_name     => 'Реквізити картки киянина',
@@ -117,14 +159,14 @@ begin
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Way4. Карткові рахунки з заборгованості БПК ********** ');
           --  Створюємо функцію Way4. Карткові рахунки з заборгованості БПК
-      l := l +1;
-      l_function_ids.extend(l);
-      l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'Way4. Карткові рахунки з заборгованості БПК',
-                                                  p_funcname => '/barsroot/barsweb/dynform.aspx?form=bpkw4.frm.debtacc',
-                                                  p_rolename => 'OW' ,
-                                                  p_frontend => l_application_type_id
-                                                  );
+--      l := l +1;
+--      l_function_ids.extend(l);      
+--      l_function_ids(l)   :=   abs_utils.add_func(
+--                                                  p_name     => 'Way4. Портфель БПК(ЮО)',
+--                                                  p_funcname => '/barsroot/barsweb/dynform.aspx?form=bpkw4.frm.portfolio_uo',
+--                                                  p_rolename => 'OW' ,    
+--                                                  p_frontend => l_application_type_id
+--                                                  );
 
 
       --  Створюємо дочірню функцію Редактирование атрибутов счета
@@ -486,7 +528,16 @@ begin
                                                   p_frontend => l_application_type_id
                                                   );
 
-
+	DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Way4. Заява на видалення тікету ********** ');
+          --  Створюємо функцію Way4. Заява на видалення тікету
+      l := l +1;
+      l_function_ids.extend(l);      
+      l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'Way4. Заява на видалення тікету',
+                                                  p_funcname => '/barsroot/bpkw4/AutoOfficialNote/index',
+                                                  p_rolename => '' ,    
+                                                  p_frontend => l_application_type_id
+                                                  );
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Way4. Портфель БПК(ЮО) ********** ');
           --  Створюємо функцію Way4. Портфель БПК(ЮО)
       l := l +1;

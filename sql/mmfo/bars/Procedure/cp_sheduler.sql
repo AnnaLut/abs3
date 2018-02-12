@@ -15,7 +15,8 @@ PROMPT *** Create  procedure CP_SHEDULER ***
                                          p_kup       IN NUMBER,
                                          p_nom       IN NUMBER,
                                          p_ir        IN NUMBER,
-                                         p_expdate   IN DATE)
+                                         p_expdate   IN DATE,
+                                         p_offerdate IN DATE)
 IS
  title constant varchar2(12) := 'cp_sheduler:';
 BEGIN
@@ -32,14 +33,16 @@ BEGIN
                              kup,
                              nom,
                              expiry_date,
-                             ir)
+                             ir,
+                             offer_date)
               VALUES (p_id,
                       p_npp,
                       p_dok,
                       p_kup,
                       p_nom,
                       p_expdate,
-                      p_ir);
+                      p_ir,
+                      p_offerdate);
       EXCEPTION
          WHEN DUP_VAL_ON_INDEX
          THEN
@@ -52,7 +55,8 @@ BEGIN
              kup = nvl(p_kup, kup),
              nom = nvl(p_nom, nom),
              expiry_date = nvl(p_expdate, expiry_date),
-             ir = nvl(p_ir, ir)
+             ir = nvl(p_ir, ir),
+             offer_date = nvl(p_offerdate, offer_date)
        WHERE id = p_id AND npp = p_npp;
 
    ELSIF p_mode = 3                                                 --deleting

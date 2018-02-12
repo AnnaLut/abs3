@@ -14,9 +14,9 @@ begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
     values ('DU8', '+Позасистемний облік депозитних ліній ЮО', 1, '#(dpu.get_nls4pay(#(REF),#(NLSA),#(KVA)))', null, '#(dpu.get_nls4pay(#(REF),#(NLSB),#(KVB)))', null, null, null, null, null, 0, 0, 0, 0, 'case when dpu.is_line(#(REF)) is null then 0 else #(S) end', null, null, null, null, 0, '1000000000000000000000000000000000000100000000000000000000000000', null);
   exception
-    when dup_val_on_index then 
-      update tts
-         set tt='DU8', name='+Позасистемний облік депозитних ліній ЮО', dk=1, nlsm='#(dpu.get_nls4pay(#(REF),#(NLSA),#(KVA)))', kv=null, nlsk='#(dpu.get_nls4pay(#(REF),#(NLSB),#(KVB)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='case when dpu.is_line(#(REF)) is null then 0 else #(S) end', s2=null, sk=null, proc=null, s3800=null, rang=0, flags='1000000000000000000000000000000000000100000000000000000000000000', nazn=null
+    when dup_val_on_index then
+      update tts 
+         set tt='DU8', name='+Позасистемний облік депозитних ліній ЮО', dk=1, nlsm='#(dpu.get_nls4pay(#(REF),#(NLSA),#(KVA)))', kv=null, nlsk='#(dpu.get_nls4pay(#(REF),#(NLSB),#(KVB)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='case when dpu.is_line(#(REF)) is null then 0 else #(S) end', s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000000000000000000000000000000000000100000000000000000000000000', nazn=null
        where tt='DU8';
   end;
   --------------------------------
@@ -79,8 +79,8 @@ begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
     values ('DU7', 'Виплата відсотків в ін.валюті (міжбанк)', 1, null, null, '#(case sys_context(''bars_context'',''user_mfo'') when ''300465'' then #(NLSB) else get_proc_nls(''T00'',#(KVA)) end)', null, null, null, '191992', '300465', 1, 1, 0, 0, null, null, null, null, null, 9, '0200100000000000000000000000000000010000000000000000000000000000', 'Відсотки по депозиту згідно #{DPU.F_NAZN(''U'',#(ND))}');
   exception
-    when dup_val_on_index then 
-      update tts
+    when dup_val_on_index then
+      update tts 
          set tt='DU7', name='Виплата відсотків в ін.валюті (міжбанк)', dk=1, nlsm=null, kv=null, nlsk='#(case sys_context(''bars_context'',''user_mfo'') when ''300465'' then #(NLSB) else get_proc_nls(''T00'',#(KVA)) end)', kvk=null, nlss=null, nlsa=null, nlsb='191992', mfob='300465', flc=1, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=9, flags='0200100000000000000000000000000000010000000000000000000000000000', nazn='Відсотки по депозиту згідно #{DPU.F_NAZN(''U'',#(ND))}'
        where tt='DU7';
   end;
@@ -101,23 +101,23 @@ begin
   end;
   begin
     insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
-    values ('52A  ', 'DU7', 'M', 1, 4, 'COBUAUKKIE', null);
+    values ('52A  ', 'DU7', 'M', 1, 4, 'COSBUAUKKIE', null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (op_rules: ''52A  '', ''DU7'', ''M'', 1, 4, ''COBUAUKKIE'', null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''52A  '', ''DU7'', ''M'', 1, 4, ''COSBUAUKKIE'', null) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
-    values ('56A  ', 'DU7', 'M', 1, 5, null, null);
+    values ('56A  ', 'DU7', 'O', 1, 5, null, null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (op_rules: ''56A  '', ''DU7'', ''M'', 1, 5, null, null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''56A  '', ''DU7'', ''O'', 1, 5, null, null) - первичный ключ не найден!');
       else raise;
       end if;
   end;
@@ -178,12 +178,12 @@ begin
   end;
   begin
     insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
-    values ('KOD_B', 'DU7', 'O', 1, 2, null, null);
+    values ('KOD_B', 'DU7', 'O', 1, 2, '6', null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (op_rules: ''KOD_B'', ''DU7'', ''O'', 1, 2, null, null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''KOD_B'', ''DU7'', ''O'', 1, 2, ''6'', null) - первичный ключ не найден!');
       else raise;
       end if;
   end;
@@ -228,6 +228,17 @@ begin
     when others then
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (op_rules: ''ND   '', ''DU7'', ''M'', 1, 1, null, null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+    begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('NOS_A', 'DU6', 'M', 0, null, '0', null);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''NOS_A'', ''DU6'', ''M'', 0, null, ''0'', null) - первичный ключ не найден!');
       else raise;
       end if;
   end;
@@ -301,66 +312,10 @@ begin
   --------------------------------
   -------- Группы контроля -------
   --------------------------------
-  delete from chklist_tts where tt='DU7';
-  begin
-    insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (3, 'DU7', 3, null, null, null);
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 3, ''DU7'', 3, null, null, null) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
-  begin
-    insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (5, 'DU7', 1, null, null, 3);
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 5, ''DU7'', 1, null, null, 3) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
-  begin
-    insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (7, 'DU7', 2, null, '(( substr(NLSA,1,4) in (''2658'',''2618'')) and kv<>980 and (substr(NLSB,1,6) in (''191992'')) ) ', null);
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 7, ''DU7'', 2, null, ''(( substr(NLSA,1,4) in (''''2658'''',''''2618'''')) and kv<>980 and (substr(NLSB,1,6) in (''''191992'''')) ) '', null) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
   --------------------------------
   ------------- Папки ------------
   --------------------------------
-  delete from folders_tts where tt='DU7';
-  begin
-    insert into folders_tts(idfo, tt)
-    values (4, 'DU7');
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (folders_tts: 4, ''DU7'') - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
-  begin
-    insert into folders_tts(idfo, tt)
-    values (24, 'DU7');
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (folders_tts: 24, ''DU7'') - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
+  
 end;
 /
 commit;

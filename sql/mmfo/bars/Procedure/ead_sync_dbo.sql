@@ -24,7 +24,7 @@ begin
    raise_application_error ( -20001, l_errormessage, false);
    return;
   end;
-  l_sync_queue_id := ead_pack.msg_create('UAGR', 'DBO;'||to_char(p_rnk), l_kf);
+  l_sync_queue_id := ead_pack.msg_create('UAGR', 'DBO;'||to_char(p_rnk), p_rnk, l_kf);
   bars_audit.info('sync_queue_id:' || to_char(l_sync_queue_id));
 end;
 /

@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/interest_utl.sql =========*** Run **
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.INTEREST_UTL is
+create or replace package interest_utl is
 
     -- вид відсоткової картки (int_idn)
     INTEREST_KIND_EFFECTIVE_RATE   constant integer := -2; -- Ефективна відсоткова ставка (активи)
@@ -50,11 +44,11 @@
     RECKONING_STATE_PAYED          constant integer :=  8;
     RECKONING_STATE_PAYMENT_FAILED constant integer :=  9;
     RECKONING_STATE_PAYM_DISCARDED constant integer := 10;
+    RECKONING_STATE_RECALCULATION  constant integer := 11;
     RECKONING_STATE_ONLY_INFO      constant integer := 99;
 
     LT_RECKONING_LINE_TYPE         constant varchar2(30 char) := 'RECKONING_LINE_TYPE';
-    RECKONING_TYPE_RAW             constant integer := 1;
-    RECKONING_TYPE_GROUPING_UNIT   constant integer := 2;
+    RECKONING_TYPE_ORDINARY_INT    constant integer := 1;
     RECKONING_TYPE_CORRECTION      constant integer := 3;
 
     LT_RECKONING_DOCUMENT_ROLE     constant varchar2(30 char) := 'RECKONING_DOCUMENT_ROLE';
@@ -65,17 +59,6 @@
     GROUPING_MODE_NO_GROUPING      constant integer := 0;
     GROUPING_MODE_GROUP_BY_RATES   constant integer := 1;
     GROUPING_MODE_GROUP_ALL        constant integer := 99;
-
-    LT_PERIODICITY_KIND            constant varchar2(30 char) := 'PERIODICITY_KIND';
-    PERIODICITY_KIND_MANUAL        constant integer := 1;
-    PERIODICITY_KIND_BY_DAY        constant integer := 2;
-    PERIODICITY_KIND_BY_WEEK       constant integer := 3;
-    PERIODICITY_KIND_BY_MONTH      constant integer := 4;
-    PERIODICITY_KIND_BY_YEAR       constant integer := 5;
-    PERIODICITY_KIND_BY_WEEK_DAY   constant integer := 6;
-    PERIODICITY_KIND_BY_MONTH_DAY  constant integer := 7;
-    PERIODICITY_KIND_BY_YEAR_DAY   constant integer := 8;
-    PERIODICITY_KIND_NOT_AVAILABLE constant integer := 99;
 
     type t_interest_reckonings is table of int_reckonings%rowtype;
 
@@ -187,35 +170,6 @@
 
     procedure end_reckoning;
 
-    function find_previous_date(
-        p_date_for in date,
-        p_period_kind in varchar2,
-        p_period_length in integer default 1,
-        p_initial_date in date default null,
-        p_strict_shift in integer default 0,
-        p_holidays_handling in integer default 0)
-    return date;
-
-    function find_next_date(
-        p_date_for in date,
-        p_period_kind in varchar2,
-        p_period_length in integer default 1,
-        p_initial_date in date default null,
-        p_strict_shift in integer default 0,
-        p_holidays_handling in integer default null)
-    return date;
-
-    function pipe_dates(
-        p_date_from in date,
-        p_date_through in date,
-        p_period_kind in varchar2,
-        p_period_length in integer,
-        p_initial_date in date,
-        p_strict_shift in integer,
-        p_holidays_handling in integer)
-    return date_list
-    pipelined;
-
     -- створення запису з результатами розрахунку відосотків
     procedure create_reckoning_row(
         p_account_id in integer,                      -- ідентифікатор рахунку, по якому розраховуються відсотки
@@ -295,50 +249,35 @@
         p_interest_rate in number,
         p_interest_amount in integer,
         p_interest_tail in number,
-        p_state_id in integer default null,
-        p_deal_id in integer default null)
+        p_is_grouping_unit in varchar2,
+        p_state_id in integer,
+        p_deal_id in integer)
     return integer;
 
     function get_rate_purpose_clause(
         p_reckoning_id in integer,
-        p_reckoning_type_id in integer,
+        p_is_grouping_unit in varchar2,
         p_interest_rate in number)
     return varchar2;
-/*
-    function generate_accrual_purpose(
-        p_reckoning_method in integer,
-        p_account_number in varchar2,
-        p_date_from in date,
-        p_date_through in date,
-        p_interest_rate in number)
-    return varchar2;
-*/
+
     function generate_accrual_purpose(
         p_reckoning_id in integer,
-        p_reckoning_type_id in integer,
         p_reckoning_method in integer,
         p_account_number in varchar2,
         p_date_from in date,
         p_date_through in date,
-        p_interest_rate in number)
+        p_interest_rate in number,
+        p_is_grouping_unit in varchar2)
     return varchar2;
-/*
-    function generate_payment_purpose(
-        p_reckoning_method in integer,
-        p_account_number in varchar2,
-        p_date_from in date,
-        p_date_through in date,
-        p_interest_rate in number)
-    return varchar2;
-*/
+
     function generate_payment_purpose(
         p_reckoning_id in integer,
-        p_reckoning_type_id in integer,
         p_reckoning_method in integer,
         p_account_number in varchar2,
         p_date_from in date,
         p_date_through in date,
-        p_interest_rate in number)
+        p_interest_rate in number,
+        p_is_grouping_unit in varchar2)
     return varchar2;
 
     function get_accrual_purpose(
@@ -385,17 +324,13 @@
 
     procedure group_reckonings(
         p_accounts in number_list,
-        p_grouping_mode_id in integer);
+        p_grouping_mode_id in integer,
+        p_line_type in integer);
 
     procedure redact_reckoning(
         p_reckoning_id in integer,
         p_interest_amount in number,
         p_accrual_purpose in varchar2);
-
-    function months_between_alt(
-        p_date_from in date,
-        p_date_to   in date)
-    return number;
 
     procedure clear_reckonings_utl(
         p_reckoning_row in int_reckonings%rowtype);
@@ -415,8 +350,7 @@
     procedure accrue_interest(
         p_reckoning_row in int_reckonings%rowtype,
         p_silent_mode in boolean default false,
-        p_do_not_store_interest_tail in boolean default false,
-        p_dk in integer default null);
+        p_do_not_store_interest_tail in boolean default false);
 
     procedure accrue_reckoned_interest(
         p_filter in varchar2,
@@ -446,7 +380,8 @@
     procedure on_payment_document_revert(
         p_document_id in integer);
 
-    procedure accrue_reckoned_interest;
+    procedure on_interest_document_revert(
+        p_document_id in integer);
 /*
     procedure accrue_reckoned_interest(
         p_dictionary_list in t_dictionary_list,
@@ -462,9 +397,13 @@
         int_  out number, -- interest accrued
         ost_  decimal default null,
         mode_ smallint default 0);
+
+    procedure recalculate_interest(
+        p_reckoning_unit in out nocopy t_reckoning_unit);
+
 end;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
+create or replace package body interest_utl as
 
     acc_form integer := 0;
     g_acc integer := 0;
@@ -2603,271 +2542,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
              else return null;
              end if;
     end;
-/*
-    procedure date_span(
-        p_date_from in date,
-        p_date_through in date,
-        p_days out integer,
-        p_weeks out integer,
-        p_months out integer,
-        p_quarters out integer,
-        p_years out integer)
-    is
-    begin
-        p_days := p_date_through - p_date_from;
-        p_weeks := trunc();
-    end;
-*/
-    function is_leap_year(p_date in date)
-    return integer
-    is
-        l_year integer := extract(year from p_date);
-    begin
-        return case when ((l_year mod 4 = 0) and (not l_year mod 100 = 0)) or (l_year mod 400 = 0) then 1
-                    else 0
-               end;
-    end;
-
-    function days_in_year(p_date in date)
-    return integer
-    is
-    begin
-        return case when is_leap_year(p_date) = 1 then 365
-                    else 366
-               end;
-    end;
-
-    function add_months_alt(
-        p_date   in date,
-        p_months in integer)
-    return date
-    is
-        l_last_day date;
-    begin
-        l_last_day := add_months(p_date, p_months);
-        return l_last_day - greatest(0, (extract(day from l_last_day) - extract(day from p_date)));
-    end;
-
-    function months_between_alt(
-        p_date_from in date,
-        p_date_to   in date)
-    return number
-    is
-        l_day_from   integer;
-        l_month_from integer;
-        l_year_from  integer;
-        l_day_to     integer;
-        l_month_to   integer;
-        l_year_to    integer;
-
-        l_months_between integer;
-
-        l_days_between integer;
-    begin
-        l_day_from   := extract(day from p_date_from);
-        l_month_from := extract(month from p_date_from);
-        l_year_from  := extract(year from p_date_from);
-
-        l_day_to     := extract(day from p_date_to);
-        l_month_to   := extract(month from p_date_to);
-        l_year_to    := extract(year from p_date_to);
-
-        l_months_between := (l_year_to - l_year_from) * 12 + (l_month_to - l_month_from);
-
-        if (l_day_to > l_day_from and l_day_from = extract(day from last_day(p_date_from))) then
-            l_day_to := l_day_from;
-        end if;
-
-        if (l_day_from > l_day_to and l_day_to = extract(day from last_day(p_date_to))) then
-            l_day_from := l_day_to;
-        end if;
-
-        if (l_day_from > l_day_to) then
-            l_months_between := l_months_between - 1;
-            l_day_to := l_day_to + 31;
-        end if;
-
-        l_days_between := l_day_to - l_day_from;
-
-        return l_months_between + l_days_between / 31;
-    end;
-
-    function handle_holidays(
-        p_date in date,
-        p_handling_mode in integer,
-        p_minimum_date in date default null)
-    return date
-    is
-        l_date date;
-    begin
-        if (p_date is null or p_handling_mode is null) then
-            return null;
-        end if;
-
-        if (p_handling_mode > 0) then
-            l_date := dat_next_u(p_date, 0);
-        elsif (p_handling_mode < 0) then
-            if (p_date <> dat_next_u(p_date, 0)) then
-                l_date := dat_next_u(p_date, -1);
-                if (p_minimum_date is not null and l_date < p_minimum_date) then
-                    l_date := dat_next_u(p_minimum_date, 1);
-                end if;
-            end if;
-        else
-            l_date := p_date;
-        end if;
-
-        return l_date;
-    end;
-
-    function find_previous_date(
-        p_date_for in date,
-        p_period_kind in varchar2,
-        p_period_length in integer default 1,
-        p_initial_date in date default null,
-        p_strict_shift in integer default 0,
-        p_holidays_handling in integer default 0)
-    return date
-    is
-        l_initial_date date := case when p_initial_date is null then p_date_for else p_initial_date end;
-        l_previous_date date;
-        l_days_remainder integer;
-        l_months_remainder number;
-        l_periods_between integer;
-        l_months_between number;
-    begin
-        if (p_date_for is null or p_period_kind is null or p_period_length is null) then
-            return null;
-        end if;
-
-        if (p_period_length <= 0) then
-            raise_application_error(-20000, 'Довжина періоду повинна бути більше нуля');
-        end if;
-
-        if (p_date_for < l_initial_date) then
-            raise_application_error(-20000, 'Дата для якої розраховується попереднє значення {' || to_char(p_date_for, 'dd.mm.yyyy') ||
-                                            '} не може бути меньшою за дату початку відліку {' || to_char(l_initial_date, 'dd.mm.yyyy') || '}');
-        end if;
-
-        case (upper(p_period_kind))
-        when 'DAY' then
-             l_days_remainder := (p_date_for - l_initial_date) mod p_period_length;
-
-             l_periods_between := trunc((p_date_for - l_initial_date) / p_period_length) -
-                                      case when l_days_remainder = 0 and p_strict_shift = 1 then 1
-                                           else 0
-                                      end;
-             l_previous_date := l_initial_date + (l_periods_between * p_period_length);
-        when 'WEEK' then
-             return find_previous_date(p_date_for, 'DAY', p_period_length * 7, p_initial_date, p_strict_shift);
-        when 'MONTH' then
-             l_months_between := round(months_between_alt(l_initial_date, p_date_for), 10);
-
-             l_months_remainder := l_months_between / p_period_length - trunc(l_months_between / p_period_length);
-
-             l_periods_between := trunc(l_months_between / p_period_length) -
-                                      case when l_months_remainder = 0 and p_strict_shift = 1 then 1
-                                           else 0
-                                      end;
-
-             l_previous_date := add_months_alt(l_initial_date, l_periods_between * p_period_length);
-        when 'QUARTER' then
-             return find_previous_date(p_date_for, 'MONTH', p_period_length * 3, p_initial_date, p_strict_shift);
-        when 'YEAR' then
-             return find_previous_date(p_date_for, 'MONTH', p_period_length * 12, p_initial_date, p_strict_shift);
-        else
-             raise_application_error(-20000, 'Неочікуваний тип періоду {' || p_period_kind || '}');
-        end case;
-
-        l_previous_date := handle_holidays(l_previous_date, p_holidays_handling, l_initial_date);
-
-        return greatest(l_previous_date, l_initial_date);
-    end;
-
-    function find_next_date(
-        p_date_for in date,
-        p_period_kind in varchar2,
-        p_period_length in integer default 1,
-        p_initial_date in date default null,
-        p_strict_shift in integer default 0,
-        p_holidays_handling in integer default null)
-    return date
-    is
-        l_initial_date date := case when p_initial_date is null then p_date_for else p_initial_date end;
-        l_next_date date;
-        l_days_difference integer;
-        l_period_length integer := p_period_length;
-        l_initial_day integer;
-        l_day_for integer;
-        l_date_for date;
-        l_starting_date date;
-    begin
-        if (p_date_for is null or p_period_kind is null or p_period_length is null) then
-            return null;
-        end if;
-
-        -- отримаємо попередню календарну дату
-        l_starting_date := find_previous_date(p_date_for, p_period_kind, p_period_length, p_initial_date, p_strict_shift => 0, p_holidays_handling => 0);
-
-        if (l_starting_date = p_date_for and p_strict_shift = 0) then
-            -- якщо зсув на один період не є обов'язковим і дата попередньої події співпадає з датою на яку ми шукаємо наступну дату,
-            -- значить ми вже на місці - повертаємо знайдене значення дати попередньої події
-            return greatest(l_initial_date, handle_holidays(l_starting_date, p_holidays_handling, l_initial_date));
-        end if;
-
-        case (upper(p_period_kind))
-        when 'DAY' then
-             l_next_date := l_starting_date + p_period_length;
-        when 'WEEK' then
-             l_next_date := l_starting_date + (7 * p_period_length);
-        when 'MONTH' then
-             l_next_date := add_months_alt(l_starting_date, p_period_length);
-        when 'QUARTER' then
-             l_next_date := add_months_alt(l_starting_date, 3 * p_period_length);
-        when 'YEAR' then
-             l_next_date := add_months_alt(l_starting_date, 12 * p_period_length);
-        else
-             raise_application_error(-20000, 'Неочікуваний тип періоду {' || p_period_kind || '}');
-        end case;
-
-        return greatest(l_initial_date, handle_holidays(l_next_date, p_holidays_handling, l_initial_date));
-    end;
-
-    function pipe_dates(
-        p_date_from in date,
-        p_date_through in date,
-        p_period_kind in varchar2,
-        p_period_length in integer,
-        p_initial_date in date,
-        p_strict_shift in integer,
-        p_holidays_handling in integer)
-    return date_list
-    pipelined
-    is
-        l_calendar_date date;
-        l_date_through date;
-        l_prev_date_through date;
-    begin
-        if (p_date_from is null or p_date_through is null or p_period_kind is null or p_initial_date is null) then
-            return;
-        end if;
-
-        l_calendar_date := find_next_date(p_date_from, p_period_kind, p_period_length, p_initial_date, p_strict_shift, 0);
-        l_date_through := handle_holidays(l_calendar_date, p_holidays_handling, p_date_from); -- find_previous_date(p_date_from, p_period_kind, p_period_length, p_initial_date, p_strict_shift, p_holidays_handling);
-        loop
-            if (l_date_through is null or l_date_through > p_date_through) then
-                exit;
-            end if;
-
-            if (l_prev_date_through is null or l_prev_date_through <> l_date_through) then
-                pipe row (l_date_through);
-            end if;
-
-            l_prev_date_through := l_date_through;
-            l_calendar_date := find_next_date(l_calendar_date, p_period_kind, p_period_length, p_initial_date, 1, 0);
-            l_date_through := handle_holidays(l_calendar_date, p_holidays_handling, l_calendar_date);
-        end loop;
-    end;
 
     procedure track_reckoning(
         p_reckoning_id in integer,
@@ -2894,13 +2568,14 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
         p_interest_rate in number,
         p_interest_amount in integer,
         p_interest_tail in number,
-        p_state_id in integer default null,
-        p_deal_id in integer default null)
+        p_is_grouping_unit in varchar2,
+        p_state_id in integer,
+        p_deal_id in integer)
     return integer
     is
         l_state_id integer := p_state_id;
     begin
-        if (p_reckoning_type_id not in (interest_utl.RECKONING_TYPE_RAW, interest_utl.RECKONING_TYPE_GROUPING_UNIT, interest_utl.RECKONING_TYPE_CORRECTION)) then
+        if (p_reckoning_type_id not in (interest_utl.RECKONING_TYPE_ORDINARY_INT, interest_utl.RECKONING_TYPE_CORRECTION)) then
             raise_application_error(-20000, 'Неочікуваний тип запису з ідентифікатором {' || p_reckoning_type_id || '}');
         end if;
 
@@ -2927,7 +2602,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
                 null,
                 null,
                 null,
-                null);
+                null,
+                p_is_grouping_unit);
 
         track_reckoning(s_int_reckoning.currval, l_state_id, '');
 
@@ -2974,18 +2650,14 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
 
     function get_rate_purpose_clause(
         p_reckoning_id in integer,
-        p_reckoning_type_id in integer,
+        p_is_grouping_unit in varchar2,
         p_interest_rate in number)
     return varchar2
     is
         l_interest_rates number_list;
         l_rate_dates string_list;
     begin
-        if (p_reckoning_type_id = INTEREST_UTL.RECKONING_TYPE_RAW) then
-            return case when p_interest_rate is null then null
-                        else ' Ставка: ' || to_char(p_interest_rate, 'FM999999990.0099') || '%'
-                   end;
-        elsif (p_reckoning_type_id = INTEREST_UTL.RECKONING_TYPE_GROUPING_UNIT) then
+        if (p_is_grouping_unit = 'Y') then
             select f.interest_rate,
                    to_char(f.date_from, 'dd/mm') || '-' || to_char(f.interest_rate, 'FM999999990.0099') || '%' rate_date
             bulk collect into l_interest_rates, l_rate_dates
@@ -2999,6 +2671,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
                             from   int_reckonings t
                             where  t.grouping_line_id = p_reckoning_id) d
                     where d.rate_change_flag = 1) f;
+
             if (l_interest_rates is empty) then
                 return null;
             elsif (l_interest_rates.count = 1) then
@@ -3006,46 +2679,23 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
             else
                 return ' Ставка: ' || tools.words_to_string(l_rate_dates, ', ', 100, p_ignore_nulls => 'Y');
             end if;
+        elsif (p_is_grouping_unit = 'N') then
+            return case when p_interest_rate is null then null
+                        else ' Ставка: ' || to_char(p_interest_rate, 'FM999999990.0099') || '%'
+                   end;
         else
             return null;
         end if;
     end;
-/*
-    function generate_accrual_purpose(
-        p_reckoning_method in integer,
-        p_account_number in varchar2,
-        p_date_from in date,
-        p_date_through in date,
-        p_interest_rate in number)
-    return varchar2
-    is
-    begin
-        return case when p_reckoning_method = 4 then
-                         substr('Амортизація рах. (пропорц.) ' || p_account_number ||
-                                ' з ' || to_char(p_date_from, 'dd.mm.yy') ||
-                                ' по ' || to_char(p_date_through, 'dd.mm.yy') || ' вкл.', 1, 160)
-                    else case when p_reckoning_method = 1 then
-                                   substr('Нарах.%% по рах.' || p_account_number ||
-                                   ' з ' || to_char(p_date_from, 'dd.mm.yy') ||
-                                   ' по ' || to_char(p_date_through, 'dd.mm.yy') ||
-                                   ' вкл.', 1, 160)
-                              else
-                                   substr('Нарах.%% по рах.' || p_account_number ||
-                                   ' з ' || to_char(p_date_from, 'dd.mm.yy') ||
-                                   ' по ' || to_char(p_date_through, 'dd.mm.yy') ||
-                                   ' вкл. Ставка % ' || to_char(p_interest_rate, 'FM999999990.0099'), 1, 160)
-                         end
-               end;
-    end;
-*/
+
     function generate_accrual_purpose(
         p_reckoning_id in integer,
-        p_reckoning_type_id in integer,
         p_reckoning_method in integer,
         p_account_number in varchar2,
         p_date_from in date,
         p_date_through in date,
-        p_interest_rate in number)
+        p_interest_rate in number,
+        p_is_grouping_unit in varchar2)
     return varchar2
     is
     begin
@@ -3057,40 +2707,18 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
                                 ' з ' || to_char(p_date_from, 'dd.mm.yy') ||
                                 ' по ' || to_char(p_date_through, 'dd.mm.yy') ||
                                 ' вкл.' ||
-                                get_rate_purpose_clause(p_reckoning_id, p_reckoning_type_id, p_interest_rate), 1, 160)
+                                get_rate_purpose_clause(p_reckoning_id, p_is_grouping_unit, p_interest_rate), 1, 160)
                end;
     end;
-/*
-    function generate_payment_purpose(
-        p_reckoning_method in integer,
-        p_account_number in varchar2,
-        p_date_from in date,
-        p_date_through in date,
-        p_interest_rate in number)
-    return varchar2
-    is
-    begin
-        return case when p_reckoning_method = 1 then
-                         substr('Випл.%% по рах.' || p_account_number ||
-                         ' з ' || to_char(p_date_from, 'dd.mm.yy') ||
-                         ' по ' || to_char(p_date_through, 'dd.mm.yy') ||
-                         ' вкл.', 1, 160)
-                    else
-                         substr('Випл.%% по рах.' || p_account_number ||
-                         ' з ' || to_char(p_date_from, 'dd.mm.yy') ||
-                         ' по ' || to_char(p_date_through, 'dd.mm.yy') ||
-                         ' вкл. Ставка % ' || to_char(p_interest_rate, 'FM999999990.0099'), 1, 160)
-               end;
-    end;
-*/
+
     function generate_payment_purpose(
         p_reckoning_id in integer,
-        p_reckoning_type_id in integer,
         p_reckoning_method in integer,
         p_account_number in varchar2,
         p_date_from in date,
         p_date_through in date,
-        p_interest_rate in number)
+        p_interest_rate in number,
+        p_is_grouping_unit in varchar2)
     return varchar2
     is
     begin
@@ -3098,7 +2726,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
                       ' з ' || to_char(p_date_from, 'dd.mm.yy') ||
                       ' по ' || to_char(p_date_through, 'dd.mm.yy') ||
                       ' вкл.' ||
-                      get_rate_purpose_clause(p_reckoning_id, p_reckoning_type_id, p_interest_rate), 1, 160);
+                      get_rate_purpose_clause(p_reckoning_id, p_is_grouping_unit, p_interest_rate), 1, 160);
     end;
 
     function get_accrual_purpose(
@@ -3113,12 +2741,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
         if (l_reckoning_row.accrual_purpose is null) then
             l_int_accn_row := read_int_accn(l_reckoning_row.account_id, l_reckoning_row.interest_kind_id);
             return generate_accrual_purpose(l_reckoning_row.id,
-                                            l_reckoning_row.line_type_id,
                                             l_int_accn_row.metr,
                                             account_utl.get_account_number(l_reckoning_row.account_id),
                                             l_reckoning_row.date_from,
                                             l_reckoning_row.date_through,
-                                            l_reckoning_row.interest_rate);
+                                            l_reckoning_row.interest_rate,
+                                            l_reckoning_row.is_grouping_unit);
         else
             return l_reckoning_row.accrual_purpose;
         end if;
@@ -3137,12 +2765,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
             l_int_accn_row := read_int_accn(l_reckoning_row.account_id, l_reckoning_row.interest_kind_id);
 
             return generate_payment_purpose(l_reckoning_row.id,
-                                            l_reckoning_row.line_type_id,
                                             l_int_accn_row.metr,
                                             account_utl.get_account_number(l_reckoning_row.account_id),
                                             l_reckoning_row.date_from,
                                             l_reckoning_row.date_through,
-                                            l_reckoning_row.interest_rate);
+                                            l_reckoning_row.interest_rate,
+                                            l_reckoning_row.is_grouping_unit);
         else
             return l_reckoning_row.payment_purpose;
         end if;
@@ -3160,18 +2788,24 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
         elsif (l_reckoning_row.state_id in (interest_utl.RECKONING_STATE_ACCRUED, interest_utl.RECKONING_STATE_PAYMENT_FAILED)) then
             return case when l_reckoning_row.payment_purpose is null then
                              generate_payment_purpose(l_reckoning_row.id,
-                                                      l_reckoning_row.line_type_id,
                                                       read_int_accn(l_reckoning_row.account_id, l_reckoning_row.interest_kind_id).metr,
                                                       account_utl.get_account_number(l_reckoning_row.account_id),
                                                       l_reckoning_row.date_from,
                                                       l_reckoning_row.date_through,
-                                                      l_reckoning_row.interest_rate)
+                                                      l_reckoning_row.interest_rate,
+                                                      l_reckoning_row.is_grouping_unit)
                         else l_reckoning_row.payment_purpose
                    end;
         elsif (l_reckoning_row.state_id in (interest_utl.RECKONING_STATE_RECKONED,
                                             interest_utl.RECKONING_STATE_MODIFIED, interest_utl.RECKONING_STATE_ACCRUAL_FAILED)) then
             return case when l_reckoning_row.accrual_purpose is null then
-                             get_accrual_purpose(p_reckoning_id)
+                             generate_accrual_purpose(l_reckoning_row.id,
+                                                      read_int_accn(l_reckoning_row.account_id, l_reckoning_row.interest_kind_id).metr,
+                                                      account_utl.get_account_number(l_reckoning_row.account_id),
+                                                      l_reckoning_row.date_from,
+                                                      l_reckoning_row.date_through,
+                                                      l_reckoning_row.interest_rate,
+                                                      l_reckoning_row.is_grouping_unit)
                         else l_reckoning_row.accrual_purpose
                    end;
         end if;
@@ -3232,7 +2866,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
         p_reckoning_row in int_reckonings%rowtype)
     is
     begin
-        if (p_reckoning_row.line_type_id = interest_utl.RECKONING_TYPE_GROUPING_UNIT) then
+        if (p_reckoning_row.is_grouping_unit = 'Y') then
             for i in (select * from int_reckonings t where t.grouping_line_id = p_reckoning_row.id) loop
                 if (i.state_id <> interest_utl.RECKONING_STATE_GROUPED) then
                     raise_application_error(-20000, 'Порушений порядок групування записів розрахунку відсотків - ' ||
@@ -3247,13 +2881,15 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
         delete int_reckonings t where t.id = p_reckoning_row.id;
     end;
 
+    -- очистка результатів попередніх розрахунків
+    -- видаляє конкретний період розрахунку відсотків
     procedure clear_reckonings(
         p_reckoning_row in int_reckonings%rowtype)
     is
     begin
         if (p_reckoning_row.state_id not in (interest_utl.RECKONING_STATE_RECKONED, interest_utl.RECKONING_STATE_MODIFIED,
                                                  interest_utl.RECKONING_STATE_ACCRUAL_FAILED, interest_utl.RECKONING_STATE_ONLY_INFO,
-                                                 interest_utl.RECKONING_STATE_RECKONING_FAIL)) then
+                                                 interest_utl.RECKONING_STATE_RECKONING_FAIL, interest_utl.RECKONING_STATE_RECALCULATION)) then
             raise_application_error(-20000, 'Розрахунок відсотків за період {' || p_reckoning_row.date_from || ' - ' || p_reckoning_row.date_through ||
                                             '} по рахунку ' || account_utl.get_account_number(p_reckoning_row.account_id) ||
                                             '(' || account_utl.get_account_currency_id(p_reckoning_row.account_id) || ')' ||
@@ -3264,6 +2900,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
         clear_reckonings_utl(p_reckoning_row);
     end;
 
+    -- очистка результатів попередніх розрахунків
+    -- використовується для підготовки/перевірки простору для розрахунку відсотків починаючи з певної дати
+    -- якщо дата p_date_from перетинається з вже нарахованими/виплаченими періодами - генерується виключення
     procedure clear_reckonings(
         p_account_id in integer,
         p_interest_kind_id in integer,
@@ -3283,6 +2922,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
         end loop;
     end;
 
+    -- очистка результатів попередніх розрахунків
+    -- видаляються усі розрахунки, що ще не були нараховані
     procedure clear_reckonings(
         p_account_id in integer,
         p_interest_kind_id in integer default null)
@@ -3292,15 +2933,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
                   from   int_reckonings t
                   where  t.account_id = p_account_id and
                          (p_interest_kind_id is null or t.interest_kind_id = p_interest_kind_id) and
-                         t.grouping_line_id is null
-                  order by t.date_from desc
+                         t.grouping_line_id is null and
+                         t.state_id in (interest_utl.RECKONING_STATE_RECKONED, interest_utl.RECKONING_STATE_MODIFIED,
+                                        interest_utl.RECKONING_STATE_ACCRUAL_FAILED, interest_utl.RECKONING_STATE_ONLY_INFO,
+                                        interest_utl.RECKONING_STATE_RECKONING_FAIL, interest_utl.RECKONING_STATE_RECALCULATION)
+                  order by t.interest_kind_id, t.date_from desc
                   for update) loop
-            if (i.state_id not in (interest_utl.RECKONING_STATE_RECKONED, interest_utl.RECKONING_STATE_MODIFIED,
-                                   interest_utl.RECKONING_STATE_ACCRUAL_FAILED, interest_utl.RECKONING_STATE_ONLY_INFO,
-                                   interest_utl.RECKONING_STATE_RECKONING_FAIL)) then
-                exit;
-            end if;
-
             clear_reckonings(i);
         end loop;
     end;
@@ -3326,7 +2964,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
         if (p_reckoning_unit.interest_amount <> 0) then
             for i in (select * from acr_intn) loop
                 tools.hide_hint(
-                    create_interest_reckoning(interest_utl.RECKONING_TYPE_RAW,
+                    create_interest_reckoning(interest_utl.RECKONING_TYPE_ORDINARY_INT,
                                               p_reckoning_unit.account_id,
                                               p_reckoning_unit.interest_kind,
                                               i.fdat,
@@ -3335,13 +2973,14 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
                                               case when nvl(i.br, 0) = 0 then nvl(i.ir, 0) else i.br end,
                                               abs(round(i.acrd)),
                                               i.remi,
+                                              'N',
                                               null,
                                               p_reckoning_unit.deal_id));
             end loop;
         else
             -- сумма проц = 0, но дату закрытия периода acr_dat все-равно надо будет проставить
             tools.hide_hint(
-                create_interest_reckoning(interest_utl.RECKONING_TYPE_RAW,
+                create_interest_reckoning(interest_utl.RECKONING_TYPE_ORDINARY_INT,
                                           p_reckoning_unit.account_id,
                                           p_reckoning_unit.interest_kind,
                                           p_reckoning_unit.date_from,
@@ -3350,6 +2989,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
                                           acrn.fprocn(p_reckoning_unit.account_id, p_reckoning_unit.interest_kind, p_reckoning_unit.date_through),
                                           0,
                                           0,
+                                          'N',
                                           null,
                                           p_reckoning_unit.deal_id));
         end if;
@@ -3407,7 +3047,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
                                           'date_through    : ' || p_reckoning_units(l).date_through       || chr(10) ||
                                            sqlerrm || chr(10) || dbms_utility.format_error_backtrace());
 
-                     l_reckoning_id := create_interest_reckoning(interest_utl.RECKONING_TYPE_RAW,
+                     l_reckoning_id := create_interest_reckoning(interest_utl.RECKONING_TYPE_ORDINARY_INT,
                                                p_reckoning_units(l).account_id,
                                                p_reckoning_units(l).interest_kind,
                                                p_reckoning_units(l).date_from,
@@ -3416,6 +3056,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
                                                null,
                                                null,
                                                null,
+                                               'N',
                                                interest_utl.RECKONING_STATE_RECKONING_FAIL,
                                                p_reckoning_units(l).deal_id);
                      track_reckoning(l_reckoning_id, interest_utl.RECKONING_STATE_RECKONING_FAIL, sqlerrm || chr(10) || dbms_utility.format_error_backtrace());
@@ -3535,7 +3176,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
 
     procedure group_reckonings(
         p_accounts in number_list,
-        p_grouping_mode_id in integer)
+        p_grouping_mode_id in integer,
+        p_line_type in integer)
     is
         l_interest_kind_id integer;
         l_date_from date;
@@ -3566,14 +3208,13 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
                              count(*) over (partition by t.interest_kind_id) total_lines_count
                       from   int_reckonings t
                       where  t.account_id = p_accounts(l) and
-                             t.line_type_id = interest_utl.RECKONING_TYPE_RAW and
+                             t.line_type_id = p_line_type and
                              t.grouping_line_id is null and
-                             -- t.interest_amount + t.interest_tail <> 0 and
                              t.state_id in (interest_utl.RECKONING_STATE_RECKONED, interest_utl.RECKONING_STATE_MODIFIED,
-                                            interest_utl.RECKONING_STATE_ONLY_INFO, interest_utl.RECKONING_STATE_ACCRUAL_FAILED)
+                                            interest_utl.RECKONING_STATE_ONLY_INFO, interest_utl.RECKONING_STATE_ACCRUAL_FAILED,
+                                            interest_utl.RECKONING_STATE_RECALCULATION)
                       order by t.interest_kind_id, t.date_from) loop
 
-                -- l_interest_rate := acrn.fprocn(i.account_id, i.interest_kind_id, i.date_from);
                 if (l_date_from is null) then
                     l_interest_kind_id := i.interest_kind_id;
                     l_date_from := i.date_from;
@@ -3588,7 +3229,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
                         (p_grouping_mode_id = interest_utl.GROUPING_MODE_GROUP_BY_RATES and i.interest_rate <> l_interest_line_rate)) then
 
                         if (l_interest_line_amount > 0) then
-                            l_grouping_line_id := create_interest_reckoning(interest_utl.RECKONING_TYPE_GROUPING_UNIT,
+                            l_grouping_line_id := create_interest_reckoning(p_line_type,
                                                       i.account_id,
                                                       i.interest_kind_id,
                                                       l_date_from,
@@ -3597,6 +3238,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
                                                       l_interest_line_rate,
                                                       l_interest_line_amount,
                                                       l_interest_line_tail,
+                                                      'Y',
                                                       null,
                                                       i.deal_id);
 
@@ -3633,7 +3275,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
                 end if;
 
                 if (i.line_number = i.total_lines_count and l_interest_line_amount > 0) then
-                    l_grouping_line_id := create_interest_reckoning(interest_utl.RECKONING_TYPE_GROUPING_UNIT,
+                    l_grouping_line_id := create_interest_reckoning(p_line_type,
                                               i.account_id,
                                               i.interest_kind_id,
                                               l_date_from,
@@ -3642,6 +3284,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
                                               l_interest_line_rate,
                                               l_interest_line_amount,
                                               l_interest_line_tail,
+                                              'Y',
                                               null,
                                               i.deal_id);
 
@@ -3820,8 +3463,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
     procedure accrue_interest(
         p_reckoning_row in int_reckonings%rowtype,
         p_silent_mode in boolean default false,
-        p_do_not_store_interest_tail in boolean default false,
-        p_dk in integer default null)
+        p_do_not_store_interest_tail in boolean default false)
     is
         l_account_row accounts%rowtype;
         l_int_accn_row int_accn%rowtype;
@@ -3846,7 +3488,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
                         'p_int_reckoning_row.date_through     : ' || p_reckoning_row.date_through     || chr(10) ||
                         'p_int_reckoning_row.interest_amount  : ' || p_reckoning_row.interest_amount);
 
-        if (p_reckoning_row.state_id = interest_utl.RECKONING_STATE_ACCRUED) then
+        if (p_reckoning_row.line_type_id = interest_utl.RECKONING_TYPE_CORRECTION or p_reckoning_row.state_id = interest_utl.RECKONING_STATE_ACCRUED) then
             return;
         end if;
 
@@ -3885,18 +3527,18 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
             if (l_interest_amount > 0 and l_income_amount > 0) then
                 l_operation_type := nvl(l_int_accn_row.tt, '%%1');
 
-                if (p_dk is null) then
-                    l_dk := case when l_interest_account_row.pap = 1 then 1 -- активний рахунок
-                                 else 0 -- пасивний рахунок (зворотній порядок рахунків)
-                            end;
-                    if (l_int_accn_row.metr = 4) then
-                        l_dk := case when l_dk = 0 then 1
-                                     when l_dk = 1 then 0
-                                     else l_dk
-                                end; -- амортизация
-                    end if;
+                if (l_int_accn_row.id mod 2 = 0) then -- актив
+                    l_dk := 1; -- прямий порядок рахунків: acra - acrb
                 else
-                    l_dk := p_dk;
+                    l_dk := 0; -- зворотній порядок рахунків при проводці: acrb - acra
+                end if;
+
+                -- амортизация (змінює порядок рахунків: амортизація активного рахунку виконується за рахунок витрат)
+                if (l_int_accn_row.metr = 4) then
+                    l_dk := case when l_dk = 0 then 1
+                                 when l_dk = 1 then 0
+                                 else l_dk
+                            end;
                 end if;
 
                 l_purpose := get_accrual_purpose(p_reckoning_row.id);
@@ -4350,11 +3992,65 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
         set_reckoning_state(l_reckoning_row.id, interest_utl.RECKONING_STATE_ACCRUED, 'Документ виплати з ідентифікатором ' || p_document_id || ' сторнований');
     end;
 
-    procedure accrue_reckoned_interest
+    procedure on_interest_document_revert(
+        p_document_id in integer)
     is
     begin
-        bars_audit.log_info('interest_utl.accrue_reckoned_interest', '');
+        interest_utl.on_accrual_document_revert(p_document_id);
+        interest_utl.on_payment_document_revert(p_document_id);
     end;
+
+    procedure recalculate_interest(
+        p_reckoning_unit in out nocopy t_reckoning_unit)
+    is
+    begin
+        -- очистка всіх попередніх прогнозів та записів про перерахунок відсотків
+        clear_reckonings(p_reckoning_unit.account_id, p_reckoning_unit.interest_kind);
+
+        delete acr_intn;
+
+        interest_utl.p_int(p_reckoning_unit.account_id,
+                           p_reckoning_unit.interest_kind,
+                           p_reckoning_unit.date_from,
+                           p_reckoning_unit.date_through,
+                           p_reckoning_unit.interest_amount,
+                           null,
+                           1);
+
+        if (p_reckoning_unit.interest_amount <> 0) then
+            for i in (select * from acr_intn) loop
+                tools.hide_hint(
+                    create_interest_reckoning(interest_utl.RECKONING_TYPE_CORRECTION,
+                                              p_reckoning_unit.account_id,
+                                              p_reckoning_unit.interest_kind,
+                                              i.fdat,
+                                              i.tdat,
+                                              i.osts / acrn.dlta(p_reckoning_unit.reckoning_calendar, i.fdat, i.tdat + 1),
+                                              case when nvl(i.br, 0) = 0 then nvl(i.ir, 0) else i.br end,
+                                              abs(round(i.acrd)),
+                                              i.remi,
+                                              'N',
+                                              null,
+                                              p_reckoning_unit.deal_id));
+            end loop;
+        else
+            -- сумма проц = 0, но дату закрытия периода acr_dat все-равно надо будет проставить
+            tools.hide_hint(
+                create_interest_reckoning(interest_utl.RECKONING_TYPE_CORRECTION,
+                                          p_reckoning_unit.account_id,
+                                          p_reckoning_unit.interest_kind,
+                                          p_reckoning_unit.date_from,
+                                          p_reckoning_unit.date_through,
+                                          fost(p_reckoning_unit.account_id, p_reckoning_unit.date_from),
+                                          acrn.fprocn(p_reckoning_unit.account_id, p_reckoning_unit.interest_kind, p_reckoning_unit.date_through),
+                                          0,
+                                          0,
+                                          'N',
+                                          null,
+                                          p_reckoning_unit.deal_id));
+        end if;
+    end;
+
 /*
     procedure accrue_reckoned_interest(
         p_dictionary_list in t_dictionary_list,
@@ -5088,14 +4784,4 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
 */
 end;
 /
- show err;
- 
-PROMPT *** Create  grants  INTEREST_UTL ***
-grant EXECUTE                                                                on INTEREST_UTL    to BARS_ACCESS_DEFROLE;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/interest_utl.sql =========*** End **
- PROMPT ===================================================================================== 
- 
+show err

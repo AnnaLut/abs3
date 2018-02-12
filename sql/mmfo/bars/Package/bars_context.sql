@@ -511,7 +511,8 @@ is
         set_context_ex(l_branch);
 
         -- Выполняем переинициализацию пакетов
-        if (not tools.equals(sys_context(CONTEXT_CTX, CTXPAR_USERBRANCH), l_branch)) then
+        if (not tools.equals(sys_context(CONTEXT_CTX, CTXPAR_USERBRANCH), l_branch)) or 
+           (sys_context(CONTEXT_CTX, CTXPAR_USERBRANCH) is null)then
             gl.param;
             sec.reinit;
         end if;

@@ -1,15 +1,58 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/gl_ui.sql =========*** Run *** =====
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.GL_UI is
+create or replace package gl_ui is
 
     g_type_message_dialog constant varchar2(100) :='DIALOG'; -- OK CANCEL
     g_type_message_info constant varchar2(100) :='INFO';     --OK
     g_type_message_error constant varchar2(100) :='ERROR';   --CLOSE
+/*
+    type t_user_visa_doc is record
+    (
+        color1           number,
+        color2           number,
+        vdat             date,
+        ref              number(38),
+        tt               char(3),
+        nlsa             varchar2(15),
+        nlsb             varchar2(15),
+        mfob             varchar2(12),
+        nb_b             varchar2(38),
+        s                number(24),
+        s_               number(24),
+        dk               number(1),
+        sk               number(2),
+        lcv1             char(3),
+        dig1             number(10),
+        userid           number(38),
+        fio              varchar2(60),
+        chk              char(70),
+        nazn             varchar2(160),
+        lcv2             char(3),
+        dig2             number(10),
+        s2               number(24),
+        s2_              number(24),
+        nd               varchar2(10),
+        nextvisagrp      varchar2(4),
+        kv               number(3),
+        kv2              number(3),
+        tobo             varchar2(30),
+        flags            varchar2(104),
+        deal_tag         number(38),
+        datd             date,
+        pdat             date,
+        prty             number(1),
+        sos              number(2),
+        nam_b            varchar2(38),
+        mfoa             varchar2(12),
+        nb_a             varchar2(38),
+        datp             date,
+        vob              number(38),
+        nam_a            varchar2(38),
+        branch           varchar2(30),
+        id_a             varchar2(14),
+        id_b             varchar2(14)
+    );
 
+    type t_user_visa_docs is table of t_user_visa_doc;
+*/
     function get_current_bank_date
     return date;
 
@@ -92,6 +135,9 @@
         p_task_run_id in integer)
     return clob;
 
+    procedure doc_input_check(
+        p_tt in varchar2);
+
     function get_task_run_button_flags(
         p_task_run_id in integer,
         p_task_run_state_id in integer,
@@ -105,10 +151,21 @@
         p_dictionary in out  t_dictionary,
         p_message out varchar2,
         p_type_message out varchar2);
+/*
+    function pipe_user_visa_docs(
+        p_start_line in integer default 1,
+        p_end_line in integer default null)
+    return t_user_visa_docs
+    pipelined;
 
+    function pipe_user_visa_docs(
+        p_visa_group in integer)
+    return t_user_visa_docs
+    pipelined;
+*/
 end;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.GL_UI as
+create or replace package body gl_ui as
 
     function get_current_bank_date_utl
     return date
@@ -528,6 +585,30 @@ CREATE OR REPLACE PACKAGE BODY BARS.GL_UI as
         tms_utl.set_branch_stage(p_branch_code, p_stage_id);
     end;
 
+
+    procedure doc_input_check(
+        p_tt in varchar2)
+    is
+    begin
+        /*if (length(sys_context('bars_context', 'user_branch'))<= 8) then
+            raise_application_error(-20000, 'Ручне введення операцій заборонено на рівні ' || sys_context('bars_context', 'user_branch'));
+        end if;*/
+        null;
+    end;
+ 
+    procedure validate_manual_operation(
+        p_tt in varchar2,
+        p_message out varchar2,
+        p_type_message out varchar2)
+    is
+    begin/*
+        if (length(sys_context('bars_context', 'user_branch')) <= 8) then
+            p_message := 'Ручне введення операцій заборонено на рівні ' || sys_context('bars_context', 'user_branch');
+            p_type_message := gl_ui.g_type_message_error;
+        end if;*/
+        null;
+    end;
+
     function validate_d9#70(p_value operw.value%type) return number is
       l_flag number;
     begin
@@ -610,27 +691,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.GL_UI as
 
       end;
 
-
-      procedure validate_manual_operation(
-          p_tt in varchar2,
-          p_message out varchar2,
-          p_type_message out varchar2)
-      is
-          l_tts_row tts%rowtype;
-      begin
-          if (bars_context.is_mfo(sys_context('bars_context', 'user_branch')) = 1) then
-              select *
-              into   l_tts_row
-              from   tts t
-              where  t.tt = p_tt;
-
-              if (substr(l_tts_row.flags, 1, 1) = '1') then  -- операція дозволена для ручного вводу
-                  p_message := 'Заборонено вводити операцію на рівні МФО';
-                  p_type_message := g_type_message_error;
-              end if;
-          end if;
-      end;
-
       procedure doc_input_validation(p_dictionary_main in t_dictionary,
                                    p_dictionary      in out t_dictionary,
                                    p_message         out varchar2,
@@ -691,17 +751,184 @@ CREATE OR REPLACE PACKAGE BODY BARS.GL_UI as
       logger.info('dict:: l_BGN=' || l_BGN || ', p_type_message=' || p_type_message || ', p_message=' || p_message);
 
     end;
+/*
+    function pipe_user_visa_docs(
+        p_start_line in integer default 1,
+        p_end_line in integer default null)
+    return t_user_visa_docs
+    pipelined
+    is
+        l_hex_visa_groups string_list;
+        l_counter integer default 0;
+    begin
+        \*if (sys_context('bars_context', 'user_mfo') is null) then
+            return;
+        end if;*\
 
+        select grpid_hex
+        bulk collect into l_hex_visa_groups
+        from   v_user_visa;
+
+        if (l_hex_visa_groups is empty) then
+            return;
+        end if;
+
+        for i in (select ref from ref_que q
+                  where exists (select 1
+                                from   oper o
+                                where  o.ref = q.ref and
+                                       o.sos >= 0 and
+                                       o.sos < 5 and
+                                       o.nextvisagrp member of l_hex_visa_groups)) loop
+
+            for j in (select sign (a.vdat - bankdate) as color1,
+                             nvl (a.sk, 0) as color2,
+                             a.vdat,
+                             a.ref,
+                             a.tt,
+                             a.nlsa,
+                             a.nlsb,
+                             a.mfob,
+                             bb.nb as nb_b,
+                             a.s,
+                             a.s / v1.denom as s_,
+                             a.dk,
+                             a.sk,
+                             v1.lcv as lcv1,
+                             v1.dig as dig1,
+                             a.userid,
+                             us.fio,
+                             a.chk,
+                             a.nazn,
+                             v2.lcv as lcv2,
+                             v2.dig as dig2,
+                             a.s2,
+                             a.s2 / v2.denom as s2_,
+                             a.nd,
+                             a.nextvisagrp,
+                             v1.kv,
+                             v2.kv as kv2,
+                             a.tobo,
+                             tt.flags || tt.fli as flags,
+                             a.deal_tag,
+                             a.datd,
+                             a.pdat,
+                             a.prty,
+                             a.sos,
+                             a.nam_b,
+                             a.mfoa,
+                             ba.nb as nb_a,
+                             a.datp,
+                             a.vob,
+                             a.nam_a,
+                             a.branch,
+                             a.id_a,
+                             a.id_b
+                        from oper a,
+                             tts tt,
+                             banks$base ba,
+                             banks$base bb,
+                             tabval$global v1,
+                             tabval$global v2,
+                             staff$base us
+                       where a.ref = i.ref
+                             and v1.kv = a.kv
+                             and v2.kv = a.kv2
+                             and a.tt = tt.tt
+                             and a.mfoa = ba.mfo
+                             and a.mfob = bb.mfo
+                             and a.userid = us.id) loop
+
+                l_counter := l_counter + 1;
+
+                if (l_counter > p_end_line) then
+                    bars_audit.log_info('gl_ui.pipe_user_visa_docs', 'rows count : ' || l_counter);
+                    return;
+                end if;
+
+                if (l_counter >= p_start_line) then
+                    pipe row (j);
+                end if;
+            end loop;
+        end loop;
+
+        bars_audit.log_info('gl_ui.pipe_user_visa_docs', 'rows count : ' || l_counter);
+    end;
+
+    function pipe_user_visa_docs(
+        p_visa_group in integer)
+    return t_user_visa_docs
+    pipelined
+    is
+        l_hex_visa_group chklist.idchk_hex%type;
+        l_counter integer default 0;
+    begin
+        select t.idchk_hex
+        into   l_hex_visa_group
+        from   bars.chklist t
+        where  t.idchk = p_visa_group;
+
+        for j in (select sign (a.vdat - bankdate) as color1,
+                         nvl (a.sk, 0) as color2,
+                         a.vdat,
+                         a.ref,
+                         a.tt,
+                         a.nlsa,
+                         a.nlsb,
+                         a.mfob,
+                         (select bb.nb from banks$base bb where a.mfob = bb.mfo) as nb_b,
+                         a.s,
+                         a.s / v1.denom as s_,
+                         a.dk,
+                         a.sk,
+                         v1.lcv as lcv1,
+                         v1.dig as dig1,
+                         a.userid,
+                         (select us.fio from staff$base us where a.userid = us.id) fio,
+                         a.chk,
+                         a.nazn,
+                         v2.lcv as lcv2,
+                         v2.dig as dig2,
+                         a.s2,
+                         a.s2 / v2.denom as s2_,
+                         a.nd,
+                         a.nextvisagrp,
+                         v1.kv,
+                         v2.kv as kv2,
+                         a.tobo,
+                         (select tt.flags || tt.fli from tts tt where tt.tt = a.tt) as flags,
+                         a.deal_tag,
+                         a.datd,
+                         a.pdat,
+                         a.prty,
+                         a.sos,
+                         a.nam_b,
+                         a.mfoa,
+                         (select ba.nb from banks$base ba where a.mfoa = ba.mfo) nb_a,
+                         a.datp,
+                         a.vob,
+                         a.nam_a,
+                         a.branch,
+                         a.id_a,
+                         a.id_b
+                    from oper a,
+                         tabval$global v1,
+                         tabval$global v2
+                   where a.sos >= 0 and
+                         a.sos < 5 and
+                         a.nextvisagrp = l_hex_visa_group and
+                         a.ref in (select q.ref from ref_que q) and
+                         v1.kv = a.kv and
+                         v2.kv = a.kv2) loop
+
+            l_counter := l_counter + 1;
+
+            pipe row (j);
+        end loop;
+
+        bars_audit.log_info('gl_ui.pipe_user_visa_docs', 'rows count : ' || l_counter);
+    end;
+*/
 end;
 /
- show err;
- 
-PROMPT *** Create  grants  GL_UI ***
-grant EXECUTE                                                                on GL_UI           to BARS_ACCESS_DEFROLE;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/gl_ui.sql =========*** End *** =====
- PROMPT ===================================================================================== 
- 
+show err

@@ -280,7 +280,7 @@ is
         where o.ref  = p.ref
           and o.accd = ad.acc
           and o.acck = ak.acc
-          and ( ad.nbs not like '8%' or ak.nbs not like '8%');
+          and ( ad.nls not like '8%' or ak.nls not like '8%');
 
         update part_zvt_doc set branch = substr(branch,1,8) where abs(tema) = 14 and fdat = p_fdat;
 

@@ -1,5 +1,3 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_INS_GRT_DEALS.sql =========*** Run **
 PROMPT ===================================================================================== 
@@ -7,8 +5,27 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_INS_GRT_DEALS ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_INS_GRT_DEALS ("DEAL_ID", "TYPE_ID", "TYPE_NAME", "DEAL_NUM", "DEAL_DATE", "GRT_NAME", "DEAL_RNK", "CTYPE", "FIO", "INN", "DOC_SER", "DOC_NUM", "DOC_ISSUER", "DOC_DATE") AS 
-  SELECT d.deal_id,
+grant SELECT                                                                 on V_INS_GRT_DEALS to UPLD;
+
+CREATE OR REPLACE FORCE VIEW BARS.V_INS_GRT_DEALS
+(
+   DEAL_ID,
+   TYPE_ID,
+   TYPE_NAME,
+   DEAL_NUM,
+   DEAL_DATE,
+   GRT_NAME,
+   DEAL_RNK,
+   CTYPE,
+   FIO,
+   INN,
+   DOC_SER,
+   DOC_NUM,
+   DOC_ISSUER,
+   DOC_DATE
+)
+AS
+SELECT d.deal_id,
        d.grt_type_id AS type_id,
        t.type_name,
        d.deal_num,
@@ -76,11 +93,40 @@ GROUP BY a.acc,
          pp.organ,
          pp.pdate;
 
-PROMPT *** Create  grants  V_INS_GRT_DEALS ***
-grant SELECT                                                                 on V_INS_GRT_DEALS to BARSREADER_ROLE;
-grant SELECT                                                                 on V_INS_GRT_DEALS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_INS_GRT_DEALS to UPLD;
 
+COMMENT ON TABLE BARS.V_INS_GRT_DEALS IS 'Дані забезпечення для страховок (Представлення)';
+
+COMMENT ON COLUMN BARS.V_INS_GRT_DEALS.DEAL_ID IS 'Код договору';
+
+COMMENT ON COLUMN BARS.V_INS_GRT_DEALS.TYPE_ID IS 'Код типу договору';
+
+COMMENT ON COLUMN BARS.V_INS_GRT_DEALS.TYPE_NAME IS 'Тип забезпечення';
+
+COMMENT ON COLUMN BARS.V_INS_GRT_DEALS.DEAL_NUM IS 'Номер договору забезпечення';
+
+COMMENT ON COLUMN BARS.V_INS_GRT_DEALS.DEAL_DATE IS 'Дата договору забезпечення';
+
+COMMENT ON COLUMN BARS.V_INS_GRT_DEALS.GRT_NAME IS 'Повна назва забезпечення';
+
+COMMENT ON COLUMN BARS.V_INS_GRT_DEALS.DEAL_RNK IS 'Код клієнта (RNK)';
+
+COMMENT ON COLUMN BARS.V_INS_GRT_DEALS.CTYPE IS 'Тип клієнта (2-юр.особа/3-фіз.особа)';
+
+COMMENT ON COLUMN BARS.V_INS_GRT_DEALS.FIO IS 'ПІБ клієнта';
+
+COMMENT ON COLUMN BARS.V_INS_GRT_DEALS.INN IS 'Ідентифікаційний номер';
+
+COMMENT ON COLUMN BARS.V_INS_GRT_DEALS.DOC_SER IS 'Документ - серія';
+
+COMMENT ON COLUMN BARS.V_INS_GRT_DEALS.DOC_NUM IS 'Документ - номер';
+
+COMMENT ON COLUMN BARS.V_INS_GRT_DEALS.DOC_ISSUER IS 'Документ - місце видачі';
+
+COMMENT ON COLUMN BARS.V_INS_GRT_DEALS.DOC_DATE IS 'Документ - дата видачі';
+
+
+
+GRANT SELECT ON BARS.V_INS_GRT_DEALS TO BARS_ACCESS_DEFROLE;
 
 
 PROMPT ===================================================================================== 

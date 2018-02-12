@@ -133,15 +133,16 @@ begin
   bars_metabase.add_column(l_tabid, 7, 'NPP', 'N', '№~п/п', '', 22, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 8, 'DNEY', 'N', 'Днів', '', 22, 5, 0, 0, 0, 0, '', '', 0, 0, 'SUM(DNEY)', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 9, 'DNK', 'D', 'Дата~наступної~сплати~купону', '', 10, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,10, 'OFFER_DATE', 'D', 'Дата~оферти', null, 10, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание процедур
-  bars_metabase.add_actiontbl(l_tabid, 'DELETE', 'cp_sheduler(3,:ID,:NPP,:DOK,:DNK,:KUP,:NOM,:IR,:EXP_DAT)');
+  bars_metabase.add_actiontbl(l_tabid, 'DELETE', 'cp_sheduler(3,:ID,:NPP,:DOK,:DNK,:KUP,:NOM,:IR,:EXP_DAT, :OFFER_DATE)');
 
   -- добавляем описание процедур
-  bars_metabase.add_actiontbl(l_tabid, 'INSERT', 'cp_sheduler(1,:ID,:NPP,:DOK,:DNK,:KUP,:NOM,:IR,:EXP_DAT)');
+  bars_metabase.add_actiontbl(l_tabid, 'INSERT', 'cp_sheduler(1,:ID,:NPP,:DOK,:DNK,:KUP,:NOM,:IR,:EXP_DAT, :OFFER_DATE)');
 
   -- добавляем описание процедур
-  bars_metabase.add_actiontbl(l_tabid, 'UPDATE', 'cp_sheduler(2,:ID,:NPP,:DOK,:DNK,:KUP,:NOM,:IR,:EXP_DAT)');
+  bars_metabase.add_actiontbl(l_tabid, 'UPDATE', 'cp_sheduler(2,:ID,:NPP,:DOK,:DNK,:KUP,:NOM,:IR,:EXP_DAT, :OFFER_DATE)');
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

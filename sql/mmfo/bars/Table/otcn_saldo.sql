@@ -96,7 +96,7 @@ PROMPT *** Create  index I1_OTCN_SALDO ***
 begin   
  execute immediate 'CREATE INDEX BARS.I1_OTCN_SALDO ON BARS.OTCN_SALDO (ACC, FDAT) ';
 exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 

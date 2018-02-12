@@ -1,23 +1,34 @@
-MERGE INTO BARS.EAD_TYPES A USING
- (SELECT
-  'FACC' as ID,
-  'Рахунок Фіз.особи' as NAME,
-  'SetAccountData' as METHOD,
-  4320 as MSG_LIFETIME,
-  5 as MSG_RETRY_INTERVAL
-  FROM DUAL) B
-ON (A.ID = B.ID)
-WHEN NOT MATCHED THEN 
-INSERT (
-  ID, NAME, METHOD, MSG_LIFETIME, MSG_RETRY_INTERVAL)
-VALUES (
-  B.ID, B.NAME, B.METHOD, B.MSG_LIFETIME, B.MSG_RETRY_INTERVAL)
-WHEN MATCHED THEN
-UPDATE SET 
-  A.NAME = B.NAME,
-  A.METHOD = B.METHOD,
-  A.MSG_LIFETIME = B.MSG_LIFETIME,
-  A.MSG_RETRY_INTERVAL = B.MSG_RETRY_INTERVAL;
+PROMPT *** Refresh data ead_types ***
 
-COMMIT;
-/
+set constraints all deferred;
+
+delete from ead_types;
+
+insert into ead_types (ID, NAME, METHOD, MSG_LIFETIME, MSG_RETRY_INTERVAL)
+values ('DICT', 'Довідник', 'SetDictionaryData', 4320, 5);
+
+insert into ead_types (ID, NAME, METHOD, MSG_LIFETIME, MSG_RETRY_INTERVAL)
+values ('CLIENT', 'Клієнт', 'SetClientData', 4320, 5);
+
+insert into ead_types (ID, NAME, METHOD, MSG_LIFETIME, MSG_RETRY_INTERVAL)
+values ('UCLIENT', 'клiент - Юр.особа', 'SetClientDataU', 4320, 5);
+
+insert into ead_types (ID, NAME, METHOD, MSG_LIFETIME, MSG_RETRY_INTERVAL)
+values ('ACC', 'Рахунок Фіз.особи', 'SetAccountData', 4320, 5);
+
+insert into ead_types (ID, NAME, METHOD, MSG_LIFETIME, MSG_RETRY_INTERVAL)
+values ('UACC', 'Рахунок Юр.особи', 'SetAccountDataU', 4320, 5);
+
+insert into ead_types (ID, NAME, METHOD, MSG_LIFETIME, MSG_RETRY_INTERVAL)
+values ('AGR', 'Угода', 'SetAgreementData', 4320, 5);
+
+insert into ead_types (ID, NAME, METHOD, MSG_LIFETIME, MSG_RETRY_INTERVAL)
+values ('UAGR', 'Угода Юр.особи', 'SetAgreementDataU', 4320, 5);
+
+insert into ead_types (ID, NAME, METHOD, MSG_LIFETIME, MSG_RETRY_INTERVAL)
+values ('ACT', 'Актуалізація ідент. документів', 'ActualizeIdDocs', 4320, 5);
+
+insert into ead_types (ID, NAME, METHOD, MSG_LIFETIME, MSG_RETRY_INTERVAL)
+values ('DOC', 'Надрукований документ', 'SetDocumentData', 4320, 5);
+
+commit work;

@@ -16022,10 +16022,3 @@ BEGIN
 END cck;
 /
 show err;
-
-PROMPT *** Create  grants  CCK ***
-grant EXECUTE                                                                on CCK             to BARS009;
-grant EXECUTE                                                                on CCK             to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on CCK             to RCC_DEAL;
-grant EXECUTE                                                                on CCK             to WR_ALL_RIGHTS;
-grant EXECUTE                                                                on CCK             to WR_CREDIT;

@@ -1,7 +1,3 @@
-exec bc.go('300465');
-delete from REZ_PAR_9200 where fdat is null;
-commit;
-exec bc.go('/');
 begin
   EXECUTE IMMEDIATE 
    'ALTER TABLE BARS.REZ_PAR_9200 DROP PRIMARY KEY CASCADE';

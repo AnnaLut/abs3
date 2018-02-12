@@ -64,11 +64,18 @@ COMMENT ON COLUMN BARS.TMP_BPK_ARSENAL57.BDAY IS '';
 
 
 PROMPT *** Create  grants  TMP_BPK_ARSENAL57 ***
-grant SELECT                                                                 on TMP_BPK_ARSENAL57 to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_BPK_ARSENAL57 to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_BPK_ARSENAL57 to BARS_DM;
 grant SELECT                                                                 on TMP_BPK_ARSENAL57 to RPBN001;
-grant SELECT                                                                 on TMP_BPK_ARSENAL57 to UPLD;
+
+begin 
+  execute immediate 
+    ' alter table TMP_BPK_ARSENAL57 add kf varchar2(6)';
+exception when others then 
+  if sqlcode=-1430 then null; else raise; end if;
+end;
+/
+
 
 
 

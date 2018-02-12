@@ -7,15 +7,14 @@
   CREATE OR REPLACE FUNCTION BARS.F_OURNAME_G RETURN VARCHAR2 IS
   N_NAME VARCHAR2(250);
 BEGIN
-  begin
-    SELECT VAL
-    INTO   N_NAME
-    FROM   PARAMS$GLOBAL
-    WHERE  PAR = 'GLB-NAME';
-  exception when others then
-    N_NAME := getbankname(f_ourmfo_g);
-  end;
-  RETURN N_NAME;
+  SELECT BRANCH_ATTRIBUTE_UTL.GET_VALUE ('GLB-NAME') INTO N_NAME FROM DUAL;
+
+    IF N_NAME IS NULL
+    THEN
+        N_NAME := getbankname (f_ourmfo_g);
+    END IF;
+
+    RETURN N_NAME;
 END;
 /
  show err;

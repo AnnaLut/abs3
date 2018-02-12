@@ -1,10 +1,8 @@
-
- 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/function/zvt_f.sql =========*** Run *** ====
  PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE FUNCTION BARS.ZVT_F (NBSD_    VARCHAR2,          -- БС Дебет
+
+CREATE OR REPLACE FUNCTION BARS.ZVT_F (NBSD_    VARCHAR2,          -- БС Дебет
                                        NBSK_    VARCHAR2,         -- БС Кредит
                                        BRD_     VARCHAR2, -- Бранч счета-Дебет
                                        BRK_     VARCHAR2, -- Бранс счета-Кредит
@@ -273,8 +271,8 @@ BEGIN
       RETURN t_;
    END IF;
 
-
-
+     
+   
    -----------------------------------------------------------
    -- 1-7 классы
 
@@ -406,7 +404,7 @@ TT_='ARE' AND (nbsd_='2401' and nbsk_='7702')
    ELSIF tt_ = 'OVR'
    THEN
       t_ := 95;                                               -- АВТ:Овердрафт
-   ELSIF tt_ IN ('PKA', 'PKD', 'PKR','PKQ')           THEN      t_ := 36;   -- БПК:меморіальні ручні
+   ELSIF tt_ IN ('PKA', 'PKD', 'PKR','PKQ','OW4')           THEN      t_ := 36;   -- БПК:меморіальні ручні
    -- заведомо старые БПК
    ELSIF     NbSD_ IN ('2625', '2605')    AND NbSK_ = '2924'
              AND SUBSTR (tt_, 1, 2) NOT IN ('KL')      THEN  t_ := -86;     -- БПК:(2924<->2625)
@@ -643,9 +641,11 @@ TT_='ARE' AND (nbsd_='2401' and nbsk_='7702')
               else
               if tt_ = 'PS1' then
               t_ := 97;
+              elsif tt_ = 'CL1' then
+              t_ := 25;                                            --Клієнт банк
               else
               t_ := 20; -- 20 початкові внутрішні платежі на рахунок клієнтів свого РУ\
-                end if;
+              end if;
             end if;
 
    ELSIF     (   NBSD_ LIKE '260%'
@@ -655,7 +655,12 @@ TT_='ARE' AND (nbsd_='2401' and nbsk_='7702')
          AND MFOA_ = gl.aMFO
          AND tt_ NOT IN ('PS0', 'PS1', 'PS2', 'ELT')
    THEN
-      t_ := 19;                                            --Кл.пл.(Поч.ВН+МБ)
+      IF tt_ IN ('CL2', 'CL5')
+      THEN
+         t_ := 25;                                            --Клієнт банк
+      ELSE
+         t_ := 19;                                            --Кл.пл.(Поч.ВН+МБ)
+      END IF;
    ELSIF     (NBSK_ LIKE '260%' OR NBSK_ LIKE '25%' OR NBSK_ LIKE '265%')
          AND MFOB_ = gl.aMFO
          AND tt_ NOT IN ('PS0', 'PS1', 'PS2','I00')
@@ -729,11 +734,11 @@ TT_='ARE' AND (nbsd_='2401' and nbsk_='7702')
     --5.     Із папки 26 «Доходи за операціями з клієнтами» перенести в папку 84 «АВТ.: Доходи» операцію BN4 («дочірня» до BNY Реалізація ЮМ (не платіжні) за відпускною ціною ОБ (бух. модель Дт 2909 Кт 6399));
    ELSIF NBSk_ = '6399' and NBSd_ = '2909' AND tt_  = ('BN4')
    THEN
-      t_ := -84;
-   --Із папки 26 «Доходи» перенести в папку 84 «АВТ.: Доходи» зв’язану (дочірню) операцію BM4 до операції BMY – бухмодель за дебетом рахунок 2909/23 і кредитом 6399/14.
+      t_ := -84;    
+   --Із папки 26 «Доходи» перенести в папку 84 «АВТ.: Доходи» зв’язану (дочірню) операцію BM4 до операції BMY – бухмодель за дебетом рахунок 2909/23 і кредитом 6399/14.                    
    ELSIF NBSk_ = '6399' and NBSd_ = '2909' AND tt_  = ('BM4')
    THEN
-      t_ := 84;
+      t_ := 84; 
 
    ELSIF NBSk_ LIKE '6%' AND tt_ NOT IN ('PS0', 'K05','SN3' , 'K2K')
    THEN
@@ -871,6 +876,7 @@ TT_='ARE' AND (nbsd_='2401' and nbsk_='7702')
       ELSE                                                          t_ := 35;    -- Меморiальнi(ручнi)
 
       END IF;
+
    END IF;
 
 
@@ -878,7 +884,8 @@ TT_='ARE' AND (nbsd_='2401' and nbsk_='7702')
    RETURN t_;
 END ZVT_F;
 /
- show err;
+
+show err;
  
 PROMPT *** Create  grants  ZVT_F ***
 grant EXECUTE                                                                on ZVT_F           to BARS_ACCESS_DEFROLE;
@@ -891,4 +898,3 @@ grant EXECUTE                                                                on 
  PROMPT ===================================================================================== 
  PROMPT *** End *** ========== Scripts /Sql/BARS/function/zvt_f.sql =========*** End *** ====
  PROMPT ===================================================================================== 
- 

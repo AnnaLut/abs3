@@ -1,14 +1,5 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_USER_VISA.sql =========*** Run *** ==
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_USER_VISA ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_USER_VISA ("GRPID", "GRPID_HEX", "GRPNAME") AS 
-  select a.idchk as grpid,
+create or replace view v_user_visa as
+select a.idchk as grpid,
        a.idchk_hex as grpid_hex,
        a.name as grpname
 from   chklist a
@@ -29,8 +20,3 @@ grant SELECT                                                                 on 
 grant SELECT                                                                 on V_USER_VISA     to WR_CHCKINNR_TOBO;
 grant SELECT                                                                 on V_USER_VISA     to WR_VERIFDOC;
 
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_USER_VISA.sql =========*** End *** ==
-PROMPT ===================================================================================== 

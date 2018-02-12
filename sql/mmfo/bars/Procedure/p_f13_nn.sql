@@ -1,4 +1,13 @@
-CREATE OR REPLACE PROCEDURE BARS.P_F13_Nn (Dat_ DATE  ,
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_F13_NN.sql =========*** Run *** 
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure P_F13_NN ***
+
+  CREATE OR REPLACE PROCEDURE BARS.P_F13_Nn (Dat_ DATE  ,
                                       sheme_ VARCHAR2 DEFAULT 'G')  IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	ѕроцедура формирование файла #13 дл€  Ѕ
@@ -8,14 +17,14 @@ CREATE OR REPLACE PROCEDURE BARS.P_F13_Nn (Dat_ DATE  ,
     параметры: Dat_ - отчетна€ дата
     sheme_ - схема формировани€
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-06.02.2018 добавлен курсор SALDO_KOR_PP дл€ включени€ корректирующих
+06.02.2018 добавлен курсор SALDO_KOR_PP дл€ включени€ корректирующих 
            проводок за пред≥дущий мес€ц в символ 35
-05.02.2018 добавлен курсор OPER_KOR_PP дл€ исключени€ корректирующих
-           символов кассплана за предыдущий мес€ц
+05.02.2018 добавлен курсор OPER_KOR_PP дл€ исключени€ корректирующих 
+           символов кассплана за предыдущий мес€ц 
            (значение показател€ будет формироватьс€ со знаком минус)
-18.01.2018 добавлен курсор (OPER_KOR) дл€ включени€ символов кассплана
-           корректирующих за мес€ц и
-           добавлен курсор (SALDO_KOR) дл€ включени€ корректирующих
+18.01.2018 добавлен курсор (OPER_KOR) дл€ включени€ символов кассплана 
+           корректирующих за мес€ц и 
+           добавлен курсор (SALDO_KOR) дл€ включени€ корректирующих 
            за мес€ц дл€ остатков
 09.11.2010 если в OPER занесены внебал.символа, то при обработке внебал.
            символов из табл.OTCN_F13_ZBSK выполн€етс€ суммирование
@@ -87,12 +96,12 @@ CURSOR ZBSIMVOL89 IS
      and p.SOS=5
      and p.DK=0 ;
 
--- коригуюч≥ документи за попередн≥й м≥с€ць
+-- коригуюч≥ документи за попередн≥й м≥с€ць 
 CURSOR OPER_KOR_PP IS
    SELECT  s.acc, s.nls, o.nlsa, o.kv, o.dk, p.fdat, p.ref, p.stmt,
            decode(p.tt, o.tt, o.sk, t.sk), p.s, o.tt, NVL(o.sk,0), p.dk,
            decode(p.tt, o.tt, 0, 1) pr -- признак дочерней операции
-   FROM OPER o, OPLDOK p, ACCOUNTS s, tts t
+   FROM OPER o, OPLDOK p, ACCOUNTS s, tts t   
    WHERE p.acc = s.acc           AND
          s.tip = 'KAS'           AND
          s.nbs in ('1001','1002','1003','1004') AND
@@ -100,23 +109,23 @@ CURSOR OPER_KOR_PP IS
          p.fdat between Dat1_  AND Dat1_ + 10  AND
          o.ref = p.ref           AND
          o.vob = 96              AND
-         --o.vdat = Dat_           AND
+         --o.vdat = Dat_           AND   
          p.sos = 5               AND
          p.tt = t.tt ;
 
 -- коригуюч≥ за м≥с€ць залишки
 CURSOR SALDO_KOR_PP IS
    SELECT  s.acc, s.nls, s.kv, SUM(decode(p.dk, 0, p.s, -p.s)) SUM_KOR
-   FROM OPER o, OPLDOK p, ACCOUNTS s
+   FROM OPER o, OPLDOK p, ACCOUNTS s   
    WHERE p.acc = s.acc           AND
          s.tip = 'KAS'           AND
          s.nbs in ('1001','1002','1003','1004') AND
          s.kv = 980              AND
          p.fdat between Dat1_  AND Dat1_ + 10 AND
          o.ref = p.ref           AND
-         o.vob = 96              AND
-         --o.vdat = Dat_           AND
-         p.sos = 5
+         o.vob = 96              AND 
+         --o.vdat = Dat_           AND  
+         p.sos = 5               
 group by s.acc, s.nls, s.kv
 order by 1;
 
@@ -125,7 +134,7 @@ CURSOR OPER_KOR IS
    SELECT  s.acc, s.nls, o.nlsa, o.kv, o.dk, p.fdat, p.ref, p.stmt,
            decode(p.tt, o.tt, o.sk, t.sk), p.s, o.tt, NVL(o.sk,0), p.dk,
            decode(p.tt, o.tt, 0, 1) pr -- признак дочерней операции
-   FROM OPER o, OPLDOK p, ACCOUNTS s, tts t
+   FROM OPER o, OPLDOK p, ACCOUNTS s, tts t   
    WHERE p.acc = s.acc           AND
          s.tip = 'KAS'           AND
          s.nbs in ('1001','1002','1003','1004') AND
@@ -133,23 +142,23 @@ CURSOR OPER_KOR IS
          p.fdat between Dat_ + 1 AND Dat2_  AND
          o.ref = p.ref           AND
          o.vob = 96              AND
-         o.vdat = Dat_           AND
+         o.vdat = Dat_           AND   
          p.sos = 5               AND
          p.tt = t.tt ;
 
 -- коригуюч≥ за м≥с€ць залишки
 CURSOR SALDO_KOR IS
    SELECT  s.acc, s.nls, s.kv, SUM(decode(p.dk, 0, p.s, -p.s)) SUM_KOR
-   FROM OPER o, OPLDOK p, ACCOUNTS s
+   FROM OPER o, OPLDOK p, ACCOUNTS s   
    WHERE p.acc = s.acc           AND
          s.tip = 'KAS'           AND
          s.nbs in ('1001','1002','1003','1004') AND
          s.kv = 980              AND
          p.fdat between Dat_ + 1 AND Dat2_  AND
          o.ref = p.ref           AND
-         o.vob = 96              AND
-         o.vdat = Dat_           AND
-         p.sos = 5
+         o.vob = 96              AND 
+         o.vdat = Dat_           AND  
+         p.sos = 5               
 group by s.acc, s.nls, s.kv
 order by 1;
 
@@ -196,7 +205,7 @@ BEGIN
     P_Proc_Set(kodf_,sheme_,nbuc1_,typ_);
 
     P_F12_Nn_sb (Dat_,sheme_,kodf_ext_);
-
+    
     logger.info ('P_F13_NN: End etap 1 for '||to_char(dat_,'dd.mm.yyyy'));
     -------------------------------------------------------------------
     userid_ := user_id;
@@ -215,14 +224,14 @@ BEGIN
        IF s_<>0 THEN
           kodp_:= lpad(TO_CHAR(sk_), 2, '0');
           znap_:= TO_CHAR(s_);
-          INSERT INTO RNBU_TRACE (nls, kv, odate, kodp, znap, nbuc, ref)
+          INSERT INTO RNBU_TRACE (nls, kv, odate, kodp, znap, nbuc, ref) 
           VALUES (nls_, kv_, data_, kodp_, znap_, nbuc_, ref_);
        END IF;
     END LOOP;
     CLOSE ZBSIMVOL89;
-
+    
     logger.info ('P_F13_NN: End etap 2 for '||to_char(dat_,'dd.mm.yyyy'));
-
+    
     -- формирование внебалансовых символов из табл. OTCN_F13_ZBSK
     IF sql_ is not null THEN
        OPEN CURS_ FOR sql_ USING Dat1_, Dat_;
@@ -248,7 +257,7 @@ BEGIN
 
        close CURS_;
     END IF;
-
+    
     logger.info ('P_F13_NN: End etap 3 for '||to_char(dat_,'dd.mm.yyyy'));
 
     -- формирование корректирующих за мес€ц символов кассового плана
@@ -398,7 +407,7 @@ BEGIN
           nbuc_ := nbuc1_;
        END IF;
 
-       IF s_ <> 0
+       IF s_ <> 0 
        THEN
           kodp_ := '70';
           znap_ := TO_CHAR(s_) ;
@@ -556,7 +565,7 @@ BEGIN
           nbuc_ := nbuc1_;
        END IF;
 
-       IF s_ <> 0
+       IF s_ <> 0 
        THEN
           kodp_ := '35';
           znap_ := TO_CHAR(s_) ;
@@ -565,7 +574,7 @@ BEGIN
        END IF;
     END LOOP;
     CLOSE SALDO_KOR_PP;
-
+    
     --- позабалансовые символа сформированные процедурой P_F13_NN
     OPEN BaseL;
     LOOP
@@ -609,8 +618,18 @@ BEGIN
 
     END LOOP;
     CLOSE BaseL1;
-
+ 
    logger.info ('P_F13_NN: End for '||to_char(dat_,'dd.mm.yyyy'));
 ----------------------------------------
 END P_F13_Nn;
 /
+show err;
+
+PROMPT *** Create  grants  P_F13_NN ***
+grant EXECUTE      on P_F13_NN        to BARS_ACCESS_DEFROLE;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_F13_NN.sql =========*** End *** 
+PROMPT ===================================================================================== 

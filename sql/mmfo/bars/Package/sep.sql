@@ -4829,7 +4829,6 @@ grant EXECUTE                                                                on 
 grant EXECUTE                                                                on SEP             to TECH002;
 grant EXECUTE                                                                on SEP             to TECH005;
 grant EXECUTE                                                                on SEP             to TOSS;
-grant EXECUTE                                                                on SEP             to USER100101;
 grant EXECUTE                                                                on SEP             to WR_ALL_RIGHTS;
 
  

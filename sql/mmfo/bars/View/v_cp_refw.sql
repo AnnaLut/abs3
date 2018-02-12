@@ -6,6 +6,7 @@ PROMPT =========================================================================
 
 
 PROMPT *** Create  view V_CP_REFW ***
+PROMPT Нотатка: після оновлення вьюхи потрібно перестворювати тріггер на неї
 
   CREATE OR REPLACE FORCE VIEW BARS.V_CP_REFW ("REF", "TAG", "NAME", "DICT_NAME", "VALUE", "ID_CP", "NAME_OP") AS 
   select a.ref, t.tag, t.name, t.dict_name, (select substr(value,1,255) from  cp_refw where ref= a.ref and tag = t.tag),

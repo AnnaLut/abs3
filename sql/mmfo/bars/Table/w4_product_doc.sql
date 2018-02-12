@@ -35,7 +35,16 @@ exception when others then
 end; 
 /
 
-
+BEGIN
+execute immediate 'ALTER TABLE w4_product_doc ADD TYPE number';
+exception when others then if  sqlcode=-1430  then null; else raise; end if;
+end;
+/
+BEGIN
+execute immediate 'ALTER TABLE w4_product_doc ADD STRUCT_CODE number';
+exception when others then if  sqlcode=-1430  then null; else raise; end if;
+end;
+/
 
 
 PROMPT *** ALTER_POLICIES to W4_PRODUCT_DOC ***
@@ -45,7 +54,8 @@ PROMPT *** ALTER_POLICIES to W4_PRODUCT_DOC ***
 COMMENT ON TABLE BARS.W4_PRODUCT_DOC IS 'Way4. Довідник договорів';
 COMMENT ON COLUMN BARS.W4_PRODUCT_DOC.GRP_CODE IS 'Група продуктів';
 COMMENT ON COLUMN BARS.W4_PRODUCT_DOC.DOC_ID IS 'Код шаблону';
-
+COMMENT ON COLUMN BARS.W4_PRODUCT_DOC.TYPE IS 'Тип шаблонів(1-для інтеграції з ЕА, null - старі шаблони)';
+COMMENT ON COLUMN BARS.W4_PRODUCT_DOC.STRUCT_CODE IS 'Типи документів (в частині документів фізичних осіб) з ЕА';
 
 
 
@@ -101,11 +111,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  W4_PRODUCT_DOC ***
-grant SELECT                                                                 on W4_PRODUCT_DOC  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on W4_PRODUCT_DOC  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on W4_PRODUCT_DOC  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on W4_PRODUCT_DOC  to OW;
-grant SELECT                                                                 on W4_PRODUCT_DOC  to UPLD;
 
 
 

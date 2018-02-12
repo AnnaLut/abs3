@@ -24,16 +24,16 @@ PROMPT *** Create  table CM_SALARY ***
 begin 
   execute immediate '
   CREATE TABLE BARS.CM_SALARY 
-   (	ID NUMBER(22,0), 
-	OKPO VARCHAR2(14), 
-	OKPO_N NUMBER(22,0), 
-	ORG_NAME VARCHAR2(100), 
-	PRODUCT_CODE VARCHAR2(32), 
-	CHG_DATE DATE DEFAULT sysdate, 
-	CHG_USER VARCHAR2(64) DEFAULT user, 
-	ORG_MFO VARCHAR2(6), 
-	ORG_NLS VARCHAR2(14), 
-	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
+   (    ID NUMBER(22,0), 
+    OKPO VARCHAR2(14), 
+    OKPO_N NUMBER(22,0), 
+    ORG_NAME VARCHAR2(100), 
+    PRODUCT_CODE VARCHAR2(32), 
+    CHG_DATE DATE DEFAULT sysdate, 
+    CHG_USER VARCHAR2(64) DEFAULT user, 
+    ORG_MFO VARCHAR2(6), 
+    ORG_NLS VARCHAR2(14), 
+    KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -41,6 +41,14 @@ begin
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 
 end; 
+/
+
+begin
+    execute immediate 'alter table bars.CM_SALARY add rnk number';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
 /
 
 
@@ -79,6 +87,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_CMSALARY_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CM_SALARY ADD CONSTRAINT FK_CMSALARY_KF FOREIGN KEY (KF)
+      REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_CMSALARY_KF_NN ***
 begin   
  execute immediate '
@@ -88,6 +109,13 @@ exception when others then
  end;
 /
 
+begin
+    execute immediate 'alter table CM_SALARY add ( rnk number)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/
 
 
 
@@ -105,12 +133,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  CM_SALARY ***
-grant SELECT                                                                 on CM_SALARY       to BARSREADER_ROLE;
 grant SELECT                                                                 on CM_SALARY       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CM_SALARY       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CM_SALARY       to CM_ACCESS_ROLE;
 grant SELECT                                                                 on CM_SALARY       to OW;
-grant SELECT                                                                 on CM_SALARY       to UPLD;
 
 
 

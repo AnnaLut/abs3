@@ -59,7 +59,7 @@ declare
 begin
 
   l_tabsemantic := 'Типи договорiв страхування';
-  l_tablinesdef := '10';
+  l_tablinesdef := '35';
   l_tabselect_statement := '';
   l_tabname     := 'INS_TYPES';
 
@@ -124,6 +124,31 @@ begin
   end if;
 
   -- добавляем описание полей
+  bars_metabase.add_column(l_tabid, 1, 'ID', 'N', 'Ідентифікатор', 3, 22, 1, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'NAME', 'C', 'Найменування', 10, 100, 2, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'OBJECT_TYPE', 'C', 'Тип об`єкту страхування (0 - контрагент, 1 - заста', 3, 22, 3, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+
+  -- добавляем описание сложного поля
+  l_newtabid := bars_metabase.get_tabid('INS_OBJECT_TYPES');
+  l_newcolid := bars_metabase.get_colid(l_newtabid, 'ID');
+  if (l_newtabid is not null and l_newcolid is not null) then
+    bars_metabase.add_extrnval(l_tabid, 3, l_newtabid, l_newcolid, '', '', '', '');
+  else
+    dbms_output.put_line('В БМД не описана таблица INS_OBJECT_TYPES для описания сложного поля таблицы INS_TYPES.');
+  end if;
+
+  -- добавляем описание для условий фильтра
+  l_newtabid := bars_metabase.get_tabid('INS_OBJECT_TYPES');
+  l_newcolid := bars_metabase.get_colid(l_newtabid, 'ID');
+  l_varcolid := bars_metabase.get_colid(l_newtabid, 'ID');
+  if (l_newtabid is not null and l_newcolid is not null) then
+    bars_metabase.add_browsetbl(l_tabid, l_newtabid, '', '3', l_newcolid, l_varcolid, 'Ідентифікатор');
+  else
+    dbms_output.put_line('В БМД не описана таблица INS_OBJECT_TYPES для описания условий фильтра таблицы INS_TYPES.');
+  end if;
+
+    -- добавляем описание сортировки
+  bars_metabase.add_sortorder(l_tabid, 1, 1, 'ASC ');
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

@@ -4,11 +4,11 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/mbk2.sql =========*** Run *** ======
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BARS.MBK2 IS
+CREATE OR REPLACE PACKAGE MBK2 IS
 
 /*
  17.11.2017 Трансфер-2017 ПОДМЕНА ПРОЦЕДУРЫ ОТКР.СЧЕТА  На уровне бал.счетов - без учета об22
- 23.01.2015 Сухова Добавки к основному пакеджу МБК, который потом Ната Ч. объединит в один
+  23.01.2015 Сухова Добавки к основному пакеджу МБК, который потом Ната Ч. объединит в один
              Забрала сюда процедуру mbk_SP
 */
 
@@ -31,10 +31,15 @@ p_SN  int   ,   --  FLAG = OK =     Вiдсотки=>~HA простроченi~1**9
 p_nd  number    -- Реф МБК
 ) ;
 
+function get_over_sum (
+   p_nd number,
+   p_wdate date, 
+   p_acc_ss number,
+   p_dat date ) return number ;
 
 END MBK2;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.MBK2 IS
+CREATE OR REPLACE PACKAGE BODY MBK2 IS
 
 /*
   04.12.2017 Sta 1521 SP - Новый план счетов
@@ -175,13 +180,13 @@ end GPK ;
 
 ---------- вынос на просрочку тела и %%
 procedure  mbk_SP ( n_SP  number,   -- Сума для виноса~HA простроченi~1**7
-                    p_SS  int   ,   -- FLAG = OK = Тiло+Вiдсотки=>~HA простроченi~1**7
-                    n_SPN number,   -- Сума для виноса~HA простроченi~1**9
-                    p_SN  int   ,   --  FLAG = OK =     Вiдсотки=>~HA простроченi~1**9
-                    p_nd  number    -- Реф МБК
-                 ) is
+p_SS  int   ,   -- FLAG = OK = Тiло+Вiдсотки=>~HA простроченi~1**7
+n_SPN number,   -- Сума для виноса~HA простроченi~1**9
+p_SN  int   ,   --  FLAG = OK =     Вiдсотки=>~HA простроченi~1**9
+p_nd  number    -- Реф МБК
+) is
 
-  aa    cc_add%rowtype   ; a1523 accounts%rowtype ; a1528 accounts%rowtype ; a1527 accounts%rowtype; a1529 accounts%rowtype ;
+ /* aa    cc_add%rowtype   ; a1523 accounts%rowtype ; a1528 accounts%rowtype ; a1527 accounts%rowtype; a1529 accounts%rowtype;
   ii    int_accn%rowtype ; rr    int_ratn%rowtype ; l_id  int_accn.id%type ;  oo oper %rowtype     ; dd    cc_deal%rowtype  ;
   sErr_ varchar2  (35)   ; sTmp_ varchar2 (100)   ; nTmp_ number           ;
   -----------------------
@@ -195,11 +200,12 @@ procedure  mbk_SP ( n_SP  number,   -- Сума для виноса~HA простроченi~1**7
     end if;
     gl.payv( 0, oo.ref, gl.bdate, oo.tt, oo.dk, oo.kv, oo.nlsa, oo.s, oo.kv, oo.nlsb, oo.s );
   end OPL1;
-
+*/
 begin
---   raise_application_error(-20000,'Дана заявка (COBUSUPABS-5245) втрачає актуальність з 1 грудня 2017р. у зв’язку з переходом на новий план рахунків. Додаткові роз’яснення щодо введення простроченої заборгованості будуть повідомлені пізніше');
+  null;
+ raise_application_error(-20000,'Дана заявка (COBUSUPABS-5245) втрачає актуальність з 1 грудня 2017р. у зв’язку з переходом на новий план рахунків. Додаткові роз’яснення щодо введення простроченої заборгованості будуть повідомлені пізніше');
 
-  If NOT ( p_SS = 0 and p_SN = 1  and ( n_SPN<>0            )  OR
+ /* If NOT ( p_SS = 0 and p_SN = 1  and ( n_SPN<>0            )  OR
 
            p_SS = 1 and p_SN = 0  and (             n_SP<>0 )  OR
            p_SS = 1 and p_SN = 1  and ( n_SPN<>0 or n_SP<>0 )
@@ -237,7 +243,7 @@ begin
                                 AND (n.mdate<bankdate_g OR n.mdate IS NULL)   AND n.dazs is null
                                 AND (a.dapp is null or a.dapp < bankdate-10)  and rownum = 1;
      EXCEPTION WHEN NO_DATA_FOUND THEN -- автоматом открыть, если не нашли. Сначала смоделировать номерасчетов
-       sTmp_     := Substr( MBK.F_NLS_MB( a1527.nbs, a1523.RNK, Null, a1523.kv, 'MBK'), 1, 30) ;
+       sTmp_     := Substr(MBK.F_NLS_MB( a1527.nbs, a1523.RNK, Null, a1523.kv, 'MBK'), 1, 30) ;
        -- открытие основного счета
        a1527.nls := Vkrzn( substr(gl.aMfo, 1,5), trim( substr(sTmp_,01,15) ) );
        MBK.Op_Reg_ex_2017 (1,dd.ND,0,a1523.Grp,nTmp_,dd.RNK, a1527.NLS, a1523.Kv, a1523.NMS,'SP ', a1523.isp, a1527.ACC,'1',null,null,null);  -- KB  pos=1
@@ -324,7 +330,8 @@ begin
   If oo.ref is not null then
      insert into MBD_K_R ( nd, ref) values (p_nd,  oo.ref );
  --  gl.pay ( 2, oo.ref, gl.bdate);
-  end if;
+  end if;*/
+ 
 
 end MBK_SP;
 

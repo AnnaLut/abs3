@@ -41,27 +41,30 @@ begin
     l_zpr.id           := 1;
     l_zpr.name         := 'DBF-Динамiка змiни залишкiв(вихiдних)по рахунках клiєнтiв';
     l_zpr.namef        := '';
-    l_zpr.bindvars     := ':sFdat1=''На дату(dd/mm/yyyy)''';
+    l_zpr.bindvars     := ':BRANCH=''МФО'',:sFdat1=''На дату(dd/mm/yyyy)''';
     l_zpr.create_stmt  := '';
     l_zpr.rpt_template := 'rep5053.frx';
     l_zpr.form_proc    := '';
-    l_zpr.default_vars := '';
-    l_zpr.bind_sql     := '';
+    l_zpr.default_vars := ':BRANCH=''Поточне''';
+    l_zpr.bind_sql     := ':BRANCH=''V_BRANCH_OWN|BRANCH|NAME|ORDER BY BRANCH''';
     l_zpr.xml_encoding := 'CL8MSWIN1251';
     l_zpr.txt          := 'select      decode(:sFdat1, ''gl.bd'',  gl.bd,  to_date(:sFdat1)   ) DATE_REP,   
-            decode(f_ourmfo,''300465'',300465, to_number(a.kf))                MFO_DEP, 
+            decode(f_ourmfo,substr(:BRANCH,2,6),300465,to_number(a.kf))                MFO_DEP, 
             substr(c.okpo,1,10)       ZKPO_CLI,    substr(c.nmk,1,50)        NAME_CLI,   
              to_number(a.nbs)         BAL_ACC,
             substr(a.nms,1,50)       NAME_ACC,    
             a.kv        KV,
+            a.ob22 OB22,
+            r.r011 R011,
             r.r013 R013,
+            r.s240 S240,
             a.nls NLS,
             case when fost(a.acc,   decode(:sFdat1, ''gl.bd'',  gl.bd,  to_date(:sFdat1)   )    )<0   then 1 else 2    end                                DK,  
             fost(a.acc,   decode(:sFdat1, ''gl.bd'',  gl.bd,  to_date(:sFdat1)   )  )/100   AMOUNT
       from    customer c,
               scli_r20 b,
               scli_zkp k,
-              (select acc, nms, rnk, nbs ,kf,kv,nls from accounts 
+              (select acc, nms, rnk, nbs ,kf,kv,nls, ob22 from accounts 
                                                     where dazs is null 
                                                        or dazs>  decode(:sFdat1, ''gl.bd'',  gl.bd,  to_date(:sFdat1) ) ) a
               left join specparam r on (r.acc = a.acc)
@@ -70,13 +73,16 @@ begin
       and ltrim(rtrim(c.okpo))=ltrim(rtrim(k.zkpo))
     group by
       decode(:sFdat1, ''gl.bd'',  gl.bd,  to_date(:sFdat1)   ),
-      decode(f_ourmfo,''300465'',300465,to_number(a.kf)),
+      decode(f_ourmfo,substr(:BRANCH,2,6),300465,to_number(a.kf)),
       substr(c.okpo,1,10),
       substr(c.nmk,1,50),
       to_number(a.nbs),
       substr(a.nms,1,50),
       a.kv,
+      a.ob22,
+      r.r011,
       r.r013,
+      r.s240,
       a.nls,
       CASE WHEN fost(a.acc,   DECODE(:sFdat1, ''gl.bd'',  gl.bd,  TO_DATE(:sFdat1)   )    )<0   THEN 1 ELSE 2    END,
       fost(a.acc,   decode(:sFdat1, ''gl.bd'',  gl.bd,  to_date(:sFdat1)   )  )/100
@@ -154,6 +160,7 @@ begin
           where id=l_rep.id;
        end;
     end if;
+
     bars_report.print_message(l_message);
 end;
 /

@@ -52,7 +52,24 @@ end;
 PROMPT *** ALTER_POLICIES to DWH_LOG ***
  exec bpa.alter_policies('DWH_LOG');
 
+prompt add parse_begin column
+begin
+	execute immediate 'alter table dwh_log add PARSE_BEGIN date';
+exception
+	when others then
+		if sqlcode = -1430 then null; else raise; end if;
+end;
+/
+prompt add parse_end column
+begin
+	execute immediate 'alter table dwh_log add PARSE_END date';
+exception
+	when others then
+		if sqlcode = -1430 then null; else raise; end if;
+end;
+/
 
+ 
 COMMENT ON TABLE BARS.DWH_LOG IS 'протокол отримання інформації і обробки від DWH';
 COMMENT ON COLUMN BARS.DWH_LOG.PARSE_BEGIN IS 'Время начала обработки';
 COMMENT ON COLUMN BARS.DWH_LOG.PARSE_END IS 'Время окончания обработки';

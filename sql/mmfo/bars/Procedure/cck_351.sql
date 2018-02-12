@@ -419,13 +419,10 @@ end;
 /
 show err;
 
-PROMPT *** Create  grants  CCK_351 ***
-grant EXECUTE                                                                on CCK_351         to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on CCK_351         to RCC_DEAL;
-grant EXECUTE                                                                on CCK_351         to START1;
-
-
+grant EXECUTE   on CCK_351  to BARS_ACCESS_DEFROLE;
+grant EXECUTE   on CCK_351  to RCC_DEAL;
+grant EXECUTE   on CCK_351  to START1;
 
 PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/CCK_351.sql =========*** End *** =
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/CCK_351.sql =========*** 
 PROMPT ===================================================================================== 

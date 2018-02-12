@@ -18,7 +18,7 @@ end;
 
 begin
 update bars.op_field set browser=
-  'TagBrowse("SELECT fio, atrt, pasp||'' ''||paspn pasp FROM bars.podotch")'
+  'TagBrowse("SELECT id, fio, atrt, pasp||'' ''||paspn pasp FROM bars.podotch")'
   where TAG='INK_I';
 end;
 /            
@@ -29,6 +29,17 @@ update bars.op_field set browser=
   where TAG='PASP1';
 end;
 /            
+
+begin
+Insert into BARS.OP_FIELD
+   (TAG, NAME, USE_IN_ARCH, BROWSER)
+ Values
+   ('CP_FC', 'Форма проведення розрахунку', 1, 'TagBrowse("SELECT code,txt FROM CP_OB_FORM_CALC")');
+exception when dup_val_on_index then
+      null;
+    end;
+/
+
 
 COMMIT;
 

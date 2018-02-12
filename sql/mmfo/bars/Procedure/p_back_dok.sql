@@ -1,13 +1,8 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_BACK_DOK.sql =========*** Run **
 PROMPT ===================================================================================== 
 
-
-PROMPT *** Create  procedure P_BACK_DOK ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_BACK_DOK (
+CREATE OR REPLACE PROCEDURE P_BACK_DOK (
     Ref_        IN  Number,
     Lev_        IN  Number default 3,
     ReasonId_   IN  Number,
@@ -312,6 +307,7 @@ BEGIN
   chk.PUT_NOS(Ref_,BackVisa_);
 
 -- Откат начисленных %%
+  interest_utl.on_interest_document_revert(ref_);
   begin
       select acc, id, int_date
         into l_acc, l_id, l_intdate
@@ -329,6 +325,7 @@ BEGIN
   exception
       when NO_DATA_FOUND then null;
   end;
+
   -- Сторно операции NOS
   IF l_tt = NosTt_ THEN
      -- для плановых операций CVV (CVV-дочерняя, NOS-главная, у NOS refl=Ref_CVV)

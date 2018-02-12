@@ -7,8 +7,6 @@ SET TRIMSPOOL ON
 SET SERVEROUTPUT ON SIZE 1000000
 SET FEED OFF
 
-spool c:\upd_specparam_15012018.txt
-
 exec bc.home;  
 
 begin
@@ -119,6 +117,3 @@ begin
 
 end;
 /
-
-
-spool off;

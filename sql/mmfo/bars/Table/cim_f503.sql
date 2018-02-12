@@ -228,9 +228,7 @@ COMMENT ON COLUMN bars.cim_f503.p3300 IS 'Код валюти розрахунків';
 
 
 PROMPT *** Create  grants  CIM_F503 ***
-grant SELECT                                                                 on CIM_F503        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_F503        to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on CIM_F503        to UPLD;
 
 
 

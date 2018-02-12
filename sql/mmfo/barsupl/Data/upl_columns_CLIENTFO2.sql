@@ -56,7 +56,7 @@ begin
   values (l_file_id, 16, 'CUST_STATUS', 'Статус клієнта в БАРС', 'VARCHAR2', 20, null, null, null, 'Y', null, null, null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
-  values (l_file_id, 17, 'CUST_ACTIVE', 'РНК активного клієнта', 'NUMBER', 22, 0, null, null, 'Y', null, null, null, null, null);
+  values (l_file_id, 17, 'CUST_ACTIVE', 'РНК активного клієнта', 'NUMBER', 22, 0, null, null, 'Y', null, null, null, null, 'TRUNC_E2');
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
   values (l_file_id, 18, 'TELM', 'Мобільний телефон', 'VARCHAR2', 20, null, null, null, 'Y', null, null, null, null, null);

@@ -7,17 +7,17 @@ begin
                                              p_attribute_value => 'SBON01');
     branch_attribute_utl.set_attribute_value(p_branch_code     => '/322669/',
                                              p_attribute_code  => 'STO_USER',
-                                             p_attribute_value => 'SBON01');
+                                             p_attribute_value => 'SBON11');
     branch_attribute_utl.set_attribute_value(p_branch_code     => '/324805/',
                                              p_attribute_code  => 'STO_USER',
-                                             p_attribute_value => 'SBON01');
+                                             p_attribute_value => 'SBON02');
     branch_attribute_utl.set_attribute_value(p_branch_code     => '/351823/',
                                              p_attribute_code  => 'STO_USER',
-                                             p_attribute_value => 'SBON01');
+                                             p_attribute_value => 'SBON21');
     begin
     branch_attribute_utl.set_attribute_value(p_branch_code     => '/304665/',
                                              p_attribute_code  => 'STO_USER',
-                                             p_attribute_value => 'SBON01');
+                                             p_attribute_value => 'SBON13');
     exception
         when others then
             dbms_output.put_line('ERROR: '||sqlerrm);

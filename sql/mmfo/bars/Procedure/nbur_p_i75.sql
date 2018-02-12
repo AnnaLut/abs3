@@ -1,4 +1,4 @@
-CREATE OR REPLACE procedure BARS.NBUR_P_I75
+create or replace procedure NBUR_P_I75 
 ( p_kod_filii        in     varchar2
 , p_report_date      in     date
 , p_form_id          in     number   default null
@@ -17,43 +17,43 @@ CREATE OR REPLACE procedure BARS.NBUR_P_I75
   l_datez         date;
   l_file_code     varchar2(2);
 BEGIN
-
+  
   bars_audit.info( $$PLSQL_UNIT||' begin for date = '||to_char(p_report_date,'dd.mm.yyyy') );
-
+  
   l_datez     := p_report_date + 1;
   l_file_code := substr(p_file_code,2,2);
-
+  
   -- определение начальных параметров (код области или МФО или подразделение)
   NBUR_FILES.P_PROC_SET( p_kod_filii, p_file_code, p_scheme, l_datez, 0, l_file_code, l_nbuc, l_type );
-
+  
   bars_audit.trace( '%s: nbuc=%s, type=%s, first_dt=%s, last_dt=%s.', $$PLSQL_UNIT, l_nbuc, to_char(l_type) );
-
+  
   -- execute immediate 'ALTER SESSION ENABLE PARALLEL DML';
-
+  
   -- open SALDO (  otcn_saldo + specparam_int);
   insert all
-    when ( R034 = 1 )
+    when ( R034 = 1 ) 
     then -- нацювалюта
-      into NBUR_DETAIL_PROTOCOLS
+      into NBUR_DETAIL_PROTOCOLS 
         ( REPORT_DATE, KF, REPORT_CODE, NBUC, FIELD_CODE, FIELD_VALUE, ACC_ID, ACC_NUM, KV )
       values
         ( p_report_date, p_kod_filii, p_file_code, NBUC, FIELD_CODE, FIELD_VALUE, ACC_ID, ACC_NUM, KV )
     else -- інвалюта
-      into NBUR_DETAIL_PROTOCOLS
+      into NBUR_DETAIL_PROTOCOLS 
         ( REPORT_DATE, KF, REPORT_CODE, NBUC, FIELD_CODE, FIELD_VALUE, ACC_ID, ACC_NUM, KV )
       values
         ( p_report_date, p_kod_filii, p_file_code, NBUC, FIELD_CODE, FIELD_VALUE, ACC_ID, ACC_NUM, KV )
-      into NBUR_DETAIL_PROTOCOLS
+      into NBUR_DETAIL_PROTOCOLS 
         ( REPORT_DATE, KF, REPORT_CODE, NBUC, FIELD_CODE, FIELD_VALUE, ACC_ID, ACC_NUM, KV )
       values
         ( p_report_date, p_kod_filii, p_file_code, NBUC, FIELD_CODE_UAH, FIELD_VALUE_UAH, ACC_ID, ACC_NUM, KV )
-  select /*+ PARALLEL 4 */
-         case
-           when l_type > 0
+  select /*+ PARALLEL 4 */ 
+         case 
+           when l_type > 0 
            then acc.NBUC -- acc.B040
            else l_nbuc
          end as NBUC
-       , case
+       , case 
            when bal.ADJ_BAL < 0
            then '1'
            when bal.ADJ_BAL > 0
@@ -66,7 +66,7 @@ BEGIN
            else '1'
          end || acc.NBS || acc.OB22 || to_char(acc.KV,'FM000') || '00' as FIELD_CODE
        , to_char(abs(bal.ADJ_BAL)) as FIELD_VALUE
-       , case
+       , case 
            when bal.ADJ_BAL < 0
            then '1'
            when bal.ADJ_BAL > 0
@@ -93,80 +93,80 @@ BEGIN
                     )
      and ( ADJ_BAL <> 0 or ADJ_BAL_UAH <> 0 )
   ;
-
+  
   commit;
-
+  
   -- OPEN OBOROTY ()
   insert all
-    when ( Ind1 = '5' and Ind2 = '0' )
-    then -- Дт. (нацювалюта)
-      into NBUR_DETAIL_PROTOCOLS
+    when ( Ind1 = '5' and Ind2 = '0' ) 
+    then -- Дт. (нацювалюта) 
+      into NBUR_DETAIL_PROTOCOLS 
          ( REPORT_DATE, KF, REPORT_CODE, NBUC
          , FIELD_CODE, FIELD_VALUE, ACC_ID, ACC_NUM, KV, REF, DESCRIPTION )
       values
          ( p_report_date, KF, p_file_code, NBUC_DB
          , Ind1 || Ind2 || R020_DB || OB22_DB || Ind3 || Ind4_DB, FIELD_VALUE
          , ACC_ID_DB, ACC_NUM_DB, CCY_ID, REF, DESCRIPTION )
-    when ( Ind1 = '6' and Ind2 = '0' )
+    when ( Ind1 = '6' and Ind2 = '0' ) 
     then -- Кт. (нацювалюта)
-      into NBUR_DETAIL_PROTOCOLS
+      into NBUR_DETAIL_PROTOCOLS 
          ( REPORT_DATE, KF, REPORT_CODE, NBUC
          , FIELD_CODE, FIELD_VALUE, ACC_ID, ACC_NUM, KV, REF, DESCRIPTION )
       values
          ( p_report_date, KF, p_file_code, NBUC_CR
          , Ind1 || Ind2 || R020_CR || OB22_CR || Ind3 || Ind4_CR, FIELD_VALUE
          , ACC_ID_CR, ACC_NUM_CR, CCY_ID, REF, DESCRIPTION )
-    when ( Ind1 = '5' and Ind2 = '1' )
-    then -- Дт. (інвалюта + еквівалент)
-      into NBUR_DETAIL_PROTOCOLS
+    when ( Ind1 = '5' and Ind2 = '1' ) 
+    then -- Дт. (інвалюта + еквівалент) 
+      into NBUR_DETAIL_PROTOCOLS 
          ( REPORT_DATE, KF, REPORT_CODE, NBUC
          , FIELD_CODE, FIELD_VALUE, ACC_ID, ACC_NUM, KV, REF, DESCRIPTION )
       values
          ( p_report_date, KF, p_file_code, NBUC_DB
          , Ind1 || Ind2 || R020_DB || OB22_DB || Ind3 || Ind4_DB, FIELD_VALUE
          , ACC_ID_DB, ACC_NUM_DB, CCY_ID, REF, DESCRIPTION )
-      into NBUR_DETAIL_PROTOCOLS
+      into NBUR_DETAIL_PROTOCOLS 
          ( REPORT_DATE, KF, REPORT_CODE, NBUC
          , FIELD_CODE, FIELD_VALUE, ACC_ID, ACC_NUM, KV, REF, DESCRIPTION )
       values
          ( p_report_date, KF, p_file_code, NBUC_DB
          , Ind1 || Ind2 || R020_DB || OB22_DB || Ind3 || Ind4_DB, FIELD_VALUE_UAH
          , ACC_ID_DB, ACC_NUM_DB, CCY_ID, REF, DESCRIPTION )
-    when ( Ind1 = '6' and Ind2 = '1' )
+    when ( Ind1 = '6' and Ind2 = '1' ) 
     then -- Кт. (інвалюта + еквівалент)
-      into NBUR_DETAIL_PROTOCOLS
+      into NBUR_DETAIL_PROTOCOLS 
          ( REPORT_DATE, KF, REPORT_CODE, NBUC
          , FIELD_CODE, FIELD_VALUE, ACC_ID, ACC_NUM, KV, REF, DESCRIPTION )
       values
          ( p_report_date, KF, p_file_code, NBUC_CR
          , Ind1 || Ind2 || R020_CR || OB22_CR || Ind3 || Ind4_CR, FIELD_VALUE
          , ACC_ID_CR, ACC_NUM_CR, CCY_ID, REF, DESCRIPTION )
-      into NBUR_DETAIL_PROTOCOLS
+      into NBUR_DETAIL_PROTOCOLS 
          ( REPORT_DATE, KF, REPORT_CODE, NBUC
          , FIELD_CODE, FIELD_VALUE, ACC_ID, ACC_NUM, KV, REF, DESCRIPTION )
       values
          ( p_report_date, KF, p_file_code, NBUC_CR
          , Ind1 || Ind2 || R020_CR || OB22_CR || Ind3 || Ind4_CR, FIELD_VALUE_UAH
          , ACC_ID_CR, ACC_NUM_CR, CCY_ID, REF, DESCRIPTION )
-    when ( CHK_F = 1 and Ind2 = '0' )
+    when ( CHK_F = 1 and Ind2 = '0' ) 
     then -- Кт. (нацювалюта)
-      into NBUR_DETAIL_PROTOCOLS
+      into NBUR_DETAIL_PROTOCOLS 
          ( REPORT_DATE, KF, REPORT_CODE, NBUC
          , FIELD_CODE, FIELD_VALUE, ACC_ID, ACC_NUM, KV, REF, DESCRIPTION )
       values
          ( p_report_date, KF, p_file_code, NBUC_CR
          , Ind1 || Ind2 || R020_CR || OB22_CR || Ind3 || Ind4_CHK, FIELD_VALUE
          , ACC_ID_CR, ACC_NUM_CR, CCY_ID, REF, DESCRIPTION )
-    when ( CHK_F = 1 and Ind2 = '1' )
+    when ( CHK_F = 1 and Ind2 = '1' ) 
     then -- Кт. (інвалюта + еквівалент)
-      into NBUR_DETAIL_PROTOCOLS
+      into NBUR_DETAIL_PROTOCOLS 
          ( REPORT_DATE, KF, REPORT_CODE, NBUC
          , FIELD_CODE, FIELD_VALUE, ACC_ID, ACC_NUM, KV, REF, DESCRIPTION )
       values
          ( p_report_date, KF, p_file_code, NBUC_CR
          , Ind1 || Ind2 || R020_CR || OB22_CR || Ind3 || Ind4_CHK, FIELD_VALUE
          , ACC_ID_CR, ACC_NUM_CR, CCY_ID, REF, CHK_DSC )
-      into NBUR_DETAIL_PROTOCOLS
+      into NBUR_DETAIL_PROTOCOLS 
          ( REPORT_DATE, KF, REPORT_CODE, NBUC
          , FIELD_CODE, FIELD_VALUE, ACC_ID, ACC_NUM, KV, REF, DESCRIPTION )
       values
@@ -178,22 +178,22 @@ BEGIN
        , to_char(txn.BAL    ) as FIELD_VALUE
        , to_char(txn.BAL_UAH) as FIELD_VALUE_UAH
        , txn.ACC_ID_DB, txn.ACC_NUM_DB, txn.R020_DB, nvl(txn.OB22_DB,'00') as OB22_DB
-       , case
-           when l_type > 0
+       , case 
+           when l_type > 0 
            then acd.NBUC
            else l_nbuc
          end as NBUC_DB
        , txn.ACC_ID_CR, txn.ACC_NUM_CR, txn.R020_CR, nvl(txn.OB22_CR,'00') as OB22_CR
-       , case
-           when l_type > 0
+       , case 
+           when l_type > 0 
            then ack.NBUC
            else l_nbuc
          end as NBUC_CR
        , substr( ' Дт. рах. = ' || txn.ACC_NUM_DB || ', Кт. рах. = ' || txn.ACC_NUM_CR, 1, 250 ) as DESCRIPTION
        , case
-           when rdb.F_75 in ('1','5')
+           when rdb.F_75 in ('1','5') 
            then '5'
-           when rcr.F_75 in ('1','6')
+           when rcr.F_75 in ('1','6') 
            then '6'
            else null
          end as Ind1
@@ -287,44 +287,44 @@ BEGIN
                when txn.R020_DB like '7%' and txn.R020_CR like '380%'
                then '01'
                --
-               when txn.CCY_ID = 980 and txn.R020_DB like '7%' and
+               when txn.CCY_ID = 980 and txn.R020_DB like '7%' and 
                   ( txn.R020_CR like '149%' or txn.R020_CR like '159%' or txn.R020_CR like '189%' or
-                    txn.R020_CR like '240%' or txn.R020_CR like '289%' or txn.R020_CR like '319%' or
+                    txn.R020_CR like '240%' or txn.R020_CR like '289%' or txn.R020_CR like '319%' or  
                     txn.R020_CR like '329%' or txn.R020_CR like '359%' or txn.R020_CR like '369%' )
                then '01'
                -- зменшення резервiв за рахунок уточнень
-               when ( txn.R020_DB like '1%' or txn.R020_DB like '2%' or txn.R020_DB like '3%'
-                    ) and txn.R020_CR like '380%'
+               when ( txn.R020_DB like '1%' or txn.R020_DB like '2%' or txn.R020_DB like '3%' 
+                    ) and txn.R020_CR like '380%' 
                then '02'
                -- списання за рахунок резерву
                when txn.R020_DB not like '7%' and
-                  ( txn.R020_CR like '1%' or txn.R020_CR like '2%' or txn.R020_CR like '3%'
-                  ) and txn.R020_CR not like '380%'
+                  ( txn.R020_CR like '1%' or txn.R020_CR like '2%' or txn.R020_CR like '3%' 
+                  ) and txn.R020_CR not like '380%' 
                then '03'
                -- повернення заборгованностi
-               when txn.CCY_ID = 980 and
+               when txn.CCY_ID = 980 and 
                   ( txn.R020_DB like '1%' or txn.R020_DB like '2%' or txn.R020_DB like '3%'
-                  ) and txn.R020_CR like '7%'
+                  ) and txn.R020_CR like '7%' 
                then '02'
                -- перерахування до iнших фондових рахункiв
-               when txn.CCY_ID = 980 and
+               when txn.CCY_ID = 980 and 
                   ( txn.R020_DB like '1%' or txn.R020_DB like '2%' or txn.R020_DB like '3%'
-                  ) and txn.R020_CR like '5%'
+                  ) and txn.R020_CR like '5%' 
                then '05'
-               when txn.CCY_ID = 980 and txn.R020_DB like '7%' and txn.R020_CR = '3739'
+               when txn.CCY_ID = 980 and txn.R020_DB like '7%' and txn.R020_CR = '3739' 
                then '07'
                when ( txn.R020_DB like '149%' or txn.R020_DB like '159%' or txn.R020_DB like '189%' or
-                      txn.R020_DB like '240%' or txn.R020_DB like '289%' or txn.R020_DB like '319%' or
-                      txn.R020_DB like '329%' or txn.R020_DB like '359%' or txn.R020_DB like '369%'
+                      txn.R020_DB like '240%' or txn.R020_DB like '289%' or txn.R020_DB like '319%' or 
+                      txn.R020_DB like '329%' or txn.R020_DB like '359%' or txn.R020_DB like '369%' 
                     ) and txn.R020_CR = '3739'
                then '07'
                -- виправнi обороти щодо коду 01
                when txn.R020_DB = txn.R020_CR
                then '11'
                -- зменшення резервiв за рахунок прибутку банку
-               when txn.CCY_ID = 980 and
-                  ( txn.R020_DB like '7%' and txn.OB22_DB = '06' ) and
-                  ( txn.R020_CR  = '3590' and txn.OB22_CR = '03' )
+               when txn.CCY_ID = 980 and 
+                  ( txn.R020_DB like '7%' and txn.OB22_DB = '06' ) and 
+                  ( txn.R020_CR  = '3590' and txn.OB22_CR = '03' ) 
                then '12'
                else '00'
              end
@@ -356,7 +356,7 @@ BEGIN
                     else '__'
                     end
                when txn.R020_CR = '7702'
-               then case
+               then case 
                     when txn.OB22_CR in ('11','12','22','65','66','75','79','83','85','92','94','96')
                     then '11'
                     when txn.OB22_CR in ('14','15','62','67','68','77','81','84','86','93','95','97')
@@ -394,7 +394,7 @@ BEGIN
                     else '__'
                     end
                when txn.R020_CR = '7706'
-               then case
+               then case 
                     when txn.OB22_CR in ('01','07','11','19')
                     then '11'
                     when txn.OB22_CR in ('02','08','12','18')
@@ -402,7 +402,7 @@ BEGIN
                     else '__'
                     end
                when txn.R020_CR = '7707'
-               then case
+               then case 
                     when txn.OB22_CR in ('01','04','06','13','14','17','19','21','25')
                     then '11'
                     when txn.OB22_CR in ('02','05','07','15','16','18','20','22')
@@ -421,14 +421,14 @@ BEGIN
                when txn.R020_DB = '3739' and txn.R020_CR like '7%'
                then '07'
                -- при формировании новых счетов для резерва
-               when txn.R020_DB = '3739' and
-                  ( txn.R020_CR like '149%' or txn.R020_CR like '159%' or txn.R020_CR like '189%' or
+               when txn.R020_DB = '3739' and 
+                  ( txn.R020_CR like '149%' or txn.R020_CR like '159%' or txn.R020_CR like '189%' or 
                     txn.R020_CR like '240%' or txn.R020_CR like '289%' or txn.R020_CR like '319%' or
-                    txn.R020_CR like '329%' or txn.R020_CR like '359%' or txn.R020_CR like '369%' )
+                    txn.R020_CR like '329%' or txn.R020_CR like '359%' or txn.R020_CR like '369%' ) 
                then '07'
                -- зменшення резервiв за рахунок прибутку банку
-               when txn.CCY_ID = 980 and (txn.R020_DB like '7%' and txn.OB22_DB = '06')
-                                 and (txn.R020_CR  = '3590' and txn.OB22_CR = '03')
+               when txn.CCY_ID = 980 and (txn.R020_DB like '7%' and txn.OB22_DB = '06') 
+                                 and (txn.R020_CR  = '3590' and txn.OB22_CR = '03') 
                then '12'
                else '00'
              end
@@ -442,7 +442,7 @@ BEGIN
          end as CHK_F
        , case
            when rcr.F_75 in ('1','6') and nvl(rdb.F_75,'0') = '0'
-           then substr( ' Дт. рах. = ' || txn.ACC_NUM_DB || ', Кт. рах. = '
+           then substr( ' Дт. рах. = ' || txn.ACC_NUM_DB || ', Кт. рах. = ' 
                                        || txn.ACC_NUM_CR || '  !!! Проверка !!!'
                       , 1, 250 )
            else null
@@ -453,7 +453,7 @@ BEGIN
            then
              case
                -- кошти направленi на формування резерву
-               when txn.R020_DB like '380%' and txn.R020_CR not like '7%'
+               when txn.R020_DB like '380%' and txn.R020_CR not like '7%' 
                then '01'
                when txn.R020_DB like '7%'   and txn.R020_CR not like '7%'
                then '01'
@@ -461,23 +461,23 @@ BEGIN
                when txn.CCY_ID = 980 and txn.R020_DB like '3801%' and txn.R020_CR like '7%'
                then '02'
                -- повернення заборгованностi
-               when ( txn.R020_DB like '1%' or txn.R020_DB like '2%' or txn.R020_DB like '3%'
-                    ) and txn.R020_DB not like '3801%' and txn.R020_CR like '7%'
+               when ( txn.R020_DB like '1%' or txn.R020_DB like '2%' or txn.R020_DB like '3%' 
+                    ) and txn.R020_DB not like '3801%' and txn.R020_CR like '7%' 
                then '04'
                -- при формировании новых счетов для резерва
-               when txn.R020_DB = '3739' and txn.R020_CR like '7%'
+               when txn.R020_DB = '3739' and txn.R020_CR like '7%' 
                then '07'
                -- при формировании новых счетов для резерва
-               when txn.R020_DB = '3739' and
-                  ( txn.R020_CR like '149%' or txn.R020_CR like '159%' or txn.R020_CR like '189%' or
+               when txn.R020_DB = '3739' and 
+                  ( txn.R020_CR like '149%' or txn.R020_CR like '159%' or txn.R020_CR like '189%' or 
                     txn.R020_CR like '240%' or txn.R020_CR like '289%' or txn.R020_CR like '319%' or
-                    txn.R020_CR like '329%' or txn.R020_CR like '359%' or txn.R020_CR like '369%' )
+                    txn.R020_CR like '329%' or txn.R020_CR like '359%' or txn.R020_CR like '369%' ) 
                then '07'
                -- списання резерву
-               when txn.R020_DB = '3903' and
-                  ( txn.R020_CR like '149%' or txn.R020_CR like '159%' or txn.R020_CR like '189%' or
+               when txn.R020_DB = '3903' and 
+                  ( txn.R020_CR like '149%' or txn.R020_CR like '159%' or txn.R020_CR like '189%' or 
                     txn.R020_CR like '240%' or txn.R020_CR like '289%' or txn.R020_CR like '319%' or
-                    txn.R020_CR like '329%' or txn.R020_CR like '359%' or txn.R020_CR like '369%' )
+                    txn.R020_CR like '329%' or txn.R020_CR like '359%' or txn.R020_CR like '369%' ) 
                then '07'
                else '00'
              end
@@ -488,10 +488,10 @@ BEGIN
       on ( acd.KF = txn.KF and acd.ACC_ID = txn.ACC_ID_DB )
     join NBUR_DM_ACCOUNTS ack
       on ( ack.KF = txn.KF and ack.ACC_ID = txn.ACC_ID_CR )
-    left
+    left 
     join SB_R020 rdb
       on ( rdb.R020 = txn.R020_DB )
-    left
+    left 
     join SB_R020 rcr
       on ( rcr.R020 = txn.R020_CR )
    where txn.KF = p_kod_filii
@@ -499,23 +499,23 @@ BEGIN
      and ( rdb.F_75 = '1' and lnnvl( rdb.D_CLOSE <= p_report_date ) or
            rcr.F_75 = '1' and lnnvl( rcr.D_CLOSE <= p_report_date ) )
   ;
-
+  
   commit;
-
+  
   -- розрахунок показників курсової різниці (код 06)
   insert all
-    when ( Ind_DB Is Not Null )
+    when ( Ind_DB Is Not Null ) 
     then
-      into NBUR_DETAIL_PROTOCOLS
+      into NBUR_DETAIL_PROTOCOLS 
          ( REPORT_DATE, KF, REPORT_CODE, NBUC
          , FIELD_CODE, FIELD_VALUE, ACC_ID, ACC_NUM, KV, DESCRIPTION )
       values
          ( p_report_date, KF, p_file_code, NBUC
          , Ind_DB || R020 || OB22 || R030 || '06', OUTCOME_DB
          , ACC_ID, ACC_NUM, CCY_ID, DESCRIPTION )
-    when ( Ind_CR Is Not Null )
+    when ( Ind_CR Is Not Null ) 
     then
-      into NBUR_DETAIL_PROTOCOLS
+      into NBUR_DETAIL_PROTOCOLS 
          ( REPORT_DATE, KF, REPORT_CODE, NBUC
          , FIELD_CODE, FIELD_VALUE, ACC_ID, ACC_NUM, KV, DESCRIPTION )
       values
@@ -545,15 +545,15 @@ BEGIN
        , 'формирование показетелей переоценки' as DESCRIPTION
     from ( select /*+ no_parallel */ a.KF, a.ACC_ID, a.ACC_NUM
                 , a.KV  as CCY_ID
-                , a.NBS as R020
+                , a.NBS as R020  
                 , a.OB22
-                , lpad(to_char(a.kv),3,'0') as R030
+                , lpad(to_char(a.kv),3,'0') as R030 
                 , nvl(p.DOS,0) as DOS
                 , nvl(p.KOS,0) as KOS
                 , nvl(b.DOSQ - b.CUDOSQ,0) as DOSQ
                 , nvl(b.KOSQ - b.CUKOSQ,0) as KOSQ
-                , case
-                    when l_type > 0
+                , case 
+                    when l_type > 0 
                     then a.NBUC -- acc.B040
                     else l_nbuc
                   end as NBUC
@@ -567,14 +567,14 @@ BEGIN
                on ( b.KF = a.KF and b.ACC_ID = a.ACC_ID )
              left
              join ( select KF, ACC_ID, ACC_NUM, KV
-                         , substr(FIELD_CODE,3,4) as NBS
+                         , substr(FIELD_CODE,3,4) as NBS 
                          , substr(FIELD_CODE,7,2) as OB22
                          , substr(FIELD_CODE,9,3) as KVP
                          , sum( case when (substr(FIELD_CODE,1,2)='50') then to_number(FIELD_VALUE) else 0 end ) as DOS
                          , sum( case when (substr(FIELD_CODE,1,2)='60') then to_number(FIELD_VALUE) else 0 end ) as KOS
-                      from NBUR_DETAIL_PROTOCOLS
+                      from NBUR_DETAIL_PROTOCOLS  
                      where kv != 980
-                     group
+                     group 
                         by KF, ACC_ID, ACC_NUM, KV
                          , substr(FIELD_CODE,3,4)
                          , substr(FIELD_CODE,7,2)
@@ -586,13 +586,13 @@ BEGIN
               and r.F_75 = '1'
               and lnnvl( r.D_CLOSE <= p_report_date )
               and lnnvl( a.CLOSE_DATE < trunc(p_report_date,'MM') )
-          ) t
+          ) t 
     where ( t.DOSQ <> t.DOS AND t.DOSQ <> 0 and t.DOS >=0 )
        or ( t.KOSQ <> t.DOS AND t.KOSQ <> 0 and t.KOS >=0 )
   ;
-
+  
   -- OPEN BaseL;
-  insert
+  insert 
     into NBUR_AGG_PROTOCOLS
        ( REPORT_DATE, KF, REPORT_CODE, NBUC, FIELD_CODE, FIELD_VALUE )
   select REPORT_DATE, KF, REPORT_CODE, NBUC, FIELD_CODE, sum(to_number(FIELD_VALUE))
@@ -603,6 +603,10 @@ BEGIN
    group by REPORT_DATE, KF, REPORT_CODE, NBUC, FIELD_CODE;
 
   bars_audit.info( $$PLSQL_UNIT||' end for date = '||TO_CHAR(p_report_date, 'dd.mm.yyyy') );
-
+  
 end NBUR_P_I75;
 /
+
+show err;
+
+grant EXECUTE on NBUR_P_I75 to BARS_ACCESS_DEFROLE;

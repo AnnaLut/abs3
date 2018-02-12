@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции !!N
-prompt Наименование операции: STOP правило на перевірку ліміта на поповнення в рамках одного РУ
+prompt STOP правило на перевірку ліміта на поповнення в рамках одного РУ
 declare
   cnt_  number;
 begin
@@ -542,57 +542,21 @@ begin
   --------------------------------
   -------- Группы контроля -------
   --------------------------------
-  delete from chklist_tts where tt='PNB';
-  begin
-    insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (1, 'PNB', 3, null, 'f_universal_box2(USERID)=1 and branch_edit.get_branch_parameter_ex(branch, ''NOT2VISA'', ''0'') = ''0''', 0);
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 1, ''PNB'', 3, null, ''f_universal_box2(USERID)=1 and branch_edit.get_branch_parameter_ex(branch, ''''NOT2VISA'''', ''''0'''') = ''''0'''''', 0) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
-  begin
-    insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (5, 'PNB', 1, null, null, 0);
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 5, ''PNB'', 1, null, null, 0) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
-  begin
-    insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (7, 'PNB', 2, null, '( f_is_resident(kv, nlsa, ref)=0 or kv<>980 and substr(NLSB,1,3)=''100'' and
-   ( substr(NLSA,1,4)=''2605'' or substr(NLSA,1,4)=''2520'' and nvl(f_get_ob22(kv, nlsa), ''02'')=''02'' or substr(NLSA,1,4) in (''2541'',''2542'') and nvl(f_get_ob22(kv, nlsa), ''01'')=''01''  ) )', 0);
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 7, ''PNB'', 2, null, ''( f_is_resident(kv, nlsa, ref)=0 or kv<>980 and substr(NLSB,1,3)=''''100'''' and
-   ( substr(NLSA,1,4)=''''2605'''' or substr(NLSA,1,4)=''''2520'''' and nvl(f_get_ob22(kv, nlsa), ''''02'''')=''''02'''' or substr(NLSA,1,4) in (''''2541'''',''''2542'''') and nvl(f_get_ob22(kv, nlsa), ''''01'''')=''''01''''  ) )'', 0) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
   --------------------------------
   ------------- Папки ------------
   --------------------------------
-  delete from folders_tts where tt='PNB';
-  begin
-    insert into folders_tts(idfo, tt)
-    values (27, 'PNB');
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (folders_tts: 27, ''PNB'') - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
 end;
 /
 commit;
+
+delete from bars.OBPC_TRANS_OUT where tt = 'PNB' and dk = 1;
+
+begin
+Insert into BARS.OBPC_TRANS_OUT
+   (TRAN_TYPE, TT, DK, W4_MSGCODE, PAY_FLAG)
+ Values
+   ('18', 'PNB', 1, 'PAYACC', 0);
+    exception when dup_val_on_index then null;
+end; 
+/  
+COMMIT;

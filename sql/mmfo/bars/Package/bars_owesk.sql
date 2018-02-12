@@ -154,7 +154,7 @@ begin
   if p_okpo is null
   or substr(p_okpo,1,5) = '99999'
   or substr(p_okpo,1,5) = '00000'
-  or p_paspser is null
+  or (p_paspser is null and length(p_paspnum)<>9)
   or p_paspnum is null then
 
      l_rnk := null;
@@ -182,7 +182,7 @@ begin
              from customer c, person p
             where c.okpo   = p_okpo
               and nvl(trim(c.sed),'00') <> '91'
-              and p.ser    = p_paspser
+              and nvl(p.ser,'0') = nvl(p_paspser,'0')
               and p.numdoc = p_paspnum
               and c.rnk = p.rnk;
            if l_date_off is not null then
@@ -199,7 +199,7 @@ begin
                 from customer c, person p
                where c.okpo   = p_okpo
                  and nvl(trim(c.sed),'00') <> '91'
-                 and p.ser    = p_paspser
+                 and nvl(p.ser,'0') = nvl(p_paspser,'0')
                  and p.numdoc = p_paspnum
                  and c.rnk = p.rnk
                  and c.date_off is null;
@@ -209,7 +209,7 @@ begin
                    from customer c, person p
                   where c.okpo   = p_okpo
                     and nvl(trim(c.sed),'00') <> '91'
-                    and p.ser    = p_paspser
+                    and nvl(p.ser,'0') = nvl(p_paspser,'0')
                     and p.numdoc = p_paspnum
                     and c.rnk = p.rnk
                     and c.date_off is not null;
@@ -275,7 +275,7 @@ begin
   if p_project.first_name is null
   or p_project.last_name is null
   or p_project.type_doc is null
-  or p_project.paspseries is null
+  or (p_project.paspseries is null and nvl(p_project.type_doc,0) = 1)
   or p_project.paspnum is null
   or p_project.paspissuer is null
   or p_project.paspdate is null

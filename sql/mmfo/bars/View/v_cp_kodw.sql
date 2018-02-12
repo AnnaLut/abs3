@@ -6,10 +6,11 @@ PROMPT =========================================================================
 
 
 PROMPT *** Create  view V_CP_KODW ***
+PROMPT Нотатка: після оновлення вьюхи потрібно перестворювати тріггер на неї
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_CP_KODW ("ID", "TAG", "VALUE") AS 
-  select k.id, t.tag, (select substr(value,1,255) from  cp_kodw where id= k.id and tag = t.tag) 
-from cp_kod k, v2_cp_tag t;
+  CREATE OR REPLACE FORCE VIEW BARS.V_CP_KODW ("ID", "CP_ID", "TAG", "NAME", "DICT_NAME", "VALUE") AS 
+  select k.id, k.cp_id, t.tag, t.name, t.dict_name, (select substr(value,1,255) from  cp_kodw where id= k.id and tag = t.tag) 
+from cp_kod k, v2_cp_tag t order by t.tag;
 
 PROMPT *** Create  grants  V_CP_KODW ***
 grant SELECT                                                                 on V_CP_KODW       to BARSREADER_ROLE;

@@ -60,7 +60,7 @@ loop
              )
   loop
      l_value := trim(kk.value);
-     l_KODDZ := replace(replace(replace(l_value ,',',''),'.',''),'/','' );
+     l_KODDZ := replace(replace(replace(replace(l_value ,',',''),'.',''),'/','' ),'-','' );
      begin
        l_n1 := to_number(l_KODDZ) ;
        if l_KODDZ <> l_value then

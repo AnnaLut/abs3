@@ -1,19 +1,11 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/NOTARY.sql =========*** Run *** ======
-PROMPT ===================================================================================== 
-
-
 PROMPT *** ALTER_POLICY_INFO to NOTARY ***
 
 
 BEGIN 
         execute immediate  
           'begin  
-               bpa.alter_policy_info(''NOTARY'', ''CENTER'' , null, ''E'', ''E'', ''E'');
-               bpa.alter_policy_info(''NOTARY'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
-               bpa.alter_policy_info(''NOTARY'', ''WHOLE'' , null, ''E'', ''E'', ''E'');
+               bpa.alter_policy_info(''NOTARY'', ''FILIAL'' , null, null, null, null);
+               bpa.alter_policy_info(''NOTARY'', ''WHOLE'' , null, null, null, null);
                null;
            end; 
           '; 
@@ -42,7 +34,11 @@ begin
 	CERTIFICATE_NUMBER VARCHAR2(30 CHAR), 
 	CERTIFICATE_ISSUE_DATE DATE, 
 	CERTIFICATE_CANCELATION_DATE DATE, 
-	STATE_ID NUMBER(5,0) DEFAULT 1
+	STATE_ID NUMBER(5,0) DEFAULT 1,
+	DOCUMENT_TYPE number(2) default 1 not null,
+	IDCARD_DOCUMENT_NUMBER number(9),
+	IDCARD_NOTATION_NUMBER VARCHAR2(14),
+	PASSPORT_EXPIRY DATE
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -62,7 +58,7 @@ PROMPT *** ALTER_POLICIES to NOTARY ***
 COMMENT ON TABLE BARS.NOTARY IS 'Централізований довідник нотаріусів, з якими Ощадбанк має договірні відносини';
 COMMENT ON COLUMN BARS.NOTARY.ID IS 'Унікальний ідентифікатор нотаріуса';
 COMMENT ON COLUMN BARS.NOTARY.TIN IS 'Індивідуальний податковий номер нотаріуса';
-COMMENT ON COLUMN BARS.NOTARY.FIRST_NAME IS 'Ім'я';
+COMMENT ON COLUMN BARS.NOTARY.FIRST_NAME IS 'Ім''я';
 COMMENT ON COLUMN BARS.NOTARY.MIDDLE_NAME IS 'По-батькові';
 COMMENT ON COLUMN BARS.NOTARY.LAST_NAME IS 'Прізвище';
 COMMENT ON COLUMN BARS.NOTARY.DATE_OF_BIRTH IS 'Дата народження';
@@ -71,7 +67,7 @@ COMMENT ON COLUMN BARS.NOTARY.PASSPORT_NUMBER IS 'Номер паспорту';
 COMMENT ON COLUMN BARS.NOTARY.ADDRESS IS 'Адреса реєстрації нотаріуса в його нотаріальному округу';
 COMMENT ON COLUMN BARS.NOTARY.PASSPORT_ISSUER IS 'Ким виданий документ';
 COMMENT ON COLUMN BARS.NOTARY.PASSPORT_ISSUED IS 'Дата видачі документа';
-COMMENT ON COLUMN BARS.NOTARY.PHONE_NUMBER IS 'Номер телефону стаціонарного зв'язку';
+COMMENT ON COLUMN BARS.NOTARY.PHONE_NUMBER IS 'Номер телефону стаціонарного зв''язку';
 COMMENT ON COLUMN BARS.NOTARY.MOBILE_PHONE_NUMBER IS 'Номер мобільного телефону';
 COMMENT ON COLUMN BARS.NOTARY.EMAIL IS 'Адреса електронної пошти нотаріуса';
 COMMENT ON COLUMN BARS.NOTARY.NOTARY_TYPE IS 'Тип реєстрації нотаріуса (1 - державний, 2 - приватний)';
@@ -145,6 +141,18 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint SYS_C0010636 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NOTARY ADD CHECK (STATE_ID IS NOT NULL) DEFERRABLE INITIALLY DEFERRED ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint UK_NOTARY ***
 begin   
  execute immediate '
@@ -160,18 +168,6 @@ exception when others then
 
 
 PROMPT *** Create  constraint SYS_C0010635 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NOTARY ADD CHECK (STATE_ID IS NOT NULL) DEFERRABLE INITIALLY DEFERRED ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C0010636 ***
 begin   
  execute immediate '
   ALTER TABLE BARS.NOTARY ADD CHECK (STATE_ID IS NOT NULL) DEFERRABLE INITIALLY DEFERRED ENABLE NOVALIDATE';
@@ -236,16 +232,49 @@ exception when others then
  end;
 /
 
+begin
+    execute immediate 'alter table NOTARY add DOCUMENT_TYPE number(2) default 1 not null';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/
+
+begin
+    execute immediate 'alter table NOTARY add IDCARD_DOCUMENT_NUMBER number(9)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/
+
+begin
+    execute immediate 'alter table NOTARY add IDCARD_NOTATION_NUMBER VARCHAR2(14)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/
+
+begin
+    execute immediate 'alter table NOTARY add PASSPORT_EXPIRY DATE';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/
+
+begin
+    execute immediate 'alter table notary
+  add constraint FK_NOTARY_PASSP foreign key (DOCUMENT_TYPE)
+  references PASSP (PASSP)';
+ exception when others then 
+    if sqlcode = -2275 then null; else raise; 
+    end if; 
+end;
+/
 
 
 PROMPT *** Create  grants  NOTARY ***
-grant SELECT                                                                 on NOTARY          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NOTARY          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NOTARY          to BARS_DM;
-grant SELECT                                                                 on NOTARY          to UPLD;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Table/NOTARY.sql =========*** End *** ======
-PROMPT ===================================================================================== 

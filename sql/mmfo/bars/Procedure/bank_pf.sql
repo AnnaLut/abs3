@@ -1,18 +1,10 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/BANK_PF.sql =========*** Run *** =
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure BANK_PF ***
-
-  CREATE OR REPLACE PROCEDURE BARS.BANK_PF (P_MODE    INT,
-                                          p_dat1    DATE,
-                                          p_dat2    DATE)
-IS
-  l_dat1 date ;
-  l_dat2 date ;
+create or replace procedure BANK_PF
+( p_mode    int
+, p_dat1    date default null
+, p_dat2    date default null
+) is
+  l_dat1    date;
+  l_dat2    date;
    -- единая для РУ ОБ, ГОУ ОБ, НАДРА
    /*
    20.10.2016 MMFO для P_MODE in (1, 3, 4) додано цикл по КF (МФО), return замінено на continue;
@@ -23,7 +15,6 @@ IS
                   з рахунку 3622/38 = "військовий збір, утриманий з доходів ФО»  на рахунки УДК
                   аналогічно функції перекриття/перерахування військового збору з рах.3622/36  - з тамими ж самими платіжними реквізитами отримувача.
                   Відмінність - відсутній зеркальний 3522 рахунок.
-
 
    19-02-2015 Sta Від Костенко Г.С., Дата: 18.02.2015, Вих. № 13/1-03/74
    09-01-2015 Sta Перекриття, перерахування сум ПДФО та ВЗ до бюджету по Бранчам  ank_PF ( 2, DATETIME_Null, DATETIME_Null )
@@ -134,7 +125,8 @@ BEGIN
 
             IF k.B6 = '3622' AND k.o6 IN ('36', '38')
             THEN
-               sDet_ := 'Військовий збір';
+				sDet_ := 'Військовий збір '||case when  k.o6='38' then 'від погашених купонів казначейських зобов’язань ' else  ' з процентних доходів ' end;
+               --sDet_ := 'Військовий збір';
                oo.nam_b := SUBSTR ('/11011000/'||oo.nam_b, 1, 38);
 
                SELECT SUBSTR (val, 1, 14)
@@ -144,7 +136,8 @@ BEGIN
                   AND tag = 'PDFOVZB'
                   AND val IS NOT NULL;
             ELSE
-               sDet_ := 'ПДФО';
+			    sDet_ := 'ПДФО з процентних доходів ';
+               --sDet_ := 'ПДФО';
                oo.nam_b := SUBSTR ('/11010800/' || oo.nam_b, 1, 38);
 
                SELECT SUBSTR (val, 1, 14)
@@ -175,7 +168,8 @@ BEGIN
                oo.tt := 'PS2';
                oo.s := k.P;
                oo.vob := 1;
-               oo.nazn := SUBSTR ('*;101;' || gl.aOkpo || ';' || sDet_ || ' з процентних доходів ' || sMes_ || ';;;' || oo.nazn, 1, 160);
+               oo.nazn := SUBSTR ('*;101;' || gl.aOkpo || ';' || sDet_ || sMes_ || ';;;' || oo.nazn, 1, 160);
+             --oo.nazn := SUBSTR ('*;101;' || gl.aOkpo || ';' || sDet_ || ' з процентних доходів ' || sMes_ || ';;;' || oo.nazn, 1, 160);
             /*
             --13-08-2014 Sta Назн пл от МС Демкович
             *;101;<gl.aOkpo>;ПДФО з процентних доходів <sMes_>;;;
@@ -854,20 +848,16 @@ BEGIN
                SET s = oo.s, s2 = oo.s
              WHERE REF = oo.REF;
          END IF;
-      END LOOP;                                                         --- z_
+      END LOOP; -- z_
     end loop; --закінчення циклу по таблиці params$base
    END IF;
 
-END Bank_PF;
+END BANK_PF;
 /
-show err;
 
-PROMPT *** Create  grants  BANK_PF ***
-grant DEBUG,EXECUTE                                                          on BANK_PF         to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on BANK_PF         to START1;
+show errors;
+
+grant EXECUTE, DEBUG on BANK_PF to BARS_ACCESS_DEFROLE;
+grant EXECUTE        on BANK_PF to START1;
 
 
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/BANK_PF.sql =========*** End *** =
-PROMPT ===================================================================================== 

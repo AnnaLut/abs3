@@ -58,7 +58,7 @@ declare
 begin
 
   l_tabsemantic := 'Управління відсотками поточних рахунків';
-  l_tablinesdef := '';
+  l_tablinesdef := 30;
   l_tabname     := 'V_CURRENT_ACCOUNTS_INTEREST';
 
   -- получаем код таблицы
@@ -71,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, null, l_tablinesdef);
 
   -- если таблица описана в БМД
   else
@@ -130,12 +130,12 @@ begin
   bars_metabase.add_column(l_tabid, 10, 'END_OF_ACCRUAL'         , 'D', 'Завершення нарахування'        , null,   10, 10, 0, 0, 0, 0, '', ''        , 0, 0, '', 0, 1, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 11, 'LAST_ACCRUAL_DATE'      , 'D', 'Дата нарахування'              , null,   10, 11, 0, 0, 0, 0, '', ''        , 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 12, 'LAST_PAYMENT_DATE'      , 'D', 'Дата виплати'                  , null,   10, 12, 0, 0, 0, 0, '', ''        , 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'INTEREST_RATE'          , 'N', 'Відсоткова ставка'             , null,   22, 13, 0, 0, 0, 0, '', '# 0.0000', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'PLANNED_INTEREST_REST'  , 'N', 'Плановий залишок відсотків'    ,  2.0,   22, 14, 0, 0, 0, 0, '', '# 0.00'  , 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'CURRENT_INTEREST_REST'  , 'N', 'Фактичний залишок відсотків'   ,  2.0,   22, 15, 0, 0, 0, 0, '', '# 0.00'  , 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'LAST_RECKONING_DATE'    , 'D', 'Прогноз розрахований по'       ,  2.1,   10, 16, 0, 0, 0, 0, '', ''        , 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'AMOUNT_TO_ACCRUAL'      , 'N', 'Сума до нарахування'           ,  2.0,   22, 17, 0, 0, 0, 0, '', '# 0.00'  , 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'AMOUNT_TO_PAYMENT'      , 'N', 'Сума до виплати'               ,  2.0,   22, 18, 0, 0, 0, 0, '', '# 0.00'  , 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'INTEREST_RATE'          , 'N', 'Відсоткова ставка'             , null,   22, 13, 0, 0, 0, 0, '', '#0.0000' , 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'LAST_RECKONING_DATE'    , 'D', 'Дата прогнозу'                 , null,   10, 14, 0, 0, 0, 0, '', ''        , 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'AMOUNT_TO_ACCRUAL'      , 'N', 'Сума до нарахування'           , null,   22, 15, 0, 0, 0, 0, '', '#0.00'   , 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'AMOUNT_TO_PAYMENT'      , 'N', 'Сума до виплати'               , null,   22, 16, 0, 0, 0, 0, '', '#0.00'   , 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'PLANNED_INTEREST_REST'  , 'N', 'Плановий залишок'              , null,   22, 17, 0, 0, 0, 0, '', '#0.00'   , 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'CURRENT_INTEREST_REST'  , 'N', 'Фактичний залишок'             , null,   22, 18, 0, 0, 0, 0, '', '#0.00'   , 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 19, 'RECEIVER_MFO'           , 'C', 'МФО отримувача'                , null,   12, 19, 0, 0, 0, 0, '', ''        , 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 20, 'RECEIVER_ACCOUNT'       , 'C', 'Рахунок отримувача'            , null,   15, 20, 0, 0, 0, 0, '', ''        , 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 21, 'RECEIVER_CURRENCY_ID'   , 'N', 'Валюта отримувача'             , null,   22, 21, 0, 0, 0, 0, '', ''        , 0, 0, '', 0, 0, 0, '', '', 0);
@@ -147,6 +147,9 @@ begin
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);
   
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 1, 'Перерозрахунок відсотків', '', '', 'SELECTED_ONE', '', '', '', '', 'sPar=V_INTEREST_RECALCULATION[ACCESSCODE=>1][PROC=>npi_ui.recalculate_interest(:ACCOUNT_ID,:DF,:DT,:G)][PAR=>:df(SEM=Дата з,TYPE=D),:dt(SEM=Дата по,TYPE=D),:g(SEM=Групування,TYPE=N,REF=V_RECKONING_GROUP_MODE)][EXEC=>BEFORE][showDialogWindow=>false]', 56);
+
   -- восстанавливаем ссылки сложных полей других таблиц
   for i in 1..l_extrnval.count loop
     l_newcolid := bars_metabase.get_colid(l_tabid, l_extrnval(i).srccolname);
@@ -208,3 +211,4 @@ end;
 /
 
 commit;
+

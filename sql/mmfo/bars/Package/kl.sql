@@ -380,6 +380,39 @@ procedure setFullCustomerAddress (
 	p_comment		customer_address.comm%type default null,
 	p_flag_visa  number default 0 );
 
+--***************************************************************************--
+-- PROCEDURE  : setFullCustomerAddress
+-- DESCRIPTION  : ????????? ?????????? ??????? ??????? ? ????? ??????????
+-- ?????????? ? ?? ? ????????????, ??? ????? ??? ??? ???? ?? ????
+--***************************************************************************--
+procedure setFullCustomerAddress (
+  p_rnk           customer_address.rnk%type,
+  p_typeId      customer_address.type_id%type,
+  p_country     customer_address.country%type,
+  p_zip           customer_address.zip%type,
+  p_domain      customer_address.domain%type,
+  p_region      customer_address.region%type,
+  p_locality    customer_address.locality%type,
+  p_address     customer_address.address%type,
+  p_territoryId   customer_address.territory_id%type,
+  p_locality_type customer_address.locality_type%type,
+  p_street_type   customer_address.street_type%type,
+  p_street        customer_address.street%type,
+  p_home_type     customer_address.home_type%type,
+  p_home          customer_address.home%type,
+  p_homepart_type customer_address.homepart_type%type,
+  p_homepart      customer_address.homepart%type,
+  p_room_type     customer_address.room_type%type,
+  p_room          customer_address.room%type,
+  p_comment       customer_address.comm%type default null,
+  p_region_id     customer_address.region_id%type,
+  p_area_id       customer_address.area_id%type,
+  p_settlement_id customer_address.settlement_id%type,
+  p_street_id     customer_address.street_id%type,
+  p_house_id      customer_address.house_id%type,
+  p_flag_visa     number default 0 );
+
+
 $if KL_PARAMS.TREASURY $then
 $else
 --***************************************************************************--
@@ -529,6 +562,14 @@ procedure check_attr_foropenacc (p_rnk in number, p_msg out varchar2);
   --
   --
   procedure set_cutomer_image(p_rnk number, p_imgage_type  varchar2, p_image blob);
+
+  -----------------------------------------------------------
+  -- Процедура перерегистрации закрытого контрагента
+  --
+  -- @p_rnk - РНК клиента
+  --  
+  procedure resurrect_customer(p_rnk customer.rnk%type,
+                               p_err_msg out varchar2);
 
 END KL;
 /
@@ -2360,6 +2401,172 @@ $end
 
 END;
 
+--***************************************************************************--
+-- PROCEDURE  : setFullCustomerAddress
+-- DESCRIPTION  : процедура обновления адресов клиента с новой структурой
+-- передается и ИД и наименование, все равно оно уже есть не вебе
+--***************************************************************************--
+procedure setFullCustomerAddress (
+  p_rnk           customer_address.rnk%type,
+  p_typeId      customer_address.type_id%type,
+  p_country     customer_address.country%type,
+  p_zip           customer_address.zip%type,
+  p_domain      customer_address.domain%type,
+  p_region      customer_address.region%type,
+  p_locality    customer_address.locality%type,
+  p_address     customer_address.address%type,
+  p_territoryId   customer_address.territory_id%type,
+  p_locality_type customer_address.locality_type%type,
+  p_street_type   customer_address.street_type%type,
+  p_street        customer_address.street%type,
+  p_home_type     customer_address.home_type%type,
+  p_home          customer_address.home%type,
+  p_homepart_type customer_address.homepart_type%type,
+  p_homepart      customer_address.homepart%type,
+  p_room_type     customer_address.room_type%type,
+  p_room          customer_address.room%type,
+  p_comment       customer_address.comm%type default null,
+  p_region_id     customer_address.region_id%type,
+  p_area_id       customer_address.area_id%type,
+  p_settlement_id customer_address.settlement_id%type,
+  p_street_id     customer_address.street_id%type,
+  p_house_id      customer_address.house_id%type,
+  p_flag_visa     number default 0 )
+IS
+  NewId_ number;
+  l_title varchar2(40) := 'kl.setFullCustomerAddress: ';
+BEGIN
+  bars_audit.trace('%s 1.params:'
+       || ' p_Rnk=>%s,'
+       || ' p_TypeId=>%s,'
+       || ' p_Country=>%s,'
+       || ' p_Zip=>%s,'
+       || ' p_Domain=>%s,'
+       || ' p_Region=>%s,'
+       || ' p_Locality=>%s,'
+       || ' p_Address=>%s,'
+       || ' p_TerritoryId=>' || to_char(p_TerritoryId),
+       l_title, to_char(p_Rnk), to_char(p_TypeId), to_char(p_Country),
+       p_Zip, p_Domain, p_Region, p_Locality, p_Address);
+
+  if p_flag_visa = 0
+  or p_flag_visa = 1 and not is_customer_visa(p_Rnk) then
+     -- Удаление
+     if     p_Country     is null
+        and p_Zip         is null
+        and p_Domain      is null
+        and p_Region      is null
+        and p_Locality    is null
+        and p_Address     is null
+        and p_TerritoryId is null
+     then
+        bars_audit.trace('%s 2. удаление данных об адресе клиента %s (тип=%s)', l_title, to_char(p_Rnk), to_char(p_TypeId));
+        delete from customer_address where rnk=p_Rnk and type_id=p_TypeId;
+        bars_audit.trace('%s 3. завершено удаление данных об адресе клиента %s (тип=%s)', l_title, to_char(p_Rnk), to_char(p_TypeId));
+     else
+        -- Обновление
+        -- для сумісності зі старою версією
+        if (p_locality_type is null
+            and p_street_type is null
+            and p_street is null
+            and p_home_type is null
+            and p_home is null
+            and p_homepart_type is null
+            and p_homepart is null
+            and p_room_type is null
+            and p_room is null
+          and p_comment is null ) then
+
+            update customer_address
+            set country       = p_Country,
+              zip            = p_Zip,
+              domain         = p_Domain,
+              region        = p_Region,
+              locality      = p_Locality,
+              address       = p_Address,
+              territory_id  = p_TerritoryId
+            where rnk = p_Rnk and type_id = p_TypeId;
+
+        else
+          update customer_address
+            set country       = p_Country,
+              zip            = p_Zip,
+              domain         = p_Domain,
+              region        = p_Region,
+              locality      = p_Locality,
+              address       = p_Address,
+              territory_id  = p_TerritoryId,
+              --locality_type = p_locality_type,
+              --street_type   = p_street_type,
+              street        = p_street,
+              home_type     = p_home_type,
+              home          = p_home,
+              homepart_type = p_homepart_type,
+              homepart      = p_homepart,
+              room_type     = p_room_type,
+              room          = p_room,
+              comm          = p_comment,
+              region_id     = p_region_id,
+              area_id       = p_area_id,
+              settlement_id = p_settlement_id,
+              street_id     = p_street_id,
+              house_id      = p_house_id,
+              locality_type_n = p_locality_type,
+              street_type_n   = p_street_type
+            where rnk = p_Rnk and type_id = p_TypeId;
+
+        end if;
+
+        if sql%rowcount = 0 then
+           bars_audit.trace('%s 4. регистрация данных об адресе клиента %s (тип=%s)', l_title, to_char(p_Rnk), to_char(p_TypeId));
+           -- Добавление
+           insert into customer_address (rnk, type_id, country, zip, domain, region, locality, address, territory_id,
+              locality_type, street_type, street, home_type, home, homepart_type, homepart, room_type, room, comm,
+              region_id, area_id, settlement_id, street_id, house_id, locality_type_n, street_type_n  )
+           values ( p_Rnk, p_TypeId, p_Country, p_Zip, p_Domain, p_Region, p_Locality, p_Address, p_TerritoryId,
+              /*p_locality_type*/null, /*p_street_type*/null, p_street, p_home_type, p_home, p_homepart_type, p_homepart,p_room_type, p_room, p_comment,
+              p_region_id, p_area_id, p_settlement_id, p_street_id,p_house_id, p_locality_type, p_street_type);
+           bars_audit.trace('%s 5. завершена регистрация данных об адресе клиента %s (тип=%s)', l_title, to_char(p_Rnk), to_char(p_TypeId));
+        else
+           bars_audit.trace('%s 6. завершено обновление данных об адресе клиента %s (тип=%s)', l_title, to_char(p_Rnk), to_char(p_TypeId));
+        end if;
+
+$if KL_PARAMS.SBER $then
+        ADD_EBK_QUEUE(p_rnk);
+
+$end
+     end if;
+$if KL_PARAMS.CLV $then
+  else
+     declare
+        l_clv clv_customer_address%rowtype;
+     begin
+        l_clv.rnk           := p_Rnk;
+        l_clv.type_id       := p_TypeId;
+        l_clv.country       := p_Country;
+        l_clv.zip           := p_Zip;
+        l_clv.domain        := p_Domain;
+        l_clv.region        := p_Region;
+        l_clv.locality      := p_Locality;
+        l_clv.address       := p_Address;
+        l_clv.territory_id  := p_TerritoryId;
+        l_clv.locality_type := p_locality_type;
+        l_clv.street_type   := p_street_type;
+        l_clv.street        := p_street;
+        l_clv.home_type     := p_home_type;
+        l_clv.home          := p_home;
+        l_clv.homepart_type := p_homepart_type;
+        l_clv.homepart      := p_homepart;
+        l_clv.room_type     := p_room_type;
+        l_clv.room          := p_room;
+        l_clv.comm          := p_comment;
+        bars_clv.set_req_customeraddress(l_clv);
+     end;
+$end
+  end if;
+
+END;
+
 $if KL_PARAMS.TREASURY $then
 $else
 --***************************************************************************--
@@ -3151,7 +3358,12 @@ begin
         check_attr(get_customerw(p_rnk, 'DJER '), 'Характеристика джерел надходжень коштiв');
         check_attr(get_customerw(p_rnk, 'CIGPO') ,'Статус зайнятості особи');
      -- ЮЛ-резидент
-     elsif mod(l_cust.codcagent, 2) = 1 then
+     elsif mod(l_cust.codcagent, 2) = 1 
+ then
+        check_attr(l_cust.adm,   'Адм. орган реєстрації');
+        check_attr(l_cust.rgtax, 'Реєстр. номер у ПІ');
+        check_attr(l_cust.datet, 'Дата реєстр. у ПІ');
+        check_attr(l_cust.datea, 'Дата реєстр. у Адм.');
         check_attr(trim(l_cust.ise), 'Інст. сектор економіки (К070)');
         check_attr(trim(l_cust.fs), 'Форма власності (К080)');
         check_attr(trim(l_cust.ved), 'Вид ек. діяльності(К110)');
@@ -3381,6 +3593,42 @@ end check_attr_foropenacc;
       begin
         return p_rnk||to_char(sysdate, 'YYMMDDHH24MISS');
         end generate_dkbo_number;
+
+
+ procedure RESURRECT_CUSTOMER
+  ( p_rnk     in     customer.rnk%type
+  , p_err_msg    out varchar2
+  ) is
+    title  constant  varchar2(64) := $$PLSQL_UNIT||'.RESURRECT_CUSTOMER';
+  begin
+    
+    bars_audit.trace( '%s: Entry with ( p_rnk=%s ).', title, to_char(p_rnk) );
+    
+    begin
+
+      update CUSTOMER
+         set DATE_OFF = null
+       where RNK = p_rnk;
+
+      begin
+        -- COBUSUPABS-5726 - перерахунок рівня ризику контрагента
+        FM_SET_RIZIK( p_rnk );
+      exception
+        when others then
+          p_err_msg := sqlerrm;
+          bars_audit.error( title ||': '||chr(10)|| p_err_msg ||chr(10)|| dbms_utility.format_error_backtrace() );
+          p_err_msg := 'Помилка перерахунку рівня ризику: ' || substr( p_err_msg, 1, 150 );
+      end;
+
+    exception
+      when others then
+        p_err_msg := substr( sqlerrm, 1, 200 );
+    end;
+
+    bars_audit.trace( '%s: Exit with ( p_err_msg=%s ).', title, p_err_msg );
+
+  end RESURRECT_CUSTOMER;
+
 
 BEGIN
 

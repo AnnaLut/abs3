@@ -7,11 +7,5 @@ begin
                                 end_date            => to_date(null),
                                 job_class           => 'DBMS_JOB$',
                                 comments            => '');
-
-  exception when others then
-      if (sqlcode = -27477) then null;
-        else raise; 
-      end if;
-
 end;
 /

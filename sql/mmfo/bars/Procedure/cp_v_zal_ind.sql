@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure CP_V_ZAL_IND ***
 
-  CREATE OR REPLACE PROCEDURE BARS.CP_V_ZAL_IND 
+ create or replace procedure CP_V_ZAL_IND
   (p_ref number, p_acc number, p_id number, p_kol_zal number, p_dat_zal date, p_mode int, p_rnk number, p_id_zal number)
 is
   l_datz       date;
@@ -28,13 +28,20 @@ BEGIN  null;
 /* raise_application_error(-20001,'START '||'l_ref= ' ||l_ref ||' p_acc= '||p_acc||' l_id= '||l_id
                            ||' p_kol_zal= '||p_kol_zal||' p_dat_zal= '||to_char(p_dat_zal,'DD.MM.YYYY')||' p_mode= '||p_mode||' p_rnk= '||p_rnk);  */
 
- l_ref       := nvl(p_ref,      PUL.get('CP_ref'));
+  /*Diver: 14.12.2017
+    «м≥на та ≥стор≥зац≥€ велась через таблицю accountsp в розр≥з≥ acc та дати застави (велось val - к≥льк≥сть в застав≥). 
+    ѕри з`€вленн≥ новоњ хот≥лки в ще в розр≥з≥ rnk (COBUMMFO-4020) такий механ≥зм неп≥дходить. 
+    ƒл€ нових ц≥лей була розширена сама таблиц€ cp_zal (+ створена ≥сторична таблиц€ cp_zal_update)
+    
+  */
+
+/* l_ref       := nvl(p_ref,      PUL.get('CP_ref'));
  l_id        := nvl(p_id,       PUL.get('CP_id')) ;
  l_acc       := nvl(p_acc,      PUL.get('CP_ACC'));
  l_id_zal    := p_id_zal ;
- /*l_id_zal := nvl(p_id_zal,PUL.get('CP_ID_ZAL')) ;*/
 
-
+ 
+ 
  l_datz:=p_DAT_ZAL;
  l_datz2:=nvl(p_DAT_ZAL, to_date('31.12.2099','dd.mm.yyyy'));
 
@@ -173,7 +180,7 @@ BEGIN  null;
   end;
  end if;
 
-
+*/
 
 END CP_V_ZAL_IND;
 /

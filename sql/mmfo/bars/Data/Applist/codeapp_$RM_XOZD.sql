@@ -23,112 +23,54 @@ begin
                              P_ARM_NAME              => l_application_name,
                              P_APPLICATION_TYPE_ID   => l_application_type_id);
 
+
         -- отримуємо ідентифікатор створеного АРМу
      l_application_id := user_menu_utl.get_arm_id(l_application_code); 
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Друк звітів ********** ');
-          --  Створюємо функцію Друк звітів
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ДЗ-0) Моделi закриття ДЗ ********** ');
+          --  Створюємо функцію ДЗ-0) Моделi закриття ДЗ
       l := l +1;
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'Друк звітів',
-                                                  p_funcname => '/barsroot/cbirep/rep_list.aspx?codeapp=\S*',
-                                                  p_rolename => '' ,
-                                                  p_frontend => l_application_type_id
-                                                  );
-
-
-      --  Створюємо дочірню функцію Друк звітів
-                     l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Друк звітів',
-															  p_funcname => '/barsroot/cbirep/rep_print.aspx?query_id=\d+\S*',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
-
-      --  Створюємо дочірню функцію Друк звітів
-                     l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Друк звітів',
-															  p_funcname => '/barsroot/cbirep/rep_query.aspx?repid=\d+\S*',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
-
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Візування "своїх" операцій ********** ');
-          --  Створюємо функцію Візування "своїх" операцій
-      l := l +1;
-      l_function_ids.extend(l);
-      l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'Візування "своїх" операцій',
-                                                  p_funcname => '/barsroot/checkinner/default.aspx?type=0',
-                                                  p_rolename => '' ,
-                                                  p_frontend => l_application_type_id
-                                                  );
-
-
-      --  Створюємо дочірню функцію Візування "своїх" операцій
-                     l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Візування "своїх" операцій',
-															  p_funcname => '/barsroot/checkinner/documents.aspx?type=0&grpid=\w+',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
-
-      --  Створюємо дочірню функцію Сервіс додатку BarsWeb.CheckInner
-                     l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Сервіс додатку BarsWeb.CheckInner',
-															  p_funcname => '/barsroot/checkinner/service.asmx',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
-
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ДЗ-0) В ЦА:Моделi закриття ДЗ ********** ');
-          --  Створюємо функцію ДЗ-0) В ЦА:Моделi закриття ДЗ
-      l := l +1;
-      l_function_ids.extend(l);
-      l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'ДЗ-0) В ЦА:Моделi закриття ДЗ',
+                                                  p_name     => 'ДЗ-0) Моделi закриття ДЗ',
                                                   p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=0&sPar=XOZ_OB22[NSIFUNCTION][showDialogWindow=>false][EDIT_MODE=>MULTI_EDIT]',
-                                                  p_rolename => 'BARS_ACCESS_DEFROLE' ,
+                                                  p_rolename => 'BARS_ACCESS_DEFROLE' ,    
                                                   p_frontend => l_application_type_id
                                                   );
 
 
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ДЗ-1) В РУ: Складні оп.перерахування з рахунків ДЗ ********** ');
-          --  Створюємо функцію ДЗ-1) В РУ: Складні оп.перерахування з рахунків ДЗ
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ДЗ-1) Складні оп.перерахування з рахунків ДЗ ********** ');
+          --  Створюємо функцію ДЗ-1) Складні оп.перерахування з рахунків ДЗ
       l := l +1;
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'ДЗ-1) В РУ: Складні оп.перерахування з рахунків ДЗ',
+                                                  p_name     => 'ДЗ-1) Складні оп.перерахування з рахунків ДЗ',
                                                   p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=OPER_XOZ[NSIFUNCTION][showDialogWindow=>false]',
                                                   p_rolename => 'BARS_ACCESS_DEFROLE' ,
                                                   p_frontend => l_application_type_id
                                                   );
 
 
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ДЗ-2) В РУ: Портфель ДЗ за госп діяльністю ********** ');
-          --  Створюємо функцію ДЗ-2) В РУ: Портфель ДЗ за госп діяльністю
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ДЗ-2) Портфель ДЗ за госп діяльністю ********** ');
+          --  Створюємо функцію ДЗ-2) Портфель ДЗ за госп діяльністю
       l := l +1;
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'ДЗ-2) В РУ: Портфель ДЗ за госп діяльністю',
+                                                  p_name     => 'ДЗ-2) Портфель ДЗ за госп діяльністю',
                                                   p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=V_XOZACC[NSIFUNCTION][showDialogWindow=>false]',
                                                   p_rolename => 'BARS_ACCESS_DEFROLE' ,
                                                   p_frontend => l_application_type_id
                                                   );
 
 
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ДЗ-4) В ЦА: Відшкодування госп.ДЗ, що виникла в РУ ********** ');
-          --  Створюємо функцію ДЗ-4) В ЦА: Відшкодування госп.ДЗ, що виникла в РУ
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ДЗ-4) Відшкодування в ЦА госп.ДЗ, що виникла в РУ ********** ');
+          --  Створюємо функцію ДЗ-4) Відшкодування в ЦА госп.ДЗ, що виникла в РУ
       l := l +1;
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'ДЗ-4) В ЦА: Відшкодування госп.ДЗ, що виникла в РУ',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=V_XOZ_RU_CA[NSIFUNCTION][showDialogWindow=>false][PROC=>BEGIN delete from TZAPROS where STMP<BARS.DAT_NEXT_U(trunc(sysdate),-7);END][EXEC=>BEFORE]',
-                                                  p_rolename => 'BARS_ACCESS_DEFROLE' ,
+                                                  p_name     => 'ДЗ-4) Відшкодування в ЦА госп.ДЗ, що виникла в РУ',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=V_XOZ_RU_CA[NSIFUNCTION][showDialogWindow=>false]'||
+          '[PROC=>BEGIN delete from TZAPROS where STMP<BARS.DAT_NEXT_U(trunc(sysdate),-7);END][EXEC=>BEFORE]',
+                                                  p_rolename => 'BARS_ACCESS_DEFROLE' ,    
                                                   p_frontend => l_application_type_id
                                                   );
 
@@ -156,6 +98,30 @@ begin
                                                   p_frontend => l_application_type_id
                                                   );
 
+
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Візування "своїх" операцій ********** ');
+          --  Створюємо функцію Візування "своїх" операцій
+      l := l +1;
+      l_function_ids.extend(l);      
+      l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'Візування "своїх" операцій',
+                                                  p_funcname => '/barsroot/checkinner/default.aspx?type=0',
+                                                  p_rolename => 'BARS_ACCESS_DEFROLE' ,    
+                                                  p_frontend => l_application_type_id
+                                                  );
+
+
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Історія змін по картотеці договорів ДЗ ********** ');
+          --  Створюємо функцію Історія змін по картотеці договорів ДЗ
+      l := l +1;
+      l_function_ids.extend(l);      
+      l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'Історія змін по картотеці договорів ДЗ',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=V_XOZ_REF_SEC[NSIFUNCTION][showDialogWindow=>false]',
+                                                  p_rolename => 'BARS_ACCESS_DEFROLE' ,    
+                                                  p_frontend => l_application_type_id
+                                                  );
+     
 
    DBMS_OUTPUT.PUT_LINE(chr(13)||chr(10)||'  Прикріпляємо ресурси функцій до даного АРМу ($RM_XOZD) - АРМ Деб.заборг. за госп. діяльністю банку  ');
     l := l_function_ids.first;

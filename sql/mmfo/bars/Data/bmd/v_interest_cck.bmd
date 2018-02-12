@@ -163,6 +163,9 @@ begin
   -- добавляем описание функции на справочник
   bars_metabase.add_nsifunction(l_tabid, 4, 'Скоригувати суму (діє лише для деяких клієнтів)', 'cck_ui.P_INT_RECKONING_SUMM_EDIT(:ID,:DEAL_ID,:P_SUMM)', ':P_SUMM(SEM=Вкажіть суму (в коп.),TYPE=N)', 'EACH', 'Скоригувати суму?', '', '', '', '', null);
 
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 5, 'Зформувати відомість', 'p_interest_txt', '', 'ONCE', '', 'Збережено', '54', '', 'sPar=[DESCR=>Зформувати відомість][EXEC=>GET_FILE_ONCE][PROC=>p_interest_txt(:p_clob, :p_namefile)][OUT_PARAMS=>:p_clob(SEM=ФАЙЛ,TYPE=CLOB),:p_namefile(SEM=ИМЯ ФАЙЛА,TYPE=fileName)]', 111);
+
   -- восстанавливаем ссылки сложных полей других таблиц
   for i in 1..l_extrnval.count loop
     l_newcolid := bars_metabase.get_colid(l_tabid, l_extrnval(i).srccolname);

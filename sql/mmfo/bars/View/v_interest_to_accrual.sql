@@ -1,14 +1,5 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_INTEREST_TO_ACCRUAL.sql =========*** 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_INTEREST_TO_ACCRUAL ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_INTEREST_TO_ACCRUAL ("ID", "ACCOUNT_ID", "INTEREST_KIND_ID", "ACCOUNT_NUMBER", "CURRENCY_ID", "OKPO", "ACCOUNT_NAME", "INTEREST_KIND_NAME", "INTEREST_ACCOUNT_NUMBER", "DATE_FROM", "DATE_THROUGH", "ACCOUNT_REST", "INTEREST_RATE", "INTEREST_AMOUNT", "COUNTER_ACCOUNT", "ACCRUAL_PURPOSE", "STATE_ID", "RECKONING_STATE", "STATE_COMMENT", "MANAGER_ID", "MANAGER_NAME", "CORPORATION_CODE", "CORPORATION_NAME") AS 
-  select r.id,
+create or replace view v_interest_to_accrual as
+select r.id,
        r.account_id,
        r.interest_kind_id,
        a.nls account_number,
@@ -27,7 +18,7 @@ PROMPT *** Create  view V_INTEREST_TO_ACCRUAL ***
                                 2 /*RECKONING_STATE_MODIFIED*/,
                                 6 /*RECKONING_STATE_ACCRUAL_FAILED*/) then
                  case when r.accrual_purpose is null then
-                           interest_utl.generate_accrual_purpose(r.id, r.line_type_id, i.metr, a.nls, r.date_from, r.date_through, r.interest_rate)
+                           interest_utl.generate_accrual_purpose(r.id, i.metr, a.nls, r.date_from, r.date_through, r.interest_rate, r.is_grouping_unit)
                       else r.accrual_purpose
                  end
             else ''
@@ -51,6 +42,7 @@ left join rnkp_kod_acc w on w.acc = a.rnk
 left join kod_cli c on c.kod_cli = nvl(w.kodk, k.kodk)
 left join staff$base s on s.id = a.isp
 where  r.grouping_line_id is null and
+       r.line_type_id = 1 /*RECKONING_TYPE_ORDINARY_INT*/ and
        (r.state_id in (1 /*RECKONING_STATE_RECKONED*/,
                        2 /*RECKONING_STATE_MODIFIED*/,
                        3 /*RECKONING_STATE_RECKONING_FAIL*/,

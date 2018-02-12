@@ -66,11 +66,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('417', '417-Виплачено перекази по системі "Швидка копійка"', 1, '#(nbs_ob22 (''2809'',''24''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, '#(nbs_ob22 (''2809'',''24''))', '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 1, 0, 0, 0, null, null, 61, null, null, null, '0000100000000000000000000000000000000100000000000000000000000000', 'Виплачено перекази по системі "Швидка копійка"');
+    values ('417', '417-Виплачено перекази по системі "Швидка копійка"', 1, '#(nbs_ob22 (''2809'',''24''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, '#(nbs_ob22 (''2809'',''24''))', '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 1, 0, 0, 0, null, null, 61, null, '0', null, '0000100001000000100000000000000000010000000000000000000000000000', 'Виплачено перекази по системі "Швидка копійка"');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='417', name='417-Виплачено перекази по системі "Швидка копійка"', dk=1, nlsm='#(nbs_ob22 (''2809'',''24''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa='#(nbs_ob22 (''2809'',''24''))', nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=1, fli=0, flv=0, flr=0, s=null, s2=null, sk=61, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn='Виплачено перекази по системі "Швидка копійка"'
+         set tt='417', name='417-Виплачено перекази по системі "Швидка копійка"', dk=1, nlsm='#(nbs_ob22 (''2809'',''24''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa='#(nbs_ob22 (''2809'',''24''))', nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=1, fli=0, flv=0, flr=0, s=null, s2=null, sk=61, proc=null, s3800='0', rang=null, flags='0000100001000000100000000000000000010000000000000000000000000000', nazn='Виплачено перекази по системі "Швидка копійка"'
        where tt='417';
   end;
   --------------------------------

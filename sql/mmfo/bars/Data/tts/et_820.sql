@@ -178,6 +178,17 @@ begin
   delete from tts_vob where tt='820';
   begin
     insert into tts_vob(vob, tt, ord)
+    values (6, '820', 6);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (tts_vob: 6, ''820'', 6) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into tts_vob(vob, tt, ord)
     values (138, '820', null);
   exception
     when dup_val_on_index then null;
@@ -190,44 +201,9 @@ begin
   --------------------------------
   -------- Группы контроля -------
   --------------------------------
-  delete from chklist_tts where tt='820';
-  begin
-    insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (2, '820', 2, null, null, null);
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 2, ''820'', 2, null, null, null) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
-  begin
-    insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (5, '820', 1, null, null, null);
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 5, ''820'', 1, null, null, null) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
   --------------------------------
   ------------- Папки ------------
   --------------------------------
-  delete from folders_tts where tt='820';
-  begin
-    insert into folders_tts(idfo, tt)
-    values (26, '820');
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (folders_tts: 26, ''820'') - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
 end;
 /
 commit;
