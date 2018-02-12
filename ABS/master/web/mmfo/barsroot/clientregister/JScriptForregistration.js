@@ -161,8 +161,8 @@ function Check_MainRekv() {
     var curElement = '';
     var selCodAg = gE(curTab, 'ddl_CODCAGENT');
     var tmpSel = selCodAg.item(selCodAg.selectedIndex).value.substr(0, 1);
-    var fioMask = /^[a-zA-Zа-яА-Яа-яА-ЯіІїЇєЄґҐ]{0,1}[a-zA-Zа-яА-Яа-яА-ЯіІїЇєЄґҐ\-\`\']{1,69}$/;
-    var cyyrilycFioMask = /^[а-яА-Яа-яА-ЯіІїЇєЄґҐ]{0,1}[а-яА-Яа-яА-ЯіІїЇєЄґҐ\-\`\']{1,69}$/;
+	var fioMask = /^[a-zA-Zа-яА-Яа-яА-ЯіІїЇєЄґҐ]{0,1}[a-zA-Zа-яА-Яа-яА-ЯіІїЇєЄґҐ\ \-\`\']{1,69}$/;
+    var cyyrilycFioMask = /^[а-яА-Яа-яА-ЯіІїЇєЄґҐ]{0,1}[а-яА-Яа-яА-ЯіІїЇєЄґҐ\ \-\`\']{1,69}$/;
     var sameSymbolsMask = /^(.)\1+$/;
 
     if (obj_Parameters['CUSTTYPE'] === 'person' && !isCustomerSpd()) {
