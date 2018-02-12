@@ -1,8 +1,8 @@
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/ead_integration.sql =========*** Run
- PROMPT ===================================================================================== 
- 
- CREATE OR REPLACE PACKAGE BARS.EAD_INTEGRATION IS
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/package/ead_integration.sql =========*** Run
+PROMPT ===================================================================================== 
+
+CREATE OR REPLACE PACKAGE BARS.EAD_INTEGRATION IS
    g_header_version   CONSTANT VARCHAR2 (64) := 'version 3.0 01.02.2018 MMFO';
    g_type_id  object_type.id%type;
    g_state_id object_state.state_id%type;
@@ -560,7 +560,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
                      p_start_date  out deal.start_date%type,
                      p_state_id    out deal.state_id%type) is
    begin
-      SELECT d.id, d.deal_number, d.start_date, d.state_id
+        begin
+      /*SELECT d.id, d.deal_number, d.start_date, d.state_id
         into p_id, p_deal_number, p_start_date, p_state_id
         FROM attribute_values avs
          JOIN
@@ -574,10 +575,40 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
             ON     av.nested_table_id = avs.nested_table_id
                AND av.attribute_id IN (SELECT id FROM attribute_kind WHERE attribute_code = 'DKBO_ACC_LIST')
          JOIN deal d ON d.id = av.object_id AND d.deal_type_id IN (select id from object_type where type_code = 'DKBO')
-      where avs.number_values = p_acc;
-   exception
-     when no_data_found then
-       null;
+      where avs.number_values = p_acc;*/
+        SELECT    MAX (d.id) KEEP (DENSE_RANK LAST ORDER BY av.value_date)  into p_id
+              FROM attribute_values avs
+                   JOIN
+                   (  SELECT t.nested_table_id ,
+                             t.object_id,
+                             t.attribute_id,
+                             t.value_date
+                        FROM ATTRIBUTE_VALUE_BY_DATE t
+                       WHERE t.attribute_id =
+                                (SELECT ak.id
+                                   FROM attribute_kind ak
+                                  WHERE ak.attribute_code = 'DKBO_ACC_LIST')) av
+                      ON     av.nested_table_id = avs.nested_table_id
+                   JOIN deal d    ON     d.id = av.object_id AND d.deal_type_id IN (SELECT tt.id
+                                                  FROM object_type tt
+                                                 WHERE tt.type_code = 'DKBO')
+                where avs.number_values =  p_acc;
+        exception
+            when no_data_found then
+                null;
+        end;
+        
+        begin
+            SELECT  D.DEAL_NUMBER,
+                    D.START_DATE ,
+                    D.STATE_ID
+            into    p_deal_number, p_start_date, p_state_id        
+            from   deal d
+            where d.ID = p_id;
+        exception
+            when no_data_found then
+                null;
+        end;
    end get_dkbo;
 
     procedure get_accagr_param(p_acc in accounts.acc%type) is
@@ -1364,7 +1395,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
         l_acc_list := pkg_dkbo_utl.f_get_all_cust_acc(p_customer_id => deal_utl.get_deal_customer_id(p_agr_id), p_deal_id => p_agr_id);
       else  -- или работаем только с теми что приехали в процедуру
         l_acc_list := tools.string_to_number_list(p_string => p_acc_list, p_splitting_symbol => ',');
-      end if; 
+      end if;
 
       for i in (select w4.nd, w4.kf
                   from deal dkbo
@@ -1532,7 +1563,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
     begin
       bc.go('/');
       get_accagr_param_reserve(p_rsrv_id);
-    
+
       for i in (SELECT a.kf,
                        a.branch as branch_id,
                        a.rnk,
@@ -1559,10 +1590,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
         l_UAgrACC_Instance_Rec.agr_number     := i.agr_code;
         l_UAgrACC_Instance_Rec.agr_date_open  := i.agr_date_open;
         l_UAgrACC_Instance_Rec.agr_date_close := null;
-      
+
         PIPE ROW(l_UAgrACC_Instance_Rec);
       end loop;
-    
+
     end get_UAgrACCRsrv_Instance_Set;
 
     FUNCTION get_UAgrDPTOLD_Instance_Set (p_nls accounts.nls%TYPE, p_daos accounts.daos%type, p_acc accounts.acc%type)
@@ -1693,7 +1724,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
     begin
      bc.go('/');
      l_sal_type:=substr(p_agr_type,1,instr(p_agr_type,'/')-1);
-     if substr(p_agr_type,1,6)='SALARY' then 
+     if substr(p_agr_type,1,6)='SALARY' then
      l_zp_id:=to_number(substr(p_agr_type,instr(p_agr_type,'/')+1,length(p_agr_type)));
      end if;
 
@@ -1805,7 +1836,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
         l_UACC_Instance_Rec.remote_controled := barsAQ.Ibank_Accounts.is_subscribed(p_acc);
 
         if l_UACC_Instance_Rec.agr_code is null then
-          raise_application_error(-20001, 'Код угоди не заповнений [agr_code]'); 
+          raise_application_error(-20001, 'Код угоди не заповнений [agr_code]');
         end if;
 
         PIPE ROW (l_UACC_Instance_Rec);
@@ -1852,7 +1883,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
         l_UACC_Instance_Rec.remote_controled := 0;
 
         if l_UACC_Instance_Rec.agr_code is null then
-          raise_application_error(-20001, 'Код угоди не заповнений [agr_code]'); 
+          raise_application_error(-20001, 'Код угоди не заповнений [agr_code]');
         end if;
 
         PIPE ROW (l_UACC_Instance_Rec);

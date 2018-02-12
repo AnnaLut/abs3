@@ -984,7 +984,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
       END;
 
     -- берем все документы
-    for cur in (select id, rnk, ea_struct_id, agr_id, da.kf, da.deposit_id
+    for cur in (select id, rnk, ea_struct_id, agr_id, d.kf, da.deposit_id
                   from ead_docs d left outer join dpt_deposit_all da on d.agr_id = da.deposit_id
                  where 1=1
 --                   and id > l_cdc_lastkey

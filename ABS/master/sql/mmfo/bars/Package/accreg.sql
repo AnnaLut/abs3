@@ -5,7 +5,7 @@ is
 -- (C) BARS. Accounts
 --***************************************************************************--
 
-g_head_version constant varchar2(64)  := 'Version 3.2  24/01/2018';
+g_head_version constant varchar2(64)  := 'Version 3.3  07/02/2018';
 g_head_defs    constant varchar2(512) := '';
 
 /* header_version - возвращает версию заголовка пакета */
@@ -188,6 +188,7 @@ procedure RSRV_ACC_NUM
 , p_nms      in     accounts_rsrv.nms%type                   -- Account name
 , p_branch   in     accounts_rsrv.branch%type                -- 
 , p_isp      in     accounts_rsrv.isp%type                   -- 
+, p_vid      in     accounts_rsrv.vid%type                   -- 
 , p_rnk      in     accounts_rsrv.rnk%type                   -- Customer number
 , p_agrm_num in     accounts_rsrv.agrm_num%type default null -- номер договору банківського обслуговування
 , p_trf_id   in     accounts_rsrv.trf_id%type   default null -- код тарифного пакету
@@ -264,7 +265,7 @@ is
   --***************************************************************************--
   g_modcode       constant varchar2(3) := 'CAC';
 
-  g_body_version  constant varchar2(64)  := 'version 2.7  30/01/2018';
+  g_body_version  constant varchar2(64)  := 'version 2.9  07/02/2018';
   g_body_defs     constant varchar2(512) := ''
 $if ACC_PARAMS.KOD_D6
 $then
@@ -2099,6 +2100,7 @@ procedure RSRV_ACC_NUM
 , p_nms      in     accounts_rsrv.nms%type
 , p_branch   in     accounts_rsrv.branch%type
 , p_isp      in     accounts_rsrv.isp%type
+, p_vid      in     accounts_rsrv.vid%type
 , p_rnk      in     accounts_rsrv.rnk%type
 , p_agrm_num in     accounts_rsrv.agrm_num%type default null -- номер договору банківського обслуговування
 , p_trf_id   in     accounts_rsrv.trf_id%type   default null -- код тарифного пакету
@@ -2146,10 +2148,10 @@ $end
 
       insert
         into ACCOUNTS_RSRV
-           ( NLS, KV, NMS, BRANCH, ISP, RNK, AGRM_NUM, TRF_ID, OB22
+           ( NLS, KV, NMS, BRANCH, ISP, RNK, AGRM_NUM, TRF_ID, OB22, VID
            , USR_ID, CRT_DT, RSRV_ID )
       values
-           ( p_nls, p_kv, p_nms, p_branch, p_isp, p_rnk, l_agrm_num, p_trf_id, nvl(p_ob22,'01')
+           ( p_nls, p_kv, p_nms, p_branch, p_isp, p_rnk, l_agrm_num, p_trf_id, nvl(p_ob22,'01'), nvl(p_vid,0)
            , GL.USR_ID(), SYSDATE, S_ACCOUNTS_RSRV.NEXTVAL )
       return RSRV_ID
         into l_rsrv_id;
@@ -2244,6 +2246,7 @@ begin
   , p_nms      => p_nms
   , p_branch   => p_branch
   , p_isp      => p_isp
+  , p_vid      => p_vid
   , p_rnk      => p_rnk
   , p_agrm_num => p_agrm_num
   , p_trf_id   => p_trf_id
@@ -2451,6 +2454,7 @@ procedure P_UNRESERVE_ACC
   l_nbs             accounts.nbs%type;
   l_ob22            accounts.ob22%type;
   l_nms             accounts.nms%type;
+  l_vid             accounts.vid%type;
   l_blkd            accounts.blkd%type;
   l_branch          accounts.branch%type;
   l_agrm_num        specparam.nkd%type;
@@ -2459,8 +2463,8 @@ procedure P_UNRESERVE_ACC
 begin
 
   begin
-    select r.NMS, r.BRANCH, r.RNK, r.AGRM_NUM, SubStr(r.NLS,1,4), r.OB22, to_char(r.TRF_ID)
-      into l_nms, l_branch, l_rnk, l_agrm_num, l_nbs, l_ob22, l_trf_id
+    select r.NMS, r.BRANCH, r.RNK, r.VID, r.AGRM_NUM, SubStr(r.NLS,1,4), r.OB22, to_char(r.TRF_ID)
+      into l_nms, l_branch, l_rnk, l_vid, l_agrm_num, l_nbs, l_ob22, l_trf_id
       from ACCOUNTS_RSRV r
      where r.NLS = p_nls
        and r.KV  = p_kv;
@@ -2531,6 +2535,7 @@ $end
       , p_nms    => l_nms
       , p_kv     => p_kv
       , p_isp    => USER_ID()
+      , p_vid    => l_vid
       , p_branch => l_branch
       , p_blkd   => l_blkd
       );

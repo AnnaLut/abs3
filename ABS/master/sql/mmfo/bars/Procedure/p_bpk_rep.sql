@@ -17,7 +17,7 @@ is
   l_int number;
 begin
 
-  delete from tmp_bpk_arsenal57;
+  delete from tmp_bpk_rep;
   
   
   -- Інформація стосовно перегляду умов зобов'язань за кредитними договорами (БПК) військовослужбовців
@@ -33,7 +33,7 @@ begin
      loop
         l_ost := abs(fost(z.acc, p_dat1));
         acrn.p_int(z.acc, 0, z.dat, p_dat1, l_int);
-        insert into tmp_bpk_arsenal57 (nmk, acc, open_date, lim_begin, lim, nls, kf)
+        insert into tmp_bpk_rep (nmk, acc, open_date, lim_begin, lim, nls, kf)
         values (z.nmk, z.rnk, z.dat, l_ost, abs(round(l_int)), z.nls, z.kf);
      end loop;
   end if;

@@ -56,7 +56,7 @@ IS
 
     --  / constants /
     --
-    g_body_version  CONSTANT VARCHAR2(64)  := 'version 1.17 25.01.2018';
+    g_body_version  CONSTANT VARCHAR2(64)  := 'version 1.18 08.02.2018';
     g_modcode       CONSTANT varchar2(6)   := 'DPT_PF';
     g_errmsg        VARCHAR2(4000);
 
@@ -77,7 +77,7 @@ IS
     -- ( після міграції / відсуності зарахувань з дати відкриття )
     procedure start_fill_contracts
     is
-    l_ctx_mfo varchar2(30) := sys_context('bars_context', 'user_mfo');
+    l_ctx_mfo varchar2(30) := nvl(sys_context('bars_context', 'user_mfo'), '/');
     begin
         bars_audit.info('DPT_PF.start_fill_contracts: начало DPT');
         for d in (select d.deposit_id, a.dapp

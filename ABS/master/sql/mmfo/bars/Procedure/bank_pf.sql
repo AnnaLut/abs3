@@ -1,4 +1,4 @@
-create or replace procedure BANK_PF
+CREATE OR REPLACE procedure BARS.BANK_PF
 ( p_mode    int
 , p_dat1    date default null
 , p_dat2    date default null
@@ -44,7 +44,7 @@ create or replace procedure BANK_PF
    MFOP_      VARCHAR2 (6);
    z_         INT;
 -- nTmp_      INT;
-   sDet_      VARCHAR2 (30);
+   sDet_      oper.nazn%type;
    sMes_      VARCHAR2 (30);
    sSql_      VARCHAR2 (2000);
    l_dat3     DATE;
@@ -855,9 +855,4 @@ BEGIN
 END BANK_PF;
 /
 
-show errors;
-
-grant EXECUTE, DEBUG on BANK_PF to BARS_ACCESS_DEFROLE;
-grant EXECUTE        on BANK_PF to START1;
-
-
+show err
