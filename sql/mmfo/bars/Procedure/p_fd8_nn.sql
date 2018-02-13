@@ -7,7 +7,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #D8 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 30/01/2018 (26/01/2018, 13/12/2017)
+% VERSION     : 13/02/2018 (09/02/2018, 08/02/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                sheme_ - схема формирования
@@ -18,6 +18,12 @@ IS
     содержиться в поле RNKA (в RNKB участвующие клиенты нашего банка или
     пустое значение для не клиентов банка)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%12/02/2018 - для нерезидентів не удаляються залишки якщо RNK=LINK_GROUP
+%09/02/2018 - внесені зміни виконані Вірко
+%08/02/2018 - значение показателя 060 (код инсайдера будем формировать из
+              CUSTOMER_UPDATE вместо CUSTOMER
+%07/02/2018 - не формировались показатели 090, 091, 092 если значение
+              номера договора было как 'N дог.' 
 %30/01/2018 - расширена табл. OTCN_F71_CUST - добавлено поле K021 т.к.
               поле CUSTTYPE использовать для K021 сейчас невозможно
               (поле CUSTTYPE числовое а K021 имеет и символьные значения)
@@ -611,7 +617,7 @@ IS
                       order by recid
                     ) r
                  ORDER BY SUBSTR (r.kodp, 4, 10),
-                          SUBSTR (r.kodp, 30),
+                          SUBSTR (r.kodp, 33),
                           SUBSTR (r.kodp, 1, 3) )
             union all
             select kodp, znap from
@@ -655,12 +661,12 @@ IS
                           '112'
                          )
                   ORDER BY SUBSTR (kodp, 4, 10),
-                           SUBSTR (kodp, 27),
+                           SUBSTR (kodp, 33),
                            SUBSTR (kodp, 1, 3),
                            recid,
                            to_date(znap, 'ddmmyyyy')) r
              ORDER BY SUBSTR (r.kodp, 4, 10),
-                      SUBSTR (r.kodp, 27),
+                      SUBSTR (r.kodp, 33),
                       SUBSTR (r.kodp, 1, 3));
 
 -- процентная ставка  (средневзвешенная)
@@ -1092,6 +1098,25 @@ IS
          END;
       end if;
 
+      if nd_ is null and p090_ is null
+      then
+         begin
+            select NVL(s.nkd, 'N дог.')
+               into p090_ 
+            from specparam s
+            where acc_ = s.acc(+);
+         exception when no_data_found then
+            null;
+         end;
+
+         p112p_ := null;
+
+         select daos 
+            into dat_nkd_
+         from accounts 
+         where acc = acc_;
+      end if;
+
       if substr(nls_,1,4) in ('2625','2627','2202','2203','2208','9129')
          and trim(tip_) not in ('SS','SP','SN')
       then
@@ -1236,15 +1261,23 @@ IS
          end;
       end if;
 
-      INSERT INTO otcn_f71_temp
-                  (rnk, acc, tp, nd, p090, p080, p081, p110,
-                   p111, p112, p113, p160, nbs, kv, ddd,
-                   p120, p125, p130, p150, nls, fdat, isp
-                  )
-           VALUES (rnk_, acc_, ptype_, nd_, p090_, p080_, p081_, sum_zd_,
-                   p111p_, p112p_, dat_nkd_, s080_, p070_, kv_, ddd_,
-                   p120_, p125_, p130_, p150_, nls_, data_, isp_
-                  );
+      if p120_ <> 0 
+      then
+
+         begin
+            INSERT INTO otcn_f71_temp
+                        (rnk, acc, tp, nd, p090, p080, p081, p110,
+                         p111, p112, p113, p160, nbs, kv, ddd,
+                         p120, p125, p130, p150, nls, fdat, isp
+                        )
+                 VALUES (rnk_, acc_, ptype_, nd_, p090_, p080_, p081_, sum_zd_,
+                         p111p_, p112p_, dat_nkd_, s080_, p070_, kv_, ddd_,
+                         p120_, p125_, p130_, p150_, nls_, data_, isp_
+                        );
+         exception
+           when others then
+               logger.info ('P_FD8_NN: Error rnk = '||to_char(rnk_));
+         end;
 
          INSERT INTO otcn_f71_history
                      (datf, acc, ostf, nd, p080, p081, p090, p110,
@@ -1253,6 +1286,7 @@ IS
               VALUES (dat_, acc_, p120_, nd_, p080_, p081_, p090_, sum_zd_,
                       p111p_, p112p_, p130_, kv_, rnk_
                      );
+      end if;
 
    END;
 ---------------------------------------------------------------------------
@@ -2161,8 +2195,11 @@ IS
    IS
    BEGIN
       IF     pog_
-         AND (   (nd_ IS NOT NULL AND nd_ <> p_nd_)
-              OR (nd_ IS NULL AND p090_ <> p_p090_)
+         AND ((nd_ IS NOT NULL AND nd_ <> nvl(p_nd_, 0) and 
+               (nvl(p_nd_, 0) <> 0 or  
+                nvl(p_nd_, 0) = 0 and nvl(p090_,'N дог.') <> nvl(p_p090_,'N дог.')))
+                OR 
+               (nd_ IS NULL AND nvl(p090_,'N дог.') <> nvl(p_p090_,'N дог.'))
              )
       THEN
          p080_ := p_p080_;
@@ -2623,6 +2660,7 @@ BEGIN
                   where o.rnk = d.link_group
                     and c.rnk = o.rnk 
                     and o.nmk <> c.nmk  
+                    and c.codcagent not in (2, 4, 6)
                     and c.prinsider = 99
                 ) ;
 
@@ -2704,7 +2742,7 @@ BEGIN
       || ' WHERE a.rnk = g1.rnk '  
       || '   AND a.rnk = c.rnk '  
       || '   AND c.ise = f.k070(+) '
-      || '   AND f.d_close is null '
+      || '   AND f.d_close(+) is null '
       || ' ORDER BY c.okpo, c.rnk, a.nbs ';
 
 --------------------------------------------------------------------------
@@ -3380,7 +3418,29 @@ BEGIN
 
    end loop;
    
+   for k in ( select oc.rnk, oc.p060, op.prins 
+              from otcn_f71_cust oc, otcn_cust_prins op
+              where oc.rnk = op.rnk 
+                and op.datf = dat_ 
+                and oc.p060 <> op.prins 
+            )
+
+      loop
+
+         SELECT U.PRINSIDER
+            INTO p060_
+         FROM CUSTOMER_UPDATE U
+         WHERE U.RNK = k.RNK
+           AND U.IDUPD = (SELECT MAX (IDUPD)
+                          FROM CUSTOMER_UPDATE
+                          WHERE RNK = U.RNK AND EFFECTDATE <= dat_);            
+
+         update otcn_f71_cust set p060 = p060_ 
+         where  rnk = k.rnk;
+   end loop;
+
    logger.info ('P_FD8_NN: End etap 3 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
+
    OPEN c_cust;
 
    LOOP
@@ -3395,6 +3455,8 @@ BEGIN
       isp_ := NULL;
       sum_d_ := 0;
       nd_ := null;
+      p_nd_ := null;
+      p_p090_ := 'N дог.'; 
 
       if dat_ >= dat_izm6 
       then
@@ -4100,13 +4162,13 @@ BEGIN
                    END;
                 end if;
 
-                if p070_ like '351%' 
-                OR p070_ like '355%' 
-                then
-                   pd_0_ := 0;
-                   fin_ := '0';
-                   s250_23_ := '0';
-                end if;
+                --if p070_ like '351%'
+                --OR p070_ like '355%'
+                --then
+                --   pd_0_ := 0;
+                --   fin_ := '0';
+                --   s250_23_ := '0';
+                --end if;
                 
                 H_ := '0';
 
