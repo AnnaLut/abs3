@@ -522,7 +522,8 @@
                                 read: {
                                     type: "GET",
                                     dataType: "json",
-                                    url:bars.config.urlContent("/api/zay/aims/get")
+                                    data: { isBuying: false },
+                                    url: bars.config.urlContent("/api/zay/aims/get")
                                 }
                             },
                             schema: {
@@ -678,4 +679,3 @@
         dataItem.set("SUP_DOC", this.checked);
     });
 });
-
