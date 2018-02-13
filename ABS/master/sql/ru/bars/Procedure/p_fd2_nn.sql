@@ -12,11 +12,21 @@ PROMPT *** Create  procedure P_FD2_NN ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #D2 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 04.02.2015 (23.12.14,16.02.14,13.02.14,07.02.14,30.01.14)
 %
+% VERSION     :  v.18.001       07.02.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
+
+   Структура показателя     L DD И C
+
+  1    L          1/3  (сумма/количество)
+  2    DD         сегмент со списком показателейт
+  4    И          K013 код вида клиента
+  5    C          R034 признак для валюты
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+07.02.2018  проверки связанные с R013 заменены на R011
 04/02/2015 - для остатков по счету 2903 (показатель 111...) будем выбирать
              остатки с учетом корректирующих.
 23/12/2014 - изменил условия в выборке
@@ -114,6 +124,7 @@ mfo_     Varchar2(12);
 nbuc1_   Varchar2(12);
 nbuc_    Varchar2(12);
 nbuc2_   Varchar2(12);
+r011_    Varchar2(1);
 r013_    Varchar2(1);
 r014_    Varchar2(1);
 k013_    Varchar2(1):='9';
@@ -242,7 +253,7 @@ for k in (select c.rnk RNK, a.acc ACC, a.nls NLS, a.kv KV, a.nbs NBS, a.tobo TOB
                  NVL(c.ved,'00000') VED, NVL(c.fs,'00') FS,
                  NVL(2-MOD(c.codcagent,2),1) REZ,
                  'XXXXX' TAG, '0' VALUE, trim(c.okpo) OKPO,
-                 NVL(sp.r013,'9') R013, NVL(sp.r014,'0') R014
+                 NVL(sp.r011,'0') R011, NVL(sp.r013,'9') R013, NVL(sp.r014,'0') R014
           from  accounts a, customer c, specparam sp,
                 (select distinct r020 from kl_f3_29 where kf='D2') k
           where a.nbs = k.r020
@@ -251,7 +262,7 @@ for k in (select c.rnk RNK, a.acc ACC, a.nls NLS, a.kv KV, a.nbs NBS, a.tobo TOB
             and (a.dazs is null or a.dazs > Dat_)
             and a.rnk = c.rnk
             and (c.date_off is null or c.date_off > Dat_)
-            and c.rnk not in (select rnk from kf77 where rnk is not null)
+--            and c.rnk not in (select rnk from kf77 where rnk is not null)
             and not exists (select 1 from customerw w
                             where w.rnk = c.rnk
                               and w.tag in ('K013'))
@@ -264,7 +275,7 @@ for k in (select c.rnk RNK, a.acc ACC, a.nls NLS, a.kv KV, a.nbs NBS, a.tobo TOB
                  NVL(c.ved,'00000') VED, NVL(c.fs,'00') FS,
                  NVL(2-MOD(c.codcagent,2),1) REZ,
                  d.tag TAG, NVL(substr(trim(d.value),1,1),'0') VALUE, trim(c.okpo) OKPO,
-                 NVL(sp.r013,'9') R013, NVL(sp.r014,'0') R014
+                 NVL(sp.r011,'0') R011, NVL(sp.r013,'9') R013, NVL(sp.r014,'0') R014
           from  accounts a, customer c, customerw d, specparam sp,
                 (select distinct r020 from kl_f3_29 where kf='D2') k
           where a.nbs = k.r020
@@ -273,7 +284,7 @@ for k in (select c.rnk RNK, a.acc ACC, a.nls NLS, a.kv KV, a.nbs NBS, a.tobo TOB
             and (a.dazs is null or a.dazs > Dat_)
             and a.rnk = c.rnk
             and (c.date_off is null or c.date_off > Dat_)
-            and c.rnk not in (select rnk from kf77 where rnk is not null)
+--            and c.rnk not in (select rnk from kf77 where rnk is not null)
             and c.rnk = d.rnk
             and d.tag = 'K013'
             and a.acc = sp.acc(+)
@@ -284,6 +295,7 @@ for k in (select c.rnk RNK, a.acc ACC, a.nls NLS, a.kv KV, a.nbs NBS, a.tobo TOB
           comm_ := '';
           k013_:='3';
           dd1_ := '00';
+          r011_ := k.r011;
           r013_ := k.r013;
           r014_ := k.r014;
 
@@ -518,26 +530,29 @@ for k in (select c.rnk RNK, a.acc ACC, a.nls NLS, a.kv KV, a.nbs NBS, a.tobo TOB
              --EXCEPTION WHEN NO_DATA_FOUND THEN
              --   r013_:='9';
              --END;
-             if k.nbs='2650' and r013_='8' then
+             if k.nbs='2650' and r011_ ='3' then
                 dd_:='09';
              end if;
-             if k.nbs='2650' and r013_='9' then
+             if k.nbs='2650' and r011_ ='1' then
                 dd_:='15';
              end if;
-             if k.nbs='2600' and r013_ in ('7') then
+             if k.nbs='2600' and r011_ ='3' then
                 dd_:='09';
              end if;
-             if k.nbs='2600' and r013_ in ('4','6') then
+             if k.nbs='2600' and r011_ ='1' then
                 dd_:='15';
              end if;
-             if k.nbs='2620' and r013_='1' then
+             if k.nbs='2620' and r011_ ='3' then
                 dd_:='09';
              end if;
-             if k.nbs='2620' and r013_='9' and r014_='6' then
+             if k.nbs='2620' and r011_ in ('1','2') and r014_ ='6' then
                 dd_:='06';
              end if;
           end if;
 
+          if k.nbs ='2903'  then
+             dd_ :='10';
+          end if;
           c_ := k.tkv;
 
           if dd_ not in ('05','10') and dd1_ != '99' then
@@ -664,7 +679,7 @@ for k in (select c.rnk RNK, a.acc ACC, a.nls NLS, a.kv KV, a.nbs NBS, a.tobo TOB
              --   r013_:='0';
              --END;
 
-             if r013_ in ('0','1','9') then
+--             if r013_ in ('0','1','9') then
                 --insert into bars.rnbu_trace
                 -- (nls, kv, odate, kodp, znap, nbuc, isp, rnk, comm, acc) VALUES
                 -- (k.nls, k.kv, k.dat, '3'||dd_||k013_||'0', '1', nbuc_, k.isp, k.rnk, comm_, k.acc);
@@ -682,8 +697,8 @@ for k in (select c.rnk RNK, a.acc ACC, a.nls NLS, a.kv KV, a.nbs NBS, a.tobo TOB
                 if ost_<>0 then
                    --данные изменения внес 16.07.2012 ОАВ
                    -- показатель кол-ва для недействующих счетов формируется при ненулевом остатке на счете
-                   if Dat_ < to_date('29122012','ddmmyyyy') or (Dat_ >= to_date('29122012','ddmmyyyy') and k013_ <> '1')
-                   then
+--                   if Dat_ < to_date('29122012','ddmmyyyy') or (Dat_ >= to_date('29122012','ddmmyyyy') and k013_ <> '1')
+--                   then
                       insert into bars.rnbu_trace
                       (nls, kv, odate, kodp, znap, nbuc, isp, rnk, comm, acc) VALUES
                       (k.nls, k.kv, k.dat, '3'||dd_||k013_||'0', '1', nbuc_, k.isp, k.rnk, comm_, k.acc);
@@ -692,9 +707,9 @@ for k in (select c.rnk RNK, a.acc ACC, a.nls NLS, a.kv KV, a.nbs NBS, a.tobo TOB
                       (nls, kv, odate, kodp, znap, nbuc, isp, rnk, comm, acc) VALUES
                       (k.nls, k.kv, dat_, '1'||'11'||k013_||'0',
                                       to_char(ABS(ost_)), nbuc_, k.isp, k.rnk, comm_, k.acc);
-                   end if;
+--                   end if;
                 end if;
-             end if;
+--             end if;
           end if;
 
           BEGIN
