@@ -19,10 +19,11 @@ namespace BarsWeb.Areas.Zay.Infrastructure.Repository.DI.Implementation
             _entities = new ZayModel(connectionStr);
         }
 
-        public IEnumerable<ZAY_AIMS> ZayAimsDictionary()
+        public IEnumerable<ZAY_AIMS> ZayAimsDictionary(bool isBuying)
         {
-            const string query = @"select za.AIM AIM_CODE, za.DESCRIPTION DESCRIPTION, 
-                za.DESCRIPTION_ENG DESCRIPTION_ENG, za.NAME AIM_NAME, za.TYPE TYPE from ZAY_AIMS za where za.TYPE=2";
+            string param = isBuying ? "1" : "2"; // 1 - купівля, 2 - продаж
+            string query = @"select za.AIM AIM_CODE, za.DESCRIPTION DESCRIPTION, 
+                za.DESCRIPTION_ENG DESCRIPTION_ENG, za.NAME AIM_NAME, za.TYPE TYPE from ZAY_AIMS za where za.TYPE="+param;
             return _entities.ExecuteStoreQuery<ZAY_AIMS>(query);
         }
 

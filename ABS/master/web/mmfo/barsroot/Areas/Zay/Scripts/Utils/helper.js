@@ -30,6 +30,7 @@ bars.helper = bars.helper || {
                     read: {
                         type: "GET",
                         dataType: "json",
+                        data: { isBuying : true },
                         url: bars.config.urlContent("/api/zay/aims/get")
                     }
                 },

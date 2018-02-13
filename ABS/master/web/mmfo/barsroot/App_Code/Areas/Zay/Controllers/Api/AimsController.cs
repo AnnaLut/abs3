@@ -19,11 +19,11 @@ namespace BarsWeb.Areas.Zay.Controllers.Api
             _dictionary = dictionary;
         }
         [HttpGet]
-        public HttpResponseMessage Get([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request)
+        public HttpResponseMessage Get([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request, bool isBuying)
         {
             try
             {
-                var data = _dictionary.ZayAimsDictionary().Select(x => new { x.AIM_CODE, x.AIM_NAME}).ToList();
+                var data = _dictionary.ZayAimsDictionary(isBuying).Select(x => new { x.AIM_CODE, x.AIM_NAME}).ToList();
                 HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, data.ToDataSourceResult(request));
                 return response;
             }
