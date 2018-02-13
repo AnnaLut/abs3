@@ -2406,9 +2406,6 @@ is
     l_ea_blob        blob := utl_raw.cast_to_raw(''); -- пустой BLOB для отправки в ЕА (идет не скан-документ, а сообщение о его необходимости)
     l_archdocid      number;
   begin
-    bars_audit.info('Дебаг помилки COBUMMFO-5060. Початок процедури створення депозиту - '||l_title ||chr(10)||
-                            'Вхідні дані: vidd = ' ||to_char(p_vidd) || ' rnk = ' || to_char(p_rnk)||
-                          ' wb = ' || to_char(p_wb));
                           
     l_valid_mobphone := bars.verify_cellphone_byrnk(p_rnk);
     if (p_datbegin is null) then
@@ -2556,9 +2553,6 @@ is
                        l_title,
                        to_char(l_termm),
                        to_char(l_termd));
-      bars_audit.info('Дебаг помилки COBUMMFO-5060. Передача даних до dpt.p_open_vklad_ex: '||chr(10)||
-                            ' vidd = ' ||to_char(p_vidd) || ' rnk = ' || to_char(p_rnk)||
-                          ' wb = ' || to_char(p_wb));
                           
       dpt.p_open_vklad_ex(p_vidd        => p_vidd,
                           p_rnk         => p_rnk,
@@ -2657,7 +2651,8 @@ is
       
       end if;
       --inga 31/03/2015 COBUSUPABS-3311 Если параметр в карточке вида вклада EA_PENS = '1', отправляем документ 143 (Пенсионное удостоверение в ЕА)
-      if l_ea_pens = '1' and l_pens_count = 0 and is_pensioner(p_rnk) = 0 then
+      --COBUMMFO-6302 - при открытии через WEB пенсионное запрашиваться не должно
+      if l_ea_pens = '1' and l_pens_count = 0 and is_pensioner(p_rnk) = 0 and p_wb = 'N' then
         l_ea_id := ead_pack.doc_create('SCAN',
                                        null,
                                        l_ea_blob,
@@ -2670,7 +2665,7 @@ is
       end if;
     end if;
     cust_insider(p_rnk);
-    bars_audit.info('Дебаг помилки COBUMMFO-5060. Перевірка ознаки on-line: wb = ' || to_char(p_wb));
+
     if (p_wb = 'Y') then
       begin
         update dpt_deposit set wb = 'Y' where deposit_id = l_dpt;
