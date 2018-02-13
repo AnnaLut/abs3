@@ -11,11 +11,14 @@ PROMPT *** Create  procedure P_F08_NN ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирование файла #08 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 22/01/2018 (18/01/2018, 11/01/2018)
+% VERSION     : 09/02/2018 (08/02/2018, 06/02/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+09.02.2018 для 3653, 3658 змінено формування параметру K072
+08.02.2018 для бал.счетов 2924, 3570 и S183='0' изменяем S183_ на '1'
+06.02.2018 для группы 290 и бал.счетов 2920, 2924 R011='0'
 22.01.2018 изменено формирование параметра K072 для ФЛ и для некотріх
            бал.счетов
 18.01.2018 для таблицы KL_K070 изменео условие p.D_CLOSE is null на 
@@ -223,15 +226,15 @@ begin
    --   s_:='31';
    --end if;
 
-   if p_nbs_ in ('3653','3658') or 
-      substr(p_nbs_,1,3) in ('355','605','606','610','611','704') and 
+   if (p_nbs_ in ('3653','3658') or 
+      substr(p_nbs_,1,3) in ('355','605','606','610','611','704')) and 
       r_=1 and s_ not in ('42','43') 
    then
       s_:= '42';
    end if;
 
-   if p_nbs_ in ('3653','3658') or 
-      substr(p_nbs_,1,3) in ('355','605','606','610','611','704') and 
+   if (p_nbs_ in ('3653','3658') or 
+      substr(p_nbs_,1,3) in ('355','605','606','610','611','704')) and 
       r_=2 and s_ not in ('N8') 
    then
       s_:= 'N8';
@@ -358,8 +361,8 @@ begin
          then
             kod_:= p_tp_ || p_nbs_ || p_r013_ || s1_ || r1_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
          else
-            kod_:= p_tp_ || p_nbs_ || p_r011_ || s1_ || r1_ || lpad(p_kv_,3,'0') || 
-                   p_s183_ || p_s130_ || p_country_;
+            kod_:= p_tp_ || p_nbs_ || '0' || s1_ || r1_ || lpad(p_kv_,3,'0') || 
+                   '1' || p_s130_ || p_country_;
          end if;
 
          if se_ <> 0 then
@@ -437,8 +440,8 @@ begin
          then
             kod_:= p_tp_ || p_nbs_ || p_r013_ || s1_ || r1_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
          else
-            kod_:= p_tp_ || p_nbs_ || p_r011_ || s1_ || r1_ || lpad(p_kv_,3,'0') || 
-                   p_s183_ || p_s130_ || p_country_;
+            kod_:= p_tp_ || p_nbs_ || '0' || s1_ || r1_ || lpad(p_kv_,3,'0') || 
+                   '1' || p_s130_ || p_country_;
          end if;
 
          if se_ <> 0 and k.nlsk not like '6%'  
@@ -458,8 +461,8 @@ begin
             then
                kod_:= p_tp_ || p_nbs_ || p_r013_ || s_ || r_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
             else 
-               kod_:= p_tp_ || p_nbs_ || p_r011_ || s_ || r_ || lpad(p_kv_,3,'0') || 
-                      p_s183_ || p_s130_ || p_country_;
+               kod_:= p_tp_ || p_nbs_ || '0' || s_ || r_ || lpad(p_kv_,3,'0') || 
+                      '1' || p_s130_ || p_country_;
             end if;
 
             INSERT INTO rnbu_trace
@@ -554,8 +557,8 @@ begin
          then
             kod_:= p_tp_ || p_nbs_ || p_r013_ || s1_ || r1_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
          else 
-            kod_:= p_tp_ || p_nbs_ || p_r011_ || s1_ || r1_ || lpad(p_kv_,3,'0') || 
-                   p_s183_ || p_s130_ || p_country_;
+            kod_:= p_tp_ || p_nbs_ || '0' || s1_ || r1_ || lpad(p_kv_,3,'0') || 
+                   '1' || p_s130_ || p_country_;
          end if;
 
          if se_ <> 0 then
@@ -646,8 +649,8 @@ begin
          then
             kod_:= p_tp_ || p_nbs_ || p_r013_ || s1_ || r1_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
          else
-            kod_:= p_tp_ || p_nbs_ || p_r011_ || s1_ || r1_ || lpad(p_kv_,3,'0') || 
-                   p_s183_ || p_s130_ || p_country_;
+            kod_:= p_tp_ || p_nbs_ || '0' || s1_ || r1_ || lpad(p_kv_,3,'0') || 
+                   '1' || p_s130_ || p_country_;
          end if;
 
          if se_ <> 0 and k.nlsd not like '7%' then
@@ -664,8 +667,8 @@ begin
             then
                kod_:= p_tp_ || p_nbs_ || p_r013_ || s_ || r_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
             else
-               kod_:= p_tp_ || p_nbs_ || p_r011_ || s_ || r_ || lpad(p_kv_,3,'0') || 
-                      p_s183_ || p_s130_ || p_country_; 
+               kod_:= p_tp_ || p_nbs_ || '0' || s_ || r_ || lpad(p_kv_,3,'0') || 
+                      '1' || p_s130_ || p_country_; 
             end if;
   
             INSERT INTO rnbu_trace
@@ -741,8 +744,8 @@ begin
          then
             kod_:= p_tp_ || p_nbs_ || p_r013_ || s1_ || r1_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
          else
-            kod_:= p_tp_ || p_nbs_ || p_r013_ || s1_ || r1_ || lpad(p_kv_,3,'0') || 
-                   p_s183_ || p_s130_ || p_country_;
+            kod_:= p_tp_ || p_nbs_ || '0' || s1_ || r1_ || lpad(p_kv_,3,'0') || 
+                   '1' || p_s130_ || p_country_;
          end if;
 
          if se_ <> 0 then  
@@ -821,8 +824,8 @@ begin
          then
             kod_:= p_tp_ || p_nbs_ || p_r013_ || s1_ || r1_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
          else
-            kod_:= p_tp_ || p_nbs_ || p_r011_ || s1_ || r1_ || lpad(p_kv_,3,'0') || 
-                   p_s183_ || p_s130_ || p_country_;
+            kod_:= p_tp_ || p_nbs_ || '0' || s1_ || r1_ || lpad(p_kv_,3,'0') || 
+                   '1' || p_s130_ || p_country_;
          end if;
 
          if se_ <> 0 then   
@@ -1212,6 +1215,11 @@ LOOP
       if nbs1_ in ('3300','3301','3305','3306','3307','3308','3320',
                    '3326','3327','3328') then
          s183_:='B';
+      end if;
+
+      if nbs1_ in ('2809','2924','3570')  and s183_ = '0' 
+      then
+         s183_:='1';
       end if;
 
       dk_:=IIF_N(se_,0,'1','2','2');
