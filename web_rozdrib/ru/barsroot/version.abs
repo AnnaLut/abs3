@@ -1,2 +1,7 @@
-=========  svn diff --summarize -r 47328:47416 D:\SVN\master\web\ru
-Bugfix_2.0.35.5.167 (Rev:47328-47416
+=========  svn diff --summarize -r 47328:47508 D:\SVN\master\web\ru
+---web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.168\ru\web\barsroot\version.abs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.168\ru\web\barsroot\w4\import_esk_file.aspx
+---web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.168\ru\web\barsroot\docinput\js\chkForm.js
+---web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.168\ru\web\barsroot
+---web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.168\ru\web
+Bugfix_2.0.35.5.168 (Rev:47328-47508
