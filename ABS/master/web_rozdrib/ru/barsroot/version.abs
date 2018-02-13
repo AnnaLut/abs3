@@ -1,5 +1,2 @@
-=========  svn diff --summarize -r 47129:47150 D:\SVN\master\web\ru
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.166\ru\web\barsroot\App_Code\webservices\FNVRService.cs
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.166\ru\web\barsroot
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.166\ru\web
-Bugfix_2.0.35.5.166 (Rev:47129-47150
+=========  svn diff --summarize -r 47328:47416 D:\SVN\master\web\ru
+Bugfix_2.0.35.5.167 (Rev:47328-47416
