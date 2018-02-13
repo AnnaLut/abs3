@@ -40,7 +40,7 @@ begin
 
     l_zpr.id           := 1;
     l_zpr.name         := 'Доходи ММСБ (зарах. 6кл.)';
-    l_zpr.namef        := 'my.txt';
+    l_zpr.namef        := '';
     l_zpr.bindvars     := ':sDate1=''Дата з (DD.MM.YYYY)'',:sDate31=''Дата по (DD.MM.YYYY)''';
     l_zpr.create_stmt  := '';
     l_zpr.rpt_template := 'DPT_306.frx';
@@ -155,6 +155,17 @@ group by c.rnk, a2.kv, a2.nls, a1.nbs, a1.ob22, a1.kv, c.nmk, c.okpo, a1.branch'
           where id=l_rep.id;
        end;
     end if;
+
+    begin
+       Insert into BARS.APP_REP
+               (CODEAPP, CODEREP, APPROVE, GRANTOR)
+       Values
+               ('$RM_DRU1', l_rep.id, 1, 1);
+          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' добавлен в АРМ Друк звітів';
+    exception when dup_val_on_index
+          then 
+          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' существует в АРМ Друк звітів';
+    end;
 
     begin
        Insert into BARS.APP_REP
