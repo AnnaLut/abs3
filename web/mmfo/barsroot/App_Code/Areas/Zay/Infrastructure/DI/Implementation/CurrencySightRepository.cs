@@ -370,7 +370,7 @@ namespace BarsWeb.Areas.Zay.Infrastructure.Repository.DI.Implementation
                             AND")
                 .AppendFormat((null == sos && null == visa) 
                             ? " (sos < 1 AND sos >= 0 AND viza >= 0 OR sos >=1  AND vdate = bankdate)"
-                            : " (sos = {0} AND viza = {1})", sos, visa)
+                            : " (sos = {0} AND viza = {1})", Convert.ToString(sos, CultureInfo.InvariantCulture), visa)
                 .Append(" ORDER BY fdat desc, id desc");
 
             var parameters = new object[]
@@ -399,7 +399,7 @@ namespace BarsWeb.Areas.Zay.Infrastructure.Repository.DI.Implementation
                             AND")
                 .AppendFormat((null == sos && null == visa)
                             ? @" (sos < 1 AND sos >= 0 AND viza >= 0 OR sos >=1  AND vdate = bankdate)"
-                            : " (sos = {0} AND viza = {1})", sos, visa)
+                            : " (sos = {0} AND viza = {1})", Convert.ToString(sos,CultureInfo.InvariantCulture), visa)
                 .Append(" ORDER BY fdat desc, id desc");
 
             var parameters = new object[]
@@ -597,7 +597,7 @@ namespace BarsWeb.Areas.Zay.Infrastructure.Repository.DI.Implementation
                             AND")
                 .AppendFormat((null == sos && null == visa)
                 ? " (sos < 1 AND sos >= 0 AND viza >= 0 OR sos >=1  AND vdate = bankdate)"
-                : " (sos = {0} AND viza = {1})", sos, visa);
+                : " (sos = {0} AND viza = {1})", Convert.ToString(sos, CultureInfo.InvariantCulture), visa);
 
             var parameters = new object[]
             {
