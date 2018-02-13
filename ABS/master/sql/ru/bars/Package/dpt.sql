@@ -5383,6 +5383,8 @@ begin
         end if;
         -- проверка "срок пополнения"
         l_status := 1 + f_dpt_stop (1, l_curcode, l_accnum, p_amount, l_bdate);
+       -- проверка возможности пополнения вклада за период указанный в настройках вида вклада
+        l_status := 1 + f_dpt_stop (17, l_curcode, l_accnum, p_amount, l_bdate);
      end if;
   --
   -- возврат суммы депозита
