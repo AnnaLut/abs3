@@ -7,13 +7,17 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_F37SB ***
 
-  CREATE OR REPLACE PROCEDURE BARS.P_F37SB (Dat_ DATE, sheme_ VARCHAR2 DEFAULT 'C' ) IS
+CREATE OR REPLACE PROCEDURE BARS.P_F37SB (Dat_ DATE, sheme_ VARCHAR2 DEFAULT 'C' ) IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FILE NAME   : Процедура формирования файла @37 для СБ
 % DESCRIPTION : Отчетность СберБанка: формирование файлов
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 2001.  All Rights Reserved.
-% VERSION     : 02/02/2016 (06/01/2016, 04/06/2013)
+% VERSION     : 02/02/2018 (26/12/2017, 19/12/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 02/02/2018 для определения кодов 10 или 20 анализировался остаток в
+%            в номинале (Ostn_) вместо эквивалента (Oste_)
+%            (если номинал 0 а эквивалент не 0 возникает перебежка) 
+% 26/12/2017 для SB_R020 изменено условие для поля D_CLOSE
 % 02/02/2016 все показатели будем формировать из таблицы OTCN_SALDO
 %            наполненной из ACCM_SNAP_BALANCES
 % 06/01/2016 исключаем дату 0101GGGG для оборотов
@@ -101,20 +105,41 @@ nbuc_    VARCHAR2(12);
 sql_acc_ clob;
 ret_     number;
 
+datz_        date := Dat_Next_U(dat_, 1);
+
 ---Остатки на отчетную дату (грн. + валюта)
 CURSOR SaldoASeekOstf IS
-   SELECT s.acc, s.nls, s.kv, aa.fdat, s.nbs, NVL(trim(sp.ob22),'00'),
-          aa.ost, aa.ostq, aa.dos, aa.kos, aa.dosq, aa.kosq, s.tobo, s.nms
-   FROM otcn_acc s, otcn_saldo aa, specparam_int sp
+   SELECT s.acc, s.nls, s.kv, aa.fdat, s.nbs, NVL(trim(s.ob22),'00'),
+          aa.ost, aa.ostq,
+          aa.dos, aa.kos,
+          aa.dosq, aa.kosq,
+          s.tobo, s.nms
+   FROM otcn_acc s, otcn_saldo aa
    WHERE aa.acc=s.acc
-     and (aa.ost + aa.ostq <> 0 or aa.dos + aa.kos <> 0 or aa.dosq + aa.kosq <> 0)
-     and s.acc = sp.acc(+);
+     and (aa.ost + aa.ostq <> 0 or
+          aa.dos + aa.kos <> 0  or
+          aa.dosq + aa.kosq <> 0)
+     and nvl(dat_alt, dat_ - 1) <> dat_
+        union all
+   SELECT s.acc, aa.acc_num nls, s.kv, dat_ fdat,
+          substr(aa.acc_num, 1, 4) nbs,
+          NVL(trim(aa.acc_ob22),'00'),
+          aa.ost_rep ost, aa.ostq_rep ostq,
+          aa.dos_repd dos, aa.kos_repd kos,
+          aa.dosq_repd dosq, aa.kosq_repd kosq,
+          s.tobo, s.nms
+   FROM otcn_acc s, nbur_kor_balances aa
+   WHERE aa.report_date = dat_
+     and aa.acc_id=s.acc
+     and (aa.ost_rep + aa.ostq_rep <> 0 or
+          aa.dos_repd + aa.kos_repd <> 0  or
+          aa.dosq_repd + aa.kosq_repd <> 0)
+     and nvl(dat_alt, dat_ - 1) = dat_;
 
 CURSOR BaseL IS
     SELECT kodp, nbuc, SUM (znap)
     FROM rnbu_trace
-    WHERE userid=userid_
-      and znap <> 0
+    WHERE znap <> 0
     GROUP BY kodp, nbuc;
 
 BEGIN
@@ -142,7 +167,7 @@ END;
 Dat1_ := TRUNC(Dat_, 'MM');
 Dat2_ := TRUNC(Dat_ + 28);
 
-if Dat_=to_date('26042010','ddmmyyyy') then --to_date('29032010','ddmmyyyy') then
+if Dat_=to_date('26042010','ddmmyyyy') then
    Dat1_ := to_date('24042010','ddmmyyyy');
 end if;
 
@@ -163,7 +188,9 @@ end if;
 -- определение начальных параметров
 P_Proc_Set_Int(kodf_,sheme_,nbuc1_,typ_);
 
-sql_acc_ := 'select r020 from sb_r020 where f_37=''1'' ';
+sql_acc_ := 'select r020 from sb_r020 where f_37=''1'' and '||
+    'd_open <= to_date('''||to_char(datz_, 'ddmmyyyy')||''', ''ddmmyyyy'') and '||
+    '(d_close is null or d_close >= to_date('''||to_char(datz_, 'ddmmyyyy')||''', ''ddmmyyyy'')) ';
 
 ret_ := f_pop_otcn(Dat_, 1, sql_acc_);
 
@@ -200,8 +227,8 @@ LOOP
       VALUES  (nls_, kv_, data_, kodp_, znap_, acc_, comm_, tobo_, nbuc_) ;
    END IF;
 
-   IF Oste_<>0 THEN
-      dk_:=IIF_N(Ostn_,0,'1','2','2');
+   IF Oste_<>0 and kv_ <> '980' THEN
+      dk_:=IIF_N(Oste_,0,'1','2','2');
       kodp_:=dk_ || '0' ;
 
       kodp_:=kodp_ || Nbs_ || zz_ || lpad(Kv_,3,'0') ;
@@ -236,7 +263,7 @@ LOOP
       VALUES  (nls_, kv_, dat_, kodp_, znap_, acc_, comm_, tobo_, nbuc_) ;
    END IF;
 
-   IF Dose_ > 0 THEN
+   IF Dose_ > 0 and kv_ <> '980'  THEN
       kodp_:='50' || Nbs_ || zz_ || lpad(Kv_,3,'0') ;
       znap_:=TO_CHAR(Dose_);
       INSERT INTO rnbu_trace     -- Дб. обороты в эквиваленте валюты
@@ -244,7 +271,7 @@ LOOP
       VALUES  (nls_, kv_, dat_, kodp_, znap_, acc_, comm_, tobo_, nbuc_) ;
    END IF;
 
-   IF Kose_ > 0 THEN
+   IF Kose_ > 0 and kv_ <> '980' THEN
       kodp_:='60' || Nbs_ || zz_ || lpad(Kv_,3,'0') ;
       znap_:=TO_CHAR(Kose_) ;
       INSERT INTO rnbu_trace     -- Кр. обороты в эквиваленте валюты
@@ -379,13 +406,7 @@ LOOP
    FETCH BaseL INTO  kodp_, nbuc_, znap_;
    EXIT WHEN BaseL%NOTFOUND;
 
-   -- убрал так как перевели металлы до двух знаков 05.03.2009
---   if substr(kodp_,1,2) in ('11','21') and
---      substr(kodp_,9,3) in ('959','961','962','964') then
---      znap_ := to_char(round(to_number(znap_)/10,0));
---   end if;
-
-   INSERT INTO tmp_irep
+  INSERT INTO tmp_irep
         (kodf, datf, kodp, znap, nbuc)
    VALUES
         ('37', Dat_, kodp_, znap_, nbuc_);
@@ -399,7 +420,6 @@ show err;
 PROMPT *** Create  grants  P_F37SB ***
 grant EXECUTE                                                                on P_F37SB         to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on P_F37SB         to RPBN002;
-grant EXECUTE                                                                on P_F37SB         to START1;
 grant EXECUTE                                                                on P_F37SB         to WR_ALL_RIGHTS;
 
 
