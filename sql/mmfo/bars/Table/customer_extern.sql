@@ -1,9 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/CUSTOMER_EXTERN.sql =========*** Run *
-PROMPT ===================================================================================== 
-
+prompt table/customer_extern
 
 PROMPT *** ALTER_POLICY_INFO to CUSTOMER_EXTERN ***
 
@@ -12,7 +7,7 @@ BEGIN
         execute immediate  
           'begin  
                bpa.alter_policy_info(''CUSTOMER_EXTERN'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''CUSTOMER_EXTERN'', ''FILIAL'' , null, null, null, null);
+               bpa.alter_policy_info(''CUSTOMER_EXTERN'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
                bpa.alter_policy_info(''CUSTOMER_EXTERN'', ''WHOLE'' , null, null, null, null);
                null;
            end; 
@@ -47,7 +42,8 @@ begin
 	ISE CHAR(5), 
 	NOTES VARCHAR2(80), 
 	RNK NUMBER, 
-	DETRNK DATE
+	DETRNK DATE,
+	KF varchar2(6)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -158,8 +154,3 @@ grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on 
 PROMPT *** Create SYNONYM  to CUSTOMER_EXTERN ***
 
   CREATE OR REPLACE PUBLIC SYNONYM CUSTOMER_EXTERN FOR BARS.CUSTOMER_EXTERN;
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Table/CUSTOMER_EXTERN.sql =========*** End *
-PROMPT ===================================================================================== 

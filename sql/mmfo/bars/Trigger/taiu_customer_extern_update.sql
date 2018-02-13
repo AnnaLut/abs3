@@ -1,10 +1,4 @@
 
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Trigger/TAIU_CUSTOMER_EXTERN_UPDATE.sql ====
-PROMPT ===================================================================================== 
-
-
 PROMPT *** Create  trigger TAIU_CUSTOMER_EXTERN_UPDATE ***
 
   CREATE OR REPLACE TRIGGER BARS.TAIU_CUSTOMER_EXTERN_UPDATE 
@@ -29,7 +23,7 @@ declare
         l_rec.EMAIL      := :old.EMAIL;       l_rec.CUSTTYPE   := :old.CUSTTYPE;    l_rec.OKPO       := :old.OKPO;
         l_rec.COUNTRY    := :old.COUNTRY;     l_rec.REGION     := :old.REGION;      l_rec.FS         := :old.FS;
         l_rec.VED        := :old.VED;         l_rec.SED        := :old.SED;         l_rec.ISE        := :old.ISE;
-        l_rec.NOTES      := :old.NOTES;
+        l_rec.NOTES      := :old.NOTES; 	  l_rec.KF 		   := :old.KF;
     else
         l_rec.ID         := :new.ID;          l_rec.NAME       := :new.NAME;        l_rec.DOC_TYPE   := :new.DOC_TYPE;
         l_rec.DOC_SERIAL := :new.DOC_SERIAL;  l_rec.DOC_NUMBER := :new.DOC_NUMBER;  l_rec.DOC_DATE   := :new.DOC_DATE;
@@ -38,9 +32,9 @@ declare
         l_rec.EMAIL      := :new.EMAIL;       l_rec.CUSTTYPE   := :new.CUSTTYPE;    l_rec.OKPO       := :new.OKPO;
         l_rec.COUNTRY    := :new.COUNTRY;     l_rec.REGION     := :new.REGION;      l_rec.FS         := :new.FS;
         l_rec.VED        := :new.VED;         l_rec.SED        := :new.SED;         l_rec.ISE        := :new.ISE;
-        l_rec.NOTES      := :new.NOTES;
+        l_rec.NOTES      := :new.NOTES;		  l_rec.KF 		   := :new.KF;
     end if;
-    bars_sqnc.split_key(l_rec.ID, l_old_key, l_rec.KF);
+    --bars_sqnc.split_key(l_rec.ID, l_old_key, l_rec.KF);
     l_rec.IDUPD         := bars_sqnc.get_nextval('s_customer_extern_update', l_rec.KF);
     l_rec.EFFECTDATE    := COALESCE(gl.bd, glb_bankdate);
     --l_rec.GLOBAL_BDATE  := glb_bankdate;    -- sysdate
@@ -112,8 +106,3 @@ begin
 end;
 /
 ALTER TRIGGER BARS.TAIU_CUSTOMER_EXTERN_UPDATE ENABLE;
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Trigger/TAIU_CUSTOMER_EXTERN_UPDATE.sql ====
-PROMPT ===================================================================================== 
