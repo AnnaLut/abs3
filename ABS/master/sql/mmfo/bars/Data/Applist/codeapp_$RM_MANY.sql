@@ -43,7 +43,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Портфель договорів забезпечення ФО',
-                                                  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_grt_portfolio&mode=3',
+                                                  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_grt_portfolio'||chr(38)||'mode=3',
                                                   p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -52,7 +52,7 @@ begin
       --  Створюємо дочірню функцію Ипотека
                      l_function_deps  :=   abs_utils.add_func(
 															  p_name     => 'Ипотека',
-															  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_grt_mortgage&deal_id=\d+',
+															  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_grt_mortgage'||chr(38)||'deal_id=\d+',
 															  p_rolename => '' ,
 															  p_frontend => l_application_type_id
 															  );
@@ -61,7 +61,7 @@ begin
       --  Створюємо дочірню функцію Депозиты
                      l_function_deps  :=   abs_utils.add_func(
 															  p_name     => 'Депозиты',
-															  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_grt_deposits&deal_id=\d+',
+															  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_grt_deposits'||chr(38)||'deal_id=\d+',
 															  p_rolename => '' ,
 															  p_frontend => l_application_type_id
 															  );
@@ -70,7 +70,7 @@ begin
       --  Створюємо дочірню функцію Перегляд графіку подій
                      l_function_deps  :=   abs_utils.add_func(
 															  p_name     => 'Перегляд графіку подій',
-															  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_grt_dog_events&deal_id=\d+',
+															  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_grt_dog_events'||chr(38)||'deal_id=\d+',
 															  p_rolename => '' ,
 															  p_frontend => l_application_type_id
 															  );
@@ -79,7 +79,7 @@ begin
       --  Створюємо дочірню функцію Ипотека - земля
                      l_function_deps  :=   abs_utils.add_func(
 															  p_name     => 'Ипотека - земля',
-															  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_grt_mortgage_land&deal_id=\d+',
+															  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_grt_mortgage_land'||chr(38)||'deal_id=\d+',
 															  p_rolename => '' ,
 															  p_frontend => l_application_type_id
 															  );
@@ -88,7 +88,7 @@ begin
       --  Створюємо дочірню функцію Движимое имущество
                      l_function_deps  :=   abs_utils.add_func(
 															  p_name     => 'Движимое имущество',
-															  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_grt_vehicles&deal_id=\d+',
+															  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_grt_vehicles'||chr(38)||'deal_id=\d+',
 															  p_rolename => '' ,
 															  p_frontend => l_application_type_id
 															  );
@@ -97,7 +97,7 @@ begin
       --  Створюємо дочірню функцію Пустая карта договора
                      l_function_deps  :=   abs_utils.add_func(
 															  p_name     => 'Пустая карта договора',
-															  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_grt_dual&deal_id=\d+',
+															  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_grt_dual'||chr(38)||'deal_id=\d+',
 															  p_rolename => '' ,
 															  p_frontend => l_application_type_id
 															  );
@@ -106,7 +106,7 @@ begin
       --  Створюємо дочірню функцію Ценности
                      l_function_deps  :=   abs_utils.add_func(
 															  p_name     => 'Ценности',
-															  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_grt_valuables&deal_id=\d+',
+															  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_grt_valuables'||chr(38)||'deal_id=\d+',
 															  p_rolename => '' ,
 															  p_frontend => l_application_type_id
 															  );
@@ -115,7 +115,7 @@ begin
       --  Створюємо дочірню функцію Товары
                      l_function_deps  :=   abs_utils.add_func(
 															  p_name     => 'Товары',
-															  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_grt_products&deal_id=\d+',
+															  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_grt_products'||chr(38)||'deal_id=\d+',
 															  p_rolename => '' ,
 															  p_frontend => l_application_type_id
 															  );
@@ -127,7 +127,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '! Протокол розрахунку резерву по НБУ-23',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=NBU23_REZ',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1'||chr(38)||'sPar=NBU23_REZ',
                                                   p_rolename => 'START1' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -139,7 +139,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '!!Формування+Перег+Кор ЗАГАЛЬНОГО протоколу по НБУ-23',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=NBU23_REZ[PROC=>REZ_23_BLOCK(:A,1)][PAR=>:A(SEM=Зв_дата_01,TYPE=D)][EXEC=>BEFORE]',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1'||chr(38)||'sPar=NBU23_REZ[PROC=>REZ_23_BLOCK(:A,1)][PAR=>:A(SEM=Зв_дата_01,TYPE=D)][EXEC=>BEFORE]',
                                                   p_rolename => 'START1' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -151,7 +151,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '3.1. Протокол відхилення резерву',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=REZ_NBU23_DELTA[PROC=>z23.P_DELTA(:A,:B)][PAR=>:A(SEM=Зв_дата_З_01-ММ-ГГГГ,TYPE=D),:B(SEM=Зв_дата_По_01-ДД-ГГГГ,TYPE=D)][EXEC=>BEFORE][EXCEL=>ALL_CSV]',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1'||chr(38)||'sPar=REZ_NBU23_DELTA[PROC=>z23.P_DELTA(:A,:B)][PAR=>:A(SEM=Зв_дата_З_01-ММ-ГГГГ,TYPE=D),:B(SEM=Зв_дата_По_01-ДД-ГГГГ,TYPE=D)][EXEC=>BEFORE][EXCEL=>ALL_CSV]',
                                                   p_rolename => 'START1' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -163,7 +163,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '04. Протокол резерву по КРЕДИТАХ',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=TEST_MANY_CCK[PROC=>Z23.TK_MANY(:A,:D,1,0,1)][PAR=>:A(SEM=Реф_КД,TYPE=N),:D(SEM=Зв_дата_01,TYPE=D))][EXEC=>BEFORE]',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1'||chr(38)||'sPar=TEST_MANY_CCK[PROC=>Z23.TK_MANY(:A,:D,1,0,1)][PAR=>:A(SEM=Реф_КД,TYPE=N),:D(SEM=Зв_дата_01,TYPE=D))][EXEC=>BEFORE]',
                                                   p_rolename => 'START1' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -175,7 +175,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '98_1. Перевірка формування проводок (резерв<->план.залиш.рах.резерву)',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=VER_DOC_MAKET[PROC=>P_DOC_MAKET(:A)][PAR=>:A(SEM=Зв_дата_01,TYPE=D)][EXEC=>BEFORE]',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1'||chr(38)||'sPar=VER_DOC_MAKET[PROC=>P_DOC_MAKET(:A)][PAR=>:A(SEM=Зв_дата_01,TYPE=D)][EXEC=>BEFORE]',
                                                   p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -187,7 +187,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '05. Протокол резерву по ЦП',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=V_CP_MANY[PROC=>PUL_DAT(to_char(:A,''dd-mm-yyyy''),null)][PAR=>:A(SEM=Звiтна_дата 01.mm.yyyy>,TYPE=D)][EXEC=>BEFORE]',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1'||chr(38)||'sPar=V_CP_MANY[PROC=>PUL_DAT(to_char(:A,''dd-mm-yyyy''),null)][PAR=>:A(SEM=Звiтна_дата 01.mm.yyyy>,TYPE=D)][EXEC=>BEFORE]',
                                                   p_rolename => 'START1' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -199,7 +199,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '6.1. Резерв по фін.деб.заборгованності (зведена)',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2&sPar=DEB_FIN[PROC=>P_DEB_FIN(:A)][PAR=>:A(SEM=Зв_дата_ДД-ММ-ГГГГ,TYPE=D)][EXEC=>BEFORE]',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2'||chr(38)||'sPar=DEB_FIN[PROC=>P_DEB_FIN(:A)][PAR=>:A(SEM=Зв_дата_ДД-ММ-ГГГГ,TYPE=D)][EXEC=>BEFORE]',
                                                   p_rolename => 'START1' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -211,7 +211,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '6.2. Резерв по госп.деб.заборгованності (зведена)',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2&sPar=DEB_HOZ[PROC=>P_DEB_HOZ(:A)][PAR=>:A(SEM=Зв_дата_ДД-ММ-ГГГГ,TYPE=D)][EXEC=>BEFORE]',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2'||chr(38)||'sPar=DEB_HOZ[PROC=>P_DEB_HOZ(:A)][PAR=>:A(SEM=Зв_дата_ДД-ММ-ГГГГ,TYPE=D)][EXEC=>BEFORE]',
                                                   p_rolename => 'START1' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -223,7 +223,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '4.3. Перегляд/заповнення параметрiв угод КП Банки (ручні)',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2&sPar=NBU23_CCK_BN_KOR[PROC=>PUL_DAT(to_char(:A,''dd-mm-yyyy''),null)][PAR=>:A(SEM=Звiтна_дата 01.ММ.ГГГГ>,TYPE=D)][EXEC=>BEFORE]',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2'||chr(38)||'sPar=NBU23_CCK_BN_KOR[PROC=>PUL_DAT(to_char(:A,''dd-mm-yyyy''),null)][PAR=>:A(SEM=Звiтна_дата 01.ММ.ГГГГ>,TYPE=D)][EXEC=>BEFORE]',
                                                   p_rolename => 'START1' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -235,7 +235,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'НБУ-23/R.Перегляд/заповнення параметрiв угод КП ФО',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2&sPar=NBU23_CCK_FL[PROC=>PUL_DAT(to_char(:A,''dd-mm-yyyy''),NULL)][PAR=>:A(SEM=Зв_дата_01-MM-ГГГГ,TYPE=D)][EXEC=>BEFORE]',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2'||chr(38)||'sPar=NBU23_CCK_FL[PROC=>PUL_DAT(to_char(:A,''dd-mm-yyyy''),NULL)][PAR=>:A(SEM=Зв_дата_01-MM-ГГГГ,TYPE=D)][EXEC=>BEFORE]',
                                                   p_rolename => 'START1' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -247,7 +247,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '4.1. Перегляд/заповнення параметрiв угод КП ЮО',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2&sPar=NBU23_CCK_UL[PROC=>PUL_DAT(to_char(:A,''dd-mm-yyyy''),null)][PAR=>:A(SEM=Зв_дата_01,TYPE=D)][EXEC=>BEFORE]',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2'||chr(38)||'sPar=NBU23_CCK_UL[PROC=>PUL_DAT(to_char(:A,''dd-mm-yyyy''),null)][PAR=>:A(SEM=Зв_дата_01,TYPE=D)][EXEC=>BEFORE]',
                                                   p_rolename => 'START1' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -259,7 +259,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'НБУ-23/R.Перегляд/заповнення параметрiв ЦП',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2&sPar=NBU23_CP[PROC=>PUL_DAT(:Par0,null)][PAR=>:Par0(SEM=Звiтна_дата 01.mm.yyyy>,TYPE=S)][EXEC=>BEFORE]',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2'||chr(38)||'sPar=NBU23_CP[PROC=>PUL_DAT(:Par0,null)][PAR=>:Par0(SEM=Звiтна_дата 01.mm.yyyy>,TYPE=S)][EXEC=>BEFORE]',
                                                   p_rolename => 'START1' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -271,7 +271,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '98_ Розпорядження на проводки',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2&sPar=ORDER_REZ[PROC=>P_ORDER_REZ(:A)][PAR=>:A(SEM=Зв_дата_01,TYPE=D)][EXEC=>BEFORE]',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2'||chr(38)||'sPar=ORDER_REZ[PROC=>P_ORDER_REZ(:A)][PAR=>:A(SEM=Зв_дата_01,TYPE=D)][EXEC=>BEFORE]',
                                                   p_rolename => 'START1' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -283,7 +283,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'FV=>АБС: Обробка Екв-Вітрини "Резерв-МСФЗ"',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2&sPar=PRVN_OSAQ[NSIFUNCTION][PROC=>PUL_DAT(to_char(:A,''dd-mm-yyyy''),null)][PAR=>:A(SEM=Зв_дата 01/ММ/РРРР,TYPE=D)][EXEC=>BEFORE]',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2'||chr(38)||'sPar=PRVN_OSAQ[NSIFUNCTION][PROC=>PUL_DAT(to_char(:A,''dd-mm-yyyy''),null)][PAR=>:A(SEM=Зв_дата 01/ММ/РРРР,TYPE=D)][EXEC=>BEFORE]',
                                                   p_rolename => 'START1' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -295,7 +295,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '3.2. Протокол виконання функцій розрахунку резерву',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2&sPar=REZ_LOG',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2'||chr(38)||'sPar=REZ_LOG',
                                                   p_rolename => 'START1' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -307,7 +307,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '07. Протокол BV по фин.дебитор.задолж.',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2&sPar=TEST_MANY_CCK_DF[PROC=>Z23.REZ_DEB_F(:D,0,0,1)][PAR=>:D(SEM=Зв_дата_01,TYPE=D)][EXEC=>BEFORE]',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2'||chr(38)||'sPar=TEST_MANY_CCK_DF[PROC=>Z23.REZ_DEB_F(:D,0,0,1)][PAR=>:D(SEM=Зв_дата_01,TYPE=D)][EXEC=>BEFORE]',
                                                   p_rolename => 'START1' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -319,7 +319,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '08. Протокол BV по хоз.дебитор.задолж.',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2&sPar=TEST_MANY_CCK_DH[PROC=>Z23.REZ_DEB_F(:D,1,0,1)][PAR=>:D(SEM=Зв_дата_01,TYPE=D)][EXEC=>BEFORE]',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2'||chr(38)||'sPar=TEST_MANY_CCK_DH[PROC=>Z23.REZ_DEB_F(:D,1,0,1)][PAR=>:D(SEM=Зв_дата_01,TYPE=D)][EXEC=>BEFORE]',
                                                   p_rolename => 'START1' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -331,7 +331,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '->00.Розподіл фін.актівів на суттєві та несуттєві',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2&sPar=[PROC=>REZ_23_BLOCK(:A,2)][PAR=>:A(SEM=Зв_дата_01-ММ-ГГГГ,TYPE=D)][MSG=>OK]',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2'||chr(38)||'sPar=[PROC=>REZ_23_BLOCK(:A,2)][PAR=>:A(SEM=Зв_дата_01-ММ-ГГГГ,TYPE=D)][MSG=>OK]',
                                                   p_rolename => 'START1' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -343,7 +343,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '->01. Перенесення поточних ГПК в архiв',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2&sPar=[PROC=>REZ_23_BLOCK(:A,3)][PAR=>:A(SEM=Зв_дата_01-ММ-ГГГГ,TYPE=D)][MSG=>OK]',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2'||chr(38)||'sPar=[PROC=>REZ_23_BLOCK(:A,3)][PAR=>:A(SEM=Зв_дата_01-ММ-ГГГГ,TYPE=D)][MSG=>OK]',
                                                   p_rolename => 'START1' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -355,7 +355,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '->02.Розрахунок ОБС.БОРГУ по КП ',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2&sPar=[PROC=>REZ_23_BLOCK(:A,4)][PAR=>:A(SEM=Зв_дата_01-ММ-ГГГГ,TYPE=D)][MSG=>OK]',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2'||chr(38)||'sPar=[PROC=>REZ_23_BLOCK(:A,4)][PAR=>:A(SEM=Зв_дата_01-ММ-ГГГГ,TYPE=D)][MSG=>OK]',
                                                   p_rolename => 'START1' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -367,7 +367,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '->03.Розрахунок ОБС.БОРГУ по МБК',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2&sPar=[PROC=>REZ_23_BLOCK(:A,5)][PAR=>:A(SEM=Зв_дата_01-ММ-ГГГГ,TYPE=D)][MSG=>OK]',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2'||chr(38)||'sPar=[PROC=>REZ_23_BLOCK(:A,5)][PAR=>:A(SEM=Зв_дата_01-ММ-ГГГГ,TYPE=D)][MSG=>OK]',
                                                   p_rolename => 'START1' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -379,7 +379,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '->04.Розрахунок ОБС.БОРГУ по БПK',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2&sPar=[PROC=>REZ_23_BLOCK(:A,6)][PAR=>:A(SEM=Зв_дата_01-ММ-ГГГГ,TYPE=D)][MSG=>OK]',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2'||chr(38)||'sPar=[PROC=>REZ_23_BLOCK(:A,6)][PAR=>:A(SEM=Зв_дата_01-ММ-ГГГГ,TYPE=D)][MSG=>OK]',
                                                   p_rolename => 'START1' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -391,7 +391,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '->04_0.Розрахунок ОБС.БОРГУ по ОВЕРДРАФТАМ',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2&sPar=[PROC=>REZ_23_BLOCK(:A,7)][PAR=>:A(SEM=Зв_дата_01-ММ-ГГГГ,TYPE=D)][MSG=>OK]',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2'||chr(38)||'sPar=[PROC=>REZ_23_BLOCK(:A,7)][PAR=>:A(SEM=Зв_дата_01-ММ-ГГГГ,TYPE=D)][MSG=>OK]',
                                                   p_rolename => 'START1' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -403,7 +403,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '->05. Розрахунок ЗАБЕЗПЕЧЕННЯ',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2&sPar=[PROC=>REZ_23_BLOCK(:A,8)][PAR=>:A(SEM=Зв_дата_01-ММ-ГГГГ,TYPE=D)][MSG=>OK]',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2'||chr(38)||'sPar=[PROC=>REZ_23_BLOCK(:A,8)][PAR=>:A(SEM=Зв_дата_01-ММ-ГГГГ,TYPE=D)][MSG=>OK]',
                                                   p_rolename => 'START1' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -415,7 +415,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Порівняльна таблиця рахунків нар.% прострочених <30 та >30 днів',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?tableName=ACC_30&accessCode=1&sPar=[PROC=>p_acc_d30(:A)][PAR=>:A(SEM=Звітна дата,TYPE=D)][EXEC=>BEFORE]',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?tableName=ACC_30'||chr(38)||'accessCode=1'||chr(38)||'sPar=[PROC=>p_acc_d30(:A)][PAR=>:A(SEM=Звітна дата,TYPE=D)][EXEC=>BEFORE]',
                                                   p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -443,6 +443,36 @@ begin
                                                   p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
+
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Друк звітів ********** ');
+          --  Створюємо функцію Друк звітів
+      l := l +1;
+      l_function_ids.extend(l);
+      l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'Друк звітів',
+                                                  p_funcname => '/barsroot/cbirep/rep_list.aspx?codeapp=\S*',
+                                                  p_rolename => '' ,
+                                                  p_frontend => l_application_type_id
+                                                  );
+
+
+      --  Створюємо дочірню функцію Друк звітів
+                     l_function_deps  :=   abs_utils.add_func(
+															  p_name     => 'Друк звітів',
+															  p_funcname => '/barsroot/cbirep/rep_print.aspx?query_id=\d+\S*',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+      --  Створюємо дочірню функцію Друк звітів
+                     l_function_deps  :=   abs_utils.add_func(
+															  p_name     => 'Друк звітів',
+															  p_funcname => '/barsroot/cbirep/rep_query.aspx?repid=\d+\S*',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
 
    DBMS_OUTPUT.PUT_LINE(chr(13)||chr(10)||'  Прикріпляємо ресурси функцій до даного АРМу ($RM_MANY) - АРМ Формування резервного фонду  ');
