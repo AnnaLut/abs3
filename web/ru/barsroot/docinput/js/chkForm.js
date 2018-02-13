@@ -783,10 +783,12 @@ function selectDopReq(evt, name, fl) {
             elem.value = result[0];
             elem.fireEvent("onchange");
             // COBUSUPABS-4641 
-            var reqvDA70 = document.getElementById("reqv_DA#70");
-            if (reqvDA70) {
-                reqvDA70.value = result[1];
-                //reqvDA70.disabled = true;
+            if ("reqw_D9#70" === name) {
+                var reqvDA70 = document.getElementById("reqv_DA#70");
+                if (reqvDA70) {
+                    reqvDA70.value = result[1];
+                    //reqvDA70.disabled = true;
+                }
             }
         }
     }
