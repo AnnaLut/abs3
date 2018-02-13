@@ -12,8 +12,12 @@ CREATE OR REPLACE PROCEDURE BARS.P_F37SB (Dat_ DATE, sheme_ VARCHAR2 DEFAULT 'C'
 % FILE NAME   : Процедура формирования файла @37 для СБ
 % DESCRIPTION : Отчетность СберБанка: формирование файлов
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 2001.  All Rights Reserved.
-% VERSION     : 19/12/2017 (30/11/2017)
+% VERSION     : 02/02/2018 (26/12/2017, 19/12/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 02/02/2018 для определения кодов 10 или 20 анализировался остаток в
+%            в номинале (Ostn_) вместо эквивалента (Oste_)
+%            (если номинал 0 а эквивалент не 0 возникает перебежка) 
+% 26/12/2017 для SB_R020 изменено условие для поля D_CLOSE
 % 02/02/2016 все показатели будем формировать из таблицы OTCN_SALDO
 %            наполненной из ACCM_SNAP_BALANCES
 % 06/01/2016 исключаем дату 0101GGGG для оборотов
@@ -186,7 +190,7 @@ P_Proc_Set_Int(kodf_,sheme_,nbuc1_,typ_);
 
 sql_acc_ := 'select r020 from sb_r020 where f_37=''1'' and '||
     'd_open <= to_date('''||to_char(datz_, 'ddmmyyyy')||''', ''ddmmyyyy'') and '||
-    '(d_close is null or d_close > to_date('''||to_char(datz_, 'ddmmyyyy')||''', ''ddmmyyyy'')) ';
+    '(d_close is null or d_close >= to_date('''||to_char(datz_, 'ddmmyyyy')||''', ''ddmmyyyy'')) ';
 
 ret_ := f_pop_otcn(Dat_, 1, sql_acc_);
 
@@ -224,7 +228,7 @@ LOOP
    END IF;
 
    IF Oste_<>0 and kv_ <> '980' THEN
-      dk_:=IIF_N(Ostn_,0,'1','2','2');
+      dk_:=IIF_N(Oste_,0,'1','2','2');
       kodp_:=dk_ || '0' ;
 
       kodp_:=kodp_ || Nbs_ || zz_ || lpad(Kv_,3,'0') ;
