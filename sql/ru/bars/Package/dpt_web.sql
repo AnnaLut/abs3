@@ -2663,7 +2663,8 @@ create or replace package body dpt_web is
       
       end if;
       --inga 31/03/2015 COBUSUPABS-3311 Если параметр в карточке вида вклада EA_PENS = '1', отправляем документ 143 (Пенсионное удостоверение в ЕА)
-      if l_ea_pens = '1' and l_pens_count = 0 and is_pensioner(p_rnk) = 0 then
+      --COBUMMFO-6302 - при открытии через WEB пенсионное запрашиваться не должно
+      if l_ea_pens = '1' and l_pens_count = 0 and is_pensioner(p_rnk) = 0 and p_wb = 'N' then
         l_ea_id := ead_pack.doc_create('SCAN',
                                        null,
                                        l_ea_blob,
