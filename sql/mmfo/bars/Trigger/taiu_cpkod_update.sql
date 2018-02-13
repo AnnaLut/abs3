@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  trigger TAIU_CPKOD_UPDATE ***
 
-  CREATE OR REPLACE TRIGGER BARS.TAIU_CPKOD_UPDATE 
+CREATE OR REPLACE TRIGGER TAIU_CPKOD_UPDATE
 after insert or delete or update
  ON BARS.CP_KOD for each row
 declare
@@ -15,8 +15,7 @@ declare
    -- триггер предполагает только одну запись за один банковский день
    -- если в один банк. день было несколько изменений, то они перезаписывают пердидущее за этот банковский день
    l_chgaction char(1);
-   l_idupd       number;
-   l_r    cp_spec_cond%rowtype; 
+   l_r    cp_spec_cond%rowtype;
 begin
    l_bankdate := gl.bd;
    if l_bankdate is null then
@@ -39,10 +38,17 @@ begin
    else
        if  updating then
            l_chgaction:= 'U';
-           select * into l_r from cp_spec_cond where id = :new.spec_cond_id;
-           if l_r.del_date is not null then
-             raise_application_error(-20001,  'Запис з довідника <Наявність особливих умов> помічений як видалено ('||l_r.id||'|'||l_r.title||', дата видалення'||to_char(l_r.del_date,'DD.MM.YYYY')||' ) Оберіть інший.');
-           end if;
+           if :new.spec_cond_id is not null then
+             begin 
+               select * into l_r from cp_spec_cond where id = :new.spec_cond_id;
+               exception
+                 when NO_DATA_FOUND then
+                   raise_application_error(-20001,  'Запис з довідника <Наявність особливих умов> з ідентифікатором '||:new.spec_cond_id||' не знайдено');
+             end;
+             if l_r.del_date is not null then
+               raise_application_error(-20001,  'Запис з довідника <Наявність особливих умов> помічений як видалено ('||l_r.id||'|'||l_r.title||', дата видалення'||to_char(l_r.del_date,'DD.MM.YYYY')||' ) Оберіть інший.');
+             end if;
+           end if;  
        else
           l_chgaction:= 'I';
        end if;
