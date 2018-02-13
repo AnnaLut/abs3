@@ -5,7 +5,7 @@ CREATE OR REPLACE PROCEDURE BARS.P_FD5_NN (Dat_   DATE,
 % DESCRIPTION :    #D5 for KB
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.17.007      24/01/2018 (12/01/2017, 08/12/2017)
+% VERSION     : v.17.009      09/02/2018 (06/02/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -33,6 +33,10 @@ CREATE OR REPLACE PROCEDURE BARS.P_FD5_NN (Dat_   DATE,
  27     I          S190 код строку прострочення погашення боргу
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 09/02/2018 - для ФЛ резидента и бал.счета 9129 изменяем K072 на '42' 
+              если K072='00'
+              для 2203, 2206, 2208 R011='1'
+ 06/02/2018 - в коде показателя бал.счет 6046 заменяем на 6055  
  24/01/2018 - для показателя різниця заокруглень изменил символ 'N' на 
               '42'
               для формирования средних остатков по основным счетам 
@@ -782,7 +786,9 @@ BEGIN
             k072_ := 'N3';
          elsif codcagent_ = 4 then
             k072_ := 'N7';
-         elsif codcagent_ = 6 then
+         elsif codcagent_ = 6 and k051_ = '91' then
+            k072_ := 'N7';
+         elsif codcagent_ = 6 and k051_ <> '91' then
             k072_ := 'N8';
          else 
             null;
@@ -819,6 +825,13 @@ BEGIN
       k111_:='00';
    END IF;
 
+   IF re_ <> 0 and codcagent_ = 5 and nbs_ = '9129' and k072_= '00' 
+   THEN
+      k072_:='42';
+      k051_:='00';
+      k111_:='00';
+   END IF;
+
    if nbs_ = '2062' then 
       nbs_ := '2063';
    elsif nbs_ = '2202' then
@@ -830,7 +843,7 @@ BEGIN
    then
       r011_ := '3';
    end if;
-   if nbs_ = '2203' and r011_ = '0'
+   if nbs_ in ('2203', '2206', '2208') 
    then
       r011_ := '1';
    end if;
@@ -2074,6 +2087,9 @@ BEGIN
     end if;
 
     logger.info ('P_FD5_NN: etap 5 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
+
+    update rnbu_trace set kodp = substr(kodp,1,2) || '6055' || substr(kodp,7)
+    where substr(kodp,3,4)='6046';
 
     ---------------------------------------------------
     DELETE FROM tmp_nbu WHERE kodf=kodf_ AND datf= dat_;
