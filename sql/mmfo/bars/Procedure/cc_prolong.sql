@@ -95,8 +95,12 @@ begin
          returning mdate
               into l_wdatl;
 
-            BARS.CCK_SPECPARAM(l.acc,l.nls,l.kv,l.tip,l_sour,l_s080_old, k.sdate, l_wdatl, k.vidd, k.nd);
-
+            --BARS.CCK_SPECPARAM(l.acc,l.nls,l.kv,l.tip,l_sour,l_s080_old, k.sdate, l_wdatl, k.vidd, k.nd);
+			 -- Встановлення дефолтних спецпараметрів по новій процедурі
+		     pul.PUT('MODULE', 'CCK');
+             pul.PUT('ND',  k.nd);
+             accreg.set_default_sparams(p_acc => l.acc);
+			 
           end loop;
 
           if l_sos = 0
