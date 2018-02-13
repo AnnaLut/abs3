@@ -320,7 +320,7 @@ is
     p_id        in zayavka.id%type,
     p_viza      in zayavka.viza%type,
     p_priority  in zayavka.priority%type  default null,
-    p_aims_code in zayavka.aims_code%type default null,
+    p_aims_code in zayavka.meta%type default null,
     p_sup_doc   in zayavka.support_document%type default null);
 
   --
@@ -5155,14 +5155,14 @@ procedure set_visa (
   p_id        in zayavka.id%type,
   p_viza      in zayavka.viza%type,
   p_priority  in zayavka.priority%type  default null,
-  p_aims_code in zayavka.aims_code%type default null,
+  p_aims_code in zayavka.meta%type default null,
   p_sup_doc   in zayavka.support_document%type default null)
 is
 begin
   update zayavka
      set viza      = p_viza,
          priority  = nvl(p_priority, priority),
-         aims_code = nvl(p_aims_code, aims_code)
+         meta      = nvl(p_aims_code, meta)
    where id = p_id;
 
    if nvl(p_sup_doc,0)<>0 then
