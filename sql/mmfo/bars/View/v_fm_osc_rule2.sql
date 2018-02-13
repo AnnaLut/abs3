@@ -1,4 +1,5 @@
-prompt view v_fm_osc_rule2
+PROMPT *** Create  view V_FM_OSC_RULE2 ***
+
 create or replace view v_fm_osc_rule2 (ref, vdat) as
 -- ============================================================================
 -- 2. Ãðîøîâ³ êîøòè ó ãîò³âêîâ³é ôîðì³
@@ -33,12 +34,9 @@ SELECT o.REF, o.vdat
                   AND UPPER(TRIM(o.NAZN)) like '%ÂÈÄÀ×%')
                OR     (SUBSTR (o.nlsa, 1, 4) IN ('2924')
                   AND SUBSTR (o.nlsb, 1, 4) IN ('2625'))
-               );   
-                  
+               OR o.TT in ('040','041','042','043','044','045','AA1','AA2','AA3','AA4','AA5','AA6','AA7','AA8','AA9', 'PKK' ))
+          AND gl.p_icurval (NVL (o.kv, 980), NVL (o.s, 0), o.vdat) >=
+                 15000000;
 
-PROMPT *** Create  grants  V_FM_OSC_RULE2 ***
-grant SELECT                                                                 on V_FM_OSC_RULE2  to BARSREADER_ROLE;
-grant SELECT                                                                 on V_FM_OSC_RULE2  to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_FM_OSC_RULE2  to FINMON01;
-grant SELECT                                                                 on V_FM_OSC_RULE2  to START1;
-grant SELECT                                                                 on V_FM_OSC_RULE2  to UPLD;
+grant select on v_fm_osc_rule2 to finmon01;
+grant select on v_fm_osc_rule2 to bars_access_defrole;
