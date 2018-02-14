@@ -1,6 +1,7 @@
 ﻿using AttributeRouting.Web.Http;
 using BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Abstract;
 using BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation;
+using BarsWeb.Areas.BpkW4.Models;
 using BarsWeb.Areas.Kernel.Models;
 using BarsWeb.Core.Models;
 using BarsWeb.Core.Models.Binders.Api;
@@ -22,7 +23,7 @@ namespace BarsWeb.Areas.BpkW4.Controllers.Api
         public InstantCardApiController(IInstantCardRepository repository) { _repo = repository; }
 
         [HttpPost]
-        [POST("/api/instantcardapicreateinstantcards")]
+        [POST("/api/BpkW4/InstantCardApi/createinstantcards")]
         public HttpResponseMessage CreateInstantCards(InstantCard obj)
         {
             try
@@ -40,7 +41,7 @@ namespace BarsWeb.Areas.BpkW4.Controllers.Api
         }
 
         [HttpGet]
-        [GET("/api/instantcardapicardtype")]
+        [GET("/api/BpkW4/InstantCardApi/cardtype")]
         public HttpResponseMessage CardType([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request, string product_code)
         {
             try
@@ -57,7 +58,7 @@ namespace BarsWeb.Areas.BpkW4.Controllers.Api
         }
 
         [HttpGet]
-        [GET("/api/instantcardapiproduct")]
+        [GET("/api/BpkW4/InstantCardApi/product")]
         public HttpResponseMessage Product()
         {
             try
@@ -74,7 +75,7 @@ namespace BarsWeb.Areas.BpkW4.Controllers.Api
         }
 
         [HttpGet]
-        [GET("/api/instantcardapibatchesmmsb")]
+        [GET("/api/BpkW4/InstantCardApi/batchesmmsb")]
         public HttpResponseMessage BatchesMmsb([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request)
         {
             try
