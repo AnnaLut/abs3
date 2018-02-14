@@ -577,7 +577,7 @@ function Check_ClientRekvPerson() {
             return false;
         }
         var organ = gE(curTab, 'ed_ORGAN').value;
-        if (isDocPassport && (organ.length < 10 || !/^[а-яА-Яа-яА-ЯіІїЇєЄ]{0,1}[а-яА-Яа-яА-ЯіІїЇєЄ\-\`\'\.\s]{1,255}$/.test(organ.toUpperCase()))) {
+		if (isDocPassport && (organ.length < 10 || !/^[0-9а-яА-Яа-яА-ЯіІїЇєЄ]{0,1}[0-9а-яА-Яа-яА-ЯіІїЇєЄ\-\`\'\.\s]{1,255}$/.test(organ.toUpperCase()))) {
             alert('Орган, що видав паспорт має містити не менше 10 символів кирилиці.');
             gE(curTab, 'ed_ORGAN').focus();
             return false;
