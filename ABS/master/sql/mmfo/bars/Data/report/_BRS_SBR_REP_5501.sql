@@ -134,7 +134,7 @@ begin
        Insert into BARS.APP_REP
                (CODEAPP, CODEREP, APPROVE, GRANTOR)
        Values
-               ('WSKR', l_rep.id, 1, 1);
+               ('$RM_SKRN', l_rep.id, 1, 1);
           l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' добавлен в АРМ Депозитні сейфи';
     exception when dup_val_on_index
           then 
