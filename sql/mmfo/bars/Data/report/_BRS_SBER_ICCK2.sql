@@ -1,5 +1,5 @@
 prompt ===================================== 
-prompt == Визначенi Кредитнi справи в сховищi
+prompt == Визначенi Кредитнi справи в сховищi xls
 prompt ===================================== 
 
 set serveroutput on
@@ -16,8 +16,8 @@ declare
    l_message   varchar2(1000);    
 
 begin     
-   l_zpr.name := 'Визначенi Кредитнi справи в сховищi';
-   l_zpr.pkey := '\BRS\SBER\ICCK';
+   l_zpr.name := 'Визначенi Кредитнi справи в сховищi xls';
+   l_zpr.pkey := '\BRS\SBER\ICCK2';
 
    l_message  := 'Ключ запроса: '||l_zpr.pkey||'  '||nlchr;
 
@@ -39,11 +39,11 @@ begin
     ------------------------    
                                 
     l_zpr.id           := 1;
-    l_zpr.name         := 'Визначенi Кредитнi справи в сховищi';
+    l_zpr.name         := 'Визначенi Кредитнi справи в сховищi xls';
     l_zpr.namef        := '';
     l_zpr.bindvars     := ':BRANCH=''Бранч-2''';
     l_zpr.create_stmt  := '';
-    l_zpr.rpt_template := 'ICCK.qrp';
+    l_zpr.rpt_template := 'ICCK.frx';
     l_zpr.form_proc    := '';
     l_zpr.default_vars := ':BRANCH=''%'''; 
     l_zpr.bind_sql     := ':BRANCH=''BRANCH|BRANCH|NAME|WHERE length(branch)=15 order by branch ''';
@@ -114,8 +114,8 @@ order by e.branch, i.branch, i.nd';
                                 
 
     l_rep.name        :='Empty';
-    l_rep.description :='Визначенi Кредитнi справи в сховищi';
-    l_rep.form        :='frm_UniReport';
+    l_rep.description :='Визначенi Кредитнi справи в сховищi xls';
+    l_rep.form        :='frm_FastReport';
     l_rep.param       :=l_zpr.kodz||',3,sFdat,sFdat2,"",TRUE,FALSE';
     l_rep.ndat        :=2;
     l_rep.mask        :='';
@@ -128,7 +128,7 @@ order by e.branch, i.branch, i.nd';
     l_rep.idf := l_repfolder;    
 
     -- Фиксированный № печатного отчета   
-    l_rep.id          := 495;
+    l_rep.id          := 5519;
 
 
     if l_isnew = 1 then                     
@@ -156,6 +156,62 @@ order by e.branch, i.branch, i.nd';
           where id=l_rep.id;                 
        end;                                  
     end if;                                  
+
+    begin
+       Insert into BARS.APP_REP
+               (CODEAPP, CODEREP, APPROVE, GRANTOR)
+       Values
+               ('$RM_DRU1', l_rep.id, 1, 1);
+          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' добавлен в АРМ Друк звітів  ';
+    exception when dup_val_on_index
+          then 
+          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' существует в АРМ Друк звітів ';
+    end;                                 
+
+    begin
+       Insert into BARS.APP_REP
+               (CODEAPP, CODEREP, APPROVE, GRANTOR)
+       Values
+               ('$RM_ICCK', l_rep.id, 1, 1);
+          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' добавлен в АРМ Інвентаризацiя Кредитних Справ в сховищi ';
+    exception when dup_val_on_index
+          then 
+          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' существует в АРМ Інвентаризацiя Кредитних Справ в сховищi ';
+    end;                                 
+
+    begin
+       Insert into BARS.APP_REP
+               (CODEAPP, CODEREP, APPROVE, GRANTOR)
+       Values
+               ('$RM_WIKD', l_rep.id, 1, 1);
+          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' добавлен в АРМ Інвентаризацiя кредитних справ в сховищi(WEB) ';
+    exception when dup_val_on_index
+          then 
+          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' существует в АРМ Інвентаризацiя кредитних справ в сховищi(WEB) ';
+    end;                                 
+
+    begin
+       Insert into BARS.APP_REP
+               (CODEAPP, CODEREP, APPROVE, GRANTOR)
+       Values
+               ('$RM_UCCK', l_rep.id, 1, 1);
+          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' добавлен в АРМ <<Кредити ЮО>> ';
+    exception when dup_val_on_index
+          then 
+          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' существует в АРМ <<Кредити ЮО>> ';
+    end;                                 
+
+    begin
+       Insert into BARS.APP_REP
+               (CODEAPP, CODEREP, APPROVE, GRANTOR)
+       Values
+               ('$RM_MAIN', l_rep.id, 1, 1);
+          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' добавлен в АРМ Адміністратора АБС ';
+    exception when dup_val_on_index
+          then 
+          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' существует в АРМ Адміністратора АБС ';
+    end;                                 
+
     bars_report.print_message(l_message);   
 end;                                        
 /                                           
