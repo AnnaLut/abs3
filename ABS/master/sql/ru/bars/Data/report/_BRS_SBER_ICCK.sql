@@ -43,7 +43,7 @@ begin
     l_zpr.namef        := '';
     l_zpr.bindvars     := ':BRANCH=''Бранч-2''';
     l_zpr.create_stmt  := '';
-    l_zpr.rpt_template := 'ICCK.qrp';
+    l_zpr.rpt_template := 'ICCK.frx';
     l_zpr.form_proc    := '';
     l_zpr.default_vars := ':BRANCH=''%'''; 
     l_zpr.bind_sql     := ':BRANCH=''BRANCH|BRANCH|NAME|WHERE length(branch)=15 order by branch ''';
@@ -115,7 +115,7 @@ order by e.branch, i.branch, i.nd';
 
     l_rep.name        :='Empty';
     l_rep.description :='Визначенi Кредитнi справи в сховищi';
-    l_rep.form        :='frm_UniReport';
+    l_rep.form        :='frm_FastReport';
     l_rep.param       :=l_zpr.kodz||',3,sFdat,sFdat2,"",TRUE,FALSE';
     l_rep.ndat        :=2;
     l_rep.mask        :='';
