@@ -25,7 +25,7 @@
 </div>
 <div id="SepTZWindow"></div>
 
-@Html.Partial("~/Areas/Sep/Views/Shared/_sepDocViewer.cshtml")
+@Html.Partial("~/Areas/Sep/Views/Shared/_sepDocViewerTz.cshtml")
 
 <script type="text/javascript" src="@Url.Content("~/lib/jsZip/jszip.min.js")"></script>
 <script>
@@ -179,7 +179,7 @@
             
             $.get('@Url.Action("GetZagA")', { rec: data.REC }).done(function (result) {
                 var data = result.data;
-                if (dk_number == 3)
+                if (dk_number == 2)
                 {
                     var swapArr = [['NAM_A', 'NAM_B'], ['ID_A', 'ID_B'], ['NLSA', 'NLSB'], ['NB', 'NBA'], ['MFOA', 'MFOB'] ];
                     for (var i = 0; i < swapArr.length; i++) {
