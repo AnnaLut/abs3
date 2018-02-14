@@ -26,10 +26,10 @@ FUNCTION К_IND_INFL ( p_DAT0 date ,  p_DATi date ) RETURN number;
 
 
  --Расчет по договору
-  PROCEDURE inflation_nd(P_ND IN NUMBER, P_DAT_BEGIN IN VARCHAR2,P_DAT_END IN VARCHAR2, P_TYP_KOD IN NUMBER DEFAULT 1);
+ PROCEDURE inflation_nd(P_ND IN NUMBER, P_DAT_BEGIN IN DATE,P_DAT_END IN DATE, P_TYP_KOD IN NUMBER DEFAULT 1);
 END rep_inflation_court;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.REP_INFLATION_COURT AS
+CREATE OR REPLACE PACKAGE BODY REP_INFLATION_COURT AS
 /******************************************************************************
    Ver        Date        Author           Description
    ---------  ----------  ---------------  ------------------------------------
@@ -138,7 +138,7 @@ end К_IND_INFL;
 
 select count(*)  into l_count
                 from V_INFLATION_SALDOA s
-                where acc=P_ACC and fdat>=P_DAT_BEGIN and fdat<=nvl(P_DAT_END,trunc(sysdate));
+                where acc=P_ACC and fdat>=P_DAT_BEGIN and  fdat<=nvl(to_date(P_DAT_END,'dd.mm.yy'),trunc(sysdate));  ---and fdat<=nvl(P_DAT_END,trunc(sysdate));
 
                       dbms_output.put_line ('l_count='||l_count);
    --------------------------------------------- DOS------------------------------------------------------------------------------------------------
@@ -148,7 +148,7 @@ select count(*)  into l_count
                          s.fdat,
                          s.dos*100  dos
                 from V_INFLATION_SALDOA s
-                where acc=P_ACC and fdat>=P_DAT_BEGIN and fdat<=nvl(P_DAT_END,trunc(sysdate))
+                where acc=P_ACC and fdat>=P_DAT_BEGIN and  fdat<=nvl(to_date(P_DAT_END,'dd.mm.yy'),trunc(sysdate)) --- and fdat<=nvl(P_DAT_END,trunc(sysdate))
                 order by fdat
                )
             )
@@ -163,13 +163,13 @@ select count(*)  into l_count
         l_ost:=abs(rep_inflation_court.fost(P_ACC,P_DAT_BEGIN))*100;
         if l_ost>0 then
            insert into tmp_inflation_court (ND , ACC   , FDAT_BEG    , DAT_BEG_K                        ,  FDAT_END,           DAT_END_K  , S_nom , S    , S_K, K, COMM)
-                                    values (null,P_ACC , P_DAT_BEGIN , round(dat_next_u(P_DAT_BEGIN,-1),'MM'), l_dat_end, round(l_dat_end,'MM'), l_ost , l_ost, null, 1, null);
+                                    values (null,P_ACC , to_date(P_DAT_BEGIN,'dd.mm.yy') , round(dat_next_u(P_DAT_BEGIN,-1),'MM'), to_date(l_dat_end,'dd.mm.yy'), to_date(l_dat_end,'dd.mm.yy'), l_ost , l_ost, null, 1, null);
         end if;
      end if;
 
      if i.dos>0 and P_DAT_BEGIN<i.fdat then
         insert into tmp_inflation_court (ND , ACC   , FDAT_BEG, DAT_BEG_K                        ,  FDAT_END,           DAT_END_K  , S_nom , S    , S_K , K, COMM)
-                                 values (null,P_ACC , i.fdat  , round(dat_next_u(i.fdat,-1),'MM'), l_dat_end, round(l_dat_end,'MM'), i.dos ,i.dos , null, 1, null);
+                                 values (null,P_ACC , i.fdat  , round(dat_next_u(i.fdat,-1),'MM'), to_date(l_dat_end,'dd.mm.yy'),  to_date(l_dat_end,'dd.mm.yy'), i.dos ,i.dos , null, 1, null);
      end if;
 
 
@@ -182,7 +182,7 @@ select count(*)  into l_count
  -- цикл по погашению    (P_DAT_BEGIN певое погашение уже учли при заполнении DOS)
    for i in (select ACC, FDAT, OSTF*100 OSTF, DOS*100 DOS, KOS*100 KOS
               from V_INFLATION_SALDOA
-             where acc=P_ACC and fdat>P_DAT_BEGIN and fdat<=nvl(P_DAT_END,trunc(sysdate))   and kos>0
+             where acc=P_ACC and fdat>P_DAT_BEGIN and fdat<=nvl(to_date(P_DAT_END,'dd.mm.yy'),trunc(sysdate))  and kos>0
              order by fdat
             )
    loop
@@ -192,10 +192,12 @@ select count(*)  into l_count
         while l_kos>0
         loop
                   l_count:=l_count+1;                     if l_count>500 then      RAISE_APPLICATION_ERROR (-20999,'Вечний цикл !!!'); end if; -- защита от вечного цикла на всякий  случай
-
+          begin
           -- ищем строку в которой есть еще не погашенная сумма долга (в которой fdat_end- дата кокончания расчета была проставлена во всей строках насильно в цикле DOS)
           select * into str_inf from tmp_inflation_court where acc=P_ACC and  fdat_end=l_dat_end and fdat_beg=(select min(fdat_beg) from tmp_inflation_court where acc=P_ACC and FDAT_END=l_dat_end);
           DBMS_OUTPUT.PUT_LINE('KOS ACC= '||to_char(P_ACC)||' '||to_char(i.fdat,'dd/mm/yyyy')||' S='||str_inf.s||'  l_kos='||l_kos);
+          EXCEPTION WHEN NO_DATA_FOUND THEN null;
+          end;
           --logger.info ('ACC= '||to_char(P_ACC)||' '||to_char(i.fdat,'dd/mm/yyyy')||' S='||str_inf.s);
          -- если погасил больше или сумму прострочки просто проставляем дату погашения платежа + остаеться часть KOS-a
          if l_kos>=str_inf.s then
@@ -219,12 +221,12 @@ select count(*)  into l_count
 
     update tmp_inflation_court
        set k=round(К_IND_INFL(  dat_next_u(FDAT_beg,-1), FDAT_END ),3)-- поскольку НБУ дает с 1 знаком после запятой
-     where acc=P_ACC and fdat_beg>=P_DAT_BEGIN and fdat_beg<=nvl(P_DAT_END,trunc(sysdate)) ;
+     where acc=P_ACC and fdat_beg>=P_DAT_BEGIN and fdat_beg<=nvl(to_date(P_DAT_END,'dd.mm.yy'),trunc(sysdate)) ;
 
     update tmp_inflation_court
        set S_K=S*k,
            S3=round((fdat_end-fdat_beg+1)*S*3/ (100*365),4)
-     where acc=P_ACC and fdat_beg>=P_DAT_BEGIN and fdat_beg<=nvl(P_DAT_END,trunc(sysdate))  ;
+     where acc=P_ACC and fdat_beg>=P_DAT_BEGIN and fdat_beg<=nvl(to_date(P_DAT_END,'dd.mm.yy'),trunc(sysdate))  ;
 
     commit;
   END;
@@ -244,8 +246,9 @@ select count(*)  into l_count
  end;
 
   -- Высчитываем затраты по договору  (по всем счетам договора)
-  PROCEDURE inflation_nd(P_ND IN  NUMBER,  P_DAT_BEGIN IN VARCHAR2,P_DAT_END IN VARCHAR2, P_TYP_KOD IN NUMBER DEFAULT 1) is
+  PROCEDURE inflation_nd(P_ND IN  NUMBER,  P_DAT_BEGIN IN DATE,P_DAT_END IN DATE, P_TYP_KOD IN NUMBER DEFAULT 1) is
  l_acc number;
+
  date_prior date;
  l_on number:=0;
  begin
@@ -254,14 +257,13 @@ select count(*)  into l_count
      RAISE_APPLICATION_ERROR (-20999,'Тип договору вказан не вірно TYP='||nvl(to_char(P_TYP_KOD),'null')||' (повинен бути 1-Кредит 2-БПК 0-рах)');
   end if;
    -- Проверяем кор-ть реф (асс) счета
-  --if  P_TYP_KOD=0    then select count(acc) into l_on from accounts where acc=P_ND; Не находился счет, поиск идет через nls VL 01.17.2018
-  if    P_TYP_KOD=0    then select count(nls) into l_on from accounts where nls=P_ND;
+  if  P_TYP_KOD=0    then select count(acc) into l_on from accounts where acc=P_ND;
   elsif P_TYP_KOD=1  then select count(nd)  into l_on from cc_deal  where nd=P_ND;
   elsif P_TYP_KOD=2  then select count(nd)  into l_on from w4_acc   where nd=P_ND;
   end if;
 
   if l_on<1 then
-     RAISE_APPLICATION_ERROR (-20999, (case when P_TYP_KOD=1 then 'Кредитний договір' when P_TYP_KOD=2 then 'Договір БПК' else 'Рахунок NLS = ' end)||to_char(P_ND)||' не знайден.');
+     RAISE_APPLICATION_ERROR (-20999, (case when P_TYP_KOD=1 then 'Кредитний договір' when P_TYP_KOD=2 then 'Договір БПК' else 'Рахунок АСС = ' end)||to_char(P_ND)||' не знайден.');
   end if ;
 
     -- для случаев когда из КД будет выведен счет после расчета
@@ -347,6 +349,7 @@ select count(*)  into l_count
  end;
 
 END rep_inflation_court;
+
 /
  show err;
  
