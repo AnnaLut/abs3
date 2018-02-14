@@ -20,7 +20,7 @@ BEGIN
 
   Loop
 
-    UPDATE TARIF set PR=0.2, SMIN=5
+    UPDATE TARIF set PR=0.2, SMIN=500
       where KOD = 31 and KF = k.KF;
 
 
@@ -33,6 +33,19 @@ BEGIN
                NAME='1.2.10.1 Вiдправлення переказiв ІВ по SWIFT (в межах України)'
       where KOD = 12 and KF = k.KF;
     
+  End Loop;
+
+END;
+/
+commit;
+
+BEGIN
+
+  Bc.go('/') ;
+
+  For k in (Select KF from MV_KF)
+
+  Loop
 
     INSERT INTO TARIF 
     ( KOD,
@@ -42,7 +55,23 @@ BEGIN
     (119, 
      840,'1.2.10.2 Вiдправлення переказiв IВ по SWIFT (за межі України)', 0, 1,
      1500, 50000, 0, NULL, NULL, k.KF );
-    
+
+  End Loop;
+
+  
+EXCEPTION WHEN dup_val_on_index then
+  null;
+END;
+/
+commit;
+
+BEGIN
+
+  Bc.go('/') ;
+
+  For k in (Select KF from MV_KF)
+
+  Loop
     
     INSERT INTO TARIF 
     ( KOD,
@@ -52,7 +81,22 @@ BEGIN
     (120, 
      840,'1.6.2.3.1 Вiдправлення переказiв IВ по SWIFT VIP-кл. (в межах України)', 0, 1,
      5000, null, 0, NULL, NULL, k.KF );
-    
+
+  End Loop;  
+  
+EXCEPTION WHEN dup_val_on_index then
+  null;
+END;
+/
+commit;
+
+BEGIN
+
+  Bc.go('/') ;
+
+  For k in (Select KF from MV_KF)
+
+  Loop
     
     INSERT INTO TARIF 
     ( KOD,
@@ -63,12 +107,10 @@ BEGIN
      840,'1.6.2.3.2 Вiдправлення переказiв IВ по SWIFT VIP-кл. (за межі України)', 0, 1,
      5000, 50000, 0, NULL, NULL, k.KF );
 
-  End Loop;
+    End Loop;  
 
-  Bc.home();
-
-EXCEPTION WHEN OTHERS then
-   null;
+EXCEPTION WHEN dup_val_on_index then
+  null;
 END;
 /
 commit;
