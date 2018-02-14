@@ -1384,6 +1384,10 @@ BEGIN
                END IF;
             END IF;
 
+            if nbs_ = '2615' then
+               nbs_ := '2610';
+            end if;
+
             -- запись параметров депозитного договора
             p_ins_depozit (2);
          END IF;
