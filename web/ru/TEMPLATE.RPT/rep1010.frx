@@ -20,7 +20,7 @@ namespace FastReport
   {
     private void _FinishReport(object sender, EventArgs e)
     {
-     
+
     }
   }
 }
