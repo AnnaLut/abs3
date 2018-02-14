@@ -1,7 +1,6 @@
-=========  svn diff --summarize -r 47328:47508 D:\SVN\master\web\ru
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.168\ru\web\barsroot\version.abs
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.168\ru\web\barsroot\w4\import_esk_file.aspx
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.168\ru\web\barsroot\docinput\js\chkForm.js
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.168\ru\web\barsroot
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.168\ru\web
-Bugfix_2.0.35.5.168 (Rev:47328-47508
+=========  svn diff --summarize -r 47509:47739 D:\SVN\master\web\ru
+---web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.169\ru\web\TEMPLATE.RPT\rep1010.frx
+---web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.169\ru\web\TEMPLATE.RPT\ICCK.frx
+---web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.169\ru\web\barsroot\version.abs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.169\ru\web
+Bugfix_2.0.35.5.169 (Rev:47509-47739
