@@ -69,6 +69,14 @@ begin
     execute immediate 'ALTER SESSION ENABLE PARALLEL DDL';
     execute immediate 'ALTER SESSION ENABLE PARALLEL DML';
 
+    -- KF + all other columns
+    select LISTAGG(t.COLUMN_NAME,', ') WITHIN GROUP ( order by case t.COLUMN_NAME when 'KF' then null else t.COLUMN_NAME end NULLS FIRST )
+      into l_col_lst
+      from ALL_TAB_COLS t
+     where OWNER = 'BARS'
+       and TABLE_NAME = l_tab_nm
+       and COLUMN_NAME != 'K150';
+
     begin
       execute immediate 'alter table ' || l_tab_nm || ' read only';
     exception
@@ -76,52 +84,9 @@ begin
         dbms_output.put_line( 'Table "'|| l_tab_nm || '" is already in read-only mode.' );
     end;
 
-    l_tab_stmt := 'create table TEST_' || l_tab_nm || q'[
-( KF     default sys_context('bars_context','user_mfo') not null
-, ACC                                                   not null
-, R011
-, R012
-, R013
-, R014
-, R016
-, R114
-, D020
-, K072
-, KEKD
-, KTK
-, KVD
-, KVK
-, IDG
-, IDS
-, SPS
-, KBK
-, NKD
-, ISTVAL
-, S031
-, S080
-, S090
-, S120
-, S130
-, S180
-, S181
-, S182
-, S190
-, S200
-, S230
-, S240
-, S250
-, S260
-, S270
-, S280
-, S290
-, S370
-, S580
-, Z290
-, D1#F9
-, NF#F9
-, DP1
+    l_tab_stmt := 'create table TEST_' || l_tab_nm || chr(10) || '( ' ||
+    replace( l_col_lst, 'KF,', q'[KF default sys_context('bars_context','user_mfo') not null,]' ) || q'[
 ) tablespace BRSBIGD
-COMPRESS FOR OLTP
 PARALLEL 24
 STORAGE( INITIAL 32K NEXT 32K )
 PARTITION BY LIST (KF)
@@ -153,10 +118,10 @@ PARTITION BY LIST (KF)
 , PARTITION P_356334 VALUES ('356334')
 )
 as
-select /*+ parallel( 24 ) */ KF, ACC, R011, R012, R013, R014, R016, R114, D020, K072, KEKD, KTK, KVD, KVK, IDG, IDS, SPS, KBK, NKD, ISTVAL
-     , S031, S080, S090, S120, S130, S180, S181, S182, S190, S200, S230, S240, S250, S260, S270, S280, S290, S370, S580, Z290, D1#F9, NF#F9, DP1
-  from SPECPARAM
- order by ACC ]'; -- for better Clustering Factor
+select /*+ parallel( 24 ) */ ]' || l_col_lst || q'[
+  from ]'|| l_tab_nm || '
+ order by ACC, KF'; -- for better Clustering Factor
+
 
     execute immediate l_tab_stmt;
     dbms_output.put_line( 'Table "TEST_'||l_tab_nm||'" created.' );
