@@ -161,10 +161,11 @@ select /*+ parallel( 24 ) */ ]' || l_col_lst || q'[
     begin
       dbms_output.put_line( 'Copying default column values from source table.' );
       for dv in ( select COLUMN_NAME, DATA_DEFAULT, DEFAULT_LENGTH
-                    from ALL_TAB_COLS t
+                    from ALL_TAB_COLS
                    where OWNER = 'BARS'
                      and TABLE_NAME = l_tab_nm
                      and COLUMN_NAME != 'KF'
+                     and COLUMN_ID > 0
                      and DATA_DEFAULT IS NOT NULL
       ) loop
         begin
