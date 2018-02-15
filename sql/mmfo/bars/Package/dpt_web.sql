@@ -1043,7 +1043,7 @@ show errors;
 create or replace package body DPT_WEB
 is
 
-  g_body_version  constant varchar2(32)  := 'version 48.06  25.10.2017';
+  g_body_version  constant varchar2(32)  := 'version 48.07  15.02.2018';
   g_awk_body_defs constant varchar2(512) := 'Сбербанк' || chr(10) ||
                                             'KF - мульти-МФО схема с доступом по филиалам' || chr(10) ||
                                             'MULTIFUNC - расширенный функционал' || chr(10) ||
@@ -7974,7 +7974,7 @@ is
                                        'AUTOCLOS_ENTRY',
                                        p_branch));
     end if;
-  
+   /* COBUMMFO-6387
     select deposit_id, nd, vidd, rnk, acc, null, null, null, null, null
       bulk collect
       into l_dpt
@@ -8009,7 +8009,62 @@ is
                and d.dat_begin < add_months(p.bday, 12)
                and fkos(d.acc, d.datz, p_bdate) = 0
                and add_months(p.bday, 12) between dat_next_u(p_bdate, -1) and
-                   p_bdate);
+                   p_bdate); 
+      */
+    
+    --COBUMMFO-6387
+    select ddd.deposit_id, ddd.nd, ddd.vidd, ddd.rnk, ddd.acc, a.nls, a.kv, ia.acra,
+               (case
+                 when dv.amr_metr > 0 then
+                  ia.acrb
+                 else
+                  null
+               end),
+               a.blkd
+      bulk collect
+      into l_dpt
+      from (select d.deposit_id, d.nd, d.vidd, d.rnk, d.acc
+              from dpt_deposit d
+             where d.branch = p_branch
+               and d.deposit_id = decode(p_dptid, 0, d.deposit_id, p_dptid)
+               and d.dat_end <= p_bdate
+            union all
+            select d.deposit_id, d.nd, d.vidd, d.rnk, d.acc
+              from dpt_deposit d, dpt_deposit_clos c
+             where d.branch = p_branch
+               and d.deposit_id = decode(p_dptid, 0, d.deposit_id, p_dptid)
+               and d.deposit_id = c.deposit_id
+               and c.action_id = 5
+            union all
+            select d.deposit_id, d.nd, d.vidd, d.rnk, d.acc
+              from dpt_deposit d, dpt_depositw w
+             where d.branch = p_branch
+               and d.deposit_id = decode(p_dptid, 0, d.deposit_id, p_dptid)
+                  --and d.dat_end    is null
+               and d.deposit_id = w.dpt_id
+               and w.tag = tag_2clos
+               and w.value = val_2clos
+            union all -- Майбутнє дітям
+            select d.deposit_id, d.nd, d.vidd, d.rnk, d.acc
+              from dpt_deposit d, person p
+             where d.branch = p_branch
+               and d.vidd in (53, 14)
+               and d.rnk = p.rnk
+               and p.bday is not null
+               and d.dat_begin < add_months(p.bday, 12)
+               and fkos(d.acc, d.datz, p_bdate) = 0
+               and add_months(p.bday, 12) between dat_next_u(p_bdate, -1) and
+                   p_bdate) ddd,
+                   dpt_vidd dv,
+                   accounts a,
+                   int_accn ia
+              where dv.vidd = ddd.vidd
+                and a.acc = ddd.acc
+                and a.acc = ia.acc      
+                and ia.id = 1
+                and acc_closing_permitted(ia.acc, 0) = 1
+                and acc_closing_permitted(ia.acra, 0) = 1
+                and (dv.amr_metr = 0 or dv.amr_metr > 0 and acc_closing_permitted(ia.acrb, 0) = 1);               
   
     for i in 1 .. l_dpt.count loop
     
@@ -8017,8 +8072,10 @@ is
                        title,
                        to_char(l_dpt(i).dptid) || '...');
     
-      begin
+      /* COBUMMFO-6387
+       begin
       
+       
         select a.nls,
                a.kv,
                i.acra,
@@ -8042,7 +8099,7 @@ is
            and acc_closing_permitted(i.acc, 0) = 1
            and acc_closing_permitted(i.acra, 0) = 1
            and (v.amr_metr = 0 or
-               v.amr_metr > 0 and acc_closing_permitted(i.acrb, 0) = 1);
+               v.amr_metr > 0 and acc_closing_permitted(i.acrb, 0) = 1); */
       
         savepoint del_ok;
       
@@ -8131,12 +8188,15 @@ is
                                       p_contractid => null);
             rollback to del_ok;
         end;
-      exception
+
+     /* COBUMMFO-6387
+       exception
         when no_data_found then
           bars_audit.trace('%s clos denied for deposit № %s',
                            title,
                            to_char(l_dpt(i).dptid));
-      end;
+      end; */ 
+      
       l_cnt := l_cnt + 1;
       if l_cnt >= l_autocommit then
         bars_audit.info(title || ' autocommit');

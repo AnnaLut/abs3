@@ -24,18 +24,18 @@ PROMPT *** Create  table DPT_REQUESTS ***
 begin 
   execute immediate '
   CREATE TABLE BARS.DPT_REQUESTS 
-   (	REQ_ID NUMBER(38,0), 
-	REQTYPE_ID NUMBER(38,0), 
-	REQ_BDATE DATE, 
-	REQ_CRDATE DATE, 
-	REQ_CRUSERID NUMBER(38,0), 
-	REQ_PRCDATE DATE, 
-	REQ_PRCUSERID NUMBER(38,0), 
-	REQ_STATE NUMBER(1,0), 
-	DPT_ID NUMBER(38,0), 
-	OTM NUMBER(1,0), 
-	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo''), 
-	BRANCH VARCHAR2(30) DEFAULT sys_context(''bars_context'',''user_branch'')
+   (  REQ_ID NUMBER(38,0), 
+  REQTYPE_ID NUMBER(38,0), 
+  REQ_BDATE DATE, 
+  REQ_CRDATE DATE, 
+  REQ_CRUSERID NUMBER(38,0), 
+  REQ_PRCDATE DATE, 
+  REQ_PRCUSERID NUMBER(38,0), 
+  REQ_STATE NUMBER(1,0), 
+  DPT_ID NUMBER(38,0), 
+  OTM NUMBER(1,0), 
+  KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo''), 
+  BRANCH VARCHAR2(30) DEFAULT sys_context(''bars_context'',''user_branch'')
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -217,8 +217,6 @@ exception when others then
 /
 
 
-
-
 PROMPT *** Create  index PK_DPTREQS ***
 begin   
  execute immediate '
@@ -244,6 +242,17 @@ exception when others then
  end;
 /
 
+
+PROMPT *** Create  index I2_DPTREQDPTID ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.I2_DPTREQDPTID ON BARS.DPT_REQUESTS (DPT_ID) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
 
 
 PROMPT *** Create  grants  DPT_REQUESTS ***
