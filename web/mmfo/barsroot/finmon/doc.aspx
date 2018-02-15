@@ -393,9 +393,7 @@
             HoverRowCssClass="headerRow"
             RefreshImageUrl="/common/images/default/16/refresh.png"
             ExcelImageUrl="/common/images/default/16/export_excel.png"
-            FilterImageUrl="/common/images/default/16/filter.png"
-                               OnPreRender="gvFmDocs_OnPreRender"
-                               OnPageIndexChanged="gvFmDocs_OnPageIndexChanged">
+            FilterImageUrl="/common/images/default/16/filter.png">
             <AlternatingRowStyle CssClass="alternateRow" />
             <Columns>
                 <asp:TemplateField ItemStyle-HorizontalAlign="Center">
