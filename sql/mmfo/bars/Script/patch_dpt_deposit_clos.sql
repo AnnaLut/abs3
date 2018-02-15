@@ -73,8 +73,12 @@ begin
     select LISTAGG(t.COLUMN_NAME,', ') WITHIN GROUP ( order by case t.COLUMN_NAME when 'KF' then -1 else t.COLUMN_ID end )
       into l_col_lst
       from ALL_TAB_COLS t
-     where OWNER = 'BARS' 
-       and TABLE_NAME = l_tab_nm;
+     where t.OWNER = 'BARS' 
+       and t.TABLE_NAME = l_tab_nm
+       and t.COLUMN_ID > 0
+--     and t.HIDDEN_COLUMN = 'NO'
+--     and t.VIRTUAL_COLUMN = 'NO'
+    ;
 
     begin
       execute immediate 'alter table ' || l_tab_nm || ' read only';
@@ -89,7 +93,7 @@ begin
 COMPRESS FOR OLTP
 PARALLEL 24
 STORAGE( INITIAL 256K NEXT 256K )
-PARTITION BY RANGE (WHEN) INTERVAL( NUMTOYMINTERVAL(3,'MONTH'))
+PARTITION BY RANGE ("WHEN") INTERVAL( NUMTOYMINTERVAL(3,'MONTH'))
 SUBPARTITION BY LIST (KF)
 SUBPARTITION TEMPLATE
 ( SUBPARTITION SP_300465 VALUES ('300465')
@@ -142,8 +146,14 @@ as
 select /*+ parallel( 24 ) */ ]' || l_col_lst || q'[
   from ]'|| l_tab_nm;
 
-    execute immediate l_tab_stmt;
-    dbms_output.put_line( 'Table "TEST_'||l_tab_nm||'" created.' );
+    begin
+      execute immediate l_tab_stmt;
+      dbms_output.put_line( 'Table "TEST_'||l_tab_nm||'" created.' );
+    exception
+      when OTHERS then
+        dbms_output.put_line( l_tab_stmt ||chr(10)|| sqlerrm );
+        raise;
+    end;
 
     -- ======================================================
     -- Default Values
