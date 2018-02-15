@@ -34,6 +34,7 @@ public partial class finmon_doc : Bars.BarsPage
     const int OMFieldidx = 15;
     const int VMFieldidx = 17;
     const string BULK_REFS_KEY = "FinmonBulkRefs";//список референсов для пакетной установке кодов ОМ/ВМ
+    private const string CURRENT_PAGE = "currentPage";
     #endregion
 
     #region Properties
@@ -239,6 +240,7 @@ public partial class finmon_doc : Bars.BarsPage
             Session["FinmonDat2"] = null;
             Session["FinmonStatuses"] = "0";
             Session["FinmonBlockedDocs"] = "0";
+            Session[CURRENT_PAGE] = null;
 
             FillData();
         }
@@ -1197,5 +1199,19 @@ public partial class finmon_doc : Bars.BarsPage
         //}
 
         gvFmDocs.PageIndex = 0;
-    } 
+    }
+
+    protected void gvFmDocs_OnPreRender(object sender, EventArgs e)
+    {
+        int pageIndex;
+        if (null != Session[CURRENT_PAGE] && int.TryParse(Session[CURRENT_PAGE].ToString(), out pageIndex))
+        {
+            gvFmDocs.PageIndex = pageIndex < gvFmDocs.PageCount ? pageIndex : gvFmDocs.PageIndex;
+        }
+    }
+
+    protected void gvFmDocs_OnPageIndexChanged(object sender, EventArgs e)
+    {
+        Session[CURRENT_PAGE] = gvFmDocs.PageIndex;
+    }
 }
