@@ -1,7 +1,7 @@
 -- ================================================================================
 -- Module : CAC
 -- Author : BAA
--- Date   : 14.02.2018
+-- Date   : 15.02.2018
 -- ================================== <Comments> ==================================
 -- recreate table SPECPARAM
 -- ================================================================================
@@ -232,6 +232,7 @@ select /*+ parallel( 24 ) */ ]' || l_col_lst || q'[
                       , TRIGGER_NAME as OBJ_NM
                    from USER_TRIGGERS
                   where TABLE_NAME = l_tab_nm
+                    and TRIGGER_NAME = 'TAIUD_SPECPARAM_UPDATE'
              )
       loop
         t_stmt.EXTEND;
