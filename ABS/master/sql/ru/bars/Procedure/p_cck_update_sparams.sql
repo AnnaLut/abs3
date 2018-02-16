@@ -2,35 +2,37 @@ prompt procedure p_cck_update_sparams
 create or replace procedure p_cck_update_sparams(p_start_date in date, p_end_date in date)
 is
 /* 
-v.1.0 17.01.2018 
+v.1.1 14.02.2018 
 COBUMMFO-6175
-РџСЂРё СЂСѓС‡РЅРѕРјСѓ СЂРµРґР°РіСѓРІР°РЅРЅС– РїР°СЂР°РјРµС‚СЂР° R011 РЅР° РѕСЃРЅРѕРІРЅРѕРјСѓ СЂР°С…СѓРЅРєСѓ SS - РЅРµРѕР±С…С–РґРЅРѕ СЂРµР°Р»С–Р·СѓРІР°С‚Рё РїСЂРѕС†РµРґСѓСЂСѓ, 
-СЏРєР° Р±СѓРґРµ Р·РјС–РЅСЋРІР°С‚Рё R011 РЅР° СЂР°С…СѓРЅРєР°С… SP, SDI,SN,SNO, SNA, SPN С†С–С”С— СѓРіРѕРґРё , - РїСЂРё Р·Р°РєСЂРёС‚С‚С– Р±Р°РЅРєС–РІСЃСЊРєРѕРіРѕ РґРЅСЏ.
+При ручному редагуванні параметра R011 на основному рахунку SS - необхідно реалізувати процедуру, 
+яка буде змінювати R011 на рахунках SP, SDI,SN,SNO, SNA, SPN цієї угоди , - при закритті банківського дня.
 */
 l_title constant varchar2(32) := 'P_CCK_UPDATE_SPARAMS';
 begin
     bars_audit.info(l_title||': start for '||p_start_date||', '||p_end_date);
     for rec in (
         with
-        changed_sp_accs as /* СЃС‡РµС‚Р° SS, РїРѕ РєРѕС‚РѕСЂС‹Рј РјРµРЅСЏР»РёСЃСЊ СЃРїРµС†РїР°СЂР°РјРµС‚СЂС‹ Р·Р° РґР°С‚Сѓ */
+        changed_sp_accs as /* счета SS, по которым менялись спецпараметры за дату */
         (
         select distinct su.acc, su.kf from bars.specparam_update su
         join bars.accounts a on su.acc = a.acc and su.kf = a.kf
         where su.effectdate between p_start_date and p_end_date
         and a.tip = 'SS'),
-        nd_r011 as /* nd Рё r011 СЌС‚РёС… СЃС‡РµС‚РѕРІ  */
+        nd_r011 as /* nd и r011 этих счетов  */
         (select nd, r011
         from bars.specparam s
         join changed_sp_accs ca on s.acc = ca.acc
         join bars.nd_acc na on ca.acc = na.acc and ca.kf = na.kf)
-        select na.acc, ndr11.r011 /* РІСЃРµ СЃС‡РµС‚Р° Рё РЅСѓР¶РЅС‹Рµ r011 РґР»СЏ РЅРёС… */
+        select na.acc, ndr11.r011 /* все счета и нужные r011 для них */
         from bars.nd_acc na
         join nd_r011 ndr11 on na.nd = ndr11.nd
+		join accounts a on na.acc = a.acc and na.kf = a.kf
+		where a.tip in ('SP ', 'SDI','SN ','SNO', 'SNA', 'SPN')
         )
     loop
         savepoint sp1;
         begin
-            bars_audit.trace(l_title||': РѕР±РЅРѕРІР»СЏРµРј СЃРїРµС†РїР°СЂР°РјРµС‚СЂС‹ СЃС‡РµС‚Р°: #'||rec.acc);
+            bars_audit.trace(l_title||': обновляем спецпараметры счета: #'||rec.acc);
             accreg.setAccountSParam(rec.acc, 'R011', rec.r011);
         exception
             when others then
