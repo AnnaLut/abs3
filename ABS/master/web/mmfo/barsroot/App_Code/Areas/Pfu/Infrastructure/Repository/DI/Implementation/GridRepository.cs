@@ -207,42 +207,94 @@ namespace BarsWeb.Areas.Pfu.Infrastructure.Repository.DI.Implementation
         }
         private BarsSql InitSearchQuery(SearchQuery qv)
         {
-
-            return new BarsSql()
+            var sqlText = new StringBuilder(@"SELECT * FROM pfu.v_pfu_pensioner where null is null ");
+            var sqlParams = new List<OracleParameter>();
+            if (!string.IsNullOrWhiteSpace(qv.Okpo))
             {
-                SqlText = @"SELECT * FROM pfu.v_pfu_pensioner WHERE
-                    (okpo = :p_okpo OR :p_okpo IS NULL)
-                       AND ((ser = :p_ser OR :p_ser IS NULL)
-                            AND (numdoc = :p_numdoc OR :p_numdoc IS NULL)
-                            AND (passp = :p_passp OR :p_passp IS NULL))
-                       AND (nmk LIKE '%' || upper(:p_nmk) || '%' OR :p_nmk IS NULL)
-                       AND (branch = :p_branch OR :p_branch IS NULL)
-                       AND (nls LIKE :p_nls || '%' OR :p_nls IS NULL)
-                       AND (kf = :p_kf OR :p_kf IS NULL)
-                       AND (is_okpo_well = :p_ipn OR :p_ipn IS NULL)",
-
-                SqlParams = new object[]
-                {
-                    new OracleParameter("p_okpo", OracleDbType.Varchar2) { Value = qv.Okpo },
-                    new OracleParameter("p_okpo", OracleDbType.Varchar2) { Value = qv.Okpo },
-                    new OracleParameter("p_ser", OracleDbType.Varchar2) { Value = qv.Ser },
-                    new OracleParameter("p_ser", OracleDbType.Varchar2) { Value = qv.Ser },
-                    new OracleParameter("p_numdoc", OracleDbType.Varchar2) { Value = qv.NumDoc },
-                    new OracleParameter("p_numdoc", OracleDbType.Varchar2) { Value = qv.NumDoc },
-                    new OracleParameter("p_passp", OracleDbType.Decimal) { Value = qv.Passp },
-                    new OracleParameter("p_passp", OracleDbType.Decimal) { Value = qv.Passp },
-                    new OracleParameter("p_nmk", OracleDbType.Varchar2) { Value = qv.Nmk },
-                    new OracleParameter("p_nmk", OracleDbType.Varchar2) { Value = qv.Nmk },
-                    new OracleParameter("p_branch", OracleDbType.Varchar2) { Value = qv.Branch },
-                    new OracleParameter("p_branch", OracleDbType.Varchar2) { Value = qv.Branch },
-                    new OracleParameter("p_nls", OracleDbType.Varchar2) { Value = qv.Nls },
-                    new OracleParameter("p_nls", OracleDbType.Varchar2) { Value = qv.Nls },
-                    new OracleParameter("p_kf", OracleDbType.Varchar2) { Value = qv.Kf },
-                    new OracleParameter("p_kf", OracleDbType.Varchar2) { Value = qv.Kf },
-                    new OracleParameter("p_ipn", OracleDbType.Int32) {Value = GetIPNNforSearch(qv)},
-                    new OracleParameter("p_ipn", OracleDbType.Int32) {Value =GetIPNNforSearch(qv) }
-                }
+                sqlText.Append(@"and okpo = :p_okpo ");
+                sqlParams.Add(new OracleParameter("p_okpo", OracleDbType.Varchar2) { Value = qv.Okpo.Trim() });
+            }
+            if (!string.IsNullOrWhiteSpace(qv.Ser))
+            {
+                sqlText.Append(@"and ser = :p_ser ");
+                sqlParams.Add(new OracleParameter("p_ser", OracleDbType.Varchar2) { Value = qv.Ser.Trim() });
+            }
+            if (!string.IsNullOrWhiteSpace(qv.NumDoc))
+            {
+                sqlText.Append(@"and numdoc = :p_numdoc ");
+                sqlParams.Add(new OracleParameter("p_numdoc", OracleDbType.Varchar2) { Value = qv.NumDoc.Trim() });
+            }
+            if (qv.Passp.HasValue)
+            {
+                sqlText.Append(@"and passp = :p_passp ");
+                sqlParams.Add(new OracleParameter("p_passp", OracleDbType.Decimal) { Value = qv.Passp });
+            }
+            if (!string.IsNullOrWhiteSpace(qv.Nmk))
+            {
+                sqlText.Append(@"and nmk like :p_nmk ");
+                sqlParams.Add(new OracleParameter("p_nmk", OracleDbType.Varchar2) { Value = string.Format("%{0}%", qv.Nmk.Trim().ToUpper()) });
+            }
+            if (!string.IsNullOrWhiteSpace(qv.Branch))
+            {
+                sqlText.Append(@"and branch = :p_branch ");
+                sqlParams.Add(new OracleParameter("p_branch", OracleDbType.Varchar2) { Value = qv.Branch.Trim() });
+            }
+            if (!string.IsNullOrWhiteSpace(qv.Nls))
+            {
+                sqlText.Append(@"and nls like :p_nls ");
+                sqlParams.Add(new OracleParameter("p_nls", OracleDbType.Varchar2) { Value = string.Format("{0}%", qv.Nls.Trim()) });
+            }
+            if (!string.IsNullOrWhiteSpace(qv.Kf))
+            {
+                sqlText.Append(@"and kf = :p_kf ");
+                sqlParams.Add(new OracleParameter("p_kf", OracleDbType.Varchar2) { Value = qv.Kf.Trim() });
+            }
+            var isOkpoWell = GetIPNNforSearch(qv);
+            if (isOkpoWell.HasValue)
+            {
+                sqlText.Append(@"and is_okpo_well = :p_is_okpo_well ");
+                sqlParams.Add(new OracleParameter("p_is_okpo_well", OracleDbType.Int32) { Value = isOkpoWell });
+            }
+            return new BarsSql
+            {
+                SqlText = sqlText.ToString(),
+                SqlParams = sqlParams.ToArray()
             };
+            //return new BarsSql()
+            //{
+            //    SqlText = @"SELECT * FROM pfu.v_pfu_pensioner WHERE
+            //        (okpo = :p_okpo OR :p_okpo IS NULL)
+            //           AND ((ser = :p_ser OR :p_ser IS NULL)
+            //                AND (numdoc = :p_numdoc OR :p_numdoc IS NULL)
+            //                AND (passp = :p_passp OR :p_passp IS NULL))
+            //           AND (nmk LIKE '%' || upper(:p_nmk) || '%' OR :p_nmk IS NULL)
+            //           AND (branch = :p_branch OR :p_branch IS NULL)
+            //           AND (nls LIKE :p_nls || '%' OR :p_nls IS NULL)
+            //           AND (kf = :p_kf OR :p_kf IS NULL)
+            //           AND (is_okpo_well = :p_ipn OR :p_ipn IS NULL)",
+
+            //    SqlParams = new object[]
+            //    {
+            //        new OracleParameter("p_okpo", OracleDbType.Varchar2) { Value = qv.Okpo },
+            //        new OracleParameter("p_okpo", OracleDbType.Varchar2) { Value = qv.Okpo },
+            //        new OracleParameter("p_ser", OracleDbType.Varchar2) { Value = qv.Ser },
+            //        new OracleParameter("p_ser", OracleDbType.Varchar2) { Value = qv.Ser },
+            //        new OracleParameter("p_numdoc", OracleDbType.Varchar2) { Value = qv.NumDoc },
+            //        new OracleParameter("p_numdoc", OracleDbType.Varchar2) { Value = qv.NumDoc },
+            //        new OracleParameter("p_passp", OracleDbType.Decimal) { Value = qv.Passp },
+            //        new OracleParameter("p_passp", OracleDbType.Decimal) { Value = qv.Passp },
+            //        new OracleParameter("p_nmk", OracleDbType.Varchar2) { Value = qv.Nmk },
+            //        new OracleParameter("p_nmk", OracleDbType.Varchar2) { Value = qv.Nmk },
+            //        new OracleParameter("p_branch", OracleDbType.Varchar2) { Value = qv.Branch },
+            //        new OracleParameter("p_branch", OracleDbType.Varchar2) { Value = qv.Branch },
+            //        new OracleParameter("p_nls", OracleDbType.Varchar2) { Value = qv.Nls },
+            //        new OracleParameter("p_nls", OracleDbType.Varchar2) { Value = qv.Nls },
+            //        new OracleParameter("p_kf", OracleDbType.Varchar2) { Value = qv.Kf },
+            //        new OracleParameter("p_kf", OracleDbType.Varchar2) { Value = qv.Kf },
+            //        new OracleParameter("p_ipn", OracleDbType.Int32) {Value = GetIPNNforSearch(qv)},
+            //        new OracleParameter("p_ipn", OracleDbType.Int32) {Value =GetIPNNforSearch(qv) }
+            //    }
+            //};
         }
 
 
