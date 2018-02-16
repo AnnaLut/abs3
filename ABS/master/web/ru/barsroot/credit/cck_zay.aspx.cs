@@ -858,7 +858,7 @@ public partial class credit_cck_zay : Bars.BarsPage
             cmd.Parameters.Add("nFIN", OracleDbType.Decimal, NFIN.Value, ParameterDirection.Input);
             cmd.Parameters.Add("nFREQ", OracleDbType.Decimal, NFREQ.Value, ParameterDirection.Input);
             cmd.Parameters.Add("dfDen", OracleDbType.Decimal, DFDEN.Value, ParameterDirection.Input);
-            cmd.Parameters.Add("PROD_", OracleDbType.Decimal, Convert.ToDecimal(Request.Params.Get("PROD")), ParameterDirection.Input);
+            cmd.Parameters.Add("PROD_", OracleDbType.Varchar2, Convert.ToString(Request.Params.Get("PROD")), ParameterDirection.Input);
 
             cmd.Parameters.Add("nBANK", OracleDbType.Decimal, NBANK.Value, ParameterDirection.Input);
             cmd.Parameters.Add("NLS", OracleDbType.Varchar2, NLS_MFO.Value, ParameterDirection.Input);

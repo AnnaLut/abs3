@@ -576,7 +576,7 @@ where c.rnk = :p_rnk";
             if (!IsPostBack)
             {
                 DataTable dtBASEY = new DataTable();
-                cmd.CommandText = "select basey as id, basey || ' - ' || name || ' (' || name_mb || ')' as name from basey";
+                cmd.CommandText = "select basey as id, basey || ' - ' || name || ' (' || name_mb || ')' as name from basey order by id";
                 adr.Fill(dtBASEY);
 
                 BASEY.DataSource = dtBASEY;
@@ -627,7 +627,7 @@ where c.rnk = :p_rnk";
             if (!IsPostBack)
             {
                 DataTable dtNFREQ = new DataTable();
-                cmd.CommandText = "select freq as id, freq || ' - ' || name as name from freq";
+                cmd.CommandText = "select freq as id, freq || ' - ' || name as name from freq order by id";
                 adr.Fill(dtNFREQ);
 
                 NFREQ.DataSource = dtNFREQ;
@@ -922,7 +922,7 @@ where c.rnk = :p_rnk";
             cmd.Parameters.Add("nFIN", OracleDbType.Decimal, NFIN.Value, ParameterDirection.Input);
             cmd.Parameters.Add("nFREQ", OracleDbType.Decimal, NFREQ.Value, ParameterDirection.Input);
             cmd.Parameters.Add("dfDen", OracleDbType.Decimal, DFDEN.Value, ParameterDirection.Input);
-            cmd.Parameters.Add("PROD_", OracleDbType.Decimal, Convert.ToDecimal(Request.Params.Get("PROD")), ParameterDirection.Input);
+            cmd.Parameters.Add("PROD_", OracleDbType.Varchar2, Convert.ToString(Request.Params.Get("PROD")), ParameterDirection.Input);
 
             cmd.Parameters.Add("nBANK", OracleDbType.Decimal, NBANK.Value, ParameterDirection.Input);
             cmd.Parameters.Add("NLS", OracleDbType.Varchar2, NLS_MFO.Value, ParameterDirection.Input);
