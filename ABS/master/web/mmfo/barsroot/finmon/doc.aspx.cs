@@ -252,6 +252,7 @@ public partial class finmon_doc : Bars.BarsPage
 
         if(FinmonFilterApplyed == "1")
         {
+            gvFmDocs.Sort(string.Empty, SortDirection.Ascending);
             gvFmDocs.DataSourceID = string.Empty;
             gvFmDocs.DataBind();
         } else
