@@ -627,4 +627,8 @@ public partial class DepositAgreement2 : Bars.BarsPage
         }
         Response.Redirect(url);
     }
+    protected bool Check(object value)
+    {
+        return value.ToString()[0] != '5';
+    }
 }
