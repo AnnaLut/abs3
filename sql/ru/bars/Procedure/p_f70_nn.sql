@@ -7,7 +7,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :   Процедура формирования #70 для КБ (универсальная)
 % COPYRIGHT   :   Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     :   20/11/2017 (06/11/2017, 24/10/2017)
+% VERSION     :   05/01/2018 (13/12/2017, 20/11/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
       sheme_ - схема формирования
@@ -15,6 +15,11 @@ IS
                                  2 - надходження вiд нерезидентiв
                                  3 - всi операцii
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+05/01/2018 для отбора кода мети продажу из табл. ZAYAVKA добавил условие
+           rownum = 1 (замечание из Ровно)
+13/12/2017 не будут показатели 32NNN, 33NNN, 41NNN для покупки валюты или 
+           35NNN, 40NNN, 42NNN, 99NNN для продажи валюты 
+           если сумма док-та после операции округления < 1.00 USD 
 20/11/2017 для изменений от 26.04.2017 убрал условие MFO_ = 353553
            (Черниговское РУ) 
 06/11/2017 удалил блоки для закрытых МФО
@@ -1199,7 +1204,8 @@ BEGIN
                      WHERE p.fdat = dat_
                        and p.nlsd = nlsk_
                        and p.s*100 = sum0_
-                       and z.ref_sps = p.ref;
+                       and z.ref_sps = p.ref
+                       and rownum = 1;
                   EXCEPTION
                      WHEN NO_DATA_FOUND
                      THEN
@@ -1280,111 +1286,111 @@ BEGIN
                   end if;
 
 	          p_ins (nnnn_, '31', TRIM (okpo_));
-               end if;
 
-               IF pr_op_ = 1 AND ko_ = '1'  -- тiльки для купiвлi
-               THEN
-                  -- назва клiєнта
-                  p_ins (nnnn_, '32', TRIM (nmk_));
-                  -- адреса клiєнта
-                  p_ins (nnnn_, '33', TRIM (adr_));
-                  -- код виду економiчної дiяльностi клiєнта
-                  p_ins (nnnn_, '41', TRIM (k110_));
-               END IF;
-
-               IF dat_ >=TO_DATE('13082007','ddmmyyyy') and
-                  pr_op_ = 3 AND ko_ = 2 
-               THEN
-                  -- код резидентностi
-                  p_ins (nnnn_, '35', to_char(2-mod(codc_,2)));
-               END IF;
-
-               -- додатковi параметри
-               IF dat_ >= TO_DATE('03072006','ddmmyyyy')
-               THEN
-                  n_ := 11;
-               END IF;
-               IF dat_ >= TO_DATE('13082007','ddmmyyyy') and
-                  pr_op_ = 3 AND ko_ = 2
-               THEN
-                  n_ := 13;
-               END IF;
-
-               FOR i IN 1 .. n_
-               LOOP
-                  IF i < 10
+                  IF pr_op_ = 1 AND ko_ = '1'  -- тiльки для купiвлi
                   THEN
-                     tag_ := 'D' || TO_CHAR (i) || '#70';
-                  ELSIF i = 10
-                  THEN
-                     tag_ := 'DA#70';
-                  ELSIF i = 11
-                  THEN
-                     tag_ := 'DB#70';
-                  ELSIF i = 12
-                  THEN
-                     tag_ := 'DC#70';
-                  ELSE
-                     tag_ := 'DD#70';
+                     -- назва клiєнта
+                     p_ins (nnnn_, '32', TRIM (nmk_));
+                     -- адреса клiєнта
+                     p_ins (nnnn_, '33', TRIM (adr_));
+                     -- код виду економiчної дiяльностi клiєнта
+                     p_ins (nnnn_, '41', TRIM (k110_));
                   END IF;
 
-                  -- для покупки нужны все доп.реквизиты (D1#70 - DA#70)
-                  IF pr_op_ = 1 AND ko_ = 1
+                  IF dat_ >=TO_DATE('13082007','ddmmyyyy') and
+                     pr_op_ = 3 AND ko_ = 2 
                   THEN
-                     BEGIN
-                        SELECT SUBSTR (VALUE, 1, 70)
-                          INTO val_
-                          FROM operw
-                         WHERE REF = refd_ AND tag = tag_;
-                     EXCEPTION
-                        WHEN NO_DATA_FOUND
-                        THEN
-                           val_ := NULL;
-                     END;
+                     -- код резидентностi
+                     p_ins (nnnn_, '35', to_char(2-mod(codc_,2)));
+                  END IF;
 
-                     if dat_ <= to_date('01012013', 'ddmmyyyy') OR
-                        (dat_ between to_date('01012013', 'ddmmyyyy') and
-                                      to_date('31082014', 'ddmmyyyy') and 
-                                      i <> 11) OR
-                        dat_ >= to_date('01092014', 'ddmmyyyy')
-                     then
+                  -- додатковi параметри
+                  IF dat_ >= TO_DATE('03072006','ddmmyyyy')
+                  THEN
+                     n_ := 11;
+                  END IF;
+                  IF dat_ >= TO_DATE('13082007','ddmmyyyy') and
+                     pr_op_ = 3 AND ko_ = 2
+                  THEN
+                     n_ := 13;
+                  END IF;
+
+                  FOR i IN 1 .. n_
+                  LOOP
+                     IF i < 10
+                     THEN
+                        tag_ := 'D' || TO_CHAR (i) || '#70';
+                     ELSIF i = 10
+                     THEN
+                        tag_ := 'DA#70';
+                     ELSIF i = 11
+                     THEN
+                        tag_ := 'DB#70';
+                     ELSIF i = 12
+                     THEN
+                        tag_ := 'DC#70';
+                     ELSE
+                        tag_ := 'DD#70';
+                     END IF;
+
+                     -- для покупки нужны все доп.реквизиты (D1#70 - DA#70)
+                     IF pr_op_ = 1 AND ko_ = 1
+                     THEN
+                        BEGIN
+                           SELECT SUBSTR (VALUE, 1, 70)
+                              INTO val_
+                           FROM operw
+                           WHERE REF = refd_ AND tag = tag_;
+                        EXCEPTION
+                           WHEN NO_DATA_FOUND
+                           THEN
+                              val_ := NULL;
+                        END;
+
+                        if dat_ <= to_date('01012013', 'ddmmyyyy') OR
+                           (dat_ between to_date('01012013', 'ddmmyyyy') and
+                                         to_date('31082014', 'ddmmyyyy') and 
+                                         i <> 11) OR
+                           dat_ >= to_date('01092014', 'ddmmyyyy')
+                        then
+                           -- код показника та default-значення
+                           p_tag (i, val_, kodp_, ref_);
+                           -- запис показника
+                           p_ins (nnnn_, kodp_, val_);
+                        end if;
+                     END IF;
+
+                     -- для продажи нужны доп.реквизиты (D1#70)
+                     -- с 13.08.2007 нужны также доп.реквизиты D2#70,D3#70
+                     IF (dat_ >=TO_DATE('03072006','ddmmyyyy') and
+                         dat_ < TO_DATE('13082007','ddmmyyyy') and
+                         pr_op_ = 3 AND ko_ = 2 AND i=1) OR
+                         (dat_ >=TO_DATE('13082007','ddmmyyyy') and
+                          dat_ < TO_DATE('01062009','ddmmyyyy') and 
+                          pr_op_ = 3 AND ko_ = 2 AND i in (1, 2, 3, 13) OR 
+                         (dat_ >=TO_DATE('01062009','ddmmyyyy') and
+                          pr_op_ = 3 AND ko_ = 2 AND i in (1, 13)) OR 
+                         (dat_ >=TO_DATE('01062017','ddmmyyyy') and
+                          pr_op_ = 3 AND ko_ = 2 AND i in (1, 11, 13))) --AND ROUND (sum0_ / dig_, 0) >= 1
+                     THEN
+                        BEGIN
+                           SELECT SUBSTR (VALUE, 1, 70)
+                             INTO val_
+                           FROM operw
+                           WHERE REF = refd_ AND tag = tag_;
+                        EXCEPTION
+                           WHEN NO_DATA_FOUND
+                           THEN
+                           val_ := NULL;
+                        END;
+
                         -- код показника та default-значення
                         p_tag (i, val_, kodp_, ref_);
                         -- запис показника
                         p_ins (nnnn_, kodp_, val_);
-                     end if;
-                  END IF;
-
-                  -- для продажи нужны доп.реквизиты (D1#70)
-                  -- с 13.08.2007 нужны также доп.реквизиты D2#70,D3#70
-                  IF (dat_ >=TO_DATE('03072006','ddmmyyyy') and
-                      dat_ < TO_DATE('13082007','ddmmyyyy') and
-                      pr_op_ = 3 AND ko_ = 2 AND i=1) OR
-                      (dat_ >=TO_DATE('13082007','ddmmyyyy') and
-                       dat_ < TO_DATE('01062009','ddmmyyyy') and 
-                       pr_op_ = 3 AND ko_ = 2 AND i in (1, 2, 3, 13) OR 
-                      (dat_ >=TO_DATE('01062009','ddmmyyyy') and
-                       pr_op_ = 3 AND ko_ = 2 AND i in (1, 13)) OR 
-                      (dat_ >=TO_DATE('01062017','ddmmyyyy') and
-                       pr_op_ = 3 AND ko_ = 2 AND i in (1, 11, 13))) --AND ROUND (sum0_ / dig_, 0) >= 1
-                  THEN
-                     BEGIN
-                        SELECT SUBSTR (VALUE, 1, 70)
-                          INTO val_
-                          FROM operw
-                         WHERE REF = refd_ AND tag = tag_;
-                     EXCEPTION
-                        WHEN NO_DATA_FOUND
-                        THEN
-                           val_ := NULL;
-                     END;
-
-                     -- код показника та default-значення
-                     p_tag (i, val_, kodp_, ref_);
-                     -- запис показника
-                     p_ins (nnnn_, kodp_, val_);
-                  END IF;
-               END LOOP;
+                     END IF;
+                  END LOOP;
+               end if;            
             END IF;
          END LOOP;
 
