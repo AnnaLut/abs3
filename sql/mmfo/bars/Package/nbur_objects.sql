@@ -435,7 +435,7 @@ is
   --
   -- constants
   --
-  g_body_version  constant varchar2(64)  := 'version 19.3  2018.02.07';
+  g_body_version  constant varchar2(64)  := 'version 19.4  2018.02.16';
 
   MODULE_PREFIX   constant varchar2(4)   := 'NBUR';
 
@@ -1610,7 +1610,9 @@ is
   ( p_report_date  in     nbur_lst_objects.report_date%type
   , p_kf           in     nbur_lst_objects.kf%type
   ) is
-    title     constant    varchar2(60)  := $$PLSQL_UNIT||'.CRT_DLY_SNPST';
+    title     constant    varchar2(64)  := $$PLSQL_UNIT||'.CRT_DLY_SNPST';
+    l_errmsg              varchar2(512);
+    l_wait_tm             number(3) := 600;
   begin
 
     bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s ).'
@@ -1640,18 +1642,25 @@ is
 
         BC.SUBST_MFO( p_kf );
 
-        if ( BARS_UTL_SNAPSHOT.CHECK_SNP_RUNNING( 'DAYBALS' ) is Null )
-        then --
+        bars_audit.trace( '%s: run SYNC_DLY_SNAP ( %s ).', title, to_char(p_report_date,'dd.mm.yyyy') );
 
-          bars_audit.trace( '%s: run SYNC_DLY_SNAP ( %s ).', title, to_char(p_report_date,'dd.mm.yyyy') );
+        loop
+          -- Перевірка наявності активного процесу формування знімку
+          l_errmsg := BARS_UTL_SNAPSHOT.CHECK_SNP_RUNNING( 'DAYBALS' );
 
-          BARS_UTL_SNAPSHOT.SYNC_SNAP( p_report_date );
+          -- якщо звільнилось, то виходимо
+          exit when ( l_errmsg is Null or l_wait_tm <= 0 );
 
-        else
+          bars_audit.info( title||': SYNC_DLY_SNAP already running '||l_errmsg );
 
-          bars_audit.info( title||': SYNC_DLY_SNAP already running.' );
+          -- чекаємо 10 хв. на звільнення ресурсу з перевіркою кожні 30 с.
+          l_wait_tm := l_wait_tm - 30;
 
-        end if;
+          dbms_lock.sleep(30);
+
+        end loop;
+
+        BARS_UTL_SNAPSHOT.SYNC_SNAP( p_report_date );
 
         BC.HOME;
 
@@ -6138,6 +6147,27 @@ is
                                  || CHR(10) || dbms_utility.format_error_backtrace() );
         end;
 
+      end loop;
+
+      -- move
+      for f in ( select distinct
+                        f.KF
+                      , f.REPORT_DATE as RPT_DT
+                   from NBUR_LST_FILES f
+                  where f.REPORT_DATE < l_lmt_dt
+                    and f.KF          = l_kf
+                    and f.FILE_STATUS = any('FINISHED','BLOCKED')
+               )
+      loop
+        begin
+          execute immediate 'alter table NBUR_DETAIL_PROTOCOLS_ARCH move subpartition '
+                         || 'for ( to_date('''||to_char(f.RPT_DT,'YYYYMMDD')||''',''YYYYMMDD''),'''||f.KF||''' ) '
+                         || 'tablespace BRS_DM_D_' || f.KF ||' compress';
+        exception
+          when others then
+            bars_audit.error( title || ': ' || dbms_utility.format_error_stack()
+                                 || CHR(10) || dbms_utility.format_error_backtrace() );
+        end;
       end loop;
 
     end if;
