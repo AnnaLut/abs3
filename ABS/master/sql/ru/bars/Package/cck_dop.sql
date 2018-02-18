@@ -55,7 +55,22 @@ PROCEDURE CC_OPEN(ND_         in OUT int,    CC_ID_      in varchar2,      nRNK 
                   SDOG        in number,     SumSDI      in number,        fPROC       in number,     BASEY       in int,
                   SDATE       in DATE,       WDATE       in DATE,          GPK         in number,     METR        in int,
                   METR_R      in number,     METR_9      in number,        nFIN        in int,        nFREQ       in int,
-                  dfDen       in int,        PROD_       in int,
+                  dfDen       in int,        PROD_       in VARCHAR2, --was int
+                  nBANK       number default null,        NLS         varchar2 default null,
+                  PAWN        number , PAWN_S  number,  PAWN_RNK  int,  PAWNP  number,   PAWNP_S  number, PAWNP_RNK   int,
+                  PAWN2       number , PAWN2_S number,  PAWN2_RNK int,  PAWNP2 number,   PAWNP2_S number, PAWNP2_RNK  int,
+                  PAWN3       number , PAWN3_S number,  PAWN3_RNK int,  PAWNP3 number,   PAWNP3_S number, PAWNP3_RNK  int,
+                  PAWN4       number , PAWN4_S number,  PAWN4_RNK int,  PAWNP4 number,   PAWNP4_S number, PAWNP4_RNK  int,
+                  PAWN5       number , PAWN5_S number,  PAWN5_RNK int,  PAWNP5 number,   PAWNP5_S number, PAWNP5_RNK  int,
+                  Err_Code    out int, Err_Message out varchar2
+);
+
+
+  PROCEDURE CC_OPEN(ND_         in OUT int,    CC_ID_      in varchar2,      nRNK        in int,        nKV         in int,
+                  SDOG        in number,     SumSDI      in number,        fPROC       in number,     BASEY       in int,
+                  SDATE       in DATE,       WDATE       in DATE,          GPK         in number,     METR        in int,
+                  METR_R      in number,     METR_9      in number,        nFIN        in int,        nFREQ       in int,
+                  dfDen       in int,        PROD_       in INT, 
                   nBANK       number default null,        NLS         varchar2 default null,
                   PAWN        number , PAWN_S  number,  PAWN_RNK  int,  PAWNP  number,   PAWNP_S  number, PAWNP_RNK   int,
                   PAWN2       number , PAWN2_S number,  PAWN2_RNK int,  PAWNP2 number,   PAWNP2_S number, PAWNP2_RNK  int,
@@ -84,6 +99,7 @@ PROCEDURE CC_OPEN(ND_         in OUT int,    CC_ID_      in varchar2,      nRNK 
   --   l_ccv.GPK     -- тип графика погашения 4 -ануитет 2 равные части
   --   l_ccv.pr      -- процентная ставка
   -- p_dig -- разряд округления сумм при построении ГПК (0 - до коп. 2 - до грн.)
+
   procedure builder_gpk(p_nd     number,
                         p_ccv    cc_v%rowtype default null,
                         p_months number default null,
@@ -242,7 +258,7 @@ PROCEDURE CC_OPEN(ND_         in OUT int,    CC_ID_      in varchar2,      nRNK 
                   SDOG        in number,     SumSDI      in number,        fPROC       in number,     BASEY       in int,
                   SDATE       in DATE,       WDATE       in DATE,          GPK         in number,     METR        in int,
                   METR_R      in number,     METR_9      in number,        nFIN        in int,        nFREQ       in int,
-                  dfDen       in int,        PROD_       in int,         
+                  dfDen       in int,        in VARCHAR2,  --COBUSUPABS-7065        
                   nBANK       number default null,        NLS         varchar2 default null,
                   PAWN        number , PAWN_S  number,  PAWN_RNK  int,  PAWNP  number,   PAWNP_S  number, PAWNP_RNK   int,
                   PAWN2       number , PAWN2_S number,  PAWN2_RNK int,  PAWNP2 number,   PAWNP2_S number, PAWNP2_RNK  int,
@@ -441,6 +457,44 @@ BEGIN
 
 
 end CC_OPEN;
+
+--открытие КД из ВЕБ , PROD_ type changed, denied to modify curr proc -->COBUSUPABS-7065
+PROCEDURE CC_OPEN(ND_         in OUT int,    CC_ID_      in varchar2,      nRNK        in int,        nKV         in int,
+                  SDOG        in number,     SumSDI      in number,        fPROC       in number,     BASEY       in int,
+                  SDATE       in DATE,       WDATE       in DATE,          GPK         in number,     METR        in int,
+                  METR_R      in number,     METR_9      in number,        nFIN        in int,        nFREQ       in int,
+                  dfDen       in int,        PROD_       in INT, 
+                  nBANK       number default null,        NLS         varchar2 default null,
+                  PAWN        number , PAWN_S  number,  PAWN_RNK  int,  PAWNP  number,   PAWNP_S  number, PAWNP_RNK   int,
+                  PAWN2       number , PAWN2_S number,  PAWN2_RNK int,  PAWNP2 number,   PAWNP2_S number, PAWNP2_RNK  int,
+                  PAWN3       number , PAWN3_S number,  PAWN3_RNK int,  PAWNP3 number,   PAWNP3_S number, PAWNP3_RNK  int,
+                  PAWN4       number , PAWN4_S number,  PAWN4_RNK int,  PAWNP4 number,   PAWNP4_S number, PAWNP4_RNK  int,
+                  PAWN5       number , PAWN5_S number,  PAWN5_RNK int,  PAWNP5 number,   PAWNP5_S number, PAWNP5_RNK  int,
+                  Err_Code    out int, Err_Message out varchar2
+) is
+
+BEGIN
+      cck_dop.cc_open(    ND_ ,     CC_ID_,    nRNK,   nKV, 
+                  SDOG,     SumSDI,    fPROC,  BASEY,
+                  SDATE,    WDATE,     GPK,    METR,
+                  METR_R,   METR_9,    nFIN,   nFREQ,
+                  dfDen,    PROD_,  --was int 
+                  nBANK,    NLS,
+                  PAWN,     PAWN_S  ,  PAWN_RNK  ,  PAWNP  ,   PAWNP_S  , PAWNP_RNK   ,
+                  PAWN2,    PAWN2_S ,  PAWN2_RNK ,  PAWNP2 ,   PAWNP2_S , PAWNP2_RNK  ,
+                  PAWN3,    PAWN3_S ,  PAWN3_RNK ,  PAWNP3 ,   PAWNP3_S , PAWNP3_RNK  ,
+                  PAWN4,    PAWN4_S ,  PAWN4_RNK ,  PAWNP4 ,   PAWNP4_S , PAWNP4_RNK  ,
+                  PAWN5,    PAWN5_S ,  PAWN5_RNK ,  PAWNP5 ,   PAWNP5_S , PAWNP5_RNK, Err_Code, Err_Message); 
+									
+EXCEPTION WHEN OTHERS THEN
+    ROLLBACK;
+    if ERR_Message is null then
+       ERR_Code:=0;
+       ERR_Message:=nvl(ERR_Message, DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());--SQLERRM;
+    end if;
+
+end CC_OPEN;
+
 ---------------------------------------------
 
 procedure builder_gpk(p_nd     number,
