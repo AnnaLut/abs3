@@ -4,7 +4,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
 % DESCRIPTION : ѕроцедура формировани€ #E2 дл€  Ѕ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.17.005      29.01.2018 (22.01.2018)
+% VERSION     : v.17.006      12.02.2018 (29.01.2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетна€ дата
            sheme_ - схема формировани€
@@ -15,6 +15,10 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
    NNN        условный пор€дковый номер
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+12.02.2018 дл€ формировани€ переменной D3#E2_ (дата контракта) добавил
+           еще одно условие дл€ формата даты 'DD,MM,YYYY'
+           (доп.параметр D3#70 был заполнен в таком виде и 
+            и возникала ошибка).
 29.01.2018 дл€ формировани€ переменной D3#E2_ (дата контракта) добавил
            еще одно условие дл€ формата даты 'DD-MM-YYYY'
            (доп.параметр D3#70 был заполнен в таком виде и 
@@ -654,14 +658,19 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
             -- з 29.12.2017 новий показник
             --  назва Ѕенеф≥ц≥ару
             if D2#E2_ is not null and D3#E2_ is not null then
-               select substr(MAX(trim(benef_name)), 1,135)
-               into d53#E2_
-               from v_cim_all_contracts
-               where upper(num) = upper(cont_num_) and
-                     open_date = to_date(cont_dat_, 'ddmmyyyy')  and
-                     status_id in (0, 8) and
-                     lpad(okpo, 10, '0') = lpad(okpo_, 10, '0') and
-                     contr_type = 1;        
+               begin
+                  select substr(MAX(trim(benef_name)), 1,135)
+                     into d53#E2_
+                  from v_cim_all_contracts
+                  where upper(num) = upper(cont_num_) and
+                        open_date = to_date(cont_dat_, 'ddmmyyyy')  and
+                        status_id in (0, 8) and
+                        lpad(okpo, 10, '0') = lpad(okpo_, 10, '0') and
+                        contr_type = 1;        
+               exception when no_data_found then
+                  null;
+               end; 
+
             end if;
 
             if d53#E2_ is not null then
@@ -1598,6 +1607,8 @@ BEGIN
                                     if instr(D3#E2_, '/') > 0 then
                                        D3#E2_ := to_char(to_date(D3#E2_, 'dd/mm/yyyy'), 'ddmmyyyy');
                                     elsif instr(D3#E2_, '.') > 0 then
+                                       D3#E2_ := to_char(to_date(D3#E2_, 'dd.mm.yyyy'), 'ddmmyyyy');
+                                    elsif instr(D3#E2_, ',') > 0 then
                                        D3#E2_ := to_char(to_date(D3#E2_, 'dd.mm.yyyy'), 'ddmmyyyy');
                                     elsif instr(D3#E2_, '-') > 0 then
                                        D3#E2_ := to_char(to_date(D3#E2_, 'dd-mm-yyyy'), 'ddmmyyyy');
