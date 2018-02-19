@@ -7,14 +7,38 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view SPEC1 ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.SPEC1 ("ACC", "NLS", "KV", "NMS", "R011", "R013", "R016", "S080", "S180", "S181", "S190", "S240", "S260", "S270", "S120", "S580", "IDG", "IDS", "DAOS") AS 
-  SELECT a.acc,
+CREATE OR REPLACE FORCE VIEW BARS.SPEC1
+(
+   ACC,
+   NLS,
+   KV,
+   NMS,
+   R011,
+   R013,
+   R016,
+   S080,
+   S180,
+   S181,
+   S190,
+   S240,
+   S260,
+   S270,
+   S120,
+   S580,
+   IDG,
+   IDS,
+   DAOS,
+   DAZS,
+   OSTC
+)
+AS
+   SELECT a.acc,
           a.nls,
           a.kv,
           a.nms,
           b.r011,
           b.r013,
-          b.r016,    
+          b.r016,
           b.s080,
           b.s180,
           b.s181,
@@ -26,7 +50,9 @@ PROMPT *** Create  view SPEC1 ***
           b.s580,
           b.idg,
           b.ids,
-          a.daos
+          a.daos,
+          A.DAZS,
+          a.OSTC
      FROM accounts a, specparam b
     WHERE a.acc = b.acc;
 
