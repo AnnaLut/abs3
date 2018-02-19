@@ -302,6 +302,8 @@ mainApp.controller("McpCtrl", function ($controller, $scope, $http, $timeout, ke
                         STATE_CODE: { type: 'string' },
                         STATE_NAME: { type: 'string' },
                         ENVELOPE_FILE_ID: { type: 'number' },
+                        ENVELOPE_STATE_ID: { type: 'number' },
+                        ENVELOPE_STATE_NAME: { type: 'string' },
                         ENVELOPE_FILE_NAME: { type: 'string' },
                         ENVELOPE_FILE_STATE: { type: 'number' },
                         ENVELOPE_COMMENT: { type: 'string' }
@@ -333,6 +335,11 @@ mainApp.controller("McpCtrl", function ($controller, $scope, $http, $timeout, ke
                 field: "ENVELOPE_FILE_NAME",
                 title: "Назва архіву",
                 width: "340px"
+            },
+            {
+                field: "ENVELOPE_FILE_ID",
+                title: "ID конверту<br>(BARS)",
+                width: "115px"
             },
             {
                 field: "ID",
@@ -429,13 +436,18 @@ mainApp.controller("McpCtrl", function ($controller, $scope, $http, $timeout, ke
             },
             {
                 field: "STATE_ID",
-                title: "ID Статусу",
-                width: "100px"
+                title: "ID статусу<br>реєстру",
+                width: "120px"
             },
             {
                 field: "STATE_NAME",
-                title: "Статус",
-                width: "100px"
+                title: "Статус<br>реєстру",
+                width: "120px"
+            },
+            {
+                field: "ENVELOPE_STATE_NAME",
+                title: "Статус<br>конверту",
+                width: "120px"
             }
         ]
         });

@@ -8,16 +8,13 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
     utilsService, signService) {
     $controller('KendoMainController', { $scope: $scope });     // Расширяем контроллер
 
-    var Token_Id = 'iit';
+    //var Token_Id = 'iit';
     var KVIT_1 = 1;
     var KVIT_2 = 2;
 
     $scope.Title = "Підтвердження відправки даних в УПСЗН";
 
     $scope.kvitId = KVIT_1;
-    var getFilesHistoryStateId = function () {
-        return $scope.kvitId === KVIT_1 ? 11 : 12;
-    };
 
     var filesGridToolbar = [
         { template: '<a class="k-button" ng-click="onClickToolbarGrid(\'files\', \'excel\')" ng-disabled="disabledToolbarGrid(\'files\', \'excel\')"><i class="pf-icon pf-16 pf-exel"></i>Конверти в Excel</a>' },
@@ -216,12 +213,12 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
             },
             {
                 field: "ID",
-                title: "ID Запису",
+                title: "ID конверту<br>(BARS)",
                 width: "10%"
             },
             {
                 field: "ID_MSP_ENV",
-                title: "ID конверту",
+                title: "ID конверту<br>(УПСЗН)",
                 width: "10%"
             },
             {
@@ -261,7 +258,7 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
     var filesHistoryDataSource = $scope.createDataSource({
         type: "webapi",
         transport: { read: { url: bars.config.urlContent("/api/Mcp/PayAcceptApi/SearchEnvelopes"),
-            data: function () { return {stateId: getFilesHistoryStateId()}; }} },
+            data: function () { return {kvitId: $scope.kvitId}; }} },
         schema: {
             model: {
                 fields: {
@@ -308,12 +305,12 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
             },
             {
                 field: "ID",
-                title: "ID Запису",
+                title: "ID конверту<br>(BARS)",
                 width: "10%"
             },
             {
                 field: "ID_MSP_ENV",
-                title: "ID конверту",
+                title: "ID конверту<br>(УПСЗН)",
                 width: "10%"
             },
             {

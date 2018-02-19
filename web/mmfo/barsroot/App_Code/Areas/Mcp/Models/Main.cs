@@ -49,5 +49,7 @@ namespace Areas.Mcp.Models
         public string ENVELOPE_FILE_NAME { get; set; }
         public short? ENVELOPE_FILE_STATE { get; set; }
         public string ENVELOPE_COMMENT { get; set; }
+        public int? ENVELOPE_STATE_ID { get; set; }
+        public string ENVELOPE_STATE_NAME { get; set; }        
     }
 }
