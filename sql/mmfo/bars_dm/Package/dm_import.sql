@@ -222,7 +222,7 @@ end;
 CREATE OR REPLACE PACKAGE BODY DM_IMPORT
  is
 
-    g_body_version constant varchar2(64) := 'Version 4.0.0 06/02/2018'; 
+    g_body_version constant varchar2(64) := 'Version 4.0.1 19/02/2018'; 
     g_body_defs    constant varchar2(512) := null;
     G_TRACE        constant varchar2(20) := 'dm_import.';
     -- DIY - parallel
@@ -2498,25 +2498,21 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                                       ';
 
 
-        q_str_postfull  varchar2(4000) :=  ' from bars.accounts a, bars.customer c, bars.accounts ao, bars.w4_acc w,
+        q_str_postfull  varchar2(4000) :=  ' from bars.accounts a, bars.accounts ao, bars.w4_acc w,
                                           (select aw.acc, p.id, p.name, p.okpo, p.product_code, p.okpo_n from bars.accountsw aw, bars.bpk_proect p
                                             where aw.tag = ''PK_PRCT''
                                               and to_number(aw.value)= p.id
                                               and regexp_replace(trim(aw.value), ''\D'') = trim(aw.value)) pk_prct
-                                    where w.acc_pk = a.acc and a.rnk = c.rnk
-                                     and c.custtype = 3 and nvl(trim(c.sed),''00'')<>''91''
-                                     and not (C.ise in (''14100'', ''14200'', ''14101'',''14201'') and C.sed =''91'')
+                                    where w.acc_pk = a.acc 
                                      and w.acc_ovr = ao.acc(+)
                                      and w.acc_pk = pk_prct.acc(+) ';
 
-        q_str_postinc varchar2(4000) :=  ' from bars.accounts a, bars.customer c, bars.accounts ao, bars.w4_acc w, acvive_accounts aa,
+        q_str_postinc varchar2(4000) :=  ' from bars.accounts a, bars.accounts ao, bars.w4_acc w, acvive_accounts aa,
                                           (select aw.acc, p.id, p.name, p.okpo, p.product_code, p.okpo_n from bars.accountsw aw, bars.bpk_proect p
                                             where aw.tag = ''PK_PRCT''
                                               and to_number(aw.value)= p.id
                                               and regexp_replace(trim(aw.value), ''\D'') = trim(aw.value)) pk_prct
-                                    where w.acc_pk = a.acc and a.rnk = c.rnk
-                                     and c.custtype = 3 and nvl(trim(c.sed),''00'')<>''91''
-                                     and not (C.ise in (''14100'', ''14200'', ''14101'',''14201'') and C.sed =''91'')
+                                    where w.acc_pk = a.acc 
                                      and w.acc_ovr = ao.acc(+)
                                      and w.acc_pk = pk_prct.acc(+)
                                      and a.acc = aa.acc';
@@ -4142,7 +4138,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                       ,w4_kproc
                       ,w4_sec
                       ,a.acc
-                       from bars.accounts a, bars.customer c, bars.accounts ao, bars.w4_acc w, acvive_accounts aa,
+                       from bars.accounts a, bars.accounts ao, bars.w4_acc w, acvive_accounts aa,
                         (select aw.acc, p.id, p.name, p.okpo, p.product_code, p.okpo_n from bars.accountsw aw, bars.bpk_proect p
                           where aw.tag = 'PK_PRCT'
                             and to_number(aw.value)= p.id
@@ -4175,9 +4171,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                                              ) ww,
                          bars.deal d,
                          (select acc, kos, dos from bars.saldoa where FDAT = trunc(p_dat)) S
-                  where w.acc_pk = a.acc and a.rnk = c.rnk
-                   and c.custtype = 3 and nvl(trim(c.sed),'00')<>'91'
-                   and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов
+                  where w.acc_pk = a.acc 
                    and w.acc_ovr = ao.acc(+)
                    and w.acc_pk = pk_prct.acc(+)
                    and a.acc = aa.acc
@@ -4239,7 +4233,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                       ,w4_kproc
                       ,w4_sec
                       ,a.acc
-                       from bars.accounts a, bars.customer c, bars.accounts ao, bars.w4_acc w/*, acvive_accounts aa*/,
+                       from bars.accounts a, bars.accounts ao, bars.w4_acc w/*, acvive_accounts aa*/,
                         (select aw.acc, p.id, p.name, p.okpo, p.product_code, p.okpo_n from bars.accountsw aw, bars.bpk_proect p
                           where aw.tag = 'PK_PRCT'
                             and to_number(aw.value)= p.id
@@ -4272,9 +4266,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                                              ) ww,
                          bars.deal d,
                          (select acc, kos, dos from bars.saldoa where FDAT = trunc(p_dat)) S
-                  where w.acc_pk = a.acc and a.rnk = c.rnk
-                   and c.custtype = 3 and nvl(trim(c.sed),'00')<>'91'
-                   and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов
+                  where w.acc_pk = a.acc
                    and w.acc_ovr = ao.acc(+)
                    and w.acc_pk = pk_prct.acc(+)
                    and p_periodtype = 'MONTH' /*Только для ежедневных выгрузок*/
