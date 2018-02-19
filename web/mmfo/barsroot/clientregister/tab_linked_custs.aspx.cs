@@ -272,9 +272,20 @@ public partial class clientregister_tab_linked_custs : System.Web.UI.Page
     protected void fvCustRelationData_ItemInserting(object sender, FormViewInsertEventArgs e)
     {
         e.Values["RNK"] = RNK;
-        if(Convert.ToString(e.Values["VAGA1"]) == "") e.Values["VAGA1"] = null;
-		if (Convert.ToString(e.Values["VAGA2"]) == "") e.Values["VAGA2"] = null;
-		e.Values["REL_INTEXT"] = Convert.ToDecimal(gvCustRelations.SelectedDataKey["REL_INTEXT"]);
+        
+        var vaga1 = e.Values["VAGA1"];
+        var vaga2 = e.Values["VAGA2"];
+        if (vaga1 != null)
+        {
+            if (string.IsNullOrWhiteSpace(vaga1.ToString())) e.Values["VAGA1"] = null;
+            else e.Values["VAGA1"] = vaga1.ToString().Replace(',', '.');
+        }
+        if (vaga2 != null)
+        {
+            if (string.IsNullOrWhiteSpace(vaga2.ToString())) e.Values["VAGA2"] = null;
+            else e.Values["VAGA2"] = vaga2.ToString().Replace(',', '.');
+        }
+        e.Values["REL_INTEXT"] = Convert.ToDecimal(gvCustRelations.SelectedDataKey["REL_INTEXT"]);
         Decimal? REL_RNK = (gvCustRelations.SelectedDataKey["RELCUST_RNK"] as Decimal?).HasValue ? (gvCustRelations.SelectedDataKey["RELCUST_RNK"] as Decimal?) : (gvCustRelations.SelectedDataKey["RELEXT_ID"] as Decimal?);
         e.Values["REL_RNK"] = REL_RNK;
     }
@@ -310,7 +321,19 @@ public partial class clientregister_tab_linked_custs : System.Web.UI.Page
 
 	protected void fvCustRelationData_ItemUpdating(object sender, FormViewUpdateEventArgs e)
 	{
-		if (Convert.ToString(e.OldValues["VAGA1"]) == "") e.NewValues["VAGA1"] = null;
-		if (Convert.ToString(e.OldValues["VAGA2"]) == "") e.NewValues["VAGA2"] = null;
-	}
+		//if (Convert.ToString(e.OldValues["VAGA1"]) == "") e.NewValues["VAGA1"] = null;
+		//if (Convert.ToString(e.OldValues["VAGA2"]) == "") e.NewValues["VAGA2"] = null;
+        var vaga1 = e.NewValues["VAGA1"];
+        var vaga2 = e.NewValues["VAGA2"];
+        if (vaga1 != null)
+        {
+            if (string.IsNullOrWhiteSpace(vaga1.ToString())) e.NewValues["VAGA1"] = null;
+            else e.NewValues["VAGA1"] = vaga1.ToString().Replace(',', '.');
+        }
+        if (vaga2 != null)
+        {
+            if (string.IsNullOrWhiteSpace(vaga2.ToString())) e.NewValues["VAGA2"] = null;
+            else e.NewValues["VAGA2"] = vaga2.ToString().Replace(',', '.');
+        }
+    }
 }
