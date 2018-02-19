@@ -33,7 +33,8 @@ PROMPT *** Create  view V_ZAL_ND_NEW ***
                ,name
   FROM (SELECT 1 pap
               ,p.nd nd
-              ,p.pr_12
+              --,p.pr_12 --COBUMMFO-6284
+			  ,first_value(p.pr_12) OVER (PARTITION BY p.acc, sz.cc_idz, az.kv ORDER BY p.acc, p.pr_12 DESC NULLS LAST) pr_12
               ,az.acc
               ,az.nls
               ,az.kv
