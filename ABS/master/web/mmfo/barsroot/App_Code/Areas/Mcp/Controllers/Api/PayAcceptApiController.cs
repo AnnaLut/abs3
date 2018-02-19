@@ -54,17 +54,11 @@ namespace BarsWeb.Areas.Mcp.Controllers.Api
         }
 
         [HttpGet]
-        public HttpResponseMessage SearchEnvelopes([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request, short? stateId)
+        public HttpResponseMessage SearchEnvelopes([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request, short kvitId)
         {
-            if (!stateId.HasValue)
-            {
-                var d = new List<Envelopes>();
-                return Request.CreateResponse(HttpStatusCode.OK, new { Data = d, Total = 0 });
-            }
-
             try
             {
-                var sql = SqlCreator.SearchEnvelopes(stateId.Value);
+                var sql = SqlCreator.SearchEnvelopes(kvitId);
                 var data = _repo.SearchGlobal<Envelopes>(request, sql);
                 var dataCount = _repo.CountGlobal(request, sql);
 

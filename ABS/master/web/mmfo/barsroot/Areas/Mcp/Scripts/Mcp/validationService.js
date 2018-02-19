@@ -24,7 +24,7 @@ angular.module(globalSettings.modulesAreas).factory("validationService", functio
                 var LAST_BALANCE_REQ = row.LAST_BALANCE_REQ;
                 if(!utilsService.isEmpty(LAST_BALANCE_REQ)){
                     var diff = (new Date() - LAST_BALANCE_REQ) / 1000;
-                    if(diff < 3600){
+                    if(diff >= 3600){
                         return FILES_CONSTS[validatorId].ID.BALANCE_2560_EMPTY;
                     }
                 }

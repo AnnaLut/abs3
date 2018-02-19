@@ -268,15 +268,12 @@ namespace BarsWeb.Areas.Mcp.Infrastructure.DI.Implementation {
             };
         }
 
-        public static BarsSql SearchEnvelopes(short value)
+        public static BarsSql SearchEnvelopes(short kvitId)
         {
             return new BarsSql()
             {
-                SqlText = @"select * from msp.v_msp_envelopes where state_id = :p_state_id",
-                SqlParams = new object[]
-                {
-                    new OracleParameter("p_state_id", OracleDbType.Int16) { Value = value }
-                }
+                SqlText = string.Format(@"msp.v_msp_envelopes_match{0}_hist", kvitId),
+                SqlParams = new object[] { }
             };
         }
 
