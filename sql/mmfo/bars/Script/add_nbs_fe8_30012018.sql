@@ -87,4 +87,36 @@ INSERT INTO KL_F3_29 ( KF, R020, R050, R012, DDD, TXT, S240 ) VALUES (
 
 commit;
 
+delete from kl_f3_29 
+where kf='E8' and r020 in ('8610', '8615', '8651', '8652', '8655');
+
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
+   ('E8', '8610', '22', '2', '121');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
+   ('E8', '8615', '22', '2', '121');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
+   ('E8', '8651', '22', '2', '121');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
+   ('E8', '8652', '22', '2', '121');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
+   ('E8', '8655', '03', '2', '121');
+COMMIT;
+
+delete from  KODOBL_REG where KO = 26 and C_REG = 28;
+Insert into KODOBL_REG
+   (KO, C_REG)
+ Values
+   (26, 28);
+COMMIT;
+
 
