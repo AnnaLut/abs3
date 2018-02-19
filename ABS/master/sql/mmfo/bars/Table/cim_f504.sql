@@ -222,7 +222,7 @@ begin
     end if; 
 end;
 / 
-COMMENT ON COLUMN BARS.CIM_F503.P030 IS 'Код країни кредитора';
+COMMENT ON COLUMN BARS.CIM_F504.P030 IS 'Код країни кредитора';
 
 PROMPT *** Create  grants  CIM_F504 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_F503        to BARS_ACCESS_DEFROLE;

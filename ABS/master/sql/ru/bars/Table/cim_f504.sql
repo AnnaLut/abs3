@@ -215,9 +215,18 @@ end;
 / 
 COMMENT ON COLUMN bars.cim_f504.p950 IS 'Величина процентної ставки за кредитом боргу';
 
+begin
+    execute immediate 'alter table bars.cim_f504 add (P030 VARCHAR2(3))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_F504.P030 IS 'Код країни кредитора';
+
 PROMPT *** Create  grants  CIM_F504 ***
-grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_F504        to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on CIM_F504        to UPLD;
+grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_F503        to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on CIM_F503        to UPLD;
 
 
 
