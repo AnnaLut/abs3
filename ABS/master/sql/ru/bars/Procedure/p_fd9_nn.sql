@@ -3,11 +3,13 @@ CREATE OR REPLACE PROCEDURE BARS.p_fd9_NN (Dat_ DATE ,
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #D9 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 31/01/2018 (25/01/2018, 13/10/2017)
+% VERSION     : 14/02/2018 (02/02/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+02.02.2018 - для расшфровки участников ЮЛ убрано условие 
+             что только неинсайдеры  (  and NVL(c.prinsider,99) = 99  )
 31.01.2018 - змінено формування частини показника ЗЗЗЗЗЗЗЗЗЗ для 
              нерезидентів
 25.01.2018 - змінено формування кодів ZZZZZZZZZZ і ЗЗЗЗЗЗЗЗЗЗ а також
@@ -165,7 +167,7 @@ BEGIN
     for k in (select c.rnk RNK, NVL(c.okpo,'0000000000') OKPO,
                      c.codcagent CODC, c.nmk NMK, NVL(c.ise,'00000') ISE,
                      b.name NMK_U, NVL(trim(b.okpo_u),'0000000000') OKPO_U,
-                     b.custtype_u TK, -- 1 - юрлицо, 2 - физлицо
+                     nvl(b.custtype_u, '2') TK, -- 1 - юрлицо, 2 - физлицо
                      b.country_u K040,
                      nvl(TO_CHAR (k.KO), b.region_u) OBL,
                      c.date_on DAT,
@@ -182,7 +184,7 @@ BEGIN
                               where datf = Dat_
                                 and rnk is not null
                                 and p040 <> 0 )
-                and NVL(c.prinsider,99) = 99
+                --and NVL(c.prinsider,99) = 99
                 and b.region_u = to_char(k.C_REG(+))
                 and c.rnk = b.rnka
                 and c.rnk <> 94809201
@@ -299,7 +301,7 @@ BEGIN
 
              okpo_k := LPAD( TO_CHAR(glb_), 10, '0');
           EXCEPTION WHEN NO_DATA_FOUND THEN
-             okpo_k := '0000000000';  --null;
+             okpo_k := '0000000000'; 
           END;
           k021_k := '4';
        END IF;
@@ -317,47 +319,52 @@ BEGIN
           END;
        END IF;
 
-       if trim(k.okpo) in ('00000000','000000000','0000000000','99999',
-                           '999999999','9999999999') and k.codc not in (1,2)
+       if (nvl(ltrim(trim(k.okpo), '0'), 'Z') = 'Z' or
+           nvl(ltrim(trim(k.okpo), '9'), 'Z') = 'Z') and 
+           k.codc not in (1,2)
        then
           -- для ЮЛ резидентов
           if k.codc in (3) then
              okpo_k := lpad(trim(k.rnk),10,'0');
-             -- органи державної влади
-             --if k.ise in ('13110','13120','13131','13132') then
-             --   kol2_ := kol2_+1;
-             --   okpo_k := 'D'||lpad(to_char(kol2_), 9, '0');
-             --end if;
              k021_k := 'E';
           end if;
+          
+          if k.codc = 4 then
+             okpo_k := 'I' || lpad(to_char(k.rnk), 9, '0');
+             k021_k := '9';
+          end if;
+                    
           -- для ФЛ резидентов
           if k.codc in (5) then
              okpo_k := lpad(substr(ser_k||numdoc_k, 1, 10), 10, '0');
              k021_k := '6';
           end if;
+          
           -- для ФЛ нерезидентов
           if k.codc = 6 and ser_k not in ('','00') and numdoc_k <> '000000' then
-             --okpo_k := 'CC' || lpad(substr(trim(ser_k)||numdoc_k, 1, 8), 8, '0');
              okpo_k := 'I' || lpad(to_char(k.rnk), 9, '0');
              k021_k := '9';
           end if;
+          
           if k.codc = 6 and ser_k in ('','00') and numdoc_k = '000000'then
              kol_ := kol_+1;
              okpo_k := 'I' || lpad(to_char(k.rnk), 9, '0');
              k021_k := '9';
           end if;
        end if;
-       if trim(k.okpo) not in ('00000000','000000000','0000000000','99999',
-                              '999999999','9999999999') and k.codc not in (1,2)
+       
+       if  nvl(ltrim(trim(k.okpo), '0'), 'Z') <> 'Z' and
+           nvl(ltrim(trim(k.okpo), '9'), 'Z') <> 'Z' and 
+           k.codc not in (1,2)
        then
           if k.codc in (4,6) then
-             --okpo_k := 'IN' || substr(lpad(NVL(trim(k.okpo),'0'), 8, '0'), 1, 8);
              okpo_k := 'I' || lpad(to_char(k.rnk), 9, '0');
              k021_k := '9';
           else
              if k.codc not in (1,2,4,6) then
                 okpo_k := substr(trim(k.okpo), 1, 10);
              end if;
+             
              if k.codc = 5 then
                 k021_k := '2';
              else
@@ -369,57 +376,45 @@ BEGIN
           end if;
        end if;
 
-       if trim(k.okpo_u) in ('00000000','000000000','0000000000', 
-                             '99999','999999999','9999999999'
-                            )
+       if  nvl(ltrim(trim(k.okpo_u), '0'), 'Z') = 'Z' or
+           nvl(ltrim(trim(k.okpo_u), '9'), 'Z') = 'Z'
        then
           if k040_ = '804' then
              okpo_ := lpad(substr(ser_ || numdoc_, 1, 10), 10, '0');
              okpo_u := ser_ || numdoc_;
+
              if k.tk = 2 then
                 k021_u := '6';
              else
                 k021_u := 'E';
              end if;
+
              if k.tk = 1 then
                 kol1_ := kol1_+1;
                 okpo_ := lpad(to_char(kol1_), 10, '0');
-                -- органи державної влади
-                --if k.ise_u in ('13110','13120','13131','13132') then
-                --   kol3_ := kol3_ + 1;
-                --   okpo_ := 'D' || lpad(to_char(kol3_), 9, '0');
-                --end if;
-                --k021_u := '9';
              end if;
           else
-             --if k.tk = 2 and trim(k.ser) is not null then
-             --   okpo_ := 'CC' || lpad(substr(trim(k.ser) || k.numdoc, 1, 8), 8, '0');
-             --   okpo_u := trim(k.ser) || k.numdoc;
-             --   k021_u := '9';
-             --end if;
-             if k.tk = 2  then  -- and trim(k.ser) is null then
-                --kol1_ := kol1_+1;
-                --okpo_ := 'I' || lpad(to_char(kol1_), 9, '0');
+             if k.tk = 2  then  
                 okpo_ := 'I' || lpad(to_char(k.rnka), 9, '0');
                 k021_u := '9';
              end if;
+             
              if k.tk = 1 then
-                --kol1_ := kol1_+1;
-                --okpo_ := 'I' || lpad(to_char(kol1_), 9, '0');
                 okpo_ := 'I' || lpad(to_char(k.rnka), 9, '0');
+
                 -- органи державної влади
                 if k.ise_u in ('13110','13120','13131','13132') then
                    kol3_ := kol3_ + 1;
                    okpo_ := 'D' || lpad(to_char(kol3_), 9, '0');
                 end if;
+                
                 k021_u := '9';
              end if;
           end if;
        end if;
 
-       if trim(k.okpo_u) not in ('00000000','000000000','0000000000',
-                                 '99999','999999999','9999999999' 
-                                )
+       if  nvl(ltrim(trim(k.okpo_u), '0'), 'Z') <> 'Z' and
+           nvl(ltrim(trim(k.okpo_u), '9'), 'Z') <> 'Z'
        then
           if k040_ <> '804' then
              select count(*)
@@ -446,7 +441,6 @@ BEGIN
              if k.ise_u in ('13110','13120','13131','13132') then
                 k021_u := 'G';
              end if;
-
           end if;
        end if;
 
@@ -569,7 +563,11 @@ BEGIN
          ('00000', 980, k.dat, kodp_, znap_, nbuc_, k.rnk);
       end if;
 
-      if k.codc in (4,6) and length(trim(k.okpo))>8 then
+      if k.codc in (4,6) and 
+         nvl(ltrim(trim(k.okpo), '0'), 'Z') <> 'Z' and
+         nvl(ltrim(trim(k.okpo), '9'), 'Z') <> 'Z' and
+         length(trim(k.okpo))>8 
+      then
 
          kodp_ := '019'||lpad(okpo_k,10,'0')||'0000000000'||k021_k||'9'||'000000'||lpad(to_char(k.rnkb),4,'0');
          znap_ := trim(k.okpo);
