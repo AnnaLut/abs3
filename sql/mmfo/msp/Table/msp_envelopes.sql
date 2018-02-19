@@ -135,7 +135,18 @@ begin
     if sqlcode = -2275 then null; else raise; 
     end if; 
 end;
-/ 
+/
+
+begin 
+  execute immediate 'alter table msp_envelopes modify filename varchar2(256)';
+exception when others then 
+  if sqlcode in (-904, -6512, -1430) then 
+    null; 
+  else 
+    raise; 
+  end if;
+end;
+/
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /sql/msp/table/msp_envelopes.sql =========*** End
