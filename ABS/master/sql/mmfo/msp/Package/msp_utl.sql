@@ -259,7 +259,7 @@ end msp_utl;
 /
 create or replace package body msp_utl is
 
-  gc_body_version constant varchar2(64) := 'version 1.31 30.01.2018';
+  gc_body_version constant varchar2(64) := 'version 1.32 02.02.2018';
   gc_mod_code     constant varchar2(3)  := 'MSP';
   -----------------------------------------------------------------------------------------
 
@@ -1098,6 +1098,7 @@ create or replace package body msp_utl is
     ex_no_parameter exception;
     ct_fname        constant varchar2(20 char) := '_OBU_[FNAME].ZIP.P7S';
     l_filename      msp_env_content.filename%type := case p_type_id when 1 then 'CTLPAY'||ct_fname when 2 then 'RESPAY'||ct_fname else null end;
+    l_start         number(2) := 12;
   begin
     if p_type_id is null then
       raise ex_no_parameter;
@@ -1106,9 +1107,10 @@ create or replace package body msp_utl is
     merge into msp_env_content e
     using (select * from msp_envelopes t where t.id = p_id) t on (e.id = t.id and e.type_id = p_type_id)
     when matched then
-      update set e.cvalue = p_value, e.ecp = p_ecp
+      update set e.cvalue = p_value, e.ecp = p_ecp, e.filename = replace(l_filename, '[FNAME]', substr(upper(t.filename),l_start,instr(t.filename,'.')-l_start))
     when not matched then
-      insert values (p_id, p_type_id, null, replace(l_filename, '[FNAME]',substr(upper(t.filename),12,25)), sysdate, p_ecp, p_value); -- replace(replace(upper(t.filename), 'REQPAY', 'CTLPAY'), '.P7S.P7S', '.P7S')
+      insert values (p_id, p_type_id, null, replace(l_filename, '[FNAME]', substr(upper(t.filename),l_start,instr(t.filename,'.')-l_start)), sysdate, p_ecp, p_value); 
+      --insert values (p_id, p_type_id, null, replace(l_filename, '[FNAME]',substr(upper(t.filename),12,25)), sysdate, p_ecp, p_value); -- replace(replace(upper(t.filename), 'REQPAY', 'CTLPAY'), '.P7S.P7S', '.P7S')
 
     if sql%rowcount = 0 then
       raise ex_no_file;

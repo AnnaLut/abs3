@@ -105,5 +105,15 @@ begin
 end;
 /
 
+begin 
+  execute immediate 'alter table msp_envelope_files_info modify filename varchar2(256)';
+exception when others then 
+  if sqlcode in (-904, -6512, -1430) then 
+    null; 
+  else 
+    raise; 
+  end if;
+end;
+/
 -- Grant/Revoke object privileges 
 grant select on MSP_ENVELOPE_FILES_INFO to BARS_ACCESS_DEFROLE;
