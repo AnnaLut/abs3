@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  trigger TAU_SPEC1 ***
 
-  CREATE OR REPLACE TRIGGER BARS.TAU_SPEC1 
+CREATE OR REPLACE TRIGGER BARS.TAU_SPEC1
   INSTEAD OF UPDATE ON "BARS"."SPEC1"
   REFERENCING FOR EACH ROW
 BEGIN
@@ -128,8 +128,6 @@ BEGIN
     update ACCOUNTS set nms=:new.nms where acc=:old.acc;
   end if;
 end TAU_SPEC1;
-
-
 /
 ALTER TRIGGER BARS.TAU_SPEC1 ENABLE;
 
