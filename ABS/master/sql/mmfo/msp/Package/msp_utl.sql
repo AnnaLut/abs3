@@ -259,7 +259,7 @@ end msp_utl;
 /
 create or replace package body msp_utl is
 
-  gc_body_version constant varchar2(64) := 'version 1.32 02.02.2018';
+  gc_body_version constant varchar2(64) := 'version 1.33 07.02.2018';
   gc_mod_code     constant varchar2(3)  := 'MSP';
   -----------------------------------------------------------------------------------------
 
@@ -2165,7 +2165,8 @@ create or replace package body msp_utl is
                              p_act_type     in msp_requests.act_type%type,
                              p_id_env       in out nocopy msp_envelopes.id_msp_env%type,
                              p_is_bad_xml   in simple_integer default 0,
-                             p_env_rq_st    out varchar2) return clob
+                             p_env_rq_st    out varchar2,
+                             p_envelope_id  out msp_envelopes.id%type) return clob
   is
     l_buff         clob;
     l_row          dbms_xmldom.domnode;
@@ -2173,17 +2174,17 @@ create or replace package body msp_utl is
     l_rq_st_detail number(1);
     l_rq_ecp_error varchar2(1000);
     l_id_msp       msp_envelope_files_info.id_msp%type;
-    l_envelope_id  msp_envelopes.id%type;
     l_isencode64   boolean := true;
+    l_env_state    msp_envelopes.state%type;
     -- перевірка чи зформована квитанція 2, якщо так то повертаємо статус конверту 'D', інакше 'R'
-    function get_match_rq_st return varchar2
+    function get_match_rq_st(p_id in msp_envelopes.id%type) return varchar2
     is
       l_cnt number;
     begin
       select count(1)
       into l_cnt
       from msp_env_content c
-      where id = p_id_env and type_id = 2;
+      where id = p_id and type_id = 2;
 
       if l_cnt > 0 then
         return 'D';
@@ -2231,31 +2232,43 @@ create or replace package body msp_utl is
         end;
       elsif p_act_type = msp_const.req_VALIDATION_STATE /*4*/ then
         begin
-          select id into l_envelope_id from msp_envelopes e where e.id_msp_env = p_id_env;
+          select id, state into p_envelope_id, l_env_state from msp_envelopes e where e.id_msp_env = p_id_env;
           -- підготовка xml відповіді
-          --dbms_output.put_line('p_envelope_id='||to_char(p_envelope_id));
-          select cvalue
-                 --bars.lob_utl.blob_to_clob(bvalue)
-          into l_buff
-          from msp_env_content c
-          where id = l_envelope_id and type_id = 1;
-
-          p_env_rq_st  := 'S';
+          begin
+            if l_env_state in (msp_const.st_env_MATCH1_CREATED, msp_const.st_env_MATCH1_SEND) then
+              select cvalue
+              into l_buff
+              from msp_env_content c
+              where id = p_envelope_id and type_id = 1;
+              p_env_rq_st  := 'S';
+            elsif l_env_state in (msp_const.st_env_MATCH2_CREATED, msp_const.st_env_MATCH2_SEND) then
+              p_env_rq_st  := 'D';
+            else
+              p_env_rq_st  := 'R';
+            end if;
+          exception
+            when no_data_found then
+              p_env_rq_st := get_match_rq_st(p_id => p_envelope_id);
+          end;
           l_isencode64 := false;
         exception
           when no_data_found then
-            p_env_rq_st := get_match_rq_st;
+            p_env_rq_st := 'R';
         end;
       elsif p_act_type = msp_const.req_PAYMENT_STATE /*5*/ then
         begin
-          select id into l_envelope_id from msp_envelopes e where e.id_msp_env = p_id_env;
+          select id, state into p_envelope_id, l_env_state from msp_envelopes e where e.id_msp_env = p_id_env;
           -- підготовка xml відповіді
-          select cvalue
-          into l_buff
-          from msp_env_content c
-          where id = l_envelope_id and type_id = 2;
-
-          p_env_rq_st  := 'S';
+          if l_env_state in (msp_const.st_env_MATCH2_CREATED, msp_const.st_env_MATCH2_SEND) then
+            select cvalue
+            into l_buff
+            from msp_env_content c
+            where id = p_envelope_id and type_id = 2;
+            p_env_rq_st  := 'S';
+          else
+            p_env_rq_st  := 'R';
+          end if;
+          
           l_isencode64 := false;
         exception
           when no_data_found then
@@ -2388,10 +2401,11 @@ create or replace package body msp_utl is
                             p_id_env     in out nocopy msp_envelopes.id_msp_env%type,
                             p_is_bad_xml in simple_integer) return clob
   is
-    l_buff      clob;
-    l_env_rq_st varchar2(1);
+    l_buff        clob;
+    l_env_rq_st   varchar2(1);
+    l_envelope_id msp_envelopes.id%type;
   begin
-    l_buff := make_request_data(p_request.req_xml, p_request.act_type, p_id_env, p_is_bad_xml, l_env_rq_st);
+    l_buff := make_request_data(p_request.req_xml, p_request.act_type, p_id_env, p_is_bad_xml, l_env_rq_st, l_envelope_id);
     l_buff := make_envelope(p_action_name => 'payment_data_ans',
                             p_idenv       => p_id_env,
                             p_data        => l_buff);
@@ -2407,14 +2421,15 @@ create or replace package body msp_utl is
                           p_id_env     in out nocopy msp_envelopes.id_msp_env%type,
                           p_is_bad_xml in simple_integer) return clob
   is
-    l_buff      clob;
-    l_env_rq_st varchar2(1);
+    l_buff        clob;
+    l_env_rq_st   varchar2(1);
+    l_envelope_id msp_envelopes.id%type;
   begin
     l_buff := get_request_data(p_request.req_xml);
     -- перетворення із base64
     decode_data(l_buff);
     -- підготовка файлу відповіді
-    l_buff := make_request_data(l_buff, p_request.act_type, p_id_env, p_is_bad_xml, l_env_rq_st);
+    l_buff := make_request_data(l_buff, p_request.act_type, p_id_env, p_is_bad_xml, l_env_rq_st, l_envelope_id);
     -- підготовка конверту
     l_buff := make_envelope(p_action_name => 'data_state_ans',
                             p_idenv       => p_id_env,
@@ -2433,19 +2448,25 @@ create or replace package body msp_utl is
                                 p_id_env     in out nocopy msp_envelopes.id_msp_env%type,
                                 p_is_bad_xml in simple_integer) return clob
   is
-    l_buff      clob;
-    l_env_rq_st varchar2(1);
+    l_buff        clob;
+    l_env_rq_st   varchar2(1);
+    l_envelope_id msp_envelopes.id%type;
   begin
     l_buff := get_request_data(p_request.req_xml);
     -- перетворення із base64
     decode_data(l_buff);
     -- підготовка файлу відповіді
-    l_buff := make_request_data(l_buff, p_request.act_type, p_id_env, p_is_bad_xml, l_env_rq_st);
+    l_buff := make_request_data(l_buff, p_request.act_type, p_id_env, p_is_bad_xml, l_env_rq_st, l_envelope_id);
     -- підготовка конверту
     l_buff := make_envelope(p_action_name => 'validation_state_answer',
                             p_idenv       => p_id_env,
                             p_data        => l_buff,
                             p_env_rq_st   => l_env_rq_st);
+    -- якщо все ок то проставляю статус квит1 відправлена
+    if l_env_rq_st = 'S' then
+      set_state_envelope(p_id    => l_envelope_id, 
+                         p_state => msp_const.st_env_MATCH1_SEND);
+    end if;
     -- set_state_request = 0
     msp_utl.set_state_request(p_request.id, 0);
     return l_buff;
@@ -2460,19 +2481,25 @@ create or replace package body msp_utl is
                              p_id_env     in out nocopy msp_envelopes.id_msp_env%type,
                              p_is_bad_xml in simple_integer) return clob
   is
-    l_buff      clob;
-    l_env_rq_st varchar2(1);
+    l_buff        clob;
+    l_env_rq_st   varchar2(1);
+    l_envelope_id msp_envelopes.id%type;
   begin
     l_buff := get_request_data(p_request.req_xml);
     -- перетворення із base64
     decode_data(l_buff);
     -- підготовка файлу відповіді
-    l_buff := make_request_data(l_buff, p_request.act_type, p_id_env, p_is_bad_xml, l_env_rq_st);
+    l_buff := make_request_data(l_buff, p_request.act_type, p_id_env, p_is_bad_xml, l_env_rq_st, l_envelope_id);
     -- підготовка конверту
     l_buff := make_envelope(p_action_name => 'payment_state_answer',
                             p_idenv       => p_id_env,
                             p_data        => l_buff,
                             p_env_rq_st   => l_env_rq_st);
+    -- якщо все ок то проставляю статус квит2 відправлена
+    if l_env_rq_st = 'S' then
+      set_state_envelope(p_id    => l_envelope_id, 
+                         p_state => msp_const.st_env_MATCH2_SEND);
+    end if;
     -- set_state_request = 0
     msp_utl.set_state_request(p_request.id, 0);
     return l_buff;

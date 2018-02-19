@@ -1,3 +1,10 @@
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /sql/msp/view/v_msp_files2pay.sql =========*** Run *** =
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create view v_msp_files2pay ***
+
 create or replace view v_msp_files2pay as
 select f.id,
        fi.filepath file_path,
@@ -44,8 +51,12 @@ select f.id,
        fi.id       as envelope_file_id,
        fi.filename as envelope_file_name,
        fi.state    as envelope_file_state,
-       fi.comm     as envelope_comment
+       fi.comm     as envelope_comment,
+       es.id       as envelope_state_id,
+       es.name     as envelope_state_name
 from msp_envelope_files_info fi
+     inner join msp_envelopes e on e.id = fi.id
+     inner join msp_envelope_state es on es.id = e.state
      inner join msp_files f on f.envelope_file_id = fi.id
      inner join msp_file_state fs on fs.id = f.state_id
      left join msp_acc_trans_2560 acc on acc.kf = f.receiver_mfo
@@ -64,3 +75,10 @@ comment on column V_MSP_FILES2PAY.ENVELOPE_FILE_ID is 'id файлу конверта';
 comment on column V_MSP_FILES2PAY.ENVELOPE_FILE_NAME is 'Назва файлу архіва конверта';
 comment on column V_MSP_FILES2PAY.ENVELOPE_FILE_STATE is 'Статус файлу конверта';
 comment on column V_MSP_FILES2PAY.ENVELOPE_COMMENT is 'Коментар до файлу конверта';
+
+grant select on v_msp_files2pay to bars_access_defrole;
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /sql/msp/view/v_msp_files2pay.sql =========*** End *** =
+PROMPT ===================================================================================== 
