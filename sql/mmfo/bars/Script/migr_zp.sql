@@ -1,26 +1,3 @@
-
-begin --убрать перед передачей в прод
-for c in (
-            select a.rnk,c.nmkv,a.acc,a.daos,a.branch from accounts a,customer c
-                where a.nbs='2909'
-                and a.ob22='11'
-                and a.kv=980
-                and c.rnk=a.rnk
-                and a.dazs is null)
- loop
- 
-     update zp_deals
-     set branch=c.branch
-     where rnk=c.rnk
-     and acc_2909=c.acc
-     and sos>=0;  
-     
- end loop;
- 
- end;               
-/
-commit;
-/         
 declare
 l_id number;
 begin
