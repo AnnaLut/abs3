@@ -108,7 +108,7 @@ is
 -- g_body_version      constant varchar2 (64) := 'version 1.00.03 04/04/2016';
 -- g_body_version      constant varchar2 (64) := 'version 1.00.04 08/08/2016';
 -- g_body_version      constant varchar2 (64) := 'version 1.00.05 20/09/2016';
-   g_body_version      constant varchar2 (64) := 'version 1.01.05 24/01/2018 ru';
+   g_body_version      constant varchar2 (64) := 'version 1.01.06 19/02/2018 ru';
    g_awk_body_defs     constant varchar2 (512) := '';
 
    type t_indicators_f503 is record (
@@ -1101,13 +1101,15 @@ end  p_f531;
            ||cur.m||'320'||l_zn0yvt||cur.p320||chr(13)||chr(10)
 
            ||cur.m||'040'||l_zn0yvt||cur.p040||chr(13)||chr(10)
-           
+
            ||cur.m||'330'||l_zn0yvt||lpad(cur.p330,3,'0')||chr(13)||chr(10)
-           ||cur.m||'080'||l_zn0yvt||cur.p080||chr(13)||chr(10)           
-           ||cur.m||'070'||l_zn0yvt||cur.p070||chr(13)||chr(10)           
-           ||cur.m||'950'||l_zn0yvt||cur.p950||chr(13)||chr(10)           
+           ||cur.m||'080'||l_zn0yvt||cur.p080||chr(13)||chr(10)
+           ||cur.m||'070'||l_zn0yvt||cur.p070||chr(13)||chr(10)
+           ||cur.m||'950'||l_zn0yvt||cur.p950||chr(13)||chr(10)
+           
+           ||cur.m||'0300'||l_zn0yvt||cur.p030||chr(13)||chr(10)
            ;
-       l_n:=l_n+8+1+6+1+1+4;
+       l_n:=l_n+8+1+6+1+1+4+1;
 
       if cur.p960 is not null then
          l_txt:=l_txt||cur.m||'960'||l_zn0yvt||to_char(cur.p960,'fm99')||chr(13)||chr(10); l_n:=l_n+1;
@@ -1813,7 +1815,7 @@ end  p_f531;
                              P999,
                              p010,
                              p040,
-                             p070, p950
+                             p070, p950, p030
                               )
               values (c.contr_id, l_date_to, substr(c.nmkk,1,27) /*as p101*/, lpad(substr(c.okpo,1,10),10,'0'), lpad(substr(c.r_agree_no,1,5),5,'0') /*r_agree_no*/,
                c.r_agree_date /*as p103*/, lpad(c.kv,3,'0') /*as pval*/, '0' /*as t*/, case when c.credit_type=0 then 1 when c.creditor_type=11 then 3 else 2 end /*as m*/,
@@ -1829,7 +1831,7 @@ end  p_f531;
                c.f504_note /*as p999*/,
                c.borrower_id /*as p010*/,
                decode(c.f503_percent_type, 1, 3, c.f503_percent_type) /*as p040*/,
-               c.f503_percent_margin /*as p070*/, c.f503_percent /*as p950*/)
+               c.f503_percent_margin /*as p070*/, c.f503_percent /*as p950*/, lpad(c.country_id,3,'0') /*as p030*/)
                returning f504_id into l_f504_id;
 
         --розрахунок незаповнених показників
@@ -2337,7 +2339,7 @@ end  p_f531;
                          c.s as p090_vk,                                                                     f.p090 as p090_r,
                          c.borrower_id as p010_vk,                                                           f.p010 as p010_r,
                          c.f503_percent_margin as p070_vk,                                                   f.p070 as p070_r,
-                         c.f503_percent as p950_vk,                                                          f.p950 as p950_r                         
+                         c.f503_percent as p950_vk,                                                          f.p950 as p950_r
                   from v_cim_credit_contracts c, cim_f504 f where c.contr_id = f.contr_id
                    and f.kf = sys_context('bars_context','user_mfo'))
       loop
@@ -2361,7 +2363,7 @@ end  p_f531;
             p090 = cur.p090_vk,
             p010 = cur.p010_vk,
             p070 = cur.p070_vk,
-            p950 = cur.p950_vk            
+            p950 = cur.p950_vk
         where f504_id = cur.f504_id;
 
         if nvl(cur.m_r,-1)        != nvl(cur.m_vk,-1)  then
@@ -2424,7 +2426,7 @@ end  p_f531;
         end if;
         if nvl(cur.p950_r,-1)     != nvl(cur.p950_vk,-1) then
           add_auto_change_hist(cur.f504_id, '950', 'величина процентної ставки', cur.p950_r, cur.p950_vk);
-        end if;        
+        end if;
 
       end loop;
 
