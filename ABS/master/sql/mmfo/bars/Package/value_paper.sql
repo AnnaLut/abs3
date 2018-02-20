@@ -3,9 +3,10 @@
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/value_paper.sql =========*** Run ***
  PROMPT ===================================================================================== 
+ 
 CREATE OR REPLACE PACKAGE VALUE_PAPER
 IS
-   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.16 02.11.2017';
+   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.17 16.02.2018';
 
    FUNCTION header_version
       RETURN VARCHAR2;
@@ -524,11 +525,19 @@ TYPE r_many_grid
   procedure change_spec_cond(p_id      cp_spec_cond.id%type,
                              p_type_op number) ; --1 додати (бронь), 2-змінити (бронь), 3-видалити, 4-зняти помітку про видалення
 
+ --Існує функція по нарахуванню купону make_int_prepare
+ --Ця ж функція для можливості нарахування дивідентів (інший рахунок чим звичайне нарахування, суму вкажуть вручну)
+ --Ньюанс - якщо для угоди невідкритий внесистемний рахунок дивідентів, то відкрити його та підвязати до угоди.
+  procedure make_int_dividends_prepare(p_ref cp_deal.ref%type default null);
+
+  procedure change_int_dividends_prepare(p_ref cp_int_dividents.ref%type, p_sum cp_int_dividents.sum%type, p_nazn cp_int_dividents.nazn%type);
+  procedure make_oper_cp_int_dividends (p_ref cp_int_dividents.ref%type, p_sum cp_int_dividents.sum%type, p_nazn cp_int_dividents.nazn%type, p_nlsrd_6 cp_int_dividents.nlsrd_6%type);
+
 END value_paper;
 /
 CREATE OR REPLACE PACKAGE BODY VALUE_PAPER
 IS
-   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.27 02.11.2017';
+   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.28 16.02.2018';
 
    g_newline constant varchar2(5) := CHR(10)||CHR(13);
    FUNCTION body_version
@@ -1893,18 +1902,18 @@ END;
              FROM cp_accounts a, cp_deal d
             WHERE a.cp_ref = d.REF
               AND d.REF = p_REF_MAIN;
-        if  p_COD_I is not null then     
+        if  p_COD_I is not null then
           insert into operw (ref, tag, value)
            values (p_REF_MAIN, 'CP_IN', p_COD_I);
-        end if;   
-        if  p_COD_M is not null then     
+        end if;
+        if  p_COD_M is not null then
           insert into operw (ref, tag, value)
            values (p_REF_MAIN, 'CP_MR', p_COD_M);
-        end if;             
-        if  p_COD_F is not null then                
+        end if;
+        if  p_COD_F is not null then
           insert into operw (ref, tag, value)
-           values (p_REF_MAIN, 'CP_FC', p_COD_F);         
-        end if;             
+           values (p_REF_MAIN, 'CP_FC', p_COD_F);
+        end if;
   exception when others then   p_sErr := sqlerrm;
   end;
 
@@ -2933,6 +2942,182 @@ END;
        end if;
    end case;
  end;
+
+ --Існує функція по нарахуванню купону make_int_prepare
+ --Ця ж функція для можливості нарахування дивідентів (інший рахунок чим звичайне нарахування, суму вкажуть вручну)
+ --Ньюанс - якщо для угоди невідкритий внесистемний рахунок дивідентів, то відкрити його та підвязати до угоди.
+ procedure make_int_dividends_prepare(p_ref cp_deal.ref%type default null)
+ is
+   l_ref           cp_deal.ref%type;
+
+   l_grp           accounts.grp%type;
+   l_nlsrd         cp_accc.nlsrd%type;
+   l_nlsrd_6       cp_accc.nlsrd_6%type;  
+   l_accrd_6       accounts.acc%type;
+   l_kv            cp_kod.kv%type;
+   l_rnk           cp_kod.rnk%type;
+   l_cp_id         cp_kod.cp_id%type;
+   l_basey         cp_kod.basey%type;
+   l_dazs          cp_deal.dazs%type;
+   l_accrd_vnesist accounts.acc%type;
+   l_nlsrd_vnesist accounts.nls%type;
+   l_nmsrd_vnesist accounts.nms%type;
+   l_accrd_sist    accounts.acc%type;
+   l_nd            oper.nd%type;
+
+   l_p4            integer;
+   l_s8            varchar2(8);
+ begin
+   if p_ref is null then
+     l_ref := to_number(bars.pul.get('cp_ref_dividents'));
+     else
+       l_ref := p_ref;
+   end if;
+   bars_audit.info('value_paper.make_int_dividends_prepare START: REF=' || l_ref);
+   if l_ref is null then
+     raise_application_error(-20001,  'Вкажіть REF угоди по якій необхідно нарахувати дивіденти');
+   end if;
+
+   select a.nlsrd, k.kv, d.dazs,
+          (select ac.cp_acc from cp_accounts ac where ac.cp_ref = l_ref and ac.cp_acctype = 'RD') as accrd,
+          (select o.nd from oper o where o.ref = l_ref) as nd,
+          k.rnk, k.cp_id, a.nlsrd_6, 
+          (select acc from accounts where nls = a.nlsrd_6 and kv = 980), 
+          k.basey
+     into l_nlsrd, l_kv, l_dazs,
+          l_accrd_vnesist,
+          l_nd,
+          l_rnk, l_cp_id, l_nlsrd_6, 
+          l_accrd_6,
+          l_basey
+   from cp_kod k
+   join cp_deal d on (k.id = d.id)
+   left join cp_accc a on (d.ryn = a.ryn and nvl(d.pf, a.pf) = a.pf and k.emi = a.emi)
+   where d.ref = l_ref;
+
+   if l_dazs is not null then
+     raise_application_error(-20001,  'Угода закрита '||l_dazs);
+   end if;
+   if l_nlsrd is null then
+     raise_application_error(-20001,  'Невказаний консолідований рахунок дивідентів (в довіднику cp_accc)');
+   end if;
+   if l_nlsrd_6 is null then
+     raise_application_error(-20001,  'Невказаний рахунок доходів по дивідентам 6 клас (в довіднику cp_accc)');
+   end if;
+   
+
+   if l_accrd_vnesist is null then --тоді відкрити по угоді внесистемний рахунок і підвязати до угоди
+     begin
+       select a.dazs, a.acc,        a.grp, l_cp_id||'/'||a.nms
+         into l_dazs, l_accrd_sist, l_grp, l_nmsrd_vnesist
+       from accounts a
+       where a.nls = l_nlsrd and a.kv = l_kv;
+       exception
+         when NO_DATA_FOUND then
+           raise_application_error(-20001,  'Консолідований рахунок дивідентів '||l_nlsrd||' у валюті '||l_kv||' не знайдено');
+     end;
+     if l_dazs is not null then
+       raise_application_error(-20001,  'Консолідований рахунок дивідентів '||l_nlsrd||' закритий '||l_dazs);
+     end if;
+
+     l_s8 := substr('000000000'|| l_ref, -8 );
+     l_nlsrd_vnesist := substr(l_nlsrd,1,5)||'0'||l_s8;
+     --відкрити
+     cp.CP_REG_EX(99,0,0,l_grp,l_p4, l_rnk , l_nlsrd_vnesist,l_kv, l_nmsrd_vnesist,'ODB',gl.aUid,l_accrd_vnesist);
+     update accounts
+     set accc=l_accrd_sist, seci=4, pos=1
+     where acc=l_accrd_vnesist;
+
+     cp.cp_inherit_specparam (l_accrd_vnesist, l_accrd_sist, 0);
+
+     --підвязати
+     insert into cp_accounts(cp_ref, cp_acctype, cp_acc)
+     values(l_ref, 'RD', l_accrd_vnesist);
+     
+     insert into int_accn (acc            ,id, acra           ,  acrb     ,   metr,   tt  ,    basey,      freq,   acr_dat   ,io)
+          values          (l_accrd_vnesist, 0, l_accrd_vnesist,  l_accrd_6,      4,  'FX%',  l_basey,         1,   gl.BDATE-1, 0);     
+   end if;
+
+   delete from cp_int_dividents where user_id = user_id();
+   insert into cp_int_dividents(ref, nazn, nlsrd_6) values(l_ref, 'Нараховані дивіденди по акціям '||l_cp_id||'уг.'||l_nd||' за період ', l_nlsrd_6);
+   bars_audit.info('value_paper.make_int_dividends_prepare END');
+ end;
+
+ procedure change_int_dividends_prepare(p_ref cp_int_dividents.ref%type, p_sum cp_int_dividents.sum%type, p_nazn cp_int_dividents.nazn%type)
+ is
+ begin
+   if p_ref is null then
+     raise_application_error(-20001,  'Вкажіть REF угоди');
+   end if;
+
+   update cp_int_dividents
+      set nazn = p_nazn, sum = p_sum
+    where ref = p_ref and user_id = user_id();
+
+   if sql%rowcount = 0 then
+     raise_application_error(-20001,  'Оновив 0 записів!');
+   end if;
+
+ end;
+
+  procedure make_oper_cp_int_dividends (p_ref cp_int_dividents.ref%type, p_sum cp_int_dividents.sum%type, p_nazn cp_int_dividents.nazn%type, p_nlsrd_6 cp_int_dividents.nlsrd_6%type)
+  is
+    oo     oper%rowtype;
+    l_acc  accounts.acc%type;
+  begin
+    bars_audit.info('value_paper.make_oper_cp_int_dividends START: REF=' || p_ref);
+
+    if p_ref is null then
+      raise_application_error(-20001,  'Вкажіть REF угоди');
+    end if;
+    if nvl(p_sum, 0) = 0 then
+      raise_application_error(-20001,  'Вкажіть суму нарахування дивідентів');
+    end if;
+    if p_nazn is null then
+      raise_application_error(-20001,  'Вкажіть признаення платежу');
+    end if;
+    if p_nlsrd_6 is null then
+      raise_application_error(-20001,  'Вкажіть рахунок доходів по дивідентам');
+    end if;    
+
+    select a.nls, a.kv, substr(a.nms, 1, 38), c.okpo, a.acc
+    into   oo.nlsa, oo.kv, oo.nam_a, oo.id_a,         l_acc
+    from cp_accounts ac, accounts a, customer c
+    where ac.cp_ref = p_ref and ac.cp_acctype = 'RD'
+      and ac.cp_acc = a.acc
+      and a.rnk = c.rnk;
+      
+    select substr(a.nms, 1, 38), c.okpo
+    into   oo.nam_b, oo.id_b
+    from accounts a, customer c
+    where a.nls = p_nlsrd_6 and a.kv = 980
+      and a.rnk = c.rnk;     
+
+    gl.ref (oo.REF);
+
+    oo.nd    := trim (Substr( '          '||to_char(oo.ref) , -10));
+    oo.s     := p_sum*100;
+    oo.s2    := gl.p_icurval(oo.kv, p_sum*100, gl.bd);
+    oo.dk    := 1;
+    oo.tt    := 'FX%';
+    oo.nlsb  := p_nlsrd_6;
+    oo.kv2   := 980;
+    oo.nazn  := substr(p_nazn,1,160);
+
+    gl.in_doc3 (oo.REF, oo.tt, 6, oo.nd, SYSDATE, gl.bdate, oo.dk,  oo.kv, oo.S , oo.kv2 ,oo.S2, null, gl.BDATE, gl.bdate,
+                  oo.nam_a, oo.nlsa,  gl.aMfo,
+                  oo.nam_b, oo.nlsb,  gl.amfo,
+                  oo.nazn ,null,oo.id_a, gl.Aokpo, null, null, 1, null, null);
+    gl.payv(0, oo.ref, gl.bdate, oo.tt, oo.dk, oo.kv, oo.nlsa, oo.s, oo.kv2, oo.nlsb, oo.s2);
+    update int_accn set acr_dat = gl.bdate where acc = l_acc and id = 0;
+      --------------------
+      -- Вставка записи-истории о начислении процентов, если, в будущем будет необходимость СТОРНО или персчета процентов.
+    ACRN.acr_dati ( l_acc, 0, oo.REF, gl.bdate, 0);
+   
+    delete from cp_int_dividents where user_id = user_id(); 
+    
+    bars_audit.info('value_paper.make_oper_cp_int_dividends END');
+end;
 
 END value_paper;
 /
