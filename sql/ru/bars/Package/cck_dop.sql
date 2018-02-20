@@ -258,7 +258,7 @@ PROCEDURE CC_OPEN(ND_         in OUT int,    CC_ID_      in varchar2,      nRNK 
                   SDOG        in number,     SumSDI      in number,        fPROC       in number,     BASEY       in int,
                   SDATE       in DATE,       WDATE       in DATE,          GPK         in number,     METR        in int,
                   METR_R      in number,     METR_9      in number,        nFIN        in int,        nFREQ       in int,
-                  dfDen       in int,        in VARCHAR2,  --COBUSUPABS-7065        
+                  dfDen       in int,     PROD_   in VARCHAR2,  --COBUSUPABS-7065        
                   nBANK       number default null,        NLS         varchar2 default null,
                   PAWN        number , PAWN_S  number,  PAWN_RNK  int,  PAWNP  number,   PAWNP_S  number, PAWNP_RNK   int,
                   PAWN2       number , PAWN2_S number,  PAWN2_RNK int,  PAWNP2 number,   PAWNP2_S number, PAWNP2_RNK  int,
