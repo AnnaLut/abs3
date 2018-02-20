@@ -15,7 +15,7 @@
         return $scope.tmp;
     };
 
-    $scope.AjaxPostFunction = function (url, post_data) {
+    $scope.AjaxPostFunction = function (url, post_data,callBackFunction) {
         $.ajax({
             url: url,
             method: "POST",
@@ -27,6 +27,8 @@
                     function (data) {
                         $('#mydiv').hide();
                         $scope.tmp = data.responseJSON;
+                        if(typeof(callBackFunction) == 'function')
+                        callBackFunction();
                     }
         });
         return $scope.tmp;
@@ -2386,7 +2388,7 @@
     };
 
     handleSaveChanges = function (grid) {
-        debugger;
+        
         var valid = true;
         // See if there are any insert rows
         var rows = grid.tbody.find("tr");
@@ -2995,15 +2997,36 @@
     }
 
     $scope.PrintF0 = function () {
+        
         var url = bars.config.urlContent("/api/Dpa/RegisterCountsDpaApi/PrintF0Files");
         var gridElement = angular.element("#formFilesReportsGrid").data("kendoGrid");
         var grid = gridElement.dataSource.data();
-        var post_data = JSON.stringify({ fileName: angular.element("#formed_file").val(), grid: grid });
+        $scope.lastTemplateFileName = angular.element("#formed_file").val();
+        var post_data = JSON.stringify({ fileName: $scope.lastTemplateFileName, grid: grid });
         if (angular.element("#formed_file").val() !== "") {
-            var data = $scope.AjaxPostFunction(url, post_data);
-            bars.ui.success({ text: "Надруковано " + grid.length + "повідомлень в С:\bars_dpa\DPA_" + angular.element("#formed_file").val() });
+            var data = $scope.AjaxPostFunction(url, post_data, $scope.getFileCallBackFunction);
+
+
         }
         else
             bars.ui.error({ text: "Оберіть спочатку файл" });
     }
+
+    $scope.getFileCallBackFunction = function (errorMsg){
+        
+        if(!errorMsg)
+        {
+
+            var gridElement = angular.element("#formFilesReportsGrid").data("kendoGrid");
+            var grid = gridElement.dataSource.data();
+            bars.ui.alert({ text: "Надруковано " + grid.length + " повідомлень " },$scope.getFileFunction);
+        }
+        else
+            bars.ui.notify('Помилка', 'Сталася помилка при виклику сервісу', errorMsg);
+    }
+
+    $scope.getFileFunction = function () {
+        window.open(bars.config.urlContent("/api/Dpa/RegisterCountsDpaApi/GetLastGeneratedTemplate?fileName="+$scope.lastTemplateFileName));
+    }
+
 }]);

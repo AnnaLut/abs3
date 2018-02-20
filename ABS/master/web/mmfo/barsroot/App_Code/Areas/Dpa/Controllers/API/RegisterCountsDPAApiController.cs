@@ -1,4 +1,5 @@
 ﻿using AttributeRouting.Web.Http;
+using Bars.Web.Report;
 using BarsWeb.Areas.Dpa.Infrastructure.Repository.DI.Abstract;
 using BarsWeb.Areas.Dpa.Models;
 using BarsWeb.Core.Models;
@@ -9,7 +10,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Runtime.InteropServices;
+using System.Text;
+using System.Web;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
 
@@ -232,6 +236,27 @@ namespace BarsWeb.Areas.Dpa.Controllers.Api
 
         }
 
+        public HttpResponseMessage GetLastGeneratedTemplate(string fileName)
+        {
+            HttpResponseMessage result = Request.CreateResponse(HttpStatusCode.OK);
+            //for XML - use utf-8
+            RtfReporter rep = new RtfReporter(HttpContext.Current);
+            string text = File.ReadAllText(rep.ReportFile);
+            Encoding windows = Encoding.GetEncoding("windows-1251");
+          
+            Encoding unicode = Encoding.Unicode;
+
+            var unicodeBytes = unicode.GetBytes(text);
+            var windowsBytes = Encoding.Convert(unicode, windows, unicodeBytes);
+            result.Content = new StreamContent(new MemoryStream(windowsBytes));
+            result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/plain");
+            result.Content.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment")
+            {
+                FileName = fileName
+            };
+
+            return result;
+        }
         [HttpPost]
         public HttpResponseMessage PrintF0Files([FromBody] dynamic request)
         {
