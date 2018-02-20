@@ -89,7 +89,7 @@ commit;
 
 delete from kl_f3_29 
 where kf='E8' and r020 in ('8610', '8615', '8651', '8652', '8655');
-
+ 
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values

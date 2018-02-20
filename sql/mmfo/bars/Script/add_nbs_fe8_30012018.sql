@@ -4,7 +4,7 @@
 
 
 exec bc.home;
-
+ 
 delete from kl_f3_29 where kf='E8' and r020 in ('3335');
 
 -- добалены группы бал. счетов 3303, 3313, 3314
