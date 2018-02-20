@@ -7,7 +7,7 @@ PROMPT *** Create view v_msp_files ***
 
 create or replace view v_msp_files as
 select f.id,
-       substr(fi.filename, 25, 2) payment_type,
+       case when instr(fi.filename,'.')>37 then substr(fi.filename, 30, 2) else substr(fi.filename, 25, 2) end payment_type,
        substr(fi.filepath, 1, instr(fi.filepath, '\')-1) file_path,
        substr(filepath, instr(filepath, '\')+1, length(filepath)-instr(filepath, '\')) file_name,
        --lpad(f.file_filia_num, 5, '0') || lpad(f.file_pay_day, 2, '0') || f.file_separator || lpad(f.file_upszn_code, 3, '0') file_name,

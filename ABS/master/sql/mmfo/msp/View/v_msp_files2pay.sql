@@ -8,8 +8,7 @@ PROMPT *** Create view v_msp_files2pay ***
 create or replace view v_msp_files2pay as
 select f.id,
        fi.filepath file_path,
-       --REQPAY_OBU_RRRRÀÀÀÀAÑÑUUTTPPDDMMYYYY
-       substr(fi.filename, 25, 2) payment_type,
+       case when instr(fi.filename,'.')>37 then substr(fi.filename, 30, 2) else substr(fi.filename, 25, 2) end payment_type,
        lpad(f.file_filia_num, 5, '0') || lpad(f.file_pay_day, 2, '0') || f.file_separator || lpad(f.file_upszn_code, 3, '0') file_name,
        (select count(1) from msp_file_records fr where fr.file_id = f.id and fr.state_id in (0)) count_to_pay,
        (select sum(fr.pay_sum)*0.01 from msp_file_records fr where fr.file_id = f.id and fr.state_id in (0)) sum_to_pay,

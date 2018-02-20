@@ -7,7 +7,7 @@ PROMPT *** Create view v_msp_file_for_match ***
 
 create or replace view v_msp_file_for_match as
 select f.id,
-       substr(fi.filename, 25, 2) payment_type,
+       case when instr(fi.filename,'.')>37 then substr(fi.filename, 30, 2) else substr(fi.filename, 25, 2) end payment_type,
        substr(fi.filepath, 1, instr(fi.filepath, '\')-1) file_path,
        substr(filepath, instr(filepath, '\')+1, length(filepath)-instr(filepath, '\')) file_name,
        f.file_bank_num,
