@@ -11,8 +11,8 @@ CREATE OR REPLACE PACKAGE CP IS
    --
    -------------------------------------------------------
 
-   G_HEADER_VERSION    constant varchar2(64) := 'v.1.14.5  13.12.2017';
-                                              --prv 'v.1.14.3 '
+   G_HEADER_VERSION    constant varchar2(64) := 'v.1.14.6  16.02.2018';
+                                              
 
    CP_PAY_   char(1):='0'; --1) 0=Конс-сист., Угоди-несист, 1=Конс-несист., Угоди-сист
    CP_AMORT_ char(1):='0'; --2) 0=ТП Амотр всегда, 1=ТП не аморт
@@ -462,14 +462,18 @@ PROCEDURE awry_period (p_id       IN     cp_kod.id%TYPE,
   function get_from_cp_zal_dat(p_ref number, p_dat date) return date;
 
   --Процедура на БМД ЦП (14) - редагування заставної інформації в розрізі контрагентів
-  procedure cp_zal_change(p_ref          cp_zal.ref%type, 
-                          p_rnk          cp_zal.rnk%type, 
-                          p_id_cp_zal    cp_zal.id_cp_zal%type, 
-                          p_id           cp_zal.id%type, 
-                          p_kol_zal      cp_zal.kolz%type, 
-                          p_zal_from     cp_zal.datz_from%type, 
-                          p_zal_to       cp_zal.datz_to%type, 
+  procedure cp_zal_change(p_ref          cp_zal.ref%type,
+                          p_rnk          cp_zal.rnk%type,
+                          p_id_cp_zal    cp_zal.id_cp_zal%type,
+                          p_id           cp_zal.id%type,
+                          p_kol_zal      cp_zal.kolz%type,
+                          p_zal_from     cp_zal.datz_from%type,
+                          p_zal_to       cp_zal.datz_to%type,
                           p_mode         int); --для функи ЦП (14)
+                          
+  procedure cp_inherit_specparam(p_acc   IN number,
+                                 p_accc  IN int,               -- рах-ку консол-ї
+                                 p_mode  in number default 0); -- резерв                          
 
 END CP;
 /
@@ -479,7 +483,7 @@ CREATE OR REPLACE PACKAGE body CP IS
 --  Пакет пр-р CP. Работа с цінними паперами
 --  Версія для КБ пізніше 05/2016
 ----------------------------------------------------------------------
-    G_BODY_VERSION      constant varchar2(64) := 'v.2.90.8  27/12/2017';
+    G_BODY_VERSION      constant varchar2(64) := 'v.2.90.9  16/02/2018';
     G_TRACE             constant varchar2(20) := 'cp.';  -- 'v.2.90.4'
     G_MODULE            constant varchar2(20) := 'CPN';
     G_PAY_CUPON         constant number(1):= 1;
@@ -5481,10 +5485,10 @@ begin
      WHERE REF = nREPO_;
    END IF;
   bars_audit.trace('%s Финиш (ID = %s, tip = %s)', title, to_char(nID_), to_char(TIPD_));
-  
+
   exception
     when others then
-      bars_audit.error(title||SQLERRM||','||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE); 
+      bars_audit.error(title||SQLERRM||','||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE);
       raise;
 end CP_PROD;
 ------------------------------------------------------------------------------
@@ -7717,7 +7721,7 @@ end CP_POG_NOM2;
 
 
   -- Сумирует общее количество Ценных бумаг по Контрагентам в рамках Пакета
-  -- Для формы ЦП (14*) 
+  -- Для формы ЦП (14*)
   function get_from_cp_zal_kolz(p_ref number, p_dat date) return number is
 -- v.1.0 12.12.2017
 -- актуальне значення(сума по всім контрагентам) пар-ра на дату
@@ -7756,21 +7760,21 @@ end CP_POG_NOM2;
     return l_dat;
 
   end;
-  
+
   --Процедура на БМД ЦП (14) - редагування заставної інформації в розрізі контрагентів
-  procedure cp_zal_change(p_ref          cp_zal.ref%type, 
-                          p_rnk          cp_zal.rnk%type, 
-                          p_id_cp_zal    cp_zal.id_cp_zal%type, 
-                          p_id           cp_zal.id%type, 
-                          p_kol_zal      cp_zal.kolz%type, 
-                          p_zal_from     cp_zal.datz_from%type, 
-                          p_zal_to       cp_zal.datz_to%type, 
+  procedure cp_zal_change(p_ref          cp_zal.ref%type,
+                          p_rnk          cp_zal.rnk%type,
+                          p_id_cp_zal    cp_zal.id_cp_zal%type,
+                          p_id           cp_zal.id%type,
+                          p_kol_zal      cp_zal.kolz%type,
+                          p_zal_from     cp_zal.datz_from%type,
+                          p_zal_to       cp_zal.datz_to%type,
                           p_mode         int) --1 - add, 2 - upd, 3 - del
   is
     l_ref    cp_zal.ref%type   := nvl(p_ref,      PUL.get('CP_ref'));
     l_id     cp_zal.id%type    := nvl(p_id,       PUL.get('CP_id'));
- 
-    l_zal_from    cp_zal.datz_from%type  := p_zal_from; 
+
+    l_zal_from    cp_zal.datz_from%type  := p_zal_from;
     l_zal_to      cp_zal.datz_to%type    := p_zal_to;
 
     l_dat         date;
@@ -7779,66 +7783,66 @@ end CP_POG_NOM2;
     if p_rnk is null then
 --      bars_error.raise_nerror(G_MODULE, 'NOT_CORRECT_PAYTYPE', 'ТЕСТ');
       raise_application_error(-20001,  'Вкажіть RNK контрагента ' );
-    end if;  
+    end if;
     if p_zal_from is null then
       raise_application_error(-20001,  'Вкажіть дату Дії з ' );
-    end if;  
+    end if;
     if p_zal_to is null then
       raise_application_error(-20001,  'Вкажіть дату Дії по ' );
-    end if;  
+    end if;
     if p_zal_to < p_zal_from then
       raise_application_error(-20001,  'Дата Дії по повинна бути більша або ж така за дату Дії з' );
-    end if;  
+    end if;
 
-    case  p_mode 
+    case  p_mode
       when 1 then
-        select min(datz_to) 
+        select min(datz_to)
         into l_dat
-        from cp_zal 
+        from cp_zal
         where ref = p_ref and rnk = p_rnk and datz_from > p_zal_from and datz_to < p_zal_to;--якщо пересікаються періоди
-        
+
         if l_dat >= l_zal_from then --підкоректувати дату _діє до_  першого періоду куди потрапляє дата _дії з_ нового запису
 --          raise_application_error(-20001,  'l_dat='||l_dat||' l_zal_from='||l_zal_from );
-          update cp_zal 
-           set   datz_to   = p_zal_from - 1 
+          update cp_zal
+           set   datz_to   = p_zal_from - 1
           where ref = p_ref and rnk = p_rnk and datz_from > p_zal_from and datz_to = l_dat;
-        end if; 
-        
+        end if;
+
         insert into cp_zal(ref, id, kolz, datz_from, rnk, datz_to)
         values (l_ref, l_id, p_kol_zal, l_zal_from, p_rnk, l_zal_to);
-      when 2 then 
-        update cp_zal 
+      when 2 then
+        update cp_zal
            set kolz      =  p_kol_zal,
                datz_from = l_zal_from,
                datz_to   = l_zal_to,
                rnk       = p_rnk
-         where id_cp_zal = p_id_cp_zal; 
+         where id_cp_zal = p_id_cp_zal;
       when 3 then
-        delete from cp_zal where id_cp_zal = p_id_cp_zal;        
-    end case;    
-  
-  
-    -- приводить періоди дій в розрізі rnk в непротерічність 
+        delete from cp_zal where id_cp_zal = p_id_cp_zal;
+    end case;
+
+
+    -- приводить періоди дій в розрізі rnk в непротерічність
     for c in ( select id_cp_zal,
-                      nvl(lead(datz_from, 1) over (order by datz_from), 
+                      nvl(lead(datz_from, 1) over (order by datz_from),
                           (select max(datz_to) from cp_zal
                             where ref = p_ref and (rnk = p_rnk or (rnk is null and p_rnk is null))) + 1) as datz_to
                  from cp_zal
                 where ref = p_ref and (rnk = p_rnk or (rnk is null and p_rnk is null)) )
     loop
-       update cp_zal set datz_to = c.datz_to-1 where id_cp_zal = c.id_cp_zal 
+       update cp_zal set datz_to = c.datz_to-1 where id_cp_zal = c.id_cp_zal
                                                  and datz_to != c.datz_to-1; --немає смислу змінювати на туж дату;
-    end loop;  
-    
+    end loop;
+
     exception
       when others then
         if sqlcode = -1  and sqlerrm like '%IND_U_CP_ZAL_DF%' then
             raise_application_error(-20001,  'Вкажіть іншу дату Діє з. Існує вже запис для rnk= '||p_rnk||', Діє з='||p_zal_from);
-          else 
+          else
             raise;
-        end if;  
-  end;    
-    
+        end if;
+  end;
+
 
 --------------------------------------
 BEGIN /* анонимный блок */

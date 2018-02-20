@@ -680,6 +680,19 @@ begin
                                                   p_frontend => l_application_type_id
                                                   );
 
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо ТИМЧАСОВО функцію ЦП Нарахування дивидентів по угоді ********** ');
+    --
+    delete from operlist a where  a.name = 'ЦП Нарахування дивидентів по угоді (тимчасово)';
+          --  Створюємо функцію ЦП Портфель ВАЛ
+      l := l +1;
+      l_function_ids.extend(l);
+      l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'ЦП Нарахування дивидентів по угоді (тимчасово)',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2&sPar=V_CP_INT_DIVIDENTS[NSIFUNCTION][PROC=>value_paper.make_int_dividends_prepare(:A)][PAR=>:A(SEM=REF угоди,TYPE=N)][EXEC=>BEFORE][showDialogWindow=>false]',
+                                                  p_rolename => 'CP_ROLE' ,
+                                                  p_frontend => l_application_type_id
+                                                  );
+
 
    DBMS_OUTPUT.PUT_LINE(chr(13)||chr(10)||'  Прикріпляємо ресурси функцій до даного АРМу ($RM_W_CP) - АРМ Цінні папери  ');
     l := l_function_ids.first;
