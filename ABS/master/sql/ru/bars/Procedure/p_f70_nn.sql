@@ -7,7 +7,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :   Процедура формирования #70 для КБ (универсальная)
 % COPYRIGHT   :   Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     :   05/01/2018 (13/12/2017, 20/11/2017)
+% VERSION     :   20/02/2018 (05/01/2018, 13/12/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
       sheme_ - схема формирования
@@ -15,6 +15,9 @@ IS
                                  2 - надходження вiд нерезидентiв
                                  3 - всi операцii
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+19/02/2018 для таблицы ZAYAVKA добавлено блок для обработки поля 
+           REF (ранее было только поле REF_SPS) и 
+           выбираем поле "meta" вместо "aims_code"
 05/01/2018 для отбора кода мети продажу из табл. ZAYAVKA добавил условие
            rownum = 1 (замечание из Ровно)
 13/12/2017 не будут показатели 32NNN, 33NNN, 41NNN для покупки валюты или 
@@ -973,7 +976,9 @@ BEGIN
                         OR (    SUBSTR (o.nlsd, 1, 4) in ('2900', '2600', '2620', '2650')
                             AND SUBSTR (o.nlsk, 1, 4) = '3739'
                             AND mfou_ = 300465 
-                            AND LOWER (TRIM (o.nazn)) like '%перерахування кошт_в на продаж%' 
+                            AND ( LOWER (TRIM (o.nazn)) like '%перерахування кошт_в для обов_язкового продажу%' OR 
+                                  LOWER (TRIM (o.nazn)) like '%перерахування кошт_в на продаж%'
+                                )
                            )
                         OR (    SUBSTR (o.nlsd, 1, 4) in ('2610','2615', '2620','2625',
                                                           '2630','2635', '2525','2546')
@@ -1179,14 +1184,25 @@ BEGIN
                       WHEN NO_DATA_FOUND
                       THEN
                       BEGIN
-                         SELECT  aims_code 
+                         SELECT  meta 
                             INTO d1#D3_
                          FROM zayavka 
-                         WHERE ref_sps = ref_;
+                         WHERE ref_sps = ref_
+                           and rownum = 1;
                       EXCEPTION
                          WHEN NO_DATA_FOUND
                          THEN
-                         d1#D3_ := NULL;
+                         BEGIN
+                            SELECT  meta 
+                               INTO d1#D3_
+                            FROM zayavka 
+                            WHERE ref = ref_
+                              and rownum = 1;
+                         EXCEPTION
+                            WHEN NO_DATA_FOUND
+                            THEN
+                            d1#D3_ := NULL;
+                         END;
                       END;
                    END;
                else
@@ -1198,7 +1214,7 @@ BEGIN
                   d1#D3_ is null
                then
                   BEGIN
-                     SELECT  z.aims_code 
+                     SELECT  z.meta 
                         INTO d1#D3_
                      FROM provodki_otc p, zayavka z
                      WHERE p.fdat = dat_
@@ -1209,7 +1225,20 @@ BEGIN
                   EXCEPTION
                      WHEN NO_DATA_FOUND
                      THEN
-                     d1#D3_ := NULL;
+                        BEGIN
+                           SELECT  z.meta 
+                              INTO d1#D3_
+                           FROM provodki_otc p, zayavka z
+                           WHERE p.fdat = dat_
+                            and p.nlsd = nlsk_
+                            and p.s*100 = sum0_
+                            and z.ref = p.ref
+                            and rownum = 1;
+                        EXCEPTION
+                           WHEN NO_DATA_FOUND
+                           THEN
+                           d1#D3_ := NULL;
+                        END;
                   END;
                end if;
                    
