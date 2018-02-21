@@ -1,3 +1,4 @@
-=========  svn diff --summarize -r 48105:48297 D:\SVN\master\web\ru
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.172\ru\web\barsroot\version.abs
-Bugfix_2.0.35.5.172 (Rev:48105-48297
+=========  svn diff --summarize -r 48298:48324 D:\SVN\master\web\ru
+---web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.173\ru\web\TEMPLATE.RPT\SMS542.FRX
+---web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.173\ru\web
+Bugfix_2.0.35.5.173 (Rev:48298-48324
