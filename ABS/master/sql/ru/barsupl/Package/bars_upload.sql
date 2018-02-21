@@ -12,9 +12,10 @@
     --
     --   created: anny (01-07-2012)
     --
+    -- version 4.2 16.02.2018 Добавлены функции установки параметров выгрузки set_param, set_job_param, set_group_param
     -----------------------------------------------------------------
 
-    G_HEADER_VERSION      constant varchar2(64)  := 'version 4.1 13.05.2015';
+    G_HEADER_VERSION      constant varchar2(64)  := 'version 4.2 16.02.2018';
 
     -----------------------------------------------------------------
     -- Константы
@@ -156,7 +157,7 @@
     --
     -----------------------------------------------------------------
     procedure upload_file( p_filecode   upl_files.file_code%type,
-	                       p_sqlid      number,
+                           p_sqlid      number,
                            p_param1     varchar2,
                            p_param2     varchar2
                           );
@@ -257,13 +258,13 @@
     -----------------------------------------------------------------
     procedure log_start_process(
                     p_start_time       date                  ,
-		    p_jobid            number    default null,
+                    p_jobid            number    default null,
                     p_groupid          number    default null,
                     p_fileid           number    ,
-		    p_parentid         number    ,
+                    p_parentid         number    ,
                     p_sqlid            number    ,
                     p_params           varchar2  ,
-		    p_bankdate         date      ,
+                    p_bankdate         date      ,
                     p_id               in out number);
 
 
@@ -279,7 +280,7 @@
     procedure log_end_process(
                     p_stop_time        date     ,
                     p_rows_uploaded    number   ,
-		    p_filename         varchar2 ,
+                    p_filename         varchar2 ,
                     p_id               in out number) ;
    -----------------------------------------------------------------
    --  LOG_ERROR_PROCESS()
@@ -303,11 +304,25 @@
    function get_param(p_param_name varchar2) return varchar2;
 
    -----------------------------------------------------------------
+   --    SET_PARAM
+   --
+   --    Устанвить глобальный параметр
+   --
+   function  set_param(p_param_name varchar2, p_value varchar2) return varchar2;
+   procedure set_param(p_param_name varchar2, p_value varchar2);
+   -----------------------------------------------------------------
    --    GET_JOB_PARAM
    --
    --    Получить параметр джоба по наименованию джоба
    --
    function get_job_param(p_job_name varchar2, p_param_name varchar2) return varchar2;
+   -----------------------------------------------------------------
+   --    SET_JOB_PARAM
+   --
+   --    Устанвить параметр джоба по наименованию джоба
+   --
+   function  set_job_param(p_job_name varchar2, p_param_name varchar2, p_value varchar2) return varchar2;
+   procedure set_job_param(p_job_name varchar2, p_param_name varchar2, p_value varchar2);
 
   -----------------------------------------------------------------
    --    GET_GROUP_PARAM
@@ -316,6 +331,13 @@
    --
    function get_group_param(p_groupid number, p_param_name varchar2) return varchar2;
 
+   -----------------------------------------------------------------
+   --    SET_GROUP_PARAM
+   --
+   --    Устанвить параметры группы выгрузки (или другими словами джоба)
+   --
+   function  set_group_param(p_groupid number, p_param_name varchar2, p_value varchar2) return varchar2;
+   procedure set_group_param(p_groupid number, p_param_name varchar2, p_value varchar2);
    -----------------------------------------------------------------
    --    INIT_PARAMS
    --
@@ -350,13 +372,14 @@ is
     --   author : Lut Anny
     --   created: 01-07-2012
     --                                                             --
+    -- version 4.9 16.02.2018 Добавлены функции установки параметров выгрузки set_param, set_job_param, set_group_param
     -----------------------------------------------------------------
 
     -----------------------------------------------------------------
     -- Константы                                                   --
     -----------------------------------------------------------------
 
-    G_BODY_VERSION         constant varchar2(64)  := 'version 4.8 25.11.2016';
+    G_BODY_VERSION         constant varchar2(64)  := 'version 4.9 16.02.2018';
     G_TRACE                constant varchar2(20)  := 'bars_upload.';
     G_MODULE               constant varchar2(3)   := 'UPL';
 
@@ -599,6 +622,7 @@ is
     is
        l_trace varchar2(500) := G_TRACE||'log_start_process: ';
        l_msg   varchar2(500);
+       l_res   varchar2(100);
     begin
 
        l_msg := case when p_fileid is null     and p_groupid is null     then 'джоба №'||p_jobid
@@ -616,6 +640,10 @@ is
                  p_params         => p_params,
                  p_bankdate       => p_bankdate,
                  p_id             => p_id);
+       l_res := case when p_fileid is null     and p_groupid is null     then set_param('STAT_JOB_ID',to_char(p_id))
+                     when p_fileid is null     and p_groupid is not null then set_param('STAT_GROUP_ID',to_char(p_id))
+                     when p_fileid is not null                           then set_param('STAT_FILE_ID',to_char(p_id))
+                end;
        bars.bars_audit.info(l_trace||'старт выгрузки '||l_msg||' upl_stat.id=' || p_id);
     end;
 
@@ -1853,16 +1881,16 @@ is
               execute immediate l_sql_after using p_param1, p_param2;
            else
              case
-               when ( instr(l_sql_before,':param1') > 0 )
+               when ( instr(l_sql_after,':param1') > 0 )
                then -- есть вхождение param1
                  bars.bars_audit.trace(l_trace||'есть вхождение param1');
-                 execute immediate l_sql_before using in p_param1;
-               when ( instr(l_sql_before,':param2') > 0 )
+                 execute immediate l_sql_after using in p_param1;
+               when ( instr(l_sql_after,':param2') > 0 )
                then -- есть вхождение param2
                  bars.bars_audit.trace(l_trace||'есть вхождение param2');
-                 execute immediate l_sql_before using p_param2;
+                 execute immediate l_sql_after using p_param2;
                else -- нет вхождения параметров
-                 execute immediate l_sql_before;
+                 execute immediate l_sql_after;
              end case;
            end if;
 
@@ -2279,6 +2307,26 @@ is
       return null;
    end;
 
+   --    SET_PARAM
+   --
+   --    Устанвить глобальный параметр
+   --
+   function set_param(p_param_name varchar2, p_value varchar2) return varchar2
+   is
+   begin
+        G_PARAMS_LIST(p_param_name) := p_value;
+        return p_value;
+   exception when others then
+      return null;
+   end;
+
+   procedure set_param(p_param_name varchar2, p_value varchar2)
+   is
+     l_ret_value  varchar2(1);
+   begin
+        l_ret_value := set_param(p_param_name, p_value);
+   end;
+
    -----------------------------------------------------------------
    --    GET_JOB_PARAM
    --
@@ -2290,6 +2338,27 @@ is
       return  G_JOBPARAM_LIST(p_job_name)(p_param_name);
    exception when others then
       return null;
+   end;
+
+   -----------------------------------------------------------------
+   --    SET_JOB_PARAM
+   --
+   --    Устанвить параметр джоба по наименованию джоба
+   --
+   function set_job_param(p_job_name varchar2, p_param_name varchar2, p_value varchar2) return varchar2
+   is
+   begin
+        G_JOBPARAM_LIST(p_job_name)(p_param_name) := p_value;
+        return p_value;
+   exception when others then
+      return null;
+   end;
+
+   procedure set_job_param(p_job_name varchar2, p_param_name varchar2, p_value varchar2)
+   is
+     l_ret_value  varchar2(1);
+   begin
+        l_ret_value := set_job_param(p_job_name, p_param_name, p_value);
    end;
 
    -----------------------------------------------------------------
@@ -2305,7 +2374,26 @@ is
       return null;
    end;
 
+   -----------------------------------------------------------------
+   --    SET_GROUP_PARAM
+   --
+   --    Устанвить параметры группы выгрузки (или другими словами джоба)
+   --
+   function set_group_param(p_groupid number, p_param_name varchar2, p_value varchar2) return varchar2
+   is
+   begin
+        G_JOBPARAM_LIST( G_JOBGROUP_LIST(p_groupid) )(p_param_name) := p_value;
+        return p_value;
+   exception when others then
+      return null;
+   end;
 
+   procedure set_group_param(p_groupid number, p_param_name varchar2, p_value varchar2)
+   is
+     l_ret_value  varchar2(1);
+   begin
+        l_ret_value := set_group_param(p_groupid, p_param_name, p_value);
+   end;
 
    -----------------------------------------------------------------
    --    INIT_GLOBAL_PARAMS
@@ -2316,6 +2404,7 @@ is
    is
 
       l_trace varchar2(1000):= G_TRACE||'init_global_params: ';
+      l_kf    upl_regions.kf%type;
    begin
 
       --------------
@@ -2324,6 +2413,11 @@ is
       if G_PARAMS_LIST.count  = 0 or p_force = 1 then
              for c in (select trim(param) param, value from upl_params) loop
                  G_PARAMS_LIST(c.param) := c.value;
+                 if c.param = 'REGION_PRFX' then --
+                    select kf into l_kf from upl_regions where CODE_CHR = c.value;
+                    G_PARAMS_LIST('KF') :=  l_kf;
+                    bars_audit.info(l_trace||'KF'||'-'||G_PARAMS_LIST('KF'));
+                 end if;
                  bars_audit.info(l_trace||c.param||'-'||c.value);
              end loop;
       end if;
@@ -2610,8 +2704,9 @@ end bars_upload;
  show err;
  
 PROMPT *** Create  grants  BARS_UPLOAD ***
-grant EXECUTE                                                                on BARS_UPLOAD     to BARS_ACCESS_USER;
-grant EXECUTE                                                                on BARS_UPLOAD     to UPLD;
+grant EXECUTE                                                                on BARS_UPLOAD to BARS;
+grant EXECUTE                                                                on BARS_UPLOAD to BARS_ACCESS_USER;
+grant EXECUTE                                                                on BARS_UPLOAD to UPLD;
 
  
  

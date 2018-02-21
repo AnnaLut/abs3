@@ -1046,9 +1046,9 @@ end bars_upload_usr;
  show err;
  
 PROMPT *** Create  grants  BARS_UPLOAD_USR ***
-grant EXECUTE                                                                on BARS_UPLOAD_UTL to BARS;
-grant EXECUTE                                                                on BARS_UPLOAD_UTL to BARS_ACCESS_USER;
-grant EXECUTE                                                                on BARS_UPLOAD_UTL to UPLD;
+grant EXECUTE                                                               on BARS_UPLOAD_UTL to BARS;
+grant EXECUTE                                                               on BARS_UPLOAD_UTL to BARS_ACCESS_USER;
+grant EXECUTE                                                               on BARS_UPLOAD_UTL to UPLD;
 
  
  

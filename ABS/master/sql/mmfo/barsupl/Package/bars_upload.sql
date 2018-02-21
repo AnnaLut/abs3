@@ -12,9 +12,10 @@
     --
     --   created: anny (01-07-2012)
     --
+    -- version 5.2 16.02.2018 Добавлены функции установки параметров выгрузки set_param, set_job_param, set_group_param
     -----------------------------------------------------------------
 
-    G_HEADER_VERSION      constant varchar2(64)  := 'version 5.1 11.01.2017';
+    G_HEADER_VERSION      constant varchar2(64)  := 'version 5.2 16.02.2018';
 
     -----------------------------------------------------------------
     -- Константы
@@ -157,7 +158,7 @@
     --
     -----------------------------------------------------------------
     procedure upload_file( p_filecode   upl_files.file_code%type,
-	                       p_sqlid      number,
+                           p_sqlid      number,
                            p_param1     varchar2,
                            p_param2     varchar2
                           );
@@ -190,7 +191,7 @@
     --    p_forcestop   --  при
     -----------------------------------------------------------------
     procedure upload_file_group( p_filegroup  number,
-	                         p_defsqlid   number,
+                                 p_defsqlid   number,
                                  p_param1     varchar2,
                                  p_param2     varchar2,
                                  p_forcestop  number    default 0);
@@ -210,12 +211,10 @@
     --    return        --  код в журнале аудита для группы (upl_stats)
     -----------------------------------------------------------------
     function  upload_file_group( p_filegroup  number,
-	                         p_parentid   number default null,
+                                 p_parentid   number default null,
                                  p_param1     varchar2,
                                  p_param2     varchar2,
                                  p_forcestop  number    default 0) return number;
-
-
 
     -----------------------------------------------------------------
     --  LOG_START_AFTERUPL_EVENT()
@@ -229,7 +228,6 @@
                     p_id           number,
                     p_eventname    varchar2 );
 
-
     -----------------------------------------------------------------
     --  LOG_STOP_AFTERUPL_EVENT()
     --
@@ -237,12 +235,12 @@
     --
     --    p_id             --  Код в протоколе выгрузки
     --    p_eventname      --  (ARC или FTP)
-	--    p_message        --  сообщение
+    --    p_message        --  сообщение
     -----------------------------------------------------------------
     procedure log_stop_afterupl_event(
                     p_id           number,
                     p_eventname    varchar2,
-                    p_message	   varchar2);
+                    p_message      varchar2);
 
 
     -----------------------------------------------------------------
@@ -258,13 +256,13 @@
     -----------------------------------------------------------------
     procedure log_start_process(
                     p_start_time       date                  ,
-		    p_jobid            number    default null,
+                    p_jobid            number    default null,
                     p_groupid          number    default null,
                     p_fileid           number    ,
-		    p_parentid         number    ,
+                    p_parentid         number    ,
                     p_sqlid            number    ,
                     p_params           varchar2  ,
-		    p_bankdate         date      ,
+                    p_bankdate         date      ,
                     p_id               in out number);
 
 
@@ -280,7 +278,7 @@
     procedure log_end_process(
                     p_stop_time        date     ,
                     p_rows_uploaded    number   ,
-		                p_filename         varchar2 ,
+                    p_filename         varchar2 ,
                     p_id               in out number) ;
    -----------------------------------------------------------------
    --  LOG_ERROR_PROCESS()
@@ -304,11 +302,26 @@
    function get_param(p_param_name varchar2) return varchar2;
 
    -----------------------------------------------------------------
+   --    SET_PARAM
+   --
+   --    Устанвить глобальный параметр
+   --
+   function  set_param(p_param_name varchar2, p_value varchar2) return varchar2;
+   procedure set_param(p_param_name varchar2, p_value varchar2);
+   -----------------------------------------------------------------
    --    GET_JOB_PARAM
    --
    --    Получить параметр джоба по наименованию джоба
    --
    function get_job_param(p_job_name varchar2, p_param_name varchar2) return varchar2;
+
+   -----------------------------------------------------------------
+   --    SET_JOB_PARAM
+   --
+   --    Устанвить параметр джоба по наименованию джоба
+   --
+   function  set_job_param(p_job_name varchar2, p_param_name varchar2, p_value varchar2) return varchar2;
+   procedure set_job_param(p_job_name varchar2, p_param_name varchar2, p_value varchar2);
 
   -----------------------------------------------------------------
    --    GET_GROUP_PARAM
@@ -317,6 +330,13 @@
    --
    function get_group_param(p_groupid number, p_param_name varchar2) return varchar2;
 
+   -----------------------------------------------------------------
+   --    SET_GROUP_PARAM
+   --
+   --    Устанвить параметры группы выгрузки (или другими словами джоба)
+   --
+   function  set_group_param(p_groupid number, p_param_name varchar2, p_value varchar2) return varchar2;
+   procedure set_group_param(p_groupid number, p_param_name varchar2, p_value varchar2);
    -----------------------------------------------------------------
    --    INIT_PARAMS
    --
@@ -354,6 +374,11 @@ is
     --   update : 11-01-2017
     --   version 5.2 26.01.2017 добавлена возможность выполнения запроса в SQL_TEXT на уровне '/'
     --                          для этого в BEFORE_PROC выйти на уровень ( bars.suda ), но в AFTER_PROC обязательно вернуться на уровень МФО ( bars.tuda() )
+    --   version 5.4 30.01.2018 добавлен параметр джоба COPY_APP
+    --                          для возможности использования разных команд копирования файлов в процедуре copy_file
+    --                          для WIN по умолчанию 'xcopy.exe', для UNIX - '#!/bin/bash[10] cp'
+    --                          [13] и [10] - будут заменены на соответствующие chr() символы
+    --   version 5.5 16.02.2018 Добавлены функции установки параметров выгрузки set_param, set_job_param, set_group_param
     --                                                             --
     -----------------------------------------------------------------
 
@@ -361,7 +386,7 @@ is
     -- Константы                                                   --
     -----------------------------------------------------------------
 
-    G_BODY_VERSION         constant varchar2(64)  := 'version 5.3 20.02.2017';
+    G_BODY_VERSION         constant varchar2(64)  := 'version 5.5 16.02.2018';
     G_TRACE                constant varchar2(20)  := 'bars_upload.';
     G_MODULE               constant varchar2(3)   := 'UPL';
 
@@ -603,6 +628,7 @@ is
     is
        l_trace varchar2(500) := G_TRACE||'log_start_process: ';
        l_msg   varchar2(500);
+       l_res   varchar2(100);
     begin
 
        l_msg := case when p_fileid is null     and p_groupid is null     then 'джоба №'||p_jobid
@@ -620,6 +646,10 @@ is
                  p_params         => p_params,
                  p_bankdate       => p_bankdate,
                  p_id             => p_id);
+       l_res := case when p_fileid is null     and p_groupid is null     then set_param('STAT_JOB_ID',to_char(p_id))
+                     when p_fileid is null     and p_groupid is not null then set_param('STAT_GROUP_ID',to_char(p_id))
+                     when p_fileid is not null                           then set_param('STAT_FILE_ID',to_char(p_id))
+                end;
        bars.bars_audit.info(l_trace||'старт выгрузки '||l_msg||' upl_stat.id=' || p_id);
     end;
 
@@ -2354,6 +2384,27 @@ is
    end;
 
    -----------------------------------------------------------------
+   --    SET_PARAM
+   --
+   --    Устанвить глобальный параметр
+   --
+   function set_param(p_param_name varchar2, p_value varchar2) return varchar2
+   is
+   begin
+        G_PARAMS_LIST(p_param_name) := p_value;
+        return p_value;
+   exception when others then
+      return null;
+   end;
+
+   procedure set_param(p_param_name varchar2, p_value varchar2)
+   is
+     l_ret_value  varchar2(1);
+   begin
+        l_ret_value := set_param(p_param_name, p_value);
+   end;
+
+   -----------------------------------------------------------------
    --    GET_JOB_PARAM
    --
    --    Получить параметр джоба по наименованию джоба
@@ -2364,6 +2415,27 @@ is
       return  G_JOBPARAM_LIST(p_job_name)(p_param_name);
    exception when others then
       return null;
+   end;
+
+   -----------------------------------------------------------------
+   --    SET_JOB_PARAM
+   --
+   --    Устанвить параметр джоба по наименованию джоба
+   --
+   function set_job_param(p_job_name varchar2, p_param_name varchar2, p_value varchar2) return varchar2
+   is
+   begin
+        G_JOBPARAM_LIST(p_job_name)(p_param_name) := p_value;
+        return p_value;
+   exception when others then
+      return null;
+   end;
+
+   procedure set_job_param(p_job_name varchar2, p_param_name varchar2, p_value varchar2)
+   is
+     l_ret_value  varchar2(1);
+   begin
+        l_ret_value := set_job_param(p_job_name, p_param_name, p_value);
    end;
 
    -----------------------------------------------------------------
@@ -2379,8 +2451,26 @@ is
       return null;
    end;
 
+   -----------------------------------------------------------------
+   --    SET_GROUP_PARAM
+   --
+   --    Устанвить параметры группы выгрузки (или другими словами джоба)
+   --
+   function set_group_param(p_groupid number, p_param_name varchar2, p_value varchar2) return varchar2
+   is
+   begin
+        G_JOBPARAM_LIST( G_JOBGROUP_LIST(p_groupid) )(p_param_name) := p_value;
+        return p_value;
+   exception when others then
+      return null;
+   end;
 
-
+   procedure set_group_param(p_groupid number, p_param_name varchar2, p_value varchar2)
+   is
+     l_ret_value  varchar2(1);
+   begin
+        l_ret_value := set_group_param(p_groupid, p_param_name, p_value);
+   end;
    -----------------------------------------------------------------
    --    INIT_GLOBAL_PARAMS
    --
@@ -2529,7 +2619,6 @@ is
          G_PARAMS_LIST('CRITICAL_STOP') := '1';
       end if;
 
-
       if G_PARAMS_LIST('ORACLE_OS') = 'WIN' then
             G_PARAMS_LIST('OS_DIR_DELIMM') := '\';
       else
@@ -2621,6 +2710,14 @@ is
 
           if not l_job.exists('COPY_TO_DIR')  then
              l_job('COPY_TO_DIR') := null;
+          end if;
+
+          if not l_job.exists('COPY_APP')  then
+             if  bars_upload.get_param('ORACLE_OS') = 'WIN'  then
+                 l_job('COPY_APP') := 'xcopy.exe';          --для WIN по умолчанию 'xcopy.exe'
+             else
+                 l_job('COPY_APP') := '#!/bin/bash[10] cp'; --для UNIX - '#!/bin/bash[10] cp'
+             end if;
           end if;
 
           if not l_job.exists('USE_COPY') or l_job.exists('USE_COPY') is null then

@@ -632,7 +632,7 @@ cp';
        -- удаление монтированого диска
        if  l_netparam is not null and  l_netparam <> 'notused' then
           l_drive  := substr(l_netparam, 1, instr(l_netparam,  ' ')-1 );
-          utl_file.put_line(l_fileh, 'net use '||l_drive||' /delete ');
+          utl_file.put_line(l_fileh, 'net use '||l_drive||' /delete /y');
        end if ;
 
        utl_file.fclose(l_fileh);
