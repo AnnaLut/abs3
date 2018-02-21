@@ -1,6 +1,3 @@
-=========  svn diff --summarize -r 47915:48104 D:\SVN\master\web\ru
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.171\ru\web\barsroot\credit\cck_zay.aspx.cs
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.171\ru\web\barsroot\credit
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.171\ru\web\barsroot
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.171\ru\web
-Bugfix_2.0.35.5.171 (Rev:47915-48104
+=========  svn diff --summarize -r 48105:48297 D:\SVN\master\web\ru
+---web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.172\ru\web\barsroot\version.abs
+Bugfix_2.0.35.5.172 (Rev:48105-48297
