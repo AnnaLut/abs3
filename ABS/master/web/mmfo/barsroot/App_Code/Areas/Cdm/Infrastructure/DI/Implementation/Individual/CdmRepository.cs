@@ -395,9 +395,11 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
 
 
                     var packPlaneBody = _entities.ExecuteStoreQuery<PersonData>("select * from EBK_QUEUE_UPDATECARD_V where rownum <= :p_Size and kf = :p_kf", sqlParams).ToList();
-                    
-                    // мапим плоский клас на иерархию              
-                    var packBody = packPlaneBody.Select(MapPersonData).ToList();
+                if (!packPlaneBody.Any())
+                    throw new ArgumentException("База даних повернула порожню чергу карток на відправку.");
+
+                // мапим плоский клас на иерархию              
+                var packBody = packPlaneBody.Select(MapPersonData).ToList();
 
                     //дополним каждую карточку информацие о привязанных особах
                     foreach (var lp in packBody)

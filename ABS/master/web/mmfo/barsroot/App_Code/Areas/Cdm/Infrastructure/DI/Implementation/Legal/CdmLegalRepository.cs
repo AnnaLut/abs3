@@ -383,8 +383,8 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.Legal
             string xml = "";
             try
             {
-                    var sqlParams = new object[]
-                    {
+                var sqlParams = new object[]
+                {
                         new OracleParameter("p_Size", OracleDbType.Int16)
                         {
                             Value = packSize
@@ -393,71 +393,74 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.Legal
                         {
                             Value = kf
                         }
-                    };
+                };
 
-                    var packPlaneBody = _entities.ExecuteStoreQuery<LegalData>("select * from V_EBKC_QUEUE_UPDCARD_LEGAL where rownum <= :p_Size and kf = :p_kf", sqlParams).ToList();
-                    // мапим плоский клас на иерархию              
-                    var packBody = packPlaneBody.Select(MapLegalData).ToList();
-                    //дополним каждую карточку информацие о привязанных особах
-                    foreach (var lp in packBody)
-                    {
-                        lp.RelatedPersons = ExtractRelatedPersonList(lp.Rnk);
-                    }
+                var packPlaneBody = _entities.ExecuteStoreQuery<LegalData>("select * from V_EBKC_QUEUE_UPDCARD_LEGAL where rownum <= :p_Size and kf = :p_kf", sqlParams).ToList();
+                if (!packPlaneBody.Any())
+                    throw new ArgumentException("База даних повернула порожню чергу карток на відправку.");
 
-                    //получаем параметры пакета
-                    decimal packNum = GetNextPackNumber();
-                    //string ourMfo = BanksRepository.GetOurMfo();
+                // мапим плоский клас на иерархию              
+                var packBody = packPlaneBody.Select(MapLegalData).ToList();
+                //дополним каждую карточку информацие о привязанных особах
+                foreach (var lp in packBody)
+                {
+                    lp.RelatedPersons = ExtractRelatedPersonList(lp.Rnk);
+                }
 
-                    //строим пакет
-                    LegalCards package = new LegalCards(kf, packNum.ToString(), HomeRepo.GetUserParam().USER_FULLNAME, packBody);
-                    XmlSerializer ser = new XmlSerializer(typeof(LegalCards));
+                //получаем параметры пакета
+                decimal packNum = GetNextPackNumber();
+                //string ourMfo = BanksRepository.GetOurMfo();
 
-                    MemoryStream ms = new MemoryStream();
-                    XmlWriter writer = XmlWriter.Create(ms, settings);
-                    ser.Serialize(writer, package, names);
-                    writer.Close();
-                    ms.Flush();
-                    ms.Seek(0, SeekOrigin.Begin);
+                //строим пакет
+                LegalCards package = new LegalCards(kf, packNum.ToString(), HomeRepo.GetUserParam().USER_FULLNAME, packBody);
+                XmlSerializer ser = new XmlSerializer(typeof(LegalCards));
 
-                    StreamReader sr = new StreamReader(ms);
-                    xml = sr.ReadToEnd();
+                MemoryStream ms = new MemoryStream();
+                XmlWriter writer = XmlWriter.Create(ms, settings);
+                ser.Serialize(writer, package, names);
+                writer.Close();
+                ms.Flush();
+                ms.Seek(0, SeekOrigin.Begin);
 
-                    //if (!Directory.Exists(@"C:\CDM\"))
-                    //    Directory.CreateDirectory(@"C:\CDM\");
-                    //File.WriteAllText(@"C:\CDM\legalPerson.xml", xml);
-                    //return allCardsSended;
+                StreamReader sr = new StreamReader(ms);
+                xml = sr.ReadToEnd();
 
-                    //отправляем данные в ЕБК
-                    bytes = Encoding.UTF8.GetBytes(xml);
+                //if (!Directory.Exists(@"C:\CDM\"))
+                //    Directory.CreateDirectory(@"C:\CDM\");
+                //File.WriteAllText(@"C:\CDM\legalPerson.xml", xml);
+                //return allCardsSended;
 
-                    var request = WebRequest.Create(apiUrl);
-                    request.Method = "POST";
-                    request.ContentType = "application/xml;charset='utf-8'";
-                    request.ContentLength = bytes.Length;
-                    Stream requestStream = request.GetRequestStream();
-                    requestStream.Write(bytes, 0, bytes.Length);
-                    requestStream.Close();
-                    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                    if (response.StatusCode == HttpStatusCode.OK)
-                    {
-                        Stream responseStream = response.GetResponseStream();
-                        string responseStr = new StreamReader(responseStream).ReadToEnd();
-                        Logger.Info(String.Format("{0} - {1}", _logMessagePrefix, xml));
-                        Logger.Info(string.Format("{0} Отримано відповідь від сервісу:: {1}", _logMessagePrefix,
-                            responseStr));
-                    }
-                    else
-                    {
-                        Logger.Error(string.Format("{0} Отримано помилковий код: {1}", _logMessagePrefix, response.StatusCode));
-                        Logger.Error(String.Format("{0} - {1}", _logMessagePrefix, xml));
-                    }
+                //отправляем данные в ЕБК
+                bytes = Encoding.UTF8.GetBytes(xml);
 
-                    //записываем результаты отправки
-                    foreach (var card in packBody)
-                    {
-                        RemoveCardFromQueue(card.Rnk,card.Kf);
-                    }
-                    Logger.Info(string.Format("{0} Успішно надіслано пакет карток розміром {1} шт.", _logMessagePrefix, packSize));               
+                var request = WebRequest.Create(apiUrl);
+                request.Method = "POST";
+                request.ContentType = "application/xml;charset='utf-8'";
+                request.ContentLength = bytes.Length;
+                Stream requestStream = request.GetRequestStream();
+                requestStream.Write(bytes, 0, bytes.Length);
+                requestStream.Close();
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    Stream responseStream = response.GetResponseStream();
+                    string responseStr = new StreamReader(responseStream).ReadToEnd();
+                    Logger.Info(String.Format("{0} - {1}", _logMessagePrefix, xml));
+                    Logger.Info(string.Format("{0} Отримано відповідь від сервісу:: {1}", _logMessagePrefix,
+                        responseStr));
+                }
+                else
+                {
+                    Logger.Error(string.Format("{0} Отримано помилковий код: {1}", _logMessagePrefix, response.StatusCode));
+                    Logger.Error(String.Format("{0} - {1}", _logMessagePrefix, xml));
+                }
+
+                //записываем результаты отправки
+                foreach (var card in packBody)
+                {
+                    RemoveCardFromQueue(card.Rnk, card.Kf);
+                }
+                Logger.Info(string.Format("{0} Успішно надіслано пакет карток розміром {1} шт.", _logMessagePrefix, packSize));
             }
             catch (Exception ex)
             {
@@ -692,7 +695,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.Legal
                     {
                         UdtTypeName = "BARS.T_REC_QLT_GRP",
                         Value = customer.CustomQualityGroups
-                    }                
+                    }
                 };
 
                 _entities.ExecuteStoreCommand(@"begin 
@@ -756,7 +759,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.Legal
                 new OracleParameter("p_batchId", OracleDbType.Varchar2)
                 {
                     Value = (batchId)
-                },                
+                },
                 new OracleParameter("p_kf", OracleDbType.Varchar2)
                 {
                     Value = (masterCard.Kf)
@@ -895,9 +898,9 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.Legal
             _entities.ExecuteStoreCommand(
                 "begin bars.ebk_dup_request_utl.request_del_gcif(p_gcif => :p_gcif); end; ",
                 new OracleParameter("p_gcif", OracleDbType.Varchar2)
-                    {
-                        Value = (gcif)
-                    }
+                {
+                    Value = (gcif)
+                }
                 );
         }
 

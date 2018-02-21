@@ -392,6 +392,9 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.PrivateEn
                     };
 
                 var packPlaneBody = _entities.ExecuteStoreQuery<PrivateEnData>("select * from v_ebkc_queue_updcard_private where rownum <= :p_Size and kf = :p_kf ", sqlParams).ToList();
+                if (!packPlaneBody.Any())
+                    throw new ArgumentException("База даних повернула порожню чергу карток на відправку.");
+
                 // мапим плоский клас на иерархию              
                 var packBody = packPlaneBody.Select(MapPrivateEnData).ToList();
                 //дополним каждую карточку информацие о привязанных особах
