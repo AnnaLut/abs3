@@ -128,7 +128,7 @@ is
     --   Выгрузка данных - пакет для техничских утилит             --
     --   created: anny (26-11-2012)
     --                                                             --
-	-- 17.04.2017 - добавлены функции mmfo_list и is_mmfo
+    -- 17.04.2017 - добавлены функции mmfo_list и is_mmfo
     -- 29.03.2017 - в имя пакетного файла для копирования добавлен код группы
     --              для устранения потенциальной взаимной блокировки "makecopy_1_GO"
     -- 15.12.2015 - додано процедуру перевірки запитів
@@ -136,15 +136,19 @@ is
     --              активних завдань вивантаження (A.Biletskyi)
     -- 03.06.2014 - добавлена обработка ошибок архивирования и
     --              их фиксация в upl_stats (V.Kharin)
-    -- 08.07.2014 - изменены процедуры "copy_file" и "send_file_to_ftp"
-    --              в части работы с UNIX (V.Kharin)
+    -- 5.3 08.07.2014 - изменены процедуры "copy_file" и "send_file_to_ftp"
+    --                  в части работы с UNIX (V.Kharin)
+    -- 5.4 30.01.2018 - добавлен параметр джоба COPY_APP
+    --                  для возможности использования разных команд копирования файлов в процедуре copy_file
+    --                  для WIN по умолчанию 'xcopy.exe', для UNIX - '#!/bin/bash[10] cp'
+    --                  [13] и [10] - будут заменены на соответствующие chr() символы
     -----------------------------------------------------------------
 
     -----------------------------------------------------------------
     -- Константы                                                   --
     -----------------------------------------------------------------
 
-    G_BODY_VERSION         constant varchar2(64)    := 'version 5.3 17.04.2017';
+    G_BODY_VERSION         constant varchar2(64)    := 'version 5.4 30.01.2018';
     G_TRACE                constant varchar2(20)    := 'bars_upload_utl';
     G_MODULE               constant varchar2(3)     := 'UPL';
 
@@ -666,13 +670,17 @@ is
        l_srcpath := p_srcpath||l_ossep||p_srcfilename;
        l_dstpath := p_dstpath||l_ossep;
 
+       l_cmd     := bars_upload.get_group_param(p_groupid, 'COPY_APP');
+       l_cmd := replace(replace(l_cmd, '[13]', chr(13)), '[10]', chr(10));
+
+
        if  bars_upload.get_param('ORACLE_OS') = 'WIN'  then
-           l_cmd     := 'xcopy.exe';
+           --l_cmd     := 'xcopy.exe';
            l_batfilename := l_batfilename||'.bat';
            l_cmd     := l_cmd||' "'||l_srcpath||'" "'||l_dstpath||'"';
        else
-           l_cmd     := '#!/bin/bash
-cp';
+           --l_cmd     := '#!/bin/bash
+--cp';
            l_batfilename := l_batfilename||'.sh';
            l_cmd     := l_cmd||' '||l_srcpath||' '||l_dstpath;
        end if;
@@ -693,7 +701,7 @@ cp';
        -- удаление монтированого диска
        if  l_netparam is not null and  l_netparam <> 'notused' then
           l_drive  := substr(l_netparam, 1, instr(l_netparam,  ' ')-1 );
-          utl_file.put_line(l_fileh, 'net use '||l_drive||' /delete ');
+          utl_file.put_line(l_fileh, 'net use '||l_drive||' /delete /y');
        end if ;
 
        utl_file.fclose(l_fileh);
