@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="01/27/2014 08:49:30" ReportInfo.Modified="01/27/2015 16:27:28" ReportInfo.CreatorVersion="2013.2.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="01/27/2014 08:49:30" ReportInfo.Modified="02/08/2018 09:56:46" ReportInfo.CreatorVersion="2014.1.2.0">
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqvvbGhv0rJ/ulNhGM40hQI8rRVU/LZjE15ygJUr+OHFif2LS7bxN9mXK2JatvrGOH7ZiKKuvitW/A45vAvmzCSg==">
-      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select &#13;&#10;    ac.branch,&#13;&#10;    ac.kv,&#13;&#10;    c.nmk,&#13;&#10;    m.phone,&#13;&#10;    c.rnk,&#13;&#10;    c.OKPO,&#13;&#10;    ac.nls,&#13;&#10;     CASE&#13;&#10;            WHEN m.status = 'SUBMITTED'&#13;&#10;            THEN&#13;&#10;               'Надіслано'&#13;&#10;            WHEN m.status = 'EXPIRED'&#13;&#10;            THEN&#13;&#10;               'Закінчився термін дії'&#13;&#10;            WHEN m.status = 'ERROR'&#13;&#10;            THEN&#13;&#10;               'Помилкових'&#13;&#10;         END&#13;&#10;            status, &#13;&#10;    count(*)  &#13;&#10;from &#13;&#10;    bars.acc_msg a, &#13;&#10;    bars.accounts ac, &#13;&#10;    bars.msg_submit_data m,&#13;&#10;    bars.customer c &#13;&#10;where &#13;&#10;    m.msg_id=a.msg_id &#13;&#10;    and ac.acc=a.acc&#13;&#10;   -- and change_time between  to_date('01/01/2015_00:00','DD/MM/YYYY_HH24:MI')  AND to_date('31/03/2015_23:59','DD/MM/YYYY_HH24:MI')&#13;&#10;   and change_time between  :Dat1  AND :Dat2+1&#13;&#10;    and ac.rnk=c.rnk&#13;&#10;    AND ac.branch like  decode(:branch,'%',ac.branch, null,ac.branch,:branch)||'%'&#13;&#10;    AND c.rnk =  decode(:rnk,'%',c.rnk, null,c.rnk,:rnk)&#13;&#10;AND c.custtype =  decode(:ctype,'%',c.custtype, null,c.custtype ,:ctype)&#13;&#10;   &#13;&#10;    &#13;&#10;    &#13;&#10;group by &#13;&#10;    ac.nls,&#13;&#10;    c.rnk,&#13;&#10;    ac.branch,&#13;&#10;    c.OKPO, &#13;&#10;    ac.kv, &#13;&#10;    status,&#13;&#10;    m.phone,&#13;&#10;    c.nmk  &#13;&#10;ORDER BY 6">
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqvvbGhv0rJ/ulNhGM40hQI8rRVU/LZjE15ygJUr+OHFif2LS7bxN9mXK2JatvrGOHM8IPkWjOtBmKmPdzoK/NbA==" CommandTimeout="500">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select &#13;&#10;    ac.branch,&#13;&#10;    ac.kv,&#13;&#10;    c.nmk,&#13;&#10;    m.phone,&#13;&#10;    c.rnk,&#13;&#10;    c.OKPO,&#13;&#10;    ac.nls,&#13;&#10;     CASE&#13;&#10;            WHEN m.status = 'SUBMITTED'&#13;&#10;            THEN&#13;&#10;               'Надіслано'&#13;&#10;            WHEN m.status = 'EXPIRED'&#13;&#10;            THEN&#13;&#10;               'Закінчився термін дії'&#13;&#10;            WHEN m.status = 'ERROR'&#13;&#10;            THEN&#13;&#10;               'Помилкових'&#13;&#10;         END&#13;&#10;            status, &#13;&#10;    count(*)  &#13;&#10;from &#13;&#10;    bars.acc_msg a, &#13;&#10;    bars.accounts ac, &#13;&#10;    bars.msg_submit_data m,&#13;&#10;    bars.customer c &#13;&#10;where &#13;&#10;    m.msg_id=a.msg_id &#13;&#10;    and ac.acc=a.acc&#13;&#10;   -- and change_time between  to_date('01/01/2015_00:00','DD/MM/YYYY_HH24:MI')  AND to_date('31/03/2015_23:59','DD/MM/YYYY_HH24:MI')&#13;&#10;   and change_time between  :Dat1  AND :Dat2+1&#13;&#10;    and ac.rnk=c.rnk&#13;&#10;    AND ac.branch like  decode(:branch,'%',ac.branch, null,ac.branch,:branch)||'%'&#13;&#10;    AND c.rnk =  decode(:rnk,'%',c.rnk, null,c.rnk,:rnk)&#13;&#10;    AND c.custtype = DECODE ( :ctype, '%', c.custtype, NULL, c.custtype, 4, 3, :ctype)&#13;&#10;&#13;&#10;    AND c.sed = DECODE ( :ctype, 4, 91, c.sed)&#13;&#10;    &#13;&#10;    &#13;&#10;group by &#13;&#10;    ac.nls,&#13;&#10;    c.rnk,&#13;&#10;    ac.branch,&#13;&#10;    c.OKPO, &#13;&#10;    ac.kv, &#13;&#10;    status,&#13;&#10;    m.phone,&#13;&#10;    c.nmk  &#13;&#10;ORDER BY 6">
         <Column Name="RNK" DataType="System.Decimal"/>
         <Column Name="NMK" DataType="System.String"/>
         <Column Name="OKPO" DataType="System.String"/>
@@ -22,7 +22,7 @@
         <CommandParameter Name="dat2" DataType="106" Expression="[sFdat2]" DefaultValue="30.01.2015"/>
         <CommandParameter Name="ctype" DataType="126" Expression="[ctype]" DefaultValue="%"/>
       </TableDataSource>
-      <TableDataSource Name="Table2" DataType="System.Int32" Enabled="true" SelectCommand="select &#13;&#10;    case when :ctype='%' or :ctype is null then &#13;&#10;              (select 'ВСІ' as name from dual)&#13;&#10;         else &#13;&#10;              (select name from bars.custtype where custtype=:ctype)&#13;&#10;    end as name&#13;&#10;from dual   ">
+      <TableDataSource Name="Table2" DataType="System.Int32" Enabled="true" SelectCommand="select &#13;&#10;    case when :ctype='%' or :ctype is null then &#13;&#10;              (select 'ВСІ' as name from dual)&#13;&#10;         else &#13;&#10;              (select name from bars.custt where custtype=:ctype)&#13;&#10;    end as name&#13;&#10;from dual   ">
         <Column Name="NAME" DataType="System.String"/>
         <CommandParameter Name="ctype" DataType="126" Expression="[ctype]" DefaultValue="%"/>
       </TableDataSource>
@@ -46,7 +46,7 @@
         </Formats>
       </TextObject>
     </ReportTitleBand>
-    <GroupHeaderBand Name="GroupHeader10" Top="77.82" Width="718.2" Height="47.25" KeepWithData="true" RepeatOnEveryPage="true" Condition="[Table.BRANCH]">
+    <GroupHeaderBand Name="GroupHeader10" Top="78.8" Width="718.2" Height="47.25" KeepWithData="true" RepeatOnEveryPage="true" Condition="[Table.BRANCH]">
       <TextObject Name="Text10" Left="103.95" Top="9.45" Width="453.6" Height="18.9" Text="[Table.BRANCH]" Font="Times New Roman, 10pt"/>
       <TextObject Name="Text11" Left="9.45" Top="9.45" Width="94.5" Height="18.9" Text="Відділення:" Font="Times New Roman, 10pt"/>
       <TableObject Name="Table1" Left="9.45" Top="28.35" Width="549.99" Height="18.9">
@@ -59,7 +59,7 @@
           <TableCell Name="Cell55" Border.Lines="All" Text="ОКПО" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
         </TableRow>
       </TableObject>
-      <GroupHeaderBand Name="GroupHeader11" Top="127.29" Width="718.2" Height="94.5" CanGrow="true" CanShrink="true" Guides="0,66.15,66.15" Condition="[Table.RNK]" SortOrder="Descending">
+      <GroupHeaderBand Name="GroupHeader11" Top="129.25" Width="718.2" Height="94.5" CanGrow="true" CanShrink="true" Guides="0,66.15,66.15" Condition="[Table.RNK]" SortOrder="Descending">
         <TableObject Name="Table1" Left="9.45" Top="56.7" Width="549.99" Height="37.8">
           <TableColumn Name="Column59" Width="105.84"/>
           <TableColumn Name="Column60" Width="94.5"/>
@@ -88,8 +88,8 @@
             <TableCell Name="Cell88" Border.Lines="All" Text="[Table.OKPO]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
           </TableRow>
         </TableObject>
-        <GroupHeaderBand Name="GroupHeader12" Top="224.02" Width="718.2" Condition="[Table.STATUS]">
-          <DataBand Name="Data3" Top="226.24" Width="718.2" Height="18.9" CanGrow="true" CanShrink="true" DataSource="Table">
+        <GroupHeaderBand Name="GroupHeader12" Top="226.95" Width="718.2" Condition="[Table.STATUS]">
+          <DataBand Name="Data3" Top="230.15" Width="718.2" Height="18.9" CanGrow="true" CanShrink="true" DataSource="Table">
             <TableObject Name="Table1" Left="9.45" Width="549.99" Height="18.9" GrowToBottom="true">
               <TableColumn Name="Column64" Width="105.84"/>
               <TableColumn Name="Column65" Width="94.5"/>
@@ -105,7 +105,7 @@
               </TableRow>
             </TableObject>
           </DataBand>
-          <GroupFooterBand Name="GroupFooter12" Top="247.36" Width="718.2" Height="18.9" CanGrow="true" CanShrink="true" KeepWithData="true">
+          <GroupFooterBand Name="GroupFooter12" Top="252.25" Width="718.2" Height="18.9" CanGrow="true" CanShrink="true" KeepWithData="true">
             <TableObject Name="Table1" Left="9.45" Width="549.99" Height="18.9">
               <TableColumn Name="Column69" Width="105.84"/>
               <TableColumn Name="Column70" Width="94.5"/>
@@ -122,7 +122,7 @@
             </TableObject>
           </GroupFooterBand>
         </GroupHeaderBand>
-        <GroupFooterBand Name="GroupFooter11" Top="268.48" Width="718.2" Height="28.35" CanGrow="true" CanShrink="true">
+        <GroupFooterBand Name="GroupFooter11" Top="274.35" Width="718.2" Height="28.35" CanGrow="true" CanShrink="true">
           <TableObject Name="Table1" Left="9.45" Width="549.99" Height="18.9">
             <TableColumn Name="Column79" Width="105.84"/>
             <TableColumn Name="Column80" Width="94.5"/>
@@ -137,10 +137,10 @@
               <TableCell Name="Cell83" Border.Lines="All" Text="[T_RNK]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
             </TableRow>
           </TableObject>
-          <ChildBand Name="Child2" Top="299.06" Width="718.2" Height="47.25"/>
+          <ChildBand Name="Child2" Top="305.9" Width="718.2" Height="47.25"/>
         </GroupFooterBand>
       </GroupHeaderBand>
-      <GroupFooterBand Name="GroupFooter10" Top="348.53" Width="718.2" Height="94.5" CanGrow="true" CanShrink="true">
+      <GroupFooterBand Name="GroupFooter10" Top="356.35" Width="718.2" Height="94.5" CanGrow="true" CanShrink="true">
         <TableObject Name="Table1" Left="9.45" Top="18.9" Width="549.99" Height="18.9">
           <TableColumn Name="Column74" Width="105.84"/>
           <TableColumn Name="Column75" Width="94.5"/>
