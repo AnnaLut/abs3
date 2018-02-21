@@ -470,7 +470,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.OW_FILES_PROC is
         l_rec(l_rec.last).doc_orn := convert_to_number(l_str);
 
         dbms_xslprocessor.valueof(l_analytic, 'DocInfo/AmountData/Extra/AddData/Parm[ParmCode="TRANS_INFO"]/Value/text()', l_str);
-        l_rec(l_rec.last).trans_info := l_str;
+        l_rec(l_rec.last).trans_info := trim(convert(dbms_xmlgen.convert(l_str,1), 'CL8MSWIN1251', 'UTF8'));
 
       else
 
