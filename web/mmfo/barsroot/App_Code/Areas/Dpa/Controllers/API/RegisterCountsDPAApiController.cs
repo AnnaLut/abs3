@@ -240,6 +240,7 @@ namespace BarsWeb.Areas.Dpa.Controllers.Api
         {
             HttpResponseMessage result = Request.CreateResponse(HttpStatusCode.OK);
             //for XML - use utf-8
+            string fileTxtName = fileName.Replace(fileName.Substring(fileName.LastIndexOf('.')), ".doc");
             RtfReporter rep = new RtfReporter(HttpContext.Current);
             string text = File.ReadAllText(rep.ReportFile);
             Encoding windows = Encoding.GetEncoding("windows-1251");
@@ -252,7 +253,7 @@ namespace BarsWeb.Areas.Dpa.Controllers.Api
             result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/plain");
             result.Content.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment")
             {
-                FileName = fileName
+                FileName = fileTxtName
             };
 
             return result;
