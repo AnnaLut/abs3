@@ -1,6 +1,6 @@
 -- ================================================================================
 -- Author : BAA
--- Date   : 22.08.2017
+-- Date   : 12.02.2018
 -- ================================== <Comments> ==================================
 -- create constraints
 -- ================================================================================
@@ -15,20 +15,15 @@ SET TIMING       OFF
 SET TRIMSPOOL    ON
 set verify       off
 
-prompt --
-prompt -- create referential constraint FK_ACCOUNTS_SBOB22
-prompt --
-
 declare
-  E_REF_CNSTRN_EXISTS exception;
-  pragma exception_init( E_REF_CNSTRN_EXISTS, -02275 );
+  E_CNSTRN_NOT_EXISTS     exception;
+  pragma exception_init( E_CNSTRN_NOT_EXISTS, -02443 );
 begin
-  execute immediate q'[alter table ACCOUNTS add constraint FK_ACCOUNTS_SBOB22 foreign key ( NBS, OB22 ) 
-  references SB_OB22 ( R020, OB22 ) NOVALIDATE ]';
+  execute immediate q'[alter table ACCOUNTS drop constraint FK_ACCOUNTS_SBOB22]';
   dbms_output.put_line( 'Table altered.' );
 exception
-  when E_REF_CNSTRN_EXISTS 
-  then dbms_output.put_line( 'Such a referential constraint already exists in the table.' );
+  when E_CNSTRN_NOT_EXISTS
+  then null;
 end;
 /
 
