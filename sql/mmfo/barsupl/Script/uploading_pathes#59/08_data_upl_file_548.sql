@@ -28,7 +28,7 @@ declare l_clob        clob;
         l_clob_before clob;
 begin
 l_clob:= to_clob('select 3 as ND_TYPE, 13 as PRVN_TP, c.KF,
-       c.ID,    c.ND,   c.NDO,   c.ACC,   c.KV, c.VIDD,
+       c.ID,    c.ND,   n.NDO,   c.ACC,   c.KV, c.VIDD,
        c.SDATE, c.TIP,   c.KV8,  c.ACC8,  c.DATE_CLOSE
   from BARSUPL.TMP_PRVN_DEALS_CONST_NDO n
   join BARS.PRVN_FLOW_DEALS_CONST c on (n.id = c.id)');
