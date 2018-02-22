@@ -10,6 +10,7 @@ begin
      where payment_type is null and filename is not null';
 end;
 /
+commit;
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /sql/msp/script/create_payment_type.sql =========*** End
