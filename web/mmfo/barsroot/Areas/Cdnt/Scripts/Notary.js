@@ -400,12 +400,20 @@
             invalid_date_format: "Невірний формат дати!"
         },
         rules: {
+            issuercheck: function (input) {
+                if (input.is("[name=passport_issuer]") && new NotaryForm().isIDCard()) {
+                    var val = input.val();
+                    if (input[0].required) return /^\d+$/.test(val);
+                    else return /^\d+$/.test(val) || !val;
+                }
+                return true;
+            },
             passpseriescheck: function (input) {
                 if (input.is("[name=passport_series]")) {
                     if (new NotaryForm().isIDCard()) return true;
                     var val = input.val();
-                    if (input[0].required) return /^[a-zA-ZаАвВеЕіІкКмМнНоОрРсСтТуУхХ]{2}$/.test(val);
-                    else return /^[a-zA-ZаАвВеЕіІкКмМнНоОрРсСтТуУхХ]{2}$/.test(val) || !val;
+                    if (input[0].required) return /^[a-zA-Zа-яА-ЯіІїЇєЄґҐ]{2}$/.test(val);
+                    else return /^[a-zA-Zа-яА-ЯіІїЇєЄґҐ]{2}$/.test(val) || !val;
                 }
                 return true;
             },
@@ -619,7 +627,8 @@
                                 newNotarius.CNT_ACCR = 0;
                                 newNotarius.CNT_REQACCR = 0;
                                 newNotarius.NOTARY_TYPE_NAME = newNotarius.NOTARY_TYPE == 1 ? 'державний' : 'приватний';
-                                mainGridDs.add(newNotarius);
+                                mainGridDs.read();
+                                //mainGridDs.add(newNotarius);
                                 dialog.close();
                             } else {
                                 bars.ui.error({ text: data.message });
