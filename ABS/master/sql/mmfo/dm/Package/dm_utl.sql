@@ -120,12 +120,15 @@ is
 
 END DM_UTL;
 /
+
+show errors;
+
 CREATE OR REPLACE PACKAGE BODY DM.DM_UTL 
 is
   --
   -- constants
   --
-  G_BODY_VERSION          constant varchar2(64) := 'version 2.0 17.08.2017';
+  G_BODY_VERSION          constant varchar2(64) := 'version 2.1  21.02.2018';
   G_MODCODE               constant varchar2(10) := 'BARS_DM';
   G_ERR_MODCODE           constant varchar2(3)  := 'ACM';
 
@@ -484,10 +487,10 @@ is
     l_stmt := case
               when ( l_sptsn = 1 and p_kf Is Not Null )
               then 'select nvl(max(ora_rowscn),0) from ' || l_tbl_own || '.' || p_table_nm ||
-                   ' subpartition for ( to_date('''||l_dt||''',''dd.mm.yyyy''), '''||p_kf||''' )'|| l_stmt
+                   ' subpartition for ( to_date('''||l_dt||''',''yyyymmdd''), '''||p_kf||''' )'|| l_stmt
               when ( l_ptsn  = 1 )
               then 'select nvl(max(ora_rowscn),0) from ' || l_tbl_own || '.' || p_table_nm ||
-                   ' partition for (to_date('''||to_char(p_date,'dd.mm.yyyy')||''',''dd.mm.yyyy''))' || l_stmt
+                   ' partition for ( to_date('''||l_dt||''',''yyyymmdd'') )' || l_stmt
               else 'select nvl(max(ora_rowscn),0) from ' || l_tbl_own || '.' || p_table_nm ||
                    ' where FDAT = to_date('''||l_dt||''',''yyyymmdd'')'
               end;
@@ -644,11 +647,10 @@ BEGIN
   NULL;
 END DM_UTL;
 /
- show err;
- 
-PROMPT *** Create  grants  DM_UTL ***
-grant EXECUTE                                                                on DM_UTL          to BARS;
 
+show err;
+
+grant EXECUTE on DM.DM_UTL to BARS;
  
  
  PROMPT ===================================================================================== 
