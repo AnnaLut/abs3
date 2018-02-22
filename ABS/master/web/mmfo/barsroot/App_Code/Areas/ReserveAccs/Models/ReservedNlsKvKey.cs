@@ -5,4 +5,8 @@
 		public string nls { get; set; }
 		public int kv { get; set; }
 	}
+	public class ReservedPrintKey : ReservedNlsKvKey
+	{
+		public string templateId { get; set; }
+	}
 }
