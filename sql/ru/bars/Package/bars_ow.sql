@@ -15521,7 +15521,7 @@ begin
   cm_alter_acc(0, null, l_msg);
 
   cm_alter_expire;
-
+/*
   for z in ( select c.contract_number, c.oper_type, c.date_in
                from cm_acc_request c
               where not exists (select 1 from accounts where nls = c.contract_number) )
@@ -15534,7 +15534,21 @@ begin
         and oper_type = z.oper_type
         and date_in = z.date_in;
   end loop;
-
+*/
+     -- запоминаем сообщение
+  update cm_acc_request set abs_status = 1,  abs_msg = 'Рахунок не знайдено'
+  where contract_number in
+  (
+   select contract_number
+    from 
+      (
+      select c.contract_number,
+      (select count('x') from accounts acc where acc.nls = c.contract_number) cr 
+      from cm_acc_request c
+      ) cm
+      where cm.cr=0
+  );
+/*
   for z in ( select c.contract_number, c.oper_type, c.date_in
                from cm_acc_request c
               where exists (select 1 from accounts where nls = c.contract_number and dazs is not null) )
@@ -15547,7 +15561,20 @@ begin
         and oper_type = z.oper_type
         and date_in = z.date_in;
   end loop;
-
+*/
+     -- запоминаем сообщение
+     update cm_acc_request   set abs_status = 1,  abs_msg = 'Рахунок закрито'
+     where contract_number in
+  (
+   select contract_number
+    from 
+      (
+      select c.contract_number,
+      (select count('x') from accounts acc where acc.nls = c.contract_number and acc.dazs is not null ) cr 
+      from cm_acc_request c
+      ) cm
+      where cm.cr>0
+  );
   bars_audit.info(h || 'Finish.');
 
 end cm_process_request;
