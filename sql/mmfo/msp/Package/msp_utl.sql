@@ -259,7 +259,7 @@ end msp_utl;
 /
 create or replace package body msp_utl is
 
-  gc_body_version constant varchar2(64) := 'version 1.33 07.02.2018';
+  gc_body_version constant varchar2(64) := 'version 1.34 22.02.2018';
   gc_mod_code     constant varchar2(3)  := 'MSP';
   -----------------------------------------------------------------------------------------
 
@@ -917,10 +917,10 @@ create or replace package body msp_utl is
   begin
     select * into l_file from msp_files where id = p_file_id;
 
-    select sum(case when state_id in (0) then 1 else 0 end) count_payed,
-           sum(case when state_id in (0) then pay_sum else 0 end) sum_payed,
-           sum(case when state_id not in (0) then 1 else 0 end) count_not_payed,
-           sum(case when state_id not in (0) then pay_sum else 0 end) sum_not_payed
+    select sum(case when state_id in (10) then 1 else 0 end) count_payed,
+           sum(case when state_id in (10) then pay_sum else 0 end) sum_payed,
+           sum(case when state_id not in (10) then 1 else 0 end) count_not_payed,
+           sum(case when state_id not in (10) then pay_sum else 0 end) sum_not_payed
     into l_count_payed, l_sum_payed, l_count_not_payed, l_sum_not_payed
     from msp_file_records
     where file_id = p_file_id;
@@ -975,7 +975,7 @@ create or replace package body msp_utl is
   is
     l_crlp char(2) := chr(13)||chr(10);
   begin
-    for c_rec in (select * from msp_file_records where file_id = p_file_id and state_id in (10,14,17) order by id)
+    for c_rec in (select * from msp_file_records where file_id = p_file_id order by id)
       loop
         p_file_buff := p_file_buff||
           to_char(c_rec.deposit_acc,'FM0000000000000000000')||
@@ -988,9 +988,14 @@ create or replace package body msp_utl is
           coalesce(c_rec.displaced,' ')||
           to_char(c_rec.pers_acc_num,'FM000000')||
           to_char(case c_rec.state_id
-                    when 10 then 0
-                    when 14 then 4
-                    when 17 then 6
+                    when  1 then '1'
+                    when  2 then '2'
+                    when  3 then '5'
+                    when  4 then '5'
+                    when  5 then '3'
+                    when 14 then '6'
+                    when 10 then '0'
+                    else         ' '
                   end,'FM0')||-- VARCHAR(1) -- Причина не зарахування
           coalesce(to_char(c_rec.fact_pay_date,'ddmmyyyy'),'        ')||-- Фактична дата зарахування коштів
           --
@@ -2801,14 +2806,17 @@ create or replace package body msp_utl is
 
   procedure create_envelope_file(p_id in number, p_id_msp in number, p_filedata in clob, p_filename in varchar2, p_filedate in varchar2, p_filepath in varchar2)
    is
-   l_state number;
+   l_state        number;
+   l_payment_type msp_envelope_files_info.payment_type%type;
   begin
     --bars.bars_audit.info('msp_utl.create_envelope_file start');
     select state into l_state from msp_envelopes where id = p_id;
 
+    l_payment_type := case when instr(p_filename,'.')>37 then substr(p_filename, 30, 2) else substr(p_filename, 25, 2) end;
+
     if l_state in (-1) then
-      insert into msp_envelope_files_info(id, id_msp, filename, filedate, state, comm, filepath,id_file)
-      values (p_id, p_id_msp, p_filename, to_date(p_filedate,'ddmmyyyyhh24miss'), -1, null, p_filepath, msp_file_seq.nextval);
+      insert into msp_envelope_files_info(id, id_msp, filename, filedate, state, comm, filepath,id_file, payment_type)
+      values (p_id, p_id_msp, p_filename, to_date(p_filedate,'ddmmyyyyhh24miss'), -1, null, p_filepath, msp_file_seq.nextval, l_payment_type);
 
       insert into msp_envelope_files(id, filedata)
       values (p_id, p_filedata);
@@ -2943,7 +2951,7 @@ create or replace package body msp_utl is
          and not exists (select 1
                            from msp_file_records mfr
                           where mfr.file_id = mf.id
-                            and mfr.state_id = 20);
+                            and mfr.state_id in (17,19,20));
 
       pfu.transport_utl.set_transport_state(p_id               => p_file_id,
                                             p_state_id         => pfu.transport_utl.trans_state_done,
