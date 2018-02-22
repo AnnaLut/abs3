@@ -293,7 +293,7 @@ namespace BarsWeb.Areas.ReserveAccs.Infrastructure.Repository.DI.Implementation
                 return connection.Query<decimal>(sql).SingleOrDefault();
             }
         }
-		public string PrintDoc(ReservedNlsKvKey key)
+		public string PrintDoc(ReservedPrintKey key)
 		{
 			string fileName = string.Empty;
 			ReservedRtfReporter rep = new ReservedRtfReporter(new WebService().Context);
@@ -301,14 +301,10 @@ namespace BarsWeb.Areas.ReserveAccs.Infrastructure.Repository.DI.Implementation
 			rep.resNls = key.nls;
 			rep.resKv = key.kv;
 
-			rep.TemplateID = "RSRV_ACC_NLS_L";
+			rep.TemplateID = key.templateId;
 			using (var connection = OraConnector.Handler.UserConnection)
 			{
-				var sql = String.Format("select c.custtype from customer c join accounts_rsrv a on c.rnk = a.rnk and a.nls = '{0}' and a.kv = {1}", key.nls, key.kv);
-				if (connection.Query<int>(sql).SingleOrDefault() == 3)
-					rep.TemplateID = "RSRV_ACC_NLS_P";
-
-				sql = String.Format("select RSRV_ID from v_reserved_acc a where a.nls = '{0}' and a.kv = {1}", key.nls, key.kv);
+				var sql = String.Format("select RSRV_ID from v_reserved_acc a where a.nls = '{0}' and a.kv = {1}", key.nls, key.kv);
 				var reserve_id = connection.Query<int>(sql).SingleOrDefault();
 				rep.ContractNumber = Convert.ToInt64(reserve_id);
 			}
@@ -316,6 +312,15 @@ namespace BarsWeb.Areas.ReserveAccs.Infrastructure.Repository.DI.Implementation
 			rep.GenerateReserveReport();
 			var tmp = rep.ReportFile;
 			return tmp;
+
+		}
+		public List<SpecParamList> GetPrintDocs()
+		{
+			var sql = @"select d.ID, d.NAME from doc_scheme d where d.id like 'RSRV_%'";
+			using (var connection = OraConnector.Handler.UserConnection)
+			{
+				return connection.Query<SpecParamList>(sql).ToList();
+			}
 		}
 	}
 }

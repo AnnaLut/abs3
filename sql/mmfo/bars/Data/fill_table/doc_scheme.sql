@@ -53,5 +53,58 @@ exception
      where ID = 'RSRV_ACC_NLS_L';
 end;
 /
+--ACC_TP_STATEMENT_SPD
+begin
+  Insert into DOC_SCHEME ( ID, NAME, PRINT_ON_BLANK, FR )
+  Values ( 'RSRV_ACC_TP_STATEMENT_SPD', 'ММСБ Заява на відкр. рах. ЮОЗаява про підключення Тарифного пакету ФОП', 0, 0 );
+exception
+  when dup_val_on_index then 
+    update DOC_SCHEME
+       set NAME = 'Заява про підключення Тарифного пакету ФОП'
+         , PRINT_ON_BLANK = 0
+         , FR = 0
+     where ID = 'RSRV_ACC_TP_STATEMENT_SPD';
+end;
+/
+--ACC_TP_STATEMENT_UO
+begin
+  Insert into DOC_SCHEME ( ID, NAME, PRINT_ON_BLANK, FR )
+  Values ( 'RSRV_ACC_TP_STATEMENT_UO', 'Заява про підключення Тарифного пакету ЮО', 0, 0 );
+exception
+  when dup_val_on_index then 
+    update DOC_SCHEME
+       set NAME = 'Заява про підключення Тарифного пакету ЮО'
+         , PRINT_ON_BLANK = 0
+         , FR = 0
+     where ID = 'RSRV_ACC_TP_STATEMENT_UO';
+end;
+/
+--ACC_TP_STATEMENT_SPD_CONF
+begin
+  Insert into DOC_SCHEME ( ID, NAME, PRINT_ON_BLANK, FR )
+  Values ( 'RSRV_ACC_TP_STATEMENT_SPD_CONF', 'Заява про підтвердження Тарифного пакету (ФОП)', 0, 0 );
+exception
+  when dup_val_on_index then 
+    update DOC_SCHEME
+       set NAME = 'Заява про підтвердження Тарифного пакету (ФОП)'
+         , PRINT_ON_BLANK = 0
+         , FR = 0
+     where ID = 'RSRV_ACC_TP_STATEMENT_SPD_CONF';
+end;
+/
+
+--ACC_TP_STATEMENT_UO_CONF
+begin
+  Insert into DOC_SCHEME ( ID, NAME, PRINT_ON_BLANK, FR )
+  Values ( 'RSRV_ACC_TP_STATEMENT_UO_CONF', 'Заява про підтвердження Тарифного пакету (ЮО)', 0, 0 );
+exception
+  when dup_val_on_index then 
+    update DOC_SCHEME
+       set NAME = 'Заява про підтвердження Тарифного пакету (ЮО)'
+         , PRINT_ON_BLANK = 0
+         , FR = 0
+     where ID = 'RSRV_ACC_TP_STATEMENT_UO_CONF';
+end;
+/
 
 COMMIT;

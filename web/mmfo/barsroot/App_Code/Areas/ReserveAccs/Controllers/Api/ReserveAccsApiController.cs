@@ -107,11 +107,23 @@ public class ReserveAccsApiController : ApiController
 		}
 	}
 	[HttpPost]
-	public HttpResponseMessage PrintDoc(ReservedNlsKvKey key)
+	public HttpResponseMessage PrintDoc(ReservedPrintKey key)
 	{
 		try
 		{ 
 			return Request.CreateResponse(HttpStatusCode.OK, _resAcctRepository.PrintDoc(key));
+		}
+		catch (Exception ex)
+		{
+			return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+		}
+	}
+	[HttpGet]
+	public HttpResponseMessage GetPrintDocs()
+	{
+		try
+		{
+			return Request.CreateResponse(HttpStatusCode.OK, _resAcctRepository.GetPrintDocs());
 		}
 		catch (Exception ex)
 		{

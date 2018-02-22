@@ -182,7 +182,7 @@
 					type: "button",
 					text: '<i class="pf-icon pf-16 pf-print"></i> Роздрукувати договір',
 					click: function (e) {
-						vm.printDoc(e);
+						$scope.winPrintDocOpen.center().open();
 					}
 				}
 			]
@@ -353,13 +353,68 @@
 				}
 			]
 		}
-
+		vm.printDocOptions = {
+			height: 300,
+			autoBind: true,
+			selectable: 'row',
+			groupable: false,
+			sortable: true,
+			resizable: true,
+			filterable: true,
+			scrollable: true,
+			pageable: {
+				refresh: true,
+				pageSizes: [10, 20, 50, 100, 200],
+				buttonCount: 1
+			},
+			change: function (e) {
+				vm.printDoc(e, vm.printDocGrid.dataItem(vm.printDocGrid.select()).ID);
+				$scope.winPrintDocOpen.close();
+			},
+			dataSource: {
+				type: 'json',
+				pageSize: 20,
+				page: 1,
+				total: 0,
+				serverPaging: false,
+				serverSorting: false,
+				serverFiltering: false,
+				serverGrouping: false,
+				serverAggregates: false,
+				transport: {
+					read: {
+						dataType: "json",
+						type: "GET",
+						url: bars.config.urlContent("/api/reserveaccs/reserveaccsapi/GetPrintDocs")
+					}
+				},
+				schema: {
+					fields: {
+						ID: { type: "string", editable: false },
+						NAME: { type: "string", editable: false }
+					}
+				}
+			},
+			columns: [
+				{
+					field: 'ID',
+					title: 'Шаблон',
+					width: '100px'
+				},
+				{
+					field: 'NAME',
+					title: 'Назва',
+					width: '140px'
+				}
+			]
+		};
+		
 		vm.runIfValid = function (event, func) {
 			if (!event.target.context.disabled) {
 				vm.executeIfBackOffice(func);
 			}
 		};
-		vm.printDoc = function (event) {
+		vm.printDoc = function (event, templateName) {
 			function formUrlForPrint(source) {
 				return window.location.href.split("barsroot")[0] + "barsroot/WebPrint.aspx?filename=" + source.replace(/\"/g, "");
 			}
@@ -370,7 +425,7 @@
 			$http({
 				method: 'POST',
 				url: "/barsroot/api/reserveaccs/reserveaccsapi/printdoc",
-				data: JSON.stringify({ kv: _kv, nls: _nls })
+				data: JSON.stringify({ kv: _kv, nls: _nls, templateId: templateName })
 			}).success(function (result) {
 				if (!result) return;
 				window.showModalDialog(formUrlForPrint(result), '', 'dialogWidth: 900px; dialogHeight: 800px; center: yes');

@@ -18,8 +18,9 @@ namespace BarsWeb.Areas.ReserveAccs.Infrastructure.Repository.DI.Abstract
 		List<string> Activate(ReserveAccsKeys keys);
 		List<ReservedAccountBase> GetReadyEtalonAccounts(ReservedKey key);
 		List<V_RESERVED_ACC> GetReservedAccounts(ReservedKey key);
+		List<SpecParamList> GetPrintDocs();
 		void AcceptWithDublication(ReservedDublicateAccKey key);
 		decimal GetCreatedAccNLSKV(string nls, int? kv);
-		string PrintDoc(ReservedNlsKvKey key);
+		string PrintDoc(ReservedPrintKey key);
 	}
 }
