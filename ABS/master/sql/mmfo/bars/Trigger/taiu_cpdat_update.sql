@@ -1,37 +1,3 @@
-
-   if  deleting
-   then
-     
-     l_chgaction:= 'D';
-     
-     insert into bars.cp_dat_update
-       ( idupd, action, effectdate, chg_date, doneby, id, npp, dok, kup, nom, ir, offer_date, kf)
-     values
-       ( s_cp_dat_update.nextval ,l_chgaction, l_bankdate, sysdate, user_id, :old.id,
-                       :old.npp, :old.dok, :old.kup, :old.nom, :old.ir, :old.offer_date, :old.kf);
-   else
-     
-     if updating 
-     then
-       l_chgaction:= 'U';
-     else
-       l_chgaction:= 'I';
-     end if;
-
-     insert into bars.cp_dat_update
-       ( idupd, action, effectdate, chg_date, doneby, id, npp, dok, kup, nom, ir, offer_date, kf)
-     values
-       ( s_cp_dat_update.nextval ,l_chgaction, l_bankdate, sysdate, user_id, :new.id,
-                       :new.npp, :new.dok, :new.kup, :new.nom, :new.ir, :new.offer_date, :new.kf);
-     
-     /*begin
-      update cp_kod
-         set ir = :new.ir
-       where id = :new.id
-         and dnk = :new.dok;
-     end;*/
-
-
 PROMPT *** Create  trigger TAIU_CPDAT_UPDATE ***
 
   CREATE OR REPLACE TRIGGER BARS.TAIU_CPDAT_UPDATE 
@@ -59,7 +25,7 @@ begin
      insert into bars.cp_dat_update
        ( idupd, action, effectdate, chg_date, doneby, id, npp, dok, kup, nom, ir)
      values
-       ( s_cp_dat_update.nextval ,l_chgaction, l_bankdate, sysdate, user_id, :old.id,
+       ( bars_sqnc.get_nextval('s_cp_dat_update') ,l_chgaction, l_bankdate, sysdate, user_id, :old.id,
                        :old.npp, :old.dok, :old.kup, :old.nom, :old.ir);
    else
 
@@ -73,7 +39,7 @@ begin
      insert into bars.cp_dat_update
        ( idupd, action, effectdate, chg_date, doneby, id, npp, dok, kup, nom, ir)
      values
-       ( s_cp_dat_update.nextval ,l_chgaction, l_bankdate, sysdate, user_id, :new.id,
+       ( bars_sqnc.get_nextval('s_cp_dat_update') ,l_chgaction, l_bankdate, sysdate, user_id, :new.id,
                        :new.npp, :new.dok, :new.kup, :new.nom, :new.ir);
 
      /*begin
