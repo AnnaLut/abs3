@@ -1,4 +1,4 @@
-create or replace force view BARS.V_ND_ACCOUNTS
+create or replace force view V_ND_ACCOUNTS
 ( ND
 , ACC
 , NLS
@@ -100,7 +100,7 @@ as
     join SAL_BRANCH s
       on ( s.ACC = a.ACC and s.FDAT = GL.BD )
     join STAFF$BASE u
-      on ( u.ID = a.ISP ) 
+      on ( u.ID = a.ISP )
   union
   select CP.ND
        , A.ACC
@@ -146,19 +146,18 @@ as
        , V.DENOM
        , A.BRANCH
        , A.OB22
-       , SB.FIO
+       , u.FIO
     from ACCOUNTS A
-       , CC_ACCP CP
-       , CC_ADD D
-       , TABVAL$GLOBAL V
-       , SAL_BRANCH S
-       , STAFF$BASE SB
-   where CP.ACCS = D.ACCS
-     and A.ACC = CP.ACC
-     and V.KV = A.KV
-     and S.ACC(+) = A.ACC
-     and S.FDAT(+) = GL.BD
-     and A.ISP = SB.ID;
+    join CC_ACCP CP
+      on ( cp.ACC = A.ACC )
+    join TABVAL$GLOBAL v
+      on ( v.KV = a.KV )
+    left
+    join SAL_BRANCH s
+      on ( s.ACC = a.ACC and s.FDAT = GL.BD )
+    join STAFF$BASE u
+      on ( u.ID = a.ISP )
+;
 
 show errors;
 
