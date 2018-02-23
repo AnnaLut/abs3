@@ -1,10 +1,8 @@
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_utl_snapshot.sql =========*** R
+PROMPT ===================================================================================== 
 
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_utl_snapshot.sql =========*** R
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.BARS_UTL_SNAPSHOT 
+create or replace package BARS_UTL_SNAPSHOT 
 is
   -- Author  : OLEG.MUZYKA
   -- Created : 07.07.2015 13:05:13
@@ -12,7 +10,6 @@ is
 
   -- Public constant declarations
   VERSION_HEAD         constant varchar2(64) := 'version 1.3  19.06.2017';
-  PKG_NAME             constant varchar2(64) := 'BARS_UTL_SNAPSHOT';
 
   -- алгоритмы наполнения accm_snap_balances
   ALGORITHM_OLD        constant varchar2(30) := 'OLD';
@@ -47,12 +44,6 @@ is
   --
   --
   function body_version return varchar2;
-
-  --------------------------------------------------------------------------------
-  --
-  -- Функція яка повертає признак чи запущено накопичення
-  --
-  function get_snp_running return number;
 
   --
   -- Перевірка наявності активного процесу формування знімку
@@ -148,13 +139,15 @@ is
 
 end BARS_UTL_SNAPSHOT;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.BARS_UTL_SNAPSHOT 
+
+show errors;
+
+create or replace package body BARS_UTL_SNAPSHOT
 is
   --
   -- constants
   --
-  VERSION_BODY    constant varchar2(64)  := 'version 1.2.9  07.09.2017';
-  MODULE_CODE     constant varchar2(8)   := 'SNAPSHOT';
+  VERSION_BODY    constant varchar2(64)  := 'version 1.3.0  23.02.2018';
 
   -- Префикс для трассировки
   PKG_CODE        constant varchar2(100) := 'UTL_SNAPSHOT';
@@ -178,7 +171,7 @@ is
   --
   function header_version return varchar2 is
   begin
-    return 'Package header '||PKG_NAME||': '||VERSION_HEAD;
+    return 'Package '||$$PLSQL_UNIT||' header '||VERSION_HEAD||'.';
   end header_version;
 
   ------------------------------------------------------------------
@@ -186,7 +179,7 @@ is
   --
   function body_version return varchar2 is
   begin
-    return 'Package body '||PKG_NAME||': '||VERSION_BODY;
+    return 'Package '||$$PLSQL_UNIT||' body '||VERSION_BODY||'.';
   end body_version;
 
   ------------------------------------------------------------------
@@ -224,11 +217,19 @@ is
         from V$SESSION s
        where s.TYPE   = 'USER'
          and s.STATUS = 'ACTIVE'
---       and s.MODULE = MODULE_CODE
+--       and s.MODULE = 'SNAPSHOT'
          and s.ACTION = l_action;
     exception
       when NO_DATA_FOUND then
         l_errmsg := null;
+      when TOO_MANY_ROWS then
+        select listagg( CLIENT_IDENTIFIER, ', ' ) WITHIN GROUP ( order by SID )
+          into l_errmsg
+          from V$SESSION s
+         where s.TYPE   = 'USER'
+           and s.STATUS = 'ACTIVE'
+           and s.ACTION = l_action;
+--      BARS_AUDIT.INFO( PKG_CODE||'.CHECK_SNP_RUNNING: Exit with ( '||l_errmsg||' ).' );
     end;
 
     return l_errmsg;
@@ -244,48 +245,38 @@ is
   ) return varchar2
   is
     l_errmsg  varchar2(500);
-    l_kf      varchar2(5);
   begin
 
     case
     when ( p_action Is Null )
     then raise_application_error( -20666, 'Parameter [p_action] must be specified!' );
-    when ( p_kf     Is Null )
-    then l_kf := sys_context('BARS_CONTEXT','USER_MFO');
+    when ( p_kf Is Null )
+    then raise_application_error( -20666, 'Parameter [p_kf] must be specified!' );
     else null;
     end case;
 
-    if ( l_kf Is Null )
-    then
-
-      l_errmsg := CHECK_SNP_RUNNING( p_action );
-
-    else
-
-      begin
-        select s.USERNAME || ' (' || s.MACHINE || '/' || s.OSUSER || ')'
-          into l_errmsg
-          from V$SESSION s
-          left
-          join V$GLOBALCONTEXT c
-            on ( c.CLIENT_IDENTIFIER = s.CLIENT_IDENTIFIER and
-                 c.NAMESPACE = 'BARS_CONTEXT' and
-                 c.ATTRIBUTE = 'USER_MFO'
-               )
-         where s.TYPE   = 'USER'
-           and s.STATUS = 'ACTIVE'
-           and s.ACTION = p_action
-           and c.VALUE  = l_kf;
-      exception
-        when NO_DATA_FOUND then
-          l_errmsg := null;
-      end;
-
-    end if;
+    begin
+      select s.USERNAME || ' (' || s.MACHINE || '/' || s.OSUSER || ')'
+        into l_errmsg
+        from V$SESSION s
+        left
+        join V$GLOBALCONTEXT c
+          on ( c.CLIENT_IDENTIFIER = s.CLIENT_IDENTIFIER and
+               c.NAMESPACE = 'BARS_CONTEXT' and
+               c.ATTRIBUTE = 'USER_MFO'
+             )
+       where s.TYPE   = 'USER'
+         and s.STATUS = 'ACTIVE'
+         and s.ACTION = p_action
+         and c.VALUE  = p_kf;
+    exception
+      when NO_DATA_FOUND then
+        l_errmsg := null;
+    end;
 
     return l_errmsg;
 
-  end check_snp_running;
+  end CHECK_SNP_RUNNING;
 
   --------------------------------------------------------------------------------
   --
@@ -299,7 +290,7 @@ is
 
     l_action := nvl(p_action,'MONBALS');
 
---  dbms_application_info.set_module( MODULE_CODE, l_action );
+--  dbms_application_info.set_module( 'SNAPSHOT', l_action );
     dbms_application_info.set_action( l_action );
 
   end set_running_flag;
@@ -1184,10 +1175,10 @@ is
       l_level := 0;
     end if;
 
-    -- после переименования субпартиция должна существовать
+    -- после переименования (суб)партиция должна существовать
     DBMS_STATS.gather_table_stats
     ( ownname          => l_owner
-    , tabname          => p_table
+    , tabname          => l_table
     , method_opt       => 'FOR ALL COLUMNS SIZE AUTO'
     , degree           => DBMS_STATS.AUTO_DEGREE
     , estimate_percent => DBMS_STATS.AUTO_SAMPLE_SIZE
@@ -1201,16 +1192,14 @@ begin
   load_algorithm();
 end bars_utl_snapshot;
 /
- show err;
- 
-PROMPT *** Create  grants  BARS_UTL_SNAPSHOT ***
-grant EXECUTE                                                                on BARS_UTL_SNAPSHOT to BARSUPL;
-grant EXECUTE                                                                on BARS_UTL_SNAPSHOT to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on BARS_UTL_SNAPSHOT to UPLD;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_utl_snapshot.sql =========*** E
- PROMPT ===================================================================================== 
- 
+show errors;
+
+PROMPT *** Create  grants  BARS_UTL_SNAPSHOT ***
+grant EXECUTE on BARS_UTL_SNAPSHOT to BARSUPL;
+grant EXECUTE on BARS_UTL_SNAPSHOT to BARS_ACCESS_DEFROLE;
+grant EXECUTE on BARS_UTL_SNAPSHOT to UPLD;
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_utl_snapshot.sql =========*** E
+PROMPT ===================================================================================== 

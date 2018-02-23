@@ -143,7 +143,7 @@ is
   <b>CURRENCY_REVALUATION</b> - процедура переоцінки валютних позицій
   %param
 
-  %version 1.1
+  %version 1.2
   %usage   переоцінка валютних позицій коригуючими проводками.
   */
     title  constant  varchar2(64) := $$PLSQL_UNIT||'.CURRENCY_REVALUATION';
@@ -160,6 +160,8 @@ is
     l_bank_dt   := GL.GBD();
     l_vdat      := DAT_NEXT_U(trunc(l_bank_dt,'MM'),-1);
     l_first_day := trunc(l_vdat,'MM');
+
+    gl.fSOS0 := 1;
 
     for cur in ( select /*+ NO_PARALLEL */ t.BRANCH, 'Finis/Реал.Курс.Рiзниця для рах.'||t.NLS||'/'||t.KV as PAYMENT_DESC
                       , t.ACC3801, a3.NLS as NLS_A, a3.KV as KV_A, SubStr(a3.NMS,1,38) as NAME_A
@@ -240,6 +242,8 @@ is
                         to_char(cur.ACC3801), to_char(cur.ACC6204), to_char(l_amnt) );
 
     end loop;
+
+    gl.fSOS0 := 0;
 
     bars_audit.trace( '%s: Exit.', title );
 
