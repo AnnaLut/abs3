@@ -55,8 +55,10 @@ public partial class vip : Bars.BarsPage
 								 WHERE d.RNK = a.rnk
 								   AND a.branch LIKE sys_context('bars_context'
 												,'user_branch_mask') ";
-        SelectCommand += " and upper(d.nmk) like  upper('%" + tbNMK.Text + "%') ";
-        SelectCommand += " and d.rnk  like '%" + tbRNK.Text + "%' ";
+        if(!string.IsNullOrWhiteSpace(tbNMK.Text))
+            SelectCommand += " and upper(d.nmk) like  upper('%" + tbNMK.Text.Trim() + "%') ";
+        if(!string.IsNullOrWhiteSpace(tbRNK.Text))
+            SelectCommand += " and d.rnk  like '%" + tbRNK.Text.Trim() + "%' ";
         //if (rbAll.Checked)
         //{
         //    SelectCommand += " and kvip like '%'";
