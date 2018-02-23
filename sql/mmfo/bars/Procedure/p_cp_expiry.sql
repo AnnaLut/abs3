@@ -8,14 +8,14 @@ PROMPT =========================================================================
 PROMPT *** Create  procedure P_CP_EXPIRY ***
 
 CREATE OR REPLACE PROCEDURE P_CP_EXPIRY (P_CP_ID       IN     NUMBER,
-                                              P_MODE        IN     NUMBER)
+                                         P_MODE        IN     NUMBER)
 IS
-/*2.4 2017.12.04*/
-   MODCODE          CONSTANT CHAR (2) NOT NULL := 'CP';
+/*2.5 2018.02.23*/
+   --MODCODE          CONSTANT CHAR (2) NOT NULL := 'CP';
    TITLE            CONSTANT CHAR (7) NOT NULL := 'CP_EXP:';
-   ERRMSGDIM        CONSTANT NUMBER (38) NOT NULL := 3000;
-   ROWSLIMIT        CONSTANT NUMBER (38) NOT NULL := 1000;
-   AUTOCOMMIT       CONSTANT NUMBER (38) NOT NULL := 1000;
+   --ERRMSGDIM        CONSTANT NUMBER (38) NOT NULL := 3000;
+   --ROWSLIMIT        CONSTANT NUMBER (38) NOT NULL := 1000;
+   --AUTOCOMMIT       CONSTANT NUMBER (38) NOT NULL := 1000;
 
    P_RESULTTXT      VARCHAR2(2000);
    P_RESULTCODE     NUMBER := 0;
@@ -57,7 +57,7 @@ IS
    --
    L_BDATE          DATE := GL.BDATE;
    L_USERID         STAFF.ID%TYPE := GL.AUID;
-   L_BASECUR        TABVAL.KV%TYPE := GL.BASEVAL;
+   --L_BASECUR        TABVAL.KV%TYPE := GL.BASEVAL;
    L_CP_DATA        T_CP_DATA;
 
    L_ACCC_EXPN      NUMBER :=0;
@@ -79,11 +79,11 @@ IS
    L_TRANSIT        ACCOUNTS.NLS%TYPE := '37392555';
 
    L_TT             TTS.TT%TYPE := 'FX7'; -- ОПЕРАЦИЯ ВЫНОСА НА ПРОСРОЧКУ
-   L_NAZN           OPER.NAZN%TYPE := CASE WHEN L_MODE = 1 THEN 'Прострочений купонних дохід, облігації *ISIN*, дог. *ND*, пакет *KOL*шт. Термін сплати *DATEXP*'
+   L_NAZN           CONSTANT OPER.NAZN%TYPE := CASE WHEN L_MODE = 1 THEN 'Прострочений купонних дохід, облігації *ISIN*, дог. *ND*, пакет *KOL*шт. Термін сплати *DATEXP*'
                                                               --'Перенесення залишку номіналу * на рахунок прострочення'
-                                           WHEN L_MODE = 0 THEN 'Прострочений номінал облігації *ISIN*, дог. *ND*, пакет *KOL*шт. Термін сплати *DATEXP*'
+                                                    WHEN L_MODE = 0 THEN 'Прострочений номінал облігації *ISIN*, дог. *ND*, пакет *KOL*шт. Термін сплати *DATEXP*'
                                                               --'Перенесення залишку нарахованого і придбаного купону * на рахунок прострочення'
-                                      END;
+                                               END;
    L_DK             OPER.DK%TYPE := 0;
    L_EXP_REF        OPER.REF%TYPE := 0;
    L_OST_R2         OPER.S%TYPE := 0;
@@ -594,14 +594,13 @@ BEGIN
         raise_application_error(-20000, P_RESULTTXT);
         P_RESULTCODE := 6;
       END IF;
-      L_NAZN := REPLACE(L_NAZN, '*ISIN*',    TO_CHAR(L_CP_DATA(I).CP_ID));
-      L_NAZN := REPLACE(L_NAZN, '*ND*',      TO_CHAR(L_CP_DATA(I).ND));
-      L_NAZN := REPLACE(L_NAZN, '*KOL*',     TO_CHAR(-L_CP_DATA(I).KOL));
-      L_NAZN := REPLACE(L_NAZN, '*DATEXP*',  TO_CHAR(L_CP_DATA(I).EXPDATE,'dd/mm/yyyy'));
-      L_DOCREC.NAZN := SUBSTR(L_NAZN,1,160);
+      L_DOCREC.NAZN := SUBSTR(REPLACE(L_NAZN, '*ISIN*',    TO_CHAR(L_CP_DATA(I).CP_ID)),1,160);
+      L_DOCREC.NAZN := SUBSTR(REPLACE(L_NAZN, '*ND*',      TO_CHAR(L_CP_DATA(I).ND)),1,160);
+      L_DOCREC.NAZN := SUBSTR(REPLACE(L_NAZN, '*KOL*',     TO_CHAR(-L_CP_DATA(I).KOL)),1,160);
+      L_DOCREC.NAZN := SUBSTR(REPLACE(L_NAZN, '*DATEXP*',  TO_CHAR(L_CP_DATA(I).EXPDATE,'dd/mm/yyyy')),1,160);
       if L_DOCREC.Vob is null then
         L_DOCREC.Vob := case when L_DOCREC.kv =  980 then 6 else 16 end;
-      end if;  
+      end if;
       L_EXP_REF := CP_MAKE_DOC(L_DOCREC);
       begin
         insert into cp_payments(CP_REF,OP_REF)
