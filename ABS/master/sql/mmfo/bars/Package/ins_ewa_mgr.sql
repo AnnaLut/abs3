@@ -12,7 +12,7 @@ CREATE OR REPLACE PACKAGE BARS.ins_ewa_mgr is
   -- Public type declarations
 
   -- Public constant declarations
-  g_header_version  constant varchar2(64)  := 'version 3.2 09/02/2018';
+  g_header_version  constant varchar2(64)  := 'version 3.21 23/02/2018';
 
   -- Public function and procedure declarations
 
@@ -195,7 +195,7 @@ type gt_response is record(
 
   -- Private constant declarations
   g_package_name constant varchar2(160) := 'ins_ewa_mgr';
-  g_body_version  constant varchar2(64)  := 'version 3.2 09/02/2018';
+  g_body_version  constant varchar2(64)  := 'version 3.21 23/02/2018';
 
   --3.0
 --исправлены мелкие ошибки при создании договоров страхования (формат полей таблиц модуля страхования, проверкуи на корректность данных и и.п.)
@@ -268,7 +268,7 @@ end get_branch;
     IF regexp_like(retval,'^\d{4}-\d{2}-\d{2}$') then --дата типу yyyy-mm-dd
        retval:= to_char(to_date(retval,'yyyy-mm-dd'),'dd.mm.yyyy'); 
     elsif regexp_like(retval,'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}\+\d{4}$') then --дата типу yyyy-mm-ddThh24:mi:ss.000+0000
-          retval:= to_char(to_date(substr(replace(retval,'T',' '),1,instr(retval,'.')-1),'yyyy-mm-dd hh24:mi:ss'),'dd.mm.yyyy');
+          retval:= to_char(cast(to_timestamp_tz(retval,'YYYY-MM-DD"T"HH24:MI:SS.FF3TZHTZM') at time zone 'Europe/Kiev' as date),'dd.mm.yyyy');
   end if;
     return retval;
   end l_xml_extract;
@@ -341,7 +341,7 @@ end get_branch;
                 exception when no_data_found then
                             p_resp.purpose    := null;
                             p_resp.errcode    := -20001;
-                            p_resp.errmessage := upper(g_package_name)||'. Не знайдено номер відділення';
+                            p_resp.errmessage := upper(g_package_name)||'. Не знайдено номер відділення "'||l_xml_extract(p_xml, l_contr_path||'salePoint/code/text()')||'".';
                             return;
                 end;
                 l_paydat.user_name:=l_xml_extract(p_xml, l_contr_path||'customFields/item[code="m1"]/value/text()'); --табельний номер
@@ -356,18 +356,53 @@ end get_branch;
                     if l_paydat.d_number is null then
                     l_paydat.d_number:=l_xml_extract(p_xml, l_contr_path||'code/text()'); --символьний № документу
                     end if;
+             begin
                 l_paydat.date_from:=to_date(l_xml_extract(p_xml, l_contr_path||'dateFrom/text()'),'dd.mm.yyyy'); --дата початоку дії страховкі
+                    exception when others then
+                    p_resp.purpose    := null;
+                    p_resp.errcode    := -20001;
+                    p_resp.errmessage := upper(g_package_name)||'. Помилка при конвертації дати початоку дії договору "'||l_xml_extract(p_xml, l_contr_path||'dateFrom/text()')||'".';
+                    return;
+             end;
+             begin
                 l_paydat.date_to:=to_date(l_xml_extract(p_xml, l_contr_path||'dateTo/text()'),'dd.mm.yyyy'); --дата кінця дії страховкі
+                     exception when others then
+                    p_resp.purpose    := null;
+                    p_resp.errcode    := -20001;
+                    p_resp.errmessage := upper(g_package_name)||'. Помилка при конвертації дати кінця дії договору "'||l_xml_extract(p_xml, l_contr_path||'dateTo/text()')||'".';
+                    return;
+             end;
+             begin
                 l_paydat.d_date:=to_date(l_xml_extract(p_xml, l_contr_path||'date/text()'),'dd.mm.yyyy'); --дата заключення договору
+                     exception when others then
+                    p_resp.purpose    := null;
+                    p_resp.errcode    := -20001;
+                    p_resp.errmessage := upper(g_package_name)||'. Помилка при конвертації дати заключення договору "'||l_xml_extract(p_xml, l_contr_path||'date/text()')||'".';
+                    return;
+             end;
                 l_paydat.purpose:=l_xml_extract(p_xml, l_pay_path||'purpose/text()'); --рпизначення платежу
                 l_paydat.cust_name:=l_xml_extract(p_xml, l_contr_path||'customer/name/text()'); --імя клієнта
                 l_paydat.cust_okpo:=nvl(l_xml_extract(p_xml, l_contr_path||'customer/code/text()'),'0000000000'); --ОКПО клієнта
                 l_paydat.cust_doc_type:=l_xml_extract(p_xml, l_contr_path||'customer/document/type/text()'); --Тип документу клієнта
                 l_paydat.cust_series:=l_xml_extract(p_xml, l_contr_path||'customer/document/series/text()'); --серія песпорта
                 l_paydat.cust_number:=l_xml_extract(p_xml, l_contr_path||'customer/document/number/text()'); --№ паснорта
+             begin
                 l_paydat.cust_doc_date:=to_date(l_xml_extract(p_xml, l_contr_path||'customer/document/date/text()'),'dd.mm.yyyy'); --дата видачі паспорта
+                    exception when others then
+                    p_resp.purpose    := null;
+                    p_resp.errcode    := -20001;
+                    p_resp.errmessage := upper(g_package_name)||'. Помилка при конвертації дати заключення договору "'||l_xml_extract(p_xml, l_contr_path||'customer/document/date/text()')||'".';
+                    return;
+             end;
                 l_paydat.cust_doc_issued:=l_xml_extract(p_xml, l_contr_path||'customer/document/issuedBy/text()'); --ким виданий паспорт
+             begin
                 l_paydat.cust_birthdate:=to_date(l_xml_extract(p_xml, l_contr_path||'customer/birthDate/text()'),'dd.mm.yyyy'); --дата народження
+                    exception when others then
+                    p_resp.purpose    := null;
+                    p_resp.errcode    := -20001;
+                    p_resp.errmessage := upper(g_package_name)||'. Помилка при конвертації дати народження "'||l_xml_extract(p_xml, l_contr_path||'customer/birthDate/text()')||'".';
+                    return;
+             end;
                 l_paydat.cust_phone:=l_xml_extract(p_xml, l_contr_path||'customer/phone/text()'); --№ телефону клієнта
                 l_paydat.cust_address:=l_xml_extract(p_xml, l_contr_path||'customer/address/text()'); --адреса клієнта
                     if l_paydat.cust_address is null then
@@ -376,13 +411,13 @@ end get_branch;
                 l_paydat.external_id:=l_xml_extract(p_xml, l_contr_path||'user/externalId/text()'); --логін касира
                 l_paydat.cu_external_id:=l_xml_extract(p_xml, 'root/currentUserExternalId/text()'); --логін користувача від якого створюється документ
                 l_paydat.external_id_tariff:=l_xml_extract(p_xml, l_contr_path||'tariff/externalId/text()'); --тип страховки EWA
-                l_paydat.email:=l_xml_extract(p_xml, l_contr_path||'user/email/text()');  --email касика
+                l_paydat.email:=l_xml_extract(p_xml, l_contr_path||'user/email/text()');  --email касира
                 ----для create_deal
                 l_paydat.ref:=to_number(l_xml_extract(p_xml, l_pay_path||'number/text()')); --референс
                 l_paydat.ewa_id:=to_number(l_xml_extract(p_xml, l_pay_path||'id/text()')); --ід платежу EWA
                 l_paydat.ins_code:=l_xml_extract(p_xml, l_contr_path||'tariff/insurer/code/text()'); --код страховкі
                 l_paydat.insuranceAmount:=nvl(to_number(l_xml_extract(p_xml, l_contr_path||'insuranceAmount/text()')),300000); --страхова сума
-                l_paydat.payment:=to_number(l_xml_extract(p_xml, l_contr_path||'payment/text()'))*100; --Загальна Сума(вартість) страховкі
+                l_paydat.payment:=to_number(l_xml_extract(p_xml, l_contr_path||'payment/text()')); --Загальна Сума(вартість) страховкі
                 l_paydat.ext_state:=l_xml_extract(p_xml, l_contr_path||'state/text()'); --статус договора
 
 
@@ -1345,7 +1380,7 @@ end get_purpose;
         p_deal_number := null;
         p_errcode := -20001;
         p_errmessage := 'В договорі відсутній документ';
-        logger.error(g_package_name||' p_errmessage='||p_errmessage||', params:'||chr(13)||chr(10)||substr(p_params.GetStringVal(),0,4000));
+        logger.error(g_package_name||' p_errmessage='||p_errmessage||', params:'||chr(13)||chr(10)||substr(p_params.GetClobVal(),0,4000));
         return;
     else
         delete ins_ewa_refs t where t.ewa_id = l_paydat.id;
@@ -1369,8 +1404,8 @@ end get_purpose;
         rollback to savepoint create_start;
         p_deal_number := null;
         p_errcode := -20001;
-        p_errmessage := 'Не знайдено код країни';
-        logger.error(g_package_name||' p_errmessage='||p_errmessage||', params:'||chr(13)||chr(10)||substr(p_params.GetStringVal(),0,4000));
+        p_errmessage := 'Не знайдено код країни "'||l_parname||'".';
+        logger.error(g_package_name||' p_errmessage='||p_errmessage||', params:'||chr(13)||chr(10)||substr(p_params.GetClobVal(),0,4000));
         return;
     end;
     begin
@@ -1380,19 +1415,19 @@ end get_purpose;
         rollback to savepoint create_start;
         p_deal_number := null;
         p_errcode := -20001;
-        p_errmessage := 'Не знайдено страхову компанію';
-        logger.error(g_package_name||' p_errmessage='||p_errmessage||', params:'||chr(13)||chr(10)||substr(p_params.GetStringVal(),0,4000));
+        p_errmessage := 'Не знайдено страхову компанію з ОКПО "'||l_paydat.ins_code||'".';
+        logger.error(g_package_name||' p_errmessage='||p_errmessage||', params:'||chr(13)||chr(10)||substr(p_params.GetClobVal(),0,4000));
         return;
     end;
     begin
-      select id into l_user_id from staff$base where upper(logname) = l_paydat.external_id;/*p_params.extract('/CreateDealParams/user/lastName/text()').GetStringVal()*/
+      select id into l_user_id from staff$base where upper(logname) = upper(l_paydat.external_id);/*p_params.extract('/CreateDealParams/user/lastName/text()').GetStringVal()*/
     exception
       when no_data_found then
         rollback to savepoint create_start;
         p_deal_number := null;
         p_errcode := -20001;
-        p_errmessage := 'Не знайдено користувача';
-        logger.error(g_package_name||' p_errmessage='||p_errmessage||', params:'||chr(13)||chr(10)||substr(p_params.GetStringVal(),0,4000));
+        p_errmessage := 'Не знайдено користувача "'||l_paydat.external_id||'".';
+        logger.error(g_package_name||' p_errmessage='||p_errmessage||', params:'||chr(13)||chr(10)||substr(p_params.GetClobVal(),0,4000));
         return;
     end;
     begin
@@ -1402,8 +1437,8 @@ end get_purpose;
         rollback to savepoint create_start;
         p_deal_number := null;
         p_errcode := -20001;
-        p_errmessage := 'Не знайдено відповідний тип страхового договору';
-        logger.error(g_package_name||' p_errmessage='||p_errmessage||', params:'||chr(13)||chr(10)||substr(p_params.GetStringVal(),0,4000));
+        p_errmessage := 'Не знайдено відповідний тип страхового договору "'||l_paydat.external_id_tariff||'".';
+        logger.error(g_package_name||' p_errmessage='||p_errmessage||', params:'||chr(13)||chr(10)||substr(p_params.GetClobVal(),0,4000));
         return;
     end;
     begin
@@ -1413,8 +1448,8 @@ end get_purpose;
         rollback to savepoint create_start;
         p_deal_number := null;
         p_errcode := -20001;
-        p_errmessage := 'Не знайдено відповідний тип документу, що посвідчує особу';
-        logger.error(g_package_name||' p_errmessage='||p_errmessage||', params:'||chr(13)||chr(10)||substr(p_params.GetStringVal(),0,4000));
+        p_errmessage := 'Не знайдено відповідний тип документу, що посвідчує особу "'||l_paydat.cust_doc_type||'".';
+        logger.error(g_package_name||' p_errmessage='||p_errmessage||', params:'||chr(13)||chr(10)||substr(p_params.GetClobVal(),0,4000));
         return;
     end;
     ----
@@ -1424,8 +1459,8 @@ end get_purpose;
         rollback to savepoint create_start;
         p_deal_number := null;
         p_errcode := -20001;
-        p_errmessage := 'Дата документу, що посвідчує особу меньше даты дати народження';
-        logger.error(g_package_name||' p_errmessage='||p_errmessage||', params:'||chr(13)||chr(10)||substr(p_params.GetStringVal(),0,4000));
+        p_errmessage := 'Дата документу, що посвідчує особу "'||to_char(l_paydat.cust_doc_date,'dd.mm.yyyy')||'" меньше дати народження "'||to_char(l_paydat.cust_doc_date,'dd.mm.yyyy')||'".';
+        logger.error(g_package_name||' p_errmessage='||p_errmessage||', params:'||chr(13)||chr(10)||substr(p_params.GetClobVal(),0,4000));
         return;
         end if;
     end;
