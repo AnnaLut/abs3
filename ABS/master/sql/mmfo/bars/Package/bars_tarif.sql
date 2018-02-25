@@ -205,8 +205,8 @@ procedure set_sh_tarif (
 is
 begin
   begin
-     insert into sh_tarif (ids, kod, tar, pr, smin, smax, nbs_ob22, kf)
-     values (p_ids, p_kod, p_tar, p_pr, p_smin, p_smax, p_nbs_ob22, getglobaloption('GLB-MFO'));
+     insert into sh_tarif (ids, kod, tar, pr, smin, smax, nbs_ob22)
+     values (p_ids, p_kod, p_tar, p_pr, p_smin, p_smax, p_nbs_ob22);
   exception when dup_val_on_index then
      update sh_tarif
         set tar      = p_tar,
