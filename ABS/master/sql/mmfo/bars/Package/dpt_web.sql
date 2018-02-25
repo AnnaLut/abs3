@@ -8013,13 +8013,16 @@ is
       */
     
     --COBUMMFO-6387
-    select ddd.deposit_id, ddd.nd, ddd.vidd, ddd.rnk, ddd.acc, a.nls, a.kv, ia.acra,
+    select ddd.deposit_id, ddd.nd, ddd.vidd, ddd.rnk, ddd.acc, 
+		ia.acra,    
                (case
                  when dv.amr_metr > 0 then
                   ia.acrb
                  else
                   null
                end),
+	       a.nls, 
+		a.kv, 
                a.blkd
       bulk collect
       into l_dpt
