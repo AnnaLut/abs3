@@ -435,7 +435,7 @@ is
   --
   -- constants
   --
-  g_body_version  constant varchar2(64)  := 'version 19.4  2018.02.16';
+  g_body_version  constant varchar2(64)  := 'version 19.5  2018.02.25';
 
   MODULE_PREFIX   constant varchar2(4)   := 'NBUR';
 
@@ -1643,22 +1643,6 @@ is
         BC.SUBST_MFO( p_kf );
 
         bars_audit.trace( '%s: run SYNC_DLY_SNAP ( %s ).', title, to_char(p_report_date,'dd.mm.yyyy') );
-
-        loop
-          -- Перевірка наявності активного процесу формування знімку
-          l_errmsg := BARS_UTL_SNAPSHOT.CHECK_SNP_RUNNING( 'DAYBALS' );
-
-          -- якщо звільнилось, то виходимо
-          exit when ( l_errmsg is Null or l_wait_tm <= 0 );
-
-          bars_audit.info( title||': SYNC_DLY_SNAP already running '||l_errmsg );
-
-          -- чекаємо 10 хв. на звільнення ресурсу з перевіркою кожні 30 с.
-          l_wait_tm := l_wait_tm - 30;
-
-          dbms_lock.sleep(30);
-
-        end loop;
 
         BARS_UTL_SNAPSHOT.SYNC_SNAP( p_report_date );
 

@@ -45,6 +45,12 @@ is
   --
   function body_version return varchar2;
 
+  --------------------------------------------------------------------------------
+  --
+  -- Функція яка повертає признак чи запущено накопичення
+  --
+  function get_snp_running return number;
+
   --
   -- Перевірка наявності активного процесу формування знімку
   --
@@ -147,7 +153,7 @@ is
   --
   -- constants
   --
-  VERSION_BODY    constant varchar2(64)  := 'version 1.3.0  23.02.2018';
+  VERSION_BODY    constant varchar2(64)  := 'version 1.3.0  25.02.2018';
 
   -- Префикс для трассировки
   PKG_CODE        constant varchar2(100) := 'UTL_SNAPSHOT';
@@ -205,7 +211,7 @@ is
   ( p_action  in   v$session.action%type default null
   ) return varchar2
   is
-    l_errmsg  varchar2(500);
+    l_errmsg  varchar2(512);
     l_action  v$session.action%type;
   begin
 
@@ -215,21 +221,27 @@ is
       select s.USERNAME || ' (' || s.MACHINE || '/' || s.OSUSER || ')'
         into l_errmsg
         from V$SESSION s
+        left
+        join V$PX_SESSION px
+          on ( px.SID = s.SID and px.QCSID = s.SID )
        where s.TYPE   = 'USER'
          and s.STATUS = 'ACTIVE'
---       and s.MODULE = 'SNAPSHOT'
          and s.ACTION = l_action;
     exception
       when NO_DATA_FOUND then
         l_errmsg := null;
       when TOO_MANY_ROWS then
-        select listagg( CLIENT_IDENTIFIER, ', ' ) WITHIN GROUP ( order by SID )
+        select listagg( CLIENT_IDENTIFIER, ', ' ) WITHIN GROUP ( order by CLIENT_IDENTIFIER )
           into l_errmsg
-          from V$SESSION s
-         where s.TYPE   = 'USER'
-           and s.STATUS = 'ACTIVE'
-           and s.ACTION = l_action;
---      BARS_AUDIT.INFO( PKG_CODE||'.CHECK_SNP_RUNNING: Exit with ( '||l_errmsg||' ).' );
+          from ( select distinct s.CLIENT_IDENTIFIER
+                   from V$SESSION s
+                   left
+                   join V$PX_SESSION px
+                     on ( px.SID = s.SID and px.QCSID = s.SID )
+                  where s.TYPE   = 'USER'
+                    and s.STATUS = 'ACTIVE'
+                    and s.ACTION = l_action
+               );
     end;
 
     return l_errmsg;
