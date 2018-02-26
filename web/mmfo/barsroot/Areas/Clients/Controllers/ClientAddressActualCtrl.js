@@ -1,6 +1,6 @@
 ﻿angular.module(globalSettings.modulesAreas)
     .controller('ClientAddressActualCtrl',
-            ['$scope',
+    ['$scope',
         function ($scope) {
 
             $scope.regionForChoose = [];
@@ -8,6 +8,8 @@
             $scope.settlementForChoose = [];
             $scope.streetForChoose = [];
             $scope.houseForChoose = [];
+
+            $scope.spanEnterRegionActual = { 'visibility': 'hidden' };
 
             $scope.KEY_ENTER = 13;
 
@@ -82,13 +84,13 @@
                 },
                 dataSource: $scope.actualAreasDataSource,
                 template: '<div style="float: left;">' +
-                              '<div style="float: left; width: 200px; word-wrap:break-word;">' +
-                                    '<span>#=AREA_NM #</span>' +
-                              '</div>' +
-                              '<div style="float: left; width: 200px; word-wrap:break-word; margin-left: 2px;">' +
-                                    '<span>#=REGION_NAME ? REGION_NAME : " "#</span>' +
-                               '</div>' +
-                          '</div>',
+                '<div style="float: left; width: 200px; word-wrap:break-word;">' +
+                '<span>#=AREA_NM #</span>' +
+                '</div>' +
+                '<div style="float: left; width: 200px; word-wrap:break-word; margin-left: 2px;">' +
+                '<span>#=REGION_NAME ? REGION_NAME : " "#</span>' +
+                '</div>' +
+                '</div>',
                 open: function () {
                     angular.element('.k-list-container').css({ "width": "460px" });
                 },
@@ -304,7 +306,7 @@
                 open: $scope.clientAddress.createDropDownOptions.open,
                 close: $scope.clientAddress.createDropDownOptions.close
             };
-            
+
             $scope.$on('writeActualAddress', function (event, args) {
                 $scope.actualIndex = args.actualModel.index;
                 $scope.REGION_ID = args.actualModel.REGION_ID;
@@ -354,8 +356,11 @@
                     $scope.clientAddress.actualModel.REGION_NAME = regionName;
                 }
                 $scope.disabledStreet = $scope.disabledStreetType = regionName === "" || $scope.actualSettlement === "" || $scope.actualSettlement === undefined ? true : false;
+
+                var showSpan = !regionName && !$scope.clientAddress.actualModel.settlementName;
+                $scope.spanEnterRegionActual = { 'visibility': showSpan ? 'visible' : 'hidden' };
             }
-            
+
             $scope.changeActualArea = function (areaName) {
                 if (areaName != $scope.clientAddress.actualModel.AREA_NAME) {
                     $scope.clientAddress.actualModel.AREA_ID = null;
@@ -363,7 +368,7 @@
                 }
                 $scope.disableRegion = $scope.clientAddress.actualModel.AREA_ID ? true : false;
             }
-            
+
             $scope.changeActualSettlement = function (settlementName) {
                 if (settlementName != $scope.clientAddress.actualModel.SETTLEMET_NAME) {
                     $scope.clientAddress.actualModel.SETL_ID = null;
@@ -380,7 +385,7 @@
                 $scope.disableRegion = $scope.clientAddress.actualModel.SETL_ID ? true : false;
                 $scope.disableArea = $scope.clientAddress.actualModel.SETL_ID ? true : false;
             }
-            
+
             $scope.changeActualStreet = function (streetName) {
                 if (streetName != $scope.clientAddress.actualModel.STREET_NAME) {
                     $scope.clientAddress.actualModel.STR_ID = null;
@@ -534,7 +539,7 @@
                 $scope.disableRegion = !actualModel.STREET_NAME || (actualModel.SETL_ID === null && actualModel.AREA_ID !== null) ? false : true;
                 $scope.disableArea = actualModel.SETL_ID === null || !actualModel.STREET_NAME ? false : true;
                 $scope.disableSettlement = $scope.disableSettlementType = !actualModel.STREET_NAME ? false : true;
-                $scope.disabledStreet = $scope.disabledStreetType  = actualModel.HOUSE_NUM_FULL || !actualModel.SETTLEMET_NAME || !actualModel.REGION_NAME ? true : false;
+                $scope.disabledStreet = $scope.disabledStreetType = actualModel.HOUSE_NUM_FULL || !actualModel.SETTLEMET_NAME || !actualModel.REGION_NAME ? true : false;
                 $scope.disabledHouse = !actualModel.SETTLEMET_NAME || !actualModel.REGION_NAME || actualModel.SECTION || actualModel.ROOM ? true : false;
                 $scope.disabledSection = !actualModel.HOUSE_NUM_FULL || !actualModel.SETTLEMET_NAME || !actualModel.REGION_NAME ? true : false;
                 $scope.disabledRoom = !actualModel.HOUSE_NUM_FULL || !actualModel.SETTLEMET_NAME || !actualModel.REGION_NAME ? true : false;
@@ -583,9 +588,12 @@
                 $scope.actualSettlementDropDown.value(data.SETL_TP_ID);
                 $scope.disabledStreet = $scope.disabledStreetType = false;
                 $scope.disableRegion = $scope.disableArea = $scope.disableSettlementType = true;
+
+                $scope.spanEnterRegionActual = { 'visibility': 'hidden' };
             }
 
             $scope.settlementLostFocus = function () {
+                $scope.spanEnterRegionActual = { 'visibility': $scope.clientAddress.actualModel.REGION_NAME ? 'hidden' : 'visible' };
                 for (var i = 0; i < $scope.settlementForChoose.length; i++) {
                     if ($scope.clientAddress.actualModel.SETTLEMET_NAME.toUpperCase() === $scope.settlementForChoose[i].SETL_NM.toUpperCase() && !$scope.clientAddress.actualModel.SETL_ID) {
                         $scope.selectedSettlement($scope.settlementForChoose[i]);
@@ -605,11 +613,11 @@
 
             $scope.streetLostFocus = function () {
                 for (var i = 0; i < $scope.streetForChoose.length; i++) {
-                    if ($scope.clientAddress.actualModel.STREET_NAME.toUpperCase() === $scope.streetForChoose[i].STR_NM.toUpperCase()) {
+                    if ($scope.clientAddress.actualModel.STR_ID === $scope.streetForChoose[i].STR_ID) {
                         $scope.selectedStreet($scope.streetForChoose[i]);
                     }
                 };
-            } 
+            }
 
             $scope.selectedHouse = function (data) {
                 $scope.clientAddress.actualModel.HOUSE_NUM_FULL = data.HOUSE_NUM_FULL;
@@ -655,6 +663,6 @@
                     case "house":
                         $scope.houseLostFocus();
                         break;
-                }          
+                }
             }
         }]);

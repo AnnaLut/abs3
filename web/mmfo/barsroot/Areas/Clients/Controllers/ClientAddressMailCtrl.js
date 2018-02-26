@@ -1,6 +1,6 @@
 ﻿angular.module(globalSettings.modulesAreas)
     .controller('ClientAddressMailCtrl',
-            ['$scope',
+    ['$scope',
         function ($scope) {
 
             $scope.regionForChoose = [];
@@ -8,6 +8,8 @@
             $scope.settlementForChoose = [];
             $scope.streetForChoose = [];
             $scope.houseForChoose = [];
+
+            $scope.spanEnterRegionMail = { 'visibility': 'hidden' };
 
             $scope.KEY_ENTER = 13;
 
@@ -82,13 +84,13 @@
                 },
                 dataSource: $scope.mailAreasDataSource,
                 template: '<div style="float: left;">' +
-                              '<div style="float: left; width: 200px; word-wrap:break-word;">' +
-                                    '<span>#=AREA_NM #</span>' +
-                              '</div>' +
-                              '<div style="float: left; width: 200px; word-wrap:break-word; margin-left: 2px;">' +
-                                    '<span>#=REGION_NAME ? REGION_NAME : " "#</span>' +
-                               '</div>' +
-                          '</div>',
+                '<div style="float: left; width: 200px; word-wrap:break-word;">' +
+                '<span>#=AREA_NM #</span>' +
+                '</div>' +
+                '<div style="float: left; width: 200px; word-wrap:break-word; margin-left: 2px;">' +
+                '<span>#=REGION_NAME ? REGION_NAME : " "#</span>' +
+                '</div>' +
+                '</div>',
                 open: function () {
                     angular.element('.k-list-container').css({ "width": "460px" });
                 },
@@ -304,7 +306,7 @@
                 open: $scope.clientAddress.createDropDownOptions.open,
                 close: $scope.clientAddress.createDropDownOptions.close
             };
-            
+
             $scope.$on('writeMailAddress', function (event, args) {
 
                 $scope.mailIndex = args.mailModel.index;
@@ -344,7 +346,7 @@
 
             angular.element(document).ready(function () {
                 $scope.bindModel();
-            });           
+            });
 
             $scope.changeMailIndex = function () {
                 $scope.clientAddress.mailModel.index = $scope.mailIndex;
@@ -356,8 +358,11 @@
                     $scope.clientAddress.mailModel.REGION_NAME = regionName;
                 }
                 $scope.disabledStreet = $scope.disabledStreetType = regionName === "" || $scope.mailSettlement === "" || $scope.mailSettlement === undefined ? true : false;
+
+                var showSpan = !regionName && !$scope.clientAddress.mailModel.settlementName;
+                $scope.spanEnterRegionMail = { 'visibility': showSpan ? 'visible' : 'hidden' };
             }
-            
+
             $scope.changeMailAreas = function (areaName) {
                 if (areaName != $scope.clientAddress.mailModel.AREA_NAME) {
                     $scope.clientAddress.mailModel.AREA_ID = null;
@@ -365,7 +370,7 @@
                 }
                 $scope.disableRegion = $scope.clientAddress.mailModel.AREA_ID ? true : false;
             }
-            
+
             $scope.changeMailSettlement = function (settlementName) {
                 if (settlementName != $scope.clientAddress.mailModel.SETTLEMET_NAME) {
                     $scope.clientAddress.mailModel.SETL_ID = null;
@@ -383,7 +388,7 @@
                 $scope.disableRegion = $scope.clientAddress.mailModel.SETL_ID ? true : false;
                 $scope.disableArea = $scope.clientAddress.mailModel.SETL_ID ? true : false;
             }
-            
+
             $scope.changeMailStreet = function (streetName) {
                 if (streetName != $scope.clientAddress.mailModel.STREET_NAME) {
                     $scope.clientAddress.mailModel.STR_ID = null;
@@ -512,7 +517,7 @@
                     STR_TP_NM: " "
                 };
             }
-            
+
             $scope.bindModel = function () {
 
                 var mailModel = $scope.clientAddress.mailModel;
@@ -584,9 +589,12 @@
                 $scope.mailSettlementDropDown.value(data.SETL_TP_ID);
                 $scope.disabledStreet = $scope.disabledStreetType = false;
                 $scope.disableRegion = $scope.disableArea = $scope.disableSettlementType = true;
+
+                $scope.spanEnterRegionMail = { 'visibility': 'hidden' };
             }
 
             $scope.settlementLostFocus = function () {
+                $scope.spanEnterRegionMail = { 'visibility': $scope.clientAddress.mailModel.REGION_NAME ? 'hidden' : 'visible' };
                 for (var i = 0; i < $scope.settlementForChoose.length; i++) {
                     if ($scope.clientAddress.mailModel.SETTLEMET_NAME.toUpperCase() === $scope.settlementForChoose[i].SETL_NM.toUpperCase() && !$scope.clientAddress.mailModel.SETL_ID) {
                         $scope.selectedSettlement($scope.settlementForChoose[i]);
@@ -606,7 +614,7 @@
 
             $scope.streetLostFocus = function () {
                 for (var i = 0; i < $scope.streetForChoose.length; i++) {
-                    if ($scope.clientAddress.mailModel.STREET_NAME.toUpperCase() === $scope.streetForChoose[i].STR_NM.toUpperCase()) {
+                    if ($scope.clientAddress.mailModel.STR_ID === $scope.streetForChoose[i].STR_ID) {
                         $scope.selectedStreet($scope.streetForChoose[i]);
                     }
                 };
