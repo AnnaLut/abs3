@@ -1,7 +1,7 @@
 create or replace package body crkr_compen_web is
 
   -- Private constant declarations
-  g_body_version constant varchar2(120) := 'Version Body 1.24 27.06.2017 10:45';
+  g_body_version constant varchar2(120) := 'Version Body 1.28 21.02.2018 17:33';
 
   --статуси вкладів
   STATE_COMPEN_OPEN      constant pls_integer := 1; --Відкритий вклад
@@ -33,8 +33,8 @@ create or replace package body crkr_compen_web is
   TYPE_OPER_REQ_DEACT_DEP constant pls_integer := 9;  --Запит на відміну актуалізації
   TYPE_OPER_REQ_DEACT_BUR constant pls_integer := 10;  --Запит на відміну актуалізації по похованню
   TYPE_OPER_BENEF_ADD     constant pls_integer := 31;  --Додавання беніфіціара
-  TYPE_OPER_BENEF_MOD     constant pls_integer := 32;  --Модифікація беніфіціара  
-  TYPE_OPER_BENEF_DEL     constant pls_integer := 33;  --Видалення беніфіціара    
+  TYPE_OPER_BENEF_MOD     constant pls_integer := 32;  --Модифікація беніфіціара
+  TYPE_OPER_BENEF_DEL     constant pls_integer := 33;  --Видалення беніфіціара
 
   --статуси реєстра на виплати
   STATE_REG_NEW           constant pls_integer := 0; --Новостворений запис реєстру (можливі зміни як реєстру так і по пов'язаним операціям)
@@ -52,6 +52,8 @@ create or replace package body crkr_compen_web is
 
   --типок для обробки сум на поховання в розрізі померлих
   type t_arr_dbcode_sum is table of pls_integer index by varchar2(32);
+  
+  G_LOG            constant varchar2(30) := 'crkr_compen_web.';
 
   -- Function and procedure implementations
   function header_version return varchar2 is
@@ -201,55 +203,55 @@ create or replace package body crkr_compen_web is
     l_new               compen_benef%rowtype;
     l_old_country       country.name%type;
     l_new_country       country.name%type;
-  begin  
-    select b.* into l_old from compen_benef_update b where b.id_compen = p_compen_id and b.idb = p_idb 
-                                                       and b.idupd = (select max(prev) from ( select lag(idupd) over (order by idupd) as prev from compen_benef_update  
-                                                                                               where id_compen = p_compen_id and idb = p_idb)); 
-    select b.* into l_new from compen_benef b where b.id_compen = p_compen_id and b.idb = p_idb;     
+  begin
+    select b.* into l_old from compen_benef_update b where b.id_compen = p_compen_id and b.idb = p_idb
+                                                       and b.idupd = (select max(prev) from ( select lag(idupd) over (order by idupd) as prev from compen_benef_update
+                                                                                               where id_compen = p_compen_id and idb = p_idb));
+    select b.* into l_new from compen_benef b where b.id_compen = p_compen_id and b.idb = p_idb;
     if b_not_eq(l_old.code, l_new.code) then
       l_txt := l_txt||'Тип беніфіціара: '||l_old.code||' нове: '||l_new.code||chr(13)||chr(10);
-    end if;  
+    end if;
     if b_not_eq(l_old.fiob, l_new.fiob) then
       l_txt := l_txt||'ПІБ беніфіціара: '||l_old.fiob||' нове: '||l_new.fiob||chr(13)||chr(10);
-    end if;  
+    end if;
     if b_not_eq(l_old.countryb, l_new.countryb) then
       select name into l_old_country from country where country = l_old.countryb;
-      select name into l_new_country from country where country = l_new.countryb;      
+      select name into l_new_country from country where country = l_new.countryb;
       l_txt := l_txt||'Країна беніфіціара: '||l_old_country||' нове: '||l_new_country||chr(13)||chr(10);
-    end if;  
+    end if;
     if b_not_eq(l_old.fulladdressb, l_new.fulladdressb) then
       l_txt := l_txt||'Адреса беніфіціара: '||l_old.fulladdressb||' нове: '||l_new.fulladdressb||chr(13)||chr(10);
-    end if;  
+    end if;
     if b_not_eq(l_old.icodb, l_new.icodb) then
       l_txt := l_txt||'ІНН беніфіціара: '||l_old.icodb||' нове: '||l_new.icodb||chr(13)||chr(10);
-    end if;  
+    end if;
     if b_not_eq(l_old.doctypeb, l_new.doctypeb) then
       l_txt := l_txt||'Тип документу беніфіціара: '||l_old.doctypeb||' нове: '||l_new.doctypeb||chr(13)||chr(10);
-    end if;  
+    end if;
     if b_not_eq(l_old.docserialb, l_new.docserialb) then
       l_txt := l_txt||'Серія документу беніфіціара: '||l_old.docserialb||' нове: '||l_new.docserialb||chr(13)||chr(10);
-    end if;  
+    end if;
     if b_not_eq(l_old.docnumberb, l_new.docnumberb) then
       l_txt := l_txt||'Номер документу беніфіціара: '||l_old.docnumberb||' нове: '||l_new.docnumberb||chr(13)||chr(10);
-    end if;  
+    end if;
     if b_not_eq(l_old.docorgb, l_new.docorgb) then
       l_txt := l_txt||'Орган що видав документ беніфіціару: '||l_old.docorgb||' нове: '||l_new.docorgb||chr(13)||chr(10);
-    end if;  
+    end if;
     if b_not_eq(l_old.docdateb, l_new.docdateb) then
       l_txt := l_txt||'Дата документа беніфіціара: '||l_old.docdateb||' нове: '||l_new.docdateb||chr(13)||chr(10);
-    end if;  
+    end if;
     if b_not_eq(l_old.clientsexb, l_new.clientsexb) then
       l_txt := l_txt||'Стать беніфіціара: '||l_old.clientsexb||' нове: '||l_new.clientsexb||chr(13)||chr(10);
-    end if;  
+    end if;
     if b_not_eq(l_old.clientphoneb, l_new.clientphoneb) then
       l_txt := l_txt||'Телефон беніфіціара: '||l_old.clientphoneb||' нове: '||l_new.clientphoneb||chr(13)||chr(10);
-    end if;  
+    end if;
     if b_not_eq(l_old.percent, l_new.percent) then
       l_txt := l_txt||'Процент беніфіціара: '||l_old.percent||' нове: '||l_new.percent||chr(13)||chr(10);
-    end if;  
-    
+    end if;
+
     return l_txt;
-  end;  
+  end;
 
   function f_dbcode(p_doc_type number, p_ser varchar2, p_numdoc varchar2) return varchar2
     is
@@ -320,7 +322,7 @@ create or replace package body crkr_compen_web is
     bars_audit.trace('START create_customer '||'p_rnk=>' || p_rnk || ' p_name=>' || p_name || ' p_ser=>'||p_ser||' p_numdoc=>'||p_numdoc);
     if p_sex is null then
       raise_application_error(-20000, 'Невказано стать');
-    end if;  
+    end if;
     begin
       select r.branch
         into l_branch
@@ -546,14 +548,14 @@ create or replace package body crkr_compen_web is
       l_customer_crkr_update_new.date_registry    := l_customer_crkr_update_old.date_registry;--по хорошому з кастамера треба брати - вдруг там його хтось якось змінив
       l_customer_crkr_update_new.change_info      := analiz_change_client(l_customer_crkr_update_old, l_customer_crkr_update_new);
       --Змінити данні в реєстрі по планових або вже відправлених але з помилкою
-      for cur in (select r.reg_id from compen_payments_registry r 
+      for cur in (select r.reg_id from compen_payments_registry r
                            where r.rnk = p_rnk
                              and r.state_id in (STATE_REG_NEW, STATE_REG_PAY_BLOCK, STATE_REG_SEND_ERR)
-                  for update           
-                                                                         	)
+                  for update
+                                                                           )
       loop
         update compen_payments_registry r
-           set 
+           set
              r.mfo_client   = l_customer_crkr_update_new.mfo,
              r.nls          = l_customer_crkr_update_new.nls,
              r.okpo         = nvl(l_customer_crkr_update_new.okpo, l_customer_crkr_update_new.inn), --Якщо представник, то має бути ЄДРПОУ, у іншому випадку ІПН клієнта
@@ -561,7 +563,7 @@ create or replace package body crkr_compen_web is
              r.date_val_reg = l_customer_crkr_update_new.date_val_reg,
              r.changedate   = sysdate
          where r.reg_id = cur.reg_id;
-      end loop;                                                                      
+      end loop;
     exception
       when no_data_found then
         l_customer_crkr_update_new.change_info := 'Додавання клієнта';
@@ -732,7 +734,9 @@ create or replace package body crkr_compen_web is
     l_dbcode        compen_portfolio.dbcode%type;
     l_cnt           number;
   begin
-
+    bars_audit.info(G_LOG || 'i_compen_oper' || ' Start p_opercode=>' ||
+                    p_opercode || ' p_compen_id=>' || p_compen_id ||' p_compen_bound=>' || p_compen_bound ||
+                    ' p_rnk=>' || p_rnk);    
     select c.ost, c.kv, c.rnk, c.status, c.dbcode
       into l_ost, l_kv, l_rnk_actual, l_compen_status, l_dbcode
       from compen_portfolio c
@@ -742,13 +746,13 @@ create or replace package body crkr_compen_web is
       case
         when l_compen_status = 0 then
           raise_application_error(-20000, 'Компенсанційний вклад незафіксований після міграції!');
-        when p_opercode = 'REBRANCH' then null;--все добре, ребранчінг в любому випадку можна                                  
-        when p_opercode like 'REQ_DEACT%' then null;--все добре, запит на відміну актуалізації в любому випадку можна                                  
+        when p_opercode = 'REBRANCH' then null;--все добре, ребранчінг в любому випадку можна
+        when p_opercode like 'REQ_DEACT%' then null;--все добре, запит на відміну актуалізації в любому випадку можна
         when l_compen_status = STATE_COMPEN_CLOSE and
              p_opercode in ('CHANGE_DA', 'CHANGE_DB') then
              null;--дозволити якщо обробляються залежні(автоматичні) операції по зміні документу
         when p_opercode in ('DEACT_DEP', 'DEACT_BUR') then
-          null; --все добре, деактуалізувати можна завжди             
+          null; --все добре, деактуалізувати можна завжди
         when l_compen_status = STATE_COMPEN_CLOSE then
           raise_application_error(-20000,
                                   'Компенсанційний вклад Закритий!');
@@ -777,7 +781,7 @@ create or replace package body crkr_compen_web is
           null; --все добре,   актуалізувати в такому випадку можна
         when l_compen_status = STATE_COMPEN_BLOCK_BUR and
              p_opercode = 'ACT_BUR' then
-          null; --наче можна актуалізувати по похованню автоматично заблокований на поховання       
+          null; --наче можна актуалізувати по похованню автоматично заблокований на поховання
         when l_compen_status = STATE_COMPEN_BLOCK and
              p_opercode in ('CHANGE_DA', 'CHANGE_DB') then
           null;--дозволити якщо обробляються залежні(автоматичні) операції по зміні документу
@@ -854,6 +858,8 @@ create or replace package body crkr_compen_web is
        p_ref_id,
        p_ben_id,
        user_id);
+       
+    bars_audit.info(G_LOG || 'i_compen_oper End');          
     return l_id;
   end;
 
@@ -893,7 +899,7 @@ create or replace package body crkr_compen_web is
           raise_application_error(-20000, 'Змініть документ на підставі якого оформлення спадщини');
         end if;
       end if;
-    end if;  
+    end if;
 
 
     if l_portfolio.status != p_status_id then --апдейтити тільки якщо статус новий
@@ -914,7 +920,7 @@ create or replace package body crkr_compen_web is
                                        else
                                          heritage_ost
                                     end,
-             status_prev          = status,                       
+             status_prev          = status,
              datl                 = sysdate
        where id = p_compen_id
       returning id, fio, country, postindex, obl, rajon, city, address, fulladdress, icod, doctype, docserial, docnumber, docorg, docdate, clientbdate, clientbplace, clientsex, clientphone, registrydate, nsc, ida, nd, sum, ost, dato, datl, attr, card, datn, ver, stat, tvbv, branch, kv, status, date_import, dbcode, percent, kkname, ob22, rnk, branchact, close_date, reason_change_status, heritage_ost, rnk_bur, branchact_bur, ostasvo, branch_crkr, status_prev, type_person, name_person, edrpo_person into l_portfolio;
@@ -1311,7 +1317,7 @@ create or replace package body crkr_compen_web is
     l_planned_day              date;
     l_customer_crkr_update_old customer_crkr_update%rowtype;
     l_customer_crkr_update_new customer_crkr_update%rowtype;
-    l_fio                      customer_crkr_update.user_fio%type;    
+    l_fio                      customer_crkr_update.user_fio%type;
   begin
     l_planned_day := get_planned_day;
     update compen_clients c
@@ -1341,7 +1347,7 @@ create or replace package body crkr_compen_web is
           null;
       end;
     end if;
-  end;    
+  end;
 
   --зміна статусу операції
   procedure set_oper_status(p_oper_id              compen_oper.oper_id%type,
@@ -1368,16 +1374,17 @@ create or replace package body crkr_compen_web is
     l_oper_arr_id         number_list := number_list();
 
     l_cbu                      compen_benef_update%rowtype;
-    l_cb                       compen_benef%rowtype;   
-    
+    l_cb                       compen_benef%rowtype;
+
     l_compen_id                compen_portfolio.id%type;
-    
+
     l_cnt                      pls_integer;
 
     procedure change_doc(p_oper_id compen_oper.oper_id%type, p_compen_id compen_portfolio.id%type)
       is
       l_doc   compen_oper_dbcode%rowtype;
     begin
+      bars_audit.info(G_LOG || 'set_oper_status.change_doc ' || ' Start p_oper_id=>' || p_oper_id || ' p_compen_id=>' || p_compen_id );              
       select * into l_doc from compen_oper_dbcode where oper_id = p_oper_id;
       select * into l_portfolio from compen_portfolio where id = p_compen_id for update;
       insert into compen_portfolio_dbcode_old(compen_id,
@@ -1419,17 +1426,27 @@ create or replace package body crkr_compen_web is
       returning id, fio, country, postindex, obl, rajon, city, address, fulladdress, icod, doctype, docserial, docnumber, docorg, docdate, clientbdate, clientbplace, clientsex, clientphone, registrydate, nsc, ida, nd, sum, ost, dato, datl, attr, card, datn, ver, stat, tvbv, branch, kv, status, date_import, dbcode, percent, kkname, ob22, rnk, branchact, close_date, reason_change_status, heritage_ost, rnk_bur, branchact_bur, ostasvo, branch_crkr, status_prev, type_person, name_person, edrpo_person into l_portfolio;
       --в анали історії
       i_row_portfolio_upd(l_portfolio);
-      delete from compen_oper_dbcode where oper_id = p_oper_id;      
+      delete from compen_oper_dbcode where oper_id = p_oper_id;
        --тре блокувати
-      set_compen_status(p_compen_id, l_doc.state_compen, 'Автоматичне блокування при зміні документа');
+      begin 
+        set_compen_status(p_compen_id, l_doc.state_compen, 'Автоматичне блокування при зміні документа');
+        exception
+          when others then
+            if sqlcode = -20010 then -- 'Вклад закритий', 'Вклад заблокований бєк-офісом'
+              null; --дати змінити документ, але статус самого вкладу він не зміне
+              else raise;
+            end if;
+      end;        
+      bars_audit.info(G_LOG || 'set_oper_status.change_doc End p_oper_id=>' || p_oper_id);      
     end;
-    
+
     procedure undo_change_document(p_oper_id compen_oper.oper_id%type, p_compen_id compen_portfolio.id%type)
       is
-        l_compen_dbcode_old        compen_portfolio_dbcode_old%rowtype; 
+        l_compen_dbcode_old        compen_portfolio_dbcode_old%rowtype;
     begin
+      bars_audit.info(G_LOG || 'set_oper_status.undo_change_document ' || ' Start p_oper_id=>' || p_oper_id || ' p_compen_id=>' || p_compen_id );                    
       select * into l_compen_dbcode_old from compen_portfolio_dbcode_old where oper_id = p_oper_id;
-      select * into l_portfolio from compen_portfolio where id = p_compen_id; 
+      select * into l_portfolio from compen_portfolio where id = p_compen_id;
 
           --записати це знову як заплановані зміни
       insert into compen_oper_dbcode(oper_id,
@@ -1454,8 +1471,8 @@ create or replace package body crkr_compen_web is
                                       nvl(l_portfolio.type_person, 0),
                                       l_portfolio.name_person,
                                       l_portfolio.edrpo_person
-                                      );   
-      --змінити назад документ і повернути статус                                
+                                      );
+      --змінити назад документ і повернути статус
       update compen_portfolio p
       set  p.doctype   = l_compen_dbcode_old.doctype,
            p.docserial = l_compen_dbcode_old.docserial,
@@ -1465,16 +1482,26 @@ create or replace package body crkr_compen_web is
            p.dbcode    = l_compen_dbcode_old.dbcode,
            p.type_person  = nvl(l_compen_dbcode_old.type_person, 0),
            p.name_person  = l_compen_dbcode_old.name_person,
-           p.edrpo_person = l_compen_dbcode_old.edrpo_person,               
+           p.edrpo_person = l_compen_dbcode_old.edrpo_person,
            p.datl      = sysdate
       where p.id = p_compen_id
       returning id, fio, country, postindex, obl, rajon, city, address, fulladdress, icod, doctype, docserial, docnumber, docorg, docdate, clientbdate, clientbplace, clientsex, clientphone, registrydate, nsc, ida, nd, sum, ost, dato, datl, attr, card, datn, ver, stat, tvbv, branch, kv, status, date_import, dbcode, percent, kkname, ob22, rnk, branchact, close_date, reason_change_status, heritage_ost, rnk_bur, branchact_bur, ostasvo, branch_crkr, status_prev, type_person, name_person, edrpo_person into l_portfolio;
       --в анали історії
-      i_row_portfolio_upd(l_portfolio); 
-      set_compen_status(p_compen_id, l_compen_dbcode_old.state_compen_prev, 'Повернення статусу при відміні зміни документа', 1);                                                          
+      i_row_portfolio_upd(l_portfolio);
+      begin
+        set_compen_status(p_compen_id, l_compen_dbcode_old.state_compen_prev, 'Повернення статусу при відміні зміни документа', 1);
+        exception
+          when others then
+            if sqlcode = -20010 then -- 'Вклад закритий', 'Вклад заблокований бєк-офісом'
+              null; --дати змінити документ, але статус самого вкладу він не зміне
+              else raise;
+            end if;
+      end;      
       delete from compen_portfolio_dbcode_old where oper_id = p_oper_id;
+      bars_audit.info(G_LOG || 'set_oper_status.undo_change_document End p_oper_id=>' || p_oper_id);            
      end;
   begin
+    bars_audit.info(G_LOG || 'set_oper_status' || ' Start p_oper_id=>' || p_oper_id || ' p_status_id=>' || p_status_id );        
     select * into l_oper from compen_oper where oper_id = p_oper_id for update;
 
     if p_status_id = STATE_OPER_COMPLETED then
@@ -1484,8 +1511,8 @@ create or replace package body crkr_compen_web is
         select * into l_portfolio from compen_portfolio where id = l_oper.compen_id for update;
         select * into l_portfolio_donor from compen_portfolio where id = l_oper.compen_bound for update;
         if l_portfolio_donor.status != STATE_COMPEN_BLOCK_HER then
-           raise_application_error(-20000, 'Вклад з якого поповнюється повинен бути в статусі - Блокований по спадщині ');          
-        end if;  
+           raise_application_error(-20000, 'Вклад з якого поповнюється повинен бути в статусі - Блокований по спадщині ');
+        end if;
         l_portfolio_donor.ost := l_portfolio_donor.ost - l_oper.amount;
         l_portfolio_donor.sum := l_portfolio_donor.sum - l_oper.amount;
         l_portfolio_donor.datl := sysdate;
@@ -1525,12 +1552,12 @@ create or replace package body crkr_compen_web is
                                                                                                               where o.compen_bound = p.id and o.oper_id = p_oper_id)*/
                                                                                         and co.oper_type = TYPE_OPER_WDO
                                                                                         and co.compen_bound = l_oper.compen_id;
-        select count(*) into l_cnt from compen_oper o where o.oper_type in (TYPE_OPER_CHANGE_D, TYPE_OPER_CHANGE_DA, TYPE_OPER_CHANGE_DB) 
+        select count(*) into l_cnt from compen_oper o where o.oper_type in (TYPE_OPER_CHANGE_D, TYPE_OPER_CHANGE_DA, TYPE_OPER_CHANGE_DB)
                                                         and o.state not in (STATE_OPER_CANCELED, STATE_OPER_COMPLETED)
                                                         and o.compen_id = l_compen_id;
         if l_cnt > 0 then
           raise_application_error(-20000,'Існує незавершена операція зміни документу на вкладі з якого списуються кошти');
-        end if;                                                  
+        end if;
         set_oper_status(l_oper_id, STATE_OPER_COMPLETED, null, l_portfolio_donor.ost);
 
         --автоматично породити операцію актуалізація при спадщині
@@ -1622,32 +1649,24 @@ create or replace package body crkr_compen_web is
         end if;
         for cur in (select o.oper_id, o.compen_id from compen_oper o where o.oper_type in (TYPE_OPER_CHANGE_DA, TYPE_OPER_CHANGE_DB) and o.state = STATE_OPER_NEW and o.compen_bound = l_oper.compen_id)
         loop
-          begin
-            change_doc(cur.oper_id, cur.compen_id);
-            set_oper_status(cur.oper_id, STATE_OPER_COMPLETED,'Автоматично');
-            exception
-              when others then
-                if sqlcode = -20010 then -- 'Вклад закритий', 'Вклад заблокований бєк-офісом'
-                  null; --дати змінити документ, але статус самого вкладу він не зміне
-                  else raise;
-                end if;
-          end;
+          change_doc(cur.oper_id, cur.compen_id);
+          set_oper_status(cur.oper_id, STATE_OPER_COMPLETED,'Автоматично');
         end loop;
         l_oper_ost := l_portfolio.ost;
       end if;
     end if;--STATE_OPER_COMPLETED
-    
+
     if p_status_id = STATE_OPER_NEW then
       if l_oper.oper_type = TYPE_OPER_WDI then--при поверненю контролером операцію по формленню спадщини (списання з померлого(WDO)-нарахування спадкоємцю(WDI))
-        --відшукати повязану операцію 
+        --відшукати повязану операцію
         select co.oper_id, co.compen_id into l_oper_id, l_compen_id from compen_oper co where co.compen_id = l_oper.compen_bound/*(select p.id from compen_oper o, compen_portfolio p
                                                                    where o.compen_bound = p.id and o.oper_id = p_oper_id)*/
                                                                    and co.oper_type = TYPE_OPER_WDO
-                                                                   and co.compen_bound = l_oper.compen_id;        
-        --set_oper_status(l_oper_id, STATE_OPER_NEW);     
-        l_oper_id := null;      
+                                                                   and co.compen_bound = l_oper.compen_id;
+        --set_oper_status(l_oper_id, STATE_OPER_NEW);
+        l_oper_id := null;
         for cur in (select * from compen_oper o where o.compen_id = l_compen_id and o.oper_type in (TYPE_OPER_CHANGE_D, TYPE_OPER_WDO) and o.state = STATE_OPER_COMPLETED
-                    order by o.oper_id desc)                                                
+                    order by o.oper_id desc)
         loop
           if cur.oper_type = TYPE_OPER_CHANGE_D then
             l_oper_id := cur.oper_id;
@@ -1657,30 +1676,22 @@ create or replace package body crkr_compen_web is
             l_oper_id := null;
             exit;
           end if;
-        end loop;    
+        end loop;
         --повернути операцію зміни документа на операціоніста япри умові що після підтверджкеної операці по зміні не було підтвердженої по оформленні спадщини
         if l_oper_id is not null then
-          undo_change_document(l_oper_id, l_compen_id); 
-          set_oper_status(l_oper_id, STATE_OPER_NEW,'Повернення при оформленні спадщини:'||p_reason_change_status);          
+          undo_change_document(l_oper_id, l_compen_id);
+          set_oper_status(l_oper_id, STATE_OPER_NEW,'Повернення при оформленні спадщини:'||p_reason_change_status);
           --відмінити зміни по повязаним
           for cur in (select o.oper_id, o.compen_id from compen_oper o where o.oper_type in (TYPE_OPER_CHANGE_DA, TYPE_OPER_CHANGE_DB) and o.state = STATE_OPER_COMPLETED and o.compen_bound = l_compen_id)
           loop
-            begin
-              undo_change_document(cur.oper_id, cur.compen_id);
-              set_oper_status(cur.oper_id, STATE_OPER_NEW,'Автоматично');
-              exception
-                when others then
-                  if sqlcode = -20010 then -- 'Вклад закритий', 'Вклад заблокований бєк-офісом'
-                    null; --дати змінити документ, але статус самого вкладу він не зміне
-                    else raise;
-                  end if;
-            end;
+            undo_change_document(cur.oper_id, cur.compen_id);
+            set_oper_status(cur.oper_id, STATE_OPER_NEW,'Автоматично');
           end loop;
-          
-        end if;  
+
+        end if;
       end if;
-    end if;  
-        
+    end if;
+
     if p_status_id = STATE_OPER_CANCELED then
       if l_oper.oper_type = TYPE_OPER_CHANGE_D then
         delete from compen_oper_dbcode where oper_id = l_oper.oper_id;
@@ -1712,10 +1723,10 @@ create or replace package body crkr_compen_web is
       --відміна по операціям над беніфіціарами
       if l_oper.oper_type = TYPE_OPER_BENEF_ADD then
         delete_benef(l_oper.compen_id, l_oper.benef_idb, 'Y');
-      end if;  
+      end if;
       if  l_oper.oper_type = TYPE_OPER_BENEF_MOD then
         select c.* into l_cbu from compen_benef_update c where c.id_compen = l_oper.compen_id and c.idb = l_oper.benef_idb
-                                                          and c.idupd = (select max(prev) from ( select lag(idupd) over (order by idupd) as prev from compen_benef_update  
+                                                          and c.idupd = (select max(prev) from ( select lag(idupd) over (order by idupd) as prev from compen_benef_update
                                                                                                   where id_compen = l_oper.compen_id and idb =  l_oper.benef_idb));
         registr_benef(p_id_compen    => l_cbu.id_compen,
                       p_code         => l_cbu.code,
@@ -1734,16 +1745,16 @@ create or replace package body crkr_compen_web is
                       p_clientphone  => l_cbu.clientphoneb,
                       p_percent      => l_cbu.percent,
                       p_idb          => l_cbu.idb,
-                      p_without_oper => 'Y');                                                  
-                                                          
-      end if;  
+                      p_without_oper => 'Y');
+
+      end if;
       if l_oper.oper_type = TYPE_OPER_BENEF_DEL then
-        update compen_benef b 
+        update compen_benef b
         set b.removedate = null
         where b.id_compen = l_oper.compen_id and b.idb = l_oper.benef_idb
         returning b.id_compen,b.idb,b.code,b.fiob,b.countryb,b.fulladdressb,b.icodb,b.doctypeb,b.docserialb,b.docnumberb,b.docorgb,b.docdateb,b.clientbdateb,b.clientsexb,b.clientphoneb,b.regdate,b.removedate,b.percent,b.branch,b.user_id,b.eddr_id into l_cb;
         i_row_benef_update(l_cb);
-      end if;   
+      end if;
       --
     end if;
 
@@ -1804,7 +1815,11 @@ create or replace package body crkr_compen_web is
 
     end if;
 
-
+    bars_audit.info(G_LOG || 'set_oper_status End');
+    exception 
+      when others then 
+        bars_audit.error(G_LOG || 'set_oper_status ' ||dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace());
+        raise;    
   end;
 
   --Функція повернення значеня ліміту/праметру
@@ -2251,7 +2266,7 @@ create or replace package body crkr_compen_web is
             set_oper_status(cur.oper_id, STATE_OPER_CANCELED);
           end loop;
         end if;
-        
+
         update compen_payments_registry
            set state_id   = p_state_id,
                msg        = p_msg,
@@ -2655,7 +2670,7 @@ create or replace package body crkr_compen_web is
            l_client.date_val_reg);
       when TOO_MANY_ROWS then
         raise_application_error(-20000,
-                                'Отримано більше записів чим очікувалось для параметрів: rnk='||p_rnk||' regtype='||l_regtype||' dbcode='||p_dbcode);                  
+                                'Отримано більше записів чим очікувалось для параметрів: rnk='||p_rnk||' regtype='||l_regtype||' dbcode='||p_dbcode);
 
     end;
 
@@ -2913,7 +2928,7 @@ create or replace package body crkr_compen_web is
     l_ignore    boolean;
 
     l_amount    compen_payments_registry.amount%type;
-    
+
     l_date      date;
     l_key       ow_keys.key_value%type;
     l_src       varchar2(4000);
@@ -3012,15 +3027,15 @@ create or replace package body crkr_compen_web is
           --додати у чергу для послідуючих запитів до ГРЦ про створення документу
           begin
             insert into compen_registry_queue(reg_id) values(l_compen_payment.id);
-            exception 
+            exception
               when dup_val_on_index then null;
-              when others then raise;            
-          end;  
+              when others then raise;
+          end;
           --змінити статус
           set_registry_status(l_compen_payment.id, STATE_REG_INITIAL);
-            
 
-          l_src := l_compen_payment.id||l_compen_payment.amount||l_compen_payment.kv||l_compen_payment.mfo||l_compen_payment.nls||l_compen_payment.ctype||l_compen_payment.okpo||l_compen_payment.ser||l_compen_payment.docnum||l_compen_payment.fio||l_compen_payment.secondary; 
+
+          l_src := l_compen_payment.id||l_compen_payment.amount||l_compen_payment.kv||l_compen_payment.mfo||l_compen_payment.nls||l_compen_payment.ctype||l_compen_payment.okpo||l_compen_payment.ser||l_compen_payment.docnum||l_compen_payment.fio||l_compen_payment.secondary;
           l_compen_payment.sign := dbms_crypto.mac(src => utl_i18n.string_to_raw(l_src, 'UTF8'),
                                                    typ => dbms_crypto.hmac_sh1,
                                                    key => utl_i18n.string_to_raw(l_key, 'UTF8'));
@@ -3093,14 +3108,14 @@ create or replace package body crkr_compen_web is
                                                        l_compen_payment.docnum);
           l_supp_node    := dbms_xmldom.appendchild(l_supp_node,
                                                     dbms_xmldom.makenode(l_supp_text));
-                                                    
+
           l_supp_element := dbms_xmldom.createelement(l_domdoc, 'okpo');
           l_supp_node    := dbms_xmldom.appendchild(l_supplier_node,
                                                     dbms_xmldom.makenode(l_supp_element));
           l_supp_text    := dbms_xmldom.createtextnode(l_domdoc,
                                                        l_compen_payment.okpo);
           l_supp_node    := dbms_xmldom.appendchild(l_supp_node,
-                                                    dbms_xmldom.makenode(l_supp_text));     
+                                                    dbms_xmldom.makenode(l_supp_text));
 
           l_supp_element := dbms_xmldom.createelement(l_domdoc, 'fio');
           l_supp_node    := dbms_xmldom.appendchild(l_supplier_node,
@@ -3108,7 +3123,7 @@ create or replace package body crkr_compen_web is
           l_supp_text    := dbms_xmldom.createtextnode(l_domdoc,
                                                        l_compen_payment.fio);
           l_supp_node    := dbms_xmldom.appendchild(l_supp_node,
-                                                    dbms_xmldom.makenode(l_supp_text));   
+                                                    dbms_xmldom.makenode(l_supp_text));
 
           l_supp_element := dbms_xmldom.createelement(l_domdoc, 'secondary');
           l_supp_node    := dbms_xmldom.appendchild(l_supplier_node,
@@ -3116,16 +3131,16 @@ create or replace package body crkr_compen_web is
           l_supp_text    := dbms_xmldom.createtextnode(l_domdoc,
                                                        l_compen_payment.secondary);
           l_supp_node    := dbms_xmldom.appendchild(l_supp_node,
-                                                    dbms_xmldom.makenode(l_supp_text));   
-                                                    
-                                                    
+                                                    dbms_xmldom.makenode(l_supp_text));
+
+
           l_supp_element := dbms_xmldom.createelement(l_domdoc, 'sign');
           l_supp_node    := dbms_xmldom.appendchild(l_supplier_node,
                                                     dbms_xmldom.makenode(l_supp_element));
           l_supp_text    := dbms_xmldom.createtextnode(l_domdoc,
                                                        l_compen_payment.sign);
           l_supp_node    := dbms_xmldom.appendchild(l_supp_node,
-                                                    dbms_xmldom.makenode(l_supp_text));   
+                                                    dbms_xmldom.makenode(l_supp_text));
 
           l_supp_element := dbms_xmldom.createelement(l_domdoc, 'date_key');
           l_supp_node    := dbms_xmldom.appendchild(l_supplier_node,
@@ -3133,9 +3148,9 @@ create or replace package body crkr_compen_web is
           l_supp_text    := dbms_xmldom.createtextnode(l_domdoc,
                                                        to_char(l_compen_payment.date_key,'DDMMYYYY'));
           l_supp_node    := dbms_xmldom.appendchild(l_supp_node,
-                                                    dbms_xmldom.makenode(l_supp_text));   
-                                                    
-                                                                                                                                                      
+                                                    dbms_xmldom.makenode(l_supp_text));
+
+
        end if;
 
 
@@ -3177,7 +3192,7 @@ create or replace package body crkr_compen_web is
       wsm_mgr.add_parameter(p_name => 'p_clob', p_value => l_clob);
       wsm_mgr.execute_request(g_response);
       l_result := g_response.cdoc; -- если есть ответ - в clob будет
-      
+
       --return; --Тіпа пацеря звязку');
 
       if substr(l_result, 1, 3) in ('400', '401', '404', '500') and length(l_result) > 3 then
@@ -3187,12 +3202,12 @@ create or replace package body crkr_compen_web is
            set state = 'ERROR', msg = substr(l_result, 1, 1024)
          where batch_id = l_batch_id;
         --Повернути в плановий статус
-        for cur in (select reg_id from compen_payments_registry  
+        for cur in (select reg_id from compen_payments_registry
                      where state_id = STATE_REG_INITIAL
                        and reg_id in (select p.compen_payment_id from compen_payments_batch p where p.batch_id = l_batch_id))
         loop
           set_registry_status(cur.reg_id, STATE_REG_NEW);
-        end loop;    
+        end loop;
         commit;
         raise_application_error(-20000,
                                 'При відправці в ГРЦ отримано помилку: ' ||
@@ -3211,12 +3226,12 @@ create or replace package body crkr_compen_web is
            set state = 'ERROR', msg = l_msg
          where batch_id = l_batch_id;
         --Повернути в плановий статус
-        for cur in (select reg_id from compen_payments_registry  
+        for cur in (select reg_id from compen_payments_registry
                      where state_id = STATE_REG_INITIAL
                        and reg_id in (select p.compen_payment_id from compen_payments_batch p where p.batch_id = l_batch_id))
         loop
           set_registry_status(cur.reg_id, STATE_REG_NEW);
-        end loop;    
+        end loop;
         commit;
         raise_application_error(-20000,
                                 'При відправці в ГРЦ отримано помилку: ' ||
@@ -3266,7 +3281,7 @@ create or replace package body crkr_compen_web is
       else
         l_compen_answer.err := dbms_xslprocessor.valueof(l_row,
                                                          'err/text()');
-        bars_audit.error('crkr_compen_web.send_payments_compen_xml: service ' || l_action ||' REG_ID='||l_compen_answer.id||' error:'||substr(l_compen_answer.err, 1, 3500));                                                         
+        bars_audit.error('crkr_compen_web.send_payments_compen_xml: service ' || l_action ||' REG_ID='||l_compen_answer.id||' error:'||substr(l_compen_answer.err, 1, 3500));
         update compen_payments_registry
            set state_id   = STATE_REG_SEND_ERR, --отримано відповідь про помилку при створенні документу
                msg        = substr(l_compen_answer.err, 1, 4000),
@@ -3281,7 +3296,7 @@ create or replace package body crkr_compen_web is
   end;
 
 
-  --Зробити запити по переданим записам реєстру в ГРЦ 
+  --Зробити запити по переданим записам реєстру в ГРЦ
   --For JOB
   procedure request_grc_state_oper
     is
@@ -3324,7 +3339,7 @@ create or replace package body crkr_compen_web is
     l_timeout           number;
 
     l_msg      compen_batch.msg%type;
-    
+
     l_reg_id   compen_payments_registry.reg_id%type;
 
     --l_start            number default dbms_utility.get_time;--debug
@@ -3332,7 +3347,7 @@ create or replace package body crkr_compen_web is
     procedure ok(p_ref compen_payments_registry.ref_oper%type, p_reg compen_payments_registry.reg_id%type)
       is
     begin
-      set_registry_status(p_reg, STATE_REG_PAY_COMPLETED,null,p_ref);      
+      set_registry_status(p_reg, STATE_REG_PAY_COMPLETED,null,p_ref);
       delete from compen_registry_queue where reg_id = p_reg;
     end;
     procedure refuse(p_ref compen_payments_registry.ref_oper%type, p_reg compen_payments_registry.reg_id%type, p_msg compen_payments_registry.msg%type)
@@ -3367,10 +3382,10 @@ create or replace package body crkr_compen_web is
                                  l_walett_pass);
     utl_http.set_transfer_timeout(l_timeout);
 
-    l_action := 'getsosref';                                          
+    l_action := 'getsosref';
 
     /* Перевірити статус пачок, які створені, але не має відповіді по відправці
-       - перерваний звязок, збій і т.д. 
+       - перерваний звязок, збій і т.д.
     */
     for cur in (select * from compen_batch where state = 'CREATE'
                                              /*and create_date < localtimestamp - interval '0 0:10:00' day to second*/
@@ -3379,7 +3394,7 @@ create or replace package body crkr_compen_web is
       --любую запись реєстра  с пачки отправляєм на проверку в ГРЦ
       select compen_payment_id into l_reg_id from compen_payments_batch where batch_id = cur.batch_id
                                                             and rownum < 2;
-                                                            
+
       dbms_lob.createtemporary(l_clob, true, dbms_lob.call);
       -- Create an empty XML document
       l_domdoc := dbms_xmldom.newdomdocument;
@@ -3391,22 +3406,22 @@ create or replace package body crkr_compen_web is
                                                                                            'root')));
       l_suppp_node := dbms_xmldom.appendchild(l_sup_node,
                                             dbms_xmldom.makenode(dbms_xmldom.createelement(l_domdoc,
-                                                                                           'body'))); 
+                                                                                           'body')));
       l_supplier_node := dbms_xmldom.appendchild(l_suppp_node,
                                             dbms_xmldom.makenode(dbms_xmldom.createelement(l_domdoc,
                                                                                            'row')));
-                                                                                                      
+
       l_supp_element := dbms_xmldom.createelement(l_domdoc, 'check_in_batch');
       l_supp_node    := dbms_xmldom.appendchild(l_supplier_node,
                                                dbms_xmldom.makenode(l_supp_element));
       l_supp_text    := dbms_xmldom.createtextnode(l_domdoc,
                                                    l_reg_id);
       l_supp_node    := dbms_xmldom.appendchild(l_supp_node,
-                                                      dbms_xmldom.makenode(l_supp_text));                                                                                           
+                                                      dbms_xmldom.makenode(l_supp_text));
 
       dbms_xmldom.writetoclob(l_domdoc, l_clob);
       dbms_xmldom.freedocument(l_domdoc);
-                                                                                       
+
       begin
         wsm_mgr.prepare_request(p_url          => l_url_wapp,
                                 p_action       => l_action,
@@ -3438,7 +3453,7 @@ create or replace package body crkr_compen_web is
                                                                          'sos/text()'));
               if l_compen_answer.sos = 1 then
                 update compen_batch b set b.state = 'SUCCEEDED' where b.batch_id = cur.batch_id;
-                for cur1 in (select reg_id from compen_payments_registry  
+                for cur1 in (select reg_id from compen_payments_registry
                                where state_id = STATE_REG_INITIAL
                                  and reg_id in (select p.compen_payment_id from compen_payments_batch p where p.batch_id = cur.batch_id))
                 loop
@@ -3455,19 +3470,19 @@ create or replace package body crkr_compen_web is
                                      )
                     loop
                       set_oper_status(cur_oper.oper_id, STATE_OPER_WAIT_CONFIRM);
-                    end loop;                
-                end loop;   
-                
+                    end loop;
+                end loop;
+
                 else
                   update compen_batch b set b.state = 'ERROR', b.msg = 'Збій при відправці' where b.batch_id = cur.batch_id;
-                  for cur1 in (select reg_id from compen_payments_registry  
+                  for cur1 in (select reg_id from compen_payments_registry
                                where state_id = STATE_REG_INITIAL
                                  and reg_id in (select p.compen_payment_id from compen_payments_batch p where p.batch_id = cur.batch_id))
                   loop
                     set_registry_status(cur1.reg_id, STATE_REG_SEND_ERR,'Збій при відправці');
                     delete from compen_registry_queue r where r.reg_id = cur1.reg_id;
-                  end loop;                      
-              end if;               
+                  end loop;
+              end if;
         end if;
       exception
         when others then
@@ -3475,9 +3490,9 @@ create or replace package body crkr_compen_web is
           --bars_audit.error(substr(sqlerrm || ' - ' ||dbms_utility.format_error_backtrace, 1, 4000));
           bars_audit.error('crkr_compen_web.request_grc_state_oper: service ' || l_action ||' error:'||substr(sqlerrm || ' - ' ||dbms_utility.format_error_backtrace, 1, 3000));
       end;
-                                                                                                                                                     
-    end loop;      
-    commit;                                                        
+
+    end loop;
+    commit;
 
     --частина друга: запити по записам реєстру
     dbms_lob.createtemporary(l_clob, true, dbms_lob.call);
@@ -3580,12 +3595,12 @@ create or replace package body crkr_compen_web is
                                                                    'ref/text()'));
         l_compen_answer.sos := to_number(dbms_xslprocessor.valueof(l_row,
                                                                    'sos/text()'));
-                                                                   
+
         begin
           case l_compen_answer.sos
             when -100 then null;
             when -102 then refuse(l_compen_answer.ref, l_compen_answer.reg, 'Збій в ГРЦ: не існує такого запису реєстру');
-            when -9   then refuse(l_compen_answer.ref, l_compen_answer.reg, 'Збій в ГРЦ: не існує операції');          
+            when -9   then refuse(l_compen_answer.ref, l_compen_answer.reg, 'Збій в ГРЦ: не існує операції');
             when -101 then err(l_compen_answer.reg, dbms_xslprocessor.valueof(l_row,'info/text()'));
             when 5 then ok(l_compen_answer.ref, l_compen_answer.reg);
             when 7 then ok(l_compen_answer.ref, l_compen_answer.reg);
@@ -3598,7 +3613,7 @@ create or replace package body crkr_compen_web is
           update compen_registry_queue q set q.ref_oper = l_compen_answer.ref, q.last_date_req = sysdate where q.reg_id = l_compen_answer.reg;
           exception when others then
             bars_audit.error('crkr_compen_web.request_grc_state_oper: service ' || l_action ||' error:'||' reg_id='||l_compen_answer.reg||' '||substr(sqlerrm || ' - ' ||dbms_utility.format_error_backtrace, 1, 3000));
-       end;   
+       end;
 
       end loop;
 
@@ -4121,23 +4136,24 @@ create or replace package body crkr_compen_web is
     l_portfolio_donor compen_portfolio%rowtype;
     l_cnt             pls_integer;
 
-    l_name            customer.nmk%type; 
-    l_inn             customer.okpo%type; 
-    l_id_sex          person.sex%type; 
-    l_birth_date      person.bday%type;  
-    l_id_doc_type     person.passp%type; 
-    l_ser             person.ser%type; 
-    l_numdoc          person.numdoc%type; 
-    l_date_of_issue   person.pdate%type; 
-    l_organ           person.organ%type; 
-    l_zip             customer_address.zip%type; 
-    l_domain          customer_address.domain%type; 
-    l_region          customer_address.region%type; 
-    l_locality        customer_address.locality%type; 
-    l_address         customer_address.address%type; 
-    l_dbcode          compen_clients.dbcode%type;    
+    l_name            customer.nmk%type;
+    l_inn             customer.okpo%type;
+    l_id_sex          person.sex%type;
+    l_birth_date      person.bday%type;
+    l_id_doc_type     person.passp%type;
+    l_ser             person.ser%type;
+    l_numdoc          person.numdoc%type;
+    l_date_of_issue   person.pdate%type;
+    l_organ           person.organ%type;
+    l_zip             customer_address.zip%type;
+    l_domain          customer_address.domain%type;
+    l_region          customer_address.region%type;
+    l_locality        customer_address.locality%type;
+    l_address         customer_address.address%type;
+    l_dbcode          compen_clients.dbcode%type;
   begin
 
+    /* Можливо потрібно буде змінити перевірку на незавізовані/невідмінені такі операції. 
     select count(*)
     into l_cnt
     from compen_oper o_d, compen_oper o_r
@@ -4152,9 +4168,9 @@ create or replace package body crkr_compen_web is
     if l_cnt > 0 then
       raise_application_error(-20000, ' Вже існує поповнення з цього вкладу на цього клієнта спадкоємця');
     end if;
-
+    */ 
     --select * into l_cust from v_customer_crkr t where t.rnk = p_rnk;
-    
+
     select c.nmk name, c.okpo inn, p.sex id_sex, p.bday birth_date, p.passp id_doc_type, p.ser, p.numdoc,
           p.pdate date_of_issue, p.organ, a.zip, a.domain, a.region, a.locality, a.address, cc.dbcode
      into l_name, l_inn, l_id_sex, l_birth_date,  l_id_doc_type, l_ser, l_numdoc, l_date_of_issue, l_organ, l_zip, l_domain, l_region, l_locality, l_address, l_dbcode
@@ -4168,13 +4184,13 @@ create or replace package body crkr_compen_web is
                   address
              from customer_address) a,
           compen_clients cc
-    where c.rnk = p.rnk and c.rnk = a.rnk and c.rnk = cc.rnk    
+    where c.rnk = p.rnk and c.rnk = a.rnk and c.rnk = cc.rnk
       and cc.rnk = p_rnk;
-    
+
     select * into l_portfolio_donor from compen_portfolio t where t.id = p_compen_donor_id;
 
     l_portfolio.id           := s_compen_portfolio.nextval;
-    l_portfolio.fio          := l_name; 
+    l_portfolio.fio          := l_name;
     l_portfolio.country      := 804;
     l_portfolio.postindex    := l_zip;
     l_portfolio.obl          := l_domain;
@@ -4249,7 +4265,7 @@ create or replace package body crkr_compen_web is
                           p_clientphone in varchar2,
                           p_percent     in number,
                           p_idb         in out number,
-                          p_without_oper in char default null                          
+                          p_without_oper in char default null
                           ) is
     l_count     pls_integer;
     l_cb        compen_benef%rowtype;
@@ -4315,7 +4331,7 @@ create or replace package body crkr_compen_web is
                                  null,
                                  null,
                                  l_cb.idb);
-      
+
 
     else
 
@@ -4342,23 +4358,23 @@ create or replace package body crkr_compen_web is
 
       if nvl(p_without_oper, 'N') != 'Y' then
         --перевірка чи є вже незавізована операція по цьому беніфіціару
-        begin 
+        begin
           select o.oper_type
           into l_oper_type
-          from compen_oper o 
+          from compen_oper o
           where o.compen_id = p_id_compen and o.benef_idb = l_cb.idb
             and o.oper_type in (TYPE_OPER_BENEF_ADD, TYPE_OPER_BENEF_MOD, TYPE_OPER_BENEF_DEL) and o.state not in (STATE_OPER_CANCELED, STATE_OPER_COMPLETED);
-            
+
           case l_oper_type
-            when TYPE_OPER_BENEF_ADD then raise_application_error(-20000, 'Операція заведення бенефіціара ще незавізована');   
-            when TYPE_OPER_BENEF_MOD then raise_application_error(-20000, 'Існує незавізована операція модифікації бенефіціара');   
-            when TYPE_OPER_BENEF_DEL then raise_application_error(-20000, 'Існує незавізована операція видалення бенефіціара');                       
-          end case;  
-            
-          exception 
+            when TYPE_OPER_BENEF_ADD then raise_application_error(-20000, 'Операція заведення бенефіціара ще незавізована');
+            when TYPE_OPER_BENEF_MOD then raise_application_error(-20000, 'Існує незавізована операція модифікації бенефіціара');
+            when TYPE_OPER_BENEF_DEL then raise_application_error(-20000, 'Існує незавізована операція видалення бенефіціара');
+          end case;
+
+          exception
             when NO_DATA_FOUND then null;
-        end;    
-          
+        end;
+
 
         l_oper_id := i_compen_oper('BEN_MOD',
                                    p_id_compen,
@@ -4382,33 +4398,33 @@ create or replace package body crkr_compen_web is
                          p_without_oper char default null) is
     l_cb       compen_benef%rowtype;
     l_oper_id  compen_oper.oper_id%type;
-    l_oper_type compen_oper.oper_type%type;    
+    l_oper_type compen_oper.oper_type%type;
   begin
     update compen_benef
        set removedate = sysdate
      where id_compen = p_id_compen and idb = p_idb
     returning id_compen, idb, code, fiob, countryb, fulladdressb, icodb, doctypeb, docserialb, docnumberb, docorgb, docdateb, clientbdateb, clientsexb, clientphoneb, regdate, removedate, percent, branch, user_id, eddr_id into l_cb;
-   
+
     if nvl(p_without_oper, 'N') != 'Y' then
-      
+
       --перевірка чи є вже незавізована операція по цьому беніфіціару
-      begin 
+      begin
         select o.oper_type
         into l_oper_type
-        from compen_oper o 
+        from compen_oper o
         where o.compen_id = p_id_compen and o.benef_idb = p_idb
           and o.oper_type in (TYPE_OPER_BENEF_ADD, TYPE_OPER_BENEF_MOD, TYPE_OPER_BENEF_DEL) and o.state not in (STATE_OPER_CANCELED, STATE_OPER_COMPLETED);
-            
+
         case l_oper_type
-          when TYPE_OPER_BENEF_ADD then raise_application_error(-20000, 'Операція заведення бенефіціара ще незавізована');   
-          when TYPE_OPER_BENEF_MOD then raise_application_error(-20000, 'Існує незавізована операція модифікації бенефіціара');   
-          when TYPE_OPER_BENEF_DEL then raise_application_error(-20000, 'Існує незавізована операція видалення бенефіціара');                       
-        end case;  
-            
-        exception 
+          when TYPE_OPER_BENEF_ADD then raise_application_error(-20000, 'Операція заведення бенефіціара ще незавізована');
+          when TYPE_OPER_BENEF_MOD then raise_application_error(-20000, 'Існує незавізована операція модифікації бенефіціара');
+          when TYPE_OPER_BENEF_DEL then raise_application_error(-20000, 'Існує незавізована операція видалення бенефіціара');
+        end case;
+
+        exception
           when NO_DATA_FOUND then null;
-      end;   
-    
+      end;
+
       l_oper_id := i_compen_oper('BEN_DEL',
                                    p_id_compen,
                                    null,
@@ -4418,8 +4434,8 @@ create or replace package body crkr_compen_web is
                                    null,
                                    null,
                                    p_idb);
-    end if;     
-       
+    end if;
+
     i_row_benef_update(l_cb);
   end;
 
@@ -4639,6 +4655,8 @@ create or replace package body crkr_compen_web is
     l_rnk_compen     compen_portfolio.rnk%type;
     l_cnt            pls_integer;
   begin
+    bars_audit.info(G_LOG || 'change_compen_document' || ' Start p_compen_id=>' ||
+                    p_compen_id || ' p_doc_type=>' || p_doc_type ||' p_type_person=>' || p_type_person);
     if p_doc_type is null then
       raise_application_error(-20000,'Незаданий тип документу');
     end if;
@@ -4719,7 +4737,7 @@ create or replace package body crkr_compen_web is
                                     p_name_person,
                                     p_edrpo_person
                                     );
-     
+
 
      --змінити інші вклади померлого по дбкоду
     if l_dbcode_old is not null then
@@ -4728,13 +4746,13 @@ create or replace package body crkr_compen_web is
         select count(*) into l_cnt from compen_portfolio where dbcode = l_dbcode_old and id <> p_compen_id;
         if l_cnt > 0 then
           raise_application_error(-20001, 'dbcode має неприпустимий символ "*" і можливі невірні зміни, потрібно "скинути" або присвоїти унікальний dbcode. Зверніться до бєк-офісу для виправлення ситуації');
-        end if;  
-      end if;  
+        end if;
+      end if;
       select count(*) into l_cnt from compen_portfolio where dbcode = l_dbcode_old and id <> p_compen_id;
       if l_cnt > 50 then
         raise_application_error(-20001, 'Багато пов''язаних вкладів по dbcode, потрібно "скинути" або присвоїти унікальний dbcode. Зверніться до бєк-офісу для виправлення ситуації');
-      end if;  
-      
+      end if;
+
       for cur in (select * from compen_portfolio where dbcode = l_dbcode_old and id <> p_compen_id)
         loop
           --відмітити це як операцію над вкладом
@@ -4812,8 +4830,13 @@ create or replace package body crkr_compen_web is
                                     p_edrpo_person);
         end loop;
     end if;
-    
+
     set_oper_status(l_oper_parent_id, STATE_OPER_COMPLETED);
+    bars_audit.info(G_LOG || 'change_compen_document End');  
+    exception 
+      when others then 
+        bars_audit.error(G_LOG || 'change_compen_document ' ||dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace());
+        raise;
   end;
 
 
@@ -5098,7 +5121,7 @@ create or replace package body crkr_compen_web is
 
       if cur.oper_type in (TYPE_OPER_REQ_DEACT_BUR, TYPE_OPER_REQ_DEACT_DEP) then
 --         set_oper_status(cur.oper_id, STATE_OPER_ERROR); --Операція відміна актуалізації по запиту можлива тільки в бєк-офісі
-         set_oper_status(cur.oper_id, STATE_OPER_COMPLETED); --05/05/2017 Наразі функція контролера підрозділа тільки в бєк офісі. 
+         set_oper_status(cur.oper_id, STATE_OPER_COMPLETED); --05/05/2017 Наразі функція контролера підрозділа тільки в бєк офісі.
         else
          set_oper_status(cur.oper_id, STATE_OPER_COMPLETED);
       end if;
@@ -5238,7 +5261,7 @@ create or replace package body crkr_compen_web is
     l_cursor sys_refcursor;
   begin
     open l_cursor for
-      select convert_doctype_asvo_to_crkr(p.doctype) doctype            , p.docserial              , p.docnumber              , p.docorg           , p.docdate,             nvl(p.type_person, 0) type_person,                 p.name_person,                 p.edrpo_person,    
+      select convert_doctype_asvo_to_crkr(p.doctype) doctype            , p.docserial              , p.docnumber              , p.docorg           , p.docdate,             nvl(p.type_person, 0) type_person,                 p.name_person,                 p.edrpo_person,
              (select name from passp where passp=d.doctype) new_doctype , d.docserial new_docserial, d.docnumber new_docnumber, d.docorg new_docorg, d.docdate new_docdate, nvl(d.type_person, 0) new_type_person, d.name_person new_name_person, d.edrpo_person new_edrpo_person
       from compen_portfolio p
         left join compen_oper o on (o.compen_id = p.id and o.oper_type in (TYPE_OPER_CHANGE_D, TYPE_OPER_CHANGE_DA, TYPE_OPER_CHANGE_DB) and o.state not in (STATE_OPER_CANCELED, STATE_OPER_COMPLETED))
@@ -5288,17 +5311,17 @@ create or replace package body crkr_compen_web is
     l_status      compen_portfolio.status%type;
     l_status_prev compen_portfolio.status_prev%type;
   begin
-    select status, status_prev 
+    select status, status_prev
     into   l_status, l_status_prev
     from compen_portfolio
     where id = p_compen_id
-    for update; 
+    for update;
     if l_status = STATE_COMPEN_BLOCK then
       set_compen_status(p_compen_id, nvl(l_status_prev, STATE_COMPEN_OPEN), NULL, 1);
       else
         raise_application_error(-20000, 'Невірний поточний статус вкладу '||p_compen_id);
-    end if;  
-  end;      
+    end if;
+  end;
 
   /*=============*/
   -- Получение даты выдачи
