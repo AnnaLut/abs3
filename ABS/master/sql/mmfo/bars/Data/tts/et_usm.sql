@@ -143,11 +143,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('USM', 'USM Переказ коштів(ін.вал) зг.кред.дог.на рах. ПАТ КБ"ПравексБанк"', 1, null, null, '#(get_proc_nls(''T00'',#(KVA)))', null, null, null, '191992', '300465', 1, 1, 0, 0, null, null, null, null, null, null, '0201100000000000000000000011000000010000000000000000000000000000', 'Перерахування коштів на власний поточний рахунок');
+    values ('USM', 'USM Переказ коштів(ін.вал) зг.кред.дог.на рах. ПАТ КБ"ПравексБанк"', 1, null, null, '#(get_proc_nls(''T00'',#(KVA)))', null, null, null, '37391192', '300465', 1, 1, 0, 0, null, null, null, null, null, null, '0201100000000000000000000011000000010000000000000000000000000000', 'Перерахування коштів на власний поточний рахунок');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='USM', name='USM Переказ коштів(ін.вал) зг.кред.дог.на рах. ПАТ КБ"ПравексБанк"', dk=1, nlsm=null, kv=null, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb='191992', mfob='300465', flc=1, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0201100000000000000000000011000000010000000000000000000000000000', nazn='Перерахування коштів на власний поточний рахунок'
+         set tt='USM', name='USM Переказ коштів(ін.вал) зг.кред.дог.на рах. ПАТ КБ"ПравексБанк"', dk=1, nlsm=null, kv=null, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb='37391192', mfob='300465', flc=1, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0201100000000000000000000011000000010000000000000000000000000000', nazn='Перерахування коштів на власний поточний рахунок'
        where tt='USM';
   end;
   --------------------------------

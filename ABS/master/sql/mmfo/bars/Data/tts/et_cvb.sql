@@ -55,11 +55,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('CVB', 'CVB-MT103 (BEN)', 1, null, null, '191992', null, null, null, '191992', '300465', 1, 2, 0, 0, '#(NOM) -  F_TARIF(4,#(KVA),#(NLSA),#(NOM))', '#(NOM) -  F_TARIF(6,#(KVA),#(NLSA),#(NOM))', null, null, null, null, '1201000000000000000000000001000000010000000000000000000000000000', null);
+    values ('CVB', 'CVB-MT103 (BEN)', 1, null, null, '37391192', null, null, null, '37391192', '300465', 1, 2, 0, 0, '#(NOM) -  F_TARIF(4,#(KVA),#(NLSA),#(NOM))', '#(NOM) -  F_TARIF(6,#(KVA),#(NLSA),#(NOM))', null, null, null, null, '1201000000000000000000000001000000010000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='CVB', name='CVB-MT103 (BEN)', dk=1, nlsm=null, kv=null, nlsk='191992', kvk=null, nlss=null, nlsa=null, nlsb='191992', mfob='300465', flc=1, fli=2, flv=0, flr=0, s='#(NOM) -  F_TARIF(4,#(KVA),#(NLSA),#(NOM))', s2='#(NOM) -  F_TARIF(6,#(KVA),#(NLSA),#(NOM))', sk=null, proc=null, s3800=null, rang=null, flags='1201000000000000000000000001000000010000000000000000000000000000', nazn=null
+         set tt='CVB', name='CVB-MT103 (BEN)', dk=1, nlsm=null, kv=null, nlsk='37391192', kvk=null, nlss=null, nlsa=null, nlsb='37391192', mfob='300465', flc=1, fli=2, flv=0, flr=0, s='#(NOM) -  F_TARIF(4,#(KVA),#(NLSA),#(NOM))', s2='#(NOM) -  F_TARIF(6,#(KVA),#(NLSA),#(NOM))', sk=null, proc=null, s3800=null, rang=null, flags='1201000000000000000000000001000000010000000000000000000000000000', nazn=null
        where tt='CVB';
   end;
   --------------------------------
