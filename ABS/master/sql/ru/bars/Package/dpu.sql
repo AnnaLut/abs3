@@ -693,7 +693,7 @@ is
   --
   -- глобальные переменные и константы
   -- 
-  g_body_version  constant varchar2(64)          := 'version 44.16  06.02.2018';
+  g_body_version  constant varchar2(64)          := 'version 44.17  26.02.2018';
   
   modcode         constant varchar2(3)           := 'DPU';
   accispparam     constant varchar2(16)          := 'DPU_ISP';
@@ -5929,7 +5929,11 @@ $then
     if ( l_rec_A.acc_cur != GL.baseval and IS_OSCHADBANK( p_mfo_B ) = 0 )
     then
       l_mfo_B  := '300465';
-      l_nls_B  := '191992';
+$if DPU_PARAMS.MMFO $then
+      l_nls_B  := BRANCH_ATTRIBUTE_UTL.GET_VALUE('C2SW.NLS');
+$else
+      l_nls_B  := nvl(GetGlobalOption('C2SW.NLS'),'37391192');
+$end
       l_nms_B  := 'ГОУ ВАТ Ощадбанк';
       l_okpo_B := '00032129';
     else
