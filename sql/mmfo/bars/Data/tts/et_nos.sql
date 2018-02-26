@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('NOS', 'NOS - Загр.перев после подбора НОСТРО-сч (доп рекв)', 1, '191992', null, null, null, null, null, null, '300465', 0, 0, 0, 0, null, null, null, null, null, null, '0100000000000000000000000000000000010000000000000000000000000000', null);
+    values ('NOS', 'NOS - Загр.перев после подбора НОСТРО-сч (доп рекв)', 1, '37391192', null, null, null, null, null, null, '300465', 0, 0, 0, 0, null, null, null, null, null, null, '0100000000000000000000000000000000010000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='NOS', name='NOS - Загр.перев после подбора НОСТРО-сч (доп рекв)', dk=1, nlsm='191992', kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob='300465', flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000010000000000000000000000000000', nazn=null
+         set tt='NOS', name='NOS - Загр.перев после подбора НОСТРО-сч (доп рекв)', dk=1, nlsm='37391192', kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob='300465', flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000010000000000000000000000000000', nazn=null
        where tt='NOS';
   end;
   --------------------------------

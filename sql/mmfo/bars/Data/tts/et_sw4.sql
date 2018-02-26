@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('SW4', 'SW4-MT103 (BANK METALS)', 1, null, null, '191992', null, null, null, '191992', '300465', 0, 2, 0, 0, null, null, null, null, null, null, '1100000000000000000000000000000000010000000000000000000000000000', null);
+    values ('SW4', 'SW4-MT103 (BANK METALS)', 1, null, null, '37391192', null, null, null, '37391192', '300465', 0, 2, 0, 0, null, null, null, null, null, null, '1100000000000000000000000000000000010000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='SW4', name='SW4-MT103 (BANK METALS)', dk=1, nlsm=null, kv=null, nlsk='191992', kvk=null, nlss=null, nlsa=null, nlsb='191992', mfob='300465', flc=0, fli=2, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1100000000000000000000000000000000010000000000000000000000000000', nazn=null
+         set tt='SW4', name='SW4-MT103 (BANK METALS)', dk=1, nlsm=null, kv=null, nlsk='37391192', kvk=null, nlss=null, nlsa=null, nlsb='37391192', mfob='300465', flc=0, fli=2, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1100000000000000000000000000000000010000000000000000000000000000', nazn=null
        where tt='SW4';
   end;
   --------------------------------
