@@ -318,7 +318,13 @@ begin
 
   -- Используется  только в Киевском РУ Ощадбанка по некоторым старым КД  (где платежный день 25 но проценты уплачиваются по 31 текущего месяца)
   if vid_ = 5 then
-    for k in (select d.ND, d.CC_ID, c.OKPO, c.nmk, substr(t.txt, 2, 1) as DP
+    for k in (select d.ND, d.CC_ID, c.OKPO, c.nmk, substr(t.txt, 2, 1) as DP, i.basem, i.basey, d.vidd, a.kv,
+                      (select max(l.fdat)
+                        from cc_lim l
+                       where l.nd = d.nd
+                         and fdat > l_dat2
+                         and l.fdat <= l_dat1
+                         and l.sumo > 0) pl_dat
                 from cc_deal  d,
                      accounts a,
                      customer c,
@@ -351,8 +357,48 @@ begin
                           where nd = d.nd
                             and tag = 'DAYSN'),
                          to_char(lpad(i.s, 2, '0')))
-                         and d.kf=sys_context('bars_context','user_mfo')) loop
-      if k.DP = 0 then
+                         and d.kf=sys_context('bars_context','user_mfo')) 
+    loop
+      If k.vidd = 11 and k.basem = 1 and k.basey = 2 then
+        begin
+          l_max     := null;
+          l_ostc_sn := null;
+          l_acc_sn  := null;
+
+          select nvl(MAX(i.acr_dat), k.pl_dat - 1), max(i.acra)
+            into l_Acr_dat, l_acc_sn
+            from int_accn i, accounts a, nd_acc n
+           where n.nd = k.nd
+             and n.acc = a.acc
+             and i.acc = a.acc
+             and i.id = 0
+             and a.tip = 'SS '
+             and a.dazs is null
+             and a.kv = k.kv;
+          select abs(a.ostc)
+            into l_ostc_sn
+            from accounts a
+           where a.acc = l_acc_sn
+             and ostc < 0
+             and ostc = ostb
+             and a.tip = 'SN '
+             and a.kv = k.kv;
+          If k.pl_DAT <= l_Acr_dat then
+            l_max := greatest(l_ostc_sn -
+                              cck.FINT(k.ND, k.pl_DAT, l_Acr_dat),
+                              0);
+          else
+            l_max := l_ostc_sn;
+          End if;
+          bars_audit.info('CCK_SBER 0 in ND = '||k.nd);
+          cck.CC_ASPN_DOG(k.nd, k.cc_id, k.okpo, k.nmk, -3, l_max);
+
+        EXCEPTION
+          WHEN NO_DATA_FOUND THEN
+            continue;
+        end;
+        
+      elsif k.DP = 0 then
         cck.CC_ASPN_DOG(k.nd, k.cc_id, k.okpo, k.nmk, -3, null);
       else
         cck.CC_ASPN_DOG(k.nd, k.cc_id, k.okpo, k.nmk, -2, null);
