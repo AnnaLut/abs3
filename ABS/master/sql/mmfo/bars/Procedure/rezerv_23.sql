@@ -1,7 +1,8 @@
 CREATE OR REPLACE PROCEDURE BARS.rezerv_23 (dat01_   in date) is
-/* Версия 3.2  05-10-2017  30-08-2017  14-07-2017  06-06-2017  11-04-2017  03-02-2017
+/* Версия 3.3  26-02-2018  05-10-2017  30-08-2017  14-07-2017  06-06-2017  11-04-2017  03-02-2017
    Рівчачок з проміжними комітами
 
+15) 26-02-2018(3.3)/COBUMMFO-6811/ - Использование архива PRVN_FIN_DEB --> FIN_DEB_ARC для определения номера договора
 14) 05-10-2017(3.2) - Разделение фин.дебиторки (номер договора из табдицы PRVN_FIN_DEB 
 13) 30-08-2017  -   Резерв брать по хоз.дебиторке  из REZ39 , если прислал FV
 12) 14-07-2017  -   tipa по хоз. дебиторки (21)
@@ -314,7 +315,7 @@ begin
                   end;
                else
                   begin
-                     select acc_ss into k.nd from prvn_fin_deb where k.acc in (acc_ss,acc_sp) and rownum=1; --acc_ss = k.nd ???
+                     select acc_ss into k.nd from fin_deb_arc where mdat = dat01_ and k.acc in (acc_ss,acc_sp) and rownum=1; --acc_ss = k.nd ???
                      --l_tipa := 17;
                   EXCEPTION WHEN NO_DATA_FOUND THEN
                      k.nd := k.acc;
