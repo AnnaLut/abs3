@@ -2061,12 +2061,13 @@ begin
    where idupd = l_dpt.idupd;
   
   -- вставляэмо запис про відновлення з архіву
-  update dpt_deposit_clos 
+  /*update dpt_deposit_clos 
      set action_id  = 7 
    where idupd = l_dpt.idupd;
-  
+  */
   -- тригер вставки в DPT_DEPOSIT_ALL
   execute immediate 'alter trigger tbi_dpt_deposit disable';  
+  dbms_application_info.set_action('recovery_deposit');
   
   bars_context.subst_branch(l_dpt.branch);  
   
@@ -2087,7 +2088,7 @@ begin
      l_dpt.cnt_ext_int, l_dpt.dat_ext_int, l_dpt.kf, l_dpt.branch, l_dpt.userid);
   
   execute immediate 'alter trigger tbi_dpt_deposit enable'; 
-  
+  dbms_application_info.set_action(null);
   -- ???
   update dpt_deposit_clos d
      set d.bdate = (select min(d1.bdate) 
@@ -2103,6 +2104,7 @@ begin
 exception
   when others then
     execute immediate 'alter trigger tbi_dpt_deposit enable';
+    dbms_application_info.set_action(null);
     bars_context.set_context;
     bars_audit.error( title || dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace() );
     raise_application_error( -20000, dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace() );
