@@ -381,7 +381,7 @@
 
             vm.streetLostFocus = function () {
                 for (var i = 0; i < vm.streetForChoose.length; i++) {
-                    if (vm.actualModel.streetName.toUpperCase() === vm.streetForChoose[i].STR_NM.toUpperCase() && !vm.actualModel.streetId) {
+                    if (vm.actualModel.streetId === vm.streetForChoose[i].STR_ID) {
                         vm.selectedStreet(vm.streetForChoose[i]);
                     }
                 };

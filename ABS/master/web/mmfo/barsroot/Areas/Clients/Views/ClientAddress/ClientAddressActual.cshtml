@@ -12,6 +12,7 @@
     <div class="text col-lg-7 col-md-7 col-sm-7 col-xs-7 containerRegion">
         <span>Область:</span>
         <input kendo-auto-complete ng-model="actualRegion" ng-change="changeActualRegion(actualRegion)" k-options="actualRegionOptions" type="text" class="form-control txtRegion" k-data-source="actualRegionDataSource" k-ng-disabled="disableRegion" ng-class="{'readOnly': disableRegion}" ng-blur="regionLostFocus()" ng-keydown="checkKeyDown($event, 'region')"/>
+        <span style="color:red;" ng-style="spanEnterRegionActual">Заповніть "Область"</span>
     </div>
     <div class="text col-lg-7 col-md-7 col-sm-7 col-xs-7 containerAreas">
         <span>Район:</span>

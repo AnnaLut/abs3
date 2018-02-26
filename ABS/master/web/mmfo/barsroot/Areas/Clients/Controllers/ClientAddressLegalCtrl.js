@@ -1,6 +1,6 @@
 ﻿angular.module(globalSettings.modulesAreas)
     .controller('ClientAddressLegalCtrl',
-            ['$scope',
+    ['$scope',
         function ($scope) {
 
 
@@ -9,6 +9,8 @@
             $scope.settlementForChoose = [];
             $scope.streetForChoose = [];
             $scope.houseForChoose = [];
+
+            $scope.spanEnterRegionLegal = { 'visibility': 'hidden' };
 
             $scope.KEY_ENTER = 13;
 
@@ -82,13 +84,13 @@
                 },
                 dataSource: $scope.legalAreasDataSource,
                 template: '<div style="float: left;">' +
-                              '<div style="float: left; width: 200px; word-wrap:break-word;">' +
-                                    '<span>#=AREA_NM #</span>' +
-                              '</div>' +
-                              '<div style="float: left; width: 200px; word-wrap:break-word; margin-left: 2px;">' +
-                                    '<span>#=REGION_NAME ? REGION_NAME : " "#</span>' +
-                               '</div>' +
-                          '</div>',
+                '<div style="float: left; width: 200px; word-wrap:break-word;">' +
+                '<span>#=AREA_NM #</span>' +
+                '</div>' +
+                '<div style="float: left; width: 200px; word-wrap:break-word; margin-left: 2px;">' +
+                '<span>#=REGION_NAME ? REGION_NAME : " "#</span>' +
+                '</div>' +
+                '</div>',
                 open: function () {
                     angular.element('.k-list-container').css({ "width": "460px" });
                 },
@@ -320,6 +322,9 @@
                     $scope.clientAddress.legalModel.REGION_NAME = regionName;
                 }
                 $scope.disabledStreet = $scope.disabledStreetType = regionName === "" || $scope.legalSettlement === "" || $scope.legalSettlement === undefined ? true : false;
+
+                var showSpan = !regionName && !$scope.clientAddress.legalModel.settlementName;
+                $scope.spanEnterRegionLegal = { 'visibility': showSpan ? 'visible' : 'hidden' };
             }
 
             $scope.changeLegalArea = function (areaName) {
@@ -572,9 +577,12 @@
                 $scope.legalSettlementDropDown.value(data.SETL_TP_ID);
                 $scope.disabledStreet = $scope.disabledStreetType = false;
                 $scope.disableRegion = $scope.disableArea = $scope.disableSettlementType = true;
+
+                $scope.spanEnterRegionLegal = { 'visibility': 'hidden' };
             }
 
-            $scope.settlementLostFocus = function () {           
+            $scope.settlementLostFocus = function () {
+                $scope.spanEnterRegionLegal = { 'visibility': $scope.clientAddress.legalModel.REGION_NAME ? 'hidden' : 'visible' };
                 for (var i = 0; i < $scope.settlementForChoose.length; i++) {
                     if ($scope.clientAddress.legalModel.SETTLEMET_NAME.toUpperCase() === $scope.settlementForChoose[i].SETL_NM.toUpperCase() && !$scope.clientAddress.legalModel.SETL_ID) {
                         $scope.selectedSettlement($scope.settlementForChoose[i]);
@@ -593,7 +601,7 @@
 
             $scope.streetLostFocus = function () {
                 for (var i = 0; i < $scope.streetForChoose.length; i++) {
-                    if ($scope.clientAddress.legalModel.STREET_NAME.toUpperCase() === $scope.streetForChoose[i].STR_NM.toUpperCase()) {
+                    if ($scope.clientAddress.legalModel.STR_ID === $scope.streetForChoose[i].STR_ID) {
                         $scope.selectedStreet($scope.streetForChoose[i]);
                     }
                 };
@@ -646,5 +654,5 @@
                         break;
                 }
             }
-            
+
         }]);
