@@ -233,10 +233,10 @@ END Z23;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.Z23 IS
 
-  G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 23.6 27-11-2017'; 
+  G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 23.7 26-02-2018'; 
 
 /*
-
+115) 26-02-2018(23.7)/COBUMMFO-6811/ - ¬ START_REZ - создание архива PRVN_FIN_DEB --> FIN_DEB_ARC 
 114) 27-11-2017(23.6) - ”брала переприв€зку задогов по ÷Ѕ
 113) 20-11-2017(23.5) - добавлено в START_REZ - REZ_PAR_9200   убрала (01-12-2017)
 112) 26-10-2017(23.4) - финансовый лизинг (207*) - обеспечение само на себ€ по параметру кредитного договора ZAL_LIZ 
@@ -1994,10 +1994,17 @@ begin
      z23.to_log_rez (user_id , 351 , p_dat01 ,' cck_arc_cc_lim');
      cck_arc_cc_lim (P_DAT =>gl.bd,P_ND =>0 );
      -- архив по хоз.дебиторке
+     z23.to_log_rez (user_id , 351 , p_dat01 ,' xoz_ref_arc');
      insert into xoz_ref_arc (REF1, STMT1, REF2, ACC, MDATE, S, FDAT, S0, NOTP, PRG, BU, DATZ, REFD, ID, KF, mdat)
      select t.REF1, t.STMT1, t.REF2, t.ACC, t.MDATE, t.S, t.FDAT, t.S0, t.NOTP, t.PRG, t.BU, t.DATZ, t.REFD, t.ID, t.KF, p_dat01
      from xoz_ref t
      where not exists (select 1 from xoz_ref_arc cl where cl.mdat= p_dat01 and rownum=1);
+     commit;
+     z23.to_log_rez (user_id , 351 , p_dat01 ,' fin_deb_arc');
+     insert into fin_deb_arc ( ACC_SS, ACC_SP, EFFECTDATE, AGRM_ID, MDAT, kf)
+     select f.ACC_SS, f.ACC_SP, f.EFFECTDATE, f.AGRM_ID, p_dat01, f.kf
+     from prvn_fin_deb f
+     where not exists (select 1 from fin_deb_arc cl where cl.mdat= p_dat01 and rownum=1);
      commit;
      /*
      -- формуванн€ 
