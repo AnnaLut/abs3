@@ -54,7 +54,11 @@ begin
                                P_ARGMNTID => NULL);
   elsif inserting then
 
-    l_actionid := 0;  -- открытие
+    if sys_context('USERENV','ACTION') = 'recovery_deposit' then
+      l_actionid := 7;  -- восстановление
+    else	
+      l_actionid := 0;  -- открытие
+    end if;
 
     select bars_sqnc.get_nextval('s_dpt_deposit_clos') into l_idupd from dual;
 
