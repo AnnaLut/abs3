@@ -36,9 +36,6 @@ grant SELECT,UPDATE                                                          on 
 grant SELECT                                                                 on v_cig_dog_sync_params  to BARS_DM;
 grant SELECT,UPDATE                                                          on v_cig_dog_sync_params  to CIG_ROLE;
 
-
-
-
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/View/v_cig_dog_sync_params.sql =========*** End *** =
 PROMPT ===================================================================================== 
