@@ -38,6 +38,33 @@ begin
 insert into bars.tarif
    (kod, kv, name, tar, pr, smin, tip, kf)
  values
+   (435, 980, 'Зарахування ЗП працівникам Тарифному пакету "БЮДЖЕТНИЙ 1"', 0, 0.15, 0, 0, '304665');
+   exception when others then  
+  if sqlcode = -00001 then null;   else raise; end if;   
+end;
+/
+begin
+insert into bars.tarif
+   (kod, kv, name, tar, pr, smin, tip, kf)
+ values
+   (435, 980, 'Зарахування ЗП працівникам Тарифному пакету "БЮДЖЕТНИЙ 1"', 0, 0.15, 0, 0, '351823');
+   exception when others then  
+  if sqlcode = -00001 then null;   else raise; end if;   
+end;
+/
+begin
+insert into bars.tarif
+   (kod, kv, name, tar, pr, smin, tip, kf)
+ values
+   (435, 980, 'Зарахування ЗП працівникам Тарифному пакету "БЮДЖЕТНИЙ 1"', 0, 0.15, 0, 0, '335106');
+   exception when others then  
+  if sqlcode = -00001 then null;   else raise; end if;   
+end;
+/
+begin
+insert into bars.tarif
+   (kod, kv, name, tar, pr, smin, tip, kf)
+ values
    (436, 980, 'Зарахування ЗП працівникам Тарифному пакету "БЮДЖЕТНИЙ 2"', 0, 0, 0, 0, '300465');
    exception when others then  
   if sqlcode = -00001 then null;   else raise; end if;   
@@ -125,6 +152,26 @@ insert into bars.tarif
 end;
 /
 begin
+insert into bars.tarif
+   (kod, kv, name, tar, pr, smin, tip, kf)
+ values
+   (435, 980, 'Зарахування ЗП працівникам Тарифному пакету "БЮДЖЕТНИЙ 1"', 0, 0.15, 0, 0, '352457');
+   exception when others then  
+  if sqlcode = -00001 then null;   else raise; end if;   
+end;
+/
+begin
+insert into bars.tarif
+   (kod, kv, name, tar, pr, smin, tip, kf)
+ values
+   (435, 980, 'Зарахування ЗП працівникам Тарифному пакету "БЮДЖЕТНИЙ 1"', 0, 0.15, 0, 0, '353553');
+   exception when others then  
+  if sqlcode = -00001 then null;   else raise; end if;   
+end;
+/
+
+
+begin
 bc.go ('300465');
 end;
 /
@@ -192,24 +239,231 @@ end;
 /
 commit;
 /
-delete  bars.zp_tarif;
-/
-commit;
-/
-insert into zp_tarif values (433,980,'300465');
-insert into zp_tarif values (434,980,'300465');
-insert into zp_tarif values (435,980,'300465');
-insert into zp_tarif values (436,980,'300465');
-insert into zp_tarif values (437,980,'300465');
-insert into zp_tarif values (438,980,'300465');
-insert into zp_tarif values (439,980,'300465');
-insert into zp_tarif values (433,980,'322669');
-insert into zp_tarif values (434,980,'322669');
-insert into zp_tarif values (435,980,'322669');
-insert into zp_tarif values (436,980,'322669');
-insert into zp_tarif values (437,980,'322669');
-insert into zp_tarif values (438,980,'322669');
-insert into zp_tarif values (439,980,'322669');
-commit;
-/
 
+begin
+  insert into bars.zp_tarif (kod, kv, kf) values (433,980,'300465');
+exception when others then  
+  if sqlcode = -00001 then 
+    null;   
+  else 
+    raise; 
+  end if;   
+end;
+/
+commit;
+
+begin
+  insert into bars.zp_tarif (kod, kv, kf) values (434,980,'300465');
+exception when others then  
+  if sqlcode = -00001 then 
+    null;   
+  else 
+    raise; 
+  end if;   
+end;
+/
+commit;
+
+begin
+  insert into bars.zp_tarif (kod, kv, kf) values (435,980,'300465');
+exception when others then  
+  if sqlcode = -00001 then 
+    null;   
+  else 
+    raise; 
+  end if;   
+end;
+/
+commit;
+
+begin
+  insert into bars.zp_tarif (kod, kv, kf) values (436,980,'300465');
+exception when others then  
+  if sqlcode = -00001 then 
+    null;   
+  else 
+    raise; 
+  end if;   
+end;
+/
+commit;
+
+begin
+  insert into bars.zp_tarif (kod, kv, kf) values (437,980,'300465');
+exception when others then  
+  if sqlcode = -00001 then 
+    null;   
+  else 
+    raise; 
+  end if;   
+end;
+/
+commit;
+
+begin
+  insert into bars.zp_tarif (kod, kv, kf) values (438,980,'300465');
+exception when others then  
+  if sqlcode = -00001 then 
+    null;   
+  else 
+    raise; 
+  end if;   
+end;
+/
+commit;
+
+begin
+  insert into bars.zp_tarif (kod, kv, kf) values (439,980,'300465');
+exception when others then  
+  if sqlcode = -00001 then 
+    null;   
+  else 
+    raise; 
+  end if;   
+end;
+/
+commit;
+
+begin
+  insert into bars.zp_tarif (kod, kv, kf) values (433,980,'322669');
+exception when others then  
+  if sqlcode = -00001 then 
+    null;   
+  else 
+    raise; 
+  end if;   
+end;
+/
+commit;
+
+begin
+  insert into bars.zp_tarif (kod, kv, kf) values (434,980,'322669');
+exception when others then  
+  if sqlcode = -00001 then 
+    null;   
+  else 
+    raise; 
+  end if;   
+end;
+/
+commit;
+
+begin
+  insert into bars.zp_tarif (kod, kv, kf) values (435,980,'322669');
+exception when others then  
+  if sqlcode = -00001 then 
+    null;   
+  else 
+    raise; 
+  end if;   
+end;
+/
+commit;
+
+begin
+  insert into bars.zp_tarif (kod, kv, kf) values (436,980,'322669');
+exception when others then  
+  if sqlcode = -00001 then 
+    null;   
+  else 
+    raise; 
+  end if;   
+end;
+/
+commit;
+
+begin
+  insert into bars.zp_tarif (kod, kv, kf) values (437,980,'322669');
+exception when others then  
+  if sqlcode = -00001 then 
+    null;   
+  else 
+    raise; 
+  end if;   
+end;
+/
+commit;
+
+begin
+  insert into bars.zp_tarif (kod, kv, kf) values (438,980,'322669');
+exception when others then  
+  if sqlcode = -00001 then 
+    null;   
+  else 
+    raise; 
+  end if;   
+end;
+/
+commit;
+
+begin
+  insert into bars.zp_tarif (kod, kv, kf) values (439,980,'322669');
+exception when others then  
+  if sqlcode = -00001 then 
+    null;   
+  else 
+    raise; 
+  end if;   
+end;
+/
+commit;
+
+begin
+  insert into bars.zp_tarif (kod, kv, kf) values (435,980,'304665');
+exception when others then  
+  if sqlcode = -00001 then 
+    null;   
+  else 
+    raise; 
+  end if;   
+end;
+/
+commit;
+
+begin
+  insert into bars.zp_tarif (kod, kv, kf) values (435,980,'335106');
+exception when others then  
+  if sqlcode = -00001 then 
+    null;   
+  else 
+    raise; 
+  end if;   
+end;
+/
+commit;
+
+begin
+  insert into bars.zp_tarif (kod, kv, kf) values (435,980,'351823');
+exception when others then  
+  if sqlcode = -00001 then 
+    null;   
+  else 
+    raise; 
+  end if;   
+end;
+/
+commit;
+
+begin
+  insert into bars.zp_tarif (kod, kv, kf) values (435,980,'352457');
+exception when others then  
+  if sqlcode = -00001 then 
+    null;   
+  else 
+    raise; 
+  end if;   
+end;
+/
+commit;
+
+begin
+  insert into bars.zp_tarif (kod, kv, kf) values (435,980,'353553');
+exception when others then  
+  if sqlcode = -00001 then 
+    null;   
+  else 
+    raise; 
+  end if;   
+end;
+/
+commit;
