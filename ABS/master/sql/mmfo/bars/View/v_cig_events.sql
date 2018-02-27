@@ -4,7 +4,6 @@ PROMPT =========================================================================
 PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_CIG_EVENTS.sql =========*** Run *** =
 PROMPT ===================================================================================== 
 
-
 PROMPT *** Create  view V_CIG_EVENTS ***
 
 create or replace view V_CIG_EVENTS as
@@ -41,8 +40,6 @@ PROMPT *** Create  grants  V_CIG_EVENTS ***
 grant SELECT,UPDATE                                                          on V_CIG_EVENTS  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CIG_EVENTS  to BARS_DM;
 grant SELECT,UPDATE                                                          on V_CIG_EVENTS  to CIG_ROLE;
-
-
 
 
 PROMPT ===================================================================================== 

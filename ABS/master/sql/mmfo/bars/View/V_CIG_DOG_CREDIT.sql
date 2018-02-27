@@ -24,6 +24,17 @@ PROMPT *** Create  view V_CIG_DOG_CREDIT ***
        overdue_cnt
   from CIG_DOG_CREDIT -- На саму таблицу накладывать политики нельзя. http://jira.unity-bars.com.ua:11000/browse/COBUMMFO-5354
 ;
+BEGIN 
+        execute immediate  
+          'begin  
+               bpa.alter_policy_info(''V_CIG_DOG_CREDIT'', ''CENTER'' , null, null, null, null);
+               bpa.alter_policy_info(''V_CIG_DOG_CREDIT'', ''FILIAL'' , ''B'', ''B'', ''B'', ''B'');
+               bpa.alter_policy_info(''V_CIG_DOG_CREDIT'', ''WHOLE'' , null, null, null, null);
+               null;
+           end; 
+          '; 
+END; 
+/
 
 PROMPT *** Create  grants  V_CIG_DOG_CREDIT ***
 grant SELECT,UPDATE                                                          on V_CIG_DOG_CREDIT to BARS_ACCESS_DEFROLE;

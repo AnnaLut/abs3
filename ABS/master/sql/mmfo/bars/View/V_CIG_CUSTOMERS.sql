@@ -19,6 +19,17 @@ PROMPT *** Create  view V_CIG_CUSTOMERS ***
        branch
   from CIG_CUSTOMERS  -- На саму таблицу накладывать политики нельзя. http://jira.unity-bars.com.ua:11000/browse/COBUMMFO-5354
 ;
+BEGIN 
+        execute immediate  
+          'begin  
+               bpa.alter_policy_info(''V_CIG_CUSTOMERS'', ''CENTER'' , null, null, null, null);
+               bpa.alter_policy_info(''V_CIG_CUSTOMERS'', ''FILIAL'' , ''B'', ''B'', ''B'', ''B'');
+               bpa.alter_policy_info(''V_CIG_CUSTOMERS'', ''WHOLE'' , null, null, null, null);
+               null;
+           end; 
+          '; 
+END; 
+/
 
 PROMPT *** Create  grants  V_CIG_CUSTOMERS ***
 grant SELECT,UPDATE                                                          on V_CIG_CUSTOMERS to BARS_ACCESS_DEFROLE;

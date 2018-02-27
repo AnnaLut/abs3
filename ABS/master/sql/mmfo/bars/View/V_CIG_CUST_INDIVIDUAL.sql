@@ -45,6 +45,18 @@ select cust_id,
   from CIG_CUST_INDIVIDUAL -- Ќа саму таблицу накладывать политики нельз€. http://jira.unity-bars.com.ua:11000/browse/COBUMMFO-5354      
 ;
 
+BEGIN 
+        execute immediate  
+          'begin  
+               bpa.alter_policy_info(''V_CIG_CUST_INDIVIDUAL'', ''CENTER'' , null, null, null, null);
+               bpa.alter_policy_info(''V_CIG_CUST_INDIVIDUAL'', ''FILIAL'' , ''B'', ''B'', ''B'', ''B'');
+               bpa.alter_policy_info(''V_CIG_CUST_INDIVIDUAL'', ''WHOLE'' , null, null, null, null);
+               null;
+           end; 
+          '; 
+END; 
+/
+
 PROMPT *** Create  grants  V_CIG_CUST_INDIVIDUAL ***
 grant SELECT,UPDATE                                                          on V_CIG_CUST_INDIVIDUAL to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CIG_CUST_INDIVIDUAL to BARS_DM;
