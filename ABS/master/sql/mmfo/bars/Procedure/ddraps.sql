@@ -200,6 +200,15 @@ BEGIN
 
   bars_audit.trace( $$PLSQL_UNIT||': gl.paysos0 -> Ok.' );
 
+  l_condition := q'[ (to_date('%dt','ddmmyyyy'),'%kf') ]';
+  l_condition := replace( l_condition, '%dt', to_char(dat_,'ddmmyyyy') );
+  l_condition := replace( l_condition, '%kf', l_kf );
+
+  if ( dat_ < GL.GBD() )
+  then
+    execute immediate 'lock table SALDOA subpartition for '||l_condition||' IN EXCLUSIVE MODE';
+  end if;
+
   -- Вибрати підходящий курсор
   IF ( l_mode = 0 )
   THEN
@@ -269,13 +278,6 @@ BEGIN
 
 --execute immediate 'alter table SNAP_BALANCES_INTR_TBL truncate partition for ( '''||l_kf||''' )';
   execute immediate 'alter table SNAP_BALANCES_INTR_TBL truncate partition P_'||l_kf;
-
-  l_condition := to_char(dat_,'ddmmyyyy');
-
-  if ( dat_ < GL.GBD() )
-  then
-    execute immediate 'lock table SALDOA subpartition for ( to_date('''||l_condition||''',''ddmmyyyy''), '''||l_kf||''' ) IN EXCLUSIVE MODE NOWAIT';
-  end if;
 
   GET_RAT(dat_);
 
@@ -404,7 +406,12 @@ BEGIN
       l_pvp_uid := gl.aUID;
   end;
 
-  GL.PL_DAT( dat_ );
+  if ( dat_ = DAT_NEXT_U( GL.GBD(), -1 ) )
+  then -- 
+    gl.bDATE := dat_;
+  else -- 
+    GL.PL_DAT( dat_ );
+  end if;
 
   gl.aUID := l_pvp_uid;
 
@@ -521,9 +528,6 @@ BEGIN
                              , p_partition_nm    => 'P_'||l_kf
                              , p_novalidate      => true );
 
-    l_condition := replace( q'[ (to_date('%dt','ddmmyyyy'),'%kf') ]', '%dt', l_condition );
-    l_condition := replace( l_condition, '%kf', l_kf );
-
     -- bypass the RLS policies
     DM_UTL.EXCHANGE_SUBPARTITION_FOR( p_source_table_nm => 'SNAP_BALANCES_EXCHANGE'
                                     , p_target_table_nm => 'SNAP_BALANCES'
@@ -542,7 +546,7 @@ BEGIN
 
   BARS_AUDIT.INFO( $$PLSQL_UNIT||': Exit.' );
 
-EXCEPTION 
+EXCEPTION
   WHEN OTHERS THEN
     -- Back to
     GL.PL_DAT( l_bank_dt );
