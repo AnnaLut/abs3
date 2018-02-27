@@ -12,31 +12,32 @@ CREATE OR REPLACE package mbm_payments is
                          drec bars_xmlklb.array_drec);  --список доп. реквизитов
 
 
-	procedure create_payment(
-								p_date oper.vdat%type default trunc(sysdate),
-								p_vdate oper.vdat%type default trunc(sysdate),
-								p_mfoa oper.mfoa%type,
-								p_mfob oper.mfob%type,
-								p_nlsa oper.nlsa%type,
-								p_nlsb oper.nlsb%type,
-								p_okpoa oper.id_a%type,
-								p_okpob oper.id_b%type,
-								p_kv tabval.lcv%type,
-								p_s oper.s%type,
-								p_nama oper.nam_a%type,
-								p_namb oper.nam_b%type,
-								p_nazn oper.nazn%type,
-								p_sk oper.sk%type,
-								p_dk oper.dk%type default 1,
-								p_vob oper.vob%type default 6,
-								p_drec varchar2 default null,
-                                p_nd oper.nd%type default null,
-								p_sign oper.sign%type default null,
-								p_ref out oper.ref%type,
-                                p_creating_date out OPER.PDAT%type,
-								p_errcode out number,
-								p_errmsg out varchar2
-								);
+	procedure create_payment(                               
+                            p_date oper.vdat%type default trunc(sysdate),
+                            p_vdate oper.vdat%type default trunc(sysdate),
+                            p_mfoa oper.mfoa%type,
+                            p_mfob oper.mfob%type,
+                            p_nlsa oper.nlsa%type,
+                            p_nlsb oper.nlsb%type,
+                            p_okpoa oper.id_a%type,
+                            p_okpob oper.id_b%type,
+                            p_kv tabval.lcv%type,
+                            p_s oper.s%type,
+                            p_nama oper.nam_a%type,
+                            p_namb oper.nam_b%type,
+                            p_nazn oper.nazn%type,
+                            p_sk oper.sk%type,
+                            p_dk oper.dk%type default 1,
+                            p_vob oper.vob%type default 6,
+                            p_drec varchar2 default null,
+                            p_nd oper.nd%type default null,
+                            p_sign oper.sign%type default null,
+                            p_cl_id number default null,
+                            p_ref out oper.ref%type,
+                            p_creating_date out OPER.PDAT%type,
+                            p_errcode out number,
+                            p_errmsg out varchar2
+                            );
 end mbm_payments;
 /
 
@@ -92,7 +93,7 @@ CREATE OR REPLACE package body mbm_payments is
    G_VALIDATE_OK     constant varchar2(4) := '0000';  -- код успешной обработки
 
    G_FILEBUFF        blob     := null;  -- переменная содержащая файл для импорта
-    
+
    l_nls_card number := 0;
 
 
@@ -672,7 +673,7 @@ CREATE OR REPLACE package body mbm_payments is
       end if;
 
       if l_mfodb = gl.amfo then
-         begin 
+         begin
             null;
          end;
       else
@@ -700,7 +701,7 @@ CREATE OR REPLACE package body mbm_payments is
    --
    procedure  validate_doc_attr(
                   p_impdoc   xml_impdocs%rowtype,
-                  p_dreclist bars_xmlklb.array_drec 
+                  p_dreclist bars_xmlklb.array_drec
     )
    is
    begin
@@ -717,8 +718,8 @@ CREATE OR REPLACE package body mbm_payments is
                   p_tt       => p_impdoc.tt);
 
    end;
-   
-   
+
+
       -----------------------------------------------------------------
    --    INSERT_DOC_TO_OPER
    --
@@ -873,9 +874,9 @@ CREATE OR REPLACE package body mbm_payments is
       bars_audit.error(l_trace||'ошибка  оплаты док-та:');
       bars_audit.error(l_trace||sqlerrm);
       raise;
-   end;   
-   
-   
+   end;
+
+
    -----------------------------------------------------------------
    --    PAY_EXTERN_DOC
    --
@@ -943,9 +944,48 @@ CREATE OR REPLACE package body mbm_payments is
       p_errcode := l_errcode;
       p_errmsg  := l_errmsg;
    end;
+   
+   function check_cl_id(p_cl_id number) return number is
+      l_cnt  number;
+    begin
+       select 1
+         into l_cnt
+         from tmp_cl_payment t
+        where t.cl_id = p_cl_id;
+        return 1;
+     exception
+       when no_data_found then
+          return 0;
+    end;
+    
+    function get_ref(p_cl_id number) return number is
+      l_ref number;
+    begin
+      select t.ref
+        into l_ref
+        from tmp_cl_payment t
+       where t.cl_id = p_cl_id;
+       return l_ref;
+    end;
+    
+    procedure ins_cl_paym_id(p_cl_id number) is
+      pragma autonomous_transaction;
+    begin
+      insert into tmp_cl_payment(cl_id)
+      values(p_cl_id);
+      commit;
+    end;
+    
+    procedure upd_cl_paym(p_cl_id number,
+                          p_ref   oper.ref%type) is
+    begin
+      update tmp_cl_payment t
+         set t.ref = p_ref
+       where t.cl_id = p_cl_id;
+    end;
 
 
-    procedure create_payment(
+    procedure create_payment(                               
                             p_date oper.vdat%type default trunc(sysdate),
                             p_vdate oper.vdat%type default trunc(sysdate),
                             p_mfoa oper.mfoa%type,
@@ -965,6 +1005,7 @@ CREATE OR REPLACE package body mbm_payments is
                             p_drec varchar2 default null,
                             p_nd oper.nd%type default null,
                             p_sign oper.sign%type default null,
+                            p_cl_id number default null,
                             p_ref out oper.ref%type,
                             p_creating_date out OPER.PDAT%type,
                             p_errcode out number,
@@ -1010,138 +1051,145 @@ CREATE OR REPLACE package body mbm_payments is
             ', p_vob=>'||to_char(p_vob)||chr(13)||chr(10)||
             ', p_drec=>'||p_drec||chr(13)||chr(10)||
             ', p_nd=>'||p_nd||chr(13)||chr(10)||
+            ', p_cl_id=>'||p_cl_id||chr(13)||chr(10)||
             ', p_sign=>'||p_sign);
+    if (check_cl_id(p_cl_id) = 0) then
+      ins_cl_paym_id(p_cl_id);
         -- точка отката
-        savepoint sp_paystart;
+          savepoint sp_paystart;
 
-        begin
-        
-            --валідація дати валютування
-            if (GL.BD > p_vdate) then
-                raise_application_error(-20000,
-                    'Дата валютування документа менша банківської дати');
-            end if;
-        
-            l_kv:=get_kv(p_kv);
-            begin
-                select 
-                    a.isp, 
-                    s.branch into l_userid, l_branch 
-                from 
-                    accounts a, 
-                    staff$base s
-                where 
-                    a.nls=case p_dk when 1 then p_nlsa else p_nlsb end
-                    and a.kv=l_kv
-                    and a.isp=s.id;
-                exception when no_data_found then
-                    raise_application_error(-20000, 'Рахунок відправника не знайдено!');
-                end;
-            -- представляемся отделением
-            bc.subst_branch(l_branch);
+          begin
 
+              --валідація дати валютування
+              if (GL.BD > p_vdate) then
+                  raise_application_error(-20000,
+                      'Дата валютування документа менша банківської дати');
+              end if;
 
-       -- вычисление операции для оплаты документа
-       /*l_tt := bars_xmlklb_imp.get_import_operation(
-                p_nlsa => p_nlsa,
-                p_mfoa => p_mfoa,
-                p_nlsb => p_nlsb,
-                p_mfob => p_mfob,
-                p_dk   => p_dk,
-                p_kv   =>get_kv(p_kv));
-           bars_audit.trace('%s: l_tt = %s', l_th, l_tt);*/
-
-        select decode(p_mfoa, p_mfob, 'CL1', 'CL2') into l_tt from dual;
-        
-        select count(1) into l_nls_card 
-        from MBM_NBS_ACC_TYPES 
-        where TYPE_ID = 'CARD' and nbs = SUBSTR(p_nlsb,0,4);
-        
-        if (p_mfoa = p_mfob and l_nls_card > 0) then
-            l_tt := 'CL5';
-        end if;
-
-        bars_audit.trace('%s: l_tt = %s', l_th, l_tt);
-
-        l_errcode := null;
-        l_errmsg := null;
-        l_ref := null;
+              l_kv:=get_kv(p_kv);
+              begin
+                  select
+                      a.isp,
+                      s.branch into l_userid, l_branch
+                  from
+                      accounts a,
+                      staff$base s
+                  where
+                      a.nls=case p_dk when 1 then p_nlsa else p_nlsb end
+                      and a.kv=l_kv
+                      and a.isp=s.id;
+                  exception when no_data_found then
+                      raise_application_error(-20000, 'Рахунок відправника не знайдено!');
+                  end;
+              -- представляемся отделением
+              bc.subst_branch(l_branch);
 
 
+         -- вычисление операции для оплаты документа
+         /*l_tt := bars_xmlklb_imp.get_import_operation(
+                  p_nlsa => p_nlsa,
+                  p_mfoa => p_mfoa,
+                  p_nlsb => p_nlsb,
+                  p_mfob => p_mfob,
+                  p_dk   => p_dk,
+                  p_kv   =>get_kv(p_kv));
+             bars_audit.trace('%s: l_tt = %s', l_th, l_tt);*/
 
-        l_impdoc.nd     := p_nd;
-        l_impdoc.ref_a  := null ;
-        l_impdoc.impref := null ;
-        l_impdoc.datd   := trunc(p_date)  ;
-        l_impdoc.vdat   := trunc(p_vdate) ;
-        l_impdoc.nam_a  := substr(p_nama, 0, 38);
-        l_impdoc.mfoa   := p_mfoa         ;
-        l_impdoc.nlsa   := p_nlsa         ;
-        l_impdoc.id_a   := p_okpoa        ;
-        l_impdoc.nam_b  := substr(p_namb, 0, 38);
-        l_impdoc.mfob   := p_mfob         ;
-        l_impdoc.nlsb   := p_nlsb         ;
-        l_impdoc.id_b   := p_okpob        ;
-        l_impdoc.s      := p_s            ;
-        l_impdoc.kv     := get_kv(p_kv)   ;
-        l_impdoc.s2     := p_s            ;
-        l_impdoc.kv2    := get_kv(p_kv)   ;
-        l_impdoc.sk     := p_sk           ;
-        l_impdoc.dk     := p_dk           ;
-        l_impdoc.tt     := l_tt           ;
-        l_impdoc.vob    := p_vob          ;
-        l_impdoc.nazn   := p_nazn         ;
-        l_impdoc.datp   := gl.bdate       ;
-        l_impdoc.userid := l_userid       ;
+          select decode(p_mfoa, p_mfob, 'CL1', 'CL2') into l_tt from dual;
 
-        l_doc.doc  := l_impdoc;
-        begin
-            if p_drec is not null then
-                l_length := length(p_drec) - length(replace(p_drec,';'));
-                l_str :=p_drec;
-                for i in 0..l_length - 1 loop
-                    l_tmp := substr(l_str, 0, instr(l_str,';')-1);
-                    l_str := substr(l_str, instr(l_str,';')+1);
-                    parse_str(l_tmp,l_name,l_val);
-                    l_doc.drec(i).tag := l_name;
-                    l_doc.drec(i).val := l_val;
-                end loop;
-            end if;
-        exception when others then
-            raise_application_error(-20000, 'Не коректно сформовано параметр D_REC!');
-        end;
-        
-        pay_extern_doc( p_doc  => l_doc,
-                        p_creating_date => p_creating_date,
-                        p_errcode => l_errcode,
-                        p_errmsg  => l_errmsg ) ;
+          select count(1) into l_nls_card
+          from MBM_NBS_ACC_TYPES
+          where TYPE_ID = 'CARD' and nbs = SUBSTR(p_nlsb,0,4);
 
-        l_ref := l_doc.doc.ref;
+          if (p_mfoa = p_mfob and l_nls_card > 0) then
+              l_tt := 'CL5';
+          end if;
 
-        p_ref:=to_char(l_ref);
-        p_errcode:=to_char(l_errcode);
-        p_errmsg:=l_errmsg;
+          bars_audit.trace('%s: l_tt = %s', l_th, l_tt);
 
-        bars_audit.trace('%s: pay_extern_doc done, l_errcode=%s, l_errmsg=%s',
-           l_th, to_char(l_errcode), l_errmsg);
+          l_errcode := null;
+          l_errmsg := null;
+          l_ref := null;
 
-       -- возврат контекста
-       bc.set_context;
 
-        exception when others then
-            bars_audit.trace('%s: exception block entry point', l_th);
-            bars_audit.trace('%s: error detected sqlerrcode=%s, sqlerrm=%s', l_th, to_char(sqlcode), sqlerrm);
-            --eсли exception запишем ошыбку в исх. параметр
-            p_errcode:=sqlcode;
-            p_errmsg:=substr(sqlerrm,1,4000);
-            -- запись полного сообщения об ошибке в журнал
-            bars_audit.error(dbms_utility.format_error_stack()||chr(10)||
-            dbms_utility.format_error_backtrace(), null, null, l_rec_id);
-            -- откат к точке начала оплаты
-            rollback to savepoint sp_paystart;
-            -- возврат контекста
-        bc.set_context;
-    end;
+
+          l_impdoc.nd     := p_nd;
+          l_impdoc.ref_a  := null ;
+          l_impdoc.impref := null ;
+          l_impdoc.datd   := trunc(p_date)  ;
+          l_impdoc.vdat   := trunc(p_vdate) ;
+          l_impdoc.nam_a  := substr(p_nama, 0, 38);
+          l_impdoc.mfoa   := p_mfoa         ;
+          l_impdoc.nlsa   := p_nlsa         ;
+          l_impdoc.id_a   := p_okpoa        ;
+          l_impdoc.nam_b  := substr(p_namb, 0, 38);
+          l_impdoc.mfob   := p_mfob         ;
+          l_impdoc.nlsb   := p_nlsb         ;
+          l_impdoc.id_b   := p_okpob        ;
+          l_impdoc.s      := p_s            ;
+          l_impdoc.kv     := get_kv(p_kv)   ;
+          l_impdoc.s2     := p_s            ;
+          l_impdoc.kv2    := get_kv(p_kv)   ;
+          l_impdoc.sk     := p_sk           ;
+          l_impdoc.dk     := p_dk           ;
+          l_impdoc.tt     := l_tt           ;
+          l_impdoc.vob    := p_vob          ;
+          l_impdoc.nazn   := p_nazn         ;
+          l_impdoc.datp   := gl.bdate       ;
+          l_impdoc.userid := l_userid       ;
+
+          l_doc.doc  := l_impdoc;
+          begin
+              if p_drec is not null then
+                  l_length := length(p_drec) - length(replace(p_drec,';'));
+                  l_str :=p_drec;
+                  for i in 0..l_length - 1 loop
+                      l_tmp := substr(l_str, 0, instr(l_str,';')-1);
+                      l_str := substr(l_str, instr(l_str,';')+1);
+                      parse_str(l_tmp,l_name,l_val);
+                      l_doc.drec(i).tag := l_name;
+                      l_doc.drec(i).val := l_val;
+                  end loop;
+              end if;
+          exception when others then
+              raise_application_error(-20000, 'Не коректно сформовано параметр D_REC!');
+          end;
+
+          pay_extern_doc( p_doc  => l_doc,
+                          p_creating_date => p_creating_date,
+                          p_errcode => l_errcode,
+                          p_errmsg  => l_errmsg ) ;
+
+          l_ref := l_doc.doc.ref;
+
+          p_ref:=to_char(l_ref);
+          p_errcode:=to_char(l_errcode);
+          p_errmsg:=l_errmsg;
+
+          bars_audit.trace('%s: pay_extern_doc done, l_errcode=%s, l_errmsg=%s',
+             l_th, to_char(l_errcode), l_errmsg);
+
+         -- возврат контекста
+         bc.set_context;
+
+          exception when others then
+              bars_audit.trace('%s: exception block entry point', l_th);
+              bars_audit.trace('%s: error detected sqlerrcode=%s, sqlerrm=%s', l_th, to_char(sqlcode), sqlerrm);
+              --eсли exception запишем ошыбку в исх. параметр
+              p_errcode:=sqlcode;
+              p_errmsg:=substr(sqlerrm,1,4000);
+              -- запись полного сообщения об ошибке в журнал
+              bars_audit.error(dbms_utility.format_error_stack()||chr(10)||
+              dbms_utility.format_error_backtrace(), null, null, l_rec_id);
+              -- откат к точке начала оплаты
+              rollback to savepoint sp_paystart;
+              -- возврат контекста
+          bc.set_context;
+      end;
+    else 
+      bars_audit.info('Дублирующий документ: '|| p_cl_id);
+      p_ref := get_ref(p_cl_id);
+    end if;
     bars_audit.info('corplight_pay_api(output parameters):
               p_ref=>'||to_char(p_ref)||chr(13)||chr(10)||
             ',p_errcode=>'||to_char(p_errcode)||chr(13)||chr(10)||
