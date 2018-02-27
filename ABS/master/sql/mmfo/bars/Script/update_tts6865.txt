@@ -1,0 +1,9 @@
+begin
+  update TTS
+     set NLSM = '#(nbs_ob22_3570 (''3570'',''03'',#(NLSA),980))'
+   where TT = 'K72';
+exception
+  when others then
+    null;
+end;
+/
