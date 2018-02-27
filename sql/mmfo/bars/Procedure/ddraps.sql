@@ -6,7 +6,7 @@ create or replace procedure DDRAPS
   <b>CREATE_DAILY_SNAPSHOT</b> - процедура створення денних знімків балансу
   %param 
   
-  %version 2.1 (23.02.2018)
+  %version 2.1 (26.02.2018)
   %usage   створення денних знімків балансу.
   */
   l_errmsg          varchar2(500);
@@ -179,10 +179,10 @@ BEGIN
      WHERE FDAT < dat_;
     
     l_mode := CASE WHEN dat# IS NULL THEN 0 ELSE 1 END;
-    
+
   END IF;
 
-  bars_audit.info( $$PLSQL_UNIT||': dat#='||to_char(dat#,'dd.mm.yyyy')||', mode='||to_char(l_mode)||'.' );
+  bars_audit.info( $$PLSQL_UNIT||': l_kf='||l_kf||', dat#='||to_char(dat#,'dd.mm.yyyy')||', mode='||to_char(l_mode)||'.' );
 
   -- --
   -- -- Превентивно прибити переоцінку з цей день

@@ -153,7 +153,7 @@ is
   --
   -- constants
   --
-  VERSION_BODY    constant varchar2(64)  := 'version 1.3.0  25.02.2018';
+  VERSION_BODY    constant varchar2(64)  := 'version 1.3.1  27.02.2018';
 
   -- ѕрефикс дл€ трассировки
   PKG_CODE        constant varchar2(100) := 'UTL_SNAPSHOT';
@@ -511,27 +511,31 @@ is
   , p_date      in     date
   ) return number
   is
-    l_tabl_scn         number;
-    l_tabl_scn_h       number;
+    l_crn_tbl_scn      number;
+    l_prv_tbl_scn      number;
     l_mod              number(1);
   begin
 
     bars_audit.trace( '%s.IS_PARTITION_MODIFIED: Entry with ( p_table = %s, p_date = %s ).'
-                    , $$PLSQL_UNIT, p_table, to_char(p_date,FMT_DATE) );
+                    , PKG_CODE, p_table, to_char(p_date,FMT_DATE) );
 
-    l_tabl_scn   := get_mod_scn( p_table, p_date); -- max(ora_rowscn)
-    l_tabl_scn_h := get_snap_scn(p_table, p_date); -- bars.accm_snap_scn
+    l_crn_tbl_scn := get_mod_scn( p_table, p_date); -- max(ora_rowscn)
+    l_prv_tbl_scn := get_snap_scn(p_table, p_date); -- bars.accm_snap_scn
 
-    bars_audit.trace( '%s.IS_PARTITION_MODIFIED: ( l_tabl_scn = %s, l_tabl_scn_h = %s ).'
-                    , $$PLSQL_UNIT, to_char(l_tabl_scn), to_char(l_tabl_scn_h) );
+    bars_audit.trace( '%s.IS_PARTITION_MODIFIED: ( l_crn_tbl_scn = %s, l_prv_tbl_scn = %s ).'
+                    , PKG_CODE, to_char(l_crn_tbl_scn), to_char(l_prv_tbl_scn) );
 
-    if ( l_tabl_scn > l_tabl_scn_h )
-    then l_mod := 1;
-    else l_mod := 0;
+    if ( l_crn_tbl_scn > l_prv_tbl_scn )
+    then
+      l_mod := 1;
+      bars_audit.info( PKG_CODE||'.IS_PARTITION_MODIFIED: ( tbl_nm='||p_table||', date='||to_char(p_date,FMT_DATE)
+                               ||', crn_tbl_scn='||to_char(l_crn_tbl_scn)||', tabl_scn_h='||to_char(l_prv_tbl_scn)||' ).' );
+    else
+      l_mod := 0;
     end if;
 
-    bars_audit.trace( '%s.IS_PARTITION_MODIFIED: Exit with ( %s ).'
-                    , $$PLSQL_UNIT, to_char(l_mod) );
+    bars_audit.trace( '%s.IS_PARTITION_MODIFIED: Exit with ( %s ).', PKG_CODE, to_char(l_mod) );
+
     return l_mod;
 
   end IS_PARTITION_MODIFIED;
@@ -546,33 +550,19 @@ is
   is
     l_create_snap      boolean := false;
     l_saldoa_snap_scn  number;
-    l_delrow_snap_scn  number;
-    l_saldob_snap_scn  number;
-
   Begin
 
-    bars_audit.trace(PKG_CODE||'IS_BDAY_MODIFIED: Start scn '|| 'fdat '||to_char(p_fdat, FMT_DATE));
+    bars_audit.trace( PKG_CODE||'IS_BDAY_MODIFIED: Start scn '|| 'fdat '||to_char(p_fdat, FMT_DATE) );
 
     -- снимок уже создавалс€ раньше, необходимо его перенакопить
     -- дл€ этого:
-    -- получим scn последних снимков балансов по партиции saldoa, saldob
+    -- получим scn последних снимков балансов по партиции saldoa
     l_saldoa_snap_scn := is_partition_modified(TAB_SALDOA,           p_fdat);
-    l_delrow_snap_scn := is_partition_modified(TAB_SALDOA_DEL_ROWS,  p_fdat);
 
-    bars_audit.trace(PKG_CODE||' saldoa_snap_scn='||l_saldoa_snap_scn||', fdat='||to_char(p_fdat, FMT_DATE));
-    bars_audit.trace(PKG_CODE||' delrow_snap_scn='||l_delrow_snap_scn||', fdat='||to_char(p_fdat, FMT_DATE));
-
-    if ( g_algorithm = ALGORITHM_MIK )
-    then
-      l_saldob_snap_scn := 0;
-    else
-      l_saldob_snap_scn := is_partition_modified( TAB_SALDOB, p_fdat );
-    end if;
+    bars_audit.trace( PKG_CODE||' saldoa_snap_scn='||l_saldoa_snap_scn||', fdat='||to_char(p_fdat, FMT_DATE) );
 
     -- и проверим модифицировались ли партиции за указанную дату с этого момента
-    if ( l_saldoa_snap_scn = 1 or
-         l_saldob_snap_scn = 1 or
-         l_delrow_snap_scn = 1 )
+    if ( l_saldoa_snap_scn = 1 )
     then
 
       bars_audit.trace( PKG_CODE||' l_create_snap = true, fdat = '||to_char(p_fdat, FMT_DATE) );
