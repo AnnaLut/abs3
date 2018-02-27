@@ -41,9 +41,6 @@ grant SELECT,UPDATE                                                          on 
 grant SELECT                                                                 on v_cig_dog_noninstalment  to BARS_DM;
 grant SELECT,UPDATE                                                          on v_cig_dog_noninstalment  to CIG_ROLE;
 
-
-
-
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/View/v_cig_dog_noninstalment.sql =========*** End *** =
 PROMPT ===================================================================================== 

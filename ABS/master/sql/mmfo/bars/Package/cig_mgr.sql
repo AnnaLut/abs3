@@ -172,10 +172,10 @@ create or replace package body cig_mgr is
     abbreviation      customer.nmkk%type,
     ownership         number,
     registr_date      date,
-    economic_activity cig_cust_company.economic_activity%type,
+    economic_activity v_cig_cust_company.economic_activity%type,
     emplote_count     NUMBER,
     cust_code         customer.okpo%type,
-    reg_num           cig_cust_company.reg_num%type,
+    reg_num           v_cig_cust_company.reg_num%type,
     tel_fax           corps.tel_fax%type,
     e_mail            corps.e_mail%type,
     a8_acc            accounts.acc%type,
@@ -1036,7 +1036,7 @@ create or replace package body cig_mgr is
         and branch = l_branch;
         -- при изменении окпо с 00000000 на другое необходимо в ПВБКИ один раз отправить 2а ключа идентификации type=3 и type=4
       if (nvl(l_okpo,'0000000000') = '0000000000' and nvl(l_okpo,'0000000000') != l_row.okpo) then
-         insert into cig_cust_change_code values
+         insert into v_cig_cust_change_code values
           (l_row.cust_key, f_ourmfo, 1);
       end if;
 
@@ -1104,7 +1104,7 @@ create or replace package body cig_mgr is
            where g.branch = cur.branch
              and g.id = cur.id;
 
-          update cig_dog_stop st
+          update v_cig_dog_stop st
              set st.branch = l_row.branch
            where st.dog_id = cur.id;
 
@@ -1335,7 +1335,7 @@ create or replace package body cig_mgr is
        where cust_id = l_custid
          and branch = l_branch;
 
-      update cig_cust_company
+      update v_cig_cust_company
          set role_id           = l_row.role_id,
              status_id         = l_row.status_id,
              lang_name         = l_row.lang_name,
@@ -1381,7 +1381,7 @@ create or replace package body cig_mgr is
            where g.branch = cur.branch
              and g.id = cur.id;
 
-          update cig_dog_stop st
+          update v_cig_dog_stop st
              set st.branch = l_row.branch
            where st.dog_id = cur.id;
 
@@ -1455,7 +1455,7 @@ create or replace package body cig_mgr is
          l_row.branch);
 
       -- вставляем запись в таблицу
-      insert into cig_cust_company
+      insert into v_cig_cust_company
         (cust_id,
          role_id,
          status_id,
@@ -3112,8 +3112,7 @@ select     d.nd,
          WHERE 1=1 -- rnk IN (16784021, 37853721, 95127921, 95497721, 151213521, 277793721)
            AND type_id < 3
          GROUP BY rnk) ) c2
-                       where tab.kv = t.kv and tab.rnk = c2.rnk(+)
-                       and 1 = nvl((select cds.is_sync from cig_dog_sync_params cds where cds.nd = tab.nd and cds.data_type = 4),1)'
+                       where tab.kv = t.kv and tab.rnk = c2.rnk(+)'--    and 1 = nvl((select cds.is_sync from cig_dog_sync_params cds where cds.nd = tab.nd and cds.data_type = 4),1)
         using l_pdatef, l_pdate, l_pdatef, l_pdate;
     elsif (p_dtype = G_CONTRACT_GRNT) then
       OPEN p_recordset FOR
@@ -4520,7 +4519,7 @@ select     d.nd,
                             p_oldbranch     in branch.branch%type,
                             p_contract_type in NUMBER default null) is
     l_th constant varchar2(200) := g_dbgcode || 'prc_dog_noninst';
-    l_rec      cig_dog_noninstalment%rowtype;
+    l_rec      v_cig_dog_noninstalment%rowtype;
     l_cl_usage number;
     l_res_sum  number;
     l_id       number;
@@ -4581,12 +4580,12 @@ select     d.nd,
     if (p_oldbranch is not null) then
       -- удаляем все предидущие записи по этому договору
       for cr_ in (select cdc.*
-                    from cig_dog_noninstalment cdc, V_CIG_DOG_GENERAL dg
+                    from v_cig_dog_noninstalment cdc, V_CIG_DOG_GENERAL dg
                    where dg.nd = p_nd
                      and cdc.dog_id = dg.id
                      and cdc.branch = p_oldbranch
                      and dg.contract_type = p_contract_type) loop
-        delete from cig_dog_noninstalment cdc
+        delete from v_cig_dog_noninstalment cdc
          where cdc.id = cr_.id
            and cr_.branch = cdc.branch;
         delete from V_CIG_SYNC_DATA csd
@@ -4598,7 +4597,7 @@ select     d.nd,
 
     select s_cig_dog_noninstalment.nextval into l_id from dual;
 
-    insert into cig_dog_noninstalment
+    insert into v_cig_dog_noninstalment
       (id,
        dog_id,
        limit_curr_id,
@@ -4794,7 +4793,7 @@ select     d.nd,
                                    l_th,
                                    to_char(l_row.nd),
                                    to_char(p_dtype));
-                  update cig_dog_stop st
+                  update v_cig_dog_stop st
                      set st.branch = l_row.branch
                    where st.dog_id = l_id;
 
@@ -4877,13 +4876,13 @@ select     d.nd,
                     -- l_count = 0 - первая передача договора, 1 - информация уже отправлялась
                     select count(m.nd)
                       into l_count
-                    from cig_dog_sync_params m
+                    from v_cig_dog_sync_params m
                     where m.nd = l_row.nd
                       and m.data_type = p_dtype;
 
                     -- эсли небыло - вставляем
                     if (l_count = 0) then
-                      insert into cig_dog_sync_params values
+                      insert into v_cig_dog_sync_params values
                         (l_row.nd, f_ourmfo, p_dtype, 1, 1);
                     end if;
                     prc_dog_bpk(l_id, l_row, p_date, old_branch);

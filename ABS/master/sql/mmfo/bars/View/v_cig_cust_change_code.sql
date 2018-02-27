@@ -34,9 +34,6 @@ grant SELECT,UPDATE                                                          on 
 grant SELECT                                                                 on v_cig_cust_change_code  to BARS_DM;
 grant SELECT,UPDATE                                                          on v_cig_cust_change_code  to CIG_ROLE;
 
-
-
-
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/View/v_cig_cust_change_code.sql =========*** End *** =
 PROMPT ===================================================================================== 
