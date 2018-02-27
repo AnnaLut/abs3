@@ -1,8 +1,6 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/nota.sql =========*** Run *** ======
- PROMPT ===================================================================================== 
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/package/nota.sql =========*** Run *** ======
+PROMPT ===================================================================================== 
  
   CREATE OR REPLACE PACKAGE BARS.NOTA is
 
@@ -91,7 +89,7 @@
                              p_CERTIFICATE_CANCELATION_DATE  date    ,
                              p_RNK                           number  ,
                              p_MFORNK                        varchar2,
-							 p_DOCUMENT_TYPE                 number,
+               p_DOCUMENT_TYPE                 number,
                              p_IDCARD_DOCUMENT_NUMBER        number,
                              p_IDCARD_NOTATION_NUMBER        varchar2,
                              p_PASSPORT_EXPIRY               date,
@@ -118,7 +116,7 @@
                              p_CERTIFICATE_CANCELATION_DATE  date    ,
                              p_RNK                           number  ,
                              p_MFORNK                        varchar2,
-							 p_DOCUMENT_TYPE                 number,
+               p_DOCUMENT_TYPE                 number,
                              p_IDCARD_DOCUMENT_NUMBER        number,
                              p_IDCARD_NOTATION_NUMBER        varchar2,
                              p_PASSPORT_EXPIRY               date,
@@ -210,7 +208,7 @@ END nota;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.NOTA AS
 
-  G_BODY_VERSION constant varchar2(64) := 'version 1.20 16.01.2018';
+  G_BODY_VERSION constant varchar2(64) := 'version 1.21 26.02.2018';
   ------------------------------------------------------------------
 
     function read_notary(
@@ -346,7 +344,69 @@ CREATE OR REPLACE PACKAGE BODY BARS.NOTA AS
              end if;
         end if;
     end;
+    
+  procedure check_notary_uniqueness(
+        p_exclude_notary_id in integer,
+        p_tin in varchar2,
+        p_certificate_number in varchar2,
+        p_error_code out integer,
+        p_error_message out varchar2)
+    is
+        pragma autonomous_transaction;
+        l_duplicate_notary_id integer;
+        l_duplicate_notary_name varchar2(300 char);
+        l_duplicate_notary_state_id integer;
+    begin
+        if (p_tin is not null and p_tin <> '0000000000') then
+            select min(n.id) keep (dense_rank last order by n.id),
+                   min(trim(n.middle_name || ' ' || n.first_name || ' ' || n.last_name)) keep (dense_rank last order by n.id),
+                   min(n.state_id) keep (dense_rank last order by n.id)
+            into   l_duplicate_notary_id, l_duplicate_notary_name, l_duplicate_notary_state_id
+            from   notary n
+            where  (p_exclude_notary_id is null or n.id <> p_exclude_notary_id) and
+                   n.tin = p_tin;
 
+            if (l_duplicate_notary_name is not null) then
+                if (l_duplicate_notary_state_id = nota.NOTARY_STATE_CLOSED) then
+                    attribute_utl.set_value(l_duplicate_notary_id, nota.ATTR_CODE_STATE, nota.NOTARY_STATE_ACTIVE,
+                                            'Відновлення нотаріуса в переліку активних у зв''язку зі спробою вводу такого самого ІПН');
+                end if;
+                p_error_code := -3;
+                p_error_message := 'Нотаріус "' || l_duplicate_notary_name ||
+                                   '" з ідентифікаційним кодом {'|| p_tin || '} вже зареєстрований';
+            end if;
+        end if;
+
+        if (p_error_code is null) then
+            if (p_certificate_number is not null) then
+                select min(n.id) keep (dense_rank last order by n.id),
+                       min(trim(n.middle_name || ' ' || n.first_name || ' ' || n.last_name)) keep (dense_rank last order by n.id),
+                       min(n.state_id) keep (dense_rank last order by n.id)
+                into   l_duplicate_notary_id, l_duplicate_notary_name, l_duplicate_notary_state_id
+                from   notary n
+                where  (p_exclude_notary_id is null or n.id <> p_exclude_notary_id) and
+                       n.certificate_number = p_certificate_number;
+
+                if (l_duplicate_notary_name is not null) then
+                    if (l_duplicate_notary_state_id = nota.NOTARY_STATE_CLOSED) then
+                        attribute_utl.set_value(l_duplicate_notary_id, nota.ATTR_CODE_STATE, nota.NOTARY_STATE_ACTIVE,
+                                                'Відновлення нотаріуса в переліку активних у зв''язку зі спробою вводу такого самого номера реєстраційного посвідчення');
+                    end if;
+
+                    p_error_code := -3;
+                    p_error_message := 'Нотаріус "' || l_duplicate_notary_name ||
+                                       '" з номером посвідчення {'|| p_certificate_number || '} вже зареєстрований';
+                end if;
+            end if;
+        end if;
+
+        commit;
+    exception
+        when others then
+             rollback;
+             raise;
+    end;
+    
   procedure create_nota     (p_TIN                           varchar2,
                              p_adr                           varchar2,
                              p_datp                          date    ,  -- дата рождения
@@ -366,7 +426,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.NOTA AS
                              p_CERTIFICATE_CANCELATION_DATE  date    ,
                              p_RNK                           number  ,
                              p_MFORNK                        varchar2,
-							 p_DOCUMENT_TYPE                 number,
+               p_DOCUMENT_TYPE                 number,
                              p_IDCARD_DOCUMENT_NUMBER        number,
                              p_IDCARD_NOTATION_NUMBER        varchar2,
                              p_PASSPORT_EXPIRY               date,
@@ -376,7 +436,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.NOTA AS
     l_serd  varchar2(64);
     l_nid   number;
     l_1     int;
-  begin
+  begin --#main
 
     bars_audit.trace('NOTA: p_TIN='||p_TIN);
 
@@ -393,26 +453,20 @@ CREATE OR REPLACE PACKAGE BODY BARS.NOTA AS
     l_serd := replace(l_serd,'T','Т');
     l_serd := replace(l_serd,'X','Х');
 
-    begin
+    begin --#1
       p_ret := null;
       p_err := null;
-      l_nid := s_notary.nextval;
-      savepoint notary_id;
-      insert
-      into   notary (id)
-             values (l_nid);
---
-      begin
-        select 1
-        into   l_1
-        from   notary
-        where  p_TIN<>'0000000000' and
-               tin=p_TIN;
-        rollback to notary_id;
-        p_ret := -3;
-        p_err := 'TIN '||p_TIN||' not unique';
-      exception when no_data_found then
-        begin
+      
+    check_notary_uniqueness(null, p_tin, p_certificate_number, p_ret, p_err);  
+     
+    if (p_ret is null) then
+      begin --#2
+         insert into notary (id)
+         values (s_notary.nextval)
+         returning id
+         into l_nid; 
+      
+         begin --#3
           attribute_utl.set_value(l_nid,ATTR_CODE_TIN,                p_TIN);
           attribute_utl.set_value(l_nid,ATTR_CODE_FIRST_NAME,         p_first_name);
           attribute_utl.set_value(l_nid,ATTR_CODE_MIDDLE_NAME,        p_middle_name);
@@ -430,17 +484,18 @@ CREATE OR REPLACE PACKAGE BODY BARS.NOTA AS
           attribute_utl.set_value(l_nid,ATTR_CODE_CERT_NUMBER,        p_CERTIFICATE_NUMBER);
           attribute_utl.set_value(l_nid,ATTR_CODE_CERT_ISSUE_DATE,    p_CERTIFICATE_ISSUE_DATE);
           attribute_utl.set_value(l_nid,ATTR_CODE_CERT_CANCEL_DATE,   p_CERTIFICATE_CANCELATION_DATE);
-		  attribute_utl.set_value(l_nid,ATTR_CODE_DOCUMENT_TYPE,         p_DOCUMENT_TYPE);
+          attribute_utl.set_value(l_nid,ATTR_CODE_DOCUMENT_TYPE,         p_DOCUMENT_TYPE);
           attribute_utl.set_value(l_nid,ATTR_CODE_IDCARD_DOCUMENT_NUM,   p_IDCARD_DOCUMENT_NUMBER);
           attribute_utl.set_value(l_nid,ATTR_CODE_IDCARD_NOTATION_NUM,   p_IDCARD_NOTATION_NUMBER);
           attribute_utl.set_value(l_nid,ATTR_CODE_PASSPORT_EXPIRY,       p_PASSPORT_EXPIRY);
           attribute_utl.set_value(l_nid,ATTR_CODE_STATE,              nota.NOTARY_STATE_ACTIVE);
 
-        exception when OTHERS then
+        exception when OTHERS then --#3
           rollback to notary_id;
           p_ret := -4;
           p_err := sqlerrm||' '||dbms_utility.format_error_backtrace;
-        end;
+        end; --#3
+        
         if p_mfornk is not null and p_rnk is not null then
           begin -- region
             insert
@@ -459,14 +514,15 @@ CREATE OR REPLACE PACKAGE BODY BARS.NOTA AS
           end;
         end if;
         p_ret := l_nid;
-      end;
-    exception when OTHERS then
+      end; --#2
+     end if;
+    exception when OTHERS then --#1
 --    raise_application_error(-30000,sqlerrm);
       rollback to notary_id;
       p_ret := -2;
       p_err := sqlerrm||' '||dbms_utility.format_error_backtrace;
-    end;
-  end;
+    end; --#1
+  end; --#main;
 
 --
 
@@ -490,7 +546,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.NOTA AS
                              p_CERTIFICATE_CANCELATION_DATE  date,
                              p_RNK                           number  ,
                              p_MFORNK                        varchar2,
-							 p_DOCUMENT_TYPE                 number,
+               p_DOCUMENT_TYPE                 number,
                              p_IDCARD_DOCUMENT_NUMBER        number,
                              p_IDCARD_NOTATION_NUMBER        varchar2,
                              p_PASSPORT_EXPIRY               date,
@@ -532,7 +588,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.NOTA AS
         attribute_utl.set_value(p_id,ATTR_CODE_CERT_NUMBER,        p_CERTIFICATE_NUMBER);
         attribute_utl.set_value(p_id,ATTR_CODE_CERT_ISSUE_DATE,    p_CERTIFICATE_ISSUE_DATE);
         attribute_utl.set_value(p_id,ATTR_CODE_CERT_CANCEL_DATE,   p_CERTIFICATE_CANCELATION_DATE);
-		attribute_utl.set_value(p_id,ATTR_CODE_DOCUMENT_TYPE,         p_DOCUMENT_TYPE);
+    attribute_utl.set_value(p_id,ATTR_CODE_DOCUMENT_TYPE,         p_DOCUMENT_TYPE);
         attribute_utl.set_value(p_id,ATTR_CODE_IDCARD_DOCUMENT_NUM,   p_IDCARD_DOCUMENT_NUMBER);
         attribute_utl.set_value(p_id,ATTR_CODE_IDCARD_NOTATION_NUM,   p_IDCARD_NOTATION_NUMBER);
         attribute_utl.set_value(p_id,ATTR_CODE_PASSPORT_EXPIRY,       p_PASSPORT_EXPIRY);
@@ -820,7 +876,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.NOTA AS
                         null,
                         p_rnk,
                         p_sender_mfo,
-						p_DOCUMENT_TYPE,
+            p_DOCUMENT_TYPE,
                         p_IDCARD_DOCUMENT_NUMBER,
                         p_IDCARD_NOTATION_NUMBER,
                         p_PASSPORT_EXPIRY,
@@ -963,7 +1019,7 @@ grant EXECUTE                                                                on 
 
  
  
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/nota.sql =========*** End *** ======
- PROMPT ===================================================================================== 
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/package/nota.sql =========*** End *** ======
+PROMPT ===================================================================================== 
  
