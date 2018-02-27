@@ -23,10 +23,12 @@ update ACC_FIN_OBS_KAT
 set kat =:new.kat23, k = :new.k23
 where acc = :old.nd;
 
+/*
 elsif :old.tip = 'OVR'  then
 update acc_over
 set kat23 =:new.kat23, k23 = :new.k23
 where nd = :old.nd;
+*/
 
 elsif :old.tip = 'BPK'  then
 update bpk_acc
