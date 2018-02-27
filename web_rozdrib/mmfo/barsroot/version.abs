@@ -1,13 +1,2 @@
-=========  svn diff --summarize -r 48644:48766 D:\SVN\master\web\mmfo
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.22\mmfo\web\barsroot\Areas\Clients\Controllers\ClientAddressMailCtrl.js
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.22\mmfo\web\barsroot\Areas\Clients\Controllers\ClientAddressLegalCtrl.js
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.22\mmfo\web\barsroot\Areas\Clients\Controllers\ClientAddressActualCtrl.js
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.22\mmfo\web\barsroot\Areas\Clients\Controllers\ClearAddressMailCtrl.js
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.22\mmfo\web\barsroot\Areas\Clients\Controllers\ClearAddressLegalCtrl.js
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.22\mmfo\web\barsroot\Areas\Clients\Controllers\ClearAddressActualCtrl.js
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.22\mmfo\web\barsroot\Areas\Clients\Views\ClientAddress\ClientAddressActual.cshtml
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.22\mmfo\web\barsroot\Areas\Clients\Views\ClientAddress\ClientAddressMail.cshtml
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.22\mmfo\web\barsroot\Areas\Clients\Views\ClientAddress\ClientAddressLegal.cshtml
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.22\mmfo\web\barsroot
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.22\mmfo\web
-Bugfix_2.0.38.4.22 (Rev:48644-48766
+=========  svn diff --summarize -r 48783:48785 D:\SVN\master\web\mmfo
+Bugfix_2.0.38.4.23 (Rev:48783-48785
