@@ -34,6 +34,17 @@ PROMPT *** Create  view V_CIG_DOG_GENERAL ***
        batch_id
   from CIG_DOG_GENERAL -- На саму таблицу накладывать политики нельзя. http://jira.unity-bars.com.ua:11000/browse/COBUMMFO-5354
 ;
+BEGIN 
+        execute immediate  
+          'begin  
+               bpa.alter_policy_info(''V_CIG_DOG_GENERAL'', ''CENTER'' , null, null, null, null);
+               bpa.alter_policy_info(''V_CIG_DOG_GENERAL'', ''FILIAL'' , ''B'', ''B'', ''B'', ''B'');
+               bpa.alter_policy_info(''V_CIG_DOG_GENERAL'', ''WHOLE'' , null, null, null, null);
+               null;
+           end; 
+          '; 
+END; 
+/
 
 PROMPT *** Create  grants  V_CIG_DOG_GENERAL ***
 grant SELECT,UPDATE                                                          on V_CIG_DOG_GENERAL to BARS_ACCESS_DEFROLE;
