@@ -1756,6 +1756,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
       else
         set_file_state(i.id, 99, 'Невірний тип файлу');
       end if;
+      commit;
       exception
         when others then
           set_file_state(i.id,

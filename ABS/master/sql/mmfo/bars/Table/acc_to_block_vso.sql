@@ -43,7 +43,14 @@ PROMPT *** ALTER_POLICIES to ACC_TO_BLOCK_VSO ***
 COMMENT ON TABLE BARS.ACC_TO_BLOCK_VSO IS '';
 COMMENT ON COLUMN BARS.ACC_TO_BLOCK_VSO.ACC IS '';
 
-
+begin   
+ execute immediate '
+  alter table BARS.ACC_TO_BLOCK_VSO
+  add constraint PK_ACC_TO_BLOCK_VSO primary key (ACC)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
 
 PROMPT *** Create  grants  ACC_TO_BLOCK_VSO ***
 grant SELECT                                                                 on ACC_TO_BLOCK_VSO to UPLD;
