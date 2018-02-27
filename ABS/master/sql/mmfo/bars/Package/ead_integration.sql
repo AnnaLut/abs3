@@ -1405,7 +1405,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
                    and dkbo.id = p_agr_id
                    and w4.acc_pk member of l_acc_list                  
                    and (dkbo.start_date > w4.dat_begin 
-                   or   dkbo.start_date <= ( select max(trunc(MIGRATION_START_TIME))  from migration_log where TABLE_NAME ='DEAL' and MIGRATION_ID= a.kf )
+                   or   dkbo.start_date <= greatest(to_date('10/02/2018','dd/mm/yyyy'), ( select max(trunc(MIGRATION_START_TIME) )from migration_log where TABLE_NAME ='DEAL' and MIGRATION_ID= a.kf ))
                        ) 
                  order by w4.nd) loop
 --        exit;
