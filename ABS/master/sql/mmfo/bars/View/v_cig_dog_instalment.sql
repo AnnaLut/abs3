@@ -49,8 +49,6 @@ grant SELECT                                                                 on 
 grant SELECT,UPDATE                                                          on v_cig_dog_instalment  to CIG_ROLE;
 
 
-
-
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/View/v_cig_dog_instalment.sql =========*** End *** =
 PROMPT ===================================================================================== 

@@ -928,7 +928,7 @@ create or replace package body cig_mgr is
     elsif p_data_type = G_DOGDATA then
       update V_CIG_DOG_GENERAL set upd_date = sysdate where id = p_data_id;
     elsif p_data_type = G_DOG_INSTDATA then
-      update cig_dog_instalment
+      update v_cig_dog_instalment
          set update_date = sysdate
        where id = p_data_id;
     elsif p_data_type = G_DOG_CREDITDATA then
@@ -981,7 +981,7 @@ create or replace package body cig_mgr is
              set upd_date = sysdate
            where id = p_data_id;
         elsif p_data_type = G_DOG_INSTDATA then
-          update cig_dog_instalment
+          update v_cig_dog_instalment
              set update_date = sysdate
            where id = p_data_id;
         elsif p_data_type = G_DOG_CREDITDATA then
@@ -1111,10 +1111,10 @@ create or replace package body cig_mgr is
           upd_syncdata_branch(cur.id, l_row.branch, G_DOGDATA, cur.branch);
 
           for crs_i in (select i.id, i.branch, i.rowid as ri
-                          from CIG_DOG_INSTALMENT i
+                          from v_cig_dog_instalment i
                          where i.branch = cur.branch
                            and i.dog_id = cur.id) loop
-            update CIG_DOG_INSTALMENT i
+            update v_cig_dog_instalment i
                set i.branch = l_row.branch
              where i.rowid = crs_i.ri;
 
@@ -1388,10 +1388,10 @@ create or replace package body cig_mgr is
           upd_syncdata_branch(cur.id, l_row.branch, G_DOGDATA, cur.branch);
 
           for crs_i in (select i.id, i.branch, i.rowid as ri
-                          from CIG_DOG_INSTALMENT i
+                          from v_cig_dog_instalment i
                          where i.branch = cur.branch
                            and i.dog_id = cur.id) loop
-            update CIG_DOG_INSTALMENT i
+            update v_cig_dog_instalment i
                set i.branch = l_row.branch
              where i.rowid = crs_i.ri;
 
@@ -4031,7 +4031,7 @@ select     d.nd,
                          p_a8_kv     in accounts.kv%type,
                          p_oldbranch in branch.branch%type) is
     l_th constant varchar2(100) := g_dbgcode || 'prc_dog_inst';
-    l_rec            cig_dog_instalment%rowtype;
+    l_rec            v_cig_dog_instalment%rowtype;
     l_cnt_all        number;
     l_sum_all        number;
     l_outst_sum      number;
@@ -4208,12 +4208,12 @@ select     d.nd,
     if p_oldbranch is not null then
       -- удаляем все предидущие записи по этому договору
       for cr in (select cdi.*
-                   from cig_dog_instalment cdi, V_CIG_DOG_GENERAL dg
+                   from v_cig_dog_instalment cdi, V_CIG_DOG_GENERAL dg
                   where dg.nd = p_nd
                     and cdi.dog_id = dg.id
                     and cdi.branch = p_oldbranch
                     and dg.contract_type = 1) loop
-        delete from cig_dog_instalment cdi
+        delete from v_cig_dog_instalment cdi
          where cdi.id = cr.id
            and cr.branch = cdi.branch;
         delete from V_CIG_SYNC_DATA csd
@@ -4239,7 +4239,7 @@ select     d.nd,
 
     select s_cig_dog_instalment.nextval into l_id from dual;
 
-    insert into cig_dog_instalment
+    insert into v_cig_dog_instalment
       (id,
        dog_id,
        body_sum,
@@ -4422,12 +4422,12 @@ select     d.nd,
     if p_oldbranch is not null then
       if (p_contract_type is null) then
         for cr in (select cdi.*
-                     from cig_dog_instalment cdi, V_CIG_DOG_GENERAL dg
+                     from v_cig_dog_instalment cdi, V_CIG_DOG_GENERAL dg
                     where dg.nd = p_nd
                       and cdi.dog_id = dg.id
                       and cdi.branch = p_oldbranch
                       and dg.contract_type = 1) loop
-          delete from cig_dog_instalment cdi
+          delete from v_cig_dog_instalment cdi
            where cdi.id = cr.id
              and cr.branch = cdi.branch;
           delete from V_CIG_SYNC_DATA csd
