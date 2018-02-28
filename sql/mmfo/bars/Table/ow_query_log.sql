@@ -116,6 +116,14 @@ exception when others then
  end;
 /
 
+begin
+    execute immediate 'create index I_OWQUERYLOG_REQID on OW_QUERY_LOG (reqid)
+  tablespace BRSDYNI';
+ exception when others then 
+    if sqlcode = -955 or sqlcode = -1408 then null; else raise; 
+    end if; 
+end;
+/ 
 
 
 PROMPT *** Create  grants  OW_QUERY_LOG ***
