@@ -15,6 +15,6 @@ namespace BarsWeb.Areas.InsUi.Models.Transport
         /// <summary>
         /// Номер документа(при успішному виконанні)
         /// </summary>
-        public decimal? externalId { get; set; }
+        public Int64? externalId { get; set; }
     }
 }

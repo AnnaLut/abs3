@@ -1,1 +1,3 @@
-<%@ WebService Language="C#" CodeBehind="~/App_Code/webservices/XRMIntegrationCard.cs" Class="Bars.WebServices.XRMIntegrationCard" %>
+<%@ WebService Language="C#" CodeBehind="~/App_Code/webservices/XRM/Services/Card/XRMIntegrationCard.cs" Class="Bars.WebServices.XRM.Services.Card.XRMIntegrationCard" %>
+
+

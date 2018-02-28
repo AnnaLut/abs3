@@ -12,7 +12,7 @@ namespace Bars.Requests
     /// </summary>
     public class DepositRequest
     {
-        private readonly IDbLogger DBLogger; 
+        private readonly IDbLogger DBLogger;
         /// <summary>
         /// Ідентифікатор запиту
         /// </summary>
@@ -29,7 +29,7 @@ namespace Bars.Requests
         /// 
         /// </summary>
         private List<AccessInfo> ACCESS_INFO;
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -71,7 +71,7 @@ namespace Bars.Requests
 
             XmlNode p_root = XmlDoc.CreateElement("AccessInfo");
             XmlDoc.AppendChild(p_root);
-            
+
             for (int i = 0; i < this.ACCESS_INFO.Count; i++)
             {
                 XmlNode p_row = XmlDoc.CreateElement("row");
@@ -90,9 +90,9 @@ namespace Bars.Requests
                     (this.ACCESS_INFO[i].FL_EARLY ? "1" : "0") + (this.ACCESS_INFO[i].FL_AGREEMENTS ? "1" : "0"));
                 p_row.AppendChild(Flags);
             }
-            
+
             // DBLogger.Info("XmlDoc = " + Convert.ToString(XmlDoc.InnerXml), "deposit");
-            
+
             return XmlDoc;
         }
 
@@ -106,15 +106,22 @@ namespace Bars.Requests
         /// <param name="CertifDate">Дата документу</param>
         /// <param name="StartDate"></param>
         /// <param name="FinishDate"></param>
-        public void Save(Decimal RequestType, String TrusteeType, Decimal CustomerID, 
-            String CertifNumber, DateTime CertifDate, DateTime StartDate, DateTime? FinishDate)
+        public void Save(Decimal RequestType, String TrusteeType, Decimal CustomerID,
+            String CertifNumber, DateTime CertifDate, DateTime StartDate, DateTime? FinishDate, OracleConnection con = null)
         {
-            OracleConnection connect = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
+            if (null == con)
+                using (con = Classes.OraConnector.Handler.IOraConnection.GetUserConnection())
+                {
+                    ExecuteCreateAccessRequest(con, RequestType, TrusteeType, CustomerID, CertifNumber, CertifDate, StartDate, FinishDate);
+                }
+            else
+                ExecuteCreateAccessRequest(con, RequestType, TrusteeType, CustomerID, CertifNumber, CertifDate, StartDate, FinishDate);
 
-            try
+        }
+        private void ExecuteCreateAccessRequest(OracleConnection con, Decimal RequestType, String TrusteeType, Decimal CustomerID, String CertifNumber, DateTime CertifDate, DateTime StartDate, DateTime? FinishDate)
+        {
+            using (OracleCommand cmd = con.CreateCommand())
             {
-                OracleCommand cmd = connect.CreateCommand();
-
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.CommandText = "ebp.create_access_request";
                 cmd.BindByName = true;
@@ -127,7 +134,6 @@ namespace Bars.Requests
                 cmd.Parameters.Add("p_date_start", OracleDbType.Date, StartDate, ParameterDirection.Input);
                 cmd.Parameters.Add("p_date_finish", OracleDbType.Date, FinishDate, ParameterDirection.Input);
                 cmd.Parameters.Add("p_access_info", OracleDbType.XmlType, this.GetXML().InnerXml, ParameterDirection.Input);
-
                 cmd.Parameters.Add("p_reqid", OracleDbType.Decimal, this.REQ_ID, ParameterDirection.Output);
 
                 cmd.ExecuteNonQuery();
@@ -136,15 +142,6 @@ namespace Bars.Requests
 
                 DBLogger.Info("Користувач створив макет запиту на доступ №" + this.REQ_ID.ToString() + " (для друку).", "deposit");
             }
-            finally
-            {
-                if (connect.State != ConnectionState.Closed)
-                {
-                    connect.Close();
-                    connect.Dispose();
-                }
-            }
-
         }
 
         /// <summary>
@@ -217,7 +214,7 @@ namespace Bars.Requests
             }
         }
 
-        
+
         /// <summary>
         /// закриття активного запиту на БЕК в поточному ТВБВ при завершенні роботи з клієнтом
         /// </summary>
@@ -309,15 +306,15 @@ namespace Bars.Requests
         /// </summary>
         /// <param name="Request_ID">ID повідомлення в черзі cust_requests</param>
         /// <param name="Request_Comment">коментар до запиту</param>
-      
+
         public static void SendMessageToBOR(Decimal Request_ID, String Request_Comment)
         {
-            Decimal msg_id =0;
+            Decimal msg_id = 0;
             OracleConnection connect = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
             //шукаємо повідомлення з відповідним запитом в черзі
 
             DbLoggerConstruct.NewDbLogger().Info("Користувач обробив запит на доступ №" + Request_ID.ToString(), "deposit");
-           
+
             try
             {
                 OracleCommand cmd = connect.CreateCommand();
@@ -336,31 +333,31 @@ namespace Bars.Requests
                             msg_id = rdr.GetOracleDecimal(0).Value;
                         DbLoggerConstruct.NewDbLogger().Info("msg_id №" + msg_id.ToString(), "deposit");
                     }
-                            if (msg_id > 0)//якщо повідомлення знайшли - всі повідомлення обробляємо.
+                    if (msg_id > 0)//якщо повідомлення знайшли - всі повідомлення обробляємо.
+                    {
+                        DbLoggerConstruct.NewDbLogger().Info("Користувач відправив ок повідомлення №" + msg_id.ToString(), "deposit");
+
+                        try
+                        {
+
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.CommandText = "bms.done_msg";
+                            cmd.BindByName = true;
+
+                            cmd.Parameters.Add("p_msg_id", OracleDbType.Decimal, msg_id, ParameterDirection.Input);
+                            cmd.Parameters.Add("p_comment", OracleDbType.Varchar2, Request_Comment, ParameterDirection.Input);
+
+                            cmd.ExecuteNonQuery();
+                        }
+                        finally
+                        {
+                            if (connect.State != ConnectionState.Closed)
                             {
-                                DbLoggerConstruct.NewDbLogger().Info("Користувач відправив ок повідомлення №" + msg_id.ToString(), "deposit");
-
-                                try
-                                {
-                             
-                                    cmd.CommandType = CommandType.StoredProcedure;
-                                    cmd.CommandText = "bms.done_msg";
-                                    cmd.BindByName = true;
-
-                                    cmd.Parameters.Add("p_msg_id", OracleDbType.Decimal, msg_id, ParameterDirection.Input);
-                                    cmd.Parameters.Add("p_comment", OracleDbType.Varchar2, Request_Comment, ParameterDirection.Input);
-
-                                    cmd.ExecuteNonQuery();
-                                }
-                                finally
-                                {
-                                    if (connect.State != ConnectionState.Closed)
-                                    {
-                                        connect.Close();
-                                        connect.Dispose();
-                                    }
-                                }
+                                connect.Close();
+                                connect.Dispose();
                             }
+                        }
+                    }
 
                 }
             }
@@ -372,7 +369,7 @@ namespace Bars.Requests
                     connect.Dispose();
                 }
             }
-            
+
         }
 
         /// <summary>
@@ -393,7 +390,7 @@ namespace Bars.Requests
 
                 cmd.Parameters.Add("p_rnk", OracleDbType.Decimal, CustomerID, ParameterDirection.Input);
                 cmd.Parameters.Add("p_dptid", OracleDbType.Decimal, ContractID, ParameterDirection.Input);
-                
+
                 OracleDataReader rdr = cmd.ExecuteReader();
 
                 if (rdr.Read())
@@ -417,7 +414,7 @@ namespace Bars.Requests
             return res;
         }
     }
-    
+
     /// <summary>
     /// Параметри запиту
     /// </summary>
@@ -484,10 +481,10 @@ namespace Bars.Requests
             set { _FL_AGREEMENTS = value; }
         }
 
-        public AccessInfo() {}
+        public AccessInfo() { }
 
         public AccessInfo(Int32 ContractID, Decimal Amount, Boolean Flag1, Boolean Flag2, Boolean Flag3, Boolean Flag4)
-        {            
+        {
             this.DPT_ID = ContractID;
             this.AMOUNT = Amount;
             this.FL_REPORT = Flag1;

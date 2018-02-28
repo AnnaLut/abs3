@@ -1,4 +1,4 @@
-using System;
+п»їusing System;
 using System.ComponentModel;
 using System.Data;
 using System.Collections;
@@ -15,11 +15,18 @@ using BarsWeb.Areas.Kernel.Models;
 using Kendo.Mvc;
 using Kendo.Mvc.UI;
 using CommandType = System.Data.CommandType;
+using Bars.WebServices;
+using barsroot.core;
+using System.IO.Compression;
+using System.IO;
+using BarsWeb.Core.Logger;
+using Oracle.DataAccess.Types;
 
 namespace Bars
 {
     public class BarsWebService : System.Web.Services.WebService
     {
+        protected string moduleName = "XRMIntegration";
         IOraConnection _hsql;
         OracleConnection _connect;
         OracleCommand _command;
@@ -34,6 +41,246 @@ namespace Bars
         }
         private IContainer components = null;
 
+        public static CultureInfo CXRMinfo()
+        {
+            CultureInfo cXRMinfo = CultureInfo.CreateSpecificCulture("en-GB");
+
+            cXRMinfo.DateTimeFormat.ShortDatePattern = "dd/MM/yyyy";
+            cXRMinfo.DateTimeFormat.DateSeparator = "/";
+
+            cXRMinfo.NumberFormat.NumberDecimalSeparator = ".";
+            cXRMinfo.NumberFormat.CurrencyDecimalSeparator = ".";
+
+            return cXRMinfo;
+        }
+
+        #region new login and bc.go, using single connection
+        protected void LoginADUserIntSingleCon(OracleConnection con, string userName, bool bcGo = true)
+        {
+            string ipAddress = RequestHelpers.GetClientIpAddress(HttpContext.Current.Request);
+
+            using (OracleCommand cmd = con.CreateCommand())
+            {
+                cmd.Connection = con;
+                cmd.CommandText = "bars.bars_login.login_user";
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.Add(new OracleParameter("p_session_id", OracleDbType.Varchar2, Session.SessionID, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("p_login_name", OracleDbType.Varchar2, userName, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("p_authentication_mode", OracleDbType.Varchar2, "ACTIVE DIRECTORY", ParameterDirection.Input));
+
+                cmd.Parameters.Add(new OracleParameter("p_hostname", OracleDbType.Varchar2, ipAddress, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("p_appname", OracleDbType.Varchar2, "barsroot", ParameterDirection.Input));
+                cmd.ExecuteNonQuery();
+
+                if (bcGo)
+                    ExecBcGo(con, HttpContext.Current.Request.Headers["branch"]);
+
+                WriteMsgToAudit(con, string.Format("XRMIntegration: Р°РІС‚РѕСЂРёР·Р°С†РёСЏ. РҐРѕСЃС‚ {0}, РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ {1} ", ipAddress, userName));
+            }
+            Session["UserLoggedIn"] = true;
+        }
+
+        protected void LoginUserIntSingleCon(OracleConnection con, string userName, bool bcGo = true)
+        {
+            UserMap userMap = Bars.Configuration.ConfigurationSettings.GetUserInfo(userName);
+            string ipAddress = RequestHelpers.GetClientIpAddress(HttpContext.Current.Request);
+
+            using (OracleCommand cmd = con.CreateCommand())
+            {
+                cmd.Connection = con;
+                cmd.CommandText = "bars.bars_login.login_user";
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.Add(new OracleParameter("p_session_id", OracleDbType.Varchar2, Session.SessionID, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("p_user_id", OracleDbType.Varchar2, userMap.user_id, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("p_hostname", OracleDbType.Varchar2, ipAddress, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("p_appname", OracleDbType.Varchar2, "barsroot", ParameterDirection.Input));
+                cmd.ExecuteNonQuery();
+
+                if (bcGo)
+                    ExecBcGo(con, HttpContext.Current.Request.Headers["branch"]);
+
+                WriteMsgToAudit(con, string.Format("XRMIntegration: Р°РІС‚РѕСЂРёР·Р°С†РёСЏ. РҐРѕСЃС‚ {0}, РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ {1} ", ipAddress, userName));
+            }
+
+            Session["UserLoggedIn"] = true;
+        }
+
+        private void ExecBcGo(OracleConnection con, string branch)
+        {
+            using (OracleCommand cmd = con.CreateCommand())
+            {
+                cmd.CommandText = "bc.go";
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.Add(new OracleParameter("p_branch", OracleDbType.Varchar2, branch, ParameterDirection.Input));
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        private void WriteMsgToAudit(OracleConnection con, string msg)
+        {
+            using (OracleCommand cmd = con.CreateCommand())
+            {
+                cmd.CommandText = "bars_audit.info";
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.Add(new OracleParameter("p_info", OracleDbType.Varchar2, msg, ParameterDirection.Input));
+                cmd.ExecuteNonQuery();
+            }
+        }
+        #endregion
+
+        #region writing/reading request and response to/from log by transaction id
+        protected T ToResponse<T>(byte[] response) where T : new()
+        {
+            try
+            {
+                Byte[] unzipResponse = Decompress(response);
+                T result = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(System.Text.Encoding.GetEncoding(1251).GetString(unzipResponse));
+
+                return result;
+            }
+            catch
+            {
+                return new T();
+            }
+        }
+        private byte[] Decompress(byte[] response)
+        {
+            using (var compressedStream = new MemoryStream(response))
+            {
+                using (var uncompressedStream = new MemoryStream())
+                {
+                    using (var gzipStream = new GZipStream(compressedStream, CompressionMode.Decompress))
+                    {
+                        gzipStream.CopyTo(uncompressedStream);
+                    }
+                    return uncompressedStream.ToArray();
+                }
+            }
+        }
+        private byte[] Compress(string uncompressedJsonString)
+        {
+            using (var uncompressedStream = new MemoryStream(System.Text.Encoding.GetEncoding(1251).GetBytes(uncompressedJsonString)))
+            {
+                using (var compressedStream = new MemoryStream())
+                {
+                    using (var gzipStream = new GZipStream(compressedStream, CompressionMode.Compress))
+                    {
+                        uncompressedStream.CopyTo(gzipStream);
+                        gzipStream.Close();
+                    }
+                    return compressedStream.ToArray();
+                }
+            }
+        }
+        protected void WriteRequestResponseToLog(OracleConnection con, decimal transactionId, object Request, object Response)
+        {
+            try
+            {
+                using (OracleCommand command = con.CreateCommand())
+                {
+                    command.Parameters.Clear();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.BindByName = true;
+                    command.CommandText = "bars.xrm_ui_oe.save_req";
+                    command.Parameters.Add("p_TransactionId", OracleDbType.Varchar2, transactionId, ParameterDirection.Input);
+                    command.Parameters.Add("p_req", OracleDbType.Blob, Compress(Newtonsoft.Json.JsonConvert.SerializeObject(Request)), ParameterDirection.Input);
+                    command.Parameters.Add("p_resp", OracleDbType.Blob, Compress(Newtonsoft.Json.JsonConvert.SerializeObject(Response)), ParameterDirection.Input);
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch { }
+        }
+        #endregion
+
+        #region Transaction processing  
+        protected String TransactionErrorMessage = "РџРѕРјРёР»РєР° РѕС‚СЂРёРјР°РЅРЅСЏ С‚СЂР°РЅР·Р°РєС†С–С— {0} Р· Р‘Р”";
+        protected String TransactionExistsMessage = "TransactionID {0} РІР¶Рµ Р±СѓР»Р° РїСЂРѕРІРµРґРµРЅР°";
+
+        protected void TransactionCreate(OracleConnection con, decimal transactionId, string userLogin, short? operationType = null, string description = null)
+        {
+            try
+            {
+                using (OracleCommand cmdTrans = con.CreateCommand())
+                {
+                    cmdTrans.CommandType = CommandType.StoredProcedure;
+                    cmdTrans.CommandText = "xrm_ui_oe.xrm_audit";
+                    cmdTrans.BindByName = true;
+                    cmdTrans.Parameters.Clear();
+                    cmdTrans.Parameters.Add("p_TransactionId", OracleDbType.Decimal, transactionId, ParameterDirection.Input);
+                    cmdTrans.Parameters.Add("p_TranType", OracleDbType.Decimal, operationType, ParameterDirection.Input);
+                    cmdTrans.Parameters.Add("p_Description", OracleDbType.Varchar2, description, ParameterDirection.Input);
+                    cmdTrans.Parameters.Add("p_user_login", OracleDbType.Varchar2, userLogin, ParameterDirection.Input);
+                    cmdTrans.ExecuteNonQuery();
+                }
+            }
+            catch (System.Exception e)
+            {
+                DbLoggerConstruct.NewDbLogger().Info(e.StackTrace + e.Message, moduleName);
+            }
+        }
+        protected decimal TransactionCheck(OracleConnection con, decimal transactionId, out byte[] responseBytes)
+        {
+            responseBytes = null;
+            decimal res = 1;
+
+            try
+            {
+                using (OracleCommand cmdTrans = con.CreateCommand())
+                {
+                    cmdTrans.CommandType = CommandType.StoredProcedure;
+                    cmdTrans.CommandText = "xrm_ui_oe.CheckTrasaction";
+                    cmdTrans.BindByName = true;
+
+                    cmdTrans.Parameters.Clear();
+                    cmdTrans.Parameters.Add("p_TransactionId", OracleDbType.Decimal, transactionId, ParameterDirection.Input);
+                    cmdTrans.Parameters.Add("p_TransactionResult", OracleDbType.Decimal, res, ParameterDirection.Output);
+                    cmdTrans.Parameters.Add("p_resp", OracleDbType.Blob, responseBytes, ParameterDirection.Output);
+                    cmdTrans.ExecuteNonQuery();
+                    res = ((OracleDecimal)cmdTrans.Parameters["p_TransactionResult"].Value).Value;
+                    if (res == -1)
+                    {
+                        OracleBlob p_resp = (OracleBlob)cmdTrans.Parameters["p_resp"].Value;
+                        responseBytes = p_resp.IsNull ? null : p_resp.Value;
+                    }
+                }
+            }
+            catch (System.Exception e)
+            {
+                DbLoggerConstruct.NewDbLogger().Info(e.StackTrace + e.Message, moduleName);
+            }
+            return res;
+        }
+
+        /// <summary>
+        /// check if transaction allready exists then throw error, if it's new, creates transaction
+        /// </summary>
+        /// <param name="con">Oracle connection</param>
+        /// <param name="transactionId">Transaction Id (passed from XRM)</param>
+        /// <param name="userLogin">AD User login (passed from XRM)</param>
+        /// <param name="operationType">Operation type (passed from XRM)</param>
+        /// <param name="moduleName">log message identifier (default is "XRMIntegration")</param>
+        /// <param name="description">Transaction decription (empty by default)</param>
+        protected void ProcessTransactions(OracleConnection con, decimal transactionId, string userLogin, short? operationType, out byte[] response, string description = "")
+        {
+            decimal TransStatus = TransactionCheck(con, transactionId, out response);
+
+            if (0 == TransStatus)
+                TransactionCreate(con, transactionId, userLogin, operationType, description);
+            else if (-1 == TransStatus)
+            {
+                if (null == response)
+                    throw new System.Exception(String.Format("TransactionID {0} already exists and there is no saved answer", transactionId));
+            }
+            else
+                throw new System.Exception(String.Format("РџРѕРјРёР»РєР° РѕС‚СЂРёРјР°РЅРЅСЏ С‚СЂР°РЅР·Р°РєС†С–С— {0} Р· Р‘Р”", transactionId));
+        }
+        #endregion Transaction
+
+        #region Old
         /// <summary>
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
@@ -66,7 +313,7 @@ namespace Bars
             base.Dispose(disposing);
         }
         /// <summary>
-        /// Первичная проверка на доступ к сервису
+        /// РџРµСЂРІРёС‡РЅР°СЏ РїСЂРѕРІРµСЂРєР° РЅР° РґРѕСЃС‚СѓРї Рє СЃРµСЂРІРёСЃСѓ
         /// </summary>
         public virtual void PrimaryCheckAccess()
         {
@@ -74,9 +321,9 @@ namespace Bars
         }
 
         /// <summary>
-        /// Сохраняем выброшенное исключение 
+        /// РЎРѕС…СЂР°РЅСЏРµРј РІС‹Р±СЂРѕС€РµРЅРЅРѕРµ РёСЃРєР»СЋС‡РµРЅРёРµ 
         /// </summary>
-        /// <param name="ex">Исключение</param>
+        /// <param name="ex">РСЃРєР»СЋС‡РµРЅРёРµ</param>
         public void SaveExeption(System.Exception ex)
         {
             if (HttpContext.Current.Session != null)
@@ -96,7 +343,7 @@ namespace Bars
         }
 
         /// <summary>
-        /// Инициализация работы с базой(создаем экземпляр интерфейса Bars.Oracle.Connection )
+        /// РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЂР°Р±РѕС‚С‹ СЃ Р±Р°Р·РѕР№(СЃРѕР·РґР°РµРј СЌРєР·РµРјРїР»СЏСЂ РёРЅС‚РµСЂС„РµР№СЃР° Bars.Oracle.Connection )
         /// </summary>
         public IOraConnection hsql
         {
@@ -111,10 +358,10 @@ namespace Bars
         }
 
         /// <summary>
-        /// Строка соединения
+        /// РЎС‚СЂРѕРєР° СЃРѕРµРґРёРЅРµРЅРёСЏ
         /// </summary>
-        /// <param name="ctx">Контекст</param>
-        /// <returns>строка соединения</returns>
+        /// <param name="ctx">РљРѕРЅС‚РµРєСЃС‚</param>
+        /// <returns>СЃС‚СЂРѕРєР° СЃРѕРµРґРёРЅРµРЅРёСЏ</returns>
         public string ConnectionString(HttpContext ctx)
         {
             return hsql.GetUserConnectionString(ctx);
@@ -134,9 +381,9 @@ namespace Bars
         }
 
         /// <summary>
-        /// Инициализация работы с базой
+        /// РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЂР°Р±РѕС‚С‹ СЃ Р±Р°Р·РѕР№
         /// </summary>
-        /// <param name="ctx">Контекст</param>
+        /// <param name="ctx">РљРѕРЅС‚РµРєСЃС‚</param>
         public void InitOraConnection(HttpContext ctx)
         {
             if (_connect == null)
@@ -144,9 +391,9 @@ namespace Bars
             _command = new OracleCommand();
         }
         /// <summary>
-        /// Инициализация работы с базой
+        /// РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЂР°Р±РѕС‚С‹ СЃ Р±Р°Р·РѕР№
         /// </summary>
-        /// <param name="connstr">строка соединения</param>
+        /// <param name="connstr">СЃС‚СЂРѕРєР° СЃРѕРµРґРёРЅРµРЅРёСЏ</param>
         public void InitOraConnection(string connstr)
         {
             if (_connect == null)
@@ -155,7 +402,7 @@ namespace Bars
             _command = new OracleCommand();
         }
         /// <summary>
-        /// Инициализация работы с базой
+        /// РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЂР°Р±РѕС‚С‹ СЃ Р±Р°Р·РѕР№
         /// </summary>
         public void InitOraConnection()
         {
@@ -164,30 +411,30 @@ namespace Bars
             _command = new OracleCommand();
         }
         /// <summary>
-        /// Начать транзакцию
+        /// РќР°С‡Р°С‚СЊ С‚СЂР°РЅР·Р°РєС†РёСЋ
         /// </summary>
         public void BeginTransaction()
         {
             _transaction = _connect.BeginTransaction();
         }
         /// <summary>
-        /// Commit транзакции
+        /// Commit С‚СЂР°РЅР·Р°РєС†РёРё
         /// </summary>
         public void CommitTransaction()
         {
             _transaction.Commit();
         }
         /// <summary>
-        /// Rollback  транзакции
+        /// Rollback  С‚СЂР°РЅР·Р°РєС†РёРё
         /// </summary>
         public void RollbackTransaction()
         {
             _transaction.Rollback();
         }
         /// <summary>
-        /// Установка роли
+        /// РЈСЃС‚Р°РЅРѕРІРєР° СЂРѕР»Рё
         /// </summary>
-        /// <param name="role">имя роли</param>
+        /// <param name="role">РёРјСЏ СЂРѕР»Рё</param>
         public void SetRole(string role)
         {
             _command.Connection = _connect;
@@ -202,7 +449,7 @@ namespace Bars
             }
         }
         /// <summary>
-        /// Commit текущего соединения
+        /// Commit С‚РµРєСѓС‰РµРіРѕ СЃРѕРµРґРёРЅРµРЅРёСЏ
         /// </summary>
         public void Commit()
         {
@@ -211,12 +458,12 @@ namespace Bars
             _command.ExecuteNonQuery();
         }
         /// <summary>
-        /// Добавить параметр запроса
+        /// Р”РѕР±Р°РІРёС‚СЊ РїР°СЂР°РјРµС‚СЂ Р·Р°РїСЂРѕСЃР°
         /// </summary>
-        /// <param name="name">имя параметра</param>
-        /// <param name="type">тип(перечисление DB_TYPE)</param>
-        /// <param name="val">значение параметра</param>
-        /// <param name="direct">direction(перечисление DIRECTION)</param>
+        /// <param name="name">РёРјСЏ РїР°СЂР°РјРµС‚СЂР°</param>
+        /// <param name="type">С‚РёРї(РїРµСЂРµС‡РёСЃР»РµРЅРёРµ DB_TYPE)</param>
+        /// <param name="val">Р·РЅР°С‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂР°</param>
+        /// <param name="direct">direction(РїРµСЂРµС‡РёСЃР»РµРЅРёРµ DIRECTION)</param>
         public void SetParameters(string name, DB_TYPE type, object val, DIRECTION direct)
         {
             _command.Parameters.Add(name, (OracleDbType)type, val, (ParameterDirection)direct);
@@ -237,26 +484,26 @@ namespace Bars
             _command.Parameters.Add(name, (OracleDbType)type, size, val, (ParameterDirection)direct);
         }
         /// <summary>
-        /// Удалить все параметры текущего OracleCommand 
+        /// РЈРґР°Р»РёС‚СЊ РІСЃРµ РїР°СЂР°РјРµС‚СЂС‹ С‚РµРєСѓС‰РµРіРѕ OracleCommand 
         /// </summary>
         public void ClearParameters()
         {
             _command.Parameters.Clear();
         }
         /// <summary>
-        /// Получить параметр
+        /// РџРѕР»СѓС‡РёС‚СЊ РїР°СЂР°РјРµС‚СЂ
         /// </summary>
-        /// <param name="name">имя параметра</param>
-        /// <returns>значение параметра</returns>
+        /// <param name="name">РёРјСЏ РїР°СЂР°РјРµС‚СЂР°</param>
+        /// <returns>Р·РЅР°С‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂР°</returns>
         public object GetParameter(string name)
         {
             return _command.Parameters[name].Value;
         }
         /// <summary>
-        /// Значение параметра из таблицы WEB_USERPARAMS
+        /// Р—РЅР°С‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂР° РёР· С‚Р°Р±Р»РёС†С‹ WEB_USERPARAMS
         /// </summary>
-        /// <param name="param">имя параметра</param>
-        /// <returns>значение</returns>
+        /// <param name="param">РёРјСЏ РїР°СЂР°РјРµС‚СЂР°</param>
+        /// <returns>Р·РЅР°С‡РµРЅРёРµ</returns>
         public string GetUserParam(string param)
         {
             _command.CommandText = "SELECT VAL FROM V_WEB_USERPARAMS WHERE PAR=:PAR";
@@ -272,7 +519,7 @@ namespace Bars
             }
         }
         /// <summary>
-        /// Взять глобальный параметр из таблицы Params
+        /// Р’Р·СЏС‚СЊ РіР»РѕР±Р°Р»СЊРЅС‹Р№ РїР°СЂР°РјРµС‚СЂ РёР· С‚Р°Р±Р»РёС†С‹ Params
         /// </summary>
         /// <param name="parName"></param>
         /// <returns></returns>
@@ -293,11 +540,11 @@ namespace Bars
         }
 
         /// <summary>
-        /// Возвращает строку запроса с пейджингом
+        /// Р’РѕР·РІСЂР°С‰Р°РµС‚ СЃС‚СЂРѕРєСѓ Р·Р°РїСЂРѕСЃР° СЃ РїРµР№РґР¶РёРЅРіРѕРј
         /// </summary>
-        /// <param name="query">входной запрос</param>
-        /// <param name="startpos">позиция с</param>
-        /// <param name="maxpos">количество строк</param>
+        /// <param name="query">РІС…РѕРґРЅРѕР№ Р·Р°РїСЂРѕСЃ</param>
+        /// <param name="startpos">РїРѕР·РёС†РёСЏ СЃ</param>
+        /// <param name="maxpos">РєРѕР»РёС‡РµСЃС‚РІРѕ СЃС‚СЂРѕРє</param>
         /// <returns></returns>
         private string MakePagingQuery(string query, int startpos, int maxpos)
         {
@@ -310,9 +557,9 @@ namespace Bars
                    "where rnum >= :MIN_ROW_TO_FETCH";
         }
         /// <summary>
-        /// Заполняет DataSet заданым запросом
+        /// Р—Р°РїРѕР»РЅСЏРµС‚ DataSet Р·Р°РґР°РЅС‹Рј Р·Р°РїСЂРѕСЃРѕРј
         /// </summary>
-        /// <param name="query">запрос</param>
+        /// <param name="query">Р·Р°РїСЂРѕСЃ</param>
         /// <returns>DataSet</returns>
         public DataSet SQL_SELECT_dataset(string query)
         {
@@ -334,11 +581,11 @@ namespace Bars
             return result;
         }
         /// <summary>
-        /// Заполняет DataSet строками начиная с номера [startpos] и количеством [maxpos] строк
+        /// Р—Р°РїРѕР»РЅСЏРµС‚ DataSet СЃС‚СЂРѕРєР°РјРё РЅР°С‡РёРЅР°СЏ СЃ РЅРѕРјРµСЂР° [startpos] Рё РєРѕР»РёС‡РµСЃС‚РІРѕРј [maxpos] СЃС‚СЂРѕРє
         /// </summary>
-        /// <param name="query">запрос</param>
-        /// <param name="startpos">начальный номер строки</param>
-        /// <param name="takeRows">количество строк</param>
+        /// <param name="query">Р·Р°РїСЂРѕСЃ</param>
+        /// <param name="startpos">РЅР°С‡Р°Р»СЊРЅС‹Р№ РЅРѕРјРµСЂ СЃС‚СЂРѕРєРё</param>
+        /// <param name="takeRows">РєРѕР»РёС‡РµСЃС‚РІРѕ СЃС‚СЂРѕРє</param>
         /// <returns></returns>
         public DataSet SQL_SELECT_dataset(string query, int startpos, int takeRows)
         {
@@ -361,8 +608,8 @@ namespace Bars
 
             int pageSize = takeRows;
 
-            //трансформируем запрос согласно щтатного кенду трасфортматорв
-            //1. конвертнем данные запроса в кендо DataSourceRequest
+            //С‚СЂР°РЅСЃС„РѕСЂРјРёСЂСѓРµРј Р·Р°РїСЂРѕСЃ СЃРѕРіР»Р°СЃРЅРѕ С‰С‚Р°С‚РЅРѕРіРѕ РєРµРЅРґСѓ С‚СЂР°СЃС„РѕСЂС‚РјР°С‚РѕСЂРІ
+            //1. РєРѕРЅРІРµСЂС‚РЅРµРј РґР°РЅРЅС‹Рµ Р·Р°РїСЂРѕСЃР° РІ РєРµРЅРґРѕ DataSourceRequest
             DataSourceRequest request = new DataSourceRequest()
             {
                 Page = startpos / (pageSize - 1) + 1,
@@ -371,11 +618,11 @@ namespace Bars
             };
             if (!String.IsNullOrEmpty(data[3]))
             {
-                //сортировки передаются сюда по-разному 
-                //бывает просто перечень полей для сортировки через запятую
+                //СЃРѕСЂС‚РёСЂРѕРІРєРё РїРµСЂРµРґР°СЋС‚СЃСЏ СЃСЋРґР° РїРѕ-СЂР°Р·РЅРѕРјСѓ 
+                //Р±С‹РІР°РµС‚ РїСЂРѕСЃС‚Рѕ РїРµСЂРµС‡РµРЅСЊ РїРѕР»РµР№ РґР»СЏ СЃРѕСЂС‚РёСЂРѕРІРєРё С‡РµСЂРµР· Р·Р°РїСЏС‚СѓСЋ
                 if (data[3].IndexOf(", ") >= 0)
                 {
-                    string[] sort = data[3].Split(new[] {", "}, StringSplitOptions.None);
+                    string[] sort = data[3].Split(new[] { ", " }, StringSplitOptions.None);
                     foreach (var sortItem in sort)
                     {
                         request.Sorts.Add(new SortDescriptor()
@@ -387,7 +634,7 @@ namespace Bars
                 }
                 else
                 {
-                    //бывает название колонки - направление
+                    //Р±С‹РІР°РµС‚ РЅР°Р·РІР°РЅРёРµ РєРѕР»РѕРЅРєРё - РЅР°РїСЂР°РІР»РµРЅРёРµ
                     string[] sort = data[3].Split(' ');
                     request.Sorts.Add(new SortDescriptor()
                     {
@@ -395,14 +642,14 @@ namespace Bars
                         SortDirection = sort[1].ToUpper() == "DESC" ? ListSortDirection.Descending : ListSortDirection.Ascending
                     });
                 }
-                
+
             }
-            //2. Создадим конвертер и произведем конвертацию
+            //2. РЎРѕР·РґР°РґРёРј РєРѕРЅРІРµСЂС‚РµСЂ Рё РїСЂРѕРёР·РІРµРґРµРј РєРѕРЅРІРµСЂС‚Р°С†РёСЋ
             KendoSqlTransformer sqlTransformer = new KendoSqlTransformer(null);
             BarsSql barssql = new BarsSql() { SqlText = query };
 
             var transFormedSql = sqlTransformer.TransformSql(barssql, request);
-            //3. Пересчитаем параметри постраничной разбивки по правилам Grid2005
+            //3. РџРµСЂРµСЃС‡РёС‚Р°РµРј РїР°СЂР°РјРµС‚СЂРё РїРѕСЃС‚СЂР°РЅРёС‡РЅРѕР№ СЂР°Р·Р±РёРІРєРё РїРѕ РїСЂР°РІРёР»Р°Рј Grid2005
             int shiftRow = request.Page - 1;
             _command.Parameters.Add("p_startNumRow", OracleDbType.Decimal, Int32.Parse(((OracleParameter)transFormedSql.SqlParams[0]).Value.ToString()) - shiftRow, ParameterDirection.Input);
             _command.Parameters.Add("p_endNumRow", OracleDbType.Decimal, Int32.Parse(((OracleParameter)transFormedSql.SqlParams[1]).Value.ToString()) - shiftRow, ParameterDirection.Input);
@@ -414,11 +661,11 @@ namespace Bars
         }
 
         /// <summary>
-        ///  Строка значений параметров из web_userparams
+        ///  РЎС‚СЂРѕРєР° Р·РЅР°С‡РµРЅРёР№ РїР°СЂР°РјРµС‚СЂРѕРІ РёР· web_userparams
         /// </summary>
-        /// <param name="params_str">строка имен параметров через запятую</param>
-        /// <param name="role">имя роли</param>
-        /// <returns>строка значений</returns>
+        /// <param name="params_str">СЃС‚СЂРѕРєР° РёРјРµРЅ РїР°СЂР°РјРµС‚СЂРѕРІ С‡РµСЂРµР· Р·Р°РїСЏС‚СѓСЋ</param>
+        /// <param name="role">РёРјСЏ СЂРѕР»Рё</param>
+        /// <returns>СЃС‚СЂРѕРєР° Р·РЅР°С‡РµРЅРёР№</returns>
         [WebMethod(EnableSession = true)]
         public string GetUserParams(string params_str, string role)
         {
@@ -943,7 +1190,7 @@ namespace Bars
             Output = ParameterDirection.Output,
             ReturnValue = ParameterDirection.ReturnValue
         };
-        //Константы из Century
+        //РљРѕРЅСЃС‚Р°РЅС‚С‹ РёР· Century
         public enum CUST_TYPE
         {
             BANK = 1,
@@ -1005,5 +1252,6 @@ namespace Bars
             ACCESS_READONLY,
             ACCESS_HOLDING
         };
+        #endregion
     }
 }
