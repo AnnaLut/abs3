@@ -115,7 +115,7 @@ PROMPT *** Create  view V_OTCN_TRACE_70_ALL ***
                    o.KODF AS KODF,
                    o.DATF AS DATF,
                    R.KV AS KV,
-                   TO_CHAR (ROUND (r.s / 100, 0)),
+                   TO_CHAR (ROUND (r.s / 100, 0)) AS SumVal,
                    TO_CHAR (R.REF) COMM
      FROM otcn_trace_70 o, oper r
     WHERE o.kodp LIKE '100%' AND o.KODF = 'C9' AND o.REF = r.REF
@@ -124,7 +124,24 @@ PROMPT *** Create  view V_OTCN_TRACE_70_ALL ***
           AND NOT EXISTS
                  (SELECT 1
                     FROM NBUR_TMP_DEL_70
-                   WHERE kodf = O.KODF AND REF = r.REF);
+                   WHERE kodf = O.KODF AND REF = r.REF)
+   UNION ALL
+   SELECT DISTINCT
+          op.REF AS REF,
+          o.KODF AS KODF,
+          o.DATF AS DATF,
+          op.KV AS KV,
+          to_char(op.s)  AS SumVal,
+          TO_CHAR (op.REF) comm
+     FROM otcn_trace_70 o , oper op
+    WHERE o.kodp LIKE 'S1800%'
+          AND op.ref = o.ref 
+          AND o.KODF = '3K'
+          AND NOT EXISTS
+                     (SELECT 1
+                        FROM NBUR_TMP_DEL_70
+                       WHERE kodf = O.KODF
+                             AND (REF = o.REF OR TO_CHAR (REF) = o.COMM));
 
 PROMPT *** Create  grants  V_OTCN_TRACE_70_ALL ***
 grant SELECT                                                                 on V_OTCN_TRACE_70_ALL to BARSREADER_ROLE;

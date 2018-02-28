@@ -152,6 +152,26 @@ public partial class docinput_editPropsVal : BarsPage
                     from doc, alltags t  order by decode(trim(t.tag), 'N', null, 'n', null, t.tag) nulls first)";
                             }
                 break;
+				case "3K": {
+                   sdsProps.SelectParameters.Add("REF", DbType.Decimal, reference);
+                   sdsProps.SelectCommand =
+                   @"select tag, name, value, rel, ref 
+                          from(with doc as (select o.ref, o.tt, o.nlsa, o.mfoa, o.kv, o.s, o.nlsb, o.mfob, o.kv2, o.s2, o.nazn from oper o where ref = :REF ),
+                       alltags as (  select f.tag, f.name, f.browser, trim(f.chkr) chkr
+                           from  op_field f, doc
+                          where   f.tag in ('D7#70', 'D8#70', 'D9#70', 'DA#70', 'DB#70', 'D6#70', 'D5#70', 'D4#70', 'D3#70', 'D2#70', 'D1#70', 'D1#D3', 'DD#70', 'D1#3K')          
+                          union all
+                          select w.tag, f.name, f.browser, trim(f.chkr) chkr
+                           from operw w, op_field f, doc
+                          where w.ref = doc.ref  
+                            and w.tag = f.tag
+							and f.tag in ('D7#70', 'D8#70', 'D9#70', 'DA#70', 'DB#70', 'D6#70', 'D5#70', 'D4#70', 'D3#70', 'D2#70', 'D1#70', 'D1#D3', 'DD#70', 'D1#3K')
+                            and nvl(f.nomodify,0)=0)
+                    select distinct t.tag, t.name,(select nvl(value,'') from operw where ref = doc.ref and tag = t.tag) as value, 
+                    decode(t.browser,null,0,1) REL, ref 
+                    from doc, alltags t  order by decode(trim(t.tag), 'N', null, 'n', null, t.tag) nulls first)";
+                            }
+                break;
             }
         
     }
