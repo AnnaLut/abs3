@@ -2,11 +2,14 @@ CREATE OR REPLACE PROCEDURE BARS.p_f3V_NN (Dat_ DATE, sheme_ varchar2 default 'G
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Процедура формирования #3V для
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 21.02.2018 
+% VERSION     : 27/02/2018 (26/02/2018) 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   параметры: Dat_ - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-21.02.2018 новый файл отчетности
+27.02.2018 - не включаем контрагентов которых нет в #3B
+26.02.2018 - добавлен блок для перекодировки кол=ва дней просрочки
+             (показатель 03 параметр S190)
+21.02.2018 - новый файл отчетности
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
     kodf_    varchar2(2) := '3V';
     userid_  number;
@@ -14,8 +17,10 @@ CREATE OR REPLACE PROCEDURE BARS.p_f3V_NN (Dat_ DATE, sheme_ varchar2 default 'G
     mfou_    number;
     ost_     number;
     ost_96_  number;
+    s190_    varchar2(1); 
     dtb_     date;
     dte_     date;
+    datf_3b_ date;
     znap_    number;
     p04_     varchar2(1);
     fmt_     varchar2 (10)  := '9990D00';
@@ -234,10 +239,36 @@ BEGIN
              VALUES (s_rnbu_record.NEXTVAL, userid_, dat_,
                      '02'||k.P||LPAD(k.okpo, 10,'0'), k.ll, 'OKPO='||k.OKPO, k.rnk);
 
+          if k.s190 = 0 
+          then
+             s190_ := '0';
+          elsif k.s190 > 0 and k.s190 < 8 
+          then
+             s190_ := 'A';
+          elsif k.s190 < 31 
+          then
+             s190_ := 'B';
+          elsif k.s190 < 61
+          then
+             s190_ := 'C';
+          elsif k.s190 < 91
+          then
+             s190_ := 'D';
+          elsif k.s190 < 181 
+          then
+             s190_ := 'E';
+          elsif k.s190 < 361 
+          then
+             s190_ := 'F';
+          else
+             s190_ := 'G';
+          end if;
+
+
           INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm, rnk)
              -- KODP = LL+P+ZZZZZZZZZZ
              VALUES (s_rnbu_record.NEXTVAL, userid_, dat_,
-                     '03'||k.P||LPAD(k.okpo, 10,'0'), k.s190, 'OKPO='||k.OKPO, k.rnk);
+                     '03'||k.P||LPAD(k.okpo, 10,'0'), s190_, 'OKPO='||k.OKPO, k.rnk);
 
           p04_ := '0';
           if k.p <> k.pp
@@ -337,6 +368,20 @@ BEGIN
             and substr(r.kodp,1,2) in ('02','03','04','05','06','07','08','09');
 
     end loop;
+
+    -- блок для знищення контрагентів яких немає в #3B 
+    select max(datf)
+       into datf_3b_
+    from tmp_nbu 
+    where kodf='3B'
+      and datf < dtb_;
+
+    delete from rnbu_trace r
+    where not exists ( select 1 from tmp_nbu t 
+                       where t.kodf = '3B' 
+                         and t.datf = datf_3b_
+                         and substr(t.kodp,11,10) = substr(r.kodp,4,10)
+                     );
     ---------------------------------------------------
     delete from tmp_nbu where kodf=kodf_ and datf= dat_;
     ---------------------------------------------------
