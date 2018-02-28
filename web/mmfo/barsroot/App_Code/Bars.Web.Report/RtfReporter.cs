@@ -271,10 +271,13 @@ namespace Bars.Web.Report
                     clob.Close();
                     clob.Dispose();
                 }
-               
 
-                _reader.Close();
-                _reader.Dispose();
+
+                if (_reader != null)
+                {
+                    _reader.Close();
+                    _reader.Dispose();
+                }
                 _cmd.Dispose();
                 if (_con.State != ConnectionState.Closed) _con.Close();
                 _con.Dispose();
@@ -335,7 +338,11 @@ namespace Bars.Web.Report
             }
             finally
             {
-                if (null != _reader) _reader.Dispose();
+                if (null != _reader)
+                {
+                    _reader.Close();
+                    _reader.Dispose();
+                }
                 _cmd.Dispose();
                 if (_con.State != ConnectionState.Closed) _con.Close();
                 _con.Dispose();
@@ -378,8 +385,10 @@ namespace Bars.Web.Report
                     return;
                 }
 
-                OracleClob clob = _reader.GetOracleClob(1);
-                _strBuf = clob.Value;
+                using (OracleClob clob = _reader.GetOracleClob(1))
+                {
+                    _strBuf = clob.Value;
+                }
 
                 _reader.Close();
 
@@ -392,7 +401,11 @@ namespace Bars.Web.Report
             }
             finally
             {
-                if (null != _reader) _reader.Dispose();
+                if (null != _reader)
+                {
+                    _reader.Close();
+                    _reader.Dispose();
+                }
                 _cmd.Dispose();
                 if (_con.State != ConnectionState.Closed) _con.Close();
                 _con.Dispose();
@@ -435,9 +448,10 @@ namespace Bars.Web.Report
                     return;
                 }
 
-                OracleClob clob = _reader.GetOracleClob(1);
-                _strBuf = clob.Value;
-
+                using (OracleClob clob = _reader.GetOracleClob(1))
+                {
+                    _strBuf = clob.Value;
+                }
 
 
                 /// записуємо буфер у файл
@@ -449,8 +463,11 @@ namespace Bars.Web.Report
             }
             finally
             {
-                _reader.Close();
-                _reader.Dispose();
+                if (_reader != null)
+                {
+                    _reader.Close();
+                    _reader.Dispose();
+                }
                 _cmd.Dispose();
                 if (_con.State != ConnectionState.Closed) _con.Close();
                 _con.Dispose();
@@ -464,9 +481,10 @@ namespace Bars.Web.Report
         {
             if (_isTemplateCompressed)
             {	// сначала распакуем
-                StreamWriter sw = File.CreateText(_strTempFile);
-                sw.Write(_strBuf);
-                sw.Close();
+                using (StreamWriter sw = File.CreateText(_strTempFile))
+                {
+                    sw.Write(_strBuf);
+                }
                 // конвертируем в бинарный вид
                 ToBin(_strTempFile);
                 // распакуем архив
@@ -474,9 +492,10 @@ namespace Bars.Web.Report
             }
             else
             {	// пишем как есть
-                StreamWriter sw = File.CreateText(_strTemplateFile);
-                sw.Write(_strBuf);
-                sw.Close();
+                using (StreamWriter sw = File.CreateText(_strTemplateFile))
+                {
+                    sw.Write(_strBuf);
+                }
             }
         }
         /// <summary>
@@ -563,6 +582,7 @@ namespace Bars.Web.Report
             {
                 datfile.Close();
                 parfile.Close();
+                _cmd.Dispose();
             }
         }
         /// <summary>

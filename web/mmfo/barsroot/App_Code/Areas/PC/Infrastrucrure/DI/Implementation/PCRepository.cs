@@ -54,58 +54,57 @@ namespace BarsWeb.Areas.PC.Infrastructure.Repository.DI.Implementation
 
             while (true)
             {
-                OracleConnection connection = OraConnector.Handler.UserConnection;
-                var trans = connection.BeginTransaction();
-                OracleCommand commandImport = new OracleCommand(proc, connection);
-                commandImport.CommandType = CommandType.StoredProcedure;
-
-                commandImport.Parameters.Add("p_mode", OracleDbType.Int32, id, ParameterDirection.Input);
-                commandImport.Parameters.Add("p_filename", OracleDbType.Varchar2, 100, null, ParameterDirection.Output);
-                commandImport.Parameters.Add("p_filebody", OracleDbType.Clob, null, ParameterDirection.Output);
-                commandImport.Parameters.Add("p_msg", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output);
-
-                commandImport.ExecuteNonQuery();
-
-                //var p = new DynamicParameters();
-                //p.Add("p_filename", dbType: DbType.String, direction: ParameterDirection.Output, size: 100);
-                //p.Add("p_filebody", OracleDbType.Clob, direction: ParameterDirection.Output);
-                //p.Add("p_msg", dbType: DbType.String, direction: ParameterDirection.Output, size: 500);
-
-                //sql = @"begin " + proc + ";" + " end;";
-
-                //using (var connection = OraConnector.Handler.UserConnection)
-                //{
-                //    connection.Execute(sql, p);
-                //}
-
-                string fileName = Convert.ToString(commandImport.Parameters["p_filename"].Value);
-                OracleClob Body = (OracleClob)commandImport.Parameters["p_filebody"].Value;
-                
-                //string fileBody = (string)Body.Value;
-                // Есть вероятность что данная реализация работает только для файлов с кодеровкой UTF-8
-                string fileBody = Encoding.UTF8.GetString(Encoding.GetEncoding(1251).GetBytes(Body.Value));
-
-                if (fileName != "null")
+                using (OracleConnection connection = OraConnector.Handler.UserConnection)
+                using (OracleTransaction trans = connection.BeginTransaction())
+                using (OracleCommand commandImport = new OracleCommand(proc, connection))
                 {
-                    /*XmlDocument xdoc = new XmlDocument();
-                    xdoc.LoadXml(fileBody);
-                    xdoc.Save(path + "\\" + fileName);*/
-                    File.WriteAllText(path + "\\" + fileName, fileBody);
-                    trans.Commit();
-                    count++;
-                    connection.Close();
-                }
-                else
-                {
-                    if (count != 0)
-                        message = "Файли успішно сформовано.";
-                    else
-                        message = "Дані для формування файлів відсутні.";
-                    trans.Commit();
-                    connection.Close();
-                    break;
-                }
+                    commandImport.CommandType = CommandType.StoredProcedure;
 
+                    commandImport.Parameters.Add("p_mode", OracleDbType.Int32, id, ParameterDirection.Input);
+                    commandImport.Parameters.Add("p_filename", OracleDbType.Varchar2, 100, null,
+                        ParameterDirection.Output);
+                    commandImport.Parameters.Add("p_filebody", OracleDbType.Clob, null, ParameterDirection.Output);
+                    commandImport.Parameters.Add("p_msg", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output);
+
+                    commandImport.ExecuteNonQuery();
+
+                    //var p = new DynamicParameters();
+                    //p.Add("p_filename", dbType: DbType.String, direction: ParameterDirection.Output, size: 100);
+                    //p.Add("p_filebody", OracleDbType.Clob, direction: ParameterDirection.Output);
+                    //p.Add("p_msg", dbType: DbType.String, direction: ParameterDirection.Output, size: 500);
+
+                    //sql = @"begin " + proc + ";" + " end;";
+
+                    //using (var connection = OraConnector.Handler.UserConnection)
+                    //{
+                    //    connection.Execute(sql, p);
+                    //}
+
+                    string fileName = Convert.ToString(commandImport.Parameters["p_filename"].Value);
+                    using (OracleClob Body = (OracleClob) commandImport.Parameters["p_filebody"].Value)
+                    {
+
+                        //string fileBody = (string)Body.Value;
+                        // Есть вероятность что данная реализация работает только для файлов с кодеровкой UTF-8
+                        string fileBody = Encoding.UTF8.GetString(Encoding.GetEncoding(1251).GetBytes(Body.Value));
+
+                        if (fileName != "null")
+                        {
+                            /*XmlDocument xdoc = new XmlDocument();
+                            xdoc.LoadXml(fileBody);
+                            xdoc.Save(path + "\\" + fileName);*/
+                            File.WriteAllText(path + "\\" + fileName, fileBody);
+                            count++;
+                            trans.Commit();
+                        }
+                        else
+                        {
+                            message = count != 0 ? "Файли успішно сформовано." : "Дані для формування файлів відсутні.";
+                            trans.Commit();
+                            break;
+                        }
+                    }
+                }
             }
             return message;
         }

@@ -32,9 +32,12 @@ namespace Bars.Classes
             {
                 connect = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
 
-                OracleCommand cmdSetRole = connect.CreateCommand();
-                cmdSetRole.CommandText = Bars.Classes.OraConnector.Handler.IOraConnection.GetSetRoleCommand("DPT_ROLE");
-                cmdSetRole.ExecuteNonQuery();
+                using (OracleCommand cmdSetRole = connect.CreateCommand())
+                {
+                    cmdSetRole.CommandText =
+                        Bars.Classes.OraConnector.Handler.IOraConnection.GetSetRoleCommand("DPT_ROLE");
+                    cmdSetRole.ExecuteNonQuery();
+                }
 
                 if (Directory.Exists(mainDir))
                 {
@@ -45,31 +48,40 @@ namespace Bars.Classes
                 Directory.CreateDirectory(mainDir);
                 TempFile = mainDir + "\\report.mht";
 
-                OracleCommand cmdSelectContractText = connect.CreateCommand();
-                cmdSelectContractText.InitialLONGFetchSize = 1000000;
+                using (OracleCommand cmdSelectContractText = connect.CreateCommand())
+                {
+                    cmdSelectContractText.InitialLONGFetchSize = 1000000;
 
-                cmdSelectContractText.CommandText = "select nd, text,id,version,adds from cc_docs where nd = :dptid and id=:template and adds=0 order by version desc";
-                cmdSelectContractText.Parameters.Add("dptid", OracleDbType.Decimal, dpt_id, ParameterDirection.Input);
-                cmdSelectContractText.Parameters.Add("template", OracleDbType.Varchar2, template, ParameterDirection.Input);
+                    cmdSelectContractText.CommandText =
+                        "select nd, text,id,version,adds from cc_docs where nd = :dptid and id=:template and adds=0 order by version desc";
+                    cmdSelectContractText.Parameters.Add("dptid", OracleDbType.Decimal, dpt_id,
+                        ParameterDirection.Input);
+                    cmdSelectContractText.Parameters.Add("template", OracleDbType.Varchar2, template,
+                        ParameterDirection.Input);
 
-                OracleDataReader rdr = cmdSelectContractText.ExecuteReader();
+                    using (OracleDataReader rdr = cmdSelectContractText.ExecuteReader())
+                    {
 
-                if (!rdr.Read())
-                    throw new Bars.Exception.BarsException("ORA-20008:Текст договору не знайдено!");
+                        if (!rdr.Read())
+                            throw new Bars.Exception.BarsException("ORA-20008:Текст договору не знайдено!");
 
-                clob = rdr.GetOracleClob(1);
-                char[] ContractText = clob.Value.ToCharArray();
-                StreamWriter sw = new StreamWriter(TempFile);
-                sw.Write(ContractText);
-                sw.Close();
-                rdr.Close();
-                rdr.Dispose();
+                        clob = rdr.GetOracleClob(1);
+                        char[] ContractText = clob.Value.ToCharArray();
+                        using (StreamWriter sw = new StreamWriter(TempFile))
+                        {
+                            sw.Write(ContractText);
+                        }
+                    }
+                }
                 return TempFile;
             }
             finally
             {
-                clob.Close();
-                clob.Dispose();
+                if (clob != null)
+                {
+                    clob.Close();
+                    clob.Dispose();
+                }
 
                 if (connect.State != ConnectionState.Closed)
                 { connect.Close(); connect.Dispose(); }
@@ -88,9 +100,12 @@ namespace Bars.Classes
             {
                 connect = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
 
-                OracleCommand cmdSetRole = connect.CreateCommand();
-                cmdSetRole.CommandText = Bars.Classes.OraConnector.Handler.IOraConnection.GetSetRoleCommand("DEP_SKRN");
-                cmdSetRole.ExecuteNonQuery();
+                using (OracleCommand cmdSetRole = connect.CreateCommand())
+                {
+                    cmdSetRole.CommandText =
+                        Bars.Classes.OraConnector.Handler.IOraConnection.GetSetRoleCommand("DEP_SKRN");
+                    cmdSetRole.ExecuteNonQuery();
+                }
 
                 if (Directory.Exists(mainDir))
                 {
@@ -101,32 +116,41 @@ namespace Bars.Classes
                 Directory.CreateDirectory(mainDir);
                 TempFile = mainDir + "\\report.rtf";
 
-                OracleCommand cmdSelectContractText = connect.CreateCommand();
-                cmdSelectContractText.InitialLONGFetchSize = 1000000;
+                using (OracleCommand cmdSelectContractText = connect.CreateCommand())
+                {
+                    cmdSelectContractText.InitialLONGFetchSize = 1000000;
 
-                cmdSelectContractText.CommandText = "select nd, text,id,version,adds from cc_docs where nd = :nd and id=:id and adds=:adds order by version desc";
-                cmdSelectContractText.Parameters.Add("nd", OracleDbType.Decimal, nd, ParameterDirection.Input);
-                cmdSelectContractText.Parameters.Add("id", OracleDbType.Varchar2, template, ParameterDirection.Input);
-                cmdSelectContractText.Parameters.Add("adds", OracleDbType.Decimal, adds, ParameterDirection.Input);
+                    cmdSelectContractText.CommandText =
+                        "select nd, text,id,version,adds from cc_docs where nd = :nd and id=:id and adds=:adds order by version desc";
+                    cmdSelectContractText.Parameters.Add("nd", OracleDbType.Decimal, nd, ParameterDirection.Input);
+                    cmdSelectContractText.Parameters.Add("id", OracleDbType.Varchar2, template,
+                        ParameterDirection.Input);
+                    cmdSelectContractText.Parameters.Add("adds", OracleDbType.Decimal, adds, ParameterDirection.Input);
 
-                OracleDataReader rdr = cmdSelectContractText.ExecuteReader();
+                    using (OracleDataReader rdr = cmdSelectContractText.ExecuteReader())
+                    {
 
-                if (!rdr.Read())
-                    throw new Exception.BarsException("Текст договору не знайдено!");
+                        if (!rdr.Read())
+                            throw new Exception.BarsException("Текст договору не знайдено!");
 
-                clob = rdr.GetOracleClob(1);
-                char[] ContractText = clob.Value.ToCharArray();
-                StreamWriter sw = new StreamWriter(TempFile, false, System.Text.Encoding.GetEncoding(1251));
-                sw.Write(ContractText);
-                sw.Close();
-                rdr.Close();
-                rdr.Dispose();
+                        clob = rdr.GetOracleClob(1);
+                        char[] ContractText = clob.Value.ToCharArray();
+                        using (StreamWriter sw = new StreamWriter(TempFile, false,
+                            System.Text.Encoding.GetEncoding(1251)))
+                        {
+                            sw.Write(ContractText);
+                        }
+                    }
+                }
                 return TempFile;
             }
             finally
             {
-                clob.Close();
-                clob.Dispose();
+                if (clob != null)
+                {
+                    clob.Close();
+                    clob.Dispose();
+                }
 
                 if (connect.State != ConnectionState.Closed)
                 { connect.Close(); connect.Dispose(); }

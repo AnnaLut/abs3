@@ -190,7 +190,12 @@ namespace Bars.Oracle
             if (oracleParameter.Value is OracleString)
                 return GetString((OracleString)oracleParameter.Value);
             if (oracleParameter.Value is OracleClob)
-                return GetString((OracleClob)oracleParameter.Value);
+            {
+                using (OracleClob clob = oracleParameter.Value as OracleClob)
+                {
+                    return GetString(clob);
+                }
+            }
 
             throw new InvalidCastException(String.Format("Unable to convert parameter {0} from type {1} to {2}", _parameterName, oracleParameter.Value.GetType(), typeof(String)));
         }

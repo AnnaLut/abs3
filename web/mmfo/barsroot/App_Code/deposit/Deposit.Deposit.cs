@@ -510,12 +510,14 @@ public class Deposit
             connect = conn.GetUserConnection();
 
             // Открываем соединение с БД
-            
+
             // Устанавливаем роль
-            OracleCommand cmdSetRole = new OracleCommand();
-            cmdSetRole.Connection = connect;
-            cmdSetRole.CommandText = conn.GetSetRoleCommand("DPT_ROLE");
-            cmdSetRole.ExecuteNonQuery();
+            using (OracleCommand cmdSetRole = new OracleCommand())
+            {
+                cmdSetRole.Connection = connect;
+                cmdSetRole.CommandText = conn.GetSetRoleCommand("DPT_ROLE");
+                cmdSetRole.ExecuteNonQuery();
+            }
 
             WriteContractText(connect, ctx, _templates);
 
@@ -546,12 +548,14 @@ public class Deposit
             connect = conn.GetUserConnection();
 
             // Открываем соединение с БД
-            
+
             // Устанавливаем роль
-            OracleCommand cmdSetRole = new OracleCommand();
-            cmdSetRole.Connection = connect;
-            cmdSetRole.CommandText = conn.GetSetRoleCommand("DPT_ROLE");
-            cmdSetRole.ExecuteNonQuery();
+            using (OracleCommand cmdSetRole = new OracleCommand())
+            {
+                cmdSetRole.Connection = connect;
+                cmdSetRole.CommandText = conn.GetSetRoleCommand("DPT_ROLE");
+                cmdSetRole.ExecuteNonQuery();
+            }
 
             WriteContractText(connect, ctx);
 
@@ -584,31 +588,38 @@ public class Deposit
             connect = conn.GetUserConnection();
 
             // Открываем соединение с БД
-            
+
             // Устанавливаем роль
-            OracleCommand cmdSetRole = connect.CreateCommand();
-            cmdSetRole.CommandText = conn.GetSetRoleCommand("DPT_ROLE");
-            cmdSetRole.ExecuteNonQuery();
+            using (OracleCommand cmdSetRole = connect.CreateCommand())
+            {
+                cmdSetRole.CommandText = conn.GetSetRoleCommand("DPT_ROLE");
+                cmdSetRole.ExecuteNonQuery();
+            }
 
             /// Формуємо відсоткову ставку
             if (BankType.GetCurrentBank() == BANKTYPE.PRVX ||
                      BankType.GetCurrentBank() == BANKTYPE.SBER)
             {
                 Decimal dummy = Decimal.MinValue;
-                OracleCommand cmd = connect.CreateCommand();
-                cmd.CommandText = "begin dpt_bonus.set_bonus_rate_web(:p_dptid,trunc(sysdate),:newRate); end;";
-                cmd.Parameters.Add("p_dptid", OracleDbType.Decimal, this.ID, ParameterDirection.Input);
-                cmd.Parameters.Add("newRate", OracleDbType.Decimal, dummy, ParameterDirection.Input);
+                using (OracleCommand cmd = connect.CreateCommand())
+                {
+                    cmd.CommandText = "begin dpt_bonus.set_bonus_rate_web(:p_dptid,trunc(sysdate),:newRate); end;";
+                    cmd.Parameters.Add("p_dptid", OracleDbType.Decimal, this.ID, ParameterDirection.Input);
+                    cmd.Parameters.Add("newRate", OracleDbType.Decimal, dummy, ParameterDirection.Input);
 
-                cmd.ExecuteNonQuery();
+                    cmd.ExecuteNonQuery();
+                }
             }
 
-            OracleCommand cmdSelTemplate = new OracleCommand();
-            cmdSelTemplate.Connection = connect;
-            cmdSelTemplate.CommandText = "select id from dpt_vidd_scheme where vidd = :vidd and flags = :flag";
-            cmdSelTemplate.Parameters.Add("vidd", OracleDbType.Decimal, this.Type, ParameterDirection.Input);
-            cmdSelTemplate.Parameters.Add("flag", OracleDbType.Decimal, 1, ParameterDirection.Input);
-            string template = (string)cmdSelTemplate.ExecuteScalar();
+            string template;
+            using (OracleCommand cmdSelTemplate = new OracleCommand())
+            {
+                cmdSelTemplate.Connection = connect;
+                cmdSelTemplate.CommandText = "select id from dpt_vidd_scheme where vidd = :vidd and flags = :flag";
+                cmdSelTemplate.Parameters.Add("vidd", OracleDbType.Decimal, this.Type, ParameterDirection.Input);
+                cmdSelTemplate.Parameters.Add("flag", OracleDbType.Decimal, 1, ParameterDirection.Input);
+                template = (string) cmdSelTemplate.ExecuteScalar();
+            }
 
             RtfReporter rep = new RtfReporter(ctx);
             rep.RoleList = "reporter,dpt_role,cc_doc";

@@ -833,6 +833,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 }
 
                 connection.Close();
+                connection.Dispose();
             }
         }
         /// <summary>
