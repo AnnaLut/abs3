@@ -243,8 +243,10 @@ namespace Bars
                     res = ((OracleDecimal)cmdTrans.Parameters["p_TransactionResult"].Value).Value;
                     if (res == -1)
                     {
-                        OracleBlob p_resp = (OracleBlob)cmdTrans.Parameters["p_resp"].Value;
-                        responseBytes = p_resp.IsNull ? null : p_resp.Value;
+                        using (OracleBlob p_resp = (OracleBlob)cmdTrans.Parameters["p_resp"].Value)
+                        {
+                            responseBytes = p_resp.IsNull ? null : p_resp.Value;
+                        }
                     }
                 }
             }

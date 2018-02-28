@@ -245,11 +245,10 @@ namespace Bars.W4
             }
             else
             {
-                OracleClob TicketBodyClob = (OracleClob)parameters[6].Value;
-                P_TICKETBODY = TicketBodyClob.Value;
-
-                TicketBodyClob.Close();
-                TicketBodyClob.Dispose();
+                using (OracleClob TicketBodyClob = (OracleClob)parameters[6].Value)
+                {
+                    P_TICKETBODY = TicketBodyClob.Value;
+                }
             }
             this.CloseConnection();
         }

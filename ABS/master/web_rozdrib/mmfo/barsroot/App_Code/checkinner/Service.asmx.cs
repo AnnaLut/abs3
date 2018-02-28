@@ -225,77 +225,72 @@ namespace BarsWeb.CheckInner
             MakeData4VisaResult Result = new MakeData4VisaResult();
             String XmlDataDecoded = MakeInputXml(grpId, "", refs).InnerXml;
 
-            OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
-            OracleCommand cmd = con.CreateCommand();
-            OracleTransaction trz = con.BeginTransaction();
-
-            try
+            using (OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection())
+            using (OracleCommand cmd = con.CreateCommand())
+            using (OracleTransaction trz = con.BeginTransaction())
             {
-                // записываем клоб по частям
-                cmd.CommandText = "insert into tmp_lob (id, strdata) values (:p_id, :p_strdata)";
-                for (Int32 i = 0; i <= XmlDataDecoded.Length / CLOB_PIECE_SIZE; i++)
+                try
                 {
-                    String StrData = XmlDataDecoded.Substring(i * CLOB_PIECE_SIZE, Math.Min(XmlDataDecoded.Length - i * CLOB_PIECE_SIZE, CLOB_PIECE_SIZE));
-
-                    cmd.Parameters.Clear();
-                    cmd.Parameters.Add("p_id", OracleDbType.Int32, i, ParameterDirection.Input);
-                    cmd.Parameters.Add("p_strdata", OracleDbType.Varchar2, StrData, ParameterDirection.Input);
-                    cmd.ExecuteNonQuery();
-                }
-
-                // собираем клоб и передаем в процедуру, разбираем результат
-                cmd.CommandText = "declare l_in_data  clob; l_out_data clob; begin bars_lob.import_clob(l_in_data); bars_lob.clear_temporary; chk.make_data4visa_xml(l_in_data, l_out_data); bars_lob.export_clob(l_out_data); end;";
-                cmd.Parameters.Clear();
-                cmd.ExecuteNonQuery();
-
-                // собираем клоб по частям
-                cmd.CommandText = "select l.id, l.strdata from tmp_lob l order by l.id";
-                cmd.Parameters.Clear();
-
-                String OutXmlData = String.Empty;
-                OracleDataReader rdr = cmd.ExecuteReader();
-                while (rdr.Read())
-                {
-                    OutXmlData += (String)rdr["strdata"];
-                }
-                rdr.Close();
-
-                // закрываем транзакцию
-                trz.Commit();
-
-                // разбираем ответ
-                XmlDocument DotNetXml = new XmlDocument();
-                DotNetXml.InnerXml = OutXmlData;
-                Result.DataXml = OutXmlData;
-                XmlNodeList NdList = DotNetXml.GetElementsByTagName("doc");
-
-                Int16 OkCnt = 0;
-                for (int i = 0; i < NdList.Count; i++)
-                {
-                    if (NdList.Item(i).Attributes["err"].InnerText != "0")
+                    // записываем клоб по частям
+                    cmd.CommandText = "insert into tmp_lob (id, strdata) values (:p_id, :p_strdata)";
+                    for (Int32 i = 0; i <= XmlDataDecoded.Length / CLOB_PIECE_SIZE; i++)
                     {
-                        Result.Code = "WARNING";
-                        Result.Text += String.Format("<BR>№{0}: <code style='FONT-SIZE: 10pt; COLOR: red'>{1}</code>", NdList.Item(i).Attributes["ref"].InnerText, NdList.Item(i).Attributes["erm"].InnerText);
+                        String StrData = XmlDataDecoded.Substring(i * CLOB_PIECE_SIZE, Math.Min(XmlDataDecoded.Length - i * CLOB_PIECE_SIZE, CLOB_PIECE_SIZE));
+
+                        cmd.Parameters.Clear();
+                        cmd.Parameters.Add("p_id", OracleDbType.Int32, i, ParameterDirection.Input);
+                        cmd.Parameters.Add("p_strdata", OracleDbType.Varchar2, StrData, ParameterDirection.Input);
+                        cmd.ExecuteNonQuery();
                     }
-                    else OkCnt++;
+
+                    // собираем клоб и передаем в процедуру, разбираем результат
+                    cmd.CommandText = "declare l_in_data  clob; l_out_data clob; begin bars_lob.import_clob(l_in_data); bars_lob.clear_temporary; chk.make_data4visa_xml(l_in_data, l_out_data); bars_lob.export_clob(l_out_data); end;";
+                    cmd.Parameters.Clear();
+                    cmd.ExecuteNonQuery();
+
+                    // собираем клоб по частям
+                    cmd.CommandText = "select l.id, l.strdata from tmp_lob l order by l.id";
+                    cmd.Parameters.Clear();
+
+                    String OutXmlData = String.Empty;
+                    using (OracleDataReader rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            OutXmlData += (String)rdr["strdata"];
+                        }
+                    }
+
+                    // закрываем транзакцию
+                    trz.Commit();
+
+                    // разбираем ответ
+                    XmlDocument DotNetXml = new XmlDocument();
+                    DotNetXml.InnerXml = OutXmlData;
+                    Result.DataXml = OutXmlData;
+                    XmlNodeList NdList = DotNetXml.GetElementsByTagName("doc");
+
+                    Int16 OkCnt = 0;
+                    for (int i = 0; i < NdList.Count; i++)
+                    {
+                        if (NdList.Item(i).Attributes["err"].InnerText != "0")
+                        {
+                            Result.Code = "WARNING";
+                            Result.Text += String.Format("<BR>№{0}: <code style='FONT-SIZE: 10pt; COLOR: red'>{1}</code>", NdList.Item(i).Attributes["ref"].InnerText, NdList.Item(i).Attributes["erm"].InnerText);
+                        }
+                        else OkCnt++;
+                    }
+
+                    // если нет ниодного хорошего документа, то статус ERROR
+                    if (OkCnt == 0) Result.Code = "ERROR";
                 }
-
-                // если нет ниодного хорошего документа, то статус ERROR
-                if (OkCnt == 0) Result.Code = "ERROR";
+                catch (System.Exception e)
+                {
+                    // откатываем транзакцию
+                    trz.Rollback();
+                    throw e;
+                }
             }
-            catch (System.Exception e)
-            {
-                // откатываем транзакцию
-                trz.Rollback();
-                throw e;
-            }
-            finally
-            {
-
-                con.Close();
-                con.Dispose();
-            }
-
             return Result;
         }
 
@@ -305,128 +300,126 @@ namespace BarsWeb.CheckInner
             VisaResult Result = new VisaResult();
             String XmlDataDecoded = HttpUtility.UrlDecode(XmlData);
 
-            OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
-            OracleCommand cmd = con.CreateCommand();
-            OracleTransaction trz = con.BeginTransaction();
-            try
+            using (OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection())
+            using (OracleCommand cmd = con.CreateCommand())
+            using (OracleTransaction trz = con.BeginTransaction())
             {
-                // записываем клоб по частям
-                cmd.CommandText = "insert into tmp_lob (id, strdata) values (:p_id, :p_strdata)";
-                for (Int32 i = 0; i <= XmlDataDecoded.Length / CLOB_PIECE_SIZE; i++)
+                try
                 {
-                    String StrData = XmlDataDecoded.Substring(i * CLOB_PIECE_SIZE, Math.Min(XmlDataDecoded.Length - i * CLOB_PIECE_SIZE, CLOB_PIECE_SIZE));
+                    // записываем клоб по частям
+                    cmd.CommandText = "insert into tmp_lob (id, strdata) values (:p_id, :p_strdata)";
+                    for (Int32 i = 0; i <= XmlDataDecoded.Length / CLOB_PIECE_SIZE; i++)
+                    {
+                        String StrData = XmlDataDecoded.Substring(i * CLOB_PIECE_SIZE, Math.Min(XmlDataDecoded.Length - i * CLOB_PIECE_SIZE, CLOB_PIECE_SIZE));
 
+                        cmd.Parameters.Clear();
+                        cmd.Parameters.Add("p_id", OracleDbType.Int32, i, ParameterDirection.Input);
+                        cmd.Parameters.Add("p_strdata", OracleDbType.Varchar2, StrData, ParameterDirection.Input);
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    // собираем клоб и передаем в процедуру, разбираем результат
+                    cmd.CommandText = "declare l_in_data  clob; l_out_data clob; begin bars_lob.import_clob(l_in_data); bars_lob.clear_temporary; chk.put_visas_xml(l_in_data, l_out_data); bars_lob.export_clob(l_out_data); end;";
                     cmd.Parameters.Clear();
-                    cmd.Parameters.Add("p_id", OracleDbType.Int32, i, ParameterDirection.Input);
-                    cmd.Parameters.Add("p_strdata", OracleDbType.Varchar2, StrData, ParameterDirection.Input);
                     cmd.ExecuteNonQuery();
-                }
 
-                // собираем клоб и передаем в процедуру, разбираем результат
-                cmd.CommandText = "declare l_in_data  clob; l_out_data clob; begin bars_lob.import_clob(l_in_data); bars_lob.clear_temporary; chk.put_visas_xml(l_in_data, l_out_data); bars_lob.export_clob(l_out_data); end;";
-                cmd.Parameters.Clear();
-                cmd.ExecuteNonQuery();
+                    // собираем клоб по частям
+                    cmd.CommandText = "select l.id, l.strdata from tmp_lob l order by l.id";
+                    cmd.Parameters.Clear();
 
-                // собираем клоб по частям
-                cmd.CommandText = "select l.id, l.strdata from tmp_lob l order by l.id";
-                cmd.Parameters.Clear();
+                    String OutXmlData = String.Empty;
+                    using (OracleDataReader rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            OutXmlData += (String)rdr["strdata"];
+                        }
+                    }
 
-                String OutXmlData = String.Empty;
-                OracleDataReader rdr = cmd.ExecuteReader();
-                while (rdr.Read())
-                {
-                    OutXmlData += (String)rdr["strdata"];
-                }
-                rdr.Close();
+                    // разбираем ответ
+                    System.Xml.XmlDocument DotNetXml = new System.Xml.XmlDocument();
+                    DotNetXml.InnerXml = OutXmlData;
+                    System.Xml.XmlNodeList NdList = DotNetXml.GetElementsByTagName("doc");
 
-                // разбираем ответ
-                System.Xml.XmlDocument DotNetXml = new System.Xml.XmlDocument();
-                DotNetXml.InnerXml = OutXmlData;
-                System.Xml.XmlNodeList NdList = DotNetXml.GetElementsByTagName("doc");
+                    // название выполняемой операции
+                    XmlNode docs4visa = DotNetXml.GetElementsByTagName("docs4visa")[0];
+                    String OperationName = String.Empty;
+                    switch (docs4visa.Attributes["par"].Value)
+                    {
+                        case "-1":
+                            OperationName = "повернуто";
+                            break;
+                        case "0":
+                            OperationName = "завізовано";
+                            break;
+                        default:
+                            OperationName = "сторновано";
+                            break;
+                    }
 
-                // название выполняемой операции
-                XmlNode docs4visa = DotNetXml.GetElementsByTagName("docs4visa")[0];
-                String OperationName = String.Empty;
-                switch (docs4visa.Attributes["par"].Value)
-                {
-                    case "-1": 
-                        OperationName = "повернуто";
-                        break;
-                    case "0":
-                        OperationName = "завізовано";
-                        break;
-                    default:
-                        OperationName = "сторновано";
-                        break;
-                }
+                    // формируем результат визирования
+                    String ResultText = String.Empty;
 
-                // формируем результат визирования
-                String ResultText = String.Empty;
+                    Int32 DocsCount = 0;
+                    Hashtable htDocsSum = new Hashtable();
 
-                Int32 DocsCount = 0;
-                Hashtable htDocsSum = new Hashtable();
-
-                cmd.CommandText = @"select o.ref, o.s / power(10, t.dig) as s, t.lcv, t.name as lcv_name
+                    cmd.CommandText = @"select o.ref, o.s / power(10, t.dig) as s, t.lcv, t.name as lcv_name
                                       from oper o, tabval t
                                      where o.ref = :p_ref
                                        and o.kv = t.kv";
 
-                cmd.Parameters.Clear();
-                cmd.Parameters.Add("p_ref", OracleDbType.Int64, ParameterDirection.Input);
+                    cmd.Parameters.Clear();
+                    cmd.Parameters.Add("p_ref", OracleDbType.Int64, ParameterDirection.Input);
 
-                for (int i = 0; i < NdList.Count; i++)
-                {
-                    // успешные документы отображаем общей суммой в разрезе валют
-                    if (NdList.Item(i).Attributes["err"].InnerText == "0")
+                    for (int i = 0; i < NdList.Count; i++)
                     {
-                        DocsCount++;
-
-                        cmd.Parameters["p_ref"].Value = Convert.ToInt64(NdList.Item(i).Attributes["ref"].InnerText);
-
-                        using (OracleDataReader rdr1 = cmd.ExecuteReader())
+                        // успешные документы отображаем общей суммой в разрезе валют
+                        if (NdList.Item(i).Attributes["err"].InnerText == "0")
                         {
-                            if (rdr1.Read())
+                            DocsCount++;
+
+                            cmd.Parameters["p_ref"].Value = Convert.ToInt64(NdList.Item(i).Attributes["ref"].InnerText);
+
+                            using (OracleDataReader rdr1 = cmd.ExecuteReader())
                             {
-                                if (!htDocsSum.Contains((String)rdr1["lcv"])) htDocsSum.Add((String)rdr1["lcv"], (Decimal)0);
-                                htDocsSum[(String)rdr1["lcv"]] = (Decimal)htDocsSum[(String)rdr1["lcv"]] + Convert.ToDecimal(rdr1["s"]);
+                                if (rdr1.Read())
+                                {
+                                    if (!htDocsSum.Contains((String)rdr1["lcv"])) htDocsSum.Add((String)rdr1["lcv"], (Decimal)0);
+                                    htDocsSum[(String)rdr1["lcv"]] = (Decimal)htDocsSum[(String)rdr1["lcv"]] + Convert.ToDecimal(rdr1["s"]);
+                                }
                             }
-                            rdr1.Close();
                         }
+                        else
+                        {
+                            ResultText += String.Format("<BR>№{0}: {1}", NdList.Item(i).Attributes["ref"].InnerText, NdList.Item(i).Attributes["erm"].InnerText);
+                        }
+                    }
+
+                    // если были успешные документы, то отображаем из первыми
+                    if (DocsCount > 0)
+                    {
+                        String DocsSumText = String.Empty;
+                        foreach (String key in htDocsSum.Keys)
+                        {
+                            DocsSumText += (!String.IsNullOrEmpty(DocsSumText) ? "; " : "") + String.Format("{0} - {1:### ### ### ### ### ### ### ##0.00#}", key, htDocsSum[key]);
+                        }
+
+                        Result.Text = String.Format("Успішно {0} {1} док. на суму {2}<BR/>{3}", OperationName, DocsCount, DocsSumText, ResultText);
                     }
                     else
                     {
-                        ResultText += String.Format("<BR>№{0}: {1}", NdList.Item(i).Attributes["ref"].InnerText, NdList.Item(i).Attributes["erm"].InnerText);
+                        Result.Text = ResultText;
                     }
-                }
 
-                // если были успешные документы, то отображаем из первыми
-                if (DocsCount > 0)
+                    // закрываем транзакцию
+                    trz.Commit();
+                }
+                catch (System.Exception e)
                 {
-                    String DocsSumText = String.Empty;
-                    foreach (String key in htDocsSum.Keys)
-                        DocsSumText += (!String.IsNullOrEmpty(DocsSumText) ? "; " : "") + String.Format("{0} - {1:### ### ### ### ### ### ### ##0.00#}", key, htDocsSum[key]);
-
-                    Result.Text = String.Format("Успішно {0} {1} док. на суму {2}<BR/>{3}", OperationName, DocsCount, DocsSumText, ResultText);
+                    // откатываем транзакцию
+                    trz.Rollback();
+                    throw e;
                 }
-                else
-                {
-                    Result.Text = ResultText;
-                }
-
-                // закрываем транзакцию
-                trz.Commit();
-            }
-            catch (System.Exception e)
-            {
-                // откатываем транзакцию
-                trz.Rollback();
-                throw e;
-            }
-            finally
-            {
-
-                con.Close();
-                con.Dispose();
             }
 
             return Result;

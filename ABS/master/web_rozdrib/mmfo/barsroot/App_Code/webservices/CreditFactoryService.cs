@@ -23,7 +23,7 @@ using Oracle.DataAccess.Types;
 /// <summary>
 /// Summary description for CreditFactoryService
 /// </summary>
-[WebService(Namespace = "http://tempuri.org/",Description="Взаємодія КФ/СМ з АБС")]
+[WebService(Namespace = "http://tempuri.org/", Description = "Взаємодія КФ/СМ з АБС")]
 [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 // To allow this Web Service to be called from script, using ASP.NET AJAX, uncomment the following line. 
 // [System.Web.Script.Services.ScriptService]
@@ -80,7 +80,7 @@ public class CreditFactoryService : Bars.BarsWebService
         Session["UserLoggedIn"] = true;
     }
 
-    [WebMethod(EnableSession = true, Description="Запис інформації про виданий кредит")]
+    [WebMethod(EnableSession = true, Description = "Запис інформації про виданий кредит")]
     [SoapHeader("WsHeaderValue", Direction = SoapHeaderDirection.InOut)]
     public XmlNode KF_CREDIT_Registation_RemoteRequest(String DBRANCH, decimal DNUM, String ACCNUM, String DCLASS, String DVKR, decimal DSUM, decimal KV, String DDATE)
     {
@@ -89,13 +89,13 @@ public class CreditFactoryService : Bars.BarsWebService
 
         Boolean isAuthenticated = CustomAuthentication.AuthenticateUser(userName, password, true);
         if (isAuthenticated) LoginUser(userName);
-        
+
         IOraConnection icon = (IOraConnection)Context.Application["OracleConnectClass"];
         OracleConnection con = icon.GetUserConnection(Context);
         OracleCommand cmd = con.CreateCommand();
 
         cmd.CommandType = System.Data.CommandType.StoredProcedure;
-        
+
         XmlDocument doc = new XmlDocument();
 
         XmlElement root = doc.CreateElement("KF_CREDIT_Registation_RemoteResponse");
@@ -123,7 +123,7 @@ public class CreditFactoryService : Bars.BarsWebService
         }
         catch (OracleException e)
         {
-            response.InnerText = "Error: " + e.Message; 
+            response.InnerText = "Error: " + e.Message;
         }
         finally
         {
@@ -134,7 +134,7 @@ public class CreditFactoryService : Bars.BarsWebService
         return doc;
     }
 
-    [WebMethod(EnableSession = true,Description="Список всіх кредитів по клієнту")]
+    [WebMethod(EnableSession = true, Description = "Список всіх кредитів по клієнту")]
     [SoapHeader("WsHeaderValue", Direction = SoapHeaderDirection.InOut)]
     public XmlNode KF_CREDITS_RemoteRequest(String OKPO, String PASPNUM, String BIRTHDATE)
     {
@@ -143,13 +143,13 @@ public class CreditFactoryService : Bars.BarsWebService
 
         Boolean isAuthenticated = CustomAuthentication.AuthenticateUser(userName, password, true);
         if (isAuthenticated) LoginUser(userName);
-        
+
         IOraConnection icon = (IOraConnection)Context.Application["OracleConnectClass"];
         OracleConnection con = icon.GetUserConnection(Context);
         OracleCommand cmd = con.CreateCommand();
 
         cmd.CommandType = System.Data.CommandType.StoredProcedure;
-        
+
         XmlDocument doc = new XmlDocument();
 
         XmlElement root = doc.CreateElement("KF_CREDITS_RemoteResponse");
@@ -166,19 +166,17 @@ public class CreditFactoryService : Bars.BarsWebService
 
             cmd.ExecuteNonQuery();
 
-            OracleClob res = (OracleClob)cmd.Parameters["p_responce"].Value;
-            string creditList = res.IsNull ? null : res.Value;
-
-            res.Close();
-            res.Dispose();
-
-            root.InnerXml = creditList;
+            using (OracleClob res = (OracleClob)cmd.Parameters["p_responce"].Value)
+            {
+                string creditList = res.IsNull ? null : res.Value;
+                root.InnerXml = creditList;
+            }
         }
-        catch(OracleException e)
+        catch (OracleException e)
         {
             root.InnerText = "Error: " + e.Message;
         }
-        finally 
+        finally
         {
             con.Close();
             con.Dispose();

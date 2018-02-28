@@ -98,16 +98,17 @@ namespace barsroot.cim
                 cmd.CommandText = "bars.sync.sync_parse";
                 cmd.ExecuteNonQuery();
 
-                var outData = cmd.Parameters["p_out_data"].Value as OracleClob;
-                var errors = cmd.Parameters["p_error"].Value as OracleClob;
-                var status = (OracleDecimal)cmd.Parameters["p_status"].Value;
-
-                return new Response<string>
+                using (OracleClob outData = cmd.Parameters["p_out_data"].Value as OracleClob,
+                                   errors = cmd.Parameters["p_error"].Value as OracleClob)
                 {
-                    Status = Convert.ToInt32(status.Value),
-                    ErrorMessage = (errors.IsNull)? (""):(errors.Value),
-                    StrData = (outData.IsNull) ? ("") : (outData.Value)
-                };
+                    OracleDecimal status = (OracleDecimal)cmd.Parameters["p_status"].Value;
+                    return new Response<string>
+                    {
+                        Status = Convert.ToInt32(status.Value),
+                        ErrorMessage = (errors.IsNull) ? ("") : (errors.Value),
+                        StrData = (outData.IsNull) ? ("") : (outData.Value)
+                    };
+                }
             }
             catch (Exception e)
             {

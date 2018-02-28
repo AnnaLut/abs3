@@ -108,10 +108,9 @@ namespace Bars.WebServices
                 string outResult = string.Empty;
 
                 // connect
-                OracleConnection con = OraConnector.Handler.UserConnection;
-                try
+                using (OracleConnection con = OraConnector.Handler.UserConnection)
+                using (OracleCommand cmd = con.CreateCommand())
                 {
-                    OracleCommand cmd = con.CreateCommand();
                     cmd.Parameters.Add("p_session_id", OracleDbType.Varchar2, Session.SessionID, ParameterDirection.Input);
                     cmd.Parameters.Add("p_user_id", OracleDbType.Varchar2, userMap.user_id, ParameterDirection.Input);
                     cmd.Parameters.Add("p_hostname", OracleDbType.Varchar2, HttpContext.Current.Request.UserHostAddress, ParameterDirection.Input);
@@ -123,28 +122,20 @@ namespace Bars.WebServices
                     cmd.ExecuteNonQuery();
                     Session["UserLoggedIn"] = true;
 
-
                     cmd.Parameters.Clear();
                     cmd.CommandText = "bars_xmlklb_imp.make_import";
                     cmd.Parameters.Add("p_indoc", OracleDbType.Clob, xmlData, ParameterDirection.Input);
                     cmd.Parameters.Add("p_packname", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output);
-                    cmd.Parameters.Add("p_outdoc", OracleDbType.Clob, "" , ParameterDirection.InputOutput);
+                    cmd.Parameters.Add("p_outdoc", OracleDbType.Clob, "", ParameterDirection.InputOutput);
 
                     cmd.ExecuteNonQuery();
 
-                    OracleClob clob = (OracleClob)cmd.Parameters["p_outdoc"].Value;
-
-                    if (!clob.IsNull)
-                        outResult = clob.Value;
-
-                    packName = Convert.ToString(cmd.Parameters["p_packname"].Value);
-
-                    cmd.Dispose();
-                }
-                finally
-                {
-                    con.Close();
-                    con.Dispose();
+                    using (OracleClob clob = (OracleClob)cmd.Parameters["p_outdoc"].Value)
+                    {
+                        if (!clob.IsNull)
+                            outResult = clob.Value;
+                        packName = Convert.ToString(cmd.Parameters["p_packname"].Value);
+                    }
                 }
 
                 nodeStatus.Value = "OK";
@@ -166,7 +157,7 @@ namespace Bars.WebServices
                 element.Attributes.SetNamedItem(nodeStatus);
 
                 if (debug)
-                {                                    	
+                {
                     element = xmlResult.CreateElement("ErrorStack");
                     errorText = xmlResult.CreateTextNode(ex.StackTrace);
                     element.AppendChild(errorText);
