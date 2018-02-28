@@ -172,7 +172,7 @@ public class Deposit
     /// </summary>
     public Client Client;
 
-    private readonly IDbLogger DBLogger; 
+    private readonly IDbLogger DBLogger;
 
     /// <summary>
     /// Конструктор класса
@@ -317,7 +317,7 @@ public class Deposit
             connect = conn.GetUserConnection();
 
             // Открываем соединение с БД
-            
+
             // Устанавливаем роль
             OracleCommand cmdSetRole = new OracleCommand();
             cmdSetRole.Connection = connect;
@@ -327,12 +327,12 @@ public class Deposit
             // Создаем договор
             DBLogger.Debug("Началась регистрация депозитного договора для клиента №"
                 + this.Client.ID.ToString(), "deposit");
-            
+
             WriteContract(connect);
-            
+
             DBLogger.Debug("Депозитный договор был успешно зарегистрирован под номером "
                 + this.ID.ToString(), "deposit");
-            
+
             // Запис додаткових реквізитів
             WriteDptField(connect);
             DBLogger.Debug("Доп.реквизиты депозитного договора №"
@@ -464,7 +464,7 @@ public class Deposit
             if (!rdr.IsDBNull(1))
                 p_acc = rdr.GetOracleDecimal(1).Value;
 
-            if (!rdr.IsClosed)rdr.Close();
+            if (!rdr.IsClosed) rdr.Close();
             rdr.Dispose();
 
             cmdGetAcc.Dispose();
@@ -505,7 +505,7 @@ public class Deposit
             connect = conn.GetUserConnection();
 
             // Открываем соединение с БД
-            
+
             // Устанавливаем роль
             OracleCommand cmdSetRole = new OracleCommand();
             cmdSetRole.Connection = connect;
@@ -541,7 +541,7 @@ public class Deposit
             connect = conn.GetUserConnection();
 
             // Открываем соединение с БД
-            
+
             // Устанавливаем роль
             OracleCommand cmdSetRole = new OracleCommand();
             cmdSetRole.Connection = connect;
@@ -579,7 +579,7 @@ public class Deposit
             connect = conn.GetUserConnection();
 
             // Открываем соединение с БД
-            
+
             // Устанавливаем роль
             OracleCommand cmdSetRole = connect.CreateCommand();
             cmdSetRole.CommandText = conn.GetSetRoleCommand("DPT_ROLE");
@@ -916,7 +916,7 @@ public class Deposit
             connect = conn.GetUserConnection();
 
             // Открываем соединение с БД
-            
+
             // Устанавливаем роль
             OracleCommand cmdSetRole = new OracleCommand();
             cmdSetRole.Connection = connect;
@@ -963,7 +963,7 @@ public class Deposit
             { connect.Close(); connect.Dispose(); }
         }
     }
-    
+
     /// <summary>
     /// Формуємо текст додатк. угоди і збегігаємо в БД (CC_DOCS)
     /// </summary>
@@ -979,7 +979,7 @@ public class Deposit
             connect = conn.GetUserConnection();
 
             // Открываем соединение с БД
-            
+
             // Устанавливаем роль
             OracleCommand cmdSetRole = connect.CreateCommand();
             cmdSetRole.CommandText = conn.GetSetRoleCommand("DPT_ROLE");
@@ -1161,7 +1161,7 @@ public class Deposit
     {
         ReadFromDatabaseExt(active, other, false);
     }
-    
+
     /// <summary>
     /// Читання з БД параметрів договору
     /// </summary>
@@ -1179,7 +1179,7 @@ public class Deposit
 
             IOraConnection conn = (IOraConnection)HttpContext.Current.Application["OracleConnectClass"];
             connect = conn.GetUserConnection();
-            
+
 
             OracleCommand cmdSetRole = connect.CreateCommand();
             cmdSetRole.CommandText = conn.GetSetRoleCommand("DPT_ROLE");
@@ -1192,7 +1192,7 @@ public class Deposit
                 RATE,DPT_STATUS,DPT_CURID,DPT_CURNAME,DPT_CURCODE,DPT_CUR_DENOM,DPT_AMOUNT,
                 DPT_SALDO,DPT_SALDO_PL,INT_SALDO,INT_SALDO_PL,
                 DPT_ACCID,DPT_ACCNUM,DPT_ACCNAME,INT_ACCID,INT_ACCNUM,INT_ACCNAME, DPT_NOCASH ";
-            
+
             if (active)
             {
                 if (all)
@@ -1299,7 +1299,7 @@ public class Deposit
                 if (!rdr.IsDBNull(33))
                 {
                     this.dpt_nocash = rdr.GetOracleString(33).Value;
-                    if (this.dpt_nocash == "1") 
+                    if (this.dpt_nocash == "1")
                         this.IsCashSum = false;
                     else
                         this.IsCashSum = true;
@@ -1340,7 +1340,7 @@ public class Deposit
         {
             IOraConnection conn = (IOraConnection)HttpContext.Current.Application["OracleConnectClass"];
             connect = conn.GetUserConnection();
-            
+
 
             OracleCommand cmdSetRole = connect.CreateCommand();
             cmdSetRole.CommandText = conn.GetSetRoleCommand("DPT_ROLE");
@@ -1416,7 +1416,7 @@ public class Deposit
             connect = conn.GetUserConnection();
 
             // Открываем соединение с БД
-            
+
 
             // Устанавливаем роль
             OracleCommand cmdSetRole = new OracleCommand();
@@ -1467,7 +1467,7 @@ public class Deposit
     /// </summary>
     /// <param name="ctx">контекст</param>
     /// <returns>Имя файла</returns>
-    public string  CreateContractTextFile(HttpContext ctx)
+    public string CreateContractTextFile(HttpContext ctx)
     {
         OracleConnection connect = new OracleConnection();
 
@@ -1483,7 +1483,7 @@ public class Deposit
             IOraConnection conn = (IOraConnection)ctx.Application["OracleConnectClass"];
             connect = conn.GetUserConnection();
 
-            
+
 
             OracleCommand cmdSetRole = new OracleCommand();
             cmdSetRole.Connection = connect;
@@ -1605,7 +1605,7 @@ public class Deposit
     public string CreateContractFooter(OracleConnection connect)
     {
         /// Поки не використовуємо
-         return String.Empty;
+        return String.Empty;
 
         //OracleCommand cmdSelTemplate = connect.CreateCommand();
         //cmdSelTemplate.CommandText = "select id from dpt_vidd_scheme where vidd = :vidd and flags = :flag";
@@ -1675,7 +1675,7 @@ public class Deposit
             IOraConnection conn = (IOraConnection)ctx.Application["OracleConnectClass"];
             connect = conn.GetUserConnection();
 
-            
+
 
             OracleCommand cmdSetRole = connect.CreateCommand();
             cmdSetRole.CommandText = conn.GetSetRoleCommand("DPT_ROLE");
@@ -1775,7 +1775,7 @@ public class Deposit
             connect = conn.GetUserConnection();
 
             // Открываем соединение с БД
-            
+
 
             // Устанавливаем роль
             OracleCommand cmdSetRole = new OracleCommand();
@@ -1815,7 +1815,7 @@ public class Deposit
             connect = conn.GetUserConnection();
 
             // Открываем соединение с БД
-            
+
 
             // Устанавливаем роль
             OracleCommand cmdSetRole = connect.CreateCommand();
@@ -1868,7 +1868,7 @@ public class Deposit
             connect = conn.GetUserConnection();
 
             // Открываем соединение с БД
-            
+
 
             // Устанавливаем роль
             OracleCommand cmdSetRole = connect.CreateCommand();
@@ -1912,7 +1912,7 @@ public class Deposit
         try
         {
             connect = OraConnector.Handler.IOraConnection.GetUserConnection();
-            
+
 
             OracleCommand cmdSetRole = connect.CreateCommand();
             cmdSetRole.CommandText = OraConnector.Handler.IOraConnection.GetSetRoleCommand("DPT_ROLE");
@@ -1944,7 +1944,7 @@ public class Deposit
         OracleConnection connect = new OracleConnection();
         try
         {
-            connect = OraConnector.Handler.IOraConnection.GetUserConnection();            
+            connect = OraConnector.Handler.IOraConnection.GetUserConnection();
 
             //OracleCommand cmdSetRole = connect.CreateCommand();
             //cmdSetRole.CommandText = OraConnector.Handler.IOraConnection.GetSetRoleCommand("DPT_ROLE");
@@ -1976,7 +1976,7 @@ public class Deposit
         try
         {
             connect = OraConnector.Handler.IOraConnection.GetUserConnection();
-            
+
 
             OracleCommand cmdSetRole = connect.CreateCommand();
             cmdSetRole.CommandText = OraConnector.Handler.IOraConnection.GetSetRoleCommand("DPT_ROLE");
@@ -2015,7 +2015,7 @@ public class Deposit
         try
         {
             connect = OraConnector.Handler.IOraConnection.GetUserConnection();
-            
+
 
             OracleCommand cmdSetRole = connect.CreateCommand();
             cmdSetRole.CommandText = OraConnector.Handler.IOraConnection.GetSetRoleCommand("DPT_ROLE");
@@ -2067,7 +2067,7 @@ public class Deposit
         try
         {
             connect = OraConnector.Handler.IOraConnection.GetUserConnection();
-            
+
 
             OracleCommand cmdSetRole = connect.CreateCommand();
             cmdSetRole.CommandText = OraConnector.Handler.IOraConnection.GetSetRoleCommand("DPT_ROLE");
@@ -2092,7 +2092,7 @@ public class Deposit
     /// <returns></returns>
     public String GetRestTT()
     {
-        String result = (this.RestReceiverMFO == BankType.GetOurMfo() ? 
+        String result = (this.RestReceiverMFO == BankType.GetOurMfo() ?
             this.GetTT(DPT_OP.OP_23, CASH.NO) :
             this.GetTT(DPT_OP.OP_26, CASH.NO));
 
@@ -2131,7 +2131,7 @@ public class Deposit
         try
         {
             connect = OraConnector.Handler.IOraConnection.GetUserConnection();
-            
+
 
             OracleCommand cmdSetRole = connect.CreateCommand();
             cmdSetRole.CommandText = OraConnector.Handler.IOraConnection.GetSetRoleCommand("DPT_ROLE");
@@ -2159,7 +2159,7 @@ public class Deposit
         try
         {
             connect = OraConnector.Handler.IOraConnection.GetUserConnection();
-            
+
 
             OracleCommand cmdSetRole = connect.CreateCommand();
             cmdSetRole.CommandText = OraConnector.Handler.IOraConnection.GetSetRoleCommand("DPT_ROLE");
@@ -2184,20 +2184,25 @@ public class Deposit
     /// </summary>
     /// <param name="dpt_id"></param>
     /// <returns></returns>
-    public static bool InheritedDeal(String dpt_id)
+    public static bool InheritedDeal(String dpt_id, OracleConnection con = null)
     {
-        OracleConnection connect = new OracleConnection();
+        if (null == con)
+            using (con = OraConnector.Handler.IOraConnection.GetUserConnection())
+            {
+                return ExecuteInheritedDeal(con, dpt_id);
+            }
+        else
+            return ExecuteInheritedDeal(con, dpt_id);
+    }
 
-        try
+    private static bool ExecuteInheritedDeal(OracleConnection con, string dpt_id)
+    {
+        using (OracleCommand cmdSetRole = con.CreateCommand(),
+                                   cmd = con.CreateCommand())
         {
-            connect = OraConnector.Handler.IOraConnection.GetUserConnection();
-            
-
-            OracleCommand cmdSetRole = connect.CreateCommand();
             cmdSetRole.CommandText = OraConnector.Handler.IOraConnection.GetSetRoleCommand("DPT_ROLE");
             cmdSetRole.ExecuteNonQuery();
 
-            OracleCommand cmd = connect.CreateCommand();
             cmd.CommandText = "select dpt_web.inherited_deal(:dpt_id, 1) from dual";
             cmd.Parameters.Add("dpt_id", OracleDbType.Decimal, dpt_id, ParameterDirection.Input);
 
@@ -2205,12 +2210,8 @@ public class Deposit
 
             return (res == "Y");
         }
-        finally
-        {
-            if (connect.State != ConnectionState.Closed)
-                connect.Close(); connect.Dispose();
-        }
     }
+
     /// <summary>
     /// перевірка на наявності депозиту в заставі по кредиту
     /// </summary>
@@ -2243,8 +2244,8 @@ public class Deposit
                 connect.Close(); connect.Dispose();
         }
     }
-   
-    
+
+
     /// <summary>
     /// розрахунок суми вкладу що належить вплатити спадкоємцю
     /// </summary>
@@ -2270,7 +2271,7 @@ public class Deposit
             cmd.Parameters.Add("inherit_id", OracleDbType.Decimal, inherit_id, ParameterDirection.Input);
             cmd.Parameters.Add("acc_id", OracleDbType.Decimal, acc_id, ParameterDirection.Input);
 
-            return (Convert.ToDecimal(Convert.ToString(cmd.ExecuteScalar())) / denom);          
+            return (Convert.ToDecimal(Convert.ToString(cmd.ExecuteScalar())) / denom);
         }
         finally
         {
@@ -2322,7 +2323,7 @@ public class Deposit
     /// <param name=""></param>
     /// <param name="p_vidd"></param>
     /// <returns></returns>
-    public  DateTime? GetDateEnd(Decimal p_vidd)
+    public DateTime? GetDateEnd(Decimal p_vidd)
     {
         OracleConnection connect = new OracleConnection();
 
@@ -2341,7 +2342,7 @@ public class Deposit
             cmd.Parameters.Add("p_dayscnt", OracleDbType.Decimal, 0, ParameterDirection.Input);
             cmd.Parameters.Add("p_dptype", OracleDbType.Decimal, p_vidd, ParameterDirection.Input);
             cmd.Parameters.Add("p_custid", OracleDbType.Decimal, this.Client.ID, ParameterDirection.Input);
-           
+
             String result = Convert.ToString(cmd.ExecuteScalar());
 
             DBLogger.Info("dpt.get_datend_uni result =" + result, "deposit");
@@ -2357,7 +2358,7 @@ public class Deposit
                 connect.Close(); connect.Dispose();
         }
     }
-    
+
     /// <summary>
     /// 
     /// </summary>
@@ -2372,7 +2373,7 @@ public class Deposit
         try
         {
             connect = OraConnector.Handler.IOraConnection.GetUserConnection();
-            
+
 
             OracleCommand cmdSetRole = connect.CreateCommand();
             cmdSetRole.CommandText = OraConnector.Handler.IOraConnection.GetSetRoleCommand("DPT_ROLE");
@@ -2410,7 +2411,7 @@ public class Deposit
         try
         {
             connect = OraConnector.Handler.IOraConnection.GetUserConnection();
-            
+
 
             OracleCommand cmdSetRole = connect.CreateCommand();
             cmdSetRole.CommandText = OraConnector.Handler.IOraConnection.GetSetRoleCommand("DPT_ROLE");
@@ -2449,7 +2450,7 @@ public class Deposit
         try
         {
             connect = OraConnector.Handler.IOraConnection.GetUserConnection();
-            
+
 
             OracleCommand cmdSetRole = connect.CreateCommand();
             cmdSetRole.CommandText = OraConnector.Handler.IOraConnection.GetSetRoleCommand("DPT_ROLE");
@@ -2479,13 +2480,13 @@ public class Deposit
         try
         {
             connect = OraConnector.Handler.IOraConnection.GetUserConnection();
-            
+
             OracleCommand cmdSetRole = connect.CreateCommand();
             cmdSetRole.CommandText = OraConnector.Handler.IOraConnection.GetSetRoleCommand("DPT_ROLE");
             cmdSetRole.ExecuteNonQuery();
 
             OracleCommand cmd = connect.CreateCommand();
-            
+
             cmd.CommandText = @"select count(*)
                 from v_dpt_vidd_tts t, dpt_deposit d 
                 where d.deposit_id = :dpt_id and d.vidd = t.dpttype_id
@@ -2517,8 +2518,8 @@ public class Deposit
 
         try
         {
-            connect= OraConnector.Handler.IOraConnection.GetUserConnection();
-            
+            connect = OraConnector.Handler.IOraConnection.GetUserConnection();
+
 
             OracleCommand cmdSetRole = connect.CreateCommand();
             cmdSetRole.CommandText = OraConnector.Handler.IOraConnection.GetSetRoleCommand("DPT_ROLE");
@@ -2548,7 +2549,7 @@ public class Deposit
         try
         {
             connect = OraConnector.Handler.IOraConnection.GetUserConnection();
-            
+
 
             OracleCommand cmdSetRole = connect.CreateCommand();
             cmdSetRole.CommandText = OraConnector.Handler.IOraConnection.GetSetRoleCommand("DPT_ROLE");
@@ -2566,8 +2567,8 @@ public class Deposit
                 connect.Close(); connect.Dispose();
         }
     }
-   
-    
+
+
     /// <summary>
     /// 
     /// </summary>
@@ -2717,7 +2718,7 @@ public class Deposit
 
                 cmd.Parameters.Add("p_dptid", OracleDbType.Decimal, dpt_id, ParameterDirection.Input);
 
-                cmd.ExecuteNonQuery();                
+                cmd.ExecuteNonQuery();
             }
 
             return result;
@@ -2728,7 +2729,7 @@ public class Deposit
                 connect.Close(); connect.Dispose();
         }
     }
-    
+
     /// <summary>
     /// Донарахування %% при виплаті після завершення по системну дату
     /// </summary>
@@ -2738,7 +2739,7 @@ public class Deposit
     {
         return ChargeInterest(dpt_id, null);
     }
-    
+
     /// <summary>
     /// Донарахування %% при виплаті після завершення по системну дату
     /// </summary>
@@ -2799,7 +2800,7 @@ public class Deposit
     /// Донарахування %% по депозиту
     /// </summary>
     /// <param name="dpt_id"></param>
-    public static void CheckCardPayoff(String payoff_type, String nls_a, Decimal kv, Decimal dpt_id, String tt )
+    public static void CheckCardPayoff(String payoff_type, String nls_a, Decimal kv, Decimal dpt_id, String tt)
     {
         OracleConnection connect = new OracleConnection();
 
@@ -2820,15 +2821,15 @@ public class Deposit
             if (payoff_type == "D")
                 cmd.CommandText += ((int)DPT_OP.OP_25).ToString() + ") ";
             else if (payoff_type == "P")
-                cmd.CommandText += ((int)DPT_OP.OP_45).ToString() + ") ";                    
+                cmd.CommandText += ((int)DPT_OP.OP_45).ToString() + ") ";
 
-            cmd.Parameters.Add("dpt_id", OracleDbType.Decimal, dpt_id, ParameterDirection.Input);            
+            cmd.Parameters.Add("dpt_id", OracleDbType.Decimal, dpt_id, ParameterDirection.Input);
 
             if (Convert.ToString(cmd.ExecuteScalar()) == tt)
             {
                 cmd.Parameters.Clear();
                 cmd.CommandText = "select dpt_web.get_payoffcardacc('P', :nlsa, :kv) from dual";
-                cmd.Parameters.Add("nlsa",OracleDbType.Varchar2, nls_a, ParameterDirection.Input);
+                cmd.Parameters.Add("nlsa", OracleDbType.Varchar2, nls_a, ParameterDirection.Input);
                 cmd.Parameters.Add("kv", OracleDbType.Decimal, kv, ParameterDirection.Input);
 
                 String result = Convert.ToString(cmd.ExecuteScalar());
@@ -2962,7 +2963,7 @@ public class Deposit
             cmdSetRole.ExecuteNonQuery();
 
             OracleCommand cmd = connect.CreateCommand();
-            
+
             OracleCommand cmdDepositInfo = new OracleCommand();
             cmdDepositInfo.Connection = connect;
             cmdDepositInfo.CommandText = "select a.ostb from dpt_deposit d, accounts a where d.deposit_id=:dpt_id and d.acc=a.acc";
@@ -2980,7 +2981,7 @@ public class Deposit
         }
         return false;
     }
-    
+
     /// <summary>
     /// Заповнення реквізитів повернення вкладу та %% даними карткового рахунка клієнта
     /// </summary>
@@ -2993,7 +2994,7 @@ public class Deposit
         try
         {
             IOraConnection conn = (IOraConnection)HttpContext.Current.Application["OracleConnectClass"];
-            
+
             connect = conn.GetUserConnection();
 
             OracleCommand cmdSQL = connect.CreateCommand();
@@ -3017,7 +3018,7 @@ public class Deposit
             {
                 cmdSQL.CommandText = @"select NLS, NMS from ACCOUNTS 
                     where NLS like '2625%' and RNK = :p_rnk and KV = :p_kv and DAZS is Null ";
-                
+
                 rdr = cmdSQL.ExecuteReader();
 
                 if (rdr.Read())
@@ -3153,60 +3154,14 @@ public class DepositAgreement
     /// <param name="ComissRef">Референс операції утримання комісії</param>
     /// <param name="ComissReqID">Референс запиту на відміну комісії</param>
     /// <returns>Ідентифікатор Додаткової Угоди</returns>
-    public static decimal Create( decimal DepositID, decimal AgreementCode, decimal CustomerRNK,
-        decimal TrusteeRNK, decimal? TrusteeID, 
-        string TransferDPT, string TransferINT, DateTime? DatBegin, DateTime? DatEnd, 
-        decimal? ComissRef, decimal? ComissReqID )
+    public static decimal Create(decimal DepositID, decimal AgreementCode, decimal CustomerRNK,
+        decimal TrusteeRNK, decimal? TrusteeID,
+        string TransferDPT, string TransferINT, DateTime? DatBegin, DateTime? DatEnd,
+        decimal? ComissRef, decimal? ComissReqID)
     {
-        OracleConnection connect = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
-
-        try
+        using (OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection())
         {
-            OracleCommand cmd = connect.CreateCommand();
-            
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.CommandText = "dpt_web.create_agreement";
-            cmd.BindByName = true;
-
-            cmd.Parameters.Add("p_dptid", OracleDbType.Decimal, DepositID, ParameterDirection.Input);
-            cmd.Parameters.Add("p_agrmnttype", OracleDbType.Decimal, AgreementCode, ParameterDirection.Input);
-            cmd.Parameters.Add("p_initcustid", OracleDbType.Decimal, CustomerRNK, ParameterDirection.Input);
-            cmd.Parameters.Add("p_trustcustid", OracleDbType.Decimal, TrusteeRNK, ParameterDirection.Input);
-            cmd.Parameters.Add("p_trustid", OracleDbType.Decimal, TrusteeID, ParameterDirection.Input);
-            cmd.Parameters.Add("p_transferdpt", OracleDbType.Clob, TransferDPT, ParameterDirection.Input);
-            cmd.Parameters.Add("p_transferint", OracleDbType.Clob, TransferINT, ParameterDirection.Input);
-            cmd.Parameters.Add("p_datbegin", OracleDbType.Date, DatBegin, ParameterDirection.Input);
-            cmd.Parameters.Add("p_datend", OracleDbType.Date, DatEnd, ParameterDirection.Input);
-
-            // ***
-            cmd.Parameters.Add("p_amountcash", OracleDbType.Decimal, null, ParameterDirection.Input);
-            cmd.Parameters.Add("p_amountcashless", OracleDbType.Decimal, null, ParameterDirection.Input);
-            cmd.Parameters.Add("p_ratereqid", OracleDbType.Decimal, null, ParameterDirection.Input);
-            cmd.Parameters.Add("p_ratevalue", OracleDbType.Decimal, null, ParameterDirection.Input);
-            cmd.Parameters.Add("p_ratedate", OracleDbType.Date, null, ParameterDirection.Input);
-            cmd.Parameters.Add("p_denomamount", OracleDbType.Decimal, null, ParameterDirection.Input);
-            cmd.Parameters.Add("p_denomcount", OracleDbType.Decimal, null, ParameterDirection.Input);
-            cmd.Parameters.Add("p_denomref", OracleDbType.Decimal, null, ParameterDirection.Input);
-            cmd.Parameters.Add("p_docref", OracleDbType.Decimal, null, ParameterDirection.Input);
-
-            cmd.Parameters.Add("p_comissref", OracleDbType.Decimal, ComissRef, ParameterDirection.Input);
-            cmd.Parameters.Add("p_comissreqid", OracleDbType.Decimal, ComissReqID, ParameterDirection.Input);
-            
-            cmd.Parameters.Add("p_agrmntid", OracleDbType.Decimal, ParameterDirection.Output);
-
-            cmd.ExecuteNonQuery();
-
-            decimal AgreementID = ((OracleDecimal)cmd.Parameters["p_agrmntid"].Value).Value;
-
-            DbLoggerConstruct.NewDbLogger().Debug("Користувач створив ДУ #" + AgreementID.ToString() + " з кодом " + 
-                AgreementCode.ToString() + " до депозитного договору #" + DepositID.ToString(), "deposit");
-            
-            return AgreementID;
-        }
-        finally
-        {
-            if (connect.State != ConnectionState.Closed)
-            { connect.Close(); connect.Dispose(); }
+            return ExecuteCreateAgreement(con, DepositID, AgreementCode, CustomerRNK, TrusteeRNK, TrusteeID, TransferDPT, TransferINT, DatBegin, DatEnd, ComissRef, ComissReqID, null, null);
         }
     }
 
@@ -3230,14 +3185,23 @@ public class DepositAgreement
     public static decimal Create(decimal DepositID, decimal AgreementCode, decimal CustomerRNK,
         decimal TrusteeRNK, decimal? TrusteeID,
         string TransferDPT, string TransferINT, DateTime? DatBegin, DateTime? DatEnd,
+        decimal? ComissRef, decimal? ComissReqID, decimal? Denomcount, decimal? Denomamount, OracleConnection con = null)
+    {
+        if (null == con)
+            using (con = OraConnector.Handler.IOraConnection.GetUserConnection())
+            {
+                return ExecuteCreateAgreement(con, DepositID, AgreementCode, CustomerRNK, TrusteeRNK, TrusteeID, TransferDPT, TransferINT, DatBegin, DatEnd, ComissRef, ComissReqID, Denomcount, Denomamount);
+            }
+        else
+            return ExecuteCreateAgreement(con, DepositID, AgreementCode, CustomerRNK, TrusteeRNK, TrusteeID, TransferDPT, TransferINT, DatBegin, DatEnd, ComissRef, ComissReqID, Denomcount, Denomamount);
+    }
+    private static decimal ExecuteCreateAgreement(OracleConnection con, decimal DepositID, decimal AgreementCode, decimal CustomerRNK,
+        decimal TrusteeRNK, decimal? TrusteeID,
+        string TransferDPT, string TransferINT, DateTime? DatBegin, DateTime? DatEnd,
         decimal? ComissRef, decimal? ComissReqID, decimal? Denomcount, decimal? Denomamount)
     {
-        OracleConnection connect = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
-
-        try
+        using (OracleCommand cmd = con.CreateCommand())
         {
-            OracleCommand cmd = connect.CreateCommand();
-
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.CommandText = "dpt_web.create_agreement";
             cmd.BindByName = true;
@@ -3270,17 +3234,15 @@ public class DepositAgreement
 
             cmd.ExecuteNonQuery();
 
-            decimal AgreementID = ((OracleDecimal)cmd.Parameters["p_agrmntid"].Value).Value;
+            OracleDecimal tmp = (OracleDecimal)cmd.Parameters["p_agrmntid"].Value;
+            decimal AgreementID = 0M;
+            if (!tmp.IsNull)
+                AgreementID = tmp.Value;
 
             DbLoggerConstruct.NewDbLogger().Debug("Користувач створив ДУ #" + AgreementID.ToString() + " з кодом " +
                 AgreementCode.ToString() + " до депозитного договору #" + DepositID.ToString(), "deposit");
 
             return AgreementID;
-        }
-        finally
-        {
-            if (connect.State != ConnectionState.Closed)
-            { connect.Close(); connect.Dispose(); }
         }
     }
     /// <summary>
@@ -3314,7 +3276,7 @@ public class DepositAgreement
 
             cmd.Parameters.Add("p_dptid", OracleDbType.Decimal, DepositID, ParameterDirection.Input);
             cmd.Parameters.Add("p_rnk", OracleDbType.Decimal, TrusteeRNK, ParameterDirection.Input);
-            
+
             OracleDataReader rdr = cmd.ExecuteReader();
 
             if (rdr.Read())
@@ -3349,6 +3311,54 @@ public class DepositAgreement
 
         return AllowedAmount;
     }
+    public static Decimal GetAllowedAmount(OracleConnection con, Decimal DepositID, Decimal TrusteeRNK)
+    {
+        String flags = String.Empty;
+        Decimal AllowedAmount = 0;
+
+        using (OracleCommand cmd = con.CreateCommand())
+        {
+
+            cmd.CommandText = @"select LPAD(to_char(da.DENOM_COUNT),4,'0'), da.DENOM_AMOUNT
+                                  from DPT_AGREEMENTS da
+                                 inner join DPT_TRUSTEE dt on (dt.id = da.trustee_id and dt.dpt_id = da.dpt_id)    
+                                 where da.dpt_id = :p_dptid
+                                   and da.agrmnt_type = 12
+                                   and da.agrmnt_state = 1
+                                   and da.date_end > TRUNC( SYSDATE ) 
+                                   and dt.typ_tr = 'T'
+                                   and dt.rnk_tr = :p_rnk 
+                                   and dt.fl_act = 1";
+
+            cmd.Parameters.Add("p_dptid", OracleDbType.Decimal, DepositID, ParameterDirection.Input);
+            cmd.Parameters.Add("p_rnk", OracleDbType.Decimal, TrusteeRNK, ParameterDirection.Input);
+
+            using (OracleDataReader rdr = cmd.ExecuteReader())
+            {
+                if (rdr.Read())
+                {
+                    if (!rdr.IsDBNull(0))
+                    {
+                        flags = rdr.GetOracleString(0).Value;
+                    }
+
+                    if (!rdr.IsDBNull(1))
+                    {
+                        // Якщо надано доступ на отримання коштів по завершенні або достроково
+                        if (flags.Substring(1, 1).Equals("1") || flags.Substring(2, 1).Equals("1"))
+                        {
+                            AllowedAmount = rdr.GetOracleDecimal(1).Value;
+                        }
+                        else
+                            throw new DepositException("Довіреній особі не надано право отримання коштів по договору!");
+                    }
+                }
+                else
+                    throw new DepositException("Не знайдено діючої ДУ про довіренісь на клієнта з РНК=" + TrusteeRNK.ToString());
+            }
+            return AllowedAmount;
+        }
+    }
 
     /// <summary>
     /// Доступні довіреній особі операції із договором
@@ -3365,10 +3375,10 @@ public class DepositAgreement
     /// <param name="AllowedFlag7"></param>
     /// <param name="AllowedFlag8"></param>
     public static void GetAllowedFlags(
-        Decimal DepositID, 
+        Decimal DepositID,
         Decimal TrusteeRNK,
         out Boolean? AllowedFlag1,
-        out Boolean? AllowedFlag2, 
+        out Boolean? AllowedFlag2,
         out Boolean? AllowedFlag3,
         out Boolean? AllowedFlag4,
         out Boolean? AllowedFlag5,
@@ -3478,7 +3488,7 @@ public enum DPT_OP
     /// <summary>
     /// Перерахування відсотків на картковий рах.
     /// </summary>
-    OP_45 = 45,   
+    OP_45 = 45,
     /// <summary>
     /// Повернення депозиту (готівкою)
     /// </summary>
