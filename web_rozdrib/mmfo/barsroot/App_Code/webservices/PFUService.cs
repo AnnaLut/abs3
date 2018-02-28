@@ -96,11 +96,10 @@ namespace Bars.WebServices
             try
             {
                 using (OracleConnection connection = new OracleConnection("Data Source=COBUMMFO_DEV;User Id=pfu;Password=pfu"))
+                using (OracleCommand command = new OracleCommand("PFU_PKG_TRANSP_CA.a_hlp_ree_apply", connection) { CommandType = CommandType.StoredProcedure })
+                using (OracleParameter resultParam = new OracleParameter("result", OracleDbType.XmlType) { Direction = ParameterDirection.ReturnValue })
                 {
                     connection.Open();
-
-                    OracleCommand command = new OracleCommand("PFU_PKG_TRANSP_CA.a_hlp_ree_apply", connection) {CommandType = CommandType.StoredProcedure};
-                    OracleParameter resultParam = new OracleParameter("result", OracleDbType.XmlType) {Direction = ParameterDirection.ReturnValue};
                     command.Parameters.Add(resultParam);
                     command.ExecuteNonQuery();
                     if (resultParam.Value != null)
@@ -114,8 +113,6 @@ namespace Bars.WebServices
                             response.Rq_Id = Int32.Parse(nodes[0].InnerText);
                         }
                     }
-
-                    connection.Close();
                 }
             }
             catch (System.Exception ex)
@@ -134,19 +131,16 @@ namespace Bars.WebServices
             try
             {
                 using (OracleConnection connection = new OracleConnection("Data Source=COBUMMFO_DEV;User Id=pfu;Password=pfu"))
+                using (OracleCommand command = new OracleCommand("PFU_PKG_TRANSP_CA.a_hlp_ree_apply", connection) { CommandType = CommandType.StoredProcedure })
+                using (OracleParameter resultParam = new OracleParameter("result", OracleDbType.XmlType) { Direction = ParameterDirection.ReturnValue })
                 {
-                    //connection.Open();
-
-                    OracleCommand command = new OracleCommand("PFU_PKG_TRANSP_CA.a_hlp_ree_apply", connection) { CommandType = CommandType.StoredProcedure };
-                    OracleParameter resultParam = new OracleParameter("result", OracleDbType.XmlType) { Direction = ParameterDirection.ReturnValue };
+                    connection.Open();
                     command.Parameters.Add(resultParam);
                     command.ExecuteNonQuery();
                     if (resultParam.Value != null)
                     {
                         response.RequestStateData = ((OracleXmlType)resultParam.Value).Value;
                     }
-
-                    connection.Close();
                 }
             }
             catch (System.Exception ex)

@@ -416,27 +416,28 @@ namespace barsroot.cim
                 oraRdr = oraCmd.ExecuteReader();
                 if (oraRdr.Read())
                 {
-                    OracleBlob blob = oraRdr.GetOracleBlob(0);
-                    if (blob.IsNull)
+                    using (OracleBlob blob = oraRdr.GetOracleBlob(0))
                     {
-                        res.Code = -1;
-                        res.Message = "Не знайденно друкованої форми по документу ref=" + docRef + " в таблиці імпортованих з corp2!";
-                    }
-                    else
-                    {
-
-                        string fileName = Path.GetTempFileName();
-                        Byte[] byteArr = new Byte[blob.Length];
-                        blob.Read(byteArr, 0, Convert.ToInt32(blob.Length));
-                        using (FileStream fs = new FileStream(fileName, FileMode.Append, FileAccess.Write))
+                        if (blob.IsNull)
                         {
-                            fs.Write(byteArr, 0, byteArr.Length);
+                            res.Code = -1;
+                            res.Message = "Не знайденно друкованої форми по документу ref=" + docRef + " в таблиці імпортованих з corp2!";
                         }
-                        res.Message = string.Format("card_{0}({1}).rtf", tt, docRef);
-                        res.DataStr = fileName;
-                        res.Code = 0;
+                        else
+                        {
+
+                            string fileName = Path.GetTempFileName();
+                            Byte[] byteArr = new Byte[blob.Length];
+                            blob.Read(byteArr, 0, Convert.ToInt32(blob.Length));
+                            using (FileStream fs = new FileStream(fileName, FileMode.Append, FileAccess.Write))
+                            {
+                                fs.Write(byteArr, 0, byteArr.Length);
+                            }
+                            res.Message = string.Format("card_{0}({1}).rtf", tt, docRef);
+                            res.DataStr = fileName;
+                            res.Code = 0;
+                        }
                     }
-                    blob.Dispose();
                 }
                 else
                 {
@@ -1285,7 +1286,7 @@ namespace barsroot.cim
                     oraCmd.Parameters.Add("p_bic", OracleDbType.Varchar2, this.BeneficiarBankInfo.BicCodeId, ParameterDirection.Input);
                     oraCmd.Parameters.Add("p_b010", OracleDbType.Varchar2, this.BeneficiarBankInfo.BankB010, ParameterDirection.Input);
                     oraCmd.Parameters.Add("p_service_branch", OracleDbType.Varchar2, this.ServiceBranch, ParameterDirection.Input);
-                    
+
                     if (this.ContrType == 0 || this.ContrType == 1)
                     {
                         addParams = ",:p_spec_id, :p_subject_id, :p_without_acts, :p_deadline, :p_txt_subject";

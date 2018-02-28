@@ -36,7 +36,7 @@ namespace Bars.DWH
         {
             this.PackageId = PackageId;
             this.PackageData = "[" + PackageData + "]";
-                //нормалізація XML, оскільки в пакеті від сховища некоректна структура
+            //нормалізація XML, оскільки в пакеті від сховища некоректна структура
             PackageStatus = "DELIVERED";
             this.PackageType = PackageType;
             this.BankDate = BankDate;
@@ -52,8 +52,7 @@ namespace Bars.DWH
             using (var ss = new StreamWriter(OutFileName, false, Encoding.UTF8))
             {
                 // чтение xml из массива байт "по элементам"
-                using (
-                    var reader = JsonReaderWriterFactory.CreateJsonReader(packageDataBytes, XmlDictionaryReaderQuotas.Max))
+                using (var reader = JsonReaderWriterFactory.CreateJsonReader(packageDataBytes, XmlDictionaryReaderQuotas.Max))
                 {
                     var ws = new XmlWriterSettings();
                     ws.Indent = false;
@@ -100,32 +99,34 @@ namespace Bars.DWH
 
             try
             {
-                var clob = new OracleClob(con, false, false);
-                var bufferLength = 1024*512;
-                var readLen = 0;
-                var chars = new char[bufferLength];
-                using (var fs = new StreamReader(OutFileName, Encoding.UTF8, false))
+                using (OracleClob clob = new OracleClob(con, false, false))
                 {
-                    while ((readLen = fs.Read(chars, 0, bufferLength)) != 0)
+                    var bufferLength = 1024 * 512;
+                    var readLen = 0;
+                    var chars = new char[bufferLength];
+                    using (var fs = new StreamReader(OutFileName, Encoding.UTF8, false))
                     {
-                        clob.Write(chars, 0, readLen);
+                        while ((readLen = fs.Read(chars, 0, bufferLength)) != 0)
+                        {
+                            clob.Write(chars, 0, readLen);
+                        }
+                    }
+
+                    using (OracleCommand cmd = con.CreateCommand())
+                    {
+                        cmd.CommandType = CommandType.Text;
+                        cmd.BindByName = true;
+                        cmd.CommandText = "begin bars.segmentation_pack.InsertNewPackage (:p_ID, :p_DATA, :p_PACKAGETYPE, :p_BANKDATE, :p_KF); end;";
+                        cmd.Parameters.Add(new OracleParameter("p_ID", OracleDbType.Int32, PackageId, ParameterDirection.Input));
+                        cmd.Parameters.Add(new OracleParameter("p_BANKDATE", OracleDbType.Varchar2, BankDate, ParameterDirection.Input));
+                        cmd.Parameters.Add(new OracleParameter("p_DATA", OracleDbType.Clob, clob, ParameterDirection.Input));
+                        //cmd.Parameters.Add(new OracleParameter("p_STATUS", OracleDbType.Varchar2, PackageStatus, ParameterDirection.Input));
+                        cmd.Parameters.Add(new OracleParameter("p_PACKAGETYPE", OracleDbType.Byte, PackageType, ParameterDirection.Input));
+                        //cmd.Parameters.Add(new OracleParameter("p_RECIEVED_DATE", OracleDbType.Date, DateTime.Now, ParameterDirection.Input));
+                        cmd.Parameters.Add(new OracleParameter("p_KF", OracleDbType.Varchar2, MFO, ParameterDirection.Input));
+                        cmd.ExecuteNonQuery();
                     }
                 }
-           
-                var cmd = con.CreateCommand();
-                cmd.CommandType = CommandType.Text;
-                cmd.BindByName = true;
-                cmd.CommandText = "begin bars.segmentation_pack.InsertNewPackage (:p_ID, :p_DATA, :p_PACKAGETYPE, :p_BANKDATE, :p_KF); end;";
-                cmd.Parameters.Add(new OracleParameter("p_ID", OracleDbType.Int32, PackageId, ParameterDirection.Input));
-                cmd.Parameters.Add(new OracleParameter("p_BANKDATE", OracleDbType.Varchar2, BankDate, ParameterDirection.Input));
-                cmd.Parameters.Add(new OracleParameter("p_DATA", OracleDbType.Clob, clob, ParameterDirection.Input));
-                //cmd.Parameters.Add(new OracleParameter("p_STATUS", OracleDbType.Varchar2, PackageStatus, ParameterDirection.Input));
-                cmd.Parameters.Add(new OracleParameter("p_PACKAGETYPE", OracleDbType.Byte, PackageType, ParameterDirection.Input));
-                //cmd.Parameters.Add(new OracleParameter("p_RECIEVED_DATE", OracleDbType.Date, DateTime.Now, ParameterDirection.Input));
-                cmd.Parameters.Add(new OracleParameter("p_KF", OracleDbType.Varchar2, MFO, ParameterDirection.Input));
-                cmd.ExecuteNonQuery();
-                clob.Close();
-                clob.Dispose();
             }
             catch (System.Exception ex)
             {
@@ -136,8 +137,8 @@ namespace Bars.DWH
                 //        response.Result = "ERROR";
                 //        break;
                 //    default:
-                        response.Description = "Database error: " + ex.Message;
-                        response.Result = "ERROR";
+                response.Description = "Database error: " + ex.Message;
+                response.Result = "ERROR";
                 //        break;
                 //}
             }
@@ -192,7 +193,7 @@ namespace Bars.DWH
             //_dbLogger.Info("On Begin. MFO = " + MFO, LoggerPrefix);
             if (string.IsNullOrEmpty(Data))
             {
-                throw new HttpException((int) HttpStatusCode.BadRequest, "Empty DATA or invalid namespace!");
+                throw new HttpException((int)HttpStatusCode.BadRequest, "Empty DATA or invalid namespace!");
             }
 
             var response = new DWHResponse("OK", "Message was written to DB successfully.");
@@ -229,7 +230,7 @@ namespace Bars.DWH
                 {
                     response.Description = "Empty DATA!";
                     response.Result = "ERROR";
-                    throw new HttpException((int) HttpStatusCode.BadRequest, "Empty DATA!");
+                    throw new HttpException((int)HttpStatusCode.BadRequest, "Empty DATA!");
                 }
             }
             finally
@@ -282,7 +283,7 @@ namespace Bars.DWH
             {
                 response.Result = "Error";
                 response.Description = ex.Message;
-                    // "Invalid PacketNumber " + PacketNumber.ToString()+ " and PreviousPacketNumber:" + PreviousPacketNumber.ToString();
+                // "Invalid PacketNumber " + PacketNumber.ToString()+ " and PreviousPacketNumber:" + PreviousPacketNumber.ToString();
                 return false;
             }
             finally

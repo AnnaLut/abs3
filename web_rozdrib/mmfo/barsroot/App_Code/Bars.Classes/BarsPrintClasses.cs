@@ -6,33 +6,28 @@ using Oracle.DataAccess.Client;
 
 namespace Bars.Classes
 {
-	/// <summary>
-	/// Клас для друку договорів
-	/// через веб
-	/// </summary>
-	public class BarsPrintClass
-	{
-		public BarsPrintClass(){}
-		/// <summary>
-		/// Друк текста договора
-		/// </summary>
-		/// <param name="dpt_id">Номер договора</param>
-		/// <param name="template">Шаблон</param>
-		/// <returns>Им'я файлу</returns>
-		public String CreateDptContractFile(Decimal dpt_id,String template)
-		{
-            OracleConnection connect = new OracleConnection();
-
+    /// <summary>
+    /// Клас для друку договорів
+    /// через веб
+    /// </summary>
+    public class BarsPrintClass
+    {
+        public BarsPrintClass() { }
+        /// <summary>
+        /// Друк текста договора
+        /// </summary>
+        /// <param name="dpt_id">Номер договора</param>
+        /// <param name="template">Шаблон</param>
+        /// <returns>Им'я файлу</returns>
+        public String CreateDptContractFile(Decimal dpt_id, String template)
+        {
             string TempFile = string.Empty;
-            String mainDir = Path.GetTempPath() + "dir\\" +
-                Bars.Configuration.ConfigurationSettings.GetCurrentUserInfo.dbuser;
-            OracleClob clob = null;
+            String mainDir = Path.GetTempPath() + "dir\\" + Bars.Configuration.ConfigurationSettings.GetCurrentUserInfo.dbuser;
 
-            try
+            using (OracleConnection connect = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection())
+            using (OracleCommand cmdSetRole = connect.CreateCommand())
+            using (OracleCommand cmdSelectContractText = connect.CreateCommand())
             {
-                connect = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
-
-                OracleCommand cmdSetRole = connect.CreateCommand();
                 cmdSetRole.CommandText = Bars.Classes.OraConnector.Handler.IOraConnection.GetSetRoleCommand("DPT_ROLE");
                 cmdSetRole.ExecuteNonQuery();
 
@@ -45,38 +40,31 @@ namespace Bars.Classes
                 Directory.CreateDirectory(mainDir);
                 TempFile = mainDir + "\\report.mht";
 
-                OracleCommand cmdSelectContractText = connect.CreateCommand();
                 cmdSelectContractText.InitialLONGFetchSize = 1000000;
 
                 cmdSelectContractText.CommandText = "select nd, text,id,version,adds from cc_docs where nd = :dptid and id=:template and adds=0 order by version desc";
                 cmdSelectContractText.Parameters.Add("dptid", OracleDbType.Decimal, dpt_id, ParameterDirection.Input);
                 cmdSelectContractText.Parameters.Add("template", OracleDbType.Varchar2, template, ParameterDirection.Input);
 
-                OracleDataReader rdr = cmdSelectContractText.ExecuteReader();
+                using (OracleDataReader rdr = cmdSelectContractText.ExecuteReader())
+                {
+                    if (!rdr.Read())
+                        throw new Bars.Exception.BarsException("ORA-20008:Текст договору не знайдено!");
 
-                if (!rdr.Read())
-                    throw new Bars.Exception.BarsException("ORA-20008:Текст договору не знайдено!");
-
-                clob = rdr.GetOracleClob(1);
-                char[] ContractText = clob.Value.ToCharArray();
-                StreamWriter sw = new StreamWriter(TempFile);
-                sw.Write(ContractText);
-                sw.Close();
-                rdr.Close();
-                rdr.Dispose();
-                return TempFile;
-            }
-            finally
-            {
-                clob.Close();
-                clob.Dispose();
-
-                if (connect.State != ConnectionState.Closed)
-                { connect.Close(); connect.Dispose(); }
+                    using (OracleClob clob = rdr.GetOracleClob(1))
+                    using (StreamWriter sw = new StreamWriter(TempFile))
+                    {
+                        char[] ContractText = clob.Value.ToCharArray();
+                        sw.Write(ContractText);
+                        rdr.Close();
+                        rdr.Dispose();
+                        return TempFile;
+                    }
+                }
             }
         }
-        public String CreateSkrFile(Decimal nd,String template,Decimal adds)
-		{
+        public String CreateSkrFile(Decimal nd, String template, Decimal adds)
+        {
             OracleConnection connect = new OracleConnection();
 
             string TempFile = string.Empty;
@@ -132,5 +120,5 @@ namespace Bars.Classes
                 { connect.Close(); connect.Dispose(); }
             }
         }
-	}
+    }
 }
