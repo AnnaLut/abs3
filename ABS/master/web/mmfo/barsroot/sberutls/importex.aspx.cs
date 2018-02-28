@@ -209,12 +209,18 @@ public partial class sberutls_importex : Bars.BarsPage
                         begin 
                             bars_xmlklb_imp.make_import(:p_indoc, :p_packname); 
                         end;");
-                    object packname = GetParameter("p_packname");
 
-                    lastFileName.Value = packname != null ? ((OracleClob)packname).Value : String.Empty;
+
+                    string clobText;
+                    using (OracleClob clob = GetParameter("p_packname") as OracleClob)
+                    {
+                        clobText = null != clob ? clob.Value : string.Empty;
+                    }
+
+                    lastFileName.Value = clobText;
 
                     ClearParameters();
-                    SetParameters("p_filename", DB_TYPE.Varchar2, packname != null ? ((OracleClob)packname).Value : null, DIRECTION.Input);
+                    SetParameters("p_filename", DB_TYPE.Varchar2, clobText, DIRECTION.Input);
                     SetParameters("p_filecnt", DB_TYPE.Decimal, cnt, DIRECTION.Output);
                     SetParameters("p_filesum", DB_TYPE.Decimal, sum, DIRECTION.Output);
                     SQL_NONQUERY(@"

@@ -1216,8 +1216,11 @@ using BarsWeb.Core.Logger;
             }
             finally
             {
-                clob.Close();
-                clob.Dispose();
+                if (clob != null)
+                {
+                    clob.Close();
+                    clob.Dispose();
+                }
 
                 if (connect.State != ConnectionState.Closed)
                 { connect.Close(); connect.Dispose(); }

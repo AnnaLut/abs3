@@ -156,25 +156,27 @@ namespace BarsWeb.Areas.Reporting.Infrastructure.Repository.DI.Implementation
 
             var sql = new Utils().CreateReportQuery(isCon, GetReportStructure(fileCode,schemeCode).ToList(), vn, fileFmt);
             //StartCreateReport(code, date);
-            
-            OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
-            
-            var oracleCommand = con.CreateCommand();
-            oracleCommand.CommandText = sql;
 
-            if(isCon == "1" || string.IsNullOrEmpty(vn))
+            using (OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection())
+            using (OracleCommand oracleCommand = con.CreateCommand())
             {
-                oracleCommand.Parameters.Add("p_REPORT_CODE", OracleDbType.Varchar2, fileCode, ParameterDirection.Input);
-            }            
-            oracleCommand.Parameters.Add("p_REPORT_DATE", OracleDbType.Varchar2, date, ParameterDirection.Input);
-            oracleCommand.Parameters.Add("p_KF", OracleDbType.Varchar2, kf, ParameterDirection.Input);
-            oracleCommand.Parameters.Add("p_VERSION_ID", OracleDbType.Decimal, versionId, ParameterDirection.Input);
+                oracleCommand.CommandText = sql;
 
-            var adapter = new OracleDataAdapter(oracleCommand);
+                if (isCon == "1" || string.IsNullOrEmpty(vn))
+                {
+                    oracleCommand.Parameters.Add("p_REPORT_CODE", OracleDbType.Varchar2, fileCode,
+                        ParameterDirection.Input);
+                }
+                oracleCommand.Parameters.Add("p_REPORT_DATE", OracleDbType.Varchar2, date, ParameterDirection.Input);
+                oracleCommand.Parameters.Add("p_KF", OracleDbType.Varchar2, kf, ParameterDirection.Input);
+                oracleCommand.Parameters.Add("p_VERSION_ID", OracleDbType.Decimal, versionId, ParameterDirection.Input);
 
-            var dataSet = new DataSet();
-            adapter.Fill(dataSet);
-            return dataSet;
+                var adapter = new OracleDataAdapter(oracleCommand);
+
+                var dataSet = new DataSet();
+                adapter.Fill(dataSet);
+                return dataSet;
+            }
         }
 
         public IEnumerable<Accessed> GetVersion(string reportDate, string kf, string fileCode)
@@ -234,25 +236,29 @@ namespace BarsWeb.Areas.Reporting.Infrastructure.Repository.DI.Implementation
             CultureInfo cultureinfo = new CultureInfo("uk-UA");
             DateTime date = DateTime.Parse(reportDate, cultureinfo);
             //var param = _tasksRepository.GetSсhedulerParameters(schedulerCode);
-            
-            OracleConnection conn = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
-            OracleCommand cmd = new OracleCommand("nbur_queue.f_put_queue_form", conn) { CommandType = System.Data.CommandType.StoredProcedure };
-            OracleParameter resultObject = new OracleParameter("p_result_object", OracleDbType.Varchar2, 4000, null, ParameterDirection.ReturnValue);
-            cmd.Parameters.Add(resultObject);
-            object[] parameters =         
-            { 
-                new OracleParameter("p_report_date",OracleDbType.Date) { Value = date },
-                new OracleParameter("p_file_code",OracleDbType.Varchar2) { Value = fileCode },
-                new OracleParameter("p_scheme",OracleDbType.Varchar2) { Value = schemeCode },
-                new OracleParameter("p_type",OracleDbType.Varchar2) { Value = fileType },
-                new OracleParameter("p_kf",OracleDbType.Varchar2) { Value = kf }
-            };
-            cmd.Parameters.AddRange(parameters);
-           
-            cmd.ExecuteNonQuery();
-            if (resultObject.Value != null)
+
+            using (OracleConnection conn = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection())
+            using (OracleCommand cmd = new OracleCommand("nbur_queue.f_put_queue_form", conn))
             {
-                result = resultObject.Value.ToString();
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                OracleParameter resultObject = new OracleParameter("p_result_object", OracleDbType.Varchar2, 4000, null,
+                    ParameterDirection.ReturnValue);
+                cmd.Parameters.Add(resultObject);
+                object[] parameters =
+                {
+                    new OracleParameter("p_report_date", OracleDbType.Date) {Value = date},
+                    new OracleParameter("p_file_code", OracleDbType.Varchar2) {Value = fileCode},
+                    new OracleParameter("p_scheme", OracleDbType.Varchar2) {Value = schemeCode},
+                    new OracleParameter("p_type", OracleDbType.Varchar2) {Value = fileType},
+                    new OracleParameter("p_kf", OracleDbType.Varchar2) {Value = kf}
+                };
+                cmd.Parameters.AddRange(parameters);
+
+                cmd.ExecuteNonQuery();
+                if (resultObject.Value != null)
+                {
+                    result = resultObject.Value.ToString();
+                }
             }
             return result;
         }
@@ -269,27 +275,33 @@ namespace BarsWeb.Areas.Reporting.Infrastructure.Repository.DI.Implementation
             CultureInfo cultureinfo = new CultureInfo("uk-UA");
             DateTime date = DateTime.Parse(reportDate, cultureinfo);
 
-            OracleConnection conn = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
-            OracleCommand cmd = new OracleCommand("nbur_files.f_get_file_clob", conn) { CommandType = System.Data.CommandType.StoredProcedure };
-            var resultObject = new OracleParameter("p_result_object", OracleDbType.Clob, 4000, null, ParameterDirection.ReturnValue);
-
-            cmd.Parameters.Add(resultObject);
-            object[] parameters =         
-            { 
-                new OracleParameter("p_report_date",OracleDbType.Date) { Value = date },
-                new OracleParameter("p_kf",OracleDbType.Varchar2) { Value = kf },
-                new OracleParameter("p_version_id",OracleDbType.Decimal) { Value = versionId },
-                new OracleParameter("p_file_code",OracleDbType.Varchar2) { Value = fileCode },
-                new OracleParameter("p_scheme_code",OracleDbType.Varchar2) { Value = schemeCode }
-            };
-            cmd.Parameters.AddRange(parameters);
-            cmd.ExecuteNonQuery();
-            OracleClob clob = resultObject.Value as OracleClob;
-            if (clob != null)
+            using (OracleConnection conn = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection())
+            using (OracleCommand cmd = new OracleCommand("nbur_files.f_get_file_clob", conn))
             {
-                result = clob.Value;
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                var resultObject = new OracleParameter("p_result_object", OracleDbType.Clob, 4000, null,
+                    ParameterDirection.ReturnValue);
+
+                cmd.Parameters.Add(resultObject);
+                object[] parameters =
+                {
+                    new OracleParameter("p_report_date", OracleDbType.Date) {Value = date},
+                    new OracleParameter("p_kf", OracleDbType.Varchar2) {Value = kf},
+                    new OracleParameter("p_version_id", OracleDbType.Decimal) {Value = versionId},
+                    new OracleParameter("p_file_code", OracleDbType.Varchar2) {Value = fileCode},
+                    new OracleParameter("p_scheme_code", OracleDbType.Varchar2) {Value = schemeCode}
+                };
+                cmd.Parameters.AddRange(parameters);
+                cmd.ExecuteNonQuery();
+                using (OracleClob clob = resultObject.Value as OracleClob)
+                {
+                    if (clob != null)
+                    {
+                        result = clob.Value;
+                    }
+                }
+                return result;
             }
-            return result;
         }
 
         public string GenerateReportFiltName(string fileCode, 
@@ -301,23 +313,27 @@ namespace BarsWeb.Areas.Reporting.Infrastructure.Repository.DI.Implementation
             CultureInfo cultureinfo = new CultureInfo("uk-UA");
             DateTime date = DateTime.Parse(reportDate, cultureinfo);
 
-            OracleConnection conn = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
-            OracleCommand cmd = new OracleCommand("nbur_files.f_get_file_name", conn) { CommandType = System.Data.CommandType.StoredProcedure };
-            var resultObject = new OracleParameter("p_result_object", OracleDbType.Varchar2, 4000, null, ParameterDirection.ReturnValue);
+            using (OracleConnection conn = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection())
+            using (OracleCommand cmd = new OracleCommand("nbur_files.f_get_file_name", conn))
+            {
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                var resultObject = new OracleParameter("p_result_object", OracleDbType.Varchar2, 4000, null,
+                    ParameterDirection.ReturnValue);
 
-            cmd.Parameters.Add(resultObject);
-            object[] parameters =         
-            { 
-                new OracleParameter("p_report_date",OracleDbType.Date) { Value = date },
-                new OracleParameter("p_kf",OracleDbType.Varchar2) { Value = kf },
-                new OracleParameter("p_version_id",OracleDbType.Int32) { Value = versionId },
-                new OracleParameter("p_file_code",OracleDbType.Varchar2) { Value = fileCode },
-                new OracleParameter("p_scheme_code",OracleDbType.Varchar2) { Value = schemeCode }
-            };
-            cmd.Parameters.AddRange(parameters);
-            cmd.ExecuteNonQuery();
-            string fileName = resultObject.Value.ToString();
-            return fileName;
+                cmd.Parameters.Add(resultObject);
+                object[] parameters =
+                {
+                    new OracleParameter("p_report_date", OracleDbType.Date) {Value = date},
+                    new OracleParameter("p_kf", OracleDbType.Varchar2) {Value = kf},
+                    new OracleParameter("p_version_id", OracleDbType.Int32) {Value = versionId},
+                    new OracleParameter("p_file_code", OracleDbType.Varchar2) {Value = fileCode},
+                    new OracleParameter("p_scheme_code", OracleDbType.Varchar2) {Value = schemeCode}
+                };
+                cmd.Parameters.AddRange(parameters);
+                cmd.ExecuteNonQuery();
+                string fileName = resultObject.Value.ToString();
+                return fileName;
+            }
         }
 
         public string GetReportFile(string code, string date)
@@ -357,6 +373,7 @@ namespace BarsWeb.Areas.Reporting.Infrastructure.Repository.DI.Implementation
             var repName = Convert.ToString(cmd.Parameters["p_result"].Value);
 
             cmd.Dispose();
+            conn.Close();
             conn.Dispose();
 
             const string rHeadlineFunc = @"select BARS.f_CREATEHEADLINE(:p_sNumFile, :p_sGCode, :p_dtRepDate, :p_sFileName, :p_nCnt) from dual";
@@ -564,15 +581,6 @@ namespace BarsWeb.Areas.Reporting.Infrastructure.Repository.DI.Implementation
                 sql += orderSql.ToString();
             }
 
-            OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
-            OracleCommand cmd = new OracleCommand(sql)
-            {
-                CommandType = System.Data.CommandType.Text,
-                CommandText = sql,
-                Connection = con
-            };
-            cmd.Parameters.AddRange(arrayParams);
-
             BarsSql bSql = new BarsSql {
                  SqlText = sql,
                  SqlParams = arrayParams
@@ -732,7 +740,8 @@ namespace BarsWeb.Areas.Reporting.Infrastructure.Repository.DI.Implementation
             return isDtl ? string.Format("{0}_DTL", vn) : vn;
         }
 
-        public List<Dictionary<string, object>> GetDetailedReportDyn(DataSourceRequest request, string vn, string fileCode, string reportDate, string kf, string fieldCode, string schemeCode, string nbuc)
+        public List<Dictionary<string, object>> GetDetailedReportDyn(DataSourceRequest request, string vn,
+            string fileCode, string reportDate, string kf, string fieldCode, string schemeCode, string nbuc)
         {
             var formFinished = GetNburListFromFinished(fileCode, reportDate, kf);
             decimal versionId = formFinished.VERSION_ID;
@@ -741,11 +750,12 @@ namespace BarsWeb.Areas.Reporting.Infrastructure.Repository.DI.Implementation
             CultureInfo cultureinfo = new CultureInfo("uk-UA");
             DateTime date = DateTime.Parse(reportDate, cultureinfo).Date;
 
-            List<OracleParameter> listParams = new List<OracleParameter> {
+            List<OracleParameter> listParams = new List<OracleParameter>
+            {
                 new OracleParameter("p_versionId ", OracleDbType.Decimal) {Value = versionId},
                 new OracleParameter("p_kf", OracleDbType.Varchar2) {Value = kf},
                 new OracleParameter("p_reportDate", OracleDbType.Date) {Value = date},
-            };            
+            };
             StringBuilder sql = new StringBuilder(string.Format(@"select *
                         FROM 
                             {0} 
@@ -757,12 +767,12 @@ namespace BarsWeb.Areas.Reporting.Infrastructure.Repository.DI.Implementation
             if (!string.IsNullOrEmpty(fieldCode))
             {
                 sql.Append(" and FIELD_CODE = :p_fieldCode ");
-                listParams.Add(new OracleParameter("p_fieldCode ", OracleDbType.Varchar2) { Value = fieldCode });
+                listParams.Add(new OracleParameter("p_fieldCode ", OracleDbType.Varchar2) {Value = fieldCode});
             }
             if (!string.IsNullOrEmpty(nbuc))
             {
                 sql.Append(" and NBUC = :p_nbuc ");
-                listParams.Add(new OracleParameter("p_nbuc ", OracleDbType.Varchar2) { Value = nbuc });
+                listParams.Add(new OracleParameter("p_nbuc ", OracleDbType.Varchar2) {Value = nbuc});
             }
 
             var reportStructure = GetReportStructure(fileCode, schemeCode).ToList();
@@ -793,34 +803,26 @@ namespace BarsWeb.Areas.Reporting.Infrastructure.Repository.DI.Implementation
 
             List<Dictionary<string, object>> data = new List<Dictionary<string, object>>();
 
-            OracleConnection connection = Bars.Classes.OraConnector.Handler.UserConnection;
-            try
+            using (OracleConnection connection = Bars.Classes.OraConnector.Handler.UserConnection)
+            using (OracleCommand cmd = connection.CreateCommand())
             {
-                using (OracleCommand cmd = connection.CreateCommand())
+                cmd.Parameters.AddRange(query.SqlParams);
+                cmd.CommandType = System.Data.CommandType.Text;
+                cmd.CommandText = query.SqlText;
+                using (OracleDataReader reader = cmd.ExecuteReader())
                 {
-                    cmd.Parameters.AddRange(query.SqlParams);
-                    cmd.CommandType = System.Data.CommandType.Text;
-                    cmd.CommandText = query.SqlText;
-                    using (OracleDataReader reader = cmd.ExecuteReader())
+                    while (reader.Read())
                     {
-                        while (reader.Read())
+                        Dictionary<string, object> row = new Dictionary<string, object>();
+                        for (int i = 0; i < reader.FieldCount; i++)
                         {
-                            Dictionary<string, object> row = new Dictionary<string, object>();
-                            for (int i = 0; i < reader.FieldCount; i++)
-                            {
-                                string key = reader.GetName(i);
-                                var value = reader[i];
-                                row[key] = value;
-                            }
-                            data.Add(row);
+                            string key = reader.GetName(i);
+                            var value = reader[i];
+                            row[key] = value;
                         }
+                        data.Add(row);
                     }
                 }
-            }
-            finally
-            {
-                connection.Dispose();
-                connection.Close();
             }
             return data;
         }
@@ -829,39 +831,29 @@ namespace BarsWeb.Areas.Reporting.Infrastructure.Repository.DI.Implementation
         {
             List<TableInfo> tsi = new List<TableInfo>();
 
-            OracleConnection connection = Bars.Classes.OraConnector.Handler.UserConnection;
-
-            try
+            using (OracleConnection connection = Bars.Classes.OraConnector.Handler.UserConnection)
+            using (OracleCommand cmd = connection.CreateCommand())
             {
-                using (OracleCommand cmd = connection.CreateCommand())
+                cmd.CommandText = string.Format(@"select * from {0} where 1=0", tableName);
+                using (var reader = cmd.ExecuteReader())
                 {
-                    cmd.CommandText = string.Format(@"select * from {0} where 1=0", tableName);
-                    using (var reader = cmd.ExecuteReader())
+                    DataTable dt = reader.GetSchemaTable();
+
+                    foreach (DataRow myField in dt.Rows)
                     {
-                        DataTable dt = reader.GetSchemaTable();
+                        DataColumn ColumnName = dt.Columns["ColumnName"];
+                        DataColumn ColumnSize = dt.Columns["ColumnSize"];
+                        DataColumn DataType = dt.Columns["DataType"];
+                        DataColumn AllowDBNull = dt.Columns["AllowDBNull"];
 
-                        foreach (DataRow myField in dt.Rows)
-                        {
-                            DataColumn ColumnName = dt.Columns["ColumnName"];
-                            DataColumn ColumnSize = dt.Columns["ColumnSize"];
-                            DataColumn DataType = dt.Columns["DataType"];
-                            DataColumn AllowDBNull = dt.Columns["AllowDBNull"];
-
-                            tsi.Add(new TableInfo(
-                                myField[ColumnName].ToString(),
-                                Convert.ToInt32(myField[ColumnSize].ToString()),
-                                myField[DataType].ToString(),
-                                Convert.ToBoolean(myField[AllowDBNull].ToString())
-                            ));
-                        }
-                        reader.Close();
+                        tsi.Add(new TableInfo(
+                            myField[ColumnName].ToString(),
+                            Convert.ToInt32(myField[ColumnSize].ToString()),
+                            myField[DataType].ToString(),
+                            Convert.ToBoolean(myField[AllowDBNull].ToString())
+                        ));
                     }
                 }
-            }
-            finally
-            {
-                connection.Dispose();
-                connection.Close();
             }
 
             return tsi;

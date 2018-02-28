@@ -109,6 +109,7 @@ namespace Bars.WebServices
 
                 // connect
                 OracleConnection con = OraConnector.Handler.UserConnection;
+                OracleClob clob=null;
                 try
                 {
                     OracleCommand cmd = con.CreateCommand();
@@ -132,7 +133,7 @@ namespace Bars.WebServices
 
                     cmd.ExecuteNonQuery();
 
-                    OracleClob clob = (OracleClob)cmd.Parameters["p_outdoc"].Value;
+                    clob = (OracleClob)cmd.Parameters["p_outdoc"].Value;
 
                     if (!clob.IsNull)
                         outResult = clob.Value;
@@ -143,6 +144,12 @@ namespace Bars.WebServices
                 }
                 finally
                 {
+                    if (clob != null)
+                    {
+                        clob.Close();
+                        clob.Dispose();
+                    }
+
                     con.Close();
                     con.Dispose();
                 }

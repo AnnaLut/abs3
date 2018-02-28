@@ -19,8 +19,8 @@ namespace BarsWeb.Areas.Crkr.Infrastructure.DI.Implementation
         {
             var model = requestData as CreateWiring;
             using (OracleConnection connection = OraConnector.Handler.UserConnection)
+            using (var command = MakeCommand(connection, "ca_compen.make_tran_tvbv"))
             {
-                var command = MakeCommand(connection, "ca_compen.make_tran_tvbv");
                 command.Parameters.Add("p_summa", OracleDbType.Varchar2, model.summa, ParameterDirection.Input);
                 command.Parameters.Add("p_nls", OracleDbType.Varchar2, model.nls, ParameterDirection.Input);
                 command.Parameters.Add("p_ob22", OracleDbType.Varchar2, model.ob22, ParameterDirection.Input);
@@ -39,8 +39,8 @@ namespace BarsWeb.Areas.Crkr.Infrastructure.DI.Implementation
         {
             var model = requestData as DeleteWiring;
             using (OracleConnection connection = OraConnector.Handler.UserConnection)
+            using (var command = MakeCommand(connection, "ca_compen.drop_tran_tvbv"))
             {
-                var command = MakeCommand(connection, "ca_compen.drop_tran_tvbv");
                 command.Parameters.Add("p_tvbv", OracleDbType.Varchar2, model.tvbv, ParameterDirection.Input);
                 command.Parameters.Add("p_kf", OracleDbType.Varchar2, model.kf, ParameterDirection.Input);
                 command.Parameters.Add("p_date_import", OracleDbType.Varchar2, model.date_import, ParameterDirection.Input);
@@ -55,8 +55,8 @@ namespace BarsWeb.Areas.Crkr.Infrastructure.DI.Implementation
         {
             var model = requestData as RebranDeposit;
             using (OracleConnection connection = OraConnector.Handler.UserConnection)
+            using (var command = MakeCommand(connection, "ca_compen.rebran_deposit"))
             {
-                var command = MakeCommand(connection, "ca_compen.rebran_deposit");
                 command.Parameters.Add("p_summa", OracleDbType.Varchar2, model.summa, ParameterDirection.Input);
                 command.Parameters.Add("p_ob22", OracleDbType.Varchar2, model.ob22, ParameterDirection.Input);
                 command.Parameters.Add("p_branchfrom", OracleDbType.Varchar2, model.branchfrom, ParameterDirection.Input);
@@ -72,13 +72,14 @@ namespace BarsWeb.Areas.Crkr.Infrastructure.DI.Implementation
         {
             var model = requestData as XmlParam;
             using (var connection = OraConnector.Handler.UserConnection)
+            using (var command = MakeCommand(connection, "ca_compen.payments_compen_xml"))
             {
-                var command = MakeCommand(connection, "ca_compen.payments_compen_xml");
                 command.Parameters.Add("p_clob", OracleDbType.Clob, model.p_clob, ParameterDirection.InputOutput);
                 command.ExecuteNonQuery();
-                var retVal = ((OracleClob)command.Parameters["p_clob"].Value).IsNull ? string.Empty : ((OracleClob)command.Parameters["p_clob"].Value).Value;
-                return retVal.Replace("\n", string.Empty);
-                 
+                using (OracleClob clob = command.Parameters["p_clob"].Value as OracleClob)
+                {
+                    return null != clob && !clob.IsNull ? clob.Value.Replace("\n", string.Empty) : string.Empty;
+                }
             }
         }
 
@@ -86,13 +87,13 @@ namespace BarsWeb.Areas.Crkr.Infrastructure.DI.Implementation
         {
             var model = requestData as PayActual;
             using (OracleConnection connection = OraConnector.Handler.UserConnection)
+            using (var command = MakeCommand(connection, "ca_compen.payment_for_actual"))
             {
-                var command = MakeCommand(connection, "ca_compen.payment_for_actual");
                 command.Parameters.Add("p_branch_from", OracleDbType.Varchar2, model.branch_from, ParameterDirection.Input);
                 command.Parameters.Add("p_branch_to", OracleDbType.Varchar2, model.branch_to, ParameterDirection.Input);
                 command.Parameters.Add("p_type", OracleDbType.Varchar2, model.type, ParameterDirection.Input);
                 command.Parameters.Add("p_s", OracleDbType.Decimal, model.summa, ParameterDirection.Input);
-                command.Parameters.Add("p_ref", OracleDbType.Decimal, ParameterDirection.Output); 
+                command.Parameters.Add("p_ref", OracleDbType.Decimal, ParameterDirection.Output);
                 command.ExecuteNonQuery();
                 var refDoc = ((OracleDecimal)command.Parameters["p_ref"].Value).IsNull ? 0 : ((OracleDecimal)command.Parameters["p_ref"].Value).Value;
                 if (refDoc != 0)
@@ -105,12 +106,12 @@ namespace BarsWeb.Areas.Crkr.Infrastructure.DI.Implementation
         {
             var model = requestData as PayActual;
             using (OracleConnection connection = OraConnector.Handler.UserConnection)
+            using (var command = MakeCommand(connection, "ca_compen.payment_for_deactual"))
             {
-                var command = MakeCommand(connection, "ca_compen.payment_for_deactual");
                 command.Parameters.Add("p_branch_from", OracleDbType.Varchar2, model.branch_from, ParameterDirection.Input);
                 command.Parameters.Add("p_branch_to", OracleDbType.Varchar2, model.branch_to, ParameterDirection.Input);
                 command.Parameters.Add("p_s", OracleDbType.Decimal, model.summa, ParameterDirection.Input);
-                command.Parameters.Add("p_ref", OracleDbType.Decimal, ParameterDirection.Output); 
+                command.Parameters.Add("p_ref", OracleDbType.Decimal, ParameterDirection.Output);
                 command.ExecuteNonQuery();
                 var refDoc = ((OracleDecimal)command.Parameters["p_ref"].Value).IsNull ? 0 : ((OracleDecimal)command.Parameters["p_ref"].Value).Value;
                 if (refDoc != 0)
@@ -123,26 +124,29 @@ namespace BarsWeb.Areas.Crkr.Infrastructure.DI.Implementation
         {
             var model = requestData as XmlParam;
             using (var connection = OraConnector.Handler.UserConnection)
+            using (var command = MakeCommand(connection, "ca_compen.back_ref"))
             {
-                var command = MakeCommand(connection, "ca_compen.back_ref");
                 command.Parameters.Add("p_ref", OracleDbType.Clob, model.p_clob, ParameterDirection.Input);
                 command.Parameters.Add("p_out", OracleDbType.Clob, null, ParameterDirection.Output);
                 command.ExecuteNonQuery();
-                var retVal = ((OracleClob)command.Parameters["p_out"].Value).IsNull ? string.Empty : ((OracleClob)command.Parameters["p_out"].Value).Value;
-                return retVal.Replace("\n", string.Empty);
-
+                using (OracleClob clob = command.Parameters["p_out"].Value as OracleClob)
+                {
+                    return null != clob && !clob.IsNull ? clob.Value.Replace("\n", string.Empty) : string.Empty;
+                }
             }
         }
         public string GetSosRefData<T>(T requestData)
         {
             var model = requestData as XmlParam;
             using (var connection = OraConnector.Handler.UserConnection)
+            using (var command = MakeCommand(connection, "ca_compen.get_sos_ref"))
             {
-                var command = MakeCommand(connection, "ca_compen.get_sos_ref");
                 command.Parameters.Add("p_clob", OracleDbType.Clob, model.p_clob, ParameterDirection.InputOutput);
                 command.ExecuteNonQuery();
-                var retVal = ((OracleClob)command.Parameters["p_clob"].Value).IsNull ? string.Empty : ((OracleClob)command.Parameters["p_clob"].Value).Value;
-                return retVal.Replace("\n", string.Empty);
+                using (OracleClob clob = command.Parameters["p_clob"].Value as OracleClob)
+                {
+                    return null != clob && !clob.IsNull ? clob.Value.Replace("\n", string.Empty) : string.Empty;
+                }
             }
         }
     }

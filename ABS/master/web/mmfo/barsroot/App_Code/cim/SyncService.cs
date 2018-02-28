@@ -87,27 +87,31 @@ namespace barsroot.cim
             OracleConnection con = OraConnector.Handler.UserConnection;
             try
             {
-                OracleCommand cmd = con.CreateCommand();
-                cmd.Parameters.Add("p_params", OracleDbType.Clob, in_params, ParameterDirection.Input);
-                cmd.Parameters.Add("in_data", OracleDbType.Clob, in_data, ParameterDirection.Input);
-                cmd.Parameters.Add("p_out_data", OracleDbType.Clob, in_data, ParameterDirection.Output);
-                cmd.Parameters.Add("p_error", OracleDbType.Clob, in_data, ParameterDirection.Output);
-                cmd.Parameters.Add("p_status", OracleDbType.Decimal, in_data, ParameterDirection.Output);
-
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.CommandText = "bars.sync.sync_parse";
-                cmd.ExecuteNonQuery();
-
-                var outData = cmd.Parameters["p_out_data"].Value as OracleClob;
-                var errors = cmd.Parameters["p_error"].Value as OracleClob;
-                var status = (OracleDecimal)cmd.Parameters["p_status"].Value;
-
-                return new Response<string>
+                using (OracleCommand cmd = con.CreateCommand())
                 {
-                    Status = Convert.ToInt32(status.Value),
-                    ErrorMessage = (errors.IsNull)? (""):(errors.Value),
-                    StrData = (outData.IsNull) ? ("") : (outData.Value)
-                };
+                    cmd.Parameters.Add("p_params", OracleDbType.Clob, in_params, ParameterDirection.Input);
+                    cmd.Parameters.Add("in_data", OracleDbType.Clob, in_data, ParameterDirection.Input);
+                    cmd.Parameters.Add("p_out_data", OracleDbType.Clob, in_data, ParameterDirection.Output);
+                    cmd.Parameters.Add("p_error", OracleDbType.Clob, in_data, ParameterDirection.Output);
+                    cmd.Parameters.Add("p_status", OracleDbType.Decimal, in_data, ParameterDirection.Output);
+
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandText = "bars.sync.sync_parse";
+                    cmd.ExecuteNonQuery();
+
+                    using (var outData = cmd.Parameters["p_out_data"].Value as OracleClob)
+                    using (var errors = cmd.Parameters["p_error"].Value as OracleClob)
+                    {
+                        var status = (OracleDecimal) cmd.Parameters["p_status"].Value;
+
+                        return new Response<string>
+                        {
+                            Status = Convert.ToInt32(status.Value),
+                            ErrorMessage = (errors.IsNull) ? ("") : (errors.Value),
+                            StrData = (outData.IsNull) ? ("") : (outData.Value)
+                        };
+                    }
+                }
             }
             catch (Exception e)
             {
@@ -121,8 +125,8 @@ namespace barsroot.cim
             finally
             {
                 con.Close();
+                con.Dispose();
             }
-            return new Response<string>();
         }
 
 

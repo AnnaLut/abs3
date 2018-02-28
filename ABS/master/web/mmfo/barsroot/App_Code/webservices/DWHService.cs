@@ -100,32 +100,40 @@ namespace Bars.DWH
 
             try
             {
-                var clob = new OracleClob(con, false, false);
-                var bufferLength = 1024*512;
-                var readLen = 0;
-                var chars = new char[bufferLength];
-                using (var fs = new StreamReader(OutFileName, Encoding.UTF8, false))
+                using (var clob = new OracleClob(con, false, false))
                 {
-                    while ((readLen = fs.Read(chars, 0, bufferLength)) != 0)
+                    var bufferLength = 1024 * 512;
+                    var readLen = 0;
+                    var chars = new char[bufferLength];
+                    using (var fs = new StreamReader(OutFileName, Encoding.UTF8, false))
                     {
-                        clob.Write(chars, 0, readLen);
+                        while ((readLen = fs.Read(chars, 0, bufferLength)) != 0)
+                        {
+                            clob.Write(chars, 0, readLen);
+                        }
+                    }
+
+                    using (var cmd = con.CreateCommand())
+                    {
+                        cmd.CommandType = CommandType.Text;
+                        cmd.BindByName = true;
+                        cmd.CommandText =
+                            "begin bars.segmentation_pack.InsertNewPackage (:p_ID, :p_DATA, :p_PACKAGETYPE, :p_BANKDATE, :p_KF); end;";
+                        cmd.Parameters.Add(new OracleParameter("p_ID", OracleDbType.Int32, PackageId,
+                            ParameterDirection.Input));
+                        cmd.Parameters.Add(new OracleParameter("p_BANKDATE", OracleDbType.Varchar2, BankDate,
+                            ParameterDirection.Input));
+                        cmd.Parameters.Add(new OracleParameter("p_DATA", OracleDbType.Clob, clob,
+                            ParameterDirection.Input));
+                        //cmd.Parameters.Add(new OracleParameter("p_STATUS", OracleDbType.Varchar2, PackageStatus, ParameterDirection.Input));
+                        cmd.Parameters.Add(new OracleParameter("p_PACKAGETYPE", OracleDbType.Byte, PackageType,
+                            ParameterDirection.Input));
+                        //cmd.Parameters.Add(new OracleParameter("p_RECIEVED_DATE", OracleDbType.Date, DateTime.Now, ParameterDirection.Input));
+                        cmd.Parameters.Add(
+                            new OracleParameter("p_KF", OracleDbType.Varchar2, MFO, ParameterDirection.Input));
+                        cmd.ExecuteNonQuery();
                     }
                 }
-           
-                var cmd = con.CreateCommand();
-                cmd.CommandType = CommandType.Text;
-                cmd.BindByName = true;
-                cmd.CommandText = "begin bars.segmentation_pack.InsertNewPackage (:p_ID, :p_DATA, :p_PACKAGETYPE, :p_BANKDATE, :p_KF); end;";
-                cmd.Parameters.Add(new OracleParameter("p_ID", OracleDbType.Int32, PackageId, ParameterDirection.Input));
-                cmd.Parameters.Add(new OracleParameter("p_BANKDATE", OracleDbType.Varchar2, BankDate, ParameterDirection.Input));
-                cmd.Parameters.Add(new OracleParameter("p_DATA", OracleDbType.Clob, clob, ParameterDirection.Input));
-                //cmd.Parameters.Add(new OracleParameter("p_STATUS", OracleDbType.Varchar2, PackageStatus, ParameterDirection.Input));
-                cmd.Parameters.Add(new OracleParameter("p_PACKAGETYPE", OracleDbType.Byte, PackageType, ParameterDirection.Input));
-                //cmd.Parameters.Add(new OracleParameter("p_RECIEVED_DATE", OracleDbType.Date, DateTime.Now, ParameterDirection.Input));
-                cmd.Parameters.Add(new OracleParameter("p_KF", OracleDbType.Varchar2, MFO, ParameterDirection.Input));
-                cmd.ExecuteNonQuery();
-                clob.Close();
-                clob.Dispose();
             }
             catch (System.Exception ex)
             {
