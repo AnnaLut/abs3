@@ -4798,6 +4798,7 @@ begin
        dat5_vmd = p_dat5_vmd,
         num_vmd = p_num_vmd,
            meta = p_meta,
+         f092 = p_f092,
         country = p_country,
           basis = decode(p_basis,substr(basis,1,254),basis,p_basis),
    benefcountry = p_benefcountry,
