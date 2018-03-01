@@ -195,6 +195,14 @@ COMMENT ON COLUMN BARS.ZAYAVKA.NUM_VMD IS '№ таможенной декларации';
 
 
 
+PROMPT *** Create  PK KOD_70_4 ***
+begin   
+ execute immediate ' alter table KOD_70_4   add constraint PK_KOD_70_4 primary key (P70) 
+     using index   tablespace BRSDYNI';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
 
 PROMPT *** Create  constraint FK_ZAYAVKA_PRODUCT_GROUP ***
 begin   
