@@ -1,11 +1,8 @@
-
- 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/rep_inflation_court.sql =========***
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BARS.REP_INFLATION_COURT AS
-
+  CREATE OR REPLACE PACKAGE rep_inflation_court AS
 
     -- Возвращает остаток по счету на дату ПО ПСЕВДО ПОТОКУ  V_INFLATION_SALDOA
 function fost(p_acc integer, p_date date) return number ;
@@ -22,14 +19,14 @@ FUNCTION К_IND_INFL ( p_DAT0 date ,  p_DATi date ) RETURN number;
 
 
  -- производит вызов процедуры inflation_acc
- PROCEDURE inflation_nls(P_NLS IN VARCHAR2,P_KV IN  NUMBER, P_DAT_BEGIN IN VARCHAR2,P_DAT_END IN VARCHAR2);
+ PROCEDURE inflation_nls(P_NLS IN VARCHAR2,P_KV IN  NUMBER, P_DAT_BEGIN IN DATE,P_DAT_END IN DATE);
 
 
  --Расчет по договору
-  PROCEDURE inflation_nd(P_ND IN NUMBER, P_DAT_BEGIN IN VARCHAR2,P_DAT_END IN VARCHAR2, P_TYP_KOD IN NUMBER DEFAULT 1);
+  PROCEDURE inflation_nd(P_ND IN NUMBER, P_DAT_BEGIN IN DATE,P_DAT_END IN DATE, P_TYP_KOD IN NUMBER DEFAULT 1);
 END rep_inflation_court;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.REP_INFLATION_COURT AS
+CREATE OR REPLACE PACKAGE BODY rep_inflation_court AS
 /******************************************************************************
    Ver        Date        Author           Description
    ---------  ----------  ---------------  ------------------------------------
@@ -138,7 +135,7 @@ end К_IND_INFL;
 
 select count(*)  into l_count
                 from V_INFLATION_SALDOA s
-                where acc=P_ACC and fdat>=P_DAT_BEGIN and fdat<=nvl(P_DAT_END,trunc(sysdate));
+                where acc=P_ACC and fdat>=P_DAT_BEGIN and fdat<=nvl(to_date(P_DAT_END,'dd.mm.yy'),trunc(sysdate)) ;
 
                       dbms_output.put_line ('l_count='||l_count);
    --------------------------------------------- DOS------------------------------------------------------------------------------------------------
@@ -148,7 +145,7 @@ select count(*)  into l_count
                          s.fdat,
                          s.dos*100  dos
                 from V_INFLATION_SALDOA s
-                where acc=P_ACC and fdat>=P_DAT_BEGIN and fdat<=nvl(P_DAT_END,trunc(sysdate))
+                where acc=P_ACC and fdat>=P_DAT_BEGIN and fdat<=nvl(to_date(P_DAT_END,'dd.mm.yy'),trunc(sysdate))
                 order by fdat
                )
             )
@@ -163,13 +160,13 @@ select count(*)  into l_count
         l_ost:=abs(rep_inflation_court.fost(P_ACC,P_DAT_BEGIN))*100;
         if l_ost>0 then
            insert into tmp_inflation_court (ND , ACC   , FDAT_BEG    , DAT_BEG_K                        ,  FDAT_END,           DAT_END_K  , S_nom , S    , S_K, K, COMM)
-                                    values (null,P_ACC , P_DAT_BEGIN , round(dat_next_u(P_DAT_BEGIN,-1),'MM'), l_dat_end, round(l_dat_end,'MM'), l_ost , l_ost, null, 1, null);
+                                    values (null,P_ACC , P_DAT_BEGIN , round(dat_next_u(P_DAT_BEGIN,-1),'MM'), to_date(l_dat_end,'dd.mm.yy'), round(l_dat_end,'MM'), l_ost , l_ost, null, 1, null);
         end if;
      end if;
 
      if i.dos>0 and P_DAT_BEGIN<i.fdat then
         insert into tmp_inflation_court (ND , ACC   , FDAT_BEG, DAT_BEG_K                        ,  FDAT_END,           DAT_END_K  , S_nom , S    , S_K , K, COMM)
-                                 values (null,P_ACC , i.fdat  , round(dat_next_u(i.fdat,-1),'MM'), l_dat_end, round(l_dat_end,'MM'), i.dos ,i.dos , null, 1, null);
+                                 values (null,P_ACC , i.fdat  , round(dat_next_u(i.fdat,-1),'MM'), to_date(l_dat_end,'dd.mm.yy'), round(l_dat_end,'MM'), i.dos ,i.dos , null, 1, null);
      end if;
 
 
@@ -182,7 +179,7 @@ select count(*)  into l_count
  -- цикл по погашению    (P_DAT_BEGIN певое погашение уже учли при заполнении DOS)
    for i in (select ACC, FDAT, OSTF*100 OSTF, DOS*100 DOS, KOS*100 KOS
               from V_INFLATION_SALDOA
-             where acc=P_ACC and fdat>P_DAT_BEGIN and fdat<=nvl(P_DAT_END,trunc(sysdate))   and kos>0
+             where acc=P_ACC and fdat>P_DAT_BEGIN and fdat<=nvl(to_date(P_DAT_END,'dd.mm.yy'),trunc(sysdate))   and kos>0
              order by fdat
             )
    loop
@@ -219,12 +216,12 @@ select count(*)  into l_count
 
     update tmp_inflation_court
        set k=round(К_IND_INFL(  dat_next_u(FDAT_beg,-1), FDAT_END ),3)-- поскольку НБУ дает с 1 знаком после запятой
-     where acc=P_ACC and fdat_beg>=P_DAT_BEGIN and fdat_beg<=nvl(P_DAT_END,trunc(sysdate)) ;
+     where acc=P_ACC and fdat_beg>=P_DAT_BEGIN and fdat_beg<=nvl(to_date(P_DAT_END,'dd.mm.yy'),trunc(sysdate));
 
     update tmp_inflation_court
        set S_K=S*k,
            S3=round((fdat_end-fdat_beg+1)*S*3/ (100*365),4)
-     where acc=P_ACC and fdat_beg>=P_DAT_BEGIN and fdat_beg<=nvl(P_DAT_END,trunc(sysdate))  ;
+     where acc=P_ACC and fdat_beg>=P_DAT_BEGIN and fdat_beg<=nvl(to_date(P_DAT_END,'dd.mm.yy'),trunc(sysdate));
 
     commit;
   END;
@@ -232,7 +229,7 @@ select count(*)  into l_count
 
 
 --  Расчитываем затраты по счету
- PROCEDURE inflation_nls(P_NLS IN VARCHAR2,P_KV IN  NUMBER,  P_DAT_BEGIN IN VARCHAR2,P_DAT_END IN VARCHAR2) is
+ PROCEDURE inflation_nls(P_NLS IN VARCHAR2,P_KV IN  NUMBER,  P_DAT_BEGIN IN DATE,P_DAT_END IN DATE) is
  l_acc number;
  begin
 
@@ -244,7 +241,7 @@ select count(*)  into l_count
  end;
 
   -- Высчитываем затраты по договору  (по всем счетам договора)
-  PROCEDURE inflation_nd(P_ND IN  NUMBER,  P_DAT_BEGIN IN VARCHAR2,P_DAT_END IN VARCHAR2, P_TYP_KOD IN NUMBER DEFAULT 1) is
+  PROCEDURE inflation_nd(P_ND IN  NUMBER,  P_DAT_BEGIN IN DATE,P_DAT_END IN DATE, P_TYP_KOD IN NUMBER DEFAULT 1) is
  l_acc number;
  date_prior date;
  l_on number:=0;
@@ -337,11 +334,8 @@ select count(*)  into l_count
          else
            update tmp_inflation_court set dat_irr=to_char(dat_next_u (fdat_beg,-1)  ,'MON. YYYY', 'NLS_DATE_LANGUAGE = UKRAINIAN')  where acc=nd.acc;
          end if;
-
-
-
+		 
      end loop;
-
   commit;
  end;
 
