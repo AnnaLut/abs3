@@ -8241,6 +8241,7 @@ begin
                                           p_erramsg => l_erramsg);
                 if l_erracode not in ('BRS-09300','BRS-09301', 'BRS-09302', 'BRS-09303', 'BRS-09304','BRS-09305') then
                    l_errumsg := 'Відхилено по технічній причині';
+ 		   bars_audit.info(h||l_err);
                 end if;
                 l_nazn := substr('Відміна операції по причині: '||l_errumsg, 1, 160);
                 if newnbs.g_state = 1 then
