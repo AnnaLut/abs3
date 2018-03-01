@@ -111,6 +111,15 @@ end;
 /
 
 
+PROMPT *** ADD COLUMN F092 to ZAYAVKA ***
+BEGIN 
+        execute immediate  
+          ' alter table zayavka add f092 char(3)'; 
+exception when others then
+  if  sqlcode=-01430 then null; else raise; end if;
+END; 
+/
+
 
 
 PROMPT *** ALTER_POLICIES to ZAYAVKA ***
