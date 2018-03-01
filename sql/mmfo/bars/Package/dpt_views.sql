@@ -1,8 +1,8 @@
 
  
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/dpt_views.sql =========*** Run *** =
- PROMPT ===================================================================================== 
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/package/dpt_views.sql =========*** Run *** =
+PROMPT ===================================================================================== 
  
  
 CREATE OR REPLACE PACKAGE DPT_VIEWS
@@ -128,7 +128,7 @@ IS
                          WHERE vidd = DC.VIDD)
                           VIDD_NAME,*/
                        0 AS rate,
-                       NVL (dpt.f_dptw (dc.deposit_id, ''NCASH''), ''0'') DPT_NOCASH, 0 AS DPT_STATUS, max(DC.archdoc_id) archdoc_id, max(dc.wb) wb
+                       NVL (dpt.f_dptw (dc.deposit_id, ''NCASH''), ''0'') DPT_NOCASH, 0 AS DPT_STATUS, max(DC.archdoc_id) archdoc_id --, max(dc.wb) wb
                        FROM cust c, accmainlst ac, dpt_deposit_clos dc, dpt_vidd v
                        WHERE c.rnk = dc.rnk AND v.vidd = dc.vidd and dc.acc = ac.acc
           GROUP BY dc.rnk,dc.acc,dc.branch,dc.kv,v.amr_metr,DC.DEPOSIT_ID,DC.ND,dc.datz/*,DC.VIDD*/, NVL (dpt.f_dptw (dc.deposit_id,''NCASH''), ''0'') '
@@ -233,7 +233,8 @@ IS
                            (SELECT denom
                               FROM tabval$global
                              WHERE kv = NVL (accmainlst.kv, lst.kv))
-                              AS DPT_CUR_DENOM, lst.wb
+                              AS DPT_CUR_DENOM, 
+			    d.wb --lst.wb
                       FROM cust
                            JOIN lst ON lst.rnk = cust.rnk
                            LEFT JOIN dpt_deposit d ON d.deposit_id = lst.DPT_ID
@@ -329,15 +330,15 @@ IS
  end;
 end;
 /
- show err;
+show err;
 
 PROMPT *** Create  grants  DPT_VIEWS ***
 grant DEBUG,EXECUTE                                                          on DPT_VIEWS       to BARS_ACCESS_DEFROLE;
 
 
 
- PROMPT =====================================================================================
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/dpt_views.sql =========*** End *** =
- PROMPT =====================================================================================
+PROMPT =====================================================================================
+PROMPT *** End *** ========== Scripts /Sql/BARS/package/dpt_views.sql =========*** End *** =
+PROMPT =====================================================================================
  
 /
