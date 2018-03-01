@@ -168,6 +168,40 @@ bars.helper = bars.helper || {
         var dropdownlist3 = $("#basis_txt").data("kendoDropDownList");
         dropdownlist3.list.width(380);
 
+        // Підстава для купівлі F092 (510):
+        $("#f092_text").kendoDropDownList({
+            dataTextField: "F902_Name",
+            dataValueField: "F092_Code",
+            optionLabel: "Оберіть підставу...",
+            valueTemplate: '<span><b>#: F092_Code #</b> - #:F092_Name#</span>',
+            template: '<span class="k-state-default"></span>' +
+            '<span class="k-state-default" style="font-size: 13px;"><b>#: F092_Code #</b> - #:F092_Name#</span>',
+            dataSource: {
+                transport: {
+                    read: {
+                        type: "GET",
+                        dataType: "json",
+                        url: bars.config.urlContent("api/zay/F092/GetBuyingF092")
+                    }
+                },
+                schema: {
+                    data: "Data",
+                    total: "Total"
+                }
+            }
+            /*,
+            change: function (e) {
+                var grid = $("#grid").data("kendoGrid");
+                var row = grid.dataItem(grid.select());
+                row.F092_Text = this.text();
+                row.F092_Code = this.value();
+            }*/
+        });
+
+        var f092Dropdownlist = $("#f092_text").data("kendoDropDownList");
+        f092Dropdownlist.list.width(380);
+
+
         // #4 Країна бенефециара:
         $("#benef_country").kendoDropDownList({
             filter: "startswith",
@@ -356,6 +390,7 @@ bars.helper = bars.helper || {
             var id = data.ID,                                                               // Идентификатор заявки
                 verifyOpt = $('#checkRequiredField').is(":checked") ? 1 : 0,                // Унікальний номер операції в системі Клієнт-Банк HOKK
                 meta = $("#meta_aim_name").data("kendoDropDownList").value(),               // Цель покупки (спр-к zay_aims)
+                f092 = $("#f092_text").data("kendoDropDownList").value(),                   // Значение параметра F092
                 contract = $("#contract").val(),                                            // № контракта
                 dat2Vmd = $("#dat2_vmd").val(),                                             // дата контракта
                 datVmd = $("#dat_vmd").val(),                                               // дата последней вмд
@@ -374,6 +409,7 @@ bars.helper = bars.helper || {
                 Id: id,
                 VerifyOpt: verifyOpt,
                 Meta: meta,
+                F092: f092,
                 Contract: contract,
                 Dat2Vmd: dat2Vmd,
                 DatVmd: datVmd,

@@ -242,7 +242,9 @@
                     OKPOP: { type: "string" },
                     COMM: { type: "string" },
                     REQ_TYPE: { type: "number" },
-                    ATTACHMENTS_COUNT: { type: "number" }
+                    ATTACHMENTS_COUNT: { type: "number" },
+                    F092_Code: { type: "string" },
+                    F092_Text: {type: "string"}
                 }
             }
         }

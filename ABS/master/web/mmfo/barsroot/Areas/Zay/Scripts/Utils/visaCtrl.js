@@ -154,7 +154,7 @@ bars.visaCtrl = bars.visaCtrl || {
         var supDoc = row.SUP_DOC ? 1 : null;
         
         var visaArr = [],
-            model = { Id: row.ID, Viza: visaType, Priority: row.PRIORITY, AimsCode: row.AIMS_CODE ? row.AIMS_CODE : null, SupDoc: supDoc };
+            model = { Id: row.ID, Viza: visaType, Priority: row.PRIORITY, AimsCode: row.AIMS_CODE ? row.AIMS_CODE : null, SupDoc: supDoc, F092Code: row.F092_Code };
         visaArr.push(model);
 
         $.ajax({

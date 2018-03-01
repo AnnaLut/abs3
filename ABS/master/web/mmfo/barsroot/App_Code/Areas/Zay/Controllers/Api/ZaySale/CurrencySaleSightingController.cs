@@ -45,7 +45,7 @@ namespace BarsWeb.Areas.Zay.Controllers.Api.ZaySale
             }
             catch (Exception ex)
             {
-                return Request.CreateResponse(HttpStatusCode.OK, ex.Message);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
     }

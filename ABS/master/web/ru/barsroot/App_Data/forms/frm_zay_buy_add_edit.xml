@@ -19,6 +19,7 @@
               l_skom number := :P_SKOM;
               l_meta number := :P_META;
               l_contract varchar2(128) := :P_CONTRACT;
+              l_f092 char(3):= :P_F092;
               l_datc date := :P_DATC;
               l_num_vmd varchar2(128) := :P_NUM_VMD;
               l_vmd1 date := :P_VMD1;
@@ -55,6 +56,7 @@
               p_kom       => l_kom,
               p_skom      => l_skom,
               p_meta      => l_meta,
+              p_f092      => l_f092,
               p_contract  => l_contract,
               p_dat2_vmd  => l_datc,
               p_num_vmd   => l_num_vmd,
@@ -93,6 +95,7 @@
               p_taxflg      => 1,
               p_taxacc      => null,
               p_aimid       => l_meta,
+              p_f092      => l_f092,
               p_contractid  => null,
               p_contractnum => l_contract,
               p_contractdat => l_datc,
@@ -133,6 +136,7 @@
               p_taxflg    => 1,
               p_taxacc    => null,
               p_aimid     => l_meta,
+              p_f092      => l_f092,
               p_contractid=> null,
               p_contractnum=> l_contract,
               p_contractdat=> l_datc,
@@ -170,6 +174,7 @@
               <parameter type="FormField" name="P_KOM" />
               <parameter type="FormField" name="P_SKOM" />
               <parameter type="FormField" name="P_META" />
+              <parameter type="FormField" name="P_F092" />
               <parameter type="FormField" name="P_CONTRACT" />
               <parameter type="FormField" name="P_DATC" />
               <parameter type="FormField" name="P_NUM_VMD" />
@@ -298,6 +303,9 @@
         <customfield name="P_BASIS" label="Код підстави для купівлі валюти" datatype="String" size="100" datasourcefield="BASIS" columnindex="3" index="2">
           <uicontrol type="DropDownList" addemptyitem="true" table="(select p63,  p63||' '||substr(txt,1,100) name from kod_70_2 order by p63)" keyfield="p63" valuefield="name" controlwidth="157"></uicontrol>
         </customfield>
+        <customfield name="P_F092" label="Підстава для купівлі (510)" datatype="String" required="false" size="50" datasourcefield="F092" columnindex="3" index="3">
+          <uicontrol type="DropDownList" addemptyitem="true" table="(select f092 as id, f092||' '||txt as name  from f092 where to_number(f092,'999')&lt;200)" keyfield="id" valuefield="name" controlwidth="157"></uicontrol>
+        </customfield>
         <customfield name="P_BENEFCOUNTRY" label="Код країни бенеф." datatype="Decimal" datasourcefield="BENEFCOUNTRY" columnindex="3" index="3">
           <uicontrol type="DropDownList" addemptyitem="true" table="(select country, country||' '||name name from country order by 1)" keyfield="country" valuefield="NAME" controlwidth="157"></uicontrol>
         </customfield>
@@ -314,7 +322,7 @@
         <customfield name="P_PRODUCT_GROUP" label="Код тов.гр." datatype="String" size="100" datasourcefield="PRODUCT_GROUP" columnindex="3" index="6">
           <uicontrol type="DropDownList" table="(select p70, to_char(p70,'09')||' '||txt txt from V_KOD_70_4 order by 1)" addemptyitem="true" keyfield="p70" valuefield="txt" controlwidth="157"></uicontrol>
         </customfield>
-        <customfield name="P_COMM" label="Коментар(деталі)" datatype="String" size="100" datasourcefield="COMM" columnindex="3" index="7">
+        <customfield name="P_COMM" label="Коментар(деталі)" datatype="String" size="250" datasourcefield="COMM" columnindex="3" index="7">
           <uicontrol type="TextBox" controlwidth="150" linescount="4" />
         </customfield>
         <customfield name="P_CONTACT_FIO" label="ПІБ контактної особи" datatype="String" size="100" datasourcefield="CONTACT_FIO" columnindex="3" index="8">

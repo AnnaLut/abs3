@@ -180,7 +180,7 @@ namespace BarsWeb.Areas.Sep.Infrastructure.Repository.DI.Implementation
         private void InitRowReplySql(string dRec)
         {
             var dateBank = _paramsRepo.GetParam("BANKDATE");
-            string fn = dRec.Substring(3, 11);
+            string fn = dRec.Substring(2, 11);
             int rec = Int32.Parse(dRec.Substring(15, 5));
 
             _checkRowReplySql = new BarsSql()

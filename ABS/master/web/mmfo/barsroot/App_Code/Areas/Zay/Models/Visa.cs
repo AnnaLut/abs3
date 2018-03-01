@@ -6,6 +6,7 @@
         public decimal Viza { get; set; }
         public decimal? Priority { get; set; }
         public decimal? AimsCode { get; set; }
+        public string F092Code { get; set; }
         public decimal? SupDoc { get; set; }
     }
 }

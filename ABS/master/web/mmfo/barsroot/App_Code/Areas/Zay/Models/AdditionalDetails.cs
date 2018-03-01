@@ -7,6 +7,7 @@ namespace BarsWeb.Areas.Zay.Models
         public decimal Id { get; set; }
         public decimal VerifyOpt { get; set; }
         public decimal? Meta { get; set; }
+        public string F092 { get; set; }
         public string Contract { get; set; }
         public string Dat2Vmd { get; set; }
         public string DatVmd { get; set; }
