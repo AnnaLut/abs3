@@ -1,2 +1,25 @@
-=========  svn diff --summarize -r 48915:48957 D:\SVN\master\web\mmfo
-Bugfix_2.0.38.4.27 (Rev:48915-48957
+=========  svn diff --summarize -r 48915:48970 D:\SVN\master\web\mmfo
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.27\mmfo\web\barsroot\Areas\Zay\Scripts\CurrencyBuySighting\tpl\RowEditPattern.tpl.html
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.27\mmfo\web\barsroot\Areas\Zay\Scripts\CurrencyBuySighting\currencyBuySightCtrl.js
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.27\mmfo\web\barsroot\Areas\Zay\Scripts\CurrencySaleSighting\currencySaleSightCtrl.js
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.27\mmfo\web\barsroot\Areas\Zay\Scripts\Utils\visaCtrl.js
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.27\mmfo\web\barsroot\Areas\Zay\Scripts\Utils\helper.js
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.27\mmfo\web\barsroot\App_Data\forms\frm_zay_buy_add_edit.xml
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.27\mmfo\web\barsroot\App_Data\forms\frm_zay_buy_add.xml
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.27\mmfo\web\barsroot\App_Data\forms\frm_zay_sal_add_edit.xml
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.27\mmfo\web\barsroot\App_Data\forms\frm_zay_sal_add.xml
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.27\mmfo\web\barsroot\App_Code\Areas\Sep\Infrastructure\Repository\DI\Implementation\SepTZRepository.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.27\mmfo\web\barsroot\App_Code\Areas\Zay\Infrastructure\DI\Abstract\ICurrencyDictionary.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.27\mmfo\web\barsroot\App_Code\Areas\Zay\Infrastructure\DI\Implementation\CurrencyDictionary.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.27\mmfo\web\barsroot\App_Code\Areas\Zay\Infrastructure\DI\Implementation\CurrencySightRepository.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.27\mmfo\web\barsroot\App_Code\Areas\Zay\Infrastructure
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.27\mmfo\web\barsroot\App_Code\Areas\Zay\Models\F092Model.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.27\mmfo\web\barsroot\App_Code\Areas\Zay\Models\Visa.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.27\mmfo\web\barsroot\App_Code\Areas\Zay\Models\AdditionalDetails.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.27\mmfo\web\barsroot\App_Code\Areas\Zay\Models\CurrencySaleModel.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.27\mmfo\web\barsroot\App_Code\Areas\Zay\Models\CurrencyBuyModel.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.27\mmfo\web\barsroot\App_Code\Areas\Zay\Controllers\Api\F092Controller.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.27\mmfo\web\barsroot\App_Code\Areas\Zay\Controllers\Api\ZaySale\CurrencySaleSightingController.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.27\mmfo\web\barsroot
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.27\mmfo\web
+Bugfix_2.0.38.4.27 (Rev:48915-48970
