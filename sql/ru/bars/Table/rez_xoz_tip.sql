@@ -59,10 +59,26 @@ exception when others then
  end;
 /
 
---exec bars_policy_adm.add_column_kf(p_table_name => 'REZ_XOZ_TIP');
---exec bars_policy_adm.alter_policy_info(p_table_name => 'REZ_XOZ_TIP', p_policy_group => 'WHOLE', p_select_policy => null, p_insert_policy => 'E', p_update_policy => 'E', p_delete_policy => 'E');
---exec bars_policy_adm.alter_policy_info(p_table_name => 'REZ_XOZ_TIP', p_policy_group => 'FILIAL', p_select_policy => 'M', p_insert_policy => 'M', p_update_policy => 'M', p_delete_policy => 'M');
---exec bars_policy_adm.alter_policies(p_table_name => 'REZ_XOZ_TIP');
+BEGIN 
+     execute immediate  
+       'begin  
+            bpa.alter_policy_info(''REZ_XOZ_TIP'', ''FILIAL'' ,null, null, null, null);
+            bpa.alter_policy_info(''REZ_XOZ_TIP'', ''WHOLE'' , null, null, null, null);
+            null;
+        end; 
+       '; 
+END; 
+/
+PROMPT *** ALTER_POLICIES to REZ_XOZ_TIP ***
+exec bpa.alter_policies('REZ_XOZ_TIP');
+BEGIN bars_policy_adm.add_column_kf(p_table_name => 'REZ_XOZ_TIP');
+exception when others then
+  if  sqlcode=-01430  then null; else raise; end if;
+end;
+/
+exec bars_policy_adm.alter_policy_info(p_table_name => 'REZ_XOZ_TIP', p_policy_group => 'WHOLE', p_select_policy => null, p_insert_policy => 'E', p_update_policy => 'E', p_delete_policy => 'E');
+exec bars_policy_adm.alter_policy_info(p_table_name => 'REZ_XOZ_TIP', p_policy_group => 'FILIAL', p_select_policy => 'M', p_insert_policy => 'M', p_update_policy => 'M', p_delete_policy => 'M');
+exec bars_policy_adm.alter_policies(p_table_name => 'REZ_XOZ_TIP');
 
 PROMPT *** Create  grants  REZ_XOZ_TIP ***
 grant SELECT  on REZ_XOZ_TIP         to BARS_ACCESS_DEFROLE;
