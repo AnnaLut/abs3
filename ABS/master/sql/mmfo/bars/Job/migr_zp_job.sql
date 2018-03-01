@@ -91,9 +91,9 @@ begin
                             job_type            => 'PLSQL_BLOCK',
                             job_action          => l_job_action,
                             number_of_arguments => 0,
-                            start_date          => TO_TIMESTAMP('2018/02/27 22:00:00.000000','yyyy/mm/dd hh24:mi:ss.ff'),
+                            start_date          => sysdate+1/24,
                             repeat_interval     => NULL,
-                            end_date            => TO_TIMESTAMP('2018/02/27 22:01:00.000000','yyyy/mm/dd hh24:mi:ss.ff'),
+                            end_date            => sysdate+2/24,
                             job_class           => 'DEFAULT_JOB_CLASS',
                             enabled             => TRUE,
                             comments            => 'Міграція зарплатних рахунків');
