@@ -314,7 +314,7 @@ exception when others then
 PROMPT *** Create  constraint NK_ZAYAVKA_ID ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ZAYAVKA MODIFY (ID CONSTRAINT NK_ZAYAVKA_ID NOT NULL ENABLE)';
+  ALTER TABLE BARS.ZAYAVKA ADD CONSTRAINT CC_ZAYAVKA_CODE2C CHECK (code_2c in (''0'', ''1'', ''2'', ''3'',''4'',''5'',''9'',''A'',''B'')) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -420,7 +420,6 @@ grant ALTER,DEBUG,DELETE,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on
 PROMPT *** Create SYNONYM  to ZAYAVKA ***
 
   CREATE OR REPLACE PUBLIC SYNONYM ZAYAVKA FOR BARS.ZAYAVKA;
-
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/Table/ZAYAVKA.sql =========*** End *** =====

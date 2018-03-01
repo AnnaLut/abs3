@@ -7,7 +7,12 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_ZAY_SALFORM ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_ZAY_SALFORM ("ID", "DK", "SOS", "SVIZA", "CUST_BRANCH", "RNK", "NMK", "ACC0", "ACC1", "NLS", "OSTC", "S2", "DIG", "S2S", "MFO0", "NLS0", "KV_CONV", "LCV_CONV", "NLS_ACC0", "FDAT", "ND", "KOM", "SKOM", "KURS_Z", "KURS_F", "VDATE", "META", "AIM_NAME", "CONTRACT", "DATC", "NUM_VMD", "VMD1", "BASIS", "DATZ", "COMM", "CONTACT_FIO", "CONTACT_TEL", "COVERED", "KB", "KV", "DOC_DESC", "DATT", "OBZ") AS 
+  CREATE OR REPLACE FORCE VIEW BARS.V_ZAY_SALFORM ("ID", "DK", "SOS", "SVIZA", 
+"CUST_BRANCH", "RNK", "NMK", "ACC0", "ACC1", "NLS", "OSTC", "S2", "DIG", "S2S",
+"MFO0", "NLS0", "KV_CONV", "LCV_CONV", "NLS_ACC0", "FDAT", "ND", "KOM", "SKOM",
+ "KURS_Z", "KURS_F", "VDATE", "META", "AIM_NAME", "CONTRACT", "DATC", "NUM_VMD", "VMD1",
+ "BASIS", "DATZ", "COMM", "CONTACT_FIO", "CONTACT_TEL", "COVERED", "KB", "KV", "DOC_DESC", 
+"DATT", "OBZ","F092") AS 
   SELECT v.id,
             DECODE (v.dk, 2, 0, 1) dk, -- для фильтра в вебе, 0 - продажа, 1 - конверсия
             v.sos,
@@ -56,7 +61,8 @@ PROMPT *** Create  view V_ZAY_SALFORM ***
             v.kv2 kv,
             NVL (zc.doc_desc, NULL) doc_desc,
             v.datt,
-            v.obz
+            v.obz,
+            v.f092
        FROM v_zay_queue v,
             country c,
             country cc,
@@ -65,8 +71,8 @@ PROMPT *** Create  view V_ZAY_SALFORM ***
             AND 2 > v.sos
             AND v.sos >= 0
             AND fdat >   bankdate
-                       - (SELECT TO_NUMBER (val)
-                            FROM birja
+                    - (SELECT TO_NUMBER (val)
+                          FROM birja
                            WHERE par = 'ZAY_DAY')
             AND v.branch LIKE
                    SYS_CONTEXT ('bars_context', 'user_branch') || '%'

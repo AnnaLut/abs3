@@ -7,8 +7,98 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_ZAY_QUEUE ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_ZAY_QUEUE ("ID", "MFO", "REQ_ID", "DK", "OBZ", "ND", "FDAT", "DATT", "RNK", "NMK", "ND_RNK", "KV_CONV", "LCV_CONV", "KV2", "LCV", "DIG", "S2", "S2S", "S3", "KOM", "SKOM", "KURS_Z", "KURS_F", "VDATE", "DATZ", "ACC0", "NLS_ACC0", "MFO0", "NLS0", "OKPO0", "OSTC0", "ACC1", "OSTC", "NLS", "SOS", "REF", "VIZA", "PRIORITY", "PRIORNAME", "PRIORVERIFY", "IDBACK", "FL_PF", "MFOP", "NLSP", "OKPOP", "RNK_PF", "PID", "CONTRACT", "DAT2_VMD", "META", "AIM_NAME", "FULL_META", "BASIS", "PRODUCT_GROUP", "PRODUCT_GROUP_NAME", "FULL_PRODUCT_GROUP", "NUM_VMD", "DAT_VMD", "DAT5_VMD", "COUNTRY", "BENEFCOUNTRY", "BANK_CODE", "BANK_NAME", "USERID", "BRANCH", "FL_KURSZ", "IDENTKB", "COMM", "CUST_BRANCH", "KURS_KL", "CONTACT_FIO", "CONTACT_TEL", "VERIFY_OPT", "CLOSE_TYPE_NAME", "AIMS_CODE", "S_PF", "REF_PF", "REF_SPS", "START_TIME", "STATE", "OPERID_NOKK", "REQ_TYPE", "VDATE_PLAN", "REASON_COMM", "CODE_2C", "P12_2C", "ATTACHMENTS_COUNT") AS 
-  SELECT z.id,                                                  -- реф заявки
+CREATE OR REPLACE FORCE VIEW BARS.V_ZAY_QUEUE
+(
+   ID,
+   MFO,
+   REQ_ID,
+   DK,
+   OBZ,
+   ND,
+   FDAT,
+   DATT,
+   RNK,
+   NMK,
+   ND_RNK,
+   KV_CONV,
+   LCV_CONV,
+   KV2,
+   LCV,
+   DIG,
+   S2,
+   S2S,
+   S3,
+   KOM,
+   SKOM,
+   KURS_Z,
+   KURS_F,
+   VDATE,
+   DATZ,
+   ACC0,
+   NLS_ACC0,
+   MFO0,
+   NLS0,
+   OKPO0,
+   OSTC0,
+   ACC1,
+   OSTC,
+   NLS,
+   SOS,
+   REF,
+   VIZA,
+   PRIORITY,
+   PRIORNAME,
+   PRIORVERIFY,
+   IDBACK,
+   FL_PF,
+   MFOP,
+   NLSP,
+   OKPOP,
+   RNK_PF,
+   PID,
+   CONTRACT,
+   DAT2_VMD,
+   META,
+   AIM_NAME,
+   full_meta,
+   BASIS,
+   PRODUCT_GROUP,
+   PRODUCT_GROUP_NAME,
+   full_product_group,
+   NUM_VMD,
+   DAT_VMD,
+   DAT5_VMD,
+   COUNTRY,
+   BENEFCOUNTRY,
+   BANK_CODE,
+   BANK_NAME,
+   USERID,
+   BRANCH,
+   FL_KURSZ,
+   IDENTKB,
+   COMM,
+   CUST_BRANCH,
+   KURS_KL,
+   CONTACT_FIO,
+   CONTACT_TEL,
+   VERIFY_OPT,
+   CLOSE_TYPE_NAME,
+   AIMS_CODE,
+   S_PF,
+   REF_PF,
+   REF_SPS,
+   START_TIME,
+   STATE,
+   OPERID_NOKK,
+   REQ_TYPE,
+   VDATE_PLAN,
+   REASON_COMM,
+   CODE_2C,
+   P12_2C,
+   ATTACHMENTS_COUNT,F092
+)
+AS
+   SELECT z.id,                                                  -- реф заявки
           SUBSTR (f_ourmfo, 1, 6),                                       -- РУ
           NULL,                                               -- реф заявки РУ
           z.dk,                                         -- 1-покупка/2-продажа
@@ -109,7 +199,8 @@ PROMPT *** Create  view V_ZAY_QUEUE ***
           z.reason_comm,
           z.code_2c,
           z.p12_2c,
-          z.attachments_count
+          z.attachments_count,
+	  z.f092
      FROM zayavka z,
           zay_queue q,
           customer c,
@@ -226,7 +317,8 @@ PROMPT *** Create  view V_ZAY_QUEUE ***
           reason_comm,
           NULL,
           NULL,
-          0 attachments_count
+          0 attachments_count,
+	  null
      FROM zayavka_ru
     WHERE     f_ourmfo_g = SYS_CONTEXT ('bars_context', 'user_mfo')
           AND f_ourmfo () = '300465';
@@ -239,7 +331,10 @@ grant SELECT                                                                 on 
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_ZAY_QUEUE     to WR_ALL_RIGHTS;
 grant SELECT                                                                 on V_ZAY_QUEUE     to ZAY;
 
-
+GRANT DELETE, INSERT, SELECT, UPDATE ON BARS.V_ZAY_QUEUE TO BARS_ACCESS_DEFROLE;
+GRANT DELETE, INSERT, SELECT, UPDATE ON BARS.V_ZAY_QUEUE TO START1;
+GRANT DELETE, INSERT, SELECT, UPDATE, FLASHBACK ON BARS.V_ZAY_QUEUE TO WR_ALL_RIGHTS;
+GRANT SELECT ON BARS.V_ZAY_QUEUE TO ZAY;
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_ZAY_QUEUE.sql =========*** End *** ==

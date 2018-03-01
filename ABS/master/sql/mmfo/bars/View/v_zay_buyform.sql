@@ -7,7 +7,13 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_ZAY_BUYFORM ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_ZAY_BUYFORM ("ID", "DK", "SOS", "SVIZA", "CUST_BRANCH", "RNK", "NMK", "ACC0", "NLS_ACC0", "OSTC0", "ACC1", "NLS", "S2", "DIG", "S2S", "MFO0", "NLS0", "FDAT", "ND", "KOM", "SKOM", "KURS_Z", "KURS_F", "VDATE", "META", "AIM_NAME", "CONTRACT", "DATC", "NUM_VMD", "VMD1", "VMD5", "COUNTRY", "CBCOUNTRY", "BASIS", "BENEFCOUNTRY", "CBBENEFCOUNTRY", "BANK_CODE", "BANK_NAME", "PRODUCT_GROUP", "PRODUCT_GROUP_NAME", "DATZ", "COMM", "CONTACT_FIO", "CONTACT_TEL", "COVERED", "KB", "KV", "DOC_DESC", "KV_CONV", "LCV_CONV", "DATT") AS 
+  CREATE OR REPLACE FORCE VIEW BARS.V_ZAY_BUYFORM ("ID", "DK", "SOS", "SVIZA", "CUST_BRANCH",
+ "RNK", "NMK", "ACC0", "NLS_ACC0", "OSTC0", "ACC1", "NLS", "S2", "DIG", "S2S", "MFO0", "NLS0",
+ "FDAT", "ND", "KOM", "SKOM", "KURS_Z", "KURS_F", "VDATE", "META", "AIM_NAME", "CONTRACT",
+ "DATC", "NUM_VMD", "VMD1", "VMD5", "COUNTRY", "CBCOUNTRY", "BASIS", "BENEFCOUNTRY", 
+"CBBENEFCOUNTRY", "BANK_CODE", "BANK_NAME", "PRODUCT_GROUP", "PRODUCT_GROUP_NAME", "DATZ",
+ "COMM", "CONTACT_FIO", "CONTACT_TEL", "COVERED", "KB", "KV", "DOC_DESC", "KV_CONV",
+ "LCV_CONV", "DATT","F092") AS 
   SELECT v.id,
             DECODE (v.dk, 1, 0, 1) dk, -- для фильтра в вебе, 0 - покупка, 1 - конверсия
             sos,
@@ -65,7 +71,8 @@ PROMPT *** Create  view V_ZAY_BUYFORM ***
             NVL (zc.doc_desc, NULL) doc_desc,
             NVL (kv_conv, 980) kv_conv,
             NVL (lcv_conv, 'UAH') lcv_conv,
-            v.datt
+            v.datt,
+  	    v.f092
        FROM v_zay_queue v,
             country c,
             country cc,
