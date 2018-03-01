@@ -1,4 +1,4 @@
-CREATE OR REPLACE PACKAGE OVRN IS  G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :='ver.2 13.11.2017';
+CREATE OR REPLACE PACKAGE BARS.OVRN IS  G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :='ver.2 13.11.2017';
 
  g_TIP  tips.tip%type     := 'OVN';
  g_VIDD cc_vidd.vidd%type := 10   ;  -- <<Солsдарний>> Оверд
@@ -106,9 +106,11 @@ procedure repl_acc (p_nd number, p_old_acc number, p_new_kv int, p_new_nls varch
 -------------------
 END ;
 /
-CREATE OR REPLACE PACKAGE BODY OVRN IS
+
+CREATE OR REPLACE PACKAGE BODY BARS.OVRN IS
  G_BODY_VERSION  CONSTANT VARCHAR2(64)  :='ver.2 27.02.2018';
 /*
+28.02.2018 Sta Разделение при начислении %%%
 27.02.2018 Sta Подбор 2608
 27.12.2017 Sta Безусловный вынос на просрочку пр завершении дог
                При закр.дог старый счет 2607 НЕ затирается, хотя он и закрывается. При открытии нового дог. Старый счет перекрывается новым.
@@ -2021,7 +2023,7 @@ begin
 
   k31_ :=  to_number( to_char( last_day(p_dat2) , 'dd') ) ;
   If  mod( to_number (to_char(p_dat2, 'YYY')) ,4) = 0 then   l_BAZP  := 36600; end if; --высокосный год
-  delete from OVR_INTX ;
+  delete from OVR_INTX where ISP = gl.aUid;
   ----------------------
   for a8 in (SELECT a.acc , NVL(i.acr_dat+1, d.sdate)  DAT1, i.metr, i.basey
              FROM accounts a, nd_acc n, cc_deal d , int_accn i
@@ -2111,6 +2113,7 @@ begin
            tmpD(d8).PR2 := Round( tmpD(d8).PR2, 8 ) ;
            tmpD(d8).PR8 := ROUND( tmpD(d8).PR8, 8 ) ;
            tmpD(d8).PR  := ROUND( tmpD(d8).PR , 8 ) ;
+           tmpD(d8).ISP := gl.aUid ;
            insert into OVR_INTX values tmpD(d8);
            ---------------------------------------
            l_donor := nvl(to_number (OVRN.GetW(x.acc, 'DONOR' ) ),0) ;
@@ -2127,7 +2130,7 @@ begin
            If l_donor <> 1 and l_kol > 1 then
               tmpD(d8).VN  := 62   ;
               begin select - round (tar/k31_,8) into tmpD(d8).PR  from ACC_TARIF where acc = x.acc and kod = 145 and tar > 0 ;
-                    If tmpD(d8).PR  < 0 then insert into OVR_INTX values tmpD(d8); end if;
+                    If tmpD(d8).PR  < 0 then         tmpD(d8).ISP := gl.aUid ;  insert into OVR_INTX values tmpD(d8); end if;
               EXCEPTION WHEN NO_DATA_FOUND THEN null;
               end ;
            end if ;
@@ -2137,7 +2140,7 @@ begin
            If l_kol > 1 and tmpD(d8).IA8  > 0 then
               tmpD(d8).VN  := 63   ;
               begin select - round( tar/k31_, 8)  into tmpD(d8).PR from ACC_TARIF where acc = x.acc and kod = 146 and tar > 0  ;
-                    If tmpD(d8).PR < 0 then insert into OVR_INTX values tmpD(d8); end if;
+                    If tmpD(d8).PR < 0 then            tmpD(d8).ISP := gl.aUid ; insert into OVR_INTX values tmpD(d8); end if;
               EXCEPTION WHEN NO_DATA_FOUND THEN null;
               end ;
            end if ;
@@ -2148,7 +2151,7 @@ begin
                  select NVL(a.pr,t.PR) into tmpD(d8).IA2 from (select kod,pr from acc_tarif where acc=x.acc and kod=144) a, tarif t where T.kod= 144 and t.kod= a.kod (+);
                  tmpD(d8).PR  :=  ROUND( tmpD(d8).S2  * tmpD(d8).IA2/100,8)  ;
                  tmpD(d8).VN  := 61   ;
-                 if tmpD(d8).PR < 0 then insert into OVR_INTX values tmpD(d8); end if ;
+                 if tmpD(d8).PR < 0 then tmpD(d8).ISP := gl.aUid ; insert into OVR_INTX values tmpD(d8); end if ;
               EXCEPTION WHEN NO_DATA_FOUND THEN null;
               end ;
            end if ;
@@ -2215,7 +2218,8 @@ loop
 
 end loop ; --x
 
-  delete  from OVR_INTX ;
+  delete  from OVR_INTX where  ISP = gl.aUid ;
+
 end INTB;
 -------------------------------
 procedure OP_3600 (dd IN cc_deal%rowtype, a26 IN accounts%rowtype , a36 IN OUT accounts%rowtype) IS   -- откр дисконта  3600

@@ -23,28 +23,29 @@ PROMPT *** Create  table OVR_INTX ***
 begin 
   execute immediate '
   CREATE TABLE BARS.OVR_INTX 
-   (	CDAT DATE, 
-	ACC8 NUMBER, 
-	SAL8 NUMBER, 
-	IP8 NUMBER, 
-	IA8 NUMBER, 
-	PAS8 NUMBER, 
-	AKT8 NUMBER, 
-	ACC NUMBER, 
-	OST2 NUMBER, 
-	IP2 NUMBER, 
-	IA2 NUMBER, 
-	KP NUMBER(38,10), 
-	KA NUMBER(38,10), 
-	S2 NUMBER(38,10), 
-	S8 NUMBER(38,10), 
-	PR2 NUMBER(38,10), 
-	PR8 NUMBER(38,10), 
-	PR NUMBER(38,10), 
-	NPP NUMBER(*,0), 
-	VN NUMBER(*,0), 
-	RNK NUMBER, 
-	MOD1 NUMBER(*,0)
+   (  CDAT DATE, 
+  ACC8 NUMBER, 
+  SAL8 NUMBER, 
+  IP8 NUMBER, 
+  IA8 NUMBER, 
+  PAS8 NUMBER, 
+  AKT8 NUMBER, 
+  ACC NUMBER, 
+  OST2 NUMBER, 
+  IP2 NUMBER, 
+  IA2 NUMBER, 
+  KP NUMBER(38,10), 
+  KA NUMBER(38,10), 
+  S2 NUMBER(38,10), 
+  S8 NUMBER(38,10), 
+  PR2 NUMBER(38,10), 
+  PR8 NUMBER(38,10), 
+  PR NUMBER(38,10), 
+  NPP NUMBER(*,0), 
+  VN NUMBER(*,0), 
+  RNK NUMBER, 
+  MOD1 NUMBER(*,0),
+        ISP int
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -54,6 +55,10 @@ exception when others then
 end; 
 /
 
+begin  EXECUTE IMMEDIATE 'ALTER TABLE  OVR_INTX ADD  (ISP int) ' ;
+exception when others then   if SQLCODE = - 01430 then null;   else raise; end if; -- ORA-01430: column being added already exists in table
+end;
+/
 
 
 
