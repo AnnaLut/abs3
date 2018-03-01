@@ -1,21 +1,22 @@
-
  
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/forex.sql =========*** Run *** =====
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.FOREX 
+ PROMPT =====================================================================================
+
+CREATE OR REPLACE PACKAGE BARS.FOREX
 
 is
 
-g_header_version  constant varchar2(64)  := 'version 2 18.07.2017-3';
+g_header_version  constant varchar2(64)  := 'version 2 26.02.2018';
 g_header_defs     constant varchar2(512) := '';
 
 /*
+
+ 26.02.2018 Sta Доп.рекв о сделкам Форекс (с новым доп.параметром F092) для корректного формирования ф.510 (файл 3К XML).
+                COBUMMFO-6808, COBUMMFO-6704 - Дзедзюсь Костя
+
  18.07.2017 Sta - передано напрямую. Все 92** проверены.
-
- 28.10.2016 Sta Переоцінка до "справедл.вартості"= поточному оф.курсу коротких одноногих.
-
+ 28.10.2016 Sta Переоцінка до "справедл.вартості"= поточному оф.курсу коротких одноногих. 
  20.10.2016 Проверка возможности пролонгации второг ноги
  15.01.2015 Анул.поч.угоду + Анул.ВСЮ.угоду
  24-12-2014 Sta Возможность корр даты в пл.календаре по %% для Депо-свопов
@@ -28,26 +29,23 @@ g_header_defs     constant varchar2(512) := '';
 */
 
 
--- header_version - возвращает версию заголовка пакета
-function header_version return varchar2;
 
--- body_version - возвращает версию тела пакета
-function body_version return varchar2;
+function header_version return varchar2; -- header_version - возвращает версию заголовка пакета
+function body_version   return varchar2; -- body_version - возвращает версию тела пакета
 ------------------------------------------
-function open_accF
-( p_rnk   number,
-  p_nbs   accounts.nbs%type,
-  p_kv    accounts.kv%type ) return number ;
+function  GetW ( p_deal_tag number, p_tag varchar2) return varchar2   ; ---- Получить     Доп.рекв о сделкам Форекс
+procedure SetW ( p_deal_tag number, p_tag varchar2,  p_val varchar2 ) ; ---  Установить   Доп.рекв о сделкам Форекс
 
-procedure open_accP
-( p_swaptag    number,
+function open_accF ( p_rnk  number,  p_nbs accounts.nbs%type,  p_kv accounts.kv%type ) return number ;
+
+procedure open_accP ( p_swaptag    number,
   p_rnk        fx_deal_acc.rnk%type,
   p_fxtype     fx_deal_acc.fx_type%type,
   p_kvtype     fx_deal_acc.kv_type%type,
   p_kv         fx_deal_acc.kv%type,
   p_acc    out number ) ;
 ------------------------------------------
-procedure REV_SPOT_OB (p_dat date, p_DEAL_TAG int ) ; -- 28.10.2016 Sta Переоцінка до "справедл.вартості"= поточному оф.курсу коротких одноногих.
+procedure REV_SPOT_OB (p_dat date, p_DEAL_TAG int ) ; -- 28.10.2016 Sta Переоцінка до "справедл.вартості"= поточному оф.курсу коротких одноногих. 
 
 procedure LONG_TERM   (p_mode int , p_SWAP_TAG int, p_DEAL_TAG int ) ;
 --Проверка возможности пролонгации второг ноги
@@ -98,19 +96,53 @@ procedure get_fxacc (
   p_accb   out number );
 
 -------------------------------------------------------------------------------
+procedure create_deal_EX (
+  p_dealtype     number,   --   0 - обычный форекс,   1 - валютный своп ,  2 - депо своп 
+  p_mode         number,   --   0 - обычный форекс,   1 - начальный своп,  2 - конечный своп,   3 - %% по своп,   4 - уменьшение срока своп
+  p_deal_tag out fx_deal.deal_tag%type,
+  p_swap_tag     fx_deal.swap_tag%type,
+  p_ntik         fx_deal.ntik%type,
+  p_dat          fx_deal.dat%type,
+  p_kva          fx_deal.kva%type,
+  p_data         fx_deal.dat_a%type,
+  p_suma         fx_deal.suma%type,
+  p_sumc         fx_deal.sumc%type,
+  p_kvb          fx_deal.kvb%type,
+  p_datb         fx_deal.dat_b%type,
+  p_sumb         fx_deal.sumb%type,
+  p_sumb1        fx_deal.sumb1%type,
+  p_sumb2        fx_deal.sumb%type,
+  p_rnk          fx_deal.rnk%type,
+  p_nb           fx_deal.nb%type,
+  p_kodb         fx_deal.kodb%type,
+  p_swi_ref      fx_deal.swi_ref%type,
+  p_swi_bic      fx_deal.swi_bic%type,
+  p_swi_acc      fx_deal.swi_acc%type,
+  p_nlsa         fx_deal.nlsa%type,            -- счет для входа валюты (документ по вал-а (FX3))
+  p_swo_bic      fx_deal.swo_bic%type,
+  p_swo_acc      fx_deal.swo_acc%type,
+  p_nlsb         fx_deal.nlsb%type,            -- счет для отправки валюты (счет партнера)
+  p_b_payflag    fx_deal.b_payflag%type,       -- флаг оплаты документа по валюте-Б (0-не платить, 1-СЭП(FX1), 2-SWIFT(FX4), 3-МО(FX6))
+  p_agrmnt_num   fx_deal.agrmnt_num%type,
+  p_agrmnt_date  fx_deal.agrmnt_date%type,
+  p_interm_b     fx_deal.interm_b%type,
+  p_alt_partyb   fx_deal.alt_partyb%type,
+  p_bicb         fx_deal.bicb%type,
+  p_curr_base    fx_deal.curr_base%type,
+  p_telexnum     fx_deal.telexnum%type,
+  p_kod_na       fx_deal.kod_na%type,
+  p_kod_nb       fx_deal.kod_na%type,
+  p_field_58d    fx_deal.field_58d%type,
+  p_vn_flag      fx_deal.vn_flag%type,
+  p_nazn         varchar2 ,
+  p_f092         VARCHAR2 , --\ доп.реквизиты
+  p_forex        VARCHAR2   --/
+);
+
+
 procedure create_deal (
-  -- p_dealtype:
-  --   0 - обычный форекс
-  --   1 - валютный своп
-  --   2 - депо своп (с процентами)
-  p_dealtype     number,
-  -- p_mode:
-  --   0 - обычный форекс
-  --   1 - начальный своп
-  --   2 - конечный своп
-  --   3 - %% по своп
-  --   4 - уменьшение срока своп
-  p_mode         number,
+  p_dealtype     number,   --   0 - обычный форекс,   1 - валютный своп ,  2 - депо своп 
+  p_mode         number,   --   0 - обычный форекс,   1 - начальный своп,  2 - конечный своп,   3 - %% по своп,   4 - уменьшение срока своп
   p_deal_tag out fx_deal.deal_tag%type,
   p_swap_tag     fx_deal.swap_tag%type,
   p_ntik         fx_deal.ntik%type,
@@ -177,13 +209,16 @@ procedure set_int_ratn_mb ( p_date date, p_kv number, p_term number, p_ir number
 --Відсоткові ставки на  МБ ринку
 end forex;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.FOREX is
 
-  g_body_version    constant varchar2(64)  := 'version 1.5 18.07.2017-3';
+CREATE OR REPLACE PACKAGE BODY BARS.FOREX  is
+
+  g_body_version    constant varchar2(64)  := 'version 2 26.02.2018';
 
 /*
+ 26.02.2018 Sta Доп.рекв о сделкам Форекс (с новым доп.параметром F092) для корректного формирования ф.510 (файл 3К XML).
+                COBUMMFO-6808, COBUMMFO-6704 - Дзедзюсь Костя
  18.07.2017 Sta - передано напрямую. Все 92** проверены.
- 05.07.2017 Sta Форекс-продукты в разрезе ДЛ/КОР + 1/2 (вал/депо) в всязи с переходом на новые бал счета
+ 05.07.2017 Sta Форекс-продукты в разрезе ДЛ/КОР + 1/2 (вал/депо) в всязи с переходом на новые бал счета 
 
  10.03.2017 Sta закоментарено    ---- update oper   set dk  = 1, kv = xx.kva, nlsa = l_1819, s = xx.suma, kv2 = xx.kvb, nlsb = l_1819, s2 = xx.sumb where ref = xx.ref ;
  24.02.2017 Sta + Алена Ш. Де-лонгация( но НЕ лонгация !!!!)  депо-свoпов
@@ -258,6 +293,27 @@ CREATE OR REPLACE PACKAGE BODY BARS.FOREX is
 function header_version return varchar2 is begin return 'Package HEADER FOREX ' || g_header_version || '.' || chr(10)   || 'AWK definition: ' || chr(10)   ||  g_header_defs; end header_version;
 function body_version   return varchar2 is begin return 'Package BODY FOREX '   || g_body_version   || '.' || chr(10) || 'AWK definition: ' || chr(10)  || g_body_defs; end body_version;
 -------------------------------------------------------------------------------
+function  GetW ( p_deal_tag number, p_tag varchar2) return varchar2  Is  ---- Получить     Доп.рекв о сделкам Форекс
+                                                     l_val varchar2 (200);
+begin 
+  begin select w.value into l_Val from operw w, fx_deal d where d.Deal_Tag = p_Deal_Tag and d.Ref = w.Ref and w.tag = p_Tag ;
+  exception when no_data_found then null;
+  end;
+  Return l_Val ;
+end GetW;
+
+procedure SetW ( p_deal_tag number, p_tag varchar2,  p_val varchar2 ) is  --- Установить   Доп.рекв о сделкам Форекс
+  l_Ref number;
+begin
+  begin select REF into l_ref from fx_deal where deal_tag = p_deal_tag;
+  exception when no_data_found then raise_application_error(-(20203), 'Не знайдено FOREX-угоду = ' || p_deal_tag );
+  end;
+  begin insert into operw (REF, TAG, VALUE) values ( l_Ref,  p_TAG, p_VAL );
+  exception when others then   if SQLCODE = - 00001 then null;   else raise; end if; --ORA-00001: unique constraint (BARS.XPK_CPTAG) violated
+  end;
+end SetW ;
+--------------
+
 procedure REV_SPOT_OB (p_dat date, p_DEAL_TAG int ) is -- 28.10.2016 Sta Переоцінка до "справедл.вартості"= поточному оф.курсу коротких одноногих.
   l_Kod  varchar2(30)   := 'SPOT';
   ff forex_ob22%rowtype ;
@@ -442,27 +498,24 @@ function get_forextype2 (p_swap number, p_dat date, p_data date, p_datb date) re
          --- функция2 получения Ключа-типа FOREX-сделки - с учетом СВОП
   l_kod varchar2(30);
 begin
-  l_kod := trim( FOREX.get_forextype (p_dat, p_data, p_datb ) ) ;
-  If p_swap  is NOT null then  l_kod := 'SWAP_' || l_kod; end if;
+  l_kod := FOREX.GetW(p_swap, 'FOREX');
+  If l_kod  is     null then  l_kod := trim( FOREX.get_forextype (p_dat, p_data, p_datb ) ) ; end if ;
+  If p_swap is NOT null then  l_kod := 'SWAP_' || l_kod; end if;
   return l_kod ;
 end get_forextype2 ;
 
 -------------------------------------------------------------------------------
 function get_forextype3 (p_deal number) return varchar2 is
          ---  функция3 получения типа FOREX-сделки по ее референсу : с учетом СВОП, с учетом процентов
-  xx  fx_deal%rowtype ;
-  l_kod1 varchar2(30) ;  l_kod2 varchar2(30) ;  l_kod3 varchar2(30) ;
-  l_nom  number := 0  ;  l_kol  number := 0  ;
+  xx  fx_deal%rowtype ;  R_Kod  varchar2(30) ;
+  l_kod1 varchar2(30) ;  l_kod2 varchar2(30) ;  l_kod3 varchar2(30) ;  l_nom  number := 0  ;  l_kol  number := 0  ;
 begin
 
   begin select * into xx from fx_deal where deal_tag = p_deal;   exception when no_data_found then null;   end;
 
   If    xx.SWAP_TAG is NOT null and xx.SWAP_TAG =  xx.DEAL_TAG  then l_kod3 := '_B0' ;
-  ElsIf xx.SWAP_TAG is NOT null and xx.SWAP_TAG <> xx.DEAL_TAG  then
-     select min(deal_tag), count(*)  into  xx.deal_tag , l_kol  from fx_deal where SWAP_TAG = xx.SWAP_TAG and deal_tag <> xx.SWAP_TAG;
-
-     If l_kol  > 0 then
-        select * into xx from fx_deal where deal_tag = xx.deal_tag;
+  ElsIf xx.SWAP_TAG is NOT null and xx.SWAP_TAG <> xx.DEAL_TAG  then select min(deal_tag), count(*)  into  xx.deal_tag , l_kol  from fx_deal where SWAP_TAG = xx.SWAP_TAG and deal_tag <> xx.SWAP_TAG;
+     If l_kol  > 0 then                                              select * into xx from fx_deal where deal_tag = xx.deal_tag;
         for k in (select * from fx_deal where SWAP_TAG=xx.SWAP_TAG and deal_tag <= p_deal and deal_tag <> xx.SWAP_TAG order by deal_tag )
         loop
            if l_nom = 0 then l_kod3 := '_EN' ;
@@ -473,14 +526,17 @@ begin
      end if;
   end if;
 
-  l_kod2 := FOREX.get_forextype (xx.dat, xx.dat_a,xx.dat_b ) ;
-
-  If    xx.SWAP_TAG is  null then   l_kod1 := ''           ;
-  ElsIf l_kol > 1            then   l_kod1 := 'D.SWAP_'    ;
-  else                              l_kod1 := 'V.SWAP_'    ;
+  R_Kod := FOREX.GetW (p_Deal, 'FOREX') ;
+  If R_Kod  is null then   
+     l_kod2 := FOREX.get_forextype (xx.dat, xx.dat_a,xx.dat_b ) ;
+     If    xx.SWAP_TAG is  null then   l_kod1 := ''           ;
+     ElsIf l_kol > 1            then   l_kod1 := 'D.SWAP_'    ;
+     else                              l_kod1 := 'V.SWAP_'    ;
+     end if;
+     R_Kod := Substr( l_kod1||l_kod2, 1, 30 ) ;
   end if;
 
-  RETURN Substr( l_kod1||l_kod2||l_kod3, 1, 30 ) ;
+  RETURN Substr( R_kod||l_kod3, 1, 30 ) ;
 
 end get_forextype3;
 
@@ -831,7 +887,7 @@ begin
 
   l_nbs  := substr(l_column, 1, 4);
   l_ob22 := substr(l_column, 6, 2);
-
+  
   if l_nbs is null then     raise_application_error(-20000, 'Не задано бал.рах для типу FOREX-угоди ' || l_kod );  end if;
 
   l_acc := FOREX.open_accF(p_rnk, l_nbs, p_kv);
@@ -866,12 +922,12 @@ is
 
 begin
   L_FOREX_KOD := pul.get('FOREX_KOD');
-  begin  -- ищем свободный
+  begin  -- ищем свободный 
      select a.acc into l_acc   from  accounts a, forex_ob22 f
       where a.rnk = p_rnk        and a.kv =  p_kv                                                          -- совпадает по РНК и по вал
         and f.kod = L_FOREX_KOD  and decode (p_kvtype,'A', f.s9a,f.s9p) like a.nbs||'_'||a.ob22            -- совпадает по бал+об22
         and a.ostb = 0 and a.ostf = 0 and a.ostc = 0  and a.dazs  is null                                  -- без остатка, но  не закрыт
-        and (a.dapp is null or a.dapp < gl.bdate -10) and rownum = 1;                                      -- работал более 10 дней назад ==>> любой из таких
+        and (a.dapp is null or a.dapp < gl.bdate -10) and rownum = 1;                                      -- работал более 10 дней назад ==>> любой из таких 
   exception when no_data_found then  FOREX.open_accP (p_swaptag, p_rnk, p_fxtype , p_kvtype, p_kv, l_acc); -- или откріваем новый
   end;
 
@@ -1119,7 +1175,7 @@ end f_dopr_b;
 --
 procedure pay_forward_vn (
   p_fxdeal in out fx_deal%rowtype,
-  p_fxtype        varchar2, ----Не исп, т.к. только ДЛ/КОР (от дат). а надо про ноги + вал/депо
+  p_fxtype        varchar2, ----Не исп, т.к. только ДЛ/КОР (от дат). а надо про ноги + вал/депо 
   p_cust          t_cust,
   p_tt            varchar2,
   p_nazn          varchar2 )
@@ -1169,12 +1225,12 @@ logger.info('XXX-11*'|| gl.bdate||'*'||p_fxdeal.dat_a||'*'|| p_fxdeal.dat_b||'*'
 
 --logger.info('XXX-2*'|| gl.bdate||p_fxdeal.dat_a||'*'|| p_fxdeal.dat_b||'*');
 
-  If p_fxdeal.dat_a > gl.bdate then
+  If p_fxdeal.dat_a > gl.bdate then 
      pay_subdoc(0, l_oper.ref, gl.bdate,       l_oper.tt, 1, p_fxdeal.kva, l_oper.nlsa, p_fxdeal.suma, p_fxdeal.kva, l_tt_nls,    p_fxdeal.suma, 'Розкрити вимоги');
      pay_subdoc(0, l_oper.ref, p_fxdeal.dat_a, l_oper.tt, 0, p_fxdeal.kva, l_oper.nlsa, p_fxdeal.suma, p_fxdeal.kva, l_tt_nls,    p_fxdeal.suma, 'Закрити вимоги');
   end if ;
 
-  If p_fxdeal.dat_b > gl.bdate then
+  If p_fxdeal.dat_b > gl.bdate then 
      pay_subdoc(0, l_oper.ref, gl.bdate,       l_oper.tt, 1, p_fxdeal.kvb, l_tt_nls,    p_fxdeal.sumb, p_fxdeal.kvb, l_oper.nlsb, p_fxdeal.sumb, 'Розкрити зобов`язання');
      pay_subdoc(0, l_oper.ref, p_fxdeal.dat_b, l_oper.tt, 0, p_fxdeal.kvb, l_tt_nls,    p_fxdeal.sumb, p_fxdeal.kvb, l_oper.nlsb, p_fxdeal.sumb, 'Закрити зобов`язання');
  end if;
@@ -1375,8 +1431,8 @@ procedure pay_fx2 (
 is
 begin
 
-  if    p_fxtype = g_fxtype_tod or p_fxtype = g_fxtype_split then  pay_tod     (p_fxdeal, p_cust, p_nazn) ;
-  elsif p_fxtype = g_fxtype_spot                             then  pay_spot    (p_fxdeal, p_cust, p_nazn) ;  -- 1.2 - SPOT
+  if    p_fxtype = g_fxtype_tod or p_fxtype = g_fxtype_split then  pay_tod     (p_fxdeal, p_cust, p_nazn) ; 
+  elsif p_fxtype = g_fxtype_spot                             then  pay_spot    (p_fxdeal, p_cust, p_nazn) ;  -- 1.2 - SPOT   
   else                                                             pay_forward (p_fxdeal, p_cust, p_nazn) ;  -- 1.3 - FORVARD
   end if;
 
@@ -1558,8 +1614,7 @@ begin
 
   -- определяем тип FOREXC-сделки
   l_fxtype := get_forextype(p_fxdeal.dat, p_fxdeal.dat_a, p_fxdeal.dat_b);
-
-  l_fxtype    := Nvl( pul.GET('FOREX_KOD'),  l_fxtype);
+  l_fxtype := Nvl( pul.GET('FOREX_KOD'),  l_fxtype);
 
   -- определяем торговый счет
   begin     select s1t into l_nls_1819 from forex_ob22 where kod = l_fxtype;
@@ -1671,9 +1726,7 @@ begin
             vn_flag     = p_fxdeal.vn_flag,
             nb          = p_fxdeal.nb
       where deal_tag = p_fxdeal.deal_tag;
-     if p_fxdeal.ref is not null then
-        gl.pay(2, p_fxdeal.ref, bankdate);
-     end if;
+     if p_fxdeal.ref is not null then      gl.pay(2, p_fxdeal.ref, bankdate);   end if;
   -- новая сделка - добавляем в таблицу
   else
      select s_fx_deal.nextval into p_fxdeal.deal_tag from dual;
@@ -1682,17 +1735,7 @@ begin
   end if;
 
   -- устанавливаем признак swap для первой своп-сделки (если не установлено, напр., создание своп из архива)
-  if p_mode = 2 then
-     update fx_deal set swap_tag = p_fxdeal.swap_tag where deal_tag = p_fxdeal.swap_tag;
-  end if;
-
-/*
-  -- Взятие на вал.поз - только в пл.даты (т.к. форвард нельзя, не знаем курс)
-  -- только на финише !!!
-  If least ( p_fxdeal.dat_a, p_fxdeal.dat_b) =  gl.bdate then
-     FOREX.p3800 ( p_fxdeal.deal_tag);
-  end if;
-*/
+  if p_mode = 2 then    update fx_deal set swap_tag = p_fxdeal.swap_tag where deal_tag = p_fxdeal.swap_tag;  end if;
 
   -- привязка документов (fx_deal_ref)
   link_ref(p_fxdeal.deal_tag, p_fxdeal.ref);
@@ -1703,9 +1746,65 @@ begin
 end new_deal;
 
 -------------------------------------------------------------------------------
--- create_deal
--- процедура создания FOREX-сделки
---
+
+-- -- процедура создания FOREX-сделки
+procedure create_deal_EX (
+  p_dealtype     number,   --   0 - обычный форекс,   1 - валютный своп ,  2 - депо своп 
+  p_mode         number,   --   0 - обычный форекс,   1 - начальный своп,  2 - конечный своп,   3 - %% по своп,   4 - уменьшение срока своп
+  p_deal_tag out fx_deal.deal_tag%type,
+  p_swap_tag     fx_deal.swap_tag%type,
+  p_ntik         fx_deal.ntik%type,
+  p_dat          fx_deal.dat%type,
+  p_kva          fx_deal.kva%type,
+  p_data         fx_deal.dat_a%type,
+  p_suma         fx_deal.suma%type,
+  p_sumc         fx_deal.sumc%type,
+  p_kvb          fx_deal.kvb%type,
+  p_datb         fx_deal.dat_b%type,
+  p_sumb         fx_deal.sumb%type,
+  p_sumb1        fx_deal.sumb1%type,
+  p_sumb2        fx_deal.sumb%type,
+  p_rnk          fx_deal.rnk%type,
+  p_nb           fx_deal.nb%type,
+  p_kodb         fx_deal.kodb%type,
+  p_swi_ref      fx_deal.swi_ref%type,
+  p_swi_bic      fx_deal.swi_bic%type,
+  p_swi_acc      fx_deal.swi_acc%type,
+  p_nlsa         fx_deal.nlsa%type,            -- счет для входа валюты (документ по вал-а (FX3))
+  p_swo_bic      fx_deal.swo_bic%type,
+  p_swo_acc      fx_deal.swo_acc%type,
+  p_nlsb         fx_deal.nlsb%type,            -- счет для отправки валюты (счет партнера)
+  p_b_payflag    fx_deal.b_payflag%type,       -- флаг оплаты документа по валюте-Б (0-не платить, 1-СЭП(FX1), 2-SWIFT(FX4), 3-МО(FX6))
+  p_agrmnt_num   fx_deal.agrmnt_num%type,
+  p_agrmnt_date  fx_deal.agrmnt_date%type,
+  p_interm_b     fx_deal.interm_b%type,
+  p_alt_partyb   fx_deal.alt_partyb%type,
+  p_bicb         fx_deal.bicb%type,
+  p_curr_base    fx_deal.curr_base%type,
+  p_telexnum     fx_deal.telexnum%type,
+  p_kod_na       fx_deal.kod_na%type,
+  p_kod_nb       fx_deal.kod_na%type,
+  p_field_58d    fx_deal.field_58d%type,
+  p_vn_flag      fx_deal.vn_flag%type,
+  p_nazn         varchar2 ,
+  p_f092         VARCHAR2 , --\ доп.реквизиты
+  p_forex        VARCHAR2   --/
+) IS
+begin 
+
+  If p_f092  is not null then pul.put('F092'     , p_F092 ) ; else  pul.put('F092'     , null);                                             end if ; 
+  If p_forex is not null then pul.put('FOREX_KOD', p_FOREX) ; else  pul.put('FOREX_KOD', Forex.get_forextype (p_dat, p_data , p_datb ) );   end if ;
+
+  FOREX.create_deal(
+  p_dealtype  ,  p_mode       ,  p_deal_tag ,  p_swap_tag  ,  p_ntik ,  p_dat      ,  p_kva      ,  p_data    ,  p_suma   ,  p_sumc     ,  p_kvb     ,  p_datb ,  p_sumb     ,
+  p_sumb1     ,  p_sumb2      ,  p_rnk      ,  p_nb        ,  p_kodb ,  p_swi_ref  ,  p_swi_bic  ,  p_swi_acc ,  p_nlsa   ,  p_swo_bic  ,  p_swo_acc ,  p_nlsb ,  p_b_payflag,
+  p_agrmnt_num,  p_agrmnt_date,  p_interm_b ,  p_alt_partyb,  p_bicb ,  p_curr_base,  p_telexnum ,  p_kod_na  ,  p_kod_nb ,  p_field_58d,  p_vn_flag ,  p_nazn 
+  );                             
+                                 FOREX.SetW ( p_deal_tag => p_deal_tag, p_tag =>'FOREX' , p_val => pul.Get('FOREX_KOD' ) ) ;  
+  If p_f092  is not null then    FOREX.SetW ( p_deal_tag => p_deal_tag, p_tag =>'F092'  , p_val => p_f092                ) ;  end if ;
+
+end create_deal_EX;
+-------------------
 procedure create_deal (
   p_dealtype     number,   --   0 - обычный форекс,   1 - валютный своп,   2 - депо своп (с процентами)
   p_mode         number,   --   0 - обычный форекс    1 - начальный своп,  2 - конечный своп,  3 - %% по своп,  4 - уменьшение срока своп
@@ -1744,29 +1843,21 @@ procedure create_deal (
   p_kod_nb       fx_deal.kod_na%type,
   p_field_58d    fx_deal.field_58d%type,
   p_vn_flag      fx_deal.vn_flag%type,
-  p_nazn         varchar2 )
-is
-  l_fxdeal fx_deal%rowtype;
-  l_data   date;
-  l_datb   date;
+  p_nazn         varchar2 )  is 
 
-  l_FOREX_KOD forex_ob22.kod%type;
+  l_fxdeal fx_deal%rowtype;  l_data   date;  l_datb   date;  l_FOREX_KOD forex_ob22.kod%type;
 
-begin
-
+begin 
   If gl.aMfo <> F_Get_Params('GLB-MFO')  then  RETURN ;  end if;
 
-  l_FOREX_KOD := Forex.get_forextype (p_dat, p_data , p_datb ) ;
+  l_FOREX_KOD := NVL( Pul.Get('FOREX_KOD'),  Forex.get_forextype (p_dat, p_data , p_datb ) ) ;
 
   If    p_dealtype = 1 then l_FOREX_KOD := 'V.SWAP_'|| l_FOREX_KOD ;
   ElsIf p_dealtype = 2 then l_FOREX_KOD := 'D.SWAP_'|| l_FOREX_KOD ;
   end if;
 
   pul.put('FOREX_KOD', l_FOREX_KOD);
-    ---------------------------------
-logger.info('XXXX-1*'|| p_data ||'*'|| p_datb||'* ');
-
-
+  ---------------------------------
   l_fxdeal.deal_tag    := null;
   l_fxdeal.swap_tag    := p_swap_tag;
   l_fxdeal.ntik        := p_ntik;
@@ -1843,7 +1934,6 @@ logger.info('XXXX-1*'|| p_data ||'*'|| p_datb||'* ');
   bars_audit.info( 'forex.create_deal: Exit with ( deal_tag = ' || l_fxdeal.deal_tag || ' ).' );
 
 end create_deal;
-
 -------------------------------------------------------------------------------
 -- proc_swap
 -- процедура разметки, перерасчета, оплаты платежного календаря по % сделки ДЕПО-СВОП
@@ -2122,7 +2212,7 @@ begin
   l_Kod := Substr ( FOREX.get_forextype3K ( xx.deal_tag) , 1, 30) ;
 
   If l_Kod like '%TOD%' then return; end if;
-  ----
+  ---- 
   begin select * into f_OB  from forex_ob22  where kod = l_kod  ;
   exception when no_data_found then  raise_application_error(-(20203), 'Не налаштовано (в forex_ob22) параметри переоцiнки для ' || l_kod);
   end;
@@ -2396,17 +2486,3 @@ begin
   init;
 end;
 /
- show err;
- 
-PROMPT *** Create  grants  FOREX ***
-grant EXECUTE                                                                on FOREX           to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on FOREX           to BARS_CONNECT;
-grant EXECUTE                                                                on FOREX           to FOREX;
-grant EXECUTE                                                                on FOREX           to START1;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/forex.sql =========*** End *** =====
- PROMPT ===================================================================================== 
- 
