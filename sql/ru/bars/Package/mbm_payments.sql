@@ -1161,7 +1161,9 @@ CREATE OR REPLACE package body mbm_payments is
                           p_errmsg  => l_errmsg ) ;
 
           l_ref := l_doc.doc.ref;
-
+          
+          
+          upd_cl_paym(p_cl_id,l_ref);
           p_ref:=to_char(l_ref);
           p_errcode:=to_char(l_errcode);
           p_errmsg:=l_errmsg;
