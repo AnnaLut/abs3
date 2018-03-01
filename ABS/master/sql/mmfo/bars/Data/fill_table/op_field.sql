@@ -40,7 +40,22 @@ exception when dup_val_on_index then
     end;
 /
 
+begin Insert into OP_FIELD 
+    (TAG,NAME,BROWSER,USE_IN_ARCH) 
+ Values 
+	('F092', 'Показник F092 для Звітності НБУ', 'TagBrowse("SELECT F092 kod, TXT naim FROM KOD_F092")', 1);
+exception when others then   
+	if SQLCODE = - 00001 then null;   
+	else 
+		raise; 
+	end if; --ORA-00001: unique constraint
+end;
+/
 
+begin Insert into OP_FIELD (TAG,NAME,BROWSER,USE_IN_ARCH) Values ('FOREX', 'Вид("довжина") ФОРЕКС-Угоди', '', 1);
+exception when others then   if SQLCODE = - 00001 then null;   else raise; end if; --ORA-00001: unique constraint
+end;
+/
 COMMIT;
 
 
