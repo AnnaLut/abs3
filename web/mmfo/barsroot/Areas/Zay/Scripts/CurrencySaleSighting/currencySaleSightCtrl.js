@@ -312,7 +312,9 @@
                         KV_CONV: { type: "number", editable: false },
                         REQ_TYPE: { type: "number", editable: false },
                         SUP_DOC: { type: "boolean" },
-                        ATTACHMENTS_COUNT: { type: "number" }
+                        ATTACHMENTS_COUNT: { type: "number" },
+                        F092_Code: { type: "string", editable: false},
+                        F092_Text: { type: "string", editable: true }
                     }
                 }
             },
@@ -557,7 +559,49 @@
                 title: "Цифровий код<br/>цілі продажу",
                 hidden: true,
                 width: 100
-            }, {
+            },
+            {
+                field: "F092_Text",
+                title: "Мета продажу (510)",
+                hidden: false,
+                width: 300,
+                editor: function (container, options) {
+                    var input = $('<input data-text-field="F092_Name" data-value-field="F092_Code" data-bind="value:' + options.field + '"/>');
+                    input.appendTo(container);
+
+                    input.kendoDropDownList({
+                        autoBind: true,
+                        dataTextField: "F902_Name",
+                        dataValueField: "F092_Code",
+                        optionLabel: "Змінити на...",
+                        valueTemplate: '<span>#:F092_Code + " " + F092_Name#</span>',
+                        template: '<span style="font-size:0.8em">#:F092_Code + " " + F092_Name#</span>',
+                        dataSource: {
+                            transport: {
+                                read: {
+                                    type: "GET",
+                                    dataType: "json",
+                                    url: bars.config.urlContent("api/zay/F092/GetSellingF092")
+                                }
+                            },
+                            schema: {
+                                data: "Data",
+                                total: "Total"
+                            }
+                        },
+                        change: function (e) {
+                            var grid = $("#grid").data("kendoGrid");
+                            var row = grid.dataItem(grid.select());
+                            row.F092_Text = this.text();
+                            row.F092_Code = this.value();
+                        }
+                    }).appendTo(container);
+
+                    var dropdownlist = input.data("kendoDropDownList");
+                    dropdownlist.list.width(360);
+                }
+            },
+            {
                 field: "TXT",
                 title: "Опис коду<br/>цілі продажу",
                 hidden:true,
@@ -637,7 +681,6 @@
             $("#btnPrintCorp").data("kendoButton").enable(isEnableCorpPrintBtn(currentRow));
         },
         edit: function (e) {
-
             var input = e.container.find(".k-input");
             var value = input.val();
             input.keyup(function () {
@@ -658,18 +701,6 @@
             });
             
         }
-        /*,
-        dataBound: function (e) {
-            console.log("dataBound");
-
-            var data = this.dataSource.view();
-
-            for (var i = 0; i < data.length; i++) {
-                var dataItem = data[i];
-                var tr = $("#grid").find("[data-uid='" + dataItem.uid + "']");
-                // use the table row (tr) and data item (dataItem)
-            }
-        }*/
     });
 
     $("#grid .k-grid-content").on("change", "input.chkbx", function (e) {

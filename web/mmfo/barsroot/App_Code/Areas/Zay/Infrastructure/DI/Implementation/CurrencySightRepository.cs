@@ -40,7 +40,9 @@ namespace BarsWeb.Areas.Zay.Infrastructure.Repository.DI.Implementation
                        trim(to_char(v.product_group,'09')||' '||v.product_group_name) product_group_name, 
                        v.num_vmd, v.viza, v.priority, v.priorname, v.comm,
                        bars_zay.get_request_cover(v.id) cover_id,
-                       v.verify_opt, v.identkb, v.kv_conv, v.req_type, v.code_2c, v.p12_2c, v.ATTACHMENTS_COUNT                  
+                       v.verify_opt, v.identkb, v.kv_conv, v.req_type, v.code_2c, v.p12_2c, v.ATTACHMENTS_COUNT, 
+                       v.f092 F092_Code,
+                       v.f092||' '||(select z.txt from f092 z where v.f092=z.f092) F092_Text               
                 FROM bars.v_zay_queue v,
                      bars.country c,
                      bars.country bc, bars.v_kod_70_2 k7
@@ -66,7 +68,9 @@ namespace BarsWeb.Areas.Zay.Infrastructure.Repository.DI.Implementation
                     to_char(v.meta,'09')||' '||v.aim_name meta_aim_name,
                     v.viza, v.priority, v.priorname, v.comm,
                     bars_zay.get_request_cover(v.id) cover_id, 
-                    v.verify_opt, v.obz, v.aims_code, null txt, v.kv_conv, v.req_type, v.ATTACHMENTS_COUNT 
+                    v.verify_opt, v.obz, v.aims_code, null txt, v.kv_conv, v.req_type, v.ATTACHMENTS_COUNT,
+                    v.f092 F092_Code,
+                    v.f092||' '||(select z.txt from f092 z where v.f092=z.f092) F092_Text
                 FROM v_zay_queue v
                 WHERE v.sos = 0 
                       AND v.dk = :p_dk
@@ -130,6 +134,7 @@ namespace BarsWeb.Areas.Zay.Infrastructure.Repository.DI.Implementation
                 command.Parameters.Add("p_id", OracleDbType.Decimal, details.Id, ParameterDirection.Input);
                 command.Parameters.Add("p_verify_opt", OracleDbType.Decimal, details.VerifyOpt, ParameterDirection.Input);
                 command.Parameters.Add("p_meta", OracleDbType.Decimal, details.Meta, ParameterDirection.Input);
+                command.Parameters.Add("p_f092", OracleDbType.Varchar2, details.F092, ParameterDirection.Input);
                 command.Parameters.Add("p_contract", OracleDbType.Varchar2, details.Contract, ParameterDirection.Input);
                 command.Parameters.Add("p_dat2_vmd", OracleDbType.Date, dat2Vmd, ParameterDirection.Input);
                 command.Parameters.Add("p_dat_vmd", OracleDbType.Date, datVmd, ParameterDirection.Input);
@@ -342,6 +347,7 @@ namespace BarsWeb.Areas.Zay.Infrastructure.Repository.DI.Implementation
                 command.Parameters.Add("p_viza", OracleDbType.Decimal, item.Viza, ParameterDirection.Input);
                 command.Parameters.Add("p_priority", OracleDbType.Decimal, item.Priority, ParameterDirection.Input);
                 command.Parameters.Add("p_aims_code", OracleDbType.Decimal, item.AimsCode, ParameterDirection.Input);
+                command.Parameters.Add("p_f092", OracleDbType.Varchar2, item.F092Code, ParameterDirection.Input);
                 command.Parameters.Add("p_sup_doc", OracleDbType.Decimal, item.SupDoc, ParameterDirection.Input);
 
                 command.ExecuteNonQuery();

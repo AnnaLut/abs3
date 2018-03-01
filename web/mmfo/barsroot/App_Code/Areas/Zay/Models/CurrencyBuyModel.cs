@@ -52,5 +52,7 @@ namespace BarsWeb.Areas.Zay.Models
         public string CODE_2C { get; set; }
         public string P12_2C { get; set; }
         public decimal? ATTACHMENTS_COUNT { get; set; }
+        public string F092_Code { get; set; }
+        public string F092_Text { get; set; }
     }
 }

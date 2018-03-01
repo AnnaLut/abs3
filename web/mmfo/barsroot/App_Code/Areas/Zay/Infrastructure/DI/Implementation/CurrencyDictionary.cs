@@ -27,6 +27,18 @@ namespace BarsWeb.Areas.Zay.Infrastructure.Repository.DI.Implementation
             return _entities.ExecuteStoreQuery<ZAY_AIMS>(query);
         }
 
+        public IEnumerable<F092Model> F092SellingDictionary()
+        {
+            var query = @"select f092 as F092_Code, txt as F092_Name from f092 where to_number(f092,'999') >199";
+            return _entities.ExecuteStoreQuery<F092Model>(query);
+        }
+
+        public IEnumerable<F092Model> F092BuyingDictionary()
+        {
+            var query = @"select f092 as F092_Code, txt as F092_Name from f092 where to_number(f092,'999') <200";
+            return _entities.ExecuteStoreQuery<F092Model>(query);
+        }
+
         public IEnumerable<Country> CountryDictionary()
         {
             const string query = @"select lpad(to_char(c.country), 3, '0') as COUNTRY_CODE, c.NAME as COUNTRY_NAME from COUNTRY c ORDER BY TO_NUMBER(COUNTRY_CODE) asc";

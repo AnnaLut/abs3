@@ -17,6 +17,7 @@
               l_kom number := :P_KOM;
               l_skom number := :P_SKOM;
               l_meta number := :P_META;
+              l_f092 char(3):= :P_F092;
               l_contract varchar2(128) := :P_CONTRACT;
               l_datc date := :P_DATC;
               l_num_vmd varchar2(128) := :P_NUM_VMD;
@@ -44,6 +45,7 @@
               p_kom           => l_kom,
               p_skom          => l_skom,
               p_meta          => l_meta,
+              p_f092          => l_f092,
               p_contract      => l_contract,
               p_dat2_vmd      => l_datc,
               p_num_vmd       => l_num_vmd,
@@ -80,6 +82,7 @@
               p_taxflg    => 0,
               p_taxacc    => null,
               p_aimid     => l_meta,
+              p_f092      => l_f092,
               p_contractid=> null,
               p_contractnum=> l_contract,
               p_contractdat=> l_datc,
@@ -118,6 +121,7 @@
               p_taxflg    => 0,
               p_taxacc    => null,
               p_aimid     => l_meta,
+              p_f092      => l_f092,
               p_contractid=> null,
               p_contractnum=> l_contract,
               p_contractdat=> l_datc,
@@ -153,6 +157,7 @@
               <parameter type="FormField" name="P_KOM" />
               <parameter type="FormField" name="P_SKOM" />
               <parameter type="FormField" name="P_META" />
+              <parameter type="FormField" name="P_F092" />
               <parameter type="FormField" name="P_CONTRACT" />
               <parameter type="FormField" name="P_DATC" />
               <parameter type="FormField" name="P_NUM_VMD" />
@@ -252,6 +257,9 @@
         </customfield>
         <customfield name="P_META" label="Мета" datatype="Decimal" required="true" datasourcefield="META" columnindex="2" index="5">
           <uicontrol type="DropDownList"  addemptyitem="true" keyfield="AIM" valuefield="NAME" table="( select AIM, to_char(aim,'09')||' '||NAME name from ZAY_AIMS where type = 2)" controlwidth="157" ></uicontrol>
+        </customfield>
+        <customfield name="P_F092" label="Мета продажу (510)" datatype="String" required="true" size="50" datasourcefield="F092" columnindex="2" index="6">
+          <uicontrol type="DropDownList" addemptyitem="true" table="(select f092 as id, f092||' '||txt as name  from f092 where to_number(f092,'999')&gt;200)" keyfield="id" valuefield="name" controlwidth="157"></uicontrol>
         </customfield>
         <customfield name="P_CONTRACT" label="Контракт/кред.логовор №" datatype="String" size="100" datasourcefield="CONTRACT" columnindex="2" index="6">
           <uicontrol type="TextBox" controlwidth="150" />

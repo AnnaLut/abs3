@@ -331,6 +331,9 @@
         <field datatype="String" key="false" name="basis">
           <column align="Left" caption="Код підстави для купівлі валюти "></column>
         </field>
+        <field datatype="Int64" key="false" name="f092">
+          <column align="Right" caption="Підстава для купівлі (510)" show="true" ></column>
+        </field> 
         <field datatype="Int64" key="false" name="Benefcountry">
           <column align="Center" caption="Код країни бенеф." show="true" width="150"></column>
         </field>

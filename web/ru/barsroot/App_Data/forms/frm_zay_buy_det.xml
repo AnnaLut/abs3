@@ -5,7 +5,7 @@
       <datasource>
         <sql>
           SELECT  v.id, to_char(meta,'09')||' '||v.aim_name name_pokup,         v.contract,     v.dat2_vmd,      v.dat_vmd,
-          v.dat5_vmd,     c.name name_perech,         v.basis,         bc.name name_benef,
+          v.dat5_vmd,     c.name name_perech,         v.basis, v.f092||' '||(select z.txt from f092 z where v.f092=z.f092) f092_text,       bc.name name_benef,
           v.bank_code,    v.bank_name,    to_char(v.product_group,'09')||' '||v.product_group_name product_group, v.num_vmd
           FROM  v_zay_queue v,
           country     c,
@@ -44,6 +44,9 @@
           <uicontrol readonly="true"></uicontrol>
         </customfield>
         <customfield name="p_basis" datatype="String" altname="basis" datasourcefield="basis" label="Підстава для покупки валюти" columnindex="2">
+          <uicontrol readonly="true"></uicontrol>
+        </customfield>
+        <customfield name="p_f092_text" datatype="String" altname="f092" datasourcefield="f092_text" label="Підстава для купівлі (510)" columnindex="2">
           <uicontrol readonly="true"></uicontrol>
         </customfield>
         <customfield name="p_name_benef" altname="name_benef" datasourcefield="name_benef" datatype="String" label="Країна бенефеціара" columnindex="2">
