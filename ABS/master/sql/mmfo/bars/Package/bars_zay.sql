@@ -6,7 +6,7 @@
 
   CREATE OR REPLACE PACKAGE BARS.BARS_ZAY
 is
-  head_ver  constant varchar2(64)  := 'version 6.0 13.07.2017';
+  head_ver  constant varchar2(64)  := 'version 6.2 20.02.2018';
   head_awk  constant varchar2(512) := ''
     ||'СБЕРБАНК' ||chr(10)
 ;
@@ -103,6 +103,7 @@ is
     p_taxflg        in  zayavka.fl_pf%type         default 1,     -- признак отчисления в ПФ          (для dk = 1)
     p_taxacc        in  zayavka.nlsp%type          default null,  -- счет клиента для отчисления в ПФ (для dk = 1)
     p_aimid         in  zayavka.meta%type,                        -- код цели покупки/продажи
+    p_f092	    in  zayavka.f092%type          default null,  -- код параметра F092
     p_contractid    in  zayavka.pid%type           default null,  -- идентификатор контракта
     p_contractnum   in  zayavka.contract%type      default null,  -- номер контракта/кред.договора
     p_contractdat   in  zayavka.dat2_vmd%type      default null,  -- дата контракта/кред.договора
@@ -229,6 +230,7 @@ is
     p_kom           in  zayavka.kom%type           default null,  -- процент (%) комиссии
     p_skom          in  zayavka.skom%type          default null,  -- фикс.сумма комиссии
     p_meta          in  zayavka.meta%type,                        -- код цели покупки/продажи
+    p_f092          in  zayavka.f092%type          default null,  -- код параметра F092
     p_contract      in  zayavka.contract%type      default null,  -- номер контракта/кред.договора
     p_dat2_vmd      in  zayavka.dat2_vmd%type      default null,  -- дата контракта/кред.договора
     p_num_vmd       in  zayavka.num_vmd%type       default null,  -- номер последней тамож.декларации
@@ -298,6 +300,7 @@ is
     p_id        in zayavka.id%type,
     p_verify_opt  in zayavka.verify_opt%type,
     p_meta      in zayavka.meta%type        default null,
+    p_f092      in zayavka.f092%type        default null,
     p_contract  in zayavka.contract%type    default null,
     p_dat2_vmd  in zayavka.dat2_vmd%type    default null,
     p_dat_vmd   in zayavka.dat_vmd%type     default null,
@@ -320,7 +323,8 @@ is
     p_id        in zayavka.id%type,
     p_viza      in zayavka.viza%type,
     p_priority  in zayavka.priority%type  default null,
-    p_aims_code in zayavka.meta%type default null,
+    p_aims_code in zayavka.aims_code%type default null,
+    p_f092      in zayavka.f092%type default null,
     p_sup_doc   in zayavka.support_document%type default null);
 
   --
@@ -607,7 +611,7 @@ end BARS_ZAY;
 CREATE OR REPLACE PACKAGE BODY BARS.BARS_ZAY
 is
 
-body_ver   constant varchar2(64)   := 'version 12.01 13.07.2017';
+body_ver   constant varchar2(64)   := 'version 12.02 20.02.2018';
 body_awk   constant varchar2(512)  := ''
     ||'СБЕРБАНК (назначение платежа)' ||chr(10)
     ||'Комиссия по курсу НБУ' ||chr(10)
@@ -1019,6 +1023,7 @@ begin
 
   if p_zayrow.dk = 1 then
      i_insdocparam (p_ref, 'D1#70', substr(to_char(p_zayrow.meta),                   1, 254));
+     i_insdocparam (p_ref, 'D1#3K', substr(to_char(p_zayrow.f092),                   1, 220));    
      i_insdocparam (p_ref, 'D2#70', substr(p_zayrow.contract,                        1, 254));
      i_insdocparam (p_ref, 'D3#70', substr(to_char(p_zayrow.dat2_vmd, 'DD.MM.YYYY'), 1, 254));
      i_insdocparam (p_ref, 'D4#70', substr(to_char(p_zayrow.dat_vmd,  'DD.MM.YYYY'), 1, 254));
@@ -1042,6 +1047,7 @@ begin
      end if;
   else
      i_insdocparam (p_ref, 'D1#70', substr(to_char(p_zayrow.meta),                   1, 254));
+     i_insdocparam (p_ref, 'D1#3K', substr(to_char(p_zayrow.f092),                   1, 220));
      i_insdocparam (p_ref, 'D2#70', substr(p_zayrow.contract,                        1, 254));
      i_insdocparam (p_ref, 'D3#70', substr(to_char(p_zayrow.dat2_vmd, 'DD.MM.YYYY'), 1, 254));
      i_insdocparam (p_ref, 'D4#70', substr(to_char(p_zayrow.dat_vmd,  'DD.MM.YYYY'), 1, 254));
@@ -1373,8 +1379,7 @@ begin
         raise_application_error( -20222, 'Не описана базовая валюта для данной пары валют в конверсии!', true );
     end;
     -- обигрываем конверсию согласно курсам (валюта по отношению к валюте - пришлось определять понятие базовой валюты в паре)
-    if l_zay.kv_conv = l_kv_base
-    then
+    if l_zay.kv_conv = l_kv_base then
       l_eqv_amount := round(l_nom_amount / l_zay.kurs_f / power(10, 2) * 100);
     else
       l_eqv_amount := round(l_nom_amount * l_zay.kurs_f / power(10, 2) * 100);
@@ -2009,9 +2014,6 @@ is
   l_doc_ref       oper.ref%type;
   l_custzay       cust_zay%rowtype;
   l_nlskom        cust_zay.nls_kom%type;
-
-
-
   l_obz           zayavka.obz%type;
   l_nlsNC         accounts.nls%type;
   l_cust          customer%rowtype;
@@ -3003,15 +3005,11 @@ if l_vzay.MFO<>'300465' then
           l_comm := 'Інформацію про створення заявки (№ ' || l_vzay.id ||') успішно передано до ЦА';
           l_type := 9;
     end if;
-
-
-
   else
     l_type := 2;
     l_flag := 1;
     l_comm := 'Інформацію про створення заявки (№ '||l_vzay.id||') успішно передано до ЦА';
   end if;
-
   l_request := soap_rpc.new_request(p_url       => l_url,
                                     p_namespace => 'http://tempuri.org/',
                                     p_method    => 'SetRequest',
@@ -3070,7 +3068,6 @@ if l_vzay.MFO<>'300465' then
   end if;
   if l_vzay.lcv is not null then
     soap_rpc.add_parameter(l_request, 'lcv', encode_base64(l_vzay.lcv));
-
   end if;
   if l_vzay.dig is not null then
     soap_rpc.add_parameter(l_request, 'dig', replace(to_char(l_vzay.dig),',','.'));
@@ -3602,6 +3599,7 @@ procedure create_request_ex
     p_taxflg        in  zayavka.fl_pf%type         default 1,     -- признак отчисления в ПФ          (для dk = 1)
     p_taxacc        in  zayavka.nlsp%type          default null,  -- счет клиента для отчисления в ПФ (для dk = 1)
     p_aimid         in  zayavka.meta%type,                        -- код цели покупки/продажи
+    p_f092          in  zayavka.f092%type          default null,  -- код параметра F092
     p_contractid    in  zayavka.pid%type           default null,  -- идентификатор контракта
     p_contractnum   in  zayavka.contract%type      default null,  -- номер контракта/кред.договора
     p_contractdat   in  zayavka.dat2_vmd%type      default null,  -- дата контракта/кред.договора
@@ -3708,6 +3706,7 @@ begin
   l_request.fl_pf         := p_taxflg;
   l_request.nlsp          := p_taxacc;
   l_request.meta          := p_aimid;
+  l_request.f092          := p_f092;
   l_request.pid           := p_contractid;
   l_request.contract      := p_contractnum;
   l_request.dat2_vmd      := p_contractdat;
@@ -4387,9 +4386,7 @@ BEGIN
            prm := p_id;
            bars_audit.trace('%s Неуспешное визирование заявки № %s - %s', l_title, to_char(p_id), to_char(msg));
            raise err;
-
       end if;
-
       -- пустая ознака операции #2C
       if l_p12_2c is null then
            msg  := 'Не указана ознака операции #2C заявки ' || p_id;
@@ -4462,13 +4459,12 @@ is
  l_comm       varchar2(256);
  l_branch   zayavka.branch%type;
 
-
  --
  -- внутр.процедура  собственно вставки новой заявки
  --
  procedure p_zay_ins (p_s int, r_rt in out zayavka%ROWtype)
  is
-  l_id       number;
+  l_id  number;
  begin
         l_id :=  bars_sqnc.get_nextval('s_zayavka');
         r_rt.comm := 'Разбиение заявки № '||nvl(r_rt.nd, r_rt.id)||' клиента '||r_rt.rnk||' суммы '||trim(to_char(r_rt.s2/100,'99999999990.99'));
@@ -4549,7 +4545,6 @@ begin
       service_request(p_reqest_id => r_zay1.id,
                       p_flag_klb  => 0);
       bars_audit.info('service_request id2='||r_zay1.id||' done');
-
     end if;
     -- первоначальной заявке меняем sos
     update zayavka set sos = -1 where id = p_id and branch = l_branch;
@@ -4669,6 +4664,7 @@ procedure upd_request
     p_kom           in  zayavka.kom%type           default null,  -- процент (%) комиссии
     p_skom          in  zayavka.skom%type          default null,  -- фикс.сумма комиссии
     p_meta          in  zayavka.meta%type,                        -- код цели покупки/продажи
+    p_f092          in  zayavka.f092%type          default null,  -- код параметра f092
     p_contract      in  zayavka.contract%type      default null,  -- номер контракта/кред.договора
     p_dat2_vmd      in  zayavka.dat2_vmd%type      default null,  -- дата контракта/кред.договора
     p_num_vmd       in  zayavka.num_vmd%type       default null,  -- номер последней тамож.декларации
@@ -5157,6 +5153,7 @@ end set_conv_kurs;
     p_id        in zayavka.id%type,
     p_verify_opt  in zayavka.verify_opt%type,
     p_meta      in zayavka.meta%type        default null,
+    p_f092      in zayavka.f092%type        default null,
     p_contract  in zayavka.contract%type    default null,
     p_dat2_vmd  in zayavka.dat2_vmd%type    default null,
     p_dat_vmd   in zayavka.dat_vmd%type     default null,
@@ -5175,6 +5172,7 @@ is
 begin
     l_upd := 'update zayavka set verify_opt = '||p_verify_opt;
     if p_meta is not null then l_upd := l_upd||', meta = '||p_meta; end if;
+    if p_f092 is not null then l_upd := l_upd||', f092 = '||p_f092; end if;
     if p_contract is not null then l_upd := l_upd||', contract = '''||p_contract||''''; end if;
     if p_dat2_vmd is not null then l_upd := l_upd||', dat2_vmd = '''||p_dat2_vmd ||''''; end if;
     if p_dat_vmd is not null then l_upd := l_upd||', dat_vmd = '''||p_dat_vmd||''''; end if;
@@ -5186,10 +5184,9 @@ begin
     if p_bank_code is not null then l_upd := l_upd||', bank_code = '''||p_bank_code||''''; end if;
     if p_product_group is not null then l_upd := l_upd||', product_group = '||p_product_group; end if;
     if p_num_vmd is not null then l_upd := l_upd||', num_vmd = '''||p_num_vmd||''''; end if;
-    if p_code_2c is not null then l_upd := l_upd||', code_2c = '||p_code_2c; end if;
-    if p_p12_2c is not null then l_upd := l_upd||', p12_2c = '||p_p12_2c; end if;
+    if p_code_2c is not null then l_upd := l_upd||', code_2c = '''||p_code_2c||''''; end if;
+    if p_p12_2c is not null then l_upd := l_upd||', p12_2c = '''||p_p12_2c||''''; end if;
     l_upd := l_upd||' where id = '||p_id;
-    --dbms_output.put_line(l_upd);
     execute immediate l_upd;
 end;
 
@@ -5201,14 +5198,16 @@ procedure set_visa (
   p_id        in zayavka.id%type,
   p_viza      in zayavka.viza%type,
   p_priority  in zayavka.priority%type  default null,
-  p_aims_code in zayavka.meta%type default null,
+  p_aims_code in zayavka.aims_code%type default null,
+  p_f092      in zayavka.f092%type default null, 
   p_sup_doc   in zayavka.support_document%type default null)
 is
 begin
   update zayavka
      set viza      = p_viza,
          priority  = nvl(p_priority, priority),
-         meta = nvl(p_aims_code, meta)
+         aims_code = nvl(p_aims_code, aims_code),
+         f092 = nvl(p_f092, f092)         
    where id = p_id;
 
    if nvl(p_sup_doc,0)<>0 then
