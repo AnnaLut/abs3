@@ -7,7 +7,17 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_ZAY_QUEUE ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_ZAY_QUEUE ("ID", "MFO", "REQ_ID", "DK", "OBZ", "ND", "FDAT", "DATT", "RNK", "NMK", "ND_RNK", "KV_CONV", "LCV_CONV", "KV2", "LCV", "DIG", "S2", "S2S", "S3", "KOM", "SKOM", "KURS_Z", "KURS_F", "VDATE", "DATZ", "ACC0", "NLS_ACC0", "MFO0", "NLS0", "OKPO0", "OSTC0", "ACC1", "OSTC", "NLS", "SOS", "REF", "VIZA", "PRIORITY", "PRIORNAME", "PRIORVERIFY", "IDBACK", "FL_PF", "MFOP", "NLSP", "OKPOP", "RNK_PF", "PID", "CONTRACT", "DAT2_VMD", "META", "AIM_NAME", "FULL_META", "BASIS", "PRODUCT_GROUP", "PRODUCT_GROUP_NAME", "FULL_PRODUCT_GROUP", "NUM_VMD", "DAT_VMD", "DAT5_VMD", "COUNTRY", "BENEFCOUNTRY", "BANK_CODE", "BANK_NAME", "USERID", "BRANCH", "FL_KURSZ", "IDENTKB", "COMM", "CUST_BRANCH", "KURS_KL", "CONTACT_FIO", "CONTACT_TEL", "VERIFY_OPT", "CLOSE_TYPE_NAME", "AIMS_CODE", "S_PF", "REF_PF", "REF_SPS", "START_TIME", "STATE", "OPERID_NOKK", "REQ_TYPE", "VDATE_PLAN", "REASON_COMM", "CODE_2C", "P12_2C") AS 
+  CREATE OR REPLACE FORCE VIEW BARS.V_ZAY_QUEUE ("ID", "MFO", "REQ_ID", "DK", "OBZ", "ND", 
+"FDAT", "DATT", "RNK", "NMK", "ND_RNK", "KV_CONV", "LCV_CONV", "KV2", "LCV", "DIG", "S2", 
+"S2S", "S3", "KOM", "SKOM", "KURS_Z", "KURS_F", "VDATE", "DATZ", "ACC0", "NLS_ACC0", "MFO0",
+ "NLS0", "OKPO0", "OSTC0", "ACC1", "OSTC", "NLS", "SOS", "REF", "VIZA", "PRIORITY", "PRIORNAME",
+ "PRIORVERIFY", "IDBACK", "FL_PF", "MFOP", "NLSP", "OKPOP", "RNK_PF", "PID", "CONTRACT", 
+"DAT2_VMD", "META", "AIM_NAME", "FULL_META", "BASIS", "PRODUCT_GROUP", "PRODUCT_GROUP_NAME",
+ "FULL_PRODUCT_GROUP", "NUM_VMD", "DAT_VMD", "DAT5_VMD", "COUNTRY", "BENEFCOUNTRY", "BANK_CODE",
+ "BANK_NAME", "USERID", "BRANCH", "FL_KURSZ", "IDENTKB", "COMM", "CUST_BRANCH", "KURS_KL",
+ "CONTACT_FIO", "CONTACT_TEL", "VERIFY_OPT", "CLOSE_TYPE_NAME", "AIMS_CODE", "S_PF", "REF_PF",
+ "REF_SPS", "START_TIME", "STATE", "OPERID_NOKK", "REQ_TYPE", "VDATE_PLAN", "REASON_COMM",
+ "CODE_2C", "P12_2C","F092") AS 
   select z.id,                                                  -- реф заявки
        substr(f_ourmfo_g,1,6),                                        -- РУ
        null,                                               -- реф заявки РУ
@@ -105,7 +115,8 @@ PROMPT *** Create  view V_ZAY_QUEUE ***
              -1, 'Удалена',
              ''),
        z.operid_nokk,
-       z.req_type, z.vdate_plan, z.reason_comm, z.code_2c, z.p12_2c
+       z.req_type, z.vdate_plan, z.reason_comm, z.code_2c, z.p12_2c,
+       z.f092
   from zayavka z, zay_queue q, customer c,
        tabval t, tabval t1, accounts a, accounts b,
        top_contracts tc, zay_priority p, zay_aims za,
@@ -141,7 +152,8 @@ select id, mfo, req_id, dk, obz, nd, fdat, datt, rnk, nmk, nd_rnk,
        userid, branch, fl_kursz, identkb, comm,
        cust_branch, kurs_kl, contact_fio, contact_tel,
        verify_opt, close_type_name, aims_code,
-       s_pf, ref_pf, ref_sps, start_time, state, operid_nokk, req_type, vdate_plan, reason_comm, null, null
+       s_pf, ref_pf, ref_sps, start_time, state, operid_nokk, req_type, vdate_plan, reason_comm,
+       null, null,null
   from zayavka_ru;
 
 PROMPT *** Create  grants  V_ZAY_QUEUE ***

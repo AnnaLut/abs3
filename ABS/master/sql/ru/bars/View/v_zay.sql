@@ -7,7 +7,17 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_ZAY ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_ZAY ("ID", "MFO", "MFO_NAME", "REQ_ID", "DK", "OBZ", "ND", "FDAT", "DATT", "RNK", "NMK", "CUSTTYPE", "ND_RNK", "KV_CONV", "LCV_CONV", "KV2", "LCV", "DIG", "S2", "S2S", "S3", "KOM", "SKOM", "KURS_Z", "KURS_F", "VDATE", "DATZ", "ACC0", "NLS_ACC0", "MFO0", "NLS0", "OKPO0", "OSTC0", "ACC1", "OSTC", "NLS", "SOS", "REF", "VIZA", "PRIORITY", "PRIORNAME", "PRIORVERIFY", "IDBACK", "FL_PF", "MFOP", "NLSP", "OKPOP", "RNK_PF", "PID", "CONTRACT", "DAT2_VMD", "META", "AIM_NAME", "BASIS", "PRODUCT_GROUP", "PRODUCT_GROUP_NAME", "NUM_VMD", "DAT_VMD", "DAT5_VMD", "COUNTRY", "BENEFCOUNTRY", "BANK_CODE", "BANK_NAME", "USERID", "BRANCH", "FL_KURSZ", "IDENTKB", "COMM", "CUST_BRANCH", "KURS_KL", "CONTACT_FIO", "CONTACT_TEL", "VERIFY_OPT", "CLOSE_TYPE", "CLOSE_TYPE_NAME", "AIMS_CODE", "S_PF", "REF_PF", "REF_SPS", "START_TIME", "STATE", "OPERID_NOKK", "REQ_TYPE", "VDATE_PLAN", "REASON_COMM") AS 
+  CREATE OR REPLACE FORCE VIEW BARS.V_ZAY ("ID", "MFO", "MFO_NAME", "REQ_ID", "DK", "OBZ",
+ "ND", "FDAT", "DATT", "RNK", "NMK", "CUSTTYPE", "ND_RNK", "KV_CONV", "LCV_CONV", "KV2",
+ "LCV", "DIG", "S2", "S2S", "S3", "KOM", "SKOM", "KURS_Z", "KURS_F", "VDATE", "DATZ", "ACC0", 
+"NLS_ACC0", "MFO0", "NLS0", "OKPO0", "OSTC0", "ACC1", "OSTC", "NLS", "SOS", "REF", "VIZA",
+ "PRIORITY", "PRIORNAME", "PRIORVERIFY", "IDBACK", "FL_PF", "MFOP", "NLSP", "OKPOP", "RNK_PF",
+ "PID", "CONTRACT", "DAT2_VMD", "META", "AIM_NAME", "BASIS", "PRODUCT_GROUP",
+ "PRODUCT_GROUP_NAME", "NUM_VMD", "DAT_VMD", "DAT5_VMD", "COUNTRY", "BENEFCOUNTRY",
+ "BANK_CODE", "BANK_NAME", "USERID", "BRANCH", "FL_KURSZ", "IDENTKB", "COMM", "CUST_BRANCH", 
+"KURS_KL", "CONTACT_FIO", "CONTACT_TEL", "VERIFY_OPT", "CLOSE_TYPE", "CLOSE_TYPE_NAME",
+ "AIMS_CODE", "S_PF", "REF_PF", "REF_SPS", "START_TIME", "STATE", "OPERID_NOKK", "REQ_TYPE",
+ "VDATE_PLAN", "REASON_COMM","F092") AS 
   select z.id,                                                  -- реф заявки
        substr(f_ourmfo_g,1,6),                                        -- РУ
        substr(getglobaloption('GLB-NAME'),1,38),         -- наименование РУ
@@ -106,7 +116,10 @@ PROMPT *** Create  view V_ZAY ***
              -1, 'Удалена',
              ''),
        z.operid_nokk,
-       z.req_type, z.vdate_plan, z.reason_comm
+       z.req_type,
+       z.vdate_plan,
+       z.reason_comm,
+       z.f092
   from zayavka z, customer c, tabval t, tabval t1,
        accounts a, accounts b,
        top_contracts tc, zay_priority p,
@@ -144,7 +157,8 @@ select z.id, z.mfo, b.nb, z.req_id, z.dk, z.obz, z.nd, z.fdat, z.datt,
        z.userid, z.branch, z.fl_kursz, z.identkb, z.comm,
        z.cust_branch, z.kurs_kl, z.contact_fio, z.contact_tel,
        z.verify_opt, z.close_type, z.close_type_name, z.aims_code,
-       z.s_pf, z.ref_pf, z.ref_sps, z.start_time, z.state, z.operid_nokk, z.req_type, z.vdate_plan, z.reason_comm
+       z.s_pf, z.ref_pf, z.ref_sps, z.start_time, z.state, z.operid_nokk, z.req_type,
+       z.vdate_plan, z.reason_comm,null
   from zayavka_ru z, banks$base b
  where z.mfo = b.mfo;
 

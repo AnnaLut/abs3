@@ -7,7 +7,11 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_ZAY_SALFORM ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_ZAY_SALFORM ("ID", "SOS", "SVIZA", "CUST_BRANCH", "RNK", "NMK", "ACC0", "ACC1", "NLS", "OSTC", "S2", "DIG", "S2S", "MFO0", "NLS0", "KV_CONV", "LCV_CONV", "NLS_ACC0", "FDAT", "ND", "KOM", "SKOM", "KURS_Z", "KURS_F", "VDATE", "META", "AIM_NAME", "CONTRACT", "DATC", "NUM_VMD", "VMD1", "BASIS", "DATZ", "COMM", "CONTACT_FIO", "CONTACT_TEL", "COVERED", "KB", "KV", "DOC_DESC", "DATT") AS 
+  CREATE OR REPLACE FORCE VIEW BARS.V_ZAY_SALFORM ("ID", "SOS", "SVIZA", "CUST_BRANCH", "RNK",
+ "NMK", "ACC0", "ACC1", "NLS", "OSTC", "S2", "DIG", "S2S", "MFO0", "NLS0", "KV_CONV", "LCV_CONV",
+ "NLS_ACC0", "FDAT", "ND", "KOM", "SKOM", "KURS_Z", "KURS_F", "VDATE", "META", "AIM_NAME", 
+ "CONTRACT", "DATC", "NUM_VMD", "VMD1", "BASIS", "DATZ", "COMM", "CONTACT_FIO", "CONTACT_TEL",
+ "COVERED", "KB", "KV", "DOC_DESC", "DATT","F092") AS 
   select v.id,
           v.sos,
           decode(v.viza,-1, '-1-Відмовлено у візі',0,'0-Чекає на візу',2,'2-Підтверджено як пріоритетну','1-Завізовано') sviza,
@@ -48,7 +52,8 @@ PROMPT *** Create  view V_ZAY_SALFORM ***
           decode(nvl(v.identkb,0),0,0,1) kb,
           v.kv2 kv,
           nvl(zc.doc_desc,null) doc_desc,
-		  v.datt
+          v.datt,
+          v.f092
           from v_zay_queue v , country c, country cc, zay_corpdocs zc
           where v.dk  in (2,4)
           and 2>v.sos
