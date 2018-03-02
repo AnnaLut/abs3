@@ -74,7 +74,16 @@ exception when others then
  end;
 /
 
-
+prompt  *** Create  constraint CC_ND_TXT_TAG *** 
+begin
+    execute immediate 'alter table ND_TXT
+  add constraint ND_TXT_TAG
+  check ((tag IN (''INTRT'',''ND_REST'') and (txt between 0 and 100 or tag is null)) or tag not IN (''INTRT'',''ND_REST''))';
+ exception when others then 
+    if sqlcode = -2264 or sqlcode = -2261 then null; else raise; 
+    end if; 
+end;
+/ 
 
 
 PROMPT *** Create  index PK_BPKPARAMETERS ***
