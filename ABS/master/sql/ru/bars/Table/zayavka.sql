@@ -108,7 +108,14 @@ exception when others then
 end; 
 /
 
-
+PROMPT *** ADD COLUMN F092 to ZAYAVKA ***
+BEGIN 
+        execute immediate  
+          ' alter table zayavka add f092 char(3)'; 
+exception when others then
+  if  sqlcode=-01430 then null; else raise; end if;
+END; 
+/
 
 
 PROMPT *** ALTER_POLICIES to ZAYAVKA ***
@@ -192,6 +199,17 @@ COMMENT ON COLUMN BARS.ZAYAVKA.ISP IS 'код пользователя, который ввел заявку';
 COMMENT ON COLUMN BARS.ZAYAVKA.TOBO IS 'код подразделения, в котором введена заявка';
 COMMENT ON COLUMN BARS.ZAYAVKA.PRODUCT_GROUP IS 'код товарной группы (kod_70_4)';
 COMMENT ON COLUMN BARS.ZAYAVKA.NUM_VMD IS '№ таможенной декларации';
+COMMENT ON COLUMN BARS.ZAYAVKA.f092 is 'Значение параметра f092';
+
+
+PROMPT *** Create  constraint PK_ZAYCLOSETYPES ***
+begin   
+ execute immediate 'alter table ZAY_CLOSE_TYPES
+  add constraint PK_ZAYCLOSETYPES primary key (ID)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
 
 
 
