@@ -1,0 +1,142 @@
+<xmlform captiontype="OnlyTitle">
+  <grids>
+    <grid id="gv" pagesize="15" showpagesizebox="true" title="Вибір комісії для даного продукту" showfilter="true">
+      <filters buttontext="Знайти" caption="Пошук комісії" columnscount="2" width ="100%">
+         <filter field="NLS" caption="Код/Рахунок" columnindex="1" condition="Equal" id="fltrnls">
+          <uicontrol></uicontrol>
+        </filter>
+        <filter field="NAME" caption="Назва комісії" columnindex="2" condition="LikeBoth" id="fltrnms" >
+          <uicontrol></uicontrol>
+        </filter>
+      </filters>
+      <buttons>
+        <button id="btn1" caption="Готівкою" hint="Комісія готівкою" type="Button">
+          <command type="Redirect" url="/barsroot/docinput/docinput.aspx?tt=KC1">
+            <parameters>
+              <parameter  type="DataField" name="KV" altname="Kv_A"/>
+              <parameter  type="DataField" name="KV" altname="Kv_B"/>
+              <parameter  type="DataField" name="NLS" altname="NLS_B"/>
+              <parameter  type="DataField" name="NAME" altname="reqv_TARON"/>
+              <parameter  type="DataField" name="KOMIS" altname="reqv_TAROB"/>
+              <parameter  type="DataField" name="FIO" altname="reqv_FIO"/>
+              <parameter  type="DataField" name="PDV" altname="reqv_PDV"/>
+              <parameter  type="DataField" name="SDATE" altname="reqv_DAT1"/>
+              <parameter  type="DataField" name="CC_ID" altname="reqv_CC_ID"/>
+              <parameter  type="DataField" name="ND" altname="reqv_ND"/>
+            </parameters>
+          </command>
+        </button>
+        <button id="btn2" caption="Безготівково" hint="Комісія безготівково" type="Button">
+          <command type="Redirect" url="/barsroot/docinput/docinput.aspx?tt=KC0">
+            <parameters>
+              <parameter  type="DataField" name="KV" altname="Kv_A"/>
+              <parameter  type="DataField" name="KV" altname="Kv_B"/>
+              <parameter  type="DataField" name="NLS" altname="NLS_B"/>
+              <parameter  type="DataField" name="NAME" altname="reqv_TARON"/>
+              <parameter  type="DataField" name="KOMIS" altname="reqv_TAROB"/>
+              <parameter  type="DataField" name="PDV" altname="reqv_PDV"/>
+              <parameter  type="DataField" name="SDATE" altname="reqv_DAT1"/>
+              <parameter  type="DataField" name="CC_ID" altname="reqv_CC_ID"/>
+              <parameter  type="DataField" name="ND" altname="reqv_ND"/>
+            </parameters>
+          </command>
+        </button>
+      </buttons>
+      <datasource>
+        <sql>
+          select
+          :nd ND,
+          :sdate SDATE,
+          :cc_id CC_ID,
+          :fio FIO,
+          c.prod PROD,
+          c.komis KOMIS,
+          c.pdv PDV,
+          b.name NAME,
+          a.nls NLS,
+          a.kv  KV
+        from cc_prod_komis c,
+          accounts a, cc_raz_komis b
+          where c.komis=b.komis
+          and  substr(c.nbs_ob22,1,4)=a.nbs
+          and  substr(c.nbs_ob22,5,2)=a.ob22
+          AND bc.is_pbranch (a.branch, 1) = 1
+		  and a.dazs is null
+          and c.prod=:prod
+        </sql>
+        <parameters>
+          <parameter name="PROD" datatype="String" type="QueryString"></parameter>
+          <parameter name="ND" datatype="Int64" type="QueryString"></parameter>
+          <parameter name="SDATE" datatype="DateTime" type="QueryString"></parameter>
+          <parameter name="CC_ID" datatype="String" type="QueryString"></parameter>
+		  <parameter name="FIO" datatype="String" type="QueryString"></parameter>
+        </parameters>
+        </datasource>
+      <rowselection method="SingleRow"/>
+      <fields>
+        <field name="ND" key="true" sort="Default" datatype="Int64">
+          <column show="false" caption="" align="Left"/>
+          <form show="true">
+            <uicontrol type="IntegerInput"/>
+          </form>
+        </field>
+        <field name="SDATE" key="true" datatype="DateTime" sort="default">
+          <column show="false" caption="Дата початку договора" align="Center"/>
+          <form show="false">
+            <uicontrol type="DateInput" readonly="true" />
+          </form>
+        </field>
+        <field name="CC_ID" key="true" datatype="String" sort="default">
+          <column show="false" caption="" align="Center"/>
+          <form show="false">
+            <uicontrol type="TextBox" readonly="true" />
+          </form>
+        </field>
+        <field name="PROD" key="true" sort="Default" datatype="String">
+          <column show="true" caption="Код продукта" align="Left"/>
+          <form show="false">
+            <uicontrol type="TextBox"/>
+          </form>
+        </field>
+		 <field name="FIO" key="true" sort="Default" datatype="String">
+          <column show="false" caption="" align="Left"/>
+          <form show="false">
+            <uicontrol type="TextBox"/>
+          </form>
+        </field>
+        <field name="KOMIS" key="true" sort="Default" datatype="String">
+          <column show="true" caption="Код комісії" align="Left"/>
+          <form show="true">
+            <uicontrol type="TextBox"/>
+          </form>
+        </field>
+        <field name="PDV" key="true" datatype="Int64" sort="default">
+          <column show="true" caption="ПДВ 1=Так 0=Ні" align="Center" />
+          <form show="true">
+            <uicontrol type="IntegerInput" readonly="true"/>
+          </form>
+        </field>
+        <field name="NAME" key="true" datatype="String" sort="default">
+          <column show="true" caption="Назва тарифу" align="Left"/>
+          <form show="true">
+            <uicontrol type="TextBox" readonly="true" />
+          </form>
+        </field>
+        <field name="NLS" key="true" sort="Default" datatype="String">
+          <column show="true" caption="Рахунок комісії" align="Left"/>
+          <form show="true">
+            <uicontrol type="TextBox"/>
+          </form>
+        </field>
+        <field name="KV" key="true" datatype="Int64" sort="default">
+          <column show="false" caption="Код валюти" align="Center" />
+          <form show="true">
+            <uicontrol type="IntegerInput" readonly="true">
+              <defaultvalue type="Constant" value="980"></defaultvalue>
+            </uicontrol>
+          </form>
+        </field>
+       </fields>
+    </grid>
+  </grids>
+</xmlform>
