@@ -1,2 +1,35 @@
-=========  svn diff --summarize -r 48973:48984 D:\SVN\master\web\mmfo
-Bugfix_2.0.38.4.28 (Rev:48973-48984
+=========  svn diff --summarize -r 48985:49073 D:\SVN\master\web\mmfo
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web\barsroot\Areas\Ndi\Scripts\ReferenceGrid.js
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web\barsroot\Areas\Ndi\Scripts\ExtJsApp\utils\RefBookUtils.js
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web\barsroot\Areas\Ndi\Scripts\ExtJsApp\utils\SetStatmentUtils.js
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web\barsroot\Areas\Ndi\Scripts\ExtJsApp\controller\refBook\RefGrid.js
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web\barsroot\Areas\Ndi\Scripts\ExtJsApp\view\refBook\UploadForm.js
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web\barsroot\Areas\Ndi\Views\ReferenceBook\ReferenceGrid.cshtml
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web\barsroot\Areas\Forex\Scripts\Services\RegularDealService.js
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web\barsroot\Areas\Forex\Scripts\Controllers\RegularDealsCtrl.js
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web\barsroot\Areas\Forex\Views\RegularDeals\RegularDeals.cshtml
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web\barsroot\deposit\Deloitte\depositagreement.aspx.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web\barsroot\deposit
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web\barsroot\App_Data\forms\frm_fin2_cust_spd.xml
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web\barsroot\App_Data\forms\frm_fin2_cust_fl.xml
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web\barsroot\App_Data\forms\frm_v_cc_komis.xml
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web\barsroot\App_Data\forms\frm_cc_prod_komis.xml
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web\barsroot\App_Data\forms\frm_fin2_cust.xml
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web\barsroot\App_Data\forms\frm_fin2_cust_bd.xml
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web\barsroot\App_Code\Areas\Ndi\Infrastructure\Repository\DI\Implementation\ReferenceBookRepository.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web\barsroot\App_Code\Areas\Ndi\Infrastructure\Helpers\RequestProvider.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web\barsroot\App_Code\Areas\Ndi\Models\CallFunctionsMetaInfo.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web\barsroot\App_Code\Areas\Ndi\Models\ViewModels\FuncOnlyViewModel.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web\barsroot\App_Code\Areas\Ndi\Models\ViewModels\MainOptionsViewModel.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web\barsroot\App_Code\Areas\Ndi\Models\ViewModels\DefParamModel.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web\barsroot\App_Code\Areas\Ndi\Controllers\ReferenceBookController.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web\barsroot\App_Code\Areas\Forex\Infrastructure\DI\Abstract\IRegularDealsRepository.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web\barsroot\App_Code\Areas\Forex\Infrastructure\DI\Implementation\RegularDealsRepository.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web\barsroot\App_Code\Areas\Forex\Models\CalcTransactionLengthModel.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web\barsroot\App_Code\Areas\Forex\Models\Agreement.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web\barsroot\App_Code\Areas\Forex\Models\FOREX_OB22.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web\barsroot\App_Code\Areas\Forex\Controllers\RegularDealsController.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web\barsroot\Scripts\Bars\bars.ui.js
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web\barsroot
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.29\mmfo\web
+Bugfix_2.0.38.4.29 (Rev:48985-49073
