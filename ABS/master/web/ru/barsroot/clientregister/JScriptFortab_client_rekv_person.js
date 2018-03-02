@@ -68,7 +68,7 @@ var ValidatePhone = {
             func: function () {
                 $('body').loader();
 
-                var validationResult = ExecSync('ConfirmCellPhoneSendSms', { rnk: parent.obj_Parameters['ID'], phone: gPhone }).d;
+                var validationResult = ExecSync('ConfirmCellPhoneSendSms', { rnk: parent.obj_Parameters['ID'], phone: gPhone + "&" + parent.obj_Parameters["OKPO"]  }).d;
 
                 if (validationResult.Status == 'OK') {
                     $('body').loader('remove');

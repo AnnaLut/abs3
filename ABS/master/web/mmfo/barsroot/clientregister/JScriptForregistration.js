@@ -768,7 +768,7 @@ function Check_ClientRekvPhone(ignoreConfirmation) {
             } else {
                 //для фіз осіб не спд виконуємо валідацію мобільного телефону
                 if (obj_Parameters['CUSTTYPE'] === 'person' && !isCustomerSpd()) {
-                    var validationResult = ExecSync('ValidateMobilePhone', { rnk: (obj_Parameters['ID'] == '' ? 0 : obj_Parameters['ID']), phone: validPhone.Phone }).d;
+					var validationResult = ExecSync('ValidateMobilePhone', { rnk: (obj_Parameters['ID'] == '' ? 0 : obj_Parameters['ID']), phone: validPhone.Phone + "&" + parent.obj_Parameters["OKPO"] }).d;
 
                     if (validationResult.Code != 'OK') {
                         alert(validationResult.Text);
