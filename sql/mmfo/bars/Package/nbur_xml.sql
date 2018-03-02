@@ -1,16 +1,10 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/nbur_xml.sql =========*** Run *** ==
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.NBUR_XML 
+create or replace package NBUR_XML 
 is
 
   --
   -- constants
   --
-  g_header_version  constant varchar2(64)  := 'version 2.1  2018.02.21';
+  g_header_version  constant varchar2(64)  := 'version 2.2  2018.03.03';
 
   --
   -- types
@@ -33,15 +27,31 @@ is
   , p_file_body      out clob
   );
 
+  --
+  --
+  --
+  procedure SET_XSD
+  ( p_file_id     in     nbur_ref_xsd.file_id%type
+  , p_scm_dt      in     nbur_ref_xsd.scm_dt%type
+  , p_scm_doc     in     blob
+  );
+
+
+
 end NBUR_XML;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.NBUR_XML
+
+show errors;
+
+----------------------------------------------------------------------------------------------------
+
+create or replace package body NBUR_XML
 is
 
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 1.8  2017.11.24';
+  g_body_version  constant varchar2(64) := 'version 1.9  2018.03.03';
   g_dt_fmt        constant varchar2(10) := 'dd.mm.yyyy';
 
   --
@@ -63,7 +73,6 @@ is
   is
   begin
     return 'Package '||$$PLSQL_UNIT||' header '||g_header_version||'.';
-
   end header_version;
 
   --
@@ -150,6 +159,52 @@ is
     return 1;
 
   end SET_RPT_PARM;
+
+  --
+  --
+  --
+  function CHK_XML
+  ( p_rpt_id      in            nbur_lst_files.file_id%type
+  , p_rpt_dt      in            nbur_lst_files.report_date%type
+  , p_rpt_body    in out nocopy nbur_lst_files.file_body%type
+  ) return varchar2
+  is
+    title          constant     varchar2(64) := $$PLSQL_UNIT||'.CHK_XML';
+    l_scm_url                   nbur_ref_xsd.scm_url%type;
+    l_xml                       XMLType;
+    l_errmsg                    varchar2(2048);
+    E_INVAL_XML_DOC             exception; -- invalid XML document
+    pragma exception_init( E_INVAL_XML_DOC, -31154 );
+  begin
+    
+    bars_audit.trace( '%s: Entry with ( rpt_id=%s ).', title, to_char(p_rpt_id) );
+    
+    begin
+      
+      select SCM_URL
+        into l_scm_url
+        from NBUR_REF_XSD
+       where ( FILE_ID, SCM_DT ) in ( select FILE_ID, max( SCM_DT )
+                                        from NBUR_REF_XSD
+                                       where FILE_ID = p_rpt_id
+                                         and SCM_DT <= p_rpt_dt );
+      
+      l_xml := XmlType( p_rpt_body ).createSchemaBasedXML( l_scm_url );
+      
+      l_xml.schemaValidate();
+      
+    exception
+      when NO_DATA_FOUND then
+        l_errmsg := null;
+      when E_INVAL_XML_DOC then
+        l_errmsg := dbms_utility.format_error_stack();
+    end;
+    
+    bars_audit.trace( '%s: Exit with ( errmsg=%s ).', title, l_errmsg );
+    
+    return l_errmsg;
+    
+  end CHK_XML;
 
   --
   --
@@ -703,6 +758,7 @@ $end
     l_clob               clob;
     l_rcur               SYS_REFCURSOR;
     l_xml                xmltype;
+    l_errmsg             varchar2(2048);
     l_rpt_code           nbur_ref_files.file_code%type;
   begin
 
@@ -716,6 +772,7 @@ $end
 
     l_ctx := dbms_xmlgen.newContext( l_rcur );
 
+--  dbms_xmlgen.setRowSetTag( l_ctx, 'NBUSTATREPORT' );
     dbms_xmlgen.setRowSetTag( l_ctx, NULL );
     dbms_xmlgen.setRowTag( l_ctx, 'DATA' );
     dbms_xmlgen.setNullHandling( l_ctx, dbms_xmlgen.EMPTY_TAG ); -- NULL_ATTR - Sets xsi:nil="true".
@@ -738,24 +795,36 @@ $end
 
     l_clob := GET_FILE_HEAD( p_file_id, p_rpt_dt, p_kf ) || chr(10) || l_clob || '</NBUSTATREPORT>';
 
+    -----------
     -- КОСТИЛІ:
 
     -- заміна <P1/> на <P1></P1> (для NULL значень)
     l_clob := REGEXP_REPLACE( l_clob, '<([^>]+?)/>', '<\1></\1>' );
 
-    if l_rpt_code ='#3E'  then
+    -- вставка атрибуту xsi:nil для елементів ...
+    case l_rpt_code
+    when '#3E'
+    then
+      l_clob := REGEXP_REPLACE( l_clob, '(<Q007_7|<Q007_8)(></)', '\1 xsi:nil = "true" \2' );
+    when '#3K'
+    then
+      l_clob := REGEXP_REPLACE( l_clob, '(<Q007_1)(></)', '\1 xsi:nil = "true" \2' );
+    else
+      null;
+    end case;
+    -----------
 
-    -- вставка атрибуту xsi:nil для елементів Q007_7 та Q007_8
---  l_clob := REGEXP_REPLACE( l_clob, '(<Q007_7|<Q007_8)([^ xsi:nil])', '\1 xsi:nil = "true" \2' );
-    l_clob := REGEXP_REPLACE( l_clob, '(<Q007_7|<Q007_8)(></)', '\1 xsi:nil = "true" \2' );
+    l_errmsg := CHK_XML( p_file_id, p_rpt_dt, l_clob );
 
-    end if;
-
-    if l_rpt_code ='#3K'  then
-
-    -- вставка атрибуту xsi:nil для елементу Q007_1 
-    l_clob := REGEXP_REPLACE( l_clob, '(<Q007_1)(></)', '\1 xsi:nil = "true" \2' );
-
+    if ( l_errmsg is Not Null )
+    then
+--    bars_audit.error( title||': '||l_errmsg );
+      NBUR_FILES.SET_CHK_LOG( p_file_id => p_file_id
+                            , p_rpt_dt  => p_rpt_dt
+                            , p_kf      => p_kf
+                            , p_vrsn_id => p_vrsn_id
+                            , p_chk_log => l_errmsg
+                            );
     end if;
 
     p_file_body := l_clob;
@@ -766,6 +835,139 @@ $end
 
   end CRT_FILE;
 
+  --
+  --
+  --
+  procedure SET_XSD
+  ( p_file_id     in     nbur_ref_xsd.file_id%type
+  , p_scm_dt      in     nbur_ref_xsd.scm_dt%type
+  , p_scm_doc     in     blob
+  ) is
+  /**
+  <b>SET_XSD</b> - реєстрація XSD схеми для валідації 
+  %param p_file_id  - ідентифікатор файлу
+  %param p_scm_dt   - дата вступу в дію XSD схеми
+  %param p_scm_doc  - файл з XSD схемою
+  
+  %version 1.1
+  %usage   створення місячних знімків балансу.
+  */
+    title   constant     varchar2(64) := $$PLSQL_UNIT||'.SET_XSD';
+    l_rpt_code           nbur_ref_files.file_code%type;
+    l_scm_url            nbur_ref_xsd.scm_url%type;
+  begin
+    
+    bars_audit.trace( '%s: Entry with ( p_file_id=%s, p_scm_dt=%s ).', title );
+    
+    case
+    when ( p_file_id Is Null )
+    then raise_application_error( -20666, 'Value for parameter [p_file_id] must be specified!', true );
+    when ( p_scm_dt  Is Null )
+    then raise_application_error( -20666, 'Value for parameter [p_scm_dt] must be specified!', true );
+    when ( p_scm_doc Is Null or DBMS_LOB.GETLENGTH( p_scm_doc ) = 0 )
+    then raise_application_error( -20666, 'Value for parameter [p_scm_doc] must be specified!', true );
+    else
+      
+      l_rpt_code := NBUR_FILES.F_GET_KODF( p_file_id );
+      
+      if ( l_rpt_code Is Null ) 
+      then raise_application_error( -20666, 'Not found report with ID='||to_char(p_file_id), true );
+      else l_rpt_code := SubStr( l_rpt_code, 2, 2 );
+      end if;
+      
+    end case;
+    
+    l_scm_url := 't' || lower( l_rpt_code ) || 'x'||to_char(p_scm_dt,'yyyymmdd')||'.xsd';
+    
+    begin
+      
+      insert
+        into NBUR_REF_XSD
+           ( FILE_ID, SCM_DT, SCM_URL, CHG_USR, CHG_DT )
+      values
+           ( p_file_id, p_scm_dt, l_scm_url, USER_ID(), SYSDATE );
+      
+    exception
+      when DUP_VAL_ON_INDEX then
+        
+        DBMS_XMLSCHEMA.DELETESCHEMA( SCHEMAURL     => l_scm_url
+                                   , DELETE_OPTION => DBMS_XMLSCHEMA.DELETE_CASCADE_FORCE );
+        
+        update NBUR_REF_XSD
+           set CHG_USR = USER_ID()
+             , CHG_DT  = SYSDATE
+         where FILE_ID = p_file_id
+           and SCM_DT  = p_scm_dt;
+        
+    end;
+    
+    DBMS_XMLSCHEMA.REGISTERSCHEMA( schemaurl       => l_scm_url
+                                 , schemadoc       => p_scm_doc
+--                               , schemadoc       => XDBURIType('https://bank.gov.ua/NBUStatService/v1/statdirectory/report/t3ex.xsd').getCLOB()
+--                               , schemadoc       => BFILENAME('XML_DIR','OracleXMLSchema.xsd')
+                                 , local           => true
+                                 , gentypes        => false
+                                 , genbean         => false
+                                 , gentables       => false
+                                 , force           => false
+                                 , owner           => 'BARS'
+                                 , csid            => NLS_CHARSET_ID( 'UTF8' ) -- 'AL32UTF8'
+                                 , enablehierarchy => DBMS_XMLSCHEMA.ENABLE_HIERARCHY_NONE );
+    
+    bars_audit.info( title||': user '||to_char(USER_ID())||' changed XSD for #'||l_rpt_code );
+    
+    bars_audit.trace( '%s: Exit.', title );
+    
+  end SET_XSD;
+  
+  --
+  -- CONVERT_CLOB_TO_BLOB
+  --
+  procedure CONVERT_CLOB_TO_BLOB
+  ( p_clob_data       in out nocopy clob
+  , p_blob_data       in out nocopy blob
+  , p_blob_csid       in            number default null
+  ) is
+  /**
+  <b>CONVERT_CLOB_TO_BLOB</b> - convert clob to blob
+  %param p_clob_data - input  parameter src CLOB
+  %param p_blob_data - output parameter dst BLOB
+  %param p_blob_csid - input  parameter character set ID for dst BLOB ( default 'UTF8' )
+  
+  %version 1.0
+  %usage   
+  */
+    title         constant varchar2(64) := $$PLSQL_UNIT||'.CONVERT_CLOB_TO_BLOB';
+    l_dst_offset           integer := 1;
+    l_src_offset           integer := 1;
+    l_blob_csid            number;
+    l_lng_context          integer := DBMS_LOB.DEFAULT_LANG_CTX;
+    l_wrn                  integer; -- := DBMS_LOB.WARN_INCONVERTIBLE_CHAR;
+  begin
+    
+    bars_audit.trace( '%s: Entry.', title );
+    
+    if ( p_blob_csid Is Null )
+    then
+      l_blob_csid := NLS_CHARSET_ID('UTF8');
+    else
+      l_blob_csid := p_blob_csid;
+    end if;
+    
+    DBMS_LOB.CONVERTTOBLOB
+    ( dest_lob     => p_blob_data
+    , src_clob     => p_clob_data
+    , amount       => DBMS_LOB.LOBMAXSIZE
+    , dest_offset  => l_dst_offset
+    , src_offset   => l_src_offset
+    , blob_csid    => l_blob_csid
+    , lang_context => l_lng_context
+    , warning      => l_wrn );
+    
+    bars_audit.trace( '%s: Exit.', title );
+    
+  end CONVERT_CLOB_TO_BLOB;
+
 
 
 BEGIN
@@ -774,12 +976,8 @@ BEGIN
   v_vrsn_id := 1;
 end NBUR_XML;
 /
- show err;
- 
-PROMPT *** Create  grants  NBUR_XML ***
-grant EXECUTE           on NBUR_XML        to BARS_ACCESS_DEFROLE;
 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/nbur_xml.sql =========*** End *** ==
- PROMPT ===================================================================================== 
+show err;
+
+grant EXECUTE on NBUR_XML to BARS_ACCESS_DEFROLE;
+
