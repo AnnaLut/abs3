@@ -31,6 +31,7 @@ namespace BarsWeb.Areas.Ndi.Models
         public int? CodeOper { get; set; }
         public int? SParColumn { get; set; }
         public bool IsFuncOnly { get; set; }
+        public bool ExternelFuncOnly { get; set; }
         public int? NativeTabelId { get; set; }
         public int? NsiTableId { get; set; }
         public int? NsiFuncId { get; set; }

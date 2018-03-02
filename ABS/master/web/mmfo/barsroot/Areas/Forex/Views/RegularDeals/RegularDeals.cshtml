@@ -47,7 +47,8 @@
                         k-auto-bind="false"
                         k-data-value-field="'TXT'"
                         k-value-primitive="true"
-                        k-data-source="RegDeal.INICDropDownDataSource" k-options="RegDeal.INICDropDownOptions" id="inicDropDown" k-ng-readonly="RegDeal.DisabledVars.INIC == true" style="width: 20%; margin-right: 5px;"></select>
+                        k-data-source="RegDeal.INICDropDownDataSource" k-options="RegDeal.INICDropDownOptions" id="inicDropDown" k-ng-readonly="RegDeal.DisabledVars.INIC == true"
+                        style="width: 20%; margin-right: 5px;"></select>
 
                 <button type="button" class="k-button" title="Перегляд бухгалтерської моделі угоди" ng-disabled="RegDeal.DisabledVars.AccMod == true" ng-click="RegDeal.ForexAccMode()"><i class="pf-icon pf-16 pf-search"></i></button>
 
@@ -58,7 +59,11 @@
                     <i class="pf-icon pf-16 pf-mail" pf-mail></i>
                 </button>
                 <button type="button" class="k-button" title="Перегляд вихідного SWIFT повідомлення" ng-click="RegDeal.ViewSWT()" ng-disabled="RegDeal.DisabledVars.ViewSWT"><i class="pf-icon pf-16 pf-find" pf-find></i></button>
-            </div>
+                <input type="text" ng-model="RegDeal.F092_CODE"  ng-keydown="RegDeal.checkKey($event) && RegDeal.backSpaceEvent($event)" class="k-textbox" style="width: 15%; margin-right: 5pt;" title="" />
+                <button type="button" class="k-button" ng-click="RegDeal.getF092Table()">
+                                                <i class="pf-icon pf-16 pf-arrow_down"></i>
+                </button>
+             </div>
         </div>
     </div>
     <div class="row">
@@ -130,6 +135,13 @@
                             <label>
                                Розділити на 2 суми
                             </label>*@
+                            <!--<select kendo-drop-down-list="RegDeal.ForexD"
+                                                    k-data-text-field="'KOD'"
+                                                    k-auto-bind="false"
+                                                    k-data-value-field="'KOD'"
+                                                    k-value-primitive="true"
+                                                    k-data-source="RegDeal.ForexTypeDropDownDataSource" k-options="RegDeal.ForexTypeDropDownOptions" id="ForexTypeDropDown"
+                                                    style="width: 20%; margin-right: 5px;"></select>-->
                     </div>
                     <div class="form-group">
 

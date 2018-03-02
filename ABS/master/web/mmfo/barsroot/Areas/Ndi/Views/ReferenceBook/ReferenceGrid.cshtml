@@ -4,9 +4,9 @@
 @using BarsWeb.Areas.Ndi.Models
 @model MainOptionsViewModel
 
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+--<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <script>
- 
+
     window.tableId = '@Model.TableId';
     /* Table Modes List by META_ACCESS_CODES table
     0 - Update + Insert + Delete
@@ -18,7 +18,7 @@
     6 - Update + Delete
     7 - Insert + Delete
     */
-    
+
     window.tableMode = '@Model.TableMode';
     window.conditions = '@Model.Conditions';
     window.sqlProc = '@Model.SqlProc';
@@ -35,8 +35,10 @@
     window.baseCodeOper = "@Model.BaseCodeOper";
     window.saveFilterLocal = "@Model.SaveFilterLocal";
     window.Code = "@Model.Code";
-    window.Base64InsertDefParamsString = "@Model.DefParamModel.Base64InsertDefParamsString"
-    
+    window.Base64InsertDefParamsString = "@Model.DefParamModel.Base64InsertDefParamsString";
+    window.base64ExternProcParams = "@Model.DefParamModel.Base64ExternProcParams";
+    window.ExternelFuncOnly = "@Model.ExternelFuncOnly";
+        
 </script>
 <script src="@Url.Content("~/Areas/Ndi/Scripts/ReferenceGrid.js")"></script>
 

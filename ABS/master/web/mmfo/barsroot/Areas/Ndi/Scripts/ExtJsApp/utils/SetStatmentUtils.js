@@ -2,7 +2,7 @@
 
     statics: {
         setHiddenColumnsToLocalSrorage: function (columnNames, localStorageModel) {
-            debugger
+            
             var columnsNamesString = '';
             if (columnNames.length)
             {

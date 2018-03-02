@@ -7,16 +7,17 @@ namespace BarsWeb.Areas.Ndi.Models
     /// </summary>
     public class CallFunctionMetaInfo
     {
-        public CallFunctionMetaInfo(string webFormName, int colId,int tableId)
+        public CallFunctionMetaInfo(string webFormName, int colId, int tableId)
         {
             this.WEB_FORM_NAME = webFormName;
             this.TABID = tableId;
         }
 
-        public CallFunctionMetaInfo ()
+        public CallFunctionMetaInfo()
         {
             this.SystemParamsInfo = new List<ParamMetaInfo>();
         }
+
         public decimal? TABID { get; set; }
         public int? ColumnId { get; set; }
         public decimal? ICON_ID { get; set; }
@@ -42,7 +43,7 @@ namespace BarsWeb.Areas.Ndi.Models
         public string SysPar { get; set; }
         public string UploadParams { get; set; }
         public List<UploadParamsInfo> UploadParamsInfo { get; set; }
-        public  List<ParamMetaInfo> SystemParamsInfo { get; set; }
+        public List<ParamMetaInfo> SystemParamsInfo { get; set; }
         public List<OutParamsInfo> OutParamsInfo { get; set; }
         public string MultiParams { get; set; }
         public List<MultiRowsParams> MultiRowsParams { get; set; }
@@ -50,6 +51,7 @@ namespace BarsWeb.Areas.Ndi.Models
         public string LinkWebFormName { get; set; }
         public bool OpenInWindow { get; set; }
         public string Base64ProcParams { get; set; }
+        public string Base64JExternProcParams {get;set;}
         public ThrowParams ThrowNsiParams { get; set; }
         public List<string> InputParamsNames { get; set; }
 

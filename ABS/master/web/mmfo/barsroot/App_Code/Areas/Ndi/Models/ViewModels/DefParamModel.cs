@@ -16,8 +16,8 @@ namespace BarsWeb.Areas.Ndi.Models
             this.InsertDefParams = new List<FieldProperties>();
         }
         public List<FieldProperties> InsertDefParams { get; set; }
-        public List<FieldProperties> DefProcParams { get; set; }
+        public List<FieldProperties> ExternProcParams { get; set; }
         public string Base64InsertDefParamsString { get; set; }
-        public string Base64ProcParams { get; set; }
+        public string Base64ExternProcParams { get; set; }
     }
 }
