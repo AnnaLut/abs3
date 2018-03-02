@@ -1,7 +1,7 @@
 
 
 PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/SBR_BPK_607.sql =========*** Run ***===
+PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/_SBR_BPK_***_607.sql =========*** Run *
 PROMPT ===================================================================================== 
 prompt ===================================== 
 prompt == Перегляд умов зобов`язань за кредитними договорами (БПК) військо
@@ -51,7 +51,7 @@ begin
     l_zpr.rpt_template := 'BPK607.frx';
     l_zpr.form_proc    := 'p_bpk_rep(1, :sFdat1, null,:p_kf)';
     l_zpr.default_vars := ':p_kf=''%''';
-    l_zpr.bind_sql     := ':p_kf=''BRANCH|BRANCH|NAME|WHERE length(branch)=8 and date_closed is null order by branch ''';
+    l_zpr.bind_sql     := ':BRANCH=''BANKS_RU|MFO|NAME|ORDER BY MFO''';
     l_zpr.xml_encoding := 'CL8MSWIN1251';
     l_zpr.txt          := 'select 1 from dual';
     l_zpr.xsl_data     := '';
@@ -130,5 +130,5 @@ commit;
 
 
 PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/Bars/Data/SBR_BPK_607.sql =========*** End ***===
+PROMPT *** End *** ========== Scripts /Sql/Bars/Data/_SBR_BPK_***_607.sql =========*** End *
 PROMPT ===================================================================================== 
