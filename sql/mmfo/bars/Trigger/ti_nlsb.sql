@@ -1,18 +1,12 @@
+DROP TRIGGER BARS.TI_NLSB;
 
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Trigger/TI_NLSB.sql =========*** Run *** ===
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  trigger TI_NLSB ***
-
-  CREATE OR REPLACE TRIGGER BARS.TI_NLSB 
+CREATE OR REPLACE TRIGGER BARS.TI_NLSB
   BEFORE INSERT ON "BARS"."ARC_RRP"
   REFERENCING FOR EACH ROW
-    WHEN (
+WHEN (
 SUBSTR(NEW.fn_a,2,1)='A' AND new.mfoa<>'300465'
-      ) DECLARE
+      )
+DECLARE
    ern  CONSTANT POSITIVE := 338; -- Trigger err code
    err  EXCEPTION;
    erm  VARCHAR2(80);
@@ -40,7 +34,7 @@ BEGIN
    END IF;
 
    IF  INSTR(:NEW.d_rec,'#fMT')>0
-       AND :NEW.mfob=gl.aMFO AND :NEW.nlsb<>'191992'
+       AND :NEW.mfob=gl.aMFO AND :NEW.nlsb not in ('37391192')
    THEN
       erm := '0992 - Недопустимый счет клиента Б';
       raise_application_error(-(20000+ern),'\'||erm,TRUE);
@@ -49,19 +43,11 @@ BEGIN
    IF :NEW.dk=1 AND
       INSTR(NVL(:NEW.d_rec,' '),'#fMT')=0 AND
       :NEW.mfob=gl.aMFO AND
-      :NEW.nlsb='191992'
+      :NEW.nlsb='37391192'
    THEN
       erm := '0953 - SWIFT: Плохой синтаксис реквизита "f"';
       raise_application_error(-(20000+ern),'\'||erm,TRUE);
    END IF;
 
 END;
-
-
 /
-ALTER TRIGGER BARS.TI_NLSB ENABLE;
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Trigger/TI_NLSB.sql =========*** End *** ===
-PROMPT ===================================================================================== 
