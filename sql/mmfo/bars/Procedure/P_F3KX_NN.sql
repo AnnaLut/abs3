@@ -8,7 +8,7 @@ IS
 % DESCRIPTION :   Процедура формирования 3KX     для КБ (универсальная)
 % COPYRIGHT   :   Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :   v.18.001          22.02.2018
+% VERSION     :   v.18.001          01.03.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
       sheme_ - схема формирования
@@ -28,6 +28,7 @@ IS
 
    gr_sumn_     number        := 1;        --  обмеження для продажу валюти
    gr_sum_      number        := 1;        --  обмеження для купівлі валюти
+   kons_sum_    number;
 
    kodp_      varchar2(10);
    znap_      varchar2(70);
@@ -430,6 +431,8 @@ BEGIN
    --- выбор курса долара для пересчета суммы
    kurs_ := f_ret_kurs (840, dat_);
    kurs1_ := f_ret_kurs (840, dat_);
+
+   kons_sum_ := gl.p_icurval (840, 100000, dat_);
 
    ourOKPO_ := lpad(F_Get_Params('OKPO',null), 8, '0');
 
@@ -868,6 +871,35 @@ BEGIN
                    end if;
 
                end if;
+
+         if  mfo_ =300465  and ko_='2' and nls_ ='2900205'
+                                       and nlsk_='29003'
+         then
+               p_ins (nnnn_, 'F091', '4');
+               p_ins (nnnn_, 'R030', LPAD (kv_, 3,'0'));
+               p_ins (nnnn_, 'T071', TO_CHAR (sum0_));
+               p_ins (nnnn_, 'K020', '0');
+               p_ins (nnnn_, 'K021', '#');
+               p_ins (nnnn_, 'Q024', '2');
+               p_ins (nnnn_, 'D100', '00');
+               p_ins (nnnn_, 'S180', '#');
+               p_ins (nnnn_, 'F089', '1');
+               p_ins (nnnn_, 'F092', '216');
+
+         elsif mfo_ =322669  and ko_='2' and nls_ ='29008801905'
+                                         and nlsk_ like '2900%'
+         then
+               p_ins (nnnn_, 'F091', '4');
+               p_ins (nnnn_, 'R030', LPAD (kv_, 3,'0'));
+               p_ins (nnnn_, 'T071', TO_CHAR (sum0_));
+               p_ins (nnnn_, 'K020', '0');
+               p_ins (nnnn_, 'K021', '#');
+               p_ins (nnnn_, 'Q024', '2');
+               p_ins (nnnn_, 'D100', '00');
+               p_ins (nnnn_, 'S180', '#');
+               p_ins (nnnn_, 'F089', '1');
+               p_ins (nnnn_, 'F092', '216');
+         else
 --               if (d6#70_ is null or d6#70_ <> '804') and ROUND (sum0_/dig_, 0) >= 1
                if  ROUND (sum0_/dig_, 0) >= 1
                then
@@ -900,7 +932,6 @@ BEGIN
 	          p_ins (nnnn_, 'K020', TRIM (okpo_));
 	          p_ins (nnnn_, 'K021', k021_);
                end if;
-
 
                p_ins (nnnn_, 'Q001', TRIM (nmk_));       -- назва клiєнта
                p_ins (nnnn_, 'Q024', q024_);             -- тип контрагента
@@ -977,6 +1008,8 @@ BEGIN
                   END IF;
                END LOOP;
 
+         end if;
+
             END IF;
 
          END LOOP;
@@ -988,6 +1021,56 @@ BEGIN
    END LOOP;
 
    CLOSE c_main;
+
+--   консолидация  операций  по rnbu_trace    операция 216
+   for u in ( select f091, r030, f092, sum(t071) t071
+                from ( select *
+                         from ( select substr(kodp,5,3) ekp_2,
+                                       substr(kodp,1,4) ekp_1, znap 
+                                  from rnbu_trace
+                              )
+                              pivot
+                              ( max(trim(znap))
+                                  for ekp_1 in ( 'F091' as F091, 'R030' as R030, 'T071' as T071,
+                                                 'K020' as K020, 'K021' as K021, 'Q001' as Q001,
+                                                 'Q024' as Q024, 'D100' as D100, 'S180' as S180,
+                                                 'F089' as F089, 'F092' as F092, 
+                                                 'Q003' as Q003, 'Q007' as Q007, 'Q006' as Q006 )
+                              )   
+                        where f091 ='4' and f092 ='216' and k021='2'
+                          and gl.p_icurval (r030, t071, dat_)< kons_sum_
+                     )
+               group by f091, r030, f092
+   ) loop
+         nnnn_ := nnnn_+1;
+         p_ins (nnnn_, 'F091', u.f091);
+         p_ins (nnnn_, 'R030', LPAD (u.r030, 3,'0'));
+         p_ins (nnnn_, 'T071', TO_CHAR (u.t071 ));
+	 p_ins (nnnn_, 'K020', '0');
+	 p_ins (nnnn_, 'K021', '#');
+         p_ins (nnnn_, 'Q024', '2');
+         p_ins (nnnn_, 'D100', '00');
+         p_ins (nnnn_, 'S180', '#');
+         p_ins (nnnn_, 'F089', '1');
+         p_ins (nnnn_, 'F092', '216');
+   end loop;
+
+   delete from rnbu_trace
+    where substr(kodp,5,3) in ( select ekp_2 from (select *
+                         from ( select substr(kodp,5,3) ekp_2,
+                                       substr(kodp,1,4) ekp_1, znap 
+                                  from rnbu_trace )
+                              pivot
+                              ( max(trim(znap))
+                                  for ekp_1 in ( 'F091' as F091, 'R030' as R030, 'T071' as T071,
+                                                 'K020' as K020, 'K021' as K021, 'Q001' as Q001,
+                                                 'Q024' as Q024, 'D100' as D100, 'S180' as S180,
+                                                 'F089' as F089, 'F092' as F092, 
+                                                 'Q003' as Q003, 'Q007' as Q007, 'Q006' as Q006 )
+                              )   
+                        where f091 ='4' and f092 ='216' and k021 ='2' and f089 ='2'
+                          and gl.p_icurval (r030, t071, dat_)< kons_sum_
+                     ));  
 
 --   операции из модуля FOREX
     IF is_swap_tag_ >= 1
