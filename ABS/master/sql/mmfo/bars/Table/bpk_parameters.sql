@@ -62,8 +62,16 @@ exception when others then
  end;
 /
 
-
-
+PROMPT *** Create  constraint CC_BPK_PARAMETERS_TAG***
+begin
+  execute immediate 'alter table bpk_parameters
+  add constraint bpk_parameters_tag
+  check ((tag IN (''INTRT'',''ND_REST'') and (txt between 0 and 100 or tag is null)) or value not IN (''INTRT'',''ND_REST''))';
+ exception when others then 
+    if sqlcode = -2264 or sqlcode = -2261 then null; else raise; 
+    end if; 
+end;
+/
 
 PROMPT *** Create  index PK_BPKPARAMETERS ***
 begin   
@@ -79,7 +87,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  BPK_PARAMETERS ***
-grant SELECT                                                                 on BPK_PARAMETERS  to BARSREADER_ROLE;
 grant SELECT                                                                 on BPK_PARAMETERS  to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BPK_PARAMETERS  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BPK_PARAMETERS  to BARS_DM;
