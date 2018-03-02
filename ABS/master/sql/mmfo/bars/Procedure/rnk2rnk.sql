@@ -7,17 +7,14 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure RNK2RNK ***
 
-  CREATE OR REPLACE PROCEDURE BARS.RNK2RNK -- передача данных одного клиента другому
-  (p_rnkfrom varchar2, -- от кого
-   p_rnkto   varchar2  -- кому
--- p_dateoff date default trunc(sysdate)
-   --ver 2.01 07.06.2017
-   )
-is
+CREATE OR REPLACE PROCEDURE BARS.RNK2RNK -- передача данных одного клиента другому
+( p_rnkfrom varchar2 -- от кого
+, p_rnkto   varchar2 -- кому
+) is --ver 2.1 02.03.2018
   type            cur is ref cursor;
   cur_            cur;
   sql_            varchar2(32000);
-  acc_            number;
+  acc_            accounts.acc%type;
   dateoff_        date;
   dazs_           varchar2(32);
   dapp_           varchar2(32);
@@ -327,151 +324,85 @@ begin
                  from   accounts
                  where  rnk='||p_rnkfrom;
         open cur_ for sql_;
+
+        DBMS_APPLICATION_INFO.SET_ACTION( $$PLSQL_UNIT );
+
         loop
-          fetch cur_ into nls_ ,
-                          kv_  ,
-                          acc_ ,
-                          dazs_,
-                          dapp_,
-                          tip_,
-                          nbs_;
+
+          fetch cur_
+           into nls_, kv_, acc_, dazs_, dapp_, tip_, nbs_;
+
           exit when cur_%notfound;
-          if dazs_ is null then
-            begin
-                  execute immediate 'update accounts
-                                     set    rnk='||p_rnkto||'
-                                     where  acc='||to_char(acc_);
-              if nbs_ = '2625' then
-                  for cur2 in -- и неважно, открыт или закрыт deal. Все равно забираем счет и присоединяем к другому, ведь счет открыт
-                         (select d.id from attribute_values avs
-                         JOIN (select  max(t.nested_table_id) keep (dense_rank last order by t.value_date) nested_table_id ,
-                                       t.object_id,
-                                       t.attribute_id
-                                from ATTRIBUTE_VALUE_BY_DATE t where t.attribute_id =
-                                                                              (SELECT ak.id
-                                                                                 FROM attribute_kind ak
-                                                                                WHERE ak.attribute_code = 'DKBO_ACC_LIST')
-                                group by t.object_id, t.attribute_id)  av   on av.nested_table_id=avs.nested_table_id
-                        JOIN deal d                ON d.id = av.object_id AND d.deal_type_id IN (SELECT tt.id FROM object_type tt WHERE tt.type_code = 'DKBO')
-                        where d.customer_id      = p_rnkfrom
-                          and avs.number_values  = acc_)
-                  loop
 
-                  --Визначаємо всі рахунки клієнта ,включені в ДКБО
-                  l_dkbo_acc_list  := bars.attribute_utl.get_number_values(p_object_id      => cur2.id
-                                                                          ,p_attribute_code => lc_acc_list);
+          begin
 
-                  l_acc_list_union := l_dkbo_acc_list MULTISET EXCEPT DISTINCT number_list(acc_);
+            begin
+              update ACCOUNTS
+                 set RNK = to_number(p_rnkto)
+               where ACC = acc_;
+            exception
+              when OTHERS then
+                DBMS_APPLICATION_INFO.SET_ACTION( NULL );
+                raise_application_error( -20738, 'RNK2RNK: помилка - '||sqlerrm, TRUE );
+            end;
 
-                  bars.attribute_utl.set_value(p_object_id      => cur2.id
-                                              ,p_attribute_code => lc_acc_list
-                                              ,p_values         => l_acc_list_union);
+            if ( ( dazs_ is null ) and ( nbs_ = '2625' ) )
+            then
 
-                    --присоединяем счет к ДКБО
-                    pkg_dkbo_utl.p_acc_map_to_dkbo(in_customer_id => p_rnkto,
-                                                   in_acc_list    => number_list(acc_),
-                                                   out_deal_id    => l_dkbo_deal);
-                    --пишем в историю переноса
-                                insert
-                                into   rnk2deal_acc (rnkfrom,
-                                                rnkto  ,
-                                                sdate  ,
-                                                deal_from     ,
-                                                deal_to      ,
-                                                acc ,
-                                                id)
-                                        values (to_number(p_rnkfrom),
-                                                to_number(p_rnkto)  ,
-                                                sysdate             ,
-                                                cur2.id           ,
-                                                l_dkbo_deal         ,
-                                                acc_                ,
-                                                user_id);
-                  end loop;
-              end if;
-            exception when OTHERS then
-              raise_application_error(-(20735), 'RNK2RNK: помилка - '||sqlerrm,TRUE);
-            end;
-          else
-            begin
-              execute immediate 'update accounts
-                                 set    dapp=null
-                                 where  acc='||to_char(acc_);
-            exception when OTHERS then
-              raise_application_error(-(20736), 'RNK2RNK: помилка - '||sqlerrm,TRUE);
-            end;
-            begin
-              execute immediate 'update accounts
-                                 set    tip=''ODB''
-                                 where  acc='||to_char(acc_);
-            exception when OTHERS then
-              raise_application_error(-(20737), 'RNK2RNK: помилка - '||sqlerrm,TRUE);
-            end;
---
-/*            begin
-              execute immediate 'alter trigger TBU_ACCOUNTS_DAZS disable';
-            exception when OTHERS then
-              raise_application_error(-(20743), 'RNK2RNK: помилка - '||sqlerrm,TRUE);
-            end;*/
---
-            dbms_application_info.set_action('rnk2rnk');
-            begin
-              execute immediate 'update accounts
-                                 set    dazs=null
-                                 where  acc='||to_char(acc_);
-            exception when OTHERS then
-/*              begin
-                dbms_utility.exec_ddl_statement('alter trigger TBU_ACCOUNTS_DAZS enable');
-              exception when OTHERS then
-                raise_application_error(-(20744), 'RNK2RNK: помилка - '||sqlerrm,TRUE);
-              end;*/
-              dbms_application_info.set_action(null);
-              raise_application_error(-(20738), 'RNK2RNK: помилка - '||sqlerrm,TRUE);
-            end;
-            dbms_application_info.set_action(null);
---
-/*            begin
-              dbms_utility.exec_ddl_statement('alter trigger TBU_ACCOUNTS_DAZS enable');
-            exception when OTHERS then
-              raise_application_error(-(20744), 'RNK2RNK: помилка - '||sqlerrm,TRUE);
-            end;*/
---
-            begin
-              execute immediate 'update accounts
-                                 set    tip='''||tip_||'''
-                                 where  acc='||to_char(acc_);
-            exception when OTHERS then
-              raise_application_error(-(20739), 'RNK2RNK: помилка - '||sqlerrm,TRUE);
-            end;
-            begin
-              execute immediate 'update accounts
-                                 set    rnk='||p_rnkto||'
-                                 where  acc='||to_char(acc_);
-            exception when OTHERS then
-              raise_application_error(-(20740), 'RNK2RNK: помилка - '||sqlerrm,TRUE);
-            end;
---            bars_audit.info('RNK2RNK: dazs_='||dazs_||', acc='||acc_);
---            execute immediate "update accounts
---                               set    dazs="||to_date(dazs_,'DD/MM/YYYY')||"
---                               where  acc="||to_char(acc_);
-            begin
-              update accounts
-              set    dazs=to_date(dazs_,'DD/MM/YYYY')
-              where  acc=acc_;
-            exception when OTHERS then
-              raise_application_error(-(20741), 'RNK2RNK: помилка - '||sqlerrm,TRUE);
-            end;
-            begin
-              update accounts
-              set    dapp=to_date(dapp_,'DD/MM/YYYY')
-              where  acc=acc_;
-            exception when OTHERS then
-              raise_application_error(-(20742), 'RNK2RNK: помилка - '||sqlerrm,TRUE);
-            end;
-          end if;
+              for cur2  -- и неважно, открыт или закрыт deal. Все равно забираем счет и присоединяем к другому, ведь счет открыт
+               in ( select d.id
+                      from ATTRIBUTE_VALUES avs
+                      JOIN ( select max(t.nested_table_id) keep (dense_rank last order by t.value_date) nested_table_id ,
+                                    t.object_id,
+                                    t.attribute_id
+                               from ATTRIBUTE_VALUE_BY_DATE t
+                              where t.attribute_id = ( SELECT ak.id
+                                                         FROM ATTRIBUTE_KIND ak
+                                                        WHERE ak.attribute_code = 'DKBO_ACC_LIST' )
+                              group by t.object_id, t.attribute_id
+                            ) av
+                         on ( av.nested_table_id = avs.nested_table_id )
+                       JOIN DEAL d
+                         ON d.id = av.object_id AND d.deal_type_id IN (SELECT tt.id FROM object_type tt WHERE tt.type_code = 'DKBO')
+                      where d.customer_id      = p_rnkfrom
+                        and avs.number_values  = acc_
+                  )
+              loop
+
+                -- Визначаємо всі рахунки клієнта ,включені в ДКБО
+                l_dkbo_acc_list := ATTRIBUTE_UTL.GET_NUMBER_VALUES( p_object_id      => cur2.id
+                                                                  , p_attribute_code => lc_acc_list);
+
+                l_acc_list_union := l_dkbo_acc_list MULTISET EXCEPT DISTINCT number_list(acc_);
+
+                ATTRIBUTE_UTL.SET_VALUE( p_object_id      => cur2.id
+                                       , p_attribute_code => lc_acc_list
+                                       , p_values         => l_acc_list_union);
+
+                -- присоединяем счет к ДКБО
+                PKG_DKBO_UTL.P_ACC_MAP_TO_DKBO( in_customer_id => to_number(p_rnkto)
+                                              , in_acc_list    => number_list(acc_)
+                                              , out_deal_id    => l_dkbo_deal );
+                -- пишем в историю переноса
+                insert
+                  into RNK2DEAL_ACC
+                     ( RNKFROM, RNKTO, SDATE, DEAL_FROM, DEAL_TO, ACC, ID )
+                values ( to_number(p_rnkfrom), to_number(p_rnkto), sysdate, cur2.id, l_dkbo_deal, acc_, user_id );
+
+              end loop;
+
+            end if;
+
+          exception
+            when OTHERS then
+              DBMS_APPLICATION_INFO.SET_ACTION( NULL );
+              raise_application_error( -20735, 'RNK2RNK: помилка - '||sqlerrm,TRUE);
+          end;
+
           cnt_ := cnt_ + 1;
+
           insert
-          into   rnk2nls (rnkfrom,
+            into RNK2NLS (rnkfrom,
                           rnkto  ,
                           sdate  ,
                           nls    ,
@@ -484,10 +415,15 @@ begin
                           kv_                 ,
                           user_id);
         end loop;
+
+        DBMS_APPLICATION_INFO.SET_ACTION( NULL );
+
         close cur_;
-        if cnt_>0 then
+
+        if ( cnt_ > 0 )
+        then
           insert
-          into   rnk2tbl (rnkfrom,
+            into rnk2tbl (rnkfrom,
                           rnkto  ,
                           tbl    ,
                           cnt    ,
@@ -500,6 +436,7 @@ begin
                           sysdate             ,
                           user_id);
         end if;
+
       elsif k.table_name<>'CUSTOMER_RISK' then
 --      bars_audit.info('update '||k.table_name||' set '||k.column_name||'='||p_rnkto||' where '||k.column_name||'='||p_rnkfrom);
 
@@ -603,9 +540,9 @@ begin
 
 end rnk2rnk;
 /
+
 show err;
 
-PROMPT *** Create  grants  RNK2RNK ***
 grant EXECUTE                                                                on RNK2RNK         to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on RNK2RNK         to RCC_DEAL;
 grant EXECUTE                                                                on RNK2RNK         to START1;
