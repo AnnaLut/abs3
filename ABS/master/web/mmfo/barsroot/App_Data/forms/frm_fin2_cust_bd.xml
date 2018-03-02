@@ -32,12 +32,12 @@
           c.OKPO = f2.OKPO(+) and c.OKPO = f3.OKPO(+) and
           c.OKPO = f4.OKPO(+) and c.RNK = p.RNK (+) and
           c.DATE_OFF is null and
+          c.branch like  '/'||f_ourmfo||'%' and
           c.k050 in ('425','410','420','140') and
           NVL(c.crisk,0) = s.FIN (+) and
           (c.custtype =2)
-          and exists (select * from v_fin_cc_deal cc where rnk = c.rnk and substr(prod,1,2) = '21' --and  EXISTS
-                          --(SELECT 1 FROM nd_acc n, accounts a WHERE n.nd = cc.nd AND n.acc = a.acc AND tip = 'LIM' AND (dazs IS NULL OR dazs > SYSDATE - 31)) 
-                          )
+          --and c.rnk in (select rnk from v_fin_cc_deal cc where substr(prod,1,2) = '21' and branch like  sys_context('bars_context','user_branch')||'%' )
+          and c.rnk in (select rnk from cc_deal cc where substr(prod,1,2) = '21' and branch like  sys_context('bars_context','user_branch')||'%' and vidd between 1 and 3 and rnk = c.rnk   )
           ORDER BY 1,2,3
         </sql>
       </datasource>

@@ -21,6 +21,7 @@
           customer.DATE_OFF is null -- and NVL(customer.crisk,0) = s.FIN (+)
           and (customer.custtype =3)
           and (customer.custtype =3 and NVL(customer.k050,0) != '910')
+          and customer.branch like  '/'||f_ourmfo||'%'
           --and v.branch like  sys_context('bars_context','user_branch')||'%'
           --and v.rnk = customer.rnk
           ORDER BY 1,2,3
