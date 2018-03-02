@@ -130,11 +130,11 @@ PROMPT *** Create  view V_OTCN_TRACE_70_ALL ***
           op.REF AS REF,
           o.KODF AS KODF,
           o.DATF AS DATF,
-          op.KV AS KV,
-          to_char(op.s)  AS SumVal,
+          o.KV AS KV,
+          o.ZNAP  AS SumVal,
           TO_CHAR (op.REF) comm
      FROM otcn_trace_70 o , oper op
-    WHERE o.kodp LIKE 'S1800%'
+    WHERE o.kodp LIKE 'T071%'
           AND op.ref = o.ref 
           AND o.KODF = '3K'
           AND NOT EXISTS
