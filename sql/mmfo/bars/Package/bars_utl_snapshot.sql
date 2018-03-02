@@ -153,7 +153,7 @@ is
   --
   -- constants
   --
-  VERSION_BODY    constant varchar2(64)  := 'version 1.3.1  27.02.2018';
+  VERSION_BODY    constant varchar2(64)  := 'version 1.3.2  28.02.2018';
 
   -- Префикс для трассировки
   PKG_CODE        constant varchar2(100) := 'UTL_SNAPSHOT';
@@ -690,7 +690,7 @@ is
 
   Begin
 
-    logger.trace( PKG_CODE||'.SYNC_SNAP Entry with p_fdat = '||to_char(p_fdat,FMT_DATE) );
+    bars_audit.trace( PKG_CODE||'.SYNC_SNAP Entry with p_fdat = '||to_char(p_fdat,FMT_DATE) );
 
     -- Якщо формується снімок то немає і даних для звіту.
     if g_algorithm = ALGORITHM_MIK
@@ -726,7 +726,7 @@ is
         l_bankday := 'N';
     end;
 
-    logger.trace(PKG_CODE||' l_bankday='||l_bankday);
+    bars_audit.trace( PKG_CODE||' l_bankday='||l_bankday );
 
     begin
       Select 'Y'
@@ -739,7 +739,7 @@ is
         l_snap_balance := 'N';
     end;
 
-    logger.trace(PKG_CODE||' l_snap_balance='||l_snap_balance);
+    bars_audit.trace( PKG_CODE||' l_snap_balance='||l_snap_balance );
 
     -- для драпсів неможна формувати снимки раніше вказаної дати
     begin
@@ -771,41 +771,34 @@ is
     if l_create_snap
     then
 
-      if g_algorithm = ALGORITHM_MIK
-      then
+      l_previous_day := DAT_NEXT_U(p_fdat, -1); -- попередня банківська даня
 
-        l_previous_day := DAT_NEXT_U(p_fdat, -1); -- попередня банківська даня
+      begin
+        Select 'Y'
+          Into l_snap_balance_previous
+          From SNAP_BALANCES
+         Where FDAT = l_previous_day
+           and rownum=1;
+      exception
+        when no_data_found then
+          l_snap_balance_previous := 'N';
+      end;
 
-        begin
-          Select 'Y'
-            Into l_snap_balance_previous
-            From snap_balances
-           Where fdat = l_previous_day
-             and rownum=1;
-        exception
-          when no_data_found then
-            l_snap_balance_previous := 'N';
-        end;
-
-        if ( is_bday_modified(l_previous_day) and l_snap_balance_previous='N' )
-        then -- повне формування
-          l_previous_day_modif := 0;
-        else -- спрощене формування
-          l_previous_day_modif := 1;
-        end if;
-
-        logger.trace(PKG_CODE||'.sync_snap: Попередній банківськй день '||' dat '||to_char(l_previous_day, FMT_DATE)||' l_previous_day_modif='||l_previous_day_modif);
-
-        logger.trace(PKG_CODE||'.sync_snap: start := ddraps; '||' fdat '||to_char(p_fdat, FMT_DATE));
-
-        BARS.DDRAPS( p_fdat, l_previous_day_modif );
-
-      else
-        bars_audit.info( PKG_CODE||': ALGORITHM <> '||ALGORITHM_MIK );
+      if ( is_bday_modified(l_previous_day) and l_snap_balance_previous='N' )
+      then -- повне формування
+        l_previous_day_modif := 0;
+      else -- спрощене формування
+        l_previous_day_modif := 1;
       end if;
 
+      bars_audit.trace( PKG_CODE||'.sync_snap: Попередній банківськй день '||to_char(l_previous_day,FMT_DATE)||' l_previous_day_modif='||l_previous_day_modif);
+
+      bars_audit.trace( PKG_CODE||'.sync_snap: create_snap = TRUE on '||to_char(p_fdat,FMT_DATE) );
+
+      BARS.DDRAPS( p_fdat, l_previous_day_modif );
+
     else
-      bars_audit.info( PKG_CODE||'.sync_snap: create_snap = false.' );
+      bars_audit.info( PKG_CODE||'.sync_snap: create_snap = FALSE on '||to_char(p_fdat,FMT_DATE) );
     End if;
 
     bars_audit.trace( '%s: Exit.', PKG_CODE||'.sync_snap' );
