@@ -14,9 +14,9 @@
         <!-- Запрос на відображення клієнтів по доступу до рахунків-->
         <sql>
           SELECT  2 as n, customer.rnk, customer.rnkp as isp,
-          customer.okpo, customer.nmk, p.RUK, s.NAME,
+          customer.okpo, customer.nmk, null RUK, s.NAME,
           f0.FDAT as f0,f1.FDAT as f1,f2.FDAT as f2,f3.FDAT as f3,f4.FDAT as f4
-          FROM customer, corps p,  stan_fin S,
+          FROM customer,  stan_fin S,
           (select OKPO, max(FDAT) FDAT from FIN_RNK where IDF=0 group by OKPO) F0,
           (select OKPO, max(FDAT) FDAT from FIN_RNK where IDF=1 group by OKPO) F1,
           (select OKPO, max(FDAT) FDAT from FIN_RNK where IDF=2 group by OKPO) F2,
@@ -24,11 +24,12 @@
           (select OKPO, max(FDAT) FDAT from FIN_RNK where IDF=4 group by OKPO) F4
           WHERE customer.OKPO = f0.OKPO(+) and customer.OKPO = f1.OKPO(+) and
           customer.OKPO = f2.OKPO(+) and customer.OKPO = f3.OKPO(+) and
-          customer.OKPO = f4.OKPO(+) and customer.RNK = p.RNK (+) and
+          customer.OKPO = f4.OKPO(+) and
           customer.DATE_OFF is null and
           NVL(customer.crisk,0) = s.FIN (+) and
+          customer.branch like  '/'||f_ourmfo||'%' and
           (customer.custtype =3 and NVL(customer.k050,0) = '910')
-          and exists (select 1 from v_fin_cc_deal where rnk = customer.rnk and  branch like  sys_context('bars_context','user_branch')||'%')
+          and exists (select 1 from v_fin_cc_deal where branch like  sys_context('bars_context','user_branch')||'%' and vidd between 1 and 3 and rnk = customer.rnk )
           --and exists (select 1 from v_gl where dazs is null and rnk = customer.rnk and substr(nbs,1,1) in ('2', '3') )
           ORDER BY 1,2,3
         </sql>

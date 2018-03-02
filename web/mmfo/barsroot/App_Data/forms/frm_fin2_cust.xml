@@ -31,7 +31,7 @@
           order by sign(rnk), 5-->
           Select  /*+ RESULT_CACHE */ 2 as n, c.rnk, c.rnkp as isp, c.okpo, c.nmk, cc.ruk, null name, datea,
           null f0, fm.fdat as f1, fm.fdat as f2, null f3, null f4, nvl(kol,0) kol, substr(c.branch,2,6) kf, decode(w.value,'1','ДКБ','2','ММСБ', null)  nameb
-          from (select * from fin_customer where custtype = 2 and DATE_OFF is null) c
+          from (select * from fin_customer where custtype = 2 and DATE_OFF is null and branch like  '/'||f_ourmfo||'%' ) c
           left join corps cc on c.rnk = cc.rnk
           left join (select okpo, max(fdat) fdat from fin_fm group by okpo ) fm on to_number(c.okpo) = fm.okpo
           left join (select rnk, sign(count(1)) kol from cc_deal where 15 > sos and 4 >vidd and branch like  sys_context('bars_context','user_branch')||'%' group by rnk) v on c.rnk = v.rnk
