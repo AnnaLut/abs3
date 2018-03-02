@@ -7,12 +7,25 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_NP ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_NP ("NP") AS 
-  SELECT n.np
-     FROM np n, staff s
-    WHERE n.ID = s.ID
-      AND s.branch = SYS_CONTEXT ('bars_context', 'user_branch');
 
+
+CREATE OR REPLACE FORCE VIEW BARS.V_NP
+(
+   NP
+)
+AS
+   SELECT n.np
+     FROM np n, staff$base s
+    WHERE     n.ID = s.ID
+    and s.id=user_id
+          AND s.branch = SYS_CONTEXT ('bars_context', 'user_branch');
+         
+
+          
+
+GRANT DELETE, INSERT, SELECT, UPDATE, FLASHBACK ON BARS.V_NP TO BARS_ACCESS_DEFROLE; 
+
+ 
 PROMPT *** Create  grants  V_NP ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_NP            to ABS_ADMIN;
 grant SELECT                                                                 on V_NP            to BARSREADER_ROLE;
