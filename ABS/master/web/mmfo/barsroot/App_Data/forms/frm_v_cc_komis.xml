@@ -1,0 +1,110 @@
+<xmlform captiontype="OnlyTitle">
+  <grids>
+    <grid id="gv" pagesize="15" showpagesizebox="true" title="Список кредитних договорів" showfilter="true">
+      <filters buttontext="Знайти" caption="Пошук кредитного договора" columnscount="4" width ="100%">
+        <filter field="PROD" caption="Код продукта" columnindex="2" condition="Equal" id="fltrprod">
+          <uicontrol></uicontrol>
+        </filter>
+        <filter field="CC_ID" caption="Номер КД" columnindex="1" condition="Equal" id="fltrccid">
+          <uicontrol></uicontrol>
+        </filter>
+        <filter field="SDATE" caption="Дата договора" columnindex="4" condition="Equal" id="fltrdat">
+          <uicontrol type="DateInput"/>
+        </filter>
+        <filter field="NMK" caption="Назва клієнта" columnindex="3" condition="LikeBoth" id="fltrnmk" >
+          <uicontrol></uicontrol>
+        </filter>
+      </filters>
+      <datasource>
+        <sql>
+          Select
+          CC_ID,
+          substr(PROD,1,6) PROD,
+          ND,
+          RNK,
+          NMK,
+          OKPO,
+          SDATE,
+          WDATE,
+          SOS,
+          BRANCH
+          from V_CC_KOMIS
+          Where branch like SYS_CONTEXT ('bars_context', 'user_branch') || '%'
+        </sql>
+      </datasource>
+      <rowselection method="SingleRow"/>
+      <fields>
+        <field name="CC_ID" key="true" sort="Default" datatype="String">
+          <column show="true" caption="Номер КД  (клік=вибір комісії)" align="Right">
+            <link url="/barsroot/barsweb/dynform.aspx?form=frm_cc_prod_komis">
+              <parameters>
+                <parameter name="PROD" altname="PROD" type="DataField" datatype="String"></parameter>
+                <parameter name="ND" altname="ND" type="DataField" datatype="Int64"></parameter>
+                <parameter name="SDATE" altname="SDATE" type="DataField" datatype="DateTime"></parameter>
+                <parameter name="CC_ID" altname="CC_ID" type="DataField" datatype="String"></parameter>
+				<parameter name="NMK" altname="FIO" type="DataField" datatype="String"></parameter>
+              </parameters>
+            </link>
+          </column>
+          <form show="true">
+            <uicontrol type="String"/>
+          </form>
+        </field>
+        <field name="ND" key="true" datatype="Int64" sort="default">
+          <column show="true" caption="Референс КД" align="Center" />
+          <form show="true">
+            <uicontrol readonly="true" />
+          </form>
+        </field>
+        <field name="PROD" key="false" sort="Default" datatype="String">
+          <column show="true" caption="Код продукта" align="Right"/>
+          <form show="true">
+            <uicontrol type="String"/>
+          </form>
+        </field>
+        <field name="RNK" key="true" sort="Default" datatype="Int64">
+          <column show="true" caption="РНК" align="Right"/>
+          <form show="true">
+            <uicontrol type="IntegerInput"/>
+          </form>
+        </field>
+        <field name="NMK" key="true" datatype="String" sort="default">
+          <column show="true" caption="Назва клієнта" align="Left"/>
+          <form show="true">
+            <uicontrol type="TextBox" readonly="true" />
+          </form>
+        </field>
+        <field name="OKPO" key="true" datatype="String" sort="default">
+          <column show="true" caption="ЗКПО" align="Right"/>
+          <form show="true">
+            <uicontrol type="TextBox" readonly="true" />
+          </form>
+        </field>
+        <field name="SDATE" key="true" datatype="DateTime" sort="default">
+          <column show="true" caption="Дата початку договора" align="Center"/>
+          <form show="true">
+            <uicontrol type="DateInput" readonly="true" />
+          </form>
+        </field>
+        <field name="WDATE" key="true" datatype="DateTime" sort="default">
+          <column show="true" caption="Дата закінчення договора" align="Center"/>
+          <form show="true">
+            <uicontrol type="DateInput" readonly="true" />
+          </form>
+        </field>
+        <field name="SOS" key="true" sort="Default" datatype="Int64">
+          <column show="true" caption="Стан договору" align="Center"/>
+          <form show="true">
+            <uicontrol type="IntegerInput"/>
+          </form>
+        </field>
+        <field name="BRANCH" key="true" datatype="String" sort="default">
+          <column show="true" caption="Відділення" align="Left"/>
+          <form show="true">
+            <uicontrol type="TextBox" readonly="true" />
+          </form>
+        </field>
+      </fields>
+    </grid>
+  </grids>
+</xmlform>
