@@ -12,6 +12,7 @@ using System.Data;
 using System;
 using System.Globalization;
 using System.Text;
+using Bars.Classes;
 
 namespace BarsWeb.Areas.Forex.Infrastucture.DI.Implementation
 {
@@ -43,7 +44,7 @@ namespace BarsWeb.Areas.Forex.Infrastucture.DI.Implementation
                  new OracleParameter("KVA", OracleDbType.Decimal) { Value = KVA }
                     //new OracleParameter("bankdate", OracleDbType.Date) { Value = BankDate },
                 };
-            return (decimal)_entities.ExecuteStoreQuery<decimal?>(query, paramsQuery).FirstOrDefault();            
+            return (decimal)_entities.ExecuteStoreQuery<decimal?>(query, paramsQuery).FirstOrDefault();
         }
 
         public decimal? GetFinResult(decimal KVA, decimal NSA, decimal KVB, decimal NSB)
@@ -53,7 +54,7 @@ namespace BarsWeb.Areas.Forex.Infrastucture.DI.Implementation
             string query = string.Format(@"SELECT ( gl.p_icurval(:KVA,:nSa,(SELECT bankdate FROM dual))-gl.p_icurval(:KVB,:nSb, (SELECT bankdate FROM dual)) ) /100 FROM dual");
             object[] paramsQuery = new object[] {
                     new OracleParameter("KVA", OracleDbType.Decimal) { Value = KVA },
-                    new OracleParameter("nSa", OracleDbType.Decimal) { Value = NSA },                                       
+                    new OracleParameter("nSa", OracleDbType.Decimal) { Value = NSA },
                     new OracleParameter("KVB", OracleDbType.Decimal) { Value = KVB },
                      new OracleParameter("nSb", OracleDbType.Decimal) { Value = NSB }
                 };
@@ -64,23 +65,23 @@ namespace BarsWeb.Areas.Forex.Infrastucture.DI.Implementation
             StringBuilder query = new StringBuilder();
             query.Append(@"select * from BOPCODE ");
             _getSql = new BarsSql()
-            {               
+            {
                 SqlParams = new object[] { }
             };
-            if(KOD != null)
+            if (KOD != null)
             {
                 query.Append("where TRANSCODE=:P_TRANSCODE");
                 _getSql.SqlText = query.ToString();
                 _getSql.SqlParams = new object[] {
                     new OracleParameter("P_TRANSCODE", OracleDbType.Varchar2) { Value = KOD }
-                };                
+                };
             }
             else
             {
                 query.Append("where ROWNUM <= 1");
                 _getSql.SqlText = query.ToString();
-            }          
-            
+            }
+
             return _entities.ExecuteStoreQuery<BOPCODE>(_getSql.SqlText, _getSql.SqlParams).AsQueryable(); ;
         }
 
@@ -125,11 +126,11 @@ namespace BarsWeb.Areas.Forex.Infrastucture.DI.Implementation
                     , country as NGA       
                     from dual,  bopcount where kodc = GetGlobalOption('KOD_G')
                     ");
-            return _entities.ExecuteStoreQuery<Prepare>(query).AsQueryable();          
+            return _entities.ExecuteStoreQuery<Prepare>(query).AsQueryable();
         }
 
-       
-        
+
+
         public ForexPartner GetPartnersForexDeals(string KVB, string KEY, string VALUE)
         {
             //StringBuilder query = new StringBuilder();
@@ -152,53 +153,53 @@ namespace BarsWeb.Areas.Forex.Infrastucture.DI.Implementation
             //           WHERE f.kv=:KVB AND UPPER(f.bick)=UPPER(s.bic (+))
             //           ) x2
             //        where (x1.mfo = x2.mfo(+) and x1.bic = x2.bic(+))";
-            
 
-             object[] SqlParams = new object[] { };
-            _getSql = new BarsSql(){ };
+
+            object[] SqlParams = new object[] { };
+            _getSql = new BarsSql() { };
 
             switch (KEY)
             {
                 case "rnk":
                     _getSql.SqlText = string.Format(sql, "RNK =:RNK");
-                    _getSql.SqlParams = new object[] {                        
+                    _getSql.SqlParams = new object[] {
                         new OracleParameter("RNK", OracleDbType.Decimal, ParameterDirection.Input) { Value = Int64.Parse(VALUE)},
                         new OracleParameter("KVB", OracleDbType.Decimal, ParameterDirection.Input) { Value = Int64.Parse(KVB) }
                     };
                     break;
-                case "mfo":                    
+                case "mfo":
                     _getSql.SqlText = string.Format(sql, "mfo =:MFO");
                     _getSql.SqlParams = new object[] {
                         new OracleParameter("MFO", OracleDbType.Varchar2, ParameterDirection.Input) { Value = VALUE },
-                        new OracleParameter("KVB", OracleDbType.Decimal, ParameterDirection.Input) { Value = Int64.Parse(KVB) }                        
+                        new OracleParameter("KVB", OracleDbType.Decimal, ParameterDirection.Input) { Value = Int64.Parse(KVB) }
                     };
                     break;
-                case "KOD_B":                    
+                case "KOD_B":
                     _getSql.SqlText = string.Format(sql, "KOD_B =:KODB");
-                    _getSql.SqlParams = new object[] {                       
+                    _getSql.SqlParams = new object[] {
                         new OracleParameter("KODB", OracleDbType.Decimal, ParameterDirection.Input) { Value = Int64.Parse(VALUE.Trim()) },
                          new OracleParameter("KVB", OracleDbType.Decimal, ParameterDirection.Input) { Value = Int64.Parse(KVB) }
                     };
                     break;
-                case "bic":                    
+                case "bic":
                     _getSql.SqlText = string.Format(sql, "bic=:BIC");
-                    _getSql.SqlParams = new object[] {                        
+                    _getSql.SqlParams = new object[] {
                         new OracleParameter("BIC", OracleDbType.Varchar2, ParameterDirection.Input) { Value = VALUE },
                          new OracleParameter("KVB", OracleDbType.Decimal, ParameterDirection.Input) { Value = Int64.Parse(KVB) }
                     };
                     break;
-                case "OKPO":                    
+                case "OKPO":
                     _getSql.SqlText = string.Format(sql, "okpo =:OKPO");
-                    _getSql.SqlParams = new object[] {                        
+                    _getSql.SqlParams = new object[] {
                         new OracleParameter("OKPO", OracleDbType.Varchar2, ParameterDirection.Input) { Value =  VALUE },
                          new OracleParameter("KVB", OracleDbType.Decimal, ParameterDirection.Input) { Value = Int64.Parse(KVB) }
                     };
-                    break;                        
-            };      
-                                
+                    break;
+            };
+
             return _entities.ExecuteStoreQuery<ForexPartner>(_getSql.SqlText, _getSql.SqlParams).AsQueryable().FirstOrDefault();
         }
-                
+
 
 
         private void InitBanksSWIFTParticipants()
@@ -240,7 +241,7 @@ namespace BarsWeb.Areas.Forex.Infrastucture.DI.Implementation
             _getSql = new BarsSql() { };
 
             switch (KEY)
-            {               
+            {
                 case "mfo":
                     _getSql.SqlText = string.Format(sql, "b.mfo =:MFO");
                     _getSql.SqlParams = new object[] {
@@ -261,7 +262,7 @@ namespace BarsWeb.Areas.Forex.Infrastucture.DI.Implementation
                         new OracleParameter("BIC", OracleDbType.Varchar2, ParameterDirection.Input) { Value = VALUE },
                          new OracleParameter("KVB", OracleDbType.Decimal, ParameterDirection.Input) { Value = Int64.Parse(KVB) }
                     };
-                    break;                
+                    break;
             };
         }
 
@@ -281,6 +282,32 @@ namespace BarsWeb.Areas.Forex.Infrastucture.DI.Implementation
             return result;
         }
 
+        public string GetTransactionLength(CalcTransactionLengthModel calcModel)
+        {
+
+            using (OracleConnection connection = OraConnector.Handler.UserConnection)
+            using (OracleCommand cmd = new OracleCommand("forex.get_forextype", connection))
+            {
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                var resultObject = new OracleParameter("p_result", OracleDbType.Varchar2, 4000, null,
+                    ParameterDirection.ReturnValue);
+
+                cmd.Parameters.Add(resultObject);
+                object[] parameters =
+                {
+                    new OracleParameter("p_dat", OracleDbType.Date) {Value = calcModel.CurrentDate},
+                    new OracleParameter("p_data", OracleDbType.Date) {Value = calcModel.DateA},
+                    new OracleParameter("p_datb", OracleDbType.Date) {Value = calcModel.DateB}
+            };
+                cmd.Parameters.AddRange(parameters);
+                cmd.ExecuteNonQuery();
+                return resultObject.Value.ToString();
+            }
+
+                
+        }
+
         public List<Revenue> GetRevenueDropDown(decimal? kv)
         {
             InitRevenue(kv);
@@ -297,24 +324,40 @@ namespace BarsWeb.Areas.Forex.Infrastucture.DI.Implementation
             return result;
         }
 
+        public IEnumerable<FOREX_OB22> GetForexType()
+        {
+            InitForexType(10);
+            var result = _entities.ExecuteStoreQuery<FOREX_OB22>(_getSql.SqlText, _getSql.SqlParams);
+            return result;
+        }
+
+        private void InitForexType(int maxId)
+        {
+            _getSql = new BarsSql()
+            {
+                SqlText = string.Format(@"select ID, KOD from FOREX_OB22 where ID <= :ID ORDER BY ID"),
+                SqlParams = new object[] { new OracleParameter("ID", OracleDbType.Int32).Value = maxId }
+            };
+        }
 
         public OutDealTag SaveGhanges(Agreement agreement)
         {
             OutDealTag out_deal_tag = new OutDealTag();
-           
-            try {
+
+            try
+            {
                 InitSaveChanges(agreement);
                 _entities.ExecuteStoreCommand(_getSql.SqlText, _getSql.SqlParams);
                 out_deal_tag.Out_Deal_Tag = int.Parse(((OracleParameter)_getSql.SqlParams[2]).Value.ToString());
             }
             catch (Exception e)
             {
-                out_deal_tag.ErrorMessaage = e.Message;                
+                out_deal_tag.ErrorMessaage = e.Message;
             }
             //return out_deal_tag = int.Parse(((OracleParameter)_getSql.SqlParams[2]).Value.ToString());
             return out_deal_tag;
         }
-       
+
 
         private void InitRNKB(string MFOB, string BICB, string KOD_B)
         {
@@ -368,7 +411,7 @@ namespace BarsWeb.Areas.Forex.Infrastucture.DI.Implementation
             IntiAccMode(ND);
             var count = _kendoSqlCounter.TransformSql(_getSql, request);
             var result = _entities.ExecuteStoreQuery<decimal>(count.SqlText, count.SqlParams).Single();
-            return result;            
+            return result;
         }
 
         private void IntiAccMode(decimal ND)
@@ -377,11 +420,11 @@ namespace BarsWeb.Areas.Forex.Infrastucture.DI.Implementation
             query.Append(@"SELECT o.ref, o.fdat, o.tt, decode(o.dk, 0, o.s, 0) / power(10, t.dig) as SDn,
                 decode(o.dk, 1, o.s, 0) / power(10, t.dig) as SKn,
                 o.sos, ACCOUNTS.nms, ACCOUNTS.nls, ACCOUNTS.kv, t.dig FROM opldok o, ACCOUNTS, tabval t  WHERE ACCOUNTS.acc = o.acc
-                AND ACCOUNTS.kv = t.kv AND o.ref in ");            
+                AND ACCOUNTS.kv = t.kv AND o.ref in ");
             query.AppendLine("(select ref from fx_deal_ref where deal_tag = :nND)");
             query.AppendLine(" ORDER BY o.fdat, o.ref, o.stmt, o.dk");
             _getSql = new BarsSql()
-            {             
+            {
                 SqlText = string.Format(query.ToString()),
                 SqlParams = new object[] { new OracleParameter("nND", OracleDbType.Decimal) { Value = ND } }
             };
@@ -424,7 +467,7 @@ namespace BarsWeb.Areas.Forex.Infrastucture.DI.Implementation
         {
             StringBuilder query = new StringBuilder();
             object[] paramsQuery = new object[] {
-                
+
             };
             if (partner.MFO != null)
             {
@@ -433,7 +476,8 @@ namespace BarsWeb.Areas.Forex.Infrastucture.DI.Implementation
                     new OracleParameter("MFOB", OracleDbType.Decimal) { Value = partner.MFO },
                     new OracleParameter("KVB", OracleDbType.Decimal) { Value = partner.KV }
                 };
-            } else
+            }
+            else
             {
                 query.Append(@"DELETE FROM forex_alien WHERE bic=:BICB and kv=:KVB");
                 paramsQuery = new object[] {
@@ -467,7 +511,7 @@ namespace BarsWeb.Areas.Forex.Infrastucture.DI.Implementation
         {
             CultureInfo cultureInfo = new CultureInfo("uk-UA");
 
-            StringBuilder query = new StringBuilder();            
+            StringBuilder query = new StringBuilder();
             query.Append(@"INSERT INTO forex_alien (MFO, BIC, NAME, NLS, KOD_G, KOD_B, OKPO, KV, BICK, NLSK, ID, TXT, AGRMNT_NUM, 
             AGRMNT_DATE, INTERM_B, CODCAGENT, TELEXNUM, ALT_PARTYB, FIELD_58D ) VALUES (:MFOB,:BICB,:NBB,:NLSB,:KOD_GB,:KOD_BB,:OKPOB,:KVB,
             :BICKB, :SSB, :id, :TXT, :dfAgrNum, :dfAgrDate, :dfB57A, :codcagent, :TELEXNUM, :dfB56A, :s58D)");
@@ -490,15 +534,15 @@ namespace BarsWeb.Areas.Forex.Infrastucture.DI.Implementation
                     new OracleParameter("dfAgrDate", OracleDbType.Date) { Value = partner.AGRMNT_DATE != null ? DateTime.Parse(partner.AGRMNT_DATE, cultureInfo) : (DateTime?)null },
                     new OracleParameter("dfB57A", OracleDbType.Varchar2) { Value = partner.ALT_PARTYB },
                     new OracleParameter("codcagent", OracleDbType.Decimal) { Value = partner.KOD_B == "804" ? 1 : 2},
-                    new OracleParameter("TELEXNUM", OracleDbType.Varchar2) { Value = partner.TELEXNUM },                    
+                    new OracleParameter("TELEXNUM", OracleDbType.Varchar2) { Value = partner.TELEXNUM },
                     new OracleParameter("dfB56A", OracleDbType.Varchar2) { Value = partner.INTERM_B},
                     new OracleParameter("s58D", OracleDbType.Varchar2) { Value = partner.FIELD_58D}
-                };            
+                };
 
             _entities.ExecuteStoreCommand(query.ToString(), paramsQuery);
         }
 
-       
+
 
         public void SaveGhangesPartners(FOREX_ALIEN partner)
         {
@@ -516,12 +560,12 @@ namespace BarsWeb.Areas.Forex.Infrastucture.DI.Implementation
                 SqlText = @" declare
                                 p_deal_tag fx_deal.deal_tag%type;
                              begin
-                                  bars.forex.create_deal
+                                  bars.forex.create_deal_EX
                                   ( :p_dealtype , :p_mode , :p_deal_tag, :p_swap_tag, :p_ntik, :p_dat, :p_kva, :p_data, 
                                     :p_suma, :p_sumc, :p_kvb , :p_datb, :p_sumb, :p_sumb1, :p_sumb2, :p_rnk , :p_nb, :p_skb, 
                                     :p_swi_ref, :p_swi_bic, :p_swi_acc, :p_nlsa, :p_swo_bic, :p_swo_acc, :p_nlsb, :p_b_payflag, 
                                     :p_agrmnt_num, :p_agrmnt_date, :p_interm_b, :p_alt_partyb, :p_bicb, :p_curr_base, 
-                                    :p_telexnum, :p_kod_na, :p_kod_nb, :p_field_58d, :p_vn_flag, :p_nazn
+                                    :p_telexnum, :p_kod_na, :p_kod_nb, :p_field_58d, :p_vn_flag, :p_nazn,:p_f092,:p_forex
                                   );
                               end;",
                 SqlParams = new object[]
@@ -563,11 +607,13 @@ namespace BarsWeb.Areas.Forex.Infrastucture.DI.Implementation
                     new OracleParameter("p_kod_nb", OracleDbType.Varchar2) { Value = agreement.KOD_NB },
                     new OracleParameter("p_field_58d", OracleDbType.Varchar2) { Value = agreement.FIELD_58D },
                     new OracleParameter("p_vn_flag", OracleDbType.Decimal) { Value = agreement.VN_FLAG == true ? 1 : 0},
-                    new OracleParameter("p_nazn", OracleDbType.Varchar2) {  Value = agreement.NAZN}
+                    new OracleParameter("p_nazn", OracleDbType.Varchar2) {  Value = agreement.NAZN},
+                    new OracleParameter("p_f092", OracleDbType.Varchar2) {  Value = agreement.F092_CODE},
+                    new OracleParameter("p_forex", OracleDbType.Varchar2) {  Value = ""}
                 }
             };
         }
-        
+
         public IQueryable<RefDetail> getSwapTag(decimal dealTag)
         {
             string query = string.Format(@"select swap_tag as nSwapTag, ref as nRef, refa as nRef1, refb as nRef2, refb2 as nRef22 from fx_deal where deal_tag = :nDealTag");
@@ -578,7 +624,7 @@ namespace BarsWeb.Areas.Forex.Infrastucture.DI.Implementation
         }
 
         public decimal GetCheckPS(string MFO, decimal KV)
-        {                       
+        {
             _getSql = new BarsSql()
             {
                 SqlText = string.Format(@"Select pul.MVPS_FIL(:p_mfo, :p_kv) l_ret from dual"),
@@ -586,9 +632,9 @@ namespace BarsWeb.Areas.Forex.Infrastucture.DI.Implementation
                     new OracleParameter("p_mfo", OracleDbType.Varchar2) { Value = MFO },
                     new OracleParameter("p_kv", OracleDbType.Decimal) { Value = KV }
                 }
-            };        
+            };
             return _entities.ExecuteStoreQuery<decimal>(_getSql.SqlText, _getSql.SqlParams).FirstOrDefault();
-        }        
+        }
 
         public decimal? GetSWRef(decimal DealTag)
         {
@@ -599,7 +645,7 @@ namespace BarsWeb.Areas.Forex.Infrastucture.DI.Implementation
                     new OracleParameter("nDealTag", OracleDbType.Varchar2) { Value = DealTag }
                 }
             };
-            return _entities.ExecuteStoreQuery<decimal?>(_getSql.SqlText, _getSql.SqlParams).FirstOrDefault(); 
+            return _entities.ExecuteStoreQuery<decimal?>(_getSql.SqlText, _getSql.SqlParams).FirstOrDefault();
         }
 
         public IQueryable<CustLims> GetCustLimits(decimal OKPOB)
@@ -640,7 +686,7 @@ namespace BarsWeb.Areas.Forex.Infrastucture.DI.Implementation
             _getSql = new BarsSql()
             {
                 SqlText = string.Format(@"select pul.get('DEAL_TAG') from dual"),
-                SqlParams = new object[] {}
+                SqlParams = new object[] { }
             };
             return _entities.ExecuteStoreQuery<string>(_getSql.SqlText, _getSql.SqlParams).FirstOrDefault();
         }
@@ -685,12 +731,12 @@ namespace BarsWeb.Areas.Forex.Infrastucture.DI.Implementation
             SqlText = string.Format(@"select GetGlobalOption('NAME') as NBA from dual");
             _fxupd.NBA = _entities.ExecuteStoreQuery<string>(SqlText, null).FirstOrDefault();
             //----BICA
-            SqlText = string.Format(@"SELECT val  FROM params WHERE par='BICCODE'");           
+            SqlText = string.Format(@"SELECT val  FROM params WHERE par='BICCODE'");
             _fxupd.BICA = _entities.ExecuteStoreQuery<string>(SqlText, null).FirstOrDefault();
             //----NBB 
             SqlText = string.Format(@"SELECT name FROM sw_banks WHERE bic=:BICB");
             SqlParams = new object[] {
-                    new OracleParameter("BICB", OracleDbType.Varchar2) { Value = _fxupd.BICB }                    
+                    new OracleParameter("BICB", OracleDbType.Varchar2) { Value = _fxupd.BICB }
                };
             _fxupd.NBB = _entities.ExecuteStoreQuery<string>(SqlText, SqlParams).FirstOrDefault();
             //----NBKB            
@@ -698,15 +744,15 @@ namespace BarsWeb.Areas.Forex.Infrastucture.DI.Implementation
             SqlParams = new object[] {
                     new OracleParameter("BICKB", OracleDbType.Varchar2) { Value = _fxupd.SWO_BIC }
                };
-            _fxupd.NBKB = _entities.ExecuteStoreQuery<string>(SqlText, SqlParams).FirstOrDefault();             
+            _fxupd.NBKB = _entities.ExecuteStoreQuery<string>(SqlText, SqlParams).FirstOrDefault();
             return _fxupd;
         }
 
         public void UpdateChanges(FXUPD fxupd)
         {
-           
-                InitUpdateChanges(fxupd);
-                _entities.ExecuteStoreCommand(_getSql.SqlText, _getSql.SqlParams);
+
+            InitUpdateChanges(fxupd);
+            _entities.ExecuteStoreCommand(_getSql.SqlText, _getSql.SqlParams);
         }
 
         private void InitUpdateChanges(FXUPD fxupd)

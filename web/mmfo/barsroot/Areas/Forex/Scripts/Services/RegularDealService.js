@@ -14,11 +14,29 @@
         var url = bars.config.urlContent("/Forex/RegularDeals/GetCurrencyProp?kv=" + kv);
 
         $http.get(url, config)
-        .success(function (data, status, headers, config) {
+            .success(function (data, status, headers, config) {
 
-            deferred.resolve(data);
+                deferred.resolve(data);
 
-        }).error(function (data, status, headers, config) {
+            }).error(function (data, status, headers, config) {
+
+            deferred.reject(data);
+        });
+        return deferred.promise;
+    }
+
+    var getTransactionLengthType = function (datCurr,datA,datB) {
+
+        var deferred = $q.defer();
+
+        var url = bars.config.urlContent("/Forex/RegularDeals/GetTransactionLengthType?datCurr=" + datCurr + "&datA=" + datA + "&datB=" + datB);
+
+        $http.get(url, config)
+            .success(function (data, status, headers, config) {
+
+                deferred.resolve(data);
+
+            }).error(function (data, status, headers, config) {
 
             deferred.reject(data);
         });
@@ -94,6 +112,7 @@
     }
 
     var PutDepo = function (dealTag) {
+        
         var deferred = $q.defer();
         var url = bars.config.urlContent("/Forex/RegularDeals/PutDepoDealTag");
         $http.get(url, {
@@ -122,6 +141,7 @@
     }
 
     var SaveGhangesPartners = function (partner) {
+        
         var deferred = $q.defer();
         var url = bars.config.urlContent("/api/Forex/RegularDealPartnerApi");
         $http.post(url, partner)

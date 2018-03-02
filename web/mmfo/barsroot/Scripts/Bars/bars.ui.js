@@ -505,14 +505,13 @@ bars.ui.handBook = function(tableName, func, options) {
 };
 
 bars.ui.getMetaDataNdiTable = function (tableName, func, options) {
-    if (!options.accessCode || options.accessCode == '')
-        options.accessCode = 1;
-    if (!options.hasCallbackFunction)
-        options.hasCallbackFunction = true;
-    if (!options.funcId)
-        options.funcId = '';
-    if (!options.filterCode)
-        options.filterCode = '';
+ options.accessCode = options.accessCode || 1;
+    options.hasCallbackFunction = options.hasCallbackFunction || true;
+    options.funcId = options.funcId || '';
+    options.filterCode = options.filterCode || '';
+    options.code = options.code || '';
+    options.externalFuncOnly = options.externalFuncOnly || false;
+    options.jsonSqlParams = options.jsonSqlParams || [];
 
     var width, height, clause, filterCode;
     var url;
@@ -520,6 +519,9 @@ bars.ui.getMetaDataNdiTable = function (tableName, func, options) {
         url = options.url;
 
     else
+        if (options.code)
+            url = bars.config.urlContent('/ndi/referencebook/GetRefBookData/?Code=') + options.code + '&externalFuncOnly=' + true + '&hasCallbackFunction=' + options.hasCallbackFunction + '&jsonSqlParams=' + options.jsonSqlParams;
+        else
         url = bars.config.urlContent('/ndi/referencebook/GetRefBookData/?accessCode=') + options.accessCode + '&tableName=' + tableName + '&hasCallbackFunction=' + options.hasCallbackFunction + '&jsonSqlParams=' + options.jsonSqlParams + '&nsiFuncId=' + options.funcId + '&filterCode=' + options.filterCode;
     if (options && options.width && options.height)
     {
@@ -554,8 +556,16 @@ bars.ui.getMetaDataNdiTable = function (tableName, func, options) {
     });
 };
 
+CallBackFunctionOnly = function (success) {
+
+    $("#barsUiAlertDialog").data('kendoWindow').close();
+    if (CallbackFunction) {
+        CallbackFunction.call(null, success);
+    }
+
+};
 CallFunctionFromMetaTable = function (result, success) {
-  
+
     $("#barsUiAlertDialog").data('kendoWindow').close();
     if (CallbackFunction)
         CallbackFunction.call(null, result, success);
@@ -569,7 +579,7 @@ bars.ui.getFiltersByMetaTable = function (func, options) {
 
 };
 
-var  CallbackFunction;
+var CallbackFunction;
 bars.ui._onShowNotifyByCenter = function(e) {
     if (!$("." + e.sender._guid)[1]) {
         var element = e.element.parent(),

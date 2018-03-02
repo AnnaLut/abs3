@@ -82,7 +82,7 @@ namespace BarsWeb.Areas.Ndi.Controllers
                     else
                         if (funcParams.Count() > 0 && funcParams.FirstOrDefault(c => c.Type == "BLOB") != null)
                         funcParams.FirstOrDefault(c => c.Type == "BLOB").ByteBody = binData;
-                    additionalParams.Add(new FieldProperties { Name = "FileName", Value = fileName, Type = "BLOB" });
+                    additionalParams.Add(new FieldProperties { Name = "FileName", Value = fileName, Type = "S" });
 
 
 
@@ -567,18 +567,18 @@ namespace BarsWeb.Areas.Ndi.Controllers
         /// </summary>
         /// <returns></returns>
         public JsonResult CallRefFunction(int? tableId, int? funcId, string jsonFuncParams, int? codeOper, int? columnId, string procName = "", string msg = "",
-            string web_form_name = "", string sPar = "", string jsonSqlProcParams = "")
+            string web_form_name = "", string sPar = "", string base64ExternProcParams = "")
         {
 
             try
             {
-                List<FieldProperties> jsonSqlProcParameter;
+                string jsonExtProcParameters = FormatConverter.ConvertFromUrlBase64UTF8(base64ExternProcParams);
                 List<FieldProperties> funcParams = JsonConvert.DeserializeObject<List<FieldProperties>>(jsonFuncParams);
-                //if (!string.IsNullOrEmpty(jsonSqlProcParams))
-                //{
-                //    jsonSqlProcParameter = JsonConvert.DeserializeObject<List<FieldProperties>>(jsonSqlProcParams);
-                //    funcParams.AddRange(jsonSqlProcParameter.Where(x => !funcParams.Select(c => c.Name).Contains(x.Name)));
-                //}
+                if (!string.IsNullOrEmpty(jsonExtProcParameters))
+                {
+                    List<FieldProperties> extParameters = JsonConvert.DeserializeObject<List<FieldProperties>>(jsonExtProcParameters);
+                    funcParams.AddRange(extParameters.Where(x => !funcParams.Select(c => c.Name).Contains(x.Name)));
+                }
 
                 string resultMessage = _repository.CallRefFunction(tableId, funcId, codeOper, columnId, funcParams, procName, msg, web_form_name);
                 return Json(new { status = "ok", msg = resultMessage });
@@ -590,7 +590,7 @@ namespace BarsWeb.Areas.Ndi.Controllers
         }
 
         public ActionResult CallFunctionWithResult(int? tableId, int? funcId, int? codeOper, string jsonFuncParams = "", string procName = "", string msg = "",
-            string web_form_name = "", string sPar = "", string jsonSqlProcParams = "")
+            string web_form_name = "", string sPar = "", string base64JExternProcParams = "")
         {
             try
             {
@@ -616,7 +616,7 @@ namespace BarsWeb.Areas.Ndi.Controllers
         }
 
         public JsonResult CallFuncWithMultypleRows(int? tableId, int? funcId, string listJsonSqlProcParams, int? codeOper, int? columnId, string procName = "", string msg = "",
-    string web_form_name = "", string sPar = "", string inputProcParams = "")
+    string web_form_name = "", string sPar = "", string inputProcParams = "",string base64JExternProcParams = "")
         {
             try
             {
@@ -643,6 +643,8 @@ namespace BarsWeb.Areas.Ndi.Controllers
         {
             try
             {
+                if (codeOper == null && string.IsNullOrEmpty(code))
+                    throw new Exception("ідентифікатор процедути пустий");
                 CallFunctionMetaInfo funcInfo = _repository.GetFunctionsMetaInfo(codeOper, code);
                 var result = new { success = true, funcMetaInfo = funcInfo };
                 return Json(result);

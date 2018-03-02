@@ -1146,7 +1146,7 @@
     },
 
     uploadFile: function (e) {
-
+        
         var thisController = this;
         var referenceGrid = thisController.getGrid();
         //получаем выбранную строку грида и загружаем в форму данные этой строки
@@ -2292,6 +2292,7 @@
             success: function (conn, resp) {
                 var response = Ext.decode(conn.responseText);
                 if (afterRequestFunction) {
+                    
                     afterRequestFunction(response.status, response.msg, thisController);
                 }
             },
@@ -2964,7 +2965,8 @@
             canSendByBatch: Ext.Array.contains(['ALL', 'EACH', 'BATCH'], funcMetaInfo.PROC_EXEC),
             MultiRowsParams: funcMetaInfo.MultiRowsParams,
             procExec: funcMetaInfo.PROC_EXEC,
-            saveInPageParams: !metadata ? null : metadata.saveInPageParams
+            saveInPageParams: !metadata ? null : metadata.saveInPageParams,
+            base64ExternProcParams: !funcMetaInfo.base64ExternProcParams ? '' : funcMetaInfo.base64ExternProcParams
         };
        
         var func = thisController.currentCalledSqlFunction;
@@ -3240,7 +3242,13 @@
                 Ext.MessageBox.show({
                     title: func.infoDialogTitle,
                     msg: "Виконання процедур закінчено." + "<br/>" + resMsg + '</br> </br>',
-                    buttons: Ext.MessageBox.OK
+                    buttons: Ext.MessageBox.OK,
+                    fn: function(btn){
+                        if(errorMsg.length < 1)
+                        callbackFunc(true);
+                        else
+                            callbackFunc(false);
+                    }
                 });
             }
 
@@ -3249,9 +3257,6 @@
                 grid.store.load();
             }
 
-            if (callbackFunc && func.errorLog.length == 0) {
-                callbackFunc();
-            }
         }
     },
 
@@ -3294,9 +3299,13 @@
                 "/barsroot/ReferenceBook/CallRefFunction",
                 {
                     codeOper: func.CodeOper, tableId: func.tableId, funcId: func.funcId, jsonFuncParams: Ext.JSON.encode(param.rowParams),
-                    ColumnId: func.ColumnId, procName: func.funcName, random: Math.random, jsonSqlProcParams: func.jsonSqlProcParams
+                    ColumnId: func.ColumnId, procName: func.funcName, random: Math.random, base64ExternProcParams: func.base64ExternProcParams
                 },
                function (status, msg, controller) {
+                    
+                    var callbackFunc;
+                   if (window.hasCallbackFunction && window.hasCallbackFunction.toUpperCase() == 'TRUE' && window.ExternelFuncOnly &&  window.ExternelFuncOnly.toUpperCase() == 'TRUE')
+                       callbackFunc =  window.parent.CallBackFunctionOnly;
                    thisController.callRefWebFunction(status, msg, controller, callbackFunc);
                });
             });
@@ -3322,7 +3331,7 @@
         var func = thisController.currentCalledSqlFunction;
         Ext.each(func.params, function (param) {
             thisController.getFileFromServer("/barsroot/ReferenceBook/CallFunctionWithResult/?" + 'tableId=' + func.tableId + '&funcId=' + func.funcId + '&codeOper=' + func.CodeOper +
-                '&jsonFuncParams=' + Ext.JSON.encode(param.rowParams) + '&procName=' + func.funcName + '&random=' + Math.random + '&jsonSqlProcParams=' + window.jsonSqlProcParams);
+                '&jsonFuncParams=' + Ext.JSON.encode(param.rowParams) + '&procName=' + func.funcName + '&random=' + Math.random + '&base64ExternProcParams=' + window.base64ExternProcParams);
         });
     },
 
@@ -3353,7 +3362,7 @@
             '&jsonFuncParams=' + Ext.JSON.encode(params) + '&procName=' + func.funcName,
                 waitMsg: 'завантаження...',
    success: function (conn, response) {
-                    debugger;
+                    
                     var result = response.result;
                     if (result.success == 'true')
                         Ext.Msg.alert('Загрузка прошла успешно', result.resultMessage);

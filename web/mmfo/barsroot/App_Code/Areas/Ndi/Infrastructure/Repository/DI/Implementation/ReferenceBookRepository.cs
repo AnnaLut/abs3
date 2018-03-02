@@ -764,7 +764,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                     if (param == null)
                         return null;
                     clobParamName = param.ColName;
-                    clobParam = new OracleParameter(clobParamName, OracleDbType.Clob, null, ParameterDirection.Output);
+                    OracleDbType paramType = param.ColType == "CLOB" ? OracleDbType.Clob : OracleDbType.Blob;
+                    clobParam = new OracleParameter(clobParamName, paramType, null, ParameterDirection.Output);
                     callFunctionCmd.Parameters.Add(clobParam);
                     var firstFileNameInParams = outParameters.FirstOrDefault(x => x.Kind == "OUT_FILE_NAME");
                     if (firstFileNameInParams != null)
@@ -833,7 +834,6 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 }
 
                 connection.Close();
-                connection.Dispose();
             }
         }
         /// <summary>

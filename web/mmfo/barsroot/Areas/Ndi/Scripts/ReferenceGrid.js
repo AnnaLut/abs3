@@ -18,7 +18,6 @@
     //точка входа в приложение
     launch: function () {
         var thisApp = this;
-      
         //заполняется из ViewBag в представлении
         var tableId = window.tableId;
         var codeOper = window.CodeOper;
@@ -31,6 +30,7 @@
         var filterCode = window.filterCode;
         var baseCodeOper = window.baseCodeOper;
         var Base64InsertDefParamsString = window.Base64InsertDefParamsString;
+        var base64ExternProcParams = window.base64ExternProcParams;
         var code = window.Code;
         var thisController = thisApp.controllers.findBy(function (controller) { return controller.id = "refBook.RefGrid"; });
         if (tableId) {
@@ -88,15 +88,17 @@
             Ext.Ajax.request({
                 url: '/barsroot/ndi/ReferenceBook/GetFuncOnlyMetaData',
                 params: {
-                    CodeOper: codeOper
+                    CodeOper: codeOper,
+                    code: code
                 },
                 success: function (conn, response) {
+                    
                     //обработка при удачном запросе на сервер
                     var result = Ext.JSON.decode(conn.responseText);
                     if (result.success) {
                         var funcMetaInfo = result.funcMetaInfo;
                         var titleMsg = 'Виконання процедури' + funcMetaInfo.DESCR;
-                        //funcMetaInfo.Base64ProcParams = Base64jsonSqlProcParams;
+                        funcMetaInfo.base64ExternProcParams = base64ExternProcParams;
                         if (funcMetaInfo.QST) {
                             Ext.MessageBox.confirm(titleMsg, funcMetaInfo.QST, function (btn) {
                                 if (btn == 'yes') {

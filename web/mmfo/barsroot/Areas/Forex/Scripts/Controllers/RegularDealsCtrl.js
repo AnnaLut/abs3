@@ -7,6 +7,7 @@
             var counterForVal = 0,
             tempNazn = 'Продаж вал ';
             vm.model = {};
+            vm.addPorp = {};
             vm.DisabledVars = {
                 SWAP: false,
                 VAL: false,
@@ -21,7 +22,7 @@
                 INIC: false,
                 PartGrid: false
             };
-
+            vm.addParams = {};
 
             vm.Initialization = function (EnterDealTag) {                
                 vm.EnterDealTag = EnterDealTag;                
@@ -103,6 +104,7 @@
             setDefaultProperties();
 
             function setDefaultProperties() {
+                
                 vm.DealTypeID = angular.element('#DealTypeId').val();
                 vm.Base = 'A';
                 vm.DAT = angular.element('#GlBankDate').val().replace(/\./g, "/");
@@ -195,6 +197,7 @@
             };
 
             vm.SavePartners = function () {
+                
                 var alt_partyb = vm.dfB57A;
                 if (vm.dfB57A !== '' && vm.dfB57A !== null && vm.dfB57A !== undefined) {
                     alt_partyb = vm.dfB57A.replace(/[\r\n]/g, " ");
@@ -240,6 +243,7 @@
             }
 
             vm.SaveGhanges = function (e) {
+                
                 var keyCode = e.keyCode || e.which;
                 if (keyCode === 13) {
                     e.preventDefault();
@@ -396,6 +400,7 @@
                     FIELD_58D: vm.s58D,
                     VN_FLAG: null,
                     NAZN: vm.sNazn,
+                    F092_CODE: vm.F092_CODE,
                     CB_NoKsB: null
                 }
                 
@@ -403,7 +408,7 @@
 
                 RegularDealService.SaveGhanges(agreement).then(
                    function (data) {                      
-
+                        
                        if (data[0].ErrorMessaage == null || data[0].ErrorMessaage == undefined) {
                            vm.DealTag = data[0].Out_Deal_Tag;
 
@@ -466,7 +471,15 @@
                                    vm.DisabledVars.OK = true;
                                    vm.DisabledVars.Print = false;
                                } else {
-                                   bars.ui.alert({ text: "Угоду збережено!" });
+                            var options = {
+                                       jsonSqlParams: "[{\"Name\":\"nDealTag\",\"Type\":\"N\",\"Value\":" + vm.DealTag + "}]",
+                                       code: "CALL_FOREX",
+                                       externelFuncOnly: true,
+                                   };
+                                   
+                                   bars.ui.alert({ text: "Угоду збережено!" },bars.ui.getMetaDataNdiTable("",function (success) {
+                                                
+                                       },options));
                                    vm.DealMode++;
                                    setSwapTag(vm.DealTag);
                                    vm.DisabledVars.ClearAll = false;
@@ -477,13 +490,14 @@
                                       
                                    RegularDealService.PutDepo(vm.DealTag).then(
                                       function (data) {
-                                          
-                                          if (data === null || data === undefined || data === '' ) {
-                                              var url = "/barsroot/ndi/referencebook/GetRefBookData/?tableName=V_FX_SWAP0&nsiFuncId=182";
-                                              window.open(url, '_blank');
-                                          } else {
-                                              bars.ui.alert({ text: "Помилка з платіжним календарем по ДЕПО-СВОП" });
-                                          };
+
+                                          //if (data === null || data === undefined || data === '' ) {
+
+                                          //    var url = "/barsroot/ndi/referencebook/GetRefBookData/?tableName=V_FX_SWAP0&nsiFuncId=182";
+                                          //    window.open(url, '_blank');
+                                          //} else {
+                                          //    bars.ui.alert({ text: "Помилка з платіжним календарем по ДЕПО-СВОП" });
+                                          //};
                                       });
                                    
                                };
@@ -517,7 +531,7 @@
                     hasCallbackFunction: true
                 };
                 bars.ui.getMetaDataNdiTable("BOPCODE", function (selectedItem) {
-
+                    
                     if (mode == 'gridCodePurposeOfPaymentA') {
                         vm.Kod_NA = selectedItem.TRANSCODE;
                         vm.sKod_NA = selectedItem.TRANSDESC;
@@ -541,6 +555,7 @@
                 };
                 if (part == 0) {
                     bars.ui.getMetaDataNdiTable("SW_BANKS", function (selectedItem) {
+                        
                         vm.NBKB = selectedItem.NAME;
                         vm.BicKB = selectedItem.BIC;
                         $scope.$apply();
@@ -577,6 +592,7 @@
                 };
 
                 bars.ui.getMetaDataNdiTable("CUST_FX_AL", function (selectedItem) {
+                    
                     vm.model.NBB = selectedItem.NAME;
                     vm.model.BicB = selectedItem.BIC;
                     vm.model.MFOB = selectedItem.MFO;
@@ -597,6 +613,21 @@
                     vm.RNKB = selectedItem.RNK;
                     vm.saveSelectedValue('partnersForexDeals');                    
                     setTrassaCent();
+                }, options);
+            };
+
+            vm.getF092Table = function () {
+                
+                var options = {
+                    tableName: "F092",
+                    hasCallbackFunction: true
+                };
+
+                bars.ui.getMetaDataNdiTable("F092", function (selectedItem) {
+                    if(selectedItem.F092 !== undefined)
+                    vm.addPorp.F092_CODE = selectedItem.F092;
+                    vm.saveSelectedValue('RegDeal.F092_CODE')
+                    
                 }, options);
             };
 
@@ -628,6 +659,7 @@
 
 
             vm.getCurrencyNameA = function (kv) {
+                
                 vm.emptyFields('clearSSA');
 
                 if (kv != undefined && kv.toString().length === 3) {
@@ -757,6 +789,7 @@
                 }
             };
 
+
             vm.INICDropDownDataSource = {
                 transport: {
                     read: {
@@ -767,8 +800,40 @@
                 }
             };
 
+            vm.ForexTypeDropDownOptions = {
+                dataSource: vm.ForexTypeDropDownDataSource,
+                select: function (e) {
+                    
+                    var dataItem = this.dataItem(e.item.index());
+                    vm.FTYPE = dataItem.KOD;
+                    $scope.$apply();
+                },
+                dataBound: function () {
+                    this.select(0);
+                }
+            };
+            vm.ForexTypeDropDownDataSource = {
+                transport: {
+                    read: {
+                        type: "GET",
+                        url: bars.config.urlContent("/Forex/RegularDeals/GetForexType"),
+                        cache: false
+                    }
+                }
+            }
+
+            vm.Forex_ob22DropDownDataSource = {
+                transport: {
+                    read: {
+                        type: "GET",
+                        url: bars.config.urlContent("/Forex/RegularDeals/GetINICDropDown"),
+                        cache: false
+                    }
+                }
+            };
             vm.INICDropDownOptions = {
                 select: function (e) {
+                    
                     var dataItem = this.dataItem(e.item.index());
                     vm.INIC = parseInt(dataItem.CODE);
                 }
@@ -905,6 +970,12 @@
                     vm.getCheckPS(vm.MFOB, vm.KVA, vm.KVB);
                     vm.getColumsLimits(vm.OKPOB);
                 }
+                if(mode == 'RegDeal.F092_CODE')
+                {
+                    vm.F092_CODE = vm.addPorp.F092_CODE;
+                    $scope.$apply();
+                }
+
             };
 
 
@@ -1346,7 +1417,7 @@
                 f_swSetDefaults();
             };
 
-            var sB57ADef = '';
+            var sB5f7ADef = '';
             function f_swSetDefaults() {
                 if (vm.KVB == 980 && (vm.BICKB == null || vm.BICKB == undefined) && (vm.dfB57A == sB57ADef || vm.dfB57A == undefined)) {
                     vm.dfB57A = '/' + (vm.NLSB == undefined ? '' : vm.NLSB) + '\n';
@@ -1365,6 +1436,7 @@
             };
 
             vm.setDatB = function () {
+                
                 if (vm.DealMode >= 2) {
                     vm.DATB = vm.DATA;
                 }

@@ -57,16 +57,27 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                     requestModel.BaseCodeOper = requestModel.Spar;
 
             }
-
+            MainOptionsViewModel tableViwModel = new MainOptionsViewModel();
             requestModel.TableName = nsiEditParams == null || string.IsNullOrEmpty(nsiEditParams.TableName) ? requestModel.TableName : nsiEditParams.TableName;
-            if (string.IsNullOrEmpty(requestModel.TableName) && nsiEditParams != null &&
-               nsiEditParams.IsFuncOnly || (requestModel.ExternalFuncOnly && requestModel.Code != null))
+           
+                if (string.IsNullOrEmpty(requestModel.TableName) && nsiEditParams != null &&
+               nsiEditParams.IsFuncOnly)
+                {
+                    return BuildFunctionOnlyRequest(requestModel);
+                }
+            if (requestModel.Code != null)
             {
-                return BuildFunctionOnlyRequest(requestModel);
+                if(requestModel.ExternalFuncOnly)
+                    return BuildFunctionOnlyRequest(requestModel);
+                else
+                {
+                    MetaCallSettings colSettings = _repository.GetMetaCallSettingsByCode(requestModel.Code);
+                    tableViwModel.Code = colSettings.CODE;
+                }
             }
 
             var metaTable = _repository.GetMetaTableByName(requestModel.TableName.Trim().ToUpper());
-            MainOptionsViewModel tableViwModel = new MainOptionsViewModel();
+           
 
             if (defParams.Count > 0)
             {
@@ -118,7 +129,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                 funcOnlyViewModel.CodeOper = requestModel.Spar;
 
             funcOnlyViewModel.ExternelFuncOnly = requestModel.ExternalFuncOnly;
-            funcOnlyViewModel.DefParamModel.Base64ProcParams = FormatConverter.ConvertToUrlBase4UTF8(requestModel.ExternalParams);
+            funcOnlyViewModel.DefParamModel.Base64ExternProcParams = FormatConverter.ConvertToUrlBase4UTF8(requestModel.JsonSqlParams);
+            funcOnlyViewModel.HasCallbackFunction = requestModel.HasCallbackFunction;
             return funcOnlyViewModel;
         }
 

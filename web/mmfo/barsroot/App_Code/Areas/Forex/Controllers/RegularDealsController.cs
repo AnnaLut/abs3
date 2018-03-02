@@ -136,8 +136,44 @@ namespace BarsWeb.Areas.Forex.Controllers
             {
                 return null;
             }
-        }        
+        }
 
+        [HttpGet]
+        public ActionResult GetForexType()
+        {
+            try
+            {
+                List<FOREX_OB22> forexTypeList = _repo.GetForexType().ToList();
+                return Json(forexTypeList, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        [HttpGet]
+        public ActionResult GetTransactionLengthType(string datCurr,string datA,string datB)
+        {
+            CalcTransactionLengthModel calcModel = new CalcTransactionLengthModel()
+            {
+                CurrentDate = DateTime.Parse(datCurr),
+                DateA = DateTime.Parse(datA),
+                DateB = DateTime.Parse(datB)
+            };
+
+            var result = new BarsWeb.Models.JsonResponse(BarsWeb.Models.JsonResponseStatus.Ok);
+            try
+            {
+                result.data = _repo.GetTransactionLength(calcModel);
+            }
+            catch (Exception e)
+            {
+                result.status = BarsWeb.Models.JsonResponseStatus.Error;
+                result.message = e.InnerException == null ? e.Message : e.InnerException.Message;
+            }
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
         [HttpGet]
         public ActionResult GetRNKB(string MFOB, string BICB, string KOD_B)
         {

@@ -14,13 +14,14 @@ namespace BarsWeb.Areas.Forex.Infrastructure.DI.Abstract
        
         List<Revenue> GetRevenueDropDown(decimal? kv);
         List<INIC> GetINICDropDown();
-
-       decimal GetCheckPS(string MFO, decimal KV);
+        IEnumerable<FOREX_OB22> GetForexType();
+        decimal GetCheckPS(string MFO, decimal KV);
         decimal? GetSWRef(decimal DealTag);
         // decimal GetPartnersForexDealsDataCount(decimal currency, DataSourceRequest request);
         // decimal GetCodePurposeOfPaymentDataCount(DataSourceRequest request);
         // decimal GetBanksSWIFTParticipantsDataCount(DataSourceRequest request);
         IQueryable<Currency> GetCurrencyProp(decimal kv);
+        string GetTransactionLength(CalcTransactionLengthModel calcModel);
         OutDealTag SaveGhanges(Agreement agreement);
         void SaveGhangesPartners(FOREX_ALIEN partner);
         void InsertOperw(decimal pInic, decimal nND);

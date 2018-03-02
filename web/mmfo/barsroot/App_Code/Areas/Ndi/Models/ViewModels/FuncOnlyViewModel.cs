@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace BarsWeb.Areas.Ndi.Models.ViewModels
+namespace BarsWeb.Areas.Ndi.Models
 {
     /// <summary>
     /// Summary description for Fun
@@ -17,6 +17,6 @@ namespace BarsWeb.Areas.Ndi.Models.ViewModels
             //
             this.IsFuncOnly = true;
         }
-        public bool ExternelFuncOnly { get; set; }
+      
     }
 }

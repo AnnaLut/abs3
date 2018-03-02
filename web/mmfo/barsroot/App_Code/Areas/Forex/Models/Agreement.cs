@@ -45,5 +45,8 @@ namespace BarsWeb.Areas.Forex.Models
         public string NAZN { get; set; }        
         public bool CB_NoKsB { get; set; }
 
+        public string F092_CODE { get; set; }
+        public string FOREX { get; set; }
+
     }
 }

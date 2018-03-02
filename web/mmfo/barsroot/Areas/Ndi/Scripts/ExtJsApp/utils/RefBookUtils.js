@@ -24,7 +24,7 @@
 
          },
          setHiddenColumnsToLocalSrorage: function (columnNames, localStorageModel) {
-            debugger
+            
             var columnsNamesString = '';
             if (columnNames.length)
             {
@@ -118,6 +118,7 @@
                     //msgTarget: 'side',
                     //allowBlank: false,
                     //width: 400
+                formField.config = [{name: 'BlobFileBtn'}]
                     formField.listeners = {
                         change: function (fld, value) {
                             
@@ -372,7 +373,7 @@
         },
 
         getColumnsHiddenFromGrid: function (grid) {
-            debugger
+            
             columnsVisible = [];
             Ext.each(grid.columns, function (column, index) {
                 if (column.isHidden()) {
