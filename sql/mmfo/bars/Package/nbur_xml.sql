@@ -51,7 +51,7 @@ is
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 1.9  2018.03.03';
+  g_body_version  constant varchar2(64) := 'version 2.0  2018.03.03';
   g_dt_fmt        constant varchar2(10) := 'dd.mm.yyyy';
 
   --
@@ -187,8 +187,9 @@ is
        where ( FILE_ID, SCM_DT ) in ( select FILE_ID, max( SCM_DT )
                                         from NBUR_REF_XSD
                                        where FILE_ID = p_rpt_id
-                                         and SCM_DT <= p_rpt_dt );
-      
+                                         and SCM_DT <= p_rpt_dt 
+                                       group by FILE_ID );
+
       l_xml := XmlType( p_rpt_body ).createSchemaBasedXML( l_scm_url );
       
       l_xml.schemaValidate();
@@ -219,6 +220,7 @@ is
     l_rpt_code           nbur_ref_files.file_code%type;
     l_okpo               varchar2(10);
     l_XmlText            varchar2(1024);
+    l_nbu_rpt_dt         date;
   begin
 
     bars_audit.trace( '%s: Entry', title );
@@ -233,14 +235,16 @@ $else
     l_okpo := F_OUROKPO();
 $end
 
-    bars_audit.trace( '%s: l_rpt_code=%s, l_okpo=%s.', title, l_rpt_code, l_okpo );
+    l_nbu_rpt_dt := DAT_NEXT_U( p_rpt_date, 1 );
+
+    bars_audit.trace( '%s: l_rpt_code=%s, l_okpo=%s, l_nbu_rpt_dt=%s.', title, l_rpt_code, l_okpo, to_char(l_nbu_rpt_dt,g_dt_fmt) );
 
     l_XmlText := '<?xml version="1.0" encoding="utf-8" standalone="yes"?>';
     l_XmlText := l_XmlText || chr(10) || '<NBUSTATREPORT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">';
     l_XmlText := l_XmlText || chr(10) || '  <HEAD>';
     l_XmlText := l_XmlText || chr(10) || '    <STATFORM>F'||SubStr(l_rpt_code,2,2)||'X</STATFORM>';
     l_XmlText := l_XmlText || chr(10) || '    <EDRPOU>'||l_okpo||'</EDRPOU>';
-    l_XmlText := l_XmlText || chr(10) || '    <REPORTDATE>'||to_char(p_rpt_date,g_dt_fmt)||'</REPORTDATE>';
+    l_XmlText := l_XmlText || chr(10) || '    <REPORTDATE>'||to_char(l_nbu_rpt_dt,g_dt_fmt)||'</REPORTDATE>';
     l_XmlText := l_XmlText || chr(10) || '  </HEAD>';
 
     bars_audit.trace( '%s: Exit with => %s', title,  chr(10)||l_XmlText );
@@ -818,13 +822,13 @@ $end
 
     if ( l_errmsg is Not Null )
     then
---    bars_audit.error( title||': '||l_errmsg );
-      NBUR_FILES.SET_CHK_LOG( p_file_id => p_file_id
-                            , p_rpt_dt  => p_rpt_dt
-                            , p_kf      => p_kf
-                            , p_vrsn_id => p_vrsn_id
-                            , p_chk_log => l_errmsg
-                            );
+      bars_audit.error( title||': '||l_errmsg );
+--    NBUR_FILES.SET_CHK_LOG( p_file_id => p_file_id
+--                          , p_rpt_dt  => p_rpt_dt
+--                          , p_kf      => p_kf
+--                          , p_vrsn_id => p_vrsn_id
+--                          , p_chk_log => l_errmsg
+--                          );
     end if;
 
     p_file_body := l_clob;
