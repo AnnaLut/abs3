@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_SOC_UPD ***
 
-  CREATE OR REPLACE PROCEDURE BARS.P_SOC_UPD 
+CREATE OR REPLACE PROCEDURE BARS.P_SOC_UPD 
 IS                   --PROMPT Ќаполнение сетки асс - дата по пенсионным счетам
    lastdate    DATE;
    startdate   DATE := TO_DATE ('01/06/2015', 'dd/mm/yyyy');
@@ -18,8 +18,12 @@ IS                   --PROMPT Ќаполнение сетки асс - дата по пенсионным счетам
    dos_k       INT;
 BEGIN
    SELECT MAX (date1) INTO lastdate FROM dpt_soc_turns;
+   bars_audit.info ('dpt_soc_turns.lastdate = ' || TO_CHAR (lastdate, 'dd/mm/yyyy'));
+   
+   bc.go('/');
+   for rec in (select * from mv_kf) loop --rec
+     bc.go(rec.kf);
 
-   bars_audit.info (      'dpt_soc_turns.lastdate = ' || TO_CHAR (lastdate, 'dd/mm/yyyy'));
    IF     lastdate IS NOT NULL
       AND lastdate < SYSDATE
       AND MONTHS_BETWEEN (SYSDATE, lastdate) < 1
@@ -210,6 +214,9 @@ BEGIN
 
    END LOOP;
 END;
+  end loop; --rec
+  
+  bc.home;
 
 END p_soc_upd;
 /
