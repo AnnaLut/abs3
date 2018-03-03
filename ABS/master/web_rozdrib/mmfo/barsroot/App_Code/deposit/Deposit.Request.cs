@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Xml;
 using BarsWeb.Core.Logger;
 using Oracle.DataAccess.Client;
+using Oracle.DataAccess.Types;
 
 namespace Bars.Requests
 {
@@ -121,6 +122,7 @@ namespace Bars.Requests
         private void ExecuteCreateAccessRequest(OracleConnection con, Decimal RequestType, String TrusteeType, Decimal CustomerID, String CertifNumber, DateTime CertifDate, DateTime StartDate, DateTime? FinishDate)
         {
             using (OracleCommand cmd = con.CreateCommand())
+            using (OracleXmlType _xml = new OracleXmlType(con, this.GetXML().InnerXml))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.CommandText = "ebp.create_access_request";
@@ -133,7 +135,7 @@ namespace Bars.Requests
                 cmd.Parameters.Add("p_cert_date", OracleDbType.Date, CertifDate, ParameterDirection.Input);
                 cmd.Parameters.Add("p_date_start", OracleDbType.Date, StartDate, ParameterDirection.Input);
                 cmd.Parameters.Add("p_date_finish", OracleDbType.Date, FinishDate, ParameterDirection.Input);
-                cmd.Parameters.Add("p_access_info", OracleDbType.XmlType, this.GetXML().InnerXml, ParameterDirection.Input);
+                cmd.Parameters.Add("p_access_info", OracleDbType.XmlType, _xml, ParameterDirection.Input);
                 cmd.Parameters.Add("p_reqid", OracleDbType.Decimal, this.REQ_ID, ParameterDirection.Output);
 
                 cmd.ExecuteNonQuery();
@@ -154,12 +156,10 @@ namespace Bars.Requests
         /// <param name="FinishDate">Дата закінчення дії довіреності</param>
         public void Modify(String CertifNumber, DateTime CertifDate, DateTime StartDate, DateTime? FinishDate)
         {
-            OracleConnection connect = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
-
-            try
+            using (OracleConnection connect = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection())
+            using (OracleCommand cmd = connect.CreateCommand())
+            using (OracleXmlType _xml = new OracleXmlType(connect, this.GetXML().InnerXml))
             {
-                OracleCommand cmd = connect.CreateCommand();
-
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.CommandText = "ebp.modify_access_request";
                 cmd.BindByName = true;
@@ -169,17 +169,9 @@ namespace Bars.Requests
                 cmd.Parameters.Add("p_cert_date", OracleDbType.Date, CertifDate, ParameterDirection.Input);
                 cmd.Parameters.Add("p_date_start", OracleDbType.Date, StartDate, ParameterDirection.Input);
                 cmd.Parameters.Add("p_date_finish", OracleDbType.Date, FinishDate, ParameterDirection.Input);
-                cmd.Parameters.Add("p_access_info", OracleDbType.XmlType, this.GetXML().InnerXml, ParameterDirection.Input);
+                cmd.Parameters.Add("p_access_info", OracleDbType.XmlType, _xml, ParameterDirection.Input);
 
                 cmd.ExecuteNonQuery();
-            }
-            finally
-            {
-                if (connect.State != ConnectionState.Closed)
-                {
-                    connect.Close();
-                    connect.Dispose();
-                }
             }
         }
 
