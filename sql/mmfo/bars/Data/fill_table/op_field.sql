@@ -30,25 +30,8 @@ update bars.op_field set browser=
 end;
 /            
 
-begin
-Insert into BARS.OP_FIELD
-   (TAG, NAME, USE_IN_ARCH, BROWSER)
- Values
-   ('CP_FC', 'Форма проведення розрахунку', 1, 'TagBrowse("SELECT code,txt FROM CP_OB_FORM_CALC")');
-exception when dup_val_on_index then
-      null;
-    end;
-/
-
-begin Insert into OP_FIELD 
-    (TAG,NAME,BROWSER,USE_IN_ARCH) 
- Values 
-	('F092', 'Показник F092 для Звітності НБУ', 'TagBrowse("SELECT F092 kod, TXT naim FROM KOD_F092")', 1);
-exception when others then   
-	if SQLCODE = - 00001 then null;   
-	else 
-		raise; 
-	end if; --ORA-00001: unique constraint
+begin Insert into OP_FIELD (TAG,NAME,BROWSER,USE_IN_ARCH) Values ('F092', 'Показник F092 для Звітності НБУ', 'TagBrowse("SELECT F092 kod, TXT naim FROM KOD_F092")', 1);
+exception when others then   if SQLCODE = - 00001 then null;   else raise; end if; --ORA-00001: unique constraint
 end;
 /
 
@@ -56,6 +39,7 @@ begin Insert into OP_FIELD (TAG,NAME,BROWSER,USE_IN_ARCH) Values ('FOREX', 'Вид(
 exception when others then   if SQLCODE = - 00001 then null;   else raise; end if; --ORA-00001: unique constraint
 end;
 /
+
 COMMIT;
 
 
