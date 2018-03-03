@@ -1,4 +1,4 @@
-create or replace package NBUR_XML 
+create or replace package BARS.NBUR_XML 
 is
 
   --
@@ -45,7 +45,7 @@ show errors;
 
 ----------------------------------------------------------------------------------------------------
 
-create or replace package body NBUR_XML
+create or replace package body BARS.NBUR_XML
 is
 
   --
@@ -813,10 +813,12 @@ $end
     when '#3K'
     then
       l_clob := REGEXP_REPLACE( l_clob, '(<Q007_1)(></)', '\1 xsi:nil = "true" \2' );
+      l_clob := REGEXP_REPLACE( l_clob, '(<Q003_2)(></)', '\1 xsi:nil = "true" \2' );
+      l_clob := REGEXP_REPLACE( l_clob, '(<Q006)(></)', '\1 xsi:nil = "true" \2' );
     else
-      null;
-    end case;
-    -----------
+      null;                                                  
+    end case;                                                
+    -----------                                              
 
     l_errmsg := CHK_XML( p_file_id, p_rpt_dt, l_clob );
 
