@@ -242,14 +242,17 @@ namespace ibank.objlayer
         }
         public String GET_DOC_XML(Decimal? P_DOCID)
         {
-            List<OracleParameter> parameters = new List<OracleParameter>();
-            parameters.Add(new OracleParameter("P_DOCID", OracleDbType.Decimal, P_DOCID, ParameterDirection.Input));
-            parameters.Add(new OracleParameter("$$RETVAL$$", OracleDbType.XmlType, ParameterDirection.ReturnValue));
-            object ReturnValue = null;
-            ExecuteNonQuery("DATA_IMPORT.GET_DOC_XML", parameters.ToArray(), CommandType.StoredProcedure, out ReturnValue);
-            using (OracleXmlType res = (OracleXmlType)ReturnValue)
+            using (OracleParameter retVal = new OracleParameter("$$RETVAL$$", OracleDbType.XmlType, ParameterDirection.ReturnValue))
             {
-                return res.IsNull ? null : res.Value;
+                List<OracleParameter> parameters = new List<OracleParameter>();
+                parameters.Add(new OracleParameter("P_DOCID", OracleDbType.Decimal, P_DOCID, ParameterDirection.Input));
+                parameters.Add(retVal);
+                object ReturnValue = null;
+                ExecuteNonQuery("DATA_IMPORT.GET_DOC_XML", parameters.ToArray(), CommandType.StoredProcedure, out ReturnValue);
+                using (OracleXmlType res = (OracleXmlType)ReturnValue)
+                {
+                    return res.IsNull ? null : res.Value;
+                }
             }
         }
     }

@@ -97,7 +97,7 @@ namespace Bars.WebServices
             {
                 using (OracleConnection connection = new OracleConnection("Data Source=COBUMMFO_DEV;User Id=pfu;Password=pfu"))
                 using (OracleCommand command = new OracleCommand("PFU_PKG_TRANSP_CA.a_hlp_ree_apply", connection) { CommandType = CommandType.StoredProcedure })
-                using (OracleParameter resultParam = new OracleParameter("result", OracleDbType.XmlType) { Direction = ParameterDirection.ReturnValue })
+                using (OracleParameter resultParam = new OracleParameter("result", OracleDbType.XmlType, ParameterDirection.ReturnValue))
                 {
                     connection.Open();
                     command.Parameters.Add(resultParam);
@@ -105,7 +105,11 @@ namespace Bars.WebServices
                     if (resultParam.Value != null)
                     {
                         XmlDocument doc = new XmlDocument();
-                        doc.LoadXml(((OracleXmlType)resultParam.Value).Value);
+
+                        using (OracleXmlType _xml = (OracleXmlType)resultParam.Value)
+                        {
+                            doc.LoadXml(_xml.Value);
+                        }
 
                         XmlNodeList nodes = doc.GetElementsByTagName("rq_id");
                         if (nodes.Count > 0)
@@ -139,7 +143,10 @@ namespace Bars.WebServices
                     command.ExecuteNonQuery();
                     if (resultParam.Value != null)
                     {
-                        response.RequestStateData = ((OracleXmlType)resultParam.Value).Value;
+                        using (OracleXmlType _xml = (OracleXmlType)resultParam.Value)
+                        {
+                            response.RequestStateData = _xml.Value;
+                        }
                     }
                 }
             }
