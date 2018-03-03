@@ -341,22 +341,13 @@ begin
             then
 
               for cur2  -- и неважно, открыт или закрыт deal. Все равно забираем счет и присоединяем к другому, ведь счет открыт
-               in ( select d.id
-                      from ATTRIBUTE_VALUES avs
-                      JOIN ( select max(t.nested_table_id) keep (dense_rank last order by t.value_date) nested_table_id ,
-                                    t.object_id,
-                                    t.attribute_id
-                               from ATTRIBUTE_VALUE_BY_DATE t
-                              where t.attribute_id = ( SELECT ak.id
-                                                         FROM ATTRIBUTE_KIND ak
-                                                        WHERE ak.attribute_code = 'DKBO_ACC_LIST' )
-                              group by t.object_id, t.attribute_id
-                            ) av
-                         on ( av.nested_table_id = avs.nested_table_id )
-                       JOIN DEAL d
-                         ON d.id = av.object_id AND d.deal_type_id IN (SELECT tt.id FROM object_type tt WHERE tt.type_code = 'DKBO')
-                      where d.customer_id      = p_rnkfrom
-                        and avs.number_values  = acc_
+               in ( select distinct d.id
+                      from deal d
+                      join Attribute_History        ah  on ah.object_id = d.id and ah.attribute_id in(select ak.id from BARS.attribute_kind ak where ak.attribute_code = 'DKBO_ACC_LIST')
+                      join Attribute_Number_History anh on anh.id = ah.id
+                     where d.deal_type_id in(select tt.id from BARS.object_type tt where tt.type_code = 'DKBO')
+                       and d.customer_id = p_rnkfrom
+                       and anh.value     = acc_
                   )
               loop
 
