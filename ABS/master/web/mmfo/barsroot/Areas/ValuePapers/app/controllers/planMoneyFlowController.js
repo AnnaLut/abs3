@@ -87,6 +87,11 @@ function planMoneyFlowController($scope, paramsService) {
     html = document.documentElement;
     var height = Math.max(html.clientHeight, html.scrollHeight, html.offsetHeight);
 
+    $scope.datePickerOptions = {
+        format: "dd.MM.yyyy",
+        parseFormats: ["dd/MM/yyyy"]
+    }
+
     $scope.gridOptions = {
         autoBind: false,
         resizable: true,

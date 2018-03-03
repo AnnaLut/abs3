@@ -172,6 +172,11 @@ function moneyFlowHomeController($scope, paramsService, $window, LS) {
         }
     };
 
+    $scope.datePickerOptions = {
+        format: "dd.MM.yyyy",
+        parseFormats: ["dd/MM/yyyy"]
+    }
+
     $scope.turnMoneyParam = function (rb1, rb2, dat) {
         $scope.vm.RB1 = rb1;
         $scope.vm.RB2 = rb2;
