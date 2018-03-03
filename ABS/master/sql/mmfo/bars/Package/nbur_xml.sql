@@ -822,13 +822,13 @@ $end
 
     if ( l_errmsg is Not Null )
     then
-      bars_audit.error( title||': '||l_errmsg );
---    NBUR_FILES.SET_CHK_LOG( p_file_id => p_file_id
---                          , p_rpt_dt  => p_rpt_dt
---                          , p_kf      => p_kf
---                          , p_vrsn_id => p_vrsn_id
---                          , p_chk_log => l_errmsg
---                          );
+--    bars_audit.error( title||': '||l_errmsg );
+      NBUR_FILES.SET_CHK_LOG( p_file_id => p_file_id
+                            , p_rpt_dt  => p_rpt_dt
+                            , p_kf      => p_kf
+                            , p_vrsn_id => p_vrsn_id
+                            , p_chk_log => l_errmsg
+                            );
     end if;
 
     p_file_body := l_clob;
