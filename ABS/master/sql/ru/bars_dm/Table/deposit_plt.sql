@@ -1,10 +1,3 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS_DM/Table/DEPOSIT_PLT.sql =========*** Run **
-PROMPT ===================================================================================== 
-
-
 PROMPT *** Create  table DEPOSIT_PLT ***
 begin 
   execute immediate '
@@ -54,7 +47,9 @@ begin
   MAL NUMBER(1,0), 
   BEN NUMBER(1,0), 
   VIDD_NAME VARCHAR2(50),
-	WB CHAR(1)
+  WB CHAR(1),
+  ob22 varchar(2),
+  nms varchar(70)
 	) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -72,56 +67,21 @@ exception
 end;
 /
 
-COMMENT ON TABLE BARS_DM.DEPOSIT_PLT IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.PER_ID IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.DEPOSIT_ID IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.BRANCH IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.KF IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.RNK IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.ND IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.DAT_BEGIN IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.DAT_END IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.NLS IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.VIDD IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.TERM IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.SDOG IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.MASSA IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.KV IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.INTRATE IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.SDOG_BEGIN IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.LAST_ADD_DATE IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.LAST_ADD_SUMA IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.OSTC IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.SUMA_PROC IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.SUMA_PROC_PLAN IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.DPT_STATUS IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.SUMA_PROC_PAYOFF IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.DATE_PROC_PAYOFF IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.DATE_DEP_PAYOFF IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.DATZ IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.DAZS IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.BLKD IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.BLKK IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.CNT_DUBL IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.ARCHDOC_ID IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.NCASH IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.NAME_D IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.OKPO_D IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.NLS_D IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.MFO_D IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.NAME_P IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.OKPO_P IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.NLSB IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.MFOB IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.NLSP IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.ROSP_M IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.MAL IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.BEN IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.VIDD_NAME IS '';
-COMMENT ON COLUMN BARS_DM.DEPOSIT_PLT.WB IS 'открыт в веб-банкинге';
-
-
-
+prompt add ob22, nms
+begin
+    execute immediate q'[alter table bars_dm.deposit_plt add ob22 varchar2(2)]';
+exception
+    when others then
+        if sqlcode = -1430 then null; else raise; end if;
+end;
+/
+begin
+    execute immediate q'[alter table bars_dm.deposit_plt add nms varchar2(70)]';
+exception
+    when others then
+        if sqlcode = -1430 then null; else raise; end if;
+end;
+/
 
 PROMPT *** Create  constraint SYS_C003232546 ***
 begin   
@@ -132,9 +92,6 @@ exception when others then
  end;
 /
 
-
-
-
 PROMPT *** Create  constraint SYS_C003232545 ***
 begin   
  execute immediate '
@@ -143,9 +100,6 @@ exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
-
-
-
 
 PROMPT *** Create  constraint SYS_C003232544 ***
 begin   
@@ -156,9 +110,6 @@ exception when others then
  end;
 /
 
-
-
-
 PROMPT *** Create  constraint SYS_C003232543 ***
 begin   
  execute immediate '
@@ -168,13 +119,5 @@ exception when others then
  end;
 /
 
-
-
 PROMPT *** Create  grants  DEPOSIT_PLT ***
 grant SELECT                                                                 on DEPOSIT_PLT     to BARSUPL;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS_DM/Table/DEPOSIT_PLT.sql =========*** End **
-PROMPT ===================================================================================== 

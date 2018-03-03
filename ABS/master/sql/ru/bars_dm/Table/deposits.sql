@@ -1,8 +1,3 @@
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS_DM/Table/DEPOSITS.sql =========*** Run *** =
-PROMPT ===================================================================================== 
-
 PROMPT *** Create  table DEPOSITS ***
 begin 
   execute immediate '
@@ -38,7 +33,9 @@ begin
   BLKK NUMBER(3,0), 
   CNT_DUBL NUMBER, 
   ARCHDOC_ID NUMBER,
-  WB CHAR(1)
+  WB CHAR(1),
+  ob22 varchar2(2),
+  nms varchar2(70)
   ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
   NOCOMPRESS LOGGING
@@ -46,6 +43,22 @@ begin
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 
 end; 
+/
+
+prompt add ob22, nms
+begin
+    execute immediate q'[alter table bars_dm.deposits add ob22 varchar2(2)]';
+exception
+    when others then
+        if sqlcode = -1430 then null; else raise; end if;
+end;
+/
+begin
+    execute immediate q'[alter table bars_dm.deposits add nms varchar2(70)]';
+exception
+    when others then
+        if sqlcode = -1430 then null; else raise; end if;
+end;
 /
 
 COMMENT ON TABLE BARS_DM.DEPOSITS IS 'Депозити';
@@ -160,7 +173,3 @@ PROMPT *** Create  grants  DEPOSITS ***
 grant SELECT                                                                 on DEPOSITS        to BARS;
 grant SELECT                                                                 on DEPOSITS        to BARSUPL;
 grant SELECT                                                                 on DEPOSITS        to BARS_SUP;
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS_DM/Table/DEPOSITS.sql =========*** End *** =
-PROMPT ===================================================================================== 

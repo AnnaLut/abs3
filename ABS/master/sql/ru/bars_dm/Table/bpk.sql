@@ -1,10 +1,3 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS_DM/Table/BPK.sql =========*** Run *** ======
-PROMPT ===================================================================================== 
-
-
 PROMPT *** Create  table BPK ***
 begin 
   execute immediate '
@@ -148,9 +141,3 @@ PROMPT *** Create  grants  BPK ***
 grant SELECT                                                                 on BPK             to BARS;
 grant SELECT                                                                 on BPK             to BARSUPL;
 grant SELECT                                                                 on BPK             to BARS_SUP;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS_DM/Table/BPK.sql =========*** End *** ======
-PROMPT ===================================================================================== 

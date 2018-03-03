@@ -1,5 +1,4 @@
-prompt ... 
-
+prompt create table credits_stat
 
 begin
     execute immediate 'create table BARS_DM.CREDITS_STAT
@@ -34,7 +33,9 @@ begin
   open_date_bal22 DATE,
   es000           VARCHAR2(24),
   es003           VARCHAR2(24),
-  vidd_custtype   NUMBER(1)
+  vidd_custtype   NUMBER(1),
+  ob22			  VARCHAR2(2),
+  nms			  VARCHAR2(70)
 ) tablespace BRSDYND';
  exception when others then 
     if sqlcode = -955 then null; else raise; 
@@ -67,7 +68,22 @@ exception
     end if;
 end;
 /
-
+begin
+  execute immediate 'alter table BARS_DM.CREDITS_STAT add ob22 varchar2(2)';
+exception 
+  when others then
+    if sqlcode = -1430 then null;
+    end if;
+end;
+/
+begin
+  execute immediate 'alter table BARS_DM.CREDITS_STAT add nms varchar2(70)';
+exception 
+  when others then
+    if sqlcode = -1430 then null;
+    end if;
+end;
+/
 -- Add comments to the columns 
 comment on table BARS_DM.CREDITS_STAT is 'Кредити, статичні дані';
 comment on column BARS_DM.CREDITS_STAT.id is 'Ідентифікатор запису';

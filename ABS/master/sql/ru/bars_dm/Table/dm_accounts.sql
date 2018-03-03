@@ -1,10 +1,3 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS_DM/Table/DM_ACCOUNTS.sql =========*** Run **
-PROMPT ===================================================================================== 
-
-
 PROMPT *** Create  table DM_ACCOUNTS ***
 begin 
   execute immediate '
@@ -28,7 +21,9 @@ begin
 	DAZS DATE, 
 	ACC_STATUS NUMBER(1,0), 
 	BLKD NUMBER(3,0), 
-	BLKK NUMBER(3,0)
+	BLKK NUMBER(3,0),
+	ob22 varchar2(2),
+	nms varchar2(70)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -37,7 +32,21 @@ exception when others then
   if sqlcode=-955 then null; else raise; end if; 
 end; 
 /
-
+prompt add ob22, nms
+begin
+    execute immediate q'[alter table bars_dm.dm_accounts add ob22 varchar2(2)]';
+exception
+    when others then
+        if sqlcode = -1430 then null; else raise; end if;
+end;
+/
+begin
+    execute immediate q'[alter table bars_dm.dm_accounts add nms varchar2(70)]';
+exception
+    when others then
+        if sqlcode = -1430 then null; else raise; end if;
+end;
+/
 
 COMMENT ON TABLE BARS_DM.DM_ACCOUNTS IS 'Поточні рахунки';
 COMMENT ON COLUMN BARS_DM.DM_ACCOUNTS.DAOS IS 'Дата відкриття рахунку';
@@ -61,9 +70,6 @@ COMMENT ON COLUMN BARS_DM.DM_ACCOUNTS.RNK IS 'РНК';
 COMMENT ON COLUMN BARS_DM.DM_ACCOUNTS.NLS IS '№ рахунку';
 COMMENT ON COLUMN BARS_DM.DM_ACCOUNTS.VIDD IS 'Вид вкладу';
 
-
-
-
 PROMPT *** Create  constraint FK_ACCOUNTS_PERID_PERIOD_ID ***
 begin   
  execute immediate '
@@ -74,9 +80,6 @@ exception when others then
  end;
 /
 
-
-
-
 PROMPT *** Create  constraint CC_ACCOUNTS_RNK_NN ***
 begin   
  execute immediate '
@@ -85,9 +88,6 @@ exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
-
-
-
 
 PROMPT *** Create  constraint CC_ACCOUNTS_KF_NN ***
 begin   
@@ -98,9 +98,6 @@ exception when others then
  end;
 /
 
-
-
-
 PROMPT *** Create  constraint CC_ACCOUNTS_BRANCH_NN ***
 begin   
  execute immediate '
@@ -109,9 +106,6 @@ exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
-
-
-
 
 PROMPT *** Create  constraint CC_ACCOUNTS_ACC_NN ***
 begin   
@@ -122,9 +116,6 @@ exception when others then
  end;
 /
 
-
-
-
 PROMPT *** Create  constraint CC_ACCOUNTS_PERID_NN ***
 begin   
  execute immediate '
@@ -133,9 +124,6 @@ exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
-
-
-
 
 PROMPT *** Create  index I_ACCOUNTS_PERID ***
 begin   
@@ -148,15 +136,7 @@ exception when others then
  end;
 /
 
-
-
 PROMPT *** Create  grants  DM_ACCOUNTS ***
 grant SELECT                                                                 on DM_ACCOUNTS     to BARS;
 grant SELECT                                                                 on DM_ACCOUNTS     to BARSUPL;
 grant SELECT                                                                 on DM_ACCOUNTS     to BARS_SUP;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS_DM/Table/DM_ACCOUNTS.sql =========*** End **
-PROMPT ===================================================================================== 

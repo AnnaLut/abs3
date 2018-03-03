@@ -32,7 +32,9 @@ begin
 	OPEN_DATE_BAL22 DATE, 
 	ES000 VARCHAR2(24), 
 	ES003 VARCHAR2(24), 
-	VIDD_CUSTTYPE NUMBER(1,0)
+	VIDD_CUSTTYPE NUMBER(1,0),
+	OB22 VARCHAR2(2),
+	NMS  VARCHAR2(70)
    ) tablespace BRSDMIMP
 PARTITION BY LIST (PER_ID) SUBPARTITION by list (KF)
 SUBPARTITION TEMPLATE
@@ -69,6 +71,29 @@ exception when others then
 end; 
 /
 
+prompt add ob22, nms
+begin
+	execute immediate 'alter table bars_dm.credits_stat add ob22 varchar2(2)';
+exception
+	when others then
+		if sqlcode = -1430 then null; else raise; end if;
+end;
+/
+begin
+	execute immediate 'alter table bars_dm.credits_stat add nms varchar2(70)';
+exception
+	when others then
+		if sqlcode = -1430 then null; else raise; end if;
+end;
+/
+prompt drop error log
+begin
+	execute immediate 'drop table bars_dm.err$_credits_stat';
+exception
+	when others then
+		if sqlcode = -942 then null; else raise; end if;
+end;
+/
 prompt create errlog
 begin
     dbms_errlog.create_error_log(dml_table_name => 'CREDITS_STAT');
