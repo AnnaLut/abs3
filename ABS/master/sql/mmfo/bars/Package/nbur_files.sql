@@ -1,121 +1,158 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/nbur_files.sql =========*** Run *** 
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.NBUR_FILES 
+create or replace package NBUR_FILES
 is
 
-g_header_version  constant varchar2(64)  := 'version 3.2  2017.08.04';
-g_header_defs     constant varchar2(512) := '';
+  g_header_version  constant varchar2(64)  := 'version 3.4  2017.10.13';
+  g_header_defs     constant varchar2(512) := '';
 
--- header_version - версія заголовку пакета
-function header_version return varchar2;
+  --
+  -- header_version - версія заголовку пакета
+  --
+  function header_version return varchar2;
 
--- body_version - версія тіла пакета
-function body_version return varchar2;
+  --
+  -- body_version - версія тіла пакета
+  --
+  function body_version return varchar2;
 
--- налаштування параметрів та підготовка даних для файлу
-procedure p_proc_set
-( p_kf           in     varchar2    -- код филиала
-, p_file_code    in     varchar2    -- код файла НБУ
-, p_scheme       in     varchar2    -- код схемы
-, p_datz         in     date        -- звітна дата
-, p_type_spr     in     number      -- джерело переліку БР
-, p_file_spr     in     varchar2    -- код файлу для умови
-, o_nbuc         out    varchar2
-, o_type         out    number
-, p_report_date  in     date := null
-);
+  --
+  -- налаштування параметрів та підготовка даних для файлу
+  --
+  procedure p_proc_set
+  ( p_kf            in     varchar2    -- код филиала
+  , p_file_code     in     varchar2    -- код файла НБУ
+  , p_scheme        in     varchar2    -- код схемы
+  , p_datz          in     date        -- звітна дата
+  , p_type_spr      in     number      -- джерело переліку БР
+  , p_file_spr      in     varchar2    -- код файлу для умови
+  , o_nbuc             out varchar2
+  , o_type             out number
+  , p_report_date   in     date := null
+  );
 
--- ідентифікатор файлу
-function f_get_id_file (p_kodf in varchar2,
-                        p_sheme in varchar2,
-                        p_type in number) return number;
+  --
+  -- ідентифікатор файлу
+  --
+  function F_GET_ID_FILE
+  ( p_kodf          in     varchar2
+  , p_sheme         in     varchar2
+  , p_type          in     number
+  ) return number;
 
---
--- код файлу по ідентифікатору файлу
---
-function F_GET_KODF
-( p_file_id       in     nbur_ref_files.id%type
-) return nbur_ref_files.file_code%type;
+  --
+  -- ідентифікатор файлу
+  --
+  function GET_FILE_ID
+  ( p_file_code     in     nbur_ref_files.file_code%type
+  ) return  nbur_ref_files.id%type;
 
---повертає версію файлу
-function f_get_version_file (p_file_id    in number,
-                               p_report_date  in date,
-                               p_kf           in varchar2 )  return number;
-                               
--- фиксация старта процесса формирования отчетного файла в списке сформированных файлов
-function F_START_FORM_FILE
-( p_userid        in     nbur_lst_files.user_id%type
-, p_version_id    in     nbur_lst_files.version_id%type
-, p_file_id       in     nbur_lst_files.file_id%type
-, p_report_date   in     nbur_lst_files.report_date%type
-, p_kf            in     nbur_lst_files.kf%type 
-, p_start_time    in     nbur_lst_files.start_time%type
-) return number;
+  --
+  -- код файлу по ідентифікатору файлу
+  --
+  function F_GET_KODF
+  ( p_file_id       in     nbur_ref_files.id%type
+  ) return nbur_ref_files.file_code%type;
+
+  --
+  -- повертає версію файлу
+  --
+  function f_get_version_file
+  ( p_file_id       in     number
+  , p_report_date   in     date
+  , p_kf            in     varchar2
+  ) return number;
+
+  --
+  -- фиксация старта процесса формирования отчетного файла в списке сформированных файлов
+  --
+  function F_START_FORM_FILE
+  ( p_userid        in     nbur_lst_files.user_id%type
+  , p_version_id    in     nbur_lst_files.version_id%type
+  , p_file_id       in     nbur_lst_files.file_id%type
+  , p_report_date   in     nbur_lst_files.report_date%type
+  , p_kf            in     nbur_lst_files.kf%type 
+  , p_start_time    in     nbur_lst_files.start_time%type
+  ) return number;
 
 --
 --   фиксация окончания процесса формирования отчетного файла в списке сформированных файлов
 --
-function f_finish_form_file (p_version_id    in number,
-                             p_file_id       in number,
-                             p_report_date   in date,
-                             p_kf            in varchar2,
-                             p_status        in varchar2 default 'FINISHED')  return number;
+function f_finish_form_file
+( p_version_id    in     number,
+  p_file_id       in     number,
+  p_report_date   in     date,
+  p_kf            in     varchar2,
+  p_status        in     varchar2 default 'FINISHED'
+) return number;
 
 -- інвалідація файлу
-procedure p_set_invalid_file (p_file_id       in number, 
+procedure p_set_invalid_file (p_file_id       in number,
                               p_report_date   in date,
                               p_kf            in varchar2,
-                              p_version_id    in number);                        
-                         
+                              p_version_id    in number
+);
+
 -- створення нового файлу
-function f_ins_new_file (p_kodf in varchar2,
+function f_ins_new_file (p_kodf  in varchar2,
                          p_sheme in varchar2,
-                         p_type in number) return number;
-            
+                         p_type  in number
+) return number;
+
 -- вставка нового файлу для філії
-function f_ins_new_file_kf (p_kodf in varchar2,
+function f_ins_new_file_kf (p_kodf  in varchar2,
                             p_sheme in varchar2,
-                            p_type in number,
-                            p_kf in number) return number;     
+                            p_type  in number,
+                            p_kf    in number
+) return number;
 
 -- повертає статуу файлу версії
 function f_get_files_status(p_report_date   in date, 
                             p_kf            in varchar2,
                             p_version_id    in number,
-                            p_file_id       in number) return varchar2;                             
-                            
+                            p_file_id       in number
+) return varchar2;
+
+--
 -- оновлення статусу  версії
-procedure p_update_files_status(p_report_date   in date, 
-                                p_kf            in varchar2,
-                                p_version_id    in number,
-                                p_file_id       in number, 
-                                p_status        in varchar2);                             
+--
+procedure p_update_files_status
+( p_report_date   in date,
+  p_kf            in varchar2,
+  p_version_id    in number,
+  p_file_id       in number,
+  p_status        in varchar2
+);
 
---блокування формування файлу
-procedure p_block_file (p_report_date   in  date, 
-                       p_kf             in  varchar2,
-                       p_version_id     in  number,
-                       p_file_id        in  number,
-                       p_status_code    out varchar2,
-                       p_status_mes     out varchar2);
+--
+-- блокування формування файлу
+--
+procedure p_block_file
+( p_report_date    in  date,
+  p_kf             in  varchar2,
+  p_version_id     in  number,
+  p_file_id        in  number,
+  p_status_code    out varchar2,
+  p_status_mes     out varchar2
+);
 
+--
 -- отримання назви  сформуваного файлу
-function f_get_file_name (p_report_date  in date, 
+--
+function f_get_file_name (p_report_date  in date,
                           p_kf           in varchar2,
                           p_version_id   in number,
                           p_file_code    in varchar2,
-                          p_scheme_code  in varchar2) return varchar2; 
-                                                   
+                          p_scheme_code  in varchar2
+) return varchar2;
+
+--
 -- отримання сформуваного файлу (clob)
-function f_get_file_clob (p_report_date  in date, 
+--
+function f_get_file_clob (p_report_date  in date,
                           p_kf           in varchar2,
                           p_version_id   in number,
                           p_file_code    in varchar2,
-                          p_scheme_code  in varchar2) return clob;    
+                          p_scheme_code  in varchar2
+) return clob;
 
   -- отримання дати
   function f_get_date
@@ -163,16 +200,16 @@ function f_get_file_clob (p_report_date  in date,
   --
   --
   procedure SET_FILE_PROC
-  ( p_proc_id     in out nbur_ref_procs.id%type
-  , p_file_id     in     nbur_ref_procs.file_id%type
-  , p_proc_type   in     nbur_ref_procs.proc_type%type default 'F'
-  , p_proc_active in     nbur_ref_procs.proc_active%type default 'Y'
-  , p_scheme      in     nbur_ref_procs.scheme%type default 'BARS'
-  , p_proc_name   in     nbur_ref_procs.proc_name%type
-  , p_description in     nbur_ref_procs.description%type
-  , p_version     in     nbur_ref_procs.version%type
-  , p_date_start  in     nbur_ref_procs.date_start%type default null
-  , p_date_finish in     nbur_ref_procs.date_finish%type default null
+  ( p_proc_id          in out nbur_ref_procs.id%type
+  , p_file_id          in     nbur_ref_procs.file_id%type
+  , p_proc_type        in     nbur_ref_procs.proc_type%type default 'F'
+  , p_proc_active      in     nbur_ref_procs.proc_active%type default 'Y'
+  , p_scheme           in     nbur_ref_procs.scheme%type default 'BARS'
+  , p_proc_name        in     nbur_ref_procs.proc_name%type
+  , p_description      in     nbur_ref_procs.description%type
+  , p_version          in     nbur_ref_procs.version%type
+  , p_date_start       in     nbur_ref_procs.date_start%type default null
+  , p_date_finish      in     nbur_ref_procs.date_finish%type default null
   );
   
   --
@@ -185,6 +222,7 @@ function f_get_file_clob (p_report_date  in date,
   , p_seg_rule         in     nbur_ref_form_stru.segment_rule%type
   , p_key_attr         in     nbur_ref_form_stru.key_attribute%type
   , p_sort_attr        in     nbur_ref_form_stru.sort_attribute%type
+  , p_seg_code         in     nbur_ref_form_stru.segment_code%type default null
   );
   
   --
@@ -203,18 +241,48 @@ function f_get_file_clob (p_report_date  in date,
   , p_strt_dt          in     nbur_lnk_files_objects.start_date%type
   );
   
+  --
+  --
+  --
   procedure SET_FILE_DEPENDENCIES
   ( p_file_code        in     nbur_ref_files.file_code%type
   , p_obj_id           in     nbur_lnk_files_objects.object_id%type
   , p_strt_dt          in     nbur_lnk_files_objects.start_date%type
   );
 
+  --
+  -- set check statement for file
+  --
+  procedure SET_FILE_CHK
+  ( p_chk_id           in out nbur_ref_file_checks.chk_id%type
+  , p_chk_dsc          in     nbur_ref_file_checks.chk_dsc%type
+  , p_chk_ste          in     nbur_ref_file_checks.chk_ste%type
+  , p_chk_stmt         in out nocopy clob
+  , p_file_id          in     NBUR_REF_FILE_CHECKS.file_id%type
+  );
+
+  --
+  -- save check file log
+  --
+  procedure SET_CHK_LOG
+  ( p_file_id          in     nbur_lst_files.file_id%type
+  , p_rpt_dt           in     nbur_lst_files.report_date%type
+  , p_kf               in     nbur_lst_files.kf%type
+  , p_vrsn_id          in     nbur_lst_files.version_id%type
+  , p_chk_log          in out nocopy clob
+  );
+
 end NBUR_FILES;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.NBUR_FILES 
+
+show errors
+
+----------------------------------------------------------------------------------------------------
+
+create or replace package body NBUR_FILES
 is
 
-  g_body_version  constant varchar2(64)  := 'version 6.1  2017.08.04';
+  g_body_version  constant varchar2(64)  := 'version 6.3  2017.10.13';
   g_body_defs     constant varchar2(512) := '';
   
   MODULE_PREFIX   constant varchar2(10)  := 'NBUR';
@@ -237,7 +305,7 @@ end body_version;
 
 procedure p_errors_log( p_add_mess in varchar2 := null )
 is
-  title      constant   varchar2(60) := $$PLSQL_UNIT||': ';
+  title      constant   varchar2(64) := $$PLSQL_UNIT||': ';
 begin
   bars_audit.error( title || p_add_mess || CHR(10) || sqlerrm || CHR(10) || dbms_utility.format_error_backtrace() );
 end p_errors_log;
@@ -349,8 +417,33 @@ begin
    return l_id_file;
 exception
     when no_data_found then
-        return null;    
+        return null;
 end f_get_id_file;
+
+  --
+  -- ідентифікатор файлу
+  --
+  function GET_FILE_ID
+  ( p_file_code     in     nbur_ref_files.file_code%type
+  ) return  nbur_ref_files.id%type
+  is
+    l_file_id              nbur_ref_files.id%type;
+  begin
+
+    begin
+       select id
+         into l_file_id
+         from NBUR_REF_FILES
+        where FILE_CODE = p_file_code;
+    exception
+      when no_data_found then
+        -- Не знайдено файл з кодом :p_file_code
+        raise_application_error( -20666, 'No file with code ' || p_file_code || ' found!', true );
+    end;
+
+    return l_file_id;
+
+  end GET_FILE_ID;
 
 --
 -- код файлу по ідентиф_катору файлу
@@ -876,18 +969,20 @@ end;
   , p_seg_rule   in     nbur_ref_form_stru.segment_rule%type
   , p_key_attr   in     nbur_ref_form_stru.key_attribute%type
   , p_sort_attr  in     nbur_ref_form_stru.sort_attribute%type
+  , p_seg_code   in     nbur_ref_form_stru.segment_code%type default null
   ) is
   begin
     
     begin
       Insert into BARS.NBUR_REF_FORM_STRU
-        ( FILE_ID, SEGMENT_NUMBER, SEGMENT_NAME, SEGMENT_RULE, KEY_ATTRIBUTE, SORT_ATTRIBUTE )
+        ( FILE_ID, SEGMENT_NUMBER, SEGMENT_CODE, SEGMENT_NAME, SEGMENT_RULE, KEY_ATTRIBUTE, SORT_ATTRIBUTE )
       Values
-        ( p_file_id, p_seg_num, p_seg_nm, p_seg_rule, p_key_attr, p_sort_attr );
+        ( p_file_id, p_seg_num, p_seg_code, p_seg_nm, p_seg_rule, p_key_attr, p_sort_attr );
     exception
       when DUP_VAL_ON_INDEX then
         update BARS.NBUR_REF_FORM_STRU
-           set SEGMENT_NAME   = p_seg_nm
+           set SEGMENT_CODE   = p_seg_code
+             , SEGMENT_NAME   = p_seg_nm
              , SEGMENT_RULE   = p_seg_rule
              , KEY_ATTRIBUTE  = p_key_attr
              , SORT_ATTRIBUTE = p_sort_attr
@@ -924,10 +1019,12 @@ end;
     
     select f.VIEW_NM, f.FILE_CODE, f.FILE_NAME, nvl(p.PROC_TYPE, 'O')
       into l_view_nm, l_file_code, l_file_name, l_proc_type
-      from BARS.NBUR_REF_FILES f, BARS.NBUR_REF_PROCS p
+      from BARS.NBUR_REF_FILES f
+      left
+      join BARS.NBUR_REF_PROCS p
+        on ( p.FILE_ID = f.ID )
      where f.ID = p_file_id
-       and f.FILE_FMT = 'TXT'
-       and f.ID = p.FILE_ID(+);
+       and f.FILE_FMT = 'TXT';
     
     if ( l_view_nm Is Null )
     then
@@ -1061,11 +1158,13 @@ end;
         l_view_stmt := l_view_stmt || '  join V_NBUR_DM_CUSTOMERS c'              ||chr(10);
         l_view_stmt := l_view_stmt || '    on ( p.REPORT_DATE = c.REPORT_DATE and'||chr(10);
         l_view_stmt := l_view_stmt || '         p.KF          = c.KF          and'||chr(10);
+--      l_view_stmt := l_view_stmt || '         p.VERSION_ID = C.VERSION_ID   and'||chr(10);
         l_view_stmt := l_view_stmt || '         p.CUST_ID    = c.CUST_ID )'       ||chr(10);
         l_view_stmt := l_view_stmt || '  left outer'                              ||chr(10);
         l_view_stmt := l_view_stmt || '  join V_NBUR_DM_AGREEMENTS a'             ||chr(10);
         l_view_stmt := l_view_stmt || '    on ( p.REPORT_DATE = a.REPORT_DATE and'||chr(10);
         l_view_stmt := l_view_stmt || '         p.KF          = a.KF          and'||chr(10);
+--      l_view_stmt := l_view_stmt || '         p.VERSION_ID  = a.VERSION_ID  and'||chr(10);
         l_view_stmt := l_view_stmt || '         p.nd          = a.AGRM_ID )'      ||chr(10);
         l_view_stmt := l_view_stmt || ' where p.REPORT_CODE = '|| DBMS_ASSERT.ENQUOTE_LITERAL( l_file_code )||chr(10);
         l_view_stmt := l_view_stmt || q'[   and v.FILE_STATUS IN ( 'FINISHED', 'BLOCKED' )]';
@@ -1163,7 +1262,7 @@ end;
   , p_obj_id           in     nbur_lnk_files_objects.object_id%type
   , p_strt_dt          in     nbur_lnk_files_objects.start_date%type
   ) is
-    title        constant     varchar2(60)  := $$PLSQL_UNIT||'.SET_FILE_DPND';
+    title        constant     varchar2(64)  := $$PLSQL_UNIT||'.SET_FILE_DPND';
   begin
     
     bars_audit.trace( '%s: Entry with ( file_id=%s, obj_id=%s ).'
@@ -1208,7 +1307,7 @@ end;
   , p_obj_id           in     nbur_lnk_files_objects.object_id%type
   , p_strt_dt          in     nbur_lnk_files_objects.start_date%type
     ) is
-    title        constant     varchar2(60) := $$PLSQL_UNIT||'.SET_FILE_DPND';
+    title        constant     varchar2(64) := $$PLSQL_UNIT||'.SET_FILE_DPND';
     l_file_id                 nbur_ref_files.id%type;
   begin
     
@@ -1218,7 +1317,7 @@ end;
     case
       when ( p_file_code is Null )
       then 
-       raise_application_error( -20666, 'Value for parameter [p_file_code] must be specified!', true );
+        raise_application_error( -20666, 'Value for parameter [p_file_code] must be specified!', true );
       when ( length( p_file_code ) != 3 )
       then
         raise_application_error( -20666, 'Value for parameter [p_file_code] must contain 3 chars!', true );
@@ -1241,21 +1340,121 @@ end;
     
   end SET_FILE_DEPENDENCIES;
 
+  --
+  -- set check statement for file
+  --
+  procedure SET_FILE_CHK
+  ( p_chk_id           in out nbur_ref_file_checks.chk_id%type
+  , p_chk_dsc          in     nbur_ref_file_checks.chk_dsc%type
+  , p_chk_ste          in     nbur_ref_file_checks.chk_ste%type
+  , p_chk_stmt         in out nocopy clob
+  , p_file_id          in     NBUR_REF_FILE_CHECKS.file_id%type
+  ) is
+    title        constant     varchar2(64) := $$PLSQL_UNIT||'.SET_FILE_CHK';
+    l_cursor                  integer;
+  begin
+
+    bars_audit.trace( '%s: Entry with ( p_chk_id=%s, p_chk_dsc=%s, p_chk_ste=%s p_file_id=%s ).'
+                    , title, to_char(p_chk_id), p_chk_dsc, to_char(p_chk_ste), to_char(p_file_id) );
+
+    case
+    when ( p_file_id Is Null )
+    then
+      raise_application_error( -20666, 'Value for parameter [p_file_id] must be specified!', true );
+    else
+      if ( p_chk_ste = 1 )
+      then
+        if ( dbms_lob.getlength( p_chk_stmt ) > 0 )
+        then -- vaidate SQL statement
+          
+          l_cursor := DBMS_SQL.OPEN_CURSOR;
+          
+          begin
+            DBMS_SQL.PARSE( l_cursor, p_chk_stmt, dbms_sql.native );
+          exception
+            when OTHERS then
+             raise_application_error( -20666, 'SQL Statement: ' || chr(10) || p_chk_stmt ||
+                                              ' Has Error: '    || chr(10) || dbms_utility.format_error_stack(), true );
+          end;
+          
+          if ( DBMS_SQL.IS_OPEN( l_cursor ) )
+          then
+            DBMS_SQL.CLOSE_CURSOR( l_cursor );
+          end if;
+          
+        else
+          raise_application_error( -20666, 'Value for parameter [p_chk_stmt] must be specified!', true );
+        end if;
+      else
+        null;
+      end if;
+    end case;
+
+    if ( p_chk_id > 0 )
+    then
+
+      update NBUR_REF_FILE_CHECKS
+         set CHK_DSC  = nvl(p_chk_dsc,CHK_DSC)
+           , CHK_STE  = nvl(p_chk_ste,CHK_STE)
+           , CHK_STMT = p_chk_stmt
+           , FILE_ID  = p_file_id
+       where CHK_ID   = p_chk_id
+      ;
+
+    else
+
+      p_chk_id := S_NBUR_REF_FILE_CHECKS.NextVal;
+
+      insert
+        into NBUR_REF_FILE_CHECKS
+           ( CHK_ID, CHK_DSC, CHK_STE, CHK_STMT, FILE_ID )
+      values
+           ( p_chk_id, nvl(p_chk_dsc,'Check for file '||F_GET_KODF(p_file_id)), p_chk_ste, nvl(p_chk_stmt,0), p_file_id );
+
+      bars_audit.trace( '%s: created row with chk_id=%s.', title, to_char(p_chk_id) );
+
+    end if;
+
+    bars_audit.trace( '%s: Exit.', title );
+
+  end SET_FILE_CHK;
+
+  --
+  -- save check file log
+  --
+  procedure SET_CHK_LOG
+  ( p_file_id          in     nbur_lst_files.file_id%type
+  , p_rpt_dt           in     nbur_lst_files.report_date%type
+  , p_kf               in     nbur_lst_files.kf%type
+  , p_vrsn_id          in     nbur_lst_files.version_id%type
+  , p_chk_log          in out nocopy clob
+  ) is
+    title        constant     varchar2(64) := $$PLSQL_UNIT||'.SET_CHK_LOG';
+  begin
+    
+    bars_audit.trace( '%s: Entry with ( file_id=%s, p_rpt_dt=%s, p_kf=%s, p_vrsn_id=%s ).'
+                    , title, to_char(p_file_id), to_char(p_rpt_dt,'dd.mm.yyyy'), p_kf, to_char(p_vrsn_id) );
+    
+    update NBUR_LST_FILES
+       set CHK_LOG = p_chk_log
+     where REPORT_DATE = p_rpt_dt
+       and KF          = p_kf
+       and VERSION_ID  = p_vrsn_id
+       and FILE_ID     = p_file_id
+--     and FILE_STATUS = 'FINISHED'
+    ;
+    
+    bars_audit.trace( '%s: Exit.', title );
+    
+  end SET_CHK_LOG;
+
 
 
 begin
   null;
 end NBUR_FILES;
 /
- show err;
- 
-PROMPT *** Create  grants  NBUR_FILES ***
-grant EXECUTE                                                                on NBUR_FILES      to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on NBUR_FILES      to RPBN002;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/nbur_files.sql =========*** End *** 
- PROMPT ===================================================================================== 
- 
+show err
+
+GRANT EXECUTE ON BARS.NBUR_FILES TO BARS_ACCESS_DEFROLE;
