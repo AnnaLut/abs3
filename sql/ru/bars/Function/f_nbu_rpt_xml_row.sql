@@ -18,6 +18,8 @@ IS
   l_frst_dt            date; -- 
   l_last_dt            date; -- 
   l_prvn_dt            date; -- 
+  l_nbu_dt             date; --    отчетная дата НБУ
+  l_is_dt_in           integer            :=1;
   l_ret_val            varchar2(4000 byte);
   l_rec                pls_integer := 0;
   l_rpt_code           char(2);
@@ -40,6 +42,17 @@ BEGIN
   
   l_rpt_code := upper( substr( trim(p_rpt_code), instr(trim(p_rpt_code),'#')+1, 2 ) );
   
+--    отчетная дата НБУ
+   l_nbu_dt := p_rpt_date;
+   loop
+      l_nbu_dt := l_nbu_dt+1;
+      select count(*)   into l_is_dt_in
+        from holiday
+       where kv =980 and holiday =l_nbu_dt;
+
+      exit when l_is_dt_in =0; 
+   end loop;
+-------------------------------------------------------------------------------
   bars_audit.info( $$PLSQL_UNIT||': l_frst_dt=' ||to_char(l_frst_dt,g_dt_fmt)||
                                  ', l_last_dt=' ||to_char(l_last_dt,g_dt_fmt)||
                                  ', l_prvn_dt=' ||to_char(l_prvn_dt,g_dt_fmt)||
@@ -51,7 +64,7 @@ BEGIN
   pipe row ( '  <HEAD>' );
   pipe row ( '    <STATFORM>F'||l_rpt_code||'X</STATFORM>' );
   pipe row ( '    <EDRPOU>'||l_okpo||'</EDRPOU>' );
-  pipe row ( '    <REPORTDATE>'||to_char(p_rpt_date,g_dt_fmt)||'</REPORTDATE>' );
+  pipe row ( '    <REPORTDATE>'||to_char(l_nbu_dt,g_dt_fmt)||'</REPORTDATE>' );
   pipe row ( '  </HEAD>' );
   
   if ( l_rpt_code = '3E' )
@@ -332,9 +345,9 @@ BEGIN
                        , XMLElement("S180",S180)
                        , XMLElement("F089",F089)
                        , XMLElement("F092",F092)
-                       , XMLElement("Q003_2",Q003_2)
+                       , XMLElement("Q003_2",XMLAttributes(nvl2(Q003_2,null,'true') as "xsi:nil"),Q003_2)
                        , XMLElement("Q007_1",XMLAttributes(nvl2(Q007_1,null,'true') as "xsi:nil"),Q007_1)
-                       , XMLElement("Q006",Q006)
+                       , XMLElement("Q006",XMLAttributes(nvl2(Q006,null,'true') as "xsi:nil"),Q006)
                        ) AS XML_ROW
        from ( select /* XML_RPT_3K */ 'A3K001'                        as EKP
                      , EKP_2                 as Q003_1 
@@ -380,7 +393,7 @@ BEGIN
 --      l_ret_val := REGEXP_REPLACE( l_ret_val, '(<Q007_1)(></)', '\1 xsi:nil = "true" \2' );
 
       pipe row ( CONVERT( l_ret_val, 'UTF8' ) );
-      
+                   --res := convert (res,'CL8MSWIN1251');      
     end loop;
     
   else

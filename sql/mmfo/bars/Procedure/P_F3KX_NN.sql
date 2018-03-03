@@ -929,7 +929,7 @@ BEGIN
                      k021_ := '#';
                   end if;
 
-	          p_ins (nnnn_, 'K020', TRIM (okpo_));
+	          p_ins (nnnn_, 'K020', lpad(TRIM (okpo_),10,'0'));
 	          p_ins (nnnn_, 'K021', k021_);
                end if;
 

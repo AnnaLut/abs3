@@ -929,7 +929,7 @@ BEGIN
                      k021_ := '#';
                   end if;
 
-	          p_ins (nnnn_, 'K020', TRIM (okpo_));
+	          p_ins (nnnn_, 'K020', lpad(TRIM (okpo_),10,'0'));
 	          p_ins (nnnn_, 'K021', k021_);
                end if;
 
@@ -1022,7 +1022,6 @@ BEGIN
 
    CLOSE c_main;
 
-   nnnn_ := nnnn_+1;
 --   консолидация  операций  по rnbu_trace    операция 216
    for u in ( select f091, r030, f092, sum(t071) t071
                 from ( select *
@@ -1043,6 +1042,7 @@ BEGIN
                      )
                group by f091, r030, f092
    ) loop
+         nnnn_ := nnnn_+1;
          p_ins (nnnn_, 'F091', u.f091);
          p_ins (nnnn_, 'R030', LPAD (u.r030, 3,'0'));
          p_ins (nnnn_, 'T071', TO_CHAR (u.t071 ));
