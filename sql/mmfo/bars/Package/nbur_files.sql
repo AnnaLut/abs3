@@ -2,7 +2,6 @@ create or replace package NBUR_FILES
 is
 
   g_header_version  constant varchar2(64)  := 'version 3.4  2017.10.13';
-  g_header_defs     constant varchar2(512) := '';
 
   --
   -- header_version - версія заголовку пакета
@@ -43,7 +42,8 @@ is
   --
   function GET_FILE_ID
   ( p_file_code     in     nbur_ref_files.file_code%type
-  ) return  nbur_ref_files.id%type;
+  ) return  nbur_ref_files.id%type
+  deterministic;
 
   --
   -- код файлу по ідентифікатору файлу
@@ -282,27 +282,25 @@ show errors
 create or replace package body NBUR_FILES
 is
 
-  g_body_version  constant varchar2(64)  := 'version 6.3  2017.10.13';
-  g_body_defs     constant varchar2(512) := '';
-  
-  MODULE_PREFIX   constant varchar2(10)  := 'NBUR';
-  
--- header_version - верс_я заголовку пакета
+  g_body_version  constant varchar2(64) := 'version 6.3  2017.10.13';
+
+  MODULE_PREFIX   constant varchar2(8) := 'NBUR';
+
+-- версія заголовку пакету
 function header_version return varchar2
 is
 begin
-  return 'Package header NBUR_FILES ' || g_header_version || '.' || chr(10) ||
-         'Package header definition(s): ' || chr(10) ||  g_header_defs;
+  return 'Package '||$$PLSQL_UNIT||' header '||g_header_version||'.';
 end header_version;
 
--- body_version - верс_я т_ла пакета
+-- версія тіла пакету
 function body_version return varchar2
 is
 begin
-  return 'Package body NBUR_FILES ' || g_body_version || '.' || chr(10) ||
-         'Package body definition(s): ' || chr(10) || g_body_defs;
+  return 'Package '||$$PLSQL_UNIT||' body '||g_body_version||'.';
 end body_version;
 
+--
 procedure p_errors_log( p_add_mess in varchar2 := null )
 is
   title      constant   varchar2(64) := $$PLSQL_UNIT||': ';
@@ -395,25 +393,25 @@ end p_proc_set;
 -- _дентиф_катор файлу
 function f_get_id_file (p_kodf in varchar2,
                         p_sheme in varchar2,
-                        p_type in number) return number is
-   l_id_file    number;
+                        p_type in number) return number
+is
+  l_id_file    number;
 begin
    begin
-       select id
+     select id
        into l_id_file
-         from NBUR_REF_FILES
-        where file_code = p_kodf
-          and scheme_code = p_sheme
-          and file_type = p_type;
+       from NBUR_REF_FILES
+      where file_code = p_kodf
+        and scheme_code = p_sheme
+        and file_type = p_type;
    exception
-        when no_data_found then
-           select max(id)
+      when no_data_found then
+         select max(id)
            into l_id_file
-             from NBUR_REF_FILES
-            where file_code = p_kodf
-              and file_type = p_type;
+           from NBUR_REF_FILES
+          where file_code = p_kodf
+            and file_type = p_type;
    end;
-       
    return l_id_file;
 exception
     when no_data_found then
@@ -426,6 +424,7 @@ end f_get_id_file;
   function GET_FILE_ID
   ( p_file_code     in     nbur_ref_files.file_code%type
   ) return  nbur_ref_files.id%type
+  deterministic
   is
     l_file_id              nbur_ref_files.id%type;
   begin
@@ -437,7 +436,10 @@ end f_get_id_file;
         where FILE_CODE = p_file_code;
     exception
       when no_data_found then
-        -- Не знайдено файл з кодом :p_file_code
+--      l_file_id := case SubStr(p_file_code,1,1) when '#' then '1' when '@' then '2' else '0' end
+--                || to_char(ASCII(SubStr(p_file_code,2,1)))
+--                || to_char(ASCII(SubStr(p_file_code,3,1)));
+        l_file_id := null;
         raise_application_error( -20666, 'No file with code ' || p_file_code || ' found!', true );
     end;
 
@@ -1409,7 +1411,7 @@ end;
         into NBUR_REF_FILE_CHECKS
            ( CHK_ID, CHK_DSC, CHK_STE, CHK_STMT, FILE_ID )
       values
-           ( p_chk_id, nvl(p_chk_dsc,'Check for file '||F_GET_KODF(p_file_id)), p_chk_ste, nvl(p_chk_stmt,0), p_file_id );
+           ( p_chk_id, nvl(p_chk_dsc,'Check for file '||F_GET_KODF(p_file_id)), nvl(p_chk_ste,0), p_chk_stmt, p_file_id );
 
       bars_audit.trace( '%s: created row with chk_id=%s.', title, to_char(p_chk_id) );
 
@@ -1431,10 +1433,10 @@ end;
   ) is
     title        constant     varchar2(64) := $$PLSQL_UNIT||'.SET_CHK_LOG';
   begin
-    
+
     bars_audit.trace( '%s: Entry with ( file_id=%s, p_rpt_dt=%s, p_kf=%s, p_vrsn_id=%s ).'
                     , title, to_char(p_file_id), to_char(p_rpt_dt,'dd.mm.yyyy'), p_kf, to_char(p_vrsn_id) );
-    
+
     update NBUR_LST_FILES
        set CHK_LOG = p_chk_log
      where REPORT_DATE = p_rpt_dt
@@ -1443,9 +1445,9 @@ end;
        and FILE_ID     = p_file_id
 --     and FILE_STATUS = 'FINISHED'
     ;
-    
+
     bars_audit.trace( '%s: Exit.', title );
-    
+
   end SET_CHK_LOG;
 
 
