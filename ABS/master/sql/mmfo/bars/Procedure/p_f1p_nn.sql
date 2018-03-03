@@ -7,17 +7,25 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_F1P_NN ***
 
-  CREATE OR REPLACE PROCEDURE BARS.P_F1P_NN (dat_      DATE,
+CREATE OR REPLACE PROCEDURE BARS.P_F1P_NN (dat_      DATE,
                                            sheme_    VARCHAR2 DEFAULT 'D')
 IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Процедура формирования файла 1P (ПБ-1)
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :    01/06/2017 (11/04/2017)
+% VERSION     :    01/03/2018 (02/02/2018, 09/06/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+01/03/2018 - для проводок Дт 100* Кт 3800 будет формироваться код 2343001
+02/02/2018 - для проводок Дт 100 Кт 1811 будем изменять код банка (KOD_B)
+             заполняем по проводке Дт 1811 Кт 3739 
+08/06/2017 - добавил parallel (8) для блока заполнения доп.реквизитов
+06/06/2017 - изменил VIEW PROVODKI_OTC на OPLDOK для заполнения в OPERW 
+             доп.параметров KOD_N, KOD_B, KOD_G
+25/04/2017 - добавлено обработку поля ID_B из VIEW PROVODKI_OTC
+             (во VIEW PROVODKI_OTC добавлено поле ID_B из OPER)
 09/12/2016 - для бал.счета 1500 изменяем значение показателя 03 на значение
              показателя 07 (не обрабатываем значение 6, 777)
              и значение 999 изменяем на 6 
@@ -217,152 +225,180 @@ BEGIN
    IF mfou_ = 300465 AND mfou_ != mfo_g
    THEN
       FOR k
-         IN (SELECT p.pdat pdat,
-                      p.fdat fdat,
-                      p.REF REF,
-                      p.tt tt,
-                      p.accd accd,
-                      p.nam_a name_a,
-                      p.nlsd nlsd,
-                      p.kv kv,
-                      p.acck acck,
-                      p.nam_b name_b,
-                      p.nlsk nlsk,
-                      p.nazn nazn,
-                      p.ptt tt1
-                 FROM provodki_otc p
-                WHERE     p.fdat BETWEEN Dat1_ AND Dat_
-                      AND p.kv <> 980
-                      AND (p.nlsd LIKE '100%' OR p.nlsk LIKE '100%')
-             ORDER BY 1, 2, 3)
+         IN ( select /*+parallel(a)*/
+               p.ref ref
+              FROM opldok p, accounts a, oper o
+              WHERE p.fdat between Dat1_ and Dat_ 
+                and p.acc = a.acc 
+                and a.nbs like '100%' 
+                and a.kv NOT IN (959, 961, 962, 964, 980)
+                and p.sos >= 4 
+                and p.ref = o.ref 
+                and o.sos = 5
+            )
+
       LOOP
-         if k.kv NOT IN (959, 961, 962, 964, 980) then
-             BEGIN
-                INSERT INTO operw (REF, tag, VALUE)
-                     VALUES (k.REF, 'KOD_N', '0000000');
-             EXCEPTION
-                WHEN OTHERS
-                THEN
-                   NULL;
-             END;
+         BEGIN
+            INSERT INTO operw (REF, tag, VALUE)
+                 VALUES (k.REF, 'KOD_N', '0000000');
+         EXCEPTION
+            WHEN OTHERS
+            THEN
+               NULL;
+         END;
 
-             kod_g_ := NULL;
-             kod_g_pb1 := NULL;
+         kod_g_ := NULL;
+         kod_g_pb1 := NULL;
 
-             FOR z IN (SELECT *
-                         FROM operw
-                        WHERE REF = k.REF)
-             LOOP
-                -- с 01.08.2012 добавляется код страны отправителя или получателя перевода
-                IF     z.tag LIKE 'n%'
-                   AND SUBSTR (TRIM (z.VALUE), 1, 1) IN ('O', 'P', 'О', 'П')
-                THEN
-                   kod_g_ := SUBSTR (TRIM (z.VALUE), 2, 3);
-                END IF;
+         FOR z IN (SELECT *
+                     FROM operw
+                    WHERE REF = k.REF)
+         LOOP
+            -- с 01.08.2012 добавляется код страны отправителя или получателя перевода
+            IF     z.tag LIKE 'n%'
+               AND SUBSTR (TRIM (z.VALUE), 1, 1) IN ('O', 'P', 'О', 'П')
+            THEN
+               kod_g_ := SUBSTR (TRIM (z.VALUE), 2, 3);
+            END IF;
 
-                IF     kod_g_ IS NULL
-                   AND z.tag LIKE 'n%'
-                   AND SUBSTR (TRIM (z.VALUE), 1, 1) NOT IN
-                          ('O', 'P', 'О', 'П')
-                THEN
-                   kod_g_ := SUBSTR (TRIM (z.VALUE), 1, 3);
-                END IF;
+            IF     kod_g_ IS NULL
+               AND z.tag LIKE 'n%'
+               AND SUBSTR (TRIM (z.VALUE), 1, 1) NOT IN
+                      ('O', 'P', 'О', 'П')
+            THEN
+               kod_g_ := SUBSTR (TRIM (z.VALUE), 1, 3);
+            END IF;
 
-                IF     kod_g_ IS NULL
-                   AND z.tag LIKE 'D6#70%'
-                   AND SUBSTR (TRIM (z.VALUE), 1, 1) IN ('O', 'P', 'О', 'П')
-                THEN
-                   kod_g_ := SUBSTR (TRIM (z.VALUE), 2, 3);
-                END IF;
+            IF     kod_g_ IS NULL
+               AND z.tag LIKE 'D6#70%'
+               AND SUBSTR (TRIM (z.VALUE), 1, 1) IN ('O', 'P', 'О', 'П')
+            THEN
+               kod_g_ := SUBSTR (TRIM (z.VALUE), 2, 3);
+            END IF;
 
-                IF     kod_g_ IS NULL
-                   AND z.tag LIKE 'D6#70%'
-                   AND SUBSTR (TRIM (z.VALUE), 1, 1) NOT IN
-                          ('O', 'P', 'О', 'П')
-                THEN
-                   kod_g_ := SUBSTR (TRIM (z.VALUE), 1, 3);
-                END IF;
+            IF     kod_g_ IS NULL
+               AND z.tag LIKE 'D6#70%'
+               AND SUBSTR (TRIM (z.VALUE), 1, 1) NOT IN
+                      ('O', 'P', 'О', 'П')
+            THEN
+               kod_g_ := SUBSTR (TRIM (z.VALUE), 1, 3);
+            END IF;
 
-                IF     kod_g_ IS NULL
-                   AND z.tag LIKE 'D6#E2%'
-                   AND SUBSTR (TRIM (z.VALUE), 1, 1) IN ('O', 'P', 'О', 'П')
-                THEN
-                   kod_g_ := SUBSTR (TRIM (z.VALUE), 2, 3);
-                END IF;
+            IF     kod_g_ IS NULL
+               AND z.tag LIKE 'D6#E2%'
+               AND SUBSTR (TRIM (z.VALUE), 1, 1) IN ('O', 'P', 'О', 'П')
+            THEN
+               kod_g_ := SUBSTR (TRIM (z.VALUE), 2, 3);
+            END IF;
 
-                IF     kod_g_ IS NULL
-                   AND z.tag LIKE 'D6#E2%'
-                   AND SUBSTR (TRIM (z.VALUE), 1, 1) NOT IN
-                          ('O', 'P', 'О', 'П')
-                THEN
-                   kod_g_ := SUBSTR (TRIM (z.VALUE), 1, 3);
-                END IF;
+            IF     kod_g_ IS NULL
+               AND z.tag LIKE 'D6#E2%'
+               AND SUBSTR (TRIM (z.VALUE), 1, 1) NOT IN
+                      ('O', 'P', 'О', 'П')
+            THEN
+               kod_g_ := SUBSTR (TRIM (z.VALUE), 1, 3);
+            END IF;
 
-                IF     kod_g_ IS NULL
-                   AND z.tag LIKE 'D1#E9%'
-                   AND SUBSTR (TRIM (z.VALUE), 1, 1) IN ('O', 'P', 'О', 'П')
-                THEN
-                   kod_g_ := SUBSTR (TRIM (z.VALUE), 2, 3);
-                END IF;
+            IF     kod_g_ IS NULL
+               AND z.tag LIKE 'D1#E9%'
+               AND SUBSTR (TRIM (z.VALUE), 1, 1) IN ('O', 'P', 'О', 'П')
+            THEN
+               kod_g_ := SUBSTR (TRIM (z.VALUE), 2, 3);
+            END IF;
 
-                IF     kod_g_ IS NULL
-                   AND z.tag LIKE 'D1#E9%'
-                   AND SUBSTR (TRIM (z.VALUE), 1, 1) NOT IN
-                          ('O', 'P', 'О', 'П')
-                THEN
-                   kod_g_ := SUBSTR (TRIM (z.VALUE), 1, 3);
-                END IF;
+            IF     kod_g_ IS NULL
+               AND z.tag LIKE 'D1#E9%'
+               AND SUBSTR (TRIM (z.VALUE), 1, 1) NOT IN
+                      ('O', 'P', 'О', 'П')
+            THEN
+               kod_g_ := SUBSTR (TRIM (z.VALUE), 1, 3);
+            END IF;
 
-                IF kod_g_ IS NULL AND z.tag LIKE 'F1%'
-                THEN
-                   kod_g_ := SUBSTR (TRIM (z.VALUE), 8, 3);
-                END IF;
+            IF kod_g_ IS NULL AND z.tag LIKE 'F1%'
+            THEN
+               kod_g_ := SUBSTR (TRIM (z.VALUE), 8, 3);
+            END IF;
 
-                IF kod_g_ IS NULL AND z.tag = 'KOD_G'
-                THEN
-                   kod_g_pb1 := SUBSTR (TRIM (z.VALUE), 1, 3);
-                END IF;
-             END LOOP;
+            IF kod_g_ IS NULL AND z.tag = 'KOD_G'
+            THEN
+               kod_g_pb1 := SUBSTR (TRIM (z.VALUE), 1, 3);
+            END IF;
+         END LOOP;
 
-             IF kod_g_ IS NULL AND kod_g_pb1 IS NOT NULL
-             THEN
-                kod_g_ := kod_g_pb1;
-             END IF;
+         IF kod_g_ IS NULL AND kod_g_pb1 IS NOT NULL
+         THEN
+            kod_g_ := kod_g_pb1;
+         END IF;
 
-             BEGIN
-                INSERT INTO operw (REF, tag, VALUE)
-                     VALUES (k.REF, 'KOD_G', kod_g_);
-             EXCEPTION
-                WHEN OTHERS
-                THEN
-                   UPDATE operw a
-                      SET a.VALUE = kod_g_
-                    WHERE a.tag = 'KOD_G' AND a.REF = k.REF;
-             END;
+         BEGIN
+            INSERT INTO operw (REF, tag, VALUE)
+                 VALUES (k.REF, 'KOD_G', kod_g_);
+         EXCEPTION
+            WHEN OTHERS
+            THEN
+               UPDATE operw a
+                  SET a.VALUE = kod_g_
+                WHERE a.tag = 'KOD_G' AND a.REF = k.REF;
+         END;
 
-             BEGIN
-                INSERT INTO operw (REF, tag, VALUE)
-                     VALUES (k.REF, 'KOD_B', '000');
-             EXCEPTION
-                WHEN OTHERS
-                THEN
-                   NULL;
-             END;
+         BEGIN
+            INSERT INTO operw (REF, tag, VALUE)
+                 VALUES (k.REF, 'KOD_B', '000');
+         EXCEPTION
+            WHEN OTHERS
+            THEN
+               NULL;
+         END;
 
-             UPDATE operw a
-                SET a.VALUE = '804'
-              WHERE     a.tag = 'KOD_G'
-                    AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) = '000')
-                    AND a.REF = k.REF;
+         UPDATE operw a
+            SET a.VALUE = '804'
+          WHERE     a.tag = 'KOD_G'
+                AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) = '000')
+                AND a.REF = k.REF;
 
-             UPDATE operw a
-                SET a.VALUE = '6'
-              WHERE     a.tag = 'KOD_B'
-                    AND (   TRIM (a.VALUE) IS NULL
-                         OR TRIM (a.VALUE) = '000'
-                         OR TRIM (a.VALUE) = '25')
-                    AND a.REF = k.REF;
-         end if;
+         UPDATE operw a
+            SET a.VALUE = '6'
+          WHERE     a.tag = 'KOD_B'
+                AND (   TRIM (a.VALUE) IS NULL
+                     OR TRIM (a.VALUE) = '000'
+                     OR TRIM (a.VALUE) = '4'
+                     OR TRIM (a.VALUE) = '25')
+                AND a.REF = k.REF;
+      END LOOP;
+
+      FOR k
+         IN (  SELECT /*+parallel (8) */
+                      p.pdat pdat,
+                      od.fdat fdat,
+                      od.REF REF,
+                      decode(od.dk, 0, od.tt, ok.tt) tt,
+                      od.acc accd,
+                      p.nam_a name_a,
+                      ad.nls nlsd,
+                      p.kv kv,
+                      ak.acc acck,
+                      p.nam_b name_b,
+                      ak.nls nlsk,
+                      p.nazn nazn,
+                      p.tt tt1, 
+                      p.s s
+               from opldok od, accounts ad, opldok ok, accounts ak, oper p
+               where od.fdat between dat1_ and dat_ and
+                     od.acc = ad.acc and
+                     od.DK = 0 and
+                     ( regexp_like(ad.NLS,'^(100)') OR regexp_like(ak.NLS,'^(100)') ) and 
+                     --(ad.nls LIKE '100%' OR ak.nls LIKE '100%')and
+                     ad.kv not like '980%' and
+                     od.ref = ok.ref and
+                     od.stmt = ok.stmt and
+                     ok.fdat between dat1_ and dat_ and
+                     ok.acc = ak.acc and
+                     ok.DK = 1 and
+                     od.ref = p.ref and 
+                     p.sos = 5
+            )
+
+      LOOP
 
          BEGIN
             SELECT SUBSTR (TRIM (VALUE), 1, 1)
@@ -1106,9 +1142,9 @@ BEGIN
             AND ob22_ IN ('07', '10')
          THEN
             UPDATE operw a
-               SET a.VALUE = '2344001'
+               SET a.VALUE = '2343001'
              WHERE     a.tag = 'KOD_N'
-                   AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) <> '2344001')
+                   AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) <> '2343001')
                    AND a.REF = k.REF;
          END IF;
 
@@ -1153,6 +1189,28 @@ BEGIN
              WHERE     a.tag = 'KOD_N'
                    AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) <> '8445002')
                    AND a.REF = k.REF;
+
+            -- определяем код банка по проводке Дт 1811 Кт 3739 в этот же день
+            begin
+               select trim(w.value)
+                  into bank_
+               from provodki_otc o, operw w
+               where o.fdat = k.fdat
+                 and o.nlsd like k.nlsk || '%'
+                 and o.nlsk like '3739%'
+                 and o.s*100 = k.s
+                 and o.ref = w.ref(+)
+                 and w.tag(+) like 'KOD_B%';
+
+               UPDATE operw a
+                  SET a.VALUE = bank_
+                WHERE  a.tag = 'KOD_B'
+                   AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) <> bank_)
+                   AND a.REF = k.REF;
+            exception when no_data_found then
+               null;
+            end;
+            
          END IF;
 
          -- куплено IВ у iншого банку-резидента
@@ -1861,8 +1919,7 @@ BEGIN
       END IF;
 
       FOR k
-         IN (  SELECT /*+ index(o, IDX_OPLDOK_KF_FDAT_ACC) */
-                      o.REF,
+         IN (  SELECT o.REF,
                       o.TT TT,
                       o.FDAT,
                       o.DK,
@@ -2609,6 +2666,7 @@ BEGIN
                     INTO ref_mmv, dat_mmv
                     FROM provodki_otc
                    WHERE     REF = ref_m37
+                         AND fdat BETWEEN Dat1_ AND Dat_+3
                          AND kv = g.kv
                          AND nlsd = g.nls
                          AND ROWNUM = 1;

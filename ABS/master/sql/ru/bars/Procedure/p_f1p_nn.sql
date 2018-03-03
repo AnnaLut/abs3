@@ -7,17 +7,31 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_F1P_NN ***
 
-  CREATE OR REPLACE PROCEDURE BARS.P_F1P_NN (dat_      DATE,
+CREATE OR REPLACE PROCEDURE BARS.P_F1P_NN (dat_      DATE,
                                            sheme_    VARCHAR2 DEFAULT 'D')
 IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Процедура формирования файла 1P (ПБ-1)
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 22/09/2016 (06/09/2016, 05/07/2016)
+% VERSION     :    01/03/2018 (02/02/2018, 09/06/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+01/03/2018 - для проводок Дт 100* Кт 3800 будет формироваться код 2343001
+02/02/2018 - для проводок Дт 100 Кт 1811 будем изменять код банка (KOD_B)
+             заполняем по проводке Дт 1811 Кт 3739 
+08/06/2017 - добавил parallel (8) для блока заполнения доп.реквизитов
+06/06/2017 - изменил VIEW PROVODKI_OTC на OPLDOK для заполнения в OPERW 
+             доп.параметров KOD_N, KOD_B, KOD_G
+25/04/2017 - добавлено обработку поля ID_B из VIEW PROVODKI_OTC
+             (во VIEW PROVODKI_OTC добавлено поле ID_B из OPER)
+09/12/2016 - для бал.счета 1500 изменяем значение показателя 03 на значение
+             показателя 07 (не обрабатываем значение 6, 777)
+             и значение 999 изменяем на 6 
+17/11/2016 - дополнительно выполняется перекодировка для полей NAM_A, NAM_B
+16/11/2016 - в наименовании контрагентов изменяем символ '<<' или  '>>'
+             на символ '"' т.к. перекодировка в DOS непонятна
 22/09/2016 - при списании со счетов '2700','2701','2706','2708','3548',
                                     '3660','3666','3668','1624','1626' 
                                     '1628' ,'37397005523','3739401901' 
@@ -43,40 +57,6 @@ IS
              где Дт 3739 Кт 2600 (2603) - (предложение ГОУ)
 21.04.2016 - для коррсчетов будем отбирать банковские металлы
              для бал.счета 1600 всегда формируем показатель 07 
-28.12.2015 - для Дт 2600 добавлено название клиента ЦПЗ (Укрпошта) 
-24.11.2015 - для Дт 2600(и название клиента Укрпошта или УДППЗ) Кт 100*
-             и назначение похож на "%в_дрядження%"
-             будет формироваться код 23120002  (замечание ГОУ)
-19.11.2015 - для кода 05 значение показателя добавляется до 10 символов
-16.11.2015 - код страны для кода 2343 выбираем из TABVAL поле COUNTRY
-13.11.2015 - для кодов 8443, 8444, 8445 не формируем код банка 4
-12.11.2015 - для кодов 2311, 8427, 8428 не формируем код государства 804
-03.11.2015 - вместо VIEW V_CIM_1PB_DOC будем использовать таблицу
-             CIM_1PB_RU_DOC
-23.10.2015 - не будем изменять коды назначений если значение не '0000000'
-19.10.2015 - для декларирования используем VIEW V_CIM_1PB_DOC
-07.10.2015 - для Дт 2600(УДППЗ - Укрпошта) Кт 100* и "видача підкріплень"
-             будет формироваться код 8446018 вместо 23120002
-             (замечание Черниговского РУ)
-02.10.2015 - для значения показателя DD='07' слева добавляются пробелы
-             до 3-х символов
-01.10.2015 - добавлено заполнение KOD_N = 8445002 для проводок
-             Дт 1002 Кт 1911 (OB22='00','01') (отримання підкріплення)
-             добавлено заполнение KOD_N = 8446008 для проводок
-             Дт 2600,2604 Кт 100* (видача ЧЕКУ)
-             добавлены переводы Золота корона 2809(OB22=36), 2909(OB22=79)
-28.09.2015 - удалены ненужные строки
-24.09.2015 - добавлено декларирование для кассы если сумма >= 1 000 000 00
-23.09.2015 - для кодов 2311,2343,8427,8428 заполняем код банка 4
-             (будет перекодирован в 6)
-             Не будут включаться анулированные переводы
-21.09.2015 - в курсоре BASEL в сортировке изменил число 28 на 27 т.к.
-             28 символ это уже код NNN
-18.09.2015 - для проводок Дт 1500 Кт 3739 которые декларируются будем
-             искать проводку за этот же день где Дт 3739 Кт 2600 (2603)
-             (предложение ГОУ)
-14.09.2015 - для декларирования вместо поля NMK будем выбирать поле NMKK
-15.07.2015 - новый файл 1P (ПБ-1)   с 01.09.2015
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
    kodf_       VARCHAR2 (2) := '1P';
    kodp_       VARCHAR2 (33);
@@ -121,7 +101,6 @@ IS
    mfou_       NUMBER;
    kor_        VARCHAR2 (4);
    ob22_       VARCHAR2 (2);
-   nlsd_       VARCHAR2 (3);
    rezid_      NUMBER;
    rezid_o     VARCHAR2 (1);
 
@@ -245,14 +224,19 @@ BEGIN
 
    IF mfou_ = 300465 AND mfou_ != mfo_g
    THEN
-      nlsd_ := '100';
-
       FOR k
-         IN (SELECT p.REF REF
-               FROM provodki_otc p
-              WHERE     p.fdat BETWEEN Dat1_ AND Dat_
-                    AND p.kv NOT IN (959, 961, 962, 964, 980)
-                    AND (p.nlsd LIKE nlsd_ || '%' OR p.nlsk LIKE nlsd_ || '%'))
+         IN ( select /*+parallel(a)*/
+               p.ref ref
+              FROM opldok p, accounts a, oper o
+              WHERE p.fdat between Dat1_ and Dat_ 
+                and p.acc = a.acc 
+                and a.nbs like '100%' 
+                and a.kv NOT IN (959, 961, 962, 964, 980)
+                and p.sos >= 4 
+                and p.ref = o.ref 
+                and o.sos = 5
+            )
+
       LOOP
          BEGIN
             INSERT INTO operw (REF, tag, VALUE)
@@ -377,30 +361,45 @@ BEGIN
           WHERE     a.tag = 'KOD_B'
                 AND (   TRIM (a.VALUE) IS NULL
                      OR TRIM (a.VALUE) = '000'
+                     OR TRIM (a.VALUE) = '4'
                      OR TRIM (a.VALUE) = '25')
                 AND a.REF = k.REF;
       END LOOP;
 
       FOR k
-         IN (  SELECT p.pdat pdat,
-                      p.fdat fdat,
-                      p.REF REF,
-                      p.tt tt,
-                      p.accd accd,
+         IN (  SELECT /*+parallel (8) */
+                      p.pdat pdat,
+                      od.fdat fdat,
+                      od.REF REF,
+                      decode(od.dk, 0, od.tt, ok.tt) tt,
+                      od.acc accd,
                       p.nam_a name_a,
-                      p.nlsd nlsd,
+                      ad.nls nlsd,
                       p.kv kv,
-                      p.acck acck,
+                      ak.acc acck,
                       p.nam_b name_b,
-                      p.nlsk nlsk,
+                      ak.nls nlsk,
                       p.nazn nazn,
-                      p.ptt tt1
-                 FROM provodki_otc p
-                WHERE     p.fdat BETWEEN Dat1_ AND Dat_
-                      AND p.kv <> 980
-                      AND (p.nlsd LIKE nlsd_ || '%' OR p.nlsk LIKE nlsd_ || '%')
-             ORDER BY 1, 2, 3)
+                      p.tt tt1, 
+                      p.s s
+               from opldok od, accounts ad, opldok ok, accounts ak, oper p
+               where od.fdat between dat1_ and dat_ and
+                     od.acc = ad.acc and
+                     od.DK = 0 and
+                     ( regexp_like(ad.NLS,'^(100)') OR regexp_like(ak.NLS,'^(100)') ) and 
+                     --(ad.nls LIKE '100%' OR ak.nls LIKE '100%')and
+                     ad.kv not like '980%' and
+                     od.ref = ok.ref and
+                     od.stmt = ok.stmt and
+                     ok.fdat between dat1_ and dat_ and
+                     ok.acc = ak.acc and
+                     ok.DK = 1 and
+                     od.ref = p.ref and 
+                     p.sos = 5
+            )
+
       LOOP
+
          BEGIN
             SELECT SUBSTR (TRIM (VALUE), 1, 1)
               INTO rezid_o
@@ -1143,9 +1142,9 @@ BEGIN
             AND ob22_ IN ('07', '10')
          THEN
             UPDATE operw a
-               SET a.VALUE = '2344001'
+               SET a.VALUE = '2343001'
              WHERE     a.tag = 'KOD_N'
-                   AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) <> '2344001')
+                   AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) <> '2343001')
                    AND a.REF = k.REF;
          END IF;
 
@@ -1190,6 +1189,28 @@ BEGIN
              WHERE     a.tag = 'KOD_N'
                    AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) <> '8445002')
                    AND a.REF = k.REF;
+
+            -- определяем код банка по проводке Дт 1811 Кт 3739 в этот же день
+            begin
+               select trim(w.value)
+                  into bank_
+               from provodki_otc o, operw w
+               where o.fdat = k.fdat
+                 and o.nlsd like k.nlsk || '%'
+                 and o.nlsk like '3739%'
+                 and o.s*100 = k.s
+                 and o.ref = w.ref(+)
+                 and w.tag(+) like 'KOD_B%';
+
+               UPDATE operw a
+                  SET a.VALUE = bank_
+                WHERE  a.tag = 'KOD_B'
+                   AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) <> bank_)
+                   AND a.REF = k.REF;
+            exception when no_data_found then
+               null;
+            end;
+            
          END IF;
 
          -- куплено IВ у iншого банку-резидента
@@ -1789,7 +1810,8 @@ BEGIN
       END LOOP;
    END IF;
 
-   our_okpo_ := SUBSTR (LPAD (f_get_params ('OUR_TOBO', NULL), 10, '0'), -10);
+   --our_okpo_ := SUBSTR (LPAD (f_get_params ('OUR_TOBO', NULL), 10, '0'), -10);
+   our_okpo_ := SUBSTR (LPAD (f_get_params ('OKPO', NULL), 10, '0'), -10);
 
    gl.param;
 
@@ -1830,7 +1852,7 @@ BEGIN
                  c.rnk RNK,
                  LPAD (TRIM (c.okpo), 10, '0') OKPO,
                  c.country COUNTRY,
-                 SUBSTR (c.nmk, 1, 47) NMK,
+                 SUBSTR (replace(replace(c.nmk, chr(171),'"'),chr(187),'"'), 1, 47) NMK,
                  t.LCV LCV,
                  a.NLS NLS,
                  NVL (fost (a.acc, dat_), 0) S2
@@ -1841,7 +1863,6 @@ BEGIN
                           AND gl.AMFO = 300001))
                  AND a.rnk = c.rnk
                  AND a.kv = t.kv
-                 --AND t.kv NOT IN (959, 961, 962, 964)
                  AND (c.codcagent = 2 OR c.rnk = 4001 AND gl.AMFO = 300001)
                  AND c.codcagent = 2
                  AND (a.dazs IS NULL OR a.dazs > dat1_)
@@ -1867,7 +1888,6 @@ BEGIN
                  AND t.kv NOT IN (980)  --959, 961, 962, 964,
                  AND (a.dazs IS NULL OR a.dazs > dat1_))
    LOOP
-      --nnn_ := nnn_ + 1;
       kor_ := g.KOR;
       rnk_ := g.rnk;
       nls_ := g.nls;
@@ -1911,10 +1931,12 @@ BEGIN
                       P.MFOA,
                       P.MFOB,
                       DECODE (P.MFOA, gl.amfo, P.ID_B, p.ID_A) ASP_K,
-                      DECODE (P.MFOA, gl.amfo, P.nam_b, p.nam_a) ASP_N,
+                      DECODE (P.MFOA, gl.amfo, replace(replace(p.nam_b, chr(171),'"'),chr(187),'"'), 
+                                               replace(replace(p.nam_a, chr(171),'"'),chr(187),'"') ) ASP_N,
                       DECODE (o.dk, 0, '6', '5') kod_e,
                       p.kv,
-                      p.vdat
+                      p.vdat,
+                      p.tt ptt
                  FROM opldok o, oper p
                 WHERE     o.tt NOT IN ('BAK')
                       AND o.acc = g.ACC
@@ -1960,7 +1982,7 @@ BEGIN
          IF k.tt IN ('VPF', 'MVQ', 'MUQ')
          THEN
             BEGIN
-               SELECT TRIM (VALUE)
+               SELECT substr(TRIM (VALUE), 1, 7)
                  INTO kod1_
                  FROM operw
                 WHERE REF = k.REF AND tag = '73' || k.tt;
@@ -1978,6 +2000,24 @@ BEGIN
             END;
          END IF;
 
+         if k.ptt = '045' then 
+            if k.kv = 978 then
+               coun_ := '000';
+            else
+                begin
+                    select max(nvl(trim(k040), '000'))
+                    into coun_
+                    from kl_r030
+                    where d_open <= k.fdat and
+                         (d_close is null or d_close > k.fdat) and
+                          r030 = lpad(k.kv, 3, '0');
+                exception
+                    when no_data_found then
+                        null;
+                end;
+            end if;
+         end if;
+         
          IF mfou_ = 300465 AND k.tt IN ('151') AND kod7_ <> '8446018'
          THEN
             kod7_ := '8446018';
@@ -2125,24 +2165,15 @@ BEGIN
                                         FROM operw
                                        WHERE REF = k.REF AND tag = 'NOS_R')) c;
 
-               -- кто корреспондент по корсчету
-               -- deb.trace( 13, 'NBS', sNBSk_ );
-               -- deb.trace( 14, 'KL', KL_);
-
                IF sNBSk_ = KL_ 
                THEN
                   -- клиент нашего банка
-                  --select decode(c.custtype,2,'U',
-                  --       decode(c.sed,91,'S','F')) || sm_ ||
-                  --       c.okpo || sm_ ||
-                  --       decode(c.custtype,2,c.nmk,' ')
-                  --   into DECL_
                   SELECT DECODE (c.custtype,
                                  1, 'U',
                                  2, 'U',
                                  DECODE (c.sed, 91, 'S', 'F')),
                          c.okpo,
-                         DECODE (c.custtype, 2, SUBSTR (c.nmkk, 1, 38), ' ')
+                         DECODE (c.custtype, 2, SUBSTR (replace(replace(c.nmkk, chr(171),'"'),chr(187),'"'), 1, 38), ' ')
                     INTO asp_S_, asp_K_, asp_N_
                     FROM customer c, cust_acc u
                    WHERE     c.codcagent IN (2, 3, 5)
@@ -2150,9 +2181,6 @@ BEGIN
                          AND u.rnk = c.rnk
                          AND ROWNUM = 1;
 
-                  -- deb.trace( 15, 'DECL_', DECL_ );
-
-                  --OPER_ := substr(sm_ || OPER_ || sm_ || bank_pb1 || sm_ || DECL_,1,110) ;
                   OPER_ :=
                      SUBSTR (
                            sm_
@@ -2237,20 +2265,19 @@ BEGIN
                   AND K.mfoa = K.mfob
                THEN
                   BEGIN
-                     SELECT P.ID_B, c.nmkk
+                     SELECT P.ID_B, replace(replace(c.nmkk, chr(171),'"'),chr(187),'"')
                        INTO ASP_K_, ASP_N_
-                       FROM oper p, customer c
-                      WHERE     p.tt NOT IN ('BAK')
-                            AND p.sos = 5
-                            AND p.kv = k.kv
-                            AND p.nlsa = k.nlsb
-                            AND p.vdat between k.vdat and k.vdat + 3  --dat_next_u(k.vdat, 1) -- k.vdat
-                            AND p.s = k.s
-                            --and p.nazn like k.nazn || '%'
-                            AND p.nlsb LIKE '260%'
-                            AND ROWNUM = 1
-                            AND TRIM (p.id_b) = TRIM (c.okpo);
-
+                     from provodki_otc p, customer c
+                     where p.vdat between k.vdat and k.vdat + 3                      
+                       AND p.tt NOT IN ('BAK')
+                       AND p.kv = k.kv
+                       AND p.nlsd = k.nlsb
+                       AND p.s * 100 =  k.s
+                       AND p.nlsk LIKE '260%'
+                       and p.rnkk = c.rnk
+                       AND ROWNUM = 1
+                       AND TRIM (p.id_b) = TRIM (c.okpo); 
+                       
                      asp_S_ :=
                         IIF_S (TO_CHAR (LENGTH (asp_K_)),
                                '8',
@@ -2292,9 +2319,9 @@ BEGIN
                   EXCEPTION
                      WHEN NO_DATA_FOUND
                      THEN
-                        ASP_K_ := '0000000000'; 
-                        ASP_N_ := 'XXXXXXXXXX';
-                        asp_S_ := 'U';
+                  ASP_K_ := '0000000000'; 
+                  ASP_N_ := 'XXXXXXXXXX';
+                  asp_S_ := 'U';
                         --NULL;
                   END;
                END IF;
@@ -2310,7 +2337,7 @@ BEGIN
                -- с 03.11.2015 выборка всех реквизитов для декларирования
                -- будет из CIM_1PB_RU_DOC
                BEGIN
-                  SELECT p.cl_type, p.cl_ipn, p.cl_name
+                  SELECT p.cl_type, p.cl_ipn, replace(replace(p.cl_name, chr(171),'"'),chr(187),'"')
                     INTO ASP_S_, ASP_K_, ASP_N_
                     FROM cim_1pb_ru_doc p
                    WHERE p.ref_ca = k.REF AND p.kv = k.kv AND p.vdat = k.vdat;
@@ -2376,7 +2403,7 @@ BEGIN
                then
                   p_ins (kodp_, LPAD (TO_CHAR (bank_), 3, ' '));
                else 
-                  p_ins (kodp_, LPAD (TO_CHAR (glb_), 3, ' '));      --bank_pb1);
+                  p_ins (kodp_, LPAD (TO_CHAR (glb_), 3, ' '));      
                end if;
 
                -- код DD=04 код типу-клієнта
@@ -2391,7 +2418,7 @@ BEGIN
                   || LPAD (coun_, 3, '0')
                   || LPAD (TO_CHAR (nnn1_), 3, '0');
 
-               p_ins (kodp_, asp_S_);                                --g.tk );
+               p_ins (kodp_, asp_S_);                                
 
                -- код DD=05 код за ЄДРПОУ (ДРФО) умовний номер
                kodp_ :=
@@ -2405,8 +2432,8 @@ BEGIN
                   || LPAD (coun_, 3, '0')
                   || LPAD (TO_CHAR (nnn1_), 3, '0');
 
-               p_ins (kodp_, LPAD (TRIM (asp_K_), 10, '0'));       --g.okpo );
-
+               p_ins (kodp_, LPAD (TRIM (asp_K_), 10, '0'));       
+               
                -- код DD=06 назва клієнта
                if asp_S_ in ('F','S') 
                then
@@ -2423,7 +2450,7 @@ BEGIN
                   || LPAD (coun_, 3, '0')
                   || LPAD (TO_CHAR (nnn1_), 3, '0');
 
-               p_ins (kodp_, asp_N_);                               --g.nmk );
+               p_ins (kodp_, asp_N_);                               
             END IF;
 
             -- код DD=10 назва банка-кореспондента
@@ -2446,6 +2473,7 @@ BEGIN
                    '1551',
                    '1721',
                    '1751',
+                   '2443',
                    '2611',
                    '2625',
                    '2627',
@@ -2538,6 +2566,7 @@ BEGIN
                    '1551',
                    '1721',
                    '1751',
+                   '2443',
                    '2611',
                    '2625',
                    '2627',
@@ -2637,6 +2666,7 @@ BEGIN
                     INTO ref_mmv, dat_mmv
                     FROM provodki_otc
                    WHERE     REF = ref_m37
+                         AND fdat BETWEEN Dat1_ AND Dat_+3
                          AND kv = g.kv
                          AND nlsd = g.nls
                          AND ROWNUM = 1;
@@ -2698,7 +2728,7 @@ BEGIN
             || LPAD (TO_CHAR (g.kv), 3, '0')
             || kod2_
             || LPAD (coun_, 3, '0')
-            || '000';                           --lpad(to_char(nnn_), 3, '0');
+            || '000';                           
 
          p_ins (kodp_, TO_CHAR (ABS (s2_)));
       ELSE
@@ -2714,7 +2744,7 @@ BEGIN
             || LPAD (TO_CHAR (g.kv), 3, '0')
             || kod2_
             || LPAD (coun_, 3, '0')
-            || '000';                           --lpad(to_char(nnn_), 3, '0');
+            || '000';                           
 
          p_ins (kodp_, TO_CHAR (s2_));
       END IF;
@@ -2729,7 +2759,7 @@ BEGIN
          || LPAD (TO_CHAR (g.kv), 3, '0')
          || kod2_
          || LPAD (coun_, 3, '0')
-         || '000';                              --lpad(to_char(nnn_), 3, '0');
+         || '000';                              
 
       p_ins (kodp_, g.nmk);
    END LOOP;
@@ -2738,29 +2768,30 @@ BEGIN
    DELETE FROM tmp_nbu
          WHERE kodf = kodf_ AND datf = dat_;
 
-   ----------------------------------------------------
-   -- изменение кода банка со значения для 1-ПБ на значение для #1P
-   --UPDATE rnbu_trace a
-   --   SET a.znap =
-   --          (SELECT LPAD (TRIM (b.regnum_n), 3, ' ')
-   --             FROM bopbank b
-   --            WHERE TRIM (a.znap) = TRIM (b.regnum))
-   -- WHERE a.kodp LIKE '07%' AND TRIM (a.znap) IS NOT NULL;
-
-   -- дополнительно для бал.счета 1600 и кода показателя 03 изменяем код банка
-   --UPDATE rnbu_trace a
-   --   SET a.znap =
-   --          (SELECT LPAD (TRIM (b.regnum_n), 3, ' ')
-   --             FROM bopbank b
-   --            WHERE TRIM (a.znap) = TRIM (b.regnum))
-   -- WHERE a.kodp LIKE '03%' 
-   --   AND substr(a.kodp, 17, 4) = '1600' 
-   --   AND TRIM (a.znap) IS NOT NULL;
-
    UPDATE rnbu_trace a
       SET a.znap = '777'
     WHERE a.kodp LIKE '07%' AND TRIM (a.znap) IS NULL;
 
+--------------------------------------------------------------------------
+   -- 08/12/2016 
+   -- дополнительно для бал.счета 1500 в кода показателя 03 изменяем код банка
+   -- на такое значение как в показателе 07 (для значения 999 меняем на 6) 
+   FOR k IN ( SELECT kodp, DECODE(TRIM(znap), '999', '6', trim(znap)) znap, REF
+              FROM rnbu_trace
+              WHERE kodp LIKE '07%' 
+                AND SUBSTR (kodp, 17, 4) = '1500'  
+                AND TRIM(znap) not in ('6', '777')
+              ORDER BY 1, 2, 3
+            )
+   LOOP
+
+         UPDATE rnbu_trace
+            SET znap = k.znap
+          WHERE kodp like '03%' 
+            and substr(kodp,3) = substr(k.kodp,3)  
+            and REF = k.REF;
+   END LOOP;
+--------------------------------------------------------------------------
    DELETE FROM rnbu_trace
          WHERE     kodp LIKE '07%'
                AND SUBSTR (kodp, 24, 4) IN ('2314', '2343')
@@ -2804,11 +2835,10 @@ BEGIN
    delete from rnbu_trace 
    where kodp like '07%'
      and substr(kodp, 24, 4) IN ('1221', '1251', '1551', '1721', '1751',
-                                 '2611', '2625', '2627', '2673', '2853',
-                                 '2869', '2871', '3461', '3592'
+                                 '2443', '2611', '2625', '2627', '2673', 
+                                 '2853', '2869', '2871', '3461', '3592'
                                 )
      and substr(kodp, 17, 4) <> '1600';
-
 
    OPEN basel;
 
@@ -2831,11 +2861,13 @@ BEGIN
                INSERT INTO tmp_nbu (kodf,
                                     datf,
                                     kodp,
-                                    znap)
+                                    znap,
+                                    nbuc)
                     VALUES (kodf_,
                             dat_,
                             kodp_,
-                            znap_);
+                            znap_,
+                            nbuc_);
             END IF;
          END IF;
       EXCEPTION
@@ -2865,7 +2897,7 @@ BEGIN
                       0)
                       p80
               FROM rnbu_trace
-             WHERE SUBSTR (kodp, 1, 2) IN ('99')  -- SUBSTR (kodp, 1, 3) IN ('715', '716')
+             WHERE SUBSTR (kodp, 1, 2) IN ('99')  
           ORDER BY SUBSTR (kodp, 3, 28),
                    SUBSTR (kodp, 31),
                    SUBSTR (kodp, 1, 2))
@@ -2885,11 +2917,13 @@ BEGIN
                INSERT INTO tmp_nbu (kodf,
                                     datf,
                                     kodp,
-                                    znap)
+                                    znap,
+                                    nbuc)
                     VALUES (kodf_,
                             dat_,
                             kodp_,
-                            k.p80);
+                            k.p80,
+                            nbuc_);
             END IF;
          END IF;
       EXCEPTION
@@ -2910,14 +2944,14 @@ BEGIN
                dat_,
                kodp,
                SUM (NVL (znap, '0')),
-               nbuc
+               nbuc_
           FROM rnbu_trace
          WHERE SUBSTR (kodp, 1, 2) NOT IN
                   ('03', '04', '05', '06', '07', '10', '80', '99') 
       GROUP BY kodf_,
                dat_,
                kodp,
-               nbuc;
+               nbuc_;
 
    logger.info ('P_F1P_NN : End ');
 END p_f1p_nn;
@@ -2925,6 +2959,7 @@ END p_f1p_nn;
 show err;
 
 PROMPT *** Create  grants  P_F1P_NN ***
+grant EXECUTE                                                                on P_F1P_NN        to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on P_F1P_NN        to RPBN002;
 
 
