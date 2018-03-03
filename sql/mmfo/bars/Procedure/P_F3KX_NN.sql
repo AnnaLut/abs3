@@ -8,7 +8,7 @@ IS
 % DESCRIPTION :   Процедура формирования 3KX     для КБ (универсальная)
 % COPYRIGHT   :   Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :   v.18.001          01.03.2018
+% VERSION     :   v.18.002          03.03.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
       sheme_ - схема формирования
@@ -17,6 +17,7 @@ IS
                                  3 - всi операцii
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+03.03.2018  в протокол для консолидир.данных не заносятся параметры сделок/клиентов
 15.02.2018  по процедуре p_f70_nn  от  20.11.2017  для РУ
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
@@ -52,14 +53,15 @@ IS
 
    rfc1_          type_ref_curs;
    v_sql_      varchar2(2000);
-   f091_  varchar2(1);
-   r030_  number;
-   t071_  number;
-   k020_  varchar2(20);
-   k021_  varchar2(1);
-   q001_  varchar2(38);
-   q024_  varchar2(1);
-   d100_  varchar2(2);
+   f089_      varchar2(1);
+   f091_      varchar2(1);
+   r030_      number;
+   t071_      number;
+   k020_      varchar2(20);
+   k021_      varchar2(1);
+   q001_      varchar2(38);
+   q024_      varchar2(1);
+   d100_      varchar2(2);
    k_days_    number;
 -----------------------------
    ko_        varchar2(2);                  -- ознака операцii з безготiвковою iнвалютою
@@ -167,9 +169,16 @@ IS
    BEGIN
       l_kodp_ := p_kodp_ || LPAD (TO_CHAR (p_np_), 3, '0');
 
-      INSERT INTO rnbu_trace
-                ( nls, kv, odate, kodp, znap, nbuc, ref, rnk, comm, acc )
-         VALUES ( nls_, kv_, dat_, l_kodp_, p_znap_, nbuc_, ref_, rnk_, to_char(refd_), acc_ );
+      if f089_ ='2'  then
+        INSERT INTO rnbu_trace
+                  ( nls, kv, odate, kodp, znap, nbuc, ref, rnk, comm, acc )
+           VALUES ( nls_, kv_, dat_, l_kodp_, p_znap_, nbuc_, ref_, rnk_, to_char(refd_), acc_ );
+      else
+        INSERT INTO rnbu_trace
+                  ( nls, kv, odate, kodp, znap, nbuc, ref, rnk, comm, acc )
+           VALUES ( '', kv_, dat_, l_kodp_, p_znap_, nbuc_, 0, 0, 'консолідація', 0 );
+      end if;
+
    END;
 
 -------------------------------------------------------------------
@@ -739,6 +748,7 @@ BEGIN
 
                nnnn_ := nnnn_ + 1;
                sum0_ := sum0_ - NVL (sumk0_, 0);
+               f089_ := '2';                          --неконсолидированные данные
 
                if ko_ = 2
                then
@@ -875,30 +885,37 @@ BEGIN
          if  mfo_ =300465  and ko_='2' and nls_ ='2900205'
                                        and nlsk_='29003'
          then
+               f089_ :='1';
                p_ins (nnnn_, 'F091', '4');
                p_ins (nnnn_, 'R030', LPAD (kv_, 3,'0'));
                p_ins (nnnn_, 'T071', TO_CHAR (sum0_));
-               p_ins (nnnn_, 'K020', '0');
+               p_ins (nnnn_, 'K020', 'k');
                p_ins (nnnn_, 'K021', '#');
                p_ins (nnnn_, 'Q024', '2');
                p_ins (nnnn_, 'D100', '00');
                p_ins (nnnn_, 'S180', '#');
-               p_ins (nnnn_, 'F089', '1');
+               p_ins (nnnn_, 'F089', f089_);
                p_ins (nnnn_, 'F092', '216');
+
+               f089_ :='2';
 
          elsif mfo_ =322669  and ko_='2' and nls_ ='29008801905'
                                          and nlsk_ like '2900%'
          then
+               f089_ :='1';
                p_ins (nnnn_, 'F091', '4');
                p_ins (nnnn_, 'R030', LPAD (kv_, 3,'0'));
                p_ins (nnnn_, 'T071', TO_CHAR (sum0_));
-               p_ins (nnnn_, 'K020', '0');
+               p_ins (nnnn_, 'K020', 'k');
                p_ins (nnnn_, 'K021', '#');
                p_ins (nnnn_, 'Q024', '2');
                p_ins (nnnn_, 'D100', '00');
                p_ins (nnnn_, 'S180', '#');
-               p_ins (nnnn_, 'F089', '1');
+               p_ins (nnnn_, 'F089', f089_);
                p_ins (nnnn_, 'F092', '216');
+
+               f089_ :='2';
+
          else
 --               if (d6#70_ is null or d6#70_ <> '804') and ROUND (sum0_/dig_, 0) >= 1
                if  ROUND (sum0_/dig_, 0) >= 1
@@ -924,11 +941,6 @@ BEGIN
                      k021_ :='3';
                   end if;
 
-                  if nls_ like '2900205%' and nlsk_ like '29003%' then
-                     okpo_ := '0';
-                     k021_ := '#';
-                  end if;
-
 	          p_ins (nnnn_, 'K020', lpad(TRIM (okpo_),10,'0'));
 	          p_ins (nnnn_, 'K021', k021_);
                end if;
@@ -937,7 +949,7 @@ BEGIN
                p_ins (nnnn_, 'Q024', q024_);             -- тип контрагента
                p_ins (nnnn_, 'D100', '00');              -- код умов валютної операції
                p_ins (nnnn_, 'S180', '#');               -- строк валютної операції
-               p_ins (nnnn_, 'F089', '2');               -- консолідація
+               p_ins (nnnn_, 'F089', f089_);             -- консолідація
 
                n_ := 13;
                
@@ -1022,7 +1034,8 @@ BEGIN
 
    CLOSE c_main;
 
---   консолидация  операций  по rnbu_trace    операция 216
+   f089_ :='1';
+--   консолидация  операций  по rnbu_trace    операция 216 для клиентов
    for u in ( select f091, r030, f092, sum(t071) t071
                 from ( select *
                          from ( select substr(kodp,5,3) ekp_2,
@@ -1037,12 +1050,15 @@ BEGIN
                                                  'F089' as F089, 'F092' as F092, 
                                                  'Q003' as Q003, 'Q007' as Q007, 'Q006' as Q006 )
                               )   
-                        where f091 ='4' and f092 ='216' and k021='2'
-                          and gl.p_icurval (r030, t071, dat_)< kons_sum_
-                     )
+                        where  f091 ='4' and f092 ='216' and k021='2' and
+                               gl.p_icurval (r030, t071, dat_)< kons_sum_ 
+                             or
+                               f091 ='4' and f092 ='216' and k020 ='k' and k021 ='#' and f089 ='1' 
+                     )          
                group by f091, r030, f092
    ) loop
          nnnn_ := nnnn_+1;
+         kv_ := u.r030;
          p_ins (nnnn_, 'F091', u.f091);
          p_ins (nnnn_, 'R030', LPAD (u.r030, 3,'0'));
          p_ins (nnnn_, 'T071', TO_CHAR (u.t071 ));
@@ -1051,9 +1067,10 @@ BEGIN
          p_ins (nnnn_, 'Q024', '2');
          p_ins (nnnn_, 'D100', '00');
          p_ins (nnnn_, 'S180', '#');
-         p_ins (nnnn_, 'F089', '1');
+         p_ins (nnnn_, 'F089', f089_);
          p_ins (nnnn_, 'F092', '216');
    end loop;
+   f089_ :='2';
 
    delete from rnbu_trace
     where substr(kodp,5,3) in ( select ekp_2 from (select *
@@ -1068,8 +1085,10 @@ BEGIN
                                                  'F089' as F089, 'F092' as F092, 
                                                  'Q003' as Q003, 'Q007' as Q007, 'Q006' as Q006 )
                               )   
-                        where f091 ='4' and f092 ='216' and k021 ='2' and f089 ='2'
-                          and gl.p_icurval (r030, t071, dat_)< kons_sum_
+                        where  f091 ='4' and f092 ='216' and k021 ='2' and f089 ='2' and
+                               gl.p_icurval (r030, t071, dat_)< kons_sum_
+                             or
+                               f091 ='4' and f092 ='216' and k020 ='k' and k021 ='#' and f089 ='1' 
                      ));  
 
 --   операции из модуля FOREX
@@ -1161,7 +1180,7 @@ BEGIN
          else
             p_ins (nnnn_, 'S180', '#');
          end if;
-         p_ins (nnnn_, 'F089', '2');
+         p_ins (nnnn_, 'F089', f089_);
 
                    BEGIN
                       SELECT substr(value, 1,3)
@@ -1230,7 +1249,7 @@ BEGIN
          p_ins (nnnn_, 'Q024', '1');
          p_ins (nnnn_, 'D100', '01');
          p_ins (nnnn_, 'S180', '#');
-         p_ins (nnnn_, 'F089', '2');
+         p_ins (nnnn_, 'F089', f089_);
          if f091_ ='3'  then
             p_ins (nnnn_, 'F092', '164');
          else
