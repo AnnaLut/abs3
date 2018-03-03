@@ -1,10 +1,3 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS_DM/Table/DEPOSITS.sql =========*** Run *** =
-PROMPT ===================================================================================== 
-
-
 PROMPT *** Create  table DEPOSITS ***
 begin 
   execute immediate '
@@ -40,7 +33,9 @@ begin
 	BLKK NUMBER(3,0), 
 	CNT_DUBL NUMBER, 
 	ARCHDOC_ID NUMBER, 
-	WB CHAR(1)
+	WB CHAR(1),
+	ob22 varchar2(2),
+	nms varchar2(70)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -50,6 +45,21 @@ exception when others then
 end; 
 /
 
+prompt add ob22, nms
+begin
+    execute immediate q'[alter table bars_dm.deposits add ob22 varchar2(2)]';
+exception
+    when others then
+        if sqlcode = -1430 then null; else raise; end if;
+end;
+/
+begin
+    execute immediate q'[alter table bars_dm.deposits add nms varchar2(70)]';
+exception
+    when others then
+        if sqlcode = -1430 then null; else raise; end if;
+end;
+/
 
 COMMENT ON TABLE BARS_DM.DEPOSITS IS 'Депозити';
 COMMENT ON COLUMN BARS_DM.DEPOSITS.WB IS 'Ознака, що депозит відкрито в веб-банкінгу';
@@ -85,9 +95,6 @@ COMMENT ON COLUMN BARS_DM.DEPOSITS.BLKK IS 'Код блокування рахунку по кредиту';
 COMMENT ON COLUMN BARS_DM.DEPOSITS.CNT_DUBL IS 'Кількість пролонгацій';
 COMMENT ON COLUMN BARS_DM.DEPOSITS.ARCHDOC_ID IS 'Ідентифікатор депозитного договору в ЕАД';
 
-
-
-
 PROMPT *** Create  constraint CC_DEPOSITS_PERID_NN ***
 begin   
  execute immediate '
@@ -96,9 +103,6 @@ exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
-
-
-
 
 PROMPT *** Create  constraint CC_DEPOSITS_BRANCH_NN ***
 begin   
@@ -109,9 +113,6 @@ exception when others then
  end;
 /
 
-
-
-
 PROMPT *** Create  constraint CC_DEPOSITS_KF_NN ***
 begin   
  execute immediate '
@@ -121,9 +122,6 @@ exception when others then
  end;
 /
 
-
-
-
 PROMPT *** Create  constraint CC_DEPOSITS_RNK_NN ***
 begin   
  execute immediate '
@@ -132,9 +130,6 @@ exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
-
-
-
 
 PROMPT *** Create  index I_DEPOSITS_PERID ***
 begin   
@@ -147,16 +142,8 @@ exception when others then
  end;
 /
 
-
-
 PROMPT *** Create  grants  DEPOSITS ***
 grant SELECT                                                                 on DEPOSITS        to BARS;
 grant SELECT                                                                 on DEPOSITS        to BARSREADER_ROLE;
 grant SELECT                                                                 on DEPOSITS        to BARSUPL;
 grant SELECT                                                                 on DEPOSITS        to UPLD;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS_DM/Table/DEPOSITS.sql =========*** End *** =
-PROMPT ===================================================================================== 

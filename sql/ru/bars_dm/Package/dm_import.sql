@@ -245,7 +245,7 @@ show errors
 
 CREATE OR REPLACE PACKAGE BODY DM_IMPORT is
 
-  g_body_version constant varchar2(64) := 'Version 3.3.5 19/02/2018';
+  g_body_version constant varchar2(64) := 'Version 3.3.7 28/02/2018';
   g_body_defs    constant varchar2(512) := null;
   G_TRACE        constant varchar2(20) := 'dm_import.';
 
@@ -596,7 +596,7 @@ begin
 
     -- стандартні кредитні договора
     for cur in (select ccd.cc_id, ccd.nd, ccd.RNK, ccd.kf, ccd.BRANCH, c.OKPO,
-                        ccd.sdate, ccd.WDATE, ccd.vidd, ccd.prod, ccd.sdog, ccv.custtype as vidd_custtype
+                        ccd.sdate, ccd.WDATE, ccd.vidd, ccd.prod, ccd.sdog, case when (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') then 2 else ccv.custtype end as vidd_custtype -- #COBUSUPABS-6567
                    from bars.cc_deal ccd
                         join bars.customer c on ccd.rnk = c.rnk
                         join bars.cc_vidd ccv on ccd.vidd = ccv.vidd
@@ -772,6 +772,26 @@ begin
        exception
          when no_data_found then null;
        end;
+       
+       -- #COBUMMFO-6343: получаем ob22 и nms основного счета кредита
+       begin
+           select ob22, nms 
+           into l_row.ob22, l_row.nms
+           from
+           (
+               select ob22, nms 
+               from bars.accounts a
+               join bars.nd_acc na on a.kf = na.kf and a.acc = na.acc
+               where na.nd = cur.nd
+               and a.tip = 'SS'
+               order by dazs desc
+           )
+           where rownum = 1;
+       exception
+           when no_data_found then
+               l_row.ob22 := null;
+               l_row.nms := null;
+       end;
 
        insert into credits_stat values l_row;
 
@@ -859,11 +879,7 @@ begin
         -- тип договору (для БПК = 19)
         l_row.vidd  := 19;
         -- Тип клиєнта по виду договора
-        begin
-          select custtype into l_row.VIDD_CUSTTYPE from bars.cc_vidd where vidd = l_row.vidd;
-        exception
-          when no_data_found then l_row.vidd_custtype := null;
-        end;
+        l_row.VIDD_CUSTTYPE := 3;  -- #COBUSUPABS-6567
 
         -- !Вид продукту, в Барсі не ведеться!
         l_row.prod := null;
@@ -945,6 +961,26 @@ begin
        exception
          when no_data_found then null;
        end;
+       
+       -- #COBUMMFO-6343: получаем ob22 и nms основного счета кредита
+       begin
+           select ob22, nms 
+           into l_row.ob22, l_row.nms
+           from
+           (
+               select ob22, nms 
+               from bars.accounts a
+               join bars.nd_acc na on a.kf = na.kf and a.acc = na.acc
+               where na.nd = cur.nd
+               and a.tip = 'SS'
+               order by dazs desc
+           )
+           where rownum = 1;
+       exception
+           when no_data_found then
+               l_row.ob22 := null;
+               l_row.nms := null;
+       end;
 
        insert into credits_stat values l_row;
 
@@ -1010,7 +1046,7 @@ begin
     -- raise no_data_found;
 
     for cur in ( select ccd.cc_id, ccd.nd, ccd.RNK, ccd.kf, ccd.BRANCH, c.OKPO,
-                        ccd.sdate, ccd.WDATE, ccd.vidd, ccd.prod, ccd.sdog, ccd.sos, ccd.kat23, ccv.custtype as vidd_custtype
+                        ccd.sdate, ccd.WDATE, ccd.vidd, ccd.prod, ccd.sdog, ccd.sos, ccd.kat23, case when (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') then 2 else ccv.custtype end as vidd_custtype -- #COBUSUPABS-6567
                    from bars.cc_deal ccd
                         join bars.customer c on ccd.rnk = c.rnk
                         join bars.cc_vidd ccv on ccd.vidd = ccv.vidd
@@ -1673,11 +1709,7 @@ begin
         -- тип договору (для БПК = 19)
         l_row.vidd  := 19;
         -- Тип клиєнта по виду договора
-        begin
-          select custtype into l_row.VIDD_CUSTTYPE from bars.cc_vidd where vidd = l_row.vidd;
-        exception
-          when no_data_found then l_row.vidd_custtype := null;
-        end;
+		l_row.VIDD_CUSTTYPE := 3; -- #COBUSUPABS-6567
 
         -- Дата укладання договору
         -- беремо, як дату відкриття 9129
@@ -2162,7 +2194,9 @@ is
         ,a.blkk
         ,d.cnt_dubl
         ,d.archdoc_id
-    ,d.wb
+		,d.wb
+		,a.ob22
+		,a.nms
     from bars.dpt_deposit d, bars.accounts a, bars.int_accn ia, bars.accounts aproc, dd, bars.customer c
     where d.acc=a.acc and ia.acc=a.acc and ia.acra=aproc.acc
       and D.DEPOSIT_ID = dd.deposit_id
@@ -2221,7 +2255,9 @@ is
         ,a.blkk
         ,d.cnt_dubl
         ,d.archdoc_id
-    ,d.wb
+		,d.wb
+		,a.ob22
+		,a.nms
     from bars.dpt_deposit d, bars.accounts a, bars.int_accn ia, bars.accounts aproc, bars.customer c
     where d.acc=a.acc and ia.acc=a.acc and ia.acra=aproc.acc
     and d.rnk = c.rnk and not (c.ise in (''14100'', ''14200'', ''14101'',''14201'') and c.sed =''91'')
@@ -2296,7 +2332,9 @@ is
         ,a.blkk
         ,d.cnt_dubl
         ,d.archdoc_id
-    ,d.wb
+		,d.wb
+		,a.ob22
+		,a.nms
      from bars.dpt_deposit_clos d, bars.accounts a, bars.int_accn ia, bars.accounts aproc, dc, bars.customer c
     where d.acc=a.acc and ia.acc=a.acc and ia.acra=aproc.acc
       and d.rnk = c.rnk and not (c.ise in (''14100'', ''14200'', ''14101'',''14201'') and c.sed =''91'')
@@ -2335,7 +2373,7 @@ begin
                      l_row.intrate, l_row.sdog_begin, l_row.last_add_date, l_row.last_add_suma,
                      l_row.ostc, l_row.suma_proc, l_row.suma_proc_plan,
                      l_row.dpt_status, l_row.suma_proc_payoff, l_row.date_proc_payoff, l_row.date_dep_payoff, l_row.datz,
-                     l_row.dazs, l_row.blkd, l_row.blkk, l_row.cnt_dubl, l_row.archdoc_id, l_row.wb;
+                     l_row.dazs, l_row.blkd, l_row.blkk, l_row.cnt_dubl, l_row.archdoc_id, l_row.wb, l_row.ob22, l_row.nms;
 
         exit when c%notfound;
 
@@ -2374,7 +2412,7 @@ begin
                      l_row.intrate, l_row.sdog_begin, l_row.last_add_date, l_row.last_add_suma,
                      l_row.ostc, l_row.suma_proc, l_row.suma_proc_plan,
                      l_row.dpt_status, l_row.suma_proc_payoff, l_row.date_proc_payoff, l_row.date_dep_payoff, l_row.datz,
-                     l_row.dazs, l_row.blkd, l_row.blkk, l_row.cnt_dubl, l_row.archdoc_id, l_row.wb;
+                     l_row.dazs, l_row.blkd, l_row.blkk, l_row.cnt_dubl, l_row.archdoc_id, l_row.wb, l_row.ob22, l_row.nms;
 
         exit when c_clos%notfound;
 
@@ -2466,7 +2504,9 @@ is
                                    a.dazs,
                                    decode(a.dazs,null,1,0) acc_status,
                                    a.blkd,
-                                   a.blkk
+                                   a.blkk,
+								   a.ob22,
+								   a.nms
                                ';
 
     q_str_postfull  varchar2(4000) :=  ' FROM bars.accounts a, bars.dpt_deposit dd, bars.customer c
@@ -2512,7 +2552,7 @@ begin
                      l_row.vidd, l_row.daos, l_row.kv, l_row.intrate, l_row.massa,
                      l_row.count_zl, l_row.ostc, l_row.ob_mon,
                      l_row.last_add_date, l_row.last_add_suma, l_row.dazs, l_row.acc_status,
-                     l_row.blkd, l_row.blkk;
+                     l_row.blkd, l_row.blkk, l_row.ob22, l_row.nms;
 
         exit when c%notfound;
 
@@ -2606,7 +2646,7 @@ is
                                         where aw.tag = ''PK_PRCT''
                                           and to_number(aw.value)= p.id
                                           and regexp_replace(trim(aw.value), ''\D'') = trim(aw.value)) pk_prct
-                                where w.acc_pk = a.acc 
+                                where w.acc_pk = a.acc
                                  and w.acc_ovr = ao.acc(+)
                                  and w.acc_pk = pk_prct.acc(+) ';
 
@@ -2615,7 +2655,7 @@ is
                                         where aw.tag = ''PK_PRCT''
                                           and to_number(aw.value)= p.id
                                           and regexp_replace(trim(aw.value), ''\D'') = trim(aw.value)) pk_prct
-                                where w.acc_pk = a.acc 
+                                where w.acc_pk = a.acc
                                  and w.acc_ovr = ao.acc(+)
                                  and w.acc_pk = pk_prct.acc(+)
                                  and a.acc = aa.acc';
@@ -3723,6 +3763,8 @@ begin
                       ,case ddt.TYP_TR when 'B' then 1 end ben     --бенефіціар
                       ,dv.TYPE_NAME vidd_name   --вид вкладу(символьний)
                       ,d.wb
+					  ,a.ob22
+					  ,a.nms
           from bars.dpt_deposit d, bars.accounts a, bars.int_accn ia, bars.accounts aproc, dd, bars.DPT_DEPOSITW dw, bars.DPT_TRUSTEE ddt, bars.DPT_VIDD dv
           , bars.customer c
           where d.acc=a.acc and ia.acc=a.acc and ia.acra=aproc.acc
@@ -3803,6 +3845,8 @@ begin
               ,case ddt.TYP_TR when 'B' then 1 end ben     --бенефіціар
               ,dv.TYPE_NAME vidd_name   --вид вкладу(символьний)
               ,d.wb
+			  ,a.ob22
+			  ,a.nms
           from bars.dpt_deposit d, bars.accounts a, bars.int_accn ia, bars.accounts aproc, bars.DPT_DEPOSITW dw, bars.DPT_TRUSTEE ddt, bars.DPT_VIDD dv
           , bars.customer c
           where d.acc=a.acc and ia.acc=a.acc and ia.acra=aproc.acc
@@ -3887,6 +3931,8 @@ begin
               ,case ddt.TYP_TR when 'B' then 1 end ben     --бенефіціар
               ,dv.TYPE_NAME vidd_name   --вид вкладу(символьний)
               ,d.wb
+			  ,a.ob22
+			  ,a.nms
           from bars.dpt_deposit d, bars.accounts a, bars.int_accn ia, bars.accounts aproc, bars.DPT_DEPOSITW dw, bars.DPT_TRUSTEE ddt, bars.DPT_VIDD dv
           , bars.customer c
           where d.acc=a.acc and ia.acc=a.acc and ia.acra=aproc.acc
@@ -3946,6 +3992,8 @@ begin
         l_row.MASSA := null;
         l_row.PER_ID := l_per_id;
         l_row.wb := c.wb;
+		l_row.ob22 := c.ob22;
+		l_row.nms := c.nms;
 
         insert into deposit_PLT values l_row;
         l_rows:=l_rows+1;
@@ -4046,6 +4094,8 @@ begin
         ,case ddt.TYP_TR when 'B' then 1 end ben     --бенефіціар
         ,dv.TYPE_NAME vidd_name   --вид вкладу(символьний)
         ,d.wb
+		,a.ob22
+		,a.nms
      from bars.dpt_deposit_clos d, bars.accounts a, bars.int_accn ia, bars.accounts aproc, dc, bars.DPT_DEPOSITW dw, bars.DPT_TRUSTEE ddt, bars.DPT_VIDD dv, bars.customer c
     where d.acc=a.acc and ia.acc=a.acc and ia.acra=aproc.acc
       and d.idupd = dc.idupd
@@ -4101,9 +4151,11 @@ begin
         l_row.MAL             := c_clos.mal;
         l_row.BEN             := c_clos.ben;
         l_row.VIDD_NAME       := c_clos.vidd_name;
-        l_row.MASSA := null;
-        l_row.PER_ID := l_per_id;
-        l_row.wb := c_clos.wb;
+        l_row.MASSA 		  := null;
+        l_row.PER_ID 		  := l_per_id;
+        l_row.wb 			  := c_clos.wb;
+		l_row.ob22 			  := c_clos.ob22;
+		l_row.nms 			  := c_clos.nms;
         insert into deposit_PLT values l_row;
         l_rows:=l_rows+1;
 
@@ -4224,6 +4276,8 @@ end deposits_plt_imp;
                       ,w4_kproc
                       ,w4_sec
                       ,a.acc
+					  ,a.ob22
+					  ,a.nms
                        from bars.accounts a, bars.accounts ao, bars.w4_acc w, acvive_accounts aa,
                         (select aw.acc, p.id, p.name, p.okpo, p.product_code, p.okpo_n from bars.accountsw aw, bars.bpk_proect p
                           where aw.tag = 'PK_PRCT'
@@ -4257,7 +4311,7 @@ end deposits_plt_imp;
                                              ) ww,
                          bars.deal d,
                          (select acc, kos, dos from bars.saldoa where FDAT = trunc(p_dat)) S
-                  where w.acc_pk = a.acc 
+                  where w.acc_pk = a.acc
                    and w.acc_ovr = ao.acc(+)
                    and w.acc_pk = pk_prct.acc(+)
                    and a.acc = aa.acc
@@ -4319,6 +4373,8 @@ end deposits_plt_imp;
                       ,w4_kproc
                       ,w4_sec
                       ,a.acc
+					  ,a.ob22
+					  ,a.nms
                        from bars.accounts a, bars.accounts ao, bars.w4_acc w,
                         (select aw.acc, p.id, p.name, p.okpo, p.product_code, p.okpo_n from bars.accountsw aw, bars.bpk_proect p
                           where aw.tag = 'PK_PRCT'
@@ -4352,7 +4408,7 @@ end deposits_plt_imp;
                                              ) ww,
                          bars.deal d,
                          (select acc, kos, dos from bars.saldoa where FDAT = trunc(p_dat)) S
-                  where w.acc_pk = a.acc 
+                  where w.acc_pk = a.acc
                    and w.acc_ovr = ao.acc(+)
                    and w.acc_pk = pk_prct.acc(+)
                    and p_periodtype = 'MONTH' /*Только для ежедневных выгрузок*/
@@ -4412,6 +4468,8 @@ end deposits_plt_imp;
             l_row.W4_KPROC := c.w4_kproc;
             l_row.W4_SEC := c.w4_sec;
             l_row.acc := c.acc;
+			l_row.ob22 := c.ob22;
+			l_row.nms := c.nms;
 
             insert into bpk_plt values l_row;
             l_rows := l_rows + 1;
@@ -5509,7 +5567,7 @@ end deposits_plt_imp;
               l_row.TELD := c.TELD;
               l_row.TELADD := c.TELADD;
               l_row.EMAIL := c.EMAIL;
-              
+
               l_row.ADR_POST_COUNTRY := c.ap_contry;
               l_row.ADR_POST_DOMAIN := c.ap_domain;
               l_row.ADR_POST_REGION := c.ap_region;
@@ -5529,7 +5587,7 @@ end deposits_plt_imp;
               l_row.ADR_WORK_LOC := c.au_locality;
               l_row.ADR_WORK_ADR := c.au_adress;
               l_row.ADR_WORK_ZIP := c.au_zip;
-              
+
               l_row.NEGATIV_STATUS := null;
               l_row.REESTR_MOB_BANK := null;
               l_row.REESTR_INET_BANK := null;

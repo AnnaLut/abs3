@@ -222,7 +222,7 @@ end;
 CREATE OR REPLACE PACKAGE BODY DM_IMPORT
  is
 
-    g_body_version constant varchar2(64) := 'Version 4.0.1 19/02/2018'; 
+    g_body_version constant varchar2(64) := 'Version 4.0.1 01/03/2018'; 
     g_body_defs    constant varchar2(512) := null;
     G_TRACE        constant varchar2(20) := 'dm_import.';
     -- DIY - parallel
@@ -624,7 +624,9 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                                      open_date_bal22,
                                      es000,
                                      es003,
-                                     vidd_custtype)
+                                     vidd_custtype,
+                                     ob22,
+                                     nms)
             select  s_credits.nextval,
                     :l_per_id,
                     ccd.nd, 
@@ -686,7 +688,9 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                          where n.nd = ccd.nd
                          and tag = 'ES003'
                          and kf = ccd.kf) as ES003,
-                      case when (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') then 2 else ccv.custtype end as vidd_custtype -- #COBUSUPABS-6567
+                      case when (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') then 2 else ccv.custtype end as vidd_custtype, -- #COBUSUPABS-6567
+                      main_acc.ob22,
+                      main_acc.nms
             from bars.cc_deal ccd
             join bars.customer c on ccd.rnk = c.rnk
             join bars.cc_vidd ccv on ccd.vidd = ccv.vidd
@@ -721,6 +725,16 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
              join bars.wcs_partners_all w on to_number(regexp_replace(trim(d.txt), '\D')) = w.id
               where d.tag = 'PAR_N'
                 and regexp_replace(trim(d.txt), '\D') = trim(d.txt)) PARTNER on ccd.nd = PARTNER.nd and ccd.kf = PARTNER.KF
+            left join
+            (select na.kf, 
+                    na.nd, 
+                    max(ob22) keep (dense_rank first order by dazs desc nulls first) as ob22, 
+                    max(nms) keep (dense_rank first order by dazs desc nulls first) as nms
+             from bars.nd_acc na
+             join bars.accounts a on na.kf = a.kf and na.acc = a.acc
+             where a.tip = 'SS'
+             group by na.kf, na.nd
+            ) MAIN_ACC on ccd.kf = main_acc.kf and ccd.nd = main_acc.nd
             where c.CUSTTYPE in (2, 3) and ccd.vidd in (1, 2, 3, 11, 12, 13)
             -- and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов -- 20.03.2017  COBUSUPABS-5659
             LOG ERRORS into ERR$_CREDITS_STAT ('STANDARD') reject limit unlimited 
@@ -772,7 +786,9 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                                      open_date_bal22,
                                      es000,
                                      es003,
-                                     vidd_custtype)
+                                     vidd_custtype,
+                                     ob22,
+                                     nms)
             with cur as
             (select ba.nd, ba.acc_pk, ba.acc_ovr, ba.acc_2208, c.rnk, a.branch, a.kf, a.nbs, a.ob22, a.daos, a.dazs, a.kv, c.okpo,
                                            aa.lim, aa.nls nls2625, aa.daos daos2625, AA.DAZS dazs2625, a.ostc ost_ovr, A9129.OSTC ost_9129, a9129.daos daos9129,
@@ -803,9 +819,9 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
             select 
             s_credits.nextval,
             :l_per_id,
-            nd,
+            cur.nd,
             rnk,
-            kf,
+            cur.kf,
             branch,
             okpo,
             nkd as cc_id,
@@ -850,12 +866,24 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
              where n.nd = cur.nd
              and tag = 'ES000'
              and kf = cur.kf) as ES003,
-            3 as vidd_custtype -- хардкод по #COBUSUPABS-6567
+            3 as vidd_custtype, -- хардкод по #COBUSUPABS-6567
+            main_acc.ob22,
+            main_acc.nms
             from cur
             left join 
             (select acc, nvl(to_number(aw.value), 0) as bpk_term
                from bars.accountsw aw
               where aw.tag = 'PK_TERM') BPK_AW_TERM on cur.acc_pk = BPK_AW_TERM.acc
+            left join
+            (select na.kf, 
+                    na.nd, 
+                    max(ob22) keep (dense_rank first order by dazs desc nulls first) as ob22, 
+                    max(nms) keep (dense_rank first order by dazs desc nulls first) as nms
+             from bars.nd_acc na
+             join bars.accounts a on na.kf = a.kf and na.acc = a.acc
+             where a.tip = 'SS'
+             group by na.kf, na.nd
+            ) MAIN_ACC on cur.kf = main_acc.kf and cur.nd = main_acc.nd
             LOG ERRORS into ERR$_CREDITS_STAT ('BPK') reject limit unlimited
             ]' using l_per_id, p_dat, p_dat, p_dat, p_dat, p_dat;
 
@@ -2498,21 +2526,25 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                                       ';
 
 
-        q_str_postfull  varchar2(4000) :=  ' from bars.accounts a, bars.accounts ao, bars.w4_acc w,
+        q_str_postfull  varchar2(4000) :=  ' from bars.accounts a, bars.customer c, bars.accounts ao, bars.w4_acc w,
                                           (select aw.acc, p.id, p.name, p.okpo, p.product_code, p.okpo_n from bars.accountsw aw, bars.bpk_proect p
                                             where aw.tag = ''PK_PRCT''
                                               and to_number(aw.value)= p.id
                                               and regexp_replace(trim(aw.value), ''\D'') = trim(aw.value)) pk_prct
-                                    where w.acc_pk = a.acc 
+                                    where w.acc_pk = a.acc and a.rnk = c.rnk
+                                     and c.custtype = 3 and nvl(trim(c.sed),''00'')<>''91''
+                                     and not (C.ise in (''14100'', ''14200'', ''14101'',''14201'') and C.sed =''91'')
                                      and w.acc_ovr = ao.acc(+)
                                      and w.acc_pk = pk_prct.acc(+) ';
 
-        q_str_postinc varchar2(4000) :=  ' from bars.accounts a, bars.accounts ao, bars.w4_acc w, acvive_accounts aa,
+        q_str_postinc varchar2(4000) :=  ' from bars.accounts a, bars.customer c, bars.accounts ao, bars.w4_acc w, acvive_accounts aa,
                                           (select aw.acc, p.id, p.name, p.okpo, p.product_code, p.okpo_n from bars.accountsw aw, bars.bpk_proect p
                                             where aw.tag = ''PK_PRCT''
                                               and to_number(aw.value)= p.id
                                               and regexp_replace(trim(aw.value), ''\D'') = trim(aw.value)) pk_prct
-                                    where w.acc_pk = a.acc 
+                                    where w.acc_pk = a.acc and a.rnk = c.rnk
+                                     and c.custtype = 3 and nvl(trim(c.sed),''00'')<>''91''
+                                     and not (C.ise in (''14100'', ''14200'', ''14101'',''14201'') and C.sed =''91'')
                                      and w.acc_ovr = ao.acc(+)
                                      and w.acc_pk = pk_prct.acc(+)
                                      and a.acc = aa.acc';
@@ -4138,7 +4170,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                       ,w4_kproc
                       ,w4_sec
                       ,a.acc
-                       from bars.accounts a, bars.accounts ao, bars.w4_acc w, acvive_accounts aa,
+                       from bars.accounts a, bars.customer c, bars.accounts ao, bars.w4_acc w, acvive_accounts aa,
                         (select aw.acc, p.id, p.name, p.okpo, p.product_code, p.okpo_n from bars.accountsw aw, bars.bpk_proect p
                           where aw.tag = 'PK_PRCT'
                             and to_number(aw.value)= p.id
@@ -4171,7 +4203,9 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                                              ) ww,
                          bars.deal d,
                          (select acc, kos, dos from bars.saldoa where FDAT = trunc(p_dat)) S
-                  where w.acc_pk = a.acc 
+                  where w.acc_pk = a.acc and a.rnk = c.rnk
+                   and c.custtype = 3 and nvl(trim(c.sed),'00')<>'91'
+                   and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов
                    and w.acc_ovr = ao.acc(+)
                    and w.acc_pk = pk_prct.acc(+)
                    and a.acc = aa.acc
@@ -4233,7 +4267,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                       ,w4_kproc
                       ,w4_sec
                       ,a.acc
-                       from bars.accounts a, bars.accounts ao, bars.w4_acc w/*, acvive_accounts aa*/,
+                       from bars.accounts a, bars.customer c, bars.accounts ao, bars.w4_acc w/*, acvive_accounts aa*/,
                         (select aw.acc, p.id, p.name, p.okpo, p.product_code, p.okpo_n from bars.accountsw aw, bars.bpk_proect p
                           where aw.tag = 'PK_PRCT'
                             and to_number(aw.value)= p.id
@@ -4266,7 +4300,9 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                                              ) ww,
                          bars.deal d,
                          (select acc, kos, dos from bars.saldoa where FDAT = trunc(p_dat)) S
-                  where w.acc_pk = a.acc
+                  where w.acc_pk = a.acc and a.rnk = c.rnk
+                   and c.custtype = 3 and nvl(trim(c.sed),'00')<>'91'
+                   and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов
                    and w.acc_ovr = ao.acc(+)
                    and w.acc_pk = pk_prct.acc(+)
                    and p_periodtype = 'MONTH' /*Только для ежедневных выгрузок*/
