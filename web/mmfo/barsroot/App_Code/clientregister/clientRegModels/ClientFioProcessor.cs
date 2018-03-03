@@ -101,6 +101,9 @@ namespace clientregister
 		}
 		private string getProcessedName()
 		{
+			if (String.IsNullOrEmpty(data.Name))
+				return "";
+
 			var expectedName = CheckBaseData("FIRST", data.Name);
 			if (expectedName != "")
 			{
@@ -128,6 +131,9 @@ namespace clientregister
 		}
 		private string getProcessedMiddleName()
 		{
+			if (String.IsNullOrEmpty(data.MName))
+				return "";
+
 			var expectedName = CheckBaseData("MIDDLE", data.MName);
 			if (expectedName != "")
 			{
@@ -151,6 +157,9 @@ namespace clientregister
 		}
 		private string getProcessedSurname()
 		{
+			if (String.IsNullOrEmpty(data.SName))
+				return "";
+
 			var pname = data.SName;
 
 			//female
