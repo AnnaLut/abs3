@@ -23,7 +23,7 @@ commit;
 
 
 begin EXECUTE IMMEDIATE 'ALTER TABLE bars.CCK_OB22_9 add  CONSTRAINT XPK_CCKOB229  PRIMARY KEY  (NBS,OB22) ' ;
-exception when others then   if SQLCODE = -02260 then null;   else raise; end if;   -- ORA-02260: table can have only one primary key
+exception when others then   if SQLCODE in (-02275, -02260) then null;   else raise; end if;   -- ORA-02260: table can have only one primary key
 end;
 /
 
