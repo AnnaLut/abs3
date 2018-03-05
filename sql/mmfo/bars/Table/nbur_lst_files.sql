@@ -123,16 +123,20 @@ declare
   pragma exception_init( e_idx_exists,      -00955 );
   e_col_already_idx      exception;
   pragma exception_init( e_col_already_idx, -01408 );
+  e_dup_keys_found       exception;
+  pragma exception_init( e_dup_keys_found,  -01452 );
 begin
-  execute immediate q'[create unique index UK_NBURLSTFILES_FILESTATUS on BARS.NBUR_LST_FILES ( REPORT_DATE, KF, FILE_ID, decode( FILE_STATUS, 'FINISHED', 0, 'BLOCKED', 0, VERSION_ID ) )
+  execute immediate q'[create unique index UK_NBURLSTFILES_FILESTATUS on NBUR_LST_FILES ( REPORT_DATE, KF, FILE_ID, decode( FILE_STATUS, 'FINISHED', 0, 'BLOCKED', 0, VERSION_ID ) )
   TABLESPACE BRSMDLI
   COMPRESS 3 ]';
   dbms_output.put_line( 'Index created.' );
 exception
-  when e_idx_exists 
+  when E_IDX_EXISTS
   then dbms_output.put_line( 'Name is already used by an existing object.' );
-  when e_col_already_idx 
+  when E_COL_ALREADY_IDX
   then dbms_output.put_line( 'Such column list already indexed.' );
+  when E_DUP_KEYS_FOUND
+  then dbms_output.put_line( 'Cannot create unique index: duplicate keys found' );
 end;
 /
 
