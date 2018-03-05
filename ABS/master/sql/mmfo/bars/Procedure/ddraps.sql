@@ -207,6 +207,7 @@ BEGIN
   if ( dat_ < GL.GBD() )
   then
     execute immediate 'lock table SALDOA subpartition for '||l_condition||' IN EXCLUSIVE MODE';
+    bars_audit.info( $$PLSQL_UNIT||': SALDOA subpartition locked.' );
   end if;
 
   -- Вибрати підходящий курсор
@@ -489,13 +490,11 @@ BEGIN
             CASE WHEN v.dk=1 THEN v.s   ELSE 0   END,
             CASE WHEN v.dk=1 THEN 0     ELSE v.s END);
       END IF;
-      
+
     END LOOP;
-    
+
   END LOOP;
-  
-  COMMIT;
-  
+
   -- Back to
   GL.PL_DAT( l_bank_dt );
 
@@ -507,11 +506,12 @@ BEGIN
   if ( dat_ = DAT_NEXT_U( GL.GBD(), -1 ) )
   then -- Доплата проводок переоцінки породжених при формуванні знімків балансу
     GL.OVERPAY_PVP;
-    commit;
   end if;
 
   -- Фіксуємо SCN на якому формуємо знімок балансу по табл. SALDOA
   BARS_UTL_SNAPSHOT.SET_TABLE_SCN( 'SALDOA', dat_, l_kf, DBMS_FLASHBACK.GET_SYSTEM_CHANGE_NUMBER() );
+
+  COMMIT;
 
   BARS_AUDIT.INFO( $$PLSQL_UNIT||': lock requested.' );
 
