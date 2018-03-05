@@ -9,7 +9,7 @@ is
   -- Purpose : Службовий пакет роботи зі знімками балансу
 
   -- Public constant declarations
-  VERSION_HEAD         constant varchar2(64) := 'version 1.3  19.06.2017';
+  VERSION_HEAD         constant varchar2(64) := 'version 1.4  05.03.2018';
 
   -- алгоритмы наполнения accm_snap_balances
   ALGORITHM_OLD        constant varchar2(30) := 'OLD';
@@ -129,6 +129,15 @@ is
   , p_scn   in     number
   );
 
+  --
+  --
+  --
+  procedure SET_TABLE_SCN
+  ( p_table in     varchar2
+  , p_date  in     date
+  , p_kf    in     varchar2
+  );
+
   -- ======================================================
   -- Modifying Subpartition Template
   -- ======================================================
@@ -153,7 +162,7 @@ is
   --
   -- constants
   --
-  VERSION_BODY    constant varchar2(64)  := 'version 1.3.2  28.02.2018';
+  VERSION_BODY    constant varchar2(64)  := 'version 1.3.3  05.03.2018';
 
   -- Префикс для трассировки
   PKG_CODE        constant varchar2(100) := 'UTL_SNAPSHOT';
@@ -500,6 +509,45 @@ is
     bars_audit.trace( '%s: Exit.', title );
 
     commit;
+
+  end SET_TABLE_SCN;
+
+  --
+  --
+  --
+  procedure SET_TABLE_SCN
+  ( p_table in     varchar2
+  , p_date  in     date
+  , p_kf    in     varchar2
+  ) is
+    title    constant     varchar2(64) :=  $$PLSQL_UNIT||'.SET_TAB_SCN';
+    l_table               varchar2(30);
+    l_date                date;
+    l_kf                  varchar2(6);
+  begin
+
+    bars_audit.trace( '%s: entry with ( p_table=>%s, p_date=>%s, p_kf=>%s ).'
+                      , title, p_table, to_char(p_date, FMT_DATE), p_kf );
+
+    l_table := upper( p_table );
+    l_date  := trunc( p_date );
+    l_kf    := nvl( p_kf, SYS_CONTEXT('BARS_CONTEXT','USER_MFO') );
+
+    update ACCM_SNAP_SCN
+       set SNAP_SCN   = USERENV('COMMITSCN')
+         , SNAP_DATE  = scn_to_timestamp(USERENV('COMMITSCN'))
+     where FDAT       = l_date
+       and TABLE_NAME = l_table
+       and KF         = l_kf;
+
+    if ( sql%rowcount = 0 )
+    then
+      insert
+        into ACCM_SNAP_SCN ( KF, FDAT, TABLE_NAME, SNAP_SCN, SNAP_DATE )
+      values ( l_kf, l_date, l_table, USERENV('COMMITSCN'), scn_to_timestamp(USERENV('COMMITSCN')) );
+    end if;
+
+    bars_audit.trace( '%s: Exit.', title );
 
   end SET_TABLE_SCN;
 
@@ -1185,7 +1233,7 @@ is
 
 begin
   load_algorithm();
-end bars_utl_snapshot;
+end BARS_UTL_SNAPSHOT;
 /
 
 show errors;
