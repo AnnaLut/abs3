@@ -58,20 +58,10 @@ begin
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSMDLI  ENABLE NOVALIDATE';
 exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 or sqlcode=-955 then null; else raise; end if;
  end;
 /
 
-PROMPT *** Create  constraint CC_BPK_PARAMETERS_TAG***
-begin
-  execute immediate 'alter table bpk_parameters
-  add constraint bpk_parameters_tag
-  check ((tag IN (''INTRT'',''ND_REST'') and (txt between 0 and 100 or tag is null)) or value not IN (''INTRT'',''ND_REST''))';
- exception when others then 
-    if sqlcode = -2264 or sqlcode = -2261 then null; else raise; 
-    end if; 
-end;
-/
 
 PROMPT *** Create  index PK_BPKPARAMETERS ***
 begin   
