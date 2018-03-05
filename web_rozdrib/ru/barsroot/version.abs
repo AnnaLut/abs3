@@ -1,4 +1,5 @@
-=========  svn diff --summarize -r 49132:49255 D:\SVN\master\web\ru
+=========  svn diff --summarize -r 49132:49289 D:\SVN\master\web\ru
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.183\ru\web\TEMPLATE.RPT\rep_3053.frx
+---web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.183\ru\web\barsroot\version.abs
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.183\ru\web
-Bugfix_2.0.35.5.183 (Rev:49132-49255
+Bugfix_2.0.35.5.183 (Rev:49132-49289
