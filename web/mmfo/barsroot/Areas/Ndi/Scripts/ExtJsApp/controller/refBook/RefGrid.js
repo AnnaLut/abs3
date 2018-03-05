@@ -3244,10 +3244,14 @@
                     msg: "Виконання процедур закінчено." + "<br/>" + resMsg + '</br> </br>',
                     buttons: Ext.MessageBox.OK,
                     fn: function(btn){
-                        if(errorMsg.length < 1)
-                        callbackFunc(true);
-                        else
-                            callbackFunc(false);
+                        
+                        if(callbackFunc && typeof (callbackFunc) == 'function')
+                        if(errorMsg && errorMsg.length < 1)
+                                callbackFunc(true);
+                            else
+                                callbackFunc(false);
+
+
                     }
                 });
             }
