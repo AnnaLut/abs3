@@ -277,12 +277,10 @@ end NBUR_FILES;
 
 show errors
 
-----------------------------------------------------------------------------------------------------
-
 create or replace package body NBUR_FILES
 is
 
-  g_body_version  constant varchar2(64) := 'version 6.3  2017.10.13';
+  g_body_version  constant varchar2(64) := 'version 6.4  2018.03.05';
 
   MODULE_PREFIX   constant varchar2(8) := 'NBUR';
 
@@ -1011,42 +1009,48 @@ end;
     l_view_nm                 nbur_ref_files.view_nm%type;
     l_file_code               nbur_ref_files.file_code%type;
     l_file_name               nbur_ref_files.file_name%type;
+    l_file_fmt                nbur_ref_files.file_fmt%type;
     l_proc_type               nbur_ref_procs.proc_type%type;
     l_field_lst               varchar2(4096);
     l_view_stmt               varchar2(16384);
     l_cmnt_stmt               dbms_utility.lname_array; -- 4000
   begin
-    
+
     bars_audit.trace( '%s: Entry with ( p_file_id=%s ).', title, to_char(p_file_id) );
-    
-    select f.VIEW_NM, f.FILE_CODE, f.FILE_NAME, nvl(p.PROC_TYPE, 'O')
-      into l_view_nm, l_file_code, l_file_name, l_proc_type
-      from BARS.NBUR_REF_FILES f
+
+    select f.VIEW_NM, f.FILE_CODE, f.FILE_NAME, f.FILE_FMT, nvl(p.PROC_TYPE, 'O')
+      into l_view_nm, l_file_code, l_file_name, l_file_fmt, l_proc_type
+      from NBUR_REF_FILES f
       left
-      join BARS.NBUR_REF_PROCS p
+      join NBUR_REF_PROCS p
         on ( p.FILE_ID = f.ID )
      where f.ID = p_file_id
-       and f.FILE_FMT = 'TXT';
-    
+       and f.FILE_FMT = 'TXT'; -- поки не виясниться як автоматично будувати VIEW для XML файлів
+
     if ( l_view_nm Is Null )
     then
-      
-      l_view_nm := 'V_NBUR_'|| case when l_file_code like '#__' 
-                                    then l_file_code
-                                    else 'OBU_' || SubStr(l_file_code, 2, 2 )
+
+      l_view_nm := 'V_NBUR_'|| case l_file_fmt
+                               when 'XML'
+                               then SubStr(l_file_code,2,2) || 'X'
+                               else case
+                                    when l_file_code like '@__'
+                                    then 'OBU_' || SubStr(l_file_code,2,2)
+                                    else l_file_code 
+                                    end
                                end;
-      
-      update BARS.NBUR_REF_FILES
+
+      update NBUR_REF_FILES
          set VIEW_NM = l_view_nm
        where ID = p_file_id;
-      
+
     end if;
-    
+
     for c in
     ( select nvl(SEGMENT_CODE,'SEG_'||to_char(SEGMENT_NUMBER,'FM00')) as SEGMENT_CODE
            , SEGMENT_NAME
            , upper(SEGMENT_RULE) as SEGMENT_RULE
-        from BARS.NBUR_REF_FORM_STRU
+        from NBUR_REF_FORM_STRU
        where FILE_ID = p_file_id
          and KEY_ATTRIBUTE = 1
        order by SEGMENT_NUMBER
@@ -1211,7 +1215,7 @@ end;
         l_view_stmt := l_view_stmt || ' where p.REPORT_CODE = '|| DBMS_ASSERT.ENQUOTE_LITERAL( l_file_code )||chr(10);
         l_view_stmt := l_view_stmt || q'[   and v.FILE_STATUS IN ( 'FINISHED', 'BLOCKED' )]';
     end if;
-    
+
     -- comments
     l_cmnt_stmt(l_cmnt_stmt.count+1) := '.DESCRIPTION   is ' || q'['Опис (коментар)']';
     l_cmnt_stmt(l_cmnt_stmt.count+1) := '.ACC_ID        is ' || q'['Ід. рахунка']';
@@ -1350,10 +1354,13 @@ end;
   , p_chk_dsc          in     nbur_ref_file_checks.chk_dsc%type
   , p_chk_ste          in     nbur_ref_file_checks.chk_ste%type
   , p_chk_stmt         in out nocopy clob
-  , p_file_id          in     NBUR_REF_FILE_CHECKS.file_id%type
+  , p_file_id          in     nbur_ref_file_checks.file_id%type
   ) is
     title        constant     varchar2(64) := $$PLSQL_UNIT||'.SET_FILE_CHK';
-    l_cursor                  integer;
+    l_cursor                  number;
+    l_col_qty                 pls_integer;
+    l_col_dsc                 dbms_sql.desc_tab;
+    l_err_msg                 varchar2(4000);
   begin
 
     bars_audit.trace( '%s: Entry with ( p_chk_id=%s, p_chk_dsc=%s, p_chk_ste=%s p_file_id=%s ).'
@@ -1368,22 +1375,42 @@ end;
       then
         if ( dbms_lob.getlength( p_chk_stmt ) > 0 )
         then -- vaidate SQL statement
-          
+
           l_cursor := DBMS_SQL.OPEN_CURSOR;
-          
+
           begin
+
+            -- перевірка на коректність SQL запиту
             DBMS_SQL.PARSE( l_cursor, p_chk_stmt, dbms_sql.native );
+
+            -- перевірка на наявність лише одного VARCHAR2 поля в результаті SQL запиту
+            DBMS_SQL.DESCRIBE_COLUMNS( l_cursor, l_col_qty, l_col_dsc );
+
+            if ( l_col_qty <> 1 )
+            then
+              l_err_msg := 'SQL statement must return only one column!';
+            else
+              if ( l_col_dsc(1).col_type <> 1 )
+              then
+                l_err_msg := 'SQL statement must return a column of VARCHAR2 data type!';
+              end if;
+            end if;
+
           exception
             when OTHERS then
-             raise_application_error( -20666, 'SQL Statement: ' || chr(10) || p_chk_stmt ||
-                                              ' Has Error: '    || chr(10) || dbms_utility.format_error_stack(), true );
+             l_err_msg := 'SQL statement has error: ' || chr(10) || dbms_utility.format_error_stack();
           end;
-          
+
           if ( DBMS_SQL.IS_OPEN( l_cursor ) )
           then
             DBMS_SQL.CLOSE_CURSOR( l_cursor );
           end if;
-          
+
+          if ( l_err_msg Is Not Null )
+          then
+            raise_application_error( -20666, l_err_msg, true );
+          end if;
+
         else
           raise_application_error( -20666, 'Value for parameter [p_chk_stmt] must be specified!', true );
         end if;
@@ -1400,8 +1427,7 @@ end;
            , CHK_STE  = nvl(p_chk_ste,CHK_STE)
            , CHK_STMT = p_chk_stmt
            , FILE_ID  = p_file_id
-       where CHK_ID   = p_chk_id
-      ;
+       where CHK_ID   = p_chk_id;
 
     else
 
@@ -1450,6 +1476,70 @@ end;
 
   end SET_CHK_LOG;
 
+  --
+  -- Validate file by check statement
+  --
+  procedure VLD_FILE
+  ( p_file_id          in     nbur_lst_files.file_id%type
+  , p_rpt_dt           in     nbur_lst_files.report_date%type
+  , p_kf               in     nbur_lst_files.kf%type
+  , p_vrsn_id          in     nbur_lst_files.version_id%type
+  ) is
+    title        constant     varchar2(64) := $$PLSQL_UNIT||'.SET_CHK_LOG';
+    l_errmsg                  clob;
+    c_chk                     sys_refcursor;
+    l_chk_msg                 varchar2(4000);
+  begin
+
+    bars_audit.trace( '%s: Entry with ( file_id=%s, p_rpt_dt=%s, p_kf=%s, p_vrsn_id=%s ).'
+                    , title, to_char(p_file_id), to_char(p_rpt_dt,'dd.mm.yyyy'), p_kf, to_char(p_vrsn_id) );
+
+    DBMS_LOB.CREATETEMPORARY( l_errmsg, FALSE, DBMS_LOB.CALL );
+
+    for r in ( select CHK_STMT
+                 from NBUR_REF_FILE_CHECKS
+                where FILE_ID  = p_file_id
+                  and CHK_STE = 1 )
+    loop
+
+      open c_chk for r.CHK_STMT using p_rpt_dt;
+
+      << CHK_MSG_ROW >>
+      loop
+
+        fetch c_chk
+         into l_chk_msg;
+
+        exit when c_chk%notfound;
+
+        l_chk_msg := trim(l_chk_msg);
+
+        if ( l_chk_msg Is Not Null )
+        then
+          DBMS_LOB.APPEND( l_errmsg, l_chk_msg||chr(10) );
+        end if;
+
+      end loop CHK_MSG_ROW;
+
+      close c_chk;
+
+    end loop;
+
+    if ( DBMS_LOB.getLength(l_errmsg) > 0 )
+    then
+      SET_CHK_LOG( p_file_id => p_file_id
+                 , p_rpt_dt  => p_rpt_dt
+                 , p_kf      => p_kf
+                 , p_vrsn_id => p_vrsn_id
+                 , p_chk_log => l_errmsg
+                 );
+    end if;
+
+    DBMS_LOB.FREETEMPORARY( l_errmsg );
+
+    bars_audit.trace( '%s: Exit.', title );
+
+  end VLD_FILE;
 
 
 begin
