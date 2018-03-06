@@ -17,6 +17,7 @@ function Validate(form) {
     if (!isFilledOkpo(form.Id_B)) return false;
     if (!isFilled(3, form.Nazn)) return false;
     NaznCalc();
+
     // Провека курса валют (что не поменялся за момент первой загрузки формы)
     var l_flags = document.getElementById("__FLAGS").value;
     if (l_flags.substr(65, 1) == "1" && l_flags.substr(11, 1) == "1")
@@ -565,11 +566,14 @@ function AskBeforePay() {
         var dk = document.getElementById("__DK").value;
         var nlsa = document.getElementById("Nls_A").value;
         var nlsb = document.getElementById("Nls_B").value;
-        paramlist += "&fPlan=" + fplan + "&fli=" + fli + "&dk=" + dk + "&nlsA=" + nlsa + "&nlsB=" + nlsb + "&" + Math.random();
-        height = 400;
+        var tt = document.getElementById("__TT").value;
+        var nmkA = document.getElementById("Nmk_A").value;
+        var nmkB = document.getElementById("Nmk_B").value;
+        paramlist += "&fPlan=" + fplan + "&fli=" + fli + "&dk=" + dk + "&nlsA=" + nlsa + "&nlsB=" + nlsb + "&tt=" + tt + "&nmkA=" + nmkA + "&nmkB=" + nmkB + "&" + Math.random();
+        height = 500;
     }
-    var result = window.showModalDialog("AskBeforePay.aspx" + paramlist, null,
-  "dialogWidth:500px; dialogHeight:" + height + "px; center:yes; status:no; resizable:yes; help:no;");
+    var result = window.showModalDialog(encodeURI("AskBeforePay.aspx" + paramlist), null,
+  "dialogWidth:600px; dialogHeight:" + height + "px; center:yes; status:no; resizable:yes; help:no;");
     return result;
 }
 
@@ -706,6 +710,7 @@ function selectAccounts(evt, elem, fl) {
                     document.getElementById("Nls_A").value = result[0];
                     if ("" == kv)
                         document.getElementById("Kv_A").value = result[1];
+                    document.getElementById("Nmk_A").value = result[4];
                 }
                 else {
                     if ("" == document.getElementById("Mfo_A").value)
@@ -718,6 +723,7 @@ function selectAccounts(evt, elem, fl) {
                     document.getElementById("Nls_B").value = result[0];
                     if ("" == kv)
                         document.getElementById("Kv_B").value = result[1];
+                    document.getElementById("Nmk_B").value = result[4];
                 }
                 else {
                     if ("" == document.getElementById("Mfo_B").value)

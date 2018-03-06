@@ -36,7 +36,7 @@
 				<asp:Panel Visible=false ID="pnWarning" runat="server" GroupingText="Попередження" Font-Bold="True" Font-Names="Verdana" Font-Size="10pt">
                     &nbsp;&nbsp;<asp:TextBox ID="lbWarning" runat="server" Font-Bold="True" 
                         Font-Names="Verdana" ForeColor="Red" ReadOnly="True" TextMode="MultiLine" EnableViewState="False"
-                        Width="100%" BackColor="#F0F0F0" BorderStyle="None" Rows="4"></asp:TextBox>
+                        Width="100%" BackColor="#F0F0F0" BorderStyle="None" Rows="10"></asp:TextBox>
                             </asp:Panel>
 			</P>
 		</form>

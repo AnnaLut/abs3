@@ -1014,6 +1014,8 @@
             <tr>
             </tr>
         </table>
+    <input id="Nmk_A" type="hidden" runat="server"/>
+    <input id="Nmk_B" type="hidden" runat="server"/>
     </form>
     <script type="text/javascript">
         AddListeners("SumA", 'onblur', SumA_Blur);
