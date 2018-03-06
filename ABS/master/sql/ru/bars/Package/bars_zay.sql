@@ -2815,7 +2815,9 @@ procedure p_data_transfer (p_req_id in zay_data_transfer.req_id%type,
                            p_comm   in zay_data_transfer.comm%type
                            )
 is
+  l_trace varchar2(500):='bars_zay. p_data_transfer';
 begin
+  bars_audit.info(l_trace||'.'||p_req_id||'.'||p_url||'.'|| p_result);
   insert into zay_data_transfer
    (id,
     req_id,
@@ -2860,6 +2862,7 @@ procedure service_track_request(p_reqest_id in zayavka.id%type) is
   l_url        varchar2(256);
   l_type       number :=7;
   l_comm       varchar2(256);
+  l_trace varchar2(500):='bars_zay.service_track_request';
 begin
   select max(v.track_id)
     into l_track_id
@@ -2945,6 +2948,7 @@ begin
   end if;
   dbms_xmlparser.freeparser(l_parser);
   DBMS_XMLDOM.freeDocument(l_doc);
+  bars_audit.info(l_trace||'.1.'||l_clob);
   end service_track_request;
 
   -------------------------------------------------------------------------------
@@ -2973,9 +2977,11 @@ begin
   l_flag          number;
   l_type          number;
   l_comm          varchar2(256);
+  l_trace varchar2(500):='bars_zay.service_request';
 begin
 if gZAYMODE = 2 then
 
+  bars_audit.info(l_trace||'.1.'||p_reqest_id||'.'||p_flag_klb);         
   -- web-сервис
   select VAL into l_mfo from params where par = 'MFO';
   select v.* into l_vzay from v_zay v where v.id = p_reqest_id;
@@ -3376,7 +3382,7 @@ if gZAYMODE = 2 then
 
     if l_status = 'error' then
       dbms_xslprocessor.valueof(l_res, 'ErrorMessage/text()', l_str);
-
+bars_audit.info(l_trace||'.2.'||l_vzay.id||'.'||l_url);         
       p_data_transfer (p_req_id => l_vzay.id,
                        p_url    => l_url,
                        p_mfo    => l_mfo,
@@ -5170,7 +5176,9 @@ procedure set_visa (
   p_f092      in zayavka.f092%type default null, 
   p_sup_doc   in zayavka.support_document%type default null)
 is
+ l_trace varchar2(500):='bars_zay.set_visa';
 begin
+  bars_audit.info(l_trace||'.1.'||p_id||'.'||p_viza);
   update zayavka
      set viza      = p_viza,
          priority  = nvl(p_priority, priority),
@@ -5185,10 +5193,12 @@ begin
    -- позвать web-сервис
    if gZAYMODE = 2 then
       if p_viza = 2 then
+          bars_audit.info(l_trace||'.2.'||p_id||'.'||p_viza);
          -- web-сервис-2 на изменение визы
          service_request(p_id,3);
       else
          -- web-сервис-1 на изменение всего
+          bars_audit.info(l_trace||'.3.'||p_id||'.'||p_viza);         
          service_request(p_id, 3);
       end if;
    end if;
@@ -5200,7 +5210,9 @@ procedure set_support_document (
   p_support_document  in zayavka.support_document%type
   )
 is
+ l_trace varchar2(500):='bars_zay.set_support_document';
 begin
+  bars_audit.info(l_trace||'.'||p_id||'.'||p_support_document);
   update zayavka z
      set z.support_document =p_support_document
    where id = p_id;

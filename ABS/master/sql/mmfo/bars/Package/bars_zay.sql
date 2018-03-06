@@ -2824,7 +2824,9 @@ procedure p_data_transfer (p_req_id in zay_data_transfer.req_id%type,
                            p_comm   in zay_data_transfer.comm%type
                            )
 is
+  l_trace varchar2(500):='bars_zay. p_data_transfer';
 begin
+  bars_audit.info(l_trace||'.'||p_req_id||'.'||p_url||'.'|| p_result);
   insert into zay_data_transfer
    (id,
     req_id,
@@ -2869,6 +2871,7 @@ procedure service_track_request(p_reqest_id in zayavka.id%type) is
   l_url        varchar2(256);
   l_type       number :=7;
   l_comm       varchar2(256);
+  l_trace varchar2(500):='bars_zay.service_track_request';
 begin
   select max(v.track_id)
     into l_track_id
@@ -2954,6 +2957,7 @@ begin
   end if;
   dbms_xmlparser.freeparser(l_parser);
   DBMS_XMLDOM.freeDocument(l_doc);
+  bars_audit.info(l_trace||'.1.'||l_clob);
   end service_track_request;
 
   -------------------------------------------------------------------------------
@@ -2982,14 +2986,15 @@ begin
   l_flag          number;
   l_type          number;
   l_comm          varchar2(256);
+  l_trace varchar2(500):='bars_zay.service_request';
 begin
 
-
+  bars_audit.info(l_trace||'.1.'||p_reqest_id||'.'||p_flag_klb);         
   -- web-сервис
   select VAL into l_mfo from params where par = 'MFO';
   select v.* into l_vzay from v_zay v where v.id = p_reqest_id;
   select z.url into l_url from zay_recipients z where z.kf = sys_context('bars_context','user_mfo');
-  
+
 if l_vzay.MFO<>'300465' then
 
   if p_flag_klb in (2,3,4) then
@@ -3387,7 +3392,7 @@ if l_vzay.MFO<>'300465' then
 
     if l_status = 'error' then
       dbms_xslprocessor.valueof(l_res, 'ErrorMessage/text()', l_str);
-
+bars_audit.info(l_trace||'.2.'||l_vzay.id||'.'||l_url);         
       p_data_transfer (p_req_id => l_vzay.id,
                        p_url    => l_url,
                        p_mfo    => l_mfo,
@@ -5202,7 +5207,9 @@ procedure set_visa (
   p_f092      in zayavka.f092%type default null, 
   p_sup_doc   in zayavka.support_document%type default null)
 is
+ l_trace varchar2(500):='bars_zay.set_visa';
 begin
+  bars_audit.info(l_trace||'.1.'||p_id||'.'||p_viza);
   update zayavka
      set viza      = p_viza,
          priority  = nvl(p_priority, priority),
@@ -5217,10 +5224,12 @@ begin
    -- позвать web-сервис
    if gZAYMODE = 2 then
       if p_viza = 2 then
+          bars_audit.info(l_trace||'.2.'||p_id||'.'||p_viza);
          -- web-сервис-2 на изменение визы
          service_request(p_id,3);
       else
          -- web-сервис-1 на изменение всего
+          bars_audit.info(l_trace||'.3.'||p_id||'.'||p_viza);         
          service_request(p_id, 3);
       end if;
    end if;
@@ -5232,7 +5241,9 @@ procedure set_support_document (
   p_support_document  in zayavka.support_document%type
   )
 is
+ l_trace varchar2(500):='bars_zay.set_support_document';
 begin
+  bars_audit.info(l_trace||'.'||p_id||'.'||p_support_document);
   update zayavka z
      set z.support_document =p_support_document
    where id = p_id;
@@ -7330,7 +7341,7 @@ is
     function ex_init(p_sqlerrm varchar2)
     return varchar2
     is
-    begin 
+    begin
     return substr(p_sqlerrm,instr(p_sqlerrm,'(')+6,instr(p_sqlerrm,')')-instr(p_sqlerrm,'(')-6);
     end;
 
@@ -7339,9 +7350,9 @@ begin
 --по одному рефу может быть несколько заявок Оо (когда разбивают суму на несколько заявок)
     for c in (select id from zayavka where sos=2 and ref=p_ref)
     loop
-      
+
         select * into l_zayavka from zayavka where id=c.id;
-            
+
         update zayavka
         set  meta          = case when p_tag='D1#70' then to_number(p_value) else l_zayavka.meta end,
              contract      = case when p_tag='D2#70' then p_value else l_zayavka.contract end,
@@ -7355,19 +7366,19 @@ begin
              bank_name     = case when p_tag='DA#70' then p_value else l_zayavka.bank_name end,
              product_group = case when p_tag='DB#70' then p_value else l_zayavka.product_group end
          where id=c.id;
-       
+
     end loop;
-exception when ex_parentnotfound then  
-  if    ex_init(sqlerrm)='FK_ZAYAVKA_ZAYAIMS' 
+exception when ex_parentnotfound then
+  if    ex_init(sqlerrm)='FK_ZAYAVKA_ZAYAIMS'
   then
      bars_error.raise_nerror (modcode, 'FK_ZAYAVKA_ZAYAIMS');
-  elsif ex_init(sqlerrm)='XFK_ZAYAVKA_COUNTRY' 
+  elsif ex_init(sqlerrm)='XFK_ZAYAVKA_COUNTRY'
   then
      bars_error.raise_nerror (modcode, 'XFK_ZAYAVKA_COUNTRY');
-  elsif ex_init(sqlerrm)='FK_ZAYAVKA_PRODUCT_GROUP' 
+  elsif ex_init(sqlerrm)='FK_ZAYAVKA_PRODUCT_GROUP'
   then
      bars_error.raise_nerror (modcode, 'FK_ZAYAVKA_PRODUCT_GROUP');
-  else raise; end if;   
+  else raise; end if;
 end;
 
 begin
