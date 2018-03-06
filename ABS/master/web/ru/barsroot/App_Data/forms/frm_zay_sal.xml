@@ -105,7 +105,7 @@
     <sql>
       SELECT decode(nvl(v.identkb,0),0,0,1) KB, v.kv2, v.dk, v.id, v.rnk, v.nmk, v.cust_branch,
       v.mfo0, v.nls0, v.nls, v.ostc/100 ostc, v.s2s, v.kurs_z,  v.fdat,
-      v.kom, v.skom, v.priority, v.priorname, to_char(meta,'09')||' '||v.aim_name aim_name, f092_text, v.comm,
+      v.kom, v.skom, v.priority, v.priorname, to_char(meta,'09')||' '||v.aim_name aim_name, f092, v.comm,
       bars_zay.get_request_cover(v.id) fl
       FROM v_zay_queue v
       WHERE v.sos          = 0
