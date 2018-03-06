@@ -1,6 +1,6 @@
 create or replace package DPT_UTILS
 is
-  head_ver  constant varchar2(64)  := 'version 1.16 12.04.2016';
+  head_ver  constant varchar2(64)  := 'version 1.16  12.04.2016';
   head_awk  constant varchar2(512) := '';
   --
   --  служебные функции
@@ -132,7 +132,7 @@ is
 --
 -- constants
 --
-body_ver  constant varchar2(64)  := 'version 1.25 05.01.2017';
+body_ver  constant varchar2(32)  := 'version 1.26  06.03.2018';
 body_awk  constant varchar2(512) := '';
 
 modcod    constant varchar2(3)   := 'DPT';
@@ -2023,91 +2023,64 @@ end NORMALIZATION_SEQUENCE;
 --
 procedure RECOVERY_CONTRACT( p_dptid  in   dpt_deposit.deposit_id%type )  -- ≥дентиф≥катор деп.договору ‘ќ
 is
-  title   constant varchar2(30) := 'RECOVERY_CONTRACT: ';
+  title   constant varchar2(32) := 'RECOVERY_CONTRACT';
   l_dpt   dpt_deposit_clos%rowtype;
-  l_tmp   number;
 begin
+
+  dbms_application_info.set_action('recovery_deposit');
+
   begin
     select c.* 
-      into l_dpt 
-      from dpt_deposit_clos c
-     where c.action_id in (1, 2) 
+      into l_dpt
+      from DPT_DEPOSIT_CLOS c
+     where c.action_id in (1,2)
        and c.deposit_id = p_dptid
        and not exists (select 1 from dpt_deposit d where d.deposit_id = c.deposit_id);
   exception
     when no_data_found then
       raise_application_error(-20000, '¬клад не найден или не закрыт!');
-  end; 
-  
-  begin
-    select 1
-      into l_tmp
-      from accounts a, 
-           int_accn i,
-           accounts b
-     where a.acc  = l_dpt.acc 
-       and a.acc  = i.acc(+) 
-       and i.id   = 1
-       and i.acra = b.acc(+) 
-       and a.dazs is null 
-       and b.dazs is null;
-  exception
-    when no_data_found then
-      raise_application_error(-20000, '–ахунки по вкладу не реан≥мован≥!');
   end;
-  
+
   -- видал€Їм запис про закритт€ депозиту
-  delete dpt_deposit_clos 
-   where idupd = l_dpt.idupd;
-  
-  -- вставл€эмо запис про в≥дновленн€ з арх≥ву
-  /*update dpt_deposit_clos 
-     set action_id  = 7 
-   where idupd = l_dpt.idupd;
-  */
-  -- тригер вставки в DPT_DEPOSIT_ALL
-  execute immediate 'alter trigger tbi_dpt_deposit disable';  
-  dbms_application_info.set_action('recovery_deposit');
-  
-  bars_context.subst_branch(l_dpt.branch);  
-  
-  -- повертаЇм депозит в портфель
-  insert into dpt_deposit
-    (deposit_id, nd, vidd, acc, kv, rnk,
-     freq, datz, dat_begin, dat_end, dat_end_alt,
-     mfo_p, nls_p, name_p, okpo_p,
-     dpt_d, acc_d, mfo_d, nls_d, nms_d, okpo_d,
-     limit, deposit_cod, comments, stop_id, cnt_dubl, 
-     cnt_ext_int, dat_ext_int, kf, branch, userid)
+  delete DPT_DEPOSIT_CLOS
+   where IDUPD = l_dpt.idupd;
+
+  -- повертаЇм депозит в портфель та вставл€эмо запис про в≥дновленн€ з арх≥ву
+  insert
+    into DPT_DEPOSIT
+       ( DEPOSIT_ID, ND, VIDD, ACC, KV, RNK,
+         FREQ, DATZ, DAT_BEGIN, DAT_END, DAT_END_ALT,
+         MFO_P, NLS_P, NAME_P, OKPO_P,
+         DPT_D, ACC_D, MFO_D, NLS_D, NMS_D, OKPO_D,
+         LIMIT, DEPOSIT_COD, COMMENTS, STOP_ID, CNT_DUBL,
+         CNT_EXT_INT, DAT_EXT_INT, KF, BRANCH, USERID )
   values
-    (l_dpt.deposit_id, l_dpt.nd, l_dpt.vidd, l_dpt.acc, l_dpt.kv, l_dpt.rnk,
-     l_dpt.freq,  l_dpt.datz,  l_dpt.dat_begin, l_dpt.dat_end, l_dpt.dat_end_alt,
-     l_dpt.mfo_p, l_dpt.nls_p, l_dpt.name_p, l_dpt.okpo_p,
-     l_dpt.dpt_d, l_dpt.acc_d, l_dpt.mfo_d, l_dpt.nls_d, l_dpt.nms_d, l_dpt.okpo_d,
-     l_dpt.limit, l_dpt.deposit_cod, l_dpt.comments, l_dpt.stop_id, l_dpt.cnt_dubl, 
-     l_dpt.cnt_ext_int, l_dpt.dat_ext_int, l_dpt.kf, l_dpt.branch, l_dpt.userid);
-  
-  execute immediate 'alter trigger tbi_dpt_deposit enable'; 
+       ( l_dpt.deposit_id, l_dpt.nd, l_dpt.vidd, l_dpt.acc, l_dpt.kv, l_dpt.rnk,
+         l_dpt.freq,  l_dpt.datz,  l_dpt.dat_begin, l_dpt.dat_end, l_dpt.dat_end_alt,
+         l_dpt.mfo_p, l_dpt.nls_p, l_dpt.name_p, l_dpt.okpo_p,
+         l_dpt.dpt_d, l_dpt.acc_d, l_dpt.mfo_d, l_dpt.nls_d, l_dpt.nms_d, l_dpt.okpo_d,
+         l_dpt.limit, l_dpt.deposit_cod, l_dpt.comments, l_dpt.stop_id, l_dpt.cnt_dubl,
+         l_dpt.cnt_ext_int, l_dpt.dat_ext_int, l_dpt.kf, l_dpt.branch, l_dpt.userid );
+
+  -- реан≥муЇмо рахунки
+  for ac in ( select ACCID from DPT_ACCOUNTS where DPTID = l_dpt.deposit_id )
+  loop
+    -- ACCREG.P_ACC_RESTORE( ac.ACCID );
+    update ACCOUNTS
+       set DAZS = NULL
+     where ACC = ac.ACCID
+       and DAZS Is Not Null;
+  end loop;
+
+  bars_audit.info( title || ': ¬клад # '||to_char(p_dptid)||' усп≥шно в≥дновлено!' ); 
+
   dbms_application_info.set_action(null);
-  -- ???
-  update dpt_deposit_clos d
-     set d.bdate = (select min(d1.bdate) 
-                      from dpt_deposit_clos d1 
-                     where d1.deposit_id = p_dptid) 
-   where d.deposit_id = p_dptid
-     and d.action_id  = 0;
-  
-  bars_context.set_context;
-  
-  bars_audit.info( title || '¬клад є '||to_char(p_dptid)||' усп≥шно в≥дновлено!' ); 
-  
+
 exception
   when others then
-    execute immediate 'alter trigger tbi_dpt_deposit enable';
     dbms_application_info.set_action(null);
-    bars_context.set_context;
-    bars_audit.error( title || dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace() );
-    raise_application_error( -20000, dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace() );
+    bars_audit.error( title||': '||dbms_utility.format_error_stack()||dbms_utility.format_error_backtrace() );
+    raise_application_error( -20000, dbms_utility.format_error_stack()||dbms_utility.format_error_backtrace(), true );
 end RECOVERY_CONTRACT;
 
 
