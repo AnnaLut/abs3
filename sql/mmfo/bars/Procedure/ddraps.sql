@@ -6,7 +6,7 @@ create or replace procedure DDRAPS
   <b>CREATE_DAILY_SNAPSHOT</b> - процедура створення денних знімків балансу
   %param 
   
-  %version 2.1 (26.02.2018)
+  %version 2.2 (06.03.2018)
   %usage   створення денних знімків балансу.
   */
   l_errmsg          varchar2(500);
@@ -200,6 +200,9 @@ BEGIN
 
   bars_audit.trace( $$PLSQL_UNIT||': gl.paysos0 -> Ok.' );
 
+  --execute immediate 'alter table SNAP_BALANCES_INTR_TBL truncate partition for ( '''||l_kf||''' )';
+  execute immediate 'alter table SNAP_BALANCES_INTR_TBL truncate partition P_'||l_kf;
+
   l_condition := q'[ (to_date('%dt','ddmmyyyy'),'%kf') ]';
   l_condition := replace( l_condition, '%dt', to_char(dat_,'ddmmyyyy') );
   l_condition := replace( l_condition, '%kf', l_kf );
@@ -276,9 +279,6 @@ BEGIN
     USING dat#, l_kf, dat_, l_kf, l_kf, dat_, dat_;
 
   END IF;
-
---execute immediate 'alter table SNAP_BALANCES_INTR_TBL truncate partition for ( '''||l_kf||''' )';
-  execute immediate 'alter table SNAP_BALANCES_INTR_TBL truncate partition P_'||l_kf;
 
   GET_RAT(dat_);
 
@@ -508,10 +508,13 @@ BEGIN
     GL.OVERPAY_PVP;
   end if;
 
-  -- Фіксуємо SCN на якому формуємо знімок балансу по табл. SALDOA
-  BARS_UTL_SNAPSHOT.SET_TABLE_SCN( 'SALDOA', dat_, l_kf, DBMS_FLASHBACK.GET_SYSTEM_CHANGE_NUMBER() );
-
   COMMIT;
+
+  -- Фіксуємо SCN на якому формуємо знімок балансу по табл. SALDOA
+  BARS_UTL_SNAPSHOT.SET_TABLE_SCN( p_table => 'SALDOA'
+                                 , p_date  => dat_
+                                 , p_kf    => l_kf
+                                 , p_scn   => DM_UTL.GET_LAST_SCN( 'SNAP_BALANCES_INTR_TBL', 'BARS', null, l_kf ) );
 
   BARS_AUDIT.INFO( $$PLSQL_UNIT||': lock requested.' );
 

@@ -446,7 +446,7 @@ is
     %param p_date      - partition key value ( FDAT )
     %param p_kf        - subpartition key value ( KF )
 
-    %version 1.1
+    %version 1.2
     %usage   отримати SCN останных змін в таблиці
     */
     title         constant     varchar2(32) := 'dm_utl.get_last_scn';
@@ -480,17 +480,38 @@ is
 
     l_stmt := case
               when upper(p_table_nm) = 'SALDOA'
-              then q'[s where not exists (select 1 from ]'||l_tbl_own||q'[.ACCOUNTS a where a.NLS like '80%' and a.ACC = s.ACC)]'
+              then q'[ s where not exists (select 1 from ]'||l_tbl_own||q'[.ACCOUNTS a where a.NLS like '80%' and a.ACC = s.ACC)]'
               else null
               end;
 
     l_stmt := case
-              when ( l_sptsn = 1 and p_kf Is Not Null )
-              then 'select nvl(max(ora_rowscn),0) from ' || l_tbl_own || '.' || p_table_nm ||
-                   ' subpartition for ( to_date('''||l_dt||''',''yyyymmdd''), '''||p_kf||''' )'|| l_stmt
+              when ( l_sptsn = 1 )
+              then --
+                case
+                when ( p_kf   Is Not Null and p_date Is Null )
+                then 'select nvl(max(ora_rowscn),0) from ' || l_tbl_own || '.' || p_table_nm ||
+                     ' partition for ( '''||p_kf||''' )' || l_stmt
+                when ( p_date Is Not Null and p_kf   Is Null )
+                then 'select nvl(max(ora_rowscn),0) from ' || l_tbl_own || '.' || p_table_nm ||
+                     ' partition for ( to_date('''||l_dt||''',''yyyymmdd'') )' || l_stmt
+                when ( p_date Is Not Null and p_kf Is Not Null )
+                then 'select nvl(max(ora_rowscn),0) from ' || l_tbl_own || '.' || p_table_nm ||
+                     ' subpartition for ( to_date('''||l_dt||''',''yyyymmdd''), '''||p_kf||''' )'|| l_stmt
+                else 'select nvl(max(ora_rowscn),0) from ' || l_tbl_own || '.' || p_table_nm || l_stmt
+                end
               when ( l_ptsn  = 1 )
-              then 'select nvl(max(ora_rowscn),0) from ' || l_tbl_own || '.' || p_table_nm ||
-                   ' partition for ( to_date('''||l_dt||''',''yyyymmdd'') )' || l_stmt
+              then -- 
+                case
+                when ( p_date Is Not Null )
+                then 'select nvl(max(ora_rowscn),0) from ' || l_tbl_own || '.' || p_table_nm ||
+                     ' partition for ( to_date('''||l_dt||''',''yyyymmdd'') )' || l_stmt
+                when ( p_kf Is Not Null )
+                then 'select nvl(max(ora_rowscn),0) from ' || l_tbl_own || '.' || p_table_nm ||
+                     ' partition for ( '''||p_kf||''' )' || l_stmt
+--              where ( p_date Is Null AND p_kf Is Null )
+--              then 'select nvl(max(ora_rowscn),0) from ' || l_tbl_own || '.' || p_table_nm || l_stmt
+                else 'select nvl(max(ora_rowscn),0) from ' || l_tbl_own || '.' || p_table_nm || l_stmt
+                end
               else 'select nvl(max(ora_rowscn),0) from ' || l_tbl_own || '.' || p_table_nm ||
                    ' where FDAT = to_date('''||l_dt||''',''yyyymmdd'')'
               end;
