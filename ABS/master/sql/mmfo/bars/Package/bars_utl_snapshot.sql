@@ -9,7 +9,7 @@ is
   -- Purpose : Службовий пакет роботи зі знімками балансу
 
   -- Public constant declarations
-  VERSION_HEAD         constant varchar2(64) := 'version 1.4  05.03.2018';
+  VERSION_HEAD         constant varchar2(64) := 'version 1.4  06.03.2018';
 
   -- алгоритмы наполнения accm_snap_balances
   ALGORITHM_OLD        constant varchar2(30) := 'OLD';
@@ -29,7 +29,7 @@ is
   TAB_SALDOZ           constant varchar2(30) := 'SALDOZ';
 
   -- таблиця щоденнх знімків балансу
-  TAB_SNAP_BALANCES    constant varchar2(30) := 'SNAP_BALANCES';
+  TAB_SNPBAL           constant varchar2(30) := 'SNAP_BALANCES';
 
   ------------------------------------------------------------------
   -- HEADER_VERSION
@@ -162,7 +162,7 @@ is
   --
   -- constants
   --
-  VERSION_BODY    constant varchar2(64)  := 'version 1.3.3  05.03.2018';
+  VERSION_BODY    constant varchar2(64)  := 'version 1.3.3  06.03.2018';
 
   -- Префикс для трассировки
   PKG_CODE        constant varchar2(100) := 'UTL_SNAPSHOT';
@@ -373,7 +373,7 @@ is
   -- ==================================================================================================
   -- get_snap_scn - возвращает scn последней генерации снимка баланса по партиции указанной таблицы
   -- ==================================================================================================
-  function get_snap_scn(p_table in varchar2, p_date in date
+  function get_snp_scn(p_table in varchar2, p_date in date
   ) return number
   is
     p           constant varchar2(100) := PKG_CODE || '.getsnapscn';
@@ -408,7 +408,7 @@ is
     --
     return l_snap_scn;
     --
-  end get_snap_scn;
+  end get_snp_scn;
 
 
   -- ==================================================================================================
@@ -567,8 +567,8 @@ is
     bars_audit.trace( '%s.IS_PARTITION_MODIFIED: Entry with ( p_table = %s, p_date = %s ).'
                     , PKG_CODE, p_table, to_char(p_date,FMT_DATE) );
 
-    l_crn_tbl_scn := get_mod_scn( p_table, p_date); -- max(ora_rowscn)
-    l_prv_tbl_scn := get_snap_scn(p_table, p_date); -- bars.accm_snap_scn
+    l_crn_tbl_scn := get_mod_scn( p_table, p_date ); -- max(ora_rowscn)
+    l_prv_tbl_scn := get_snp_scn( p_table, p_date ); -- bars.accm_snap_scn
 
     bars_audit.trace( '%s.IS_PARTITION_MODIFIED: ( l_crn_tbl_scn = %s, l_prv_tbl_scn = %s ).'
                     , PKG_CODE, to_char(l_crn_tbl_scn), to_char(l_prv_tbl_scn) );
@@ -606,6 +606,13 @@ is
     -- для этого:
     -- получим scn последних снимков балансов по партиции saldoa
     l_saldoa_snap_scn := is_partition_modified(TAB_SALDOA,           p_fdat);
+
+    /*
+    if ( get_mod_scn( TAB_SALDOA, p_fdat ) > get_mod_scn( TAB_SNPBAL, p_fdat ) )
+    then l_saldoa_snap_scn := 1;
+    else l_saldoa_snap_scn := 0;
+    end if;
+    */
 
     bars_audit.trace( PKG_CODE||' saldoa_snap_scn='||l_saldoa_snap_scn||', fdat='||to_char(p_fdat, FMT_DATE) );
 
@@ -650,8 +657,8 @@ is
     else -- перевірка на модифікацію даних в партиції табл.SNAP_BALANCES за останній робочий день міс.
 
       l_last_bdt := DAT_NEXT_U(add_months(p_fdat,1),-1);
-      l_tabl_scn := get_mod_scn( TAB_SNAP_BALANCES, l_last_bdt);
-      l_snap_scn := get_snap_scn(TAB_SALDOZ, p_fdat);
+      l_tabl_scn := get_mod_scn( TAB_SNPBAL, l_last_bdt );
+      l_snap_scn := get_snp_scn( TAB_SALDOZ, p_fdat     );
 
       if ( l_snap_scn < l_tabl_scn )
       then
@@ -1238,7 +1245,6 @@ end BARS_UTL_SNAPSHOT;
 
 show errors;
 
-PROMPT *** Create  grants  BARS_UTL_SNAPSHOT ***
 grant EXECUTE on BARS_UTL_SNAPSHOT to BARSUPL;
 grant EXECUTE on BARS_UTL_SNAPSHOT to BARS_ACCESS_DEFROLE;
 grant EXECUTE on BARS_UTL_SNAPSHOT to UPLD;
