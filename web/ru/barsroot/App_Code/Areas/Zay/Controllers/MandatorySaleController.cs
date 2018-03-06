@@ -6,12 +6,13 @@ using BarsWeb.Areas.Zay.Infrastructure.Repository.DI.Abstract;
 using BarsWeb.Areas.Zay.Models;
 using BarsWeb.Models;
 using Kendo.Mvc.UI;
+using BarsWeb.Controllers;
 
 namespace BarsWeb.Areas.Zay.Controllers
 {
     [CheckAccessPage]
     [AuthorizeUser]
-    public class MandatorySaleController : Controller
+    public class MandatorySaleController : ApplicationController
     {
         private IMandatorySaleRepository _repo;
         private IZayParams _zayParams;
@@ -42,7 +43,7 @@ namespace BarsWeb.Areas.Zay.Controllers
             int baseVal = 0;
             ViewBag.baseVal = int.TryParse(_kernelParams.GetParam("BASEVAL").Value, out baseVal);
             ViewBag.baseVal = baseVal;
-            
+
             return View();
         }
 
@@ -56,10 +57,10 @@ namespace BarsWeb.Areas.Zay.Controllers
             catch (Exception ex)
             {
                 result.status = JsonResponseStatus.Error;
-                result.message = "Виникла помилка в ході зняття заявки з контролю! <br/>" + 
+                result.message = "Виникла помилка в ході зняття заявки з контролю! <br/>" +
                     ex.InnerException == null ? ex.Message : ex.InnerException.Message;
             }
-            return Json(result, JsonRequestBehavior.AllowGet); 
+            return Json(result, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult GetZayLinkedDocs([DataSourceRequest] DataSourceRequest request, decimal docRef)
@@ -78,7 +79,7 @@ namespace BarsWeb.Areas.Zay.Controllers
         public ActionResult GetD27Params(decimal docRef)
         {
             var nazn = _repo.GetOperNazn(docRef);
-            return Json(new {nazn}, JsonRequestBehavior.AllowGet);
+            return Json(new { nazn }, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult CreateBid(ZayDebt bidParams)
@@ -91,10 +92,10 @@ namespace BarsWeb.Areas.Zay.Controllers
             catch (Exception ex)
             {
                 result.status = JsonResponseStatus.Error;
-                result.message = "Виникла помилка в ході оформлення завки! <br/>" + 
+                result.message = "Виникла помилка в ході оформлення завки! <br/>" +
                     ex.InnerException == null ? ex.Message : ex.InnerException.Message;
             }
-            return Json(result, JsonRequestBehavior.AllowGet); 
+            return Json(result, JsonRequestBehavior.AllowGet);
         }
     }
 }

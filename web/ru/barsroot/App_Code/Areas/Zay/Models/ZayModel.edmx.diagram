@@ -6,6 +6,7 @@
     <edmx:Diagrams>
       <Diagram DiagramId="1eb34cb2de784ac8890abe0ec9666256" Name="Diagram1">
         <EntityTypeShape EntityType="BarsWeb.Areas.Zay.Models.BIRJA" Width="1.5" PointX="0.5" PointY="0.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Zay.Models.ZAYAVKA" Width="1.5" PointX="3.375" PointY="0.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

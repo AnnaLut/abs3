@@ -153,42 +153,13 @@ namespace BarsWeb.Areas.Zay.Infrastructure.Repository.DI.Implementation
             var nobz1919 = _zayParams.GetParam("OBZ_1919");
             _basicSql = new BarsSql()
             {
-                SqlText = @"SELECT 1 Flag_New, c.rnk, c.nmk, a.acc, a.kv, t.lcv iso, a.nls, o.ref, o.s/power(10,t.dig) suma,  
-                        o.fdat vdat, dat_next_u(o.fdat,1) dat5, t.dig
-                       ,(select least(count(*), 1) from zay_debt_klb zk where zk.rnk = c.rnk AND zk.kv2 = a.kv AND zk.datz = o.fdat) kb
-                       ,(select count(*) from fdat fd where fd.fdat >= o.fdat AND fd.fdat <= bankdate) dni
-                       ,(SELECT count(0) FROM zay_debt zd WHERE zd.ref=zd.refd AND zd.ref=o.REF) zay  
-                       ,null refd, 0 zay_sum     
-                       ,rownum                
-                  FROM accounts a, customer c, tabval t, opldok o
-                  WHERE a.nbs = '2603'
-                    AND a.kv <> 980
-                    AND a.rnk = c.rnk
-                    AND a.kv  = t.kv
-                    AND a.acc = o.acc
-                    AND o.fdat >= dat_next_u(bankdate,-1) and o.fdat <= bankdate
-                    AND o.dk  = 1
-                    AND o.sos = 5
-                    AND o.ref NOT IN (SELECT DISTINCT ref FROM zay_debt)
-                  UNION ALL
-                 SELECT 0, c.rnk, c.nmk, a.acc, a.kv, t.lcv, a.nls, oper.ref, oper.s/power(10,t.dig), 
-                                           oper.vdat, dat_next_u(oper.vdat,1), t.dig
-                                          ,(select least(count(*), 1) from zay_debt_klb zk where zk.rnk = c.rnk AND zk.kv2 = a.kv AND zk.datz = oper.vdat) kb     
-                                          ,(select count(*) from fdat fd where fd.fdat >= oper.vdat AND fd.fdat <= bankdate) dni
-                                          ,(SELECT count(0) FROM zay_debt zd WHERE zd.ref=zd.refd AND zd.ref=oper.REF) zay                                           
-                                          ,z.refd, nvl(z.zay_sum/power(10,t.dig),0)
-                                          ,rownum
-                   FROM accounts a, customer c, tabval t, oper, zay_debt z
-                  WHERE a.nbs = '2603'
-                    AND a.kv <> 980 
-                    AND a.rnk = c.rnk
-                    AND a.kv  = t.kv
-                    AND a.nls = decode(oper.dk,1,oper.nlsb,oper.nlsa)
-                    AND a.kv  = decode(oper.dk,1,nvl(oper.kv2,oper.kv),oper.kv)
-                    AND oper.sos = 5
-                    AND oper.ref = z.ref
-                    AND z.sos = 0                    
-                  ORDER BY  4, 1, 9, 7 desc",
+                SqlText = @"select 1 as Flag_New, sa.rnk, sa.nmk, sa.acc, sa.kv, sa.lcv iso, sa.nls,
+sa.ref, sa.DOC_AMNT, sa.fdat vdat, dat_next_u(sa.fdat,1) dat5, sa.dig, NULL as REFD, SPLIT_AMNT as suma, sa.SALE_TP, st.TP_NM, sa.DAY_QTY, 0 zay_sum, 1 as request
+from V_ZAY_SPLIT_DTL sa
+, ZAY_SALE_TYPES st
+where st.TP_ID = sa.SALE_TP
+ORDER BY 4, 1, 9, 7 desc",
+
                 SqlParams = new object[] { }
             };
 
@@ -244,35 +215,59 @@ namespace BarsWeb.Areas.Zay.Infrastructure.Repository.DI.Implementation
             {
                 mandatoryPercent = Convert.ToDecimal(nobzProc.Value);
             }
-            foreach (var row in result)
+            if (result.First().request == 1)
             {
-                row.Tip = 2;
-                
-                if (row.Flag_New == 1)
+                foreach (var row in result)
                 {
-                    row.Zay = 0;
-                    row.S1s = row.Suma*mandatoryPercent/100;
-                    row.S2s = row.Suma - row.S1s;
+                    if (row.SALE_TP == 1) {
+                        row.S1s = 0;
+                        row.S2s = row.Suma;
+                    }
+                    if (row.SALE_TP == 2){
+                        row.S1s = Math.Round(row.Suma * mandatoryPercent / 100, 2, MidpointRounding.AwayFromZero);
+                        row.S2s = row.Suma - row.S1s;
+                    }
+                    if (row.SALE_TP == 3){
+                        row.S1s = row.Suma;
+                        row.S2s = 0;
+                    }
+
+
                 }
-                else
+            }
+
+            if (result.First().request == 2)
+            {
+                foreach (var row in result)
                 {
-                    if (row.Zay_Sum == 0)
+                    row.Tip = 2;
+
+                    if (row.Flag_New == 1)
                     {
                         row.Zay = 0;
-                        row.S1s = row.Suma * mandatoryPercent / 100;
+                        row.S1s = Math.Round(row.Suma * mandatoryPercent / 100, 2, MidpointRounding.AwayFromZero);
+                        row.S2s = row.Suma - row.S1s;
                     }
                     else
                     {
-                        row.Zay = 1;
-                        if (row.Zay_Sum != null)
+                        if (row.Zay_Sum == 0)
                         {
-                            row.S1s = row.Zay_Sum.Value;
+                            row.Zay = 0;
+                            row.S1s = Math.Round(row.Suma * mandatoryPercent / 100, 2, MidpointRounding.AwayFromZero);
                         }
+                        else
+                        {
+                            row.Zay = 1;
+                            if (row.Zay_Sum != null)
+                            {
+                                row.S1s = row.Zay_Sum.Value;
+                            }
+                        }
+                        row.Payed = GetPayedSum(row.Ref);
+                        row.S2s = row.Suma - row.S1s - row.Payed;
                     }
-                    row.Payed = GetPayedSum(row.Ref);
-                    row.S2s =  row.Suma - row.S1s - row.Payed;
-                }
 
+                }
             }
 
             return result;
@@ -281,7 +276,8 @@ namespace BarsWeb.Areas.Zay.Infrastructure.Repository.DI.Implementation
         public decimal GetMandatorySaleCount(DataSourceRequest request)
         {
             InitBasicSql();
-            var total = _entities.ExecuteStoreQuery<decimal>(_kendoSqlCounter.TransformSql(_basicSql, null).SqlText, _basicSql.SqlParams).Single();
+            var transformSql = _kendoSqlCounter.TransformSql(_basicSql, request);
+            var total = _entities.ExecuteStoreQuery<decimal>(transformSql.SqlText, transformSql.SqlParams).Single();
             return total;
         }
 
