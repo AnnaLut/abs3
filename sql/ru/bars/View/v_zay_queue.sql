@@ -17,7 +17,7 @@ PROMPT *** Create  view V_ZAY_QUEUE ***
  "BANK_NAME", "USERID", "BRANCH", "FL_KURSZ", "IDENTKB", "COMM", "CUST_BRANCH", "KURS_KL",
  "CONTACT_FIO", "CONTACT_TEL", "VERIFY_OPT", "CLOSE_TYPE_NAME", "AIMS_CODE", "S_PF", "REF_PF",
  "REF_SPS", "START_TIME", "STATE", "OPERID_NOKK", "REQ_TYPE", "VDATE_PLAN", "REASON_COMM",
- "CODE_2C", "P12_2C","F092") AS 
+ "CODE_2C", "P12_2C","ATTACHMENTS_COUNT","F092") AS 
   select z.id,                                                  -- реф заявки
        substr(f_ourmfo_g,1,6),                                        -- РУ
        null,                                               -- реф заявки РУ
@@ -116,6 +116,7 @@ PROMPT *** Create  view V_ZAY_QUEUE ***
              ''),
        z.operid_nokk,
        z.req_type, z.vdate_plan, z.reason_comm, z.code_2c, z.p12_2c,
+       z.ATTACHMENTS_COUNT,
        z.f092
   from zayavka z, zay_queue q, customer c,
        tabval t, tabval t1, accounts a, accounts b,
@@ -153,7 +154,7 @@ select id, mfo, req_id, dk, obz, nd, fdat, datt, rnk, nmk, nd_rnk,
        cust_branch, kurs_kl, contact_fio, contact_tel,
        verify_opt, close_type_name, aims_code,
        s_pf, ref_pf, ref_sps, start_time, state, operid_nokk, req_type, vdate_plan, reason_comm,
-       null, null,null
+       null, null,null,null
   from zayavka_ru;
 
 PROMPT *** Create  grants  V_ZAY_QUEUE ***

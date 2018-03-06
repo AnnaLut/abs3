@@ -117,6 +117,17 @@ exception when others then
 END; 
 /
 
+PROMPT *** ADD COLUMN F092 to ZAYAVKA ***
+BEGIN 
+        execute immediate  
+          ' alter table zayavka add ATTACHMENTS_COUNT integer '; 
+exception when others then
+  if  sqlcode=-01430 then null; else raise; end if;
+END; 
+/
+COMMENT ON COLUMN BARS.ZAYAVKA.ATTACHMENTS_COUNT IS 'Кількість доданих документів';
+/
+
 
 PROMPT *** ALTER_POLICIES to ZAYAVKA ***
  exec bpa.alter_policies('ZAYAVKA');
