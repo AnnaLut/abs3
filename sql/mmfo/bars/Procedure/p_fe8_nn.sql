@@ -4,11 +4,19 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe8_nn (dat_     DATE,
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #E8 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 2008.  All Rights Reserved.
-% VERSION     : 30/01/2018 (26/01/2018, 11/10/2017)
+% VERSION     : 05/03/2018 (02/03/2018, 15/02/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                sheme_ - схема формирования
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+05.03.2018 - для бал.счетов группы 162 номер договора, дату начала и дату 
+             окончания вибираем из табл. CC_DEAL                          
+             (добавлено в те блоки где обрабатывается группа 270)
+             для группы 921 в табл. FX_DEAL для отбора вибираем поля 
+             ACC9B и DAT_B
+02.03.2018 - для бал.счетов группы 162 номер договора, дату начала и дату 
+             окончания вибираем из табл. CC_DEAL 
+15.02.2018 - изменяем бал.счет 2615 на 2610
 30.01.2018 - змінено формування коду K021
 25.01.2018 - змінено формування кодів ZZZZZZZZZZ та K021
 11.10.2017 - для групп бал.счетоа 270, 366 дату начала договора вибираем из
@@ -315,25 +323,6 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe8_nn (dat_     DATE,
          THEN
             kod_okpo := 'I' || LPAD (to_char(rnk_), 9,'0');
 
-            --BEGIN
-            --   SELECT 'CC' || LPAD (SUBSTR (TRIM (ser) || TRIM (numdoc), 1, 8),
-            --                        8,
-            --                        '0'
-            --                       )
-            --      INTO kod_okpo
-            --   FROM person
-            --   WHERE rnk = rnk_;
-            --EXCEPTION
-            --   WHEN NO_DATA_FOUND
-            --   THEN
-            --   ncontr_ := ncontr_ + 1;
-            --   if mfo_ = 300465
-            --   then
-            --      kod_okpo := 'IN' || LPAD (TO_CHAR (ncontr_), 8, '0');
-            --   else
-            --      kod_okpo := 'IN' || LPAD (TO_CHAR(our_reg_) || substr(TO_CHAR (100+ncontr_), 2, 2), 8, '0');
-            --   end if;
-            --END;
             k021_ := '9';
          END IF;
 
@@ -361,26 +350,8 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe8_nn (dat_     DATE,
       THEN
          IF mfo_ <> 324805 and custtype_ = 1 and rez_ = 2
          THEN
-            --BEGIN
-            --   SELECT 'CC' || LPAD (SUBSTR (TRIM (ser) || TRIM (numdoc), 1, 8),
-            --                        8,
-            --                        '0'
-            --                       )
-            --      INTO kod_okpo
-            --   FROM person
-            --   WHERE rnk = rnk_;
-            --EXCEPTION
-            --   WHEN NO_DATA_FOUND
-            --   THEN
-            --   ncontr_ := ncontr_ + 1;
-            --   if mfo_ = 300465
-            --   then
-            --      kod_okpo := 'IN' || LPAD (TO_CHAR (ncontr_), 8, '0');
-            --   else
-            --      kod_okpo := 'IN' || LPAD (TO_CHAR(our_reg_) || substr(TO_CHAR (100+ncontr_), 2, 2), 8, '0');
-            --   end if;
-            --END;
             kod_okpo := 'I' || LPAD (to_char(rnk_), 9,'0');
+
             k021_ := '9';
          END IF;
 
@@ -397,12 +368,6 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe8_nn (dat_     DATE,
          END IF;
 
       END IF;
-
-      -- ФЛ предприниматели
-      --IF custtype_ = 3
-      --THEN
-      --   kod_okpo := LPAD (kod_okpo, 10, '0');
-      --end if;
 
       -- Юрлица резиденты, нерезиденты
       IF custtype_ =2 and okpo_ in ('00000','000000000','0000000000','99999','999999999')
@@ -443,10 +408,8 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe8_nn (dat_     DATE,
             ncontr_ := ncontr_ + 1;
             if mfo_ = 300465
             then
-               --kod_okpo := 'IN' || LPAD (TO_CHAR (ncontr_), 8, '0');
                kod_okpo := 'I' || LPAD (TO_CHAR (rnk_), 9, '0');
             else
-               --kod_okpo := 'IN' || LPAD (TO_CHAR(our_reg_) || substr(TO_CHAR (100+ncontr_), 2, 2), 8, '0');
                kod_okpo := 'I' || LPAD (TO_CHAR(rnk_), 9, '0');
             end if;
             k021_ := '9';
@@ -580,18 +543,28 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe8_nn (dat_     DATE,
             null;
          end;
 
-         --begin
-         --   select fx.rnk, min(fx.deal_tag), min(fx.dat_a), max(fx.dat_a)
-         --      into rnk_3351, p090_, p111p_, p112p_
-         --   from TMP_VPKLB t, fx_deal fx
-         --   where t.sk = rnk_
-         --      and t.sk = fx.rnk
-         --      and t.ref = fx.ref
-         --   group by fx.rnk;
-         --exception when no_data_found then
-         --   null;
-         --end;
       end if;
+
+      -- показатели 090, 092, 112 для группы 921 (9210 - 9218)  
+      if substr(nls_,1,3) = '921'
+      then
+         begin
+            select fx.ntik, fx.dat, fx.dat_a 
+               into p090_, p111p_, p112p_
+            from fx_deal fx
+            where fx.acc9b = acc_
+              --and fx.sos <> 15
+              and fx.dat_b > dat_
+              and rownum = 1;
+         exception when no_data_found then
+            null;
+         end;
+      end if;
+
+      if p070_ = '2615'
+      then
+         p070_ := '2610';
+      end if;     
 
       INSERT INTO otcn_f71_temp
                    (rnk, acc, tp, nd, p090, p080, p081, p110, p111,
@@ -602,14 +575,6 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe8_nn (dat_     DATE,
                    p112p_, p113_, '0', p070_, p140_, ddd_, p120_, 0, p130_,
                    p150_, nls_, data_, isp_
                   );
-
-      --INSERT INTO otcn_fe8_history
-      --            (datf, acc, ostf, nd, p090, p110, p111, p112,
-      --             p130, rnk
-      --            )
-      --  VALUES (dat_, acc_, p120_, nd_, p090_, sum_zd_, p111p_, p112p_,
-      --             p130_, rnk_
-      --            );
    EXCEPTION
       WHEN OTHERS
       THEN
@@ -941,7 +906,7 @@ BEGIN
          END;
       END IF;
 
-      if Dat_ > dat_izm3 and (nls_ like '270%' or nls_ like '366%')
+      if Dat_ > dat_izm3 and (nls_ like '162%' or nls_ like '270%' or nls_ like '366%')
       then
          BEGIN
             select nd
@@ -963,19 +928,22 @@ BEGIN
          -- код контрагента
          kod_okpo := LPAD (TRIM (p030_), 10, '0');
 
-         -- определяем N договора из SPECPARAM nkd
-         BEGIN
-            SELECT NVL(nkd, 'N дог.'), NVL(r013, '0')
-               INTO nkd_, r013_
-            FROM specparam
-            WHERE acc = acc_;
-         EXCEPTION WHEN NO_DATA_FOUND THEN
-            nkd_ := 'N дог.';
-            r013_ := '0';
-         END;
+         if p_nd_ is null 
+         then 
+            -- определяем N договора из SPECPARAM nkd
+            BEGIN
+               SELECT NVL(nkd, 'N дог.'), NVL(r013, '0')
+                  INTO nkd_, r013_
+               FROM specparam
+               WHERE acc = acc_;
+            EXCEPTION WHEN NO_DATA_FOUND THEN
+               nkd_ := 'N дог.';
+               r013_ := '0';
+            END;
+         end if;
 
-        -- обработка счетов депозитов клиентов
-        -- вычисляем общую сумму по 1 договору
+         -- обработка счетов депозитов клиентов
+         -- вычисляем общую сумму по 1 договору
          sum_71 := 0;
          sum_71o:= 0;
          sum_lim:= 0;
@@ -1139,6 +1107,17 @@ BEGIN
                   p111p_ := p111_;
                   p112p_ := p112_;
                END;
+               if Dat_ > dat_izm3 and nls_ like '162%' 
+               then
+                  BEGIN
+                     SELECT c.nd, NVL (c.cc_id, nkd_), c.sdate, c.wdate
+                        INTO nd_, p090_, p111p_, p112p_
+                     FROM cc_deal c
+                     WHERE c.nd = p_nd_;
+                  EXCEPTION WHEN NO_DATA_FOUND THEN
+                     null;
+                  END;
+               end if;
             elsif nls_ LIKE '3%' THEN
                 if nbs_ in ('3660','3661') then
                    -- дата укладення угоди
@@ -1241,7 +1220,7 @@ BEGIN
                  END;
                END;
 
-               if Dat_ > dat_izm3 and nls_ like '270%'
+               if Dat_ > dat_izm3 and (nls_ like '162%' or nls_ like '270%')
                then
                   BEGIN
                      SELECT c.nd, NVL (c.cc_id, nkd_), c.sdate, c.wdate
@@ -1258,7 +1237,6 @@ BEGIN
                then
                  p112p_ := null;
                end if;
-
             END IF;
 
             IF SUBSTR (nls_, 4, 1) = '8'  AND SUBSTR (nbs_, 4, 1) = '8' THEN
@@ -1369,7 +1347,7 @@ BEGIN
                      END;
                   end if;
 
-                  if Dat_ > dat_izm3 and (nls_ like '270%' or nls_ like '366%')
+                  if Dat_ > dat_izm3 and (nls_ like '162%' or nls_ like '270%' or nls_ like '366%')
                   then
                      BEGIN
                         SELECT c.nd, NVL (c.cc_id, nkd_), c.sdate, c.wdate
@@ -1384,10 +1362,14 @@ BEGIN
                END IF;
             END IF;
 
-            if nbs_ = '2615' then
-               nbs_ := '2610';
+            if nbs_ = '2615' or nls_ like '8615%' then
+               p070_ := '2610';
             end if;
 
+             if nbs_ = '2652' or nls_ like '8652%' then
+               p070_ := '2651';
+            end if;
+            
             -- запись параметров депозитного договора
             p_ins_depozit (2);
          END IF;
