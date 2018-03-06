@@ -3,8 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Web.Http;
-using BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Abstract;
 using BarsWeb.Areas.Kernel.Infrastructure.DI.Implementation;
 using BarsWeb.Core.Logger;
 using Newtonsoft.Json;
@@ -13,8 +11,6 @@ using BarsWeb.Areas.Cdm.Models.Transport.Legal;
 using BarsWeb.Areas.Cdm.Models.Transport.PrivateEn;
 using BarsWeb.Areas.Cdm.Utils;
 using BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation;
-using BarsWeb.Core.Infrastructure;
-using Ninject;
 
 namespace clientregister
 {
@@ -26,16 +22,6 @@ namespace clientregister
     {
 
         readonly ClientAdditionalUtil _clientAdditionalUtil =  new ClientAdditionalUtil();
-
-        public IEbkFindRepository EbkFindRepo
-        {
-            get
-            {
-                var ninjectKernel = (INinjectDependencyResolver)GlobalConfiguration.Configuration.DependencyResolver;
-                var kernel = ninjectKernel.GetKernel();
-                return kernel.Get<IEbkFindRepository>();
-            }
-        }
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
@@ -120,29 +106,22 @@ namespace clientregister
 
                     try
                     {
-                        decimal ebkClientRnk;
-                        if (decimal.TryParse(Request.Params.Get("rnk"), out ebkClientRnk))
+                        var ebkClientRnk = Request.Params.Get("rnk");
+                        var repo = new EbkFindRepository(DbLoggerConstruct.NewDbLogger());
+                        var client = repo.RequestEbkClient(param).FirstOrDefault(c => (c.ClientCard != null && c.ClientCard.Rnk == Convert.ToDecimal(ebkClientRnk) || c.ClientPrivateEnCard != null && c.ClientPrivateEnCard.Rnk == Convert.ToDecimal(ebkClientRnk) || c.ClientLegalCard != null && c.ClientLegalCard.Rnk == Convert.ToDecimal(ebkClientRnk)));
+                        if (client != null)
                         {
-                            var client = EbkFindRepo.RequestEbkClient(param).FirstOrDefault(c =>
-                                c != null && (
-                                    c.ClientCard != null && c.ClientCard.Rnk == ebkClientRnk
-                                    || c.ClientPrivateEnCard != null && c.ClientPrivateEnCard.Rnk == ebkClientRnk
-                                    || c.ClientLegalCard != null && c.ClientLegalCard.Rnk == ebkClientRnk
-                                ));
-                            if (client != null)
+                            if (client.ClientCard != null)
                             {
-                                if (client.ClientCard != null)
-                                {
-                                    SetEbkClientParamToClient(client.ClientCard, MyClient);
-                                }
-                                else if (client.ClientPrivateEnCard != null)
-                                {
-                                    SetEbkClientPeParamToClient(client.ClientPrivateEnCard, MyClient);
-                                }
-                                else if (client.ClientLegalCard != null)
-                                {
-                                    SetEbkClientLpParamToClient(client.ClientLegalCard, MyClient);
-                                }
+                                SetEbkClientParamToClient(client.ClientCard, MyClient);
+                            }
+                            else if (client.ClientPrivateEnCard != null)
+                            {
+                                SetEbkClientPeParamToClient(client.ClientPrivateEnCard, MyClient);
+                            }
+                            else if (client.ClientLegalCard != null)
+                            {
+                                SetEbkClientLpParamToClient(client.ClientLegalCard, MyClient);
                             }
                         }
                     }
@@ -206,7 +185,7 @@ namespace clientregister
                     break;
             }
 
-            string[] tabs = new string[8];
+            string[] tabs = new string[9];
 
             tabs[0] = Resources.clientregister.GlobalResources.tab0;
             tabs[1] = Resources.clientregister.GlobalResources.tab1;
@@ -216,6 +195,7 @@ namespace clientregister
             tabs[5] = Resources.clientregister.GlobalResources.tab5;
             tabs[6] = Resources.clientregister.GlobalResources.tab6;
 			tabs[7] = Resources.clientregister.GlobalResources.tab7;
+            tabs[8] = Resources.clientregister.GlobalResources.tab8;
 
             string nSPD ;
             string rezId;
@@ -258,7 +238,7 @@ namespace clientregister
                             	    array['" + tabs[5] + @"']='tab_dop_rekv.asPX?rnk=" + rnk + @"&client=" + client + @"&spd=" +nSPD+ @"&rezid=" + rezId + @"';
                             	    array['" + tabs[6] + @"']='tab_linked_custs.asPX?rnk=" + rnk + @"&client=" + client + @"&spd=" + nSPD + @"&rezid=" + rezId + @"';
 									" + ((!string.IsNullOrEmpty(rnk)) ? ("array['" + tabs[7] + @"']='tab_custs_segments.aspx?rnk=" + rnk + @"&client=" + client + "';") :(""))  + @";
-                                    " + (GetUsageCorpLightParam() && (!string.IsNullOrEmpty(rnk)) ? "array['" + "CorpLight" + @"']='/barsroot/corpLight/relatedCustomers/index?custId=" + rnk + 
+                                    " + (GetUsageCorpLightParam() && (!string.IsNullOrEmpty(rnk)) ? "array['" + tabs[8] + @"']='/barsroot/cdo/common/relatedCustomers/index?custId=" + rnk + 
                                             (!string.IsNullOrEmpty(Request.Params.Get("clmode")) 
                                             ? @"&clmode=" + Request.Params.Get("clmode") : @"") + @"'" : "") + @";
                             	    fnInitTab('webtab',array,1200,'onChangeTab');
