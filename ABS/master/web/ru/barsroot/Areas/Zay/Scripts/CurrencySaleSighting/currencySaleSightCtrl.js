@@ -17,9 +17,9 @@
             {
                 template: "<button id='btnRefresh' type='button' class='k-button' title='Оновити'><i class='pf-icon pf-16 pf-reload_rotate'></i></button>"
             },
-             {
-                 template: "<button id='btnFilter' type='button' class='k-button' title='Складний фільтр'><i class='pf-icon pf-16 pf-filter-ok'></i></button>"
-             },
+             //{
+             //    template: "<button id='btnFilter' type='button' class='k-button' title='Складний фільтр'><i class='pf-icon pf-16 pf-filter-ok'></i></button>"
+             //},
             { type: "separator" },
             {
                 template: "<button id='btnPrintCorp' type='button' class='k-button' title='Завантажити для друку, заявка CORP2'><i class='pf-icon pf-16 pf-print'></i></button>"
@@ -54,20 +54,20 @@
     }
 
 
-    $("#btnFilter").kendoButton({
-        click: function () {
-            bars.ui.getFiltersByMetaTable(function (response) {
-                if (response.length > 0) {
-                    var grid = $("#grid").data("kendoGrid");
-                    filterParam = response[0];
-                    var res = getFilterParam();
-                    grid.dataSource.read({
-                        flt: res
-                    });
-                }
-            }, { tableName: "V_ZAY_QUEUE" });
-        }
-    });
+    //$("#btnFilter").kendoButton({
+    //    click: function () {
+    //        bars.ui.getFiltersByMetaTable(function (response) {
+    //            if (response.length > 0) {
+    //                var grid = $("#grid").data("kendoGrid");
+    //                filterParam = response[0];
+    //                var res = getFilterParam();
+    //                grid.dataSource.read({
+    //                    flt: res
+    //                });
+    //            }
+    //        }, { tableName: "V_ZAY_QUEUE" });
+    //    }
+    //});
     var createCencelTemplate = function (data) {
         var box = $("#cencel-box"),
             cencelTemplate = kendo.template($("#CencelReasonPattern").html());
