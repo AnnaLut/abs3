@@ -14,6 +14,7 @@ namespace BarsWeb.Areas.Zay.Models
         public string Iso { get; set; }
         public string Nls { get; set; }
         public decimal Ref { get; set; }
+        public decimal DOC_AMNT { get; set; }
         public decimal Suma { get; set; }
         public DateTime Vdat { get; set; }
         public DateTime Dat5 { get; set; }
@@ -34,5 +35,9 @@ namespace BarsWeb.Areas.Zay.Models
         public decimal? Zay_Sum { get; set; }
         public decimal? Flag_New { get; set; }
         public decimal? Rownum { get; set; }
+        public decimal? SALE_TP { get; set; }
+        public string TP_NM { get; set; }
+        public decimal? request { get; set; }
+        
     }
 }
