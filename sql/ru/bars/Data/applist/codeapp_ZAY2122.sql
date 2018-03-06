@@ -26,7 +26,8 @@ values (l_codeoper_2, 'ZAY22. Візування введених угод (продаж)', 'N/A', '/barsro
      begin
       select codeapp into l_codeapp from operapp where codeoper =rec.codeoper;
      exception
-       when too_many_rows then l_codeapp:='WBIR';
+       when too_many_rows or no_data_found
+	then  l_codeapp:='WBIR';
      end; 
 
     begin
