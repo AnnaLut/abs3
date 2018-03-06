@@ -136,3 +136,93 @@ end;
 /
 
 COMMIT;
+
+begin
+  Insert 
+    into NBS_TIPS ( NBS, TIP ) Values ( '1623', 'DEP' );
+exception
+  when DUP_VAL_ON_INDEX then
+    null;
+end;
+/
+
+begin
+  Insert 
+    into NBS_TIPS ( NBS, TIP ) Values ( '2701', 'DEP' );
+exception
+  when DUP_VAL_ON_INDEX then
+    null;
+end;
+/
+
+begin
+  Insert 
+    into NBS_TIPS ( NBS, TIP ) Values ( '3660', 'DEP' );
+exception
+  when DUP_VAL_ON_INDEX then
+    null;
+end;
+/
+
+begin
+  Insert 
+    into NBS_TIPS ( NBS, TIP ) Values ( '1628', 'DEN' );
+exception
+  when DUP_VAL_ON_INDEX then
+    null;
+end;
+/
+
+begin
+  Insert 
+    into NBS_TIPS ( NBS, TIP ) Values ( '2708', 'DEN' );
+exception
+  when DUP_VAL_ON_INDEX then
+    null;
+end;
+/
+
+begin
+  Insert 
+    into NBS_TIPS ( NBS, TIP ) Values ( '3668', 'DEN' );
+exception
+  when DUP_VAL_ON_INDEX then
+    null;
+end;
+/
+
+begin
+  Insert 
+    into NBS_TIPS ( NBS, TIP ) Values ( '1626', 'SDI' );
+exception
+  when DUP_VAL_ON_INDEX then
+    null;
+end;
+/
+
+begin
+  Insert 
+    into NBS_TIPS ( NBS, TIP ) Values ( '2706', 'SDI' );
+exception
+  when DUP_VAL_ON_INDEX then
+    null;
+end;
+/
+
+begin
+  Insert 
+    into NBS_TIPS ( NBS, TIP ) Values ( '3666', 'SDI' );
+exception
+  when DUP_VAL_ON_INDEX then
+    null;
+end;
+/
+
+begin
+  Insert 
+    into NBS_TIPS ( NBS, TIP ) Values ( '9510', 'ZAL' );
+exception
+  when DUP_VAL_ON_INDEX then
+    null;
+end;
+/
