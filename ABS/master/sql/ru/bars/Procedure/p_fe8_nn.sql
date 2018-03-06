@@ -4,11 +4,16 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe8_nn (dat_     DATE,
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #E8 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 2008.  All Rights Reserved.
-% VERSION     : 02/03/2018 (15/02/2018, 30/01/2018)
+% VERSION     : 05/03/2018 (02/03/2018, 15/02/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+05.03.2018 - для бал.счетов группы 162 номер договора, дату начала и дату 
+             окончания вибираем из табл. CC_DEAL                          
+             (добавлено в те блоки где обрабатывается группа 270)
+             для группы 921 в табл. FX_DEAL для отбора вибираем поля 
+             ACC9B и DAT_B
 02.03.2018 - для бал.счетов группы 162 номер договора, дату начала и дату 
              окончания вибираем из табл. CC_DEAL 
 15.02.2018 - изменяем бал.счет 2615 на 2610
@@ -547,9 +552,9 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe8_nn (dat_     DATE,
             select fx.ntik, fx.dat, fx.dat_a 
                into p090_, p111p_, p112p_
             from fx_deal fx
-            where fx.acc9a = acc_
+            where fx.acc9b = acc_
               --and fx.sos <> 15
-              and fx.dat_a > dat_
+              and fx.dat_b > dat_
               and rownum = 1;
          exception when no_data_found then
             null;
@@ -901,7 +906,7 @@ BEGIN
          END;
       END IF;
 
-      if Dat_ > dat_izm3 and (nls_ like '270%' or nls_ like '366%')
+      if Dat_ > dat_izm3 and (nls_ like '162%' or nls_ like '270%' or nls_ like '366%')
       then
          BEGIN
             select nd
@@ -923,19 +928,22 @@ BEGIN
          -- код контрагента
          kod_okpo := LPAD (TRIM (p030_), 10, '0');
 
-         -- определяем N договора из SPECPARAM nkd
-         BEGIN
-            SELECT NVL(nkd, 'N дог.'), NVL(r013, '0')
-               INTO nkd_, r013_
-            FROM specparam
-            WHERE acc = acc_;
-         EXCEPTION WHEN NO_DATA_FOUND THEN
-            nkd_ := 'N дог.';
-            r013_ := '0';
-         END;
+         if p_nd_ is null 
+         then 
+            -- определяем N договора из SPECPARAM nkd
+            BEGIN
+               SELECT NVL(nkd, 'N дог.'), NVL(r013, '0')
+                  INTO nkd_, r013_
+               FROM specparam
+               WHERE acc = acc_;
+            EXCEPTION WHEN NO_DATA_FOUND THEN
+               nkd_ := 'N дог.';
+               r013_ := '0';
+            END;
+         end if;
 
-        -- обработка счетов депозитов клиентов
-        -- вычисляем общую сумму по 1 договору
+         -- обработка счетов депозитов клиентов
+         -- вычисляем общую сумму по 1 договору
          sum_71 := 0;
          sum_71o:= 0;
          sum_lim:= 0;
@@ -1099,6 +1107,17 @@ BEGIN
                   p111p_ := p111_;
                   p112p_ := p112_;
                END;
+               if Dat_ > dat_izm3 and nls_ like '162%' 
+               then
+                  BEGIN
+                     SELECT c.nd, NVL (c.cc_id, nkd_), c.sdate, c.wdate
+                        INTO nd_, p090_, p111p_, p112p_
+                     FROM cc_deal c
+                     WHERE c.nd = p_nd_;
+                  EXCEPTION WHEN NO_DATA_FOUND THEN
+                     null;
+                  END;
+               end if;
             elsif nls_ LIKE '3%' THEN
                 if nbs_ in ('3660','3661') then
                    -- дата укладення угоди
@@ -1201,7 +1220,7 @@ BEGIN
                  END;
                END;
 
-               if Dat_ > dat_izm3 and nls_ like '270%'
+               if Dat_ > dat_izm3 and (nls_ like '162%' or nls_ like '270%')
                then
                   BEGIN
                      SELECT c.nd, NVL (c.cc_id, nkd_), c.sdate, c.wdate
