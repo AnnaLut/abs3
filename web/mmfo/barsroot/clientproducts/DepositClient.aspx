@@ -31,7 +31,28 @@
     <script type="text/javascript" language="javascript" src="/Common/jquery/jquery.alerts.js"></script>
     <script type="text/javascript" language="javascript" src="/Common/jquery/jquery.blockUI.js"></script>
     <script type="text/javascript" language="javascript" src="/Common/jquery/jquery.custom.js"></script>
-    <link href="/Common/CSS/jquery/jquery.1.8.css?v1.1" type="text/css" rel="stylesheet" />
+     
+	<%--kendo--%>
+    <link href="../Content/Bootstrap/bootstrap.css" rel="stylesheet" />
+    <link href="../Content/Themes/Kendo/kendo.common.min.css" rel="stylesheet" />
+    <link href="../Content/Themes/Kendo/kendo.dataviz.min.css" rel="stylesheet" />
+    <link href="../Content/Themes/Kendo/kendo.bootstrap.min.css" rel="stylesheet" />
+    <link href="../Content/Themes/Kendo/kendo.dataviz.bootstrap.min.css" rel="stylesheet" />
+    <link href="../Content/Themes/Kendo/Styles.css" rel="stylesheet" />
+    <link href="../Content/images/PureFlat/pf-icons.css" rel="stylesheet" />
+    <script src="../Scripts/kendo/kendo.all.min.js"></script>
+    <script src="../Scripts/kendo/kendo.aspnetmvc.min.js"></script>
+    <script src="../Scripts/kendo/cultures/kendo.culture.uk.min.js"></script>
+    <script src="../Scripts/kendo/cultures/kendo.culture.uk-UA.min.js"></script>
+    <script src="../Scripts/kendo/messages/kendo.messages.uk-UA.min.js"></script>
+    <script src="../Scripts/Bars/bars.ui.js"></script>
+    <script src="../Scripts/Bars/bars.utils.js"></script>
+    <script src="../Scripts/Bars/bars.config.js"></script>
+    <script src="../Scripts/Bars/bars.extension.js?v1.0"></script>
+    <script type="text/javascript" src="../Scripts/KendoCommon.js?v1.0.0"></script>
+	
+	<%--other--%>
+	<link href="/Common/CSS/jquery/jquery.1.8.css?v1.1" type="text/css" rel="stylesheet" />
     <link href="/Common/CSS/jquery/custom.css?v1.1" type="text/css" rel="stylesheet" />
     <link href="/Common/CSS/BarsGridView.css?v1.1" type="text/css" rel="stylesheet" />
     <script type="text/javascript" language="javascript">
