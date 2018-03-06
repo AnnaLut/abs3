@@ -13,7 +13,7 @@ create or replace package cp_rep_dgp is
 end cp_rep_dgp;
 /
 create or replace package body cp_rep_dgp is
-  G_BODY_VERSION constant varchar2(64) := 'v.1.3  22.11.2017';
+  G_BODY_VERSION constant varchar2(64) := 'v.1.4  05.03.2018';
   G_TRACE        constant varchar2(20) := 'CP_REP_DGP.';
   ---
   cursor G_CUR (p_nlsb_arr string_list, p_date_from date, p_date_to date)
@@ -125,9 +125,9 @@ create or replace package body cp_rep_dgp is
                      p_date_from
                     --  and k.dox > 1        -- 1 - акції 2 - БЦП
                  and o.sos = 5 --- and k.emi in (0,6) -- держ/НЕ держ/інв
-               order by 4; --1,3,4  
+               order by 4; --1,3,4
   -----------------------------------------------------------------
-  
+
 
   function header_version return varchar2 is
   begin
@@ -342,7 +342,7 @@ create or replace package body cp_rep_dgp is
     l_c number;
   begin
     /*Підказка від Людмила Марценюк
-    ID_CALC_SET - дата - всегда последний день месяца ГГММДДСС  
+    ID_CALC_SET - дата - всегда последний день месяца ГГММДДСС
     СС - номер сессии приема файла (наверно возможно за одну дату несколько сессий , но в расчет должна быть одна максимальная)
     */
     /* СС в розрахунок не брав */
@@ -355,14 +355,14 @@ create or replace package body cp_rep_dgp is
                                         from bars.prvn_fv_rez
                                        where unique_bars_is = '9/' || p_ref
                                          and to_date(substr(id_calc_set, 1, 6), 'YYMMDD') <= p_date)
-       and rownum = 1; 
-    return l_c;  
-    exception 
-      when NO_DATA_FOUND then 
+       and rownum = 1;
+    return l_c;
+    exception
+      when NO_DATA_FOUND then
         l_c := null;
         return l_c;
   end;
-  
+
   function get_ss_kor(p_accs cp_deal.accs%type, p_date date) return number is
     l_c number;
   begin
@@ -377,22 +377,22 @@ create or replace package body cp_rep_dgp is
            and o.ref = o2.ref
            and o2.acc = p_accs
            and o2.fdat <= p_date
-           and o.sos = 5;      
-    end if;  
+           and o.sos = 5;
+    end if;
     return nvl(l_c, 0);
-  end;   
+  end;
 
   function get_rezq39(p_ref cp_deal.ref%type, p_date date) return number is
     l_c number;
-  begin    
+  begin
     -- Сума резерву, розрахованого згідно вимог МСБО 39 на початок звітного періоду
       select sum(rezq39)
-      into l_c                                                                              
+      into l_c
       from nbu23_rez where tipa=9 and nd = p_ref and
                            fdat = (select max(fdat) from  nbu23_rez
                                    where tipa=9 and nd = p_ref and
                                    fdat <= p_date);
-      return l_c;                             
+      return l_c;
   end;
 
   --існує стара версія звіту: процедура cp_zv_D , таблиця tmp_cp_zv, вйуха v_cp_zv7k
@@ -437,7 +437,7 @@ create or replace package body cp_rep_dgp is
     l_is_default    number(1);
     --
     l_chr_start_time number;
-    l_chr_end_time   number;    
+    l_chr_end_time   number;
     --
     k               G_CUR%ROWTYPE;
 
@@ -446,7 +446,7 @@ create or replace package body cp_rep_dgp is
     open G_CUR(l_nlsb_arr, p_date_from, p_date_to);
     loop
       FETCH G_CUR INTO k;
-      EXIT WHEN G_CUR%NOTFOUND;      
+      EXIT WHEN G_CUR%NOTFOUND;
       l_cnt := l_cnt + 1;
       /*системні значення*/
       l_cp_dgp_zv_row.ref       := k.ref;
@@ -557,7 +557,7 @@ create or replace package body cp_rep_dgp is
             l_cp_dgp_zv_row.g024  := null;
       end;
 
-      
+
       l_rez := get_rezq39(k.ref, p_date_from);                                                    --тест--уточнення -- Сума резерву, розрахованого згідно вимог МСБО 39 на початок звітного періоду
       l_cp_dgp_zv_row.g025 := l_rez;
       l_rez := nvl(l_rez, 0);
@@ -567,15 +567,15 @@ create or replace package body cp_rep_dgp is
         l_ss := -rez.ostc96(k.accs, p_date_from - 1) / 100;
       end if;
       /*банком були надані приклади по корегуючим (неупорядковано, потрібно переуточнити)
-          наскільки можна зрозуміти 
+          наскільки можна зрозуміти
             для резерву  (g025):
               ref 96104973401 Отримано з Finevare. Корекція доходів на суму НЕвизнаних по дог= 9/21425065701
                 * в cp_deal рахунок 31189925065701 для реф. угоди купівлі 21425065701 неіснує.
                   але для звіту береться nbu23_rez - скоріше всього воно тут має враховуватися
-            для переоцінки (g026): 
-              ref 90685271001 Згортання уцінки по обл.ПАТ "Укртелеком" с.V, к.179428, зг.п.91 розд.XV Інстр.з бух.об.опер.з ЦП та фін.ін. затв.Пост.Прав.НБУ 22.06.2015 р. №400.    
+            для переоцінки (g026):
+              ref 90685271001 Згортання уцінки по обл.ПАТ "Укртелеком" с.V, к.179428, зг.п.91 розд.XV Інстр.з бух.об.опер.з ЦП та фін.ін. затв.Пост.Прав.НБУ 22.06.2015 р. №400.
       */
-      /* а нафіга обороти, якщо залишок на дату береться .... 
+      /* а нафіга обороти, якщо залишок на дату береться ....
       l_ss_kor := get_ss_kor(k.accs, p_date_from - 1) / 100;
       l_ss := l_ss + l_ss_kor;
       */
@@ -601,20 +601,20 @@ create or replace package body cp_rep_dgp is
       l_chr_end_time := dbms_utility.get_time;
       if (l_chr_end_time - l_chr_start_time) / (100 * 60) > 1 then /*min*/
         bars_audit.info(G_TRACE || l_title || ' Функція get_is_default('||k.ref||','||p_date_from||') відпрацьовує '||(l_chr_end_time - l_chr_start_time) / (100 * 60)||' хвилин');
-      end if;  
+      end if;
       if l_is_default = 1 then
         l_cp_dgp_zv_row.g029 := '4';                                                           --тест--уточнення -- Категорія якості за МСФЗ на початок періоду
         else
           if l_is_default = 0 and l_days_cnt = 0 then
-            l_cp_dgp_zv_row.g029 := '1'; 
+            l_cp_dgp_zv_row.g029 := '1';
           elsif l_is_default = 0 and l_days_cnt <= 30  then
-            l_cp_dgp_zv_row.g029 := '2'; 
-          elsif l_is_default = 0 and l_days_cnt between 30+1 and 60  then            
-            l_cp_dgp_zv_row.g029 := '3'; 
+            l_cp_dgp_zv_row.g029 := '2';
+          elsif l_is_default = 0 and l_days_cnt between 30+1 and 60  then
+            l_cp_dgp_zv_row.g029 := '3';
           else
-            l_cp_dgp_zv_row.g029 := 'невідомо';   
-          end if;  
-      end if;  
+            l_cp_dgp_zv_row.g029 := 'невідомо';
+          end if;
+      end if;
 
       l_cp_dgp_zv_row.g030  := get_riven(k.id, p_date_from);                                 --тест--уточнення -- Рівень на початок звітного періоду
       /*Показники групи: Придбання протягом звітного періоду*/
@@ -746,7 +746,7 @@ create or replace package body cp_rep_dgp is
       l_cp_dgp_zv_row.g060 := '-';                                                        --потрібно видалити?--уточнення-- Сума резерву, фактично сформованого на кінець дня звітної дати, грн (згідно постанови № 23)
 
 
-      l_rez := get_rezq39(k.ref, p_date_to);                                   
+      l_rez := get_rezq39(k.ref, p_date_to);
       l_cp_dgp_zv_row.g061 := l_rez;                                                      --тест--уточнення g025-- Сума резерву, розрахованого згідно вимог МСБО 39 на кінець дня звітної дати
       l_rez := nvl(l_rez, 0);
 
@@ -754,7 +754,7 @@ create or replace package body cp_rep_dgp is
       if k.accs is not null then
         l_ss := -rez.ostc96(k.accs, p_date_to+1) / 100;
       end if;
-      /* а нафіга обороти, якщо залишок на дату береться .... 
+      /* а нафіга обороти, якщо залишок на дату береться ....
       l_ss_kor := get_ss_kor(k.accs, p_date_to+1) / 100;
       l_ss := l_ss + l_ss_kor;
       */
@@ -772,7 +772,7 @@ create or replace package body cp_rep_dgp is
       end if;
 
       /*Фиалкович: Такой же что и для балансовой . На данный момент балансовая = справедливой, ну и конечно поделить на пакет, т к на 1 шт*/
-      if l_sn = 0 then 
+      if l_sn = 0 then
         l_sb := null;
         else
           l_sb := round(l_sb / round(l_sn / l_cena, 0), 2);
@@ -791,22 +791,22 @@ create or replace package body cp_rep_dgp is
       l_is_default := get_is_default(k.ref, p_date_to+1);
       l_chr_end_time := dbms_utility.get_time;
       if (l_chr_end_time - l_chr_start_time) / (100 * 60) > 1 then /*хвилин*/
-        bars_audit.info(G_TRACE || l_title || ' Функція get_is_default('||k.ref||','||p_date_to+1||') відпрацьовує '||(l_chr_end_time - l_chr_start_time) / (100 * 60)||' хвилин');
-      end if;  
+        bars_audit.info(G_TRACE || l_title || ' Функція get_is_default('||k.ref||','||to_char(p_date_to+1, 'DD.MM.YYYY')||') відпрацьовує '||(l_chr_end_time - l_chr_start_time) / (100 * 60)||' хвилин');
+      end if;
       if l_is_default = 1 then
         l_cp_dgp_zv_row.g066 := '4';                                                           --тест--уточнення g029-- Категорія якості за МСФЗ на кінець дня звітної дати
         else
           if l_is_default = 0 and l_days_cnt = 0 then
-            l_cp_dgp_zv_row.g066 := '1'; 
+            l_cp_dgp_zv_row.g066 := '1';
           elsif l_is_default = 0 and l_days_cnt <= 30  then
-            l_cp_dgp_zv_row.g066 := '2'; 
-          elsif l_is_default = 0 and l_days_cnt between 30+1 and 60  then            
-            l_cp_dgp_zv_row.g066 := '3'; 
+            l_cp_dgp_zv_row.g066 := '2';
+          elsif l_is_default = 0 and l_days_cnt between 30+1 and 60  then
+            l_cp_dgp_zv_row.g066 := '3';
           else
-            l_cp_dgp_zv_row.g066 := 'невідомо';   
-          end if;  
-      end if;  
-      
+            l_cp_dgp_zv_row.g066 := 'невідомо';
+          end if;
+      end if;
+
       l_cp_dgp_zv_row.g067 := nvl(to_char(l_days_cnt), 'невідомо');                          --тест--уточнення g028-- Кількість днів прострочки
       l_cp_dgp_zv_row.g068 := get_riven(k.id, p_date_to);                                    --тест--уточнення g030-- Рівень станом на звітну дату
 
@@ -1065,7 +1065,7 @@ create or replace package body cp_rep_dgp is
         bars_audit.error(G_TRACE || l_title || substr(dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace(), 1, 2000));
         if G_CUR%ISOPEN then
           close G_CUR;
-        end if;          
+        end if;
         raise_application_error(-20001, G_TRACE || l_title || substr(dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace(), 1, 2000));
   end;
 
@@ -1109,17 +1109,17 @@ create or replace package body cp_rep_dgp is
     l_is_default    number(1);
     --
     l_chr_start_time number;
-    l_chr_end_time   number;     
+    l_chr_end_time   number;
     --
     k               G_CUR%ROWTYPE;
 
   begin
     bars_audit.info(G_TRACE || l_title || ' OPEN CURSOR ');
     open G_CUR(l_nlsb_arr, p_date_from, p_date_to);
-    bars_audit.info(G_TRACE || l_title || ' START LOOP ');    
+    bars_audit.info(G_TRACE || l_title || ' START LOOP ');
     loop
       FETCH G_CUR INTO k;
-      EXIT WHEN G_CUR%NOTFOUND;      
+      EXIT WHEN G_CUR%NOTFOUND;
       l_cnt := l_cnt + 1;
       /*системні значення*/
       l_cp_dgp_zv_row.ref       := k.ref;
@@ -1219,7 +1219,7 @@ create or replace package body cp_rep_dgp is
 
       l_cp_dgp_zv_row.g023 := '-';                                                               --!устаріло? Сума резерву, фактично сформованого на початок звітного періоду (згідно постанови № 23), грн
 
-      l_rez := get_rezq39(k.ref, p_date_from);                                   
+      l_rez := get_rezq39(k.ref, p_date_from);
       l_cp_dgp_zv_row.g024 := l_rez;                                                             --!тест--уточнення -- Сума резерву, розрахованого згідно вимог МСБО 39 на початок звітного періоду
       l_rez := nvl(l_rez, 0);
 
@@ -1253,20 +1253,20 @@ create or replace package body cp_rep_dgp is
       l_chr_end_time := dbms_utility.get_time;
       if (l_chr_end_time - l_chr_start_time) / (100 * 60) > 1 then /*хвилин*/
         bars_audit.info(G_TRACE || l_title || ' Функція get_is_default('||k.ref||','||p_date_from||') відпрацьовує '||(l_chr_end_time - l_chr_start_time) / (100 * 60)||' хвилин');
-      end if;  
+      end if;
       if l_is_default = 1 then
         l_cp_dgp_zv_row.g027 := '4';                                                           --тест-- Категорія якості за МСФЗ на поч звітної дати
         else
           if l_is_default = 0 and l_days_cnt = 0 then
-            l_cp_dgp_zv_row.g027 := '1'; 
+            l_cp_dgp_zv_row.g027 := '1';
           elsif l_is_default = 0 and l_days_cnt <= 30  then
-            l_cp_dgp_zv_row.g027 := '2'; 
-          elsif l_is_default = 0 and l_days_cnt between 30+1 and 60  then            
-            l_cp_dgp_zv_row.g027 := '3'; 
+            l_cp_dgp_zv_row.g027 := '2';
+          elsif l_is_default = 0 and l_days_cnt between 30+1 and 60  then
+            l_cp_dgp_zv_row.g027 := '3';
           else
-            l_cp_dgp_zv_row.g027 := 'невідомо';   
-          end if;  
-      end if; 
+            l_cp_dgp_zv_row.g027 := 'невідомо';
+          end if;
+      end if;
 
       l_cp_dgp_zv_row.g028  := get_riven(k.id, p_date_from);                                 --!тест--уточнення -- Рівень на початок звітного періоду
       /*Показники групи: Придбання протягом звітного періоду*/
@@ -1397,7 +1397,7 @@ create or replace package body cp_rep_dgp is
 
       l_cp_dgp_zv_row.g058 := '-';                                                        --!потрібно видалити?--уточнення-- Сума резерву, фактично сформованого на кінець дня звітної дати, грн (згідно постанови № 23)
 
-      l_rez := get_rezq39(k.ref, p_date_to);                                   
+      l_rez := get_rezq39(k.ref, p_date_to);
       l_cp_dgp_zv_row.g059 := l_rez;                                                      --!тест--уточнення g025-- Сума резерву, розрахованого згідно вимог МСБО 39 на кінець дня звітної дати
       l_rez := nvl(l_rez,0);
 
@@ -1419,11 +1419,11 @@ create or replace package body cp_rep_dgp is
       end if;
 
       /*Фиалкович: Такой же что и для балансовой . На данный момент балансовая = справедливой, ну и конечно поделить на пакет, т к на 1 шт*/
-      if l_sn = 0 then 
+      if l_sn = 0 then
         l_sb := null;
         else
           l_sb := round(l_sb / round(l_sn / l_cena, 0), 2);
-      end if;      
+      end if;
       if  k.kv = 980 then
         l_cp_dgp_zv_row.g062 := l_sb;                                                        --!тест--уточнення--Справедлива вартість ЦП згідно МСБО 39 на звітну дату за 1 шт
         else
@@ -1437,22 +1437,22 @@ create or replace package body cp_rep_dgp is
       l_is_default := get_is_default(k.ref, p_date_to+1);
       l_chr_end_time := dbms_utility.get_time;
       if (l_chr_end_time - l_chr_start_time) / (100 * 60) > 1 then /*хвилин*/
-        bars_audit.info(G_TRACE || l_title || ' Функція get_is_default('||k.ref||','||p_date_to+1||') відпрацьовує '||(l_chr_end_time - l_chr_start_time) / (100 * 60)||' хвилин');
-      end if;  
+        bars_audit.info(G_TRACE || l_title || ' Функція get_is_default('||k.ref||','||to_char(p_date_to+1, 'DD.MM.YYYY')||') відпрацьовує '||(l_chr_end_time - l_chr_start_time) / (100 * 60)||' хвилин');
+      end if;
       if l_is_default = 1 then
         l_cp_dgp_zv_row.g063 := '4';                                                           --тест-- --уточнення g027-- Категорія якості за МСФЗ на кінець дня звітної дати
         else
           if l_is_default = 0 and l_days_cnt = 0 then
-            l_cp_dgp_zv_row.g063 := '1'; 
+            l_cp_dgp_zv_row.g063 := '1';
           elsif l_is_default = 0 and l_days_cnt <= 30  then
-            l_cp_dgp_zv_row.g063 := '2'; 
-          elsif l_is_default = 0 and l_days_cnt between 30+1 and 60  then            
-            l_cp_dgp_zv_row.g063 := '3'; 
+            l_cp_dgp_zv_row.g063 := '2';
+          elsif l_is_default = 0 and l_days_cnt between 30+1 and 60  then
+            l_cp_dgp_zv_row.g063 := '3';
           else
-            l_cp_dgp_zv_row.g063 := 'невідомо';   
-          end if;  
-      end if;      
-       
+            l_cp_dgp_zv_row.g063 := 'невідомо';
+          end if;
+      end if;
+
       l_cp_dgp_zv_row.g064 := get_riven(k.id, p_date_to);                                    --!тест--уточнення g030-- Рівень станом на звітну дату
 
 
@@ -1611,7 +1611,7 @@ create or replace package body cp_rep_dgp is
            and o.fdat >= p_date_from
            and o.fdat <= p_date_to --and o.tt in ('FXU','FXU'
 --           and o.tt in ('FX%', '080', '013')
-           ;        
+           ;
 
         select sum(decode(o1.dk, 0, 1, 1, -1) * o1.sq) / 100
           into l_cp_dgp_zv_row.g067                                                         --!тест--6390 dk= 1, 7390 dk = 0 --доучточнення--уточнення --Визнання результату при первісному визнанні (рахунки 6390,7390)
@@ -1635,7 +1635,7 @@ create or replace package body cp_rep_dgp is
         l_cp_dgp_zv_row.g069 := '-';                                                        --!уточнення через Абашидзе--Результат переоцінки залишку внаслідок зміни валютних курсів протягом звітного періоду
        /* Абашидзе: Да, с Васей Хариным переговорила, он сказал, что помнит об этом вопросе, но не так легко у них взять алгоритм...
                    обещал, что в ближайшее время скажет результат*/
-                   
+
 
         select /*nvl(sum(o.s), 0) / 100, */nvl(sum(o.sq), 0) / 100 -- по R при нарахуванні на 605
           into l_cp_dgp_zv_row.g070                                                          --!тест--уточнення Сума процентного доходу протягом звітного періоду
@@ -1646,8 +1646,8 @@ create or replace package body cp_rep_dgp is
            and o.fdat >= p_date_from
            and o.fdat <= p_date_to --and o.tt in ('FXU','FXU'
 --           and o.tt in ('FX%', '080', '013')
-           ;        
-                   
+           ;
+
         /*!*/--l_cp_dgp_zv_row.g071 := '-';                                                        --Отриманий купон.дохід за звітний період
         select nvl(sum(o.sq), 0) / 100
           into l_cp_dgp_zv_row.g071                                                          --Отриманий купон, грн
@@ -1657,7 +1657,7 @@ create or replace package body cp_rep_dgp is
            and o.sos = 5
            and o.fdat >= p_date_from
            and o.fdat <= p_date_to;
-           --and o.tt in ('FX7', 'FX8', 'F80');        
+           --and o.tt in ('FX7', 'FX8', 'F80');
 
         select /*nvl(sum(o.s), 0) / 100,*/ nvl(sum(o.sq), 0) / 100 -- по D при амортизації на 6
             into l_cp_dgp_zv_row.g072                                                        --!тест--уточнення --Амортизація дисконту протягом звітного періоду
@@ -1712,7 +1712,7 @@ create or replace package body cp_rep_dgp is
       l_cp_dgp_zv_row.g083 := '-';
       l_cp_dgp_zv_row.g084 := '-';
       l_cp_dgp_zv_row.g085 := '-';
-      l_cp_dgp_zv_row.g086 := '-';      
+      l_cp_dgp_zv_row.g086 := '-';
 
       if l_cnt_prod = 0 then --жодної продажі, але ж купівля була
         insert into cp_dgp_zv values l_cp_dgp_zv_row;
@@ -1726,7 +1726,7 @@ create or replace package body cp_rep_dgp is
         bars_audit.error(G_TRACE || l_title || substr(dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace(), 1, 2000));
         if G_CUR%ISOPEN then
           close G_CUR;
-        end if;  
+        end if;
         raise_application_error(-20001, G_TRACE || l_title || substr(dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace(), 1, 2000));
   end dgp8;
 
@@ -1734,36 +1734,36 @@ create or replace package body cp_rep_dgp is
   procedure info_report_progress(p_date_from cp_dgp_zv.date_from%type,
                                  p_date_to   cp_dgp_zv.date_to%type,
                                  p_type_id   cp_dgp_zv_type.type_id%type) is
-  pragma autonomous_transaction;                          
+  pragma autonomous_transaction;
   /*
     - на тесті було довге формування звіту і веб відвалювався по таймауту
     - при запуску звіту можливо нажати "Ні", тоді має показати або останне успішне формування або цей запис
   */
-    l_id        cp_kod.id%type;     
+    l_id        cp_kod.id%type;
     l_cp_dgp_zv cp_dgp_zv%rowtype;
   begin
-    
+
     delete from cp_dgp_zv
      where user_id = user_id()
        and type_id = p_type_id;
-       
-       
-    select id into l_id from cp_kod where rownum = 1;   
+
+
+    select id into l_id from cp_kod where rownum = 1;
     l_cp_dgp_zv.id          := l_id;
     l_cp_dgp_zv.user_id     := user_id();
     l_cp_dgp_zv.ref         := 0;
-    l_cp_dgp_zv.type_id     := p_type_id;   
-    l_cp_dgp_zv.date_from   := p_date_from;   
-    l_cp_dgp_zv.date_to     := p_date_to;        
-    l_cp_dgp_zv.date_reg    := sysdate; 
-    l_cp_dgp_zv.kf          := gl.kf;               
+    l_cp_dgp_zv.type_id     := p_type_id;
+    l_cp_dgp_zv.date_from   := p_date_from;
+    l_cp_dgp_zv.date_to     := p_date_to;
+    l_cp_dgp_zv.date_reg    := sysdate;
+    l_cp_dgp_zv.kf          := gl.kf;
     l_cp_dgp_zv.g001        := 'Звіт за '||to_char(p_date_from,'DD.MM.YYYYY')||'-'||to_char(p_date_to,'DD.MM.YYYY');
     l_cp_dgp_zv.g002        := 'Запущено в '||to_char(sysdate,'HH24:MI DD.MM.YYYY');
     l_cp_dgp_zv.g003        := 'Звіт формується або такий що має помилки';
     insert into  cp_dgp_zv values l_cp_dgp_zv;
     commit;
-  end;                                 
-                                 
+  end;
+
 
   procedure prepare_dgp(p_date_from cp_dgp_zv.date_from%type,
                         p_date_to   cp_dgp_zv.date_to%type,
@@ -1775,10 +1775,10 @@ create or replace package body cp_rep_dgp is
     bars_audit.info(G_TRACE || l_title || ' Start p_date_from=>' ||
                     p_date_from || ' p_date_to=>' || p_date_to ||
                     ' p_type_id=>' || p_type_id);
-    info_report_progress(l_date_from, l_date_to, p_type_id);--Записати автономною транзакцією про старт процесу (в звіті є функція відмовитись від переформатування звіту)                
+    info_report_progress(l_date_from, l_date_to, p_type_id);--Записати автономною транзакцією про старт процесу (в звіті є функція відмовитись від переформатування звіту)
     delete from cp_dgp_zv
      where user_id = user_id()
-       and type_id = p_type_id;    
+       and type_id = p_type_id;
     case p_type_id
       when 7 then
         dgp7(l_date_from, l_date_to);
