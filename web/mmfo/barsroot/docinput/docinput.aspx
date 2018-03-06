@@ -78,7 +78,7 @@
         //функція «співпадіння» щодо виявлення належності клієнта до публічних діячів, осіб близьких або пов’язаними з публічними особами при відкритті РНК клієнту
         function fnCheckCustomer(textbox) {
             //"Nam_A"
-            var nmk = document.getElementById(textbox);
+            var nmk = document.getElementById(textbox); 
 
             if (nmk !== null && nmk.value != null && nmk.value !== undefined) {
                 $.ajax({

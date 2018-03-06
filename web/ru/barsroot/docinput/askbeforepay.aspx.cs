@@ -1,103 +1,97 @@
 ﻿using System;
-using System.Collections;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
-using System.Web;
-using System.Web.SessionState;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
+using System.Linq;
 using Oracle.DataAccess.Client;
 using Bars.Oracle;
 
 
 namespace DocInput
 {
-	/// <summary>
-	/// Summary description for AskBeforePay.
-	/// </summary>
-	public partial class AskBeforePay : Bars.BarsPage
-	{
-		private decimal _nSum;
-		private decimal _nSumA;
-		private decimal _nSumB;
-		private int    _nKv;
-		private int    _nKvA;
-		private int    _nKvB;
-	
-		protected void Page_Load(object sender, System.EventArgs e)
-		{
-			if(!this.IsPostBack)
-			{
-				// проверочка
-				if(!(  null!=Request.Params["SumA"]
-					&& null!=Request.Params["SumB"]
-					&& null!=Request.Params["KvA"]
-					&& null!=Request.Params["KvB"]
-				 ||    null!=Request.Params["Sum"]
-					&& null!=Request.Params["Kv"]
-					))
-				throw new Exception("Аргументы URL не содержат необходимых параметров.");
-				if(null!=Request.Params["Sum"])
-				{
-					_nSum	= decimal.Parse(Request.Params["Sum"]);
-					_nKv    = int.Parse(Request.Params["Kv"]);
-					textSum.Text = ValueSpelledOut(_nSum, _nKv);
-				}
-				else
-				{
-					_nSumA	= decimal.Parse(Request.Params["SumA"]);
-					_nKvA   = int.Parse(Request.Params["KvA"]);
-					_nSumB	= decimal.Parse(Request.Params["SumB"]);
-					_nKvB   = int.Parse(Request.Params["KvB"]);
-					textSum.Text = ValueSpelledOut(_nSumA, _nKvA)
-						+" за\n"+  ValueSpelledOut(_nSumB, _nKvB);
-				}
+    /// <summary>
+    /// Summary description for AskBeforePay.
+    /// </summary>
+    public partial class AskBeforePay : Bars.BarsPage
+    {
+        private decimal _nSum;
+        private decimal _nSumA;
+        private decimal _nSumB;
+        private int _nKv;
+        private int _nKvA;
+        private int _nKvB;
+        private int _nTt;
+
+        protected void Page_Load(object sender, System.EventArgs e)
+        {
+            if (!this.IsPostBack)
+            {
+                // проверочка
+                if (!(null != Request.Params["SumA"]
+                    && null != Request.Params["SumB"]
+                    && null != Request.Params["KvA"]
+                    && null != Request.Params["KvB"]
+                 || null != Request.Params["Sum"]
+                    && null != Request.Params["Kv"]
+                    ))
+                    throw new Exception("Аргументы URL не содержат необходимых параметров.");
+                if (null != Request.Params["Sum"])
+                {
+                    _nSum = decimal.Parse(Request.Params["Sum"]);
+                    _nKv = int.Parse(Request.Params["Kv"]);
+                    textSum.Text = ValueSpelledOut(_nSum, _nKv);
+                }
+                else
+                {
+                    _nSumA = decimal.Parse(Request.Params["SumA"]);
+                    _nKvA = int.Parse(Request.Params["KvA"]);
+                    _nSumB = decimal.Parse(Request.Params["SumB"]);
+                    _nKvB = int.Parse(Request.Params["KvB"]);
+                    textSum.Text = ValueSpelledOut(_nSumA, _nKvA)
+                        + " за\n" + ValueSpelledOut(_nSumB, _nKvB);
+                }
 
                 if (Request.QueryString.Count > 4)
                 {
                     checkWarning();
                 }
-			}
-		}
+            }
+        }
 
-		/// <summary>
-		/// возвращает сумму прописью
-		/// </summary>
-		/// <returns></returns>
-		private string ValueSpelledOut(decimal nSum, int nKv)
-		{			
-			string strSum = "";
-			IOraConnection icon = (IOraConnection)Context.Application["OracleConnectClass"];
-			OracleConnection con = icon.GetUserConnection(Context);			
-			try
-			{   
-				OracleCommand cmd = con.CreateCommand();
-				cmd.CommandText = icon.GetSetRoleCommand("WR_DOC_INPUT");
-				cmd.ExecuteNonQuery();
-				cmd.CommandText = "select f_sumpr(:nSum,:nKv,(select gender from tabval where kv=:nKv)) from dual";
-				cmd.Parameters.Add("nSum", OracleDbType.Decimal, nSum, ParameterDirection.Input);
-				cmd.Parameters.Add("nKv", OracleDbType.Decimal, nKv, ParameterDirection.Input);
-				OracleDataReader rdr = cmd.ExecuteReader();
-				rdr.Read();
-				if(!rdr.IsDBNull(0)) 
-					strSum = rdr.GetOracleString(0).Value;
-				rdr.Close();
-			}
-			finally
-			{   				
-				con.Close();
-				con.Dispose();
-			}			
-			return strSum;
-		}
+        /// <summary>
+        /// возвращает сумму прописью
+        /// </summary>
+        /// <returns></returns>
+        private string ValueSpelledOut(decimal nSum, int nKv)
+        {
+            string strSum = "";
+            IOraConnection icon = (IOraConnection)Context.Application["OracleConnectClass"];
+            OracleConnection con = icon.GetUserConnection(Context);
+            try
+            {
+                OracleCommand cmd = con.CreateCommand();
+                cmd.CommandText = icon.GetSetRoleCommand("WR_DOC_INPUT");
+                cmd.ExecuteNonQuery();
+                cmd.CommandText = "select f_sumpr(:nSum,:nKv,(select gender from tabval where kv=:nKv)) from dual";
+                cmd.Parameters.Add("nSum", OracleDbType.Decimal, nSum, ParameterDirection.Input);
+                cmd.Parameters.Add("nKv", OracleDbType.Decimal, nKv, ParameterDirection.Input);
+                OracleDataReader rdr = cmd.ExecuteReader();
+                rdr.Read();
+                if (!rdr.IsDBNull(0))
+                    strSum = rdr.GetOracleString(0).Value;
+                rdr.Close();
+            }
+            finally
+            {
+                con.Close();
+                con.Dispose();
+            }
+            return strSum;
+        }
         /// <summary>
         /// Проверка на блокировку счетов и допустимых остатков.
         /// </summary>
         private void checkWarning()
         {
-            string warnMessage = string.Empty, warnMessage2 = string.Empty; ;
+            string warnMessage = string.Empty, warnMessage2 = string.Empty;
             IOraConnection icon = (IOraConnection)Context.Application["OracleConnectClass"];
             OracleConnection con = icon.GetUserConnection();
             try
@@ -116,16 +110,19 @@ namespace DocInput
                     _nSumB = decimal.Parse(Request.Params["SumB"]);
                     _nKvB = int.Parse(Request.Params["KvB"]);
                 }
+                string Tt = Request.Params["tt"];
                 string NlsA = Request.Params["nlsA"];
                 string NlsB = Request.Params["nlsB"];
+                string NmkA = Request.Params["nmkA"];
+                string NmkB = Request.Params["nmkB"];
                 int nDk = int.Parse(Request.Params["dk"]);
                 int nFli = int.Parse(Request.Params["fli"]);
                 int nFaktPlan = int.Parse(Request.Params["fPlan"]);
                 decimal nOst, nOstb, nOstc, nOstx, nLim, nDelta;
                 decimal nBlkk, nBlkd, nPap;
-                
-                nDelta = (nDk == 0)?(_nSumA):(_nSumA*(-1));
-                
+
+                nDelta = (nDk == 0) ? (_nSumA) : (_nSumA * (-1));
+
                 OracleCommand cmd = con.CreateCommand();
                 cmd.CommandText = icon.GetSetRoleCommand("WR_DOC_INPUT");
                 cmd.ExecuteNonQuery();
@@ -146,29 +143,30 @@ namespace DocInput
                         nOst = nOstc;
                     else
                         nOst = nOstb;
-                    
+
                     if (nDelta < 0 && nBlkd > 0)
                         warnMessage += Resources.docinput.GlobalResources.WarnBlockDeb + "\n";
-                    else if(nDelta > 0 && nBlkk > 0)
+                    else if (nDelta > 0 && nBlkk > 0)
                         warnMessage += Resources.docinput.GlobalResources.WarnBlockKred + "\n";
 
-                    if(nPap == 1 && nDelta > 0 && nOst + nLim + nDelta > 0 
+                    if (nPap == 1 && nDelta > 0 && nOst + nLim + nDelta > 0
                        ||
                        nPap == 2 && nDelta < 0 && nOst + nLim + nDelta < 0)
                         warnMessage += Resources.docinput.GlobalResources.WarnNoMoney + "\n";
 
                     if (nOstx != 0 && nPap == 1 && nDelta < 0 && nOst + nDelta - nOstx < 0
-			           ||
+                       ||
                        nOstx != 0 && nPap == 2 && nDelta > 0 && nOst + nDelta - nOstx > 0)
                         warnMessage += Resources.docinput.GlobalResources.WarnToMuch + "\n";
-                    if(!string.IsNullOrEmpty(warnMessage))
-                        warnMessage = Resources.docinput.GlobalResources.WarnAcc + " " + NlsA + "(" + _nKvA + "):\n" + warnMessage;
                 }
+                warnMessage += WarnIfPublicPerson(NlsA, Tt, NmkA);
+                if (!string.IsNullOrEmpty(warnMessage))
+                    warnMessage = Resources.docinput.GlobalResources.WarnAcc + " " + NlsA + "(" + _nKvA + "):\n" + warnMessage;
 
-                if (nFli == 1) 
+                if (nFli == 1)
                 {
-                    nDelta = (nDk == 0) ? ((-1)*_nSumB) : (_nSumB);
-                    
+                    nDelta = (nDk == 0) ? ((-1) * _nSumB) : (_nSumB);
+
                     cmd.Parameters["nls"].Value = NlsB;
                     cmd.Parameters["kv"].Value = _nKvB;
 
@@ -204,9 +202,11 @@ namespace DocInput
                         if (!string.IsNullOrEmpty(warnMessage2))
                             warnMessage2 = Resources.docinput.GlobalResources.WarnAcc + " " + NlsB + "(" + _nKvB + "):\n" + warnMessage2;
                     }
+
+                    warnMessage2 += WarnIfPublicPerson(NlsB, Tt, NmkB);
                 }
 
-                warnMessage += warnMessage2;
+                warnMessage += "\n\n" + warnMessage2;
 
                 // код K060 != 99
                 cmd.CommandText = "SELECT f_check_insider(:nlsa, :kva, :nlsb, :kvb, :dk) from dual";
@@ -219,7 +219,7 @@ namespace DocInput
                 string warnMessage3 = Convert.ToString(cmd.ExecuteScalar());
 
                 if (!string.IsNullOrEmpty(warnMessage3))
-                    warnMessage += warnMessage3;
+                    warnMessage += "\n" + warnMessage3;
                 //----
 
                 rdr.Close();
@@ -238,25 +238,64 @@ namespace DocInput
                 pnWarning.Visible = false;
         }
 
-		#region Web Form Designer generated code
-		override protected void OnInit(EventArgs e)
-		{
-			//
-			// CODEGEN: This call is required by the ASP.NET Web Form Designer.
-			//
-			InitializeComponent();
-			base.OnInit(e);
-		}
-		
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{    
+        /// <summary>
+        /// Виводить інформаційне повідомлення 
+        /// про збіг з переліком публічних діячів
+        /// </summary>
+        /// <param name="nls"></param>
+        /// <param name="tt">Номер операції</param>
+        /// <param name="nmk"></param>
+        /// <returns></returns>
+        private string WarnIfPublicPerson(string nls, string tt, string nmk)
+        {
+            var warnMessage = string.Empty;
 
-		}
-		#endregion
+            // COBUSUPABS-6070
+            string[] publicAccounts = { "2620", "2625", "2630", "2635" };
 
-	}
+            if (publicAccounts.Any(nls.StartsWith) && (tt == "027" && _nSumB >= 150000 || tt != "027"))
+            {
+                int flag;
+                var icon = (IOraConnection)Context.Application["OracleConnectClass"];
+                using (OracleConnection con = icon.GetUserConnection(Context))
+                using (OracleCommand cmd = con.CreateCommand())
+                {
+                    cmd.CommandText = @"select finmon_is_public(:p_name, :p_rnk, 1) fl from dual";
+                    cmd.Parameters.Add("p_name", OracleDbType.Varchar2, nmk, ParameterDirection.Input);
+                    cmd.Parameters.Add("p_rnk", OracleDbType.Decimal, null, ParameterDirection.Input);
+
+                    if (con.State != ConnectionState.Open)
+                        con.Open();
+
+                    flag = int.Parse(cmd.ExecuteScalar().ToString());
+                }
+
+                if (0 != flag)
+                    warnMessage += string.Format(format: Resources.docinput.GlobalResources.WarnPublic, arg0: flag, arg1: nmk);
+            }
+
+            return warnMessage;
+        }
+
+        #region Web Form Designer generated code
+        override protected void OnInit(EventArgs e)
+        {
+            //
+            // CODEGEN: This call is required by the ASP.NET Web Form Designer.
+            //
+            InitializeComponent();
+            base.OnInit(e);
+        }
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+
+        }
+        #endregion
+
+    }
 }
