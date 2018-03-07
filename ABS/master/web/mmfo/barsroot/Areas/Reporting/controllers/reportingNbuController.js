@@ -1466,10 +1466,10 @@
             };
 
             $scope.OpenDetailedReportGrid = function (isRowDetailed) {
-                if ($scope.selectedFileVersionInfo && $scope.selectedFileVersionInfo.FILE_FMT == "XML") {
-                    bars.ui.notify('Увага', 'Для файлів XML протокол відсутній', 'error', { autoHideAfter: 5 * 1000 });
-                    return;
-                }
+                //if ($scope.selectedFileVersionInfo && $scope.selectedFileVersionInfo.FILE_FMT == "XML") {
+                //    bars.ui.notify('Увага', 'Для файлів XML протокол відсутній', 'error', { autoHideAfter: 5 * 1000 });
+                //    return;
+                //}
 
                 $scope.isRowDetailed = isRowDetailed;
 
