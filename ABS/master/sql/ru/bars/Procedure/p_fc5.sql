@@ -4,7 +4,7 @@ IS
 % DESCRIPTION : Процедура формирования #С5 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.17.014  31/01/2018
+% VERSION     : v.17.016  03/03/2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
 
@@ -196,7 +196,6 @@ IS
    ret_         number;
    in_acc_      varchar2(255);
 
-   s190_        varchar2(1);
    r012_        specparam.r012%type;
    s580_        specparam.s580%type;
    s580a_       specparam.s580%type;
@@ -510,8 +509,6 @@ BEGIN
 
    ret_ := F_POP_OTCN( dat_, 1, sql_acc_, null, 0, 1);
 
---   p_upd_r012('C5', mfou_);
-
    cursor_sql := 'select a.*, n.nd nd1, null nd2, null nd3, null nd4, n.nd nd,
                          decode(t.r020, null, 0, 1) fa7p, i.freq,
                          decode(k.k077,null,decode(substr(a.nbs,1,1),''1'',''1'',''3''),k.k077) k077
@@ -612,6 +609,10 @@ BEGIN
               if s240_ = 'Z' then
                  s245_ :='2';
               end if;
+          end if;
+          
+          if nls_ like '29%' then 
+             r011_ := '0';
           end if;
 
           IF typ_ > 0 THEN
@@ -860,7 +861,7 @@ BEGIN
                z.acc, z.accs, z.nd, a.nbs, nvl(p.r013, '0'),
                gl.p_icurval (a.kv, a.ost, dat_) ost
           FROM cc_accp z, sal a, specparam p
-         WHERE z.acc in (select acc from rnbu_trace where substr(kodp,2,5) in ('90101','90151','90301','90311','90361','95001'))
+         WHERE z.acc in (select acc from rnbu_trace where substr(kodp,2,4)||substr(kodp,7,1) in ('26021','26221','90301','90311','90361','95001','95003'))
            AND z.accs = a.acc
            and a.fdat=dat_
            AND a.acc = p.acc
@@ -869,7 +870,7 @@ BEGIN
            and a.ost<0;
 
        -- сумма задолженности, кот. покрывает данный залог
-       for p in (select * from rnbu_trace where substr(kodp,2,5) in ('90101','90151','90301','90311','90361','95001'))
+       for p in (select * from rnbu_trace where substr(kodp,2,4)||substr(kodp,7,1) in ('26021','26221','90301','90311','90361','95001','95003'))
        loop
           acc_ := p.acc;
           rnk_ := p.rnk;
@@ -906,31 +907,25 @@ BEGIN
                 sz1_ :=  se_;
              end if;
 
-            -- Для Петрокоммерца не корректируем сумму задолженности на сумму дисконта/премии
-            -- письмо от Самсон Ю. (01/10/2007)
-             if mfou_ NOT IN (300120) THEN
-                -- определяем остаток счетов дисконта или премии
-                BEGIN
-                   select SUM(NVL(Gl.P_Icurval( s.KV, s.ost, dat_ ) ,0))
-                      INTO s04_
-                   from sal s
-                   where s.fdat=dat_
-                     AND s.acc in (select d.acc
-                                   from nd_acc d, accounts s
-                                   where d.acc<>acc_ and
-                                         d.nd = k.nd and
-                                         d.acc=s.acc and
-                                         s.rnk=rnk_  and
-                                         substr(s.nbs,4,1) in ('5','6','9')
-                                         and substr(s.nbs,1,3)=substr(k.nbs,1,3));
-                EXCEPTION WHEN NO_DATA_FOUND THEN
-                   s04_ := 0;
-                END;
+            -- определяем остаток счетов дисконта или премии
+             BEGIN
+               select SUM(NVL(Gl.P_Icurval( s.KV, s.ost, dat_ ) ,0))
+                  INTO s04_
+               from sal s
+               where s.fdat=dat_
+                 AND s.acc in (select d.acc
+                               from nd_acc d, accounts s
+                               where d.acc<>acc_ and
+                                     d.nd = k.nd and
+                                     d.acc=s.acc and
+                                     s.rnk=rnk_  and
+                                     substr(s.nbs,4,1) in ('5','6','9')
+                                     and substr(s.nbs,1,3)=substr(k.nbs,1,3));
+             EXCEPTION WHEN NO_DATA_FOUND THEN
+               s04_ := 0;
+             END;
 
-                ostc_ := abs(k.ost + NVL(s04_,0));
-             else
-                ostc_ := abs(k.ost);
-             end if;
+             ostc_ := abs(k.ost + NVL(s04_,0));
 
              -- депозиты, которые выступают залогами, привязаны к другим РНК
              if k.rnk <> rnk_ then
@@ -992,7 +987,7 @@ BEGIN
                 s580a_ := '9';
              end if;
 
-             if substr(p.kodp, 2, 5) = '95001' then
+             if substr(p.kodp,2,4)||substr(p.kodp,7,1) = '95001' then
                 s580a_ := '5';
              end if;
 
@@ -1003,7 +998,7 @@ BEGIN
                  kodp = substr(kodp,1,10)|| s580a_||substr(kodp,12)
              where recid = p.recid;
 
-             if substr(p.kodp, 2, 5) = '95001' then
+             if substr(p.kodp,2,4)||substr(p.kodp,7,1) = '95001' then
                 s580a_ := '9';
              end if;
 
@@ -1025,8 +1020,7 @@ BEGIN
                     round(prem * decode(suma, 0, 1, sump / suma)) prem_row,
                     nd, id, ob22, custtype, accr, accr_30, tip
              from (
-                 select /*+ index(t PK_NBU23REZ_ID) */
-                        t.acc, t.nls, decode(t.kv, 974, 933, t.kv) kv, t.rnk, t.s080,
+                 select t.acc, t.nls, decode(t.kv, 974, 933, t.kv) kv, t.rnk, t.s080,
                         nvl(gl.p_icurval(t.kv, t.sz, dat_), 0) szq,
                         nvl(gl.p_icurval(t.kv, t.rez_30, dat_), 0) szq_30,
                         a.isp, a.mdate, a.tobo, nvl(a.nbs, substr(a.nls, 1,4)) nbs,
@@ -1237,8 +1231,7 @@ BEGIN
 
    for k in (select acc, nbs, nls, kv, rnk, s080, szq, isp, mdate, tobo, r031, r030,
                     r011, r013, s580, rez, discont, prem, nd, id, ob22, custtype, accr, tip
-               from ( select /*+ index(t PK_NBU23REZ_ID) */
-                             t.acc, t.nls, decode(t.kv, 974, 933, t.kv) kv, t.rnk, t.s080,
+               from ( select t.acc, t.nls, decode(t.kv, 974, 933, t.kv) kv, t.rnk, t.s080,
                              gl.p_icurval(t.kv, t.sz - t.rez_30, dat_) szq,
                              a.isp, a.mdate, a.tobo, nvl(a.nbs, substr(a.nls, 1,4)) nbs,
                              r031, decode(lpad(l.r030, 3, '0'), '974', '933', lpad(l.r030, 3, '0')) r030,
@@ -1268,8 +1261,7 @@ BEGIN
                               or
                                 mfo_ <> 300465 and nvl(t.dat_mi, dat_+1) > dat_ )
                       union
-                      select /*+ index(t PK_NBU23REZ_ID) */
-                             t.acc, t.nls, decode(t.kv, 974, 933, t.kv) kv, t.rnk, t.s080,
+                      select t.acc, t.nls, decode(t.kv, 974, 933, t.kv) kv, t.rnk, t.s080,
                              gl.p_icurval(t.kv, t.rez_30, dat_) szq,
                              a.isp, a.mdate, a.tobo, nvl(a.nbs, substr(a.nls, 1,4)) nbs,
                              r031, decode(lpad(l.r030, 3, '0'), '974', '933', lpad(l.r030, 3, '0')) r030,
@@ -1511,15 +1503,15 @@ BEGIN
       granica_  number := 100;
       mask_     varchar2(100);
    begin
-      for k in (select fdat, ref, acc, nls, kv, sq, nbs, acca, nlsa,
+      for k in (select fdat, ref, acc, nls, kv, sq, nbs, acca, nlsa, rnka,
                        sum(sq) over (partition by acc) sum_all
                 from (select /*+ leading(a) index(o,IDX_OPLDOK_KF_FDAT_ACC)  */
-                             o.fdat, o.ref, o.acc, a.nls, a.kv,
+                             o.fdat, o.ref, o.acc, a.nls, a.kv, 
                              decode(o.dk, 0, -1, 1) * gl.p_icurval(a.kv, o.s, dat_) sq,
-                             a.nbs, z.acc acca, x.nls nlsa
+                             a.nbs, z.acc acca, x.nls nlsa, x.rnk rnka
                       from accounts a, opldok o, opldok z, accounts x, oper p
                       where o.fdat = any (select fdat from fdat
-                                           where fdat between datp_ and dat_
+                                           where fdat between datb_+1 and dat_
                                              and fdat !=to_date('20171218','yyyymmdd')  ) and
                         o.acc = a.acc 
                         and a.tip = 'REZ' 
@@ -1548,37 +1540,17 @@ BEGIN
                          rownum = 1;
                exception
                   when no_data_found then
-                      if k.nlsa like '7%' then
-                         begin
-                             if k.nls like '3590%' then
-                                mask_ := '355%';
-                             else
-                                mask_ := null;
-                             end if;
-
-                             if mask_ is not null then
-                                 select r.recid, r.kodp, r.znap
-                                 into recid_, kodp_, znap_
-                                 from opl o, rnbu_trace r
-                                 where o.fdat = k.fdat and
-                                       o.nls like mask_ and
-                                       o.kv = k.kv and
-                                       o.sq = abs(k.sq) and
-                                       o.acc = r.acc and
-                                       rownum = 1;
-                             else
-                                recid_ := null;
-                             end if;
-                         exception
-                             when no_data_found then
-                                recid_ := null;
-                         end;
-                      else
-                         recid_ := null;
-                      end if;
+                      recid_ := null;
                end;
 
                if recid_ is not null then
+              
+                  if abs(k.sq) > znap_ then
+                     znap_ := -1 * znap_;
+                  else 
+                     znap_ := k.sq;
+                  end if;
+                  
                   INSERT INTO rnbu_trace
                               (recid, userid, nls, kv, odate, kodp,
                                znap, acc, rnk, isp, mdate, ref,
@@ -1586,7 +1558,7 @@ BEGIN
                               )
                    select s_rnbu_record.NEXTVAL recid,
                           userid, nls, kv, odate, kodp,
-                          to_char(k.sq), acc,
+                          to_char(znap_), acc,
                           rnk, isp, mdate, k.ref,
                           'Списання за рахунок резерву РЕФ = '||to_char(k.ref) comm,
                           nbuc, tobo
