@@ -195,7 +195,7 @@ type gt_response is record(
 
   -- Private constant declarations
   g_package_name constant varchar2(160) := 'ins_ewa_mgr';
-  g_body_version  constant varchar2(64)  := 'version 3.21 23/02/2018';
+  g_body_version  constant varchar2(64)  := 'version 3.21bf 06/03/2018';
 
   --3.0
 --исправлены мелкие ошибки при создании договоров страхования (формат полей таблиц модуля страхования, проверкуи на корректность данных и и.п.)
@@ -257,7 +257,7 @@ end get_branch;
 --------------------------------------------------------------------------------------------------------------------------------------------
 -- l_xml_extract обробка помилок та конвертація в дату xml значень
 -- 
-  function l_xml_extract(pl_xml xmltype, pl_xpath varchar2) return varchar2 is
+  function l_xml_extract(pl_xml xmltype, pl_xpath varchar2, p_to_date number default 0) return varchar2 is
   retval varchar2(32000);
   begin
     if pl_xml.existSNode(pl_xpath) > 0 then
@@ -265,9 +265,9 @@ end get_branch;
     else
       retval:=null;
     end if;
-    IF regexp_like(retval,'^\d{4}-\d{2}-\d{2}$') then --дата типу yyyy-mm-dd
+    IF regexp_like(retval,'^\d{4}-\d{2}-\d{2}$') and p_to_date = 1 then --дата типу yyyy-mm-dd
        retval:= to_char(to_date(retval,'yyyy-mm-dd'),'dd.mm.yyyy'); 
-    elsif regexp_like(retval,'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}\+\d{4}$') then --дата типу yyyy-mm-ddThh24:mi:ss.000+0000
+    elsif regexp_like(retval,'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}\+\d{4}$') and p_to_date = 1 then --дата типу yyyy-mm-ddThh24:mi:ss.000+0000
           retval:= to_char(cast(to_timestamp_tz(retval,'YYYY-MM-DD"T"HH24:MI:SS.FF3TZHTZM') at time zone 'Europe/Kiev' as date),'dd.mm.yyyy');
   end if;
     return retval;
@@ -305,7 +305,7 @@ end get_branch;
      
      loop
         --Отримання значення по якому перевіряється умова використання альтернативного Xpath
-        l_test_path:=nvl(l_xml_extract(p_xml,substr(i.alt_path_cond,1,instr(i.alt_path_cond,'|')-1)),'null');
+        l_test_path:=nvl(l_xml_extract(p_xml,substr(i.alt_path_cond,1,instr(i.alt_path_cond,'|')-1),1),'null');
         --Значення для порівняння
         l_test_zn:=substr(i.alt_path_cond,instr(i.alt_path_cond,'|')+1);
         --Якщо умова отримання альтернативного Xpath не порожня та виконується беремо альтернативний Xpath інакше основний.
@@ -318,7 +318,7 @@ end get_branch;
         if upper(l_path) = upper(l_contr_path||'salePoint/code/text()')
         then
           begin
-            l_str:=nvl(get_branch(l_xml_extract(p_xml,l_path)),i.def_val);
+            l_str:=nvl(get_branch(l_xml_extract(p_xml,l_path,1)),i.def_val);
             exception when no_data_found then
               p_resp.purpose    := null;
               p_resp.errcode    := -20001;
@@ -326,7 +326,7 @@ end get_branch;
               return;
           end;
         else
-            l_str:=nvl(l_xml_extract(p_xml,l_path),i.def_val);
+            l_str:=nvl(l_xml_extract(p_xml,l_path,1),i.def_val);
         end if;    
       l_imp_val(i.id):=l_str;
   
@@ -336,14 +336,7 @@ end get_branch;
   end if;
    
                 l_paydat.id:=to_number(l_xml_extract(p_xml, l_contr_path||'id/text()')); --ід договора
-                begin
-                            l_paydat.branch:=get_branch(l_xml_extract(p_xml, l_contr_path||'salePoint/code/text()')); --бранч
-                exception when no_data_found then
-                            p_resp.purpose    := null;
-                            p_resp.errcode    := -20001;
-                            p_resp.errmessage := upper(g_package_name)||'. Не знайдено номер відділення "'||l_xml_extract(p_xml, l_contr_path||'salePoint/code/text()')||'".';
-                            return;
-                end;
+                l_paydat.branch:=l_xml_extract(p_xml, l_contr_path||'salePoint/code/text()'); --бранч
                 l_paydat.user_name:=l_xml_extract(p_xml, l_contr_path||'customFields/item[code="m1"]/value/text()'); --табельний номер
                 l_paydat.mfob:=l_xml_extract(p_xml, l_pay_path||'recipientBankMfo/text()'); --МФО банку страхової
                 l_paydat.nameb:=l_xml_extract(p_xml, l_pay_path||'recipientName/text()'); --назва страхової
@@ -357,7 +350,7 @@ end get_branch;
                     l_paydat.d_number:=l_xml_extract(p_xml, l_contr_path||'code/text()'); --символьний № документу
                     end if;
              begin
-                l_paydat.date_from:=to_date(l_xml_extract(p_xml, l_contr_path||'dateFrom/text()'),'dd.mm.yyyy'); --дата початоку дії страховкі
+                l_paydat.date_from:=to_date(l_xml_extract(p_xml, l_contr_path||'dateFrom/text()',1),'dd.mm.yyyy'); --дата початоку дії страховкі
                     exception when others then
                     p_resp.purpose    := null;
                     p_resp.errcode    := -20001;
@@ -365,7 +358,7 @@ end get_branch;
                     return;
              end;
              begin
-                l_paydat.date_to:=to_date(l_xml_extract(p_xml, l_contr_path||'dateTo/text()'),'dd.mm.yyyy'); --дата кінця дії страховкі
+                l_paydat.date_to:=to_date(l_xml_extract(p_xml, l_contr_path||'dateTo/text()',1),'dd.mm.yyyy'); --дата кінця дії страховкі
                      exception when others then
                     p_resp.purpose    := null;
                     p_resp.errcode    := -20001;
@@ -373,7 +366,7 @@ end get_branch;
                     return;
              end;
              begin
-                l_paydat.d_date:=to_date(l_xml_extract(p_xml, l_contr_path||'date/text()'),'dd.mm.yyyy'); --дата заключення договору
+                l_paydat.d_date:=to_date(l_xml_extract(p_xml, l_contr_path||'date/text()',1),'dd.mm.yyyy'); --дата заключення договору
                      exception when others then
                     p_resp.purpose    := null;
                     p_resp.errcode    := -20001;
@@ -387,7 +380,7 @@ end get_branch;
                 l_paydat.cust_series:=l_xml_extract(p_xml, l_contr_path||'customer/document/series/text()'); --серія песпорта
                 l_paydat.cust_number:=l_xml_extract(p_xml, l_contr_path||'customer/document/number/text()'); --№ паснорта
              begin
-                l_paydat.cust_doc_date:=to_date(l_xml_extract(p_xml, l_contr_path||'customer/document/date/text()'),'dd.mm.yyyy'); --дата видачі паспорта
+                l_paydat.cust_doc_date:=to_date(l_xml_extract(p_xml, l_contr_path||'customer/document/date/text()',1),'dd.mm.yyyy'); --дата видачі паспорта
                     exception when others then
                     p_resp.purpose    := null;
                     p_resp.errcode    := -20001;
@@ -396,7 +389,7 @@ end get_branch;
              end;
                 l_paydat.cust_doc_issued:=l_xml_extract(p_xml, l_contr_path||'customer/document/issuedBy/text()'); --ким виданий паспорт
              begin
-                l_paydat.cust_birthdate:=to_date(l_xml_extract(p_xml, l_contr_path||'customer/birthDate/text()'),'dd.mm.yyyy'); --дата народження
+                l_paydat.cust_birthdate:=to_date(l_xml_extract(p_xml, l_contr_path||'customer/birthDate/text()',1),'dd.mm.yyyy'); --дата народження
                     exception when others then
                     p_resp.purpose    := null;
                     p_resp.errcode    := -20001;
@@ -487,7 +480,6 @@ end get_prodpack_ins_k;
     end;
 
     begin
-      logger.info('INS get_purpose datetime_in='||to_char(sysdate, 'dd.mm.yyyy hh24:mi:ss')||'.START CREATING PURPOSE');
     if p_ext_idn is null then
         begin
         --Get mask id if a.ewa_type_id=p_peydat.external_id_tariff;
@@ -558,7 +550,6 @@ end get_prodpack_ins_k;
     l_nazn:=l_nazn||i.split_s;
     end if;
     end loop;
-    logger.info('INS get_purpose datetime_in='||to_char(sysdate, 'dd.mm.yyyy hh24:mi:ss')||'.MASK PARSED');
     if l_nazn is null then
         p_resp.purpose        := null;
         p_resp.errcode    := -20001;
@@ -566,10 +557,6 @@ end get_prodpack_ins_k;
         p_resp.errmessage := l_err;
         call_logger(p_peydat, l_err);
         return;
-      else
-        null;
-        logger.info('INS out from array l_nazn='||l_nazn);
-        logger.info('INS get_purpose  datetime_out='||to_char(sysdate, 'dd.mm.yyyy hh24:mi:ss')||'.PURPOSE :'||l_nazn);
       end if;
          p_resp.purpose := l_nazn;
     end;
@@ -607,6 +594,7 @@ procedure get_purpose(p_branch         in varchar2,
       l_imp_val gt_imp_val;
       l_paydat gt_paydat;
       l_resp gt_response;
+	  l_start_time timestamp:=localtimestamp;
 begin
     logger.info('INS get_purpose datetime_in='||to_char(sysdate, 'dd.mm.yyyy hh24:mi:ss'));
     
@@ -661,6 +649,7 @@ begin
     p_purpose:=l_resp.purpose;
     p_errcode:=l_resp.errcode;
     p_errmessage:=l_resp.errmessage;
+	logger.info('INS get_purpose created in '||to_char(localtimestamp -l_start_time)||' for code: '||l_paydat.d_number||'.PURPOSE :'||l_resp.purpose);
   
   end get_purpose;
   --------------------------------------------------------------------------------
@@ -674,20 +663,28 @@ begin
   l_imp_val gt_imp_val;
   l_paydat gt_paydat;
   l_resp gt_response;
+  l_start_time timestamp:=localtimestamp;
     
 begin
-  logger.info('INS get_purpose datetime_in='||to_char(sysdate, 'dd.mm.yyyy hh24:mi:ss'));
   l_pars_xml(p_xml, l_imp_val, l_paydat, l_resp,1,0);
    if l_resp.errcode is null then
       purp_creator(l_imp_val, l_paydat, l_resp); 
       p_purpose:=l_resp.purpose;
       p_errcode:=l_resp.errcode;
       p_errmessage:=l_resp.errmessage;
+
+      logger.info('INS get_purpose created in '||to_char(localtimestamp -l_start_time)||' for deal id: '||l_paydat.id||' code: '||l_paydat.d_number||'.PURPOSE :'||l_resp.purpose);
   else
     p_purpose:=l_resp.purpose;
     p_errcode:=l_resp.errcode;
     p_errmessage:=l_resp.errmessage;
+	logger.error(substr('INS get_purpose error for deal id '||l_resp.errmessage||' deal id '||to_char(l_paydat.id)||' deal_code '||l_paydat.d_number,1,4000));
   end if;
+  exception when others then
+  p_purpose:=null;
+    p_errcode:=-20001;
+    p_errmessage:=sqlerrm;
+    logger.error(substr('INS get_purpose error for deal id: '||to_char(l_paydat.id)||' code: '||l_paydat.d_number||' '||sqlerrm,1,4000));  
 end get_purpose;
 
   --------------------------------------------------------------------------------
@@ -1058,31 +1055,30 @@ end get_purpose;
     l_resp gt_response;
     l_err varchar2(255);
     l_ref_exists number;
+	l_start_time timestamp:=localtimestamp; 
                
       
       begin
-      logger.info('INS pay_isu datetime_in='||to_char(sysdate, 'dd.mm.yyyy hh24:mi:ss'));
       l_pars_xml(p_xml, l_params, l_paydat, l_resp,0,0);
-        if l_resp.errcode <> 0 then
+        if l_resp.errcode is not null then
         p_ref        := -1;
         p_errcode    := l_resp.errcode;
         l_err  := l_resp.errmessage;
         p_errmessage:=l_err;
-        call_logger(l_paydat, l_err);
+        call_logger(l_paydat, l_err||' Договір id: '||to_char(l_paydat.id)||' code: '||l_paydat.d_number||'.');
         return;
         end if;
+	  logger.info('INS pay_isu datetime_in='||to_char(sysdate, 'dd.mm.yyyy hh24:mi:ss')||'. Договір id: '||to_char(l_paydat.id)||' code: '||l_paydat.d_number||'.');
       select count(*) into l_ref_exists from ins_ewa_refs a where a.ewa_id = l_paydat.id and (a.ref is not null or a.ref<>-1);
       if l_ref_exists <> 0 then
         p_ref        := -1;
         p_errcode    := -20000;
         l_err  := 'Повторний запит в рамках договору:'||l_paydat.id;
         p_errmessage:=l_err;
-        call_logger(l_paydat, l_err);
+        call_logger(l_paydat, l_err||' Договір id: '||to_char(l_paydat.id)||' code: '||l_paydat.d_number||'.');
         return;
       end if;
-      if l_resp.errcode is not null then
-        null;
-      end if;
+      
     savepoint sp_paystart;
     begin
       -- вибір операції
@@ -1103,7 +1099,7 @@ end get_purpose;
           p_errcode    := -20001;
           l_err := upper(g_package_name)||'. Не знайдено код операції';
           p_errmessage:=l_err;
-          call_logger(l_paydat, l_err);
+          call_logger(l_paydat, l_err||' Договір id: '||to_char(l_paydat.id)||' code: '||l_paydat.d_number||'.');
           return;
       end;
       -- вибір користувача від якого створюється документ
@@ -1119,7 +1115,7 @@ end get_purpose;
           p_errcode    := -20001;
           l_err := upper(g_package_name)||'. Не знайдено користувача';
           p_errmessage:=l_err;
-          call_logger(l_paydat, l_err);
+          call_logger(l_paydat, l_err||' Договір id: '||to_char(l_paydat.id)||' code: '||l_paydat.d_number||'.');
           return;
       end;
       bc.subst_branch(l_branch);
@@ -1140,7 +1136,7 @@ end get_purpose;
           p_errcode    := -20001;
           l_err := upper(g_package_name)||'. Не знайдено транзитний рахунок';
           p_errmessage:=l_err;
-          call_logger(l_paydat, l_err);
+          call_logger(l_paydat, l_err||' Договір id: '||to_char(l_paydat.id)||' code: '||l_paydat.d_number||'.');
           return;
       end;
       l_random := l_paydat.d_number;
@@ -1223,7 +1219,7 @@ end get_purpose;
         p_ref        := -1;
         p_errcode    := l_errcode;
         p_errmessage:=l_errmsg;
-        call_logger(l_paydat, l_errmsg);
+        call_logger(l_paydat, l_errmsg||' Договір id: '||to_char(l_paydat.id)||' code: '||l_paydat.d_number||'.');
         bars_login.logout_user;
         rollback to savepoint sp_paystart;
         return;
@@ -1270,14 +1266,14 @@ end get_purpose;
             p_errcode    := sqlcode;
             p_errmessage := substr(sqlerrm, 1, 4000);
             p_errmessage:=l_errmsg;
-            call_logger(l_paydat, l_errmsg);
+            call_logger(l_paydat, l_errmsg||' Договір id: '||to_char(l_paydat.id)||' code: '||l_paydat.d_number||'.');
             bars_login.logout_user;
             rollback to savepoint sp_paystart;
             return;
         end;
       end if;
       insert into ins_ewa_refs(ewa_id,ref) values (l_paydat.id, l_doc.doc.ref);
-      logger.info('INS pay_isu datetime_out='||to_char(sysdate, 'dd.mm.yyyy hh24:mi:ss'));
+      logger.info('INS pay_isu payment_created  in '||to_char(localtimestamp -l_start_time)||' for deal id: '||l_paydat.id||' code: '||l_paydat.d_number||'. ref '||l_doc.doc.ref);
       bars_login.logout_user;
     exception
       when others then
@@ -1285,7 +1281,7 @@ end get_purpose;
         p_errcode    := sqlcode;
         l_err  := substr(sqlerrm, 1, 4000);
         p_errmessage:=l_err;
-        call_logger(l_paydat, l_err);
+        call_logger(l_paydat, substr(' deal_id '||to_char(l_paydat.id)||' code '||l_paydat.d_number||' err '||l_err,1,4000));
         bars_login.logout_user;
         rollback to savepoint sp_paystart;
         return;
@@ -1362,16 +1358,17 @@ end get_purpose;
 
 
   begin
-    logger.info('INS create_deal datetime_in='||to_char(sysdate, 'dd.mm.yyyy hh24:mi:ss'));
+
     l_pars_xml(p_params, l_params, l_paydat, l_resp,0,1);
-        if l_resp.errcode <> 0 then
+        if l_resp.errcode is not null then
         p_deal_number:= null;
         p_errcode    := l_resp.errcode;
         l_err        := l_resp.errmessage;
         p_errmessage :=l_err;
-        call_logger(l_paydat, l_err);
+        call_logger(l_paydat, l_err||' Договір id: '||to_char(l_paydat.id)||' code: '||l_paydat.d_number||'.');
         return;
         end if; 
+	logger.info('INS create_deal datetime_in='||to_char(sysdate, 'dd.mm.yyyy hh24:mi:ss')||' Договір id: '||to_char(l_paydat.id)||' code: '||l_paydat.d_number||'.');
     -----------------------------------------------
     ---Добавлена проверка на присутствие рефа в json.
     ---Если есть, то загружаем в табличку для дальнейшей передачи статусов платежей в EWA.
