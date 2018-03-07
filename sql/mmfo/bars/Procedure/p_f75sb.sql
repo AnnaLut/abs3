@@ -6,7 +6,7 @@ create or replace procedure P_F75SB
 % DESCRIPTION :    Процедура формирование файла @75 для СБ
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 2009.All Rights Reserved.
 %                                                 Версия для Сбербанка
-% VERSION     :    30.01.2018 (09.06.2017)
+% VERSION     :    08.02.2018 (30.01.2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 09.06.2017 - в курсоре SEL выбирались документы только после отчетной даты
              (добавлен период с начала месяца)
@@ -88,72 +88,112 @@ days_     number;
          t.nlsk, substr(t.nlsk,1,4) nbsk,
          t.s*100,
          DECODE(t.s*100, 0, t.sq*100, gl.p_icurval(t.kv, t.s*100, o.vdat)), t.nazn
-       , NVL(sb.f_75, '0') pr_d
-       , NVL(sb1.f_75,'0') pr_k
+       , NVL(sbd.f_75,'0') pr_d
+       , NVL(sbk.f_75,'0') pr_k
        , NVL(t.OB22D,'00') ob22_d
        , NVL(t.OB22K,'00') ob22_k
-    FROM tmp_file03 t
-       , SB_R020 sb
-       , SB_R020 sb1
-       , oper o
-   WHERE substr(t.nlsd,1,4)=sb.r020
-     and sb.f_75='1' and sb.D_OPEN <= Dat_ and lnnvl( sb.D_CLOSE <= Dat_ )
-     and substr(t.nlsk,1,4)=sb1.r020(+)
-     and not exists (select 1 from ref_kor where ref=t.ref and vob in (96, 99))
-     and t.ref = o.ref
+    from TMP_FILE03 t
+    join OPER o
+      on ( o.ref = t.ref )
+    join ( select R020, F_75
+             from SB_R020
+            where F_75 = '1'
+              and D_OPEN <= Dat_
+              and lnnvl( D_CLOSE <= Dat_ )
+         ) sbd
+      on ( sbd.R020 = substr(t.NLSD,1,4) )
+    left
+    join ( select R020, F_75
+             from SB_R020
+            where F_75 = '1'
+              and D_OPEN <= Dat_
+              and lnnvl( D_CLOSE <= Dat_ )
+         ) sbk
+      on ( sbk.R020 = substr(t.NLSK,1,4) )
+   where not exists (select 1 from REF_KOR where ref=t.ref and vob in (96, 99))
    UNION
   SELECT t.fdat, t.ref, t.accd, t.nlsd, t.kv, substr(t.nlsd,1,4) nbs, t.acck,
          t.nlsk, substr(t.nlsk,1,4) nbsk,
          t.s*100, DECODE(t.s*100, 0, t.sq*100, gl.p_icurval( t.kv, t.s*100, r.vdat/*t.fdat*/)), t.nazn
-       , NVL(sb.f_75, '0') pr_d
-       , NVL(sb1.f_75,'0') pr_k
+       , NVL(sbd.f_75, '0') pr_d
+       , NVL(sbk.f_75,'0') pr_k
        , NVL(t.OB22D,'00') ob22_d
        , NVL(t.OB22K,'00') ob22_k
-    FROM tmp_file03 t
-       , SB_R020 sb
-       , SB_R020 sb1
-       , ref_kor r
-   WHERE substr(t.nlsd,1,4)=sb.r020
-     and sb.f_75='1' and sb.D_OPEN <= Dat_ and lnnvl( sb.D_CLOSE <= Dat_ )
-     and substr(t.nlsk,1,4)=sb1.r020(+)
-     and t.ref=r.ref
-     and r.vob in (96, 99)
+    from TMP_FILE03 t
+    join REF_KOR r
+      on ( r.ref = t.REF )
+    join ( select R020, F_75
+             from SB_R020
+            where F_75 = '1'
+              and D_OPEN <= Dat_
+              and lnnvl( D_CLOSE <= Dat_ )
+         ) sbd
+      on ( sbd.R020 = substr(t.NLSD,1,4) )
+    left
+    join ( select R020, F_75
+             from SB_R020
+            where F_75 = '1'
+              and D_OPEN <= Dat_
+              and lnnvl( D_CLOSE <= Dat_ )
+         ) sbk
+      on ( sbk.R020 = substr(t.NLSK,1,4) )
+   where r.vob in (96,99)
      and r.vdat >= vdatr_
    UNION
   SELECT t.fdat, t.ref, t.accd, t.nlsd, t.kv, substr(t.nlsd,1,4) nbs, t.acck,
          t.nlsk, substr(t.nlsk,1,4) nbsk,
          t.s*100,
          DECODE(t.s*100, 0, t.sq*100, gl.p_icurval (t.kv, t.s*100, o.vdat)), t.nazn
-       , NVL(sb.f_75, '0') pr_d
-       , NVL(sb1.f_75,'0') pr_k
+       , NVL(sbd.f_75,'0') pr_d
+       , NVL(sbk.f_75,'0') pr_k
        , NVL(t.OB22D,'00') ob22_d
        , NVL(t.OB22K,'00') ob22_k
-    FROM tmp_file03 t
-       , SB_R020 sb
-       , SB_R020 sb1
-       , oper o
-   WHERE substr(t.nlsk,1,4)=sb1.r020
-     and sb1.f_75='1' and sb1.D_OPEN <= Dat_ and lnnvl( sb1.D_CLOSE <= Dat_ )
-     and substr(t.nlsd,1,4)=sb.r020(+)
-     and not exists (select 1 from ref_kor where ref=t.ref and vob in (96, 99))
-     and t.ref = o.ref
+    from TMP_FILE03 t
+    join OPER o
+      on ( o.ref = t.ref )
+    join ( select R020, F_75
+             from SB_R020
+            where F_75 = '1'
+              and D_OPEN <= Dat_
+              and lnnvl( D_CLOSE <= Dat_ )
+         ) sbk
+      on ( sbk.R020 = substr(t.NLSK,1,4) )
+    left
+    join ( select R020, F_75
+             from SB_R020
+            where F_75 = '1'
+              and D_OPEN <= Dat_
+              and lnnvl( D_CLOSE <= Dat_ )
+         ) sbd
+      on ( sbd.R020 = substr(t.NLSD,1,4) )
+   WHERE not exists (select 1 from ref_kor where ref=t.ref and vob in (96,99))
    UNION
   SELECT t.fdat, t.ref, t.accd, t.nlsd, t.kv, substr(t.nlsd,1,4) nbs, t.acck,
          t.nlsk, substr(t.nlsk,1,4) nbsk,
          t.s*100, DECODE(t.s*100, 0, t.sq*100, gl.p_icurval (t.kv, t.s*100, r.vdat/*t.fdat*/)), t.nazn
-       , NVL(sb.f_75, '0') pr_d
-       , NVL(sb1.f_75,'0') pr_k
+       , NVL(sbd.f_75,'0') pr_d
+       , NVL(sbk.f_75,'0') pr_k
        , NVL(t.OB22D,'00') OB22_D
        , NVL(t.ob22K,'00') OB22_K
-    FROM tmp_file03 t
-       , SB_R020 sb
-       , SB_R020 sb1
-       , ref_kor r
-   WHERE substr(t.nlsk,1,4)=sb1.r020
-     and sb1.f_75='1' and sb1.D_OPEN <= Dat_ and lnnvl( sb1.D_CLOSE <= Dat_ )
-     and substr(t.nlsd,1,4)=sb.r020(+)
-     and t.ref=r.ref
-     and r.vob in (96,99)
+    FROM TMP_FILE03 t
+    join REF_KOR    r
+      on ( r.REF = t.REF )
+    join ( select R020, F_75
+             from SB_R020
+            where F_75 = '1'
+              and D_OPEN <= Dat_
+              and lnnvl( D_CLOSE <= Dat_ )
+         ) sbk
+      on ( sbk.R020 = substr(t.NLSK,1,4) )
+    left
+    join ( select R020, F_75
+             from SB_R020
+            where F_75 = '1'
+              and D_OPEN <= Dat_
+              and lnnvl( D_CLOSE <= Dat_ )
+         ) sbd
+      on ( sbd.R020 = substr(t.NLSD,1,4) )
+   WHERE r.vob in (96,99)
      and r.vdat >= vdatr_;
 
 BEGIN
@@ -372,7 +412,7 @@ BEGIN
   END LOOP;
 
   CLOSE Saldo;
------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
   OPEN OBOROTY;
 
   LOOP
@@ -386,7 +426,7 @@ BEGIN
     comm_ := substr('Дт рах. = ' || nlsd_ || ' Кт рах. = ' || nlsk_ || '  ' || nazn_, 1, 200);
 
     kk_ := '00';
-
+--------------------------------------------------------------------------------
     IF pr_d in ('1','5') THEN
    
       if ( nbs_ = '7700' )
@@ -550,6 +590,7 @@ BEGIN
          kk_ := '05';
       end if;
 
+      -- Перерахування до інших установ
       if kv_=980 and nlsd_ like '7%' and nlsk_ like '3739%'
       then
          kk_ := '07';
@@ -568,7 +609,7 @@ BEGIN
          kk_ := '07';
       end if;
 
-      -- виправнi обороти щодо коду 01
+      -- виправнi обороти (щодо коду 01)
       if ( nbs_ = nbsk_ )
       then
         kk_ := '11';
@@ -618,8 +659,8 @@ BEGIN
          VALUES ( nlsd_, kv_, data_, kodp_, znap_, ref_, comm_, accd_, nbuc_ );
 
       END IF;
-
-      if pr_k in ('1', '6') then
+--------------------------------------------------------------------------------
+      if pr_k in ('1','6') then
 
         -- при формировании новых счетов для резерва
         if nlsd_ like '3739%' and nlsk_ like '7%' 
@@ -803,7 +844,7 @@ BEGIN
           IF ( typ_ > 0 )
           then nbuc_ := NVL(F_Codobl_Tobo(acck_,typ_),nbuc1_);
           else nbuc_ := nbuc1_;
-          END IF;
+          end if;
 
           kodp_:= dk_ || Nbsk_ || ob22_k || lpad(kv_, 3, '0') || kk_ ;
           znap_:= to_char(Dosq_);
@@ -814,39 +855,42 @@ BEGIN
         END IF;
 
       end if;
-
+--------------------------------------------------------------------------------
     END IF;
 
     kk_ := '00';
 
     IF pr_k in ('1','6') and pr_d = '0' THEN
 
-      comm_ := substr(comm_ || '   !!! Проверка !!!', 1, 200);
+      comm_ := SubStr( comm_ || '   !!! Проверка !!!', 1, 200 );
 
       -- кошти направленi на формування резерву
-      if nlsd_ like '380%' and nlsk_ not like '7%' then
-         kk_ := '01';
+      if nlsd_ like '380%' and nlsk_ NOT like '770%'
+      then
+        kk_ := '01';
       end if;
 
-      if nlsd_ like '7%' and nlsk_ not like '7%' then
-         kk_ := '01';
+      if nlsd_ like '770%' and nlsk_ NOT like '770%'
+      then
+        kk_ := '01';
       end if;
 
       -- зменшення резервiв за рахунок уточнень
-      if kv_ = 980 and nlsd_ like '3801%' and nlsk_ like '7%' then
-         kk_ := '02';
+      if kv_ = 980 and nlsd_ like '3801%' and nlsk_ like '770%'
+      then
+        kk_ := '02';
       end if;
 
-      -- повернення заборгованностi
-      if (nlsd_ like '1%' or nlsd_ like '2%' or nlsd_ like '3%') and nlsd_ not like '3801%' and
-         nlsk_ like '7%' then
-         kk_ := '04';
-      end if;
+--    -- повернення заборгованностi
+--    if (nlsd_ like '1%' or nlsd_ like '2%' or nlsd_ like '3%') and nlsd_ not like '3801%' and
+--       nlsk_ like '7%' then
+--       kk_ := '04';
+--    end if;
 
-      -- при формировании новых счетов для резерва
-      if nlsd_ like '3739%' and nlsk_ like '7%' then
-         kk_ := '07';
-      end if;
+--    -- при формировании новых счетов для резерва
+--    if nlsd_ like '3739%' and nlsk_ like '7%' then
+--       kk_ := '07';
+--    end if;
 
       -- при формировании новых счетов для резерва
       if ( nlsd_ like '3739%' and
@@ -859,7 +903,7 @@ BEGIN
                     ,'3119','3219','3569','3590','3599','3690','3692','3699')
          )
       then
-         kk_ := '07';
+        kk_ := '07';
       end if;
 
       -- списання резерву
@@ -873,45 +917,52 @@ BEGIN
                     ,'3119','3219','3569','3590','3599','3690','3692','3699')
          )
       then
-         kk_ := '07';
+        kk_ := '07';
       end if;
 
-      IF Dos_ > 0 THEN
-         if kv_ != 980 then
-            dk_ := '61';
-         else
-            dk_ := '60';
-         end if;
+      IF Dos_ > 0 
+      THEN
 
-         kodp_:= dk_ || Nbsk_ || ob22_k || lpad(kv_, 3, '0') || kk_ ;
-         znap_:=TO_CHAR(Dos_);
+        if ( kv_ = 980 )
+        then dk_ := '60';
+        else dk_ := '61';
+        end if;
 
-         IF typ_>0 THEN
-            nbuc_ := NVL(F_Codobl_Tobo(acck_,typ_),nbuc1_);
-         ELSE
-            nbuc_ := nbuc1_;
-         END IF;
+        if ( typ_ > 0 )
+        then nbuc_ := NVL(F_Codobl_Tobo(acck_,typ_),nbuc1_);
+        else nbuc_ := nbuc1_;
+        end if;
 
-         INSERT INTO rnbu_trace(nls, kv, odate, kodp, znap, ref, comm, acc, nbuc)
-         VALUES  (nlsk_, kv_, data_, kodp_, znap_, ref_, comm_, acck_, nbuc_) ;
-      END IF;
-
-      IF kv_ != 980 and Dosq_ > 0 THEN
-         kodp_:= '60' || Nbsk_ || ob22_k || lpad(kv_, 3, '0') || kk_ ;
-         znap_:=TO_CHAR(Dosq_);
-
-         IF typ_>0 THEN
-            nbuc_ := NVL(F_Codobl_Tobo(acck_,typ_),nbuc1_);
-         ELSE
-            nbuc_ := nbuc1_;
-         END IF;
+        kodp_ := dk_ || Nbsk_ || ob22_k || lpad(kv_, 3, '0') || kk_;
+        znap_ := TO_CHAR(Dos_);
 
          INSERT INTO rnbu_trace(nls, kv, odate, kodp, znap, ref, comm, acc, nbuc)
-         VALUES  (nlsk_, kv_, data_, kodp_, znap_, ref_, comm_, acck_, nbuc_) ;
+         VALUES ( nlsk_, kv_, data_, kodp_, znap_, ref_, comm_, acck_, nbuc_ );
+
       END IF;
+
+      IF kv_ != 980 and Dosq_ > 0 
+      THEN
+
+        dk_ := '60'
+
+        if ( typ_ > 0 )
+        then nbuc_ := NVL(F_Codobl_Tobo(acck_,typ_),nbuc1_);
+        else nbuc_ := nbuc1_;
+        end if;
+
+        kodp_ := dk_ || Nbsk_ || ob22_k || lpad(kv_, 3, '0') || kk_;
+        znap_ := TO_CHAR(Dosq_);
+
+        INSERT INTO rnbu_trace(nls, kv, odate, kodp, znap, ref, comm, acc, nbuc)
+        VALUES ( nlsk_, kv_, data_, kodp_, znap_, ref_, comm_, acck_, nbuc_ );
+
+      END IF;
+
     END IF;
+
   END LOOP;
-  
+
   CLOSE OBOROTY;
 
   -- розрахунок показникыв курсової р?зниц? (код 06)
