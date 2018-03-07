@@ -314,7 +314,8 @@ namespace BarsWeb.Areas.Cdnt.Infrastructure.DI.Implementation
         }
         public IEnumerable<BarsListItem> GetDocumentTypes()
         {
-            var sql = "SELECT PASSP as list_item_id, NAME as list_item_name FROM PASSP WHERE PSPTYP = '01'";
+            var sql= "SELECT PASSP as list_item_id, (case when PASSP = 7 then 'ID-картка' else NAME end) as list_item_name FROM PASSP WHERE PSPTYP = '01'";
+            //var sql = "SELECT PASSP as list_item_id, NAME as list_item_name FROM PASSP WHERE PSPTYP = '01'";
             return _entities.ExecuteStoreQuery<BarsListItem>(sql);
         }
         public IEnumerable<BarsListItem> GetAccreditationTypes()
