@@ -305,17 +305,18 @@ commit;
 
 begin
   -- special values for accounts of financial receivables
-  for k in ( select t1.R020, t1.OB22, t1.TIP
+  for k in ( select t1.R020, t1.OB22
+--                , t1.TIP
               from ( select substr(NBS_P,1,4) as R020
                           , substr(NBS_P,5,2) as OB22
-                          , case when ( MOD_ABS in (2,3) ) then 'SK9' else 'OFR' end TIP
+--                        , case when ( MOD_ABS in (2,3) ) then 'SK9' else 'OFR' end TIP
                        from FIN_DEBT
                       where NBS_P like '357___'
                    ) t1
               left
               join NBS_TIPS t2
                 on ( t2.NBS = t1.R020 and t2.OB22 = t1.OB22 )
-             where T2.TIP Is Null 
+             where t2.NBS Is Null
            )
   loop
     begin
@@ -323,7 +324,7 @@ begin
         into NBS_TIPS
            ( NBS, OB22, TIP )
       Values
-           ( k.R020, k.OB22, k.TIP );
+           ( k.R020, k.OB22, 'OFR' );
     exception
       when DUP_VAL_ON_INDEX then
         null;

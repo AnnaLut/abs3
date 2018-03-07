@@ -45,6 +45,38 @@ begin
       end;
     end loop;
     commit;
+    -- ѕрисвоение типа счетам фин.деб. по справочнику
+    for ac in ( select a.ROWID as ROW_ID
+                     , t.TIP
+                     , a.ACC
+                  from ACCOUNTS a
+                  join ( select substr(NBS_N,1,4) as R020
+                              , substr(NBS_N,5,2) as OB22
+                              , 'ODB' as TIP -- 'SK0'
+                           from FIN_DEBT
+                          where NBS_N like '357___'
+                          union
+                         select substr(NBS_P,1,4) as R020
+                              , substr(NBS_P,5,2) as OB22
+                              , 'OFR' as TIP
+                           from FIN_DEBT
+                          where NBS_P like '357___'
+                       ) t
+                    on ( t.R020 = a.NBS and t.OB22 = a.OB22 )
+                 where a.DAZS is null
+                   and a.TIP not in ( 'SK0', 'SK9', t.TIP )
+              )
+    loop
+      begin
+        update ACCOUNTS
+           set TIP   = ac.TIP
+         where ROWID = ac.ROW_ID;
+      exception
+        when OTHERS then
+          dbms_output.put_line( 'ACC='||to_char(ac.ACC)||', errmsg='||sqlerrm );
+      end;
+    end loop;
+    commit;
     bars.bc.home();
   end loop;
 end;
