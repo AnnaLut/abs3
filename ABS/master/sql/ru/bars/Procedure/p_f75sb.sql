@@ -944,7 +944,7 @@ BEGIN
       IF kv_ != 980 and Dosq_ > 0 
       THEN
 
-        dk_ := '60'
+        dk_ := '60';
 
         if ( typ_ > 0 )
         then nbuc_ := NVL(F_Codobl_Tobo(acck_,typ_),nbuc1_);
