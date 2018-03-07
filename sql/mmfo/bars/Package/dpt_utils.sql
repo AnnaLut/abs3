@@ -2028,7 +2028,7 @@ is
 begin
 
   dbms_application_info.set_action('recovery_deposit');
-
+ 
   begin
     select c.* 
       into l_dpt
@@ -2075,7 +2075,6 @@ begin
   bars_audit.info( title || ': ¬клад # '||to_char(p_dptid)||' усп≥шно в≥дновлено!' ); 
 
   dbms_application_info.set_action(null);
-
 exception
   when others then
     dbms_application_info.set_action(null);

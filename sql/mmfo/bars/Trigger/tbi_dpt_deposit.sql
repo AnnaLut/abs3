@@ -7,16 +7,20 @@ PROMPT =========================================================================
 
 PROMPT *** Create  trigger TBI_DPT_DEPOSIT ***
 
-  CREATE OR REPLACE TRIGGER BARS.TBI_DPT_DEPOSIT 
+CREATE OR REPLACE TRIGGER BARS.TBI_DPT_DEPOSIT 
 before insert on dpt_deposit
 for each row
 begin
+  if sys_context('USERENV','ACTION') = 'recovery_deposit' then
+    null;
+  else  
    insert into dpt_deposit_all (deposit_id
-	, branch, kf
+  , branch, kf
    )
    values (:new.deposit_id
-	, :new.branch, :new.kf
+  , :new.branch, :new.kf
    );
+  end if; 
 end;
 
 
