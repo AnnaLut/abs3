@@ -222,7 +222,7 @@ end;
 CREATE OR REPLACE PACKAGE BODY DM_IMPORT
  is
 
-    g_body_version constant varchar2(64) := 'Version 4.0.1 01/03/2018'; 
+    g_body_version constant varchar2(64) := 'Version 4.0.2 07/03/2018'; 
     g_body_defs    constant varchar2(512) := null;
     G_TRACE        constant varchar2(20) := 'dm_import.';
     -- DIY - parallel
@@ -2093,6 +2093,8 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
             ,d.cnt_dubl
             ,d.archdoc_id
             ,d.wb
+			,a.ob22
+			,a.nms
         from bars.dpt_deposit d, bars.accounts a, bars.int_accn ia, bars.accounts aproc, dd, bars.customer c
         where d.acc=a.acc and ia.acc=a.acc and ia.acra=aproc.acc
           and D.DEPOSIT_ID = dd.deposit_id
@@ -2152,6 +2154,8 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
             ,d.cnt_dubl
             ,d.archdoc_id
             ,d.wb
+			,a.ob22
+			,a.nms
         from bars.dpt_deposit d, bars.accounts a, bars.int_accn ia, bars.accounts aproc, bars.customer c
         where d.acc=a.acc and ia.acc=a.acc and ia.acra=aproc.acc
         and d.rnk = c.rnk and not (c.ise in (''14100'', ''14200'', ''14101'',''14201'') and c.sed =''91'')
@@ -2227,6 +2231,8 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
             ,d.cnt_dubl
             ,d.archdoc_id
             ,d.wb
+			,a.ob22
+			,a.nms
          from bars.dpt_deposit_clos d, bars.accounts a, bars.int_accn ia, bars.accounts aproc, dc, bars.customer c
         where d.acc=a.acc and ia.acc=a.acc and ia.acra=aproc.acc
           and d.rnk = c.rnk and not (c.ise in (''14100'', ''14200'', ''14101'',''14201'') and c.sed =''91'')
@@ -2263,7 +2269,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                          l_row.intrate, l_row.sdog_begin, l_row.last_add_date, l_row.last_add_suma,
                          l_row.ostc, l_row.suma_proc, l_row.suma_proc_plan,
                          l_row.dpt_status, l_row.suma_proc_payoff, l_row.date_proc_payoff, l_row.date_dep_payoff, l_row.datz,
-                         l_row.dazs, l_row.blkd, l_row.blkk, l_row.cnt_dubl, l_row.archdoc_id, l_row.wb;
+                         l_row.dazs, l_row.blkd, l_row.blkk, l_row.cnt_dubl, l_row.archdoc_id, l_row.wb, l_row.ob22, l_row.nms;
 
             exit when c%notfound;
 
@@ -2302,7 +2308,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                          l_row.intrate, l_row.sdog_begin, l_row.last_add_date, l_row.last_add_suma,
                          l_row.ostc, l_row.suma_proc, l_row.suma_proc_plan,
                          l_row.dpt_status, l_row.suma_proc_payoff, l_row.date_proc_payoff, l_row.date_dep_payoff, l_row.datz,
-                         l_row.dazs, l_row.blkd, l_row.blkk, l_row.cnt_dubl, l_row.archdoc_id, l_row.wb;
+                         l_row.dazs, l_row.blkd, l_row.blkk, l_row.cnt_dubl, l_row.archdoc_id, l_row.wb, l_row.ob22, l_row.nms;
 
             exit when c_clos%notfound;
 
@@ -2393,7 +2399,9 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                                        a.dazs,
                                        decode(a.dazs,null,1,0) acc_status,
                                        a.blkd,
-                                       a.blkk
+                                       a.blkk,
+									   a.ob22,
+									   a.nms
                                    ';
 
         q_str_postfull  varchar2(4000) :=  ' FROM bars.accounts a, bars.dpt_deposit dd, bars.customer c
@@ -2438,7 +2446,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                          l_row.vidd, l_row.daos, l_row.kv, l_row.intrate, l_row.massa,
                          l_row.count_zl, l_row.ostc, l_row.ob_mon,
                          l_row.last_add_date, l_row.last_add_suma, l_row.dazs, l_row.acc_status,
-                         l_row.blkd, l_row.blkk;
+                         l_row.blkd, l_row.blkk, l_row.ob22, l_row.nms;
 
             exit when c%notfound;
 
@@ -3672,6 +3680,8 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                           ,case ddt.TYP_TR when 'B' then 1 end ben     --бенефіціар
                           ,dv.TYPE_NAME vidd_name   --вид вкладу(символьний)
                           ,d.wb
+						  ,a.ob22
+						  ,a.nms
               from bars.dpt_deposit d, bars.accounts a, bars.int_accn ia, bars.accounts aproc, dd, bars.DPT_DEPOSITW dw, bars.DPT_TRUSTEE ddt, bars.DPT_VIDD dv
               , bars.customer c
               where d.acc=a.acc and ia.acc=a.acc and ia.acra=aproc.acc
@@ -3752,6 +3762,8 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                   ,case ddt.TYP_TR when 'B' then 1 end ben     --бенефіціар
                   ,dv.TYPE_NAME vidd_name   --вид вкладу(символьний)
                   ,d.wb
+				  ,a.ob22
+				  ,a.nms
               from bars.dpt_deposit d, bars.accounts a, bars.int_accn ia, bars.accounts aproc, bars.DPT_DEPOSITW dw, bars.DPT_TRUSTEE ddt, bars.DPT_VIDD dv
               , bars.customer c
               where d.acc=a.acc and ia.acc=a.acc and ia.acra=aproc.acc
@@ -3836,6 +3848,8 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                   ,case ddt.TYP_TR when 'B' then 1 end ben     --бенефіціар
                   ,dv.TYPE_NAME vidd_name   --вид вкладу(символьний)
                   ,d.wb
+				  ,a.ob22
+				  ,a.nms
               from bars.dpt_deposit d, bars.accounts a, bars.int_accn ia, bars.accounts aproc, bars.DPT_DEPOSITW dw, bars.DPT_TRUSTEE ddt, bars.DPT_VIDD dv
               , bars.customer c
               where d.acc=a.acc and ia.acc=a.acc and ia.acra=aproc.acc
@@ -3892,9 +3906,11 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
             l_row.MAL             := c.mal;
             l_row.BEN             := c.ben;
             l_row.VIDD_NAME       := c.vidd_name;
-            l_row.MASSA := null;
-            l_row.PER_ID := l_per_id;
-            l_row.wb := c.wb;
+            l_row.MASSA 		  := null;
+            l_row.PER_ID 		  := l_per_id;
+            l_row.wb 			  := c.wb;
+			l_row.ob22 			  := c.ob22;
+			l_row.nms 			  := c.nms;
 
             insert into deposit_PLT values l_row;
             l_rows:=l_rows+1;
@@ -3995,6 +4011,8 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
             ,case ddt.TYP_TR when 'B' then 1 end ben     --бенефіціар
             ,dv.TYPE_NAME vidd_name   --вид вкладу(символьний)
             ,d.wb
+			,a.ob22
+			,a.nms
          from bars.dpt_deposit_clos d, bars.accounts a, bars.int_accn ia, bars.accounts aproc, dc, bars.DPT_DEPOSITW dw, bars.DPT_TRUSTEE ddt, bars.DPT_VIDD dv, bars.customer c
         where d.acc=a.acc and ia.acc=a.acc and ia.acra=aproc.acc
           and d.idupd = dc.idupd
@@ -4050,9 +4068,11 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
             l_row.MAL             := c_clos.mal;
             l_row.BEN             := c_clos.ben;
             l_row.VIDD_NAME       := c_clos.vidd_name;
-            l_row.MASSA := null;
-            l_row.PER_ID := l_per_id;
-            l_row.wb := c_clos.wb;
+            l_row.MASSA 		  := null;
+            l_row.PER_ID 		  := l_per_id;
+            l_row.wb 			  := c_clos.wb;
+			l_row.ob22 			  := c_clos.ob22;
+			l_row.nms 			  := c_clos.nms;
             insert into deposit_PLT values l_row;
             l_rows:=l_rows+1;
 
@@ -4170,6 +4190,8 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                       ,w4_kproc
                       ,w4_sec
                       ,a.acc
+					  ,a.ob22
+					  ,a.nms
                        from bars.accounts a, bars.customer c, bars.accounts ao, bars.w4_acc w, acvive_accounts aa,
                         (select aw.acc, p.id, p.name, p.okpo, p.product_code, p.okpo_n from bars.accountsw aw, bars.bpk_proect p
                           where aw.tag = 'PK_PRCT'
@@ -4216,7 +4238,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
 
                    union all
 
-                                   select a.branch      --відділення
+                select a.branch      --відділення
                       ,a.kf          --РУ
                       ,a.rnk         --РНК
                       ,w.nd          --Номер договору
@@ -4267,6 +4289,8 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                       ,w4_kproc
                       ,w4_sec
                       ,a.acc
+					  ,a.ob22
+					  ,a.nms
                        from bars.accounts a, bars.customer c, bars.accounts ao, bars.w4_acc w/*, acvive_accounts aa*/,
                         (select aw.acc, p.id, p.name, p.okpo, p.product_code, p.okpo_n from bars.accountsw aw, bars.bpk_proect p
                           where aw.tag = 'PK_PRCT'
@@ -4362,6 +4386,8 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
             l_row.W4_KPROC := c.w4_kproc;
             l_row.W4_SEC := c.w4_sec;
             l_row.acc := c.acc;
+			l_row.ob22 := c.ob22;
+			l_row.nms := c.nms;
             insert into bpk_plt values l_row;
             l_rows := l_rows + 1;
 
