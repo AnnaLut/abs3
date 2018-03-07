@@ -133,12 +133,15 @@ begin
   bars_metabase.add_column(l_tabid, 14, 'FDAT', 'D', 'Дата ~ВИНИКНЕННЯ~Деб.заборг.', '1.5', null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 17, 'S240', 'N', 'Залишк.~термiн~днiв', '.5', null, 16, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 18, 'S180', 'N', 'Початк.~термiн~днiв', '.5', null, 15, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'S', 'N', 'НЕзакрита~Сума~Деб.заборг.', '1.5', null, 12, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'S', 'N', 'НЕзакрита~Сума~Деб.заборг.', '1.5', null, 12, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(SQ)', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 24, 'OB22', 'C', 'Ob22', '.3', null, 2, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'BRANCH', 'C', 'Бранч', '1', null, 18, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'BRANCH', 'C', 'Бранч', '1', null, 39, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 38, 'KV', 'N', 'Код~вал', '.3', null, 1, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 39, 'MDATE', 'D', 'План-дата~закриття', '1', null, 14, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 40, 'NMS', 'C', 'Назва~рах ДЗ', '2', null, 17, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 41, 'RNK', 'N', 'Код~RNK', '1', null, 18, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 42, 'NMK', 'C', 'Назва~контр.агента', '1.5', null, 19, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 43, 'SQ', 'N', 'НЕзакрита~Сума екв~Деб.заборг.', '1.5', null, 38, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 9, 5, 'ASC ');
