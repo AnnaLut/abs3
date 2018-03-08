@@ -353,7 +353,7 @@
                                     <asp:Label ID="Label2" runat="server" Text='<%# Eval("BRANCH_NAME") %>' ToolTip='<%# Eval("BRANCH") %>'></asp:Label>
                                 </ItemTemplate>
                             </asp:TemplateField>
-                            <asp:BoundField DataField="STATUS_REVIEW" HeaderText="Статус рішення" SortExpression="STATUS_REVIEW" />
+                            <%--<asp:BoundField DataField="STATUS_REVIEW" HeaderText="Статус рішення" SortExpression="STATUS_REVIEW" />--%>
                             <asp:TemplateField HeaderText="Статус" SortExpression="STATES" meta:resourcekey="TemplateFieldResource3">
                                 <ItemTemplate>
                                     <Bars:LabelTooltip ID="Label3" runat="server" Text='<%# Eval("STATES") %>' TextLength="30"

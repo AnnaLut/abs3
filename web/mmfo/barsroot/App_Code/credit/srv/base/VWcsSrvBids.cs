@@ -26,7 +26,7 @@ namespace credit
         {
             fillFields();
         }
-        public VWcsSrvBidsRecord(BbDataSource Parent, OracleDecimal RowScn, Decimal? BID_ID, String SUBPRODUCT_ID, String SUBPRODUCT_NAME, DateTime? CRT_DATE, String F, String I, String O, DateTime? BDATE, String INN, Decimal? SUMM, Decimal? OWN_FUNDS, String TERM, String CREDIT_CURRENCY, Decimal? SINGLE_FEE, Decimal? MONTHLY_FEE, Decimal? INTEREST_RATE, String REPAYMENT_METHOD, Decimal? REPAYMENT_DAY, String GARANTEES, Decimal? MGR_ID, String MGR_FIO, String BRANCH, String BRANCH_NAME, String STATES, String FIO, String SRV, String SRV_HIERARCHY, Decimal? CHECKOUTED, String STATUS_REVIEW)
+        public VWcsSrvBidsRecord(BbDataSource Parent, OracleDecimal RowScn, Decimal? BID_ID, String SUBPRODUCT_ID, String SUBPRODUCT_NAME, DateTime? CRT_DATE, String F, String I, String O, DateTime? BDATE, String INN, Decimal? SUMM, Decimal? OWN_FUNDS, String TERM, String CREDIT_CURRENCY, Decimal? SINGLE_FEE, Decimal? MONTHLY_FEE, Decimal? INTEREST_RATE, String REPAYMENT_METHOD, Decimal? REPAYMENT_DAY, String GARANTEES, Decimal? MGR_ID, String MGR_FIO, String BRANCH, String BRANCH_NAME, String STATES, String FIO, String SRV, String SRV_HIERARCHY, Decimal? CHECKOUTED/*, String STATUS_REVIEW*/)
             : this(Parent)
         {
             this.BID_ID = BID_ID;
@@ -57,7 +57,7 @@ namespace credit
             this.SRV = SRV;
             this.SRV_HIERARCHY = SRV_HIERARCHY;
             this.CHECKOUTED = CHECKOUTED;
-            this.STATUS_REVIEW = STATUS_REVIEW;
+            //this.STATUS_REVIEW = STATUS_REVIEW;
             this.RowScn = RowScn;
             this.IsRowscnSupported = false;
             this.ClearChanges();
@@ -92,7 +92,7 @@ namespace credit
             Fields.Add( new BbField("SRV", OracleDbType.Varchar2, true, false, false, false, false, "V_WCS_SRV_BIDS", ObjectTypes.View, "Заявки службы (CБ, ЮС, СПА, ДР, ФЕП)", "Краткий код службы"));
             Fields.Add( new BbField("SRV_HIERARCHY", OracleDbType.Varchar2, false, false, false, false, false, "V_WCS_SRV_BIDS", ObjectTypes.View, "Заявки службы (CБ, ЮС, СПА, ДР, ФЕП)", "Идентификатор уровеня иерархии"));
             Fields.Add( new BbField("CHECKOUTED", OracleDbType.Decimal, true, false, false, false, false, "V_WCS_SRV_BIDS", ObjectTypes.View, "Заявки службы (CБ, ЮС, СПА, ДР, ФЕП)", "В обработке 0/1"));
-            Fields.Add(new BbField("STATUS_REVIEW", OracleDbType.Varchar2, false, false, false, false, false, "V_WCS_SRV_BIDS", ObjectTypes.View, "Заявки службы (CБ, ЮС, СПА, ДР, ФЕП)", "Статус рішення"));
+            //Fields.Add(new BbField("STATUS_REVIEW", OracleDbType.Varchar2, false, false, false, false, false, "V_WCS_SRV_BIDS", ObjectTypes.View, "Заявки службы (CБ, ЮС, СПА, ДР, ФЕП)", "Статус рішення"));
         }
         public Decimal? BID_ID { get { return (Decimal?)FindField("BID_ID").Value; } set {SetField("BID_ID", value);} }
         public String SUBPRODUCT_ID { get { return (String)FindField("SUBPRODUCT_ID").Value; } set {SetField("SUBPRODUCT_ID", value);} }
@@ -122,7 +122,7 @@ namespace credit
         public String SRV { get { return (String)FindField("SRV").Value; } set {SetField("SRV", value);} }
         public String SRV_HIERARCHY { get { return (String)FindField("SRV_HIERARCHY").Value; } set {SetField("SRV_HIERARCHY", value);} }
         public Decimal? CHECKOUTED { get { return (Decimal?)FindField("CHECKOUTED").Value; } set {SetField("CHECKOUTED", value);} }
-        public String STATUS_REVIEW { get { return (String)FindField("STATUS_REVIEW").Value; } set { SetField("STATUS_REVIEW", value); } }
+        //public String STATUS_REVIEW { get { return (String)FindField("STATUS_REVIEW").Value; } set { SetField("STATUS_REVIEW", value); } }
     }
 
     public sealed class VWcsSrvBidsFilters : BbFilters
@@ -157,7 +157,7 @@ namespace credit
             SRV = new BBVarchar2Filter(this, "SRV");
             SRV_HIERARCHY = new BBVarchar2Filter(this, "SRV_HIERARCHY");
             CHECKOUTED = new BBDecimalFilter(this, "CHECKOUTED");
-            STATUS_REVIEW = new BBVarchar2Filter(this, "STATUS_REVIEW");
+            //STATUS_REVIEW = new BBVarchar2Filter(this, "STATUS_REVIEW");
         }
         public BBDecimalFilter BID_ID;
         public BBVarchar2Filter SUBPRODUCT_ID;
@@ -187,7 +187,7 @@ namespace credit
         public BBVarchar2Filter SRV;
         public BBVarchar2Filter SRV_HIERARCHY;
         public BBDecimalFilter CHECKOUTED;
-        public BBVarchar2Filter STATUS_REVIEW;
+        //public BBVarchar2Filter STATUS_REVIEW;
     }
 
     public partial class VWcsSrvBids : BbTable<VWcsSrvBidsRecord, VWcsSrvBidsFilters>
@@ -240,8 +240,9 @@ namespace credit
                         rdr.IsDBNull(25) ?  (String)null : Convert.ToString(rdr[25]), 
                         rdr.IsDBNull(26) ?  (String)null : Convert.ToString(rdr[26]), 
                         rdr.IsDBNull(27) ?  (String)null : Convert.ToString(rdr[27]), 
-                        rdr.IsDBNull(28) ?  (Decimal?)null : Convert.ToDecimal(rdr[28]),
-                        rdr.IsDBNull(29) ?  (String)null : Convert.ToString(rdr[29]))
+                        rdr.IsDBNull(28) ?  (Decimal?)null : Convert.ToDecimal(rdr[28])
+                        //,rdr.IsDBNull(29) ?  (String)null : Convert.ToString(rdr[29])
+                        )
                     );
                 }
             }

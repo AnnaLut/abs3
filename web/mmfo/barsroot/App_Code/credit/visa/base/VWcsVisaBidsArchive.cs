@@ -26,7 +26,7 @@ namespace credit
         {
             fillFields();
         }
-        public VWcsVisaBidsArchiveRecord(BbDataSource Parent, OracleDecimal RowScn, Decimal? BID_ID, String SUBPRODUCT_ID, String SUBPRODUCT_NAME, DateTime? CRT_DATE, String STATUS, String F, String I, String O, String FIO, DateTime? BDATE, String INN, String WORK_MAIN_NAME, String WORK_MAIN_INN, String WORK_ADD_NAME, String WORK_ADD_INN, Decimal? PROPERTY_COST, Decimal? SUMM, Decimal? OWN_FUNDS, String TERM, String CREDIT_CURRENCY, Decimal? SINGLE_FEE, Decimal? MONTHLY_FEE, Decimal? INTEREST_RATE, String REPAYMENT_METHOD, Decimal? REPAYMENT_DAY, String GARANTEES, String GARANTEES_IDS, Decimal? MGR_ID, String MGR_FIO, String BRANCH, String BRANCH_NAME, String STATES, DateTime? CHECKOUT_DAT, DateTime? CHECKIN_DAT, Decimal? CHECKOUT_USER_ID, String CHECKOUT_USER_FIO, String CHECKOUT_USER_BRANCH, String SRV_HIERARCHY, String STATUS_REVIEW)
+        public VWcsVisaBidsArchiveRecord(BbDataSource Parent, OracleDecimal RowScn, Decimal? BID_ID, String SUBPRODUCT_ID, String SUBPRODUCT_NAME, DateTime? CRT_DATE, String STATUS, String F, String I, String O, String FIO, DateTime? BDATE, String INN, String WORK_MAIN_NAME, String WORK_MAIN_INN, String WORK_ADD_NAME, String WORK_ADD_INN, Decimal? PROPERTY_COST, Decimal? SUMM, Decimal? OWN_FUNDS, String TERM, String CREDIT_CURRENCY, Decimal? SINGLE_FEE, Decimal? MONTHLY_FEE, Decimal? INTEREST_RATE, String REPAYMENT_METHOD, Decimal? REPAYMENT_DAY, String GARANTEES, String GARANTEES_IDS, Decimal? MGR_ID, String MGR_FIO, String BRANCH, String BRANCH_NAME, String STATES, DateTime? CHECKOUT_DAT, DateTime? CHECKIN_DAT, Decimal? CHECKOUT_USER_ID, String CHECKOUT_USER_FIO, String CHECKOUT_USER_BRANCH, String SRV_HIERARCHY/*, String STATUS_REVIEW*/)
             : this(Parent)
         {
             this.BID_ID = BID_ID;
@@ -67,7 +67,7 @@ namespace credit
             this.CHECKOUT_USER_FIO = CHECKOUT_USER_FIO;
             this.CHECKOUT_USER_BRANCH = CHECKOUT_USER_BRANCH;
             this.SRV_HIERARCHY = SRV_HIERARCHY;
-            this.STATUS_REVIEW = STATUS_REVIEW;
+            //this.STATUS_REVIEW = STATUS_REVIEW;
             this.RowScn = RowScn;
             this.IsRowscnSupported = false;
             this.ClearChanges();
@@ -112,7 +112,7 @@ namespace credit
             Fields.Add( new BbField("CHECKOUT_USER_FIO", OracleDbType.Varchar2, false, false, false, false, false, "V_WCS_VISA_BIDS_ARCHIVE", ObjectTypes.View, "Архив заявок для визирования (Представление)", "ФИО пользователя обработки"));
             Fields.Add( new BbField("CHECKOUT_USER_BRANCH", OracleDbType.Varchar2, false, false, false, false, false, "V_WCS_VISA_BIDS_ARCHIVE", ObjectTypes.View, "Архив заявок для визирования (Представление)", "Код отделения пользователя обработки"));
             Fields.Add( new BbField("SRV_HIERARCHY", OracleDbType.Varchar2, false, false, false, false, false, "V_WCS_VISA_BIDS_ARCHIVE", ObjectTypes.View, "Архив заявок для визирования (Представление)", "Идентификатор уровеня иерархии"));
-            Fields.Add(new BbField("STATUS_REVIEW", OracleDbType.Varchar2, false, false, false, false, false, "V_WCS_VISA_BIDS_ARCHIVE", ObjectTypes.View, "Архив заявок для визирования (Представление)", "Статус рішення"));
+            //Fields.Add(new BbField("STATUS_REVIEW", OracleDbType.Varchar2, false, false, false, false, false, "V_WCS_VISA_BIDS_ARCHIVE", ObjectTypes.View, "Архив заявок для визирования (Представление)", "Статус рішення"));
         }
         public Decimal? BID_ID { get { return (Decimal?)FindField("BID_ID").Value; } set {SetField("BID_ID", value);} }
         public String SUBPRODUCT_ID { get { return (String)FindField("SUBPRODUCT_ID").Value; } set {SetField("SUBPRODUCT_ID", value);} }
@@ -152,7 +152,7 @@ namespace credit
         public String CHECKOUT_USER_FIO { get { return (String)FindField("CHECKOUT_USER_FIO").Value; } set {SetField("CHECKOUT_USER_FIO", value);} }
         public String CHECKOUT_USER_BRANCH { get { return (String)FindField("CHECKOUT_USER_BRANCH").Value; } set {SetField("CHECKOUT_USER_BRANCH", value);} }
         public String SRV_HIERARCHY { get { return (String)FindField("SRV_HIERARCHY").Value; } set {SetField("SRV_HIERARCHY", value);} }
-        public String STATUS_REVIEW { get { return (String)FindField("STATUS_REVIEW").Value; } set { SetField("STATUS_REVIEW", value); } }
+        //public String STATUS_REVIEW { get { return (String)FindField("STATUS_REVIEW").Value; } set { SetField("STATUS_REVIEW", value); } }
     }
 
     public sealed class VWcsVisaBidsArchiveFilters : BbFilters
@@ -197,7 +197,7 @@ namespace credit
             CHECKOUT_USER_FIO = new BBVarchar2Filter(this, "CHECKOUT_USER_FIO");
             CHECKOUT_USER_BRANCH = new BBVarchar2Filter(this, "CHECKOUT_USER_BRANCH");
             SRV_HIERARCHY = new BBVarchar2Filter(this, "SRV_HIERARCHY");
-            STATUS_REVIEW = new BBVarchar2Filter(this, "STATUS_REVIEW");
+            //STATUS_REVIEW = new BBVarchar2Filter(this, "STATUS_REVIEW");
         }
         public BBDecimalFilter BID_ID;
         public BBVarchar2Filter SUBPRODUCT_ID;
@@ -237,7 +237,7 @@ namespace credit
         public BBVarchar2Filter CHECKOUT_USER_FIO;
         public BBVarchar2Filter CHECKOUT_USER_BRANCH;
         public BBVarchar2Filter SRV_HIERARCHY;
-        public BBVarchar2Filter STATUS_REVIEW;
+        //public BBVarchar2Filter STATUS_REVIEW;
     }
 
     public partial class VWcsVisaBidsArchive : BbTable<VWcsVisaBidsArchiveRecord, VWcsVisaBidsArchiveFilters>
@@ -300,8 +300,9 @@ namespace credit
                         rdr.IsDBNull(35) ?  (Decimal?)null : Convert.ToDecimal(rdr[35]), 
                         rdr.IsDBNull(36) ?  (String)null : Convert.ToString(rdr[36]), 
                         rdr.IsDBNull(37) ?  (String)null : Convert.ToString(rdr[37]), 
-                        rdr.IsDBNull(38) ?  (String)null : Convert.ToString(rdr[38]),
-                        rdr.IsDBNull(39) ? (String)null : Convert.ToString(rdr[39]))
+                        rdr.IsDBNull(38) ?  (String)null : Convert.ToString(rdr[38])
+                        //,rdr.IsDBNull(39) ? (String)null : Convert.ToString(rdr[39])
+                        )
                     );
                 }
             }

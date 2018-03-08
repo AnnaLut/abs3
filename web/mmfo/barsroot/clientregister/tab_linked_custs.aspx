@@ -1766,7 +1766,6 @@
         };
 
         $("input[title='Додати']").mouseover(function () {
-            debugger;
             InitData(checkElement.value);
         });
         //table with names finmon_reft_akalist;
