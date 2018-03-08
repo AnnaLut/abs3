@@ -26,7 +26,7 @@ namespace credit
         {
             fillFields();
         }
-        public VWcsBidsRecord(BbDataSource Parent, OracleDecimal RowScn, Decimal? BID_ID, String SUBPRODUCT_ID, String SUBPRODUCT_NAME, String SUBPRODUCT_DESC, DateTime? CRT_DATE, Decimal? RNK, String F, String I, String O, String FIO, DateTime? BDATE, String INN, Decimal? SUMM, Decimal? OWN_FUNDS, String TERM, String CREDIT_CURRENCY, Decimal? SINGLE_FEE, Decimal? MONTHLY_FEE, Decimal? INTEREST_RATE, String REPAYMENT_METHOD, String REPAYMENT_METHOD_TEXT, Decimal? REPAYMENT_DAY, String GARANTEES, Decimal? MGR_ID, String MGR_FIO, String BRANCH, String BRANCH_NAME, String BRANCH_HIERARCHY, String STATES, String INIT_PAYMENT_MTD, String WORKER_BANK, String STATUS_REVIEW)
+        public VWcsBidsRecord(BbDataSource Parent, OracleDecimal RowScn, Decimal? BID_ID, String SUBPRODUCT_ID, String SUBPRODUCT_NAME, String SUBPRODUCT_DESC, DateTime? CRT_DATE, Decimal? RNK, String F, String I, String O, String FIO, DateTime? BDATE, String INN, Decimal? SUMM, Decimal? OWN_FUNDS, String TERM, String CREDIT_CURRENCY, Decimal? SINGLE_FEE, Decimal? MONTHLY_FEE, Decimal? INTEREST_RATE, String REPAYMENT_METHOD, String REPAYMENT_METHOD_TEXT, Decimal? REPAYMENT_DAY, String GARANTEES, Decimal? MGR_ID, String MGR_FIO, String BRANCH, String BRANCH_NAME, String BRANCH_HIERARCHY, String STATES, String INIT_PAYMENT_MTD, String WORKER_BANK/*, String STATUS_REVIEW*/)
             : this(Parent)
         {
             this.BID_ID = BID_ID;
@@ -60,7 +60,7 @@ namespace credit
             this.STATES = STATES;
             this.INIT_PAYMENT_MTD = INIT_PAYMENT_MTD;
             this.WORKER_BANK = WORKER_BANK;
-            this.STATUS_REVIEW = STATUS_REVIEW;
+            //this.STATUS_REVIEW = STATUS_REVIEW;
             this.RowScn = RowScn;
             this.IsRowscnSupported = false;
             this.ClearChanges();
@@ -98,7 +98,7 @@ namespace credit
             Fields.Add( new BbField("STATES", OracleDbType.Varchar2, true, false, false, false, false, "V_WCS_BIDS", ObjectTypes.View, "Заявки (Представление)", "Состояния"));
             Fields.Add( new BbField("INIT_PAYMENT_MTD", OracleDbType.Varchar2, true, false, false, false, false, "V_WCS_BIDS", ObjectTypes.View, "Заявки (Представление)", "Шлях видачі"));        
             Fields.Add(new BbField("WORKER_BANK", OracleDbType.Varchar2, true, false, false, false, false, "V_WCS_BIDS", ObjectTypes.View, "Заявки (Представление)", "Приналежність до працівників"));
-            Fields.Add(new BbField("STATUS_REVIEW", OracleDbType.Varchar2, true, false, false, false, false, "V_WCS_BIDS", ObjectTypes.View, "Заявки (Представление)", "Статус розгляду"));
+            //Fields.Add(new BbField("STATUS_REVIEW", OracleDbType.Varchar2, true, false, false, false, false, "V_WCS_BIDS", ObjectTypes.View, "Заявки (Представление)", "Статус розгляду"));
         }
         public Decimal? BID_ID { get { return (Decimal?)FindField("BID_ID").Value; } set {SetField("BID_ID", value);} }
         public String SUBPRODUCT_ID { get { return (String)FindField("SUBPRODUCT_ID").Value; } set {SetField("SUBPRODUCT_ID", value);} }
@@ -131,7 +131,7 @@ namespace credit
         public String STATES { get { return (String)FindField("STATES").Value; } set {SetField("STATES", value);} }
         public String INIT_PAYMENT_MTD { get { return (String)FindField("INIT_PAYMENT_MTD").Value; } set {SetField("INIT_PAYMENT_MTD", value);} }
         public String WORKER_BANK { get { return (String)FindField("WORKER_BANK").Value; } set { SetField("WORKER_BANK", value); } }
-        public String STATUS_REVIEW { get { return (String)FindField("STATUS_REVIEW").Value; } set { SetField("STATUS_REVIEW", value); } }
+        //public String STATUS_REVIEW { get { return (String)FindField("STATUS_REVIEW").Value; } set { SetField("STATUS_REVIEW", value); } }
     }
 
     public sealed class VWcsBidsFilters : BbFilters
@@ -169,7 +169,7 @@ namespace credit
             STATES = new BBVarchar2Filter(this, "STATES");
             INIT_PAYMENT_MTD = new BBVarchar2Filter(this, "INIT_PAYMENT_MTD");
             WORKER_BANK = new BBVarchar2Filter(this, "WORKER_BANK");
-            STATUS_REVIEW = new BBVarchar2Filter(this, "STATUS_REVIEW");
+            //STATUS_REVIEW = new BBVarchar2Filter(this, "STATUS_REVIEW");
         }
         public BBDecimalFilter BID_ID;
         public BBVarchar2Filter SUBPRODUCT_ID;
@@ -202,7 +202,7 @@ namespace credit
         public BBVarchar2Filter STATES;
         public BBVarchar2Filter INIT_PAYMENT_MTD;
         public BBVarchar2Filter WORKER_BANK;
-        public BBVarchar2Filter STATUS_REVIEW;
+        //public BBVarchar2Filter STATUS_REVIEW;
     }
 
     public partial class VWcsBids : BbTable<VWcsBidsRecord, VWcsBidsFilters>
@@ -258,8 +258,9 @@ namespace credit
                         rdr.IsDBNull(28) ?  (String)null : Convert.ToString(rdr[28]), 
                         rdr.IsDBNull(29) ?  (String)null : Convert.ToString(rdr[29]), 
                         rdr.IsDBNull(30) ?  (String)null : Convert.ToString(rdr[30]),
-                        rdr.IsDBNull(31) ? (String)null : Convert.ToString(rdr[31]),
-                        rdr.IsDBNull(32) ? (String)null : Convert.ToString(rdr[32]))
+                        rdr.IsDBNull(31) ? (String)null : Convert.ToString(rdr[31])
+                        //,rdr.IsDBNull(32) ? (String)null : Convert.ToString(rdr[32])
+                        )
                     );
                 }
             }

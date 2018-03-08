@@ -121,7 +121,7 @@
                                     <asp:Label ID="Label2" runat="server" Text='<%# Eval("BRANCH_NAME") %>' ToolTip='<%# Eval("BRANCH") %>'></asp:Label>
                                 </ItemTemplate>
                             </asp:TemplateField>
-                            <asp:BoundField DataField="STATUS_REVIEW" HeaderText="Статус рішення" SortExpression="STATUS_REVIEW" />
+                            <%--<asp:BoundField DataField="STATUS_REVIEW" HeaderText="Статус рішення" SortExpression="STATUS_REVIEW" />--%>
                             <asp:BoundField DataField="STATES" HeaderText="Статус" SortExpression="STATES" meta:resourcekey="BoundFieldResource8" />
                         </Columns>
                         <RowStyle CssClass="normalRow"></RowStyle>

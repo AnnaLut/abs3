@@ -450,7 +450,6 @@ function SaveAccount() {
         url: bars.config.urlContent("/api/custacc/start/"),
         data: { acc: 0, nbs: page_g.tbNbs.value },
         success: function (result) {
-            //debugger;
             if (result.rez === 1) {
 				if (isRozpodilAcct()) {
 					bars.ui.approve({
