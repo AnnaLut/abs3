@@ -1,0 +1,154 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Bars.API.Dpt.Models</name>
+    </assembly>
+    <members>
+        <member name="T:Bars.API.Dpt.Models.Deposit">
+            <summary>
+            Model for account
+            </summary>
+        </member>
+        <member name="P:Bars.API.Dpt.Models.Deposit.Id">
+            <summary>
+            Id
+            </summary>
+        </member>
+        <member name="P:Bars.API.Dpt.Models.Deposit.CurrencyId">
+            <summary>
+            Currency (digital code)
+            </summary>
+        </member>
+        <member name="P:Bars.API.Dpt.Models.Deposit.CurrencyCode">
+            <summary>
+            Currency (literal code - ISO 4217)
+            </summary>
+        </member>
+        <member name="P:Bars.API.Dpt.Models.Deposit.CustomerId">
+            <summary>
+            Ідентифікатор клієнта
+            </summary>
+        </member>
+        <member name="P:Bars.API.Dpt.Models.Deposit.TypeId">
+            <summary>
+            Вид депозиту
+            </summary>
+        </member>
+        <member name="P:Bars.API.Dpt.Models.Deposit.TypeName">
+            <summary>
+            Найменування типу 
+            </summary>
+        </member>
+        <member name="P:Bars.API.Dpt.Models.Deposit.Rate">
+            <summary>
+            відсоткова ставка
+            </summary>
+        </member>
+        <member name="P:Bars.API.Dpt.Models.Deposit.AccToReplenish">
+            <summary>
+            Repayment account data
+            </summary>
+        </member>
+        <member name="P:Bars.API.Dpt.Models.Deposit.ReplenishDefaultPurpose">
+            <summary>
+            Default replanish purpose
+            </summary>
+        </member>
+        <member name="P:Bars.API.Dpt.Models.Deposit.InterestAccrual">
+            <summary>
+            нараховані відсотки
+            </summary>
+        </member>
+        <member name="P:Bars.API.Dpt.Models.Deposit.InterestPaid">
+            <summary>
+            виплачені відсотки
+            </summary>
+        </member>
+        <member name="P:Bars.API.Dpt.Models.Deposit.TransferBankId">
+            <summary>
+            Виплата депозиту : МФО банку 
+            </summary>
+        </member>
+        <member name="P:Bars.API.Dpt.Models.Deposit.BankId">
+            <summary>
+            Банк в якому выдкритий депозит
+            </summary>
+        </member>
+        <member name="P:Bars.API.Dpt.Models.Deposit.TransferAccountNumber">
+            <summary>
+            Виплата депозиту : номер рахунку
+            </summary>
+        </member>
+        <member name="P:Bars.API.Dpt.Models.Deposit.TransferAccountName">
+            <summary>
+            Виплата депозиту : найменування рахунку
+            </summary>
+        </member>
+        <member name="P:Bars.API.Dpt.Models.Deposit.TransferCustomerCode">
+            <summary>
+            Виплата депозиту : код ЄДРПО клієнта
+            </summary>
+        </member>
+        <member name="P:Bars.API.Dpt.Models.Deposit.Balance">
+            <summary>
+            Тіло депозиту
+            </summary>
+        </member>
+        <member name="P:Bars.API.Dpt.Models.Deposit.BeginDate">
+            <summary>
+            Дата початку 
+            </summary>
+        </member>
+        <member name="P:Bars.API.Dpt.Models.Deposit.EndDate">
+            <summary>
+            Дата завершення 
+            </summary>
+        </member>
+        <member name="P:Bars.API.Dpt.Models.Deposit.TermAdd">
+            <summary>
+            Допустимий строк поповнення (ціла частина в місяцях)
+            Ignore для mobile
+            </summary>
+        </member>
+        <member name="P:Bars.API.Dpt.Models.Deposit.TermAddDate">
+            <summary>
+            Допустимий строк поповнення
+            </summary>
+        </member>
+        <member name="P:Bars.API.Dpt.Models.Deposit.MinAddSum">
+            <summary>
+            Мінімальна сума поповнення
+            </summary>
+        </member>
+        <member name="P:Bars.API.Dpt.Models.Deposit.IsCapitalization">
+            <summary>
+            Признак капіталізації (нарахування)
+            </summary>
+        </member>
+        <member name="P:Bars.API.Dpt.Models.Deposit.MaxProlongations">
+            <summary>
+            Максимальна кількість пролонгацій
+            </summary>
+        </member>
+        <member name="P:Bars.API.Dpt.Models.Deposit.IsMoneyBox">
+            <summary>
+            Признак вкладу копілки (1 - так, 0 - ні)
+            </summary>
+        </member>
+        <member name="P:Bars.API.Dpt.Models.Deposit.IsProlongation">
+            <summary>
+            Признак пролонгації
+            </summary>
+        </member>
+        <member name="P:Bars.API.Dpt.Models.Deposit.Comments">
+            <summary>
+            Коментар
+            </summary>
+        </member>
+        <member name="P:Bars.API.Dpt.Models.Deposit.IsReplenished">
+            <summary>
+            Признак можливості поповнення
+            </summary>
+        </member>
+    </members>
+</doc>

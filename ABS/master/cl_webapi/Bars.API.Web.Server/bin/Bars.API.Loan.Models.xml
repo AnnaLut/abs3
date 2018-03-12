@@ -1,0 +1,163 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Bars.API.Loan.Models</name>
+    </assembly>
+    <members>
+        <member name="T:Bars.API.Loan.Models.ScheduleCombine">
+            <summary>
+            Model for Loan
+            </summary>
+        </member>
+        <member name="T:Bars.API.Loan.Models.Schedule">
+            <summary>
+            Model for Loan
+            </summary>
+        </member>
+        <member name="T:Bars.API.Loan.Models.Loan">
+            <summary>
+            Model for Loan
+            </summary>
+        </member>
+        <member name="P:Bars.API.Loan.Models.Loan.Id">
+            <summary>
+            Id кредита
+            </summary>
+        </member>
+        <member name="P:Bars.API.Loan.Models.Loan.CustomerId">
+            <summary>
+            Код клієнта
+            </summary>
+        </member>
+        <member name="P:Bars.API.Loan.Models.Loan.BankId">
+            <summary>
+            Ідентифікатор банку
+            </summary>
+        </member>
+        <member name="P:Bars.API.Loan.Models.Loan.LoanType">
+            <summary>
+            Тип (название) кредита
+            </summary>
+        </member>
+        <member name="P:Bars.API.Loan.Models.Loan.ContractDate">
+            <summary>
+            Дата кредитного договора
+            </summary>
+        </member>
+        <member name="P:Bars.API.Loan.Models.Loan.ContractNumber">
+            <summary>
+            Номер договора
+            </summary>
+        </member>
+        <member name="P:Bars.API.Loan.Models.Loan.DateEnd">
+            <summary>
+            Срок погашения (дата окончания договора)
+            </summary>
+        </member>
+        <member name="P:Bars.API.Loan.Models.Loan.Percents">
+            <summary>
+            Процентная ставка
+            </summary>
+        </member>
+        <member name="P:Bars.API.Loan.Models.Loan.PayPeriod">
+            <summary>
+            периодичность погашения
+            </summary>
+        </member>
+        <member name="P:Bars.API.Loan.Models.Loan.CurrencyCode">
+            <summary>
+            Буквенный ISO-код валюты
+            </summary>
+        </member>
+        <member name="P:Bars.API.Loan.Models.Loan.Amount">
+            <summary>
+            Сума кредиту / лимита кредитной линии
+            </summary>
+        </member>
+        <member name="P:Bars.API.Loan.Models.Loan.Rest">
+            <summary>
+            Залишок по кредиту
+            </summary>
+        </member>
+        <member name="P:Bars.API.Loan.Models.Loan.RepaymentAccount">
+            <summary>
+            Repayment account data
+            </summary>
+        </member>
+        <member name="P:Bars.API.Loan.Models.Loan.PercentAmount">
+            <summary>
+            Нараховані відсотки
+            </summary>
+        </member>
+        <member name="P:Bars.API.Loan.Models.Loan.PercentPayTerm">
+            <summary>
+            Срок погашения процентов
+            </summary>
+        </member>
+        <member name="P:Bars.API.Loan.Models.Loan.OutstandingDebet">
+            <summary>
+            Сумма просроченной задолженности
+            </summary>
+        </member>
+        <member name="P:Bars.API.Loan.Models.Loan.OutstandingPercent">
+            <summary>
+            Сумма просроченных процентов
+            </summary>
+        </member>
+        <member name="P:Bars.API.Loan.Models.Loan.PercentByOutstandingDebet">
+            <summary>
+            проценты на просроченную задолженность
+            </summary>
+        </member>
+        <member name="P:Bars.API.Loan.Models.Loan.Status">
+            <summary>
+            Статус кредита (0 - не погашен,1- погашен, 2- просрочен)
+            </summary>
+        </member>
+        <member name="P:Bars.API.Loan.Models.Loan.DateBegin">
+            <summary>
+            Дата выдачи кредита
+            </summary>
+        </member>
+        <member name="P:Bars.API.Loan.Models.Loan.MinRepay">
+            <summary>
+            Минимальная сумма погашения
+            </summary>
+        </member>
+        <member name="P:Bars.API.Loan.Models.Loan.PercentPay">
+            <summary>
+            Сумма процентов к уплате (в составе платежа за текущий месяц)
+            </summary>
+        </member>
+        <member name="P:Bars.API.Loan.Models.Loan.OutFine">
+            <summary>
+            Пеня за несвоевременное исполнение обязательств 
+            </summary>
+        </member>
+        <member name="P:Bars.API.Loan.Models.Loan.TotalSum">
+            <summary>
+            Всего к погашению в текущем периоде (в текущем месяце)
+            </summary>
+        </member>
+        <member name="P:Bars.API.Loan.Models.Loan.PayTerm">
+            <summary>
+            Срок очередного платежа (в месяце, следующем за текущим)
+            </summary>
+        </member>
+        <member name="P:Bars.API.Loan.Models.Loan.AmountEarlyPay">
+            <summary>
+            Сумма последнего платежа по погашению задолженности
+            </summary>
+        </member>
+        <member name="P:Bars.API.Loan.Models.Loan.LastPayDate">
+            <summary>
+            Дата последнего платежа по погашению задолженности
+            </summary>
+        </member>
+        <member name="P:Bars.API.Loan.Models.Loan.LastPayAmount">
+            <summary>
+            Сумма последнего платежа по погашению задолженности
+            </summary>
+        </member>
+    </members>
+</doc>

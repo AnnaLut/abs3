@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Bars.API.Pay.Models</name>
+    </assembly>
+    <members>
+        <member name="P:Bars.API.Pay.Models.Payment.Purpose">
+            <summary>
+            Призначення платежу
+            </summary>
+        </member>
+        <member name="P:Bars.API.Pay.Models.Payment.Amount">
+            <summary>
+            Сума платежу
+            </summary>
+        </member>
+        <member name="P:Bars.API.Pay.Models.Payment.Recipient">
+            <summary>
+            Сторона Б платежу
+            </summary>
+        </member>
+        <member name="T:Bars.API.Pay.Models.Responses.UpdateResourceStatus">
+            <summary>
+            Create payment status object
+            </summary>
+        </member>
+        <member name="P:Bars.API.Pay.Models.Responses.UpdateResourceStatus.BankReceivedDate">
+            <summary>
+            Date when bank had received payment
+            </summary>
+        </member>
+        <member name="P:Bars.API.Pay.Models.Responses.UpdateResourceStatus.StatusCode">
+            <summary>
+            Status code
+            </summary>
+        </member>
+        <member name="P:Bars.API.Pay.Models.Responses.UpdateResourceStatus.Message">
+            <summary>
+            Status message
+            </summary>
+        </member>
+        <member name="T:Bars.API.Pay.Models.Responses.UpdateResourceStatus`1">
+            <summary>
+            Create payment status object
+            </summary>
+        </member>
+        <member name="P:Bars.API.Pay.Models.Responses.UpdateResourceStatus`1.Id">
+            <summary>
+            Document Id
+            </summary>
+        </member>
+        <member name="P:Bars.API.Pay.Models.Responses.UpdateResourceStatus`1.BankReceivedDate">
+            <summary>
+            Date when bank had received payment
+            </summary>
+        </member>
+        <member name="P:Bars.API.Pay.Models.Responses.UpdateResourceStatus`1.StatusCode">
+            <summary>
+            Status code
+            </summary>
+        </member>
+        <member name="P:Bars.API.Pay.Models.Responses.UpdateResourceStatus`1.Message">
+            <summary>
+            Status message
+            </summary>
+        </member>
+        <member name="P:Bars.API.Pay.Models.SwiftModel.Purpose">
+            <summary>
+            Призначення платежу
+            </summary>
+        </member>
+        <member name="P:Bars.API.Pay.Models.SwiftModel.PaymentFee">
+            <summary>
+            Комісійні за рахунок
+            </summary>
+        </member>
+        <member name="P:Bars.API.Pay.Models.SwiftModel.Amount">
+            <summary>
+            Сума платежу
+            </summary>
+        </member>
+    </members>
+</doc>

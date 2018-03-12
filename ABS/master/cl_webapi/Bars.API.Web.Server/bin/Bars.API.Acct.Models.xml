@@ -1,0 +1,258 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Bars.API.Acct.Models</name>
+    </assembly>
+    <members>
+        <member name="T:Bars.API.Acct.Models.AccountBase">
+            <summary>
+            Represents account containing balance which includes all uncompleted transactions
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.AccountBase.Id">
+            <summary>
+            Account id
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.AccountBase.BankCode">
+            <summary>
+            Bank code
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.AccountBase.Number">
+            <summary>
+            Account number
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.AccountBase.CurrencyCode">
+            <summary>
+            Account currency-name mnemonic
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.AccountBase.CustomerId">
+            <summary>
+            Customer ID
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.AccountBase.PlanedBalance">
+            <summary>
+            Account balance including all uncompleted transactions
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.AccountBase.Name">
+            <summary>
+            Account name
+            </summary>
+        </member>
+        <member name="T:Bars.API.Acct.Models.AccountsCount">
+            <summary>
+            Model representing count of accounts for distinct currency for customer (ABS side)
+            </summary>
+        </member>
+        <member name="T:Bars.API.Acct.Models.CustCurrAccountCount">
+            <summary>
+            Model to represent accounts count for the currency for the specified customer
+            </summary>
+        </member>
+        <member name="T:Bars.API.Acct.Models.IncomingDocument">
+            <summary>
+            Модель платежу 
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.IncomingDocument.RecipientCustomerId">
+            <summary>
+            Documetn recipient customer id 
+            </summary>
+        </member>
+        <member name="T:Bars.API.Acct.Models.Document">
+            <summary>
+            Модель платежу
+            </summary>
+        </member>
+        <member name="T:Bars.API.Acct.Models.DayTurnover">
+            <summary>
+            Модель платежу
+            </summary>
+        </member>
+        <member name="T:Bars.API.Acct.Models.UserAccounts">
+            <summary>
+            Model for account
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.UserAccounts.AccId">
+            <summary>
+            Unique identifier of account
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.UserAccounts.BankId">
+            <summary>
+            Bank code
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.UserAccounts.UserId">
+            <summary>
+            User Guid
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.UserAccounts.Name">
+            <summary>
+            Account name
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.UserAccounts.Description">
+            <summary>
+            Account description
+            </summary>
+        </member>
+        <member name="T:Bars.API.Acct.Models.Account">
+            <summary>
+            Model for account
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.Account.Id">
+            <summary>
+            Unique identifier of account
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.Account.CustomerId">
+            <summary>
+            Owner customer id
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.Account.Type">
+            <summary>
+            Type of account (Current, Card, etc )
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.Account.Number">
+            <summary>
+            Number
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.Account.Name">
+            <summary>
+            Nama of account
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.Account.BankId">
+            <summary>
+            Bank code
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.Account.CurrencyId">
+            <summary>
+            Currency (digital code)
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.Account.CurrencyCode">
+            <summary>
+            Currency (literal code - ISO 4217)
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.Account.Balance">
+            <summary>
+            Balance 
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.Account.PlannedBalance">
+            <summary>
+            Planned Balance
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.Account.LastActive">
+            <summary>
+            Last activity date
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.Account.OpeningDate">
+            <summary>
+            Open date
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.Account.ClosingDate">
+            <summary>
+            Close date 
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.Account.DebitTurns">
+            <summary>
+            Debit Turns
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.Account.CreditTurns">
+            <summary>
+            Credit Turns
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.Account.LockDebitCode">
+            <summary>
+            Block code for Debit
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.Account.LockCreditCode">
+            <summary>
+            Block code for Credit
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.Account.Limit">
+            <summary>
+            Limit 
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.Account.TaxCode">
+            <summary>
+            Customer tax code
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.Account.IsTechnical">
+            <summary>
+            Is technical account
+            </summary>
+        </member>
+        <member name="T:Bars.API.Acct.Models.Transaction">
+            <summary>
+            Модель платежу
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.Transaction.Id">
+            <summary>
+            Номер тразнакції (GUID)
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.Transaction.DocumentDate">
+            <summary>
+            Фінансова дата документу
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.Transaction.CreatedDate">
+            <summary>
+            Дата створення документу
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.Transaction.PayedDate">
+            <summary>
+            Фактична дата оплати документу
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.Transaction.Sender">
+            <summary>
+            Сторона А платежу
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.Transaction.Recipient">
+            <summary>
+            Сторона Б платежу
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.Transaction.Purpose">
+            <summary>
+            Призначення платежу
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Models.Transaction.Amount">
+            <summary>
+            Сума платежу
+            </summary>
+        </member>
+    </members>
+</doc>

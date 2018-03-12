@@ -1,0 +1,238 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Bars.API.Cust.Server</name>
+    </assembly>
+    <members>
+        <member name="T:Bars.API.Cust.Server.Configuration.CustomerSearchConfiguration">
+            <summary>
+                Configuration (mapping model CustomerSearchModel to database table/view)
+            </summary>
+        </member>
+        <member name="T:Bars.API.Cust.Server.Configuration.QuantitiesConfiguration">
+            <summary>
+                Configuration (mapping model Quantities to database table)
+            </summary>
+        </member>
+        <member name="M:Bars.API.Cust.Server.Configuration.QuantitiesConfiguration.#ctor">
+            <summary>
+                Quantities QuantitiesConfiguration
+            </summary>
+        </member>
+        <member name="T:Bars.API.Cust.Server.Configuration.RegistrationQueueConfiguration">
+            <summary>
+                Configuration (mapping model Customer to database table)
+            </summary>
+        </member>
+        <member name="M:Bars.API.Cust.Server.Configuration.RegistrationQueueConfiguration.#ctor">
+            <summary>
+                Constructor RegistrationQueueConfiguration
+            </summary>
+        </member>
+        <member name="T:Bars.API.Cust.Server.Configuration.CustomerConfiguration">
+            <summary>
+                Configuration (mapping model Customer to database table)
+            </summary>
+        </member>
+        <member name="M:Bars.API.Cust.Server.Configuration.CustomerConfiguration.#ctor">
+            <summary>
+                Constructor CustomerConfiguration
+            </summary>
+        </member>
+        <member name="T:Bars.API.Cust.Server.Controllers.CustomersBaseController">
+            <summary>
+                Work with customers (base)
+            </summary>
+            <remarks>Customers</remarks>
+        </member>
+        <member name="M:Bars.API.Cust.Server.Controllers.CustomersBaseController.#ctor(Bars.API.Cust.Server.Infrastructure.Repository.ICustomersRepository,Bars.API.Cust.Server.Infrastructure.Repository.ICustomersSearchRepository)">
+            <summary>
+                Constructor CustomersBaseController
+            </summary>
+            <param name="repository"></param>
+        </member>
+        <member name="M:Bars.API.Cust.Server.Controllers.CustomersBaseController.Get">
+            <summary>
+                Get all customers
+            </summary>
+            <remarks>Get an array of all customers</remarks>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.API.Cust.Server.Controllers.CustomersBaseController.GetList(System.Decimal[])">
+            <summary>
+            Get customers by id list
+            </summary>
+            <param name="custId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.API.Cust.Server.Controllers.CustomersBaseController.Get(System.Decimal)">
+            <summary>
+                Get single customer
+            </summary>
+            <param name="custId">customer code</param>
+            <remarks>Get single customer by custId</remarks>
+            <returns>customer object</returns>
+            <response code="404">Customer not found</response>
+        </member>
+        <member name="M:Bars.API.Cust.Server.Controllers.CustomersBaseController.FindCustomers(System.String[])">
+            <summary>
+            Find customers by EDRPO/OKPO (F000101010, L03030303030)
+            </summary>
+            <param name="custEDRPOs">EDRPO/OKPO`s list (F000101010, L03030303030) </param>
+            <returns></returns>
+        </member>
+        <member name="T:Bars.API.Cust.Server.Controllers.V1.CustomersV1Controller">
+            <summary>
+                Work with customers (V1)
+            </summary>
+            <remarks>Customers</remarks>
+        </member>
+        <member name="M:Bars.API.Cust.Server.Controllers.V1.CustomersV1Controller.#ctor(Bars.API.Cust.Server.Infrastructure.Repository.ICustomersRepository,Bars.API.Cust.Server.Infrastructure.Repository.ICustomersSearchRepository)">
+            <summary>
+                Constructor AccountsV1Controller
+            </summary>
+            <param name="repository"></param>
+        </member>
+        <member name="M:Bars.API.Cust.Server.Controllers.V1.CustomersV1Controller.Get">
+            <summary>
+                Get all customers
+            </summary>
+            <remarks>Get an array of all customers</remarks>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.API.Cust.Server.Controllers.V1.CustomersV1Controller.GetList(System.Decimal[])">
+            <summary>
+            Get cusstomers by id list
+            </summary>
+            <param name="custId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.API.Cust.Server.Controllers.V1.CustomersV1Controller.Get(System.Decimal)">
+            <summary>
+                Get single customer
+            </summary>
+            <param name="custId">customer code</param>
+            <remarks>Get single customer by custId</remarks>
+            <returns>customer object</returns>
+            <response code="404">Customer not found</response>
+        </member>
+        <member name="M:Bars.API.Cust.Server.Controllers.V1.CustomersV1Controller.FindCustomers(System.String[])">
+            <summary>
+            Find customers by EDRPO/OKPO
+            </summary>
+            <param name="custEDRPOs"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Bars.API.Cust.Server.CustServerModule">
+            <summary>
+                Ninject module for CUST Server
+            </summary>
+        </member>
+        <member name="T:Bars.API.Cust.Server.DbContexts.CustDbContext">
+            <summary>
+                DbContext for server module CUST
+            </summary>
+        </member>
+        <member name="M:Bars.API.Cust.Server.DbContexts.CustDbContext.#ctor(System.String)">
+            <summary>
+                Constructor CustDbContext
+            </summary>
+            <param name="connectionString"></param>
+        </member>
+        <member name="P:Bars.API.Cust.Server.DbContexts.CustDbContext.Customers">
+            <summary>
+                Customers DbSet
+            </summary>
+        </member>
+        <member name="P:Bars.API.Cust.Server.DbContexts.CustDbContext.CustomersSearch">
+            <summary>
+            Customers search configuration
+            </summary>
+        </member>
+        <member name="M:Bars.API.Cust.Server.DbContexts.CustDbContext.OnModelCreating(System.Data.Entity.DbModelBuilder)">
+            <summary>
+                Setup configuration
+            </summary>
+            <param name="modelBuilder"></param>
+        </member>
+        <member name="T:Bars.API.Cust.Server.Infrastructure.Repository.QuantitiesRepository">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Bars.API.Cust.Server.Infrastructure.Repository.QuantitiesRepository.#ctor(Bars.API.Core.Interfaces.IDatabaseFactory{Bars.API.Cust.Server.DbContexts.CustDbContext})">
+            <summary>
+            
+            </summary>
+            <param name="databaseFactory"></param>
+        </member>
+        <member name="T:Bars.API.Cust.Server.Infrastructure.Repository.IQuantitiesRepository">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Bars.API.Cust.Server.Infrastructure.Repository.RegistrationQueueRepository">
+            <summary>
+            </summary>
+        </member>
+        <member name="M:Bars.API.Cust.Server.Infrastructure.Repository.RegistrationQueueRepository.#ctor(Bars.API.Core.Interfaces.IDatabaseFactory{Bars.API.Cust.Server.DbContexts.CustDbContext})">
+            <summary>
+            </summary>
+            <param name="databaseFactory"></param>
+        </member>
+        <member name="T:Bars.API.Cust.Server.Infrastructure.Repository.IRegistrationQueueRepository">
+            <summary>
+            </summary>
+        </member>
+        <member name="T:Bars.API.Cust.Server.Infrastructure.Repository.CustomersRepository">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Bars.API.Cust.Server.Infrastructure.Repository.CustomersRepository.#ctor(Bars.API.Core.Interfaces.IDatabaseFactory{Bars.API.Cust.Server.DbContexts.CustDbContext},Bars.API.Cust.Server.Infrastructure.Repository.IQuantitiesRepository)">
+            <summary>
+            
+            </summary>
+            <param name="databaseFactory"></param>
+            <param name="qantitiRepository"></param>
+        </member>
+        <member name="M:Bars.API.Cust.Server.Infrastructure.Repository.CustomersRepository.GetMany(System.Linq.Expressions.Expression{System.Func{Bars.API.Cust.Models.Customer,System.Boolean}})">
+            <summary>
+            
+            </summary>
+            <param name="where"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Bars.API.Cust.Server.Infrastructure.Repository.ICustomersRepository">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Bars.API.Cust.Server.Resources.CustResource">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:Bars.API.Cust.Server.Resources.CustResource.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:Bars.API.Cust.Server.Resources.CustResource.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:Bars.API.Cust.Server.Resources.CustResource.CustomerNotFindFromQueue">
+            <summary>
+              Looks up a localized string similar to Клієнт не знайдений в черзі.
+            </summary>
+        </member>
+        <member name="P:Bars.API.Cust.Server.Resources.CustResource.LoadModuleCUSTServerLoad">
+            <summary>
+              Looks up a localized string similar to Module CUST Server: Load.
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,198 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Bars.API.Loan.Server</name>
+    </assembly>
+    <members>
+        <member name="T:Bars.API.Loan.Server.Configuration.LoanConfiguration">
+            <summary>
+                Configuration (mapping model Loan to database table)
+            </summary>
+        </member>
+        <member name="M:Bars.API.Loan.Server.Configuration.LoanConfiguration.#ctor">
+            <summary>
+                Constructor AccountConfiguration
+            </summary>
+        </member>
+        <member name="T:Bars.API.Loan.Server.Controllers.SchedulesBaseController">
+            <summary>
+                Work with accounts (base)
+            </summary>
+            <remarks>Accounts</remarks>
+        </member>
+        <member name="F:Bars.API.Loan.Server.Controllers.SchedulesBaseController._repository">
+            <summary>
+            Repository object
+            </summary>
+        </member>
+        <member name="T:Bars.API.Loan.Server.Controllers.V1.SchedulesV1Controller">
+            <summary>
+                Work with accounts (V1)
+            </summary>
+            <inheritdoc />
+        </member>
+        <member name="M:Bars.API.Loan.Server.Controllers.V1.SchedulesV1Controller.GetVersion">
+            <summary>
+                Get module version
+            </summary>
+            <remarks>Get version </remarks>
+            <returns>string</returns>
+        </member>
+        <member name="T:Bars.API.Loan.Server.Controllers.V1.LoansV1Controller">
+            <summary>
+                Work with accounts (V1)
+            </summary>
+            <inheritdoc />
+        </member>
+        <member name="M:Bars.API.Loan.Server.Controllers.V1.LoansV1Controller.#ctor(Bars.API.Loan.Server.Infrastructure.Repository.ILoansRepository)">
+            <summary>
+                Constructor AccountsV1Controller
+            </summary>
+            <param name="repository"></param>
+        </member>
+        <member name="M:Bars.API.Loan.Server.Controllers.V1.LoansV1Controller.Get(System.Int32)">
+            <summary>
+                Get all Loans for customer
+            </summary>
+            <remarks>Get an array of all Loans for client </remarks>
+            <param name="custId">customer code</param>
+            <returns>list of Loans</returns>
+        </member>
+        <member name="M:Bars.API.Loan.Server.Controllers.V1.LoansV1Controller.Get(System.Int32,System.Int32)">
+            <summary>
+                Get single loan
+            </summary>
+            <param name="custId">customer code</param>
+            <param name="loanId">loan code</param>
+            <remarks>Get single loan by providing a number(accId) </remarks>
+            <returns>account object</returns>
+            <response code="404">loan not found</response>
+        </member>
+        <member name="M:Bars.API.Loan.Server.Controllers.V1.LoansV1Controller.GetVersion">
+            <summary>
+                Get module version
+            </summary>
+            <remarks>Get version </remarks>
+            <returns>string</returns>
+        </member>
+        <member name="T:Bars.API.Loan.Server.Controllers.LoansBaseController">
+            <summary>
+                Work with accounts (base)
+            </summary>
+            <remarks>Accounts</remarks>
+        </member>
+        <member name="F:Bars.API.Loan.Server.Controllers.LoansBaseController._repository">
+            <summary>
+            Repository object
+            </summary>
+        </member>
+        <member name="M:Bars.API.Loan.Server.Controllers.LoansBaseController.#ctor(Bars.API.Loan.Server.Infrastructure.Repository.ILoansRepository)">
+            <summary>
+                Constructor AccountsBaseController
+            </summary>
+            <param name="repository"></param>
+        </member>
+        <member name="M:Bars.API.Loan.Server.Controllers.LoansBaseController.Get(System.Int32)">
+            <summary>
+                Get all Loans for customer
+            </summary>
+            <remarks>Get an array of all loans for client </remarks>
+            <param name="custId">customer code</param>
+            <returns>list of loans</returns>
+        </member>
+        <member name="M:Bars.API.Loan.Server.Controllers.LoansBaseController.Get(System.Int32,System.Int32)">
+            <summary>
+                Get single account
+            </summary>
+            <param name="custId">customer code</param>
+            <param name="loanId">loan code</param>
+            <remarks>Get single loan by providing a number(accId) </remarks>
+            <returns>loan object</returns>
+            <response code="404">loan not found</response>
+        </member>
+        <member name="T:Bars.API.Loan.Server.Infrastructure.Repository.SchedulesRepository">
+            <summary>
+            AccountsRepository
+            </summary>
+        </member>
+        <member name="T:Bars.API.Loan.Server.Infrastructure.Repository.ISchedulesRepository">
+            <summary>
+            ILoansRepository
+            </summary>
+        </member>
+        <member name="T:Bars.API.Loan.Server.Infrastructure.Repository.LoansRepository">
+            <summary>
+            AccountsRepository
+            </summary>
+        </member>
+        <member name="M:Bars.API.Loan.Server.Infrastructure.Repository.LoansRepository.#ctor(Bars.API.Core.Interfaces.IDatabaseFactory{Bars.API.Loan.Server.DataContexts.LoanDbContext})">
+            <summary>
+            Constructor LoansRepository
+            </summary>
+            <param name="databaseFactory"></param>
+        </member>
+        <member name="T:Bars.API.Loan.Server.Infrastructure.Repository.ILoansRepository">
+            <summary>
+            ILoansRepository
+            </summary>
+        </member>
+        <member name="T:Bars.API.Loan.Server.Infrastructure.Repository.LoanDatabaseFactory">
+            <summary>
+            AcctDatabaseFactory
+            </summary>
+        </member>
+        <member name="M:Bars.API.Loan.Server.Infrastructure.Repository.LoanDatabaseFactory.Dispose">
+            <summary>
+            Dispose
+            </summary>
+        </member>
+        <member name="M:Bars.API.Loan.Server.Infrastructure.Repository.LoanDatabaseFactory.Get">
+            <summary>
+            AcctDbContext 
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.API.Loan.Server.Infrastructure.Repository.LoanDatabaseFactory.DisposeCore">
+            <summary>
+            DisposeCore
+            </summary>
+        </member>
+        <member name="T:Bars.API.Loan.Server.LoanServerModule">
+            <summary>
+            Ninject module for LOAN Server
+            </summary>
+        </member>
+        <member name="T:Bars.API.Loan.Server.DataContexts.LoanDbContext">
+            <summary>
+                DbContext for server module ACCT
+            </summary>
+        </member>
+        <member name="M:Bars.API.Loan.Server.DataContexts.LoanDbContext.#ctor(System.String)">
+            <summary>
+                Constructor AcctDbContext
+            </summary>
+            <param name="connectionString"></param>
+        </member>
+        <member name="P:Bars.API.Loan.Server.DataContexts.LoanDbContext.Loans">
+            <summary>
+            Loans list
+            </summary>
+        </member>
+        <member name="P:Bars.API.Loan.Server.DataContexts.LoanDbContext.SchedulePlans">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Bars.API.Loan.Server.DataContexts.LoanDbContext.OnModelCreating(System.Data.Entity.DbModelBuilder)">
+            <summary>
+                Setup configuration
+            </summary>
+            <param name="modelBuilder"></param>
+        </member>
+        <member name="T:Bars.API.Loan.Server.Models.SchedulePlans">
+            <summary>
+            Model for Loan
+            </summary>
+        </member>
+    </members>
+</doc>
