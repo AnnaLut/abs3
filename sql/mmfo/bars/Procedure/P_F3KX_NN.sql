@@ -8,7 +8,7 @@ IS
 % DESCRIPTION :   Процедура формирования 3KX     для КБ (универсальная)
 % COPYRIGHT   :   Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :   v.18.002          03.03.2018
+% VERSION     :   v.18.002          12.03.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
       sheme_ - схема формирования
@@ -17,6 +17,7 @@ IS
                                  3 - всi операцii
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+12.03.2018  уточнениe по консолидации операций по 3739
 03.03.2018  в протокол для консолидир.данных не заносятся параметры сделок/клиентов
 15.02.2018  по процедуре p_f70_nn  от  20.11.2017  для РУ
 
@@ -539,14 +540,14 @@ BEGIN
                         OR (    SUBSTR (o.nlsd, 1, 4) = '2603'
                             AND SUBSTR (o.nlsk, 1, 4) = '3739'
                             AND mfou_ = 300465
-                            AND ( LOWER (TRIM (o.nazn)) like '%перерахування кошт_в для обов_язкового продажу%' OR
-                                  LOWER (TRIM (o.nazn)) like '%перерахування кошт_в на продаж%'
+                            AND ( LOWER (TRIM (o.nazn)) like '%перерах%кошт_в для обов_язкового продажу%' OR
+                                  LOWER (TRIM (o.nazn)) like '%перерах%кошт_в%продаж%'
                                 )
                            )
                         OR (    SUBSTR (o.nlsd, 1, 4) in ('2900', '2600', '2620', '2650')
                             AND SUBSTR (o.nlsk, 1, 4) = '3739'
                             AND mfou_ = 300465
-                            AND LOWER (TRIM (o.nazn)) like '%перерахування кошт_в на продаж%'
+                            AND LOWER (TRIM (o.nazn)) like '%перерах%кошт_в%продаж%'
                            )
                         OR (    SUBSTR (o.nlsd, 1, 4) in ('2610','2615', '2620','2625',
                                                           '2630','2635', '2525','2546')
@@ -556,6 +557,7 @@ BEGIN
                        )
               GROUP BY '2', o.rnkd, o.REF, o.accd, o.nlsd, o.kv, o.acck, o.nlsk, o.nazn );
 
+   commit;
    -- для РУ Ощадбанку видаляємо проводки виду Дт 2600/2620/2650 Кт 2900
    -- якщо наявна заявка на продаж валюти на цю суму по цьому клієнту в найближчі +/- 3 дні
    if mfou_ = 300465 and mfo_ = 351823  then
@@ -667,6 +669,7 @@ BEGIN
 
       sum1_ := sum1_ - NVL (sumk1_, 0);
       rez_ := MOD (codc_, 2);
+      k021_ :='1';
 
       if length(trim(okpo_)) <= 8
       then
@@ -710,7 +713,7 @@ BEGIN
             where rnk = rnk_
               and rownum=1;
 
-            okpo_ := substr (trim(ser_) || ' ' || trim(numdoc_), 1, 14);
+            okpo_ := substr (trim(ser_)||trim(numdoc_), 1, 14);
             k021_ :='6';
          EXCEPTION WHEN NO_DATA_FOUND THEN
             null;
@@ -916,10 +919,26 @@ BEGIN
 
                f089_ :='2';
 
+         elsif ko_='2' and nlsk_ like '3739%' and d1#3K_='216' and sum1_< kons_sum_ 
+         then
+               f089_ :='1';
+               p_ins (nnnn_, 'F091', '4');
+               p_ins (nnnn_, 'R030', LPAD (kv_, 3,'0'));
+               p_ins (nnnn_, 'T071', TO_CHAR (sum0_));
+               p_ins (nnnn_, 'K020', 'k');
+               p_ins (nnnn_, 'K021', '#');
+               p_ins (nnnn_, 'Q024', '2');
+               p_ins (nnnn_, 'D100', '00');
+               p_ins (nnnn_, 'S180', '#');
+               p_ins (nnnn_, 'F089', f089_);
+               p_ins (nnnn_, 'F092', '216');
+
+               f089_ :='2';
+
          else
 --               if (d6#70_ is null or d6#70_ <> '804') and ROUND (sum0_/dig_, 0) >= 1
-               if  ROUND (sum0_/dig_, 0) >= 1
-               then
+--               if  round(sum0_, 0) >= 1
+--               then
                   -- код операції
                   p_ins (nnnn_, 'F091', (case when ko_=1 then '3'  else '4'  end));
                   -- код валюти
@@ -943,82 +962,82 @@ BEGIN
 
 	          p_ins (nnnn_, 'K020', lpad(TRIM (okpo_),10,'0'));
 	          p_ins (nnnn_, 'K021', k021_);
-               end if;
 
-               p_ins (nnnn_, 'Q001', TRIM (nmk_));       -- назва клiєнта
-               p_ins (nnnn_, 'Q024', q024_);             -- тип контрагента
-               p_ins (nnnn_, 'D100', '00');              -- код умов валютної операції
-               p_ins (nnnn_, 'S180', '#');               -- строк валютної операції
-               p_ins (nnnn_, 'F089', f089_);             -- консолідація
-
-               n_ := 13;
-               
-               FOR i IN 1 .. n_
-               LOOP
-                  IF i < 10
-                  THEN
-                     tag_ := 'D' || TO_CHAR (i) || '#70';
-                  ELSIF i = 10
-                  THEN
-                     tag_ := 'DA#70';
-                  ELSIF i = 11
-                  THEN
-                     tag_ := 'DB#70';
-                  ELSIF i = 12
-                  THEN
-                     tag_ := 'DC#70';
-                  ELSE
-                     tag_ := 'DD#70';
-                  END IF;
-
-                  -- для покупки нужны все доп.реквизиты (D1#70 - DA#70)
-                  IF ko_ = 1  AND i in (1, 2, 3, 13) THEN
-                     if i !=1 then
-                       BEGIN
-                          SELECT SUBSTR (VALUE, 1, 70)
-                            INTO val_
-                            FROM operw
-                           WHERE REF = refd_ AND tag = tag_;
-                       EXCEPTION
-                          WHEN NO_DATA_FOUND
-                          THEN
-                             val_ := NULL;
-                       END;
-                     else 
-                        val_ := d1#3K_;
-                     end if;
-                     -- код показника та default-значення
-                     p_tag (i, val_, kodp_, ref_);
-                     -- запис показника
-                     p_ins (nnnn_, kodp_, val_);
-
-                  END IF;
-
-                  -- для продажи нужны доп.реквизиты (D1#70)
-                  -- с 13.08.2007 нужны также доп.реквизиты D2#70,D3#70
---                  IF   ko_ = 2 AND i in (1, 11, 13)
-                  IF   ko_ = 2 AND i in (1, 13)
-                  THEN
-                     if i !=1 then
-                       BEGIN
-                          SELECT SUBSTR (VALUE, 1, 70)
-                            INTO val_
-                            FROM operw
-                           WHERE REF = refd_ AND tag = tag_;
-                       EXCEPTION
-                          WHEN NO_DATA_FOUND
-                          THEN
-                             val_ := NULL;
-                       END;
-                     else  
-                        val_ := d1#3K_;
-                     end if;
-                     -- код показника та default-значення
-                     p_tag (i, val_, kodp_, ref_);
-                     -- запис показника
-                     p_ins (nnnn_, kodp_, val_);
-                  END IF;
-               END LOOP;
+                  p_ins (nnnn_, 'Q001', TRIM (nmk_));       -- назва клiєнта
+                  p_ins (nnnn_, 'Q024', q024_);             -- тип контрагента
+                  p_ins (nnnn_, 'D100', '00');              -- код умов валютної операції
+                  p_ins (nnnn_, 'S180', '#');               -- строк валютної операції
+                  p_ins (nnnn_, 'F089', f089_);             -- консолідація
+    
+                  n_ := 13;
+                  
+                  FOR i IN 1 .. n_
+                  LOOP
+                     IF i < 10
+                     THEN
+                        tag_ := 'D' || TO_CHAR (i) || '#70';
+                     ELSIF i = 10
+                     THEN
+                        tag_ := 'DA#70';
+                     ELSIF i = 11
+                     THEN
+                        tag_ := 'DB#70';
+                     ELSIF i = 12
+                     THEN
+                        tag_ := 'DC#70';
+                     ELSE
+                        tag_ := 'DD#70';
+                     END IF;
+    
+                     -- для покупки нужны все доп.реквизиты (D1#70 - DA#70)
+                     IF ko_ = 1  AND i in (1, 2, 3, 13) THEN
+                        if i !=1 then
+                          BEGIN
+                             SELECT SUBSTR (VALUE, 1, 70)
+                               INTO val_
+                               FROM operw
+                              WHERE REF = refd_ AND tag = tag_;
+                          EXCEPTION
+                             WHEN NO_DATA_FOUND
+                             THEN
+                                val_ := NULL;
+                          END;
+                        else 
+                           val_ := d1#3K_;
+                        end if;
+                        -- код показника та default-значення
+                        p_tag (i, val_, kodp_, ref_);
+                        -- запис показника
+                        p_ins (nnnn_, kodp_, val_);
+     
+                     END IF;
+     
+                     -- для продажи нужны доп.реквизиты (D1#70)
+                     -- с 13.08.2007 нужны также доп.реквизиты D2#70,D3#70
+--                     IF   ko_ = 2 AND i in (1, 11, 13)
+                     IF   ko_ = 2 AND i in (1, 13)
+                     THEN
+                        if i !=1 then
+                          BEGIN
+                             SELECT SUBSTR (VALUE, 1, 70)
+                               INTO val_
+                               FROM operw
+                              WHERE REF = refd_ AND tag = tag_;
+                          EXCEPTION
+                             WHEN NO_DATA_FOUND
+                             THEN
+                                val_ := NULL;
+                          END;
+                        else  
+                           val_ := d1#3K_;
+                        end if;
+                        -- код показника та default-значення
+                        p_tag (i, val_, kodp_, ref_);
+                        -- запис показника
+                        p_ins (nnnn_, kodp_, val_);
+                     END IF;
+                  END LOOP;
+--               end if;
 
          end if;
 
@@ -1050,7 +1069,7 @@ BEGIN
                                                  'F089' as F089, 'F092' as F092, 
                                                  'Q003' as Q003, 'Q007' as Q007, 'Q006' as Q006 )
                               )   
-                        where  f091 ='4' and f092 ='216' and k021='2' and
+                        where  f091 ='4' and f092 ='216' and k021 in ('2','6') and
                                gl.p_icurval (r030, t071, dat_)< kons_sum_ 
                              or
                                f091 ='4' and f092 ='216' and k020 ='k' and k021 ='#' and f089 ='1' 
@@ -1085,7 +1104,7 @@ BEGIN
                                                  'F089' as F089, 'F092' as F092, 
                                                  'Q003' as Q003, 'Q007' as Q007, 'Q006' as Q006 )
                               )   
-                        where  f091 ='4' and f092 ='216' and k021 ='2' and f089 ='2' and
+                        where  f091 ='4' and f092 ='216' and k021 in ('2','6') and f089 ='2' and
                                gl.p_icurval (r030, t071, dat_)< kons_sum_
                              or
                                f091 ='4' and f092 ='216' and k020 ='k' and k021 ='#' and f089 ='1' 
@@ -1275,7 +1294,11 @@ insert into OTCN_TRACE_70(KODF, DATF, USERID, NLS, KV, ODATE, KODP, ZNAP, NBUC, 
 select kodf_, dat_, USERID_, NLS, KV, ODATE, KODP, ZNAP, NBUC, ISP, RNK, ACC, REF, COMM, ND, MDATE, TOBO
 from rnbu_trace;
 
+--             otc_del_arch('3K', dat_, 1);
+--             OTC_SAVE_ARCH('3K', dat_, 1);
+--             commit;
+
     logger.info ('P_F3KX  end  for date = '||to_char(dat_, 'dd.mm.yyyy'));
 
 END;
-/
+/               
