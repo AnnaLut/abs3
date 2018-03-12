@@ -29,6 +29,7 @@
               l_rnk number := :P_RNK;
               l_kv number := :P_KV;
               l_kv_conv number := :P_KV_CONV;
+              l_obz number := :P_OBZ;
               begin
               if (l_id is not null) then
               bars_zay.upd_request
@@ -59,7 +60,8 @@
               p_product_group => null,
               p_comm          => l_comm,
               p_contactfio    => l_contact_fio,
-              p_contacttel    => l_contact_tel);
+              p_contacttel    => l_contact_tel,
+              p_obz=>  l_obz);
 
               else
               if nvl(l_kv_conv,980) != 980 then
@@ -140,7 +142,8 @@
               p_tel         => l_contact_tel,
               p_branch      => null,
               p_operid_nokk => null,
-              p_reqid       => l_id);
+              p_reqid       => l_id,
+              p_obz=>  l_obz);
               end if;
               end if;
               end;
@@ -169,6 +172,7 @@
               <parameter type="FormField" name="P_RNK" />
               <parameter type="FormField" name="P_KV" />
               <parameter type="FormField" name="P_KV_CONV" />
+              <parameter type="FormField" name="P_OBZ" />
             </parameters>
           </command>
         </button>
@@ -284,6 +288,9 @@
         </customfield>
         <customfield name="P_CONTACT_TEL" label="ТЕЛ контактної особи" datatype="String" size="100" datasourcefield="CONTACT_TEL" columnindex="3" index="4">
           <uicontrol type="TextBox" controlwidth="150" />
+        </customfield>
+        <customfield name="P_OBZ" label="ОБЗ" datatype="Int64"  datasourcefield="OBZ" columnindex="3" index="5">
+          <uicontrol type="CheckBox" truevalue="1" />
         </customfield>
       </customfields>
     </customform>
