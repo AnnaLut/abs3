@@ -14,8 +14,7 @@
 0000: 6F00000001000000 FFFF01000D004347 5458566965775374 6174650400010000
 0020: 0000000000390100 002C000000030000 0003000000010000 0061020000F8FFFF
 0040: FFE1FFFFFFFFFFFF FFFFFFFFFF1E0300 00C4010000010000 0001000000010000
-0060: 000F4170706C6963 6174696F6E497465 6D02000000075769 6E646F77730B4672
-0080: 6D5F4163636F756E 74
+0060: 000F4170706C6963 6174696F6E497465 6D00000000
 .enddata
 .data DT_MAKERUNDLG
 0000: 02000000001A513A 5C4241525339385C 42494E5C63757374 61636E742E657865
@@ -14892,8 +14891,8 @@ or (dfCountry = nCountryCrimeaVEZ)
 .head 6 +  If cmbIse.Init(hWndItem)
 .head 7 -  Call cmbIse.Populate(hSql(), "ise", "ise||' '||name", "ise", 
 "where (d_close is null or d_close>=bankdate) and (ise='00000' or ise in (select k070 from kl_k070 where " ||
-IifS(bPrRezid=TRUE, IifS(nCType=1 or nCType=2, "k072 not in ('L','N','0')",
-               IifS(bPersonSPD=FALSE,"k072 in (" || PAR_CUSTK072 || ")","k072='L'")), "k072='0'") || "))
+IifS(bPrRezid=TRUE, IifS(nCType=1 or nCType=2, "k078 not in ('L','N','0')",
+               IifS(bPersonSPD=FALSE,"k078 in (" || PAR_CUSTK072 || ")","k078='L'")), "k078='0'") || "))
  order by ise")
 .head 7 -  Call cmbIse.SetSelectById(dfIse)
 .head 7 +  If NOT cmbIse.strCurrentId
