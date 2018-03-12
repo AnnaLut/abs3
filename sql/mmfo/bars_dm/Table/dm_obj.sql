@@ -34,7 +34,6 @@ COMMENT ON COLUMN BARS_DM.DM_OBJ.IMP_TYPE IS 'Тип выгрузки (DAY - ежедневная дел
 COMMENT ON COLUMN BARS_DM.DM_OBJ.OBJ_PROC IS 'Процедура выгрузки';
 COMMENT ON COLUMN BARS_DM.DM_OBJ.IMP_ORDER IS 'Порядок выгрузки';
 COMMENT ON COLUMN BARS_DM.DM_OBJ.ACTIVE IS 'Включена (1/0)';
-COMMENT ON COLUMN BARS_DM.PARALLEL_FLAG IS 'Параллель в разрезе МФО (Y/N)';
 
 
 
