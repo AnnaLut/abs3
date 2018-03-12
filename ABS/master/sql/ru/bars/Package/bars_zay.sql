@@ -4682,6 +4682,7 @@ is
   l_dig  tabval.dig%type;
   l_viza zayavka.viza%type;
   l_dk   zayavka.dk%type;
+  l_kv_conv  zayavka.kv_conv%type;
 
   ern        NUMBER;          -- код ошибки (из err_zay)
   msg        VARCHAR2(254);   -- текстовка ошибки "для себя"
@@ -4693,7 +4694,12 @@ is
 begin
 
   begin
-   select z.kv2, t.dig, z.viza, z.dk into l_kv, l_dig, l_viza, l_dk from zayavka z, tabval t where z.id = p_id and z.kv2 = t.kv;
+     select z.kv2, t.dig, z.viza, z.dk, z.kv_conv
+      into l_kv,  l_dig, l_viza, l_dk, l_kv_conv
+      from zayavka z, tabval t
+     where z.id = p_id and z.kv2 = t.kv;
+
+    bars_audit.info( 'l_dk=' || to_char(l_dk)||', l_kv_conv='||to_char(l_kv_conv) );
   exception when no_data_found then
          msg  := 'Заявка ' || p_id || ' не найдена!' ;
          ern  := 6;
@@ -4712,7 +4718,11 @@ begin
 
   if l_dk in (1,3) or (l_dk = 2 and nvl(p_mfo0,f_ourmfo()) = f_ourmfo() ) then
     begin
-     select acc into l_acc0 from accounts where nls = p_nls_acc0 and kv = decode(l_dk, 3, p_kv_conv, 980);
+     select acc
+       into l_acc0
+       from accounts
+      where nls = p_nls_acc0
+        and kv  = decode(l_dk, 3, nvl(p_kv_conv,l_kv_conv), 980);
     exception when no_data_found then
            msg  := 'Не найден т/с ' || p_nls_acc0 || ' вал '||iif_n(l_dk, 3, 980, p_kv_conv, 980) ;
            ern  := 26;
@@ -4759,7 +4769,7 @@ begin
            skom = p_skom,
            fdat = p_fdat,
          kurs_z = p_kurs,
-        kv_conv = p_kv_conv,
+        kv_conv = nvl(p_kv_conv,KV_CONV),
            mfo0 = p_mfo0,
            nls0 = p_nls0,
        contract = p_contract,
