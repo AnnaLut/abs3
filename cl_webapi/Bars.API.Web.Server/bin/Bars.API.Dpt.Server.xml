@@ -1,0 +1,149 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Bars.API.Dpt.Server</name>
+    </assembly>
+    <members>
+        <member name="T:Bars.API.Dpt.Server.DptServerModule">
+            <summary>
+            Ninject module for DPT Server
+            </summary>
+        </member>
+        <member name="T:Bars.API.Dpt.Server.Configuration.DepositConfiguration">
+            <summary>
+                Configuration (mapping model Deposit to database table)
+            </summary>
+        </member>
+        <member name="M:Bars.API.Dpt.Server.Configuration.DepositConfiguration.#ctor">
+            <summary>
+                Constructor AccountConfiguration
+            </summary>
+        </member>
+        <member name="T:Bars.API.Dpt.Server.Controllers.DepositsBaseController">
+            <summary>
+                Work with accounts (base)
+            </summary>
+            <remarks>Accounts</remarks>
+        </member>
+        <member name="F:Bars.API.Dpt.Server.Controllers.DepositsBaseController._repository">
+            <summary>
+            Repository object
+            </summary>
+        </member>
+        <member name="M:Bars.API.Dpt.Server.Controllers.DepositsBaseController.#ctor(Bars.API.Dpt.Server.Infrastructure.Repository.IDepositsRepository)">
+            <summary>
+                Constructor DepositsBaseController
+            </summary>
+            <param name="repository"></param>
+        </member>
+        <member name="M:Bars.API.Dpt.Server.Controllers.DepositsBaseController.Get(System.Int32)">
+            <summary>
+                Get all Deposits for customer
+            </summary>
+            <remarks>Get an array of all deposits for client </remarks>
+            <param name="custId">customer code</param>
+            <returns>list of deposits</returns>
+        </member>
+        <member name="M:Bars.API.Dpt.Server.Controllers.DepositsBaseController.Get(System.Int32,System.Int32)">
+            <summary>
+                Get single Deposit
+            </summary>
+            <param name="custId">customer code</param>
+            <param name="depositId">account code</param>
+            <remarks>Get single account by providing a number(accId) </remarks>
+            <returns>deposit object</returns>
+            <response code="404">deposit not found</response>
+        </member>
+        <member name="T:Bars.API.Dpt.Server.Controllers.V1.DepositsController">
+            <summary>
+                Work with accounts (V1)
+            </summary>
+            <inheritdoc />
+        </member>
+        <member name="M:Bars.API.Dpt.Server.Controllers.V1.DepositsController.#ctor(Bars.API.Dpt.Server.Infrastructure.Repository.IDepositsRepository)">
+            <summary>
+                Constructor AccountsV1Controller
+            </summary>
+            <param name="repository"></param>
+        </member>
+        <member name="M:Bars.API.Dpt.Server.Controllers.V1.DepositsController.Get(System.Int32)">
+            <summary>
+                Get all Deposits for customer
+            </summary>
+            <remarks>Get an array of all Deposits for client </remarks>
+            <param name="custId">customer code</param>
+            <returns>list of Deposits</returns>
+        </member>
+        <member name="M:Bars.API.Dpt.Server.Controllers.V1.DepositsController.Get(System.Int32,System.Int32)">
+            <summary>
+                Get single Deposit
+            </summary>
+            <param name="custId">customer code</param>
+            <param name="depositId">Deposit code</param>
+            <remarks>Get single account by providing a number(accId) </remarks>
+            <returns>Deposit object</returns>
+            <response code="404">Deposit not found</response>
+        </member>
+        <member name="M:Bars.API.Dpt.Server.Controllers.V1.DepositsController.GetVersion">
+            <summary>
+                Get module version
+            </summary>
+            <remarks>Get version </remarks>
+            <returns>string</returns>
+        </member>
+        <member name="T:Bars.API.Dpt.Server.Infrastructure.Repository.DepositsRepository">
+            <summary>
+            AccountsRepository
+            </summary>
+        </member>
+        <member name="M:Bars.API.Dpt.Server.Infrastructure.Repository.DepositsRepository.#ctor(Bars.API.Core.Interfaces.IDatabaseFactory{Bars.API.Dpt.Server.DataContexts.DptDbContext})">
+            <summary>
+            Constructor AccountsRepository
+            </summary>
+            <param name="databaseFactory"></param>
+        </member>
+        <member name="T:Bars.API.Dpt.Server.Infrastructure.Repository.IDepositsRepository">
+            <summary>
+            IAccountsRepository
+            </summary>
+        </member>
+        <member name="T:Bars.API.Dpt.Server.Infrastructure.Repository.DptDatabaseFactory">
+            <summary>
+            AcctDatabaseFactory
+            </summary>
+        </member>
+        <member name="M:Bars.API.Dpt.Server.Infrastructure.Repository.DptDatabaseFactory.Dispose">
+            <summary>
+            Dispose
+            </summary>
+        </member>
+        <member name="M:Bars.API.Dpt.Server.Infrastructure.Repository.DptDatabaseFactory.Get">
+            <summary>
+            AcctDbContext 
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.API.Dpt.Server.Infrastructure.Repository.DptDatabaseFactory.DisposeCore">
+            <summary>
+            DisposeCore
+            </summary>
+        </member>
+        <member name="T:Bars.API.Dpt.Server.DataContexts.DptDbContext">
+            <summary>
+                DbContext for server module ACCT
+            </summary>
+        </member>
+        <member name="M:Bars.API.Dpt.Server.DataContexts.DptDbContext.#ctor(System.String)">
+            <summary>
+                Constructor AcctDbContext
+            </summary>
+            <param name="connectionString"></param>
+        </member>
+        <member name="M:Bars.API.Dpt.Server.DataContexts.DptDbContext.OnModelCreating(System.Data.Entity.DbModelBuilder)">
+            <summary>
+                Setup configuration
+            </summary>
+            <param name="modelBuilder"></param>
+        </member>
+    </members>
+</doc>

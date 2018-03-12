@@ -1,0 +1,867 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Bars.Identity.Oracle</name>
+    </assembly>
+    <members>
+        <member name="T:Bars.Identity.Oracle.IdentityRole">
+            <summary>
+                Class that implements the ASP.NET Identity
+                IRole interface
+            </summary>
+        </member>
+        <member name="M:Bars.Identity.Oracle.IdentityRole.#ctor">
+            <summary>
+                Default constructor for Role
+            </summary>
+        </member>
+        <member name="M:Bars.Identity.Oracle.IdentityRole.#ctor(System.String)">
+            <summary>
+                Constructor that takes names as argument
+            </summary>
+            <param name="name"></param>
+        </member>
+        <member name="P:Bars.Identity.Oracle.IdentityRole.Id">
+            <summary>
+                Role ID
+            </summary>
+        </member>
+        <member name="P:Bars.Identity.Oracle.IdentityRole.Name">
+            <summary>
+                Role name
+            </summary>
+        </member>
+        <member name="T:Bars.Identity.Oracle.Repositories.Base.RepositoryBase`2">
+            <summary>
+            
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="T:Bars.Identity.Oracle.RoleStore`1">
+            <summary>
+                Class that implements the key ASP.NET Identity role store iterfaces
+            </summary>
+        </member>
+        <member name="M:Bars.Identity.Oracle.RoleStore`1.#ctor">
+            <summary>
+                Default constructor that initializes a new Oracle Database
+                instance using the Default Connection string
+            </summary>
+        </member>
+        <member name="M:Bars.Identity.Oracle.RoleStore`1.#ctor(Bars.Identity.Oracle.OracleDatabase)">
+            <summary>
+                Constructor that takes a Oracle Database as argument
+            </summary>
+            <param name="database"></param>
+        </member>
+        <member name="P:Bars.Identity.Oracle.RoleStore`1.Roles">
+            <summary>
+                Get all Roles defined.
+                This code is a loose implementation.
+                An occurrence of a performance problem is when you get a large amount of data.
+            </summary>
+        </member>
+        <member name="T:Bars.Identity.Oracle.IdentityUser">
+            <summary>
+                Class that implements the ASP.NET Identity
+                IUser interface
+            </summary>
+        </member>
+        <member name="M:Bars.Identity.Oracle.IdentityUser.#ctor">
+            <summary>
+                Default constructor
+            </summary>
+        </member>
+        <member name="M:Bars.Identity.Oracle.IdentityUser.#ctor(System.String)">
+            <summary>
+                Constructor that takes user name as argument
+            </summary>
+            <param name="userName"></param>
+        </member>
+        <member name="P:Bars.Identity.Oracle.IdentityUser.NumId">
+            <summary>
+                Numeric User Id
+            </summary>
+        </member>
+        <member name="P:Bars.Identity.Oracle.IdentityUser.DisplayName">
+            <summary>
+                User's name
+            </summary>
+        </member>
+        <member name="P:Bars.Identity.Oracle.IdentityUser.FirstName">
+            <summary>
+            First Name
+            </summary>
+        </member>
+        <member name="P:Bars.Identity.Oracle.IdentityUser.LastName">
+            <summary>
+            Last Name
+            </summary>
+        </member>
+        <member name="P:Bars.Identity.Oracle.IdentityUser.Patronymic">
+            <summary>
+            Patronymic
+            </summary>
+        </member>
+        <member name="P:Bars.Identity.Oracle.IdentityUser.Email">
+            <summary>
+                Email
+            </summary>
+        </member>
+        <member name="P:Bars.Identity.Oracle.IdentityUser.EmailConfirmed">
+            <summary>
+                True if the email is confirmed, default is false
+            </summary>
+        </member>
+        <member name="P:Bars.Identity.Oracle.IdentityUser.PasswordHash">
+            <summary>
+                The salted/hashed form of the user password
+            </summary>
+        </member>
+        <member name="P:Bars.Identity.Oracle.IdentityUser.SecurityStamp">
+            <summary>
+                A random value that should change whenever a users credentials have changed (password changed, login removed)
+            </summary>
+        </member>
+        <member name="P:Bars.Identity.Oracle.IdentityUser.PhoneNumber">
+            <summary>
+                PhoneNumber for the user
+            </summary>
+        </member>
+        <member name="P:Bars.Identity.Oracle.IdentityUser.PhoneNumberConfirmed">
+            <summary>
+                True if the phone number is confirmed, default is false
+            </summary>
+        </member>
+        <member name="P:Bars.Identity.Oracle.IdentityUser.TwoFactorEnabled">
+            <summary>
+                Is two factor enabled for the user
+            </summary>
+        </member>
+        <member name="P:Bars.Identity.Oracle.IdentityUser.LockoutEndDateUtc">
+            <summary>
+                DateTime in UTC when lockout ends, any time in the past is considered not locked out.
+            </summary>
+        </member>
+        <member name="P:Bars.Identity.Oracle.IdentityUser.LockoutEnabled">
+            <summary>
+                Is lockout enabled for this user
+            </summary>
+        </member>
+        <member name="P:Bars.Identity.Oracle.IdentityUser.AccessFailedCount">
+            <summary>
+                Used to record failures for the purposes of lockout
+            </summary>
+        </member>
+        <member name="P:Bars.Identity.Oracle.IdentityUser.Id">
+            <summary>
+                User ID
+            </summary>
+        </member>
+        <member name="P:Bars.Identity.Oracle.IdentityUser.UserName">
+            <summary>
+                User's name
+            </summary>
+        </member>
+        <member name="P:Bars.Identity.Oracle.IdentityUser.CreatingDate">
+            <summary>
+                Creating Date
+            </summary>
+        </member>
+        <member name="P:Bars.Identity.Oracle.IdentityUser.IsTechPassword">
+            <summary>
+            Is use teach password
+            </summary>
+        </member>
+        <member name="P:Bars.Identity.Oracle.IdentityUser.TechPassword">
+            <summary>
+            Tech password
+            </summary>
+        </member>
+        <member name="P:Bars.Identity.Oracle.IdentityUser.TaxCode">
+            <summary>
+            Tax code
+            </summary>
+        </member>
+        <member name="T:Bars.Identity.Oracle.UserLoginsTable">
+            <summary>
+                Class that represents the UserLogins table in the Oracle Database
+            </summary>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserLoginsTable.#ctor(Bars.Identity.Oracle.OracleDatabase)">
+            <summary>
+                Constructor that takes a Oracle Database instance
+            </summary>
+            <param name="database"></param>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserLoginsTable.Delete(Bars.Identity.Oracle.IdentityUser,Microsoft.AspNet.Identity.UserLoginInfo)">
+            <summary>
+                Deletes a login from a user in the UserLogins table
+            </summary>
+            <param name="user">User to have login deleted</param>
+            <param name="login">Login to be deleted from user</param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserLoginsTable.Delete(System.String)">
+            <summary>
+                Deletes all Logins from a user in the UserLogins table
+            </summary>
+            <param name="userId">The user's id</param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserLoginsTable.Insert(Bars.Identity.Oracle.IdentityUser,Microsoft.AspNet.Identity.UserLoginInfo)">
+            <summary>
+                Inserts a new login in the UserLogins table
+            </summary>
+            <param name="user">User to have new login added</param>
+            <param name="login">Login to be added</param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserLoginsTable.FindUserIdByLogin(Microsoft.AspNet.Identity.UserLoginInfo)">
+            <summary>
+                Return a userId given a user's login
+            </summary>
+            <param name="login"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserLoginsTable.FindByUserId(System.String)">
+            <summary>
+                Returns a list of user's logins
+            </summary>
+            <param name="userId">The user's id</param>
+            <returns></returns>
+        </member>
+        <member name="T:Bars.Identity.Oracle.UserClaimsTable">
+            <summary>
+            Class that represents the UserClaims table in the Oracle Database
+            </summary>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserClaimsTable.#ctor(Bars.Identity.Oracle.OracleDatabase)">
+            <summary>
+            Constructor that takes a Oracle Database instance 
+            </summary>
+            <param name="database"></param>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserClaimsTable.FindByUserId(System.String)">
+            <summary>
+            Returns a ClaimsIdentity instance given a userId
+            </summary>
+            <param name="userId">The user's id</param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserClaimsTable.Delete(System.String)">
+            <summary>
+            Deletes all claims from a user given a userId
+            </summary>
+            <param name="userId">The user's id</param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserClaimsTable.Insert(System.Security.Claims.Claim,System.String)">
+            <summary>
+            Inserts a new claim in UserClaims table
+            </summary>
+            <param name="claim">User's claim to be added</param>
+            <param name="userId">User's id</param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserClaimsTable.Delete(Bars.Identity.Oracle.IdentityUser,System.Security.Claims.Claim)">
+            <summary>
+            Deletes a claim from a user 
+            </summary>
+            <param name="user">The user to have a claim deleted</param>
+            <param name="claim">A claim to be deleted from user</param>
+            <returns></returns>
+        </member>
+        <member name="T:Bars.Identity.Oracle.UserStore`1">
+            <summary>
+            Class that implements the key ASP.NET Identity user store iterfaces
+            </summary>
+        </member>
+        <member name="P:Bars.Identity.Oracle.UserStore`1.Users">
+            <summary>
+            Get all Users defined.
+            This code is a loose implementation.
+            An occurrence of a performance problem is when you get a large amount of data.
+            </summary>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.#ctor">
+            <summary>
+            Default constructor that initializes a new Oracle Database
+            instance using the Default Connection string
+            </summary>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.#ctor(Bars.Identity.Oracle.OracleDatabase)">
+            <summary>
+            Constructor that takes a Oracle Database as argument 
+            </summary>
+            <param name="database"></param>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.CreateAsync(`0)">
+            <summary>
+            Insert a new TUser in the UserTable
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.FindByIdAsync(System.String)">
+            <summary>
+            Returns an TUser instance based on a userId query 
+            </summary>
+            <param name="userId">The user's Id</param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.FindByNameAsync(System.String)">
+            <summary>
+            Returns an TUser instance based on a userName query 
+            </summary>
+            <param name="userName">The user's name</param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.UpdateAsync(`0)">
+            <summary>
+            Updates the UsersTable with the TUser instance values
+            </summary>
+            <param name="user">TUser to be updated</param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.AddClaimAsync(`0,System.Security.Claims.Claim)">
+            <summary>
+            Inserts a claim to the UserClaimsTable for the given user
+            </summary>
+            <param name="user">User to have claim added</param>
+            <param name="claim">Claim to be added</param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.GetClaimsAsync(`0)">
+            <summary>
+            Returns all claims for a given user
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.RemoveClaimAsync(`0,System.Security.Claims.Claim)">
+            <summary>
+            Removes a claim froma user
+            </summary>
+            <param name="user">User to have claim removed</param>
+            <param name="claim">Claim to be removed</param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.AddLoginAsync(`0,Microsoft.AspNet.Identity.UserLoginInfo)">
+            <summary>
+            Inserts a Login in the UserLoginsTable for a given User
+            </summary>
+            <param name="user">User to have login added</param>
+            <param name="login">Login to be added</param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.FindAsync(Microsoft.AspNet.Identity.UserLoginInfo)">
+            <summary>
+            Returns an TUser based on the Login info
+            </summary>
+            <param name="login"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.GetLoginsAsync(`0)">
+            <summary>
+            Returns list of UserLoginInfo for a given TUser
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.RemoveLoginAsync(`0,Microsoft.AspNet.Identity.UserLoginInfo)">
+            <summary>
+            Deletes a login from UserLoginsTable for a given TUser
+            </summary>
+            <param name="user">User to have login removed</param>
+            <param name="login">Login to be removed</param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.AddToRoleAsync(`0,System.String)">
+            <summary>
+            Inserts a entry in the UserRoles table
+            </summary>
+            <param name="user">User to have role added</param>
+            <param name="roleName">Name of the role to be added to user</param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.GetRolesAsync(`0)">
+            <summary>
+            Returns the roles for a given TUser
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.IsInRoleAsync(`0,System.String)">
+            <summary>
+            Verifies if a user is in a role
+            </summary>
+            <param name="user"></param>
+            <param name="role"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.RemoveFromRoleAsync(`0,System.String)">
+            <summary>
+            Removes a user from a role
+            </summary>
+            <param name="user"></param>
+            <param name="role"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.DeleteAsync(`0)">
+            <summary>
+            Deletes a user
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.GetPasswordHashAsync(`0)">
+            <summary>
+            Returns the PasswordHash for a given TUser
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.HasPasswordAsync(`0)">
+            <summary>
+            Verifies if user has password
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.SetPasswordHashAsync(`0,System.String)">
+            <summary>
+            Sets the password hash for a given TUser
+            </summary>
+            <param name="user"></param>
+            <param name="passwordHash"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.SetSecurityStampAsync(`0,System.String)">
+            <summary>
+             Set security stamp
+            </summary>
+            <param name="user"></param>
+            <param name="stamp"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.GetSecurityStampAsync(`0)">
+            <summary>
+            Get security stamp
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.SetEmailAsync(`0,System.String)">
+            <summary>
+            Set email on user
+            </summary>
+            <param name="user"></param>
+            <param name="email"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.GetEmailAsync(`0)">
+            <summary>
+            Get email from user
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.GetEmailConfirmedAsync(`0)">
+            <summary>
+            Get if user email is confirmed
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.SetEmailConfirmedAsync(`0,System.Boolean)">
+            <summary>
+            Set when user email is confirmed
+            </summary>
+            <param name="user"></param>
+            <param name="confirmed"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.FindByEmailAsync(System.String)">
+            <summary>
+            Get user by email
+            </summary>
+            <param name="email"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.SetPhoneNumberAsync(`0,System.String)">
+            <summary>
+            Set user phone number
+            </summary>
+            <param name="user"></param>
+            <param name="phoneNumber"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.GetPhoneNumberAsync(`0)">
+            <summary>
+            Get user phone number
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.GetPhoneNumberConfirmedAsync(`0)">
+            <summary>
+            Get if user phone number is confirmed
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.SetPhoneNumberConfirmedAsync(`0,System.Boolean)">
+            <summary>
+            Set phone number if confirmed
+            </summary>
+            <param name="user"></param>
+            <param name="confirmed"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.SetTwoFactorEnabledAsync(`0,System.Boolean)">
+            <summary>
+            Set two factor authentication is enabled on the user
+            </summary>
+            <param name="user"></param>
+            <param name="enabled"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.GetTwoFactorEnabledAsync(`0)">
+            <summary>
+            Get if two factor authentication is enabled on the user
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.GetLockoutEndDateAsync(`0)">
+            <summary>
+            Get user lock out end date
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.SetLockoutEndDateAsync(`0,System.DateTimeOffset)">
+            <summary>
+            Set user lockout end date
+            </summary>
+            <param name="user"></param>
+            <param name="lockoutEnd"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.IncrementAccessFailedCountAsync(`0)">
+            <summary>
+            Increment failed access count
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.ResetAccessFailedCountAsync(`0)">
+            <summary>
+            Reset failed access count
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.GetAccessFailedCountAsync(`0)">
+            <summary>
+            Get failed access count
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.GetLockoutEnabledAsync(`0)">
+            <summary>
+            Get if lockout is enabled for the user
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserStore`1.SetLockoutEnabledAsync(`0,System.Boolean)">
+            <summary>
+            Set lockout enabled for user
+            </summary>
+            <param name="user"></param>
+            <param name="enabled"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Bars.Identity.Oracle.OracleDatabase">
+            <summary>
+                Class that encapsulates a Oracle Database connections
+                and CRUD operations
+            </summary>
+        </member>
+        <member name="M:Bars.Identity.Oracle.OracleDatabase.#ctor">
+            <summary>
+                Default constructor which uses the "DefaultConnection" connectionString
+            </summary>
+        </member>
+        <member name="M:Bars.Identity.Oracle.OracleDatabase.#ctor(System.String)">
+            <summary>
+                Constructor which takes the connection string name
+            </summary>
+            <param name="connectionStringName"></param>
+        </member>
+        <member name="M:Bars.Identity.Oracle.OracleDatabase.Execute(System.String,System.Collections.IEnumerable)">
+            <summary>
+                Executes a non-query Oracle statement
+            </summary>
+            <param name="commandText">The Oracle query to execute</param>
+            <param name="parameters">Optional parameters to pass to the query</param>
+            <returns>The count of records affected by the Oracle statement</returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.OracleDatabase.QueryValue(System.String,System.Collections.IEnumerable)">
+            <summary>
+                Executes a Oracle query that returns a single scalar value as the result.
+            </summary>
+            <param name="commandText">The Oracle query to execute</param>
+            <param name="parameters">Optional parameters to pass to the query</param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.OracleDatabase.Query(System.String,System.Collections.IEnumerable)">
+            <summary>
+                Executes a SQL query that returns a list of rows as the result.
+            </summary>
+            <param name="commandText">The Oracle query to execute</param>
+            <param name="parameters">Parameters to pass to the Oracle query</param>
+            <returns>
+                A list of a Dictionary of Key, values pairs representing the
+                ColumnName and corresponding value
+            </returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.OracleDatabase.EnsureConnectionOpen">
+            <summary>
+                Opens a connection if not open
+            </summary>
+        </member>
+        <member name="M:Bars.Identity.Oracle.OracleDatabase.EnsureConnectionClosed">
+            <summary>
+                Closes a connection if open
+            </summary>
+        </member>
+        <member name="M:Bars.Identity.Oracle.OracleDatabase.CreateCommand(System.String,System.Collections.IEnumerable,System.Data.Common.DbConnection)">
+            <summary>
+                Creates a OracleCommand with the given parameters
+            </summary>
+            <param name="commandText">The Oracle query to execute</param>
+            <param name="parameters">Parameters to pass to the Oracle query</param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.OracleDatabase.AddParameters(System.Data.Common.DbCommand,System.Collections.IEnumerable)">
+            <summary>
+                Adds the parameters to a Oracle command
+            </summary>
+            <param name="command">The Oracle query to execute</param>
+            <param name="parameters">Parameters to pass to the Oracle query</param>
+        </member>
+        <member name="M:Bars.Identity.Oracle.OracleDatabase.GetStrValue(System.String,System.Collections.IEnumerable)">
+            <summary>
+                Helper method to return query a string value
+            </summary>
+            <param name="commandText">The Oracle query to execute</param>
+            <param name="parameters">Parameters to pass to the Oracle query</param>
+            <returns>The string value resulting from the query</returns>
+        </member>
+        <member name="T:Bars.Identity.Oracle.RoleTable">
+            <summary>
+                Class that represents the Role table in the Oracle Database
+            </summary>
+        </member>
+        <member name="M:Bars.Identity.Oracle.RoleTable.#ctor(Bars.Identity.Oracle.OracleDatabase)">
+            <summary>
+                Constructor that takes a Oracle Database instance
+            </summary>
+            <param name="database"></param>
+        </member>
+        <member name="M:Bars.Identity.Oracle.RoleTable.Delete(System.String)">
+            <summary>
+                Deltes a role from the Roles table
+            </summary>
+            <param name="roleId">The role Id</param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.RoleTable.Insert(Bars.Identity.Oracle.IdentityRole)">
+            <summary>
+                Inserts a new Role in the Roles table
+            </summary>
+            <param name="role">The role's name</param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.RoleTable.GetRoleName(System.String)">
+            <summary>
+                Returns a role name given the roleId
+            </summary>
+            <param name="roleId">The role Id</param>
+            <returns>Role name</returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.RoleTable.GetRoleId(System.String)">
+            <summary>
+                Returns the role Id given a role name
+            </summary>
+            <param name="roleName">Role's name</param>
+            <returns>Role's Id</returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.RoleTable.GetRoleById(System.String)">
+            <summary>
+                Gets the IdentityRole given the role Id
+            </summary>
+            <param name="roleId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.RoleTable.GetRoleByName(System.String)">
+            <summary>
+                Gets the IdentityRole given the role name
+            </summary>
+            <param name="roleName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.RoleTable.Update(Bars.Identity.Oracle.IdentityRole)">
+            <summary>
+                Update Role's attributes
+            </summary>
+            <param name="role"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.RoleTable.GetRoles">
+            <summary>
+                Get the all Roles
+            </summary>
+            <returns>IdentityRole</returns>
+        </member>
+        <member name="T:Bars.Identity.Oracle.UserRolesTable">
+            <summary>
+                Class that represents the UserRoles table in the Oracle Database
+            </summary>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserRolesTable.#ctor(Bars.Identity.Oracle.OracleDatabase)">
+            <summary>
+                Constructor that takes a Oracle Database instance
+            </summary>
+            <param name="database"></param>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserRolesTable.FindByUserId(System.String)">
+            <summary>
+                Returns a list of user's roles
+            </summary>
+            <param name="userId">The user's id</param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserRolesTable.Delete(System.String)">
+            <summary>
+                Deletes all roles from a user in the UserRoles table
+            </summary>
+            <param name="userId">The user's id</param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserRolesTable.Insert(Bars.Identity.Oracle.IdentityUser,System.String)">
+            <summary>
+                Inserts a new role for a user in the UserRoles table
+            </summary>
+            <param name="user">The User</param>
+            <param name="roleId">The Role's id</param>
+            <returns></returns>
+        </member>
+        <member name="T:Bars.Identity.Oracle.UserTable`1">
+            <summary>
+                Class that represents the Users table in the Oracle Database
+            </summary>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserTable`1.#ctor(Bars.Identity.Oracle.OracleDatabase)">
+            <summary>
+                Constructor that takes a Oracle Database instance
+            </summary>
+            <param name="database"></param>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserTable`1.GetUserName(System.String)">
+            <summary>
+                Returns the user's name given a user id
+            </summary>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserTable`1.GetUserId(System.String)">
+            <summary>
+                Returns a User ID given a user name
+            </summary>
+            <param name="userName">The user's name</param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserTable`1.GetUserById(System.String)">
+            <summary>
+                Returns an TUser given the user's id
+            </summary>
+            <param name="userId">The user's id</param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserTable`1.GetUserByName(System.String)">
+            <summary>
+                Returns a list of TUser instances given a user name
+            </summary>
+            <param name="userName">User's name</param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserTable`1.GetUserByEmail(System.String)">
+            <summary>
+                Get Users by email
+            </summary>
+            <param name="email"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserTable`1.GetPasswordHash(System.String)">
+            <summary>
+                Return the user's password hash
+            </summary>
+            <param name="userId">The user's id</param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserTable`1.SetPasswordHash(System.String,System.String)">
+            <summary>
+                Sets the user's password hash
+            </summary>
+            <param name="userId"></param>
+            <param name="passwordHash"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserTable`1.GetSecurityStamp(System.String)">
+            <summary>
+                Returns the user's security stamp
+            </summary>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserTable`1.Insert(`0)">
+            <summary>
+                Inserts a new user in the Users table
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserTable`1.Delete(System.String)">
+            <summary>
+                Deletes a user from the Users table
+            </summary>
+            <param name="userId">The user's id</param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserTable`1.Delete(`0)">
+            <summary>
+                Deletes a user from the Users table
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserTable`1.Update(`0)">
+            <summary>
+                Updates a user in the Users table
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.Identity.Oracle.UserTable`1.GetUsers">
+            <summary>
+                Returns all list of TUser instances
+            </summary>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

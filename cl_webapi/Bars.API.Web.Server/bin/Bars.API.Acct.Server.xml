@@ -1,0 +1,498 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Bars.API.Acct.Server</name>
+    </assembly>
+    <members>
+        <member name="T:Bars.API.Acct.Server.AcctServerAMProfile">
+            <summary>
+            Auto mapoper profile
+            </summary>
+            <remarks>
+            Contains definition for Mappings. See https://github.com/AutoMapper/AutoMapper/wiki/Getting-started for more details
+            </remarks>
+        </member>
+        <member name="T:Bars.API.Acct.Server.AcctServerModule">
+            <summary>
+            Ninject module for ACCT Server
+            </summary>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Configuration.AccountsCountConfiguration">
+            <summary>
+                Configuration (mapping model Account to database table)
+            </summary>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Configuration.AccountsCountConfiguration.#ctor">
+            <summary>
+                Constructor AccountConfiguration
+            </summary>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Configuration.IncomingDocumentConfiguration">
+            <summary>
+                Configuration (mapping model V_MBM_INCOMING_DOC to database table)
+            </summary>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Configuration.IncomingDocumentConfiguration.#ctor">
+            <summary>
+                Constructor IncomingDocumentConfiguration
+            </summary>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Configuration.TurnoverConfiguration">
+            <summary>
+                Configuration (mapping model Account to database table)
+            </summary>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Configuration.TurnoverConfiguration.#ctor">
+            <summary>
+                Constructor AccountConfiguration
+            </summary>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Configuration.DocumentConfiguration">
+            <summary>
+                Configuration (mapping model Account to database table)
+            </summary>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Configuration.DocumentConfiguration.#ctor">
+            <summary>
+                Constructor AccountConfiguration
+            </summary>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Configuration.DayTurnoverConfiguration">
+            <summary>
+                Configuration (mapping model Account to database table)
+            </summary>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Configuration.DayTurnoverConfiguration.#ctor">
+            <summary>
+                Constructor AccountConfiguration
+            </summary>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Configuration.AccountConfiguration">
+            <summary>
+                Configuration (mapping model Account to database table)
+            </summary>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Configuration.AccountConfiguration.#ctor">
+            <summary>
+                Constructor AccountConfiguration
+            </summary>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Controllers.AccountsBaseController">
+            <summary>
+                Work with accounts (base)
+            </summary>
+            <remarks>Accounts</remarks>
+        </member>
+        <member name="F:Bars.API.Acct.Server.Controllers.AccountsBaseController._repository">
+            <summary>
+            Repository object
+            </summary>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Controllers.AccountsBaseController.#ctor(Bars.API.Acct.Server.Infrastructure.Repository.IAccountsRepository)">
+            <summary>
+                Constructor AccountsBaseController
+            </summary>
+            <param name="repository"></param>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Controllers.AccountsBaseController.Get(System.Decimal)">
+            <summary>
+                Get all accounts for customer
+            </summary>
+            <remarks>Get an array of all accounts for client </remarks>
+            <param name="custId">customer code</param>
+            <returns>list of accounts</returns>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Controllers.AccountsBaseController.ODataGet(System.Decimal)">
+            <summary>
+             Get all accounts for customer (OData)
+            </summary>
+            <param name="custId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Controllers.AccountsBaseController.Get(System.Decimal,System.Decimal)">
+            <summary>
+                Get single account
+            </summary>
+            <param name="custId">customer code</param>
+            <param name="accId">account code</param>
+            <remarks>Get single account by providing a number(accId) </remarks>
+            <returns>account object</returns>
+            <response code="404">Account not found</response>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Controllers.StatementsBaseController">
+            <summary>
+            Payments Api
+            </summary>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Controllers.StatementsBaseController.#ctor(Bars.API.Acct.Server.Infrastructure.Repository.IStatementsRepository)">
+            <summary>
+            
+            </summary>
+            <param name="statementsRepository"></param>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Controllers.StatementsBaseController.Get(System.Int64)">
+            <summary>
+            Get statement by id
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Controllers.StatementsBaseController.GetFile(ExportTypes,System.Decimal,System.String,System.Nullable{System.DateTime},System.Nullable{System.DateTime})">
+            <summary>
+            Get statement by accID
+            </summary>
+            <param name="type"></param>
+            <param name="accId">Account id</param>
+            <param name="currencyCode"></param>
+            <param name="dateStart"></param>
+            <param name="dateEnd"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Controllers.TurnoversBaseController">
+            <summary>
+            Payments Api
+            </summary>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Controllers.DayTurnoversBaseController">
+            <summary>
+            Payments Api
+            </summary>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Controllers.TransactionsBaseController">
+            <summary>
+            Payments Api
+            </summary>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Controllers.TransactionsBaseController.#ctor(Bars.API.Acct.Server.Infrastructure.Repository.ITransactionsRepository)">
+            <summary>
+            Коструктор
+            </summary>
+            <param name="paymentsRepository"></param>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Controllers.TransactionsBaseController.GetByAcc(System.Int64,System.Nullable{System.DateTime},System.Nullable{System.DateTime})">
+            <summary>
+            Get transactions by accounts id
+            </summary>
+            <param name="accId"></param>
+            <param name="dateStart"></param>
+            <param name="dateEnd"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Controllers.TransactionsBaseController.Get(System.Decimal)">
+            <summary>
+            Get transaction by ID
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Controllers.TransactionsBaseController.GetAllIncoming(System.Decimal,System.Nullable{System.DateTime},System.Nullable{System.DateTime})">
+            <summary>
+            Get all incoming transactions by cystomerId
+            </summary>
+            <param name="customerId"></param>
+            <param name="dateStart"></param>
+            <param name="dateEnd"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Controllers.TransactionsBaseController.CreateTransaction(Bars.API.Acct.Models.Transaction)">
+            <summary>
+            
+            </summary>
+            <param name="transaction"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Controllers.v1.AccountsV1Controller">
+            <summary>
+                Work with accounts (V1)
+            </summary>
+            <inheritdoc />
+        </member>
+        <member name="M:Bars.API.Acct.Server.Controllers.v1.AccountsV1Controller.#ctor(Bars.API.Acct.Server.Infrastructure.Repository.IAccountsRepository)">
+            <summary>
+                Constructor AccountsV1Controller
+            </summary>
+            <param name="repository"></param>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Controllers.v1.AccountsV1Controller.Get(System.Decimal)">
+            <summary>
+                Get all accounts for customer
+            </summary>
+            <remarks>Get an array of all accounts for client </remarks>
+            <param name="custId">customer code</param>
+            <returns>list of accounts</returns>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Controllers.v1.AccountsV1Controller.Get(System.Decimal,System.Decimal)">
+            <summary>
+                Get single account
+            </summary>
+            <param name="custId">customer code</param>
+            <param name="accId">account code</param>
+            <remarks>Get single account by providing a number(accId) </remarks>
+            <returns>account object</returns>
+            <response code="404">Account not found</response>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Controllers.v1.AccountsV1Controller.ODataGet(System.Decimal)">
+            <summary>
+            
+            </summary>
+            <param name="custId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Controllers.v1.AccountsV1Controller.GetVersion">
+            <summary>
+                Get module version
+            </summary>
+            <remarks>Get version </remarks>
+            <returns>string</returns>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Controllers.V1.StatementsV1Controller">
+            <summary>
+            Accounts Api
+            </summary>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Controllers.V1.TurnoversV1Controller">
+            <summary>
+            Accounts Api
+            </summary>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Controllers.V1.DayTurnoversV1Controller">
+            <summary>
+            Accounts Api
+            </summary>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Controllers.V1.TransactionsV1Controller">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Controllers.V1.TransactionsV1Controller.#ctor(Bars.API.Acct.Server.Infrastructure.Repository.ITransactionsRepository)">
+            <param name="paymentsRepository"></param>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Controllers.v2.AccountsV2Controller">
+            <summary>
+                Work with accounts (V1)
+            </summary>
+            <inheritdoc />
+        </member>
+        <member name="M:Bars.API.Acct.Server.Controllers.v2.AccountsV2Controller.#ctor(Bars.API.Acct.Server.Infrastructure.Repository.IAccountsRepository)">
+            <summary>
+                Constructor AccountsV2Controller
+            </summary>
+            <param name="repository"></param>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Controllers.v2.AccountsV2Controller.Get(System.Decimal)">
+            <summary>
+                Get all accounts for customer (modify)
+            </summary>
+            <remarks>Get an array of all accounts for client </remarks>
+            <param name="custId">customer code</param>
+            <returns>list of accounts</returns>
+            <response code="404">Not found</response>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Controllers.v2.AccountsV2Controller.Get(System.Decimal,System.Decimal)">
+            <summary>
+                Get single account
+            </summary>
+            <param name="custId">customer code</param>
+            <param name="accId">account code</param>
+            <remarks>Get single account by providing a number(accId) </remarks>
+            <returns>account object</returns>
+            <response code="404">Account not found</response>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Controllers.v2.AccountsV2Controller.GetVersion">
+            <summary>
+                Get module version
+            </summary>
+            <remarks>Get version </remarks>
+            <returns>string</returns>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Infrastructure.Repository.AccountsRepository">
+            <summary>
+            AccountsRepository
+            </summary>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Infrastructure.Repository.AccountsRepository.#ctor(Bars.API.Core.Interfaces.IDatabaseFactory{Bars.API.Acct.Server.DbContexts.AcctDbContext})">
+            <summary>
+            Constructor AccountsRepository
+            </summary>
+            <param name="databaseFactory"></param>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Infrastructure.Repository.IAccountsRepository">
+            <summary>
+            IAccountsRepository
+            </summary>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Infrastructure.Repository.AcctDatabaseFactory">
+            <summary>
+            AcctDatabaseFactory
+            </summary>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Infrastructure.Repository.AcctDatabaseFactory.Dispose">
+            <summary>
+            Dispose
+            </summary>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Infrastructure.Repository.AcctDatabaseFactory.Get">
+            <summary>
+            AcctDbContext 
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Infrastructure.Repository.AcctDatabaseFactory.DisposeCore">
+            <summary>
+            DisposeCore
+            </summary>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Infrastructure.Repository.IncomingDocumentsRepository">
+            <summary>
+            AccountsRepository
+            </summary>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Infrastructure.Repository.IncomingDocumentsRepository.#ctor(Bars.API.Core.Interfaces.IDatabaseFactory{Bars.API.Acct.Server.DbContexts.AcctDbContext})">
+            <summary>
+            Constructor PaymentsRepository
+            </summary>
+            <param name="databaseFactory"></param>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Infrastructure.Repository.IIncomingDocumentsRepository">
+            <summary>
+            IAccountsRepository
+            </summary>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Infrastructure.Repository.StatementsRepository">
+            <summary>
+            AccountsRepository
+            </summary>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Infrastructure.Repository.StatementsRepository.GetFile(ExportTypes,Bars.API.Acct.Models.StatementParams,System.String)">
+            <summary>
+            Get statement by account id
+            </summary>
+            <param name="type"></param>
+            <param name="param"></param>
+            <param name="path"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Infrastructure.Repository.IStatementsRepository">
+            <summary>
+            IAccountsRepository
+            </summary>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Infrastructure.Repository.TurnoversRepository">
+            <summary>
+            AccountsRepository
+            </summary>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Infrastructure.Repository.ITurnoversRepository">
+            <summary>
+            IAccountsRepository
+            </summary>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Infrastructure.Repository.DocumentsRepository">
+            <summary>
+            AccountsRepository
+            </summary>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Infrastructure.Repository.DocumentsRepository.#ctor(Bars.API.Core.Interfaces.IDatabaseFactory{Bars.API.Acct.Server.DbContexts.AcctDbContext})">
+            <summary>
+            Constructor PaymentsRepository
+            </summary>
+            <param name="databaseFactory"></param>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Infrastructure.Repository.IDocumentsRepository">
+            <summary>
+            IAccountsRepository
+            </summary>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Infrastructure.Repository.DayTurnoversRepository">
+            <summary>
+            AccountsRepository
+            </summary>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Infrastructure.Repository.IDayTurnoversRepository">
+            <summary>
+            IAccountsRepository
+            </summary>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Infrastructure.Repository.TransactionsRepository">
+            <summary>
+            AccountsRepository
+            </summary>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Infrastructure.Repository.TransactionsRepository.#ctor(Bars.API.Acct.Server.Infrastructure.Repository.IDocumentsRepository,Bars.API.Acct.Server.Infrastructure.Repository.IIncomingDocumentsRepository)">
+            <summary>
+            Constructor PaymentsRepository
+            </summary>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Infrastructure.Repository.ITransactionsRepository">
+            <summary>
+            IAccountsRepository
+            </summary>
+        </member>
+        <member name="T:Bars.API.Acct.Server.DbContexts.AcctDbContext">
+            <summary>
+                DbContext for server module ACCT
+            </summary>
+        </member>
+        <member name="M:Bars.API.Acct.Server.DbContexts.AcctDbContext.#ctor(System.String)">
+            <summary>
+                Constructor AcctDbContext
+            </summary>
+            <param name="connectionString"></param>
+        </member>
+        <member name="M:Bars.API.Acct.Server.DbContexts.AcctDbContext.OnModelCreating(System.Data.Entity.DbModelBuilder)">
+            <summary>
+                Setup configuration
+            </summary>
+            <param name="modelBuilder"></param>
+        </member>
+        <member name="T:Bars.API.Acct.Server.Resources.AcctResource">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Server.Resources.AcctResource.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Server.Resources.AcctResource.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Server.Resources.AcctResource.AddingError">
+            <summary>
+              Looks up a localized string similar to Помилка додавання API.
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Server.Resources.AcctResource.DocumentNotFound">
+            <summary>
+              Looks up a localized string similar to Документ не знайдено.
+            </summary>
+        </member>
+        <member name="P:Bars.API.Acct.Server.Resources.AcctResource.NewApiAdded">
+            <summary>
+              Looks up a localized string similar to Додано нову API.
+            </summary>
+        </member>
+        <member name="T:FrxParameter">
+            <summary>
+            Параметр отчета FastReport
+            </summary>
+        </member>
+        <member name="T:FrxParameters">
+            <summary>
+            Параметры отчета FastReport
+            </summary>
+        </member>
+        <member name="M:FrxDoc.ExportToMemoryStream(ExportTypes,System.IO.MemoryStream)">
+            <summary>
+            єкспорт в поток в пам"яті
+            </summary>
+            <param name="exportType">тип файлу експорту</param>
+            <param name="stream">поток в який буде проведено експорт</param>
+        </member>
+    </members>
+</doc>

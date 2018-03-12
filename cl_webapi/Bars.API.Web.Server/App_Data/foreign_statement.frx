@@ -1,0 +1,270 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="12/29/2015 16:14:32" ReportInfo.Modified="12/13/2017 11:36:44" ReportInfo.CreatorVersion="2014.3.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+    
+
+    private void Page1_StartPage(object sender, EventArgs e)
+    {
+      System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.CreateSpecificCulture(&quot;uk&quot;);
+      System.Threading.Thread.CurrentThread.CurrentUICulture = System.Globalization.CultureInfo.CreateSpecificCulture(&quot;uk&quot;);
+    }
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <OracleDataConnection Name="cobubb" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXD2lfZr5Qr+kB9x5rruh9SOJqT5lZ/M3ven5rwUfE7nA==">
+      <TableDataSource Name="Table" Alias="v_mbm_turnovers" DataType="System.Int32" Enabled="true" SelectCommand=" select t.*, to_char(t.PAYED_DATE, 'dd.mm.yyyy') PAYED_DATE_STR, t.debit /100 dt, t.kredit / 100 cr , &#13;&#10; round((select nvl(RATE_O/BSUM,0) from cur_rates where kv = A.KV and  VDATE = trunc(sysdate)) *  t.debit / 100,2) edt,&#13;&#10; round((select nvl(RATE_O/BSUM,0) from cur_rates where kv = A.KV and  VDATE = trunc(sysdate)) * t.kredit / 100,2) ecr&#13;&#10; from v_mbm_turnovers t , accounts a&#13;&#10; where TURNOVER_DATE &gt; to_date(:p_date1,'dd.mm.yyyy') and TURNOVER_DATE &lt;= to_date(:p_date2,'dd.mm.yyyy') and A.ACC = :p_acc_id&#13;&#10; and A.ACC=T.ACC_ID&#13;&#10; order by t.payed_date asc">
+        <Column Name="ID" DataType="System.Decimal"/>
+        <Column Name="ACC_ID" DataType="System.Decimal"/>
+        <Column Name="STATE" DataType="System.Int16"/>
+        <Column Name="TRANSACTION_TYPE" DataType="System.String"/>
+        <Column Name="DOCUMENT_ID" DataType="System.Decimal"/>
+        <Column Name="DOCUMENT_NUMBER" DataType="System.String"/>
+        <Column Name="DEBIT" DataType="System.Decimal"/>
+        <Column Name="KREDIT" DataType="System.Decimal"/>
+        <Column Name="PURPOSE" DataType="System.String"/>
+        <Column Name="CORESPONDETN_BANK_ID" DataType="System.String"/>
+        <Column Name="CORESPONDENT_ACC_NUMBER" DataType="System.String"/>
+        <Column Name="CORESPONDENT_CURRENCY_ID" DataType="System.Int16"/>
+        <Column Name="CORESPONDENT_NAME" DataType="System.String"/>
+        <Column Name="CREATED_DATE" DataType="System.DateTime"/>
+        <Column Name="PAYED_DATE" DataType="System.DateTime"/>
+        <Column Name="DT" DataType="System.Decimal"/>
+        <Column Name="CR" DataType="System.Decimal"/>
+        <Column Name="CORESPONDENT_CODE" DataType="System.String"/>
+        <Column Name="PAYED_DATE_STR" DataType="System.String"/>
+        <Column Name="TURNOVER_DATE" DataType="System.DateTime"/>
+        <Column Name="EDT" DataType="System.Decimal"/>
+        <Column Name="ECR" DataType="System.Decimal"/>
+        <CommandParameter Name="p_date1" DataType="126" Expression="[p_date1]"/>
+        <CommandParameter Name="p_date2" DataType="126" Expression="[p_date2]"/>
+        <CommandParameter Name="p_acc_id" DataType="107" Expression="[p_acc_id]" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table3" Alias="header_data" DataType="System.Int32" Enabled="true" SelectCommand="select c.nmk client_name, c.okpo client_code, a.kf client_bank_id, b.nb client_bank_name, a.nls acc_num, a.nms acc_name, t.lcv acc_cur_name, to_char(a.dapp, 'dd.mm.yyyy') last_active_date, a.ostc balance,&#13;&#10; bars.fost(a.acc,to_date(:p_date1,'dd.mm.yyyy')-1) start_balance_date , bars.fost(a.acc, to_date(:p_date2,'dd.mm.yyyy')) finish_balance_date   &#13;&#10;from bars.customer c, bars.accounts a, bars.banks b, bars.tabval$global t&#13;&#10;where c.rnk=a.rnk and a.kf=b.mfo and a.kv=t.kv and a.acc=:p_acc_id">
+        <Column Name="CLIENT_NAME" DataType="System.String"/>
+        <Column Name="CLIENT_CODE" DataType="System.Decimal"/>
+        <Column Name="CLIENT_BANK_ID" DataType="System.String"/>
+        <Column Name="CLIENT_BANK_NAME" DataType="System.String"/>
+        <Column Name="ACC_NUM" DataType="System.String"/>
+        <Column Name="ACC_NAME" DataType="System.String"/>
+        <Column Name="ACC_CUR_NAME" DataType="System.String"/>
+        <Column Name="LAST_ACTIVE_DATE" DataType="System.DateTime"/>
+        <Column Name="BALANCE" DataType="System.Decimal"/>
+        <Column Name="START_BALANCE_DATE" DataType="System.Decimal"/>
+        <Column Name="FINISH_BALANCE_DATE" DataType="System.Decimal"/>
+        <CommandParameter Name="p_date1" DataType="126" Expression="[p_date1]" DefaultValue="&quot;2016-01-01&quot;"/>
+        <CommandParameter Name="p_date2" DataType="126" Expression="[p_date2]" DefaultValue="&quot;2016-01-15&quot;"/>
+        <CommandParameter Name="p_acc_id" DataType="107" Expression="[p_acc_id]" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table5" Alias="director_info" DataType="System.Int32" Enabled="true" SelectCommand="select &#13;&#10; crum.Sign_number as SIGN_NUMBER,  &#13;&#10;concat(substr(MRC.FIRST_NAME,0, 1), '.') as FIRST_NAME, &#13;&#10;MRC.LAST_NAME as SURNAME, &#13;&#10;concat(substr(MRC.SECOND_NAME, 0, 1), '.') as PATRONIMIC&#13;&#10;from Accounts a&#13;&#10;join Customer c on A.RNK = c.RNK&#13;&#10;join Mbm_cust_rel_users_map crum on c.rnk = CRUM.CUST_ID&#13;&#10;join Mbm_rel_customers mrc on crum.Rel_cust_id = mrc.ID&#13;&#10;where CRUM.SIGN_NUMBER=1 and  &#13;&#10;a.acc =:p_acc_id and&#13;&#10;rownum=1&#13;&#10;">
+        <Column Name="SIGN_NUMBER" DataType="System.Int64"/>
+        <Column Name="FIRST_NAME" DataType="System.String"/>
+        <Column Name="SURNAME" DataType="System.String"/>
+        <Column Name="PATRONIMIC" DataType="System.String"/>
+        <CommandParameter Name="p_acc_id" DataType="107" Expression="[p_acc_id]" DefaultValue="132530"/>
+      </TableDataSource>
+      <TableDataSource Name="Table7" Alias="accountant_info" DataType="System.Int32" Enabled="true" SelectCommand="select &#13;&#10; crum.Sign_number as SIGN_NUMBER,  &#13;&#10;concat(substr(MRC.FIRST_NAME,0, 1), '.') as FIRST_NAME, &#13;&#10;MRC.LAST_NAME as SURNAME, &#13;&#10;concat(substr(MRC.SECOND_NAME, 0, 1), '.') as PATRONIMIC&#13;&#10;from Accounts a&#13;&#10;join Customer c on A.RNK = c.RNK&#13;&#10;join Mbm_cust_rel_users_map crum on c.rnk = CRUM.CUST_ID&#13;&#10;join Mbm_rel_customers mrc on crum.Rel_cust_id = mrc.ID&#13;&#10;where CRUM.SIGN_NUMBER=2 and  &#13;&#10;a.acc =:p_acc_id and&#13;&#10;rownum=1">
+        <Column Name="SIGN_NUMBER" DataType="System.Int64"/>
+        <Column Name="FIRST_NAME" DataType="System.String"/>
+        <Column Name="SURNAME" DataType="System.String"/>
+        <Column Name="PATRONIMIC" DataType="System.String"/>
+        <CommandParameter Name="p_acc_id" DataType="107" Expression="[p_acc_id]" DefaultValue="0"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_date1" DataType="System.String" Expression="&quot;01.01.2016&quot;"/>
+    <Parameter Name="p_date2" DataType="System.String" Expression="&quot;29.01.2016&quot;"/>
+    <Parameter Name="p_acc_id" DataType="System.String" Expression="&quot;2208444&quot;"/>
+    <Total Name="Total_Debit_by_Period" Expression="[v_mbm_turnovers.DEBIT]/100" Evaluator="Data1"/>
+    <Total Name="Total_Credit_by_Period" Expression="[v_mbm_turnovers.KREDIT]/100" Evaluator="Data1"/>
+  </Dictionary>
+  <ReportPage Name="Page1" PaperWidth="376.5" FirstPageSource="1" OtherPagesSource="1" Guides="708.75,708.75" StartPageEvent="Page1_StartPage">
+    <ReportTitleBand Name="ReportTitle1" Width="1347.57" Height="179.55">
+      <TableObject Name="Table2" Width="1208.75" Height="132.3">
+        <TableColumn Name="Column11" Width="208.75"/>
+        <TableColumn Name="Column12" Width="500"/>
+        <TableColumn Name="Column13" Width="500"/>
+        <TableRow Name="Row3">
+          <TableCell Name="Cell11" Text="Назва Клієнта"/>
+          <TableCell Name="Cell12" Text="[header_data.CLIENT_NAME]" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell33">
+            <TextObject Name="Text1" Left="75.6" Width="557.55" Height="28.35" Text="Дата формування виписки [Date]" HorzAlign="Right"/>
+          </TableCell>
+        </TableRow>
+        <TableRow Name="Row4">
+          <TableCell Name="Cell16" Text="Код Клієнта"/>
+          <TableCell Name="Cell17" Text="[header_data.CLIENT_CODE]" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell34"/>
+        </TableRow>
+        <TableRow Name="Row5">
+          <TableCell Name="Cell21" Text="Назва банку"/>
+          <TableCell Name="Cell22" Text="[header_data.CLIENT_BANK_NAME]" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell35"/>
+        </TableRow>
+        <TableRow Name="Row6">
+          <TableCell Name="Cell26" Text="МФО банку"/>
+          <TableCell Name="Cell27" Text="[header_data.CLIENT_BANK_ID]" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell36"/>
+        </TableRow>
+        <TableRow Name="Row7">
+          <TableCell Name="Cell31" Text="Рахунок Клієнта"/>
+          <TableCell Name="Cell32" Text="[header_data.ACC_NUM]([header_data.ACC_CUR_NAME]) [header_data.ACC_NAME]" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell37"/>
+        </TableRow>
+        <TableRow Name="Row8">
+          <TableCell Name="Cell38" Text="Період виписки"/>
+          <TableCell Name="Cell39" Text="[IIf([p_date1]==[p_date2],&quot;за &quot; + [p_date1] ,&quot;з &quot; + [p_date1] + &quot; по &quot; + [p_date2])]" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell40"/>
+        </TableRow>
+        <TableRow Name="Row9">
+          <TableCell Name="Cell41" Text="Дата останнього руху коштів"/>
+          <TableCell Name="Cell42" Text="[header_data.LAST_ACTIVE_DATE]" Format="Date" Format.Format="d" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell43"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table4" Top="160.65" Width="481.95" Height="18.9">
+        <TableColumn Name="Column35" Width="217.35"/>
+        <TableColumn Name="Column36" Width="132.3"/>
+        <TableColumn Name="Column37" Width="132.3"/>
+        <TableRow Name="Row15">
+          <TableCell Name="Cell68" Text="Початковий залишок"/>
+          <TableCell Name="Cell69" Text="[Format(&quot;{0:# ##0.00;(# ##0.00);0.00}&quot;,[header_data.START_BALANCE_DATE] / 100)]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell70" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+      <BarcodeObject Name="Barcode1" Left="-9450" Top="-9450" Width="177.5" Height="94.5"/>
+    </ReportTitleBand>
+    <ColumnHeaderBand Name="ColumnHeader1" Top="183.55" Width="1347.57"/>
+    <DataBand Name="Data1" Top="276.6" Width="1347.57" Height="18.9" CanGrow="true" CanShrink="true" Guides="37.8" DataSource="Table">
+      <TableObject Name="Table4" Width="1336.09" Height="18.9" GrowToBottom="true">
+        <TableColumn Name="Column6" Width="53.27"/>
+        <TableColumn Name="Column7" Width="81.62"/>
+        <TableColumn Name="Column30" Width="1"/>
+        <TableColumn Name="Column41" Width="91.07"/>
+        <TableColumn Name="Column8" Width="91.07"/>
+        <TableColumn Name="Column60" Width="113.4"/>
+        <TableColumn Name="Column9" Width="91.07"/>
+        <TableColumn Name="Column62" Width="120.1"/>
+        <TableColumn Name="Column14" Width="100.52"/>
+        <TableColumn Name="Column17" Width="100.52"/>
+        <TableColumn Name="Column18" Width="111.86"/>
+        <TableColumn Name="Column38" Width="100.52"/>
+        <TableColumn Name="Column31" Width="280.07"/>
+        <TableRow Name="Row2" AutoSize="true">
+          <TableCell Name="Cell6" Border.Lines="All" Text=" [Row#]" Padding="0, 1, 0, 1" VertAlign="Center" Font="Arial, 8.25pt"/>
+          <TableCell Name="Cell7" Border.Lines="All" Text="[v_mbm_turnovers.DOCUMENT_NUMBER]" VertAlign="Center" Font="Arial, 8.25pt"/>
+          <TableCell Name="Cell75"/>
+          <TableCell Name="Cell74" Border.Lines="Right, Top, Bottom" Text="[v_mbm_turnovers.PAYED_DATE_STR]" VertAlign="Center" Font="Arial, 8.25pt"/>
+          <TableCell Name="Cell8" Border.Lines="All" Text="[IIf([v_mbm_turnovers.DEBIT] == 0, &quot;&quot;, [v_mbm_turnovers.DT])]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 8.25pt"/>
+          <TableCell Name="Cell106" Border.Lines="All" Text="[IIf([v_mbm_turnovers.DEBIT] == 0, &quot;&quot;, [v_mbm_turnovers.edt])]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 8.25pt"/>
+          <TableCell Name="Cell9" Border.Lines="All" Text="[IIf([v_mbm_turnovers.KREDIT] == 0, &quot;&quot;, [v_mbm_turnovers.CR])]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 8.25pt"/>
+          <TableCell Name="Cell108" Border.Lines="All" Text="[IIf([v_mbm_turnovers.KREDIT] == 0, &quot;&quot;, [v_mbm_turnovers.ecr])]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 8.25pt"/>
+          <TableCell Name="Cell19" Border.Lines="All" Text="[v_mbm_turnovers.CORESPONDENT_NAME]" VertAlign="Center" Font="Arial, 8.25pt"/>
+          <TableCell Name="Cell58" Border.Lines="All" Text="[v_mbm_turnovers.CORESPONDENT_CODE]" VertAlign="Center" Font="Arial, 8.25pt"/>
+          <TableCell Name="Cell23" Border.Lines="All" Text="[v_mbm_turnovers.CORESPONDENT_ACC_NUMBER]" VertAlign="Center" Font="Arial, 8.25pt"/>
+          <TableCell Name="Cell71" Border.Lines="All" Text="[v_mbm_turnovers.CORESPONDETN_BANK_ID]" VertAlign="Center" Font="Arial, 8.25pt"/>
+          <TableCell Name="Cell59" Border.Lines="All" Text="[v_mbm_turnovers.PURPOSE]" VertAlign="Center" Font="Arial, 8.25pt"/>
+        </TableRow>
+      </TableObject>
+      <DataHeaderBand Name="DataHeader1" Top="187.55" Width="1347.57" Height="85.05">
+        <TableObject Name="Table4" Width="1336.09" Height="47.25" Border.Lines="Top, Bottom">
+          <TableColumn Name="Column24" Width="53.27"/>
+          <TableColumn Name="Column25" Width="81.62"/>
+          <TableColumn Name="Column23" Width="1"/>
+          <TableColumn Name="Column40" Width="91.07"/>
+          <TableColumn Name="Column26" Width="91.07"/>
+          <TableColumn Name="Column59" Width="113.4"/>
+          <TableColumn Name="Column27" Width="91.07"/>
+          <TableColumn Name="Column61" Width="120.1"/>
+          <TableColumn Name="Column28" Width="100.52"/>
+          <TableColumn Name="Column15" Width="100.52"/>
+          <TableColumn Name="Column16" Width="111.86"/>
+          <TableColumn Name="Column39" Width="100.52"/>
+          <TableColumn Name="Column29" Width="280.07"/>
+          <TableRow Name="Row12" Height="47.25">
+            <TableCell Name="Cell50" Border.Lines="Left, Right" Text="№ п/п" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell51" Border.Lines="Right" Text="№ док-та" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell76"/>
+            <TableCell Name="Cell73" Border.Lines="Right, Top, Bottom" Text="Дата проведення" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell53" Border.Lines="Right" Text="ДТ рахунку" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell105" Border.Lines="Right" Text="ДТ рахунку (еквівалент)" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell54" Border.Lines="Right" Text="КТ рахунку" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell107" Border.Lines="Right" Text="КТ рахунку (еквівалент)" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell18" Border.Lines="Right" Text="Назва контрагента" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell20" Border.Lines="Right" Text="Код контрангента" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell55" Border.Lines="Right" Text="Рахунок&#13;&#10;контрагента" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell72" Border.Lines="All" Text="МФО контрагента" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell56" Border.Lines="Right" Text="Призначення платежу" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          </TableRow>
+        </TableObject>
+      </DataHeaderBand>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="312.95" Width="1347.57" Height="38.8">
+      <TableObject Name="Table1" Width="519.75" Height="37.8">
+        <TableColumn Name="Column32" Width="207.9"/>
+        <TableColumn Name="Column33" Width="103.95"/>
+        <TableColumn Name="Column34" Width="207.9"/>
+        <TableRow Name="Row13">
+          <TableCell Name="Cell60" Text="Оборотів за період"/>
+          <TableCell Name="Cell61" Text="[Format(&quot;{0:# ##0.00;(# ##0.00);0.00}&quot;,[Total_Debit_by_Period])]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell62" Text="[Format(&quot;{0:# ##0.00;(# ##0.00);0.00}&quot;,[Total_Credit_by_Period])]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row14">
+          <TableCell Name="Cell65" Text="Вихідний залишок"/>
+          <TableCell Name="Cell66" Text="[Format(&quot;{0:# ##0.00;(# ##0.00);0.00}&quot;,[header_data.FINISH_BALANCE_DATE] / 100)]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell67"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table6" Left="916.65" Width="425.25" Height="19.9">
+        <TableColumn Name="Column42" Width="135.45"/>
+        <TableColumn Name="Column43" Width="144.9"/>
+        <TableColumn Name="Column44" Width="144.9"/>
+        <TableRow Name="Row16">
+          <TableCell Name="Cell77" Text="[IIf([director_info.FIRST_NAME]==&quot; &quot;, &quot;&quot;, &quot;Директор&quot;)]"/>
+          <TableCell Name="Cell78" Text="[[director_info.SURNAME] + &quot; &quot; + [director_info.FIRST_NAME] + [director_info.PATRONIMIC]]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell83"/>
+        </TableRow>
+        <TableRow Name="Row17" Height="1">
+          <TableCell Name="Cell87"/>
+          <TableCell Name="Cell86"/>
+          <TableCell Name="Cell84"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table8" Left="916.65" Top="18.9" Width="425.25" Height="19.9">
+        <TableColumn Name="Column45" Width="135.45"/>
+        <TableColumn Name="Column46" Width="144.9"/>
+        <TableColumn Name="Column47" Width="144.9"/>
+        <TableRow Name="Row18">
+          <TableCell Name="Cell88" Text="[IIf([accountant_info.FIRST_NAME]==&quot; &quot;, &quot;&quot;, &quot;Бухгалтер&quot;)]"/>
+          <TableCell Name="Cell89" Text="[[accountant_info.SURNAME] + &quot; &quot; + [accountant_info.FIRST_NAME] + [accountant_info.PATRONIMIC]]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell90"/>
+        </TableRow>
+        <TableRow Name="Row19" Height="1">
+          <TableCell Name="Cell91"/>
+          <TableCell Name="Cell92"/>
+          <TableCell Name="Cell93"/>
+        </TableRow>
+      </TableObject>
+    </ReportSummaryBand>
+    <ColumnFooterBand Name="ColumnFooter1" Top="299.5" Width="1347.57" Height="9.45"/>
+    <PageFooterBand Name="PageFooter1" Top="355.75" Width="1347.57" Height="264.6">
+      <TextObject Name="Text2" Left="1237.95" Width="113.4" Height="18.9" Text="сторінка [Page#]"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

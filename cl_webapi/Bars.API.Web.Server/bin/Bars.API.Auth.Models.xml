@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Bars.API.Auth.Models</name>
+    </assembly>
+    <members>
+        <member name="T:Bars.API.Auth.Models.Device">
+            <summary>
+            List of devices
+            </summary>
+        </member>
+        <member name="T:Bars.API.Auth.Models.RegistrationQueue">
+            <summary>
+            Черга рееєстрації
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.RegistrationQueue.BankId">
+            <summary>
+            Код установи
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.RegistrationQueue.CustId">
+            <summary>
+            Код клієнта (RNK)
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.RegistrationQueue.PhoneNumber">
+            <summary>
+            Номер телефону
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.RegistrationQueue.SessionId">
+            <summary>
+            Сессія регістрації
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.RegistrationQueue.EDRPO">
+            <summary>
+            Унікальний код клієнта ЕДРПО
+            </summary>
+        </member>
+        <member name="T:Bars.API.Auth.Models.UserCustomerBank">
+            <summary>
+            Represent appearance of the customer in one bank instance (MFO)
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.UserCustomerBank.EDRPO">
+            <summary>
+            Customer EDRPO (unique in all banks)
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.UserCustomerBank.CustId">
+            <summary>
+            Customer identifier in bank (rnk as usual) (is unique only inside one bank)
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.UserCustomerBank.BankId">
+            <summary>
+            Bank identifier
+            </summary>
+        </member>
+        <member name="T:Bars.API.Auth.Models.UserCustomers">
+            <summary>
+            Realtions beetwen 
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.UserCustomers.UserId">
+            <summary>
+            User id
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.UserCustomers.EDRPO">
+            <summary>
+            Customer EDRPO
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.UserCustomers.ProviderId">
+            <summary>
+            Customor Id
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.UserCustomers.SignNumber">
+            <summary>
+            Sign number
+            </summary>
+        </member>
+    </members>
+</doc>
