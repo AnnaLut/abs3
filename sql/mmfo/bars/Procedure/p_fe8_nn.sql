@@ -4,11 +4,13 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe8_nn (dat_     DATE,
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #E8 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 2008.  All Rights Reserved.
-% VERSION     : 05/03/2018 (02/03/2018, 15/02/2018)
+% VERSION     : 12/03/2018 (05/03/2018, 02/03/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+12.03.2018 - для группы 921 динамически выбираем необходимые поля т.к. 
+             в РУ отсутствует поле ACC9B 
 05.03.2018 - для бал.счетов группы 162 номер договора, дату начала и дату 
              окончания вибираем из табл. CC_DEAL                          
              (добавлено в те блоки где обрабатывается группа 270)
@@ -549,13 +551,12 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe8_nn (dat_     DATE,
       if substr(nls_,1,3) = '921'
       then
          begin
-            select fx.ntik, fx.dat, fx.dat_a 
-               into p090_, p111p_, p112p_
-            from fx_deal fx
-            where fx.acc9b = acc_
-              --and fx.sos <> 15
-              and fx.dat_b > dat_
-              and rownum = 1;
+            execute immediate ' select fx.ntik, fx.dat, fx.dat_a 
+                                from fx_deal fx 
+                                where fx.acc9b = :acc_
+                                  and fx.dat_b > :dat_
+                                  and rownum = 1 '
+            into p090_, p111p_, p112p_ using acc_, dat_;
          exception when no_data_found then
             null;
          end;
