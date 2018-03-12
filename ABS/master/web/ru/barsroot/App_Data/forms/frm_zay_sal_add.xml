@@ -125,6 +125,12 @@
             <uicontrol type="CheckBox" truevalue="1" align="Center" readonly="true"/>
           </form>
         </field>
+        <field name="OBZ" datatype="Boolean" key="false" sort="Default">
+          <column show="true" caption="ОБЗ" align="Center" width="25"/>
+          <form show="false" rwmode="RO" required="false" columnindex="1" index="16">
+            <uicontrol type="CheckBox" truevalue="1" align="Center" readonly="true"/>
+          </form>
+        </field>
         <field datatype="Int64" key="false" name="KB">
           <column show="true"  caption="Кл-Б" align="Center"></column>
           <form show="false" rwmode="RO" required="false" columnindex="3" index="32">
