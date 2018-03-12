@@ -11,7 +11,7 @@ PROMPT *** Create  view V_ZAY_SALFORM ***
  "NMK", "ACC0", "ACC1", "NLS", "OSTC", "S2", "DIG", "S2S", "MFO0", "NLS0", "KV_CONV", "LCV_CONV",
  "NLS_ACC0", "FDAT", "ND", "KOM", "SKOM", "KURS_Z", "KURS_F", "VDATE", "META", "AIM_NAME", 
  "CONTRACT", "DATC", "NUM_VMD", "VMD1", "BASIS", "DATZ", "COMM", "CONTACT_FIO", "CONTACT_TEL",
- "COVERED", "KB", "KV", "DOC_DESC", "DATT","F092") AS 
+ "COVERED", "KB", "KV", "DOC_DESC", "DATT","OBZ","F092") AS 
   select v.id,
           v.sos,
           decode(v.viza,-1, '-1-Відмовлено у візі',0,'0-Чекає на візу',2,'2-Підтверджено як пріоритетну','1-Завізовано') sviza,
@@ -53,6 +53,7 @@ PROMPT *** Create  view V_ZAY_SALFORM ***
           v.kv2 kv,
           nvl(zc.doc_desc,null) doc_desc,
           v.datt,
+          v.obz,
           v.f092
           from v_zay_queue v , country c, country cc, zay_corpdocs zc
           where v.dk  in (2,4)
