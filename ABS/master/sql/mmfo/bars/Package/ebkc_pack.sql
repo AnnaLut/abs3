@@ -1,11 +1,14 @@
 create or replace package EBKC_PACK
 is
-
-  g_header_version constant varchar2(64) := 'version 1.00 31/04/2016';
+  --
+  -- Customer Data Management (CDM)
+  --
+  g_header_version constant varchar2(64) := 'version 1.01 13/03/2018';
 
   -- типи клієнтів, що використовуються в ЕБК Корп
-  LEGAL_PERSON      constant varchar2(1) := 'L';   -- Юр.особа
-  PRIVATE_ENT       constant varchar2(1) := 'P';   -- ФОП
+  LEGAL_ENTITY      constant varchar2(1) := 'L';   -- ЮО
+  PRIVATE_ENT       constant varchar2(1) := 'P';   -- ФОП (Entepreneur)
+  INDIVIDUAL        constant varchar2(1) := 'I';   -- ФО
 
   -- header_version - возвращает версию заголовка пакета
   function header_version return varchar2;
@@ -82,81 +85,41 @@ create or replace package body EBKC_PACK
 is
 
   -- Версія пакету
-  g_body_version constant varchar2(64) := 'version 1.02 19/01/2018';
-  g_dbgcode constant varchar2(20)      := 'ebkc_pack';
+  g_body_version constant varchar2(64) := 'version 1.03 13/03/2018';
 
   -- header_version - возвращает версию заголовка пакета
   function header_version return varchar2 is
   begin
-    return 'Package header ' || g_dbgcode || ' ' || g_header_version || '.';
+    return 'Package '||$$PLSQL_UNIT||' header '||g_header_version||'.';
   end header_version;
 
   -- body_version - возвращает версию тела пакета
   function body_version return varchar2 is
   begin
-    return 'Package body '   || g_dbgcode || ' ' || g_body_version || '.';
+    return 'Package '||$$PLSQL_UNIT||' body '||g_body_version||'.';
   end body_version;
 
-  --
-  --
-  --
-  function is_legal_pers
-  ( p_rnk  in     number
-  ) return boolean
+  function get_custtype( p_rnk in number) return varchar2
   is
-    -- l_legal       boolean := false;
-    -- cursor c_legal
-    -- is
-    -- select null
-    --   from customer
-    --   where rnk = p_rnk
-    --     and custtype = 2;
-    -- r_legal c_legal%ROWTYPE;
+    l_ret varchar2(1);
   begin
-    -- OPEN c_legal;
-    -- FETCH c_legal INTO r_legal;
-    -- l_legal := c_legal%FOUND;
-    -- CLOSE c_legal;
-    for x in ( select 0
-                 from customer
-                where rnk = p_rnk
-                  and custtype = 2 )
+    for x in ( select CUSTTYPE, trim(SED) as SED
+                 from CUSTOMER
+                where RNK = p_rnk )
     loop
-     return true;
+      return case
+             when ( x.CUSTTYPE = 2 )
+             then LEGAL_ENTITY
+             when ( x.CUSTTYPE = 3 )
+             then case 
+                  when ( x.SED = '91' )
+                  then PRIVATE_ENT
+                  else INDIVIDUAL
+                  end
+             else null
+             end;
     end loop;
-
-    return false;
-
-  end is_legal_pers;
-
-  --
-  --
-  --
-  function is_private_ent( p_rnk in number
-  ) return boolean
-  is
-  begin
-    for x in ( select 0
-                 from customer
-                where rnk = p_rnk
-                  and custtype = 3
-                  and sed = '91  ' )
-    loop
-      return true;
-    end loop;
-
-    return false;
-
-  end is_private_ent;
-
-  function get_custtype(p_rnk in number) return varchar2 is
-  l_ret varchar2(1);
-  begin
-    if    is_legal_pers(p_rnk)  then l_ret := LEGAL_PERSON;
-    elsif is_private_ent(p_rnk) then l_ret := PRIVATE_ENT;
-    end if;
-    return l_ret;
-  end get_custtype;
+  end GET_CUSTTYPE;
 
   procedure save_into_hist(p_rnk in number) is
   begin
@@ -287,36 +250,81 @@ is
   --
   -- дублікати по ЮО,ФОП отримані від ЕГАРа
   --
-  procedure request_dup_mass
-  ( p_batchId in varchar2,
-    p_kf in varchar2,
-    p_rnk in number,
-    p_custtype in varchar2,
+  procedure REQUEST_DUP_MASS
+  ( p_batchId       in varchar2,
+    p_kf            in varchar2,
+    p_rnk           in number,
+    p_custtype      in varchar2,
     p_duplicate_ebk in t_duplicate_ebk
   ) is
-    l_rnk               customer.rnk%type;
+    title           constant     varchar2(64) := $$PLSQL_UNIT||'.REQUEST_DUP_MASS';
+    l_rnk                        customer.rnk%type;
   begin
 
+    bars_audit.trace( '%s: Entry with ( p_kf=%s, p_rnk=%s, p_custtype=%s ).', title, p_kf, to_char(p_rnk), p_custtype );
+
+    case
+    when ( p_kf is null )
+    then raise_application_error( -20666,'Value for parameter [p_kf] must be specified!', true );
+    when ( p_rnk is null )
+    then raise_application_error( -20666,'Value for parameter [p_rnk] must be specified!', true );
+    when ( p_custtype is null )
+    then raise_application_error( -20666,'Value for parameter [p_custtype] must be specified!', true );
+    when ( p_duplicate_ebk is null or p_duplicate_ebk.count = 0 )
+    then raise_application_error( -20666,'Value for parameter [p_duplicate_ebk] must be specified!', true );
+    else null;
+    end case;
+
 $if EBK_PARAMS.CUT_RNK $then
+    bc.set_policy_group('WHOLE');
     l_rnk := EBKC_WFORMS_UTL.GET_RNK(p_rnk,p_kf);
 $else
     l_rnk := p_rnk;
 $end
 
-    bars_audit.info('save received dublicate for rnk='||l_rnk);
+    bars_audit.info( title||': save received dublicate for rnk='||l_rnk );
 
     insert
-      into ebkc_duplicate
+      into EBKC_DUPLICATE
          ( KF, RNK, DUP_KF, DUP_RNK, CUST_TYPE )
-    select p_kf, l_rnk, dup.kf, dup.rnk, p_custtype
+    select p_kf, l_rnk, dup.kf
+$if EBK_PARAMS.CUT_RNK $then
+         , EBKC_WFORMS_UTL.GET_RNK(dup.RNK,dup.KF)
+$else
+         , dup.RNK
+$end
+         , p_custtype
       from table (p_duplicate_ebk) dup
      where not exists ( select null
-                          from ebkc_duplicate
-                         where kf  = p_kf
-                           and rnk = l_rnk
-                           and dup_kf = dup.kf
-                           and rnk = dup.rnk );
-  end request_dup_mass;
+                          from EBKC_DUPLICATE
+                         where KF      = p_kf
+                           and RNK     = l_rnk
+$if EBK_PARAMS.CUT_RNK $then
+                           and DUP_RNK = EBKC_WFORMS_UTL.GET_RNK(dup.RNK,dup.KF)
+$else
+                           and DUP_KF  = dup.KF
+$end
+                           and DUP_RNK = dup.RNK
+                      );
+
+    commit;
+
+$if EBK_PARAMS.CUT_RNK $then
+    bc.set_context;
+$end
+
+    bars_audit.trace( '%s: Exit.', title );
+
+  exception
+    when others then
+$if EBK_PARAMS.CUT_RNK $then
+      bc.set_context;
+$end
+      bars_audit.error( title || ': p_batch='||p_batchid||', p_kf='||p_kf||', p_rnk='||to_char(p_rnk)
+                              || ', p_duplicate_ebk.count='||to_char(p_duplicate_ebk.count) );
+      bars_audit.error( title || ': ' || dbms_utility.format_error_stack() || dbms_utility.format_error_backtrace() );
+      raise_application_error( -20666, title || ': ' || SQLERRM, true );
+  end REQUEST_DUP_MASS;
 
   --
   -- дублікати по ЮО, отримані від ЕГАРа
@@ -326,7 +334,7 @@ $end
                      p_rnk in number,
                      p_duplicate_ebk in t_duplicate_ebk) is
   begin
-    request_dup_mass (p_batchId, p_kf, p_rnk, 'L', p_duplicate_ebk);
+    request_dup_mass( p_batchId, p_kf, p_rnk, 'L', p_duplicate_ebk );
   end request_legal_dup_mass;
 
   --
@@ -352,11 +360,23 @@ $end
     p_slave_client_ebk in     t_slave_client_ebk
   ) is
     title          constant   varchar2(64) := $$PLSQL_UNIT||'.REQUEST_GCIF_MASS';
-    l_sysdate                 date;
+    l_sys_dt                  ebkc_gcif.insert_date%type := sysdate;
     l_rnk                     customer.rnk%type;
   begin
 
-    l_sysdate := sysdate;
+    bars_audit.trace( '%s: Entry with ( p_kf=%s, p_rnk=%s, p_gcif=%s ).', title, p_kf, to_char(p_rnk), p_gcif );
+
+    case
+    when ( p_kf is null )
+    then raise_application_error( -20666,'Value for parameter [p_kf] must be specified!', true );
+    when ( p_rnk is null )
+    then raise_application_error( -20666,'Value for parameter [p_rnk] must be specified!', true );
+    when ( p_gcif is null )
+    then raise_application_error( -20666,'Value for parameter [p_gcif] must be specified!', true );
+    when ( p_custtype is null )
+    then raise_application_error( -20666,'Value for parameter [p_custtype] must be specified!', true );
+    else null;
+    end case;
 
 $if EBK_PARAMS.CUT_RNK $then
     bc.set_policy_group('WHOLE');
@@ -365,32 +385,57 @@ $else
     l_rnk := p_rnk;
 $end
 
-    -- перед загрузкой мастер-записи  с GCIF - ом и подчиненных записей,
-    -- необходимо очистить старую загрузку подчиненных карточек по этой же мастер карточке,
-    -- т.к. могли быть добавлены или уделены некоторые
+    -- перед загрузкой мастер-записи  с GCIF-ом и подчиненных записей,
+    -- необходимо очистить старую загрузку подчиненных карточек по этой же мастер карточке
 
     delete EBKC_SLAVE
-     where gcif = p_gcif
-        or gcif = (select gcif from ebkc_gcif where kf = p_kf and rnk = l_rnk) ;
+     where GCIF = p_gcif
+        or GCIF in ( select GCIF
+                       from EBKC_GCIF
+                      where RNK = l_rnk
+--                      and CUST_TYPE = g_cust_tp 
+                   );
 
     delete EBKC_GCIF
-     where (kf = p_kf and rnk = l_rnk)
-        or (gcif = p_gcif);
+     where RNK = l_rnk
+        or ( KF = p_kf and GCIF = p_gcif );
 
-    -- записиваем присланную актуальную структуру
-   insert into ebkc_gcif(kf, rnk, gcif, insert_date, cust_type)
-   values (p_kf, l_rnk, p_gcif, l_sysdate, p_custtype);
-
+   -- записиваем присланную актуальную структуру
    insert
-     into ebkc_slave
-        ( gcif, slave_kf, slave_rnk, cust_type )
-   select p_gcif, sce.kf, sce.rnk, p_custtype
-     from table( p_slave_client_ebk ) sce
-    where not exists ( select null from ebkc_slave
-                        where gcif = p_gcif
-                          and slave_kf = sce.kf
-                          and slave_rnk = sce.rnk
-                          and cust_type = p_custtype );
+     into EBKC_GCIF
+        ( KF, RNK, GCIF, CUST_TYPE, INSERT_DATE )
+   values
+        ( p_kf, l_rnk, p_gcif, p_custtype, l_sys_dt );
+
+    if ( p_slave_client_ebk.count > 0 )
+    then
+
+      insert
+        into EBKC_SLAVE
+           ( GCIF, SLAVE_KF, SLAVE_RNK, CUST_TYPE )
+      select p_gcif
+           , sce.KF
+$if EBK_PARAMS.CUT_RNK $then
+           , EBKC_WFORMS_UTL.GET_RNK( sce.RNK, sce.KF )
+$else
+           , sce.RNK
+$end
+           , p_custtype
+        from table( p_slave_client_ebk ) sce
+       where not exists ( select 0
+                            from EBKC_SLAVE
+                           where GCIF      = p_gcif
+                             and SLAVE_KF  = sce.KF
+$if EBK_PARAMS.CUT_RNK $then
+                             and SLAVE_RNK = EBKC_WFORMS_UTL.GET_RNK(sce.RNK,sce.KF)
+$else
+                             and SLAVE_RNK = sce.RNK
+$end
+                             and CUST_TYPE = p_custtype
+                        );
+
+   end if;
+
    commit;
 
 $if EBK_PARAMS.CUT_RNK $then
@@ -405,8 +450,9 @@ $end
 $if EBK_PARAMS.CUT_RNK $then
       bc.set_context;
 $end
-      bars_audit.error( title || ': p_batch='||p_batchid||', p_kf='||p_kf||', p_rnk='||to_char(p_rnk)||', p_gcif='||p_gcif );
-      bars_audit.error( title || ': ' || dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace() );
+      bars_audit.error( title || ': p_batch='||p_batchid||', p_kf='      ||p_kf      ||', p_rnk='                ||to_char(p_rnk)
+                              || ', p_gcif=' ||p_gcif   ||', p_custtype='||p_custtype||', p_slave_clients.count='||to_char(p_slave_client_ebk.count) );
+      bars_audit.error( title || ': ' || dbms_utility.format_error_stack() || dbms_utility.format_error_backtrace() );
       raise_application_error( -20666, title || ': ' || SQLERRM, true );
   end REQUEST_GCIF_MASS;
 
@@ -570,19 +616,18 @@ $end
   --
   -- run from JOB
   --
-  procedure create_group_duplicate
+  procedure CREATE_GROUP_DUPLICATE
   is
-    l_trace  varchar2(500) := g_dbgcode || 'create_group_duplicate: ';
-    l_kf varchar2(6);
-    l_cycle integer;
-    l_lock VARCHAR2(30);
-    l_status NUMBER;
+    title   constant   varchar2(64) := $$PLSQL_UNIT||'.CREATE_GROUP_DUPLICATE';
+    l_kf               varchar2(6);
+    l_lock             varchar2(30);
+    l_status           number;
     ---
     procedure create_group_duplicate_kf
     is
     begin
 
-      bars_audit.info(l_trace||' Entry with KF='||l_kf);
+      bars_audit.info( title||': Entry with KF='||l_kf);
 
       for r in ( select distinct rnk
                    from ebkc_duplicate
@@ -591,7 +636,7 @@ $end
                   order by rnk )
       loop
 
-        dbms_application_info.set_client_info(l_trace|| ' set MC for rnk=' || r.rnk);
+        dbms_application_info.set_client_info( title||': set MC for rnk=' || r.rnk);
 
         -- устанавливаем основную карточку
         -- выбор по правилу наивыcшего - продукт,дата последней модификации, качество картки клиента
@@ -619,7 +664,7 @@ $end
                     )
         loop
 
-            bars_audit.trace(l_trace||'set master card for rnk = %s, dup_rnk = %s, last_modifc_date=%s, quality=%s, master_card=%s',
+            bars_audit.trace( title||': set master card for rnk = %s, dup_rnk = %s, last_modifc_date=%s, quality=%s, master_card=%s',
                                to_char(x.rnk), to_char(x.dup_rnk), to_char(x.last_modifc_date), to_char(x.quality), to_char(x.master_queue));
             if x.master_queue = 1
             then -- это наша основная карточка
@@ -634,13 +679,13 @@ $end
           end loop;
       end loop;
 
-      bars_audit.info(l_trace||' Exit.');
+      bars_audit.info( title||': Exit.');
 
     end create_group_duplicate_kf;
     ---
   begin
 
-    bars_audit.info(l_trace||' Start');
+    bars_audit.info( title||': Started.');
 
     l_kf := sys_context('bars_context','user_mfo');
 
@@ -648,7 +693,7 @@ $end
     dbms_lock.allocate_unique('LegalDuplicateGroups', l_lock);
     l_status := dbms_lock.request(l_lock, dbms_lock.x_mode,180,true);
 
-    bars_audit.trace('dbms_lock status for LegalDuplicateGroups = %s', to_char(l_status));
+    bars_audit.trace( '%s: dbms_lock status for LegalDuplicateGroups = %s', title, to_char(l_status));
 
     if l_status = 0
     THEN
@@ -689,7 +734,7 @@ $end
 
    end if;
    l_status := dbms_lock.release(l_lock);
-   bars_audit.info(l_trace||' finished');
+   bars_audit.info( title||': Finished.');
    exception
      when others then
        rollback;
