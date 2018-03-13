@@ -1,8 +1,3 @@
-=========  svn diff --summarize -r 49632:49722 D:\SVN\master\web\ru
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.188\ru\web\barsroot\Areas\Zay\Scripts\CurrencySaleSighting\currencySaleSightCtrl.js
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.188\ru\web\barsroot\Areas
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.188\ru\web\barsroot\App_Data\forms\frm_zay_sal_add_edit.xml
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.188\ru\web\barsroot\App_Data\forms\frm_zay_sal_add.xml
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.188\ru\web\barsroot
----web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.188\ru\web
-Bugfix_2.0.35.5.188 (Rev:49632-49722
+=========  svn diff --summarize -r 49723:49776 D:\SVN\master\web\ru
+---web_release----: D:\SVN\Releases\Bugfix_2.0.35.5.189\ru\web\barsroot\version.abs
+Bugfix_2.0.35.5.189 (Rev:49723-49776
