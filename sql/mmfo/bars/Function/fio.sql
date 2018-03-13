@@ -1,9 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/function/fio.sql =========*** Run *** ======
- PROMPT ===================================================================================== 
- 
+prompt function bars.fio
   CREATE OR REPLACE FUNCTION BARS.FIO (p_nmk VARCHAR, p_par NUMBER) RETURN VARCHAR2
 IS
   l_1space NUMBER;
@@ -66,10 +61,4 @@ grant EXECUTE                                                                on 
 grant EXECUTE                                                                on FIO             to START1;
 grant EXECUTE                                                                on FIO             to UPLD;
 grant EXECUTE                                                                on FIO             to WR_ALL_RIGHTS;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/function/fio.sql =========*** End *** ======
- PROMPT ===================================================================================== 
- 
+grant EXECUTE                                                                on FIO             to BARS_INTGR;

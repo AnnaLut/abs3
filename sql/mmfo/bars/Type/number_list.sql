@@ -1,9 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/type/number_list.sql =========*** Run *** ==
- PROMPT ===================================================================================== 
- 
+prompt type/number_list.sql
   CREATE OR REPLACE TYPE BARS.NUMBER_LIST as table of number(38, 12)
 /
 
@@ -15,10 +10,4 @@ grant EXECUTE                                                                on 
 grant EXECUTE                                                                on NUMBER_LIST     to BARS_DM;
 grant EXECUTE                                                                on NUMBER_LIST     to UPLD;
 grant EXECUTE                                                                on NUMBER_LIST     to WR_ALL_RIGHTS;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/type/number_list.sql =========*** End *** ==
- PROMPT ===================================================================================== 
- 
+grant EXECUTE                                                                on NUMBER_LIST     to BARS_INTGR;

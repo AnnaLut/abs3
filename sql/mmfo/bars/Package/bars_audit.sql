@@ -1,9 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_audit.sql =========*** Run *** 
- PROMPT ===================================================================================== 
- 
+prompt package/bars_audit.sql
   CREATE OR REPLACE PACKAGE BARS.BARS_AUDIT 
 is
 
@@ -2422,10 +2417,4 @@ grant EXECUTE                                                                on 
 grant EXECUTE                                                                on BARS_AUDIT      to START1;
 grant EXECUTE                                                                on BARS_AUDIT      to UPLD;
 grant EXECUTE                                                                on BARS_AUDIT      to WR_ALL_RIGHTS;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_audit.sql =========*** End *** 
- PROMPT ===================================================================================== 
- 
+grant EXECUTE                                                                on BARS_AUDIT      to BARS_INTGR;
