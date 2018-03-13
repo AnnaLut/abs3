@@ -1,8 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/function/getbrat.sql =========*** Run *** ==
- PROMPT ===================================================================================== 
+prompt function/getbrat.sql
  
   CREATE OR REPLACE FUNCTION BARS.GETBRAT (dat_ DATE,nb_ SMALLINT,kv_ SMALLINT,s_ SMALLINT)
 RETURN NUMBER IS
@@ -46,10 +42,5 @@ grant EXECUTE                                                                on 
 grant EXECUTE                                                                on GETBRAT         to DPT;
 grant EXECUTE                                                                on GETBRAT         to DPT_ROLE;
 grant EXECUTE                                                                on GETBRAT         to WR_ALL_RIGHTS;
+grant EXECUTE                                                                on GETBRAT         to BARS_INTGR;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/function/getbrat.sql =========*** End *** ==
- PROMPT ===================================================================================== 
- 

@@ -1409,3 +1409,4 @@ grant EXECUTE                                                                on 
 grant EXECUTE                                                                on BARS_LOGIN      to WCS_SYNC_USER;
 grant EXECUTE                                                                on BARS_LOGIN      to WR_ALL_RIGHTS;
 grant EXECUTE                                                                on BARS_LOGIN      to BARS_DM;
+grant EXECUTE                                                                on BARS_LOGIN      to BARS_INTGR;

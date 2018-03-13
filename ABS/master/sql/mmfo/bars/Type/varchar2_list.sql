@@ -1,9 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/type/varchar2_list.sql =========*** Run *** 
- PROMPT ===================================================================================== 
- 
+prompt type/varchar2_list.sql 
   CREATE OR REPLACE TYPE BARS.VARCHAR2_LIST AS TABLE OF VARCHAR2(32000);
 /
 
@@ -16,10 +11,4 @@ grant EXECUTE                                                                on 
 grant EXECUTE                                                                on VARCHAR2_LIST   to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on VARCHAR2_LIST   to UPLD;
 grant EXECUTE                                                                on VARCHAR2_LIST   to WR_ALL_RIGHTS;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/type/varchar2_list.sql =========*** End *** 
- PROMPT ===================================================================================== 
- 
+grant EXECUTE                                                                on VARCHAR2_LIST   to BARS_INTGR;

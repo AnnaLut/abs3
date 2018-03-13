@@ -1,10 +1,5 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_ourmfo_g.sql =========*** Run ***
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE FUNCTION BARS.F_OURMFO_G RETURN VARCHAR2 IS
+prompt function/f_ourmfo_g.sql
+CREATE OR REPLACE FUNCTION BARS.F_OURMFO_G RETURN VARCHAR2 IS
   N_MFO NUMBER;
 BEGIN
   begin
@@ -31,10 +26,4 @@ grant EXECUTE                                                                on 
 grant EXECUTE                                                                on F_OURMFO_G      to START1;
 grant EXECUTE                                                                on F_OURMFO_G      to UPLD;
 grant EXECUTE                                                                on F_OURMFO_G      to WR_ALL_RIGHTS;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/function/f_ourmfo_g.sql =========*** End ***
- PROMPT ===================================================================================== 
- 
+grant EXECUTE                                                                on F_OURMFO_G      to BARS_INTGR with grant option;

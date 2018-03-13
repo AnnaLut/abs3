@@ -1,9 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_context.sql =========*** Run **
- PROMPT ===================================================================================== 
- 
+prompt package/bars_context.sql
 create or replace package bars.bars_context
 as
 
@@ -1122,10 +1117,4 @@ grant EXECUTE                                                                on 
 grant EXECUTE                                                                on BARS_CONTEXT    to RPBN002;
 grant EXECUTE                                                                on BARS_CONTEXT    to TEST;
 grant EXECUTE                                                                on BARS_CONTEXT    to WR_ALL_RIGHTS;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_context.sql =========*** End **
- PROMPT ===================================================================================== 
- 
+grant EXECUTE                                                                on BARS_CONTEXT    to BARS_INTGR;
