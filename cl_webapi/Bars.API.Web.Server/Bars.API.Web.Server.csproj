@@ -22,7 +22,6 @@
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
     <UseGlobalApplicationHostFile />
-    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -69,8 +68,9 @@
       <Private>True</Private>
       <HintPath>..\..\..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Ninject, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -101,6 +101,7 @@
     </Reference>
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.DynamicData" />
@@ -117,6 +118,7 @@
       <HintPath>..\..\..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.Helpers.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Http, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Http.Owin, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -199,10 +201,6 @@
       <Project>{7678b021-17aa-45ac-a6e1-70f757b00282}</Project>
       <Name>Bars.API.Acct.Server</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Analytics\Bars.API.Analytics.Server\Bars.API.Analytics.Server.csproj">
-      <Project>{67301759-5b2d-4ff8-9a6e-df9cdb69a933}</Project>
-      <Name>Bars.API.Analytics.Server</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Bars.API.Core\Bars.API.Core.csproj">
       <Project>{5bbc2aa5-1e79-418d-86ba-44b875fa9456}</Project>
       <Name>Bars.API.Core</Name>
@@ -223,14 +221,6 @@
       <Project>{790c1bfe-79a9-4abf-bdd4-68c9b76c68c8}</Project>
       <Name>Bars.API.Dpt.Server</Name>
     </ProjectReference>
-    <ProjectReference Include="..\FcApp\Bars.API.FcApp.Models\Bars.API.FcApp.Models.csproj">
-      <Project>{673e8674-d9b4-4cd8-8e8e-c3db5a68fde9}</Project>
-      <Name>Bars.API.FcApp.Models</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FcApp\Bars.API.FcApp.Server\Bars.API.FcApp.Server.csproj">
-      <Project>{e86578af-402c-48b8-bd97-4aacd16a0d7e}</Project>
-      <Name>Bars.API.FcApp.Server</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Loan\Bars.API.Loan.Models\Bars.API.Loan.Models.csproj">
       <Project>{cea35727-1707-4f1d-8c5a-04ed9f9f8b09}</Project>
       <Name>Bars.API.Loan.Models</Name>
@@ -250,14 +240,6 @@
     <ProjectReference Include="..\Public\Bars.API.Public.Server\Bars.API.Public.Server.csproj">
       <Project>{42a0db5c-3fd6-4d13-8292-b5235aff6a17}</Project>
       <Name>Bars.API.Public.Server</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SupDocuments\Bars.API.SupDocuments.Models\Bars.API.SupDocuments.Models.csproj">
-      <Project>{ca6ba5b6-22c6-4f72-8f5b-b49cf18c2aef}</Project>
-      <Name>Bars.API.SupDocuments.Models</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SupDocuments\Bars.API.SupDocuments.Server\Bars.API.SupDocuments.Server.csproj">
-      <Project>{f75038ad-dc51-4b34-b7a8-7fc1a15d4bca}</Project>
-      <Name>Bars.API.SupDocuments.Server</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

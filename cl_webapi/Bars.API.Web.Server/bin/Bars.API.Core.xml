@@ -13,21 +13,6 @@
                 Usage :  [Cache(ClientTimeSpan = 10, ServerTimeSpan = 10)]
             </summary>
         </member>
-        <member name="P:Bars.API.Core.Attributes.CacheAttribute.ServerTimeSpan">
-            <summary>
-            Server time spam
-            </summary>
-        </member>
-        <member name="P:Bars.API.Core.Attributes.CacheAttribute.ClientTimeSpan">
-            <summary>
-            Client time spam
-            </summary>
-        </member>
-        <member name="P:Bars.API.Core.Attributes.CacheAttribute.AnonymousOnly">
-            <summary>
-            Anonimus only flag
-            </summary>
-        </member>
         <member name="F:Bars.API.Core.Constants.AppName">
             <summary>
             Назва додатку
@@ -110,27 +95,6 @@
             Get the current user Id
             </summary>
             <returns></returns>
-        </member>
-        <member name="M:Bars.API.Core.Controllers.RootController.IsRequestFromApp(System.String)">
-            <summary>
-            Check if this request from some kind of app
-            </summary>
-            <param name="type">AUTH_APPLICATIONS.name</param>
-            <returns></returns>
-        </member>
-        <member name="M:Bars.API.Core.Controllers.RootController.UserIsAdmin">
-            <summary>
-            Has user Admin role ?
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="T:Bars.API.Core.CoreAMProfile">
-            <summary>
-            Auto mapoper profile
-            </summary>
-            <remarks>
-            Contains definition for Mappings. See https://github.com/AutoMapper/AutoMapper/wiki/Getting-started for more details
-            </remarks>
         </member>
         <member name="T:Bars.API.Core.Exceptions.HttpErrors.ApiException">
             <summary>
@@ -218,18 +182,21 @@
             </summary>
             <param name="moduleName"></param>
         </member>
-        <member name="M:Bars.API.Core.Extensions.BarsLog.Error(System.String)">
-            <summary>
-            
-            </summary>
-            <param name="message"></param>
-        </member>
         <member name="M:Bars.API.Core.Extensions.BarsLog.Error(System.String,System.Exception)">
             <summary>
             In-code errors with exceptions
             </summary>
             <param name="message"></param>
             <param name="e"></param>
+        </member>
+        <member name="M:Bars.API.Core.Extensions.BarsLog.Error(System.String,System.String,System.String,System.String)">
+            <summary>
+            In-code errors with client info
+            </summary>
+            <param name="message"></param>
+            <param name="custId"></param>
+            <param name="bankId"></param>
+            <param name="details"></param>
         </member>
         <member name="M:Bars.API.Core.Extensions.BarsLog.ErrorWithCustInfo(System.String,System.String,System.String,System.Exception)">
             <summary>
@@ -239,12 +206,6 @@
             <param name="custId"></param>
             <param name="bankId"></param>
             <param name="e"></param>
-        </member>
-        <member name="M:Bars.API.Core.Extensions.BarsLog.Info(System.String)">
-            <summary>
-            Method overloading for logging services working 
-            </summary>
-            <param name="message"></param>
         </member>
         <member name="M:Bars.API.Core.Extensions.BarsLog.Info(System.String,System.String,System.String)">
             <summary>
@@ -378,12 +339,6 @@
                 Creates the kernel that will manage your application.
             </summary>
             <returns>The created kernel.</returns>
-        </member>
-        <member name="M:Bars.API.Core.Infrastructure.DI.NinjectWebCommon.RegisterServices(Ninject.IKernel)">
-            <summary>
-                Load your modules or register your services here!
-            </summary>
-            <param name="kernel">The kernel.</param>
         </member>
         <member name="M:Bars.API.Core.Infrastructure.PagingExtensions.GetPage``1(System.Linq.IQueryable{``0},Bars.API.Core.Infrastructure.Page)">
             <summary>

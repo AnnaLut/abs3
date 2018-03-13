@@ -4,9 +4,261 @@
         <name>Bars.API.Auth.Models</name>
     </assembly>
     <members>
+        <member name="T:Bars.API.Auth.Models.AuthUserCustomerRole">
+            <summary>
+            Application list with allowed API clients 
+            </summary>
+        </member>
+        <member name="T:Bars.API.Auth.Models.AuthBidSessions">
+            <summary>
+            BankID session
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.AuthBidSessions.Id">
+            <summary>
+             Id
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.AuthBidSessions.SidBi">
+            <summary>
+            BankId SID
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.AuthBidSessions.CardNumber">
+            <summary>
+            BankId SID
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.AuthBidSessions.PhoneNumber">
+            <summary>
+            Mobile phone
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.AuthBidSessions.ExtUserId">
+            <summary>
+            User id in external system
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.AuthBidSessions.CreatingDate">
+            <summary>
+            Transaction date creation
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.AuthBidSessions.OtpCode">
+            <summary>
+            Status
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.AuthBidSessions.ErrorMessage">
+            <summary>
+            Session Id
+            </summary>
+        </member>
+        <member name="T:Bars.API.Auth.Models.AuthTransactions">
+            <summary>
+            User transaction model
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.AuthTransactions.Id">
+            <summary>
+            Transactions Id
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.AuthTransactions.UserId">
+            <summary>
+            User Id
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.AuthTransactions.TypeId">
+            <summary>
+            Transaction type
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.AuthTransactions.CreatingDate">
+            <summary>
+            Transaction date creation
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.AuthTransactions.StatusId">
+            <summary>
+            Status
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.AuthTransactions.SessionId">
+            <summary>
+            Session Id
+            </summary>
+        </member>
+        <member name="T:Bars.API.Auth.Models.AuthApplications">
+            <summary>
+            Application list with allowed API clients 
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.AuthApplications.Id">
+            <summary>
+            Application Id
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.AuthApplications.Secret">
+            <summary>
+            Secret word
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.AuthApplications.Name">
+            <summary>
+            Application name
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.AuthApplications.ApplicationType">
+            <summary>
+            Application Type
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.AuthApplications.Active">
+            <summary>
+            Activity flag
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.AuthApplications.RefreshTokenLifeTime">
+            <summary>
+            Timeout of refresh token
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.AuthApplications.AllowedOrigin">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Bars.API.Auth.Models.AuthUserTokens">
+            <summary>
+            Авторизаційний токен
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.AuthUserTokens.Id">
+            <summary>
+            Ідентифікатор токена
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.AuthUserTokens.Subject">
+            <summary>
+            Логін користувача
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.AuthUserTokens.UserId">
+            <summary>
+            Ідентифікатор користувача
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.AuthUserTokens.ClientId">
+            <summary>
+            Додаток, за домомогою якого відбувалася авторизація
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.AuthUserTokens.IssuedUtc">
+            <summary>
+            Дата видачі токена
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.AuthUserTokens.ExpiresUtc">
+            <summary>
+            Дата завершення дії токена
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.AuthUserTokens.ProtectedTicket">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.AuthUserTokens.TwoFactorCode">
+            <summary>
+            Код ОТП, введений при двухфакторній авторизації
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.AuthUserTokens.SessionId">
+            <summary>
+            Унікальний номер сессії
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.AuthUserTokens.BankIdSid">
+            <summary>
+            Код BankID, отриманий з переходу від провайдера BankID
+            </summary>
+        </member>
+        <member name="T:Bars.API.Auth.Models.CardUserModel">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.CardUserModel.SidBi">
+            <summary>
+            Идентификатор сессии BankID
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.CardUserModel.CardNumber">
+            <summary>
+            Номер банковской карты
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.CardUserModel.Phone">
+            <summary>
+            Мобильный телефон клиента
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.CardUserModel.UserId">
+            <summary>
+            Номер клиента в процесинговой системе
+            </summary>
+        </member>
+        <member name="T:Bars.API.Auth.Models.BankIdModel">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.BankIdModel.Authorization">
+            <summary>
+            </summary>
+        </member>
         <member name="T:Bars.API.Auth.Models.Device">
             <summary>
             List of devices
+            </summary>
+        </member>
+        <member name="T:Bars.API.Auth.Models.KeyLoginModel">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Bars.API.Auth.Models.ApplicationTypes">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:Bars.API.Auth.Models.ApplicationTypes.JavaScript">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:Bars.API.Auth.Models.ApplicationTypes.NativeConfidential">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Bars.API.Auth.Models.TransactionTypes">
+            <summary>
+            Тип транзакції
+            </summary>
+        </member>
+        <member name="F:Bars.API.Auth.Models.TransactionTypes.Payment">
+            <summary>
+            Платіж
+            </summary>
+        </member>
+        <member name="T:Bars.API.Auth.Models.LoginUserModel">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.LoginUserModel.UserName">
+            <summary>
+            
             </summary>
         </member>
         <member name="T:Bars.API.Auth.Models.RegistrationQueue">
@@ -34,29 +286,9 @@
             Сессія регістрації
             </summary>
         </member>
-        <member name="P:Bars.API.Auth.Models.RegistrationQueue.EDRPO">
+        <member name="F:Bars.API.Auth.Models.RegistrationQueue.BirthDay">
             <summary>
-            Унікальний код клієнта ЕДРПО
-            </summary>
-        </member>
-        <member name="T:Bars.API.Auth.Models.UserCustomerBank">
-            <summary>
-            Represent appearance of the customer in one bank instance (MFO)
-            </summary>
-        </member>
-        <member name="P:Bars.API.Auth.Models.UserCustomerBank.EDRPO">
-            <summary>
-            Customer EDRPO (unique in all banks)
-            </summary>
-        </member>
-        <member name="P:Bars.API.Auth.Models.UserCustomerBank.CustId">
-            <summary>
-            Customer identifier in bank (rnk as usual) (is unique only inside one bank)
-            </summary>
-        </member>
-        <member name="P:Bars.API.Auth.Models.UserCustomerBank.BankId">
-            <summary>
-            Bank identifier
+            Дата народження
             </summary>
         </member>
         <member name="T:Bars.API.Auth.Models.UserCustomers">
@@ -64,24 +296,44 @@
             Realtions beetwen 
             </summary>
         </member>
+        <member name="P:Bars.API.Auth.Models.UserCustomers.BankId">
+            <summary>
+            Bank Identifier
+            </summary>
+        </member>
         <member name="P:Bars.API.Auth.Models.UserCustomers.UserId">
             <summary>
             User id
             </summary>
         </member>
-        <member name="P:Bars.API.Auth.Models.UserCustomers.EDRPO">
-            <summary>
-            Customer EDRPO
-            </summary>
-        </member>
-        <member name="P:Bars.API.Auth.Models.UserCustomers.ProviderId">
+        <member name="P:Bars.API.Auth.Models.UserCustomers.CustId">
             <summary>
             Customor Id
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.UserCustomers.ApiUrl">
+            <summary>
+            Base Server API url
             </summary>
         </member>
         <member name="P:Bars.API.Auth.Models.UserCustomers.SignNumber">
             <summary>
             Sign number
+            </summary>
+        </member>
+        <member name="T:Bars.API.Auth.Models.UserModel">
+            <summary>
+            Модель користувача
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.UserModel.UserName">
+            <summary>
+            Логін користувача 
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.UserModel.Phone">
+            <summary>
+            Номер мобільного
             </summary>
         </member>
     </members>
