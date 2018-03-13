@@ -1,4 +1,4 @@
-prompt barsupl Р¤Р°Р№Р» РІС‹РіСЂСѓР·РєРё: BPK2
+prompt barsupl Файл выгрузки: BPK2
 prompt sql
 prompt delta
 declare
@@ -53,12 +53,12 @@ select  branch,
         w4_kproc,
         w4_sec,
         acc,
-		ob22,
-		nms
+        ob22,
+        nms
         from bars_dm.bpk_plt
         where per_id=bars_dm.dm_import.GET_PERIOD_ID('DAY',nvl(to_date(:param1, 'dd/mm/yyyy'), trunc(sysdate)))
 ]');
-l_descript varchar2(250) := q'[РџР»Р°С‚С–Р¶РЅС– РєР°СЂС‚РєРё 2 РґР»СЏ CRM - Р·РјС–РЅРё]';
+l_descript varchar2(250) := q'[Платіжні картки 2 для CRM - зміни]';
 begin
     insert into upl_sql(sql_id, sql_text, descript, vers)
     values (4, l_sql_text, l_descript, '1.0');
@@ -123,11 +123,13 @@ select  branch,
         w4_arsum,
         w4_kproc,
         w4_sec,
-        acc
+        acc,
+		ob22,
+		nms
         from bars_dm.bpk_plt
         where per_id=bars_dm.dm_import.GET_PERIOD_ID('MONTH',nvl(to_date(:param1, 'dd/mm/yyyy'), trunc(sysdate)))
 ]');
-l_descript varchar2(250) := q'[РџР»Р°С‚С–Р¶РЅС– РєР°СЂС‚РєРё 2 РґР»СЏ CRM - MONTH]';
+l_descript varchar2(250) := q'[Платіжні картки 2 для CRM - MONTH]';
 begin
     insert into upl_sql(sql_id, sql_text, descript, vers)
     values (5, l_sql_text, l_descript, '1.0');
@@ -136,14 +138,14 @@ exception
         update barsupl.upl_sql
         set sql_text = l_sql_text,
             descript = l_descript,
-            vers = '1.1'
+            vers = '1.2'
         where sql_id = 5;
 end;
 /
 prompt file
 begin
-	insert into barsupl.upl_files (FILE_ID, SQL_ID, FILE_CODE, FILENAME_PRFX, EQVSPACE, DELIMM, DEC_DELIMM, ENDLINE, HEAD_LINE, DESCRIPT, ORDER_ID, NULLVAL, DATA_TYPE, DOMAIN_CODE, ISACTIVE, SEQ_CASHE, GK_INDICATOR, MASTER_CKGK, CRITICAL_FLG, PARTITIONED)
-	values (4, 4, 'BPK2', 'Bpk2', 0, '35', null, '13||10', 0, 'Р’РёРІР°РЅС‚Р°Р¶РµРЅРЅСЏ РґР°РЅРёС… РїРѕ РїР»Р°С‚С–Р¶РЅРёРј РєР°СЂС‚РєР°Рј(2)', 1, null, 'WHOLE', null, 1, null, 1, null, 0, 1);
+    insert into barsupl.upl_files (FILE_ID, SQL_ID, FILE_CODE, FILENAME_PRFX, EQVSPACE, DELIMM, DEC_DELIMM, ENDLINE, HEAD_LINE, DESCRIPT, ORDER_ID, NULLVAL, DATA_TYPE, DOMAIN_CODE, ISACTIVE, SEQ_CASHE, GK_INDICATOR, MASTER_CKGK, CRITICAL_FLG, PARTITIONED)
+    values (4, 4, 'BPK2', 'Bpk2', 0, '35', null, '13||10', 0, 'Вивантаження даних по платіжним карткам(2)', 1, null, 'WHOLE', null, 1, null, 1, null, 0, 1);
 exception
     when dup_val_on_index then
         null;
@@ -154,158 +156,158 @@ begin
     delete from barsupl.upl_columns
     where file_id = 4;
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 1, 'branch', 'Р’С–РґРґС–Р»РµРЅРЅСЏ', 'CHAR', 30, null, null, null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 1, 'branch', 'Відділення', 'CHAR', 30, null, null, null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 2, 'kf', 'Р РЈ', 'CHAR', 12, null, null, null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 2, 'kf', 'РУ', 'CHAR', 12, null, null, null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 3, 'rnk', 'Р РќРљ', 'NUMBER', 15, 0, null, null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 3, 'rnk', 'РНК', 'NUMBER', 15, 0, null, null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 4, 'nd', 'РќРѕРјРµСЂ РґРѕРіРѕРІРѕСЂСѓ', 'NUMBER', 15, 0, null, null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 4, 'nd', 'Номер договору', 'NUMBER', 15, 0, null, null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 5, 'dat_begin', 'Р”Р°С‚Р° РґРѕРіРѕРІРѕСЂСѓ', 'DATE', 10, null, 'dd/mm/yyyy', null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 5, 'dat_begin', 'Дата договору', 'DATE', 10, null, 'dd/mm/yyyy', null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 6, 'bpk_type', 'РўРёРї РїР»Р°С‚С–Р¶РЅРѕС— РєР°СЂС‚Рё', 'VARCHAR2', 50, null, null, null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 6, 'bpk_type', 'Тип платіжної карти', 'VARCHAR2', 50, null, null, null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 7, 'nls', 'РЅРѕРјРµСЂ СЂР°С…СѓРЅРєСѓ', 'VARCHAR2', 15, null, null, null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 7, 'nls', 'номер рахунку', 'VARCHAR2', 15, null, null, null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 8, 'daos', 'Р”Р°С‚Р° РІС–РґРєСЂРёС‚С‚СЏ СЂР°С…СѓРЅРєСѓ', 'DATE', 10, null, 'dd/mm/yyyy', null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 8, 'daos', 'Дата відкриття рахунку', 'DATE', 10, null, 'dd/mm/yyyy', null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 9, 'kv', 'Р’Р°Р»СЋС‚Р° СЂР°С…СѓРЅРєСѓ', 'NUMBER', 3, 0, null, null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 9, 'kv', 'Валюта рахунку', 'NUMBER', 3, 0, null, null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 10, 'intrate', 'Р’С–РґСЃРѕС‚РєРѕРІР° СЃС‚Р°РІРєР°', 'NUMBER', 5, 2, '990D00', null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 10, 'intrate', 'Відсоткова ставка', 'NUMBER', 5, 2, '990D00', null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 11, 'ostc', 'РџРѕС‚РѕС‡РЅРёР№ Р·Р°Р»РёС€РѕРє РЅР° СЂР°С…СѓРЅРєСѓ', 'NUMBER', 15, 2, '9999999999990D00', null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 11, 'ostc', 'Поточний залишок на рахунку', 'NUMBER', 15, 2, '9999999999990D00', null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 12, 'date_lastop', 'Р”Р°С‚Р° РѕСЃС‚Р°РЅРЅСЊРѕС— РѕРїРµСЂР°С†С–С—', 'DATE', 10, null, 'dd/mm/yyyy', null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 12, 'date_lastop', 'Дата останньої операції', 'DATE', 10, null, 'dd/mm/yyyy', null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 13, 'cred_line', 'РљСЂРµРґРёС‚РЅР° Р»С–РЅС–СЏ', 'VARCHAR2', 20, null, null, null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 13, 'cred_line', 'Кредитна лінія', 'VARCHAR2', 20, null, null, null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 14, 'cred_lim', 'РЎСѓРјР° РІСЃС‚Р°РЅРѕРІР»РµРЅРѕС— РєСЂРµРґ.Р»С–РЅС–С—', 'NUMBER', 15, 2, '9999999999990D00', null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 14, 'cred_lim', 'Сума встановленої кред.лінії', 'NUMBER', 15, 2, '9999999999990D00', null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 15, 'use_cred_sum', 'Р’РёРєРѕСЂРёСЃС‚Р°РЅР° СЃСѓРјР° РєСЂРµРґ.Р»С–РЅС–С—', 'NUMBER', 15, 2, '9999999999990D00', null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 15, 'use_cred_sum', 'Використана сума кред.лінії', 'NUMBER', 15, 2, '9999999999990D00', null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 16, 'dazs', 'Р”Р°С‚Р° Р·Р°РєСЂРёС‚С‚СЏ СЂР°С…СѓРЅРєСѓ', 'DATE', 10, null, 'dd/mm/yyyy', null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 16, 'dazs', 'Дата закриття рахунку', 'DATE', 10, null, 'dd/mm/yyyy', null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 17, 'blkd', 'РљРѕРґ Р±Р»РѕРєСѓРІР°РЅРЅСЏ СЂР°С…СѓРЅРєСѓ РїРѕ РґРµР±РµС‚Сѓ', 'NUMBER', 3, 0, null, null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 17, 'blkd', 'Код блокування рахунку по дебету', 'NUMBER', 3, 0, null, null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 18, 'blkk', 'РљРѕРґ Р±Р»РѕРєСѓРІР°РЅРЅСЏ СЂР°С…СѓРЅРєСѓ РїРѕ РєСЂРµРґРёС‚Сѓ', 'NUMBER', 3, 0, null, null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 18, 'blkk', 'Код блокування рахунку по кредиту', 'NUMBER', 3, 0, null, null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 19, 'bpk_status', 'РЎС‚Р°С‚СѓСЃ РґРѕРіРѕРІРѕСЂСѓ РїРѕ СЂР°С…СѓРЅРєСѓ (1-РІС–РґРєСЂРёС‚РёР№, 0-Р·Р°РєСЂРёС‚РёР№)', 'NUMBER', 1, 0, null, null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 19, 'bpk_status', 'Статус договору по рахунку (1-відкритий, 0-закритий)', 'NUMBER', 1, 0, null, null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 20, 'pk_okpo', 'Р—Р°СЂРїР»Р°С‚РЅРёР№ РїСЂРѕРµРєС‚, Р„Р”Р РџРћРЈ РѕСЂРіР°РЅС–Р·Р°С†С–С—', 'VARCHAR2', 10, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 20, 'pk_okpo', 'Зарплатний проект, ЄДРПОУ організації', 'VARCHAR2', 10, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 21, 'pk_name', 'Р—Р°СЂРїР»Р°С‚РЅРёР№ РїСЂРѕРµРєС‚, РќР°Р·РІР° РѕСЂРіР°РЅС–Р·Р°С†С–С—', 'VARCHAR2', 100, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 21, 'pk_name', 'Зарплатний проект, Назва організації', 'VARCHAR2', 100, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 22, 'pk_okpo_n', 'Р—Р°СЂРїР»Р°С‚РЅРёР№ РїСЂРѕРµРєС‚, РљРѕРґ СЃС‚СЂСѓРєС‚СѓСЂРЅРѕРіРѕ РїС–РґСЂРѕР·РґС–Р»Сѓ', 'NUMBER', 22, 0, null, null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 22, 'pk_okpo_n', 'Зарплатний проект, Код структурного підрозділу', 'NUMBER', 22, 0, null, null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 23, 'VID', 'Р’РёРґ СЂР°С…СѓРЅРєСѓ (Р”Р¤РЎ)', 'VARCHAR2', 35, null, null, null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 23, 'VID', 'Вид рахунку (ДФС)', 'VARCHAR2', 35, null, null, null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 24, 'LIE_SUM', 'РђСЂРµС€С‚ СЂР°С…СѓРЅРєСѓ. РЎСѓРјР° РѕР±С‚СЏР¶РµРЅРЅСЏ', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 24, 'LIE_SUM', 'Арешт рахунку. Сума обтяження', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 25, 'LIE_VAL', 'РђСЂРµС€С‚ СЂР°С…СѓРЅРєСѓ. Р’Р°Р»СЋС‚Р° РѕР±С‚СЏР¶РµРЅРЅСЏ', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 25, 'LIE_VAL', 'Арешт рахунку. Валюта обтяження', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 26, 'LIE_DATE', 'РђСЂРµС€С‚ СЂР°С…СѓРЅРєСѓ. Р”Р°С‚Р° РґРѕРєСѓРјРµРЅС‚Р°', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 26, 'LIE_DATE', 'Арешт рахунку. Дата документа', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 27, 'LIE_DOCN', 'РђСЂРµС€С‚ СЂР°С…СѓРЅРєСѓ. РќРѕРјРµСЂ РґРѕРєСѓРјРµРЅС‚Р°', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 27, 'LIE_DOCN', 'Арешт рахунку. Номер документа', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 28, 'LIE_ATRT', 'РђСЂРµС€С‚ СЂР°С…СѓРЅРєСѓ. РћСЂРіР°РЅ, СЏРєРёР№ РІРёРґР°РІ РґРѕРєСѓРјРµРЅС‚', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 28, 'LIE_ATRT', 'Арешт рахунку. Орган, який видав документ', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 29, 'LIE_DOC', 'РђСЂРµС€С‚ СЂР°С…СѓРЅРєСѓ. РќР°Р·РІР° РґРѕРєСѓРјРµРЅС‚Сѓ', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 29, 'LIE_DOC', 'Арешт рахунку. Назва документу', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 30, 'PK_TERM', 'Р‘РџРљ. РљС–Р»СЊРєС–СЃС‚СЊ РјС–СЃСЏС†С–РІ РґС–С— РєР°СЂС‚РєРё', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 30, 'PK_TERM', 'БПК. Кількість місяців дії картки', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 31, 'PK_OLDND', 'Р‘РџРљ. РќРѕРјРµСЂ РґРѕРіРѕРІРѕСЂСѓ РїРѕ Р—Рџ', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 31, 'PK_OLDND', 'БПК. Номер договору по ЗП', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 32, 'PK_WORK', 'Р‘РџРљ. РњС–СЃС†Рµ СЂРѕР±РѕС‚Рё', 'VARCHAR2', 254, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 32, 'PK_WORK', 'БПК. Місце роботи', 'VARCHAR2', 254, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 33, 'PK_CNTRW', 'Р‘РџРљ. РњС–СЃС†Рµ СЂРѕР±РѕС‚Рё: РєСЂР°С—РЅР°', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 33, 'PK_CNTRW', 'БПК. Місце роботи: країна', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 34, 'PK_OFAX', 'Р‘РџРљ. РњС–СЃС†Рµ СЂРѕР±РѕС‚Рё: FAX', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 34, 'PK_OFAX', 'БПК. Місце роботи: FAX', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 35, 'PK_PHONE', 'Р‘РџРљ. РњС–СЃС†Рµ СЂРѕР±РѕС‚Рё: С‚РµР»РµС„РѕРЅ', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 35, 'PK_PHONE', 'БПК. Місце роботи: телефон', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 36, 'PK_PCODW', 'Р‘РџРљ. РњС–СЃС†Рµ СЂРѕР±РѕС‚Рё: РїРѕС€С‚РѕРІРёР№ С–РЅРґРµРєСЃ', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 36, 'PK_PCODW', 'БПК. Місце роботи: поштовий індекс', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 37, 'PK_ODAT', 'Р‘РџРљ. РњС–СЃС†Рµ СЂРѕР±РѕС‚Рё: Р· СЏРєРѕРіРѕ С‡Р°СЃСѓ РїСЂР°С†СЋС”', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 37, 'PK_ODAT', 'БПК. Місце роботи: з якого часу працює', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 38, 'PK_STRTW', 'Р‘РџРљ. РњС–СЃС†Рµ СЂРѕР±РѕС‚Рё: РІСѓР»РёС†СЏ', 'VARCHAR2', 254, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 38, 'PK_STRTW', 'БПК. Місце роботи: вулиця', 'VARCHAR2', 254, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 39, 'PK_CITYW', 'Р‘РџРљ. РњС–СЃС†Рµ СЂРѕР±РѕС‚Рё: РјС–СЃС‚Рѕ', 'VARCHAR2', 254, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 39, 'PK_CITYW', 'БПК. Місце роботи: місто', 'VARCHAR2', 254, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 40, 'PK_OFFIC', 'Р‘РџРљ. РџРѕСЃР°РґР°', 'VARCHAR2', 30, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 40, 'PK_OFFIC', 'БПК. Посада', 'VARCHAR2', 30, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 41, 'DKBO_DATE_OFF', 'Р”Р°С‚Р° СЂРѕР·С–СЂРІР°РЅРЅСЏ Р”РљР‘Рћ', 'DATE', 10, null, 'dd/mm/yyyy', null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 41, 'DKBO_DATE_OFF', 'Дата розірвання ДКБО', 'DATE', 10, null, 'dd/mm/yyyy', null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 42, 'DKBO_START_DATE', 'Р”Р°С‚Р° РїСЂРёС”РґРЅР°РЅРЅСЏ РґРѕ Р”РљР‘Рћ', 'DATE', 10, null, 'dd/mm/yyyy', null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 42, 'DKBO_START_DATE', 'Дата приєднання до ДКБО', 'DATE', 10, null, 'dd/mm/yyyy', null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 43, 'DKBO_DEAL_NUMBER', 'в„– РґРѕРіРѕРІРѕСЂСѓ Р”РљР‘Рћ', 'VARCHAR2', 30, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 43, 'DKBO_DEAL_NUMBER', '№ договору ДКБО', 'VARCHAR2', 30, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 44, 'KOS', 'РћР±РѕСЂРѕС‚Рё РљСЂРµРґРёС‚', 'NUMBER', 24, 0, null, null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 44, 'KOS', 'Обороти Кредит', 'NUMBER', 24, 0, null, null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 45, 'DOS', 'РћР±РѕСЂРѕС‚Рё Р”РµР±РµС‚', 'NUMBER', 24, 0, null, null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 45, 'DOS', 'Обороти Дебет', 'NUMBER', 24, 0, null, null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 46, 'W4_ARSUM', 'Way4. РђСЂРµС€С‚РѕРІР°РЅР° СЃСѓРјР°', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 46, 'W4_ARSUM', 'Way4. Арештована сума', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 47, 'W4_KPROC', 'Way4. Р’С–РґСЃРѕС‚РѕРє РїРѕ РєСЂРµРґРёС‚Сѓ', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 47, 'W4_KPROC', 'Way4. Відсоток по кредиту', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 48, 'W4_SEC', 'Way4. РўР°Р№РЅРµ СЃР»РѕРІРѕ', 'VARCHAR2', 254, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null);
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 48, 'W4_SEC', 'Way4. Тайне слово', 'VARCHAR2', 254, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null);
 
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 49, 'ACC', 'РЈРЅС–РєР°Р»СЊРЅРёР№ С–РґРµРЅС‚РёС„С–РєР°С‚РѕСЂ СЂР°С…СѓРЅРєСѓ', 'NUMBER', 24, 0, null, null, 'Y', null, null, null, null);
-	
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 50, 'ob22', 'РђРЅР°Р»С–С‚РёРєР° СЂР°С…СѓРЅРєСѓ', 'CHAR', 2, null, null, null, 'Y', null, null, null, null);
-	
-	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
-	values (4, 51, 'nms', 'РќР°Р·РІР° СЂР°С…СѓРЅРєСѓ', 'VARCHAR2', 70, null, null, null, 'Y', null, null, null, null);	
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 49, 'ACC', 'Унікальний ідентифікатор рахунку', 'NUMBER', 24, 0, null, null, 'Y', null, null, null, null);
+    
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 50, 'ob22', 'Аналітика рахунку', 'CHAR', 2, null, null, null, 'Y', null, null, null, null);
+    
+    insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID)
+    values (4, 51, 'nms', 'Назва рахунку', 'VARCHAR2', 70, null, null, null, 'Y', null, null, null, null);  
 
 end;
 /
