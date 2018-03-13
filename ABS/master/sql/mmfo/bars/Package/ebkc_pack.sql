@@ -393,7 +393,6 @@ $end
         or GCIF in ( select GCIF
                        from EBKC_GCIF
                       where RNK = l_rnk
---                      and CUST_TYPE = g_cust_tp 
                    );
 
     delete EBKC_GCIF
