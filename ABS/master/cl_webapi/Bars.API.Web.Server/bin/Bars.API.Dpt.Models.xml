@@ -69,11 +69,6 @@
             Виплата депозиту : МФО банку 
             </summary>
         </member>
-        <member name="P:Bars.API.Dpt.Models.Deposit.BankId">
-            <summary>
-            Банк в якому выдкритий депозит
-            </summary>
-        </member>
         <member name="P:Bars.API.Dpt.Models.Deposit.TransferAccountNumber">
             <summary>
             Виплата депозиту : номер рахунку

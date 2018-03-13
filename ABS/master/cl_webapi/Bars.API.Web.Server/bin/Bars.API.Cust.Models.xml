@@ -4,24 +4,51 @@
         <name>Bars.API.Cust.Models</name>
     </assembly>
     <members>
-        <member name="P:Bars.API.Cust.Models.CustomerSearchModel.RNK">
+        <member name="M:Bars.API.Cust.Models.BankId.RequestFilter.SetCustomerFields(Bars.API.Cust.Models.BankId.Customer)">
             <summary>
-            Customer identifier
+            
+            </summary>
+            <param name="customer"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Bars.API.Cust.Models.BankId.BankIdSessions">
+            <summary>
+            
             </summary>
         </member>
-        <member name="P:Bars.API.Cust.Models.CustomerSearchModel.CustType">
+        <member name="P:Bars.API.Cust.Models.BankId.BankIdSessions.SessionId">
             <summary>
-            Customer type (1=БН,2=Юридическое лицо,3=Физическое лицо)
+            
             </summary>
         </member>
-        <member name="P:Bars.API.Cust.Models.CustomerSearchModel.OKPO">
+        <member name="P:Bars.API.Cust.Models.BankId.BankIdSessions.Id">
             <summary>
-            Customer OKPO/INN
+            
             </summary>
         </member>
-        <member name="P:Bars.API.Cust.Models.CustomerSearchModel.CL_OKPO">
+        <member name="P:Bars.API.Cust.Models.BankId.BankIdSessions.UserId">
             <summary>
-            CL search OKPO including first character indicating type of the customer (example: F000000000 - Physical person with OKPO 000000000)
+            
+            </summary>
+        </member>
+        <member name="P:Bars.API.Cust.Models.BankId.BankIdSessions.ExtUserId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Bars.API.Cust.Models.BankId.BankIdSessions.BankIdSid">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Bars.API.Cust.Models.BankId.BankIdSessions.BankId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Bars.API.Cust.Models.BankId.BankIdSessions.CustId">
+            <summary>
+            
             </summary>
         </member>
         <member name="T:Bars.API.Cust.Models.Quantities">
@@ -49,6 +76,56 @@
             the numbers of Loans
             </summary>
         </member>
+        <member name="T:Bars.API.Cust.Models.Company">
+            <summary>
+            Customer
+            </summary>
+        </member>
+        <member name="P:Bars.API.Cust.Models.Company.Id">
+            <summary>
+            Company code
+            </summary>
+        </member>
+        <member name="P:Bars.API.Cust.Models.Company.Name">
+            <summary>
+            Company name
+            </summary>
+        </member>
+        <member name="P:Bars.API.Cust.Models.Company.NameShort">
+            <summary>
+            Short Company name
+            </summary>
+        </member>
+        <member name="P:Bars.API.Cust.Models.Company.NameInternational">
+            <summary>
+            International Company name
+            </summary>
+        </member>
+        <member name="P:Bars.API.Cust.Models.Company.ContractNumber">
+            <summary>
+            Company number
+            </summary>
+        </member>
+        <member name="P:Bars.API.Cust.Models.Company.DateOpen">
+            <summary>
+            Company open date
+            </summary>
+        </member>
+        <member name="P:Bars.API.Cust.Models.Company.DateClosed">
+            <summary>
+            Company close date
+            </summary>
+        </member>
+        <member name="P:Bars.API.Cust.Models.Company.BankId">
+            <summary>
+            Registred bank id
+            </summary>
+        </member>
+        <member name="P:Bars.API.Cust.Models.Company.Quantities">
+            <summary>
+            The company quantities of bank products
+            </summary>
+        </member>
         <member name="T:Bars.API.Cust.Models.Customer">
             <summary>
             Customer
@@ -62,6 +139,11 @@
         <member name="P:Bars.API.Cust.Models.Customer.ClientId">
             <summary>
             Client ID (unique client ID)
+            </summary>
+        </member>
+        <member name="P:Bars.API.Cust.Models.Customer.BankId">
+            <summary>
+            Client bank code
             </summary>
         </member>
         <member name="P:Bars.API.Cust.Models.Customer.TaxCode">
@@ -87,11 +169,6 @@
         <member name="P:Bars.API.Cust.Models.Customer.ContractNumber">
             <summary>
             Contract number
-            </summary>
-        </member>
-        <member name="P:Bars.API.Cust.Models.Customer.Address">
-            <summary>
-            Customer address
             </summary>
         </member>
         <member name="P:Bars.API.Cust.Models.Customer.CustType">
@@ -127,11 +204,6 @@
         <member name="P:Bars.API.Cust.Models.Customer.BankDate">
             <summary>
             Current open bank date
-            </summary>
-        </member>
-        <member name="P:Bars.API.Cust.Models.Customer.EDRPO">
-            <summary>
-            CorpLight customer identifier (First letter - customer type, Second letter - OKPO, the rest depending on the user type)
             </summary>
         </member>
     </members>

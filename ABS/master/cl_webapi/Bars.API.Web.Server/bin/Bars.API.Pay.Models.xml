@@ -4,6 +4,26 @@
         <name>Bars.API.Pay.Models</name>
     </assembly>
     <members>
+        <member name="P:Bars.API.Pay.Models.PaymentAccount1.BankCode">
+            <summary>
+            Код банку
+            </summary>
+        </member>
+        <member name="P:Bars.API.Pay.Models.PaymentAccount1.TaxCode">
+            <summary>
+            Код ЄДРПО
+            </summary>
+        </member>
+        <member name="P:Bars.API.Pay.Models.PaymentAccount1.Name">
+            <summary>
+            Найменування кореспондента
+            </summary>
+        </member>
+        <member name="P:Bars.API.Pay.Models.PaymentAccount1.AccNumber">
+            <summary>
+            Номер рахунку 
+            </summary>
+        </member>
         <member name="P:Bars.API.Pay.Models.Payment.Purpose">
             <summary>
             Призначення платежу
@@ -22,6 +42,11 @@
         <member name="T:Bars.API.Pay.Models.Responses.UpdateResourceStatus">
             <summary>
             Create payment status object
+            </summary>
+        </member>
+        <member name="P:Bars.API.Pay.Models.Responses.UpdateResourceStatus.Id">
+            <summary>
+            Document Id
             </summary>
         </member>
         <member name="P:Bars.API.Pay.Models.Responses.UpdateResourceStatus.BankReceivedDate">
@@ -62,21 +87,6 @@
         <member name="P:Bars.API.Pay.Models.Responses.UpdateResourceStatus`1.Message">
             <summary>
             Status message
-            </summary>
-        </member>
-        <member name="P:Bars.API.Pay.Models.SwiftModel.Purpose">
-            <summary>
-            Призначення платежу
-            </summary>
-        </member>
-        <member name="P:Bars.API.Pay.Models.SwiftModel.PaymentFee">
-            <summary>
-            Комісійні за рахунок
-            </summary>
-        </member>
-        <member name="P:Bars.API.Pay.Models.SwiftModel.Amount">
-            <summary>
-            Сума платежу
             </summary>
         </member>
     </members>

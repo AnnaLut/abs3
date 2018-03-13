@@ -4,11 +4,6 @@
         <name>Bars.API.Cust.Server</name>
     </assembly>
     <members>
-        <member name="T:Bars.API.Cust.Server.Configuration.CustomerSearchConfiguration">
-            <summary>
-                Configuration (mapping model CustomerSearchModel to database table/view)
-            </summary>
-        </member>
         <member name="T:Bars.API.Cust.Server.Configuration.QuantitiesConfiguration">
             <summary>
                 Configuration (mapping model Quantities to database table)
@@ -45,7 +40,7 @@
             </summary>
             <remarks>Customers</remarks>
         </member>
-        <member name="M:Bars.API.Cust.Server.Controllers.CustomersBaseController.#ctor(Bars.API.Cust.Server.Infrastructure.Repository.ICustomersRepository,Bars.API.Cust.Server.Infrastructure.Repository.ICustomersSearchRepository)">
+        <member name="M:Bars.API.Cust.Server.Controllers.CustomersBaseController.#ctor(Bars.API.Cust.Server.Infrastructure.Repository.ICustomersRepository)">
             <summary>
                 Constructor CustomersBaseController
             </summary>
@@ -58,11 +53,18 @@
             <remarks>Get an array of all customers</remarks>
             <returns></returns>
         </member>
-        <member name="M:Bars.API.Cust.Server.Controllers.CustomersBaseController.GetList(System.Decimal[])">
+        <member name="M:Bars.API.Cust.Server.Controllers.CustomersBaseController.GetList(System.Collections.Generic.List{System.Decimal})">
             <summary>
             Get customers by id list
             </summary>
             <param name="custId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bars.API.Cust.Server.Controllers.CustomersBaseController.ValidateRegistation(Bars.API.Auth.Models.RegistrationQueue)">
+            <summary>
+            
+            </summary>
+            <param name="queue"></param>
             <returns></returns>
         </member>
         <member name="M:Bars.API.Cust.Server.Controllers.CustomersBaseController.Get(System.Decimal)">
@@ -74,20 +76,13 @@
             <returns>customer object</returns>
             <response code="404">Customer not found</response>
         </member>
-        <member name="M:Bars.API.Cust.Server.Controllers.CustomersBaseController.FindCustomers(System.String[])">
-            <summary>
-            Find customers by EDRPO/OKPO (F000101010, L03030303030)
-            </summary>
-            <param name="custEDRPOs">EDRPO/OKPO`s list (F000101010, L03030303030) </param>
-            <returns></returns>
-        </member>
         <member name="T:Bars.API.Cust.Server.Controllers.V1.CustomersV1Controller">
             <summary>
                 Work with customers (V1)
             </summary>
             <remarks>Customers</remarks>
         </member>
-        <member name="M:Bars.API.Cust.Server.Controllers.V1.CustomersV1Controller.#ctor(Bars.API.Cust.Server.Infrastructure.Repository.ICustomersRepository,Bars.API.Cust.Server.Infrastructure.Repository.ICustomersSearchRepository)">
+        <member name="M:Bars.API.Cust.Server.Controllers.V1.CustomersV1Controller.#ctor(Bars.API.Cust.Server.Infrastructure.Repository.ICustomersRepository)">
             <summary>
                 Constructor AccountsV1Controller
             </summary>
@@ -100,7 +95,7 @@
             <remarks>Get an array of all customers</remarks>
             <returns></returns>
         </member>
-        <member name="M:Bars.API.Cust.Server.Controllers.V1.CustomersV1Controller.GetList(System.Decimal[])">
+        <member name="M:Bars.API.Cust.Server.Controllers.V1.CustomersV1Controller.GetList(System.Collections.Generic.List{System.Decimal})">
             <summary>
             Get cusstomers by id list
             </summary>
@@ -115,13 +110,6 @@
             <remarks>Get single customer by custId</remarks>
             <returns>customer object</returns>
             <response code="404">Customer not found</response>
-        </member>
-        <member name="M:Bars.API.Cust.Server.Controllers.V1.CustomersV1Controller.FindCustomers(System.String[])">
-            <summary>
-            Find customers by EDRPO/OKPO
-            </summary>
-            <param name="custEDRPOs"></param>
-            <returns></returns>
         </member>
         <member name="T:Bars.API.Cust.Server.CustServerModule">
             <summary>
@@ -142,11 +130,6 @@
         <member name="P:Bars.API.Cust.Server.DbContexts.CustDbContext.Customers">
             <summary>
                 Customers DbSet
-            </summary>
-        </member>
-        <member name="P:Bars.API.Cust.Server.DbContexts.CustDbContext.CustomersSearch">
-            <summary>
-            Customers search configuration
             </summary>
         </member>
         <member name="M:Bars.API.Cust.Server.DbContexts.CustDbContext.OnModelCreating(System.Data.Entity.DbModelBuilder)">
@@ -180,6 +163,11 @@
             </summary>
             <param name="databaseFactory"></param>
         </member>
+        <member name="M:Bars.API.Cust.Server.Infrastructure.Repository.RegistrationQueueRepository.Delete(Bars.API.Auth.Models.RegistrationQueue)">
+            <summary>
+            </summary>
+            <param name="entity"></param>
+        </member>
         <member name="T:Bars.API.Cust.Server.Infrastructure.Repository.IRegistrationQueueRepository">
             <summary>
             </summary>
@@ -203,10 +191,22 @@
             <param name="where"></param>
             <returns></returns>
         </member>
+        <member name="M:Bars.API.Cust.Server.Infrastructure.Repository.CustomersRepository.ValidateRegistration(Bars.API.Auth.Models.RegistrationQueue)">
+            <summary>
+            </summary>
+            <param name="entity"></param>
+        </member>
         <member name="T:Bars.API.Cust.Server.Infrastructure.Repository.ICustomersRepository">
             <summary>
             
             </summary>
+        </member>
+        <member name="M:Bars.API.Cust.Server.Infrastructure.Repository.ICustomersRepository.ValidateRegistration(Bars.API.Auth.Models.RegistrationQueue)">
+            <summary>
+            
+            </summary>
+            <param name="entity"></param>
+            <returns></returns>
         </member>
         <member name="T:Bars.API.Cust.Server.Resources.CustResource">
             <summary>
