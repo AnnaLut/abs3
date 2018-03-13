@@ -1,27 +1,2 @@
-=========  svn diff --summarize -r 49631:49722 D:\SVN\master\web\mmfo
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.38\mmfo\web\barsroot\viewaccounts\Scripts\Default.js
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.38\mmfo\web\barsroot\App_Code\credit\core\base\VWcsBids.cs
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.38\mmfo\web\barsroot\App_Code\credit\visa\base\VWcsVisaBids.cs
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.38\mmfo\web\barsroot\App_Code\credit\visa\base\VWcsVisaBidsArchive.cs
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.38\mmfo\web\barsroot\App_Code\credit\crdsrv\base\VWcsCrdsrvBids.cs
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.38\mmfo\web\barsroot\App_Code\credit\crdsrv\base\VWcsCrdsrvBidsArchive.cs
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.38\mmfo\web\barsroot\App_Code\credit\secretarycc\base\VWcsCcBids.cs
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.38\mmfo\web\barsroot\App_Code\credit\secretarycc\base\VWcsCcBidsArchive.cs
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.38\mmfo\web\barsroot\App_Code\credit\manager\base\VWcsMgrBids.cs
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.38\mmfo\web\barsroot\App_Code\credit\manager\base\VWcsMgrBidsArchive.cs
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.38\mmfo\web\barsroot\App_Code\credit\srv\base\VWcsSrvBidsArchive.cs
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.38\mmfo\web\barsroot\App_Code\credit\srv\base\VWcsSrvBids.cs
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.38\mmfo\web\barsroot\clientregister\tab_linked_custs.aspx
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.38\mmfo\web\barsroot\credit\manager\queries_arh.aspx
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.38\mmfo\web\barsroot\credit\manager\queries.aspx
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.38\mmfo\web\barsroot\credit\visa\queries.aspx
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.38\mmfo\web\barsroot\credit\visa\queries_arh.aspx
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.38\mmfo\web\barsroot\credit\secretarycc\queries_arh.aspx
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.38\mmfo\web\barsroot\credit\secretarycc\queries.aspx
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.38\mmfo\web\barsroot\credit\srv\queries_arh.aspx
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.38\mmfo\web\barsroot\credit\srv\queries.aspx
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.38\mmfo\web\barsroot\credit\crdsrv\queries_arh.aspx
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.38\mmfo\web\barsroot\credit\crdsrv\queries.aspx
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.38\mmfo\web\barsroot
----web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.38\mmfo\web
-Bugfix_2.0.38.4.38 (Rev:49631-49722
+=========  svn diff --summarize -r 49723:49776 D:\SVN\master\web\mmfo
+Bugfix_2.0.38.4.40 (Rev:49723-49776
