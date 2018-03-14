@@ -1,0 +1,164 @@
+﻿@using BarsWeb.Areas.F601.Models;
+@model List<CreditInfoObject>
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Підпис та відправка даних, сформованих для форми F601.";
+}
+
+<h2>Перегляд інформації по формі F601</h2>
+
+<fieldset id="formsSet">
+
+    @(Html.Kendo().Grid<CreditInfoObject>()
+        .Name("CreditInfoObjectsGrid")
+        .Columns(columns =>
+        {
+            columns.Bound(p => p.ObjectCode).Title("Код об'єкта").Filterable(filterable => filterable
+             .Extra(false)
+             .Operators(operators => operators
+             .ForString(str => str.Clear().IsEqualTo("Рівне")
+             .IsNotEqualTo("Не рівне")
+             .StartsWith("Починається з")
+             .EndsWith("Закінчується на")
+             .Contains("Містить")
+             )))
+             .Width(100);
+
+            columns.Bound(p => p.ObjectType).Title("Тип об'єкта").Filterable(filterable => filterable.UI("objectTypeFilter")
+            .Extra(false)
+              .Operators(operators => operators
+              .ForString(str => str.Clear().IsEqualTo("Рівне")
+              )))
+              .Width(100);
+
+            columns.Bound(p => p.Name).Title("Опис об'єкта").Filterable(filterable => filterable
+              .Extra(false)
+              .Operators(operators => operators
+              .ForString(str => str.Clear().IsEqualTo("Рівне")
+              .IsNotEqualTo("Не рівне")
+              .StartsWith("Починається з")
+              .EndsWith("Закінчується на")
+              .Contains("Містить")
+              )));
+
+            columns.Command(command => command.Custom("Переглянути деталі").Click("showDetails")).Width(160);
+            columns.Bound(p => p.Status).Title("Статус").Filterable(filterable => filterable.UI("statusFilter")
+            .Extra(false)
+              .Operators(operators => operators
+              .ForString(str => str.Clear().IsEqualTo("Рівне")
+              )));
+
+            columns.Bound(p => p.PacketCreationDate).Title("Дата створення об'єкта").Format("{0:dd.MM.yyyy}").Width(100);
+            columns.Bound(p => p.PacketTransmissionDate).Title("Дата відправки об'єкта").Format("{0:dd.MM.yyyy}").Width(100);
+            columns.Bound(p => p.ErrorsDescription).Title("Опис помилок").Filterable(true);
+        })
+        .Pageable(pager => pager.ButtonCount(2))
+        .Sortable()
+        .Scrollable()
+        .Filterable()
+        //.Events(e => e.FilterMenuInit("filterMenuInit"))
+        .HtmlAttributes(new { style = "height:550px;" })
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .PageSize(20)
+            .Read(read => read.Action("GetCreditInfoObjectsList", "F601Data"))
+         )
+    )
+
+    <form id="SomeForm" action="@Url.Action("SignPackets", "F601SignerController")">
+        <p>
+            <button id="btnSubmit" type="button" onclick="SignPacketsClick();">Підписати та відправити дані</button>
+        </p>
+    </form>
+
+    @(Html.Kendo().Window().Name("Details")
+        .Title("Інформація по об'єкту")
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .Width(600)
+    )
+</fieldset>
+
+<script src="/barsroot/Scripts/jquery/jquery.iecors.js"></script>
+<script language="javascript" src="~/Areas/F601/Scripts/Index.js" type="text/javascript"></script>
+<script language="javascript" src="~/Areas/F601/Scripts/Signer.js" type="text/javascript"></script>
+@*<link href="~/Areas/F601/CSS/SomeCssFile.css" rel="stylesheet">*@
+
+<script type="text/x-kendo-template" id="template">
+    <div id="details-container">
+        <h2> Ім'я #= Name #</h2>
+    </div>
+</script>
+
+<script type="text/javascript">
+
+    function statusFilter(element) {
+        element.kendoDropDownList({
+            dataSource:
+            {
+                type: "aspnetmvc-ajax",
+                transport: {
+                    read: {
+                        url: bars.config.urlContent("/F601/F601Data/GetStatusesList")
+                    }
+                }
+            },
+            optionLabel: "--Оберіть значення--"
+        });
+    }
+
+    function objectTypeFilter(element) {
+        element.kendoDropDownList({
+            dataSource:
+            {
+                type: "aspnetmvc-ajax",
+                transport: {
+                    read: {
+                        url: bars.config.urlContent("/F601/F601Data/GetObjectTypesList")
+                    }
+                }
+            },
+            optionLabel: "--Оберіть значення--"
+        });
+    }
+
+    function filterMenuInit(e) {
+        var firstValueDropDown = e.container.find("select:eq(0)").data("kendoDropDownList");
+
+        debugger;
+        setTimeout(function () {
+            firstValueDropDown.wrapper.hide();
+        });
+    }
+
+    function showDetails(e) {
+        e.preventDefault();
+
+        var detailsTemplate = kendo.template($("#template").html());
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        var wnd = $("#Details").data("kendoWindow");
+
+        $.get('/barsroot/F601/F601Data/ShowObjectDetailedInfo', { id: dataItem.Id })
+            .done(function (result) {
+                bars.ui.loader('fieldset', false);
+
+                if (result.status == 'ok') {
+
+                    debugger;
+                    var contentToShow = result.data.replace(new RegExp('{', 'g'), '<br> {').replace(new RegExp(',', 'g'), ', <br>').replace(new RegExp('}', 'g'), '} <br>');
+                    wnd.content(contentToShow);
+                    wnd.center().open();
+                }
+                else {
+                    bars.ui.error({ title: "Помилка", text: result.message });
+                }
+            })
+            .fail(function (result) {
+                bars.ui.loader('fieldset', false);
+                bars.ui.error({ title: "Помилка", text: "Помилка при запиті на перегляд детальної інформації." });
+            });
+    }
+</script>
+
+
