@@ -111,16 +111,30 @@ namespace Bars.WebServices.OutsideServices
             XmlDocument xmlDoc = new XmlDocument();
             dynamic records = response;
 
-            foreach (var record in records)
+            if (serviceName == TypeClient.ServiceName.SINGLE_WINDOW || 
+                (serviceName == TypeClient.ServiceName.QUICK_MONEY && response[0].Length == 1)) //old version for single_window & quick_money.TransactionShortReport
             {
-                foreach (var field in record)
+
+                foreach (var record in records)
                 {
-                    xmlDoc.LoadXml(field.Value);
-                    XmlNode root = xmlDoc.FirstChild;
-                    XmlNodeList list = root["Data"].ChildNodes;
-                    foreach (XmlNode node in list)
-                        result += node.OuterXml;
+                    foreach (var field in record)
+                    {
+                        xmlDoc.LoadXml(field.Value);
+                        XmlNode root = xmlDoc.FirstChild;
+                        XmlNodeList list = root["Data"].ChildNodes;
+                        foreach (XmlNode node in list)
+                            result += node.OuterXml;
+                    }
                 }
+            }
+            else
+            {
+                var recond = response[0][3];
+                xmlDoc.LoadXml((recond as QuickMoney.Field).Value);
+                XmlNode root = xmlDoc.FirstChild;
+                XmlNodeList list = root["NBUSTATREPORT"].ChildNodes;
+                foreach (XmlNode node in list)
+                    result += node.OuterXml;
             }
 
             return result;
