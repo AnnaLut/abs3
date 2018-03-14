@@ -12,11 +12,12 @@ PROMPT *** Create  procedure P_FE9_SB ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #E9 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 10/04/2017 (07/04/2017, 06/04/2017, 03/04/2017)
+% VERSION     : 14/03/2018 (08/08/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+13/03/2018 - доопрацювання по швидкій копійці (COBUMMFO-5136)
 10.04.2017 - раскоментарил некоторые строки при наполнении
 07.04.2017 - оптимизация наполнения временной табл. OTCN_PROV_TEMP
 06.04.2017 - не включаем проводки комиссии по системе Швидка копійка 
@@ -104,8 +105,6 @@ PROMPT *** Create  procedure P_FE9_SB ***
    sumk0_     DECIMAL (24);                            --ком_с_я по контракту
    kodp_      VARCHAR2 (33);
 
-
-
    znap_      VARCHAR2 (70);
    tag_       VARCHAR2 (5);
    userid_    NUMBER;
@@ -160,7 +159,11 @@ PROMPT *** Create  procedure P_FE9_SB ***
    d060k030_  Varchar2 (1);
    po_kod_    Varchar2 (3);
    nn_        Number := 0;
-
+   
+   kol_       Number := 0;
+   
+   l_err      Number := 0;
+   l_message  Varchar2 (255);
 
 -- переказ коштiв по мiжнароднiй системi переказу коштiв або отримання переказу
    CURSOR opl_dok
@@ -290,7 +293,7 @@ BEGIN
    -- переказ коштiв нерезидентам (отримання коштiв вiд нерезидентiв)
    INSERT INTO OTCN_PROV_TEMP
    (ko, rnk, fdat, REF, tt, accd, nlsd, kv, acck, nlsk, s_nom, s_eqv, s_kom, nazn, branch)
-   select /*+ FULL(k) LEADING(k ad) */
+   select /*+ FULL(k) LEADING(k) */
            k.d060, 1, od.fdat, od.ref, od.tt, 
            ad.acc accd, ad.nls nlsd, ad.kv, ak.acc acck, ak.nls nlsk, od.s  s_nom,
            gl.p_icurval (ad.kv, od.s, od.fdat) s_eqv, 
@@ -314,6 +317,7 @@ BEGIN
           not (ad.NLS  like '29091030046500%' and ak.NLS  like '29094030046530%') and 
           not (substr(ad.NLS,1,4) = substr(ak.NLS,1,4) and ad.ob22 = ak.ob22 and lower(p.nazn) like '%перенес%') and
           not (lower(p.nazn) like '%повернення%' and p.tt not in ('M37','MMV','CN3','CN4')) and  
+          not (ad.kv = 980 and lower(od.txt) like '%ком_с_я%') and
           od.ref = p.ref and 
           lower(p.nazn) not like '%western%' and
           p.sos = 5;  
@@ -322,12 +326,12 @@ BEGIN
    -- введенных в последние календарные дни и проведенные в балансе 1 рабочего дня след. месяца
    if mfou_ = 300465 then
       if last_dayF != Dat_ then
-         INSERT /*+ APPEND PARALLEL(otcn_prov_temp) */ INTO OTCN_PROV_TEMP
+         INSERT /*+ APPEND */ INTO OTCN_PROV_TEMP
           (ko, rnk, fdat, REF, tt, accd, nlsd, kv, acck, nlsk, s_nom, s_eqv, nazn, branch)
          SELECT *
          FROM (
                 -- ТIЛЬКИ ДЛЯ ВС?Х ОБЛУПРАВЛIННЬ ОЩАДБАНКУ    перерахування переказiв
-                SELECT  /*+ PARALLEL(o.o) */
+                SELECT  /*+ PARALLEL(8) */
                      k.d060, ca.rnk, o.fdat, o.ref, o.tt, o.accd, o.nlsd, o.kv,
                      o.acck, o.nlsk,
                      o.s * 100 s_nom,
@@ -347,7 +351,7 @@ BEGIN
                   AND p.pdat < one_day_
                 UNION
                 -- надходження переказiв (видача переказiв)
-                SELECT /*+ PARALLEL(o.o) */
+                SELECT /*+ PARALLEL(8) */
                     k.d060, ca.rnk, o.fdat, o.ref, o.tt, o.accd, o.nlsd, o.kv,
                     o.acck, o.nlsk, o.s * 100 s_nom,
                     gl.p_icurval (o.kv, o.s * 100, o.fdat) s_eqv, o.nazn, o.branch
@@ -543,28 +547,6 @@ BEGIN
                   d060_ := '99';
                END;
             EXCEPTION WHEN NO_DATA_FOUND THEN
-               --BEGIN
-               --   select kl.d060
-               --      into d060_
-               --   from kl_fe9 kl
-               --   where (trim(kl.nlsd), kl.ob22) in
-               --         (select substr(a.nls,1,4), NVL(a.ob22,'00')
-               --          from opldok o, accounts a
-               --          where (o.ref, o.stmt) in
-               --                (select ref, stmt
-               --                 from opl
-               --                 where fdat = fdat_  and
-               --                    acc = acc_ and
-               --                    dk = 1) and
-               --                 o.acc = a.acc and
-               --                 a.nls LIKE '2809%' and
-               --                 a.kv = kv_ and
-               --                 o.dk = 0
-               --         )
-               --     and rownum = 1;
-               --EXCEPTION WHEN NO_DATA_FOUND THEN
-               --   d060_ := '99';  --null; -- не будем включать ненужные системы
-               --END;                       -- если будет null то включаются лишние
                null;
             END;
          end if;
@@ -582,7 +564,7 @@ BEGIN
             END IF;
          END IF;
 
-         if Dat_ >= dat_izm2 then  --and d060_ <> '42' then
+         if Dat_ >= dat_izm2 then  
             kod_w_ := '1';
             kod_f_ := '2';
             kod_a_ := '3';
@@ -591,7 +573,6 @@ BEGIN
          -- 31.03.2016 заменил для d060_ значение 11 на 42 
          if Dat_ >= dat_izm2 and d060_ = '42' and kv_ = 980 then
             kod_f_ := '1';
-            --d060_ := '42';
          end if;
 
          if formOk_ and d060_ <> '99' then
@@ -673,7 +654,7 @@ BEGIN
                D1#E9_ := kod_g_;
             end if;
 
-            if d060_ = '42' --AND D1#E9_ ='000' 
+            if d060_ = '42' 
             then
                D1#E9_ := '804';
             end if; 
@@ -741,14 +722,77 @@ BEGIN
    END LOOP;
 
    CLOSE opl_dok;
+   
+   if mfo_ = 300465 then
+      begin
+          select count(*)
+          into kol_
+          from NBUR_TMP_E9_CLOB
+          where report_date = dat_;
+          
+          if kol_ = 0 then
+             logger.info('P_FE9_SB: begin load data from SK');
+             
+             begin 
+                p_nbur_get_sk_data(Dat1_, dat_, mfo_);
+                
+                select count(*)
+                into kol_
+                from NBUR_TMP_E9_CLOB
+                where report_date = dat_;
+                
+                logger.info('P_FE9_SB: end load data from SK');
+             exception
+                when others then
+                     logger.error('P_FE9_SB: ERRORS during load data from SK '||sqlerrm);
+             end;
+          end if;
+          
+          if kol_ <> 0 then
+             p_nbur_xml_sk_parse(dat_, mfo_, l_err, l_message);  
+          end if;
+          
+          INSERT INTO rnbu_trace
+                 (odate, kodp, znap, nbuc, comm)
+          select report_date, '11'||ctkod_d060_1||nvl(ctkod_f001, '1')||
+              nvl(ctkod_k021, '3')||lpad(nvl(ctkod_k020, '0'), 10, '0')||
+              '00'||lpad(nvl(ctkod_r030, '0'), 3, '0')||
+              lpad(nvl(ctkod_k040_1, '0'), 3, '0')||
+              lpad(nvl(ctkod_ku_1, '0'), 3, '0')||
+              lpad(nvl(ctkod_k040_2, '0'), 3, '0')||
+              lpad(nvl(ctkod_ku_2, '0'), 3, '0'),
+              ctkod_t071, ctkod_ku_1, 'З XML по ШК'
+          from NBUR_TMP_E9_SK
+          where report_date = dat_ and 
+                kf = mfo_ and
+                ctkod_t071 <> 0 and 
+                ctkod_t080 <> 0
+                union all
+          select report_date, '31'||ctkod_d060_1||nvl(ctkod_f001, '1')||
+              nvl(ctkod_k021, '3')||lpad(nvl(ctkod_k020, '0'), 10, '0')||
+              '00'||lpad(nvl(ctkod_r030, '0'), 3, '0')||
+              lpad(nvl(ctkod_k040_1, '0'), 3, '0')||
+              lpad(nvl(ctkod_ku_1, '0'), 3, '0')||
+              lpad(nvl(ctkod_k040_2, '0'), 3, '0')||
+              lpad(nvl(ctkod_ku_2, '0'), 3, '0'),
+              ctkod_t080, ctkod_ku_1, 'З XML по ШК'
+          from NBUR_TMP_E9_SK
+          where report_date = dat_ and 
+                kf = mfo_ and
+                ctkod_t071 <> 0 and 
+                ctkod_t080 <> 0;   
+      exception
+         when others then 
+            logger.info('P_FE9_SB: error during load data from SK');
+      end;     
+   end if;
 ---------------------------------------------------
    DELETE FROM tmp_nbu
-         WHERE kodf = kodf_ AND datf = dat_;
+   WHERE kodf = kodf_ AND datf = dat_;
 ---------------------------------------------------
    INSERT INTO tmp_nbu (kodp, datf, kodf, znap, nbuc)
       SELECT kodp, dat_, kodf_, SUM(to_number(znap)), nbuc
         FROM rnbu_trace
-       WHERE userid = userid_
       GROUP BY KODP,NBUC;
 ----------------------------------------
    logger.info ('P_FE9_SB: End ');
