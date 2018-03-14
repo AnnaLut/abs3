@@ -1,2 +1,5 @@
-=========  svn diff --summarize -r 49723:49776 D:\SVN\master\web\mmfo
-Bugfix_2.0.38.4.40 (Rev:49723-49776
+=========  svn diff --summarize -r 49777:49812 D:\SVN\master\web\mmfo
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.41\mmfo\web\TEMPLATE.RPT\BPK607.frx
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.41\mmfo\web\TEMPLATE.RPT
+---web_release----: D:\SVN\Releases\Bugfix_2.0.38.4.41\mmfo\web
+Bugfix_2.0.38.4.41 (Rev:49777-49812
