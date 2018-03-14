@@ -300,27 +300,34 @@ is
      rollback;
      raise;
   end;
+
+  --
+  --
+  --
+  function get_cust_quantity_for_group(p_group_id in number, p_custtype in varchar2) return number
+  is
+  begin
+     for x in ( select count(1) as qty
+                  from EBKC_REQ_UPDATECARD  t
+                 where t.group_id = p_group_id
+                   and t.kf = gl.kf
+                   and nvl(cust_type,ebkc_pack.get_custtype(t.rnk)) = p_custtype
+                   and not exists (select null from customer where rnk = t.rnk and date_off is not null) )
+     loop
+      return x.qty;
+     end loop;
+  end get_cust_quantity_for_group;
  -- +
- function get_cust_quantity_for_group(p_group_id in number, p_custtype in varchar2) return number is
+ function get_legal_quantity_for_group(p_group_id in number ) return number
+ is
  begin
-    for x in ( select count(1) as qty from EBKC_REQ_UPDATECARD  t
-               where  t.group_id = p_group_id
-                 and  t.kf = gl.kf
-                 and  nvl(cust_type,ebkc_pack.get_custtype(t.rnk)) = p_custtype
-                 and  not exists (select null from customer where rnk = t.rnk and date_off is not null) )
-    loop
-     return x.qty;
-    end loop;
- end get_cust_quantity_for_group;
- -- +
- function get_legal_quantity_for_group(p_group_id in number ) return number is
- begin
-     return get_cust_quantity_for_group(p_group_id, ebkc_pack.LEGAL_PERSON);
+   return GET_CUST_QUANTITY_FOR_GROUP( p_group_id, EBKC_PACK.LEGAL_ENTITY );
  end;
  -- +
- function get_priv_quantity_for_group(p_group_id in number ) return number is
+ function get_priv_quantity_for_group(p_group_id in number ) return number
+ is
  begin
-     return get_cust_quantity_for_group(p_group_id, ebkc_pack.PRIVATE_ENT);
+   return GET_CUST_QUANTITY_FOR_GROUP( p_group_id, EBKC_PACK.PRIVATE_ENT );
  end;
 
   function get_cust_quantity_for_subgr(p_group_id in number,
@@ -338,14 +345,14 @@ is
 
     if l_sql is not null
     then
-      execute immediate ' select count(1) as qty '||
-                        '   from EBKC_REQ_UPDATECARD_LEGAL  teru '||
-                        '  where teru.group_id = :p_group_id '||
+      execute immediate 'select count(1) as qty '||
+                        '  from EBKC_REQ_UPDATECARD_LEGAL  teru '||
+                        ' where teru.group_id = :p_group_id '||
                         '   and kf = gl.kf '||
                         '   and not exists (select null from customer where rnk = teru.rnk and date_off is not null)'||
                         '   and teru.quality '||l_sql
-                        into l_qty
-                        using p_group_id;
+         into l_qty
+        using p_group_id;
     end if;
 
    return nvl(l_qty,0);
@@ -588,30 +595,32 @@ is
                and (a.recommendvalue is not null or a.descr is not null)) = p_attr_qty);
  end get_subgrp_count;
 
- procedure get_legal_subgrp_count(p_group_id       in number default 1,
-                                 p_prc_quality_id in number default null, /* Подгруппы на первой стр.,null значит Все*/
-                                 p_nmk            in varchar2 default null,
-                                 p_rnk            in number default null,
-                                 p_okpo           in varchar2 default null,
-                                 p_quality_group  in varchar2 default null, /*Card, Default*/
-                                 p_percent        in number default null, /*Процент Качества*/
-                                 p_attr_qty       in number default null, /*Кол-во атрибутов для правки*/
-                                 p_branch         in varchar2 default null,
-                                 p_count_row      out number) is
- begin
-         get_subgrp_count(p_group_id      => p_group_id,
-                                 p_prc_quality_id => p_prc_quality_id,
-                                 p_nmk            => p_nmk,
-                                 p_rnk            => p_rnk,
-                                 p_okpo           => p_okpo,
-                                 p_ser            => null,
-                                 p_numdoc         => null,
-                                 p_quality_group  => p_quality_group,
-                                 p_percent        => p_percent,
-                                 p_attr_qty       => p_attr_qty,
-                                 p_branch         => p_branch,
-                                 p_custtype       => ebkc_pack.LEGAL_PERSON,
-                                 p_count_row      => p_count_row);
+  procedure get_legal_subgrp_count
+  ( p_group_id       in  number default 1,
+    p_prc_quality_id in  number default null, /* Подгруппы на первой стр.,null значит Все*/
+    p_nmk            in  varchar2 default null,
+    p_rnk            in  number default null,
+    p_okpo           in  varchar2 default null,
+    p_quality_group  in  varchar2 default null, /*Card, Default*/
+    p_percent        in  number default null, /*Процент Качества*/
+    p_attr_qty       in  number default null, /*Кол-во атрибутов для правки*/
+    p_branch         in  varchar2 default null,
+    p_count_row      out number
+  ) is
+  begin
+    get_subgrp_count( p_group_id       => p_group_id,
+                      p_prc_quality_id => p_prc_quality_id,
+                      p_nmk            => p_nmk,
+                      p_rnk            => p_rnk,
+                      p_okpo           => p_okpo,
+                      p_ser            => null,
+                      p_numdoc         => null,
+                      p_quality_group  => p_quality_group,
+                      p_percent        => p_percent,
+                      p_attr_qty       => p_attr_qty,
+                      p_branch         => p_branch,
+                      p_custtype       => EBKC_PACK.LEGAL_ENTITY,
+                      p_count_row      => p_count_row );
  end get_legal_subgrp_count;
 
  procedure get_priv_subgrp_count(p_group_id       in number default 1,
@@ -739,7 +748,6 @@ begin
   ) loop
     pipe row(r_cust_subgrp_ebk(cur.rnk, cur.group_id, cur.id_prc_quality, cur.okpo, cur.nmk, cur.quality, cur.document, cur.birth_day, cur.attr_qty, cur.last_card_upd, cur.last_user_upd, cur.branch));
   end loop;
-
   return;
 end get_subgrp;
 
@@ -828,7 +836,6 @@ begin
   ) loop
     pipe row(r_cust_subgrp_ebk(cur.rnk, cur.group_id, cur.id_prc_quality, cur.okpo, cur.nmk, cur.quality, null, null, cur.attr_qty, cur.last_card_upd, cur.last_user_upd, cur.branch));
   end loop;
-
   return;
 end get_legal_subgrp;
 
