@@ -7,6 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** ALTER_POLICY_INFO to TMP_BPK_REP ***
 
+DROP TABLE TMP_BPK_REP;
 
 BEGIN 
         execute immediate  
