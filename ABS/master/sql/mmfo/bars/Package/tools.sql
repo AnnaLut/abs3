@@ -1,15 +1,11 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/tools.sql =========*** Run *** =====
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.TOOLS is
+create or replace package tools is
     -- Author  : Artem Yurchenko
     -- Created : 16.11.2010
     -- Version 2.0   01.10.2017
 
-    gn_dummy   number;  -- Для возвратов функций
+    ANNO_FIRST_DAY constant date := date '0001-01-01';
+
+    -- gn_dummy   number;  -- Для возвратов функций
 
     lf constant char(1 byte) := chr(10);
     cr constant char(1 byte) := chr(13);
@@ -80,6 +76,12 @@
         p_ceiling_length in integer default null,
         p_ignore_nulls in char default 'N')
     return varchar2;
+
+    function words_to_clob(
+        p_words in string_list,
+        p_splitting_symbol in varchar2 default ';',
+        p_ignore_nulls in char default 'N')
+    return clob;
 
     function number_list_to_string(
         p_number_list in number_list,
@@ -341,11 +343,9 @@
     return number;
 end;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.TOOLS as
+create or replace package body tools as
 
    -- Version 2.0   01.10.2017
-
-    ANNO_FIRST_DAY constant date := date '0001-01-01';
 
     procedure hide_hint(p_bool in boolean)
     is
@@ -627,6 +627,33 @@ CREATE OR REPLACE PACKAGE BODY BARS.TOOLS as
         end loop;
 
         return substrb(l_string, 1, l_current_length - l_splitter_length);
+    end;
+
+    function words_to_clob(
+        p_words in string_list,
+        p_splitting_symbol in varchar2 default ';',
+        p_ignore_nulls in char default 'N')
+    return clob
+    is
+        l integer;
+        l_clob clob;
+    begin
+        if (p_words is null or p_words is empty) then
+            return null;
+        end if;
+
+        dbms_lob.createtemporary(l_clob, false);
+
+        l := p_words.first;
+        while (l is not null) loop
+            if (p_words(l) is not null or nvl(p_ignore_nulls, 'N') <> 'Y') then
+                dbms_lob.append(l_clob, p_words(l) || p_splitting_symbol);
+            end if;
+
+            l := p_words.next(l);
+        end loop;
+
+        return rtrim(l_clob, p_splitting_symbol);
     end;
 
     function number_list_to_string(
@@ -1715,15 +1742,3 @@ CREATE OR REPLACE PACKAGE BODY BARS.TOOLS as
     end;
 end;
 /
- show err;
- 
-PROMPT *** Create  grants  TOOLS ***
-grant EXECUTE                                                                on TOOLS           to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on TOOLS           to PFU;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/tools.sql =========*** End *** =====
- PROMPT ===================================================================================== 
- 
