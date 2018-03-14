@@ -1159,7 +1159,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
     end;
   begin
       begin
-          select substr(val, 1, instr(val, '/', 1, 4)-1) || '/webservices/QuickMoneyService.asmx' into l_url from params where par = 'REPORT_SERVER_URL';
+          select substr(val, 1, instr(val, '/', 1, 4)-1) || '/webservices/QuickMoneyService.asmx' into l_url from web_barsconfig  where key = 'EWA.URL_SEND_REF_STATUS';
       exception when no_data_found then
           raise_application_error(-20000, 'Параметр REPORT_SERVER_URL не задано');
       end;
@@ -1226,7 +1226,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
     end;
   begin
       begin
-          select substr(val, 1, instr(val, '/', 1, 4)-1) || '/webservices/SingleWindowService.asmx' into l_url from params where par = 'REPORT_SERVER_URL';
+          select substr(val, 1, instr(val, '/', 1, 4)-1) || '/webservices/SingleWindowService.asmx' into l_url from web_barsconfig where key = 'EWA.URL_SEND_REF_STATUS';
       exception when no_data_found then
           raise_application_error(-20000, 'Параметр REPORT_SERVER_URL не задано');
       end;
