@@ -1,10 +1,8 @@
-
- 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/ebkc_wforms_utl.sql =========*** Run
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BARS.EBKC_WFORMS_UTL 
+CREATE OR REPLACE PACKAGE BARS.EBKC_WFORMS_UTL 
 is
 
   --
@@ -147,13 +145,16 @@ is
 
 end EBKC_WFORMS_UTL;
 /
+
+show errors;
+
 CREATE OR REPLACE PACKAGE BODY BARS.EBKC_WFORMS_UTL 
 is
 
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 1.07  2017.04.13';
+  g_body_version  constant varchar2(64) := 'version 1.08  2018.03.14';
 
   --
   -- variables
@@ -163,7 +164,7 @@ is
   -- повертає версію заголовка пакета
   --
   function header_version
-     return varchar2
+    return varchar2
   is
   begin
     return 'Package '||$$PLSQL_UNIT||' header '||g_header_version||'.';
@@ -981,14 +982,10 @@ end change_master_card;
                     , $$PLSQL_UNIT, to_char(p_rnkfrom), to_char(p_rnkto) );
 
     -- передача данных одного клиента другому на основании стандартной процедуры
-    BARS.RNK2RNK( p_rnkfrom, p_rnkto );
-
-    -- устанавливаем rcif для основной карточки
-    insert into ebkc_rcif(rcif,send) select p_rnkto, 0 from dual
-    where not exists (select null from ebkc_rcif where rcif = p_rnkto) ;
+    RNK2RNK( p_rnkfrom, p_rnkto );
 
     -- разрываем связь дочерней с основной
-    delete BARS.EBKC_DUPLICATE_GROUPS
+    delete EBKC_DUPLICATE_GROUPS
      where m_rnk = p_rnkto
        and d_rnk = p_rnkfrom;
 
