@@ -46,25 +46,35 @@ is
                    p_rnk in number,
                    p_duplicate_ebk in t_duplicate_ebk);
 
-  procedure request_legal_gcif_mass(p_batchId in varchar2,
-                            p_kf in varchar2,
-                            p_rnk in number,
-                            p_gcif in varchar2,
-                            p_slave_client_ebk in t_slave_client_ebk);
+  procedure REQUEST_LEGAL_GCIF_MASS
+  ( p_batchId             in varchar2
+  , p_kf                  in varchar2
+  , p_rnk                 in number
+  , p_gcif                in varchar2
+  , p_slave_client_ebk    in t_slave_client_ebk);
 
-  procedure request_private_gcif_mass(p_batchId in varchar2,
-                            p_kf in varchar2,
-                            p_rnk in number,
-                            p_gcif in varchar2,
-                            p_slave_client_ebk in t_slave_client_ebk);
+  procedure REQUEST_PRIVATE_GCIF_MASS
+  ( p_batchId             in varchar2
+  , p_kf                  in varchar2
+  , p_rnk                 in number
+  , p_gcif                in varchar2
+  , p_slave_client_ebk    in t_slave_client_ebk );
 
-  procedure request_legal_updatecard_mass(p_batchId in varchar2,
-                             p_kf in varchar2,
-                             p_rnk in number,
-                             p_anls_quality in number,
-                             p_defaultGroupQuality in number,
-                             p_tab_attr  t_rec_ebk,
-                             p_rec_qlt_grp t_rec_qlt_grp);
+  procedure REQUEST_INDIVIDUAL_GCIF_MASS
+  ( p_batchId             in varchar2
+  , p_kf                  in varchar2
+  , p_rnk                 in number
+  , p_gcif                in varchar2
+  , p_slave_client_ebk    in t_slave_client_ebk );
+
+  procedure REQUEST_LEGAL_UPDATECARD_MASS
+  ( p_batchId             in varchar2
+  , p_kf                  in varchar2
+  , p_rnk                 in number
+  , p_anls_quality        in number
+  , p_defaultGroupQuality in number
+  , p_tab_attr            in t_rec_ebk
+  , p_rec_qlt_grp         in t_rec_qlt_grp);
 
   procedure request_private_updcard_mass(p_batchId in varchar2,
                              p_kf in varchar2,
@@ -364,7 +374,8 @@ $end
     l_rnk                     customer.rnk%type;
   begin
 
-    bars_audit.trace( '%s: Entry with ( p_kf=%s, p_rnk=%s, p_gcif=%s ).', title, p_kf, to_char(p_rnk), p_gcif );
+    bars_audit.trace( '%s: Entry with ( p_kf=%s, p_rnk=%s, p_gcif=%s, p_slaves.count=%s ).'
+                    , title, p_kf, to_char(p_rnk), p_gcif, to_char(p_slave_client_ebk.count) );
 
     case
     when ( p_kf is null )
@@ -373,67 +384,44 @@ $end
     then raise_application_error( -20666,'Value for parameter [p_rnk] must be specified!', true );
     when ( p_gcif is null )
     then raise_application_error( -20666,'Value for parameter [p_gcif] must be specified!', true );
-    when ( p_custtype is null )
-    then raise_application_error( -20666,'Value for parameter [p_custtype] must be specified!', true );
     else null;
     end case;
 
 $if EBK_PARAMS.CUT_RNK $then
     bc.set_policy_group('WHOLE');
-    l_rnk := EBKC_WFORMS_UTL.GET_RNK(p_rnk,p_kf);
-$else
-    l_rnk := p_rnk;
 $end
 
-    -- перед загрузкой мастер-записи  с GCIF-ом и подчиненных записей,
-    -- необходимо очистить старую загрузку подчиненных карточек по этой же мастер карточке
+    for c in ( select t1.KF, t1.RNK
+                 from ( select KF, RNK
+                          from table( p_slave_client_ebk )
+                         union all
+                        select p_kf, p_rnk
+                          from dual
+                      ) t1
+                 join MV_KF t2
+                   on ( t2.KF = t1.KF )
+             )
+    loop
 
-    delete EBKC_SLAVE
-     where GCIF = p_gcif
-        or GCIF in ( select GCIF
-                       from EBKC_GCIF
-                      where RNK = l_rnk
-                   );
+      bars_audit.trace( '%s: c.KF=%s, c.RNK=%s.', title, c.KF, to_char(c.RNK) );
 
-    delete EBKC_GCIF
-     where RNK = l_rnk
-        or ( KF = p_kf and GCIF = p_gcif );
+$if EBK_PARAMS.CUT_RNK $then
+      l_rnk := EBKC_WFORMS_UTL.GET_RNK( c.RNK, c.KF );
+$else
+      l_rnk := c.RNK;
+$end
 
-   -- записиваем присланную актуальную структуру
-   insert
-     into EBKC_GCIF
-        ( KF, RNK, GCIF, CUST_TYPE, INSERT_DATE )
-   values
-        ( p_kf, l_rnk, p_gcif, p_custtype, l_sys_dt );
-
-    if ( p_slave_client_ebk.count > 0 )
-    then
+      delete EBKC_GCIF
+       where RNK = l_rnk
+          or ( KF = c.KF and GCIF = p_gcif );
 
       insert
-        into EBKC_SLAVE
-           ( GCIF, SLAVE_KF, SLAVE_RNK, CUST_TYPE )
-      select p_gcif
-           , sce.KF
-$if EBK_PARAMS.CUT_RNK $then
-           , EBKC_WFORMS_UTL.GET_RNK( sce.RNK, sce.KF )
-$else
-           , sce.RNK
-$end
-           , p_custtype
-        from table( p_slave_client_ebk ) sce
-       where not exists ( select 0
-                            from EBKC_SLAVE
-                           where GCIF      = p_gcif
-                             and SLAVE_KF  = sce.KF
-$if EBK_PARAMS.CUT_RNK $then
-                             and SLAVE_RNK = EBKC_WFORMS_UTL.GET_RNK(sce.RNK,sce.KF)
-$else
-                             and SLAVE_RNK = sce.RNK
-$end
-                             and CUST_TYPE = p_custtype
-                        );
+        into EBKC_GCIF
+           ( KF, RNK, GCIF, CUST_TYPE, INSERT_DATE )
+      values
+           ( c.KF, l_rnk, p_gcif, p_custtype, l_sys_dt );
 
-   end if;
+   end loop;
 
    commit;
 
@@ -458,31 +446,49 @@ $end
   --
   --
   --
-  procedure request_legal_gcif_mass(p_batchId in varchar2,
-                              p_kf in varchar2,
-                              p_rnk in number,
-                              p_gcif in varchar2,
-                              p_slave_client_ebk in t_slave_client_ebk) is
+  procedure REQUEST_LEGAL_GCIF_MASS
+  ( p_batchId in varchar2,
+    p_kf in varchar2,
+    p_rnk in number,
+    p_gcif in varchar2,
+    p_slave_client_ebk in t_slave_client_ebk
+  ) is
   begin
-    request_gcif_mass(p_batchId, p_kf, p_rnk, p_gcif, 'L', p_slave_client_ebk);
-  end request_legal_gcif_mass;
+    REQUEST_GCIF_MASS(p_batchId, p_kf, p_rnk, p_gcif, LEGAL_ENTITY, p_slave_client_ebk);
+  end REQUEST_LEGAL_GCIF_MASS;
 
   --
   --
   --
-  procedure request_private_gcif_mass(p_batchId in varchar2,
-                              p_kf in varchar2,
-                              p_rnk in number,
-                              p_gcif in varchar2,
-                              p_slave_client_ebk in t_slave_client_ebk) is
+  procedure REQUEST_PRIVATE_GCIF_MASS
+  ( p_batchId in varchar2,
+    p_kf in varchar2,
+    p_rnk in number,
+    p_gcif in varchar2,
+    p_slave_client_ebk in t_slave_client_ebk
+  ) is
   begin
-    request_gcif_mass(p_batchId, p_kf, p_rnk, p_gcif, 'P', p_slave_client_ebk);
-  end request_private_gcif_mass;
+    request_gcif_mass(p_batchId, p_kf, p_rnk, p_gcif, PRIVATE_ENT, p_slave_client_ebk);
+  end REQUEST_PRIVATE_GCIF_MASS;
 
   --
   --
   --
-  procedure request_updatecard_mass
+  procedure REQUEST_INDIVIDUAL_GCIF_MASS
+  ( p_batchId             in varchar2
+  , p_kf                  in varchar2
+  , p_rnk                 in number
+  , p_gcif                in varchar2
+  , p_slave_client_ebk    in t_slave_client_ebk
+  ) is
+  begin
+    REQUEST_GCIF_MASS( p_batchId, p_kf, p_rnk, p_gcif, INDIVIDUAL, p_slave_client_ebk );
+  end REQUEST_INDIVIDUAL_GCIF_MASS;
+
+  --
+  --
+  --
+  procedure REQUEST_UPDATECARD_MASS
   ( p_batchId             in     varchar2,
     p_kf                  in     varchar2,
     p_rnk                 in     number,
