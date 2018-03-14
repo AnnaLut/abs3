@@ -36,15 +36,25 @@ is
       p_parameters in varchar2_list,
       p_values     in varchar2_list);
 
-  procedure request_legal_dup_mass(p_batchId in varchar2,
-                   p_kf in varchar2,
-                   p_rnk in number,
-                   p_duplicate_ebk in t_duplicate_ebk);
 
-  procedure request_private_dup_mass(p_batchId in varchar2,
-                   p_kf in varchar2,
-                   p_rnk in number,
-                   p_duplicate_ebk in t_duplicate_ebk);
+  procedure REQUEST_LEGAL_DUP_MASS
+  ( p_batchId             in varchar2
+  , p_kf                  in varchar2
+  , p_rnk                 in number
+  , p_duplicate_ebk       in t_duplicate_ebk );
+
+  procedure REQUEST_PRIVATE_DUP_MASS
+  ( p_batchId             in varchar2
+  , p_kf                  in varchar2
+  , p_rnk                 in number
+  , p_duplicate_ebk       in t_duplicate_ebk );
+
+  procedure REQUEST_INDIVIDUAL_DUP_MASS
+  ( p_batchId             in varchar2
+  , p_kf                  in varchar2
+  , p_rnk                 in number
+  , p_duplicate_ebk       in t_duplicate_ebk );
+
 
   procedure REQUEST_LEGAL_GCIF_MASS
   ( p_batchId             in varchar2
@@ -66,6 +76,7 @@ is
   , p_rnk                 in number
   , p_gcif                in varchar2
   , p_slave_client_ebk    in t_slave_client_ebk );
+
 
   procedure REQUEST_LEGAL_UPDATECARD_MASS
   ( p_batchId             in varchar2
@@ -337,29 +348,46 @@ $end
   end REQUEST_DUP_MASS;
 
   --
-  -- дублікати по ЮО, отримані від ЕГАРа
+  -- дублікати по ЮО
   --
-  procedure request_legal_dup_mass(p_batchId in varchar2,
-                     p_kf in varchar2,
-                     p_rnk in number,
-                     p_duplicate_ebk in t_duplicate_ebk) is
+  procedure REQUEST_LEGAL_DUP_MASS
+  ( p_batchId in varchar2,
+    p_kf in varchar2,
+    p_rnk in number,
+    p_duplicate_ebk in t_duplicate_ebk
+  ) is
   begin
-    request_dup_mass( p_batchId, p_kf, p_rnk, 'L', p_duplicate_ebk );
-  end request_legal_dup_mass;
+    REQUEST_DUP_MASS( p_batchId, p_kf, p_rnk, LEGAL_ENTITY, p_duplicate_ebk );
+  end REQUEST_LEGAL_DUP_MASS;
 
   --
-  -- дублікати по ФОП, отримані від ЕГАРа
+  -- дублікати по ФОП
   --
-  procedure request_private_dup_mass(p_batchId in varchar2,
-                     p_kf in varchar2,
-                     p_rnk in number,
-                     p_duplicate_ebk in t_duplicate_ebk) is
+  procedure REQUEST_PRIVATE_DUP_MASS
+  ( p_batchId in varchar2,
+    p_kf in varchar2,
+    p_rnk in number,
+    p_duplicate_ebk in t_duplicate_ebk
+  ) is
   begin
-    request_dup_mass (p_batchId, p_kf, p_rnk, 'P', p_duplicate_ebk);
-  end request_private_dup_mass;
+    REQUEST_DUP_MASS( p_batchId, p_kf, p_rnk, PRIVATE_ENT, p_duplicate_ebk );
+  end REQUEST_PRIVATE_DUP_MASS;
 
   --
-  -- gcif по ЮО,ФОП отримані від ЕГАРа
+  -- дублікати по ФО
+  --
+  procedure REQUEST_INDIVIDUAL_DUP_MASS
+  ( p_batchId             in varchar2
+  , p_kf                  in varchar2
+  , p_rnk                 in number
+  , p_duplicate_ebk       in t_duplicate_ebk
+  ) is
+  begin
+    REQUEST_DUP_MASS( p_batchId, p_kf, p_rnk, INDIVIDUAL, p_duplicate_ebk );
+  end REQUEST_INDIVIDUAL_DUP_MASS;
+
+  --
+  -- GCIF по ФО, ЮО та ФОП
   --
   procedure REQUEST_GCIF_MASS
   ( p_batchId          in     varchar2,
