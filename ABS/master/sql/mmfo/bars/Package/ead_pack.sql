@@ -1711,7 +1711,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
                     acc, nbs, rnk, kf
                from accounts
               where (acc, kf) in (select acc, kf from accounts_update au join ead_nbs e on ead_pack.get_acc_nbs(au.acc) = e.nbs and e.custtype = 3
-                             where kf member of kflist
+                             where kf member of kflist and rnk > 199
                                and idupd > l_cdc_lastkey_acc
                                and idupd <= l_cdc_newkey_acc)
          )
