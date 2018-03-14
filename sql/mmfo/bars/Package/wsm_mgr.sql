@@ -72,16 +72,18 @@ create or replace package wsm_mgr is
     parameters      t_parameters,
     headers         t_headers,
     namespace       varchar2(256),
-    soap_method     varchar2(256)
+    soap_method     varchar2(256),
+    soap_login      varchar2(30 char),
+    soap_password   varchar2(255 char)
     );
 
   ----
   -- Объект ответа
   --
   type t_response is record(
-    xdoc xmltype,
     bdoc blob,
-    cdoc clob);
+    cdoc clob,
+    xdoc xmltype);
 
   --------------------------------------------------------------------------------
   -- кодируем строку в base64
@@ -115,6 +117,8 @@ create or replace package wsm_mgr is
                             p_wallet_pwd      in varchar2 default null,
                             p_namespace       in varchar2 default null,
                             p_soap_method     in varchar2 default null,
+                            p_soap_login      in varchar2 default null,
+                            p_soap_password   in varchar2 default null,
                             p_body            in clob default null,
                             p_blob_body       in blob default null);
   --------------------------------------------------------------------------------
@@ -130,12 +134,19 @@ create or replace package wsm_mgr is
   --
   procedure execute_request(p_response out t_response);
   --SOAP
+  procedure execute_soap(
+    p_response out t_response,
+    p_status_code out integer,
+    p_error_details out clob);
+
   procedure execute_soap(p_response out t_response);
   --WebApi
   procedure execute_api(p_response out t_response);
+
   --------------------------------------------------------------------------------
   --  проверить сервис
   --
+/*
   function test_service(p_echo clob, p_http_method in varchar2 default 'POST') return varchar2;
   --------------------------------------------------------------------------------
   --  подписать буфер
@@ -145,7 +156,7 @@ create or replace package wsm_mgr is
   --  проверить подпись  буфер
   --
   procedure verify_sign(p_buffer clob, p_sign_buffer in clob, p_signs_count out number);
-
+*/
 end wsm_mgr;
 /
 create or replace package body wsm_mgr is
@@ -158,8 +169,6 @@ create or replace package body wsm_mgr is
   -- Private constant declarations
   g_body_version  constant varchar2(64) := 'version 1.04 13/01/2017';
   g_awk_body_defs constant varchar2(512) := '';
-
-  g_service_url varchar2(256);
 
   g_request  t_request;
   g_response t_response;
@@ -371,6 +380,8 @@ create or replace package body wsm_mgr is
                             p_wallet_pwd      in varchar2 default null,
                             p_namespace       in varchar2 default null,
                             p_soap_method     in varchar2 default null,
+                            p_soap_login      in varchar2 default null,
+                            p_soap_password   in varchar2 default null,
                             p_body            in clob default null,
                             p_blob_body       in blob default null) as
   begin
@@ -393,6 +404,8 @@ create or replace package body wsm_mgr is
     g_request.headers         := g_headers;
     g_request.namespace       := p_namespace;
     g_request.soap_method     := p_soap_method;
+    g_request.soap_login      := p_soap_login;
+    g_request.soap_password   := p_soap_password;
     if g_request.body  is null then
       dbms_lob.createtemporary(g_request.body,false);
     end if;
@@ -612,86 +625,102 @@ create or replace package body wsm_mgr is
   end;
 
 
-  procedure generate_envelope(p_env in out nocopy clob) as
+  procedure generate_envelope(
+      p_env in out nocopy clob)
+  as
   begin
-    p_env := g_xmlhead || '<soap:Envelope ' ||
-             'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ' ||
-             'xmlns:xsd="http://www.w3.org/2001/XMLSchema" ' ||
-             'xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">' ||
-             '<soap:Body>' || '<' || g_request.soap_method || ' xmlns="' ||
-             g_request.namespace || '">' || g_request.body || '</' || g_request.soap_method || '>' ||
-             '</soap:Body>' || '</soap:Envelope>';
+      p_env := g_xmlhead ||
+               '<soap:Envelope  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  xmlns:xsd="http://www.w3.org/2001/XMLSchema" ' ||
+                               'xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">';
+
+      if (g_request.soap_login is not null) then
+          dbms_lob.append(p_env, '<soap:Header><WsHeader xmlns="' || g_request.namespace ||
+                                 '"><UserName>' || g_request.soap_login ||  '</UserName>' ||
+                                 case when (g_request.soap_password is not null) then
+                                           '<Password>' || g_request.soap_password || '</Password>'
+                                      else null
+                                 end ||
+                                 '</WsHeader></soap:Header>');
+      end if;
+
+      dbms_lob.append(p_env, '<soap:Body><' || g_request.soap_method || ' xmlns="' || g_request.namespace || '">');
+      dbms_lob.append(p_env, g_request.body);
+      dbms_lob.append(p_env, '</' || g_request.soap_method || '></soap:Body></soap:Envelope>');
   end;
 
   --------------------------------------------------------------------------------
   -- вызов подготовленого запроса SOAP
-  --
+  procedure execute_soap(
+      p_response out t_response,
+      p_status_code out integer,
+      p_error_details out clob)
+  as
+      l_http_req    utl_http.req;
+      l_http_resp   utl_http.resp;
+      l_env         clob;
+      l_env_length  number;
 
-  procedure execute_soap(p_response out t_response) as
-    l_http_req    utl_http.req;
-    l_http_resp   utl_http.resp;
-    l_env         clob;
-    l_env_length  number;
+      l_parameter   t_parameter;
 
-    l_parameter   t_parameter;
-
-    l_tmp     raw(32767);
-    l_offset  number := 1;
-    l_ammount number := 2000;
-    l_buffer  varchar2(2000);
-    l_header      t_header;
-    l_name        varchar2(256);
-    l_hdr_value   varchar2(1024);
-    l_hdr         t_header;
-    l_hdrs        t_headers;
-    l_result      clob;
-    l_db_charset  varchar2(100) := 'AL32UTF8';
-
+      l_tmp         raw(32767);
+      l_offset      number := 1;
+      l_amount      number := 2000;
+      l_buffer  varchar2(2000);
+      l_header      t_header;
+      l_name        varchar2(256);
+      l_hdr_value   varchar2(1024);
+      l_hdr         t_header;
+      l_hdrs        t_headers;
+      l_result      clob;
+      l_db_charset  varchar2(100) := 'AL32UTF8';
   begin
-    trace_info('g_request.http_method=' || g_request.http_method || ', g_request.parameters.count=' || g_request.parameters.count);
+      bars_audit.log_trace('wsm_mgr.execute_soap (call)',
+                           p_log_message => 'url             : ' || g_request.url             || chr(10) ||
+                                            'action          : ' || g_request.action          || chr(10) ||
+                                            'http_method     : ' || g_request.http_method     || chr(10) ||
+                                            'content_type    : ' || g_request.content_type    || chr(10) ||
+                                            'content_charset : ' || g_request.content_charset || chr(10) ||
+                                            'wallet_path     : ' || g_request.wallet_path     || chr(10) ||
+                                            'wallet_pwd      : ' || g_request.wallet_pwd      || chr(10) ||
+                                            'namespace       : ' || g_request.namespace       || chr(10) ||
+                                            'soap_method     : ' || g_request.soap_method,
+                           p_auxiliary_info => g_request.body);
 
     select value into l_db_charset from nls_database_parameters where parameter = 'NLS_CHARACTERSET';
 
+      for i in 1..g_request.parameters.count loop
+          l_parameter := g_request.parameters(i);
 
-    for i in 1 .. g_request.parameters.count loop
-      l_parameter := g_request.parameters(i);
+          dbms_lob.writeappend(g_request.body, length ('<'||l_parameter.p_param_name||'>'), '<'||l_parameter.p_param_name||'>');
+          dbms_lob.append(g_request.body, dbms_xmlgen.convert(l_parameter.p_param_value));
+          dbms_lob.writeappend(g_request.body, length('</'||l_parameter.p_param_name||'>'), '</'||l_parameter.p_param_name||'>');
+      end loop;
 
-      trace_info('parameter: p_param_name=[' || l_parameter.p_param_name || '], p_param_value=[' || substr(l_parameter.p_param_value, 1, 2000) || ']');
+      generate_envelope(l_env);
 
-      dbms_lob.writeappend(g_request.body, length ('<'||l_parameter.p_param_name||'>'), '<'||l_parameter.p_param_name||'>');
-      dbms_lob.append(g_request.body, dbms_xmlgen.convert(l_parameter.p_param_value));
-      dbms_lob.writeappend(g_request.body, length('</'||l_parameter.p_param_name||'>'), '</'||l_parameter.p_param_name||'>');
+      bars_audit.log_trace('wsm_mgr.execute_soap (envelope)',
+                           p_log_message => 'url         : ' || g_request.url || chr(10) ||
+                                            'soap_method : ' || g_request.soap_method,
+                           p_auxiliary_info => l_env);
 
-    end loop;
+      utl_http.set_transfer_timeout(g_transfer_timeout);
 
-    generate_envelope(l_env);
+      -- SSL соединение выполняем через wallet
+      if (instr(lower(g_request.url), 'https://') > 0) then
+          utl_http.set_wallet(g_request.wallet_path, g_request.wallet_pwd);
+      end if;
 
-    utl_http.set_transfer_timeout(g_transfer_timeout);
+      begin
+          l_http_req := utl_http.begin_request(g_request.url, g_request.http_method, g_http_version);
+      exception
+          when utl_http.request_failed then
+               raise_application_error(-20001, 'Не запущено сервіс за адресою [' || g_request.url || ']' || sqlerrm, false);
+      end;
 
-    -- SSL соединение выполняем через wallet
-    if (instr(lower(g_request.url), 'https://') > 0) then
-      utl_http.set_wallet(g_request.wallet_path, g_request.wallet_pwd);
-    end if;
-
-    begin
-      l_http_req := utl_http.begin_request(g_request.url, g_request.http_method, g_http_version);
-    exception
-      when others then
-        if sqlcode = -29273 then
-          raise_application_error(-20001, 'Не запущено сервіс за адресою [' || g_request.url || ']' || sqlerrm, false);
-        else
-          raise;
-        end if;
-    end;
-
-    trace_info('g_request.url             = [' || g_request.url || ']' || chr(10) || 'g_request.body            = [' || substr(g_request.body, 1, 2000) || ']' || chr(10) ||
-               'g_request.content_type    = [' || g_request.content_type || ']' || chr(10) || 'g_request.content_charset = [' ||
-               g_request.content_charset || ']');
-
-    -- header
+      -- header
     for i in 1 .. g_request.headers.count loop
-      l_header := g_request.headers(i);
-      utl_http.set_header(l_http_req, l_header.p_header_name, l_header.p_header_value);
+        l_header := g_request.headers(i);
+        utl_http.set_header(l_http_req, l_header.p_header_name, l_header.p_header_value);
     end loop;
 
     utl_http.set_header(l_http_req, 'SOAPAction', g_request.namespace || g_request.soap_method);
@@ -701,121 +730,112 @@ create or replace package body wsm_mgr is
     -- определяем длину сообщения
     l_env_length := dbms_lob.getlength(l_env);
 
-    -- формируем тело запроса
-/*    if (l_env_length <= 32767) then
-      -- если длина xml-данных меньше 32Кб
-      utl_http.set_header(r     => l_http_req,
-                          name  => 'Content-Length',
-                          value => l_env_length);
+      if (l_env_length <= 32767) then
 
-      -- тело запроса
-      l_tmp := utl_raw.cast_to_raw(dbms_lob.substr(l_env, 32767, 1));
+          if (l_db_charset = 'AL32UTF8') then
+              l_tmp := utl_raw.cast_to_raw(dbms_lob.substr(l_env, l_env_length, 1));
+          else
+              l_tmp := utl_raw.convert(utl_raw.cast_to_raw(dbms_lob.substr(l_env, l_env_length, 1)),
+                                       'american_america.al32utf8',
+                                       'american_america.' || lower(l_db_charset));
+          end if;
 
-      dbms_output.put_line('l_tmp' || l_tmp);
-      utl_http.write_raw(l_http_req, l_tmp);
+          utl_http.set_header(l_http_req, 'Content-Length', utl_raw.length(l_tmp));
 
-    elsif (l_env_length > 32767) then
-      -- если длина xml-данных больше 32Кб
-      utl_http.set_header(r     => l_http_req,
-                          name  => 'Transfer-Encoding',
-                          value => 'chunked');
+          utl_http.write_raw(l_http_req, l_tmp);
 
-      -- тело запроса по кусочкам
+      elsif (l_env_length > 32767) then
 
-      while (l_offset < l_env_length) loop
-        dbms_lob.read(l_env, l_ammount, l_offset, l_buffer);
-        l_tmp := utl_raw.cast_to_raw(l_buffer);
-        utl_http.write_raw(l_http_req, l_tmp);
-        l_offset := l_offset + l_ammount;
-      end loop;
-    end if;*/
+          -- если длина xml-данных больше 32Кб
+          utl_http.set_header(l_http_req, 'Transfer-Encoding', 'chunked');
 
-    if (l_env_length <= 32767) then
+          -- тело запроса по кусочкам
+          while (l_offset < l_env_length) loop
 
-      if l_db_charset = 'AL32UTF8' then
-        l_tmp := utl_raw.cast_to_raw(dbms_lob.substr(l_env, l_env_length, 1));
-      else
-        l_tmp := utl_raw.convert(utl_raw.cast_to_raw(dbms_lob.substr(l_env, l_env_length, 1)),'american_america.al32utf8', 'american_america.'||lower(l_db_charset) );
+              dbms_lob.read(l_env, l_amount, l_offset, l_buffer);
+
+              if (l_db_charset = 'AL32UTF8') then
+                  l_tmp := utl_raw.cast_to_raw(l_buffer);
+              else
+                  l_tmp := utl_raw.convert(utl_raw.cast_to_raw(l_buffer), 'american_america.al32utf8', 'american_america.' || lower(l_db_charset));
+              end if;
+
+              utl_http.write_raw(l_http_req, l_tmp);
+
+              l_offset := l_offset + l_amount;
+          end loop;
       end if;
 
-      utl_http.set_header(r     => l_http_req,
-                          name  => 'Content-Length',
-                          value => utl_raw.length(l_tmp) );
+      l_http_resp := utl_http.get_response(l_http_req);
 
-      utl_http.write_raw(l_http_req, l_tmp);
+      -- set response code, response http header and response cookies global
+      g_status_code := l_http_resp.status_code;
+      p_status_code := l_http_resp.status_code;
 
-    elsif (l_env_length > 32767) then
-      -- если длина xml-данных больше 32Кб
-      utl_http.set_header(r     => l_http_req,
-                          name  => 'Transfer-Encoding',
-                          value => 'chunked');
+      for i in 1 .. utl_http.get_header_count(l_http_resp) loop
 
-      -- тело запроса по кусочкам
-      while (l_offset < l_env_length) loop
-        dbms_lob.read(l_env, l_ammount, l_offset, l_buffer);
-        if l_db_charset = 'AL32UTF8' then
-          l_tmp := utl_raw.cast_to_raw(l_buffer);
-        else
-          l_tmp := utl_raw.convert(utl_raw.cast_to_raw(l_buffer),'american_america.al32utf8', 'american_america.'||lower(l_db_charset));
-        end if;
-        utl_http.write_raw(l_http_req, l_tmp);
-        l_offset := l_offset + l_ammount;
+          utl_http.get_header(l_http_resp, i, l_name, l_hdr_value);
+
+          l_hdr.p_header_name := l_name;
+          l_hdr.p_header_value := l_hdr_value;
+
+          l_hdrs(i) := l_hdr;
       end loop;
-    end if;
 
-    l_http_resp := utl_http.get_response(l_http_req);
+      g_headers := l_hdrs;
 
-    -- set response code, response http header and response cookies global
-    g_status_code := l_http_resp.status_code;
-    trace_info('g_status_code = [' || g_status_code || ']');
+      -- работает для баз с не AL32UTF8 кодировкой
+      --utl_http.set_body_charset(l_http_resp, 'UTF8');
 
-    for i in 1 .. utl_http.get_header_count(l_http_resp) loop
-      utl_http.get_header(l_http_resp, i, l_name, l_hdr_value);
-      l_hdr.p_header_name := l_name;
-      l_hdr.p_header_value := l_hdr_value;
-      l_hdrs(i) := l_hdr;
-      trace_info('res header name=[' || l_name || '], value=[' || l_hdr_value || ']');
-    end loop;
+      -- читаем ответ
+      dbms_lob.createtemporary(l_result, false);
 
-    g_headers := l_hdrs;
+      dbms_lob.open(l_result, dbms_lob.lob_readwrite);
 
-    -- работает для баз с не AL32UTF8 кодировкой
-    --utl_http.set_body_charset(l_http_resp, 'UTF8');
+      begin
+          loop
+              utl_http.read_text(l_http_resp, l_buffer);
+              dbms_lob.writeappend(l_result, length(l_buffer), l_buffer);
+          end loop;
+      exception
+          when utl_http.end_of_body then
+               null;
+      end;
 
-    -- читаем ответ
-    dbms_lob.createtemporary(l_result, false);
-    dbms_lob.open(l_result, dbms_lob.lob_readwrite);
+      utl_http.end_response(l_http_resp);
 
-    begin
-      loop
-        utl_http.read_text(l_http_resp, l_buffer);
-        dbms_lob.writeappend(l_result, length(l_buffer), l_buffer);
-      end loop;
-    exception
-      when utl_http.end_of_body then
-        null;
-    end;
+      if (g_status_code = 200) then
+          -- хак для возможности конвертировать в xmltype
+          l_result := replace(l_result, 'xmlns=', 'mlns=');
 
-    utl_http.end_response(l_http_resp);
-    -- хак для возможности конвертировать в xmltype
-    l_result := replace(l_result, 'xmlns=', 'mlns=');
-    --update test_clob set data = l_result where metod_name = 'test';
-    --    commit;
-    if g_status_code != 200 then
-      raise_application_error(-20001,
-                              'Сервіс повернув код [' || g_status_code || ']. Перевірте налаштування. Текст відповіді:' || chr(13) || chr(10) || l_result,
-                              false);
-    end if;
+          p_response.cdoc := l_result;
+      else
+          p_error_details := l_result;
+      end if;
+  end;
 
-    --
-    p_response.cdoc := l_result;
-    begin
-      p_response.xdoc := xmltype.createxml(l_result);
-    exception
-      when others then
-        p_response.xdoc := null;
-    end;
-    trace_info('l_result_clob = [' || dbms_lob.substr(p_response.cdoc, 2000) || ']');
+  procedure execute_soap(
+      p_response out t_response)
+  is
+      l_status_code integer;
+      l_error_details clob;
+  begin
+      execute_soap(p_response, l_status_code, l_error_details);
+
+      if (l_status_code not in (200, 201)) then
+          bars_audit.log_error(p_procedure_name => 'wsm_mgr.execute_soap',
+                               p_log_message => 'Результат виклику веб-сервіса : ' || g_request.url ||
+                                                ', метод : ' || g_request.soap_method ||
+                                                ', код відповіді : ' || l_status_code || tools.crlf ||
+                                                dbms_utility.format_call_stack(),
+                               p_auxiliary_info => l_error_details);
+
+          raise_application_error(-20001,
+                                  'Сервіс повернув код [' || l_status_code ||
+                                  ']. Перевірте налаштування. Текст відповіді:' || tools.crlf ||
+                                       dbms_lob.substr(l_error_details, 512),
+                                  false);
+      end if;
   end;
 
   --------------------------------------------------------------------------------
@@ -985,8 +1005,7 @@ create or replace package body wsm_mgr is
     utl_http.end_response(l_http_resp);
     -- хак для возможности конвертировать в xmltype
     l_result := replace(l_result, 'xmlns=', 'mlns=');
-    --update test_clob set data = l_result where metod_name = 'test';
-    --    commit;
+
     if g_status_code != 200 then
       bars_audit.log_error('wsm_mgr.execute_api', 'g_status_code : ' || g_status_code, p_auxiliary_info => l_result);
       raise_application_error(-20001,
@@ -994,7 +1013,6 @@ create or replace package body wsm_mgr is
                               false);
     end if;
 
-    --
     p_response.cdoc := l_result;
     begin
       p_response.xdoc := xmltype.createxml(l_result);
@@ -1002,11 +1020,11 @@ create or replace package body wsm_mgr is
       when others then
         p_response.xdoc := null;
     end;
-    --trace_info('l_result_clob = [' || p_response.cdoc || ']');
   end;
   ------------------------------------------------------------------------------
   --  проверить сервис
   --
+/*
   function test_service(p_echo clob, p_http_method in varchar2 default 'POST') return varchar2 is
     l_result varchar2(32767);
   begin
@@ -1099,14 +1117,7 @@ create or replace package body wsm_mgr is
       l_result := g_response.xdoc.extract('//ErrorMessage/text()').getstringval();
       raise_application_error(-20001, 'Помилка перевірки підпису підпису - ' || l_result, false);
     end if;
-  end;
-
-begin
-  -- Initialization
-  null;
+  end;*/
 end wsm_mgr;
 /
- show err;
- 
-PROMPT *** Create  grants  WSM_MGR ***
-grant EXECUTE                                                                on WSM_MGR         to PFU;
+show err;
