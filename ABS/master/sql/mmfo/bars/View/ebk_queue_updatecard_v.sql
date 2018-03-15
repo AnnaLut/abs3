@@ -1,7 +1,7 @@
 -- ======================================================================================
 -- Module : CDM (ЄБК)
 -- Author : BAA
--- Date   : 21.09.2017
+-- Date   : 12.02.2018
 -- ======================================================================================
 -- create view EBK_QUEUE_UPDATECARD_V
 -- ======================================================================================
@@ -93,12 +93,15 @@ create or replace force view EBK_QUEUE_UPDATECARD_V
 , CURRENTACCOUNT
 , OTHER
 , LASTCHANGEDT
-) AS 
-select equ.KF,                          -- Код РУ (код МФО)
+, CUST_ID
+, GCIF
+, RCIF
+) as
+select eq.KF,                          -- Код РУ (код МФО)
        case
          when ( EBK_PARAMS.IS_CUT_RNK = 1 )
-         then trunc(equ.RNK/100)
-         else equ.RNK
+         then trunc(eq.RNK/100)
+         else eq.RNK
        end as RNK,                      -- Реєстр. № (РНК)
        ecbi.date_ON  as dateON ,        -- Дата реєстрації
        ecbi.date_OFF as dateOFF,        -- Дата закриття
@@ -174,15 +177,23 @@ select equ.KF,                          -- Код РУ (код МФО)
        ecbi.deposit,
        ecbi.current_account as CurrentAccount,
        ecbi.other,
-       equ.insert_date as lastChangeDt
-  from EBK_QUEUE_UPDATECARD equ
+       eq.INSERT_DATE as lastChangeDt,
+       eq.RNK as CUST_ID,
+       cast( null as number ) as GCIF, -- eg.GCIF,
+       cast( null as number ) as RCIF
+  from ( select KF, RNK, INSERT_DATE
+           from EBK_QUEUE_UPDATECARD
+          where STATUS = 0
+          order by ROWID
+       ) eq
   join EBK_CUST_BD_INFO_V  ecbi
-    on ( ecbi.RNK = equ.RNK )
- where equ.STATUS = 0
- order by KF, RNK
+    on ( ecbi.RNK = eq.RNK )
+--left outer
+--join EBKC_GCIF eg
+--  on ( eg.RNK = eq.RNK )
 ;
 
 show errors;
-grant SELECT                                                                 on EBK_QUEUE_UPDATECARD_V to UPLD;
 
 grant SELECT on EBK_QUEUE_UPDATECARD_V to BARS_ACCESS_DEFROLE;
+grant SELECT on EBK_QUEUE_UPDATECARD_V to BARSREADER_ROLE;

@@ -1,14 +1,89 @@
+-- ======================================================================================
+-- Module : CDM (ªÁÊ)
+-- Author : BAA
+-- Date   : 12.02.2018
+-- ======================================================================================
+-- create view V_EBKC_QUEUE_UPDCARD_LEGAL
+-- ======================================================================================
 
+SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
+SET ECHO         OFF
+SET LINES        500
+SET PAGES        500
 
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_EBKC_QUEUE_UPDCARD_LEGAL.sql ========
-PROMPT ===================================================================================== 
+prompt -- ======================================================
+prompt -- create view V_EBKC_QUEUE_UPDCARD_LEGAL
+prompt -- ======================================================
 
-
-PROMPT *** Create  view V_EBKC_QUEUE_UPDCARD_LEGAL ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_EBKC_QUEUE_UPDCARD_LEGAL ("KF", "RNK", "LASTCHANGEDT", "DATEOFF", "DATEON", "FULLNAME", "FULLNAMEINTERNATIONAL", "FULLNAMEABBREVIATED", "K014", "K040", "BUILDSTATEREGISTER", "OKPO", "ISOKPOEXCLUSION", "K060", "K030", "OFFBALANCEDEPCODE", "OFFBALANCEDEPNAME", "K070", "K080", "K110", "K050", "K051", "LA_INDEX", "LA_TERRITORYCODE", "LA_REGION", "LA_AREA", "LA_SETTLEMENT", "LA_K040", "LA_FULLADDRESS", "AA_INDEX", "AA_TERRITORYCODE", "AA_REGION", "AA_AREA", "AA_SETTLEMENT", "AA_K040", "AA_FULLADDRESS", "REGIONALPI", "AREAPI", "ADMREGAUTHORITY", "ADMREGDATE", "PIREGDATE", "DPAREGNUMBER", "DPIREGDATE", "VATDATA", "VATCERTNUMBER", "NAMEBYSTATUS", "BORROWERCLASS", "REGIONALHOLDINGNUMBER", "K013", "GROUPAFFILIATION", "INCOMETAXPAYERREGDATE", "SEPARATEDIVCORPCODE", "ECONOMICACTIVITYTYPE", "FIRSTACCDATE", "INITIALFORMFILLDATE", "EVALUATIONREPUTATION", "AUTHORIZEDCAPITALSIZE", "RISKLEVEL", "REVENUESOURCESCHARACTER", "ESSENCECHARACTER", "NATIONALPROPERTY", "VIPSIGN", "NOTAXPAYERSIGN") AS 
-  select v.kf,
+create or replace force view V_EBKC_QUEUE_UPDCARD_LEGAL
+( KF
+, RNK
+, LASTCHANGEDT
+, DATEOFF
+, DATEON
+, FULLNAME
+, FULLNAMEINTERNATIONAL
+, FULLNAMEABBREVIATED
+, K014
+, K040
+, BUILDSTATEREGISTER
+, OKPO
+, ISOKPOEXCLUSION
+, K060
+, K030
+, OFFBALANCEDEPCODE
+, OFFBALANCEDEPNAME
+, K070
+, K080
+, K110
+, K050
+, K051
+, LA_INDEX
+, LA_TERRITORYCODE
+, LA_REGION
+, LA_AREA
+, LA_SETTLEMENT
+, LA_K040
+, LA_FULLADDRESS
+, AA_INDEX
+, AA_TERRITORYCODE
+, AA_REGION
+, AA_AREA
+, AA_SETTLEMENT
+, AA_K040
+, AA_FULLADDRESS
+, REGIONALPI
+, AREAPI
+, ADMREGAUTHORITY
+, ADMREGDATE
+, PIREGDATE
+, DPAREGNUMBER
+, DPIREGDATE
+, VATDATA
+, VATCERTNUMBER
+, NAMEBYSTATUS
+, BORROWERCLASS
+, REGIONALHOLDINGNUMBER
+, K013
+, GROUPAFFILIATION
+, INCOMETAXPAYERREGDATE
+, SEPARATEDIVCORPCODE
+, ECONOMICACTIVITYTYPE
+, FIRSTACCDATE
+, INITIALFORMFILLDATE
+, EVALUATIONREPUTATION
+, AUTHORIZEDCAPITALSIZE
+, RISKLEVEL
+, REVENUESOURCESCHARACTER
+, ESSENCECHARACTER
+, NATIONALPROPERTY
+, VIPSIGN
+, NOTAXPAYERSIGN
+, CUST_ID
+, GCIF
+, RCIF
+) AS
+select v.kf,
        case
          when ( EBK_PARAMS.IS_CUT_RNK = 1 )
          then trunc(v.RNK/100)
@@ -59,9 +134,9 @@ PROMPT *** Create  view V_EBKC_QUEUE_UPDCARD_LEGAL ***
        v.vat_Cert_Number   as vatCertNumber,
        v.name_By_Status    as nameByStatus,
        v.borrower_Class    as borrowerClass,
-       v.regional_Holding_Number as regionalHoldingNumber,
+       v.regional_Holding_Number   as regionalHoldingNumber,
        v.k013,
-       v.group_Affiliation as groupAffiliation,
+       v.group_Affiliation         as groupAffiliation,
        v.income_Tax_Payer_Reg_Date as incomeTaxPayerRegDate,
        v.separate_Div_Corp_Code    as separateDivCorpCode,
        v.economic_Activity_Type    as economicActivityType,
@@ -74,20 +149,24 @@ PROMPT *** Create  view V_EBKC_QUEUE_UPDCARD_LEGAL ***
        v.essence_Character         as essenceCharacter,
        v.national_Property         as nationalProperty,
        v.vip_Sign                  as vipSign,
-       v.no_Taxpayer_Sign          as noTaxpayerSign
-  from V_EBKC_LEGAL_PERSON v
- where exists ( select null from ebkc_queue_updatecard lp 
-                 where lp.rnk = v.rnk 
-                   and lp.cust_type = 'L'
-                   and lp.status=0 );
+       v.no_Taxpayer_Sign          as noTaxpayerSign,
+       v.RNK                       as CUST_ID,
+       cast( null as number ) as GCIF, -- g.GCIF,
+       cast( null as number ) as RCIF
+  from ( select RNK
+           from EBKC_QUEUE_UPDATECARD
+          where CUST_TYPE = 'L'
+            and STATUS    = 0
+          order by ROWID
+       ) q
+  join V_EBKC_LEGAL_PERSON v
+    on ( v.RNK = q.RNK )
+--left outer
+--join EBKC_GCIF g
+--  on ( g.RNK = q.RNK )
+;
 
-PROMPT *** Create  grants  V_EBKC_QUEUE_UPDCARD_LEGAL ***
-grant SELECT                                                                 on V_EBKC_QUEUE_UPDCARD_LEGAL to BARSREADER_ROLE;
-grant SELECT                                                                 on V_EBKC_QUEUE_UPDCARD_LEGAL to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_EBKC_QUEUE_UPDCARD_LEGAL to UPLD;
+show errors;
 
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_EBKC_QUEUE_UPDCARD_LEGAL.sql ========
-PROMPT ===================================================================================== 
+grant SELECT on V_EBKC_QUEUE_UPDCARD_LEGAL to BARS_ACCESS_DEFROLE;
+grant SELECT on V_EBKC_QUEUE_UPDCARD_LEGAL to BARSREADER_ROLE;
