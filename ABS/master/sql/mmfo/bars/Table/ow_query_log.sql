@@ -125,6 +125,15 @@ begin
 end;
 / 
 
+begin
+    execute immediate 'create index I_OW_QUERY_LOG_ND on OW_QUERY_LOG (nd)
+  tablespace BRSDYNI';
+ exception when others then 
+    if sqlcode = -955 or sqlcode = -1408 then null; else raise; 
+    end if; 
+end;
+/ 
+
 
 PROMPT *** Create  grants  OW_QUERY_LOG ***
 grant SELECT                                                                 on OW_QUERY_LOG    to BARSREADER_ROLE;
