@@ -3,7 +3,7 @@
 -- Author : BAA
 -- Date   : 19.10.2017
 -- ======================================================================================
--- create TABLESPACES
+-- create TableSpaces for DM
 -- ======================================================================================
 
 SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
@@ -13,17 +13,19 @@ SET PAGES        500
 SET FEEDBACK     OFF
 
 prompt -- ======================================================
-prompt -- create tablespace for DataMart's tables
+prompt -- create tablespace for DataMart's tables and indexes
 prompt -- ======================================================
 
 declare
   e_tblsp_exists         exception;
   pragma exception_init( e_tblsp_exists, -01543 );
+  l_tblsp_nm             varchar2(30);
 begin
   for c in ( select KF from BARS.KF_RU )
   loop
+    l_tblsp_nm := 'BRS_DM_'||c.KF;
     begin
-      execute immediate 'create tablespace BRS_DM_D_' || c.KF || q'[
+      execute immediate 'create tablespace '|| l_tblsp_nm || q'[
 DATAFILE SIZE 32M 
 AUTOEXTEND ON NEXT 32M 
 MAXSIZE UNLIMITED 
@@ -32,38 +34,7 @@ ONLINE
 EXTENT MANAGEMENT LOCAL AUTOALLOCATE 
 SEGMENT SPACE MANAGEMENT AUTO 
 FLASHBACK ON ]';
-      dbms_output.put_line( 'Tablespace created.' );
-    exception
-      when e_tblsp_exists
-      then null;
-      when OTHERS 
-      then dbms_output.put_line( sqlerrm );
-    end;
-  end loop;
-end;
-/
-
-prompt -- ======================================================
-prompt -- create tablespace for DataMart's indexes
-prompt -- ======================================================
-
-declare
-  e_tblsp_exists         exception;
-  pragma exception_init( e_tblsp_exists, -01543 );
-begin
-  for c in ( select KF from BARS.KF_RU )
-  loop
-    begin
-      execute immediate 'create tablespace BRS_DM_I_' ||c.KF || q'[
-DATAFILE SIZE 4M
-AUTOEXTEND ON NEXT 4M
-MAXSIZE UNLIMITED
-LOGGING
-ONLINE
-EXTENT MANAGEMENT LOCAL AUTOALLOCATE
-SEGMENT SPACE MANAGEMENT AUTO
-FLASHBACK ON]';
-      dbms_output.put_line( 'Tablespace created.' );
+      dbms_output.put_line( 'Tablespace "'||l_tblsp_nm||'" created.' );
     exception
       when e_tblsp_exists
       then null;
