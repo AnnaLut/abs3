@@ -68,7 +68,19 @@ begin
     if sqlcode = -1430 then null; else raise; 
     end if; 
 end;
-/  
+/
+
+
+begin
+    execute immediate 'create index I_OW_QUERY_LOG_ND on OW_QUERY_LOG (nd)
+  tablespace BRSDYNI';
+ exception when others then 
+    if sqlcode = -955 or sqlcode = -1408 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
 
 -- Add comments to the columns 
 comment on column OW_QUERY_LOG.respbody
