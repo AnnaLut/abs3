@@ -1,4 +1,4 @@
-create or replace procedure BARS.EBK_SENDCARDPACKAGES
+create or replace procedure EBK_SENDCARDPACKAGES
 ( p_action_name      in     varchar2
 , p_cardsCount       in     varchar2
 , p_packSize         in     varchar2
@@ -9,8 +9,8 @@ create or replace procedure BARS.EBK_SENDCARDPACKAGES
   %param p_cardsCount  - 
   %param p_packSize    - 
   
-  %version  2.3
-  %date     2017.09.21
+  %version  2.4
+  %date     2018.02.12
   %modifier BAA
   %usage   
   */
@@ -21,6 +21,7 @@ create or replace procedure BARS.EBK_SENDCARDPACKAGES
   l_wallet_pwd   varchar2(128);
   l_response     wsm_mgr.t_response;
   l_pkg_sz       number(8);
+  l_rsp          number(1);
   l_kf           varchar2(6) := sys_context('bars_context','user_mfo');
 
   --
@@ -47,13 +48,35 @@ create or replace procedure BARS.EBK_SENDCARDPACKAGES
   is
     l_q_sz number(38);
   begin
-    
-    select count(RNK)
-      into l_q_sz
-      from EBK_QUEUE_UPDATECARD
-     where KF = l_kf
-       and STATUS = 0;
-    
+
+    case p_action_name
+    when 'SendCardPackages'
+    then
+      select count(RNK)
+        into l_q_sz
+        from EBK_QUEUE_UPDATECARD
+       where KF = l_kf
+         and STATUS = 0;
+    when 'SendCardPackagesLegal'
+    then
+      select count(RNK)
+        into l_q_sz
+        from EBKC_QUEUE_UPDATECARD
+       where KF = l_kf
+         and STATUS = 0
+         and CUST_TYPE = 'L';
+    when 'SendCardPackagesPrivateEn'
+    then
+      select count(RNK)
+        into l_q_sz
+        from EBKC_QUEUE_UPDATECARD
+       where KF = l_kf
+         and STATUS = 0
+         and CUST_TYPE = 'P';
+    else
+      l_q_sz := 0;
+    end case;
+
     return l_q_sz;
     
   end GET_QUEUE_SIZE;
@@ -61,31 +84,40 @@ create or replace procedure BARS.EBK_SENDCARDPACKAGES
   --
   --
   --
-  procedure SET_REQUEST
+  function SET_REQUEST
+  return number
+  -- 0 - все ок 
+  -- 1 - проблема з бд
+  -- 2 - проблема не з бд
   is
   begin
 
-    wsm_mgr.prepare_request( p_url          => l_url,
+    WSM_MGR.prepare_request( p_url          => l_url,
                              p_action       => p_action_name,
-                             p_http_method  => wsm_mgr.g_http_post,
-                             p_content_type => wsm_mgr.g_ct_json,
+                             p_http_method  => WSM_MGR.g_http_post,
+                             p_content_type => WSM_MGR.g_ct_json,
                              p_wallet_path  => l_wallet_path,
                              p_wallet_pwd   => l_wallet_pwd );
 
-    wsm_mgr.add_header( p_name => 'Authorization', p_value => l_ahr_val );
+    WSM_MGR.add_header( p_name => 'Authorization', p_value => l_ahr_val );
 
-    wsm_mgr.add_parameter( p_name => 'cardsCount', p_value => p_cardsCount );
-    wsm_mgr.add_parameter( p_name => 'packSize',   p_value => to_char(l_pkg_sz) );
-    wsm_mgr.add_parameter( p_name => 'kf',         p_value => l_kf );
+    WSM_MGR.add_parameter( p_name => 'cardsCount', p_value => p_cardsCount );
+    WSM_MGR.add_parameter( p_name => 'packSize',   p_value => to_char(l_pkg_sz) );
+    WSM_MGR.add_parameter( p_name => 'kf',         p_value => l_kf );
 
-    wsm_mgr.execute_request(l_response);
+    WSM_MGR.execute_request(l_response);
+--  WSM_MGR.execute_api(l_response);
+
+    bars_audit.trace( '%s: response=%s.', $$PLSQL_UNIT, DBMS_LOB.substr(l_response.cdoc,3000) );
+
+    return nvl(to_number(dbms_lob.substr(l_response.cdoc,1)),0);
 
 --  l_result := l_response.cdoc; -- если есть ответ - в clob будет
 
   end SET_REQUEST;
 
   --
-  --
+  -- розпаралелити відправку по МФО та типах клієнтів
   --
   procedure SEND_CARDS
   is
@@ -94,13 +126,13 @@ create or replace procedure BARS.EBK_SENDCARDPACKAGES
 
     loop
 
-      l_qty := GET_QUEUE_SIZE;
+      l_qty := GET_QUEUE_SIZE();
 
-      exit when l_qty = 0;
+      l_rsp := SET_REQUEST();
 
-      SET_REQUEST;
+      exit when l_qty = 0 or l_rsp = 2;
 
-      if ( l_qty = GET_QUEUE_SIZE )
+      if ( l_rsp = 1 and l_qty = GET_QUEUE_SIZE() )
       then -- розмір черги не змінився
 
         if ( l_pkg_sz > 1 )
@@ -111,12 +143,36 @@ create or replace procedure BARS.EBK_SENDCARDPACKAGES
         else -- l_pkg_sz = 1
 
           -- виключаємо "поганий" РНК з передачі в ЄБК
-          update EBK_QUEUE_UPDATECARD
-             set STATUS = 9
-           where RNK = ( select min(RNK)
-                           from EBK_QUEUE_UPDATECARD
-                          where KF = l_kf
-                            and STATUS = 0 );
+          case p_action_name
+          when 'SendCardPackages'
+          then
+            update EBK_QUEUE_UPDATECARD
+               set STATUS = 9
+             where ROWID = ( select min(ROWID)
+                               from EBK_QUEUE_UPDATECARD
+                              where KF = l_kf
+                                and STATUS = 0 );
+          when 'SendCardPackagesLegal'
+          then
+            update EBKC_QUEUE_UPDATECARD
+               set STATUS = 9
+             where ROWID = ( select min(ROWID)
+                             from EBKC_QUEUE_UPDATECARD
+                            where KF = l_kf
+                              and STATUS = 0
+                              and CUST_TYPE = 'L' );
+          when 'SendCardPackagesPrivateEn'
+          then
+            update EBKC_QUEUE_UPDATECARD
+               set STATUS = 9
+             where ROWID = ( select min(ROWID)
+                               from EBKC_QUEUE_UPDATECARD
+                              where KF = l_kf
+                                and STATUS = 0
+                                and CUST_TYPE = 'P' );
+          else
+            null;
+          end case;
 
           -- по наївності надіємося, що "поганий" РНК тільки один
           l_pkg_sz := to_number( p_packSize );
@@ -166,10 +222,5 @@ begin
   
 end EBK_SENDCARDPACKAGES;
 /
-show err;
 
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/EBK_SENDCARDPACKAGES.sql =========
-PROMPT ===================================================================================== 
+show err

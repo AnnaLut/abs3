@@ -1,14 +1,91 @@
+-- ======================================================================================
+-- Module : CDM (ªÁÊ)
+-- Author : BAA
+-- Date   : 12.02.2018
+-- ======================================================================================
+-- create view V_EBKC_QUEUE_UPDCARD_LEGAL
+-- ======================================================================================
 
+SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
+SET ECHO         OFF
+SET LINES        500
+SET PAGES        500
 
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_EBKC_QUEUE_UPDCARD_PRIVATE.sql ======
-PROMPT ===================================================================================== 
+prompt -- ======================================================
+prompt -- create view V_EBKC_QUEUE_UPDCARD_LEGAL
+prompt -- ======================================================
 
-
-PROMPT *** Create  view V_EBKC_QUEUE_UPDCARD_PRIVATE ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_EBKC_QUEUE_UPDCARD_PRIVATE ("KF", "RNK", "LASTCHANGEDT", "DATEOFF", "DATEON", "FULLNAME", "FULLNAMEINTERNATIONAL", "FULLNAMEABBREVIATED", "K014", "K040", "BUILDSTATEREGISTER", "OKPO", "ISOKPOEXCLUSION", "K060", "K010", "K070", "K080", "K110", "K050", "K051", "LA_INDEX", "LA_TERRITORYCODE", "LA_REGION", "LA_AREA", "LA_SETTLEMENT", "LA_STREET", "LA_HOUSENUMBER", "LA_SECTIONNUMBER", "LA_APARTMENTSNUMBER", "LA_NOTES", "AA_INDEX", "AA_TERRITORYCODE", "AA_REGION", "AA_AREA", "AA_SETTLEMENT", "AA_STREET", "AA_HOUSENUMBER", "AA_SECTIONNUMBER", "AA_APARTMENTSNUMBER", "AA_NOTES", "REGIONALPI", "AREAPI", "ADMREGAUTHORITY", "ADMREGDATE", "PIREGDATE", "ADMREGNUMBER", "PIREGNUMBER", "TP_K050", "DOCTYPE", "DOCSER", "DOCNUMBER", "DOCORGAN", "DOCISSUEDATE", "ACTUALDATE", "EDDRID", "BIRTHDATE", "BIRTHPLACE", "SEX", "MOBILEPHONE", "BORROWERCLASS", "SMALLBUSINESSBELONGING", "K013", "GROUPAFFILIATION", "EMAIL", "EMPLOYMENTSTATUS", "CUST_ID") AS 
-  select v.kf,
+create or replace force view V_EBKC_QUEUE_UPDCARD_PRIVATE
+( KF
+, RNK
+, LASTCHANGEDT
+, DATEOFF
+, DATEON
+, FULLNAME
+, FULLNAMEINTERNATIONAL
+, FULLNAMEABBREVIATED
+, K014
+, K040
+, BUILDSTATEREGISTER
+, OKPO
+, ISOKPOEXCLUSION
+, K060
+, K010
+, K070
+, K080
+, K110
+, K050
+, K051
+, LA_INDEX
+, LA_TERRITORYCODE
+, LA_REGION
+, LA_AREA
+, LA_SETTLEMENT
+, LA_STREET
+, LA_HOUSENUMBER
+, LA_SECTIONNUMBER
+, LA_APARTMENTSNUMBER
+, LA_NOTES
+, AA_INDEX
+, AA_TERRITORYCODE
+, AA_REGION
+, AA_AREA
+, AA_SETTLEMENT
+, AA_STREET
+, AA_HOUSENUMBER
+, AA_SECTIONNUMBER
+, AA_APARTMENTSNUMBER
+, AA_NOTES
+, REGIONALPI
+, AREAPI
+, ADMREGAUTHORITY
+, ADMREGDATE
+, PIREGDATE
+, ADMREGNUMBER
+, PIREGNUMBER
+, TP_K050
+, DOCTYPE
+, DOCSER
+, DOCNUMBER
+, DOCORGAN
+, DOCISSUEDATE
+, ACTUALDATE
+, EDDRID
+, BIRTHDATE
+, BIRTHPLACE
+, SEX
+, MOBILEPHONE
+, BORROWERCLASS
+, SMALLBUSINESSBELONGING
+, K013
+, GROUPAFFILIATION
+, EMAIL
+, EMPLOYMENTSTATUS
+, CUST_ID
+, GCIF
+, RCIF
+) as
+select v.kf,
        case
          when ( EBK_PARAMS.IS_CUT_RNK = 1 )
          then trunc(v.RNK/100)
@@ -77,20 +154,23 @@ PROMPT *** Create  view V_EBKC_QUEUE_UPDCARD_PRIVATE ***
        v.ms_gr           as groupAffiliation,
        v.email,
        v.cigpo           as employmentStatus,
-       v.RNK             as CUST_ID
-  from V_EBKC_PRIVATE_ENT v
- where exists ( select null from ebkc_queue_updatecard lp
-                 where lp.rnk = v.rnk
-                   and lp.cust_type = 'P'
-                   and lp.status=0 );
+       v.RNK             as CUST_ID,
+       cast( null as number ) as GCIF, -- g.GCIF,
+       cast( null as number ) as RCIF
+  from ( select RNK
+           from EBKC_QUEUE_UPDATECARD
+          where CUST_TYPE = 'P'
+            and STATUS    = 0
+          order by ROWID
+       ) q
+  join V_EBKC_PRIVATE_ENT v
+    on ( v.RNK = q.RNK )
+--left outer
+--join EBKC_GCIF g
+--  on ( g.RNK = q.RNK )
+;
 
-PROMPT *** Create  grants  V_EBKC_QUEUE_UPDCARD_PRIVATE ***
-grant SELECT                                                                 on V_EBKC_QUEUE_UPDCARD_PRIVATE to BARSREADER_ROLE;
-grant SELECT                                                                 on V_EBKC_QUEUE_UPDCARD_PRIVATE to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_EBKC_QUEUE_UPDCARD_PRIVATE to UPLD;
+show errors;
 
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_EBKC_QUEUE_UPDCARD_PRIVATE.sql ======
-PROMPT ===================================================================================== 
+grant SELECT on V_EBKC_QUEUE_UPDCARD_PRIVATE to BARS_ACCESS_DEFROLE;
+grant SELECT on V_EBKC_QUEUE_UPDCARD_PRIVATE to BARSREADER_ROLE;
