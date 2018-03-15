@@ -2,7 +2,7 @@ declare
     schema_already_exists exception;
     pragma exception_init(schema_already_exists, -1920);
 begin
-    execute immediate 'create user nbu_gateway identified by &&nbu_gateway_pass default tablespace brsmdld';
+    execute immediate 'create user nbu_gateway identified by nbu_gateway default tablespace brsmdld';
 exception
     when schema_already_exists then
          null;
