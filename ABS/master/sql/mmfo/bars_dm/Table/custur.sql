@@ -103,7 +103,7 @@ SUBPARTITION TEMPLATE
             SUBPARTITION KF_354507 VALUES (''354507''),
             SUBPARTITION KF_356334 VALUES (''356334'')
           )
-(PARTITION INITIAL_PARTITION VALUES (0) ';
+(PARTITION INITIAL_PARTITION VALUES (0)) ';
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 
 end; 
