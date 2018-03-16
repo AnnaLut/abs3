@@ -8,7 +8,7 @@ IS
 % DESCRIPTION :   Процедура формирования 3KX     для КБ (универсальная)
 % COPYRIGHT   :   Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :   v.18.002          12.03.2018
+% VERSION     :   v.18.003          15.03.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
       sheme_ - схема формирования
@@ -164,21 +164,23 @@ IS
          return(l_ret_val);
    END;
 -------------------------------------------------------------------
-   PROCEDURE p_ins (p_np_ IN NUMBER, p_kodp_ IN VARCHAR2, p_znap_ IN VARCHAR2)
+   PROCEDURE p_ins (p_np IN NUMBER, p_kodp IN VARCHAR2, p_znap IN VARCHAR2)
    IS
-      l_kodp_   VARCHAR2 (10);
+      l_kodp   varchar2 (10);
+      l_znap   varchar2 (70);
    BEGIN
-      l_kodp_ := p_kodp_ || LPAD (TO_CHAR (p_np_), 3, '0');
+      l_kodp := p_kodp || LPAD (TO_CHAR (p_np), 3, '0');
+      l_znap := p_znap;
 
-      if f089_ ='2'  then
-        INSERT INTO rnbu_trace
-                  ( nls, kv, odate, kodp, znap, nbuc, ref, rnk, comm, acc )
-           VALUES ( nls_, kv_, dat_, l_kodp_, p_znap_, nbuc_, ref_, rnk_, to_char(refd_), acc_ );
-      else
-        INSERT INTO rnbu_trace
-                  ( nls, kv, odate, kodp, znap, nbuc, ref, rnk, comm, acc )
-           VALUES ( '', kv_, dat_, l_kodp_, p_znap_, nbuc_, 0, 0, 'консолідація', 0 );
+      if l_kodp like 'Q007%'  and  length(trim(p_znap))=8          --дата из 8-ми цифр
+                              and  regexp_instr(trim(p_znap),'^[0-9]+$')>0
+      then
+           l_znap := substr(p_znap,1,2)||'.'||substr(p_znap,3,2)||'.'||substr(p_znap,5,4);
       end if;
+
+      INSERT INTO rnbu_trace
+                ( nls, kv, odate, kodp, znap, nbuc, ref, rnk, comm, acc )
+         VALUES ( nls_, kv_, dat_, l_kodp, l_znap, nbuc_, ref_, rnk_, to_char(refd_), acc_ );
 
    END;
 
@@ -579,7 +581,7 @@ BEGIN
         and a.nlsk like '2900%'
         and a.ko = 2
         and a.ref not in (SELECT ref
-                          FROM provodki
+                          FROM provodki_otc
                           WHERE ref=a.ref
                             and (nlsd like '2901%' or nlsk like '2901%'))
         and a.ref not in (SELECT ref
@@ -752,6 +754,7 @@ BEGIN
                nnnn_ := nnnn_ + 1;
                sum0_ := sum0_ - NVL (sumk0_, 0);
                f089_ := '2';                          --неконсолидированные данные
+               refd_ := null;
 
                if ko_ = 2
                then
@@ -813,14 +816,15 @@ BEGIN
                      begin
                         select ref
                            into refd_
-                        from provodki p
+                        from provodki_otc p
                         WHERE fdat = dat_
                           AND accd = acck_
                           AND kv=kv_
                           AND s = s0_
-                          AND EXISTS (SELECT 1
+                          AND ( tt like 'GO%' and nbsk = '3739' or
+                            EXISTS (SELECT 1
                                       FROM operw o
-                                      WHERE o.REF = p.ref AND tag like 'D_#70')
+                                      WHERE o.REF = p.ref AND tag like 'D_#70') )
                           AND rownum=1;
                      exception
                                when no_data_found then
@@ -877,12 +881,39 @@ BEGIN
                             USING ref_ ;
                       exception
                           WHEN NO_DATA_FOUND  THEN
+                             if refd_ is not null  then
+                               begin     
+                                  EXECUTE IMMEDIATE sql_z
+                                     INTO d1#3K_
+                                    USING refd_ ;
+                               exception
+                                  WHEN NO_DATA_FOUND  THEN
+                                         d1#3K_ := NULL;
+                               end;
+                             else
                                        d1#3K_ := NULL;
+                             end if;
                       end;
                    else
                       d1#3K_ :='000';
                    end if;
 
+               end if;
+
+                  -- ОКПО клiєнта
+                  IF rez_ = 0 and trim(okpo_) is NULL -- для нерезидентiв
+                  THEN
+                     okpo_ := '0';
+                  END IF;
+
+                  if okpo_ = ourOKPO_ then
+                     okpo_ := ourGLB_;
+                     codc_ := 1 ;
+                     k021_ :='3';
+                  end if;
+-- замена кода клиента для RNK=93073101  всеукраїнський банк розвитку
+               if rnk_ =93073101  then
+                  k021_ :='1';
                end if;
 
          if  mfo_ =300465  and ko_='2' and nls_ ='2900205'
@@ -892,8 +923,8 @@ BEGIN
                p_ins (nnnn_, 'F091', '4');
                p_ins (nnnn_, 'R030', LPAD (kv_, 3,'0'));
                p_ins (nnnn_, 'T071', TO_CHAR (sum0_));
-               p_ins (nnnn_, 'K020', 'k');
-               p_ins (nnnn_, 'K021', '#');
+               p_ins (nnnn_, 'K020', lpad(TRIM (okpo_),10,'0'));
+               p_ins (nnnn_, 'K021', k021_);
                p_ins (nnnn_, 'Q024', '2');
                p_ins (nnnn_, 'D100', '00');
                p_ins (nnnn_, 'S180', '#');
@@ -909,8 +940,8 @@ BEGIN
                p_ins (nnnn_, 'F091', '4');
                p_ins (nnnn_, 'R030', LPAD (kv_, 3,'0'));
                p_ins (nnnn_, 'T071', TO_CHAR (sum0_));
-               p_ins (nnnn_, 'K020', 'k');
-               p_ins (nnnn_, 'K021', '#');
+               p_ins (nnnn_, 'K020', lpad(TRIM (okpo_),10,'0'));
+               p_ins (nnnn_, 'K021', k021_);
                p_ins (nnnn_, 'Q024', '2');
                p_ins (nnnn_, 'D100', '00');
                p_ins (nnnn_, 'S180', '#');
@@ -925,8 +956,8 @@ BEGIN
                p_ins (nnnn_, 'F091', '4');
                p_ins (nnnn_, 'R030', LPAD (kv_, 3,'0'));
                p_ins (nnnn_, 'T071', TO_CHAR (sum0_));
-               p_ins (nnnn_, 'K020', 'k');
-               p_ins (nnnn_, 'K021', '#');
+               p_ins (nnnn_, 'K020', lpad(TRIM (okpo_),10,'0'));
+               p_ins (nnnn_, 'K021', k021_);
                p_ins (nnnn_, 'Q024', '2');
                p_ins (nnnn_, 'D100', '00');
                p_ins (nnnn_, 'S180', '#');
@@ -947,18 +978,6 @@ BEGIN
                   -- сума в  сотых валюты (код 11)
                   p_ins (nnnn_, 'T071', TO_CHAR ( sum0_ ));
 --                  p_ins (nnnn_, 'T071', TO_CHAR (ROUND (sum0_ / dig_, 0)));
-
-                  -- ОКПО клiєнта
-                  IF rez_ = 0 and trim(okpo_) is NULL -- для нерезидентiв
-                  THEN
-                     okpo_ := '0';
-                  END IF;
-
-                  if okpo_ = ourOKPO_ then
-                     okpo_ := ourGLB_;
-                     codc_ := 1 ;
-                     k021_ :='3';
-                  end if;
 
 	          p_ins (nnnn_, 'K020', lpad(TRIM (okpo_),10,'0'));
 	          p_ins (nnnn_, 'K021', k021_);
@@ -1053,6 +1072,9 @@ BEGIN
 
    CLOSE c_main;
 
+   DELETE FROM tmp_nbu
+         WHERE kodf = kodf_ AND datf = dat_;
+
    f089_ :='1';
 --   консолидация  операций  по rnbu_trace    операция 216 для клиентов
    for u in ( select f091, r030, f092, sum(t071) t071
@@ -1069,33 +1091,34 @@ BEGIN
                                                  'F089' as F089, 'F092' as F092, 
                                                  'Q003' as Q003, 'Q007' as Q007, 'Q006' as Q006 )
                               )   
-                        where  f091 ='4' and f092 ='216' and k021 in ('2','6') and
-                               gl.p_icurval (r030, t071, dat_)< kons_sum_ 
-                             or
-                               f091 ='4' and f092 ='216' and k020 ='k' and k021 ='#' and f089 ='1' 
+                        where  f091 ='4' and f092 ='216'
+                           and ( f089 ='1' or f089 ='2' and t071<kons_sum_)
                      )          
                group by f091, r030, f092
    ) loop
-         nnnn_ := nnnn_+1;
-         kv_ := u.r030;
-         p_ins (nnnn_, 'F091', u.f091);
-         p_ins (nnnn_, 'R030', LPAD (u.r030, 3,'0'));
-         p_ins (nnnn_, 'T071', TO_CHAR (u.t071 ));
-	 p_ins (nnnn_, 'K020', '0');
-	 p_ins (nnnn_, 'K021', '#');
-         p_ins (nnnn_, 'Q024', '2');
-         p_ins (nnnn_, 'D100', '00');
-         p_ins (nnnn_, 'S180', '#');
-         p_ins (nnnn_, 'F089', f089_);
-         p_ins (nnnn_, 'F092', '216');
-   end loop;
-   f089_ :='2';
+          nnnn_ := nnnn_+1;
+          kodp_ := LPAD (TO_CHAR (nnnn_), 3, '0');
+          insert into tmp_nbu (kodf, datf, kodp, znap, nbuc)   values (kodf_, dat_, 'F091'||kodp_, u.f091, nbuc_);
+          insert into tmp_nbu (kodf, datf, kodp, znap, nbuc)   values (kodf_, dat_, 'R030'||kodp_, LPAD (u.r030, 3,'0'), nbuc_);
+          insert into tmp_nbu (kodf, datf, kodp, znap, nbuc)   values (kodf_, dat_, 'T071'||kodp_, TO_CHAR (u.t071), nbuc_);
+          insert into tmp_nbu (kodf, datf, kodp, znap, nbuc)   values (kodf_, dat_, 'K020'||kodp_, '0', nbuc_);
+          insert into tmp_nbu (kodf, datf, kodp, znap, nbuc)   values (kodf_, dat_, 'K021'||kodp_, '#', nbuc_);
+          insert into tmp_nbu (kodf, datf, kodp, znap, nbuc)   values (kodf_, dat_, 'Q024'||kodp_, '2', nbuc_);
+          insert into tmp_nbu (kodf, datf, kodp, znap, nbuc)   values (kodf_, dat_, 'D100'||kodp_, '00', nbuc_);
+          insert into tmp_nbu (kodf, datf, kodp, znap, nbuc)   values (kodf_, dat_, 'S180'||kodp_, '#', nbuc_);
+          insert into tmp_nbu (kodf, datf, kodp, znap, nbuc)   values (kodf_, dat_, 'F089'||kodp_, f089_, nbuc_);
+          insert into tmp_nbu (kodf, datf, kodp, znap, nbuc)   values (kodf_, dat_, 'F092'||kodp_, '216', nbuc_);
 
-   delete from rnbu_trace
-    where substr(kodp,5,3) in ( select ekp_2 from (select *
+          update rnbu_trace
+             set comm = substr(substr(kodp,5,3)||' консолідовано'||comm,1,200),
+                 kodp = substr(kodp,1,4)||kodp_,
+                 znap = case when substr(kodp,1,4)='F089' then '1' else znap end
+           where substr(kodp,5,3) in ( select ekp_2 from (
+                       select ekp_2
                          from ( select substr(kodp,5,3) ekp_2,
                                        substr(kodp,1,4) ekp_1, znap 
-                                  from rnbu_trace )
+                                  from rnbu_trace
+                              )
                               pivot
                               ( max(trim(znap))
                                   for ekp_1 in ( 'F091' as F091, 'R030' as R030, 'T071' as T071,
@@ -1104,11 +1127,12 @@ BEGIN
                                                  'F089' as F089, 'F092' as F092, 
                                                  'Q003' as Q003, 'Q007' as Q007, 'Q006' as Q006 )
                               )   
-                        where  f091 ='4' and f092 ='216' and k021 in ('2','6') and f089 ='2' and
-                               gl.p_icurval (r030, t071, dat_)< kons_sum_
-                             or
-                               f091 ='4' and f092 ='216' and k020 ='k' and k021 ='#' and f089 ='1' 
-                     ));  
+                        where  f091 ='4' and f092 ='216' and r030 =u.r030
+                           and ( f089 ='1' or f089 ='2' and t071<kons_sum_)
+                                      ) );
+                                    
+   end loop;
+   f089_ :='2';
 
 --   операции из модуля FOREX
     IF is_swap_tag_ >= 1
@@ -1277,14 +1301,26 @@ BEGIN
     end loop;
 
 ---------------------------------------------------
-   DELETE FROM tmp_nbu
-         WHERE kodf = kodf_ AND datf = dat_;
-
    INSERT INTO tmp_nbu
             (kodf, datf, kodp, znap, nbuc)
-      SELECT kodf_, dat_, kodp, znap, nbuc
-        FROM rnbu_trace
-       WHERE userid = userid_;
+      select kodf_, dat_, kodp, znap, nbuc
+        from rnbu_trace
+       where userid = userid_
+         and substr(kodp,5,3) not in ( select ekp_2  from (
+                       select *
+                         from ( select substr(kodp,5,3) ekp_2,
+                                       substr(kodp,1,4) ekp_1, znap 
+                                  from rnbu_trace
+                              )
+                              pivot
+                              ( max(trim(znap))
+                                  for ekp_1 in ( 'F091' as F091, 'R030' as R030, 'T071' as T071,
+                                                 'K020' as K020, 'K021' as K021, 'Q001' as Q001,
+                                                 'Q024' as Q024, 'D100' as D100, 'S180' as S180,
+                                                 'F089' as F089, 'F092' as F092, 
+                                                 'Q003' as Q003, 'Q007' as Q007, 'Q006' as Q006 )
+                              )   
+                        where  f091 ='4' and f092 ='216' and f089 ='1') );
 ----------------------------------------
 
 DELETE FROM OTCN_TRACE_70
@@ -1301,4 +1337,4 @@ from rnbu_trace;
     logger.info ('P_F3KX  end  for date = '||to_char(dat_, 'dd.mm.yyyy'));
 
 END;
-/               
+/         
