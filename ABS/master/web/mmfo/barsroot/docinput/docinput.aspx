@@ -1057,12 +1057,17 @@
                 <td>
                     <input id="Message33" meta:resourcekey="Message33" type="hidden" runat="server" value="Дата валютирования отличается от текущей. Продолжить?" />
                 </td>
+                <td>
+                    <input id="Message34" meta:resourcekey="Message34" type="hidden" runat="server" value="Необходимо внести изменения либо в ОКПО, либо в МФО"/>
+                </td>
             </tr>
             <tr>
             </tr>
             <tr>
             </tr>
         </table>
+    <input type="hidden" id="__Nls_B" runat="server"/>
+    <input type="hidden" id="__Id_B" runat="server"/>
     </form>
     <script type="text/javascript">
         AddListeners("SumA", 'onblur', SumA_Blur);

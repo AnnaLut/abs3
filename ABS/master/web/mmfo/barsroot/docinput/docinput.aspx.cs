@@ -457,7 +457,8 @@ namespace DocInput
 
                 Nam_A.Attributes["onblur"] = "fnCheckCustomer(" + Nam_A.ClientID + ")";
                 Nam_B.Attributes["onblur"] = "fnCheckCustomer(" + Nam_B.ClientID + ")";
-
+                __Nls_B.Value = Nls_B.Text;
+                __Id_B.Value = Id_B.Text;
             }
             else
             {
@@ -739,6 +740,10 @@ namespace DocInput
                 s_dateD = PAR_SYSDATE;
             else if (TT_Flags[4] == '2')
                 s_dateD = DateTime.Now.ToString("dd/MM/yyyy");
+            else if ("014" == TT)
+            {
+                s_dateD = Request.QueryString["DatD"];
+            }
             else
                 s_dateD = bDATE.ToString("dd/MM/yyyy");
             DocD_TextBox.Text = s_dateD.Replace(".", "/");
@@ -1582,7 +1587,7 @@ namespace DocInput
                     {
                         var newLinePos = oraEx.Message.IndexOf("ORA-", 11);
                         if (newLinePos < 0) newLinePos = oraEx.Message.Length;
-                        var message = oraEx.Message.Substring(11, newLinePos-11);
+                        var message = oraEx.Message.Substring(11, newLinePos - 11);
                         throw new Exception(message);
                     }
                 }
@@ -2022,6 +2027,11 @@ namespace DocInput
                 Sk.Attributes["onkeydown"] = "javascript:selectCashSymbol(event);";
             }
 
+            if (Request.Params["Drec"] != null)
+            {
+                Drec.Value = Request.Params["Drec"];
+            }
+
             return;
 
             //string url_Name = ((Request.Params.Get("name") == null)?(""):(Request.Params.Get("name")));
@@ -2217,8 +2227,10 @@ namespace DocInput
             {
                 if (!string.IsNullOrEmpty(saldo.Nms))
                 {
-                    if (Request["mode_nam_a"] == "1") // подстановка имени клиента вместо наименования счета
+                    if (Request["mode_nam_a"] == "1" || "014" == TT) // подстановка имени клиента вместо наименования счета
+                    {
                         SetReadOnly(eNam, saldo.Nmk);
+                    }
                     else
                         SetReadOnly(eNam, saldo.Nms);
                 }
@@ -2503,7 +2515,7 @@ namespace DocInput
                     if (!string.IsNullOrEmpty(sRes) && sRes != "null")
                     {
                         res = sRes;
-                    }                    
+                    }
                 }
             }
             finally

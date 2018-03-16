@@ -88,7 +88,7 @@
         width: "700px",
         resizable: false,
         actions: ["Close"]
-    })
+    });
     var dpFrom = $("#dpRegisterOptionFrom").kendoDatePicker({ format: "dd.MM.yyyy" });
     var dpTo = $("#dpRegisterOptionTo").kendoDatePicker({ format: "dd.MM.yyyy" });
     var ddType = $("#ddRegisterType").kendoDropDownList({
@@ -118,7 +118,7 @@
                 read: {
                     url: bars.config.urlContent('api/sep/Sep3720Api/GetSep3720RegisterList'),
                     data: function () {
-                        return { rg_tp: ddType.data("kendoDropDownList").value(), rg_dt_from: dpFrom.data("kendoDatePicker").value(), rg_dt_to : dpTo.data("kendoDatePicker").value()}
+                        return { rg_tp: ddType.data("kendoDropDownList").value(), rg_dt_from: dpFrom.data("kendoDatePicker").value(), rg_dt_to : dpTo.data("kendoDatePicker").value()};
                     },
                     type: "GET"
                 }
@@ -382,7 +382,7 @@
         var rowNum = grid.select().length;
         if (rowNum == 1) {
             var altParams = { nls: record.NLSALT, kv: record.KV };
-            funcSuite("toAlt", altParams)
+            funcSuite("toAlt", altParams);
         }
         else {
             var docList = [];
@@ -515,7 +515,7 @@
         }
         else
         {
-            $("#registerTypeText").text(ddType.data("kendoDropDownList").text())
+            $("#registerTypeText").text(ddType.data("kendoDropDownList").text());
             $("#registerOptions").hide();
             $("#registerGridContent").show();
             registerGrid.data("kendoGrid").dataSource.read();
@@ -556,8 +556,8 @@
         return (source);
     };
 
-	function GetSum(dk) {
-        var Sum = 0
+    function GetSum(dk) {
+        var Sum = 0;
         var data = $("#sep3720Grid").data("kendoGrid").dataSource.data();
         if (data.length > 0)
         {
@@ -603,7 +603,7 @@
                                 SumC_t: sum.toFixed(2),
                                 nazn: docTarget,
                                 BPROC: encodeURI("set role bars_access_defrole@begin sep.check_t902_dok(" + record.REF + "); end;"),
-                                APROC: encodeURI("set role bars_access_defrole@begin sep.del_ref_t902(" + record.REF + "); end;")
+                                APROC: encodeURI("set role bars_access_defrole@begin sep.del_ref_t902(" + record.REF + "); sep_utl.copy_operw(:REF," + record.REF +"); end;")
                             };
 
                             $("#Sep3720Window").kendoWindow({
@@ -616,9 +616,9 @@
                                 close: function (e) { refreshGrid(); },
                                 content: "/barsroot/docinput/docinput.aspx?" + serializeData(formParams)
                             }).data("kendoWindow").center().open();
-                        })
+                        });
                     });
-                break
+                break;
             case "toAnotherAccount":
                 var grid = getSep3720Grid();
                 var record = grid.dataItem(grid.select());
@@ -657,9 +657,9 @@
                             }).data("kendoWindow").center().open();
 
                             //window.location = '/barsroot/docinput/docinput.aspx?' + jQuery.param(formParams);
-                        })
+                        });
                     });
-                break
+                break;
             case "toAnotherBank":
                 var grid = getSep3720Grid();
                 var record = grid.dataItem(grid.select());
@@ -693,15 +693,15 @@
                             }).data("kendoWindow").center().open();
 
                             //window.location = '/barsroot/docinput/docinput.aspx?' + jQuery.param(formParams);
-                        })
+                        });
                     });
-                break
+                break;
             case "toUpdate":
                 var grid = getSep3720Grid();
                 var record = grid.dataItem(grid.select());
                 var sum = record.S * 100;
                 var ss1 = 'ЗАРАХУВАТИ на рахунок ' + record.NLSB + ' ' + record.NAMB2 + '?<br/>' + 'Буде добавлено проводку в основну операцію';
-                var ss2 = 'ЗАРАХУВАТИ на рахунок ' + record.NLSB + ' ' + record.NAMB2 + '?<br/>' + 'Буде сформовано внутрішній мем.ордер';
+                var ss2 = 'ЗАРАХУВАТИ на рахунок ' + record.NLSB + ' ' + (record.NAMB2 || record.NAMB) + '?<br/>' + 'Буде сформовано внутрішній мем.ордер';
                 var nazn1 = record.NAZN + record.DREC;
                 var nazn2 = 'Док ' + record.ND + ' від ' + kendo.toString(record.DATD, 'dd/MM/yyyy') + ' ' + record.NAZN;
                 bars.ui.confirm({ text: (sOrd902 == 'N' || sOrd902 == '0') ? ss1 : ss2 },
@@ -723,8 +723,8 @@
 
                                 SumC_t: sum.toFixed(2),
                                 nazn: 'Док ' + record.ND.trim() + ' від ' + kendo.toString(record.DATD, 'dd/MM/yyyy') + ' ' + record.NAZN,
-								BPROC: encodeURI("set role bars_access_defrole@begin sep.check_t902_dok(" + record.REF + "); end;"),
-                                APROC: encodeURI("set role bars_access_defrole@begin sep.del_ref_t902(" + record.REF + "); end;")
+                                BPROC: encodeURI("set role bars_access_defrole@begin sep.check_t902_dok(" + record.REF + "); end;"),
+                                APROC: encodeURI("set role bars_access_defrole@begin sep.del_ref_t902(" + record.REF + "); sep_utl.copy_operw(:REF," + record.REF +"); end;")
                             };
                             //if (record.DK === 1) {
                             //    formParams = {
@@ -776,9 +776,9 @@
                                 close: function (e) { refreshGrid(); },
                                 content: "/barsroot/docinput/docinput.aspx?" + serializeData(formParams)
                             }).data("kendoWindow").center().open();
-                        })
+                        });
                     });
-                break
+                break;
             case "toAlt":
                 var grid = getSep3720Grid();
                 var record = grid.dataItem(grid.select());
@@ -805,7 +805,7 @@
 
                                         SumC_t: sum.toFixed(2),
                                         nazn: 'Док ' + record.ND + 'від ' + kendo.toString(record.DATD, 'dd/MM/yyyy') + ' ' + record.NAZN,
-										BPROC: encodeURI("set role bars_access_defrole@begin sep.check_t902_dok(" + record.REF + "); end;"),
+                                        BPROC: encodeURI("set role bars_access_defrole@begin sep.check_t902_dok(" + record.REF + "); end;"),
                                         APROC: encodeURI("set role bars_access_defrole@begin sep.del_ref_t902(" + record.REF + "); end;")
                                     };
 
@@ -821,13 +821,13 @@
                                     }).data("kendoWindow").center().open();
 
                                     //window.location = '/barsroot/docinput/docinput.aspx?' + jQuery.param(formParams);
-                                })
+                                });
                             } else {
                                 bars.ui.alert({ text: 'По заданій референції : ' + record.REF + '<br>НЕ знайдено альтернативний рахунок!' });
                             }
                         });
                     });
-                break
+                break;
             case "toAlts":
                 var grid = getSep3720Grid();
                 var rowNumber = grid.select().length;
@@ -836,7 +836,7 @@
                         bars.ui.alert({ text: result.message });
                     });
                 });
-                break
+                break;
             case "toRequest":
                 $.ajax({
                     type: "POST",
@@ -849,7 +849,7 @@
                     dataType: "json",
                     contentType: "application/json"
                 });
-                break
+                break;
             default:
         }
     }
@@ -895,7 +895,7 @@
         enableButton('pbDel', currentRowData != null);
         enableButton('pbUpdate', currentRowData != null && (currentRowData.OTM != 0 && currentRowData.DAZS == null));
         enableButton('pbAlt', currentRowData != null && showAlt());
-        enableButton('pbRequest', grid.select().length > 0)//currentRowData != null && grid.select().length == 1);
+        enableButton('pbRequest', grid.select().length > 0); //currentRowData != null && grid.select().length == 1);
         enableButton('pbDetails', currentRowData != null);
         enableButton('pbPrint', currentRowData != null);
         enableButton('pbGetAnswer', currentRowData != null && currentRowData.RECO != null);
@@ -1043,7 +1043,7 @@
                     width: "100px",
                     template: "<div style='text-align:right;'>#=S.toFixed(2)#</div>",
                     //footerTemplate: "<div style='text-align:right;'>#=sum.toFixed(2)#</div>"
-					footerTemplate: "<div style='text-align:left;'>D: #=GetSum(0).toFixed(2)# <br/>K: #=GetSum(1).toFixed(2)#</div>"
+                    footerTemplate: "<div style='text-align:left;'>D: #=GetSum(0).toFixed(2)# <br/>K: #=GetSum(1).toFixed(2)#</div>"
                 },
                 {
                     field: "FDAT",
