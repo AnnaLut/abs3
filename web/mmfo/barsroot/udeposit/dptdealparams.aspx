@@ -228,7 +228,7 @@
                                             <span class="BarsLabel" id="lbSum">Сума:</span>
                                         </td>
                                         <td>
-                                            <input class="BarsTextBox" id="tbSum" type="text" name="tbSum" title="Сума договору" maxlength="10"
+                                            <input class="BarsTextBox" id="tbSum" type="text" name="tbSum" title="Сума договору" maxlength="12"
                                                 onchange="fnCheckAmount(this)" tabindex="2" style="text-align: right; width: 150px" />
                                         </td>
                                     </tr>
