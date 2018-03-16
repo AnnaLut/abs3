@@ -180,8 +180,11 @@ namespace BarsWeb.Areas.Sep.Infrastructure.Repository.DI.Implementation
         private void InitRowReplySql(string dRec)
         {
             var dateBank = _paramsRepo.GetParam("BANKDATE");
-            string fn = dRec.Substring(2, 12);
-            int rec = Int32.Parse(dRec.Substring(15, 5));
+            int fnStartPos = dRec.IndexOf("$", StringComparison.Ordinal);
+            int fnEndPos = dRec.IndexOf(' ', fnStartPos);
+            string fn = dRec.Substring(fnStartPos, fnEndPos-fnStartPos);
+            int recEndPos = dRec.LastIndexOf("#", StringComparison.Ordinal);
+            int rec = int.Parse(dRec.Substring(fnEndPos, recEndPos-fnEndPos).Trim());
 
             _checkRowReplySql = new BarsSql()
             {

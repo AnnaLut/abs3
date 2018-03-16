@@ -103,16 +103,79 @@ namespace BarsWeb.Areas.Sep.Infrastructure.Repository.DI.Implementation
             _baseSep3720Sql = new BarsSql()
             {
                 SqlText = string.Format(
-                @"select * from (SELECT o.dk DK,o.ref REF,a.mfoa MFOA,a.nlsa NLSA,a.s/100 S,a.nlsb NLSB,a.nam_b NAMB,a.nazn NAZN,a.d_rec DREC,
-                a.rec REC,o.fdat FDAT,a.nd ND,a.nam_a NAMA,a.vob VOB,a.datd DATD, a.datp DATP, a.id_a OKPOA,a.id_b OKPOB,k.okpo OKPOB2,s.nms NAMB2,
-                NVL(s.pap/s.pap,0) OTM,a.kv KV, s.nlsalt NLSALT, s.dazs DAZS,
-                t.blk BLK, 
-                t.otm SOS, t.rec_o RECO, t.stmp STMP, s.blkk BLKK, a.mfob MFOB, o.acc ACC, a.fa_name FA_NAME, a.fa_ln FA_LN
-                FROM arc_rrp a, opldok o, t902 t, accounts s, customer k
-                WHERE o.acc in (SELECT acc FROM accounts WHERE tip IN ('902', '90D')) and
-                o.tt in ('R01','D01') and a.rec=t.rec and o.ref=t.ref and a.nlsb=s.nls (+) and
-                a.kv=s.kv (+) and s.rnk=k.rnk (+) {0} {1} ) base_query where 1=1 ORDER BY FDAT 
-                ",
+                //@"select * from (SELECT o.dk DK,o.ref REF,a.mfoa MFOA,a.nlsa NLSA,a.s/100 S,a.nlsb NLSB,a.nam_b NAMB,a.nazn NAZN,a.d_rec DREC,
+                //a.rec REC,o.fdat FDAT,a.nd ND,a.nam_a NAMA,a.vob VOB,a.datd DATD, a.datp DATP, a.id_a OKPOA,a.id_b OKPOB,k.okpo OKPOB2,s.nms NAMB2,
+                //NVL(s.pap/s.pap,0) OTM,a.kv KV, s.nlsalt NLSALT, s.dazs DAZS,
+                //t.blk BLK, 
+                //t.otm SOS, t.rec_o RECO, t.stmp STMP, s.blkk BLKK, a.mfob MFOB, o.acc ACC, a.fa_name FA_NAME, a.fa_ln FA_LN
+                //FROM arc_rrp a, opldok o, t902 t, accounts s, customer k
+                //WHERE o.acc in (SELECT acc FROM accounts WHERE tip IN ('902', '90D')) and
+                //o.tt in ('R01','D01') and a.rec=t.rec and o.ref=t.ref and a.nlsb=s.nls (+) and
+                //a.kv=s.kv (+) and s.rnk=k.rnk (+) {0} {1} ) base_query where 1=1 ORDER BY FDAT 
+                //",
+                    @"SELECT *
+                    FROM (SELECT o.dk DK,
+                                 o.REF REF,
+                                 a.mfoa MFOA,
+                                 a.nlsa NLSA,
+                                 a.s / 100 S,
+                                nvl((SELECT nlsb
+                                               FROM arc_rrp
+                                              WHERE rec = t.rec_o), a.nlsb) NLSB,
+                                 a.nam_b NAMB,
+                                 a.nazn NAZN,
+                                 a.d_rec DREC,
+                                 a.rec REC,
+                                 o.fdat FDAT,
+                                 a.nd ND,
+                                 a.nam_a NAMA,
+                                 a.vob VOB,
+                                 a.datd DATD,
+                                 a.datp DATP,
+                                 a.id_a OKPOA,
+                                 nvl(k.okpo,a.id_b) OKPOB,
+                                 s.nms NAMB2,
+                                 CASE
+                                    WHEN    s.nls IS NOT NULL
+                                         OR nvl((SELECT nlsb
+                                               FROM arc_rrp
+                                              WHERE rec = t.rec_o), a.nlsb) <> a.nlsb
+                                               
+                                    THEN
+                                       1
+                                    ELSE
+                                       0
+                                 END
+                                    OTM,
+                                 a.kv KV,
+                                 s.nlsalt NLSALT,
+                                 s.dazs DAZS,
+                                 t.blk BLK,
+                                 t.otm SOS,
+                                 t.rec_o RECO,
+                                 t.stmp STMP,
+                                 s.blkk BLKK,
+                                 a.mfob MFOB,
+                                 o.acc ACC,
+                                 a.fa_name FA_NAME,
+                                 a.fa_ln FA_LN
+                            FROM arc_rrp a,
+                                 opldok o,
+                                 t902 t,
+                                 accounts s,
+                                 customer k
+                           WHERE     o.acc IN (SELECT acc
+                                                 FROM accounts
+                                                WHERE tip IN ('902', '90D'))
+                                 AND o.tt IN ('R01', 'D01')
+                                 AND a.rec = t.rec
+                                 AND o.REF = t.REF
+                                 AND a.nlsb = s.nls(+)
+                                 AND a.kv = s.kv(+)
+                                 AND s.rnk = k.rnk(+)
+                                 {0} {1}) base_query
+                   WHERE 1 = 1
+                ORDER BY FDAT",
                 accessType.Mode == "hrivna" ? "and a.kv=980" : "and a.kv<>980",
                 accessType.AccessFlags.Contains("V") ? "and a.kv=" + kv.Value : ""
                 ),
