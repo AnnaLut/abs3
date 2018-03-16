@@ -445,7 +445,7 @@ is
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 19.6  2018.03.15';
+  g_body_version  constant varchar2(64) := 'version 19.6  2018.03.16';
   fmt_dt          constant varchar2(10) := 'dd.mm.yyyy';
 
   MODULE_PREFIX   constant varchar2(4)  := 'NBUR';
@@ -6108,8 +6108,6 @@ is
     bars_audit.trace( '%s: Entry with ( p_start_id=%s, p_end_id=%s, p_lmt_dt=%s, p_kf=%s ).'
                     , title, to_char(p_start_id), to_char(p_end_id), to_char(p_lmt_dt,fmt_dt), p_kf );
 
-    BARS_CONTEXT.SUBST_MFO( p_kf );
-
     execute immediate 'ALTER SESSION ENABLE PARALLEL DML';
 
     << RMV_RPT >>
@@ -6128,38 +6126,36 @@ is
              )
     loop
 
-        bars_audit.trace( '%s: rpt_dt=%s, vrsn_id=%s, rpt_code=%s.', title
-                        , to_char(f.RPT_DT,fmt_dt), to_char(f.VRSN_ID), f.RPT_CODE );
+      bars_audit.trace( '%s: rpt_dt=%s, vrsn_id=%s, rpt_code=%s.', title
+                      , to_char(f.RPT_DT,fmt_dt), to_char(f.VRSN_ID), f.RPT_CODE );
 
-        begin
+      begin
 
-          delete NBUR_DETAIL_PROTOCOLS_ARCH
-           where REPORT_DATE = f.RPT_DT
-             and KF          = f.KF
-             and VERSION_ID  = f.VRSN_ID
-             and REPORT_CODE = f.RPT_CODE;
+        delete NBUR_DETAIL_PROTOCOLS_ARCH
+         where REPORT_DATE = f.RPT_DT
+           and KF          = f.KF
+           and VERSION_ID  = f.VRSN_ID
+           and REPORT_CODE = f.RPT_CODE;
 
-          delete NBUR_AGG_PROTOCOLS_ARCH
-           where REPORT_DATE = f.RPT_DT
-             and KF          = f.KF
-             and VERSION_ID  = f.VRSN_ID
-             and REPORT_CODE = f.RPT_CODE;
+        delete NBUR_AGG_PROTOCOLS_ARCH
+         where REPORT_DATE = f.RPT_DT
+           and KF          = f.KF
+           and VERSION_ID  = f.VRSN_ID
+           and REPORT_CODE = f.RPT_CODE;
 
-          update NBUR_LST_FILES
-             set FILE_STATUS = 'DELETED'
-           where ROWID = f.ROW_ID;
+        update NBUR_LST_FILES
+           set FILE_STATUS = 'DELETED'
+         where ROWID = f.ROW_ID;
 
-          commit;
+        commit;
 
-        exception
-          when others then
-            bars_audit.error( title || ': ' || dbms_utility.format_error_stack()
-                                            || dbms_utility.format_error_backtrace() );
-        end;
+      exception
+        when others then
+          bars_audit.error( title || ': ' || dbms_utility.format_error_stack()
+                                          || dbms_utility.format_error_backtrace() );
+      end;
 
-      end loop RMV_RPT;
-
-    BARS_CONTEXT.SET_CONTEXT;
+    end loop RMV_RPT;
 
     bars_audit.trace( '%s: Exit.', title );
 
