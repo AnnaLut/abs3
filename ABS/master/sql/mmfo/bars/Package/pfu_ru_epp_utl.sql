@@ -1713,8 +1713,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
     for i in (select *
                 from pfu_ca_files t
                where t.state = 0
-               order by t.kf
-                 for update skip locked) loop
+               order by t.kf) loop
       begin
       if (l_kf is not null and l_kf != i.kf) or (l_kf is null) then
         l_kf := i.kf;
