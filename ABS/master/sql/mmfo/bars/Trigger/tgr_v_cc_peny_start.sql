@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  trigger TGR_V_CC_PENY_START ***
 
-  CREATE OR REPLACE TRIGGER BARS.TGR_V_CC_PENY_START 
+CREATE OR REPLACE TRIGGER BARS.TGR_V_CC_PENY_START
 INSTEAD OF UPDATE OR INSERT OR DELETE
 ON BARS.V_CC_PENY_START REFERENCING NEW AS NEW OLD AS OLD
 FOR EACH ROW
@@ -34,11 +34,13 @@ BEGIN
    end;   
    begin
      select min(nd) into nd_ from nd_acc n where acc=l_acc;
+     --bars_audit.info('V_CC_PENY_START ins ND = '||nd_); 
      insert into cc_peny_start (acc,ostc,branch,nd,ir)
                         values (l_acc,cck_app.to_number2(:NEW.OSTC)*100
                                ,:new.branch, nd_,l_IR);
    exception when DUP_VAL_ON_INDEX then
-    update cc_peny_start set ostc=:NEW.ostc*100, IR=cck_app.TO_number2 (l_IR) where acc=l_acc;
+    --bars_audit.info('V_CC_PENY_START upd ND = '||nd_||' l_acc = '||l_acc);
+    update cc_peny_start set ostc=:NEW.ostc*100, IR=cck_app.TO_number2 (l_IR) where acc=l_acc and nd = nd_;
    end;
       begin
       select max(bdat) into gl_bd from int_ratn where id=2 and acc=l_acc;

@@ -7,8 +7,23 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_CC_PENY_START ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_CC_PENY_START ("ACC", "NMK", "NLS", "KV", "OSTC", "BRANCH", "SUM", "OST_SN8", "NLS_SN8", "IR", "ACC_SN8", "ND") AS 
-  SELECT acc,
+CREATE OR REPLACE FORCE VIEW BARS.V_CC_PENY_START
+(
+   ACC,
+   NMK,
+   NLS,
+   KV,
+   OSTC,
+   BRANCH,
+   SUM,
+   OST_SN8,
+   NLS_SN8,
+   IR,
+   ACC_SN8,
+   ND
+)
+AS
+   SELECT acc,
           nmk,
           nls,
           kv,
@@ -34,16 +49,16 @@ PROMPT *** Create  view V_CC_PENY_START ***
                              'NLS_NUMERIC_CHARACTERS = ''. ''')
                        SUM,
                     TO_CHAR (
-                       fost (
-                          NVL (
-                             p.acc_sn8,
-                             (SELECT aa.acc
-                                FROM accounts aa, nd_acc na
-                               WHERE     na.acc = aa.acc
-                                     AND na.nd = n.nd
-                                     AND aa.tip = 'SN8'
-                                     AND ROWNUM = 1)),
-                          gl.bd)
+                         fost (
+                            NVL (
+                               p.acc_sn8,
+                               (SELECT aa.acc
+                                  FROM accounts aa, nd_acc na
+                                 WHERE     na.acc = aa.acc
+                                       AND na.nd = n.nd
+                                       AND aa.tip = 'SN8'
+                                       AND ROWNUM = 1)),
+                            gl.bd)
                        / 100,
                        '99999999999D99',
                        'NLS_NUMERIC_CHARACTERS = ''. ''')
@@ -65,19 +80,24 @@ PROMPT *** Create  view V_CC_PENY_START ***
                        ir,
                     p.acc_sn8,
                     n.nd,
-                    ROW_NUMBER () OVER (PARTITION BY n.nd ORDER BY n.nd, p.ostc desc nulls last)
+                    ROW_NUMBER ()
+                    OVER (PARTITION BY n.nd
+                          ORDER BY n.nd, p.ostc DESC NULLS LAST)
                        AS numb_nd
                FROM saldo a,
                     customer c,
                     cc_peny_start p,
-                    nd_acc n
+                    nd_acc n,
+                    cc_deal d
               WHERE     a.rnk = c.rnk
                     AND n.acc = a.acc
                     AND a.acc = p.acc(+)
                     AND a.dazs IS NULL
                     AND a.tip IN ('SP ', 'SPN', 'SK9')
+                    AND D.ND = n.nd
+                    and D.VIDD <>110 -- Умышленно убрал овердрафты так как они не подходят под этот функционал дублируют проводки
            ORDER BY n.nd, a.tip)
-    WHERE numb_nd = 1;
+    WHERE     numb_nd = 1;
 
 PROMPT *** Create  grants  V_CC_PENY_START ***
 grant SELECT                                                                 on V_CC_PENY_START to BARSREADER_ROLE;
