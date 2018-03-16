@@ -13,7 +13,7 @@ PROMPT *** Create  procedure P_F2K_NN ***
 % DESCRIPTION : Процедура формирование файла #2K
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 %
-% VERSION     : v.18.004     06.02.2018
+% VERSION     : v.18.005     16.03.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: dat_ - отчетная дата
            sheme_ - схема формирования
@@ -27,6 +27,7 @@ PROMPT *** Create  procedure P_F2K_NN ***
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+ 16.03.2018  адрес клиента заполняется отдельным скриптом
  06.02.2018  обязательное заполнение кода DDD=310 при  отсутствии операций
  31.01.2018  отсекаем закрытых клиентов 
  10.01.2018  ограничение по отбору операций по типу оплаты SOS
@@ -81,8 +82,10 @@ p_351          varchar2(1);
 p_360          varchar2(70);
 p_391          varchar2(10);
 
+ addr_         varchar2(200);
  ise_          varchar2(5);
  cod_c         integer;
+ is_in_rnbu    integer;
 
 --    операции DDD начинающиеся с 0..
 procedure p_ins_0( p_rnk number, p_kodp varchar2,
@@ -287,10 +290,10 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
 
    dats_ := trunc(dat_, 'mm');
    
-   for k in ( select c.okpo, max(c.codcagent) codcagent, max(ise) ise,
-                             max(c.nmk) nmk, max(c.adr) adr, max(c.rnk) rnk,
-                             max(re.rnbor) rnbor, max(re.rnbou) rnbou,
-                             max(re.rnbos) rnbos, max(re.rnbod) rnbod
+   for k in ( select c.okpo, c.codcagent, c.ise,
+                             c.nmk, c.adr, c.rnk,
+                             re.rnbor, re.rnbou,
+                             re.rnbos, re.rnbod
                 from customer c,
                      ( select *
                          from ( select u.rnk, u.tag, substr(trim(u.value),1,20) value
@@ -309,7 +312,7 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
                where c.rnk = re.rnk
                  and c.date_off is null
                  and trim(re.rnbor) is not null
-               group by c.okpo
+               order by c.okpo
             )
    loop
        if     k.ise like '13%'             then    segm_a :='G';
@@ -319,6 +322,37 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
              segm_a := '1';
        end if;
        segm_z := lpad(trim(k.okpo),10,'0');
+
+       begin
+--         addr_ := f_get_adr(k.rnk,2);
+select
+     address||', '||decode(locality_type,1,'м.',3,'c.',2,'смт.',5, 'ст.',4, 'хут.',null )||decode(locality,null,null,(locality||', '))||decode(domain,null,null,(domain||', '))||C.NAME||', '||zip
+     into addr_
+ from customer_address a, country c
+ where
+     a.rnk=k.rnk
+     and a.type_id=2
+     and c.country=a.country;
+
+       exception
+         when others  then
+            begin
+--               addr_ := f_get_adr(k.rnk,1);
+select
+     address||', '||decode(locality_type,1,'м.',3,'c.',2,'смт.',5, 'ст.',4, 'хут.',null )||decode(locality,null,null,(locality||', '))||decode(domain,null,null,(domain||', '))||C.NAME||', '||zip
+     into addr_
+ from customer_address a, country c
+ where
+     a.rnk=k.rnk
+     and a.type_id=1
+     and c.country=a.country;
+
+            exception
+               when others  then  addr_ :=k.adr;
+            end;
+       end;
+
+--       addr_ := nvl(f_get_adr(k.rnk),k.adr);
 
        is_dat_exist_ := 0;
        begin
@@ -434,8 +468,6 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
           loop
              flag_opp_ := 1;
              
-             nnnn_ :=nnnn_+1;
-
              if u.acc = v.accd  then
                 p_310 :='1';
                 p_330 := v.nlsk;
@@ -508,10 +540,12 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
              
              p_391 := p_260;
 
+             nnnn_ :=nnnn_+1;
+
              segm_n := lpad(to_char(nnnn_),4,'0');
              kodp_ := segm_z||segm_a||segm_n;
 
-             p_ins_0( k.rnk, kodp_, k.nmk, k.adr, p_030 );
+             p_ins_0( k.rnk, kodp_, k.nmk, addr_, p_030 );
    
              p_ins_1( k.rnk, kodp_, k.rnbor, k.rnbou, k.rnbos );
 
@@ -531,7 +565,7 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
              segm_n := lpad(to_char(nnnn_),4,'0');
              kodp_ := segm_z||segm_a||segm_n;
 
-             p_ins_0( k.rnk, kodp_, k.nmk, k.adr, p_030 );
+             p_ins_0( k.rnk, kodp_, k.nmk, addr_, p_030 );
    
              p_ins_1( k.rnk, kodp_, k.rnbor, k.rnbou, k.rnbos );
 
@@ -552,15 +586,26 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
        end loop;                   --цикл по счетам
 
        if flag_acc_ = 0 then             --нет счетов
-          nnnn_ :=nnnn_+1;
-          nnno_ :=nnnn_;
 
-          segm_n := lpad(to_char(nnnn_),4,'0');
-          kodp_ := segm_z||segm_a||segm_n;
+--  возможно наличие нескольких rnk для клиента (одинаковое ОКПО -segm_a)
+--  при формировании только клиентских показателей проверям не было ли уже такого ОКПО 
+          is_in_rnbu := 0;
+          select count(*)  into is_in_rnbu
+            from rnbu_trace
+           where substr(kodp,4,10) = segm_z;
 
-          p_ins_0( k.rnk, kodp_, k.nmk, k.adr, p_030 );
+          if is_in_rnbu =0  then
+            nnnn_ :=nnnn_+1;
+            nnno_ :=nnnn_;
+
+            segm_n := lpad(to_char(nnnn_),4,'0');
+            kodp_ := segm_z||segm_a||segm_n;
+
+            p_ins_0( k.rnk, kodp_, k.nmk, addr_, p_030 );
     
-          p_ins_1( k.rnk, kodp_, k.rnbor, k.rnbou, k.rnbos );
+            p_ins_1( k.rnk, kodp_, k.rnbor, k.rnbou, k.rnbos );
+          end if;
+
        end if;
 
    end if;
