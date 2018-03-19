@@ -57,7 +57,7 @@ BEGIN
             OR (l_value_parent = c.value_parent
                 AND c.required = 'Y'
                 AND l_value IS NOT NULL)
-            OR (L_TT IN ('AA3','AA5') AND L_VALUE IS NULL AND (l_value_parent !='Паспорт ID-картка' or l_value_parent is  null))
+            OR (L_TT IN ('AA3','AA5','TM8','TTI','TMP') AND L_VALUE IS NULL AND (l_value_parent !='Паспорт ID-картка' or l_value_parent is  null))
          THEN
             NULL;
          ELSE
