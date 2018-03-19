@@ -223,7 +223,7 @@ Show errors;
 CREATE OR REPLACE PACKAGE BODY DM_IMPORT
  is
 
-    g_body_version constant varchar2(64) := 'Version 4.0.3 14/03/2018';
+    g_body_version constant varchar2(64) := 'Version 4.0.4 19/03/2018';
     g_body_defs    constant varchar2(512) := null;
     G_TRACE        constant varchar2(20) := 'dm_import.';
 	-- # COBUMMFO-6343
@@ -271,6 +271,8 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
         subpartition_doesnt_exist exception;
         pragma exception_init(subpartition_doesnt_exist, -14251);
     begin
+        -- устанавливаем время ожидания ddl_lock, чтобы не получить -54 при одновременном truncate
+        execute immediate 'alter session set ddl_lock_timeout=30';
         execute immediate 'alter table '||p_table_name||' truncate subpartition '||'P'||p_period_id||'_KF_'||p_kf; -- e.g. P995_KF_300465
     exception
         when subpartition_doesnt_exist then
@@ -2536,25 +2538,21 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                                       ';
 
 
-        q_str_postfull  varchar2(4000) :=  ' from bars.accounts a, bars.customer c, bars.accounts ao, bars.w4_acc w,
+        q_str_postfull  varchar2(4000) :=  ' from bars.accounts a, bars.accounts ao, bars.w4_acc w,
                                           (select aw.acc, p.id, p.name, p.okpo, p.product_code, p.okpo_n from bars.accountsw aw, bars.bpk_proect p
                                             where aw.tag = ''PK_PRCT''
                                               and to_number(aw.value)= p.id
                                               and regexp_replace(trim(aw.value), ''\D'') = trim(aw.value)) pk_prct
-                                    where w.acc_pk = a.acc and a.rnk = c.rnk
-                                     and c.custtype = 3 and nvl(trim(c.sed),''00'')<>''91''
-                                     and not (C.ise in (''14100'', ''14200'', ''14101'',''14201'') and C.sed =''91'')
+                                    where w.acc_pk = a.acc
                                      and w.acc_ovr = ao.acc(+)
                                      and w.acc_pk = pk_prct.acc(+) ';
 
-        q_str_postinc varchar2(4000) :=  ' from bars.accounts a, bars.customer c, bars.accounts ao, bars.w4_acc w, acvive_accounts aa,
+        q_str_postinc varchar2(4000) :=  ' from bars.accounts a, bars.accounts ao, bars.w4_acc w, acvive_accounts aa,
                                           (select aw.acc, p.id, p.name, p.okpo, p.product_code, p.okpo_n from bars.accountsw aw, bars.bpk_proect p
                                             where aw.tag = ''PK_PRCT''
                                               and to_number(aw.value)= p.id
                                               and regexp_replace(trim(aw.value), ''\D'') = trim(aw.value)) pk_prct
-                                    where w.acc_pk = a.acc and a.rnk = c.rnk
-                                     and c.custtype = 3 and nvl(trim(c.sed),''00'')<>''91''
-                                     and not (C.ise in (''14100'', ''14200'', ''14101'',''14201'') and C.sed =''91'')
+                                    where w.acc_pk = a.acc
                                      and w.acc_ovr = ao.acc(+)
                                      and w.acc_pk = pk_prct.acc(+)
                                      and a.acc = aa.acc';
@@ -2958,7 +2956,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                        r.bdate,
                        r.edate,
                        r.sign_privs,
-                       case when r.rnk is null then ''D'' else '''' end as change_type,
+                       coalesce(case when r.rnk is null then ''D'' else '''' end, case when not (c.date_off is null or c.date_off>=sysdate) then ''Z'' else '''' end) as change_type,
                        case when c.custtype = 3 and C.ise in (''14100'', ''14200'', ''14101'',''14201'') and C.sed =''91'' then 4 else c.custtype end CL_TYPE
                  from customer_rel_updated cru
                  left join bars.V_CUSTOMER_REL r on (cru.rnk = r.rnk and cru.rel_rnk = r.rel_rnk and cru.rel_intext = r.rel_intext and cru.rel_id = r.rel_id)
@@ -2985,11 +2983,11 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                        r.bdate,
                        r.edate,
                        r.sign_privs,
-                       case when r.rnk is null then ''D'' else '''' end as change_type,
+                       coalesce(case when r.rnk is null then ''D'' else '''' end, case when not (c.date_off is null or c.date_off>=sysdate) then ''Z'' else '''' end) as change_type,
                        case when c.custtype = 3 and C.ise in (''14100'', ''14200'', ''14101'',''14201'') and C.sed =''91'' then 4 else c.custtype end CL_TYPE
                  from customer_rel_updated cru
                  full join bars.V_CUSTOMER_REL r on (cru.rnk = r.rnk and cru.rel_rnk = r.rel_rnk and cru.rel_intext = r.rel_intext and cru.rel_id = r.rel_id)
-                 join bars.customer c on cru.rnk = c.rnk or r.rnk = c.rnk
+                 join bars.customer  c on cru.rnk = c.rnk or r.rnk = c.rnk
                 where (r.vaga1 is not null or r.vaga2 is null)   -- COBUSUPABS-5519';
     begin
         bars.bars_audit.info(l_trace||' start');
@@ -4256,7 +4254,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                       ,a.acc
                       ,a.ob22
                       ,a.nms
-                       from bars.accounts a, bars.customer c, bars.accounts ao, bars.w4_acc w, acvive_accounts aa,
+                       from bars.accounts a, bars.accounts ao, bars.w4_acc w, acvive_accounts aa,
                         (select aw.acc, p.id, p.name, p.okpo, p.product_code, p.okpo_n from bars.accountsw aw, bars.bpk_proect p
                           where aw.tag = 'PK_PRCT'
                             and to_number(aw.value)= p.id
@@ -4289,9 +4287,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                                              ) ww,
                          bars.deal d,
                          (select acc, kos, dos from bars.saldoa where FDAT = trunc(p_dat)) S
-                  where w.acc_pk = a.acc and a.rnk = c.rnk
-                   and c.custtype = 3 and nvl(trim(c.sed),'00')<>'91'
-                   and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов
+                  where w.acc_pk = a.acc
                    and w.acc_ovr = ao.acc(+)
                    and w.acc_pk = pk_prct.acc(+)
                    and a.acc = aa.acc
@@ -4355,7 +4351,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                       ,a.acc
                       ,a.ob22
                       ,a.nms
-                       from bars.accounts a, bars.customer c, bars.accounts ao, bars.w4_acc w/*, acvive_accounts aa*/,
+                       from bars.accounts a, bars.accounts ao, bars.w4_acc w/*, acvive_accounts aa*/,
                         (select aw.acc, p.id, p.name, p.okpo, p.product_code, p.okpo_n from bars.accountsw aw, bars.bpk_proect p
                           where aw.tag = 'PK_PRCT'
                             and to_number(aw.value)= p.id
@@ -4388,9 +4384,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                                              ) ww,
                          bars.deal d,
                          (select acc, kos, dos from bars.saldoa where FDAT = trunc(p_dat)) S
-                  where w.acc_pk = a.acc and a.rnk = c.rnk
-                   and c.custtype = 3 and nvl(trim(c.sed),'00')<>'91'
-                   and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов
+                  where w.acc_pk = a.acc
                    and w.acc_ovr = ao.acc(+)
                    and w.acc_pk = pk_prct.acc(+)
                    and p_periodtype = 'MONTH' /*Только для ежедневных выгрузок*/
