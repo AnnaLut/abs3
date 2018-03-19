@@ -7,7 +7,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #D8 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 13/02/2018 (09/02/2018, 08/02/2018)
+% VERSION     : 15/03/2018 (13/03/2018, 26/02/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата 
                sheme_ - схема формирования
@@ -18,6 +18,12 @@ IS
     содержиться в поле RNKA (в RNKB участвующие клиенты нашего банка или
     пустое значение для не клиентов банка)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%14/03/2018 - для таблицы FX_DEAL добавлено условие DAT <= dat_
+              изменено формирование показателей 131 и 132 
+              будет формироваться сумма просрочки больше 90 дней
+%26/02/2018 - изменено формирование показателя 161 (убрал условие 
+              zamina_a_ not in ('0') для вида реструктуризации 4  
+              изменено формированне показателя 124 
 %13/02/2018 - для нерезидентів не удаляються залишки якщо RNK=LINK_GROUP
 %09/02/2018 - внесені зміни виконані Вірко
 %08/02/2018 - значение показателя 060 (код инсайдера будем формировать из
@@ -372,6 +378,9 @@ IS
    f71k_        NUMBER;
    p120_        NUMBER;
    p125_        NUMBER;
+   p131_        NUMBER;
+   p132_        NUMBER;
+   dos_spn_     NUMBER;
    ndk_         NUMBER;
    nd_          NUMBER;
    nd_trans     NUMBER;
@@ -692,7 +701,7 @@ IS
                           '124','125','126','127','128','131','132'
                          )
       GROUP BY kodp
-      ORDER BY SUBSTR (kodp, 4, 10), SUBSTR (kodp, 27), SUBSTR (kodp, 1, 3);
+      ORDER BY SUBSTR (kodp, 4, 10), SUBSTR (kodp, 33), SUBSTR (kodp, 1, 3);
 
 -------------------------------------------------------------------
    PROCEDURE p_ins (
@@ -1095,10 +1104,7 @@ IS
             THEN
                p111p_ := p111_;
          END;
-      end if;
 
-      if nd_ is null and p090_ is null
-      then
          begin
             select NVL(s.nkd, 'N дог.')
                into p090_ 
@@ -1255,6 +1261,7 @@ IS
             where fx.acc9a = acc_
               --and fx.sos <> 15
               and fx.dat_a > dat_
+              and fx.dat <= dat_ 
               and rownum = 1;
          exception when no_data_found then
             null;
@@ -3782,7 +3789,6 @@ BEGIN
                                                   '2103','2113','2123','2133','2203', 
                                                   '2211','2220','2233','3570','3578' ) 
                 then
-               
                    begin
                       select a.tip 
                          into tip_ 
@@ -4249,7 +4255,7 @@ BEGIN
                          IF dat_ >= to_date('31102017','ddmmyyyy')
                          THEN
                             if vid_ in (1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 15, 17)
-                               and NVL(zamina_a, '0') not in ('0','5','6')
+                               and NVL(zamina_a, '0') not in ('5','6')
                             then  
                                vid_ := 4; -- реструктуризована без заміни активу
                             elsif vid_ in (1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 15, 17)
@@ -4496,7 +4502,7 @@ BEGIN
 
                    -- дисконт та прем_ю показуємо з_ знаком
                    p_ins (ddd_ || kod_okpo || kod_nnnn || p070_ || p140_,
-                          TO_CHAR (0 - p120_),
+                          TO_CHAR (0 - p120_),  -- TO_CHAR (p120_),
                           nls_, '00', k021_, w_, '00', H_, K140_
                          );
                 ELSE
@@ -4791,47 +4797,19 @@ BEGIN
                                   -- (это поле OBS=4,5 в NBU23_REZ)
                                   if Dat_ >= dat_izm5 
                                   then
-                                     BEGIN
-                                        select NVL(kol_351, 1)
-                                           into s190_
-                                        from nbu23_rez
-                                        where fdat = dat23_
-                                          and acc = acc_
-                                          and nd = nd_
-                                          and kol_351 <> 0
-                                          and rownum = 1;
-                                     EXCEPTION WHEN NO_DATA_FOUND THEN
-                                        BEGIN
-                                           select NVL(kol_351, 1)
-                                              into s190_
-                                           from nbu23_rez
-                                           where fdat = dat23_
-                                             and acc = acc_
-                                             and kol_351 <> 0 
-                                             and rownum = 1;
-                                        EXCEPTION WHEN NO_DATA_FOUND THEN
-                                           BEGIN
-                                              select NVL(kol_351, 1)
-                                                 into s190_
-                                              from nbu23_rez
-                                              where fdat = dat23_
-                                                and nd = nd_
-                                                and kol_351 <> 0
-                                                and rownum = 1;
-                                           EXCEPTION WHEN NO_DATA_FOUND THEN
-                                              s190_ := 1;
-                                           END;
-                                        END;
-                                     END;
-                                     -- по  просьбе Мищенко изменяем OBS с "3" на "4"
-                                     if mfo_ = 300465 and rnk_ in (940143, 946362) 
-                                     then
-                                        s190_ := 91;
-                                     end if;
-                                     if s190_ > 90   
-                                     then
+
+                                     select NVL(sum(dos), 0) 
+                                        into dos_spn_
+                                     from saldoa 
+                                     where fdat between dat_ - 90 and dat_
+                                       and acc = acc_; 
+
+                                     if ABS(p120_) > gl.p_icurval(kv_, dos_spn_, dat_)
+                                     then 
+                                        p131_ := ABS(p120_) - gl.p_icurval(kv_, dos_spn_, dat_);
+
                                         p_ins ('131' || kod_okpo || kod_nnnn || p070_ || p140_,
-                                               TO_CHAR (ABS (p120_)),
+                                               TO_CHAR (ABS (p131_)),
                                                nls_,
                                                null, k021_, w_, '00', H_, K140_
                                               );                                            
@@ -4841,6 +4819,15 @@ BEGIN
                             end if;
                          else
                             if ddd_ = '123' then
+                               begin
+                                  select a.tip 
+                                     into tip_ 
+                                  from accounts a  
+                                  where a.acc = acc_;
+                               exception when no_data_found then
+                                  tip_  := 'SN';
+                               end;
+
                                if (p070_ in ('1408', '1418', '1428', '1508',
                                              '1518', '1528', '1538', '1548', 
                                              '1607', '2018', '2028', '2038', 
@@ -4878,71 +4865,29 @@ BEGIN
                                              '2458', '2607', '2627', '2657',   
                                              '3008', '3018', '3108', '3118',   
                                              '3218', '3418', '3428', '3568'    
-                                            ) and p120_ < 0 ) 
+                                            ) and p120_ < 0 ) AND tip_ = 'SPN'
                                then
 
                                   -- на 01.11.2016 новый показатель 132 
                                   -- (это поле OBS=4,5 в NBU23_REZ)
                                   -- на 01.02.2017 новый показатель 132 
                                   -- (это поле KOL_351 в NBU23_REZ)
+                                  -- 14.03.2018 
+                                  -- сумма просрочки больше 90 дней
                                   if Dat_ >= dat_izm5 
                                   then
-                                     BEGIN
-                                        select NVL(kol_351, 1)
-                                           into s190_
-                                        from nbu23_rez
-                                        where fdat = dat23_
-                                          and acc = acc_
-                                          and nd = nd_
-                                          and kol_351 <> 0
-                                          and rownum = 1;
-                                     EXCEPTION WHEN NO_DATA_FOUND THEN
-                                        BEGIN
-                                           select NVL(kol_351, 1)
-                                              into s190_
-                                           from nbu23_rez
-                                           where fdat = dat23_
-                                             and acc = acc_
-                                             and kol_351 <> 0 
-                                             and rownum = 1;
-                                        EXCEPTION WHEN NO_DATA_FOUND THEN
-                                           BEGIN
-                                              select NVL(kol_351, 1)
-                                                 into s190_
-                                              from nbu23_rez
-                                              where fdat = dat23_
-                                                and nd = nd_
-                                                and kol_351 <> 0  
-                                                and rownum = 1;
-                                           EXCEPTION WHEN NO_DATA_FOUND THEN
-                                              s190_ := 1;
-                                           END;
-                                        END;
-                                     END;
-                                     --if p070_ = '3119' 
-                                     --then
-                                     --   begin
-                                     --      select NVL(s190, '1')
-                                     --         into s190s_ 
-                                     --      from specparam 
-                                     --      where acc = acc_;
-                                     --   exception when no_data_found then 
-                                     --      s190s_ := '1';
-                                     --   end;
-                                     --   if s190s_ in ('4', '5', 'E', 'F', 'G') 
-                                     --   then
-                                     --      s190_ := 91;
-                                     --   end if;
-                                     --end if; 
-                                     -- по  просьбе Мищенко изменяем OBS с "3" на "4"
-                                     if mfo_ = 300465 and rnk_ in (940143, 946362) 
-                                     then
-                                        s190_ := 91;
-                                     end if;
-                                     if s190_ > 90 
-                                     then
+                                     select NVL(sum(dos), 0) 
+                                        into dos_spn_
+                                     from saldoa 
+                                     where fdat between dat_ - 90 and dat_
+                                       and acc = acc_; 
+
+                                     if ABS(p120_) > gl.p_icurval(kv_, dos_spn_, dat_)
+                                     then 
+                                        p132_ := ABS(p120_) - gl.p_icurval(kv_, dos_spn_, dat_);
+
                                         p_ins ('132' || kod_okpo || kod_nnnn || p070_ || p140_,
-                                               TO_CHAR (ABS (p120_)),
+                                               TO_CHAR (ABS (p132_)),
                                                nls_,
                                                null, k021_, w_, '00', H_, K140_
                                               );                                            
@@ -4977,47 +4922,19 @@ BEGIN
                                   -- (это поле KOL_351 в NBU23_REZ)
                                   if Dat_ >= dat_izm5 
                                   then
-                                     BEGIN
-                                        select NVL(kol_351, 1)
-                                           into s190_
-                                        from nbu23_rez
-                                        where fdat = dat23_
-                                          and acc = acc_
-                                          and nd = nd_
-                                          and kol_351 <> 0
-                                          and rownum = 1;
-                                     EXCEPTION WHEN NO_DATA_FOUND THEN
-                                        BEGIN
-                                           select NVL(kol_351, 1)
-                                              into s190_ 
-                                           from nbu23_rez
-                                           where fdat = dat23_
-                                             and acc = acc_
-                                             and kol_351 <> 0 
-                                             and rownum = 1;
-                                        EXCEPTION WHEN NO_DATA_FOUND THEN
-                                           BEGIN
-                                              select NVL(kol_351, 1)
-                                                 into s190_
-                                              from nbu23_rez
-                                              where fdat = dat23_
-                                                and nd = nd_
-                                                and kol_351 <> 0 
-                                                and rownum = 1;
-                                           EXCEPTION WHEN NO_DATA_FOUND THEN
-                                              s190_ := 1;
-                                           END;
-                                        END;
-                                     END;
-                                     -- по  просьбе Мищенко изменяем OBS с "3" на "4"
-                                     if mfo_ = 300465 and rnk_ in (940143, 946362) 
-                                     then
-                                        s190_ := 91;
-                                     end if;
-                                     if s190_ > 90 
-                                     then
+
+                                     select NVL(sum(dos), 0) 
+                                        into dos_spn_
+                                     from saldoa 
+                                     where fdat between dat_ - 90 and dat_
+                                       and acc = acc_; 
+
+                                     if ABS(p120_) > gl.p_icurval(kv_, dos_spn_, dat_)
+                                     then 
+                                        p131_ := ABS(p120_) - gl.p_icurval(kv_, dos_spn_, dat_);
+
                                         p_ins ('131' || kod_okpo || kod_nnnn || p070_ || p140_,
-                                               TO_CHAR (ABS (p120_)),
+                                               TO_CHAR (ABS (p131_)),
                                                nls_,
                                                null, k021_, w_, '00', H_, K140_
                                               );                                            
@@ -5305,7 +5222,7 @@ BEGIN
                              '2458', '2607', '2627', '2657',
                              '3008', '3018', '3108', '3118', 
                              '3218', '3418', '3428', '3568'
-                           ) and p120_ < 0 and tip_ <> 'SNP'
+                           ) and p120_ < 0 and tip_ <> 'SPN'
              then   
 
                 BEGIN 
@@ -5504,107 +5421,127 @@ BEGIN
           if n_trans <> 0 then
              -- код класса контрагента/инсайдера код 085
              update rnbu_trace set kodp = substr(kodp,1,24)||'01'||substr(kodp,27)
-             where substr(kodp,1,3) = '085' and substr(kodp,25,2)='00' and nd = nd_;
+             where substr(kodp,1,3) = '085' and substr(kodp,14,4)=kod_nnnn and 
+                   substr(kodp,25,2)='00' and nd = nd_;
 
              -- дата першого траншу код 111
              update rnbu_trace set kodp = substr(kodp,1,24)||'01'||substr(kodp,27),
                                    znap = TO_CHAR (p111_1, dfmt_)
-             where substr(kodp,1,3) = '111' and substr(kodp,25,2)='00' and nd = nd_ ;
+             where substr(kodp,1,3) = '111' and substr(kodp,14,4)=kod_nnnn and 
+                   substr(kodp,25,2)='00' and nd = nd_ ;
 
              -- дата останнього траншу код 112
              update rnbu_trace set kodp = substr(kodp,1,24)||'01'||substr(kodp,27),
                                    znap = TO_CHAR (p112_2, dfmt_)
-             where substr(kodp,1,3) = '112' and substr(kodp,25,2)='00' and nd = nd_ ;
+             where substr(kodp,1,3) = '112' and substr(kodp,14,4)=kod_nnnn and 
+                   substr(kodp,25,2)='00' and nd = nd_ ;
 
              -- коефіцієнт CCF код 150
              update rnbu_trace set kodp = substr(kodp,1,24)||'01'||substr(kodp,27)
-             where substr(kodp,1,3) = '150' and substr(kodp,25,2)='00' and nd = nd_ ;
+             where substr(kodp,1,3) = '150' and substr(kodp,14,4)=kod_nnnn and 
+                   substr(kodp,25,2)='00' and nd = nd_ ;
 
              -- стан заборгованості код 160
              update rnbu_trace set kodp = substr(kodp,1,24)||'01'||substr(kodp,27)
-             where substr(kodp,1,3) = '160' and substr(kodp,25,2)='00' and nd = nd_ ;
+             where substr(kodp,1,3) = '160' and substr(kodp,14,4)=kod_nnnn and 
+                   substr(kodp,25,2)='00' and nd = nd_ ;
 
              -- стан заборгованост_ щодо реструктуризац?ї код 161
              update rnbu_trace set kodp = substr(kodp,1,24)||'01'||substr(kodp,27)
-             where substr(kodp,1,3) = '161' and substr(kodp,25,2)='00' and nd = nd_ ;
+             where substr(kodp,1,3) = '161' and substr(kodp,14,4)=kod_nnnn and 
+                   substr(kodp,25,2)='00' and nd = nd_ ;
 
              -- ризик невиконання своїх зобовязань перед банком
              update rnbu_trace set kodp = substr(kodp,1,24)||'01'||substr(kodp,27)
-             where substr(kodp,1,3) = '162' and substr(kodp,25,2)='00' and nd = nd_ ;
+             where substr(kodp,1,3) = '162' and substr(kodp,14,4)=kod_nnnn and 
+                   substr(kodp,25,2)='00' and nd = nd_ ;
 
              -- сума відкличних зобовязань банку код 118
              update rnbu_trace set kodp = substr(kodp,1,24)||'01'||substr(kodp,27)
-             where substr(kodp,1,3)='118' and nd = nd_;
+             where substr(kodp,1,3)='118' and substr(kodp,14,4)=kod_nnnn and nd = nd_;
 
              -- сума фактичної заборгованост_ контрагента код 119
              update rnbu_trace set kodp = substr(kodp,1,24)||'01'||substr(kodp,27)
-             where substr(kodp,1,3)='119' and nd = nd_;
+             where substr(kodp,1,3)='119' and substr(kodp,14,4)=kod_nnnn and nd = nd_;
 
              -- дисконт та прем_ю показуємо з_ знаком коды 122, 124
              update rnbu_trace set kodp = substr(kodp,1,24)||'01'||substr(kodp,27)
-             where substr(kodp,1,3) in ('122','124') and nd = nd_;
+             where substr(kodp,1,3) in ('122','124') and substr(kodp,14,4)=kod_nnnn and nd = nd_;
 
              -- основна сума код 121 бал.рахунки 3578,3579
              update rnbu_trace set kodp = substr(kodp,1,24)||'01'||substr(kodp,27)
-             where substr(nls,1,4) in ('3578','3579') and substr(kodp,1,3) = '121' and nd = nd_;
+             where substr(nls,1,4) in ('3578','3579') and substr(kodp,14,4)=kod_nnnn and 
+                   substr(kodp,1,3) = '121' and nd = nd_;
 
              -- прострочена сума код 126 бал.рахунок 3578
              update rnbu_trace set kodp = substr(kodp,1,24)||'01'||substr(kodp,27)
-             where substr(nls,1,4) = '3578' and substr(kodp,1,3) = '126' and nd = nd_;
+             where substr(nls,1,4) = '3578' and substr(kodp,14,4)=kod_nnnn and 
+                   substr(kodp,1,3) = '126' and nd = nd_;
 
              -- прострочена сума код 131 бал.рахунок 3578
              update rnbu_trace set kodp = substr(kodp,1,24)||'01'||substr(kodp,27)
-             where substr(nls,1,4) = '3578' and substr(kodp,1,3) = '131' and nd = nd_;
+             where substr(nls,1,4) = '3578' and substr(kodp,14,4)=kod_nnnn and 
+                   substr(kodp,1,3) = '131' and nd = nd_;
 
              -- нараховані доходи код 123
              update rnbu_trace set kodp = substr(kodp,1,24)||'01'||substr(kodp,27)
-             where substr(kodp,1,3) = '123' and nd = nd_;
+             where substr(kodp,1,3) = '123' and substr(kodp,14,4)=kod_nnnn and nd = nd_;
 
              -- нараховані доходи код 132
              update rnbu_trace set kodp = substr(kodp,1,24)||'01'||substr(kodp,27)
-             where substr(kodp,1,3) = '132' and nd = nd_;
+             where substr(kodp,1,3) = '132' and substr(kodp,14,4)=kod_nnnn and nd = nd_;
 
              if Dat_ >= dat_izm5 
              then 
                 -- коефіцієнт PD
                 update rnbu_trace set kodp = substr(kodp,1,24)||'01'||substr(kodp,27)
-                where substr(kodp,1,3) = '163' and substr(kodp,25,2)='00' and nd = nd_ ;
+                where substr(kodp,1,3) = '163' and substr(kodp,14,4)=kod_nnnn and 
+                      substr(kodp,25,2)='00' and nd = nd_ ;
 
                 -- код скоригованого класу контрагента
                 update rnbu_trace set kodp = substr(kodp,1,24)||'01'||substr(kodp,27)
-                where substr(kodp,1,3) = '164' and substr(kodp,25,2)='00' and nd = nd_ ;
+                where substr(kodp,1,3) = '164' and substr(kodp,14,4)=kod_nnnn and 
+                      substr(kodp,25,2)='00' and nd = nd_ ;
 
                 -- код фактору
                 update rnbu_trace set kodp = substr(kodp,1,24)||'01'||substr(kodp,27)
-                where substr(kodp,1,3) = '170' and substr(kodp,25,2)='00' and nd = nd_ ;
+                where substr(kodp,1,3) = '170' and substr(kodp,14,4)=kod_nnnn and 
+                      substr(kodp,25,2)='00' and nd = nd_ ;
 
                 -- код фактору щодо належності до групи
                 update rnbu_trace set kodp = substr(kodp,1,24)||'01'||substr(kodp,27)
-                where substr(kodp,1,3) = '171' and substr(kodp,25,2)='00' and nd = nd_ ;
+                where substr(kodp,1,3) = '171' and substr(kodp,14,4)=kod_nnnn and 
+                      substr(kodp,25,2)='00' and nd = nd_ ;
 
                 -- код фактору щодо наявності ознаки
                 update rnbu_trace set kodp = substr(kodp,1,24)||'01'||substr(kodp,27)
-                where substr(kodp,1,3) = '172' and substr(kodp,25,2)='00' and nd = nd_ ;
+                where substr(kodp,1,3) = '172' and substr(kodp,14,4)=kod_nnnn and 
+                      substr(kodp,25,2)='00' and nd = nd_ ;
 
                 -- код фактору щодо подій дефолту
                 update rnbu_trace set kodp = substr(kodp,1,24)||'01'||substr(kodp,27)
-                where substr(kodp,1,3) = '173' and substr(kodp,25,2)='00' and nd = nd_ ;
+                where substr(kodp,1,3) = '173' and substr(kodp,14,4)=kod_nnnn and 
+                      substr(kodp,25,2)='00' and nd = nd_ ;
 
                 -- код фактору щодо своєчасної сплати боргу
                 update rnbu_trace set kodp = substr(kodp,1,24)||'01'||substr(kodp,27)
-                where substr(kodp,1,3) = '174' and substr(kodp,25,2)='00' and nd = nd_ ;
+                where substr(kodp,1,3) = '174' and substr(kodp,14,4)=kod_nnnn and 
+                      substr(kodp,25,2)='00' and nd = nd_ ;
 
                 -- код фактору щодо додаткових характеристик
                 update rnbu_trace set kodp = substr(kodp,1,24)||'01'||substr(kodp,27)
-                where substr(kodp,1,3) = '175' and substr(kodp,25,2)='00' and nd = nd_ ;
+                where substr(kodp,1,3) = '175' and substr(kodp,14,4)=kod_nnnn and 
+                      substr(kodp,25,2)='00' and nd = nd_ ;
 
                 -- код фактору щодо кредитної історії
                 update rnbu_trace set kodp = substr(kodp,1,24)||'01'||substr(kodp,27)
-                where substr(kodp,1,3) = '176' and substr(kodp,25,2)='00' and nd = nd_ ;
+                where substr(kodp,1,3) = '176' and substr(kodp,14,4)=kod_nnnn and 
+                      substr(kodp,25,2)='00' and nd = nd_ ;
 
                 -- код ознаки дефолту
                 update rnbu_trace set kodp = substr(kodp,1,24)||'01'||substr(kodp,27)
-                where substr(kodp,1,3) = '179' and substr(kodp,25,2)='00' and nd = nd_ ;
+                where substr(kodp,1,3) = '179' and substr(kodp,14,4)=kod_nnnn and 
+                      substr(kodp,25,2)='00' and nd = nd_ ;
 
              end if;
 
@@ -5612,17 +5549,17 @@ BEGIN
              then 
                 -- сума нарахованих доходів неотриманих до 30 днів код 127
                 update rnbu_trace set kodp = substr(kodp,1,24)||'01'||substr(kodp,27)
-                where substr(kodp,1,3) = '127' and nd = nd_;
+                where substr(kodp,1,3) = '127' and substr(kodp,14,4)=kod_nnnn and nd = nd_;
 
                 -- розмір кредитного ризику код 128
                 update rnbu_trace set kodp = substr(kodp,1,24)||'01'||substr(kodp,27)
-                where substr(kodp,1,3) = '128' and nd = nd_;
+                where substr(kodp,1,3) = '128' and substr(kodp,14,4)=kod_nnnn and nd = nd_;
 
              end if;
 
              -- сума резерв_в код 125
              update rnbu_trace set kodp = substr(kodp,1,24)||'01'||substr(kodp,27)
-             where substr(kodp,1,3) = '125' and nd = nd_;
+             where substr(kodp,1,3) = '125' and substr(kodp,14,4)=kod_nnnn and nd = nd_;
           end if;
 
       END LOOP;
@@ -5793,7 +5730,7 @@ where substr(kodp,1,3) in ('121','123')
                        '9617','9618','9600','9601'
                       );
 
-update rnbu_trace set kodp = '124' || substr(kodp,4)
+update rnbu_trace set kodp = '124' || substr(kodp,4), znap = 0 - znap 
 where substr(kodp,1,3) in ('125')
   and substr(kodp,18,4) in ('3107');
 
@@ -5826,7 +5763,7 @@ where substr(r.kodp,1,3) = '083'
 -- замена показателей 080,082 на значения сформированные 28.11.2014
 if mfo_ = 324805 and dat_ >= to_date('31122014','ddmmyyyy') then
    for k in ( select kodp, substr(kodp,1,3) ddd, substr(kodp,4,10) okpo,
-                     substr(kodp,14,4) nnnn, substr(kodp,27) rnk
+                     substr(kodp,14,4) nnnn, substr(kodp,33) rnk
               from rnbu_trace
               where (kodp like '080%' or kodp like '082%')
               order by substr(kodp,4,10), substr(kodp,14,4),
