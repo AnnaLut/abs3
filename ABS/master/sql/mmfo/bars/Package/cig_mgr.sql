@@ -2982,7 +2982,7 @@ select           aa.nd,
            decode(w.value,''0'',''0'',''1'',''1'',''2'',''2'',''3'',''3'',''4'',''4'',''5'',''5'',''6'',''6'',''7'',''7'',''8'',''8'',''9'') as position,
            c.okpo,
            fio(c.nmk, 2) || fio(c.nmk, 1) || to_char(p.bday, ''ddmmyyyy'') as cust_key,
- case when  p.passp = 7 then nvl(p.ser,0) else p.ser end ser
+ case when  p.passp = 7 then nvl(p.ser,0) else p.ser end ser,
            p.numdoc,
            p.pdate as passp_iss_date,
            null as passp_exp_date,
