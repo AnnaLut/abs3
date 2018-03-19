@@ -13,7 +13,7 @@ create or replace package cp_rep_dgp is
 end cp_rep_dgp;
 /
 create or replace package body cp_rep_dgp is
-  G_BODY_VERSION constant varchar2(64) := 'v.1.4  05.03.2018';
+  G_BODY_VERSION constant varchar2(64) := 'v.1.5  19.03.2018';
   G_TRACE        constant varchar2(20) := 'CP_REP_DGP.';
   ---
   cursor G_CUR (p_nlsb_arr string_list, p_date_from date, p_date_to date)
@@ -224,6 +224,7 @@ create or replace package body cp_rep_dgp is
   function get_kontragent(p_ref int,
                           p_isk varchar2 default 'Контрагенту',
                           p_vx  int default 1) return varchar is
+    l_title         constant varchar2(25) := 'get_kontragent: ';                          
     l_ref  int;
     ttt1   varchar2(4000);
     pos    int; --  Контрагенту  :АБ "ПОЛТАВА-Банк"
@@ -232,7 +233,13 @@ create or replace package body cp_rep_dgp is
   begin
     l_ref := P_ref;
     l_isk := P_isk;
-    select get_stiket(l_ref) into ttt1 from dual;
+    begin
+      select get_stiket(l_ref) into ttt1 from dual;
+      exception
+        when others then
+          bars_audit.error(G_TRACE || l_title ||' l_ref='||l_ref||' '|| substr(dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace(), 1, 2000));
+          ttt1 := null;
+    end;
     if ttt1 is null then
       return '***?';
     end if;
@@ -346,6 +353,11 @@ create or replace package body cp_rep_dgp is
     СС - номер сессии приема файла (наверно возможно за одну дату несколько сессий , но в расчет должна быть одна максимальная)
     */
     /* СС в розрахунок не брав */
+    
+    /* 19.03.2018 від Людмила Марценюк
+       Меняется структура таблицы  prvn_fv_rez
+       Индексы учтем, но наверное в новой таблице. 
+       IS_DEFAULT - вообще убрали.
     select is_default
       into l_c
       from bars.prvn_fv_rez
@@ -361,6 +373,9 @@ create or replace package body cp_rep_dgp is
       when NO_DATA_FOUND then
         l_c := null;
         return l_c;
+        
+     */
+    return null;    
   end;
 
   function get_ss_kor(p_accs cp_deal.accs%type, p_date date) return number is
@@ -394,6 +409,16 @@ create or replace package body cp_rep_dgp is
                                    fdat <= p_date);
       return l_c;
   end;
+
+  procedure send_msg( p_txt varchar2 )
+  is
+  begin
+    if getglobaloption('BMS')='1' then -- BMS Признак: 1-установлена рассылка сообщений
+    -- bms.add_subscriber( gl.aUid);
+       bms.enqueue_msg( p_txt, dbms_aq.no_delay, dbms_aq.never, gl.aUid );
+    end if;
+--    bars_audit.info( 'OSA=>BMS:'||p_txt );
+  end send_msg;
 
   --існує стара версія звіту: процедура cp_zv_D , таблиця tmp_cp_zv, вйуха v_cp_zv7k
   /* Населення данними для звіту DGP-007:
@@ -1060,12 +1085,14 @@ create or replace package body cp_rep_dgp is
     end loop;
     close G_CUR;
     bars_audit.info(G_TRACE || l_title || ' Itog l_cnt =  '||l_cnt);
+    send_msg('Кінець формування DGP007: для перегляду результату при запуску звіту нажміть Ні');                
     exception
       when others then
         bars_audit.error(G_TRACE || l_title || substr(dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace(), 1, 2000));
         if G_CUR%ISOPEN then
           close G_CUR;
         end if;
+        send_msg('Звіт DGP007 при формуванні отримав помилку: '||G_TRACE || l_title || substr(dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace(), 1, 2000));
         raise_application_error(-20001, G_TRACE || l_title || substr(dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace(), 1, 2000));
   end;
 
@@ -1721,12 +1748,14 @@ create or replace package body cp_rep_dgp is
     end loop;
     close G_CUR;
     bars_audit.info(G_TRACE || l_title || ' Itog l_cnt =  '||l_cnt);
+    send_msg('Кінець формування DGP008: для перегляду результату при запуску звіту нажміть Ні');            
     exception
       when others then
         bars_audit.error(G_TRACE || l_title || substr(dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace(), 1, 2000));
         if G_CUR%ISOPEN then
           close G_CUR;
         end if;
+        send_msg('Звіт DGP008 при формуванні отримав помилку: '||G_TRACE || l_title || substr(dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace(), 1, 2000));        
         raise_application_error(-20001, G_TRACE || l_title || substr(dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace(), 1, 2000));
   end dgp8;
 
