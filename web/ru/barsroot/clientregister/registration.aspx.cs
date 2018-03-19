@@ -185,7 +185,7 @@ namespace clientregister
                     break;
             }
 
-            string[] tabs = new string[9];
+            string[] tabs = new string[8];
 
             tabs[0] = Resources.clientregister.GlobalResources.tab0;
             tabs[1] = Resources.clientregister.GlobalResources.tab1;
@@ -195,7 +195,6 @@ namespace clientregister
             tabs[5] = Resources.clientregister.GlobalResources.tab5;
             tabs[6] = Resources.clientregister.GlobalResources.tab6;
 			tabs[7] = Resources.clientregister.GlobalResources.tab7;
-            tabs[8] = Resources.clientregister.GlobalResources.tab8;
 
             string nSPD ;
             string rezId;
@@ -238,10 +237,10 @@ namespace clientregister
                             	    array['" + tabs[5] + @"']='tab_dop_rekv.asPX?rnk=" + rnk + @"&client=" + client + @"&spd=" +nSPD+ @"&rezid=" + rezId + @"';
                             	    array['" + tabs[6] + @"']='tab_linked_custs.asPX?rnk=" + rnk + @"&client=" + client + @"&spd=" + nSPD + @"&rezid=" + rezId + @"';
 									" + ((!string.IsNullOrEmpty(rnk)) ? ("array['" + tabs[7] + @"']='tab_custs_segments.aspx?rnk=" + rnk + @"&client=" + client + "';") :(""))  + @";
-                                    " + (GetUsageCorpLightParam() && (!string.IsNullOrEmpty(rnk)) ? "array['" + tabs[8] + @"']='/barsroot/cdo/common/relatedCustomers/index?custId=" + rnk + 
+                                    " + (GetUsageCorpLightParam() ? "array['" + "CorpLight" + @"']='/barsroot/corpLight/relatedCustomers/index?custId=" + rnk + 
                                             (!string.IsNullOrEmpty(Request.Params.Get("clmode")) 
                                             ? @"&clmode=" + Request.Params.Get("clmode") : @"") + @"'" : "") + @";
-                            	    fnInitTab('webtab',array,1200,'onChangeTab');
+                            	    fnInitTab('webtab',array,500,'onChangeTab');
                                 }
                                 function onChangeTab()
                                 {
