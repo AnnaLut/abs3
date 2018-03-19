@@ -614,20 +614,21 @@ public class SepLockDocsRepository : ISepLockDocsRepository
                             string.Empty,
                             string.Empty,
                             string.Empty);
-                        if (Regex.IsMatch(dRec, @"^#B(\d){2}#fMT (\w){3} *?"))
-                        {
-                            var ot = _entities.T902.Count(t => t.REC == Doc.rec && t.OTM == 0);
-                            if (0 == ot)
-                            {
-                                creatorDoc.DrecS.Add(new cDoc.Tags("NOS_A", "0"));
-                            }
-                        }
+
+                        //if (null!=dRec && Regex.IsMatch(dRec, @"^#B(\d){2}#fMT (\w){3} *?"))
+                        //{
+                        //    var ot = _entities.T902.Count(t => t.REC == Doc.rec && t.OTM == 0);
+                        //    if (0 == ot)
+                        //    {
+                        //        creatorDoc.DrecS.Add(new cDoc.Tags("NOS_A", "0"));
+                        //    }
+                        //}
                         if (creatorDoc.oDocument())
                         {
 
                             cRef = creatorDoc.Ref;
 
-                            sql_query = "UPDATE arc_rrp SET ref=:p_ref, dat_b=to_date(:p_dat_b, 'dd.mm.yyyy HH24:MI:SS'), sos=:p_sos, blk=0 WHERE rec in (select rec from rec_que where rec_g=:p_rec) and fn_b IS NULL";
+                            sql_query = "UPDATE arc_rrp SET ref=:p_ref, dat_b=to_date(:p_dat_b, 'dd.mm.yyyy HH24:MI:SS'), sos=:p_sos, blk=0 WHERE rec in (select rec from rec_que where nvl(rec_g, rec)=:p_rec) and fn_b IS NULL";
                             par = new DynamicParameters();
                             par.Add("p_ref", dbType: DbType.Decimal, value: cRef, direction: ParameterDirection.Input);
                             par.Add("p_dat_b", dbType: DbType.String, value: dDat.ToString(@"dd.MM.yyyy HH:mm:ss"), direction: ParameterDirection.Input);
@@ -650,7 +651,7 @@ public class SepLockDocsRepository : ISepLockDocsRepository
 
                             try
                             {
-                                sql_query = "DELETE FROM rec_que WHERE rec_g=:p_rec";
+                                sql_query = "DELETE FROM rec_que WHERE nvl(rec_g, rec)=:p_rec";
                                 par = new DynamicParameters();
                                 par.Add("p_rec", dbType: DbType.Decimal, value: Doc.rec, direction: ParameterDirection.Input);
                                 connection.Execute(sql_query, par);
