@@ -286,9 +286,29 @@
             Сессія регістрації
             </summary>
         </member>
-        <member name="F:Bars.API.Auth.Models.RegistrationQueue.BirthDay">
+        <member name="P:Bars.API.Auth.Models.RegistrationQueue.EDRPO">
             <summary>
-            Дата народження
+            Унікальний код клієнта ЕДРПО
+            </summary>
+        </member>
+        <member name="T:Bars.API.Auth.Models.UserCustomerBank">
+            <summary>
+            Represent appearance of the customer in one bank instance (MFO)
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.UserCustomerBank.EDRPO">
+            <summary>
+            Customer EDRPO (unique in all banks)
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.UserCustomerBank.CustId">
+            <summary>
+            Customer identifier in bank (rnk as usual) (is unique only inside one bank)
+            </summary>
+        </member>
+        <member name="P:Bars.API.Auth.Models.UserCustomerBank.BankId">
+            <summary>
+            Bank identifier
             </summary>
         </member>
         <member name="T:Bars.API.Auth.Models.UserCustomers">
@@ -296,24 +316,19 @@
             Realtions beetwen 
             </summary>
         </member>
-        <member name="P:Bars.API.Auth.Models.UserCustomers.BankId">
-            <summary>
-            Bank Identifier
-            </summary>
-        </member>
         <member name="P:Bars.API.Auth.Models.UserCustomers.UserId">
             <summary>
             User id
             </summary>
         </member>
-        <member name="P:Bars.API.Auth.Models.UserCustomers.CustId">
+        <member name="P:Bars.API.Auth.Models.UserCustomers.EDRPO">
             <summary>
-            Customor Id
+            Customer EDRPO
             </summary>
         </member>
-        <member name="P:Bars.API.Auth.Models.UserCustomers.ApiUrl">
+        <member name="P:Bars.API.Auth.Models.UserCustomers.ProviderId">
             <summary>
-            Base Server API url
+            Customor Id
             </summary>
         </member>
         <member name="P:Bars.API.Auth.Models.UserCustomers.SignNumber">

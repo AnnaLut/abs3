@@ -4,6 +4,14 @@
         <name>Bars.API.Acct.Server</name>
     </assembly>
     <members>
+        <member name="T:Bars.API.Acct.Server.AcctServerAMProfile">
+            <summary>
+            Auto mapoper profile
+            </summary>
+            <remarks>
+            Contains definition for Mappings. See https://github.com/AutoMapper/AutoMapper/wiki/Getting-started for more details
+            </remarks>
+        </member>
         <member name="T:Bars.API.Acct.Server.AcctServerModule">
             <summary>
             Ninject module for ACCT Server
@@ -21,12 +29,12 @@
         </member>
         <member name="T:Bars.API.Acct.Server.Configuration.IncomingDocumentConfiguration">
             <summary>
-                Configuration (mapping model Account to database table)
+                Configuration (mapping model V_MBM_INCOMING_DOC to database table)
             </summary>
         </member>
         <member name="M:Bars.API.Acct.Server.Configuration.IncomingDocumentConfiguration.#ctor">
             <summary>
-                Constructor AccountConfiguration
+                Constructor IncomingDocumentConfiguration
             </summary>
         </member>
         <member name="T:Bars.API.Acct.Server.Configuration.TurnoverConfiguration">

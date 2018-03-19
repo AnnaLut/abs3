@@ -4,26 +4,6 @@
         <name>Bars.API.Pay.Models</name>
     </assembly>
     <members>
-        <member name="P:Bars.API.Pay.Models.PaymentAccount1.BankCode">
-            <summary>
-            Код банку
-            </summary>
-        </member>
-        <member name="P:Bars.API.Pay.Models.PaymentAccount1.TaxCode">
-            <summary>
-            Код ЄДРПО
-            </summary>
-        </member>
-        <member name="P:Bars.API.Pay.Models.PaymentAccount1.Name">
-            <summary>
-            Найменування кореспондента
-            </summary>
-        </member>
-        <member name="P:Bars.API.Pay.Models.PaymentAccount1.AccNumber">
-            <summary>
-            Номер рахунку 
-            </summary>
-        </member>
         <member name="P:Bars.API.Pay.Models.Payment.Purpose">
             <summary>
             Призначення платежу
