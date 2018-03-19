@@ -29,6 +29,11 @@
             Код клієнта
             </summary>
         </member>
+        <member name="P:Bars.API.Loan.Models.Loan.BankId">
+            <summary>
+            Ідентифікатор банку
+            </summary>
+        </member>
         <member name="P:Bars.API.Loan.Models.Loan.LoanType">
             <summary>
             Тип (название) кредита

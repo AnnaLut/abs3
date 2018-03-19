@@ -178,6 +178,11 @@
             Loans list
             </summary>
         </member>
+        <member name="P:Bars.API.Loan.Server.DataContexts.LoanDbContext.SchedulePlans">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="M:Bars.API.Loan.Server.DataContexts.LoanDbContext.OnModelCreating(System.Data.Entity.DbModelBuilder)">
             <summary>
                 Setup configuration

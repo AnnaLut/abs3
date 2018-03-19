@@ -51,6 +51,26 @@
             
             </summary>
         </member>
+        <member name="P:Bars.API.Cust.Models.CustomerSearchModel.RNK">
+            <summary>
+            Customer identifier
+            </summary>
+        </member>
+        <member name="P:Bars.API.Cust.Models.CustomerSearchModel.CustType">
+            <summary>
+            Customer type (1=БН,2=Юридическое лицо,3=Физическое лицо)
+            </summary>
+        </member>
+        <member name="P:Bars.API.Cust.Models.CustomerSearchModel.OKPO">
+            <summary>
+            Customer OKPO/INN
+            </summary>
+        </member>
+        <member name="P:Bars.API.Cust.Models.CustomerSearchModel.CL_OKPO">
+            <summary>
+            CL search OKPO including first character indicating type of the customer (example: F000000000 - Physical person with OKPO 000000000)
+            </summary>
+        </member>
         <member name="T:Bars.API.Cust.Models.Quantities">
             <summary>
             the number of banking products
@@ -141,11 +161,6 @@
             Client ID (unique client ID)
             </summary>
         </member>
-        <member name="P:Bars.API.Cust.Models.Customer.BankId">
-            <summary>
-            Client bank code
-            </summary>
-        </member>
         <member name="P:Bars.API.Cust.Models.Customer.TaxCode">
             <summary>
             Customer OKPO code
@@ -204,6 +219,11 @@
         <member name="P:Bars.API.Cust.Models.Customer.BankDate">
             <summary>
             Current open bank date
+            </summary>
+        </member>
+        <member name="P:Bars.API.Cust.Models.Customer.EDRPO">
+            <summary>
+            CorpLight customer identifier (First letter - customer type, Second letter - OKPO, the rest depending on the user type)
             </summary>
         </member>
     </members>

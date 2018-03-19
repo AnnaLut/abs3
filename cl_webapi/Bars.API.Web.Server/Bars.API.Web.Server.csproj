@@ -172,7 +172,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="connectionStrings.config" />
+    <Content Include="connectionStrings.config">
+      <SubType>Designer</SubType>
+    </Content>
     <None Include="Properties\PublishProfiles\DeveloperDeploy.pubxml" />
     <Content Include="settings.conf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -200,6 +202,10 @@
     <ProjectReference Include="..\Acct\Bars.API.Acct.Server\Bars.API.Acct.Server.csproj">
       <Project>{7678b021-17aa-45ac-a6e1-70f757b00282}</Project>
       <Name>Bars.API.Acct.Server</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Analytics\Bars.API.Analytics.Server\Bars.API.Analytics.Server.csproj">
+      <Project>{67301759-5b2d-4ff8-9a6e-df9cdb69a933}</Project>
+      <Name>Bars.API.Analytics.Server</Name>
     </ProjectReference>
     <ProjectReference Include="..\Bars.API.Core\Bars.API.Core.csproj">
       <Project>{5bbc2aa5-1e79-418d-86ba-44b875fa9456}</Project>

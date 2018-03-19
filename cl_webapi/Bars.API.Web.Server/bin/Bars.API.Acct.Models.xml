@@ -44,6 +44,16 @@
             Account name
             </summary>
         </member>
+        <member name="T:Bars.API.Acct.Models.AccountsCount">
+            <summary>
+            Model representing count of accounts for distinct currency for customer (ABS side)
+            </summary>
+        </member>
+        <member name="T:Bars.API.Acct.Models.CustCurrAccountCount">
+            <summary>
+            Model to represent accounts count for the currency for the specified customer
+            </summary>
+        </member>
         <member name="T:Bars.API.Acct.Models.IncomingDocument">
             <summary>
             Модель платежу
@@ -224,12 +234,12 @@
             Дата створення документу
             </summary>
         </member>
-        <member name="F:Bars.API.Acct.Models.Transaction.Sender">
+        <member name="P:Bars.API.Acct.Models.Transaction.Sender">
             <summary>
             Сторона А платежу
             </summary>
         </member>
-        <member name="F:Bars.API.Acct.Models.Transaction.Recipient">
+        <member name="P:Bars.API.Acct.Models.Transaction.Recipient">
             <summary>
             Сторона Б платежу
             </summary>
@@ -242,36 +252,6 @@
         <member name="P:Bars.API.Acct.Models.Transaction.Amount">
             <summary>
             Сума платежу
-            </summary>
-        </member>
-        <member name="T:Bars.API.Acct.Models.TransactionAccount">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="P:Bars.API.Acct.Models.TransactionAccount.BankId">
-            <summary>
-            Код банку
-            </summary>
-        </member>
-        <member name="P:Bars.API.Acct.Models.TransactionAccount.AccountNumber">
-            <summary>
-            Номер рахунку 
-            </summary>
-        </member>
-        <member name="P:Bars.API.Acct.Models.TransactionAccount.Name">
-            <summary>
-            Найменування кореспондента
-            </summary>
-        </member>
-        <member name="P:Bars.API.Acct.Models.TransactionAccount.CurrencyId">
-            <summary>
-            Валюта рахунку
-            </summary>
-        </member>
-        <member name="P:Bars.API.Acct.Models.TransactionAccount.CustomerCode">
-            <summary>
-            Код ЄДРПО
             </summary>
         </member>
     </members>
