@@ -456,9 +456,6 @@ function callOplDoc(form, signData) {
     }
     else
         webService.Doc.callService(onPayDoc, "PayDoc", data, tags, checkDocsList);
-
-    // Сохраняем результат (может понадобиться в месте вызова docinput окна. Там можно будет его удалить)
-    sessionStorage.setItem("docinputResult", "success");
 }
 
 function onValidateDoc(result) {

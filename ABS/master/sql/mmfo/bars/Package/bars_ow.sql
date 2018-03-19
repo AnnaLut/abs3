@@ -12583,8 +12583,16 @@ begin
      accreg.setAccountwParam(l_acc, 'PK_ODAT', to_char(p_wdate,'dd.MM.yyyy'));
   end if;
   -- p_salaryproect=-1 = власна картка (без З/П проекта)
- if l_iscrm=1 then
-     select id into l_salaryproect from bpk_proect where id_cm=p_salaryproect and used_w4=1 ;
+  if l_iscrm=1 and p_salaryproect is not null and p_salaryproect <> -1 then
+     begin
+       select id
+         into l_salaryproect
+         from bpk_proect
+        where id_cm = p_salaryproect and used_w4 = 1;
+     exception
+       when no_data_found then
+         l_salaryproect := p_salaryproect;
+     end;
      accreg.setAccountwParam(l_acc, 'PK_PRCT', l_salaryproect);
   elsif p_salaryproect is not null and p_salaryproect <> -1 then
      accreg.setAccountwParam(l_acc, 'PK_PRCT', p_salaryproect);

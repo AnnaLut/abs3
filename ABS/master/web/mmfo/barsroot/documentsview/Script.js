@@ -213,7 +213,7 @@ function getError(result, modal) {
 //Продублировать документ
 function CreateSameDocument() {
     //location.replace("/barsroot/docinput/docinput.aspx?tt=" + escape(selectedRow.tt) + "&refDoc=" + selectedRowId);
-    window.showModalDialog("/barsroot/docinput/docinput.aspx?tt=" + escape(selectedRow.tt) + "&refDoc=" + selectedRowId, "", "dialogHeight:700px;dialogWidth:1280px;center:yes;edge:sunken;help:no;status:no;");
+    window.showModalDialog("/barsroot/docinput/docinput.aspx?duplicate=1&tt=" + escape(selectedRow.tt) + "&refDoc=" + selectedRowId, "", "dialogHeight:700px;dialogWidth:1280px;center:yes;edge:sunken;help:no;status:no;");
 }
 //Load Default.aspx
 function LoadDocuments() {

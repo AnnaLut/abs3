@@ -43,7 +43,7 @@ begin
     l_zpr.namef        := '';
     l_zpr.bindvars     := ':BRANCH=''Бранч-2''';
     l_zpr.create_stmt  := '';
-    l_zpr.rpt_template := 'ICCK.qrp';
+    l_zpr.rpt_template := 'ICCK.frx';
     l_zpr.form_proc    := '';
     l_zpr.default_vars := ':BRANCH=''%'''; 
     l_zpr.bind_sql     := ':BRANCH=''BRANCH|BRANCH|NAME|WHERE length(branch)=15 order by branch ''';
@@ -71,7 +71,7 @@ FROM (select TO_CHAR(d.nd) nd, d.rnk, d.cc_id, d.sdate, c.nmk, d.sos, d.branch f
                accounts A, 
                (select ref, value ND from OPERW where tag=''ND'')  w,   
                BRANCH_PARAMETERS  i, saldoa s
-          WHERE i.branch = :BRANCH 
+          WHERE i.branch LIKE :BRANCH 
             and i.tag    = ''REF_ICCK''
             and o.ref   >= to_number(i.VAL)  
             and a.dazs is null and A.ACC = O.ACC AND A.NBS =''9819'' AND A.OB22 IN (''02'',''79'',''83'',''03'',''I3'',''B8'') 
@@ -156,61 +156,6 @@ order by e.branch, i.branch, i.nd';
           where id=l_rep.id;                 
        end;                                  
     end if;                                  
-
-    begin
-       Insert into BARS.APP_REP
-               (CODEAPP, CODEREP, APPROVE, GRANTOR)
-       Values
-               ('$RM_DRU1', l_rep.id, 1, 1);
-          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' добавлен в АРМ Друк звітів  ';
-    exception when dup_val_on_index
-          then 
-          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' существует в АРМ Друк звітів ';
-    end;                                 
-
-    begin
-       Insert into BARS.APP_REP
-               (CODEAPP, CODEREP, APPROVE, GRANTOR)
-       Values
-               ('$RM_ICCK', l_rep.id, 1, 1);
-          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' добавлен в АРМ Інвентаризацiя Кредитних Справ в сховищi ';
-    exception when dup_val_on_index
-          then 
-          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' существует в АРМ Інвентаризацiя Кредитних Справ в сховищi ';
-    end;                                 
-
-    begin
-       Insert into BARS.APP_REP
-               (CODEAPP, CODEREP, APPROVE, GRANTOR)
-       Values
-               ('$RM_WIKD', l_rep.id, 1, 1);
-          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' добавлен в АРМ Інвентаризацiя кредитних справ в сховищi(WEB) ';
-    exception when dup_val_on_index
-          then 
-          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' существует в АРМ Інвентаризацiя кредитних справ в сховищi(WEB) ';
-    end;                                 
-
-    begin
-       Insert into BARS.APP_REP
-               (CODEAPP, CODEREP, APPROVE, GRANTOR)
-       Values
-               ('$RM_UCCK', l_rep.id, 1, 1);
-          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' добавлен в АРМ <<Кредити ЮО>> ';
-    exception when dup_val_on_index
-          then 
-          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' существует в АРМ <<Кредити ЮО>> ';
-    end;                                 
-
-    begin
-       Insert into BARS.APP_REP
-               (CODEAPP, CODEREP, APPROVE, GRANTOR)
-       Values
-               ('$RM_MAIN', l_rep.id, 1, 1);
-          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' добавлен в АРМ Адміністратора АБС ';
-    exception when dup_val_on_index
-          then 
-          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' существует в АРМ Адміністратора АБС ';
-    end;                                 
 
     bars_report.print_message(l_message);   
 end;                                        

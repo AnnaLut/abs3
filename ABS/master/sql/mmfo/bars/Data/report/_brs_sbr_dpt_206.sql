@@ -40,10 +40,10 @@ begin
 
     l_zpr.id           := 1;
     l_zpr.name         := 'Звіт БПК (кількість відкр/закр. в розрізі ТВБВ 1-4)';
-    l_zpr.namef        := 'my.txt';
+    l_zpr.namef        := '';
     l_zpr.bindvars     := ':zDate1=''Дата з(DD.MM.YYYY)'',:zDate2=''Дата по(DD.MM.YYYY)''';
     l_zpr.create_stmt  := '';
-    l_zpr.rpt_template := '';
+    l_zpr.rpt_template := 'rep_5516.frx';
     l_zpr.form_proc    := '';
     l_zpr.default_vars := '';
     l_zpr.bind_sql     := '';
@@ -127,6 +127,72 @@ group by a.branch';
        l_message:=l_message||'Кат.запрос c таким ключем уже существует под №'||l_zpr.kodz||', его параметры изменены.';
 
     end if;
+
+    ------------------------    
+    --  report            --    
+    ------------------------    
+                                
+
+    l_rep.name        :='Empty';
+    l_rep.description :='Звіт БПК (кількість відкр/закр. в розрізі ТВБВ 1-4)';
+    l_rep.form        :='frm_FastReport';
+    l_rep.param       :=l_zpr.kodz||',3,sFdat,sFdat2,"",FALSE,FALSE';
+    l_rep.ndat        :=2;
+    l_rep.mask        :='';
+    l_rep.usearc      :=0;
+    l_rep.idf         :=null;    
+
+    -- Фиксированный № печатного отчета   
+    l_rep.id          := 5516;
+
+
+    if l_isnew = 1 then                     
+       begin                                
+          insert into reports values l_rep;        
+          l_message:=l_message||nlchr||'Добавлен новый печ. отчет под №'||l_rep.id;
+       exception when dup_val_on_index then  
+           bars_error.raise_error('REP',14, to_char(l_rep.id));
+       end;                                    
+    else                                            
+       begin                                        
+          insert into reports values l_rep;         
+          l_message:=l_message||nlchr||'Добавлен новый печ. отчет под №'||l_rep.id;
+       exception when dup_val_on_index then         
+          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' изменен.';
+          update reports set                
+             name        = l_rep.name,       
+             description = l_rep.description,
+             form        = l_rep.form,       
+             param       = l_rep.param,      
+             ndat        = l_rep.ndat,       
+             mask        = l_rep.mask,       
+             usearc      = l_rep.usearc,     
+             idf         = l_rep.idf         
+          where id=l_rep.id;                 
+       end;                                  
+    end if;                                  
+
+    begin
+       Insert into BARS.APP_REP
+               (CODEAPP, CODEREP, APPROVE, GRANTOR)
+       Values
+               ('$RM_NBUR', l_rep.id, 1, 1);
+          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' добавлен в АРМ Звітність (новий)';
+    exception when dup_val_on_index
+          then 
+          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' существует в АРМ Звітність (новий)';
+    end;
+
+    begin
+       Insert into BARS.APP_REP
+               (CODEAPP, CODEREP, APPROVE, GRANTOR)
+       Values
+               ('$RM_DRU1', l_rep.id, 1, 1);
+          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' добавлен в АРМ Друк звітів';
+    exception when dup_val_on_index
+          then 
+          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' существует в АРМ Друк звітів';
+    end;
 
     bars_report.print_message(l_message);
 end;

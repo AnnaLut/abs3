@@ -136,15 +136,14 @@
 
     // ToolBarButtonFunction Region  ---------------------------
 
-    function deleteRow(requestSatisfied) {
+    function deleteRow() {
    
         var grid = getSepTZGrid();
         var row = grid.dataItem(grid.select());
         var rowREC = { rowREC: row.REC };
         var ss1 = "ВИЛУЧИТИ з картотеки запитів ?<br/>";
         var ss2 = "Задоволення запиту відміняється.";
-        var text = ss1 + ((true!==requestSatisfied) ? ss2 : "");
-        bars.ui.confirm({ text: text },
+        bars.ui.confirm({ text: ss1 + ss2 },
             function () {
                 bars.ui.loader('#sepTZGrid', true);
                 $.get('@Url.Action("DeleteRow")', { rowRec: row.REC }).done(function (data) {
@@ -309,7 +308,7 @@
                     strOKPOb = row.OKPOA;
                     s3 = row.MFOA;
                     s2 = row.NLSA;
-                    s6 = row.NLSB;
+                    s6 = row.NLSB
                     //s6 = s902;
                     //strNAMa = nms902;
                     strNAMa = row.NAM_B;
@@ -370,10 +369,7 @@
                     Id_B: strOKPOb,
                     Mfo_B: s3,
                     Nazn: sNazn,
-                    Nls_B_Editable: 1,
-                    Drec: sDrec,
-                    Nd: s7,
-                    DatD: dDatD
+                    Nls_B_Editable: 1
                 }
                 $("#SepTZWindow").kendoWindow({
                     width: "630px",
@@ -382,14 +378,7 @@
                     modal: true,
                     visible: false,
                     iframe: true,
-                    close: function(e) {
-                        var result = sessionStorage.getItem("docinputResult");
-                        if ("success"===result) {
-                            deleteRow(true);
-                            sessionStorage.removeItem("docinputResult");
-                        }
-                        refreshGrid();
-                    },
+                    close: function (e) { refreshGrid(); },
                     content: '/barsroot/docinput/docinput.aspx?' + jQuery.param(formParams)
                 }).data("kendoWindow").center().open();
 

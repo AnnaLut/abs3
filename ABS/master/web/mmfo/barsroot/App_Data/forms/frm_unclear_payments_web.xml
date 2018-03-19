@@ -194,7 +194,7 @@
         </form>
       </field>
       <field name="DATD" datatype="DateTime" key="false" sort="Default" size="30">
-        <column show="true" caption="МФО. В" width="30" />
+        <column show="true" caption="Дата док." width="30" />
        </field>
 
       <field name="S" datatype="Int64" key="false" sort="Default" size="30">

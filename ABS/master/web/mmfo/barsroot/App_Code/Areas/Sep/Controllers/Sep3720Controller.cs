@@ -6,7 +6,6 @@ using BarsWeb.Models;
 using Kendo.Mvc.UI;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Web.Mvc;
 using Dapper;
@@ -151,15 +150,15 @@ namespace BarsWeb.Areas.Sep.Controllers
             var result = new JsonResponse(JsonResponseStatus.Ok);
             try
             {
-                decimal? refDocument = 0;
+                decimal refDocument = 0;
                 using (var connection = OraConnector.Handler.UserConnection)
                 {
-                    string query = @"SELECT MAX(t.ref)
+                    string query = @"SELECT t.ref
                                      FROM arc_rrp t
                                      WHERE t.rec >= :rec
                                      AND t.d_rec LIKE '%#?' || :fa_name || LPAD (:fa_ln, 6, ' ') || '#%'";
 
-                    refDocument = connection.Query<decimal?>(query, new { rec = rec, fa_name = fname, fa_ln = fln }).SingleOrDefault();
+                    refDocument = connection.Query<decimal>(query, new { rec = rec, fa_name = fname, fa_ln = fln }).SingleOrDefault();
                 }
                 result.data = refDocument;
             }

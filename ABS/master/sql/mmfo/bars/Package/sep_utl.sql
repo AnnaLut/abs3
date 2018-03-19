@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/sep_utl.sql =========*** Run *** ===
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.SEP_UTL is
+CREATE OR REPLACE PACKAGE BARS."SEP_UTL" is
 --***************************************************************--
 --              Communication with NBU Payment System
 --                     (C) Unity-BARS (2000-2015)
@@ -48,9 +42,14 @@ procedure unlock_by_sum_blk(p_sum number,
                             p_kv  number,
                             p_blk number,
                             p_msg out varchar2);
+-- копирование  operw                            
+procedure  copy_operw ( p_ref_new operw.ref%TYPE,p_ref_old operw.ref%TYPE);                            
 end;
+
+
 /
-CREATE OR REPLACE PACKAGE BODY BARS.SEP_UTL is
+
+CREATE OR REPLACE PACKAGE BODY BARS."SEP_UTL" is
 --***************************************************************--
 --              Communication with NBU Payment System
 --                     (C) Unity-BARS (2000-2015)
@@ -574,17 +573,14 @@ begin
            to_char(l_total_amount / 100, '999999990D00');
 
 end;
+---------
+procedure  copy_operw ( p_ref_new operw.ref%TYPE,
+                        p_ref_old operw.ref%TYPE) is
+begin
+  insert into operw 
+     select p_ref_new, w.tag,w.value,w.kf from operw w where w.ref=p_ref_old;        
+end;
 
 end;
-/
- show err;
- 
-PROMPT *** Create  grants  SEP_UTL ***
-grant EXECUTE                                                                on SEP_UTL         to BARS_ACCESS_DEFROLE;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/sep_utl.sql =========*** End *** ===
- PROMPT ===================================================================================== 
- 
+/

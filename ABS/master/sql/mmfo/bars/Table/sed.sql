@@ -127,6 +127,7 @@ grant SELECT                                                                 on 
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SED             to WR_ALL_RIGHTS;
 grant SELECT                                                                 on SED             to WR_CUSTREG;
 grant FLASHBACK,SELECT                                                       on SED             to WR_REFREAD;
+grant SELECT                                                                 on SED             to BARS_INTGR;
 
 
 

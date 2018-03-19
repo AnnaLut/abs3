@@ -106,7 +106,8 @@
   <grid id="tNlg2"  pagesize="20"  showpagesizebox="true"  title="Розбір рахунка " >
    <datasource>
       <sql>
-        select v_per_excess_cash_atm.*, (s*100)   s2, case when trunc(sysdate)-datd>180 then '1' else '0' end color,  trunc(sysdate)-datd kkol
+        select v_per_excess_cash_atm.*, (s*100)   s2,   case when trunc(sysdate)-datd>180 then '1' else '0' end color,  trunc(sysdate)-datd kkol, 
+              'Визнання доходів банку за надлишками готівки в касетах за '||to_char( datd,'dd-mm-yyyy') naznn
         from v_per_excess_cash_atm
       </sql>
       <parameters>
@@ -127,6 +128,14 @@
         
       </button>
 
+      <button caption=" Переглянуть привязані документи " id="BtHist" type="Image" imagename="table" hint="Переглянуть привязані документи">
+        <command  type="Redirect" url="/barsroot/tools/nlk/kartoteka_hist.aspx" target="Self">
+          <parameters>
+            <parameter type="DataField" name="ACC"   altname="ACC"></parameter>
+            <parameter type="DataField" name="REF"   altname="REF1"></parameter>
+          </parameters>
+        </command>
+      </button>
 
 
       <!-- ********** Видалити з картотеки        -->
@@ -142,36 +151,16 @@
 
       </button>
 
-      <button caption="Створити документ" id="Bt3" type="Image" imagename="check2"  hint="Створити документ" >
-        <command  type="Redirect" url="/barsroot/docinput/docinput.aspx?tt=061">
-
-          <parameters>
-            <parameter type="DataField" name="KVA"   altname="kv_a"></parameter>
-            <parameter type="DataField" name="KVA"   altname="kv_b"></parameter>
-            <parameter type="DataField" name="REF"   altname="reqv_REF92"></parameter>     
-            <parameter type="DataField" name="NAZNO" altname="nazn"></parameter>
-            <parameter type="DataField" name="S2"    altname="sumc_t"></parameter>
-            <parameter type="DataField" name="NLSA"  altname="nls_a"></parameter>
-            <parameter datatype="Int64" type="Constant" name="DK" altname="dk">
-              <defaultvalue type="Constant" value="1" />
-            </parameter>
-            <parameter type="DataField" name="BPROC" ></parameter>
-            <parameter type="DataField" name="APROC" ></parameter>
-          </parameters>
-        </command>
-
-
-      </button>
       
       <!-- ********** виконати перекриття  тест з вибором операції (
            треба звязка з функцією визов строки  /barsroot/docinput/docinput.aspx?\S*      -->
       
-       <!--<button caption="Створити документ(вибір операції)" id="Bt4" type="Image" imagename="checks"  hint="Створити документ(вибір операції)" >
-         <command  type="Redirect" url="/barsroot/docinput/docinput.aspx">
+       <button caption="Створити документ(вибір операції)" id="Bt4" type="Image" imagename="checks"  hint="Створити документ(вибір операції)" >
+         <command  type="Redirect" url="/barsroot/docinput/docinput.aspx" >
 
            <customfields oktext="OK" canceltext="End"  title="Вибір кода операції">
              <customfield  datatype="String"  name="TT" altname="tt" required="true" label="Тип операції"  >
-               <uicontrol   type="DropDownList" addemptyitem="true" table="(select tt, tt||' - '||name as name from tts where tt in ('009','PKR','024') order by tt desc)"  keyfield="TT" valuefield="name">
+               <uicontrol   type="DropDownList" addemptyitem="true" table="(select tt, tt||' - '||name as name from tts where tt in ('053','PKR','301') order by tt desc)"  keyfield="TT" valuefield="name">
                </uicontrol>
              </customfield>
            </customfields>
@@ -184,6 +173,7 @@
              <parameter type="DataField" name="S2"    altname="sumb_t"></parameter>
              <parameter type="DataField" name="NLSA" altname="nls_a"></parameter>
              <parameter datatype="Int64" type="Constant" name="DK" altname="dk"><defaultvalue type="Constant" value="1" /></parameter>
+             <parameter datatype="Int64" type="Constant" name="flag_se"><defaultvalue type="Constant" value="1" /></parameter>
              <parameter type="DataField" name="BPROC" ></parameter>
              <parameter type="DataField" name="APROC" ></parameter>
            </parameters>
@@ -191,8 +181,28 @@
         </command>
 
          
-       </button>-->
-      
+       </button>
+
+      <button caption="Віднести на доходи" id="Bt3" type="Image" imagename="moneybag_dollar"  hint="Віднести на доходи" >
+        <command  type="Redirect" url="/barsroot/docinput/docinput.aspx?tt=061">
+
+          <parameters>
+            <parameter type="DataField" name="KVA"   altname="kv_a"></parameter>
+            <parameter type="DataField" name="KVA"   altname="kv_b"></parameter>
+            <parameter type="DataField" name="REF"   altname="reqv_REF92"></parameter>
+            <parameter type="DataField" name="NAZNN" altname="nazn"></parameter>
+            <parameter type="DataField" name="S2"    altname="sumc_t"></parameter>
+            <parameter type="DataField" name="NLSA"  altname="nls_a"></parameter>
+            <parameter datatype="Int64" type="Constant" name="DK" altname="dk">
+              <defaultvalue type="Constant" value="1" />
+            </parameter>
+            <parameter type="DataField" name="BPROC" ></parameter>
+            <parameter type="DataField" name="APROC" ></parameter>
+          </parameters>
+        </command>
+
+
+      </button>
       
     </buttons>
     
@@ -213,9 +223,13 @@
         </form>
        </field>
 
+       <field name="SO" datatype="Decimal" key="false" sort="Default" size="70">
+        <column show="true" caption="Сума акту вилучення"></column> 
+       </field>
+      
       <field name="S" datatype="Decimal" key="false" sort="Default" size="70">
-        <column show="true" caption="Сума документу">
-        </column> 
+        <column show="true" caption="Залишок акту вилучення">
+        </column>
         <form show="true" rwmode="RO">
           <uicontrol type="Text" controlwidth="60" />
         </form>
@@ -228,6 +242,13 @@
         </form>
       </field>
 
+      <field name="NAZNN" datatype="String" key="true" sort="Default" size="170">
+        <column show="true" caption="Призначення платежу" width="600" />
+        <form show="true" rwmode="RO">
+          <uicontrol type="Text" controlwidth="60" />
+        </form>
+      </field>
+      
       <field name="DATD" datatype="DateTime" key="false" sort="Default" size="70">
         <column show="true" caption="Дата документа" />
         <form show="true" rwmode="RO">

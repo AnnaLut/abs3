@@ -3,7 +3,6 @@ using Oracle.DataAccess.Client;
 using Bars.Classes;
 using System.Linq;
 using System.Text;
-using System.Data;
 
 namespace clientregister
 {
@@ -76,17 +75,16 @@ namespace clientregister
 
 					var query = @"select {0} 
 											from {1} t 
-											where (t.{2}UA = :p_source 
-												or t.{2}RU = :p_source) " +
-					(this.Sex != null ? @"and sexid = {3}" : "");
+											where (t.{2}UA = '{3}' 
+												or t.{2}RU = '{3}') " +
+					(this.Sex != null ? @"and sexid = {4}" : "");
 
 					cmd.CommandText = String.Format(query,
 													field,
 													table,
 													fioPart,
+													source.Replace("'", "''"),
 													data.Sex);
-
-					cmd.Parameters.Add("p_source", OracleDbType.Varchar2, source, ParameterDirection.Input);
 
 					using (OracleDataReader rdr = cmd.ExecuteReader())
 					{

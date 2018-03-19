@@ -1,0 +1,126 @@
+<xmlform captiontype="OnlyTitle">
+  <grids>
+    <grid table="V_NLK_REF_PAY" id="gv" pagesize="30" showpagesizebox="true" title="Перегляд оброблених документів в картотеці" >
+      <datasource>
+        <sql>
+          select *
+          FROM V_NLK_REF_PAY
+        </sql>
+        <parameters>
+          <parameter  type="QueryString" name="ACC"  altname="acc"/>
+        </parameters>
+      </datasource>
+      <rowselection method="SingleRow" />
+      
+      <buttons>
+        <button caption="Перегляд вх.докум." id="Bt1" type="Button" imagename="folder" hint="Відкрит карточку вхідного документа">
+          <command  type="Redirect" url="/barsroot/documentview/default.aspx" target="Blank">
+            <parameters>
+              <parameter type="DataField" name="REF" altname="ref"></parameter>
+            </parameters>
+          </command>
+        </button>
+
+        <button caption="Перегляд вих.докум." id="Bt2" type="Button" imagename="document_gear" hint="Відкрит карточку вихідного документа">
+          <command  type="Redirect" url="/barsroot/documentview/default.aspx" target="Blank">
+
+            <parameters>
+              <parameter type="DataField" name="REF2" altname="ref"></parameter>
+            </parameters>
+          </command>
+        </button>
+        
+      </buttons>
+      
+      <fields>
+        <field name="REF" key="true" datatype="Int64" sort="default">
+          <column show="true" caption="Референс вх." align="right"/>
+          <form show="true" rwmode="RW" required="true"   >
+            <uicontrol type="Text" />
+            
+          </form>
+        </field>
+        <field name="VDAT" key="false" datatype="DateTime" sort="default">
+          <column show="true" caption="Дата валютування вх." align="center" />
+          <form show="true" rwmode="RW" required="true">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="MFOA" key="false" datatype="String" sort="default">
+          <column show="true" caption="МФО А" align="left" />
+          <form show="true" rwmode="RW">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="NLSA" key="false" datatype="String" sort="default">
+          <column show="true" caption="Номера рахунку відправника" align="left" />
+          <form show="true" rwmode="RW">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="TT" key="false" datatype="String" sort="default">
+          <column show="true" caption="Код операції" align="left" />
+          <form show="true" rwmode="RW" required="true">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="REF2" key="true" datatype="Int64" sort="default">
+          <column show="true" caption="Реф перекред." align="right" />
+          <form show="true" rwmode="RW" required="true">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="VDAT2" key="false" datatype="DateTime" sort="default">
+          <column show="true" caption="Дата операції" align="center" />
+          <form show="true" rwmode="RW" required="true">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="MFOB" key="false" datatype="String" sort="default">
+          <column show="true" caption="МФО Б" align="left" />
+          <form show="true" rwmode="RW">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="NLSB" key="false" datatype="String" sort="default">
+          <column show="true" caption="Рахунок отримувача" align="left" />
+          <form show="true" rwmode="RW">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="TT2" key="false" datatype="String" sort="default">
+          <column show="true" caption="Код операції" align="left" />
+          <form show="true" rwmode="RW" required="true">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="NAZN" key="false" datatype="String" sort="default">
+          <column show="true" caption="Призначення платежу" align="left" />
+          <form show="true" rwmode="RW">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="FIO" key="false" datatype="String" sort="default">
+          <column show="true" caption="Виконавець" align="left" />
+          <form show="true" rwmode="RW" required="true">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="SOS" key="false" datatype="Int64" sort="default">
+          <column show="true" caption="SOS" align="right" />
+          <form show="true" rwmode="RW">
+            <uicontrol type="Text" />
+          </form>
+          <layout>
+            <colors scope="EntireRow" >
+              <color color="clRed"   value="-1" columnindex="5"  bold="true"/>
+              <color color="clGreen" value="1"  columnindex="5"  bold="false"/>
+              <color color="clBlue"  value="0"  columnindex="5"  bold="true"/>
+            </colors>
+          </layout>
+        </field>
+        
+      </fields>
+    </grid>
+  </grids>
+</xmlform>

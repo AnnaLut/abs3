@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_swift.sql =========*** Run *** 
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BARS.BARS_SWIFT 
+CREATE OR REPLACE PACKAGE BARS.bars_swift
 is
 
 --**************************************************************--
@@ -1026,7 +1026,7 @@ procedure stmt_unlink_doc(
     procedure impmsg_document_link(
                   p_docRef    in  oper.ref%type,
                   p_swRef     in  sw_journal.swref%type );
-
+   
        procedure impmsg_document_link_all(
                   p_docRef    in  oper.ref%type,
                   p_swRef     in  sw_journal.swref%type );
@@ -1560,7 +1560,8 @@ procedure stmt_unlink_doc(
 
 end bars_swift;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.BARS_SWIFT 
+
+CREATE OR REPLACE PACKAGE BODY BARS.bars_swift
 is
 
 --**************************************************************--
@@ -12131,7 +12132,7 @@ end impmsg_delete_message;
         bars_audit.trace('Document Ref=%s successfully linked with message SwRef=%s.', '<list>', to_char(p_swRef));
 
     end impmsgi_document_link;
-
+    
 
     -----------------------------------------------------------------
     -- IMPMSGI_DOCUMENT_LINK()
@@ -12311,8 +12312,8 @@ end impmsg_delete_message;
         bars_audit.trace('Document Ref=%s successfully linked with message SwRef=%s.', to_char(p_docRef), to_char(p_swRef));
 
     end impmsgi_document_link;
-
-
+    
+    
     -----------------------------------------------------------------
     -- IMPMSGI_DOCUMENT_LINK_ALL()
     --
@@ -16705,7 +16706,8 @@ begin
     g_notifylist := t_doclist();
 end bars_swift;
 /
- show err;
+
+
  
 PROMPT *** Create  grants  BARS_SWIFT ***
 grant EXECUTE                                                                on BARS_SWIFT      to BARS013;

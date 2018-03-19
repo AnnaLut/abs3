@@ -148,16 +148,8 @@ begin
     dbms_output.put_line('В БМД не описана таблица PS для описания сложного поля таблицы SREZERV_OB22.');
   end if;
 
-  -- добавляем описание сложного поля
-  l_newtabid := bars_metabase.get_tabid('SB_OB22');
-  l_newcolid := bars_metabase.get_colid(l_newtabid, 'OB22');
-  if (l_newtabid is not null and l_newcolid is not null) then
-    bars_metabase.add_extrnval(l_tabid, 7, l_newtabid, l_newcolid, '', 'sb_ob22.r020(+) = srezerv_ob22.nbs', '', '');
-  else
-    dbms_output.put_line('В БМД не описана таблица SB_OB22 для описания сложного поля таблицы SREZERV_OB22.');
-  end if;
-
-  -- добавляем описание сложного поля
+  -- удаляем описание сложного поля
+  bars_metabase.delete_extrnval(l_tabid, 7);
   l_newtabid := bars_metabase.get_tabid('REZ_NAL');
   l_newcolid := bars_metabase.get_colid(l_newtabid, 'NAL');
   if (l_newtabid is not null and l_newcolid is not null) then

@@ -37,5 +37,6 @@ namespace BarsWeb.Areas.Sep.Models
         public decimal? ACC { get; set; }
         public string FA_NAME { get; set; }
         public decimal? FA_LN { get; set; }
+        public decimal? REF_INF { get; set; }
     }
 }

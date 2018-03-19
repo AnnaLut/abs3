@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_ARCHIVE_DOCS ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_ARCHIVE_DOCS ("REC", "REF", "REF_A", "FN_A", "DAT_A", "FN_B", "DAT_B", "DATD", "DATP", "VDAT", "DK", "MFOA", "NLSA", "NAM_A", "MFOB", "NLSB", "NAM_B", "NAZN", "ND", "S", "D_REC", "SOS", "BLK", "VOB", "NAZNK", "NAZNS", "ID_A", "ID_B", "ID_O", "BIS", "KV", "REC_A", "REC_B", "NAME_B", "NAME_A") AS 
+  CREATE OR REPLACE FORCE VIEW BARS.V_ARCHIVE_DOCS ("REC", "REF", "REF_A", "FN_A", "DAT_A", "FN_B", "DAT_B", "DATD", "DATP", "VDAT", "DK", "MFOA", "NLSA", "NAM_A", "MFOB", "NLSB", "NAM_B", "NAZN", "ND", "S", "D_REC", "SOS", "BLK", "VOB", "NAZNK", "NAZNS", "ID_A", "ID_B", "ID_O", "BIS", "KV", "REC_A", "REC_B", "NAME_A", "NAME_B") AS 
   SELECT x0.rec,
           x0.REF,
           x0.ref_a,

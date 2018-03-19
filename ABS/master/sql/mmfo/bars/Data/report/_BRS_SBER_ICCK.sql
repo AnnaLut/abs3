@@ -71,7 +71,7 @@ FROM (select TO_CHAR(d.nd) nd, d.rnk, d.cc_id, d.sdate, c.nmk, d.sos, d.branch f
                accounts A, 
                (select ref, value ND from OPERW where tag=''ND'')  w,   
                BRANCH_PARAMETERS  i, saldoa s
-          WHERE i.branch = :BRANCH 
+          WHERE i.branch LIKE :BRANCH 
             and i.tag    = ''REF_ICCK''
             and o.ref   >= to_number(i.VAL)  
             and a.dazs is null and A.ACC = O.ACC AND A.NBS =''9819'' AND A.OB22 IN (''02'',''79'',''83'',''03'',''I3'',''B8'') 
@@ -115,7 +115,7 @@ order by e.branch, i.branch, i.nd';
 
     l_rep.name        :='Empty';
     l_rep.description :='Визначенi Кредитнi справи в сховищi';
-    l_rep.form        :='frm_UniReport';
+    l_rep.form        :='frm_FastReport';
     l_rep.param       :=l_zpr.kodz||',3,sFdat,sFdat2,"",TRUE,FALSE';
     l_rep.ndat        :=2;
     l_rep.mask        :='';

@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Xml.Serialization;
+using System.ComponentModel.DataAnnotations;
 
 namespace Bars.WebServices.GercPayModels
 {
@@ -22,7 +24,34 @@ namespace Bars.WebServices.GercPayModels
         public decimal? Amount { get; set; }
         public string Currency { get; set; }
         public string Purpose { get; set; }
+
+        [XmlIgnore]
         public decimal? CashSymbol { get; set; }
+
+        [XmlElement("CashSymbol")]
+        public String CashSymbolForXml
+        {
+            get
+            {
+                return null == CashSymbol ? null : CashSymbol.ToString();
+            }
+            set
+            {
+                if (!string.IsNullOrEmpty(value))
+                {
+                    decimal tmp;
+                    if (!decimal.TryParse(value, out tmp))
+                        throw new System.Exception("Parameter CashSymbol must be a number.");
+                    else
+                        CashSymbol = tmp;
+                }
+                else
+                {
+                    CashSymbol = null;
+                }
+            }
+        }
+
         public decimal? DebitFlag { get; set; }
         public string AdditionalRequisites { get; set; }
         public string DigitalSignature { get; set; }

@@ -6,16 +6,6 @@
 -- create table SNAP_BALANCES_INTR_TBL (for MMFO scheme)
 -- ======================================================================================
 
-SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
-SET DEFINE       OFF
-SET ECHO         OFF
-SET FEEDBACK     OFF
-SET LINES        500
-SET PAGES        500
-SET TERMOUT      ON
-SET TIMING       OFF
-SET TRIMSPOOL    ON
-
 
 prompt -- ======================================================
 prompt -- create table SNAP_BALANCES_INTR_TBL

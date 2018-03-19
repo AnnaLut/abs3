@@ -1015,7 +1015,7 @@ function drawFilterElementStatic() {
 ********************************************************************************/
 function ShowPopupMenu() {
     if (document.getElementById('popupmenu') == null) {
-        document.body.insertBefore(document.createElement("<div id='popupmenu' style='visibility:hidden;POSITION: absolute'>"));
+        document.body.insertBefore(document.createElement("<div id='popupmenu' style='visibility:hidden;POSITION: fixed'>"));
         document.getElementById('popupmenu').innerHTML = MakePopupMenu();
     }
     popupmenu.style.left = (event.x < popupmenu.style.width ? popupmenu.style.width : event.x) + document.body.scrollLeft;

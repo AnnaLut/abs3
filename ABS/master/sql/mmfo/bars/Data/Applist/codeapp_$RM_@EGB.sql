@@ -67,6 +67,28 @@ begin
 															  );
 					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Спецпараметри РАХУНКА для ручної установки ********** ');
+          --  Створюємо функцію Спецпараметри РАХУНКА для ручної установки
+      l := l +1;
+      l_function_ids.extend(l);      
+      l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'Спецпараметри РАХУНКА для ручної установки',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?tableName=SPEC1&accessCode=2',
+                                                  p_rolename => 'bars_access_defrole' ,    
+                                                  p_frontend => l_application_type_id
+                                                  );
+
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Рахунки та Спецпараметри ********** ');
+          --  Створюємо функцію Рахунки та Спецпараметри
+      l := l +1;
+      l_function_ids.extend(l);      
+      l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'Рахунки та Спецпараметри',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?tableName=ACCOUNTS_SPECPARAM&accessCode=1',
+                                                  p_rolename => 'bars_access_defrole' ,    
+                                                  p_frontend => l_application_type_id
+                                                  );
+
    DBMS_OUTPUT.PUT_LINE(chr(13)||chr(10)||'  Прикріпляємо ресурси функцій до даного АРМу ($RM_@EGB) - АРМ Реєстрація клієнтів і рахунків (БАНКИ)  ');
     l := l_function_ids.first;
     while (l is not null and l_function_ids(l)  is not null) loop
