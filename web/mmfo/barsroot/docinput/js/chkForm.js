@@ -508,7 +508,6 @@ function chkDrec(form) {
     callObj.async = false;
     callObj.funcName = "CheckDopReq";
     // Очищаем поле Drec
-    var drec = form.Drec.value;
     form.Drec.value = "";
     for (var i = pairs.length - 2; i >= 0; i--) {
         var reqEl = form.document.getElementById(pairs[i]);
@@ -568,34 +567,6 @@ function chkDrec(form) {
         form.NaznS.value = '11';
     else
         form.NaznS.value = '10';
-
-    if (isEmpty(form.Drec.value) && !isEmpty(drec)) {
-        // Якщо поля Nls_B та Id_B не змінювалися, повертаємо в форму значення Drec та сповіщуємо про необхідність внесення змін в OKPO чи MFO
-        if (form.__Nls_B.value === form.Nls_B.value && form.__Id_B.value === form.Id_B.value) {
-            form.Drec.value = drec;
-            alert(LocalizedString("Message34"));
-            return false;
-        }
-        // Якщо змінилися і Nls_B і Id_B
-        if (form.__Nls_B.value !== form.Nls_B.value && form.__Id_B.value !== form.Id_B.value) {
-            form.Drec.value = drec.replace(drec.charAt(1), "-");
-            form.__DK.value = 2;
-            return true;
-        }
-        // Якщо змінилося лише поле Nls_B
-        if (form.__Nls_B.value !== form.Nls_B.value) {
-            form.Drec.value = drec.replace(drec.charAt(1), "+");
-            form.__DK.value = 3;
-            return true;
-        }
-        // Якщо змінилося лише поле Id_B
-        if (form.__Id_B.value !== form.Id_B.value) {
-            form.Drec.value = drec.replace(drec.charAt(1), "!");
-            form.__DK.value = 3;
-            return true;
-        }
-    }
-
     return true;
 }
 

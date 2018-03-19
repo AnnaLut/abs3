@@ -1,10 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="10/17/2017 16:48:43" ReportInfo.Modified="10/18/2017 14:42:59" ReportInfo.CreatorVersion="2014.3.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="10/17/2017 16:48:43" ReportInfo.Modified="02/22/2018 15:54:23" ReportInfo.CreatorVersion="2014.3.2.0">
   <Dictionary>
-    <OracleDataConnection Name="obmmfo6_dev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoWN0HWRv5NgSW2TEYI2W7WcPsfvN5ZY4ajUiiHe1hVo3g==">
-      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select CHAR00 BRANCH, NUM00 RNK, CHAR01 ND, CHAR02 NLS, CHAR03 NBS, NUM01 OSTC, NUM02 DEPOSIT_ID, NUM03 KV, DAT00 PLANDATE, NUM04 COMPROC, NUM05 LIMIT from rs_tmp_report_data where session_id=:session_id order by id">
+    <OracleDataConnection Name="obmmfo6_dev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQJTNAah0NeryB2T8Cf4PDPg=">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select CHAR00 BRANCH, CHAR01 OKPO, CHAR02 ND, CHAR03 NLS, CHAR04 NBS, NUM00 OSTC, NUM01 DEPOSIT_ID, NUM02 KV, DAT00 PLANDATE, NUM03 COMPROC, NUM04 LIMIT from rs_tmp_report_data where session_id=:session_id order by id">
         <Column Name="BRANCH" DataType="System.String"/>
-        <Column Name="RNK" DataType="System.Decimal"/>
         <Column Name="ND" DataType="System.String"/>
         <Column Name="NLS" DataType="System.String"/>
         <Column Name="NBS" DataType="System.String"/>
@@ -14,6 +13,7 @@
         <Column Name="PLANDATE" DataType="System.DateTime"/>
         <Column Name="COMPROC" DataType="System.Decimal"/>
         <Column Name="LIMIT" DataType="System.Decimal"/>
+        <Column Name="OKPO" DataType="System.String"/>
         <CommandParameter Name="session_id" DataType="112" Expression="[session_id]" DefaultValue="0"/>
       </TableDataSource>
     </OracleDataConnection>
@@ -22,7 +22,7 @@
   </Dictionary>
   <ReportPage Name="Page1" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9" FirstPageSource="15" OtherPagesSource="15">
     <ReportTitleBand Name="ReportTitle1" Width="1047.06" Height="56.7">
-      <TextObject Name="Text1" Width="1048.95" Height="56.7" Text="Звіт про суми ненарахованих та невиплачених вкладів та відсотків депозитів ФО по всьому ДЕПОЗИТНОМУ ПОРТФЕЛЮ за [sFdat2] р." Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text1" Width="1048.95" Height="56.7" Text="Звіт по депозитам за якими здійснено поповнення в результаті чого залишки потрапляють під дію програми лояльності по всьому &#13;&#10;ДЕПОЗИТНОМУ ПОРТФЕЛЮ за [sFdat2] р." Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
     </ReportTitleBand>
     <PageHeaderBand Name="PageHeader1" Top="60.7" Width="1047.06" Height="56.7">
       <TableObject Name="Table1" Width="1048.95" Height="56.7">
@@ -58,7 +58,7 @@
         <TableColumn Name="Column16" Width="113.4"/>
         <TableRow Name="Row2" Height="37.8">
           <TableCell Name="Cell37" Border.Lines="All" Text="[Table.BRANCH]" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell38" Border.Lines="All" Text="[Table.RNK]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell38" Border.Lines="All" Text="[Table.OKPO]" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell39" Border.Lines="All" Text="[Table.ND]" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell40" Border.Lines="All" Text="[Table.NLS]" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell41" Border.Lines="All" Text="[Table.KV]" HorzAlign="Center" VertAlign="Center"/>

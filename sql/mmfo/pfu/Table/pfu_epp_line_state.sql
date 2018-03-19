@@ -49,7 +49,15 @@ exception when others then
  end;
 /
 
-
+PROMPT *** Create  constraint PK_PFU_EPP_LINE_STATE ***
+begin
+    execute immediate 'alter table PFU_EPP_LINE_STATE
+  add constraint PK_PFU_EPP_LINE_STATE primary key (ID)';
+ exception when others then 
+    if sqlcode = -2261 or sqlcode = -2260 then null; else raise; 
+    end if; 
+end;
+/
 
 PROMPT *** Create  grants  PFU_EPP_LINE_STATE ***
 grant SELECT                                                                 on PFU_EPP_LINE_STATE to BARSREADER_ROLE;

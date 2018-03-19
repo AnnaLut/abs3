@@ -1,0 +1,223 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="02/09/2018 18:13:33" ReportInfo.Modified="02/14/2018 09:38:22" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="COBUSUPABS_DEV_MMFO_DB" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQKgLMotVjkj6Pz/QLxQWxUU=">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select CHAR00 BRANCH, CHAR01 PERIOD, NUM00 S_1, NUM01 N_COUNT1, NUM02 N_OPEN, NUM03 N_CLOS, NUM04 N_COUNT2, NUM05 SD_Q, NUM06 S_2, NUM07 SP_S_1, NUM08 SP_N_COUNT1, NUM09 SP_N_OPEN, NUM10 SP_N_CLOS, NUM11 SP_N_COUNT2, NUM12 SP_SD_Q, NUM13 SP_S_2, NUM14 VP_S_1, NUM15 VP_N_COUNT1, NUM16 VP_N_OPEN, NUM17 VP_N_CLOS, NUM18 VP_N_COUNT2, NUM19 VP_SD_Q, NUM20 VP_S_2, NUM21 PP_CONT_2620_NC, NUM22 PP_CONT_2620, NUM23 ZK_S_1, NUM24 ZK_N_COUNT1, NUM25 ZK_N_OPEN, NUM26 ZK_N_CLOS, NUM27 ZK_N_COUNT2, NUM28 ZK_SD_Q, NUM29 ZK_S_2, NUM30 ZB_S_1, NUM31 ZB_N_COUNT1, NUM32 ZB_N_OPEN, NUM33 ZB_N_CLOS, NUM34 ZB_N_COUNT2, NUM35 ZB_SD_Q, NUM36 ZB_S_2 from rs_tmp_report_data where session_id=:session_id order by id">
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="PERIOD" DataType="System.String"/>
+        <Column Name="S_1" DataType="System.Decimal"/>
+        <Column Name="N_COUNT1" DataType="System.Decimal"/>
+        <Column Name="N_OPEN" DataType="System.Decimal"/>
+        <Column Name="N_CLOS" DataType="System.Decimal"/>
+        <Column Name="N_COUNT2" DataType="System.Decimal"/>
+        <Column Name="SD_Q" DataType="System.Decimal"/>
+        <Column Name="S_2" DataType="System.Decimal"/>
+        <Column Name="SP_S_1" DataType="System.Decimal"/>
+        <Column Name="SP_N_COUNT1" DataType="System.Decimal"/>
+        <Column Name="SP_N_OPEN" DataType="System.Decimal"/>
+        <Column Name="SP_N_CLOS" DataType="System.Decimal"/>
+        <Column Name="SP_N_COUNT2" DataType="System.Decimal"/>
+        <Column Name="SP_SD_Q" DataType="System.Decimal"/>
+        <Column Name="SP_S_2" DataType="System.Decimal"/>
+        <Column Name="VP_S_1" DataType="System.Decimal"/>
+        <Column Name="VP_N_COUNT1" DataType="System.Decimal"/>
+        <Column Name="VP_N_OPEN" DataType="System.Decimal"/>
+        <Column Name="VP_N_CLOS" DataType="System.Decimal"/>
+        <Column Name="VP_N_COUNT2" DataType="System.Decimal"/>
+        <Column Name="VP_SD_Q" DataType="System.Decimal"/>
+        <Column Name="VP_S_2" DataType="System.Decimal"/>
+        <Column Name="PP_CONT_2620_NC" DataType="System.Decimal"/>
+        <Column Name="PP_CONT_2620" DataType="System.Decimal"/>
+        <Column Name="ZK_S_1" DataType="System.Decimal"/>
+        <Column Name="ZK_N_COUNT1" DataType="System.Decimal"/>
+        <Column Name="ZK_N_OPEN" DataType="System.Decimal"/>
+        <Column Name="ZK_N_CLOS" DataType="System.Decimal"/>
+        <Column Name="ZK_N_COUNT2" DataType="System.Decimal"/>
+        <Column Name="ZK_SD_Q" DataType="System.Decimal"/>
+        <Column Name="ZK_S_2" DataType="System.Decimal"/>
+        <Column Name="ZB_S_1" DataType="System.Decimal"/>
+        <Column Name="ZB_N_COUNT1" DataType="System.Decimal"/>
+        <Column Name="ZB_N_OPEN" DataType="System.Decimal"/>
+        <Column Name="ZB_N_CLOS" DataType="System.Decimal"/>
+        <Column Name="ZB_N_COUNT2" DataType="System.Decimal"/>
+        <Column Name="ZB_SD_Q" DataType="System.Decimal"/>
+        <Column Name="ZB_S_2" DataType="System.Decimal"/>
+        <CommandParameter Name="session_id" DataType="112" Expression="[session_id]" DefaultValue="0"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.Int32"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="677" PaperHeight="210" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle1" Width="2483.46" Height="28.35">
+      <TextObject Name="Text1" Width="2485.35" Height="18.9" Text="Звіт БПК (кількість відкр/закр. в розрізі ТВБВ 1-4)" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="32.35" Width="2483.46" Height="37.8">
+      <TableObject Name="Table1" Width="2485.35" Height="37.8">
+        <TableColumn Name="Column40" Width="141.75"/>
+        <TableColumn Name="Column41" Width="85.05"/>
+        <TableColumn Name="Column42" Width="47.25"/>
+        <TableColumn Name="Column43" Width="75.6"/>
+        <TableColumn Name="Column44" Width="47.25"/>
+        <TableColumn Name="Column45" Width="47.25"/>
+        <TableColumn Name="Column46" Width="75.6"/>
+        <TableColumn Name="Column47" Width="122.85"/>
+        <TableColumn Name="Column48" Width="47.25"/>
+        <TableColumn Name="Column49" Width="47.25"/>
+        <TableColumn Name="Column50" Width="47.25"/>
+        <TableColumn Name="Column51" Width="47.25"/>
+        <TableColumn Name="Column52" Width="47.25"/>
+        <TableColumn Name="Column53" Width="47.25"/>
+        <TableColumn Name="Column54" Width="122.85"/>
+        <TableColumn Name="Column55" Width="47.25"/>
+        <TableColumn Name="Column56" Width="47.25"/>
+        <TableColumn Name="Column57" Width="47.25"/>
+        <TableColumn Name="Column58" Width="47.25"/>
+        <TableColumn Name="Column59" Width="47.25"/>
+        <TableColumn Name="Column60" Width="47.25"/>
+        <TableColumn Name="Column61"/>
+        <TableColumn Name="Column62"/>
+        <TableColumn Name="Column63" Width="47.25"/>
+        <TableColumn Name="Column64" Width="47.25"/>
+        <TableColumn Name="Column65" Width="47.25"/>
+        <TableColumn Name="Column66"/>
+        <TableColumn Name="Column67" Width="47.25"/>
+        <TableColumn Name="Column68" Width="47.25"/>
+        <TableColumn Name="Column69"/>
+        <TableColumn Name="Column70" Width="122.85"/>
+        <TableColumn Name="Column71" Width="47.25"/>
+        <TableColumn Name="Column72" Width="47.25"/>
+        <TableColumn Name="Column73"/>
+        <TableColumn Name="Column74" Width="47.25"/>
+        <TableColumn Name="Column75" Width="47.25"/>
+        <TableColumn Name="Column76"/>
+        <TableColumn Name="Column77" Width="122.85"/>
+        <TableColumn Name="Column78" Width="85.05"/>
+        <TableRow Name="Row2" Height="37.8">
+          <TableCell Name="Cell112" Text="BRANCH" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell113" Text="PERIOD" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell114" Text="S_1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell115" Text="N_COUNT1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell116" Text="N_OPEN" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell117" Text="N_CLOS" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell118" Text="N_COUNT2" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell119" Text="SD_Q" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell120" Text="S_2" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell121" Text="SP_S_1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell122" Text="SP_N_COUNT1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell123" Text="SP_N_OPEN" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell124" Text="SP_N_CLOS" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell125" Text="SP_N_COUNT2" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell126" Text="SP_SD_Q" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell127" Text="SP_S_2" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell128" Text="VP_S_1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell129" Text="VP_N_COUNT1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell130" Text="VP_N_OPEN" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell131" Text="VP_N_CLOS" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell132" Text="VP_N_COUNT2" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell133" Text="VP_SD_Q" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell134" Text="VP_S_2" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell135" Text="PP_CONT_2620_NC" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell136" Text="PP_CONT_2620" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell137" Text="ZK_S_1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell138" Text="ZK_N_COUNT1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell139" Text="ZK_N_OPEN" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell140" Text="ZK_N_CLOS" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell141" Text="ZK_N_COUNT2" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell142" Text="ZK_SD_Q" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell143" Text="ZK_S_2" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell144" Text="ZB_S_1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell145" Text="ZB_N_COUNT1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell146" Text="ZB_N_OPEN" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell147" Text="ZB_N_CLOS" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell148" Text="ZB_N_COUNT2" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell149" Text="ZB_SD_Q" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell150" Text="ZB_S_2" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="74.15" Width="2483.46" Height="37.8" DataSource="Table">
+      <TableObject Name="Table1" Width="2485.35" Height="37.8">
+        <TableColumn Name="Column1" Width="141.75"/>
+        <TableColumn Name="Column2" Width="85.05"/>
+        <TableColumn Name="Column3" Width="47.25"/>
+        <TableColumn Name="Column4" Width="75.6"/>
+        <TableColumn Name="Column5" Width="47.25"/>
+        <TableColumn Name="Column6" Width="47.25"/>
+        <TableColumn Name="Column7" Width="75.6"/>
+        <TableColumn Name="Column8" Width="122.85"/>
+        <TableColumn Name="Column9" Width="47.25"/>
+        <TableColumn Name="Column10" Width="47.25"/>
+        <TableColumn Name="Column11" Width="47.25"/>
+        <TableColumn Name="Column12" Width="47.25"/>
+        <TableColumn Name="Column13" Width="47.25"/>
+        <TableColumn Name="Column14" Width="47.25"/>
+        <TableColumn Name="Column15" Width="122.85"/>
+        <TableColumn Name="Column16" Width="47.25"/>
+        <TableColumn Name="Column17" Width="47.25"/>
+        <TableColumn Name="Column18" Width="47.25"/>
+        <TableColumn Name="Column19" Width="47.25"/>
+        <TableColumn Name="Column20" Width="47.25"/>
+        <TableColumn Name="Column21" Width="47.25"/>
+        <TableColumn Name="Column22"/>
+        <TableColumn Name="Column23"/>
+        <TableColumn Name="Column24" Width="47.25"/>
+        <TableColumn Name="Column25" Width="47.25"/>
+        <TableColumn Name="Column26" Width="47.25"/>
+        <TableColumn Name="Column27"/>
+        <TableColumn Name="Column28" Width="47.25"/>
+        <TableColumn Name="Column29" Width="47.25"/>
+        <TableColumn Name="Column30"/>
+        <TableColumn Name="Column31" Width="122.85"/>
+        <TableColumn Name="Column32" Width="47.25"/>
+        <TableColumn Name="Column33" Width="47.25"/>
+        <TableColumn Name="Column34"/>
+        <TableColumn Name="Column35" Width="47.25"/>
+        <TableColumn Name="Column36" Width="47.25"/>
+        <TableColumn Name="Column37"/>
+        <TableColumn Name="Column38" Width="122.85"/>
+        <TableColumn Name="Column39" Width="85.05"/>
+        <TableRow Name="Row1" Height="37.8">
+          <TableCell Name="Cell1" Text="[Table.BRANCH]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell2" Text="[Table.PERIOD]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell3" Text="[Table.S_1]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell4" Text="[Table.N_COUNT1]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell5" Text="[Table.N_OPEN]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell26" Text="[Table.N_CLOS]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell31" Text="[Table.N_COUNT2]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell36" Text="[Table.SD_Q]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell41" Text="[Table.S_2]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell46" Text="[Table.SP_S_1]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell51" Text="[Table.SP_N_COUNT1]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell56" Text="[Table.SP_N_OPEN]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell61" Text="[Table.SP_N_CLOS]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell66" Text="[Table.SP_N_COUNT2]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell71" Text="[Table.SP_SD_Q]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell76" Text="[Table.SP_S_2]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell81" Text="[Table.VP_S_1]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell86" Text="[Table.VP_N_COUNT1]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell91" Text="[Table.VP_N_OPEN]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell92" Text="[Table.VP_N_CLOS]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell93" Text="[Table.VP_N_COUNT2]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell94" Text="[Table.VP_SD_Q]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell95" Text="[Table.VP_S_2]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell96" Text="[Table.PP_CONT_2620_NC]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell97" Text="[Table.PP_CONT_2620]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell98" Text="[Table.ZK_S_1]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell99" Text="[Table.ZK_N_COUNT1]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell100" Text="[Table.ZK_N_OPEN]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell101" Text="[Table.ZK_N_CLOS]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell102" Text="[Table.ZK_N_COUNT2]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell103" Text="[Table.ZK_SD_Q]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell104" Text="[Table.ZK_S_2]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell105" Text="[Table.ZB_S_1]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell106" Text="[Table.ZB_N_COUNT1]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell107" Text="[Table.ZB_N_OPEN]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell108" Text="[Table.ZB_N_CLOS]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell109" Text="[Table.ZB_N_COUNT2]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell110" Text="[Table.ZB_SD_Q]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell111" Text="[Table.ZB_S_2]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+  </ReportPage>
+</Report>

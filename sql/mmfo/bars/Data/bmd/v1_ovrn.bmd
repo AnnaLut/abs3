@@ -234,6 +234,9 @@ begin
   bars_metabase.add_nsifunction(l_tabid, 13, 'Дод.Інформація (в т.ч. для БКІ )', '', '', 'EACH', '', '', '', '', '/barsroot/CreditUi/NewCredit/?custtype=2'||chr(38)||'nd=:ND'||chr(38)||'tagOnly=true', 99);
 
   -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 19, '2.*) Нарах. дох та витрат(%%, ком.) по 1 дог. за поточний період', 'OVRN.INTX(1, DATETIME_Null, :D, :ACC, 0) ', ':D(SEM=Вкл_ПО_дату,TYPE=D) ', 'EACH', '', '', '', '', '', null);
+
+  -- добавляем описание функции на справочник
   bars_metabase.add_nsifunction(l_tabid, 20, '2.0) Нарахування дох та витрат (%%, комісія) за ПОТОЧНИЙ період', 'OVRN.INTX(1, DATETIME_Null, :D,0,0)', ':D(SEM=Вкл_ПО_дату,TYPE=D) ', 'ONCE', '', 'Виконано !', 'FunNSIEditF("OVR_INTX[NSIFUNCTION][PROC=>OVRN.INTX(0,:D,0,0)][PAR=>:D(SEM=Вкл_по_дату,TYPE=D)][EXEC=>BEFORE]",2) ', '', '', null);
 
   -- добавляем описание функции на справочник
@@ -250,6 +253,9 @@ begin
 
   -- добавляем описание функции на справочник
   bars_metabase.add_nsifunction(l_tabid, 33, '3.1)Детальний по дням Протокол  нарахування за ДОВІЛЬНИЙ період', '', '', '', '', '', '', '', 'sPar=OVR_INTX[ACCESSCODE=>1][CONDITIONS=>(OVR_INTX.MOD1=0)]', null);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 34, '4.*) Нарах. дох та витрат з ПРОВОДКАМИ по 1 дог.за поточний період', 'OVRN.INTX(1, DATETIME_Null, :D, :ACC, 0) ; OVRN.INTB(1)', ':D(SEM=Вкл_ПО_дату,TYPE=D) ', 'EACH', 'Увага ! Ця дія  НЕзворотня ! Виконати ?', 'Виконано !', '', '', '', null);
 
   -- добавляем описание функции на справочник
   bars_metabase.add_nsifunction(l_tabid, 90, '1.БЭК-супровід. Старт дня. 1 Дог.', 'OVRN.background  ( 1, 0, :ND,  DATETIME_Null ) ', '', 'EACH', '', 'Виконано !', '', '', '', null);

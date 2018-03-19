@@ -114,6 +114,7 @@ grant SELECT                                                                 on 
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on RANG            to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on RANG            to WR_REFREAD;
 grant SELECT                                                                 on RANG            to WR_VIEWACC;
+grant SELECT                                                                 on RANG            to BARS_INTGR;
 
 
 

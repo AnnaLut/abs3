@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view TOBO ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.TOBO ("TOBO", "NAME", "B040", "DESCRIPTION", "DATE_OPENED", "DATE_CLOSED") AS 
+  CREATE OR REPLACE FORCE VIEW BARS.TOBO (TOBO, NAME, B040, DESCRIPTION, DATE_OPENED, DATE_CLOSED) AS 
   select branch,name,b040,description,date_opened,date_closed from branch
  ;
 
@@ -30,6 +30,7 @@ grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on 
 grant SELECT                                                                 on TOBO            to WR_CUSTREG;
 grant FLASHBACK,SELECT                                                       on TOBO            to WR_REFREAD;
 grant SELECT                                                                 on TOBO            to WR_VIEWACC;
+grant SELECT                                                                 on TOBO            to BARS_INTGR;
 
 
 

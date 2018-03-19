@@ -41,12 +41,12 @@ begin
     l_zpr.id           := 1;
     l_zpr.name         := 'БПК рахунки,  контроль зарах. 35 та 90 днів';
     l_zpr.namef        := '';  
-    l_zpr.bindvars     := ':zdate=''Звітна дата (DD.MM.YYYY) '',:Nbpk=''Вкл. нац. карту? (1-так / 0,пусто - ні) ''';
+    l_zpr.bindvars     := ':BRANCH=''Відділення '',:zdate=''Звітна дата (DD.MM.YYYY) '',:Nbpk=''Вкл. нац. карту? (1-так / 0,пусто - ні) ''';
     l_zpr.create_stmt  := '';
     l_zpr.rpt_template := 'rep_5520.frx';
     l_zpr.form_proc    := '';
     l_zpr.default_vars := '';
-    l_zpr.bind_sql     := '';
+    l_zpr.bind_sql     := ':BRANCH=''V_BRANCH_OWN|BRANCH|NAME''';
     l_zpr.xml_encoding := 'CL8MSWIN1251';
     l_zpr.txt          := ' select x.branch, x.nls, x.kv
      , to_char(x.daos,''dd.mm.yyyy'') as daos
@@ -81,7 +81,7 @@ where a.nbs = ''2625''
   and w.dat_close is NULL
   and c.k050=''000'' and c.CUSTTYPE=3
   and w.acc_pk is not NULL  
-  and instr(a.branch, sys_context(''bars_context'',''user_mfo'')) > 0           
+  and instr(to_number(replace(a.branch, ''/'', '''')), case when to_number(replace('':BRANCH'', ''/'', '''')) is NULL or length(ltrim(rtrim(replace('':BRANCH'', ''/'', ''''))))=0 then to_number(replace(a.branch, ''/'', '''')) else to_number(replace('':BRANCH'', ''/'', '''')) end) > 0           
   and w.card_code not like (case when nvl(:Nbpk,''0'')<>''0'' then ''0'' else ''LOC%'' end)
 --  and instr((select min(bb.obl) from branch bb where bb.branch=a.branch and bb.date_closed is NULL), case when :KO is NULL then (select min(bb.obl) from branch bb where bb.branch=a.branch and bb.date_closed is NULL) else :KO end)>0  
 --  and instr(upper(w.card_code), upper(nvl(:PROD,w.card_code)))>0

@@ -17,8 +17,8 @@ grant SELECT                                                                 on 
 grant SELECT                                                                 on FM_YESNO        to BARSUPL;
 grant SELECT                                                                 on FM_YESNO        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FM_YESNO        to FINMON01;
-grant SELECT                                                                 on FM_YESNO        to START1;
 grant SELECT                                                                 on FM_YESNO        to UPLD;
+grant SELECT                                                                 on FM_YESNO        to BARS_INTGR;
 
 
 

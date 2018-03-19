@@ -6,12 +6,6 @@
 -- create TableSpaces for DM
 -- ======================================================================================
 
-SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
-SET ECHO         OFF
-SET LINES        500
-SET PAGES        500
-SET FEEDBACK     OFF
-
 prompt -- ======================================================
 prompt -- create tablespace for DataMart's tables and indexes
 prompt -- ======================================================

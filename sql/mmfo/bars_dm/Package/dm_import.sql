@@ -226,6 +226,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
     g_body_version constant varchar2(64) := 'Version 4.0.3 14/03/2018';
     g_body_defs    constant varchar2(512) := null;
     G_TRACE        constant varchar2(20) := 'dm_import.';
+	-- # COBUMMFO-6343
     -- DIY - parallel
     -- partitioned: segments, credits_stat, custur
     c_cntdays constant number := 40; -- кількість днів, за які зберігаємо дані у вітринах
@@ -3970,6 +3971,8 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
             l_row.wb          := c.wb;
             l_row.ob22            := c.ob22;
             l_row.nms             := c.nms;
+			l_row.ob22 := c.ob22;
+			l_row.nms := c.nms;
 
             insert into deposit_PLT values l_row;
             l_rows:=l_rows+1;
@@ -4132,6 +4135,8 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
             l_row.wb          := c_clos.wb;
             l_row.ob22            := c_clos.ob22;
             l_row.nms             := c_clos.nms;
+			l_row.ob22 := c_clos.ob22;
+			l_row.nms := c_clos.nms;
             insert into deposit_PLT values l_row;
             l_rows:=l_rows+1;
 

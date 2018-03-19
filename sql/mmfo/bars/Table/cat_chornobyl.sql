@@ -1,19 +1,12 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/CAT_CHORNOBYL.sql =========*** Run ***
-PROMPT ===================================================================================== 
-
-
 PROMPT *** ALTER_POLICY_INFO to CAT_CHORNOBYL ***
 
 
 BEGIN 
         execute immediate  
           'begin  
-               bpa.alter_policy_info(''CAT_CHORNOBYL'', ''CENTER'' , ''C'', ''C'', ''C'', null);
-               bpa.alter_policy_info(''CAT_CHORNOBYL'', ''FILIAL'' , ''F'', ''F'', ''F'', null);
-               bpa.alter_policy_info(''CAT_CHORNOBYL'', ''WHOLE'' , ''C'', ''C'', ''C'', null);
+               bpa.alter_policy_info(''CAT_CHORNOBYL'', ''CENTER'' , null, null, null, null);
+               bpa.alter_policy_info(''CAT_CHORNOBYL'', ''FILIAL'' , null, null, null, null);
+               bpa.alter_policy_info(''CAT_CHORNOBYL'', ''WHOLE'' , null, null, null, null);
                null;
            end; 
           '; 
@@ -56,7 +49,3 @@ grant DELETE,INSERT,SELECT,UPDATE                                            on 
 grant SELECT                                                                 on CAT_CHORNOBYL   to UPLD;
 
 
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Table/CAT_CHORNOBYL.sql =========*** End ***
-PROMPT ===================================================================================== 

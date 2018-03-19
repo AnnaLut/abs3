@@ -1,9 +1,4 @@
 begin
-umu.add_report2arm(  p_report_id => 5715,
-                      p_arm_code  => '$RM_REZR',
-                      p_approve   => 1);
+UMU.ADD_REPORT2ARM(5716, '$RM_DRU1',1);
 end;
-
 /
-
-commit;

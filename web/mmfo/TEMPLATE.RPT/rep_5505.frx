@@ -1,25 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="10/17/2017 16:48:43" ReportInfo.Modified="10/18/2017 14:38:46" ReportInfo.CreatorVersion="2014.3.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="10/17/2017 16:48:43" ReportInfo.Modified="02/22/2018 16:44:06" ReportInfo.CreatorVersion="2014.3.2.0">
   <Dictionary>
-    <OracleDataConnection Name="obmmfo6_dev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoWN0HWRv5NgSW2TEYI2W7Wco3HzAeoRXQLPKmo39ulqqA==">
-      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select CHAR00 BRANCH, NUM00 DEPOSIT_ID, CHAR01 ND, DAT00 DATZ, NUM01 RNK, NUM02 ID, NUM03 SUM, NUM04 ACC, CHAR02 NLS, NUM05 KV, CHAR03 NBS, CHAR04 NMS, CHAR05 LCV, DAT01 DAOS, NUM06 OSTC, CHAR06 TT, CHAR07 DPT from rs_tmp_report_data where session_id=:session_id order by BRANCH, KV">
+    <OracleDataConnection Name="obmmfo6_dev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQFSBi7yoqbN49iXPRFEIm1c=">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select CHAR00 BRANCH, NUM00 DEPOSIT_ID, CHAR01 ND, DAT00 DATZ, CHAR02 OKPO, NUM01 ID, NUM02 SUM, NUM03 ACC, CHAR03 NLS, NUM04 KV, CHAR04 NBS, CHAR05 NMS,  DAT01 DAOS, NUM05 OSTC, CHAR06 TT from rs_tmp_report_data where session_id=:session_id order by BRANCH, KV">
         <Column Name="NBS" DataType="System.String"/>
         <Column Name="BRANCH" DataType="System.String"/>
         <Column Name="DEPOSIT_ID" DataType="System.Decimal"/>
         <Column Name="ND" DataType="System.String"/>
         <Column Name="DATZ" DataType="System.DateTime"/>
-        <Column Name="RNK" DataType="System.Decimal"/>
         <Column Name="ID" DataType="System.Decimal"/>
         <Column Name="SUM" DataType="System.Decimal"/>
         <Column Name="ACC" DataType="System.Decimal"/>
         <Column Name="NLS" DataType="System.String"/>
         <Column Name="KV" DataType="System.Decimal"/>
         <Column Name="NMS" DataType="System.String"/>
-        <Column Name="LCV" DataType="System.String"/>
         <Column Name="DAOS" DataType="System.DateTime"/>
         <Column Name="OSTC" DataType="System.Decimal"/>
         <Column Name="TT" DataType="System.String"/>
-        <Column Name="DPT" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
         <CommandParameter Name="session_id" DataType="112" Expression="[session_id]" DefaultValue="0"/>
       </TableDataSource>
     </OracleDataConnection>
@@ -64,7 +62,7 @@
         <TableColumn Name="Column15" Width="103.95"/>
         <TableRow Name="Row2" Height="37.8">
           <TableCell Name="Cell37" Border.Lines="All" Text="[Table.BRANCH]" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell38" Border.Lines="All" Text="[Table.RNK]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell38" Border.Lines="All" Text="[Table.OKPO]" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell39" Border.Lines="All" Text="[Table.ND]" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell40" Border.Lines="All" Text="[Table.NLS]" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell41" Border.Lines="All" Text="[Table.KV]" HorzAlign="Center" VertAlign="Center"/>

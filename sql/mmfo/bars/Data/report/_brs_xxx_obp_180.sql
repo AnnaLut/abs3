@@ -40,7 +40,7 @@ begin
 
     l_zpr.id           := 1;
     l_zpr.name         := 'БПК. Дебіторська заборгованність';
-    l_zpr.namef        := 'my.txt';
+    l_zpr.namef        := '';
     l_zpr.bindvars     := ':Branch1=''Відділення (%-всі)'',:OKPO1=''ІНН клієнта (%-всі)'',:NLS_PK1=''Рахунок клієнта (%-всі)'',:LCV1=''Валюта рахунку'',:ZP_OKPO=''ЄДРПОУ ЗП проекту (%-всі)''';
     l_zpr.create_stmt  := '';
     l_zpr.rpt_template := 'rep_5503.frx';
@@ -180,6 +180,16 @@ begin
           l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' существует в АРМ Друк звітів';
     end;
 
+    begin
+       Insert into BARS.APP_REP
+               (CODEAPP, CODEREP, APPROVE, GRANTOR)
+       Values
+               ('$RM_NBUR', l_rep.id, 1, 1);
+          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' добавлен в АРМ Звітність (новий)';
+    exception when dup_val_on_index
+          then 
+          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' существует в АРМ Звітність (новий)';
+    end;
 
     bars_report.print_message(l_message);
 end;

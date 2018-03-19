@@ -1,10 +1,8 @@
-
- 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARSAQ/package/data_import.sql =========*** Run *
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BARSAQ.DATA_IMPORT is
+CREATE OR REPLACE PACKAGE BARSAQ.data_import is
 
   -- global consts
   G_HEADER_VERSION constant varchar2(64)  := 'version 1.32 15/07/2015';
@@ -453,11 +451,13 @@
   -- sync_acctariffs - Синхронизация тарифов между схемами BANK -> CORE
   --
   procedure sync_acctariffs;
+  
 
 
 procedure sync_acc_transactions2_TEST(
     p_startdate in date    default null,
     p_scn       in number  default null);
+
 
   ----
   -- sync_acctariffs - синхронизация клиентов
@@ -466,7 +466,8 @@ procedure sync_acc_transactions2_TEST(
 
 end data_import;
 /
-CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
+
+CREATE OR REPLACE PACKAGE BODY BARSAQ.data_import is
 
   -- global consts
   G_BODY_VERSION constant varchar2(64)  := 'version 1.97 14/03/2017';
@@ -2530,7 +2531,7 @@ procedure sync_acc_transactions2_TEST(
            and v.groupid (+) not in (77, 80, 81, 30, 130)
            and v.status (+) = 2)
            loop
-dbms_application_info.set_action(cur_r.rn||'/'||cur_r.cnt||' Parent');
+dbms_application_info.set_action(cur_r.rn||'/'||cur_r.cnt||' Parent'); 
         l_ref92_bank_id := null;
         l_ref92_cust_code := null;
         l_ref92_acc_num := null;
@@ -2609,7 +2610,7 @@ dbms_application_info.set_action(cur_r.rn||'/'||cur_r.cnt||' Parent');
           )
           loop
 
-dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
+dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld'); 
         l_ref92_bank_id := null;
         l_ref92_cust_code := null;
         l_ref92_acc_num := null;
@@ -2653,7 +2654,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     --
   end sync_acc_transactions2_TEST;
 
-
+  
   ----
   -- sync_acc_period_transactions2 - синхронизирует проводки в АБС для передачи в систему
   --
@@ -3910,6 +3911,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     l_sideB_tag     doc_import_props.tag%type := 'ф';
     l_blank_ser     varchar2(100);
     l_blank_num     varchar2(100);
+    l_is_nls_closed number(1);
     --
     numeric_value_error exception;
     pragma exception_init(numeric_value_error, -6502);
@@ -4052,6 +4054,21 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
             when numeric_value_error then
                 raise_application_error(-20000, 'Рахунок отримувача занадто довгий');
         end;
+
+        -- перевірка рахунка отримувача
+        begin
+          select 1 into l_is_nls_closed from v_kf_accounts a where kf=l_doc.mfo_b and a.nls = l_doc.nls_b and kv=l_doc.kv and dazs is not null;
+
+          if l_is_nls_closed = 1 then
+            raise_application_error(-20000, 'Рахунок отримувача закритий');
+          end if;
+        exception
+          when no_data_found then
+            null;
+          when others then
+            raise;
+        end;
+
         begin
             l_doc.nam_b     := get_attr_varchar2(l_body, 'PAYEE_NAME');
         exception
@@ -6707,8 +6724,8 @@ end data_import;
  show err;
  
 PROMPT *** Create  grants  DATA_IMPORT ***
-grant EXECUTE                                                                on DATA_IMPORT     to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on DATA_IMPORT     to IBANK_ADMIN;
+grant EXECUTE                                                                on BARSAQ.DATA_IMPORT     to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on BARSAQ.DATA_IMPORT     to IBANK_ADMIN;
 
  
  

@@ -4,7 +4,7 @@ is
   --
   -- constants
   --
-  g_header_version  constant varchar2(64)  := 'version 17.5  2018.03.15';
+  g_header_version  constant varchar2(64)  := 'version 17.4  2018.02.07';
 
   --
   -- types
@@ -387,16 +387,6 @@ is
   );
 
   --
-  -- REMOVE_INVALID_DM_VERSIONS
-  --
-  procedure REMOVE_INVALID_DM_VERSIONS
-  ( p_start_id     in     number
-  , p_end_id       in     number
-  , p_lmt_dt       in     date
-  , p_kf           in     varchar2
-  );
-
-  --
   -- ¬идаленн€ ≥нвал≥дних верс≥й в≥трин
   --
   procedure REMOVE_INVALID_VERSIONS
@@ -410,7 +400,7 @@ is
   procedure REMOVE_OBSOLETE_VERSIONS;
 
   --
-  -- GATHER_DM_STATS
+  --
   --
   procedure GATHER_DM_STATS
   ( p_start_id     in     number
@@ -418,7 +408,7 @@ is
   );
 
   --
-  -- LOAD_ALL_OBJECTS
+  --
   --
   --  p_report_date - «в≥тна дата
   --  p_kf          -  од фiлiалу (ћ‘ќ)
@@ -445,10 +435,9 @@ is
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 19.6  2018.03.16';
-  fmt_dt          constant varchar2(10) := 'dd.mm.yyyy';
+  g_body_version  constant varchar2(64)  := 'version 19.5  2018.02.25';
 
-  MODULE_PREFIX   constant varchar2(4)  := 'NBUR';
+  MODULE_PREFIX   constant varchar2(4)   := 'NBUR';
 
   --
   -- types
@@ -468,7 +457,6 @@ is
   l_err_rec_id         pls_integer;
   l_frst_yr_dt         date;
   l_attempt_num        number(1);
-  l_dm_tblsps          boolean;
 
   --
   -- exceptions
@@ -511,7 +499,7 @@ is
         into l_sel
         from ALL_POLICIES
        where OBJECT_OWNER = 'BARS'
-         and OBJECT_NAME  = p_obj_nm
+         and OBJECT_NAME  = 'DPU_DEAL'
          and POLICY_GROUP = 'FILIAL'
          and ENABLE       = 'YES';
 
@@ -531,20 +519,6 @@ is
 
   end CHK_OBJ_POLICY_STE;
 
-  --
-  --
-  --
-  function CHK_DM_TBLSPS return boolean
-  is
-    l_qty  pls_integer;
-  begin
-    select count(1)
-      into l_qty
-      from DBA_TABLESPACES 
-     where TABLESPACE_NAME like 'BRS_DM%';
-    return case l_qty when 0 then FALSE else TRUE end;
-  end CHK_DM_TBLSPS;
-  
   --
   --
   --
@@ -840,7 +814,7 @@ is
   begin
 
     bars_audit.trace( '%s: Entry with ( rpt_dt=%s, kf=%s, vrsn_id =%s, obj_id=%s ).'
-                    , title, to_char(p_rpt_dt,fmt_dt), p_kf, to_char(p_vrsn_id), to_char(p_obj_id) );
+                    , title, to_char(p_rpt_dt,'dd.mm.yyyy'), p_kf, to_char(p_vrsn_id), to_char(p_obj_id) );
 
     select LISTAGG( o.OBJECT_NAME, ', ' ) WITHIN GROUP ( order by o.ID )
       into l_errmsg
@@ -893,7 +867,7 @@ is
   begin
 
     bars_audit.trace( '%s: Entry with ( rpt_dt=%s, kf=%s, obj_id=%s, prd_tp=%s ).'
-                    , title, to_char(p_rpt_dt,fmt_dt), p_kf, to_char(p_obj_id), p_prd_tp );
+                    , title, to_char(p_rpt_dt,'dd.mm.yyyy'), p_kf, to_char(p_obj_id), p_prd_tp );
 
     if ( l_errmsg Is Not Null )
     then
@@ -995,7 +969,7 @@ is
       return l_version_id;
   exception
       when no_data_found  then
-           LOG_ERRORS('not found VERSION for obj='||p_object_id||' for DAT='||to_char(p_report_date, fmt_dt), l_err_rec_id );
+           LOG_ERRORS('not found VERSION for obj='||p_object_id||' for DAT='||to_char(p_report_date, 'dd.mm.yyyy'), l_err_rec_id );
            return -1;
   end f_get_version_object;
 
@@ -1100,7 +1074,7 @@ is
   begin
 
     bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s, version_id =%s ).'
-                    , title, to_char(p_report_date,fmt_dt), p_kf, to_char(p_version_id) );
+                    , title, to_char(p_report_date,'dd.mm.yyyy'), p_kf, to_char(p_version_id) );
 
     dbms_application_info.set_client_info( title );
 
@@ -1156,7 +1130,7 @@ is
   begin
 
     bars_audit.trace( '%s: Entry with ( rpt_dt=%s, kf=%s, vrsn_id=%s, obj_id=%s ).'
-                    , title, to_char(p_report_date,fmt_dt), p_kf
+                    , title, to_char(p_report_date,'dd.mm.yyyy'), p_kf
                     , to_char(p_version_id), to_char(p_object_id) );
 
     if ( p_kf Is Null )
@@ -1208,7 +1182,7 @@ is
 
   exception
     when others then
-      LOG_ERRORS('for obj='||p_object_id||' DAT='||to_char(p_report_date, fmt_dt)||' KF='||p_kf, l_err_rec_id );
+      LOG_ERRORS('for obj='||p_object_id||' DAT='||to_char(p_report_date, 'dd.mm.yyyy')||' KF='||p_kf, l_err_rec_id );
   end P_FINISH_LOAD_OBJECT;
 
   ---------------------------------------------------------------------
@@ -1364,7 +1338,7 @@ is
 
   exception
     when OTHERS then
-      LOG_ERRORS( l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, fmt_dt)||' KF='||p_kf, l_err_rec_id );
+      LOG_ERRORS( l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, 'dd.mm.yyyy')||' KF='||p_kf, l_err_rec_id );
       p_finish_load_object( l_object_id, p_version_id, p_report_date, p_kf, null, l_err_rec_id );
   end p_load_customers;
 
@@ -1582,7 +1556,7 @@ is
 
   exception
     when others then
-      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, fmt_dt)||' KF='||p_kf, l_err_rec_id );
+      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, 'dd.mm.yyyy')||' KF='||p_kf, l_err_rec_id );
       p_finish_load_object( l_object_id, p_version_id, p_report_date, p_kf, null, l_err_rec_id );
   end p_load_accounts;
 
@@ -1642,7 +1616,7 @@ is
   begin
 
     bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s ).'
-                    , title, to_char(p_report_date,fmt_dt), p_kf );
+                    , title, to_char(p_report_date,'dd.mm.yyyy'), p_kf );
 
     if ( p_kf is null )
     then -- запуск формуванн€ щоденного зн≥мку балансу дл€ вс≥х KF
@@ -1668,15 +1642,15 @@ is
 
         BC.SUBST_MFO( p_kf );
 
-        bars_audit.trace( '%s: run SYNC_DLY_SNAP ( %s ).', title, to_char(p_report_date,fmt_dt) );
+        bars_audit.trace( '%s: run SYNC_DLY_SNAP ( %s ).', title, to_char(p_report_date,'dd.mm.yyyy') );
 
         BARS_UTL_SNAPSHOT.SYNC_SNAP( p_report_date );
 
         BC.HOME;
 
       else
-        bars_audit.error( title||': дата '||to_char(p_report_date,fmt_dt)||' не Ї банк≥вським днем!' );
-        raise_application_error( -20666, '«в≥тна дата '||to_char(p_report_date,fmt_dt)||' не Ї банк≥вським днем.' );
+        bars_audit.error( title||': дата '||to_char(p_report_date,'dd.mm.yyyy')||' не Ї банк≥вським днем!' );
+        raise_application_error( -20666, '«в≥тна дата '||to_char(p_report_date,'dd.mm.yyyy')||' не Ї банк≥вським днем.' );
       end if;
 
     end if;
@@ -1762,7 +1736,7 @@ is
 
       else
 
-        LOG_ERRORS( 'retrying create snapshot for p_report_date='||to_char(p_report_date, fmt_dt)||' and p_kf='||p_kf, l_err_rec_id );
+        LOG_ERRORS( 'retrying create snapshot for p_report_date='||to_char(p_report_date, 'dd.mm.yyyy')||' and p_kf='||p_kf, l_err_rec_id );
 
       end if;
 
@@ -1786,7 +1760,7 @@ is
 
   exception
     when others then
-      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, fmt_dt)||' KF='||p_kf, l_err_rec_id );
+      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, 'dd.mm.yyyy')||' KF='||p_kf, l_err_rec_id );
       p_finish_load_object( l_object_id, p_version_id, p_report_date, p_kf, null, l_err_rec_id );
   end p_load_dailybal;
 
@@ -1801,7 +1775,7 @@ is
   begin
 
     bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s ).'
-                    , title, to_char(p_report_date,fmt_dt), p_kf );
+                    , title, to_char(p_report_date,'dd.mm.yyyy'), p_kf );
 
     if ( p_kf is null )
     then -- запуск формуванн€ щоденного зн≥мку балансу дл€ вс≥х KF
@@ -1824,7 +1798,7 @@ is
 
         BC.SUBST_MFO( p_kf );
 
-        bars_audit.trace( '%s: run SYNC_MO_SNAP ( %s ).', title, to_char(p_report_date,fmt_dt) );
+        bars_audit.trace( '%s: run SYNC_MO_SNAP ( %s ).', title, to_char(p_report_date,'dd.mm.yyyy') );
 
         BARS_SNAPSHOT.CREATE_MONTHLY_SNAPSHOT
         ( p_snapshot_dt => trunc(p_report_date,'MM')
@@ -1931,7 +1905,7 @@ is
 
   exception
     when others then
-      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, fmt_dt)||' KF='||p_kf, l_err_rec_id );
+      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, 'dd.mm.yyyy')||' KF='||p_kf, l_err_rec_id );
       p_finish_load_object( l_object_id, p_version_id, p_report_date, p_kf, null, l_err_rec_id );
   end p_load_monthbal;
 
@@ -2014,7 +1988,7 @@ is
 
   exception
     when others then
-      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, fmt_dt)||' KF='||p_kf, l_err_rec_id );
+      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, 'dd.mm.yyyy')||' KF='||p_kf, l_err_rec_id );
       p_finish_load_object( l_object_id, p_version_id, p_report_date, p_kf, null, l_err_rec_id );
   end LOAD_BAL_YEARLY;
 
@@ -2040,7 +2014,7 @@ is
   begin
 
     bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s, version_id =%s ).'
-                    , title, to_char(p_report_date,fmt_dt), p_kf, to_char(p_version_id) );
+                    , title, to_char(p_report_date,'dd.mm.yyyy'), p_kf, to_char(p_version_id) );
 
     l_object_id := f_get_object_id_by_name(l_object_name);
 
@@ -2138,7 +2112,7 @@ is
 
   exception
     when OTHERS then
-      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, fmt_dt)||' KF='||p_kf, l_err_rec_id );
+      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, 'dd.mm.yyyy')||' KF='||p_kf, l_err_rec_id );
       p_finish_load_object( l_object_id, p_version_id, p_report_date, p_kf, null, l_err_rec_id );
   end P_LOAD_TRANSACTIONS;
 
@@ -2413,7 +2387,7 @@ is
 
   exception
     when OTHERS then
-      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, fmt_dt)||' KF='||p_kf, l_err_rec_id );
+      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, 'dd.mm.yyyy')||' KF='||p_kf, l_err_rec_id );
       p_finish_load_object( l_object_id, p_version_id, p_report_date, p_kf, null, l_err_rec_id );
   end P_LOAD_BALANCES_R013;
 
@@ -2439,7 +2413,7 @@ is
   begin
 
     bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s, version_id =%s ).'
-                    , title, to_char(p_report_date,fmt_dt), p_kf, to_char(p_version_id) );
+                    , title, to_char(p_report_date,'dd.mm.yyyy'), p_kf, to_char(p_version_id) );
 
     l_object_id := f_get_object_id_by_name(l_object_name);
 
@@ -2682,7 +2656,7 @@ is
 
   exception
     when OTHERS then
-      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, fmt_dt)||' KF='||p_kf, l_err_rec_id );
+      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, 'dd.mm.yyyy')||' KF='||p_kf, l_err_rec_id );
       p_finish_load_object( l_object_id, p_version_id, p_report_date, p_kf, null, l_err_rec_id );
   end P_LOAD_ADL_DOC_RPT_DTL;
 
@@ -2708,7 +2682,7 @@ is
   begin
 
     bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s, version_id =%s ).'
-                    , title, to_char(p_report_date,fmt_dt), p_kf, to_char(p_version_id) );
+                    , title, to_char(p_report_date,'dd.mm.yyyy'), p_kf, to_char(p_version_id) );
 
     l_object_id := f_get_object_id_by_name(l_object_name);
 
@@ -2856,7 +2830,7 @@ is
 
   exception
     when OTHERS then
-      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, fmt_dt)||' KF='||p_kf, l_err_rec_id );
+      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, 'dd.mm.yyyy')||' KF='||p_kf, l_err_rec_id );
       p_finish_load_object( l_object_id, p_version_id, p_report_date, p_kf, null, l_err_rec_id );
   end LOAD_ADL_DOC_SWT_DTL;
 
@@ -2882,7 +2856,7 @@ is
   begin
 
     bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s, version_id =%s ).'
-                    , title, to_char(p_report_date,fmt_dt), p_kf, to_char(p_version_id) );
+                    , title, to_char(p_report_date,'dd.mm.yyyy'), p_kf, to_char(p_version_id) );
 
     l_object_id := f_get_object_id_by_name(l_object_name);
 
@@ -3150,7 +3124,7 @@ is
 
   exception
     when OTHERS then
-      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, fmt_dt)||' KF='||p_kf, l_err_rec_id );
+      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, 'dd.mm.yyyy')||' KF='||p_kf, l_err_rec_id );
       p_finish_load_object( l_object_id, p_version_id, p_report_date, p_kf, null, l_err_rec_id );
   end P_LOAD_AGRM_ACCOUNTS;
 
@@ -3176,7 +3150,7 @@ is
   begin
 
     bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s, version_id =%s ).'
-                    , title, to_char(p_report_date,fmt_dt), p_kf, to_char(p_version_id) );
+                    , title, to_char(p_report_date,'dd.mm.yyyy'), p_kf, to_char(p_version_id) );
 
     l_object_id := f_get_object_id_by_name(l_object_name);
 
@@ -3372,7 +3346,7 @@ is
 
   exception
     when OTHERS then
-      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, fmt_dt)||' KF='||p_kf, l_err_rec_id );
+      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, 'dd.mm.yyyy')||' KF='||p_kf, l_err_rec_id );
       p_finish_load_object( l_object_id, p_version_id, p_report_date, p_kf, null, l_err_rec_id );
   end P_LOAD_ACNT_RATES;
 
@@ -3399,7 +3373,7 @@ is
   begin
 
     bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s, version_id =%s ).'
-                    , title, to_char(p_report_date,fmt_dt), p_kf, to_char(p_version_id) );
+                    , title, to_char(p_report_date,'dd.mm.yyyy'), p_kf, to_char(p_version_id) );
 
     l_object_id := f_get_object_id_by_name(l_object_name);
 
@@ -3544,7 +3518,7 @@ is
 
   exception
     when OTHERS then
-      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, fmt_dt)||' KF='||p_kf, l_err_rec_id );
+      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, 'dd.mm.yyyy')||' KF='||p_kf, l_err_rec_id );
       p_finish_load_object( l_object_id, p_version_id, p_report_date, p_kf, null, l_err_rec_id );
   end P_LOAD_AGRM_RATES;
 
@@ -3570,7 +3544,7 @@ is
   begin
 
     bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s, version_id =%s ).'
-                    , title, to_char(p_report_date,fmt_dt), p_kf, to_char(p_version_id) );
+                    , title, to_char(p_report_date,'dd.mm.yyyy'), p_kf, to_char(p_version_id) );
 
     l_object_id := f_get_object_id_by_name(l_object_name);
 
@@ -4005,7 +3979,7 @@ is
 
   exception
     when OTHERS then
-      LOG_ERRORS( l_object_name||' for vrsn_id='||p_version_id||' rpt_dt='||to_char(p_report_date,fmt_dt)||' kf='||p_kf, l_err_rec_id );
+      LOG_ERRORS( l_object_name||' for vrsn_id='||p_version_id||' rpt_dt='||to_char(p_report_date,'dd.mm.yyyy')||' kf='||p_kf, l_err_rec_id );
       p_finish_load_object( l_object_id, p_version_id, p_report_date, p_kf, null, l_err_rec_id );
   end LOAD_AGREEMENTS;
 
@@ -4031,7 +4005,7 @@ is
   begin
 
     bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s, version_id =%s ).'
-                    , title, to_char(p_report_date,fmt_dt), p_kf, to_char(p_version_id) );
+                    , title, to_char(p_report_date,'dd.mm.yyyy'), p_kf, to_char(p_version_id) );
 
     l_object_id := f_get_object_id_by_name(l_object_name);
 
@@ -4146,7 +4120,7 @@ is
 
   exception
     when OTHERS then
-      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, fmt_dt)||' KF='||p_kf, l_err_rec_id );
+      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, 'dd.mm.yyyy')||' KF='||p_kf, l_err_rec_id );
       p_finish_load_object( l_object_id, p_version_id, p_report_date, p_kf, null, l_err_rec_id );
   end LOAD_TXN_SYMBOLS;
 
@@ -4172,7 +4146,7 @@ is
   begin
 
     bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s, version_id =%s ).'
-                    , title, to_char(p_report_date,fmt_dt), p_kf, to_char(p_version_id) );
+                    , title, to_char(p_report_date,'dd.mm.yyyy'), p_kf, to_char(p_version_id) );
 
     l_object_id := f_get_object_id_by_name(l_object_name);
 
@@ -4269,7 +4243,7 @@ is
 
   exception
     when OTHERS then
-      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, fmt_dt)||' KF='||p_kf, l_err_rec_id );
+      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, 'dd.mm.yyyy')||' KF='||p_kf, l_err_rec_id );
       p_finish_load_object( l_object_id, p_version_id, p_report_date, p_kf, null, l_err_rec_id );
   end LOAD_BALANCES_CLT;
 
@@ -4297,7 +4271,7 @@ is
   begin
 
     bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s, version_id =%s ).'
-                    , title, to_char(p_report_date,fmt_dt), p_kf, to_char(p_version_id) );
+                    , title, to_char(p_report_date,'dd.mm.yyyy'), p_kf, to_char(p_version_id) );
 
     l_object_id := f_get_object_id_by_name(l_object_name);
 
@@ -4473,7 +4447,7 @@ is
 
   exception
     when OTHERS then
-      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, fmt_dt)||' KF='||p_kf, l_err_rec_id );
+      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, 'dd.mm.yyyy')||' KF='||p_kf, l_err_rec_id );
       p_finish_load_object( l_object_id, p_version_id, p_report_date, p_kf, null, l_err_rec_id );
   end LOAD_PROVISIONS;
 
@@ -4499,7 +4473,7 @@ is
   begin
 
     bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s, version_id =%s ).'
-                    , title, to_char(p_report_date,fmt_dt), p_kf, to_char(p_version_id) );
+                    , title, to_char(p_report_date,'dd.mm.yyyy'), p_kf, to_char(p_version_id) );
 
     l_object_id := f_get_object_id_by_name(l_object_name);
 
@@ -4629,7 +4603,7 @@ is
 
   exception
     when OTHERS then
-      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, fmt_dt)||' KF='||p_kf, l_err_rec_id );
+      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, 'dd.mm.yyyy')||' KF='||p_kf, l_err_rec_id );
       p_finish_load_object( l_object_id, p_version_id, p_report_date, p_kf, null, l_err_rec_id );
   end LOAD_PAYMENT_SHD;
 
@@ -4655,7 +4629,7 @@ is
   begin
 
     bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s, version_id =%s ).'
-                    , title, to_char(p_report_date,fmt_dt), p_kf, to_char(p_version_id) );
+                    , title, to_char(p_report_date,'dd.mm.yyyy'), p_kf, to_char(p_version_id) );
 
     l_object_id := f_get_object_id_by_name(l_object_name);
 
@@ -4788,7 +4762,7 @@ is
 
   exception
     when OTHERS then
-      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, fmt_dt)||' KF='||p_kf, l_err_rec_id );
+      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, 'dd.mm.yyyy')||' KF='||p_kf, l_err_rec_id );
       p_finish_load_object( l_object_id, p_version_id, p_report_date, p_kf, null, l_err_rec_id );
   end LOAD_CHRON_AVG_BALS;
 
@@ -4820,7 +4794,7 @@ is
   begin
 
     bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s, version_id =%s ).'
-                    , title, to_char(p_report_date,fmt_dt), p_kf, to_char(p_version_id) );
+                    , title, to_char(p_report_date,'dd.mm.yyyy'), p_kf, to_char(p_version_id) );
 
     l_object_id := f_get_object_id_by_name(l_object_name);
 
@@ -4845,8 +4819,8 @@ is
     l_nxt_mo_last_bnk_dt := DAT_NEXT_U( add_months( trunc(p_report_date,'MM'), 2 ), -1 );
 
     bars_audit.trace( '%s: ( rpt_mo_frst_bnk_dt=%s, rpt_mo_last_bnk_dt=%s, nxt_mo_frst_bnk_dt=%s, nxt_mo_last_bnk_dt=%s ).'
-                    , title, to_char(l_rpt_mo_frst_bnk_dt,fmt_dt), to_char(l_rpt_mo_last_bnk_dt,fmt_dt)
-                           , to_char(l_nxt_mo_frst_bnk_dt,fmt_dt), to_char(l_nxt_mo_last_bnk_dt,fmt_dt) );
+                    , title, to_char(l_rpt_mo_frst_bnk_dt,'dd.mm.yyyy'), to_char(l_rpt_mo_last_bnk_dt,'dd.mm.yyyy')
+                           , to_char(l_nxt_mo_frst_bnk_dt,'dd.mm.yyyy'), to_char(l_nxt_mo_last_bnk_dt,'dd.mm.yyyy') );
 
     p_start_load_object( l_object_id, l_object_name, p_version_id, p_report_date, p_kf, systimestamp );
 
@@ -4979,7 +4953,7 @@ is
 
   exception
     when OTHERS then
-      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, fmt_dt)||' KF='||p_kf, l_err_rec_id );
+      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, 'dd.mm.yyyy')||' KF='||p_kf, l_err_rec_id );
       p_finish_load_object( l_object_id, p_version_id, p_report_date, p_kf, null, l_err_rec_id );
   end LOAD_TRANSACTIONS_CNSL;
 
@@ -5005,7 +4979,7 @@ is
   begin
 
     bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s, version_id =%s ).'
-                    , title, to_char(p_report_date,fmt_dt), p_kf, to_char(p_version_id) );
+                    , title, to_char(p_report_date,'dd.mm.yyyy'), p_kf, to_char(p_version_id) );
 
     l_object_id := f_get_object_id_by_name(l_object_name);
 
@@ -5203,7 +5177,7 @@ is
 
   exception
     when OTHERS then
-      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, fmt_dt)||' KF='||p_kf, l_err_rec_id );
+      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, 'dd.mm.yyyy')||' KF='||p_kf, l_err_rec_id );
       p_finish_load_object( l_object_id, p_version_id, p_report_date, p_kf, null, l_err_rec_id );
   end LOAD_PROFIT_AND_LOSS;
 
@@ -5229,7 +5203,7 @@ is
 --  begin
 --
 --    bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s, version_id =%s ).'
---                    , title, to_char(p_report_date,fmt_dt), p_kf, to_char(p_version_id) );
+--                    , title, to_char(p_report_date,'dd.mm.yyyy'), p_kf, to_char(p_version_id) );
 --
 --    l_object_id := f_get_object_id_by_name(l_object_name);
 --
@@ -5276,7 +5250,7 @@ is
 --
 --  exception
 --    when OTHERS then
---      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, fmt_dt)||' KF='||p_kf, l_err_rec_id );
+--      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, 'dd.mm.yyyy')||' KF='||p_kf, l_err_rec_id );
 --      p_finish_load_object( l_object_id, p_version_id, p_report_date, p_kf, null, l_err_rec_id );
 --  end LOAD_***;
 
@@ -5407,7 +5381,7 @@ is
   begin
 
     bars_audit.trace( '%s: Start running with ( dm_tab_nm=%s, rpt_dt=%s, kf=%s, vrsn_id=%s).'
-                    , title, p_dm_tab_nm, to_char(p_rpt_dt,fmt_dt), p_kf, to_char(p_vrsn_id) );
+                    , title, p_dm_tab_nm, to_char(p_rpt_dt,'dd/mm/yyyy'), p_kf, to_char(p_vrsn_id) );
 
     case
       when ( p_vrsn_id > 0 )
@@ -5516,7 +5490,7 @@ is
   begin
 
     bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s ).'
-                    , title, to_char(p_report_date,fmt_dt), p_kf );
+                    , title, to_char(p_report_date,'dd.mm.yyyy'), p_kf );
 
     -- check and lock
     if ( p_vrsn_id Is Null )
@@ -5733,7 +5707,7 @@ is
   begin
 
     bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s, vrsn_id=%s, file_id=%s ).', title
-                    , to_char(p_report_dt,fmt_dt), p_kf, to_char(p_vrsn_id), to_char(p_file_id) );
+                    , to_char(p_report_dt,'dd.mm.yyyy'), p_kf, to_char(p_vrsn_id), to_char(p_file_id) );
 
     begin
 
@@ -5810,7 +5784,7 @@ is
   begin
 
     bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s, object_id=%s ).', title
-                    , to_char(p_rpt_dt,fmt_dt), p_kf, to_char(p_obj_id) );
+                    , to_char(p_rpt_dt,'dd.mm.yyyy'), p_kf, to_char(p_obj_id) );
 
     if ( p_kf is Null )
     then
@@ -5847,7 +5821,7 @@ is
   begin
 
     bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s, object_id=%s, version_id=%s ).', title
-                    , to_char(p_report_date,fmt_dt), p_kf, to_char(p_object_id), to_char(p_version_id) );
+                    , to_char(p_report_date,'dd.mm.yyyy'), p_kf, to_char(p_object_id), to_char(p_version_id) );
 
     if ( p_version_id > 0 )
     then
@@ -5902,7 +5876,7 @@ is
   begin
 
     bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s, version_id=%s, object_nm=%s ).', title
-                    , to_char(p_report_date,fmt_dt), p_kf, to_char(p_version_id), p_object_nm );
+                    , to_char(p_report_date,'dd.mm.yyyy'), p_kf, to_char(p_version_id), p_object_nm );
 
     /*
     begin
@@ -5983,7 +5957,7 @@ is
   begin
 
     bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s, object_id=%s, version_id=%s ).', title
-                    , to_char(p_report_date,fmt_dt), p_kf, to_char(p_object_id), to_char(p_version_id) );
+                    , to_char(p_report_date,'dd.mm.yyyy'), p_kf, to_char(p_object_id), to_char(p_version_id) );
 
     RETRIEVE_VERSION
     ( p_report_date => p_report_date
@@ -5995,171 +5969,6 @@ is
     bars_audit.trace( '%s: Exit.', title );
 
   end RETRIEVE_VERSION;
-
-  --
-  -- REMOVE_INVALID_DM_VERSIONS
-  --
-  procedure REMOVE_INVALID_DM_VERSIONS
-  ( p_start_id     in     number
-  , p_end_id       in     number
-  , p_lmt_dt       in     date
-  , p_kf           in     varchar2
-  ) is
-    title     constant    varchar2(64) := $$PLSQL_UNIT||'.REMOVE_INVALID_DM_VERSIONS';
-  begin
-
-    bars_audit.trace( '%s: Entry with ( p_start_id=%s, p_end_id=%s, p_lmt_dt=%s, p_kf=%s ).'
-                    , title, to_char(p_start_id), to_char(p_end_id), to_char(p_lmt_dt,fmt_dt), p_kf );
-
-    execute immediate 'ALTER SESSION ENABLE PARALLEL DML';
-
-    << LST_OBJ >>
-    for o in ( select o.ID          as OBJ_ID
-                    , t.TABLE_NAME  as TBL_NM
-                    , t.IOT_TYPE
-                    , p.PARTITIONING_TYPE
-                    , p.PARTITIONING_KEY_COUNT
-                    , p.SUBPARTITIONING_TYPE
-                    , p.SUBPARTITIONING_KEY_COUNT
-                    , p.PARTITIONING_KEY_COUNT + p.SUBPARTITIONING_KEY_COUNT as KEY_CNT
-                    , nvl2(p.INTERVAL,1,0) as ITRV
-                 from NBUR_REF_OBJECTS o
-                 join ALL_TABLES t
-                   on ( t.OWNER = 'BARS'  and t.TABLE_NAME = o.OBJECT_NAME||'_ARCH' )
-                 join ALL_PART_TABLES p
-                   on ( p.OWNER = t.OWNER and p.TABLE_NAME = t.TABLE_NAME )
-                where ID between p_start_id and p_end_id
-             )
-    loop
-
-      bars_audit.trace( '%s: obj_id=%s, tbl_nm=%s, key_cnt=%s.'
-                      , title, to_char(o.OBJ_ID), o.TBL_NM, to_char(o.KEY_CNT)  );
-
-      << LST_VRSN >>
-      for v in ( select v.ROWID       as ROW_ID
-                      , v.REPORT_DATE as RPT_DT
-                      , v.KF
-                      , v.VERSION_ID  as VRSN_ID
-                   from NBUR_LST_OBJECTS v
-                  where v.REPORT_DATE   < p_lmt_dt
-                    and v.KF            = p_kf
-                    and v.OBJECT_ID     = o.OBJ_ID
-                    and v.OBJECT_STATUS = 'INVALID'
-                  order by v.REPORT_DATE
---                  for update of OBJECT_STATUS nowait
-               )
-      loop
-
-        bars_audit.trace( '%s: tbl_nm=%s, rpt_dt=%s, vrsn_id=%s.', title
-                        , o.TBL_NM, to_char(v.RPT_DT,fmt_dt), to_char(v.VRSN_ID) );
-
-        begin
-
-          if ( o.KEY_CNT = 3 )
-          then
-            begin
-              execute immediate 'alter table '||o.TBL_NM||' drop partition for ( to_date('''||
-                                to_char(v.RPT_DT,'YYYYMMDD')||''',''YYYYMMDD''),'''||v.KF||''','||to_char(v.VRSN_ID)||' )';
-              bars_audit.trace( '%s: partition dropped for (%s,%s).', title, to_char(v.RPT_DT,fmt_dt), v.KF );
-            exception
-              when e_ptsn_not_exsts then
-                null;
-            end;
-          else
-            execute immediate 'delete /*+ PARALLEL( '||to_char(l_dop)||' ) */ '||o.TBL_NM
-                  ||chr(10)|| ' where REPORT_DATE = :v_rpt_dt'
-                  ||chr(10)|| '   and KF          = :v_kf'
-                  ||chr(10)|| '   and VERSION_ID  = :v_vrsn_id'
-            using v.RPT_DT, v.KF, v.VRSN_ID;
-          end if;
-
-          update NBUR_LST_OBJECTS
-             set OBJECT_STATUS = 'DELETED'
-           where ROWID = v.ROW_ID;
-
-          commit;
-
-        exception
-          when others then
-            bars_audit.error( title || ': ' || dbms_utility.format_error_stack()
-                                            || dbms_utility.format_error_backtrace() );
-        end;
-
-      end loop LST_VRSN;
-
-    end loop LST_OBJ;
-
-    bars_audit.trace( '%s: Exit.', title );
-
-  end REMOVE_INVALID_DM_VERSIONS;
-
-  --
-  -- REMOVE_INVALID_RPT_VERSIONS
-  --
-  procedure REMOVE_INVALID_RPT_VERSIONS
-  ( p_start_id     in     number
-  , p_end_id       in     number
-  , p_lmt_dt       in     date
-  , p_kf           in     varchar2
-  ) is
-    title     constant    varchar2(64) := $$PLSQL_UNIT||'.REMOVE_INVALID_DM_VERSIONS';
-  begin
-
-    bars_audit.trace( '%s: Entry with ( p_start_id=%s, p_end_id=%s, p_lmt_dt=%s, p_kf=%s ).'
-                    , title, to_char(p_start_id), to_char(p_end_id), to_char(p_lmt_dt,fmt_dt), p_kf );
-
-    execute immediate 'ALTER SESSION ENABLE PARALLEL DML';
-
-    << RMV_RPT >>
-    for f in ( select f.ROWID       as ROW_ID
-                    , f.REPORT_DATE as RPT_DT
-                    , f.KF
-                    , f.VERSION_ID  as VRSN_ID
-                    , SubStr(f.FILE_NAME,1,3) as RPT_CODE
-                 from NBUR_LST_FILES f
-                where f.REPORT_DATE < p_lmt_dt
-                  and f.KF          = p_kf
-                  and f.FILE_ID between p_start_id and p_end_id
-                  and f.FILE_STATUS = 'INVALID'
-                order by f.REPORT_DATE
---                for update of FILE_STATUS nowait
-             )
-    loop
-
-      bars_audit.trace( '%s: rpt_dt=%s, vrsn_id=%s, rpt_code=%s.', title
-                      , to_char(f.RPT_DT,fmt_dt), to_char(f.VRSN_ID), f.RPT_CODE );
-
-      begin
-
-        delete NBUR_DETAIL_PROTOCOLS_ARCH
-         where REPORT_DATE = f.RPT_DT
-           and KF          = f.KF
-           and VERSION_ID  = f.VRSN_ID
-           and REPORT_CODE = f.RPT_CODE;
-
-        delete NBUR_AGG_PROTOCOLS_ARCH
-         where REPORT_DATE = f.RPT_DT
-           and KF          = f.KF
-           and VERSION_ID  = f.VRSN_ID
-           and REPORT_CODE = f.RPT_CODE;
-
-        update NBUR_LST_FILES
-           set FILE_STATUS = 'DELETED'
-         where ROWID = f.ROW_ID;
-
-        commit;
-
-      exception
-        when others then
-          bars_audit.error( title || ': ' || dbms_utility.format_error_stack()
-                                          || dbms_utility.format_error_backtrace() );
-      end;
-
-    end loop RMV_RPT;
-
-    bars_audit.trace( '%s: Exit.', title );
-
-  end REMOVE_INVALID_RPT_VERSIONS;
 
   --
   --
@@ -6176,29 +5985,12 @@ is
   %version 1.2 (07/02/2018)
   %usage   ¬идаленн€ ≥нвал≥дних верс≥й даних з арх≥вних в≥трин даних
   */
-    title        constant  varchar2(64) := $$PLSQL_UNIT||'.REMOVE_INVALID_VERSIONS';
-
-    l_lmt_dt               date;
-    l_kf                   varchar2(6);
-    l_task_nm              varchar2(30);
-    l_sql_stmt             varchar2(4000);
-
-    e_task_not_found       exception;
-    pragma exception_init( e_task_not_found, -29498 );
-
-    function GET_DM_QTY return pls_integer
-    is
-      l_dm_qty   pls_integer;
-    begin
-      select count(ID)
-        into l_dm_qty
-        from NBUR_REF_OBJECTS;
-      return l_dm_qty;
-    end GET_DM_QTY;
-
+    title        constant varchar2(64)  := $$PLSQL_UNIT||'.REMOVE_INVALID_VERSIONS';
+    l_lmt_dt              date;
+    l_kf                  varchar2(6);
   begin
 
-    bars_audit.trace( '%s: Entry with ( p_report_date=%s, p_kf=%s ).', title, to_char(p_report_date,fmt_dt), p_kf );
+    bars_audit.trace( '%s: Entry with ( p_report_date=%s, p_kf=%s ).', title, to_char(p_report_date,'dd.mm.yyyy'), p_kf );
 
     l_kf := nvl(p_kf,l_usr_mfo);
 
@@ -6218,77 +6010,128 @@ is
     else -- for one KF
 
       if ( p_report_date Is Null )
-      then -- залишаЇмо ус≥ верс≥њ в≥трин за поточний ≥ попередн≥й м≥с€ць
+      then -- залишаЇмо в≥трини за поточний ≥ попередн≥й м≥с€ць
         l_lmt_dt := add_months( trunc(GL.GBD(),'MM'), -1 );
-      else -- залишаЇмо ус≥ верс≥њ в≥трин за поточний м≥с€ць та останн≥й банк≥вський день попереднього м≥с€ц€
-        l_lmt_dt := DAT_NEXT_U( trunc(p_report_date,'MM'), -1 );
+      else
+        l_lmt_dt := DAT_NEXT_U( p_report_date, -1 );
       end if;
 
-      bars_audit.trace( '%s: l_lmt_dt=%s.', title, to_char(l_lmt_dt,fmt_dt) );
+      for o in ( select o.ID          as OBJ_ID
+                      , o.OBJECT_NAME as OBJ_NM
+                      , t.TABLE_NAME  as TBL_NM
+                      , t.IOT_TYPE
+                      , p.PARTITIONING_TYPE
+                      , p.PARTITIONING_KEY_COUNT
+                      , p.SUBPARTITIONING_TYPE
+                      , p.SUBPARTITIONING_KEY_COUNT
+                      , p.PARTITIONING_KEY_COUNT + p.SUBPARTITIONING_KEY_COUNT as KEY_CNT
+                      , nvl2(p.INTERVAL,1,0) as ITRV
+                   from NBUR_REF_OBJECTS o
+                   join ALL_TABLES t
+                     on ( t.OWNER = 'BARS'  and t.TABLE_NAME = o.OBJECT_NAME||'_ARCH' )
+                   join ALL_PART_TABLES p
+                     on ( p.OWNER = t.OWNER and p.TABLE_NAME = t.TABLE_NAME ) )
+      loop
 
-      begin
+        bars_audit.trace( '%s: obj_id=%s, obj_nm=%s, tbl_nm=%s, key_cnt=%s.'
+                        , title, to_char(o.OBJ_ID), o.OBJ_NM, o.TBL_NM, to_char(o.KEY_CNT)  );
 
-        l_task_nm := 'REMOVE_INVALID_DM_VERSIONS';
+        for v in ( select v.ROWID       as ROW_ID
+                        , v.REPORT_DATE as RPT_DT
+                        , v.KF
+                        , v.VERSION_ID  as VRSN_ID
+                     from NBUR_LST_OBJECTS v
+                    where v.REPORT_DATE   < l_lmt_dt
+                      and v.KF            = l_kf
+                      and v.OBJECT_ID     = o.OBJ_ID
+                      and v.OBJECT_STATUS = 'INVALID'
+                      for update of OBJECT_STATUS nowait
+                 )
+        loop
+
+          bars_audit.trace( '%s: tbl_nm=%s, rpt_dt=%s, vrsn_id=%s.', title
+                          , o.TBL_NM, to_char(v.RPT_DT,'dd.mm.yyyy'), to_char(v.VRSN_ID) );
+
+          begin
+
+            if ( o.KEY_CNT = 3 )
+            then
+              execute immediate 'alter table '||o.TBL_NM||' drop partition for ( to_date('''||
+                                to_char(v.RPT_DT,'YYYYMMDD')||''',''YYYYMMDD''),'''||v.KF||''','||to_char(v.VRSN_ID)||' )';
+            else
+              execute immediate 'delete /*+ PARALLEL( '||to_char(l_dop)||' ) */ '||o.TBL_NM
+                    ||chr(10)|| ' where REPORT_DATE = :v_rpt_dt'
+                    ||chr(10)|| '   and KF          = :v_kf'
+                    ||chr(10)|| '   and VERSION_ID  = :v_vrsn_id'
+              using v.RPT_DT, v.KF, v.VRSN_ID;
+            end if;
+
+            update NBUR_LST_OBJECTS
+               set OBJECT_STATUS = 'DELETED'
+             where ROWID = v.ROW_ID;
+  --         where REPORT_DATE = v.RPT_DT
+  --           and KF          = v.KF
+  --           and VERSION_ID  = v.VRSN_ID
+  --           and OBJECT_ID   = o.OBJ_ID;
+
+            commit;
+
+          exception
+            when others then
+              bars_audit.error( title || ': ' || dbms_utility.format_error_stack()
+                                   || CHR(10) || dbms_utility.format_error_backtrace() );
+          end;
+
+        end loop;
+
+      end loop;
+
+      for f in ( select f.ROWID       as ROW_ID
+                      , f.REPORT_DATE as RPT_DT
+                      , f.KF
+                      , f.VERSION_ID  as VRSN_ID
+                      , f.FILE_ID
+                      , SubStr(f.FILE_NAME,1,3) as RPT_CODE
+                   from NBUR_LST_FILES f
+                  where f.REPORT_DATE < l_lmt_dt
+                    and f.KF          = l_kf
+                    and f.FILE_STATUS = 'INVALID'
+                    for update of FILE_STATUS nowait
+               )
+      loop
+
+        bars_audit.trace( '%s: rpt_dt=%s, vrsn_id=%s, rpt_code=%s.', title
+                        , to_char(f.RPT_DT,'dd.mm.yyyy'), to_char(f.VRSN_ID), f.RPT_CODE );
 
         begin
-          DBMS_PARALLEL_EXECUTE.drop_task( task_name => l_task_nm );
+
+          delete NBUR_DETAIL_PROTOCOLS_ARCH
+           where REPORT_DATE = f.RPT_DT
+             and KF          = f.KF
+             and VERSION_ID  = f.VRSN_ID
+             and REPORT_CODE = f.RPT_CODE;
+
+          delete NBUR_AGG_PROTOCOLS_ARCH
+           where REPORT_DATE = f.RPT_DT
+             and KF          = f.KF
+             and VERSION_ID  = f.VRSN_ID
+             and REPORT_CODE = f.RPT_CODE;
+
+          update NBUR_LST_FILES
+             set FILE_STATUS = 'DELETED'
+--             , FILE_BODY   = null
+--             , FILE_HASH   = null
+           where ROWID = f.ROW_ID;
+
+          commit;
+
         exception
-          when e_task_not_found 
-          then null;
+          when others then
+            bars_audit.error( title || ': ' || dbms_utility.format_error_stack()
+                                 || CHR(10) || dbms_utility.format_error_backtrace() );
         end;
 
-        DBMS_PARALLEL_EXECUTE.create_task( task_name => l_task_nm );
-
-        l_sql_stmt := 'select ID, ID from NBUR_REF_OBJECTS';
-
-        DBMS_PARALLEL_EXECUTE.create_chunks_by_sql( task_name => l_task_nm
-                                                  , sql_stmt  => l_sql_stmt
-                                                  , by_rowid  => FALSE );
-
-        l_sql_stmt := 'begin NBUR_OBJECTS.REMOVE_INVALID_DM_VERSIONS( :start_id, :end_id, to_date('''
-                    || to_char(l_lmt_dt,'YYYYMMDD') || ''',''YYYYMMDD''), '''||l_kf||''' ); end;';
-
-        DBMS_PARALLEL_EXECUTE.run_task( task_name      => l_task_nm
-                                      , sql_stmt       => l_sql_stmt
-                                      , language_flag  => DBMS_SQL.NATIVE
-                                      , parallel_level => GET_DM_QTY() );
-
-        DBMS_PARALLEL_EXECUTE.drop_task( task_name => l_task_nm );
-
-      end;
-
-      begin
-
-        l_task_nm := 'REMOVE_INVALID_RPT_VERSIONS';
-
-        begin
-          DBMS_PARALLEL_EXECUTE.drop_task( task_name => l_task_nm );
-        exception
-          when e_task_not_found 
-          then null;
-        end;
-
-        DBMS_PARALLEL_EXECUTE.create_task( task_name => l_task_nm );
-
-        l_sql_stmt := 'select min(ID), max(ID) from ( select id, ntile(16) over (order by ID) as GRP_ID  from NBUR_REF_FILES ) group by GRP_ID';
-
-        DBMS_PARALLEL_EXECUTE.create_chunks_by_sql( task_name => l_task_nm
-                                                  , sql_stmt  => l_sql_stmt
-                                                  , by_rowid  => FALSE );
-
-        l_sql_stmt := 'begin NBUR_OBJECTS.REMOVE_INVALID_RPT_VERSIONS( :start_id, :end_id, to_date('''
-                    || to_char(l_lmt_dt,'YYYYMMDD') || ''',''YYYYMMDD''), '''||l_kf||''' ); end;';
-
-        DBMS_PARALLEL_EXECUTE.run_task( task_name      => l_task_nm
-                                      , sql_stmt       => l_sql_stmt
-                                      , language_flag  => DBMS_SQL.NATIVE
-                                      , parallel_level => 15 );
-
-        DBMS_PARALLEL_EXECUTE.drop_task( task_name => l_task_nm );
-
-      end;
-
-      execute immediate 'ALTER SESSION ENABLE PARALLEL DDL';
+      end loop;
 
       -- move
       for f in ( select distinct
@@ -6300,35 +6143,15 @@ is
                     and f.FILE_STATUS = any('FINISHED','BLOCKED')
                )
       loop
-
         begin
           execute immediate 'alter table NBUR_DETAIL_PROTOCOLS_ARCH move subpartition '
                          || 'for ( to_date('''||to_char(f.RPT_DT,'YYYYMMDD')||''',''YYYYMMDD''),'''||f.KF||''' ) '
-                         || case when l_dm_tblsps then 'tablespace BRS_DM_' || f.KF else '' end
-                         || ' COMPRESS UPDATE INDEXES INDEXES PARALLEL 24';
-          bars_audit.trace( '%s: subpartition moved for (%s,%s).', title, to_char(f.RPT_DT,fmt_dt), f.KF );
+                         || 'tablespace BRS_DM_D_' || f.KF ||' compress';
         exception
-          when e_ptsn_not_exsts then
-            null;
           when others then
             bars_audit.error( title || ': ' || dbms_utility.format_error_stack()
-                                            || dbms_utility.format_error_backtrace() );
+                                 || CHR(10) || dbms_utility.format_error_backtrace() );
         end;
-
-        begin
-          execute immediate 'alter table NBUR_AGG_PROTOCOLS_ARCH move subpartition '
-                         || 'for ( to_date('''||to_char(f.RPT_DT,'YYYYMMDD')||''',''YYYYMMDD''),'''||f.KF||''' ) '
-                         || case when l_dm_tblsps then 'tablespace BRS_DM_' || f.KF else '' end
-                         || ' COMPRESS UPDATE INDEXES PARALLEL 24';
-          bars_audit.trace( '%s: subpartition moved for (%s,%s).', title, to_char(f.RPT_DT,fmt_dt), f.KF );
-        exception
-          when e_ptsn_not_exsts then
-            null;
-          when others then
-            bars_audit.error( title || ': ' || dbms_utility.format_error_stack()
-                                            || dbms_utility.format_error_backtrace() );
-        end;
-
       end loop;
 
     end if;
@@ -6354,9 +6177,8 @@ is
 
     bars_audit.trace( '%s: Entry.', title );
 
-    l_lmt_dt := add_months( trunc(GL.GBD(),'MM'), -6 );
-
-    bars_audit.trace( '%s: l_lmt_dt=%s.', title, to_char(l_lmt_dt,fmt_dt) );
+    -- залишаЇмо в≥трини за р≥к
+    l_lmt_dt := add_months( trunc(GL.GBD(),'MM'), -12 );
 
     for o in ( select distinct
                       v.REPORT_DATE as RPT_DT
@@ -6367,31 +6189,27 @@ is
                  join ALL_TABLES t
                    on ( t.OWNER = 'BARS' and t.TABLE_NAME = o.OBJECT_NAME||'_ARCH' )
                 where v.REPORT_DATE < l_lmt_dt
-                  and v.OBJECT_STATUS != 'DELETED'
                 order by v.REPORT_DATE
              )
     loop
 
-      bars_audit.trace( '%s: tbl_nm=%s, rpt_dt=%s.', title, o.TBL_NM, to_char(o.RPT_DT,fmt_dt) );
+      bars_audit.trace( '%s: tbl_nm=%s, rpt_dt=%s.', title, o.TBL_NM, to_char(o.RPT_DT,'dd.mm.yyyy') );
 
       begin
 
-        begin
-          execute immediate 'alter table '||o.TBL_NM||' drop partition for ( to_date('''||to_char(o.RPT_DT,'YYYYMMDD')||''',''YYYYMMDD'') )';
-          bars_audit.trace( '%s: partition dropped for %s.', title, to_char(o.RPT_DT,fmt_dt) );
-        exception
-          when e_ptsn_not_exsts then
-            null;
-        end;
+        execute immediate 'alter table '||o.TBL_NM||' drop partition for ( to_date('''||to_char(o.RPT_DT,'YYYYMMDD')||''',''YYYYMMDD'') )';
+        bars_audit.trace( '%s: partition dropped for %.', title, to_char(o.RPT_DT,'dd.mm.yyyy') );
 
         update NBUR_LST_OBJECTS
            set OBJECT_STATUS = 'DELETED'
          where REPORT_DATE   = o.RPT_DT;
 
       exception
+        when e_ptsn_not_exsts then
+          null;
         when others then
           bars_audit.error( title || ': ' || dbms_utility.format_error_stack()
-                                          || dbms_utility.format_error_backtrace() );
+                               || CHR(10) || dbms_utility.format_error_backtrace() );
       end;
 
     end loop;
@@ -6400,42 +6218,31 @@ is
                       f.REPORT_DATE as RPT_DT
                  from NBUR_LST_FILES f
                 where f.REPORT_DATE < l_lmt_dt
-                  and f.FILE_STATUS != 'DELETED'
              )
     loop
 
       begin
 
-        bars_audit.trace( '%s: tbl_nm=NBUR_DETAIL_PROTOCOLS_ARCH, rpt_dt=%s.', title, to_char(f.RPT_DT,fmt_dt) );
+        bars_audit.trace( '%s: rpt_dt=%s, tbl_nm=NBUR_DETAIL_PROTOCOLS_ARCH.', title, to_char(f.RPT_DT,'dd.mm.yyyy') );
 
-        begin
-          execute immediate 'alter table NBUR_DETAIL_PROTOCOLS_ARCH drop partition for ( to_date('''||to_char(f.RPT_DT,'YYYYMMDD')||''',''YYYYMMDD'') )';
-          bars_audit.trace( '%s: partition dropped for %s.', title, to_char(f.RPT_DT,fmt_dt) );
-        exception
-          when e_ptsn_not_exsts then
-            null;
-        end;
+        execute immediate 'alter table NBUR_DETAIL_PROTOCOLS_ARCH drop partition for ( to_date('''||to_char(f.RPT_DT,'YYYYMMDD')||''',''YYYYMMDD'') )';
 
-        bars_audit.trace( '%s: tbl_nm=NBUR_AGG_PROTOCOLS_ARCH, rpt_dt=%s.', title, to_char(f.RPT_DT,fmt_dt) );
+        bars_audit.trace( '%s: rpt_dt=%s, tbl_nm=NBUR_AGG_PROTOCOLS_ARCH.', title, to_char(f.RPT_DT,'dd.mm.yyyy') );
 
-        begin
-          execute immediate 'alter table NBUR_AGG_PROTOCOLS_ARCH drop partition for ( to_date('''||to_char(f.RPT_DT,'YYYYMMDD')||''',''YYYYMMDD'') )';
-          bars_audit.trace( '%s: partition dropped for %s.', title, to_char(f.RPT_DT,fmt_dt) );
-        exception
-          when e_ptsn_not_exsts then
-            null;
-        end;
+        execute immediate 'alter table NBUR_AGG_PROTOCOLS_ARCH drop partition for ( to_date('''||to_char(f.RPT_DT,'YYYYMMDD')||''',''YYYYMMDD'') )';
 
         update NBUR_LST_FILES
            set FILE_STATUS = 'DELETED'
---           , FILE_BODY   = null
---           , FILE_HASH   = null
+             , FILE_BODY   = null
+             , FILE_HASH   = null
          where REPORT_DATE = f.RPT_DT;
 
       exception
+        when e_ptsn_not_exsts then
+          null;
         when others then
           bars_audit.error( title || ': ' || dbms_utility.format_error_stack()
-                                          || dbms_utility.format_error_backtrace() );
+                               || CHR(10) || dbms_utility.format_error_backtrace() );
       end;
 
     end loop;
@@ -6511,7 +6318,7 @@ is
   begin
 
     bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s, version_id=%s, auto_stat=%s ).'
-                    , title, to_char(p_report_date,fmt_dt), p_kf, to_char(p_version_id)
+                    , title, to_char(p_report_date,'dd.mm.yyyy'), p_kf, to_char(p_version_id)
                     , case when p_auto_stat then 'True' else 'False' end );
 
     P_LOAD_CUSTOMERS
@@ -6717,8 +6524,6 @@ BEGIN
     from MV_KF;
 
   l_attempt_num := 1;
-
-  l_dm_tblsps := CHK_DM_TBLSPS();
 
 END NBUR_OBJECTS;
 /

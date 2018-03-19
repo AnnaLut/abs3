@@ -16,7 +16,7 @@ PROMPT *** Create/replace  ARM  $RM_@EGU ***
     l_arm_resource_type_id  integer := resource_utl.get_resource_type_id(user_menu_utl.get_arm_resource_type_code(l_application_type_id));
     l_func_resource_type_id integer := resource_utl.get_resource_type_id(user_menu_utl.get_func_resource_type_code(l_application_type_id));
     l integer := 0;
-	d integer := 0;
+    d integer := 0;
 begin
      DBMS_OUTPUT.PUT_LINE(' $RM_@EGU створюємо (або оновлюємо) АРМ АРМ Реєстрація клієнтів і рахунків (ЮО) ');
      user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code,
@@ -25,12 +25,12 @@ begin
 
         -- отримуємо ідентифікатор створеного АРМу
      l_application_id := user_menu_utl.get_arm_id(l_application_code); 
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Об'єднання клієнтів ********** ');
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Об''єднання клієнтів ********** ');
           --  Створюємо функцію Об'єднання клієнтів
       l := l +1;
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'Об'єднання клієнтів',
+                                                  p_name     => 'Об''єднання клієнтів',
                                                   p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_rnk2rnk',
                                                   p_rolename => 'START1' ,
                                                   p_frontend => l_application_type_id
@@ -43,7 +43,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Оновлення рахунків(по доступу)',
-                                                  p_funcname => '/barsroot/customerlist/custacc.aspx?type=2&t=1',
+                                                  p_funcname => '/barsroot/customerlist/custacc.aspx?type=2'||CHR(38)||'t=1',
                                                   p_rolename => 'START1' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -63,21 +63,21 @@ begin
 
       --  Створюємо дочірню функцію Картка контрагента
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Картка контрагента',
-															  p_funcname => '/barsroot/clientregister/default.aspx?client=\w+',
-															  p_rolename => 'WR_CUSTREG' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Картка контрагента',
+                                                              p_funcname => '/barsroot/clientregister/default.aspx?client=\w+',
+                                                              p_rolename => 'WR_CUSTREG' ,
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Перегляд рахунків контрагенту
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Перегляд рахунків контрагенту',
-															  p_funcname => '/barsroot/customerlist/custacc.aspx?type=0&rnk=\d+(&mod=ro)*',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Перегляд рахунків контрагенту',
+                                                              p_funcname => '/barsroot/customerlist/custacc.aspx?type=0'||CHR(38)||'rnk=\d+('||CHR(38)||'mod=ro)*',
+                                                              p_rolename => '' ,
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Реєстрація клієнтів і рахунків (ФО-СПД) ********** ');
           --  Створюємо функцію Реєстрація клієнтів і рахунків (ФО-СПД)
@@ -85,7 +85,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Реєстрація клієнтів і рахунків (ФО-СПД)',
-                                                  p_funcname => '/barsroot/customerlist/default.aspx?custtype=3&spd=1',
+                                                  p_funcname => '/barsroot/customerlist/default.aspx?custtype=3'||CHR(38)||'spd=1',
                                                   p_rolename => 'WR_CUSTLIST' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -93,21 +93,21 @@ begin
 
       --  Створюємо дочірню функцію Перегляд рахунків контрагенту(readonly)
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Перегляд рахунків контрагенту(readonly)',
-															  p_funcname => '/barsroot/customerlist/custacc.aspx?type=0&rnk=\d+&mod=ro',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Перегляд рахунків контрагенту(readonly)',
+                                                              p_funcname => '/barsroot/customerlist/custacc.aspx?type=0'||CHR(38)||'rnk=\d+'||CHR(38)||'mod=ro',
+                                                              p_rolename => '' ,
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Перегляд атрибутів рахунку
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Перегляд атрибутів рахунку',
-															  p_funcname => '/barsroot/viewaccounts/accountform.aspx?type=\d+&acc=\d+&rnk=\d*&accessmode=0',
-															  p_rolename => 'WR_VIEWACC' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Перегляд атрибутів рахунку',
+                                                              p_funcname => '/barsroot/viewaccounts/accountform.aspx?type=\d+'||CHR(38)||'acc=\d+'||CHR(38)||'rnk=\d*'||CHR(38)||'accessmode=0',
+                                                              p_rolename => 'WR_VIEWACC' ,
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Зміни підключення/відключення СДО корпоративних клієнтів ********** ');
           --  Створюємо функцію Зміни підключення/відключення СДО корпоративних клієнтів
@@ -115,11 +115,33 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Зміни підключення/відключення СДО корпоративних клієнтів',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?tableName=V_LIST_TAR&accessCode=2',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?tableName=V_LIST_TAR'||CHR(38)||'accessCode=2',
                                                   p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
 
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Спецпараметри РАХУНКА для ручної установки ********** ');
+          --  Створюємо функцію Спецпараметри РАХУНКА для ручної установки
+      l := l +1;
+      l_function_ids.extend(l);      
+      l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'Спецпараметри РАХУНКА для ручної установки',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?tableName=SPEC1'||CHR(38)||'accessCode=2',
+                                                  p_rolename => 'bars_access_defrole' ,    
+                                                  p_frontend => l_application_type_id
+                                                  );
+
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Рахунки та Спецпараметри ********** ');
+          --  Створюємо функцію Рахунки та Спецпараметри
+      l := l +1;
+      l_function_ids.extend(l);      
+      l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'Рахунки та Спецпараметри',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?tableName=ACCOUNTS_SPECPARAM'||CHR(38)||'accessCode=1',
+                                                  p_rolename => 'bars_access_defrole' ,    
+                                                  p_frontend => l_application_type_id
+                                                  );
+   
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Довідники NEW ********** ');
           --  Створюємо функцію Довідники NEW

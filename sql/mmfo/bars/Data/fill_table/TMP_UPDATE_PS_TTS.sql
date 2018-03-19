@@ -1,6 +1,5 @@
 prompt Importing table TMP_UPDATE_PS_TTS...
-set feedback off
-set define off
+
 insert into TMP_UPDATE_PS_TTS (OLD_NBS, NEW_NBS)
 values ('1417', '1416');
 

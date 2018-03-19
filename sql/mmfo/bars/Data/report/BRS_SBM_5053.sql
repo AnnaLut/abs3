@@ -7,10 +7,7 @@ prompt =====================================
 prompt == DBF-Динамiка змiни залишкiв(вихiдних)по рахунках клiєнтiв
 prompt ===================================== 
 
-set serveroutput on
-set feed off       
-declare                               
-
+declare
    nlchr       char(2):=chr(13)||chr(10);
    l_zpr       zapros%rowtype;    
    l_zprr      zapros%rowtype;    

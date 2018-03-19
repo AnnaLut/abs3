@@ -26,6 +26,26 @@
         </command>
 
       </button>
+      <button caption="  Перегляд оброблених документів  " id="Bt_view" type="Image" imagename="document_zoom_in" hint="Перегляд оброблених документів">
+        <command  type="Redirect" url="/barsroot/barsweb/dynform.aspx?form=frm_nlk_ref_pay" target="Self" checkselectedrow="false" >
+
+          <parameters>
+            <parameter type="DataField" name="ACC" altname="acc"></parameter>
+          </parameters>
+        </command>
+
+      </button>
+
+      <button caption="       Віднесення на доходи 1095 днів     " id="Bt_per" type="Image" imagename="moneybag_dollar" hint="Віднесення на доходи документів які не оброблені протягом 1095 днів">
+        <command  type="Redirect" url="/barsroot/barsweb/dynform.aspx?form=frm_per_290908_web" target="Self" checkselectedrow="false" >
+
+          <parameters>
+            <parameter type="DataField" name="ACC" altname="acc"></parameter>
+          </parameters>
+        </command>
+
+      </button>
+      
     </buttons>
     
     <fields>
@@ -171,7 +191,7 @@
 
            <customfields oktext="OK" canceltext="End"  title="Вибір кода операції">
              <customfield  datatype="String"  name="TT" altname="tt" required="true" label="Тип операції"  >
-               <uicontrol   type="DropDownList" addemptyitem="true" table="(select tt, tt||' - '||name as name from tts where tt in ('310','177','K20') order by tt asc)"  keyfield="TT" valuefield="name">
+               <uicontrol   type="DropDownList" addemptyitem="true" table="(select tt, tt||' - '||name as name from tts where tt in ('310','177','101','D66','PKR') order by tt asc)"  keyfield="TT" valuefield="name">
                </uicontrol>
              </customfield>
            </customfields>
@@ -199,8 +219,8 @@
 
          
        </button>
-      
-    </buttons>
+
+     </buttons>
     
     <fields>
 

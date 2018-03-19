@@ -12,7 +12,7 @@ BEGIN
         execute immediate  
           'begin  
                bpa.alter_policy_info(''NLK_REF_UPDATE'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''NLK_REF_UPDATE'', ''FILIAL'' , null, null, null, null);
+               bpa.alter_policy_info(''NLK_REF_UPDATE'', ''FILIAL'', ''M'', ''M'', ''M'', ''M'');
                bpa.alter_policy_info(''NLK_REF_UPDATE'', ''WHOLE'' , null, null, null, null);
                null;
            end; 
@@ -88,6 +88,17 @@ exception when others then
  end;
 /
 
+
+PROMPT *** Create  index IDX_SKRYNKANDUPDATE ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IDX_SKRYNKANDUPDATE ON BARS.NLK_REF_UPDATE (ACC, KF) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
 
 
 PROMPT *** Create  grants  NLK_REF_UPDATE ***

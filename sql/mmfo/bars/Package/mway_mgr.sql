@@ -1,7 +1,8 @@
+
  
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/package/mway_mgr.sql =========*** Run *** ==
-PROMPT ===================================================================================== 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/mway_mgr.sql =========*** Run *** ==
+ PROMPT ===================================================================================== 
  
   CREATE OR REPLACE PACKAGE BARS.MWAY_MGR is
 
@@ -162,7 +163,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MWAY_MGR is
   --
 
   -- Private constant declarations
-  g_body_version  constant varchar2(64)  := 'version 5.7 16/03/2018';
+  g_body_version  constant varchar2(64)  := 'version 5.6 16/02/2018';
   g_awk_body_defs constant varchar2(512) := '';
   g_dbgcode constant varchar2(12) := 'mway_mgr.';
 
@@ -1750,10 +1751,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.MWAY_MGR is
                          where p.ref = o.ref
                            and p.dpt_id = l_deposit.dpt_id
                            and o.sos >=0
-                           and o.tt in ('PKD', 'OW4', 'PK!', '215', '015', '515', '013', 'R01', 'DP0', 'DP2', 'DP5', 'DPD', 'DPI', 'DPL', 'W2D', 'DBF', 'ALT',
-                                        '24', '190', '191', '901', 'BAK', 'I00', 'IB1', 'IB1', 'OW1', 'OW5', 'SMO', 'ST2', 'PS1', 'ZMO')
-                           /*and o.tt in ('PKD','OW4','PK!','215','015','515','013','R01','DP0',
-                                        'DP2','DP5','DPD','DPI','DPL','W2D','DBF','ALT')*/
+                           and o.tt in ('PKD','OW4','PK!','215','015','515','013','R01','DP0',
+                                        'DP2','DP5','DPD','DPI','DPL','W2D','DBF','ALT')
                            and o.pdat between l_dat_s and l_dat_po;
 
                       else
@@ -1764,43 +1763,26 @@ CREATE OR REPLACE PACKAGE BODY BARS.MWAY_MGR is
                          where p.ref = o.ref
                            and p.dpt_id = l_deposit.dpt_id
                            and o.sos >=0
-                           and o.tt in ('PKD', 'OW4', 'PK!', '215', '015', '515', '013', 'R01', 'DP0', 'DP2', 'DPD', 'DPI', 'W2D', 'DBF', 'ALT',
-                                        '24', '190', '191', '901', 'BAK', 'I00', 'IB1', 'IB1', 'OW1', 'OW5', 'SMO', 'ST2', 'PS1', 'ZMO')
-                           /*and o.tt in ('PKD','OW4','PK!','215','015','515','013','R01','DP0',
-                                        'DP2','DP5','DPD','DPI','DPL','W2D','DBF','ALT')*/
+                           and o.tt in ('PKD','OW4','PK!','215','015','515','013','R01','DP0',
+                                        'DP2','DP5','DPD','DPI','DPL','W2D','DBF','ALT')
                            and o.pdat between l_dat_s and l_dat_po;
 
                       end if;
 
                       l_summ := l_sum_month + l_sum;
-                      
-                      if l_count_mm = 0 then -- первый мес€ц
-                       
-                         if l_summ > l_deposit.dpt_amount * 2 then
-                            --731 ѕревышен лимит пополнени€ за период
-                            rollback to savepoint sp_paystart;
-                            get_error(731,
+
+                      if l_summ > l_deposit.dpt_amount then
+
+                        --731 ѕревышен лимит пополнени€ за период
+                        rollback to savepoint sp_paystart;
+                        get_error(731,
                                   ltrim(to_char(l_deposit.dpt_amount)),
                                   p_error_code,
                                   p_error_message);
-                             return;
-                         else
-                            null;
-                         end if;    
-                      else  -- не первый мес€ц
-                        if l_summ > l_deposit.dpt_amount then
-                            --731 ѕревышен лимит пополнени€ за период
-                            rollback to savepoint sp_paystart;
-                            get_error(731,
-                                  ltrim(to_char(l_deposit.dpt_amount)),
-                                  p_error_code,
-                                  p_error_message);
-                             return;
-                         else
-                            null;
-                         end if;    
-                      end if;  
-                    
+                        return;
+                      else
+                        null;
+                      end if;
                     else
                       null;
                     end if;
@@ -1956,10 +1938,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.MWAY_MGR is
                          where p.ref = o.ref
                            and p.dpt_id = l_deposit.dpt_id
                            and o.sos >=0
-                           and o.tt in ('PKD', 'OW4', 'PK!', '215', '015', '515', '013', 'R01', 'DP0', 'DP2', 'DP5', 'DPD', 'DPI', 'DPL', 'W2D', 'DBF', 'ALT',
-                                        '24', '190', '191', '901', 'BAK', 'I00', 'IB1', 'IB1', 'OW1', 'OW5', 'SMO', 'ST2', 'PS1', 'ZMO')
-                           /*and o.tt in ('PKD','OW4','PK!','215','015','515','013','R01','DP0',
-                                        'DP2','DP5','DPD','DPI','DPL','W2D','DBF','ALT')*/
+                           and o.tt in ('PKD','OW4','PK!','215','015','515','013','R01','DP0',
+                                        'DP2','DP5','DPD','DPI','DPL','W2D','DBF','ALT')
                            and o.pdat between l_dat_s and l_dat_po;
 
                       else
@@ -1970,42 +1950,25 @@ CREATE OR REPLACE PACKAGE BODY BARS.MWAY_MGR is
                          where p.ref = o.ref
                            and p.dpt_id = l_deposit.dpt_id
                            and o.sos >=0
-                           and o.tt in ('PKD', 'OW4', 'PK!', '215', '015', '515', '013', 'R01', 'DP0', 'DP2', 'DPD', 'DPI', 'W2D', 'DBF', 'ALT',
-                                        '24', '190', '191', '901', 'BAK', 'I00', 'IB1', 'IB1', 'OW1', 'OW5', 'SMO', 'ST2', 'PS1', 'ZMO')
-                           /*and o.tt in ('PKD','OW4','PK!','215','015','515','013','R01','DP0',
-                                        'DP2','DP5','DPD','DPI','DPL','W2D','DBF','ALT')*/
+                           and o.tt in ('PKD','OW4','PK!','215','015','515','013','R01','DP0',
+                                        'DP2','DP5','DPD','DPI','DPL','W2D','DBF','ALT')
                            and o.pdat between l_dat_s and l_dat_po;
 
                       end if;
 
                       l_summ := l_sum_month + l_sum;
 
-                      
-                      if l_count_mm = 0 then -- первый мес€ц
-                       
-                         if l_summ > l_deposit.dpt_amount * 2 then
-                            --731 ѕревышен лимит пополнени€ за период
-                            rollback to savepoint sp_paystart;
-                            get_error(731,
+                      if l_summ > l_deposit.dpt_amount then
+
+                        --731 ѕревышен лимит пополнени€ за период
+                        rollback to savepoint sp_paystart;
+                        get_error(731,
                                   ltrim(to_char(l_deposit.dpt_amount)),
                                   p_error_code,
                                   p_error_message);
-                             return;
-                         else
-                            null;
-                         end if;    
-                      else  -- не первый мес€ц
-                        if l_summ > l_deposit.dpt_amount then
-                            --731 ѕревышен лимит пополнени€ за период
-                            rollback to savepoint sp_paystart;
-                            get_error(731,
-                                  ltrim(to_char(l_deposit.dpt_amount)),
-                                  p_error_code,
-                                  p_error_message);
-                             return;
-                         else
-                            null;
-                         end if;    
+                        return;
+                      else
+                        null;
                       end if;
                     else
                       null;
@@ -4010,11 +3973,11 @@ begin
    null;
 end mway_mgr;
 /
-show err;
+ show err;
  
  
  
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/package/mway_mgr.sql =========*** End *** ==
-PROMPT ===================================================================================== 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/mway_mgr.sql =========*** End *** ==
+ PROMPT ===================================================================================== 
  

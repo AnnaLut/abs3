@@ -1,3 +1,8 @@
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/_BRS_SBR_REP_5714.sql =========*** Run 
+PROMPT ===================================================================================== 
 prompt ===================================== 
 prompt == Звіт про дату зміни ліміту кредиту по БПК
 prompt ===================================== 
@@ -41,48 +46,66 @@ begin
     l_zpr.id           := 1;
     l_zpr.name         := 'Звіт про дату зміни ліміту кредиту по БПК';
     l_zpr.namef        := '';
-    l_zpr.bindvars     := '';
+    l_zpr.bindvars     := ':sFdat1=''Дата з (DD.MM.YYYY)'',:sFdat2=''Дата по (DD.MM.YYYY)''';
     l_zpr.create_stmt  := '';
     l_zpr.rpt_template := 'rep_5714.frx';
     l_zpr.form_proc    := '';
     l_zpr.default_vars := '';
     l_zpr.bind_sql     := '';
     l_zpr.xml_encoding := 'CL8MSWIN1251';
-    l_zpr.txt          := 'select a.branch,c.NMK,c.okpo,c.rnk,w.CARD_CODE,wc.product_code,wp.grp_code, to_char(a.lim/100) lim_grn,to_char(u.chg_lim,''dd/mm/yyyy'') as chg_lim,to_char(b.DAOS,''dd/mm/yyyy'') as DAOS'||nlchr||
-                           'from (select * from accounts where nbs =2625 and dazs is null and lim > 0) a '||nlchr||
-                           '   inner join w4_acc w on a.acc=w.acc_pk'||nlchr||
-                           '   inner join w4_card wc on w.card_code=wc.code'||nlchr||
-                           '   inner join w4_product wp on wc.PRODUCT_CODE=wp.CODE'||nlchr||
-                           '   inner join customer c on a.rnk=c.rnk '||nlchr||
-                           '   inner join (select acc,daos from accounts where nbs =9129 and dazs is null) b on b.acc=w.acc_9129'||nlchr||
-                           '   inner join '||nlchr||
-                           '(SELECT a.acc,  max(a.chgdate) chg_lim'||nlchr||
-                           '  FROM accounts_update a, accounts_update b'||nlchr||
-                           ' WHERE  a.acc = b.acc'||nlchr||
-                           '   AND (   a.LIM <> b.LIM'||nlchr||
-                           '        OR a.LIM IS NULL AND b.LIM IS NOT NULL'||nlchr||
-                           '        OR a.LIM IS NOT NULL AND b.LIM IS NULL'||nlchr||
-                           '       )'||nlchr||
-                           '   AND a.idupd ='||nlchr||
-                           '          (SELECT MIN (idupd)'||nlchr||
-                           '             FROM accounts_update'||nlchr||
-                           '            WHERE acc = b.acc'||nlchr||
-                           '              AND idupd > b.idupd'||nlchr||
-                           '              AND (   LIM <> b.LIM'||nlchr||
-                           '                   OR LIM IS NULL AND b.LIM IS NOT NULL'||nlchr||
-                           '                   OR LIM IS NOT NULL AND b.LIM IS NULL'||nlchr||
-                           '                  ))'||nlchr||
-                           '   AND b.idupd ='||nlchr||
-                           '          (SELECT MAX (idupd)'||nlchr||
-                           '             FROM accounts_update'||nlchr||
-                           '            WHERE acc = a.acc'||nlchr||
-                           '              AND idupd < a.idupd'||nlchr||
-                           '              AND (   LIM <> a.LIM'||nlchr||
-                           '                   OR LIM IS NULL AND a.LIM IS NOT NULL'||nlchr||
-                           '                   OR LIM IS NOT NULL AND a.LIM IS NULL'||nlchr||
-                           '                  ))'||nlchr||
-                           ' GROUP BY a.acc ) u on a.acc=u.acc'||nlchr||
-                           'ORDER BY a.BRANCH,c.RNK';
+    l_zpr.txt          := 'select
+ a.branch,
+ c.NMK,
+ c.okpo,
+ c.rnk,
+ w.CARD_CODE,
+ wc.product_code,
+ wp.grp_code,
+ to_char(a.lim / 100) lim_grn,
+ to_char(u.chg_lim, ''dd/mm/yyyy'') as chg_lim,
+ to_char(b.DAOS, ''dd/mm/yyyy'') as DAOS
+  from accounts a,
+       w4_acc w,
+       w4_card wc,
+       w4_product wp,
+       customer c,
+       accounts b,
+       (SELECT u1.acc, max(u1.chgdate) chg_lim
+          FROM accounts_update u1, accounts_update u2
+         WHERE u1.acc = u2.acc
+           AND (u1.LIM <> u2.LIM OR u1.LIM IS NULL AND u2.LIM IS NOT NULL OR
+               u1.LIM IS NOT NULL AND u2.LIM IS NULL)
+           AND u1.idupd =
+               (SELECT MIN(idupd)
+                  FROM accounts_update
+                 WHERE acc = u2.acc
+                   AND idupd > u2.idupd
+                   AND (LIM <> u2.LIM OR LIM IS NULL AND u2.LIM IS NOT NULL OR
+                       LIM IS NOT NULL AND u2.LIM IS NULL))
+           AND u2.idupd =
+               (SELECT MAX(idupd)
+                  FROM accounts_update
+                 WHERE acc = u1.acc
+                   AND idupd < u1.idupd
+                   AND (LIM <> u1.LIM OR LIM IS NULL AND u1.LIM IS NOT NULL OR
+                       LIM IS NOT NULL AND u1.LIM IS NULL))
+         GROUP BY u1.acc) u
+ where a.nbs = ''2625''
+   and a.kf = sys_context(''bars_context'',''user_mfo'')
+   and a.daos between to_date(:sFdat1, ''dd.mm.yyyy'') and to_date(:sFdat2, ''dd.mm.yyyy'')
+   and a.dazs is null
+   and a.lim > 0
+   and w.acc_pk = a.acc
+   and w.kf = a.kf
+   and w.card_code = wc.code
+   and w.kf = wc.kf
+   and wc.PRODUCT_CODE = wp.CODE
+   and wc.kf= wp.kf
+   and a.rnk = c.rnk
+   and b.nbs = ''9129''
+   and b.dazs is null
+   and b.acc = w.acc_9129
+   and u.acc = a.acc';
     l_zpr.xsl_data     := '';
     l_zpr.xsd_data     := '';
 
@@ -115,8 +138,8 @@ begin
     l_rep.name        :='Empty';
     l_rep.description :='Звіт про дату зміни ліміту кредиту по БПК';
     l_rep.form        :='frm_FastReport';
-    l_rep.param       :=l_zpr.kodz||',3,sFdat,sFdat2,"",FALSE,FALSE';
-    l_rep.ndat        :=null;
+    l_rep.param       :=l_zpr.kodz||',3,sFdat,sFdat2,"",TRUE,FALSE';
+    l_rep.ndat        :=2;
     l_rep.mask        :='';
     l_rep.usearc      :=0;
     begin                                                                        
@@ -160,3 +183,9 @@ end;
 /                                           
                                             
 commit;                                     
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/Bars/Data/_BRS_SBR_REP_5714.sql =========*** End 
+PROMPT ===================================================================================== 

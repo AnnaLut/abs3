@@ -159,23 +159,23 @@ begin
   else
     dbms_output.put_line('В БМД не описана таблица ACCOUNTS для описания условий фильтра таблицы OPER.');
   end if;
-
-  -- добавляем описание для условий фильтра
+  
+  -- Удаляем из фильтра ОБ22 рахунку - А
   l_newtabid := bars_metabase.get_tabid('ACCOUNTS_F');
   l_newcolid := bars_metabase.get_colid(l_newtabid, 'NLS');
   l_varcolid := bars_metabase.get_colid(l_newtabid, 'OB22');
   if (l_newtabid is not null and l_newcolid is not null) then
-    bars_metabase.add_browsetbl(l_tabid, l_newtabid, '', '9', l_newcolid, l_varcolid, 'ОБ22 рахунку - А');
+    bars_metabase.delete_browsetbl(l_tabid, l_newtabid, null, '9', l_newcolid);
   else
     dbms_output.put_line('В БМД не описана таблица ACCOUNTS_F для описания условий фильтра таблицы OPER.');
   end if;
-
-  -- добавляем описание для условий фильтра
+  
+  -- Удаляем из фильтра ОБ22 рахунку - Б
   l_newtabid := bars_metabase.get_tabid('ACCOUNTS_F');
   l_newcolid := bars_metabase.get_colid(l_newtabid, 'NLS');
   l_varcolid := bars_metabase.get_colid(l_newtabid, 'OB22');
   if (l_newtabid is not null and l_newcolid is not null) then
-    bars_metabase.add_browsetbl(l_tabid, l_newtabid, '', '12', l_newcolid, l_varcolid, 'ОБ22 рахунку - Б');
+    bars_metabase.delete_browsetbl(l_tabid, l_newtabid, null, '12', l_newcolid);
   else
     dbms_output.put_line('В БМД не описана таблица ACCOUNTS_F для описания условий фильтра таблицы OPER.');
   end if;

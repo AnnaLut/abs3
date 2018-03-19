@@ -4,7 +4,6 @@ prompt == депозитів ФО по всьому ДЕПОЗИТНОМУ ПОРТФЕЛЮ за дату / за період
 prompt ===================================== 
 
 set serveroutput on
-set feed off       
 declare                               
 
    nlchr       char(2):=chr(13)||chr(10);
@@ -42,15 +41,15 @@ begin
     l_zpr.id           := 1;
     l_zpr.name         := 'Звіт про суми ненарахованих та невиплачених вкладів та відсотків';
     l_zpr.namef        := '';
-    l_zpr.bindvars     := ':sFdat1=''Дата виплати (DD.MM.YYYY)'',:sFdat2=''Банківська дата (DD.MM.YYYY)'',:BRANCH=''Вiддiлення(%-всі)''';
+    l_zpr.bindvars     := ':sFdat2=''Дата виплати (DD.MM.YYYY)'',:BRANCH=''Вiддiлення(%-всі)''';
     l_zpr.create_stmt  := '';
     l_zpr.rpt_template := 'rep_5504.frx';
     l_zpr.form_proc    := '';
     l_zpr.default_vars := ':BRANCH=''%''';
     l_zpr.bind_sql     := ':BRANCH=''V_BRANCH_OWN|BRANCH|NAME''';
     l_zpr.xml_encoding := 'CL8MSWIN1251';
-    l_zpr.txt          := 'select d.branch, d.rnk, d.nd, a.nls, a.nbs, (a.ostc/100) ostc, d.deposit_id, d.kv,
-                   dpt.get_intpaydate(:sFdat2,
+    l_zpr.txt          := 'select d.branch, c.okpo, d.nd, a.nls, a.nbs, (a.ostc/100) ostc, d.deposit_id, d.kv,
+                   dpt.get_intpaydate(to_date(gl.bd, ''dd.mm.yyyy''),
                                       d.dat_begin,
                                       d.dat_end,
                                       d.freq,
@@ -59,84 +58,88 @@ begin
                                       1) plandate,
                    v.comproc,
                    v.limit
-              from dpt_deposit d, dpt_vidd v, accounts a
+              from dpt_deposit d, dpt_vidd v, accounts a, customer c
              where d.vidd = v.vidd
                and d.acc = a.acc
                and d.kv = a.kv
+               and d.rnk = c.rnk
                and d.branch like :BRANCH||''%''
               -- and p_dptid = 0 -- депозитный портфель
                and d.mfo_p is not null
                and d.nls_p is not null
-               and dpt.get_intpaydate(:sFdat2,
-                                      d.dat_begin,
-                                      d.dat_end,
-                                      d.freq,
-                                      decode(v.amr_metr, 0, 0, 1),
-                                      decode(nvl(d.cnt_dubl, 0), 0, 0, 1),
-                                      1) between :sFdat1 and :sFdat2
-              union all
-select ''Всього по рах. 2638:'', null, null, null, a.nbs, sum(a.ostc)/100 ostc, null, d.kv,
-                   null,
-                   null,
-                   null
-              from dpt_deposit d, dpt_vidd v, accounts a
-             where d.vidd = v.vidd
-               and d.acc = a.acc
-               and d.kv = a.kv
-               and d.branch like :BRANCH||''%''
-              -- and p_dptid = 0 -- депозитный портфель
-               and d.mfo_p is not null
-               and d.nls_p is not null
-               and a.nbs = ''2638''
-               and dpt.get_intpaydate(:sFdat2,
-                                      d.dat_begin,
-                                      d.dat_end,
-                                      d.freq,
-                                      decode(v.amr_metr, 0, 0, 1),
-                                      decode(nvl(d.cnt_dubl, 0), 0, 0, 1),
-                                      1) between :sFdat1 and :sFdat2 group by d.kv, a.nbs
+               and dpt.get_intpaydate(to_date(:sFdat2,''dd.mm.yyyy''),
+                                  d.dat_begin,
+                                  d.dat_end,
+                                  d.freq,
+                                  decode(v.amr_metr, 0, 0, 1),
+                                  decode(nvl(d.cnt_dubl, 0), 0, 0, 1),
+                                  1) = to_date(:sFdat2,''dd.mm.yyyy'') 
                 union all
 select ''Всього неперераховано на рах. 2630'', null, null, null, a.nbs, sum(a.ostc)/100 ostc, null, d.kv,
                    null,
                    null,
                    null
-              from dpt_deposit d, dpt_vidd v, accounts a
+              from dpt_deposit d, dpt_vidd v, accounts a, customer c
              where d.vidd = v.vidd
                and d.acc = a.acc
                and d.kv = a.kv
+               and d.rnk = c.rnk 
                and d.branch like :BRANCH||''%''
               -- and p_dptid = 0 -- депозитный портфель
                and d.mfo_p is not null
                and d.nls_p is not null
                and a.nbs = ''2630''
-               and dpt.get_intpaydate(:sFdat2,
-                                      d.dat_begin,
-                                      d.dat_end,
-                                      d.freq,
-                                      decode(v.amr_metr, 0, 0, 1),
-                                      decode(nvl(d.cnt_dubl, 0), 0, 0, 1),
-                                      1) between :sFdat1 and :sFdat2 group by d.kv, a.nbs
+               and dpt.get_intpaydate(to_date(:sFdat2,''dd.mm.yyyy''),
+                                 d.dat_begin,
+                                 d.dat_end,
+                                 d.freq,
+                                 decode(v.amr_metr, 0, 0, 1),
+                                 decode(nvl(d.cnt_dubl, 0), 0, 0, 1),
+                                 1) = to_date(:sFdat2,''dd.mm.yyyy'')  group by d.kv, a.nbs
                union all
 select ''Всього неперераховано на рах. 2635:'', null, null, null, a.nbs, sum(a.ostc)/100 ostc, null, d.kv,
                    null,
                    null,
                    null
-              from dpt_deposit d, dpt_vidd v, accounts a
+              from dpt_deposit d, dpt_vidd v, accounts a, customer c
              where d.vidd = v.vidd
                and d.acc = a.acc
                and d.kv = a.kv
+               and d.rnk = c.rnk 
                and d.branch like :BRANCH||''%''
               -- and p_dptid = 0 -- депозитный портфель
                and d.mfo_p is not null
                and d.nls_p is not null
                and a.nbs = ''2635''
-               and dpt.get_intpaydate(:sFdat2,
-                                      d.dat_begin,
-                                      d.dat_end,
-                                      d.freq,
-                                      decode(v.amr_metr, 0, 0, 1),
-                                      decode(nvl(d.cnt_dubl, 0), 0, 0, 1),
-                                      1) between :sFdat1 and :sFdat2 group by d.kv, a.nbs';
+               and dpt.get_intpaydate(to_date(:sFdat2,''dd.mm.yyyy''),
+                                 d.dat_begin,
+                                 d.dat_end,
+                                 d.freq,
+                                 decode(v.amr_metr, 0, 0, 1),
+                                 decode(nvl(d.cnt_dubl, 0), 0, 0, 1),
+                                 1) = to_date(:sFdat2,''dd.mm.yyyy'')  group by d.kv, a.nbs
+               union all
+select ''Всього по рах. 2638:'', null, null, null, a.nbs, sum(a.ostc)/100 ostc, null, d.kv,
+                   null,
+                   null,
+                   null
+              from dpt_deposit d, dpt_vidd v, accounts a, customer c
+             where d.vidd = v.vidd
+               and d.acc = a.acc
+               and d.kv = a.kv
+               and d.rnk = c.rnk 
+               and d.branch like :BRANCH||''%''
+              -- and p_dptid = 0 -- депозитный портфель
+               and d.mfo_p is not null
+               and d.nls_p is not null
+               and a.nbs = ''2638''
+               and dpt.get_intpaydate(to_date(:sFdat2,''dd.mm.yyyy''),
+                                 d.dat_begin,
+                                 d.dat_end,
+                                 d.freq,
+                                 decode(v.amr_metr, 0, 0, 1),
+                                 decode(nvl(d.cnt_dubl, 0), 0, 0, 1),
+                                 1) = to_date(:sFdat2,''dd.mm.yyyy'')  group by d.kv, a.nbs';
     l_zpr.xsl_data     := '';
     l_zpr.xsd_data     := '';
 
