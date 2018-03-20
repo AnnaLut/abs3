@@ -574,11 +574,39 @@ begin
 
 end;
 ---------
-procedure  copy_operw ( p_ref_new operw.ref%TYPE,
-                        p_ref_old operw.ref%TYPE) is
+procedure copy_operw(p_ref_new operw.ref%TYPE, p_ref_old operw.ref%TYPE) is
 begin
-  insert into operw 
-     select p_ref_new, w.tag,w.value,w.kf from operw w where w.ref=p_ref_old;        
+  insert into operw
+    select p_ref_new, w.tag, w.value, w.kf
+      from operw w
+     where w.ref = p_ref_old;
+
+  for i in (select *
+              from oper o
+              join t902 t
+                on t.ref = o.ref
+             where o.ref = p_ref_old
+               and o.d_rec like ('%#fMT%')
+               and t.otm = 0) loop
+    begin
+      insert into operw
+        (ref, tag, value)
+      values
+        (p_ref_new, 'NOS_A', '0');
+    exception
+      when dup_val_on_index then
+        null;
+    end;
+    begin
+      insert into operw
+        (ref, tag, value)
+      values
+        (p_ref_new, 'f', SUBSTR(i.d_rec, 7, 6));
+    exception
+      when dup_val_on_index then
+        null;
+    end;
+  end loop;
 end;
 
 end;
