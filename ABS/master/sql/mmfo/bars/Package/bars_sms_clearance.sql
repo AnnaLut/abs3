@@ -2,7 +2,6 @@
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_sms_clearance.sql =========*** 
  PROMPT ===================================================================================== 
- 
 CREATE OR REPLACE PACKAGE BODY bars_sms_clearance
 IS
    ----
@@ -457,14 +456,14 @@ IS
       END;
 
       p_acc_clearance := acc1_;
-      
-      
-    
+
+
+
 
       --заносимо дані в таблицю зв'язку рахунок=рахунок оплати за СМС
       INSERT INTO SMS_ACC_CLEARANCE (acc, ACC_CLEARANCE)
            VALUES (p_acc_parent, p_acc_clearance);
-      Exception when dup_val_on_index then null;     
+      Exception when dup_val_on_index then null;
 
       logger.info (
             'open_3570. для счета ACC='
@@ -1126,6 +1125,7 @@ IS
       l_acc_clearance_exp   accounts.acc%TYPE;
       l_clearance_exp       NUMBER;
       l_fost            NUMBER;
+      l_fost_overdraft  NUMBER;
    BEGIN
       logger.info ('pay_clearance_exp. Для счета ACC=' || p_acc_parent);
       find_clearance_exp (p_acc_parent, l_acc_clearance_exp, l_clearance_exp); --шукаємо рахунок заборгованості та заборгованість
@@ -1168,13 +1168,35 @@ IS
             || ' погашено ');
       END IF;
 
-      IF ( (l_fost < ABS (l_clearance_exp)) AND l_clearance_exp < 0)
-      THEN --якщо э заборгованість і на рахунку менше грошей ніж заборгованість то платимо все що є
+      IF ( (l_fost < ABS (l_clearance_exp)) AND l_clearance_exp < 0) then
+		   -- проверка на овердрафт
+        IF  l_fost<0 then  select (LIM+l_fost) OST into l_fost_overdraft  from accounts where acc=p_acc_parent;
+           IF (l_fost_overdraft>0 and (l_fost_overdraft>=abs(l_clearance_exp))) then
+              create_paydoc_clearance (p_acc_parent,
+                                      l_acc_clearance_exp,
+                                      ABS (l_clearance_exp)); --платимо
+               logger.info (
+               'pay_clearance_exp. Для счета ACC='
+               || p_acc_parent
+               || ' l_clearance_exp ='
+               || l_clearance_exp
+               || ' погашено');
+            ELSE
+                logger.info (
+               'pay_clearance_exp. Для счета ACC='
+               || p_acc_parent
+               || ' Овердрафт перевишив лимит кредитних коштів');
+               raise_application_error(-20000,'Овердрафт перевишив лимит кредитних коштів');
+            END IF;
+           --проверка на овердрафт
+        ELSE
+       --якщо э заборгованість і на рахунку менше грошей ніж заборгованість то платимо все що є
          create_paydoc_clearance (p_acc_parent, l_acc_clearance_exp, l_fost); --платимо
          logger.info (
                'pay_clearance_exp. Для счета ACC='
             || p_acc_parent
             || ' погашено частково');
+      END IF;      
       END IF;
    END pay_clearance_exp;
 
@@ -1186,6 +1208,7 @@ IS
    IS
       l_acc_clearance   accounts.acc%TYPE;
       l_cnt_sms         NUMBER;
+
       l_clearance       NUMBER;
       l_fost            NUMBER;
    BEGIN
@@ -1216,7 +1239,6 @@ IS
             || ' немає заборгованості для погашення ');
          RETURN;
       END IF;
-
 
       logger.info (
             'pay_clearance. Для счета ACC='
