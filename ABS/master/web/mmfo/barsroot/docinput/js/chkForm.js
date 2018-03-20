@@ -71,18 +71,18 @@ function Validate(form) {
 
     if (document.getElementById("__VOBCONFIRM").value == '1' && form.VobList.options.length > 1)
         if (Dialog(LocalizedString('Message8') + " <br>'" +
-		form.VobList.options[form.VobList.selectedIndex].text +
-		"'(VOB=" + form.VobList.options[form.VobList.selectedIndex].value + ")?", "confirm") != 1) return false;
+            form.VobList.options[form.VobList.selectedIndex].text +
+            "'(VOB=" + form.VobList.options[form.VobList.selectedIndex].value + ")?", "confirm") != 1) return false;
 
     // show customer verification card, if needed
     if (form.__IS_NEED_CHECK_TT.value == 1) {
         var tt = document.getElementById("__TT").value;
         var ttCheckedRes = CheckTTForPayVerification(tt);
-        if(ttCheckedRes){
+        if (ttCheckedRes) {
             var rnk = form.__RNK_A.value;
             var result = window.showModalDialog(encodeURI('/barsroot/PaymentVerification/PaymentVerification?rnk=' + rnk),
                 null, 'dialogWidth: 640px; dialogHeight: 480px; center: yes; status: no');
-            if (!result){
+            if (!result) {
                 return;
             }
         }
@@ -91,7 +91,7 @@ function Validate(form) {
     //    Перевірка на блокування рахунків 2625, 2605     (COBUMMFO-3907)
     var nls = form.__DK.value != 0 ? form.Nls_A.value : form.Nls_B.value;
     var maskAcc = nls.slice(0, 4);
-    if(maskAcc == "2625" || maskAcc == "2605"){
+    if (maskAcc == "2625" || maskAcc == "2605") {
         if (null == webService.Doc) webService.useService("DocService.asmx?wsdl", "Doc");
         var callObj = webService.createCallOptions();
         callObj.async = false;
@@ -113,10 +113,10 @@ function Validate(form) {
             document.getElementById("btPayIt").disabled = true;
             callOplDoc(form, result);
         },
-		function (errorText) {
-		    document.getElementById("btPayIt").disabled = false;
-		    alert(errorText);
-		});
+            function (errorText) {
+                document.getElementById("btPayIt").disabled = false;
+                alert(errorText);
+            });
     }
     else { // все по старому
         if (!(document.getElementById("btPayIt").disabled = signDoc(form))) return false;
@@ -157,7 +157,7 @@ function chkDate(name) {
     var vobList = document.getElementById("VobList");
     if (vobList.options.length > 0) {
         if (vobList.options[vobList.selectedIndex].value == "96" ||
-    	  vobList.options[vobList.selectedIndex].value == "99")
+            vobList.options[vobList.selectedIndex].value == "99")
             return true;
     }
 
@@ -223,16 +223,16 @@ function chkQDoc(form) {
             var newLink = location.href;
 
             newLink = newLink.replace("?qdoc=" + getParamFromUrl("qdoc", location.search),
-        "?qdoc=" + encodeURIComponent("-"));
+                "?qdoc=" + encodeURIComponent("-"));
 
             newLink = newLink.replace("&tt=" + document.getElementById("__TT").value,
-        "&tt=" + form.qDocsTT_dk2.value);
+                "&tt=" + form.qDocsTT_dk2.value);
 
             newLink = newLink.replace("&nazn=" + getParamFromUrl("nazn", location.search),
-        "&nazn=" + encodeURIComponent(form.qDocsNaznReturn.value));
+                "&nazn=" + encodeURIComponent(form.qDocsNaznReturn.value));
 
             newLink = newLink.replace("&drec_?=" + getParamFromUrl("drec_?", location.search),
-        "&drec_-=" + encodeURIComponent(dRec.replace("?", "-")));
+                "&drec_-=" + encodeURIComponent(dRec.replace("?", "-")));
 
             location.replace(newLink);
             return false;
@@ -321,7 +321,7 @@ function checkKv(type, form) {
         form.Kv_B.value = form.Kv_A.value;
         form.Kv_B.fireEvent("onchange");
     }
-        //KV_B
+    //KV_B
     else if (type == 1) {
         form.Kv_B.value = form.Kv_B.value.toUpperCase();
         form.Kv_A.value = form.Kv_B.value;
@@ -350,8 +350,7 @@ function isFilled(n, elem) {
 function isFilledOkpo(elem) {
     if (elem.style.visibility == 'hidden' || elem.readOnly) return true;
     var str = elem.value;
-    if (isNaN(str))
-    { alert(elem.title + ".\n " + LocalizedString('Message12')); return false; }
+    if (isNaN(str)) { alert(elem.title + ".\n " + LocalizedString('Message12')); return false; }
 
     if ((str.length > 8 && str.length < 11) || str == '99999')
         return true;
@@ -362,8 +361,7 @@ function isFilledOkpo(elem) {
     }
     if (str != '00000000' && str == v_okpo(str))
         return true;
-    else
-    { alert(elem.title + ".\n " + LocalizedString('Message13')); elem.focus(); return false; };
+    else { alert(elem.title + ".\n " + LocalizedString('Message13')); elem.focus(); return false; };
 }
 
 function v_okpo(okpo) {
@@ -439,7 +437,7 @@ function chkCustomReq(reqName) {
     // Дата рождения DRDAY
     if (reqName == 'DRDAY' || checkAll) {
         var elem = document.getElementById('reqv_DRDAY');
-        if (elem  && elem.value) {
+        if (elem && elem.value) {
             var reqDateS = elem.value;
             elem.value = reqDateS.replace(/\//g, '.');
             // проверяем формат даты DD.MM.YYYY
@@ -476,7 +474,7 @@ function chkCustomReq(reqName) {
                 elem.value = '';
                 return false;
             }
-                // 36 524.2199 - 100 років
+            // 36 524.2199 - 100 років
             else if (days > 36524) {
                 alert('Невірне значення реквізиту [Дата народження] - різниця з датою документа більше 100 років.');
                 elem.value = '';
@@ -573,8 +571,10 @@ function chkDrec(form) {
         // Якщо поля Nls_B та Id_B не змінювалися, повертаємо в форму значення Drec та сповіщуємо про необхідність внесення змін в OKPO чи MFO
         if (form.__Nls_B.value === form.Nls_B.value && form.__Id_B.value === form.Id_B.value) {
             form.Drec.value = drec;
-            alert(LocalizedString("Message34"));
-            return false;
+            if (form.__DK.value == 2 || form.__DK.value == 3) {
+                alert(LocalizedString("Message34"));
+                return false;
+            }
         }
         // Якщо змінилися і Nls_B і Id_B
         if (form.__Nls_B.value !== form.Nls_B.value && form.__Id_B.value !== form.Id_B.value) {
@@ -607,15 +607,15 @@ function AskBeforePay() {
     var height = 250;
     if (elem > 0) {
         paramlist += "Sum=" + Math.round(elem * kop_a)
-    + "&Kv=" + document.getElementById("Kv_A").value;
+            + "&Kv=" + document.getElementById("Kv_A").value;
     } else {
         var elemA = GetValue("SumA");
         var elemB = GetValue("SumB");
         if (elemA > 0 && elemB > 0) {
             paramlist += "SumA=" + Math.round(elemA * kop_a)
-		+ "&KvA=" + document.getElementById("Kv_A").value;
+                + "&KvA=" + document.getElementById("Kv_A").value;
             paramlist += "&SumB=" + Math.round(elemB * kop_b)
-		+ "&KvB=" + document.getElementById("Kv_B").value;
+                + "&KvB=" + document.getElementById("Kv_B").value;
         } else {
             alert(LocalizedString('Message17'));
             return false;
@@ -633,7 +633,7 @@ function AskBeforePay() {
         height = 400;
     }
     var result = window.showModalDialog("AskBeforePay.aspx" + paramlist, null,
-  "dialogWidth:500px; dialogHeight:" + height + "px; center:yes; status:no; resizable:yes; help:no;");
+        "dialogWidth:500px; dialogHeight:" + height + "px; center:yes; status:no; resizable:yes; help:no;");
     return result;
 }
 
@@ -647,7 +647,7 @@ function chkCashSymbol() {
     var vSK = parseInt(eSK.value);
     var vDK = parseInt(eDK.value);
     if ((0 == vDK || 2 == vDK) && vSK < 40
-   || (1 == vDK || 3 == vDK) && vSK >= 40) {
+        || (1 == vDK || 3 == vDK) && vSK >= 40) {
         var isOk = cDocHand(4, eSK.form);
         if (!isOk) {
             eSK.focus();
@@ -678,7 +678,7 @@ function chkCashSymbol_link(ctrl_nazn) {
     var vSK = parseInt(eSK.value);
     var vDK = parseInt(eDK.value);
     if ((0 == vDK || 2 == vDK) && vSK < 40
-   || (1 == vDK || 3 == vDK) && vSK >= 40) {
+        || (1 == vDK || 3 == vDK) && vSK >= 40) {
         var isOk = cDocHand_link(eSK.form, 4, event.srcElement, ctrl_nazn);
         if (!isOk) {
             eSK.focus();
@@ -762,8 +762,8 @@ function selectAccounts(evt, elem, fl) {
         }
         var tt = document.getElementById("__TT").value;
         var result = window.showModalDialog("dialog.aspx?type=metatab_base&role=wr_doc_input&dk=" + type + "&nls=" + elem.value + "&mfo=" + mfo + "&kv=" + kv + "&tt=" + tt,
-			window,
-			"dialogWidth:600px;dialogHeight:600px;center:yes;edge:sunken;help:no;status:no;");
+            window,
+            "dialogWidth:600px;dialogHeight:600px;center:yes;edge:sunken;help:no;status:no;");
         if (result != null) {
             if (1 == e_n) {
                 if (-1 != type) {
@@ -822,7 +822,7 @@ function selectNazn(evt) {
         }
     }
 }
- 
+
 function selectDopReq(evt, name, fl) {
     var elem = document.getElementsByName(name)[0];
     if (document.getElementsByName(name).length > 1) {
@@ -844,7 +844,7 @@ function selectDopReq(evt, name, fl) {
             window,
             "dialogWidth:600px;dialogHeight:600px;center:yes;edge:sunken;help:no;status:no;");
         if (result != null) {
-            if (name === "reqv_INK_I") 
+            if (name === "reqv_INK_I")
                 BindIncasatorsData(result[0]);
             elem.value = result[0];
             elem.fireEvent("onchange");
@@ -879,12 +879,12 @@ function selectDopReqExt(evt, name, fl) {
     var reqvalue = escape(elem.value);
     reqname += "[split]dfNlsA[split]dfNlsB[split]dfKvA[split]dfKvB";
     reqvalue += "[split]" + document.getElementById("Nls_A").value + "[split]" + document.getElementById("Nls_B").value + "[split]" + document.getElementById("Kv_A").value + "[split]" + document.getElementById("Kv_B").value;
-    
+
     if (VK_F12 == charCode || 1 == fl) {
         var tail = "''";
         var result = window.showModalDialog("dialog.aspx?type=metatab_req&role=wr_doc_input&reqname=" + reqname + "&reqvalue=" + reqvalue,
-			window,
-			"dialogWidth:600px;dialogHeight:600px;center:yes;edge:sunken;help:no;status:no;");
+            window,
+            "dialogWidth:600px;dialogHeight:600px;center:yes;edge:sunken;help:no;status:no;");
         if (result != null) {
             elem.value = result[0];
             if (elem.id === 'reqv_KOD_N') {
@@ -921,8 +921,7 @@ function validateKodN() {
     webService.Doc.callService(onCheckKodN, "CheckKodN", tt, kodN);
 }
 
-function setValidatedReq(item)
-{
+function setValidatedReq(item) {
     var elem = document.getElementById('reqv_' + item.Name);
     var elemLb = document.getElementById('lb_reqv_' + item.Name);
     if (elem) {
@@ -943,8 +942,7 @@ function onCheckKodN(result) {
         setValidatedReq({ Name: 'KOD_B', Value: '', IsEdit: true, IsEmpty: document.getElementById('reqv_KOD_B').required === '0' });
         setValidatedReq({ Name: 'KOD_G', Value: '', IsEdit: true, IsEmpty: document.getElementById('reqv_KOD_G').required === '0' });
     }
-    for (var i = 0; i < result.value.length; i++)
-    {
+    for (var i = 0; i < result.value.length; i++) {
         var item = result.value[i];
         setValidatedReq(item);
     }
@@ -972,8 +970,8 @@ function selectAccounts_link(evt, elem, fl, ctrl_nls, ctrl_nms, e_n) {
         }
         var tt = document.getElementById("__TT").value;
         var result = window.showModalDialog("dialog.aspx?type=metatab_base&role=wr_doc_input&dk=" + type + "&nls=" + elem.value + "&mfo=" + mfo + "&kv=" + kv + "&tt=" + tt,
-			window,
-			"dialogWidth:600px;dialogHeight:600px;center:yes;edge:sunken;help:no;status:no;");
+            window,
+            "dialogWidth:600px;dialogHeight:600px;center:yes;edge:sunken;help:no;status:no;");
         if (result != null) {
             document.getElementById(ctrl_nls).value = result[0];
             document.getElementById(ctrl_nms).value = result[2];

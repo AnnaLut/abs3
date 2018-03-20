@@ -133,14 +133,15 @@ namespace BarsWeb.Areas.Sep.Infrastructure.Repository.DI.Implementation
                                  a.datd DATD,
                                  a.datp DATP,
                                  a.id_a OKPOA,
-                                 nvl(k.okpo,a.id_b) OKPOB,
+                                 case when t.rec_o is not null then nvl(k.okpo,a.id_b )
+                                 else a.id_b 
+                                 end OKPOB,
                                  s.nms NAMB2,
                                  CASE
                                     WHEN    s.nls IS NOT NULL
                                          OR nvl((SELECT nlsb
                                                FROM arc_rrp
-                                              WHERE rec = t.rec_o), a.nlsb) <> a.nlsb
-                                               
+                                              WHERE rec = t.rec_o), a.nlsb) <> a.nlsb                                               
                                     THEN
                                        1
                                     ELSE
