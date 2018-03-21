@@ -28,7 +28,15 @@ COMMENT ON COLUMN BARSAQ.TMP_ACC.ACC_NUM IS 'Номер счета';
 COMMENT ON COLUMN BARSAQ.TMP_ACC.CUR_ID IS 'Код валюты';
 COMMENT ON COLUMN BARSAQ.TMP_ACC.DAPP IS 'Дата последнего движения';
 
-
+-- Create/Recreate primary, unique and foreign key constraints 
+begin
+    execute immediate 'alter table TMP_ACC
+  add constraint PK_TMP_ACC primary key (ACC)';
+ exception when others then 
+    if sqlcode = -2261 or sqlcode = -2260 then null; else raise; 
+    end if; 
+end;
+/ 
 
 PROMPT *** Create  grants  TMP_ACC ***
 grant SELECT                                                                 on TMP_ACC         to BARSREADER_ROLE;
