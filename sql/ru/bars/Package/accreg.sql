@@ -5,7 +5,7 @@ is
 -- (C) BARS. Accounts
 --***************************************************************************--
 
-g_head_version constant varchar2(64)  := 'Version 2.10  11/01/2018';
+g_head_version constant varchar2(64)  := 'Version 3.3  07/02/2018';
 g_head_defs    constant varchar2(512) := '';
 
 /* header_version - возвращает версию заголовка пакета */
@@ -183,14 +183,17 @@ procedure p_acc_restore (
 -- Reservation of the account number
 --
 procedure RSRV_ACC_NUM
-( p_nls      in     accounts_rsrv.nls%type            -- Account  number
-, p_kv       in     accounts_rsrv.kv%type             -- Currency code
-, p_nms      in     accounts_rsrv.nms%type            -- Account name
-, p_branch   in     accounts_rsrv.branch%type         -- 
-, p_isp      in     accounts_rsrv.isp%type            -- 
-, p_rnk      in     accounts_rsrv.rnk%type            -- Customer number
-, p_agrm_num in     accountsw.value%type default null -- 
---, p_errmsg      out varchar2
+( p_nls      in     accounts_rsrv.nls%type                   -- Account  number
+, p_kv       in     accounts_rsrv.kv%type                    -- Currency code
+, p_nms      in     accounts_rsrv.nms%type                   -- Account name
+, p_branch   in     accounts_rsrv.branch%type                -- 
+, p_isp      in     accounts_rsrv.isp%type                   -- 
+, p_vid      in     accounts_rsrv.vid%type                   -- 
+, p_rnk      in     accounts_rsrv.rnk%type                   -- Customer number
+, p_agrm_num in     accounts_rsrv.agrm_num%type default null -- номер договору банківського обслуговування
+, p_trf_id   in     accounts_rsrv.trf_id%type   default null -- код тарифного пакету
+, p_ob22     in     accounts_rsrv.ob22%type     default null -- 
+, p_errmsg      out varchar2
 );
 
 --
@@ -201,34 +204,9 @@ procedure CNCL_RSRV_ACC_NUM
 , p_kv       in     accounts_rsrv.kv%type
 );
 
---
--- P_RESERVE_ACC
---
-procedure P_RESERVE_ACC
-( p_acc      in out accounts.acc%type
-, p_rnk      in     accounts.rnk%type                 -- Customer number
-, p_nls      in     accounts.nls%type                 -- Account  number
-, p_kv       in     accounts.kv%type                  -- Currency code
-, p_nms      in     accounts.nms%type                 -- Account name
-, p_tip      in     accounts.tip%type                 -- Account type
-, p_grp      in     accounts.grp%type                 -- 
-, p_isp      in     accounts.isp%type                 -- 
-, p_pap      in     accounts.pap%type    default null -- 
-, p_vid      in     accounts.vid%type    default null -- 
-, p_pos      in     accounts.pos%type    default null -- 
-, p_blkd     in     accounts.blkd%type   default null -- 
-, p_blkk     in     accounts.blkk%type   default null -- 
-, p_lim      in     accounts.lim%type    default null -- 
-, p_ostx     in     accounts.ostx%type   default null -- 
-, p_nlsalt   in     accounts.nlsalt%type default null -- 
-, p_branch   in     accounts.branch%type default null -- 
-, p_ob22     in     accounts.ob22%type   default null -- OB22
-, p_agrm_num in     accountsw.value%type default null -- номер договору банківського обслуговування
-, p_trf_id   in     sh_tarif.ids%type    default null -- код тарифного пакету
-);
-
 procedure REJECT_RESERVE_ACC
-( p_acc      in     accounts.acc%type
+( p_nls      in     accounts_rsrv.nls%type
+, p_kv       in     accounts_rsrv.kv%type
 , p_errmsg      out varchar2
 );
 
@@ -243,9 +221,9 @@ procedure check_user_permissions
 -- P_UNRESERVE_ACC
 --
 procedure P_UNRESERVE_ACC
-( p_acc      in     accounts.acc%type
-, p_flagopen in     number default 1
-, p_ob22     in     accounts.ob22%type default null
+( p_nls      in     accounts.nls%type
+, p_kv       in     accounts.kv%type
+, p_acc         out accounts.acc%type
 );
 
 procedure UNRSRV_ACC
@@ -287,7 +265,7 @@ is
   --***************************************************************************--
   g_modcode       constant varchar2(3) := 'CAC';
 
-  g_body_version  constant varchar2(64)  := 'version 2.4  23/01/2018';
+  g_body_version  constant varchar2(64)  := 'version 2.9  07/02/2018';
   g_body_defs     constant varchar2(512) := ''
 $if ACC_PARAMS.KOD_D6
 $then
@@ -604,10 +582,14 @@ procedure OPN_ACC
   l_blkd                  accounts.blkd%type;
   l_nbs                   accounts.nbs%type;
   l_tip                   accounts.tip%type;
+  l_opn_dt                date;
+  l_cls_dt                date;
 begin
 
   bars_audit.trace( '%s: Entry with ( rnk=%s, nls=%s, kv=%s, nms=%s, ob22=%s ).'
                   , title, to_char(p_rnk), p_nls, to_char(p_kv), p_nms, p_ob22 );
+
+  DBMS_APPLICATION_INFO.SET_ACTION( title );
 
   l_blkd := p_blkd;
 
@@ -729,19 +711,43 @@ $end
 
   if ( p_ob22 Is Not Null )
   then
+  
+    if ( l_nbs Not Like '8%' )
+    then
+      begin
+
+        select D_OPEN,   D_CLOSE
+          into l_opn_dt, l_cls_dt
+          from SB_OB22
+         where R020 = l_nbs
+           and OB22 = p_ob22;
+
+        case
+          when ( l_opn_dt > gl.bd )
+          then raise_application_error(-20666, 'Код OB22 "'||p_ob22||'" для R020 "'||l_nbs||'" діє з '    ||to_char(l_opn_dt,'dd.MM.yyyy'), true );
+          when ( l_cls_dt <= gl.bd )
+          then raise_application_error(-20666, 'Код OB22 "'||p_ob22||'" для R020 "'||l_nbs||'" закрито з '||to_char(l_cls_dt,'dd.MM.yyyy'), true );
+          else null;
+        end case;
+
+      exception
+        when NO_DATA_FOUND then
+          raise_application_error(-20666, 'Код OB22 "'||p_ob22||'" для R020 "'||l_nbs||'" відсутній в довіднику!', true );
+      end;
+    end if;
+
     SetAccountSParam( p_acc, 'OB22', p_ob22 );
+
   end if;
 
   if ( p_mdate Is Not Null )
   then
     SetAccountSParam( p_acc, 'MDATE', to_char(p_mdate,'dd/MM/yyyy') );
   end if;
-  
-  set_default_sparams( p_acc); -- проставляем умолчательные значения спецпараметров
 
 $if ACC_PARAMS.MMFO
 $then
-  if ( BARS_DPA.DPA_NBS( l_nbs, p_ob22 ) = 1 )
+  if ( BARS_DPA.DPA_NBS( p_nbs, p_ob22 ) = 1 )
   then -- COBUMMFO-4028
     BARS_DPA.ACCOUNTS_TAX( p_acc  => p_acc
                          , p_daos => trunc(SYSDATE)
@@ -757,6 +763,8 @@ $then
   end if;
 $end
   bars_audit.trace( '%s: Exit with acc=%s.', title, to_char(p_acc) );
+
+  DBMS_APPLICATION_INFO.SET_ACTION( null );
 
 end OPN_ACC;
 
@@ -1786,7 +1794,7 @@ procedure closeAccount
 --   недоначислены %% ! Продолжать закрытие счета?
 --   Счет начисления %% может еще быть задействован! Продолжать закрытие счета?
 is
-  title      constant varchar2(64) := $$PLSQL_UNIT || 'closeAccount';
+  title      constant varchar2(64) := $$PLSQL_UNIT || '.CloseAccount';
   l_bankdate date;
   l_ostc     accounts.ostc%type;
   l_ostb     accounts.ostb%type;
@@ -1802,9 +1810,9 @@ is
   l_rnk      accounts.rnk%type;
 begin
 
-  DBMS_APPLICATION_INFO.SET_ACTION( 'ACCREG.CloseAccount' );
-
   bars_audit.info( title||': Entry with ( p_acc=>'||to_char(p_acc)||' ).' );
+
+  DBMS_APPLICATION_INFO.SET_ACTION( title );
 
   -- признак: счет закрывать нельзя
   p_can_close := 0;
@@ -1977,47 +1985,8 @@ procedure P_ACC_RESTORE
   l_dapp     date;
   l_acc_tp   accounts.tip%type;
   l_r020     accounts.nbs%type;
+  l_rnk      accounts.rnk%type;
   l_active   number(1);
-  ---<NEWNBS>---
-  r_tfm_fc   transform_2017_forecast%rowtype;
-  
-  procedure CHK_EXISTENCE
-  is
-    l_exst  number(1);
-  begin
-
-    begin
-
-      select 1 -- existent
-        into l_exst
-        from ACCOUNTS
-       where KF  = r_tfm_fc.KF
-         and NLS = r_tfm_fc.NEW_NLS
-         and KV  = r_tfm_fc.KV
-       union 
-      select 1 -- forecast
-        from TRANSFORM_2017_FORECAST
-       where KF      = r_tfm_fc.KF
-         and NEW_NLS = r_tfm_fc.NEW_NLS
-         and KV      = r_tfm_fc.KV
-       union 
-      select 1 -- reserved
-        from ACCOUNTS_RSRV
-       where KF  = r_tfm_fc.KF
-         and NLS = r_tfm_fc.NEW_NLS
-         and KV  = r_tfm_fc.KV;
-
-      r_tfm_fc.NEW_NLS := VKRZN( substr(r_tfm_fc.KF,1,5), r_tfm_fc.NEW_NBS||'0'||trunc(dbms_random.value(100000000,999999999)) );
-
-      CHK_EXISTENCE();
-
-    exception
-      when NO_DATA_FOUND then
-        null;
-    end;
-
-  end CHK_EXISTENCE;
-  ---<NEWNBS>---
 begin
 
   DBMS_APPLICATION_INFO.SET_ACTION( 'ACCREG.RestoreAccount' );
@@ -2025,64 +1994,37 @@ begin
   bars_audit.info( title||': Entry with ( p_acc=>'||to_char(p_acc)
                         ||', p_daos=>'||to_char(p_daos,'dd.mm.yyyy')||' ).' );
 
-  -- ищем счет
   begin
-    select nvl(NBS,SubStr(NLS,1,4)), TIP
-         , KF, KV, ACC, NBS, NLS, OB22
-      into l_r020, l_acc_tp
-         , r_tfm_fc.KF, r_tfm_fc.KV, r_tfm_fc.ACC, r_tfm_fc.NBS, r_tfm_fc.NLS, r_tfm_fc.OB22
-      from ACCOUNTS
-     where acc = p_acc;
+    select nvl(a.NBS,SubStr(a.NLS,1,4)), a.TIP, a.RNK
+      into l_r020, l_acc_tp, l_rnk
+      from ACCOUNTS a
+     where a.ACC = p_acc;
   exception
     when no_data_found then
       bars_error.raise_nerror( g_modcode, 'ACC_NOT_FOUND' );
   end;
 
   begin
+    select DATE_OFF
+      into l_dapp
+      from CUSTOMER
+     where RNK = l_rnk
+       and DATE_OFF Is Null;
+  exception
+    when no_data_found then
+      bars_error.raise_error( g_modcode, 41, to_char(l_rnk) );
+  end;
 
+  begin
     select D_CLOSE
       into l_dapp
       from PS
      where NBS = l_r020
        and lnnvl( D_CLOSE <= GL.GBD() );
-
   exception
     when no_data_found then
       bars_error.raise_nerror( g_modcode, 'INVALID_R020', l_r020 );
   end;
-
-  ---<NEWNBS>---
-  begin
-
-    if ( r_tfm_fc.OB22 Is Null )
-    then
-      select R020_NEW
-        into r_tfm_fc.NEW_NBS
-        from TRANSFER_2017
-       where R020_OLD = r_tfm_fc.NBS
-         and R020_OLD != R020_NEW;
-    else
-      select R020_NEW, OB_NEW
-        into r_tfm_fc.NEW_NBS, r_tfm_fc.NEW_OB22
-        from TRANSFER_2017
-       where R020_OLD = r_tfm_fc.NBS
-         and OB_OLD   = r_tfm_fc.OB22
-         and R020_OLD != R020_NEW;
-    end if;
-
-    r_tfm_fc.NEW_NLS := VKRZN( substr(r_tfm_fc.KF,1,5), r_tfm_fc.NEW_NBS||'0'||SubStr(r_tfm_fc.NLS,6,9) );
-
-    CHK_EXISTENCE();
-
-    r_tfm_fc.INSERT_DATE := sysdate;
-
-    insert into TRANSFORM_2017_FORECAST values r_tfm_fc;
-
-  exception
-    when NO_DATA_FOUND then
-      null;
-  end;
-  ---<NEWNBS>---
 
   -- если нужно поменять дату открытия счета, проверим дату последнего движения:
   -- дата открытия счета д.б. <= даты последнего движения
@@ -2147,7 +2089,7 @@ begin
 
   DBMS_APPLICATION_INFO.SET_ACTION( null );
 
-end P_ACC_RESTORE;
+end p_acc_restore;
 
 --
 -- Reservation of the account number
@@ -2158,13 +2100,16 @@ procedure RSRV_ACC_NUM
 , p_nms      in     accounts_rsrv.nms%type
 , p_branch   in     accounts_rsrv.branch%type
 , p_isp      in     accounts_rsrv.isp%type
+, p_vid      in     accounts_rsrv.vid%type
 , p_rnk      in     accounts_rsrv.rnk%type
-, p_agrm_num in     accountsw.value%type default null -- номер договору банківського обслуговування
---, p_trf_id   in     sh_tarif.ids%type    default null -- код тарифного пакету
---, p_errmsg      out varchar2
+, p_agrm_num in     accounts_rsrv.agrm_num%type default null -- номер договору банківського обслуговування
+, p_trf_id   in     accounts_rsrv.trf_id%type   default null -- код тарифного пакету
+, p_ob22     in     accounts_rsrv.ob22%type     default null
+, p_errmsg      out varchar2
 ) is
   title    constant varchar2(64) := $$PLSQL_UNIT || 'RSRV_ACC_NUM';
-  p_errmsg          varchar2(2048);
+  l_rsrv_id         accounts_rsrv.rsrv_id%type;
+  l_agrm_num        accounts_rsrv.agrm_num%type;
 begin
 
   bars_audit.trace( '%s: Entry with ( p_nls=>%s, p_kv=>%s, p_nms=>%s, p_branch=>%s, p_isp=>%s, p_rnk=>%s ).'
@@ -2177,22 +2122,53 @@ begin
   then p_errmsg := 'Не вказано валюту рахунку!';
   when ( p_rnk Is Null )
   then p_errmsg := 'Не вказано РНК власника рахунку!';
---when ( p_agrm_num Is Null )
+--when ( l_agrm_num Is Null )
 --then p_errmsg := 'Не вказано номер договору банківського обслуговування!';
---when ( p_trf_id   Is Null )
---then p_errmsg := 'Не вказано код тарифного пакету';
+  when ( p_trf_id   Is Null )
+  then p_errmsg := 'Не вказано код тарифного пакету';
   else
+
+    if ( p_agrm_num Is Null )
+    then
+      l_agrm_num := KL.GET_CUSTOMERW( p_rnk, 'NDBO' );
+    else
+      l_agrm_num := p_agrm_num;
+      if ( p_agrm_num <> KL.GET_CUSTOMERW( p_rnk, 'NDBO' ) )
+      then
+$if ACC_PARAMS.MMFO
+$then
+        EAD_PACK.MSG_CREATE( 'UAGR', 'ACC;'||to_char(l_rsrv_id)||';RSRV', p_rnk, GL.KF() );
+$else
+        EAD_PACK.MSG_CREATE( 'UAGR', 'ACC;'||to_char(l_rsrv_id)||';RSRV' );
+$end
+      end if;
+    end if;
+
     begin
+
       insert
         into ACCOUNTS_RSRV
-           ( NLS, KV, NMS, BRANCH, ISP, RNK, AGRM_NUM, USR_ID, CRT_DT )
+           ( NLS, KV, NMS, BRANCH, ISP, RNK, AGRM_NUM, TRF_ID, OB22, VID
+           , USR_ID, CRT_DT, RSRV_ID )
       values
-           ( p_nls, p_kv, p_nms, p_branch, p_isp, p_rnk, p_agrm_num, user_id, sysdate );
+           ( p_nls, p_kv, p_nms, p_branch, p_isp, p_rnk, l_agrm_num, p_trf_id, nvl(p_ob22,'01'), nvl(p_vid,0)
+           , GL.USR_ID(), SYSDATE, S_ACCOUNTS_RSRV.NEXTVAL )
+      return RSRV_ID
+        into l_rsrv_id;
+
+$if ACC_PARAMS.MMFO
+$then
+      EAD_PACK.MSG_CREATE( 'UACC', 'ACC;'||to_char(l_rsrv_id)||';RSRV', p_rnk, GL.KF() );
+$else
+      EAD_PACK.MSG_CREATE( 'UACC', 'ACC;'||to_char(l_rsrv_id)||';RSRV' );
+$end
+
     exception
       when others then
         p_errmsg := sqlerrm;
         bars_audit.error( title||': '||p_errmsg );
     end;
+
   end case;
 
   bars_audit.trace( '%s: Exit with p_errmsg=>%s.', title, p_errmsg );
@@ -2259,6 +2235,7 @@ procedure P_RESERVE_ACC
 , p_trf_id   in     sh_tarif.ids%type    default null -- код тарифного пакету
 ) is
   l_acc             accounts.acc%type;
+  l_errmsg          varchar2(2048);
 begin
 
   bars_audit.trace( $$PLSQL_UNIT || 'P_RESERVE_ACC: Entry with ( p_rnk=%s, p_nls=%s, p_kv=%s ).', to_char(p_rnk), p_nls, to_char(p_kv) );
@@ -2269,54 +2246,20 @@ begin
   , p_nms      => p_nms
   , p_branch   => p_branch
   , p_isp      => p_isp
+  , p_vid      => p_vid
   , p_rnk      => p_rnk
   , p_agrm_num => p_agrm_num
+  , p_trf_id   => p_trf_id
+  , p_ob22     => p_ob22
+  , p_errmsg   => l_errmsg
   );
 
-  OPN_ACC
-  ( p_acc    => l_acc
-  , p_rnk    => p_rnk
-  , p_nbs    => null
-  , p_ob22   => p_ob22
-  , p_nls    => p_nls
-  , p_nms    => p_nms
-  , p_kv     => p_kv
-  , p_isp    => p_isp
-  , p_pap    => p_pap
-  , p_tip    => p_tip
-  , p_pos    => p_pos
-  , p_vid    => p_vid
-  , p_branch => p_branch
---, p_lim    => p_lim,
-  , p_blkd   => p_blkd
-  , p_blkk   => p_blkk
-  , p_grp    => p_grp
-  , p_mode   => 9
-  );
-
-  update ACCOUNTS a
-     set a.DAZS = bankdate
-       , a.BLKD = 0
-   where a.ACC  = l_acc;
-
-  -- «Зарезервовано»
-  setAccountwParam( l_acc, 'RESERVED', '1' );
-
-  -- «Номер договору (ф.71)» - номер договору банківського обслуговування (ДБО)
-  if ( p_agrm_num Is Not Null )
+  if ( l_errmsg Is Not Null )
   then
-    setAccountSParam( l_acc, 'NKD', p_agrm_num );
+    raise_application_error( -20666, l_errmsg, true );
   end if;
 
-  -- «Код пакету тарифів»
-  if ( p_trf_id Is Not Null )
-  then
-    setAccountwParam( l_acc, 'SHTAR', to_char(p_trf_id) );
-  end if;
-
-  p_acc := l_acc;
-
-  bars_audit.trace( $$PLSQL_UNIT || 'P_RESERVE_ACC: Exit with ( p_acc=%s ).', to_char(p_acc) );
+  bars_audit.trace( $$PLSQL_UNIT || 'P_RESERVE_ACC: Exit.' );
 
 end p_reserve_acc;
 
@@ -2324,56 +2267,68 @@ end p_reserve_acc;
 --
 --
 procedure REJECT_RESERVE_ACC
-( p_acc      in     accounts.acc%type
+( p_nls      in     accounts_rsrv.nls%type
+, p_kv       in     accounts_rsrv.kv%type
 , p_errmsg      out varchar2
 ) is
   l_rnk             accounts.rnk%type;
-  l_nls             accounts.nls%type;
-  l_kv              accounts.kv%type;
+  l_acc             accounts.acc%type;
 begin
 
-  bars_audit.trace( $$PLSQL_UNIT || 'REJECT_RESERVE_ACC: Entry with ( p_acc = %s ).',  to_char(p_acc) );
+  bars_audit.trace( $$PLSQL_UNIT || 'REJECT_RESERVE_ACC: Entry with ( p_nls=%s, p_kv=%s ).', p_nls, to_char(p_kv) );
 
-  update ACCOUNTSW
-     set VALUE = null
-   where ACC   = p_acc
-     and TAG   = 'RESERVED'
-     and VALUE = '1';
+  begin
 
-  if ( sql%rowcount = 0 )
-  then
-    p_errmsg := 'Рахунок #'||to_char(p_acc)||' не є зарезервованим!';
-  else
+    -- на перехідний період (існують відкритто-закритті рах.)
+    select a.ACC
+      into l_acc
+      from ACCOUNTS a
+     where a.NLS  = p_nls
+       and a.KV   = p_kv
+       and a.DAZS Is Not Null
+       and a.DAZS = a.DAOS;
 
-    begin
-      select to_number(VAL)
-        into l_rnk
-        from PARAMS
-       where PAR = 'OUR_RNK';
-    exception
-      when NO_DATA_FOUND then
-        l_rnk := 1;
+    update ACCOUNTSW
+       set VALUE = null
+     where ACC   = l_acc
+       and TAG   = 'RESERVED'
+       and VALUE = '1';
+
+    if ( sql%rowcount > 0 )
+    then
+
+      begin
+        select to_number(VAL)
+          into l_rnk
+          from PARAMS
+         where PAR = 'OUR_RNK';
+      exception
+        when NO_DATA_FOUND then
+          l_rnk := 1;
 $if ACC_PARAMS.MMFO
 $then
-        l_rnk := to_number( BARS_SQNC.RUKEY( l_rnk ) );
+          l_rnk := to_number( BARS_SQNC.RUKEY( l_rnk ) );
 $end
-    end;
+      end;
 
-    update ACCOUNTS
-       set RNK = l_rnk
-     where ACC = p_acc
-    return NLS, KV
-      into l_nls, l_kv;
+      update ACCOUNTS
+         set RNK = l_rnk
+       where ACC = l_acc;
 
-    setAccountSParam( p_acc, 'NKD',   null );
-    setAccountwParam( p_acc, 'SHTAR', null );
+      setAccountSParam( l_acc, 'NKD',   null );
+      setAccountwParam( l_acc, 'SHTAR', null );
 
-    CNCL_RSRV_ACC_NUM
-    ( p_nls => l_nls
-    , p_kv  => l_kv
-    );
+    end if;
 
-  end if;
+  exception
+    when NO_DATA_FOUND then
+      null;
+  end;
+
+  CNCL_RSRV_ACC_NUM
+  ( p_nls => p_nls
+  , p_kv  => p_kv
+  );
 
   bars_audit.trace( $$PLSQL_UNIT || 'REJECT_RESERVE_ACC: Exit with ( p_errmsg = %s ).', p_errmsg );
 
@@ -2397,9 +2352,9 @@ begin
   begin
 $if ACC_PARAMS.MMFO
 $then
-    l_flag := to_number(BRANCH_ATTRIBUTE_UTL.GET_VALUE( 'ACC_REZ' ));
+    l_flag := to_number(BRANCH_ATTRIBUTE_UTL.GET_VALUE('ACC_REZ'));
 $else
-    l_flag := F_GET_PARAMS( 'ACC_REZ', 0 );
+    l_flag := F_GET_PARAMS('ACC_REZ',0);
 $end
   exception
     when others then
@@ -2491,21 +2446,65 @@ end CHECK_USER_PERMISSIONS;
 -- Description : перевод счета из статуса "Резерв" в "Открытый"
 --***************************************************************************--
 procedure P_UNRESERVE_ACC
-( p_acc      in     accounts.acc%type
-, p_flagopen in     number default 1
-, p_ob22     in     accounts.ob22%type default null
+( p_nls      in     accounts.nls%type
+, p_kv       in     accounts.kv%type
+, p_acc         out accounts.acc%type
 ) is
   l_rnk             accounts.rnk%type;
-  l_msg             varchar2(2048);
   l_nbs             accounts.nbs%type;
-  l_nls             accounts.nls%type;
-  l_kv              accounts.kv%type;
   l_ob22            accounts.ob22%type;
+  l_nms             accounts.nms%type;
+  l_vid             accounts.vid%type;
   l_blkd            accounts.blkd%type;
+  l_branch          accounts.branch%type;
+  l_agrm_num        specparam.nkd%type;
+  l_trf_id          accountsw.value%type;
+  l_msg             varchar2(2048);
 begin
 
-  if ( p_flagopen = 1 )
+  begin
+    select r.NMS, r.BRANCH, r.RNK, r.VID, r.AGRM_NUM, SubStr(r.NLS,1,4), r.OB22, to_char(r.TRF_ID)
+      into l_nms, l_branch, l_rnk, l_vid, l_agrm_num, l_nbs, l_ob22, l_trf_id
+      from ACCOUNTS_RSRV r
+     where r.NLS = p_nls
+       and r.KV  = p_kv;
+  exception
+    when NO_DATA_FOUND then
+      raise_application_error( -20000, 'Номер рахунку '||p_nls||'('||to_char(p_kv)||') не зарезервовано!' );
+  end;
+
+  CHECK_USER_PERMISSIONS( l_nbs );
+
+  l_msg := KL.GET_EMPTY_ATTR_FOROPENACC(l_rnk);
+
+  if ( l_msg is not null )
   then
+    raise_application_error( -20000, 'Для відкриття рахунку в картці клієнта необхідно заповнити поля:' || chr(10) || l_msg );
+  end if;
+
+  -- проверка балансовго счёта на пренадлежность к ДПА COBUMMFO-5343
+  if ( BARS_DPA.DPA_NBS( l_nbs, null ) = 1 )
+  then
+$if ACC_PARAMS.MMFO
+$then
+    l_blkd := to_number(BRANCH_ATTRIBUTE_UTL.GET_VALUE('DPA_BLK'));
+$else
+    l_blkd := F_GET_PARAMS('DPA_BLK',0);
+$end
+  end if;
+
+  CNCL_RSRV_ACC_NUM
+  ( p_nls => p_nls
+  , p_kv  => p_kv
+  );
+
+  begin
+
+    select a.ACC
+      into p_acc
+      from ACCOUNTS a
+     where a.NLS = p_nls
+       and a.KV  = p_kv;
 
     delete ACCOUNTSW
      where ACC   = p_acc
@@ -2517,66 +2516,45 @@ begin
       raise_application_error( -20000, 'Рахунок #'||to_char(p_acc)||' не є зарезервованим!' );
     end if;
 
-    begin
-      select a.RNK, a.BLKD, a.OB22, a.NLS, a.KV
-           , nvl(a.NBS,SubStr(a.NLS,1,4))
-        into l_rnk, l_blkd, l_ob22, l_nls, l_kv, l_nbs
-        from ACCOUNTS a
-       where a.ACC = p_acc;
-    exception
-      when no_data_found then
-        raise_application_error(-20000, 'Рахунок #'||to_char(p_acc)||' не знайдено!');
-    end;
-
-    l_msg := kl.get_empty_attr_foropenacc(l_rnk);
-
-    if ( l_msg is not null )
-    then
-      raise_application_error( -20000, 'Для відкриття рахунку в картці клієнта необхідно заповнити поля:' || chr(10) || l_msg );
-    end if;
-
-$if ACC_PARAMS.SBER
-$then
---  if ( p_ob22 Is Null AND l_ob22 Is Null )
---  then
---    raise_application_error( -20666, 'Для відкриття рахунку необхідно заповнити параметр ОБ22', true );
---  else
-      l_ob22 := p_ob22;
---  end if;
-
-    CHECK_USER_PERMISSIONS( l_nbs );
-$end
-
-    -- проверка балансовго счёта на пренадлежность к ДПА COBUMMFO-5343
-    if ( BARS_DPA.DPA_NBS( l_nbs, l_ob22 ) = 1 )
-    then
-      l_blkd := F_GET_PARAMS('DPA_BLK',0);
-    end if;
-
     update ACCOUNTS a
        set a.DAOS = BANKDATE()
          , a.NBS  = l_nbs
-         , a.OB22 = l_ob22
          , a.DAZS = Null
          , a.ISP  = USER_ID()
          , a.BLKD = l_blkd
-     where a.ACC = p_acc;
+     where a.ACC  = p_acc;
 
-    CNCL_RSRV_ACC_NUM
-    ( p_nls => l_nls
-    , p_kv  => l_kv
-    );
+  exception
+    when NO_DATA_FOUND then
+      OPN_ACC
+      ( p_acc    => p_acc
+      , p_rnk    => l_rnk
+      , p_nbs    => l_nbs
+      , p_ob22   => l_ob22
+      , p_nls    => p_nls
+      , p_nms    => l_nms
+      , p_kv     => p_kv
+      , p_isp    => USER_ID()
+      , p_vid    => l_vid
+      , p_branch => l_branch
+      , p_blkd   => l_blkd
+      );
+  end;
 
-    -- параметру «Код строку кред/деп рахунків (S180)» - значенням «1»;
-    setAccountSParam( p_acc, 'S180', '1' );
+  -- «Номер договору (ф.71)» - номер договору банківського обслуговування (ДБО)
+  setAccountSParam( p_acc, 'NKD', l_agrm_num );
 
-    -- параметру «Спеціальний параметр (S181)» - значенням «1»
-    setAccountSParam( p_acc, 'S181', '1' );
+  -- «Код пакету тарифів»
+  setAccountWParam( p_acc, 'SHTAR', l_trf_id );
 
-    -- параметру «Код строку «до погашення» (S240)» - значенням «1»;
-    setAccountSParam( p_acc, 'S240', '1' );
+  -- параметру «Код строку кред/деп рахунків (S180)» - значенням «1»;
+  setAccountSParam( p_acc, 'S180', '1' );
 
-  end if;
+  -- параметру «Спеціальний параметр (S181)» - значенням «1»
+  setAccountSParam( p_acc, 'S181', '1' );
+
+  -- параметру «Код строку «до погашення» (S240)» - значенням «1»;
+  setAccountSParam( p_acc, 'S240', '1' );
 
   bars_audit.trace( $$PLSQL_UNIT || 'P_UNRESERVE_ACC: Exit.' );
 
@@ -2651,14 +2629,14 @@ end UNRSRV_ACC;
 --
 --
 procedure DUPLICATE_ACC
-( p_acc           in out accounts.acc%type
-, p_kv            in     accounts.kv%type
-, p_errmsg           out varchar2
+( p_acc      in out accounts.acc%type
+, p_kv       in     accounts.kv%type
+, p_errmsg      out varchar2
 ) is
-  title       constant   varchar2(64) := $$PLSQL_UNIT||'.DUPLICATE_ACC';
-  r_accounts             accounts%rowtype;
-  r_specparam            specparam%rowtype;
-  l_acc_id               accounts.acc%type;
+  title    constant varchar2(64) := $$PLSQL_UNIT||'.DUPLICATE_ACC';
+  r_accounts        accounts%rowtype;
+  r_specparam       specparam%rowtype;
+  l_acc_id          accounts.acc%type;
 begin
 
   bars_audit.trace( '%s: Entry with ( p_acc=%s, p_kv=%s ).', title, to_char(p_acc), to_char(p_kv) );
@@ -2762,32 +2740,28 @@ l_acc_row accounts%rowtype;
 l_result  varchar2(500);
 begin
     l_module := pul.get('MODULE');
-    bars_audit.trace(title||': start for acc #'||p_acc||', module ('||nvl(l_module, 'GENERAL')||')'||' spid = '||p_spid);
+    bars_audit.trace(title||': start for acc #'||p_acc||', module ('||l_module||')'||' spid = '||p_spid);
     select * into l_acc_row from accounts where acc = p_acc;
-    
-    if p_spid = 1 then -- R011
-        
-        bars_audit.trace(title||': R011. Tip = '||l_acc_row.tip||', nbs='||l_acc_row.nbs);
-        
-        /* ищем умолчательное значение, если нет специфической для модуля логики заполнения */
-        begin
-            select r011
-            into l_result
-            from cck_r011
-            where nbs = l_acc_row.nbs
-            and module_specific = 'N';
-            return l_result;
-        exception
-            when no_data_found then null;
-        end;
 
+    if p_spid = 1 then -- R011
+
+        bars_audit.trace(title||': R011. Tip = '||l_acc_row.tip||', nbs='||l_acc_row.nbs);
+        /* общее */
+        if l_acc_row.nbs = '3578' and l_acc_row.tip in ('SK0', 'SK9') then
+            l_result := '1';
+            return l_result;
+        elsif l_acc_row.nbs = '9129' and l_acc_row.tip = 'CR9' then
+            l_result := '4';
+            return l_result;
+        end if;
+        
         if l_module = 'CCK' then
             bars_audit.trace(title||': CCK. Tip = '||l_acc_row.tip);
             
             /* COBUMMFO-6175 автоматически определяем R011 при открытии счета */
             if trim(l_acc_row.tip) in ('SS', 'SDI', 'SN') then
                 bars_audit.trace(title||': CCK. Ищем r011 по справочнику');
-                begin
+begin
                     select r011
                     into l_result
                     from cck_r011
@@ -2813,39 +2787,11 @@ begin
                 )
                 and (dazs is null or dazs > gl.bd)
                 and rownum = 1;
-            elsif l_acc_row.tip in ('SK0', 'SK9', 'CR9') then
-                l_result := case 
-                                when l_acc_row.nbs = '3528' and l_acc_row.tip in ('SK0', 'SK9') then '1' 
-                                when l_acc_row.nbs = '9129' and l_acc_row.tip = 'CR9' then '4' 
-                            end;
             end if;
-        elsif l_module = 'DPT' then
-            bars_audit.trace(title||': CCK. Ищем r011 по справочнику');
-            begin
-                select r011
-                into l_result
-                from cck_r011
-                where nbs = l_acc_row.nbs;
-            exception
-                when no_data_found then
-                    bars_audit.error(title || ': не найдено значение r011 в справочнике для балансового #'||l_acc_row.nbs);
-            end;
+        elsif l_module = 'BPK' then
+  null;
         end if;
     elsif p_spid = 2 then -- R013
-        
-        /* ищем умолчательное значение, если нет специфической для модуля логики заполнения */
-        begin
-            select r013
-            into l_result
-            from cck_r013
-            where nbs = l_acc_row.nbs
-            and module_specific = 'N'
-            and   ob22 = case when ob22 = '-' then '-' else l_acc_row.ob22 end;
-            return l_result;
-        exception
-            when no_data_found then null;
-        end;
-    
         if l_module = 'CCK' then
             /* COBUMMFO-6282 автоматически определяем R013 при открытии счета */
             bars_audit.trace(title||': CCK. Tip = '||l_acc_row.tip);
@@ -2879,7 +2825,6 @@ end get_default_spar_value;
 procedure set_default_sparams(p_acc in accounts.acc%type)
     is
 title       constant   varchar2(64) := $$PLSQL_UNIT||'.SET_DEFAULT_SPARAMS';
-l_sparam	varchar2(500);
 begin
     bars_audit.trace(title||': start for acc #'||p_acc);
     for spar in (select *
@@ -2887,14 +2832,10 @@ begin
                  where s.def_flag = 'Y')
     loop
         begin
-			l_sparam := get_default_spar_value(p_acc, spar.spid);
-			if l_sparam is null then 
-				continue; /* дефолтное значение по-умолчанию не-пустое */
-			end if;
             if spar.tabname in ('ACCOUNTSW') then
-                setAccountwParam(p_acc, spar.tag, l_sparam);
+                setAccountwParam(p_acc, spar.tag, get_default_spar_value(p_acc, spar.spid));
             else
-                setAccountSParam(p_acc, spar.name, l_sparam);
+                setAccountSParam(p_acc, spar.name, get_default_spar_value(p_acc, spar.spid));
             end if;
         exception
             when others then
