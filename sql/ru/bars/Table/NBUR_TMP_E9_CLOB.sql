@@ -46,10 +46,14 @@ prompt -- Alters
 prompt -- ======================================================
 
 declare
-  l_stmt   varchar2(2048);
+  e_col_exsts            exception;
+  pragma exception_init( e_col_exsts, -01430 );
 begin
-  l_stmt := q'[CLOB LOB ( XML_FILE ) STORE AS SECUREFILE ( TABLESPACE BRSLOBD DISABLE STORAGE IN ROW COMPRESS HIGH NOCACHE NOLOGGING )]';
-  NBUR_UTIL.SET_COL('NBUR_TMP_E9_CLOB','XML_FILE', l_stmt );
+  execute immediate 'alter table BARS.NBUR_TMP_E9_CLOB add XML_FILE CLOB LOB ( XML_FILE ) STORE AS SECUREFILE ( TABLESPACE BRSLOBD DISABLE STORAGE IN ROW COMPRESS HIGH NOCACHE NOLOGGING )';
+  dbms_output.put_line( 'Table altered.' );
+exception
+  when E_COL_EXSTS
+  then null;
 end;
 /
 
