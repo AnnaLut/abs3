@@ -73,7 +73,7 @@ namespace Areas.F601.Controllers.Api
             }
             catch (Exception e)
             {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.StackTrace);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message + " \r\n" + e.StackTrace);
             }
         }
 
@@ -102,7 +102,7 @@ namespace Areas.F601.Controllers.Api
             }
             catch (Exception e)
             {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.StackTrace);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message + " \r\n" + e.StackTrace);
             }
         }
 
@@ -123,7 +123,7 @@ namespace Areas.F601.Controllers.Api
             }
             catch (Exception e)
             {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.StackTrace);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message + " \r\n" + e.StackTrace);
             }
         }
     }

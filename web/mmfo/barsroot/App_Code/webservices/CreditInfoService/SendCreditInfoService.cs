@@ -53,8 +53,8 @@ namespace Bars.WebServices.CreditInfoService
         [WebMethod(EnableSession = true)]
         public ResponseResult SendData(string requestType, string nbuURL, string body)
         {
-            Logger.Debug("Початок метода сервісу SendData.", SERVICE_NAME);
-            Login();
+			Login();
+            Logger.Debug("Початок метода сервісу SendData.", SERVICE_NAME);        
 
             var responseToDB = SendDataToNBUService( requestType, nbuURL, body);
             Logger.Debug("Закінчення метода сервісу SendData.", SERVICE_NAME);
@@ -110,7 +110,7 @@ namespace Bars.WebServices.CreditInfoService
             request.Credentials = CredentialCache.DefaultCredentials;
             request.ContentType = "application/json";
 
-            string certName = Configuration.ConfigurationSettings.AppSettings["F601.CertificateName"];
+            string certName = System.Configuration.ConfigurationManager.AppSettings["F601.CertificateName"];
             ManageSSlCertification(request, certName);
 
             if (requestType == "POST" || requestType == "PUT")
