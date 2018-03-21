@@ -33,7 +33,9 @@ create or replace package transp_utl is
 
   g_status_code pls_integer;
 
+  g_proxy_url varchar2(256);
   g_transfer_timeout constant number := 1800;
+
 ----------------------------------------------------------------------------
 
 -- types
@@ -161,8 +163,6 @@ create or replace package body transp_utl is
   -- g_response t_response;
 
   g_xmlhead  constant varchar2(100) := '<?xml version="1.0" encoding="utf-8"?>';
-
-  g_proxy_url varchar2(256);
 
  procedure send_loger(p_req_id  number,
                       p_act     varchar2,
@@ -524,25 +524,27 @@ create or replace package body transp_utl is
   -- вызов подготовленого запроса WebApi
   --
 
-  procedure execute_api(p_response out t_response) as
-    l_http_req    utl_http.req;
-    l_http_resp   utl_http.resp;
-    l_parameter   t_parameter;
-    l_param_value clob;
-    l_length  number;
-    l_tmp     raw(32767);
-    l_offset  number := 1;
-    l_ammount number := 2000;
-    l_buffer  varchar2(32767);
-    l_header      t_header;
-    l_name        varchar2(256);
-    l_hdr_value   varchar2(1024);
-    l_hdr         t_header;
-    l_hdrs        t_headers;
-    l_result      clob;
-    l_db_charset  varchar2(100) := 'AL32UTF8';
-    l_response_raw raw(2000);
-    eob           boolean;
+  procedure execute_api(
+      p_response out clob)
+  as
+      l_http_req     utl_http.req;
+      l_http_resp    utl_http.resp;
+      l_parameter    t_parameter;
+      l_param_value  clob;
+      l_length       number;
+      l_tmp          raw(32767);
+      l_offset       number := 1;
+      l_ammount      number := 2000;
+      l_buffer       varchar2(32767);
+      l_header       t_header;
+      l_name         varchar2(256);
+      l_hdr_value    varchar2(1024);
+      l_hdr          t_header;
+      l_hdrs         t_headers;
+      l_result       clob;
+      l_db_charset   varchar2(100) := 'AL32UTF8';
+      l_response_raw raw(2000);
+      eob            boolean;
   begin
     --trace_info('g_request.http_method=' || g_request.http_method );
 
@@ -579,13 +581,7 @@ create or replace package body transp_utl is
           raise;
         end if;
     end;
-/*
-    trace_info('g_request.url             = [' || g_request.url || ']' || chr(10) ||
-               'g_request.body            = [' || substr(g_request.body, 1, 2000) || ']' || chr(10) ||
-               'g_request.blob_body.len   = [' || dbms_lob.getlength(g_request.blob_body) || ']' || chr(10) ||
-               'g_request.content_type    = [' || g_request.content_type || ']' || chr(10) ||
-               'g_request.content_charset = [' || g_request.content_charset || ']');
-*/
+
     -- header
     for i in 1 .. g_request.headers.count loop
       l_header := g_request.headers(i);
@@ -690,13 +686,8 @@ create or replace package body transp_utl is
                              'g_status_code : ' || g_status_code || chr(10) ||
                              'url           : ' || g_request.url,
                              p_auxiliary_info => l_result);
-    if g_status_code != 200 then
-      raise_application_error(-20001,
-                              'Сервіс повернув код [' || g_status_code || ']. Перевірте налаштування. Текст відповіді:' || chr(13) || chr(10) || l_result,
-                              false);
-    end if;
 
-    p_response.cdoc := l_result;
+    p_response := l_result;
   end;
  -------------------------------------------------------------------------------------------------------------------
     procedure run_parallel(p_task           in varchar2,
@@ -867,7 +858,6 @@ end;
                   p_err_txt varchar2) is
      l_reqtype transp_receive_type%rowtype;
      l_req_id  number;
-     l_err_txt varchar(4000);
      l_jobname varchar2(50);
      l_clob    clob;
      l_blob    blob;
@@ -953,20 +943,21 @@ end;
      p_params := crt_xml_params(l_req_id);
  end;
 -------------------------------------------------------------------------------------------------------------------------------
- procedure send_req(p_start_id number, p_last_id number) is
-     l_response    t_response;
-     l_wallet_path varchar2(255);
-     l_wallet_pwd  varchar2(255);
-     l_send_uri    TRANSP_URI%rowtype;
-     l_send_type   TRANSP_SEND_TYPE%rowtype;
-     l_clob        clob;
+ procedure send_req(p_start_id number, p_last_id number)
+ is
+     l_response       clob;
+     l_wallet_path    varchar2(255);
+     l_wallet_pwd     varchar2(255);
+     l_send_uri       transp_uri%rowtype;
+     l_send_type      transp_send_type%rowtype;
+     l_clob           clob;
+     l_attempts_count integer := 0;
+     l_success_flag   boolean := false;
  begin
 
-     dbms_lob.createtemporary(l_clob, true);
-
-     for req in (SELECT Q.ID, Q.MAIN_ID, Q.URI_ID, Q.TYPE_ID, Q.STATE_ID
-                   FROM BARSTRANS.TRANSP_SEND_REQ Q
-                  WHERE Q.ID BETWEEN P_START_ID AND P_LAST_ID) loop
+     for req in (select q.id, q.main_id, q.uri_id, q.type_id, q.state_id
+                   from barstrans.transp_send_req q
+                  where q.id between p_start_id and p_last_id) loop
 
          select u.uri_id,
                 u.uri_desc,
@@ -1011,20 +1002,20 @@ end;
           where t.id = req.type_id;
 
          select q.req_date
-           into l_clob
-           from barstrans.transp_send_main_req q
-          where id = req.main_id;
+         into   l_clob
+         from   barstrans.transp_send_main_req q
+         where  id = req.main_id;
 
-        l_wallet_path := bars.branch_attribute_utl.get_attribute_value('/', 'PATH_FOR_ABSBARS_WALLET');
-        l_wallet_pwd := bars.branch_attribute_utl.get_attribute_value('/', 'PASS_FOR_ABSBARS_WALLET');
+         l_wallet_path := bars.branch_attribute_utl.get_attribute_value('/', 'PATH_FOR_ABSBARS_WALLET');
+         l_wallet_pwd := bars.branch_attribute_utl.get_attribute_value('/', 'PASS_FOR_ABSBARS_WALLET');
 
          prepare_request(p_url         => g_proxy_url,
                          p_http_method => g_http_post,
                          p_wallet_path => l_wallet_path,
                          p_wallet_pwd  => l_wallet_pwd,
                          p_body        => l_clob);
-         for param in (SELECT PARAM_TYPE, TAG, VALUE
-                         FROM BARSTRANS.TRANSP_SEND_REQ_PARAMS qp
+         for param in (select param_type, tag, value
+                         from barstrans.transp_send_req_params qp
                         where qp.data_id = req.main_id) loop
              if param.param_type = 'GET' then
                  add_parameter(p_name => param.tag, p_value => param.value);
@@ -1043,67 +1034,67 @@ end;
          add_header(p_name  => 'MyProxyCT',
                     p_value => l_send_type.cont_type);
          add_header(p_name  => 'MyProxyTimeout',
-                    p_value => 60000 /*l_send_type.timeout*/);
+                    p_value => 300000 /*l_send_type.timeout*/); -- milliseconds
          add_header(p_name  => 'MyProxyURI',
                     p_value => l_send_uri.base_host || l_send_uri.req_path || '/' ||
                                l_send_type.type_name);
          add_header(p_name  => 'MyReqHeadAuthorization',
                     p_value => 'Basic ' ||
-                               utl_encode.text_encode(l_send_uri.AUTH_USER || ':' ||
-                                                      l_send_uri.AUTH_PATH,
+                               utl_encode.text_encode(l_send_uri.auth_user || ':' ||
+                                                      l_send_uri.auth_path,
                                                       encoding => utl_encode.base64));
 
-         send_loger(req.main_id, 'req', 'INFO', 'Data sended.', req.id);
-         for try in 1 .. l_send_type.trys loop
+         loop
+             l_attempts_count := l_attempts_count + 1;
+
              begin
                  execute_api(l_response);
-                 send_loger(req.main_id,
-                            'WEB_SERVICE_SEND' || req.id,
-                            'INFO',
-                            'Data sended.');
-                 update TRANSP_SEND_REQ s
-                    set s.send_time = sysdate
-                  where s.id = req.id;
-                 exit;
+
+                 if (g_status_code = 200) then
+                     send_loger(req.main_id, 'WEB_SERVICE_SEND' || req.id, 'INFO', 'Data sent');
+
+                     update transp_send_req s
+                     set    s.send_time = sysdate
+                     where  s.id = req.id;
+
+                     l_success_flag := true;
+                 else
+                      send_loger(req.main_id,
+                                 'WEB_SERVICE_SEND' || req.id,
+                                 'ERROR',
+                                 substrb('Attempt: ' || l_attempts_count || chr(10) || dbms_lob.substr(l_response, 4000), 1, 4000));
+                 end if;
              exception
                  when others then
-                     if try <= l_send_type.trys then
-                         send_loger(req.main_id,
-                                    'WEB_SERVICE_SEND' || req.id,
-                                    'INFO',
-                                    'Try- ' || try || ' err: ' ||
-                                    sqlerrm(sqlcode));
-                     else
-                         send_loger(req.main_id,
-                                    'WEB_SERVICE_SEND' || req.id,
-                                    'ERROR',
-                                    sqlerrm(sqlcode));
-                         exit;
-                     end if;
+                      send_loger(req.main_id,
+                                 'WEB_SERVICE_SEND' || req.id,
+                                 'ERROR',
+                                 substrb('Attempt: ' || l_attempts_count || chr(10) ||
+                                         sqlerrm || chr(10) || dbms_utility.format_error_backtrace() || chr(10) ||
+                                         dbms_lob.substr(l_response, 4000), 1, 4000));
              end;
+
+             exit when (l_success_flag or l_attempts_count >= nvl(l_send_type.trys, 1));
          end loop;
-     begin
-         update TRANSP_SEND_REQ rq
-            set rq.resp_num = to_number(l_response.cdoc)
-          where rq.id = req.id;
-     exception when others then
-       if sqlcode =-22835 then
-            update TRANSP_SEND_REQ rq
-            set rq.resp_clob= l_response.cdoc
-          where rq.id = req.id;
-        else
-            raise;
-        end if;
-     end;
 
-          for i in 1..g_headers.count loop
-              if substr(g_headers(i).p_header_name,1,10) = 'MyRespHead' then
-              insert into TRANSP_SEND_RESP_PARAMS values(req.id, 'HEADER', substr(g_headers(i).p_header_name,11), g_headers(i).p_header_value);
-              end if;
-          end loop;
+         if (l_response is not null) then
+             if (regexp_like(l_response, '^\d+$')) then
+                 update transp_send_req rq
+                 set    rq.resp_num = to_number(l_response)
+                 where  rq.id = req.id;
+             else
+                  update transp_send_req rq
+                  set    rq.resp_clob = l_response
+                  where  rq.id = req.id;
+             end if;
+         end if;
 
+         for i in 1..g_headers.count loop
+             if substr(g_headers(i).p_header_name,1,10) = 'MyRespHead' then
+             insert into transp_send_resp_params values(req.id, 'HEADER', substr(g_headers(i).p_header_name,11), g_headers(i).p_header_value);
+             end if;
+         end loop;
 
-         l_clob := l_response.cdoc;
          g_request.headers.delete;
          g_request.parameters.delete;
      end loop;
@@ -1111,7 +1102,6 @@ end;
 -------------------------------------------------------------------------------------------------------------
   procedure prep_req(p_sess_id number) is
       l_reqtype     transp_send_type%rowtype;
-      l_uris        transp_uri%rowtype;
       l_TYPE_ID     transp_send_main_req.send_type%type;
       l_parallel_ch number;
       l_start_id    number;
@@ -1228,8 +1218,6 @@ end;
                          p_main_sess  out number) is
         --asinc/parallel
         l_reqtype   transp_send_type%rowtype;
-        l_uris      transp_uri%rowtype;
-        l_response  t_response;
         l_main_sess number;
         l_sub_sess  number;
         l_uri_id    number;
@@ -1342,13 +1330,9 @@ end;
                    p_main_sess  out number) is
         --asinc/parallel
         l_reqtype   transp_send_type%rowtype;
-        l_uris      transp_uri%rowtype;
-        l_response  t_response;
         l_main_sess number;
         l_sub_sess  number;
         l_uri_id    number;
-        l_jobname   varchar2(50);
-
     begin
         --ІД основного запиту
         l_main_sess := s_transp_send_main_req.nextval;
@@ -1481,6 +1465,16 @@ end;
         end;
 
 begin
-    g_proxy_url := bars.branch_attribute_utl.get_attribute_value('/', 'LINK_FOR_ABSBARS_WEBAPISERVICES', p_raise_expt => 0, p_check_exist => 0) || '/transp/ProxyV1/Direct';
+    g_proxy_url := bars.branch_attribute_utl.get_attribute_value('/', 'LINK_FOR_ABSBARS_WEBAPISERVICES', p_raise_expt => 0, p_check_exist => 0);
+
+    if (g_proxy_url is null) then
+        raise_application_error(-20000, 'Не вказаний URL веб-сервера АБС для передачі даних через транспортний механізм');
+    end if;
+
+    if (g_proxy_url not like '%/') then
+        g_proxy_url := g_proxy_url || '/';
+    end if;
+
+    g_proxy_url := g_proxy_url || 'transp/ProxyV1/Direct';
 end transp_utl;
 /

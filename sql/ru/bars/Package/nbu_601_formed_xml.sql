@@ -1,7 +1,3 @@
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/PACKAGE/nbu_601_formed_xml.sql =========*** Run *** 
-PROMPT ===================================================================================== 
-
 create or replace package nbu_601_formed_xml  as
 
  current_date   date;
@@ -18,10 +14,10 @@ create or replace package nbu_601_formed_xml  as
  function get_xml_credit_pledge return clob;
  function get_xml_pledge_dep  return clob;
  function get_user_name  return varchar2;
+ procedure run_formated_xml_job(p_kf in varchar2);
  procedure run_formated_xml;
 
  end nbu_601_formed_xml;
-
 
 /
 create or replace package body nbu_601_formed_xml as
@@ -58,7 +54,7 @@ function get_xml_person_fo return clob
                            xmlelement("K060", p.k060),
                            xmlelement("STATUS", p.status),
                            xmlelement("KF",p.kf)
-                            ))
+                           ))
               ))
   into l_xmltype_peson_fo
   from nbu_person_fo p where kf=sys_context('bars_context','user_mfo');
@@ -113,7 +109,7 @@ function get_xml_address_fo return clob
                                xmlelement("ZIP",a.zip),
                                xmlelement("CITY",a.city),
                                xmlelement("STREETADDRESS",a.streetaddress),
-                               xmlelement("HAUSENO",a.houseno),
+                               xmlelement("HOUSENO",a.houseno),
                                xmlelement("ADRKORP",a.adrkorp),
                                xmlelement("FLATNO",a.flatno),
                                xmlelement("STATUS",a.status),
@@ -146,7 +142,7 @@ function get_xml_person_uo  return clob
                                xmlelement("REGISTRDAY", to_char(p.registryday,'dd.mm.yyyy')),
                                xmlelement("NUMBERREGISTRY", p.numberregistry),
                                xmlelement("K110", p.k110),
-                               xmlelement("EC_YEAR", p.ec_year),
+                               xmlelement("EC_YEAR",to_char(p.ec_year,'dd.mm.yyyy')),
                                xmlelement("COUNTERYCODNEREZ", p.countrycodnerez),
                                xmlelement("ISMEMBER", p.ismember),
                                xmlelement("ISCONTROLLER",p.iscontroller),
@@ -178,10 +174,10 @@ function get_xml_finperformance_uo return clob
                           xmlagg(xmlelement("FINPERFORMANCE_UO",
                                xmlelement("RNK", f.rnk),
                                xmlelement("SALES", f.sales),
-                               xmlelement("ebit", f.ebit),
-                               xmlelement("CODEDRPOU", f.ebitda),
-                               xmlelement("REGISTRDAY", to_char(f.totaldebt,'dd.mm.yyyy')),
-                               xmlelement("NUMBERREGISTRY", f.status),
+                               xmlelement("EBIT", f.ebit),
+                               xmlelement("EBITDA", f.ebitda),
+                               xmlelement("TOTALDEBT", f.totaldebt),
+                               xmlelement("STATUS", f.status),
                                xmlelement("KF",f.kf)
                          )))
                  )
@@ -192,6 +188,36 @@ function get_xml_finperformance_uo return clob
      end if;
     return l_xml_finperformance_uo.getClobVal();
 end get_xml_finperformance_uo;
+
+function get_xml_groupur_uo  return clob
+  is
+  l_xml_groupur_uo xmltype;
+  begin
+    select xmlelement("ROOT",
+           xmlelement("CURRENT_USER",get_user_name()) ,
+           xmlelement("REPORTING_TIME",to_char(sysdate,'dd.mm.yyyy hh24:mi:ss')),
+           xmlelement("REPORTING_DATE",to_char(trunc(sysdate,'mm'),'dd.mm.yyyy')),
+           xmlelement("USER_KF", current_user_KF),
+            XmlElement("GROUPUR_UO_FOS",
+                  xmlagg(xmlelement("GROUPUR_UO",
+                               xmlelement("RNK", p.rnk),
+                               xmlelement("WHOIS", p.whois),
+                               xmlelement("ISREZGR", p.isrezgr),
+                               xmlelement("CODEDRPOUGR", p.codedrpougr),
+                               xmlelement("NAMEURGR", p.nameurgr),
+                               xmlelement("COUNTRYCODGR", p.countrycodgr),
+                               xmlelement("STATUS",p.status),
+                               xmlelement("STATUS_MESSAGE", p.status_message),
+                               xmlelement("KF",p.kf)
+                            )))
+                 )
+    into l_xml_groupur_uo
+    from nbu_groupur_uo p where kf=sys_context('bars_context','user_mfo');
+     if l_xml_groupur_uo is null then
+       select XmlElement("GROUPUR_UO",'NO DATA') into l_xml_groupur_uo from dual;
+     end if;
+    return l_xml_groupur_uo.getClobVal();
+end get_xml_groupur_uo;
 
 function get_xml_finperformancegr_uo return clob
   is
@@ -237,7 +263,7 @@ function get_xml_ownerjur_uo return clob
                                xmlelement("NAMEOJ",o.nameoj),
                                xmlelement("ISREZOJ",o.isrezoj),
                                xmlelement("CODEDRPOUOJ",o.codedrpouoj),
-                               xmlelement("REGISTRYDAYOJ",o.registrydayoj),
+                               xmlelement("REGISTRYDAYOJ",to_char (o.registrydayoj,'dd.mm.yyyy')),
                                xmlelement("NUMBERREGISTRYOJ",o.numberregistryoj),
                                xmlelement("CONTRYCODOJ",o.countrycodoj),
                                xmlelement("PARCENOJ",o.percentoj),
@@ -343,7 +369,7 @@ function get_xml_credit return clob
                                xmlelement("ARREARPROC",c.arrearproc),
                                xmlelement("DAYBASE",c.daybase),
                                xmlelement("DAYPROC",c.dayproc),
-                               xmlelement("FACTENDDAY",to_date(c.factendday,'dd.mm.yyyy')),
+                               xmlelement("FACTENDDAY",to_char(c.factendday,'dd.mm.yyyy')),
                                xmlelement("FLAGZ",c.flagz),
                                xmlelement("KLASS",c.klass),
                                xmlelement("RISK",c.risk),
@@ -404,12 +430,12 @@ function get_xml_pledge_dep return clob
                                 xmlelement("ACC",c.acc),
                                 xmlelement("ORDERNUM",c.ordernum),
                                 xmlelement("NUMBERPLEDGE",c.numberpledge),
-                                xmlelement("PLEDGEDAY",c.pledgeday),
+                                xmlelement("PLEDGEDAY",to_char(c.pledgeday,'dd.mm.yyyy')),
                                 xmlelement("S031",c.s031),
                                 xmlelement("R030",c.r030),
                                 xmlelement("SUMPLEDGE",c.sumpledge),
                                 xmlelement("PRICEPLEDGE",c.pricepledge),
-                                xmlelement("LASTPLEDGEDAY",c.lastpledgeday),
+                                xmlelement("LASTPLEDGEDAY",to_char(c.lastpledgeday,'dd.mm.yyyy')),
                                 xmlelement("CODREALTY",c.codrealty),
                                 xmlelement("ZIPREALTY",c.ziprealty),
                                 xmlelement("SQUAREREALTY",c.squarerealty),
@@ -432,40 +458,206 @@ function get_xml_pledge_dep return clob
     return l_xml_pledge_dep.getClobVal();
 end;
 
-procedure run_formated_xml
+
+
+procedure run_formated_xml_job (p_kf in varchar2)
   is
   id number;
   params BARSTRANS.TRANSP_UTL.t_add_params;
   KF varchar2(6);
+  l_request_id_person_fo number;
+  l_request_id_document_fo number;
+  l_request_id_address_fo number;
+  l_request_id_person_uo number;
+  l_request_id_finperformance_uo number;
+  l_request_id_fingr_uo number;
+  l_request_id_partners_uo number;
+  l_request_id_ownerpp number;
+  l_request_id_ownerjur number;
+  l_request_id_credit number;
+  l_request_id_credit_pledge number;
+  l_request_id_pledge_dep number;
   begin
    params(1).param_type:='GET';
    params(1).tag:='KF';
    params(1).value:=f_ourmfo;
-   KF:=current_user_kf;
-    begin
+   KF:=300465;
+   bars_login.login_user(p_sessionid =>sys_guid(),
+                         p_userid    =>1 ,
+                         p_hostname  =>null ,
+                         p_appname   =>null );
+
+   begin
     BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_person_fo(), params, 'NBU_PERSON_FO', KF, id);
-    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_document_fo(), params, 'NBU_DOCUMENT_FO', KF, id);
-    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_address_fo(), params, 'NBU_ADDRESS_FO', KF, id);
-    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_person_uo(), params, 'NBU_PERSON_UO', KF, id);
-    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_finperformance_uo(), params, 'NBU_FINPERFORMANCE_UO', KF, id);
-    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_finperformancegr_uo(), params, 'NBU_FINPERFORMANCEGR_UO', KF, id);
-    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_partners_uo(), params, 'NBU_PARTNERS_UO', KF, id);
-    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_ownerpp_uo(), params, 'NBU_OWNERPP_UO', KF, id);
-    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_ownerjur_uo(), params, 'NBU_OWNERJUR_UO', KF, id);
-    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_credit(), params, 'NBU_CREDIT', KF, id);
-    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_credit_pledge(), params, 'NBU_CREDIT_PLADGE', KF, id);
-    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_pledge_dep(), params, 'NBU_PLADGE_DEP', KF, id);
+      select t.id into l_request_id_person_fo from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=1 and kf=p_kf) and
+           data_type_id=1 and kf=p_kf;
+       bars.nbu_601_migrate.set_data_request_state(l_request_id_person_fo,9,'Дані успішно передані до ЦА');
+      commit;
+     exception
+       when others then
+         bars.nbu_601_migrate.set_data_request_state(l_request_id_person_fo,10,sqlerrm || dbms_utility.format_error_backtrace());
+     commit;
     end;
-   end;
+
+    begin
+    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_document_fo(), params, 'NBU_DOCUMENT_FO', KF, id);
+    select id into l_request_id_document_fo from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=2 and kf=p_kf) and
+           data_type_id=2 and kf=p_kf;
+       bars.nbu_601_migrate.set_data_request_state(l_request_id_document_fo,9,'Дані успішно передані до ЦА');
+       commit;
+     exception
+       when others then
+         bars.nbu_601_migrate.set_data_request_state(l_request_id_document_fo,10,sqlerrm || dbms_utility.format_error_backtrace());
+     commit;
+    end;
+
+    Begin
+    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_address_fo(), params, 'NBU_ADDRESS_FO', KF, id);
+    select id into l_request_id_address_fo from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=3 and kf=p_kf) and
+           data_type_id=3 and kf=p_kf;
+       bars.nbu_601_migrate.set_data_request_state(l_request_id_address_fo,9,'Дані успішно передані до ЦА');
+       commit;
+     exception
+       when others then
+         bars.nbu_601_migrate.set_data_request_state(l_request_id_address_fo,10,sqlerrm || dbms_utility.format_error_backtrace());
+     commit;
+    end;
+
+    begin
+    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_person_uo(), params, 'NBU_PERSON_UO', KF, id);
+     select id into l_request_id_person_uo from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=7 and kf=p_kf) and
+           data_type_id=7 and kf=p_kf;
+       bars.nbu_601_migrate.set_data_request_state(l_request_id_person_uo,9,'Дані успішно передані до ЦА');
+       commit;
+     exception
+       when others then
+         bars.nbu_601_migrate.set_data_request_state(l_request_id_person_uo,10,sqlerrm || dbms_utility.format_error_backtrace());
+     commit;
+    end;
+
+    begin
+    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_finperformance_uo(), params, 'NBU_FINPERFORMANCE_UO', KF, id);
+     select id into l_request_id_finperformance_uo from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=8 and kf=p_kf) and
+           data_type_id=8 and kf=p_kf;
+       bars.nbu_601_migrate.set_data_request_state(l_request_id_finperformance_uo,9,'Дані успішно передані до ЦА');
+      commit;
+     exception
+       when others then
+         bars.nbu_601_migrate.set_data_request_state(l_request_id_finperformance_uo,10,sqlerrm || dbms_utility.format_error_backtrace());
+     commit;
+    end;
+
+    begin
+    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_finperformancegr_uo(), params, 'NBU_FINPERFORMANCEGR_UO', KF, id);
+      select id into l_request_id_fingr_uo from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=10 and kf=p_kf) and
+           data_type_id=10 and kf=p_kf;
+       bars.nbu_601_migrate.set_data_request_state(l_request_id_fingr_uo,9,'Дані успішно передані до ЦА');
+       commit;
+     exception
+       when others then
+         bars.nbu_601_migrate.set_data_request_state(l_request_id_fingr_uo,10,sqlerrm || dbms_utility.format_error_backtrace());
+     commit;
+    end;
+
+    begin
+    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_partners_uo(), params, 'NBU_PARTNERS_UO', KF, id);
+     select id into l_request_id_partners_uo from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=11 and kf=p_kf) and
+           data_type_id=11 and kf=p_kf;
+       bars.nbu_601_migrate.set_data_request_state(l_request_id_partners_uo,9,'Дані успішно передані до ЦА');
+      commit;
+     exception
+       when others then
+         bars.nbu_601_migrate.set_data_request_state(l_request_id_partners_uo,10,sqlerrm || dbms_utility.format_error_backtrace());
+     commit;
+    end;
+
+    begin
+    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_ownerpp_uo(), params, 'NBU_OWNERPP_UO', KF, id);
+      select id into l_request_id_ownerpp from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=13 and kf=p_kf) and
+           data_type_id=13 and kf=p_kf;
+       bars.nbu_601_migrate.set_data_request_state(l_request_id_ownerpp,9,'Дані успішно передані до ЦА');
+       commit;
+     exception
+       when others then
+         bars.nbu_601_migrate.set_data_request_state(l_request_id_ownerpp,10,sqlerrm || dbms_utility.format_error_backtrace());
+     commit;
+    end;
+
+    begin
+    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_ownerjur_uo(), params, 'NBU_OWNERJUR_UO', KF, id);
+     select id into l_request_id_ownerjur from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=14 and kf=p_kf) and
+           data_type_id=14 and kf=p_kf;
+       bars.nbu_601_migrate.set_data_request_state(l_request_id_ownerjur,9,'Дані успішно передані до ЦА');
+       commit;
+     exception
+       when others then
+         bars.nbu_601_migrate.set_data_request_state(l_request_id_ownerjur,10,sqlerrm || dbms_utility.format_error_backtrace());
+     commit;
+    end;
+
+     begin
+    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_pledge_dep(), params, 'NBU_PLEDGE_DEP', KF, id);
+    select id into l_request_id_pledge_dep  from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=15 and kf=p_kf) and
+           data_type_id=15 and kf=p_kf;
+       bars.nbu_601_migrate.set_data_request_state(l_request_id_pledge_dep,9,'Дані успішно передані до ЦА');
+       commit;
+     exception
+       when others then
+         bars.nbu_601_migrate.set_data_request_state(l_request_id_pledge_dep,10,sqlerrm || dbms_utility.format_error_backtrace());
+     commit;
+    end;
+
+    begin
+    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_credit(), params, 'NBU_CREDIT', KF, id);
+     select id into l_request_id_credit  from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=16 and kf=p_kf) and
+           data_type_id=16 and kf=p_kf;
+       bars.nbu_601_migrate.set_data_request_state(l_request_id_credit,9,'Дані успішно передані до ЦА');
+       commit;
+     exception
+       when others then
+         bars.nbu_601_migrate.set_data_request_state(l_request_id_credit,10,sqlerrm || dbms_utility.format_error_backtrace());
+     commit;
+    end;
+
+    begin
+    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_credit_pledge(), params, 'NBU_CREDIT_PLEDGE', KF, id);
+     select id into l_request_id_credit_pledge  from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=17 and kf=p_kf) and
+           data_type_id=17 and kf=p_kf;
+       bars.nbu_601_migrate.set_data_request_state(l_request_id_credit_pledge,9,'Дані успішно передані до ЦА');
+       commit;
+     exception
+       when others then
+         bars.nbu_601_migrate.set_data_request_state(l_request_id_credit_pledge,10,sqlerrm || dbms_utility.format_error_backtrace());
+     commit;
+    end;
+    
+   /* begin
+    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_groupur_uo(), params, 'NBU_GROUPUR_UO', KF, id);
+     select id into l_request_id_credit_pledge  from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=9 and kf=p_kf) and
+           data_type_id=9 and kf=p_kf;
+       bars.nbu_601_migrate.set_data_request_state(l_request_id_credit_pledge,9,'Дані успішно передані до ЦА');
+       commit;
+     exception
+       when others then
+         bars.nbu_601_migrate.set_data_request_state(l_request_id_credit_pledge,10,sqlerrm || dbms_utility.format_error_backtrace());
+     commit;
+    end; */
+
+ end;
+
+
+procedure run_formated_xml
+  is
+ current_kf varchar2(50):=sys_context('bars_context','user_mfo');
+ begin
+      dbms_scheduler.set_job_argument_value(job_name  =>'RUN_FORMATED_XML',
+                                         argument_position =>1,
+                                         argument_value => current_kf );
+
+   dbms_scheduler.run_job(job_name =>'RUN_FORMATED_XML', use_current_session => false);
+end;
 
 end;
 /
-
-grant execute on nbu_601_formed_xml to barstrans;
-grant execute on nbu_601_formed_xml to BARS_ACCESS_DEFROLE;
-
-PROMPT ===================================================================================== 
-PROMPT *** End*** ========== Scripts /Sql/BARS/PACKAGE/nbu_601_formed_xml.sql =========*** End*** 
-PROMPT ===================================================================================== 
-
-
+grant execute on nbu_601_request_data_ru to barstrans;
+grant execute on nbu_601_request_data_ru to bars_access_defrole;

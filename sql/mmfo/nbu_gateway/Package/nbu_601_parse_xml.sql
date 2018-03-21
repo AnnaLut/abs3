@@ -39,7 +39,7 @@ TYPE t_nbu_credit              IS TABLE OF core_credit%ROWTYPE;
 TYPE t_nbu_credit_pledge       IS TABLE OF core_credit_pledge%ROWTYPE;
 TYPE t_nbu_pladge_dep          IS TABLE OF core_pledge_dep%ROWTYPE;
 --2
-l_date varchar(10) :='yyyy.mm.dd';
+l_date varchar(10) :='dd.mm.yyyy';
 l_cur_user varchar2(10);
 l_data_rep date;
 l_str1 varchar2(100);
@@ -114,7 +114,7 @@ end;*/
         dbms_xslprocessor.valueof(l_header, 'USER_KF/text()',l_kf);
         l_person_kf:=trim (l_kf);
 
-        l_check_id:=nbu_gateway.nbu_core_service.get_active_data_request_id(1,l_person_kf,l_date_cur, l_cur_user,l_data_rep);
+        l_check_id:=nbu_gateway.nbu_core_service.get_active_data_request_id('PERSON',l_person_kf,l_date_cur, l_cur_user,l_data_rep);
 
         Begin
          --формируем список строк данных
@@ -208,7 +208,7 @@ end;*/
        end;
        commit;
 end;
-  
+
 procedure p_parse_document_fo (p_id in  NUMBER)
   is
     l_clob       clob;
@@ -932,9 +932,6 @@ procedure p_parse_finperformancegr_uo (p_id in  NUMBER)
 
              dbms_xslprocessor.valueof(l_row, 'PERCENTOJ/text()', l_str);
              l_OWNERJUR_UO (l_OWNERJUR_UO.last).PERCENTOJ  :=to_number(l_str);
-
-             --dbms_xslprocessor.valueof(l_row, 'STATUS/text()', l_str);
-             --l_OWNERJUR_UO (l_OWNERJUR_UO.last).STATUS   := trim(l_str);
 
              dbms_xslprocessor.valueof(l_row, 'KF/text()', l_str);
              l_OWNERJUR_UO (l_OWNERJUR_UO.last).KF := to_number(l_str);
@@ -1681,7 +1678,7 @@ procedure p_parse_pledge_dep (p_id in  NUMBER)
              dbms_output.put_line(l_NBU_PLEDGE_DEP.count);
 
              begin
-            execute immediate 'alter table nbu_gateway.core_credit_pledge truncate partition for (' || l_check_id || ') reuse storage';
+            execute immediate 'alter table nbu_gateway.core_pledge_dep truncate partition for (' || l_check_id || ') reuse storage';
         exception
             when partition_doesnt_exist then
                  null;

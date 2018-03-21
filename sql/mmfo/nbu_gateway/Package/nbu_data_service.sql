@@ -310,7 +310,8 @@ create or replace package body nbu_data_service as
                                                               min(t.vdate) keep (dense_rank last order by t.vdate, t.branch) last_rate_date,
                                                               min(t.branch) keep (dense_rank last order by t.vdate, t.branch) last_branch
                                                        from   bars.cur_rates$base t
-                                                       where  t.vdate <= sysdate
+                                                       where  t.vdate >= sysdate - 10 and
+                                                              t.vdate <= sysdate
                                                        group by t.kv)) loop
             g_exchange_rates(i.kv) := i.rate_o;
         end loop;
@@ -707,7 +708,7 @@ create or replace package body nbu_data_service as
                                                             i.core_company_id,
                                                             'INSUFFICIENT_AMOUNT',
                                                             'Загальна сума заборгованості {' || to_char(nvl(i.total_loans_amount, 0) / 100, 'FM99999999990.00') ||
-                                                            ' грн. } меньша за граничне значення {' || (l_bottom_line / 100) || '}',
+                                                            ' грн.} менша за граничне значення {' || to_char(l_bottom_line / 100, 'FM999990.00') || ' грн.}',
                                                             i.default_core_company_id,
                                                             i.default_core_company_kf,
                                                             null);
@@ -823,7 +824,7 @@ create or replace package body nbu_data_service as
                                                             i.core_person_id,
                                                             'INSUFFICIENT_AMOUNT',
                                                             'Загальна сума заборгованості {' || to_char(nvl(i.total_loans_amount, 0) / 100, 'FM99999999990.00') ||
-                                                            ' грн. } меньша за граничне значення {' || (l_bottom_line / 100) || '}',
+                                                            ' грн.} менша за граничне значення {' || to_char(l_bottom_line / 100, 'FM999990.00') || ' грн.}',
                                                             i.default_core_person_id,
                                                             i.default_core_person_kf,
                                                             null);

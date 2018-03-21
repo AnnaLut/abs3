@@ -30,7 +30,7 @@ create or replace type body t_nbu_response is
 
                 dbms_lob.copy(l_payload, p_json, l_end_position - l_start_position - 1, src_offset => l_start_position + 1);
 
-                payload := t_nbu_response_payload(json_utl.base64url_to_string(l_payload));
+                payload := t_nbu_response_payload(replace(json_utl.base64url_to_string(l_payload), '\"', ''''));
             end if;
 
             if (l_string = 'protected') then

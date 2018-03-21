@@ -75,13 +75,13 @@ create or replace type body t_core_loan is
         numberdog        := l_core_loan_row.numdog;
         dogday           := l_core_loan_row.dogday;
         endday           := l_core_loan_row.endday;
-        sumzagal         := -l_core_loan_row.sumzagal;
+        sumzagal         := - l_core_loan_row.sumzagal;
         r030             := l_core_loan_row.r030;
         proccredit       := l_core_loan_row.proccredit;
-        sumpay           := l_core_loan_row.sumpay;
+        sumpay           := - l_core_loan_row.sumpay;
         periodbase       := l_core_loan_row.periodbase;
         periodproc       := l_core_loan_row.periodproc;
-        sumarrears       := l_core_loan_row.sumarrears;
+        sumarrears       := - l_core_loan_row.sumarrears;
         arrearbase       := l_core_loan_row.arrearbase;
         arrearproc       := l_core_loan_row.arrearproc;
         daybase          := l_core_loan_row.daybase;
@@ -250,6 +250,30 @@ create or replace type body t_core_loan is
            p_is_valid := false;
            p_validation_message := case when p_validation_message is null then null else p_validation_message || ', ' end ||
                                    'Дата кредитного договору не вказана';
+       end if;
+
+       if (typecredit is null) then
+           p_is_valid := false;
+           p_validation_message := case when p_validation_message is null then null else p_validation_message || ', ' end ||
+                                   'Не визначений тип кредиту';
+       end if;
+
+       if (proccredit is null) then
+           p_is_valid := false;
+           p_validation_message := case when p_validation_message is null then null else p_validation_message || ', ' end ||
+                                   'Не вказана номінальна відсоткова ставка';
+       end if;
+
+       if (periodbase is null) then
+           p_is_valid := false;
+           p_validation_message := case when p_validation_message is null then null else p_validation_message || ', ' end ||
+                                   'Не вказана періодичність сплати основного боргу';
+       end if;
+
+       if (periodproc is null) then
+           p_is_valid := false;
+           p_validation_message := case when p_validation_message is null then null else p_validation_message || ', ' end ||
+                                   'Не вказана періодичність сплати відсотків';
        end if;
 
        if (customer_id is null) then

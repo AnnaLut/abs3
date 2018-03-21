@@ -7,14 +7,14 @@ begin
      (
             request_id    number(38),
             rnk           number(38),
-            codregion     varchar2(3 char),
-            area          varchar2(100 char),
-            zip           varchar2(10 char),
-            city          varchar2(254 char),
-            streetaddress varchar2(254 char),
-            houseno       varchar2(50 char),
-            adrkorp       varchar2(10 char),
-            flatno        varchar2(10 char),
+            codregion     varchar2(4000 byte),
+            area          varchar2(4000 byte),
+            zip           varchar2(4000 byte),
+            city          varchar2(4000 byte),
+            streetaddress varchar2(4000 byte),
+            houseno       varchar2(4000 byte),
+            adrkorp       varchar2(4000 byte),
+            flatno        varchar2(4000 byte),
             kf            varchar2(6 char)
      )
      tablespace brsmdld

@@ -38,21 +38,20 @@ create or replace type body t_nbu_response_payload is
                 l_end_position := dbms_lob.instr(p_payload, ',', l_start_position + 1);
 
                 general_err_code := dbms_lob.substr(p_payload, l_end_position - l_start_position - 1, l_start_position + 1);
-                dbms_output.put_line('general_err_code : ' || general_err_code);
+                -- dbms_output.put_line('general_err_code : ' || general_err_code);
             when 'general_http_status_code' then
                 l_start_position := dbms_lob.instr(p_payload, ':', l_end_position + 1);
                 l_end_position := dbms_lob.instr(p_payload, ',', l_start_position + 1);
 
                 general_http_status_code := dbms_lob.substr(p_payload, l_end_position - l_start_position - 1, l_start_position + 1);
-                dbms_output.put_line('general_http_status_code : ' || general_http_status_code);
+                -- dbms_output.put_line('general_http_status_code : ' || general_http_status_code);
             when 'general_err_comment' then
-                l_start_position := dbms_lob.instr(p_payload, ':', l_end_position + 1);
-                l_end_position := dbms_lob.instr(p_payload, ',', l_start_position + 1);
+                l_start_position := dbms_lob.instr(p_payload, '"', l_end_position + 1);
+                l_end_position := dbms_lob.instr(p_payload, '"', l_start_position + 1);
 
                 general_err_comment := dbms_lob.substr(p_payload, l_end_position - l_start_position - 1, l_start_position + 1);
-                dbms_output.put_line('general_err_comment : ' || general_err_comment);
+                -- dbms_output.put_line('general_err_comment : ' || general_err_comment);
             when 'result_kvi' then
-                dbms_output.put_line('result_kvi : ' || dbms_lob.substr(p_payload, 10, l_end_position));
                 if (dbms_lob.substr(p_payload, 10, l_end_position) not like '%null%') then
                     l_start_position := dbms_lob.instr(p_payload, '[', l_end_position + 1);
                     l_end_position := dbms_lob.instr(p_payload, ']', l_start_position + 1);
@@ -68,7 +67,7 @@ create or replace type body t_nbu_response_payload is
 
                             l_payload_unit := dbms_lob.substr(l_result_kvi, l_array_end_position - l_array_start_position - 1, l_array_start_position + 1);
 
-                            dbms_output.put_line('l_payload_unit : ' || l_payload_unit);
+                            -- dbms_output.put_line('l_payload_unit : ' || l_payload_unit);
 
                             if (l_payload_unit is not null and l_payload_unit <> 'null') then
                                  if (response_units is null) then

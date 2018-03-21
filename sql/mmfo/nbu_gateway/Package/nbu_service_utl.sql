@@ -72,6 +72,9 @@ create or replace package nbu_service_utl is
         p_session_row nbu_session%rowtype);
 
     procedure process_responses;
+
+    procedure repeat_session(
+        p_session_id in integer);
 end;
 /
 create or replace package body nbu_service_utl as
@@ -312,7 +315,7 @@ create or replace package body nbu_service_utl as
         l_wallet_pass varchar2(32767 byte);
         l_response bars.wsm_mgr.t_response;
     begin
-        l_url := bars.branch_attribute_utl.get_attribute_value('/', 'LINK_FOR_ABSBARS_SOAPWEBSERVICES') || 'SendCreditInfoService.asmx';
+        l_url := bars.branch_attribute_utl.get_attribute_value('/', 'NBU_601_PROXY_WEB_SERVER') || 'SendCreditInfoService.asmx';
         -- l_url := 'https://tbarsweb-00-11.oschadbank.ua:44302/barsroot/webservices/SendCreditInfoService.asmx';
         -- l_url := 'https://10.10.10.79:90/barsroot/webservices/SendCreditInfoService.asmx';
 
@@ -418,53 +421,55 @@ create or replace package body nbu_service_utl as
         p_customer_object_row in nbu_reported_object%rowtype)
     is
     begin
-        for i in (select s.*
-                  from   nbu_session s
-                  where  s.state_id in (nbu_service_utl.SESSION_STATE_PENDING, nbu_service_utl.SESSION_STATE_NEW) and
-                         s.object_id in (select t.id
-                                         from   nbu_reported_pledge t
-                                         where  t.customer_object_id = p_customer_object_row.id) and
-                         not exists (select 1
-                                     from   nbu_session ss
-                                     where  ss.object_id = s.object_id and
-                                            s.state_id in (nbu_service_utl.SESSION_STATE_RESPONDED, nbu_service_utl.SESSION_STATE_NBU_SIGN_VERIF))
-                  for update) loop
+        if (p_customer_object_row.external_id is not null) then
+            for i in (select s.*
+                      from   nbu_session s
+                      where  s.state_id in (nbu_service_utl.SESSION_STATE_PENDING, nbu_service_utl.SESSION_STATE_NEW) and
+                             s.object_id in (select t.id
+                                             from   nbu_reported_pledge t
+                                             where  t.customer_object_id = p_customer_object_row.id) and
+                             not exists (select 1
+                                         from   nbu_session ss
+                                         where  ss.object_id = s.object_id and
+                                                s.state_id in (nbu_service_utl.SESSION_STATE_RESPONDED, nbu_service_utl.SESSION_STATE_NBU_SIGN_VERIF))
+                      for update) loop
 
-            set_session_state(i.id,
-                              nbu_service_utl.SESSION_STATE_TO_SIGN,
-                              'Клієнт з кодом {' || nbu_object_utl.get_object_code(p_customer_object_row) ||
-                              '} переданий до НБУ і отримав ідентифікатор {' || p_customer_object_row.external_id ||
-                              '} - розпочинаємо передачу даних по заставах клієнта', null);
-        end loop;
+                set_session_state(i.id,
+                                  nbu_service_utl.SESSION_STATE_TO_SIGN,
+                                  '',
+                                  null);
+            end loop;
+        end if;
     end;
 
     procedure proceed_further_loan_session(
         p_customer_object_row in nbu_reported_object%rowtype)
     is
     begin
-        for i in (select s.*
-                  from   nbu_session s
-                  where  s.state_id in (nbu_service_utl.SESSION_STATE_PENDING, nbu_service_utl.SESSION_STATE_NEW) and
-                         s.object_id in (select t.id
-                                         from   nbu_reported_loan t
-                                         where  t.customer_object_id = p_customer_object_row.id) and
-                         not exists (select 1
-                                     from   nbu_reported_pledge p
-                                     join   nbu_reported_object o on o.id = p.id and
-                                                                     o.state_id = nbu_object_utl.OBJ_STATE_NEW
-                                     where  p.customer_object_id = p_customer_object_row.id) and
-                         not exists (select 1
-                                     from   nbu_session ss
-                                     where  ss.object_id = s.object_id and
-                                            s.state_id in (nbu_service_utl.SESSION_STATE_RESPONDED, nbu_service_utl.SESSION_STATE_NBU_SIGN_VERIF))
-                  for update) loop
+        if (p_customer_object_row.external_id is not null) then
+            for i in (select s.*
+                      from   nbu_session s
+                      where  s.state_id in (nbu_service_utl.SESSION_STATE_PENDING, nbu_service_utl.SESSION_STATE_NEW) and
+                             s.object_id in (select t.id
+                                             from   nbu_reported_loan t
+                                             where  t.customer_object_id = p_customer_object_row.id) and
+                             not exists (select 1
+                                         from   nbu_reported_pledge p
+                                         join   nbu_reported_object o on o.id = p.id and
+                                                                         o.state_id = nbu_object_utl.OBJ_STATE_NEW
+                                         where  p.customer_object_id = p_customer_object_row.id) and
+                             not exists (select 1
+                                         from   nbu_session ss
+                                         where  ss.object_id = s.object_id and
+                                                s.state_id in (nbu_service_utl.SESSION_STATE_RESPONDED, nbu_service_utl.SESSION_STATE_NBU_SIGN_VERIF))
+                      for update) loop
 
-            set_session_state(i.id,
-                              nbu_service_utl.SESSION_STATE_TO_SIGN,
-                              'Клієнт з кодом {' || nbu_object_utl.get_object_code(p_customer_object_row) ||
-                              '} переданий до НБУ і отримав ідентифікатор {' || p_customer_object_row.external_id ||
-                              '} - розпочинаємо передачу даних по кредитах клієнта', null);
-        end loop;
+                set_session_state(i.id,
+                                  nbu_service_utl.SESSION_STATE_TO_SIGN,
+                                  '',
+                                  null);
+            end loop;
+        end if;
     end;
 
     procedure proceed_further_sessions(
@@ -617,13 +622,31 @@ create or replace package body nbu_service_utl as
     begin
         for i in (select s.*
                   from   nbu_session s
-                  where  s.state_id = nbu_service_utl.SESSION_STATE_RESPONDED
-                  for update) loop
-
+                  where  s.state_id in (nbu_service_utl.SESSION_STATE_RESPONDED)
+                  /*for update*/) loop
             process_response(i);
         end loop;
     end;
 
+    procedure repeat_session(
+        p_session_id in integer)
+    is
+        l_session_row nbu_session%rowtype;
+    begin
+        l_session_row := read_session(p_session_id);
+        if (l_session_row.state_id in (nbu_service_utl.SESSION_STATE_SIGNED, nbu_service_utl.SESSION_STATE_SEND_FAILED)) then
+            call_service(l_session_row);
+
+            l_session_row := read_session(p_session_id, p_lock => true);
+            if (l_session_row.state_id = nbu_service_utl.SESSION_STATE_RESPONDED) then
+                process_response(l_session_row);
+            end if;
+        else
+            raise_application_error(-20000, 'Сесія взаємодії з НБУ перебуває в стані {' ||
+                                            bars.list_utl.get_item_name(nbu_service_utl.LT_SESSION_STATE, l_session_row.state_id) ||
+                                            '} - повторна відправка даних заборонена');
+        end if;
+    end;
 begin
     g_nbu_url(nbu_object_utl.OBJ_TYPE_COMPANY) := 'https://172.22.2.168/cr_reestr/api/customer_lp';
     g_nbu_url(nbu_object_utl.OBJ_TYPE_PERSON)  := 'https://172.22.2.168/cr_reestr/api/customer_pp';

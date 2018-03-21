@@ -11,17 +11,17 @@ begin
     execute immediate
     'create table NBU_ADDRESS_FO
     (
-        rnk    NUMBER(38),
-        codRegion VARCHAR2(3),
-        area VARCHAR2(100),
-        zip VARCHAR2(10),
-        city   VARCHAR2(254),
-        streetAddress VARCHAR2(254),
-        houseNo VARCHAR2(50),
-        adrKorp VARCHAR2(10),
-        flatNo   VARCHAR2(10),
-        status VARCHAR2(30),
-	status_message VARCHAR2(4000),
+        rnk             NUMBER(38),
+        codRegion       VARCHAR2(4000 byte),
+        area            VARCHAR2(4000 byte),
+        zip             VARCHAR2(4000 byte),
+        city            VARCHAR2(4000 byte),
+        streetAddress   VARCHAR2(4000 byte),
+        houseNo         VARCHAR2(4000 byte),
+        adrKorp         VARCHAR2(4000 byte),
+        flatNo          VARCHAR2(4000 byte),
+        status          VARCHAR2(30 char),
+        status_message  VARCHAR2(4000 byte),
         kf    VARCHAR2(6)
     )
     TABLESPACE BRSMDLD

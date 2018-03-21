@@ -107,13 +107,15 @@ create or replace type body t_core_person is
 
         members         := l_person_family_row.members;
 
-        k060            := bars.string_list(l_person_row.k060);
+        k060            := bars.string_list(lpad(l_person_row.k060, 2, '0'));
 
         core_object_kf  := p_person_kf;
         core_object_id  := p_person_id;
 
         codman          := l_object_row.external_id;
         person_code     := l_person_row.person_code;
+
+        reported_object_id := l_object_row.id;
 
         return;
     end;
@@ -165,7 +167,7 @@ create or replace type body t_core_person is
                 l_address_keys.delete();
                 l_address_keys.extend(8);
                 l_address_keys(1) := json_utl.make_json_string('codRegion', addresses(l).codRegion, p_mandatory => true);
-                l_address_keys(2) := json_utl.make_json_string('area', addresses(l).area, p_mandatory => true);
+                l_address_keys(2) := json_utl.make_json_string('area', nvl(addresses(l).area, addresses(l).city), p_mandatory => true);
                 l_address_keys(3) := json_utl.make_json_string('zip', addresses(l).zip, p_mandatory => true);
                 l_address_keys(4) := json_utl.make_json_string('city', addresses(l).city, p_mandatory => true);
                 l_address_keys(5) := json_utl.make_json_string('streetAddress', addresses(l).streetAddress, p_mandatory => true);
@@ -226,7 +228,7 @@ create or replace type body t_core_person is
         l integer;
     begin
         if (p_core_object is null) then
-            return null;
+            return false;
         end if;
 
         if (p_core_object is of (t_core_person)) then
@@ -281,14 +283,7 @@ create or replace type body t_core_person is
                     if (l_core_person.addresses.count = addresses.count) then
                         l := l_core_person.addresses.first;
                         while (l_equals and l is not null) loop
-                            l_equals := bars.tools.equals(l_core_person.addresses(l).codregion    , addresses(l).codregion    ) and
-                                        bars.tools.equals(l_core_person.addresses(l).area         , addresses(l).area         ) and
-                                        bars.tools.equals(l_core_person.addresses(l).zip          , addresses(l).zip          ) and
-                                        bars.tools.equals(l_core_person.addresses(l).city         , addresses(l).city         ) and
-                                        bars.tools.equals(l_core_person.addresses(l).streetaddress, addresses(l).streetaddress) and
-                                        bars.tools.equals(l_core_person.addresses(l).houseno      , addresses(l).houseno      ) and
-                                        bars.tools.equals(l_core_person.addresses(l).adrkorp      , addresses(l).adrkorp      ) and
-                                        bars.tools.equals(l_core_person.addresses(l).flatno       , addresses(l).flatno       );
+                            l_equals := addresses(l).equals(l_core_person.addresses(l));
                             l := l_core_person.addresses.next(l);
                         end loop;
                     else
@@ -353,6 +348,10 @@ create or replace type body t_core_person is
         p_is_valid out boolean,
         p_validation_message out varchar2)
     is
+        l_valid_addresses_count integer;
+        l integer;
+        l_address_is_valid boolean;
+        l_address_validation_message varchar2(32767 byte);
     begin
         p_is_valid := true;
 
@@ -364,6 +363,27 @@ create or replace type body t_core_person is
         if (inn is null) then
             p_is_valid := false;
             p_validation_message := 'Ідентифікаційний код клієнта не вказаний';
+        end if;
+
+        if (addresses is not null and addresses is not empty) then
+            l := addresses.first;
+            while (l is not null) loop
+                addresses(l).perform_check(l_address_is_valid, l_address_validation_message);
+
+                if (l_address_is_valid) then
+                    l_valid_addresses_count := l_valid_addresses_count + 1;
+                end if;
+
+                l := addresses.next(l);
+            end loop;
+
+            if (l_valid_addresses_count = 0) then
+                p_is_valid := false;
+                p_validation_message := 'Адреса клієнта не пройшла перевірку';
+            end if;
+        else
+            p_is_valid := false;
+            p_validation_message := 'Адреса клієнта не заповнена';
         end if;
     end;
 end;

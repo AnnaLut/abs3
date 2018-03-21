@@ -965,7 +965,7 @@ create or replace package body nbu_core_service as
             return null;
         end if;
 
-        select t_core_person_address(substr(nvl(t.codregion, b.region_code), 1, 2),
+        select t_core_person_address(substr(ltrim(nvl(t.codregion, b.region_code), '0'), 1, 2),
                                      substr(t.area, 1, 100),
                                      substr(t.zip, 1, 10),
                                      substr(t.city, 1, 254),
