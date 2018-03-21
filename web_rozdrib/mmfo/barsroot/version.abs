@@ -1,7 +1,11 @@
-=========  svn diff --summarize -r 50284:50490 D:\SVN\master\web\mmfo
+=========  svn diff --summarize -r 50284:50513 D:\SVN\master\web\mmfo
+---web_release----: D:\SVN\Releases\Bugfix_2.0.39.5.5\mmfo\web\TEMPLATE.RPT\IDDOC2.frx
+---web_release----: D:\SVN\Releases\Bugfix_2.0.39.5.5\mmfo\web\TEMPLATE.RPT
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.39.5.5\mmfo\web\barsroot\Areas\Sep\Views\Sep3720\Index.cshtml
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.39.5.5\mmfo\web\barsroot\App_Code\Areas\Sep\Infrastructure\Repository\DI\Implementation\Sep3720Repository.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.39.5.5\mmfo\web\barsroot\App_Code\Areas\Transp\Controllers\Api\ProxyV1Controller.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.39.5.5\mmfo\web\barsroot\App_Code\Areas\Transp\Controllers\Api\V1Controller.cs
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.39.5.5\mmfo\web\barsroot\docinput\js\chkForm.js
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.39.5.5\mmfo\web\barsroot
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.39.5.5\mmfo\web
-Bugfix_2.0.39.5.5 (Rev:50284-50490
+Bugfix_2.0.39.5.5 (Rev:50284-50513
