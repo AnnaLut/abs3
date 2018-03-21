@@ -45,6 +45,7 @@ create or replace package nbu_601_request_data_ru is
     ---розмір фінансових показників діяльності боржника.
     procedure p_nbu_finperformance_uo (kf_ in varchar2);
 
+    procedure p_nbu_groupur_uo(kf_ in varchar2);
     --розмір фінансових показників діяльності групи юридичних осіб, що знаходяться під спільним контролем
     procedure p_nbu_finperformancegr_uo (kf_ varchar2);
 
@@ -71,7 +72,6 @@ create or replace package nbu_601_request_data_ru is
 end;
 
 /
-
 create or replace package body nbu_601_request_data_ru is
 
     g_balance_accounts string_list := string_list('2010', '2018', '2020', '2027', '2028', '2029', '2030', '2037', '2038', '2039', '2060', '2062',
@@ -167,7 +167,7 @@ create or replace package body nbu_601_request_data_ru is
                     where  c.sed <> 91 and
                            c.custtype = 3 and
                            c.rnk in (select a.rnk
-                                     from   accounts a
+                                     from   accounts a  
                                      where  a.kf = kf_ and
                                             (a.nbs member of g_balance_accounts or (a.nbs in ('2600', '2620', '2625', '2650', '2655') and a.ostq < 0)) and
                                             a.acc in (select acc from nd_acc where kf = kf_
@@ -185,7 +185,7 @@ create or replace package body nbu_601_request_data_ru is
                     fiz.countrycodnerez,          -- countrycodnerez varchar2(3),
                     fiz.prinsider,                -- k060            varchar2(2),
                     null,                         -- status          varchar2(30),
-                    null, 
+                    null,
 					kf_);                         -- kf              varchar2(6) not null
         end loop;
         commit;
@@ -253,7 +253,7 @@ create or replace package body nbu_601_request_data_ru is
                     address.homepart,
                     address.room,
                     null,
-					null, 
+					          null,
                     kf_);
         end loop;
 
@@ -286,6 +286,15 @@ create or replace package body nbu_601_request_data_ru is
                                       r.kol24 = '100' and
                                       r.fdat = trunc(sysdate, 'mm') and
                                       rownum = 1), 'false') ismember,
+                          --
+                          coalesce((select 'true' from rez_cr r , cust_bun b,cust_rel cr 
+                                     where r.kol24 in ('[001]','[100]',001,100) and b.id_rel=cr.id and cr.id in (12,51)
+                                     and r.rnk=c.rnk and b.rnka=c.rnk  and r.fdat = trunc(sysdate,'mm') and rownum = 1),
+                                   (select 'false' from rez_cr r 
+                                     where r.kol24 in ('[001]','[100]',001,100) 
+                                     and r.rnk=c.rnk and r.fdat = trunc(sysdate,'mm') and rownum = 1),
+                                   (select null from rez_cr cr where  cr.rnk=c.rnk and cr.fdat = trunc(sysdate,'mm') and (cr.kol24 in ('000','[000]') or cr.kol24 is null) and rownum = 1 )) isController,
+                          ----                                                           
                           nvl((select 'true'
                                from   d8_cust_link_groups d8
                                where  d8.okpo = c.okpo and
@@ -314,12 +323,12 @@ create or replace package body nbu_601_request_data_ru is
                     l_ec_year,            -- ec_year         date,
                     ur.country,           -- countrycodnerez varchar2(3),
                     ur.ismember,          -- ismember        varchar2(5),
-                    null,                 -- iscontroller    varchar2(5),
+                    ur.isController,      -- iscontroller    varchar2(5),
                     ur.ispartner,         -- ispartner       varchar2(5),
                     null,                 -- isaudit         varchar2(5),
                     ur.k060,              -- k060            varchar2(2),
                     null,                 -- status          varchar2(30),
-                    null, 
+                    null,
 					kf_);                 -- kf              varchar2(6)
         end loop;
 
@@ -374,13 +383,52 @@ create or replace package body nbu_601_request_data_ru is
                     l_ebitda,             -- ebitda    number(32),
                     l_totaldebt,          -- totaldebt number(32),
                     null,                 -- status    varchar2(30),
-                    null, 
+                    null,
 					kf_);                 -- kf        varchar2(6)
         end loop;
 
         commit;
     end;
+    --------------------------------
+      procedure p_nbu_groupur_uo(
+       kf_ in varchar2)
+       is
+       begin
+       bc.go (kf_);
 
+       begin
+            execute immediate 'alter table nbu_groupur_uo truncate partition for (''' || kf_ || ''') reuse storage';
+       end;
+
+       for groupur  in (select distinct  p.rnk, decode(c.codcagent,3,'true','false') isRezGr,c.okpo,nmk,country 
+                           from  customer c, nbu_person_uo p,cust_bun b
+                           where c.rnk=p.rnk and p.iscontroller is not null and p.rnk=b.rnka
+                           union 
+                           select distinct  p.rnk, decode (country,804,'true','false') isRezGr,c.okpo,name,c.country 
+                           from  customer_extern c, nbu_person_uo p
+                           where c.rnk=p.rnk and p.iscontroller is not null)loop
+                          insert into nbu_groupur_uo (rnk,
+                                                      whois,
+                                                      isrezgr,
+                                                      codedrpougr,
+                                                      nameurgr,
+                                                      countrycodgr,
+                                                      status,
+                                                      status_message,
+                                                      kf)
+                                       values (groupur.rnk,
+                                               null,
+                                               groupur.isRezGr,
+                                               groupur.okpo,
+                                               groupur.nmk,
+                                               groupur.country,
+                                               null,
+                                               null,
+                                               kf_);
+          end loop;               
+        commit;
+    end;
+    
     ---------------------------------
     procedure p_nbu_finperformancegr_uo(
        kf_ in varchar2)
@@ -444,7 +492,7 @@ create or replace package body nbu_601_request_data_ru is
                         l_totaldebtgr,     -- totaldebtgr number(32),
                         i.last_grkl,       -- classgr     varchar2(3),
                         null,              -- status      varchar2(30),
-                        null, 
+                        null,
 						kf_);              -- kf          varchar2(6)
             exception
                 when no_data_found then
@@ -465,11 +513,12 @@ create or replace package body nbu_601_request_data_ru is
         begin
         execute immediate 'alter table NBU_OWNERJUR_UO truncate partition for (''' || kf_ || ''') reuse storage';
         end;
-        for n in (select rnka as rnk,rnkb,name,decode (country_u,804,'true','false') isrezoj,okpo_u,'' as registrydayoj ,'' as numberregistryoj,country_u,min(vaga1) as vaga1,' ' status
-                  from cust_bun
-                  where vaga1>10 and (edate>sysdate or edate is null) and custtype_u=1
-                        and id_rel in (1,4)
-                        group by rnka,rnkb,name,decode (country_u,804,'true','false'),okpo_u,country_u) -- юр
+        for n in (select b.rnka as rnk,b.rnkb,b.name,decode (b.country_u,804,'true','false') isrezoj,b.okpo_u, c.datea as registrydayoj ,c.rgadm as numberregistryoj,b.country_u,min(b.vaga1) as vaga1,' ' status
+                  from cust_bun b 
+                  left join customer c on   b.rnka=c.rnk
+                  where b.vaga1>10 and (b.edate>sysdate or b.edate is null) and b.custtype_u=1
+                        and b.id_rel in (1,4)
+                        group by b.rnka,b.rnkb,b.name,decode (b.country_u,804,'true','false'),b.okpo_u,c.datea,c.rgadm,b.country_u) -- юр
                   loop
                     begin
                   insert into bars.nbu_ownerjur_uo  ( rnk,rnkb,nameoj,isrezoj,codedrpouoj,registrydayoj,numberregistryoj,countrycodoj,percentoj,status,kf) values
@@ -638,7 +687,7 @@ create or replace package body nbu_601_request_data_ru is
                                   from   int_ratn t
                                   where  t.id = 0 and bdat < trunc(sysdate, 'mm')
                                   group by t.acc) proc on proc.acc = bpk.acc and
-                                                          bpk.nbs in ('2625', '2202', '2203', '2605', '2062', '2063') --номінальна процентна ставка
+                                                          bpk.nbs in ('2625', '2202', '2203', '2605', '2062', '2063','9129') --номінальна процентна ставка
                        where rnk_client.rnk = bpk.rnk and rnk_client.kf = kf_)
 
           loop
@@ -719,7 +768,7 @@ create or replace package body nbu_601_request_data_ru is
                                  from   agg_monbals ag,
                                         nd_acc n,
                                         accounts a2
-                                 where  ag.fdat=add_months(trunc(sysdate,'mm'),-2) and
+                                 where  ag.fdat=add_months(trunc(sysdate,'mm'),-1) and
                                         a2.nbs in (9020,9023,9122,9129) and
                                         n.acc = a2.acc and
                                         n.acc = ag.acc)
@@ -730,7 +779,7 @@ create or replace package body nbu_601_request_data_ru is
                                   from   agg_monbals ag,
                                          nd_acc n,
                                          accounts a2
-                                  where ag.fdat = add_months(trunc(sysdate,'mm'),-2) and
+                                  where ag.fdat = add_months(trunc(sysdate,'mm'),-1) and
                                         a2.tip in ('SS','SP ', 'SN','SPN','SNO','SNA') and
                                         n.acc = a2.acc and
                                         n.acc = ag.acc)

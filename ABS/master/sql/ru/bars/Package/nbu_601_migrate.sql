@@ -1,7 +1,3 @@
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/PACKAGE/nbu_601_migrate.sql =========*** Run *** 
-PROMPT ===================================================================================== 
-
 create or replace package nbu_601_migrate as
 
     REQ_STATE_NEW                  constant integer := 1;
@@ -28,12 +24,15 @@ create or replace package nbu_601_migrate as
         p_raise_ndf in boolean default true)
         return nbu_branch_601%rowtype;
 
-
   procedure create_data_request(
         P_KF in varchar2);
 
-end;
+  procedure set_data_request_state(
+        p_request_id in integer,
+        p_state_id in integer,
+        p_tracking_comment in varchar2);      	
 
+end;
 /
 create or replace package body nbu_601_migrate  as
 
@@ -310,7 +309,6 @@ procedure run_data_request(
     is
         pragma autonomous_transaction;
         l_request_row nbu_data_request_601%rowtype;
-        l_core_branch_row nbu_branch_601%rowtype;
         l_job_name varchar2(30 char);
        -- l_request_mode varchar2(32767 byte);
         job_is_runing exception;
@@ -318,45 +316,29 @@ procedure run_data_request(
     begin
         l_request_row := read_data_request(p_request_id, p_lock => true);
 
-       -- l_request_mode := bars.branch_attribute_utl.get_attribute_value('/', 'NBU_601_DATA_REQUEST_MODE', p_raise_expt => 0, p_check_exist => 0);
+        -- слід пам'ятати, що звернення до dbms_scheduler фіксує транзакцію
+        -- (це означає, що використати savepoint в даному випадку не вдасться, тому вся процедура повністю виконується в атономній транзакції,
+        -- для того щоб поведінка процедури була прогнозованою і повністю охоплювала весь процес обробки одного запиту даних)
 
-       -- if (l_request_mode = 'CENTRALIZED') then
+        ensure_wrapper_program('nbu_601_migrate.handle_data_request',
+                               'Запуск сбора данных для 601 отчета');
 
-             l_core_branch_row := read_branch(l_request_row.kf);
+        l_job_name := generate_job_name(l_request_row.kf, get_request_type_code(l_request_row.data_type_id));
+        ensure_wrapper_job(l_job_name, 'Джоб для обробки запитів на отримання даних для формування 601-ї форми з філії {' || l_request_row.kf ||
+                                           '} по типу даних {' || get_request_type_name(l_request_row.data_type_id) || '}');
 
-            if (l_core_branch_row.is_internal = 1) then
+        dbms_scheduler.set_job_argument_value(job_name       => l_job_name,
+                                              argument_name  => 'p_request_id',
+                                              argument_value => l_request_row.id);
+        set_data_request_state(l_request_row.id, nbu_601_migrate.REQ_STATE_WAITING_FOR_DATA, 'Очікує на отримання даних з філії');
 
-                -- слід пам'ятати, що звернення до dbms_scheduler фіксує транзакцію
-                -- (це означає, що використати savepoint в даному випадку не вдасться, тому вся процедура повністю виконується в атономній транзакції,
-                -- для того щоб поведінка процедури була прогнозованою і повністю охоплювала весь процес обробки одного запиту даних)
-
-                ensure_wrapper_program('nbu_601_migrate.handle_data_request',
-                                       'Запуск сбора данных для 601 отчета');
-
-                l_job_name := generate_job_name(l_request_row.kf, get_request_type_code(l_request_row.data_type_id));
-                ensure_wrapper_job(l_job_name, 'Джоб для обробки запитів на отримання даних для формування 601-ї форми з філії {' || l_request_row.kf ||
-                                                   '} по типу даних {' || get_request_type_name(l_request_row.data_type_id) || '}');
-
-                dbms_scheduler.set_job_argument_value(job_name       => l_job_name,
-                                                      argument_name  => 'p_request_id',
-                                                      argument_value => l_request_row.id);
-                set_data_request_state(l_request_row.id, nbu_601_migrate.REQ_STATE_WAITING_FOR_DATA, 'Очікує на отримання даних з філії');
-
-                -- не виключений подвійний запуск джоба, якщо два користувачі одночасно запустять повторне отримання даних з РУ - другий виклик ігнорується
-                begin
-                    dbms_scheduler.run_job(job_name => l_job_name, use_current_session => false);
-                exception
-                    when job_is_runing then
-                         null;
-                end;
-            else
-
-                raise_application_error(-20000, 'Робота з віддаленими регіональними управліннями не реалізована');
-
-            end if;
-        --else
-          --  set_data_request_state(l_request_row.id, nbu_601_migrate.REQ_STATE_WAITING_FOR_DATA, 'Очікує на отримання даних з філії');
-        --end if;
+        -- не виключений подвійний запуск джоба, якщо два користувачі одночасно запустять повторне отримання даних з РУ - другий виклик ігнорується
+        begin
+            dbms_scheduler.run_job(job_name => l_job_name, use_current_session => false);
+        exception
+            when job_is_runing then
+                 null;
+        end;
 
         commit;
     exception
@@ -384,36 +366,79 @@ procedure run_all_data_requests(
     l_request_id_person_uo int;
     l_request_id_fingr_uo int;
     begin
-      bars.nbu_601_request_data_ru.p_nbu_w4_bpk(P_KF);
+     begin 
+     bars.nbu_601_request_data_ru.p_nbu_w4_bpk(P_KF);
        select id into l_request_id_w4_bpk from nbu_data_request_601 t where  t.report_instance_id= (select max(report_instance_id) from nbu_data_request_601 where data_type_id=19 and kf=p_kf) and
            data_type_id=19 and kf=p_kf and report_instance_id=p_report_id;
-            set_data_request_state(l_request_id_w4_bpk,nbu_601_migrate.REQ_STATE_DATA_DELIVERED, 'Дані отримано');
+         set_data_request_state(l_request_id_w4_bpk,nbu_601_migrate.REQ_STATE_DATA_DELIVERED, 'Дані отримано');
+         commit;
+         exception 
+         when others then
+         set_data_request_state(l_request_id_w4_bpk,10,sqlerrm ||' '||dbms_utility.format_error_backtrace());
+         commit;   
+      end;
       ---
+      begin
       bars.nbu_601_request_data_ru.p_nbu_person_fo(P_KF);
        select id into l_request_id_person_fo from nbu_data_request_601 t where  t.report_instance_id= (select max(report_instance_id) from nbu_data_request_601 where data_type_id=1 and kf=p_kf) and
            data_type_id=1 and kf=p_kf and report_instance_id=p_report_id;
              set_data_request_state(l_request_id_person_fo,nbu_601_migrate.REQ_STATE_DATA_DELIVERED, 'Дані отримано');
+             commit;
+             exception 
+             when others then
+             set_data_request_state(l_request_id_person_fo,10,sqlerrm ||' '||dbms_utility.format_error_backtrace()); 
+             commit;
+      end;
       ---
+      begin 
       bars.nbu_601_request_data_ru.p_nbu_document_fo(P_KF);
         select id into l_request_id_document_fo from nbu_data_request_601 t where  t.report_instance_id= (select max(report_instance_id) from nbu_data_request_601 where data_type_id=2 and kf=p_kf) and
            data_type_id=2 and kf=p_kf and report_instance_id=p_report_id;
             set_data_request_state(l_request_id_document_fo,nbu_601_migrate.REQ_STATE_DATA_DELIVERED, 'Дані отримано');
+            commit;
+             exception 
+             when others then
+             set_data_request_state(l_request_id_document_fo,10,sqlerrm ||' '||dbms_utility.format_error_backtrace()); 
+             commit;
+      end;       
       ---
+      begin
       bars.nbu_601_request_data_ru.p_nbu_address_fo(P_KF);
          select id into l_request_id_address_fo from nbu_data_request_601 t where  t.report_instance_id= (select max(report_instance_id) from nbu_data_request_601 where data_type_id=3 and kf=p_kf) and
            data_type_id=3 and kf=p_kf and report_instance_id=p_report_id;
            set_data_request_state(l_request_id_address_fo,nbu_601_migrate.REQ_STATE_DATA_DELIVERED, 'Дані отримано');
+           commit;
+            exception 
+            when others then
+            set_data_request_state(l_request_id_address_fo,10,sqlerrm ||' '||dbms_utility.format_error_backtrace()); 
+            commit;
+      end;
       ----
+      begin
       bars.nbu_601_request_data_ru.p_nbu_person_uo(P_KF);
        select id into l_request_id_person_uo from nbu_data_request_601 t where  t.report_instance_id= (select max(report_instance_id) from nbu_data_request_601 where data_type_id=7 and kf=p_kf) and
            data_type_id=7 and kf=p_kf and report_instance_id=p_report_id;
            set_data_request_state(l_request_id_person_uo,nbu_601_migrate.REQ_STATE_DATA_DELIVERED, 'Дані отримано');
+           commit;
+            exception 
+            when others then
+            set_data_request_state(l_request_id_person_uo,10,sqlerrm ||' '||dbms_utility.format_error_backtrace()); 
+            commit;
+      end;
       --
+      begin
+      bars.nbu_601_request_data_ru.p_nbu_finperformance_uo(P_KF);  
       select id into l_request_id_fingr_uo from nbu_data_request_601 t where  t.report_instance_id= (select max(report_instance_id) from nbu_data_request_601 where data_type_id=10 and kf=p_kf) and
            data_type_id=10 and kf=p_kf and report_instance_id=p_report_id;
-           run_data_request(l_request_id_fingr_uo);
+           set_data_request_state(l_request_id_person_uo,nbu_601_migrate.REQ_STATE_DATA_DELIVERED, 'Дані отримано');
+           commit;
+           exception 
+             when others then 
+              set_data_request_state(l_request_id_fingr_uo,10,sqlerrm ||'' || dbms_utility.format_error_backtrace());
+              commit;
+      end;
 
-
+      
  for i in (select * from nbu_data_request_601 t
                   where  t.report_instance_id = p_report_id and
                          t.state_id = nbu_601_migrate.REQ_STATE_NEW and
@@ -422,6 +447,7 @@ procedure run_all_data_requests(
                          ) loop
             run_data_request(i.id);
         end loop;
+      commit;
 end;
 
 procedure handle_data_request(
@@ -497,8 +523,7 @@ procedure create_data_request(P_KF in varchar2)
     if l_instance_id is null then l_instance_id:=0;
        l_instance_id_insert:=l_instance_id+1;
 
-     for report_instance_form_first in (select distinct t.id from nbu_data_type_601 t
-                                       order by  t.id)
+     for report_instance_form_first in (select distinct t.id from nbu_data_type_601 t order by  t.id)
       loop
            begin
            insert into nbu_data_request_601
@@ -526,15 +551,17 @@ procedure create_data_request(P_KF in varchar2)
            track_data_request(l_request_id, nbu_601_migrate.REQ_STATE_NEW, 'Сформовано запит на отримання даних з філії');
       end if;
     commit;
-   run_all_data_requests(l_instance_id_insert,p_kf);
+    dbms_scheduler.set_job_argument_value(job_name          =>'RUN_ALL_601',
+                                          argument_position =>1,
+                                          argument_value    => l_instance_id_insert );
+   dbms_scheduler.set_job_argument_value(job_name          =>'RUN_ALL_601',
+                                         argument_position =>2,
+                                         argument_value    => p_kf ) ;
+
+    dbms_scheduler.run_job(job_name =>'RUN_ALL_601', use_current_session => false);
+
  end;
 end;
 /
-
-grant execute on nbu_601_migrate to barstrans;
-grant execute on nbu_601_migrate to BARS_ACCESS_DEFROLE;
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/PACKAGE/nbu_601_migrate.sql =========*** End *** 
-PROMPT ===================================================================================== 
- 
+grant execute on nbu_601_request_data_ru to barstrans;
+grant execute on nbu_601_request_data_ru to bars_access_defrole;

@@ -128,15 +128,16 @@ begin
   bars_metabase.add_column(l_tabid, 2, 'OBJECT_ID', 'N', 'OBJECT_ID', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 3, 'OBJECT_TYPE_ID', 'N', 'OBJECT_TYPE_ID', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 4, 'OBJECT_TYPE_NAME', 'C', 'Тип об''єкту', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'OBJECT_CODE', 'C', 'Код типу об''єкта', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'OBJECT_NAME', 'C', 'Назва об''єкта', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'SESSION_CREATION_TIME', 'D', 'Дата створення сесії', '3', 2, 3, 0, 1, 0, 0, '', 'dd/MM/yyyy hhhh:mm:ss', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'SESSION_ACTIVITY_TIME', 'D', 'Дата активності сесії', '3', 2, 3, 0, 1, 0, 0, '', 'dd/MM/yyyy hhhh:mm:ss', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'SESSION_TYPE_ID', 'N', 'SESSION_TYPE_ID', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'SESSION_TYPE_NAME', 'C', 'Назва типу сесії', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'STATE_ID', 'N', 'STATE_ID', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'SESSION_STATE', 'C', 'Статус сесії', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'SESSION_DETAILS', 'C', 'Деталі сесії', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'OBJECT_KF', 'C', 'МФО', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'OBJECT_CODE', 'C', 'Код типу об''єкта', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'OBJECT_NAME', 'C', 'Назва об''єкта', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'SESSION_CREATION_TIME', 'D', 'Дата створення сесії', '3', 2, 3, 0, 1, 0, 0, '', 'dd/MM/yyyy hhhh:mm:ss', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'SESSION_ACTIVITY_TIME', 'D', 'Дата активності сесії', '3', 2, 3, 0, 1, 0, 0, '', 'dd/MM/yyyy hhhh:mm:ss', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'SESSION_TYPE_ID', 'N', 'SESSION_TYPE_ID', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'SESSION_TYPE_NAME', 'C', 'Назва типу сесії', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'STATE_ID', 'N', 'STATE_ID', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'SESSION_STATE', 'C', 'Статус сесії', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'SESSION_DETAILS', 'C', 'Деталі сесії', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

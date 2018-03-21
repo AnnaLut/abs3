@@ -88,22 +88,16 @@ namespace BarsWeb.Areas.Transp
                         }
                         else
                         {
-                            HttpResponseMessage resp = new HttpResponseMessage(HttpStatusCode.InternalServerError);
+                            HttpResponseMessage resp = new HttpResponseMessage(HttpStatusCode.NonAuthoritativeInformation);
                             resp.Content = new StringContent(resp_str, Encoding.UTF8, "text/plain");
                             return resp;
                         }
-
-
                     }
                     catch (Exception e)
                     {
-                        
-                        return Request.CreateResponse(HttpStatusCode.InternalServerError, e);
-
+                        return Request.CreateResponse(HttpStatusCode.NonAuthoritativeInformation, e);
                     }
-
                 }
-
             }
         }
 

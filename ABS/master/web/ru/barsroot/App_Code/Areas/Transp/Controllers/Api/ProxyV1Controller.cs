@@ -87,8 +87,8 @@ namespace BarsWeb.Areas.Transp
                 }
             }
 
-            try
-            {
+            //try
+            //{
                 HttpWebResponse response = (HttpWebResponse)trRequest.GetResponse();
 
                 using (Stream responseStream = response.GetResponseStream())
@@ -107,13 +107,13 @@ namespace BarsWeb.Areas.Transp
                 }
                 result.Content = new StringContent(respStr);
                 return result;
-            }
-            catch (Exception ex)
-            {
-                HttpResponseMessage result = Request.CreateResponse(HttpStatusCode.InternalServerError);
-                result.Content = new StringContent(ex.Message);
-                return result;
-            }
+            //}
+            //catch (Exception ex)
+            //{
+            //    HttpResponseMessage result = Request.CreateResponse(HttpStatusCode.InternalServerError);
+            //    result.Content = new StringContent(ex.Message);
+            //    return result;
+            //}
 
         }
     }

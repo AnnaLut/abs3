@@ -8,6 +8,12 @@ select s.id,
             when o.object_type_id = 4 then 'Кредит'
             else null
        end object_type_name,
+       case when o.object_type_id = 1 then c.core_customer_kf
+            when o.object_type_id = 2 then c.core_customer_kf
+            when o.object_type_id = 3 then pl.core_pledge_kf
+            when o.object_type_id = 4 then cr.core_loan_kf
+            else null
+       end object_kf,
        case when o.object_type_id in (1, 2) then c.customer_code
             when o.object_type_id = 3 then pl.pledge_number
             when o.object_type_id = 4 then cr.loan_number
@@ -34,6 +40,7 @@ from   nbu_session s
 join   nbu_reported_object o on o.id = s.object_id
 left join nbu_reported_customer c on c.id = s.object_id
 left join nbu_reported_pledge pl on pl.id = s.object_id
-left join nbu_reported_loan cr on cr.id = s.object_id;
+left join nbu_reported_loan cr on cr.id = s.object_id
+order by s.last_activity_at desc, s.id desc;
 
 grant all on v_nbu_session to bars_access_defrole;
