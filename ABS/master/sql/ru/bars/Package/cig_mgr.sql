@@ -1,5 +1,3 @@
-
- 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/cig_mgr.sql =========*** Run *** ===
  PROMPT ===================================================================================== 
@@ -15,7 +13,7 @@
   --
 
   -- Public constant declarations
-  g_header_version  constant varchar2(64) := 'version 1.7 16/12/2013';
+  g_header_version  constant varchar2(64) := 'version 1.8 21/03/2018';
   g_awk_header_defs constant varchar2(512) := '';
 
   --------------------------------------------------------------------------------
@@ -1046,7 +1044,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CIG_MGR is
          insert into cig_cust_change_code values
           (l_row.cust_key, f_ourmfo, 1);
       end if;
-
+begin
       update cig_customers
          set cust_name = trim(l_row.surname) || ' ' || trim(l_row.firstname) || ' ' ||
                          trim(l_row.fathers_name),
@@ -1054,7 +1052,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.CIG_MGR is
              branch    = l_row.branch
        where cust_id = l_custid
          and branch = l_branch;
-
+   
+  EXCEPTION WHEN OTHERS  THEN
+     bars_audit.info ('cig_mgr.prc_individual ERROR: '||l_custid||': ' ||sqlerrm);
+  end;      
+ begin 
       update cig_cust_individual
          set role_id        = l_row.role_id,
              first_name     = l_row.firstname,
@@ -1092,6 +1094,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.CIG_MGR is
              branch               = l_row.branch
        where cust_id = l_custid
          and branch = l_branch;
+         
+    EXCEPTION WHEN OTHERS  THEN
+     bars_audit.info ('cig_mgr.prc_individual ERROR: '||l_custid||': ' ||sqlerrm);
+  end;       
 
       if sql%rowcount > 0 then
         l_upd := true;
@@ -1172,6 +1178,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CIG_MGR is
 
       -- вставка в таблицу клентов
       select s_cig_customers.nextval into l_custid from dual;
+ begin       
       insert into cig_customers
         (cust_id, cust_type, rnk, upd_date, cust_name, cust_code, branch)
       values
@@ -1183,7 +1190,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.CIG_MGR is
          trim(l_row.fathers_name),
          l_row.okpo,
          l_row.branch);
+    EXCEPTION WHEN OTHERS  THEN
+     bars_audit.info ('cig_mgr.prc_individual ERROR: '||l_custid||': ' ||sqlerrm);
+  end;       
 
+begin 
       -- вставка в таблицу физлиц
       insert into cig_cust_individual
         (cust_id,
@@ -1257,6 +1268,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.CIG_MGR is
          l_row.reg_zip,
          l_row.branch);
 
+  EXCEPTION WHEN OTHERS  THEN
+     bars_audit.info ('cig_mgr.prc_individual ERROR: '||l_custid||': ' ||sqlerrm);
+  end; 
+  
       upd_syncdata(l_custid, l_row.branch, G_CUSTDATA);
 
       add_event(G_WITHOUT_ERRORS,
@@ -1334,14 +1349,18 @@ CREATE OR REPLACE PACKAGE BODY BARS.CIG_MGR is
     -- обновление
     if (l_custid is not null) then
       l_upd := false;
-
+ begin 
       update cig_customers
          set cust_name = l_row.name,
              cust_code = l_row.cust_code,
              branch    = l_row.branch
        where cust_id = l_custid
          and branch = l_branch;
-
+ 
+ EXCEPTION WHEN OTHERS  THEN
+     bars_audit.info ('cig_mgr.prc_company ERROR: '||l_custid||': ' ||sqlerrm);
+  end; 
+ begin 
       update cig_cust_company
          set role_id           = l_row.role_id,
              status_id         = l_row.status_id,
@@ -1369,7 +1388,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.CIG_MGR is
              branch               = l_row.branch
        where cust_id = l_custid
          and branch = l_branch;
-
+ EXCEPTION WHEN OTHERS  THEN
+     bars_audit.info ('cig_mgr.prc_company ERROR: '||l_custid||': ' ||sqlerrm);
+  end; 
       if sql%rowcount > 0 then
         l_upd := true;
       end if;
@@ -1450,6 +1471,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.CIG_MGR is
 
       -- вставка в таблицу клентов
       select s_cig_customers.nextval into l_custid from dual;
+      
+  begin 
       insert into cig_customers
         (cust_id, cust_type, rnk, upd_date, cust_name, cust_code, branch)
       values
@@ -1460,7 +1483,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.CIG_MGR is
          l_row.name,
          l_row.cust_code,
          l_row.branch);
-
+ EXCEPTION WHEN OTHERS  THEN
+     bars_audit.info ('cig_mgr.prc_company ERROR: '||l_custid||': ' ||sqlerrm);
+  end; 
+  
+ begin 
       -- вставляем запись в таблицу
       insert into cig_cust_company
         (cust_id,
@@ -1513,7 +1540,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.CIG_MGR is
          l_row.reg_addr,
          l_row.reg_zip,
          l_row.branch);
-
+         
+ EXCEPTION WHEN OTHERS  THEN
+     bars_audit.info ('cig_mgr.prc_company ERROR: '||l_custid||': ' ||sqlerrm);
+  end; 
+  
       upd_syncdata(l_custid, l_row.branch, G_CUSTDATA);
 
       -- запись в журнал
@@ -1945,7 +1976,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CIG_MGR is
                        c.okpo,
                        fio(c.nmk, 2) || fio(c.nmk, 1) ||
                        to_char(p.bday, 'ddmmyyyy') as cust_key,
-                       p.ser,
+                       case when  p.passp = 7 then nvl(p.ser,0) else p.ser end ser,
                        p.numdoc,
                        p.pdate as passp_iss_date,
                        null as passp_exp_date,
@@ -2347,7 +2378,7 @@ select
            decode(w.value,''0'',''0'',''1'',''1'',''2'',''2'',''3'',''3'',''4'',''4'',''5'',''5'',''6'',''6'',''7'',''7'',''8'',''8'',''9'') as position,
            c.okpo,
            fio(c.nmk, 2) || fio(c.nmk, 1) || to_char(p.bday, ''ddmmyyyy'') as cust_key,
-           p.ser,
+           case when  p.passp = 7 then nvl(p.ser,0) else p.ser end ser,
            p.numdoc,
            p.pdate as passp_iss_date,
            null as passp_exp_date,
@@ -2813,7 +2844,7 @@ select           aa.nd,
            decode(w.value,''0'',''0'',''1'',''1'',''2'',''2'',''3'',''3'',''4'',''4'',''5'',''5'',''6'',''6'',''7'',''7'',''8'',''8'',''9'') as position,
            c.okpo,
            fio(c.nmk, 2) || fio(c.nmk, 1) || to_char(p.bday, ''ddmmyyyy'') as cust_key,
-           p.ser,
+           case when  p.passp = 7 then nvl(p.ser,0) else p.ser end ser,
            p.numdoc,
            p.pdate as passp_iss_date,
            null as passp_exp_date,
@@ -3330,7 +3361,7 @@ select           aa.nd,
                        c.okpo,
                        fio(c.nmk, 2) || fio(c.nmk, 1) ||
                        to_char(p.bday, 'ddmmyyyy') as cust_key,
-                       p.ser,
+                       case when  p.passp = 7 then nvl(p.ser,0) else p.ser end ser,
                        p.numdoc,
                        p.pdate as passp_iss_date,
                        null as passp_exp_date,
