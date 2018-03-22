@@ -1,15 +1,9 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/DM/package/dm_utl.sql =========*** Run *** ======
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE DM.DM_UTL 
+CREATE OR REPLACE PACKAGE DM.DM_UTL 
 is
   --
   -- constants
   --
-  g_header_version        constant varchar2(64) := 'version 1.6 17.08.2017';
+  g_header_version        constant varchar2(64) := 'version 1.7 22.03.2018';
 
   --
   -- HEADER_VERSION
@@ -29,7 +23,7 @@ is
   --
   -- EXCHANGE PARTITION BY CONDITION FOR
   --
-  PROCEDURE EXCHANGE_PARTITION_FOR
+  procedure EXCHANGE_PARTITION_FOR
   ( p_source_table_nm   in     all_tab_subpartitions.table_name%type
   , p_target_table_nm   in     all_tab_subpartitions.table_name%type
   , p_condition         in     varchar2
@@ -39,7 +33,7 @@ is
   --
   -- EXCHANGE SUBPARTITION BY NAME
   --
-  PROCEDURE EXCHANGE_SUBPARTITION
+  procedure EXCHANGE_SUBPARTITION
   ( p_source_table_nm   in     all_tab_subpartitions.table_name%type
   , p_target_table_nm   in     all_tab_subpartitions.table_name%type
   , p_subpartition_nm   in     all_tab_subpartitions.subpartition_name%type
@@ -49,7 +43,7 @@ is
   --
   -- EXCHANGE SUBPARTITION BY CONDITION FOR
   --
-  PROCEDURE EXCHANGE_SUBPARTITION_FOR
+  procedure EXCHANGE_SUBPARTITION_FOR
   ( p_source_table_nm   in     all_tab_subpartitions.table_name%type
   , p_target_table_nm   in     all_tab_subpartitions.table_name%type
   , p_condition         in     varchar2
@@ -59,11 +53,19 @@ is
   --
   -- RENAME PARTITION BY CONDITION FOR
   --
-  PROCEDURE RENAME_PARTITION_FOR
+  procedure RENAME_PARTITION_FOR
   ( p_table_nm          in     all_tab_subpartitions.table_name%type
   , p_partition_nm      in     all_tab_subpartitions.partition_name%type
   , p_condition         in     varchar2
   , p_rename_sub        in     signtype default 0
+  );
+
+  procedure SPLIT_IDX_PARTITION
+  ( p_idx_nm            in     varchar2
+  , p_ptsn_nm           in     varchar2
+  , p_spl_cd            in     varchar2
+  , p_new1_nm           in     varchar2 default null
+  , p_new2_nm           in     varchar2 default null
   );
 
   --
@@ -80,42 +82,42 @@ is
   -- GATHER_TBL_STATS
   --
   procedure GATHER_TBL_STATS
-  ( p_own_name     in     varchar2 default 'BARS'
-  , p_tab_name     in     varchar2
-  , p_dop          in     integer  default 1
+  ( p_own_name          in     varchar2 default 'BARS'
+  , p_tab_name          in     varchar2
+  , p_dop               in     integer  default 1
   );
 
   --
   -- GATHER_TBL_STATS
   --
   procedure GATHER_TBL_STATS
-  ( p_own_name     in     varchar2
-  , p_tab_name     in     varchar2
-  , p_ptsn_name    in     varchar2
-  , p_mth_opt      in     varchar2
-  , p_dop          in     integer
-  , p_grnlr        in     varchar2
-  , p_cascade      in     boolean
-  , p_force        in     boolean  default FALSE
+  ( p_own_name          in     varchar2
+  , p_tab_name          in     varchar2
+  , p_ptsn_name         in     varchar2
+  , p_mth_opt           in     varchar2
+  , p_dop               in     integer
+  , p_grnlr             in     varchar2
+  , p_cascade           in     boolean
+  , p_force             in     boolean  default FALSE
   );
 
   --
   -- GATHER_IDX_STATS
   --
   procedure GATHER_IDX_STATS
-  ( p_own_name     in     varchar2 default 'BARS'
-  , p_idx_name     in     varchar2
-  , p_dop          in     integer  default 1
-  , p_grnlr        in     varchar2 default 'AUTO'
-  , p_force        in     boolean  default FALSE
+  ( p_own_name          in     varchar2 default 'BARS'
+  , p_idx_name          in     varchar2
+  , p_dop               in     integer  default 1
+  , p_grnlr             in     varchar2 default 'AUTO'
+  , p_force             in     boolean  default FALSE
   );
 
   --
   -- GATHER_DM_STATS
   --
   procedure GATHER_DM_STATS
-  ( p_dm_nm        in     varchar2
-  , p_force        in     boolean default FALSE
+  ( p_dm_nm             in     varchar2
+  , p_force             in     boolean default FALSE
   );
 
 END DM_UTL;
@@ -128,7 +130,7 @@ is
   --
   -- constants
   --
-  G_BODY_VERSION          constant varchar2(64) := 'version 2.1  21.02.2018';
+  G_BODY_VERSION          constant varchar2(64) := 'version 2.2  22.03.2018';
   G_MODCODE               constant varchar2(10) := 'BARS_DM';
   G_ERR_MODCODE           constant varchar2(3)  := 'ACM';
 
@@ -425,9 +427,47 @@ is
 
     end if;
 
-    bars.bars_audit.trace( 'dm_utl.exchange_subpartition_for: Exit.'  );
+    bars.bars_audit.trace( '%s: Exit.', title );
 
   end RENAME_PARTITION_FOR;
+
+  --
+  -- SPLIT_IDX_PARTITION
+  --
+  procedure SPLIT_IDX_PARTITION
+  ( p_idx_nm            in     varchar2
+  , p_ptsn_nm           in     varchar2
+  , p_spl_cd            in     varchar2
+  , p_new1_nm           in     varchar2 default null
+  , p_new2_nm           in     varchar2 default null
+  ) is
+    title         constant     varchar2(32) := 'dm_utl.split_idx_partition';
+    l_spl_stmt                 varchar2(512);
+  begin
+
+    bars_audit.trace( '%s: Entry with ( p_idx_nm=>%s, p_ptsn_nm=>%s, p_spl_cd=%s, p_new1_nm=%s, p_new2_nm=%s ).'
+                    , title, p_idx_nm, p_ptsn_nm, p_spl_cd, p_new1_nm, p_new2_nm );
+
+    l_spl_stmt := 'alter index '||p_idx_nm||' split partition '||p_ptsn_nm||' at '||p_spl_cd;
+
+    case
+    when ( p_new1_nm Is Not Null and p_new2_nm Is Not Null )
+    then
+      l_spl_stmt := l_spl_stmt||' into ( partition '||p_new1_nm||', partition '||p_new2_nm||' )';
+    when ( p_new1_nm Is Not Null and p_new2_nm Is Null )
+    then
+      l_spl_stmt := l_spl_stmt||' into ( partition '||p_new1_nm||', partition '||p_ptsn_nm||' )';
+    else
+     null;
+    end case;
+
+    bars_audit.trace( '%s: stmt=>%s.', title, l_spl_stmt );
+
+    execute immediate l_spl_stmt;
+
+    bars.bars_audit.trace( '%s: Exit.', title );
+
+  end SPLIT_IDX_PARTITION;
 
   --
   -- GET_MOD_SCN
@@ -672,9 +712,3 @@ END DM_UTL;
 show err;
 
 grant EXECUTE on DM.DM_UTL to BARS;
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/DM/package/dm_utl.sql =========*** End *** ======
- PROMPT ===================================================================================== 
- 
