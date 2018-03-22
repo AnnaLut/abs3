@@ -1,11 +1,11 @@
 prompt package bars_intgr.xrm_import
 
-create or replace package bars_intgr.xrm_import
+create or replace package xrm_import
 is
     --
     -- Наполнение витрин для псевдо-онлайн выгрузок в CRM
     --
-    g_header_version  constant varchar2(64)  := 'version 0.1.0 03/03/2018'; 
+    g_header_version  constant varchar2(64)  := 'version 0.2.0 21/03/2018';
 
     --
     -- header_version - возвращает версию заголовка пакета
@@ -17,21 +17,33 @@ is
     --
     function body_version return varchar2;
 
-    
+
     function add38phone (p_phone in varchar2, p_kf varchar2 default sys_context('bars_context', 'user_mfo')) return varchar2;
-    
+
     --
     -- Устанавливает максимальный idupd по таблицам-зависимостям объекта (в случае успешной выгрузки)
     --
     procedure reset_object_idupd(p_object_name varchar2, p_kf varchar2 default sys_context('bars_context', 'user_mfo'));
     
     --
+    -- Очистка витрины для дельты (ежедневная)
+    -- p_kf - МФО, для которого очищаем данные; для слэша очищаем витрину полностью
+    --
+    procedure clear_datamart (p_datamart_name in varchar2, p_kf in varchar2 default sys_context('bars_context', 'user_mfo'));
+    
+    --
+    -- Очистка всех витрин для дельты (ежедневная)
+    -- p_kf - МФО, для которого очищаем данные; для слэша очищаем витрины полностью
+    --
+    procedure clear_datamarts(p_kf in varchar2 default sys_context('bars_context', 'user_mfo'));
+
+    --
     -- Выгрузка CLIENTFO2 - физические лица
     --
-    procedure import_clientfo2 (p_rows_ok  out number, 
-                                p_rows_err out number, 
+    procedure import_clientfo2 (p_rows_ok  out number,
+                                p_rows_err out number,
                                 p_status   out varchar2);
-    
+
     procedure import_client_address;
 
     ---
@@ -44,15 +56,14 @@ is
     -- Общая процедура запуска выгрузки
     --
     procedure imp_run;
-    
-end xrm_import;
 
+end xrm_import;
 /
 show errors;
 
-create or replace package body bars_intgr.xrm_import
+create or replace package body xrm_import
 is
-    g_body_version constant varchar2(64) := 'Version 0.1.0 03/03/2018'; 
+    g_body_version constant varchar2(64) := 'Version 0.2.0 21/03/2018';
     G_TRACE        constant varchar2(20) := 'xrm_import.';
     G_IS_MMFO      constant number(1)    := 1;
 
@@ -67,7 +78,7 @@ is
     begin
         return 'Package body xrm_import ' || g_body_version;
     end body_version;
-    
+
     --
     -- Логгирование статистики
     -- Не автономная транзакция, чтобы не было проблем с параллелью
@@ -112,11 +123,11 @@ is
 
         commit;
     end log_stat_event;
-    
+
     --
     -- Возвращает список ключей (измененных записей) для дельты; не поддерживает составные ключи
     --
-    function get_changed_keys (p_object_name varchar2, 
+    function get_changed_keys (p_object_name varchar2,
                                p_kf varchar2 default sys_context('bars_context', 'user_mfo'))
     return bars.number_list
     is
@@ -126,7 +137,7 @@ is
     begin
         bars.bars_audit.info(l_trace||'start.');
         -- конструируем запрос
-        select listagg ('select distinct '||key_column||' from bars.'||table_name||' where idupd>='||idupd||/*test*/' and rownum <=300 '||/**/case when sql_predicate is not null then ' and '||sql_predicate end, 
+        select listagg ('select distinct '||key_column||' from bars.'||table_name||' where idupd>='||idupd||case when sql_predicate is not null then ' and '||sql_predicate end,
                ' union ' )
                within group (order by 1) q
         into l_sql
@@ -134,7 +145,7 @@ is
         where kf = p_kf
         and object_name = p_object_name;
         bars.bars_audit.info(l_trace||'prepared sql = ['||l_sql||']');
-        
+
         execute immediate l_sql bulk collect into l_keys;
         bars.bars_audit.info(l_trace||'finish');
         return l_keys;
@@ -143,7 +154,7 @@ is
     --
     -- Инкрементирует и возвращает номер дельты в разрезе объекта и МФО; для слэша инкрементим все и возвращаем максимальный
     --
-    function increment_object_changenumber(p_object_name varchar2, 
+    function increment_object_changenumber(p_object_name varchar2,
                                            p_kf varchar2 default sys_context('bars_context', 'user_mfo'))
     return number
     is
@@ -156,7 +167,7 @@ is
         returning max(changenumber) into l_ret;
         return l_ret;
     end increment_object_changenumber;
-    
+
     --
     -- Устанавливает максимальный idupd по таблицам-зависимостям объекта (в случае успешной выгрузки)
     --
@@ -168,7 +179,7 @@ is
         loop
             -- e.g. "select max(idupd) from bars.customer_update where kf = 300465"
             execute immediate 'select max(idupd) from bars.'||rec.table_name||' where kf = '||p_kf into l_max_idupd;
-            
+
             update imp_object_dependency
             set idupd = l_max_idupd
             where object_name = p_object_name
@@ -177,6 +188,39 @@ is
         end loop;
     end reset_object_idupd;
     
+    --
+    -- Очистка витрины для дельты (ежедневная)
+    -- p_kf - МФО, для которого очищаем данные; для слэша очищаем витрину полностью
+    --
+    procedure clear_datamart (p_datamart_name in varchar2, p_kf in varchar2 default sys_context('bars_context', 'user_mfo'))
+        is
+    l_trace varchar2(150) := g_trace || 'clear_datamart['||p_datamart_name||']: ';
+    resourse_busy exception;
+    pragma exception_init(resourse_busy, -54);
+    begin
+        if p_kf is null then
+            execute immediate 'truncate table bars_intgr.'||p_datamart_name;
+        else
+            execute immediate 'alter table bars_intgr.'||p_datamart_name||' truncate partition for ('''||p_kf||''')';
+        end if;
+    exception
+        when resourse_busy then
+            bars.bars_audit.error(l_trace || 'resourse busy; очистим в следующий раз');
+    end clear_datamart;
+    
+    --
+    -- Очистка всех витрин для дельты (ежедневная)
+    -- p_kf - МФО, для которого очищаем данные; для слэша очищаем витрины полностью
+    --
+    procedure clear_datamarts(p_kf in varchar2 default sys_context('bars_context', 'user_mfo'))
+        is
+    begin
+        for rec in (select * from imp_object)
+        loop
+            clear_datamart(rec.object_name, p_kf);
+        end loop;
+    end clear_datamarts;
+
     --
     -- add prefix '38' to phone number
     --
@@ -215,39 +259,40 @@ is
         when no_data_found then
             return l_phone;
     end add38phone;
-    
+
     --
     -- Выгрузка CLIENTFO2 - физические лица
     --
-    procedure import_clientfo2 (p_rows_ok  out number, 
-                                p_rows_err out number, 
+    procedure import_clientfo2 (p_rows_ok  out number,
+                                p_rows_err out number,
                                 p_status   out varchar2)
         is
     c_object_name  constant varchar2(32) := 'CLIENTFO2';
     l_changenumber number;
 
     l_changelist bars.number_list;
-    
+
     l_test_log varchar2(4000);
     begin
         bars.bars_audit.info(g_trace||' clientfo_imp start');
-        
+
         /* собираем измененные записи */
         l_changelist := get_changed_keys(c_object_name);
-        
+
         bars.bars_audit.info(g_trace||c_object_name||': finished collecting rnk: '||l_changelist.count);
-        
+
         savepoint imp_start;
-        
+
         select listagg(column_value, ',') within group (order by 1) into l_test_log from table(l_changelist) where rownum <= 15;
         bars.bars_audit.info(g_trace||c_object_name||': rnks:'||substr(l_test_log, 1, 150));
-        
+
         l_changenumber := increment_object_changenumber(c_object_name);
-        
+
         /* выгрузка */
-        
+
         merge into clientfo2 C
         using (
+                with delta as (select /*+ materialize*/ column_value as rnk from table(l_changelist))
                   select l_changenumber as changenumber,
                        c.rnk,--РНК
                        c.branch,--відділення
@@ -583,8 +628,10 @@ is
                                 "'3'_C20" p_settlement_id,
                                 "'3'_C21" p_street_id,
                                 "'3'_C22" p_house_id
-                           from (select rnk, type_id, country,zip, domain, region, locality, address, territory_id, locality_type, street_type,
-                           street, home_type, home, homepart_type, homepart, room_type, room, koatuu, region_id, area_id, settlement_id, street_id, house_id from bars.customer_address)
+                           from (select bars.customer_address.rnk, type_id, country,zip, domain, region, locality, address, territory_id, locality_type, street_type,
+                                   street, home_type, home, homepart_type, homepart, room_type, room, koatuu, region_id, area_id, settlement_id, street_id, house_id 
+                                   from bars.customer_address 
+                                   join delta on bars.customer_address.rnk = delta.rnk)
                           pivot (max(country) c1, max(zip) c2, max(domain) c3, max(region) c4, max(locality) c5, max(address) c6, max(territory_id) c7,
                           max(locality_type) c8, max(street_type) c9, max(street) c10, max(home_type) c11, max(home) c12, max(homepart_type) c13,
                           max(homepart) c14,max(room_type) c15, max(room) c16, max(koatuu) c17, max(region_id) c18, max(area_id) c19, max(settlement_id) c20,
@@ -601,12 +648,13 @@ is
                                     "'TEL_D'_CC"  as tel_d,
                                     "'UADR'_CC"   as UADR
                                from (select w.rnk, tag, value
-                                       from bars.customerw w
+                                       from bars.customerw w 
+                                       join delta on w.rnk = delta.rnk
                                       where tag in ('CIGPO','EMAIL','GR   ','MPNO ','VIP_K', 'TEL_D', 'UADR')
                                     )
                              pivot ( max(value) cc for tag in ('CIGPO', 'EMAIL', 'GR   ', 'MPNO ', 'VIP_K', 'TEL_D', 'UADR'))
                              ) w
-                              , (select column_value as rnk from table(l_changelist)) delta, bars.EBKC_GCIF gc, bars.RNK_REKV rkv, bars.country cntr,
+                              , delta, bars.EBKC_GCIF gc, bars.RNK_REKV rkv, bars.country cntr,
                               (select rnk,
                                       "'SUBSD'_CC" as SUBSD,
                                       "'SUBSN'_CC" as SUBSN,
@@ -708,7 +756,8 @@ is
                                       "'DOV_A'_CC" as DOV_A,
                                       "'DOV_F'_CC" as DOV_F
                                from (select w.rnk, tag, value
-                                       from bars.customerw w
+                                       from bars.customerw w 
+                                       join delta on w.rnk = delta.rnk
                                       where tag in ('SUBSD','SUBSN','ELT_N','ELT_D','SW_RN','Y_ELT','BUSSS','PC_MF',
                                                     'PC_Z4','PC_Z3','PC_Z5','PC_Z2','PC_Z1','AGENT','PC_SS','STMT',
                                                     'VIDKL','TIPA','PHKLI','AF1_9','IDDPD','DAIDI','DATVR','DATZ',
@@ -750,9 +799,9 @@ is
 
         ) Q
         on (c.rnk = Q.rnk and c.kf = q.kf)
-        when matched then 
+        when matched then
             update
-            set 
+            set
             c.changenumber = q.changenumber,
             c.LAST_NAME = q.LAST_NAME,
             c.FIRST_NAME = q.FIRST_NAME,
@@ -951,7 +1000,7 @@ is
             c.RVPH3 = q.RVPH3,
             c.SAB = q.SAB,
             c.VIP_ACCOUNT_MANAGER = q.VIP_ACCOUNT_MANAGER
-        when not matched then insert 
+        when not matched then insert
             (CHANGENUMBER, LAST_NAME,FIRST_NAME,MIDDLE_NAME,BDAY,GR,PASSP,SER,NUMDOC,PDATE,ORGAN,PASSP_EXPIRE_TO,PASSP_TO_BANK,KF,RNK,OKPO,CUST_STATUS,CUST_ACTIVE,TELM,TELW,
             TELD,TELADD,EMAIL,ADR_POST_COUNTRY,ADR_POST_DOMAIN,ADR_POST_REGION,ADR_POST_LOC,ADR_POST_ADR,ADR_POST_ZIP,ADR_FACT_COUNTRY,ADR_FACT_DOMAIN,ADR_FACT_REGION,
             ADR_FACT_LOC,ADR_FACT_ADR,ADR_FACT_ZIP,ADR_WORK_COUNTRY,ADR_WORK_DOMAIN,ADR_WORK_REGION,ADR_WORK_LOC,ADR_WORK_ADR,ADR_WORK_ZIP,BRANCH,NEGATIV_STATUS,
@@ -961,8 +1010,8 @@ is
             DJOWF,DJCFI,DJ_LN,DJ_FH,DJ_CP,CHORN,CRISK_KL,BC,SPMRK,K013,KODID,COUNTRY,MS_FS,MS_VD,MS_GR,LIM_KASS,LIM,LICO,UADR,MOB01,MOB02,MOB03,SUBS,K050,DEATH,NO_PHONE,
             NSMCV,NSMCC,NSMCT,NOTES,SAMZ,OREP,OVIFS,AF6,FSKRK,FSOMD,FSVED,FSZPD,FSPOR,FSRKZ,FSZOP,FSKPK,FSKPR,FSDIB,FSCP,FSVLZ,FSVLA,FSVLN,FSVLO,FSSST,FSSOD,FSVSN,DOV_P,
             DOV_A,DOV_F,NMKV,SN_GC,NMKK,PRINSIDER,NOTESEC,MB,PUBLP,WORKB,C_REG,C_DST,RGADM,RGTAX,DATEA,DATET,RNKP,CIGPO,COUNTRY_NAME,TARIF,AINAB,TGR,CUSTTYPE,RIZIK,SNSDR,
-            IDPIB,FS,SED,DJER,CODCAGENT,SUTD,RVDBC,RVIBA,RVIDT,RV_XA,RVIBR,RVIBB,RVRNK,RVPH1,RVPH2,RVPH3,SAB,VIP_ACCOUNT_MANAGER) 
-            values 
+            IDPIB,FS,SED,DJER,CODCAGENT,SUTD,RVDBC,RVIBA,RVIDT,RV_XA,RVIBR,RVIBB,RVRNK,RVPH1,RVPH2,RVPH3,SAB,VIP_ACCOUNT_MANAGER)
+            values
             (q.CHANGENUMBER, q.LAST_NAME,q.FIRST_NAME,q.MIDDLE_NAME,q.BDAY,q.GR,q.PASSP,q.SER,q.NUMDOC,q.PDATE,q.ORGAN,q.ACTUAL_DATE,null,q.KF,q.RNK,q.OKPO,q.CUST_STATUS,
             q.CUST_ACTIVE,q.TELM,q.TELW,q.TELD,q.TELADD,q.EMAIL,q.AP_COUNTRY,q.AP_DOMAIN,q.AP_REGION,q.AP_LOCALITY,q.AP_ADRESS,q.AP_ZIP,
             q.AU_COUNTRY,q.AU_DOMAIN,q.AU_REGION,q.AU_LOCALITY,q.AU_ADRESS,q.AU_ZIP,q.AU_COUNTRY,q.AU_DOMAIN,q.AU_REGION,
@@ -976,29 +1025,30 @@ is
             q.NOTESEC,q.MB,q.PUBLP,q.WORKB,q.C_REG,q.C_DST,q.RGADM,q.RGTAX,q.DATEA,q.DATET,q.RNKP,q.CIGPO,q.COUNTRY_NAME,q.TARIF,q.AINAB,q.TGR,q.CUSTTYPE,q.RIZIK,q.SNSDR,
             q.IDPIB,q.FS,q.SED,q.DJER,q.CODCAGENT,q.SUTD,q.RVDBC,q.RVIBA,q.RVIDT,q.RV_XA,q.RVIBR,q.RVIBB,q.RVRNK,q.RVPH1,q.RVPH2,q.RVPH3,q.SAB,q.VIP_ACCOUNT_MANAGER)
         log errors into ERR$_CLIENTFO2 reject limit unlimited;
+
+        p_rows_ok := sql%rowcount;
+        select count(*) into p_rows_err from ERR$_CLIENTFO2 where changenumber = l_changenumber;
         
         reset_object_idupd(c_object_name);
         
-        p_rows_ok := sql%rowcount;
-        select count(*) into p_rows_err from ERR$_CLIENTFO2 where changenumber = l_changenumber;
         p_status := 'SUCCESS';
-        
+
         bars.bars_audit.info(g_trace||c_object_name||': finished');
     exception
         when others then
             rollback to imp_start;
             p_status := 'ERROR';
-            bars.bars_audit.error(g_trace||c_object_name||': error'); /*test*/
+            bars.bars_audit.error(g_trace||c_object_name||': '|| sqlerrm || ':' || dbms_utility.format_error_stack); /*test*/
             raise;
     end import_clientfo2;
-    
+
     procedure import_client_address
         is
     begin
         null;
     end import_client_address;
-    
-    
+
+
     ---
     --- Запуск выгрузки по объекту в контексте указанного МФО (для параллели).
     ---
@@ -1015,7 +1065,7 @@ is
     begin
         -- представляемся и запускаем выгрузку
         bars.bc.go(p_mfo);
-        execute immediate 'begin ' || p_object_proc || '(:p1, :p2, :p3); end;' 
+        execute immediate 'begin ' || p_object_proc || '(:p1, :p2, :p3); end;'
         using in out l_rows_ok, in out l_rows_err, in out l_status;
 
         commit;
@@ -1047,7 +1097,7 @@ is
         l_changenumber    number;
         l_id_event        number;
         l_errmsg          varchar2(512);
-        
+
         -- parallel stuff
         c_task_name       constant varchar2(32) := 'INTGR_IMPORT';
         l_chunk_stmt      varchar2(128);
@@ -1092,7 +1142,7 @@ is
                 select count(*) into l_mfo_cnt from imp_object_mfo where object_name = cur.object_name;
                 -- получаем чанки по МФО
                 l_chunk_stmt := 'select kf as START_ID, kf as END_ID from imp_object_mfo where object_name = '''||cur.object_name||'''';
-                
+
                 -- лог начала задачи
                 log_stat_event (p_changenumber => l_changenumber,
                                 p_start_time => sysdate,
@@ -1108,15 +1158,15 @@ is
                 drop_import_task;
                 dbms_parallel_execute.create_task(c_task_name);
                 -- создаем чанки по МФО
-                dbms_parallel_execute.create_chunks_by_sql(task_name => c_task_name, 
-                                                           sql_stmt  => l_chunk_stmt, 
+                dbms_parallel_execute.create_chunks_by_sql(task_name => c_task_name,
+                                                           sql_stmt  => l_chunk_stmt,
                                                            by_rowid  => false);
                 -- запуск задачи по всем МФО
-                dbms_parallel_execute.run_task(task_name      => c_task_name, 
-                                               sql_stmt       => replace(replace(l_task_statement, ':object_proc', cur.object_proc), ':id_event', l_id_event), 
-                                               language_flag  => dbms_sql.native, 
+                dbms_parallel_execute.run_task(task_name      => c_task_name,
+                                               sql_stmt       => replace(replace(l_task_statement, ':object_proc', cur.object_proc), ':id_event', l_id_event),
+                                               language_flag  => dbms_sql.native,
                                                parallel_level => case when G_IS_MMFO = 1 then l_mfo_cnt+1 else 0 end);
-                    
+
 
                 -- лог окончания
                 select case when status = 'ERROR' then 'ERROR' else 'SUCCESS' end into l_final_status from intgr_stats where id = l_id_event;
@@ -1136,7 +1186,7 @@ is
                     log_stat_event(p_stop_time  => sysdate,
                                    p_status => 'ERROR',
                                    p_id => l_id_event);
-                                  
+
             end;
             -- обнуляем id выгрузки объекта
             l_id_event := null;
@@ -1144,7 +1194,7 @@ is
         end loop;
 
     end imp_run;
-    
+
 begin
     null;
 end;
