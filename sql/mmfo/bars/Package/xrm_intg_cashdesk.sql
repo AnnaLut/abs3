@@ -1,6 +1,6 @@
 create or replace package xrm_intg_cashdesk
 is
-   g_head_version   constant varchar2 (64) := 'version 1.2 12.02.2018';
+   g_head_version   constant varchar2 (64) := 'version 1.3 14.03.2018';
 
    --
    -- реализация функционала сервиса функционала сервиса  XRMIntegrationCreateDocuments
@@ -14,7 +14,7 @@ end xrm_intg_cashdesk;
 /
 create or replace package body xrm_intg_cashdesk
 is
-   g_body_version   constant varchar2 (64) := 'version 1.2 12.02.2018';
+   g_body_version   constant varchar2 (64) := 'version 1.3 14.03.2018';
 
    g_p_name         constant varchar2 (17) := 'xrm_intg_cashdesk';
 
@@ -102,7 +102,7 @@ is
             'По користувачу не знайдено ключ для підпису');
    end get_user_key_id;
 
-   procedure crt_doc (p_requestdata in clob, p_result out clob)
+   procedure crt_doc (p_requestdata in clob, p_result out clob, p_ref out oper.ref%type, p_contract out  number)
    is
       l_parser          dbms_xmlparser.parser;
       l_doc             dbms_xmldom.domdocument;
@@ -135,7 +135,8 @@ is
       l_tmp             varchar2(256);
       l_nms_a           accounts.nms%type;
       l_nms_b           accounts.nms%type;
-      p_dat             date;
+      l_pdat            date;
+      l_datd            date;
       procedure get_okpo_nam (p_nls    in     varchar2,
                               p_kv     in     number,
                               p_okpo      out customer.okpo%type,
@@ -258,7 +259,8 @@ is
       dbms_xslprocessor.valueof (l_analytic, 'root/body/row/typea/text()', l_rec.typea);
       dbms_xslprocessor.valueof (l_analytic, 'root/body/row/typeb/text()', l_rec.typeb);
       dbms_xslprocessor.valueof (l_analytic, 'root/body/row/idb/text()', l_rec.idb);
-      dbms_xslprocessor.valueof (l_analytic, 'root/body/row/namb/text()', l_rec.namb);
+      dbms_xslprocessor.valueof (l_analytic, 'root/body/row/namb/text()', l_tmp);
+      l_rec.namb:=substr(l_tmp,1,38);
       dbms_xslprocessor.valueof (l_analytic, 'root/body/row/nazn/text()', l_rec.nazn);
       dbms_xslprocessor.valueof (l_analytic, 'root/body/row/mfob/text()', l_rec.mfob);
       dbms_xslprocessor.valueof (l_analytic, 'root/body/row/tabn/text()', l_rec.tabn);
@@ -281,9 +283,39 @@ is
 
       dbms_xmldom.freedocument (l_doc);
 
-
-      --можно ли делать ручную операцию по данному тт для данного юзера
       begin
+      if l_rec.typea =g_type_deposit or l_rec.typeb =g_type_deposit then
+       --операция по депозиту
+         select t.flags,
+                t.fli,
+                t.flv,
+                t.kv,
+                t.kvk,
+                t.nlsa,
+                t.nlsb,
+                t.mfob,
+                t.sk,
+                t.dk,
+                t.nazn,
+                t.s,
+                t.s2,
+                t1.dig,
+                t2.dig,
+                t1.lcv,
+                t2.lcv
+           into l_tt
+           from tts t,
+                tabval t1,
+                tabval t2
+          where t.kv = t1.kv(+)
+            and t.kvk = t2.kv(+)
+            and t.tt = l_rec.tt
+            and (flv = 0 or (flv = 1 and substr (t.flags, 12, 1) = '1')) --мультивалютные, по которым курс не принимаеться от пользователя
+            and t.fli < 3
+            and exists (select null from dpt_tts_vidd d where d.tt = t.tt );
+         p_contract:= l_rec.contractb;
+      else
+      --можно ли делать ручную операцию по данному тт для данного юзера
          select t.flags,
                 t.fli,
                 t.flv,
@@ -306,30 +338,31 @@ is
                 staff_tts s,
                 tabval t1,
                 tabval t2
-          where     t.kv = t1.kv(+)
-                and t.kvk = t2.kv(+)
-                and t.tt = l_rec.tt
-                and t.tt = s.tt
-                and (flv = 0 or (flv = 1 and substr (t.flags, 12, 1) = '1')) --мультивалютные, по которым курс не принимаеться от пользователя
-                and t.fli < 3
-                and substr (t.flags, 1, 1) = '1'
-                and (   s.id = user_id
-                     or s.id in (select id_whom
-                                   from staff_substitute
-                                  where     id_who = user_id
-                                        and date_is_valid (date_start,
-                                                           date_finish,
-                                                           null,
-                                                           null) = 1))
-                and decode ( (select nvl (min (to_number (val)), 0)
-                                from params
-                               where par = 'LOSECURE'),
-                            0, nvl (s.approve, 0),
-                            1) = 1
-                and date_is_valid (s.adate1,
-                                   s.adate2,
-                                   s.rdate1,
-                                   s.rdate2) = 1;
+          where t.kv = t1.kv(+)
+            and t.kvk = t2.kv(+)
+            and t.tt = l_rec.tt
+            and t.tt = s.tt
+            and (flv = 0 or (flv = 1 and substr (t.flags, 12, 1) = '1')) --мультивалютные, по которым курс не принимаеться от пользователя
+            and t.fli < 3
+            and substr (t.flags, 1, 1) = '1'
+                  and (   s.id = user_id
+                       or s.id in (select id_whom
+                                     from staff_substitute
+                                    where     id_who = user_id
+                                          and date_is_valid (date_start,
+                                                             date_finish,
+                                                             null,
+                                                             null) = 1))
+            and decode ( (select nvl (min (to_number (val)), 0)
+                            from params
+                           where par = 'LOSECURE'),
+                        0, nvl (s.approve, 0),
+                        1) = 1
+            and date_is_valid (s.adate1,
+                               s.adate2,
+                               s.rdate1,
+                               s.rdate2) = 1;
+       end if;
       exception
          when no_data_found
          then
@@ -352,7 +385,7 @@ is
       l_tmp:=l_rec.typea;
       l_rec.typea := l_rec.typeb;
       l_rec.typeb := l_tmp;
-       end if;
+      end if;
 
       --проверка ключа пользовтеля
       $if $$debug_flag $then
@@ -421,8 +454,56 @@ is
       else
          bars_error.raise_nerror (g_modcode, 'MFOB_NOT_FOUND');
       end if;
-
+----------------------------------------------------
+      --определеяем окпоб намб
+      if l_oper.mfob = f_ourmfo then
       --подбираем окпоа и нама по счету
+      get_okpo_nam (l_oper.nlsa,
+                    l_oper.kv,
+                    l_oper.id_a,
+                    l_oper.nam_a,
+                    l_nms_a);
+      get_okpo_nam (l_oper.nlsb,
+                    l_oper.kv2,
+                    l_oper.id_b,
+                    l_oper.nam_b,
+                    l_nms_b);                    
+         --в случае внутребанковских операций в nam подставляются счета
+         if l_tt.dk = 0 then  --нужно учитывать переворот, если namb подставляем из XML
+           l_oper.nam_a:= substr(nvl(l_rec.namb,l_nms_a),1,38);
+           l_oper.nam_b:= substr(l_nms_b,1,38);
+         else
+           l_oper.nam_a:= substr(l_nms_a,1,38);
+           l_oper.nam_b:= substr(nvl(l_rec.namb,l_nms_b),1,38);           
+         end if;  
+      elsif l_oper.mfob <> f_ourmfo and l_rec.idb is not null and l_rec.namb is not null
+      then 
+        if l_tt.dk = 0 then  --нужно учитывать переворот
+           get_okpo_nam (l_oper.nlsb,
+                         l_oper.kv2,
+                         l_oper.id_b,
+                         l_oper.nam_b,
+                         l_nms_b); 
+         l_oper.id_a := l_rec.idb;
+         --в случае межбанковских операций в nam подставляются контрагенты
+         l_oper.nam_a:= l_rec.namb;
+         l_oper.nam_b := substr(l_nms_b,1,38);                   
+        else
+           get_okpo_nam (l_oper.nlsa,
+                         l_oper.kv,
+                         l_oper.id_a,
+                         l_oper.nam_a,
+                         l_nms_a); 
+         l_oper.id_b := l_rec.idb;
+         --в случае межбанковских операций в nam подставляются контрагенты
+         l_oper.nam_a:= substr(l_nms_a,1,38);
+         l_oper.nam_b := l_rec.namb;                       
+        end if;            
+      else
+         bars_error.raise_nerror (g_modcode, 'BSIDE_NOT_FOUND');
+      end if;       
+----------------------------------------------------
+ /*     --подбираем окпоа и нама по счету
       get_okpo_nam (l_oper.nlsa,
                     l_oper.kv,
                     l_oper.id_a,
@@ -437,13 +518,23 @@ is
                        l_oper.id_b,
                        l_oper.nam_b,
                        l_nms_b);
+         --в случае внутребанковских операций в nam подставляются счета
+         if l_tt.dk = 0 then  --нужно учитывать переворот, если namb подставляем из XML
+           l_oper.nam_a:= substr(nvl(l_rec.namb,l_nms_a),1,38);
+           l_oper.nam_b:= substr(l_nms_b,1,38);
+         else
+           l_oper.nam_a:= substr(l_nms_a,1,38);
+           l_oper.nam_b:= substr(nvl(l_rec.namb,l_nms_b),1,38);           
+         end if;  
       elsif l_oper.mfob <> f_ourmfo and l_rec.idb is not null and l_rec.namb is not null
       then
          l_oper.id_b := l_rec.idb;
+         --в случае межбанковских операций в nam подставляются контрагенты
+         l_oper.nam_a:= substr(l_nms_a,1,38);
          l_oper.nam_b := l_rec.namb;
       else
          bars_error.raise_nerror (g_modcode, 'BSIDE_NOT_FOUND');
-      end if;
+      end if;*/
 
       --проверяем назначение
       if l_rec.nazn is null
@@ -599,7 +690,8 @@ is
       else
          l_oper.vdat:=l_rec.vdat;
       end if;
-      p_dat:= sysdate;
+      l_pdat:= sysdate;
+      l_datd:= gl.bdate;
       --создаем док
       gl.ref (l_oper.ref);
 
@@ -607,7 +699,7 @@ is
                   tt_      => l_oper.tt,
                   vob_     => l_oper.vob,
                   nd_      => substr (l_oper.ref, 1, 10),
-                  pdat_    => p_dat,
+                  pdat_    => l_pdat,
                   vdat_    => l_oper.vdat,
                   dk_      => l_oper.dk,
                   kv_      => l_oper.kv,
@@ -615,8 +707,8 @@ is
                   kv2_     => l_oper.kv2,
                   s2_      => l_oper.s2,
                   sk_      => l_oper.sk,
-                  data_    => gl.bdate,
-                  datp_    => gl.bdate,
+                  data_    => l_datd,
+                  datp_    => l_datd,
                   nam_a_   => substr (l_oper.nam_a, 1, 38),
                   nlsa_    => l_oper.nlsa,
                   mfoa_    => l_oper.mfoa,
@@ -652,6 +744,24 @@ is
          l_buf_ext := null;
       end if;
 
+      if l_tt.dk = 0  --COBUXRMIII-54 (Пока так)
+      then
+      l_tmp:=l_oper.nlsa;
+      l_oper.nlsa := l_oper.nlsb;
+      l_oper.nlsb := l_tmp;
+
+      l_tmp:=l_oper.id_a;
+      l_oper.id_a := l_oper.id_b;
+      l_oper.id_b := l_tmp;
+
+      l_tmp:=l_oper.nam_a;
+      l_oper.nam_a := l_oper.nam_b;
+      l_oper.nam_b := l_tmp;
+
+      l_tmp:=l_oper.kv;
+      l_oper.kv := l_oper.kv2;
+      l_oper.kv2 := l_tmp;
+      end if;
       --формируем ответ
       l_domdoc := dbms_xmldom.newdomdocument;
       l_root_node := dbms_xmldom.makenode (l_domdoc);
@@ -710,19 +820,10 @@ is
          dbms_xmldom.appendchild (
             l_element_node,
             dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, l_oper.nlsa)));
-----b
       l_element_node :=
          dbms_xmldom.appendchild (
             l_node3,
-            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'nms_a')));
-      l_element_tnode :=
-         dbms_xmldom.appendchild (
-            l_element_node,
-            dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, l_nms_a)));
-      l_element_node :=
-         dbms_xmldom.appendchild (
-            l_node3,
-            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'id_a')));
+            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'ida')));
       l_element_tnode :=
          dbms_xmldom.appendchild (
             l_element_node,
@@ -730,12 +831,11 @@ is
       l_element_node :=
          dbms_xmldom.appendchild (
             l_node3,
-            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'nam_a')));
+            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'nama')));
       l_element_tnode :=
          dbms_xmldom.appendchild (
             l_element_node,
             dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, l_oper.nam_a)));
-----e
       l_element_node :=
          dbms_xmldom.appendchild (
             l_node3,
@@ -744,19 +844,10 @@ is
          dbms_xmldom.appendchild (
             l_element_node,
             dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, l_oper.nlsb)));
-----b
       l_element_node :=
          dbms_xmldom.appendchild (
             l_node3,
-            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'nms_b')));
-      l_element_tnode :=
-         dbms_xmldom.appendchild (
-            l_element_node,
-            dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, l_nms_b)));
-      l_element_node :=
-         dbms_xmldom.appendchild (
-            l_node3,
-            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'id_b')));
+            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'idb')));
       l_element_tnode :=
          dbms_xmldom.appendchild (
             l_element_node,
@@ -764,7 +855,7 @@ is
       l_element_node :=
          dbms_xmldom.appendchild (
             l_node3,
-            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'nam_b')));
+            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'namb')));
       l_element_tnode :=
          dbms_xmldom.appendchild (
             l_element_node,
@@ -777,7 +868,6 @@ is
          dbms_xmldom.appendchild (
             l_element_node,
             dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, l_oper.mfob)));
-----e
       l_element_node :=
          dbms_xmldom.appendchild (
             l_node3,
@@ -827,7 +917,16 @@ is
          dbms_xmldom.appendchild (
             l_element_node,
             dbms_xmldom.makenode (
-               dbms_xmldom.createtextnode (l_domdoc, to_char (p_dat, 'DD/MM/YYYY'))));
+               dbms_xmldom.createtextnode (l_domdoc, to_char (l_pdat, 'DD/MM/YYYY'))));
+      l_element_node :=
+         dbms_xmldom.appendchild (
+            l_node3,
+            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'datd')));
+      l_element_tnode :=
+         dbms_xmldom.appendchild (
+            l_element_node,
+            dbms_xmldom.makenode (
+               dbms_xmldom.createtextnode (l_domdoc, to_char (l_datd, 'DD/MM/YYYY'))));
 
       dbms_lob.createtemporary (l_clob_data, false);
       dbms_xmldom.writetoclob (l_domdoc, l_clob_data);
@@ -835,6 +934,7 @@ is
 
       --пакуем ответ
       p_result := xrm_maintenance.packing (l_clob_data);
+      p_ref:=l_oper.ref;
    end;
 
    procedure pay_doc (p_requestdata in clob, p_result out clob)
@@ -869,7 +969,7 @@ is
       type l_opldok is table of opl%rowtype;
 
       l_tab_opl         l_opldok := l_opldok ();
-
+      l_temp            varchar(4000);
       l_branch          varchar2(256);
    begin
       -- парсим хмл
@@ -881,8 +981,10 @@ is
       l_analytic := dbms_xmldom.makenode (l_doc);
 
       dbms_xslprocessor.valueof (l_analytic, 'root/body/row/ref/text()', l_oper.ref);
-      dbms_xslprocessor.valueof (l_analytic, 'root/body/row/docsignin/text()', l_signin);
-      dbms_xslprocessor.valueof (l_analytic, 'root/body/row/docsignsep/text()', l_signsep);
+      dbms_xslprocessor.valueof (l_analytic, 'root/body/row/docsignin/text()', l_temp);
+      l_signin:=l_temp;
+      dbms_xslprocessor.valueof (l_analytic, 'root/body/row/docsignsep/text()', l_temp);
+      l_signsep:=l_temp;
       dbms_xslprocessor.valueof (l_analytic, 'root/body/row/tabn/text()', l_tabn);
 
       dbms_xmldom.freedocument (l_doc);
@@ -1077,6 +1179,15 @@ is
       l_element_node :=
          dbms_xmldom.appendchild (
             l_node3,
+            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'datd')));
+      l_element_tnode :=
+         dbms_xmldom.appendchild (
+            l_element_node,
+            dbms_xmldom.makenode (
+               dbms_xmldom.createtextnode (l_domdoc, to_char (l_oper.datd, 'DD/MM/YYYY'))));
+      l_element_node :=
+         dbms_xmldom.appendchild (
+            l_node3,
             dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'state')));
       l_element_tnode :=
          dbms_xmldom.appendchild (
@@ -1089,8 +1200,8 @@ is
             l_node3,
             dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'acc_model')));
 
-    if l_tab_opl.COUNT  >0 then         
- 
+    if l_tab_opl.COUNT  >0 then
+
       for j in l_tab_opl.first .. l_tab_opl.last
       loop
          l_node5 :=
@@ -1696,12 +1807,12 @@ is
                   dbms_xmldom.createtextnode (
                      l_domdoc,
                      xrm_maintenance.cut_off_ru_tail (l_docs_answers_to_xrm (j).ref))));
-                     
+
       select  o.sos
         into l_sos
         from oper o
        where o.ref = l_docs_answers_to_xrm (j).ref;
-       
+
          l_element_node :=
             dbms_xmldom.appendchild (
                l_node3,
@@ -1711,7 +1822,7 @@ is
                l_element_node,
                dbms_xmldom.makenode (
                   dbms_xmldom.createtextnode (
-                     l_domdoc,l_sos)));                                     
+                     l_domdoc,l_sos)));
          l_element_node :=
             dbms_xmldom.appendchild (
                l_node3,
@@ -1745,7 +1856,7 @@ is
 
          for t in (select counter,
                mark,
-               checkgroup_id, 
+               checkgroup_id,
                checkgroup,
                username,
                dat
@@ -2291,14 +2402,6 @@ is
       l_element_node :=
          dbms_xmldom.appendchild (
             l_node3,
-            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'nlsa')));
-      l_element_tnode :=
-         dbms_xmldom.appendchild (
-            l_element_node,
-            dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, c.nlsa)));
-      l_element_node :=
-         dbms_xmldom.appendchild (
-            l_node3,
             dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 's')));
       l_element_tnode :=
          dbms_xmldom.appendchild (
@@ -2346,15 +2449,6 @@ is
             l_element_node,
             dbms_xmldom.makenode (
                dbms_xmldom.createtextnode (l_domdoc, c.mfob)));
-       l_element_node :=
-         dbms_xmldom.appendchild (
-            l_node3,
-            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'nlsb')));
-      l_element_tnode :=
-         dbms_xmldom.appendchild (
-            l_element_node,
-            dbms_xmldom.makenode (
-               dbms_xmldom.createtextnode (l_domdoc, c.nlsb)));
       l_element_node :=
          dbms_xmldom.appendchild (
             l_node3,
@@ -2412,7 +2506,7 @@ is
       l_element_node :=
          dbms_xmldom.appendchild (
             l_node3,
-            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'id_a')));
+            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'ida')));
       l_element_tnode :=
          dbms_xmldom.appendchild (
             l_element_node,
@@ -2421,7 +2515,7 @@ is
       l_element_node :=
          dbms_xmldom.appendchild (
             l_node3,
-            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'nam_a')));
+            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'nama')));
       l_element_tnode :=
          dbms_xmldom.appendchild (
             l_element_node,
@@ -2430,7 +2524,7 @@ is
       l_element_node :=
          dbms_xmldom.appendchild (
             l_node3,
-            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'id_b')));
+            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'idb')));
       l_element_tnode :=
          dbms_xmldom.appendchild (
             l_element_node,
@@ -2439,7 +2533,7 @@ is
       l_element_node :=
          dbms_xmldom.appendchild (
             l_node3,
-            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'nam_b')));
+            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'namb')));
       l_element_tnode :=
          dbms_xmldom.appendchild (
             l_element_node,
@@ -2524,26 +2618,6 @@ is
                        l_element_node,
                        dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, t.counter)));
               end loop;
-
----b
-      l_element_node :=
-         dbms_xmldom.appendchild (
-            l_node3,
-            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'nms_a')));
-      l_element_tnode :=
-         dbms_xmldom.appendchild (
-            l_element_node,
-            dbms_xmldom.makenode (
-               dbms_xmldom.createtextnode (l_domdoc,c.nms_a)));
-      l_element_node :=
-         dbms_xmldom.appendchild (
-            l_node3,
-            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'nms_b')));
-      l_element_tnode :=
-         dbms_xmldom.appendchild (
-            l_element_node,
-            dbms_xmldom.makenode (
-               dbms_xmldom.createtextnode (l_domdoc,c.nms_b)));
       l_element_node :=
          dbms_xmldom.appendchild (
             l_node3,
@@ -2746,14 +2820,6 @@ is
       l_element_node :=
          dbms_xmldom.appendchild (
             l_node3,
-            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'nlsa')));
-      l_element_tnode :=
-         dbms_xmldom.appendchild (
-            l_element_node,
-            dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, c.nlsa)));
-      l_element_node :=
-         dbms_xmldom.appendchild (
-            l_node3,
             dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 's')));
       l_element_tnode :=
          dbms_xmldom.appendchild (
@@ -2801,15 +2867,6 @@ is
             l_element_node,
             dbms_xmldom.makenode (
                dbms_xmldom.createtextnode (l_domdoc, c.mfob)));
-       l_element_node :=
-         dbms_xmldom.appendchild (
-            l_node3,
-            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'nlsb')));
-      l_element_tnode :=
-         dbms_xmldom.appendchild (
-            l_element_node,
-            dbms_xmldom.makenode (
-               dbms_xmldom.createtextnode (l_domdoc, c.nlsb)));
       l_element_node :=
          dbms_xmldom.appendchild (
             l_node3,
@@ -2867,7 +2924,7 @@ is
       l_element_node :=
          dbms_xmldom.appendchild (
             l_node3,
-            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'id_a')));
+            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'ida')));
       l_element_tnode :=
          dbms_xmldom.appendchild (
             l_element_node,
@@ -2876,7 +2933,7 @@ is
       l_element_node :=
          dbms_xmldom.appendchild (
             l_node3,
-            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'nam_a')));
+            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'nama')));
       l_element_tnode :=
          dbms_xmldom.appendchild (
             l_element_node,
@@ -2885,7 +2942,7 @@ is
       l_element_node :=
          dbms_xmldom.appendchild (
             l_node3,
-            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'id_b')));
+            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'idb')));
       l_element_tnode :=
          dbms_xmldom.appendchild (
             l_element_node,
@@ -2894,7 +2951,7 @@ is
       l_element_node :=
          dbms_xmldom.appendchild (
             l_node3,
-            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'nam_b')));
+            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'namb')));
       l_element_tnode :=
          dbms_xmldom.appendchild (
             l_element_node,
@@ -2917,7 +2974,7 @@ is
 
         for t in (select counter,
                mark,
-               checkgroup_id, 
+               checkgroup_id,
                checkgroup,
                username,
                dat
@@ -2979,26 +3036,6 @@ is
                        l_element_node,
                        dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, t.counter)));
               end loop;
-
----b
-      l_element_node :=
-         dbms_xmldom.appendchild (
-            l_node3,
-            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'nms_a')));
-      l_element_tnode :=
-         dbms_xmldom.appendchild (
-            l_element_node,
-            dbms_xmldom.makenode (
-               dbms_xmldom.createtextnode (l_domdoc,c.nms_a)));
-      l_element_node :=
-         dbms_xmldom.appendchild (
-            l_node3,
-            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'nms_b')));
-      l_element_tnode :=
-         dbms_xmldom.appendchild (
-            l_element_node,
-            dbms_xmldom.makenode (
-               dbms_xmldom.createtextnode (l_domdoc,c.nms_b)));
       l_element_node :=
          dbms_xmldom.appendchild (
             l_node3,
@@ -3063,6 +3100,377 @@ is
       --пакуем ответ
       p_result := xrm_maintenance.packing (l_clob_data);
    end;
+
+ procedure dep_get_avail_tt(p_requestdata in clob, p_result out clob)
+   is
+      l_parser          dbms_xmlparser.parser;
+      l_doc             dbms_xmldom.domdocument;
+      l_analytic        dbms_xmldom.domnode;
+
+      l_domdoc          dbms_xmldom.domdocument;
+      l_root_node       dbms_xmldom.domnode;
+      l_element_node    dbms_xmldom.domnode;
+      l_element_tnode   dbms_xmldom.domnode;
+      l_node            dbms_xmldom.domnode;
+      l_node2           dbms_xmldom.domnode;
+      l_node3           dbms_xmldom.domnode;
+      l_clob_data       clob;
+      l_oper            number(3);
+      l_deposit_id      DPT_DEPOSIT.DEPOSIT_ID%TYPE;
+      type t_tts_array is record
+       (
+          op_type     v_dpt_vidd_tts.op_type%type,
+          op_name     v_dpt_vidd_tts.op_name%type,
+          tt_cash     v_dpt_vidd_tts.tt_cash%type
+       );
+      type t_tts is table of t_tts_array;
+      l_tts_ar         t_tts := t_tts ();
+
+  begin
+      -- парсим хмл
+
+      l_parser := dbms_xmlparser.newparser;
+      dbms_xmlparser.parseclob (l_parser, p_requestdata);
+      l_doc := dbms_xmlparser.getdocument (l_parser);
+      dbms_xmlparser.freeparser (l_parser);
+
+      l_analytic := dbms_xmldom.makenode (l_doc);
+
+      dbms_xslprocessor.valueof (l_analytic, 'root/body/row/oper/text()', l_oper);
+      dbms_xslprocessor.valueof (l_analytic, 'root/body/row/deposit_id/text()', l_deposit_id);
+      dbms_xmldom.freedocument (l_doc);
+
+      l_deposit_id:=xrm_maintenance.add_ru_tail (l_deposit_id);
+
+      begin
+        with oper_tt as (--(первинний внесок)
+                          select 0 oper, 0 tt from dual
+                    -- (поповнення)
+                    union select 1 oper, 1 tt from dual      
+                    --close (выплата тела при досрочном расторжении)
+                    union select 4 oper, 21 tt from dual
+                    union select 4 oper, 23 tt from dual
+                    union select 4 oper, 25 tt from dual
+                    union select 4 oper, 26 tt from dual
+                    union select 4 oper, 33 tt from dual
+                    union select 4 oper, 35 tt from dual
+                    --closep (выплата процентов при досрочном расторжении)
+                    union select 5 oper, 3 tt from dual
+                    union select 5 oper, 33 tt from dual
+                    union select 5 oper, 34 tt from dual
+                    union select 5 oper, 23 tt from dual
+                    union select 5 oper, 26 tt from dual
+                    union select 5 oper, 45 tt from dual
+                    --payout (?????????????)
+                    union select 5 oper, 21 tt from dual
+                    --retutn (выплата тела по окончанию срока)
+                    union select 6 oper, 23 tt from dual
+                    union select 6 oper, 23 tt from dual
+                    union select 6 oper, 23 tt from dual
+                    union select 6 oper, 23 tt from dual
+                    union select 6 oper, 23 tt from dual
+                    --retutp (выплата процентов по окончанию срока)
+                    union select 3 oper, 3 tt from dual
+                    union select 3 oper, 33 tt from dual
+                    union select 3 oper, 43 tt from dual
+                    union select 3 oper, 45 tt from dual
+                    union select 3 oper, 46 tt from dual
+                    )
+        select op_type,op_name,tt_cash
+        bulk collect into l_tts_ar
+        from v_dpt_vidd_tts v, dpt_deposit d, oper_tt tt
+        where tt.oper = l_oper
+          and v.tt_id = tt.tt
+          and v.dpttype_id = d.vidd
+          and d.deposit_id = l_deposit_id
+          and ((l_oper=6 and v.op_type not in ('EDP','DPE')) or l_oper<>6);
+      exception
+         when no_data_found
+         then
+            bars_error.raise_nerror (g_modcode, 'DPT_NOT_FOUND');
+      end;
+
+--формируем ответ
+      l_domdoc := dbms_xmldom.newdomdocument;
+      l_root_node := dbms_xmldom.makenode (l_domdoc);
+      l_node :=
+         dbms_xmldom.appendchild (
+            l_root_node,
+            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'root')));
+      l_node2 :=
+         dbms_xmldom.appendchild (
+            l_node,
+            dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'body')));
+
+      if l_tts_ar.count > 0
+      then
+         for j in l_tts_ar.first .. l_tts_ar.last
+         loop
+            l_node3 :=
+               dbms_xmldom.appendchild (
+                  l_node2,
+                  dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'row')));
+            l_element_node :=
+               dbms_xmldom.appendchild (
+                  l_node3,
+                  dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'op_type')));
+            l_element_tnode :=
+               dbms_xmldom.appendchild (
+                  l_element_node,
+                  dbms_xmldom.makenode (
+                     dbms_xmldom.createtextnode (l_domdoc,l_tts_ar (j).op_type)));
+            l_element_node :=
+               dbms_xmldom.appendchild (
+                  l_node3,
+                  dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'op_name')));
+            l_element_tnode :=
+               dbms_xmldom.appendchild (
+                  l_element_node,
+                  dbms_xmldom.makenode (
+                     dbms_xmldom.createtextnode (l_domdoc,l_tts_ar (j).op_name)));
+            l_element_node :=
+               dbms_xmldom.appendchild (
+                  l_node3,
+                  dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'tt_cash')));
+            l_element_tnode :=
+               dbms_xmldom.appendchild (
+                  l_element_node,
+                  dbms_xmldom.makenode (
+                     dbms_xmldom.createtextnode (l_domdoc,l_tts_ar (j).tt_cash)));
+         end loop;
+      end if;
+
+      dbms_lob.createtemporary (l_clob_data, false);
+      dbms_xmldom.writetoclob (l_domdoc, l_clob_data);
+      dbms_xmldom.freedocument (l_domdoc);
+
+      --пакуем ответ
+      p_result := xrm_maintenance.packing (l_clob_data);
+
+  end;
+
+procedure dep_tt_valid(p_requestdata in clob, p_result out clob)
+   is
+      l_parser          dbms_xmlparser.parser;
+      l_doc             dbms_xmldom.domdocument;
+      l_analytic        dbms_xmldom.domnode;
+
+      l_domdoc          dbms_xmldom.domdocument;
+      l_root_node       dbms_xmldom.domnode;
+      l_element_node    dbms_xmldom.domnode;
+      l_element_tnode   dbms_xmldom.domnode;
+      l_node            dbms_xmldom.domnode;
+      l_node2           dbms_xmldom.domnode;
+      l_node3           dbms_xmldom.domnode;
+      l_clob_data       clob;
+      l_oper            number(3);
+      l_deposit_id      DPT_DEPOSIT.DEPOSIT_ID%TYPE;
+      l_trusteetype     Dpt_Trustee_Type.Id%TYPE;
+      l_rnk             DPT_DEPOSIT.Rnk%TYPE;
+      l_sum             DPT_DEPOSIT.Limit%TYPE;
+      l_flag            number(1);
+      l_route           number(1);
+
+      l_dpt_amount      DPT_DEPOSIT.Limit%TYPE;
+      l_dpt_nocash      number(1);
+      l_kv              DPT_DEPOSIT.kv%TYPE;
+      l_nls             ACCOUNTS.NLS%TYPE;
+      l_disable_add     dpt_vidd.disable_add%TYPE;
+      l_vidd            dpt_vidd.vidd%TYPE;
+      l_tts             tts%ROWTYPE;
+      l_stmt            l_tts.nlsb%TYPE;
+      l_fl_int_payoff   number(1);
+      l_fl_avans_payoff number(1);
+      l_chargedamount   number;
+
+      function AllowedFlag (p_dptid in DPT_DEPOSIT.DEPOSIT_ID%TYPE, p_rnk in DPT_DEPOSIT.Rnk%TYPE, p_flag in number)
+      return number
+      is
+        l_res   number(1);
+      begin
+        begin
+         select substr (
+                        LPAD(to_char(da.DENOM_COUNT),8,'0'),
+                        p_flag,
+                        1)
+         into l_res
+            from DPT_AGREEMENTS da
+            inner join DPT_TRUSTEE dt on (dt.id = da.trustee_id and dt.dpt_id = da.dpt_id)
+            where da.dpt_id = p_dptid
+            and da.agrmnt_type = 12
+            and da.agrmnt_state = 1
+            and nvl(da.date_end,trunc(sysdate+1)) >= TRUNC( SYSDATE )
+            and dt.typ_tr = 'T'
+            and dt.rnk_tr = p_rnk
+            and dt.fl_act = 1;
+        exception when others then
+          l_res:=0;
+        end;
+      return l_res;
+      end;
+
+       -- Схема виплати відсотків у відділенні: 1 - можна платити на касу, default = 0, платити на рахунок, відповідно до ЕБП.
+      function  DPT_PAY_CASHDESK(p_tag in varchar)
+      return number
+      is
+       nval number(1);
+      begin
+        begin
+         select to_number(VAL)
+         into nval
+         from BRANCH_PARAMETERS
+         where BRANCH = sys_context('bars_context','user_branch')
+           and TAG =  p_tag;
+        exception when others then
+          nval:=0;
+        end;
+      return nval;
+      end;
+
+  begin
+      -- парсим хмл
+
+      l_parser := dbms_xmlparser.newparser;
+      dbms_xmlparser.parseclob (l_parser, p_requestdata);
+      l_doc := dbms_xmlparser.getdocument (l_parser);
+      dbms_xmlparser.freeparser (l_parser);
+
+      l_analytic := dbms_xmldom.makenode (l_doc);
+
+      dbms_xslprocessor.valueof (l_analytic, 'root/body/row/oper/text()', l_oper);
+      dbms_xslprocessor.valueof (l_analytic, 'root/body/row/tt/text()', l_tts.tt);
+      dbms_xslprocessor.valueof (l_analytic, 'root/body/row/deposit_id/text()', l_deposit_id);
+      dbms_xslprocessor.valueof (l_analytic, 'root/body/row/rnk/text()', l_rnk);
+      dbms_xslprocessor.valueof (l_analytic, 'root/body/row/trustee_type/text()', l_trusteetype);
+      dbms_xslprocessor.valueof (l_analytic, 'root/body/row/sum/text()', l_sum);
+
+      dbms_xmldom.freedocument (l_doc);
+
+      l_deposit_id:=xrm_maintenance.add_ru_tail (l_deposit_id);
+      l_rnk:=xrm_maintenance.add_ru_tail (l_rnk);
+      begin
+        select nvl(a1.ostb, a1.ostc)                         dpt_amount,
+               nvl (dpt.f_dptw (d.deposit_id, 'NCASH'), '0') dpt_nocash,
+               d.kv,
+               a.nls,
+               nvl(v.disable_add,0) disable_add,
+               d.vidd,
+               dpt.payoff_enable (d.acc,
+                                  d.freq,
+                                  DECODE (v.amr_metr, 0, 0, 1),
+                                  d.dat_begin,
+                                  d.dat_end,
+                                  bankdate,
+                                  DECODE (NVL (d.cnt_dubl, 0), 0, 0, 1)),
+              DECODE (v.amr_metr, 0, 0, 1)
+          into l_dpt_amount,
+               l_dpt_nocash,
+               l_kv,
+               l_nls,
+               l_disable_add,
+               l_vidd,
+               l_fl_int_payoff,
+               l_fl_avans_payoff
+        from dpt_deposit d,
+             dpt_vidd    v,
+             accounts    a,
+             saldo       a1
+        where d.deposit_id =l_deposit_id
+          and d.acc = a1.acc
+          and d.acc = a.acc
+          and v.vidd = d.vidd;
+      exception
+         when no_data_found
+         then
+            bars_error.raise_nerror ('DPT', 'DPT_NOT_FOUND');
+      end;
+
+
+      if     l_oper = 0 then   --Первинний внесок на деп.рахунок
+        if l_sum = 0 then
+          raise_application_error(-20001,'Сума первинного внеску не може бути нульовою!');
+        elsif  l_dpt_amount <> 0 then
+          raise_application_error(-20001,'Сума депозиту має бути нульовою!');
+        elsif  l_dpt_nocash = 1 then
+          raise_application_error(-20001,'Депозит не передбачає первинного внеску готівкою!');
+        end if;
+      elsif  l_oper = 1 then   --Поповнення депозитного рахунку
+        if      l_dpt_amount <= 0 then
+          raise_application_error(-20001,'Сума депозиту не може бути нульовою!');
+        elsif   l_disable_add <> 0 then
+          raise_application_error(-20001,'Депозит не передбачає поповнення!');
+        elsif  l_trusteetype = 'T' then --перевірка для довіреної особи
+         l_flag:=AllowedFlag(l_deposit_id,l_rnk,3);
+         if l_flag=0 then
+           raise_application_error(-20001,'Довірена особа не може поповнювати даний депозит!');
+         end if;
+        elsif   f_dpt_stop(1,l_kv,l_nls,l_sum,bankdate)= 0 then
+          raise_application_error(-20001,'Не пройшла перевірка по сроку поповнення!');
+        elsif   f_dpt_stop(2,l_kv,l_nls,l_sum,bankdate)= 0 then
+          raise_application_error(-20001,'Не пройшла перевірка на мінімальну суму поповнення!');
+        elsif   f_dpt_stop(17,l_kv,l_nls,l_sum,bankdate)= 0 then
+          raise_application_error(-20001,'Не пройшла перевірка на обмеження поповнення за період!');
+        elsif   f_dpt_stop(24,l_kv,l_nls,l_sum,bankdate)= 0 then
+          raise_application_error(-20001,'Не пройшла перевірка на максимальну суму поповнення за весь період дії вкладу!');
+        end if;
+      elsif  l_oper in (3,33,43,45,46) then   --Виплата готівки з рах.нарах.%%
+        l_route:= dpt_web.is_demandpt (l_deposit_id); --зміна переходу route
+        if l_route = 0 then --dopisit_percent_pay
+           if  l_trusteetype = 'H' then  --перевірка для спадкоємця
+             if   dpt_web.inherited_deal(l_deposit_id, 1) = 'Y' then
+               raise_application_error(-20001,'Дана функція заблокована. По депозитному договору є зареєстровані спадкоємці. Скористайтесь функцією \"Реєстрація свідоцтв про право на спадок\".');
+             end if;
+
+
+            begin
+              select * into l_tts from tts  where tt=l_tts.tt;
+            exception
+               when no_data_found
+               then
+                  bars_error.raise_nerror ('DPT', 'TT_NOT_FOUND');
+            end;
+            if l_tts.nlsb is not null and substr (l_tts.nlsb, 1, 1) = '#'
+            then
+                l_stmt := trim (leading '#' from l_tts.nlsb);
+                execute immediate 'select ' || l_stmt || 'from dual' into l_tts.nlsb;
+            end if;
+            if is_cash_account (l_tts.nlsb,l_kv) <> 1 then
+              raise_application_error(-20001,'Виплата не через касу заборонена!');
+            end if;
+
+           elsif EBP.GET_ARCHIVE_DOCID(l_deposit_id) >0    ---ід депозитного договору в ЕАД (якщо = 0 - вклад відкривався не по ЕБП)  --(активность кнопки на вебе)
+             and nvl(ebp.get_active_request(l_rnk, l_deposit_id),0)<=0  then --Перевірка наявності активного запиту
+               raise_application_error(-20001,'Вклад відкривався не по ЕБП!');
+           end if;
+        --Донарахування %% при виплаті після завершення по системну дату
+        if     l_fl_int_payoff  = 0 then
+             raise_application_error(-20001,'Не наступив термін виплати відсотків по вкладу №!');
+        elsif  l_fl_int_payoff  = 1  and  l_fl_avans_payoff   =1 then
+          dpt_web.advance_makeint(l_deposit_id);
+        end if;
+        dpt_charge_interest(p_dptid         => l_deposit_id,
+                            p_chargedamount => l_chargedamount,
+                            is_payoff       => null);
+        elsif l_route = 1 then --transfer
+          raise_application_error(-20001,'Оказывается и это нужно делать, а "Животик" говорил, что не нужно!');
+        end if;
+      end if;
+
+  end;
+
+   procedure dep_crt_doc(p_requestdata in clob, p_result out clob)
+   is
+      l_ref             oper.ref%type;
+      l_contract        number(38);
+   begin
+  --Вызов стандартного создания макета операции
+  crt_doc (p_requestdata, p_result,l_ref, l_contract);
+  --AfterPayProc
+  --dpt_web.fill_dpt_payments(l_contract,l_ref);
+  dpt_web.fill_dpt_payments(xrm_maintenance.add_ru_tail (l_contract),l_ref);
+  
+   end;
+
    procedure doc_service (p_doctype         in     int,
                           p_requestdata     in     clob,
                           p_result             out clob,
@@ -3070,12 +3478,14 @@ is
                           p_resultmessage      out varchar2)
    is
       l_requestdata   clob;
+      l_ref           oper.ref%type;
+      l_contract      number(38);
    begin
       l_requestdata := xrm_maintenance.unpacking (p_requestdata);
 
       if p_doctype = 1                                                           -- cтворення макету операції
       then
-         crt_doc (l_requestdata, p_result);
+         crt_doc (l_requestdata, p_result, l_ref, l_contract);
       elsif p_doctype = 2                                                        -- фиксация документа
       then
          pay_doc (l_requestdata, p_result);
@@ -3091,6 +3501,15 @@ is
       elsif p_doctype = 8                                                        -- перегляд документів відділення
       then
          get_docs (l_requestdata, p_result);
+      elsif p_doctype = 11                                                        -- перегляд доступних операцій (TT) по депозитом
+      then
+         dep_get_avail_tt (l_requestdata, p_result);
+      elsif p_doctype = 12                                                        -- первинна валідація операції над депозитом
+      then
+         dep_tt_valid (l_requestdata, p_result);
+      elsif p_doctype = 13                                                        -- cтворення макету операції по депозитам
+      then
+         dep_crt_doc (l_requestdata, p_result);
       end if;
 
       p_resultcode := 0;
