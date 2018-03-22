@@ -13,7 +13,7 @@ create or replace package cp_rep_dgp is
 end cp_rep_dgp;
 /
 create or replace package body cp_rep_dgp is
-  G_BODY_VERSION constant varchar2(64) := 'v.1.5  19.03.2018';
+  G_BODY_VERSION constant varchar2(64) := 'v.1.6  22.03.2018';
   G_TRACE        constant varchar2(20) := 'CP_REP_DGP.';
   ---
   cursor G_CUR (p_nlsb_arr string_list, p_date_from date, p_date_to date)
@@ -106,7 +106,7 @@ create or replace package body cp_rep_dgp is
                      customer c
                where (e.acc = a.acc and substr(a.nls, 1, 1) != '8' and
                      k.dox > 1 or nvl(e.accd, e.accp) = a.acc and k.dox = 1)
-                 and (a.dapp > p_date_from - 3 or a.ostc != 0 or a.ostb != 0)
+                 --and (a.dapp > p_date_from - 3 or a.ostc != 0 or a.ostb != 0)
                  and substr(a.nls, 1, 4) in (select column_value from table( p_nlsb_arr ))
                  and o.vdat <= p_date_to --
                  and e.id = k.id
@@ -121,8 +121,8 @@ create or replace package body cp_rep_dgp is
                  and e.accs = s.acc(+)
                  and k.spec_cond_id = ks.id(+)
                  and k.tip = 1 --and k.country=804  --and k.kv=980
-                 and nvl(k.datp, to_date('01/01/2050', 'dd/mm/yyyy')) >
-                     p_date_from
+                 --and nvl(k.datp, to_date('01/01/2050', 'dd/mm/yyyy')) > p_date_from
+                 and rez.ostc96(e.acc, p_date_from - 1) != 0
                     --  and k.dox > 1        -- 1 - акції 2 - БЦП
                  and o.sos = 5 --- and k.emi in (0,6) -- держ/НЕ держ/інв
                order by 4; --1,3,4
