@@ -45,7 +45,7 @@ create or replace package nbu_601_request_data_ru is
     ---розмір фінансових показників діяльності боржника.
     procedure p_nbu_finperformance_uo (kf_ in varchar2);
 
-    procedure p_nbu_groupur_uo(kf_ in varchar2);
+    --procedure p_nbu_groupur_uo(kf_ in varchar2);
     --розмір фінансових показників діяльності групи юридичних осіб, що знаходяться під спільним контролем
     procedure p_nbu_finperformancegr_uo (kf_ varchar2);
 
@@ -70,7 +70,6 @@ create or replace package nbu_601_request_data_ru is
     ----заполнение залогов
     procedure  p_nbu_pledge_dep  (kf_ in varchar2);
 end;
-
 /
 create or replace package body nbu_601_request_data_ru is
 
@@ -390,7 +389,7 @@ create or replace package body nbu_601_request_data_ru is
         commit;
     end;
     --------------------------------
-      procedure p_nbu_groupur_uo(
+   /*   procedure p_nbu_groupur_uo(
        kf_ in varchar2)
        is
        begin
@@ -406,7 +405,7 @@ create or replace package body nbu_601_request_data_ru is
                            union 
                            select distinct  p.rnk, decode (country,804,'true','false') isRezGr,c.okpo,name,c.country 
                            from  customer_extern c, nbu_person_uo p
-                           where c.rnk=p.rnk and p.iscontroller is not null)loop
+                           where c.id=p.rnk and p.iscontroller is not null)loop
                           insert into nbu_groupur_uo (rnk,
                                                       whois,
                                                       isrezgr,
@@ -427,7 +426,7 @@ create or replace package body nbu_601_request_data_ru is
                                                kf_);
           end loop;               
         commit;
-    end;
+    end;*/
     
     ---------------------------------
     procedure p_nbu_finperformancegr_uo(
@@ -1038,4 +1037,3 @@ grant execute on nbu_601_request_data_ru to bars_access_defrole;
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/PACKAGE/nbu_601_request_data_ru.sql =========*** End *** 
 PROMPT ===================================================================================== 
-
