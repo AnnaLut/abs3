@@ -156,7 +156,6 @@
                 {
                     name: "Видалити",
                     click: function (e) {  //add a click event listener on the delete button
-                        console.log(e);
                         var grid = $('#accountsGrid').data('kendoGrid');
                         var tr = $(e.target).closest("tr"); //get the row for deletion
                         var data = this.dataItem(tr); //get the row data so it can be referred later

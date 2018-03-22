@@ -13,7 +13,6 @@ angular.module(globalSettings.modulesAreas)
 
             customersService.getModuleVersion().then(
                 function (response) {
-                    console.log(response);
                     vm.moduleVersion = 'v' + response;
                 },
                 function () { }
