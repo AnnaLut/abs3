@@ -733,7 +733,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
          and i.id = 0
          and i.acc = ss.ACC
          and ss.ostb < 0;
-      ii.STP_DAT       := NVL(ii.STP_DAT, gl.bdate - 1);
+      ii.STP_DAT := least(NVL(ii.STP_DAT, gl.bdate - 1), gl.bdate - 1);
       CCK_DPK.ACR_DAT_ := ii.acr_dat;
       -- Z2n_-  Норм.проценты   положит число
       select -ostb into Z2N_ from accounts where ACC = II.acra;
