@@ -166,12 +166,8 @@
                         </tr>
                         <tr>
                             <td class="style3">
-                                <asp:Label ID="Label19" runat="server" Text="Щомісячна комісія"></asp:Label>
-                                &nbsp;
                             </td>
-                            <td class="style4" rowspan="1">
-                                <asp:Label ID="Label20" runat="server" Text='<%# rp_dosr.Sum %>'></asp:Label>
-                                &nbsp;
+                            <td class="style4">
                             </td>
                         </tr>
                         <tr>

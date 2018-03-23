@@ -33,13 +33,13 @@ public partial class credit_repayment_dostr : Bars.BarsPage
         }
     }
 
-    public String NLS
-    {
-        get
-        {
-            return Convert.ToString(Request.Params.Get("nls"));
-        }
-    }
+	public String NLS
+	{
+		get
+		{
+			return  Convert.ToString(Request.Params.Get("nls"));
+		}
+	}
 
     public Decimal ACC
     {
@@ -56,20 +56,20 @@ public partial class credit_repayment_dostr : Bars.BarsPage
         //decimal kl_ = 0;
         if (!IsPostBack)
         {
-            rp_dosr = null;
-
+            rp_dosr = null; 
+            
             form2.DataBind();
             pb_del.Visible = false;
             pb_GPK_NEW.Visible = false;
             pb_GPK_OLD.Visible = false;
-
+  
         }
 
         // если параметры передали в урл то наполняем
-        if (!IsPostBack && Request.Params.Get("ccid") != null)
+        if (!IsPostBack && Request.Params.Get("ccid") != null )
         {
             String CC_ID = Request.Params.Get("ccid");
-            String NLS = Request.Params.Get("nls");
+			String NLS = Request.Params.Get("nls");
 
             DateTimeFormatInfo dtfi = new DateTimeFormatInfo();
             dtfi.ShortDatePattern = "yyyyMMdd";
@@ -79,7 +79,7 @@ public partial class credit_repayment_dostr : Bars.BarsPage
             tbsCC_ID.Value = CC_ID;
             tbsCC_ID.Enabled = false;
             ibSearch.Visible = false;
-
+           
             ibSearch_Click(sender, null);
         }
 
@@ -93,7 +93,7 @@ public partial class credit_repayment_dostr : Bars.BarsPage
             btPgpk.Visible = false;
             K1.Enabled = true;
             lbPageTitle.Text = "Дострокового погашення з перебудовою графіка погашення";
-
+            
         }
         else if (Request.Params.Get("type") == "2")
         {
@@ -113,7 +113,7 @@ public partial class credit_repayment_dostr : Bars.BarsPage
         }
 
 
-
+        
     }
     protected void ibSearch_Click(object sender, ImageClickEventArgs e)
     {
@@ -127,9 +127,8 @@ public partial class credit_repayment_dostr : Bars.BarsPage
             ClientScript.RegisterStartupScript(typeof(string), "error_text", "alert('" + "При поиске произошла ошибка : " + rp_dosr.RetText + "')", true);
             rp_dosr = null;
         }
-        else
-        {
-
+        else {
+            
             pb_del.Visible = true;
             pb_GPK_NEW.Visible = true;
             pb_GPK_OLD.Visible = true;
@@ -138,12 +137,10 @@ public partial class credit_repayment_dostr : Bars.BarsPage
             //Response.Write(gpk + " " + rp_dosr.LbGPK_ + " - " + lb_gpk.Text);
             if (gpk == 0)
             { //LbGPK.Text = "Класичний"; 
-                drl_gpl.SelectedValue = "0";
-            }
+                drl_gpl.SelectedValue = "0"; }
             else
             { //LbGPK.Text = "Антуітет"; 
-                drl_gpl.SelectedValue = "1";
-            }
+                drl_gpl.SelectedValue = "1"; }
 
             LinREF.Visible = false;
             LinREF.Text = "0";
@@ -173,12 +170,10 @@ public partial class credit_repayment_dostr : Bars.BarsPage
 
         if (Convert.ToDecimal(rp_dosr.LbGPK_) == 0)
         { //LbGPK.Text = "Класичний"; 
-            drl_gpl.SelectedValue = "0";
-        }
+            drl_gpl.SelectedValue = "0"; }
         else
         { //LbGPK.Text = "Антуітет"; 
-            drl_gpl.SelectedValue = "1";
-        }
+            drl_gpl.SelectedValue = "1"; }
 
     }
 
@@ -193,7 +188,7 @@ public partial class credit_repayment_dostr : Bars.BarsPage
         refreh_date();
         pb_del.Enabled = true;
 
-    }
+     }
 
     /// <summary>
     /// Зміна графіка  
@@ -203,12 +198,12 @@ public partial class credit_repayment_dostr : Bars.BarsPage
         SendZay(2);
         btPay.Enabled = false;
         btPgpk.Enabled = false;
-        //  lbRef.Enabled = false;
-        //  LinREF.Enabled = false;
+      //  lbRef.Enabled = false;
+      //  LinREF.Enabled = false;
         refreh_date();
         pb_del.Enabled = true;
     }
-
+ 
     /// <summary>
     /// Розбор проплат 
     /// </summary>
@@ -227,12 +222,12 @@ public partial class credit_repayment_dostr : Bars.BarsPage
             cmd.ExecuteNonQuery();
 
             Decimal? ND1;
-
-
+           
+     
 
             //ND1 = -Convert.ToDecimal(tbsCC_ID.Value);
             ND1 = Convert.ToDecimal(tbsCC_ID.Value);
-
+         
 
 
             cmd.CommandType = CommandType.StoredProcedure;
@@ -240,11 +235,11 @@ public partial class credit_repayment_dostr : Bars.BarsPage
             cmd.CommandText = "CCK_DPK.PREV";
 
             cmd.Parameters.Add("p_ND", OracleDbType.Decimal, ND1, ParameterDirection.Input);
-            cmd.Parameters.Add("p_NLS", OracleDbType.Varchar2, NLS, ParameterDirection.Input);
+			cmd.Parameters.Add("p_NLS", OracleDbType.Varchar2, NLS, ParameterDirection.Input);
             //Response.Write("договір " + ND1);
             cmd.ExecuteNonQuery();
-
-
+            
+           
 
 
 
@@ -279,7 +274,7 @@ public partial class credit_repayment_dostr : Bars.BarsPage
                 lbFIO.Text = Convert.ToString(rdr["NMS"]);
             }
             cmd.ExecuteNonQuery();
-
+            
         }
         finally
         {
@@ -315,8 +310,8 @@ public partial class credit_repayment_dostr : Bars.BarsPage
             Decimal? ND1;
             Decimal? S;
             Decimal? Ref_;
-            Int16? p_gpk_;
-            // Decimal? p_mode; //0 - справка, 1 - модификация
+            Int16?   p_gpk_;
+           // Decimal? p_mode; //0 - справка, 1 - модификация
             //Decimal? ErrCode;
             //String ErrMessage;
 
@@ -335,7 +330,7 @@ public partial class credit_repayment_dostr : Bars.BarsPage
             //                    -- 2=НЕТ (с перерасчетом суммы до последней ненулевой даты)
 
             p_gpk_ = Convert.ToInt16(drl_gpl.SelectedValue);
-            //  Response.Write(p_mode + " " + Convert.ToString(p_gpk_));
+          //  Response.Write(p_mode + " " + Convert.ToString(p_gpk_));
             cmd.Parameters.Add("p_mode", OracleDbType.Decimal, p_mode, ParameterDirection.Input);
             cmd.Parameters.Add("p_ND", OracleDbType.Decimal, ND1, ParameterDirection.Input);
             cmd.Parameters.Add("p_acc2620", OracleDbType.Decimal, ACC, ParameterDirection.Input);
@@ -351,11 +346,11 @@ public partial class credit_repayment_dostr : Bars.BarsPage
             cmd.Parameters.Add("p_Z5", OracleDbType.Decimal, null, ParameterDirection.InputOutput);
             cmd.Parameters.Add("p_R1", OracleDbType.Decimal, null, ParameterDirection.InputOutput);
             cmd.Parameters.Add("p_R2", OracleDbType.Decimal, null, ParameterDirection.InputOutput);
-            cmd.Parameters.Add("p_P1", OracleDbType.Decimal, null, ParameterDirection.Output);
+            cmd.Parameters.Add("p_P1", OracleDbType.Decimal, null , ParameterDirection.Output);
 
 
 
-            //  drl_gpl.SelectedValue = Convert.ToString( p_gpk_); 
+           //  drl_gpl.SelectedValue = Convert.ToString( p_gpk_); 
 
             cmd.ExecuteNonQuery();
             Ref_ = (cmd.Parameters["p_P1"].Status == OracleParameterStatus.Success ? ((OracleDecimal)cmd.Parameters["p_P1"].Value).Value : (Decimal?)null);
@@ -363,34 +358,34 @@ public partial class credit_repayment_dostr : Bars.BarsPage
 
             if (Ref_ != null)
             { LinREF.Visible = true;
-                lbRef.Visible = true;
+            lbRef.Visible = true;
             lbRef.Text = "Документ Реф. №: ";
-                LinREF.Text =  Convert.ToString(Ref_);
-                LinREF.NavigateUrl = "/barsroot/documentview/default.aspx?ref=" + Convert.ToString(Ref_) ;
+            LinREF.Text =  Convert.ToString(Ref_);
+            LinREF.NavigateUrl = "/barsroot/documentview/default.aspx?ref=" + Convert.ToString(Ref_) ;
                 
 
-                LinREF.Attributes.Add("onclick",
+          LinREF.Attributes.Add("onclick",
             "javascript:"+
-                    "window.showModalDialog("+
-                    LinREF.ClientID+".href,"+
-                    "'ModalDialog',"+
-                    "'dialogHeight:600px; dialogLeft:100px; dialogTop:100px; dialogWidth:1100px; help:no; resizable:yes; scroll:yes;'"+
-                    ");"+
-                    "return false;"
+            "window.showModalDialog("+
+            LinREF.ClientID+".href,"+
+            "'ModalDialog',"+
+            "'dialogHeight:600px; dialogLeft:100px; dialogTop:100px; dialogWidth:1100px; help:no; resizable:yes; scroll:yes;'"+
+            ");"+
+            "return false;"
             );
             }
-
-            }
+                
+        }
         finally
         {
             con.Close();
             con.Dispose();
         }
 
-
+        
         return true;
     }
-
+    
     protected void pb_del_Click(object sender, ImageClickEventArgs e)
     {
         OracleConnection con = OraConnector.Handler.IOraConnection.GetUserConnection();
@@ -417,7 +412,7 @@ public partial class credit_repayment_dostr : Bars.BarsPage
 
             cmd.Parameters.Add("p_ND", OracleDbType.Decimal, ND1, ParameterDirection.Input);
             cmd.Parameters.Add("p_REF", OracleDbType.Decimal, ref_, ParameterDirection.Input);
-
+     
 
 
 
@@ -475,8 +470,8 @@ public class cRePayment_dosr
     private Decimal? _K1_MAX;
     private Decimal? _sDD_dosr;
     private Decimal? _LbGPK;
-
-    private String _branch;
+    
+    private String   _branch;
     private String _sdat;
     private String _wdat;
     private String _dat_prev;
@@ -484,11 +479,9 @@ public class cRePayment_dosr
     private String _glbd;
     private String _dat_mod;
 
-    public decimal Sum { get; set; }
+  # endregion
 
-    #endregion
-
-    #region Публичные свойства
+    # region Публичные свойства
     /// <summary>
     /// Содержит ли данные
     /// </summary>
@@ -640,17 +633,17 @@ public class cRePayment_dosr
     /// <summary>
     ///  
     /// </summary>
-    public Decimal? LbGPK_
+    public  Decimal? LbGPK_
     {
-
-        get { return _LbGPK; }
+        
+        get {return _LbGPK;   }
         set { _LbGPK = value; }
     }
 
     /// <summary>
     ///  Бранч КД
     /// </summary>
-    public String branch_
+    public String  branch_
     {
         get { return _branch; }
         set { _branch = value; }
@@ -717,7 +710,7 @@ public class cRePayment_dosr
     public Decimal? FindCredit1(String CC_ID, String type_, String nls_)
     {
         this.CC_ID = CC_ID;
-        this.NLS = nls_;
+        this.NLS   = nls_;
         //this.DAT1 = DAT1;
         //Decimal? p_mode = 0;
         //Decimal? ref1_; 
@@ -727,7 +720,7 @@ public class cRePayment_dosr
 
         OracleConnection con = OraConnector.Handler.IOraConnection.GetUserConnection();
         OracleCommand cmd = new OracleCommand(OraConnector.Handler.IOraConnection.GetSetRoleCommand("WR_CREDIT"), con);
-
+        
 
         if (con.State == ConnectionState.Closed) con.Open();
         try
@@ -740,7 +733,7 @@ public class cRePayment_dosr
             cmd.Parameters.Clear();
             cmd.Parameters.Add("ND_", OracleDbType.Decimal, 100, this.CC_ID, ParameterDirection.Input);
             cmd.Parameters.Add("NLS_", OracleDbType.Decimal, 100, this.NLS, ParameterDirection.Input);
-            cmd.CommandText = "select  BRANCH, ND, CC_ID, SDATE, WDATE, RNK, NMK, MES, KV, NLS, Z1,Z2,Z3,Z4,Z5,R1,R2,K1,K0, DAT_MOD,sum_com from V_CCKDPK where nd = :ND_ and nls = :NLS_";
+            cmd.CommandText = "select  BRANCH, ND, CC_ID, SDATE, WDATE, RNK, NMK, MES, KV, NLS, Z1,Z2,Z3,Z4,Z5,R1,R2,K1,K0, DAT_MOD from V_CCKDPK where nd = :ND_ and nls = :NLS_";
             OracleDataReader rdr = cmd.ExecuteReader();
 
             if (rdr.Read())
@@ -758,13 +751,11 @@ public class cRePayment_dosr
                 if (!String.IsNullOrEmpty(Convert.ToString(rdr["sdate"]))) this.sdat_ = Convert.ToString(rdr["sdate"], cinfo).Substring(0, 10);
                 if (!String.IsNullOrEmpty(Convert.ToString(rdr["DAT_MOD"]))) this.dat_mod_ = Convert.ToString(rdr["DAT_MOD"], cinfo).Substring(0, 10); else this.dat_mod_ = null;
                 this._sNLS = Convert.ToString(rdr["NLS"]);
-
-                if (Convert.ToString(rdr["NLS"]).Substring(0, 4) == "2625")
-                { this._K1_MAX = 100000000; }
+                
+                if (Convert.ToString(rdr["NLS"]).Substring(0,4) == "2625") 
+                     {this._K1_MAX = 100000000; }
                 else { this._K1_MAX = Convert.ToDecimal(rdr["K1"]); }
-
-                this.Sum = Convert.ToDecimal(rdr["sum_com"]);
-
+                     
 
 
 
@@ -777,13 +768,13 @@ public class cRePayment_dosr
             cmd.Parameters.Clear();
             cmd.Parameters.Add("ND", OracleDbType.Decimal, this.CC_ID, ParameterDirection.Input);
             this.DD = Convert.ToDecimal(cmd.ExecuteScalar());
+            
+            
+            
 
-
-
-
-
-
-
+            
+            
+            
 
             // дати угоди
             cmd.CommandType = CommandType.Text;
@@ -798,31 +789,31 @@ public class cRePayment_dosr
                 if (!String.IsNullOrEmpty(Convert.ToString(rdr1["wdat1"]))) this.wdat_ = Convert.ToString(rdr1["wdat1"], cinfo).Substring(0, 10);
                 if (!String.IsNullOrEmpty(Convert.ToString(rdr1["dat_prev"]))) this.dat_prev_ = Convert.ToString(rdr1["dat_prev"], cinfo).Substring(0, 10);
                 if (!String.IsNullOrEmpty(Convert.ToString(rdr1["dat_next"]))) this.dat_next_ = Convert.ToString(rdr1["dat_next"], cinfo).Substring(0, 10);
-
+                
             }
-
+           
         }
         finally
         {
             con.Close();
             con.Dispose();
         }
+   
+
+       //If DAT_PREV > DAT1 and DAT_PREV < DAT4
+       //   Set K2_OLD = SalDateDay( DAT_PREV)
+       //Else If DAT_NEXT > DAT1 and DAT_NEXT < DAT4
+       //   Set K2_OLD = SalDateDay( DAT_NEXT )
 
 
-        //If DAT_PREV > DAT1 and DAT_PREV < DAT4
-        //   Set K2_OLD = SalDateDay( DAT_PREV)
-        //Else If DAT_NEXT > DAT1 and DAT_NEXT < DAT4
-        //   Set K2_OLD = SalDateDay( DAT_NEXT )
-
-
-        if (Convert.ToDateTime(this.sdat_) < Convert.ToDateTime(this.dat_prev_) & Convert.ToDateTime(this.dat_prev_) < Convert.ToDateTime(this.wdat_) & type_ == "2")
+        if (Convert.ToDateTime(this.sdat_) < Convert.ToDateTime(this.dat_prev_) & Convert.ToDateTime(this.dat_prev_) < Convert.ToDateTime(this.wdat_) & type_ =="2")
         {
             this.DD = Convert.ToDecimal(this.dat_prev_.Substring(0, 2));
         }
         else if (Convert.ToDateTime(this.sdat_) < Convert.ToDateTime(this.dat_next_) & Convert.ToDateTime(this.dat_next_) < Convert.ToDateTime(this.wdat_) & type_ == "2")
         {
             this.DD = Convert.ToDecimal(this.dat_next_.Substring(0, 2));
-        }
+        }      
 
 
 
@@ -844,8 +835,8 @@ public class cRePayment_dosr
     {
     }
 
+  
 
-
-
-    #endregion
+  
+    # endregion
 }
