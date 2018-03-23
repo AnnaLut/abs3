@@ -1,9 +1,10 @@
 -- ======================================================================================
 -- Module : DPU
 -- Author : BAA
--- Date   : 15.12.2017
+-- Date   : 15.01.2018
 -- ===================================== <Comments> =====================================
 -- create table DPU_TYPES_OB22
+-- 15.01.2018 - ƒепозити буджетних орган. в≥дкриваютьс€ лише терм≥ном до року
 -- 30.09.2015 - ƒепозити буджетних орган. в≥дкриваютьс€ лише в нац.валют≥ та лише терм≥ном до року
 -- ======================================================================================
 
@@ -50,7 +51,6 @@ begin
 , constraint CC_DPUTYPESOB22_IRVK check (IRVK in (''0'',''1''))
 , constraint CC_DPUTYPESOB22_K013_S181   check ( S181 = case when K013 = ''1'' then ''1'' else S181 end )
 , constraint CC_DPUTYPESOB22_K013_IRVK   check ( IRVK = case when K013 = ''1'' then ''0'' else IRVK end )
-, constraint CC_DPUTYPESOB22_K013_R034   check ( R034 = case when K013 = ''1'' then ''1'' else R034 end )
 ) TABLESPACE BRSSMLD';
 
   dbms_output.put_line( 'Table "DPU_TYPES_OB22" created.' );
@@ -178,6 +178,22 @@ COMMENT ON COLUMN DPU_TYPES_OB22.OB22_EXP IS '«наченн€ OB22 рах. ѕ–ќ÷≈Ќ“Ќ»’ витр
 COMMENT ON COLUMN DPU_TYPES_OB22.NBS_RED  IS 'Ѕалансовий рахунок «ћ≈ЌЎ≈ЌЌя витрат';
 COMMENT ON COLUMN DPU_TYPES_OB22.OB22_RED IS '«наченн€ OB22 рах. «ћ≈ЌЎ≈ЌЌя витрат';
 COMMENT ON COLUMN DPU_TYPES_OB22.IRVK     IS '1 - безв≥дкличний (строковий) / 0 - в≥дкличний (на вимогу)';
+
+prompt -- ======================================================
+prompt -- Alters
+prompt -- ======================================================
+
+declare
+  E_CNSTRN_NOT_EXISTS    exception;
+  pragma exception_init( E_CNSTRN_NOT_EXISTS, -02443 );
+begin
+  execute immediate 'alter table DPU_TYPES_OB22 drop constraint CC_DPUTYPESOB22_K013_R034';
+  dbms_output.put_line( 'Table altered.' );
+exception
+  when E_CNSTRN_NOT_EXISTS
+  then dbms_output.put_line( 'Constraint does not exist in the table.' );
+end;
+/
 
 prompt -- ======================================================
 prompt -- FINISH

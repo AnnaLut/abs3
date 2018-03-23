@@ -14,7 +14,6 @@ SET LINES        200
 SET PAGES        200
 SET TERMOUT      ON
 SET TRIMSPOOL    ON
-
 prompt -- ======================================================
 prompt --  modify table PERSON
 prompt -- ======================================================

@@ -1,9 +1,9 @@
 
- 
- PROMPT ===================================================================================== 
+
+ PROMPT =====================================================================================
  PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_ourmfo_g.sql =========*** Run ***
- PROMPT ===================================================================================== 
- 
+ PROMPT =====================================================================================
+
   CREATE OR REPLACE FUNCTION BARS.F_OURMFO_G RETURN VARCHAR2 IS
   N_MFO NUMBER;
 BEGIN
@@ -19,7 +19,7 @@ BEGIN
 END;
 /
  show err;
- 
+
 PROMPT *** Create  grants  F_OURMFO_G ***
 grant EXECUTE                                                                on F_OURMFO_G      to ABS_ADMIN;
 grant EXECUTE                                                                on F_OURMFO_G      to BARSAQ with grant option;
@@ -31,10 +31,10 @@ grant EXECUTE                                                                on 
 grant EXECUTE                                                                on F_OURMFO_G      to START1;
 grant EXECUTE                                                                on F_OURMFO_G      to UPLD;
 grant EXECUTE                                                                on F_OURMFO_G      to WR_ALL_RIGHTS;
+grant EXECUTE                                                                on F_OURMFO_G      to BARS_INTGR;
 
- 
- 
- PROMPT ===================================================================================== 
+
+
+ PROMPT =====================================================================================
  PROMPT *** End *** ========== Scripts /Sql/BARS/function/f_ourmfo_g.sql =========*** End ***
- PROMPT ===================================================================================== 
- 
+ PROMPT =====================================================================================

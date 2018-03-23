@@ -3542,11 +3542,13 @@ begin
                  end if;
                  exception
                    when others then                
-                    l_err := ' витовка док. ' || l_srn || ' - ошибка ';
-                    bars_audit.info(h || p_filename || ': ' || l_err);
+
+                    l_err := substr(' витовка док.' || l_srn || '-ошибка:'||sqlerrm,1,254);
+                    bars_audit.info(h ||'Err:' || p_filename|| ' Ref:'||l_srn||' '|| dbms_utility.format_error_stack() || chr(10) ||
+                                    dbms_utility.format_error_backtrace());
                     l_msg := substr(l_msg || l_err, 1, 254);                
                     update ow_pkk_que
-                       set resp_text  = l_msg
+                       set resp_text  = l_err
                     where f_n = l_iic_filename
                        and ref = l_srn
                        and dk = l_dk
@@ -9936,7 +9938,8 @@ begin
        update ow_locpay_match t
           set t.state = 1,
               t.revfile_name = l_file_name
-       where t.revflag in(1, 2) and t.state = 0;
+       where t.revflag in(1, 2) and (t.state = 0 or (t.state = 10 AND t.revfile_name IS NULL));
+
     end if;
   elsif p_mode in(0, 1, 2) or p_mode is null then
     -- FileHeader
