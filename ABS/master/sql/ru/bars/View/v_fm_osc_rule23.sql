@@ -20,7 +20,8 @@ PROMPT *** Create  view V_FM_OSC_RULE23 ***
         or upper(o.nazn) like '%ÔÈÍÏÎÌÎÙ%'
         or upper(o.nazn) like '%Ô²ÍÀÍÑÎÂÀ%'
         or upper(o.nazn) like '%ÄÎÏÎÌÎÃ%'
-        or upper(o.nazn) like '%ÏÎÌÎÙ%' )
+        or upper(o.nazn) like '%ÏÎÌÎÙ%' 
+		or upper(o.nazn) like '%ÔÄ%')
    and gl.p_icurval(nvl(o.kv,980), nvl(o.s,0), o.vdat) >= 10000000 ;
 
 PROMPT *** Create  grants  V_FM_OSC_RULE23 ***

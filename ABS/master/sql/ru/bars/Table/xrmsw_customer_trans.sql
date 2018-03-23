@@ -26,7 +26,8 @@ begin
    (	TRANSACTIONID VARCHAR2(30), 
 	RNK NUMBER, 
 	STATUSCODE NUMBER, 
-	ERRORMESSAGE VARCHAR2(2000)
+	ERRORMESSAGE VARCHAR2(2000),
+	kf               VARCHAR2(6) default sys_context(''bars_context'',''user_mfo'')
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -36,6 +37,13 @@ exception when others then
 end; 
 /
 
+begin
+    execute immediate 'ALTER TABLE BARS.XRMSW_CUSTOMER_TRANS add(kf VARCHAR2(6) default sys_context(''bars_context'',''user_mfo''))';
+   exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if;
+end;
+/
 
 
 

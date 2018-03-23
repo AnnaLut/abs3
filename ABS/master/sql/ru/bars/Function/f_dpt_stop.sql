@@ -1,10 +1,10 @@
 
- 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_dpt_stop.sql =========*** Run ***
  PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE FUNCTION BARS.F_DPT_STOP 
+
+
+CREATE OR REPLACE FUNCTION f_dpt_stop
  ( p_code  INT,
    p_kv    INT,
    p_nls   VARCHAR2,
@@ -28,6 +28,7 @@ IS
 -- p_code = 6  - частичное снятие вклада
 -- p_code = 7  - снятие вклада -залога по кредитному договору
 -- p_code = 8  - счет заблокирован (ДЕМАРК)
+-- p_code = 17 - стоп-правило на ограничение пополнения за период
 -- ======================================================================================
   c_modcode constant char(3) := 'DPT';
   l_dptid    dpt_deposit.deposit_id%type;
@@ -58,25 +59,39 @@ IS
   l_type     accounts.tip%type;
   l_nls      accounts.nls%type;
   --------------------------------------
+
+  l_termadd1 number(5);
+  l_limit     dpt_deposit.limit%type;
+  l_res       number(10);
+  l_count_mm  number(5);
+  l_dat_start date;
+  l_dat_end   date;
+  l_dat_s     date;
+  l_dat_po    date;
+  l_sum_month oper.s%type;
+  l_comproc   dpt_vidd.comproc%type;
+  l_is_bnal   number;
+  --------------------------------------
 BEGIN
 
   BEGIN
     SELECT d.deposit_id, d.acc, d.rnk, d.dat_begin, d.dat_end, nvl(a.tobo,'0'),
            v.vidd, nvl(v.duration,0), nvl(v.duration_days,0), t.lcv,
-           nvl(v.min_summ,0)*100, nvl(v.limit,0)*100, nvl(v.max_limit,0)*100
+           nvl(v.min_summ,0)*100, nvl(v.limit,0)*100, nvl(v.max_limit,0)*100, d.limit, v.comproc, v.term_add
       INTO l_dptid, l_acc, l_rnk, l_dat1, l_dat2,
            l_toboA, l_vidd, l_termM, l_termD, l_lcv,
-           l_sum0_min, l_sum_min, l_sum_max
+           l_sum0_min, l_sum_min, l_sum_max, l_limit,  l_comproc, l_termadd
       FROM dpt_deposit d, accounts a, dpt_vidd v, tabval t
      WHERE d.acc = a.acc
        AND d.vidd = v.vidd
        AND t.kv = a.kv
        AND a.nls = p_nls
        AND a.kv = p_kv ;
+
   EXCEPTION
     WHEN NO_DATA_FOUND THEN RETURN 0;
   END;
-
+       bars_audit.info('DPT_F_STOP p_sum = '||p_sum);
   -- Стоп-правило на МИНИМАЛЬНУЮ сумму первичного взноса(0)
   IF p_code = 0 THEN
 
@@ -96,7 +111,7 @@ BEGIN
      ELSE
         -- минимальная сумма для данной операции = l_sum_min/100
         bars_error.raise_error(c_modcode, 100,
-                               trim(to_char(l_sum_min/100, '9999999990D99')), l_lcv);
+                               trim(to_char(l_sum_min/100, '9999999990D99'))||' '||p_sum, l_lcv);
      END IF;
 
   -- Стоп-правило на МАКСИМАЛЬНУЮ сумму пополнения по инд.графику (22)
@@ -190,7 +205,7 @@ BEGIN
 
         -- общая сумма пополнений за период действия вклада
         SELECT nvl(sum(kos),0)
-	  INTO l_sum
+      INTO l_sum
           FROM saldoa
          WHERE acc = l_acc
            AND fdat > l_dat1
@@ -223,7 +238,7 @@ BEGIN
         SELECT l_dat1
              + trunc(l_termadd * (add_months(l_dat1, l_termM) - l_dat1))
              + trunc(l_termadd * l_termD)
-	  INTO l_datx
+      INTO l_datx
           FROM dual;
      ELSIF l_termadd < 0 THEN -- настройка вида вклада
         BEGIN
@@ -316,8 +331,8 @@ BEGIN
             FROM saldoa s
            WHERE s.acc = l_acc
              AND s.fdat =
-	        (SELECT min(fdat) FROM saldoa WHERE acc = s.acc AND kos > 0);
-	EXCEPTION
+            (SELECT min(fdat) FROM saldoa WHERE acc = s.acc AND kos > 0);
+    EXCEPTION
           WHEN NO_DATA_FOUND THEN RETURN 0;
         END;
 
@@ -331,16 +346,16 @@ BEGIN
         l_sum := l_sum0 * l_koef - l_sum;
 
         IF l_cnt * l_koef = 0 THEN
-	   -- исчерпан лимит частичных снятий со вклада
+       -- исчерпан лимит частичных снятий со вклада
            bars_error.raise_error(c_modcode, 103);
         ELSIF l_cnt <= l_cnt2 THEN
-	   -- превышено допустимое кол-во частичных снятий со вклада
+       -- превышено допустимое кол-во частичных снятий со вклада
            bars_error.raise_error(c_modcode, 104);
         ELSIF l_sum <= 0 THEN
-	   -- исчерпан лимит частичных снятий со вклада
+       -- исчерпан лимит частичных снятий со вклада
            bars_error.raise_error(c_modcode, 105);
         ELSE
-	   RETURN trunc(least(p_sum, l_sum)/100, 0) * 100;
+       RETURN trunc(least(p_sum, l_sum)/100, 0) * 100;
         END IF;
 
      END IF;
@@ -370,6 +385,160 @@ BEGIN
         END IF;
      END IF;
 
+  -- стоп-правило на ограничение пополнения за период
+  ELSIF p_code = 17 then
+     begin
+
+      -- 1.вычисляем возможный срок пополения, если без срока = выходим
+
+      l_termadd := trunc(l_termadd,0);
+
+      bars_audit.info(c_modcode || ' Депозит №' || l_dptid ||
+                         ' Термін поповнення: ' || l_termadd ||
+                         ' місяців Дата С: ' || l_dat1 || ' Сумма: ' ||
+                         l_limit);
+
+      --безсрочный вид вклада
+      if nvl(l_termadd, 0) = 0 then
+        bars_audit.info(c_modcode || 'безсрочный вид вклада');
+        return 0;
+      end if;
+
+      -- 2.вычислить вид вклада, является он пополняемым
+      l_res := dpt_web.forbidden_amount(l_acc, p_sum);
+      bars_audit.info(c_modcode || 'Результат можливості поповнення: ' ||
+                         l_res);
+      if (l_res = 0) then
+        bars_audit.info(c_modcode || 'Можливо поповнити: ' || l_res);
+        null;
+      elsif (l_res = 1) then
+      bars_audit.info(c_modcode || 'Вклад не передбачає поповнення: ' ||
+                           l_res);
+      bars_error.raise_error(c_modcode, 410,'Вклад №'||l_dptid||' не передбачає поповнення!');
+      else
+      bars_audit.info(c_modcode ||
+                           'Cума зарахування на депозитний рахунок #' ||
+                           to_char(l_acc) ||
+                           ' менша за мінімальну суму поповнення вкладу (' ||
+                           to_char(l_res / 100) || ' / ' || p_kv || ')');
+      bars_error.raise_error(c_modcode, 410,'Cума зарахування на депозитний рахунок #' ||
+                           to_char(l_acc) ||
+                           ' менша за мінімальну суму поповнення вкладу (' ||
+                           to_char(l_res / 100) || ' / ' || p_kv || ')');
+      end if;
+
+      -- 3.проверить можно ли его пополнить в указанных сроках на виде вклада
+      l_dat_start := l_dat1;
+      l_dat_end   := add_months(l_dat1, l_termadd) - 1;
+
+      bars_audit.info(c_modcode || 'Період можливого поповнення Депозиту №' ||
+                         l_dptid || ' ' || l_dat_start || ' - ' ||
+                         l_dat_end);
+
+      if --Все ОК, пополнять можно
+      p_dat between l_dat_start and l_dat_end then
+      bars_audit.info(c_modcode || 'Депозит №' || l_dptid ||
+                           ' пополнять можно ');
+      null;
+      else
+         bars_audit.info(c_modcode || 'По Депозиту №' || l_dptid ||
+                           ' закічився термін поповнення! Вклад можливо було поповнювати протягом ' ||
+                           to_char(l_termadd) || ' міcяців.');
+      -- Закончился срок пополнения
+       bars_error.raise_error(c_modcode, 410,'По Депозиту №' || l_dptid ||
+                           ' закічився термін поповнення! Вклад можливо було поповнювати протягом ' ||
+                           to_char(l_termadd) || ' міcяців.');
+      end if;
+
+      -- 4.вычислить граничные даты  месяца
+      select floor(months_between(trunc(sysdate), (l_dat1)))
+        into l_count_mm
+        from dual;
+
+       bars_audit.info(c_modcode ||
+                         ' Кількість повних місяців по Депозиту №' ||
+                         l_dptid || ' ' || l_count_mm);
+
+      l_dat_s  := add_months(l_dat1, l_count_mm);
+      l_dat_po := add_months(l_dat_s, 1) - 1;
+
+      bars_audit.info(c_modcode || ' Граничні дати поточного місяця ' ||
+                         l_dat_s || ' - ' || l_dat_po);
+
+
+      --5.вычислить за этот период сумму пополнений по вкладу
+    if nvl(l_comproc, 0) = 0 then
+     --нет капитализации-то учитываем сумму пополнения операций 'DP5' и 'DPL
+    select nvl(sum(o.s), 0)
+      into l_sum_month
+      from dpt_payments p, oper o
+     where p.ref = o.ref
+       and p.dpt_id = l_dptid
+       and o.sos >= 0
+       and o.tt in ('PKD', 'OW4', 'PK!', '215', '015', '515', '013', 'R01', 'DP0', 'DP2', 'DP5', 'DPD', 'DPI', 'DPL', 'W2D', 'DBF', 'ALT',
+        '24', '190', '191', '901', 'BAK', 'I00', 'IB1', 'IB1', 'OW1', 'OW5', 'SMO', 'ST2', 'PS1', 'ZMO')
+       and o.pdat between l_dat_s and l_dat_po;
+
+     else
+       --есть капитализация-то не учитываем в сумму пополнения операций 'DP5' и 'DPL'
+         select nvl(sum(o.s), 0)
+      into l_sum_month
+      from dpt_payments p, oper o
+     where p.ref = o.ref
+       and p.dpt_id = l_dptid
+       and o.sos >=0
+       and o.tt in ('PKD', 'OW4', 'PK!', '215', '015', '515', '013', 'R01', 'DP0', 'DP2', 'DPD', 'DPI', 'W2D', 'DBF', 'ALT',
+                   '24', '190', '191', '901', 'BAK', 'I00', 'IB1', 'IB1', 'OW1', 'OW5', 'SMO', 'ST2', 'PS1', 'ZMO')
+       and o.pdat between l_dat_s and l_dat_po;
+
+    end if;
+
+       bars_audit.info(c_modcode || ' Сума поповнення ' || l_sum_month ||
+                         ' за поточний місяць ' || l_dat_s || ' - ' ||
+                         l_dat_po);
+       bars_audit.info(c_modcode || ' Сума поповнення ' || p_sum);
+      -- прибавить общую сумму к сумме документу
+      l_sum := l_sum_month + p_sum;
+
+      --6.сравнить лимит депозита с полученной суммой
+      -- если общая сумма не превышает лимит = позволяем вставить документ, если нет = выдаем сообщение при вставке документа
+       bars_audit.info(c_modcode || ' Загальна сума: ' || l_sum ||
+                         ' Сумма депозиту: ' || l_limit);
+      
+      select count(*)
+      into l_is_bnal
+      from bars.dpt_depositw dw
+      where dw.dpt_id = l_dptid
+        and dw.tag = 'NCASH'
+        and dw.value = 1;
+        
+      bars_audit.trace('1478 безнал: ' || l_is_bnal);
+        
+      if (l_count_mm = 0) and (l_is_bnal > 0) then -- первый месяц и безнал
+
+        if l_sum > l_limit * 2 then
+          bars_audit.info(c_modcode || ' Перевищено суму ліміту ' ||
+                           to_char(l_limit) || ' за місць з ' ||
+                           to_char(l_dat_s) || ' по ' || to_char(l_dat_po));
+          bars_error.raise_error(c_modcode, 410,' Перевищено суму ліміту ' ||
+                           to_char(l_limit) || ' за місць з ' ||
+                           to_char(l_dat_s) || ' по ' || to_char(l_dat_po));
+         else
+           return 0;                  
+         end if;
+      elsif l_sum > l_limit then
+        bars_audit.info(c_modcode || ' Перевищено суму ліміту ' ||
+                           to_char(l_limit) || ' за місць з ' ||
+                           to_char(l_dat_s) || ' по ' || to_char(l_dat_po));
+        bars_error.raise_error(c_modcode, 410,' Перевищено суму ліміту ' ||
+                           to_char(l_limit) || ' за місць з ' ||
+                           to_char(l_dat_s) || ' по ' || to_char(l_dat_po));
+      else
+       return 0;
+      end if;
+
+    end;
+
 ------------------------------------------------------------------------------
   ELSE
     RETURN 0;
@@ -378,6 +547,7 @@ BEGIN
   RETURN 0 ;
 
 END f_dpt_stop ;
+
 /
  show err;
  
@@ -390,5 +560,4 @@ grant EXECUTE                                                                on 
  
  PROMPT ===================================================================================== 
  PROMPT *** End *** ========== Scripts /Sql/BARS/function/f_dpt_stop.sql =========*** End ***
- PROMPT ===================================================================================== 
- 
+ PROMPT =====================================================================================

@@ -14,17 +14,6 @@
 --
 -- COBUCDMCORP-64
 -- ======================================================================================
-
-SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
-SET DEFINE       OFF
-set echo         Off
-set lines        500
-set pages        500
-set termout      On
-set timing       Off
-set trimspool    On
-
-
 Prompt INSERT INTO CUSTOMER_FIELD TAG LIKE 'SANKC';
 BEGIN
 suda;

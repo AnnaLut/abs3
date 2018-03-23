@@ -1,3 +1,9 @@
+set serveroutput on size unlimited
+
+prompt -- ======================================================
+prompt -- trigger TIU_CUSA
+prompt -- ======================================================
+
 create or replace trigger TIU_CUSA
 after insert or update on CUSTOMER
 declare
@@ -14,10 +20,10 @@ declare
   l_global_bdate  customer_update.global_bdate%type;
 BEGIN
 
-  IF pul.cus_rec.rnk IS NOT NULL
+  IF kl.cus_rec.rnk IS NOT NULL
   THEN
 
-    l_idupd        := s_customer_update.nextval;
+    l_idupd        := bars_sqnc.get_nextval('S_CUSTOMER_UPDATE',kl.cus_rec.KF);
     l_doneby       := user_name;
     l_chgdate      := sysdate;
     l_global_bdate := glb_bankdate;
@@ -52,35 +58,36 @@ BEGIN
       , CHGDATE,     CHGACTION
       , EFFECTDATE , GLOBAL_BDATE )
     VALUES
-      ( pul.cus_rec.KF       ,
-        pul.cus_rec.RNK      , pul.cus_rec.TGR      ,
-        pul.cus_rec.CUSTTYPE , pul.cus_rec.COUNTRY  ,
-        pul.cus_rec.NMK      , pul.cus_rec.NMKV     ,
-        pul.cus_rec.NMKK     , pul.cus_rec.CODCAGENT,
-        pul.cus_rec.PRINSIDER, pul.cus_rec.OKPO     ,
-        pul.cus_rec.ADR      , pul.cus_rec.SAB      ,
-        pul.cus_rec.C_REG    , pul.cus_rec.C_DST    ,
-        pul.cus_rec.RGTAX    , pul.cus_rec.DATET    ,
-        pul.cus_rec.ADM      , pul.cus_rec.DATEA    ,
-        pul.cus_rec.STMT     , pul.cus_rec.DATE_ON  ,
-        pul.cus_rec.DATE_OFF , pul.cus_rec.NOTES    ,
-        pul.cus_rec.NOTESEC  , pul.cus_rec.CRISK    ,
-        pul.cus_rec.PINCODE  , pul.cus_rec.ND       ,
-        pul.cus_rec.RNKP     , pul.cus_rec.ISE      ,
-        pul.cus_rec.FS       , pul.cus_rec.OE       ,
-        pul.cus_rec.VED      , pul.cus_rec.SED      ,
-        pul.cus_rec.LIM      , pul.cus_rec.MB       ,
-        pul.cus_rec.RGADM    , pul.cus_rec.BC       ,
-        pul.cus_rec.BRANCH   , pul.cus_rec.TOBO     ,
-        pul.cus_rec.ISP      , pul.cus_rec.TAXF     ,
-        pul.cus_rec.NOMPDV   , pul.cus_rec.K050     ,
-        pul.cus_rec.NREZID_CODE,
-        l_idupd              , l_doneby             ,
-        l_chgdate            , pul.cus_otm          ,
-        l_local_bdate        , l_global_bdate      );
+      ( kl.cus_rec.KF
+      , kl.cus_rec.RNK      , kl.cus_rec.TGR
+      , kl.cus_rec.CUSTTYPE , kl.cus_rec.COUNTRY
+      , kl.cus_rec.NMK      , kl.cus_rec.NMKV
+      , kl.cus_rec.NMKK     , kl.cus_rec.CODCAGENT
+      , kl.cus_rec.PRINSIDER, kl.cus_rec.OKPO
+      , kl.cus_rec.ADR      , kl.cus_rec.SAB
+      , kl.cus_rec.C_REG    , kl.cus_rec.C_DST
+      , kl.cus_rec.RGTAX    , kl.cus_rec.DATET
+      , kl.cus_rec.ADM      , kl.cus_rec.DATEA
+      , kl.cus_rec.STMT     , kl.cus_rec.DATE_ON
+      , kl.cus_rec.DATE_OFF , kl.cus_rec.NOTES
+      , kl.cus_rec.NOTESEC  , kl.cus_rec.CRISK
+      , kl.cus_rec.PINCODE  , kl.cus_rec.ND
+      , kl.cus_rec.RNKP     , kl.cus_rec.ISE
+      , kl.cus_rec.FS       , kl.cus_rec.OE
+      , kl.cus_rec.VED      , kl.cus_rec.SED
+      , kl.cus_rec.LIM      , kl.cus_rec.MB
+      , kl.cus_rec.RGADM    , kl.cus_rec.BC
+      , kl.cus_rec.BRANCH   , kl.cus_rec.TOBO
+      , kl.cus_rec.ISP      , kl.cus_rec.TAXF
+      , kl.cus_rec.NOMPDV   , kl.cus_rec.K050
+      , kl.cus_rec.NREZID_CODE
+      , l_idupd              , l_doneby
+      , l_chgdate            , kl.cus_otm
+      , l_local_bdate        , l_global_bdate
+      );
 
   END IF;
-  
+
 END tiu_cusa;
 /
 

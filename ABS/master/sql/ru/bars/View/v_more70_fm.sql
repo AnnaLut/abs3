@@ -32,7 +32,7 @@ select a.rnk, a.acc, sum(o.sq) as s_k
     and o.sos = 5
     group by a.rnk,a.acc)
     group by rnk )
-    where sum_kas*100/sum_ob > 70;
+    where case when nvl(sum_ob,0) <> 0 then sum_kas * 100 / sum_ob else 0 end > 70;
 
 PROMPT *** Create  grants  V_MORE70_FM ***
 grant SELECT                                                                 on V_MORE70_FM     to CUST001;

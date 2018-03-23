@@ -78,26 +78,24 @@ COMMENT ON COLUMN BARS.SEC_AUDIT.REC_STACK IS '';
 
 
 
-PROMPT *** Create  constraint FK_SECAUDIT_SECRECTYPE ***
+PROMPT *** Drop constraint FK_SECAUDIT_SECRECTYPE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SEC_AUDIT ADD CONSTRAINT FK_SECAUDIT_SECRECTYPE FOREIGN KEY (REC_TYPE)
-	  REFERENCES BARS.SEC_RECTYPE (SEC_RECTYPE) ENABLE';
+  ALTER TABLE BARS.SEC_AUDIT DROP CONSTRAINT FK_SECAUDIT_SECRECTYPE';
 exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+  if  sqlcode=-2443 then null; else raise; end if;
  end;
 /
 
 
 
 
-PROMPT *** Create  constraint FK_SECAUDIT_BRANCH ***
+PROMPT *** Drop constraint FK_SECAUDIT_BRANCH ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SEC_AUDIT ADD CONSTRAINT FK_SECAUDIT_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
+ALTER TABLE BARS.SEC_AUDIT DROP CONSTRAINT FK_SECAUDIT_BRANCH';
 exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+  if  sqlcode=-2443 then null; else raise; end if;
  end;
 /
 
@@ -107,11 +105,10 @@ exception when others then
 PROMPT *** Create  constraint FK_SECAUDIT_STAFF ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SEC_AUDIT ADD CONSTRAINT FK_SECAUDIT_STAFF FOREIGN KEY (REC_UID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
+ALTER TABLE BARS.SEC_AUDIT DROP CONSTRAINT FK_SECAUDIT_STAFF';
 exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
+  if  sqlcode=-2443 then null; else raise; end if;
+end;
 /
 
 
@@ -120,12 +117,10 @@ exception when others then
 PROMPT *** Create  constraint PK_SECAUDIT ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SEC_AUDIT ADD CONSTRAINT PK_SECAUDIT PRIMARY KEY (REC_ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSAUDITI  ENABLE';
+ALTER TABLE BARS.SEC_AUDIT DROP CONSTRAINT PK_SECAUDIT';
 exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
+  if  sqlcode=-2443 then null; else raise; end if;
+end;
 /
 
 
@@ -230,11 +225,9 @@ exception when others then
 PROMPT *** Create  index PK_SECAUDIT ***
 begin   
  execute immediate '
-  CREATE UNIQUE INDEX BARS.PK_SECAUDIT ON BARS.SEC_AUDIT (REC_ID) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSAUDITI ';
+DROP INDEX BARS.PK_SECAUDIT';
 exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
+  if  sqlcode=-1418  then null; else raise; end if;
  end;
 /
 

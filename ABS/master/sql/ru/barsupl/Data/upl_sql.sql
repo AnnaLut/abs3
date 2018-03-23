@@ -54,11 +54,12 @@ declare
              bdate,
              edate
         from bars_dm.custur_rel c
-   where c.per_id=bars_dm.dm_import.GET_PERIOD_ID(''DAY'',nvl(to_date(:param1, ''dd/mm/yyyy''), trunc(sysdate)))');
+   where c.per_id=bars_dm.dm_import.GET_PERIOD_ID(''DAY'',nvl(to_date(:param1, ''dd/mm/yyyy''), trunc(sysdate)))
+   and c.change_type is null');
 begin
   update barsupl.upl_sql
   set sql_text = l_clob,
-      vers = '1.3'
+      vers = '1.4'
   where sql_id = 6;
   if sql%rowcount = 0 then
 	insert into barsupl.upl_sql (sql_id, sql_text, before_proc, after_proc, descript, vers)
@@ -77,11 +78,12 @@ declare
              bdate,
              edate
         from bars_dm.custur_rel c
-   where c.per_id=bars_dm.dm_import.GET_PERIOD_ID(''MONTH'',nvl(to_date(:param1, ''dd/mm/yyyy''), trunc(sysdate)))');
+   where c.per_id=bars_dm.dm_import.GET_PERIOD_ID(''MONTH'',nvl(to_date(:param1, ''dd/mm/yyyy''), trunc(sysdate)))
+   and c.change_type is null');
 begin
   update barsupl.upl_sql
   set sql_text = l_clob,
-      vers = '1.3'
+      vers = '1.4'
   where sql_id = 7;
   if sql%rowcount = 0 then
 	insert into barsupl.upl_sql (sql_id, sql_text, before_proc, after_proc, descript, vers)
@@ -395,6 +397,78 @@ begin
   set sql_text = l_clob,
       vers = '1.2'
   where sql_id = 50;
+end;
+/
+
+prompt upl_sql clientfo month
+declare 
+  l_clob clob := TO_CLOB('select last_name,
+       first_name,
+       middle_name,
+       bday,
+       gr,
+       passp,
+       ser,
+       numdoc,
+       pdate,
+       organ,
+       passp_expire_to,
+       passp_to_bank,
+       kf ru,
+       rnk,
+       okpo,
+       cust_status,
+       cust_active,
+       telm,
+       telw,
+       teld,
+       teladd,
+       email,
+       adr_post_country,
+       adr_post_domain,
+       adr_post_region,
+       adr_post_loc,
+       adr_post_adr,
+       adr_post_zip,
+       adr_fact_country,
+       adr_fact_domain,
+       adr_fact_region,
+       adr_fact_loc,
+       adr_fact_adr,
+       adr_fact_zip,
+       adr_work_country,
+       adr_work_domain,
+       adr_work_region,
+       adr_work_loc,
+       adr_work_adr,
+       adr_work_zip,
+       branch,
+       negativ_status,
+       reestr_mob_bank,
+       reestr_inet_bank,
+       reestr_sms_bank,
+       month_income,
+       subject_role,
+       rezident,
+       merried,
+       emp_status,
+       subject_class,
+       insider,
+       sex,
+       vipk,
+       vip_fio_manager,
+       vip_phone_manager,
+       date_on,
+       date_off,
+       eddr_id,
+       actual_date
+from bars_dm.customers c
+   where c.per_id=bars_dm.dm_import.GET_PERIOD_ID(''MONTH'',nvl(to_date(:param1, ''dd/mm/yyyy''), trunc(sysdate)))');
+begin
+  update barsupl.upl_sql
+  set sql_text = l_clob,
+      vers = '1.2'
+  where sql_id = 51;
 end;
 /
 
@@ -991,7 +1065,7 @@ select LAST_NAME,
         p_settlement_id,
         p_street_id,
         p_house_id,
-        case when PASSP = 7 then actual_date else null end as IDCARD_VALID_DATE,
+        actual_date as IDCARD_VALID_DATE,
         vip_account_manager
         from bars_dm.customers_plt
         where per_id=bars_dm.dm_import.GET_PERIOD_ID(''DAY'',nvl(to_date(:param1, ''dd/mm/yyyy''), trunc(sysdate)))');
@@ -1066,7 +1140,7 @@ select LAST_NAME,
         DATE_ON,
         DATE_OFF,
         EDDR_ID,
-        case when PASSP = 7 then actual_date else null end as IDCARD_VALID_DATE,        
+        actual_date as IDCARD_VALID_DATE,        
         IDDPL,        
         BPLACE,
         SUBSD,
@@ -1587,7 +1661,7 @@ select LAST_NAME,
         DATE_ON,
         DATE_OFF,
         EDDR_ID,
-        case when PASSP = 7 then actual_date else null end as IDCARD_VALID_DATE,        
+        actual_date as IDCARD_VALID_DATE,        
         IDDPL,        
         BPLACE,
         SUBSD,

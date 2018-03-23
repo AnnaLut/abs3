@@ -1,8 +1,3 @@
-SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED 
-SET ECHO OFF 
-SET LINES 500 
-SET PAGES 500 
-SET FEEDBACK OFF 
 begin 
   BPA.ALTER_POLICY_INFO( 'IBX_TYPES', 'WHOLE' , null, null, null, null );
   BPA.ALTER_POLICY_INFO( 'IBX_TYPES', 'FILIAL', null, null, null, null ); 
@@ -266,4 +261,3 @@ exception when others then
    dbms_output.put_line('INFO: code: '||sqlcode||', '||sqlerrm(sqlcode)||' with msg: ''commenting column ABS_NAZN_MASK'); 
 end;
 /
-SET FEEDBACK     ON 

@@ -6,15 +6,6 @@
 -- modify table EBKC_DUPLICATE_GROUPS
 -- ======================================================
 
-SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
-SET FEEDBACK     OFF
-SET TIMING       OFF
-SET DEFINE       OFF
-SET LINES        200
-SET PAGES        200
-SET TERMOUT      ON
-SET TRIMSPOOL    ON
-
 prompt -- ======================================================
 prompt --  modify table EBKC_DUPLICATE_GROUPS
 prompt -- ======================================================
@@ -41,7 +32,7 @@ update BARS.EBKC_DUPLICATE_GROUPS d
 
 commit;
 
-SET FEEDBACK OFF
+
 
 declare
   e_already_nn  exception;

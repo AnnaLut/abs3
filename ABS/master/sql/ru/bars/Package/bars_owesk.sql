@@ -39,7 +39,7 @@ is
 --
 -- constants
 --
-g_body_version    constant varchar2(64)  := 'version 1.23 22/11/2016';
+g_body_version    constant varchar2(64)  := 'version 1.24 17/10/2017';
 g_body_defs       constant varchar2(512) := '';
 g_modcode         constant varchar2(3)   := 'BPK';
 g_pkbcode         constant varchar2(100) := 'bars_owesk';
@@ -154,7 +154,7 @@ begin
   if p_okpo is null
   or substr(p_okpo,1,5) = '99999'
   or substr(p_okpo,1,5) = '00000'
-  or p_paspser is null
+  or (p_paspser is null and length(p_paspnum)<>9)
   or p_paspnum is null then
 
      l_rnk := null;
@@ -182,7 +182,7 @@ begin
              from customer c, person p
             where c.okpo   = p_okpo
               and nvl(trim(c.sed),'00') <> '91'
-              and p.ser    = p_paspser
+              and nvl(p.ser,'0') = nvl(p_paspser,'0')
               and p.numdoc = p_paspnum
               and c.rnk = p.rnk;
            if l_date_off is not null then
@@ -199,7 +199,7 @@ begin
                 from customer c, person p
                where c.okpo   = p_okpo
                  and nvl(trim(c.sed),'00') <> '91'
-                 and p.ser    = p_paspser
+                 and nvl(p.ser,'0') = nvl(p_paspser,'0')
                  and p.numdoc = p_paspnum
                  and c.rnk = p.rnk
                  and c.date_off is null;
@@ -209,7 +209,7 @@ begin
                    from customer c, person p
                   where c.okpo   = p_okpo
                     and nvl(trim(c.sed),'00') <> '91'
-                    and p.ser    = p_paspser
+                    and nvl(p.ser,'0') = nvl(p_paspser,'0')
                     and p.numdoc = p_paspnum
                     and c.rnk = p.rnk
                     and c.date_off is not null;
@@ -275,7 +275,7 @@ begin
   if p_project.first_name is null
   or p_project.last_name is null
   or p_project.type_doc is null
-  or p_project.paspseries is null
+  or (p_project.paspseries is null and nvl(p_project.type_doc,0) = 1)
   or p_project.paspnum is null
   or p_project.paspissuer is null
   or p_project.paspdate is null
@@ -633,7 +633,7 @@ begin
             where o.acc_pk = a.acc and a.dazs is null
               and a.acc = w.acc and w.tag = 'PK_PRCT'
               and w.value = to_char(p_proect_id)
-              and o.card_code like '%VECCST%'
+              and regexp_like(o.card_code,'(VECCST)|(MSTDEBPID)')
               and a.rnk = l_rnk;
            l_err := 'Клієнту вже відкрито картку ' || l_card || ' ' || l_nls;
         exception
@@ -641,7 +641,7 @@ begin
               -- обновление реквизитов клиента
               bars_ow.alter_client(l_rnk, l_client_array(i));
            when too_many_rows then
-              l_err := 'Клієнту вже відкрито картки %VECCST%';
+              l_err := 'Клієнту вже відкрито картки %VECCST% або %MSTDEBPID%';
         end;
      end if;
 
@@ -713,7 +713,7 @@ begin
 
   bars_audit.trace(h || 'Start.');
 
-  if p_card_code not like '%VECCST%' then
+  if not regexp_like(p_card_code,'(VECCST)|(MSTDEBPID)') then
      raise_application_error(-20000, 'Заборонено відкривати картку ' || p_card_code || ' для Електронний студентський квиток');
   end if;
 

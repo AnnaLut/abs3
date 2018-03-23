@@ -495,11 +495,11 @@ elsif mode_ = 102 then  /* сальдовка  за период, с корр 096*/
  select a.branch,
          a.nbs,
          a.kv,
-         nvl(s.ob22,'00') ob22,
+         nvl(a.ob22,'00') ob22,
          substr(a.nms,1,35) nms,
          a.nls,
          y.ost,y.ostq,y.dos,y.dosq,y.kos,y.kosq,y.osti,y.ostiq
- from accounts a,specparam_int s,
+ from accounts a,--specparam_int s,  OB22 переїхало в accounts
       (select m.acc,
          sum(m.ost) ost,  sum(m.ostq) ostq,
          sum(m.dos) dos,  sum(m.dosq) dosq,
@@ -530,7 +530,8 @@ elsif mode_ = 102 then  /* сальдовка  за период, с корр 096*/
                ))
     and  a.branch like BRANCH_||'%'
     and  a.branch like sys_context('bars_context','user_branch')||'%'
-    and  a.acc=s.acc(+);
+    --and  a.acc=s.acc(+)
+	;
 end if;
 commit;
 Return;

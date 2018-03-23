@@ -1,7 +1,16 @@
-CREATE OR REPLACE PROCEDURE BARS.P_INV_CCK_FL_23 (p_dat date, p_frm int) is
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_INV_CCK_FL_23.sql =========*** R
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure P_INV_CCK_FL_23 ***
+
+  CREATE OR REPLACE PROCEDURE BARS.P_INV_CCK_FL_23 (p_dat date, p_frm int) is
 -- ============================================================================
 --                    Инвентаризационная ведомость - 23 постанова
---                          VERSION 7.0 (14/05/2013)
+--                          VERSION 7.1 (04/12/2017)
 -- ============================================================================
 /*
  Даные про классификацию кредитных операций и расчет сумы резерва по физ.лицам - 23 постанова
@@ -35,14 +44,12 @@ CREATE OR REPLACE PROCEDURE BARS.P_INV_CCK_FL_23 (p_dat date, p_frm int) is
   l_count_s031   number;
   l_time_start   varchar2(20);
   l_time_finish  varchar2(20);
-  l_newnbs number;
 
   l_usedwh    char(1);        -- использование загрузки в ЦАС
   l_errmsg    varchar2(500);  -- сообщение
   l_errcode   number;         -- код выполнения
 
 begin
-   l_newnbs := NEWNBS.GET_STATE;
    --
    -- проверка на возможность пересчета инв. ведомости
    -- Выполняется только для тех у кого работает загрузка в ЦАС
@@ -502,7 +509,7 @@ loop
    select a.acc into l_acc9129
      from accounts a, nd_acc n, nbu23_rez r
     where n.nd = k.ND and a.acc = n.acc and a.nbs = '9129' and (a.dazs is null or a.dazs>l_dat) and a.daos <= l_dat
-      and a.acc = r.acc and r.nd = k.nd and r.rnk = k.rnk and r.r013 = 9 and r.fdat = trunc(last_day(l_dat)+1,'MM') and r.id like 'CCK%';
+      and a.acc = r.acc and r.nd = k.nd and r.rnk = k.rnk and r.r013 = '9' and r.fdat = trunc(last_day(l_dat)+1,'MM') and r.id like 'CCK%';
       select -decode(k.acc, acc_pot, nvl(f_get_ost (l_acc9129,DI_,1,8),0)/100, 0)
         into GG.G25
         from dual;
@@ -520,7 +527,7 @@ loop
    select a.acc into l_acc9129
      from accounts a, nd_acc n, nbu23_rez r
     where n.nd = k.ND and a.acc = n.acc and a.nbs = '9129' and (a.dazs is null or a.dazs>l_dat) and a.daos <= l_dat
-      and a.acc = r.acc and r.nd = k.nd and r.rnk = k.rnk and r.r013 = 1 and r.fdat = trunc(last_day(l_dat)+1,'MM') and r.id like 'CCK%';
+      and a.acc = r.acc and r.nd = k.nd and r.rnk = k.rnk and r.r013 = '1' and r.fdat = trunc(last_day(l_dat)+1,'MM') and r.id like 'CCK%';
       select -decode(k.acc, acc_pot, nvl(f_get_ost (l_acc9129,DI_,1,8),0)/100, 0)
         into GG.G26
         from dual;
@@ -810,8 +817,8 @@ bars_audit.trace('%s 17-1.Вставляем данные по БПК ФЛ расширенные.',l_title);
        null G10, null G11, null G12, 0 G13, null G14, null G15, null G16, p.prinsiderlv1 G17, null G18, a.nbs G19, a.ob22 G20,
        -f_get_ost(a.acc,DI_,1,7)/100 G21,
        -f_get_ost(a.acc,DI_,1,8)/100 G22, 0 G23, null G24,
-       decode(s.r013,9,-(nvl(f_get_ost(ba.acc_9129,DI_,1,8)/100,0)), 0) G25,
-       decode(s.r013,1,-(nvl(f_get_ost(ba.acc_9129,DI_,1,8)/100,0)), 0) G26,
+       decode(s.r013,'9',-(nvl(f_get_ost(ba.acc_9129,DI_,1,8)/100,0)), 0) G25,
+       decode(s.r013,'1',-(nvl(f_get_ost(ba.acc_9129,DI_,1,8)/100,0)), 0) G26,
        nvl(acrn.fprocn(ba.acc_ovr,0,l_dat),0) G27,
        null G28,
        -f_get_ost(ba.acc_2208,DI_,1,8)/100-f_get_ost(ba.acc_2627,DI_,1,8)/100 G29, -f_get_ost(ba.acc_2209,DI_,1,8)/100 G30,
@@ -840,7 +847,7 @@ bars_audit.trace('%s 17-1.Вставляем данные по БПК ФЛ расширенные.',l_title);
             and fdat = trunc(last_day(l_dat)+1,'MM')  and substr(id,1,2) in ('BP','W4') ) t36
   where ba.acc_ovr is not null
     and ba.acc_ovr = a.acc
-    and a.nbs in (decode(l_newnbs,0,'2202','2203'),'2203')
+    and a.nbs in ('2202','2203')
     and a.daos <= l_dat
     and nvl(a.branch,'/') = b.branch
     and a.rnk      = c.rnk
@@ -859,8 +866,8 @@ bars_audit.trace('%s 17-1.Вставляем данные по БПК ФЛ расширенные.',l_title);
        null, null, null, 0, null, 0, null, p.prinsiderlv1 G17, null, a.nbs G19, null G20,
        0 G21,
        0 G22, 0 G23, null,
-       decode(s.r013,9,-(nvl(f_get_ost(ba.acc_9129,DI_,1,8)/100,0)), 0) G25,
-       decode(s.r013,1,-(nvl(f_get_ost(ba.acc_9129,DI_,1,8)/100,0)), 0) G26,
+       decode(s.r013,'9',-(nvl(f_get_ost(ba.acc_9129,DI_,1,8)/100,0)), 0) G25,
+       decode(s.r013,'1',-(nvl(f_get_ost(ba.acc_9129,DI_,1,8)/100,0)), 0) G26,
        nvl(acrn.fprocn(ba.acc_ovr,0,l_dat),0) G27,
        null G28,
        -f_get_ost(ba.acc_2208,DI_,1,8)/100-f_get_ost(ba.acc_2627,DI_,1,8)/100 G29, -f_get_ost(ba.acc_2209,DI_,1,8)/100 G30,
@@ -908,8 +915,8 @@ bars_audit.trace('%s 17-1.Вставляем данные по БПК ФЛ расширенные.',l_title);
        null, null, null, 0, null, 0, null, p.prinsiderlv1 G17, null, a.nbs G19, null G20,
        0 G21,
        0 G22, 0 G23, null,
-       decode(s.r013,9,-(nvl(f_get_ost(ba.acc_9129,DI_,1,8)/100,0)), 0) G25,
-       decode(s.r013,1,-(nvl(f_get_ost(ba.acc_9129,DI_,1,8)/100,0)), 0) G26,
+       decode(s.r013,'9',-(nvl(f_get_ost(ba.acc_9129,DI_,1,8)/100,0)), 0) G25,
+       decode(s.r013,'1',-(nvl(f_get_ost(ba.acc_9129,DI_,1,8)/100,0)), 0) G26,
        nvl(acrn.fprocn(ba.acc_ovr,0,l_dat),0) G27,
        null G28,
        -f_get_ost(ba.acc_2208,DI_,1,8)/100-f_get_ost(ba.acc_2627,DI_,1,8)/100 G29, -f_get_ost(ba.acc_2209,DI_,1,8)/100 G30,
@@ -1086,8 +1093,8 @@ bars_audit.trace('%s 17-1.Вставляем данные по БПК ФЛ расширенные.',l_title);
        null G10, null G11, null G12, 0 G13, null G14, null G15, null G16, p.prinsiderlv1 G17, null G18, a.nbs G19, a.ob22 G20,
        -f_get_ost(a.acc,DI_,1,7)/100 G21,
        -f_get_ost(a.acc,DI_,1,8)/100 G22, 0 G23, null G24,
-       decode(ba.acc_ovr, null, decode(s.r013,9,-(nvl(f_get_ost(ba.acc_9129,DI_,1,8)/100,0)), 0), 0) G25,
-       decode(ba.acc_ovr, null, decode(s.r013,1,-(nvl(f_get_ost(ba.acc_9129,DI_,1,8)/100,0)), 0), 0) G26,
+       decode(ba.acc_ovr, null, decode(s.r013,'9',-(nvl(f_get_ost(ba.acc_9129,DI_,1,8)/100,0)), 0), 0) G25,
+       decode(ba.acc_ovr, null, decode(s.r013,'1',-(nvl(f_get_ost(ba.acc_9129,DI_,1,8)/100,0)), 0), 0) G26,
        nvl(acrn.fprocn(ba.acc_2207,0,l_dat),0) G27,
        null G28,
        0 G29, decode(ba.acc_ovr, null, -f_get_ost(ba.acc_2209,DI_,1,8)/100,0) G30,
@@ -1215,32 +1222,32 @@ execute immediate
     -- кред.счета, которые не попали в ведомость, но есть в снапах
        (select b.name G01, a.kf G02, a.branch G03,  substr(''Iншi ''||c.nmk,1,70) G04, a.kv G07,
                a.nbs G19, a.ob22 G20,
-               decode (a.nbs, decode(l_newnbs,0,''2202'',''2203''), -f_get_ost(a.acc,di_,1,7),
+               decode (a.nbs, ''2202'', -f_get_ost(a.acc,di_,1,7),
                               ''2203'', -f_get_ost(a.acc,di_,1,7),
-                      	      decode(l_newnbs,0,''2207'',''2203''), -f_get_ost(a.acc,di_,1,7),
+                      	      ''2207'', -f_get_ost(a.acc,di_,1,7),
                       	      ''2232'', -f_get_ost(a.acc,di_,1,7),
                       	      ''2233'', -f_get_ost(a.acc,di_,1,7),
-                      	      decode(l_newnbs,0,''2237'',''2233''), -f_get_ost(a.acc,di_,1,7),
+                      	      ''2237'', -f_get_ost(a.acc,di_,1,7),
         	      0 )/100 G21,
-               decode (a.nbs, decode(l_newnbs,0,''2202'',''2203''), -f_get_ost(a.acc,di_,1,8),
+               decode (a.nbs, ''2202'', -f_get_ost(a.acc,di_,1,8),
                       	      ''2203'', -f_get_ost(a.acc,di_,1,8),
-                      	      decode(l_newnbs,0,''2207'',''2203''), -f_get_ost(a.acc,di_,1,8),
+                      	      ''2207'', -f_get_ost(a.acc,di_,1,8),
                       	      ''2232'', -f_get_ost(a.acc,di_,1,8),
                       	      ''2233'', -f_get_ost(a.acc,di_,1,8),
-                      	      decode(l_newnbs,0,''2237'',''2233''), -f_get_ost(a.acc,di_,1,8),
+                      	      ''2237'', -f_get_ost(a.acc,di_,1,8),
                        0 )/100 G22,
                decode (a.nbs, ''9129'', -f_get_ost(a.acc,di_,1,8),
                        0 )/100 G25,
                decode (a.nbs, ''2208'', -f_get_ost(a.acc,di_,1,8),
                               ''2238'', -f_get_ost(a.acc,di_,1,8),
                        0 )/100 G29,
-               decode (a.nbs, decode(l_newnbs,0,''2209'',''2208''), -f_get_ost(a.acc,di_,1,8),
-                              decode(l_newnbs,0,''2239'',''2238''), -f_get_ost(a.acc,di_,1,8),
+               decode (a.nbs, ''2209'', -f_get_ost(a.acc,di_,1,8),
+                              ''2239'', -f_get_ost(a.acc,di_,1,8),
                        0 )/100 G30,
 	       a.acc acc, a.rnk rnk
           from ACCM_AGG_MONBALS bb, accounts a, customer c, branch b
          where bb.acc = a.acc
-           and (   a.nbs in (decode(l_newnbs,0,''2202'',''2203''),''2203'',decode(l_newnbs,0,''2207'',''2203''),''2208'',decode(l_newnbs,0,''2209'',''2208''),''2232'',''2233'',decode(l_newnbs,0,''2237'',''2233''),''2238'',decode(l_newnbs,0,''2239'',''2238''))
+           and (   a.nbs in (''2202'',''2203'',''2207'',''2208'',''2209'',''2232'',''2233'',''2237'',''2238'',''2239'')
 	        or (a.nbs = ''9129'' and c.custtype = 3 and nvl(trim(c.sed),''00'')<>''91'') )
            and caldt_ID = di_
            -- смотрим, что счета нет среди INV_CCK_FL_23.ACC
@@ -1298,3 +1305,15 @@ exception when others then
 
 end P_INV_CCK_FL_23 ;
 /
+show err;
+
+PROMPT *** Create  grants  P_INV_CCK_FL_23 ***
+grant EXECUTE                                                                on P_INV_CCK_FL_23 to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on P_INV_CCK_FL_23 to RCC_DEAL;
+grant EXECUTE                                                                on P_INV_CCK_FL_23 to START1;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_INV_CCK_FL_23.sql =========*** E
+PROMPT ===================================================================================== 

@@ -6,14 +6,6 @@
 -- create table EBK_RCIF
 -- ======================================================
 
-SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
-SET FEEDBACK     OFF
-SET TIMING       OFF
-SET DEFINE       OFF
-SET LINES        200
-SET PAGES        200
-SET TERMOUT      ON
-SET TRIMSPOOL    ON
 
 prompt -- ======================================================
 prompt -- recreate table EBK_RCIF

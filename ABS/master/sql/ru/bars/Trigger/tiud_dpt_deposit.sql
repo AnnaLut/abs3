@@ -39,7 +39,7 @@ begin
        dpt_d, acc_d, mfo_d, nls_d, nms_d, okpo_d,
        limit, deposit_cod, comments,
        action_id, actiion_author, "WHEN", bdate, stop_id,
-       cnt_dubl, cnt_ext_int, dat_ext_int, userid, archdoc_id, forbid_extension, branch )
+       cnt_dubl, cnt_ext_int, dat_ext_int, userid, archdoc_id, forbid_extension, branch, wb)
     values
       (l_idupd,:old.deposit_id,:old.nd,:old.vidd,:old.acc,:old.kv,:old.rnk,
        :old.freq,:old.datz,:old.dat_begin,:old.dat_end,:old.dat_end_alt,
@@ -47,7 +47,7 @@ begin
        :old.dpt_d,:old.acc_d,:old.mfo_d,:old.nls_d,:old.nms_d,:old.okpo_d,
        :old.limit,:old.deposit_cod,:old.comments,
        l_actionid, l_userid, sysdate, l_bankdate, :old.stop_id,
-       :old.cnt_dubl, :old.cnt_ext_int, :old.dat_ext_int, :old.userid, :old.archdoc_id, :old.forbid_extension, :old.branch);
+       :old.cnt_dubl, :old.cnt_ext_int, :old.dat_ext_int, :old.userid, :old.archdoc_id, :old.forbid_extension, :old.branch, :old.wb);
 
       DPT_WEB.CLOSE_STO_ARGMNT(P_DPTID    => :old.deposit_id,
                                P_ACCID    => :old.acc,
@@ -65,7 +65,7 @@ begin
        dpt_d, acc_d, mfo_d, nls_d, nms_d, okpo_d,
        limit, deposit_cod, comments,
        action_id, actiion_author, "WHEN", bdate, stop_id,
-       cnt_dubl, cnt_ext_int, dat_ext_int, userid, archdoc_id, forbid_extension, branch)
+       cnt_dubl, cnt_ext_int, dat_ext_int, userid, archdoc_id, forbid_extension, branch, wb)
     values
       (l_idupd,:new.deposit_id,:new.nd,:new.vidd,:new.acc,:new.kv,:new.rnk,
        :new.freq,:new.datz,:new.dat_begin,:new.dat_end,:new.dat_end_alt,
@@ -73,7 +73,7 @@ begin
        :new.dpt_d,:new.acc_d,:new.mfo_d,:new.nls_d,:new.nms_d,:new.okpo_d,
        :new.limit,:new.deposit_cod,:new.comments,
        l_actionid, l_userid, sysdate, l_bankdate, :new.stop_id,
-       :new.cnt_dubl, :new.cnt_ext_int, :new.dat_ext_int, :new.userid, :new.archdoc_id, :new.forbid_extension, :new.branch );
+       :new.cnt_dubl, :new.cnt_ext_int, :new.dat_ext_int, :new.userid, :new.archdoc_id, :new.forbid_extension, :new.branch, :new.wb);
 
   else
     -- проверим, действительно ли что-то менялось
@@ -115,6 +115,7 @@ begin
      or nvl(:old.dat_ext_int, to_date('10.11.4977','dd.mm.yyyy')) !=
         nvl(:new.dat_ext_int, to_date('10.11.4977','dd.mm.yyyy'))
      or nvl(:old.branch,    '_____')   != nvl(:new.branch,    '_____') -- ребранчинг
+     or nvl(:old.wb, 'E') != nvl(:new.wb, 'E')
     then
 
       if (:old.vidd <> :new.vidd)
@@ -142,7 +143,7 @@ begin
          dpt_d, acc_d, mfo_d, nls_d, nms_d, okpo_d,
          limit, deposit_cod, comments,
          action_id, actiion_author, "WHEN", bdate, stop_id,
-         cnt_dubl, cnt_ext_int, dat_ext_int, userid, archdoc_id, forbid_extension, branch)
+         cnt_dubl, cnt_ext_int, dat_ext_int, userid, archdoc_id, forbid_extension, branch, wb)
       values
         (l_idupd,:new.deposit_id,:new.nd,:new.vidd,:new.acc,:new.kv,:new.rnk,
          :new.freq,:new.datz,:new.dat_begin,:new.dat_end,:new.dat_end_alt,
@@ -150,7 +151,7 @@ begin
          :new.dpt_d,:new.acc_d,:new.mfo_d,:new.nls_d,:new.nms_d,:new.okpo_d,
          :new.limit,:new.deposit_cod,:new.comments,
          l_actionid, l_userid, sysdate, l_bankdate, :new.stop_id,
-         :new.cnt_dubl, :new.cnt_ext_int, :new.dat_ext_int, :new.userid, :new.archdoc_id,:new.forbid_extension, :new.branch);
+         :new.cnt_dubl, :new.cnt_ext_int, :new.dat_ext_int, :new.userid, :new.archdoc_id,:new.forbid_extension, :new.branch, :new.wb);
 
 
     else

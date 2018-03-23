@@ -22,7 +22,8 @@ PROMPT *** Create  view V_FM_OSC_RULE6 ***
                OR a.nls LIKE '26%'
                OR a.nls LIKE '28%'
                OR a.nls LIKE '29%'
-               OR a.nls LIKE '37%')
+               OR a.nls LIKE '37%'
+			   OR DECODE (o.dk, 1, o.mfoa, o.mfob) <> f_ourmfo)
           AND gl.p_icurval (NVL (o.kv, 980), NVL (o.s, 0), o.vdat) >=15000000;
 
 PROMPT *** Create  grants  V_FM_OSC_RULE6 ***

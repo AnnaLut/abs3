@@ -1,4 +1,5 @@
-CREATE OR REPLACE function BARS.F_NBU_RPT_XML_ROW
+ 
+  CREATE OR REPLACE FUNCTION BARS.F_NBU_RPT_XML_ROW 
 ( p_rpt_code    IN     varchar2
 , p_rpt_date    IN     date
 ) RETURN varchar2_list
@@ -9,7 +10,7 @@ IS
   %param p_rpt_code - 
   %param p_rpt_date - 
 
-  %version 1.6    22/03/2017
+  %version 1.5 (02/03/2017)
   %usage   
   */
   g_dt_fmt    constant varchar2(10) := 'dd.mm.yyyy';
@@ -18,7 +19,6 @@ IS
   l_frst_dt            date; -- 
   l_last_dt            date; -- 
   l_prvn_dt            date; -- 
-  l_nbu_rpt_dt         date; --    отчетная дата НБУ
   l_ret_val            varchar2(4000 byte);
   l_rec                pls_integer := 0;
   l_rpt_code           char(2);
@@ -36,15 +36,11 @@ BEGIN
   l_prvn_dt := l_last_dt + 1;
   
   -- BARS.BARS_CONTEXT.SUBST_MFO(BARS.F_OURMFO_G());
-
+  
   l_okpo := f_ourokpo();
   
   l_rpt_code := upper( substr( trim(p_rpt_code), instr(trim(p_rpt_code),'#')+1, 2 ) );
   
---    отчетная дата НБУ
-   l_nbu_rpt_dt := DAT_NEXT_U( p_rpt_date, 1 );
-
--------------------------------------------------------------------------------
   bars_audit.info( $$PLSQL_UNIT||': l_frst_dt=' ||to_char(l_frst_dt,g_dt_fmt)||
                                  ', l_last_dt=' ||to_char(l_last_dt,g_dt_fmt)||
                                  ', l_prvn_dt=' ||to_char(l_prvn_dt,g_dt_fmt)||
@@ -56,7 +52,7 @@ BEGIN
   pipe row ( '  <HEAD>' );
   pipe row ( '    <STATFORM>F'||l_rpt_code||'X</STATFORM>' );
   pipe row ( '    <EDRPOU>'||l_okpo||'</EDRPOU>' );
-  pipe row ( '    <REPORTDATE>'||to_char(l_nbu_rpt_dt,g_dt_fmt)||'</REPORTDATE>' );
+  pipe row ( '    <REPORTDATE>'||to_char(p_rpt_date,g_dt_fmt)||'</REPORTDATE>' );
   pipe row ( '  </HEAD>' );
   
   if ( l_rpt_code = '3E' )
@@ -320,57 +316,55 @@ BEGIN
       
     end loop;
     
-  elsif  ( l_rpt_code = '3K' )   then
-
+  elsif ( l_rpt_code = '1P' )
+  then
+  
     for d in 
     ( SELECT XMLElement( "DATA" -- If value is null, then no element is created for that value
-                       , XMLElement("EKP", EKP)
+                       , XMLElement("EKP",   EKP)
+                       , XMLElement("K040_1",K040_1)
+                       , XMLElement("RCBNK_B010", RCBNK_B010)
+                       , XMLElement("RCBNK_NAME", RCBNK_NAME)
+                       , XMLElement("K040_2",K040_2)
+                       , XMLElement("R030",  R030)
+                       , XMLElement("R020",  R020)
+                       , XMLElement("R040",  R040)
+                       , XMLElement("T023",  T023)
                        , XMLElement("Q003_1",Q003_1)
-                       , XMLElement("F091",F091)
-                       , XMLElement("R030",R030 )
-                       , XMLElement("T071",T071)
-                       , XMLElement("K020",K020)
-                       , XMLElement("K021",K021)
-                       , XMLElement("Q001",Q001)
-                       , XMLElement("Q024",Q024)
-                       , XMLElement("D100",D100)
-                       , XMLElement("S180",S180)
-                       , XMLElement("F089",F089)
-                       , XMLElement("F092",F092)
-                       , XMLElement("Q003_2",XMLAttributes(nvl2(Q003_2,null,'true') as "xsi:nil"),Q003_2)
-                       , XMLElement("Q007_1",XMLAttributes(nvl2(Q007_1,null,'true') as "xsi:nil"),Q007_1)
-                       , XMLElement("Q006",XMLAttributes(nvl2(Q006,null,'true') as "xsi:nil"),Q006)
+                       , XMLElement("RCUKRU_GLB_2", RCUKRU_GLB_2)
+                       , XMLElement("K018",  K018)
+                       , XMLElement("K020",  K020)
+                       , XMLElement("Q001",  Q001)
+                       , XMLElement("RCUKRU_GLB_1", RCUKRU_GLB_1)
+                       , XMLElement("Q004",  Q004)
+                       , XMLElement("T080",  T080)
+                       , XMLElement("T071",  T071)
                        ) AS XML_ROW
-       from ( select /* XML_RPT_3K */ 'A3K001'                        as EKP
-                     , EKP_2                 as Q003_1 
-                     , F091                 as F091
-                     , R030                 as R030
-                     , T071                 as T071
-                     , K020                 as K020 
-                     , K021                 as K021 
-                     , Q001                 as Q001 
-                     , Q024                 as Q024
-                     , D100                 as D100
-                     , S180                 as S180
-                     , F089                 as F089
-                     , F092                 as F092
-                     , Q003                 as Q003_2
-                     , Q007                 as Q007_1
-                     , Q006                 as Q006
+        FROM ( select /* XML_RPT_1P */ 1              as EKP
+                     , substr(ekp_1,2,3)                 as K040_1 
+                     , substr(ekp_1,5,10)                as RCBNK_B010 
+                     , substr(ekp_1,26,3)                as K040_2
+                     , substr(ekp_1,19,3)                as R030
+                     , substr(ekp_1,15,4)                as R020 
+                     , substr(ekp_1,22,3)                as R040 
+                     , substr(ekp_1,1,1)                 as T023 
+                     , substr(ekp_1,29,3)                as Q003_1
+                     , RCBNK as RCBNK_NAME
+                     , RCUKRU_2 as RCUKRU_GLB_2
+                     , K018, K020, Q001
+                     , RCUKRU_1 as RCUKRU_GLB_1, Q004, T080, T071
               from ( select *
-          from ( select substr(kodp,5,3) ekp_2,
-                        substr(kodp,1,4) ekp_1, znap 
+          from ( select substr(kodp,3,30) ekp_1,
+                        substr(kodp,1,2) ekp_2, znap 
                    from tmp_nbu
-                  where kodf= l_rpt_code
-                    and datf =p_rpt_date
+                  where kodf= substr(l_rpt_code,2,2)
+            and datf =p_rpt_date
               )
                pivot
               ( max(trim(znap))
-                for ekp_1 in ( 'F091' as F091, 'R030' as R030, 'T071' as T071,
-                               'K020' as K020, 'K021' as K021, 'Q001' as Q001,
-                               'Q024' as Q024, 'D100' as D100, 'S180' as S180,
-                               'F089' as F089, 'F092' as F092, 
-                               'Q003' as Q003, 'Q007' as Q007, 'Q006' as Q006 )
+                for ekp_2 in ( '10' as RCBNK, '07' as RCUKRU_2, '04' as K018,
+                               '05' as K020,  '06' as Q001,     '03' as RCUKRU_1,
+                               '99' as Q004,  '80' as T080, '71' as T071 )
               )   )
             )
     ) loop
@@ -381,13 +375,12 @@ BEGIN
       l_ret_val := '  '||d.XML_ROW.getStringVal();
       l_ret_val := regexp_replace(l_ret_val,'<DATA><','<DATA>'||chr(10)||'    <');
       l_ret_val := regexp_replace(l_ret_val,'></DATA>','>'||chr(10)||'  </DATA>');
---    -- вставка атрибуту xsi:nil для елементу Q007_1 
---      l_ret_val := REGEXP_REPLACE( l_ret_val, '(<Q007_1)(></)', '\1 xsi:nil = "true" \2' );
-
+  --  l_ret_val := regexp_replace(l_ret_val,'><[^/]','>'||chr(10)||'    <');
+  --  l_ret_val := regexp_replace(l_ret_val,'<([^<>]+?)/>','<\1></\1>') -- заміна <P1/> на <P1></P1> для NULL значень
       pipe row ( CONVERT( l_ret_val, 'UTF8' ) );
-                   --res := convert (res,'CL8MSWIN1251');      
+      
     end loop;
-    
+
   else
     
     bars_audit.info( $$PLSQL_UNIT||': invalid report type.' );
@@ -405,6 +398,8 @@ BEGIN
   
 END F_NBU_RPT_XML_ROW;
 /
+ show err;
+ 
+grant EXECUTE                                                                on F_NBU_RPT_XML_ROW to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on F_NBU_RPT_XML_ROW to RPBN002;
 
-create or replace public synonym F_NBU_RPT_XML_ROW for BARS.F_NBU_RPT_XML_ROW;
-grant execute on F_NBU_RPT_XML_ROW to RPBN002;

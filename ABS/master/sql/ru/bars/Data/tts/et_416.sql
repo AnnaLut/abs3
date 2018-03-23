@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('K16', 'd: розрахунки за прийняті перекази по системі "Швидка копійка"', 1, null, 980, '373930300465', 980, null, null, null, null, 0, 0, 0, 0, null, null, 5, null, null, null, '0000100000000000000000000000000000000100000000000000000000000000', 'розрахунки за прийняті перекази по системі "Швидка копійка"');
+    values ('K16', 'd: розрахунки за прийняті перекази по системі "Швидка копійка"', 1, null, 980, '373910300465', 980, null, null, null, null, 0, 0, 0, 0, null, null, 5, null, null, null, '0000100000000000000000000000000000000100000000000000000000000000', 'розрахунки за прийняті перекази по системі "Швидка копійка"');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='K16', name='d: розрахунки за прийняті перекази по системі "Швидка копійка"', dk=1, nlsm=null, kv=980, nlsk='373930300465', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn='розрахунки за прийняті перекази по системі "Швидка копійка"'
+         set tt='K16', name='d: розрахунки за прийняті перекази по системі "Швидка копійка"', dk=1, nlsm=null, kv=980, nlsk='373910300465', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn='розрахунки за прийняті перекази по системі "Швидка копійка"'
        where tt='K16';
   end;
   --------------------------------
@@ -57,7 +57,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции 416
-prompt Наименование операции: 416  Прийнято перекази по системі "Швидка копійка"
+prompt Наименование операции: 416-Прийнято перекази по системі "Швидка копійка"
 declare
   cnt_  number;
 begin
@@ -66,11 +66,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('416', '416  Прийнято перекази по системі "Швидка копійка"', 0, '#(nbs_ob22 (''2909'',''60''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, '#(nbs_ob22 (''2909'',''60''))', '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 1, 0, 0, 0, null, null, 32, null, null, null, '1000100001000000000000000001000000010000000000000000000000000000', 'Прийнято перекази по системі "Швидка копійка"');
+    values ('416', '416-Прийнято перекази по системі "Швидка копійка"', 0, '#(nbs_ob22 (''2909'',''60''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, '#(nbs_ob22 (''2909'',''60''))', '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 1, 0, 0, 0, null, null, 32, null, '0', null, '0000100001000000100000000001000000010000000000000000000000000000', 'Прийнято перекази по системі "Швидка копійка"');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='416', name='416  Прийнято перекази по системі "Швидка копійка"', dk=0, nlsm='#(nbs_ob22 (''2909'',''60''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa='#(nbs_ob22 (''2909'',''60''))', nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=1, fli=0, flv=0, flr=0, s=null, s2=null, sk=32, proc=null, s3800=null, rang=null, flags='1000100001000000000000000001000000010000000000000000000000000000', nazn='Прийнято перекази по системі "Швидка копійка"'
+         set tt='416', name='416-Прийнято перекази по системі "Швидка копійка"', dk=0, nlsm='#(nbs_ob22 (''2909'',''60''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa='#(nbs_ob22 (''2909'',''60''))', nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=1, fli=0, flv=0, flr=0, s=null, s2=null, sk=32, proc=null, s3800='0', rang=null, flags='0000100001000000100000000001000000010000000000000000000000000000', nazn='Прийнято перекази по системі "Швидка копійка"'
        where tt='416';
   end;
   --------------------------------

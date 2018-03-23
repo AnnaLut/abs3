@@ -533,7 +533,7 @@ type t_insurance is record(nd         w4_acc.nd%type,
                            datefrom   date,
                            dateto     date,
                            ext_id     ins_w4_deals.ins_ext_id%type,
-                           ext_code   ins_mapping_purpose.ext_code%type,
+                           ext_code   INS_EWA_PROD_PACK.EWA_TYPE_ID%type,
                            haveins    number,
                            haveoldins number,
                            ins_ukr_id number,
@@ -829,13 +829,12 @@ begin
             wd.ins_ukr_id, wd.ins_wrd_id, a.nls, a.branch;
 
   --отримання реквізитів страхової компанії
-  select min(p.nls), min(p.mfo), min(im.ext_code), min(c.okpo), min(p.name)
-    into l_insurance.ins_nls, l_insurance.ins_mfo, l_insurance.ext_code, l_insurance.ins_okpo, l_insurance.ins_name
-    from ins_partners p
-    join customer c
-      on p.rnk = c.rnk
-    join ins_mapping_purpose im
-      on im.okpo_ic = c.okpo and im.ext_id = l_insurance.ext_id;
+    ins_ewa_mgr.get_prodpack_ins_k(l_insurance.ext_id,
+                                   l_insurance.ins_nls,
+                                   l_insurance.ins_mfo,
+                                   l_insurance.ext_code,
+                                   l_insurance.ins_okpo,
+                                   l_insurance.ins_name);
 
   return l_insurance;
 end;
@@ -1646,7 +1645,7 @@ begin
      select decode(dk,p_dk,nlsa,nlsb), decode(dk,p_dk,kv,kv2) into l_nlsb, l_kv2 from oper where ref = p_ref;
      if newnbs.g_state = 1 then
         l_accounts_row := account_utl.read_account(l_nlsb, l_kv2);
-       
+
         l_txt := case when l_nlsb like '2__9%' and l_accounts_row.tip = 'SPN' then 'Погашення проср. %%'
                       when l_nlsb like '3578%' and l_accounts_row.tip = 'SK9' then 'Погашення проср. комісії'
                       when l_nlsb like '2__7%' and l_accounts_row.tip = 'SP ' then 'Погашення проср. тіла КД'
@@ -1656,14 +1655,14 @@ begin
                       else 'Погашення тіла КД'
                  end;
      else
-        l_txt := case when l_nlsb like '2__9%' then 'Погашення проср. %%'
-                      when l_nlsb like '3579%' then 'Погашення проср. комісії'
-                      when l_nlsb like '2__7%' then 'Погашення проср. тіла КД'
-                      when l_nlsb like '2__8%' then 'Погашення %%'
-                      when l_nlsb like '3578%' then 'Погашення комісії'
-                      when l_nlsb like '6___%' then 'Погашення пені'
-                      else 'Погашення тіла КД'
-                  end;   
+     l_txt := case when l_nlsb like '2__9%' then 'Погашення проср. %%'
+                   when l_nlsb like '3579%' then 'Погашення проср. комісії'
+                   when l_nlsb like '2__7%' then 'Погашення проср. тіла КД'
+                   when l_nlsb like '2__8%' then 'Погашення %%'
+                   when l_nlsb like '3578%' then 'Погашення комісії'
+                   when l_nlsb like '6___%' then 'Погашення пені'
+                   else 'Погашення тіла КД'
+              end;
      end if;
      l_txt := l_txt || ': Реф.' || p_ref || ' ' ||
               case when p_transfer_flag = 1 then 'відправлено до ПЦ'
@@ -3542,13 +3541,11 @@ begin
                  end if;
                  exception
                    when others then                
-
-                    l_err := substr('Квитовка док.' || l_srn || '-ошибка:'||sqlerrm,1,254);
-                    bars_audit.info(h ||'Err:' || p_filename|| ' Ref:'||l_srn||' '|| dbms_utility.format_error_stack() || chr(10) ||
-                                    dbms_utility.format_error_backtrace());
+                    l_err := 'Квитовка док. ' || l_srn || ' - ошибка ';
+                    bars_audit.info(h || p_filename || ': ' || l_err);
                     l_msg := substr(l_msg || l_err, 1, 254);                
                     update ow_pkk_que
-                       set resp_text  = l_err
+                       set resp_text  = l_msg
                     where f_n = l_iic_filename
                        and ref = l_srn
                        and dk = l_dk
@@ -3744,7 +3741,7 @@ begin
                from w4_sparam
               where grp_code = l_grpcode
                 and tip = l_pk_tip
-                and nbs =substr(p_mode, 1, 4)
+                and nbs = substr(p_mode,1,4)
                 and sp_id is not null
                 and value is not null )
   loop
@@ -3830,7 +3827,7 @@ begin
   if newnbs.g_state = 1 then
      l_nbs := get_new_nbs(substr(p_mode,1,4));     
   else
-     l_nbs := substr(p_mode,1,4);
+  l_nbs := substr(p_mode,1,4);
   end if;
   l_nms := case when p_mode in ('2202', '2203', '2062', '2063') then
                      substr('Кред. ' || l_pk_nms, 1, 70)
@@ -5636,7 +5633,7 @@ begin
             l_newnb := get_new_nbs_ob22(substr(p_nls,5,4), substr(p_nls,-2));
             l_nls := nbs_ob22_null(l_newnb.nbs, l_newnb.ob22, l_branch);
          else
-            l_nls := nbs_ob22_null(substr(p_nls,5,4), substr(p_nls,-2), l_branch);
+         l_nls := nbs_ob22_null(substr(p_nls,5,4), substr(p_nls,-2), l_branch);
          end if;
 
       end if;
@@ -5748,7 +5745,7 @@ begin
                      l_newnb := get_new_nbs_ob22(substr(l_nls,5,4), substr(l_nls,-2));
                      p_nlsa := nbs_ob22_null(l_newnb.nbs, l_newnb.ob22, l_branch);
                   else
-                     p_nlsa := nbs_ob22_null(substr(l_nls,5,4), substr(l_nls,-2), l_branch);
+                  p_nlsa := nbs_ob22_null(substr(l_nls,5,4), substr(l_nls,-2), l_branch);
                   end if;                 
                -- нормальный счет - оставляем как есть
                end if;
@@ -5765,7 +5762,7 @@ begin
                      l_newnb := get_new_nbs_ob22(substr(l_nls,5,4), substr(l_nls,-2));
                      p_nlsb := nbs_ob22_null(l_newnb.nbs, l_newnb.ob22, l_branch);
                   else
-                     p_nlsb := nbs_ob22_null(substr(l_nls,5,4), substr(l_nls,-2), l_branch);
+                  p_nlsb := nbs_ob22_null(substr(l_nls,5,4), substr(l_nls,-2), l_branch);
                   end if;  
                -- нормальный счет - оставляем как есть
                end if;
@@ -5964,7 +5961,7 @@ begin
                      l_newnb := get_new_nbs_ob22(substr(p_nlsb,5,4), substr(p_nlsb,-2));
                      p_nlsb := nbs_ob22_null(l_newnb.nbs, l_newnb.ob22, l_branch);
                   else
-                     p_nlsb := nbs_ob22_null(substr(p_nlsb,5,4), substr(p_nlsb,-2), l_branch);
+                  p_nlsb := nbs_ob22_null(substr(p_nlsb,5,4), substr(p_nlsb,-2), l_branch);
                   end if;                   
                else
                   p_nlsb := get_nls_cardpay(p_dat, p_drn, p_orn, p_nlsb, p_kv2);
@@ -6011,7 +6008,7 @@ begin
                   l_newnb := get_new_nbs_ob22(substr(p_nlsb,5,4), substr(p_nlsb,-2));
                   p_nlsb := nbs_ob22_null(l_newnb.nbs, l_newnb.ob22, l_branch);
                else
-                  p_nlsb := nbs_ob22_null(substr(p_nlsb,5,4), substr(p_nlsb,-2), l_branch);
+               p_nlsb := nbs_ob22_null(substr(p_nlsb,5,4), substr(p_nlsb,-2), l_branch);
                end if;                
             else
                p_nlsb := get_nls_cardpay(p_dat, p_drn, p_orn, p_nlsb, p_kv2);
@@ -6046,9 +6043,9 @@ begin
             l_newnb := get_new_nbs_ob22(substr(p_nlsa,5,4), substr(p_nlsa,-2));
             p_nlsa := nbs_ob22_null(l_newnb.nbs, l_newnb.ob22, p_branch);
          else
-            p_nlsa := nbs_ob22_null(substr(p_nlsa,5,4), substr(p_nlsa,-2), p_branch);
-         end if;
+         p_nlsa := nbs_ob22_null(substr(p_nlsa,5,4), substr(p_nlsa,-2), p_branch);
       end if;
+   end if;
    end if;
    -- счет Б
    if p_nlsb like 'NLS%' then
@@ -6061,9 +6058,9 @@ begin
             l_newnb := get_new_nbs_ob22(substr(p_nlsb,5,4), substr(p_nlsb,-2));
             p_nlsb := nbs_ob22_null(l_newnb.nbs, l_newnb.ob22, p_branch);
          else
-            p_nlsb := nbs_ob22_null(substr(p_nlsb,5,4), substr(p_nlsb,-2), p_branch);
-         end if;
+         p_nlsb := nbs_ob22_null(substr(p_nlsb,5,4), substr(p_nlsb,-2), p_branch);
       end if;
+   end if;
    end if;
 end get_nls_onbranch_cardpay;
 
@@ -6590,6 +6587,11 @@ is
    l_nls_trans    varchar2(15);
    l_ref_add      number;
    l_cur_bdate    date;
+   l_errumsg      varchar2(1000);
+   l_erracode     varchar2(1000);
+   l_erramsg      varchar2(1000);
+   l_acc_row      accounts%rowtype;
+
    l_newnb        t_newnb;
 begin
 
@@ -6737,7 +6739,7 @@ begin
                   l_newnb :=  get_new_nbs_ob22('2909', '80');
                   l_nlsa := nbs_ob22 (l_newnb.nbs, l_newnb.ob22);
                else
-                  l_nlsa := nbs_ob22 ('2909','80');
+               l_nlsa := nbs_ob22 ('2909','80');
                end if;
             else
                l_tt := 'OW1';
@@ -6758,17 +6760,53 @@ begin
             l_sk  := 58;
          end if;
 
-         if l_atrn(i).debit_anlaccount = 'NLS_LOCPAY' then
-            ipay_doc (l_tt, l_vob, l_dk, l_sk,
-               l_nam_a, l_nlsa, null, l_id_a,
-               l_nam_b, l_nlsb, null, l_id_b,
-               l_kv1, l_s1, l_kv2, l_s2, l_nazn, l_ref, 4);
-         else
-            ipay_doc (l_tt, l_vob, l_dk, l_sk,
-               l_nam_a, l_nlsa, null, l_id_a,
-               l_nam_b, l_nlsb, null, l_id_b,
-               l_kv1, l_s1, l_kv2, l_s2, l_nazn, l_ref);
-         end if;
+         begin
+            if l_atrn(i).debit_anlaccount = 'NLS_LOCPAY' then
+               ipay_doc (l_tt, l_vob, l_dk, l_sk,
+                  l_nam_a, l_nlsa, null, l_id_a,
+                  l_nam_b, l_nlsb, null, l_id_b,
+                  l_kv1, l_s1, l_kv2, l_s2, l_nazn, l_ref, 4);
+            else
+               ipay_doc (l_tt, l_vob, l_dk, l_sk,
+                  l_nam_a, l_nlsa, null, l_id_a,
+                  l_nam_b, l_nlsb, null, l_id_b,
+                  l_kv1, l_s1, l_kv2, l_s2, l_nazn, l_ref);
+            end if;
+         exception
+            when others then
+              bars_error.get_error_info(p_errtxt   => sqlerrm ,
+                                        p_errumsg  => l_errumsg,
+                                        p_erracode => l_erracode,
+                                        p_erramsg  => l_erramsg);
+              -- Якщо помилка, що рахунок закрито пробуємо реанімувати інакше помилка
+              if l_erracode = 'BRS-09303' then
+                 l_acc_row := account_utl.read_account(p_account_number => l_nlsa,
+                                                       p_currency       => l_kv1);
+                 if l_acc_row.tip like 'W4%' and l_acc_row.nbs is not null and l_acc_row.dazs is not null then
+                    accreg.p_acc_restore(l_acc_row.acc);
+                 end if;
+                 
+                 l_acc_row := account_utl.read_account(p_account_number => l_nlsb,
+                                                       p_currency       => l_kv2);
+                 if l_acc_row.tip like 'W4%' and l_acc_row.nbs is not null and l_acc_row.dazs is not null then
+                    accreg.p_acc_restore(l_acc_row.acc);
+                 end if;
+                 -- Якщо все ок відкриваємо рахунок
+                 if l_atrn(i).debit_anlaccount = 'NLS_LOCPAY' then
+                    ipay_doc (l_tt, l_vob, l_dk, l_sk,
+                       l_nam_a, l_nlsa, null, l_id_a,
+                       l_nam_b, l_nlsb, null, l_id_b,
+                       l_kv1, l_s1, l_kv2, l_s2, l_nazn, l_ref, 4);
+                 else
+                    ipay_doc (l_tt, l_vob, l_dk, l_sk,
+                       l_nam_a, l_nlsa, null, l_id_a,
+                       l_nam_b, l_nlsb, null, l_id_b,
+                       l_kv1, l_s1, l_kv2, l_s2, l_nazn, l_ref);
+                 end if;                                                          
+              else
+                 raise;
+              end if;
+         end;
 
          if l_atrn(i).credit_anlaccount = 'NLS_LOCPAY_FEE' then
             update ow_locpay_match t
@@ -7588,8 +7626,8 @@ is
               l_newnb := get_new_nbs_ob22(substr(p_nls,5,4), substr(p_nls,-2));
               l_nls := nbs_ob22_null(l_newnb.nbs, l_newnb.ob22, l_branch);
            else
-              l_nls := nbs_ob22_null(substr(p_nls,5,4), substr(p_nls,-2), l_branch);
-           end if;
+           l_nls := nbs_ob22_null(substr(p_nls,5,4), substr(p_nls,-2), l_branch);
+        end if;
         end if;
      else
         l_nls := p_nls;
@@ -8055,7 +8093,7 @@ begin
                l_newnb :=  get_new_nbs_ob22('2909', '80');
                l_nlsb := nbs_ob22 (l_newnb.nbs, l_newnb.ob22);
             else
-               l_nlsb := nbs_ob22 ('2909','80');
+            l_nlsb := nbs_ob22 ('2909','80');
             end if;
             l_nam_b := l_doc(i).cnt_clientname;
             ipay_doc (l_tt, l_vob, 1, l_sk,
@@ -8251,7 +8289,7 @@ begin
                    l_newnb :=  get_new_nbs_ob22('2909', '80');
                    l_nlsb := nbs_ob22 (l_newnb.nbs, l_newnb.ob22);
                 else
-                   l_nlsb := nbs_ob22 ('2909','80');
+                l_nlsb := nbs_ob22 ('2909','80');
                 end if;
                 ipay_doc (l_tt, l_vob, l_dk, l_sk,
                    l_nam_a, l_nlsa, null,   l_id_a,
@@ -8873,7 +8911,7 @@ begin
   if p_okpo is null
   or substr(p_okpo,1,5) = '99999'
   or substr(p_okpo,1,5) = '00000'
-  or p_paspser is null
+  or (p_paspser is null and length(p_paspnum)<>9)
   or p_paspnum is null then
 
      l_rnk := null;
@@ -8890,7 +8928,7 @@ begin
      -- ищем клиентов с паспортными данными
      select count(*) into l_count_passp
        from person p, customer c
-      where p.ser = p_paspser
+      where nvl(p.ser,'0') = nvl(p_paspser,'0')
         and p.numdoc = p_paspnum
         and p.rnk = c.rnk
         and ( p_spd = 0 and nvl(trim(c.sed),'00') <> '91'
@@ -8908,7 +8946,7 @@ begin
               select c.rnk, c.date_off into l_rnk, l_date_off
                 from customer c, person p
                where c.okpo   = p_okpo
-                 and p.ser    = p_paspser
+                 and nvl(p.ser,'0') = nvl(p_paspser,'0')
                  and p.numdoc = p_paspnum
                  and c.rnk = p.rnk
                  and ( p_spd = 0 and nvl(trim(c.sed),'00') <> '91'
@@ -8929,7 +8967,7 @@ begin
            select max(c.rnk) into l_rnk
              from customer c, person p
             where c.okpo   = p_okpo
-              and p.ser    = p_paspser
+              and nvl(p.ser,'0') = nvl(p_paspser,'0')
               and p.numdoc = p_paspnum
               and c.rnk = p.rnk
               and c.date_off is null
@@ -8942,7 +8980,7 @@ begin
               select max(c.rnk) into l_rnk
                 from customer c, person p
                where c.okpo   = p_okpo
-                 and p.ser    = p_paspser
+                 and nvl(p.ser,'0') = nvl(p_paspser,'0')
                  and p.numdoc = p_paspnum
                  and c.rnk = p.rnk
                  and c.date_off is not null
@@ -9938,8 +9976,7 @@ begin
        update ow_locpay_match t
           set t.state = 1,
               t.revfile_name = l_file_name
-       where t.revflag in(1, 2) and (t.state = 0 or (t.state = 10 AND t.revfile_name IS NULL));
-
+       where t.revflag in(1, 2) and t.state = 0;
     end if;
   elsif p_mode in(0, 1, 2) or p_mode is null then
     -- FileHeader
@@ -12248,15 +12285,34 @@ begin
   return l_xml;
 end;
 
-function add_query_to_log(p_rnk in number,
-                          p_nd  in number) return number is
+function add_query_to_log(p_rnk      in number,
+                          p_nd       in number,
+                          p_respcode in number default null,
+                          p_resptext in varchar2 default null,
+                          p_reqbody  in clob default null,
+                          p_respbody in clob default null,
+                          p_reqid    in number default null,
+                          p_err_text in varchar2 default null) return number is
+  pragma autonomous_transaction;
   l_reqid number;
 begin
+if p_reqid is null then
   insert into ow_query_log
     (reqid, rnk, nd)
   values
     (bars_sqnc.get_nextval('S_OW_QUERY_LOG'), p_rnk, p_nd)
   returning reqid into l_reqid;
+else
+ update ow_query_log t
+       set t.respcode = p_respcode,
+           t.resptext = p_resptext,
+           t.reqbody  = p_reqbody,
+           t.respbody = p_respbody,
+           t.err_text = p_err_text
+     where t.reqid    = p_reqid;
+l_reqid:=p_reqid;
+end if;
+ commit;
   return l_reqid;
 end;
 
@@ -12286,8 +12342,8 @@ begin
 end;
 
 function pers_instant_card(p_nd in number, p_cmclient in cm_client_que%rowtype)
-  return boolean is
-  l_isok boolean := true;
+  return varchar2 is
+  l_err varchar2(4000) := null;
   l_xml xmltype;
   l_body clob;
   l_reqid number;
@@ -12317,12 +12373,8 @@ begin
     l_respcode := to_number(extract(l_respxml,'UFXMsg/@resp_code', null));
     l_resptext := extract(l_respxml,'UFXMsg/@resp_text', null);
 
-    update ow_query_log t
-       set t.respcode = l_respcode,
-           t.resptext = l_resptext,
-           t.reqbody = l_body,
-           t.respbody = l_response.cdoc
-     where t.reqid = l_reqid;
+    l_reqid :=add_query_to_log(p_cmclient.rnk, p_nd, l_respcode, l_resptext, l_body, l_response.cdoc, l_reqid);
+	
   else
     l_xml := get_pers_xml(2, p_cmclient, l_reqid);
     l_body := l_xml.getClobVal();
@@ -12333,12 +12385,8 @@ begin
     l_respcode := to_number(extract(l_respxml,'UFXMsg/@resp_code', null));
     l_resptext := extract(l_respxml,'UFXMsg/@resp_text', null);
 
-    update ow_query_log t
-       set t.respcode = l_respcode,
-           t.resptext = l_resptext,
-           t.reqbody = l_body,
-           t.respbody = l_response.cdoc
-     where t.reqid = l_reqid;
+    l_reqid :=add_query_to_log(p_cmclient.rnk, p_nd, l_respcode, l_resptext, l_body, l_response.cdoc, l_reqid);
+	
     if l_respcode = 0 then
 
       l_reqid := add_query_to_log(p_cmclient.rnk, p_nd);
@@ -12350,29 +12398,23 @@ begin
       l_respcode := to_number(extract(l_respxml,'UFXMsg/@resp_code', null));
       l_resptext := extract(l_respxml,'UFXMsg/@resp_text', null);
 
-      update ow_query_log t
-         set t.respcode = l_respcode,
-             t.resptext = l_resptext,
-             t.reqbody = l_body,
-             t.respbody = l_response.cdoc
-       where t.reqid = l_reqid;
+      l_reqid :=add_query_to_log(p_cmclient.rnk, p_nd, l_respcode, l_resptext, l_body, l_response.cdoc, l_reqid);
 
     end if;
   end if;
-  if l_respcode <> 0 then
-     l_isok := false;
+  if l_respcode = 0 then
+     l_err:='OK';
+  else
+     l_err := l_resptext;
   end if;
-  return l_isok;
+  return l_err;
 exception
   when others then
-    update ow_query_log t
-       set t.err_text = substr(dbms_utility.format_error_stack() || chr(10) ||
-                        dbms_utility.format_error_backtrace(), 1, 4000),
-           t.reqbody = l_body,
-           t.respbody = l_response.cdoc
-     where t.reqid = l_reqid;
-    l_isok := false;
-    return l_isok;
+    l_err := substr(dbms_utility.format_error_stack() || chr(10) ||
+                  dbms_utility.format_error_backtrace(), 1, 4000);
+  l_reqid :=add_query_to_log(null,null,null, null, l_body, l_response.cdoc, l_reqid, l_err);
+  
+    return l_err;
 end;
 
 -------------------------------------------------------------------------------
@@ -12409,7 +12451,7 @@ is
   l_opertype   number;
   i number;
   l_cmclient   cm_client_que%rowtype;
-  l_isok       boolean;
+  l_pers_err       varchar2(4000);
   l_dkbo_deal  number;
   h varchar2(100) := 'bars_ow.open_card. ';
   l_sendsms    varchar2(3);
@@ -12626,13 +12668,14 @@ begin
   -- отправляем запрос на W4 по персонализации карты
   if l_opertype = 6 and l_iscrm = '0' then
 
-     l_isok := pers_instant_card(l_nd, l_cmclient);
-     if l_isok then
+     l_pers_err := pers_instant_card(l_nd, l_cmclient);
+     if l_pers_err = 'OK' then
         update cm_client_que
            set add_info = replace(add_info, '<SEND_INSTANT>Y</SEND_INSTANT>', '<SEND_INSTANT>N</SEND_INSTANT>')
          where id = l_cmclient.id;
-/*     else
-       delete from cm_client_que where id = l_cmclient.id; */
+    else
+	   raise_application_error(-20000, 'Помилка при персоналізації Instant карти: '||substr(l_pers_err,1,100));
+/*        delete from cm_client_que where id = l_cmclient.id; */
      end if;
   end if;
   bars_audit.info(h || 'Finish.');
@@ -12956,7 +12999,7 @@ begin
   or p_project.first_name is null
   or p_project.last_name is null
   or p_project.type_doc is null
-  or p_project.paspseries is null
+  or (p_project.paspseries is null and nvl(p_project.type_doc,0) = 1)
   or p_project.paspnum is null
   or p_project.paspissuer is null
   or p_project.paspdate is null
@@ -13003,8 +13046,10 @@ begin
      (p_project.paspseries <> upper(p_project.paspseries) or length(p_project.paspseries) <> 2) then
      append_msg('Невірно заповнено серію паспорту');
   end if;
-  if nvl(p_project.type_doc,0) = 1 and
-     (not check_digit(p_project.paspnum) or length(p_project.paspnum) <> 6) then
+  if (nvl(p_project.type_doc,0) = 1 and
+     (not check_digit(p_project.paspnum) or length(p_project.paspnum) <> 6)) or
+     (nvl(p_project.type_doc,0) = 7 and
+     (not check_digit(p_project.paspnum) or length(p_project.paspnum) <> 9)) then
      append_msg('Невірно заповнено номер паспорту');
   end if;
   if p_project.email is not null and not check_email(upper(p_project.email)) then
@@ -15181,7 +15226,7 @@ begin
                      exception when no_data_found then
                         l_ovr_new_ob22 := null;
                      end;                       
-                    -- новый долгоср. 2203
+                 -- новый долгоср. 2203
                     if l_old_tip = 'W4C' and l_ovr_new_ob22 <> l_ovr_old_ob22 then
                        l_ovr_new_nbs := case when l_ovr_old_nbs = '2203' then '2203' else '2063' end;
                     -- новый краткоср. 2203
@@ -15193,15 +15238,15 @@ begin
                     end if;                   
                  else
                     -- новый долгоср. 2203
-                    if l_new_tip = 'W4B' and l_ovr_old_nbs in ('2202', '2062') then
-                       l_ovr_new_nbs := case when l_ovr_old_nbs = '2202' then '2203' else '2063' end;
-                    -- новый краткоср. 2202
-                    elsif l_new_tip = 'W4C' and l_ovr_old_nbs in ('2203', '2063') then
-                       l_ovr_new_nbs := case when l_ovr_old_nbs = '2203' then '2202' else '2062' end;
-                    -- БС не меняется
-                    else
-                       l_ovr_new_nbs := null;
-                    end if;
+                 if l_new_tip = 'W4B' and l_ovr_old_nbs in ('2202', '2062') then
+                    l_ovr_new_nbs := case when l_ovr_old_nbs = '2202' then '2203' else '2063' end;
+                 -- новый краткоср. 2202
+                 elsif l_new_tip = 'W4C' and l_ovr_old_nbs in ('2203', '2063') then
+                    l_ovr_new_nbs := case when l_ovr_old_nbs = '2203' then '2202' else '2062' end;
+                 -- БС не меняется
+                 else
+                    l_ovr_new_nbs := null;
+                 end if;
                  
                  end if;
                  -- если БС меняется, открываем новый счет
@@ -15815,6 +15860,7 @@ is
   l_acc         number;
   i number;
   l_batch       number;
+  l_iscrm      varchar2(1) := nvl(sys_context('CLIENTCONTEXT','ISCRM'), '0');  
   h varchar2(100) := 'bars_ow.create_instant_cards. ';
 begin
 
@@ -15953,6 +15999,12 @@ begin
      select bars_sqnc.get_nextval('S_CMCLIENT') into l_cmclient.id from dual;
 
      insert into cm_client_que values l_cmclient;
+     if l_iscrm = '1' then
+        update cm_client t
+           set t.oper_status = 3,
+               t.resp_txt    = 'Емуляція обробки заявки по запитам від CRM'
+         where t.id = l_cmclient.id;
+     end if;
 
   end loop;
 
@@ -15979,6 +16031,7 @@ is
   i             number;
   l_batch       number;
   l_opendate    date;
+  l_iscrm      varchar2(1) := nvl(sys_context('CLIENTCONTEXT','ISCRM'), '0');  
   h varchar2(100) := 'bars_ow.create_instant_cards. ';
 begin
 
@@ -16126,6 +16179,13 @@ begin
 
      insert into cm_client_que values l_cmclient;
 
+     if l_iscrm = '1' then
+        update cm_client t
+           set t.oper_status = 3,
+               t.resp_txt    = 'Емуляція обробки заявки по запитам від CRM'
+         where t.id = l_cmclient.id;
+     end if;
+     
   end loop;
 
   bars_audit.info(h || 'Finish.');
@@ -16657,7 +16717,7 @@ begin
      l_newnb :=  get_new_nbs_ob22('2909', '80');
      l_nlsb := nbs_ob22 (l_newnb.nbs, l_newnb.ob22);
   else
-     l_nlsb := nbs_ob22 ('2909','80');
+            l_nlsb := nbs_ob22 ('2909','80');
   end if;
   ipay_doc ('OW7', l_oper.vob, 1, l_oper.sk,
      l_oper.nam_a, l_oper.nlsa, null, l_oper.id_a,

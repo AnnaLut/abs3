@@ -1,7 +1,3 @@
-set lines 1000
-set trimspool on
-set serveroutput on size 1000000
-
 prompt Создание / Обновление операции G01
 prompt Наименование операции: G01 ГЕРЦ Касові 
 declare

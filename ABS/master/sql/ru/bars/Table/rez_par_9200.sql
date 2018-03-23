@@ -7,7 +7,8 @@ begin
         nd      integer,
         fin     number,
         VKR     VARCHAR2(3),
-        PD      number)
+        PD      number
+       )
         tablespace BRSMDLD';
 exception when others then
   -- ORA-00955: name is already used by an existing object
@@ -46,6 +47,15 @@ exception when others then
   if SQLCODE = - 01430 then null;   else raise; end if; 
 end;
 /
+
+begin
+ execute immediate   'alter table REZ_PAR_9200 add ( KF      VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')) ';
+exception when others then
+  -- ORA-01430: column being added already exists in table
+  if SQLCODE = - 01430 then null;   else raise; end if; 
+end;
+/
+
 begin
   EXECUTE IMMEDIATE 
  'ALTER TABLE REZ_PAR_9200 ADD (CONSTRAINT PK_REZ_PAR_9200 PRIMARY KEY (fdat,RNK,ND))';

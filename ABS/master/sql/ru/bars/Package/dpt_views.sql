@@ -6,7 +6,21 @@
  
   CREATE OR REPLACE PACKAGE BARS.DPT_VIEWS 
 IS
-   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.1 27.02.2017';
+   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.2 01.09.2017';
+/*
+|| версия 1.2 - изменения для проэкта XRM.
+  Добавлено: r_short_portfolio
+             t_short_portfolio
+             r_dpt_vidd
+             t_dpt_vidd
+             get_portfolio_trustee
+             get_portfolio_inherit
+             get_portfolio_benefic
+             get_portfolio_onchild
+             get_portfolio_main
+             get_portfolio_all
+||           get_dpt_products
+*/
 
    FUNCTION header_version
       RETURN VARCHAR2;
@@ -70,11 +84,69 @@ TYPE r_portfolio IS record (DPT_ID NUMBER (38),
                             wb varchar2(1));
  type t_portfolio is table of r_portfolio;
  function get_portfolio(p_rnk in customer.rnk%type, p_mode In int) return t_portfolio pipelined;
+ type t_tmp_dptrpt is table of tmp_dptrpt%rowtype;
+ function get_rpt(p_code     in  tmp_dptrpt.code%type,
+                  p_dat1     in  tmp_dptrpt.fdat%type,
+                  p_dat2     in  tmp_dptrpt.fdat%type,
+                  p_dptid    in  tmp_dptrpt.dptid%type) return t_tmp_dptrpt pipelined;
+                  
+ 
+ 
+ ---
+  type r_short_portfolio is record (mark       char (1 byte),
+                                   dpt_id     number (38),
+                                   dpt_num    varchar2 (35 byte),
+                                   type_name  varchar2 (50 byte),
+                                   datz       date,
+                                   dat_end    date,
+                                   nls        varchar2 (15 byte),      
+                                   lcv        char (3 byte),
+                                   dpt_lock   varchar2(30),
+                                   archdoc_id number (38),
+                                   ostc       number,
+                                   ost_int    number);
+ type t_short_portfolio is table of r_short_portfolio;     
+ 
+ type r_dpt_vidd is record (   type_id          dpt_types.type_id%type,
+                               type_name        dpt_types.type_name%type,
+                               type_code        dpt_types.type_code%type,
+                               fl_active        varchar2(50),
+                               fl_demand        varchar2(50),
+                               fl_webbanking    varchar2(50),
+                               vidd             dpt_vidd.vidd%type,
+                               kv               dpt_vidd.kv%type,
+                               vidd_name        dpt_vidd.type_name%type,
+                               duration         dpt_vidd.duration%type,
+                               duration_days    dpt_vidd.duration_days%type,
+                               LIMIT            varchar2(50),
+                               freq_k           varchar2(50),
+                               dubl             varchar2(50));
+ type t_dpt_vidd is table of r_dpt_vidd;
+ function get_dpt_products return t_dpt_vidd pipelined;                    
+ 
+ function get_portfolio_main(p_rnk in customer.rnk%type) return t_short_portfolio pipelined;
+ function get_portfolio_trustee(p_rnk in customer.rnk%type) return t_short_portfolio pipelined;
+ function get_portfolio_inherit(p_rnk in customer.rnk%type) return t_short_portfolio pipelined;
+ function get_portfolio_benefic(p_rnk in customer.rnk%type) return t_short_portfolio pipelined;
+ function get_portfolio_onchild(p_rnk in customer.rnk%type) return t_short_portfolio pipelined;
+ function get_portfolio_all(p_rnk in customer.rnk%type) return t_short_portfolio pipelined;
 END;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.DPT_VIEWS 
 IS
-   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.08 27.02.2017';
+   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.12 23.11.2017';
+
+   /*
+|| - в версии 1.11 добавлены следующие функции:
+    get_portfolio_trustee
+    get_portfolio_inherit
+    get_portfolio_benefic
+    get_portfolio_onchild
+    get_portfolio_main
+    get_portfolio_all
+    get_dpt_products
+|| необходимы для проэкта XRM
+*/
 
    FUNCTION body_version
       RETURN VARCHAR2
@@ -121,10 +193,10 @@ IS
                          WHERE vidd = DC.VIDD)
                           VIDD_NAME,*/
                        0 AS rate,
-                       NVL (dpt.f_dptw (dc.deposit_id, ''NCASH''), ''0'') DPT_NOCASH, 0 AS DPT_STATUS, DC.COMMENTS DPT_COMMENTS, max(DC.archdoc_id) archdoc_id, dc.wb
+                       NVL (dpt.f_dptw (dc.deposit_id, ''NCASH''), ''0'') DPT_NOCASH, 0 AS DPT_STATUS, max(DC.archdoc_id) archdoc_id, max(dc.wb) wb
                        FROM cust c, accmainlst ac, dpt_deposit_clos dc, dpt_vidd v
                        WHERE c.rnk = dc.rnk AND v.vidd = dc.vidd and dc.acc = ac.acc
-          GROUP BY dc.rnk,dc.acc,dc.branch,dc.kv,v.amr_metr,DC.DEPOSIT_ID,DC.ND,dc.datz/*,DC.VIDD*/, NVL (dpt.f_dptw (dc.deposit_id,''NCASH''), ''0''),DC.COMMENTS, dc.wb'
+          GROUP BY dc.rnk,dc.acc,dc.branch,dc.kv,v.amr_metr,DC.DEPOSIT_ID,DC.ND,dc.datz/*,DC.VIDD*/, NVL (dpt.f_dptw (dc.deposit_id,''NCASH''), ''0'') '
              ||
                case when p_mode in (0,-2) then l_stmt_str   || ' HAVING max(DC.archdoc_id) = -1 '
                 when p_mode in (1, -1) then l_stmt_str  || ' HAVING max(DC.archdoc_id) >= 0 '
@@ -152,7 +224,7 @@ IS
                         TRUNC (SYSDATE))
                 rate,
                            coalesce(d.limit, (select limit from dpt_deposit_clos where deposit_id = d.deposit_id and action_id = 0)) dpt_amount,
-               lst.DPT_COMMENTS,
+               D.COMMENTS,
                NVL (d.archdoc_id, lst.archdoc_id) AS archdoc_id,
                lst.DPT_NOCASH,
                CASE WHEN d.deposit_id IS NOT NULL THEN nvl(d.status,0) ELSE -1 END
@@ -252,20 +324,353 @@ IS
       END LOOP;
 
       CLOSE l_cursor;
-
-
    end;
+ function get_rpt(p_code     in  tmp_dptrpt.code%type,
+                  p_dat1     in  tmp_dptrpt.fdat%type,
+                  p_dat2     in  tmp_dptrpt.fdat%type,
+                  p_dptid    in  tmp_dptrpt.dptid%type) return t_tmp_dptrpt pipelined
 
+
+ is
+  pragma autonomous_transaction;
+  l_tmp_dptrpt_rec tmp_dptrpt%rowtype;
+  l_context varchar2(30) := sys_context('bars_context','user_branch');
+ begin
+   bc.go('/');
+   bars_audit.info('dpt_views.get_rpt started');
+   gen_dptrpt(p_code, p_dat1, p_dat2,p_dptid, 1);
+   commit;
+   bars_audit.info('dpt_views.get_rpt gen_dptrpt ok');
+   for k in (select * from  bars.tmp_dptrpt )
+   loop
+    bars_audit.info('dpt_views.get_rpt loop' ||k.DPTID ||'   ' || to_char(k.FDAT));
+    l_tmp_dptrpt_rec.recid          := k.recid;
+    l_tmp_dptrpt_rec.CODE           := k.CODE;
+    l_tmp_dptrpt_rec.DPTID          := k.DPTID;
+    l_tmp_dptrpt_rec.DPTNUM         := k.DPTNUM;
+    l_tmp_dptrpt_rec.DPTDAT         := k.DPTDAT;
+    l_tmp_dptrpt_rec.DATBEG         := k.DATBEG;
+    l_tmp_dptrpt_rec.DATEND         := k.DATEND;
+    l_tmp_dptrpt_rec.DEPACCNUM      := k.DEPACCNUM;
+    l_tmp_dptrpt_rec.DEPACCNAME     := k.DEPACCNAME;
+    l_tmp_dptrpt_rec.INTACCNUM      := k.INTACCNUM;
+    l_tmp_dptrpt_rec.INTACCNAME     := k.INTACCNAME;
+    l_tmp_dptrpt_rec.CURID          := k.CURID;
+    l_tmp_dptrpt_rec.CURCODE        := k.CURCODE;
+    l_tmp_dptrpt_rec.CURNAME        := k.CURNAME;
+    l_tmp_dptrpt_rec.TYPEID         := k.TYPEID;
+    l_tmp_dptrpt_rec.TYPENAME       := k.TYPENAME;
+    l_tmp_dptrpt_rec.CUSTID         := k.CUSTID;
+    l_tmp_dptrpt_rec.CUSTNAME       := k.CUSTNAME;
+    l_tmp_dptrpt_rec.DOCTYPE        := k.DOCTYPE;
+    l_tmp_dptrpt_rec.ISAL_GEN       := k.ISAL_GEN;
+    l_tmp_dptrpt_rec.OSAL_GEN       := k.OSAL_GEN;
+    l_tmp_dptrpt_rec.FDAT           := k.FDAT;
+    l_tmp_dptrpt_rec.PDAT           := k.PDAT;
+    l_tmp_dptrpt_rec.ISAL_DAT       := k.ISAL_DAT;
+    l_tmp_dptrpt_rec.OSAL_DAT       := k.OSAL_DAT;
+    l_tmp_dptrpt_rec.DOCREF         := k.DOCREF;
+    l_tmp_dptrpt_rec.DOCNUM         := k.DOCNUM;
+    l_tmp_dptrpt_rec.DOCTT          := k.DOCTT;
+    l_tmp_dptrpt_rec.DOCDK          := k.DOCDK;
+    l_tmp_dptrpt_rec.DOCSUM         := k.DOCSUM;
+    l_tmp_dptrpt_rec.DOCSK          := k.DOCSK;
+    l_tmp_dptrpt_rec.DOCUSER        := k.DOCUSER;
+    l_tmp_dptrpt_rec.DOCDTL         := k.DOCDTL;
+    l_tmp_dptrpt_rec.CORRMFO        := k.CORRMFO;
+    l_tmp_dptrpt_rec.CORRACC        := k.CORRACC;
+    l_tmp_dptrpt_rec.CORRNAME       := k.CORRNAME;
+    l_tmp_dptrpt_rec.CORRCODE       := k.CORRCODE;
+    l_tmp_dptrpt_rec.USERID         := k.USERID;
+    l_tmp_dptrpt_rec.USERNAME       := k.USERNAME;
+    l_tmp_dptrpt_rec.BRN4ID         := k.BRN4ID;
+    l_tmp_dptrpt_rec.BRN4NAME       := k.BRN4NAME;
+
+    pipe row(l_tmp_dptrpt_rec);
+
+   end loop;
+   bars_audit.info('dpt_views.get_rpt gen_endloop');
+   bars_audit.info('dpt_views.get_rpt exit');
+ end;
+ 
+ function get_portfolio_trustee(p_rnk in customer.rnk%type) return t_short_portfolio pipelined    
+ is
+    l_short_portfolio r_short_portfolio;
+ begin
+  for k in (SELECT p.dpt_id DPT_ID,
+                   p.dpt_num DPT_NUM,
+                   p.vidd_name TYPE_NAME,
+                   p.cust_name NMK,
+                   p.dpt_accnum NLS,
+                   p.dpt_curcode LCV,
+                   p.dat_begin DATZ,
+                   p.dat_end DAT_END,
+                   p.DPT_LOCK,
+                   p.ARCHDOC_ID,
+                   (p.dpt_saldo / p.dpt_cur_denom) OST_DEP,
+                   (p.int_saldo / dpt_cur_denom) OST_INT,
+                   WB
+              FROM v_dpt_portfolio_ALL_active p
+             WHERE     p.DAT_END IS NOT NULL
+                   AND p.DPT_ID IN (SELECT dpt_id
+                                      FROM DPT_TRUSTEE
+                                     WHERE     rnk_tr = p_rnk
+                                           AND typ_tr = 'T'
+                                           AND FL_ACT = 1
+                                           AND UNDO_ID IS NULL))
+  loop
+   l_short_portfolio.mark       :=      'T';
+   l_short_portfolio.dpt_id     :=      k.dpt_id;
+   l_short_portfolio.dpt_num    :=      k.dpt_num;
+   l_short_portfolio.type_name  :=      k.type_name;
+   l_short_portfolio.datz       :=      k.datz;     
+   l_short_portfolio.dat_end    :=      k.dat_end;
+   l_short_portfolio.nls        :=      k.nls;
+   l_short_portfolio.lcv        :=      k.lcv;
+   l_short_portfolio.dpt_lock   :=      k.dpt_lock;
+   l_short_portfolio.archdoc_id :=      k.archdoc_id;
+   l_short_portfolio.ostc       :=      k.ost_dep;
+   l_short_portfolio.ost_int    :=      k.ost_int;
+   
+   pipe row (l_short_portfolio);
+  end loop;     
+ end;
+ function get_portfolio_inherit(p_rnk in customer.rnk%type) return t_short_portfolio pipelined
+  is 
+    l_short_portfolio r_short_portfolio;
+ begin
+  for k in (SELECT p.dpt_id DPT_ID,
+                   p.dpt_num DPT_NUM,
+                   p.vidd_name TYPE_NAME,
+                   p.cust_name NMK,
+                   p.dpt_accnum NLS,
+                   p.dpt_curcode LCV,
+                   p.dat_begin DATZ,
+                   p.dat_end,
+                   h.INHERIT_SHARE,
+                   (p.dpt_saldo / p.dpt_cur_denom) OST_DEP,
+                   (p.int_saldo / dpt_cur_denom) OST_INT,
+                   p.DPT_LOCK,
+                   p.ARCHDOC_ID,
+                   WB
+              FROM V_DPT_PORTFOLIO_ALL_ACTIVE p, DPT_INHERITORS h
+             WHERE p.DPT_ID = h.dpt_id AND h.INHERIT_CUSTID = p_rnk)             
+  loop
+   l_short_portfolio.mark       :=      'H';
+   l_short_portfolio.dpt_id     :=      k.dpt_id;
+   l_short_portfolio.dpt_num    :=      k.dpt_num;
+   l_short_portfolio.type_name  :=      k.type_name;
+   l_short_portfolio.datz       :=      k.datz;     
+   l_short_portfolio.dat_end    :=      k.dat_end;
+   l_short_portfolio.nls        :=      k.nls;
+   l_short_portfolio.lcv        :=      k.lcv;
+   l_short_portfolio.dpt_lock   :=      k.dpt_lock;
+   l_short_portfolio.archdoc_id :=      k.archdoc_id;
+   l_short_portfolio.ostc       :=      k.OST_DEP;
+   l_short_portfolio.ost_int    :=      k.ost_int;
+   
+   pipe row (l_short_portfolio);
+  end loop; 
+ end;
+ function get_portfolio_benefic(p_rnk in customer.rnk%type) return t_short_portfolio pipelined
+  is 
+    l_short_portfolio r_short_portfolio;
+ begin  
+   for k in (SELECT p.dpt_id DPT_ID,
+                    p.dpt_num DPT_NUM,
+                    p.dat_begin DATZ,
+                    p.dat_end DAT_END,
+                    p.vidd_name TYPE_NAME,
+                    p.cust_name NMK,
+                    p.dpt_accnum NLS,
+                    p.dpt_curcode LCV,
+                    (p.dpt_saldo / p.dpt_cur_denom) OST_DEP,
+                    (p.int_saldo / dpt_cur_denom) OST_INT,
+                    p.DPT_LOCK,
+                    p.ARCHDOC_ID,
+                    b.RNK_TR,
+                    b.ID TRUSTEE_ID,
+                    p.dpt_curid KV,
+                    WB
+               FROM v_dpt_portfolio_ALL_active p, dpt_trustee b
+              WHERE p.DAT_END IS NOT NULL
+                AND p.DPT_ID = b.dpt_id
+                AND rnk_tr = p_rnk
+                AND typ_tr = 'B'
+                AND FL_ACT = 1)
+  loop
+   l_short_portfolio.mark       :=      'B';
+   l_short_portfolio.dpt_id     :=      k.dpt_id;
+   l_short_portfolio.dpt_num    :=      k.dpt_num;
+   l_short_portfolio.type_name  :=      k.type_name;
+   l_short_portfolio.datz       :=      k.datz;     
+   l_short_portfolio.dat_end    :=      k.dat_end;
+   l_short_portfolio.nls        :=      k.nls;
+   l_short_portfolio.lcv        :=      k.lcv;
+   l_short_portfolio.dpt_lock   :=      k.dpt_lock;
+   l_short_portfolio.archdoc_id :=      k.archdoc_id;
+   l_short_portfolio.ostc       :=      k.OST_DEP;
+   l_short_portfolio.ost_int    :=      k.ost_int;
+   
+   pipe row (l_short_portfolio);
+  end loop; 
+ end;
+ function get_portfolio_onchild(p_rnk in customer.rnk%type) return t_short_portfolio pipelined is 
+    l_short_portfolio r_short_portfolio;
+ begin
+   for k in (SELECT p.dpt_id DPT_ID,
+                   p.dpt_num DPT_NUM,
+                   p.vidd_name TYPE_NAME,
+                   p.cust_name NMK,
+                   p.dpt_accnum NLS,
+                   p.dpt_curcode LCV,
+                   p.dat_begin DATZ,
+                   p.dat_end,
+                   h.INHERIT_SHARE,
+                   (p.dpt_saldo / p.dpt_cur_denom) OST_DEP,
+                   (p.int_saldo / dpt_cur_denom) OST_INT,
+                   p.DPT_LOCK,
+                   p.ARCHDOC_ID,
+                   WB
+              FROM V_DPT_PORTFOLIO_ALL_ACTIVE p, DPT_INHERITORS h
+             WHERE p.DPT_ID = h.dpt_id AND h.INHERIT_CUSTID = p_rnk)
+  loop
+   l_short_portfolio.mark       :=      'C';
+   l_short_portfolio.dpt_id     :=      k.dpt_id;
+   l_short_portfolio.dpt_num    :=      k.dpt_num;
+   l_short_portfolio.type_name  :=      k.type_name;
+   l_short_portfolio.datz       :=      k.datz;     
+   l_short_portfolio.dat_end    :=      k.dat_end;
+   l_short_portfolio.nls        :=      k.nls;
+   l_short_portfolio.lcv        :=      k.lcv;
+   l_short_portfolio.dpt_lock   :=      k.dpt_lock;
+   l_short_portfolio.archdoc_id :=      k.archdoc_id;
+   l_short_portfolio.ostc       :=      k.OST_DEP;
+   l_short_portfolio.ost_int    :=      k.ost_int;
+   
+   pipe row (l_short_portfolio);
+  end loop; 
+ end;
+ 
+ function get_portfolio_main(p_rnk in customer.rnk%type) return t_short_portfolio pipelined 
+ is
+  l_short_portfolio r_short_portfolio;
+ begin
+   for k in (SELECT p.dpt_id DPT_ID,
+                   p.dpt_num DPT_NUM,
+                   p.vidd_name TYPE_NAME,
+                   p.cust_name NMK,                   
+                   p.dpt_curcode LCV,
+                   p.dat_begin DATZ,
+                   p.dat_end,
+                   p.dpt_accnum NLS,
+                   (p.dpt_saldo / p.dpt_cur_denom) OST_DEP,
+                   (p.int_saldo / dpt_cur_denom) OST_INT,
+                   p.DPT_LOCK,
+                   p.ARCHDOC_ID,
+                   WB
+              FROM table(dpt_views.get_portfolio(p_rnk,1)) p)
+   loop
+   l_short_portfolio.mark       :=      'V';
+   l_short_portfolio.dpt_id     :=      k.dpt_id;
+   l_short_portfolio.dpt_num    :=      k.dpt_num;
+   l_short_portfolio.type_name  :=      k.type_name;
+   l_short_portfolio.datz       :=      k.datz;     
+   l_short_portfolio.dat_end    :=      k.dat_end;
+   l_short_portfolio.nls        :=      k.nls;
+   l_short_portfolio.lcv        :=      k.lcv;
+   l_short_portfolio.dpt_lock   :=      k.dpt_lock;
+   l_short_portfolio.archdoc_id :=      k.archdoc_id;
+   l_short_portfolio.ostc       :=      k.OST_DEP;
+   l_short_portfolio.ost_int    :=      k.ost_int;
+   
+   pipe row (l_short_portfolio);
+  end loop; 
+ end;
+ 
+  function get_portfolio_all(p_rnk in customer.rnk%type) return t_short_portfolio pipelined
+   is
+  l_short_portfolio r_short_portfolio;
+ begin
+   for k in (select v.* from table(dpt_views.get_portfolio_main(p_rnk)) v union all
+             select t.* from table(dpt_views.get_portfolio_trustee(p_rnk)) t union all
+             select h.* from table(dpt_views.get_portfolio_inherit(p_rnk)) h union all
+             select b.* from table(dpt_views.get_portfolio_benefic(p_rnk)) b union all
+             select c.* from table(dpt_views.get_portfolio_onchild(p_rnk)) c)
+   loop
+   l_short_portfolio.mark       :=      k.mark;
+   l_short_portfolio.dpt_id     :=      k.dpt_id;
+   l_short_portfolio.dpt_num    :=      k.dpt_num;
+   l_short_portfolio.type_name  :=      k.type_name;
+   l_short_portfolio.datz       :=      k.datz;     
+   l_short_portfolio.dat_end    :=      k.dat_end;
+   l_short_portfolio.nls        :=      k.nls;
+   l_short_portfolio.lcv        :=      k.lcv;
+   l_short_portfolio.dpt_lock   :=      k.dpt_lock;
+   l_short_portfolio.archdoc_id :=      k.archdoc_id;
+   l_short_portfolio.ostc       :=      k.ostc;
+   l_short_portfolio.ost_int    :=      k.ost_int;
+   
+   pipe row (l_short_portfolio);
+  end loop; 
+ end;
+ 
+ function get_dpt_products return t_dpt_vidd pipelined
+ is
+ l_dpt_vidd r_dpt_vidd;
+ begin
+  for k in (SELECT dt.type_id,
+                   dt.type_name,
+                   dt.type_code,
+                   dt.fl_active,
+                   dt.fl_demand,
+                   dt.fl_webbanking,
+                   dv.vidd,
+                   dv.kv,
+                   dv.type_name AS vidd_name,
+                   dv.duration,
+                   dv.duration_days,
+                   dv.LIMIT,
+                   dv.freq_k,
+                   CASE WHEN DV.FL_DUBL > 0 THEN 'З автопролонгацією' ELSE 'Без автопролонгації' END AS dubl
+              FROM TABLE (dpt_adm.get_dpt_type_sets) dt,
+                   TABLE (dpt_adm.get_dpt_vidd_sets (dt.type_id)) dv
+             WHERE dt.fl_act = 1 
+               AND dv.flagid = 1)
+  loop      
+   l_dpt_vidd.type_id       := k.type_id;        
+   l_dpt_vidd.type_name     := k.type_name;    
+   l_dpt_vidd.type_code     := k.type_code;  
+   l_dpt_vidd.fl_active     := k.fl_active;  
+   l_dpt_vidd.fl_demand     := k.fl_demand; 
+   l_dpt_vidd.fl_webbanking := k.fl_webbanking; 
+   l_dpt_vidd.vidd          := k.vidd; 
+   l_dpt_vidd.kv            := k.kv; 
+   l_dpt_vidd.vidd_name     := k.vidd_name; 
+   l_dpt_vidd.duration      := k.duration; 
+   l_dpt_vidd.duration_days := k.duration_days; 
+   l_dpt_vidd.LIMIT         := k.LIMIT; 
+   l_dpt_vidd.freq_k        := k.freq_k; 
+   l_dpt_vidd.dubl          := k.dubl; 
+      
+   pipe row (l_dpt_vidd);
+  end loop;
+ end;
+  
+ 
 end;
 /
  show err;
- 
-PROMPT *** Create  grants  DPT_VIEWS ***
-grant EXECUTE                                                                on DPT_VIEWS       to BARS_ACCESS_DEFROLE;
 
- 
- 
- PROMPT ===================================================================================== 
+
+PROMPT *** Create  grants  DPT_VIEWS ***
+grant EXECUTE                                                          on DPT_VIEWS       to BARS_ACCESS_DEFROLE;
+
+
+
+
+
+ PROMPT =====================================================================================
  PROMPT *** End *** ========== Scripts /Sql/BARS/package/dpt_views.sql =========*** End *** =
- PROMPT ===================================================================================== 
+ PROMPT =====================================================================================
  

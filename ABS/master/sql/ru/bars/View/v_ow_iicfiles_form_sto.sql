@@ -41,6 +41,7 @@ PROMPT *** Create  view V_OW_IICFILES_FORM_STO ***
                                                              FROM oper
                                                             WHERE nlsa = o1.nlsa
                                                               AND pdat >= bankdate - 30
+							      and ref in (select ref from ow_pkk_que)
                                                               AND tt != NVL ( getglobaloption ('ASG_FOR_BPK'), 'W4Y')
                                                               AND sos BETWEEN 2 AND 4)
                                                AND sos > 0

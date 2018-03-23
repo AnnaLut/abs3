@@ -12,7 +12,7 @@ select x.fn
      , sum(case when substr(p.nlsa,1,4) in ('6510') or substr(p.nlsb,1,4) in ('6510') then o.s else 0 end) as opl_fee
 from bars.opldok o, bars.xml_impfiles x, bars.accounts a, bars.xml_impdocs p
 where o.ref=p.ref
-  and x.dat>=trunc(sysdate) - 5
+  and x.dat>=dat_next_u(gl.bd, - 5)
   and x.kf=o.kf
   and X.FN=p.fn
   and o.fdat=x.dat

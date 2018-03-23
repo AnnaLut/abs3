@@ -6,14 +6,6 @@
 -- modify table EBK_QUEUE_UPDATECARD
 -- ======================================================
 
-SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
-SET FEEDBACK     OFF
-SET TIMING       OFF
-SET DEFINE       OFF
-SET LINES        200
-SET PAGES        200
-SET TERMOUT      ON
-SET TRIMSPOOL    ON
 
 prompt -- ======================================================
 prompt --  modify table EBK_QUEUE_UPDATECARD
@@ -41,7 +33,7 @@ update BARS.EBK_QUEUE_UPDATECARD q
 
 commit;
 
-SET FEEDBACK OFF
+
 
 declare
   e_already_nn  exception;

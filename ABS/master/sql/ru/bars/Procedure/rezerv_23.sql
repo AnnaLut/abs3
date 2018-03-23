@@ -278,7 +278,7 @@ begin
 
             elsif (k.tip in ('SK9','OFR') or k.nbs in ('3570','3578')) and k. nbs not in ('3548') and k.rez<>0  THEN 
                   o_se_2   := -k.bv*100; l_rez_30 := k.rez; l_rezq_30:= k.rezq;
-                  l_rez_0  := 0        ; l_rezq_0 := 0    ; 
+                  l_rez_0  := 0        ; l_rezq_0 := 0;
 
             else                   o_se_2   := 0; l_rez_30 := 0; l_rezq_30:= 0;
 
@@ -359,8 +359,8 @@ begin
             end;
          end if;
 
-         update nbu23_rez set idr    = idr_ , ARJK  = ARJK_  , rz      = k.rz       , cc_id    = k.cc_id    , rez    = k.rez      , rezq     = k.rezq  ,
-                              kat    = k.kat, s250  = k.s250 , nd      = k.nd       , nd_cp    = nd_cp_     , id     = k.idkod    , branch   = k.branch,
+         update nbu23_rez set idr    = idr_ , ARJK  = ARJK_  , rz      = k.rz , cc_id = k.cc_id    , rez    = k.rez      , rezq     = k.rezq  ,
+                              kat    = k.kat, s250  = k.s250 , nd      = k.nd , nd_cp = nd_cp_     , id     = k.idkod    , branch   = k.branch,
                               rezn   = 0    , reznq = 0      , bv_30   = -o_se_2/100, custtype = k. custtype,
                               bvq_30 = -gl.p_icurval (k.kv, o_se_2 , dat31_)/100, rez_30 = l_rez_30,rezq_30 = l_rezq_30  , tipa     = l_tipa  ,
                               rez_0  = l_rez_0               ,rezq_0  = l_rezq_0

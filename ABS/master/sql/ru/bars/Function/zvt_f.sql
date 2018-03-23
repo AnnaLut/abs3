@@ -404,7 +404,7 @@ TT_='ARE' AND (nbsd_='2401' and nbsk_='7702')
    ELSIF tt_ = 'OVR'
    THEN
       t_ := 95;                                               -- АВТ:Овердрафт
-   ELSIF tt_ IN ('PKA', 'PKD', 'PKR','PKQ')           THEN      t_ := 36;   -- БПК:меморіальні ручні
+   ELSIF tt_ IN ('PKA', 'PKD', 'PKR','PKQ','OW4')           THEN      t_ := 36;   -- БПК:меморіальні ручні
    -- заведомо старые БПК
    ELSIF     NbSD_ IN ('2625', '2605')    AND NbSK_ = '2924'
              AND SUBSTR (tt_, 1, 2) NOT IN ('KL')      THEN  t_ := -86;     -- БПК:(2924<->2625)
@@ -641,9 +641,11 @@ TT_='ARE' AND (nbsd_='2401' and nbsk_='7702')
               else
               if tt_ = 'PS1' then
               t_ := 97;
+              elsif tt_ = 'CL1' then
+              t_ := 25;                                            --Клієнт банк
               else
               t_ := 20; -- 20 початкові внутрішні платежі на рахунок клієнтів свого РУ\
-                end if;
+              end if;
             end if;
 
    ELSIF     (   NBSD_ LIKE '260%'
@@ -653,7 +655,12 @@ TT_='ARE' AND (nbsd_='2401' and nbsk_='7702')
          AND MFOA_ = gl.aMFO
          AND tt_ NOT IN ('PS0', 'PS1', 'PS2', 'ELT')
    THEN
-      t_ := 19;                                            --Кл.пл.(Поч.ВН+МБ)
+      IF tt_ IN ('CL2', 'CL5')
+      THEN
+         t_ := 25;                                            --Клієнт банк
+      ELSE
+         t_ := 19;                                            --Кл.пл.(Поч.ВН+МБ)
+      END IF;
    ELSIF     (NBSK_ LIKE '260%' OR NBSK_ LIKE '25%' OR NBSK_ LIKE '265%')
          AND MFOB_ = gl.aMFO
          AND tt_ NOT IN ('PS0', 'PS1', 'PS2','I00')
@@ -869,6 +876,7 @@ TT_='ARE' AND (nbsd_='2401' and nbsk_='7702')
       ELSE                                                          t_ := 35;    -- Меморiальнi(ручнi)
 
       END IF;
+
    END IF;
 
 

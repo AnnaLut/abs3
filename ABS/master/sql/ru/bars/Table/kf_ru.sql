@@ -139,7 +139,7 @@ exception when others then
 /
 
 
-
+grant select on bars.kf_ru to bars_access_defrole;
 
 
 PROMPT ===================================================================================== 

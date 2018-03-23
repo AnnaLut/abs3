@@ -106,7 +106,7 @@ end;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.STO_PAYMENT_UTL as
 
-  G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=  'version 2.5 19.01.2017';
+  G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=  'version 2.7 20.11.2017';
 
   FUNCTION header_version
      RETURN VARCHAR2
@@ -462,6 +462,16 @@ CREATE OR REPLACE PACKAGE BODY BARS.STO_PAYMENT_UTL as
                 end if;
             create_payment_que (l_payment_id, l_errmsg);
         end loop;
+		        -- сбрасываем статус платежам с нулевой суммой #COBUSUPABS-6340
+        for rec in (select t.id from sto_payment t
+                    where t.value_date = gl.bd + 1 
+                    and t.state = sto_payment_utl.STO_PM_STATE_READY_TO_WITHDRAW
+                    and nvl(t.payment_amount, 0) = 0)
+        loop
+            sto_payment_utl.set_payment_state(p_payment_id => rec.id,
+                                              p_state      => sto_payment_utl.STO_PM_STATE_NEW,
+                                              p_comment    => 'Нульова сумма. Повернено на доопрацювання');
+        end loop;
     end;
 
     procedure check_new_payment(
@@ -571,7 +581,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.STO_PAYMENT_UTL as
             end if;
         end if;
 
-        if (l_payment_row.state not in (sto_payment_utl.STO_PM_STATE_NEW, sto_payment_utl.STO_PM_STATE_SBON_AMOUNT_GOT)) then
+        if (l_payment_row.state not in (sto_payment_utl.STO_PM_STATE_NEW, 
+                                        sto_payment_utl.STO_PM_STATE_SBON_AMOUNT_GOT, 
+                                        case when nvl(l_payment_row.payment_amount, 0) = 0 then sto_payment_utl.STO_PM_STATE_READY_TO_WITHDRAW else '-' end) --COBUSUPABS-6340
+            )
+        then
             raise_application_error(-20000, 'Платіж знаходиться в стані {' || get_payment_state_name(l_payment_row.state) || '} і не може приймати оновлення сум від СБОН+');
         end if;
 

@@ -708,7 +708,7 @@ IS
                            WHERE a.acc = ddc.acc)
                             AS                                                                      account_number
                    FROM dpt_deposit_clos ddc
-                 --  join dpt_deposit d on ddc.deposit_id = d.deposit_id
+                   join dpt_deposit d on ddc.deposit_id = d.deposit_id
                    left outer join staff$base sb on ddc.actiion_author = sb.id
                   WHERE ddc.deposit_id = p_agr_id
 --                    and d.wb = 'N'

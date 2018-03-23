@@ -1,4 +1,3 @@
-п»їprompt Актуализация спецпараметров CCK (cck_upd_sparams)
 declare
 id_ number;
 begin

@@ -24,7 +24,8 @@ begin
    (	ID NUMBER, 
 	IDN NUMBER, 
 	PHOTO BLOB, 
-	NAME VARCHAR2(100)
+	NAME VARCHAR2(100), 
+	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -37,8 +38,17 @@ exception when others then
 end; 
 /
 
-
-
+BEGIN
+  EXECUTE IMMEDIATE 'alter table OW_BATCH_PHOTO add KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')';
+EXCEPTION
+  WHEN OTHERS THEN
+    IF SQLCODE = -01430 THEN
+      NULL;
+    ELSE
+      RAISE;
+    END IF; 
+END;
+/
 
 PROMPT *** ALTER_POLICIES to OW_BATCH_PHOTO ***
  exec bpa.alter_policies('OW_BATCH_PHOTO');

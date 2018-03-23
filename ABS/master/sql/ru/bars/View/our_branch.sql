@@ -14,7 +14,7 @@ PROMPT *** Create  view OUR_BRANCH ***
           "DESCRIPTION",
 		  "DATE_CLOSED"
      FROM BRANCH
-    WHERE BRANCH LIKE SYS_CONTEXT ('bars_context', 'user_branch_mask');
+    WHERE BRANCH LIKE SYS_CONTEXT ('bars_context', 'user_branch_mask') and length(branch)>15;
 
 PROMPT *** Create  grants  OUR_BRANCH ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on OUR_BRANCH      to ABS_ADMIN;

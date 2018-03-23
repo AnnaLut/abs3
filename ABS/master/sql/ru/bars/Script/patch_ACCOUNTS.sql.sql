@@ -4,17 +4,6 @@
 -- ================================== <Comments> ==================================
 -- create constraints
 -- ================================================================================
-
-SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
-SET FEEDBACK     OFF
-SET DEFINE       OFF
-SET LINES        300
-SET PAGES        500
-SET TERMOUT      ON
-SET TIMING       OFF
-SET TRIMSPOOL    ON
-set verify       off
-
 declare
   E_CNSTRN_NOT_EXISTS     exception;
   pragma exception_init( E_CNSTRN_NOT_EXISTS, -02443 );

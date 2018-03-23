@@ -2,12 +2,6 @@
 -- c 01.01.2018
 -- параметр K072 на 01.01.2018 2-х значный 
 
-SET LINES 1000
-SET TRIMSPOOL ON
-SET SERVEROUTPUT ON SIZE 1000000
-SET FEED OFF
-
-spool c:\upd_specparam_15012018.txt
 
 exec bc.home;  
 
@@ -119,6 +113,3 @@ begin
 
 end;
 /
-
-
-spool off;

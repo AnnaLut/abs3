@@ -320,6 +320,7 @@ grant SELECT                                                                 on 
 grant SELECT                                                                 on CUSTOMER_ADDRESS to BARSUPL;
 grant DELETE,SELECT,UPDATE                                                   on CUSTOMER_ADDRESS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUSTOMER_ADDRESS to BARS_DM;
+grant SELECT                                                                 on CUSTOMER_ADDRESS to FINMON;
 grant SELECT                                                                 on CUSTOMER_ADDRESS to BARS_SUP;
 grant SELECT                                                                 on CUSTOMER_ADDRESS to CUST001;
 grant SELECT                                                                 on CUSTOMER_ADDRESS to RPBN001;
@@ -331,7 +332,7 @@ grant DELETE,SELECT                                                          on 
 
 PROMPT *** Create SYNONYM  to CUSTOMER_ADDRESS ***
 
-  CREATE OR REPLACE SYNONYM BARSDWH_ACCESS_USER.CUSTOMER_ADDRESS FOR BARS.CUSTOMER_ADDRESS;
+--  CREATE OR REPLACE SYNONYM BARSDWH_ACCESS_USER.CUSTOMER_ADDRESS FOR BARS.CUSTOMER_ADDRESS;
 
 
 PROMPT ===================================================================================== 

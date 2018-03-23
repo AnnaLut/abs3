@@ -5,16 +5,6 @@
 -- ======================================================================================
 -- modify table DPT_FILE_ROW
 -- ======================================================
-
-SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
-SET FEEDBACK     OFF
-SET TIMING       OFF
-SET DEFINE       OFF
-SET LINES        500
-SET PAGES        500
-SET TERMOUT      ON
-SET TRIMSPOOL    ON
-
 prompt -- ======================================================
 prompt --  modify table DPT_FILE_ROW
 prompt -- ======================================================
@@ -31,7 +21,7 @@ exception
 end;
 /
 
-SET FEEDBACK ON
+
 
 comment on column DPT_FILE_ROW.KF is 'Код фiлiалу (МФО)';
 
@@ -41,7 +31,7 @@ update DPT_FILE_ROW
 
 commit;
 
-SET FEEDBACK OFF
+
 
 declare
   e_already_nn  exception;
@@ -68,11 +58,11 @@ exception
 end;
 /
 
-SET FEEDBACK ON
+
 
 comment on column DPT_FILE_ROW.ERR_MSG is 'Повідомлення про помилку';
 
-SET FEEDBACK OFF
+
 
 prompt -- ======================================================
 prompt -- Indexes
@@ -105,7 +95,7 @@ exception
 end;
 /
 
-SET FEEDBACK ON
+
 
 prompt -- ======================================================
 prompt -- Policies

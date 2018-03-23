@@ -27,13 +27,14 @@
     eng_first       varchar2(30),
     eng_last        varchar2(30)
     );
-
+  
   procedure rebranch_file_processing(p_filename in varchar2,
                                      p_filebody in blob,
                                      p_fileid   out number,
                                      p_msg      out varchar2);
 
   procedure get_nd(p_rnk in number);
+  function get_filefromzip(p_zipped_blob blob) return blob;
 
   procedure acc_req_file_processing;
 
@@ -57,13 +58,14 @@
   -- процедура установки спецпараметров счетов
   --
   procedure set_sparam (p_mode varchar2, p_acc number);
-end;
+end;  
 /
-CREATE OR REPLACE PACKAGE BODY BARS.OW_UTL is
+CREATE OR REPLACE PACKAGE BODY ow_utl is
 
   type t_rebranch is table of ow_rebranch_data%rowtype index by pls_integer;
   type t_accreq is table of w4_acc_request%rowtype index by pls_integer;
-  g_modcode         constant varchar2(3)   := 'BPK';
+  g_modcode         constant varchar2(3)   := 'BPK';  
+  c_END_OF_CENTRAL_DIRECTORY constant raw(4) := hextoraw( '504B0506' ); -- End of central directory signature for zip
 
   procedure parse_rebranch_file(p_fileid   in number,
                                 p_filebody in clob) is
@@ -132,8 +134,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.OW_UTL is
     l_acc_list number_list;
     l_nd       w4_acc.nd%type;
   begin
-    select t.*
-      bulk collect
+    select t.* bulk collect
       into l_lines
       from ow_rebranch_data t
      where t.fileid = p_fileid and t.state = 0;
@@ -141,6 +142,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.OW_UTL is
       for i in l_lines.first .. l_lines.last
       loop
         begin
+          savepoint befor_upd;
           select nd
             into l_nd
             from w4_acc w
@@ -148,8 +150,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.OW_UTL is
               on w.acc_pk = a.acc and a.nls = l_lines(i).nls and
                  a.rnk = l_lines(i).rnk;
 
-          select atr_vallue
-            bulk collect
+          select atr_vallue bulk collect
             into l_acc_list
             from w4_acc unpivot(atr_vallue for attribute_name in(acc_2207,
                                                                   acc_2208,
@@ -166,7 +167,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.OW_UTL is
                                                                   acc_pk))
            where nd = l_nd;
 
-          savepoint befor_upd;
           upd_branch(l_acc_list, l_lines(i).branch);
 
           -- формуємо заявку в СМ на зміну бранча
@@ -212,8 +212,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.OW_UTL is
                                      p_filebody in blob,
                                      p_fileid   out number,
                                      p_msg      out varchar2) is
+    l_filename     varchar2(100);
     l_filetype     varchar2(8) := 'REBRANCH';
     l_id           number := null;
+    i              number;
     l_blob         blob;
     l_clob         clob;
     l_warning      integer;
@@ -241,7 +243,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.OW_UTL is
 
     bars_audit.info(h || 'File converted to clob');
 
-    l_id := s_owfiles.nextval;
+    l_id := bars_sqnc.get_nextval('S_OWFILES');
 
     insert into ow_files
       (id, file_type, file_name, file_body, file_status, origin)
@@ -263,25 +265,127 @@ CREATE OR REPLACE PACKAGE BODY BARS.OW_UTL is
        where id = p_fileid;
 
   end;
-  procedure get_nd(p_rnk in number) is
+   procedure get_nd(p_rnk in number)
+     is
 
   begin
    for z in (select w.nd
-             from w4_acc w, accounts a
-                       where w.acc_pk = a.acc and w.dat_close is null and
-                             a.dazs is null and rnk = p_rnk)
+     from w4_acc w, accounts a
+     where
+        w.acc_pk = a.acc
+       and W.DAT_CLOSE is null
+       and a.dazs is null
+       and rnk =p_rnk)
      loop
      begin
         bars.bars_ow.add_deal_to_cmque(z.nd,3);
-      exception
-        when others then
+     exception when OTHERS then
         bars_audit.info('Помилка при відправці № дог=' || to_char(z.nd));
      end;
      end loop;
 
    end;
-
-  procedure bulk_insert_accreq(l_rec in t_accreq) is
+  function little_endian( p_big number, p_bytes pls_integer := 4 )
+  return raw
+  is
+    t_big number := p_big;
+  begin
+    if t_big > 2147483647
+    then
+      t_big := t_big - 4294967296;
+    end if;
+    return utl_raw.substr( utl_raw.cast_from_binary_integer( t_big, utl_raw.little_endian ), 1, p_bytes );
+  end;
+     
+  function blob2num(p_blob blob,
+                    p_len  integer,
+                    p_pos  integer) return number is
+    rv number;
+  begin
+    rv := utl_raw.cast_to_binary_integer(dbms_lob.substr(p_blob,
+                                                         p_len,
+                                                         p_pos),
+                                         utl_raw.little_endian);
+    if rv < 0 then
+      rv := rv + 4294967296;
+    end if;
+    return rv;
+  end;
+  function get_filefromzip(p_zipped_blob blob) return blob is
+    t_tmp      blob;
+    t_ind      integer;
+    t_hd_ind   integer;
+    t_fl_ind   integer;
+    t_len      integer;
+  begin
+    t_ind := nvl(dbms_lob.getlength(p_zipped_blob), 0) - 21;
+    loop
+      exit when t_ind < 1 or dbms_lob.substr(p_zipped_blob, 4, t_ind) = c_end_of_central_directory;
+      t_ind := t_ind - 1;
+    end loop;
+    --
+    if t_ind <= 0 then
+      return null;
+    end if;
+    --
+    t_hd_ind := blob2num(p_zipped_blob, 4, t_ind + 16) + 1;
+    for i in 1 .. blob2num(p_zipped_blob, 2, t_ind + 8)
+    loop
+        t_len := blob2num(p_zipped_blob, 4, t_hd_ind + 24); -- uncompressed length
+        if t_len = 0 then
+            -- empty file
+            return empty_blob();
+        end if;
+        --
+        if dbms_lob.substr(p_zipped_blob, 2, t_hd_ind + 10) in
+           (hextoraw('0800') -- deflate
+           ,
+            hextoraw('0900') -- deflate64
+            ) then
+          t_fl_ind := blob2num(p_zipped_blob, 4, t_hd_ind + 42);
+          t_tmp    := hextoraw('1F8B0800000000000003'); -- gzip header
+          dbms_lob.copy(t_tmp,
+                        p_zipped_blob,
+                        blob2num(p_zipped_blob, 4, t_hd_ind + 20),
+                        11,
+                        t_fl_ind + 31 +
+                        blob2num(p_zipped_blob, 2, t_fl_ind + 27) -- File name length
+                        + blob2num(p_zipped_blob, 2, t_fl_ind + 29) -- Extra field length
+                        );
+          dbms_lob.append(t_tmp,
+                          utl_raw.concat(dbms_lob.substr(p_zipped_blob,
+                                                         4,
+                                                         t_hd_ind + 16) -- CRC32
+                                        ,
+                                         little_endian(t_len) -- uncompressed length
+                                         ));
+          return utl_compress.lz_uncompress(t_tmp);
+        end if;
+        --
+        if dbms_lob.substr(p_zipped_blob, 2, t_hd_ind + 10) =
+           hextoraw('0000') -- The file is stored (no compression)
+         then
+          t_fl_ind := blob2num(p_zipped_blob, 4, t_hd_ind + 42);
+          dbms_lob.createtemporary(t_tmp, true);
+          dbms_lob.copy(t_tmp,
+                        p_zipped_blob,
+                        t_len,
+                        1,
+                        t_fl_ind + 31 +
+                        blob2num(p_zipped_blob, 2, t_fl_ind + 27) -- File name length
+                        + blob2num(p_zipped_blob, 2, t_fl_ind + 29) -- Extra field length
+                        );
+          return t_tmp;
+        end if;
+      t_hd_ind := t_hd_ind + 46 + blob2num(p_zipped_blob, 2, t_hd_ind + 28) -- File name length
+                  + blob2num(p_zipped_blob, 2, t_hd_ind + 30) -- Extra field length
+                  + blob2num(p_zipped_blob, 2, t_hd_ind + 32); -- File comment length
+    end loop;
+    --
+    return null;
+  end;
+  
+    procedure bulk_insert_accreq(l_rec in t_accreq) is
   begin
     forall j in l_rec.first .. l_rec.last
       insert into w4_acc_request values l_rec (j);
@@ -958,16 +1062,17 @@ CREATE OR REPLACE PACKAGE BODY BARS.OW_UTL is
   begin
 
     bars_audit.info(h || 'Start.');
-    for c_req in (select t.id, t.external_file_id, t.request_data
+    for c_req in (select t.id, t.external_file_id, t.request_data, t.kf
                     from barstrans.transport_unit t
                    where t.unit_type_id = l_unit_type_id and
                          t.state_id in
                          (barstrans.transport_utl.trans_state_new,
                           barstrans.transport_utl.trans_state_failed) and
-                         t.failures_count <= barstrans.transport_utl.marginal_tries_count
+                         t.failures_count < barstrans.transport_utl.marginal_tries_count
                    order by 1 desc)
     loop
       begin
+        bc.go(c_req.kf);
         l_dest_offset := 1;
         l_src_offset  := 1;
         bars_audit.info(h || 'File(id=' || c_req.id || ') is processed');

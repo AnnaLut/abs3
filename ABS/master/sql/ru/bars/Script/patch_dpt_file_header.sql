@@ -10,14 +10,6 @@
 -- drop trigger TI_HEADER
 -- ======================================================================================
 
-SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
-SET FEEDBACK     OFF
-SET TIMING       OFF
-SET DEFINE       OFF
-SET LINES        500
-SET PAGES        500
-SET TERMOUT      ON
-SET TRIMSPOOL    ON
 
 prompt -- ======================================================
 prompt --  modify table DPT_FILE_HEADER
@@ -45,7 +37,7 @@ update DPT_FILE_HEADER
 
 commit;
 
-SET FEEDBACK OFF
+
 
 declare
   e_already_nn           exception;
@@ -203,7 +195,7 @@ select distinct fh.AGENCY_TYPE, fh.AGENCY_TYPE
 
 commit;
 
-SET FEEDBACK OFF
+
 
 declare
   e_ref_cnstrn_exists    exception;

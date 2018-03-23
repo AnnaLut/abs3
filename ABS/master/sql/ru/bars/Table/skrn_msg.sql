@@ -1,4 +1,4 @@
-
+﻿
 
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/skrn_msg.sql =========*** Run *** =====
@@ -11,7 +11,6 @@ PROMPT *** ALTER_POLICY_INFO to skrn_msg ***
 BEGIN 
         execute immediate  
           'begin  
-               bpa.alter_policy_info(''skrn_msg'', ''CENTER'' , null, null, null, null);
                bpa.alter_policy_info(''skrn_msg'', ''FILIAL'' , null, null, null, null);
                bpa.alter_policy_info(''skrn_msg'', ''WHOLE'' , null, null, null, null);
                null;
@@ -76,8 +75,8 @@ end;
 
 PROMPT *** Create  grants  skrn_msg ***
 
-grant select on skrn_msg to BARS_ACCESS_DEFROLE;
-
+grant select, insert, update, delete on skrn_msg to BARS_ACCESS_DEFROLE;
+grant select on skrn_msg to BARS_DM;
 
 
 

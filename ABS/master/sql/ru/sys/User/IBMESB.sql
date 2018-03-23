@@ -6,14 +6,6 @@
 -- create user IBMESB
 -- ======================================================================================
 
-SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
-SET DEFINE       ON
-SET ECHO         OFF
-SET LINES        500
-SET PAGES        500
-SET TIMING       OFF
-SET VERIFY       OFF
-SET FEEDBACK     OFF
 
 prompt -- ======================================================
 prompt -- create user IBMESB
@@ -23,7 +15,7 @@ declare
   e_usr_exists           exception;
   pragma exception_init( e_usr_exists, -01920 );
 begin
-  execute immediate 'create user IBMESB identified by &usr_pswd';
+  execute immediate 'create user IBMESB identified by IBMESB';
   dbms_output.put_line('User created.');
 exception
   when e_usr_exists
@@ -31,7 +23,7 @@ exception
 end;
 /
 
-SET FEEDBACK ON
+
 
 grant create session to IBMESB;
 

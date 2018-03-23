@@ -32,15 +32,18 @@ PROMPT *** Create  view V_EAD_DOCS ***
        ead_struct_codes sc,
        customer         c,
        dpt_deposit      d
- where ed.type_id = 'DOC'
+ where 1=1
+   and (ed.type_id = 'DOC' or ed.type_id = 'SCAN' and ed.ea_struct_id in ('146', '221','224'))
    and ed.crt_staff_id = sb.id
    and ed.crt_branch = b.branch
-   and ed.template_id = ds.id
+   and ed.template_id = ds.id(+)
    and ed.ea_struct_id = sc.id
    and ed.rnk = c.rnk
-   and ed.agr_id = d.deposit_id(+);
+   and ed.agr_id = d.deposit_id(+)
+;
 
 PROMPT *** Create  grants  V_EAD_DOCS ***
+
 grant SELECT                                                                 on V_EAD_DOCS      to BARS_ACCESS_DEFROLE;
 
 

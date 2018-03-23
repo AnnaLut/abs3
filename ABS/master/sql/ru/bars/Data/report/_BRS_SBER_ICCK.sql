@@ -128,7 +128,7 @@ order by e.branch, i.branch, i.nd';
     l_rep.idf := l_repfolder;    
 
     -- Фиксированный № печатного отчета   
-    l_rep.id          := 495;
+    l_rep.id          := 5519;
 
 
     if l_isnew = 1 then                     
@@ -156,6 +156,40 @@ order by e.branch, i.branch, i.nd';
           where id=l_rep.id;                 
        end;                                  
     end if;                                  
+
+    begin
+       Insert into BARS.APP_REP
+               (CODEAPP, CODEREP, APPROVE, GRANTOR)
+       Values
+               ('ICCK', l_rep.id, 1, 1);
+          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' добавлен в АРМ Інвентаризацiя Кредитних Справ в сховищi';
+    exception when dup_val_on_index
+          then 
+          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' существует в АРМ Інвентаризацiя Кредитних Справ в сховищi';
+    end;
+
+    begin
+       Insert into BARS.APP_REP
+               (CODEAPP, CODEREP, APPROVE, GRANTOR)
+       Values
+               ('WIKD', l_rep.id, 1, 1);
+          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' добавлен в АРМ Інвентаризацiя кредитних справ в сховищi(WEB)';
+    exception when dup_val_on_index
+          then 
+          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' существует в АРМ Інвентаризацiя кредитних справ в сховищi(WEB)';
+    end;
+
+    begin
+       Insert into BARS.APP_REP
+               (CODEAPP, CODEREP, APPROVE, GRANTOR)
+       Values
+               ('DRU1', l_rep.id, 1, 1);
+          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' добавлен в АРМ Друк звітів';
+    exception when dup_val_on_index
+          then 
+          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' существует в АРМ Друк звітів';
+    end;
+
     bars_report.print_message(l_message);   
 end;                                        
 /                                           

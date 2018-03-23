@@ -1,5 +1,4 @@
 
- 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/safe_deposit.sql =========*** Run **
  PROMPT ===================================================================================== 
@@ -142,7 +141,7 @@ create or replace package safe_deposit is
 end safe_deposit;
 /
 create or replace package body safe_deposit is
-  g_body_version  constant varchar2(64) := 'version 3.8 12/09/2017';
+  g_body_version  constant varchar2(64) := 'version 3.9 02/10/2017';
   g_awk_body_defs constant varchar2(512) := '' || 'OBU' || chr(10);
   /*-------------------------------------------------------------------------------------------------------------------------------------*/
   /*  Назва : safe_deposit
@@ -648,7 +647,7 @@ create or replace package body safe_deposit is
            nvl(c.adr, ' '),
            nvl(p.bplace, ' '),
            nvl(to_char(p.bday, 'DD/MM/YYYY'), '01/01/0001'),
-           nvl(w.value, p.cellphone) cellphone
+           nvl(f_get_cust_tel(c.rnk), ' ')
       into p_nmk,
            p_custtype,
            p_okpo,
@@ -660,11 +659,9 @@ create or replace package body safe_deposit is
            p_birthplace,
            p_birthday,
            p_tel
-      from customer c, person p, customerw w
+      from customer c, person p
      where c.rnk = p_rnk
-       and p.rnk(+) = c.rnk
-       and p.rnk = w.rnk
-       and lower(w.tag) = 'mpno';
+       and p.rnk(+) = c.rnk;
   end getcustomer;
 
   /*-------------------------------------------------------------------------------------------------------------------------------------*/
@@ -1145,9 +1142,10 @@ create or replace package body safe_deposit is
                   and p.rnk = w.rnk
                   and lower(w.tag) = 'mpno')
              when 2 then
-              (select nvl(coalesce(r.telr, r.telb), ' ')
-                 from corps r
-                where r.rnk = c.rnk)
+              (select nvl(w.value, ' ')
+                 from customerw w
+                where w.rnk = c.rnk
+                  and lower(w.tag) = 'mpno')
              else
               null
            end as tel
@@ -1193,3 +1191,4 @@ grant EXECUTE                                                                on 
  PROMPT ===================================================================================== 
  PROMPT *** End *** ========== Scripts /Sql/BARS/package/safe_deposit.sql =========*** End **
  PROMPT ===================================================================================== 
+
