@@ -32,7 +32,7 @@ begin
 	FILE_N NUMBER(22,0), 
 	FILE_TYPE NUMBER, 
 	STATE NUMBER, 
-	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
+	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')	
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -43,6 +43,17 @@ end;
 /
 
 
+BEGIN
+  EXECUTE IMMEDIATE 'alter table OW_BATCH_FILES add external_file_id VARCHAR2(300 CHAR)';
+EXCEPTION
+  WHEN OTHERS THEN
+    IF SQLCODE = -01430 THEN
+      NULL;
+    ELSE
+      RAISE;
+    END IF; 
+END;
+/
 
 
 PROMPT *** ALTER_POLICIES to OW_BATCH_FILES ***

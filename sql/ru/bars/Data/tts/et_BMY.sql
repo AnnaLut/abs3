@@ -890,12 +890,12 @@ begin
   
     begin
     insert into tts_vob(vob, tt, ord)
-    values (406, 'BMY', null);
+    values (177, 'BMY', null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (tts_vob: 406, ''BMY'', null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (tts_vob: 177, ''BMY'', null) - первичный ключ не найден!');
       else raise;
       end if;
   end;

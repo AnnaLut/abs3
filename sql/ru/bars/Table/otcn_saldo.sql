@@ -1,8 +1,3 @@
-SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
-SET ECHO         OFF
-SET LINES        500
-SET PAGES        500
-SET FEEDBACK     OFF
 
 prompt -- ======================================================
 prompt -- create table OTCN_SALDO
@@ -166,7 +161,7 @@ prompt -- ======================================================
 prompt -- Grants
 prompt -- ======================================================
 
-grant SELECT                      on OTCN_SALDO to BARSREADER_ROLE;
+
 grant DELETE,INSERT,SELECT,UPDATE on OTCN_SALDO to BARS_ACCESS_DEFROLE;
 grant SELECT                      on OTCN_SALDO to RPBN001;
 grant DELETE,INSERT,SELECT,UPDATE on OTCN_SALDO to RPBN002;

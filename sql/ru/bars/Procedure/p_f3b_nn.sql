@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE BARS.p_f3b_NN (Dat_ DATE, sheme_ varchar2 default 'G', pr_op_ Number default 1) IS
+  CREATE OR REPLACE PROCEDURE BARS.p_f3b_NN (Dat_ DATE, sheme_ varchar2 default 'G', pr_op_ Number default 1) IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Процедура формирования #3B для
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
@@ -405,3 +405,9 @@ BEGIN
 ------------------------------------------------------------------
 END p_f3b_NN;
 /
+
+CREATE OR REPLACE PUBLIC SYNONYM P_F3B_NN FOR BARS.P_F3B_NN;
+
+GRANT EXECUTE ON BARS.P_F3B_NN TO BARS_ACCESS_DEFROLE;
+
+GRANT EXECUTE ON BARS.P_F3B_NN TO RPBN002;

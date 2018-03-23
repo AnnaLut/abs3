@@ -827,8 +827,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.BARS_XMLKLB_IMP is
                            bars_error.raise_nerror(G_MODULE, 'CLOSE_PAYER_ACCOUNT', p_impdoc.nlsa, to_char(p_impdoc.kv));
                         end if;
             exception when no_data_found then
-              bars_error.raise_error(G_MODULE, 168, p_impdoc.nlsa||'('||p_impdoc.kv||')' );
-            end;
+            bars_error.raise_error(G_MODULE, 168, p_impdoc.nlsa||'('||p_impdoc.kv||')' );
+         end;
         end;
       else
          if p_impdoc.nlsa <> vkrzn(substr(p_impdoc.mfoa,1,5), p_impdoc.nlsa) then
@@ -918,8 +918,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.BARS_XMLKLB_IMP is
                            bars_error.raise_nerror(G_MODULE, 'CLOSE_PAYER_ACCOUNT', p_impdoc.nlsb, to_char(p_impdoc.kv));
                         end if;
             exception when no_data_found then 
-               bars_error.raise_error(G_MODULE, 169, p_impdoc.nlsb||'('||p_impdoc.kv2||')' );
-            end;
+            bars_error.raise_error(G_MODULE, 169, p_impdoc.nlsb||'('||p_impdoc.kv2||')' );
+         end;
          end;
       else
         if p_impdoc.nlsb <> vkrzn(substr(p_impdoc.mfob,1,5), p_impdoc.nlsb) then
@@ -2070,14 +2070,20 @@ CREATE OR REPLACE PACKAGE BODY BARS.BARS_XMLKLB_IMP is
    --
    procedure  clear_import_journals(p_date  date)   is
       l_trace   varchar2 (1000) := G_TRACE||'clear_imp_journals: ';
+	  l_date date;
    begin
-
-
-      bars_audit.info(l_trace||'Начало очистки журналов импорта по '||to_char(p_date,'dd/mm/yyyy') ||' (не вкючая)' );
+		
+	  if p_date >= dat_next_u(gl.bd, - 5) then
+	      bars_audit.info(l_trace||'Данные за последние 5 дней еще храним. Меняем дату '||to_char(p_date,'dd/mm/yyyy'));
+		  l_date := dat_next_u(gl.bd, - 5);
+	  else
+	      l_date := p_date;
+	  end if;
+      bars_audit.info(l_trace||'Начало очистки журналов импорта по '||to_char(l_date,'dd/mm/yyyy') ||' (не вкючая)' );
 
       for c in (select impref
                   from xml_impdocs
-                 where (status in (G_PAYED, G_DELETED) and dat < p_date)
+                 where (status in (G_PAYED, G_DELETED) and dat < l_date)
                     or dat < sysdate - 30
                ) loop
           delete from xml_impdocsw where impref = c.impref;
@@ -2093,7 +2099,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.BARS_XMLKLB_IMP is
                             and f.kf  = d.kf(+)
                        )
                  where impref is null
-                   and dat < p_date
+                   and dat < l_date
                ) loop
            delete from xml_impfiles where fn = c.fn and  dat = c.dat and  kf= c.kf;
       end loop;

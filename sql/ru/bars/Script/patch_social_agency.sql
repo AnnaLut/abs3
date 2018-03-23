@@ -31,7 +31,7 @@ using ( select TYPE_ID, BRANCH
 
 commit;
 
-SET FEEDBACK OFF
+
 
 prompt -- ======================================================
 prompt -- Index

@@ -42,6 +42,6 @@ prompt -- ======================================================
 prompt -- Grants
 prompt -- ======================================================
 
-grant SELECT on V_CUSTOMER_GCIF to BARSREADER_ROLE;
+
 grant SELECT on V_CUSTOMER_GCIF to BARS_ACCESS_DEFROLE;
 grant SELECT on V_CUSTOMER_GCIF to UPLD;

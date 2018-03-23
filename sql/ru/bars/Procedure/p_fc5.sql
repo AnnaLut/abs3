@@ -1002,7 +1002,7 @@ BEGIN
                 s580a_ := '9';
              end if;
 
-             kodp_ := SUBSTR(p.kodp, 1,10) || '9' ||substr(p.kodp,12);
+             kodp_ := SUBSTR(p.kodp, 1,6) || '9' || SUBSTR(p.kodp, 8,3) || s580a_||substr(p.kodp,12);
              znap_ := TO_CHAR (sz0_);
 
              INSERT INTO RNBU_TRACE(recid, userid, nls, kv, odate, kodp, znap, rnk, acc, comm, nbuc, isp, tobo, nd)
@@ -1576,7 +1576,7 @@ BEGIN
        for k in (select nvl(a.nbuc, b.nbuc) nbuc, nvl(a.t020, b.t020) t020,
                         nvl(a.nbs, b.nbs) nbs, nvl(a.kv, b.kv) kv,  nvl(a.rez, b.rez) rez,
                         a.ostq ost1, b.ostq ost2, nvl(a.ostq, 0) - nvl(b.ostq, 0) rizn,
-                        R011_R013
+                        R013_s580, R013_s580_A
                 from (select nbuc, t020, rez, nbs, kv,
                             ostq +
                             (case when nbs not like '9%'
@@ -1613,7 +1613,8 @@ BEGIN
                             substr(r.kodp, 1, 1) t020, 2-MOD(c.codcagent,2) rez,
                             substr(r.kodp, 2, 4) nbs, r.kv,
                             sum(to_number(r.znap)) ostq,
-                            min('1'||substr(kodp, 6, 2)) R011_R013
+                            min('1'||substr(kodp, 6, 2)) R013_s580,
+                            min('1'||substr(kodp, 6, 2)) R013_s580_A
                         from rnbu_trace r, customer c
                         where substr(r.kodp, 2, 4) in ('1410','1412','1415','1416','1417','1418',
                                       '1490','1491','1492','1493','1590','1592','1890',
@@ -1629,48 +1630,96 @@ BEGIN
                 order by 1, 2 )
        loop
           begin
-             begin
-               select /*+ leading(r) */ r.recid
-               into recid_
-               from rnbu_trace r, customer c
-               where r.nbuc = k.nbuc and
-                     r.kodp like k.t020||k.nbs||k.R011_R013||lpad(k.kv,3,'0')||'%' and
-                    (sign(k.rizn) = -1 and to_number(r.znap) >= abs(k.rizn) or
-                     sign(k.rizn) = 1 and to_number(r.znap) > 0) and
-                     r.rnk = c.rnk and
-                     2-MOD(c.codcagent,2) = k.rez and
-                    rownum = 1;
-             exception
-                when no_data_found then
-                   begin
-                       select /*+ leading(r) */ r.recid
-                       into recid_
-                       from rnbu_trace r, customer c
-                       where r.nbuc = k.nbuc and
-                             r.kodp like k.t020||k.nbs||'__'||lpad(k.kv, 3, '0')||'%' and
-                            (sign(k.rizn) = -1 and to_number(r.znap) >= abs(k.rizn) or
-                             sign(k.rizn) = 1 and to_number(r.znap) > 0) and
-                            r.rnk = c.rnk and
-                            2-MOD(c.codcagent,2) = k.rez and
-                            rownum = 1;
-                   exception
-                        when no_data_found then
-                          begin
-                               select /*+ leading(r) */ r.recid
+             if k.nbs not in ('2400','2401') then
+                begin
+                   select r.recid
+                   into recid_
+                   from rnbu_trace r, customer c
+                   where r.nbuc = k.nbuc and
+                         r.kodp like k.t020||k.nbs||'__'||lpad(k.kv,3,'0')||'%' and
+                         substr(kodp,6,2) = substr(k.R013_s580,2,2) and
+                        (sign(k.rizn) = -1 and to_number(r.znap) >= abs(k.rizn) or
+                         sign(k.rizn) = 1 and to_number(r.znap) > 0) and
+                         r.rnk = c.rnk and
+                         2-MOD(c.codcagent,2) = k.rez and
+                        rownum = 1;
+                exception
+                    when no_data_found then
+                       begin
+                           select r.recid
+                           into recid_
+                           from rnbu_trace r, customer c
+                           where r.nbuc = k.nbuc and
+                                 r.kodp like k.t020||k.nbs||'__'||lpad(k.kv, 3, '0')||'%' and
+                                 substr(kodp, 6, 2) = substr(k.R013_s580_A,2,2) and
+                                (sign(k.rizn) = -1 and to_number(r.znap) >= abs(k.rizn) or
+                                 sign(k.rizn) = 1 and to_number(r.znap) > 0) and
+                                r.rnk = c.rnk and
+                                2-MOD(c.codcagent,2) = k.rez and
+                                rownum = 1;
+                       exception
+                            when no_data_found then
+                              begin
+                                   select r.recid
+                                   into recid_
+                                   from rnbu_trace r, customer c
+                                   where r.nbuc = k.nbuc and
+                                         r.kodp like k.t020||k.nbs||'__'||lpad(k.kv, 3, '0')||'%' and
+                                         substr(kodp, 6, 2) = substr(k.R013_s580,2,2) and
+                                        (sign(k.rizn) = -1 and to_number(r.znap) >= abs(k.rizn) or
+                                         sign(k.rizn) = 1 and to_number(r.znap) > 0) and
+                                         r.rnk = c.rnk and
+                                         2-MOD(c.codcagent,2) = k.rez and
+                                         rownum = 1;
+                              exception
+                                 when no_data_found then
+                                   recid_ := null;
+                              end;
+                       end;
+                end;
+             else
+                begin
+                   select r.recid
+                   into recid_
+                   from rnbu_trace r, customer c
+                   where r.nbuc = k.nbuc and
+                         r.kodp like k.t020||k.nbs||'_2'||lpad(k.kv, 3, '0')||'%' and
+                         substr(kodp, 6, 2) = substr(k.R013_s580,2,2) and
+                        (sign(k.rizn) = -1 and to_number(r.znap) >= abs(k.rizn) or
+                         sign(k.rizn) = 1 and to_number(r.znap) > 0) and
+                         r.rnk = c.rnk and
+                         2-MOD(c.codcagent,2) = k.rez and
+                         rownum = 1;
+                exception
+                   when no_data_found then
+                       begin
+                           select r.recid
+                           into recid_
+                           from rnbu_trace r, customer c
+                           where r.nbuc = k.nbuc and
+                                 substr(kodp, 6,2) = substr(k.R013_s580,2,2) and
+                                 r.kodp like k.t020||k.nbs||'_3'||lpad(k.kv, 3, '0')||'%' and
+                                (sign(k.rizn) = -1 and to_number(r.znap) >= abs(k.rizn) or
+                                 sign(k.rizn) = 1 and to_number(r.znap) > 0) and
+                                 r.rnk = c.rnk and
+                                 2-MOD(c.codcagent,2) = k.rez and
+                                rownum = 1;
+                       exception
+                            when no_data_found then
+                               select r.recid
                                into recid_
                                from rnbu_trace r, customer c
                                where r.nbuc = k.nbuc and
                                      r.kodp like k.t020||k.nbs||'__'||lpad(k.kv, 3, '0')||'%' and
+                                     substr(kodp, 6, 2) = substr(k.R013_s580_A,2,2) and
                                     (sign(k.rizn) = -1 and to_number(r.znap) >= abs(k.rizn) or
                                      sign(k.rizn) = 1 and to_number(r.znap) > 0) and
                                      r.rnk = c.rnk and
-                                     rownum = 1;
-                          exception
-                             when no_data_found then
-                               recid_ := null;
-                          end;
-                   end;
-             end;
+                                     2-MOD(c.codcagent,2) = k.rez and
+                                    rownum = 1;
+                       end;
+                end;
+             end if;
           exception
              when no_data_found then
                   recid_ := null;

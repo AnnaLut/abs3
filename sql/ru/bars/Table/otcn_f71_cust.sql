@@ -11,11 +11,14 @@ PROMPT *** ALTER_POLICY_INFO to OTCN_F71_CUST ***
 BEGIN 
         execute immediate  
           'begin  
+               bpa.alter_policy_info(''OTCN_F71_CUST'', ''FILIAL'' , null, null, null, null);
+               bpa.alter_policy_info(''OTCN_F71_CUST'', ''WHOLE'' , null, null, null, null);
                null;
            end; 
           '; 
 END; 
 /
+
 
 PROMPT *** Create  table OTCN_F71_CUST ***
 begin 

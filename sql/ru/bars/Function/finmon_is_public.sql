@@ -17,10 +17,11 @@ BEGIN
   if p_rnk is not null
   then
       begin
-       select nmk
-         into l_name
-         from customer
-        where rnk = p_rnk;
+          select nmk
+          into l_name
+          from customer
+          where rnk = p_rnk;
+          l_name := replace(replace(replace(replace(replace(replace(replace(replace(l_name,'/',''),'\',''),'*',''),'~',''),'!',''),'&',''),'?',''),' ','');
       exception when no_data_found then l_name := null;
       end;
   else

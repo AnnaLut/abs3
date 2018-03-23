@@ -67,7 +67,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.segmentation_pack IS
        SET package_status = g_parse_result.status
           ,package_error  = g_parse_result.description
      WHERE package_id = p_package_id;
-    COMMIT;
+    COMMIT WORK;
   END set_package_status;
 
   function udf_to_number(ps_numero string) return number is
@@ -91,8 +91,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.segmentation_pack IS
     l_nm          string(38);
     l_pt          string(38);
     l_rnk         customer.rnk%TYPE;
-    l_error_count NUMBER := 0;
-    l_tmp_cnt     NUMBER := 0;
+    l_error_count pls_integer := 0;
+    l_tmp_cnt     pls_integer := 0;
 --    l_bankdate    DATE;
     l_date_off    DATE;
   BEGIN
@@ -173,7 +173,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.segmentation_pack IS
             bars.attribute_utl.set_value(l_rnk,
                                          'CUSTOMER_SEGMENT_PRODUCTS_AMNT',
                                          udf_to_number(l_pt),
-                                         -- l_bankdate,
+--                                       l_bankdate,
                                          to_date(l_dwhlog_row.bank_date, 'DD.MM.YYYY'),
                                          cast(null as date));
           WHEN '1' THEN
@@ -276,15 +276,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.segmentation_pack IS
 
     bars.bars_audit.info('segmentation_pack.parse_capacity - LOOP ended. ');
 
-    IF (l_error_count > 0) THEN
-      g_parse_result.status := 'PARSED';
-      set_package_status(p_package_id);
-      --  ROLLBACK;
-    ELSE
-      g_parse_result.status      := 'PARSED';
-      g_parse_result.description := null;
-      set_package_status(p_package_id);
-    END IF;
+    g_parse_result.status      := 'PARSED';
+    set_package_status(p_package_id);
 
   END parse_capacity;
   /*
@@ -313,8 +306,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.segmentation_pack IS
     l_row    dbms_xmldom.domnode;
 
     l_rnk         customer.rnk%TYPE;
-    l_error_count NUMBER := 0;
-    l_tmp_cnt     NUMBER := 0;
+    l_error_count pls_integer := 0;
+    l_tmp_cnt     pls_integer := 0;
     --    l_bank_date   DATE;
     l_date_off DATE;
 
@@ -471,19 +464,13 @@ CREATE OR REPLACE PACKAGE BODY BARS.segmentation_pack IS
 
     bars.bars_audit.info('segmentation_pack.parse_segments - LOOP ended. ERRORS count: ' || to_char(l_error_count));
 
-    IF (l_error_count > 0) THEN
-      g_parse_result.status := 'PARSED';
-      set_package_status(p_package_id);
-      -- rollback;
-    ELSE
-      g_parse_result.status      := 'PARSED';
-      g_parse_result.description := null;
-      set_package_status(p_package_id);
-    END IF;
+    g_parse_result.status      := 'PARSED';
+    set_package_status(p_package_id);
+
   END parse_segments;
 
  PROCEDURE parse_bussegment(p_package_id IN NUMBER) IS
- 
+
     l_dwhlog_row dwh_log%rowtype;
 --    l_clob CLOB;
 
@@ -492,9 +479,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.segmentation_pack IS
     l_rows   dbms_xmldom.domnodelist;
     l_row    dbms_xmldom.domnode;
 
-    l_rnk         customer.rnk%TYPE;
-    l_error_count NUMBER := 0;
-    l_tmp_cnt     NUMBER := 0;
+    l_customerrow         customer%ROWTYPE;
+    l_error_count pls_integer := 0;
+    l_tmp_cnt     pls_integer := 0;
 
     l_dwh_rnk VARCHAR2(32767 BYTE);
     l_s1      VARCHAR2(32767 BYTE);
@@ -522,7 +509,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.segmentation_pack IS
     LOOP
 
       SAVEPOINT before_customer;
-    
+
       l_row := dbms_xmldom.item(l_rows, i);
 
       dbms_xslprocessor.valueof(l_row, 'rnk/text()', l_dwh_rnk);
@@ -535,17 +522,20 @@ CREATE OR REPLACE PACKAGE BODY BARS.segmentation_pack IS
 
 
        BEGIN
-        SELECT t1.rnk
-          INTO l_rnk
-          FROM customer t1
-         WHERE rnk = to_number(l_dwh_rnk)
-            and date_off is null
-        ;
-         
-          bars.kl.setCustomerElement(l_rnk,'BUSSL', l_s1, 0);
-        
-          bars.kl.setCustomerElement(l_rnk,'BUSSS', l_s2, 0);
- 
+        SELECT * INTO l_customerrow
+          FROM customer
+         WHERE rnk = to_number(l_dwh_rnk);
+
+        if l_customerrow.date_off is not null then
+          l_error_count := l_error_count + 1;
+          IF (length(nvl(g_parse_result.description, 0)) < 1950) THEN
+            g_parse_result.description := g_parse_result.description || 'RNK:' || to_char(l_dwh_rnk) || ' closed.';
+          end if;
+          continue;
+        end if; 
+
+        bars.kl.setCustomerElement(l_customerrow.rnk,'BUSSL', l_s1, 0);
+        bars.kl.setCustomerElement(l_customerrow.rnk,'BUSSS', l_s2, 0);
 
       EXCEPTION
 
@@ -553,20 +543,14 @@ CREATE OR REPLACE PACKAGE BODY BARS.segmentation_pack IS
           ROLLBACK TO before_customer;
           l_error_count := l_error_count + 1;
           IF (length(nvl(g_parse_result.description, 0)) < 1950) THEN
-            g_parse_result.description := g_parse_result.description ||
-                                          'RNK:' || to_char(l_dwh_rnk) ||
-                                          ' not found.';
+            g_parse_result.description := g_parse_result.description || 'RNK:' || to_char(l_dwh_rnk) || ' not found.';
           END IF;
         WHEN OTHERS THEN
-          bars_audit.error('segmentation_pack.parse_bussegment : ' ||
-                           l_error_count || ' : ' || lpad(l_rnk, 8) ||
-                           SQLERRM);
+          bars_audit.error('segmentation_pack.parse_bussegment : ' || l_error_count || ' : ' || lpad(l_customerrow.rnk, 8) || SQLERRM);
           ROLLBACK TO before_customer;
           l_error_count := l_error_count + 1;
           IF (length(nvl(g_parse_result.description, 0)) < 1950) THEN
-            g_parse_result.description := g_parse_result.description ||
-                                          'RNK:' || to_char(l_dwh_rnk) ||
-                                          ' others ERROR.';
+            g_parse_result.description := g_parse_result.description || 'RNK:' || to_char(l_dwh_rnk) || ' others ERROR.';
           END IF;
       END;
 
@@ -574,21 +558,13 @@ CREATE OR REPLACE PACKAGE BODY BARS.segmentation_pack IS
 
     END LOOP;
 
-    bars.bars_audit.info('SEGMENTATION_PACK: parse_bussegment - LOOP ended. ERRORS count: ' ||
-                         to_char(l_error_count));
+    bars.bars_audit.info('SEGMENTATION_PACK: parse_bussegment - LOOP ended. ERRORS count: ' || to_char(l_error_count));
 
-    IF (l_error_count > 0) THEN
-      g_parse_result.status := 'PARSED';
-      set_package_status(p_package_id);
-      -- rollback;
-    ELSE
-      g_parse_result.status      := 'PARSED';
---      g_parse_result.description := 'NO ERRORS';
-      set_package_status(p_package_id);
-    END IF;
- 
+    g_parse_result.status      := 'PARSED';
+    set_package_status(p_package_id);
+
  END parse_bussegment;
- /* Процедура на всякий случай вдруг когдато будет парсится Json из базы 
+ /* Процедура на всякий случай вдруг когдато будет парсится Json из базы
   PROCEDURE parse_bussegment(p_package_id IN NUMBER) IS
 
     l_clob   CLOB;
@@ -600,7 +576,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.segmentation_pack IS
     l_rnk         customer.rnk%TYPE;
     l_error_count NUMBER := 0;
     l_tmp_cnt     NUMBER := 0;
-    
+
   BEGIN
     bars.bars_audit.info('SEGMENTATION_PACK: parse_bussegment - start. package №' ||
                          to_char(p_package_id));
@@ -612,13 +588,13 @@ CREATE OR REPLACE PACKAGE BODY BARS.segmentation_pack IS
 
     bars.bars_audit.info('SEGMENTATION_PACK: parse_bussegment - CLOB selected');
 
- 
+
       l_list := json_list(l_clob);
       FOR i IN 1..l_list.count
       LOOP
-      
+
       SAVEPOINT before_customer;
-      
+
         l_dwh_rnk  := json_ext.get_string(json(l_list.get(i)),'rnk');
         l_BUSSL := json_ext.get_string(json(l_list.get(i)),'s1');
         l_BUSSS := json_ext.get_string(json(l_list.get(i)),'s2');
@@ -633,14 +609,14 @@ CREATE OR REPLACE PACKAGE BODY BARS.segmentation_pack IS
         ;
 
 
-        if l_BUSSL in ('1','2') then --Проверка на допустимое значение 
+        if l_BUSSL in ('1','2') then --Проверка на допустимое значение
           bars.kl.setCustomerElement(l_rnk,'BUSSL', l_BUSSL, 0);
         end if;
-        
+
         if l_BUSSL in ('11','12','21','22','23') then --Проверка на допустимое значение
           bars.kl.setCustomerElement(l_rnk,'BUSSS', l_BUSSS, 0);
         end if;
-        
+
       EXCEPTION
         WHEN no_data_found THEN
           l_error_count := l_error_count + 1;
@@ -660,7 +636,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.segmentation_pack IS
           END IF;
       END;
 
-      
+
     END LOOP;
 
     bars.bars_audit.info('SEGMENTATION_PACK: parse_bussegment - LOOP ended. ');
@@ -707,26 +683,26 @@ CREATE OR REPLACE PACKAGE BODY BARS.segmentation_pack IS
     l_doc := dbms_xmlparser.getdocument(l_parser);
     dbms_xmlparser.freeParser(l_parser);
 
-    l_row := dbms_xmldom.makeNode(l_doc); -- #document 
-    l_row := dbms_xmldom.getFirstChild(l_row); -- /packagedata 
-    l_row := dbms_xmldom.getFirstChild(l_row); -- /rw 
+    l_row := dbms_xmldom.makeNode(l_doc); -- #document
+    l_row := dbms_xmldom.getFirstChild(l_row); -- /packagedata
+    l_row := dbms_xmldom.getFirstChild(l_row); -- /rw
 
     while not dbms_xmldom.isNull(l_row) loop
-    
+
       l_row_child := dbms_xmldom.getFirstChild(l_row); -- /rnk
       l_dwh_rnk   := dbms_xmldom.getNodeValue(dbms_xmldom.getFirstChild(l_row_child));
       l_dwh_rnk   := bars_sqnc.rukey(l_dwh_rnk, l_dwhlog_row.kf);
-    
+
       l_row_child := dbms_xmldom.getNextSibling(l_row_child); -- /branch
       l_branch    := dbms_xmldom.getNodeValue(dbms_xmldom.getFirstChild(l_row_child));
-    
+
       BEGIN
         SELECT rnk, date_off
           INTO l_rnk, l_date_off
           FROM customer
          WHERE rnk = to_number(l_dwh_rnk)
            AND custtype = 3;
-      
+
         --дані по закритим клієнтам не зберігаємо.
         if l_date_off is not null then
           l_row := dbms_xmldom.getNextSibling(l_row);
@@ -734,29 +710,28 @@ CREATE OR REPLACE PACKAGE BODY BARS.segmentation_pack IS
         end if;
 
         bars.attribute_utl.set_value(l_rnk, 'CUSTOMER_SEGMENT_TVBV', l_branch, to_date(l_dwhlog_row.bank_date, 'DD.MM.YYYY'), cast(null as date));
-      
+
       EXCEPTION
         WHEN no_data_found THEN
           l_error_count := l_error_count + 1;
-        
+
           IF (length(nvl(g_parse_result.description, 0)) < 1950) THEN
             g_parse_result.description := g_parse_result.description || 'RNK:' || to_char(l_dwh_rnk) || ' not found.';
           END IF;
         WHEN OTHERS THEN
           l_error_count := l_error_count + 1;
-        
+
           IF (length(nvl(g_parse_result.description, 0)) < 1950) THEN
             g_parse_result.description := g_parse_result.description || 'RNK:' || to_char(l_dwh_rnk) || ':' || sqlerrm;
           END IF;
       END;
-    
+
       l_row := dbms_xmldom.getNextSibling(l_row);
     end loop;
 
     bars.bars_audit.info('segmentation_pack.parse_CustomerInfo - ERRORS count: ' || to_char(l_error_count));
 
     g_parse_result.status      := 'PARSED';
---    g_parse_result.description := tools.iif(l_error_count = 0, 'NO ERRORS', null);
     set_package_status(p_package_id);
 
     dbms_xmldom.freeDocument(l_doc);
@@ -774,6 +749,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.segmentation_pack IS
      WHERE package_id = p_package_id;
 
     dbms_output.put_line('parse start' || to_char(p_type));
+    g_parse_result.status      := 'PROCESSING';
+    g_parse_result.description := null;
+    set_package_status(p_package_id);
 
     CASE p_type
       WHEN 1 THEN

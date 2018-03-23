@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/xrm_ui_oe.sql =========*** Run *** =
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BARS.XRM_UI_OE 
+CREATE OR REPLACE PACKAGE XRM_UI_OE
 IS
    title              CONSTANT VARCHAR2 (19) := 'xrm_ui_oe:';
 
@@ -23,8 +23,8 @@ IS
                        p_Description   XRMSW_AUDIT.Description%type,
                        p_user_login    XRMSW_AUDIT.user_login%type);
 
-   procedure CheckTrasaction(p_TransactionId IN XRMSW_AUDIT.TransactionId%type, p_TransactionResult OUT number);
-
+  procedure CheckTrasaction(p_TransactionId IN XRMSW_AUDIT.TransactionId%type, p_TransactionResult OUT number, p_resp out blob);
+  procedure save_req(p_TransactionId IN XRMSW_AUDIT.TransactionId%type, p_req in blob, p_resp in blob);
    procedure xrm_customer_trans(p_TransactionId XRMSW_AUDIT.TransactionId%type,
                                 p_rnk           customer.rnk%type,
                                 p_STATUSCODE    number,
@@ -120,8 +120,8 @@ IS
            sendsms             IN VARCHAR2,
            orderid             IN NUMBER,
            StatusCode          IN NUMBER,
-           ErrorMessage        IN VARCHAR2);                
-           
+           ErrorMessage        IN VARCHAR2);
+
         PROCEDURE xrm_FreeSbon_trans (
            p_TransactionId     IN XRMSW_AUDIT.TransactionId%TYPE,
            payer_account_id    IN INTEGER,
@@ -143,6 +143,7 @@ IS
            ErrorMessage        IN VARCHAR2);
 
   PROCEDURE xrm_dkbo_trans (  TransactionId     IN VARCHAR2,
+                              ext_id            IN VARCHAR2,
                               Rnk               IN NUMBER,
                               DealNumber        IN deal.deal_number%TYPE,
                               acc_list          IN VARCHAR2,
@@ -152,13 +153,13 @@ IS
                               deal_id           IN Number,
                               start_date        IN date,
                               StatusCode        IN NUMBER,
-                              ErrorMessage      IN VARCHAR2);          
-                                  
+                              ErrorMessage      IN VARCHAR2);
+
 END;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.XRM_UI_OE 
+CREATE OR REPLACE PACKAGE BODY XRM_UI_OE
 IS
-  g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.08 18.05.2017';      
+  g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.08 18.05.2017';
 
    FUNCTION body_version
       RETURN VARCHAR2
@@ -195,7 +196,7 @@ IS
    commit;
   end;
 
-  procedure CheckTrasaction(p_TransactionId IN XRMSW_AUDIT.TransactionId%type, p_TransactionResult OUT number)
+  procedure CheckTrasaction(p_TransactionId IN XRMSW_AUDIT.TransactionId%type, p_TransactionResult OUT number, p_resp out blob)
   is
   l_exists int :=0;
   begin
@@ -211,10 +212,32 @@ IS
 
    if (l_exists != 0)
    then p_TransactionResult := -1;
+     begin
+       select t.resp
+         into p_resp
+         from XRMSW_QUERY_LOG t
+        where t.transactionid = p_TransactionId;
+     exception
+       when no_Data_found then
+         p_resp := null;
+     end;
    else p_TransactionResult := 0;
    end if;
 
    bars_audit.info(title || 'CheckTrasaction finished with TransactionResult=' || to_char(p_TransactionResult));
+  end;
+
+  procedure save_req(p_TransactionId IN XRMSW_AUDIT.TransactionId%type, p_req in blob, p_resp in blob)
+    
+  is
+  begin
+   bars_audit.info(title || 'save_req starts with TransactionId=' || to_char(p_TransactionId));    
+    insert into XRMSW_QUERY_LOG(TRANSACTIONID, REQ, RESP)
+    values(p_TransactionId, p_req, p_resp);
+   bars_audit.info(title || 'save_req finished with TransactionId=' || to_char(p_TransactionId));    
+  exception
+    when dup_val_on_index then
+       bars_audit.info(title || 'save_req already exists with TransactionId=' || to_char(p_TransactionId));
   end;
 
 
@@ -415,17 +438,17 @@ IS
                                   orderid              NUMBER,
                                   StatusCode           NUMBER,
                                   ErrorMessage         VARCHAR2)
-  is    
+  is
    pragma autonomous_transaction;
-  begin  
+  begin
    begin
      insert into XRMSW_FREESBON_TRANS(TRANSACTIONID, PAYER_ACCOUNT_ID, START_DATE, STOP_DATE, PAYMENT_FREQUENCY, HOLIDAY_SHIFT, PROVIDER_ID, REGULAR_AMOUNT, RECEIVER_MFO, RECEIVER_ACCOUNT, RECEIVER_NAME, RECEIVER_EDRPOU, PURPOSE, EXTRA_ATTRIBUTES, SENDSMS, ORDERID, STATUSCODE, ERRORMESSAGE)
-     values (p_TransactionId, PAYER_ACCOUNT_ID, START_DATE, STOP_DATE, PAYMENT_FREQUENCY, HOLIDAY_SHIFT, PROVIDER_ID, REGULAR_AMOUNT, RECEIVER_MFO, RECEIVER_ACCOUNT, RECEIVER_NAME, RECEIVER_EDRPOU, PURPOSE, EXTRA_ATTRIBUTES, SENDSMS, ORDERID, STATUSCODE, ERRORMESSAGE);   
+     values (p_TransactionId, PAYER_ACCOUNT_ID, START_DATE, STOP_DATE, PAYMENT_FREQUENCY, HOLIDAY_SHIFT, PROVIDER_ID, REGULAR_AMOUNT, RECEIVER_MFO, RECEIVER_ACCOUNT, RECEIVER_NAME, RECEIVER_EDRPOU, PURPOSE, EXTRA_ATTRIBUTES, SENDSMS, ORDERID, STATUSCODE, ERRORMESSAGE);
    exception when dup_val_on_index then bars_audit.error(title||'XRMSW_FREESBON_TRANS:p_TransactionId='||to_char(p_TransactionId)|| ' already exists!');
-   end;  
+   end;
    commit;
-   bars_audit.info(title|| 'XRMSW_FREESBON_TRANS finished');   
-  end;                                  
+   bars_audit.info(title|| 'XRMSW_FREESBON_TRANS finished');
+  end;
 
      PROCEDURE xrm_Sbon_trans (
                p_TransactionId     IN XRMSW_AUDIT.TransactionId%TYPE,
@@ -444,19 +467,20 @@ IS
                orderid             IN NUMBER,
                StatusCode          IN NUMBER,
                ErrorMessage        IN VARCHAR2)
-  is          
+  is
     pragma autonomous_transaction;
-  begin  
+  begin
    begin
      insert into XRMSW_SBON_TRANS(TRANSACTIONID, SBONTYPE, PAYER_ACCOUNT_ID, START_DATE, STOP_DATE, PAYMENT_FREQUENCY, HOLIDAY_SHIFT, PROVIDER_ID, PERSONAL_ACCOUNT, REGULAR_AMOUNT, CEILING_AMOUNT, EXTRA_ATTRIBUTES, SENDSMS, ORDER_ID, STATUSCODE, ERRORMESSAGE)
-     values (p_TransactionId, SBONTYPE, PAYER_ACCOUNT_ID, START_DATE, STOP_DATE, PAYMENT_FREQUENCY, HOLIDAY_SHIFT, PROVIDER_ID, PERSONAL_ACCOUNT, REGULAR_AMOUNT, CEILING_AMOUNT, EXTRA_ATTRIBUTES, SENDSMS, ORDERID, STATUSCODE, ERRORMESSAGE);         
-   exception when dup_val_on_index then bars_audit.error(title||'XRMSW_SBON_TRANS:p_TransactionId='||to_char(p_TransactionId)|| ' already exists!');   
-   end;  
+     values (p_TransactionId, SBONTYPE, PAYER_ACCOUNT_ID, START_DATE, STOP_DATE, PAYMENT_FREQUENCY, HOLIDAY_SHIFT, PROVIDER_ID, PERSONAL_ACCOUNT, REGULAR_AMOUNT, CEILING_AMOUNT, EXTRA_ATTRIBUTES, SENDSMS, ORDERID, STATUSCODE, ERRORMESSAGE);
+   exception when dup_val_on_index then bars_audit.error(title||'XRMSW_SBON_TRANS:p_TransactionId='||to_char(p_TransactionId)|| ' already exists!');
+   end;
    commit;
-   bars_audit.info(title|| 'XRMSW_SBON_TRANS finished');   
-  end;  
-  
+   bars_audit.info(title|| 'XRMSW_SBON_TRANS finished');
+  end;
+
   PROCEDURE xrm_dkbo_trans (  TransactionId     IN VARCHAR2,
+                              ext_id            IN VARCHAR2,
                               Rnk               IN NUMBER,
                               DealNumber        IN deal.deal_number%TYPE,
                               acc_list          IN VARCHAR2,
@@ -467,11 +491,11 @@ IS
                               start_date        IN date,
                               StatusCode        IN NUMBER,
                               ErrorMessage      IN VARCHAR2)
- is          
+ is
     pragma autonomous_transaction;
-  begin  
-   begin     
-    INSERT INTO XRMSW_DKBO_TRANS (TRANSACTIONID,
+  begin
+   begin
+    INSERT INTO XRMSW_DKBO_TRANS (TRANSACTIONID,                                  
                                   RNK,
                                   DEALNUMBER,
                                   ACC_LIST,
@@ -481,7 +505,8 @@ IS
                                   DEAL_ID,
                                   STARTDATE,
                                   STATUSCODE,
-                                  ERRORMESSAGE)
+                                  ERRORMESSAGE,
+                                  EXTERNAL_ID)
          VALUES (TransactionId,
                  Rnk,
                  DealNumber,
@@ -492,13 +517,14 @@ IS
                  DEAL_ID,
                  start_date,
                  STATUSCODE,
-                 ERRORMESSAGE);         
-   exception when dup_val_on_index then bars_audit.error(title||'XRMSW_DKBO_TRANS:TransactionId='||to_char(TransactionId)|| ' already exists!');   
-   end;  
+                 ERRORMESSAGE,
+                 ext_id);
+   exception when dup_val_on_index then bars_audit.error(title||'XRMSW_DKBO_TRANS:TransactionId='||to_char(TransactionId)|| ' already exists!');
+   end;
    commit;
-   bars_audit.info(title|| 'XRMSW_DKBO_TRANS finished');   
-  end;                             
-                                                                             
+   bars_audit.info(title|| 'XRMSW_DKBO_TRANS finished');
+  end;
+
 END;
 /
  show err;

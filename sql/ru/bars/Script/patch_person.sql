@@ -6,14 +6,6 @@
 -- modify table PERSON
 -- ======================================================
 
-SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
-SET FEEDBACK     OFF
-SET TIMING       OFF
-SET DEFINE       OFF
-SET LINES        200
-SET PAGES        200
-SET TERMOUT      ON
-SET TRIMSPOOL    ON
 prompt -- ======================================================
 prompt --  modify table PERSON
 prompt -- ======================================================
@@ -26,5 +18,3 @@ begin
   
 end;
 /
-
-SET FEEDBACK ON

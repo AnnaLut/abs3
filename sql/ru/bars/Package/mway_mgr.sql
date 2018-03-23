@@ -1,3 +1,7 @@
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/package/mway_mgr.sql =========*** Run *** ==
+PROMPT ===================================================================================== 
+
 CREATE OR REPLACE PACKAGE BARS.MWAY_MGR is
 
   --
@@ -162,7 +166,7 @@ CREATE OR REPLACE PACKAGE BODY MWAY_MGR is
   --
 
   -- Private constant declarations
-  g_body_version  constant varchar2(64)  := 'version 5.5 17/09/2017';
+  g_body_version  constant varchar2(64)  := 'version 5.7 16/03/2018';
   g_awk_body_defs constant varchar2(512) := '';
   g_dbgcode constant varchar2(12) := 'mway_mgr.';
 
@@ -1426,6 +1430,14 @@ CREATE OR REPLACE PACKAGE BODY MWAY_MGR is
     l_nazn varchar2(160);
     l_limit_for_day number;
     l_drn_tr mway_match.drn_tr%type;
+    l_termadd        number;
+    l_dat_start      date;
+    l_dat_end        date;
+    l_count_mm       number(5);
+    l_dat_s          date;
+    l_dat_po         date;
+    l_sum_month      oper.s%type;
+    l_summ           number;
     function get_ammount_for_day(p_nls accounts.nls%type) return number
     is
       l_sum_ammount number := 0;
@@ -1699,6 +1711,106 @@ CREATE OR REPLACE PACKAGE BODY MWAY_MGR is
                   end if;
 
                   bc.subst_branch(l_accb.branch);
+                  
+                 -- COBUSUPABS-6352 щодо обмеження поповнення нових строкових вкладів
+                  if substr(l_accb.nls, 1, 3) = '263' then
+
+                    l_termadd := trunc(l_dpt_vidd.term_add, 0);
+
+                    --безсрочный вид вклада
+                    if nvl(l_termadd, 0) > 0 then
+
+                      -- проверить можно ли его пополнить в указанных сроках на виде вклада
+                      l_dat_start := l_deposit.dat_begin;
+                      l_dat_end   := add_months(l_deposit.dat_begin,
+                                                l_termadd) - 1;
+
+                      if trunc(sysdate) between l_dat_start and l_dat_end then
+                        null;
+                      else
+                        -- 730 Закончился срок пополнения
+                        rollback to savepoint sp_paystart;
+                        get_error(730,
+                                  ltrim(to_char(l_termadd)),
+                                  p_error_code,
+                                  p_error_message);
+                        return;
+                      end if;
+
+                      --  вычислить граничные даты  месяца
+                      select floor(months_between(trunc(sysdate), (l_deposit.dat_begin)))
+                        into l_count_mm
+                        from dual;
+
+                      l_dat_s  := add_months(l_deposit.dat_begin,
+                                             l_count_mm);
+                      l_dat_po := add_months(l_dat_s, 1) - 1;
+
+                      if nvl(l_dpt_vidd.comproc, 0) = 0 then
+                        --нет капитализации-то учитываем сумму пополнения операций 'DP5' и 'DPL
+                        select nvl(sum(o.s), 0)
+                          into l_sum_month
+                          from dpt_payments p, oper o
+                         where p.ref = o.ref
+                           and p.dpt_id = l_deposit.dpt_id
+                           and o.sos >=0
+                           and o.tt in ('PKD', 'OW4', 'PK!', '215', '015', '515', '013', 'R01', 'DP0', 'DP2', 'DP5', 'DPD', 'DPI', 'DPL', 'W2D', 'DBF', 'ALT',
+                                        '24', '190', '191', '901', 'BAK', 'I00', 'IB1', 'IB1', 'OW1', 'OW5', 'SMO', 'ST2', 'PS1', 'ZMO')
+                           /*and o.tt in ('PKD','OW4','PK!','215','015','515','013','R01','DP0',
+                                        'DP2','DP5','DPD','DPI','DPL','W2D','DBF','ALT')*/
+                           and o.pdat between l_dat_s and l_dat_po;
+
+                      else
+                        --есть капитализация-то не учитываем в сумму пополнения операций 'DP5' и 'DPL'
+                        select nvl(sum(o.s), 0)
+                          into l_sum_month
+                          from dpt_payments p, oper o
+                         where p.ref = o.ref
+                           and p.dpt_id = l_deposit.dpt_id
+                           and o.sos >=0
+                           and o.tt in ('PKD', 'OW4', 'PK!', '215', '015', '515', '013', 'R01', 'DP0', 'DP2', 'DPD', 'DPI', 'W2D', 'DBF', 'ALT',
+                                        '24', '190', '191', '901', 'BAK', 'I00', 'IB1', 'IB1', 'OW1', 'OW5', 'SMO', 'ST2', 'PS1', 'ZMO')
+                           /*and o.tt in ('PKD','OW4','PK!','215','015','515','013','R01','DP0',
+                                        'DP2','DP5','DPD','DPI','DPL','W2D','DBF','ALT')*/
+                           and o.pdat between l_dat_s and l_dat_po;
+
+                      end if;
+
+                      l_summ := l_sum_month + l_sum;
+                      
+                      if l_count_mm = 0 then -- первый месяц
+                       
+                         if l_summ > l_deposit.dpt_amount * 2 then
+                            --731 Превышен лимит пополнения за период
+                            rollback to savepoint sp_paystart;
+                            get_error(731,
+                                  ltrim(to_char(l_deposit.dpt_amount)),
+                                  p_error_code,
+                                  p_error_message);
+                             return;
+                         else
+                            null;
+                         end if;    
+                      else  -- не первый месяц
+                        if l_summ > l_deposit.dpt_amount then
+                            --731 Превышен лимит пополнения за период
+                            rollback to savepoint sp_paystart;
+                            get_error(731,
+                                  ltrim(to_char(l_deposit.dpt_amount)),
+                                  p_error_code,
+                                  p_error_message);
+                             return;
+                         else
+                            null;
+                         end if;    
+                      end if;  
+                    
+                    else
+                      null;
+                    end if;
+
+                  end if;
+                    
                 else
                   --705 Мінімальна сума поповнення %s
                   rollback to savepoint sp_paystart;
@@ -1805,6 +1917,106 @@ CREATE OR REPLACE PACKAGE BODY MWAY_MGR is
 
 
                   bc.subst_branch(l_accb.branch);
+                  
+                   -- COBUSUPABS-6352 щодо обмеження поповнення нових строкових вкладів
+                  if substr(l_accb.nls, 1, 3) = '263' then
+
+                    l_termadd := trunc(l_dpt_vidd.term_add, 0);
+
+                    --безсрочный вид вклада
+                    if nvl(l_termadd, 0) > 0 then
+
+                      -- проверить можно ли его пополнить в указанных сроках на виде вклада
+                      l_dat_start := l_deposit.dat_begin;
+                      l_dat_end   := add_months(l_deposit.dat_begin,
+                                                l_termadd) - 1;
+
+                      if trunc(sysdate) between l_dat_start and l_dat_end then
+                        null;
+                      else
+                        -- 730 Закончился срок пополнения
+                        rollback to savepoint sp_paystart;
+                        get_error(730,
+                                  ltrim(to_char(l_termadd)),
+                                  p_error_code,
+                                  p_error_message);
+                        return;
+                      end if;
+
+                      --  вычислить граничные даты  месяца
+                      select floor(months_between(trunc(sysdate), (l_deposit.dat_begin)))
+                        into l_count_mm
+                        from dual;
+
+                      l_dat_s  := add_months(l_deposit.dat_begin,
+                                             l_count_mm);
+                      l_dat_po := add_months(l_dat_s, 1) - 1;
+
+                      if nvl(l_dpt_vidd.comproc, 0) = 0 then
+                        --нет капитализации-то учитываем сумму пополнения операций 'DP5' и 'DPL
+                        select nvl(sum(o.s), 0)
+                          into l_sum_month
+                          from dpt_payments p, oper o
+                         where p.ref = o.ref
+                           and p.dpt_id = l_deposit.dpt_id
+                           and o.sos >=0
+                           and o.tt in ('PKD', 'OW4', 'PK!', '215', '015', '515', '013', 'R01', 'DP0', 'DP2', 'DP5', 'DPD', 'DPI', 'DPL', 'W2D', 'DBF', 'ALT',
+                                        '24', '190', '191', '901', 'BAK', 'I00', 'IB1', 'IB1', 'OW1', 'OW5', 'SMO', 'ST2', 'PS1', 'ZMO')
+                           /*and o.tt in ('PKD','OW4','PK!','215','015','515','013','R01','DP0',
+                                        'DP2','DP5','DPD','DPI','DPL','W2D','DBF','ALT')*/
+                           and o.pdat between l_dat_s and l_dat_po;
+
+                      else
+                        --есть капитализация-то не учитываем в сумму пополнения операций 'DP5' и 'DPL'
+                        select nvl(sum(o.s), 0)
+                          into l_sum_month
+                          from dpt_payments p, oper o
+                         where p.ref = o.ref
+                           and p.dpt_id = l_deposit.dpt_id
+                           and o.sos >=0
+                           and o.tt in ('PKD', 'OW4', 'PK!', '215', '015', '515', '013', 'R01', 'DP0', 'DP2', 'DPD', 'DPI', 'W2D', 'DBF', 'ALT',
+                                        '24', '190', '191', '901', 'BAK', 'I00', 'IB1', 'IB1', 'OW1', 'OW5', 'SMO', 'ST2', 'PS1', 'ZMO')
+                           /*and o.tt in ('PKD','OW4','PK!','215','015','515','013','R01','DP0',
+                                        'DP2','DP5','DPD','DPI','DPL','W2D','DBF','ALT')*/
+                           and o.pdat between l_dat_s and l_dat_po;
+
+                      end if;
+
+                      l_summ := l_sum_month + l_sum;
+                      
+                      if l_count_mm = 0 then -- первый месяц
+                       
+                         if l_summ > l_deposit.dpt_amount * 2 then
+                            --731 Превышен лимит пополнения за период
+                            rollback to savepoint sp_paystart;
+                            get_error(731,
+                                  ltrim(to_char(l_deposit.dpt_amount)),
+                                  p_error_code,
+                                  p_error_message);
+                             return;
+                         else
+                            null;
+                         end if;    
+                      else  -- не первый месяц
+                        if l_summ > l_deposit.dpt_amount then
+                            --731 Превышен лимит пополнения за период
+                            rollback to savepoint sp_paystart;
+                            get_error(731,
+                                  ltrim(to_char(l_deposit.dpt_amount)),
+                                  p_error_code,
+                                  p_error_message);
+                             return;
+                         else
+                            null;
+                         end if;    
+                      end if;  
+                    
+                    else
+                      null;
+                    end if;
+
+                  end if;
+                  
                 else
                   --705 Мінімальна сума поповнення %s
                   rollback to savepoint sp_paystart;
@@ -3802,3 +4014,7 @@ end mway_mgr;
 show errors
 
 exec sys.utl_recomp.recomp_serial('BARS');
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/package/mway_mgr.sql =========*** End *** ==
+PROMPT ===================================================================================== 

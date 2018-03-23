@@ -19,6 +19,7 @@ prompt -- ======================================================
 begin
   BARS.BPA.ALTER_POLICY_INFO( 'ACCOUNTS_RSRV', 'WHOLE' , NULL,  'E',  'E', 'E' );
   BARS.BPA.ALTER_POLICY_INFO( 'ACCOUNTS_RSRV', 'FILIAL',  'M',  'M',  'M', 'M' );
+  BARS.BPA.ALTER_POLICY_INFO( 'ACCOUNTS_RSRV', 'CENTER', NULL,  'E',  'E', 'E' );
 end;
 /
 

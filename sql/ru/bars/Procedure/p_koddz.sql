@@ -9,9 +9,9 @@ PROMPT *** Create  procedure P_KODDZ ***
 
   CREATE OR REPLACE PROCEDURE BARS.P_KODDZ (p_mode int) is
 
-  --20-06-2012 Добавлена таблица реф (REF_KODDZ)
+  --20-06-2012 Р”РѕР±Р°РІР»РµРЅР° С‚Р°Р±Р»РёС†Р° СЂРµС„ (REF_KODDZ)
 
-  -- p_mode = 0  - тек год = 1  - прош.год   n-прош.год
+  -- p_mode = 0  - С‚РµРє РіРѕРґ = 1  - РїСЂРѕС€.РіРѕРґ   n-РїСЂРѕС€.РіРѕРґ
 
   l_dat1 date;  l_dat2 date;
   l_KODDZ KOD_DZR.KOD%type ;
@@ -42,20 +42,20 @@ for k in (select o.ref,o.S/100 S , o.vdat, o.sos
            )
 loop
 
-  -- этот док нам не нужен
+  -- СЌС‚РѕС‚ РґРѕРє РЅР°Рј РЅРµ РЅСѓР¶РµРЅ
   If k.sos  <> 5      OR
      k.vdat <= l_dat1 OR
      k.vdat >= l_dat2     then
      goto HETK;
   end if;
   -------------------------------------
-  for kk in ( select ref,tag, substr(value ,1,15) value
+  for kk in ( select ref,tag, substr(value ,1,10) value
               from operw
               where ref=k.ref and (tag like 'K_DZ_' or tag = 'KODDZ' )
              )
   loop
      l_value := trim(kk.value);
-     l_KODDZ := replace(replace(replace(replace(l_value ,',',''),'.',''),'-',''),'/','' );
+     l_KODDZ := replace(replace(replace(replace(l_value ,',',''),'.',''),'/','' ),'-','' );
      begin
        l_n1 := to_number(l_KODDZ) ;
        if l_KODDZ <> l_value then
@@ -96,9 +96,9 @@ loop
        --ORA-00001: unique constraint (BARS.XPK_TMP_AN_KL) violated
        if sqlcode = -00001 then
           raise_application_error(-(20203),
-          '      Дубль кода='|| l_KODDZ ||
-          ', реф док=' || k.ref ||
-          ', дата='|| to_char(k.vdat, 'dd.mm.yyyy'),  TRUE);
+          '      Р”СѓР±Р»СЊ РєРѕРґР°='|| l_KODDZ ||
+          ', СЂРµС„ РґРѕРє=' || k.ref ||
+          ', РґР°С‚Р°='|| to_char(k.vdat, 'dd.mm.yyyy'),  TRUE);
        else raise;
        end if;
      end;

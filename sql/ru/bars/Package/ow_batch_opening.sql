@@ -1,9 +1,15 @@
-create or replace package ow_batch_opening is
+
+
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/OW_BATCH_OPENING.sql =========*** 
+ PROMPT ===================================================================================== 
+ 
+CREATE OR REPLACE PACKAGE "BARS"."OW_BATCH_OPENING" is
 
   -- Author  : VITALII.KHOMIDA
   -- Created : 13.04.2017 11:46:26
-  -- Purpose : 
-  g_header_version constant varchar2(64) := 'version 1.000 13/04/2017';
+  -- Purpose :
+  g_header_version constant varchar2(64) := 'version 1.003 02/10/2017';
 
   other_file  constant number := 0; -- будь-яке пакетне відкритя
   salary_file constant number := 1; -- зарплатні файли
@@ -29,6 +35,16 @@ create or replace package ow_batch_opening is
                         p_filebody in blob,
                         p_filetype in number default 0,
                         p_fileid   out number);
+
+  FUNCTION split_key(p_key     IN VARCHAR2) RETURN VARCHAR2;
+
+  -- импорт ахфива gzip (gz), который содержит xlm с фото формата BASE64
+  PROCEDURE import_file_gz(p_filename         IN VARCHAR2
+                          ,p_filebody         IN BLOB
+                          ,p_external_file_id IN VARCHAR2
+                          ,p_filetype         in number
+                          ,p_fileid           OUT NUMBER);
+
   procedure create_deal(p_fileid in number,
                         -- p_proect_id is not null - SALARY
                         -- p_proect_id is null - PENSION, SOCIAL
@@ -36,19 +52,27 @@ create or replace package ow_batch_opening is
                         p_card_code in varchar2,
                         p_branch    in varchar2,
                         p_isp       in number);
-                        
+
   procedure form_ticket(p_fileid     in number,
                         p_ticketname out varchar2,
                         p_ticketdata out clob);
 
+    -- процедура принимает архив на пакетное открытие в формате блоб, и возращает тикет в формате клоб
+  PROCEDURE batch_get_process(p_filename         IN VARCHAR2
+                             ,p_filebody         IN BLOB
+                             ,p_external_file_id IN VARCHAR2
+                             ,p_filetype         in number
+                             ,p_ticketdata       OUT BLOB);
+
 end;
 /
-grant execute on OW_BATCH_OPENING to BARS_ACCESS_DEFROLE;
+  grant DEBUG,EXECUTE  ON "BARS"."OW_BATCH_OPENING" TO "BARSTRANS";
+  grant DEBUG,EXECUTE  ON "BARS"."OW_BATCH_OPENING" TO "BARS_ACCESS_DEFROLE";
+/  
+  
+CREATE OR REPLACE PACKAGE BODY "BARS"."OW_BATCH_OPENING" is
 
-
-create or replace package body ow_batch_opening is
-
-  g_body_version constant varchar2(64) := 'version 1.000 13/04/2017';
+  g_body_version constant varchar2(64) := 'version 1.004 02/10/2017';
 
   g_modcode constant varchar2(3) := 'BPK';
 
@@ -57,15 +81,16 @@ create or replace package body ow_batch_opening is
   g_w4_email_char   constant varchar2(100) := '^[A-Z0-9@.-]+$';
   g_digit           constant varchar2(100) := '^[0-9]+$';
   g_all_char        constant varchar2(100) := '^[А-Я0-9'||'ҐІЄЇ'||chr(39)||'/., -]+$';
-   
-  type t_batch_list is table of ow_batch_open_data%rowtype index by pls_integer;
-  type t_photo_list is table of ow_batch_photo%rowtype index by pls_integer;
+
+  type t_batch_header is table of ow_batch_files%rowtype index by pls_integer;
+  type t_batch_list   is table of ow_batch_open_data%rowtype index by pls_integer;
+  type t_photo_list   is table of ow_batch_photo%rowtype index by pls_integer;
   -- header_version - возвращает версию заголовка пакета
   function header_version return varchar2 is
   begin
     return 'Package header ow_batch_opening ' || g_header_version;
   end header_version;
-  
+
   -------------------------------------------------------------------------------
   -- body_version - возвращает версию тела пакета
   function body_version return varchar2 is
@@ -89,6 +114,17 @@ create or replace package body ow_batch_opening is
     update ow_batch_files t set t.state = p_state where t.id = p_fileid;
     commit;
   end;
+
+  -- функиця привода rnk к нужному формату
+  FUNCTION split_key(p_key     IN VARCHAR2) RETURN VARCHAR2 IS
+    l_old_key VARCHAR2(38 CHAR);
+    p_kf      VARCHAR2(8);
+  BEGIN
+    bars_sqnc.split_key(p_key     => p_key
+                       ,p_old_key => l_old_key
+                       ,p_kf      => p_kf);
+    RETURN l_old_key;
+  END split_key;
 
   -------------------------------------------------------------------------------
   -- create_customer
@@ -589,7 +625,7 @@ create or replace package body ow_batch_opening is
   end alter_client;
   --Розархівування файлів
   function get_files_list(p_zipfile in blob) return t_fileinflist is
-  
+
     l_filelist as_zip.file_list := as_zip.file_list();
     l_fi_list  t_fileinflist := t_fileinflist();
   begin
@@ -598,7 +634,7 @@ create or replace package body ow_batch_opening is
     loop
       l_fi_list.extend;
       l_fi_list(i).file_name := substr(l_filelist(i), 1, 250);
-    
+
       l_fi_list(i).file_data := as_zip.get_file(p_zipped_blob => p_zipfile,
                                                              p_file_name   => l_filelist(i),
                                                              p_encoding    => 'CL8MSWIN1251');
@@ -606,8 +642,8 @@ create or replace package body ow_batch_opening is
     end loop;
     return l_fi_list;
   end;
-  
-  -- Отримання списку файлів 
+
+  -- Отримання списку файлів
   function get_files_from_ext(p_fileinflist in t_fileinflist,
                               p_file_ext    in varchar2)
     return t_fileinflist is
@@ -622,7 +658,7 @@ create or replace package body ow_batch_opening is
     end loop;
     return l_fi_list;
   end;
-  
+
   function convert_photo_data(p_fileinflist in t_fileinflist)
     return t_fileinflist is
     l_photo   ordimage;
@@ -640,6 +676,69 @@ create or replace package body ow_batch_opening is
     return l_fi_list;
   end;
 
+  -- преобразовать фото до нужного размера
+  FUNCTION convert_photo_data(p_photo_blob IN BLOB)
+     RETURN BLOB
+  IS
+     l_photo     ordimage;
+     l_blob      BLOB := p_photo_blob;
+  BEGIN
+     l_photo  := ordimage(p_photo_blob, 1);
+
+     IF l_photo.width <> c_width AND l_photo.height <> c_height THEN
+        ordimage.process(l_photo, 'fileFormat=JPEG, fixedScale=' || c_width || ' ' || c_height);
+        l_blob := l_photo.source.localdata;
+     END IF;
+
+     RETURN l_blob;
+  END;
+
+  -- преобразовать тип данныйх BLOB в CLOB
+  FUNCTION blob_to_clob(blob_in IN BLOB) RETURN CLOB AS
+    v_clob    CLOB;
+    v_varchar VARCHAR2(32767);
+    v_start   PLS_INTEGER := 1;
+    v_buffer  PLS_INTEGER := 32767;
+  BEGIN
+    dbms_lob.createtemporary(v_clob
+                            ,FALSE);
+
+    FOR i IN 1 .. ceil(dbms_lob.getlength(blob_in) / v_buffer)
+    LOOP
+
+      v_varchar := utl_raw.cast_to_varchar2(dbms_lob.substr(blob_in
+                                                           ,v_buffer
+                                                           ,v_start));
+
+      dbms_lob.writeappend(v_clob
+                          ,length(v_varchar)
+                          ,v_varchar);
+      v_start := v_start + v_buffer;
+    END LOOP;
+    RETURN v_clob;
+  END blob_to_clob;
+
+  FUNCTION clob_to_blob(p_clob CLOB) RETURN BLOB AS
+    l_blob          BLOB;
+    l_dest_offset   INTEGER := 1;
+    l_source_offset INTEGER := 1;
+    l_lang_context  INTEGER := dbms_lob.default_lang_ctx;
+    l_warning       INTEGER := dbms_lob.warn_inconvertible_char;
+  BEGIN
+
+    dbms_lob.createtemporary(l_blob
+                            ,TRUE);
+    dbms_lob.converttoblob(dest_lob     => l_blob
+                          ,src_clob     => p_clob
+                          ,amount       => dbms_lob.lobmaxsize
+                          ,dest_offset  => l_dest_offset
+                          ,src_offset   => l_source_offset
+                          ,blob_csid    => dbms_lob.default_csid
+                          ,lang_context => l_lang_context
+                          ,warning      => l_warning);
+    RETURN l_blob;
+  END;
+
   function check_phone(p_phone varchar2) return varchar2 is
     l_ret varchar2(100) := null;
   begin
@@ -655,7 +754,7 @@ create or replace package body ow_batch_opening is
     end if;
     return l_ret;
   end;
-  
+
   function check_pcode(p_pcode varchar2) return varchar2 is
     l_ret varchar2(100) := null;
   begin
@@ -684,11 +783,11 @@ create or replace package body ow_batch_opening is
     if p_okpo is null or substr(p_okpo, 1, 5) = '99999' or
        substr(p_okpo, 1, 5) = '00000' or p_paspser is null or
        p_paspnum is null then
-    
+
       l_rnk := null;
-    
+
     else
-    
+
       -- ищем клиентов с ОКПО
       select count(*)
         into l_count_okpo
@@ -696,7 +795,7 @@ create or replace package body ow_batch_opening is
        where c.okpo = p_okpo and
              (p_spd = 0 and nvl(trim(c.sed), '00') <> '91' or
              p_spd = 1 and nvl(trim(c.sed), '00') = '91');
-    
+
       -- ищем клиентов с паспортными данными
       select count(*)
         into l_count_passp
@@ -704,16 +803,16 @@ create or replace package body ow_batch_opening is
        where p.ser = p_paspser and p.numdoc = p_paspnum and p.rnk = c.rnk and
              (p_spd = 0 and nvl(trim(c.sed), '00') <> '91' or
              p_spd = 1 and nvl(trim(c.sed), '00') = '91');
-    
+
       -- есть клиенты с ОКПО и паспортными данными
       if l_count_okpo > 0 and l_count_passp > 0 then
-      
+
         -- в банкке зарегистрирован один клиент с такими данными
         if l_count_okpo = 1 or l_count_passp = 1 then
-        
+
           -- в customer и person это должен быть один клиент
           begin
-          
+
             select c.rnk, c.date_off
               into l_rnk, l_date_off
               from customer c, person p
@@ -721,20 +820,20 @@ create or replace package body ow_batch_opening is
                    p.numdoc = p_paspnum and c.rnk = p.rnk and
                    (p_spd = 0 and nvl(trim(c.sed), '00') <> '91' or
                    p_spd = 1 and nvl(trim(c.sed), '00') = '91');
-          
+
             -- если клиент закрыт, реанимируем его
             if l_date_off is not null then
               update customer set date_off = null where rnk = l_rnk;
             end if;
-          
+
           exception
             when no_data_found then
               null;
           end;
-        
+
           -- нашли нескольких клиентов с таким ОКПО
         elsif l_count_okpo > 1 then
-        
+
           -- ищем среди открытых клиентов
           select max(c.rnk)
             into l_rnk
@@ -744,10 +843,10 @@ create or replace package body ow_batch_opening is
                  c.date_off is null and
                  (p_spd = 0 and nvl(trim(c.sed), '00') <> '91' or
                  p_spd = 1 and nvl(trim(c.sed), '00') = '91');
-        
+
           -- среди открытых клиентов не нашли, ищем среди закрытых
           if l_rnk is null then
-          
+
             select max(c.rnk)
               into l_rnk
               from customer c, person p
@@ -756,7 +855,7 @@ create or replace package body ow_batch_opening is
                    c.date_off is not null and
                    (p_spd = 0 and nvl(trim(c.sed), '00') <> '91' or
                    p_spd = 1 and nvl(trim(c.sed), '00') = '91');
-          
+
             -- реанимируем клиента
             if l_rnk is not null then
               update customer set date_off = null where rnk = l_rnk;
@@ -779,11 +878,11 @@ create or replace package body ow_batch_opening is
     l_row        dbms_xmldom.domnode;
     l_batch_list t_batch_list;
   begin
-  
+
     l_parser := dbms_xmlparser.newparser;
     dbms_xmlparser.parseclob(l_parser, p_file_data);
     l_doc := dbms_xmlparser.getdocument(l_parser);
-  
+
     l_rows := dbms_xmldom.getelementsbytagname(l_doc, 'ROW');
     for i in 0 .. dbms_xmldom.getlength(l_rows) - 1
     loop
@@ -791,7 +890,7 @@ create or replace package body ow_batch_opening is
       l_batch_list(i).id  := p_id;
       l_batch_list(i).idn := i + 1;
       if p_file_type = esk_file then
-        l_batch_list(i).okpo := substr(dbms_xslprocessor.valueof(l_row, 'IPN/text()'),1,14);        
+        l_batch_list(i).okpo := substr(dbms_xslprocessor.valueof(l_row, 'IPN/text()'),1,14);
       else
         l_batch_list(i).okpo := substr(dbms_xslprocessor.valueof(l_row, 'OKPO/text()'),1,14);
       end if;
@@ -821,7 +920,7 @@ create or replace package body ow_batch_opening is
         l_batch_list(i).addr1_street :=substr(dbms_xslprocessor.valueof(l_row, 'ADDR_STREET/text()'),1,100);
         l_batch_list(i).addr1_streettype :=substr(dbms_xslprocessor.valueof(l_row, 'ADDR_STREETTYPE/text()'),1,10);
         l_batch_list(i).addr1_streetname :=substr(dbms_xslprocessor.valueof(l_row, 'ADDR_STREETNAME/text()'),1,100);
-        l_batch_list(i).addr1_bud :=substr(dbms_xslprocessor.valueof(l_row, 'ADDR_BUD/text()'),1,50);        
+        l_batch_list(i).addr1_bud :=substr(dbms_xslprocessor.valueof(l_row, 'ADDR_BUD/text()'),1,50);
       else
         l_batch_list(i).addr1_cityname :=substr(dbms_xslprocessor.valueof(l_row, 'ADDR1_CITYNAME/text()'),1,100);
         l_batch_list(i).addr1_pcode :=check_pcode(dbms_xslprocessor.valueof(l_row, 'ADDR1_PCODE/text()'));
@@ -850,12 +949,12 @@ create or replace package body ow_batch_opening is
       l_batch_list(i).addr2_bud :=substr(dbms_xslprocessor.valueof(l_row, 'ADDR2_BUD/text()'),1,50);
       if l_batch_list(i).addr2_bud is not null then
         l_batch_list(i).addr2_street := l_batch_list(i).addr2_street || ' ' || l_batch_list(i).addr2_bud;
-      end if;      
+      end if;
       l_batch_list(i).region_id2 :=dbms_xslprocessor.valueof(l_row, 'REGION_ID2/text()');
       l_batch_list(i).area_id2 :=dbms_xslprocessor.valueof(l_row, 'AREA_ID2/text()');
       l_batch_list(i).settlement_id2 :=dbms_xslprocessor.valueof(l_row, 'SETTLEMENT_ID2/text()');
       l_batch_list(i).street_id2 :=dbms_xslprocessor.valueof(l_row, 'STREET_ID2/text()');
-      l_batch_list(i).house_id2 :=dbms_xslprocessor.valueof(l_row, 'HOUSE_ID2/text()');      
+      l_batch_list(i).house_id2 :=dbms_xslprocessor.valueof(l_row, 'HOUSE_ID2/text()');
       l_batch_list(i).work :=substr(dbms_xslprocessor.valueof(l_row, 'WORK/text()'),1,254);
       l_batch_list(i).office :=substr(dbms_xslprocessor.valueof(l_row, 'OFFICE/text()'),1,32);
       l_batch_list(i).date_w :=to_date(dbms_xslprocessor.valueof(l_row, 'DATE_W/text()'),'dd.mm.yyyy');
@@ -872,7 +971,7 @@ create or replace package body ow_batch_opening is
         l_batch_list(i).kk_streetname :=substr(dbms_xslprocessor.valueof(l_row, 'ADDR3_STREETNAME/text()'),1,64);
         l_batch_list(i).kk_apartment :=substr(dbms_xslprocessor.valueof(l_row, 'ADDR3_BUD/text()'),1,32);
         l_batch_list(i).kk_postcode :=check_pcode(dbms_xslprocessor.valueof(l_row, 'ADDR3_PCODE/text()'));
-      end if;      
+      end if;
       l_batch_list(i).max_term :=dbms_xslprocessor.valueof(l_row, 'MAX_TERM/text()');
       l_batch_list(i).pasp_end_date :=to_date(dbms_xslprocessor.valueof(l_row, 'PASP_END_DATE/text()'),'dd.mm.yyyy');
       l_batch_list(i).pasp_eddrid_id :=substr(dbms_xslprocessor.valueof(l_row, 'PASP_EDDRID_ID/text()'),1,14);
@@ -880,7 +979,242 @@ create or replace package body ow_batch_opening is
     end loop;
     return l_batch_list;
   end;
-  
+
+      -- обрабатывает XML with BASE64
+    PROCEDURE parse_file(p_id           IN     NUMBER
+                        ,p_file_data    IN     CLOB
+                        ,p_file_type    IN     NUMBER
+                        ,p_batch_list      OUT t_batch_list
+                        ,p_photo_list      OUT t_photo_list
+                        ,p_batch_header    OUT t_batch_header
+                        )
+    IS
+       -- коллекция данныйх
+       l_batch_list   t_batch_list;
+       -- коллекция фото
+       l_photo_list   t_photo_list;
+
+       l_batch_header t_batch_header;
+    BEGIN
+       IF p_file_data IS NOT NULL THEN
+         -- парсинг хедера хмл, наполнение коллекции l_batch_header, для дальнейго сохранения в таблице OW_BATCH_FILES
+         SELECT xt.branch
+               ,xt.isp
+               ,xt.projectid
+               ,xt.cardcode
+           into l_batch_header(1).branch
+               ,l_batch_header(1).isp
+               ,l_batch_header(1).PROECT_ID
+               ,l_batch_header(1).CARD_CODE
+           FROM XMLTABLE('/ROWSET/HEADER'
+                         PASSING (SELECT xmltype(p_file_data) z
+                                    FROM dual)
+                         COLUMNS branch VARCHAR2(30) PATH 'BRANCH'
+                                ,isp NUMBER(22) PATH 'ISP'
+                                ,projectid NUMBER(22) PATH 'PROJECTID'
+                                ,cardcode VARCHAR2(32) PATH 'CARDCODE') xt;
+
+          -- парсинг входящего клоба в формате хмл, для наполнения l_batch_list и l_photo_list
+          FOR rec IN (          SELECT ROWNUM
+                                      ,xt.okpo
+                                      ,xt.last_name
+                                      ,xt.first_name
+                                      ,xt.middle_name
+                                      ,xt.type_doc
+                                      ,xt.paspseries
+                                      ,xt.paspnum
+                                      ,xt.paspissuer
+                                      ,xt.paspdate
+                                      ,xt.bday
+                                      ,xt.country
+                                      ,xt.resident
+                                      ,xt.gender
+                                      ,xt.phone_home
+                                      ,xt.phone_mob
+                                      ,xt.email
+                                      ,xt.eng_first_name
+                                      ,xt.eng_last_name
+                                      ,xt.mname
+                                      ,xt.addr1_cityname
+                                      ,xt.addr1_pcode
+                                      ,xt.addr1_domain
+                                      ,xt.addr1_region
+                                      ,xt.addr1_street
+                                      ,xt.addr1_streettype
+                                      ,xt.addr1_streetname
+                                      ,xt.addr1_bud
+                                      ,xt.addr2_cityname
+                                      ,xt.addr2_pcode
+                                      ,xt.addr2_domain
+                                      ,xt.addr2_region
+                                      ,xt.addr2_street
+                                      ,xt.addr2_streettype
+                                      ,xt.addr2_streetname
+                                      ,xt.addr2_bud
+                                      ,xt.work
+                                      ,xt.office
+                                      ,xt.date_w
+                                      ,xt.okpo_w
+                                      ,xt.pers_cat
+                                      ,xt.aver_sum
+                                      ,xt.tabn
+                                      ,xt.acc_instant
+                                      ,xt.kk_secret_word
+                                      ,xt.kk_regtype
+                                      ,xt.kk_cityareaid
+                                      ,xt.kk_streettypeid
+                                      ,xt.kk_streetname
+                                      ,xt.kk_apartment
+                                      ,xt.kk_postcode
+                                      ,xt.max_term
+                                      ,xt.pasp_end_date
+                                      ,xt.pasp_eddrid_id
+                                      -- преобразование бейс64 в фото
+                                      ,barstrans.file_utl.decode_base64(xt.photo_data) AS photo_jpg
+                                  FROM XMLTABLE('/ROWSET/ROW'
+                                                PASSING                                                                                          --xmltype
+                                                       (SELECT xmltype(p_file_data) z
+                                                          FROM DUAL t)
+                                                COLUMNS okpo VARCHAR2(14) PATH 'OKPO'
+                                                       ,last_name VARCHAR2(70) PATH 'LAST_NAME'
+                                                       ,first_name VARCHAR2(70) PATH 'FIRST_NAME'
+                                                       ,middle_name VARCHAR2(70) PATH 'MIDDLE_NAME'
+                                                       ,type_doc NUMBER(22) PATH 'TYPE_DOC'
+                                                       ,paspseries VARCHAR2(16) PATH 'PASPSERIES'
+                                                       ,paspnum VARCHAR2(16) PATH 'PASPNUM'
+                                                       ,paspissuer VARCHAR2(128) PATH 'PASPISSUER'
+                                                       ,paspdate VARCHAR2(11) PATH 'PASPDATE'
+                                                       ,bday VARCHAR2(11) PATH 'BDAY'
+                                                       ,country VARCHAR2(3) PATH 'COUNTRY'
+                                                       ,resident VARCHAR2(1) PATH 'RESIDENT'
+                                                       ,gender VARCHAR2(1) PATH 'GENDER'
+                                                       ,phone_home VARCHAR2(13) PATH 'PHONE_HOME'
+                                                       ,phone_mob VARCHAR2(13) PATH 'PHONE_MOB'
+                                                       ,email VARCHAR2(30) PATH 'EMAIL'
+                                                       ,eng_first_name VARCHAR2(30) PATH 'ENG_FIRST_NAME'
+                                                       ,eng_last_name VARCHAR2(30) PATH 'ENG_LAST_NAME'
+                                                       ,mname VARCHAR2(20) PATH 'MNAME'
+                                                       ,addr1_cityname VARCHAR2(100) PATH 'ADDR1_CITYNAME'
+                                                       ,addr1_pcode VARCHAR2(10) PATH 'ADDR1_PCODE'
+                                                       ,addr1_domain VARCHAR2(48) PATH 'ADDR1_DOMAIN'
+                                                       ,addr1_region VARCHAR2(48) PATH 'ADDR1_REGION'
+                                                       ,addr1_street VARCHAR2(100) PATH 'ADDR1_STREET'
+                                                       ,addr1_streettype NUMBER(10) PATH 'ADDR1_STREETTYPE'
+                                                       ,addr1_streetname VARCHAR2(100) PATH 'ADDR1_STREETNAME'
+                                                       ,addr1_bud VARCHAR2(50) PATH 'ADDR1_BUD'
+                                                       ,addr2_cityname VARCHAR2(100) PATH 'ADDR2_CITYNAME'
+                                                       ,addr2_pcode VARCHAR2(10) PATH 'ADDR2_PCODE'
+                                                       ,addr2_domain VARCHAR2(48) PATH 'ADDR2_DOMAIN'
+                                                       ,addr2_region VARCHAR2(48) PATH 'ADDR2_REGION'
+                                                       ,addr2_street VARCHAR2(100) PATH 'ADDR2_STREET'
+                                                       ,addr2_streettype NUMBER(10) PATH 'ADDR2_STREETTYPE'
+                                                       ,addr2_streetname VARCHAR2(100) PATH 'ADDR2_STREETNAME'
+                                                       ,addr2_bud VARCHAR2(50) PATH 'ADDR2_BUD'
+                                                       ,WORK VARCHAR2(254) PATH 'WORK'
+                                                       ,office VARCHAR2(32) PATH 'OFFICE'
+                                                       ,date_w DATE PATH 'DATE_W'
+                                                       ,okpo_w VARCHAR2(14) PATH 'OKPO_W'
+                                                       ,pers_cat VARCHAR2(2) PATH 'PERS_CAT'
+                                                       ,aver_sum NUMBER(12) PATH 'AVER_SUM'
+                                                       ,tabn VARCHAR2(32) PATH 'TABN'
+                                                       ,acc_instant NUMBER(22) PATH 'ACC_INSTANT'
+                                                       ,kk_secret_word VARCHAR2(32) PATH 'KK_SECRET_WORD'
+                                                       ,kk_regtype NUMBER(1) PATH 'KK_REGTYPE'
+                                                       ,kk_cityareaid NUMBER(10) PATH 'KK_CITYAREAID'
+                                                       ,kk_streettypeid NUMBER(10) PATH 'KK_STREETTYPEID'
+                                                       ,kk_streetname VARCHAR2(64) PATH 'KK_STREETNAME'
+                                                       ,kk_apartment VARCHAR2(32) PATH 'KK_APARTMENT'
+                                                       ,kk_postcode VARCHAR2(5) PATH 'KK_POSTCODE'
+                                                       ,max_term NUMBER PATH 'MAX_TERM'
+                                                       ,pasp_end_date DATE PATH 'PASP_END_DATE'
+                                                       ,pasp_eddrid_id VARCHAR2(14) PATH 'PASP_EDDRID_ID'
+                                                       ,photo_data CLOB PATH 'PHOTO_DATA') xt)
+          LOOP
+             -- // наполнение коллекции данных
+             l_batch_list(rec.ROWNUM).id                := p_id;
+             l_batch_list(rec.ROWNUM).idn               := rec.ROWNUM;
+             l_batch_list(rec.ROWNUM).okpo              := SUBSTR(rec.okpo, 1, 14);
+             l_batch_list(rec.ROWNUM).first_name        := SUBSTR(UPPER(rec.first_name), 1, 70);
+             l_batch_list(rec.ROWNUM).last_name         := SUBSTR(UPPER(rec.last_name), 1, 70);
+             l_batch_list(rec.ROWNUM).middle_name       := UPPER(SUBSTR(rec.middle_name, 1, 70));
+             l_batch_list(rec.ROWNUM).type_doc          := rec.type_doc;
+             l_batch_list(rec.ROWNUM).paspseries        := SUBSTR(rec.paspseries, 1, 16);
+             l_batch_list(rec.ROWNUM).paspnum           := SUBSTR(rec.paspnum, 1, 16);
+             l_batch_list(rec.ROWNUM).paspissuer        := SUBSTR(rec.paspissuer, 1, 128);
+             l_batch_list(rec.ROWNUM).paspdate          := TO_DATE(rec.paspdate, 'dd.mm.yyyy');
+             l_batch_list(rec.ROWNUM).bday              := TO_DATE(rec.bday, 'dd.mm.yyyy');
+             l_batch_list(rec.ROWNUM).country           := SUBSTR(rec.country, 1, 3);
+             l_batch_list(rec.ROWNUM).resident          := SUBSTR(rec.resident, 1, 1);
+             l_batch_list(rec.ROWNUM).gender            := SUBSTR(rec.gender, 1, 1);
+             l_batch_list(rec.ROWNUM).phone_home        := check_phone(rec.phone_home);
+             l_batch_list(rec.ROWNUM).phone_mob         := check_phone(rec.phone_mob);
+             l_batch_list(rec.ROWNUM).email             := SUBSTR(rec.email, 1, 30);
+             l_batch_list(rec.ROWNUM).eng_first_name    := SUBSTR(rec.eng_first_name, 1, 30);
+             l_batch_list(rec.ROWNUM).eng_last_name     := SUBSTR(rec.eng_last_name, 1, 30);
+             l_batch_list(rec.ROWNUM).mname             := SUBSTR(rec.mname, 1, 20);
+             l_batch_list(rec.ROWNUM).addr1_cityname    := SUBSTR(rec.addr1_cityname, 1, 100);
+             l_batch_list(rec.ROWNUM).addr1_pcode       := check_pcode(rec.addr1_pcode);
+             l_batch_list(rec.ROWNUM).addr1_domain      := SUBSTR(rec.addr1_domain, 1, 48);
+             l_batch_list(rec.ROWNUM).addr1_region      := SUBSTR(rec.addr1_region, 1, 48);
+             l_batch_list(rec.ROWNUM).addr1_street      := SUBSTR(rec.addr1_street, 1, 100);
+             l_batch_list(rec.ROWNUM).addr1_streettype  := SUBSTR(rec.addr1_streettype, 1, 10);
+             l_batch_list(rec.ROWNUM).addr1_streetname  := SUBSTR(rec.addr1_streetname, 1, 100);
+             l_batch_list(rec.ROWNUM).addr1_bud         := SUBSTR(rec.addr1_bud, 1, 50);
+
+             IF l_batch_list(rec.ROWNUM).addr1_bud IS NOT NULL THEN
+                l_batch_list(rec.ROWNUM).addr1_street  := l_batch_list(rec.ROWNUM).addr1_street || ' ' || l_batch_list(rec.ROWNUM).addr1_bud;
+             END IF;
+
+             l_batch_list(rec.ROWNUM).addr2_cityname    := SUBSTR(rec.addr2_cityname, 1, 100);
+             l_batch_list(rec.ROWNUM).addr2_pcode       := check_pcode(rec.addr2_pcode);
+             l_batch_list(rec.ROWNUM).addr2_domain      := SUBSTR(rec.addr2_domain, 1, 48);
+             l_batch_list(rec.ROWNUM).addr2_region      := SUBSTR(rec.addr2_region, 1, 48);
+             l_batch_list(rec.ROWNUM).addr2_street      := SUBSTR(rec.addr2_street, 1, 100);
+             l_batch_list(rec.ROWNUM).addr2_streettype  := SUBSTR(rec.addr2_streettype, 1, 10);
+             l_batch_list(rec.ROWNUM).addr2_streetname  := SUBSTR(rec.addr2_streetname, 1, 100);
+             l_batch_list(rec.ROWNUM).addr2_bud         := SUBSTR(rec.addr1_bud, 1, 50);
+
+             IF l_batch_list(rec.ROWNUM).addr2_bud IS NOT NULL THEN
+                l_batch_list(rec.ROWNUM).addr2_street  := l_batch_list(rec.ROWNUM).addr2_street || ' ' || l_batch_list(rec.ROWNUM).addr2_bud;
+             END IF;
+
+             l_batch_list(rec.ROWNUM).work              := SUBSTR(rec.work, 1, 254);
+             l_batch_list(rec.ROWNUM).office            := SUBSTR(rec.office, 1, 32);
+             l_batch_list(rec.ROWNUM).date_w            := TO_DATE(rec.date_w, 'dd.mm.yyyy');
+             l_batch_list(rec.ROWNUM).okpo_w            := SUBSTR(rec.okpo_w, 1, 14);
+             l_batch_list(rec.ROWNUM).pers_cat          := SUBSTR(rec.pers_cat, 1, 2);
+             l_batch_list(rec.ROWNUM).aver_sum          := SUBSTR(rec.aver_sum, 1, 12);
+             l_batch_list(rec.ROWNUM).tabn              := SUBSTR(rec.tabn, 1, 32);
+             l_batch_list(rec.ROWNUM).acc_instant       := SUBSTR(rec.acc_instant, 1, 22);
+
+             l_batch_list(rec.ROWNUM).kk_secret_word    := SUBSTR(rec.kk_secret_word, 1, 32);
+             l_batch_list(rec.ROWNUM).kk_regtype        := rec.kk_regtype;
+             l_batch_list(rec.ROWNUM).kk_cityareaid     := rec.kk_cityareaid;
+             l_batch_list(rec.ROWNUM).kk_streettypeid   := rec.kk_streettypeid;
+             l_batch_list(rec.ROWNUM).kk_streetname     := rec.kk_streetname;
+             l_batch_list(rec.ROWNUM).kk_apartment      := rec.kk_apartment;
+             l_batch_list(rec.ROWNUM).kk_postcode       := rec.kk_postcode;
+
+             l_batch_list(rec.ROWNUM).max_term          := rec.max_term;
+             l_batch_list(rec.ROWNUM).pasp_end_date     := TO_DATE(rec.pasp_end_date, 'dd.mm.yyyy');
+             l_batch_list(rec.ROWNUM).pasp_eddrid_id    := SUBSTR(rec.pasp_eddrid_id, 1, 14);
+             l_batch_list(rec.ROWNUM).kf                := SYS_CONTEXT('bars_context', 'user_mfo');
+             --\\ наполнение коллекции данных
+
+             --// наполнение коллеции фото
+             l_photo_list(rec.ROWNUM).id                := p_id;
+             l_photo_list(rec.ROWNUM).idn               := rec.ROWNUM;
+             -- конвертнуть до нужного размера
+             l_photo_list(rec.ROWNUM).photo             := convert_photo_data(rec.photo_jpg);
+             --\\ наполнение коллеции фото
+          END LOOP;
+       END IF;
+
+       p_batch_list  := l_batch_list;
+       p_photo_list  := l_photo_list;
+       p_batch_header := l_batch_header;
+    END parse_file;
+
   function check_file(p_batch_list in t_batch_list,
                       p_file_type  in number) return t_batch_list is
     l_batch_list t_batch_list := p_batch_list;
@@ -897,7 +1231,7 @@ create or replace package body ow_batch_opening is
     for i in l_batch_list.first .. l_batch_list.last
     loop
       l_batch_list(i).str_err := null;
-       
+
       if p_file_type = esk_file then
         l_batch_list(i).country        := 804;
         l_batch_list(i).resident       := 1;
@@ -924,7 +1258,7 @@ create or replace package body ow_batch_opening is
       if l_batch_list(i).eng_last_name is null then
         l_batch_list(i).eng_last_name := substr(f_translate_kmu(l_batch_list(i).last_name),1,30);
       end if;
-        
+
       if l_batch_list(i).paspseries is not null then
         l_batch_list(i).paspseries := kl.recode_passport_serial(l_batch_list(i).paspseries);
       end if;
@@ -948,7 +1282,7 @@ create or replace package body ow_batch_opening is
 
         append_msg('Не заповнено обов''язкові поля');
       end if;
-        
+
       if length(trim(l_batch_list(i).eng_first_name||' '||l_batch_list(i).eng_last_name)) > 24 then
         append_msg('Кількість знаків Прізвище та І''мя для ембосування перевищує 24 символи');
       end if;
@@ -1037,7 +1371,7 @@ create or replace package body ow_batch_opening is
         l_batch_list(i).rnk := found_client(l_batch_list(i).okpo, l_batch_list(i).paspseries, l_batch_list(i).paspnum);
       else
         l_batch_list(i).rnk := null;
-      end if;      
+      end if;
     end loop;
     return l_batch_list;
   end;
@@ -1054,13 +1388,14 @@ create or replace package body ow_batch_opening is
       if p_photo_list.count > 0 then
         for k in p_photo_list.first .. p_photo_list.last
         loop
-          if upper(p_photo_list(k).file_name) like '%' || l_batch_list(i).okpo || '%' 
+          if upper(p_photo_list(k).file_name) like '%' || l_batch_list(i).okpo || '%'
           or upper(p_photo_list(k).file_name) like '%' || upper(l_batch_list(i).paspseries)||l_batch_list(i).paspnum || '%'
           or upper(p_photo_list(k).file_name) like '%' || l_batch_list(i).okpo||'_' ||upper(l_batch_list(i).paspseries)||l_batch_list(i).paspnum ||'%' then
             l_photo_list(i).id := l_batch_list(i).id;
             l_photo_list(i).idn := l_batch_list(i).idn;
             l_photo_list(i).photo := p_photo_list(k).file_data;
             l_photo_list(i).name := p_photo_list(k).file_name;
+			l_photo_list(i).kf := sys_context('bars_context','user_mfo');
             exit;
           end if;
           if p_file_type in (kk_file, mp_file) and k = p_photo_list.last then
@@ -1072,17 +1407,17 @@ create or replace package body ow_batch_opening is
           l_batch_list(i).str_err := 'Відсутнє фото';
         end if;
       end if;
-    
+
     end loop;
-    
+
     forall x in indices of l_batch_list
       insert into ow_batch_open_data values l_batch_list(x);
-    
+
     forall z in indices of l_photo_list
-      insert into ow_batch_photo values l_photo_list(z);      
-     
+      insert into ow_batch_photo values l_photo_list(z);
+
   end;
-  
+
   procedure processing_file(p_file_list  in t_fileinflist,
                             p_photo_list in t_fileinflist,
                             p_zip_fname  in varchar2,
@@ -1096,14 +1431,14 @@ create or replace package body ow_batch_opening is
     l_blob_csid number := dbms_lob.default_csid;
     l_lang_context number := dbms_lob.default_lang_ctx;
     l_batch_list t_batch_list;
-    l_n number;        
+    l_n number;
     h varchar2(100) := 'ow_batch_opening.parse_file. ';
-  begin  
+  begin
     bars_audit.info(h || 'Start. ZIP file name: ' || p_zip_fname);
 
-    dbms_lob.createtemporary(l_file_data, false);    
+    dbms_lob.createtemporary(l_file_data, false);
     if p_file_list.count > 0 then
-      bars_audit.info(h || 'Processing.' || 'p_filename=>' || p_file_list(1).file_name);      
+      bars_audit.info(h || 'Processing.' || 'p_filename=>' || p_file_list(1).file_name);
       -- обробляєм тільки 1 файл з архіву
       insert into ow_batch_files (id, file_name, zipfile_name, file_date, file_type, state)
       values (bars_sqnc.get_nextval(p_sqnc => 'S_OW_BATCH_FILES'), p_file_list(1).file_name, p_zip_fname, sysdate, p_file_type, 0)
@@ -1127,13 +1462,94 @@ create or replace package body ow_batch_opening is
      -- вставка данних в проміжну таблицю
      add_data(l_batch_list, p_photo_list, p_file_type);
      set_state(l_id, 3);
-     
+
      l_n :=  l_batch_list.COUNT;
      update ow_batch_files t set t.file_n = l_n where t.id = l_id;
      p_fileid := l_id;
     end if;
   end;
-  
+
+  -- обработка блоб файла, в котором фото и информация содержатся в одном xml
+  PROCEDURE processing_file(p_file_blob   IN     BLOB
+                           ,p_zip_fname   IN     VARCHAR2
+                           ,p_file_type   IN     NUMBER
+                           ,p_external_file_id in VARCHAR2
+                           ,p_fileid         OUT NUMBER
+                           )
+  IS
+    l_id         NUMBER;
+    l_file_data  CLOB;
+    l_file_clob  CLOB;
+    l_batch_list t_batch_list;
+    l_photo_list t_photo_list;
+    l_batch_header t_batch_header;
+    l_n          NUMBER;
+    h            VARCHAR2(100) := 'ow_batch_opening.parse_file. ';
+  BEGIN
+    bars_audit.info(h || 'Start. ZIP file name: ' || p_zip_fname);
+
+    dbms_lob.createtemporary(l_file_data, FALSE);
+    IF length(p_file_blob) > 0 THEN
+      bars_audit.info(h || 'Processing.' || 'p_filename=>' || p_file_type);
+     -- bc.go(300465);
+      -- обробляєм тільки 1 файл з архіву
+      INSERT INTO ow_batch_files
+        (id
+        ,file_name
+        ,zipfile_name
+        ,file_date
+        ,file_type
+        ,state
+        ,external_file_id
+        )
+      VALUES
+        (S_OW_BATCH_FILES.NEXTVAL -- bars_sqnc.get_nextval(p_sqnc => 'S_OW_BATCH_FILES'
+        ,p_zip_fname
+        ,p_zip_fname
+        ,SYSDATE
+        ,p_file_type
+        ,0
+        ,p_external_file_id)
+      RETURNING id INTO l_id;
+      COMMIT;
+
+      -- преобразование из блоб в клоб
+      l_file_clob := ow_batch_opening.blob_to_clob(p_file_blob);
+
+      -- парсим файл. получаем коллекции данных и фото
+      parse_file(p_id           => l_id
+                ,p_file_data    => l_file_clob
+                ,p_file_type    => 0
+                ,p_batch_list   => l_batch_list
+                ,p_photo_list   => l_photo_list
+                ,p_batch_header => l_batch_header);
+      set_state(l_id, 1);
+
+      -- перевіряємо корекнтість данних
+      l_batch_list := check_file(l_batch_list, p_file_type);
+      set_state(l_id, 2);
+      -- вставка данних в проміжні таблиці
+          forall x in indices of l_batch_list
+            insert into ow_batch_open_data values l_batch_list(x);
+
+          forall z in indices of l_photo_list
+            insert into ow_batch_photo values l_photo_list(z);
+      set_state(l_id, 3);
+
+      l_n := l_batch_list.count;
+
+      UPDATE ow_batch_files t
+         SET t.file_n = l_n
+            ,t.branch = l_batch_header(1).branch
+            ,t.isp    = l_batch_header(1).isp
+            ,t.proect_id = l_batch_header(1).PROECT_ID
+            ,t.card_code = l_batch_header(1).CARD_CODE
+       WHERE t.id = l_id;
+
+      p_fileid := l_id;
+    END IF;
+  END processing_file;
+
   function get_photo_data(p_id  number,
                           p_idn in number) return blob is
     l_blob blob;
@@ -1147,7 +1563,7 @@ create or replace package body ow_batch_opening is
     when no_data_found then
       return empty_blob();
   end;
- 
+
   procedure import_file(p_filename in varchar2,
                         p_filebody in blob,
                         p_filetype in number default 0,
@@ -1158,34 +1574,67 @@ create or replace package body ow_batch_opening is
 
     h varchar2(100) := 'ow_batch_opening.import_file. ';
   begin
-    
+
     bars_audit.info(h || 'Start.'|| 'p_filename=>' || p_filename);
 
     --Масив файлів архіу
     l_fi_list := get_files_list(p_filebody);
-    
+
     --Масив файлів на відкриття карток
     l_fi_list_xml := get_files_from_ext(l_fi_list, 'xml');
-    
+
     --Масив фотографій клієнтів
-    l_fi_list_jpg := get_files_from_ext(l_fi_list, 'jpg');    
-    
+    l_fi_list_jpg := get_files_from_ext(l_fi_list, 'jpg');
+
     --Ковертимо фотографії до заданого розміру
     l_fi_list_jpg := convert_photo_data(l_fi_list_jpg);
-    
-    -- Обробка файлу 
+
+    -- Обробка файлу
     processing_file(l_fi_list_xml, l_fi_list_jpg, p_filename, p_filetype, p_fileid);
-             
+
     bars_audit.info(h || 'p_filename=>' || p_filename);
     bars_audit.info(h || 'Finish.');
+  exception when others then
+    bars_audit.error(sqlerrm || chr(10) || dbms_utility.format_error_backtrace());
+    bars_error.raise_error('DOC',
+                                 47,
+                                 'Увага !!! '||sqlerrm || chr(10) || dbms_utility.format_error_backtrace());
 
   end;
 
+  -- импорт ахфива gzip (gz), который содержит xlm с фото формата BASE64
+  PROCEDURE import_file_gz(p_filename         IN VARCHAR2
+                          ,p_filebody         IN BLOB
+                          ,p_external_file_id IN VARCHAR2
+                          ,p_filetype         IN NUMBER
+                          ,p_fileid           OUT NUMBER) IS
+    l_uncompressed_blob BLOB;
+    h                   VARCHAR2(100) := 'ow_batch_opening.import_file. ';
+  BEGIN
+    --bars_audit.info(h || 'Start.' || 'p_filename=>' || p_filename);
+
+    l_uncompressed_blob := to_blob('0');
+
+    -- Разархивировать gzip архив в переменную l_uncompressed_blob
+    utl_compress.lz_uncompress(src => p_filebody
+                              ,dst => l_uncompressed_blob);
+
+      -- Обробка файлу
+      processing_file(p_file_blob        => l_uncompressed_blob
+                     ,p_zip_fname        => p_filename
+                     ,p_file_type        => p_filetype
+                     ,p_external_file_id => p_external_file_id
+                     ,p_fileid           => p_fileid);
+
+    bars_audit.info(h || 'p_filename=>' || p_filename);
+    bars_audit.info(h || 'Finish.');
+
+  END import_file_gz;
 
   procedure form_ticket (
     p_fileid     in number,
     p_ticketname out varchar2,
-    p_ticketdata out clob 
+    p_ticketdata out clob
      )
   is
     l_count     number  := 0;
@@ -1204,29 +1653,34 @@ create or replace package body ow_batch_opening is
        bars_error.raise_nerror(g_modcode, 'FILE_NOT_FOUND');
     end;
 
-    for v in ( select p.okpo, p.first_name,
-                      p.last_name, p.middle_name, p.paspseries,
-                      p.paspnum, to_char(p.bday,'dd/mm/yyyy') bday,
-                      p.tabn, a.nls, p.str_err
-                 from ow_batch_open_data p, w4_acc w, accounts a
-                where p.id = p_fileid and p.nd = w.nd(+) and w.acc_pk = a.acc(+) )
+    for v in (SELECT bf.external_file_id as ext_id
+                    ,a.nls
+                    ,ow_batch_opening.split_key(p.rnk) as rnk
+                    ,(case when p.str_err is null then 1 else 0 end) as code
+                    ,p.str_err
+                FROM ow_batch_open_data p
+                    ,ow_batch_files     bf
+                    ,w4_acc             w
+                    ,accounts           a
+               WHERE p.id = p_fileid
+                 AND p.nd = w.nd(+)
+                 AND w.acc_pk = a.acc(+)
+                 and p.id     = bf.id )
     loop
 
        l_count := l_count + 1;
 
-       select
-          XmlElement("ROW",
-             XmlElement("OKPO", v.okpo),
-             XmlElement("FIRST_NAME", v.first_name),
-             XmlElement("LAST_NAME", v.last_name),
-             XmlElement("MIDDLE_NAME", v.middle_name),
-             XmlElement("PASPSERIES", v.paspseries),
-             XmlElement("PASPNUM", v.paspnum),
-             XmlElement("BDAY", v.bday),
-             XmlElement("TABN", v.tabn),
-             XmlElement("ACC", v.nls),
-             XmlElement("ERR", v.str_err)
-          )
+       SELECT xmlelement("ROW"
+                          ,xmlelement("EXT_ID"
+                                     ,v.ext_id)
+                          ,xmlelement("NLS"
+                                     ,v.nls)
+                          ,xmlelement("RNK"
+                                     ,v.rnk)
+                          ,xmlelement("CODE"
+                                     ,v.code)
+                          ,xmlelement("MSG"
+                                     ,v.str_err))
        into l_xml_tmp
        from dual;
 
@@ -1296,18 +1750,14 @@ create or replace package body ow_batch_opening is
                  from ow_batch_open_data
                 where id = p_id )
     loop
-
        -- открываем счет
        l_flagopen := 1;
        l_msg      := null;
 
        -- если ошибка в данных, счет не открываем
        if z.rnk is null and z.str_err is not null then
-
           l_flagopen := 0;
-
        elsif z.rnk is not null then
-
           -- проверка для клиента
           l_msg := check_opencard(z.rnk, p_cardcode);
 
@@ -1315,7 +1765,6 @@ create or replace package body ow_batch_opening is
           if l_msg is not null then
              l_flagopen := 2;
           end if;
-
        end if;
 
        update ow_batch_open_data
@@ -1325,7 +1774,7 @@ create or replace package body ow_batch_opening is
 
     end loop;
 
-  end;  
+  end;
 
   procedure create_deal (
     p_fileid    in number,
@@ -1531,8 +1980,82 @@ create or replace package body ow_batch_opening is
     bars_audit.info(h || 'Finish.');
 
   end;
+
+  -- процедура принимает архив на пакетное открытие в формате блоб, и возращает тикет в формате заарзивированного blob
+  PROCEDURE batch_get_process(p_filename         IN VARCHAR2
+                             ,p_filebody         IN BLOB
+                             ,p_external_file_id IN VARCHAR2
+                             ,p_filetype         IN NUMBER
+                             ,p_ticketdata       OUT BLOB) IS
+    l_fileid            NUMBER;
+    l_ticketname        VARCHAR2(300);
+    l_compressed_blob   BLOB;
+    l_uncompressed_blob BLOB;
+    l_ticketdata_clob   CLOB;
+  
+    TYPE batch_files_rectype IS RECORD(
+       fileid    ow_batch_files.id%TYPE
+      ,proect_id ow_batch_files.proect_id%TYPE
+      ,card_code ow_batch_files.card_code%TYPE
+      ,branch    ow_batch_files.branch%TYPE
+      ,isp       ow_batch_files.isp%TYPE);
+    batch_files_rec batch_files_rectype;
+  BEGIN
+    l_compressed_blob   := to_blob('0');
+    l_uncompressed_blob := to_blob('0');
+    dbms_lob.createtemporary(l_ticketdata_clob
+                            ,FALSE);
+  
+    -- ипорт файла и его обработка
+    import_file_gz(p_filename         => p_filename
+                  ,p_filebody         => p_filebody
+                  ,p_external_file_id => p_external_file_id
+                  ,p_filetype         => p_filetype
+                  ,p_fileid           => l_fileid);
+    -- если файл обработан, создаём сделки
+    IF SQL%FOUND THEN
+      -- переменные для создания сделки
+      SELECT t.id AS fileid
+            ,t.proect_id
+            ,t.card_code
+            ,t.branch
+            ,t.isp
+        INTO batch_files_rec
+        FROM ow_batch_files t
+       WHERE t.id = l_fileid;
+      -- создаём сделку
+      create_deal(p_fileid    => batch_files_rec.fileid
+                 ,p_proect_id => batch_files_rec.proect_id
+                 ,p_card_code => batch_files_rec.card_code
+                 ,p_branch    => batch_files_rec.branch
+                 ,p_isp       => batch_files_rec.isp);
+      -- сделка создана, формируем тикет
+      IF SQL%FOUND THEN
+        form_ticket(p_fileid     => l_fileid
+                   ,p_ticketname => l_ticketname
+                   ,p_ticketdata => l_ticketdata_clob);
+        -- преобразовать клоб в блоб
+        l_uncompressed_blob := clob_to_blob(l_ticketdata_clob);
+        -- заархивировать блоб
+        utl_compress.lz_compress(src => l_uncompressed_blob
+                                ,dst => l_compressed_blob);
+      
+        p_ticketdata := l_compressed_blob;
+      
+      END IF;
+    END IF;
+  
+  END batch_get_process;
 end;
 /
-grant execute on OW_BATCH_OPENING to BARS_ACCESS_DEFROLE;
 
+ show err;
+ 
+PROMPT *** Create  grants  OW_BATCH_OPENING ***
 
+  grant DEBUG,EXECUTE  ON "BARS"."OW_BATCH_OPENING" TO "BARSTRANS";
+  grant DEBUG,EXECUTE  ON "BARS"."OW_BATCH_OPENING" TO "BARS_ACCESS_DEFROLE";
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/OW_BATCH_OPENING.sql =========*** 
+ PROMPT =====================================================================================  

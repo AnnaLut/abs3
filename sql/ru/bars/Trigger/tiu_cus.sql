@@ -8,7 +8,7 @@ declare
   err          EXCEPTION;
 BEGIN
   
-  IF pul.cus_rec.rnk IS NOT NULL
+  IF kl.cus_rec.rnk IS NOT NULL
   THEN
     RAISE err;
   END IF;
@@ -139,76 +139,79 @@ BEGIN
           (:old.nrezid_code is not null and :new.nrezid_code is null) or
        :new.isp <> :old.isp or
           (:old.isp is null and :new.isp is not null) or
-          (:old.isp is not null and :new.isp is null) )
+          (:old.isp is not null and :new.isp is null) or
+       :new.kf <> :old.kf or
+          (:old.kf is null and :new.kf is not null) or
+          (:old.kf is not null and :new.kf is null) )
   THEN
 
     IF INSERTING
     THEN -- Customer opened
-      pul.cus_otm := 1;
+      kl.cus_otm := 1;
     ELSIF UPDATING AND :OLD.date_off IS NULL AND :NEW.date_off IS NULL
     THEN -- Customer changed
-      pul.cus_otm := 2;
+      kl.cus_otm := 2;
     ELSIF UPDATING AND :OLD.date_off IS NOT NULL AND :NEW.date_off IS NOT NULL AND USER_NAME = 'BARS'
     THEN -- Customer changed
-      pul.cus_otm := 2;
+      kl.cus_otm := 2;
     ELSIF UPDATING AND :OLD.date_off IS NULL AND :NEW.date_off IS NOT NULL
     THEN -- Customer closed
-      pul.cus_otm := 3;
+      kl.cus_otm := 3;
     ELSIF UPDATING AND :OLD.date_off IS NOT NULL AND :NEW.date_off IS NULL
     THEN -- "Resurection"
-      pul.cus_otm := 0;
+      kl.cus_otm := 0;
     END IF;
     
-    pul.cus_rec.KF          := :new.KF;
-    pul.cus_rec.RNK         := :new.RNK;
-    pul.cus_rec.TGR         := :new.TGR;
-    pul.cus_rec.CUSTTYPE    := :new.CUSTTYPE;
-    pul.cus_rec.COUNTRY     := :new.COUNTRY;
-    pul.cus_rec.NMK         := :new.NMK;
-    pul.cus_rec.NMKV        := :new.NMKV;
-    pul.cus_rec.NMKK        := :new.NMKK;
-    pul.cus_rec.CODCAGENT   := :new.CODCAGENT;
-    pul.cus_rec.PRINSIDER   := :new.PRINSIDER;
-    pul.cus_rec.OKPO        := :new.OKPO;
-    pul.cus_rec.ADR         := :new.ADR;
-    pul.cus_rec.SAB         := :new.SAB;
-    pul.cus_rec.C_REG       := :new.C_REG;
-    pul.cus_rec.C_DST       := :new.C_DST;
-    pul.cus_rec.RGTAX       := :new.RGTAX;
-    pul.cus_rec.DATET       := :new.DATET;
-    pul.cus_rec.ADM         := :new.ADM;
-    pul.cus_rec.DATEA       := :new.DATEA;
-    pul.cus_rec.STMT        := :new.STMT;
-    pul.cus_rec.DATE_ON     := :new.DATE_ON;
-    pul.cus_rec.DATE_OFF    := :new.DATE_OFF;
-    pul.cus_rec.NOTES       := :new.NOTES;
-    pul.cus_rec.NOTESEC     := :new.NOTESEC;
-    pul.cus_rec.CRISK       := :new.CRISK;
-    pul.cus_rec.PINCODE     := :new.PINCODE;
-    pul.cus_rec.ND          := :new.ND;
-    pul.cus_rec.RNKP        := :new.RNKP;
-    pul.cus_rec.ISE         := :new.ISE;
-    pul.cus_rec.FS          := :new.FS;
-    pul.cus_rec.OE          := :new.OE;
-    pul.cus_rec.VED         := :new.VED;
-    pul.cus_rec.SED         := :new.SED;
-    pul.cus_rec.LIM         := :new.LIM;
-    pul.cus_rec.MB          := :new.MB;
-    pul.cus_rec.RGADM       := :new.RGADM;
-    pul.cus_rec.BC          := :new.BC;
-    pul.cus_rec.BRANCH      := :new.BRANCH;
-    pul.cus_rec.TOBO        := :new.TOBO;
-    pul.cus_rec.ISP         := :new.ISP;
-    pul.cus_rec.TAXF        := :new.TAXF;
-    pul.cus_rec.NOMPDV      := :new.NOMPDV;
-    pul.cus_rec.K050        := :new.K050;
-    pul.cus_rec.NREZID_CODE := :new.NREZID_CODE;
+    kl.cus_rec.KF          := :new.KF;
+    kl.cus_rec.RNK         := :new.RNK;
+    kl.cus_rec.TGR         := :new.TGR;
+    kl.cus_rec.CUSTTYPE    := :new.CUSTTYPE;
+    kl.cus_rec.COUNTRY     := :new.COUNTRY;
+    kl.cus_rec.NMK         := :new.NMK;
+    kl.cus_rec.NMKV        := :new.NMKV;
+    kl.cus_rec.NMKK        := :new.NMKK;
+    kl.cus_rec.CODCAGENT   := :new.CODCAGENT;
+    kl.cus_rec.PRINSIDER   := :new.PRINSIDER;
+    kl.cus_rec.OKPO        := :new.OKPO;
+    kl.cus_rec.ADR         := :new.ADR;
+    kl.cus_rec.SAB         := :new.SAB;
+    kl.cus_rec.C_REG       := :new.C_REG;
+    kl.cus_rec.C_DST       := :new.C_DST;
+    kl.cus_rec.RGTAX       := :new.RGTAX;
+    kl.cus_rec.DATET       := :new.DATET;
+    kl.cus_rec.ADM         := :new.ADM;
+    kl.cus_rec.DATEA       := :new.DATEA;
+    kl.cus_rec.STMT        := :new.STMT;
+    kl.cus_rec.DATE_ON     := :new.DATE_ON;
+    kl.cus_rec.DATE_OFF    := :new.DATE_OFF;
+    kl.cus_rec.NOTES       := :new.NOTES;
+    kl.cus_rec.NOTESEC     := :new.NOTESEC;
+    kl.cus_rec.CRISK       := :new.CRISK;
+    kl.cus_rec.PINCODE     := :new.PINCODE;
+    kl.cus_rec.ND          := :new.ND;
+    kl.cus_rec.RNKP        := :new.RNKP;
+    kl.cus_rec.ISE         := :new.ISE;
+    kl.cus_rec.FS          := :new.FS;
+    kl.cus_rec.OE          := :new.OE;
+    kl.cus_rec.VED         := :new.VED;
+    kl.cus_rec.SED         := :new.SED;
+    kl.cus_rec.LIM         := :new.LIM;
+    kl.cus_rec.MB          := :new.MB;
+    kl.cus_rec.RGADM       := :new.RGADM;
+    kl.cus_rec.BC          := :new.BC;
+    kl.cus_rec.BRANCH      := :new.BRANCH;
+    kl.cus_rec.TOBO        := :new.TOBO;
+    kl.cus_rec.ISP         := :new.ISP;
+    kl.cus_rec.TAXF        := :new.TAXF;
+    kl.cus_rec.NOMPDV      := :new.NOMPDV;
+    kl.cus_rec.K050        := :new.K050;
+    kl.cus_rec.NREZID_CODE := :new.NREZID_CODE;
 
   END IF;
 
 EXCEPTION
-   WHEN err THEN
-      bars_error.raise_error('CAC', ern);
+  WHEN err THEN
+    bars_error.raise_error( 'CAC', ern );
 END tiu_cus;
 /
 

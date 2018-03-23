@@ -340,7 +340,8 @@ If p_mode = 2 then
 end if;
 
     ----- Вычисление  эффективной ставки p_ND < 0 -- l_mode := 2; По текущему ГПК + по условиям КД
-    p_irr_BV (p_ND => - dd2.nd, R_DAT => dd2.sdate );
+    --p_irr_BV (p_ND => - dd2.nd, R_DAT => dd2.sdate );
+    cck_dop.calc_sdi( dd2.nd, null);  -- Взята процедура из авторизации для первоначального расчета эф.ставки
     --------открытие счетов
     cck_dop.open_account(p_nd => dd2.nd,  p_tip => 'SS ') ;
     cck_dop.open_account(p_nd => dd2.nd,  p_tip => 'SN ') ;

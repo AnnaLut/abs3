@@ -43,7 +43,7 @@ exception
 end;
 /
 
-SET FEEDBACK     ON
+
 
 prompt -- ======================================================
 prompt -- Comments

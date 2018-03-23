@@ -148,7 +148,7 @@ prompt -- Grants
 prompt -- ======================================================
 
 grant DELETE,INSERT,SELECT,UPDATE on TMP_FILE03 to ABS_ADMIN;
-grant SELECT                      on TMP_FILE03 to BARSREADER_ROLE;
+
 grant DELETE,INSERT,SELECT,UPDATE on TMP_FILE03 to BARS_ACCESS_DEFROLE;
 grant SELECT                      on TMP_FILE03 to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE on TMP_FILE03 to RPBN002;

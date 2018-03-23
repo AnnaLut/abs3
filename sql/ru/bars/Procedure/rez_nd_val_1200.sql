@@ -18,6 +18,45 @@ begin
       EXCEPTION WHEN NO_DATA_FOUND THEN  NULL;
       END;
    end if;
+   /*
+   begin
+      for k in (select distinct rnk from REZ_PAR_9200 where fdat=p_dat01 and fin is null)
+      LOOP
+         l_fin := null;
+         l_pd  := null;
+         l_VKR := NULL; 
+         begin
+            select * into nv from nd_val 
+            where fdat= p_dat01  and rnk= k.rnk and tipa not in (30,92,93) 
+              and fin in (select max(fin) from nd_val where fdat= p_dat01  and rnk = k.rnk and tipa not in (30,92,93) ) and rownum=1;
+         EXCEPTION  WHEN NO_DATA_FOUND  THEN 
+            if nv.tipa in (15) THEN
+               begin
+                  select k.fin_351, k.pd, k.vncrr into l_fin, l_pd, l_VKR 
+                  from cp_deal c, cp_kod k where c.ref = nv.nd and c.id=k.id;
+               EXCEPTION  WHEN NO_DATA_FOUND  THEN NULL;
+               end; 
+            else
+               begin
+                  select k.fin_351, k.pd,cck_app.get_nd_txt(k.nd,'VNCRR') into l_fin, l_pd, l_vkr 
+                  from cc_deal k where k.nd = nv.nd; 
+               EXCEPTION  WHEN NO_DATA_FOUND  THEN NULL;
+               end; 
+            end if;
+         end;
+         if l_fin is null THEN
+            begin 
+               select fin, pd, vkr into l_fin, l_pd, l_vkr from REZ_PAR_9200 
+               where fdat = add_months( p_dat01, -1 ) and rnk=k.rnk and rownum=1;
+            EXCEPTION  WHEN NO_DATA_FOUND  THEN NULL;
+            end;
+         end if;        
+         if l_fin is not null or l_pd is not null or l_vkr is not null THEN
+            update REZ_PAR_9200 set fin = l_fin, pd = l_pd, vkr = l_vkr where fdat = p_dat01 and rnk=k.rnk and fin is null;
+         end if;
+      end LOOP;
+   end;
+   */
    l_d1 := sysdate; 
    z23.to_log_rez (user_id , 351 , p_dat01 ,'Начало параметры 1200');
    for k in ( select p_dat01 fdat,c.custtype,substr(c.nmk,1,35) nmk, 'NEW/' || acc id, - ost_korr(a.acc,l_dat31,null,a.nbs) bv, 

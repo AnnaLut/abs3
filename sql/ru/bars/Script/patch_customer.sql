@@ -6,14 +6,6 @@
 -- modify table CUSTOMER
 -- ======================================================
 
-SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
-SET FEEDBACK     OFF
-SET TIMING       OFF
-SET DEFINE       OFF
-SET LINES        200
-SET PAGES        200
-SET TERMOUT      ON
-SET TRIMSPOOL    ON
 
 prompt -- ======================================================
 prompt --  modify table CUSTOMER
@@ -43,7 +35,7 @@ exception
 end;
 /
 
-SET FEEDBACK ON
+
 
 prompt -- ======================================================
 prompt -- Comments

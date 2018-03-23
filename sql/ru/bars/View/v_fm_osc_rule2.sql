@@ -19,25 +19,25 @@ create or replace view v_fm_osc_rule2 (ref, vdat) as
 -- ============================================================================
 SELECT o.REF, o.vdat
      FROM oper o
-    WHERE     (       SUBSTR (o.nlsa, 1, 4) IN ('1001', '1002', '1005') AND o.mfoa = f_ourmfo
-                  AND SUBSTR (o.nlsb, 1, 2) IN ('20','21','22','25','26','28','29','37')
-               OR     SUBSTR (o.nlsb, 1, 4) IN ('1001', '1002', '1005') AND o.mfob = f_ourmfo
-                  AND SUBSTR (o.nlsa, 1, 2) IN ('20','21','22','25','26','28','29','37')
-               OR     SUBSTR (o.nlsa, 1, 4) IN ('2902', '2909') AND o.dk = 1 AND o.mfoa = f_ourmfo
-                  AND SUBSTR (o.nlsb, 1, 2) IN ('20','21','22','25','26','28','29','37')
-               OR     SUBSTR (o.nlsb, 1, 4) IN ('2902', '2909') AND o.dk = 0 AND o.mfob = f_ourmfo
-                  AND SUBSTR (o.nlsa, 1, 2) IN ('20','21','22','25','26','28','29','37')
+    WHERE     (       (SUBSTR (o.nlsa, 1, 4) IN ('1001', '1002', '1005') AND o.mfoa = f_ourmfo
+                  AND (SUBSTR (o.nlsb, 1, 2) IN ('20','21','22','25','26','28','29','37') or o.mfob <> f_ourmfo))
+               OR     (SUBSTR (o.nlsb, 1, 4) IN ('1001', '1002', '1005') AND o.mfob = f_ourmfo
+                  AND (SUBSTR (o.nlsa, 1, 2) IN ('20','21','22','25','26','28','29','37') or o.mfoa <> f_ourmfo))
+               OR     (SUBSTR (o.nlsa, 1, 4) IN ('2902', '2909') AND o.dk = 1 AND o.mfoa = f_ourmfo
+                  AND (SUBSTR (o.nlsb, 1, 2) IN ('20','21','22','25','26','28','29','37') or o.mfob <> f_ourmfo))
+               OR     (SUBSTR (o.nlsb, 1, 4) IN ('2902', '2909') AND o.dk = 0 AND o.mfob = f_ourmfo
+                  AND (SUBSTR (o.nlsa, 1, 2) IN ('20','21','22','25','26','28','29','37') or o.mfoa <> f_ourmfo))
 
-               OR     SUBSTR (o.nlsa, 1, 4) IN ('2924')
+               OR     (SUBSTR (o.nlsa, 1, 4) IN ('2924')
                   AND SUBSTR (o.nlsb, 1, 4) IN ('2924')
-                  AND (UPPER(TRIM(o.NAZN)) like '%œŒœŒ¬Õ≈ÕÕﬂ%' OR UPPER(TRIM(o.NAZN)) like '¬»ƒ¿◊¿ √Œ“≤¬ »:%' OR UPPER(TRIM(o.NAZN)) like '%«¿–¿’”¬¿ÕÕﬂ%')
+                  AND (UPPER(TRIM(o.NAZN)) like '%œŒœŒ¬Õ≈ÕÕﬂ%' OR UPPER(TRIM(o.NAZN)) like '¬»ƒ¿◊¿ √Œ“≤¬ »:%' OR UPPER(TRIM(o.NAZN)) like '%«¿–¿’”¬¿ÕÕﬂ%'))
 
-               OR     SUBSTR (o.nlsb, 1, 4) IN ('2924')
+               OR     (SUBSTR (o.nlsb, 1, 4) IN ('2924')
                   AND SUBSTR (o.nlsa, 1, 4) IN ('2625')
-                  AND UPPER(TRIM(o.NAZN)) like '%¬»ƒ¿◊%'
+                  AND UPPER(TRIM(o.NAZN)) like '%¬»ƒ¿◊%')
 
-               OR     SUBSTR (o.nlsa, 1, 4) IN ('2924')
-                  AND SUBSTR (o.nlsb, 1, 4) IN ('2625')
+               OR     (SUBSTR (o.nlsa, 1, 4) IN ('2924')
+                  AND SUBSTR (o.nlsb, 1, 4) IN ('2625'))
 
                OR o.TT in ('040','041','042','043','044','045','AA1','AA2','AA3','AA4','AA5','AA6','AA7','AA8','AA9', 'PKK' ))
 

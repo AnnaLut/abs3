@@ -144,7 +144,7 @@ end bms;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.BMS is
 
-    G_BODY_VERSION                 constant varchar2(64) := 'version 1.4 26/10/2015';
+    G_BODY_VERSION                 constant varchar2(64) := 'version 1.5 28/09/2017';
 
     G_WSPROXY_URL_TAG              constant varchar2(12) := 'PROXY_WS_URL';
     G_WSPROXY_NS_TAG               constant varchar2(12) := 'PROXY_WS_NS';
@@ -772,6 +772,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.BMS is
         l_message_type_row bms_message_type%rowtype;
         l_user_id integer;
         l_message_id integer;
+        l_wallet_dir  web_barsconfig.val%type;
+        l_wallet_pass web_barsconfig.val%type;
     begin
         bars_audit.trace('bms.push_msg_web: p_user_login=%s, p_message=%s',
                          p_user_login,
@@ -782,6 +784,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.BMS is
         end if;
 
         l_namespace := getglobaloption(G_WSPROXY_NS_TAG);
+        select max(val) into l_wallet_dir from web_barsconfig where key = 'SMPP.Wallet_dir';
+        select max(val) into l_wallet_pass from web_barsconfig where key = 'SMPP.Wallet_pass';
 
         for c in (select val
                   from   params$global
@@ -791,7 +795,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.BMS is
             -- подготовить реквест
             l_request := soap_rpc.new_request(p_url       => c.val,
                                               p_namespace => l_namespace,
-                                              p_method    => G_WSPROXY_METHOD);
+                                              p_method    => G_WSPROXY_METHOD,
+                                              p_wallet_dir => l_wallet_dir,
+                                              p_wallet_pass => l_wallet_pass);
             -- добавить параметры
             soap_rpc.add_parameter(l_request,
                                    G_WSPROXY_USERLOGIN_PARAM,

@@ -55,7 +55,7 @@ begin
       l_err:= '';         select d.* into dd    from cc_deal  d where nd = p_nd and sos <13 ;
       l_err:= 'рах.SS';   select a.* into a2202 from accounts a, nd_acc n where n.nd=dd.nd and n.acc=a.acc and a.tip='SS ';
       l_err:= 'рах.SDI';  select a.* into a2206 from accounts a, nd_acc n where n.nd=dd.nd and n.acc=a.acc and a.tip='SDI';
-      l_err:= 'рах.2625'; select a.* into a2625 from accounts a, nd_acc n, w4_acc w where n.nd=dd.nd and n.acc=a.acc and a.nbs='2625' and a.rnk=dd.rnk and a.acc = w.acc_pk and card_code like 'STND_MYCR_%';
+      l_err:= 'рах.2625'; select a.* into a2625 from accounts a, nd_acc n, w4_acc w where n.nd=dd.nd and n.acc=a.acc and a.nbs='2625' and a.rnk=dd.rnk and a.acc = w.acc_pk and card_code like 'STND_MYCR_UA%';
       l_err:= 'РНК кл.'||dd.rnk; select c.* into cu from customer c       where rnk = dd.rnk ;
       l_err:= 'Суму рекв.Дисконту';  select txt into s_SDI from nd_txt    where nd  = dd.nd and tag = 'S_SDI';
       s_SDI:=  replace  ( s_SDI, '.', '' );

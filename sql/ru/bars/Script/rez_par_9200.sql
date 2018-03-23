@@ -1,7 +1,3 @@
-exec tuda;
-delete from REZ_PAR_9200 where fdat is null;
-commit;
-exec suda;
 begin
   EXECUTE IMMEDIATE 
    'ALTER TABLE BARS.REZ_PAR_9200 DROP PRIMARY KEY CASCADE';

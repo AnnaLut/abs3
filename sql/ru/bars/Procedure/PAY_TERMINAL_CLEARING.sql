@@ -68,14 +68,14 @@ begin
   case
    when ( p_operation_type = 'INCOME' )
    then 
-     l_tt  := '089';
+     l_tt  := 'IP2';
      l_dk  := 0;
      l_vob := 56;
      l_sk  := 29;
      l_nazn :='Ïîïîâíåííÿ ãîò³âêè ïî òåğì³íàëó ';
    when ( p_operation_type = 'OUTCOME' )
    then
-     l_tt  :='207';
+     l_tt  :='IP1';
      l_dk  := 1;
      l_vob := 222;
      l_sk  := 58;
@@ -164,7 +164,7 @@ begin
               prty_  => null
             );
  
-  paytt( flg_  => 1
+  paytt( flg_  => 0
        , ref_  => l_ref
        , datv_ => l_bnk_dt
        , tt_   => l_tt

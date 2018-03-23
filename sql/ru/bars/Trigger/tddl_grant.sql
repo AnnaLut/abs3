@@ -41,9 +41,11 @@ BEGIN
                                 'BARSDWH_ACCESS_USER',
                                 'BARSUPL',
                                 'BARS_DM',
+								'FINMON',
                                 'SBON',
                                 'OIM',
-                                'OIM_APPROVE')
+                                'OIM_APPROVE',
+								'BARS_INTGR')
          THEN
             CONTINUE;
          END IF;

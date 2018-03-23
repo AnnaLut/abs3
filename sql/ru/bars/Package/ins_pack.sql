@@ -2228,8 +2228,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.ins_pack is
   procedure set_w4_state(p_nd in number,
                          p_state_id in varchar2,
                          p_msg in varchar2 default null) is
+	l_msg varchar2(4000);
   begin
-    update ins_w4_deals set state = p_state_id, err_msg = p_msg, set_date = sysdate where nd = p_nd;
+    l_msg:=substr(p_msg,1,4000);
+    update ins_w4_deals set state = p_state_id, err_msg = l_msg, set_date = sysdate where nd = p_nd;
   end set_w4_state;
 
   -- запись запроса/ответа по договорам БПК

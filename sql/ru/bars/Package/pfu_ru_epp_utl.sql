@@ -723,18 +723,17 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
                             p_nls  out varchar2,
                             p_term out number) is
   begin
-    select a.nls, wt.term_max
-      into p_nls, p_term
-      from w4_acc w
-      join w4_card t
-        on w.card_code = t.code and w.nd = p_nd
-      join w4_product wp
-        on t.product_code = wp.code
-      join w4_tips wt
-        on wp.tip = wt.tip
-      join accounts a
-        on w.acc_pk = a.acc;
-
+     select a.nls, t.maxterm
+           into p_nls, p_term
+           from w4_acc w
+           join w4_card t
+             on w.card_code = t.code and w.nd = p_nd
+          /* join w4_product wp
+             on t.product_code = wp.code
+           join w4_tips wt
+             on wp.tip = wt.tip*/
+           join accounts a
+             on w.acc_pk = a.acc;
   end;
 
   procedure create_epp(p_fileid in number) is
@@ -963,7 +962,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
      where t.epp_number = p_eppnum;
     l_rnk := p_rnk;
     l_code := 0;
-
+    
     if p_rnk is null then
        l_rnk := get_client(p_okpo    => l_epp.tax_registration_number,
                             p_paspser => case when  l_epp.document_type = 1 then substr(l_epp.document_id, 1, 2) else null end,
@@ -1005,7 +1004,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
                             else 'PENS_SOC_MIGRANT' end;
       l_nd := get_pens_deal(l_rnk, l_cardcode, l_productcode);
     end if;
-
+    
     if l_code = 0 then
         if l_nd is null then
            begin
@@ -1094,7 +1093,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
             end;
         end if;
     end if;
-
+    
     if l_code in (0, 1) then
       update pfu_epp_line_processing t
          set t.state_id = 20,
@@ -1716,6 +1715,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
                where t.state = 0
                  for update skip locked) loop
       begin
+        dbms_session.reset_package;
         bars.bc.go(i.kf);
       if i.file_type = 1 then
         epp_processing(i.file_data, i.id);
@@ -1723,10 +1723,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
         issuecard_processing(i.file_data, i.id);
       elsif i.file_type = 3 then
         activateacc_procesing(i.file_data, i.id);
-      elsif i.file_type = 4 then
+      elsif i.file_type in ( 4, 13) then
         pfu_ru_file_utl.ref_state_processing(i.file_data, i.id);
       elsif i.file_type = 5 then
         pfu_ru_file_utl.get_ebp_processing(i.file_data, i.id);
+      elsif i.file_type = 6 then
+        pfu_ru_file_utl.get_create_paym_processing(i.file_data, i.id);
       elsif i.file_type = 7 then
         pfu_ru_file_utl.get_cardkill_processing(i.file_data, i.id);
       elsif i.file_type = 8 then
@@ -1738,13 +1740,15 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
       elsif i.file_type = 11 then
         pfu_ru_file_utl.get_restart_epp_processing(i.file_data, i.id);
       elsif i.file_type = 12 then
-        pfu_ru_file_utl.get_branch_processing(i.file_data, i.id);
-	  elsif i.file_type = 15 then
-		pfu_ru_file_utl.set_card_block_processing(i.file_data, i.id);
+        pfu_ru_file_utl.get_branch_processing(i.file_data, i.id); 
+      elsif i.file_type = 14 then
+        pfu_ru_file_utl.get_report_processing(i.file_data, i.id);
+      elsif i.file_type = 15 then
+ 	pfu_ru_file_utl.set_card_block_processing(i.file_data, i.id);
       elsif i.file_type = 16 then
-      	pfu_ru_file_utl.set_destruct_processing(i.file_data, i.id);
+        pfu_ru_file_utl.set_destruct_processing(i.file_data, i.id);
       elsif i.file_type = 17 then
- 	      pfu_ru_file_utl.set_card_unblock_processing(i.file_data, i.id);
+ 	pfu_ru_file_utl.set_card_unblock_processing(i.file_data, i.id);
       else
         set_file_state(i.id, 99, 'Невірний тип файлу');
       end if;

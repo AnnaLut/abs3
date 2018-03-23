@@ -7,16 +7,6 @@
 --   1) ÀÐÌ ßêîñò³ ÔÎÏ
 --   2) ÀÐÌ ßêîñò³ ÞÎ
 -- ======================================================================================
-
-SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
-SET DEFINE       OFF
-set echo         Off
-set lines        500
-set pages        500
-set termout      On
-set timing       Off
-set trimspool    On
-
 begin
   Insert into BARS.ROLES$BASE ( ROLE_NAME ) Values ( 'BARS_ACCESS_DEFROLE' );
 exception

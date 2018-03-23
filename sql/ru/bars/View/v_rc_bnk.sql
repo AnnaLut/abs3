@@ -8,9 +8,12 @@ PROMPT =========================================================================
 PROMPT *** Create  view V_RC_BNK ***
 
   CREATE OR REPLACE FORCE VIEW BARS.V_RC_BNK ("B010", "NAME") AS 
-  select b010, name from rc_bnk
- union all
-select country || '0000000', null from country;
+  select B010, NAME
+  from BARS.RC_BNK
+ union ALL
+select to_char(COUNTRY,'FM000') || '0000000', NULL
+  from BARS.COUNTRY
+;
 
 PROMPT *** Create  grants  V_RC_BNK ***
 grant SELECT                                                                 on V_RC_BNK        to BARS_ACCESS_DEFROLE;

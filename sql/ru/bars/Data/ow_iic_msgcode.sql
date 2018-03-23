@@ -29,6 +29,17 @@ exec bpa.alter_policy_info( 'V_OW_IIC_MSGCODE', 'FILIAL', 'M', 'M', 'M', 'M' );
 
 commit;
 
+begin
+   delete from refapp t where t.tabid = (select t.tabid from meta_tables t where t.tabname = 'OW_IIC_MSGCODE');
+   delete from references t where t.tabid = (select t.tabid from meta_tables t where t.tabname = 'OW_IIC_MSGCODE');
+   delete from meta_sortorder t where t.tabid = (select t.tabid from meta_tables t where t.tabname = 'OW_IIC_MSGCODE');
+   delete from meta_columns t where t.tabid = (select t.tabid from meta_tables t where t.tabname = 'OW_IIC_MSGCODE');
+   delete from dyn_filter t where t.tabid = (select t.tabid from meta_tables t where t.tabname = 'OW_IIC_MSGCODE');
+   delete from meta_tables t where t.tabname = 'OW_IIC_MSGCODE';
+   delete from policy_table t where t.table_name = 'OW_IIC_MSGCODE';
+end;
+/
+commit;
 
 
 

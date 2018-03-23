@@ -2075,7 +2075,7 @@ begin
      end;
        z23.to_log_rez (user_id , 351 , p_dat01 ,' допривязка счетов нач процентов+9129 к залогам по КП ');
      -- допривязка счетов нач процентов+9129 к залогам по КП
-     for K1 in (select n.*, ost_korr(a.acc,dat31_,null,a.nbs) ostc from accounts a, nd_acc n 
+     for K1 in (select n.*, a.ostc from accounts a, nd_acc n 
                 where a.acc = n.acc 
                  and a.tip not in ('SS ','DEP','DIU','SDI','SNA') 
                  and (a.nls <'3' or a.nbs='9129') and (a.dazs is null or a.dazs >=p_dat01) 

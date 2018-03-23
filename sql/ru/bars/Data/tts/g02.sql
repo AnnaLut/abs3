@@ -1,7 +1,3 @@
-set lines 1000
-set trimspool on
-set serveroutput on size 1000000
-
 prompt Создание / Обновление операции G02
 prompt Наименование операции: G02 ГЕРЦ Зовнішні 
 declare
