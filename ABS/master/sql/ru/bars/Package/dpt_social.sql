@@ -1,11 +1,11 @@
-create or replace package DPT_SOCIAL 
+create or replace package BARS.DPT_SOCIAL 
 is
   -- ---------------------------------------------------- --
   --  Пакет работы с депозитами пенсионеров и безработных --
   -- ---------------------------------------------------- --
 
   -- поддержка версионности пакета
-  g_header_version  constant varchar2(64)  := 'version 14.1  05.07.2017';
+  g_header_version  constant varchar2(64)  := 'version 14.2  08.09.2017';
   
   -- фиксация типа данных и маск.размерности для текстов сообщений
   g_errmsg          varchar2(3000);
@@ -234,6 +234,15 @@ is
   -- проставлення agency_id для прийнятого файла
   procedure set_agencyid (p_header_id  in  dpt_file_row.header_id%type);
 
+  -- Перевірка рахунка
+  function check_account
+  ( p_nls       in   accounts.nls%type,
+    p_branch    in   accounts.branch%type,
+    p_id_code   in   customer.okpo%type,
+    p_nmk       in   customer.nmk%type,
+    p_acc_type  in   dpt_file_row.acc_type%type
+  ) return varchar2;
+  
   -- Перевірка рахунка по saldo
   procedure check_account_access
    (p_nls       in   accounts.nls%type,
@@ -311,7 +320,7 @@ show errors
 create or replace package body DPT_SOCIAL
 is
   
-  g_body_version  constant varchar2(64) := 'version 13.27 27.07.2017';
+  g_body_version  constant varchar2(64) := 'version 13.30  08.09.2017';
   g_modcode       constant varchar2(3)  := 'SOC';
 
 type acc_rec is record (id     accounts.acc%type,
@@ -1234,10 +1243,19 @@ begin
        where p_centre is not null)
   loop
 
-    -- представляемся подразделением
-    l_branch := cur_branch.branch;
-    bars_context.subst_branch(l_branch);
-    bars_audit.trace('%s представились подразделением %s', title, l_branch);
+    if ( l_branch = cur_branch.branch )
+    then
+      null;
+    else
+
+      bars_context.set_context;
+
+      -- представляемся подразделением
+      l_branch := cur_branch.branch;
+      bars_context.subst_branch(l_branch);
+      bars_audit.trace('%s представились подразделением %s', title, l_branch);
+
+    end if;
 
     -- реквизиты органа соц.защиты
     begin
@@ -2922,33 +2940,35 @@ begin
     end if;
   end if;
 
-  begin
-
-    select HEADER_ID
-      into l_hdr_id
-      from DPT_FILE_HEADER
-     where DAT      = p_dat
-       and TYPE_ID  = p_type_id
-       and FILENAME = p_filename;
-
-    begin
-      FILE_DELETE( l_hdr_id );
-    exception
-      when OTHERS then
-
-        if ( sqlerrm like '%SOC-00084%' ) -- Заборонено видалення оплачених файлів зарахувань
-        then -- Заборонена зміна оплачених файлів
-          bars_error.raise_nerror( g_modcode, 'BF_IS_PAID', to_char(l_hdr_id), sys_context('bars_context','user_branch') );
-        else
-          bars_error.raise_nerror( g_modcode, 'GENERAL_ERROR_CODE', sqlerrm );
-        end if;
-
-    end;
-
-  exception
-    when NO_DATA_FOUND then
-      null;
-  end;
+--begin
+--
+--  select HEADER_ID
+--    into l_hdr_id
+--    from DPT_FILE_HEADER
+--   where DAT      = p_dat
+--     and TYPE_ID  = p_type_id
+--     and FILENAME = p_filename;
+--
+--  begin
+--    FILE_DELETE( l_hdr_id );
+--  exception
+--    when OTHERS then
+--
+--      if ( sqlerrm like '%SOC-00084%' ) -- Заборонено видалення оплачених файлів зарахувань
+--      then -- Заборонена зміна оплачених файлів
+--        bars_error.raise_nerror( g_modcode, 'BF_IS_PAID', to_char(l_hdr_id), sys_context('bars_context','user_branch') );
+--      else
+--        bars_error.raise_nerror( g_modcode, 'GENERAL_ERROR_CODE', sqlerrm );
+--      end if;
+--
+--  end;
+--
+--exception
+--  when NO_DATA_FOUND then
+--    null;
+--  when TOO_MANY_ROWS then
+--    bars_error.raise_nerror( g_modcode, 'GENERAL_ERROR_CODE', 'Файл '||p_filename||' вже був прийнятий датою '||to_char(p_dat,'dd.mm.yyyy') );
+--end;
 
   l_hdr_id := bars_sqnc.get_nextval('S_FILE_HEADER');
 
@@ -3465,6 +3485,47 @@ begin
   
 end SET_AGENCYID;
 
+  -- Перевірка рахунка
+  function CHECK_ACCOUNT
+  ( p_nls       in     accounts.nls%type,
+    p_branch    in     accounts.branch%type,
+    p_id_code   in     customer.okpo%type,
+    p_nmk       in     customer.nmk%type,
+    p_acc_type  in     dpt_file_row.acc_type%type
+  ) return varchar2
+  is
+    title   constant   varchar2(64)   := 'dpt_social.check_account';
+    l_ccy_id           tabval.kv%type := gl.baseval;
+    l_err_msg          varchar2(1024) := null;
+    l_csl_dt           date;
+  begin
+    
+    bars_audit.trace('%s: entry, nls=>%s, branch=>%s, id_code=>%s.', title, p_nls, p_branch, p_id_code );
+    
+    begin
+      
+      select DAZS
+        into l_csl_dt
+        from ACCOUNTS -- SALDO
+       where KF  = BARS_CONTEXT.EXTRACT_MFO(p_branch)
+         and NLS = p_nls
+         and KV  = l_ccy_id;
+      
+      if ( l_csl_dt Is Not Null )
+      then
+        l_err_msg := 'Рахунок '||p_nls||'/'||to_char(l_ccy_id)||' закритий!';
+      end if;
+      
+    exception
+      when NO_DATA_FOUND then
+        l_err_msg := 'Рахунок '||p_nls||'/'||to_char(l_ccy_id)||' не знайдено!';
+    end;
+    
+    bars_audit.trace('%s: exit, err_msg=>%s.', title, l_err_msg );
+    
+    return l_err_msg;
+    
+  end CHECK_ACCOUNT;
 --
 -- Перевірка доступу на перегляд до рахунку (повертає 0 / 1)
 --
