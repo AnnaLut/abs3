@@ -9,7 +9,7 @@ IS
   %param p_rpt_code - 
   %param p_rpt_date - 
 
-  %version 1.5 (02/03/2017)
+  %version 1.6    22/03/2017
   %usage   
   */
   g_dt_fmt    constant varchar2(10) := 'dd.mm.yyyy';
@@ -18,8 +18,7 @@ IS
   l_frst_dt            date; -- 
   l_last_dt            date; -- 
   l_prvn_dt            date; -- 
-  l_nbu_dt             date; --    отчетная дата НБУ
-  l_is_dt_in           integer            :=1;
+  l_nbu_rpt_dt         date; --    отчетная дата НБУ
   l_ret_val            varchar2(4000 byte);
   l_rec                pls_integer := 0;
   l_rpt_code           char(2);
@@ -43,15 +42,8 @@ BEGIN
   l_rpt_code := upper( substr( trim(p_rpt_code), instr(trim(p_rpt_code),'#')+1, 2 ) );
   
 --    отчетная дата НБУ
-   l_nbu_dt := p_rpt_date;
-   loop
-      l_nbu_dt := l_nbu_dt+1;
-      select count(*)   into l_is_dt_in
-        from holiday
-       where kv =980 and holiday =l_nbu_dt;
+   l_nbu_rpt_dt := DAT_NEXT_U( p_rpt_date, 1 );
 
-      exit when l_is_dt_in =0; 
-   end loop;
 -------------------------------------------------------------------------------
   bars_audit.info( $$PLSQL_UNIT||': l_frst_dt=' ||to_char(l_frst_dt,g_dt_fmt)||
                                  ', l_last_dt=' ||to_char(l_last_dt,g_dt_fmt)||
@@ -64,7 +56,7 @@ BEGIN
   pipe row ( '  <HEAD>' );
   pipe row ( '    <STATFORM>F'||l_rpt_code||'X</STATFORM>' );
   pipe row ( '    <EDRPOU>'||l_okpo||'</EDRPOU>' );
-  pipe row ( '    <REPORTDATE>'||to_char(l_nbu_dt,g_dt_fmt)||'</REPORTDATE>' );
+  pipe row ( '    <REPORTDATE>'||to_char(l_nbu_rpt_dt,g_dt_fmt)||'</REPORTDATE>' );
   pipe row ( '  </HEAD>' );
   
   if ( l_rpt_code = '3E' )
