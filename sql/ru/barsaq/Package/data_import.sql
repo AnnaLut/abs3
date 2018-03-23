@@ -3592,6 +3592,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
     l_sideB_tag     doc_import_props.tag%type := 'ф';
     l_blank_ser     varchar2(100);
     l_blank_num     varchar2(100);
+    l_is_nls_closed number(1);
     --
     numeric_value_error exception;
     pragma exception_init(numeric_value_error, -6502);
@@ -3734,6 +3735,21 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
             when numeric_value_error then
                 raise_application_error(-20000, 'Рахунок отримувача занадто довгий');
         end;
+        
+        -- перевірка рахунка отримувача
+        begin
+          select 1 into l_is_nls_closed from v_kf_accounts a where kf=l_doc.mfo_b and a.nls = l_doc.nls_b and kv=l_doc.kv and dazs is not null;
+
+          if l_is_nls_closed = 1 then
+            raise_application_error(-20000, 'Рахунок отримувача закритий');
+          end if;
+        exception
+          when no_data_found then
+            null;
+          when others then
+            raise;
+        end;
+        
         begin
             l_doc.nam_b     := get_attr_varchar2(l_body, 'PAYEE_NAME');
         exception

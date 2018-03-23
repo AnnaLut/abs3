@@ -1,16 +1,15 @@
 
- 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/xrm_integration_oe.sql =========*** 
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BARS.XRM_INTEGRATION_OE 
+CREATE OR REPLACE PACKAGE "XRM_INTEGRATION_OE"
 IS
    title              CONSTANT VARCHAR2 (19) := 'xrm_integration_oe:';
 
    TYPE t_cursor IS REF CURSOR;
 
-   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.57 22.05.2017';
+   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.59 02.10.2017';
 
    FUNCTION header_version
       RETURN VARCHAR2;
@@ -83,8 +82,8 @@ IS
       p_dkbo_num           OUT VARCHAR2,
       p_dkbo_in            OUT VARCHAR2,
       p_dkbo_out           OUT VARCHAR2,
-	  ResultCode		   OUT INT,
-      ResultMessage 	   OUT VARCHAR2);
+    ResultCode       OUT INT,
+      ResultMessage      OUT VARCHAR2);
 
 
    PROCEDURE open_customer (
@@ -162,8 +161,8 @@ IS
       -------------------------------------kl.setCustomerElement
       /*Tag_   IN OUT customerw.tag%type                             ,
       Val_   IN OUT customerw.value%type                           ,
-      Otd_   IN OUT customerw.isp%type                             ,
-      -------------------------------------kl.setCustomerRel
+      Otd_   IN OUT customerw.isp%type                             ,*/
+      -------------------------------------kl.setCustomerRel 2017_08_29 COBUXRMII-132
         p_relid            IN OUT customer_rel.rel_id%type         ,
         p_relrnk           IN OUT customer_rel.rel_rnk%type        ,
         p_relintext        IN OUT customer_rel.rel_intext%type     ,
@@ -185,7 +184,7 @@ IS
         p_notaryregion     IN OUT customer_rel.notary_region%type  ,
         p_signprivs        IN OUT customer_rel.sign_privs%type     ,
         p_signid           IN OUT customer_rel.sign_id%type        ,
-        p_namer            IN OUT customer_rel.name_r%type         ,*/
+        p_namer            IN OUT customer_rel.name_r%type         ,
       -------------------------------------kl.setCustomerRel
       -------------------------------------kl.setFullCustomerAddress
       p_1country         IN OUT customer_address.country%TYPE,
@@ -259,6 +258,15 @@ IS
       p_status              OUT INT,
       p_status_code         OUT VARCHAR2,
       p_error_code          OUT VARCHAR2);
+   -- поиска клиента за данными документов, даты ДР
+   PROCEDURE find_customer(p_Ser             IN person.ser%TYPE
+                          ,p_Numdoc          IN person.numdoc%TYPE
+                          ,p_Passp           IN person.passp%TYPE DEFAULT NULL
+                          ,p_Bday            IN person.bday%TYPE DEFAULT NULL
+                          ,p_rnk             OUT person.rnk%TYPE
+                          ,p_status_out      OUT VARCHAR2
+                          ,p_status_code_out OUT VARCHAR2
+                          ,p_error_code_out  OUT VARCHAR2);															
 
    PROCEDURE SearchClient (p_in_RNK            IN     NUMBER DEFAULT NULL,
                            p_in_OKPO           IN     VARCHAR2 DEFAULT NULL,
@@ -347,7 +355,7 @@ PROCEDURE CreateDepositAgreement (
    P_COMISSREF        IN     dpt_agreements.comiss_ref%TYPE,
    P_DOCREF           IN     dpt_agreements.doc_ref%TYPE, -- реф. документу поповнення / частк.зняття (ДУ про зміну суми договору)
    P_COMISSREQID      IN     dpt_agreements.comiss_reqid%TYPE, -- идентификатор запроса на отмену комисии
-   p_FREQ			  IN     freq.freq%type,
+   p_FREQ       IN     freq.freq%type,
    P_AGRMNTID            OUT dpt_agreements.agrmnt_id%TYPE, -- идентификатор ДУ
    P_ERRORMESSAGE        OUT VARCHAR2);
 
@@ -376,16 +384,20 @@ PROCEDURE set_risk (p_rnk IN NUMBER, p_riskid IN NUMBER, p_riskvalue IN NUMBER, 
  type t_risks is table of r_risks;
 function get_risklist (p_rnk IN NUMBER) return t_risks pipelined;
 
+  -- функция проверки на террориста, инсайдера, публичного деятеля
+  FUNCTION check_tr_pub_ins(p_name VARCHAR
+                           ,p_rnk    NUMBER DEFAULT NULL) RETURN VARCHAR2;
+
  type r_instant is record ( productCode w4_product.code%type,
-							productName w4_product.name%type,
-                            CardCode	v_w4_card.code%type,
-                            CardName	v_w4_card.sub_name%type,
-                            KV 			tabval.lcv%type);
+              productName w4_product.name%type,
+                            CardCode  v_w4_card.code%type,
+                            CardName  v_w4_card.sub_name%type,
+                            KV      tabval.lcv%type);
  type t_instant is table of r_instant;
  function getInstantDict return t_instant pipelined;
- type r_instantrow is record ( 	NLS accounts.nls%type,
-                            	KV 	tabval.lcv%type,
-                                Branch	accounts.branch%type);
+ type r_instantrow is record (  NLS accounts.nls%type,
+                              KV  tabval.lcv%type,
+                                Branch  accounts.branch%type);
  type t_instantlist is table of r_instantrow;
  FUNCTION OrderInstant (p_transactionid   IN     NUMBER,
                         p_cardcode        IN     v_w4_card.code%TYPE,
@@ -407,12 +419,27 @@ function get_risklist (p_rnk IN NUMBER) return t_risks pipelined;
                              p_hash           in    varchar2,
                              p_state            out number,
                              p_msg              out varchar2,
-                             p_bulkid           out number);
-                                                   
-    procedure CardBulkTicket(p_bulkid         in    number,
+                             p_bulkid           out varchar2);
+
+    PROCEDURE CardBulkInsert(p_branch         IN VARCHAR2
+                            ,p_unit_type_code IN VARCHAR2
+                            ,p_ext_id         IN VARCHAR2
+                            ,p_receiver_url   IN VARCHAR2
+                            ,p_request_data   IN CLOB
+                            ,p_hash           IN VARCHAR2
+                            ,p_state          OUT NUMBER
+                            ,p_msg            OUT VARCHAR2
+                            ,p_bulkid         OUT varchar2);
+
+    procedure CardBulkTicket(p_bulkid         in varchar2,
                              p_bulkstatus       out varchar2,
-                             p_ticket           out clob);   
-                              
+                             p_ticket           out clob);
+
+    PROCEDURE CardBulkTicket(p_bulkid        IN varchar2
+                            ,p_resultcode    OUT NUMBER
+                            ,p_resultmessage OUT VARCHAR2
+                            ,p_ticket        OUT CLOB);
+
     PROCEDURE CreateRegular (p_TransactionId   IN NUMBER,
                              IDS                 sto_det.ids%TYPE DEFAULT NULL,
                              ord                 sto_det.ord%TYPE,
@@ -440,7 +467,7 @@ function get_risklist (p_rnk IN NUMBER) return t_risks pipelined;
                              p_idd           OUT sto_det.idd%TYPE,
                              p_status        OUT NUMBER,
                              p_status_text   OUT VARCHAR2);
-                            
+
     PROCEDURE CreateSbonContr (p_TransactionId       IN     NUMBER,
                                p_payer_account_id    IN     INTEGER,
                                p_start_date          IN     DATE,
@@ -465,7 +492,7 @@ function get_risklist (p_rnk IN NUMBER) return t_risks pipelined;
                                  p_holiday_shift       IN     INTEGER,
                                  p_provider_id         IN     INTEGER,
                                  p_personal_account    IN     VARCHAR2,
-                                 p_regular_amount      IN     NUMBER,                                 
+                                 p_regular_amount      IN     NUMBER,
                                  p_extra_attributes    IN     CLOB,
                                  p_sendsms             IN     VARCHAR2,
                                  p_order_id               OUT NUMBER,
@@ -489,27 +516,149 @@ function get_risklist (p_rnk IN NUMBER) return t_risks pipelined;
                                      p_sendsms             IN     VARCHAR2,
                                      p_order_id               OUT NUMBER,
                                      p_result_code            OUT NUMBER,
-                                     p_result_message         OUT VARCHAR2);  
+                                     p_result_message         OUT VARCHAR2);
 
     PROCEDURE MapDKBO (p_TransactionId    IN     NUMBER,
+                       p_ext_id           IN     VARCHAR2,
                        p_customer_id      IN     customer.rnk%TYPE,
                        p_deal_number      IN     deal.deal_number%TYPE DEFAULT NULL,
-                       p_acc_list         IN     varchar2,
+                       p_acc_list         IN     number_list DEFAULT NULL,
                        p_dkbo_date_from   IN     DATE DEFAULT bankdate,
                        p_dkbo_date_to     IN     DATE DEFAULT trunc(add_months(bankdate, 12)),
                        p_dkbo_state       IN     VARCHAR2 DEFAULT 'CONNECTED',
                        p_deal_id            OUT INTEGER,
                        p_start_date         OUT DATE
-                       );   
-  function getversion return varchar2;
-                                                                      
-                                                           
-END;
+                       );
+
+     -- процедура меняет блокировку счёта
+     PROCEDURE blk_change(p_transactionid IN NUMBER
+                         ,p_branch        IN VARCHAR2
+                         ,p_nls           IN accounts.nls%TYPE -- Номер лицевого счета (внешний)
+                         ,p_kv            IN accounts.kv%TYPE -- Код валюты
+                         ,p_blkd          IN accounts.blkd%TYPE -- Код блокировки дебет
+                         ,p_blkk          IN accounts.blkk%TYPE -- Код блокировки кредит
+                         ,p_info_out      OUT VARCHAR2) -- ответ. если успешно - 0 и текст, если нет - "-1 и тест"
+     ;
+         -- опытувальнык дкбо
+    PROCEDURE p_quest_answ_ins(p_transactionid   IN NUMBER
+                              ,p_object_id       IN NUMBER
+                              ,p_attribute_code  IN attribute_kind.attribute_code%TYPE
+                              ,p_attribute_value IN VARCHAR2);
+
+  -- процедура обработки полученного запроса на партийное создание счетов
+    -- запускается джобом кажые пол часа
+    PROCEDURE process_transport_unit;
+
+  -- SKRN: Відмітка про підпис докуметів 
+  procedure setdocissigned_skrn(p_id             varchar2,
+                                p_nd             number,
+                                p_adds           number,
+                                p_state          out number,
+                                p_result_code    out number,
+                                p_result_message out varchar2);
+
+  -- SKRN: Запит на отримання «Документів по договору»                              
+  type xrm_ref_tp is record(
+    ref  number,
+    datd date,
+    nlsa varchar2(15),
+    kva  integer,
+    sa   number,
+    nlsb varchar2(15),
+    kvb  integer,
+    sb   number(24),
+    nazn varchar2(160));
+
+  type xrm_ref_tb is table of xrm_ref_tp;
+
+  function getdocsbydeal_skrn(p_nd in number) return xrm_ref_tb
+    pipelined;
+    
+ function f_is_holiday (p_dat in date) return boolean;
+    
+ procedure DatePeriod(p_date1   in date,
+                     p_date2   in date,
+                     p_calcDay in number default null,
+                     p_Odate   out date);   
+    
+     -- SKRN: Відкриття скриньки 
+  procedure open_safe_deposit(p_n_sk          in number, -- номер скриньки
+                              p_o_sk          in number, --Вид скриньки
+                              p_keynumber     in varchar2, --Номер ключа
+                              p_keycount      in number, --  Кількість виданих клієнту ключів
+                              p_dealnum       in varchar2,
+                              p_tarif_id      in number,
+                              p_dealstartdate in date,
+                              p_dealenddate   in date,
+                              p_rnk           in number,
+                              p_deal_id       out number,
+                              p_resultcode    out int,
+                              p_resultmessage out varchar2);
+                              
+--SKRN: -- Проверяет заполение обязательных параметров для Операций
+procedure check_skrynka_menu(p_dat           in  date   default null,
+                             p_dat2          in  date   default null, 
+                             p_sum           in  number default null,
+                             p_mode          in  number,
+                             p_resultcode    out number, -- 0 не все парам. заполнены, 1- все ок, -1 - операция не найдена
+                             p_resultmessage out varchar2);                              
+
+--SKRN: операції по скринькам
+procedure oper_dep_skrn(p_dat           in date default null, -- обязательный datename1
+                        p_dat2          in date default null, -- обязательный datename2
+                        p_n_sk          in number default null,
+                        p_mode          in number, -- код операции
+                        p_nd            in number, -- код договора
+                        p_userid        in number default null,
+                        p_sum           in number default null, -- обязательный numparname
+                        p_ndoc          in varchar2 default null,
+                        p_resultcode    out int,
+                        p_resultmessage out varchar2);
+                        
+--SKRN: -- Закрытие депозитного договора (сейфа) 
+procedure Сlose_ContractLease(p_n_sk          in number default null, -- код ячейки
+                              p_nd            in number default null, -- код договора
+                              p_userid        in number default null,
+                              p_sum           in number default null,
+                              p_ndoc          in varchar2 default null,
+                              p_resultcode    out int,
+                              p_resultmessage out varchar2);
+                              
+ -- Банківська довіреність
+ --  Приєднання довіреної ФО до договору оренди сейфа
+ --  Створення довіреності (банківської та нотаріальної) 
+ --  Редагування (анулювання) довіреності (банківської та нотаріальної)                              
+procedure Merge_Skrynka_Attorney( p_nd          in skrynka_attorney.nd%type,
+                                  p_rnk         in skrynka_attorney.rnk%type,
+                                  p_date_from   in varchar2,
+                                  p_date_to     in varchar2,
+                                  p_cancel_date in varchar2);
+ 
+ -- Запит на БЕК-ОФІС                                                                                     
+procedure request_forbackoff(p_transactionid in number,
+                             p_trustee       in cust_requests.trustee_type%type,
+                             p_req_id        in cust_requests.req_id%type,
+                             p_req_type      in cust_requests.req_type%type,
+                             p_cust_id       in cust_requests.trustee_rnk%type,
+                             p_scaccess      in clob,
+                             p_scwarrant     in clob,
+                             p_scsignscard   in clob,
+                             p_depositlist   in number_list, 
+                             resultcode    out number,
+                             resultmessage out varchar2);
+                             
+ -- Відповідь від БЕК-ОФІСУ
+procedure request_frombackoff(p_req_id     in cust_requests.req_id%type,
+                              resultstate     out number,
+                              result_comments out varchar2);
+end;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.XRM_INTEGRATION_OE 
+CREATE OR REPLACE PACKAGE BODY "XRM_INTEGRATION_OE"
 IS
-   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.90 22.05.2017';
+   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.94 23.01.2018';
    g_null_date      CONSTANT DATE := null;
+
+   g_ismmfo         CONSTANT params$base.val%type := nvl(getglobaloption('IS_MMFO'), '0');
 
    FUNCTION body_version
       RETURN VARCHAR2
@@ -525,6 +674,16 @@ IS
    BEGIN
       RETURN 'Package body xrm_integration_oe ' || g_body_version;
    END header_version;
+
+   function get_old_key(p_key in varchar2) return varchar2 is
+     l_old_key varchar2(38);
+     l_kf      varchar2(6);
+   begin
+     bars_sqnc.split_key(p_key     => p_key,
+                         p_old_key => l_old_key,
+                         p_kf      => l_kf);
+     return l_old_key;
+   end;
 
    PROCEDURE open_card (p_transactionid  in     number,
                         p_kf             IN     VARCHAR2,       -- код филиала
@@ -578,7 +737,7 @@ IS
                          p_cobrandid    => p_cobrandid,
                          p_sendsms      => null,
                          p_nd           => p_nd,
-			 p_reqid        => l_reqid
+       p_reqid        => l_reqid
                          );
       bars_audit.trace (
          title || 'bars_ow.open_card- ok;nd=' || TO_CHAR (p_nd));
@@ -640,6 +799,9 @@ IS
                                  p_ERRORMESSAGE   => nvl(SQLERRM,'Ok'));
       exception when others then bars_audit.error(title||'xrm_ui_oe.xrm_card_trans failed with mess:' || sqlerrm);
       end;
+      
+      dbms_session.clear_context('clientcontext','iscrm');    
+
    END;
 
    PROCEDURE SearchClient (p_in_RNK            IN     NUMBER DEFAULT NULL,
@@ -1150,8 +1312,8 @@ IS
       p_dkbo_num           OUT VARCHAR2,
       p_dkbo_in            OUT VARCHAR2,
       p_dkbo_out           OUT VARCHAR2,
-	  ResultCode		   OUT INT,
-      ResultMessage 	   OUT VARCHAR2)
+    ResultCode       OUT INT,
+      ResultMessage      OUT VARCHAR2)
    IS
    l_verified_docs number := 0;
    l_errmsg varchar2(500) := '';
@@ -1161,69 +1323,69 @@ IS
       ResultMessage := 'Ok';
       bc.go (p_branch);
       l_verified_docs := GET_VERIFIED_STATE(p_rnk);
-	  bars_audit.trace (title || 'dpt_web.l_verified_docs =' || to_char(l_verified_docs));
+    bars_audit.trace (title || 'dpt_web.l_verified_docs =' || to_char(l_verified_docs));
       if l_verified_docs = 1
       then
-		  dpt_web.create_deposit (p_vidd          => p_vidd,
-								  p_rnk           => p_rnk,
-								  p_nd            => p_nd,
-								  p_sum           => p_sum,
-								  p_nocash        => p_nocash,
-								  p_datz          => p_datz,
-								  p_namep         => p_namep,
-								  p_okpop         => p_okpop,
-								  p_nlsp          => p_nlsp,
-								  p_mfop          => p_mfop,
-								  p_fl_perekr     => p_fl_perekr,
-								  p_name_perekr   => p_name_perekr,
-								  p_okpo_perekr   => p_okpo_perekr,
-								  p_nls_perekr    => p_nls_perekr,
-								  p_mfo_perekr    => p_mfo_perekr,
-								  p_comment       => p_comment,
-								  p_dpt_id        => p_dpt_id,
-								  p_datbegin      => p_datbegin,
-								  p_duration      => p_duration,
-								  p_duration_days => p_duration_days);
-     	  bars_audit.trace (title || 'dpt_web.create_deposit - ok;');
+      dpt_web.create_deposit (p_vidd          => p_vidd,
+                  p_rnk           => p_rnk,
+                  p_nd            => p_nd,
+                  p_sum           => p_sum,
+                  p_nocash        => p_nocash,
+                  p_datz          => p_datz,
+                  p_namep         => p_namep,
+                  p_okpop         => p_okpop,
+                  p_nlsp          => p_nlsp,
+                  p_mfop          => p_mfop,
+                  p_fl_perekr     => p_fl_perekr,
+                  p_name_perekr   => p_name_perekr,
+                  p_okpo_perekr   => p_okpo_perekr,
+                  p_nls_perekr    => p_nls_perekr,
+                  p_mfo_perekr    => p_mfo_perekr,
+                  p_comment       => p_comment,
+                  p_dpt_id        => p_dpt_id,
+                  p_datbegin      => p_datbegin,
+                  p_duration      => p_duration,
+                  p_duration_days => p_duration_days);
+        bars_audit.trace (title || 'dpt_web.create_deposit - ok;');
 
-		  BEGIN
-			 SELECT a.nls,
-					TO_CHAR (a.daos, 'dd/mm/yyyy'),
-					TO_CHAR (d.dat_begin, 'dd/mm/yyyy'),
-					TO_CHAR (d.dat_end, 'dd/mm/yyyy'),
-					a.blkd,
-					a.blkk,
-					deal.deal_number,
-					TO_CHAR (deal.start_date, 'dd/mm/yyyy'),
-					TO_CHAR (deal.close_date, 'dd/mm/yyyy'),
-					aint.nls,
-					dpt.fproc (d.acc, SYSDATE)
-			   INTO p_nls,
-					p_daos,
-					p_dat_begin,
-					p_dat_end,
-					p_blkd,
-					p_blkk,
-					p_dkbo_num,
-					p_dkbo_in,
-					p_dkbo_out,
-					p_nlsint,
-					p_rate
-			   FROM accounts a,
-					dpt_deposit d,
-					dpt_accounts da,
-					accounts aint,
-					deal
-			  WHERE     a.acc = d.acc
-					AND da.dptid = d.deposit_id
-					AND da.accid != d.acc
-					AND aint.acc = da.accid
-					AND d.deposit_id = p_dpt_id
-					AND deal.customer_id = d.rnk
-					AND deal.deal_type_id IN (SELECT tt.id
-												FROM object_type tt
-											   WHERE tt.type_code = 'DKBO');
-		  EXCEPTION
+      BEGIN
+       SELECT a.nls,
+          TO_CHAR (a.daos, 'dd/mm/yyyy'),
+          TO_CHAR (d.dat_begin, 'dd/mm/yyyy'),
+          TO_CHAR (d.dat_end, 'dd/mm/yyyy'),
+          a.blkd,
+          a.blkk,
+          deal.deal_number,
+          TO_CHAR (deal.start_date, 'dd/mm/yyyy'),
+          TO_CHAR (deal.close_date, 'dd/mm/yyyy'),
+          aint.nls,
+          dpt.fproc (d.acc, SYSDATE)
+         INTO p_nls,
+          p_daos,
+          p_dat_begin,
+          p_dat_end,
+          p_blkd,
+          p_blkk,
+          p_dkbo_num,
+          p_dkbo_in,
+          p_dkbo_out,
+          p_nlsint,
+          p_rate
+         FROM accounts a,
+          dpt_deposit d,
+          dpt_accounts da,
+          accounts aint,
+          deal
+        WHERE     a.acc = d.acc
+          AND da.dptid = d.deposit_id
+          AND da.accid != d.acc
+          AND aint.acc = da.accid
+          AND d.deposit_id = p_dpt_id
+          AND deal.customer_id = d.rnk
+          AND deal.deal_type_id IN (SELECT tt.id
+                        FROM object_type tt
+                         WHERE tt.type_code = 'DKBO');
+      EXCEPTION
              WHEN NO_DATA_FOUND
              THEN
              BEGIN
@@ -1258,23 +1420,23 @@ IS
                     AND da.accid != d.acc
                     AND aint.acc = da.accid
                     AND d.deposit_id = p_dpt_id;
-			 EXCEPTION WHEN OTHERS
-			 THEN ResultCode := -1;
-				  ResultMessage := SQLERRM;
+       EXCEPTION WHEN OTHERS
+       THEN ResultCode := -1;
+          ResultMessage := SQLERRM;
              END;
-				bars_audit.error (title || 'open_deposit' || SQLERRM);
-		  END;
-	    l_errmsg := NVL(SQLERRM,'Ok');
+        bars_audit.error (title || 'open_deposit' || SQLERRM);
+      END;
+      l_errmsg := NVL(SQLERRM,'Ok');
         l_errcode := 0;
-	  else
-	    l_errmsg := 'Без відмітки "Документи перевірено" створення депозиту неможливе';
+    else
+      l_errmsg := 'Без відмітки "Документи перевірено" створення депозиту неможливе';
         l_errcode := -1;
       end if;
 
-	  ResultCode := l_errcode;
+    ResultCode := l_errcode;
       ResultMessage := l_errmsg;
 
-	  begin
+    begin
         xrm_ui_oe.xrm_deposit_trans(p_TransactionId => p_TransactionId,
                                     p_DPTID         => p_dpt_id,
                                     p_NLS           => p_NLS,
@@ -1293,13 +1455,15 @@ IS
       exception when others then bars_audit.error(title||'xrm_ui_oe.xrm_deposit_trans failed with mess:' || sqlerrm);
       end;
 
-	  bars_audit.info (title || 'ResultMessage =' || to_char(ResultMessage));
+    bars_audit.info (title || 'ResultMessage =' || to_char(ResultMessage));
    END;
 
    PROCEDURE open_customer (
       p_TransactionId    IN     NUMBER,
       p_UserLogin        IN     staff.logname%TYPE,
       p_OperationType    IN     INT, -- 1 открытие/ 2 обновление данных клиента, 0 - поиск клиента, 3 установка даты закрытия
+                                     -- 4 открытие/ обновление связанного лица, 5 - удаление связанного лица
+									 -- 6 - поиск клиента по данным документа (серия, номер, дата рождения)																																						   
       p_ClientType       IN     custtype.custtype%TYPE,
       p_FormType         IN     INT, -- 1,2,3 упрощенная форма, 0 полная форма
       p_kf               IN     VARCHAR2,
@@ -1371,30 +1535,30 @@ IS
       -------------------------------------kl.setCustomerElement
       /*Tag_   IN OUT customerw.tag%type                             ,
       Val_   IN OUT customerw.value%type                           ,
-      Otd_   IN OUT customerw.isp%type                             ,
-      -------------------------------------kl.setCustomerRel
-        p_relid            IN OUT customer_rel.rel_id%type         ,
-        p_relrnk           IN OUT customer_rel.rel_rnk%type        ,
-        p_relintext        IN OUT customer_rel.rel_intext%type     ,
-        p_vaga1            IN OUT customer_rel.vaga1%type          ,
-        p_vaga2            IN OUT customer_rel.vaga2%type          ,
-        p_typeid           IN OUT customer_rel.type_id%type        ,
-        p_position         IN OUT customer_rel.position%type       ,
-        p_position_r       IN OUT customer_rel.position_r%type     ,
-        p_firstname        IN OUT customer_rel.first_name%type     ,
-        p_middlename       IN OUT customer_rel.middle_name%type    ,
-        p_lastname         IN OUT customer_rel.last_name%type      ,
-        p_documenttypeid   IN OUT customer_rel.document_type_id%type ,
-        p_document         IN OUT customer_rel.document%type       ,
-        p_trustregnum      IN OUT customer_rel.trust_regnum%type   ,
-        p_trustregdat      IN OUT customer_rel.trust_regdat%type   ,
-        p_bdate            IN OUT customer_rel.bdate%type          ,
-        p_edate            IN OUT customer_rel.edate%type          ,
-        p_notaryname       IN OUT customer_rel.notary_name%type    ,
-        p_notaryregion     IN OUT customer_rel.notary_region%type  ,
-        p_signprivs        IN OUT customer_rel.sign_privs%type     ,
-        p_signid           IN OUT customer_rel.sign_id%type        ,
-        p_namer            IN OUT customer_rel.name_r%type         ,*/
+      Otd_   IN OUT customerw.isp%type                             ,*/
+      -------------------------------------kl.setCustomerRel 2017_08_29 COBUXRMII-132
+      p_relid            IN OUT customer_rel.rel_id%type         ,
+      p_relrnk           IN OUT customer_rel.rel_rnk%type        ,
+      p_relintext        IN OUT customer_rel.rel_intext%type     ,
+      p_vaga1            IN OUT customer_rel.vaga1%type          ,
+      p_vaga2            IN OUT customer_rel.vaga2%type          ,
+      p_typeid           IN OUT customer_rel.type_id%type        ,
+      p_position         IN OUT customer_rel.position%type       ,
+      p_position_r       IN OUT customer_rel.position_r%type     ,
+      p_firstname        IN OUT customer_rel.first_name%type     ,
+      p_middlename       IN OUT customer_rel.middle_name%type    ,
+      p_lastname         IN OUT customer_rel.last_name%type      ,
+      p_documenttypeid   IN OUT customer_rel.document_type_id%type ,
+      p_document         IN OUT customer_rel.document%type       ,
+      p_trustregnum      IN OUT customer_rel.trust_regnum%type   ,
+      p_trustregdat      IN OUT customer_rel.trust_regdat%type   ,
+      p_bdate            IN OUT customer_rel.bdate%type          ,
+      p_edate            IN OUT customer_rel.edate%type          ,
+      p_notaryname       IN OUT customer_rel.notary_name%type    ,
+      p_notaryregion     IN OUT customer_rel.notary_region%type  ,
+      p_signprivs        IN OUT customer_rel.sign_privs%type     ,
+      p_signid           IN OUT customer_rel.sign_id%type        ,
+      p_namer            IN OUT customer_rel.name_r%type         ,
       -------------------------------------kl.setFullCustomerAddress
       p_1country         IN OUT customer_address.country%TYPE,
       p_1zip             IN OUT customer_address.zip%TYPE,
@@ -1498,31 +1662,47 @@ IS
         INTO p_clientname_gc
         FROM DUAL;
 
-      BEGIN
-         SELECT rnk
-           INTO p_clientid
-           FROM customer
-          WHERE     (rnk = p_clientid OR p_clientid IS NULL)
-                AND (nmk = l_clientname OR l_clientname IS NULL)
-                AND (OKPO = Okpo_ OR Okpo_ IS NULL)
-                AND ROWNUM = 1;
-      EXCEPTION
-         WHEN NO_DATA_FOUND
-         THEN
-            IF (p_OperationType IN (0, 3))
-            THEN
-               p_status := -1;
-               p_status_code := 'Не знайдено';
-               p_error_code :=
-                     'Не знайдено клієнта з РНК = '
-                  || TO_CHAR (p_clientid);
-
-               IF (p_OperationType = 1)
-               THEN
-                  DateOn_ := SYSDATE;
-               END IF;
+      IF p_OperationType = 6 then 
+        find_customer(p_Ser             => Ser_,
+                      p_Numdoc          => Numdoc_,
+                      p_Passp           => Passp_,
+                      p_Bday            => Bday_,
+                      p_rnk             => p_clientid,
+                      p_status_out      => p_status,
+                      p_status_code_out => p_status_code,
+                      p_error_code_out  => p_error_code);
+      else
+        BEGIN
+          SELECT rnk
+            INTO p_clientid
+            FROM customer
+           WHERE (rnk = p_clientid OR p_clientid IS NULL)
+             AND (nmk = l_clientname OR l_clientname IS NULL)
+             AND (OKPO = Okpo_ OR Okpo_ IS NULL)
+             AND ROWNUM = 1;
+        EXCEPTION
+          WHEN NO_DATA_FOUND THEN
+            IF (p_OperationType IN (0
+                                   ,3)) THEN
+              p_status      := -1;
+              p_status_code := 'Не знайдено';
+              p_error_code  := 'Не знайдено клієнта з РНК = ' ||
+                               TO_CHAR(p_clientid);
+            
+              IF (p_OperationType = 1) THEN
+                DateOn_ := SYSDATE;
+              END IF;
             END IF;
-      END;
+        END;
+      end if;
+
+      -- проверка принадлежности к террористу, инсайдеру, публичному деятелю 2017_08_30 COBUXRMII-132
+      IF p_clientid is not null then
+        p_error_code := check_tr_pub_ins(null, p_clientid);
+      else
+        p_error_code := check_tr_pub_ins(l_clientname);
+      end if;
+
 
       if ((p_OperationType = 1 and p_clientid is null) or (p_OperationType = 2))
       THEN
@@ -1535,9 +1715,16 @@ IS
                RnkP_ := NULL;
             END IF;
 
+            -- COBUXRMII-152 - менеджер должен быть обязательно
+            /*
             IF Isp_ = 0
             THEN
                Isp_ := NULL;
+            END IF;
+            */
+
+            IF nvl(Isp_, 0) = 0 THEN
+              raise_application_error(-20000, 'Не заполнено поле менеджер клиента (ClientManager). Заполните его');
             END IF;
 
             kl.setCustomerAttr (Rnk_           => p_clientid,
@@ -1587,29 +1774,29 @@ IS
             THEN
                p_status := -1;
                p_error_code := title ||
-			   	case
-					when SQLERRM like '%FK_CUSTOMER_ISE%' then 'Некоректне значення коду "Інституційний сектор економіки" (' || Ise_ ||')'
-					when SQLERRM like '%UK_CUSTOMER_SAB%' then 'Неунікальний еклектроний код клієнта (' || Sab_ ||')'
-					when SQLERRM like '%FK_CUSTOMER_VED%' then 'Некоректне значення коду "Вид економічної діяльності" (' || Ved_ ||')'
-					when SQLERRM like '%FK_CUSTOMER_TOBO%' then 'Неіснуюче відділення клієнта (' || Tobo_ ||')'
-					when SQLERRM like '%FK_CUSTOMER_TGR%' then 'Некоректне значення парамтра "Тип госреєстру" (1:Реєстр ЄДРПОУ,2:Реєстр ДРФО (фiз.осiб),3:Реєстр ТРДПА (тимчасовий)) (' || Tgr_ ||')'
-					when SQLERRM like '%FK_CUSTOMER_STMT%' then 'Некоректне значення параметра "Тип виписки" (0:Не використовується,5:Клієнт-Банк) (' || Stmt_ ||')'
-					when SQLERRM like '%FK_CUSTOMER_STAFF%' then 'Неіснуючий код відповідального виконавця клієнта (' || Isp_ ||')'
-					when SQLERRM like '%FK_CUSTOMER_SPRREG%' then 'Некоректні/невідповідні значення пари параметрів "ДПА (Код обл, Код району)" (' ||CReg_||','||CDst_||')'
-					when SQLERRM like '%FK_CUSTOMER_SPK050%' then 'Некоректне значення параметра "K050 (КЛАССИФИКАЦИЯ ОРГАНИЗАЦИОННО-ПРАВОВЫХ ФОРМ ХОЗЯЙСТВОВАНИЯ)"'
-					when SQLERRM like '%FK_CUSTOMER_SED%' then 'Некоректне значення параметра "Сектор економічної діяльності" (' || Sed_ ||')'
-					when SQLERRM like '%FK_CUSTOMER_PRINSIDER%' then 'Некоректне значення параметра "Ознака інсайдера" (' || Prinsider_ ||')'
-					when SQLERRM like '%FK_CUSTOMER_OE%' then 'Некоректне значення параметра "Форма господарювання" (' || Oe_ ||')'
-					when SQLERRM like '%FK_CUSTOMER_FS%' then 'Некоректне значення параметра "Форма власності" (' || Fs_  ||')'
-					when SQLERRM like '%FK_CUSTOMER_CUSTTYPE%' then 'Некоректне значення параметра "Тип клієнта" (' || Custtype_ ||')'
-					when SQLERRM like '%FK_CUSTOMER_CUSTOMER%' then 'Неіснуюче РНК холдинга (' || RnkP_ ||')'
-					when SQLERRM like '%FK_CUSTOMER_COUNTRY%' then 'Неіснуючий код країни клієнта (' || Country_ ||')'
-					when SQLERRM like '%FK_CUSTOMER_CODCAGENT%' then 'Неіснуючий код характеристики контрагента (' || Codcagent_ ||')'
-					when SQLERRM like '%FK_CUSTOMER_BRANCH%' then 'Неіснуюче відділення клієнта  (' || Tobo_ ||')'
-					when SQLERRM like '%CC_CUSTOMER_TOBO_NN%' then 'Пусте значення відділення'
-					when SQLERRM like '%CC_CUSTOMER_BC%' then 'Некоректне значення параметра "Ознака не-клієнта Банку" (' || BC_ ||')'
-					else SQLERRM
-				end;
+          case
+          when SQLERRM like '%FK_CUSTOMER_ISE%' then 'Некоректне значення коду "Інституційний сектор економіки" (' || Ise_ ||')'
+          when SQLERRM like '%UK_CUSTOMER_SAB%' then 'Неунікальний еклектроний код клієнта (' || Sab_ ||')'
+          when SQLERRM like '%FK_CUSTOMER_VED%' then 'Некоректне значення коду "Вид економічної діяльності" (' || Ved_ ||')'
+          when SQLERRM like '%FK_CUSTOMER_TOBO%' then 'Неіснуюче відділення клієнта (' || Tobo_ ||')'
+          when SQLERRM like '%FK_CUSTOMER_TGR%' then 'Некоректне значення парамтра "Тип госреєстру" (1:Реєстр ЄДРПОУ,2:Реєстр ДРФО (фiз.осiб),3:Реєстр ТРДПА (тимчасовий)) (' || Tgr_ ||')'
+          when SQLERRM like '%FK_CUSTOMER_STMT%' then 'Некоректне значення параметра "Тип виписки" (0:Не використовується,5:Клієнт-Банк) (' || Stmt_ ||')'
+          when SQLERRM like '%FK_CUSTOMER_STAFF%' then 'Неіснуючий код відповідального виконавця клієнта (' || Isp_ ||')'
+          when SQLERRM like '%FK_CUSTOMER_SPRREG%' then 'Некоректні/невідповідні значення пари параметрів "ДПА (Код обл, Код району)" (' ||CReg_||','||CDst_||')'
+          when SQLERRM like '%FK_CUSTOMER_SPK050%' then 'Некоректне значення параметра "K050 (КЛАССИФИКАЦИЯ ОРГАНИЗАЦИОННО-ПРАВОВЫХ ФОРМ ХОЗЯЙСТВОВАНИЯ)"'
+          when SQLERRM like '%FK_CUSTOMER_SED%' then 'Некоректне значення параметра "Сектор економічної діяльності" (' || Sed_ ||')'
+          when SQLERRM like '%FK_CUSTOMER_PRINSIDER%' then 'Некоректне значення параметра "Ознака інсайдера" (' || Prinsider_ ||')'
+          when SQLERRM like '%FK_CUSTOMER_OE%' then 'Некоректне значення параметра "Форма господарювання" (' || Oe_ ||')'
+          when SQLERRM like '%FK_CUSTOMER_FS%' then 'Некоректне значення параметра "Форма власності" (' || Fs_  ||')'
+          when SQLERRM like '%FK_CUSTOMER_CUSTTYPE%' then 'Некоректне значення параметра "Тип клієнта" (' || Custtype_ ||')'
+          when SQLERRM like '%FK_CUSTOMER_CUSTOMER%' then 'Неіснуюче РНК холдинга (' || RnkP_ ||')'
+          when SQLERRM like '%FK_CUSTOMER_COUNTRY%' then 'Неіснуючий код країни клієнта (' || Country_ ||')'
+          when SQLERRM like '%FK_CUSTOMER_CODCAGENT%' then 'Неіснуючий код характеристики контрагента (' || Codcagent_ ||')'
+          when SQLERRM like '%FK_CUSTOMER_BRANCH%' then 'Неіснуюче відділення клієнта  (' || Tobo_ ||')'
+          when SQLERRM like '%CC_CUSTOMER_TOBO_NN%' then 'Пусте значення відділення'
+          when SQLERRM like '%CC_CUSTOMER_BC%' then 'Некоректне значення параметра "Ознака не-клієнта Банку" (' || BC_ ||')'
+          else SQLERRM
+        end;
                p_status_code := '';
                bars_audit.info (p_error_code);
          END;
@@ -1768,6 +1955,70 @@ IS
              p_status := -1;
              p_status_code := 'Не знайдено';
              p_error_code := 'Клієнта з РНК = ' || TO_CHAR (p_clientid) || ' вже існує';
+
+      -- создание/изменение связанного лица 2017_08_29 COBUXRMII-132
+      elsif p_OperationType = 4 then
+            -- проверка заполнения обязательных полей
+            if p_relid is null then
+               p_status_code := 'Помилка вводу';
+               p_error_code := 'Не заповнено поле relid';
+            elsif p_relrnk is null then
+               p_status_code := 'Помилка вводу';
+               p_error_code := 'Не заповнено поле relrnk';
+            elsif p_relintext is null then
+               p_status_code := 'Помилка вводу';
+               p_error_code := 'Не заповнено поле relintext';
+            end if;
+
+       kl.setcustomerrel(p_rnk            => p_clientid,
+                         p_relid          => p_relid,
+                         p_relrnk         => p_relrnk,
+                         p_relintext      => p_relintext,
+                         p_vaga1          => p_vaga1,
+                         p_vaga2          => p_vaga2,
+                         p_typeid         => p_typeid,
+                         p_position       => p_position,
+                         p_position_r     => p_position_r,
+                         p_firstname      => p_firstname,
+                         p_middlename     => p_middlename,
+                         p_lastname       => p_lastname,
+                         p_documenttypeid => p_documenttypeid,
+                         p_document       => p_document,
+                         p_trustregnum    => p_trustregnum,
+                         p_trustregdat    => p_trustregdat,
+                         p_bdate          => p_bdate,
+                         p_edate          => p_edate,
+                         p_notaryname     => p_notaryname,
+                         p_notaryregion   => p_notaryregion,
+                         p_signprivs      => p_signprivs,
+                         p_signid         => p_signid,
+                         p_namer          => p_namer);
+        if sql%rowcount > 0 then
+          p_status_code := 'Ok. Повязана особа створена/змінена';
+        end if;
+      -- удаление связанного лица 2017_08_29 COBUXRMII-132
+      elsif p_OperationType = 5 then
+           -- проверка заполнения обязательных полей
+            if p_clientid is null then
+               p_status_code := 'Помилка вводу';
+               p_error_code := 'Не заповнено поле rnk';
+            elsif p_relid is null then
+               p_status_code := 'Помилка вводу';
+               p_error_code := 'Не заповнено поле relid';
+            elsif p_relrnk is null then
+               p_status_code := 'Помилка вводу';
+               p_error_code := 'Не заповнено поле relrnk';
+            elsif p_relintext is null then
+               p_status_code := 'Помилка вводу';
+               p_error_code := 'Не заповнено поле relintext';
+            end if;
+         kl.delCustomerRel(p_rnk       => p_clientid,
+                           p_relid     => p_relid,
+                           p_relrnk    => p_relrnk,
+                           p_relintext => p_relintext);
+         if sql%rowcount > 0 then
+          p_status_code := 'Ok. Повязана особа видалена';
+        end if;
       END IF;
 
       IF p_clientid IS NOT NULL
@@ -2274,6 +2525,39 @@ IS
 
    END;
 
+		-- поиска клиента за данными документов, даты ДР
+   PROCEDURE find_customer(p_Ser             IN person.ser%TYPE
+                          ,p_Numdoc          IN person.numdoc%TYPE
+                          ,p_Passp           IN person.passp%TYPE DEFAULT NULL
+                          ,p_Bday            IN person.bday%TYPE DEFAULT NULL
+                          ,p_rnk             OUT person.rnk%TYPE
+                          ,p_status_out      OUT VARCHAR2
+                          ,p_status_code_out OUT VARCHAR2
+                          ,p_error_code_out  OUT VARCHAR2) IS
+     l_ret_val NUMBER;
+   BEGIN
+     p_status_out      := '0';
+     p_status_code_out := 'Ok';
+     p_error_code_out  := '';
+
+     SELECT p.rnk
+       INTO l_ret_val
+       FROM PERSON p
+      WHERE upper(TRIM(p.ser)) = upper(TRIM(p_Ser))
+        AND TRIM(p.numdoc) = TRIM(p_Numdoc)
+        AND (trunc(p.bday) = trunc(p_Bday) OR p_Bday IS NULL)
+        AND (p.passp = p_Passp OR p_Passp IS NULL);     
+     p_rnk := l_ret_val;
+   EXCEPTION
+     WHEN no_data_found THEN
+       p_status_out      := '-1';
+       p_status_code_out := 'Не знайдено';
+       p_error_code_out  := 'Не знайдено клієнта за введиними данними';
+     WHEN TOO_MANY_ROWS THEN
+       p_status_out      := '-1';
+       p_status_code_out := 'Декілька клієнтів';
+       p_error_code_out  := 'За введиними данними знайдено більше одного клієнта';
+   END find_customer;													  
    PROCEDURE AttrCustomer (Rnk_   IN     customerw.rnk%TYPE,
                            Tag_   IN     customerw.tag%TYPE,
                            Val_   IN OUT customerw.VALUE%TYPE,
@@ -2380,7 +2664,7 @@ IS
     PROCEDURE set_risk (p_rnk IN NUMBER, p_riskid IN NUMBER, p_riskvalue IN NUMBER, p_errormessage OUT varchar2)
     IS
     BEGIN
-	 begin
+   begin
        kl.set_customer_risk (p_rnk         => p_rnk,
                              p_riskid      => p_riskid,
                              p_riskvalue   => p_riskvalue);
@@ -2590,7 +2874,7 @@ is
 l_result number := 0;
 begin
  begin
-	 l_result := EBP.GET_VERIFIED_STATE(p_rnk => p_rnk);
+   l_result := EBP.GET_VERIFIED_STATE(p_rnk => p_rnk);
  exception when others then l_result := -1;
   bars_audit.info ('XRM_INTEGRATION_OE:GET_VERIFIED_STATE' || sqlerrm);
  end;
@@ -2605,10 +2889,10 @@ PROCEDURE CreateDepositAgreement (
    P_TRUSTCUSTID      IN     dpt_agreements.TRUSTEE_ID%TYPE,
    P_TRUSTID          IN     dpt_trustee.id%type,
    P_DENOMCOUNT       IN     dpt_agreements.DENOM_COUNT%TYPE,
-   P_TRANSFERDPT      IN     CLOB,              					-- параметры возврата депозита
-   P_TRANSFERINT      IN     CLOB,              					-- параметры выплаты процентов
-   P_AMOUNTCASH       IN     dpt_agreements.amount_cash%TYPE, 		-- сума готівкою (ДУ про зміну суми договору)
-   P_AMOUNTCASHLESS   IN     dpt_agreements.amount_cashless%TYPE, 	-- сума безготівкою (ДУ про зміну суми договору)
+   P_TRANSFERDPT      IN     CLOB,                        -- параметры возврата депозита
+   P_TRANSFERINT      IN     CLOB,                        -- параметры выплаты процентов
+   P_AMOUNTCASH       IN     dpt_agreements.amount_cash%TYPE,     -- сума готівкою (ДУ про зміну суми договору)
+   P_AMOUNTCASHLESS   IN     dpt_agreements.amount_cashless%TYPE,   -- сума безготівкою (ДУ про зміну суми договору)
    P_DATBEGIN         IN     dpt_agreements.date_begin%TYPE,
    P_DATEND           IN     dpt_agreements.date_end%TYPE,
    P_RATEREQID        IN     dpt_agreements.rate_reqid%TYPE,
@@ -2617,16 +2901,16 @@ PROCEDURE CreateDepositAgreement (
    P_DENOMAMOUNT      IN     dpt_agreements.denom_amount%TYPE,
    P_DENOMREF         IN     dpt_agreements.denom_ref%TYPE,
    P_COMISSREF        IN     dpt_agreements.comiss_ref%TYPE,
-   P_DOCREF           IN     dpt_agreements.doc_ref%TYPE, 		-- реф. документу поповнення / частк.зняття (ДУ про зміну суми договору)
-   P_COMISSREQID      IN     dpt_agreements.comiss_reqid%TYPE, 	-- идентификатор запроса на отмену комисии
-   p_FREQ			  IN     freq.freq%type,
-   P_AGRMNTID            OUT dpt_agreements.agrmnt_id%TYPE, 	-- идентификатор ДУ
+   P_DOCREF           IN     dpt_agreements.doc_ref%TYPE,     -- реф. документу поповнення / частк.зняття (ДУ про зміну суми договору)
+   P_COMISSREQID      IN     dpt_agreements.comiss_reqid%TYPE,  -- идентификатор запроса на отмену комисии
+   p_FREQ       IN     freq.freq%type,
+   P_AGRMNTID            OUT dpt_agreements.agrmnt_id%TYPE,   -- идентификатор ДУ
    P_ERRORMESSAGE        OUT VARCHAR2)
  is
   l_deposit dpt_deposit%rowtype;
   l_vidd_flags dpt_vidd_scheme%rowtype;
   l_vidd dpt_vidd%rowtype;
-  l_do	int := 1;
+  l_do  int := 1;
   l_trustid dpt_trustee.id%type;
  begin
 
@@ -2651,7 +2935,7 @@ PROCEDURE CreateDepositAgreement (
     where deposit_id = p_dptid
       and rnk = p_initcustid;
   exception when no_data_found then p_ERRORMESSAGE:= 'Депозит ' || p_dptid || ' не знайдено для клієнта з РНК =' ||p_initcustid;
-  	l_do := 0;
+    l_do := 0;
   end;
   /*проверить доступность заказываемой ДУ*/
   if (l_do = 1)
@@ -2680,12 +2964,12 @@ PROCEDURE CreateDepositAgreement (
         begin
           if (P_AGRMNTTYPE = 11)
           then
-              if (P_TRANSFERDPT = '' and P_TRANSFERINT = '')
+              if P_TRANSFERDPT is null and P_TRANSFERINT is null
               then p_ERRORMESSAGE := 'Не вказано рахунки виплати депозиту';
                    bars_audit.info('Не вказано рахунки виплати депозиту');
-              elsif (nvl(P_TRANSFERDPT,'')!='' and nvl(P_TRANSFERINT,'')='')
+              elsif P_TRANSFERDPT is not null and P_TRANSFERINT is null
               then p_ERRORMESSAGE := 'Виконано зміну рахунку виплати вкладу.';
-              elsif (nvl(P_TRANSFERDPT,'')!='' and nvl(P_TRANSFERINT,'')!='' and l_vidd.comproc = 1)
+              elsif P_TRANSFERDPT is not null and P_TRANSFERINT is not null and l_vidd.comproc = 1
               then p_ERRORMESSAGE := 'Вклад '||P_DPTID||' передбачає капіталізацію. Рахунок виплати відсотків змінювати не можна.';
               end if;
           end if;
@@ -2749,6 +3033,65 @@ PROCEDURE CreateDepositAgreement (
   end loop;
  end;
 
+     -- функция проверки на террориста, инсайдера, публичного деятеля
+     FUNCTION check_tr_pub_ins(p_name VARCHAR
+                              ,p_rnk  NUMBER DEFAULT NULL) RETURN VARCHAR2 IS
+       l_retval VARCHAR2(50);
+       l_tr     NUMBER;
+       l_pub    NUMBER;
+       l_ins    NUMBER;
+     BEGIN
+       -- проверка на террориста
+       l_tr := coalesce(f_istr(p_name)
+                       ,0);
+       -- публичный деятель
+       IF p_rnk IS NOT NULL THEN
+         l_pub := finmon_is_public(p_name => NULL
+                                  ,p_rnk  => p_rnk);
+       ELSE
+         l_pub := coalesce(finmon_is_public(p_name
+                                           ,NULL)
+                          ,0);
+       END IF;
+
+       -- инсайдер
+       IF p_rnk IS NOT NULL THEN
+         BEGIN
+           SELECT c.prinsider
+             INTO l_ins
+             FROM customer c
+            WHERE c.rnk = p_rnk
+              AND c.prinsider <> 99;
+         EXCEPTION
+           WHEN no_data_found THEN
+             l_ins := 0;
+         END;
+       ELSE
+         BEGIN
+           SELECT c.rnk
+             INTO l_ins
+             FROM customer c
+            WHERE upper(c.nmk) = upper(p_name)
+              AND c.prinsider <> 99;
+         EXCEPTION
+           WHEN no_data_found THEN
+             l_ins := 0;
+         END;
+       END IF;
+
+       IF l_tr > 0 THEN
+         -- террорист
+         l_retval := 'TER';
+       ELSIF l_pub > 0 THEN
+         -- публичный деятель
+         l_retval := 'PUB';
+       ELSIF l_ins > 0 THEN
+         -- инсайдер
+         l_retval := 'INS: ' || l_ins;
+       END IF;
+       RETURN l_retval;
+     END check_tr_pub_ins;
+
  function getInstantDict return t_instant pipelined
  is
  l_instant r_instant;
@@ -2784,6 +3127,8 @@ PROCEDURE CreateDepositAgreement (
   l_ERRORMESSAGE varchar2(4000);
   begin
     bc.go (p_branch);
+    
+    dbms_session.set_context('clientcontext','iscrm','1');    
     BEGIN
        bars_ow.create_instant_cards (p_cardcode   => p_cardcode,
                                      p_branch     => p_branch,
@@ -2793,18 +3138,18 @@ PROCEDURE CreateDepositAgreement (
 
     bars_audit.trace(
      'xrm_ui_oe.xrm_InstantcardOrder_trans(p_TransactionId   => '||to_char(p_transactionid)||',
-	                                      P_CARDCODE     	=> '||P_CARDCODE||',
-                                          P_BRANCH     		=> '||P_BRANCH||',
-                                          P_CARDCOUNT    	=> '||to_char(P_CARDCOUNT)||',
-                                          p_STATUSCODE     	=> '||NVL(SQLCODE, 0)||',
-                                          p_ERRORMESSAGE   	=> '||NVL(l_ERRORMESSAGE,'Ok')||');');
+                                        P_CARDCODE      => '||P_CARDCODE||',
+                                          P_BRANCH        => '||P_BRANCH||',
+                                          P_CARDCOUNT     => '||to_char(P_CARDCOUNT)||',
+                                          p_STATUSCODE      => '||NVL(SQLCODE, 0)||',
+                                          p_ERRORMESSAGE    => '||NVL(l_ERRORMESSAGE,'Ok')||');');
     begin
      xrm_ui_oe.xrm_InstantcardOrder_trans(p_TransactionId   => p_transactionid,
-	                                      P_CARDCODE     	=> P_CARDCODE,
-                                          P_BRANCH     		=> P_BRANCH,
-                                          P_CARDCOUNT    	=> P_CARDCOUNT,
-                                          p_STATUSCODE     	=> NVL(SQLCODE, 0),
-                                          p_ERRORMESSAGE   	=> NVL(l_ERRORMESSAGE,'Ok'));
+                                        P_CARDCODE      => P_CARDCODE,
+                                          P_BRANCH        => P_BRANCH,
+                                          P_CARDCOUNT     => P_CARDCOUNT,
+                                          p_STATUSCODE      => NVL(SQLCODE, 0),
+                                          p_ERRORMESSAGE    => NVL(l_ERRORMESSAGE,'Ok'));
     exception when others then bars_audit.error(title||'xrm_ui_oe.xrm_InstantcardOrder_trans failed with mess:' || sqlerrm);
     end;
     commit;
@@ -2837,6 +3182,8 @@ PROCEDURE CreateDepositAgreement (
     l_instantrow.KV := k.KV;
     pipe row (l_instantrow);
    end loop;
+     dbms_session.clear_context('clientcontext','iscrm');    
+
   end;
 
   FUNCTION SetGetCardParam (p_TransactionId   IN NUMBER,
@@ -2844,11 +3191,11 @@ PROCEDURE CreateDepositAgreement (
                             p_xmltags         IN CLOB) return t_cardParams pipelined
   is
   pragma autonomous_transaction;
-  l_cardParam 		r_cardParam;
-  l_ERRORMESSAGE 	varchar2(4000) := null;
-  l_dataxml      	XMLTYPE;
-  l_counttags 		number(38);
-  p_acc				accounts.acc%type;
+  l_cardParam     r_cardParam;
+  l_ERRORMESSAGE  varchar2(4000) := null;
+  l_dataxml       XMLTYPE;
+  l_counttags     number(38);
+  p_acc       accounts.acc%type;
   FUNCTION get_data_from_xml
      (p_dataxml xmltype, p_param varchar2)
   RETURN varchar2
@@ -2871,7 +3218,7 @@ PROCEDURE CreateDepositAgreement (
 
   begin
     bc.go('/'||f_ourmfo||'/');
-	bars_audit.info( 'p_nd = ' || p_nd || ',p_xmltags= ' ||p_xmltags);
+  bars_audit.info( 'p_nd = ' || p_nd || ',p_xmltags= ' ||p_xmltags);
     l_dataxml :=   XMLTYPE.createXML(p_xmltags);
    select to_number(xmlquery('count($doc/params/descendant::*)' passing l_dataxml as "doc" returning content))/2
      into l_counttags
@@ -2892,33 +3239,33 @@ PROCEDURE CreateDepositAgreement (
      l_cardParam.TAG := get_data_from_xml(l_dataxml, 'TAG['||to_char(i)||']');
      l_cardParam.VAL := get_data_from_xml(l_dataxml, 'VAL['||to_char(i)||']');
      --bars_audit.info('xrm_integration_oe.SetGetCardParam: l_cardParam.TAG='|| l_cardParam.TAG || ', l_cardParam.VAL='|| l_cardParam.VAL);
-	 begin
+   begin
       accreg.setAccountwParam(p_acc, l_cardParam.TAG, l_cardParam.VAL);
-	 exception when others then l_ERRORMESSAGE := ' Параметра з тегом ' || l_cardParam.TAG || ' не існує! Неможливо встановити.';
-	 end;
+   exception when others then l_ERRORMESSAGE := ' Параметра з тегом ' || l_cardParam.TAG || ' не існує! Неможливо встановити.';
+   end;
      commit;
-	 bars_audit.info('l_ERRORMESSAGE = '|| l_ERRORMESSAGE);
+   bars_audit.info('l_ERRORMESSAGE = '|| l_ERRORMESSAGE);
     end loop;
     --l_cardParam := null;
 
     for k in (select tag, value val, 'Ok' err from accountsw where acc = p_acc
-			   union all
-			   select l_cardParam.TAG, l_cardParam.VAL, l_ERRORMESSAGE from dual where l_ERRORMESSAGE is not null
-			   )
+         union all
+         select l_cardParam.TAG, l_cardParam.VAL, l_ERRORMESSAGE from dual where l_ERRORMESSAGE is not null
+         )
     loop
      l_cardParam.TAG := k.tag;
      l_cardParam.val := k.val;
-	 l_cardParam.ERR := k.err;
+   l_cardParam.ERR := k.err;
      pipe row (l_cardParam);
     end loop;
    end if;
 
    begin
      xrm_ui_oe.xrm_SetGetCardParams_trans(p_TransactionId   => p_transactionid,
-	                                      P_ND		     	=> P_ND,
-                                          P_XMLTAGS    		=> P_XMLTAGS,
-                                          p_STATUSCODE     	=> NVL(SQLCODE, 0),
-                                          p_ERRORMESSAGE   	=> NVL(l_ERRORMESSAGE,'Ok'));
+                                        P_ND          => P_ND,
+                                          P_XMLTAGS       => P_XMLTAGS,
+                                          p_STATUSCODE      => NVL(SQLCODE, 0),
+                                          p_ERRORMESSAGE    => NVL(l_ERRORMESSAGE,'Ok'));
    exception when others then bars_audit.error(title||'xrm_ui_oe.xrm_SetGetCardParams_trans failed with mess:' || sqlerrm);
    end;
   end;
@@ -2975,12 +3322,12 @@ PROCEDURE CreateDepositAgreement (
 
    select max(ord)+1
      into l_ord
-     from sto_det 
-    where ids = l_ids;    
-  
+     from sto_det
+    where ids = l_ids;
+
   begin
       STO_ALL.Add_RegularTreaty (IDS         => IDS,
-                                 ord         => l_ord,        
+                                 ord         => l_ord,
                                  tt          => tt,
                                  vob         => vob,
                                  dk          => dk,
@@ -3036,24 +3383,44 @@ PROCEDURE CreateDepositAgreement (
                           p_hash           in    varchar2,
                           p_state            out number,
                           p_msg              out varchar2,
-                          p_bulkid           out number)
+                          p_bulkid           out varchar2)
  is
- l_res number;
  begin
-    begin
-    l_res := barstrans.transport_utl.create_transport_unit(
+    p_bulkid := barstrans.transport_utl.create_transport_unit(
      p_unit_type_code   => p_unit_type_code,
      p_ext_id           => p_ext_id,
      p_receiver_url     => p_receiver_url,
      p_request_data     => p_request_data,
      p_hash             => p_hash,
      p_state            => p_state,
-     p_msg              => p_msg);
+     p_msg              => p_msg
+     );
     end;
-  p_bulkid := l_res;
- end;
 
-  procedure CardBulkTicket(p_bulkid         in    number,
+  PROCEDURE CardBulkInsert(p_branch         IN VARCHAR2
+                          ,p_unit_type_code IN VARCHAR2
+                          ,p_ext_id         IN VARCHAR2
+                          ,p_receiver_url   IN VARCHAR2
+                          ,p_request_data   IN CLOB
+                          ,p_hash           IN VARCHAR2
+                          ,p_state          OUT NUMBER
+                          ,p_msg            OUT VARCHAR2
+                          ,p_bulkid         OUT varchar2) IS
+    l_res NUMBER;
+  BEGIN
+    bc.go(p_branch);
+    bars_audit.info('cardbulkinsert 2 ' || p_branch);
+    p_bulkid := barstrans.transport_utl.create_transport_unit(p_unit_type_code => p_unit_type_code
+                                                            ,p_ext_id         => p_ext_id
+                                                            ,p_receiver_url   => p_receiver_url
+                                                            ,p_request_data   => p_request_data
+                                                            ,p_hash           => p_hash
+                                                            ,p_state          => p_state
+                                                            ,p_msg            => p_msg);
+
+  END;
+
+  procedure CardBulkTicket(p_bulkid         in    varchar2,
                            p_bulkstatus       out varchar2,
                            p_ticket           out clob)
   is
@@ -3066,6 +3433,19 @@ PROCEDURE CreateDepositAgreement (
    else p_bulkstatus := 'Файл в обробці.';
    end if;
   end;
+
+  PROCEDURE CardBulkTicket(p_bulkid        IN varchar2
+                          ,p_resultcode    OUT NUMBER
+                          ,p_resultmessage OUT VARCHAR2
+                          ,p_ticket        OUT CLOB) IS
+  BEGIN
+    barstrans.transport_utl.get_unit_state_xrm(p_unit_id => p_bulkid
+                                              ,p_state   => p_resultcode
+                                              ,p_msg     => p_resultmessage);
+    IF p_resultcode = 1 THEN
+      p_ticket     := barstrans.transport_utl.get_unit_respinbase64(p_bulkid);
+    END IF;
+  END;
 
     PROCEDURE CreateSbonContr (p_TransactionId       IN     NUMBER,
                                p_payer_account_id    IN     INTEGER,
@@ -3099,7 +3479,7 @@ PROCEDURE CreateDepositAgreement (
                 p_order_id             => p_order_id,
                 p_result_code          => p_result_code,
                 p_result_message       => p_result_message);
-    
+
          begin
          xrm_ui_oe.xrm_Sbon_trans (
                    p_TransactionId     => p_TransactionId,
@@ -3118,8 +3498,8 @@ PROCEDURE CreateDepositAgreement (
                    orderid             => p_order_id,
                    StatusCode          => p_result_code,
                    ErrorMessage        => p_result_message);
-          exception when others then bars_audit.error(title||'xrm_ui_oe.CreateFreeSbonRegular failed with mess:' || sqlerrm);  
-          end; 
+          exception when others then bars_audit.error(title||'xrm_ui_oe.CreateFreeSbonRegular failed with mess:' || sqlerrm);
+          end;
     end;
 
     PROCEDURE CreateSbonNoContr (p_TransactionId       IN     NUMBER,
@@ -3130,7 +3510,7 @@ PROCEDURE CreateDepositAgreement (
                                  p_holiday_shift       IN     INTEGER,
                                  p_provider_id         IN     INTEGER,
                                  p_personal_account    IN     VARCHAR2,
-                                 p_regular_amount      IN     NUMBER,                                 
+                                 p_regular_amount      IN     NUMBER,
                                  p_extra_attributes    IN     CLOB,
                                  p_sendsms             IN     VARCHAR2,
                                  p_order_id               OUT NUMBER,
@@ -3146,7 +3526,7 @@ PROCEDURE CreateDepositAgreement (
                 p_holiday_shift             => p_holiday_shift,
                 p_provider_id               => p_provider_id,
                 p_personal_account          => p_personal_account,
-                p_regular_amount            => p_regular_amount,                
+                p_regular_amount            => p_regular_amount,
                 p_extra_attributes          => p_extra_attributes,
                 p_sendsms                   => p_sendsms,
                 p_order_id                  => p_order_id,
@@ -3169,10 +3549,10 @@ PROCEDURE CreateDepositAgreement (
                    sendsms             => p_sendsms,
                    orderid             => p_order_id,
                    StatusCode          => p_result_code,
-                   ErrorMessage        => p_result_message);                   
-        exception when others then bars_audit.error(title||'xrm_ui_oe.CreateFreeSbonRegular failed with mess:' || sqlerrm);  
-        end; 
-    end;                                 
+                   ErrorMessage        => p_result_message);
+        exception when others then bars_audit.error(title||'xrm_ui_oe.CreateFreeSbonRegular failed with mess:' || sqlerrm);
+        end;
+    end;
 
     PROCEDURE CreateFreeSbonRegular (p_TransactionId       IN     NUMBER,
                                      p_payer_account_id    IN     INTEGER,
@@ -3212,8 +3592,8 @@ PROCEDURE CreateDepositAgreement (
                 p_order_id              =>p_order_id,
                 p_result_code           =>p_result_code,
                 p_result_message        =>p_result_message);
-    
-       begin   
+
+       begin
          xrm_ui_oe.xrm_freesbon_trans(p_TransactionId   => p_transactionid,
                                       payer_account_id  => p_payer_account_id,
                                       start_date        => p_start_date,
@@ -3231,15 +3611,16 @@ PROCEDURE CreateDepositAgreement (
                                       sendsms           => p_sendsms,
                                       orderid           => p_order_id,
                                       StatusCode => NVL(p_result_code, SQLCODE),
-                                      ErrorMessage => NVL(p_result_message, sqlerrm));   
-       exception when others then bars_audit.error(title||'xrm_ui_oe.CreateFreeSbonRegular failed with mess:' || sqlerrm);  
-       end;    
-    end;                                        
- 
+                                      ErrorMessage => NVL(p_result_message, sqlerrm));
+       exception when others then bars_audit.error(title||'xrm_ui_oe.CreateFreeSbonRegular failed with mess:' || sqlerrm);
+       end;
+    end;
+
     PROCEDURE MapDKBO (p_TransactionId    IN     NUMBER,
+                       p_ext_id           IN     VARCHAR2,
                        p_customer_id      IN     customer.rnk%TYPE,
                        p_deal_number      IN     deal.deal_number%TYPE DEFAULT NULL,
-                       p_acc_list         IN     varchar2,
+                       p_acc_list         IN     number_list DEFAULT NULL,
                        p_dkbo_date_from   IN     DATE DEFAULT bankdate,
                        p_dkbo_date_to     IN     DATE DEFAULT trunc(add_months(bankdate, 12)),
                        p_dkbo_state       IN     VARCHAR2 DEFAULT 'CONNECTED',
@@ -3249,61 +3630,1108 @@ PROCEDURE CreateDepositAgreement (
      p_result_code number := 0;
      p_result_message varchar2(4000);
      l_acclist varchar2(4000);
-     acc_list number_list;
     begin
-    bars_audit.info('xrm_integration_oe:MapDKBO: acc_list = ' ||p_acc_list ||', p_customer_id =' || to_char(p_customer_id));
-     acc_list := tools.string_to_number_list(p_acc_list,',');
      begin
          pkg_dkbo_utl.p_acc_map_to_dkbo(
             in_customer_id  => p_customer_id,
-            in_acc_list     => acc_list,
+            in_acc_list     => p_acc_list,
             out_deal_id     => p_deal_id);
-         
+
         select d.start_date
-          into p_start_date 
-          from deal d 
+          into p_start_date
+          from deal d
          where d.id = p_deal_id;
-     exception when others then p_result_code := -1;  p_result_message := dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace();   
+     exception when others then p_result_code := -1;  p_result_message := sqlerrm;
      end;
-     
-      begin   
+
+     select concatstr(column_value) into l_acclist from table(p_acc_list);
+
+      begin
          xrm_ui_oe.xrm_dkbo_trans ( TransactionId    => p_TransactionId,
-                                    Rnk              => nvl(p_customer_id,-1),
+                                    ext_id           => p_ext_id,
+                                    Rnk              => p_customer_id,
                                     DealNumber       => p_deal_number,
-                                    acc_list         => p_acc_list,
+                                    acc_list         => l_acclist,
                                     dkbo_date_from   => p_dkbo_date_from,
                                     dkbo_date_to     => p_dkbo_date_to,
-                                    dkbo_date_state  => nvl(p_dkbo_state,-1),
-                                    deal_id          => nvl(p_deal_id,-1),
+                                    dkbo_date_state  => p_dkbo_state,
+                                    deal_id          => p_deal_id,
                                     start_date       => p_start_date,
                                     StatusCode       => NVL(p_result_code, SQLCODE),
-                                    ErrorMessage     => NVL(p_result_message, sqlerrm));   
-       exception when others then bars_audit.error(title||'xrm_ui_oe.xrm_dkbo_trans failed with mess:' || dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace());  
-       end;   
-    
+                                    ErrorMessage     => NVL(p_result_message, sqlerrm)
+                                    );
+       exception when others then bars_audit.error(title||'xrm_ui_oe.xrm_dkbo_trans failed with mess:' || sqlerrm);
+       end;
+
     end;
-    
-    function getversion return varchar2
-    is
-    l_version varchar2(1000);
+
+   -- процедура меняет блокировку счёта
+   PROCEDURE blk_change(p_transactionid IN NUMBER
+                       ,p_branch        IN VARCHAR2
+                       ,p_nls           IN accounts.nls%TYPE -- Номер лицевого счета (внешний)
+                       ,p_kv            IN accounts.kv%TYPE -- Код валюты
+                       ,p_blkd          IN accounts.blkd%TYPE -- Код блокировки дебет
+                       ,p_blkk          IN accounts.blkk%TYPE -- Код блокировки кредит
+                       ,p_info_out      OUT VARCHAR2) -- ответ. если успешно - 0 и текст, если нет - "-1 и тест"
+    IS
+     l_acc accounts.acc%TYPE;
+   BEGIN
+     -- предствились
+     bc.go(p_branch);
+     -- проверка наличия счёта в базе
+     BEGIN
+       SELECT a.acc
+         INTO l_acc
+         FROM accounts a
+        WHERE a.nls = p_nls
+          AND a.kv = p_kv;
+     EXCEPTION
+       WHEN no_data_found THEN
+         p_info_out := '-1 Введённый счёт отсутсвует';
+         RETURN;
+     END;
+
+     UPDATE accounts a
+        SET a.blkd = p_blkd
+           ,a.blkk = p_blkk
+      WHERE a.acc = l_acc;
+     IF SQL%FOUND THEN
+       p_info_out := '0 Статус изменён';
+     END IF;
+   END blk_change;
+
+    -- опытувальнык дкбо
+    PROCEDURE p_quest_answ_ins(p_transactionid   IN NUMBER
+                              ,p_object_id       IN NUMBER
+                              ,p_attribute_code  IN attribute_kind.attribute_code%TYPE
+                              ,p_attribute_value IN VARCHAR2) IS
+    BEGIN
+
+
+      pkg_dkbo_utl.p_quest_answ_ins(in_object_id       => p_object_id,
+                                    in_attribute_code  => p_attribute_code,
+                                    in_attribute_value => p_attribute_value);
+    END p_quest_answ_ins;
+
+  -- процедура обработки полученного запроса на партийное создание счетов
+  -- запускается джобом кажые пол часа
+  PROCEDURE process_transport_unit IS
+    l_ticketdata BLOB;
+  BEGIN
+    -- обработка запросов unit_type_id IN (1, 2)
+    ow_utl.acc_req_file_processing;
+
+    l_ticketdata := to_blob('0');
+    FOR rec_tr_unit IN (SELECT *
+                          FROM barstrans.transport_unit t
+                         WHERE t.state_id IN
+                               (barstrans.transport_utl.trans_state_new
+                               ,barstrans.transport_utl.trans_state_failed)
+                           AND t.failures_count <
+                               barstrans.transport_utl.marginal_tries_count
+                              -- пакетное открытие/изменение
+                           AND t.unit_type_id IN (3, 4, 5, 6))
+    LOOP
+      BEGIN
+        bars.ow_batch_opening.batch_get_process(p_filename         => '0'
+                                               ,p_filebody         => rec_tr_unit.request_data
+                                               ,p_external_file_id => rec_tr_unit.external_file_id
+                                               ,p_filetype         => rec_tr_unit.unit_type_id
+                                               ,p_ticketdata       => l_ticketdata);
+
+        barstrans.transport_utl.save_response(p_id        => rec_tr_unit.id
+                                             ,p_resp_data => l_ticketdata);
+        IF SQL%FOUND THEN
+          -- установить статус об успешно обработаном запросе
+          barstrans.transport_utl.set_transport_state(p_id               => rec_tr_unit.id
+                                                     ,p_state_id         => barstrans.transport_utl.trans_state_done
+                                                     ,p_tracking_comment => 'Успешно сохранён ответ'
+                                                     ,p_stack_trace      => barstrans.file_utl.encode_base64(l_ticketdata));
+        END IF;
+        dbms_lob.freetemporary(l_ticketdata);
+      EXCEPTION
+        WHEN OTHERS THEN
+          barstrans.transport_utl.set_transport_failure(p_id            => rec_tr_unit.id
+                                                       ,p_error_message => SQLERRM
+                                                       ,p_stack_trace   => dbms_utility.format_error_stack() ||
+                                                                           chr(10) ||
+                                                                           dbms_utility.format_error_backtrace());
+      END;
+    END LOOP;
+
+  END process_transport_unit;
+
+  -- SKRN: Відмітка про підпис докуметів
+  procedure setdocissigned_skrn(p_id             in varchar2,
+                                p_nd             in number,
+                                p_adds           in number,
+                                p_state          out number,
+                                p_result_code    out number,
+                                p_result_message out varchar2) is
+    l_id    doc_scheme.id%type;
+    l_nd    skrynka_nd.nd%type;
+    l_adds  cc_docs.adds%type;
+    l_state cc_docs.state%type;
+  begin
+
+    -- проверка наличия шаблона в базе
     begin
-        begin
-        SELECT ver || ' installed ' || TO_CHAR (max_inst_date, 'dd.mm.yyyy HH:MI:SS')
-          INTO l_version
-          FROM (SELECT 'vers.id ='
-                       || version_id || ' (' || TO_CHAR (version_date, 'dd.mm.yyyy')|| ')'              
-                          AS ver,
-                       install_date,
-                       MAX (install_date) OVER (ORDER BY install_date DESC)
-                          AS max_inst_date
-                  FROM XRMSW_VERSION t)
-         WHERE install_date = max_inst_date;
-        exception when no_data_found then l_version := 'unknown';
-        end;
-      return l_version;
-    end;                                                                            
-END;
+
+      select s.id
+        into l_id
+        from doc_scheme s
+       where upper(s.id) = upper(p_id);
+
+    exception
+      when no_data_found then
+        p_state          := 0;
+        p_result_code    := -1;
+        p_result_message := substr('Шаблон ' || p_id || ' не знайдений ' ||
+                                   sqlerrm,
+                                   1,
+                                   255);
+        return;
+    end;
+
+    -- проверка наличия договора в базе
+    begin
+
+      select n.nd
+        into l_nd
+        from skrynka_nd n
+       where n.nd = p_nd
+         and n.sos <> 15
+         and n.branch = sys_context('bars_context', 'user_branch');
+
+    exception
+      when no_data_found then
+        p_state          := 0;
+        p_result_code    := -1;
+        p_result_message := substr('Договор ' || p_nd || ' не найден ' ||
+                                   sqlerrm,
+                                   1,
+                                   255);
+        return;
+    end;
+
+    -- проверка номера доп.соглашения
+    begin
+
+      select c.adds
+        into l_adds
+        from cc_docs c
+       where c.id = p_id
+         and c.nd = p_nd
+         and c.adds = p_adds
+         and c.kf = sys_context('bars_context', 'user_mfo');
+
+    exception
+      when no_data_found then
+        p_state          := 0;
+        p_result_code    := -1;
+        p_result_message := substr('Доп. соглашение с № ' || p_adds ||
+                                   ' для договора № ' || p_nd ||
+                                   ' не найдено ' || sqlerrm,
+                                   1,
+                                   255);
+        return;
+    end;
+
+    select state
+      into l_state
+      from cc_docs c
+     where c.id = p_id
+       and c.nd = p_nd
+       and c.adds = p_adds
+       and c.kf = sys_context('bars_context', 'user_mfo');
+
+    if l_state = 2 then
+
+      p_state          := l_state;
+      p_result_code    := 0;
+      p_result_message := substr('Договор ' || p_nd || ' уже подпиcан! ',
+                                 1,
+                                 255);
+
+    else
+
+      update cc_docs
+         set state = 2, version = sysdate
+       where id = p_id
+         and nd = p_nd
+         and adds = p_adds;
+
+      if sql%found then
+        select state
+          into l_state
+          from cc_docs c
+         where c.id = p_id
+           and c.nd = p_nd
+           and c.adds = p_adds
+           and c.kf = sys_context('bars_context', 'user_mfo');
+
+        p_state          := l_state;
+        p_result_code    := 0;
+        p_result_message := null;
+      end if;
+    end if;
+
+  exception
+    when no_data_found then
+      p_state          := 0;
+      p_result_code    := -1;
+      p_result_message := substr(sqlerrm, 1, 255);
+
+  end setdocissigned_skrn;
+
+  -- SKRN: Запит на отримання «Документів по договору»
+  function getdocsbydeal_skrn(p_nd in number) return xrm_ref_tb
+    pipelined is
+    l_ref_tb xrm_ref_tp;
+    l_nd     skrynka_nd.nd%type;
+  begin
+
+    if p_nd is null then
+      raise_application_error(-20001,
+                              'Номер договору не заданий!');
+    end if;
+
+    -- проверка наличия договора в базе
+    begin
+
+      select n.nd
+        into l_nd
+        from skrynka_nd n
+       where n.nd = p_nd
+         and n.sos <> 15
+         and n.branch = sys_context('bars_context', 'user_branch');
+
+    exception
+      when no_data_found then
+        raise_application_error(-20001,
+                                'Договору з таким номером не існує');
+    end;
+
+    for i in (select o.ref as ref,
+                     o.datd datd,
+                     o.nlsa nlsa,
+                     o.kv kva,
+                     o.s / 100 sa,
+                     o.nlsb nlsb,
+                     o.kv2 kvb,
+                     to_char(o.s2 / 100, '999999999990.99') sb,
+                     o.nazn nazn
+                from oper o, skrynka_nd_ref r
+               where o.ref = r.ref
+                 and r.nd = p_nd
+                 and r.branch = sys_context('bars_context', 'user_branch')
+                 and (o.sos >= 0 or sos is null)
+               order by r.ref)
+
+     loop
+      l_ref_tb.ref  := i.ref;
+      l_ref_tb.datd := i.datd;
+      l_ref_tb.nlsa := i.nlsa;
+      l_ref_tb.kva  := i.kva;
+      l_ref_tb.sa   := i.sa;
+      l_ref_tb.nlsb := i.nlsb;
+      l_ref_tb.kvb  := i.kvb;
+      l_ref_tb.sb   := i.sb;
+      l_ref_tb.nazn := i.nazn;
+
+      pipe row(l_ref_tb);
+    end loop;
+
+  end getdocsbydeal_skrn;
+
+ 
+   -- вихідний = true, робочий = false 
+   -- Данная функция на базе ММФО находится по пути  -> nbur_calendar.f_is_holiday
+   
+  function f_is_holiday (p_dat in date) return boolean is
+      l_ret   boolean;
+      l_cnt   number;
+  begin
+      SELECT count(*)
+      INTO l_cnt
+      FROM holiday
+      WHERE kv = 980 AND
+            holiday = p_dat;
+
+      l_ret := (case when l_cnt = 0 then false else true end);
+
+      return l_ret;
+  end f_is_holiday;
+
+ 
+ 
+ 
+ -- Проверяет дату ПО рабочий или выходной, максимальное дней в периоде между датами.
+ -- http://jira.unity-bars.com.ua:11000/browse/COBUXRMIV-36
+ -- p_calcDay максимальное количество дней в периоде (по умолчанию 365)
+ -- *если макс. указанная дата в периоде выходной день то берем предыдущий рабочий, иначе следующий рабочий.
+
+ procedure DatePeriod (p_date1   in  date,
+                       p_date2   in  date,
+                       p_calcDay in  number default null,
+                       p_Odate   out date) is
+         l_holiday boolean;
+    begin
+       l_holiday := XRM_INTEGRATION_OE.f_is_holiday((p_date2));  -- проверка выходного дня
+
+      if    (p_date2 - p_date1)+1 > nvl(p_calcDay,365)                                 then -- если больше 365 - Ошибка
+         raise_application_error(-20000,'Дата "ПО" не може бути більше року');
+
+     elsif l_holiday = false and (p_date2 - p_date1)+1          <= nvl(p_calcDay,365) then -- если <= 365 и дата ПО не вых. - ОК
+         p_Odate := p_date2;
+
+      elsif l_holiday = true and (p_date2 - p_date1)+1           <= nvl(p_calcDay,365) then -- Дата ПО вых.(смотреть заголовок*),
+         p_Odate := case when (f_workday(p_date2,1)+1) - p_date1 <= nvl(p_calcDay,365)
+                         then f_workday(p_date2,1)
+                              else f_workday(p_date2,-1) end;
+      end if;
+
+     end DatePeriod;
+
+
+ -- SKRN: Відкриття скриньки
+  procedure open_safe_deposit(p_n_sk          in number, -- номер скриньки
+                              p_o_sk          in number, --Вид скриньки
+                              p_keynumber     in varchar2, --Номер ключа
+                              p_keycount      in number, --  Кількість виданих клієнту ключів
+                              p_dealnum       in varchar2,
+                              p_tarif_id      in number,
+                              p_dealstartdate in date,
+                              p_dealenddate   in date,
+                              p_rnk           in number,
+                              p_deal_id       out number,
+                              p_resultcode    out int,
+                              p_resultmessage out varchar2) is
+
+    l_verified_rnk    number(5);
+    l_verified_tariff number(5);
+    l_verified_skrn   number(5);
+    l_errmsg          varchar2(4000) := '';
+    l_errcode         number := 0;
+    l_nd              skrynka.n_sk%type;
+    l_nls3600         accounts.nls%type;
+    l_s               skrynka_nd.sdoc%type;
+    l_custtype        customer.custtype%type;
+    l_custnmk         customer.nmk%type;
+    l_custokpo        customer.okpo%type;
+    l_custadr         customer.adr%type;
+    l_custtel         skrynka_nd.tel%type;
+    l_person          person%rowtype;
+    l_n_sk            skrynka.n_sk%type := bars_sqnc.rukey(p_n_sk);
+    l_rnk             number := bars_sqnc.rukey(p_rnk);
+    l_odate           date;
+  begin
+
+    bars_audit.info(title || 'open_safe_deposit p_safeid: ' || p_n_sk);
+
+    p_resultcode    := 0;
+    p_resultmessage := null;
+
+    -- перевірка періода заведення договору
+   xrm_integration_oe.dateperiod(p_date1   => p_dealstartdate,
+                                 p_date2   => p_dealenddate,
+                                 p_calcday => null,
+                                 p_odate   => l_odate);
+    -- перевірка на існування клієнта
+    select count(c.rnk)
+      into l_verified_rnk
+      from customer c
+     where c.rnk = l_rnk
+       and c.date_off is null;
+
+    bars_audit.trace(title || 'open_safe_dep.l_verified_rnk =' || l_rnk ||
+                     ' -> ' || to_char(l_verified_rnk));
+    bars_audit.info(title || 'l_verified_rnk: ' || l_rnk || ' -> ' ||
+                    to_char(l_verified_rnk));
+
+    -- перевірка на існування/вільностіскриньки
+    select count(1)
+      into l_verified_skrn
+      from skrynka s
+     where s.o_sk = p_o_sk
+       and s.n_sk = l_n_sk
+       and s.branch = sys_context('bars_context', 'user_branch')
+       and s.kf = sys_context('bars_context', 'user_mfo')
+       and not exists (select 1
+              from skrynka_nd n
+             where n.n_sk = s.n_sk
+               and n.sos in (0, 1));
+
+    bars_audit.trace(title || 'open_safe_dep.l_verified_skrn =' ||
+                     l_n_sk || ' -> ' || to_char(l_verified_skrn));
+    bars_audit.info(title || 'l_verified_skrn: ' || l_n_sk || ' -> ' ||
+                    to_char(l_verified_skrn));
+
+    --перевірка коду тарифа p_tarif_id
+    select count(1)
+      into l_verified_tariff
+      from skrynka_tariff sf
+     where sf.o_sk = p_o_sk
+       and sf.tariff = p_tarif_id
+       and sf.branch = sys_context('bars_context', 'user_branch')
+       and sf.kf = sys_context('bars_context', 'user_mfo');
+
+    bars_audit.trace(title || 'open_safe_dep.l_verified_tariff =' ||
+                     p_tarif_id || ' -> ' || to_char(l_verified_tariff));
+    bars_audit.info(title || 'l_verified_tariff: ' || p_tarif_id || ' -> ' ||
+                    to_char(l_verified_tariff));
+
+    -- период - должно всегда отрабатывать если не больше чем 365
+    if l_odate is not null  then
+      -- якщо кліент існує
+      if l_verified_rnk > 0 then
+        --якщо існує скринька і вона вільна
+        if l_verified_skrn > 0 then
+          -- якщо вказано правильно тариф
+          if l_verified_tariff > 0 then
+            -- перевірка Дати С
+            if p_dealstartdate >= trunc(sysdate) then
+
+              begin
+                --1. Генерація реф.договора
+                select bars_sqnc.get_nextval('S_CC_DEAL')
+                  into l_nd
+                  from dual;
+
+                bars_audit.trace(title || 'open_safe_dep.l_nd =' ||
+                                 to_char(l_nd));
+                bars_audit.info(title || 'open_safe_dep.l_nd =' ||
+                                to_char(l_nd));
+
+                --2.  Процедура відкриття 3600
+                select substr(f_newnls((select max(a.acc)
+                                         from accounts          a,
+                                              branch_parameters b
+                                        where a.nls = b.val
+                                          and a.kv = 980
+                                          and b.tag = 'CASH'),
+                                       'SD_DR',
+                                       '3600'),
+                              1,
+                              14)
+                  into l_nls3600
+                  from dual;
+
+                bars_audit.trace(title || 'open_safe_dep.l_nls3600 =' ||
+                                 to_char(l_nls3600));
+                bars_audit.info(title || 'open_safe_dep.l_nls3600 =' ||
+                                to_char(l_nls3600));
+
+                -- Call the procedure safe_deposit.open_3600 (Привязка счета )
+                safe_deposit.open_3600(p_nd => l_nd, p_nls => l_nls3600);
+
+                -- 3. Відкриття угоди
+
+                --пошук залогової вартість за ключ p_bail_sum
+                select st.s
+                  into l_s
+                  from skrynka_tip st
+                 where st.o_sk = p_o_sk
+                   and st.branch =
+                       sys_context('bars_context', 'user_branch')
+                   and st.kf = sys_context('bars_context', 'user_mfo');
+
+                bars_audit.info(title || 'open_safe_dep.l_s =' ||
+                                to_char(l_s * 100));
+
+                -- пошук типа кліента
+                select cm.custtype,
+                       cm.nmk,
+                       cm.okpo,
+                       cm.adr,
+                       safe_deposit.f_get_cust_tel(cm.rnk)
+                  into l_custtype,
+                       l_custnmk,
+                       l_custokpo,
+                       l_custadr,
+                       l_custtel
+                  from customer cm
+                 where cm.rnk = l_rnk;
+
+                -- Call the procedure safe_deposit.deal
+                safe_deposit.deal(p_safe_id            => l_n_sk,
+                                  p_safe_type_id       => p_o_sk,
+                                  p_key_used           => 1, --флаг - признак ключ выдан = 1, не выдан = 0
+                                  p_key_number         => p_keynumber,
+                                  p_key_count          => p_keycount,
+                                  p_bail_sum           => l_s * 100,
+                                  p_safe_man_id        => null,
+                                  p_bank_trustee_id    => null,
+                                  p_deal_id            => l_nd,
+                                  p_deal_num           => p_dealnum,
+                                  p_tarif_id           => p_tarif_id,
+                                  p_deal_date          => trunc(sysdate),
+                                  p_deal_start_date    => p_dealstartdate,
+                                  p_deal_end_date      => l_odate,
+                                  p_custtype           => l_custtype,
+                                  p_fio                => case l_custtype
+                                                            when 3 then
+                                                             l_custnmk
+                                                            else
+                                                             null
+                                                          end,
+                                  p_okpo               => l_custokpo,
+                                  p_doc                => case l_custtype
+                                                            when 3 then
+                                                             l_person.ser || ' ' ||
+                                                             l_person.numdoc
+                                                            else
+                                                             null
+                                                          end,
+                                  p_issued             => case l_custtype
+                                                            when 3 then
+                                                             l_person.pdate || ' ' ||
+                                                             l_person.organ
+                                                            else
+                                                             null
+                                                          end,
+                                  p_address            => l_custadr,
+                                  p_birthplace         => case l_custtype
+                                                            when 3 then
+                                                             l_person.bplace
+                                                            else
+                                                             null
+                                                          end,
+                                  p_birthdate          => case l_custtype
+                                                            when 3 then
+                                                             l_person.bday
+                                                            else
+                                                             null
+                                                          end,
+                                  p_phone              => case l_custtype
+                                                            when 3 then
+                                                             l_custtel
+                                                            else
+                                                             null
+                                                          end,
+                                  p_nmk                => case l_custtype
+                                                            when 2 then
+                                                             l_custnmk
+                                                            else
+                                                             null
+                                                          end,
+                                  p_nlsk               => null,
+                                  p_mfok               => null,
+                                  p_trustee_fio        => null,
+                                  p_trustee_okpo       => null,
+                                  p_trustee_doc        => null,
+                                  p_trustee_issued     => null,
+                                  p_trustee_address    => null,
+                                  p_trustee_birthplace => null,
+                                  p_trustee_birthdate  => null,
+                                  p_trustee_deal_num   => null,
+                                  p_trustee_deal_start => null,
+                                  p_trustee_deal_end   => null,
+                                  p_is_import          => 0,
+                                  p_rnk                => l_rnk);
+
+                bars_audit.trace(title ||
+                                 'open_safe_dep.create_safe_deposit- ok;');
+                bars_audit.info(title ||
+                                'open_safe_dep.create_safe_deposit- ok;');
+                p_deal_id := get_old_key(l_nd);
+                l_errmsg  := 'Ok';
+                l_errcode := 0; -- ОК
+
+              exception
+                when others then
+                  l_errcode := -1;
+                  l_errmsg  := sqlerrm;
+                  bars_audit.info(title ||
+                                'open_safe_dep.create_safe_deposit- error;'||sqlerrm||' '||dbms_utility.format_error_stack() || ' ' || dbms_utility.format_error_backtrace());
+              end;
+
+            else
+              l_errmsg  := 'Не вірно вказана "дата З"  p_dealstartdate = ' ||
+                           p_dealstartdate ||
+                           '. Дата повинна бути більша або рівна сьогоднішной!';
+              l_errcode := -1;
+            end if; -- p_dealstartdate
+
+          else
+            l_errmsg  := 'Не знайден тариф  p_tarif_id = ' || p_tarif_id ||
+                         ' для скриньки p_n_sk = ' || p_n_sk;
+            l_errcode := -1;
+          end if; -- l_verified_tariff
+
+        else
+          l_errmsg  := 'Не знайдена скринька p_n_sk = ' || p_n_sk ||
+                       ' або скринька зайнята!';
+          l_errcode := -1;
+        end if; -- l_verified_skrn
+
+      else
+        l_errmsg  := 'Не знайдено клієнта з РНК = ' || p_rnk;
+        l_errcode := -1;
+      end if; --l_verified_rnk
+    else
+      l_errmsg  := 'Термін договору не може перевищувати 365 днів';
+      l_errcode := -1;
+    end if; --l_odate
+
+    p_resultcode    := l_errcode;
+    p_resultmessage := l_errmsg;
+
+    bars_audit.info(title || 'open_safe_dep.create_safe_deposit result: ' ||
+                    p_resultcode || ' ' || p_resultmessage || ' ' || p_deal_id);
+
+  end open_safe_deposit;
+  
+ -- Проверяет заполение обязательных параметров для Операций
+procedure check_skrynka_menu(p_dat           in  date   default null,
+                             p_dat2          in  date   default null,
+                             p_sum           in  number default null,
+                             p_mode          in  number,
+                             p_resultcode    out number, -- 0 не все парам. заполнены, 1- все ок, -1 - операция не найдена
+                             p_resultmessage out varchar2) is
+   l_datename1  number(1);
+   l_datename2  number(1);
+   l_numparname number(1);
+
+ begin
+
+  begin
+    select decode(s.datename1,null,0,1), decode(s.datename2,null,0,1) , decode(s.numparname,null,0,1)
+      into l_datename1, l_datename2, l_numparname
+      from skrynka_menu s
+     where s.type = 'SKRN'
+       and s.kf   = sys_context('bars_context', 'user_mfo')
+       and s.item = p_mode;
+
+ exception
+  when no_data_found then
+    p_resultcode    := -1;
+    p_resultmessage := 'Не знайдено операції №' || p_mode;
+ end;
+
+    if      l_datename1  = case when l_datename1 = 0 then 0     
+                                                               when p_dat  is null then 0 else 1 end     
+       and l_datename2  = case when l_datename2 = 0 then 0     
+                                                               when p_dat2  is null then 0 else 1 end 
+       and l_numparname = case when l_numparname = 0 then 0     
+                                                               when p_sum  is null then 0 else 1 end
+   then  p_resultcode  := 1 ;
+
+   else  p_resultcode  := 0 ;
+  end if;
+  
+
+ end check_skrynka_menu;
+
+
+--SKRN: операції по скринькам
+procedure oper_dep_skrn(p_dat         in date default null, -- обязательный datename1
+                        p_dat2        in date default null, -- обязательный datename2
+                        p_n_sk        in number default null,
+                        p_mode        in number, -- код операции
+                        p_nd          in number, -- код договора
+                        p_userid      in number default null,
+                        p_sum         in number default null, -- обязательный numparname
+                        p_ndoc        in varchar2 default null,
+                        p_resultcode    out int,
+                        p_resultmessage out varchar2) is
+
+  l_resultcode    int(3);
+  l_resultmessage varchar2(255);
+  l_odate          date;
+
+begin
+
+  bars_audit.info(title || 'oper_dep_skrn p_mode: ' || p_mode );
+
+  p_resultcode    := 0;
+  p_resultmessage := null;
+
+ -- Првоерка периода пролонгации Деп. ячеки  (налом и без налом)
+ if p_mode in (17,18)then
+
+   if p_dat2 is null then   raise_application_error(-20000,'Не вказана дата пролонгації');
+   end if;
+     xrm_integration_oe.dateperiod(p_date1   =>(bankdate + 1),
+                                   p_date2   => p_dat2,
+                                   p_calcday => null,
+                                   p_odate   => l_odate);
+  end if;
+
+ -- Проверяет заполнение обязательных параметров
+  xrm_integration_oe.check_skrynka_menu(p_dat           => p_dat,
+                                        p_dat2          => p_dat2,
+                                        p_sum           => p_sum,
+                                        p_mode          => p_mode,
+                                        p_resultcode    => l_resultcode,
+                                        p_resultmessage => l_resultmessage);
+
+  if l_resultcode = 1 then  -- Все ОК
+
+    begin
+      -- Call the procedure
+      skrn.p_dep_skrn(dat_     => p_dat,
+                      dat2_    => p_dat2,
+                      n_sk_    => p_n_sk,
+                      mode_    => p_mode,
+                      par_     => p_nd,
+                      p_userid => bars_sqnc.rukey(p_userid),
+                      p_sum    => p_sum,
+                      p_extnd  => p_ndoc);
+
+    exception
+      when others then
+        p_resultcode    := -1;
+        p_resultmessage := sqlerrm;
+        bars_audit.error(title || ' oper_dep_skrn ' || sqlerrm);
+    end;
+
+  elsif l_resultcode = 0 then  -- Параметры не заполнены
+    p_resultcode    := -1;
+    p_resultmessage := 'Не заповненні обов''язкові параметри для коду операції №' || p_mode;
+
+  elsif l_resultcode = -1 then -- Операция не найдена
+    p_resultcode    := -1;
+    p_resultmessage := l_resultmessage;
+  end if;
+
+  bars_audit.info(title || ' oper_dep_skrn ResultMessage =' ||
+                  to_char(p_resultmessage));
+
+exception
+  when others then
+    p_resultcode    := -1;
+    p_resultmessage := sqlerrm;
+
+    bars_audit.info(title || ' oper_dep_skrn ResultMessage =' ||
+                    to_char(p_resultmessage));
+
+end oper_dep_skrn;
+
+
+-- Закрытие депозитного договора (сейфа)
+
+procedure Сlose_ContractLease(p_n_sk        in number default null, -- код ячейки
+                              p_nd          in number default null, -- код договора
+                              p_userid      in number default null,
+                              p_sum         in number default null,
+                              p_ndoc        in varchar2 default null,
+                              p_resultcode    out int,
+                              p_resultmessage out varchar2) is
+
+ l_n_sk number;
+ l_nd  number;
+
+  begin
+   bars_audit.info(title || 'Сlose_ContractLease: ' || p_nd || '\' || p_n_sk );
+
+    begin
+
+
+ select sk.n_sk, sk.nd
+   into l_n_sk , l_nd
+   from SKRYNKA_ND sk
+  where sk.nd   = nvl(p_nd, sk.nd)
+    and sk.n_sk = nvl(p_n_sk, sk.n_sk)
+    and sk.kf   = sys_context('bars_context', 'user_mfo') ;
+
+        -- Call the procedure
+        skrn.p_dep_skrn(dat_     => bankdate ,
+                        dat2_    => bankdate ,
+                        n_sk_    => l_n_sk,
+                        mode_    => 1, -- закрытие
+                        par_     => l_nd,
+                        p_userid => p_userid,
+                        p_sum    => p_sum,
+                        p_extnd  => p_ndoc);
+
+   exception
+       when no_data_found then
+        p_resultcode    := -1;
+        p_resultmessage := 'Не знайдено угоду\ячейку №' || p_nd||'\'||p_n_sk;
+
+        bars_audit.info(title || 'Сlose_ContractLease ResultMessage =' || to_char(p_resultmessage));
+
+        when others then
+          p_resultcode    := -1;
+          p_resultmessage := sqlerrm;
+          bars_audit.error(title || ' oper_dep_skrn ' || sqlerrm);
+      end;
+
+ /* else  resultcode    := -1;
+        resultmessage := 'Не вірный код операції №' || p_mode;
+ end if;  */
+        bars_audit.info(title || 'Сlose_ContractLease ResultMessage =' || to_char(p_resultmessage));
+
+  end Сlose_ContractLease;
+
+ -- Банківська довіреність
+ --  Приєднання довіреної ФО до договору оренди сейфа
+ --  Створення довіреності (банківської та нотаріальної)
+ --  Редагування (анулювання) довіреності (банківської та нотаріальної)
+
+ procedure Merge_Skrynka_Attorney( p_nd          in skrynka_attorney.nd%type,
+                                   p_rnk         in skrynka_attorney.rnk%type,
+                                   p_date_from   in varchar2,
+                                   p_date_to     in varchar2,
+                                   p_cancel_date in varchar2) is
+ l_rnk NUMBER(38);                                   
+   begin
+    
+    begin 
+      select  count (c.rnk)
+        into l_rnk
+            from customer c 
+         where c.rnk = p_rnk ; 
+       exception
+        when no_data_found then
+          raise_application_error(-20001,
+                                  'Контрагента з таким номером не існує');
+      end;
+  safe_deposit.merge_skrynka_attorney(p_nd          => p_nd,
+                                      p_rnk         => p_rnk,
+                                      p_date_from   => p_date_from,
+                                      p_date_to     => p_date_to,
+                                      p_cancel_date => p_cancel_date);
+
+ end Merge_Skrynka_Attorney;
+ 
+-- Запит на БЕК-ОФІС
+procedure request_forbackoff(p_transactionid in number,
+                             p_trustee       in cust_requests.trustee_type%type,
+                             p_req_id        in cust_requests.req_id%type,
+                             p_req_type      in cust_requests.req_type%type,
+                             p_cust_id       in cust_requests.trustee_rnk%type,
+                             p_scaccess      in clob,
+                             p_scwarrant     in clob,
+                             p_scsignscard   in clob,
+                             p_depositlist   in number_list,
+                             resultcode      out number,
+                             resultmessage   out varchar2) is
+  l_ead_sync_queu_client ead_sync_queue.id%type;
+  l_ead_sync_queu_agr    ead_sync_queue.id%type;
+  l_err_check exception;
+  l_res_scaccess           blob;
+  l_res_cr_doc             ead_docs.id%type;
+  l_res_cr_doc_scwarrant   ead_docs.id%type;
+  l_res_cr_doc_scsignscard ead_docs.id%type;
+
+begin
+  savepoint sp1;
+  resultcode    := 0;
+  resultmessage := 'Ok';
+
+  bars_audit.trace(title ||
+                   'Користувач почав формування запиту на доступ №' ||
+                   to_char(p_req_id));
+
+  -- Встановлення статусу доступу
+  begin
+    ebp.set_request_state(p_reqid   => p_req_id,
+                          p_state   => 0,
+                          p_comment => '');
+  
+  exception
+    when no_data_found then
+      resultcode    := -1;
+      resultmessage := title ||
+                       ' error set_request_state в системе нет записи с p_req_id:' ||
+                       p_req_id || ' ' || sqlerrm;
+    
+    when others then
+      resultcode    := -1;
+      resultmessage := title || ' error set_request_state: ' || sqlerrm ||
+                       dbms_utility.format_error_backtrace;
+    
+      bars_audit.error(title || ' set_request_state resultcode: ' ||
+                       resultcode || ' resultmessage: ' || resultmessage);
+      rollback to sp1;
+      return;
+    
+  end;
+
+  bars_audit.trace(title ||
+                   'Користувач завершив формування запиту на доступ №' ||
+                   to_char(p_req_id));
+
+  begin
+  
+    -- Страховочна синхронізація клієнта в ЕАД ead_sync_queu.id
+    l_ead_sync_queu_client := ead_pack.msg_create(p_type_id => 'CLIENT',
+                                                  p_obj_id  => p_cust_id
+												  /* временно закомичено, пока Шестаков не обновит процедуру 
+												  ,
+												  p_rnk     => p_cust_id*/
+												  );
+    bars_audit.trace(title ||
+                     'Створити повідомлення для синхронізації клієнта в ЕАД' ||
+                     to_char(l_ead_sync_queu_client));
+  
+    if l_ead_sync_queu_client is null or l_ead_sync_queu_client = 0 then
+      raise l_err_check;
+    end if;
+  exception
+    when l_err_check then
+      resultcode    := -1;
+      resultmessage := title ||
+                       ' error msg_create не выполнилась синхронизация клиента в ЕАД l_ead_sync_queu_client:' ||
+                       l_ead_sync_queu_client;
+    
+    when others then
+      resultcode    := -1;
+      resultmessage := title || ' error msg_create: ' || sqlerrm ||
+                       dbms_utility.format_error_backtrace;
+    
+      bars_audit.error(title || ' msg_create resultcode: ' || resultcode ||
+                       ' resultmessage: ' || resultmessage);
+      rollback to sp1;
+      return;
+  end;
+
+  -- Заява на доступ до Картки Клієнта
+  --0 - картка клиента
+  if (p_req_type = 0) then
+  
+    -- convert fromBase64 in blob
+    l_res_scaccess := barstrans.file_utl.decode_base64(p_clob_in => p_scaccess);
+  
+    -- Разархивировать gzip архив в переменную l_uncompressed_blob   from_blob in clob
+    l_res_scaccess := utl_compress.lz_uncompress(src => l_res_scaccess);
+  
+    l_res_cr_doc := ead_pack.doc_create(p_type_id      => 'SCAN',
+                                        p_template_id  => null,
+                                        p_scan_data    => l_res_scaccess,
+                                        p_ea_struct_id => 146,
+                                        p_rnk          => p_cust_id,
+                                        p_agr_id       => null);
+  
+    bars_audit.trace(title || 'Створили надрукований документ в ЕАД' ||
+                     to_char(l_res_cr_doc) || ' коли p_req_type: ' ||
+                     p_req_type);
+  
+    --(1,2) 1-доступ до депозиту; 2 - дострокове повернення коштів  
+  else
+  
+    for i in 1 .. p_depositlist.count loop
+    
+      -- Страховочна синхронізація клієнта в ЕАД ead_sync_queu.id
+      l_ead_sync_queu_agr := ead_pack.msg_create(p_type_id => 'AGR',
+                                                 p_obj_id  => to_char('DPT' ||
+                                                                      p_depositlist(i))
+						                         /* временно закомичено, пока Шестаков не обновит процедуру,
+												 p_rnk     => p_cust_id */
+												 );
+    
+      bars_audit.trace(title ||
+                       'Створити повідомлення для синхронізації клієнта в ЕАД' ||
+                       to_char(l_ead_sync_queu_agr));
+    
+      -- convert fromBase64 in blob
+      l_res_scaccess := barstrans.file_utl.decode_base64(p_clob_in => p_scaccess);
+    
+      -- Разархивировать gzip архив в переменную l_uncompressed_blob   from_blob in clob
+      l_res_scaccess := utl_compress.lz_uncompress(src => l_res_scaccess);
+    
+      l_res_cr_doc := ead_pack.doc_create(p_type_id      => 'SCAN',
+                                          p_template_id  => null,
+                                          p_scan_data    => l_res_scaccess,
+                                          p_ea_struct_id => 224,
+                                          p_rnk          => p_cust_id,
+                                          p_agr_id       => p_depositlist(i));
+    
+      bars_audit.trace(title || 'Створили надрукований документ в ЕАД' ||
+                       to_char(l_res_cr_doc) || ' коли p_req_type: ' ||
+                       p_req_type);
+    
+      -- p_scwarrant
+      if (p_scwarrant is not null) then
+        l_res_scaccess := null;
+      
+        -- convert fromBase64 in blob
+        l_res_scaccess := barstrans.file_utl.decode_base64(p_clob_in => p_scwarrant);
+      
+        -- Разархивировать gzip архив в переменную l_uncompressed_blob   from_blob in clob
+        l_res_scaccess := utl_compress.lz_uncompress(src => l_res_scaccess);
+      
+        l_res_cr_doc_scwarrant := ead_pack.doc_create(p_type_id      => 'SCAN',
+                                                      p_template_id  => null,
+                                                      p_scan_data    => l_res_scaccess,
+                                                      p_ea_struct_id => case
+                                                                         upper(p_trustee)
+                                                                          when 'T' then
+                                                                           222
+                                                                          else
+                                                                           223
+                                                                        end,
+                                                      p_rnk          => p_cust_id,
+                                                      p_agr_id       => p_depositlist(i));
+      
+        bars_audit.trace(title || 'Створили надрукований документ в ЕАД' ||
+                         to_char(l_res_cr_doc_scwarrant) ||
+                         ' для депозиту№: ' || p_depositlist(i));
+      
+      end if;
+    
+      -- p_scsignscard
+      if (p_scsignscard is not null) then
+        l_res_scaccess := null;
+        -- convert fromBase64 in blob
+        l_res_scaccess := barstrans.file_utl.decode_base64(p_clob_in => p_scsignscard);
+      
+        -- Разархивировать gzip архив в переменную l_uncompressed_blob   from_blob in clob
+        l_res_scaccess := utl_compress.lz_uncompress(src => l_res_scaccess);
+      
+        l_res_cr_doc_scsignscard := ead_pack.doc_create(p_type_id      => 'SCAN',
+                                                        p_template_id  => null,
+                                                        p_scan_data    => l_res_scaccess,
+                                                        p_ea_struct_id => 221,
+                                                        p_rnk          => p_cust_id,
+                                                        p_agr_id       => p_depositlist(i));
+      
+        bars_audit.trace(title || 'Створили надрукований документ в ЕАД' ||
+                         to_char(l_res_cr_doc_scsignscard) ||
+                         ' для депозиту№: ' || p_depositlist(i));
+      
+      end if;
+    
+    end loop;
+  
+  end if;
+
+  exception  
+    when others then
+      resultcode    := -1;
+      resultmessage := title || 'request_forbackoff: ' || sqlerrm ||
+                       dbms_utility.format_error_backtrace;
+    
+      bars_audit.error(title || '  resultcode: ' || resultcode ||
+                       ' resultmessage: ' || resultmessage);
+      rollback to sp1;
+      return;
+end request_forbackoff;
+
+-- Відповідь від БЕК-ОФІСУ
+procedure request_frombackoff(p_req_id     in cust_requests.req_id%type,
+                              resultstate     out number,
+                              result_comments out varchar2) is
+l_req_id cust_requests.req_id%type;
+begin
+
+  select t.req_id, t.req_state, t.comments
+    into l_req_id, resultstate, result_comments
+    from cust_requests t
+   where t.req_id = p_req_id;
+   
+exception
+  when no_data_found then
+    raise_application_error(-20001,
+                            'Нет данных по запросу p_req_id:' || p_req_id);
+  
+end request_frombackoff;
+
+end;
 /
+
  show err;
  
 PROMPT *** Create  grants  XRM_INTEGRATION_OE ***
@@ -3314,4 +4742,3 @@ grant DEBUG,EXECUTE                                                          on 
  PROMPT ===================================================================================== 
  PROMPT *** End *** ========== Scripts /Sql/BARS/package/xrm_integration_oe.sql =========*** 
  PROMPT ===================================================================================== 
- 

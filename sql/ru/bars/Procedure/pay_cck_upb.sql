@@ -774,7 +774,8 @@ nSSPK_
      if substr(nls_SG,1,2)='26' then
         pay_no(nls_1002,nls_SG,'CCK');
         gl.payv(flg_,ref_, DAT_, tt_, 1,kv_,nls_1002,sum1T_,kv_,nls_SG,sum1T_);
-        update opldok set txt='Зарахування коштів на поточний рахунок' where stmt=gl.aSTMT and ref=ref_;
+        --update opldok set txt='Зарахування коштів на поточний рахунок' where stmt=gl.aSTMT and ref=ref_; --COBUMMFO-6212
+		  update opldok set txt='Надходження коштів для погашення кредиту' where stmt=gl.aSTMT and ref=ref_;
      else
         pay_no(nls_1002,nls_SG,'CCM');
      gl.payv(flg_,ref_, DAT_, tt_, 1,kv_,nls_1002,sum1T_,kv_,nls_SG,sum1T_);

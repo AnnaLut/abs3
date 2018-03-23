@@ -669,14 +669,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
                 from dpt_agreements a
                 where a.agrmnt_id > l_cdc_lastkey_agr
 		          AND a.agrmnt_type != 25 -- lypskykh #COBUMMFO-5263
-                  and a.dpt_id in (select max(dc.deposit_id) KEEP (DENSE_RANK FIRST ORDER BY dc.when) as deposit_id
-                                      from dpt_deposit_clos dc,
-                                           dpt_deposit d 
-                                        where dc.deposit_id = d.deposit_id(+)
-                                        and nvl(dc.archdoc_id, 0) > 0
-                                        and d.wb = 'N'
-                                        and dc.deposit_id = a.dpt_id )
-                                
+                  and exists (select 1
+                              from dpt_deposit_clos dc join dpt_deposit d using (deposit_id)
+                              where deposit_id = a.dpt_id
+                                and nvl(dc.archdoc_id, 0) > 0
+                                and d.wb = 'N')
                  order by a.agrmnt_id) loop
       -- клиент
       l_sync_id := ead_pack.msg_create('CLIENT', to_char(cur.rnk));
