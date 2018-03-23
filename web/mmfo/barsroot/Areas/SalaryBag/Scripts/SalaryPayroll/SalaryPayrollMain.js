@@ -229,7 +229,8 @@ function initKendoWidgets() {
                     doc_ref: { type: "number" },
                     sos: { type: "number" },
                     signed: { type: "string" },
-                    signed_fio: { type: "string" }
+                    signed_fio: { type: "string" },
+                    doc_comment: { type: "string" }
                 }
             }
         }
@@ -265,7 +266,8 @@ function initKendoWidgets() {
             { field: "nlsb", title: "Рахунок", width: "150px" },
             { field: "s", title: "Сума, &#8372;", width: "120px", template: '<div style="text-align:right;">#= convertToMoneyStr(s) #</div>' },
             { field: "nazn", title: "Призначення платежу", width: "350px" },
-            { field: "source", title: "Джерело", width: "150px" }
+            { field: "source", title: "Джерело", width: "150px" },
+            { field: "doc_comment", title: "Коментар", width: "350px" }
         ],
         selectable: "multiple, row",
         editable: false,

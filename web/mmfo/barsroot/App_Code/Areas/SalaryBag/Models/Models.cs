@@ -146,6 +146,7 @@ namespace Areas.SalaryBag.Models
         public string source { get; set; }
         public decimal? doc_ref { get; set; }
         public int? sos { get; set; }
+        public string doc_comment { get; set; }
     }
 
     public class ClientModel
