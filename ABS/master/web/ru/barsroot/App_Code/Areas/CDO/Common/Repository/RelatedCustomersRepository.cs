@@ -79,49 +79,49 @@ namespace BarsWeb.Areas.CDO.Common.Repository
                                   MBM_REL_CUSTOMERS rc
                             left join mbm_cust_rel_users_map um on (
                                   rc.id = um.rel_cust_id )
-                            where um.cust_id = :p_cust_id AND um.approved_type IN ('update', 'delete', 'add') AND um.sign_number <> 0
-                        UNION
-                        select 
-                            rc.id as Id,       
-                            rc.tax_code as TaxCode,       
-                            rc.first_name as FirstName,   
-                            rc.last_name as LastName,
-                            rc.second_name as SecondName, 
-                            rc.doc_type as DocType,
-                            rc.doc_series as DocSeries,
-                            rc.doc_number as DocNumber,
-                            rc.doc_organization as DocOrganization,
-                            rc.doc_date as DocDate,
-                            'Corp2' as Sdo,
-                            rc.cell_phone as CellPhone,
-                            rc.email as Email,                           
-                            um.sign_number as SignNumber,                           
-                            um.cust_id as CustId,
-                            um.user_id as UserId,
-                            um.approved_type as ApprovedType,
-                            um.is_approved as IsApprovedDecimal,
-                            rc.login as Login,
-                            ar.registration_id as AcskRegistrationId,
-                            rc.CREATED_DATE as CreateDate,
-                            um.sequential_visa as SequentialVisa,
-                            rc.birth_date as BirthDate,
-                            rc.FIO_CARD as FullNameGenitiveCase,
-                            ca.region_id as addressRegionId,
-                            ca.city as addressCity,
-                            ca.street as addressStreet,
-                            ca.house_number as addressHouseNumber,
-                            ca.addition as addressAddition
-                              from
-                                  CORP2_REL_CUSTOMERS rc
-                            left join corp2_rel_customers_address ca on(
-                                rc.id = ca.rel_cust_id
-                            )
-                            left join corp2_acsk_registration ar on(
-                                rc.id = ar.rel_cust_id
-                            )
-                            left join corp2_cust_rel_users_map um on (
-                                  rc.id = um.rel_cust_id )
-                            where um.cust_id = :p_cust_id AND um.approved_type IN ('update', 'delete', 'add')  AND um.sign_number <> 0";
+                            where um.cust_id = :p_cust_id AND um.approved_type IN ('update', 'delete', 'add') AND um.sign_number <> 0";
+            //UNION
+            //            select 
+            //                rc.id as Id,       
+            //                rc.tax_code as TaxCode,       
+            //                rc.first_name as FirstName,   
+            //                rc.last_name as LastName,
+            //                rc.second_name as SecondName, 
+            //                rc.doc_type as DocType,
+            //                rc.doc_series as DocSeries,
+            //                rc.doc_number as DocNumber,
+            //                rc.doc_organization as DocOrganization,
+            //                rc.doc_date as DocDate,
+            //                'Corp2' as Sdo,
+            //                rc.cell_phone as CellPhone,
+            //                rc.email as Email,                           
+            //                um.sign_number as SignNumber,                           
+            //                um.cust_id as CustId,
+            //                um.user_id as UserId,
+            //                um.approved_type as ApprovedType,
+            //                um.is_approved as IsApprovedDecimal,
+            //                rc.login as Login,
+            //                ar.registration_id as AcskRegistrationId,
+            //                rc.CREATED_DATE as CreateDate,
+            //                um.sequential_visa as SequentialVisa,
+            //                rc.birth_date as BirthDate,
+            //                rc.FIO_CARD as FullNameGenitiveCase,
+            //                ca.region_id as addressRegionId,
+            //                ca.city as addressCity,
+            //                ca.street as addressStreet,
+            //                ca.house_number as addressHouseNumber,
+            //                ca.addition as addressAddition
+            //                  from
+            //                      CORP2_REL_CUSTOMERS rc
+            //                left join corp2_rel_customers_address ca on(
+            //                    rc.id = ca.rel_cust_id
+            //                )
+            //                left join corp2_acsk_registration ar on(
+            //                    rc.id = ar.rel_cust_id
+            //                )
+            //                left join corp2_cust_rel_users_map um on (
+            //                      rc.id = um.rel_cust_id )
+            //                where um.cust_id = :p_cust_id AND um.approved_type IN ('update', 'delete', 'add')  AND um.sign_number <> 0";
 #endregion
             var result = _entities.ExecuteStoreQuery<RelatedCustomer>(sql, custId).ToList();
             
@@ -133,11 +133,11 @@ namespace BarsWeb.Areas.CDO.Common.Repository
                             from 
                                 mbm_cust_rel_users_map
                             where 
-                                (is_approved = 0 or is_approved is null) AND sign_number <> 0
-                        UNION
-                        select distinct cust_id 
-                            from CORP2_CUST_REL_USERS_MAP
-                            where (is_approved = 0 or is_approved is null) AND sign_number <> 0";
+                                (is_approved = 0 or is_approved is null) AND sign_number <> 0";
+                        //UNION
+                        //select distinct cust_id 
+                        //    from CORP2_CUST_REL_USERS_MAP
+                        //    where (is_approved = 0 or is_approved is null) AND sign_number <> 0";
             var result = _entities.ExecuteStoreQuery<decimal>(sql).ToList();
             return result;
         }

@@ -2,7 +2,7 @@ declare
     schema_already_exists exception;
     pragma exception_init(schema_already_exists, -1920);
 begin
-    execute immediate 'create user barstrans identified by &&barstrans_pass default tablespace brsmdld';
+    execute immediate 'create user barstrans identified by barstrans default tablespace brsmdld';
 exception
     when schema_already_exists then
          null;

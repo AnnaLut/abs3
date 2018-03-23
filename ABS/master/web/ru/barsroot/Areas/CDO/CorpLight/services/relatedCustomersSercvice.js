@@ -78,7 +78,6 @@ angular.module(globalSettings.modulesAreas)
                 state.isLoading = true;
                 var deferred = $q.defer();
 
-                console.log(_url);
                 $http.post(_url +'create', relCustomer)
                 .success(function (response) {
                     state.isLoading = false;
