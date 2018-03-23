@@ -52,7 +52,37 @@
                 }
         }
     },
+    getSosFilterDataSource: function () {
+        switch (this.formType) {
+            case 0:
+                return {
+                    accepted: [
+                        { sos: 1, sosName: 'Прийнята' },
+                        { sos: 2, sosName: 'Очікує підтвердження БО' }
+                    ],
+                    processed: [
+                        { sos: -1, sosName: 'Відхилена' },
+                        { sos: 0, sosName: 'Документи введені' },
+                        { sos: 5, sosName: 'Оплачена' }
+                    ],
+                    draft: null
+                    //draft: [ { sos: 3, sosName: 'Чернетка' } ]
+                }
+            default:
+                return {
+                    //accepted: [ { sos: 2, sosName: 'Очікує підтвердження БО' } ],
+                    accepted: null,
+                    processed: [
+                        { sos: 0, sosName: 'Документи введені' },
+                        { sos: 5, sosName: 'Оплачена' }
+                    ],
+                    draft: null
+                }
+        }
+    },
     initGridOptions: function () {
+        var filtersDs = formCfg.getSosFilterDataSource();
+
         this.processed_gridOptions = getGridOptions({}, {
             transport: {
                 read: {
@@ -68,7 +98,7 @@
                     { field: "pr_date", operator: "lte", value: getFilterToValue() }
                 ]
             }
-        }, true);
+        }, true, filtersDs.processed);
         this.accepted_gridOptions = getGridOptions({
             selectable: this.formType == 0 ? 'row' : 'multiple, row',
         }, {
@@ -79,7 +109,7 @@
                         }
                     }
                 }
-            }, false);
+            }, false, filtersDs.accepted);
         this.draft_gridOptions = getGridOptions({
             selectable: 'multiple, row'
         }, {
@@ -90,7 +120,7 @@
                         }
                     }
                 }
-            }, false);
+            }, false, filtersDs.draft);
     },
     getCurrentGridOptions: function () {
         switch (this.currentGridName) {
@@ -108,17 +138,15 @@
         var grid = $(this.currentGridSelector).data("kendoGrid");
         if (grid) {
             grid.dataSource.read();
-            //grid.refresh();
         }
     },
     refreshGrid: function () {
         var grid = $(this.currentGridSelector).data("kendoGrid");
         grid.refresh();
-        //grid.dataSource.read();
     }
 };
 
-function getGridOptions(options, dataSourse, showSign) {
+function getGridOptions(options, dataSourse, showSign, sosFilterDs) {
     if (options === undefined || options == null) options = {};
     if (dataSourse === undefined || dataSourse == null) dataSourse = {};
     var toShow = true;
@@ -140,7 +168,7 @@ function getGridOptions(options, dataSourse, showSign) {
                 mode: "single",
                 allowUnsort: true
             },
-            filterable: false,
+            filterable: true,
             columns: [
                 { field: "signed", title: " ", filterable: false, width: "35px", template: '<div class="signed-cell#= signed == "Y" ? "" : " invisible" #" title="Підписав:&\\#013;#= signed_fio #"></div>', hidden: !showSign },
                 { field: "pr_date", title: "Дата відомості", width: "100px", template: "<div style='text-align:center;'>#= kendo.toString(pr_date,'dd.MM.yyyy') || '' #</div>" },
@@ -154,8 +182,41 @@ function getGridOptions(options, dataSourse, showSign) {
                 { field: "zp_deal_id", title: "№ ЗП договору", width: "150px" },
                 { field: "nmk", title: "Назва ЮО", width: "250px" },
                 { field: "rnk", title: "РНК", width: "80px" },
-                { field: "sos_name", title: "Статус", width: "190px" },
-                { field: "src_name", title: "Джерело надходження", width: "150px" },
+                {
+                    field: "sos", title: "Статус", width: "190px",
+                    template: "#= sos_name #",
+                    filterable: sosFilterDs ? {
+                        ui: function (element) {
+                            element.kendoDropDownList({
+                                dataSource: sosFilterDs,
+                                optionLabel: '--Оберіть значення--',
+                                dataTextField: 'sosName',
+                                dataValueField: 'sos'
+                            });
+                        }
+                    } : false
+                },
+                {
+                    field: "src", title: "Джерело надходження", width: "150px",
+                    template: "#= src_name #",
+                    filterable: {
+                        ui: function (element) {
+                            element.kendoDropDownList({
+                                dataSource: [
+                                    { value: 1, name: 'Ручне введення' },
+                                    { value: 2, name: 'Імпорт файлу' },
+                                    { value: 3, name: 'Ручне введення' },
+                                    { value: 4, name: 'Змішаний тип' },
+                                    { value: 5, name: 'Інтернет банк' }
+                                ],
+                                optionLabel: '--Оберіть значення--',
+                                dataTextField: 'name',
+                                dataValueField: 'value'
+                            });
+                        }
+
+                    }
+                },
                 { field: "comm_reject", title: "Коментар", width: "300px" },
                 { field: "fio", title: "Менеджер", width: "250px" }
             ],

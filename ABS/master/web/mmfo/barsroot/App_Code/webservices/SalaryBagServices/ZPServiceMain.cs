@@ -133,6 +133,8 @@ namespace Bars.SalaryBagSrv
                 };
 
                 Corp2Intr.SimpleResponse response = ws.SavePayrollInfoFromAbs(data);
+                res.message = response.Msg;
+
                 if (response.Status.ToUpper() != "OK")
                     throw new System.Exception(response.Msg);
             }

@@ -409,7 +409,8 @@ namespace BarsWeb.Areas.SalaryBag.Infrastructure.DI.Implementation
                                 z.ref doc_ref, 
                                 o.sos,
                                 z.signed,
-                                case when s.fio is null and z.corp2_id is not null then 'Корпоративний клієнт' else s.fio end signed_fio
+                                case when s.fio is null and z.corp2_id is not null then 'Корпоративний клієнт' else s.fio end signed_fio,
+                                z.doc_comment
                             from zp_payroll_doc z, oper o, staff$base s
                             where 
                                 o.ref(+) = z.ref 
