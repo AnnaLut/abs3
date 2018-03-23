@@ -65,7 +65,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.BARS_WEB_UI is
   --
 
   -- Private constant declarations
-  g_body_version  constant varchar2(64)  := 'version 1.0 26/11/2013';
+  g_body_version  constant varchar2(64)  := 'version 1.1 21/03/2018';
   g_awk_body_defs constant varchar2(512) := '';
   g_dbgcode constant varchar2(12) := 'bars_web_ui.';
   g_exclude_funcs_mask constant varchar2(1024) := '/barsroot/barsweb/welcome.aspx|/barsroot/|/barsroot/board/index/|/barsroot/messages/count/';
@@ -112,7 +112,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.BARS_WEB_UI is
     if instr(g_exclude_funcs_mask, p_func_url) = 0 then
 
       insert into ui_func_stats_buff(id, stat_date, staff_id, func_url, user_data)
-        values (s_uifuncstats.nextval, sysdate, user_id, p_func_url, p_user_data );
+        values (s_uifuncstats.nextval, sysdate, nvl(user_id,1), p_func_url, p_user_data );
 
     end if;
 
