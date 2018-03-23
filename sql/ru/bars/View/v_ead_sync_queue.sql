@@ -33,7 +33,7 @@ PROMPT *** Create  view V_EAD_SYNC_QUEUE ***
                  when type_id in ('DOC') then (select to_char(rnk) from ead_docs where ID = obj_id)
                  when type_id in ('ACC') then 
                         case when substr(obj_id, 0, instr(obj_id,';')-1) in ('DPT','ACC') 
-                        then (select to_char(rnk) from accounts where acc = substr(obj_id, instr(obj_id,';')+1, length(obj_id)))
+                        then (select to_char(rnk) from accounts where acc = REGEXP_SUBSTR(substr(obj_id, instr(obj_id,';')+1, length(obj_id)), '[^;]+'))
                         end
             end as rnk,
        sq.status_id,
