@@ -1,8 +1,4 @@
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_stop.sql =========*** Run *** ===
- PROMPT =====================================================================================
- 
-CREATE OR REPLACE FUNCTION F_STOP (KOD_     INT,
+CREATE OR REPLACE FUNCTION BARS.F_STOP (KOD_     INT,
                                         KV_      INT,
                                         NLS_     VARCHAR2,
                                         S_       NUMERIC,
@@ -3140,6 +3136,8 @@ BEGIN
       l_kv := kv_;
 
       -- 1.вычисл€ем возможный срок пополени€, если без срока = выходим
+     
+            begin
   select dd.deposit_id, dd.acc, v.term_add, dd.dat_begin, dd.limit, v.comproc
       into l_deposit, l_acc, l_term_add, l_dat_begin, l_limit, l_comproc
       from dpt_deposit dd, accounts a, dpt_vidd v
@@ -3147,7 +3145,9 @@ BEGIN
        and a.nls = NLS_
        and a.kv = l_kv
        and dd.vidd = v.vidd;
-
+exception when no_data_found then 
+return 0;
+end ;
       l_term_add1 := to_number(floor(l_term_add));
 
       bars_audit.trace('1478 ' || l_deposit || ' ' || l_term_add1 || ' ' ||
@@ -3257,9 +3257,9 @@ BEGIN
       where dw.dpt_id = l_deposit
         and dw.tag = 'NCASH'
         and dw.value = 1;
-        
+
       bars_audit.trace('1478 безнал: ' || l_is_bnal);
-        
+
       if (l_count_mm = 0) and (l_is_bnal > 0) then -- первый мес€ц и безнал
 
         if l_sum > l_limit * 2 then
@@ -3269,9 +3269,9 @@ BEGIN
                to_char(l_dat_po);
           raise err;
         else
-          null;  
+          null;
         end if;
-        
+
       elsif l_sum > l_limit then
         bars_audit.trace('1478 ' || 'ѕеревищено сумму л≥м≥ту!');
         erm := '******ѕеревищено сумму л≥м≥ту ' || to_char(l_limit) ||
@@ -3281,7 +3281,7 @@ BEGIN
       else
         null;
       end if;
-      
+
     end; -- end of 1478
 
   end if;
@@ -3302,17 +3302,3 @@ EXCEPTION
          TRUE);
 END f_STOP;
 /
- show err;
- 
-PROMPT *** Create  grants  F_STOP ***
-grant EXECUTE                                                                on F_STOP          to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on F_STOP          to OPERKKK;
-grant EXECUTE                                                                on F_STOP          to PYOD001;
-grant EXECUTE                                                                on F_STOP          to WR_ALL_RIGHTS;
-grant EXECUTE                                                                on F_STOP          to WR_DOC_INPUT;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/function/f_stop.sql =========*** End *** ===
- PROMPT ===================================================================================== 
