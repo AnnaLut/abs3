@@ -20,14 +20,14 @@ using System.IO;
 using System.Xml;
 
 namespace Bars.WebServices.CBD
-{ 
+{
     [WebService(Namespace = "http://ws.unity-bars.com.ua/")]
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
     public class CBDDataExchangeService : BarsWebService
     {
         # region Конструкторы
         public CBDDataExchangeService()
-        { 
+        {
         }
         # endregion
 
@@ -38,7 +38,7 @@ namespace Bars.WebServices.CBD
         # region Веб-методы
         [WebMethod(EnableSession = true)]
         [SoapHeader("WsHeaderValue", Direction = SoapHeaderDirection.InOut)]
-         public ResultResponse ReciveData(string p_mfo, int p_id, DateTime p_date, string p_clob)
+        public ResultResponse ReciveData(string p_mfo, int p_id, string p_date, string p_clob)
         {
             var result = new ResultResponse { status = -999, message = "", StackTrace = "" };
 
@@ -61,7 +61,7 @@ namespace Bars.WebServices.CBD
 
                         cmd.Parameters.Add("p_mfo", OracleDbType.Varchar2, p_mfo, ParameterDirection.Input);
                         cmd.Parameters.Add("p_id", OracleDbType.Int64, p_id, ParameterDirection.Input);
-                        cmd.Parameters.Add("p_date", OracleDbType.Date, p_date, ParameterDirection.Input);
+                        cmd.Parameters.Add("p_date", OracleDbType.Varchar2, p_date, ParameterDirection.Input);
                         cmd.Parameters.Add("p_clob", OracleDbType.Clob, p_clob, ParameterDirection.Input);
                         cmd.Parameters.Add("p_state", OracleDbType.Decimal, result.status, ParameterDirection.Output);
                         cmd.Parameters.Add("p_message", OracleDbType.Varchar2, 4000, result.message, ParameterDirection.Output);
@@ -76,7 +76,7 @@ namespace Bars.WebServices.CBD
             {
                 result.message += e.Message;
                 result.StackTrace += e.StackTrace;
-            }           
+            }
             return result;
         }
 
@@ -88,8 +88,8 @@ namespace Bars.WebServices.CBD
 
             try
             {
-                RuClientService clientService = new RuClientService(p_url);
-                result = clientService.ResponseData(Convert.ToDateTime(p_date), p_mfo, UserName, Password);
+                RuDataExchangeService clientService = new RuDataExchangeService() { Url = p_url };
+                result = clientService.ResponseData(p_date, p_mfo, UserName, Password);
             }
             catch (System.Exception ex)
             {
@@ -132,25 +132,27 @@ namespace Bars.WebServices.RU
                 {
                     bodyStream.BaseStream.Seek(0, SeekOrigin.Begin);
                     bodyText = bodyStream.ReadToEnd();
-                }              
+                }
 
                 XmlDocument xmlDoc = new XmlDocument();
                 xmlDoc.LoadXml(bodyText);
 
                 int id = Convert.ToInt32(xmlDoc.GetElementsByTagName("p_id")[0].InnerText);
                 string mfo = xmlDoc.GetElementsByTagName("p_mfo")[0].InnerText;
-                DateTime date = Convert.ToDateTime(xmlDoc.GetElementsByTagName("p_date")[0].InnerText);
+                //DateTime date = Convert.ToDateTime(xmlDoc.GetElementsByTagName("p_date")[0].InnerText);
+                string date = xmlDoc.GetElementsByTagName("p_date")[0].InnerText;
                 string clob = xmlDoc.GetElementsByTagName("buffer")[0].InnerText;
                 string url = xmlDoc.GetElementsByTagName("p_url")[0].InnerText;
 
-                CBDClientService clientCBDService = new CBDClientService(url);
+                CBDDataExchangeService clientCBDService = new CBDDataExchangeService() { Url = url };
+                // uncomment after changes
                 result = clientCBDService.ReciveData(mfo, id, date, clob);
             }
             catch (System.Exception ex)
             {
                 result.message += ex.Message;
                 result.StackTrace += ex.StackTrace;
-            }           
+            }
             return result;
         }
 
@@ -160,7 +162,7 @@ namespace Bars.WebServices.RU
         /// </summary>
         [WebMethod(EnableSession = true)]
         [SoapHeader("WsHeaderValue", Direction = SoapHeaderDirection.InOut)]
-        public ResultResponseFromRu ResponseData(DateTime p_date, string p_mfo, string user, string pass)
+        public ResultResponseFromRu ResponseData(string p_date, string p_mfo, string user, string pass)
         {
             var result = new ResultResponseFromRu { id = -999, clob = "", message = "" };
 
@@ -180,7 +182,7 @@ namespace Bars.WebServices.RU
                         cmd.CommandType = CommandType.StoredProcedure;
                         cmd.CommandText = "bars.pkg_sw_compare.response_data";
 
-                        cmd.Parameters.Add("p_date", OracleDbType.Date, p_date, ParameterDirection.Input);
+                        cmd.Parameters.Add("p_date", OracleDbType.Varchar2, p_date, ParameterDirection.Input);
                         cmd.Parameters.Add("p_mfo", OracleDbType.Varchar2, p_mfo, ParameterDirection.Input);
                         cmd.Parameters.Add("p_id", OracleDbType.Decimal, result.id, ParameterDirection.Output);
                         cmd.Parameters.Add("p_clob", OracleDbType.Clob, result.clob, ParameterDirection.Output);

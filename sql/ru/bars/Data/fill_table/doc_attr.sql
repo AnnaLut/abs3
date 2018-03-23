@@ -74,11 +74,11 @@ begin
   Insert
     into DOC_ATTR ( ID, NAME, SSQL )
   Values ( 'RSRV_ACC_VID_NM', 'Вид зарезервованого рахунку'
-         , 'select Substr(v.NAME,1,16) into :sValue from VIDS v where v.VID=3' );
+         , 'select Substr(v.NAME,1,16) into :sValue from ACCOUNTS_RSRV a, VIDS v where a.VID = v.VID and a.RSRV_ID=:ND' );
 exception
   when DUP_VAL_ON_INDEX then
     update DOC_ATTR
-       set SSQL = 'select Substr(v.NAME,1,16) into :sValue from VIDS v where v.VID=3'
+       set SSQL = 'select Substr(v.NAME,1,16) into :sValue from ACCOUNTS_RSRV a, VIDS v where a.VID = v.VID and a.RSRV_ID=:ND'
          , NAME = 'Вид зарезервованого рахунку'
      where ID   = 'RSRV_ACC_VID_NM';
 end;

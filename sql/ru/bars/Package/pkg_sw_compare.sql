@@ -22,13 +22,13 @@ CREATE OR REPLACE PACKAGE PKG_SW_COMPARE IS
                         p_message     out varchar2);
 
   --получение файлов в ЦБД (эта процедура вызывается веб сервисом на уровне ЦБД)
-  procedure recive_data (p_mfo in varchar, p_id in number, p_date in date, p_clob in clob, p_state out number, p_message  out varchar2);
+  procedure recive_data (p_mfo in varchar, p_id in number, p_date in varchar2, p_clob in clob, p_state out number, p_message  out varchar2);
 
   --точечный запрос данных из ЦБД на РУ
-  procedure request_data (p_date in date, p_mfo in varchar2, p_message out varchar2);
+  procedure request_data (p_date in varchar2, p_mfo in varchar2, p_message out varchar2);
 
  --ответ на запрос файлов из ЦБД
-  procedure response_data (p_date in date, p_mfo in varchar2, p_id out number, p_clob out clob, p_message out varchar2) ;
+  procedure response_data (p_date in varchar2, p_mfo in varchar2, p_id out number, p_clob out clob, p_message out varchar2) ;
 
     --ЦБД импортит файлы со сторонних систем
   procedure import_sw_data (p_date in date,p_kod_nbu VARCHAR2, p_type in number, p_message out varchar2);
@@ -513,7 +513,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
 
     bars.wsm_mgr.add_parameter(p_name  => 'p_id',p_value => to_char(p_id));
     bars.wsm_mgr.add_parameter(p_name  => 'p_mfo',p_value => to_char(sys_context('bars_gl', 'mfo')));
-    bars.wsm_mgr.add_parameter(p_name  => 'p_date',p_value => to_char(p_date));
+    bars.wsm_mgr.add_parameter(p_name  => 'p_date',p_value => to_char(p_date,'dd.mm.yyyy'));
     bars.wsm_mgr.add_parameter(p_name  => 'p_url',p_value => l_sw_branch_ws_parameters_row2.url|| g_service_name_cbd);
   end;
 
@@ -532,8 +532,8 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
 
 --------------------------------------------------------------------------------
     $if $$debug_flag $then
-    l_SW_branch_ws_parameters_row2.url :='http://10.10.10.101:10102/barsroot/webservices/';  --jeka тестовая строка
-    l_SW_branch_ws_parameters_row.url:='http://10.10.10.101:10102/barsroot/webservices/';  --OBMMFO6   --jeka тестовая строка
+    l_SW_branch_ws_parameters_row2.url :='http://10.10.10.44:19485/barsroot/webservices/';  --jeka тестовая строка
+    l_SW_branch_ws_parameters_row.url:='http://10.10.10.44:19483/barsroot/webservices/';  --OBMMFO6   --jeka тестовая строка
     $end
     --l_SW_branch_ws_parameters_row.url:='http://10.10.10.101:10080/barsroot/webservices/';   --TSTSUM   --jeka тестовая строка
 ---------------------------------------------------------------------------------------
@@ -552,7 +552,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
     bars.wsm_mgr.add_parameter(p_name => 'UserName', p_value => l_SW_branch_ws_parameters_row.login);
     bars.wsm_mgr.add_parameter(p_name => 'Password', p_value => l_SW_branch_ws_parameters_row.password);
     bars.wsm_mgr.add_parameter(p_name  => 'p_mfo',p_value => p_mfo);
-    bars.wsm_mgr.add_parameter(p_name  => 'p_date',p_value => to_char(p_date));
+    bars.wsm_mgr.add_parameter(p_name  => 'p_date',p_value => to_char(p_date,'dd.mm.yyyy'));
     bars.wsm_mgr.add_parameter(p_name  => 'p_url',p_value => l_SW_branch_ws_parameters_row.url|| g_service_name_ru);
   end;
 
@@ -890,18 +890,20 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
 
 
   --ЦБД получает файлы (эта процедура вызывается веб сервисом на уровне ЦБД)
-  procedure recive_data (p_mfo in varchar, p_id in number, p_date in date, p_clob in clob, p_state out number, p_message  out varchar2) is
+  procedure recive_data (p_mfo in varchar, p_id in number, p_date in varchar2, p_clob in clob, p_state out number, p_message  out varchar2) is
     title        varchar2(100) := 'pkg_SW_COMPARE.recive_data. ';
     l_err        number(10);
     l_message    VARCHAR2(4000);
     l_CF         SW_CA_FILES%ROWTYPE;
     l_com_id     SW_COMPARE.ID%TYPE;
     n_ex         number(1):=1;
+    l_date       date;
   begin
     bars_audit.info(title || 'Start. ');
+    l_date:=to_date(p_date,'dd.mm.yyyy');
     begin
       begin  --ищем на наличие уже принятых файлов
-       select CF.* into l_CF from SW_CA_FILES CF where CF.KF = p_mfo and CF.DDATE = p_date;
+       select CF.* into l_CF from SW_CA_FILES CF where CF.KF = p_mfo and CF.DDATE = l_date;
       exception when no_data_found then n_ex:=0;
                 when others then p_message:= title || ': ' || dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace();
                                   n_ex:=2;
@@ -940,7 +942,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
           insert into SW_CA_FILES
             (id,kf, file_data , state,message ,sign, ddate , sdate )
           values
-            (p_id,p_mfo,p_clob, 1, null,null, p_date, sysdate);
+            (p_id,p_mfo,p_clob, 1, null,null, l_date, sysdate);
           p_state :=1; --успешно прошел только импорт
         exception
               when others then
@@ -973,7 +975,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
   end;
 
   --точечный запрос данных из ЦБД на РУ
-  procedure request_data (p_date in date, p_mfo in varchar2, p_message out varchar2) is
+  procedure request_data (p_date in varchar2, p_mfo in varchar2, p_message out varchar2) is
     l_id            SW_RU_FILES.ID%type;
     title           varchar2(100) := 'pkg_SW_COMPARE.request_data. ';
     l_response      bars.wsm_mgr.t_response;
@@ -992,9 +994,11 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
     l_xml           xmltype;
     l_message       sw_ru_files.message%type;
     l_xdoc          xmltype;
+    l_date          date;
   begin
+      l_date:=to_date(p_date,'dd.mm.yyyy');
       begin  --ищем на наличие уже принятых файлов
-       select CF.* into l_CF from SW_CA_FILES CF where CF.KF = p_mfo and CF.DDATE = p_date;
+       select CF.* into l_CF from SW_CA_FILES CF where CF.KF = p_mfo and CF.DDATE = l_date;
       exception when no_data_found then n_ex:=0;
       end;
 
@@ -1027,7 +1031,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
 
       begin
     --вызываем вебсервис
-       prepare_transport_request_cbd(p_date,p_mfo);
+       prepare_transport_request_cbd(l_date,p_mfo);
        bars.wsm_mgr.execute_soap(l_response);
 
        --считываем  ответ
@@ -1042,7 +1046,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
           insert into SW_CA_FILES
             (id,kf, file_data , state,message ,sign, ddate , sdate )
           values
-            (l_id,p_mfo,l_file_data, 1, l_message,null, p_date, sysdate);
+            (l_id,p_mfo,l_file_data, 1, l_message,null, l_date, sysdate);
             --парсим XML
            p_xml_parse(l_id, p_mfo, l_err, l_message);
 /*           if l_err> 0 then raise_application_error(-20001,'Помилка при обробці даних!');
@@ -1067,7 +1071,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
 
 
  --ответ на запрос файлов из ЦБД
-  procedure response_data (p_date in date, p_mfo in varchar2, p_id out number, p_clob out clob, p_message out varchar2) is
+  procedure response_data (p_date in varchar2, p_mfo in varchar2, p_id out number, p_clob out clob, p_message out varchar2) is
     l_id         SW_RU_FILES.ID%type;
     title        varchar2(100) := 'pkg_SW_COMPARE.response_data. ';
     l_clob       clob;
@@ -1076,12 +1080,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
     l_state      number;
     l_state_b      number;
     l_response   bars.wsm_mgr.t_response;
+    l_date       date;
   begin
       bc.go(p_mfo);
       bars_audit.info(title || 'Start. ');
+      l_date:=to_date(p_date,'dd.mm.yyyy');
      begin
       begin
-      select s.id, s.file_data, s.state into l_id,l_clob_arh_b, l_state_b from SW_RU_FILES s where s.ddate  = p_date;
+      select s.id, s.file_data, s.state into l_id,l_clob_arh_b, l_state_b from SW_RU_FILES s where s.ddate  = l_date;
        if l_id is not null then
              insert into SW_RU_FILES_HIST (STATE,
                                            MESSAGE,
@@ -1101,8 +1107,8 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
                                           file_data,
                                           sdate,
                                           sysdate
-                                    from SW_RU_FILES where ddate  = p_date;
-              delete from SW_RU_FILES where ddate  = p_date;
+                                    from SW_RU_FILES where ddate  = l_date;
+              delete from SW_RU_FILES where ddate  = l_date;
 
       l_state_b:=-1;
       end if;
@@ -1112,10 +1118,10 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
       bars_audit.info(title || 'Start. ');
       begin
        ---подготовка данных
-       data_prepare (p_date, l_clob);
+       data_prepare (l_date, l_clob);
 
        --конвертируем клоб в блоб, пакуем, опять в клоб и пишем в талицу фалов РУ
-       write_files (null,l_clob,null,p_date,l_clob_arh,l_state, l_id);
+       write_files (null,l_clob,null,l_date,l_clob_arh,l_state, l_id);
 
        --обновляем статус на успешный
        update SW_RU_FILES s set s.state = 5 where s.id =  l_id;
@@ -1159,7 +1165,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
     end;
   begin
       begin
-          select substr(val, 1, instr(val, '/', 1, 4)-1) || '/webservices/QuickMoneyService.asmx' into l_url from params where par = 'REPORT_SERVER_URL';
+          select substr(val, 1, instr(val, '/', 1, 4)-1) || '/webservices/QuickMoneyService.asmx' into l_url from web_barsconfig  where key = 'EWA.URL_SEND_REF_STATUS';
       exception when no_data_found then
           raise_application_error(-20000, 'Параметр REPORT_SERVER_URL не задано');
       end;
@@ -1226,7 +1232,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
     end;
   begin
       begin
-          select substr(val, 1, instr(val, '/', 1, 4)-1) || '/webservices/SingleWindowService.asmx' into l_url from params where par = 'REPORT_SERVER_URL';
+          select substr(val, 1, instr(val, '/', 1, 4)-1) || '/webservices/SingleWindowService.asmx' into l_url from web_barsconfig where key = 'EWA.URL_SEND_REF_STATUS';
       exception when no_data_found then
           raise_application_error(-20000, 'Параметр REPORT_SERVER_URL не задано');
       end;
@@ -1611,7 +1617,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
     if cur.nls is null then
       l_cause:=l_cause+8; -- відсутній рахунок ТВБВ (некорректний)
     end if;
-     if cur.sk <> nvl(cur.totalcomission,0)-nvl(cur.bankcomission,0) then
+     if cur.sk <> nvl(cur.totalcomission,0)-nvl(cur.bankcomission,0) and cur.tt = 'CN1'  then
       l_cause:=l_cause+16; -- некорректна комісія ЄВ-АБС
     end if;
 
