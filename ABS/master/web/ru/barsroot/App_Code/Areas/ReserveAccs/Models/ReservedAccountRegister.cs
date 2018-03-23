@@ -6,6 +6,7 @@ namespace BarsWeb.Areas.ReserveAccs.Models
     {
         public string Type { get; set; }
         public decimal? Group { get; set; }
+        //хз що за параметр
         public decimal? Pap { get; set; }
         public decimal? Subspecies { get; set; }
         public decimal? Pos { get; set; }
@@ -19,5 +20,7 @@ namespace BarsWeb.Areas.ReserveAccs.Models
         public string Ob22 { get; set; }
         public decimal? Tarriff { get; set; }
         public string ND { get; set; }
-    }
+		public int DdVid { get; set; }
+		public string MainCurr { get; set; }
+	}
 }

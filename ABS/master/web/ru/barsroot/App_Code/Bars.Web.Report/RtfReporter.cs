@@ -15,43 +15,43 @@ namespace Bars.Web.Report
 	/// </summary>
 	public class RtfReporter
 	{
-		private HttpContext _ctx;	        // текущий HTTP контекст
-		string _strBuf = null;
-		private string _strTemplateID;	    // ID шаблона
-		private bool _isTemplateCompressed;	// флаг: true-шаблон сжат, false-оригинал
-		private long _nContractNumber;      // номер договора		        
-        private long _nAdds = 0;            // параметр ADDS для договора		        
+		protected HttpContext _ctx;         // текущий HTTP контекст
+		protected string _strBuf = null;
+		protected string _strTemplateID;	    // ID шаблона
+		protected bool _isTemplateCompressed;	// флаг: true-шаблон сжат, false-оригинал
+		protected long _nContractNumber;      // номер договора		        
+        protected long _nAdds = 0;            // параметр ADDS для договора		        
         /// <summary>
         /// Імена одержаних файлів
         /// Якщо імя порожне - файла немає.
         /// </summary>
-        private string _strReportFile;	    // имя файла готового отчета
-        private string _strHeaderFile;      // імя файлу верхнього колонтитула
-        private string _strFooterFile;      // імя файлу нижнього колонтитула
-        private string _strHeaderExFile;    // імя файлу верхнього розширеного колонтитула
+        protected string _strReportFile;	    // имя файла готового отчета
+        protected string _strHeaderFile;      // імя файлу верхнього колонтитула
+        protected string _strFooterFile;      // імя файлу нижнього колонтитула
+        protected string _strHeaderExFile;    // імя файлу верхнього розширеного колонтитула
 
-		private string _strDataFile;        // имя файла данных
-		private string _strTempFile;        // имя временного файла
-		private string _strCompressedFile;  // имя сжатого файла
+		protected string _strDataFile;        // имя файла данных
+		protected string _strTempFile;        // имя временного файла
+		protected string _strCompressedFile;  // имя сжатого файла
 
-		private string _strTempDir;	        // временная директория
-		private string _strTemplateFile;    // имя файла шаблона
-		private string _strParamListFile;   // имя файла списка параметров
+		protected string _strTempDir;	        // временная директория
+		protected string _strTemplateFile;    // имя файла шаблона
+		protected string _strParamListFile;   // имя файла списка параметров
 
-		private string _strRoleList;	    // список ролей через запятую
+		protected string _strRoleList;      // список ролей через запятую
 
-		OracleConnection _con;
-		OracleCommand _cmd;
-		OracleDataReader _reader;
+		protected OracleConnection _con;
+		protected OracleCommand _cmd;
+		protected OracleDataReader _reader;
 
-		long _nEvent = -1;	                //	Код события для трасировки сессии Oracle
-		long _nLevel = -1;	                //  Уровень детализации события трасировки сессии Oracle
+		protected long _nEvent = -1;                    //	Код события для трасировки сессии Oracle
+		protected long _nLevel = -1;	                //  Уровень детализации события трасировки сессии Oracle
 
         /// <summary>
         /// Конструктор без параметрів
         /// !!! Не використовується !!!
         /// </summary>
-		private RtfReporter(){}
+		protected RtfReporter(){}
         /// <summary>
         /// Конструктор
         /// </summary>
@@ -426,7 +426,7 @@ namespace Bars.Web.Report
 		/// Дампим байтовый буфер на диск
 		/// По ходу распаковуем, если надо
 		/// </summary>
-		private void Dump2Disk()
+		protected void Dump2Disk()
 		{
 			if(_isTemplateCompressed)
 			{	// сначала распакуем
@@ -448,7 +448,7 @@ namespace Bars.Web.Report
 		/// <summary>
 		/// Подготавливаем файл данных
 		/// </summary>
-		private void MakeDataFile()
+		protected void MakeDataFile()
 		{
 			Encoding enc = Encoding.GetEncoding(1251);
 
@@ -535,7 +535,7 @@ namespace Bars.Web.Report
 		/// Преобразование Hex --> Bin
 		/// </summary>
 		/// <param name="strFileName">имя преобразуемого файла</param>
-		private void ToBin(string strFileName)
+		protected void ToBin(string strFileName)
 		{
 			Process proc = Process.Start("ToBin.exe", strFileName);
 			bool flagTerm = proc.WaitForExit(15000);
@@ -550,7 +550,7 @@ namespace Bars.Web.Report
 		/// Распаковка ZIP-архива
 		/// </summary>
 		/// <param name="strArchive">имя исходного архива</param>
-		private void Unpack(string strArchive)
+		protected void Unpack(string strArchive)
 		{
 			string args = "-extract -over=all -path=specify -nofix -silent -NoZipExtension "
 				+ strArchive + " " + _strTempDir;
@@ -576,7 +576,7 @@ namespace Bars.Web.Report
 			}
 		}
 
-		private void MakeReport(string strReportFile)
+		protected void MakeReport(string strReportFile)
 		{
 			string strParams = "/generate " + _strTemplateFile +
 				" " + _strDataFile + " " + strReportFile;

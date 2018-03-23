@@ -20,6 +20,8 @@ var flagEnhCheck = false;
 var flagCheckSpecParams = false;
 var localSP = new Array();
 var spRequiredParams = new Array();
+var nmk = null;
+var specParamList = null;
 //Default.aspx
 function InitDefault() {
     var access = 0;
@@ -31,14 +33,29 @@ function InitDefault() {
     acc = getParamFromUrl("acc", location.href);
     if (accessmode == 1) access = 1;
     if (access == 0) {
-        document.getElementById("btSave").disabled = true;
-        document.getElementById("btClose").disabled = true;
-        document.getElementById("cbOnAllValuts").disabled = true;
-        document.getElementById("btSave").style.filter = 'progid:DXImageTransform.Microsoft.Alpha( style=0,opacity=25)progid:DXImageTransform.Microsoft.BasicImage(grayScale=1)';
-        document.getElementById("btClose").style.filter = 'progid:DXImageTransform.Microsoft.Alpha( style=0,opacity=25)progid:DXImageTransform.Microsoft.BasicImage(grayScale=1)';
-    }
-    else
-        document.getElementById("cbOnAllValuts").disabled = false;
+     document.getElementById("btSave").disabled = true;
+		$.ajax({
+			type: "GET",
+			url: bars.config.urlContent("/api/custacc/start/"),
+			success: function (result) {
+				if (result > 0) {
+					document.getElementById("btSave").disabled = true;
+					document.getElementById("cbOnAllValuts").disabled = true;
+					document.getElementById("btSave").style.filter = 'progid:DXImageTransform.Microsoft.Alpha( style=0,opacity=25)progid:DXImageTransform.Microsoft.BasicImage(grayScale=1)';
+				}
+				else {
+					document.getElementById("cbOnAllValuts").disabled = false;
+					document.getElementById("btSave").disabled = false;
+				}
+			}
+		});
+		document.getElementById("btClose").disabled = true;
+		document.getElementById("cbOnAllValuts").disabled = true;
+		//document.getElementById("btSave").style.filter = 'progid:DXImageTransform.Microsoft.Alpha( style=0,opacity=25)progid:DXImageTransform.Microsoft.BasicImage(grayScale=1)';
+		document.getElementById("btClose").style.filter = 'progid:DXImageTransform.Microsoft.Alpha( style=0,opacity=25)progid:DXImageTransform.Microsoft.BasicImage(grayScale=1)';
+	}
+	else
+		document.getElementById("cbOnAllValuts").disabled = false;
     //Загрузка картинок
     if (document.getElementById("btSave").src == "") {
         //document.getElementById("btSave").src = image1.src;
@@ -86,6 +103,7 @@ function onPopulate(result) {
 
     if ("" != result.value[59].text) new_rights = true;
     lbNmk.innerText = LocalizedString('Message2') + result.value[56].text;
+	nmk = result.value[56].text.substr(0, result.value[56].text.indexOf("("));
     //Счет закрыт
     if ("" != result.value[10].text) accessmode = 0;
 
@@ -366,6 +384,42 @@ function GetErrAccount() {
     }
     return err;
 }
+
+
+function GetPublicFlag(nmk) {
+    $.ajax({
+        type: "POST",
+        url: bars.config.urlContent("/clientregister/defaultWebService.asmx/GetPublicFlag"),
+        data: { nmk: nmk },
+        async: false,
+        success: function (result) {
+            if (result && result.text && result.text != '') {
+                alert(result.text);
+            }
+        }
+    })
+}
+
+// служебные функция JavaScript
+var ServiceUrl = '/barsroot/clientregister/defaultWebService.asmx';
+function ExecSync(method, args) {
+    var executor = new Sys.Net.XMLHttpSyncExecutor();
+    var request = new Sys.Net.WebRequest();
+
+    request.set_url(ServiceUrl + '/' + method);
+    request.set_httpVerb('POST');
+    request.get_headers()['Content-Type'] = 'application/json; charset=utf-8';
+    request.set_executor(executor);
+    request.set_body(JSON.stringify(args, function (key, value) { return value === "" ? "" : value; }));
+    request.invoke();
+
+    if (executor.get_responseAvailable()) {
+        return (executor.get_object());
+    }
+
+    return (false);
+}
+
 //Сохранение счета
 function SaveAccount() {
     var err = GetErrAccount();
@@ -382,68 +436,27 @@ function SaveAccount() {
     }
 
     var message;
-
     var page_g = document.frames("Tab0").document.all;
+
+	var isRozpodilAcct = function () {
+		return (page_g.tbNbs.value == 2603 && page_g.tb_Lcv.value !== "UAH")
+	}
 
     $.ajax({
         type: "GET",
         url: bars.config.urlContent("/api/custacc/start/"),
         data: { acc: 0, nbs: page_g.tbNbs.value },
-        success: function (result) {
-            //debugger;
+		success: function (result) {
             if (result.rez === 1) {
-                // start
-                if (acc == 0 || OnAllValuts) {
-                    message = LocalizedString('Message17');
-                    if (OnAllValuts == false) {
-                        if (document.frames("Tab0").document.all.tbNbs.value == "") message += LocalizedString('Message18');
-                        message += LocalizedString('Message19') + document.frames("Tab0").document.all.tbNls.value + LocalizedString('Message20') + document.frames("Tab0").document.all.tb_Lcv.value + " ?";
-                    }
-                    else {
-                        if (document.frames("Tab0").document.all.tbNbs.value == "") message += LocalizedString('Message21');
-                        message += LocalizedString('Message22') + document.frames("Tab0").document.all.tbNls.value + LocalizedString('Message23');
-                    }
-                }
-                else message = LocalizedString('Message24') + document.frames("Tab0").document.all.tbNls.value + " (" + document.frames("Tab0").document.all.tb_Lcv.value + ") ?";
-                if (Dialog(message, 0) == 1) {
-                    var valuts = null;
-                    var gen = null;
-                    var sp = null;
-                    var per = null;
-                    var pertbl = null;
-                    var rates = null;
-                    var sob = null;
-                    if (edit_data.value.general.edit == true) gen = ForUpdateAccount();
-                    if (edit_data.value.sp.edit == true || acc == 0) {
-                        sp = makeArray(edit_data.value.sp.data);
-                        sp[sp.length] = document.frames("Tab3").document.all.cbSPOpt.checked;
-                        sp[sp.length] = acc_obj.value[2].text;
-                    }
-                    if (edit_data.value.percent.edit == true) per = ForUpdatePercent();
-                    if (edit_data.value.percent.edittbl == true) {
-                        pertbl = makeArray(edit_data.value.percent.tbl);
-                        if (pertbl.length == 0) pertbl = null;
-                    }
-                    if (edit_data.value.rates.edit == true) rates = makeArray(edit_data.value.rates.tbl);
-                    if (edit_data.value.sob.edit == true) {
-                        sob = makeArray(edit_data.value.sob.tbl);
-                        if (sob.length == 0) sob = null;
-                        else sob[sob.length] = new Array(acc_obj.value[54].text);
-                    }
-                    if (OnAllValuts) {
-                        valuts = codValutes;
-                        gen = ForUpdateAccount();
-                    }
-                    // снимаем блокировку для 2900 (НАДРА) при открытии
-                    if (flagEnhCheck && acc == 0 && gen[10] == '2900')
-                        gen[16] = 0;
-                    //
-                    save_try = true;
-                    webService.Acc.callService(onSaving, "Save", acc, valuts, gen, sp, per, pertbl, rates, sob);
-
-                }
-
-                // end
+				if (isRozpodilAcct()) {
+					bars.ui.approve({
+						text: "Увага! Ви відкриваєте розподільчий рахунок 2603*. Продовжити?",
+						func: SaveAcctProcess,
+						nfunc: function () { return; }
+					});
+				} else {
+					SaveAcctProcess();
+				}
             } else if (result.rez === 2) {
                 //debugger;
                 bars.ui.confirm({ text: "Зарезевувати рахунок?" }, function () {
@@ -455,7 +468,72 @@ function SaveAccount() {
         }
     });
 }
-
+function SaveAcctProcess() {
+	if (acc == 0 || OnAllValuts) {
+		message = LocalizedString('Message17');
+		if (OnAllValuts == false) {
+			if (document.frames("Tab0").document.all.tbNbs.value == "")
+				message += LocalizedString('Message18');
+			message += LocalizedString('Message19') +
+				document.frames("Tab0").document.all.tbNls.value +
+				LocalizedString('Message20') +
+				document.frames("Tab0").document.all.tb_Lcv.value + " ?";
+		}
+		else {
+			if (document.frames("Tab0").document.all.tbNbs.value == "")
+				message += LocalizedString('Message21');
+			message += LocalizedString('Message22') +
+				document.frames("Tab0").document.all.tbNls.value +
+				LocalizedString('Message23');
+		}
+	}
+	else message = LocalizedString('Message24') + document.frames("Tab0").document.all.tbNls.value + " (" + document.frames("Tab0").document.all.tb_Lcv.value + ") ?";
+	if (Dialog(message, 0) == 1) {
+		var valuts = null;
+		var gen = null;
+		var sp = null;
+		var per = null;
+		var pertbl = null;
+		var rates = null;
+		var sob = null;
+		if (edit_data.value.general.edit == true) gen = ForUpdateAccount();
+		if (edit_data.value.sp.edit == true || acc == 0) {
+			sp = makeArray(edit_data.value.sp.data);
+			sp[sp.length] = document.frames("Tab3").document.all.cbSPOpt.checked;
+			sp[sp.length] = acc_obj.value[2].text;
+		}
+		if (edit_data.value.percent.edit == true) per = ForUpdatePercent();
+		if (edit_data.value.percent.edittbl == true) {
+			pertbl = makeArray(edit_data.value.percent.tbl);
+			if (pertbl.length == 0) pertbl = null;
+		}
+		if (edit_data.value.rates.edit == true) rates = makeArray(edit_data.value.rates.tbl);
+		if (edit_data.value.sob.edit == true) {
+			sob = makeArray(edit_data.value.sob.tbl);
+			if (sob.length == 0) sob = null;
+			else sob[sob.length] = new Array(acc_obj.value[54].text);
+		}
+		if (OnAllValuts) {
+			valuts = codValutes;
+			gen = ForUpdateAccount();
+		}
+		// снимаем блокировку для 2900 (НАДРА) при открытии
+		if (flagEnhCheck && acc == 0 && gen[10] == '2900')
+			gen[16] = 0;
+		//
+		save_try = true;
+		webService.Acc.callService(onSaving, "Save", acc, valuts, gen, sp, per, pertbl, rates, sob);
+	}
+}
+function getSPIDByName(list, search) {
+	for (var i = 0; i < list.length; i++) {
+		if (list[i].NAME == search) {
+			found = list[i].ID;
+			break;
+		}
+	}
+	return found;
+}
 function onSaving(result) {
     alertify.set({
         labels: {
@@ -561,6 +639,24 @@ function onSaving(result) {
 function ReservedAcct() {
     $('body').loader();
     var data = ForUpdateAccount();
+    var main_curr = "";
+
+	if (acc != 0) {
+		array = data[6].split(',');
+		main_curr = array.shift();
+		data[6] = array.join(',')
+	}
+	var ndbo = null;
+	$.ajax({
+		url: "/barsroot/api/reserveaccs/reserveaccsapi/GetNDBO" + "?rnk=" + rnk,
+		method: "GET",
+		dataType: "json",
+		async: false,
+		success:
+		function (data) {
+			ndbo = data;
+		}
+	});
 
     var param = {
         Number: data[5],
@@ -578,10 +674,28 @@ function ReservedAcct() {
         MaxBalance: data[1],
         AlternativeNumber: data[2],
         Branch: data[19],
-        UserId: data[9]
+        UserId: data[9],
+        Ob22: (data[26] == "" || data[26] == null) ? "01" : data[26],
+        Tarriff: data[27],
+        ND: ndbo,
+        R013: data[28],
+        S180: data[30],
+		S240: data[31],
+		ddVid: data[12],
+		mainCurr: main_curr
     }
 
-    $.post('/barsroot/api/acct/ReservedAccounts/', param, function (request) {
+	///IE8 doenst have method indexOf in Array
+	Array.prototype.indexOf || (Array.prototype.indexOf = function (r, t) { var n; if (null == this) throw new TypeError('"this" is null or not defined'); var e = Object(this), i = e.length >>> 0; if (0 === i) return -1; var a = +t || 0; if (Math.abs(a) === 1 / 0 && (a = 0), a >= i) return -1; for (n = Math.max(a >= 0 ? a : i - Math.abs(a), 0); i > n;) { if (n in e && e[n] === r) return n; n++ } return -1 });
+	var nbs_balans_acct = [2512, 2513, 2520, 2523, 2525, 2526, 2530, 2531, 2541, 2542, 2544, 2545, 2546, 2551, 2552, 2553, 2554, 2555, 2556, 2561, 2562, 2565, 2570, 2571, 2572, 2600, 2604, 2620, 2622, 2640, 2641, 2642, 2643, 2644, 2650];
+	if (nbs_balans_acct.indexOf(parseInt(data[10])) > -1 ||
+		(parseInt(data[10]) == 2603 && parseInt(main_curr) == 980)) {
+		param.DebitBlockCode = "0";
+		param.CreditBlockCode = "0";
+		param.Ob22 = "01";
+	}
+
+    $.post('/barsroot/api/reserveaccs/reserveaccsapi/Reserved', param, function (request) {
         $('body').loader('remove');
         barsUiAlert({
             text: 'Рахунок зарезервовано. (acc: ' + request.Id + ')',
@@ -594,6 +708,63 @@ function ReservedAcct() {
         $('body').loader('remove');
         barsUiError(request.responseJSON.ExceptionMessage);
     });
+}
+function SaveAcctProcess() {
+	if (acc == 0 || OnAllValuts) {
+		message = LocalizedString('Message17');
+		if (OnAllValuts == false) {
+			if (document.frames("Tab0").document.all.tbNbs.value == "")
+				message += LocalizedString('Message18');
+			message += LocalizedString('Message19') +
+				document.frames("Tab0").document.all.tbNls.value +
+				LocalizedString('Message20') +
+				document.frames("Tab0").document.all.tb_Lcv.value + " ?";
+		}
+		else {
+			if (document.frames("Tab0").document.all.tbNbs.value == "")
+				message += LocalizedString('Message21');
+			message += LocalizedString('Message22') +
+				document.frames("Tab0").document.all.tbNls.value +
+				LocalizedString('Message23');
+		}
+	}
+	else message = LocalizedString('Message24') + document.frames("Tab0").document.all.tbNls.value + " (" + document.frames("Tab0").document.all.tb_Lcv.value + ") ?";
+	if (Dialog(message, 0) == 1) {
+		var valuts = null;
+		var gen = null;
+		var sp = null;
+		var per = null;
+		var pertbl = null;
+		var rates = null;
+		var sob = null;
+		if (edit_data.value.general.edit == true) gen = ForUpdateAccount();
+		if (edit_data.value.sp.edit == true || acc == 0) {
+			sp = makeArray(edit_data.value.sp.data);
+			sp[sp.length] = document.frames("Tab3").document.all.cbSPOpt.checked;
+			sp[sp.length] = acc_obj.value[2].text;
+		}
+		if (edit_data.value.percent.edit == true) per = ForUpdatePercent();
+		if (edit_data.value.percent.edittbl == true) {
+			pertbl = makeArray(edit_data.value.percent.tbl);
+			if (pertbl.length == 0) pertbl = null;
+		}
+		if (edit_data.value.rates.edit == true) rates = makeArray(edit_data.value.rates.tbl);
+		if (edit_data.value.sob.edit == true) {
+			sob = makeArray(edit_data.value.sob.tbl);
+			if (sob.length == 0) sob = null;
+			else sob[sob.length] = new Array(acc_obj.value[54].text);
+		}
+		if (OnAllValuts) {
+			valuts = codValutes;
+			gen = ForUpdateAccount();
+		}
+		// снимаем блокировку для 2900 (НАДРА) при открытии
+		if (flagEnhCheck && acc == 0 && gen[10] == '2900')
+			gen[16] = 0;
+		//
+		save_try = true;
+		webService.Acc.callService(onSaving, "Save", acc, valuts, gen, sp, per, pertbl, rates, sob);
+	}
 }
 
 function ForUpdateAccount() {
@@ -653,6 +824,7 @@ function ForUpdateAccount() {
     result[26] = data[63].text;
 
     var n_data = document.all.edit_data.value.general.data;
+	var sp_data = document.all.edit_data.value.sp.data;
     for (key in n_data) {
         //for (var key = 0; key <= n_data.length; key++) {
         val = n_data[key];
@@ -685,6 +857,31 @@ function ForUpdateAccount() {
             case "ddOb22": result[26] = val; break;
         }
     }
+	for (kv in codValutes) {
+		result[6] += "," + codValutes[kv];
+	}
+
+	specParamList = null;
+
+	$.ajax({
+		url: "/barsroot/api/reserveaccs/reserveaccsapi/GetSpecParamList",
+		method: "GET",
+		dataType: "json",
+		async: false,
+		success:
+		function (data) {
+			specParamList = data.list;
+		}
+	});
+	for (key in sp_data) {
+		switch (key) {
+			case getSPIDByName(specParamList, "Код ПАКЕТУ тарифiв"): result[27] = sp_data[key]; break;//Код ПАКЕТУ тарифiв
+			case getSPIDByName(specParamList, "Спеціальний параметр R013"): result[28] = sp_data[key]; break;//Спеціальний параметр R013
+			case getSPIDByName(specParamList, "Номер договору (ф.71)"): result[29] = sp_data[key]; break;//Номер договору (ф.71)
+			case getSPIDByName(specParamList, "Код сроку кред/деп рахунків (S180) S180"): result[30] = sp_data[key]; break;//Код сроку кред/деп рахунків (S180) S180
+			case getSPIDByName(specParamList, 'Код сроку "до погашення" (S240) S240'): result[31] = sp_data[key]; break;//Код сроку "до погашення" (S240) S240
+		}
+	}
     return result;
 }
 /* Соответсвие идекиов масива и параметров счета 
