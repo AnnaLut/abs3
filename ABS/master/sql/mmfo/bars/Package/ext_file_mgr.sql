@@ -239,7 +239,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.EXT_FILE_MGR as
 
         bars.wsm_mgr.execute_soap(l_response);
 
-        l_xml := l_response.xdoc.extract('/soap:Envelope/soap:Body/child::node()', 'xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"');
+        --l_xml := l_response.xdoc.extract('/soap:Envelope/soap:Body/child::node()', 'xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"');
+		l_xml := xmltype(l_response.cdoc).extract('/soap:Envelope/soap:Body/child::node()', 'xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"');
+		
 
         l_response_code := l_xml.extract('/GetFileResponse/GetFileResult/ResponseCode/text()').GetStringVal();
 
@@ -364,8 +366,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.EXT_FILE_MGR as
 
         bars.wsm_mgr.execute_soap(l_response);
 
-        l_xml := l_response.xdoc.extract('/soap:Envelope/soap:Body/child::node()', 'xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"');
+        --l_xml := l_response.xdoc.extract('/soap:Envelope/soap:Body/child::node()', 'xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"');
+		l_xml := xmltype(l_response.cdoc).extract('/soap:Envelope/soap:Body/child::node()', 'xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"');
 
+		
         l_response_code := l_xml.extract('/PutFileResponse/PutFileResult/ResponseCode/text()').GetStringVal();
 
         if (upper(l_response_code) = 'SUCCESS') then
@@ -481,8 +485,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.EXT_FILE_MGR as
 
         bars.wsm_mgr.execute_soap(l_response);
 
-        l_xml := l_response.xdoc.extract('/soap:Envelope/soap:Body/child::node()', 'xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"');
-
+        --l_xml := l_response.xdoc.extract('/soap:Envelope/soap:Body/child::node()', 'xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"');
+		l_xml := xmltype(l_response.cdoc).extract('/soap:Envelope/soap:Body/child::node()', 'xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"');
+         
+		
         l_response_code := l_xml.extract('/RemoveFileResponse/RemoveFileResult/ResponseCode/text()').GetStringVal();
 
         if (upper(l_response_code) = 'SUCCESS') then
