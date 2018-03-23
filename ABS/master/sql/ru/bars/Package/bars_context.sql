@@ -283,9 +283,12 @@ as
     --
     procedure home;
 
-end bars_context;
+end BARS_CONTEXT;
 /
-create or replace package body bars_context
+
+show errors;
+
+create or replace package body BARS_CONTEXT
 is
 
 
@@ -293,7 +296,7 @@ is
     -- Константы
     --
     --
-    VERSION_BODY          constant varchar2(64)  := 'version 1.42 09.10.2017';
+    VERSION_BODY          constant varchar2(64)  := 'version 1.43 23.03.2018';
     VERSION_BODY_DEFS     constant varchar2(512) := ''
                           || 'KF            Мультифилиальная схема с полем ''KF'''                   || chr(10)
                           || 'POLICY_GROUP  Использование групп политик'                             || chr(10)
@@ -855,42 +858,19 @@ is
         -- Получаем умолчательное отделение пользователя
         l_branch := sys_context(CONTEXT_CTX, CTXPAR_USERBRANCH);
 
-        -- Викликано з пакета dpt_social - прийом файлів зарахувань
-        -- дозволяємо представлятися відділеннями прописаними в dpt_file_subst
-        if (trim(lower(get_caller_name)) like '%package body bars.dpt_social%') then
-
-            -- якщо відділення є дочірнім - перевіряти не треба
-            if (p_branch not like l_branch || '%') then
-
-                -- Для спрощення пошуку рахунків дозволяємо пакету dpt_social
-                -- представлятися '/321983/'
-                if (p_branch != '/321983/') then
-                    begin
-                        select 1 into l_dummy
-                          from dpt_file_subst
-                         where parent_branch = l_branch
-                           and p_branch like child_branch || '%';
-                    exception
-                        when NO_DATA_FOUND then return;
-                    end;
-                end if;
-            end if;
-        else
-            --
-            -- Если пользователь не имеет права представиться заданым подразделением
-            -- т.е. заданное подразделение не является его дочерним или основным, то
-            -- выбрасываем соотв. сообщение
-            -- проверку осуществляем по доступности бранча из представления V_BR_ACCESS
-            begin
-                select 1 into l_dummy
-                  from v_branch_access
-                 where branch = p_branch;
-            exception
-                when NO_DATA_FOUND then
-                    raise_application_error(-20000, 'Пользователь ' || sys_context(GLOBAL_CTX, CTXPAR_USERNAME) || ' не имеет права представляться подразделением ' || p_branch);
-            end;
-
-        end if;
+        --
+        -- Если пользователь не имеет права представиться заданым подразделением
+        -- т.е. заданное подразделение не является его дочерним или основным, то
+        -- выбрасываем соотв. сообщение
+        -- проверку осуществляем по доступности бранча из представления V_BR_ACCESS
+        begin
+            select 1 into l_dummy
+              from v_branch_access
+             where branch = p_branch;
+        exception
+            when NO_DATA_FOUND then
+                raise_application_error(-20000, 'Пользователь ' || sys_context(GLOBAL_CTX, CTXPAR_USERNAME) || ' не имеет права представляться подразделением ' || p_branch);
+        end;
 
         -- МФО, которое мы должны установить
         l_new_mfo := nvl(extract_mfo(p_branch), ROOT_MFO);
