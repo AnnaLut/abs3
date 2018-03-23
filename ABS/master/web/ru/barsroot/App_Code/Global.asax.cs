@@ -55,7 +55,7 @@ namespace BarsWeb
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
             // Add a reference here to the new MediaTypeFormatter that adds text/plain support
-            //GlobalConfiguration.Configuration.Formatters.Insert(0, new TextMediaTypeFormatter());
+            GlobalConfiguration.Configuration.Formatters.Insert(0, new TextMediaTypeFormatter());
 
         }
         protected void Application_PostAuthorizeRequest()
