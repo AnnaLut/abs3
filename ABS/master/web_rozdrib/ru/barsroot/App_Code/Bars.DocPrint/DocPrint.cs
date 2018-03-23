@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Globalization;
 using System.IO;
 using System.Collections;
 using System.Collections.Specialized;
-using System.Text;
 using System.Data;
 using System.Web;
 using Oracle.DataAccess.Client;
-
 using Bars.Exception;
 using Bars.Oracle;
 using Bars.Classes;
@@ -679,11 +676,13 @@ namespace Bars.DocPrint
             this(Ref, TemplPath, GetRandomFileName(Ref.ToString()), DBLink)
         {
         }
-        public cDocPrint(OracleConnection con, long Ref, string TemplPath, bool printTrnModel)
+
+        public cDocPrint(OracleConnection con, long Ref, string TemplPath, bool printTrnModel, bool useNewConn = true)
         {
             this.InRef = Ref;
             this.printTrnModel = printTrnModel;
-            this.con = ((IOraConnection)AppDomain.CurrentDomain.GetData("OracleConnectClass")).GetUserConnection();
+
+            this.con = useNewConn ? ((IOraConnection)AppDomain.CurrentDomain.GetData("OracleConnectClass")).GetUserConnection() : con;
 
             if (con.State != ConnectionState.Open) con.Open();
             try
@@ -695,13 +694,16 @@ namespace Bars.DocPrint
             }
             finally
             {
-                if (ConnectionState.Open == con.State)
-                    con.Close();
-                con.Dispose();
+                if (useNewConn)
+                {
+                    if (ConnectionState.Open == con.State)
+                        con.Close();
+                    con.Dispose();
 
-                if (ConnectionState.Open == this.con.State)
-                    this.con.Close();
-                this.con.Dispose();
+                    if (ConnectionState.Open == this.con.State)
+                        this.con.Close();
+                    this.con.Dispose();
+                }
             }
         }
 
