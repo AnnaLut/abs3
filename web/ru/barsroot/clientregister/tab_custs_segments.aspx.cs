@@ -69,6 +69,11 @@ public partial class clientregister_tab_custs_segments : System.Web.UI.Page
         CST_DATE_STOP.Text = datarecord.CST_DATE_STOP; //
         CUSTOMER_VIP.Text = datarecord.VIP_CUSTOMER_FLAG; //
     }
-    
-    # endregion
+
+    #endregion
+
+    protected void chkShowAll_CheckedChanged(object sender, EventArgs e)
+    {
+        gv.DataBind();
+    }
 }

@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
 
-/// <summary>
-/// Summary description for ActivationAccounts
-/// </summary>
-public class ActivationAccounts
+
+namespace BarsWeb.Areas.BpkW4.Models
 {
-    public IList<decimal> Data { get; set; }
-    public int Confirm { get; set; }
+	public class ActivationAccounts
+	{
+		public IList<decimal> Data { get; set; }
+		public int Confirm { get; set; }
+	}
 }

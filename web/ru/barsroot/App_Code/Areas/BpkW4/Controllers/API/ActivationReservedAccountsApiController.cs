@@ -1,6 +1,7 @@
 ﻿using AttributeRouting.Web.Http;
 using BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Abstract;
 using BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation;
+using BarsWeb.Areas.BpkW4.Models;
 using BarsWeb.Areas.Kernel.Models;
 using BarsWeb.Core.Models;
 using BarsWeb.Core.Models.Binders.Api;
@@ -25,9 +26,10 @@ namespace BarsWeb.Areas.BpkW4.Controllers.Api
         {
             try
             {
-                decimal?[] arra = Array.ConvertAll(acc.Data.ToArray(), value => new decimal?(value));
-                BarsSql sql = SqlCreatorBPK.Active(arra, acc.Confirm);
-                _repo.ExecuteStoreCommand(sql.SqlText, sql.SqlParams);
+                //decimal?[] arra = Array.ConvertAll(acc.Data.ToArray(), value => new decimal?(value));
+                //BarsSql sql = SqlCreatorBPK.Active(arra, acc.Confirm);
+                //_repo.ExecuteStoreCommand(sql.SqlText, sql.SqlParams);
+				_repo.Activate(acc.Data, acc.Confirm);
                 return Request.CreateResponse(HttpStatusCode.OK, new { });
             }
             catch (Exception ex)
@@ -39,7 +41,7 @@ namespace BarsWeb.Areas.BpkW4.Controllers.Api
 
         [HttpGet]
         [GET("/api/BpkW4/ActivationReservedAccountsApi/activationreservedaccounts")]
-        public HttpResponseMessage SearchClaims([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request)
+        public HttpResponseMessage ActivationReservedAccounts([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request)
         {
             try
             {

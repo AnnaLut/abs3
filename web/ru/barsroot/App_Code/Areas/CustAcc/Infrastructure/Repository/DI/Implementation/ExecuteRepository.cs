@@ -50,43 +50,27 @@ namespace BarsWeb.Areas.CustAcc.Infrastructure.Repository.DI.Implementation
             int group_cnt = 0;
 			using (OracleConnection connection = OraConnector.Handler.UserConnection)
 			{
-				try
+				using (OracleCommand cmd = new OracleCommand())
 				{
-					using (OracleCommand cmd = new OracleCommand())
+					cmd.CommandText = @"select count(*) idgs 
+											from GROUPS_staff 
+												where idu = ( select bars.user_id user_id
+																from params$base
+																	where par = 'REGNCODE'
+																		and rownum = 1 )				
+													  and idg in (1018, 1020, 1044, 1025)";     //1044 WAY4-АБС
+																								//1018 Підрозділ бек-офісу
+																								//1020 Група технологів
+					cmd.CommandType = CommandType.Text;
+					cmd.Connection = connection;
+
+					using (OracleDataReader reader = cmd.ExecuteReader())
 					{
-						cmd.CommandText = "select bars.user_id user_id" +
-										  "         from params$base " +
-										  "             where par = 'REGNCODE'" +
-										  "             and rownum =1";
-						cmd.Connection = connection;
-						cmd.CommandType = CommandType.Text;
-						int userId = 0;
-						using (OracleDataReader reader = cmd.ExecuteReader())
+						while (reader.Read())
 						{
-							while (reader.Read())
-							{
-								userId = Convert.ToInt32(reader["user_id"].ToString());
-							}
-						}
-						cmd.CommandText = "select count(*) idgs " +
-											  "		from GROUPS_staff " +					//1020 Група технологів
-											  "			where idu=:user_id " +				//1018 Підрозділ бек-офісу
-											  "			  and idg in (1018, 1020, 1044)";	//1044 WAY4-АБС		
-						cmd.Parameters.Clear();
-						cmd.Parameters.Add("user_id", OracleDbType.Decimal, userId, ParameterDirection.Input);
-						using (OracleDataReader reader = cmd.ExecuteReader())
-						{
-							while (reader.Read())
-							{
-								group_cnt += Convert.ToInt32(reader["idgs"].ToString());
-							}
+							group_cnt += Convert.ToInt32(reader["idgs"].ToString());
 						}
 					}
-
-				}
-				finally
-				{
-					connection.Close();
 				}
 			}
 			return group_cnt;

@@ -70,6 +70,23 @@ function Validate(form) {
             }
         }
     }
+	
+	//    Перевірка на блокування рахунків 2625, 2605     (COBUMMFO-3907)
+    var nls = form.__DK.value != 0 ? form.Nls_A.value : form.Nls_B.value;
+    var maskAcc = nls.slice(0, 4);
+    if(maskAcc == "2625" || maskAcc == "2605"){
+        if (null == webService.Doc) webService.useService("DocService.asmx?wsdl", "Doc");
+        var callObj = webService.createCallOptions();
+        callObj.async = false;
+        callObj.funcName = "checkAcc";
+        callObj.params = new Array();
+        callObj.params.acc = nls;
+        var result = webService.Doc.callService(callObj);
+        if (result.error || result.value[0] == "1") {
+            alert(result.value[1] == "" || result.value[1] == null ? "Рахунок " + nls + " заблоковано" : result.value[1]);
+            return false;
+        }
+    }
 
     if (!(document.getElementById("btPayIt").disabled = AskBeforePay())) return false;
 

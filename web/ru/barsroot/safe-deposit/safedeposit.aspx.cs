@@ -22,8 +22,9 @@ public partial class safe_deposit_safedeposit : System.Web.UI.Page
     {
          if (Request["safe_id"] == null ||
             (Request["custtype"] == null && Request["dpt_id"] == null))
-            Response.Redirect("safeportfolio.aspx");        
-      
+            Response.Redirect("safeportfolio.aspx");
+
+        Decimal pcusttype = Decimal.MinValue;
         if (!IsPostBack)
         {
             safe_deposit sdpt;
@@ -46,7 +47,7 @@ public partial class safe_deposit_safedeposit : System.Web.UI.Page
                 btSelectClient.Enabled = false;
 
             /// Юр чи фіз особа
-            Decimal pcusttype = Decimal.MinValue;
+            
 
             if (sdpt.custtype != Decimal.MinValue)
                 pcusttype = sdpt.custtype;
@@ -71,7 +72,7 @@ public partial class safe_deposit_safedeposit : System.Web.UI.Page
         else if (!String.IsNullOrEmpty(RNK.Value))
             GetClient();    
         
-        if (String.IsNullOrWhiteSpace(TEL.Text))
+        if ((String.IsNullOrWhiteSpace(TEL.Text)) && (pcusttype == 3))
         {
             string script = "alert('Введіть номер мобільного телефону на картці клієнта!');"; ClientScript.RegisterClientScriptBlock(this.GetType(), "Alert", script, true);
         }
@@ -211,6 +212,8 @@ public partial class safe_deposit_safedeposit : System.Web.UI.Page
          //       Label18.Visible = true;
                 Label19.Visible = true;
                 Label20.Visible = true;
+                Label21.Visible = false; // для ЮО телефон - необов'язковий
+                TEL.Enabled = true;      // для ЮО телефон можна змінювати і зберігати
 
 
 
@@ -224,6 +227,8 @@ public partial class safe_deposit_safedeposit : System.Web.UI.Page
             Trustee_tab.Visible = false;
             Label19.Visible = false;
             Label20.Visible = false;
+            Label21.Visible = true; // для ФО телефон - обов'язковий
+            TEL.Enabled = false;    // для ФО телефон неможна змінювати - він береться з картки
         }
         else
             throw new SafeDepositException("Не определен тип клиента!");
@@ -394,7 +399,7 @@ public partial class safe_deposit_safedeposit : System.Web.UI.Page
         sdpt.birthplace = BIRTH_PLACE.Text;
         if (BDATE.Date != BDATE.MinDate)
             sdpt.birthdate = BDATE.Date;
-        sdpt.phone = TEL.Text;
+        sdpt.phone = String.IsNullOrEmpty(TEL.Text)? " " : TEL.Text;
 
         sdpt.trustee_fio = TRUSTEE_FIO.Text;
         sdpt.trustee_okpo = TRUSTEE_OKPO.Text;

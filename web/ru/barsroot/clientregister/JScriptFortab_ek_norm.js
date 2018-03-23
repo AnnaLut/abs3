@@ -93,7 +93,9 @@ function GetHelpValue(edObj, ddlObj, tblName) {
             }
         }
     }, {
-        clause:tail
+        clause:tail,
+        close: function (e) { $("html, body", this.appendTo.context).css("overflow", ""); },
+        open: function (e) { $("html, body", this.appendTo.context).css("overflow", "hidden"); }
     });
 
 

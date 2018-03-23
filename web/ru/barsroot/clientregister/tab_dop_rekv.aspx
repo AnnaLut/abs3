@@ -96,7 +96,7 @@
                                     value='<%# Eval("VALUE") %>'
                                     nottoedit='<%# Eval("NOT_TO_EDIT") %>'
                                     id="edEdVal"
-                                    onchange="addToSaveTags(this)" />
+                                    onfocusout="addToSaveTags(this)" />
                             </ItemTemplate>
                             <ItemStyle Width="250px" HorizontalAlign="Center"></ItemStyle>
                         </asp:TemplateField>

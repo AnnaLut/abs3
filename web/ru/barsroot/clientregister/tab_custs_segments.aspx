@@ -32,7 +32,7 @@
             var _rnk = document.getElementById('ctl00_body_ClientRnk').value;
             // console.log(_rnk);
             var rnd = Math.random();
-            core$IframeBox({ url: "/barsroot/clientregister/tab_custs_segments_capacity.aspx?rnk=" + _rnk, width: 520, height: 500, id: 'segmentform' });
+            core$IframeBox({ url: "/barsroot/clientregister/tab_custs_segments_capacity.aspx?rnk=" + _rnk, width: 420, height: 520, id: 'segmentform' });
         }
     </script>
 </asp:Content>
@@ -57,14 +57,14 @@
                             </td>
                             <td>
                                 <asp:TextBox ID="CUSTOMER_SEGMENT_ACTIVITY" runat="server" Enabled="false"
-                                    TabIndex="1" ToolTip="Сегмент активності" CssClass="InfoText40" Style="margin-left: 29px" Width="250px" />
+                                    TabIndex="1" CssClass="InfoText40" Style="margin-left: 29px" Width="250px" />
                             </td>
                             <td>
-                                <asp:TextBox ID="CSA_DATE_START" runat="server" MaxLength="15" Enabled="false"
+                                <asp:TextBox ID="CSA_DATE_START" runat="server"  Enabled="false"
                                     TabIndex="2" CssClass="InfoText40" Style="margin-left: 20px" Width="100px" />
                             </td>
                             <td>
-                                <asp:TextBox ID="CSA_DATE_STOP" runat="server" MaxLength="15" Enabled="false"
+                                <asp:TextBox ID="CSA_DATE_STOP" runat="server"  Enabled="false"
                                     TabIndex="3" CssClass="InfoText40" Style="margin-left: 20px" Width="100px" />
                             </td>
                         </tr>
@@ -72,15 +72,15 @@
                             <td runat="server">Сегмент фінансовий
                             </td>
                             <td>
-                                <asp:TextBox ID="CUSTOMER_SEGMENT_FINANCIAL" runat="server" MaxLength="15" Enabled="false"
-                                    TabIndex="1" ToolTip="Сегмент активності" CssClass="InfoText40" Style="margin-left: 29px" Width="250px" />
+                                <asp:TextBox ID="CUSTOMER_SEGMENT_FINANCIAL" runat="server" Enabled="false"
+                                    TabIndex="1" CssClass="InfoText40" Style="margin-left: 29px" Width="250px" />
                             </td>
                             <td>
-                                <asp:TextBox ID="CSF_DATE_START" runat="server" MaxLength="15" Enabled="false"
+                                <asp:TextBox ID="CSF_DATE_START" runat="server"  Enabled="false"
                                     TabIndex="2" CssClass="InfoText40" Style="margin-left: 20px" Width="100px" />
                             </td>
                             <td>
-                                <asp:TextBox ID="CSF_DATE_STOP" runat="server" MaxLength="15" Enabled="false"
+                                <asp:TextBox ID="CSF_DATE_STOP" runat="server"  Enabled="false"
                                     TabIndex="3" CssClass="InfoText40" Style="margin-left: 20px" Width="100px" />
                             </td>
 
@@ -89,15 +89,15 @@
                             <td runat="server">Сегмент поведінковий
                             </td>
                             <td>
-                                <asp:TextBox ID="CUSTOMER_SEGMENT_BEHAVIOR" runat="server" MaxLength="15" Enabled="false"
-                                    TabIndex="1" ToolTip="Сегмент активності" CssClass="InfoText40" Style="margin-left: 29px" Width="250px" />
+                                <asp:TextBox ID="CUSTOMER_SEGMENT_BEHAVIOR" runat="server"  Enabled="false"
+                                    TabIndex="1" CssClass="InfoText40" Style="margin-left: 29px" Width="250px" />
                             </td>
                             <td>
-                                <asp:TextBox ID="CSB_DATE_START" runat="server" MaxLength="15" Enabled="false"
+                                <asp:TextBox ID="CSB_DATE_START" runat="server"  Enabled="false"
                                     TabIndex="2" CssClass="InfoText40" Style="margin-left: 20px" Width="100px" />
                             </td>
                             <td>
-                                <asp:TextBox ID="CSB_DATE_STOP" runat="server" MaxLength="15" Enabled="false"
+                                <asp:TextBox ID="CSB_DATE_STOP" runat="server"  Enabled="false"
                                     TabIndex="3" CssClass="InfoText40" Style="margin-left: 20px" Width="100px" />
                             </td>
 
@@ -106,11 +106,11 @@
                             <td runat="server"><a href='#' onclick='frameCustCapacity();return false;'>Продуктове навантаження</a>
                             </td>
                             <td>
-                                <asp:TextBox ID="CUSTOMER_SEGMENT_PRODUCTS_AMNT" runat="server" MaxLength="15" Enabled="false"
-                                    TabIndex="1" ToolTip="Сегмент активності" CssClass="InfoText40" Style="margin-left: 29px" Width="250px" />
+                                <asp:TextBox ID="CUSTOMER_SEGMENT_PRODUCTS_AMNT" runat="server"  Enabled="false"
+                                    TabIndex="1" CssClass="InfoText40" Style="margin-left: 29px" Width="250px" />
                             </td>
                             <td>
-                                <asp:TextBox ID="CSP_DATE_START" runat="server" MaxLength="15" Enabled="false"
+                                <asp:TextBox ID="CSP_DATE_START" runat="server"  Enabled="false"
                                     TabIndex="2" CssClass="InfoText40" Style="margin-left: 20px" Width="100px" />
                             </td>
                             <td>
@@ -121,15 +121,15 @@
                             <td runat="server">Кіл-ть розрахунків карткою в ТСП
                             </td>
                             <td>
-                                <asp:TextBox ID="CUSTOMER_SEGMENT_TRANSACTIONS" runat="server" MaxLength="15" Enabled="false"
-                                    TabIndex="1" ToolTip="Сегмент активності" CssClass="InfoText40" Style="margin-left: 29px" Width="250px" />
+                                <asp:TextBox ID="CUSTOMER_SEGMENT_TRANSACTIONS" runat="server"  Enabled="false"
+                                    TabIndex="1" CssClass="InfoText40" Style="margin-left: 29px" Width="250px" />
                             </td>
                             <td>
-                                <asp:TextBox ID="CST_DATE_START" runat="server" MaxLength="15" Enabled="false"
+                                <asp:TextBox ID="CST_DATE_START" runat="server"  Enabled="false"
                                     TabIndex="2" CssClass="InfoText40" Style="margin-left: 20px" Width="100px" />
                             </td>
                             <td>
-                                <asp:TextBox ID="CST_DATE_STOP" runat="server" MaxLength="15" Enabled="false"
+                                <asp:TextBox ID="CST_DATE_STOP" runat="server"  Enabled="false"
                                     TabIndex="3" CssClass="InfoText40" Style="margin-left: 20px" Width="100px" />
                             </td>
 
@@ -139,7 +139,7 @@
                             </td>
                             <td>
                                 <asp:TextBox ID="CUSTOMER_SEGMENT_ATM" runat="server" Enabled="false"
-                                    TabIndex="1" ToolTip="Кіл-ть операцій зняття готівки в АТМ" CssClass="InfoText40" Style="margin-left: 29px" Width="250px" />
+                                    TabIndex="1" CssClass="InfoText40" Style="margin-left: 29px" Width="250px" />
                             </td>
                             <td>
                                 <asp:TextBox ID="CSAT_DATE_START" runat="server" Enabled="false"
@@ -151,7 +151,7 @@
                             </td>
                             <td>
                                 <asp:TextBox ID="CS_BPK_CREDITLINE" runat="server" Enabled="false"
-                                    TabIndex="1" ToolTip="Сума встановленого КЛ на БПК(грн)" CssClass="InfoText40" Style="margin-left: 29px" Width="250px" />
+                                    TabIndex="1" CssClass="InfoText40" Style="margin-left: 29px" Width="250px" />
                             </td>
                             <td>
                                 <asp:TextBox ID="CS_BPK_CREDITLINE_START" runat="server" Enabled="false"
@@ -163,14 +163,14 @@
                             </td>
                             <td>
                                 <asp:TextBox ID="CS_CASHCREDIT_GIVEN" runat="server" Enabled="false"
-                                    TabIndex="1" ToolTip="Сума наданого Кеш кредиту (грн)" CssClass="InfoText40" Style="margin-left: 29px" Width="250px" />
+                                    TabIndex="1" CssClass="InfoText40" Style="margin-left: 29px" Width="250px" />
                             </td>
                             <td>
                                 <asp:TextBox ID="CS_CASHCREDIT_GIVEN_START" runat="server" Enabled="false"
                                     TabIndex="2" CssClass="InfoText40" Style="margin-left: 20px" Width="100px" />
                             </td>
                             <td>
-                                <asp:TextBox ID="CS_CASHCREDIT_GIVEN_STOP" runat="server" MaxLength="15" Enabled="false"
+                                <asp:TextBox ID="CS_CASHCREDIT_GIVEN_STOP" runat="server"  Enabled="false"
                                     TabIndex="3" CssClass="InfoText40" Style="margin-left: 20px" Width="100px" />
                             </td>
                         </tr>
@@ -179,7 +179,7 @@
                             </td>
                             <td>
                                 <asp:TextBox ID="CUSTOMER_SEGMENT_TVBV" runat="server" Enabled="false"
-                                    TabIndex="1" ToolTip="Обслуговуюче відділення" CssClass="InfoText40" Style="margin-left: 29px" Width="250px" />
+                                    TabIndex="1" CssClass="InfoText40" Style="margin-left: 29px" Width="250px" />
                             </td>
                             <td>
                                 <asp:TextBox ID="CUSTOMER_SEGMENT_TVBV_START" runat="server" Enabled="false"
@@ -191,7 +191,7 @@
                             </td>
                             <td>
                                 <asp:TextBox ID="CUSTOMER_SEGMENT_KODM" runat="server" Enabled="false"
-                                    TabIndex="1" ToolTip="Код портфеля менеджера" CssClass="InfoText40" Style="margin-left: 29px" Width="250px" />
+                                    TabIndex="1" CssClass="InfoText40" Style="margin-left: 29px" Width="250px" />
                             </td>
                             <td>
                                 <asp:TextBox ID="CSK_DATE_START" runat="server" Enabled="false"
@@ -203,7 +203,7 @@
                             </td>
                             <td>
                                 <asp:TextBox ID="CUSTOMER_SEGMENT_MANAGER" runat="server" Enabled="false"
-                                    TabIndex="1" ToolTip="ПІБ менеджера" CssClass="InfoText40" Style="margin-left: 29px" Width="250px" />
+                                    TabIndex="1" CssClass="InfoText40" Style="margin-left: 29px" Width="250px" />
                             </td>
                             <td>
                                 <asp:TextBox ID="CSM_DATE_START" runat="server" Enabled="false"
@@ -227,6 +227,7 @@
                 <asp:Panel ID="pnlSegmentsHistory" runat="server" GroupingText="Історія змін клієнта №">
                     <asp:TextBox ID="ClientRnk" meta:resourcekey="ClientRnk" runat="server" Visible="True"
                         TabIndex="32" MaxLength="10" ToolTip="RNK" CssClass="InfoText40" />
+                    <asp:CheckBox ID="chkShowAll" runat="server" AutoPostBack="True" OnCheckedChanged="chkShowAll_CheckedChanged" Text="Отобразить все изменения" />
                     <table border="0" cellpadding="3" cellspacing="0">
                         <tr>
                             <td style="width: 300px; vertical-align: top">
@@ -234,6 +235,7 @@
                                     TypeName="clientregister.VCustomerSegmentsHistory">
                                     <SelectParameters>
                                         <asp:QueryStringParameter Name="RNK" QueryStringField="RNK" Type="Decimal" />
+                                        <asp:ControlParameter ControlID="chkShowAll" DefaultValue="False" Name="ShowAll" PropertyName="Checked" />
                                     </SelectParameters>
                                 </bars:BarsObjectDataSource>
                                 <bars:BarsGridViewEx ID="gv" runat="server" AutoGenerateColumns="False"
@@ -252,7 +254,7 @@
                                     <FooterStyle CssClass="footerRow"></FooterStyle>
                                     <HeaderStyle CssClass="headerRow"></HeaderStyle>
                                     <PagerStyle CssClass="pagerRow"></PagerStyle>
-                                    <RowStyle CssClass="normalRow"></RowStyle>
+                                    <RowStyle CssClass="normalRow" HorizontalAlign="Right"></RowStyle>
                                     <SelectedRowStyle CssClass="selectedRow"></SelectedRowStyle>
                                 </bars:BarsGridViewEx>
                             </td>

@@ -293,7 +293,7 @@
                 Тип гос. реестра
             </td>
             <td>
-                <select class="edit long" id="ddl_TGR" title="Выбор по нажатию левой кнопки мыши"
+                <select class="edit long ddlTGRClass" id="ddl_TGR" title="Выбор по нажатию левой кнопки мыши"
                     tabindex="13">
                 </select>
             </td>
@@ -303,7 +303,7 @@
                 Идентификационный код
             </td>
             <td>
-                <input class="edit centered" id="ed_OKPO" onblur="checkOKPO(getEl('ed_OKPO'),true);setSexByOKPO();" tabindex="14"
+                <input class="edit centered" id="ed_OKPO" onblur="checkOKPO(getEl('ed_OKPO'),true);setSexByOKPO();setTgrList();" tabindex="14"
                     type="text" maxlength="10" />
                 <div class="required">
                     *</div>

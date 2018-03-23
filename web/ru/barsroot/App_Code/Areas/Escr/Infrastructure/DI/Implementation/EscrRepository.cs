@@ -36,6 +36,14 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
             _dbLogger = DbLoggerConstruct.NewDbLogger();
         }
 
+        enum TypeQuery: byte
+        {
+            /// <summary>Оплата проводок</summary>
+            Pay = 1,
+            /// <summary>Видалення проводок</summary>
+            Delete = 2
+        }
+
         private void LoginUser(String userName, OracleCommand cmd) 
         {
             // информация о текущем пользователе
@@ -1146,8 +1154,7 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
             List<EscrRefList> ref_list = new List<EscrRefList>();
             try
             {
-                cmd.CommandType = System.Data.CommandType.Text;
-                cmd.CommandText = "select TT,REF,NLSB,OSTC,NAZN,S,ACC,ND,SDATE,CC_ID,ID_B,TXT from VW_ESCR_REF_FOR_COMPENSATION";
+                cmd.CommandText = "select TT,REF,NLSB,OSTC,NAZN,S,ACC,ND,SDATE,CC_ID,ID_B,TXT,DATE_CHECK from VW_ESCR_REF_FOR_COMPENSATION";
 
                 OracleDataReader reader = cmd.ExecuteReader();
 
@@ -1166,6 +1173,8 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
                     r.CC_ID = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? String.Empty : reader.GetString(9);
                     r.ID_B = String.IsNullOrEmpty(reader.GetValue(10).ToString()) ? String.Empty : reader.GetString(10);
                     r.TXT = String.IsNullOrEmpty(reader.GetValue(11).ToString()) ? String.Empty : reader.GetString(11);
+                    byte? date_check_from_db = String.IsNullOrEmpty(reader.GetValue(12).ToString()) ? (byte?)null : reader.GetByte(12);
+                    r.DATE_CHECK = date_check_from_db.HasValue && date_check_from_db == 1;
                     ref_list.Add(r);
                 }
             }
@@ -1179,22 +1188,23 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
 
         }
 
-        public void RepaymentAll(List<decimal> all_list)
+        public void PayOrDelete(List<decimal> all_list, byte type)
         {
             OracleConnection connection = OraConnector.Handler.UserConnection;
             OracleCommand cmd = connection.CreateCommand();
             cmd.CommandType = System.Data.CommandType.StoredProcedure;
             cmd.Parameters.Clear();
             decimal? id;
-            cmd.CommandText = @"escr.p_log_header_set";
-            cmd.Parameters.Add(new OracleParameter("id_log", OracleDbType.Decimal, System.Data.ParameterDirection.Output));
-     
-            cmd.ExecuteNonQuery();
-            id = cmd.Parameters["id_log"].Value.ToString() == "null" ? (decimal?)null : Convert.ToDecimal(cmd.Parameters["id_log"].Value.ToString());
-
-            cmd.CommandText = @"escr.oplv";
             try
-            { 
+            {
+                cmd.CommandText = @"escr.p_log_header_set";
+                cmd.Parameters.Add(new OracleParameter("id_log", OracleDbType.Decimal, System.Data.ParameterDirection.Output));
+     
+                cmd.ExecuteNonQuery();
+                id = cmd.Parameters["id_log"].Value.ToString() == "null" ? (decimal?)null : Convert.ToDecimal(cmd.Parameters["id_log"].Value.ToString());
+
+                cmd.CommandText = type == (byte)TypeQuery.Pay ? @"escr.oplv" : @"escr.p_ref_del";
+            
                 foreach (decimal row in all_list)
                 {
                     cmd.Parameters.Clear();
@@ -1218,7 +1228,6 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
             List<EscrJournal> journal_list = new List<EscrJournal>();
             try
             {
-                cmd.CommandType = System.Data.CommandType.Text;
                 cmd.CommandText = @"select id ,-- порядковий номер журналу
                                    total_deal_count,--загальна к-сть кредитів для зарахування
                                    succes_deal_count,-- к-сть успішних оплат
@@ -1258,7 +1267,6 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
             List<EscrJournalDetail> detail_list = new List<EscrJournalDetail>();
             try
             {
-                cmd.CommandType = System.Data.CommandType.Text;
                 cmd.CommandText = @"select id_log, deal_id, err_code, err_desc, comments 
                             from VW_escr_pay_log_body
                             where id_log = :id";

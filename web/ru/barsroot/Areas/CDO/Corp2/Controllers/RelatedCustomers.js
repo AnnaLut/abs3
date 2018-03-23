@@ -73,6 +73,7 @@ angular.module(globalSettings.modulesAreas)
                         if (res && res != 'null')
                             vm.reatedCustomers.unshift(res);
                 }, function (err) {
+                    //console.log(err);
                 });
             }
 

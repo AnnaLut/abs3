@@ -13,6 +13,7 @@ angular.module(globalSettings.modulesAreas)
         var limitDictionary = null;
         customersService.getModuleVersion().then(
             function (response) {
+                //console.log(response);
                 vm.moduleVersion = 'v' + response;
             },
             function () { }

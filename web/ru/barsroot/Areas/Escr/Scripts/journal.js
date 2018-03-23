@@ -105,7 +105,16 @@ function GetJournalList() {
         schema: {
             data: "Data",
             total: "Total",
-            errors: "Errors",
+            errors: function (e) {
+                if (e.Status != undefined) {
+                    bars.ui.error({
+                        title: "Помилка ",
+                        text: e.Status,
+                        width: '800px',
+                        height: '600px'
+                    })
+                }
+            },
             model: {
                 id: 'ID',
                 fields: {
@@ -140,7 +149,16 @@ function detailInit(e) {
             schema: {
                 data: "Data",
                 total: "Total",
-                errors: "Errors",
+                errors: function (e) {
+                    if (e.Status != undefined) {
+                        bars.ui.error({
+                            title: "Помилка ",
+                            text: e.Status,
+                            width: '800px',
+                            height: '600px'
+                        })
+                    }
+                },
                 model: {
                     fields: {
                         DEAL_ID: { type: "number" },
@@ -152,6 +170,7 @@ function detailInit(e) {
             },
             pageSize: 5
         },
+        toolbar: ["excel"],
         pageable: {
             refresh: true,
             pageSizes: [5, 10, 20],
@@ -176,8 +195,12 @@ function detailInit(e) {
              width: 450,
              nullable: true,
              field: "COMMENTS"
-         } ]
-    });
+         }],
+        excel: {
+            fileName: "Проблемні кредити журналу " + data.ID + ".xlsx",
+            allPages: true
+        }
+    }).data("kendoGrid");
 }
 
 function CatchErrors(data) {

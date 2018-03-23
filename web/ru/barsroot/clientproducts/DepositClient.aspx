@@ -693,10 +693,6 @@
                             <td>
                                 <asp:TextBox ID="textCellPhone" meta:resourcekey="textCellPhone" runat="server" MaxLength="15"
                                     TabIndex="40" ToolTip="Мобільний телефон клієнта" CssClass="InfoText40" onchange = "RepeatCellNumbers();"/>
-                                <ajax:MaskedEditExtender
-                                    ID="meeCellPhone" runat="server"
-                                    TargetControlID="textCellPhone"
-                                    Mask="+38(999)9999999" />
                             </td>
                             <td></td>                                                   
                             <td>

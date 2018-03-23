@@ -1,8 +1,8 @@
-﻿@using Kendo.Mvc.UI
-@{
+﻿@{
     string title = "Журнал результатів зарахування коштів по компенсаційній програмі";
 }
-<script src="~/Areas/Escr/Scripts/journal.js"></script>
+<script src="@Url.Content("~/lib/jsZip/jszip.js")"></script>
+<script src="~/Areas/Escr/Scripts/journal.js?v.1.0.1"></script>
 <link href="~/Areas/Escr/Css/portfolio.css" rel="stylesheet" />
 <h1>@title</h1>
 <style>
@@ -15,10 +15,10 @@
       }
 
     .k-grid-content {
-        max-height: 700px;
+        max-height: 400px;
         min-height: 40px;
     }
-    div.k-grid .k-selectable a {
+    div.k-grid .k-selectable a :not(button){
         TEXT-DECORATION: underline;
         COLOR: rgb(51,153,255);
     }
