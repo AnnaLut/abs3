@@ -203,38 +203,7 @@ namespace Bars.WebServices
             }
 
             return hashs;
-        }
-
-        private void LoginUserInt(String userName)
-        {
-            // информация о текущем пользователе
-            UserMap userMap = Bars.Configuration.ConfigurationSettings.GetUserInfo(userName);
-
-            try
-            {
-                InitOraConnection();
-                // установка первичных параметров
-                ClearParameters();
-                SetParameters("p_session_id", DB_TYPE.Varchar2, Session.SessionID, DIRECTION.Input);
-                SetParameters("p_user_id", DB_TYPE.Varchar2, userMap.user_id, DIRECTION.Input);
-                SetParameters("p_hostname", DB_TYPE.Varchar2, RequestHelpers.GetClientIpAddress(HttpContext.Current.Request), DIRECTION.Input);
-                SetParameters("p_appname", DB_TYPE.Varchar2, "barsroot", DIRECTION.Input);
-                SQL_PROCEDURE("bars.bars_login.login_user");
-
-                ClearParameters();
-                SetParameters("p_info", DB_TYPE.Varchar2,
-                    String.Format("GercPayService: авторизация. Хост {0}, пользователь {1}", RequestHelpers.GetClientIpAddress(HttpContext.Current.Request), userName),
-                    DIRECTION.Input);
-                SQL_PROCEDURE("bars_audit.info");
-            }
-            finally
-            {
-                DisposeOraConnection();
-            }
-
-            // Если выполнили установку параметров
-            Session["UserLoggedIn"] = true;
-        }
+        }        
 
         private void LoginUser()
         {
@@ -820,8 +789,11 @@ namespace Bars.WebServices
 
         [SoapHeader("WsHeaderValue", Direction = SoapHeaderDirection.In)]
         [WebMethod(EnableSession = true)]
-        public UserBranchModel GetUserBranch()
+        public UserBranchModel GetUserBranch(string userLogin)
         {
+			if (string.IsNullOrWhiteSpace(userLogin))
+                throw new ArgumentException("Argument can not be null or empty, argument name 'userLogin'");
+			
             UserBranchModel userBranchModel = new UserBranchModel();
             try
             {
@@ -836,7 +808,7 @@ namespace Bars.WebServices
                         cmd.BindByName = true;
                         cmd.CommandText = "GERC_PAYMENTS.GetUserBranch";
 
-                        cmd.Parameters.Add("p_UserLogin", OracleDbType.Varchar2, WsHeaderValue.UserName, ParameterDirection.Input);
+                        cmd.Parameters.Add("p_UserLogin", OracleDbType.Varchar2, userLogin, ParameterDirection.Input);
                         cmd.Parameters.Add("p_branch", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output);
                         cmd.Parameters.Add("p_ErrorMessage", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output);
 
@@ -1205,5 +1177,99 @@ namespace Bars.WebServices
             finally { DisposeOraConnection(); }
         }
         #endregion методы веб-сервиса КЛИЕНТЫ
+		
+		[SoapHeader("WsHeaderValue", Direction = SoapHeaderDirection.In)]
+        [WebMethod(EnableSession = true)]
+        public CheckAccResult CheckAccountByBranch(CheckAccByBranch request)
+        {
+            CheckAccResult response = new CheckAccResult();
+            try
+            {
+                LoginUser();
+
+                using (OracleConnection connection = Classes.OraConnector.Handler.IOraConnection.GetUserConnection())
+                using (OracleCommand cmd = connection.CreateCommand())
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.BindByName = true;
+                    cmd.CommandText = "BARS.Gerc_Payments.CheckAccountByBranch";
+
+                    cmd.Parameters.Add("p_branch", OracleDbType.Varchar2, 4000, request.Branch, ParameterDirection.Input);
+                    cmd.Parameters.Add("p_nls", OracleDbType.Varchar2, 4000, request.Nls, ParameterDirection.Input);
+                    cmd.Parameters.Add("p_kv", OracleDbType.Decimal, request.Kv, ParameterDirection.Input);
+
+                    cmd.Parameters.Add("p_status", OracleDbType.Decimal, null, ParameterDirection.Output);
+                    cmd.Parameters.Add("p_comment", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output);
+
+                    cmd.ExecuteNonQuery();
+
+                    OracleDecimal _status = (OracleDecimal)cmd.Parameters["p_status"].Value;
+                    if (!_status.IsNull)
+                        response.Status = Convert.ToInt32(_status.Value);
+
+                    OracleString _comment = (OracleString)cmd.Parameters["p_comment"].Value;
+                    if (!_comment.IsNull)
+                        response.Comment = _comment.Value;
+                }
+            }
+            catch (Exception.AutenticationException aex)
+            {
+                response.ErrorMessage = String.Format("Помилка авторизації: {0}", aex.Message);
+            }
+            catch (System.Exception ex)
+            {
+                string exMsg = null == ex.InnerException ? ex.Message : ex.InnerException.Message;
+                response.ErrorMessage = ex.StackTrace + "//" + exMsg;
+            }
+
+            return response;
+        }
+
+        [SoapHeader("WsHeaderValue", Direction = SoapHeaderDirection.In)]
+        [WebMethod(EnableSession = true)]
+        public CheckAccResult CheckAccountByKf(CheckAccByKf request)
+        {
+            CheckAccResult response = new CheckAccResult();
+            try
+            {
+                LoginUser();
+
+                using (OracleConnection connection = Classes.OraConnector.Handler.IOraConnection.GetUserConnection())
+                using (OracleCommand cmd = connection.CreateCommand())
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.BindByName = true;
+                    cmd.CommandText = "BARS.Gerc_Payments.CheckAccountByKf";
+
+                    cmd.Parameters.Add("p_kf", OracleDbType.Varchar2, 4000, request.Kf, ParameterDirection.Input);
+                    cmd.Parameters.Add("p_nls", OracleDbType.Varchar2, 4000, request.Nls, ParameterDirection.Input);
+                    cmd.Parameters.Add("p_kv", OracleDbType.Decimal, request.Kv, ParameterDirection.Input);
+
+                    cmd.Parameters.Add("p_status", OracleDbType.Decimal, null, ParameterDirection.Output);
+                    cmd.Parameters.Add("p_comment", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output);
+
+                    cmd.ExecuteNonQuery();
+
+                    OracleDecimal _status = (OracleDecimal)cmd.Parameters["p_status"].Value;
+                    if (!_status.IsNull)
+                        response.Status = Convert.ToInt32(_status.Value);
+
+                    OracleString _comment = (OracleString)cmd.Parameters["p_comment"].Value;
+                    if (!_comment.IsNull)
+                        response.Comment = _comment.Value;
+                }
+            }
+            catch (Exception.AutenticationException aex)
+            {
+                response.ErrorMessage = String.Format("Помилка авторизації: {0}", aex.Message);
+            }
+            catch (System.Exception ex)
+            {
+                string exMsg = null == ex.InnerException ? ex.Message : ex.InnerException.Message;
+                response.ErrorMessage = ex.StackTrace + "//" + exMsg;
+            }
+
+            return response;
+        }
     }
 }

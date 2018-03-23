@@ -11,91 +11,84 @@ using BarsWeb.Areas.ReserveAccs.Infrastructure.Repository.DI.Abstract;
 using BarsWeb.Areas.ReserveAccs.Models;
 using Bars.Classes;
 using System.Data;
+using BarsWeb.Areas.Acct.Models.Bases;
+using BarsWeb.Areas.ReserveAccs.Models.Bases;
+using Dapper;
+using BarsWeb.Areas.BpkW4.Models;
+using System.Threading.Tasks;
+using Bars.Web.Report;
+using System.Web.Services;
 
 namespace BarsWeb.Areas.ReserveAccs.Infrastructure.Repository.DI.Implementation
 {
     public class ReserveAccsRepository : IReserveAccsRepository
     {
-
         public decimal Reserved(ReservedAccountRegister account)
         {
-            bool txCommitted = false;
-            OracleConnection connect = new OracleConnection();
-            decimal? acc = null;
-            connect = OraConnector.Handler.IOraConnection.GetUserConnection();
-            var transaction = connect.BeginTransaction();
-            try
-            {
+			using (OracleConnection connect = OraConnector.Handler.UserConnection)
+			{
+				var transaction = connect.BeginTransaction();
+				try
+				{
+					if (account.Tarriff == null)
+					{
+						if (!String.IsNullOrEmpty(account.MainCurr))
+						{
+							var sql = String.Format("select aw.value from ACCOUNTSW aw join accounts a on a.acc = aw.acc and a.nls = '{0}' and a.kv = {1}", account.Number, account.MainCurr);
+							account.Tarriff = connect.Query<decimal?>(sql).SingleOrDefault();
+						}
+					}
 
-                OracleCommand cmdInsertInfo = connect.CreateCommand();
+					using (OracleCommand cmdInsertInfo = connect.CreateCommand())
+					{
+						//cmdInsertInfo.CommandText = @"begin accreg.p_reserve_acc"
+						cmdInsertInfo.CommandText = @"begin accreg.RSRV_ACC_NUM(
+																	:p_nls,
+																	:p_kv,
+																	:p_nms,
+																	:p_branch,
+																	:p_isp,
+																	:p_vid,
+																	:p_rnk,
+																	:p_agrm_num,
+																	:p_trf_id,
+																	:p_ob22,
+																	:p_errmsg); end;";
 
-                cmdInsertInfo.CommandText = @"begin accreg.p_reserve_acc (
-                            :p_acc,
-                            :p_rnk,
-                            :p_nls,     
-                            :p_kv,       
-                            :p_nms,      
-                            :p_tip,      
-                            :p_grp,      
-                            :p_isp,      
-                            :p_pap,      
-                            :p_vid,      
-                            :p_pos,      
-                            :p_blkd,     
-                            :p_blkk,     
-                            :p_lim,     
-                            :p_ostx,     
-                            :p_nlsalt,          
-                            :p_branch,
-                            :p_ob22,
-                            :p_agrm_num,
-                            :p_trf_id); end;";
-                cmdInsertInfo.BindByName = true;
-                var array_kvs = account.CurrencyId.Split(',');
+						cmdInsertInfo.BindByName = true;
+						var array_kvs = account.CurrencyId.Split(',');
+						var err_msg = "";
+						foreach (var kv in array_kvs)
+						{
+							cmdInsertInfo.Parameters.Clear();
+							cmdInsertInfo.Parameters.Add("p_nls", OracleDbType.Varchar2, account.Number, ParameterDirection.Input);
+							cmdInsertInfo.Parameters.Add("p_kv", OracleDbType.Decimal, Convert.ToDecimal(kv), ParameterDirection.Input);
+							cmdInsertInfo.Parameters.Add("p_nms", OracleDbType.Varchar2, account.Name, ParameterDirection.Input);
+							cmdInsertInfo.Parameters.Add("p_branch", OracleDbType.Varchar2, account.Branch, ParameterDirection.Input);
+							cmdInsertInfo.Parameters.Add("p_isp", OracleDbType.Decimal, account.UserId == null ? GetIsp(connect) : account.UserId, ParameterDirection.Input);
+							cmdInsertInfo.Parameters.Add("p_vid", OracleDbType.Decimal, account.DdVid, ParameterDirection.Input);
+							cmdInsertInfo.Parameters.Add("p_rnk", OracleDbType.Decimal, account.CustomerId, ParameterDirection.Input);
+							cmdInsertInfo.Parameters.Add("p_agrm_num", OracleDbType.Varchar2, account.ND, ParameterDirection.Input);
+							cmdInsertInfo.Parameters.Add("p_trf_id", OracleDbType.Decimal, account.Tarriff, ParameterDirection.Input);
+							cmdInsertInfo.Parameters.Add("p_ob22", OracleDbType.Varchar2, account.Ob22, ParameterDirection.Input);
+							cmdInsertInfo.Parameters.Add("p_errmsg", OracleDbType.Varchar2, 4000, err_msg, ParameterDirection.Output);
+							cmdInsertInfo.ExecuteNonQuery();
 
-                foreach (var kv in array_kvs)
-                {
-                    cmdInsertInfo.Parameters.Clear();
-                    cmdInsertInfo.Parameters.Add("p_acc", OracleDbType.Decimal, 38, acc, ParameterDirection.InputOutput);
-                    cmdInsertInfo.Parameters.Add("p_rnk", OracleDbType.Decimal, account.CustomerId, ParameterDirection.Input);
-                    cmdInsertInfo.Parameters.Add("p_nls", OracleDbType.Varchar2, account.Number, ParameterDirection.Input);
-                    cmdInsertInfo.Parameters.Add("p_kv", OracleDbType.Decimal, Convert.ToDecimal(kv), ParameterDirection.Input);
-                    cmdInsertInfo.Parameters.Add("p_nms", OracleDbType.Varchar2, account.Name, ParameterDirection.Input);
-                    cmdInsertInfo.Parameters.Add("p_tip", OracleDbType.Char, account.Type, ParameterDirection.Input);
-                    cmdInsertInfo.Parameters.Add("p_grp", OracleDbType.Decimal, account.Group, ParameterDirection.Input);
-                    cmdInsertInfo.Parameters.Add("p_isp", OracleDbType.Decimal, account.UserId == null ? GetIsp(connect) : account.UserId, ParameterDirection.Input);
-                    cmdInsertInfo.Parameters.Add("p_pap", OracleDbType.Decimal, account.Pap, ParameterDirection.Input);
-                    cmdInsertInfo.Parameters.Add("p_vid", OracleDbType.Decimal, account.Subspecies, ParameterDirection.Input);
-                    cmdInsertInfo.Parameters.Add("p_pos", OracleDbType.Decimal, account.Pos, ParameterDirection.Input);
-                    cmdInsertInfo.Parameters.Add("p_blkd", OracleDbType.Decimal, account.DebitBlockCode, ParameterDirection.Input);
-                    cmdInsertInfo.Parameters.Add("p_blkk", OracleDbType.Decimal, account.CreditBlockCode, ParameterDirection.Input);
-                    cmdInsertInfo.Parameters.Add("p_lim", OracleDbType.Decimal, 0, ParameterDirection.Input);
-                    cmdInsertInfo.Parameters.Add("p_ostx", OracleDbType.Decimal, 0, ParameterDirection.Input);
-                    cmdInsertInfo.Parameters.Add("p_nlsalt", OracleDbType.Varchar2, 0, ParameterDirection.Input);
-                    cmdInsertInfo.Parameters.Add("p_branch", OracleDbType.Varchar2, account.Branch, ParameterDirection.Input);
-                    cmdInsertInfo.Parameters.Add("p_ob22", OracleDbType.Varchar2, account.Ob22, ParameterDirection.Input);
-                    cmdInsertInfo.Parameters.Add("p_agrm_num", OracleDbType.Varchar2, account.ND, ParameterDirection.Input);
-                    cmdInsertInfo.Parameters.Add("p_trf_id", OracleDbType.Decimal, account.Tarriff, ParameterDirection.Input);
-
-                    cmdInsertInfo.ExecuteNonQuery();
-                }
-                txCommitted = true;
-                transaction.Commit();
-                return Convert.ToDecimal(Convert.ToString(cmdInsertInfo.Parameters["p_acc"].Value));
-
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                if (!txCommitted) transaction.Rollback();
-                connect.Close();
-                connect.Dispose();
-            }
+							err_msg = Convert.ToString(cmdInsertInfo.Parameters["p_errmsg"].Value);
+							if (err_msg != "null")
+								throw new Exception(err_msg);
+						}
+						transaction.Commit();
+						return Convert.ToDecimal(Convert.ToString(cmdInsertInfo.Parameters["p_nls"].Value));
+					}
+				}
+				catch (Exception ex)
+				{
+					transaction.Rollback();
+					throw ex;
+				}
+			}
         }
-
         public List<SpecParamList> GetSpecParamList()
         {
             List<SpecParamList> list = new List<SpecParamList>();
@@ -133,7 +126,6 @@ namespace BarsWeb.Areas.ReserveAccs.Infrastructure.Repository.DI.Implementation
                 connect.Dispose();
             }
         }
-
         public String GetNDBO(Decimal rnk)
         {
             using (var connection = OraConnector.Handler.UserConnection)
@@ -153,33 +145,34 @@ namespace BarsWeb.Areas.ReserveAccs.Infrastructure.Repository.DI.Implementation
                 }
             }
         }
-
-        public void Activate(List<decimal> accountId)
+        public List<string> Activate(ReserveAccsKeys keys)
         {
             bool txCommitted = false;
+			var result_acc = new List<string>();
             using (var connection = OraConnector.Handler.UserConnection)
             {
                 OracleTransaction tx = connection.BeginTransaction();
                 try
                 {
-
-
-                    foreach (decimal id in accountId)
+                    foreach (decimal kv in keys.KV)
                     {
-                        String ob22 = GetOb22(connection, id);
+						//String ob22 = GetOb22(connection, id);
+						string t_acc = "";
                         OracleCommand cmd = connection.CreateCommand();
+						cmd.Transaction = tx;
                         cmd.CommandText = @"begin 
-                                                accreg.p_unreserve_acc(:p_acc, 1, :p_ob22);
+                                                accreg.p_unreserve_acc(:p_nls, :p_kv, :p_acc);
                                              end;";
                         cmd.Parameters.Clear();
-                        cmd.Parameters.Add("p_acc", OracleDbType.Decimal, id, ParameterDirection.Input);
-                        cmd.Parameters.Add("p_ob22", OracleDbType.Varchar2, ob22, ParameterDirection.Input);
+                        cmd.Parameters.Add("p_nls", OracleDbType.Varchar2, keys.NLS, ParameterDirection.Input);
+						cmd.Parameters.Add("p_kv", OracleDbType.Decimal, kv, ParameterDirection.Input);
+						cmd.Parameters.Add("p_acc", OracleDbType.Decimal, t_acc, ParameterDirection.Output);
                         cmd.ExecuteNonQuery();
-                    }
+						result_acc.Add(t_acc);
+					}
                     tx.Commit();
                     txCommitted = true;
                 }
-
                 catch (Exception e)
                 {
                     if (e.Message.StartsWith("ORA-20000"))
@@ -204,9 +197,9 @@ namespace BarsWeb.Areas.ReserveAccs.Infrastructure.Repository.DI.Implementation
                 {
                     if (!txCommitted) tx.Rollback();
                 }
-            }
+				return result_acc;
+			}
         }
-
         private String GetOb22(OracleConnection connection, Decimal accountId)
         {
             OracleCommand cmd = connection.CreateCommand();
@@ -222,7 +215,6 @@ namespace BarsWeb.Areas.ReserveAccs.Infrastructure.Repository.DI.Implementation
                 throw ex;
             }
         }
-
         private Decimal GetIsp(OracleConnection connection)
         {
             OracleCommand cmd = connection.CreateCommand();
@@ -238,6 +230,95 @@ namespace BarsWeb.Areas.ReserveAccs.Infrastructure.Repository.DI.Implementation
                 throw ex;
             }
         }
-    }
+		public List<Models.Bases.ReservedAccountBase> GetReadyEtalonAccounts(ReservedKey key)
+		{
+			var sql = String.Format("select acc as \"Id\", nls as \"Number\", kv as \"CurrencyId\", nms as \"Name\", rnk as \"CustomerId\" from accounts where nls = {0} and rnk = {1} and dazs is null", key.nls, key.rnk);
+			using (var connection = OraConnector.Handler.UserConnection)
+			{
+				return connection.Query<Models.Bases.ReservedAccountBase>(sql).ToList();
+			}
+		}
+		public List<V_RESERVED_ACC> GetReservedAccounts(ReservedKey key)
+		{
+			var sql = String.Format("select * from V_RESERVED_ACC where nls = {0} and rnk = {1}", key.nls, key.rnk);
+			using (var connection = OraConnector.Handler.UserConnection)
+			{
+				return connection.Query<V_RESERVED_ACC>(sql).ToList();
+			}
+		}
+		public void AcceptWithDublication(ReservedDublicateAccKey key)
+		{
+			using (var connection = OraConnector.Handler.UserConnection)
+			{
+				var transaction = connection.BeginTransaction();
+				using (var cmdInsertInfo = connection.CreateCommand())
+				{
+					cmdInsertInfo.Transaction = transaction;
+					cmdInsertInfo.CommandText = @"begin accreg.UNRSRV_ACC(
+													 :p_acc, 
+													 :p_kv,
+													 :p_errmsg ); end;";
+					try
+					{
+						var err_msg = "";
+						foreach (var kv in key.kv)
+						{
+							cmdInsertInfo.Parameters.Clear();
+							cmdInsertInfo.Parameters.Add("p_acc", OracleDbType.Decimal, key.acc, ParameterDirection.Input);
+							cmdInsertInfo.Parameters.Add("p_kv", OracleDbType.Decimal, kv, ParameterDirection.Input);
+							cmdInsertInfo.Parameters.Add("p_errmsg", OracleDbType.Varchar2, 4000, err_msg , ParameterDirection.Output);
+							cmdInsertInfo.ExecuteNonQuery();
+		
+							err_msg = Convert.ToString(cmdInsertInfo.Parameters["p_errmsg"].Value);
+							if (err_msg != "null")
+							{
+								throw new Exception(err_msg);
+							}
+						}
+						transaction.Commit();
+					}
+					catch (Exception ex)
+					{
+						transaction.Rollback();
+						throw ex;
+					}
+				}
+			}
+		}
+        public decimal GetCreatedAccNLSKV(string nls, int? kv)
+        {
+            var sql = String.Format("select a.acc from accounts a where a.nls = '{0}'  and a.kv = {1}", nls, kv);
+            using (var connection = OraConnector.Handler.UserConnection)
+            {
+                return connection.Query<decimal>(sql).SingleOrDefault();
+            }
+        }
+		public string PrintDoc(ReservedPrintKey key)
+		{
+			string fileName = string.Empty;
+			RtfReporter rep = new RtfReporter(new WebService().Context);
+			rep.RoleList = "reporter,cc_doc";
+			rep.TemplateID = key.templateId;
+
+			using (var connection = OraConnector.Handler.UserConnection)
+			{
+				var sql = String.Format("select RSRV_ID from v_reserved_acc a where a.nls = '{0}' and a.kv = {1}", key.nls, key.kv);
+				var reserve_id = connection.Query<int>(sql).SingleOrDefault();
+				rep.ContractNumber = Convert.ToInt64(reserve_id);
+			}
+
+			rep.Generate();
+			var tmp = rep.ReportFile;
+			return tmp;
+		}
+		public List<SpecParamList> GetPrintDocs()
+		{
+			var sql = @"select d.ID, d.NAME from doc_scheme d where d.id like 'RSRV_%'";
+			using (var connection = OraConnector.Handler.UserConnection)
+			{
+				return connection.Query<SpecParamList>(sql).ToList();
+			}
+		}
+	}
 }
 

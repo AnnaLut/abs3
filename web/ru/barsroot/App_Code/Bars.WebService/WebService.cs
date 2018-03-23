@@ -15,6 +15,7 @@ using BarsWeb.Areas.Kernel.Models;
 using Kendo.Mvc;
 using Kendo.Mvc.UI;
 using CommandType = System.Data.CommandType;
+using barsroot.core;
 
 namespace Bars
 {
@@ -33,6 +34,75 @@ namespace Bars
             //Context.Response;
         }
         private IContainer components = null;
+
+        #region Login
+        protected string GetHostName()
+        {
+            string userHost = HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
+
+            if (String.IsNullOrEmpty(userHost) || String.Compare(userHost, "unknown", true) == 0)
+                userHost = HttpContext.Current.Request.UserHostAddress;
+
+            if (String.Compare(userHost, HttpContext.Current.Request.UserHostName) != 0)
+                userHost += " (" + HttpContext.Current.Request.UserHostName + ")";
+
+            return userHost;
+        }
+        protected void LoginUser(String userName)
+        {
+            // информаци€ о текущем пользователе
+            UserMap userMap = Bars.Configuration.ConfigurationSettings.GetUserInfo(userName);
+
+            try
+            {
+                InitOraConnection();
+                // установка первичных параметров
+                SetParameters("p_session_id", DB_TYPE.Varchar2, Session.SessionID, DIRECTION.Input);
+                SetParameters("p_user_id", DB_TYPE.Varchar2, userMap.user_id, DIRECTION.Input);  //ERROR
+                SetParameters("p_hostname", DB_TYPE.Varchar2, GetHostName(), DIRECTION.Input);
+                SetParameters("p_appname", DB_TYPE.Varchar2, "barsroot", DIRECTION.Input);
+                SQL_PROCEDURE("bars.bars_login.login_user");
+            }
+            finally
+            {
+                DisposeOraConnection();
+            }
+
+            // ≈сли выполнили установку параметров
+            Session["UserLoggedIn"] = true;
+        }
+
+        protected void LoginUserInt(String userName)
+        {
+            // информаци€ о текущем пользователе
+            UserMap userMap = Bars.Configuration.ConfigurationSettings.GetUserInfo(userName);
+
+            try
+            {
+                InitOraConnection();
+                // установка первичных параметров
+                ClearParameters();
+                SetParameters("p_session_id", DB_TYPE.Varchar2, Session.SessionID, DIRECTION.Input);
+                SetParameters("p_user_id", DB_TYPE.Varchar2, userMap.user_id, DIRECTION.Input);
+                SetParameters("p_hostname", DB_TYPE.Varchar2, RequestHelpers.GetClientIpAddress(HttpContext.Current.Request), DIRECTION.Input);
+                SetParameters("p_appname", DB_TYPE.Varchar2, "barsroot", DIRECTION.Input);
+                SQL_PROCEDURE("bars.bars_login.login_user");
+
+                ClearParameters();
+                SetParameters("p_info", DB_TYPE.Varchar2,
+                    String.Format("STOService: авторизаци€. ’ост {0}, пользователь {1}", RequestHelpers.GetClientIpAddress(HttpContext.Current.Request), userName),
+                    DIRECTION.Input);
+                SQL_PROCEDURE("bars_audit.info");
+            }
+            finally
+            {
+                DisposeOraConnection();
+            }
+
+            // ≈сли выполнили установку параметров
+            Session["UserLoggedIn"] = true;
+        }
+        #endregion
 
         /// <summary>
         /// Required method for Designer support - do not modify
@@ -375,7 +445,7 @@ namespace Bars
                 //бывает просто перечень полей дл€ сортировки через зап€тую
                 if (data[3].IndexOf(", ") >= 0)
                 {
-                    string[] sort = data[3].Split(new[] {", "}, StringSplitOptions.None);
+                    string[] sort = data[3].Split(new[] { ", " }, StringSplitOptions.None);
                     foreach (var sortItem in sort)
                     {
                         request.Sorts.Add(new SortDescriptor()
@@ -395,7 +465,7 @@ namespace Bars
                         SortDirection = sort[1].ToUpper() == "DESC" ? ListSortDirection.Descending : ListSortDirection.Ascending
                     });
                 }
-                
+
             }
             //2. —оздадим конвертер и произведем конвертацию
             KendoSqlTransformer sqlTransformer = new KendoSqlTransformer(null);

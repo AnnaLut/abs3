@@ -606,7 +606,7 @@ public partial class DptClientRequestCreate : Bars.BarsPage
             Bars.EAD.EadPack ep = new Bars.EAD.EadPack(new ibank.core.BbConnection());
 
             // Страховочна синхронізація клієнта в ЕАД
-            Decimal? ClientApplicationID = ep.MSG_CREATE("CLIENT", cust_id.ToString(), (Int64)cust_id);
+            Decimal? ClientApplicationID = ep.MSG_CREATE("CLIENT", cust_id.ToString(), (UInt64?)cust_id);
 
             if (req_type == 0)
             {
@@ -618,7 +618,7 @@ public partial class DptClientRequestCreate : Bars.BarsPage
                 for (int i = 0; i < AccessList.Count; i++)
                 {
                     // Страховочна синхронізація договору в ЕАД
-                    Decimal? DealApplicationID = ep.MSG_CREATE("AGR", "DPT;" + AccessList[i].DPT_ID.ToString(), (Int64)cust_id);
+                    Decimal? DealApplicationID = ep.MSG_CREATE("AGR", "DPT;" + AccessList[i].DPT_ID.ToString(), (UInt64?)cust_id);
 
                     // Заява на доступ до вкладного рахунку
                     Decimal? AccessApplicationID = ep.DOC_CREATE("SCAN", null, scAccessApplication.Value, 224, cust_id, AccessList[i].DPT_ID);

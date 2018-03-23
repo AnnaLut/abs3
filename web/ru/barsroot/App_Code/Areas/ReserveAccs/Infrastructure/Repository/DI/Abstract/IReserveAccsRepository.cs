@@ -1,6 +1,8 @@
 ﻿using Areas.Admin.Models;
 using BarsWeb.Areas.Admin.Models;
+using BarsWeb.Areas.BpkW4.Models;
 using BarsWeb.Areas.ReserveAccs.Models;
+using BarsWeb.Areas.ReserveAccs.Models.Bases;
 using Kendo.Mvc.UI;
 using System;
 using System.Collections.Generic;
@@ -13,6 +15,12 @@ namespace BarsWeb.Areas.ReserveAccs.Infrastructure.Repository.DI.Abstract
         decimal Reserved(ReservedAccountRegister account);
         List<SpecParamList> GetSpecParamList();
         String GetNDBO(Decimal rnk);
-        void Activate(List<decimal> accountId);
-    }
+		List<string> Activate(ReserveAccsKeys keys);
+		List<ReservedAccountBase> GetReadyEtalonAccounts(ReservedKey key);
+		List<V_RESERVED_ACC> GetReservedAccounts(ReservedKey key);
+		List<SpecParamList> GetPrintDocs();
+		void AcceptWithDublication(ReservedDublicateAccKey key);
+		decimal GetCreatedAccNLSKV(string nls, int? kv);
+		string PrintDoc(ReservedPrintKey key);
+	}
 }
