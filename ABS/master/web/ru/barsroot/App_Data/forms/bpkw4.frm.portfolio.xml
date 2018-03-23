@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <xmlform captiontype="OnlyTitle" caption="Дата видачі карти">
   <grids>
     <grid table="W4_DEAL_WEB" id="gv" pagesize="10" showpagesizebox="true" title="Way4. Портфель БПК" showfilter="true">
@@ -50,13 +50,20 @@
               </parameter>
             </parameters>
           </command>
-        </button>
+        </button>        
         <button id="btnPrint" caption="Друк договорів" hint="Друк договорів">
           <command type="Redirect" url="/barsroot/printcontract/index?multiSelection=true">
             <sessionVariables>
               <variable name="multiprint_id" field="ACC_ACC"></variable>
               <variable name="multiprint_filter" field="DOC_ID"></variable>
             </sessionVariables>
+          </command>
+        </button>
+        <button id="btnPrintIns" caption="Друк договорів страхування" hint="Друк договорів страхування">
+          <command type="Redirect" url="/barsroot/InsUi/cardinsurance" checkselectedrow="false">
+            <parameters>
+              <parameter type="DataField" name="ND" altname="bpkw4nd"></parameter>
+            </parameters>
           </command>
         </button>
         <button id="btnFormRequest" caption="Сформувати запит" hint="Сформувати запит" >
@@ -87,7 +94,7 @@
             </sessionVariables>
           </command>
         </button>
-
+        
         <button id="btnAdditionalKkSCH" caption="Дод.карта школяра" hint="Додаткова картка  школяра">
           <command type="Redirect" url="/barsroot/cardkiev/cardkievparams.aspx?card_kiev=1sch">
             <sessionVariables>
@@ -97,17 +104,17 @@
             </sessionVariables>
           </command>
         </button>
-
+        
         <button id="btnLongTerm" caption="Довгострокове доручення" hint="Довгострокове доручення">
           <command type="Redirect" url="/barsroot/w4/AddRegularPayment.aspx" checkselectedrow="true" target="Self">
             <parameters>
               <parameter type="DataField" datatype="String" name="ACC_NLS" altname="NLS">
-              </parameter>
+               </parameter>
               <parameter type="DataField" datatype="String" name="CUST_RNK" altname="RNK">
               </parameter>
               <parameter type="DataField" datatype="String" name="CUST_NAME" altname="NMK">
               </parameter>
-              <parameter type="DataField" datatype="String" name="ACC_KV" altname="KV">
+                <parameter type="DataField" datatype="String" name="ACC_KV" altname="KV">
               </parameter>
               <parameter type="DataField" datatype="String" name="ACC_OB22" altname="OB22">
               </parameter>
@@ -118,24 +125,15 @@
             </parameters>
           </command>
         </button>
-
-        <button id="addToDKBO" caption="Приєднати до ДКБО" hint="Приєднати до ДКБО">
-          <command type="Redirect" url="/barsroot/bpkw4/checkdkbo/index" checkselectedrow="true" target="Self">
+        <button id="addCollateral" caption="Договір забезпечення" hint="Створити/приєднати договір забезпечення">
+          <command type="Redirect" url="/barsroot/CreditUi/Provide/Index?tip=3" checkselectedrow="false" target="Self">
             <parameters>
-              <parameter type="DataField" datatype="String" name="CUST_RNK" altname="RNK">
-              </parameter>
-              <parameter type="DataField" datatype="String" name="ACC_ACC" altname="ACC_ACC">
-              </parameter>
-              <parameter type="DataField" datatype="Int64" name="ISDKBO" altname="ISDKBO">
-              </parameter>
-              <parameter type="DataField" datatype="Int64" name="IS_ACC_CLOSE" altname="IS_ACC_CLOSE">
-              </parameter>
+              <parameter type="DataField" name="ND" altname="id"></parameter>
             </parameters>
           </command>
-        </button>
-
+        </button>		
+		
       </buttons>
-
       <rowselection method="SingleRow" />
       <editform style="Dialog" title="" width="400" >
         <buttons defaulttype="Button">
@@ -288,7 +286,6 @@
             <uicontrol type="Text" />
           </form>
         </field>
-
         <field name="BARCOD" key="false" datatype="String" sort="default">
           <column show="true" caption="Штрих–код" align="center" />
           <form show="true" rwmode="RW" required="false">
@@ -298,18 +295,6 @@
         <field name="COBRANDID" key="false" datatype="String" sort="default">
           <column show="true" caption="Ід ко-бренду" align="center" />
           <form show="true" rwmode="RW" required="false">
-            <uicontrol type="Text" />
-          </form>
-        </field>
-        <field name="ISDKBO" key="true" datatype="Int64">
-          <column show="true" caption="Рахунок приєднано до ДКБО" align="center" />
-          <form show="true" rwmode="RW" required="false">
-            <uicontrol type="CheckBox" truevalue="1"  readonly="true"/>
-          </form>
-        </field>
-        <field name="IS_ACC_CLOSE" key="true" datatype="Int64" sort="default">
-          <column show="false" caption="IS_ACC_CLOSE" align="right" />
-          <form show="false" rwmode="RW" required="false">
             <uicontrol type="Text" />
           </form>
         </field>

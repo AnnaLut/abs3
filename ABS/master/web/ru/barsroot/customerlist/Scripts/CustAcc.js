@@ -231,7 +231,7 @@ function fnCloseAcc() {
         //перевірка группи клієнта та рахунку до закриття
         $.ajax({
             type: "GET",
-            url: bars.config.urlContent("/api/custacc/start/BackOfficeCheck/"),
+            url: bars.config.urlContent("/api/custacc/start/"),
 			success: function (result) {
 				if (result !== 0) {
 					fnRunCloseAcc(nls, vid);
@@ -242,8 +242,6 @@ function fnCloseAcc() {
 				}
             }
         });
-
- 
     }
 }
 

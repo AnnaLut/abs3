@@ -19,7 +19,6 @@ public partial class CardKievCardKievParams : Page
     private const string KkRegisterBuildTag = "W4KKB";
     private const string KkRegisterZipTag = "W4KKZ";
     private const string KkRegisterSKTag = "W4SKS";
-    private const string KkS2Sotszahist = "W4KKC";
 
 
     private bool hasCardKiev = false;
@@ -41,9 +40,19 @@ public partial class CardKievCardKievParams : Page
     {
         if (Session["docNumberKK"] == null)
         {
+
+	    if (!string.IsNullOrEmpty(Request.Params["frm_id"]))
+            {
+                return string.Format(
+                "/barsroot/barsweb/dynform.aspx?form={0}&rnk={1}&proect_id={2}&card_code={3}",
+                Request.Params["frm_id"],
+                currentRnk,
+                Request.Params["proect_id"],
+                Request.Params["card_code"]);
+            }
             return string.Format(
-                "/barsroot/barsweb/dynform.aspx?form={0}&rnk={1}&proect_id={2}&card_code={3}",                
-                string.IsNullOrEmpty(Request.Params["frm_id"]) ? "bpkw4.frm.newdeal" : Request.Params["frm_id"],
+                //"/barsroot/barsweb/dynform.aspx?form=bpkw4.frm.newdeal&rnk={0}&proect_id={1}&card_code={2}",
+                "/barsroot/bpkw4/RegisteringNewCard?rnk={0}&proectId={1}&cardCode={2}",
                 currentRnk,
                 Request.Params["proect_id"],
                 Request.Params["card_code"]);
@@ -396,31 +405,6 @@ public partial class CardKievCardKievParams : Page
         }
     }
 
-    void DeleteInsert2Customerw(string tag, string value)
-    {
-        OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
-        OracleCommand cmdInsert = con.CreateCommand();
-        OracleCommand cmdDelete = con.CreateCommand();
-        try
-        {
-            cmdDelete.CommandText = "delete from customerw cw where cw.rnk = :p_rnk and cw.tag = :p_tag";
-            cmdDelete.Parameters.Add("p_rnk", OracleDbType.Int64, currentRnk, ParameterDirection.Input);
-            cmdDelete.Parameters.Add("p_tag", OracleDbType.Varchar2, tag, ParameterDirection.Input);
-            cmdDelete.ExecuteNonQuery();
-
-            cmdInsert.CommandText = "insert into customerw (rnk, tag, value, isp) values (:p_rnk, :p_tag, :p_value, 0)";
-            cmdInsert.Parameters.Add("p_rnk", OracleDbType.Int64, currentRnk, ParameterDirection.Input);
-            cmdInsert.Parameters.Add("p_tag", OracleDbType.Varchar2, tag, ParameterDirection.Input);
-            cmdInsert.Parameters.Add("p_value", OracleDbType.Varchar2, value, ParameterDirection.Input);
-            cmdInsert.ExecuteNonQuery();
-        }
-        finally
-        {
-            con.Close();
-            con.Dispose();
-        }
-    }
-
     private void LoadPassword()
     {
         OracleConnection connect = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
@@ -522,8 +506,6 @@ public partial class CardKievCardKievParams : Page
         {
             SavePassword(tbPassWord.Text.Trim());
             SaveAddress();
-
-            DeleteInsert2Customerw(KkS2Sotszahist, SENT_TO_SOTSZAHIST.Value);
 
             if (Session["docNumberKK"] != null)
             {

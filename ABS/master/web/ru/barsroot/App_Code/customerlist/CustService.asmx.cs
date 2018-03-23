@@ -250,6 +250,10 @@ namespace CustomerList
                     return "Клиент не может быть перерегистрирован датой (" + bdate.ToShortDateString() + "), меньшей даты открытия (" + date.ToShortDateString() + ").";
                 SetParameters("rnk", DB_TYPE.Decimal, rnk, DIRECTION.Input);
                 SQL_NONQUERY("UPDATE customer SET date_off=NULL WHERE rnk=:rnk");
+                ClearParameters();
+                SetParameters("p_rnk", DB_TYPE.Decimal, rnk, DIRECTION.Input);
+                SQL_NONQUERY("BEGIN fm_set_rizik(:p_rnk); END;");
+                ClearParameters();				
                 return "";
             }
             finally
@@ -556,7 +560,7 @@ namespace CustomerList
                 else if (type == "11")
                 {
                     SetRole(base_role);
-                    table = "V_ACCOUNTS";
+                    table = "V_ACCOUNTS_PREM";
                 }
 
                 string query = BuildSelectStatementForTable(sql, table + " a", where, data, false);

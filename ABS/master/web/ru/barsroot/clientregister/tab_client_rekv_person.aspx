@@ -166,7 +166,7 @@
                                 <td runat="server" meta:resourcekey="tdOrg">Кем выдан
                                 </td>
                                 <td>
-                                    <input class="edit long" id="ed_ORGAN" tabindex="5" type="text" maxlength="70" />
+                                    <input class="edit long" id="ed_ORGAN" tabindex="5" type="text" maxlength="150" />
                                     <button id="bt_help"
                                         style="height: 24px"
                                         onclick="GetOrganHelp();ToDoOnChange();"

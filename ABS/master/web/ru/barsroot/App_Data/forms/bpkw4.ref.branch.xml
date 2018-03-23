@@ -4,7 +4,7 @@
     <grid id="gBranch" pagesize="10">
       <datasource>
         <sql>
-          select branch, name from our_branch where length(branch)>=15 order by branch
+          select branch, name from v_branch_obu order by branch
         </sql>
       </datasource>
       <fields>

@@ -69,7 +69,7 @@ bars.ui.dialog = function (options) {
     var buttonTemplate = '<button class="delete-confirm k-button" style="float:right;margin:7px 5px 7px 5px;">{0}</button>';
     var controls;
     if (options.buttons != null) {
-        controls = $('<div />', { 'class': 'k-content k-window-footer' }); 
+        controls = $('<div />', { 'class': 'k-content k-window-footer', 'style':'position: absolute; width: 99%;' }); 
         alert.parent().addClass('with-footer').append(controls);
         
         $.each(options.buttons,function(index,value) {

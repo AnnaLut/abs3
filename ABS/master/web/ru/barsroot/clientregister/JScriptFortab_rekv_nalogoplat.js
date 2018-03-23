@@ -124,7 +124,7 @@ function GetC_dstList() {
                     //newItem.innerText = responce.Data[i];
 
                     newItem.value = trim(responce.Data[i].C_DST);
-                    newItem.innerText = trim(responce.Data[i].NAME_STI);
+                    newItem.innerText = trim(responce.Data[i].C_DST) + " - " + trim(responce.Data[i].NAME_STI);
                 }
             }
 		});

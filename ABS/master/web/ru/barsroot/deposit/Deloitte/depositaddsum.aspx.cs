@@ -285,6 +285,16 @@ public partial class DepositAddSum : Bars.BarsPage
 
             result = Convert.ToDecimal(Convert.ToString(cmdCheckStopFunc.ExecuteScalar()));
 
+            // стоп-правило на ограничение пополнения за период
+            cmdCheckStopFunc.Parameters.Clear();
+            cmdCheckStopFunc.Parameters.Add("kod", OracleDbType.Decimal, 17, ParameterDirection.Input);
+            cmdCheckStopFunc.Parameters.Add("kv", OracleDbType.Decimal, Kv, ParameterDirection.Input);
+            cmdCheckStopFunc.Parameters.Add("nls", OracleDbType.Varchar2, Nls, ParameterDirection.Input);
+            cmdCheckStopFunc.Parameters.Add("s", OracleDbType.Decimal, SUM, ParameterDirection.Input);
+
+            _dbLogger.Info("SUM " + SUM.ToString() + "", "deposit");
+            result = Convert.ToDecimal(Convert.ToString(cmdCheckStopFunc.ExecuteScalar()));
+
             _dbLogger.Debug("Стоп функция на пополнение счёта для депозита № " + dpt_id +
                 " завершилась. Текущий депозитный договор можно пополнять.", "deposit");
             
@@ -351,7 +361,7 @@ public partial class DepositAddSum : Bars.BarsPage
         if (textContractAddSum.ValueDecimal >= textMinAddSum.ValueDecimal)
         {
          //   DBLogger.Info("Сума поповнення депозиту #" + textMinAddSum.ValueDecimal.ToString() + "", "deposit");
-            CheckStopFunction(textMinAddSum.ValueDecimal * 100, Convert.ToDecimal(Kv_B.Value), Nls_A.Value, dpt_id.Value);
+            CheckStopFunction(textContractAddSum.ValueDecimal * 100, Convert.ToDecimal(Kv_B.Value), Nls_A.Value, dpt_id.Value);
 
             // Друк анкети для фін.моніторингу
             if (eadFinmonQuestionnaire.Visible && Tools.PrintQuestionnaire(Convert.ToInt32(Kv_B.Value), textContractAddSum.ValueDecimal * 100))

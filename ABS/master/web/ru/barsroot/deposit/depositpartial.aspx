@@ -15,6 +15,16 @@
 	<link href="/Common/css/barsgridview.css" type="text/css" rel="stylesheet"/>		
 	<script type="text/javascript" language="javascript" src="js/js.js?v1.1"></script>
 	<script type="text/javascript" language="javascript" src="js/ck.js"></script>
+    <style>
+        .normalRow
+        {
+            background-color: white;
+        }
+        .NoActive
+        {
+            background-color: lightcoral;
+        }
+    </style>
 </head>
 <body>
     <form id="form1" runat="server">
@@ -72,6 +82,13 @@
                             </asp:BoundField>
                             <asp:BoundField DataField="CERTIF_DATE" HeaderText="Дата свідоцтва про права">
                             </asp:BoundField>
+                            <asp:BoundField Visible="false" DataField="INHERIT_STATE" HeaderText="Статус активації">
+                            </asp:BoundField>
+                             <asp:TemplateField HeaderText="Статус активації">
+                                <ItemTemplate>
+                                    <asp:Label ID="State" runat="server" Text='<%# Eval("INHERIT_STATE").ToString() == "1" ? "Активний" : "Неактивний"%>'></asp:Label>
+                                </ItemTemplate>
+                            </asp:TemplateField>
                             <asp:BoundField Visible="false" DataField="ATTR_INCOME" HeaderText="Код ознаки доходу">
                             </asp:BoundField>
                             <asp:BoundField Visible="false" DataField="NAME_INCOME" HeaderText="Ознака доходу">
@@ -83,7 +100,7 @@
                         </Columns>
                     </Bars:BarsGridViewEx>
                 </td>
-        </tr>                
+        </tr> 
         <tr>
             <td>
                 <asp:FormView ID="fvInheritor" runat="server" DataSourceID="dsInheritor" 
@@ -231,7 +248,7 @@
         <tr>
             <td>
                 <Bars:barssqldatasource ProviderName="barsroot.core" ID="dsInheritors" runat="server"
-                    SelectCommand="select INHERIT_ID, INHERIT_NAME, INHERIT_SHARE, INHERIT_DATE, CERTIF_NUM, CERTIF_DATE from v_dpt_inheritors h where h.dpt_id = :DPT_ID ">
+                    SelectCommand="select INHERIT_ID, INHERIT_NAME, INHERIT_SHARE, INHERIT_DATE, CERTIF_NUM, CERTIF_DATE, INHERIT_STATE from v_dpt_inheritors h where h.dpt_id = :DPT_ID ">
                     <SelectParameters>
                         <asp:ControlParameter ControlID="dpt_id" Name="DPT_ID" PropertyName="Value" />
                     </SelectParameters>

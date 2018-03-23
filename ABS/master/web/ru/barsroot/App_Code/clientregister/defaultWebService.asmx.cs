@@ -19,6 +19,7 @@ using BarsWeb.Core.Logger;
 using ibank.core;
 using Bars.UserControls;
 using barsroot.core;
+using System.Text;
 
 namespace clientregister
 {
@@ -436,7 +437,7 @@ namespace clientregister
         /// <param name="val">возврат кодовых значений</param>
         /// <param name="txt">возврат текстовых значений</param>
         [WebMethod(EnableSession = true)]
-        public List<TgrRecord> GetTgrList(String CType)
+        public List<TgrRecord> GetTgrList(String CType, int rezid)
         {
             List<TgrRecord> res = new List<TgrRecord>();
 
@@ -447,7 +448,9 @@ namespace clientregister
             switch (CType)
             {
                 case "person":
-                    break;
+					if(rezid == 1)
+						cmd.CommandText += "where tgr in (2, 5) ";
+					break;
                 case "corp":
                 case "bank":
                     cmd.CommandText += "where tgr in (1, 3) ";
@@ -2101,13 +2104,36 @@ namespace clientregister
                     {
                         WriteRnkRekvToDatabase(myClient);
                     }
-
+					if (ID == "") //new customer
+					{ 
+						ClearParameters();
+						SetParameters("Rnk_", DB_TYPE.Decimal, Convert.ToDecimal(myClient.ID), DIRECTION.Input);
+						SetParameters("Tag_", DB_TYPE.Varchar2, "PUBLP", DIRECTION.Input);
+						SetParameters("Val_", DB_TYPE.Varchar2, "Нi", DIRECTION.Input);
+						SetParameters("Otd_", DB_TYPE.Decimal, 0, DIRECTION.Input);
+						SQL_PROCEDURE("kl.setCustomerElement");
+					}
                     WriteDopRekvToDatabase(myClient,
                                             custAttrList,
                                             custAttrCheck,
                                             custRiskList,
                                             custReptList);
-                    if (myClient.CUSTTYPE == "person")
+
+					//check extra fin reqv if user turn of frontend validation 		
+					//Actors are corp clients or persons
+					//which are Bank Clients
+					if ((myClient.CUSTTYPE == "person" || myClient.CUSTTYPE == "corp") && myClient.BC != "1")
+					{
+						int current_custtype = 3; //person as default
+                        if (myClient.CUSTTYPE == "corp")
+                            current_custtype = 2;
+						ForceCheckFinRekv(  Convert.ToDecimal(myClient.ID),
+											current_custtype,
+											Convert.ToInt32(CODCAGENT),
+											Convert.ToInt32(K050));
+					}
+
+					if (myClient.CUSTTYPE == "person")
                     {
 
                         WritePersonToDatabase(myClient);
@@ -2174,12 +2200,153 @@ namespace clientregister
 
             return res;
         }
-        /// <summary>
-        /// перевірити наявність зареєстрованого олієнта 
-        /// </summary>
-        /// <param name="client">данні клієнта</param>
-        /// <returns></returns>
-        public RegistrationResult VerifyExistingClient(Client client)
+		enum CustTypes
+		{
+			bank = 1,
+			corp = 2,
+			person = 3
+		}
+		private string GetDoprekvMainFillingSign(int custtype, int nRezId, int k050)
+		{
+			string sqlTail;
+			if (custtype == 1)
+			{ 
+				sqlTail = "f.b";
+			}
+			else if (custtype == 2)
+			{	
+				sqlTail = ((nRezId == 1) ? ("f.u") : ("f.u_nrez"));
+			}
+			else
+			{
+				if (nRezId == 1)
+				{ 
+					if (k050 == 910)
+					{ 
+						sqlTail = "f.f_spd";
+					}
+					else
+					{ 
+						sqlTail = "f.f";
+					}
+				}
+				else
+				{ 
+					sqlTail = "f.f_nrez";
+				}
+			}
+			return sqlTail;
+		}
+		private int IsRezident(int codagetn)
+		{
+			var agentCodes = new List<int>();
+			using (OracleCommand cmd = GetOraConnection().CreateCommand())
+			{
+				cmd.Parameters.Clear();
+				cmd.CommandText = @"select * from codcagent where rezid = 1";
+				using (var reader = cmd.ExecuteReader())
+				{
+					while (reader.Read())
+					{
+						agentCodes.Add(Convert.ToInt32(reader["codcagent"]));
+					}
+				}
+			}
+			return (agentCodes.Contains(codagetn)) ? 1 : 0;
+		}
+		private void ForceCheckFinRekv(decimal rnk, int custtype, int codcagent, int k050)
+		{
+			var fillSign = GetDoprekvMainFillingSign(custtype, IsRezident(codcagent), k050);
+			var sqlTailUsed = string.Format("and nvl({0}, 0) > 0 ", fillSign);
+
+			var emptyRekv = CheckRekv(rnk, "FM", fillSign, sqlTailUsed);
+			if (!String.IsNullOrEmpty(emptyRekv))
+			{
+				var initPhrase = @"Для збереження необхідно заповнити Дод. реквізити фінмоніторінгу:<br>" + emptyRekv;
+				throw new Exception(initPhrase);
+			}
+		}
+		/// <summary>
+		/// General function for force validation of clients additional details
+		/// parametr rekvCodde controlld group ov client details
+		/// -- GENERAL - main details
+		/// -- FM      - financial monitoring
+		/// -- DTP	   - deposites
+		/// -- BPK	   - bank payment card
+		/// -- SANKC   - sanctions
+		/// -- OTHERS  - other details
+		/// -- CRISK   - risk criteria
+		/// </summary>
+		/// <param name="rnk"></param>
+		/// <param name="rekvCodde"></param>
+		/// <param name="optField"></param>
+		/// <param name="optCase"></param>
+		/// <returns></returns>
+		private string CheckRekv(decimal rnk, string rekvCodde, string optField, string optCase)
+		{
+			var sql = String.Format(@"SELECT 
+										b.tag,
+										b.name name,
+										b.opt, 
+										w.value
+									FROM ( SELECT 
+												f.tag,
+												f.name, 
+												decode(nvl({0},0),0,0,1,0,2,1) opt, 
+												nvl(a.isp,0) isp 
+											FROM ( SELECT 
+														tag, 
+														max(isp) isp 
+													FROM 
+														v_customerw 
+													WHERE 
+														rnk= :p_rnk
+														AND isp in (0,(select otd 
+																		from otd_user 
+																		where userid = bars.user_id 
+																			and rownum = 1) ) 
+													GROUP BY tag
+												) a, 
+												customer_field f
+												WHERE 
+												a.tag(+)= f.tag 
+												and code= :p_code {1} 
+										) b, 
+										v_customerw w 
+									WHERE 
+										b.tag = w.tag(+) 
+										AND b.isp = w.isp(+) 
+										AND w.rnk(+) = :p_rnk
+										AND b.opt = 1", optField, optCase);
+
+			var requiredEmptyDopReqv = new StringBuilder();
+			using (OracleCommand cmd = GetOraConnection().CreateCommand())
+			{
+				cmd.Parameters.Clear();
+				cmd.Parameters.Add("p_rnk", OracleDbType.Decimal, rnk, ParameterDirection.Input);
+				cmd.Parameters.Add("p_code", OracleDbType.Varchar2, rekvCodde, ParameterDirection.Input);
+				cmd.CommandText = sql;
+				using (var reader = cmd.ExecuteReader())
+				{
+					while (reader.Read())
+					{
+						if (reader["VALUE"].ToString() == "")
+						{
+							if(reader["TAG"].ToString() != "PUBLP") //has default value in database
+								requiredEmptyDopReqv.Append("- " + reader["NAME"].ToString() + "<br>");
+						}
+					}
+				}
+			}
+			return requiredEmptyDopReqv.ToString();
+		}
+
+		/// <summary>
+		/// перевірити наявність зареєстрованого олієнта 
+		/// </summary>
+		/// <param name="client">данні клієнта</param>
+		/// <returns></returns>
+		public RegistrationResult VerifyExistingClient(Client client)
         {
             var result = new RegistrationResult();
             using (OracleCommand cmd = GetOraConnection().CreateCommand())
@@ -3065,15 +3232,15 @@ namespace clientregister
             //}
         }
 
-        private void UpdateAccPhones(string oldPhone, string newPhone, decimal? rnk)
-        {
-            ClearParameters();
+       private void UpdateAccPhones(string oldPhone, string newPhone, decimal rnk)
+		{
+			ClearParameters();
 
-            SetParameters("p_old_phone", DB_TYPE.Varchar2, GetParamObj("Str", oldPhone), DIRECTION.Input);
-            SetParameters("p_new_phone", DB_TYPE.Varchar2, GetParamObj("Str", newPhone), DIRECTION.Input);
-            SetParameters("p_rnk", DB_TYPE.Decimal, GetParamObj("Dec", newPhone), DIRECTION.Input);
-            SQL_PROCEDURE("bars_sms_acc.change_acc_phones");
-        }
+			SetParameters("p_old_phone", DB_TYPE.Varchar2, GetParamObj("Str", oldPhone), DIRECTION.Input);
+			SetParameters("p_new_phone", DB_TYPE.Varchar2, GetParamObj("Str", newPhone), DIRECTION.Input);
+			SetParameters("p_rnk", DB_TYPE.Decimal, GetParamObj("Dec", rnk.ToString()), DIRECTION.Input);
+			SQL_PROCEDURE("bars_sms_acc.change_acc_phones");
+		}
 
         [WebMethod(EnableSession = true)]
         public int CheckSPValue(string tag, string tabname, string value)

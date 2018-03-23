@@ -2,7 +2,8 @@
 @{
     string title = "Список на компенсацію";
 }
-<script src="~/Areas/Escr/Scripts/RefList.js"></script>
+<script src="@Url.Content("~/lib/jsZip/jszip.js")"></script>
+<script src="~/Areas/Escr/Scripts/RefList.js?v.1.0.1"></script>
 <link href="~/Areas/Escr/Css/portfolio.css" rel="stylesheet" />
 <h1>@title</h1>
 <style>
@@ -10,13 +11,22 @@
         margin-right: 7px;
     }
 
-     .k-grid table{
-          width: auto;
-      }
+    .k-grid table {
+        table-layout: fixed;
+    }
 
      .k-grid-content {
-          max-height: 700px;
+          max-height: 400px;
       }
-</style>
 
+    .k-tooltip {
+        background: gray !important;
+        width: 500px;
+    }
+
+    .red {
+        background-color: #fca6a6;
+    }
+</style>
+    <h4>Оплата буде виконана лише по референсам за поточний місяць</h4>
     <div id="gridRefList" class="fixed_headers" > </div >

@@ -11,6 +11,7 @@ namespace BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Abstract
         decimal CountGlobal(DataSourceRequest request, BarsSql searchQuery);
         IEnumerable<T> ExecuteStoreQuery<T>(BarsSql searchQuery);
         int ExecuteStoreCommand(string commandText, params object[] parameters);
+		void Activate(IList<decimal> data, int confirm);
     }
 }
 

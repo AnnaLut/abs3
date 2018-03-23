@@ -384,8 +384,8 @@ namespace Bars.WebServices
                                         cmd.Parameters.Add("p_ref", OracleDbType.Decimal, null, ParameterDirection.Output);
                                         cmd.Parameters.Add("p_errcode", OracleDbType.Decimal, null, ParameterDirection.Output);
                                         cmd.Parameters.Add("p_errmsg", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output);
-
-                                        cmd.Parameters.Add("p_operw", OracleDbType.Varchar2, Doc.AdditionalOperRequisites, ParameterDirection.Input);
+										
+										cmd.Parameters.Add("p_operw", OracleDbType.Varchar2, Doc.AdditionalOperRequisites, ParameterDirection.Input);
 
                                         cmd.ExecuteNonQuery();
 

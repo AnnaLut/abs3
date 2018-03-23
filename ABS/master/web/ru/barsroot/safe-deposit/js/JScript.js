@@ -58,7 +58,7 @@ function BacktoPortfolioAll() {
 
 function GetNewTemplate()
 {
-    var url = 'dialog.aspx?type=metatab&role=wr_metatab&tabname=DOC_SCHEME&tail="ID LIKE \'%SKRN%\'"';
+    var url = 'dialog.aspx?type=metatab&role=wr_metatab&tabname=DOC_SCHEME&tail="ID LIKE \'SKRN%\'"';
     url +="&code=" + Math.random();
     
     var result = window.showModalDialog(url,"",
@@ -444,7 +444,7 @@ function FormNotFilled()
     arr[12] = { code: 'KEY_NUM', name: 'Кількість ключів' };
     arr[14] = { code: 'KEYS_GIVEN', name: 'Отримано ключів' };
     arr[15] = { code: 'listTarif', name: 'Тариф' };
-    arr[17] = { code: 'TEL', name: 'Телефон' };
+  
     if (document.getElementById('CUSTTYPE').value == "2") 
     {
                 arr[15] = 'MFO';
@@ -455,7 +455,10 @@ function FormNotFilled()
         //      arr[20] = 'TRUSTEE_ISSUED';
         //      var _div = document.getElementById('divTrustee');
         //      _div.className = "mn";
-            }
+    }
+    else if (document.getElementById('CUSTTYPE').value == "3") {
+        arr[17] = { code: 'TEL', name: 'Телефон' }; // телефон обов'язковий тільки для ФО
+    }
 
     for (var id in arr)
     {

@@ -28,7 +28,7 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Abstract
         string GetStatusCode(decimal status_id, Oracle.DataAccess.Client.OracleCommand cmd);
         void SetNewSum(decimal? deal_id, decimal? new_good_cost, decimal? new_deal_sum, decimal? new_comp_sum, Oracle.DataAccess.Client.OracleCommand cmd);
         IQueryable<EscrRefList> GetRefList();
-        void RepaymentAll(List<decimal> all_list);
+        void PayOrDelete(List<decimal> all_list, byte type);
         IQueryable<EscrJournal> GetJournalList();
         IQueryable<EscrJournalDetail> GetJournalDetail(decimal id);
         void RestoreGLK(decimal id);

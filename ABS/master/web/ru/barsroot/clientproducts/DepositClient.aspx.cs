@@ -809,7 +809,12 @@ public partial class DepositClient : Bars.BarsPage
 
         textHomePhone.Text = client.HomePhone.Substring(Math.Max(0, client.HomePhone.Length - 10));
         textWorkPhone.Text = client.WorkPhone.Substring(Math.Max(0, client.WorkPhone.Length - 10));
-        textCellPhone.Text = client.CellPhone.Substring(Math.Max(0, client.CellPhone.Length - 10));
+        var croppedMobPhone = client.CellPhone.Substring(Math.Max(0, client.CellPhone.Length - 10));
+
+        if (croppedMobPhone != "000-00-00" && !croppedMobPhone.Contains("x"))
+            textCellPhone.Text = croppedMobPhone.Substring(0, 3) + "*****" + croppedMobPhone.Substring(8, 2);
+        else
+            textCellPhone.Text = croppedMobPhone;
 
         // Особлива відмітка нестандартного клієнта
         if ((client.SpecialMarks.HasValue) && (listSpecial.Items.FindByValue(Convert.ToString(client.SpecialMarks)) != null))

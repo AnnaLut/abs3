@@ -18,10 +18,11 @@ namespace clientregister
 {
     public partial class VCustomerSegmentsHistory
     {
-        public List<VCustomerSegmentsHistoryRecord> SelectCustSegmentsHistory(Decimal RNK)
+        public List<VCustomerSegmentsHistoryRecord> SelectCustSegmentsHistory(Decimal RNK, Boolean ShowAll)
+        //public List<VCustomerSegmentsHistoryRecord> SelectCustSegmentsHistory(Decimal RNK)
         {
             this.Filter.RNK.Equal(RNK);
-           // this.Filter.ROWNUMBER.Equal(1);
+            if (!ShowAll) this.Filter.ROWNUMBER.Less(3);
             return Select();
         }
         //public List<VCustomerSegmentsRecord> SelectCustSegments()

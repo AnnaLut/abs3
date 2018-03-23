@@ -475,7 +475,7 @@ namespace DocInput
             foreach (string js_nam in js_list)
             {
                 if (!ClientScript.IsClientScriptBlockRegistered(js_nam))
-                    ClientScript.RegisterClientScriptBlock(Page.GetType(), js_nam, "<script language=\"javascript\" src=\"js/" + js_nam + ".js?v1.9.54\"></script>");
+                    ClientScript.RegisterClientScriptBlock(Page.GetType(), js_nam, "<script language=\"javascript\" src=\"js/" + js_nam + ".js?v1.9.55\"></script>");
             }
             if ("1" == parSignMixedMode)
             {

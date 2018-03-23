@@ -22,7 +22,6 @@
               <parameter type="QueryString" name="proect_id" altname="proect_id"></parameter>
               <parameter type="QueryString" name="card_code" altname="card_code"></parameter>
               <parameter type="QueryString" name="card_kiev" altname="card_kiev"></parameter>
-              <parameter type="QueryString" name="frm_id" altname="frm_id"></parameter>
             </parameters>
           </command>
         </button>

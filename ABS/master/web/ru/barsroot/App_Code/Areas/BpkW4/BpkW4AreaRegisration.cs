@@ -51,11 +51,11 @@ namespace BarsWeb.Areas.BpkW4
             var ninjectKernel = controllerFactory.NinjectKernel;
             ninjectKernel.Bind<IKievCardRepository>().To<KievCardRepository>();
             ninjectKernel.Bind<IBatchBranchingRepository>().To<BatchBranchingRepository>();
+			ninjectKernel.Bind<IRegNewCardRepository>().To<RegNewCardRepository>();
             ninjectKernel.Bind<IInstantCardRepository>().To<InstantCardRepository>();
             ninjectKernel.Bind<IActivationReservedAccountsRepository>().To<ActivationReservedAccountsRepository>();
             ninjectKernel.Bind<ICheckdkboRepository>().To<CheckdkboRepository>();
-            ninjectKernel.Bind<IAcceptAccRepository>().To<AcceptAccRepository>();
-			ninjectKernel.Bind<IRegNewCardRepository>().To<RegNewCardRepository>();
+			ninjectKernel.Bind<IAcceptAccRepository>().To<AcceptAccRepository>();
         }
 
         private void RegisterBundles(BundleCollection bundles)

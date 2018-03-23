@@ -996,7 +996,25 @@ namespace ViewAccounts
 			return result;
 		}
 		[WebMethod(EnableSession = true)]
+		public string currentUserId()
+		{
+			using (var connection = Bars.Classes.OraConnector.Handler.UserConnection)
+			{
+				string sql = @"select user_id from dual";
+				return connection.Query<string>(sql).SingleOrDefault();
+			}
+		}
+		[WebMethod(EnableSession = true)]
 		public string getFioFromId(string id)
+		{
+			return getGeneralFioFronId(id, "SELECT fio FROM staff WHERE type=1 AND id=:ID");
+		}
+		[WebMethod(EnableSession = true)]
+		public string getFioFromAllstaffById(string id)
+		{
+			return getGeneralFioFronId(id, "SELECT fio FROM staff$base WHERE type=1 AND id=:ID");
+		}
+		private string getGeneralFioFronId(string id, string query)
 		{
 			string result = string.Empty;
 			try
@@ -1004,7 +1022,7 @@ namespace ViewAccounts
 				InitOraConnection(Context);
 				SetRole(base_role);
 				SetParameters("ID", DB_TYPE.Decimal, id, DIRECTION.Input);
-				result = Convert.ToString(SQL_SELECT_scalar("SELECT fio FROM staff WHERE type=1 AND id=:ID"));
+				result = Convert.ToString(SQL_SELECT_scalar(query));
 			}
 			catch (System.Exception ex)
 			{

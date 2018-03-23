@@ -97,7 +97,7 @@ function GetCodecagentList() {
 }
 // Тип гос реестра
 function GetTGRList() {
-    var items = ExecSync('GetTgrList', { CType: parent.obj_Parameters['CUSTTYPE'] }).d;
+	var items = ExecSync('GetTgrList', { CType: parent.obj_Parameters['CUSTTYPE'], rezid: $get('ddl_CODCAGENT').item($get('ddl_CODCAGENT').selectedIndex).value.substr(0, 1)}).d; //Do important 2nd parameter
     $get('ddl_TGR').options.length = 0;
     for (var i in items) {
         var item = document.createElement("OPTION");
@@ -793,10 +793,52 @@ function setSexByOKPO() {
         }
     }
 }
+//COBUSUPABS-6570
+function setTgrList() {
+	var rezid = getParamFromUrl('rezid', document.location.href);
+	if (parent.obj_Parameters['CUSTTYPE'] === 'person' && rezid === "1") { 
+		var okpo = $get('ed_OKPO').value;
+		if (okpo == '0000000000') {
+			$('.ddlTGRClass option[value="5"]').attr("selected", "selected");
+		} else {
+			$('.ddlTGRClass option[value="2"]').attr("selected", "selected");
+		}
+	}
+}
 
 function ToUpperCase(fieldName) {
 	getEl(fieldName).value = getEl(fieldName).value.toUpperCase();
 }
+//Fix Json problem
+var JSON = JSON || {};
+// implement JSON.stringify serialization
+JSON.stringify = JSON.stringify || function (obj) {
+	var t = typeof (obj);
+	if (t != "object" || obj === null) {
+		// simple data type
+		if (t == "string") obj = '"' + obj + '"';
+		return String(obj);
+	}
+	else {
+		// recurse array or object
+		var n, v, json = [], arr = (obj && obj.constructor == Array);
+		for (n in obj) {
+			v = obj[n]; t = typeof (v);
+
+			if (t == "string") v = '"' + v + '"';
+			else if (t == "object" && v !== null) v = JSON.stringify(v);
+
+			json.push((arr ? "" : '"' + n + '":') + String(v));
+		}
+		return (arr ? "[" : "{") + String(json) + (arr ? "]" : "}");
+	}
+};
+// implement JSON.parse de-serialization
+JSON.parse = JSON.parse || function (str) {
+	if (str === "") str = '""';
+	eval("var p=" + str + ";");
+	return p;
+};
 
 $(document).ready(function () {
     var isOper2ndNameEmpty = false;
@@ -839,6 +881,139 @@ $(document).ready(function () {
     $("#ed_FIO_LN").on("focusout", periodCheckSndName);
     $("#ed_FIO_FN").on("focusout", periodCheckSndName);
 
+	///
+	///Autocomplete Features
+	///
+
+	function callConfWinNameMname(option, item, value) {
+		var msgString = "Ви намагаєтесь ввести <b>російське</b> " + option + ", пропонуємо<br>" +
+			"замінити його на <b>український</b> аналог (з довідника)";
+		parent.bars.ui.approve({
+			text: msgString,
+			func: function () { item.val(value.toUpperCase()); },
+			nfunc: function () { }
+		});
+	}
+	//Formatting for base productivity
+	String.prototype.capitalize = function () {
+		return this.charAt(0).toUpperCase() + this.slice(1).toLocaleLowerCase();
+	};
+
+	//Db get only 1 or 2, else its need to be null
+	function getSexOfPerson() {
+		var ddlSex = parent.getFrame('Tab3').document.getElementById('ddl_SEX');
+		var sex = ddlSex.options[ddlSex.selectedIndex].value;
+
+		if (sex != 1 && sex != 2)
+			sex = "";
+		return sex;
+	};
+
+	//basic info for autocomplete name
+	function getNameInfo() {
+		return {
+			Sex: getSexOfPerson(),
+			Name: $('#ed_FIO_FN').val().capitalize()
+		};
+	};
+	function getMidNameInfo() {
+		var m_name = getNameInfo();
+		m_name.MName = $('#ed_FIO_MN').val().capitalize();
+		return m_name;
+	}
+	//name autocomplete
+	$("#ed_FIO_FN").autocomplete({
+		source: function (request, response) {
+
+			var n_info = getNameInfo();
+			$.ajax({
+				url: '/barsroot/clientregister/defaultWebService.asmx/GetListNames',
+				data: JSON.stringify({ 'info': n_info }),
+				type: "POST",
+				contentType: "application/json; charset=utf-8",
+				dataType: "json",
+				success: function (data) {
+					//collect data from server responce
+					var codes_nls = [];
+					for (var i = 0; i < data.d.length; i++) {
+						codes_nls.push(data.d[i]);
+					}
+					data.d = [];
+					response(codes_nls);
+				}
+			});
+		},
+		minLength: 2,
+		select: function (event, ui) {
+			//evetn if variant was swelected
+		},
+		focus: function (event, ui) {
+			event.preventDefault();
+		}
+	});
+
+	//mode 1 name
+	//mode 2 midname
+	function checkCompleteName_Midname(mode, data) {
+		if (mode == 1) {
+			data.MName = null;
+		} else if (mode == 2) {
+			data.Name = null;
+		}
+		$.ajax({
+			url: '/barsroot/clientregister/defaultWebService.asmx/KlNameUlt',
+			data: JSON.stringify({ 'info': data }),
+			type: "POST",
+			contentType: "application/json; charset=utf-8",
+			dataType: "json",
+			success: function (data) {
+				if (data.d !== null && data.d !== "") {
+					if (mode == 1) {
+						callConfWinNameMname("ім'я", $("#ed_FIO_FN"), data.d);
+					} else if (mode == 2) {
+						callConfWinNameMname("по-батькові", $("#ed_FIO_MN"), data.d);
+					}
+				}
+			}
+		});
+
+	}
+
+	//$("#ed_FIO_FN").focusout(function () {
+	//	if ($("#ed_FIO_FN").val().length > 0) {
+	//		var n_info = getMidNameInfo();
+	//		checkCompleteName_Midname(1, n_info);
+	//	}
+	//});
+	$("#ed_FIO_MN").autocomplete({
+		source: function (request, response) {
+
+			var n_info = getMidNameInfo();
+			$.ajax({
+				url: '/barsroot/clientregister/defaultWebService.asmx/GetListMidNames',
+				data: JSON.stringify({ 'info': n_info }),
+				type: "POST",
+				contentType: "application/json; charset=utf-8",
+				dataType: "json",
+				success: function (data) {
+					//collect data from server responce
+					var codes_nls = [];
+					for (var i = 0; i < data.d.length; i++) {
+						codes_nls.push(data.d[i]);
+					}
+					data.d = [];
+					response(codes_nls);
+				}
+			});
+		},
+		minLength: 2,
+		select: function (event, ui) {
+			//evetn if variant was swelected
+		},
+		focus: function (event, ui) {
+			event.preventDefault();
+		}
+	});
 
 	//check if user start typing ua or en language
 	(function initTypingCheker() {

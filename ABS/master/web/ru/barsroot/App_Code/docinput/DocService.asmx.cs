@@ -1570,5 +1570,33 @@ namespace DocInput
             return res;
         }
 
+		/// <summary>
+        /// Перевірка на блокування рахунків 2625, 2605     (COBUMMFO-3907)
+        /// </summary>
+        /// <param name="acc"></param>
+        /// <returns></returns>
+        [WebMethod(EnableSession = true)]
+        public string[] checkAcc(string acc)
+        {
+            string[] result = { "1", "" };      // 1 - BLOCKED  0 - OK
+            using (var con = ((IOraConnection)Application["OracleConnectClass"]).GetUserConnection())
+            {
+                using (OracleCommand cmd = con.CreateCommand())
+                {
+                    cmd.CommandText = "select check_blkd(a.nls, a.kv) from accounts a where a.nls = :p_nls";
+                    cmd.Parameters.Add("p_nls", OracleDbType.Varchar2, acc, ParameterDirection.Input);
+                    try
+                    {
+                        result[0] = Convert.ToString(cmd.ExecuteScalar());
+                    }
+                    catch (Exception e)
+                    {
+                        result[0] = "1";
+                        result[1] = e.InnerException != null ? e.InnerException.Message : e.Message;
+                    }
+                }
+            }
+            return result;
+        }
     }
 }

@@ -8,6 +8,7 @@ using Bars.Classes;
 
 using Bars.UserControls;
 using System.Linq;
+using System.Collections.Generic;
 
 public partial class credit_cck_zay : Bars.BarsPage
 {
@@ -15,6 +16,9 @@ public partial class credit_cck_zay : Bars.BarsPage
     private String _ShowCustomerReferPattern = "ShowCustomerRefer({0}, '{1}', '{2}', '{3}'); return false;";
     private String _ShowBanksReferPattern = "ShowBanksRefer('{0}', '{1}'); return false;";
     private String _ShowDepositReferPattern = "ShowDepositRefer('{0}', '{1}', '{2}', '{3}', '{4}'); return false;";
+
+
+
     string[] _creditOrders = { "220263", "220353" };
     string[] _creditOrdersNew = { "220377", "220353" };
     # endregion
@@ -34,7 +38,6 @@ public partial class credit_cck_zay : Bars.BarsPage
             cbINS_CheckedChanged(cbINS, e);
             cbPAWN_CheckedChanged(cbPAWN, e);
             cbPAWNP_CheckedChanged(cbPAWNP, e);
-
 
             if (!useNew)
             {
@@ -63,6 +66,9 @@ public partial class credit_cck_zay : Bars.BarsPage
             }
             creditOrderTitle.Visible = creditOrder.Visible = _creditOrders.Contains(Request.Params.Get("PROD"));
         }
+
+        btnNo.OnClientClick = String.Format("fnClickOK('{0}','{1}')", btnNo.UniqueID, "");
+
     }
 
     private void ConfigForm()
@@ -84,6 +90,8 @@ public partial class credit_cck_zay : Bars.BarsPage
         Decimal? RNK = (sender as Bars.UserControls.TextBoxNumb).Value;
         String RNK_CtrlID = (sender as Control).ID;
         String BaseID = RNK_CtrlID.Substring(0, RNK_CtrlID.IndexOf("_") + 1);
+        decimal? PRINSIDER;
+        String parametrIns;
 
         if (!RNK.HasValue) return;
 
@@ -96,7 +104,19 @@ public partial class credit_cck_zay : Bars.BarsPage
             cmd.ExecuteNonQuery();
 
             cmd.Parameters.Add("p_rnk", OracleDbType.Decimal, RNK, ParameterDirection.Input);
-            cmd.CommandText = "select okpo, nmk as fio, date_off from customer where rnk = :p_rnk";
+            //cmd.CommandText = "select okpo, nmk as fio, date_off, PRINSIDER from customer where rnk = :p_rnk";
+            cmd.CommandText = @"
+select c.okpo
+, c.nmk as fio
+, c.date_off
+, c.Prinsider
+, cw.value
+from customer c 
+left join customerw cw
+on (c.rnk = cw.rnk
+and cw.tag='INSFO')
+where c.rnk = :p_rnk";
+
             OracleDataReader rdr = cmd.ExecuteReader();
 
             if (rdr.Read())
@@ -105,6 +125,14 @@ public partial class credit_cck_zay : Bars.BarsPage
                 {
                     (FindControl(BaseID + "OKPO") as TextBox).Text = rdr["OKPO"] == DBNull.Value ? (String)null : (String)rdr["OKPO"];
                     (FindControl(BaseID + "FIO") as TextBox).Text = rdr["FIO"] == DBNull.Value ? (String)null : (String)rdr["FIO"];
+                    PRINSIDER = rdr["PRINSIDER"] == DBNull.Value ? null : (decimal?)rdr["PRINSIDER"];
+                    parametrIns = rdr["value"] == DBNull.Value ? null : (string)rdr["value"];
+
+                    ///Перевірка на приналежність до пов’язаних з банком осіб та параметру «Ознака наявності анкети інсайдера»
+                    if (PRINSIDER != 99 && (parametrIns == "0" || String.IsNullOrEmpty(parametrIns)))
+                    {
+                        ShowConfirmInsider();
+                    }
                 }
                 else
                 {
@@ -112,8 +140,14 @@ public partial class credit_cck_zay : Bars.BarsPage
                     (FindControl(BaseID + "OKPO") as TextBox).Text = "";
                     (FindControl(BaseID + "FIO") as TextBox).Text = "";
 
-                    ShowError("Клієн (" + RNK.ToString() + ") закритий");
+                    ShowError("Клієнт (" + RNK.ToString() + ") закритий");
                 }
+
+                if (!btSend.Enabled)
+                {
+                    UpdatePanelsEnable(true);
+                }
+
             }
             else
             {
@@ -133,6 +167,23 @@ public partial class credit_cck_zay : Bars.BarsPage
             con.Dispose();
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     /*protected void CC_ID_ValueChanged(object sender, EventArgs e)
     {
         String CC_ID = (sender as Bars.UserControls.TextBoxString).Value;
@@ -406,7 +457,16 @@ public partial class credit_cck_zay : Bars.BarsPage
         PAWN5.Enabled = (sender as CheckBox).Checked;
         PAWN5_S.Enabled = (sender as CheckBox).Checked;
     }
+    protected void cbFPROC2_CheckedChanged(object sender, EventArgs e)
+    {
+        cbFPROC3.Visible = FPROC3Title.Visible = FPROC3.Visible = FPROC3_DATETitle.Visible = FPROC3_DATE.Visible =
+             FPROC2.IsRequired = FPROC2_DATE.IsRequired = FPROC2.Enabled = FPROC2_DATE.Enabled = cbFPROC2.Checked;
+    }
 
+    protected void cbFPROC3_CheckedChanged(object sender, EventArgs e)
+    {
+        FPROC3.Enabled = FPROC3_DATE.Enabled = FPROC3.IsRequired = FPROC3_DATE.IsRequired = cbFPROC3.Checked;
+    }
     protected void cbPAWNP_CheckedChanged(object sender, EventArgs e)
     {
         PAWNP_RNK.Enabled = (sender as CheckBox).Checked;
@@ -486,7 +546,7 @@ public partial class credit_cck_zay : Bars.BarsPage
     protected override void OnPreRender(EventArgs e)
     {
         BindControls();
-
+        cbFPROC2.Visible = FPROC2Title.Visible = FPROC2.Visible = FPROC2_DATETitle.Visible = FPROC2_DATE.Visible = Request.Params.Get("CUSTTYPE") == "3"; //декілька ставок тільки для ФО
         base.OnPreRender(e);
     }
     # endregion
@@ -517,6 +577,7 @@ public partial class credit_cck_zay : Bars.BarsPage
                 KV.DataSource = dtKV;
                 KV.DataValueField = "ID";
                 KV.DataTextField = "NAME";
+                KV.SelectedIndex = 6;
                 KV.DataBind();
             }
 
@@ -524,12 +585,13 @@ public partial class credit_cck_zay : Bars.BarsPage
             if (!IsPostBack)
             {
                 DataTable dtBASEY = new DataTable();
-                cmd.CommandText = "select basey as id, basey || ' - ' || name || ' (' || name_mb || ')' as name from basey";
+                cmd.CommandText = "select basey as id, basey || ' - ' || name || ' (' || name_mb || ')' as name from basey order by id";
                 adr.Fill(dtBASEY);
 
                 BASEY.DataSource = dtBASEY;
                 BASEY.DataValueField = "ID";
                 BASEY.DataTextField = "NAME";
+                BASEY.SelectedIndex = 1;
                 BASEY.DataBind();
             }
 
@@ -537,6 +599,10 @@ public partial class credit_cck_zay : Bars.BarsPage
             cmd.CommandText = "select web_utl.get_bankdate from dual";
             DateTime dBankDate = Convert.ToDateTime(cmd.ExecuteScalar());
             SDATE.MinValue = dBankDate;
+            SDATE.Value = dBankDate;
+            WDATE.Value = dBankDate.AddYears(Request.Params.Get("PROD")[3] == '3' ? 3 : 1); //довгострокові +3 роки, короткострокові +1 рік
+
+            FPROC2_DATE.MinValue = dBankDate.AddDays(1); //min > bddate
 
             // Графік погашення (1,2,3) : 
             if (!IsPostBack)
@@ -553,6 +619,7 @@ public partial class credit_cck_zay : Bars.BarsPage
                 GPK.DataSource = dtGPK;
                 GPK.DataValueField = "ID";
                 GPK.DataTextField = "NAME";
+                GPK.SelectedIndex = 1;
                 GPK.DataBind();
             }
 
@@ -573,12 +640,13 @@ public partial class credit_cck_zay : Bars.BarsPage
             if (!IsPostBack)
             {
                 DataTable dtNFREQ = new DataTable();
-                cmd.CommandText = "select freq as id, freq || ' - ' || name as name from freq";
+                cmd.CommandText = "select freq as id, freq || ' - ' || name as name from freq order by id";
                 adr.Fill(dtNFREQ);
 
                 NFREQ.DataSource = dtNFREQ;
                 NFREQ.DataValueField = "ID";
                 NFREQ.DataTextField = "NAME";
+                NFREQ.SelectedIndex = 4;
                 NFREQ.DataBind();
             }
 
@@ -590,7 +658,7 @@ public partial class credit_cck_zay : Bars.BarsPage
             if (!IsPostBack)
             {
                 DataTable dtMETR = new DataTable();
-                cmd.CommandText = "select metr as id, metr || ' - ' || name as name from int_metr where metr > 94";
+                cmd.CommandText = "select metr as id, metr || ' - ' || name as name from int_metr where metr > 94 or metr=0";
                 adr.Fill(dtMETR);
 
                 METR.DataSource = dtMETR;
@@ -707,6 +775,15 @@ public partial class credit_cck_zay : Bars.BarsPage
     {
         ScriptManager.RegisterStartupScript(this, this.GetType(), "send_error", "alert('" + ErrorText + "');", true);
     }
+
+
+    private void ShowConfirmInsider()
+    {
+        //ScriptManager.RegisterStartupScript(this, this.GetType(), "confirm_isider", "ConfirmInsider('" + Text + "');", true);
+        mpe.Show();
+    }
+
+
     private void HideError()
     {
     }
@@ -714,6 +791,30 @@ public partial class credit_cck_zay : Bars.BarsPage
     {
         // скрываем ошибки
         HideError();
+        if (cbFPROC2.Checked && FPROC2_DATE.Value <= SDATE.Value)
+        {
+            ShowError("Дата введеня ставки №2 має бути більшою за дату початку КД");
+            return false;
+        }
+
+        if (cbFPROC2.Checked && FPROC2_DATE.Value >= WDATE.Value)
+        {
+            ShowError("Дата введеня ставки №2 має бути меншою за дату закінчення КД");
+            return false;
+        }
+
+        //якщо ввели третю ставку і вона <= дати другої ставки
+        if (cbFPROC3.Checked && FPROC3_DATE.Value <= FPROC2_DATE.Value)
+        {
+            ShowError("Дата введеня ставки №3 має бути більшою за дату введеня ставки №2");
+            return false;
+        }
+
+        if (cbFPROC3.Checked && FPROC3_DATE.Value >= WDATE.Value)
+        {
+            ShowError("Дата введеня ставки №3 має бути меншою за дату закінчення КД");
+            return false;
+        }
 
         OracleConnection con = OraConnector.Handler.IOraConnection.GetUserConnection();
         OracleCommand cmd = new OracleCommand(OraConnector.Handler.IOraConnection.GetSetRoleCommand("WR_CREDIT"), con);
@@ -952,6 +1053,19 @@ public partial class credit_cck_zay : Bars.BarsPage
                                                         :nBANK4,:NLS4,:NLS_NAME4,:NLS_OKPO4,
                                                         :nBANK5,:NLS5,:NLS_NAME5,:NLS_OKPO5, :CREDIT_ORDER);
                                     end;");
+
+                if (cbFPROC2.Checked && ND.HasValue)
+                {
+                    cmd.CommandText = @"bars.cck.p_int_save";
+                    cmd.Parameters.Clear();
+                    cmd.Parameters.Add("nd", OracleDbType.Decimal, ND, ParameterDirection.Input);
+                    cmd.Parameters.Add("int_2_val", OracleDbType.Decimal, FPROC2.Value, ParameterDirection.Input);
+                    cmd.Parameters.Add("int_2_date", OracleDbType.Date, FPROC2_DATE.Value, ParameterDirection.Input);
+                    cmd.Parameters.Add("int_3_val", OracleDbType.Decimal, FPROC3.Value, ParameterDirection.Input);
+                    cmd.Parameters.Add("int_3_date", OracleDbType.Date, FPROC3_DATE.Value, ParameterDirection.Input);
+                    cmd.ExecuteNonQuery();
+                }
+
             }
             finally
             {
@@ -998,4 +1112,47 @@ public partial class credit_cck_zay : Bars.BarsPage
         prSDI.Value = nPrSDI;
     }
     # endregion
+
+
+    private void UpdatePanelsEnable(bool state)
+    {
+        IList<object> UpdatePanelsCollection = new List<object>(new object[]
+        {
+            attrMain,
+            pnlMonthlyCommission,
+            attrSDI,
+            attrPayInstuctions,
+            attrPayInstuctions2,
+            attrPayInstuctions3,
+            attrPayInstuctions4,
+            attrPayInstuctions5,
+            attrPawn,
+            attrPawn2,
+            attrPawn3,
+            attrPawn4,
+            attrPawn5,
+            attrPawnP,
+            attrPawnP2,
+            attrPawnP3,
+            attrPawnP4,
+            attrPawnP5
+        });
+
+        foreach (Panel updatePanel in UpdatePanelsCollection)
+        {
+            updatePanel.Enabled = state;
+        }
+
+        btSend.Enabled = state;
+    }
+
+
+    protected void btnNo_Click(object sender, EventArgs e)
+    {
+        (FindControl("RNK") as Bars.UserControls.TextBoxNumb).Value = (Decimal?)null;
+        (FindControl("OKPO") as TextBox).Text = "";
+        (FindControl("FIO") as TextBox).Text = "";
+
+        UpdatePanelsEnable(false);
+    }
 }

@@ -1112,9 +1112,11 @@ function saveCustomerToBase() {
         var mobPhone = gE(clientRekvTab, 'ed_TELM') != undefined ? gE(clientRekvTab, 'ed_TELM').value : undefined;
 
         //if mobile phone is masked - it was not changed and obj_Parameters['DopRekv_MPNO'] contains initial value
-        if (mobPhone && mobPhone.indexOf("*****") !== -1) {
-            mobPhone = obj_Parameters['DopRekv_MPNO'];
-        }
+        if (obj_Parameters['CUSTTYPE'] === 'person') {
+			if (mobPhone.indexOf("*****") !== -1) {
+				mobPhone = obj_Parameters['DopRekv_MPNO'];
+			}
+		}
 
         if (mobPhone) {
             custAttrList['MPNO'] = {

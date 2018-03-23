@@ -89,8 +89,8 @@ function OpenACC(NLS, RNK, readonly) {
     else { bars.ui.error({ title: 'Помилка', text: "Неправильний рахунок клієнта!" }); }
 }
 
-function ApplyActivation() { Activation(1); }
-function CanselActivation() { Activation(0); }
+function ApplyActivation() { isBackoficceCkeck(Activation, 1); }
+function CanselActivation() { isBackoficceCkeck(Activation, 0); }
 
 // confirm<number> [0, 1]
 function Activation(confirm) {
@@ -124,6 +124,19 @@ function Activation(confirm) {
     }
 }
 
+function isBackoficceCkeck(func, param) {
+	$.ajax({
+		type: "GET",
+		url: bars.config.urlContent("/api/custacc/start/"),
+		success: function (result) {
+			if (result > 0) {
+				func(param);
+			} else {
+				bars.ui.alert({ text: "Поточний користувач не нележить \"Підрозділу бек-офісу\"" });
+			}
+		}
+	});
+}
 //  Array<number>
 function ActivationRequest(data, confirm) {
     AJAX({
@@ -135,7 +148,7 @@ function ActivationRequest(data, confirm) {
                 $("#winConfirm").data("kendoWindow").close();
                 updateMainGrid();
             },
-            error: function (jqXHR, textStatus, errorThrown) { },
+            error: function (jqXHR, textStatus, errorThrown) { $("#winConfirm").data("kendoWindow").close(); },
             data: JSON.stringify({ Data: data, Confirm: confirm })
         }
     });

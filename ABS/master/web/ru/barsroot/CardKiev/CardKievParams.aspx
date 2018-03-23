@@ -125,12 +125,7 @@
                     <asp:Label ID="Label2" runat="server" Text="Слово-пароль:"></asp:Label> <br />
                     <asp:TextBox ID="tbPassWord" runat="server" MaxLength="24" OnTextChanged="tbPassWord_TextChanged" style="background-color: #FFEBFF"></asp:TextBox>
                 </td>
-                <td colspan="3">
-                    <asp:Label ID="Label99" runat="server" Text="Документи клієнта передано<br> до служби соц.захисту"></asp:Label> <br />                    
-                    <select id="SENT_TO_SOTSZAHIST" runat="server" style="background-color: #FFEBFF">
-                        <option value="1">Так</option>
-                        <option value="2">Ні</option>
-                    </select>
+                <td>
                 </td>
             </tr>
             <tr>

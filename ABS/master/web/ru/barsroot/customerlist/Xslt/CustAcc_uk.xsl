@@ -116,14 +116,14 @@
     <xsl:value-of select="OB22" />
   </TD>
   <TD>
-  <xsl:if test="$blk>0">
+  <xsl:if test="$blk>0 and $mode!=2">
     <xsl:attribute name="style">color:white;background-color:purple</xsl:attribute>
   </xsl:if>
   <xsl:attribute name="id"><xsl:value-of select="concat('NLS_',position())" /></xsl:attribute>
   <xsl:value-of select="NLS" />
 </TD>
   <TD>
-    <xsl:if test="$blk>0">
+    <xsl:if test="$blk>0 and $mode!=2">
       <xsl:attribute name="style">color:white;background-color:purple</xsl:attribute>
     </xsl:if>
     <xsl:attribute name="id">
@@ -142,7 +142,7 @@
   </TD>
 
   <TD>
-    <xsl:if test="$blk>0">
+    <xsl:if test="$blk>0 and $mode!=2">
       <xsl:attribute name="style">color:white;background-color:purple</xsl:attribute>
     </xsl:if>
     <xsl:attribute name="id">
@@ -151,17 +151,17 @@
     <xsl:value-of select="RNK" />
   </TD>
 <TD align="right">
-    <xsl:if test="$blk>0">
+    <xsl:if test="$blk>0 and $mode!=2">
       <xsl:attribute name="style">color:purple</xsl:attribute>
     </xsl:if>
     <xsl:value-of select="OKPO" />
   </TD>
 <TD noWrap="true">
-  <xsl:if test="$blk>0"><xsl:attribute name="style">color:purple</xsl:attribute></xsl:if>
+  <xsl:if test="$blk>0 and $mode!=2"><xsl:attribute name="style">color:purple</xsl:attribute></xsl:if>
 	<xsl:value-of select="NMS" />
 </TD>
   <TD noWrap="true">
-    <xsl:if test="$blk>0">
+    <xsl:if test="$blk>0 and $mode!=2">
       <xsl:attribute name="style">color:purple</xsl:attribute>
     </xsl:if>
     <xsl:value-of select="DAOS" />
@@ -188,7 +188,7 @@
 	<xsl:value-of select="format-number(OSTB div DIG, $frmtStr, 'ua')" />
 </TD>
   <TD noWrap="true">
-    <xsl:if test="$blk>0">
+    <xsl:if test="$blk>0 and $mode!=2">
       <xsl:attribute name="style">color:purple</xsl:attribute>
     </xsl:if>
     <xsl:value-of select="DAZS" />

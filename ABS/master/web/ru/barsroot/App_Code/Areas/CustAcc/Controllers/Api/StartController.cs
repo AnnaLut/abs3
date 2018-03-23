@@ -23,7 +23,7 @@ namespace BarsWeb.Areas.CustAcc.Controllers.Api
             }
             catch (Exception ex)
             {
-                return Request.CreateResponse(HttpStatusCode.OK, ex.Message);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
         [HttpGet]
@@ -36,7 +36,7 @@ namespace BarsWeb.Areas.CustAcc.Controllers.Api
             }
             catch (Exception ex)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, ex.Message);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
     }

@@ -7,6 +7,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
+using System.Text;
 
 namespace clientregister
 {
@@ -27,11 +28,16 @@ namespace clientregister
 		private void MyDataBind(ListItemCollection ItemsList, HtmlSelect Target)
 		{
 			Target.Items.Clear();
-			for(int i=0; i<ItemsList.Count; i++)
-			{
-				ListItem tmp = new ListItem(ItemsList[i].Text,ItemsList[i].Value);
-				Target.Items.Add(tmp);
-			}
+			StringBuilder itemText = new StringBuilder();
+            for (int i = 0; i < ItemsList.Count; i++)
+            {
+                itemText.Clear()
+                    .Append(ItemsList[i].Value)
+                    .Append(" - ")
+                    .Append(ItemsList[i].Text);
+                ListItem tmp = new ListItem(itemText.ToString(), ItemsList[i].Value);
+                Target.Items.Add(tmp);
+            }
 		}
 		protected void Page_Load(object sender, EventArgs e)
 		{
