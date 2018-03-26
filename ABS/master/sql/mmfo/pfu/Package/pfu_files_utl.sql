@@ -928,7 +928,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_FILES_UTL as
          l_ser            := dbms_xslprocessor.valueof(l_row, 'ser/text()');
          l_numdoc         := dbms_xslprocessor.valueof(l_row, 'numdoc/text()');
          l_pdate          := to_date(dbms_xslprocessor.valueof(l_row, 'pdate/text()'),'dd.mm.yyyy');
-         l_organ          := utl_raw.cast_to_varchar2(hextoraw(dbms_xslprocessor.valueof(l_row, 'organ/text()')));
+         l_organ 		  := substr(trim(utl_raw.cast_to_varchar2(hextoraw(dbms_xslprocessor.valueof(l_row, 'organ/text()')))),1,70);
          l_bday           := to_date(dbms_xslprocessor.valueof(l_row, 'bday/text()'),'dd.mm.yyyy');
          l_bplace         := utl_raw.cast_to_varchar2(hextoraw(dbms_xslprocessor.valueof(l_row, 'bplace/text()')));
          l_cellphone      := dbms_xslprocessor.valueof(l_row, 'cellphone/text()');
