@@ -88,19 +88,20 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
                     }
                 }
 
-                var lastKeyId = resultData.Where(i => i.RequestState == 5).OrderBy(e => e.RequesTime).LastOrDefault();
-                if (lastKeyId != null)
-                {
-                    try
-                    {
-                         _corp2RelatedCustomersRepository.Corp2Services.UserManager.SetUserACSKKeySn(_corp2RelatedCustomersRepository.Corp2Services.GetSecretKey(), userId, lastKeyId.CertificateId);
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new Exception("Виникла помилка під час запросу до сервісу Corp2. Зверніться до адміністратора." + Environment.NewLine + ex.Message);
-                    }
-                    _corp2RelatedCustomersRepository.UpdateRelatedCustomerKey(relCustId, lastKeyId.CertificateId);
-                }
+                //var lastKeyId = resultData.Where(i => i.RequestState == 5).OrderBy(e => e.RequesTime).LastOrDefault();
+                //if (lastKeyId != null)
+                //{
+                //    var serialNumber = Convert.ToInt32(lastKeyId.Id).ToString("X8");
+                //    try
+                //    {
+                //        _corp2RelatedCustomersRepository.Corp2Services.UserManager.SetUserACSKKeySn(_corp2RelatedCustomersRepository.Corp2Services.GetSecretKey(), userId, serialNumber);
+                //    }
+                //    catch (Exception ex)
+                //    {
+                //        throw new Exception("Виникла помилка під час запросу до сервісу Corp2. Зверніться до адміністратора." + Environment.NewLine + ex.Message);
+                //    }
+                //    _corp2RelatedCustomersRepository.UpdateRelatedCustomerKey(relCustId, serialNumber);
+                //}
 
                 return Request.CreateResponse(HttpStatusCode.OK, result);
             }
@@ -141,10 +142,22 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
                     {
                         BarsSql sql = SqlCreator.SearchUserById(relCustId);
                         var user = _corp2RelatedCustomersRepository.ExecuteStoreQuery<RelatedCustomer>(sql).FirstOrDefault();
-                        if (user.AcskRegistrationId == null)
+                        decimal userId;
+                        if (user.AcskRegistrationId == null && decimal.TryParse(user.UserId, out userId))
                         {
                             _acskRepository.MapCorp2RelatedCustomerToAcskUser(relCustId, userInfo); //insert into CORP2_ACSK_REGISTRATION
+                            try
+                            {
+                                var serialNumber = Convert.ToInt32(userInfo.RegistrationId).ToString("X8");
+                                _corp2RelatedCustomersRepository.Corp2Services.UserManager.SetUserACSKKeySn(_corp2RelatedCustomersRepository.Corp2Services.GetSecretKey(), userId, serialNumber);
+                                _corp2RelatedCustomersRepository.UpdateRelatedCustomerKey(relCustId, serialNumber);
+                            }
+                            catch (Exception ex)
+                            {
+                                throw new Exception("Виникла помилка під час запросу до сервісу Corp2. Зверніться до адміністратора." + Environment.NewLine + ex.Message);
+                            }
                         }
+                        //else throw new Exception("");
                         //_corp2RelatedCustomersRepository.VisaMapedRelatedCustomerToUser(relCustId, custId);
                         _corp2RelatedCustomersRepository.SetAcskActual(relCustId, 1); //update CORP2_REL_CUSTOMERS set ACSK_ACTUAL
                         result.Data = userInfo;
@@ -250,7 +263,7 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
                     patch += "/";
                 }
                 patch += "areas/cdo/Corp2/reports/cl_acsk_requestCorp2.frx";
-            
+
                 var param = new FrxParameters
                 {
                     new FrxParameter("id", TypeCode.String, relCustId)
@@ -259,7 +272,7 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
                 using (var str = new MemoryStream())
                 {
                     doc.ExportToMemoryStream(FrxExportTypes.Pdf, str);
-                
+
                     var biteArray = str.ToArray();
                     result.Content = new ByteArrayContent(biteArray);
                     result.Content.Headers.ContentType = new MediaTypeHeaderValue("application/pdf");
@@ -276,7 +289,7 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message + Environment.NewLine + ex.StackTrace);
             }
         }
-        
+
         private bool ValidateProfileSign(decimal custId)
         {
             return true;

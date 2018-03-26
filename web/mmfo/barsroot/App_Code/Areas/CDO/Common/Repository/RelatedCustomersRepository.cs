@@ -65,7 +65,7 @@ namespace BarsWeb.Areas.CDO.Common.Repository
                             um.approved_type as ApprovedType,
                             um.is_approved as IsApprovedDecimal,
                             null as Login,
-                            null as AcskRegistrationId,
+                            null as AcskSertificateSn,
                             null as CreateDate,
                             null as SequentialVisa,
                             null as BirthDate,
@@ -101,7 +101,7 @@ namespace BarsWeb.Areas.CDO.Common.Repository
             //                um.approved_type as ApprovedType,
             //                um.is_approved as IsApprovedDecimal,
             //                rc.login as Login,
-            //                ar.registration_id as AcskRegistrationId,
+            //                rc.key_id as AcskSertificateSn,
             //                rc.CREATED_DATE as CreateDate,
             //                um.sequential_visa as SequentialVisa,
             //                rc.birth_date as BirthDate,
@@ -122,7 +122,7 @@ namespace BarsWeb.Areas.CDO.Common.Repository
             //                left join corp2_cust_rel_users_map um on (
             //                      rc.id = um.rel_cust_id )
             //                where um.cust_id = :p_cust_id AND um.approved_type IN ('update', 'delete', 'add')  AND um.sign_number <> 0";
-#endregion
+            #endregion
             var result = _entities.ExecuteStoreQuery<RelatedCustomer>(sql, custId).ToList();
             
             return result;

@@ -500,6 +500,8 @@ angular.module(globalSettings.modulesAreas)
                     getUserInfo(relCustId, custId);
                 } else {
                     vm.currentUser = new RelatedCustomer(custId, userId, firstName, lastName, patronymic, email, relCustId, isExistUser);
+                    vm.currentUser.DocType = 1;
+                    SetDropDocListValue();
                     if (!vm.reatedCustomers) {
                         vm.reatedCustomers = [];
                         getCustomerRelatedCustomers(vm.currentUser.CustId);
