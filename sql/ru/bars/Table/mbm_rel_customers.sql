@@ -73,6 +73,11 @@ exception when others then
  end;
 /
 
+begin   
+ execute immediate 'alter table MBM_REL_CUSTOMERS modify doc_number VARCHAR2(14)';
+end;
+/
+
 
 COMMENT ON TABLE MBM_REL_CUSTOMERS IS 'Повязані особи котрим надано доступ до CorpLight';
 

@@ -127,7 +127,10 @@ exception when others then
  end;
 /
 
-
+begin   
+ execute immediate 'alter table MBM_REL_CUSTOMERS modify doc_number VARCHAR2(14)';
+end;
+/
 
 PROMPT *** Create  grants  MBM_REL_CUSTOMERS ***
 grant SELECT                                                                 on MBM_REL_CUSTOMERS to BARSREADER_ROLE;
