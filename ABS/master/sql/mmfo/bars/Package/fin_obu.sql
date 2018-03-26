@@ -1503,15 +1503,19 @@ Begin
         /* AZ3	3	Валовий прибуток / збиток  (квартальна)*/
     elsif 	kod_ = 'AZ3' and p_type_ = 1 then
             Case
-  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2090',dat_, okpo_) - fin_nbu.ZN_FDK('2095',dat_, okpo_);
- 			    when FZ_ in ('R','C')  then return fin_nbu.ZN_FDK('2000',dat_, okpo_) - fin_nbu.ZN_FDK('2050',dat_, okpo_);
+  				when FZ_ = 'N'         then return --fin_nbu.ZN_FDK('2090',dat_, okpo_) - fin_nbu.ZN_FDK('2095',dat_, okpo_);
+				                                   CALC_POK_DOP('AZ1',dat_, okpo_, p_type)-CALC_POK_DOP('AZ2',dat_, okpo_, p_type);
+ 			    when FZ_ in ('R','C')  then return --fin_nbu.ZN_FDK('2000',dat_, okpo_) - fin_nbu.ZN_FDK('2050',dat_, okpo_);
+				                                   CALC_POK_DOP('AZ1',dat_, okpo_, p_type)-CALC_POK_DOP('AZ2',dat_, okpo_, p_type);
 					                   else return null;
 			end case;
 		/* AZ3	3	Валовий прибуток / збиток  (кумулятивна) */
     elsif 	kod_ = 'AZ3' and p_type_ = 2 then
 	        Case
-			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2090',3,dat_, okpo_) - fin_nbu.ZN_F2('2095',3,dat_, okpo_);
- 			   when FZ_ in ('R','C')  then return fin_nbu.ZN_F2('2000',3,dat_, okpo_) - fin_nbu.ZN_F2('2050',3,dat_, okpo_);
+			   when FZ_ = 'N'         then return --fin_nbu.ZN_F2('2090',3,dat_, okpo_) - fin_nbu.ZN_F2('2095',3,dat_, okpo_);
+			                                      CALC_POK_DOP('AZ1',dat_, okpo_, p_type)-CALC_POK_DOP('AZ2',dat_, okpo_, p_type);  
+ 			   when FZ_ in ('R','C')  then return --fin_nbu.ZN_F2('2000',3,dat_, okpo_) - fin_nbu.ZN_F2('2050',3,dat_, okpo_);
+			                                      CALC_POK_DOP('AZ1',dat_, okpo_, p_type)-CALC_POK_DOP('AZ2',dat_, okpo_, p_type);
 			 		                  else return null;
 			End case;
 
@@ -1578,29 +1582,33 @@ Begin
         /* AZ8	8	Операційний прибуток / збиток  (квартальна)*/
     elsif 	kod_ = 'AZ8' and p_type_ = 1 then
             Case
-  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2190',dat_, okpo_) - fin_nbu.ZN_FDK('2195',dat_, okpo_);
- 			    when FZ_ in ('R','C')  then return fin_nbu.ZN_FDK('2000',dat_, okpo_) - fin_nbu.ZN_FDK('2050',dat_, okpo_) + fin_nbu.ZN_FDK('2120',dat_, okpo_) - fin_nbu.ZN_FDK('2180',dat_, okpo_);
+  				when FZ_ = 'N'         then return CALC_POK_DOP('AZ3',dat_, okpo_, p_type)+CALC_POK_DOP('AZ4',dat_, okpo_, p_type)-CALC_POK_DOP('AZ5',dat_, okpo_, p_type)-CALC_POK_DOP('AZ6',dat_, okpo_, p_type)-CALC_POK_DOP('AZ7',dat_, okpo_, p_type);
+				                                   --fin_nbu.ZN_FDK('2190',dat_, okpo_) - fin_nbu.ZN_FDK('2195',dat_, okpo_);
+ 			    when FZ_ in ('R','C')  then return CALC_POK_DOP('AZ3',dat_, okpo_, p_type)+CALC_POK_DOP('AZ4',dat_, okpo_, p_type)-CALC_POK_DOP('AZ7',dat_, okpo_, p_type);
+				                                   --fin_nbu.ZN_FDK('2000',dat_, okpo_) - fin_nbu.ZN_FDK('2050',dat_, okpo_) + fin_nbu.ZN_FDK('2120',dat_, okpo_) - fin_nbu.ZN_FDK('2180',dat_, okpo_);
 					                   else return null;
 			end case;
 		/* AZ8	8	Операційний прибуток / збиток (кумулятивна) */
     elsif 	kod_ = 'AZ8' and p_type_ = 2 then
 	        Case
-			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2190',3,dat_, okpo_) - fin_nbu.ZN_F2('2195',3,dat_, okpo_);
- 			   when FZ_ in ('R','C')  then return fin_nbu.ZN_F2('2000',3,dat_, okpo_) - fin_nbu.ZN_F2('2050',3,dat_, okpo_) + fin_nbu.ZN_F2('2120',3,dat_, okpo_) - fin_nbu.ZN_F2('2180',3,dat_, okpo_);
+			   when FZ_ = 'N'         then return CALC_POK_DOP('AZ3',dat_, okpo_, p_type)+CALC_POK_DOP('AZ4',dat_, okpo_, p_type)-CALC_POK_DOP('AZ5',dat_, okpo_, p_type)-CALC_POK_DOP('AZ6',dat_, okpo_, p_type)-CALC_POK_DOP('AZ7',dat_, okpo_, p_type); 
+			                                      --fin_nbu.ZN_F2('2190',3,dat_, okpo_) - fin_nbu.ZN_F2('2195',3,dat_, okpo_);
+ 			   when FZ_ in ('R','C')  then return CALC_POK_DOP('AZ3',dat_, okpo_, p_type)+CALC_POK_DOP('AZ4',dat_, okpo_, p_type)-CALC_POK_DOP('AZ7',dat_, okpo_, p_type); 
+			                                      --fin_nbu.ZN_F2('2000',3,dat_, okpo_) - fin_nbu.ZN_F2('2050',3,dat_, okpo_) + fin_nbu.ZN_F2('2120',3,dat_, okpo_) - fin_nbu.ZN_F2('2180',3,dat_, okpo_);
 			 		                  else return null;
 			End case;
 
         /* AZ9	9	Фінансові доходи (квартальна)*/
     elsif 	kod_ = 'AZ9' and p_type_ = 1 then
             Case
-  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2220',dat_, okpo_);
+  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2220',dat_, okpo_) + greatest(fin_nbu.ZN_FDK('2405',dat_, okpo_),0);
  			    when FZ_ in ('R','C')  then return null;
 					                   else return null;
 			end case;
 		/* AZ9	9	Фінансові доходи (кумулятивна) */
     elsif 	kod_ = 'AZ9' and p_type_ = 2 then
 	        Case
-			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2220',3,dat_, okpo_);
+			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2220',3,dat_, okpo_) + greatest(fin_nbu.ZN_F2('2405',3,dat_, okpo_),0);
  			   when FZ_ in ('R','C')  then return null;
 			 		                  else return null;
 			End case;
@@ -1608,14 +1616,14 @@ Begin
         /* AZ10	10	Фінансові витрати (квартальна)*/
     elsif 	kod_ = 'AZ10' and p_type_ = 1 then
             Case
-  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2250',dat_, okpo_);
- 			    when FZ_ in ('R','C')  then return fin_nbu.ZN_FDK('2250',dat_, okpo_);
+  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2250',dat_, okpo_) + abs(least(fin_nbu.ZN_FDK('2405',dat_, okpo_),0));
+ 			    when FZ_ in ('R','C')  then return fin_nbu.ZN_FDK('2250',dat_, okpo_) ;
 					                   else return null;
 			end case;
 		/* AZ10	10	Фінансові витрати (кумулятивна) */
     elsif 	kod_ = 'AZ10' and p_type_ = 2 then
 	        Case
-			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2250',3,dat_, okpo_);
+			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2250',3,dat_, okpo_) + abs(least(fin_nbu.ZN_F2('2405',3,dat_, okpo_),0));
  			   when FZ_ in ('R','C')  then return fin_nbu.ZN_F2('2250',3,dat_, okpo_);
 			 		                  else return null;
 			End case;
@@ -1623,14 +1631,14 @@ Begin
         /* AZ11	11	Результат від участі в капіталі (квартальна)*/
     elsif 	kod_ = 'AZ11' and p_type_ = 1 then
             Case
-  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2200',dat_, okpo_) - fin_nbu.ZN_FDK('2255',dat_, okpo_);
+  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2200',dat_, okpo_) - abs(fin_nbu.ZN_FDK('2255',dat_, okpo_)) + fin_nbu.ZN_FDK('2415',dat_, okpo_);
  			    when FZ_ in ('R','C')  then return null;
 					                   else return null;
 			end case;
 		/* AZ11	11	Результат від участі в капіталі (кумулятивна) */
     elsif 	kod_ = 'AZ11' and p_type_ = 2 then
 	        Case
-			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2200',3,dat_, okpo_) - fin_nbu.ZN_F2('2255',3,dat_, okpo_);
+			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2200',3,dat_, okpo_) - abs(fin_nbu.ZN_F2('2255',3,dat_, okpo_)) + fin_nbu.ZN_F2('2415',3,dat_, okpo_);
  			   when FZ_ in ('R','C')  then return null;
 			 		                  else return null;
 			End case;
@@ -1638,14 +1646,14 @@ Begin
         /* AZ12	12	Інші доходи (квартальна)*/
     elsif 	kod_ = 'AZ12' and p_type_ = 1 then
             Case
-  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2240',dat_, okpo_) + greatest(fin_nbu.ZN_FDK('2275',dat_, okpo_),0);
+  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2240',dat_, okpo_) + greatest(fin_nbu.ZN_FDK('2275',dat_, okpo_),0) + greatest(fin_nbu.ZN_FDK('2305',dat_, okpo_),0) + greatest(fin_nbu.ZN_FDK('2400',dat_, okpo_),0) + fin_nbu.ZN_FDK('2445',dat_, okpo_);
  			    when FZ_ in ('R','C')  then return fin_nbu.ZN_FDK('2240',dat_, okpo_);
 					                   else return null;
 			end case;
 		/* AZ12	12	Інші доходи  (кумулятивна) */
     elsif 	kod_ = 'AZ12' and p_type_ = 2 then
 	        Case
-			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2240',3,dat_, okpo_) + greatest(fin_nbu.ZN_F2('2275',3,dat_, okpo_),0);
+			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2240',3,dat_, okpo_) + greatest(fin_nbu.ZN_F2('2275',3,dat_, okpo_),0) + greatest(fin_nbu.ZN_F2('2305',3,dat_, okpo_),0) + greatest(fin_nbu.ZN_F2('2400',3,dat_, okpo_),0) + fin_nbu.ZN_F2('2245',3,dat_, okpo_);
  			   when FZ_ in ('R','C')  then return fin_nbu.ZN_F2('2240',3,dat_, okpo_);
 			 		                  else return null;
 			End case;
@@ -1653,15 +1661,15 @@ Begin
         /* AZ13	13	Інші витрати (квартальна)*/
     elsif 	kod_ = 'AZ13' and p_type_ = 1 then
             Case
-  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2270',dat_, okpo_) - least(fin_nbu.ZN_FDK('2275',dat_, okpo_),0);
- 			    when FZ_ in ('R','C')  then return fin_nbu.ZN_FDK('2270',dat_, okpo_);
+  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2270',dat_, okpo_) - least(fin_nbu.ZN_FDK('2275',dat_, okpo_),0) - least(fin_nbu.ZN_FDK('2305',dat_, okpo_),0) - least(fin_nbu.ZN_FDK('2400',dat_, okpo_),0);
+ 			    when FZ_ in ('R','C')  then return fin_nbu.ZN_FDK('2270',dat_, okpo_) - abs(fin_nbu.ZN_FDK('2250',dat_, okpo_));
 					                   else return null;
 			end case;
 		/* AZ13	13	Інші витрати  (кумулятивна) */
     elsif 	kod_ = 'AZ13' and p_type_ = 2 then
 	        Case
-			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2270',3,dat_, okpo_) - least(fin_nbu.ZN_F2('2275',3,dat_, okpo_),0);
- 			   when FZ_ in ('R','C')  then return fin_nbu.ZN_F2('2270',3,dat_, okpo_);
+			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2270',3,dat_, okpo_) - least(fin_nbu.ZN_F2('2275',3,dat_, okpo_),0) - least(fin_nbu.ZN_F2('2305',3,dat_, okpo_),0) - least(fin_nbu.ZN_F2('2400',3,dat_, okpo_),0);
+ 			   when FZ_ in ('R','C')  then return fin_nbu.ZN_F2('2270',3,dat_, okpo_) - abs(fin_nbu.ZN_F2('2250',3,dat_, okpo_));
 			 		                  else return null;
 			End case;
 
@@ -1683,29 +1691,35 @@ Begin
         /* AZ15	15	Прибуток / збиток до оподаткування  (квартальна)*/
     elsif 	kod_ = 'AZ15' and p_type_ = 1 then
             Case
-  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2290',dat_, okpo_) - fin_nbu.ZN_FDK('2295',dat_, okpo_) + fin_nbu.ZN_FDK('2305',dat_, okpo_);
- 			    when FZ_ in ('R','C')  then return fin_nbu.ZN_FDK('2290',dat_, okpo_);
+  				when FZ_ = 'N'         then return --fin_nbu.ZN_FDK('2290',dat_, okpo_) - fin_nbu.ZN_FDK('2295',dat_, okpo_) + fin_nbu.ZN_FDK('2305',dat_, okpo_);
+				                                   CALC_POK_DOP('AZ8',dat_, okpo_, p_type) + CALC_POK_DOP('AZ9',dat_, okpo_, p_type) - CALC_POK_DOP('AZ10',dat_, okpo_, p_type) + CALC_POK_DOP('AZ11',dat_, okpo_, p_type) +
+												   CALC_POK_DOP('AZ12',dat_, okpo_, p_type) - CALC_POK_DOP('AZ13',dat_, okpo_, p_type) + CALC_POK_DOP('AZ14',dat_, okpo_, p_type);
+ 			    when FZ_ in ('R','C')  then return --fin_nbu.ZN_FDK('2290',dat_, okpo_);
+				                                   CALC_POK_DOP('AZ8',dat_, okpo_, p_type) - CALC_POK_DOP('AZ10',dat_, okpo_, p_type) + CALC_POK_DOP('AZ12',dat_, okpo_, p_type) - CALC_POK_DOP('AZ13',dat_, okpo_, p_type);    
 					                   else return null;
 			end case;
 		/* AZ15	15	Прибуток / збиток до оподаткування  (кумулятивна)*/
     elsif 	kod_ = 'AZ15' and p_type_ = 2 then
 	        Case
-			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2290',3,dat_, okpo_) - fin_nbu.ZN_F2('2295',3,dat_, okpo_) + fin_nbu.ZN_F2('2305',3,dat_, okpo_);
- 			   when FZ_ in ('R','C')  then return fin_nbu.ZN_F2('2290',3,dat_, okpo_) ;
+			   when FZ_ = 'N'         then return --fin_nbu.ZN_F2('2290',3,dat_, okpo_) - fin_nbu.ZN_F2('2295',3,dat_, okpo_) + fin_nbu.ZN_F2('2305',3,dat_, okpo_);
+			                                      CALC_POK_DOP('AZ8',dat_, okpo_, p_type) + CALC_POK_DOP('AZ9',dat_, okpo_, p_type) - CALC_POK_DOP('AZ10',dat_, okpo_, p_type) + CALC_POK_DOP('AZ11',dat_, okpo_, p_type) +
+												  CALC_POK_DOP('AZ12',dat_, okpo_, p_type) - CALC_POK_DOP('AZ13',dat_, okpo_, p_type) + CALC_POK_DOP('AZ14',dat_, okpo_, p_type);
+ 			   when FZ_ in ('R','C')  then return --fin_nbu.ZN_F2('2290',3,dat_, okpo_) ;
+			                                      CALC_POK_DOP('AZ8',dat_, okpo_, p_type) - CALC_POK_DOP('AZ10',dat_, okpo_, p_type) + CALC_POK_DOP('AZ12',dat_, okpo_, p_type) - CALC_POK_DOP('AZ13',dat_, okpo_, p_type);     
 			 		                  else return null;
 			End case;
 
         /* AZ16	16	Податки (квартальна)*/
     elsif 	kod_ = 'AZ16' and p_type_ = 1 then
             Case
-  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2300',dat_, okpo_);
+  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2300',dat_, okpo_) + fin_nbu.ZN_FDK('2455',dat_, okpo_);
  			    when FZ_ in ('R','C')  then return fin_nbu.ZN_FDK('2300',dat_, okpo_);
 					                   else return null;
 			end case;
 		/* AZ16	16	Податки  (кумулятивна)*/
     elsif 	kod_ = 'AZ16' and p_type_ = 2 then
 	        Case
-			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2300',3,dat_, okpo_);
+			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2300',3,dat_, okpo_) + fin_nbu.ZN_F2('2455',3,dat_, okpo_);
  			   when FZ_ in ('R','C')  then return fin_nbu.ZN_F2('2300',3,dat_, okpo_) ;
 			 		                  else return null;
 			End case;
@@ -1713,15 +1727,19 @@ Begin
         /* AZ17	17	Чистий прибуток / збиток (квартальна)*/
     elsif 	kod_ = 'AZ17' and p_type_ = 1 then
             Case
-  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2350',dat_, okpo_)-fin_nbu.ZN_FDK('2355',dat_, okpo_);
- 			    when FZ_ in ('R','C')  then return fin_nbu.ZN_FDK('2350',dat_, okpo_);
+  				when FZ_ = 'N'         then return --fin_nbu.ZN_FDK('2350',dat_, okpo_)-fin_nbu.ZN_FDK('2355',dat_, okpo_);
+				                                   CALC_POK_DOP('AZ15',dat_, okpo_, p_type) - CALC_POK_DOP('AZ16',dat_, okpo_, p_type); 
+ 			    when FZ_ in ('R','C')  then return --fin_nbu.ZN_FDK('2350',dat_, okpo_);
+				                                   CALC_POK_DOP('AZ15',dat_, okpo_, p_type) - CALC_POK_DOP('AZ16',dat_, okpo_, p_type);  
 					                   else return null;
 			end case;
 		/* AZ17	17	Чистий прибуток / збиток  (кумулятивна)*/
     elsif 	kod_ = 'AZ17' and p_type_ = 2 then
 	        Case
-			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2350',3,dat_, okpo_)-fin_nbu.ZN_F2('2355',3,dat_, okpo_);
- 			   when FZ_ in ('R','C')  then return fin_nbu.ZN_F2('2350',3,dat_, okpo_) ;
+			   when FZ_ = 'N'         then return --fin_nbu.ZN_F2('2350',3,dat_, okpo_)-fin_nbu.ZN_F2('2355',3,dat_, okpo_);
+			                                      CALC_POK_DOP('AZ15',dat_, okpo_, p_type) - CALC_POK_DOP('AZ16',dat_, okpo_, p_type); 
+ 			   when FZ_ in ('R','C')  then return --fin_nbu.ZN_F2('2350',3,dat_, okpo_) ;
+			                                      CALC_POK_DOP('AZ15',dat_, okpo_, p_type) - CALC_POK_DOP('AZ16',dat_, okpo_, p_type);     
 			 		                  else return null;
 			End case;
 
@@ -1741,12 +1759,28 @@ Begin
 			 		                  else return null;
 			End case;
 
+/* AZPZ	 Чистий прибуток/збитокAgg  */
+ elsif 	kod_ = 'AZPZ' and p_type_ = 1 then
+            Case
+  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2465',dat_, okpo_);
+ 			    when FZ_ in ('R','C')  then return fin_nbu.ZN_FDK('2350',dat_, okpo_);
+					                   else return null;
+			end case; 
+		/* AZPZ	18	Чистий прибуток/збитокAgg  (кумулятивна)*/
+    elsif 	kod_ = 'AZPZ' and p_type_ = 2 then
+	        Case
+			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2465',3,dat_, okpo_);
+ 			   when FZ_ in ('R','C')  then return fin_nbu.ZN_F2('2350',3,dat_, okpo_);
+			 		                  else return null;
+			End case; 	
 --***********************************Агрегований баланс АКТИВ ********************************************************
 		/* AB1	1	Активи  */
          elsif 	kod_ = 'AB1' then
 			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1300',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1300',4,dat_, okpo_);
+  			     when FZ_ = 'N'        then  return --fin_nbu.ZN_F1('1300',4,dat_, okpo_);
+				                                    CALC_POK_DOP('AB7',dat_, okpo_, p_type) + CALC_POK_DOP('AB13',dat_, okpo_, p_type); 
+			     when FZ_ in ('R','C') then  return --fin_nbu.ZN_F1('1300',4,dat_, okpo_);
+				                                    CALC_POK_DOP('AB7',dat_, okpo_, p_type) + CALC_POK_DOP('AB13',dat_, okpo_, p_type); 
 			                           else null;
 			End case;
 
@@ -1756,8 +1790,8 @@ Begin
   			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1010',4,dat_, okpo_)+fin_nbu.ZN_F1('1005',4,dat_, okpo_)+fin_nbu.ZN_F1('1020',4,dat_, okpo_)+fin_nbu.ZN_F1('1115',4,dat_, okpo_);
 			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1010',4,dat_, okpo_)+fin_nbu.ZN_F1('1005',4,dat_, okpo_)+fin_nbu.ZN_F1('1020',4,dat_, okpo_);
 			                           else null;
-			End case;
-
+			End case;		                                                                                                                                                              
+			
 		/* AB3	3	Нематеріальні активи */
          elsif 	kod_ = 'AB3' then
 			Case
@@ -1794,8 +1828,11 @@ Begin
 		/* AB7	7	Необоротні активи */
          elsif 	kod_ = 'AB7' then
 			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1200',4,dat_, okpo_)+fin_nbu.ZN_F1('1095',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1200',4,dat_, okpo_)+fin_nbu.ZN_F1('1095',4,dat_, okpo_);
+  			     when FZ_ = 'N'        then  return --fin_nbu.ZN_F1('1200',4,dat_, okpo_)+fin_nbu.ZN_F1('1095',4,dat_, okpo_);
+				                                    CALC_POK_DOP('AB2',dat_, okpo_, p_type) + CALC_POK_DOP('AB3',dat_, okpo_, p_type) + CALC_POK_DOP('AB4',dat_, okpo_, p_type) +
+													CALC_POK_DOP('AB5',dat_, okpo_, p_type)  + CALC_POK_DOP('AB6',dat_, okpo_, p_type);
+			     when FZ_ in ('R','C') then  return --fin_nbu.ZN_F1('1200',4,dat_, okpo_)+fin_nbu.ZN_F1('1095',4,dat_, okpo_);
+				                                    CALC_POK_DOP('AB2',dat_, okpo_, p_type) + CALC_POK_DOP('AB6',dat_, okpo_, p_type);
 			                           else null;
 			End case;
 
@@ -1844,8 +1881,12 @@ Begin
 		/* AB13	13	Оборотні активи */
          elsif 	kod_ = 'AB13' then
 			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1195',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1195',4,dat_, okpo_);
+  			     when FZ_ = 'N'        then  return --fin_nbu.ZN_F1('1195',4,dat_, okpo_);
+				                                    CALC_POK_DOP('AB8',dat_, okpo_, p_type) + CALC_POK_DOP('AB9',dat_, okpo_, p_type) + CALC_POK_DOP('AB10',dat_, okpo_, p_type) +
+													CALC_POK_DOP('AB11',dat_, okpo_, p_type) + CALC_POK_DOP('AB12',dat_, okpo_, p_type);
+			     when FZ_ in ('R','C') then  return --fin_nbu.ZN_F1('1195',4,dat_, okpo_);
+				                                    CALC_POK_DOP('AB8',dat_, okpo_, p_type) + CALC_POK_DOP('AB9',dat_, okpo_, p_type) + CALC_POK_DOP('AB10',dat_, okpo_, p_type) +
+													CALC_POK_DOP('AB11',dat_, okpo_, p_type) + CALC_POK_DOP('AB12',dat_, okpo_, p_type);
 			                           else null;
 			End case;
 
@@ -1856,8 +1897,10 @@ Begin
 		/* AP1	1	Пасиви */
          elsif 	kod_ = 'AP1' then
 			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1900',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1900',4,dat_, okpo_);
+  			     when FZ_ = 'N'        then  return --fin_nbu.ZN_F1('1900',4,dat_, okpo_);
+				                                    CALC_POK_DOP('AP8',dat_, okpo_, p_type) + CALC_POK_DOP('AP12',dat_, okpo_, p_type) + CALC_POK_DOP('AP17',dat_, okpo_, p_type);
+			     when FZ_ in ('R','C') then  return --fin_nbu.ZN_F1('1900',4,dat_, okpo_);
+				                                    CALC_POK_DOP('AP8',dat_, okpo_, p_type) + CALC_POK_DOP('AP12',dat_, okpo_, p_type) + CALC_POK_DOP('AP17',dat_, okpo_, p_type);
 			                           else null;
 			End case;
 
@@ -1866,7 +1909,7 @@ Begin
 			Case
   			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1400',4,dat_, okpo_)+fin_nbu.ZN_F1('1401',4,dat_, okpo_)+fin_nbu.ZN_F1('1410',4,dat_, okpo_)
 				                                   +fin_nbu.ZN_F1('1411',4,dat_, okpo_)+fin_nbu.ZN_F1('1415',4,dat_, okpo_)+fin_nbu.ZN_F1('1425',4,dat_, okpo_)
-												   +fin_nbu.ZN_F1('1435',4,dat_, okpo_)+fin_nbu.ZN_F1('1430',4,dat_, okpo_);
+												   +fin_nbu.ZN_F1('1435',4,dat_, okpo_)+fin_nbu.ZN_F1('1430',4,dat_, okpo_)-fin_nbu.ZN_F1('1412',4,dat_, okpo_);
 			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1400',4,dat_, okpo_)+fin_nbu.ZN_F1('1410',4,dat_, okpo_)+fin_nbu.ZN_F1('1415',4,dat_, okpo_)
 				                                   +fin_nbu.ZN_F1('1425',4,dat_, okpo_);
 			                           else null;
@@ -1899,8 +1942,10 @@ Begin
 		/* AP6	6	Власний капітал */
          elsif 	kod_ = 'AP6' then
 			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1495',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1495',4,dat_, okpo_);
+  			     when FZ_ = 'N'        then  return --fin_nbu.ZN_F1('1495',4,dat_, okpo_);
+				                                    CALC_POK_DOP('AP2',dat_, okpo_, p_type) + CALC_POK_DOP('AP3',dat_, okpo_, p_type) + CALC_POK_DOP('AP4',dat_, okpo_, p_type) + CALC_POK_DOP('AP5',dat_, okpo_, p_type);
+			     when FZ_ in ('R','C') then  return --fin_nbu.ZN_F1('1495',4,dat_, okpo_);
+				                                    CALC_POK_DOP('AP2',dat_, okpo_, p_type) + CALC_POK_DOP('AP5',dat_, okpo_, p_type);
 			                           else null;
 			End case;
 
@@ -1915,12 +1960,14 @@ Begin
 		/* AP8	8	Капітал */
          elsif 	kod_ = 'AP8' then
 			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1400',4,dat_, okpo_) + fin_nbu.ZN_F1('1401',4,dat_, okpo_) + fin_nbu.ZN_F1('1410',4,dat_, okpo_)
+  			     when FZ_ = 'N'        then  return /*fin_nbu.ZN_F1('1400',4,dat_, okpo_) + fin_nbu.ZN_F1('1401',4,dat_, okpo_) + fin_nbu.ZN_F1('1410',4,dat_, okpo_)
 				                                   +fin_nbu.ZN_F1('1411',4,dat_, okpo_) + fin_nbu.ZN_F1('1415',4,dat_, okpo_) + fin_nbu.ZN_F1('1425',4,dat_, okpo_)
 												   +fin_nbu.ZN_F1('1435',4,dat_, okpo_) + fin_nbu.ZN_F1('1430',4,dat_, okpo_) + fin_nbu.ZN_F1('1405',4,dat_, okpo_)
-												   +fin_nbu.ZN_F1('1412',4,dat_, okpo_) + fin_nbu.ZN_F1('1420',4,dat_, okpo_) + fin_nbu.ZN_F1('1490',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1400',4,dat_, okpo_) + fin_nbu.ZN_F1('1410',4,dat_, okpo_) + fin_nbu.ZN_F1('1415',4,dat_, okpo_)
-				                                   +fin_nbu.ZN_F1('1425',4,dat_, okpo_) + fin_nbu.ZN_F1('1420',4,dat_, okpo_) + fin_nbu.ZN_F1('1490',4,dat_, okpo_);
+												   +fin_nbu.ZN_F1('1412',4,dat_, okpo_) + fin_nbu.ZN_F1('1420',4,dat_, okpo_) + fin_nbu.ZN_F1('1490',4,dat_, okpo_);*/
+												   CALC_POK_DOP('AP6',dat_, okpo_, p_type) + CALC_POK_DOP('AP7',dat_, okpo_, p_type); 
+			     when FZ_ in ('R','C') then  return /*fin_nbu.ZN_F1('1400',4,dat_, okpo_) + fin_nbu.ZN_F1('1410',4,dat_, okpo_) + fin_nbu.ZN_F1('1415',4,dat_, okpo_)
+				                                   +fin_nbu.ZN_F1('1425',4,dat_, okpo_) + fin_nbu.ZN_F1('1420',4,dat_, okpo_) + fin_nbu.ZN_F1('1490',4,dat_, okpo_);*/
+												   CALC_POK_DOP('AP6',dat_, okpo_, p_type) + CALC_POK_DOP('AP7',dat_, okpo_, p_type); 
 			                           else null;
 			End case;
 
@@ -1928,7 +1975,7 @@ Begin
          elsif 	kod_ = 'AP9' then
 			Case
   			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1510',4,dat_, okpo_) + fin_nbu.ZN_F1('1520',4,dat_, okpo_) + fin_nbu.ZN_F1('1525',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1510',4,dat_, okpo_);
+			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1595',4,dat_, okpo_);
 			                           else null;
 			End case;
 
@@ -1943,7 +1990,7 @@ Begin
 		/* AP11	11	Інші довгострокові зобов'язання */
          elsif 	kod_ = 'AP11' then
 			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1515',4,dat_, okpo_) + fin_nbu.ZN_F1('1521',4,dat_, okpo_) + fin_nbu.ZN_F1('1526',4,dat_, okpo_)
+  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1515',4,dat_, okpo_) --+ fin_nbu.ZN_F1('1521',4,dat_, okpo_) + fin_nbu.ZN_F1('1526',4,dat_, okpo_)
 				                                   +fin_nbu.ZN_F1('1530',4,dat_, okpo_) + fin_nbu.ZN_F1('1535',4,dat_, okpo_) + fin_nbu.ZN_F1('1540',4,dat_, okpo_)
 												   +fin_nbu.ZN_F1('1545',4,dat_, okpo_) ;
 			     when FZ_ in ('R','C') then  return null;
@@ -1953,8 +2000,10 @@ Begin
 		/* AP12	12	Довгострокові зобов'язання */
          elsif 	kod_ = 'AP12' then
 			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1595',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1595',4,dat_, okpo_);
+  			     when FZ_ = 'N'        then  return --fin_nbu.ZN_F1('1595',4,dat_, okpo_);
+				                                    CALC_POK_DOP('AP9',dat_, okpo_, p_type) + CALC_POK_DOP('AP10',dat_, okpo_, p_type) + CALC_POK_DOP('AP11',dat_, okpo_, p_type);
+			     when FZ_ in ('R','C') then  return --fin_nbu.ZN_F1('1595',4,dat_, okpo_);
+				                                    CALC_POK_DOP('AP9',dat_, okpo_, p_type) ;
 			                           else null;
 			End case;
 
@@ -1973,7 +2022,7 @@ Begin
 				                                   +fin_nbu.ZN_F1('1630',4,dat_, okpo_) + fin_nbu.ZN_F1('1605',4,dat_, okpo_) + fin_nbu.ZN_F1('1635',4,dat_, okpo_)
 												   +fin_nbu.ZN_F1('1640',4,dat_, okpo_) + fin_nbu.ZN_F1('1645',4,dat_, okpo_) + fin_nbu.ZN_F1('1650',4,dat_, okpo_);
 			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1610',4,dat_, okpo_) + fin_nbu.ZN_F1('1615',4,dat_, okpo_) + fin_nbu.ZN_F1('1625',4,dat_, okpo_)
-				                                   +fin_nbu.ZN_F1('1630',4,dat_, okpo_);
+				                                   +fin_nbu.ZN_F1('1630',4,dat_, okpo_) + fin_nbu.ZN_F1('1605',4,dat_, okpo_);
 			                           else null;
 			End case;
 
@@ -1997,8 +2046,10 @@ Begin
 		/* AP17	17	Поточні зобов'язання */
          elsif 	kod_ = 'AP17' then
 			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1695',4,dat_, okpo_) + fin_nbu.ZN_F1('1700',4,dat_, okpo_) + fin_nbu.ZN_F1('1800',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1695',4,dat_, okpo_) + fin_nbu.ZN_F1('1700',4,dat_, okpo_);
+  			     when FZ_ = 'N'        then  return --fin_nbu.ZN_F1('1695',4,dat_, okpo_) + fin_nbu.ZN_F1('1700',4,dat_, okpo_) + fin_nbu.ZN_F1('1800',4,dat_, okpo_);
+				                                    CALC_POK_DOP('AP13',dat_, okpo_, p_type) + CALC_POK_DOP('AP14',dat_, okpo_, p_type) + CALC_POK_DOP('AP15',dat_, okpo_, p_type) + CALC_POK_DOP('AP16',dat_, okpo_, p_type);
+			     when FZ_ in ('R','C') then  return --fin_nbu.ZN_F1('1695',4,dat_, okpo_) + fin_nbu.ZN_F1('1700',4,dat_, okpo_);
+				                                    CALC_POK_DOP('AP13',dat_, okpo_, p_type) + CALC_POK_DOP('AP14',dat_, okpo_, p_type) + CALC_POK_DOP('AP15',dat_, okpo_, p_type) + CALC_POK_DOP('AP16',dat_, okpo_, p_type);
 			                           else null;
 			End case;
 
