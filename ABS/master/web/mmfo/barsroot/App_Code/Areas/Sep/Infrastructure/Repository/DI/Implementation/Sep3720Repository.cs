@@ -136,6 +136,7 @@ namespace BarsWeb.Areas.Sep.Infrastructure.Repository.DI.Implementation
                                  case when t.rec_o is not null then nvl(k.okpo,a.id_b )
                                  else a.id_b 
                                  end OKPOB,
+                                 k.okpo OKPOB2,
                                  s.nms NAMB2,
                                  CASE
                                     WHEN    s.nls IS NOT NULL
