@@ -1398,7 +1398,7 @@ IS
         l_UACC_Instance_Rec.open_date        := i.open_date;
         l_UACC_Instance_Rec.close_date       := null;
         l_UACC_Instance_Rec.account_status   := 6;
---        l_UACC_Instance_Rec.agr_number       := i.agr_number;
+        l_UACC_Instance_Rec.agr_number       := i.agr_number;
         l_UACC_Instance_Rec.agr_code         := i.agr_code;
         l_UACC_Instance_Rec.account_type     := l_acc_type; --i.account_type;
         l_UACC_Instance_Rec.agr_type         := l_agr_type; -- rAccAgrParam.agr_type;
