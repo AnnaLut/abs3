@@ -39,7 +39,13 @@ end;
 /
 
 
-
+begin 
+  execute immediate 
+    ' ALTER TABLE BARS.FIN_KVED  ADD (KOD VARCHAR2(4) DEFAULT ''2000'' )';
+exception when others then 
+  if sqlcode=-1430 then null; else raise; end if;
+end;
+/
 
 PROMPT *** ALTER_POLICIES to FIN_KVED ***
  exec bpa.alter_policies('FIN_KVED');
@@ -54,12 +60,26 @@ COMMENT ON COLUMN BARS.FIN_KVED.WEIGHT IS 'Питома вага';
 COMMENT ON COLUMN BARS.FIN_KVED.FLAG IS 'Флаг активності 0-ні 1-так';
 
 
+begin 
+  execute immediate 
+    ' ALTER TABLE BARS.FIN_PD  DROP CONSTRAINT PK_FINKVED';
+exception when others then 
+  if sqlcode=-2443 then null; else raise; end if;
+end;
+/
 
+begin 
+  execute immediate 
+    ' drop index PK_FINKVED';
+exception when others then 
+  if sqlcode=-02429 or sqlcode=-01418 then null; else raise; end if;
+end;
+/
 
 PROMPT *** Create  constraint PK_FINKVED ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.FIN_KVED ADD CONSTRAINT PK_FINKVED PRIMARY KEY (OKPO, DAT, KVED)
+  ALTER TABLE BARS.FIN_KVED ADD CONSTRAINT PK_FINKVED PRIMARY KEY (OKPO, DAT, KVED, KOD)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSBIGI  ENABLE';
 exception when others then
@@ -73,7 +93,7 @@ exception when others then
 PROMPT *** Create  index PK_FINKVED ***
 begin   
  execute immediate '
-  CREATE UNIQUE INDEX BARS.PK_FINKVED ON BARS.FIN_KVED (OKPO, DAT, KVED) 
+  CREATE UNIQUE INDEX BARS.PK_FINKVED ON BARS.FIN_KVED (OKPO, DAT, KVED, KOD) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSBIGI ';
 exception when others then
@@ -84,7 +104,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  FIN_KVED ***
+--grant SELECT                                                                 on FIN_KVED        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FIN_KVED        to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on FIN_KVED        to UPLD;
 
 
 

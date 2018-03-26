@@ -14,7 +14,6 @@
     <div>
         <asp:Panel ID="PnZag" runat="server">
             <table>
-            
                 <tr>
                     <td style="width: 25Px">
                     </td>
@@ -26,7 +25,7 @@
                             Width="100Px" />
                     </td>
                     <td>
-                        <asp:Label ID="LbNMK" runat="server"></asp:Label> 
+                        <asp:Label ID="LbNMK" runat="server"></asp:Label>
                     </td>
                 </tr>
                 <tr>
@@ -43,13 +42,14 @@
                             CausesValidation="false" />
                     </td>
                 </tr>
-                 <tr>
-                <td colspan="1"></td>
-                <td colspan="4">
-                <asp:CheckBox ID="CC_CK" runat="server" Text="Позичальник належить до СК"  ToolTip="Позичальник належить до страхових компаній"
-                        Font-Size="X-Small" Font-Italic="True"  AutoPostBack="true"
-                        oncheckedchanged="CC_CK_CheckedChanged" />
-                </td>
+                <tr>
+                    <td colspan="1">
+                    </td>
+                    <td colspan="3">
+                        <asp:CheckBox ID="CC_CK" runat="server" Text="Позичальник належить до СК" ToolTip="Позичальник належить до страхових компаній"
+                            Font-Size="X-Small" Font-Italic="True" AutoPostBack="true" OnCheckedChanged="CC_CK_CheckedChanged"
+                            Visible="False" />
+                    </td>
                 </tr>
             </table>
         </asp:Panel>
@@ -114,12 +114,15 @@
             </table>
         </asp:Panel>
         <asp:Panel ID="PnKVED" runat="server" Width="900">
-            <Bars:BarsGridViewEx AllowPaging="false" ID="DataKved" runat="server" CssClass="barsGridView"
+            <Bars:BarsGridViewEx AllowPaging="false" ID="DataKved" runat="server"  CssClass="barsGridView"
                 Visible="true" AutoGenerateColumns="False" OnRowDataBound="DataDepository_RowDataBound"
                 ShowPageSizeBox="false" EnableViewState="true" DataKeyNames="FLAG,ORD" AllowSorting="true"
                 Width="880" ShowCaption="false" ShowExportExcelButton="True" ShowFilter="false"
-                ShowFooter="True">
+                ShowFooter="true">
                 <Columns>
+                    <asp:BoundField DataField="KOD" HeaderText="Рядок" HtmlEncode="False">
+                        <ItemStyle Wrap="False" HorizontalAlign="Center" />
+                    </asp:BoundField>
                     <asp:BoundField DataField="KVED" HeaderText="Код &lt;BR&gt;за КВЕД-2010" HtmlEncode="False">
                         <ItemStyle Wrap="False" HorizontalAlign="Center" />
                     </asp:BoundField>
@@ -134,6 +137,12 @@
                     <asp:BoundField DataField="WEIGHT" HeaderText="Питома вага &lt;BR&gt;%" HtmlEncode="False">
                         <ItemStyle Wrap="False" HorizontalAlign="Right" />
                     </asp:BoundField>
+                    <asp:TemplateField>
+                                    <ItemTemplate>
+                                        <asp:Image ID="Im4" runat="server" Visible='<%# (Convert.ToString(Eval("ERR")).Length == 0)?(false):(true) %>'
+                                            ToolTip='<%# Eval("ERR")%>' ImageUrl="/Common/Images/default/16/warning.png"  Height="15Px" Width="15Px"  />
+                                    </ItemTemplate>
+                                </asp:TemplateField>
                 </Columns>
                 <FooterStyle CssClass="footerRow" />
                 <HeaderStyle CssClass="headerRow" />
@@ -150,6 +159,18 @@
             BorderStyle="Outset" Style="margin-left: 50px;">
             <br />
             <table width="700Px">
+                <tr>
+                    <td style="width: 10%">
+                    </td>
+                    <td style="width: 40%">
+                        <asp:Label ID="Lb_kod" runat="server" Text="Рядок"></asp:Label>
+                        &nbsp;<span class="style1">*</span>
+                    </td>
+                    <td style="width: 50%">
+                        <asp:DropDownList ID="dl_kod" runat="server" Width="350Px" TabIndex="1" AutoPostBack="True">
+                        </asp:DropDownList>
+                    </td>
+                </tr>
                 <tr>
                     <td style="width: 10%">
                     </td>
@@ -196,6 +217,7 @@
             <br />
         </asp:Panel>
     </div>
+    <asp:HiddenField ID="KOD_" runat="server" />
     <asp:HiddenField ID="KVED_" runat="server" />
     <asp:HiddenField ID="SS_" runat="server" />
     <asp:HiddenField ID="FLAG_" runat="server" />

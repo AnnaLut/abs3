@@ -115,9 +115,10 @@
                 </td>
                 <%--OnClientClick="select_KVED()"--%>
                 <td>
-                    <asp:Button ID="btKVED" runat="server" Height="22px" 
-                        Text="Ф2.2000" ToolTip="Розшифровка даних 2000 рядка Ф2" Width="72px" CausesValidation="false" 
-                        onclick="btKVED_Click" BackColor="#99CCFF" />
+                    <asp:Button ID="btKVED" runat="server" Height="22px" Width="132px"
+                        Text="Ф2.2000+2010+2120" 
+                        ToolTip="Розшифровка даних 2000+2010+2120 рядка Ф2"  CausesValidation="false" 
+                        onclick="btKVED_Click" BackColor="#C4CEDD"  />
                     <asp:Label ID="Lb_n_ved" runat="server"></asp:Label>
                     <asp:RequiredFieldValidator ID="Reqtb_kved" runat="server" ControlToValidate="tb_kved"
                         Display="Dynamic" SetFocusOnError="true" ToolTip="Не вірний формат">Заповніть поле</asp:RequiredFieldValidator>

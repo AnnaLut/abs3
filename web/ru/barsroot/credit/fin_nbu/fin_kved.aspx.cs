@@ -65,6 +65,16 @@ public partial class credit_fin_nbu_fin_kved : Bars.BarsPage
                 //Биндим
                 dl_kved.DataBind();
                 dl_kved.Items.Insert(0, new ListItem("Виберіть вид економічної діяльності", ""));
+
+
+                dl_kod.DataSource = SQL_SELECT_dataset("select kod, kod||' - '||name as name from fin_forma2 where fm = 'N' and kod in ('2000','2010','2120') order by kod").Tables[0];
+                dl_kod.DataTextField = "name";
+                dl_kod.DataValueField = "kod";
+                //Биндим
+                dl_kod.DataBind();
+                dl_kod.Items.Insert(0, new ListItem("Виберіть рядок ф.2", ""));
+
+
             }
             finally
             {
@@ -98,7 +108,7 @@ public partial class credit_fin_nbu_fin_kved : Bars.BarsPage
             SetParameters("prnk",  DB_TYPE.Int64, Convert.ToInt64(RNK_.Value), DIRECTION.Input);
             SetParameters("pokpo", DB_TYPE.Int64, Convert.ToInt64(OKPO_.Value) , DIRECTION.Input);
             SetParameters("pdat",  DB_TYPE.Date,  Convert.ToDateTime(DAT_.Value), DIRECTION.Input);
-            DataKved.DataSource = SQL_SELECT_dataset(@"select kved, name, volme_sales, to_char(weight,'999990.99')||' %' weight, flag, ord from table(fin_nbu.f_fin_kved(:prnk,:pokpo,:pdat))");
+            DataKved.DataSource = SQL_SELECT_dataset(@"select kod, kved, name, volme_sales, to_char(weight,'999990.99')||' %' weight, flag, ord, err from table(fin_nbu.f_fin_kved(:prnk,:pokpo,:pdat))");
 
 
             DataKved.DataBind();
@@ -263,6 +273,7 @@ public partial class credit_fin_nbu_fin_kved : Bars.BarsPage
                 cmd.Parameters.Add("p_rnk", OracleDbType.Int64, Convert.ToInt64(RNK_.Value), ParameterDirection.Input);
                 cmd.Parameters.Add("p_okpo", OracleDbType.Int64, Convert.ToInt64(OKPO_.Value), ParameterDirection.Input);
                 cmd.Parameters.Add("p_dat", OracleDbType.Date, Convert.ToDateTime(DAT_.Value, cinfo), ParameterDirection.Input);
+                cmd.Parameters.Add("p_kod", OracleDbType.Varchar2,  dl_kod.SelectedValue, ParameterDirection.Input);
                 cmd.Parameters.Add("p_kved", OracleDbType.Varchar2, dl_kved.SelectedValue, ParameterDirection.Input);
                 cmd.Parameters.Add("p_volme_sales", OracleDbType.Decimal, volme_sales, ParameterDirection.Input);
                 cmd.ExecuteNonQuery();
@@ -293,17 +304,17 @@ public partial class credit_fin_nbu_fin_kved : Bars.BarsPage
         string script = @"<script language='javascript'>
 			var selectedRow;
             var lastColor;
-			function S_A(id, kved_,ss_,flag_, ord_)
+			function S_A(id, kved_,ss_,kod_, ord_)
 			{
 			 if(selectedRow != null ) selectedRow.style.backgroundColor = lastColor;
 			 lastColor = document.getElementById('r_'+id).style.backgroundColor;
-             if(ord_ == 0 ) document.getElementById('r_'+id).style.backgroundColor = '#d3d3d3';
+             if(ord_ == 0 ) document.getElementById('r_'+id).style.backgroundColor = '#cce6ff';
              //document.getElementById('r_'+id).style.backgroundColor = '#d3d3d3';
 			 selectedRow = document.getElementById('r_'+id);
 			   document.getElementById('KVED_').value =   kved_;
                document.getElementById('SS_' ).value  =   ss_;
-               document.getElementById('FLAG_').value =   flag_;
-               document.getElementById('ORD_' ).value =   ord_;
+               document.getElementById('FLAG_').value =   ord_;
+               document.getElementById('KOD_' ).value =   kod_;
      //          nd = nd1;
 			}
 			</script>";
@@ -326,16 +337,38 @@ public partial class credit_fin_nbu_fin_kved : Bars.BarsPage
             if (ord == 0)
             { 
             row.Attributes.Add("onclick", "S_A('" + row_counter + "','" +
-                row.Cells[0].Text + "','"  + row.Cells[2].Text + "',\"" +
-                ord + "\",'" + ord + "')");
+                row.Cells[1].Text + "','"  + row.Cells[3].Text + "',\"" +
+                row.Cells[0].Text + "\",'" + ord  + "')");
+            }
+            else
+            {
+                row.Attributes.Add("onclick", "S_A('" + row_counter + "','" +
+                    "" + "','" + "" + "',\"" +
+                    "" + "\",'" + ord + "')");
             }
 
         
             //if (row.Cells[5].Text == "1")
+            if (ord == 0)
+            {
+                row.ForeColor = Color.Black;
+                row.BackColor = Color.FromArgb(240, 240, 245);
+            }
+
             if ( ord == 1)
             {
                 row.ForeColor = Color.Black;
-                row.BackColor = Color.FromArgb(200, 220, 240);
+                row.BackColor = Color.FromArgb(214, 214, 194);
+                row.Font.Bold = true;
+            }
+
+
+            if (ord == 2)
+            {
+                row.ForeColor = Color.Black;
+                row.BackColor = Color.FromArgb(224, 224, 209);
+                row.Font.Italic = true;
+                row.Font.Bold = true;
             }
             //  Response.Write("-" + row.Cells[10].Text  );
 
@@ -358,6 +391,7 @@ public partial class credit_fin_nbu_fin_kved : Bars.BarsPage
         clear_form();
         pnrekv.Visible = true;
         dl_kved.Enabled = true;
+        dl_kod.Enabled = true;
  
     }
     
@@ -368,6 +402,8 @@ public partial class credit_fin_nbu_fin_kved : Bars.BarsPage
         else
         {
             pnrekv.Visible = true;
+            dl_kod.SelectedValue = KOD_.Value;
+            dl_kod.Enabled = false;
             dl_kved.SelectedValue = KVED_.Value;
             dl_kved.Enabled = false;
             tb_sump.Text = SS_.Value;
@@ -412,8 +448,8 @@ public partial class credit_fin_nbu_fin_kved : Bars.BarsPage
     
     private void clear_form()
     {
-       
-        
+
+        KOD_.Value = null;
         KVED_.Value = null;
         SS_.Value = null;
         FLAG_.Value = null;
@@ -422,6 +458,7 @@ public partial class credit_fin_nbu_fin_kved : Bars.BarsPage
 
 
         dl_kved.SelectedValue = "";
+        dl_kod.SelectedValue = "";
         tb_sump.Text = null;
 
 
@@ -519,7 +556,6 @@ public partial class credit_fin_nbu_fin_kved : Bars.BarsPage
             } 
  
     }
-
 
     protected void CC_CK_CheckedChanged(object sender, EventArgs e)
     {
