@@ -18,6 +18,7 @@ using Newtonsoft.Json;
 using System.Data;
 using Oracle.DataAccess.Client;
 using Oracle.DataAccess.Types;
+using System.Linq;
 
 
 namespace Bars.EAD.Structs.Params.Dicts
@@ -722,15 +723,24 @@ namespace Bars.EAD.Structs.Params
 
             String AgrType = ObjID.Split(';')[0];
             UInt64 ACC = Convert.ToUInt64(ObjID.Split(';')[1]);
+			bool ReservedAcc = ObjID.Split(';').ElementAtOrDefault(2) == "RSRV";
 
             OracleCommand cmd = con.CreateCommand();
-            cmd.CommandText = @"select rnk, changed, created, user_login, user_fio, account_number, currency_code, mfo, branch_id, open_date, close_date, account_status, agr_number, agr_code, account_type, agr_type, remote_controled
-                                  from TABLE (ead_integration.get_ACC_Instance_Set(:p_agr_type, :p_acc))";
-
-            cmd.Parameters.Clear();
+			cmd.Parameters.Clear();
             cmd.BindByName = true;
             cmd.Parameters.Add("p_agr_type", OracleDbType.Varchar2, AgrType, ParameterDirection.Input);
-            cmd.Parameters.Add("p_acc", OracleDbType.Int64, ACC, ParameterDirection.Input);
+			if(ReservedAcc)
+            {
+                cmd.CommandText = @"select rnk, changed, created, user_login, user_fio, account_number, currency_code, mfo, branch_id, open_date, close_date, account_status, agr_number, agr_code, account_type, agr_type, remote_controled
+                                 from TABLE (ead_integration.get_UACCRsrv_Instance_Set(:p_agr_type, :p_rsrv_id))";
+                cmd.Parameters.Add("p_rsrv_id", OracleDbType.Int64, ACC, ParameterDirection.Input);
+            }
+            else
+            {
+				cmd.CommandText = @"select rnk, changed, created, user_login, user_fio, account_number, currency_code, mfo, branch_id, open_date, close_date, account_status, agr_number, agr_code, account_type, agr_type, remote_controled
+                                  from TABLE (ead_integration.get_ACC_Instance_Set(:p_agr_type, :p_acc))";            
+				cmd.Parameters.Add("p_acc", OracleDbType.Int64, ACC, ParameterDirection.Input);
+			}
 
             Account res = new Account();
             using (OracleDataReader rdr = cmd.ExecuteReader())
