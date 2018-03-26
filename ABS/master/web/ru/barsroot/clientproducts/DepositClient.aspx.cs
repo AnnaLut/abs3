@@ -811,7 +811,7 @@ public partial class DepositClient : Bars.BarsPage
         textWorkPhone.Text = client.WorkPhone.Substring(Math.Max(0, client.WorkPhone.Length - 10));
         var croppedMobPhone = client.CellPhone.Substring(Math.Max(0, client.CellPhone.Length - 10));
 
-        if (croppedMobPhone != "000-00-00" && !croppedMobPhone.Contains("x"))
+        if (croppedMobPhone != "000-00-00" && !croppedMobPhone.Contains("x") && croppedMobPhone.Length == 10)
             textCellPhone.Text = croppedMobPhone.Substring(0, 3) + "*****" + croppedMobPhone.Substring(8, 2);
         else
             textCellPhone.Text = croppedMobPhone;
