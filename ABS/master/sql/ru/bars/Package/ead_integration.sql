@@ -5,6 +5,22 @@
   CREATE OR REPLACE PACKAGE BARS.EAD_INTEGRATION 
 IS
    g_header_version   CONSTANT VARCHAR2 (64) := 'version 2.2   01.10.2017';
+   
+   
+    type TAccAgrParam is record
+
+   (
+     agr_code  specparam.nkd%type,
+     agr_number  string(50),
+     acc_type  string(50),
+     agr_type  string(50),
+     agr_date  string(50),
+     agr_status  number,
+--     p_parent_agr_code out varchar2,
+     parent_agr_type string(50)
+   );
+   rAccAgrParam TAccAgrParam;
+   
 
    FUNCTION header_version
       RETURN VARCHAR2;
@@ -328,6 +344,34 @@ IS
 
    TYPE ACC_Instance_Set IS TABLE OF ACC_Instance_Rec;
    function get_ACC_Instance_Set (p_agr_type string, p_acc accounts.acc%type) return ACC_Instance_Set pipelined;
+   
+  --UACC_ RESERV 26.03.2018
+  TYPE UACC_Instance_Rec IS RECORD
+   (
+      rnk              customer.rnk%TYPE,
+      changed          DATE,
+      created          DATE,
+      user_login       staff$base.logname%TYPE,
+      user_fio         staff$base.fio%TYPE,
+      account_number   accounts.nls%TYPE,
+      currency_code    accounts.kv%TYPE,
+      mfo              banks.mfo%TYPE,
+      branch_id        accounts.branch%TYPE,
+      open_date        accounts.daos%TYPE,
+      close_date       accounts.dazs%TYPE,
+      account_status   SMALLINT,
+      agr_number       specparam.nkd%TYPE,
+      agr_code         VARCHAR2 (500),
+      account_type     VARCHAR2 (500),
+      agr_type         VARCHAR2 (10),
+      remote_controled number(1)
+   );
+
+   TYPE UACC_Instance_Set IS TABLE OF UACC_Instance_Rec;
+ --  function get_UACC_Instance_Set (p_agr_type string, p_acc accounts.acc%type) return UACC_Instance_Set pipelined;
+   function get_UACCRsrv_Instance_Set (p_agr_type string, p_rsrv_id accounts_rsrv.rsrv_id%type) return UACC_Instance_Set pipelined;
+ 
+  
 
    -----------------------------------------------------------------------
    -- EADService.cs         Structs.Params.Act.GetInstance
@@ -1291,6 +1335,85 @@ IS
     end loop;
 
    end;
+
+ 
+  ----------------!!!!!  26.03.2018
+ function get_UACCRsrv_Instance_Set (p_agr_type string, p_rsrv_id accounts_rsrv.rsrv_id%type) return UACC_Instance_Set pipelined is
+     l_UACC_Instance_Rec UACC_Instance_Rec;
+     l_agr_type varchar2(10);
+     l_acc_type varchar2(10);
+    begin
+  --    bc.go('/');
+  --    get_accagr_param_reserve(p_rsrv_id);
+
+     for i in ( SELECT a.rnk,
+                       a.kf,
+                       kl.get_customerw (a.rnk, 'NDBO') NDBO,
+                       kl.get_customerw (a.rnk, 'DDBO') DDBO,
+                       kl.get_customerw (a.rnk, 'SDBO') SDBO,
+                       trunc(a.crt_dt) as changed,
+                       sb.logname AS user_login,
+                       sb.fio AS user_fio,
+                       a.nls AS account_number,
+                       a.kv AS currency_code,
+                       a.kf AS mfo,
+                       a.branch AS branch_id,
+                       trunc(a.crt_dt) as open_date,
+                    --   rAccAgrParam.agr_code as agr_code,
+                       kl.get_customerw (a.rnk, 'NDBO') as agr_code,
+                       kl.get_customerw (a.rnk, 'NDBO') as agr_number,
+                       nvl(rAccAgrParam.acc_type,'pr_uo') AS account_type
+                     FROM accounts_rsrv a join staff$base sb on a.usr_id = sb.id
+                   WHERE a.rsrv_id = p_rsrv_id)
+     loop
+    
+  if (i.ndbo is not null and i.open_date >= to_date(replace(i.DDBO,'.','/'),'dd/mm/yyyy'))
+        then
+        l_agr_type     := tools.iif(i.SDBO is not null, 'dbo_uo');
+        end if;
+
+          if substr(i.account_number,1,4) in ('2655', '2605') then
+            l_acc_type := 'kpk_uo';
+          elsif substr(i.account_number,1,4) in ('2525', '2546', '2610', '2615', '2651', '2652') then
+            l_acc_type := 'dep_uo';
+          else
+            l_acc_type := 'pr_uo';
+          end if;
+--         p_agr_type := nvl(l_agr_type,l_acc_type);
+         l_agr_type := case when l_acc_type ='dep_uo' then 'dep_uo' else nvl(l_agr_type,l_acc_type) end;   --- temporary until dkbo
+     
+     
+     
+     
+     
+        l_UACC_Instance_Rec.rnk              := i.rnk; --ead_integration.split_key (i.rnk, i.kf);
+        l_UACC_Instance_Rec.changed          := i.changed;
+--        l_UACC_Instance_Rec.created          := i.created;
+        l_UACC_Instance_Rec.user_login       := i.user_login;
+        l_UACC_Instance_Rec.user_fio         := i.user_fio;
+        l_UACC_Instance_Rec.account_number   := i.account_number;
+        l_UACC_Instance_Rec.currency_code    := i.currency_code;
+        l_UACC_Instance_Rec.mfo              := i.mfo;
+        l_UACC_Instance_Rec.branch_id        := i.branch_id;
+        l_UACC_Instance_Rec.open_date        := i.open_date;
+        l_UACC_Instance_Rec.close_date       := null;
+        l_UACC_Instance_Rec.account_status   := 6;
+--        l_UACC_Instance_Rec.agr_number       := i.agr_number;
+        l_UACC_Instance_Rec.agr_code         := i.agr_code;
+        l_UACC_Instance_Rec.account_type     := l_acc_type; --i.account_type;
+        l_UACC_Instance_Rec.agr_type         := l_agr_type; -- rAccAgrParam.agr_type;
+        l_UACC_Instance_Rec.remote_controled := 0;
+
+        if l_UACC_Instance_Rec.agr_code is null then
+          raise_application_error(-20001, 'Код угоди не заповнений [agr_code]');
+        end if;
+
+        PIPE ROW (l_UACC_Instance_Rec);
+     end loop;
+
+    END get_UACCRsrv_Instance_Set;
+
+
 
    -----------------------------------------------------------------------
    -- EADService.cs         Structs.Params.GercClient.GetInstance!!!
