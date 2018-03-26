@@ -94,7 +94,7 @@ begin
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSBIGI  ENABLE';
 exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 or sqlcode=-28667 then null; else raise; end if;
  end;
 /
 
@@ -112,6 +112,29 @@ exception when others then
  end;
 /
 
+
+PROMPT *** Create  index IDX_DPTACCOUNTS_ACCID ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IDX_DPTACCOUNTS_ACCID ON BARS.DPT_ACCOUNTS (ACCID) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+PROMPT *** Create  index IDX_DPTACCOUNTS_DPTID ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IDX_DPTACCOUNTS_DPTID ON BARS.DPT_ACCOUNTS (DPTID) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
 
 
 PROMPT *** Create  grants  DPT_ACCOUNTS ***
