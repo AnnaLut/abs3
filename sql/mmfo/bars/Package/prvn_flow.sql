@@ -537,25 +537,71 @@ begin
              select * into sn1  from accounts  where dazs is null and (nbs like '1%' or nbs like '2%' ) and kv = x.KV
                 and acc in (select acc from nd_acc where nd = x.ND)  and rownum = 1;
              -- найти код продукта
-             select substr (prod, 1,6) into l_prod from cc_deal where nd = x.ND;
+             select nvl(substr(prod, 1, 6),'206973') into l_prod from cc_deal where nd = x.ND;
           EXCEPTION WHEN NO_DATA_FOUND THEN   not_sna (x.tip, x.nd, x.RI, 'NOT SNA') ;  goto Rec_Next;
           end;
-          -- Бал счет = ***8
-          sn2.NBS   := substr( l_prod,1,3) ||'8' ;
+
+          -- Бал счет = ***9
+          sn2.NBS   := substr( l_prod,1,3) ||'9' ;
           SN2.nls   := F_NEWNLS ( SN1.acc, 'SN ', sn2.NBS ) ;
           SN2.nms   := 'НЕвизн.дох. Угода=3/'||x.nd ;
           SN2.kv    := x.kv ;
           op_reg (1, x.nd, 0, 0, p4_, sn1.Rnk, sn2.nls, SN2.kv, sn2.nms, 'SNA', SN1.isp, SN2.acc);
+          update accounts set pap = 2, tobo = sn1.branch, daos = oo.vdat, mdate = sn1.MDATE  where acc = SN2.acc;
+          l_kol := 1 ;
 
-          -- об22
-          If  SN2.nls like '2%'  then
-              begin select sn into sn2.ob22 from cck_ob22  where nbs||ob22 = l_prod ;
-              EXCEPTION WHEN NO_DATA_FOUND THEN sn2.ob22 := null ;
-              end;
-          else                                  sn2.ob22 := '01' ; -- для М.Б - константа
-          end if;
+/*
+коригування % доходів 1.xlsx
+Демкович Марія Степанівна <DemkovichMS@oschadbank.ua>
+Вт 06.03.2018 10:26
+
+*/        
+          If    sn2.nbs = '1509' then sn2.ob22 := '07' ;
+          elsIf sn2.nbs = '1529' then sn2.ob22 := '15' ;
+          elsIf sn2.nbs = '2029' then sn2.ob22 := '15' ;
+          elsIf sn2.nbs = '2039' then sn2.ob22 := '11' ;
+          elsIf sn2.nbs = '2069' then sn2.ob22 := '73' ;
+          elsIf sn2.nbs = '2079' then sn2.ob22 := '36' ;
+          elsIf sn2.nbs = '2089' then sn2.ob22 := '39' ;
+          elsIf sn2.nbs = '2109' then sn2.ob22 := '23' ;
+          elsIf sn2.nbs = '2119' then sn2.ob22 := '24' ;
+          elsIf sn2.nbs = '2129' then sn2.ob22 := '39' ;
+          elsIf sn2.nbs = '2139' then sn2.ob22 := '39' ;
+          elsIf sn2.nbs = '2209' then sn2.ob22 := 'J1' ;
+          elsIf sn2.nbs = '2239' then sn2.ob22 := '70' ;
+          else                        sn2.ob22 := null ; 
+          end if ;
+
+          If sn2.ob22 is not null THEN Accreg.setAccountSParam(sn2.acc, 'OB22',  sn2.ob22 ) ; end if;
+
+/*          -- 14.03.2018 От спрапвочника CCK_OB22_9 - отказались !  
+          begin  select substr( SNA,5,2) into sn2.ob22 from cck_ob22_9  where substr(sna,1,4) = sn2.nbs  and rownum = 1 ;
+          EXCEPTION WHEN NO_DATA_FOUND THEN   sn2.ob22 := '01' ; -- 
+          end;
           Accreg.setAccountSParam(SN2.Acc, 'OB22', sn2.ob22 );
+*/
 
+/* 12.03.2018 
+Вс 11.03.2018 15:06 Вікторія Семенова <viktoriia.semenova@unity-bars.com>
+Пока предварительный (еще банк не подтвердил)  вариант такой :
+2) при открытии новых счетов SNA -  параметры S080, S180, S190, S240, S260, mDate, R011 - наследуем с 'SS ', 'SN ', 'SP ', 'SPN' (с одного из).
+Параметр R013 - присваиваем значение "3"  для всех счетов - БС= 2209, 2239, 2069, 2089, 2079
+*/
+          for s9 in (select s.* 
+                     from specparam s, accounts a, nd_acc n 
+                     where s.acc= a.acc and a.acc = n.acc and n.nd = x.ND and a.kv = x.kv  and a.dazs is null and a.tip in ('SS ', 'SN ', 'SP ', 'SPN')
+                     order by a.ostc desc
+                     )
+          loop
+              Accreg.setAccountSParam(SN2.Acc, 'S080', s9.S080 );
+              Accreg.setAccountSParam(SN2.Acc, 'S180', s9.S180 );
+              Accreg.setAccountSParam(SN2.Acc, 'S190', s9.S190 );
+              Accreg.setAccountSParam(SN2.Acc, 'S240', s9.S240 );
+              Accreg.setAccountSParam(SN2.Acc, 'S260', s9.S260 );
+              Accreg.setAccountSParam(SN2.Acc, 'R011', s9.R011 );
+              Accreg.setAccountSParam(SN2.Acc, 'R013', '3'     );
+              EXIT ;
+          end loop; 
 
 /*           2208, 2238, 2068, 2088 з тип=SNA,
              присвоюється параметри: R011, R013, S080, S180, S190, S200, S240, S260, S270
@@ -567,6 +613,7 @@ begin
              2068	A	4
              2088	5	8
 */
+/*
           If sn2.NBS in ( '2208', '2238', '2068', '2088' ) then
              begin  select xx.S080, xx.S180, xx.S190, xx.S240, xx.S260, xx.mDate
                     into   ss.S080, ss.S180, ss.S190, ss.S240, ss.S260, sn2.mdate
@@ -596,9 +643,7 @@ begin
              EXCEPTION WHEN NO_DATA_FOUND THEN Accreg.setAccountSParam(SN2.Acc, 'R013', '4' );
              end;
           end if;
-
-          update accounts set pap = 2, tobo = sn1.branch, daos = oo.vdat  where acc = SN2.acc;
-          l_kol := 1 ;
+*/
 
        elsIf l_kol > 1 then not_sna (x.tip, x.nd, x.RI, 'NOT uniq SNA') ;  goto Rec_Next;
        end if;
