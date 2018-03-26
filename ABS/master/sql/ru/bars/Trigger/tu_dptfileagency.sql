@@ -10,18 +10,19 @@ begin
   -- Якщо є оплачені документи - орган соц. захисту змінювати не можна
   select count(*)
     into l_cnt
-    from dpt_file_row
-   where header_id = :old.header_id and branch = :old.branch and ref is not null;
+    from DPT_FILE_ROW
+   where HEADER_ID = :old.HEADER_ID
+     and REF is not null;
 
   if ( l_cnt > 0 )
   then
-    bars_error.raise_nerror('SOC', 'BF_IS_PAID',to_char(:old.header_id),to_char(:old.branch));
+    bars_error.raise_nerror( 'SOC', 'BF_IS_PAID', to_char(:old.HEADER_ID), to_char(:old.BRANCH) );
+  else
+    update DPT_FILE_ROW
+       set AGENCY_ID   = :new.AGENCY_ID
+         , AGENCY_NAME = ( select NAME from SOCIAL_AGENCY where AGENCY_ID = :new.AGENCY_ID )
+     where HEADER_ID   = :old.HEADER_ID;
   end if;
-
-  update DPT_FILE_ROW
-     set AGENCY_ID = :new.agency_id
-       , AGENCY_NAME = (select name from social_agency where agency_id = :new.agency_id )
-   where HEADER_ID = :old.header_id;
 
 end TU_DPTFILEAGENCY;
 /

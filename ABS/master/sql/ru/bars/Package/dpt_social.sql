@@ -256,7 +256,7 @@ is
   procedure check_account_closed
    (p_nls       in   accounts.nls%type,
     p_branch    in   accounts.branch%type,
-	p_id_code   in   customer.okpo%type,
+    p_id_code   in   customer.okpo%type,
     p_nmk       in   customer.nmk%type,
     p_acc_type  in   dpt_file_row.acc_type%type,
     p_res       out  number) ;
@@ -286,7 +286,7 @@ is
     return varchar2;
 
   -- функція підтягування реального рахунку проплати для соц. файлів
-  -- p_return_type: 		0 - nls
+  -- p_return_type: 0 - nls
   --				1 - client_name
   --				2 - client_okpo
   function f_file_account
@@ -320,7 +320,7 @@ show errors
 create or replace package body DPT_SOCIAL
 is
   
-  g_body_version  constant varchar2(64) := 'version 13.30  08.09.2017';
+  g_body_version  constant varchar2(64) := 'version 13.31  26.03.2018';
   g_modcode       constant varchar2(3)  := 'SOC';
 
 type acc_rec is record (id     accounts.acc%type,
@@ -2650,7 +2650,7 @@ is
   l_curbranch     branch.branch%type := sys_context('bars_context','user_branch');
   l_typename      social_agency_type.type_name%type;
   l_tarifid       social_agency_type.tarif_id%type;
-  l_branchname    branch.name%type;
+  l_cls_dt        branch.date_closed%type;
   l_agencyid      social_agency.agency_id%type;
   l_date_off      social_agency.date_off%type;
   l_debitaccid    accounts.acc%type;
@@ -2680,16 +2680,23 @@ begin
 
   -- перевірка корректності заданого коду підрозділу
   begin
-    select name 
-      into l_branchname 
-      from branch 
-     where branch = p_branch;
+
+    select DATE_CLOSED 
+      into l_cls_dt
+      from BRANCH 
+     where BRANCH = p_branch;
+
+    if ( l_cls_dt Is Not Null )
+    then
+      raise_application_error(-20000, 'Подразделение ' || p_branch || ' закрыто с ' || to_char(l_cls_dt,'dd.mm.yyyy') );
+     end if;
+
   exception
     when no_data_found then
       -- не коректно заданий код підрозділу %s
-      bars_error.raise_nerror(g_modcode, 'BRANCH_NOT_FOUND', p_branch);
+      bars_error.raise_nerror( g_modcode, 'BRANCH_NOT_FOUND', p_branch );
   end;
-  
+
   if ( p_branch != l_curbranch )
   then
     bars_context.subst_branch(p_branch);
@@ -2750,21 +2757,25 @@ begin
   
   bars_audit.trace('%s рах.коміс.доходів = %s (%s)', title, p_comissaccnum, to_char(l_comissaccid));
 
-  if p_agencyid is null 
+  if ( p_agencyid is null )
   then -- відкриття договору з ОСЗ
-    
+
     begin
-      
+
+      -- пошук дублів (для 2 та 3 рівнів)
       select AGENCY_ID
         into l_agencyid
         from SOCIAL_AGENCY
        where TYPE_ID = p_agntype
          and BRANCH  = p_branch
+         and regexp_like(BRANCH,'^/(\d{6}/){2,3}$')
          and DATE_OFF Is Null;
-      
+
       bars_error.raise_nerror( g_modcode, 'AGENCY_ALREADY_EXISTS', to_char(p_agntype), p_branch, to_char(l_agencyid) );
-      
+
     exception
+      when TOO_MANY_ROWS then
+        bars_error.raise_nerror( g_modcode, 'TOO_MANY_AGENCIES_EXIST', to_char(p_agntype), p_branch );
       when NO_DATA_FOUND then
         
         insert
@@ -2779,11 +2790,11 @@ begin
              , p_agnaddress, p_agnphone, p_agndetails )
         return AGENCY_ID
           into p_agencyid;
-    
+
         bars_audit.trace('%s відкритий договір з ОСЗ № %s', title, to_char(p_agencyid));
-        
+
     end;
-    
+
   else -- зміна реквізитів договору з ОСЗ
 
     begin
