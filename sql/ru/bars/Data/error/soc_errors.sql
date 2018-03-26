@@ -235,15 +235,18 @@ begin
 
   bars_error.add_message(l_mod, 96, l_exc, l_rus, 'В отделении %s не найден орган социальной защиты тип %s',                '', 1, 'AGENCY_BRANCH_NOT_FOUND');
   bars_error.add_message(l_mod, 96, l_exc, l_ukr, 'У відділенні %s не знайдено орган соціального захисту тип %s',           '', 1, 'AGENCY_BRANCH_NOT_FOUND');
-  
+
   bars_error.add_message(l_mod, 97, l_exc, l_rus, 'Орган соц. защиты для типа %s и отделения %s уже открыт с № %s.',        '', 1, 'AGENCY_ALREADY_EXISTS');
   bars_error.add_message(l_mod, 97, l_exc, l_ukr, 'Орган соц. захисту для типу %s та відділення %s вже існує під  № %s.',   '', 1, 'AGENCY_ALREADY_EXISTS');
-  
+
+  bars_error.add_message(l_mod, 98, l_exc, l_rus, 'Открыто больше одного органа соц. защиты для типа %s и отделения %s.',   '', 1, 'TOO_MANY_AGENCIES_EXIST');
+  bars_error.add_message(l_mod, 98, l_exc, l_ukr, 'Існує більше одного органу соц. захисту для типу %s та відділення %s.',  '', 1, 'TOO_MANY_AGENCIES_EXIST');
+
   l_exc := -20666;
-  
+
   bars_error.add_message( l_mod, 666, l_exc, l_ukr, '%s', '', 1, 'GENERAL_ERROR_CODE' );
   bars_error.add_message( l_mod, 666, l_exc, l_rus, '%s', '', 1, 'GENERAL_ERROR_CODE' );
-  
+
 end;
 /
 
