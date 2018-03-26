@@ -31,7 +31,8 @@ CREATE OR REPLACE PROCEDURE BARS.PAY_2620
 begin  
   -- основная проводка 
   gl.payv(flg_,ref_, VDAT_, tt_,dk_,kv_,nlsm_,sa_,kvk_,nlsk_,ss_);
-
+  return;
+/*
   -- Комиссию НЕ берем
   iF KV_ <> GL.BASEVAL      or 
      gl.doc.NLSA  NOT LIKE '2620%' OR  -- счет не 2620
@@ -64,7 +65,7 @@ begin
      gl.payv ( flg_, ref_, VDAT_, l_ttD, 1, gl.baseval, gl.doc.NLSA, oo.s, gl.baseval,  oo.nlsb , oo.s ); 
      update operw set value = l_kod  where ref = ref_ and tag =l_tag;
      if SQL%rowcount = 0 then insert into operw (ref,tag, value) values (Ref_, l_tag, l_kod) ;  end if  ;
-  end if;
+  end if;*/
 
 END PAY_2620 ;
 /

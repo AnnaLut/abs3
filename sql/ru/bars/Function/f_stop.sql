@@ -334,7 +334,7 @@ BEGIN
 
       ------------------------------------
 
-      RETURN 0; --Постанова НБУ 81
+      RETURN S_; --Постанова НБУ 81
 
       IF kv_ = 980
       THEN                                 -----  1).  ГРН - Постанова НБУ 140
@@ -3136,7 +3136,7 @@ BEGIN
       l_kv := kv_;
 
       -- 1.вычисляем возможный срок пополения, если без срока = выходим
-     
+
             begin
   select dd.deposit_id, dd.acc, v.term_add, dd.dat_begin, dd.limit, v.comproc
       into l_deposit, l_acc, l_term_add, l_dat_begin, l_limit, l_comproc
@@ -3145,7 +3145,7 @@ BEGIN
        and a.nls = NLS_
        and a.kv = l_kv
        and dd.vidd = v.vidd;
-exception when no_data_found then 
+exception when no_data_found then
 return 0;
 end ;
       l_term_add1 := to_number(floor(l_term_add));
