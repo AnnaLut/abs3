@@ -14,15 +14,14 @@ create or replace package nbu_601_formed_xml  as
  function get_xml_credit_pledge return clob;
  function get_xml_pledge_dep  return clob;
  function get_user_name  return varchar2;
- procedure run_formated_xml_job(p_kf in varchar2);
+ function get_xml_groupur_uo return clob;
+ procedure run_formated_xml_job (p_kf in varchar2, p_user_id in varchar2);
  procedure run_formated_xml;
 
- end nbu_601_formed_xml;
+end nbu_601_formed_xml;
 
 /
 create or replace package body nbu_601_formed_xml as
-
- current_user_kf varchar2(50):=sys_context('bars_context','user_mfo');
 
 function  get_user_name  return varchar2
   is
@@ -40,7 +39,7 @@ function get_xml_person_fo return clob
           xmlelement("CURRENT_USER",get_user_name()) ,
           xmlelement("REPORTING_TIME",to_char(sysdate,'dd.mm.yyyy hh24:mi:ss')),
           xmlelement("REPORTING_DATE",to_char(trunc(sysdate,'mm'),'dd.mm.yyyy')),
-          xmlelement("USER_KF", current_user_KF),
+          xmlelement("USER_KF", sys_context('bars_context','user_mfo')),
           XmlElement("PERSON_FO_FOS",
         xmlagg(XmlElement("PERSON_FO",
                            Xmlelement("RNK", p.rnk),
@@ -72,7 +71,7 @@ function get_xml_document_fo return clob
           xmlelement("CURRENT_USER",get_user_name()) ,
           xmlelement("REPORTING_TIME",to_char(sysdate,'dd.mm.yyyy hh24:mi:ss')),
           xmlelement("REPORTING_DATE",to_char(trunc(sysdate,'mm'),'dd.mm.yyyy')),
-          xmlelement("USER_KF", current_user_KF),
+          xmlelement("USER_KF", sys_context('bars_context','user_mfo')),
            XmlElement("DOCUMENT_FOS",
                     xmlagg(xmlelement("DOCUMENT_FO",
                               xmlelement("RNK", d.rnk),
@@ -100,7 +99,7 @@ function get_xml_address_fo return clob
           xmlelement("CURRENT_USER",get_user_name()) ,
           xmlelement("REPORTING_TIME",to_char(sysdate,'dd.mm.yyyy hh24:mi:ss')),
           xmlelement("REPORTING_DATE",to_char(trunc(sysdate,'mm'),'dd.mm.yyyy')),
-          xmlelement("USER_KF", current_user_KF),
+          xmlelement("USER_KF", sys_context('bars_context','user_mfo')),
            XmlElement("ADDRESS_FOS",
                    xmlagg(xmlelement("ADDRESS_FO",
                                xmlelement("RNK",a.rnk),
@@ -132,7 +131,7 @@ function get_xml_person_uo  return clob
            xmlelement("CURRENT_USER",get_user_name()) ,
            xmlelement("REPORTING_TIME",to_char(sysdate,'dd.mm.yyyy hh24:mi:ss')),
            xmlelement("REPORTING_DATE",to_char(trunc(sysdate,'mm'),'dd.mm.yyyy')),
-           xmlelement("USER_KF", current_user_KF),
+           xmlelement("USER_KF", sys_context('bars_context','user_mfo')),
             XmlElement("PERSON_UO_FOS",
                   xmlagg(xmlelement("PERSON_UO",
                                xmlelement("RNK", p.rnk),
@@ -169,7 +168,7 @@ function get_xml_finperformance_uo return clob
           xmlelement("CURRENT_USER",get_user_name()) ,
           xmlelement("REPORTING_TIME",to_char(sysdate,'dd.mm.yyyy hh24:mi:ss')),
           xmlelement("REPORTING_DATE",to_char(trunc(sysdate,'mm'),'dd.mm.yyyy')),
-          xmlelement("USER_KF", current_user_KF),
+          xmlelement("USER_KF", sys_context('bars_context','user_mfo')),
           XmlElement("FINPERFORMANCE_UO_FOS",
                           xmlagg(xmlelement("FINPERFORMANCE_UO",
                                xmlelement("RNK", f.rnk),
@@ -197,7 +196,7 @@ function get_xml_groupur_uo  return clob
            xmlelement("CURRENT_USER",get_user_name()) ,
            xmlelement("REPORTING_TIME",to_char(sysdate,'dd.mm.yyyy hh24:mi:ss')),
            xmlelement("REPORTING_DATE",to_char(trunc(sysdate,'mm'),'dd.mm.yyyy')),
-           xmlelement("USER_KF", current_user_KF),
+           xmlelement("USER_KF", sys_context('bars_context','user_mfo')),
             XmlElement("GROUPUR_UO_FOS",
                   xmlagg(xmlelement("GROUPUR_UO",
                                xmlelement("RNK", p.rnk),
@@ -227,7 +226,7 @@ function get_xml_finperformancegr_uo return clob
           xmlelement("CURRENT_USER",get_user_name()) ,
           xmlelement("REPORTING_TIME",to_char(sysdate,'dd.mm.yyyy hh24:mi:ss')),
           xmlelement("REPORTING_DATE",to_char(trunc(sysdate,'mm'),'dd.mm.yyyy')),
-          xmlelement("USER_KF", current_user_KF),
+          xmlelement("USER_KF", sys_context('bars_context','user_mfo')),
           XmlElement("FINPERFORMANCEGR_UO_FOS",
           xmlagg(xmlelement("FINPERFORMANCEGR_UO",
                                xmlelement("RNK", f.rnk),
@@ -255,7 +254,7 @@ function get_xml_ownerjur_uo return clob
            xmlelement("CURRENT_USER",get_user_name()) ,
            xmlelement("REPORTING_TIME",to_char(sysdate,'dd.mm.yyyy hh24:mi:ss')),
            xmlelement("REPORTING_DATE",to_char(trunc(sysdate,'mm'),'dd.mm.yyyy')),
-           xmlelement("USER_KF", current_user_KF),
+           xmlelement("USER_KF", sys_context('bars_context','user_mfo')),
            XmlElement("OWNERJUR_UO_FOS",
                     xmlagg(xmlelement("OWNERJUR_UO",
                                xmlelement("RNK",o.rnk),
@@ -287,7 +286,7 @@ end;
            xmlelement("CURRENT_USER",get_user_name()) ,
            xmlelement("REPORTING_TIME",to_char(sysdate,'dd.mm.yyyy hh24:mi:ss')),
            xmlelement("REPORTING_DATE",to_char(trunc(sysdate,'mm'),'dd.mm.yyyy')),
-           xmlelement("USER_KF", current_user_KF),
+           xmlelement("USER_KF", sys_context('bars_context','user_mfo')),
            XmlElement("OWNERPP_UO_FOS",
                    xmlagg(xmlelement("OWNERPP_UO",
                                xmlelement("RNK",o.rnk),
@@ -319,7 +318,7 @@ function get_xml_partners_uo return clob
            xmlelement("CURRENT_USER",get_user_name()) ,
            xmlelement("REPORTING_TIME",to_char(sysdate,'dd.mm.yyyy hh24:mi:ss')),
            xmlelement("REPORTING_DATE",to_char(trunc(sysdate,'mm'),'dd.mm.yyyy')),
-           xmlelement("USER_KF", current_user_KF),
+           xmlelement("USER_KF", sys_context('bars_context','user_mfo')),
            XmlElement("PARTNERS_UO_FOS",
                      xmlagg(xmlelement("PARTNERS_UO",
                                xmlelement("RNK",p.rnk),
@@ -347,7 +346,7 @@ function get_xml_credit return clob
            xmlelement("CURRENT_USER",get_user_name()) ,
            xmlelement("REPORTING_TIME",to_char(sysdate,'dd.mm.yyyy hh24:mi:ss')),
            xmlelement("REPORTING_DATE",to_char(trunc(sysdate,'mm'),'dd.mm.yyyy')),
-           xmlelement("USER_KF", current_user_KF),
+           xmlelement("USER_KF", sys_context('bars_context','user_mfo')),
            XmlElement("NBU_CREDIT_FOS",
                xmlagg(xmlelement("NBU_CREDIT",
                                xmlelement("RNK",c.rnk),
@@ -394,7 +393,7 @@ function get_xml_credit_pledge return clob
            xmlelement("CURRENT_USER",get_user_name()) ,
            xmlelement("REPORTING_TIME",to_char(sysdate,'dd.mm.yyyy hh24:mi:ss')),
            xmlelement("REPORTING_DATE",to_char(trunc(sysdate,'mm'),'dd.mm.yyyy')),
-           xmlelement("USER_KF", current_user_KF),
+           xmlelement("USER_KF", sys_context('bars_context','user_mfo')),
            XmlElement("CREDIT_PLADGE_FOS",
           xmlagg( xmlelement("CREDIT_PLADGE",
                                 xmlelement("RNK",c.rnk),
@@ -423,7 +422,7 @@ function get_xml_pledge_dep return clob
            xmlelement("CURRENT_USER",get_user_name()) ,
            xmlelement("REPORTING_TIME",to_char(sysdate,'dd.mm.yyyy hh24:mi:ss')),
            xmlelement("REPORTING_DATE",to_char(trunc(sysdate,'mm'),'dd.mm.yyyy')),
-           xmlelement("USER_KF", current_user_KF),
+           xmlelement("USER_KF", sys_context('bars_context','user_mfo')),
            XmlElement("PLEDGE_DEP_FOS",
           xmlagg( xmlelement("PLEDGE_DEP",
                                 xmlelement("RNK",c.rnk),
@@ -460,7 +459,7 @@ end;
 
 
 
-procedure run_formated_xml_job (p_kf in varchar2)
+procedure run_formated_xml_job (p_kf in varchar2, p_user_id in varchar2)
   is
   id number;
   params BARSTRANS.TRANSP_UTL.t_add_params;
@@ -478,15 +477,18 @@ procedure run_formated_xml_job (p_kf in varchar2)
   l_request_id_credit_pledge number;
   l_request_id_pledge_dep number;
   begin
-   params(1).param_type:='GET';
-   params(1).tag:='KF';
-   params(1).value:=f_ourmfo;
-   KF:=300465;
-   bars_login.login_user(p_sessionid =>sys_guid(),
-                         p_userid    =>1 ,
+     bars_login.login_user(p_sessionid =>sys_guid(),
+                         p_userid    =>p_user_id ,
                          p_hostname  =>null ,
                          p_appname   =>null );
-
+   
+   bc.go(p_kf);                    
+   bars_audit.info('KF_601= ' || ' ' ||p_kf);
+   params(1).param_type:='GET';
+   params(1).tag:='KF';
+   params(1).value:=p_kf;
+   KF:=300465;
+ 
    begin
     BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_person_fo(), params, 'NBU_PERSON_FO', KF, id);
       select t.id into l_request_id_person_fo from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=1 and kf=p_kf) and
@@ -630,7 +632,7 @@ procedure run_formated_xml_job (p_kf in varchar2)
          bars.nbu_601_migrate.set_data_request_state(l_request_id_credit_pledge,10,sqlerrm || dbms_utility.format_error_backtrace());
      commit;
     end;
-    
+
    /* begin
     BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_groupur_uo(), params, 'NBU_GROUPUR_UO', KF, id);
      select id into l_request_id_credit_pledge  from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=9 and kf=p_kf) and
@@ -649,10 +651,15 @@ procedure run_formated_xml_job (p_kf in varchar2)
 procedure run_formated_xml
   is
  current_kf varchar2(50):=sys_context('bars_context','user_mfo');
+ current_id number:=user_id ();
  begin
       dbms_scheduler.set_job_argument_value(job_name  =>'RUN_FORMATED_XML',
                                          argument_position =>1,
                                          argument_value => current_kf );
+
+      dbms_scheduler.set_job_argument_value(job_name  =>'RUN_FORMATED_XML',
+                                         argument_position =>2,
+                                         argument_value => current_id );
 
    dbms_scheduler.run_job(job_name =>'RUN_FORMATED_XML', use_current_session => false);
 end;
