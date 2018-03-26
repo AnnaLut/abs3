@@ -118,6 +118,34 @@ public partial class credit_fin_nbu_fin_form_pd_fo: Bars.BarsPage
                Tb_dat.Text = rdr0["SDATE"] == DBNull.Value ? (String)null : (String)rdr0["SDATE"];
             }
 
+            cmd.Parameters.Clear();
+            cmd.Parameters.Add("RNK_", OracleDbType.Decimal, rnk, ParameterDirection.Input);
+            cmd.CommandText = @"select REAL6MONTH, NOREAL6MONTH, STATUS, MEMBERS, REAL6INCOME, NOREAL6INCOME
+                                 from  NBU_PROFIT_FO a 
+                                 Where a.rnk = :RNK_ ";
+            OracleDataReader rdr1 = cmd.ExecuteReader();
+            if (rdr1.Read())
+            {
+
+                if (!String.IsNullOrEmpty(Convert.ToString(rdr1["REAL6MONTH"]))) tb_real6month.Value = rdr1["REAL6MONTH"] == DBNull.Value ? (decimal)0 : (decimal)rdr1["REAL6MONTH"];
+                if (!String.IsNullOrEmpty(Convert.ToString(rdr1["NOREAL6MONTH"]))) tb_noreal6month.Value = rdr1["NOREAL6MONTH"] == DBNull.Value ? (decimal)0 : (decimal)rdr1["NOREAL6MONTH"];
+
+                dl_status.SelectedValue = Convert.ToString(rdr1["STATUS"]);
+
+                if (!String.IsNullOrEmpty(Convert.ToString(rdr1["MEMBERS"])))
+                {
+                    Decimal l_members;
+                    l_members = Convert.ToDecimal( rdr1["MEMBERS"] );
+                    tb_members.Value = l_members;
+                }
+
+                if (!String.IsNullOrEmpty(Convert.ToString(rdr1["REAL6INCOME"]))) tb_real6income.Value = rdr1["REAL6INCOME"] == DBNull.Value ? (decimal)0 : (decimal)rdr1["REAL6INCOME"];
+                if (!String.IsNullOrEmpty(Convert.ToString(rdr1["NOREAL6INCOME"]))) tb_noreal6income.Value = rdr1["NOREAL6INCOME"] == DBNull.Value ? (decimal)0 : (decimal)rdr1["NOREAL6INCOME"];
+
+             
+            }
+
+
             // -- Автоматизоване визначення показників	 type 3	
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.CommandText = "fin_nbu.get_subpok_fo";
@@ -304,12 +332,19 @@ public partial class credit_fin_nbu_fin_form_pd_fo: Bars.BarsPage
 
     protected void Bt_tofolders_Click(object sender, EventArgs e)
     {
+        //ScriptManager.RegisterStartupScript(this, this.GetType(), "send_success", "location.replace('" + "/barsroot/barsweb/dynform.aspx?form=frm_fin2_kart_kl_fl&rnk=" + Convert.ToString(RNK_.Value) + "')", true);
+
         backToFolders("/barsroot/barsweb/dynform.aspx?form=frm_fin2_kart_kl_fl&rnk=" + Convert.ToString(RNK_.Value));
+       
     }
 
     protected void backToFolders(String p_url)
     {
-        ScriptManager.RegisterStartupScript(this, this.GetType(), "send_success", "location.replace('" + p_url + "')", true);
+        
+        ScriptManager.RegisterStartupScript(this, this.GetType(), "send_success", "location.replace('" + p_url + "');", true);
+        
+       
+       
     }
 
     private void ShowError(String ErrorText)
@@ -325,14 +360,25 @@ public partial class credit_fin_nbu_fin_form_pd_fo: Bars.BarsPage
         if (String.IsNullOrEmpty(DL_kredhist.SelectedValue)) {ShowError(" Заповніть!!! " + Lb_kredhist.Text); return;}
         if (String.IsNullOrEmpty(DL_kpz.SelectedValue))      { ShowError(" Заповніть!!! " + Lb_kpz.Text); return; }
 
+        // перевірки для додаткових показників
+        if (String.IsNullOrEmpty( Convert.ToString(tb_real6month.Value) ))  { ShowError(" Заповніть!!! " + Lb_real6month.Text); return; }
+        if (String.IsNullOrEmpty(Convert.ToString(tb_noreal6month.Value)))  { ShowError(" Заповніть!!! " + Lb_noreal6month.Text); return; }
+        if (String.IsNullOrEmpty(dl_status.SelectedValue))                  { ShowError(" Заповніть!!! " + Lb_status.Text); return; }
+        if (String.IsNullOrEmpty(Convert.ToString(tb_members.Value)))       { ShowError(" Заповніть!!! " + Lb_members.Text); return; }
+        if (String.IsNullOrEmpty(Convert.ToString(tb_real6income.Value)))   { ShowError(" Заповніть!!! " + Lb_real6income.Text); return; }
+        if (String.IsNullOrEmpty(Convert.ToString(tb_noreal6income.Value))) { ShowError(" Заповніть!!! " + Lb_noreal6income.Text); return; }
+
+
         record_fp_nd("IP1", DL_kredhist.SelectedValue, "60");
         record_fp_nd("IP2", DL_kpz.SelectedValue, "60");
         record_fp_nd("CLS", Dl_clas.SelectedValue, "60");
         set_nd_vncrr(ND_.Value, RNK_.Value, Dl_bkrr.SelectedValue);
         record_fp_nd("ZKD", (Cb_zkd.Checked)?("1"):("0"), "60");
+        
         // розрахунок PD
             calc_pd();
             Tb_pd.Text = String.Format("{0:N3}", read_nd_d(ND_.Value, RNK_.Value, "PD", "60", DAT_.Value));
+            set_form601(RNK_.Value);
             ShowError(" Дані збережено успішно!!! ");
     }
 
@@ -349,5 +395,48 @@ public partial class credit_fin_nbu_fin_form_pd_fo: Bars.BarsPage
     protected void Dl_SelectedIndexChanged(object sender, EventArgs e)
     {
         Tb_pd.Text = null;
+    }
+
+    protected void set_form601(string rnk_)
+    {
+        try
+        {
+            InitOraConnection();
+            {
+                CultureInfo cinfo = CultureInfo.CreateSpecificCulture("en-GB");
+                cinfo.DateTimeFormat.ShortDatePattern = "dd/MM/yyyy";
+                cinfo.DateTimeFormat.DateSeparator = "/";
+
+                ClearParameters();
+
+                SetParameters("rnk_",           DB_TYPE.Varchar2, rnk_, DIRECTION.Input);
+                SetParameters("P_REAL6MONTH",   DB_TYPE.Decimal,  tb_real6month.Value,  DIRECTION.Input);
+                SetParameters("P_NOREAL6MONTH", DB_TYPE.Decimal,  tb_noreal6month.Value  , DIRECTION.Input);
+                SetParameters("P_STATUS",       DB_TYPE.Varchar2, dl_status.SelectedValue, DIRECTION.Input);
+                SetParameters("P_MEMBERS",      DB_TYPE.Decimal,  tb_members.Value , DIRECTION.Input);
+
+                SetParameters("P_REAL6INCOME",   DB_TYPE.Decimal, tb_real6income.Value , DIRECTION.Input);
+                SetParameters("P_NOREAL6INCOME", DB_TYPE.Decimal, tb_noreal6income.Value , DIRECTION.Input);
+                
+                SQL_NONQUERY(@"declare
+                                l_rnk number := :rnk_;
+                                begin
+                                p_person_fo_profit(P_RNK            => l_rnk,
+                                                   P_REAL6MONTH     => :P_REAL6MONTH,
+                                                   P_NOREAL6MONTH   => :P_NOREAL6MONTH,
+                                                   P_STATUS         => :P_STATUS,
+                                                   P_MEMBERS        => :P_MEMBERS,
+                                                   P_REAL6INCOME   => :P_REAL6INCOME, 
+                                                   P_NOREAL6INCOME => :P_NOREAL6INCOME
+                                                   );
+                                end;  ");
+
+            }
+
+        }
+        finally
+        {
+            DisposeOraConnection();
+        }
     }
 }

@@ -15,8 +15,9 @@ begin
         real6month      NUMBER(32),
         noreal6month    NUMBER(32),
         status          VARCHAR2(5),
-	status_message  VARCHAR2(4000),
-        kf              VARCHAR2(6)
+        members         NUMBER(2),
+        type            NUMBER(3),
+		kf              VARCHAR2(6)  DEFAULT sys_context(''bars_context'',''user_mfo'') 
     )
     TABLESPACE BRSMDLD';
 exception
@@ -25,6 +26,73 @@ exception
 end;
 /
 
+
+begin 
+  execute immediate 
+    ' ALTER TABLE bars.NBU_PROFIT_FO ADD (members NUMBER(2))';
+exception when others then 
+  if sqlcode=-1430 then null; else raise; end if;
+end;
+/
+
+
+begin 
+  execute immediate 
+    ' ALTER TABLE bars.NBU_PROFIT_FO ADD (type NUMBER(3))';
+exception when others then 
+  if sqlcode=-1430 then null; else raise; end if;
+end;
+/
+
+begin 
+  execute immediate 
+    ' ALTER TABLE bars.NBU_PROFIT_FO ADD (kf   VARCHAR2(6)  DEFAULT sys_context(''bars_context'',''user_mfo'') )';
+exception when others then 
+  if sqlcode=-1430 then null; else raise; end if;
+end;
+/
+
+
+begin 
+  execute immediate 
+    ' ALTER TABLE bars.NBU_PROFIT_FO modify (kf   VARCHAR2(6)  DEFAULT sys_context(''bars_context'',''user_mfo'') )';
+exception when others then 
+  if sqlcode=-1430 then null; else raise; end if;
+end;
+/
+
+begin 
+  execute immediate 
+    ' ALTER TABLE bars.NBU_PROFIT_FO modify ( real6month      NUMBER  )';
+exception when others then 
+  if sqlcode=-1430 then null; else raise; end if;
+end;
+/
+
+begin 
+  execute immediate 
+    ' ALTER TABLE bars.NBU_PROFIT_FO modify ( noreal6month    NUMBER  )';
+exception when others then 
+  if sqlcode=-1430 then null; else raise; end if;
+end;
+/
+
+
+begin 
+  execute immediate 
+    ' ALTER TABLE bars.NBU_PROFIT_FO add ( real6income     NUMBER  )';
+exception when others then 
+  if sqlcode=-1430 then null; else raise; end if;
+end;
+/
+
+begin 
+  execute immediate 
+    ' ALTER TABLE bars.NBU_PROFIT_FO add ( noreal6income   NUMBER  )';
+exception when others then 
+  if sqlcode=-1430 then null; else raise; end if;
+end;
+/
 COMMENT ON TABLE BARS.NBU_PROFIT_FO IS 'Дані про дохід Боржника ';
 COMMENT ON COLUMN BARS.NBU_PROFIT_FO.rnk IS 'Регистрационный номер.';
 COMMENT ON COLUMN BARS.NBU_PROFIT_FO.real6month IS 'Підтверджений дохід Боржника ';
@@ -43,5 +111,3 @@ exception
          null;
 end;
 /
-
-grant all on NBU_PROFIT_FO to BARS_ACCESS_DEFROLE;
