@@ -5,10 +5,14 @@
  PROMPT ===================================================================================== 
  
   CREATE OR REPLACE PACKAGE BARS.FIN_NBU IS
-   G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'version 1.4.0  20.06.2017';
+   G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'version 1.5.0  12.03.2018';
    
-   G_DATE_VAL DATE := to_date('04-03-2012','dd-mm-yyyy'); --дата  видачі вал.КД до якої не враховується валютна виручка
+   G_DATE_VAL   DATE := to_date('04-03-2012','dd-mm-yyyy'); --дата  видачі вал.КД до якої не враховується валютна виручка
+   G_ALG_351    varchar2(30) :=  'FIN_351_18';
    
+   G_ALG_351_16 varchar2(30) :=  'FIN_351_16';    
+   G_ALG_351_18 varchar2(30) :=  'FIN_351_18';    
+   g_fin_351_18_date   date := to_date('01-04-2017','dd-mm-yyyy');
 /*
 
 20-06-2017 - correction_parameters добавлен VKR
@@ -38,7 +42,7 @@
  
   type tp_kod  is table of varchar2(4) index by pls_integer;
   type tp_s    is table of number      index by pls_integer;
-  type tp_zero is table of varchar2(3) index by pls_integer;
+  type tp_zero is table of varchar2(4) index by pls_integer;
   type tp_indic is record
     ( kod    tp_kod
     , p_s    tp_s
@@ -48,11 +52,13 @@
 
   
   type t_col_KVED
-       is record(             KVED         fin_kved.kved%type,
+       is record(             KOD          fin_kved.kod%type,
+	                          KVED         fin_kved.kved%type,
                               NAME         ved.name%type,
                               VOLME_SALES  fin_kved.VOLME_SALES%type,
                               WEIGHT       fin_kved.WEIGHT%type,
                               FLAG         fin_kved.flag%type,
+							  err          varchar2(2000),
 							  ord          int
                 );
 
@@ -133,7 +139,11 @@ procedure adjustment_class_bud(RNK_  number,
                  DAT_   date default aDAT_,
                  OKPO_  int default aOKPO_
                  ) RETURN  number;
-				 
+		
+FUNCTION CALC_SCOR_BAL (KOD_   char,
+                        l_val  number,
+                        id_     number
+                 ) RETURN  number;		
 ---------------------------------------------------------------				 
 --
 -- Розрахунок фінансових коефіцієнтів
@@ -410,7 +420,8 @@ procedure determ_kved(p_rnk         customer.rnk%type,
 					  
 Procedure save_volmesales (p_rnk         customer.rnk%type,
                            p_okpo        fin_kved.okpo%type,
-                           p_dat         fin_kved.dat%type,  
+                           p_dat         fin_kved.dat%type, 
+                           p_kod        fin_kved.kved%type,						   
                            p_kved        fin_kved.kved%type,
                            p_volme_sales fin_kved.VOLME_SALES%type 					 	   
                           );			
@@ -507,7 +518,7 @@ procedure set_vnkr_cp (RNK_   number,
 					   p_idf  number ,
 					   p_vnkr varchar2);
 
-
+function  export_to_script_fin_que (p_idf number) return blob;
 					   
 function header_version return varchar2;
 
@@ -517,7 +528,7 @@ END fin_nbu;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.FIN_NBU IS
 
- G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=  'version 1.4.0  20.06.2017';
+ G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=  'version 1.5.0  12.03.2018';
  G_coun    int;
  g_pawn    int;
  -------------------------------------------
@@ -532,6 +543,16 @@ CREATE OR REPLACE PACKAGE BODY BARS.FIN_NBU IS
  end if; 
  
  end;
+  
+ procedure fin_alg (dat_ date)
+as
+begin
+   if DAT_ < g_fin_351_18_date
+       then  G_ALG_351 :=  G_ALG_351_16;
+	   else  G_ALG_351 :=  G_ALG_351_18;
+   end if;
+end;  
+  
   
  FUNCTION ZN_rep (KOD_   char,
                  IDF_   int default 1,
@@ -960,11 +981,12 @@ begin
  FOR f IN 1 .. tp_indics.kod.COUNT()
  LOOP
   if tp_indics.kod(f) = p_kod then
-      case when tp_indics.p_zero(f) != 'RZN' 
-	       then sTmp :=  CALC_SCOR_BAL(p_kod, MIN_MAX_SCOR(p_id, tp_indics.kod(f), tp_indics.p_zero(f)), p_id ) ;
-	       else sTmp :=  CALC_SCOR_BAL(p_kod, tp_indics.p_s(f)*100, p_id);
+      case when tp_indics.p_zero(f) = 'ZERO'   then sTmp :=  0;
+	       when tp_indics.p_zero(f) != 'RZN' 
+											   then sTmp :=  CALC_SCOR_BAL(p_kod, MIN_MAX_SCOR(p_id, tp_indics.kod(f), tp_indics.p_zero(f)), p_id ) ;
+											   else sTmp :=  CALC_SCOR_BAL(p_kod, tp_indics.p_s(f)*100, p_id);
 	  end case;
-	   record_fp(regexp_replace(p_kod,'PK','X'), sTmp, 6, aDAT_, aOKPO_);
+	   record_fp(replace(regexp_replace(p_kod,'PK','X'),'LK','LX'), sTmp, 6, aDAT_, aOKPO_);
 	  return sTmp;
   end if;
  
@@ -1127,20 +1149,47 @@ begin
 		end if;
 	end;
 
-
-		 case	
-		    when k112_ in ('A')          then     v_:=1;
-		    when k112_ in ('B','C','F')  then     v_:=2;
-            when k112_ in ('G')          then     v_:=3;			
-		    else                                  v_:=4;
-		 end case;
+   
+    case  G_ALG_351
+	    when  G_ALG_351_16  then 
+   
+					 case	
+						when k112_ in ('A')          then     v_:=1;
+						when k112_ in ('B','C','F')  then     v_:=2;
+						when k112_ in ('G')          then     v_:=3;			
+						else                                  v_:=4;
+					 end case;
 
 		 /*
 		  Якщо Ф2,2000 = 0 то    v_:=4;
 		 */
 		  if  zn_p('2000', 2, fdat_max_, okpo_) = 0
 		     then   v_:=4;
-		 end if;
+		 end if;					 
+					 
+					 
+	    when  G_ALG_351_18  then 
+   
+					 case	
+						when k112_ in ('A')              then     v_:=1;
+						when k112_ in ('B','C','F')      then     v_:=2;
+						when k112_ in ('G')              then     v_:=3;			
+						when k112_ in ('K','L','M','N')  then     v_:=4;
+						else                                      v_:=5;
+					 end case;
+
+		 /*
+		  Якщо Ф2,2000 = 0 то    v_:=4;
+		 */
+		/*  if  zn_p('2000', 2, fdat_max_, okpo_) = 0
+		     then   v_:=5;
+		 end if;					 
+		*/			 
+         else  null;
+       end case;		 
+
+		
+
 		  
 		 
    RETURN v_;
@@ -1188,6 +1237,8 @@ end if;
 
 end get_kved;
 
+
+
   PROCEDURE  ZN_IPB (rnk_  in number,
                      ved  in int default 0, 
 					 DAT_  in  date default aDAT_
@@ -1212,6 +1263,9 @@ end get_kved;
 k_  number := 0 ;
 			   
 BEGIN
+
+   fin_alg(DAT_);
+
 
  calculation_class(rnk_, dat_);
  
@@ -1396,6 +1450,10 @@ IS
 	   -- розрахунок показників  
 		Calc_FP();
 		
+  		
+	case  G_ALG_351
+	    when G_ALG_351_16  then
+	    
 	 --  if  sum_s_ = 0 then goto exit_prc;   end if;   --якщо ненадано звітність нічого не розраховувати клас = 8
 	  
 	      if ved_ = 1 and FZ_ = 'N' then
@@ -1433,13 +1491,67 @@ IS
 			   
 	   end if;   
 
+	when  G_ALG_351_18 then
+ 
+       if ved_ = 1 and FZ_ = 'N' then
+	           -- Z = 2,305 + 0,707 · X5 + 0,588 · X8 + 0,421 · X10 + 0,615 · X11 + 0,502 · X12 + 0,634 · X13
+			  sTmp_ :=  2.305 + ( 0.707 * set_indic(1,'LK5') ) + ( 0.588 * set_indic(1,'LK8') ) + (0.421 * set_indic(1,'LK10') ) + (0.615 * set_indic(1,'LK11')) + (0.502 * set_indic(1,'LK12')) + (0.634 * set_indic(1,'LK13')) ;
+
+	   elsif ved_ = 2 and FZ_ = 'N' then
+	          -- Z = 1,670 + 0,375 · X2 + 0,333 · X11 + 0,313 · X13 + 0,436 · X14 + 0,352 · X15+ 0,261 · X16
+	          sTmp_ :=  1.670 + ( 0.375 * set_indic(2,'LK2') ) + (0.333 * set_indic(2,'LK11')) + (0.313 * set_indic(2,'LK13')) + (0.436 * set_indic(2,'LK14') ) + (0.352 * set_indic(2,'LK15')) + (0.261 * set_indic(2,'LK16'));
+
+	   elsif ved_ = 3 and FZ_ = 'N' then
+	          -- Z = 1,939 + 0,480 · X2 + 0,556 · X6 + 0,650 · X8 + 0,282 · X17 + 0,202· X18
+	          sTmp_ :=  1.939 + (0.480 * set_indic(3,'LK2')) + (0.556 * set_indic(3,'LK6')) + (0.650 * set_indic(3,'LK8')) + (0.282 * set_indic(3,'LK17')) + (0.202 * set_indic(3,'LK18'));
+
+	   elsif ved_ = 4 and FZ_ = 'N' then
+	          -- Z = 1,291 + 0,476 · X1 + 0,602 · X2 + 0,501 · X3 + 0,381 · X4
+	          sTmp_ :=  1.291 + (0.476 * set_indic(4,'LK1')) + (0.602 * set_indic(4,'LK2')) + (0.501 * set_indic(4,'LK3')) + (0.381 * set_indic(4,'LK4') );
+
+	   elsif ved_ = 5 and FZ_ = 'N' then
+	          -- Z =  1,719 + 0,648 · X5 + 0,662· X6 + 0,476 · X7 + 0,596 · X8 + 0,468 · X9
+	          sTmp_ :=  1.719 + (0.648 * set_indic(5,'LK5')) + (0.662* set_indic(5,'LK6')) + (0.476 * set_indic(5,'LK7')) + (0.596 * set_indic(5,'LK8')) + (0.468 * set_indic(5,'LK9')) ;
+
+
+			  
+	   elsif ved_ = 1 and FZ_ in ('R','C') then
+	           -- Z =  2,938 + 0.457 · X8 + 0.597· X9 + 0.870 · X11 + 0.053· X13 + 0,616 · X17
+			  sTmp_ := 2.938 + (0.457 * set_indic(1,'LK8') ) + (0.597 * set_indic(1,'LK9')) + (0.870 * set_indic(1,'LK11')) + (0.053 * set_indic(1,'LK13')) + (0.616 * set_indic(1,'LK17')) ;
+
+	   elsif ved_ = 2 and FZ_ in ('R','C') then
+	          -- Z = 1,608 + 0,460 · X2 + 0,341 · X11 + 0,513 · X12 + 0,411 · X14
+	          sTmp_ :=  1.608 + (0.460 * set_indic(2,'LK2')) + (0.341 * set_indic(2,'LK11')) + (0.513 * set_indic(2,'LK12')) + (0.411 * set_indic(2,'LK14'));
+
+	   elsif ved_ = 3 and FZ_ in ('R','C') then
+	          -- Z =  1,933 + 0,622 · X6 + 0,199 · X7+ 0,507· X8 + 0,379 · X10 + 0,346 · X18
+	          sTmp_ :=  1.933 + (0.622 * set_indic(3,'LK6')) + (0.199 * set_indic(3,'LK7'))+ (0.507 * set_indic(3,'LK8')) + (0.379 * set_indic(3,'LK10')) + (0.346 * set_indic(3,'LK18'));
+
+	   elsif ved_ = 4 and FZ_ in ('R','C') then
+	          -- Z =  1,291 + 0,476 · X1 + 0,602 · X2 + 0,501 · X3 + 0,381 · X4
+	          sTmp_ :=  1.291 + (0.476 * set_indic(4,'LK1')) + (0.602 * set_indic(4,'LK2')) + (0.501 * set_indic(4,'LK3')) + (0.381 * set_indic(4,'LK4'));
+
+	   elsif ved_ = 5 and FZ_ in ('R','C') then
+	          -- Z =  1,719 + 0,648 · X5 + 0,662· X6 + 0,476 · X7 + 0,596 · X8 + 0,468 · X9
+	          sTmp_ := 1.719 + (0.648 * set_indic(5,'LK5')) + (0.662* set_indic(5,'LK6')) + (0.476 * set_indic(5,'LK7')) + (0.596 * set_indic(5,'LK8')) + (0.468 * set_indic(5,'LK9'));
+			  
+
+			  
+        end if;
+       else null;
+    end case;	 
+	   
 	   trace(l_mod,'Вид економічної діяльності = '||ved_);
        record_fp('GVED',  ved_, 6, DAT_, OKPO_);	   
        trace(l_mod,'Інтегральний показник = '||to_char(sTmp_, '9999990.999'));	
 	   record_fp('PIPB',  round(sTmp_,3), 6, DAT_, OKPO_);
 	   
 	   -- Визначаємо клас по інтегральному показнику.
-	   l_clas := CALC_SCOR_BAL('CLAS',sTmp_,ved_);
+ 	case  G_ALG_351
+	    when G_ALG_351_16  then  l_clas := CALC_SCOR_BAL('CLAS',sTmp_,ved_);
+		when G_ALG_351_18  then  l_clas := CALC_SCOR_BAL('KLAS',sTmp_,ved_);
+		else null;
+	end case;
 	   trace(l_mod,'Клас позичальника = '||l_clas);	
 
        record_fp('CLAS',  l_clas, 6, DAT_, OKPO_);
@@ -1575,8 +1687,8 @@ where okpo =  OKPO_
 				    dat0_ := DAT_;
       				 dat1_ := trunc( (DAT_ - 1) , 'Y' ); 
 					 Q_    := to_char( (dat0_ - 1) , 'Q'); 
- 	 if LOGK_(DAT_, OKPO_, 2) > 0 then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||DAT_,TRUE);  end if;
-	 if LOGK_(DAT1_, OKPO_, 2) > 0 then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||DAT1_,TRUE);  end if;	 
+						 if LOGK_(DAT_, OKPO_, 2) > 0 then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||DAT_,TRUE);  end if;
+						 if LOGK_(DAT1_, OKPO_, 2) > 0 then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||DAT1_,TRUE);  end if;	 
 					 return  round((ZN_P(KOD_, 2, DAT1_, OKPO_)+ZN_P(KOD_, 2, DAT0_, OKPO_))/(4 + Q_))*4;
 					
 				elsif gr_ = 3 
@@ -1593,14 +1705,15 @@ where okpo =  OKPO_
         then  
 				if gr_ = 4 
 				   then dat0_ := DAT_;
-				   return (ZN_FDK(KOD_,DAT_, OKPO_) +  ZN_FDK(KOD_,add_months(trunc(DAT_),-3), OKPO_) + ZN_FDK(KOD_,add_months(trunc(DAT_),-6), OKPO_) + ZN_FDK(KOD_,add_months(trunc(DAT_),-9), OKPO_));
-  	 if LOGK_(DAT_, OKPO_, 2) > 0                       then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||DAT_,TRUE);  end if;
-	 if LOGK_(add_months(trunc(DAT_),-3), OKPO_, 2) > 0 then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||add_months(trunc(DAT_),-3),TRUE);  end if;
-	 if LOGK_(add_months(trunc(DAT_),-6), OKPO_, 2) > 0 then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||add_months(trunc(DAT_),-6),TRUE);  end if;
-	 if LOGK_(add_months(trunc(DAT_),-9), OKPO_, 2) > 0 then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||add_months(trunc(DAT_),-9),TRUE);  end if;	 
+				   --return (ZN_FDK(KOD_,DAT_, OKPO_) +  ZN_FDK(KOD_,add_months(trunc(DAT_),-3), OKPO_) + ZN_FDK(KOD_,add_months(trunc(DAT_),-6), OKPO_) + ZN_FDK(KOD_,add_months(trunc(DAT_),-9), OKPO_));
+					 if LOGK_(DAT_, OKPO_, 2) > 0                       then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||DAT_,TRUE);  end if;
+					 if LOGK_(add_months(trunc(DAT_),-3), OKPO_, 2) > 0 then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||add_months(trunc(DAT_),-3),TRUE);  end if;
+					 if LOGK_(add_months(trunc(DAT_),-6), OKPO_, 2) > 0 then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||add_months(trunc(DAT_),-6),TRUE);  end if;
+					 if LOGK_(add_months(trunc(DAT_),-9), OKPO_, 2) > 0 then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||add_months(trunc(DAT_),-9),TRUE);  end if;	 
+	              return (ZN_FDK(KOD_,DAT_, OKPO_) +  ZN_FDK(KOD_,add_months(trunc(DAT_),-3), OKPO_) + ZN_FDK(KOD_,add_months(trunc(DAT_),-6), OKPO_) + ZN_FDK(KOD_,add_months(trunc(DAT_),-9), OKPO_));
 				elsif gr_ = 3 
 				   then dat0_ := DAT_ ; 
-				   	    if LOGK_(DAT_, OKPO_, 2) > 0 then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||DAT_,TRUE);  end if;
+				   	 if LOGK_(DAT_, OKPO_, 2) > 0 then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||DAT_,TRUE);  end if;
 						return ZN_P(KOD_, 2, DAT0_, OKPO_) ; 
 				else  return 0;
 				end if;
@@ -2039,9 +2152,10 @@ PROCEDURE Calc_FP (
 				  ) 
 as
 sTmp_ number;
-l_rzn varchar2(3) :='RZN';
-l_min varchar2(3) :='MIN';
-l_max varchar2(3) :='MAX';
+l_rzn varchar2(3)  :='RZN';
+l_min varchar2(3)  :='MIN';
+l_max varchar2(3)  :='MAX';
+l_zero varchar2(4) :='ZERO';
 l_mod varchar2(254) := 'fin.Calc_FP>>';
 BEGIN
   tp_indics := null;
@@ -2050,7 +2164,8 @@ BEGIN
   aDAT_  :=  trunc(DAT_);
   FZ_    :=  fin_nbu.F_FM (aOKPO_, aDAT_ ) ;  -- (вид ворми звітності допустимі ' ', 'M', 'C')
 
-
+ case   G_ALG_351
+       when  G_ALG_351_16 then 
   --'PK1' then	    -- К1, МК1 – показники покриття боргу  
             CASE 
 			  WHEN FZ_ = 'N' THEN
@@ -2402,7 +2517,427 @@ BEGIN
                                     sTmp_ :=  null;	get_indic('PK16',sTmp_,l_min);	
 						   end;
 			  ELSE sTmp_:= null;
+			END CASE; 
+			
+    when  G_ALG_351_18 then 			
+     -- ***2018***   =======================================================================================================================================================			
+	 -- 2018   зміна постанови 351		
+	 -- LK1    К1, МК1 – показники капіталу  (Частка капіталу в балансі підприємства)
+	 -- ф. 1 р.   1495 гр. 4 / ф. 1 р.   1300 гр. 4
+	 -- ф. 1-м р. 1495 гр. 4 / ф. 1-м р. 1300 гр. 4
+	 -- l_min
+            CASE 
+			  WHEN FZ_ = 'N' THEN
+			               begin   
+						            sTmp_ :=     ZN_F1('1495',4)  /  ZN_F1('1300',4);
+									get_indic('LK1',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK1',sTmp_,l_min);	
+						   end;
+			  WHEN FZ_ in ('R', 'C') THEN
+			               begin   
+						            sTmp_ :=     ZN_F1('1495',4)  /  ZN_F1('1300',4);
+									get_indic('LK1',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK1',sTmp_,l_min);	
+						   end;			   
+			  ELSE sTmp_:= null;
 			END CASE; 			
+
+			 
+     -- LK2  К2, МК2 – показники загальної ліквідності (Спроможність підприємства покривати короткостроко-ві зобов’язання за рахунок оборотних активів)
+	 --  (ф. 1 р. 1125 гр. + р. 1100 + р. 1110 + р. 1165 гр. 4  )  /   ф. 1 р. 1695 гр. 4
+	 --  (ф. 1-м р. 1125 + р. 1155 + р. 1100 + р. 1110 + р. 1165 гр. 4 )   / ф. 1-м р. 1695 гр. 4
+     -- l_max	 
+            CASE 
+			  WHEN FZ_ = 'N' THEN
+			               begin   
+						            sTmp_ :=   (  ZN_F1('1125',4) + ZN_F1('1100',4) + ZN_F1('1110',4) + ZN_F1('1165',4) )   /  ZN_F1('1695',4);
+									get_indic('LK2',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK2',sTmp_,l_max);	
+						   end;
+			  WHEN FZ_ in ('R', 'C') THEN
+			               begin   
+						            sTmp_ :=      (  ZN_F1('1125',4) + ZN_F1('1155',4) + ZN_F1('1100',4) + ZN_F1('1110',4) + ZN_F1('1165',4) )  /  ZN_F1('1695',4);
+									get_indic('LK2',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK2',sTmp_,l_max);	
+						   end;			   
+			  ELSE sTmp_:= null;
+			END CASE; 
+	
+     
+     -- LK3  К3, МК3 – показники покриття боргу прибутком до оподаткування (Спроможність обслуговування боргу прибутком до оподаткування)
+	 --  (ф. 2 р. 2190 – р. 2195 + р. 2220 – р. 2250 гр. 3) /   (ф. 1 р. 1510 + р. 1515 + р. 1600 + р. 1610 –р. 1165 гр. 4)
+	 --   ф. 2-м р. 2290 гр. 3  /  (ф. 1-м р. 1595 + р. 1600 + р. 1610 – р. 1165 гр. 4)
+	 -- l_zero
+	 
+            CASE 
+			  WHEN FZ_ = 'N' THEN
+			               begin   
+						            sTmp_ :=   (  ZN_F2('2190',4) - ZN_F2('2195',4) + ZN_F2('2220',4) - ZN_F2('2250',4) )  /  
+											  greatest (  ( ZN_F1('1510',4) + ZN_F1('1515',4) + ZN_F1('1600',4) + ZN_F1('1610',4) - ZN_F1('1165',4) ) ,0);
+									get_indic('LK3',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK3',0,l_zero);	
+						   end;
+			  WHEN FZ_ in ('R', 'C') THEN
+			               begin   
+						            sTmp_ :=      ( ZN_F2('2290',4) ) /
+                							    greatest (  ( ZN_F1('1595',4) + ZN_F1('1600',4) + ZN_F1('1610',4) - ZN_F1('1165',4) ) ,0);
+									get_indic('LK3',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK3',0,l_zero);	
+						   end;			   
+			  ELSE sTmp_:= null;
+			END CASE; 
+
+
+	 --  LK4 К4, МК4 – показники операційної рентабельності активів ( Ефективність використання активів підприємства в операційній діяльності )
+	 --  ф. 2 р. 2190 – р. 2195 гр. 3  /   ф. 1 р. 1300 гр. 4
+	 --  (ф. 2-м р. 2000 + р. 2120 – р. 2050 – р. 2180 гр. 3 ) /  ф. 1-м р. 1300 гр. 4
+	 --  l_min
+	 
+            CASE 
+			  WHEN FZ_ = 'N' THEN
+			               begin   
+						            sTmp_ :=   (  ZN_F2('2190',4) - ZN_F2('2195',4)  )  /  (  ZN_F1('1300',4) ) ;
+									get_indic('LK4',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK4',sTmp_,l_min);	
+						   end;
+			  WHEN FZ_ in ('R', 'C') THEN
+			               begin   
+						            sTmp_ :=     (  ZN_F2('2000',4) + ZN_F2('2120',4) - ZN_F2('2050',4) - ZN_F2('2180',4)    ) /  (  ZN_F1('1300',4) );
+									get_indic('LK4',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK4',sTmp_,l_min);	
+						   end;			   
+			  ELSE sTmp_:= null;
+			END CASE; 
+
+	 --  LK5 К5, МК5 – показники оборотності запасів ( Період повного обороту запасів )
+	 --  (ф. 1 р. 1100 + р. 1110 гр. 4) · 365   /  ф. 2 р. 2050 гр. 3
+	 --  (ф. 1-м р. 1100 + р. 1110 гр. 4) · 365  /  ф. 2-м р. 2050 гр. 3
+	 --  l_max
+	 
+            CASE 
+			  WHEN FZ_ = 'N' THEN
+			               begin   
+						            sTmp_ :=   (  ZN_F1('1100',4) + ZN_F1('1110',4)  ) * 365  /  ( ZN_F2('2050',4) ) ;
+									get_indic('LK5',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK5',sTmp_,l_max);	
+						   end;
+			  WHEN FZ_ in ('R', 'C') THEN
+			               begin   
+						            sTmp_ :=      (  ZN_F1('1100',4) + ZN_F1('1110',4)  ) * 365  /  (  ZN_F2('2050',4)  );
+									get_indic('LK5',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK5',sTmp_,l_max);	
+						   end;			   
+			  ELSE sTmp_:= null;
+			END CASE; 
+
+	 --  LK6  К6, МК6 – показники покриття боргу валовим прибутком ( Спроможність обслуговування боргу валовим прибутком )
+	 --  ф. 2 р. 2090 – р. 2095 гр. 3 /  ( ф. 1 р. 1510 + р. 1515 + + р. 1600 + р. 1610 – р. 1165 гр. 4 )
+	 --  ф. 2-м р. 2000 – р. 2050 гр. 3 /  ( ф. 1-м р. 1595 + р. 1600 + р. 1610 – р. 1165 гр. 4 )
+	 --  l_zero
+	 
+            CASE 
+			  WHEN FZ_ = 'N' THEN
+			               begin   
+						            sTmp_ :=   ( ZN_F2('2090',4) - ZN_F2('2095',4) )  /  
+											   greatest (  ( ZN_F1('1510',4) + ZN_F1('1515',4) + ZN_F1('1600',4) + ZN_F1('1610',4) - ZN_F1('1165',4) ) ,0);
+									get_indic('LK6',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK6',0,l_zero);	
+						   end;
+			  WHEN FZ_ in ('R', 'C') THEN
+			               begin   
+						            sTmp_ :=   ( ZN_F2('2000',4) - ZN_F2('2050',4) )  /  
+											   greatest (  ( ZN_F1('1595',4) + ZN_F1('1600',4) + ZN_F1('1610',4) - ZN_F1('1165',4) ) ,0);
+									get_indic('LK6',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK6',0,l_zero);	
+						   end;			   
+			  ELSE sTmp_:= null;
+			END CASE; 
+	
+	 --  LK7  К7, МК7 – показники покриття чистих фінансових витрат операційним прибутком (Спроможність фінансування чистих неопераційних витрат за результатами операційної діяльності)
+	 --  ф. 2 р. 2190 – р. 2195 гр. 3  /  ф. 2 р. 2250 – р. 2220 гр. 3
+	 --  ф. 2-м р. 2000 + р. 2120 – р. 2050 – р. 2180 гр. 3  /  ф. 2-м р. 2165 + р. 2270 –р. 2160 – р. 2240 гр. 3
+	 --  l_zero
+	 
+            CASE 
+			  WHEN FZ_ = 'N' THEN
+			               begin   
+						            sTmp_ :=   ( ZN_F2('2190',4) - ZN_F2('2195',4) )  /  
+											   greatest (  ZN_F2('2250',4) - ZN_F2('2220',4)  ,0);
+									get_indic('LK7',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK7',0,l_zero);	
+						   end;
+			  WHEN FZ_ in ('R', 'C') THEN
+			               begin   
+						            sTmp_ :=   ( ZN_F2('2000',4) + ZN_F2('2120',4) - ZN_F2('2050',4) - ZN_F2('2180',4) )  /  
+											   greatest (  ZN_F2('2165',4) + ZN_F2('2270',4) - ZN_F2('2160',4) - ZN_F2('2240',4)  ,0);
+									get_indic('LK7',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK7',0,l_zero);	
+						   end;			   
+			  ELSE sTmp_:= null;
+			END CASE; 	
+	
+	 --  LK8  К8, МК8 – показники оборотності кредиторської заборгованості ( Період повного обороту кредиторської заборгованості )
+	 --  ф. 1 р. 1615 гр. 4 · 365 / ф. 2 р. 2050 гр. 3
+	 --  ф. 1-м р. 1615 гр. 4 · 365 / ф. 2-м р. 2050 гр. 3
+	 --  l_max
+	 
+            CASE 
+			  WHEN FZ_ = 'N' THEN
+			               begin   
+						            sTmp_ :=   (  ZN_F1('1615',4)  ) * 365  /  ( ZN_F2('2050',4) ) ;
+									get_indic('LK8',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK8',sTmp_,l_max);	
+						   end;
+			  WHEN FZ_ in ('R', 'C') THEN
+			               begin   
+						            sTmp_ :=   (  ZN_F1('1615',4)   ) * 365  /  (  ZN_F2('2050',4)  );
+									get_indic('LK8',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK8',sTmp_,l_max);	
+						   end;			   
+			  ELSE sTmp_:= null;
+			END CASE; 	
+	
+
+	 --  LK9 К9, МК9 – показники оборотності дебіторської заборгованості (Період повного обороту дебіторської заборгованості)
+	 --  ф. 1 р. 1125 гр. 4 · 365    /  ф. 2 р. 2000 р. + 2010 гр. 3
+	 --  ф. 1-м р. 1125 гр. 4 · 365  /  ф. 2-м р. 2000 гр. 3
+	 --  l_max
+	 
+            CASE 
+			  WHEN FZ_ = 'N' THEN
+			               begin   
+						            sTmp_ :=   (  ZN_F1('1125',4)  ) * 365  /  ( ZN_F2('2000',4) + ZN_F2('2010',4) ) ;
+									get_indic('LK9',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK9',sTmp_,l_max);	
+						   end;
+			  WHEN FZ_ in ('R', 'C') THEN
+			               begin   
+						            sTmp_ :=    (  ZN_F1('1125',4)  ) * 365  /  ( ZN_F2('2000',4)  ) ;
+									get_indic('LK9',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK9',sTmp_,l_max);	
+						   end;			   
+			  ELSE sTmp_:= null;
+			END CASE; 		
+	
+	 --  LK10   К10 – показник маневреності робочого капіталу (Частка оборотних активів, непокритих поточними зобов’язан-нями)
+	 --  LK10   МК10 – показник оборотності робочого капіталу  (Співвідношен-ня оборотних активів, непокритих поточними зобов’язан-нями, та чистого доходу)
+	 -- l_min (ф. 1 р.   1195 – р. 1160 – р. 1165 – р.1190 – р.1695 + р. 1600 + р.1610 + р. 1690 гр. 4 ) /  ф. 1 р. 1300 гр. 4
+	 -- l_max (ф. 1-м р. 1195 – р. 1160 – р. 1165 – р.1190 – р.1695 + р. 1600 + р.1610 + р. 1690 гр. 4 ) /  ф. 2-м р. 2000 гр. 3
+	 
+            CASE 
+			  WHEN FZ_ = 'N' THEN
+			               begin   
+						            sTmp_ :=   (  ZN_F1('1195',4) - ZN_F1('1160',4) - ZN_F1('1165',4) - ZN_F1('1190',4) - ZN_F1('1695',4) + ZN_F1('1600',4) + ZN_F1('1610',4) + ZN_F1('1690',4) )  /  (  ZN_F1('1300',4) ) ;
+									get_indic('LK10',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK10',sTmp_,l_min);	
+						   end;
+			  WHEN FZ_ in ('R', 'C') THEN
+			               begin   
+						            sTmp_ :=     (  ZN_F1('1195',4) - ZN_F1('1160',4) - ZN_F1('1165',4) - ZN_F1('1190',4) - ZN_F1('1695',4) + ZN_F1('1600',4) + ZN_F1('1610',4) + ZN_F1('1690',4) )  /  (  ZN_F2('2000',4) ) ;
+									get_indic('LK10',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK10',sTmp_,l_max);	
+						   end;			   
+			  ELSE sTmp_:= null;
+			END CASE; 	
+
+	 --  LK11  К11, МК11 – показники покриття боргу чистим доходом (Спроможність обслуговування боргу доходами від основного виду діяльності)
+	 --  (ф. 1 р. 1510 + р. 1515 + р. 1600 + р. 1610 – р. 1165 гр. 4 ) / ( ф. 2 р. 2000 + р. 2010 гр. 3)
+	 --  (ф. 1-м р. 1595 + р. 1600 + р. 1610 – р. 1165 гр. 4 ) /  ( ф. 2-м (2-мс) р. 2000 гр. 3 )
+	 --  l_max
+	 
+            CASE 
+			  WHEN FZ_ = 'N' THEN
+			               begin   
+						            sTmp_ :=   (  ZN_F1('1510',4) + ZN_F1('1515',4) + ZN_F1('1600',4) + ZN_F1('1610',4) - ZN_F1('1165',4)  )  /  ( ZN_F2('2000',4) + ZN_F2('2010',4) ) ;
+									get_indic('LK11',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK11',sTmp_,l_max);	
+						   end;
+			  WHEN FZ_ in ('R', 'C') THEN
+			               begin   
+						            sTmp_ :=    (   ZN_F1('1595',4) + ZN_F1('1600',4) + ZN_F1('1610',4) - ZN_F1('1165',4)  )   /  ( ZN_F2('2000',4)  ) ;
+									get_indic('LK11',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK11',sTmp_,l_max);	
+						   end;			   
+			  ELSE sTmp_:= null;
+			END CASE; 			
+	
+	 --  LK12  К12 – показник покриття боргу прибутком до амортизації та оподаткування (Спроможність обслуговування боргу прибутком до оподаткування та амортизації)
+	 --  LK12  МК12 – показник рентабельності активів до оподаткування (Ефективність використання активів підприємства)
+	 --  l_zero ф. 2 р. 2190 – р. 2195 + р. 2220 – р. 2250 + р. 2515 гр. 3 / ф. 1 р. 1510 + р. 1515 + р. 1600 + р. 1610 – р. 1165 гр. 4
+	 --  l_min ф. 2-м р. 2290 гр. 3 / ф. 1-м р. 1300 гр. 4
+	 --  
+	 
+            CASE 
+			  WHEN FZ_ = 'N' THEN
+			               begin   
+						            sTmp_ :=   ( ZN_F2('2190',4) - ZN_F2('2195',4) + ZN_F2('2220',4) - ZN_F2('2250',4) + ZN_F2('2515',4) )  /  
+											   greatest (  ZN_F1('1510',4) + ZN_F1('1515',4) + ZN_F1('1600',4) + ZN_F1('1610',4) - ZN_F1('1165',4)  ,0);
+									get_indic('LK12',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK12',0,l_zero);	
+						   end;
+			  WHEN FZ_ in ('R', 'C') THEN
+			               begin   
+						            sTmp_ :=   ( ZN_F2('2290',4)  )  /  
+											   (  ZN_F1('1300',4) );
+									get_indic('LK12',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK12',sTmp_,l_min);	
+						   end;			   
+			  ELSE sTmp_:= null;
+			END CASE; 		
+
+	 --  LK13  К13 – показник частки неопераційних елементів балансу (Частка активів, яка не має прямого відношення до операційної діяльності підприємства)
+	 --  LK13  МК13 – показник покриття фінансових витрат операційним прибутком (Спроможність фінансування неопераційних витрат операційним прибутком)
+	 --  l_max (ф. 1 р. 1000 + р. 1030 + р. 1035 + р. 1040 + р. 1045 + р. 1050 + р. 1090 + р. 1155 + р. 1160 + р. 1190 гр. 4 ) / (ф. 1 р. 1300 гр. 4)
+	 --  l_zero(ф. 2-м р. 2000 + р. 2120 – р. 2050 – р. 2180 гр. 3 )  / ( ф. 2-м р. 2165 + р. 2270 гр. 3)
+	 --   
+	 
+            CASE 
+			  WHEN FZ_ = 'N' THEN
+			               begin   
+						            sTmp_ :=   (  ZN_F1('1000',4) + ZN_F1('1030',4) + ZN_F1('1035',4) + ZN_F1('1040',4) + ZN_F1('1045',4) + ZN_F1('1050',4) + ZN_F1('1090',4) + ZN_F1('1155',4) + ZN_F1('1160',4) + ZN_F1('1190',4)  )  /  ( ZN_F1('1300',4)) ;
+									get_indic('LK13',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK13',sTmp_,l_max);	
+						   end;
+			  WHEN FZ_ in ('R', 'C') THEN
+			               begin   
+						            sTmp_ :=    (   ZN_F2('2000',4) + ZN_F2('2120',4) - ZN_F2('2050',4) - ZN_F2('2180',4)  )   /    greatest ( ZN_F2('2165',4) + ZN_F2('2270',4) , 0 ) ;
+									get_indic('LK13',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK13',0,l_zero);	
+						   end;			   
+			  ELSE sTmp_:= null;
+			END CASE; 					
+
+	 --  LK14 К14, МК14 – показники оборотності поточних активів (Період повного обороту поточних активів)
+	 --  ф. 1 р. 1195 гр. 4 · 365 / ф. 2 р. 2000 р. + 2010 гр. 3
+	 --  ф. 1-м р. 1195 гр. 4 · 365 / ф. 2-м р. 2000 гр. 3
+	 --  l_max
+	 
+            CASE 
+			  WHEN FZ_ = 'N' THEN
+			               begin   
+						            sTmp_ :=   (  ZN_F1('1195',4) * 365)  /  ( ZN_F2('2000',4) + ZN_F2('2010',4)) ;
+									get_indic('LK14',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK14',sTmp_,l_max);	
+						   end;
+			  WHEN FZ_ in ('R', 'C') THEN
+			               begin   
+						            sTmp_ :=   (  ZN_F1('1195',4) * 365)  /  ( ZN_F2('2000',4) ) ;
+									get_indic('LK14',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK14',sTmp_,l_max);	
+						   end;			   
+			  ELSE sTmp_:= null;
+			END CASE; 
+
+	 --  LK15  К15 – показник покриття фінансових витрат прибутком до оподаткування та амортизації (Спроможність фінансування неопераційних витрат операційним прибутком до вирахування амортизації)
+	 --  ф. 2 р. 2190 - р. 2195 + р. 2515 гр. 3 / ф. 2 р. 2250 гр. 3
+	 --  
+	 --  l_zero
+	 
+            CASE 
+			  WHEN FZ_ = 'N' THEN
+			               begin   
+						            sTmp_ :=   ( ZN_F2('2190',4) - ZN_F2('2195',4) + ZN_F2('2515',4) )  /  
+											   greatest (  ZN_F2('2250',4)  ,0);
+									get_indic('LK15',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK15',0,l_zero);	
+						   end;
+			  ELSE sTmp_:= null;
+			END CASE; 			
+	
+	 --  LK16  К16 – показник рентабельності до оподаткування (Ефективність діяльності підприємства до оподаткування)
+	 --  (ф. 2 р. 2190 – р. 2195 + р. 2220 – р. 2250 гр. 3 ) / ( ф. 2 р. 2000 + р. 2010 гр. 3 )
+	 --  
+	 --  l_min    
+	 
+            CASE 
+			  WHEN FZ_ = 'N' THEN
+			               begin   
+						            sTmp_ :=   (  ZN_F2('2190',4) - ZN_F2('2195',4) + ZN_F2('2220',4) - ZN_F2('2250',4)   )  /  (  ZN_F2('2000',4) + ZN_F2('2010',4) ) ;
+									get_indic('LK16',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK16',sTmp_,l_min);	
+						   end;
+			  ELSE sTmp_:= null;
+			END CASE; 
+
+	 --  LK17  К17 – показник покриття фінансових витрат валовим (Спроможність фінансування неопераційних витрат валовим прибутком)
+	 --  LK17  МК17 – показник валової рентабельності (Ефективність основної діяльності підприємства)
+	 --  l_zero   ф. 2 р. 2090 – р. 2095 гр. 3  /  ф. 2 р. 2250 гр. 3
+	 --  l_min  ф. 2-м р. 2000 – р. 2050 гр. 3  /  ф. 2-м р. 2000 гр. 3
+	 --   
+	 
+            CASE 
+			  WHEN FZ_ = 'N' THEN
+			               begin   
+						            sTmp_ :=   (  ZN_F2('2090',4) - ZN_F2('2095',4)   )  /  greatest( ZN_F2('2250',4),0) ;
+									get_indic('LK17',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK17',0,l_zero);	
+						   end;
+			  WHEN FZ_ in ('R', 'C') THEN
+			               begin   
+						            sTmp_ :=    (   ZN_F2('2000',4) - ZN_F2('2050',4)  )   /    ( ZN_F2('2000',4)  ) ;
+									get_indic('LK17',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK17',0,l_min);	
+						   end;			   
+			  ELSE sTmp_:= null;
+			END CASE; 
+
+	 --  LK18  К18, МК18 – показники заборгованості (Частка боргу підприємства до активів)
+	 --  ф. 1 р. 1510 + р. 1515 + р. 1600 + р. 1610 гр. 4 / ф. 1 р. 1300 гр. 4
+	 --  ф. 1-м р. 1595 + р. 1600 + р. 1610 гр. 4 / ф. 1-м р. 1300 гр. 4
+	 --  l_max    
+	 
+            CASE 
+			  WHEN FZ_ = 'N' THEN
+			               begin   
+						            sTmp_ :=   (  ZN_F1('1510',4) + ZN_F1('1515',4) + ZN_F1('1600',4) + ZN_F1('1610',4)  )  /  (  ZN_F1('1300',4)  ) ;
+									get_indic('LK18',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK18',sTmp_,l_max);	
+						   end;
+			  WHEN FZ_ in ('R', 'C') THEN
+			               begin   
+						            sTmp_ :=   (  ZN_F1('1595',4)  + ZN_F1('1600',4) + ZN_F1('1610',4)  )  /  (  ZN_F1('1300',4)  ) ;
+									get_indic('LK18',sTmp_,l_rzn);
+							exception when ZERO_DIVIDE then 
+                                    sTmp_ :=  null;	get_indic('LK18',sTmp_,l_max);	
+						   end;						   
+			  ELSE sTmp_:= null;
+			END CASE; 
+			
+     else null;
+  end case;	 
   
  for f in 1 .. tp_indics.kod.count()
  loop
@@ -3918,14 +4453,16 @@ FUNCTION f_fin_kved  (  p_rnk  customer.rnk%type
   l_CK   varchar2(1);
 BEGIN
      --   'N_CK'    1 - страхова компанія
- l_ck := substr(nvl(kl.get_customerw(P_RNK => p_rnk, 
+    /*l_ck := substr(nvl(kl.get_customerw(P_RNK => p_rnk, 
 	                          P_TAG => 'N_CK', 
 					          P_ISP => 0),0),1,1);
 							  
     if l_ck = '0' then  l_2000 :=  ZN_F2(2000, 3, p_dat, p_okpo);
 	              else  l_2000 :=  ZN_F2(2010, 3, p_dat, p_okpo); 
 	end if;
+	*/ 
 	 
+	 l_2000 :=  nvl(ZN_F2(2000, 3, p_dat, p_okpo),0) + nvl(ZN_F2(2010, 3, p_dat, p_okpo),0) + nvl(ZN_F2(2120, 3, p_dat, p_okpo),0);
 	 
 	 select max(nvl(volme_sales,0)), sum(nvl(volme_sales,0))
 	   into l_max, l_ss
@@ -3934,28 +4471,48 @@ BEGIN
 			 dat  = p_dat;
 	  
    
-     for x in ( select a.kved, v.name, volme_sales, weight, flag 
+     for x in ( select a.kod, a.kved, v.name, sum(volme_sales)volme_sales, weight, flag 
 	              from fin_kved a, ved v  
 				 where okpo = p_okpo and 
 				       dat = p_dat and 
 					   a.kved = v.ved
+			   GROUP BY GROUPING SETS(  
+                         (a.kod, a.kved, v.name, volme_sales, weight, flag),
+                         (a.kod  ),
+                         ()
+                         )
 					) 
      loop   
+	        l_kved.kod         := x.kod;
             l_kved.kved        := x.kved;
 			l_kved.name        := x.name;
 			l_kved.volme_sales := nvl(x.volme_sales,0);
+			
 			case  when l_2000 != 0 then l_kved.weight      := round(nvl(x.volme_sales,0)*100/l_2000,12);
 			                       else l_kved.weight      := null;
             end case;
+
             l_kved.flag        := x.flag;
-			l_kved.ord         := 0;
+			case 
+			     when x.kod is null and x.kved is null     then l_kved.ord         := 1; l_kved.name        := 'Всього:';
+			     when x.kod is not null and x.kved is null then l_kved.ord         := 2; l_kved.name        := 'Разом по рядку '||x.kod||':';  l_kved.kod := null;
+                 else l_kved.ord         := 0;
+            end case;
+			
+			
+			case 
+			     when x.kod is not null and x.kved is null and nvl(ZN_F2(x.kod, 3, p_dat, p_okpo),0) != nvl(x.volme_sales,0) 
+				            then l_kved.err := 'Увага !!!   Сума по рядку '||x.kod||'  не відповідає формі№2  рядок '||x.kod||'('||trim(to_char(nvl(ZN_F2(x.kod, 3, p_dat, p_okpo),0),'999999999990.00')) ||')';  
+				 else l_kved.err := null;  
+			end case;
+			
             l_vols := l_vols + l_kved.volme_sales;
 			l_volp := l_volp + l_kved.weight;
 			
             PIPE ROW(l_kved);   
  
      end loop;
-   
+          /*  l_kved.kod        := null;
             l_kved.kved        := null;
 			l_kved.name        := 'Всього:';
 			l_kved.volme_sales := l_vols;
@@ -3963,7 +4520,7 @@ BEGIN
 			l_kved.flag        := null;
 			l_kved.ord         := 1;
 		
-            PIPE ROW(l_kved); 
+            PIPE ROW(l_kved); */
    
    
  RETURN;
@@ -3983,15 +4540,15 @@ as
   l_CK   varchar2(1);
 BEGIN
      --   'N_CK'    1 - страхова компанія
- l_ck := substr(nvl(kl.get_customerw(P_RNK => p_rnk, 
+  /*  l_ck := substr(nvl(kl.get_customerw(P_RNK => p_rnk, 
 	                          P_TAG => 'N_CK', 
 					          P_ISP => 0),0),1,1);
 							  
     if l_ck = '0' then  l_2000 :=  ZN_F2(2000, 3, p_dat, p_okpo);
 	              else  l_2000 :=  ZN_F2(2010, 3, p_dat, p_okpo); 
 	end if;
-
-	 
+  */
+	l_2000 :=  nvl(ZN_F2(2000, 3, p_dat, p_okpo),0) + nvl(ZN_F2(2010, 3, p_dat, p_okpo),0) + nvl(ZN_F2(2120, 3, p_dat, p_okpo),0);
 	 
 	 select max(nvl(volme_sales,0)), sum(nvl(volme_sales,0))
 	   into l_max, l_ss
@@ -4045,7 +4602,8 @@ end;
 	
 Procedure save_volmesales (p_rnk         customer.rnk%type,
                            p_okpo        fin_kved.okpo%type,
-                           p_dat         fin_kved.dat%type,  
+                           p_dat         fin_kved.dat%type, 
+                           p_kod        fin_kved.kved%type,						   
                            p_kved        fin_kved.kved%type,
                            p_volme_sales fin_kved.VOLME_SALES%type 					 	   
                           )
@@ -4058,14 +4616,15 @@ as
 begin
   
 begin      
- insert into fin_kved (okpo,   dat,   kved,   volme_sales ) 
-              values (p_okpo, p_dat, p_kved, p_volme_sales);
+ insert into fin_kved (okpo,   dat,   kod, kved,   volme_sales ) 
+              values (p_okpo, p_dat, p_kod, p_kved, p_volme_sales);
 exception when dup_val_on_index then 
   update fin_kved
     set  volme_sales  = p_volme_sales
   where  okpo         = p_okpo         and
          dat          = p_dat          and
-         kved         = p_kved; 
+         kved         = p_kved         and
+		 kod          = p_kod; 
 end;
 		 determ_kved(p_rnk,p_okpo,p_dat);
 end;
@@ -4771,19 +5330,19 @@ begin
 	  
   -- 3.4. спрямування кредиту, наданого Контрагенту А, на погашення кредиту Контрагента В, що був використаний Контрагентом В   
 	case 
-       when ZN_P_ND('SKK', 52, DAT_) = 1 then l_klass := greatest(l_klass, 8); -- не менше 8	
+       when ZN_P_ND('SKK', 52, DAT_) = 1 then l_klass := greatest(l_klass, 9); -- не менше 8	змінено в 2018 році на 9
 	   else null;
 	end case;
 	  
   -- 3.5. «Контрагент має від'ємне значення капіталу на кінець року протягом трьох останніх років поспіль». 	  
 	case 
-       when ZN_P_ND('KVZK', 52, DAT_) = 1 and  sysdate > to_date('01-01-2019','dd-mm-yyyy') then l_klass := greatest(l_klass, 8); -- не менше 8	
+       when ZN_P_ND('KVZK', 52, DAT_) = 1 and  sysdate > to_date('01-01-2019','dd-mm-yyyy') then l_klass := greatest(l_klass, 9); -- не менше 8	 змінено в 2018 році на 9
 	   else null;
 	end case;	
 	  
   -- 3.6 Порушення вимоги щодо одночасного виконання	  
 	case 
-       when ZN_P_ND('PVKZ', 52, DAT_) = 1 then l_klass := greatest(l_klass, 8); -- не менше 8	
+       when ZN_P_ND('PVKZ', 52, DAT_) = 1 then l_klass := greatest(l_klass, 9); -- не менше 8	змінено в 2018 році на 9
 	   else null;
 	end case;		  
 	  
@@ -4884,20 +5443,34 @@ function  get_pd (  p_rnk   IN  number,
 as
 l_vncr  cck_rating.ord%type;
 l_repl  number;
+l_    fin_pd.k%type;
 l_k   fin_pd.k%type;
 l_k2  fin_pd.k2%type;
-
+l_aver fin_pd_nbu.k_aver%type;
 l_idf number;
 l_cls_max number;
-
+l_ved     number; 
+l_okpo     varchar2(14);
 l_Y    number :=0 ;
 l_N    number :=0 ;
 l_tmp  number :=0;
 begin
 
+  fin_alg(p_dat);
+  
+  if  p_idf = 50 and  G_ALG_351 = G_ALG_351_18
+      then  begin 
+	            select okpo into l_okpo from fin_customer  where rnk = p_rnk and rownum = 1;
+				l_ved := FIN_NBU.ZN_P('GVED', 6, FIN_NBU.ZN_P_ND_DATE('ZVTP', 51, p_DAT, p_ND, p_RNK), l_okpo, null);   
+				l_ved := nvl(l_ved ,5);
+			  exception when no_data_found then  l_ved := 5;
+            end; 	  
+	  else  l_ved := 0;
+   end if;
+
   case 
     when p_idf = 50               then l_idf := 50;    l_cls_max:=10;  -- юрособи
-	when p_idf between 60 and 65  then l_idf := 60;    l_cls_max:=5;   -- фіз особи 
+	when p_idf between 60 and 65  then l_idf := 60;    l_cls_max:=5;   -- фіз особи     
 	when p_idf between 80 and 81  then l_idf := 80;    l_cls_max:=5;   -- банки особи 
 	                              else l_idf := p_idf; l_cls_max:=5;   -- інші
   end case;
@@ -4918,11 +5491,13 @@ begin
    for x in (
                     select  kod, val, IDF, k, k2     
               from fin_pd UNPIVOT INCLUDE NULLS (VAL FOR KOD IN (ip1, ip2, ip3, ip4, ip5))
-                where (idf,fin, vncrr) in (select idf, fin, max(vncrr)
+                where (idf,fin, vncrr, alg, ved) in (select idf, fin, max(vncrr), alg, ved
                                              from fin_pd p 
                                             where idf = p_idf and
-                                                  fin = nvl(p_clas,l_cls_max) and vncrr <= l_vncr
-                                            group by idf, fin   
+                                                  fin = nvl(p_clas,l_cls_max) and vncrr <= l_vncr and
+			 									  alg = G_ALG_351 and
+												  ved = l_ved
+                                            group by idf, fin , alg, ved  
                                                        )
 				and val is not null									   
              )
@@ -4955,10 +5530,28 @@ begin
          then raise_application_error(-(20000),'      '||'Відсутні Скоринг для idf='||p_idf,TRUE);
    End;		
 
-	if l_tmp >= 0.5 then  return  l_k;
-	                else  return  l_k2;
+	if l_tmp >= 0.5 then  l_ := l_k;
+	                else  l_ := l_k2;
 	end if;
-
+	
+	-- Немножко колдавства.   Обмеження НБУ по довіднику не менше середнього значення діапазону.  Управління обмеження періодом дії
+	begin
+	   Select k_aver
+	     into l_aver
+		 from fin_pd_nbu
+		where idf = p_idf and
+              fin = nvl(p_clas,l_cls_max)  and
+		      ved = l_ved  and
+			  p_dat between date_begin and date_close and
+			  G_ALG_351 = G_ALG_351_18; 
+			  
+        l_ := greatest(l_, l_aver);			  
+		
+	   exception when no_data_found then  l_aver := 0;
+	end;
+	
+   return l_;
+ 
 end get_pd;
 
 
@@ -5677,7 +6270,7 @@ begin
    for k in (
          Select nd, rnk, idf, kod, sum(s) kol_m
 		   from fin_nd_hist
-		  where fdat between add_months(p_fdat,-12) and p_fdat 
+		  where fdat between add_months(p_fdat,-6) and p_fdat 
 			and  (nd, rnk, idf, kod) in (       
 											select nd, rnk, idf, kod           
 											 from fin_nd_hist h
@@ -5972,7 +6565,137 @@ begin
 
 end;					   
 	
+function  export_to_script_fin_que (p_idf number) return blob
+  is
+       nlchr      char(2) := chr(13)||chr(10);
+       l_txt      varchar2(32000);
+       l_clob     blob;
+       p_clob_scrpt blob;
+       l_ number;
 
+    
+
+begin
+
+       p_clob_scrpt:= null;
+       dbms_lob.createtemporary(l_clob,  FALSE);
+	   
+	    l_txt:=l_txt||'PROMPT =====================================================================================                     '||nlchr ;
+		l_txt:=l_txt||'PROMPT *** Run *** ========== Scripts /Sql/bars/data/fin_question_'||p_idf||'.sql =========*** Run **            '||nlchr ;
+		l_txt:=l_txt||'PROMPT =====================================================================================                     '||nlchr ;
+        l_txt:=l_txt||'                                                                                                                 '||nlchr ;
+		l_txt:=l_txt||'declare                                                                                                          '||nlchr ;
+        dbms_lob.append(l_clob, UTL_RAW.CAST_TO_RAW(l_txt));
+		l_txt:= nlchr ;
+		
+		
+		
+		l_txt:=l_txt||'	procedure add_question ( p_name       fin_question.name%type,                            '||nlchr ;
+		l_txt:=l_txt||'							 p_ord        fin_question.ord%type,                             '||nlchr ;
+		l_txt:=l_txt||'							 p_kod        fin_question.kod%type,                             '||nlchr ;
+		l_txt:=l_txt||'							 p_idf        fin_question.idf%type,                             '||nlchr ;
+		l_txt:=l_txt||'							 p_descript   fin_question.descript%type default null,           '||nlchr ;
+		l_txt:=l_txt||'							 p_pob        fin_question.pob%type default 0                    '||nlchr ;
+		l_txt:=l_txt||'							                                                                 '||nlchr ;
+		l_txt:=l_txt||'						)                                                                    '||nlchr ;
+		l_txt:=l_txt||'	as                                                                                       '||nlchr ;
+		l_txt:=l_txt||'	l_ques  fin_question%rowtype;                                                            '||nlchr ;
+		l_txt:=l_txt||'	begin                                                                                    '||nlchr ;
+		l_txt:=l_txt||'                                                                                          '||nlchr ;
+		l_txt:=l_txt||'	   l_ques.name       :=   p_name     ;                                                   '||nlchr ;
+		l_txt:=l_txt||'	   l_ques.ord        :=   p_ord      ;                                                   '||nlchr ;
+		l_txt:=l_txt||'	   l_ques.kod        :=   p_kod      ;                                                   '||nlchr ;
+		l_txt:=l_txt||'	   l_ques.idf        :=   p_idf      ;                                                   '||nlchr ;
+		l_txt:=l_txt||'	   l_ques.pob        :=   p_pob      ;                                                   '||nlchr ;
+		l_txt:=l_txt||'	   l_ques.descript   :=   p_descript ;                                                   '||nlchr ;
+	    dbms_lob.append(l_clob, UTL_RAW.CAST_TO_RAW(l_txt));
+		l_txt:= nlchr ;	   
+		   
+			  
+		l_txt:=l_txt||'	 insert into fin_question                            '||nlchr ;
+		l_txt:=l_txt||'		  values l_ques;                                 '||nlchr ;
+		l_txt:=l_txt||'	exception when dup_val_on_index then                 '||nlchr ;
+		l_txt:=l_txt||'	  update fin_question                                '||nlchr ;
+		l_txt:=l_txt||'		set  row  = l_ques                               '||nlchr ;
+		l_txt:=l_txt||'	  where  kod  = l_ques.kod and                       '||nlchr ;
+		l_txt:=l_txt||'			 idf  = l_ques.idf ;                         '||nlchr ;
+		l_txt:=l_txt||'end;                                                 '||nlchr ;
+		dbms_lob.append(l_clob, UTL_RAW.CAST_TO_RAW(l_txt));
+		l_txt:= nlchr ;	
+
+		                                                                                               
+		l_txt:=l_txt||'	procedure add_question_rep ( p_kod        fin_question_reply.kod%type,          '||nlchr ;
+		l_txt:=l_txt||'								 p_name       fin_question_reply.name%type,         '||nlchr ;
+		l_txt:=l_txt||'								 p_ord        fin_question_reply.ord%type,          '||nlchr ;
+		l_txt:=l_txt||'								 p_val        fin_question_reply.val%type,          '||nlchr ;
+		l_txt:=l_txt||'								 p_idf        fin_question_reply.idf%type,          '||nlchr ;
+		l_txt:=l_txt||'								 p_repl_s     fin_question_reply.repl_s%type,       '||nlchr ;
+		l_txt:=l_txt||'								 p_namep      fin_question_reply.namep%type         '||nlchr ;
+		l_txt:=l_txt||'						)                                                           '||nlchr ;
+		l_txt:=l_txt||'	as                                                                              '||nlchr ;
+		l_txt:=l_txt||'	l_ques  fin_question_reply%rowtype;                                             '||nlchr ;
+		l_txt:=l_txt||'	begin                                                                           '||nlchr ;
+		dbms_lob.append(l_clob, UTL_RAW.CAST_TO_RAW(l_txt));
+		l_txt:= nlchr ;	
+	
+	
+		l_txt:=l_txt||'      l_ques.name       :=   p_name     ;                       '||nlchr ;
+		l_txt:=l_txt||'      l_ques.ord        :=   p_ord      ;                       '||nlchr ;
+		l_txt:=l_txt||'      l_ques.kod        :=   p_kod      ;                       '||nlchr ;
+		l_txt:=l_txt||'      l_ques.idf        :=   p_idf      ;                       '||nlchr ;
+		l_txt:=l_txt||'      l_ques.val        :=   p_val      ;                       '||nlchr ;
+		l_txt:=l_txt||'      l_ques.repl_s     :=   p_repl_s   ;                       '||nlchr ;
+		l_txt:=l_txt||'      l_ques.namep      :=   p_namep    ;                       '||nlchr ;
+		dbms_lob.append(l_clob, UTL_RAW.CAST_TO_RAW(l_txt));
+		l_txt:= nlchr ;			   
+			  
+		l_txt:=l_txt||' 	 insert into fin_question_reply                         '||nlchr ;
+		l_txt:=l_txt||' 		  values l_ques;                                    '||nlchr ;
+		l_txt:=l_txt||' 	exception when dup_val_on_index then                    '||nlchr ;
+		l_txt:=l_txt||' 	  update fin_question_reply                             '||nlchr ;
+		l_txt:=l_txt||' 		set  row  = l_ques                                  '||nlchr ;
+		l_txt:=l_txt||' 	  where  kod  = l_ques.kod and                          '||nlchr ;
+		l_txt:=l_txt||' 			 ord  = l_ques.ord and                          '||nlchr ;
+		l_txt:=l_txt||' 			 idf  = l_ques.idf ;                            '||nlchr ;
+		l_txt:=l_txt||'end;                                                        '||nlchr ;
+		l_txt:=l_txt||'                                                             '||nlchr ;
+		l_txt:=l_txt||'                                                             '||nlchr ;
+		l_txt:=l_txt||'Begin                                                        '||nlchr ;
+		dbms_lob.append(l_clob, UTL_RAW.CAST_TO_RAW(l_txt));
+		l_txt:= nlchr ;		
+	   
+	   
+	for  k in (select * from fin_question where idf = p_idf order by ord)
+    loop	
+	   l_txt:=nlchr||' dbms_output.put_line(''PROMPT *** IDF='||k.idf||' KOD>>'||k.kod||' *** '||k.name||''');'||nlchr ;
+       l_txt:=l_txt||' add_question('''||k.name||''', '||k.ord||', '''||k.kod||''', '||k.idf||', '''||k.descript||''', '||k.pob||');'||nlchr ;
+	   dbms_lob.append(l_clob, UTL_RAW.CAST_TO_RAW(l_txt));
+	   l_txt:= null ;	   
+	   
+	   
+	 for i in (select * from fin_question_reply where idf = k.idf and kod = k.kod order by ord)
+     loop
+	    l_txt:=l_txt||'    add_question_rep('''||i.kod ||''', '''||i.name ||''', '||i.ord ||', '|| i.val||', '||i.idf||', '||nvl(to_char(i.repl_s,'9999999999.99'),'null') ||', '''||i.namep ||''');'||nlchr ;
+		dbms_lob.append(l_clob, UTL_RAW.CAST_TO_RAW(l_txt));
+	    l_txt:= null ;	
+     end loop; 	 
+	   
+	   
+	   
+	end loop;   
+	   
+	   
+	   l_txt:=l_txt||'end;                                        '||nlchr;
+       l_txt:=l_txt||'/                                           '||nlchr;
+       l_txt:=l_txt||'                                            '||nlchr;
+       l_txt:=l_txt||'commit;                                     '||nlchr;
+	   
+       dbms_lob.append(l_clob, UTL_RAW.CAST_TO_RAW(l_txt));
+       p_clob_scrpt:=l_clob;
+       return p_clob_scrpt;
+end;	
+	
+	
 /**
  * header_version - возвращает версию заголовка пакета FIN_NBU
  */
