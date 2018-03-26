@@ -4,7 +4,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
 % DESCRIPTION : Процедура формирования #E2 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.17.006      12.02.2018 (29.01.2018)
+% VERSION     : v.17.007      20.03.2018 (12.02.2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -15,6 +15,9 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
    NNN        условный порядковый номер
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+20.03.2018 для проводок Дт 3720 Кт 3739 из доп.реквизита "PASPN" 
+           по коду серии и по номеру паспорта определяем контрагента 
+           и его код ИНН 
 12.02.2018 для формирования переменной D3#E2_ (дата контракта) добавил
            еще одно условие для формата даты 'DD,MM,YYYY'
            (доп.параметр D3#70 был заполнен в таком виде и 
@@ -118,6 +121,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
    swift_k_   VARCHAR2 (12);
    bic_code   VARCHAR2 (14);
    rnk_       NUMBER;
+   rnk1_       NUMBER;
    okpo_      VARCHAR2 (14);
    okpo1_     VARCHAR2 (14);
    nmk_       VARCHAR2 (70);
@@ -1460,6 +1464,23 @@ BEGIN
                         if okpo_ = ourOKPO_ then
                            okpo_ := ourGLB_;
                            codc_ := 1 ;
+                        end if;
+
+                        if nlsk_ like '3739%' and  nls_ like '3720%'
+                        then
+                           BEGIN
+                              select max(c.rnk), max(c.okpo)
+                                 into rnk1_, okpo_
+                              from operw w, person p, customer c
+                              where w.ref = ref_
+                                and w.tag like 'PASPN%'
+                                and upper(substr(w.value,1,2)) = p.ser
+                                and ( substr(w.value,3,6) = p.numdoc OR
+                                      substr(w.value,4.6) = p.numdoc )
+                                and p.rnk = c.rnk ;
+                           EXCEPTION WHEN NO_DATA_FOUND THEN
+                              null; 
+                           END;
                         end if;
 
                         if mfo_ = 300465 and 

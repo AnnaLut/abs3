@@ -3,7 +3,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fc9_nn ( dat_     DATE,
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #C9 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 14/11/2017 (18/08/2017, 15/08/2017)
+% VERSION     : 16/03/2018 (11/12/2017, 14/11/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -13,6 +13,10 @@ CREATE OR REPLACE PROCEDURE BARS.p_fc9_nn ( dat_     DATE,
                (классификатор KOD_C9_1) и D2#70 - DC#70.
                Нужен доп.пармаметр DC#70 - номер ВМД.%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+16.03.2018 для проводок Дт 2909 Кт 2924 из OPERW и TAG='59' определяем
+           номер лиц.счета 2625 и по нему определяем ОКПО клиента
+11.12.2017 для проводок Дт 2909 Кт 2924 добавил условие поиска RNK 
+           контрагента из проводки Дт 3739 Кт 2909 и TAG like '59%'
 14.11.2017 удалил ненужные строки и изменил некоторые блоки формирования 
 18.08.2017 для Запорожья МФО=313957 не будут включаться проводки 
            Дт 3739  Кт 29091100070000
@@ -115,6 +119,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fc9_nn ( dat_     DATE,
    -- флаг для определения наличия поля BENEFCOUNTRY т.TOP_CONTRACTS
    -- (из модуля биржевые операции)
    pr_s3_     NUMBER;    -- флаг для определение наличия поля S3 табл.ZAYAVKA
+   pr_2625_   NUMBER;
    -- (из модуля биржевые операции)
    s3_        NUMBER;
    ko_        VARCHAR2 (2);      -- ознака операцii з безготiвковою iнвалютою
@@ -358,7 +363,8 @@ CREATE OR REPLACE PROCEDURE BARS.p_fc9_nn ( dat_     DATE,
                d1#C9_ := '30';  -- с 26.07.2012 согласно письма Рощиной от 11.07.2012
             end if;
             
-            if instr(lower(nazn_),'комерц_йний переказ') > 0 
+            if instr(lower(nazn_),'комерційний переказ') > 0  OR 
+               instr(lower(nazn_),'комерцiйний переказ') > 0 
             then
                d1#C9_ := '01';  -- восстановил 21.09.2015 (было до 26.07.2012)
                --d1#C9_ := '30';  -- с 26.07.2012 согласно письма Рощиной от 11.07.2012
@@ -390,6 +396,11 @@ CREATE OR REPLACE PROCEDURE BARS.p_fc9_nn ( dat_     DATE,
             d1#C9_ := '30';  
          end if;
 
+         if pr_2625_ = 1 
+         then
+            d1#C9_ := '30';
+         end if;
+ 
          if TRIM (p_value_) is null and d1#C9_ is not null 
          then
             p_value_ := NVL (SUBSTR (TRIM (d1#C9_), 1, 70), '00');
@@ -1257,8 +1268,9 @@ BEGIN
                      into rnk_
                   from provodki_otc p, operw w
                   where p.fdat = dat_ 
-                    and p.nlsd like '2924%'
-                    and p.nlsk like '2625%'
+                    and ( (p.nlsd like '2924%' and p.nlsk like '2625%') OR 
+                          (p.nlsd like '3739%' and p.nlsk like '2909%')
+                        )
                     and p.kv = k.kv 
                     and p.s*100 = k.s_nom 
                     and w.ref = k.ref 
@@ -1354,6 +1366,7 @@ BEGIN
          kod_g_ := null;
          s_nom_2603 := 0;
          name_sp_ := '';
+         pr_2625_ := 0;
 
          if nlsk_ like '2909______0000%' and nls_ like '2909%'
          then
@@ -1622,7 +1635,17 @@ BEGIN
                         --  and p.nlsk like '2625%'
                         --  and p.rnkk = c.rnk;               
                      EXCEPTION WHEN NO_DATA_FOUND THEN
-                        NULL;
+                        BEGIN 
+                           select 1, trim(c.okpo)
+                              into pr_2625_, okpo_
+                           from operw o, accounts a, customer c
+                           where o.ref = ref_
+                             and o.tag like '59%'
+                             and substr(o.value,2,14) like a.nls || '%'
+                             and a.rnk = c.rnk;
+                        EXCEPTION WHEN NO_DATA_FOUND THEN 
+                           NULL;
+                        END;
                      END;  
                   end if; 
 
