@@ -1,3 +1,7 @@
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /sql/bars/table/zp_payroll_doc.sql =========*** Run *** ===
+PROMPT ===================================================================================== 
+
 exec bars.bpa.alter_policy_info( 'ZP_PAYROLL_DOC', 'WHOLE' , null, null, null, null ); 
 /
 exec bars.bpa.alter_policy_info( 'ZP_PAYROLL_DOC', 'FILIAL', null, null, null, null );
@@ -96,6 +100,29 @@ begin
     end if; 
 end;
 /
+begin
+    execute immediate 'alter table zp_payroll_doc add passp_serial varchar2(2)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/
+begin
+    execute immediate 'alter table zp_payroll_doc add passp_num varchar2(6)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/
+begin
+    execute immediate 'alter table zp_payroll_doc add doc_comment varchar2(4000)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/
+comment on column bars.zp_payroll_doc.passp_serial is 'Серія паспорту';
+comment on column bars.zp_payroll_doc.passp_num is 'Номер паспорту';
 exec  bars.bpa.alter_policies('ZP_PAYROLL_DOC'); 
 /
 comment on table  bars.ZP_PAYROLL_DOC is 'Документи  ЗП відомості';
@@ -103,5 +130,6 @@ comment on column bars.ZP_PAYROLL_DOC.id_pr is 'id ЗП відомості';
 /
 grant select,delete,update,insert on bars.ZP_PAYROLL_DOC to bars_access_defrole;
 /
-
-
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /sql/bars/table/zp_payroll_doc.sql =========*** Run *** ===
+PROMPT ===================================================================================== 
