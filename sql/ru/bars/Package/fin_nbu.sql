@@ -3411,7 +3411,26 @@ from fin_rnk where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_ and
      kod in ('1300','1900')
   having NVL(SUM(decode(KOD,'1300',S,0)),0)<>
          NVL(SUM(decode(KOD,'1300',0,S)),0)
-	 
+UNION ALL
+select 1,NVL(SUM(decode(KOD,'1100',S,0)),0),
+         NVL(SUM(decode(KOD,'1100',0,S)),0)
+from fin_rnk where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_ and
+     kod in ('1100','1101','1102','1103','1104')
+  having NVL(SUM(decode(KOD,'1100',S,0)),0)<
+         NVL(SUM(decode(KOD,'1100',0,S)),0)	
+UNION ALL
+select 1,NVL(SUM(decode(KOD,'1425',S,0)),0),
+         NVL(SUM(decode(KOD,'1425',0,S)),0)
+from fin_rnk where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_ and
+     kod in ('1425')
+  having NVL(SUM(decode(KOD,'1425',S,0)),0)>0
+UNION ALL
+select 1,NVL(SUM(decode(KOD,'1430',S,0)),0),
+         NVL(SUM(decode(KOD,'1430',0,S)),0)
+from fin_rnk where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_ and
+     kod in ('1430')
+  having NVL(SUM(decode(KOD,'1430',S,0)),0)>0
+	
 			);  
 end if;
 
