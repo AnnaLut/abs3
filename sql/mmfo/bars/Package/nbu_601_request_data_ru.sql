@@ -70,6 +70,7 @@ create or replace package nbu_601_request_data_ru is
     ----заполнение залогов
     procedure  p_nbu_pledge_dep  (kf_ in varchar2);
 end;
+
 /
 create or replace package body nbu_601_request_data_ru is
 
@@ -389,8 +390,7 @@ create or replace package body nbu_601_request_data_ru is
         commit;
     end;
     --------------------------------
-   /*   procedure p_nbu_groupur_uo(
-       kf_ in varchar2)
+   /*  procedure p_nbu_groupur_uo(kf_ in varchar2)
        is
        begin
        bc.go (kf_);
@@ -399,13 +399,13 @@ create or replace package body nbu_601_request_data_ru is
             execute immediate 'alter table nbu_groupur_uo truncate partition for (''' || kf_ || ''') reuse storage';
        end;
 
-       for groupur  in (select distinct  p.rnk, decode(c.codcagent,3,'true','false') isRezGr,c.okpo,nmk,country 
+       for groupur  in (select distinct  p.rnk, decode(c.codcagent,3,'true','false') isRezGr,c.okpo,nmk,country
                            from  customer c, nbu_person_uo p,cust_bun b
                            where c.rnk=p.rnk and p.iscontroller is not null and p.rnk=b.rnka
-                           union 
-                           select distinct  p.rnk, decode (country,804,'true','false') isRezGr,c.okpo,name,c.country 
-                           from  customer_extern c, nbu_person_uo p
-                           where c.rnk=p.rnk and p.iscontroller is not null)loop
+                           union
+                           select distinct  p.rnk, decode (country,804,'true','false') isRezGr,c.okpo,name,c.country
+                           from  customer_extern c, nbu_person_uo p,customer_rel r
+                           where p.rnk=r.rnk and r.rel_rnk=c.id and p.iscontroller is not null)loop
                           insert into nbu_groupur_uo (rnk,
                                                       whois,
                                                       isrezgr,
@@ -424,10 +424,10 @@ create or replace package body nbu_601_request_data_ru is
                                                null,
                                                null,
                                                kf_);
-          end loop;               
+          end loop;
         commit;
-    end;*/
-    
+    end;
+    */
     ---------------------------------
     procedure p_nbu_finperformancegr_uo(
        kf_ in varchar2)
@@ -1037,3 +1037,4 @@ grant execute on nbu_601_request_data_ru to bars_access_defrole;
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/PACKAGE/nbu_601_request_data_ru.sql =========*** End *** 
 PROMPT ===================================================================================== 
+
