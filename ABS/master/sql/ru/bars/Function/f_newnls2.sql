@@ -1,19 +1,12 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_newnls2.sql =========*** Run *** 
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE FUNCTION BARS.F_NEWNLS2 
-  (acc2_       INT,                -- ACC счета
-   descrname_  VARCHAR2,           -- тип счета
-   nbs2_       VARCHAR2,           -- номер балансового счета
-   rnk2_       INT,                -- регистрационный номер клиента
-   idd2_       INT,                -- номер вклада
-   kv_         NUMBER DEFAULT 0,   -- валюта
-   inmask_     VARCHAR2 default ''
-  )
-RETURN NUMBER
+CREATE OR REPLACE FUNCTION BARS.F_NEWNLS2 
+( acc2_       INT,                -- ACC счета
+  descrname_  VARCHAR2,           -- тип счета
+  nbs2_       VARCHAR2,           -- номер балансового счета
+  rnk2_       INT,                -- регистрационный номер клиента
+  idd2_       INT,                -- номер вклада
+  kv_         NUMBER DEFAULT 0,   -- валюта
+  inmask_     VARCHAR2 default ''
+) RETURN NUMBER
 IS
 --версия 20 от 24-02-2012 (автор неизвестен)
   RNK_        int;
@@ -74,23 +67,23 @@ BEGIN
       SELECT UPPER(NVL(nbs_,SUBSTR(MASK,1,4))||SUBSTR(MASK,5,10))
       INTO   mask_
       FROM   nlsmask
-      WHERE  maskid=descrname_;
+      WHERE  maskid = descrname_;
 
     END IF;
 
-  EXCEPTION WHEN OTHERS THEN
-    RETURN TO_NUMBER(NULL);
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN TO_NUMBER(NULL);
   END;
 
---расчертить цифрами счет BBBB1000000000
+  -- расчертить цифрами счет BBBB1000000000
   len2_   := LENGTH(mask_);
   nlsnew_ := SUBSTR(mask_,1,4)||'1'||SUBSTR(mask_,6,9);
   npos_   := 0;
 
 --замены из динамического селекта
-  FOR k IN (SELECT UPPER(typeid) typeid,
-                   sqlval
-            FROM newnlsdescr)
+  FOR k IN ( SELECT UPPER(typeid) typeid, sqlval
+               FROM newnlsdescr )
   LOOP
     BEGIN
 --    находим вхождение
@@ -102,12 +95,12 @@ BEGIN
 
         WHILE SUBSTR(mask_,pos_,1)=k.typeid
         LOOP
-          pos_ := pos_+1;
-          len_ := len_+1;
+          pos_ := pos_ + 1;
+          len_ := len_ + 1;
         END LOOP;
 
-        s1_ := SUBSTR(nlsnew_,1,bpos_-1);
-        s3_ := SUBSTR(nlsnew_,bpos_+len_,len2_-bpos_-len_+1);
+        s1_ := SUBSTR(nlsnew_, 1, bpos_ -1 );
+        s3_ := SUBSTR(nlsnew_,bpos_ + len_, len2_ - bpos_ - len_ + 1);
 
         IF k.typeid='N' OR k.typeid='№' THEN  -- порядковый номер
           npos_      := bpos_;
@@ -117,7 +110,7 @@ BEGIN
           c := DBMS_SQL.open_cursor;  -- открыть курсор
           DBMS_SQL.parse(c,k.sqlval,DBMS_SQL.native);
 
---        приготовить дин.SQL
+          -- приготовить дин.SQL
           IF    SUBSTR(k.sqlval,-4)=':RNK' THEN
                 DBMS_SQL.bind_variable(c,':RNK',rnk_);
           ELSIF SUBSTR(k.sqlval,-4)=':ACC' THEN
@@ -131,13 +124,13 @@ BEGIN
           END IF;
 
           DBMS_SQL.define_column(c,1,s2_,15);
---        установить знач. колонки в SELECT
+          -- установить знач. колонки в SELECT
           i := DBMS_SQL.EXECUTE(c);  --выполнить приготовленный SQL
 --        DBMS_OUTPUT.put_line (k.sqlval);
 
           IF DBMS_SQL.fetch_rows(c)>0 THEN  -- прочитать
              DBMS_SQL.column_value(c,1,s2_);
---           снять результирующую переменную
+          -- снять результирующую переменную
           END IF;
 
 --        DBMS_OUTPUT.put_line('s2_='||s2_);
@@ -161,10 +154,10 @@ BEGIN
   BEGIN
     FOR k IN 1..len2_
     LOOP
-      c_ := SUBSTR(nlsnew_,k,1);
+      c_ := SUBSTR(nlsnew_, k, 1);
 
-      IF c_<'0' OR c_>'9' THEN
-        c_:='0';
+      IF c_ < '0' OR c_ > '9' THEN
+        c_ := '0';
       END IF;
 
       nls1_ := nls1_||c_;
@@ -198,22 +191,37 @@ BEGIN
                  SUBSTR(nlsnew_,npos_+nlen_));
       IF    numsimbol_='N' THEN
         begin
-          select 1
-          into   find_
-          from   accounts
-          where  nls=nlsfin_ and
-                 rownum<2;
-        exception when no_data_found then
-          find_ := 2;
-          exit;
+          select t.EXST
+            into find_
+            from ( select 1 as EXST
+                     from ACCOUNTS
+                    where NLS = nlsfin_
+                    union
+                   select 1
+                     from ACCOUNTS_RSRV
+                    where NLS = nlsfin_
+                 ) t;
+        exception
+          when no_data_found then
+            find_ := 2;
+            exit;
         end;
       ELSIF numsimbol_ = '№' THEN
+        -- Этот блок предназаначен для обработки маски нумерации для мультивал.
+        -- счетов (если определен параметр функции KV_ и маска нумерации №№)
         begin
-          select 1
-          into   find_
-          from   accounts
-          where  nls=nlsfin_ and
-                 kv=kv_;
+          select t.EXST
+            into find_
+            from ( select 1 as EXST
+                     from ACCOUNTS
+                    where NLS = nlsfin_
+                      and KV  = kv_
+                    union
+                   select 1
+                     from ACCOUNTS_RSRV
+                    where NLS = nlsfin_
+                      and KV  = kv_
+                 ) t;
         exception when no_data_found then
           find_ := 2;
           exit;
@@ -232,25 +240,39 @@ BEGIN
                    to_char(i_));
         IF    numsimbol_='N' THEN
           begin
-            select 1
-            into   find_
-            from   accounts
-            where  nls=nlsfin_ and
-                   rownum<2;
-          exception when no_data_found then
-            find_ := 2;
-            exit;
+            select t.EXST
+              into find_
+              from ( select 1 as EXST
+                       from ACCOUNTS
+                      where nls = nlsfin_
+                      union
+                     select 1
+                       from ACCOUNTS_RSRV
+                      where nls = nlsfin_
+                   ) t;
+          exception
+            when no_data_found then
+              find_ := 2;
+              exit;
           end;
         ELSIF numsimbol_ = '№' THEN
           begin
-            select 1
-            into   find_
-            from   accounts
-            where  nls=nlsfin_ and
-                   kv=kv_;
-          exception when no_data_found then
-            find_ := 2;
-            exit;
+            select t.EXST
+              into find_
+              from ( select 1 as EXST
+                       from ACCOUNTS
+                      where NLS = nlsfin_
+                        and KV  = kv_
+                      union
+                     select 1
+                       from ACCOUNTS_RSRV
+                      where NLS = nlsfin_
+                        and KV  = kv_
+                   ) t;
+          exception
+            when no_data_found then
+              find_ := 2;
+              exit;
           end;
         END IF;
       end loop;
@@ -262,20 +284,13 @@ BEGIN
 
 END f_newnls2;
 /
- show err;
- 
-PROMPT *** Create  grants  F_NEWNLS2 ***
-grant EXECUTE                                                                on F_NEWNLS2       to ABS_ADMIN;
-grant EXECUTE                                                                on F_NEWNLS2       to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on F_NEWNLS2       to CUST001;
-grant EXECUTE                                                                on F_NEWNLS2       to FOREX;
-grant EXECUTE                                                                on F_NEWNLS2       to RCC_DEAL;
-grant EXECUTE                                                                on F_NEWNLS2       to WR_ALL_RIGHTS;
-grant EXECUTE                                                                on F_NEWNLS2       to WR_VIEWACC;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/function/f_newnls2.sql =========*** End *** 
- PROMPT ===================================================================================== 
- 
+show err;
+
+grant EXECUTE on F_NEWNLS2 to ABS_ADMIN;
+grant EXECUTE on F_NEWNLS2 to BARS_ACCESS_DEFROLE;
+grant EXECUTE on F_NEWNLS2 to CUST001;
+grant EXECUTE on F_NEWNLS2 to RCC_DEAL;
+grant EXECUTE on F_NEWNLS2 to START1;
+grant EXECUTE on F_NEWNLS2 to WR_ALL_RIGHTS;
+grant EXECUTE on F_NEWNLS2 to WR_VIEWACC;
