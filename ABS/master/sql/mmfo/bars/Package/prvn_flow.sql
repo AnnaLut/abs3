@@ -986,7 +986,7 @@ begin -- OSA_V_PROV_RESULTS_OSH = PRVN_FV_REZ => PRVN_OSA= > PRVN_OSAq
       ElsIf x.TIP = 17   then
 
          begin
-            select ACC_SP  into l_acc from PRVN_FIN_DEB  where ACC_SS = x.nd  and ACC_SS <> ACC_SP;
+            select ACC_SP  into l_acc from FIN_DEB_ARC  where ACC_SS = x.nd  and ACC_SS <> ACC_SP and mdat = z_dat01;
              -- ACC_SP is not null
              --and EFFECTDATE < z_dat01;
          exception  when NO_DATA_FOUND  then l_acc := x.nd;
