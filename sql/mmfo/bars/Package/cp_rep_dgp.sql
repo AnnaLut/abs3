@@ -13,7 +13,7 @@ create or replace package cp_rep_dgp is
 end cp_rep_dgp;
 /
 create or replace package body cp_rep_dgp is
-  G_BODY_VERSION constant varchar2(64) := 'v.1.6  22.03.2018';
+  G_BODY_VERSION constant varchar2(64) := 'v.1.7  27.03.2018';
   G_TRACE        constant varchar2(20) := 'CP_REP_DGP.';
   ---
   cursor G_CUR (p_nlsb_arr string_list, p_date_from date, p_date_to date)
@@ -480,7 +480,7 @@ create or replace package body cp_rep_dgp is
       l_cp_dgp_zv_row.date_from := p_date_from;
       l_cp_dgp_zv_row.date_to   := p_date_to;
       l_cp_dgp_zv_row.user_id   := user_id();
-      l_cp_dgp_zv_row.date_reg  := trunc(sysdate);
+      l_cp_dgp_zv_row.date_reg  := sysdate;
       l_cp_dgp_zv_row.kf        := gl.kf;
       ---------
       l_cp_dgp_zv_row.g001 := k.nbs1;                                                       --Номер балансового рахунку
@@ -843,20 +843,20 @@ create or replace package body cp_rep_dgp is
       */
       l_cnt_prod := 0;
       for p in (select o.ref,
-                  p.nd,
-                  p.s / 100 s_p, -- сума угоди продажу всього пакета
+                  pp.nd,
+                  pp.s / 100 s_p, -- сума угоди продажу всього пакета
                   o.s / 100 s,
                   o.stmt,
                   o.tt,
-                  decode(vob, 096, p.vdat, o.fdat) dat_opl,
-                  p.datp dat_ug,
+                  decode(vob, 096, pp.vdat, o.fdat) dat_opl,
+                  pp.datp dat_ug,
                   ar.op ar_op,
                   nvl(ar.sumb, 0) / 100  ar_sumb,
                   nvl(ar.n, 0) / 100 ar_n
-             from opldok o, oper p, cp_arch ar
+             from opldok o, oper pp, cp_arch ar
             where o.acc = k.acc
               and o.dk = 1
-              and o.ref = p.ref
+              and o.ref = pp.ref
               and o.ref = ar.ref(+)
               and o.fdat between p_date_from and p_date_to
               and o.sos = 5
@@ -1155,7 +1155,7 @@ create or replace package body cp_rep_dgp is
       l_cp_dgp_zv_row.date_from := p_date_from;
       l_cp_dgp_zv_row.date_to   := p_date_to;
       l_cp_dgp_zv_row.user_id   := user_id();
-      l_cp_dgp_zv_row.date_reg  := trunc(sysdate);
+      l_cp_dgp_zv_row.date_reg  := sysdate;
       l_cp_dgp_zv_row.kf        := gl.kf;
       ---------
       l_cp_dgp_zv_row.g001 := k.nbs1;                                                       --!Номер балансового рахунку
@@ -1210,7 +1210,7 @@ create or replace package body cp_rep_dgp is
                                 + gl.p_icurval(k.kv, l_sp * 100, p_date_from - 1) / 100;
       end if;
 
-      l_sr := 0; l_sr2 := 0; l_sr3 := 0;
+      l_sr := 0; l_sr2 := 0; l_sr3 := 0; l_sr_ur := 0; l_sr_expr := 0;
       if k.accr is not null then
         l_sr := -rez.ostc96(k.accr, p_date_from - 1) / 100;
       end if;
@@ -1490,26 +1490,27 @@ create or replace package body cp_rep_dgp is
       */
       l_cnt_prod := 0;
       for p in (select o.ref,
-                  p.nd,
-                  p.s / 100 s_p, -- сума угоди продажу всього пакета
+                  pp.nd,
+                  pp.s / 100 s_p, -- сума угоди продажу всього пакета
                   o.s / 100 s,
                   o.stmt,
                   o.tt,
-                  decode(vob, 096, p.vdat, o.fdat) dat_opl,
-                  p.datp dat_ug,
+                  decode(vob, 096, pp.vdat, o.fdat) dat_opl,
+                  pp.datp dat_ug,
                   ar.op ar_op,
                   nvl(ar.sumb, 0) / 100  ar_sumb,
                   nvl(ar.n, 0) / 100 ar_n
-             from opldok o, oper p, cp_arch ar
+             from opldok o, oper pp, cp_arch ar
             where o.acc = k.acc
               and o.dk = 1
-              and o.ref = p.ref
+              and o.ref = pp.ref
               and o.ref = ar.ref(+)
               and o.fdat between p_date_from and p_date_to
               and o.sos = 5
             order by 1)
       loop
         l_cnt_prod := l_cnt_prod + 1;
+        bars_audit.info(G_TRACE || l_title || ' l_cnt_prod =  '||l_cnt_prod||' k.acc='||k.acc||' ref_sale='||p.ref||' ref_buy='||k.ref);
         /*Показники групи: Реалізація протягом звітного періоду*/
         /*системні*/
         l_cp_dgp_zv_row.ref_sale := p.ref;
