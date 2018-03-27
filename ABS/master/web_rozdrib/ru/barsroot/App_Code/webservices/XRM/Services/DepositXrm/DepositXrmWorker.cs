@@ -1140,6 +1140,7 @@ namespace Bars.WebServices.XRM.Services.DepositXrm
         {
             AccessRequestRes res = new AccessRequestRes();
             using (OracleCommand cmd = con.CreateCommand())
+            using (OracleXmlType _xml = new OracleXmlType(con, GetXML(req.AccessList).InnerXml))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.CommandText = "ebp.create_access_request";
@@ -1152,7 +1153,7 @@ namespace Bars.WebServices.XRM.Services.DepositXrm
                 cmd.Parameters.Add("p_cert_date", OracleDbType.Date, req.CertifDate, ParameterDirection.Input);
                 cmd.Parameters.Add("p_date_start", OracleDbType.Date, req.StartDate, ParameterDirection.Input);
                 cmd.Parameters.Add("p_date_finish", OracleDbType.Date, req.FinishDate, ParameterDirection.Input);
-                cmd.Parameters.Add("p_access_info", OracleDbType.XmlType, GetXML(req.AccessList).InnerXml, ParameterDirection.Input);
+                cmd.Parameters.Add("p_access_info", OracleDbType.XmlType, _xml, ParameterDirection.Input);
 
                 cmd.Parameters.Add("p_reqid", OracleDbType.Decimal, res.ReqId, ParameterDirection.Output);
 

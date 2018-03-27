@@ -18,7 +18,7 @@ namespace Bars.WebServices.XRM.Services.Card.Models
     }
     public class XRMBulkCardRes
     {
-        public decimal BulkID;
+        public string BulkID;
         public int ResultCode;
         public string ResultMessage;
     }
@@ -30,7 +30,7 @@ namespace Bars.WebServices.XRM.Services.Card.Models
         public Int16 OperationType;
         public Int64 KF;
         public string Branch;
-        public decimal BulkID;
+        public string BulkID;
     }
     public class XRMBulkCardTicketRes
     {

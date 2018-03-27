@@ -124,16 +124,16 @@ namespace Bars.WebServices.XRM.Services.Card
                     cmdBulkCardParam.Parameters.Add("p_hash", OracleDbType.Clob, XRMBulkCardReq.hash, ParameterDirection.Input);
                     cmdBulkCardParam.Parameters.Add("p_state", OracleDbType.Decimal, XRMBulkCardRes.ResultCode, ParameterDirection.Output);
                     cmdBulkCardParam.Parameters.Add("p_msg", OracleDbType.Varchar2, 4000, XRMBulkCardRes.ResultMessage, ParameterDirection.Output);
-                    cmdBulkCardParam.Parameters.Add("p_bulkid", OracleDbType.Decimal, XRMBulkCardRes.BulkID, ParameterDirection.Output);
+                    cmdBulkCardParam.Parameters.Add("p_bulkid", OracleDbType.Varchar2, 4000, XRMBulkCardRes.BulkID, ParameterDirection.Output);
 
                     cmdBulkCardParam.ExecuteNonQuery();
                     OracleDecimal resstate = (OracleDecimal)cmdBulkCardParam.Parameters["p_state"].Value;
                     OracleString resmsg = (OracleString)cmdBulkCardParam.Parameters["p_msg"].Value;
-                    OracleDecimal res = (OracleDecimal)cmdBulkCardParam.Parameters["p_bulkid"].Value;
+                    OracleString res = (OracleString)cmdBulkCardParam.Parameters["p_bulkid"].Value;
 
                     XRMBulkCardRes.ResultCode = Convert.ToInt16(resstate.IsNull ? -2 : resstate.Value);
                     XRMBulkCardRes.ResultMessage = resmsg.IsNull ? "" : resmsg.Value;
-                    XRMBulkCardRes.BulkID = res.IsNull ? -2 : res.Value;
+                    XRMBulkCardRes.BulkID = res.IsNull ? "-2" : res.Value;
                 }
                 catch (SystemException e)
                 {
@@ -156,7 +156,7 @@ namespace Bars.WebServices.XRM.Services.Card
                     cmdBulkCardTicket.CommandText = "xrm_integration_oe.CardBulkTicket";
                     cmdBulkCardTicket.Parameters.Clear();
                     cmdBulkCardTicket.BindByName = true;
-                    cmdBulkCardTicket.Parameters.Add("p_bulkid", OracleDbType.Decimal, XRMBulkCardTicketReq.BulkID, ParameterDirection.Input);
+                    cmdBulkCardTicket.Parameters.Add("p_bulkid", OracleDbType.Varchar2, XRMBulkCardTicketReq.BulkID, ParameterDirection.Input);
                     cmdBulkCardTicket.Parameters.Add("p_bulkstatus", OracleDbType.Varchar2, 400, XRMBulkCardTicketRes.ResultMessage, ParameterDirection.Output);
                     cmdBulkCardTicket.Parameters.Add("p_ticket", OracleDbType.Clob, null, ParameterDirection.Output);
 
@@ -458,9 +458,11 @@ namespace Bars.WebServices.XRM.Services.Card
                     OCardRes.NLS = (resnls == null || ((OracleString)resnls).IsNull) ? "" : ((OracleString)resnls).Value;
 
                     object resnd = cmd.Parameters["p_nd"].Value;
+                    if (null == resnd || ((OracleDecimal)resnd).IsNull) throw new System.Exception("procedure returned null in parameter p_nd");
                     OCardRes.nd = ((OracleDecimal)resnd).Value;
 
                     object resacc = cmd.Parameters["p_acc"].Value;
+                    if (null == resacc || ((OracleDecimal)resacc).IsNull) throw new System.Exception("procedure returned null in parameter p_acc");
                     OCardRes.acc = ((OracleDecimal)resacc).Value;
 
                     object resdaos = cmd.Parameters["p_daos"].Value;
