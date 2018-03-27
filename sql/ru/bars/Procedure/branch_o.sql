@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/BRANCH_O.sql =========*** Run *** 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure BRANCH_O ***
-
-  CREATE OR REPLACE PROCEDURE BARS.BRANCH_O 
+CREATE OR REPLACE PROCEDURE BARS.BRANCH_O 
 (  MODE_        int,
    branch_      varchar2,
    sRNK_ IN OUT VARCHAR2,
@@ -19,28 +10,27 @@ PROMPT *** Create  procedure BRANCH_O ***
    kv_     OUT  int,
    NLS_    out  varchar2,
    NMS_ IN OUT  varchar2,
-   ACC_    out  int ) is
----------
- errk SMALLINT;  ern  CONSTANT POSITIVE := 333;  err  EXCEPTION; erm  VARCHAR2(180);
- ret_ int;
- tip_nls_  accounts.TIP%TYPE ;
- tip_      accounts.TIP%TYPE ;
- ACC3800_  accounts.ACC%TYPE ;
- RNK_      accounts.RNK%TYPE := to_number(sRNK_);
- ntmp_     int; n_ int;
- X_MASK_   NLSMASK.MASK%type := '1002_NNNNNNNNN';
- NMK_      customer.NMK%TYPE ;
- AB22_1    int;
- AB22_2    int;
- ---------
+   ACC_    out  int
+) is
+  errk SMALLINT;  ern  CONSTANT POSITIVE := 333;  err  EXCEPTION; erm  VARCHAR2(180);
+  ret_ int;
+  tip_nls_  accounts.TIP%TYPE ;
+  tip_      accounts.TIP%TYPE ;
+  ACC3800_  accounts.ACC%TYPE ;
+  RNK_      accounts.RNK%TYPE := to_number(sRNK_);
+  ntmp_     int; n_ int;
+  X_MASK_   NLSMASK.MASK%type := '1002_NNNNNNNNN';
+  NMK_      customer.NMK%TYPE ;
+  AB22_1    int;
+  AB22_2    int;
 begin
 
    -- прикинуться MFO
    bars_context.subst_branch(substr(branch_,1,8) );  -- прикинуться
 
-If MODE_  = 1 then
+  If MODE_  = 1 then
 
-   If sRNK_ is null then
+    If sRNK_ is null then
       If length(branch_) <15 then
           bars_context.set_context;  -- вернуться
           return;
@@ -110,84 +100,80 @@ If MODE_  = 1 then
    RETURN;
 end if;
 ----------------------------------
-begin
-  select 1 into n_ from ps      where d_close is null and nbs=nbs_ ;
-  select 1 into n_ from sb_ob22 where d_close is null and r020=nbs_ and ob22=OB22_;
-EXCEPTION WHEN NO_DATA_FOUND THEN  return;
-end;
-
-If nbs_ in ('3800','3801') then
-
-   if length(branch_)<>15 then
-      return;
-   end if;
-
-   xm_3800 (gl.aMFO, branch_, gl.BDATE );
-   xv_3800 (gl.aMFO, branch_, gl.BDATE );
-   return;
-end if;
-----------------------------------
-Tip_ := iif_s (nbs_,'1004', 'KAS','KAS','ODB') ;
-kv_  := 980 ;
-begin
-
-  -- найти счет c нужным ОБ22
-  select a.acc, a.tip, a.nls, a.nms
-  into acc_, tip_nls_, nls_, nms_
-  from accounts a, SPECPARAM_INT s
-  where a.nbs=NBS_ and a.dazs is null and a.branch=branch_
-    and a.kv =kv_  and a.acc=s.acc and s.ob22=OB22_ ;
-
-EXCEPTION WHEN NO_DATA_FOUND THEN
-
   begin
-
-    -- найти счет c пустым или отсутствующим ОБ22
-    select acc , tip,      nls , nms
-    into   acc_, tip_nls_, nls_, nms_
-    from accounts a
-    where a.nbs=NBS_ and a.dazs is null and a.branch=branch_ and a.kv=kv_
-      and not exists
-        (select 1 from SPECPARAM_INT where acc=a.acc and ob22 is not null)
-      and rownum=1;
-
-  EXCEPTION WHEN NO_DATA_FOUND THEN acc_:= null;
+    select 1 into n_ from ps      where d_close is null and nbs=nbs_ ;
+    select 1 into n_ from sb_ob22 where d_close is null and r020=nbs_ and ob22=OB22_;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN  return;
   end;
-end;
 
-If ACC_ is not null and tip_nls_ <> TIP_ then
-   -- установить тип счета
-   update accounts set tip=tip_ where acc=ACC_;
+  If nbs_ in ('3800','3801')
+  then
+    if length(branch_)<>15
+    then
+      return;
+    end if;
+    xm_3800 (gl.aMFO, branch_, gl.BDATE );
+    xv_3800 (gl.aMFO, branch_, gl.BDATE );
+    return;
+  end if;
+----------------------------------
+  Tip_ := iif_s (nbs_,'1004', 'KAS','KAS','ODB') ;
+  kv_  := 980;
+  begin
+    -- найти счет c нужным ОБ22
+    select a.acc, a.tip, a.nls, a.nms
+      into acc_, tip_nls_, nls_, nms_
+      from ACCOUNTS a
+     where a.nbs=NBS_
+       and a.dazs is null
+       and a.branch=branch_
+       and a.kv =kv_
+       and a.ob22=OB22_;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      begin
+        -- найти счет c пустым или отсутствующим ОБ22
+        select acc , tip,      nls , nms
+          into acc_, tip_nls_, nls_, nms_
+          from ACCOUNTS a
+         where a.nbs=NBS_
+           and a.dazs is null
+           and a.branch=branch_
+           and a.kv=kv_
+           and a.ob22 is null
+           and rownum=1;
+      EXCEPTION
+        WHEN NO_DATA_FOUND THEN acc_:= null;
+      end;
+  end;
 
-elsIf ACC_ is null  then
-   -- открытие счета
-   AB22_1 :=to_char(instr('0123456789ABCDEF',substr(OB22_,1,1))-1);
-   AB22_2 :=to_char(instr('0123456789ABCDEF',substr(OB22_,2,1))-1);
-   PUL.Set_Mas_Ini('OB22',AB22_1||AB22_2, 'Тек.ОБ22 преобр в число' );
-   NLS_ := substr(f_newnls3 (null,null,nbs_,RNK_,null,kv_,mask_) ||'', 1, 14);
-   op_reg (99, 0, 0, GRP_, RET_, RNK_, NLS_, KV_, nms_, tip_,isp_,ACC_);
-   update accounts set tobo = branch_ where acc=ACC_;
+  If ACC_ is not null and tip_nls_ <> TIP_ 
+  then -- установить тип счета
+    update ACCOUNTS
+       set tip=tip_ 
+     where acc=ACC_;
+  elsIf ACC_ is null
+  then -- открытие счета
+    AB22_1 :=to_char(instr('0123456789ABCDEF',substr(OB22_,1,1))-1);
+    AB22_2 :=to_char(instr('0123456789ABCDEF',substr(OB22_,2,1))-1);
+    PUL.Set_Mas_Ini('OB22',AB22_1||AB22_2, 'Тек.ОБ22 преобр в число' );
+    NLS_ := substr(f_newnls2(null,null,nbs_,RNK_,null,kv_,mask_) ||'', 1, 14);
 
-end if;
+    OP_REG( 99, 0, 0, GRP_, RET_, RNK_, NLS_, KV_, nms_, tip_,isp_,ACC_ );
 
--- открытие спецпарам ob22
-update SPECPARAM_INT set ob22=OB22_ where acc=ACC_;
-if SQL%rowcount=0  then
-   insert into SPECPARAM_INT (acc,ob22) values (ACC_,ob22_);
-end if;
+    update ACCOUNTS
+       set tobo = branch_
+         , ob22 = OB22_
+     where acc=ACC_;
 
+  end if;
 
-end Branch_o;
+end BRANCH_O;
 /
+
 show err;
 
-PROMPT *** Create  grants  BRANCH_O ***
-grant EXECUTE                                                                on BRANCH_O        to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on BRANCH_O        to CUST001;
-grant EXECUTE                                                                on BRANCH_O        to WR_ALL_RIGHTS;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/BRANCH_O.sql =========*** End *** 
-PROMPT ===================================================================================== 
+grant EXECUTE on BRANCH_O to BARS_ACCESS_DEFROLE;
+grant EXECUTE on BRANCH_O to CUST001;
+grant EXECUTE on BRANCH_O to WR_ALL_RIGHTS;
