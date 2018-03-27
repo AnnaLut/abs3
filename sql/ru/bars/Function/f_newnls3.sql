@@ -1,19 +1,12 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_newnls3.sql =========*** Run *** 
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE FUNCTION BARS.F_NEWNLS3 
- ( acc2_        INT,             -- ACC счета
-   descrname_   VARCHAR2,        -- тип счета
-   nbs2_        VARCHAR2,        -- номер балансового счета
-   rnk2_        INT,             -- регистрационный номер клиента
-   idd2_        INT,             -- номер вклада
-   kv_          NUMBER DEFAULT 0, -- валюта
-   inmask_      VARCHAR2 default '' --
- )
-RETURN NUMBER
+CREATE OR REPLACE FUNCTION BARS.F_NEWNLS3
+( acc2_        INT,             -- ACC счета
+  descrname_   VARCHAR2,        -- тип счета
+  nbs2_        VARCHAR2,        -- номер балансового счета
+  rnk2_        INT,             -- регистрационный номер клиента
+  idd2_        INT,             -- номер вклада
+  kv_          NUMBER DEFAULT 0, -- валюта
+  inmask_      VARCHAR2 default '' --
+) RETURN NUMBER
 IS
   -- ******************** верси€ 16 от 04-07-06 *****************************
   RNK_    int;
@@ -33,11 +26,11 @@ IS
   erm VARCHAR2(80);
 
 BEGIN
-  AMFO5_ :=substr(gl.aMFO,1,5);
-  RNK_   :=RNK2_;
-  ACC_   :=ACC2_;
-  IDD_   :=IDD2_;
-  NBS_   :=NBS2_;
+  AMFO5_ := substr(gl.aMFO,1,5);
+  RNK_   := RNK2_;
+  ACC_   := ACC2_;
+  IDD_   := IDD2_;
+  NBS_   := NBS2_;
 
   BEGIN
     IF ACC_    is not null and RNK_ is null   then
@@ -62,7 +55,6 @@ BEGIN
       WHERE UPPER (maskid) = UPPER (descrname_);
 
     END IF;
-
 
   EXCEPTION
     WHEN OTHERS THEN
@@ -161,25 +153,36 @@ BEGIN
    --обрабатываем пор€дковый номер
    IF npos_ > 0 THEN
       IF numsimbol_ = 'N' THEN
-         SELECT MAX (TO_NUMBER(NVL(LTRIM(SUBSTR(nls,npos_,nlen_),'0'),'0')))+1
-           INTO nn_
-           FROM accounts
-          WHERE nls LIKE SUBSTR (nlsnew_, 1, 4)
-                        || '_'
-                        || SUBSTR (nlsnew_, 6, npos_ - 6)
-                        || LPAD ('_', nlen_, '_')
-                        || SUBSTR (nlsnew_, npos_ + nlen_);
+        SELECT MAX(TO_NUMBER(NVL(LTRIM(SUBSTR(nls,npos_,nlen_),'0'),'0')))+1
+          INTO nn_
+          FROM ( select NLS, KV
+                   from ACCOUNTS
+                  union all
+                 select NLS, KV
+                   from ACCOUNTS_RSRV
+               )
+         WHERE nls LIKE SUBSTR (nlsnew_, 1, 4)
+                       || '_'
+                       || SUBSTR (nlsnew_, 6, npos_ - 6)
+                       || LPAD ('_', nlen_, '_')
+                       || SUBSTR (nlsnew_, npos_ + nlen_);
       ELSIF numsimbol_ = 'є' THEN
         -- Ётот блок предназаначен дл€ обработки маски нумерации дл€ мультивал.
         -- счетов (если опрределен параметр функции KV_ и маска нумерации єє)
         SELECT MAX(TO_NUMBER(NVL(LTRIM(SUBSTR(nls,npos_,nlen_),'0'),'0')))+1
           INTO nn_
-          FROM accounts
-         WHERE kv = kv_ AND nls LIKE SUBSTR (nlsnew_, 1, 4)
+          FROM ( select NLS, KV
+                    from ACCOUNTS
+                   union all
+                  select NLS, KV
+                    from ACCOUNTS_RSRV
+                )
+         WHERE kv = kv_
+           AND nls LIKE SUBSTR (nlsnew_, 1, 4)
                        || '_'
                        || SUBSTR (nlsnew_, 6, npos_ - 6)
                        || LPAD ('_', nlen_, '_')
-                       || SUBSTR (nlsnew_, npos_ + nlen_) ;
+                       || SUBSTR (nlsnew_, npos_ + nlen_);
       END IF;
 
       -- Ётот блок предназаначен дл€ обработки ситуации переполнени€ счетчика,
@@ -191,7 +194,12 @@ BEGIN
       THEN
         SELECT MAX(TO_NUMBER(NVL(LTRIM(SUBSTR(nls,npos_),'0'),'0')))
           INTO nn_
-          FROM accounts
+          FROM ( select NLS, KV
+                    from ACCOUNTS
+                   union all
+                  select NLS, KV
+                    from ACCOUNTS_RSRV
+               )
          WHERE nls LIKE SUBSTR (nlsnew_, 1, 4)
                        || '_'
                        || SUBSTR (nlsnew_, 6, npos_ - 6)
@@ -204,25 +212,16 @@ BEGIN
          nn_ := 1;
       END IF;
 
-      nlsnew_ := SUBSTR (nlsnew_, 1, npos_ - 1)
-              || SUBSTR ('0000000000' || TO_CHAR (nn_), -nlen_)
-              || SUBSTR (nlsnew_,
-                         npos_ + nlen_,
-                         LENGTH (nlsnew_) - npos_ - nlen_ + 1 );
+      nlsnew_ := SUBSTR( nlsnew_, 1, npos_ - 1 )
+              || SUBSTR( '0000000000' || TO_CHAR (nn_), -nlen_ )
+              || SUBSTR( nlsnew_, npos_ + nlen_, length(nlsnew_) - npos_ - nlen_ + 1 );
    END IF;
 
-   RETURN TO_NUMBER (vkrzn (amfo5_, nlsnew_));
+   RETURN to_number(VKRZN( amfo5_, nlsnew_ ));
 
-END f_newnls3;
+END F_NEWNLS3;
 /
- show err;
- 
-PROMPT *** Create  grants  F_NEWNLS3 ***
-grant EXECUTE                                                                on F_NEWNLS3       to WR_ALL_RIGHTS;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/function/f_newnls3.sql =========*** End *** 
- PROMPT ===================================================================================== 
- 
+show err;
+
+grant EXECUTE on F_NEWNLS3 to WR_ALL_RIGHTS;
