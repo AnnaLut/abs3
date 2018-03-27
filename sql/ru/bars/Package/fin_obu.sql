@@ -4897,7 +4897,7 @@ begin
        from cc_deal
       where rnk = Rnk_
         and nd  = Nd_;   
-  EXCEPTION WHEN no_data_found  THEN return;
+  EXCEPTION WHEN no_data_found  THEN null;
   End;
 
 

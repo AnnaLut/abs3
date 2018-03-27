@@ -1489,6 +1489,7 @@ IS
 	   else	 sTmp_ := null;
 	         --raise_application_error(-(20000),'/' ||'     '||'Не визначено Моделі розрахунку інтегрального показника боржника '||ved_,TRUE);
 
+            end if; 
 	when  G_ALG_351_18 then
  
        if ved_ = 1 and FZ_ = 'N' then
