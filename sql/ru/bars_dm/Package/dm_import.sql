@@ -245,7 +245,7 @@ show errors
 
 CREATE OR REPLACE PACKAGE BODY DM_IMPORT is
 
-  g_body_version constant varchar2(64) := 'Version 3.3.7 28/02/2018';
+  g_body_version constant varchar2(64) := 'Version 3.3.8 19/03/2018';
   g_body_defs    constant varchar2(512) := null;
   G_TRACE        constant varchar2(20) := 'dm_import.';
 
@@ -3010,7 +3010,7 @@ procedure custur_rel_imp(p_dat        in date default trunc(sysdate),
                    r.bdate,
                    r.edate,
                    r.sign_privs,
-                   case when r.rnk is null then ''D'' else '''' end as change_type,
+                   coalesce(case when r.rnk is null then ''D'' else '''' end, case when not (c.date_off is null or c.date_off>=sysdate) then ''Z'' else '''' end) as change_type,
                    case when c.custtype = 3 and C.ise in (''14100'', ''14200'', ''14101'',''14201'') and C.sed =''91'' then 4 else c.custtype end CL_TYPE
              from customer_rel_updated cru
              left join bars.V_CUSTOMER_REL r on (cru.rnk = r.rnk and cru.rel_rnk = r.rel_rnk and cru.rel_intext = r.rel_intext and cru.rel_id = r.rel_id)
@@ -3036,7 +3036,7 @@ procedure custur_rel_imp(p_dat        in date default trunc(sysdate),
                        r.bdate,
                        r.edate,
                        r.sign_privs,
-                       case when r.rnk is null then ''D'' else '''' end as change_type,
+                       coalesce(case when r.rnk is null then ''D'' else '''' end, case when not (c.date_off is null or c.date_off>=sysdate) then ''Z'' else '''' end) as change_type,
                        case when c.custtype = 3 and C.ise in (''14100'', ''14200'', ''14101'',''14201'') and C.sed =''91'' then 4 else c.custtype end CL_TYPE
                  from customer_rel_updated cru
                  full join bars.V_CUSTOMER_REL r on (cru.rnk = r.rnk and cru.rel_rnk = r.rel_rnk and cru.rel_intext = r.rel_intext and cru.rel_id = r.rel_id)
