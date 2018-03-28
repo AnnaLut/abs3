@@ -445,7 +445,7 @@ is
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 19.6  2018.03.16';
+  g_body_version  constant varchar2(64) := 'version 19.7  2018.03.27';
   fmt_dt          constant varchar2(10) := 'dd.mm.yyyy';
 
   MODULE_PREFIX   constant varchar2(4)  := 'NBUR';
@@ -680,14 +680,24 @@ is
 
       -- or
       DBMS_STATS.COPY_TABLE_STATS
-      ( OWNNAME     =>
-      , TABNAME     =>
+      ( OWNNAME     => 'BARS'
+      , TABNAME     => p_tbl_nm
       , SRCPARTNAME =>
       , DSTPARTNAME =>
-      , FORCE => TRUE
+      , FORCE       => TRUE
       );
 
-      -- export_table_stats
+      -- or export import table stats
+
+      —- 1. create a table to hold stats
+      dbms_stats.create_stat_table(‘SYSADM’,’TABLESTATS’,’D_SYSADM_M’);
+      -— 2. partition stats export
+      dbms_stats.export_table_stats(‘SYSADM’,’ORDERHDR_ALL’,’ORDERHDR_ALL_P88?,’TABLESTATS’);
+      -— 3. manual copy step :)
+      update TABLESTATS set c2=replace(c2,’88’,’90’);
+      commit;
+      -- 4. partition stats import
+      dbms_stats.import_table_stats(‘SYSADM’,’ORDERHDR_ALL’,’ORDERHDR_ALL_P90?,’TABLESTATS’);
       */
 
       DBMS_STATS.LOCK_PARTITION_STATS
@@ -700,6 +710,89 @@ is
     dbms_application_info.set_client_info( null );
 
   end GATHER_TABLE_STATS;
+
+    --
+  --
+  --
+  procedure COPY_TABLE_STATS
+  ( p_tbl_nm       in     nbur_ref_objects.object_name%type
+  , p_kf           in     nbur_lst_objects.kf%type
+  , p_rpt_dt       in     nbur_lst_objects.report_date%type
+  ) is
+    l_ptsn_nm             varchar2(30);
+    r_srec                dbms_stats.statrec;
+    l_numrows             number;
+    l_numblks             number;
+    l_avgrlen             number;
+    l_density             number;
+    l_distcnt             number;
+    l_nullcnt             number;
+    l_avgclen             number;
+  begin
+
+    if ( p_kf Is Null )
+    then
+      null;
+    else
+
+      l_ptsn_nm := 'P_'||p_kf;
+
+      dbms_application_info.set_client_info( 'Copy stats to "'||p_tbl_nm||'" partition "'||l_ptsn_nm||'".' );
+
+      DBMS_STATS.GET_TABLE_STATS
+      ( ownname  => 'BARS'
+      , tabname  => p_tbl_nm
+      , partname => l_ptsn_nm
+      , numrows  => l_numrows
+      , numblks  => l_numblks
+      , avgrlen  => l_avgrlen
+      );
+
+      DBMS_STATS.SET_TABLE_STATS
+      ( ownname  => 'BARS'
+      , tabname  => p_tbl_nm
+      , partname => l_ptsn_nm
+      , numrows  => l_numrows
+      , numblks  => l_numblks
+      , avgrlen  => l_avgrlen
+      );
+
+      DBMS_STATS.GET_COLUMN_STATS
+      ( ownname  => 'BARS'
+      , tabname  => p_tbl_nm
+      , colname  => 'REPORT_DATE'
+      , partname => l_ptsn_nm
+      , distcnt  => l_distcnt
+      , density  => l_density
+      , nullcnt  => l_nullcnt
+      , srec     => r_srec
+      , avgclen  => l_avgclen
+      );
+
+      -- DBMS_STATS.CONVERT_RAW_VALUE(
+      --  rawval     RAW, 
+      --  resval OUT DATE);
+
+      -- DBMS_STATS.PREPARE_COLUMN_VALUES(
+      -- r_srec, ,NOVALS); --  NOVALS DBMS_STATS.DATEARRAY;
+      -- NOVALS := DBMS_STATS.DATEARRAY(to_date('2004-01-01','yyyy-mm-dd'),to_date('2005-01-01','yyyy-mm-dd'),to_date('2006-01-01','yyyy-mm-dd'));
+
+      r_srec.minval := utl_raw.cast_from_number(5000);
+      r_srec.maxval := utl_raw.cast_from_number(5999);
+
+      DBMS_STATS.SET_COLUMN_STATS
+      ( ownname  => 'BARS'
+      , tabname  => p_tbl_nm
+      , partname => l_ptsn_nm
+      , colname  => 'REPORT_DATE'
+      , distcnt  => l_distcnt
+      , density  => l_density
+      , nullcnt  => l_nullcnt
+      , avgclen  => l_avgclen
+      , srec     => r_srec
+      );
+
+  end COPY_TABLE_STATS;
 
   --
   --
@@ -2086,10 +2179,10 @@ is
            ( REPORT_DATE, KF, REF, STMT, SOS, TT, TXT, KV, BAL, BAL_UAH
            , CUST_ID_DB, ACC_ID_DB, ACC_NUM_DB, ACC_TYPE_DB, R020_DB, OB22_DB, NBUC_DB
            , CUST_ID_CR, ACC_ID_CR, ACC_NUM_CR, ACC_TYPE_CR, R020_CR, OB22_CR, NBUC_CR )
-      select p_report_date, p_kf, d.REF, d.STMT, d.SOS, d.TT, d.TXT, d.KV, d.S, d.SQ
+      select /*+ ORDERED USE_HASH( d k ) */ p_report_date, p_kf, d.REF, d.STMT, d.SOS, d.TT, d.TXT, d.KV, d.S, d.SQ
            , d.CUST_ID as CUST_ID_DB, d.ACC as ACC_ID_DB, d.ACC_NUM as ACC_NUM_DB, d.ACC_TYPE as ACC_TYPE_DB, d.nbs as R020_DB, d.ob22 as OB22_DB, d.NBUC as NBUC_DB
            , k.CUST_ID as CUST_ID_CR, k.ACC as ACC_ID_CR, k.ACC_NUM as ACC_NUM_CR, k.ACC_TYPE as ACC_TYPE_CR, k.nbs as R020_CR, k.OB22 as OB22_CR, k.NBUC as NBUC_CR
-        from ( select p.REF, p.STMT, p.ACC
+        from ( select/*+ FULL( a ) USE_HASH( a p ) */ p.REF, p.STMT, p.ACC
                     , p.SOS, p.TT, p.TXT, p.S, p.SQ
                     , a.ACC_NUM, a.KV, a.NBS, a.OB22, a.ACC_TYPE, a.CUST_ID, a.NBUC
                  from OPLDOK p
@@ -2100,7 +2193,7 @@ is
                   and p.SOS = 5
                   and p.DK = 0
              ) d
-        join ( select p.REF, p.STMT, p.ACC
+        join ( select /*+ FULL( a ) USE_HASH( a p ) */ p.REF, p.STMT, p.ACC
                     , a.ACC_NUM, a.KV, a.NBS, a.OB22, a.ACC_TYPE, a.CUST_ID, a.NBUC
                  from OPLDOK p
                  join NBUR_DM_ACCOUNTS a
@@ -2110,7 +2203,7 @@ is
                   and p.SOS = 5
                   and p.DK = 1
              ) k
-          on (k.REF = d.REF AND k.STMT = d.STMT );
+          on ( k.REF = d.REF AND k.STMT = d.STMT );
 
     end if;
 
