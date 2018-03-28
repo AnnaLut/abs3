@@ -754,6 +754,7 @@ function Check_ClientRekvPerson() {
 }
 
 function Check_ClientRekvPhone(ignoreConfirmation) {
+    
     var validPhone = validatePhone(ignoreConfirmation);
     if (validPhone.Status != 'ok') {
         if (validPhone.Status == 'duplSimbMobPhone') {
@@ -768,7 +769,7 @@ function Check_ClientRekvPhone(ignoreConfirmation) {
             } else {
                 //для фіз осіб не спд виконуємо валідацію мобільного телефону
                 if (obj_Parameters['CUSTTYPE'] === 'person' && !isCustomerSpd()) {
-					var validationResult = ExecSync('ValidateMobilePhone', { rnk: (obj_Parameters['ID'] == '' ? 0 : obj_Parameters['ID']), phone: validPhone.Phone + "&" + parent.obj_Parameters["OKPO"] }).d;
+                    var validationResult = ExecSync('ValidateMobilePhone', { rnk: (obj_Parameters['ID'] == '' ? 0 : obj_Parameters['ID']), phoneOkpo: validPhone.Phone + "&" + parent.obj_Parameters["OKPO"] }).d;
 
                     if (validationResult.Code != 'OK') {
                         alert(validationResult.Text);
@@ -1587,7 +1588,7 @@ function validatePhone(ignoreConfirmation) {
     var result = { Status: 'ok', Message: '' }
     var curTab = getFrame('Tab3');
     if (gE(curTab, 'ckb_main').checked) {
-
+        
         var mobPhone = '';
         if (custAttrList['MPNO'] != undefined) {
             mobPhone = custAttrList['MPNO'].Value;
