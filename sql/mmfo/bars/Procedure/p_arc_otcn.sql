@@ -14,7 +14,7 @@ PROMPT *** Create  procedure P_ARC_OTCN ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%is
 % DESCRIPTION :    Допоміжгна функція для формування #A7
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     :    03/08/2017 (02/08/2017)
+% VERSION     :   28/03/2018 (12/03/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  параметры: PDAT_ - звітна дата
             PMODE_ - ознака режиму формування
@@ -170,6 +170,8 @@ begin
       null;
 
   end case;
+  
+  commit;
 
   if cnt1_ = 0
   then
@@ -191,6 +193,8 @@ begin
                          );
     
     cnt_ins1_ := sql%rowcount;
+    
+    commit;
   else -- було збережено раніше, тому не чіпаємо історію
     null;
   end if;
@@ -200,7 +204,7 @@ begin
 
     insert 
       into OTC_ARC_CC_TRANS ( KF, DAT_OTC, NPP, REF, ACC, FDAT, SV, SZ, D_PLAN, D_FAKT, DAPP, REFP, COMM )
-    select /*+ PARALLEL(8) */    KF, datn_,   NPP, REF, ACC, FDAT, SV, SZ, D_PLAN, D_FAKT, DAPP, REFP, COMM
+    select /*+ PARALLEL(8) */    KF, datn_, NPP, nvl(REF, 0), ACC, FDAT, SV, SZ, D_PLAN, D_FAKT, DAPP, REFP, COMM
       from CC_TRANS
      where ( KF, ACC ) in ( select n.KF, n.ACC
                               from ACCOUNTS s
@@ -216,18 +220,25 @@ begin
                          );
                          
     cnt_ins2_ := sql%rowcount;
+    
+    commit;
   else -- було збережено раніше, тому не чіпаємо історію
     null;
   end if;
   
-  insert
-    into OTC_ARC_INFO
-       ( NPP, KF, DAT_OTC, DAT_SYS, DAT_BANK, USERID, RUN_MODE, CNT_LIM, CNT_TRANS)
-  values
-       ( S_OTC_ARC.NextVal, mfo_, datn_, sysdate, bankdate, user_id, lmode_, cnt_ins1_, cnt_ins2_ );
+  begin
+      insert
+        into OTC_ARC_INFO
+           ( NPP, KF, DAT_OTC, DAT_SYS, DAT_BANK, USERID, RUN_MODE, CNT_LIM, CNT_TRANS)
+      values
+           ( S_OTC_ARC.NextVal, mfo_, datn_, sysdate, bankdate, user_id, lmode_, cnt_ins1_, cnt_ins2_ );
 
-  commit;
-
+      commit;
+  exception
+    when others then
+        bars_audit.error( $$PLSQL_UNIT||': Error.'||sqlerrm);
+  end;
+  
   bars_audit.trace( '%s: Exit.', $$PLSQL_UNIT );
 
 end P_ARC_OTCN;
