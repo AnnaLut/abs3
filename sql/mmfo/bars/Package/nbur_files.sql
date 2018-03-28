@@ -855,6 +855,14 @@ end;
   , p_view_nm          in     nbur_ref_files.view_nm%type default null
   , p_f_turns          in     nbur_ref_files.flag_turns%type default 0
   ) is
+  /**
+  <b>SET_FILE</b> - Create new / Change existing NBU reporting file
+  %param p_file_id - 
+  
+  %version 1.3
+  %usage   
+  */
+    title          constant   varchar2(64) := $$PLSQL_UNIT||'.SET_FILE';
     l_view_nm                 nbur_ref_files.view_nm%type;
   begin
 
@@ -874,6 +882,7 @@ end;
     end if;
 
     begin
+
       Insert
         into NBUR_REF_FILES
         ( FILE_CODE, SCHEME_CODE, FILE_TYPE, FILE_NAME, SCHEME_NUMBER, UNIT_CODE
@@ -883,10 +892,14 @@ end;
         ( p_file_code, p_scm_code, p_file_tp, p_file_nm, p_scm_num, p_unit_code
         , p_period_tp, p_location_code, p_file_code_alt, p_cnsl_tp, p_val_tp_ind
         , l_view_nm, p_f_turns, p_file_fmt )
-      returning ID 
-           into p_file_id;
+      return ID
+        into p_file_id;
+
+      bars_audit.info( title ||': Created reporting file #'||to_char(p_file_id) );
+
     exception
       when DUP_VAL_ON_INDEX then
+
         update NBUR_REF_FILES
            set SCHEME_CODE        = p_scm_code
              , FILE_TYPE          = p_file_tp
@@ -902,18 +915,22 @@ end;
              , FLAG_TURNS         = p_f_turns
              , FILE_FMT           = p_file_fmt
          where FILE_CODE = p_file_code
-     returning ID
+        return ID
           into p_file_id;
+
+     bars_audit.info( title ||': Changed  reporting file #'||to_char(p_file_id) );
+
     end;
 
     if ( p_file_tp = 1 )
-    then --
+    then -- для фалів звітності НБУ
       begin
         insert
           into KL_F00$GLOBAL
-             ( KODF, AA, A017, NN, PERIOD, R, SEMANTIC, KODF_EXT, PR_TOBO, TYPE_ZNAP )
+             ( KODF, AA, A017, NN, PERIOD, PROCC, R, SEMANTIC, KODF_EXT, PR_TOBO, TYPE_ZNAP )
         values
-             ( SubStr(p_file_code,2,2), p_scm_num, p_scm_code, p_unit_code, p_period_tp, p_location_code, p_file_nm, p_file_code_alt, 0, p_val_tp_ind );
+             ( SubStr(p_file_code,2,2), p_scm_num, p_scm_code, p_unit_code, p_period_tp
+             , 'XXXXL', p_location_code, p_file_nm, p_file_code_alt, 0, p_val_tp_ind );
       exception
         when DUP_VAL_ON_INDEX then
           update KL_F00$GLOBAL
@@ -923,7 +940,6 @@ end;
                , R         = p_location_code
                , SEMANTIC  = p_file_nm
                , KODF_EXT  = p_file_code_alt
-               , PR_TOBO   = 0
                , TYPE_ZNAP = p_val_tp_ind
            where KODF = SubStr(p_file_code,2,2)
              and A017 = p_scm_code;
@@ -961,7 +977,7 @@ end;
            and FILE_ID = p_file_id;
     end;
 
-    l_file_code := F_GET_KODF( p_file_id );
+    l_file_code := SubStr( F_GET_KODF( p_file_id ), 2, 2 );
 
     begin
       insert
