@@ -1,7 +1,7 @@
 create or replace package NBUR_FILES
 is
 
-  g_header_version  constant varchar2(64)  := 'version 3.4  2017.10.13';
+  g_header_version  constant varchar2(64)  := 'version 3.5  2018.03.28';
 
   --
   -- header_version - версія заголовку пакета
@@ -51,6 +51,13 @@ is
   function F_GET_KODF
   ( p_file_id       in     nbur_ref_files.id%type
   ) return nbur_ref_files.file_code%type;
+
+  --
+  -- альтернативний код файлу по ідентифікатору файлу
+  --
+  function GET_FILE_CODE_ALT
+  ( p_file_id       in     nbur_ref_files.id%type
+  ) return nbur_ref_files.file_code_alt%type;
 
   --
   -- повертає версію файлу
@@ -280,7 +287,7 @@ show errors
 create or replace package body NBUR_FILES
 is
 
-  g_body_version  constant varchar2(64) := 'version 6.4  2018.03.05';
+  g_body_version  constant varchar2(64) := 'version 6.5  2018.03.28';
 
   MODULE_PREFIX   constant varchar2(8) := 'NBUR';
 
@@ -445,30 +452,58 @@ end f_get_id_file;
 
   end GET_FILE_ID;
 
---
--- код файлу по ідентиф_катору файлу
---
-function F_GET_KODF
-( p_file_id       in     nbur_ref_files.id%type
-) return nbur_ref_files.file_code%type
-is
-  l_file_code            nbur_ref_files.file_code%type;
-begin
-  
+  --
+  -- код файлу по ідентиф_катору файлу
+  --
+  function F_GET_KODF
+  ( p_file_id       in     nbur_ref_files.id%type
+  ) return nbur_ref_files.file_code%type
+  is
+    l_file_code            nbur_ref_files.file_code%type;
   begin
-    select f.FILE_CODE
-      into l_file_code
-      from NBUR_REF_FILES f
-     where f.ID = p_file_id;
-  exception
-    when NO_DATA_FOUND then
-      l_file_code := null;
-  end;
-  
-  return l_file_code;
-  
-end F_GET_KODF;
+    
+    begin
+      select f.FILE_CODE
+        into l_file_code
+        from NBUR_REF_FILES f
+       where f.ID = p_file_id;
+    exception
+      when NO_DATA_FOUND then
+        l_file_code := null;
+    end;
+    
+    return l_file_code;
+    
+  end F_GET_KODF;
 
+  --
+  -- альтернативний код файлу по ідентифікатору файлу
+  --
+  function GET_FILE_CODE_ALT
+  ( p_file_id       in     nbur_ref_files.id%type
+  ) return nbur_ref_files.file_code_alt%type
+  is
+    l_file_code_alt        nbur_ref_files.file_code_alt%type;
+  begin
+
+    begin
+      select nvl( FILE_CODE_ALT, SubStr(FILE_CODE,2,2) )
+        into l_file_code_alt
+        from NBUR_REF_FILES
+       where ID = p_file_id;
+    exception
+      when NO_DATA_FOUND then
+        l_file_code_alt := null;
+        raise_application_error( -20666, 'No file with ID ' || p_file_id || ' found!', true );
+    end;
+
+    return l_file_code_alt;
+
+  end GET_FILE_CODE_ALT;
+
+--
+--
+--
 function f_get_version_file (p_file_id    in number,
                              p_report_date  in date,
                              p_kf           in varchar2 )  return number
@@ -822,16 +857,25 @@ end;
   ) is
     l_view_nm                 nbur_ref_files.view_nm%type;
   begin
-    
+
     if ( p_view_nm Is Null )
     then
-      l_view_nm := 'V_'||p_file_code;
+      l_view_nm := 'V_NBUR_'|| case p_file_fmt
+                               when 'XML'
+                               then SubStr(p_file_code,2,2) || 'X'
+                               else case
+                                    when p_file_code like '@__'
+                                    then 'OBU_' || SubStr(p_file_code,2,2)
+                                    else p_file_code 
+                                    end
+                               end;
     else
       l_view_nm := p_view_nm;
     end if;
-    
+
     begin
-      Insert into BARS.NBUR_REF_FILES
+      Insert
+        into NBUR_REF_FILES
         ( FILE_CODE, SCHEME_CODE, FILE_TYPE, FILE_NAME, SCHEME_NUMBER, UNIT_CODE
         , PERIOD_TYPE, LOCATION_CODE, FILE_CODE_ALT, CONSOLIDATION_TYPE, VALUE_TYPE_IND
         , VIEW_NM, FLAG_TURNS, FILE_FMT )
@@ -843,7 +887,7 @@ end;
            into p_file_id;
     exception
       when DUP_VAL_ON_INDEX then
-        update BARS.NBUR_REF_FILES
+        update NBUR_REF_FILES
            set SCHEME_CODE        = p_scm_code
              , FILE_TYPE          = p_file_tp
              , FILE_NAME          = p_file_nm
@@ -861,7 +905,31 @@ end;
      returning ID
           into p_file_id;
     end;
-    
+
+    if ( p_file_tp = 1 )
+    then --
+      begin
+        insert
+          into KL_F00$GLOBAL
+             ( KODF, AA, A017, NN, PERIOD, R, SEMANTIC, KODF_EXT, PR_TOBO, TYPE_ZNAP )
+        values
+             ( p_file_code, p_scm_num, p_scm_code, p_unit_code, p_period_tp, p_location_code, p_file_nm, p_file_code_alt, 0, p_val_tp_ind );
+      exception
+        when DUP_VAL_ON_INDEX then
+          update KL_F00$GLOBAL
+             set AA        = p_scm_num
+               , NN        = p_unit_code
+               , PERIOD    = p_period_tp
+               , R         = p_location_code
+               , SEMANTIC  = p_file_nm
+               , KODF_EXT  = p_file_code_alt
+               , PR_TOBO   = 0
+               , TYPE_ZNAP = p_val_tp_ind
+           where KODF = p_file_code
+             and A017 = p_scm_code;
+      end;
+    end if;
+
   end SET_FILE;
   
   --
@@ -874,23 +942,46 @@ end;
   , p_nbuc      in     nbur_ref_files_local.nbuc%type
   , p_e_address in     nbur_ref_files_local.e_address%type
   ) is
+    l_file_code        nbur_ref_files.file_code%type;
   begin
-    
+
     begin
-      Insert into BARS.NBUR_REF_FILES_LOCAL
-        ( KF, FILE_ID, FILE_PATH, NBUC, E_ADDRESS )
+      Insert
+        into NBUR_REF_FILES_LOCAL
+           ( KF, FILE_ID, FILE_PATH, NBUC, E_ADDRESS )
       Values
-        ( p_kf, p_file_id, p_file_path, p_nbuc, p_e_address );
+           ( p_kf, p_file_id, p_file_path, p_nbuc, p_e_address );
     exception
       when DUP_VAL_ON_INDEX then
-        update BARS.NBUR_REF_FILES_LOCAL
+        update NBUR_REF_FILES_LOCAL
            set FILE_PATH = p_file_path
              , NBUC      = p_nbuc
              , E_ADDRESS = p_e_address
          where KF      = p_kf
            and FILE_ID = p_file_id;
     end;
-    
+
+    l_file_code := F_GET_KODF( p_file_id );
+
+    begin
+      insert
+        into KL_F00$LOCAL
+           ( POLICY_GROUP, KODF, A017, UUU, ZZZ, PATH_O, BRANCH, KF )
+      values
+           ( 'FILIAL', l_file_code, 'C', p_e_address, p_nbuc, p_file_path, '/'||p_kf||'/', p_kf );
+    exception
+      when DUP_VAL_ON_INDEX then
+        update KL_F00$LOCAL
+           set UUU    = p_e_address
+             , ZZZ    = p_nbuc
+             , PATH_O = p_file_path
+         where KF           = p_kf
+           and POLICY_GROUP = 'FILIAL'
+           and BRANCH       = '/'||p_kf||'/'
+           and KODF         = l_file_code
+           and A017         = 'C';
+    end;
+
   end SET_FILE_LOCAL;
   
   --
