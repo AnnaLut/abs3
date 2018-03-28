@@ -24,7 +24,8 @@ select fr.id,
        fr.block_comment,
        fi.id as envelope_file_id,
        f.receiver_mfo mfo,
-       fr.ref
+       fr.ref,
+       fr.fact_pay_date
 from msp_envelope_files_info fi
      inner join msp_files f on f.envelope_file_id = fi.id
      inner join msp_file_records fr on fr.file_id = f.id
@@ -37,6 +38,7 @@ comment on column v_msp_file_records.envelope_file_id is 'id файлу конверта';
 comment on column v_msp_file_records.state_name is 'Назва статусу інформаційного рядка файлу';
 comment on column v_msp_file_records.check_date is 'Дата зарахування';
 comment on column v_msp_file_records.branch_code is 'Код МФО';
+comment on column v_msp_file_records.fact_pay_date is 'Дата фактичного зарахування коштів на рахунки';
 
 
 PROMPT *** Create  grants  v_msp_file_records ***

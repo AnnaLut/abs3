@@ -15,7 +15,7 @@ select f.id,
        (select a.ostc*0.01 from bars.accounts a where a.nls = acc2.acc_num and a.kf = '300465' and a.kv = 980) balance_2909,
        rest.rest*0.01 balance_2560,
        rest.restdate last_balance_req,
-       null fact_payment_date,
+       f.send_pay_date fact_payment_date,
        null fact_payment_sum,
        null return_payment_sum,
        f.file_bank_num,
@@ -74,6 +74,7 @@ comment on column V_MSP_FILES2PAY.ENVELOPE_FILE_ID is 'id файлу конверта';
 comment on column V_MSP_FILES2PAY.ENVELOPE_FILE_NAME is 'Назва файлу архіва конверта';
 comment on column V_MSP_FILES2PAY.ENVELOPE_FILE_STATE is 'Статус файлу конверта';
 comment on column V_MSP_FILES2PAY.ENVELOPE_COMMENT is 'Коментар до файлу конверта';
+comment on column V_MSP_FILES2PAY.FACT_PAYMENT_DATE is 'Фактична дата передачі реєстру на оплату';
 
 grant select on v_msp_files2pay to bars_access_defrole;
 
