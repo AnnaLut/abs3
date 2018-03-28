@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/kl.sql =========*** Run *** ========
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.KL 
+create or replace package KL
 IS
 
 --***************************************************************************--
@@ -573,14 +567,17 @@ procedure check_attr_foropenacc (p_rnk in number, p_msg out varchar2);
 
 END KL;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.KL 
-IS
+
+show errors;
+
+create or replace package body KL
+is
 
 --***************************************************************************--
 -- (C) BARS. Contragents
 --***************************************************************************--
 
-  G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 1.9  23/10/2017';
+  G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 2.0  28/03/2018';
   G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := ''
 $if KL_PARAMS.TREASURY $then
   || 'KAZ   - Для казначейства (без связ.клиентов, счетов юр.лиц в др.банках)' || chr(10)
@@ -1691,7 +1688,8 @@ $if KL_PARAMS.RI $then
   k060_     number;
 $end
 BEGIN
-  if eddr_id_ is not null then
+  if eddr_id_ is not null 
+  then
     bars_audit.trace('%s 1.params:'
          || ' Rnk_=>%s,'
          || ' actual_date_=>%s,'
@@ -1717,35 +1715,35 @@ BEGIN
        l_title, to_char(Rnk_), Sex_, to_char(Passp_), Ser_, Numdoc_,
        to_char(Pdate_,'dd/MM/yyyy'), Organ_, to_char(Bday_,'dd/MM/yyyy'));
   end if;
-  bars_audit.trace('%s 2.params:'
-       || ' Bplace_=>%s,'
-       || ' Teld_=>%s,'
-       || ' Telw_=>%s',
-       l_title, Bplace_, Teld_, Telw_);
+  
+  bars_audit.trace( '%s 2.params: Bplace_=>%s, Teld_=>%s, Telw_=>%s, TelM_=>%s.'
+                  , l_title, Bplace_, Teld_, Telw_, TelM_ );
 
   UPDATE Person
-     SET sex        = Sex_   ,
-         passp      = Passp_ ,
-         telw       = TelW_  ,
-         teld       = TelD_  ,
-         CellPhone  = case when TelM_ <> 'XXXXXXXXXX' then TelM_ else CellPhone end,
-         ser        = Ser_   ,
-         numdoc     = Numdoc_,
-         pdate      = PDate_ ,
-         organ      = Organ_ ,
-         bday       = BDay_  ,
-         bplace     = BPlace_,
-         date_photo = nvl(Fdate_, date_photo),
-		 actual_date = actual_date_                                                 ,
+     SET sex         = Sex_   ,
+         passp       = Passp_ ,
+         telw        = TelW_  ,
+         teld        = TelD_  ,
+         CellPhone   = case when TelM_ = 'XXXXXXXXXX' then CellPhone else TelM_ end,
+         ser         = Ser_   ,
+         numdoc      = Numdoc_,
+         pdate       = PDate_ ,
+         organ       = Organ_ ,
+         bday        = BDay_  ,
+         bplace      = BPlace_,
+         date_photo  = nvl(Fdate_, date_photo),
+         actual_date = actual_date_,
          eddr_id     = eddr_id_
    WHERE rnk = rnk_;
-  IF SQL%rowcount = 0 THEN
-     bars_audit.trace('%s 3. регистрация параметров физ.лица РНК=%s', l_title, Rnk_);
-     INSERT INTO Person (rnk, sex, passp, ser, numdoc, pdate, organ, bday, bplace, telD, telW, CellPhone, date_photo, actual_date, eddr_id)
-     VALUES (Rnk_, Sex_, Passp_, Ser_, Numdoc_, PDate_, Organ_, BDay_, BPlace_, TelD_, TelW_, TelM_, Fdate_, actual_date_, eddr_id_);
-     bars_audit.trace('%s 4. завершена регистрация параметров физ.лица РНК=%s', l_title, Rnk_);
+
+  IF SQL%rowcount = 0 
+  THEN
+    bars_audit.trace('%s 3. регистрация параметров физ.лица РНК=%s', l_title, Rnk_);
+    INSERT INTO Person (rnk, sex, passp, ser, numdoc, pdate, organ, bday, bplace, telD, telW, CellPhone, date_photo, actual_date, eddr_id)
+    VALUES (Rnk_, Sex_, Passp_, Ser_, Numdoc_, PDate_, Organ_, BDay_, BPlace_, TelD_, TelW_, TelM_, Fdate_, actual_date_, eddr_id_);
+    bars_audit.trace('%s 4. завершена регистрация параметров физ.лица РНК=%s', l_title, Rnk_);
   ELSE
-     bars_audit.trace('%s 5. завершено обновление параметров физ.лица РНК=%s', l_title, Rnk_);
+    bars_audit.trace('%s 5. завершено обновление параметров физ.лица РНК=%s', l_title, Rnk_);
   END IF;
 
 $if KL_PARAMS.SBER $then
@@ -1753,7 +1751,10 @@ $if KL_PARAMS.SBER $then
 
 $end
   -- Моб.тел.
-  If (TelM_ <> 'XXXXXXXXXX') Then
+  If ( TelM_ = 'XXXXXXXXXX' )
+  Then
+    null;
+  Else
     setCustomerElement(Rnk_, 'MPNO', TelM_, 0);
   End If;
 
@@ -1816,16 +1817,17 @@ $if KL_PARAMS.RI $then
         end;
       end if;
     end if;
+
     if k060_ is not null
     then
       update customer
-      set    prinsider=k060_
-      where  rnk=Rnk_;
-
+         set prinsider=k060_
+       where rnk=Rnk_;
 $if KL_PARAMS.SBER $then
       ADD_EBK_QUEUE(Rnk_);
 $end
     end if;
+
   end if;
 $end
 
@@ -3637,20 +3639,13 @@ BEGIN
 
 END KL;
 /
- show err;
- 
-PROMPT *** Create  grants  KL ***
-grant EXECUTE                                                                on KL              to ABS_ADMIN;
-grant EXECUTE                                                                on KL              to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on KL              to CUST001;
-grant EXECUTE                                                                on KL              to WR_ALL_RIGHTS;
-grant EXECUTE                                                                on KL              to WR_CUSTREG;
-grant EXECUTE                                                                on KL              to WR_TOBO_ACCOUNTS_LIST;
-grant EXECUTE                                                                on KL              to WR_USER_ACCOUNTS_LIST;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/kl.sql =========*** End *** ========
- PROMPT ===================================================================================== 
- 
+show errors;
+
+grant EXECUTE on KL to ABS_ADMIN;
+grant EXECUTE on KL to BARS_ACCESS_DEFROLE;
+grant EXECUTE on KL to CUST001;
+grant EXECUTE on KL to WR_ALL_RIGHTS;
+grant EXECUTE on KL to WR_CUSTREG;
+grant EXECUTE on KL to WR_TOBO_ACCOUNTS_LIST;
+grant EXECUTE on KL to WR_USER_ACCOUNTS_LIST;
