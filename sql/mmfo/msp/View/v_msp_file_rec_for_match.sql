@@ -20,7 +20,8 @@ select fr.id,
        rs.name as state_name,
        fr.block_type_id,
        fr.block_comment,
-       fi.id as envelope_file_id
+       fi.id as envelope_file_id,
+       fr.fact_pay_date
 from msp_envelope_files_info fi
      inner join msp_files f on f.envelope_file_id = fi.id
      inner join msp_file_records fr on fr.file_id = f.id
@@ -31,6 +32,7 @@ PROMPT *** Create comments on v_msp_file_rec_for_match ***
 
 comment on column v_msp_file_rec_for_match.envelope_file_id is 'id файлу конверта';
 comment on column v_msp_file_rec_for_match.state_name is 'Назва статусу інформаційного рядка файлу';
+comment on column v_msp_file_rec_for_match.fact_pay_date is 'Фактична дата зарахування коштів';
 
 
 PROMPT *** Create  grants  v_msp_file_rec_for_match ***

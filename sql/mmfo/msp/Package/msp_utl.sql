@@ -4,7 +4,7 @@ PROMPT =========================================================================
  
 create or replace package msp_utl is
 
-  gc_header_version constant varchar2(64)  := 'version 1.2 18.01.2018';
+  gc_header_version constant varchar2(64)  := 'version 1.3 02.03.2018';
 
   type r_file_array is record (
     file_name    varchar2(50),
@@ -79,8 +79,6 @@ create or replace package msp_utl is
   --
   function replace_ukrsmb2dos(l_txt clob) return clob;
 
-  --procedure set_state_request(p_id in number, p_state in number, p_comment in varchar2 default null);
-  --procedure set_state_envelope(p_id number, p_state in number, p_comm in varchar2 default null);
   procedure set_state (p_id in number, p_state in number, p_comm in varchar2, p_obj in number);
 
   -----------------------------------------------------------------------------------------
@@ -88,9 +86,15 @@ create or replace package msp_utl is
   --
   --    Оновлення статуса файла
   --
+  --      p_file_id       - id файлу
+  --      p_state_id      - id стану
+  --      p_comment       - коментар
+  --      p_send_pay_date - дата відправки файла на оплату
+  -- 
   procedure set_file_state(p_file_id  in msp_files.id%type,
                            p_state_id in msp_files.state_id%type,
-                           p_comment  in msp_files.comm%type default null);
+                           p_comment  in msp_files.comm%type default null,
+                           p_send_pay_date in msp_files.send_pay_date%type default null);
 
   -----------------------------------------------------------------------------------------
   --  create_parsing_file
@@ -99,15 +103,6 @@ create or replace package msp_utl is
   --
   procedure create_parsing_file(p_envelope_file_id in msp_envelope_files_info.id%type,
                                 p_id_file          in msp_envelope_files_info.id_file%type);
-
-  -----------------------------------------------------------------------------------------
-  --  set_file_record_state
-  --
-  --    Оновлення статуса інформаційного рядка файла
-  --
-  /*procedure set_file_record_state(p_file_record_id  in msp_file_records.id%type,
-                                  p_state_id        in msp_file_records.state_id%type,
-                                  p_comment        in msp_file_records.comm%type default null);*/
 
   -----------------------------------------------------------------------------------------
   --  make_matching
@@ -156,21 +151,6 @@ create or replace package msp_utl is
                                  p_matching_tp in simple_integer);
 
   -----------------------------------------------------------------------------------------
-  --  get_matching
-  --
-  --    Отримання квитанції 1/2
-  --
-  --function get_matching(p_file_id     in msp_files.id%type,
-  --                      p_matching_tp in simple_integer default 1) return clob;
-
-  -----------------------------------------------------------------------------------------
-  --  create_parsing_file
-  --
-  --    Парсинг і запис табличних даних файлів
-  --
-  --procedure create_parsing_file(p_envelope_file_id in msp_envelope_files_info.id%type);
-
-  -----------------------------------------------------------------------------------------
   --  process_file
   --
   --    Прсинг та валідація нових файлів
@@ -184,8 +164,6 @@ create or replace package msp_utl is
   --
   procedure encode_data(p_data in out nocopy clob);
   procedure decode_data(p_data in out nocopy clob);
-  /*function decodeclobfrombase64(p_clob clob) return clob;
-  function encodeclobtobase64(p_clob clob) return clob;*/
   function utf8todeflang(p_clob in clob) return clob;
 
   -----------------------------------------------------------------------------------------
@@ -194,6 +172,14 @@ create or replace package msp_utl is
   --    Включення інформаційного рядка в оплату
   --
   procedure set_file_record2pay(p_file_record_id in msp_file_records.id%type);
+  
+  -----------------------------------------------------------------------------------------
+  --  set_file_record_payed
+  --
+  --    Оновлення статуса інформаційного рядка файла на сплачено
+  --
+  procedure set_file_record_payed(p_file_record_id in msp_file_records.id%type,
+                                  p_payed_date in date);
 
   -----------------------------------------------------------------------------------------
   --  set_file_for_pay
@@ -210,15 +196,6 @@ create or replace package msp_utl is
   procedure set_file_record_blocked(p_file_record_id in msp_file_records.id%type,
                                     p_comment        in msp_file_records.comm%type,
                                     p_block_type_id  in msp_file_records.block_type_id%type);
-
-  --function decode_request_data(p_request_id in msp_requests.id%type) return clob;
-
-  -----------------------------------------------------------------------------------------
-  --  prepare_request_xml
-  --
-  --    Функція готує xml відповідь на запит
-  --
-  --function prepare_request_xml(p_request_id in msp_requests.id%type) return clob;
 
   -----------------------------------------------------------------------------------------
   --  create_request
@@ -259,7 +236,7 @@ end msp_utl;
 /
 create or replace package body msp_utl is
 
-  gc_body_version constant varchar2(64) := 'version 1.34 22.02.2018';
+  gc_body_version constant varchar2(64) := 'version 1.35 02.03.2018';
   gc_mod_code     constant varchar2(3)  := 'MSP';
   -----------------------------------------------------------------------------------------
 
@@ -459,12 +436,22 @@ create or replace package body msp_utl is
   --
   --    Оновлення статуса файла
   --
+  --      p_file_id       - id файлу
+  --      p_state_id      - id стану
+  --      p_comment       - коментар
+  --      p_send_pay_date - дата відправки файла на оплату
+  --
   procedure set_file_state(p_file_id  in msp_files.id%type,
                            p_state_id in msp_files.state_id%type,
-                           p_comment  in msp_files.comm%type default null)
+                           p_comment  in msp_files.comm%type default null,
+                           p_send_pay_date in msp_files.send_pay_date%type default null)
   is
   begin
-    update msp_files set state_id = p_state_id, comm = p_comment where id = p_file_id;
+    update msp_files
+       set state_id      = p_state_id,
+           comm          = coalesce(p_comment, comm),
+           send_pay_date = coalesce(p_send_pay_date, send_pay_date)
+    where id = p_file_id;
     if sql%rowcount = 0 then
       raise ex_no_file;
     end if;
@@ -496,6 +483,31 @@ create or replace package body msp_utl is
     when others then
       bars.bars_error.raise_nerror (gc_mod_code, 'ERRUPD_FILEREC_STATUS', dbms_utility.format_error_backtrace || ' ' || sqlerrm);
   end set_file_record_state;
+
+  -----------------------------------------------------------------------------------------
+  --  set_file_record_payed
+  --
+  --    Оновлення статуса інформаційного рядка файла на сплачено
+  --
+  procedure set_file_record_payed(p_file_record_id in msp_file_records.id%type,
+                                  p_payed_date in date)
+    is
+      l_file_id   msp_files.id%type;
+  begin
+    update msp_file_records
+       set state_id = 10,
+           fact_pay_date = p_payed_date
+     where id = p_file_record_id
+    returning file_id into l_file_id;
+
+     update msp_files mf
+         set mf.state_id = 9 --'PAYED'
+       where mf.id = l_file_id
+         and not exists (select 1
+                           from msp_file_records mfr
+                          where mfr.file_id = mf.id
+                            and mfr.state_id in (17,19,20));
+  end;
 
   -----------------------------------------------------------------------------------------
   --  checking_record2
@@ -567,10 +579,10 @@ create or replace package body msp_utl is
     l_block_type_id     msp_file_records.block_type_id%type;
   begin
     -- наявність пенсіонера
-    select count(1) 
-    into l_c_pens 
+    select count(1)
+    into l_c_pens
     from pfu.pfu_pensioner p
-    where p.okpo = p_numident and p.kf = to_char(p_receiver_mfo) 
+    where p.okpo = p_numident and p.kf = to_char(p_receiver_mfo)
           and p.date_off is null and rownum = 1;
 
     if (p_numident is not null) then
@@ -973,8 +985,16 @@ create or replace package body msp_utl is
     p_file_buff      in out nocopy clob
     )
   is
-    l_crlp char(2) := chr(13)||chr(10);
+    l_crlp       char(2) := chr(13)||chr(10);
+    l_cnt_err    number;
+    ex_err_state exception;
   begin
+    select count(1) into l_cnt_err from msp_file_records where file_id = p_file_id and state_id not in (1, 2, 3, 4, 5, 14, 10) and rownum = 1;
+    
+    if l_cnt_err > 0 then
+      raise ex_err_state;
+    end if;
+    
     for c_rec in (select * from msp_file_records where file_id = p_file_id order by id)
       loop
         p_file_buff := p_file_buff||
@@ -987,21 +1007,23 @@ create or replace package body msp_utl is
           rpad(coalesce(c_rec.pay_day,' '),2,' ')||
           coalesce(c_rec.displaced,' ')||
           to_char(c_rec.pers_acc_num,'FM000000')||
-          to_char(case c_rec.state_id
-                    when  1 then '1'
-                    when  2 then '2'
-                    when  3 then '5'
-                    when  4 then '5'
-                    when  5 then '3'
-                    when 14 then '6'
-                    when 10 then '0'
-                    else         ' '
-                  end,'FM0')||-- VARCHAR(1) -- Причина не зарахування
+          case c_rec.state_id
+               when  1 then '1'
+               when  2 then '2'
+               when  3 then '5'
+               when  4 then '5'
+               when  5 then '3'
+               when 14 then '6'
+               when 10 then '0'
+               else         ' '
+          end||-- VARCHAR(1) -- Причина не зарахування
           coalesce(to_char(c_rec.fact_pay_date,'ddmmyyyy'),'        ')||-- Фактична дата зарахування коштів
           --
           l_crlp;
       end loop;
   exception
+    when ex_err_state then
+      bars.bars_error.raise_nerror (gc_mod_code, 'ERROR_MATCHING_BODY', 'Реєстр містить інформаційні рядки із помилковими станами');
     when no_data_found then
       bars.bars_error.raise_nerror (gc_mod_code, 'UNKNOWN_MATCHING_BODY', to_char(p_file_id));
     when others then
@@ -1112,9 +1134,12 @@ create or replace package body msp_utl is
     merge into msp_env_content e
     using (select * from msp_envelopes t where t.id = p_id) t on (e.id = t.id and e.type_id = p_type_id)
     when matched then
-      update set e.cvalue = p_value, e.ecp = p_ecp, e.filename = replace(l_filename, '[FNAME]', substr(upper(t.filename),l_start,instr(t.filename,'.')-l_start))
+      update set e.cvalue = p_value,
+                 e.ecp = p_ecp,
+                 e.filename = replace(l_filename, '[FNAME]', substr(upper(t.filename),l_start,instr(t.filename,'.')-l_start)),
+                 e.insert_dttm = sysdate
     when not matched then
-      insert values (p_id, p_type_id, null, replace(l_filename, '[FNAME]', substr(upper(t.filename),l_start,instr(t.filename,'.')-l_start)), sysdate, p_ecp, p_value); 
+      insert values (p_id, p_type_id, null, replace(l_filename, '[FNAME]', substr(upper(t.filename),l_start,instr(t.filename,'.')-l_start)), sysdate, p_ecp, p_value);
       --insert values (p_id, p_type_id, null, replace(l_filename, '[FNAME]',substr(upper(t.filename),12,25)), sysdate, p_ecp, p_value); -- replace(replace(upper(t.filename), 'REQPAY', 'CTLPAY'), '.P7S.P7S', '.P7S')
 
     if sql%rowcount = 0 then
@@ -1181,8 +1206,9 @@ create or replace package body msp_utl is
     ex_include_violation exception;
   begin
     update msp_file_records set state_id = 19 where file_id = p_file_id and state_id = 0;
-    set_file_state(p_file_id  => p_file_id,
-                   p_state_id => 8);
+    set_file_state(p_file_id       => p_file_id,
+                   p_state_id      => 8,
+                   p_send_pay_date => sysdate);
     bars_audit.info('msp.msp_utl.set_file_for_pay, p_file_id='||to_char(p_file_id));
   exception
     when no_data_found then
@@ -1588,13 +1614,14 @@ create or replace package body msp_utl is
                           p_ecp         in clob default null)
   is
     l_state       msp_envelopes.state%type;
+    l_comm        msp_envelopes.comm%type;
     l_matching_tp number;
     l_errst       number;
     l_new_state   number;
     ex_unknown_matching exception;
     l_buff        blob;
   begin
-    select state into l_state from msp_envelopes where id = p_envelope_id;
+    select state, comm into l_state, l_comm from msp_envelopes where id = p_envelope_id;
 
     l_errst := case when l_state = msp_const.st_env_MATCH1_PROCESSING then msp_const.st_env_MATCH1_CREATE_ERROR
                     when l_state = msp_const.st_env_MATCH1_SIGN_WAIT then msp_const.st_env_MATCH1_ENV_CREATE_ERROR
@@ -1627,7 +1654,7 @@ create or replace package body msp_utl is
   exception
     when ex_unknown_matching then
       -- статус не міняю але пишу коментар
-      set_state_envelope(p_envelope_id, l_state, 'Помилка збереження файлу квитанції. Поточний статус (state='||to_char(l_state)||') конверту не дозволяє зберегти файл.');
+      set_state_envelope(p_envelope_id, l_state, 'Помилка збереження файлу квитанції. ' || chr(13) || l_comm);
     when others then
       -- міняю статус і пишу коментар
       set_state_envelope(p_envelope_id, l_errst, 'Помилка збереження файлу квитанції. '||' '||dbms_utility.format_error_backtrace || ' ' || sqlerrm);
@@ -2273,7 +2300,7 @@ create or replace package body msp_utl is
           else
             p_env_rq_st  := 'R';
           end if;
-          
+
           l_isencode64 := false;
         exception
           when no_data_found then
@@ -2469,7 +2496,7 @@ create or replace package body msp_utl is
                             p_env_rq_st   => l_env_rq_st);
     -- якщо все ок то проставляю статус квит1 відправлена
     if l_env_rq_st = 'S' then
-      set_state_envelope(p_id    => l_envelope_id, 
+      set_state_envelope(p_id    => l_envelope_id,
                          p_state => msp_const.st_env_MATCH1_SEND);
     end if;
     -- set_state_request = 0
@@ -2502,7 +2529,7 @@ create or replace package body msp_utl is
                             p_env_rq_st   => l_env_rq_st);
     -- якщо все ок то проставляю статус квит2 відправлена
     if l_env_rq_st = 'S' then
-      set_state_envelope(p_id    => l_envelope_id, 
+      set_state_envelope(p_id    => l_envelope_id,
                          p_state => msp_const.st_env_MATCH2_SEND);
     end if;
     -- set_state_request = 0
@@ -3037,5 +3064,4 @@ grant execute on msp_utl to bars_access_defrole;
   
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /sql/msp/package/msp_utl.sql =========*** End *** 
-PROMPT ===================================================================================== 
- 
+PROMPT =====================================================================================

@@ -169,3 +169,14 @@ begin
     end if; 
 end;
 / 
+
+begin 
+  execute immediate 'alter table msp_files add send_pay_date date';
+exception when others then 
+  if sqlcode in (-904, -6512, -1430) then 
+    null; 
+  else 
+    raise; 
+  end if;
+end;
+/

@@ -25,7 +25,6 @@ from msp_envelopes e
      inner join msp_envelope_state s on s.id = e.state
 where e.code in ('payment_data')
       and e.state in (10,16,17,18,19,20)
-      and 0 = (select sum(case when f.state_id in (0) then 0 else 1 end) from msp_files f where f.envelope_file_id = e.id)
 ;
 PROMPT *** Create comments on v_msp_envelopes_match2_hist ***
 comment on column v_msp_envelopes_match2_hist.total_sum is 'Загальна сума конверту';
