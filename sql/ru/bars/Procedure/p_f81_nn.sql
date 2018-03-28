@@ -10,14 +10,17 @@ PROMPT *** Create  procedure P_F81_NN ***
   CREATE OR REPLACE PROCEDURE BARS.P_F81_NN (Dat_ DATE,
                                       sheme_ varchar2 default 'G')  IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% DESCRIPTION :	Процедура формирование файла #81 для КБ
-% COPYRIGHT   :	Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 31/01/2016 (03/04/2015, 21/03/2014)
+% DESCRIPTION :    Процедура формирование файла #81 для КБ
+% COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
+% VERSION     :   27/03/2018 (09/02/2016)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-31.01.2016 - после перехода на новые DRAPSы
+09.02.2016 - код группы стран (параметр K041) выбираем из истории 
+             изменения параметра кода страны COUNTRY в CUSTOMERW
+             (было сделано Вирко для Запорожья)
+31.01.2016 - после перехода на новые DRAPSы 
              исключаем проводки перекрытия корректирующих за декабрь
 01/04/2015 - из месячных корректирующих проводок (Dos96_, Kos96_)
              вычитаем корректирующие за год выполненные в январе
@@ -44,7 +47,7 @@ PROMPT *** Create  procedure P_F81_NN ***
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 kodf_    varchar2(2):='81';
 rnk_     number;
-typ_ 	 number;
+typ_      number;
 acc_     Number;
 pacc_    Number;
 dat1_    Date;
@@ -100,7 +103,7 @@ flag_    number;
 sql_acc_ varchar2(2000):='';
 sql_doda_ varchar2(200):='';
 ff_      number;
-ret_	 number;
+ret_     number;
 korr504_ number := 0;
 add_     number := 0;
 d_sum_   number;
@@ -142,12 +145,11 @@ CURSOR Saldo IS
 CURSOR BaseL IS
     SELECT kodp, nbuc, SUM (znap)
     FROM rnbu_trace
-    WHERE userid=userid_
     GROUP BY kodp,nbuc;
 ---------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 procedure p_ins(p_dat_ date, p_tp_ varchar2, p_nls_ varchar2,p_nbs_ varchar2,
-  		p_kv_ smallint, p_k041_ varchar2, p_znap_ varchar2,
+          p_kv_ smallint, p_k041_ varchar2, p_znap_ varchar2,
                 p_comm_ varchar2 default '')
 IS
    kod_ varchar2(10);
@@ -212,29 +214,40 @@ OPEN Saldo;
                     Dos99zg_, Kos99zg_, tips_, k041_, pacc_;
    EXIT WHEN Saldo%NOTFOUND;
 
-   if typ_ > 0 then
+   if typ_ > 0 then  
       nbuc_ := nvl(f_codobl_tobo(acc_,typ_),nbuc1_);
    else
       nbuc_ := nbuc1_;
    end if;
 
+--   k041_ := f_k041(f_country_hist(rnk_, dat_));
+
    --- после перехода на новые DRAPSы
    --- обороты по перекрытию 6,7 классов на 5040,5041
-   IF to_char(Dat_,'MM')='12' and (nls_ like '6%' or nls_ like '7%' or nls_ like '504%' or nls_ like '390%') THEN
-      SELECT NVL(SUM(decode(dk,0,1,0)*s),0),
-                    NVL(SUM(decode(dk,1,1,0)*s),0)
-             INTO d_sum_, k_sum_
-             FROM opldok
-             WHERE fdat  between Dat_  AND Dat_+29 AND
-                   acc  = acc_   AND
-                   (tt like 'ZG8%'  or tt like 'ZG9%');
+   IF to_char(Dat_,'MM')='12' and (nls_ like '6%' or nls_ like '7%' or nls_ like '390%' or nls_ like '504%') THEN
+      if nls_ like '504%' or nls_ like '390%' then
+         Dos96_ := 0;
+         Kos96_ := 0; 
+      else
+         SELECT NVL(SUM(decode(o.dk,0,1,0)*o.s),0),
+                    NVL(SUM(decode(o.dk,1,1,0)*o.s),0)
+           INTO d_sum_, k_sum_
+           FROM opldok o, oper p
+          WHERE o.fdat = any(select fdat from fdat where fdat between Dat_  AND  Dat_+31)
+            AND o.acc  = acc_
+            AND (o.tt like 'ZG8%'  or o.tt like 'ZG9%')
+            and o.ref = p.ref
+            and p.sos = 5
+            and p.vob = 96;
+        
+         if Dos96_ >0 then
+            Dos96_ := Dos96_ - d_sum_;
+         end if;
 
-      IF Dos96_ <> 0 then
-         Dos96_ := Dos96_ - d_sum_;
-      END IF;
-      IF Kos96_ <> 0 THEN
-         Kos96_ := Kos96_ - k_sum_;
-      END IF;
+         if Kos96_ >0 then
+            Kos96_ := Kos96_ - k_sum_;
+         end if;
+      end if;
    END IF;
 
    --- корректирующие обороты за год по перекрытию 6,7 классов на 5040,5041
@@ -247,15 +260,17 @@ OPEN Saldo;
    END IF;
 
    if nbs_ not in ('3902','3903','5040','5041') and nbs_ not like '6%' and nbs_ not like '7%' then
-      --Ostn_:=Ostn_-Dos96_+Kos96_+Dos99zg_-Kos99zg_;
       Ostn_ := Ostn_-Dos96_+Kos96_-Dos99_+Kos99_;
    else
-      Ostn_ := Ostn_-Dos96_+Kos96_-Dos99_+Kos99_-Dos96zg_+Kos96zg_-Dos99zg_+Kos99zg_-Doszg_+Koszg_;
+--      Ostn_ := Ostn_-Dos96_+Kos96_-Dos99_+Kos99_-Dos96zg_+Kos96zg_-Dos99zg_+Kos99zg_-Doszg_+Koszg_;
+      if nbs_ not in ('5040','5041') then
+         Ostn_ := Ostn_-Dos96_+Kos96_-Dos99_+Kos99_-Dos96zg_+Kos96zg_-Dos99zg_+Kos99zg_-Doszg_+Koszg_;
+      end if;
+      
+      if nbs_ in ('5040','5041') then   
+         Ostn_ := Ostn_-Dos96zg_+Kos96zg_-Dos99zg_+Kos99zg_-Doszg_+Koszg_;
+      end if;   
    end if;
-
-   --if nbs_ in ('3902','3903') then
-   --   Ostn_:=Ostn_+Dos99_-Kos99_; --Ostn_+Dos99zg_-Kos99zg_
-   --end if;
 
    -- згортання коригувань по в_дкоригованих коригуючих проводках
    if Ostn_ <> 0 and substr(nls_,1,1) in ('6','7') and Dos96zg_ +  Kos96zg_ > 0 then
@@ -311,9 +326,9 @@ LOOP
    end if;
 
    INSERT INTO tmp_nbu
-	  (kodf, datf, kodp,  znap, nbuc)
+      (kodf, datf, kodp,  znap, nbuc)
    VALUES
-	  (kodf_, Dat_, kodp_, b_, nbuc_);
+      (kodf_, Dat_, kodp_, b_, nbuc_);
 END LOOP;
 CLOSE BaseL;
 ------------------------------------------------------------------

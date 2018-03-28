@@ -12,7 +12,7 @@ PROMPT *** Create  procedure P_FA4_NN ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Процедура формирование файла #A4 для КБ
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :    20/04/2017 (03/04/2017, 09/02/2016)
+% VERSION     :    28/03/2018 (20/04/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -100,6 +100,8 @@ korr504_ number := 0;
 add_     number := 0;
 d_sum_   number;
 k_sum_   number;
+d_sum96_   number;
+k_sum96_   number;
 -------------------------------------------------------------------------------
 CURSOR Saldo IS
    SELECT a.rnk, a.acc, a.nls, a.kv, s.fdat, a.nbs, s.ost, s.ostq,
@@ -137,7 +139,6 @@ CURSOR Saldo IS
 CURSOR BaseL IS
     SELECT kodp, nbuc, SUM (znap)
     FROM rnbu_trace
-    WHERE userid=userid_
     GROUP BY kodp,nbuc;
 ---------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -213,26 +214,42 @@ OPEN Saldo;
    else
       nbuc_ := nbuc1_;
    end if;
-
-   --k041_ := f_k041(f_country_hist(rnk_, dat_));
-
+   
+--   k041_ := f_k041(f_country_hist(rnk_, dat_));
+   
    --- после перехода на новые DRAPSы
    --- обороты по перекрытию 6,7 классов на 5040,5041
-   IF to_char(Dat_,'MM')='12' and (nls_ like '6%' or nls_ like '7%' or nls_ like '504%' or nls_ like '390%') THEN
-      SELECT NVL(SUM(decode(dk,0,1,0)*s),0),
-                    NVL(SUM(decode(dk,1,1,0)*s),0)
-             INTO d_sum_, k_sum_
-             FROM opldok 
-             WHERE fdat  between Dat_  AND Dat_+29 AND
-                   acc  = acc_   AND
-                   (tt like 'ZG8%'  or tt like 'ZG9%');
+   IF to_char(Dat_,'MM')='12' and (nls_ like '6%' or nls_ like '7%' or nls_ like '390%' or nls_ like '504%') THEN
+      if nls_ like '504%' or nls_ like '390%' then
+         Dos96_ := 0;
+         Kos96_ := 0; 
+      else
+         SELECT NVL(SUM(decode(o.dk,0,1,0)*o.s),0),
+                    NVL(SUM(decode(o.dk,1,1,0)*o.s),0)
+           INTO d_sum_, k_sum_
+           FROM opldok o, oper p
+          WHERE o.fdat = any(select fdat from fdat where fdat between Dat_  AND  Dat_+31)
+            AND o.acc  = acc_
+            AND (o.tt like 'ZG8%'  or o.tt like 'ZG9%')
+            and o.ref = p.ref
+            and p.sos = 5
+            and p.vob = 96;
+            
+         select NVL(SUM(decode(o.dk,0,1,0)*o.s),0),
+                NVL(SUM(decode(o.dk,1,1,0)*o.s),0)
+         INTO d_sum96_, k_sum96_
+         from kor_prov o
+         where acc = acc_  and
+               vdat = dat_;       
+        
+         if Dos96_ >0 and Dos96_ > d_sum96_ and Dos96_ >= d_sum_ then
+            Dos96_ := Dos96_ - d_sum_;
+         end if;
 
-      IF Dos96_ <> 0 then 
-         Dos96_ := Dos96_ - d_sum_;
-      END IF;
-      IF Kos96_ <> 0 THEN
-         Kos96_ := Kos96_ - k_sum_;
-      END IF;
+         if Kos96_ >0 and Kos96_ > k_sum96_ and  Kos96_ >= k_sum_ then
+            Kos96_ := Kos96_ - k_sum_;
+         end if;
+      end if;
    END IF;
 
 --- корректирующие обороты за год
@@ -253,9 +270,11 @@ OPEN Saldo;
    END IF;
 
    if nbs_ in ('5040','5041') then
-      Ostn_ := Ostn_-Dos96_+Kos96_;
+      Ostn_ := Ostn_ - Dos96_ + Kos96_;
+      Ostq_ := Ostq_ - Dosq96_ + Kosq96_;
    else
       Ostn_ := Ostn_ - Dos96_ + Kos96_ - Dos99_ + Kos99_;
+      Ostq_ := Ostq_ - Dosq96_ + Kosq96_ - Dosq99_ + Kosq99_;
    end if;
 
    IF Ostn_ <> 0 THEN
@@ -263,7 +282,6 @@ OPEN Saldo;
       p_ins(data_, dk_, nls_, nbs_, kv_, k041_, TO_CHAR(ABS(Ostn_)));
    END IF;
 
-   Ostq_ := Ostq_ - Dosq96_ + Kosq96_ - Dosq99_ + Kosq99_;
 
    IF Ostq_<>0 THEN
       dk_ := IIF_N(Ostq_,0,'1','2','2')||'0';
