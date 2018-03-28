@@ -913,7 +913,7 @@ end;
           into KL_F00$GLOBAL
              ( KODF, AA, A017, NN, PERIOD, R, SEMANTIC, KODF_EXT, PR_TOBO, TYPE_ZNAP )
         values
-             ( p_file_code, p_scm_num, p_scm_code, p_unit_code, p_period_tp, p_location_code, p_file_nm, p_file_code_alt, 0, p_val_tp_ind );
+             ( SubStr(p_file_code,2,2), p_scm_num, p_scm_code, p_unit_code, p_period_tp, p_location_code, p_file_nm, p_file_code_alt, 0, p_val_tp_ind );
       exception
         when DUP_VAL_ON_INDEX then
           update KL_F00$GLOBAL
@@ -925,7 +925,7 @@ end;
                , KODF_EXT  = p_file_code_alt
                , PR_TOBO   = 0
                , TYPE_ZNAP = p_val_tp_ind
-           where KODF = p_file_code
+           where KODF = SubStr(p_file_code,2,2)
              and A017 = p_scm_code;
       end;
     end if;
