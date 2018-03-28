@@ -1,4 +1,13 @@
-CREATE OR REPLACE PROCEDURE BARS.P_F3A_NN (dat_ DATE, sheme_ VARCHAR2 DEFAULT 'D')
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_F3A_NN.sql =========*** Run *** 
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure P_F3A_NN ***
+
+  CREATE OR REPLACE PROCEDURE BARS.P_F3A_NN (dat_ DATE, sheme_ VARCHAR2 DEFAULT 'D')
 IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #3A для КБ (универсальная) с 01.06.2009
@@ -6,13 +15,16 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #3A для КБ (универсальная) с 01.06.2009
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 27/12/2017 (26/12/2017, 16/11/2017)
+% VERSION     : 27/03/2018 (27/12/2017, 26/12/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-27/12/2017 - с 26.12.2017 (на 27.12.2017) в показателе вместо параметра R013 
-             будет формироваться параметр R011 
+27/03/2018 - не будут включаться в файл Дт обороты которые были в 
+             кореспонденции со счетами овердрафтов - перенос на просрочку 
+             ( Дт 2063  Кт 2600 (овердрафт) )
+27/12/2017 - с 26.12.2017 (на 27.12.2017) в показателе вместо параметра R013
+             будет формироваться параметр R011
 26/12/2017 - для KL_R020 изменено условие для поля D_CLOSE
 06/11/2017 - вместо кл-ра KL_F3_29 будем использовать кл-р KOD_R020
 27/10/2017 - для бал.рах.2630 добавил обробку OB22 IN ('B2','B3','B4','B5')
@@ -662,7 +674,7 @@ BEGIN
        commit;
     ----------------------------------------------------------------------------
        DELETE FROM RNBU_HISTORY
-       WHERE odate = dat_; 
+       WHERE odate = dat_;
              --and kf = to_char(mfo_);
     ----------------------------------------------------------------------------
 
@@ -716,7 +728,7 @@ BEGIN
                    THEN
                    null;
                 END;
-             end if;    
+             end if;
           else
              if r011_ <> '0' then
                 BEGIN
@@ -963,6 +975,41 @@ BEGIN
 
                        -- вычитаем "переброски"
                        sdos_ := sdos_ - vost_;
+                       
+                       if substr(trim(nls_),1,3) = '206' and vost_ = 0 then
+                          poisk_ := '260%';
+            
+                          BEGIN
+                             -- переброски с гр.260 (овердрафт) в гр.206 просрочка 
+                             SELECT NVL(SUM(s*100), 0)
+                                INTO vost_
+                             FROM tmp_file03
+                             WHERE FDAT = data_
+                               AND accd=acc_
+                               AND nlsk like poisk_ 
+                               AND acck in (select acc from acc_over where NVL (sos, 0) <> 1);
+
+                             p_ins_del (acc_, nls_, kv_, '(переброски с '||substr(trim(nls_),1,3)||' на '||poisk_||') ', sdos_, vost_);
+
+                             p_ins_log (   '(переброски с '||substr(trim(nls_),1,3)||' на '||poisk_||') DK=0 r020='''
+                                        || nbs_
+                                        || ''' Счет='''
+                                        || nls_
+                                        || ''' вал='''
+                                        || kv_
+                                        || ''' дата='''
+                                        || data_
+                                        || ''' сумма=',
+                                        vost_);
+                          EXCEPTION
+                             WHEN NO_DATA_FOUND
+                          THEN
+                             vost_ := 0;
+                          END;
+
+                          -- вычитаем "переброски"
+                          sdos_ := sdos_ - vost_;
+                       end if; 
                    end if;
                 END IF;
 
@@ -1228,7 +1275,7 @@ BEGIN
                 THEN
                    sdos_ := Gl.P_Icurval (kv_, sdos_, data_);
 
-                   if dat_ < dat_izm1 
+                   if dat_ < dat_izm1
                    then
                       kodp_ :=
                             '5'
@@ -1247,7 +1294,7 @@ BEGIN
                          || TO_CHAR (2 - cntr_)
                          || d020_
                          || LPAD (kv_, 3, '0');
-                   end if;  
+                   end if;
 
                    IF s180_ = '0' THEN
                       nls_ := 'X' || nls_;
@@ -1299,7 +1346,7 @@ BEGIN
                 END IF;
 
                 -- обороты пролонгации
-                IF s_prol_ > 0 AND spcnt_ >= 0 AND r050_ = '11' and se_ < 0 
+                IF s_prol_ > 0 AND spcnt_ >= 0 AND r050_ = '11' and se_ < 0
                 THEN
 
                    s_prol_ := Gl.P_Icurval (kv_, s_prol_, data_);
@@ -1370,7 +1417,7 @@ BEGIN
                                     kv_, cntr_, spcnt_, s180_, k081_, k092_, sdos_,
                                     skos_, mdate_, k112_, r011_, d020_, isp_, se_, acc_
                                    );
-                   end if;  
+                   end if;
                 END IF;
              END IF;
 
@@ -1394,10 +1441,10 @@ BEGIN
                 (nbs_ NOT IN ('1500','1600','2600','2605',
                               '2620','2625','2630','2635','2650','2655') and skos_ > 0 )
                      OR
-                (nbs_ = '2600' and r013_  in ('1','7','8','A') and skos_ > 0) 
+                (nbs_ = '2600' and r013_  in ('1','7','8','A') and skos_ > 0)
                  and dat_ < dat_izm1
                      OR
-                (nbs_ = '2600' and r013_  in ('1','7','8','A') and skos_ > 0)
+                (nbs_ in ('2600', '2605','2620','2625','2650','2655') and r011_  = '3' and skos_ > 0)
                  and dat_ >= dat_izm1
                      OR
                 mfou_ not in (300465) and
@@ -1409,7 +1456,7 @@ BEGIN
                     OR
                 (mfou_ <> 300465 and
                    (nbs_ = '2605' AND r013_ in ('1','3') OR
-                    nbs_ = '2655' AND r013_ = '3') and skos_ > 0) and 
+                    nbs_ = '2655' AND r013_ = '3') and skos_ > 0) and
                  dat_ < dat_izm1
                      OR
                 (mfou_ <> 300465 and
@@ -1418,18 +1465,18 @@ BEGIN
                      OR
                  mfou_ in (300465) and
                    ((nbs_ = '2605' and r013_ in ('1','3') and skos_ > 0 and spcnt_ <> 0)   OR
-                    (nbs_ = '2655' and r013_ = '3' and skos_ > 0) ) and 
-                    dat_ < dat_izm1  
+                    (nbs_ = '2655' and r013_ = '3' and skos_ > 0) ) and
+                    dat_ < dat_izm1
                      OR
                  mfou_ in (300465) and
                    ((nbs_ ='2605' and r011_ = '3' and skos_ > 0 and spcnt_ <> 0)   OR
                     (nbs_ = '2655' and r011_ = '3' and skos_ > 0) ) and
                     dat_ >= dat_izm1
                      OR
-                (nbs_ = '2650' and r013_ in ('1','3','8') and skos_ > 0) and 
+                (nbs_ = '2650' and r013_ in ('1','3','8') and skos_ > 0) and
                 dat_ < dat_izm1
                      OR
-                (nbs_ = '2650' and r011_ = '3' and skos_ > 0) and 
+                (nbs_ = '2650' and r011_ = '3' and skos_ > 0) and
                 dat_ >= dat_izm1
              THEN
                 if nbs_ in ('2610','2611','2615','2616','2617','2630','2635',
@@ -1484,7 +1531,7 @@ BEGIN
                         AND t.acck=acc_
                         AND t.nlsd LIKE nbs_ || '%'
                         AND t.accd = s.acc
-                        AND NVL(s.r013,'0') not in ('4','6');
+                        AND NVL(s.r011,'0') = '3';
                    end if;
 
                   -- 14/07/2014 OAB: не исключаем переброску с 2620 текущего счета на 2620 депозитный
@@ -1498,7 +1545,7 @@ BEGIN
                         AND t.acck=acc_
                         AND t.nlsd LIKE nbs_ || '%'
                         AND t.accd = s.acc
-                        AND NVL(s.r013,'0') in ('1','2','3');
+                        AND NVL(s.r011,'0') = '3';
                    end if;
 
                    if nbs_ = '2620' and mfou_ = 300465 then
@@ -2612,20 +2659,20 @@ BEGIN
 
                 -- кредитовые обороты
                 IF (skos_ > 0 AND r050_ = '22' and se_ >= 0) OR
-                   (skos_ > 0 and se_ >= 0 and nbs_ = '2600' and r013p_ in ('1','7','8','A')) OR
-                   (skos_ > 0 and se_ >= 0 and nbs_ = '2605' and r013p_ in ('1','3')) OR
-                   (skos_ > 0 and se_ >= 0 and nbs_ = '2655' and r013p_ = '3') OR
-                   (skos_ > 0 and se_ >= 0 and nbs_ = '2650' and r013p_ in ('1','3','8'))
+                   (skos_ > 0 and se_ >= 0 and nbs_ in ('2600', '2605', '2620', '2625','2650', '2655') and r011_ = '3')
+--                   (skos_ > 0 and se_ >= 0 and nbs_ = '2605' and r013p_ in ('1','3')) OR
+--                   (skos_ > 0 and se_ >= 0 and nbs_ = '2655' and r013p_ = '3') OR
+--                   (skos_ > 0 and se_ >= 0 and nbs_ = '2650' and r013p_ in ('1','3','8'))
                 THEN
 
                    skos_ := Gl.P_Icurval (kv_, skos_, data_);
 
-                   IF mfo_ = 300465 AND spcnt_ = 0
-                   THEN
-                      cntr1_ := 'X';
-                   ELSE
+                   -- IF mfo_ = 300465 AND spcnt_ = 0
+                   -- THEN
+                   --    cntr1_ := 'X';
+                   -- ELSE
                       cntr1_ := TO_CHAR (2 - cntr_);
-                   END IF;
+                   -- END IF;
 
                    if dat_ < dat_izm1
                    then
@@ -2690,23 +2737,23 @@ BEGIN
 
                 -- обороты пролонгации
                 IF (s_prol_ > 0 AND r050_ = '22'  and se_ > 0) OR
-                   (s_prol_ > 0 and se_ > 0 and nbs_ = '2600' and r013p_ in ('1','7','8','A')) OR
-                   (s_prol_ > 0 and se_ > 0 and nbs_ = '2605' and r013p_ in ('1','3')) OR
-                   (s_prol_ > 0 and se_ > 0 and nbs_ = '2655' and r013p_ = '3') OR
-                   (s_prol_ > 0 and se_ > 0 and nbs_ = '2650' and r013p_ in ('1','3','8'))
+                   (s_prol_ > 0 and se_ > 0 and nbs_ in ('2600', '2605', '2620', '2625','2650', '2655')) 
+--                   (s_prol_ > 0 and se_ > 0 and nbs_ = '2605' and r013p_ in ('1','3')) OR
+--                   (s_prol_ > 0 and se_ > 0 and nbs_ = '2655' and r013p_ = '3') OR
+--                   (s_prol_ > 0 and se_ > 0 and nbs_ = '2650' and r013p_ in ('1','3','8'))
                 THEN
 
                    s_prol_ := Gl.P_Icurval (kv_, s_prol_, data_);
 
-                   IF mfo_ = 300465 AND spcnt_ = 0
-                   THEN
-                      cntr1_ := 'X';
-                   ELSE
+                   -- IF mfo_ = 300465 AND spcnt_ = 0
+                   -- THEN
+                   --    cntr1_ := 'X';
+                   -- ELSE
                       cntr1_ := TO_CHAR (2 - cntr_);
-                   END IF;
+                   -- END IF;
 
                    if dat_ < dat_izm1
-                   then 
+                   then
                    kodp_ :=
                       '6' || nbs_ || r013_ || s180_ || cntr1_ || '02' || LPAD (kv_, 3, '0');
                    else
@@ -2764,7 +2811,7 @@ BEGIN
                                          kv_, cntr_, spcnt_, s180_, k081_, k092_, sdos_,
                                         skos_, mdate_, k112_, r011_, d020_, isp_, se_, acc_
                                        );
-                      end if;  
+                      end if;
                    END IF;
                 END IF;
              END IF;
@@ -2864,12 +2911,12 @@ BEGIN
                 END IF;
              END IF;
 
-             IF mfo_ = 300465 AND spcnt_ = 0
-             THEN
-                cntr1_ := 'X';
-             ELSE
+             -- IF mfo_ = 300465 AND spcnt_ = 0
+             -- THEN
+             --    cntr1_ := 'X';
+             -- ELSE
                 cntr1_ := TO_CHAR (2 - cntr_);
-             END IF;
+             -- END IF;
 
              if dat_ < dat_izm1
              then
@@ -3000,12 +3047,12 @@ BEGIN
                      znap_ := TO_CHAR (GL.P_Icurval(kv_, ABS(se_)-ABS(vost_), Data_));
                   END IF;
 
-                   IF mfo_ = 300465 AND spcnt_ = 0
-                   THEN
-                      cntr1_ := 'X';
-                   ELSE
+                   -- IF mfo_ = 300465 AND spcnt_ = 0
+                   -- THEN
+                   --    cntr1_ := 'X';
+                   -- ELSE
                       cntr1_ := TO_CHAR (2 - cntr_);
-                   END IF;
+                   -- END IF;
 
                    IF s180_ = '0'
                    THEN
@@ -3487,5 +3534,13 @@ BEGIN
 ----------------------------------------------------------------------
 END;
 /
-
 show err;
+
+PROMPT *** Create  grants  P_F3A_NN ***
+grant EXECUTE                                                                on P_F3A_NN        to BARS_ACCESS_DEFROLE;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_F3A_NN.sql =========*** End *** 
+PROMPT ===================================================================================== 
