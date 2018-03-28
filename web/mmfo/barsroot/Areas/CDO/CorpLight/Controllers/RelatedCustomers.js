@@ -644,8 +644,7 @@ angular.module(globalSettings.modulesAreas)
                 $.ajax({
                     type: 'PUT',
                     url: bars.config.urlContent('/api/cdo/corpLight/users/LockUser?userId=' + userId +
-                        '&customerId=' + custId +
-                        '&bankId=' + document.getElementById('bankId').value),
+                        '&customerId=' + custId),
                     success: function (data, textStatus, jqXHR) {
                         bars.ui.loader(userForm, false);
                         bars.ui.notify('Успішно!', 'Користувача заблоковано', 'success');
