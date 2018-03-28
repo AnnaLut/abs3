@@ -7,7 +7,7 @@ CREATE OR REPLACE PROCEDURE p_kol_deb_otc(p_dat01 date, p_mode integer, p_deb in
 */
 
    l_del  number      ;  l_kol     number ; l_del_kv  number ;  l_xoz_new number ; l_time number ;  l_commit  integer :=0;
-   l_tx   varchar2(30);  l_dat31   date   ; l_d1      date   ;  FL_       NUMBER ; l_kor  INTEGER; 
+   l_tx   varchar2(30);  l_dat31   date   ; l_d1      date   ;  FL_       NUMBER ; l_kor  INTEGER;  l_di      integer;
 
  TYPE CurTyp IS REF CURSOR;
  c0   CurTyp;
@@ -32,6 +32,7 @@ begin
    else              l_tx := ' (госп.з модул€) ';
    end if;
    l_d1 := sysdate; 
+   select to_char ( p_DAT01, 'J' ) - 2447892 into l_di from dual;
    z23.to_log_rez (user_id , 351 , p_dat01 ,'Ќачало  ол-во дней прострочки (дебиторка) (OTC)' || l_tx);
    l_dat31 := Dat_last_work (p_dat01 - 1);  -- последний рабочий день мес€ца
    if trunc(p_dat01,'MM') = p_dat01   THEN l_kor := 1; 
@@ -62,22 +63,22 @@ begin
       if  p_deb = 0   THEN
          OPEN c0 FOR
             select 17 tip, decode(c.custtype,3,3,2) custtype, c.custtype cus, a.nbs, a.nls, a.kv, a.acc, a.rnk, a.branch, 
-                   - decode(l_kor,1,ost_korr(a.acc,l_dat31,null,a.nbs),2, a.ostc, fost(a.acc,p_dat01) ) bv, d.deb, a.mdate, a.acc nd
+                   - decode(l_kor,1,ost_korr(a.acc,l_dat31,null,a.nbs),2, a.ostc, snp.FOST( a.acc,l_DI,0,7) ) bv, d.deb, a.mdate, a.acc nd
             from   accounts a,customer c, rez_deb d 
             where  a.nbs = d.nbs and d.deb in (1,2) and d.deb is not null and a.nbs is not null and (a.dazs is null or a.dazs >= p_dat01) 
                    and a.acc not in ( select accc from accounts where nbs is null and substr(nls,1,4)='3541' and accc is not null) and a.rnk = c.rnk 
                    and  ( decode(l_kor,1, f_tip_xoz(p_dat01, a.acc, a.tip) , a.tip) not in ('XOZ','W4X')  or l_xoz_new != 1 )
             union  all 
             select 17 tip,decode(c.custtype,3,3,2) custtype, c.custtype cus, nvl(nbs,substr(nls,1,4)) nbs, a.nls, a.kv, a.acc, a.rnk, a.branch,  
-                   - decode(l_kor,1,ost_korr(a.acc,l_dat31,null,a.nbs),2, a.ostc, fost(a.acc,p_dat01) ) bv, 1 deb, a.mdate, a.acc nd
+                   - decode(l_kor,1,ost_korr(a.acc,l_dat31,null,a.nbs),2, a.ostc, snp.FOST( a.acc,l_DI,0,7) ) bv, 1 deb, a.mdate, a.acc nd
             from   accounts a, cp_deal cp, customer c
             where  (cp.active=1 or cp.active = -1 and cp.dazs >= p_dat01) and substr(a.nls,1,4)='3541'  and 
-                    decode(l_kor,1,ost_korr(a.acc,l_dat31,null,a.nbs),2, a.ostc, fost(a.acc,p_dat01) ) < 0 and  a.acc in  (cp.accr,cp.acc) and 
+                    decode(l_kor,1,ost_korr(a.acc,l_dat31,null,a.nbs),2, a.ostc, snp.FOST( a.acc,l_DI,0,7) ) < 0 and  a.acc in  (cp.accr,cp.acc) and 
                     a.rnk = c.rnk  and a.acc not in ( select accc from accounts where nbs is null  and  substr(nls,1,4)='3541'  and accc is not null) ; 
       else 
          OPEN c0 FOR
             select 21 tip, decode(c.custtype,3,3,2) custtype, c.custtype cus, a.nbs, a.nls, a.kv, a.acc, a.rnk, a.branch,
-                   - decode(l_kor,1,ost_korr(a.acc,l_dat31,null,a.nbs),2, a.ostc, fost(a.acc,p_dat01) ) bv, 3 deb, x.fdat mdate, x.id nd 
+                   - decode(l_kor,1,ost_korr(a.acc,l_dat31,null,a.nbs),2, a.ostc, snp.FOST( a.acc,l_DI,0,7) ) bv, 3 deb, x.fdat mdate, x.id nd 
             from   xoz_ref x, accounts a, customer c, rez_deb d 
             where  a.nbs = d.nbs and d.deb in (2) and d.deb is not null and x.fdat < p_dat01 and (datz >= p_dat01 or datz is null) and s0<>0 
                    and s<>0 and x.acc=a.acc and  ( decode(l_kor,1, f_tip_xoz(p_dat01, a.acc, a.tip) , a.tip) in ('W4X', 'XOZ')  and  l_xoz_new = 1 ) and a.rnk=c.rnk;

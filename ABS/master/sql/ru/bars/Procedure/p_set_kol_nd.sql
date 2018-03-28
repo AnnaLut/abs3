@@ -14,7 +14,7 @@ CREATE OR REPLACE PROCEDURE BARS.P_SET_KOL_ND (p_dat01 date, p_nd integer, p_tip
 BEGIN
    begin
 
-      update kol_nd_dat   set dat   = p_dat01 , nd   = p_nd  , tipa = p_tipa, kol = kol_n   where  nd = p_nd and dat = p_dat01;
+      update kol_nd_dat   set dat   = p_dat01 , nd   = p_nd  , tipa = p_tipa, kol = kol_n   where  nd = p_nd and dat = p_dat01 and tipa = p_tipa ;
 
       IF SQL%ROWCOUNT=0 then
          Insert into BARS.kol_nd_dat  (dat    , nd  , tipa  , kol  ) Values (p_dat01, p_nd, p_tipa, kol_n);

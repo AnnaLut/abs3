@@ -15,7 +15,7 @@ PROMPT *** Create  procedure P_KOL_ND_BPK_OTC ***
  l_rnk   accounts.rnk%type; l_custtype customer.custtype%type; l_s080  specparam.s080%type; l_s250 w4_acc.s250%type; 
 
  KOL_    integer; l_fin    integer; l_f    integer; OPEN_    integer; l_TIP    integer; l_vidd  integer; 
- l_fin23 integer; l_grp    integer; l_cls  integer; l_nd     integer; l_kor    INTEGER;
+ l_fin23 integer; l_grp    integer; l_cls  integer; l_nd     integer; l_kor    INTEGER; l_di    integer;
  PR_     number ; FL_      NUMBER ;  
 
  DATSP_  varchar2(30); DASPN_   varchar2(30); l_txt  varchar2(1000); 
@@ -35,6 +35,7 @@ begin
       END;
    end if;
    delete from kol_nd_dat where  dat = p_dat01 and tipa IN (41, 42);
+   select to_char ( p_DAT01, 'J' ) - 2447892 into l_di from dual;
    z23.to_log_rez (user_id , 351 , p_dat01 ,'Начало К-во дней БПК 351 (OTC)');
    l_dat31 := Dat_last_work (p_dat01 - 1);  -- последний рабочий день месяца
    if trunc(p_dat01,'MM') = p_dat01   THEN l_kor := 1; 
@@ -51,7 +52,7 @@ begin
                             select  41 tipa, nd, acc_pk     from bpk_acc where dat_end is null union all                 
                             select  41 tipa, nd, acc_2209   from bpk_acc where acc_2209 is not null and dat_end is null union all 
                             select  41 tipa, nd, acc_2207   from bpk_acc where acc_2207 is not null and dat_end is null) b,accounts a, customer c
-                where b.acc = a.acc and decode(l_kor,1,ost_korr(a.acc,l_dat31,null,a.nbs),2, a.ostc, fost(a.acc,p_dat01) ) < 0 and a.NBS not in ('3550','3551') and a.rnk = c.rnk )
+                where b.acc = a.acc and decode(l_kor,1,ost_korr(a.acc,l_dat31,null,a.nbs),2, a.ostc, snp.FOST( a.acc,l_DI,0,7) ) < 0 and a.NBS not in ('3550','3551') and a.rnk = c.rnk )
                 group by nd, rnk, tipa )
       loop
        p_set_kol_nd( p_dat01, k.nd, k.tipa, k.kol );  
