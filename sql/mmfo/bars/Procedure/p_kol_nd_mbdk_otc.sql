@@ -14,7 +14,7 @@ PROMPT *** Create  procedure P_KOL_ND_MBDK_OTC ***
   l_s080   specparam.s080%type;
   
   KOL_     integer; l_idf    integer;  KOL_N    integer; l_fin23  integer;  OPEN_    integer; l_fin    integer; l_OPEN    integer;
-  PR_      number ; FL_      NUMBER ;  l_kor    INTEGER;
+  PR_      number ; FL_      NUMBER ;  l_kor    INTEGER; l_di     integer;
   DATP_    date   ;
   l_dat31  date   ;                       
            
@@ -30,6 +30,7 @@ begin
       END;
    end if;
    delete from kol_nd_dat where  dat = p_dat01 and tipa IN (5, 6);
+   select to_char ( p_DAT01, 'J' ) - 2447892 into l_di from dual;
    z23.to_log_rez (user_id , 351 , p_dat01 ,'Начало К-во дней МБДК (OTC)');
    begin
       select 1 into l_open from nd_open  where fdat = p_dat01 and rownum=1;
@@ -45,7 +46,7 @@ begin
                   (select e.* from cc_deal e,nd_open n  
                    where n.fdat = p_dat01 and e.nd = n.nd and (e.vidd> 1500  and e.vidd<  1600 ) and e.sdate< p_dat01 and e.vidd<>1502 and  
                          (e.sos>9 and e.sos< 15 or e.wdate >= l_dat31 )) d, cc_add ad,customer c
-             WHERE a.acc = ad.accs  and d.nd = ad.nd and a.rnk=c.rnk  and ad.adds = 0  and  decode(l_kor,1,ost_korr(a.acc,l_dat31,null,a.nbs),2, a.ostc, fost(a.acc,p_dat01) ) < 0  and 
+             WHERE a.acc = ad.accs  and d.nd = ad.nd and a.rnk=c.rnk  and ad.adds = 0  and  decode(l_kor,1,ost_korr(a.acc,l_dat31,null,a.nbs),2, a.ostc, snp.FOST( a.acc,l_DI,0,7)) < 0  and 
                    d.nd=(select max(n.nd) from nd_acc n,cc_deal d1  where n.acc=a.acc and n.nd=d1.nd and (d1.vidd> 1500  and d1.vidd<  1600 ) 
                    and d1.vidd<>1502 and d1.sdate< p_dat01 and  (sos>9 and sos< 15 or d1.wdate >= l_dat31 ) )
              union all                   
@@ -61,7 +62,7 @@ begin
                 where n.nd=k.nd and n.acc=a.acc 
                   and (a.nbs     in (select nbs from rez_deb  where grupa = 3 and ( d_close is null or d_close > p_DAT01 )) or a.tip in ('SP ','SPN')) --('1517','1527','1529','1509') 
                   and  a.nbs not in (select nbs from rez_deb  where grupa = 2 and ( d_close is null or d_close > p_DAT01 ))                             --('1500','1502') 
-                  and decode(l_kor,1,ost_korr(a.acc,l_dat31,null,a.nbs),2, a.ostc, fost(a.acc,p_dat01) ) < 0);
+                  and decode(l_kor,1,ost_korr(a.acc,l_dat31,null,a.nbs),2, a.ostc, snp.FOST( a.acc,l_DI,0,7) ) < 0);
       EXCEPTION WHEN NO_DATA_FOUND THEN  kol_ := 0;
       END;
       p_set_kol_nd( p_dat01, k.nd, k.tipa, kol_ );

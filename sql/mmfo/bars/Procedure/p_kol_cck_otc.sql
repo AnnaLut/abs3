@@ -13,7 +13,7 @@ PROMPT *** Create  procedure p_kol_cck_otc ***
 
  PR_    number ; l_s      NUMBER ; fl_      number ; l_dos  number ; l_cls  integer; l_fin_okpo  NUMBER ;
  KOL_N  integer; l_f      INTEGER; l_fin23  INTEGER; l_fin  INTEGER; l_tipa INTEGER; l_OPEN      integer;
- l_kor  INTEGER;
+ l_kor  INTEGER; l_di     integer;
  DATP_  date   ; l_dat31  date   ; l_dd date;
 
  l_TIP  varchar2(50); DATSP_   varchar2(30); DASPN_   varchar2(30); l_txt    varchar2(1000);
@@ -36,6 +36,7 @@ begin
       select 1 into l_open from nd_open  where fdat = p_dat01 and rownum=1;
    EXCEPTION WHEN NO_DATA_FOUND THEN  p_nd_open(p_dat01); 
    end;
+   select to_char ( p_DAT01, 'J' ) - 2447892 into l_di from dual;
    l_dat31 := Dat_last_work (p_dat01 - 1);  -- последний рабочий день месяца
    z23.to_log_rez (user_id , 351 , p_dat01 ,'Начало К-во дней кредиты (ОТС) ');
    if trunc(p_dat01,'MM') = p_dat01   THEN l_kor := 1; 
@@ -100,17 +101,17 @@ begin
 
             OPEN c0 FOR
                select a.acc, a.nls, a.kv  from  nd_acc n, accounts a 
-               where n.nd=k.nd and n.acc=a.acc and a.tip in ('SP ','SPN','SK9','SL ') and decode(l_kor,1,ost_korr(a.acc,l_dat31,null,a.nbs),2, a.ostc, fost(a.acc,p_dat01) ) < 0 ;
+               where n.nd=k.nd and n.acc=a.acc and a.tip in ('SP ','SPN','SK9','SL ') and decode(l_kor,1,ost_korr(a.acc,l_dat31,null,a.nbs),2, a.ostc, snp.FOST( a.acc,l_DI,0,7) ) < 0 ;
 
          elsif pr_ = 2 THEN 
             OPEN c0 FOR
                select a.acc, a.nls, a.kv  from  nd_acc n, accounts a 
-               where n.nd=k.nd and n.acc=a.acc and a.tip in ('SP ','SL ') and decode(l_kor,1,ost_korr(a.acc,l_dat31,null,a.nbs),2, a.ostc, fost(a.acc,p_dat01) ) < 0;
+               where n.nd=k.nd and n.acc=a.acc and a.tip in ('SP ','SL ') and decode(l_kor,1,ost_korr(a.acc,l_dat31,null,a.nbs),2, a.ostc, snp.FOST( a.acc,l_DI,0,7) ) < 0;
 
          else
             OPEN c0 FOR
                select a.acc, a.nls, a.kv from  nd_acc n, accounts a 
-               where n.nd=k.nd and n.acc=a.acc and a.tip in ('SPN','SK9') and decode(l_kor,1,ost_korr(a.acc,l_dat31,null,a.nbs),2, a.ostc, fost(a.acc,p_dat01) ) < 0;
+               where n.nd=k.nd and n.acc=a.acc and a.tip in ('SPN','SK9') and decode(l_kor,1,ost_korr(a.acc,l_dat31,null,a.nbs),2, a.ostc, snp.FOST( a.acc,l_DI,0,7) ) < 0;
 
          end if;                  
 

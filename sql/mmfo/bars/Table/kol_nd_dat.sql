@@ -44,10 +44,25 @@ COMMENT ON COLUMN BARS.KOL_ND_DAT.TIPA  IS 'Тип актива';
 COMMENT ON COLUMN BARS.KOL_ND_DAT.KOL   IS 'К-во дней';
 COMMENT ON COLUMN BARS.KOL_ND_DAT.KF    IS 'Код филиала';
 
-PROMPT *** Create  constraint PK_KOL_ND_DAT ***
+PROMPT *** Create  constraint KOL_ND_DAT ***
+begin   
+ execute immediate 'alter table KOL_ND_DAT drop constraint PK_KOL_ND_DAT cascade';
+exception when others then
+  if  sqlcode=-2443  then null; else raise; end if;
+ end;
+/
+
+begin   
+ execute immediate 'drop index PK_KOL_ND_DAT ';
+exception when others then
+  if  sqlcode=-1418  then null; else raise; end if;
+ end;
+/
+
+
 begin   
  execute immediate '
-  ALTER TABLE BARS.KOL_ND_DAT ADD CONSTRAINT PK_KOL_ND_DAT PRIMARY KEY (DAT,ND)
+  ALTER TABLE BARS.KOL_ND_DAT ADD CONSTRAINT PK_KOL_ND_DAT PRIMARY KEY (DAT,ND,TIPA)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSMDLI  ENABLE';
 exception when others then
@@ -77,7 +92,7 @@ exception when others then
 PROMPT *** Create  index PK_KOL_ND_DAT ***
 begin   
  execute immediate '
-  CREATE UNIQUE INDEX BARS.PK_KOL_ND_DAT ON BARS.KOL_ND_DAT (DAT,ND) 
+  CREATE UNIQUE INDEX BARS.PK_KOL_ND_DAT ON BARS.KOL_ND_DAT (DAT,ND,TIPA) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSMDLI ';
 exception when others then

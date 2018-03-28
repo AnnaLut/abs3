@@ -12,8 +12,8 @@ CREATE OR REPLACE PROCEDURE BARS.P_KOL_ND_OVER_OTC (p_dat01 date, p_mode integer
 
  l_s080 specparam.s080%type;
 
- l_kol   integer; l_custtype  integer;  l_fin      integer; l_f    integer; l_fin23     integer;
- l_tip   integer; fl_         integer;  l_cls      integer; l_kor  integer; 
+ l_kol   integer; l_custtype  integer;  l_fin      integer; l_f    integer; l_fin23  integer;
+ l_tip   integer; fl_         integer;  l_cls      integer; l_kor  integer; l_di     integer;
  l_dat31 date   ; l_txt  varchar2(1000);
 
  TYPE CurTyp IS REF CURSOR;
@@ -29,6 +29,7 @@ begin
       EXCEPTION WHEN NO_DATA_FOUND THEN  NULL;
       END;
    end if;
+   select to_char ( p_DAT01, 'J' ) - 2447892 into l_di from dual;
    z23.to_log_rez (user_id , 351 , p_dat01 ,'Начало К-во дней ОВЕРДРАФТЫ (OTC)');
    l_dat31 := Dat_last_work (p_dat01 - 1);  -- последний рабочий день месяца
    delete from kol_nd_dat where  dat = p_dat01 and tipa IN (10);
@@ -68,12 +69,12 @@ begin
             else 
             --OPEN c1 FOR
                select max(nvl(f_days_past_due(p_DAT01, acc,decode(custtype,3,25000,50000)),0)) into l_kol
-               from  (select decode(l_kor,1,ost_korr(a.acc,l_dat31,null,a.nbs),2, a.ostc, fost(a.acc,p_dat01) ) ost, acc, custtype
+               from  (select decode(l_kor,1,ost_korr(a.acc,l_dat31,null,a.nbs),2, a.ostc, snp.FOST( a.acc,l_DI,0,7) ) ost, acc, custtype
                       from accounts a, customer c
                       where a.acc in (select acco from acc_over where nd=k.nd) 
                         AND ( NBS IN (select nbs from rez_deb  where grupa = 4 and ( d_close is null or d_close > p_dat01)) or a.tip in ('SP ','SPN') ) and a.rnk=c.rnk   --2067, 2069
                       union all
-                      select decode(l_kor,1,ost_korr(a.acc,l_dat31,null,a.nbs),2, a.ostc, fost(a.acc,p_dat01) ) ost, acc, custtype from accounts a  , customer c
+                      select decode(l_kor,1,ost_korr(a.acc,l_dat31,null,a.nbs),2, a.ostc, snp.FOST( a.acc,l_DI,0,7) ) ost, acc, custtype from accounts a  , customer c
                       where ( NBS IN (select nbs from rez_deb  where grupa = 4 and ( d_close is null or d_close > p_dat01 )) or a.tip in ('SP ','SPN') ) and a.rnk=c.rnk  --2067, 2069
                         AND acc in (select acra from int_accn
                                     where id=0 and acc in (select acco from acc_over  where nd=k.nd)) and nbs not like '8%')
