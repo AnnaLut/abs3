@@ -15,11 +15,14 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #3A для КБ (универсальная) с 01.06.2009
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 27/12/2017 (26/12/2017, 16/11/2017)
+% VERSION     : 27/03/2018 (27/12/2017, 26/12/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+27/03/2018 - не будут включаться в файл Дт обороты которые были в 
+             кореспонденции со счетами овердрафтов - перенос на просрочку 
+             ( Дт 2063  Кт 2600 (овердрафт) )
 27/12/2017 - с 26.12.2017 (на 27.12.2017) в показателе вместо параметра R013
              будет формироваться параметр R011
 26/12/2017 - для KL_R020 изменено условие для поля D_CLOSE
@@ -671,7 +674,7 @@ BEGIN
        commit;
     ----------------------------------------------------------------------------
        DELETE FROM RNBU_HISTORY
-       WHERE odate = dat_ and
+       WHERE odate = dat_ and 
              kf = to_char(mfo_);
     ----------------------------------------------------------------------------
 
@@ -972,6 +975,41 @@ BEGIN
 
                        -- вычитаем "переброски"
                        sdos_ := sdos_ - vost_;
+                       
+                       if substr(trim(nls_),1,3) = '206' and vost_ = 0 then
+                          poisk_ := '260%';
+            
+                          BEGIN
+                             -- переброски с гр.260 (овердрафт) в гр.206 просрочка
+                             SELECT NVL(SUM(s*100), 0)
+                                INTO vost_
+                             FROM tmp_file03
+                             WHERE FDAT = data_
+                               AND accd=acc_
+                               AND nlsk like poisk_ 
+                               AND acck in (select acc from acc_over where NVL (sos, 0) <> 1);
+
+                             p_ins_del (acc_, nls_, kv_, '(переброски с '||substr(trim(nls_),1,3)||' на '||poisk_||') ', sdos_, vost_);
+
+                             p_ins_log (   '(переброски с '||substr(trim(nls_),1,3)||' на '||poisk_||') DK=0 r020='''
+                                        || nbs_
+                                        || ''' Счет='''
+                                        || nls_
+                                        || ''' вал='''
+                                        || kv_
+                                        || ''' дата='''
+                                        || data_
+                                        || ''' сумма=',
+                                        vost_);
+                          EXCEPTION
+                             WHEN NO_DATA_FOUND
+                          THEN
+                             vost_ := 0;
+                          END;
+
+                          -- вычитаем "переброски"
+                          sdos_ := sdos_ - vost_;
+                       end if; 
                    end if;
                 END IF;
 
@@ -1315,14 +1353,14 @@ BEGIN
 
                    if dat_ < dat_izm1
                    then
-                   kodp_ :=
-                         '5'
-                      || nbs_
-                      || r013_
-                      || s180_
-                      || TO_CHAR (2 - cntr_)
-                      || '02'
-                      || LPAD (kv_, 3, '0');
+                      kodp_ :=
+                            '5'
+                         || nbs_
+                         || r013_
+                         || s180_
+                         || TO_CHAR (2 - cntr_)
+                         || '02'
+                         || LPAD (kv_, 3, '0');
                    else
                       kodp_ :=
                             '5'
@@ -1333,7 +1371,6 @@ BEGIN
                          || '02'
                          || LPAD (kv_, 3, '0');
                    end if;
-
 
                    IF s180_ = '0' THEN
                       nls_ := 'X' || nls_;
@@ -1351,20 +1388,20 @@ BEGIN
 
                    if dat_ < dat_izm1
                    then
-                   INSERT INTO RNBU_HISTORY
-                                (odate,
-                                 nls,
-                                 kv, CODCAGENT, ints, s180, k081, k092, dos,
-                                 kos, mdate, k112, mb, d020, isp, ost, acc
-                                )
-                         VALUES (dat_,
-                                 DECODE (SUBSTR (nls_, 1, 1),
-                                         'X', SUBSTR (nls_, 2, 14),
-                                         nls_
-                                        ),
-                                 kv_, cntr_, spcnt_, s180_, k081_, k092_, sdos_,
-                                 skos_, mdate_, k112_, r013_, d020_, isp_, se_, acc_
-                                );
+                      INSERT INTO RNBU_HISTORY
+                                   (odate,
+                                    nls,
+                                    kv, CODCAGENT, ints, s180, k081, k092, dos,
+                                    kos, mdate, k112, mb, d020, isp, ost, acc
+                                   )
+                            VALUES (dat_,
+                                    DECODE (SUBSTR (nls_, 1, 1),
+                                            'X', SUBSTR (nls_, 2, 14),
+                                            nls_
+                                           ),
+                                    kv_, cntr_, spcnt_, s180_, k081_, k092_, sdos_,
+                                    skos_, mdate_, k112_, r013_, d020_, isp_, se_, acc_
+                                   );
                    else
                       INSERT INTO RNBU_HISTORY
                                    (odate,
@@ -1407,7 +1444,7 @@ BEGIN
                 (nbs_ = '2600' and r013_  in ('1','7','8','A') and skos_ > 0)
                  and dat_ < dat_izm1
                      OR
-                (nbs_ = '2600' and r013_  in ('1','7','8','A') and skos_ > 0)
+                (nbs_ in ('2600', '2605','2620','2625','2650','2655') and r011_  = '3' and skos_ > 0)
                  and dat_ >= dat_izm1
                      OR
                 mfou_ not in (300465) and
@@ -1494,7 +1531,7 @@ BEGIN
                         AND t.acck=acc_
                         AND t.nlsd LIKE nbs_ || '%'
                         AND t.accd = s.acc
-                        AND NVL(s.r013,'0') not in ('4','6');
+                        AND NVL(s.r011,'0') = '3';
                    end if;
 
                   -- 14/07/2014 OAB: не исключаем переброску с 2620 текущего счета на 2620 депозитный
@@ -1508,7 +1545,7 @@ BEGIN
                         AND t.acck=acc_
                         AND t.nlsd LIKE nbs_ || '%'
                         AND t.accd = s.acc
-                        AND NVL(s.r013,'0') in ('1','2','3');
+                        AND NVL(s.r011,'0') = '3';
                    end if;
 
                    if nbs_ = '2620' and mfou_ = 300465 then
@@ -2622,20 +2659,20 @@ BEGIN
 
                 -- кредитовые обороты
                 IF (skos_ > 0 AND r050_ = '22' and se_ >= 0) OR
-                   (skos_ > 0 and se_ >= 0 and nbs_ = '2600' and r013p_ in ('1','7','8','A')) OR
-                   (skos_ > 0 and se_ >= 0 and nbs_ = '2605' and r013p_ in ('1','3')) OR
-                   (skos_ > 0 and se_ >= 0 and nbs_ = '2655' and r013p_ = '3') OR
-                   (skos_ > 0 and se_ >= 0 and nbs_ = '2650' and r013p_ in ('1','3','8'))
+                   (skos_ > 0 and se_ >= 0 and nbs_ in ('2600', '2605', '2620', '2625','2650', '2655') and r011_ = '3') 
+--                   (skos_ > 0 and se_ >= 0 and nbs_ = '2605' and r013p_ in ('1','3')) OR
+--                   (skos_ > 0 and se_ >= 0 and nbs_ = '2655' and r013p_ = '3') OR
+--                   (skos_ > 0 and se_ >= 0 and nbs_ = '2650' and r013p_ in ('1','3','8'))
                 THEN
 
                    skos_ := Gl.P_Icurval (kv_, skos_, data_);
 
                    -- IF mfo_ = 300465 AND spcnt_ = 0
                    -- THEN
-                      -- cntr1_ := 'X';
+                   --    cntr1_ := 'X';
                    -- ELSE
                       cntr1_ := TO_CHAR (2 - cntr_);
---                   END IF;
+                   -- END IF;
 
                    if dat_ < dat_izm1
                    then
@@ -2665,20 +2702,20 @@ BEGIN
 
                       if dat_ < dat_izm1
                       then
-                      INSERT INTO RNBU_HISTORY
-                                    (odate,
-                                     nls,
-                                     kv, CODCAGENT, ints, s180, k081, k092, dos,
-                                     kos, mdate, k112, mb, d020, isp, ost, acc
-                                    )
-                             VALUES (dat_,
-                                     DECODE (SUBSTR (nls_, 1, 1),
-                                             'X', SUBSTR (nls_, 2, 14),
-                                             nls_
-                                            ),
-                                     kv_, cntr_, spcnt_, s180_, k081_, k092_, sdos_,
-                                     skos_, mdate_, k112_, r013_, d020_, isp_, se_, acc_
-                                    );
+                         INSERT INTO RNBU_HISTORY
+                                       (odate,
+                                        nls,
+                                        kv, CODCAGENT, ints, s180, k081, k092, dos,
+                                        kos, mdate, k112, mb, d020, isp, ost, acc
+                                       )
+                                VALUES (dat_,
+                                        DECODE (SUBSTR (nls_, 1, 1),
+                                                'X', SUBSTR (nls_, 2, 14),
+                                                nls_
+                                               ),
+                                        kv_, cntr_, spcnt_, s180_, k081_, k092_, sdos_,
+                                        skos_, mdate_, k112_, r013_, d020_, isp_, se_, acc_
+                                       );
                       else
                          INSERT INTO RNBU_HISTORY
                                        (odate,
@@ -2700,20 +2737,20 @@ BEGIN
 
                 -- обороты пролонгации
                 IF (s_prol_ > 0 AND r050_ = '22'  and se_ > 0) OR
-                   (s_prol_ > 0 and se_ > 0 and nbs_ = '2600' and r013p_ in ('1','7','8','A')) OR
-                   (s_prol_ > 0 and se_ > 0 and nbs_ = '2605' and r013p_ in ('1','3')) OR
-                   (s_prol_ > 0 and se_ > 0 and nbs_ = '2655' and r013p_ = '3') OR
-                   (s_prol_ > 0 and se_ > 0 and nbs_ = '2650' and r013p_ in ('1','3','8'))
+                   (s_prol_ > 0 and se_ > 0 and nbs_ in ('2600', '2605', '2620', '2625','2650', '2655')) 
+--                   (s_prol_ > 0 and se_ > 0 and nbs_ = '2605' and r013p_ in ('1','3')) OR
+--                   (s_prol_ > 0 and se_ > 0 and nbs_ = '2655' and r013p_ = '3') OR
+--                   (s_prol_ > 0 and se_ > 0 and nbs_ = '2650' and r013p_ in ('1','3','8'))
                 THEN
 
                    s_prol_ := Gl.P_Icurval (kv_, s_prol_, data_);
 
                    -- IF mfo_ = 300465 AND spcnt_ = 0
                    -- THEN
-                      -- cntr1_ := 'X';
+                   --    cntr1_ := 'X';
                    -- ELSE
                       cntr1_ := TO_CHAR (2 - cntr_);
-                   --END IF;
+                   -- END IF;
 
                    if dat_ < dat_izm1
                    then
@@ -2876,10 +2913,10 @@ BEGIN
 
              -- IF mfo_ = 300465 AND spcnt_ = 0
              -- THEN
-                -- cntr1_ := 'X';
+             --    cntr1_ := 'X';
              -- ELSE
                 cntr1_ := TO_CHAR (2 - cntr_);
-             --END IF;
+             -- END IF;
 
              if dat_ < dat_izm1
              then
@@ -2901,7 +2938,6 @@ BEGIN
                    || d020_
                    || LPAD (kv_, 3, '0');
               end if;
-
 
              IF s180_ = '0' AND LENGTH(trim(nls_)) <= 14
              THEN
@@ -3013,10 +3049,10 @@ BEGIN
 
                    -- IF mfo_ = 300465 AND spcnt_ = 0
                    -- THEN
-                      -- cntr1_ := 'X';
+                   --    cntr1_ := 'X';
                    -- ELSE
                       cntr1_ := TO_CHAR (2 - cntr_);
-                   --END IF;
+                   -- END IF;
 
                    IF s180_ = '0'
                    THEN
@@ -3219,13 +3255,13 @@ BEGIN
                                                   and k.d_close is null
                                               );
 
-                      r013p_ := '0';
-                   EXCEPTION
-                      WHEN NO_DATA_FOUND
-                        THEN
-                        null;
-                     END;
-                end if;
+                         r013p_ := '0';
+                      EXCEPTION
+                         WHEN NO_DATA_FOUND
+                           THEN
+                           null;
+                      END;
+                   end if;
                 else
                    if r011p_ <> '0' then
                       BEGIN
