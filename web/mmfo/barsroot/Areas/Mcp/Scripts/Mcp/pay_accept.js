@@ -477,7 +477,7 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
                     PAY_SUM: { type: 'number' },
                     FULL_NAME: { type: 'string' },
                     NUMIDENT: { type: 'string' },
-                    PAY_DAY: { type: 'string' },
+                    FACT_PAY_DATE: { type: 'date' },
                     DISPLACED: { type: 'string' },
                     STATE_ID: { type: 'number' },
                     STATE_NAME: { type: 'string' },
@@ -517,9 +517,10 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
                 width: "10%"
             },
             {
-                field: "PAY_DAY",
+                field: "FACT_PAY_DATE",
                 title: "Дата<br>зарахування",
-                width: "10%"
+                width: "10%",
+                format: "{0:dd.MM.yyyy HH:mm}"
             },
             {
                 field: "STATE_ID",
