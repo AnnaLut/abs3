@@ -1,4 +1,4 @@
-create or replace package BARS.NBUR_XML 
+create or replace package NBUR_XML
 is
 
   --
@@ -45,13 +45,13 @@ show errors;
 
 ----------------------------------------------------------------------------------------------------
 
-create or replace package body BARS.NBUR_XML
+create or replace package body NBUR_XML
 is
 
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 2.0  2018.03.03';
+  g_body_version  constant varchar2(64) := 'version 2.1  2018.03.28';
   g_dt_fmt        constant varchar2(10) := 'dd.mm.yyyy';
 
   --
@@ -225,7 +225,7 @@ is
 
     bars_audit.trace( '%s: Entry', title );
 
-    l_rpt_code := NBUR_FILES.F_GET_KODF( p_file_id );
+    l_rpt_code := NBUR_FILES.GET_FILE_CODE_ALT( p_file_id );
 
     --
 $if ACC_PARAMS.MMFO $then
@@ -242,7 +242,7 @@ $end
     l_XmlText := '<?xml version="1.0" encoding="utf-8" standalone="yes"?>';
     l_XmlText := l_XmlText || chr(10) || '<NBUSTATREPORT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">';
     l_XmlText := l_XmlText || chr(10) || '  <HEAD>';
-    l_XmlText := l_XmlText || chr(10) || '    <STATFORM>F'||SubStr(l_rpt_code,2,2)||'X</STATFORM>';
+    l_XmlText := l_XmlText || chr(10) || '    <STATFORM>F'||l_rpt_code||'X</STATFORM>';
     l_XmlText := l_XmlText || chr(10) || '    <EDRPOU>'||l_okpo||'</EDRPOU>';
     l_XmlText := l_XmlText || chr(10) || '    <REPORTDATE>'||to_char(l_nbu_rpt_dt,g_dt_fmt)||'</REPORTDATE>';
     l_XmlText := l_XmlText || chr(10) || '  </HEAD>';
