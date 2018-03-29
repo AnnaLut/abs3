@@ -447,6 +447,7 @@ is
   --
   g_body_version  constant varchar2(64) := 'version 19.7  2018.03.27';
   fmt_dt          constant varchar2(10) := 'dd.mm.yyyy';
+  fmt_tm          constant varchar2(21) := 'dd.mm.yyyy hh24:mi:ss';
 
   MODULE_PREFIX   constant varchar2(4)  := 'NBUR';
 
@@ -635,7 +636,7 @@ is
   ( p_tbl_nm       in     nbur_ref_objects.object_name%type
   , p_kf           in     nbur_lst_objects.kf%type
   ) is
-     l_ptsn_nm             varchar2(30);
+    l_ptsn_nm             varchar2(30);
   begin
 
     if ( p_kf Is Null )
@@ -711,16 +712,19 @@ is
 
   end GATHER_TABLE_STATS;
 
-    --
+  --
   --
   --
   procedure COPY_TABLE_STATS
   ( p_tbl_nm       in     nbur_ref_objects.object_name%type
   , p_kf           in     nbur_lst_objects.kf%type
   , p_rpt_dt       in     nbur_lst_objects.report_date%type
+  , p_numrows      in     number default null
   ) is
+    title     constant    varchar2(32) := $$PLSQL_UNIT||'.COPY_TABLE_STATS';
     l_ptsn_nm             varchar2(30);
-    r_srec                dbms_stats.statrec;
+    srec                  dbms_stats.statrec;
+    datevals              dbms_stats.datearray;
     l_numrows             number;
     l_numblks             number;
     l_avgrlen             number;
@@ -728,6 +732,8 @@ is
     l_distcnt             number;
     l_nullcnt             number;
     l_avgclen             number;
+    l_min_dt              date;
+    l_max_dt              date;
   begin
 
     if ( p_kf Is Null )
@@ -735,6 +741,12 @@ is
       null;
     else
 
+/*
+      копіювання статистики
+      з субпартиції архівної    таблиці NBUR_DM_%_ARCH
+      в партицію    оперативної таблиці NBUR_DM_%
+      1) 
+*/
       l_ptsn_nm := 'P_'||p_kf;
 
       dbms_application_info.set_client_info( 'Copy stats to "'||p_tbl_nm||'" partition "'||l_ptsn_nm||'".' );
@@ -752,9 +764,10 @@ is
       ( ownname  => 'BARS'
       , tabname  => p_tbl_nm
       , partname => l_ptsn_nm
-      , numrows  => l_numrows
+      , numrows  => nvl(p_numrows,l_numrows)
       , numblks  => l_numblks
       , avgrlen  => l_avgrlen
+      , force    => TRUE
       );
 
       DBMS_STATS.GET_COLUMN_STATS
@@ -765,20 +778,31 @@ is
       , distcnt  => l_distcnt
       , density  => l_density
       , nullcnt  => l_nullcnt
-      , srec     => r_srec
+      , srec     => srec
       , avgclen  => l_avgclen
       );
 
-      -- DBMS_STATS.CONVERT_RAW_VALUE(
-      --  rawval     RAW, 
-      --  resval OUT DATE);
+      DBMS_STATS.CONVERT_RAW_VALUE( srec.minval, l_min_dt );
+      DBMS_STATS.CONVERT_RAW_VALUE( srec.maxval, l_max_dt );
 
-      -- DBMS_STATS.PREPARE_COLUMN_VALUES(
-      -- r_srec, ,NOVALS); --  NOVALS DBMS_STATS.DATEARRAY;
-      -- NOVALS := DBMS_STATS.DATEARRAY(to_date('2004-01-01','yyyy-mm-dd'),to_date('2005-01-01','yyyy-mm-dd'),to_date('2006-01-01','yyyy-mm-dd'));
+      bars_audit.info( title||': OLD min_dt='||to_char(l_min_dt,fmt_tm)||', max_dt='||to_char(l_max_dt,fmt_tm) );
 
-      r_srec.minval := utl_raw.cast_from_number(5000);
-      r_srec.maxval := utl_raw.cast_from_number(5999);
+      -- for number
+      -- srec.minval := utl_raw.cast_from_number(5000);
+      -- srec.maxval := utl_raw.cast_from_number(5999);
+
+      -- for date
+      datevals := DBMS_STATS.DATEARRAY( p_rpt_dt, p_rpt_dt );
+
+      DBMS_STATS.PREPARE_COLUMN_VALUES
+      ( srec     => srec
+      , datevals => datevals
+      );
+
+      DBMS_STATS.CONVERT_RAW_VALUE( srec.minval, l_min_dt );
+      DBMS_STATS.CONVERT_RAW_VALUE( srec.maxval, l_max_dt );
+
+      bars_audit.info( title||': NEW min_dt='||to_char(l_min_dt,fmt_tm)||', max_dt='||to_char(l_max_dt,fmt_tm) );
 
       DBMS_STATS.SET_COLUMN_STATS
       ( ownname  => 'BARS'
@@ -789,8 +813,11 @@ is
       , density  => l_density
       , nullcnt  => l_nullcnt
       , avgclen  => l_avgclen
-      , srec     => r_srec
+      , srec     => srec
+      , force    => TRUE
       );
+
+    end if;
 
   end COPY_TABLE_STATS;
 
@@ -5657,44 +5684,37 @@ is
         case t_tbl_lst(i)
           when ( 'NBUR_DM_AGRM_ACCOUNTS' )
           then
-         -- if ( l_vrsn_id = 1 )
-         -- then
-              -- check table type
-              select count(1)
-                into l_iot
-                from ALL_TABLES
-               where OWNER = 'BARS'
-                 and TABLE_NAME like 'NBUR_DM_AGRM_ACCOUNTS_ARCH'
-                 and IOT_TYPE Is Not Null;
-              if ( l_iot > 0 )
-              then -- for index-organized table create partition manually
-                if ( p_kf Is Null )
-                then
-                  for b in ( select MFO
-                               from BANKS$BASE
-                              where MFOU = '300465'
-                                and BLK = 0
-                                and SSP Is Not Null
-                                and ( p_kf = MFO or p_kf is Null )
-                              order by 1 )
-                  loop
-                    CREATE_RANGE_PARTITION
-                    ( p_dm_tab_nm => 'NBUR_DM_AGRM_ACCOUNTS_ARCH'
-                    , p_rpt_dt    => p_report_date
-                    , p_kf        => b.MFO
-                    , p_vrsn_id   => Null
-                    );
-                  end loop;
-                else
+            -- check table type
+            select count(1)
+              into l_iot
+              from ALL_TABLES
+             where OWNER = 'BARS'
+               and TABLE_NAME like 'NBUR_DM_AGRM_ACCOUNTS_ARCH'
+               and IOT_TYPE Is Not Null;
+            if ( l_iot > 0 )
+            then -- for index-organized table create partition manually
+              if ( p_kf Is Null )
+              then
+                for b in ( select KF
+                             from MV_KF
+                            order by KF )
+                loop
                   CREATE_RANGE_PARTITION
                   ( p_dm_tab_nm => 'NBUR_DM_AGRM_ACCOUNTS_ARCH'
                   , p_rpt_dt    => p_report_date
-                  , p_kf        => p_kf
+                  , p_kf        => b.KF
                   , p_vrsn_id   => Null
                   );
-                end if;
+                end loop;
+              else
+                CREATE_RANGE_PARTITION
+                ( p_dm_tab_nm => 'NBUR_DM_AGRM_ACCOUNTS_ARCH'
+                , p_rpt_dt    => p_report_date
+                , p_kf        => p_kf
+                , p_vrsn_id   => Null
+                );
               end if;
-         -- end if;
+            end if;
 
           when ( 'NBUR_DM_CHRON_AVG_BALS' )
           then
