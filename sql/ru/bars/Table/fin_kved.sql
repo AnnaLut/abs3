@@ -60,9 +60,12 @@ COMMENT ON COLUMN BARS.FIN_KVED.WEIGHT IS 'Питома вага';
 COMMENT ON COLUMN BARS.FIN_KVED.FLAG IS 'Флаг активності 0-ні 1-так';
 
 
+update fin_kved set kod = '2000' where kod is null;
+commit;
+
 begin 
   execute immediate 
-    ' ALTER TABLE BARS.FIN_PD  DROP CONSTRAINT PK_FINKVED';
+    ' ALTER TABLE BARS.FIN_KVED  DROP CONSTRAINT PK_FINKVED';
 exception when others then 
   if sqlcode=-2443 then null; else raise; end if;
 end;
