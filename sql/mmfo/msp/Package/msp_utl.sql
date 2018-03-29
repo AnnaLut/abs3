@@ -735,6 +735,7 @@ create or replace package body msp_utl is
   procedure parse_files
   is
     l_err_state msp_envelope_files_info.state%type;
+    l_err_msg   varchar2(4000);
   begin
     -- set status 1 IN_PARSE Виконується парсинг
     for r in (select distinct id from msp_envelope_files_info where state in (-1))
@@ -756,10 +757,12 @@ create or replace package body msp_utl is
         exception
           when others then
             l_err_state := 2; -- 2 PARSE_ERROR Помилка парсингу
+            l_err_msg   := sqlerrm;
+            exit;
         end;
       end loop;
 
-      set_envelope_file_state(r.id, coalesce(l_err_state, 3), sqlerrm); -- 2 PARSE_ERROR Помилка парсингу / 3 PARSED Файл розібраний 
+      set_envelope_file_state(r.id, coalesce(l_err_state, 3), l_err_msg); -- 2 PARSE_ERROR Помилка парсингу / 3 PARSED Файл розібраний 
       commit;
     end loop;
   end parse_files;
