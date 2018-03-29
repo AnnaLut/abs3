@@ -9,10 +9,11 @@ PROMPT *** Create  procedure CCK_351 ***
 
   CREATE OR REPLACE PROCEDURE BARS.CCK_351 (p_dat01 date, p_nd integer, p_mode integer  default 0 ) IS
 
-/* Версия 14.5   28-11-2017 16-11-2017  17-10-2017  03-10-2017  06-09-2017  30-08-2017  12-06-2017
+/* Версия 14.6   26-03-2018  28-11-2017 16-11-2017  17-10-2017  03-10-2017  06-09-2017  30-08-2017  12-06-2017
    Розрахунок кредитного ризику по кредитах + БПК
 
    ----------------------------------------------
+27) 26-03-2018(14.6) - По физикам при определении PD использ. l_idf вместо l_fp (не перехідні положення) + по оверам исключить 3570,3578
 26) 28-11-2017(14.5) - Новый план счетов по ОВЕРАМ холдинга берем все счета + 9003 вместо 9023
 25) 27-11-2017(14.4) - LGD 9129 для безризикових =1 , по ризиковим розраховується
 24) 17-10-2017(14.3) - При удалении из таблицы добавила tipa = 90 - 9129 по оверам и 94 - 9129 по БПК
@@ -143,7 +144,7 @@ begin
                       substr( decode(c.custtype,3, c.nmk, nvl(c.nmkk,c.nmk) ) , 1,35) NMK, decode(trim(c.sed),'91',3,c.custtype) custtype,
                       a.branch, DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ,trim(c.sed) sed         --, n.nd,a.*
                from   nd_acc n,accounts a , customer c
-               where  n.nd = d.nd and n.acc=a.acc --and a.nbs in ('2067','2069' ,'2600','2607','2608' ,'9129') Берем все счета 16-11-2017
+               where  n.nd = d.nd and n.acc=a.acc and a.nbs not in ('3570','3578') --and a.nbs in ('2067','2069' ,'2600','2607','2608' ,'9129') Берем все счета 16-11-2017 кроме 3570,3578 14-03-2018
                  and  ost_korr(a.acc,l_dat31,null,a.nbs) <>0 and a.rnk = c.rnk;
          else
             OPEN c0 FOR
@@ -302,12 +303,12 @@ begin
                   elsif  l_S250  = 8 and d.vidd not in ( 1, 2, 3) THEN
                      l_pd := f_fin_pd_grupa (2, l_kol);
                   else
-                     if s.custtype = 3   THEN   --or d.prod like '21%' THEN
-                        l_pd  := fin_nbu.get_pd(s.rnk, d.nd, p_dat01,l_fin, VKR_,l_fp);
-                        l_idf := l_fp;
-                     else
-                        l_pd  := fin_nbu.get_pd(s.rnk, d.nd, p_dat01,l_fin, VKR_,l_idf);
-                     end if;
+                     --if s.custtype = 3   THEN   --or d.prod like '21%' THEN
+                     l_pd  := fin_nbu.get_pd(s.rnk, d.nd, p_dat01,l_fin, VKR_,l_idf);
+                        --l_idf := l_fp;
+                     --else
+                     --   l_pd  := fin_nbu.get_pd(s.rnk, d.nd, p_dat01,l_fin, VKR_,l_idf);
+                     --end if;
                   end if;
                end if;
                if s.rnk = 90931101 and sys_context('bars_context','user_mfo') = '300465' THEN  -- COBUSUPABS-5538

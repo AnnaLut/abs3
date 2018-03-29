@@ -9,9 +9,10 @@ PROMPT *** Create  procedure P_KOL_ND ***
 
   CREATE OR REPLACE PROCEDURE BARS.P_KOL_ND (p_dat01 date, p_nd integer, p_mode integer) IS
 
-/* Версия 7.0 22-06-2017  20-03-2017  23-01-2017  21-12-2016  07-11-2016
+/* Версия 7.1   26-03-2018  22-06-2017  20-03-2017  23-01-2017  21-12-2016  07-11-2016
    Кількість днів прострочки по договору + фін.клас
    -------------------------------------
+ 7) 26-03-2018(7.1) - фін.класс не определен для физ.=5, для юр. =10  (Письмо Коваленко Светланы 23-03-2018)
  6) 22-06-2017 - Если не установлен фин.стан - корректировка на к-во дней просрочки.
  5) 20-03-2017 - Не доходило до перех_дних положень
  4) 23-01-2017 - Добавлен параметр S080 в p_get_nd_val
@@ -240,11 +241,11 @@ begin
       if (l_fin is null or l_fin = 0) and k.vidd in ( 1, 2, 3) THEN
          l_txt := 'Кредити.';
          p_error_351( P_dat01, k.nd, user_id,15, null, null, null, null, l_txt, k.rnk, null);
-         l_fin := least(nvl(l_fin23,1),4);  -- к-во дней до 31 , но не определен фин.клас. (не выше 4 , т.к. kol>=31 - 5 клас
+         l_fin := 10;  -- фін.класс не определен
       --logger.info('FIN 5 : nd = ' || k.nd || ' l_fin = '|| l_fin || ' k.fin23 = '|| k.fin23 ) ;
       end if;
-      if l_fin is null and k.vidd in (11, 12, 13) THEN l_fin := nvl(l_fin,f_fin23_fin351(l_fin23,kol_n));
-      else if l_fin is null or l_fin=0            THEN l_fin := nvl(k.fin23,1); end if;
+      if l_fin is null and k.vidd in (11, 12, 13) THEN l_fin := 5; -- фін.класс не определен  (Письмо Коваленко Светланы 23-03-2018) nvl(l_fin,f_fin23_fin351(l_fin23,kol_n));
+      else if l_fin is null or l_fin=0            THEN l_fin := 5;  end if; --??  nvl(k.fin23,1);
       end if;
       --logger.info('FIN 3 : nd = ' || k.nd || ' l_fin = '|| l_fin || ' k.fin23 = '|| k.fin23 ) ;
       --logger.info('REZ_nd_351 6 : nd = ' || k.nd || ' l_fin = '|| l_fin || ' fin23 = '|| k.fin23) ;
