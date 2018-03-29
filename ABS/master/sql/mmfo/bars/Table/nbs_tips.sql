@@ -44,11 +44,11 @@ PROMPT *** ALTER_POLICIES to NBS_TIPS ***
  exec bpa.alter_policies('NBS_TIPS');
 
 
-COMMENT ON TABLE BARS.NBS_TIPS IS 'Связь R020+OB22<->Типы счетов';
+COMMENT ON TABLE  BARS.NBS_TIPS      IS 'Связь R020+OB22<->Типы счетов';
 COMMENT ON COLUMN BARS.NBS_TIPS.OB22 IS 'Параметр OB22';
-COMMENT ON COLUMN BARS.NBS_TIPS.NBS IS 'Номер балансового рахунку (R020)';
-COMMENT ON COLUMN BARS.NBS_TIPS.TIP IS 'Тип рахунку';
-COMMENT ON COLUMN BARS.NBS_TIPS.OPT IS '';
+COMMENT ON COLUMN BARS.NBS_TIPS.NBS  IS 'Номер балансового рахунку (R020)';
+COMMENT ON COLUMN BARS.NBS_TIPS.TIP  IS 'Тип рахунку';
+COMMENT ON COLUMN BARS.NBS_TIPS.OPT  IS 'Необязятельность типа';
 
 
 
