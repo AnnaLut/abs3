@@ -170,7 +170,7 @@ function Check_MainRekv() {
         var isDocPassport = gE(getFrame('Tab3'), 'ddl_PASSP').value === "1";
         if (tmpSel == '1') {
             var ln = gE(curTab, 'ed_FIO_LN').value;
-            // debugger;
+
             if (sameSymbolsMask.test(ln.toUpperCase()) && ln.length >= 2) {
                 alert('Прізвище має складатись з неоднакових символів.');
                 if (curElement == '') curElement = 'ed_FIO_LN';
@@ -754,7 +754,7 @@ function Check_ClientRekvPerson() {
 }
 
 function Check_ClientRekvPhone(ignoreConfirmation) {
-    
+        
     var validPhone = validatePhone(ignoreConfirmation);
     if (validPhone.Status != 'ok') {
         if (validPhone.Status == 'duplSimbMobPhone') {
@@ -769,8 +769,12 @@ function Check_ClientRekvPhone(ignoreConfirmation) {
             } else {
                 //для фіз осіб не спд виконуємо валідацію мобільного телефону
                 if (obj_Parameters['CUSTTYPE'] === 'person' && !isCustomerSpd()) {
-                    var validationResult = ExecSync('ValidateMobilePhone', { rnk: (obj_Parameters['ID'] == '' ? 0 : obj_Parameters['ID']), phoneOkpo: validPhone.Phone + "&" + parent.obj_Parameters["OKPO"] }).d;
+                    var validationResult = ExecSync('ValidateMobilePhone', { rnk: (obj_Parameters['ID'] == '' ? 0 : obj_Parameters['ID']), phoneOkpo: validPhone.Phone + "&" + obj_Parameters["OKPO"] }).d;
 
+                    if (!validationResult) {
+                        alert('Необроблена помилка перевірки № тел. в ValidateMobilePhone');
+                        return false;
+                    }
                     if (validationResult.Code != 'OK') {
                         alert(validationResult.Text);
                         return false;
@@ -1031,8 +1035,7 @@ function getArray(associativeArray) {
 
 function Register() {
     locked = false;
-
-	debugger;
+	
     if (validate()) {
         var ClientRekv;
         if (obj_Parameters['CUSTTYPE'] == 'person') ClientRekv = Check_ClientRekvPerson();
@@ -1588,7 +1591,7 @@ function validatePhone(ignoreConfirmation) {
     var result = { Status: 'ok', Message: '' }
     var curTab = getFrame('Tab3');
     if (gE(curTab, 'ckb_main').checked) {
-        
+                
         var mobPhone = '';
         if (custAttrList['MPNO'] != undefined) {
             mobPhone = custAttrList['MPNO'].Value;
