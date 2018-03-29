@@ -20,7 +20,7 @@ PROMPT *** Create  procedure P_KOL_CP_OTC ***
 
 begin
    delete from kol_nd_dat where  dat = p_dat01 and tipa IN (15);
-   for k in ( select 15 tipa, f_days_past_due (p_dat01,accexpr,0) kol, c.*  from cp_deal c where  c.ACCEXPR IS NOT NULL AND KF = sys_context('bars_context','user_mfo') )
+   for k in ( select 15 tipa, f_days_past_due (p_dat01,accexpr,0) kol, c.*  from cp_deal c where  c.ACCEXPR IS NOT NULL )
    LOOP
        p_set_kol_nd( p_dat01, k.ref, k.tipa, k.kol );  
    end LOOP;
