@@ -254,6 +254,10 @@ public partial class credit_fin_nbu_fin_kved : Bars.BarsPage
         {
             ShowError("Не заповнено Код за КВЕД-2010 " + ". !!!");
         }
+        else if (string.IsNullOrEmpty(dl_kod.SelectedValue))
+        {
+            ShowError("Не заповнено Код рядка форми2 " + ". !!!");
+        }
         else
         {
             OracleConnection con = OraConnector.Handler.IOraConnection.GetUserConnection();
