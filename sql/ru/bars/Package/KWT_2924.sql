@@ -1,12 +1,20 @@
-CREATE OR REPLACE PACKAGE KWT_2924 IS
 
- G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :=  'ver.4.1 30.11.2017';
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/kwt_2924.sql =========*** Run *** ==
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.KWT_2924 IS
+
+ G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :=  'ver.4.2 13.02.2018';
 
 /*
  добавлено АТМ
  Пакедж по квитовке счетов 2924
 */
 ---================================================================
+procedure DEL_ATM3 (p_acc number) ; -- Очистка План-Частка~суми заг.плат
+procedure UPD3     (p_acc number, p_REF1 number, p_Del number, p_S3 number ) ; -- План-Частка~суми заг.плат
 procedure CLS_ATM  ( p_DAT date,    p_acc  number , p_pap int );
 procedure DEL_ATM2 ( p_REF1 number, p_REF2 number ) ;
 procedure DEL_ATM1 ( p_ACC  number, p_REF1 number ) ;
@@ -30,18 +38,11 @@ function body_version   return varchar2;
 
 END KWT_2924;
 /
-show err;
---------------------
-GRANT EXECUTE ON KWT_2924 TO BARS_ACCESS_DEFROLE;
-
-
----------------------------------------------------------
-CREATE OR REPLACE PACKAGE BODY KWT_2924 IS
- G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=   'ver.4. 15.11.2017';
+CREATE OR REPLACE PACKAGE BODY BARS.KWT_2924 IS
+ G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=   'ver.4.2 13.02.2018';
 /*
-
+ 13.02.2018 Sta -- План-Частка~суми заг.плат
  15.11.2017 Sta -- Трансфер 2017 6399.01 => 6340.01
-
  01.11.2017 Sta дох/расх за прошліе 180 дней
  21.09.2017 Sta Внебаланс при закр на расходы
  20.09.2017 OYF Изменены имена табл по требованиям стандарта
@@ -57,6 +58,26 @@ CREATE OR REPLACE PACKAGE BODY KWT_2924 IS
  g_TAG ACCOUNTS_FIELD.tag%type := 'KWT_2924';
  n_err number      := -20203 ;
 ---================================================================
+procedure DEL_ATM3 (p_acc number) is  -- Очистка План-Частка~суми заг.плат
+begin If gl.doc.s <> to_number(pul.GET('ITOG3')) then 
+         raise_application_error( n_err, 'Сума документу НЕ = Сумі введених часток = ' || to_number(pul.GET('ITOG3')) ) ;
+      end if ;
+      insert into atm_ref2 (ref1, ref2, s) select ref1, gl.aRef, s from atm_ref3 where acc = p_acc ;
+      delete from atm_ref3 where acc = p_acc ;
+      pul.put ('ITOG3', null );
+end del_atm3;
+
+procedure UPD3     (p_acc number, p_REF1 number, p_Del number, p_S3 number ) is -- План-Частка~суми заг.плат
+ l_I3 number ;
+begin
+ If p_S3 > p_Del then return; end if;
+ ---------------------------------------
+ delete from ATM_REF3 where acc= p_acc and  REF1 = p_Ref1   ;
+ insert into ATM_REF3 (s,ref1,acc) values (p_S3*100,p_Ref1, p_acc);
+ select sum( s) into l_I3 from ATM_REF3 where acc= p_acc  ;
+ pul.put ('ITOG3', to_char(l_I3) );
+end UPD3;
+
 procedure CLS_ATM  ( p_DAT date,    p_acc number , p_pap int ) is
   oo oper%rowtype;   l_DAT date ; l_OST number;   l_dk1 int  ; l_dk2 int ;   l_D1  number; l_D2   number;
   BBBBOO varchar2 (6) ;
@@ -72,7 +93,7 @@ begin
         l_ost := fost ( k.acc, (l_dat-1) );
         l_dk1 := k.pap - 1 ;
         l_DK2 := 2 - k.pap ;
-        -- 
+        --
         begin select r020||ob22 into BBBBOO from sb_ob22 where r020||ob22  in ('639901','634001') and d_close is null and rownum = 1 ;  -- Трансфер 2017
         EXCEPTION WHEN NO_DATA_FOUND THEN raise_application_error( n_err, 'В довіднику SB_OB22 відсутня аналітика для 63**' )  ;
         end;
@@ -157,35 +178,23 @@ begin l_ACC  := NVL ( p_acc, to_number( pul.get('ATM_ACC' ))) ;
       l_REF2 := NVL( p_ref2, gl.aRef ) ;
       l_DK1  :=              to_number (pul.get('ATM_DK'  ))  ; l_DK2 := 1- l_DK1;
 
-  bars_audit.trace('KWT_2924_INS_ATM2('
-            ||' p_ACC   => '||p_ACC
-            ||',p_REF1  => '||p_REF1
-            ||',p_REF2  => '||p_REF2
-            ||',l_ACC   => '||l_ACC
-            ||',l_REF1  => '||l_REF1
-            ||',l_REF2  => '||l_REF2
-            ||',l_DK1   => '||l_DK1
-            ||')'
-            );
+      bars_audit.trace('KWT_2924_INS_ATM2('||' p_ACC=> '||p_ACC||',p_REF1=> '||p_REF1||',p_REF2=> '||p_REF2||',l_ACC=> '||l_ACC||',l_REF1=> '||l_REF1||',l_REF2=> '||l_REF2||',l_DK1   => '||l_DK1||')'  );
 
       select         s     into l_D1 from opldok where ref =        l_ref1                                     and acc = l_acc and dk =  l_dk1 ;
-
       select NVL(sum(s),0) into l_D2 from opldok where ref in (select ref2 from atm_ref2 where ref1 = l_ref1 ) and acc = l_acc and dk =  l_dk2 ;
       l_del  := l_D1 - l_D2 ;
 
       If l_Del <= 0 then  raise_application_error(n_err,'Сума введеного доку HE може бути більшою, ніж '||l_Del/100  )  ;  end if ;
-begin
-        select ref into l_ref2 from opldok o where o.acc = l_acc and o.ref = p_ref2 and o.dk = l_DK2 and o.s <= l_Del;
-     exception when no_data_found then null;
-   end;      
+
+      begin   select ref into l_ref2 from opldok o where o.acc = l_acc and o.ref = p_ref2 and o.dk = l_DK2 and o.s <= l_Del;
+      exception when no_data_found then null;
+      end;  
+
       insert into atm_ref2 (ref1, ref2) values (l_ref1, l_ref2);
 
       --insert into atm_ref2 (ref1, ref2) select l_ref1, l_ref2 from opldok o where o.acc = l_acc and o.ref = p_ref2 and o.dk = l_DK2 and o.s <= l_Del;
-       bars_audit.trace('KWT_2924_INS_ATM2_atmref2('
-            ||',l_REF2  => '||l_REF2
-            ||',l_REF1  => '||l_REF1
-            ||')'
-            );
+       bars_audit.trace('KWT_2924_INS_ATM2_atmref2('||',l_REF2  => '||l_REF2||',l_REF1  => '||l_REF1   ||')'  );
+
 end INS_ATM2;
 
 procedure RR ( p_mode int, p_acc number, p_s number, p_ref number ) is
@@ -435,4 +444,15 @@ function body_version   return varchar2 is begin  return 'Package body KWT_2924 
 begin   null ;
 END KWT_2924 ;
 /
-show err;
+ show err;
+ 
+PROMPT *** Create  grants  KWT_2924 ***
+grant EXECUTE                                                                on KWT_2924        to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on KWT_2924        to START1;
+
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/kwt_2924.sql =========*** End *** ==
+ PROMPT ===================================================================================== 
+ 

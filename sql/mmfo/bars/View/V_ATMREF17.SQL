@@ -1,14 +1,5 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_ATMREF17.sql =========*** Run *** ===
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_ATMREF17 ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_ATMREF17 ("ACC", "KV", "NLS", "NMS", "BRANCH", "TIP", "OB22", "OSTC", "DK", "REF1", "VDAT1", "S1", "NAZN1", "KOL", "S2", "DEL", "NLS_2909", "NAZN_PKR", "NAZN_015", "NAZN_310", "CHK") AS 
-  SELECT a.acc,
+ CREATE OR REPLACE FORCE VIEW BARS.V_ATMREF17 
+ as SELECT a.acc,
           a.kv,
           a.nls,
           a.nms,
@@ -54,7 +45,16 @@ PROMPT *** Create  view V_ATMREF17 ***
           || ','
           || r1.ref1
           || ',:REF);'
-             CHK
+             CHK,
+             'set role bars_access_defrole@KWT_2924.DEL_ATM3('
+          || a.acc
+          || ',:REF);'
+		     CHK3,
+            (SELECT s / 100
+             FROM ATM_REF3
+            WHERE ref1 = r1.REF1 AND acc = a.acc)
+             S3,
+          TO_NUMBER (pul.GET ('ITOG3')) / 100 ITOG3
      FROM (SELECT *
              FROM accounts
             WHERE acc = TO_NUMBER (pul.GET ('ATM_ACC'))) a,
@@ -70,13 +70,11 @@ PROMPT *** Create  view V_ATMREF17 ***
           AND r1.ref1 = o1.REF
           AND r1.ref1 = r2.ref1(+)
           AND o1.sos = 5;
+		  
 
-PROMPT *** Create  grants  V_ATMREF17 ***
-grant SELECT                                                                 on V_ATMREF17      to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_ATMREF17      to UPLD;
+		  
+CREATE OR REPLACE SYNONYM BARS.V_ATMREF18 FOR BARS.V_ATMREF17;
 
+GRANT SELECT ON BARS.V_ATMREF17 TO BARS_ACCESS_DEFROLE;
 
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_ATMREF17.sql =========*** End *** ===
-PROMPT ===================================================================================== 
+GRANT SELECT ON BARS.V_ATMREF17 TO UPLD;
