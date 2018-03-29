@@ -9,9 +9,10 @@ PROMPT *** Create  procedure P_KOL_ND_BPK ***
 
   CREATE OR REPLACE PROCEDURE BARS.P_KOL_ND_BPK (p_dat01 date, p_mode integer) IS
 
-/* Версия 4.1 08-02-2017   24-01-2017  03-10-2016
+/* Версия 4.3  26-03-2018 08-02-2017   24-01-2017  03-10-2016
    К_льк_сть дн_в прострочки по договорам БПК
    -------------------------------------
+ 7) 26-03-2018(4.3) - если фін.класс не определен для физ.=5, для юр. =10  (Письмо Коваленко Светланы 23-03-2018)
  6) 24-10-2017(4.2) - 2625,2627 - и нет др. задолженности - fin = 5, VKR = 'ГГГ', PD = 1
  5) 08-02-2017 - Изменено условие пересчета к-ва дней по БПК
  4) 08-02-2017 - Портфельный метод через функцию f_get_port (k.nd, k.rnk);
@@ -107,12 +108,12 @@ begin
          if (l_fin is null or l_fin = 0) and k.custtype = 2 THEN
             l_txt := 'ЮО.';
             p_error_351( P_dat01, k.nd, user_id, 15, null, k.custtype, null, null, l_txt, k.rnk, NULL);
-            l_fin := nvl(l_fin23,1);
-         ELSIF (l_fin is null or l_fin = 0) and k.custtype = 3  THEN
-            l_fin := nvl(l_fin,f_fin23_fin351(l_fin23,k.kol));
+            l_fin := 10;
+         ELSIF (l_fin is null or l_fin = 0) and k.custtype = 3  THEN l_fin := 5; -- фін.класс не определен  (Письмо Коваленко Светланы 23-03-2018)
+            --l_fin := nvl(l_fin,f_fin23_fin351(l_fin23,k.kol));
          END IF;
          if l_fin is null or l_fin=0 THEN
-            l_fin := nvl(l_fin23,1);
+            l_fin := 5; -- фін.класс не определен  (Письмо Коваленко Светланы 23-03-2018)  l_fin := nvl(l_fin23,1);
          end if;
          fin_nbu.record_fp_nd('CLSP', l_fin, l_f, p_dat01, k.nd, k.rnk); -- ф_н.стан зкоригований на к-ть дн_в прострочки
          l_s080 := f_get_s080(p_dat01, l_tip, l_fin);

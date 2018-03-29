@@ -9,9 +9,10 @@ PROMPT *** Create  procedure OVER_351 ***
 
   CREATE OR REPLACE PROCEDURE BARS.OVER_351 (p_dat01 date, p_mode integer  default 0 ) IS
 
-/* Версия 10.4  03-01-2018  28-11-2017  16-11-2017  12-09-2017  04-05-2017   05-04-2017  06-03-2017
+/* Версия 10.5  26-03-2018  03-01-2018  28-11-2017  16-11-2017  12-09-2017  04-05-2017   05-04-2017  06-03-2017
  Розрахунок кредитного ризику по ОВЕРДРАФТАХ
 -------------------------------------------
+15) 26-03-2018(10.5) - 9129 не ризиковий (fin=1) + s080
 14) 03-01-2018(10.4) - тормозился расчет
 13) 28-11-2017(10.3) - Новый план счетов через REZ_DEB (2069 --> SPN)
 12) 27-11-2017(10.2) - LGD для 9129 безризикових =1 , по ризиковим розраховується
@@ -216,7 +217,10 @@ begin
             else                                              l_LGD := round(greatest(0,1 - (l_zal_lgd + L_RC) / l_s),8);
             end if;
 
-            if s.nbs in ('9129','9122') and l_r013 = 9 THEN l_pd :=0; l_pd_0 := 1; l_lgd := 1;  end if;
+            if s.nbs in ('9129','9122') and l_r013 = 9 THEN 
+               l_pd   :=0; l_pd_0 := 1; l_lgd := 1; l_fin := 1;
+               l_s080 := f_get_s080 (p_dat01,l_tip_fin, l_fin);
+            end if;
             IF l_dv >= 51 and  l_lgd >=l_lgd_51 then
                if f_rnk_not_uudv(s.rnk) = 0 THEN l_LGD  := l_lgd_51; end if;
             end if;
