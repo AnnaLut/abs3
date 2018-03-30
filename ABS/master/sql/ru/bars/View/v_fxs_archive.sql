@@ -86,7 +86,7 @@ AS
                        'A', sumb / suma,
                        'B', suma / sumb,
                        GREATEST (suma, sumb) / LEAST (suma, sumb)),
-               4)
+               8)
                KURS,
             sumc / POWER (10, ta.dig) sumc,
             CASE
