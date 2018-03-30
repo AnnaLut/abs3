@@ -15,7 +15,7 @@ PROMPT *** Create  view V_FM_OSC_RULE5 ***
           AND SUBSTR (DECODE (o.dk, 0, o.nlsb, o.nlsa), 1, 4) IN ('1001',
                                                                   '1002',
                                                                   '1005')
-          AND o.mfoa = bc.current_mfo
+          AND o.mfoa = gl.kf
            AND p.dk = 1
           AND (   a.nls LIKE '20%'
                OR a.nls LIKE '21%'
