@@ -609,7 +609,7 @@ namespace BarsWeb.Areas.Forex.Infrastucture.DI.Implementation
                     new OracleParameter("p_vn_flag", OracleDbType.Decimal) { Value = agreement.VN_FLAG == true ? 1 : 0},
                     new OracleParameter("p_nazn", OracleDbType.Varchar2) {  Value = agreement.NAZN},
                     new OracleParameter("p_f092", OracleDbType.Varchar2) {  Value = agreement.F092_CODE},
-                    new OracleParameter("p_forex", OracleDbType.Varchar2) {  Value = ""}
+                    new OracleParameter("p_forex", OracleDbType.Varchar2) {  Value = agreement.FOREX }
                 }
             };
         }
