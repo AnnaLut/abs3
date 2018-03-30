@@ -77,7 +77,7 @@
 
     var GetCustLimits = function (okpob) {
         var deferred = $q.defer();
-
+        
         var url = bars.config.urlContent("/Forex/RegularDeals/GetCustLimits");
 
         $http.get(url, {
@@ -400,6 +400,7 @@
     return {
         getCurrencyNameA: getCurrencyNameA,
         getCurrencyNameB: getCurrencyNameB,
+        getTransactionLengthType: getTransactionLengthType,
         SaveGhanges: SaveGhanges,
         GetRNKB: GetRNKB,
         GetNLSA: GetNLSA,

@@ -59,10 +59,6 @@
                     <i class="pf-icon pf-16 pf-mail" pf-mail></i>
                 </button>
                 <button type="button" class="k-button" title="Перегляд вихідного SWIFT повідомлення" ng-click="RegDeal.ViewSWT()" ng-disabled="RegDeal.DisabledVars.ViewSWT"><i class="pf-icon pf-16 pf-find" pf-find></i></button>
-                <input type="text" ng-model="RegDeal.F092_CODE"  ng-keydown="RegDeal.checkKey($event) && RegDeal.backSpaceEvent($event)" class="k-textbox" style="width: 15%; margin-right: 5pt;" title="" />
-                <button type="button" class="k-button" ng-click="RegDeal.getF092Table()">
-                                                <i class="pf-icon pf-16 pf-arrow_down"></i>
-                </button>
              </div>
         </div>
     </div>
@@ -97,7 +93,7 @@
                     </div>
                     <div class="form-group">
                         <label for="reg_deal_DATA">Дата надходження</label>
-                        <input id="datePicker1" kendo-date-picker k-format="'dd/MM/yyyy'" style="width: 29%; margin-right: 15pt;" k-ng-model="RegDeal.DATA" ng-keydown="RegDeal.checkKey($event)" ng-blur="RegDeal.setDatB()" />
+                        <input id="datePicker1" kendo-date-picker k-format="'dd/MM/yyyy'" style="width: 29%; margin-right: 15pt;" k-ng-model="RegDeal.DATA" ng-keydown="RegDeal.checkKey($event)" ng-blur="RegDeal.blurDatAHandler()" />
                         <span class="asterisk_input" style="margin: 0pt 0pt 0pt -1.5em; "></span>
                         <input type="radio" id="BaseA" ng-model="RegDeal.Base" value="A" />
                         <label for="BaseA">A-base</label>
@@ -129,19 +125,21 @@
                     <div class="form-group">
 
                         <label style="text-align: left">Дата відправки</label>
-                        <input id="datePicker2" kendo-date-picker k-format="'dd/MM/yyyy'" style="width: 29%; margin-right: 15pt;" k-ng-model="RegDeal.DATB" ng-keydown="RegDeal.checkKey($event)" />
+                        <input id="datePicker2" kendo-date-picker k-format="'dd/MM/yyyy'" style="width: 29%; margin-right: 15pt;" k-ng-model="RegDeal.DATB" ng-blur="RegDeal.blurDatBHandler()" ng-keydown="RegDeal.checkKey($event)" />
                         <span class="asterisk_input" style="margin: 0pt 0pt 0pt -1.5em;"></span>
                         @*<input type="checkbox" ng-model="RegDeal.checkboxModel.cb2"  />
                             <label>
                                Розділити на 2 суми
                             </label>*@
-                            <!--<select kendo-drop-down-list="RegDeal.ForexD"
+                            <label> Тип угоди </label>
+                            <select kendo-drop-down-list="RegDeal.ForexDateType"
+                                                    k-ng-model = "RegDeal.ForexDateType"
                                                     k-data-text-field="'KOD'"
                                                     k-auto-bind="false"
                                                     k-data-value-field="'KOD'"
                                                     k-value-primitive="true"
                                                     k-data-source="RegDeal.ForexTypeDropDownDataSource" k-options="RegDeal.ForexTypeDropDownOptions" id="ForexTypeDropDown"
-                                                    style="width: 20%; margin-right: 5px;"></select>-->
+                                                    style="width: 20%; margin-right: 5px;"></select>
                     </div>
                     <div class="form-group">
 
@@ -292,7 +290,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="" style="margin-top:35px;">
+                        <label for="" style="margin-top:5px;">
                             Код призначення для PA
                         </label>
                         <div class="col-md-12 col-sm-12">
@@ -303,6 +301,17 @@
                         </div>
                     </div>
 
+                     <div class="form-group">
+                                            <label for="" style="margin-top:5px;">
+                                                Код призначення для F092
+                                            </label>
+                                            <div class="col-md-12 col-sm-12">
+                                                <label for="" style="margin-bottom: 15pt"></label>
+                                                <input type="text"  ng-model="RegDeal.F092_CODE"  ng-keydown="RegDeal.checkKey($event) && RegDeal.backSpaceEvent($event)" class="k-textbox" style="width: 40%; margin-right: 5pt;" title="Код F092" />
+                                                <input type="text" ng-model="RegDeal.F092_TXT" ng-keydown="RegDeal.backSpaceEvent($event)" class="k-textbox k-state-disabled inputReadOnly" style="width: 40%; margin-right: 5pt;" readonly />
+                                                <button type="button" class="k-button" style="width: 10%;"  ng-click="RegDeal.getF092Table()" ng-disabled="false"><i class="pf-icon pf-16 pf-arrow_down"></i></button>
+                                            </div>
+                     </div>
                 </div>
             </div>
         </div>
@@ -334,7 +343,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="" class="col-md-12 col-sm-12 control-label">
+                        <label for="" class="col-md-12 col-sm-12 control-label"  style="margin-bottom: 18pt">
                             Код призначення для PB
                         </label>
                         <div class="col-md-12 col-sm-12">

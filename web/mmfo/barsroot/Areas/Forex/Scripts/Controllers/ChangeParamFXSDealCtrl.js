@@ -141,6 +141,7 @@
             };
             //-----
             vm.SaveGhanges = function () {
+            
                 var interm_b = vm.dfB56A;
                 if (vm.dfB56A != '' && vm.dfB56A != null && vm.dfB56A != undefined) {
                     interm_b = vm.dfB56A.replace(/[\r\n]/g, " ");

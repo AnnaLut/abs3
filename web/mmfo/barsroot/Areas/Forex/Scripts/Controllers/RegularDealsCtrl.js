@@ -1,7 +1,7 @@
 ﻿angular.module('BarsWeb.Controllers')
     .controller('RegularDealsCtrl', ['$scope', '$http', 'RegularDealService',
         function ($scope, $http, RegularDealService) {
-
+            var sB57ADef;
             var vm = this;
 
             var counterForVal = 0,
@@ -78,9 +78,9 @@
                                  },
                                  function (response) {
 
-                                 });                             
-                               
+                                 });
 
+                               
                                if (vm.DealTypeID == 2) {
                                    vm.DisabledVars.DEPO = true;                                   
                                    vm.DATA = null;
@@ -120,7 +120,7 @@
                         tempNazn = 'Валютний своп з ';
                     } else tempNazn = 'ДЕПО СВОП з ';
                 };
-
+                
                 vm.DATA = vm.DAT;
                 vm.DATB = vm.DAT;
                 vm.dfAgrDate = '';
@@ -362,7 +362,7 @@
 
                 vm.sKb = vm.KVB == 980 ? vm.MFOB : vm.BicB;
                 var dealMode = vm.DealMode;
-                console.log('vm.nSwRef ' + vm.nSwRef);
+              
                 var agreement = {
                     DealType: vm.DealTypeID,
                     Mode: vm.DealMode,
@@ -401,6 +401,7 @@
                     VN_FLAG: null,
                     NAZN: vm.sNazn,
                     F092_CODE: vm.F092_CODE,
+                    FOREX: vm.ForexDateType._old || vm.ForexDateType,
                     CB_NoKsB: null
                 }
                 
@@ -474,11 +475,12 @@
                             var options = {
                                        jsonSqlParams: "[{\"Name\":\"nDealTag\",\"Type\":\"N\",\"Value\":" + vm.DealTag + "}]",
                                        code: "CALL_FOREX",
-                                       externelFuncOnly: true,
+                                        hasCallbackFunction: false//,
+                                      // externelFuncOnly: true,
                                    };
                                    
                                    bars.ui.alert({ text: "Угоду збережено!" },bars.ui.getMetaDataNdiTable("",function (success) {
-                                                
+
                                        },options));
                                    vm.DealMode++;
                                    setSwapTag(vm.DealTag);
@@ -620,13 +622,18 @@
                 
                 var options = {
                     tableName: "F092",
-                    hasCallbackFunction: true
+                    hasCallbackFunction: true,
+                    filterCode: ""
                 };
 
                 bars.ui.getMetaDataNdiTable("F092", function (selectedItem) {
-                    if(selectedItem.F092 !== undefined)
-                    vm.addPorp.F092_CODE = selectedItem.F092;
-                    vm.saveSelectedValue('RegDeal.F092_CODE')
+                    if(selectedItem && selectedItem.F092 !== undefined)
+                    {
+                        vm.addParams.F092_TXT = selectedItem.TXT;
+                        vm.addPorp.F092_CODE = selectedItem.F092;
+                        vm.saveSelectedValue('RegDeal.F092')
+                    }
+
                     
                 }, options);
             };
@@ -716,6 +723,34 @@
                 }
             };
 
+            vm.getTransactionLengthType = function (datCurr,datA,datB) {
+                    
+                if(!datCurr || !datA || !datB)
+                    return;
+
+                var da =   kendo.toString(kendo.parseDate(vm.DATA , "yyyy-MM-dd"), "dd/MM/yyyy");
+                var db = kendo.toString(kendo.parseDate(vm.DATB , "yyyy-MM-dd"), "dd/MM/yyyy");
+                
+                if(!da || !db)
+                    return;
+                vm.loading = true;
+                    RegularDealService.getTransactionLengthType(datCurr,da,db).then(
+                        function (data) {
+                            if(data)
+                            {
+                                
+                                vm.loading = false;
+                                vm.ForexDateType = data.data;
+                                $scope.$apply();
+
+                            }
+
+
+                        },
+                        function (data) { }
+                    );
+
+            };
 
             vm.getCurrencyNameB = function (kv) {
                 if (kv != undefined && kv.toString().length === 3) {
@@ -744,6 +779,7 @@
 
 
                 }
+
             };
 
             vm.revenueDropDownDataSource = {
@@ -851,6 +887,7 @@
                     vm.SSA = null;
                 }
                 else if (mode == 'clearAll') {
+                    
                     if (vm.MFOA == vm.Mfo_300465) {
                        
                         var k = angular.element('#inicDropDown').data("kendoDropDownList").dataSource.read();
@@ -968,10 +1005,12 @@
                         vm.BicKB = null;
                     }
                     vm.getCheckPS(vm.MFOB, vm.KVA, vm.KVB);
+                    
                     vm.getColumsLimits(vm.OKPOB);
                 }
-                if(mode == 'RegDeal.F092_CODE')
+                if(mode == 'RegDeal.F092')
                 {
+                    vm.F092_TXT = vm.addParams.F092_TXT;
                     vm.F092_CODE = vm.addPorp.F092_CODE;
                     $scope.$apply();
                 }
@@ -1154,7 +1193,7 @@
 
 
             function Swap() {
-
+                
                 var tempSwap = {};
                 vm.DisabledVars.INIC = true;
 
@@ -1181,7 +1220,9 @@
                     vm.SumB = tempSwap.SumB;
                     vm.DATA = null;
                     vm.DATB = null;
+                    vm.ForexDateType = "";
                 } else {
+                    vm.ForexDateType = "";
                     vm.DATA = null;
                     vm.DATB = null;
                     vm.SumA = null;
@@ -1412,6 +1453,7 @@
             function setTrassaCent() {
                 vm.dfB57A = vm.sTmpB57A;
                 if (vm.dfB57A == null || vm.dfB57A == undefined || vm.dfB57A == '') {
+                    
                     sB57ADef = vm.dfB57A;
                 }
                 f_swSetDefaults();
@@ -1419,6 +1461,7 @@
 
             var sB5f7ADef = '';
             function f_swSetDefaults() {
+                
                 if (vm.KVB == 980 && (vm.BICKB == null || vm.BICKB == undefined) && (vm.dfB57A == sB57ADef || vm.dfB57A == undefined)) {
                     vm.dfB57A = '/' + (vm.NLSB == undefined ? '' : vm.NLSB) + '\n';
                     if (vm.BicB == null || vm.BicB == undefined) {
@@ -1428,6 +1471,7 @@
                     }
                     sB57ADef = vm.dfB57A;
                 } else {
+                    
                     if (vm.dfB57A == sB57ADef || vm.dfB57A == undefined) {
                         vm.dfB57A = '';
                         sB57ADef = vm.dfB57A;
@@ -1440,9 +1484,21 @@
                 if (vm.DealMode >= 2) {
                     vm.DATB = vm.DATA;
                 }
+
+
+
             };
 
+            vm.blurDatAHandler = function () {
+                vm.setDatB();
+                vm.getTransactionLengthType(vm.DAT, vm.DATA, vm.DATB);
+            }
 
+
+            vm.blurDatBHandler = function () {
+                
+                vm.getTransactionLengthType(vm.DAT, vm.DATA, vm.DATB);
+            }
             vm.getOurTrassa = function (key, value) {
                 if (vm.KVA != 980 && value != null && value != undefined && value != '') {
                     var kvb = vm.KVB;
