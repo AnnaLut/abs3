@@ -10,7 +10,7 @@ PROMPT *** Create  view V_FM_OSC_RULE19 ***
   CREATE OR REPLACE FORCE VIEW BARS.V_FM_OSC_RULE19 ("REF", "VDAT") AS 
   select o.ref, o.vdat
   from oper o, accounts a, customer c
- where decode(o.dk,1,o.nlsb,o.nlsa) like '1919%' and decode(o.dk,1,nvl(o.kv2,o.kv),o.kv) <> 980
+ where decode(o.dk,1,o.nlsb,o.nlsa) like '37391192%' and decode(o.dk,1,nvl(o.kv2,o.kv),o.kv) <> 980
    and decode(o.dk,1,o.nlsa,o.nlsb) = a.nls
    and decode(o.dk,1,o.kv,nvl(o.kv2,o.kv)) = a.kv
    and a.rnk = c.rnk

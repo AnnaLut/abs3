@@ -15,6 +15,7 @@ PROMPT *** Create  view V_FM_OSC_RULE5 ***
           AND SUBSTR (DECODE (o.dk, 0, o.nlsb, o.nlsa), 1, 4) IN ('1001',
                                                                   '1002',
                                                                   '1005')
+          AND o.mfoa = bc.current_mfo
            AND p.dk = 1
           AND (   a.nls LIKE '20%'
                OR a.nls LIKE '21%'
@@ -28,8 +29,8 @@ PROMPT *** Create  view V_FM_OSC_RULE5 ***
           AND gl.p_icurval (NVL (o.kv, 980), NVL (o.s, 0), o.vdat) >=15000000;
 
 PROMPT *** Create  grants  V_FM_OSC_RULE5 ***
-grant SELECT                                                                 on V_FM_OSC_RULE5  to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_FM_OSC_RULE5  to FINMON01;
+grant SELECT                                                                 on BARS.V_FM_OSC_RULE5  to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on BARS.V_FM_OSC_RULE5  to FINMON01;
 
 
 
