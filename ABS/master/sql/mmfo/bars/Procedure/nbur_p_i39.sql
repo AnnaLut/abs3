@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure NBUR_P_I39 ***
 
-  CREATE OR REPLACE PROCEDURE BARS.NBUR_P_I39 (p_kod_filii        varchar2,
+CREATE OR REPLACE PROCEDURE BARS.NBUR_P_I39 (p_kod_filii        varchar2,
                                              p_report_date      date,
                                              p_form_id          number,
                                              p_scheme           varchar2 default 'C',
@@ -18,9 +18,9 @@ is
 % DESCRIPTION : Процедура формирования #39 для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.16.007  23.08.2017
+% VERSION     :  v.16.0087  29.03.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.16.007  23.08.2017';
+  ver_          char(30)  := 'v.16.0087  29.03.2018';
 /*
    Структура показника  L DDD VVV
 
@@ -152,7 +152,7 @@ BEGIN
                         from NBUR_DM_TRANSACTIONS t, vp_list v, oper p, operw w
                         where t.report_date = p_report_date and
                             t.kf = p_kod_filii and
-                            t.tt not in ('BAK') and
+                            t.tt not in ('BAK', 'TOU') and
                             t.kv in (959,961,962,964) and
                             (t.acc_id_db = v.acc3800 and
                              t.acc_num_cr like '110%' and
