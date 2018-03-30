@@ -916,13 +916,14 @@ begin
      if b643 = true and p_fxdeal.field_58d is not null then
         set_operw(p_ref, '58D', p_fxdeal.field_58d);
      else
-        set_operw(p_ref, '58A', case when p_fxdeal.nlsb is not null then '/' || p_fxdeal.nlsb || chr(13) || chr(10) || p_fxdeal.bicb
+        set_operw(p_ref, '58A', case when p_fxdeal.swo_acc is not null then '/' || p_fxdeal.swo_acc || chr(13) || chr(10)|| p_fxdeal.bicb
+                                     when p_fxdeal.nlsb is not null then '/' || p_fxdeal.nlsb || chr(13) || chr(10) || p_fxdeal.bicb
                                      else p_fxdeal.bicb
                                 end);
      end if;
   end if;
 
-  set_operw(p_ref, '57A', case when p_fxdeal.swo_acc is not null then '/' || p_fxdeal.swo_acc || chr(13) || chr(10) || p_fxdeal.swo_bic
+  set_operw(p_ref, '57A', case when p_fxdeal.swo_acc is not null  and 1=0 then '/' || p_fxdeal.swo_acc || chr(13) || chr(10) || p_fxdeal.swo_bic
                                else p_fxdeal.swo_bic
                           end);
   if p_fxdeal.alt_partyb is not null and p_fxdeal.swo_bic is null then
