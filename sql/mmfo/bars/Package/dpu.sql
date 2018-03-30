@@ -693,7 +693,7 @@ is
   --
   -- глобальные переменные и константы
   -- 
-  g_body_version  constant varchar2(64)          := 'version 44.17  26.02.2018';
+  g_body_version  constant varchar2(64)          := 'version 44.18  30.03.2018';
   
   modcode         constant varchar2(3)           := 'DPU';
   accispparam     constant varchar2(16)          := 'DPU_ISP';
@@ -4704,7 +4704,9 @@ begin
     
     begin
       select ac.NLS
+           , ac.KV
         into l_accrec.ACC_NUM
+           , l_accrec.ACC_CUR
         from ACCOUNTS ac
         join DPU_ACCOUNTS da
           on ( da.ACCID = ac.ACC )
@@ -4781,8 +4783,10 @@ $end
                  when '56A  ' -- SWIFT-код Банка Посередника
                  then r_swtags.TAG56_CODE
                  when '57A  ' -- SWIFT-код Банка Посередника
-                 then '/' || r_swtags.TAG57_ACC || chr(10)
-                          || r_swtags.TAG57_CODE
+                 then case l_accrec.ACC_CUR
+                      when 643 then ''
+                      else '/' || r_swtags.TAG57_ACC || chr(10)
+                      end || r_swtags.TAG57_CODE
                  when '59   ' -- Реквізити отримувача
                  then '/' || r_swtags.TAG59_ACC               || chr(10) -- Номер рахунку Отримувача 
                           || SubStr(r_swtags.TAG59_NAME,1,35) || chr(10) -- Назва Отримувача
