@@ -1,9 +1,10 @@
+
  
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/forex.sql =========*** Run *** =====
- PROMPT =====================================================================================
-
-CREATE OR REPLACE PACKAGE BARS.FOREX
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.FOREX 
 
 is
 
@@ -209,8 +210,7 @@ procedure set_int_ratn_mb ( p_date date, p_kv number, p_term number, p_ir number
 --Відсоткові ставки на  МБ ринку
 end forex;
 /
-
-CREATE OR REPLACE PACKAGE BODY BARS.FOREX  is
+CREATE OR REPLACE PACKAGE BODY BARS.FOREX is
 
   g_body_version    constant varchar2(64)  := 'version 2 26.02.2018';
 
@@ -1116,7 +1116,7 @@ begin
   set_operw(p_ref, 'KOD_N', p_fxdeal.kod_na);
 
   if p_fxdeal.kva <> gl.baseval then
-     select round(gl.p_icurval(p_fxdeal.kvb, p_fxdeal.sumb, bankdate) * nominal / p_fxdeal.suma, 4) into l_kurs from tabval where kv = p_fxdeal.kva;
+     select round(gl.p_icurval(p_fxdeal.kvb, p_fxdeal.sumb, bankdate) * nominal / p_fxdeal.suma, 8) into l_kurs from tabval where kv = p_fxdeal.kva;
      set_operw(p_ref, 'KURS', to_char(l_kurs));
   end if;
 
@@ -1154,7 +1154,7 @@ begin
   set_operw(p_ref, 'KOD_N', p_fxdeal.kod_nb);
 
   if p_fxdeal.kvb <> gl.baseval then
-     select round(gl.p_icurval(p_fxdeal.kva, p_fxdeal.suma, bankdate) * nominal / p_fxdeal.sumb, 4) into l_kurs from tabval where kv = p_fxdeal.kvb;
+     select round(gl.p_icurval(p_fxdeal.kva, p_fxdeal.suma, bankdate) * nominal / p_fxdeal.sumb, 8) into l_kurs from tabval where kv = p_fxdeal.kvb;
      set_operw(p_ref, 'KURS', to_char(l_kurs));
   end if;
 
@@ -1791,17 +1791,26 @@ procedure create_deal_EX (
   p_forex        VARCHAR2   --/
 ) IS
 begin 
-
+  
+  bars_audit.info('FOREX1:'||p_forex);
+    
   If p_f092  is not null then pul.put('F092'     , p_F092 ) ; else  pul.put('F092'     , null);                                             end if ; 
   If p_forex is not null then pul.put('FOREX_KOD', p_FOREX) ; else  pul.put('FOREX_KOD', Forex.get_forextype (p_dat, p_data , p_datb ) );   end if ;
+
+ -- bars_audit.info('FOREX2:'||p_forex);
 
   FOREX.create_deal(
   p_dealtype  ,  p_mode       ,  p_deal_tag ,  p_swap_tag  ,  p_ntik ,  p_dat      ,  p_kva      ,  p_data    ,  p_suma   ,  p_sumc     ,  p_kvb     ,  p_datb ,  p_sumb     ,
   p_sumb1     ,  p_sumb2      ,  p_rnk      ,  p_nb        ,  p_kodb ,  p_swi_ref  ,  p_swi_bic  ,  p_swi_acc ,  p_nlsa   ,  p_swo_bic  ,  p_swo_acc ,  p_nlsb ,  p_b_payflag,
   p_agrmnt_num,  p_agrmnt_date,  p_interm_b ,  p_alt_partyb,  p_bicb ,  p_curr_base,  p_telexnum ,  p_kod_na  ,  p_kod_nb ,  p_field_58d,  p_vn_flag ,  p_nazn 
   );                             
-                                 FOREX.SetW ( p_deal_tag => p_deal_tag, p_tag =>'FOREX' , p_val => pul.Get('FOREX_KOD' ) ) ;  
+                                 FOREX.SetW ( p_deal_tag => p_deal_tag, p_tag =>'FOREX' , p_val => pul.Get('FOREX_KOD' ) ) ; 
+                                 
+                               -- bars_audit.info(p_val);
+                                  
   If p_f092  is not null then    FOREX.SetW ( p_deal_tag => p_deal_tag, p_tag =>'F092'  , p_val => p_f092                ) ;  end if ;
+
+   bars_audit.info('FOREX3_GET:'||pul.Get('FOREX_KOD' ));
 
 end create_deal_EX;
 -------------------
@@ -2486,3 +2495,17 @@ begin
   init;
 end;
 /
+ show err;
+ 
+PROMPT *** Create  grants  FOREX ***
+grant EXECUTE                                                                on FOREX           to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on FOREX           to BARS_CONNECT;
+grant EXECUTE                                                                on FOREX           to FOREX;
+grant EXECUTE                                                                on FOREX           to START1;
+
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/forex.sql =========*** End *** =====
+ PROMPT ===================================================================================== 
+ 

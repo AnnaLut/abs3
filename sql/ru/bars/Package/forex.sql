@@ -896,7 +896,7 @@ begin
   set_operw(p_ref, 'KOD_N', p_fxdeal.kod_na);
 
   if p_fxdeal.kva <> gl.baseval then
-     select round(gl.p_icurval(p_fxdeal.kvb, p_fxdeal.sumb, bankdate) * nominal / p_fxdeal.suma, 4) into l_kurs from tabval where kv = p_fxdeal.kva;
+     select round(gl.p_icurval(p_fxdeal.kvb, p_fxdeal.sumb, bankdate) * nominal / p_fxdeal.suma, 8) into l_kurs from tabval where kv = p_fxdeal.kva;
      set_operw(p_ref, 'KURS', to_char(l_kurs));
   end if;
 
@@ -934,7 +934,7 @@ begin
   set_operw(p_ref, 'KOD_N', p_fxdeal.kod_nb);
 
   if p_fxdeal.kvb <> gl.baseval then
-     select round(gl.p_icurval(p_fxdeal.kva, p_fxdeal.suma, bankdate) * nominal / p_fxdeal.sumb, 4) into l_kurs from tabval where kv = p_fxdeal.kvb;
+     select round(gl.p_icurval(p_fxdeal.kva, p_fxdeal.suma, bankdate) * nominal / p_fxdeal.sumb, 8) into l_kurs from tabval where kv = p_fxdeal.kvb;
      set_operw(p_ref, 'KURS', to_char(l_kurs));
   end if;
 
