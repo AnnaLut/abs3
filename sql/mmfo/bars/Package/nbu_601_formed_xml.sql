@@ -15,6 +15,7 @@ create or replace package nbu_601_formed_xml  as
  function get_xml_pledge_dep  return clob;
  function get_user_name  return varchar2;
  function get_xml_groupur_uo return clob;
+ function get_xml_finperformancepr_uo return clob;
  procedure run_formated_xml_job (p_kf in varchar2, p_user_id in varchar2);
  procedure run_formated_xml;
 
@@ -481,19 +482,19 @@ procedure run_formated_xml_job (p_kf in varchar2, p_user_id in varchar2)
                          p_userid    =>p_user_id ,
                          p_hostname  =>null ,
                          p_appname   =>null );
-   
-   bc.go(p_kf);                    
+
+   bc.go(p_kf);
    bars_audit.info('KF_601= ' || ' ' ||p_kf);
    params(1).param_type:='GET';
    params(1).tag:='KF';
    params(1).value:=p_kf;
    KF:=300465;
- 
+
    begin
-    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_person_fo(), params, 'NBU_PERSON_FO', KF, id);
-      select t.id into l_request_id_person_fo from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=1 and kf=p_kf) and
+     select t.id into l_request_id_person_fo from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=1 and kf=p_kf) and
            data_type_id=1 and kf=p_kf;
-       bars.nbu_601_migrate.set_data_request_state(l_request_id_person_fo,9,'Дані успішно передані до ЦА');
+    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_person_fo(), params, 'NBU_PERSON_FO', KF, id);
+      bars.nbu_601_migrate.set_data_request_state(l_request_id_person_fo,9,'Дані успішно передані до ЦА');
       commit;
      exception
        when others then
@@ -502,9 +503,9 @@ procedure run_formated_xml_job (p_kf in varchar2, p_user_id in varchar2)
     end;
 
     begin
-    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_document_fo(), params, 'NBU_DOCUMENT_FO', KF, id);
-    select id into l_request_id_document_fo from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=2 and kf=p_kf) and
+        select id into l_request_id_document_fo from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=2 and kf=p_kf) and
            data_type_id=2 and kf=p_kf;
+    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_document_fo(), params, 'NBU_DOCUMENT_FO', KF, id);
        bars.nbu_601_migrate.set_data_request_state(l_request_id_document_fo,9,'Дані успішно передані до ЦА');
        commit;
      exception
@@ -514,10 +515,10 @@ procedure run_formated_xml_job (p_kf in varchar2, p_user_id in varchar2)
     end;
 
     Begin
+     select id into l_request_id_address_fo from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=3 and kf=p_kf) and
+          data_type_id=3 and kf=p_kf;
+     bars.nbu_601_migrate.set_data_request_state(l_request_id_address_fo,9,'Дані успішно передані до ЦА');
     BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_address_fo(), params, 'NBU_ADDRESS_FO', KF, id);
-    select id into l_request_id_address_fo from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=3 and kf=p_kf) and
-           data_type_id=3 and kf=p_kf;
-       bars.nbu_601_migrate.set_data_request_state(l_request_id_address_fo,9,'Дані успішно передані до ЦА');
        commit;
      exception
        when others then
@@ -526,9 +527,9 @@ procedure run_formated_xml_job (p_kf in varchar2, p_user_id in varchar2)
     end;
 
     begin
-    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_person_uo(), params, 'NBU_PERSON_UO', KF, id);
      select id into l_request_id_person_uo from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=7 and kf=p_kf) and
-           data_type_id=7 and kf=p_kf;
+       data_type_id=7 and kf=p_kf;
+    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_person_uo(), params, 'NBU_PERSON_UO', KF, id);
        bars.nbu_601_migrate.set_data_request_state(l_request_id_person_uo,9,'Дані успішно передані до ЦА');
        commit;
      exception
@@ -538,9 +539,9 @@ procedure run_formated_xml_job (p_kf in varchar2, p_user_id in varchar2)
     end;
 
     begin
-    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_finperformance_uo(), params, 'NBU_FINPERFORMANCE_UO', KF, id);
-     select id into l_request_id_finperformance_uo from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=8 and kf=p_kf) and
+      select id into l_request_id_finperformance_uo from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=8 and kf=p_kf) and
            data_type_id=8 and kf=p_kf;
+    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_finperformance_uo(), params, 'NBU_FINPERFORMANCE_UO', KF, id);
        bars.nbu_601_migrate.set_data_request_state(l_request_id_finperformance_uo,9,'Дані успішно передані до ЦА');
       commit;
      exception
@@ -550,9 +551,9 @@ procedure run_formated_xml_job (p_kf in varchar2, p_user_id in varchar2)
     end;
 
     begin
-    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_finperformancegr_uo(), params, 'NBU_FINPERFORMANCEGR_UO', KF, id);
       select id into l_request_id_fingr_uo from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=10 and kf=p_kf) and
            data_type_id=10 and kf=p_kf;
+    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_finperformancegr_uo(), params, 'NBU_FINPERFORMANCEGR_UO', KF, id);
        bars.nbu_601_migrate.set_data_request_state(l_request_id_fingr_uo,9,'Дані успішно передані до ЦА');
        commit;
      exception
@@ -562,9 +563,9 @@ procedure run_formated_xml_job (p_kf in varchar2, p_user_id in varchar2)
     end;
 
     begin
-    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_partners_uo(), params, 'NBU_PARTNERS_UO', KF, id);
-     select id into l_request_id_partners_uo from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=11 and kf=p_kf) and
+      select id into l_request_id_partners_uo from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=11 and kf=p_kf) and
            data_type_id=11 and kf=p_kf;
+    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_partners_uo(), params, 'NBU_PARTNERS_UO', KF, id);
        bars.nbu_601_migrate.set_data_request_state(l_request_id_partners_uo,9,'Дані успішно передані до ЦА');
       commit;
      exception
@@ -574,9 +575,9 @@ procedure run_formated_xml_job (p_kf in varchar2, p_user_id in varchar2)
     end;
 
     begin
-    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_ownerpp_uo(), params, 'NBU_OWNERPP_UO', KF, id);
       select id into l_request_id_ownerpp from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=13 and kf=p_kf) and
            data_type_id=13 and kf=p_kf;
+    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_ownerpp_uo(), params, 'NBU_OWNERPP_UO', KF, id);
        bars.nbu_601_migrate.set_data_request_state(l_request_id_ownerpp,9,'Дані успішно передані до ЦА');
        commit;
      exception
@@ -586,9 +587,9 @@ procedure run_formated_xml_job (p_kf in varchar2, p_user_id in varchar2)
     end;
 
     begin
-    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_ownerjur_uo(), params, 'NBU_OWNERJUR_UO', KF, id);
-     select id into l_request_id_ownerjur from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=14 and kf=p_kf) and
+      select id into l_request_id_ownerjur from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=14 and kf=p_kf) and
            data_type_id=14 and kf=p_kf;
+    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_ownerjur_uo(), params, 'NBU_OWNERJUR_UO', KF, id);
        bars.nbu_601_migrate.set_data_request_state(l_request_id_ownerjur,9,'Дані успішно передані до ЦА');
        commit;
      exception
@@ -598,9 +599,10 @@ procedure run_formated_xml_job (p_kf in varchar2, p_user_id in varchar2)
     end;
 
      begin
+      select id into l_request_id_pledge_dep  from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=15 and kf=p_kf) and
+           data_type_id=15 and kf=p_kf; 
     BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_pledge_dep(), params, 'NBU_PLEDGE_DEP', KF, id);
-    select id into l_request_id_pledge_dep  from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=15 and kf=p_kf) and
-           data_type_id=15 and kf=p_kf;
+    
        bars.nbu_601_migrate.set_data_request_state(l_request_id_pledge_dep,9,'Дані успішно передані до ЦА');
        commit;
      exception
@@ -610,9 +612,9 @@ procedure run_formated_xml_job (p_kf in varchar2, p_user_id in varchar2)
     end;
 
     begin
-    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_credit(), params, 'NBU_CREDIT', KF, id);
-     select id into l_request_id_credit  from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=16 and kf=p_kf) and
+      select id into l_request_id_credit  from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=16 and kf=p_kf) and
            data_type_id=16 and kf=p_kf;
+    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_credit(), params, 'NBU_CREDIT', KF, id);
        bars.nbu_601_migrate.set_data_request_state(l_request_id_credit,9,'Дані успішно передані до ЦА');
        commit;
      exception
@@ -622,9 +624,9 @@ procedure run_formated_xml_job (p_kf in varchar2, p_user_id in varchar2)
     end;
 
     begin
-    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_credit_pledge(), params, 'NBU_CREDIT_PLEDGE', KF, id);
      select id into l_request_id_credit_pledge  from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=17 and kf=p_kf) and
-           data_type_id=17 and kf=p_kf;
+          data_type_id=17 and kf=p_kf;
+    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_credit_pledge(), params, 'NBU_CREDIT_PLEDGE', KF, id);
        bars.nbu_601_migrate.set_data_request_state(l_request_id_credit_pledge,9,'Дані успішно передані до ЦА');
        commit;
      exception
@@ -635,18 +637,17 @@ procedure run_formated_xml_job (p_kf in varchar2, p_user_id in varchar2)
 
    /* begin
     BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_groupur_uo(), params, 'NBU_GROUPUR_UO', KF, id);
-     select id into l_request_id_credit_pledge  from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=9 and kf=p_kf) and
+     select id into l_request_id_groupur_uo from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=9 and kf=p_kf) and
            data_type_id=9 and kf=p_kf;
-       bars.nbu_601_migrate.set_data_request_state(l_request_id_credit_pledge,9,'Дані успішно передані до ЦА');
+       bars.nbu_601_migrate.set_data_request_state(l_request_id_groupur_uo,9,'Дані успішно передані до ЦА');
        commit;
      exception
        when others then
-         bars.nbu_601_migrate.set_data_request_state(l_request_id_credit_pledge,10,sqlerrm || dbms_utility.format_error_backtrace());
+         bars.nbu_601_migrate.set_data_request_state(l_request_id_groupur_uo,10,sqlerrm || dbms_utility.format_error_backtrace());
      commit;
     end; */
 
  end;
-
 
 procedure run_formated_xml
   is

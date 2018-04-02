@@ -86,6 +86,12 @@
         }
     }
     function go(url, elem) {
+
+        //open F601 grid in a new tab so that Emulation mode is IE 10 as in _LayoutKendoF610.cshtml
+        //and it won't be overwriten by other layout to IE8. Necessary for barscryptor to manage IE request type properly, with user content-type
+        if (url =="/barsroot/F601/F601Data/Index")
+            window.open(url);
+
         if (blockArms) {
             new PNotify({
                 title: 'Попередження',
