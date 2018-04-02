@@ -9,7 +9,7 @@ IS
 % DESCRIPTION :  Процедура формирования #A7 для КБ (универсальная)
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.18.006  22.03.2018   
+% VERSION     :  v.18.007  30/03/2018 (22.03.2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%/%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                pmode_ = режим (0 - для отчетности, 1 - для ANI-отчетов, 2 - для @77)
@@ -1285,7 +1285,6 @@ BEGIN
                 instr(nbspremiy_, nbs_) > 0 or
                 tips_ = 'SNA'
              then
-
                 if nd_ is null and nls_ like '3%'  then
 
                 begin
@@ -1639,8 +1638,11 @@ BEGIN
                 then
                    s242_ := 'B';
                 end if;
+                
+                if tips_ in ('SK9','SP','SPN','OFR','KSP','KK9','KPN', 'SNA') then
+                   s242_ :='Z';
+                end if;
 
---             if s242_ !='Z'  then s190_ :='0';  end if;
              if s242_ ='Z' and s190_ ='0'  then  s190_ :='A';  end if;
 
     ------- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -1914,7 +1916,7 @@ BEGIN
              end if;
 
              -- не кредиты и не счета начисленных процентов кредитного модуля
-             IF tips_ NOT IN ('SS', 'SP', 'SL')
+             IF tips_ NOT IN ('SS')
                    and not (tips_ = 'DEP' and nls_ like '132%')
                    AND fa7p_ = 0
                    AND exist_sbb_acc =0
@@ -1922,12 +1924,12 @@ BEGIN
                    and exist_cp_acc =0
                 OR                                -- обычный режим
                        pmode_ = 1
-                   AND tips_ IN ('SS', 'SP', 'SL')
+                   AND tips_ IN ('SS')
                    AND NOT tp_graf
                    AND fa7p_ = 0
                 OR
                    pmode_  in (0, 2) AND
-                   tips_ IN ('SS', 'SP', 'SL') and
+                   tips_ IN ('SS') and
                    exist_trans_acc = 0 and
                    NOT tp_graf
              THEN
@@ -1938,6 +1940,12 @@ BEGIN
                    s242_ := p240_;
                 END IF;
 
+                if trim(tips_) in ('SK9','SP','SPN','OFR','KSP','KK9','KPN', 'SNA')
+                then
+                   s242_ :='Z';
+                   comm_ := comm_ || ' тип '||trim(tips_);
+                end if;
+                
                 IF tips_ = 'NL8'
                 THEN
                    SELECT COUNT (*)
@@ -2043,7 +2051,6 @@ BEGIN
                          x_ := '2';
                       END IF;
 
---             if s242_ !='Z'  then s190_ :='0';  end if;
              if s242_ ='Z' and s190_ ='0'  then  s190_ :='A';  end if;
 
                          pp_doda;
@@ -2323,7 +2330,6 @@ BEGIN
                       kodp_ :=
                              dk_ || nbs_ || r013_ || x_ || s242_ || rez_ || r012_ || r030_ ;
                    else
---             if s242_ !='Z'  then s190_ :='0';  end if;
              if s242_ ='Z' and s190_ ='0'  then  s190_ :='A';  end if;
 
                       kodp_ :=
@@ -2391,17 +2397,16 @@ BEGIN
              END IF;
 
              IF pmode_ = 1
-                   AND tips_ IN ('SS', 'SP', 'SL')
+                   AND tips_ IN ('SS')
                    AND tp_graf      -- с разбивкой по графику
                    AND type_ = 1
-                OR                            -- с разбивкой по таблице OTC_LIM_SB
-                       tips_ NOT IN ('SS', 'SP', 'SL')
+                OR     tips_ NOT IN ('SS', 'SP', 'SL')
                    AND SUBSTR (nls_, 1, 4) IN
                           ('1410', '1413', '1414', '1418', '1623', '1624', '2701',
                            '3112', '3113', '3114', '3660', '3648')
                    AND ( exist_sbb_acc > 0 or exist_cclim_acc >0 )
                 OR     pmode_ in (0, 2)
-                   AND tips_ IN ('SS', 'SP', 'SL')
+                   AND tips_ IN ('SS')
                    AND (exist_trans_acc > 0 or tp_graf)
                 or
                     SUBSTR (nls_, 1, 4) IN ('1410','1412','1413','1414','1420','1422','1423',
@@ -2623,29 +2628,6 @@ BEGIN
                       END IF;
                    END IF;
 
---                   IF nbs_ IN ('2600', '2620') AND r013_ = '0' and sn_ < 0
---                   THEN
---                      r013_ := '9';
---                   END IF;
-
-      /*             IF     nbs_ IN ('2610', '2615')
-                     AND (   r013_ IS NULL
-                          OR r013_ = '0'
-                          OR r013_ NOT IN ('1', '9')
-                          OR mdate_ IS NOT NULL
-                         )
-                   THEN
-                      IF mdate_ IS NULL OR mdate_ > dat_
-                      THEN
-                        r013_ := '9';
-                      END IF;
-
-                      IF mdate_ IS NOT NULL AND mdate_ <= dat_
-                      THEN
-                        r013_ := '1';
-                      END IF;
-                   END IF;
-      */
                       pp_doda;
 
                       if datn_ < zm_date2_ then
@@ -2655,7 +2637,7 @@ BEGIN
                          kodp_ :=
                                  dk_ || nbs_ || r013_ || x_ || s242_ || rez_ || r012_ || r030_;
                       else
---             if s242_ !='Z'  then s190_ :='0';  end if;
+
              if s242_ ='Z' and s190_ ='0'  then  s190_ :='A';  end if;
 
                          kodp_ :=
@@ -3324,11 +3306,7 @@ BEGIN
          nbuc_ := nbuc1_;
       END IF;
 
-      s240_ := nvl(fs240 (datn_, k.acc, dathb_, dathe_, k.mdate, k.s240), '0');
-
-      if s240_ = '0' then
-         s240_ := '1';
-      end if;
+      s240_ := 'Z';
 
       if nvl(k.s180, '0') = '0' then
          s180_ := fs180 (k.acc, SUBSTR (k.nbs, 1, 1), dat_);
@@ -3337,10 +3315,6 @@ BEGIN
       end if;
 
       s181_ := nvl(fs181(k.acc, datn_, nvl(s180_, '0')), '0');
-
-      if s181_ = '1' and s240_ > 'B' and s240_ <> 'Z' then
-         s240_ := 'B';
-      end if;
 
       if     k.tip in ('SK9','SP ','SPN','OFR','KSP','KK9','KPN')
       then
@@ -3468,7 +3442,7 @@ BEGIN
       if k.szq <> 0 then
           if TP_SND then
              -- прострочені відсотки
-             if k.tip in ('SK9','SP ','SPN','OFR','KSP','KK9','KPN')  then
+             if k.tip in ('SK9','SP ','SPN','OFR','KSP','KK9','KPN', 'SNA') then
                 s240_ := 'Z';
              end if;
 
@@ -3494,7 +3468,7 @@ BEGIN
 
              znap_ := to_char(k.szq);
           else
-             if     k.tip in ('SK9','SP ','SPN','OFR','KSP','KK9','KPN')
+             if     k.tip in ('SK9','SP ','SPN','OFR','KSP','KK9','KPN', 'SNA')
              then
                 s240_ := 'Z';
 
@@ -3519,7 +3493,6 @@ BEGIN
                 elsif datn_ < zm_date3_ then
                    kodp_ := '2'||nbs_||r013_||s181_||s240_||k.rez||r012_||k.r030;
                 else
---                  if s240_ !='Z'  then s190_ :='0';  end if;
                   if s240_ ='Z' and s190_ ='0'  then  s190_ :='A';  end if;
 
                    kodp_ := '2'||nbs_||r011_||r013_||s181_||s240_||k.rez||s190_||k.r030;
@@ -3554,7 +3527,7 @@ BEGIN
           end if;
 
           if srezp_ <> 0 and not TP_SND then
-             if     k.tip in ('SK9','SP ','SPN','OFR','KSP','KK9','KPN')
+             if     k.tip in ('SK9','SP ','SPN','OFR','KSP','KK9','KPN','SNA')
              then
                 s240_ := 'Z';
              end if;
@@ -3576,7 +3549,6 @@ BEGIN
              elsif datn_ < zm_date3_ then
                 kodp_ := '2'||nbs_||r013_||s181_||s240_||k.rez||r012_||k.r030;
              else
---                if s240_ !='Z'  then s190_ :='0';  end if;
                 if s240_ ='Z' and s190_ ='0'  then  s190_ :='A';  end if;
 
                 kodp_ := '2'||nbs_||r011_||r013_||s181_||s240_||k.rez||s190_||k.r030;
@@ -3608,7 +3580,7 @@ BEGIN
             values(k.nd, k.acc, k.nls, k.kv, kodp_, se_, se_, discont_, premiy_);
          end if;
       else
-         if     k.tip in ('SK9','SP ','SPN','OFR','KSP','KK9','KPN') and
+         if     k.tip in ('SK9','SP ','SPN','OFR','KSP','KK9','KPN','SNA') and
             substr(k.nls, 1, 4) not in ('2607','2627','1819','2809','3519','3559')
          then
             s240_ := 'Z';
@@ -3621,7 +3593,6 @@ BEGIN
          elsif  datn_ < zm_date3_ then
             kodp_ := '2'||nbs_||r013_||s181_||s240_||k.rez||r012_||k.r030;
          else
---             if s240_ !='Z'  then s190_ :='0';  end if;
              if s240_ ='Z' and s190_ ='0'  then  s190_ :='A';  end if;
 
             kodp_ := '2'||nbs_||r011_||r013_||s181_||s240_||k.rez||s190_||k.r030;
@@ -4057,7 +4028,7 @@ BEGIN
                      and exists ( select 1
                                     from nbu23_rez n
                                    where n.fdat = datr_
-                                     and n.tip in ('SK9','SP ','SPN','KSP','KPN')
+                                     and n.tip in ('SK9','SP ','SPN','KSP','KPN','SNA')
                                      and n.bv >0
                                      and n.diskont =0 and n.rez =0
                                      and n.nd = r.nd
@@ -4456,6 +4427,13 @@ BEGIN
         when others then
             logger.info ('P_FA7_NN: Errors '||sqlerrm);
       end;
+      
+      delete from NBUR_TMP_A7_S245 where report_date = dat_;
+      insert into NBUR_TMP_A7_S245(report_date, acc_id, s245, ost)
+      select dat_, acc, (case when substr(kodp,9,1)='Z' then '2' else '1' end) s245, sum(znap) ost
+      from rnbu_trace
+      where substr(kodp,2,4) = substr(nls,1,4)
+      group by acc, (case when substr(kodp,9,1)='Z' then '2' else '1' end);
    end if;
 
    logger.info ('P_FA7_NN: END ');
