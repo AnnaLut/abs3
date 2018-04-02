@@ -47,7 +47,7 @@ namespace BarsWeb.Areas.F601.Infrastructure.DI.Abstract
             {
                 using (OracleCommand cmd = connection.CreateCommand())
                 {
-                    cmd.CommandText = @"select t.object_id, t.object_type_name, t.object_code, 
+                    cmd.CommandText = @"select t.id, t.object_type_name, t.object_code, 
                                                 t.object_name, t.session_state, t.session_creation_time,
                                                 t.session_activity_time, t.session_details 
                                                                 from nbu_gateway.v_nbu_session t";
@@ -58,7 +58,7 @@ namespace BarsWeb.Areas.F601.Infrastructure.DI.Abstract
                         {
                             sessionList.Add(new CreditInfoObject()
                             {
-                                Id = Convert.ToInt64(reader["object_id"]),
+                                Id = Convert.ToInt64(reader["id"]),
                                 ObjectType = Convert.ToString(reader["object_type_name"]),
                                 ObjectCode = Convert.ToString(reader["object_code"]),
                                 Name = Convert.ToString(reader["object_name"]),
