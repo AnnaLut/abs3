@@ -77,7 +77,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.TIC is
 -- (C) BARS. Documents Print
 --***************************************************************--
 
-G_BODY_VERSION  CONSTANT varchar2(64)  := 'version 1.36 26/06/2014';
+G_BODY_VERSION  CONSTANT varchar2(64)  := 'version 1.37 01/04/2018';
 G_AWK_BODY_DEFS CONSTANT varchar2(512) := ''
   || 'BRANCH - для мультимфо' || chr(13) || chr(10)
 ;
@@ -1917,7 +1917,7 @@ begin
         select a.nls, a.nms, o.s into szPFUNlsA, szPFUNmsA, nSummComis
           from opldok o, accounts a
          where a.acc=o.acc AND o.ref=nRecID AND o.tt <> l_tt AND o.dk=0
-           AND a.nls not like '8%' ;
+           AND a.nls not like '8%' and rownum=1 ; -- Не знаю кто делал, было в РУ, думаю сами делали
      exception when no_data_found then
         szPFUNlsA  := '' ;
         szPFUNmsA  := '' ;
@@ -1932,7 +1932,7 @@ begin
         select a.nls, a.nms into szPFUNlsB, szPFUNmsB
           from opldok o, accounts a
          where a.acc=o.acc AND o.ref=nRecID AND o.tt <> l_tt AND o.dk=1
-           AND a.nls not like '8%' ;
+           AND a.nls not like '8%' and rownum=1 ; -- Не знаю кто делал, было в РУ, думаю сами делали
      exception when no_data_found then
         szPFUNlsB := '' ;
         szPFUNmsB := '' ;
@@ -1954,12 +1954,33 @@ begin
           and o1.ref=o2.ref AND o1.stmt=o2.stmt
           and a1.nbs <> '6204' and a2.nbs <> '6204'
 		  and a1.nls not like '8%' and a2.nls not like '8%' ;
-    exception when no_data_found then
-       szPFUNlsA := '' ;
-       szPFUNmsA := '' ;
-       szPFUNlsB := '' ;
-       szPFUNmsB := '' ;
-       nFSummB   := 0  ;
+     exception when others then
+       if sqlcode = -01403 then
+           szPFUNlsA := '' ;
+           szPFUNmsA := '' ;
+           szPFUNlsB := '' ;
+           szPFUNmsB := '' ;
+           nFSummB   := 0  ;
+       elsif sqlcode = -01422 then
+         begin
+           select  o1.stmt, a1.nls, a1.nms, a2.nls, a2.nms, o1.s
+              into l_stmt, szPFUNlsA, szPFUNmsA, szPFUNlsB, szPFUNmsB, nFSummB
+              from opldok o1, accounts a1, opldok o2, accounts a2
+            where o1.ref=nRecID AND o1.tt=l_tt AND a1.kv=l_kv
+              and o1.acc=a1.acc AND o1.dk=0 AND o2.acc=a2.acc AND o2.dk=1
+              and o1.ref=o2.ref-- AND o1.stmt=o2.stmt
+              and a1.nbs <> '6204' and a2.nbs <> '6204'
+              and a1.nls not like '8%' and a2.nls not like '8%'
+              and  o1.stmt<>o2.stmt 
+              and o1.acc <>o2.acc;
+         exception when no_data_found then
+            szPFUNlsA := '' ;
+            szPFUNmsA := '' ;
+            szPFUNlsB := '' ;
+            szPFUNmsB := '' ;
+            nFSummB   := 0  ;
+         end;
+       end if;
     end;
     lszVars := 'OPFU-A~OPFUN-A~OPFU-B~OPFUN-B~OSummDo~OSummDoLit~' ;
     lszVals :=  szPFUNlsA || '~' ||
