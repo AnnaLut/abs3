@@ -6,22 +6,22 @@
  
   CREATE OR REPLACE PACKAGE BARS.FIN_NBU IS
    G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'version 1.5.0  12.03.2018';
-   
+
    G_DATE_VAL   DATE := to_date('04-03-2012','dd-mm-yyyy'); --дата  видачі вал.КД до якої не враховується валютна виручка
    G_ALG_351    varchar2(30) :=  'FIN_351_18';
-   
+
    G_ALG_351_16 varchar2(30) :=  'FIN_351_16';    
    G_ALG_351_18 varchar2(30) :=  'FIN_351_18';    
    g_fin_351_18_date   date := to_date('01-04-2017','dd-mm-yyyy');
 /*
 
 20-06-2017 - correction_parameters добавлен VKR
-27.07.2012 
+27.07.2012
 
   Приведення показників до річного виміру здійснюється в такий спосіб:
   FIN_NBU_RV  (params) 1 - Спосіб №1(НБУ)
                        2 - Спосіб №2(НБУ)
-				       3 - ОБУ 
+				       3 - ОБУ
 
 */
 
@@ -29,17 +29,17 @@
   aOKPO_      int;      -- активный код ОКПО
   aND_       int;      -- активный код ND
   aRNK_      int;      -- активный код RNK
-  aDAT_       date;     -- активна дата 
-  
+  aDAT_       date;     -- активна дата
+
   FZ_  char(1);
   spPKdR_   number                ;
 
-  ern CONSTANT POSITIVE   := 208; 
-  err EXCEPTION; 
+  ern CONSTANT POSITIVE   := 208;
+  err EXCEPTION;
   erm VARCHAR2(80);
 
-  
- 
+
+
   type tp_kod  is table of varchar2(4) index by pls_integer;
   type tp_s    is table of number      index by pls_integer;
   type tp_zero is table of varchar2(4) index by pls_integer;
@@ -50,7 +50,7 @@
     ) ;
   tp_indics tp_indic;
 
-  
+
   type t_col_KVED
        is record(             KOD          fin_kved.kod%type,
 	                          KVED         fin_kved.kved%type,
@@ -63,77 +63,77 @@
                 );
 
   TYPE t_KVED iS TABLE OF t_col_KVED;
-  
-  
+
+
   ---для застави
-  
+
   type tp_nds is record
-    (  acc          number    
-	  ,ostc         number    
+    (  acc          number
+	  ,ostc         number
 	  ,nd           number
 	  ,ost_pawn     number
     );
   type tp_nd is table of tp_nds index by pls_integer;
-  
+
   type tp_accs is record
-    (  acc          number    
-	  ,ostc         number 
-      ,kl           number 	  
+    (  acc          number
+	  ,ostc         number
+      ,kl           number
 	  ,kof          number
 	  ,pawn         number
-	  ,nd           tp_nd  
-    );  
+	  ,nd           tp_nd
+    );
   type tp_acc  is table of tp_accs  index by pls_integer;
-  
+
   type tp_pawn is record ( acc    tp_acc) ;
   tp_pawns tp_pawn;
-  
+
   -- масив перевірки проходлжнння логіки форм
-    type t_col_logk is record(  DAT  fin_fm.fdat%type    
+    type t_col_logk is record(  DAT  fin_fm.fdat%type
                                ,OKPO fin_fm.okpo%type
                                ,IDF  fin_rnk.idf%type
                                ,err  int  );
     TYPE t_logk iS TABLE OF t_col_logk index by pls_integer;
-	
+
     type tp_logk is record ( logk    t_logk) ;
-	
+
     tp_logks tp_logk;
-  
+
  function f_kpz_nd(p_nd number, p_dat date) return number;
- 
- -- Автоматизоване визначення показників	 type 3					   
+
+ -- Автоматизоване визначення показників	 type 3
 procedure get_subpok_fo (RNK_  number,
                          ND_   number,
 					     DAT_  date);
- 
+
 procedure calc_pd_fl(RNK_ number,
                      ND_  number,
                      DAT_ date,
 					 CLS_ number,
 					 VNCR_ varchar2);
-					  
-					  
--- Автоматизоване визначення показників						   
+
+
+-- Автоматизоване визначення показників
 procedure get_subpok_bud (RNK_  number,
                           ND_   number,
 					      DAT_  date);
 
--- Корегування класу позичальника (Постанова 351)				  BUD  
+-- Корегування класу позичальника (Постанова 351)				  BUD
 procedure adjustment_class_bud(RNK_  number,
                                ND_   number,
-					           DAT_  date);						  
----------------------------------------------------------------				 
+					           DAT_  date);
+---------------------------------------------------------------
 --
 -- Розрахунок фінансових коефіцієнтів
---				 
----------------------------------------------------------------				  
-/* 
- FUNCTION Calculation_KAT23 (aOBS_   int, 
-                              CLASS_  int  
-						      ) RETURN  number; 
+--
+---------------------------------------------------------------
+/*
+ FUNCTION Calculation_KAT23 (aOBS_   int,
+                              CLASS_  int
+						      ) RETURN  number;
   */
-  
-  
+
+
      FUNCTION ZN_rep (KOD_   char,
                  IDF_   int default 1,
                  DAT_   date default aDAT_,
@@ -147,16 +147,16 @@ FUNCTION CALC_SCOR_BAL (KOD_   char,
 ---------------------------------------------------------------				 
 --
 -- Розрахунок фінансових коефіцієнтів
---				 
----------------------------------------------------------------				  
-  FUNCTION Calculation_FP (KOD_   char, 
-                           OKPO_  int default aOKPO_, 
+--
+---------------------------------------------------------------
+  FUNCTION Calculation_FP (KOD_   char,
+                           OKPO_  int default aOKPO_,
 						   DAT_   date default aDAT_
-						 ) RETURN  number; 
+						 ) RETURN  number;
 
 
 PROCEDURE Calc_FP (
-	 		       OKPO_  int default aOKPO_, 
+	 		       OKPO_  int default aOKPO_,
 				   DAT_   date default aDAT_
 				  ) ;
 ---
@@ -165,39 +165,39 @@ PROCEDURE Calc_FP (
 --
 ---
  FUNCTION GET_VED (RNK_   number, fdat_max_ date default null) RETURN  number;
- 
+
  FUNCTION GET_KVED (RNK_   number, fdat_max_ date, p_type number default 0) RETURN  varchar2;
- 
+
  FUNCTION GET_GVED (RNK_   char,  fdat_max_ date default null ) RETURN  number;
----------------------------------------------------------------				 
+---------------------------------------------------------------
 --
 -- Інтегральний показник боржника
---				 
----------------------------------------------------------------							 
+--
+---------------------------------------------------------------
  PROCEDURE  ZN_IPB ( rnk_  in number,
-                     ved   in int default 0, 
+                     ved   in int default 0,
 					 DAT_  in  date default aDAT_
 					 ) ;
 
 -- розрахунок інтегрального показника та початкового класу по постанові 351
 PROCEDURE  calculation_class (rnk_  in number,
 					          DAT_  in  date default aDAT_
-					          ) ;					 
-					 
- FUNCTION ZN_sql_p (KOD_   char, 
+					          ) ;
+
+ FUNCTION ZN_sql_p (KOD_   char,
                  IDF_   int default 1,
 				 DAT_   date default aDAT_,
 				 OKPO_  int default aOKPO_
-                 ) RETURN  number;	
+                 ) RETURN  number;
 
- FUNCTION ZN_sql (KOD_   char, 
+ FUNCTION ZN_sql (KOD_   char,
                  IDF_   int default 1,
 				 DAT_   date default aDAT_,
 				 OKPO_  int default aOKPO_,
 				 p_null number default 0
-                 ) RETURN  number;			
+                 ) RETURN  number;
 --===========================================================
-FUNCTION ZN_P_ND_HIST (KOD_   char, 
+FUNCTION ZN_P_ND_HIST (KOD_   char,
                        IDF_   int default 1,
 	    			   DAT_   date default aDAT_,
 				       ND_    int default aND_,
@@ -210,7 +210,7 @@ FUNCTION ZN_P_ND_REPL_HIST (KOD_   char,
 					    	ND_    int default  aND_,
 						    RNK_   int default aRNK_
 						) RETURN  fin_question_reply.name%type;
-						
+
 
 FUNCTION ZN_P_ND_date_hist (KOD_   char,
 						    IDF_   int default 1,
@@ -221,63 +221,63 @@ FUNCTION ZN_P_ND_date_hist (KOD_   char,
 
 
 
-				 
----------------------------------------------------------------				 
+
+---------------------------------------------------------------
 --
 -- Вичитуємо значення показника
---				 
----------------------------------------------------------------				  
-  FUNCTION ZN_P (KOD_   char, 
+--
+---------------------------------------------------------------
+  FUNCTION ZN_P (KOD_   char,
                  IDF_   int default 1,
 				 DAT_   date default aDAT_,
 				 OKPO_  int default aOKPO_,
-                 p_null number default 0				 
-			   ) RETURN  number ; --result_cache; 	   
+                 p_null number default 0
+			   ) RETURN  number ; --result_cache;
 
-  FUNCTION ZN_P_ND (KOD_   char, 
+  FUNCTION ZN_P_ND (KOD_   char,
                     IDF_   int default 1,
 				    DAT_   date default aDAT_,
 				    ND_    int default  aND_,
 					RNK_   int default aRNK_,
 				    p_null number default 0
 					) RETURN  number;
-					
+
   FUNCTION ZN_P_ND_date (KOD_   char,
 						 IDF_   int default 1,
 						 DAT_   date default aDAT_,
 						 ND_    int default aND_,
 						 RNK_   int default aRNK_
-						 ) RETURN  date;					
----------------------------------------------------------------				 
+						 ) RETURN  date;
+---------------------------------------------------------------
 --
 -- Вичитуємо значення показника Форми№1 графи
---				 
----------------------------------------------------------------				   
-FUNCTION ZN_F1    (KOD_   char, 
-                   GR_   char,    
+--
+---------------------------------------------------------------
+FUNCTION ZN_F1    (KOD_   char,
+                   GR_   char,
                    DAT_   date default aDAT_,
 				   OKPO_  int default aOKPO_
                     ) RETURN  number ;
 
 
----------------------------------------------------------------				 
+---------------------------------------------------------------
 --
 -- Вичитуємо значення показника Форми№2 графи
---				 
----------------------------------------------------------------	
+--
+---------------------------------------------------------------
 
-FUNCTION ZN_F2    (KOD_   char, 
-                   GR_   char,  
+FUNCTION ZN_F2    (KOD_   char,
+                   GR_   char,
                    DAT_   date default aDAT_,
 				   OKPO_  int default aOKPO_
                     ) RETURN  number;
 
----------------------------------------------------------------				 
+---------------------------------------------------------------
 --
 -- Вичитуємо значення показника Форми№2 за квартал
---				 
----------------------------------------------------------------			
-   FUNCTION ZN_FDK (KOD_   char, 
+--
+---------------------------------------------------------------
+   FUNCTION ZN_FDK (KOD_   char,
                    DAT_   date ,
 				   OKPO_  int default aOKPO_
                     ) RETURN  number;
@@ -286,21 +286,21 @@ FUNCTION ZN_F2    (KOD_   char,
 --    Вичитуем вид форми зв?тност? за зв?тний пер?од
 --
 ---------------------------------------------------------------
-  FUNCTION F_FM ( 
-                  OKPO_ int, 
+  FUNCTION F_FM (
+                  OKPO_ int,
                   DAT_ date  ) RETURN char RESULT_CACHE ;
-				  
-				  
+
+
 ---------------------------------------------------------------
 --
 --Лог?чний контроль Форми №1 та форми №2
 --
 ----------------------------------------------------------------
   function logk_  ( DAT_ date, OKPO_ int , IDF_ int ) RETURN number ;
-  
-  FUNCTION LOGK ( 
-                   DAT_ date, 
-                   OKPO_ int, 
+
+  FUNCTION LOGK (
+                   DAT_ date,
+                   OKPO_ int,
                    IDF_  int) RETURN number ;
 
 ---------------------------------------------------------------
@@ -310,8 +310,8 @@ FUNCTION ZN_F2    (KOD_   char,
 ---------------------------------------------------------------
 
   FUNCTION LOGK_D (
-                    DAT_ date, 
-                    OKPO_ int, 
+                    DAT_ date,
+                    OKPO_ int,
                     IDF_  int)  RETURN number;
 
 
@@ -321,52 +321,52 @@ FUNCTION ZN_F2    (KOD_   char,
 --
 ----------------------------------------------------------------
 
-PROCEDURE record_fp(KOD_   IN  char, 
-                     S_    IN  number,  
+PROCEDURE record_fp(KOD_   IN  char,
+                     S_    IN  number,
                      IDF_  IN  int,
 				     DAT_  IN  date default aDAT_,
 				     OKPO_ IN  int default aOKPO_  );
-					
-					
-PROCEDURE record_fp_ND(KOD_   IN  char, 
-                       S_    IN  number,  
+
+
+PROCEDURE record_fp_ND(KOD_   IN  char,
+                       S_    IN  number,
                        IDF_  IN  int,
 				       DAT_  IN  date default aDAT_,
 				       ND_ IN  int default aND_,
-                       RNK_   int default aRNK_ );	
+                       RNK_   int default aRNK_ );
 
 PROCEDURE record_fp_ND_date(KOD_         IN  char,
     						val_date_    IN  date,
 							IDF_         IN  int,
 							DAT_         IN  date default aDAT_,
 							ND_          IN  int  default aND_,
-							RNK_         IN  int  default aRNK_ );					   
+							RNK_         IN  int  default aRNK_ );
 
 ---------------------------------------------------------------
 --
 --  Запис/розрахунок  групи ризику та класу боржника
 --
 ----------------------------------------------------------------
-				
+
 PROCEDURE get_class(ND_ in number,
                     OKPO_ in number,
                     DAT_ in date,
 					RNK_ in number
 					);
-					
+
 PROCEDURE get_class_fl (ND_ in number,
 	                    OKPO_ in number,
 						DAT_ in date,
 				     	RNK_ in number);
 
-						
+
   FUNCTION LOGK_read (
                    DAT_ date,
                    OKPO_ int,
                    IDF_  int,
 				   mode_ int ) RETURN number;
 
- FUNCTION CC_val 
+ FUNCTION CC_val
               ( ND_ number,
 			    RNK_ number,
 				DAT_ date,
@@ -381,7 +381,7 @@ PROCEDURE get_class_fl (ND_ in number,
 procedure Load_testND (
 			Rnk_   number,
 			ND_    number,
-			DAT_   date  
+			DAT_   date
 	 	) ;
 
 procedure correction_parameters (                    p_mod     Varchar2,
@@ -395,68 +395,68 @@ procedure correction_parameters (                    p_mod     Varchar2,
                                                      p_pd      Nbu23_Cck_Ul_Kor.pd%type,
                                                      p_comm    Nbu23_Cck_Ul_Kor.comm%type,
                                                      p_vkr     Nbu23_Cck_Ul_Kor.vkr%type);
-													 
-													 
+
+
  Procedure get_adjustment (p_mod   in  Varchar2,
                            p_nd    in  Nbu23_Cck_Ul_Kor.nd%type,
-						   p_flag  Out number, 
+						   p_flag  Out number,
 						   p_fin23 Out Nbu23_Cck_Ul_Kor.fin23%type,
                            p_obs23 Out Nbu23_Cck_Ul_Kor.obs23%type,
                            p_kat23 Out Nbu23_Cck_Ul_Kor.kat23%type,
                            p_k23   Out Nbu23_Cck_Ul_Kor.k23%type
 						   );
-						   
+
  --  таблична функція для WEB  на таблицю FIN_KVED
 FUNCTION f_fin_kved  (p_rnk  customer.rnk%type,
                       p_okpo fin_kved.okpo%type,
                       p_dat  fin_kved.dat%type
-                      )   					  
+                      )
             RETURN t_kved PIPELINED  PARALLEL_ENABLE;
 
 procedure determ_kved(p_rnk         customer.rnk%type,
                       p_okpo        fin_kved.okpo%type,
-                      p_dat         fin_kved.dat%type				 	   
+                      p_dat         fin_kved.dat%type
                       );
-					  
+
 Procedure save_volmesales (p_rnk         customer.rnk%type,
                            p_okpo        fin_kved.okpo%type,
                            p_dat         fin_kved.dat%type, 
                            p_kod        fin_kved.kved%type,						   
                            p_kved        fin_kved.kved%type,
-                           p_volme_sales fin_kved.VOLME_SALES%type 					 	   
-                          );			
+                           p_volme_sales fin_kved.VOLME_SALES%type
+                          );
 
-						  
+
 Procedure del_volmesales (p_rnk         customer.rnk%type,
                           p_okpo        fin_kved.okpo%type,
-                          p_dat         fin_kved.dat%type,  
+                          p_dat         fin_kved.dat%type,
                           p_kved        fin_kved.kved%type
                           );
 
-						  
+
 Procedure add_findat (p_rnk         fin_dat.rnk%type,
                       p_nd          fin_dat.nd%type,
-                      p_dat         fin_dat.fdat%type);  
+                      p_dat         fin_dat.fdat%type);
 
--- Автоматизоване визначення чи входить клієнт до групи	
+-- Автоматизоване визначення чи входить клієнт до групи
 procedure rnk_group  (RNK_  number,
                       ND_   number,
 					  DAT_  date,
 					  zDAT_ date,
 					  okpo_ varchar2);
-					  
+
 -- Автоматизоване визначення показників
 procedure get_subpok (RNK_  number,
                       ND_   number,
 					  DAT_  date,
 					  zDAT_ date);
-					  
+
 procedure get_restr  (RNK_  number,
                       ND_   number,
 					  DAT_  date,
-					  zDAT_ date);					  
+					  zDAT_ date);
 
--- Корегування класу позичальника (Постанова 351)				   
+-- Корегування класу позичальника (Постанова 351)
 procedure adjustment_class (RNK_  number,
                             ND_   number,
 					        DAT_  date,
@@ -465,7 +465,7 @@ procedure adjustment_class (RNK_  number,
 -- Функція визначення значення коофіциента PD
 function  get_pd (  p_rnk   IN  number,
                     p_nd    IN  number,
-					p_dat   IN  date,   
+					p_dat   IN  date,
 					p_clas  in  number,
 					p_vncr  in  varchar2,
 					p_idf   in  number
@@ -474,10 +474,10 @@ function  get_pd (  p_rnk   IN  number,
 
 /* **********************************************
 *  Визначення показників для клієнта  консолідованої звітності
-**************************************************/ 
+**************************************************/
 procedure get_subpok_kons (RNK_  number,
                            ND_ number,
-					       DAT_  date );				   
+					       DAT_  date );
 
 -- Корегування класу клієнта консолідованої звітності (Постанова 351)
 procedure adjustment_class_kons (RNK_  number,
@@ -487,8 +487,8 @@ procedure adjustment_class_kons (RNK_  number,
 
 --З моменту усунення подій на підставі яких було визнано дефолт минуло щонайменше 180 днів
 -- elimination_events(p_rnk, p_nd, p_fdat, '53,54', 55)
-procedure  elimination_events (  p_rnk        fin_nd.rnk%type 
-                                ,p_nd         fin_nd.nd%type 
+procedure  elimination_events (  p_rnk        fin_nd.rnk%type
+                                ,p_nd         fin_nd.nd%type
 								,p_fdat       date
 								,p_idf_list   varchar2
 								,p_idf        number
@@ -496,34 +496,34 @@ procedure  elimination_events (  p_rnk        fin_nd.rnk%type
 
 	--*Цінні папери   (бюджетники)
 
--- Автоматизоване визначення показників						   
+-- Автоматизоване визначення показників
 procedure get_subpok_bud_cp (RNK_  number,
                              ND_   number,
 					         DAT_  date);
-							 
--- Корегування класу позичальника (Постанова 351)				  BUD  
+
+-- Корегування класу позичальника (Постанова 351)				  BUD
 procedure adjustment_class_bud_cp(RNK_  number,
                                   ND_   number,
 					              DAT_  date);
 
-								 
+
 function get_vnkr_cp (RNK_  number,
-                      ND_   number, 
+                      ND_   number,
 					  DAT_  date   ,
-					  p_idf   number ) return varchar2;								 
-								 
+					  p_idf   number ) return varchar2;
+
 procedure set_vnkr_cp (RNK_   number,
-                       ND_    number, 
+                       ND_    number,
 				 	   DAT_   date   ,
 					   p_idf  number ,
 					   p_vnkr varchar2);
 
 function  export_to_script_fin_que (p_idf number) return blob;
-					   
+
 function header_version return varchar2;
 
-function body_version   return varchar2;		
-			  
+function body_version   return varchar2;
+
 END fin_nbu;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.FIN_NBU IS
@@ -536,14 +536,14 @@ CREATE OR REPLACE PACKAGE BODY BARS.FIN_NBU IS
                    p_msg  SEC_AUDIT.REC_MESSAGE%type)
  as
  begin
- 
+
  if user_id in( 1, 20094) then   logger.info  (p_mod||' '||p_msg);
                                  dbms_output.put_line(p_mod||' '||p_msg);
                           else   logger.trace (p_mod||' '||p_msg);
- end if; 
- 
+ end if;
+
  end;
-  
+
  procedure fin_alg (dat_ date)
 as
 begin
@@ -578,7 +578,7 @@ end;
                and idf  = IDF_;
  --   DEB.TRACE(1, KOD_||'-'||sTmp_||' Return',1);
            RETURN sTmp_;
-           
+
                   exception when NO_DATA_FOUND
                          THEN   null;
     END;
@@ -597,16 +597,16 @@ FM_ := FIN_NBU.F_FM(OKPO_, DAT_);
          select kod_old from fin_forma2 where kod = KOD_ and 2 = IDF_ and fm = 'N' and fm = decode(FM_,'N',FM_,' ','N')
 		  union all
 		 select kod_old from fin_forma1m where kod = KOD_ and 1 = IDF_ and fm = 'R' and fm = decode(FM_,'R',FM_,'M','R')
-		 union all 
+		 union all
 		 select kod_old from fin_forma2m where kod = KOD_ and 2 = IDF_ and fm = 'R' and fm = decode(FM_,'R',FM_,'M','R')
         );
   exception when NO_DATA_FOUND
     then l_sql := 0;
    end;
 
-    
+
  --  DEB.TRACE(1, KOD_||'-'||DAT_||'-kod_old-'||l_sql||'='||FIN_NBU.F_FM(OKPO_, DAT_)||'*'||OKPO_,1);
-   
+
  l_sql :=  nvl(replace(replace(l_sql, '#(','fin_nbu.ZN_sql_p('''),')',''',IDF_, DAT_, OKPO_)'),0);
  l_sql2 := 'Select '||l_sql||' from (select :IDF_ as idf_, :DAT_ as dat_, :OKPO_ as okpo_, :FM_ as FM from dual)';
 
@@ -624,33 +624,33 @@ FM_ := FIN_NBU.F_FM(OKPO_, DAT_);
 end ZN_rep;
 
 
- FUNCTION ZN_sql_p (KOD_   char, 
+ FUNCTION ZN_sql_p (KOD_   char,
                  IDF_   int default 1,
 				 DAT_   date default aDAT_,
 				 OKPO_  int default aOKPO_
                  ) RETURN  number IS
 
  sTmp_ number := 0 ;
- 
-			   
+
+
 BEGIN
 
-     BEGIN	
-    select NVL(SS,s) 
-	  into sTmp_ 
+     BEGIN
+    select NVL(SS,s)
+	  into sTmp_
 	  from fin_rnk
 	 where okpo = OKPO_
        and fdat = DAT_
        and kod  = KOD_
 	   and idf  = IDF_;
-          exception when NO_DATA_FOUND 
+          exception when NO_DATA_FOUND
 	 THEN  sTmp_ := 0;
     END;
-  RETURN sTmp_;		   
+  RETURN sTmp_;
 
 end ZN_sql_p;
 
- FUNCTION ZN_sql (KOD_   char, 
+ FUNCTION ZN_sql (KOD_   char,
                  IDF_   int default 1,
 				 DAT_   date default aDAT_,
 				 OKPO_  int default aOKPO_,
@@ -660,30 +660,30 @@ end ZN_sql_p;
  l_sql varchar2(4000) ;
  l_sql2 varchar2(4000) ;
  FM_ fin_fm.fm%type;
- 
- BEGIN				 
+
+ BEGIN
 
  FM_ := FIN_NBU.F_FM(OKPO_, DAT_);
- 
+
  --logger.info('ERROR_0 FIN_parse+sql '||KOD_||' '||IDF_||' '||FIN_NBU.F_FM(OKPO_, aDAT_)||' '||aDAT_);
  begin
  select kod_old
   into  l_sql
   from (
          select kod_old from fin_forma1 where kod = KOD_ and 1 = IDF_ and fm = FIN_NBU.F_FM(OKPO_, aDAT_)
-		 union all 
+		 union all
 		 select kod_old from fin_forma2 where kod = KOD_ and 2 = IDF_ and fm = FIN_NBU.F_FM(OKPO_, aDAT_)
 		 union all
 		 select kod_old from fin_forma1m where kod = KOD_ and 1 = IDF_ and fm = FIN_NBU.F_FM(OKPO_, aDAT_)
-		 union all 
+		 union all
 		 select kod_old from fin_forma2m where kod = KOD_ and 2 = IDF_ and fm = FIN_NBU.F_FM(OKPO_, aDAT_)
         );
   exception when NO_DATA_FOUND
     then l_sql := p_null;
 --   logger.info('ERROR_1 FIN_parse+sql '||KOD_||' '||IDF_||' '||FIN_NBU.F_FM(OKPO_, aDAT_)||' '||aDAT_);
-   end; 
-    
-	
+   end;
+
+
  l_sql :=  nvl(replace(replace(l_sql, '#(','fin_nbu.ZN_sql_p('''),')',''',IDF_, DAT_, OKPO_)'), nvl(to_char(p_null),'null as s '));
  l_sql2 := 'Select '||l_sql||' from (select :IDF_ as idf_, :DAT_ as dat_, :OKPO_ as okpo_, :FM_ as FM from dual)';
 
@@ -691,75 +691,75 @@ end ZN_sql_p;
 -- logger.info('FIN_parse+sql2 '||l_sql2);
          trace('ZN_sql','sTmp_4='||l_sql2);
 		 begin
-          execute immediate l_sql2 into sTmp_ using IDF_, DAT_, OKPO_, FM_; 
+          execute immediate l_sql2 into sTmp_ using IDF_, DAT_, OKPO_, FM_;
 		  exception when NO_DATA_FOUND
 		         THEN sTmp_ := p_null;
 		 end;
 
 	trace('ZN_sql','sTmp_3='||sTmp_);
     return sTmp_;
-   
+
 
 
 end ZN_sql;
 
 
-  FUNCTION ZN_P (KOD_   char, 
+  FUNCTION ZN_P (KOD_   char,
                  IDF_   int default 1,
 				 DAT_   date default aDAT_,
 				 OKPO_  int default aOKPO_,
-				 p_null number default 0				 
+				 p_null number default 0
                  ) RETURN  number  is --result_cache relies_on (fin_rnk) IS
 
  sTmp_ number := 0 ;
  --nFM varchar2(1) := FIN_NBU.F_FM(OKPO_, aDAT_);
-			   
+
 BEGIN
   trace('ZN_P','sTmp_1='||p_null);
-     BEGIN	
-    select NVL(SS,S) 
-	  into sTmp_ 
+     BEGIN
+    select NVL(SS,S)
+	  into sTmp_
 	  from fin_rnk
 	 where okpo = OKPO_
        and fdat = DAT_
        and kod  = KOD_
 	   and idf  = IDF_;
 	   trace('ZN_P','sTmp_='||sTmp_);
-          exception when NO_DATA_FOUND 
-		         THEN 
+          exception when NO_DATA_FOUND
+		         THEN
 				sTmp_:= fin_nbu.ZN_sql(KOD_, IDF_,  DAT_, OKPO_, p_null) ;
 				trace('ZN_P','sTmp_2='||sTmp_);
-				 
+
     END;
-  RETURN sTmp_;		   
+  RETURN sTmp_;
 
 end ZN_P;
 
-  FUNCTION ZN_P_ND (KOD_   char, 
+  FUNCTION ZN_P_ND (KOD_   char,
                  IDF_   int default 1,
 				 DAT_   date default aDAT_,
 				 ND_    int default aND_,
 				 RNK_   int default aRNK_,
-				 p_null number default 0	
+				 p_null number default 0
                  ) RETURN  number IS
 
  sTmp_ number := 0 ;
-			   
+
 BEGIN
 
-    BEGIN	
-    select s 
-	  into sTmp_ 
+    BEGIN
+    select s
+	  into sTmp_
 	  from fin_nd
 	 where nd = ND_ and rnk = RNK_
        --and fdat = DAT_
        and kod  = KOD_
 	   and idf  = IDF_;
-          exception when NO_DATA_FOUND 
+          exception when NO_DATA_FOUND
 		         THEN sTmp_ := p_null;
-		--raise_application_error(-(20000),'\' ||'     '||KOD_||'Відсутні дані за звітний період - '||DAT_,TRUE); 
+		--raise_application_error(-(20000),'\' ||'     '||KOD_||'Відсутні дані за звітний період - '||DAT_,TRUE);
     END;
-  RETURN sTmp_;		   
+  RETURN sTmp_;
 
 end ZN_P_ND;
 
@@ -790,7 +790,7 @@ BEGIN
 
 end ZN_P_ND_date;
 
-  FUNCTION ZN_P_ND_HIST (KOD_   char, 
+  FUNCTION ZN_P_ND_HIST (KOD_   char,
                  IDF_   int default 1,
 				 DAT_   date default aDAT_,
 				 ND_    int default aND_,
@@ -798,22 +798,22 @@ end ZN_P_ND_date;
                  ) RETURN  number IS
 
  sTmp_ number := 0 ;
-			   
+
 BEGIN
 
-    BEGIN	
-    select s 
-	  into sTmp_ 
+    BEGIN
+    select s
+	  into sTmp_
 	  from fin_nd_hist
 	 where nd = ND_ and rnk = RNK_
        and fdat = DAT_
        and kod  = KOD_
 	   and idf  = IDF_;
-          exception when NO_DATA_FOUND 
+          exception when NO_DATA_FOUND
 		         THEN sTmp_ := null;
-		--raise_application_error(-(20000),'\' ||'     '||KOD_||'Відсутні дані за звітний період - '||DAT_,TRUE); 
+		--raise_application_error(-(20000),'\' ||'     '||KOD_||'Відсутні дані за звітний період - '||DAT_,TRUE);
     END;
-  RETURN sTmp_;		   
+  RETURN sTmp_;
 
 end ZN_P_ND_HIST;
 
@@ -829,7 +829,7 @@ sTmp_ fin_question_reply.name%type;
 BEGIN
 
     BEGIN
-  
+
 
 	select  nvl(r.namep,R.NAME) as name
      into sTmp_
@@ -868,12 +868,12 @@ BEGIN
 		         THEN sTmp_ := null;
 		--raise_application_error(-(20000),'/' ||'     '||KOD_||'Відсутні дані за звітний період - '||DAT_,TRUE);
     END;
- 
+
  if  (sTmp_ = to_date('01-01-0001','dd-mm-yyyy') or sTmp_ is null ) then return null;
                                            else return sTmp_;
  end if;
 
- 
+
 end ZN_P_ND_date_hist;
 FUNCTION MIN_MAX_SCOR (    ID_   int,
                            KOD_  char,
@@ -909,12 +909,12 @@ procedure get_indic (p_kod fin_rnk.kod%type, p_s number, p_zero varchar2 default
 as
 t_ind pls_integer;
 begin
- 
+
    t_ind := tp_indics.kod.count()+1;
    tp_indics.kod( t_ind )    := p_kod;
    tp_indics.p_s( t_ind )    := p_s;
    tp_indics.p_zero( t_ind ) := p_zero;
- 
+
 end;
 
 FUNCTION CALC_SCOR_BAL (KOD_   char,
@@ -948,15 +948,15 @@ for c in (select *
           from FIN_OBU_SIGN_TYPES s
          where s.id = c.max_sign;
 
-       
-   
+
+
         l_sql := 'select 1 from dual where :min_val '|| l_mins || ':l_val and :l_val '||l_maxs ||' :max_val';
-      
+
 
          trace('CALC_SCOR_BAL>',KOD_||' sql > '||'select 1 from dual where '|| c.min_val || ' '|| l_mins || ' '|| l_val || ' and '|| l_val || ' '||l_maxs ||' '|| c.max_val || '');
 
          begin
-                execute immediate l_sql into sTmp_ using c.min_val, l_val, l_val, c.max_val; 
+                execute immediate l_sql into sTmp_ using c.min_val, l_val, l_val, c.max_val;
          exception when NO_DATA_FOUND
                  THEN null;
          end;
@@ -965,14 +965,14 @@ for c in (select *
 
         END LOOP;
 
-	   return null; 
-    
+	   return null;
+
 
 end CALC_SCOR_BAL;
 
 
 -- пошук значення в колекции
-function set_indic (p_id  fin_nbu_scoring.id%type, 
+function set_indic (p_id  fin_nbu_scoring.id%type,
                     p_kod fin_rnk.kod%type) return number
 as
 sTmp number;
@@ -989,9 +989,9 @@ begin
 	   record_fp(replace(regexp_replace(p_kod,'PK','X'),'LK','LX'), sTmp, 6, aDAT_, aOKPO_);
 	  return sTmp;
   end if;
- 
+
  END LOOP;
- 
+
 end;
 
   FUNCTION GET_VED (RNK_   number, fdat_max_ date default null ) RETURN  number IS
@@ -1003,46 +1003,46 @@ k111_ varchar2(2);
 k112_ varchar2(1);
 
 sumk_ number;
-Sumv_ number; 
+Sumv_ number;
 
 begin
 
      select ved , okpo
         into ved_ , OKPO_
-      from fin_customer 
+      from fin_customer
     where rnk = rnk_;
 
 	ved_ := GET_KVED(RNK_,fdat_max_);
-	
+
 	Begin
-    select k111, k112 
-       into k111_, k112_  
-     from kl_k110 
-   where k110 = ved_ --and d_open < sysdate 
+    select k111, k112
+       into k111_, k112_
+     from kl_k110
+   where k110 = ved_ --and d_open < sysdate
                and (d_close is null )
 			   and rownum = 1
-               order by d_close desc;			   
-    exception when NO_DATA_FOUND THEN 
-             --raise_application_error(-(20000),'\ ' ||'     Невірний КВЕД для РНК -'||rnk_||' (КВЕД '||ved_||' не існує в довіднику (KL_K110) або закритий',TRUE);  
-		--k111_ := 0; 
-		--k112_ := 0;	
+               order by d_close desc;
+    exception when NO_DATA_FOUND THEN
+             --raise_application_error(-(20000),'\ ' ||'     Невірний КВЕД для РНК -'||rnk_||' (КВЕД '||ved_||' не існує в довіднику (KL_K110) або закритий',TRUE);
+		--k111_ := 0;
+		--k112_ := 0;
                 begin
-				   select k111, k112 
-					   into k111_, k112_  
-					 from kl_k110 
-				   where k110 = ved_ --and d_open < sysdate 
+				   select k111, k112
+					   into k111_, k112_
+					 from kl_k110
+				   where k110 = ved_ --and d_open < sysdate
 							   and rownum = 1
 							   order by d_close desc;
 		exception when NO_DATA_FOUND THEN
-		      raise_application_error(-(20000),'\ ' ||'     Невірний КВЕД для РНК -'||rnk_||' (КВЕД '||ved_||' не існує в довіднику (KL_K110) ',TRUE);  
+		      raise_application_error(-(20000),'\ ' ||'     Невірний КВЕД для РНК -'||rnk_||' (КВЕД '||ved_||' не існує в довіднику (KL_K110) ',TRUE);
 		end;
 
 
-		
+
     end;
 
 if substr(ved_,1,1) != 'N' then
-	
+
 
 			if   k111_ in ('01','02','03','04','05') and k112_ in ('A', 'B')                                                               then     v_:=1;
 		 elsif   k111_ in ('15', '16') and k112_ in ('D')                                                                                  then     v_:=2;
@@ -1054,8 +1054,8 @@ if substr(ved_,1,1) != 'N' then
 		 elsif   k111_ in ('60','61','62','63','64') and k112_ in ('I')                                                                    then     v_:=7;
 		 elsif   k111_ in ('65','67') and k112_ in ('J')                                                                                   then     v_:=8;
 		 else    v_:=9;
-		 end if; 
- 
+		 end if;
+
  else
  /*
  Відповідно з жовтневими змінами
@@ -1064,7 +1064,7 @@ if substr(ved_,1,1) != 'N' then
 			if   k111_ in ('01','02','03')                                                                                   then     v_:=1;
 		 elsif   k111_ in ('10', '11', '12')                                                                                 then     v_:=2;
 		 elsif   k111_ in ('13','14','15','16','17','18', '31', '32')                                                        then     v_:=3;
-		 elsif   (k111_ between '05' and '09' 
+		 elsif   (k111_ between '05' and '09'
 			   or k111_ between '19' and '30' or k111_ in ('33','35')
 			   or k111_ between '36' and '39')                                                                               then     v_:=4;
 		elsif (k111_ between '41' and '43')                                                                                  then     v_:=5;
@@ -1076,7 +1076,7 @@ if substr(ved_,1,1) != 'N' then
 
 		 else                                                                                                                         v_:=9;
 		 end if;
- 
+
 end if;
 
     IF      fdat_max_ IS NULL THEN RETURN v_;
@@ -1103,15 +1103,15 @@ SELECT SUM (s)
 
     END IF;
 
- 
- 
+
+
 --    RETURN v_;
- 	   
+
 
 end GET_VED;
 
 -- визначення групи виду економічної діяльності (постанова 351)
-FUNCTION GET_GVED (RNK_   char, 
+FUNCTION GET_GVED (RNK_   char,
                    fdat_max_ date default null ) RETURN  number IS
 	ved_  varchar2(5);
 	OKPO_ varchar2(12);
@@ -1123,29 +1123,29 @@ FUNCTION GET_GVED (RNK_   char,
 begin
 
 	ved_ := GET_KVED(RNK_,fdat_max_, 1);
-	
- 
-       begin		
+
+
+       begin
 		select   okpo
 		   into   OKPO_
-		   from fin_customer 
+		   from fin_customer
 		  where rnk = rnk_;
-        exception when NO_DATA_FOUND THEN  null;		   
+        exception when NO_DATA_FOUND THEN  null;
 	   end;
- 
+
 
 	Begin
-		select k111, k112 
-		  into k111_, k112_  
-	 	  from kl_k110 
-  	     where k110 = ved_ 
+		select k111, k112
+		  into k111_, k112_
+	 	  from kl_k110
+  	     where k110 = ved_
 		   and (d_close is null )
 		   and rownum = 1
-		 order by d_close desc;			   
-	exception when NO_DATA_FOUND THEN  
-	    if ved_ is null 
-		  then  null; --raise_application_error(-(20000),'\ ' ||'     Не внесена інформація про розшифрування Ф2 рядка 2000  для РНК -'||rnk_||'  ',TRUE);  
-          else  raise_application_error(-(20000),'\ ' ||'     Невірний КВЕД для РНК -'||rnk_||' (КВЕД '||ved_||' не існує в довіднику (KL_K110) або закритий',TRUE);  
+		 order by d_close desc;
+	exception when NO_DATA_FOUND THEN
+	    if ved_ is null
+		  then  null; --raise_application_error(-(20000),'\ ' ||'     Не внесена інформація про розшифрування Ф2 рядка 2000  для РНК -'||rnk_||'  ',TRUE);
+          else  raise_application_error(-(20000),'\ ' ||'     Невірний КВЕД для РНК -'||rnk_||' (КВЕД '||ved_||' не існує в довіднику (KL_K110) або закритий',TRUE);
 		end if;
 	end;
 
@@ -1190,8 +1190,8 @@ begin
 
 		
 
-		  
-		 
+
+
    RETURN v_;
 
 end GET_GVED;
@@ -1209,9 +1209,9 @@ FUNCTION GET_KVED (RNK_   number, fdat_max_ date, p_type number default 0) RETUR
 			   where rnk = rnk_;
 			 exception when NO_DATA_FOUND THEN p_ved := null;
 		  end;
- 
+
  if  p_type = 0 then   return p_ved; end if;
-  
+
 		  begin
 			  select ved
 				into p_kved
@@ -1228,9 +1228,9 @@ FUNCTION GET_KVED (RNK_   number, fdat_max_ date, p_type number default 0) RETUR
 						   where okpo = okpo_ and fdat = fdat_max_;
 						 exception when NO_DATA_FOUND THEN p_kved := null;
 					  end;
-			 end if;			  
+			 end if;
 
- 
+
 if p_kved is not null then  return p_kved;
 else return null;
 end if;
@@ -1240,9 +1240,9 @@ end get_kved;
 
 
   PROCEDURE  ZN_IPB (rnk_  in number,
-                     ved  in int default 0, 
+                     ved  in int default 0,
 					 DAT_  in  date default aDAT_
-					 ) 
+					 )
 	IS
 
  sTmp_ number := 0 ;
@@ -1259,49 +1259,49 @@ end get_kved;
  OKPO_ number;
  ved_ number;
  sum_s_ number;
- 
+
 k_  number := 0 ;
-			   
+
 BEGIN
 
    fin_alg(DAT_);
 
 
  calculation_class(rnk_, dat_);
- 
+
 	if nvl(VED, 0) = 0 or nvl(VED, 0) > 9 then        ved_ :=GET_VED(RNK_ , DAT_);
      else  ved_ := VED;
-	end if; 
+	end if;
 
-	/*Якщо дані форми № 2 “Звіт про фінансові результати” (графа 035) або форм № 2-м   
-	  (№ 2-мс) “Звіт про фінансові результати” (графа 030) містять нульове значення, 
-	  банк для розрахунку інтегрального показника боржника – юридичної особи використовує 
+	/*Якщо дані форми № 2 “Звіт про фінансові результати” (графа 035) або форм № 2-м
+	  (№ 2-мс) “Звіт про фінансові результати” (графа 030) містять нульове значення,
+	  банк для розрахунку інтегрального показника боржника – юридичної особи використовує
 	  модель розрахунку № 9 “Інші послуги та операції”;*/
-	
-	
+
+
 	select okpo
 	  into OKPO_
 	  from fin_customer
 	 where rnk = rnk_;
-	
+
 	begin
-    select sum(s) 
+    select sum(s)
 	  into sum_s_
-	  from fin_rnk 
-	 where idf in (1,2) 
-	   and okpo = OKPO_ 
+	  from fin_rnk
+	 where idf in (1,2)
+	   and okpo = OKPO_
 	   and fdat = DAT_;
   exception when NO_DATA_FOUND THEN sum_s_ := 0;
-  END;  
-	
+  END;
+
   aOKPO_ :=  OKPO_;
   aDAT_  :=  trunc(DAT_);
-  FZ_    := fin_nbu.F_FM (aOKPO_, aDAT_ ) ; 
- 
+  FZ_    := fin_nbu.F_FM (aOKPO_, aDAT_ ) ;
 
-	  
+
+
   if  sum_s_ = 0 then goto exit_prc;   end if;   --якщо ненадано звітність нічого не розраховувати клас = 8
- 
+
  K1 :=  Calculation_FP('K1');    case when K1 >= 100 then k1 := 100; else K1 := K1; end case;     record_fp('K1', K1, 6, DAT_, OKPO_);
  K2 :=  Calculation_FP('K2');    case when K2 >= 100 then k2 := 100; else K2 := K2; end case;     record_fp('K2', K2, 6, DAT_, OKPO_);
  K3 :=  Calculation_FP('K3');    case when K3 >= 100 then k3 := 100; else K3 := K3; end case;     record_fp('K3', K3, 6, DAT_, OKPO_);
@@ -1312,97 +1312,97 @@ BEGIN
  K8 :=  Calculation_FP('K8');    case when K8 >= 100 then k8 := 100; else K8 := K8; end case;     record_fp('K8', K8, 6, DAT_, OKPO_);
  K9 :=  Calculation_FP('K9');    case when K9 >= 100 then k9 := 100; else K9 := K9; end case;     record_fp('K9', K9, 6, DAT_, OKPO_);
  K10 :=  Calculation_FP('K10');  case when K10 >= 100 then k10 := 100; else K10 := K10; end case; record_fp('K10', K10, 6, DAT_, OKPO_);
- 
+
  if FZ_ in (' ', 'N') then
-    
+
 	       if ved_ = 1  then sTmp_ := (( 1.3*K3) + (0.03*K4) + (0.001*K5) + (0.61*K6) + ( 0.75*K7) + ( 2.5*K8) + (0.04*K9) - 0.2);
-		                     --RETURN sTmp_;	 
-	
+		                     --RETURN sTmp_;
+
         elsif ved_ = 2  then sTmp_ := ((0.035*K1) +(0.04*K2) + (2.7*K3) +( 0.1*K6) + (1.1*K7) +( 1.2*K8) + (0.05*K9) -  0.8);
-		                     --RETURN sTmp_;	 
- 
+		                     --RETURN sTmp_;
+
         elsif ved_ = 3  then sTmp_ := ((0.95*K3)  + (0.03*K4) + ( 1.1*K6)  + ( 1.4*K7) + ( 3.1*K8)  + (0.04*K9) + (0.03*K10) -  0.45);
-		                     --RETURN sTmp_; 
+		                     --RETURN sTmp_;
 
 	    elsif ved_ = 4  then sTmp_ := ((0.025*K1) + (1.9*K3) +( 0.45*K6) + (1.5*K8) +( 0.03*K9) -  0.5);
-		                     --RETURN sTmp_; 
+		                     --RETURN sTmp_;
 
 	    elsif ved_ = 5  then sTmp_ := ((0.02*K1) + (1.7*K3) + (0.01*K4) + (0.3*K6) + ( 0.4*K7) + (2.9*K8) - 0.1);
-		                     --RETURN sTmp_; 
+		                     --RETURN sTmp_;
 
 
 	    elsif ved_ = 6  then sTmp_ := ((1.03*K3) + (0.001*K4) + (0.16*K6) + (  0.6*K7) + ( 2.9*K8) + ( 0.08*K9) - 0.14);
-		                     --RETURN sTmp_; 
+		                     --RETURN sTmp_;
 
 	    elsif ved_ = 7  then sTmp_ := ((0.07*K2) + (1.27*K3) + (0.32*K6) + (1.98*K8) +(0.04*K9) + (0.04*K10) - 0.15);
-		                     --RETURN sTmp_; 
+		                     --RETURN sTmp_;
 
 	    elsif ved_ = 8  then sTmp_ := ((0.025*K1) + ( 2.7*K3) + (0.005*K4) + (0.13*K7) + (  2.4*K8) -  0.93);
-		                     --RETURN sTmp_; 
+		                     --RETURN sTmp_;
 
 	    elsif ved_ = 9  then sTmp_ := ((0.03*K1) + (  0.9*K3) + (0.01*K4) + (0.002*K5) + (0.15*K6) + (  0.5*K7) + ( 2.9*K8) -   0.05);
-		                     --RETURN sTmp_; 
-		
-        							 
-    	 end if;		
-		 
-		 
+		                     --RETURN sTmp_;
+
+
+    	 end if;
+
+
   else
-                                          
+
   	       if ved_ = 1  then sTmp_ := ((0.02*K1) + (0.02*K2) + (1.5*K3) + (0.6*K7) + (2.6*K8) + (0.008*K9) -1.1);
-		                     --RETURN sTmp_;	 
-	 
+		                     --RETURN sTmp_;
+
         elsif ved_ = 2  then sTmp_ := ((0.01*K1) + (0.03*K2) + (2.2*K3) + (0.03*K4) + (0.95*K7) + (1.3*K8) + (0.06*K9) + (0.2*K10) - 0.7);
-		                     --RETURN sTmp_;	 
- 
+		                     --RETURN sTmp_;
+
         elsif ved_ = 3  then sTmp_ := ((0.03*K2) + (1.95*K3) + (0.01*K4) + (0.002*K6) + (2.5*K7) + (0.8*K8) + (0.05*K9) - 0.9);
-		                     --RETURN sTmp_; 
+		                     --RETURN sTmp_;
 
 	    elsif ved_ = 4  then sTmp_ := ((0.01*K1) + (2.42*K3) + (0.01*K4) + (0.05*K7) + (1.35*K8) + (0.05*K9) - 0.7);
-		                     --RETURN sTmp_; 
+		                     --RETURN sTmp_;
 
 	    elsif ved_ = 5  then sTmp_ := ((0.02*K1) + (2.2*K3) + (0.001*K5) + (0.01*K6) + (0.009*K7) + (1.4*K8) + (0.2*K10) - 0.27);
-		                     --RETURN sTmp_; 
+		                     --RETURN sTmp_;
 
 
 	    elsif ved_ = 6  then sTmp_ := ((0.03*K1) + (1.85*K3) + (0.004*K4) + (0.001*K5) + (0.1*K6) + (0.2*K7) + (2.2*K8) + (0.009*K9) - 0.35);
-		                     --RETURN sTmp_; 
+		                     --RETURN sTmp_;
 
 	    elsif ved_ = 7  then sTmp_ := ((0.04*K1) + (0.01*K2) + (1.8*K3) + (0.002*K5) + (0.6*K6) + (0.85*K7) + (1.7*K8) + (0.03*K9) - 0.8);
-		                     --RETURN sTmp_; 
+		                     --RETURN sTmp_;
 
 	    elsif ved_ = 8  then sTmp_ := ((0.02*K1) + (1.7*K3) + (0.001*K4) + (0.001*K5) + (0.15*K6) + (3.1*K8) + (0.02*K9) - 0.4);
-		                     --RETURN sTmp_; 
+		                     --RETURN sTmp_;
 
 	    elsif ved_ = 9  then sTmp_ := ((0.01*K1) + (1.92*K3) + (0.01*K6) + (0.02*K7) + (1.2*K8) + (0.01*K9) - 0.35);
-		                     --RETURN sTmp_; 
+		                     --RETURN sTmp_;
 
          end if;
-  
-  
+
+
  -- return 0;
-end if;  
-	
- 
+end if;
+
+
    <<exit_prc>>
-   
+
    record_fp('IPB',  round(sTmp_,2), 6, DAT_, OKPO_);
 /*  if  sum_s_ = 0 then  record_fp('IPB',  0, 6, DAT_, OKPO_);
 else                 record_fp('IPB',  sTmp_, 6, DAT_, OKPO_);
- end if; */    
+ end if; */
  --якщо ненадано звітність нічого не розраховувати клас = 8
-   
-  
-   
+
+
+
   -- get_class(RNK_ ,	OKPO_ ,	DAT_ ,	VED_  );
 
-   
+
 end ZN_IPB;
 
 -- розрахунок інтегрального показника та початкового класу по постанові 351
 PROCEDURE  calculation_class (rnk_  in number,
 					          DAT_  in  date default aDAT_
-					          ) 
+					          )
 IS
 	 sTmp_ number := 0 ;
 	 OKPO_ number;
@@ -1411,7 +1411,7 @@ IS
 	 l_cls_DB  number;
 	 k_  number := 0 ;
 	 l_clas number;
-	 l_mod varchar2(254) := 'fin_nbu.calculation_class >>';		   
+	 l_mod varchar2(254) := 'fin_nbu.calculation_class >>';
   BEGIN
 
 		ved_ :=GET_GVED(RNK_ , DAT_);
@@ -1420,77 +1420,76 @@ IS
 		  into OKPO_
 		  from fin_customer
 		 where rnk = rnk_;
-		
+
 		begin
-		select sum(s) 
+		select sum(s)
 		  into sum_s_
-		  from fin_rnk 
-		 where idf in (1,2) 
-		   and okpo = OKPO_ 
+		  from fin_rnk
+		 where idf in (1,2)
+		   and okpo = OKPO_
 		   and fdat = DAT_;
 	  exception when NO_DATA_FOUND THEN sum_s_ := 0;
-	  END;  
-		
+	  END;
+
 	  aOKPO_ :=  OKPO_;
 	  aDAT_  :=  trunc(DAT_);
-	  FZ_    :=  fin_nbu.F_FM (aOKPO_, aDAT_ ) ; 
+	  FZ_    :=  fin_nbu.F_FM (aOKPO_, aDAT_ ) ;
 
 	   Delete from fin_rnk where okpo = aOKPO_  and fdat = aDAT_ and idf = 6 and kod like 'X%';
-	   
-     	if  (LOGK_read (DAT_,OKPO_,1,1)=0) 
+
+     	if  (LOGK_read (DAT_,OKPO_,1,1)=0)
 		   then null;
 		   else    record_fp('PIPB',  -1, 6, DAT_, OKPO_);
 	               record_fp('CLAS',  10, 6, DAT_, OKPO_);
 				   record_fp('GVED',  ved_, 6, DAT_, OKPO_);
 				   return;
 		end if;
-		 
-	  
-	  
-	   -- розрахунок показників  
+
+
+
+	   -- розрахунок показників
 		Calc_FP();
-		
+
   		
 	case  G_ALG_351
 	    when G_ALG_351_16  then
 	    
 	 --  if  sum_s_ = 0 then goto exit_prc;   end if;   --якщо ненадано звітність нічого не розраховувати клас = 8
-	  
+
 	      if ved_ = 1 and FZ_ = 'N' then
 			  sTmp_ := 2.767 + (0.309 * set_indic(1,'PK11')) +  (0.821 * set_indic(1,'PK15')) + (0.577 * set_indic(1,'PK1')) + (0.504 * set_indic(1,'PK10')) + (0.291 * set_indic(1,'PK16'));
 	          --trace(l_mod, '2.767 + (0.309 * '||set_indic(1,'PK11')||') +  (0.821 * '||set_indic(1,'PK15')||') + (0.577 * '||set_indic(1,'PK1')||') + (0.504 * '||set_indic(1,'PK10')||') + (0.291 * '||set_indic(1,'PK16')||')');
 	   elsif ved_ = 2 and FZ_ = 'N' then
-	          sTmp_ := 1.884 + (0.240 * set_indic(2,'PK11')) +  (0.288 * set_indic(2,'PK4'))  + (0.557 * set_indic(2,'PK15')) + (0.335 * set_indic(2,'PK2')) + (0.678 * set_indic(2,'PK13')) 
+	          sTmp_ := 1.884 + (0.240 * set_indic(2,'PK11')) +  (0.288 * set_indic(2,'PK4'))  + (0.557 * set_indic(2,'PK15')) + (0.335 * set_indic(2,'PK2')) + (0.678 * set_indic(2,'PK13'))
 			                 + (0.457 * set_indic(2,'PK7') ) +  (0.342 * set_indic(2,'PK1'))  + (0.203 * set_indic(2,'PK3'));
-              
+
 	   elsif ved_ = 3 and FZ_ = 'N' then
-	          sTmp_ := 2.366 + (0.430 * set_indic(3,'PK1'))  + (0.656 * set_indic(3,'PK15')) + (0.517 * set_indic(3,'PK8')) + (0.630 * set_indic(3,'PK16')) 
+	          sTmp_ := 2.366 + (0.430 * set_indic(3,'PK1'))  + (0.656 * set_indic(3,'PK15')) + (0.517 * set_indic(3,'PK8')) + (0.630 * set_indic(3,'PK16'))
 			                 + (0.228 * set_indic(3,'PK10')) + (0.489 * set_indic(3,'PK12')) + (0.437 * set_indic(3,'PK6'));
 
 	   elsif ved_ = 4 and FZ_ = 'N' then
 	          sTmp_ := 2.042 + (0.686 * set_indic(4,'PK6')) +  (0.473 * set_indic(4,'PK14')) + (0.272 * set_indic(4,'PK5')) +  (0.816 * set_indic(4,'PK9')) + (0.902 * set_indic(4,'PK10')) + (0.494 * set_indic(4,'PK3'));
-							 
 
-       -- Моделі розрахунку інтегрального показника боржника – юридичної особи для малого підприємства							        
+
+       -- Моделі розрахунку інтегрального показника боржника – юридичної особи для малого підприємства
 
        elsif ved_ = 1 and FZ_ in ('R','C') then
-	          sTmp_ := 2.844 + (0.650 * set_indic(1,'PK11')) + (0.506 * set_indic(1,'PK3')) + (1.689 * set_indic(1,'PK10')) + (0.287 * set_indic(1,'PK4')) 
+	          sTmp_ := 2.844 + (0.650 * set_indic(1,'PK11')) + (0.506 * set_indic(1,'PK3')) + (1.689 * set_indic(1,'PK10')) + (0.287 * set_indic(1,'PK4'))
 			                 + (0.656 * set_indic(1,'PK7'))  + (0.608 * set_indic(1,'PK5')) + (0.373 * set_indic(1,'PK2')) ;
 
        elsif ved_ = 2 and FZ_ in ('R','C') then
 	          sTmp_ := 2.177 + (0.523 * set_indic(2,'PK1')) + (0.471 * set_indic(2,'PK5')) + (0.426 * set_indic(2,'PK2')) + (0.318 * set_indic(2,'PK11'))+ (0.246 * set_indic(2,'PK12'));
-			 
+
        elsif ved_ = 3 and FZ_ in ('R','C') then
 	          sTmp_ := 2.427 + (0.490 * set_indic(3,'PK11'))  + (0.717 * set_indic(3,'PK8')) + (0.393 * set_indic(3,'PK6')) + (0.637 * set_indic(3,'PK3')) + (0.380 * set_indic(3,'PK5'));
 
 	   elsif ved_ = 4 and FZ_ in ('R','C') then
 	          sTmp_ := 1.798 + (0.486 * set_indic(4,'PK9')) + (0.436 * set_indic(4,'PK6')) + (0.345 * set_indic(4,'PK1')) +  (0.365 * set_indic(4,'PK13')) + (0.333 * set_indic(4,'PK3')) ;
- 
-	   else	 sTmp_ := null;
-	         --raise_application_error(-(20000),'/' ||'     '||'Не визначено Моделі розрахунку інтегрального показника боржника '||ved_,TRUE);				  
-			   
-	   end if;   
 
+	   else	 sTmp_ := null;
+	         --raise_application_error(-(20000),'/' ||'     '||'Не визначено Моделі розрахунку інтегрального показника боржника '||ved_,TRUE);
+
+            end if; 
 	when  G_ALG_351_18 then
  
        if ved_ = 1 and FZ_ = 'N' then
@@ -1542,26 +1541,26 @@ IS
     end case;	 
 	   
 	   trace(l_mod,'Вид економічної діяльності = '||ved_);
-       record_fp('GVED',  ved_, 6, DAT_, OKPO_);	   
-       trace(l_mod,'Інтегральний показник = '||to_char(sTmp_, '9999990.999'));	
+       record_fp('GVED',  ved_, 6, DAT_, OKPO_);
+       trace(l_mod,'Інтегральний показник = '||to_char(sTmp_, '9999990.999'));
 	   record_fp('PIPB',  round(sTmp_,3), 6, DAT_, OKPO_);
-	   
+
 	   -- Визначаємо клас по інтегральному показнику.
  	case  G_ALG_351
 	    when G_ALG_351_16  then  l_clas := CALC_SCOR_BAL('CLAS',sTmp_,ved_);
 		when G_ALG_351_18  then  l_clas := CALC_SCOR_BAL('KLAS',sTmp_,ved_);
 		else null;
 	end case;
-	   trace(l_mod,'Клас позичальника = '||l_clas);	
+	   trace(l_mod,'Клас позичальника = '||l_clas);
 
        record_fp('CLAS',  l_clas, 6, DAT_, OKPO_);
-  
+
 
 	  -- <<exit_prc>>
  end calculation_class;
 
-FUNCTION ZN_F1    (KOD_   char, 
-                   GR_   char,    
+FUNCTION ZN_F1    (KOD_   char,
+                   GR_   char,
                    DAT_   date default aDAT_,
 				   OKPO_  int default aOKPO_
                     ) RETURN  number  IS
@@ -1570,7 +1569,7 @@ dat0_ date					;
 k_ number;
 BEGIN
 if gr_ = 4 then dat0_ := DAT_;
-elsif gr_ = 3 then dat0_ := trunc( (DAT_ - 1) , 'Y' ); 
+elsif gr_ = 3 then dat0_ := trunc( (DAT_ - 1) , 'Y' );
 else  return 0;
 end if;
 
@@ -1580,12 +1579,12 @@ end if;
      from fin_fm
     where okpo = OKPO_
       and fdat = DAT0_;
-  exception when NO_DATA_FOUND THEN  raise_application_error(-(20000),'\ '||'     Код показника (баланс) '||KOD_||' Відсутні дані за звітний період - '||DAT0_,TRUE); 
-  END; 
+  exception when NO_DATA_FOUND THEN  raise_application_error(-(20000),'\ '||'     Код показника (баланс) '||KOD_||' Відсутні дані за звітний період - '||DAT0_,TRUE);
+  END;
 
-  
-  if LOGK_(DAT_, OKPO_, 1) > 0 
-   then  raise_application_error(-(20000),'\ '||'      Баланс Форми №1 заповнений з помилками за період - '||DAT0_,TRUE);  
+
+  if LOGK_(DAT_, OKPO_, 1) > 0
+   then  raise_application_error(-(20000),'\ '||'      Баланс Форми №1 заповнений з помилками за період - '||DAT0_,TRUE);
  null;
   end if;
 
@@ -1595,8 +1594,8 @@ return ZN_P(KOD_, 1, DAT0_, OKPO_) ;
 END ZN_F1;
 
 
-FUNCTION ZN_F2    (KOD_   char, 
-                   GR_   char,  
+FUNCTION ZN_F2    (KOD_   char,
+                   GR_   char,
                    DAT_   date default aDAT_,
 				   OKPO_  int default aOKPO_
                     ) RETURN  number IS
@@ -1612,98 +1611,98 @@ FZ_ :=  FIN_NBU.F_FM(OKPO_, DAT_);
 	/*
 	ВОТ ТУТ САМОЕ ИНТЕРЕСНОЕ..........
 	коли змінюється форма звітності з повної в малу.....
-	
-	
+
+
 	Пропоную наступне формулювання приведення показників до річного значення.
 
 Приведення показників до річного виміру здійснюється в такий спосіб:
-а) у разі наявності в Банку однакових форм звітності за останні 5 звітних періодів - шляхом 
+а) у разі наявності в Банку однакових форм звітності за останні 5 звітних періодів - шляхом
    підсумовування даних за останні чотири квартали, визначених на підставі такої фінансової звітності;
-б) у разі відсутності в Банку однакових форм звітності за останні 5 звітних періодів – шляхом коригування 
+б) у разі відсутності в Банку однакових форм звітності за останні 5 звітних періодів – шляхом коригування
    даних, отриманих за результатами останнього звітного періоду, на коефіцієнт зіставності 4/N, де N - порядковий номер останнього звітного періоду (кварталу);
-в) у разі відсутності фінансової звітності для визначення даних за п.а) їх визначення відбувається з 
+в) у разі відсутності фінансової звітності для визначення даних за п.а) їх визначення відбувається з
    врахуванням норм п.п.3.10.2. цієї Методики
 
    */
-   
+
    -- вставка початок
-   
-   
+
+
  select count(*)
-  into l_ 
-from fin_fm 
+  into l_
+from fin_fm
 where okpo =  OKPO_
    and fdat between  add_months(trunc( DAT_),-12) and DAT_
-   --and Fm <> FIN_NBU.F_FM(OKPO_, DAT_);  
-   and Fm not in ( FZ_, decode(FZ_,'N',' ',' ','N','-') ); 
- 
-	
+   --and Fm <> FIN_NBU.F_FM(OKPO_, DAT_);
+   and Fm not in ( FZ_, decode(FZ_,'N',' ',' ','N','-') );
+
+
 	if l_ > 0 or FZ_ not in ( ' ', 'N') then spPKdR_ := 1;
-	else 
-	   
+	else
+
 	    select count(*)
-		  into l_ 
-		from fin_fm 
+		  into l_
+		from fin_fm
 		where okpo =  OKPO_
 		   and fdat between  add_months(trunc( DAT_),-12) and DAT_
-		   --and Fm = FIN_NBU.F_FM(OKPO_, DAT_); 
+		   --and Fm = FIN_NBU.F_FM(OKPO_, DAT_);
 		   and fm in ( FZ_, decode(FZ_,'N',' ',' ','N','-')  );
 	   if l_ < 5 then spPKdR_ := 1;
 	   end if;
-	
-	
-	end if; 
-	
+
+
+	end if;
+
 	-- вставка кінкць
-	
-	
-	 IF spPKdR_ = 1  
+
+
+	 IF spPKdR_ = 1
 	 -- спосіб №1 запропонований НБУ
 
-	    then   
+	    then
 
-		if LOGK_(DAT_, OKPO_, 2) > 0 
+		if LOGK_(DAT_, OKPO_, 2) > 0
         then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||DAT_,TRUE);  end if;
 
-		if gr_ = 4 
-				   then 
+		if gr_ = 4
+				   then
 				    dat0_ := DAT_;
-					Q_    := to_char( (dat0_ - 1) , 'Q'); 
+					Q_    := to_char( (dat0_ - 1) , 'Q');
 				        return         round(  (zn_p(KOD_, 2, DAT0_, OKPO_)/Q_)*4);
-					
-				elsif gr_ = 3 
-				   then dat0_ := DAT_ ; 
-						return          ZN_P(KOD_, 2, DAT0_, OKPO_) ; 
+
+				elsif gr_ = 3
+				   then dat0_ := DAT_ ;
+						return          ZN_P(KOD_, 2, DAT0_, OKPO_) ;
 				 else  return           0;
 				 end if;
-		
-		
+
+
   elsIF spPKdR_ = 2
      -- спосіб №2 запропонований НБУ
-        then   
-		
-			    if gr_ = 4 
-				   then 
+        then
+
+			    if gr_ = 4
+				   then
 				    dat0_ := DAT_;
-      				 dat1_ := trunc( (DAT_ - 1) , 'Y' ); 
-					 Q_    := to_char( (dat0_ - 1) , 'Q'); 
+      				 dat1_ := trunc( (DAT_ - 1) , 'Y' );
+					 Q_    := to_char( (dat0_ - 1) , 'Q');
 						 if LOGK_(DAT_, OKPO_, 2) > 0 then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||DAT_,TRUE);  end if;
 						 if LOGK_(DAT1_, OKPO_, 2) > 0 then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||DAT1_,TRUE);  end if;	 
 					 return  round((ZN_P(KOD_, 2, DAT1_, OKPO_)+ZN_P(KOD_, 2, DAT0_, OKPO_))/(4 + Q_))*4;
-					
-				elsif gr_ = 3 
-			 	    then            dat0_ := DAT_ ; 
+
+				elsif gr_ = 3
+			 	    then            dat0_ := DAT_ ;
 						            if LOGK_(DAT_, OKPO_, 2) > 0 then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||DAT_,TRUE);  end if;
-		    		return          ZN_P(KOD_, 2, DAT0_, OKPO_) ; 
+		    		return          ZN_P(KOD_, 2, DAT0_, OKPO_) ;
 				 else  return           0;
 				 end if;
-		
-				
-		
+
+
+
   elsIF spPKdR_ = 3
      -- спосіб №3 запропонований ОБУ
-        then  
-				if gr_ = 4 
+        then
+				if gr_ = 4
 				   then dat0_ := DAT_;
 				   --return (ZN_FDK(KOD_,DAT_, OKPO_) +  ZN_FDK(KOD_,add_months(trunc(DAT_),-3), OKPO_) + ZN_FDK(KOD_,add_months(trunc(DAT_),-6), OKPO_) + ZN_FDK(KOD_,add_months(trunc(DAT_),-9), OKPO_));
 					 if LOGK_(DAT_, OKPO_, 2) > 0                       then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||DAT_,TRUE);  end if;
@@ -1714,47 +1713,47 @@ where okpo =  OKPO_
 				elsif gr_ = 3 
 				   then dat0_ := DAT_ ; 
 				   	 if LOGK_(DAT_, OKPO_, 2) > 0 then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||DAT_,TRUE);  end if;
-						return ZN_P(KOD_, 2, DAT0_, OKPO_) ; 
+						return ZN_P(KOD_, 2, DAT0_, OKPO_) ;
 				else  return 0;
 				end if;
-	
+
 	END IF;
 
 
 END ZN_F2;
 
 
-  FUNCTION ZN_FDK (KOD_   char, 
+  FUNCTION ZN_FDK (KOD_   char,
                    DAT_   date ,
 				   OKPO_  int default aOKPO_
                     ) RETURN  number IS
 
     sTmp_ number := 0 ;
 	sTmp1_ number := 0 ;
-	k_ number ; 
+	k_ number ;
 	k1_ number ;
-	
+
 	/* попробуємо вирахувати значення ф2 квартальну
 	   але треба врахувать що попереднього каварталу може не бути.
     */
-	
-	
-	
-  DAT0_ date;                     -- дата звітна         
+
+
+
+  DAT0_ date;                     -- дата звітна
   DAT1_ date;      -- дата поперереднього кварталу
   Q_ number ;       -- № звітного кварталу
- 
- 
- 
+
+
+
  BEGIN
 
-  DAT0_ :=  trunc(DAT_);                     -- дата звітна         
+  DAT0_ :=  trunc(DAT_);                     -- дата звітна
   DAT1_ :=  add_months(trunc(DAT_),-3);      -- дата поперереднього кварталу
   Q_    := to_char( (DAT0_ - 1) , 'Q');     -- № звітного кварталу
-  
-  
- 
-   
+
+
+
+
    --  наявність даних за попередній квартал 1 - Yes, 0 - No
  begin
    select 1
@@ -1763,8 +1762,8 @@ END ZN_F2;
     where okpo = OKPO_
       and fdat = DAT1_;
   exception when NO_DATA_FOUND THEN k_ := 0;
-  END;  
-	
+  END;
+
    sTmp_ := zn_p(KOD_, 2, DAT0_, OKPO_);
     begin
    select 1
@@ -1772,52 +1771,52 @@ END ZN_F2;
      from fin_fm
     where okpo = OKPO_
       and fdat = DAT0_;
-  exception when NO_DATA_FOUND THEN raise_application_error(-(20000),'\ ' ||'     '||KOD_||' Відсутні дані за звітний період - '||DAT0_,TRUE); 
-  END; 
-		 							
-    IF k_ = 0 or Q_ = 1    -- якщо І квартал або відсутні дані за попередній квартал 
+  exception when NO_DATA_FOUND THEN raise_application_error(-(20000),'\ ' ||'     '||KOD_||' Відсутні дані за звітний період - '||DAT0_,TRUE);
+  END;
+
+    IF k_ = 0 or Q_ = 1    -- якщо І квартал або відсутні дані за попередній квартал
 	                       -- то значення показника поділим на № кварталу
-               THEN   
+               THEN
 					sTmp_ := sTmp_ / Q_;
-	ELSE   
+	ELSE
 	   sTmp1_ := zn_p(KOD_, 2, DAT1_, OKPO_);
-	   
+
 	       begin
 			   select 1
 				 into k_
 				 from fin_fm
 				where okpo = OKPO_
 				  and fdat = DAT0_;
-			  exception when NO_DATA_FOUND THEN 
-			       sTmp_ := sTmp_ / Q_;  
-				   sTmp1_ := 0; 
-		   END; 
-	 		/* 		BEGIN	
+			  exception when NO_DATA_FOUND THEN
+			       sTmp_ := sTmp_ / Q_;
+				   sTmp1_ := 0;
+		   END;
+	 		/* 		BEGIN
 						select s
-						  into sTmp1_ 
+						  into sTmp1_
 						  from fin_rnk
 						 where okpo = OKPO_
 						   and fdat = DAT1_
 						   and kod  = KOD_
 						   and idf  = 2;
-							  exception when NO_DATA_FOUND 
+							  exception when NO_DATA_FOUND
 							      THEN sTmp_ := sTmp_ / Q_;  sTmp1_ := 0;   -- на всякий случай але ми це вже раніше обробили
 						END;  */
-		    
+
 			-- іначе значення цього кварталу відняти значення попереднього кварталу
 		   sTmp_ := sTmp_ - sTmp1_;
-		   
-    END IF;	   
-	  
-	  RETURN round(sTmp_,5);		   
+
+    END IF;
+
+	  RETURN round(sTmp_,5);
 
 end ZN_FDK;
 
 
 
 
-FUNCTION Calculation_FP (KOD_   char, 
-						 OKPO_  int default aOKPO_, 
+FUNCTION Calculation_FP (KOD_   char,
+						 OKPO_  int default aOKPO_,
 						 DAT_   date default aDAT_
 						 ) RETURN  number IS
 sTmp_ number := 0 ;
@@ -1839,275 +1838,275 @@ BEGIN
   aDAT_  :=  trunc(DAT_);
   FZ_    :=  fin_nbu.F_FM (aOKPO_, aDAT_ ) ;  -- (вид ворми звітності допустимі ' ', 'M', 'C')
 
- 
+
   /*
   2.Фінансові коефіцієнти визначаються згідно з таблицею 3 цього додатка  на підставі
-  даних фінансової звітності за 
-             - останній звітний період 
+  даних фінансової звітності за
+             - останній звітний період
 			 - та даних звітності останнього звітного року:
-  
-  3. З метою уникнення надмірного впливу фінансових коефіцієнтів на інтегральний показник 
-  фінансового стану береться до розрахунку їх максимальне значення не більше 100. 
 
-  4.   Якщо під час розрахунку фінансового коефіцієнта знаменник формули дорівнює нулю, 
-  то під час розрахунку інтегрального показника береться значення фінансового коефіцієнта, 
-  що дорівнює 1 
-  
-  (за винятком фінансових коефіцієнтів К5, К6, К7, МК6, МК7, за якими береться значення, що дорівнює 0). 
-  
-  Якщо знаменник коефіцієнта К5 дорівнює нулю або має від’ємне значення, 
-  то для розрахунків береться значення коефіцієнта, що дорівнює нулю. 
-  
-  Під час розрахунку фінансових коефіцієнтів К5, К8, К9, К10, МК5, МК8, МК9, МК10 на підставі квартальної звітності, 
-  у тому числі з метою врахування сезонності та циклічності, здійснюється приведення показників форми № 2 (№ 2-м) “Звіт про фінансові результати” 
-  до річного виміру. 
+  3. З метою уникнення надмірного впливу фінансових коефіцієнтів на інтегральний показник
+  фінансового стану береться до розрахунку їх максимальне значення не більше 100.
+
+  4.   Якщо під час розрахунку фінансового коефіцієнта знаменник формули дорівнює нулю,
+  то під час розрахунку інтегрального показника береться значення фінансового коефіцієнта,
+  що дорівнює 1
+
+  (за винятком фінансових коефіцієнтів К5, К6, К7, МК6, МК7, за якими береться значення, що дорівнює 0).
+
+  Якщо знаменник коефіцієнта К5 дорівнює нулю або має від’ємне значення,
+  то для розрахунків береться значення коефіцієнта, що дорівнює нулю.
+
+  Під час розрахунку фінансових коефіцієнтів К5, К8, К9, К10, МК5, МК8, МК9, МК10 на підставі квартальної звітності,
+  у тому числі з метою врахування сезонності та циклічності, здійснюється приведення показників форми № 2 (№ 2-м) “Звіт про фінансові результати”
+  до річного виміру.
 
 Приведення показників до річного виміру здійснюється в такий спосіб:
 
-а) коригуванням  квартальних показників форми № 2 (№ 2-м) “Звіт про фінансові результати” 
+а) коригуванням  квартальних показників форми № 2 (№ 2-м) “Звіт про фінансові результати”
    на коефіцієнт зіставності (4/N, де N – порядковий номер останнього звітного кварталу), або
 
-б) на основі розрахунку середньоквартальних показників з урахуванням останнього звітного кварталу 
+б) на основі розрахунку середньоквартальних показників з урахуванням останнього звітного кварталу
    та останнього звітного року. Отримані середньоквартальні значення показників перемножуються на 4, або
 
-в) з використанням іншого методу, що забезпечує приведення показників до річного виміру. У разі використання банком 
-    іншого методу приведення показників до річного виміру похибка отриманих результатів від його застосування 
-	не повинна бути більшою, ніж 10% від значень показників, отриманих у результаті застосування будь-якого з методів, наведених вище.    
+в) з використанням іншого методу, що забезпечує приведення показників до річного виміру. У разі використання банком
+    іншого методу приведення показників до річного виміру похибка отриманих результатів від його застосування
+	не повинна бути більшою, ніж 10% від значень показників, отриманих у результаті застосування будь-якого з методів, наведених вище.
 
-	У разі використання даних річної звітності приведення показників до річного виміру не здійснюється. 
+	У разі використання даних річної звітності приведення показників до річного виміру не здійснюється.
 
-  
+
   */
-  
+
 
 	IF KOD_ = 'K1'  --    K1 (коефіцієнт покриття (ліквід-ність третього ступеня))      = B260/B620
 		    THEN
-			   CASE      WHEN FZ_ = ' ' THEN   
+			   CASE      WHEN FZ_ = ' ' THEN
 								   case when ZN_F1('620', 4) = 0 then RETURN 1;
 										else sTmp_ :=  ZN_F1('260',4)/ZN_F1('620',4);       RETURN sTmp_;
 								   end case;
-						 WHEN FZ_ = 'N' THEN   
+						 WHEN FZ_ = 'N' THEN
 								   case when ZN_F1('1695', 4) = 0 then RETURN 1;
 										else sTmp_ :=  ZN_F1('1195',4)/(ZN_F1('1600',4)+ZN_F1('1605',4)+ZN_F1('1610',4)+ZN_F1('1615',4)+ZN_F1('1620',4)+ZN_F1('1625',4)+ZN_F1('1630',4)+ZN_F1('1690',4));       RETURN sTmp_;
-								   end case;  
-						WHEN FZ_ in ('R','C') THEN   
+								   end case;
+						WHEN FZ_ in ('R','C') THEN
 								   case when (ZN_F1('1695', 4)-ZN_F1('1665', 4)) = 0 then RETURN 1;
 										else sTmp_ :=  (ZN_F1('1195',4)-ZN_F1('1170',4))/(ZN_F1('1695', 4)-ZN_F1('1665', 4));       RETURN sTmp_;
-								   end case;  		   
+								   end case;
 			 	     	ELSE       case when ZN_F1('620',4) = 0 then RETURN 1;
 										else sTmp_ :=  ZN_F1('260',4)/ZN_F1('620',4);       RETURN sTmp_;
 								   end case;
 			END CASE;
-			
+
 	ELSIF KOD_ = 'K2'  --    K1 (проміжний коефіцієнт покриття)      = (ф.1 р.150+р.160+р.220+р.230+р. 240 гр. 4)/620 гр. 4
 		                     --              M                              = (ф.1-м р.160+р.220+р.230+р.240гр.4)       /ф.1-мр.620 гр.4
 							 --              C                              =  (ф.1-мср.210+р.230+р.240гр.4)/ф.-мср.620 гр.4
 
 		     THEN
-                 CASE    WHEN FZ_ = ' ' THEN   
+                 CASE    WHEN FZ_ = ' ' THEN
 											   case when ZN_F1('620',4) = 0 then RETURN 1;
 													else sTmp_ :=  (ZN_F1('150',4)+ZN_F1('160',4)+ZN_F1('220',4)+ZN_F1('230',4)+ZN_F1('240',4))/ZN_F1('620',4);       RETURN sTmp_;
 											   end case;
-						 WHEN FZ_ = 'N' THEN   
+						 WHEN FZ_ = 'N' THEN
 											   case when ZN_F1('1695',4) = 0 then RETURN 1;
 													else sTmp_ :=  (ZN_F1('1120',4)+ZN_F1('1125',4)+ZN_F1('1160',4)+ZN_F1('1165',4))/(ZN_F1('1600',4)+ZN_F1('1605',4)+ZN_F1('1610',4)+ZN_F1('1615',4)+ZN_F1('1620',4)+ZN_F1('1625',4)+ZN_F1('1630',4)+ZN_F1('1690',4));       RETURN sTmp_;
 											   end case;
-						 WHEN FZ_ in ('R','C') THEN   
+						 WHEN FZ_ in ('R','C') THEN
 											   case when (ZN_F1('1695', 4)-ZN_F1('1665', 4)) = 0 then RETURN 1;
 													else sTmp_ :=  (ZN_F1('1125',4)+ZN_F1('1160',4)+ZN_F1('1165',4))/(ZN_F1('1695', 4)-ZN_F1('1665', 4));       RETURN sTmp_;
-											   end case;											   
+											   end case;
 						 WHEN FZ_ = 'M' THEN
 											   case when ZN_F1('620',4) = 0 then RETURN 1;
 													else sTmp_ :=  (ZN_F1('160',4)+ZN_F1('220',4)+ZN_F1('230',4)+ZN_F1('240',4))/ZN_F1('620',4);                   RETURN sTmp_;
-											   end case;						 
+											   end case;
 						ELSE                   case when ZN_F1('620',4) = 0 then RETURN 1;
 													else sTmp_ :=  (ZN_F1('210',4)+ZN_F1('230',4)+ZN_F1('240',4))/ZN_F1('620',4);                               RETURN sTmp_;
 											   end case;
 			    END CASE;
-				
-				
+
+
     ELSIF KOD_ = 'K3' -- K3 (коефіцієнт фінансової незалежно-сті )                            =  ф.1р.380гр.4/ф.1р.640гр.4
             THEN
-			   CASE      WHEN FZ_ = ' ' THEN   
+			   CASE      WHEN FZ_ = ' ' THEN
 								   case when ZN_F1('640',4) = 0 then RETURN 1;
 										else sTmp_ :=  ZN_F1('380',4)/ZN_F1('640',4);       RETURN sTmp_;
 								   end case;
-						 WHEN FZ_ = 'N' THEN   
+						 WHEN FZ_ = 'N' THEN
 								   case when ZN_F1('1900',4) = 0 then RETURN 1;
 										else sTmp_ :=  ZN_F1('1495',4)/ZN_F1('1900',4);       RETURN sTmp_;
-								   end case;   
-						 WHEN FZ_ in ('R','C') THEN   
+								   end case;
+						 WHEN FZ_ in ('R','C') THEN
 								   case when ZN_F1('1900',4) = 0 then RETURN 1;
 										else sTmp_ :=  ZN_F1('1495',4)/ZN_F1('1900',4);       RETURN sTmp_;
-								   end case; 								   
+								   end case;
 			 	     	ELSE       case when ZN_F1('640',4) = 0 then RETURN 1;
 										else sTmp_ :=  ZN_F1('380',4)/ZN_F1('640',4);       RETURN sTmp_;
 								   end case;
 			END CASE;
-			
-			
+
+
 	ELSIF KOD_ = 'K4' -- K3 (коефіцієнт покриття необорот-них активів власним капіталом  )    = ф.1 р.380 гр.4/ф.1 р.080гр.4
 
-		
+
             THEN
-			   CASE      WHEN FZ_ = ' ' THEN   
+			   CASE      WHEN FZ_ = ' ' THEN
 								   case when ZN_F1('080',4) = 0 then RETURN 1;
 										else sTmp_ :=  ZN_F1('380',4)/ZN_F1('080',4);       RETURN sTmp_;
 								   end case;
-						WHEN FZ_ = 'N' THEN   
+						WHEN FZ_ = 'N' THEN
 								   case when ZN_F1('1095',4) = 0 then RETURN 1;
 										else sTmp_ :=  ZN_F1('1495',4)/ZN_F1('1095',4);       RETURN sTmp_;
-								   end case;   
-						WHEN FZ_ in ('R','C') THEN   
+								   end case;
+						WHEN FZ_ in ('R','C') THEN
 								   case when ZN_F1('1095',4) = 0 then RETURN 1;
 										else sTmp_ :=  ZN_F1('1495',4)/ZN_F1('1095',4);       RETURN sTmp_;
-								   end case;   
-								   
+								   end case;
+
 			 	     	ELSE       case when ZN_F1('080',4) = 0 then RETURN 1;
 										else sTmp_ :=  ZN_F1('380',4)/ZN_F1('080',4);       RETURN sTmp_;
 								   end case;
 			END CASE;
 
-			
-	ELSIF KOD_ = 'K5' -- K5 (коефіцієнт рентабель-ності власного капіталу  )    
-            THEN 
+
+	ELSIF KOD_ = 'K5' -- K5 (коефіцієнт рентабель-ності власного капіталу  )
+            THEN
                     --  K5 ' ' --                 //=             (ф. 2 рр. 220–225 гр. 3) /
                     --                                ф. 1 [(р. 300+р. 310+р. 320+р. 330–рр. 360–370 гр. 3)+
-					--                                      (р. 300+р. 310+р. 320+р. 330–р. 360–р. 370 гр. 4)]:2 
-					
-			CASE  WHEN FZ_ = ' ' THEN   		
-			      N1_ := ( (ZN_F1('300', 3)+ZN_F1('310', 3)+ZN_F1('320',3)+ZN_F1('330',3) - (ZN_F1('360',3)+ZN_F1('370', 3))) + 
+					--                                      (р. 300+р. 310+р. 320+р. 330–р. 360–р. 370 гр. 4)]:2
+
+			CASE  WHEN FZ_ = ' ' THEN
+			      N1_ := ( (ZN_F1('300', 3)+ZN_F1('310', 3)+ZN_F1('320',3)+ZN_F1('330',3) - (ZN_F1('360',3)+ZN_F1('370', 3))) +
 			              (ZN_F1('300', 4)+ZN_F1('310', 4)+ZN_F1('320',4)+ZN_F1('330',4) - (ZN_F1('360',4)+ZN_F1('370', 4))) ) / 2;
-				  WHEN FZ_ = 'N' THEN   
-				 N1_ := ( (ZN_F1('1400', 3)+ZN_F1('1405', 3)+ZN_F1('1410',3) - ZN_F1('1425',3)-ZN_F1('1430', 3)) + 
-			              (ZN_F1('1400', 4)+ZN_F1('1405', 4)+ZN_F1('1410',4) - ZN_F1('1425',4)-ZN_F1('1430', 4)) ) / 2; 
-                  WHEN FZ_ in ('R','C') THEN   
-				 N1_ :=  (ZN_F1('1615', 3) +  ZN_F1('1615', 4) ) / 2; 						  
+				  WHEN FZ_ = 'N' THEN
+				 N1_ := ( (ZN_F1('1400', 3)+ZN_F1('1405', 3)+ZN_F1('1410',3) - ZN_F1('1425',3)-ZN_F1('1430', 3)) +
+			              (ZN_F1('1400', 4)+ZN_F1('1405', 4)+ZN_F1('1410',4) - ZN_F1('1425',4)-ZN_F1('1430', 4)) ) / 2;
+                  WHEN FZ_ in ('R','C') THEN
+				 N1_ :=  (ZN_F1('1615', 3) +  ZN_F1('1615', 4) ) / 2;
 			     ELSE
 			     N2_ := (ZN_F1('530', 3)+ZN_F1('530',4))/2;
-			
-			END CASE;	
-			
+
+			END CASE;
+
                     ---  K5  to  'M' and 'MC'     //  = (ф.2-мср.030гр.3/ф.1-мср.530(гр. 3+гр. 4):2
 				    --   N2_ := (ZN_F1('530', 3)+ZN_F1('530',4))/2;
 
-				 
-                	   CASE      WHEN FZ_ = ' ' THEN   
+
+                	   CASE      WHEN FZ_ = ' ' THEN
 									   case when N1_ <= 0 then RETURN 0;
 											else sTmp_ :=  (ZN_F2('220', 4)-ZN_F2('225', 4))/N1_;       RETURN sTmp_;
 									   end case;
-								WHEN FZ_ = 'N' THEN   
+								WHEN FZ_ = 'N' THEN
 									   case when N1_ <= 0 then RETURN 0;
 											else sTmp_ :=  (ZN_F2('2350', 4)-ZN_F2('2355', 4))/N1_;       RETURN sTmp_;
-									   end case;	   
-								WHEN FZ_ in ('R','C') THEN   
+									   end case;
+								WHEN FZ_ in ('R','C') THEN
 									   case when N1_ = 0 then RETURN 1;
 											else sTmp_ :=  (ZN_F2('2000', 4))/N1_;       RETURN sTmp_;
-									   end case;	   
-									   
+									   end case;
+
 							     ELSE
 									   case when N2_ = 0 then RETURN 1;
 											else sTmp_ :=  ZN_F2('030', 4)/N2_;       RETURN sTmp_;
-									   end case;					 
+									   end case;
 			          END CASE;
 	ELSIF KOD_ = 'K6' --		ф. 2 рр. 100–105 гр. 3/ф. 2 р. 035 гр. 3
-	
+
 	             -- 'M'    (ф. 2-м р. 030–р. 090–р. 100–р. 110–р. 120–р. 140гр. 3 )/ф. 2-м р. 030 гр. 3
             THEN
-				   	   CASE      WHEN FZ_ = ' ' THEN   
+				   	   CASE      WHEN FZ_ = ' ' THEN
 									   case when ZN_F2('035',3) = 0 then RETURN 0;
 											else sTmp_ :=  (ZN_F2('100', 3)-ZN_F2('105', 3))/ZN_F2('035', 3);       RETURN sTmp_;
 									   end case;
-								 WHEN FZ_ = 'N' THEN   
+								 WHEN FZ_ = 'N' THEN
 									   case when ZN_F2('2000',3) = 0 then RETURN 0;
 											else sTmp_ :=  (ZN_F2('2190', 3)-ZN_F2('2195', 3))/ZN_F2('2000', 3);       RETURN sTmp_;
-									   end case;	
-								 WHEN FZ_ in ('R','C') THEN   
+									   end case;
+								 WHEN FZ_ in ('R','C') THEN
 									   case when ZN_F2('2000',3) = 0 then RETURN 0;
 											else sTmp_ :=  (ZN_F2('2000', 3)-ZN_F2('2050', 3))/ZN_F2('2000', 3);       RETURN sTmp_;
-									   end case;									   
+									   end case;
 							     ELSE
 									   case when ZN_F2('030',3) = 0  then RETURN 0;
 											else sTmp_ :=  (ZN_F2('030', 3)-ZN_F2('080', 3))/ZN_F2('030',3);       RETURN sTmp_;
-									   end case;					 
+									   end case;
 			          END CASE;
 
-					  
+
     	ELSIF KOD_ = 'K7' --		ф. 2 рр. 220–225+р. 260+р. 210+рр. 180+р. 140 гр.3/ф. 2 р. 035+р. 060 гр. 3
 
-	
+
 	                     -- 'M'    (ф. 2-м р. 070–р. 180+р. 120+р. 150+р. 170 гр. 3)/ф. 2-м р. 030+р. 040 гр. 3
 
             THEN
-				   	   CASE      WHEN FZ_ = ' ' THEN   
+				   	   CASE      WHEN FZ_ = ' ' THEN
 									   case when (ZN_F2('035',3)+ZN_F2('060',3)) = 0 then RETURN 0;
 											else sTmp_ :=  (ZN_F2('220', 3)-ZN_F2('225', 3)+ZN_F2('260',3)+ZN_F2('210',3)+ZN_F2('180',3)+ZN_F2('140',3))/(ZN_F2('035',3)+ZN_F2('060',3));       RETURN sTmp_;
 									   end case;
-								 WHEN FZ_ = 'N' THEN   
+								 WHEN FZ_ = 'N' THEN
 									   case when (ZN_F2('2000',3)+ZN_F2('2120',3)) = 0 then RETURN 0;
 											else sTmp_ :=  (ZN_F2('2290', 3)-ZN_F2('2295', 3)+ZN_F2('2250',3)+ZN_F2('2515',3))/(ZN_F2('2000',3)+ZN_F2('2120',3));       RETURN sTmp_;
-									   end case;	 
-								 WHEN FZ_ in ('R','C') THEN   
+									   end case;
+								 WHEN FZ_ in ('R','C') THEN
 									   case when (ZN_F2('2280',3)) = 0 then RETURN 0;
 											else sTmp_ :=  (ZN_F2('2290', 3))/(ZN_F2('2280',3));       RETURN sTmp_;
-									   end case;										   
+									   end case;
 							     ELSE
 									   case when (ZN_F2('030',3)+ZN_F2('040',3)+ZN_F2('050',3)) = 0  then RETURN 0;
 											else sTmp_ :=  ZN_F2('130',3)/(ZN_F2('030',3)+ZN_F2('040',3)+ZN_F2('050',3)) ;       RETURN sTmp_;
-									   end case;					 
+									   end case;
 			          END CASE;
-					  
+
 	    ELSIF KOD_ = 'K8' --		  ф. 2 рр. 220–225 гр. 3/ф. 1 р. 280 (гр. 3+гр. 4):2
 	                     -- 'M'    ф. 2-м рр. 070–180 гр. 3 / ф. 1-м р. 280 (гр. 3+гр. 4):2
             THEN
-			
-			
-				   	   CASE      WHEN FZ_ = ' ' THEN   
+
+
+				   	   CASE      WHEN FZ_ = ' ' THEN
 									   case when (ZN_F1('280',3)+ZN_F1('280',4))/2 = 0 then RETURN 1;
 											else sTmp_ := (ZN_F2('220', 4)-ZN_F2('225', 4)) /((ZN_F1('280',3)+ZN_F1('280',4))/2);       RETURN sTmp_;
 									   end case;
-								WHEN FZ_ = 'N' THEN   
+								WHEN FZ_ = 'N' THEN
 									   case when (ZN_F1('1300',3)+ZN_F1('1300',4))/2 = 0 then RETURN 1;
 											else sTmp_ := (ZN_F2('2350', 4)-ZN_F2('2355', 4)) /((ZN_F1('1300',3)+ZN_F1('1300',4))/2);       RETURN sTmp_;
 									   end case;
-								WHEN FZ_ in ('R','C') THEN   
+								WHEN FZ_ in ('R','C') THEN
 									   case when (ZN_F1('1300',3)+ZN_F1('1300',4))/2 = 0 then RETURN 1;
 											else sTmp_ := (ZN_F2('2350', 4)) /((ZN_F1('1300',3)+ZN_F1('1300',4))/2);       RETURN sTmp_;
-									   end case;									   
+									   end case;
 							     ELSE
 									   case when (ZN_F1('280',3)+ZN_F1('280',4))/2 = 0  then RETURN 1;
 											else sTmp_ :=  (ZN_F2('150', 4))/((ZN_F1('280',3)+ZN_F1('280',4))/2) ;       RETURN sTmp_;
-									   end case;					 
+									   end case;
 			          END CASE;
-		
-		
-		
-		
+
+
+
+
 		ELSIF KOD_ = 'K9' --		  ф. 2 р. 035 гр. 3   / ф. 1 р. 260 (гр. 3+гр. 4):2
 
 	                     -- 'M'     ф. 2-м р. 030 гр. 3 /ф. 1-м р. 260 (гр. 3+гр. 4):2
 
             THEN
-				   	   CASE      WHEN FZ_ = ' ' THEN   
+				   	   CASE      WHEN FZ_ = ' ' THEN
 									   case when (ZN_F1('260',3)+ZN_F1('260',4))/2 = 0 then RETURN 1;
 											else sTmp_ := (ZN_F2('035', 4)) /((ZN_F1('260',3)+ZN_F1('260',4))/2);       RETURN sTmp_;
 									   end case;
-								 WHEN FZ_ = 'N' THEN   
+								 WHEN FZ_ = 'N' THEN
 									   case when (ZN_F1('1195',3)+ZN_F1('1195',4))/2 = 0 then RETURN 1;
 											else sTmp_ := (ZN_F2('2000', 4)) /((ZN_F1('1195',3)+ZN_F1('1195',4))/2);       RETURN sTmp_;
-									   end case;	   
-								 WHEN FZ_ in ('R','C') THEN   
+									   end case;
+								 WHEN FZ_ in ('R','C') THEN
 									   case when (ZN_F1('1195',3)-ZN_F1('1170',3))+(ZN_F1('1195',4)-ZN_F1('1170',4))/2 = 0 then RETURN 1;
 											else sTmp_ := (ZN_F2('2000', 4)) /((ZN_F1('1195',3)-ZN_F1('1170',3)+ZN_F1('1195',4)-ZN_F1('1170',4))/2);       RETURN sTmp_;
-									   end case;									   
+									   end case;
 							     ELSE
 									   case when (ZN_F1('260',3)+ZN_F1('260',4))/2 = 0  then RETURN 1;
 											else sTmp_ :=  (ZN_F2('030', 4))/((ZN_F1('260',3)+ZN_F1('260',4))/2) ;       RETURN sTmp_;
-									   end case;					 
+									   end case;
 			          END CASE;
-					  
-					  
-					  
+
+
+
 	    ELSIF KOD_ = 'K10' --		  (ф. 2 рр. 220–225+р. 260+р. 210+р. 180+р. 140 гр. 3 ) /   ф. 1 р. 480+р. 620 гр. 4
 
 
@@ -2115,41 +2114,41 @@ BEGIN
 
 
             THEN
-				   	   CASE      WHEN FZ_ = ' ' THEN   
+				   	   CASE      WHEN FZ_ = ' ' THEN
 									   case when (ZN_F1('480',4)+ZN_F1('620',4)) = 0 then RETURN 1;
 											else sTmp_ := (ZN_F2('220', 4)-ZN_F2('225', 4)+ZN_F2('260', 4)+ZN_F2('210', 4)+ZN_F2('180', 4)+ZN_F2('140', 4)) /(ZN_F1('480',4)+ZN_F1('620',4));       RETURN sTmp_;
 									   end case;
-								WHEN FZ_ = 'N' THEN   
+								WHEN FZ_ = 'N' THEN
 									   case when (ZN_F1('1500',4)+ZN_F1('1510',4)+ZN_F1('1515',4)+ZN_F1('1600',4)+ZN_F1('1605',4)+ZN_F1('1610',4)+ZN_F1('1615',4)+ZN_F1('1620',4)+ZN_F1('1625',4)+ZN_F1('1630',4)+ZN_F1('1690',4)) = 0 then RETURN 1;
 											else sTmp_ := (ZN_F2('2290', 4)-ZN_F2('2295', 4)+ZN_F2('2250', 4)+ZN_F2('2515', 4)) /(ZN_F1('1500',4)+ZN_F1('1510',4)+ZN_F1('1515',4)+ZN_F1('1600',4)+ZN_F1('1605',4)+ZN_F1('1610',4)+ZN_F1('1615',4)+ZN_F1('1620',4)+ZN_F1('1625',4)+ZN_F1('1630',4)+ZN_F1('1690',4));   --    RETURN sTmp_;
-									   end case;	   
+									   end case;
 									       RETURN sTmp_;
-								WHEN FZ_ in ('R','C') THEN   
+								WHEN FZ_ in ('R','C') THEN
 									   case when (ZN_F1('1595',4)+ZN_F1('1695',4)+ZN_F1('1665',4)) = 0 then RETURN 1;
 											else sTmp_ := (ZN_F2('2290', 4)) /(ZN_F1('1595',4)+ZN_F1('1695',4)+ZN_F1('1665',4));   --    RETURN sTmp_;
-									   end case;	   
-									       RETURN sTmp_;										   
+									   end case;
+									       RETURN sTmp_;
 							     ELSE
 									   case when (ZN_F1('480',4)+ZN_F1('620',4)) = 0  then RETURN 1;
 											else sTmp_ :=  (ZN_F2('130', 4))/(ZN_F1('480',4)+ZN_F1('620',4)) ;       RETURN sTmp_;
-										end case;					 
-			          END CASE;			  
-					  
-  
+										end case;
+			          END CASE;
+
+
 	else return null;
-		
+
 	END IF;
 
-	
+
 END Calculation_FP;
 
 -- Пошук мінімальних або махсимальних значень по скоренгу
 
 
 PROCEDURE Calc_FP (
-	 		       OKPO_  int default aOKPO_, 
+	 		       OKPO_  int default aOKPO_,
 				   DAT_   date default aDAT_
-				  ) 
+				  )
 as
 sTmp_ number;
 l_rzn varchar2(3)  :='RZN';
@@ -2159,362 +2158,362 @@ l_zero varchar2(4) :='ZERO';
 l_mod varchar2(254) := 'fin.Calc_FP>>';
 BEGIN
   tp_indics := null;
-  
+
   aOKPO_ :=  OKPO_;
   aDAT_  :=  trunc(DAT_);
   FZ_    :=  fin_nbu.F_FM (aOKPO_, aDAT_ ) ;  -- (вид ворми звітності допустимі ' ', 'M', 'C')
 
  case   G_ALG_351
        when  G_ALG_351_16 then 
-  --'PK1' then	    -- К1, МК1 – показники покриття боргу  
-            CASE 
+  --'PK1' then	    -- К1, МК1 – показники покриття боргу
+            CASE
 			  WHEN FZ_ = 'N' THEN
-			               begin   
+			               begin
 						            sTmp_ :=     ( ZN_F1('1510',4) + ZN_F1('1515',4) + ZN_F1('1600',4) + ZN_F1('1610',4) - ZN_F1('1165',4) )  /  (ZN_F2('2000',4) + ZN_F2('2010',4));
 									get_indic('PK1',sTmp_,l_rzn);
-							exception when ZERO_DIVIDE then 
-                                    sTmp_ :=  null;	get_indic('PK1',sTmp_,l_min);	
+							exception when ZERO_DIVIDE then
+                                    sTmp_ :=  null;	get_indic('PK1',sTmp_,l_min);
 						   end;
 			  WHEN FZ_ = 'R' THEN
-			                begin    
+			                begin
 						            sTmp_ :=     ( ZN_F1('1595',4) + ZN_F1('1600',4) + ZN_F1('1610',4) - ZN_F1('1165',4) )  /  (ZN_F2('2000',4));
 									get_indic('PK1',sTmp_,l_rzn);
-							exception when ZERO_DIVIDE then 
-                                    sTmp_ :=  null;	get_indic('PK1',sTmp_,l_min);		
+							exception when ZERO_DIVIDE then
+                                    sTmp_ :=  null;	get_indic('PK1',sTmp_,l_min);
 						   end;
 			  WHEN FZ_ = 'C' THEN
-			                begin    
+			                begin
 						            sTmp_ :=     ( ZN_F1('1595',4) + ZN_F1('1600',4) - ZN_F1('1165',4) )  /  (ZN_F2('2000',4));
 									get_indic('PK1',sTmp_,l_rzn);
-							exception when ZERO_DIVIDE then 
-                                    sTmp_ :=  null;	get_indic('PK1',sTmp_,l_min);		
+							exception when ZERO_DIVIDE then
+                                    sTmp_ :=  null;	get_indic('PK1',sTmp_,l_min);
 						   end;
 			  ELSE sTmp_:= null;
 			END CASE;
- 
-  --'PK2' then	   -- К2,  МК2 – показники рентабельності активів   
-            CASE 
+
+  --'PK2' then	   -- К2,  МК2 – показники рентабельності активів
+            CASE
 			  WHEN FZ_ = 'N' THEN
-			               begin    
+			               begin
 						            sTmp_ :=     ( ZN_F2('2350',4) - ZN_F2('2355',4)  )  /  ZN_F1('1300',4);
 									get_indic('PK2',sTmp_,l_rzn);
-							exception when ZERO_DIVIDE then 
-                                    sTmp_ :=  null; 	get_indic('PK2',sTmp_,l_min);		
+							exception when ZERO_DIVIDE then
+                                    sTmp_ :=  null; 	get_indic('PK2',sTmp_,l_min);
 						   end;
 			  WHEN FZ_ IN ('R','C') THEN
-			                begin    
+			                begin
 						            sTmp_ :=     ( ZN_F2('2000',4) - ZN_F2('2050',4)  )  /  ZN_F1('1300',4);
 									get_indic('PK2',sTmp_,l_rzn);
-							exception when ZERO_DIVIDE then 
+							exception when ZERO_DIVIDE then
                                     sTmp_ := null; get_indic('PK2',sTmp_,l_min);
 						   end;
  		      ELSE sTmp_:= null;
 			END CASE;
-  -- 'PK3' then	    -- К3 –показник покриття фінансових витрат за результатами  операційної діяльності 
-            CASE 
-			  WHEN FZ_ = 'N' THEN 
-			                   
-                                if ( ZN_F2('2250',4) - ZN_F2('2220',4)   ) <= 0	 then sTmp_ :=  null; 	get_indic('PK3',sTmp_,l_max);		
-                                 else								
+  -- 'PK3' then	    -- К3 –показник покриття фінансових витрат за результатами  операційної діяльності
+            CASE
+			  WHEN FZ_ = 'N' THEN
+
+                                if ( ZN_F2('2250',4) - ZN_F2('2220',4)   ) <= 0	 then sTmp_ :=  null; 	get_indic('PK3',sTmp_,l_max);
+                                 else
 						            sTmp_ :=     ( ZN_F2('2190',4) - ZN_F2('2195',4)  )  /  ( ZN_F2('2250',4) - ZN_F2('2220',4)  );
 									get_indic('PK3',sTmp_,l_rzn);
 								end if;
-							 
-			               
-			  WHEN FZ_ = 'R' THEN 
-			  			    begin    
+
+
+			  WHEN FZ_ = 'R' THEN
+			  			    begin
 						            sTmp_ :=     ( ZN_F2('2000',4) - ZN_F2('2050',4)  )  /   ZN_F2('2270',4);
 									get_indic('PK3',sTmp_,l_rzn);
-							exception when ZERO_DIVIDE then 
+							exception when ZERO_DIVIDE then
                                     sTmp_ := null; get_indic('PK3',sTmp_,l_max);
 						   end;
-			                 
-			  WHEN FZ_ = 'C' THEN 
-			  			    begin    
+
+			  WHEN FZ_ = 'C' THEN
+			  			    begin
 						            sTmp_ :=     ( ZN_F2('2000',4) - ZN_F2('2050',4)  )  /   ZN_F2('2165',4);
 									get_indic('PK3',sTmp_,l_rzn);
-							exception when ZERO_DIVIDE then 
+							exception when ZERO_DIVIDE then
                                     sTmp_ := null; get_indic('PK3',sTmp_,l_max);
 						   end;
-			                 
+
 			  ELSE sTmp_:= null;
-			END CASE; 
- 
+			END CASE;
+
    -- 'PK4' then	    -- К4, MK4 –  показники капіталу
-            CASE 
-			  WHEN FZ_ = 'N' THEN 
-			  			    begin    
+            CASE
+			  WHEN FZ_ = 'N' THEN
+			  			    begin
 						            sTmp_ :=      ZN_F1('1495',4)  /   ZN_F1('1300',4);
 									get_indic('PK4',sTmp_,l_rzn);
-							exception when ZERO_DIVIDE then 
+							exception when ZERO_DIVIDE then
                                     sTmp_ := null; get_indic('PK4',sTmp_,l_min);
 						   end;
-							 
-			               
-			  WHEN FZ_ in ('R','C') THEN 
-			  			    begin    
+
+
+			  WHEN FZ_ in ('R','C') THEN
+			  			    begin
 						            sTmp_ :=      ZN_F1('1495',4)  /   ZN_F1('1300',4);
 									get_indic('PK4',sTmp_,l_rzn);
-							exception when ZERO_DIVIDE then 
+							exception when ZERO_DIVIDE then
                                     sTmp_ := null; get_indic('PK4',sTmp_,l_min);
 						   end;
-			                 
+
 			  ELSE sTmp_:= null;
-			END CASE; 
- 
- 
+			END CASE;
+
+
     -- 'PK5' then	    -- . К5, MK5 – показники маневреності робочого капіталу
-            CASE 
-			  WHEN FZ_ = 'N' THEN 
-			  			    begin    
+            CASE
+			  WHEN FZ_ = 'N' THEN
+			  			    begin
 						            sTmp_ :=   (ZN_F1('1195',4) - ZN_F1('1695',4))  /   ZN_F1('1300',4);
 									get_indic('PK5',sTmp_,l_rzn);
-							exception when ZERO_DIVIDE then 
+							exception when ZERO_DIVIDE then
                                     sTmp_ := null; get_indic('PK5',sTmp_,l_max);
 						   end;
-							 
-			               
-			  WHEN FZ_ in ('R','C') THEN 
-			  			    begin    
+
+
+			  WHEN FZ_ in ('R','C') THEN
+			  			    begin
 						            sTmp_ :=   (ZN_F1('1195',4) - ZN_F1('1695',4))  /   ZN_F1('1300',4);
 									get_indic('PK5',sTmp_,l_rzn);
-							exception when ZERO_DIVIDE then 
+							exception when ZERO_DIVIDE then
                                     sTmp_ := null; get_indic('PK5',sTmp_,l_min);
 						   end;
-			                 
+
 			  ELSE sTmp_:= null;
-			END CASE; 
- 
-   -- 'PK6' then	    -- К6 ,МК6 – показники покриття капіталом боргу 
-            CASE 
-			  WHEN FZ_ = 'N' THEN 
-			                   
-                                if ( ZN_F1('1510',4) + ZN_F1('1515',4)  + ZN_F1('1600',4) + ZN_F1('1610',4) - ZN_F1('1165',4) ) <= 0	 then sTmp_ :=  null; 	get_indic('PK6',sTmp_,l_max);		
-                                 else								
+			END CASE;
+
+   -- 'PK6' then	    -- К6 ,МК6 – показники покриття капіталом боргу
+            CASE
+			  WHEN FZ_ = 'N' THEN
+
+                                if ( ZN_F1('1510',4) + ZN_F1('1515',4)  + ZN_F1('1600',4) + ZN_F1('1610',4) - ZN_F1('1165',4) ) <= 0	 then sTmp_ :=  null; 	get_indic('PK6',sTmp_,l_max);
+                                 else
 						            sTmp_ :=      ZN_F1('1495',4)   /  ( ZN_F1('1510',4) + ZN_F1('1515',4)  + ZN_F1('1600',4) + ZN_F1('1610',4) - ZN_F1('1165',4) );
 									get_indic('PK6',sTmp_,l_rzn);
 								end if;
-							 
-			               
-			  WHEN FZ_ = 'R' THEN 
-                                if ( ZN_F1('1595',4) + ZN_F1('1600',4)  + ZN_F1('1610',4) - ZN_F1('1165',4) ) <= 0	 then sTmp_ :=  null; 	get_indic('PK6',sTmp_,l_max);		
-                                 else								
+
+
+			  WHEN FZ_ = 'R' THEN
+                                if ( ZN_F1('1595',4) + ZN_F1('1600',4)  + ZN_F1('1610',4) - ZN_F1('1165',4) ) <= 0	 then sTmp_ :=  null; 	get_indic('PK6',sTmp_,l_max);
+                                 else
 						            sTmp_ :=      ZN_F1('1495',4)   /  ( ZN_F1('1595',4) + ZN_F1('1600',4)  + ZN_F1('1610',4) - ZN_F1('1165',4) );
 									get_indic('PK6',sTmp_,l_rzn);
 								end if;
-			                 
-			  WHEN FZ_ = 'C' THEN 
-                                if ( ZN_F1('1595',4) + ZN_F1('1600',4) - ZN_F1('1165',4) ) <= 0	 then sTmp_ :=  null; 	get_indic('PK6',sTmp_,l_max);		
-                                 else								
+
+			  WHEN FZ_ = 'C' THEN
+                                if ( ZN_F1('1595',4) + ZN_F1('1600',4) - ZN_F1('1165',4) ) <= 0	 then sTmp_ :=  null; 	get_indic('PK6',sTmp_,l_max);
+                                 else
 						            sTmp_ :=      ZN_F1('1495',4)   /  ( ZN_F1('1595',4) + ZN_F1('1600',4) - ZN_F1('1165',4) );
 									get_indic('PK6',sTmp_,l_rzn);
 								end if;
-			                 
+
 			  ELSE sTmp_:= null;
-			END CASE; 
- 
+			END CASE;
+
      -- 'PK7' then	    -- . К7 ,МК7 – показники швидкої ліквідності
-            CASE 
-			  WHEN FZ_ in ( 'N','R') THEN 
-			  			    begin    
+            CASE
+			  WHEN FZ_ in ( 'N','R') THEN
+			  			    begin
 						            sTmp_ :=   (ZN_F1('1125',4) + ZN_F1('1165',4))  /   ZN_F1('1695',4);
 									get_indic('PK7',sTmp_,l_rzn);
-							exception when ZERO_DIVIDE then 
+							exception when ZERO_DIVIDE then
                                     sTmp_ := null; get_indic('PK7',sTmp_,l_max);
 						   end;
-							 
-			               
-			  WHEN FZ_ in ('C') THEN 
-			  			    begin    
+
+
+			  WHEN FZ_ in ('C') THEN
+			  			    begin
 						            sTmp_ :=   (ZN_F1('1155',4) + ZN_F1('1165',4))  /   ZN_F1('1695',4);
 									get_indic('PK7',sTmp_,l_rzn);
-							exception when ZERO_DIVIDE then 
+							exception when ZERO_DIVIDE then
                                     sTmp_ := null; get_indic('PK7',sTmp_,l_max);
 						   end;
-			                 
+
 			  ELSE sTmp_:= null;
-			END CASE; 
-			
-     -- 'PK8' then	    -- К8, МК8 – показники оборотності активів 
-            CASE 
-			  WHEN FZ_ in ( 'N') THEN 
-			  			    begin    
+			END CASE;
+
+     -- 'PK8' then	    -- К8, МК8 – показники оборотності активів
+            CASE
+			  WHEN FZ_ in ( 'N') THEN
+			  			    begin
 						            sTmp_ :=   ZN_F1('1300',4)   /   (ZN_F2('2000',4) + ZN_F2('2010',4) );
 									get_indic('PK8',sTmp_,l_rzn);
-							exception when ZERO_DIVIDE then 
+							exception when ZERO_DIVIDE then
                                     sTmp_ := null; get_indic('PK8',sTmp_,l_min);
 						   end;
-							 
-			               
-			  WHEN FZ_ in ('R','C') THEN 
-			  			    begin    
+
+
+			  WHEN FZ_ in ('R','C') THEN
+			  			    begin
 						            sTmp_ :=   ZN_F1('1300',4)   /   ZN_F2('2000',4) ;
 									get_indic('PK8',sTmp_,l_rzn);
-							exception when ZERO_DIVIDE then 
+							exception when ZERO_DIVIDE then
                                     sTmp_ := null; get_indic('PK8',sTmp_,l_min);
 						   end;
-			                 
+
 			  ELSE sTmp_:= null;
-			END CASE; 			
-			
+			END CASE;
+
      -- 'PK9' then	    -- . К9,  МК9 –показники оборотності поточних активів
-            CASE 
-			  WHEN FZ_ in ( 'N') THEN 
-			  			    begin    
+            CASE
+			  WHEN FZ_ in ( 'N') THEN
+			  			    begin
 						            sTmp_ :=   ZN_F1('1195',4) *365  /   (ZN_F2('2000',4) + ZN_F2('2010',4) );
 									get_indic('PK9',sTmp_,l_rzn);
-							exception when ZERO_DIVIDE then 
+							exception when ZERO_DIVIDE then
                                     sTmp_ := null; get_indic('PK9',sTmp_,l_min);
 						   end;
-							 
-			               
-			  WHEN FZ_ in ('R','C') THEN 
-			  			    begin    
+
+
+			  WHEN FZ_ in ('R','C') THEN
+			  			    begin
 						            sTmp_ :=   ZN_F1('1195',4)*365   /   ZN_F2('2000',4) ;
 									get_indic('PK9',sTmp_,l_rzn);
-							exception when ZERO_DIVIDE then 
+							exception when ZERO_DIVIDE then
                                     sTmp_ := null; get_indic('PK9',sTmp_,l_min);
 						   end;
-			                 
+
 			  ELSE sTmp_:= null;
-			END CASE; 				
-			
+			END CASE;
+
     -- 'PK10' then	    -- К10  –показник загальної ліквідності, MK10 – показник оборотності робочого капіталу
-            CASE 
-			  WHEN FZ_ in ( 'N') THEN 
-			  			    begin    
+            CASE
+			  WHEN FZ_ in ( 'N') THEN
+			  			    begin
 						            sTmp_ :=   ZN_F1('1195',4) /   ZN_F1('1695',4);
 									get_indic('PK10',sTmp_,l_rzn);
-							exception when ZERO_DIVIDE then 
+							exception when ZERO_DIVIDE then
                                     sTmp_ := null; get_indic('PK10',sTmp_,l_max);
 						   end;
-							 
-			               
-			  WHEN FZ_ in ('R','C') THEN 
-			  			    begin    
+
+
+			  WHEN FZ_ in ('R','C') THEN
+			  			    begin
 						            sTmp_ :=   (  ZN_F1('1195',4) - ZN_F1('1695',4) )   /   ZN_F2('2000',4) ;
 									get_indic('PK10',sTmp_,l_rzn);
-							exception when ZERO_DIVIDE then 
+							exception when ZERO_DIVIDE then
                                     sTmp_ := null; get_indic('PK10',sTmp_,l_min);
 						   end;
-			                 
+
 			  ELSE sTmp_:= null;
-			END CASE; 				
-			
+			END CASE;
+
   -- 'PK11' then	    -- К11- показник здатності обслуговування боргу, MК11 – показник покриття боргу операційним прибутком
-            CASE 
-			  WHEN FZ_ = 'N' THEN 
-			                   
-                                if ( ZN_F1('1510',4) + ZN_F1('1515',4)  + ZN_F1('1600',4) + ZN_F1('1610',4) - ZN_F1('1165',4) ) <= 0	 then sTmp_ :=  null; 	get_indic('PK11',sTmp_,l_max);		
-                                 else								
+            CASE
+			  WHEN FZ_ = 'N' THEN
+
+                                if ( ZN_F1('1510',4) + ZN_F1('1515',4)  + ZN_F1('1600',4) + ZN_F1('1610',4) - ZN_F1('1165',4) ) <= 0	 then sTmp_ :=  null; 	get_indic('PK11',sTmp_,l_max);
+                                 else
 						            sTmp_ :=     ( ZN_F2('2190',4) - ZN_F2('2195',4) + ZN_F2('2515',4) + ZN_F2('2220',4) - ZN_F2('2250',4) )   /  ( ZN_F1('1510',4) + ZN_F1('1515',4)  + ZN_F1('1600',4) + ZN_F1('1610',4) - ZN_F1('1165',4) );
 									get_indic('PK11',sTmp_,l_rzn);
 								end if;
-							 
-			               
-			  WHEN FZ_ = 'R' THEN 
-                                if ( ZN_F1('1595',4) + ZN_F1('1600',4)  + ZN_F1('1610',4) - ZN_F1('1165',4) ) <= 0	 then sTmp_ :=  null; 	get_indic('PK11',sTmp_,l_max);		
-                                 else								
+
+
+			  WHEN FZ_ = 'R' THEN
+                                if ( ZN_F1('1595',4) + ZN_F1('1600',4)  + ZN_F1('1610',4) - ZN_F1('1165',4) ) <= 0	 then sTmp_ :=  null; 	get_indic('PK11',sTmp_,l_max);
+                                 else
 						            sTmp_ :=    (ZN_F2('2000',4) - ZN_F2('2050',4) )   /  ( ZN_F1('1595',4) + ZN_F1('1600',4)  + ZN_F1('1610',4) - ZN_F1('1165',4) );
 									get_indic('PK11',sTmp_,l_rzn);
 								end if;
-			                 
-			  WHEN FZ_ = 'C' THEN 
-                                if ( ZN_F1('1595',4) + ZN_F1('1600',4) - ZN_F1('1165',4) ) <= 0	 then sTmp_ :=  null; 	get_indic('PK11',sTmp_,l_max);		
-                                 else								
+
+			  WHEN FZ_ = 'C' THEN
+                                if ( ZN_F1('1595',4) + ZN_F1('1600',4) - ZN_F1('1165',4) ) <= 0	 then sTmp_ :=  null; 	get_indic('PK11',sTmp_,l_max);
+                                 else
 						            sTmp_ :=       (ZN_F2('2000',4) - ZN_F2('2050',4) )   /  ( ZN_F1('1595',4) + ZN_F1('1600',4) - ZN_F1('1165',4) );
 									get_indic('PK11',sTmp_,l_rzn);
 								end if;
-			                 
+
 			  ELSE sTmp_:= null;
-			END CASE; 
- 
- 
-    -- 'PK12' then	    -- . K12 – показник достатності робочого капіталу, МК12 – показник оборотності основних засобів 
-            CASE 
-			  WHEN FZ_ in ( 'N') THEN 
-			  			    begin    
+			END CASE;
+
+
+    -- 'PK12' then	    -- . K12 – показник достатності робочого капіталу, МК12 – показник оборотності основних засобів
+            CASE
+			  WHEN FZ_ in ( 'N') THEN
+			  			    begin
 						            sTmp_ :=  (      ZN_F1('1100',4)*365 /    ZN_F2('2050',4)                          )   +
                                               (      ZN_F1('1125',4)*365 /  ( ZN_F2('2000',4)  + ZN_F2('2010',3)    )  )  -
 											  (      ZN_F1('1615',4)*365 /    ZN_F2('2050',4)                          );
 									get_indic('PK12',sTmp_,l_rzn);
-							exception when ZERO_DIVIDE then 
+							exception when ZERO_DIVIDE then
                                     sTmp_ := null; get_indic('PK12',sTmp_,l_min);
 						   end;
-							 
-			               
-			  WHEN FZ_ in ('R','C') THEN 
-			  			    begin    
+
+
+			  WHEN FZ_ in ('R','C') THEN
+			  			    begin
 						            sTmp_ :=  ZN_F1('1010',4)    /   ZN_F2('2000',4) ;
 									get_indic('PK12',sTmp_,l_rzn);
-							exception when ZERO_DIVIDE then 
+							exception when ZERO_DIVIDE then
                                     sTmp_ := null; get_indic('PK12',sTmp_,l_min);
 						   end;
-			                 
+
 			  ELSE sTmp_:= null;
-			END CASE; 		
- 
- --'PK13' then	    -- . К13– показник оборотності дебіторської заборгованості, MK13 – показник чистого прибутку до оподаткування 
-            CASE 
+			END CASE;
+
+ --'PK13' then	    -- . К13– показник оборотності дебіторської заборгованості, MK13 – показник чистого прибутку до оподаткування
+            CASE
 			  WHEN FZ_ = 'N' THEN
-			               begin   
+			               begin
 						            sTmp_ :=     ( ZN_F1('1125',4)*365)  /  (ZN_F2('2000',4) + ZN_F2('2010',4));
 									get_indic('PK13',sTmp_,l_rzn);
-							exception when ZERO_DIVIDE then 
-                                    sTmp_ :=  null;	get_indic('PK13',sTmp_,l_min);	
+							exception when ZERO_DIVIDE then
+                                    sTmp_ :=  null;	get_indic('PK13',sTmp_,l_min);
 						   end;
 			  WHEN FZ_ = 'R' THEN
-			                begin    
+			                begin
 						            sTmp_ :=     ( ZN_F2('2000',4) + ZN_F2('2120',4) - ZN_F2('2050',4) - ZN_F2('2180',4) + ZN_F2('2240',4) - ZN_F2('2270',4)  )  /  (ZN_F2('2000',4));
 									get_indic('PK13',sTmp_,l_rzn);
-							exception when ZERO_DIVIDE then 
-                                    sTmp_ :=  null;	get_indic('PK13',sTmp_,l_min);		
+							exception when ZERO_DIVIDE then
+                                    sTmp_ :=  null;	get_indic('PK13',sTmp_,l_min);
 						   end;
 			  WHEN FZ_ = 'C' THEN
-			                begin    
+			                begin
 						            sTmp_ :=     (  ZN_F2('2000',4) +  ZN_F2('2160',4) -  ZN_F2('2050',4) -  ZN_F2('2165',4) )  /  (ZN_F2('2000',4));
 									get_indic('PK13',sTmp_,l_rzn);
-							exception when ZERO_DIVIDE then 
-                                    sTmp_ :=  null;	get_indic('PK13',sTmp_,l_min);		
+							exception when ZERO_DIVIDE then
+                                    sTmp_ :=  null;	get_indic('PK13',sTmp_,l_min);
 						   end;
 			  ELSE sTmp_:= null;
-			END CASE; 
- 
+			END CASE;
+
   --'PK14' then	    -- К14 – показник оборотності кредиторської заборгованості
            sTmp_ := null;
-           CASE 
+           CASE
 			  WHEN FZ_ = 'N' THEN
-			               begin   
+			               begin
 						            sTmp_ :=     ( ZN_F1('1615',4)*365)  /  ZN_F2('2050',4);
 									get_indic('PK14',sTmp_,l_rzn);
-							exception when ZERO_DIVIDE then 
-                                    sTmp_ :=  null;	get_indic('PK14',sTmp_,l_min);	
+							exception when ZERO_DIVIDE then
+                                    sTmp_ :=  null;	get_indic('PK14',sTmp_,l_min);
 						   end;
 			  ELSE sTmp_:= null;
-			END CASE; 
- 
+			END CASE;
+
    --'PK15' then	    -- К15 – показник частки неопераційних елементів балансу
-            CASE 
+            CASE
 			  WHEN FZ_ = 'N' THEN
-			               begin   
+			               begin
 						            sTmp_ :=     ( ZN_F1('1000',4) + ZN_F1('1030',4) + ZN_F1('1040',4) + ZN_F1('1050',4) + ZN_F1('1155',4) + ZN_F1('1160',4) )  /  ZN_F1('1300',4);
 									get_indic('PK15',sTmp_,l_rzn);
-							exception when ZERO_DIVIDE then 
-                                    sTmp_ :=  null;	get_indic('PK15',sTmp_,l_min);	
+							exception when ZERO_DIVIDE then
+                                    sTmp_ :=  null;	get_indic('PK15',sTmp_,l_min);
 						   end;
 			  ELSE sTmp_:= null;
-			END CASE; 
+			END CASE;
 
 
- 
-  --'PK16' then	    -- К16 – показник операційного прибутку до відрахування амортизації 
-            CASE 
+
+  --'PK16' then	    -- К16 – показник операційного прибутку до відрахування амортизації
+            CASE
 			  WHEN FZ_ = 'N' THEN
-			               begin   
+			               begin
 						            sTmp_ :=     ( ZN_F2('2190',4) - ZN_F2('2195',4) + ZN_F2('2515',4) )  /  ( ZN_F2('2000',4) + ZN_F2('2010',4) );
 									get_indic('PK16',sTmp_,l_rzn);
-							exception when ZERO_DIVIDE then 
-                                    sTmp_ :=  null;	get_indic('PK16',sTmp_,l_min);	
+							exception when ZERO_DIVIDE then
+                                    sTmp_ :=  null;	get_indic('PK16',sTmp_,l_min);
 						   end;
 			  ELSE sTmp_:= null;
 			END CASE; 
@@ -2944,22 +2943,22 @@ BEGIN
  record_fp(tp_indics.kod(f), tp_indics.p_s(f), 6, DAT_, OKPO_);
  trace(l_mod, aOKPO_||' - '||rpad(f,3,' ')||' ~ '||lpad(tp_indics.kod(f),5,' ')||' = '||lpad(to_char(tp_indics.p_s(f),'9999990.999'),15,' ')||' >'||tp_indics.p_zero(f));
  end loop;
-  
+
 null;
 end;
-  
-  
-FUNCTION F_FM ( OKPO_ int, DAT_ date  )   RETURN char 
+
+
+FUNCTION F_FM ( OKPO_ int, DAT_ date  )   RETURN char
   RESULT_CACHE  relies_on (fin_fm)
 IS
   sTmp_ char(1):=' ';
-  l_mod varchar2(254) := 'fin_nbu.fm >>';	
+  l_mod varchar2(254) := 'fin_nbu.fm >>';
 begin
-  begin 
+  begin
     select f.FM into sTmp_ from FIN_FM f  where f.okpo = OKPO_  and  fdat = DAT_;
-   exception when NO_DATA_FOUND THEN 
-       select max(f.FM) into sTmp_ from FIN_FM f  where f.okpo = OKPO_  and 
-                         (f.okpo,f.fdat) = ( select okpo,max(fdat) from FIN_FM 
+   exception when NO_DATA_FOUND THEN
+       select max(f.FM) into sTmp_ from FIN_FM f  where f.okpo = OKPO_  and
+                         (f.okpo,f.fdat) = ( select okpo,max(fdat) from FIN_FM
                              where okpo=f.OKPO and fdat <= DAT_ group by okpo );
   end;
     --TRACE(l_mod,'FIN_FM-'||OKPO_||':'||TO_CHAR(DAT_,'DD-MM-YYYY'));
@@ -2967,27 +2966,27 @@ begin
 end F_FM;
 -----------
 
-function logk_  ( DAT_ date, OKPO_ int , IDF_ int ) RETURN number 
-   is 
+function logk_  ( DAT_ date, OKPO_ int , IDF_ int ) RETURN number
+   is
    t_ind pls_integer;
-   l_mod varchar2(254) := 'fin_nbu.logk_ >>';	
+   l_mod varchar2(254) := 'fin_nbu.logk_ >>';
 begin
    --return logk ( DAT_ , OKPO_  , IDF_ );
-   
-  if tp_logks.logk.COUNT() > 0 then  
+
+  if tp_logks.logk.COUNT() > 0 then
 
   	  FOR f IN 1 .. tp_logks.logk.COUNT()
 		 LOOP
-		 
+
 		  if tp_logks.logk(f).okpo = OKPO_ and tp_logks.logk(f).dat = DAT_ and tp_logks.logk(f).idf = IDF_
-		      then --trace(l_mod,'read tp_logks-'||tp_logks.logk(f).okpo||'-'||TO_CHAR(tp_logks.logk(f).DAT,'DD-MM-YYYY')); 
+		      then --trace(l_mod,'read tp_logks-'||tp_logks.logk(f).okpo||'-'||TO_CHAR(tp_logks.logk(f).DAT,'DD-MM-YYYY'));
 			       return tp_logks.logk(f).err;
 		  end if;
-		  
+
          END LOOP;
   end if;
-  
-  
+
+
    t_ind := tp_logks.logk.COUNT()+1;
    tp_logks.logk(t_ind).dat    := DAT_;
    tp_logks.logk(t_ind).okpo   := OKPO_;
@@ -2999,11 +2998,11 @@ begin
    /*tp_logks.logk(t_ind).err    := LOGK_read (DAT_  => tp_logks.logk(t_ind).dat,
  										     OKPO_ => tp_logks.logk(t_ind).okpo ,
 										     IDF_  => tp_logks.logk(t_ind).idf,
-										     mode_ => 1);*/											 
- 
-    --trace(l_mod,'read table-'||tp_logks.logk(t_ind).okpo||'-'||TO_CHAR(tp_logks.logk(t_ind).DAT,'DD-MM-YYYY')); 
+										     mode_ => 1);*/
+
+    --trace(l_mod,'read table-'||tp_logks.logk(t_ind).okpo||'-'||TO_CHAR(tp_logks.logk(t_ind).DAT,'DD-MM-YYYY'));
     return tp_logks.logk(t_ind).err;
-	
+
 end;
 
 
@@ -3015,162 +3014,162 @@ begin
  FZ_:= fin_nbu.F_FM (OKPO_, DAT_ ) ;
 
  If IDF_ = 2 then
-     
+
 	If FZ_ in ('R','C') then /* Лог_чний контроль форми 2-R */
        select count (*) into N2_
-       from (  --  2280	Разом доходи (2000 + 2120 + 2240)	
+       from (  --  2280	Разом доходи (2000 + 2120 + 2240)
 	         select 1 KOL, NVL(SUM(decode(KOD,'2280',S,0)),0) SL,
                            NVL(SUM(decode(KOD,'2280',0,S)),0) SR
-             from fin_rnk 
-             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_ 
+             from fin_rnk
+             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_
                and  kod in ('2280','2000','2120','2240')
              having NVL(SUM(decode(KOD,'2280',S,0)),0)<>
                     NVL(SUM(decode(KOD,'2280',0,S)),0)
-	UNION ALL		--  2285	Разом витрати (2050 + 2180 + 2270)	
+	UNION ALL		--  2285	Разом витрати (2050 + 2180 + 2270)
 			select 1 KOL, NVL(SUM(decode(KOD,'2285',S,0)),0) SL,
                           NVL(SUM(decode(KOD,'2288',0,S)),0) SR
-             from fin_rnk 
-             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_ 
+             from fin_rnk
+             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_
                and  kod in ('2285','2050','2180','2270')
              having NVL(SUM(decode(KOD,'2285',S,0)),0)<>
-                    NVL(SUM(decode(KOD,'2285',0,S)),0)		
-    UNION ALL		--  2290	Фінансовий результат до оподаткування (2280 - 2285)	
+                    NVL(SUM(decode(KOD,'2285',0,S)),0)
+    UNION ALL		--  2290	Фінансовий результат до оподаткування (2280 - 2285)
 			select 1 KOL, NVL(SUM(decode(KOD,'2290',S,0)),0) SL,
                           NVL(SUM(decode(KOD,'2290',0,decode(KOD,'2285',-1,1)*S)),0) SR
-             from fin_rnk 
-             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_ 
+             from fin_rnk
+             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_
                and  kod in ('2290','2280','2285')
              having NVL(SUM(decode(KOD,'2290',S,0)),0)<>
                     NVL(SUM(decode(KOD,'2290',0,decode(KOD,'2285',-1,1)*S)),0)
-     UNION ALL		--  2350	Чистий прибуток (збиток) (2290 - 2300)	
+     UNION ALL		--  2350	Чистий прибуток (збиток) (2290 - 2300)
 			select 1 KOL, NVL(SUM(decode(KOD,'2350',S,0)),0) SL,
                           NVL(SUM(decode(KOD,'2350',0,decode(KOD,'2300',-1,1)*S)),0) SR
-             from fin_rnk 
-             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_ 
+             from fin_rnk
+             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_
                and  kod in ('2350','2290','2300','2310')
              having NVL(SUM(decode(KOD,'2350',S,0)),0)<>
-                    NVL(SUM(decode(KOD,'2350',0,decode(KOD,'2300',-1,1)*S)),0)	
+                    NVL(SUM(decode(KOD,'2350',0,decode(KOD,'2300',-1,1)*S)),0)
 	union all
 	select 1 kol,NVL(SUM(decode(KOD,'2285',S,0)),0),
 			 greatest(NVL(SUM(decode(KOD,'2285',0,S)),0),NVL(SUM(decode(KOD,'2285',S,0)),0))
 	from fin_rnk where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_ and
 		 kod in ('2285','2250')
 	  having NVL(SUM(decode(KOD,'2285',S,0)),0)<>
-			 greatest(NVL(SUM(decode(KOD,'2285',0,S)),0),NVL(SUM(decode(KOD,'2285',S,0)),0))					
+			 greatest(NVL(SUM(decode(KOD,'2285',0,S)),0),NVL(SUM(decode(KOD,'2285',S,0)),0))
 					);
-					
-					
+
+
     elsIf FZ_ = 'N' then /* Лог_чний контроль форми 2-N */
        select count (*) into N2_
        from (  --  Валовий (прибуток\збиток)  2090=2000+2010-2050-2070+2095
 	         select 1 KOL, NVL(SUM(decode(KOD,'2090',S,0)),0) SL,
                            NVL(SUM(decode(KOD,'2090',0,decode(KOD,'2050',-1,'2070',-1,'2095',1,1)*S)),0) SR
-             from fin_rnk 
-             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_ 
+             from fin_rnk
+             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_
                and  kod in ('2090','2095','2000','2010','2050','2070')
              having NVL(SUM(decode(KOD,'2090',S,0)),0)<>
                     NVL(SUM(decode(KOD,'2090',0,decode(KOD,'2050',-1,'2070',-1,'2095',1,1)*S)),0)
 	UNION ALL		--  Фінансовий результат від операційної діяльності (прибуток\збиток)  2190 = 2090-2095+2105+2110+2120-2130-2150-2180+2195
 			select 1 KOL, NVL(SUM(decode(KOD,'2190',S,0)),0) SL,
                            NVL(SUM(decode(KOD,'2190',0,decode(KOD,'2095',-1,'2130',-1,'2150',-1,'2180',-1,'2195',1,1)*S)),0) SR
-             from fin_rnk 
-             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_ 
+             from fin_rnk
+             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_
                and  kod in ('2190','2090','2095','2105','2110','2120','2130','2150','2180','2195')
              having NVL(SUM(decode(KOD,'2190',S,0)),0)<>
-                    NVL(SUM(decode(KOD,'2190',0,decode(KOD,'2095',-1,'2130',-1,'2150',-1,'2180',-1,'2195',1,1)*S)),0)		
+                    NVL(SUM(decode(KOD,'2190',0,decode(KOD,'2095',-1,'2130',-1,'2150',-1,'2180',-1,'2195',1,1)*S)),0)
 	UNION ALL		--  Фінансовий результат до оподаткування (прибуток\збиток)  2290 = 2190-2195+2200+2220+2240-2250-2255-2270+2275+2295
 			select 1 KOL, NVL(SUM(decode(KOD,'2290',S,0)),0) SL,
                            NVL(SUM(decode(KOD,'2290',0,decode(KOD,'2195',-1,'2250',-1,'2255',-1,'2270',-1,'2295',1,1)*S)),0) SR
-             from fin_rnk 
-             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_ 
+             from fin_rnk
+             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_
                and  kod in ('2290','2190','2195','2200','2220','2240','2250','2255','2270','2275','2295')
              having NVL(SUM(decode(KOD,'2290',S,0)),0)<>
-                    NVL(SUM(decode(KOD,'2290',0,decode(KOD,'2195',-1,'2250',-1,'2255',-1,'2270',-1,'2295',1,1)*S)),0)	
+                    NVL(SUM(decode(KOD,'2290',0,decode(KOD,'2195',-1,'2250',-1,'2255',-1,'2270',-1,'2295',1,1)*S)),0)
 	UNION ALL		--  Чистий фынансовий результат (прибуток\збиток)  2350 = 2290-2295-2300-2355+2305
 			select 1 KOL, NVL(SUM(decode(KOD,'2350',S,0)),0) SL,
                            NVL(SUM(decode(KOD,'2350',0,decode(KOD,'2305',1,'2290',1,'2355',1,-1)*S)),0) SR
-             from fin_rnk 
-             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_ 
+             from fin_rnk
+             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_
                and  kod in ('2350','2290','2295','2300','2355','2305')
              having NVL(SUM(decode(KOD,'2350',S,0)),0)<>
-                    NVL(SUM(decode(KOD,'2350',0,decode(KOD,'2305',1,'2290',1,'2355',1,-1)*S)),0)						
+                    NVL(SUM(decode(KOD,'2350',0,decode(KOD,'2305',1,'2290',1,'2355',1,-1)*S)),0)
 	UNION ALL		--  Інший сукупній дохід до оподаткування  2450 = 2400+2405+2410+2415+2445
 			select 1 KOL, NVL(SUM(decode(KOD,'2450',S,0)),0) SL,
                            NVL(SUM(decode(KOD,'2450',0,S)),0) SR
-             from fin_rnk 
-             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_ 
+             from fin_rnk
+             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_
                and  kod in ('2450','2400','2405','2410','2415','2445')
              having NVL(SUM(decode(KOD,'2450',S,0)),0)<>
-                    NVL(SUM(decode(KOD,'2450',0,S)),0)									
+                    NVL(SUM(decode(KOD,'2450',0,S)),0)
 	UNION ALL		--  Інший сукупній дохід після оподаткування  2460 = 2450-2455
 			select 1 KOL, NVL(SUM(decode(KOD,'2460',S,0)),0) SL,
                            NVL(SUM(decode(KOD,'2460',0,decode(KOD,'2450',1,-1)*S)),0) SR
-             from fin_rnk 
-             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_ 
+             from fin_rnk
+             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_
                and  kod in ('2460','2450','2455')
              having NVL(SUM(decode(KOD,'2460',S,0)),0)<>
-                    NVL(SUM(decode(KOD,'2460',0,decode(KOD,'2450',1,-1)*S)),0)					
+                    NVL(SUM(decode(KOD,'2460',0,decode(KOD,'2450',1,-1)*S)),0)
 	UNION ALL		--  Сукупний дохід (сума рядків 2350, 2355 та 2460)  2465 = 2350-2355+2460
 			select 1 KOL, NVL(SUM(decode(KOD,'2465',S,0)),0) SL,
                            NVL(SUM(decode(KOD,'2465',0,decode(KOD,'2355',-1,1)*S)),0) SR
-             from fin_rnk 
-             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_ 
+             from fin_rnk
+             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_
                and  kod in ('2465','2350','2355','2460')
              having NVL(SUM(decode(KOD,'2465',S,0)),0)<>
-                    NVL(SUM(decode(KOD,'2465',0,decode(KOD,'2355',-1,1)*S)),0)	
+                    NVL(SUM(decode(KOD,'2465',0,decode(KOD,'2355',-1,1)*S)),0)
 	UNION ALL		--  Разом (ІІІ ЕЛЕМЕНТИ ОПЕРАЦІЙНИХ ВИТРАТ)  2550 = 2500+2505+2510+2515+2520
 			select 1 KOL, NVL(SUM(decode(KOD,'2550',S,0)),0) SL,
                            NVL(SUM(decode(KOD,'2550',0,S)),0) SR
-             from fin_rnk 
-             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_ 
+             from fin_rnk
+             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_
                and  kod in ('2550','2500','2505','2510','2515','2520')
              having NVL(SUM(decode(KOD,'2550',S,0)),0)<>
-                    NVL(SUM(decode(KOD,'2550',0,S)),0)					
+                    NVL(SUM(decode(KOD,'2550',0,S)),0)
 					);
-					
+
     elsIf FZ_ = 'M' then /* Лог_чний контроль форми 2-M */
        select count (*) into N2_
        from (select 1 KOL, NVL(SUM(decode(KOD,'010',S,0)),0) SL,
                            NVL(SUM(decode(KOD,'010',0,S)),0) SR
-             from fin_rnk 
-             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_ 
+             from fin_rnk
+             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_
                and  kod in ('030','010','020')
              having NVL(SUM(decode(KOD,'010',S,0)),0)<>
                     NVL(SUM(decode(KOD,'010',0,S)),0)
           UNION ALL
 		    select 1 KOL, NVL(SUM(decode(KOD,'070',S,0)),0) SL,
                            NVL(SUM(decode(KOD,'070',0,S)),0) SR
-             from fin_rnk 
-             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_ 
+             from fin_rnk
+             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_
                and  kod in ('070','030','040','050')
              having NVL(SUM(decode(KOD,'070',S,0)),0)<>
                     NVL(SUM(decode(KOD,'070',0,S)),0)
           UNION ALL
 		    select 1 KOL, NVL(SUM(decode(KOD,'120',S,0)),0) SL,
                            NVL(SUM(decode(KOD,'120',0,S)),0) SR
-             from fin_rnk 
-             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_ 
+             from fin_rnk
+             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_
                and  kod in ('120','080','090','100')
              having NVL(SUM(decode(KOD,'120',S,0)),0)<>
                     NVL(SUM(decode(KOD,'120',0,S)),0)
-		UNION ALL		
+		UNION ALL
 			select 1 KOL, NVL(SUM(decode(KOD,'130',S,0)),0) SL,
                            NVL(SUM(decode(KOD,'130',0,decode(KOD,'070',1,-1)*S)),0) SR
-             from fin_rnk 
-             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_ 
+             from fin_rnk
+             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_
                and  kod in ('130','070','120')
              having NVL(SUM(decode(KOD,'130',S,0)),0)<>
                     NVL(SUM(decode(KOD,'130',0,decode(KOD,'070',1,-1)*S)),0)
-		UNION ALL		
+		UNION ALL
 			select 1 KOL, NVL(SUM(decode(KOD,'150',S,0)),0) SL,
                            NVL(SUM(decode(KOD,'150',0,decode(KOD,'130',1,'145',1,-1)*S)),0) SR
-             from fin_rnk 
-             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_ 
+             from fin_rnk
+             where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_
                and  kod in ('150','130','140','145')
              having NVL(SUM(decode(KOD,'150',S,0)),0)<>
-                    NVL(SUM(decode(KOD,'150',0,decode(KOD,'130',1,'145',1,-1)*S)),0)					
-        
-				
+                    NVL(SUM(decode(KOD,'150',0,decode(KOD,'130',1,'145',1,-1)*S)),0)
+
+
         );
     else /* Лог_чний контроль форми 2 */
 
@@ -3185,7 +3184,7 @@ begin
            NVL(SUM( decode(KOD,'035',S,0)),0) <>
            NVL(SUM( decode(KOD,'035',0, Decode(KOD,'010',1,-1)*S)),0)
        UNION ALL  /*  2) 050 = 035-040+055 */
-         select 1, 
+         select 1,
            NVL(SUM(decode(KOD,'050',S,0)), 0) ,
            NVL(SUM(decode(KOD,'050',0,decode(KOD,'040',-1,1)*S)),0)
          from fin_rnk where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_ and
@@ -3244,13 +3243,13 @@ begin
    FIN_nbu.aOKPO_ := OKPO_;
    return N2_;
 end if;
-If IDF_<> 1 then 
+If IDF_<> 1 then
    FIN_nbu.aOKPO_ := OKPO_;
-   RETURN 0; 
+   RETURN 0;
 end if;
 ------------
 ---Форма № 1 на 8 условий раветства
-If (FZ_ = ' ' or FZ_ = 'M') then /* Лог_чний контроль форми 1 старої + 1-M */ 
+If (FZ_ = ' ' or FZ_ = 'M') then /* Лог_чний контроль форми 1 старої + 1-M */
 select count (*) into N2_
 from (
 select 1 KOL, NVL(SUM(decode(KOD,'010',S,0)),0) SL,
@@ -3401,7 +3400,7 @@ UNION ALL
 select 1 KOL, NVL(SUM(decode(KOD,'1900',S,0)),0) SL,
               NVL(SUM(decode(KOD,'1900',0,S)),0) SR
 from fin_rnk where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_ and
-     kod in ('1900','1495','1595','1695','1700','1800') 
+     kod in ('1900','1495','1595','1695','1700','1800')
        having NVL(SUM(decode(KOD,'1900',S,0)),0)<>
               NVL(SUM(decode(KOD,'1900',0,S)),0)
 UNION ALL
@@ -3422,13 +3421,13 @@ UNION ALL
 select 1,NVL(SUM(decode(KOD,'1425',S,0)),0),
          NVL(SUM(decode(KOD,'1425',0,S)),0)
 from fin_rnk where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_ and
-     kod in ('1425')
+     kod in ('1425') and  FDAT >=  to_date('01-04-2018','dd-mm-yyyy') 
   having NVL(SUM(decode(KOD,'1425',S,0)),0)>0
 UNION ALL
 select 1,NVL(SUM(decode(KOD,'1430',S,0)),0),
          NVL(SUM(decode(KOD,'1430',0,S)),0)
 from fin_rnk where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_ and
-     kod in ('1430')
+     kod in ('1430') and  FDAT >=  to_date('01-04-2018','dd-mm-yyyy') 
   having NVL(SUM(decode(KOD,'1430',S,0)),0)>0
 	
 			);  
@@ -3446,9 +3445,9 @@ FUNCTION LOGK_D (DAT_ date    , OKPO_ int, IDF_  int)  RETURN number Is
  M0_ char(1); M1_  char(1); M2_ char(1); M3_ char(1); M4_ char(1);
 begin
 
-  If IDF_ <> 2 then 
+  If IDF_ <> 2 then
      FIN_nbu.aOKPO_ := OKPO_;
-     return 0; 
+     return 0;
   end if;
 
   M0_:= fin_nbu.F_FM(OKPO_,           DAT_    );
@@ -3457,48 +3456,48 @@ begin
   M3_:= fin_nbu.F_FM(OKPO_,add_months(DAT_,- 9));
   M4_:= fin_nbu.F_FM(OKPO_,add_months(DAT_,-12));
   ---Форма № 2 на возрастание кроме первого кв
-  If M0_ = M1_  then 
+  If M0_ = M1_  then
      select count(*) into KOL_
      from fin_rnk f0 , fin_rnk f1
      where f0.OKPO = OKPO_   and f0.FDAT = DAT_  and f0.idf=IDF_
-       and f1.OKPO = f0.OKPO and f1.FDAT = add_months(f0.FDAT,-3) 
-       and f1.idf  = f0.idf  and f0.kod  = f1.kod 
+       and f1.OKPO = f0.OKPO and f1.FDAT = add_months(f0.FDAT,-3)
+       and f1.idf  = f0.idf  and f0.kod  = f1.kod
        and f0.s    < f1.s
        and to_char( DAT_-1,'Q')<>'1'
        and (f0.kod<>'190' or M0_<>'M');
   end if;
   N1_:= N1_ + KOL_;
 
-  If M1_ = M2_   then 
-     select count(*) into KOL_ 
+  If M1_ = M2_   then
+     select count(*) into KOL_
      from fin_rnk f0 , fin_rnk f1
      where f0.OKPO = OKPO_   and f0.FDAT = add_months(DAT_,-3)  and f0.idf=IDF_
-       and f1.OKPO = f0.OKPO and f1.FDAT = add_months(f0.FDAT,-3) 
-       and f1.idf  = f0.idf  and f0.kod  = f1.kod 
+       and f1.OKPO = f0.OKPO and f1.FDAT = add_months(f0.FDAT,-3)
+       and f1.idf  = f0.idf  and f0.kod  = f1.kod
        and f0.s    < f1.s
        and to_char( DAT_-1,'Q')<>'2'
        and (f0.kod<>'190' or M1_<>'M');
   end if;
   N1_:= N1_ + KOL_;
 
-  If M2_ = M3_   then 
+  If M2_ = M3_   then
      select count(*) into KOL_
      from fin_rnk f0 , fin_rnk f1
      where f0.OKPO = OKPO_   and f0.FDAT = add_months(DAT_,-6)  and f0.idf=IDF_
-       and f1.OKPO = f0.OKPO and f1.FDAT = add_months(f0.FDAT,-3) 
-       and f1.idf  = f0.idf  and f0.kod  = f1.kod 
+       and f1.OKPO = f0.OKPO and f1.FDAT = add_months(f0.FDAT,-3)
+       and f1.idf  = f0.idf  and f0.kod  = f1.kod
        and f0.s    <f1.s
        and to_char( DAT_-1,'Q')<>'3'
        and (f0.kod<>'190' or M2_<>'M');
   end if;
   N1_:= N1_ + KOL_;
 
-  If M3_ = M4_   then 
+  If M3_ = M4_   then
      select count(*) into KOL_
      from fin_rnk f0 , fin_rnk f1
      where f0.OKPO = OKPO_   and f0.FDAT = add_months(DAT_,-9)    and f0.idf=IDF_
-       and f1.OKPO = f0.OKPO and f1.FDAT = add_months(f0.FDAT,-3) 
-       and f1.idf  = f0.idf  and f0.kod  = f1.kod 
+       and f1.OKPO = f0.OKPO and f1.FDAT = add_months(f0.FDAT,-3)
+       and f1.idf  = f0.idf  and f0.kod  = f1.kod
        and f0.s    < f1.s
        and to_char( DAT_-1,'Q')<>'4'
        and (f0.kod<>'190' or M3_<>'M');
@@ -3509,14 +3508,14 @@ begin
 
 end LOGK_D;
 
-PROCEDURE record_fp(KOD_   IN  char, 
-                     S_    IN  number,  
+PROCEDURE record_fp(KOD_   IN  char,
+                     S_    IN  number,
                      IDF_  IN  int,
 				     DAT_  IN  date default aDAT_,
 				     OKPO_ IN  int default aOKPO_ )
-	IS				 
-Begin					 
-					 
+	IS
+Begin
+
 UPDATE FIN_RNK
   SET S = round(S_,3)
     WHERE fdat = DAT_
@@ -3525,40 +3524,40 @@ UPDATE FIN_RNK
 	  AND idf = IDF_;
 if SQL%rowcount = 0 then
    INSERT INTO FIN_RNK (FDAT,  IDF, KOD, S,  OKPO) VALUES (DAT_,  IDF_, KOD_, round(S_,3),  OKPO_);
-end if;   
-					 
+end if;
+
 END record_fp;
-  
-  
-  PROCEDURE record_fp_ND(KOD_   IN  char, 
-                         S_    IN  number,  
+
+
+  PROCEDURE record_fp_ND(KOD_   IN  char,
+                         S_    IN  number,
                          IDF_  IN  int,
 				         DAT_  IN  date default aDAT_,
 				         ND_   IN  int default aND_,
                          RNK_  IN  int default aRNK_ )
-	IS				 
-Begin					 
-					 
+	IS
+Begin
+
 UPDATE FIN_ND
-  SET S = round(S_,3), fdat = DAT_ 
-    WHERE --fdat = DAT_  AND 
+  SET S = round(S_,3), fdat = DAT_
+    WHERE --fdat = DAT_  AND
 	  ND = ND_ and rnk = RNK_
 	  AND kod = KOD_
 	  AND idf = IDF_;
 if SQL%rowcount = 0 then
    INSERT INTO FIN_ND (FDAT,  IDF, KOD, S,  ND, RNK) VALUES (DAT_,  IDF_, KOD_, round(S_,3),  ND_, RNK_);
-end if;   
+end if;
 
- 
+
  MERGE INTO BARS.FIN_ND_HIST A USING  (SELECT DAT_ as FDAT,  IDF_ as IDF, KOD_ as KOD, round(S_,3) as S, ND_ as ND, RNK_ as RNK, null as VAL_DATE   FROM DUAL) B
                                ON (A.RNK = B.RNK and A.ND = B.ND and A.IDF = B.IDF and A.KOD = B.KOD and A.FDAT = B.FDAT)
-        WHEN NOT MATCHED THEN 
+        WHEN NOT MATCHED THEN
                   INSERT (FDAT, IDF, KOD, S, ND, RNK, VAL_DATE)
                   VALUES (B.FDAT, B.IDF, B.KOD, B.S, B.ND, B.RNK, B.VAL_DATE)
         WHEN MATCHED THEN
                    UPDATE SET  A.S = B.S,  A.VAL_DATE = B.VAL_DATE;
-				   
-	 				 
+
+
 END record_fp_ND;
 
 PROCEDURE record_fp_ND_date(KOD_         IN  char,
@@ -3588,45 +3587,45 @@ if SQL%rowcount = 0 then
    INSERT INTO FIN_ND (FDAT,  IDF, KOD, val_date,  ND, RNK)
       VALUES (DAT_,  IDF_, KOD_, l_val_date_,  ND_, RNK_);
 end if;
-	  
+
 	   MERGE INTO BARS.FIN_ND_HIST A USING  (SELECT DAT_ as FDAT,  IDF_ as IDF, KOD_ as KOD, null as S, ND_ as ND, RNK_ as RNK, l_val_date_ as VAL_DATE   FROM DUAL) B
                                ON (A.RNK = B.RNK and A.ND = B.ND and A.IDF = B.IDF and A.KOD = B.KOD and A.FDAT = B.FDAT)
-        WHEN NOT MATCHED THEN 
+        WHEN NOT MATCHED THEN
                   INSERT (FDAT, IDF, KOD, S, ND, RNK, VAL_DATE)
                   VALUES (B.FDAT, B.IDF, B.KOD, B.S, B.ND, B.RNK, B.VAL_DATE)
         WHEN MATCHED THEN
                    UPDATE SET  A.S = B.S,  A.VAL_DATE = B.VAL_DATE;
-				   
-				   
+
+
 
 
 END record_fp_ND_date;
-  
+
 	PROCEDURE get_class(ND_ in number,
 	                    OKPO_ in number,
 						DAT_ in date,
 						RNK_ in number)
   IS
   aIPB_  number;
-  v_     number;  
-  kv_     number; 
+  v_     number;
+  kv_     number;
   class_ number;
   obs_ number;
-  l_col number:=-1;	
+  l_col number:=-1;
   --rnk_ number;
 
-    
+
   BEGIN
-  
+
   aDAT_  := DAT_;
   aOKPO_ := OKPO_;
   aND_   := ND_;
   aRNK_ := rnk_;
-  
-  
-    BEGIN	
-    select s 
-	  into aIPB_  
+
+
+    BEGIN
+    select s
+	  into aIPB_
 	  from fin_rnk
 	 where okpo = OKPO_
        and fdat = DAT_
@@ -3634,19 +3633,19 @@ END record_fp_ND_date;
 	   and idf  = 6;
           exception when NO_DATA_FOUND THEN --goto next1_ ;
 		  if ZN_P_ND ('KP3', 5) = 2 then class_ := 8; goto next1_;
-		  else  raise_application_error(-(20000),'\ ' ||'     Не розраховано  інтегрований показник боржника за  звітний період - '||DAT_,TRUE);  
+		  else  raise_application_error(-(20000),'\ ' ||'     Не розраховано  інтегрований показник боржника за  звітний період - '||DAT_,TRUE);
 		  end if;
     END;
-  
-    
-    
+
+
+
       v_ :=GET_VED(RNK_ , DAT_);
 
-  
-  
-  
- IF fin_nbu.F_FM(OKPO_, DAT_ ) in (' ', 'N') then 
- 
+
+
+
+ IF fin_nbu.F_FM(OKPO_, DAT_ ) in (' ', 'N') then
+
 		  IF v_ = 1 then
 				if aIPB_ >   1.25   then  class_ := 1;
 			 elsif aIPB_ >=  0.81   then  class_ := 2;
@@ -3658,8 +3657,8 @@ END record_fp_ND_date;
 			 elsif aIPB_ >  -3.20   then  class_ := 8;
 			 else                         class_ := 9;
 			 end if;
-			 
-		elsif v_ = 2 then 
+
+		elsif v_ = 2 then
 				if aIPB_ >   1.35   then  class_ := 1;
 			 elsif aIPB_ >=  0.71   then  class_ := 2;
 			 elsif aIPB_ >=  0.35   then  class_ := 3;
@@ -3670,7 +3669,7 @@ END record_fp_ND_date;
 			 elsif aIPB_ >  -3.50   then  class_ := 8;
 			 else                         class_ := 9;
 			 end if;
-			 
+
 		elsif v_ = 3 then
 				if aIPB_ >   1.35   then  class_ := 1;
 			 elsif aIPB_ >=  0.81   then  class_ := 2;
@@ -3682,7 +3681,7 @@ END record_fp_ND_date;
 			 elsif aIPB_ >  -3.70   then  class_ := 8;
 			 else                         class_ := 9;
 			 end if;
-			 
+
 		elsif v_ = 4 then
 				if aIPB_ >   1.35   then  class_ := 1;
 			 elsif aIPB_ >=  0.80   then  class_ := 2;
@@ -3694,7 +3693,7 @@ END record_fp_ND_date;
 			 elsif aIPB_ >  -4.70   then  class_ := 8;
 			 else                         class_ := 9;
 			 end if;
-			 
+
 		elsif v_ = 5 then
 				if aIPB_ >   0.60   then  class_ := 1;
 			 elsif aIPB_ >=  0.07   then  class_ := 2;
@@ -3719,7 +3718,7 @@ END record_fp_ND_date;
 			 elsif aIPB_ >  -4.70   then  class_ := 8;
 			 else                         class_ := 9;
 			 end if;
-			 
+
 		elsif v_ = 7 then
 				if aIPB_ >   1.55   then  class_ := 1;
 			 elsif aIPB_ >=  1.01   then  class_ := 2;
@@ -3731,7 +3730,7 @@ END record_fp_ND_date;
 			 elsif aIPB_ >  -3.50   then  class_ := 8;
 			 else                         class_ := 9;
 			 end if;
-			 
+
 		elsif v_ = 8 then
 				if aIPB_ >   2.00   then  class_ := 1;
 			 elsif aIPB_ >=  1.20   then  class_ := 2;
@@ -3743,7 +3742,7 @@ END record_fp_ND_date;
 			 elsif aIPB_ >  -4.20   then  class_ := 8;
 			 else                         class_ := 9;
 			 end if;
-			 
+
 		elsif v_ = 9 then
 				if aIPB_ >   1.15   then  class_ := 1;
 			 elsif aIPB_ >=  0.70   then  class_ := 2;
@@ -3769,8 +3768,8 @@ END record_fp_ND_date;
 			 elsif aIPB_ >  -4.20   then  class_ := 8;
 			 else                         class_ := 9;
 			 end if;
-			 
-		elsif v_ = 2 then 
+
+		elsif v_ = 2 then
 				if aIPB_ >   2.00   then  class_ := 1;
 			 elsif aIPB_ >=  1.40   then  class_ := 2;
 			 elsif aIPB_ >=  1.05   then  class_ := 3;
@@ -3781,7 +3780,7 @@ END record_fp_ND_date;
 			 elsif aIPB_ >  -4.40   then  class_ := 8;
 			 else                         class_ := 9;
 			 end if;
-			 
+
 		elsif v_ = 3 then
 				if aIPB_ >   1.70   then  class_ := 1;
 			 elsif aIPB_ >=  1.11   then  class_ := 2;
@@ -3793,7 +3792,7 @@ END record_fp_ND_date;
 			 elsif aIPB_ >  -4.10   then  class_ := 8;
 			 else                         class_ := 9;
 			 end if;
-			 
+
 		elsif v_ = 4 then
 				if aIPB_ >   2.20   then  class_ := 1;
 			 elsif aIPB_ >=  1.25   then  class_ := 2;
@@ -3805,7 +3804,7 @@ END record_fp_ND_date;
 			 elsif aIPB_ >  -4.90   then  class_ := 8;
 			 else                         class_ := 9;
 			 end if;
-			 
+
 		elsif v_ = 5 then
 				if aIPB_ >   2.10   then  class_ := 1;
 			 elsif aIPB_ >=  1.40   then  class_ := 2;
@@ -3830,7 +3829,7 @@ END record_fp_ND_date;
 			 elsif aIPB_ >  -5.20   then  class_ := 8;
 			 else                         class_ := 9;
 			 end if;
-			 
+
 		elsif v_ = 7 then
 				if aIPB_ >   1.40   then  class_ := 1;
 			 elsif aIPB_ >=  0.86   then  class_ := 2;
@@ -3842,7 +3841,7 @@ END record_fp_ND_date;
 			 elsif aIPB_ >  -4.40   then  class_ := 8;
 			 else                         class_ := 9;
 			 end if;
-			 
+
 		elsif v_ = 8 then
 				if aIPB_ >   2.50   then  class_ := 1;
 			 elsif aIPB_ >=  1.51   then  class_ := 2;
@@ -3854,7 +3853,7 @@ END record_fp_ND_date;
 			 elsif aIPB_ >  -3.40   then  class_ := 8;
 			 else                         class_ := 9;
 			 end if;
-			 
+
 		elsif v_ = 9 then
 				if aIPB_ >   1.60   then  class_ := 1;
 			 elsif aIPB_ >=  0.98   then  class_ := 2;
@@ -3868,77 +3867,77 @@ END record_fp_ND_date;
 			 end if;
 		else  class_ := 9999;
 		end if;
-  
+
   END IF;
-  
+
  <<next1_>>
-  
+
   if ZN_P_ND ('KP5', 5) = 1 then class_ := 9;
-  else  
+  else
         if ZN_P_ND ('KP4', 5) = 1 or  ZN_P_ND ('KP3', 5) = 2 then class_ := GREATEST(8,class_);
-        else 
+        else
 			  if  ZN_P_ND ('KP1', 5) = 1 then
 				   if ZN_P_ND ('KP2', 5) = 2 then class_ := GREATEST(8,class_);
-			       end if;	
-			   else class_ := GREATEST(8,class_);	   
-              end if;  			  
-        end if;  		
-  
+			       end if;
+			   else class_ := GREATEST(8,class_);
+              end if;
+        end if;
+
   end if;
-  
+
  -- record_fp('110', class_, 6, DAT_, OKPO_ );
-  
-  
-  if nd_ = 0 then 
-					  update v_fin_cc_deal  
+
+
+  if nd_ = 0 then
+					  update v_fin_cc_deal
 						 set fin23 = class_
 					   where  rnk = rnk_
-						 --and sos < 15 
+						 --and sos < 15
 						-- and vidd in (1,2,3)
 	                                                 ;
   else
-					update v_fin_cc_deal  
+					update v_fin_cc_deal
 					 set fin23 = class_
 				   where  nd = nd_   and rnk = rnk_
-					 --and sos < 15 -- 
+					 --and sos < 15 --
 					 --and vidd in (1,2,3)
                                                 	 ;
-               --	record_fp_nd('110', class_, 6, DAT_, ND_, RNK_ );											 
-   end if;	 
+               --	record_fp_nd('110', class_, 6, DAT_, ND_, RNK_ );
+   end if;
 
    record_fp_nd('110', class_, 6, DAT_, ND_, RNK_ );
 /*    if rnk_ > 0 then
    kl.setCustomerElement(RNK_, 'FIN23', class_, 0);
    end if; */
-   
+
    	    if  class_ is not null and rnk_ > 0   then
 				-------- запишем в карточку клієнта
 		select count(1) into l_col from customerw where rnk=RNK_ and tag='FIN23' and isp !=0;
-		if l_col >= 1 then 
+		if l_col >= 1 then
 		   delete from customerw where rnk=RNK_ and tag='FIN23';
 		   kl.setCustomerElement(RNK_, 'FIN23', class_, 0);
-		else 
+		else
 		   kl.setCustomerElement(RNK_, 'FIN23', class_, 0);
 		end if;
-        end if; 
-		
+        end if;
+
 /*
 Кредити в іноземній валюті
 */
 
 
-  
-  
 
-if ZN_P_ND ('KP6', 5) = 2 
+
+
+if ZN_P_ND ('KP6', 5) = 2
     then class_ := GREATEST(8,class_);
 end if;
 
 
 
-  if nd_ = 0 then 
+  if nd_ = 0 then
 
-	  begin 
+	  begin
 			select max(CC_val( nd,RNK,DAT_))
 			  into kv_
 			  from v_fin_cc_deal
@@ -3946,75 +3945,75 @@ end if;
 
 			  update v_fin_cc_deal c
 				 set fin23 = class_
-			   where rnk = rnk_  
+			   where rnk = rnk_
 			   and CC_val( nd,RNK,DAT_) = 1
-			  -- and (sdate > G_DATE_VAL  or (sdate <= G_DATE_VAL and exists (select 1 from cck_restr where nd = c.nd and fdat > G_DATE_VAL))	 )	
-			 ; 
-			 
+			  -- and (sdate > G_DATE_VAL  or (sdate <= G_DATE_VAL and exists (select 1 from cck_restr where nd = c.nd and fdat > G_DATE_VAL))	 )
+			 ;
+
     	if kv_ = 1 then  record_fp_nd('110', class_, 6, DAT_, ND_, RNK_ );
 		                 record_fp('110', class_, 6, DAT_, OKPO_);
 		 end if;
-		 
+
 		exception when NO_DATA_FOUND THEN
 			  null;
 		end;
-				 
+
   else
-   
+
              kv_ := CC_val( nd_,RNK_,DAT_);
-	 
+
 			  update v_fin_cc_deal c
 				 set fin23 = class_
 			   where nd = nd_ and rnk = rnk_
 --				 and  kv != 980
                 and kv_ = 1
 --      		and (sdate > G_DATE_VAL or (sdate <= G_DATE_VAL and exists (select 1 from cck_restr where nd = c.nd and fdat > G_DATE_VAL)) )
-				 ; 
+				 ;
 
     	if kv_ = 1 then  record_fp_nd('110', class_, 6, DAT_, ND_, RNK_ );
 		                 record_fp('110', class_, 6, DAT_, OKPO_);
 		 end if;
-				 
-   end if;	
 
-	 
-	 if  class_ is not null and rnk_ > 0  and kv_ = 1 then 
+   end if;
+
+
+	 if  class_ is not null and rnk_ > 0  and kv_ = 1 then
 				-------- запишем в карточку клієнта
 				      select count(1) into l_col from customerw where rnk=RNK_ and tag='FIN23' and isp !=0;
-		if l_col >= 1 then 
+		if l_col >= 1 then
 		   delete from customerw where rnk=RNK_ and tag='FIN23';
 		   kl.setCustomerElement(RNK_, 'FIN23', class_, 0);
-		else 
+		else
 		   kl.setCustomerElement(RNK_, 'FIN23', class_, 0);
 		end if;
-		/* 
+		/*
     update customerw set value = class_, isp = 0 where rnk=RNK_ and tag='FIN23' returning count(rnk) into l_col;
     if l_col=0 then
        insert into customerw (rnk, tag, value, isp) values (RNK_, 'FIN23', class_, 0);
     end if; */
-	
-	end if; 
-	 
-	 
-	        begin   
+
+	end if;
+
+
+	        begin
                    select max(obs23)
 				     into obs_
-			         from v_fin_cc_deal 
-				    where rnk = rnk_ --and sos<15 
+			         from v_fin_cc_deal
+				    where rnk = rnk_ --and sos<15
 					  --and vidd in (1,2,3)
 					  ;
- 			  exception when NO_DATA_FOUND THEN 
+ 			  exception when NO_DATA_FOUND THEN
 					obs_ := null;
-		     END; 
-  
-            if obs_ is not null then 
+		     END;
+
+            if obs_ is not null then
 			              fin_nbu.record_fp('OBS', obs_, 6, DAT_, OKPO_ );
-					--	  fin_nbu.record_fp_nd('OBS', obs_, 6, DAT_, ND_, RNK_ ); 
+					--	  fin_nbu.record_fp_nd('OBS', obs_, 6, DAT_, ND_, RNK_ );
 			end if;
-  
-  
- 
- 
+
+
+
+
   null;
 END get_class;
 
@@ -4023,114 +4022,114 @@ PROCEDURE get_class_fl (ND_ in number,
 						DAT_ in date,
 				     	RNK_ in number)
   IS
-  
+
   class_ number;
   class_r number;
   l_col number:=-1;
-  kv_     number;   
+  kv_     number;
   --rnk_ number;
 
-    
+
   BEGIN
-  
+
   aDAT_  := DAT_;
   aOKPO_ := OKPO_;
   aND_   := ND_;
   aRNK_ := rnk_;
 
-     BEGIN	
+     BEGIN
     select max(fin23)
-	  into class_ 
+	  into class_
 	  from v_fin_cc_deal
 	 where (nd = nd_ or nd_ = 0) and rnk = rnk_;
           exception when NO_DATA_FOUND THEN --goto next1_ ;
-		                                    raise_application_error(-(20000),'\ ' ||'     Не знайдено REF KD = '||ND_,TRUE);  
+		                                    raise_application_error(-(20000),'\ ' ||'     Не знайдено REF KD = '||ND_,TRUE);
     END;
-  
-  
+
+
   if ZN_P_ND ('KP5', 5) = 1 then class_ := 4;
-  else  
+  else
         if ZN_P_ND ('KP4', 5) = 1 or  ZN_P_ND ('KP3', 5) = 2 then class_ := GREATEST(4,class_);
-        else 
+        else
 			  if  ZN_P_ND ('KP1', 5) = 1 then
 				   if ZN_P_ND ('KP2', 5) = 2 then class_ := GREATEST(4,class_);
-			       end if;	
-			   elsif ZN_P_ND ('KP1', 5) = 2 then class_ := GREATEST(4,class_);	   
-			   end if;  			  
-        end if;  		
-  
+			       end if;
+			   elsif ZN_P_ND ('KP1', 5) = 2 then class_ := GREATEST(4,class_);
+			   end if;
+        end if;
+
   end if;
-  
-  
-  if nd_ = 0 then 
-					  update v_fin_cc_deal  
+
+
+  if nd_ = 0 then
+					  update v_fin_cc_deal
 						 set fin23 = class_
 					   where  rnk = rnk_
 
 	                                                 ;
   else
-					update v_fin_cc_deal  
+					update v_fin_cc_deal
 					 set fin23 = class_
 				   where  nd = nd_   and rnk = rnk_
                                                 	 ;
-   end if;	
+   end if;
 
 /*
 Кредити в іноземній валюті
 */
 
-if ZN_P_ND ('KP6', 5) = 2 
+if ZN_P_ND ('KP6', 5) = 2
     then class_ := GREATEST(4,class_);
 end if;
 
-  if nd_ = 0 then 
+  if nd_ = 0 then
 			  update v_fin_cc_deal c
 				 set fin23 = class_
-			   where rnk = rnk_  
+			   where rnk = rnk_
 			     and CC_val( nd,RNK,DAT_) = 1
 			                    and (sdate > G_DATE_VAL
 				                     or (sdate <= G_DATE_VAL and exists (select 1 from cck_restr where nd = c.nd and fdat > G_DATE_VAL))
-									 ); 
-		begin 
+									 );
+		begin
 			select max(CC_val( nd,RNK,DAT_))
 			  into kv_
 			  from v_fin_cc_deal
 			 where nd = nd_ and rnk = rnk_ and sdate > G_DATE_VAL;
-		 
+
     	if kv_ = 1 then  record_fp_nd('110', class_, 6, DAT_, ND_, RNK_ );
 		                 record_fp('110', class_, 6, DAT_, OKPO_);
 		 end if;
-		 
+
 		exception when NO_DATA_FOUND THEN
 			  null;
 		end;
   else
            kv_ := CC_val( nd_,RNK_,DAT_);
-		   
+
 			  update v_fin_cc_deal c
 				 set fin23 = class_
 			   where nd = nd_ and rnk = rnk_ and kv_ = 1
 				 and  kv != 980  and (sdate > G_DATE_VAL
 				                     or (sdate <= G_DATE_VAL and exists (select 1 from cck_restr where nd = c.nd and fdat > G_DATE_VAL))
-									 ); 
-   end if;	
-	 
-	if  class_ is not null and kv_ = 1 then 
+									 );
+   end if;
+
+	if  class_ is not null and kv_ = 1 then
 				-------- запишем в карточку клієнта
       select count(1) into l_col from customerw where rnk=RNK_ and tag='FIN23' and isp !=0;
-		if l_col >= 1 and class_ is not null and rnk_ > 0 then 
+		if l_col >= 1 and class_ is not null and rnk_ > 0 then
 		   delete from customerw where rnk=RNK_ and tag='FIN23';
 		   kl.setCustomerElement(RNK_, 'FIN23', class_, 0);
-		else 
+		else
 		   kl.setCustomerElement(RNK_, 'FIN23', class_, 0);
 		end if;
-		
+
     /* update customerw set value = class_, isp = 0 where rnk=RNK_ and tag='FIN23' returning count(rnk) into l_col;
     if l_col=0 then
        insert into customerw (rnk, tag, value, isp) values (RNK_, 'FIN23', class_, 0);
     end if; */
-	end if; 
- 
+	end if;
+
   null;
 END get_class_fl;
 
@@ -4145,10 +4144,10 @@ END get_class_fl;
 coun_ number;
 sum_  number;
 kont_ number;
- 
+
  begin
- 
- 
+
+
  select nvl(count(s),0), nvl(sum(abs(s)),0)
    into     coun_, sum_
    from fin_rnk
@@ -4157,25 +4156,25 @@ kont_ number;
     and fdat = dat_;
 
     kont_ := LOGK( DAT_ , OKPO_ , IDF_ );
-	
+
 	if mode_ = 1 then
 	      if kont_ = 0  and coun_ !=0 and sum_ != 0 then return 0;           -- повністю заповненна форма та пройдена логіку
 	   elsif kont_ = 0  and coun_ !=0 and sum_  = 0 then return 1;           -- створена форма , клієгт ненадав даних
 	   elsif kont_ != 0 and coun_ !=0 and sum_ != 0 then return 2;         -- створена форма , набрана з помилками
 	   elsif kont_ = 0  and coun_ =0  and sum_  = 0 then RETURN 3;            ---ЗВІТНІСТЬ НЕ ВВОДИЛАСЬ
 	   end if;
-	elsif mode_ = 2 then 
-	   if kont_ = 0 and coun_ !=0 and sum_ != 0 
+	elsif mode_ = 2 then
+	   if kont_ = 0 and coun_ !=0 and sum_ != 0
 	        then return 0;      -- заборонити редагування
-			else return 1;      -- дозволити редагування  
+			else return 1;      -- дозволити редагування
 	   end if;
 	else return -1;
 	end if;
-			return -1;	 
+			return -1;
 end LOGK_read;
 
 
-FUNCTION CC_val 
+FUNCTION CC_val
               ( ND_ number,
 			    RNK_ number,
 				DAT_ date,
@@ -4195,74 +4194,74 @@ begin
 Тобто на валюту рахунку 8999 не дивимось.
  G_DATE_VAL DATE := to_date('04-03-2012','dd-mm-yyyy');
  */
- 
- if l_pos = '23' 
+
+ if l_pos = '23'
     then  l_date_val := G_DATE_VAL;
 	else  l_date_val := to_date('01-01-1900','dd-mm-yyyy');
  end if;
- 
+
  begin
 	 select  vidd, kv, (select nvl(max(fdat),c.sdate) from cck_restr where nd = c.nd and vid_restr = 5 and pr_no = 0) as sdate
 	   into  p_vidd, p_kv, p_sdate
 	   from  v_fin_cc_deal c
 	  where  rnk =  RNK_
 		and  nd = ND_ and rownum = 1
-		order by decode(kv,980,null, kv) asc NULLS LAST;  
-		exception when NO_DATA_FOUND THEN 
+		order by decode(kv,980,null, kv) asc NULLS LAST;
+		exception when NO_DATA_FOUND THEN
 			 p_vidd    :=  0;
 			 p_kv      :=  fin_nbu.zn_p_nd('VAL', '30', dat_, nd_, rnk_);
 			 p_sdate   :=  sysdate;
  end;
 
     if p_vidd != 3 then
-    
+
 			if p_kv != 980 and p_sdate > L_DATE_VAL then return 1;
 						                            else return 0;
 			end if;
-    
-   else    
-		   
+
+   else
+
 		   begin
 		   for k in (
 			  select a.kv, (select nvl(max(fdat),c.sdate) from cck_restr where nd = c.nd and vid_restr = 5 and pr_no = 0) as sdate
-				from cc_deal c, nd_acc nd, accounts a  
+				from cc_deal c, nd_acc nd, accounts a
 			   where c.nd = ND_
-				 and c.nd = nd.nd    
+				 and c.nd = nd.nd
 				 and nd.acc = a.acc and a.dazs is null
 				 --and a.ostc != 0
-				 and a.tip in ('SS ','SP ') 
+				 and a.tip in ('SS ','SP ')
 				 order by decode(a.kv,980,null, a.kv) asc NULLS LAST
 			)
 			loop
-			/*Клас боржників за кредитами наданими в іноземній валюті, які надано до 04.03.2012 року (включно) та до яких не вносилися 
-			  зміни після 04.03.2012 року має оцінюватися без врахування показника «відсутність в боржника, якому надано кредит в 
-			  іноземній валюті, документально підтверджених очікуваних надходжень виручки/доходів в іноземній валюті в обсязі, 
+			/*Клас боржників за кредитами наданими в іноземній валюті, які надано до 04.03.2012 року (включно) та до яких не вносилися
+			  зміни після 04.03.2012 року має оцінюватися без врахування показника «відсутність в боржника, якому надано кредит в
+			  іноземній валюті, документально підтверджених очікуваних надходжень виручки/доходів в іноземній валюті в обсязі,
 			  достатньому для погашення боргу протягом дії договору».*/
 			   if k.kv != 980 and k.sdate >  L_DATE_VAL then return 1;
 			elsif k.kv != 980 and k.sdate <= L_DATE_VAL then return 0;
 			elsif k.kv  = 980 then return 0;
 			end if;
-			
+
 			end loop;
 			end;
-		 
+
 			if  fin_nbu.zn_p_nd('VAL', '30', dat_, nd_, rnk_) = 980 then return 0;
 																	else return 1;
 			end if;
-			
- 	end if; 
-     
-	 
 
- 
+ 	end if;
 
-end cc_val;			  
+
+
+
+
+end cc_val;
 
 procedure Load_testND (
 			Rnk_   number,
 			ND_    number,
-			DAT_   date  
-	 	) 
+			DAT_   date
+	 	)
   is
 p_Rnk    number;
 p_Sos_   number;
@@ -4274,54 +4273,54 @@ Begin
 
 
 Begin
-Select sos 
+Select sos
   into p_Sos_
   from cc_deal
  where nd  = Nd_
    and rnk = Rnk_;
 EXCEPTION WHEN no_data_found  THEN return;
   End;
-   
-  
+
+
  /*
  Визначим через який механізм визначали тестового клієнта
  */
 
 
   Select count(1)
-    Into p_Col_ 
+    Into p_Col_
     from fin_nd
    where nd  = -1
-     and rnk = Rnk_;   
-     
+     and rnk = Rnk_;
+
 
   Select -okpo
     Into p_Okpo
     From Customer
    Where rnk = Rnk_;
-    
 
 
 
-   If   p_Col_ >= 10 then p_Rnk := Rnk_;    
-                     else p_Rnk := p_Okpo; 
-   End If;                        
+
+   If   p_Col_ >= 10 then p_Rnk := Rnk_;
+                     else p_Rnk := p_Okpo;
+   End If;
 
 
 
-   
-   
+
+
     /*
         Якщо договір в стані "Новий" підставим занчення тестового розрахунку
    */
 
-   
-if  p_Sos_ = 0  
-   
-   then    
-   
-        For k in (select rowid as Id_row  from fin_nd where rnk = p_Rnk and nd = -1 and fdat = Dat_) 
-        Loop 
+
+if  p_Sos_ = 0
+
+   then
+
+        For k in (select rowid as Id_row  from fin_nd where rnk = p_Rnk and nd = -1 and fdat = Dat_)
+        Loop
               Begin
                    update fin_nd
                       set nd = Nd_,
@@ -4329,11 +4328,11 @@ if  p_Sos_ = 0
                     where rowid = k.Id_row;
 
             EXCEPTION WHEN DUP_VAL_ON_INDEX  THEN null;
-           End;  
-		End loop;   
-   
+           End;
+		End loop;
+
    else null;
-end if;      
+end if;
 
 End Load_testND;
 
@@ -4373,7 +4372,7 @@ begin
     l_nbu23_kor.kf      :=   sys_context('bars_context','user_mfo');
 
     if BARSUPL.IS_T0_OK(l_nbu23_kor.zdat) = 1 THEN
-       raise_application_error(-20000,'Зміна параметрів заборонена! Відбулася вигрузка данних T0 '); 
+       raise_application_error(-20000,'Зміна параметрів заборонена! Відбулася вигрузка данних T0 ');
     end if;
 
    Case  p_mod
@@ -4396,8 +4395,8 @@ begin
       end if;
       raise_application_error(-(20001),'\      Не вірно введено клас позичальника. Допустиме значення від '||l_min||' до '||l_max ,TRUE);
    end if;
-   
- -- Перевірили коментарій	
+
+ -- Перевірили коментарій
    if  regexp_like (l_nbu23_kor.comm, '[йцукенгшщзхїфівапролджєячсмитьбю]') and length(l_nbu23_kor.comm) >5 then null;
        else  raise_application_error(-(20001),'\      Необхідно вказати причину коригування (>5 знаків) ' ,TRUE);
    end if;
@@ -4423,7 +4422,7 @@ end;
 
  Procedure get_adjustment (p_mod   in  Varchar2,
                            p_nd    in  Nbu23_Cck_Ul_Kor.nd%type,
-						   p_flag  Out number, 
+						   p_flag  Out number,
 						   p_fin23 Out Nbu23_Cck_Ul_Kor.fin23%type,
                            p_obs23 Out Nbu23_Cck_Ul_Kor.obs23%type,
                            p_kat23 Out Nbu23_Cck_Ul_Kor.kat23%type,
@@ -4431,7 +4430,7 @@ end;
 						   )
 as
 l_zdat date;
-l_d number;  
+l_d number;
 begin
   if  to_char(sysdate,'mm') = '01'
       then l_d := 20;
@@ -4439,30 +4438,30 @@ begin
   End if;
 
 /*
- if  to_number(to_char(sysdate,'dd')) < l_d 
+ if  to_number(to_char(sysdate,'dd')) < l_d
       then l_zdat := trunc(sysdate-l_d,'MM');
 	  else l_zdat := trunc(sysdate,'MM');
  End if;
 */
- 
+
  l_zdat := round(sysdate,'MM');
 
-  begin 
+  begin
 	select fin23, obs23, kat23, k23
-	  into p_fin23, p_obs23,p_kat23, p_k23  
+	  into p_fin23, p_obs23,p_kat23, p_k23
 	  from Nbu23_Cck_Ul_Kor
 	 where id = (select max(id) from Nbu23_Cck_Ul_Kor where nd = p_nd and mod = p_mod and zdat = l_zdat);
    p_flag := 1;
   exception when no_data_found then  p_flag := 0;
-  end;  
+  end;
 end;
 
  --  таблична функція для WEB  на таблицю FIN_KVED
 FUNCTION f_fin_kved  (  p_rnk  customer.rnk%type
                        ,p_okpo fin_kved.okpo%type
                        ,p_dat  fin_kved.dat%type
-                      )   					  
-            RETURN t_kved PIPELINED  PARALLEL_ENABLE iS 
+                      )
+            RETURN t_kved PIPELINED  PARALLEL_ENABLE iS
   l_kved t_col_kved;
   l_vols number := 0;
   l_volp number := 0;
@@ -4475,9 +4474,9 @@ BEGIN
     /*l_ck := substr(nvl(kl.get_customerw(P_RNK => p_rnk, 
 	                          P_TAG => 'N_CK', 
 					          P_ISP => 0),0),1,1);
-							  
+
     if l_ck = '0' then  l_2000 :=  ZN_F2(2000, 3, p_dat, p_okpo);
-	              else  l_2000 :=  ZN_F2(2010, 3, p_dat, p_okpo); 
+	              else  l_2000 :=  ZN_F2(2010, 3, p_dat, p_okpo);
 	end if;
 	*/ 
 	 
@@ -4486,7 +4485,7 @@ BEGIN
 	 select max(nvl(volme_sales,0)), sum(nvl(volme_sales,0))
 	   into l_max, l_ss
 	   from fin_kved
-	   where okpo = p_okpo and 
+	   where okpo = p_okpo and
 			 dat  = p_dat;
 	  
    
@@ -4527,9 +4526,9 @@ BEGIN
 			
             l_vols := l_vols + l_kved.volme_sales;
 			l_volp := l_volp + l_kved.weight;
-			
-            PIPE ROW(l_kved);   
- 
+
+            PIPE ROW(l_kved);
+
      end loop;
           /*  l_kved.kod        := null;
             l_kved.kved        := null;
@@ -4544,11 +4543,11 @@ BEGIN
    
  RETURN;
 
- END; 
+ END;
 
  procedure determ_kved(p_rnk         customer.rnk%type,
                        p_okpo        fin_kved.okpo%type,
-                       p_dat         fin_kved.dat%type				 	   
+                       p_dat         fin_kved.dat%type
                       )
 as
   l_max number;
@@ -4562,9 +4561,9 @@ BEGIN
   /*  l_ck := substr(nvl(kl.get_customerw(P_RNK => p_rnk, 
 	                          P_TAG => 'N_CK', 
 					          P_ISP => 0),0),1,1);
-							  
+
     if l_ck = '0' then  l_2000 :=  ZN_F2(2000, 3, p_dat, p_okpo);
-	              else  l_2000 :=  ZN_F2(2010, 3, p_dat, p_okpo); 
+	              else  l_2000 :=  ZN_F2(2010, 3, p_dat, p_okpo);
 	end if;
   */
 	l_2000 :=  nvl(ZN_F2(2000, 3, p_dat, p_okpo),0) + nvl(ZN_F2(2010, 3, p_dat, p_okpo),0) + nvl(ZN_F2(2120, 3, p_dat, p_okpo),0);
@@ -4572,36 +4571,36 @@ BEGIN
 	 select max(nvl(volme_sales,0)), sum(nvl(volme_sales,0))
 	   into l_max, l_ss
 	   from fin_kved
-	   where okpo = p_okpo and 
+	   where okpo = p_okpo and
 			 dat  = p_dat;
-			 
-    
-	
+
+
+
  If  l_2000 = l_ss then
 
      select max(kved) kved, count(kved) coun
 	   into l_kved, l_coun
 	   from fin_kved
       where okpo        = p_okpo and
-            dat         = p_dat  and	  
+            dat         = p_dat  and
 			volme_sales = l_max;
-   
+
      -- проставляємо флаг для квед з максимальним значенням питомої ваги
 		update fin_kved a
            set  flag         = case when  a.volme_sales = l_max then 1 else 0 end
          where  okpo         = p_okpo         and
-                dat          = p_dat; 
-		
-    -- Проставимо квед при умові що єдиного значення питомої ваги		
-    case 
+                dat          = p_dat;
+
+    -- Проставимо квед при умові що єдиного значення питомої ваги
+    case
 	    when l_coun = 1 then
 		     update fin_fm
 			    set ved = l_kved
 			  where okpo = p_okpo and
-                    fdat = p_dat;			  
+                    fdat = p_dat;
 		else null;
     end case;
- 
+
  else
     update fin_kved a
            set  flag         = 0
@@ -4611,20 +4610,20 @@ BEGIN
      update fin_fm
 			    set ved = null
 			  where okpo = p_okpo and
-                    fdat = p_dat;				
- 
- end if; 
-			 
-		 
+                    fdat = p_dat;
+
+ end if;
+
+
 end;
 
-	
+
 Procedure save_volmesales (p_rnk         customer.rnk%type,
                            p_okpo        fin_kved.okpo%type,
                            p_dat         fin_kved.dat%type, 
                            p_kod        fin_kved.kved%type,						   
                            p_kved        fin_kved.kved%type,
-                           p_volme_sales fin_kved.VOLME_SALES%type 					 	   
+                           p_volme_sales fin_kved.VOLME_SALES%type
                           )
 as
   l_max number;
@@ -4637,7 +4636,7 @@ begin
 begin      
  insert into fin_kved (okpo,   dat,   kod, kved,   volme_sales ) 
               values (p_okpo, p_dat, p_kod, p_kved, p_volme_sales);
-exception when dup_val_on_index then 
+exception when dup_val_on_index then
   update fin_kved
     set  volme_sales  = p_volme_sales
   where  okpo         = p_okpo         and
@@ -4647,40 +4646,40 @@ exception when dup_val_on_index then
 end;
 		 determ_kved(p_rnk,p_okpo,p_dat);
 end;
-	
-					  
-  
+
+
+
 
 Procedure del_volmesales (p_rnk         customer.rnk%type,
                           p_okpo        fin_kved.okpo%type,
-                          p_dat         fin_kved.dat%type,  
+                          p_dat         fin_kved.dat%type,
                           p_kved        fin_kved.kved%type
                           )
 as
 begin
-  
- delete from fin_kved  
+
+ delete from fin_kved
   where  okpo         = p_okpo         and
          dat          = p_dat          and
-         kved         = p_kved; 
-	
-determ_kved(p_rnk,p_okpo,p_dat);
-					
-end;  
-  
+         kved         = p_kved;
 
-  
+determ_kved(p_rnk,p_okpo,p_dat);
+
+end;
+
+
+
 Procedure add_findat (p_rnk         fin_dat.rnk%type,
                       p_nd          fin_dat.nd%type,
                       p_dat         fin_dat.fdat%type)
 as
-begin      
- insert into fin_dat  (rnk, nd, fdat) 
+begin
+ insert into fin_dat  (rnk, nd, fdat)
                values (p_rnk, p_nd, p_dat);
 exception when dup_val_on_index then  null;
-end;  
+end;
 
--- Автоматизоване визначення чи входить клієнт до групи			   
+-- Автоматизоване визначення чи входить клієнт до групи
 procedure rnk_group  (RNK_  number,
                       ND_   number,
 					  DAT_  date,
@@ -4692,46 +4691,46 @@ Is
 	l_NGRP   number := 0;
 	l_fin_cust fin_cust%rowtype;
 	l_ int;
-	
+
 begin
 
 
   aND_     := ND_ ;      -- активный код ND
   aRNK_    := RNK_;      -- активный код RNK
   aDAT_    := zDAT_;     -- активна дата звітності
-  
-    
-  
- 
+
+
+
+
  /*
  * Належнійсть до груп повязаних
  */
- 
+
 		 begin
 				select 1
 				  into 	l_NGRP
-				  from D8_cust_link_Groups 
+				  from D8_cust_link_Groups
 				 where okpo    = okpo_ and
 					   rownum = 1;
-				 fin_nbu.record_fp_nd('NGRP', l_NGRP, 51, DAT_); 
-		 exception when no_data_found then 
-		         fin_nbu.record_fp_nd('NGRP', 0,      51, DAT_); 
+				 fin_nbu.record_fp_nd('NGRP', l_NGRP, 51, DAT_);
+		 exception when no_data_found then
+		         fin_nbu.record_fp_nd('NGRP', 0,      51, DAT_);
 		 end;
- 
+
   /*
    Належність клієнта до груп консолідованих
   */
-  
-       fin_nbu.record_fp_nd('NGRK', l_NGRK, 51, DAT_); 
-	   fin_nbu.record_fp_nd('GRKL', null, 51, DAT_); 
-	   fin_nbu.record_fp_nd('CLS1', null, 56, DAT_); 
-	   
-	   --fin_nbu.record_fp_nd('GRCL', null, 51, zDAT_); 
-	  
+
+       fin_nbu.record_fp_nd('NGRK', l_NGRK, 51, DAT_);
+	   fin_nbu.record_fp_nd('GRKL', null, 51, DAT_);
+	   fin_nbu.record_fp_nd('CLS1', null, 56, DAT_);
+
+	   --fin_nbu.record_fp_nd('GRCL', null, 51, zDAT_);
+
 	  for cur in ( select * from (
-					select rel_id, rel_rnk, rel_intext 
-					  from BARS.CUSTOMER_REL 
-					 where rnk    = RNK_      and 
+					select rel_id, rel_rnk, rel_intext
+					  from BARS.CUSTOMER_REL
+					 where rnk    = RNK_      and
 						   rel_id in (51)   and
 						   sysdate between nvl(bdate,sysdate) and nvl(edate,sysdate)
                       order by rel_id desc, rel_intext desc
@@ -4739,55 +4738,55 @@ begin
 
 				  )
 	  loop
-	     
+
 		 if cur.rel_id = 51       then  l_NGRK :=  1;
 		 else CONTINUE;
 		 end if;
-		 
+
 	  case cur.rel_intext
 	       when 1 then --customer
-		        begin 
+		        begin
 					Select rnk , (cur.rel_intext+1)||lpad(lpad(rnk,10,'0'),11,'9') okpo, nmkk, ved, datea
 					  into l_okpo_rel, l_fin_cust.okpo, l_fin_cust.nmk, l_fin_cust.ved, l_fin_cust.datea
 					  from customer
-					 Where rnk = cur.rel_rnk and custtype = 2;  
-					 fin_nbu.record_fp_nd('NGRK', l_NGRK, 51, DAT_); 
-					 fin_nbu.record_fp_nd('NUMG', l_okpo_rel, 51, DAT_); 
-				exception when no_data_found then 
+					 Where rnk = cur.rel_rnk and custtype = 2;
+					 fin_nbu.record_fp_nd('NGRK', l_NGRK, 51, DAT_);
+					 fin_nbu.record_fp_nd('NUMG', l_okpo_rel, 51, DAT_);
+				exception when no_data_found then
 				  null;
 				end;
 		   when 0 then -- CUSTOMER_EXTERN
-		        begin 
+		        begin
 					Select id , (cur.rel_intext+1)||lpad(lpad(id,10,'0'),11,'9') okpo, substr(name,1,38) nmk, ved, null datea
 					  into l_okpo_rel, l_fin_cust.okpo, l_fin_cust.nmk, l_fin_cust.ved, l_fin_cust.datea
 					  from CUSTOMER_EXTERN
-					 Where id = cur.rel_rnk and custtype = 1;  
-					 fin_nbu.record_fp_nd('NGRK', l_NGRK, 51, DAT_); 
-					 fin_nbu.record_fp_nd('NUMG', l_okpo_rel, 51, DAT_); 
-				exception when no_data_found then 
+					 Where id = cur.rel_rnk and custtype = 1;
+					 fin_nbu.record_fp_nd('NGRK', l_NGRK, 51, DAT_);
+					 fin_nbu.record_fp_nd('NUMG', l_okpo_rel, 51, DAT_);
+				exception when no_data_found then
 				  null;
-				end;		   
+				end;
 		   else null;
 	  end case;
-	  
-	  
-	Begin  
+
+
+	Begin
 	  l_ :=  ZN_P_ND('CLS', 59, DAT_,-2,-l_fin_cust.okpo, null);
-	   exception when others then 
+	   exception when others then
 	       raise_application_error (-20000,  '\9999       Не вірний формать кода ОКПО групи під спільним контролем:' || -l_fin_cust.okpo);
 	end;
 	   -- клас групи контролера
-	   fin_nbu.record_fp_nd('GRKL', ZN_P_ND('CLS', 59, DAT_,-2,-l_fin_cust.okpo, null), 51, DAT_); 
-	   --fin_nbu.record_fp_nd('GRCL', l_, 51, zDAT_); 
-	   
-	   if   LOGK_read (trunc(add_months(DAT_,-9),'YYYY'),l_fin_cust.okpo,1,1) = 0   then   fin_nbu.record_fp_nd('NKZV', 1, 51, DAT_); 
-	                                                                                else   fin_nbu.record_fp_nd('NKZV', 0, 51, DAT_);   
+	   fin_nbu.record_fp_nd('GRKL', ZN_P_ND('CLS', 59, DAT_,-2,-l_fin_cust.okpo, null), 51, DAT_);
+	   --fin_nbu.record_fp_nd('GRCL', l_, 51, zDAT_);
+
+	   if   LOGK_read (trunc(add_months(DAT_,-9),'YYYY'),l_fin_cust.okpo,1,1) = 0   then   fin_nbu.record_fp_nd('NKZV', 1, 51, DAT_);
+	                                                                                else   fin_nbu.record_fp_nd('NKZV', 0, 51, DAT_);
        End if;
-	  
+
 	  begin
 	    l_fin_cust.okpo := to_number(l_fin_cust.okpo);
-	   
-			  if l_fin_cust.okpo is not null and cur.rel_id = 51  then 
+
+			  if l_fin_cust.okpo is not null and cur.rel_id = 51  then
 				  begin
 				   l_fin_cust.custtype := 5;
 				   l_fin_cust.kf   := sys_context('bars_context','user_mfo');
@@ -4797,12 +4796,12 @@ begin
 			  end if;
   	   exception when others then  null;
 	   end;
-	   
+
 	  end loop;
-	  
-	  
+
+
 	end;
--- Автоматизоване визначення показників						   
+-- Автоматизоване визначення показників
 procedure get_subpok (RNK_  number,
                       ND_   number,
 					  DAT_  date,
@@ -4818,7 +4817,7 @@ Is
 	sTmp2   number := 0;
 	sTmp3   number := 0;
 	l_dat  date;
-	
+
 	l_bv  number;
 	l_rez number;
 	l_period int;
@@ -4828,7 +4827,7 @@ Is
 	l_ int;
 	x_ int;
 	l_dat_ date;
-	
+
 begin
 
 
@@ -4849,230 +4848,230 @@ begin
 	exception when NO_DATA_FOUND THEN
 					     null; --raise_application_error(-(20000),'\ ' ||'     Не знайдено угоду з ND - '||nd_,TRUE);
 	END;
-	
+
 	    -- період звітності
     Begin
 		SELECT s
 		  into l_period
 		  from fin_rnk
-		 where kod = 'TZVT' 
+		 where kod = 'TZVT'
 		   and okpo = okpo_
 		   and fdat = zDAT_ and s in (3,6,12);
-	  exception when NO_DATA_FOUND THEN  
+	  exception when NO_DATA_FOUND THEN
              l_period := fin_obu.p_zvt(RNK_, zDAT_);
-    end;	
+    end;
 
 	   record_fp('TZVT',  l_period, 6, zDAT_, OKPO_);
-        	
-	
+
+
   aOKPO_   := okpo_;      -- активный код ОКПО
   aND_     := ND_ ;      -- активный код ND
   aRNK_    := RNK_;      -- активный код RNK
   aDAT_    := zDAT_;     -- активна дата звітності
-  
+
   FZ_    :=  fin_nbu.F_FM (aOKPO_, aDAT_ ) ;   -- форма звітності
-  
-   
+
+
  --Контрагент має від`ємне значення капіталу протягом 3 останніх років', 'KVZK', 52
   case
-    -- < 1  дата реестрації < 1 року  
-    when  add_months(sysdate,-12) < datea_        
+    -- < 1  дата реестрації < 1 року
+    when  add_months(sysdate,-12) < datea_
 	     then   sTmp0 := 0; -- Ні
-	-- річна звітність    
-	when zDAT_ = trunc(zDAT_,'YYYY')  
-	     then 
+	-- річна звітність
+	when zDAT_ = trunc(zDAT_,'YYYY')
+	     then
 		      if  (
-			       ZN_P(1495,1) < 0 and 
-			       ZN_P(1495,1, add_months(zDAT_,-12)) < 0 and 
-				   ZN_P(1495,1, add_months(zDAT_,-24)) < 0 
+			       ZN_P(1495,1) < 0 and
+			       ZN_P(1495,1, add_months(zDAT_,-12)) < 0 and
+				   ZN_P(1495,1, add_months(zDAT_,-24)) < 0
 				   ) or
 				  (
-				   ZN_P(1495,1) < 0 and 
-				   LOGK_read (add_months(zDAT_,-12),OKPO_,1,1) = 1 and 
+				   ZN_P(1495,1) < 0 and
+				   LOGK_read (add_months(zDAT_,-12),OKPO_,1,1) = 1 and
 				   LOGK_read (add_months(zDAT_,-24),OKPO_,1,1) = 0
 				   )
 				then  sTmp1:= 1 ; -- Так
-			  end if; 
-	else 
+			  end if;
+	else
 	        if  (
-			     ZN_P(1495,1) < 0 and 
-			     ZN_P(1495,1, add_months(trunc(zDAT_,'YYYY'),-12)) < 0 and 
-				 ZN_P(1495,1, add_months(trunc(zDAT_,'YYYY'),-24)) < 0 and 
-				 ZN_P(1495,1, add_months(trunc(zDAT_,'YYYY'),-36)) < 0  
+			     ZN_P(1495,1) < 0 and
+			     ZN_P(1495,1, add_months(trunc(zDAT_,'YYYY'),-12)) < 0 and
+				 ZN_P(1495,1, add_months(trunc(zDAT_,'YYYY'),-24)) < 0 and
+				 ZN_P(1495,1, add_months(trunc(zDAT_,'YYYY'),-36)) < 0
 				 )  or
 				(
-				 ZN_P(1495,1) < 0 and 
-				 LOGK_read (add_months(trunc(zDAT_,'YYYY'),0),OKPO_,1,1)   = 1 and 
+				 ZN_P(1495,1) < 0 and
+				 LOGK_read (add_months(trunc(zDAT_,'YYYY'),0),OKPO_,1,1)   = 1 and
 				 LOGK_read (add_months(trunc(zDAT_,'YYYY'),-12),OKPO_,1,1) = 0 and
 				 LOGK_read (add_months(trunc(zDAT_,'YYYY'),-24),OKPO_,1,1) = 0
 				) or
 				(
-				 ZN_P(1495,1) < 0 and 
+				 ZN_P(1495,1) < 0 and
 				 LOGK_read (add_months(trunc(zDAT_,'YYYY'),0),OKPO_,1,1)   = 0 and  -- заповнена
 				 LOGK_read (add_months(trunc(zDAT_,'YYYY'),-12),OKPO_,1,1) = 1 and  --не заповнена
 				 LOGK_read (add_months(trunc(zDAT_,'YYYY'),-24),OKPO_,1,1) = 0
 				)
             then sTmp2:= 1 ; -- Так
-            end if;			
-  end case;		 
-  
-  fin_nbu.record_fp_nd('KVZK', greatest(0, sTmp0, sTmp1, sTmp2), 52, DAT_); 
-  
+            end if;
+  end case;
 
-  
+  fin_nbu.record_fp_nd('KVZK', greatest(0, sTmp0, sTmp1, sTmp2), 52, DAT_);
+
+
+
   -- Порушення вимогщодо одночасного виконання співідношення систої кредитної заборгованості до чистої виручки від реалізації', 4,'PVKZ', 52, null, 1 );
-     
+
 	 sTmp0 := null;
 	 sTmp1 := null;
 	 if FZ_ = 'N' then
-	 --Чиста кредитна заборгованість до чистої виручки від реалізації 
-	     
+	 --Чиста кредитна заборгованість до чистої виручки від реалізації
+
 		begin
-		            sTmp0 :=     ( ZN_F1('1510',4) + ZN_F1('1515',4) + ZN_F1('1600',4) + ZN_F1('1610',4) - ZN_F1('1165',4) )  /  
+		            sTmp0 :=     ( ZN_F1('1510',4) + ZN_F1('1515',4) + ZN_F1('1600',4) + ZN_F1('1610',4) - ZN_F1('1165',4) )  /
 					             ( ZN_F2('2000',4) + ZN_F2('2010',4) );
 			exception when ZERO_DIVIDE then
-                    sTmp0 :=  null;	
-		end; 
+                    sTmp0 :=  null;
+		end;
 
-      --Чиста кредитна заборгованість до значення EBITDA  	    
+      --Чиста кредитна заборгованість до значення EBITDA
 		begin
-		            sTmp1 :=     ( ZN_F1('1510',4) + ZN_F1('1515',4) + ZN_F1('1600',4) + ZN_F1('1610',4) - ZN_F1('1165',4) )  /  
+		            sTmp1 :=     ( ZN_F1('1510',4) + ZN_F1('1515',4) + ZN_F1('1600',4) + ZN_F1('1610',4) - ZN_F1('1165',4) )  /
 					             ( ZN_F2('2190',4) - ZN_F2('2195',4) + ZN_F2('2515',4) );
-			exception when ZERO_DIVIDE then   sTmp1 :=  null;	
-		end; 		
-	 
+			exception when ZERO_DIVIDE then   sTmp1 :=  null;
+		end;
+
 	 else
-	  --Чиста кредитна заборгованість до чистої виручки від реалізації 
+	  --Чиста кредитна заборгованість до чистої виручки від реалізації
 		begin
-		          sTmp0 :=     ( ZN_F1('1595',4) + ZN_F1('1600',4) + ZN_F1('1610',4) - ZN_F1('1165',4) )  /  
+		          sTmp0 :=     ( ZN_F1('1595',4) + ZN_F1('1600',4) + ZN_F1('1610',4) - ZN_F1('1165',4) )  /
 				               ( ZN_F2('2000',4) );
-		exception when ZERO_DIVIDE then  sTmp0 :=  null;	
+		exception when ZERO_DIVIDE then  sTmp0 :=  null;
 		 		  when others  then
 					    if sqlcode=-20000  then sTmp0 :=  null; -- відсутні дані
 						                   else raise;
 					    end if;
-		 end;	 
-	 
-	 
-	  --Чиста кредитна заборгованість до значення EBITDA 
+		 end;
+
+
+	  --Чиста кредитна заборгованість до значення EBITDA
 		begin
-		          sTmp1 :=     ( ZN_F1('1595',4) + ZN_F1('1600',4) + ZN_F1('1610',4) - ZN_F1('1165',4) )  /  
+		          sTmp1 :=     ( ZN_F1('1595',4) + ZN_F1('1600',4) + ZN_F1('1610',4) - ZN_F1('1165',4) )  /
 				               ( ZN_F2('2000',4) - ZN_F2('2050',4) );
-		exception when ZERO_DIVIDE then sTmp1 :=  null;	
+		exception when ZERO_DIVIDE then sTmp1 :=  null;
 				  when others  then
 					    if sqlcode=-20000  then sTmp1 :=  null; -- відсутні дані
 						                   else raise;
 					    end if;
-		 end;	 
+		 end;
 	 end if;
 
-    fin_nbu.record_fp_nd('KZDV', sTmp0, 52, DAT_); 
-    fin_nbu.record_fp_nd('KZDE', sTmp1, 52, DAT_); 
+    fin_nbu.record_fp_nd('KZDV', sTmp0, 52, DAT_);
+    fin_nbu.record_fp_nd('KZDE', sTmp1, 52, DAT_);
 
 
-	if  sdate_ < to_date('03-01-2017','dd-mm-yyyy') 
+	if  sdate_ < to_date('03-01-2017','dd-mm-yyyy')
 	    then x_ := 7;
 	    else x_ := 5;
 	end if;
-	
+
 	if  sTmp0 > 2.5 and (sTmp1 > x_ or sTmp1 <= 0) then sTmp2:= 1;
 	                                               else sTmp2:= 0;
     end if;
-	
+
 	fin_nbu.record_fp_nd('PVKZ', sTmp2, 52, DAT_);
-	
-	
-	
+
+
+
 	/*
-	Порушення вимоги щодо одночасного виконання до 01.01.2018 року не застосовується якщо на момент надання 
-	кредиту значення чистої кредитної заборгованості до значення EBITDA було менше 7 та на дату визначення 
+	Порушення вимоги щодо одночасного виконання до 01.01.2018 року не застосовується якщо на момент надання
+	кредиту значення чистої кредитної заборгованості до значення EBITDA було менше 7 та на дату визначення
 	банком розміру кредитного ризику кредит є реструктуризованим.
 	*/
-	
-	
+
+
 	sdatey_ := trunc(sdate_,'YYYY');
-	
+
 	/*   вилучено 23/01/2017
     if FZ_ = 'N' then
-      --Чиста кредитна заборгованість до значення EBITDA  	    
+      --Чиста кредитна заборгованість до значення EBITDA
 		begin
-		            sTmp3 :=     ( ZN_F1('1510',4, sdatey_) + ZN_F1('1515',4, sdatey_) + ZN_F1('1600',4,sdatey_) + ZN_F1('1610',4,sdatey_) - ZN_F1('1165',4,sdatey_) )  /  
+		            sTmp3 :=     ( ZN_F1('1510',4, sdatey_) + ZN_F1('1515',4, sdatey_) + ZN_F1('1600',4,sdatey_) + ZN_F1('1610',4,sdatey_) - ZN_F1('1165',4,sdatey_) )  /
 					             ( ZN_F2('2190',4,sdatey_) - ZN_F2('2195',4,sdatey_) + ZN_F2('2515',4,sdatey_) );
 			exception when ZERO_DIVIDE then  sTmp3 :=     null;	 -- ділення на 0
 			          when others  then
 					    if sqlcode=-20000  then sTmp3 :=  null; -- відсутні дані
 						                   else raise;
 					    end if;
-		end; 		
-	 
+		end;
+
 	 else
-	 
-	  --Чиста кредитна заборгованість до значення EBITDA 
+
+	  --Чиста кредитна заборгованість до значення EBITDA
 		begin
-		          sTmp3 :=     ( ZN_F1('1595',4,sdatey_) + ZN_F1('1600',4,sdatey_) + ZN_F1('1610',4,sdatey_) - ZN_F1('1165',4,sdatey_) )  /  
+		          sTmp3 :=     ( ZN_F1('1595',4,sdatey_) + ZN_F1('1600',4,sdatey_) + ZN_F1('1610',4,sdatey_) - ZN_F1('1165',4,sdatey_) )  /
 				               ( ZN_F2('2000',4,sdatey_) - ZN_F2('2050',4,sdatey_) );
 		exception when ZERO_DIVIDE then  sTmp3 :=     null;	  -- ділення на 0
 		          when others  then
 					    if sqlcode=-20000  then sTmp3 :=  null; -- відсутні дані
 						                   else raise;
 					    end if;
-		 end;	 
+		 end;
 	 end if;
-	 
-    if  DAT_ < to_date('01/01/2018','DD/MM/YYYY') and sTmp3 < 7  and ZN_P_ND('KRES', 51, DAT_)  >  0   
-         then fin_nbu.record_fp_nd('PVKZ',     0, 52, DAT_); 
-         else fin_nbu.record_fp_nd('PVKZ', sTmp2, 52, DAT_); 		 
+
+    if  DAT_ < to_date('01/01/2018','DD/MM/YYYY') and sTmp3 < 7  and ZN_P_ND('KRES', 51, DAT_)  >  0
+         then fin_nbu.record_fp_nd('PVKZ',     0, 52, DAT_);
+         else fin_nbu.record_fp_nd('PVKZ', sTmp2, 52, DAT_);
 	end if;
 	*/
-	
-	 
-  -- 17. У Банку відсутні фінансова звітність Контрагента за останній звітний період понад 3 місяці після термінів подання 
-  -- 17,'PD17', 53 ,
- 
 
-    -- перевірка на заповнення розшифровки рядка 2000 
+
+  -- 17. У Банку відсутні фінансова звітність Контрагента за останній звітний період понад 3 місяці після термінів подання
+  -- 17,'PD17', 53 ,
+
+
+    -- перевірка на заповнення розшифровки рядка 2000
 	  if GET_KVED(RNK_, case when (sysdate-datea_) < 366 then zDAT_ else TRUNC(zDAT_,'YYYY') end , 1) is null
 		 then sTmp0 := 1;
 		 else sTmp0 := 0;
 	  end if;
-	  fin_nbu.record_fp_nd('PD20', sTmp0, 53, DAT_); 
-	  
-   -- перевірка поданої звітності   
+	  fin_nbu.record_fp_nd('PD20', sTmp0, 53, DAT_);
+
+   -- перевірка поданої звітності
 /*    if to_char(dat_,'MM') = '05' then l_ := 5;
 	                             else l_ := 4;
     end if;
-   
 
-   case l_period 
+
+   case l_period
       when 3  then l_dat := trunc(add_months(DAT_, -l_),'Q');
       when 12 then l_dat := trunc(add_months(DAT_, -5 ),'YYYY');
       else if to_char(add_months(DAT_,-4),'MM')>=6 then l_dat := add_months(trunc(add_months(DAT_,-4),'YYYY'),5);
                                                    else l_dat := trunc(add_months(DAT_,-4),'YYYY');
            end if;
    end case;
- */   
- 
-   l_dat_ := trunc(sysdate); 
+ */
+
+   l_dat_ := trunc(sysdate);
    if to_char(l_dat_-19,'MM')    = '04' then l_ := 4;
                                         else l_ := 3;
    end if;
-   
 
-   case l_period 
+
+   case l_period
       when 3  then l_dat := greatest(trunc(add_months(l_DAT_, -l_)-19,'Q'),zDAT_);
       when 12 then l_dat := greatest(trunc(add_months(l_DAT_, -4 )-19,'YYYY'),zDAT_);
       else if to_char(add_months(l_DAT_,-3)-19,'MM')>=6 then l_dat := add_months(trunc(add_months(l_DAT_,-3)-19,'YYYY'),5);
                                                         else l_dat := trunc(add_months(l_DAT_,-3)-19,'YYYY');
            end if;
    end case;
-  
-    case 
-      when 	LOGK_read(l_dat, OKPO_,1,1) != 0   
-      then  fin_nbu.record_fp_nd('PD17', 1, 53, DAT_); 
-      else  fin_nbu.record_fp_nd('PD17', 0, 53, DAT_); 
-    end case;	  
-   
-  
+
+    case
+      when 	LOGK_read(l_dat, OKPO_,1,1) != 0
+      then  fin_nbu.record_fp_nd('PD17', 1, 53, DAT_);
+      else  fin_nbu.record_fp_nd('PD17', 0, 53, DAT_);
+    end case;
+
+
   --  Сплата боргу Контрагентом в обсязі, меншому, ніж обсяг доходів, визнаних Банком', 1,'VD1', 54,
     sTmp0 := 0;
     --fin_obu.days_of_delay(ND_);
@@ -5080,125 +5079,125 @@ begin
 	if  fin_obu.g_kol_dely > 0
 	    then sTmp0 := 1;
 	end if;
-	   
+
 	if  (greatest(0, sTmp0) = 1 and
 	    ZN_P_ND ('INV', 32, DAT_)  != 2 and
 		ZN_P_ND ('TIP', 32, DAT_)  != 1 and
-		ZN_P_ND ('NGRK',51, DAT_)  not in ( 1, 2)  ) 
-	then fin_nbu.record_fp_nd('VD1', 1, 54, DAT_); 
-	else fin_nbu.record_fp_nd('VD1', 0, 54, DAT_); 
+		ZN_P_ND ('NGRK',51, DAT_)  not in ( 1, 2)  )
+	then fin_nbu.record_fp_nd('VD1', 1, 54, DAT_);
+	else fin_nbu.record_fp_nd('VD1', 0, 54, DAT_);
 	end if;
   */
   -- Зменшення відсоткової ставки більш ніж на 30% від первинних умов договору
-  /* 
+  /*
     If  ZN_P_ND('KRES', 51, DAT_) = 0 then
 			Begin
 				select  acrn.fprocn (a.acc, 0, ''), a.acc
 				  into  sTmp0, sTmp2
 				  from nd_acc n, accounts a
 				 where n.acc = a.acc
-				   and n.nd = ND_ 
+				   and n.nd = ND_
 				   and a.tip = 'LIM';
 			 exception when NO_DATA_FOUND THEN null;
-			END;	   
-		  
+			END;
+
 			BEGIN
 			  SELECT ir
 				INTO sTmp1
-				FROM int_ratn 
+				FROM int_ratn
 			   WHERE acc=sTmp2 AND id=0 AND
-				     bdat = (SELECT MIN(bdat) 
+				     bdat = (SELECT MIN(bdat)
 					           FROM int_ratn
 						      WHERE acc=sTmp2 AND id=0);
 		   EXCEPTION WHEN NO_DATA_FOUND THEN null;
 		   END;
-  
-        if    sTmp0 > 0  then       
-		     sTmp3 := sTmp1*100/sTmp0; 
+
+        if    sTmp0 > 0  then
+		     sTmp3 := sTmp1*100/sTmp0;
 		else sTmp3 := 0;
 		end if;
-		
-		if sTmp3 < 70 then fin_nbu.record_fp_nd('VD4', 1, 54, DAT_); 
-		              else fin_nbu.record_fp_nd('VD4', 0, 54, DAT_);           
+
+		if sTmp3 < 70 then fin_nbu.record_fp_nd('VD4', 1, 54, DAT_);
+		              else fin_nbu.record_fp_nd('VD4', 0, 54, DAT_);
 		end if;
-  
-    else fin_nbu.record_fp_nd('VD4', 0, 54, DAT_);           
+
+    else fin_nbu.record_fp_nd('VD4', 0, 54, DAT_);
     end if;
   */
-  
+
   --  Контрагент поновив регулярні платежі
-         fin_nbu.record_fp_nd('ZD1', 1, 55, DAT_);   
+         fin_nbu.record_fp_nd('ZD1', 1, 55, DAT_);
 		 If  ZN_P_ND('KRES', 51, DAT_) > 0 then
 					   sTmp0 := 0;
 					   sTmp1 := 0;
 						for k in 1..12
-						loop 
+						loop
 						fin_obu.days_of_delay(ND_, add_months(trunc(sdate_ , 'MM'), -k) );
 
-							if k<= 6 
-							  then sTmp0:= greatest(sTmp0,FIN_OBU.G_KOL_DELY); 
+							if k<= 6
+							  then sTmp0:= greatest(sTmp0,FIN_OBU.G_KOL_DELY);
 							end if;
 
 							if  add_months(trunc(sdate_ , 'MM'), -k) =  trunc(add_months(trunc(sdate_ , 'MM'), -k),'MM')
-							  then sTmp1:= greatest(sTmp1,FIN_OBU.G_KOL_DELY); 
+							  then sTmp1:= greatest(sTmp1,FIN_OBU.G_KOL_DELY);
 							end if;
-						end loop;    
+						end loop;
 
 					 If  sTmp0>0 or sTmp1> 0
 						 then fin_nbu.record_fp_nd('ZD1', 0, 55, DAT_);
 						 else fin_nbu.record_fp_nd('ZD1', 1, 55, DAT_);
-					 End if; 		 
+					 End if;
 
 		End if;
-	  
-  
-  -- Жодне з зобов’язань Контрагента на дату ухвалення рішення про припинення визнання дефолту не є простроченим більше ніж на 30 календарних днів 
+
+
+  -- Жодне з зобов’язань Контрагента на дату ухвалення рішення про припинення визнання дефолту не є простроченим більше ніж на 30 календарних днів
       fin_obu.days_of_delay(ND_);
-	  fin_nbu.record_fp_nd('KKDP', fin_obu.g_kol_dely, 56, DAT_);     
-      if fin_obu.g_kol_dely > 30 then  fin_nbu.record_fp_nd('ZD2', 0, 55, DAT_);            
-	                             else  fin_nbu.record_fp_nd('ZD2', 1, 55, DAT_);            
+	  fin_nbu.record_fp_nd('KKDP', fin_obu.g_kol_dely, 56, DAT_);
+      if fin_obu.g_kol_dely > 30 then  fin_nbu.record_fp_nd('ZD2', 0, 55, DAT_);
+	                             else  fin_nbu.record_fp_nd('ZD2', 1, 55, DAT_);
       end if;
-  
+
  -- Сформований резерв у відсотках
         Begin
           select sum(nvl(bv,0)),  sum(nvl(rez39,0))
 		    into l_bv   ,  l_rez
-            from nbu23_rez 
-           where rnk = RNK_          and 
+            from nbu23_rez
+           where rnk = RNK_          and
                  nd  = ND_           and
                  tip in ('SS', 'SP','SN','SPN','SNO','SL') and    --,'CR9'
                  fdat = add_months(DAT_,-1);
            exception when NO_DATA_FOUND then l_bv := 0; l_rez := 0;
-		end; 
-		
+		end;
+
 	If 	l_bv!= 0 then
           sTmp0 := 	(l_rez*100) / l_bv;
 	else  sTmp0 := 	0;
-    end if;	
-	
-	fin_nbu.record_fp_nd('SRKA', sTmp0, 52, DAT_);            
-	
-    if  sTmp0 > 50 	
-			then  fin_nbu.record_fp_nd('PD1', 1, 53, DAT_); 
-			else  fin_nbu.record_fp_nd('PD1', 0, 53, DAT_); 
+    end if;
+
+	fin_nbu.record_fp_nd('SRKA', sTmp0, 52, DAT_);
+
+    if  sTmp0 > 50
+			then  fin_nbu.record_fp_nd('PD1', 1, 53, DAT_);
+			else  fin_nbu.record_fp_nd('PD1', 0, 53, DAT_);
 	End if;
-		
-		
+
+
 		------------------------------------------------------------------------------------
 		--показники для PD
 		------------------------------------------------------------------------------------
-	-- 2.1.	Динаміка фактичних значень інтегрального показника 	 
- 
+	-- 2.1.	Динаміка фактичних значень інтегрального показника
+
      sTmp0 := zn_p('PIPB', 6, zDAT_, OKPO_) - zn_p('PIPB', 6, add_months(zDAT_,-l_period), OKPO_ );
 	       trace('get_subpok ', ' l_period='|| l_period);
 	       trace('get_subpok ', sTmp0||' PIPB='|| zn_p('PIPB', 6, zDAT_, OKPO_)||' PIPB-period= '||zn_p('PIPB', 6, add_months(zDAT_, -l_period), OKPO_));
-	 case  when  sTmp0>0 then fin_nbu.record_fp_nd('IP1', 1, 50, DAT_);            
-           when  sTmp0<0 then fin_nbu.record_fp_nd('IP1', 3, 50, DAT_);            
-           when  sTmp0=0 then fin_nbu.record_fp_nd('IP1', 2, 50, DAT_);            
-		   else               fin_nbu.record_fp_nd('IP1', 2, 50, DAT_);            
+	 case  when  sTmp0>0 then fin_nbu.record_fp_nd('IP1', 1, 50, DAT_);
+           when  sTmp0<0 then fin_nbu.record_fp_nd('IP1', 3, 50, DAT_);
+           when  sTmp0=0 then fin_nbu.record_fp_nd('IP1', 2, 50, DAT_);
+		   else               fin_nbu.record_fp_nd('IP1', 2, 50, DAT_);
 	 end case;
 
-	 
+
 	 --  2.3.	Наявність та активність ринків збуту продукції  ( з аналогічним періодом попереднього року)
 	         -- Чиста виручка від реалізації
 		Begin
@@ -5216,29 +5215,29 @@ begin
 						                   else raise;
 					    end if;
 		end;
-	 
-		 case  when  sTmp0>0 then fin_nbu.record_fp_nd('IP3', 1, 50, DAT_);            
-               when  sTmp0<0 then fin_nbu.record_fp_nd('IP3', 3, 50, DAT_);            
-               when  sTmp0=0 then fin_nbu.record_fp_nd('IP3', 2, 50, DAT_);            
-		       else               fin_nbu.record_fp_nd('IP3', 2, 50, DAT_);            
-	     end case; 
-	 
-	 --  2.4.	Якість менеджменту 
-	    
-		fin_nbu.record_fp_nd('IP4', ZN_P_ND('PKR', 31, DAT_), 50, DAT_);            
-	    
-	  if fin_obu.g_kol_dely between 30 and 90 
+
+		 case  when  sTmp0>0 then fin_nbu.record_fp_nd('IP3', 1, 50, DAT_);
+               when  sTmp0<0 then fin_nbu.record_fp_nd('IP3', 3, 50, DAT_);
+               when  sTmp0=0 then fin_nbu.record_fp_nd('IP3', 2, 50, DAT_);
+		       else               fin_nbu.record_fp_nd('IP3', 2, 50, DAT_);
+	     end case;
+
+	 --  2.4.	Якість менеджменту
+
+		fin_nbu.record_fp_nd('IP4', ZN_P_ND('PKR', 31, DAT_), 50, DAT_);
+
+	  if fin_obu.g_kol_dely between 30 and 90
 	                             then  fin_nbu.record_fp_nd('FP6', 1, 32, DAT_);
 		                         else  fin_nbu.record_fp_nd('FP6', 0, 32, DAT_);
-      end if; 	 
-	 
-	 
+      end if;
+
+
 	  if fin_obu.g_kol_dely > 90 then  fin_nbu.record_fp_nd('FP7', 1, 32, DAT_);
 		                         else  fin_nbu.record_fp_nd('FP7', 0, 32, DAT_);
-      end if; 
-	
-	 
-end get_subpok;						   
+      end if;
+
+
+end get_subpok;
 
 
 procedure get_restr  (RNK_  number,
@@ -5251,55 +5250,55 @@ Is
  	l_dat  date;
 begin
   return; -- тимчасово відмінили розрахунок
-  
+
   aND_     := ND_ ;      -- активный код ND
   aRNK_    := RNK_;      -- активный код RNK
   aDAT_    := zDAT_;     -- активна дата звітності
-  
+
     -- Реструктуризація
 	   sTmp  := 0;
 	   sTmp1 := null;
        l_dat := null;
-	   
+
  	   -- кількість і дата реструктуризації
-	   select count(fdat)  kol, max(fdat) dat 
+	   select count(fdat)  kol, max(fdat) dat
 	     into             sTmp,         l_dat
-         from CCK_RESTR_V 
+         from CCK_RESTR_V
         where nd    = ND_
 		  and rnk   = RNK_
           and fdat <= DAT_;
-	
-	
+
+
 	-- клас на останню дату реструктуризхації
 	begin
         select s
-		  into sTmp1 
+		  into sTmp1
           from (
                    select a.*, ROW_NUMBER() OVER(ORDER BY fdat desc) num
                      from fin_nd_hist a
-                    where kod   = 'CLSP' 
+                    where kod   = 'CLSP'
                       and rnk   = RNK_
                       and nd    =  ND_
 					  and fdat <= l_dat
                 ) where num = 1;
 		exception when no_data_found then
-               sTmp1 := null;   		
-    end;    
-	
+               sTmp1 := null;
+    end;
+
 	   -- кідбкістть днів прострочки на дату реструктуризації.
 	   fin_obu.days_of_delay(ND_, l_dat);
 	    --fin_obu.g_kol_dely
-	
+
 	fin_nbu.record_fp_nd('KRES', sTmp, 51, DAT_);
 	fin_nbu.record_fp_nd_DATE('DRES', l_dat, 51, DAT_);
 	fin_nbu.record_fp_nd('CRES', sTmp1, 51, DAT_);
 	fin_nbu.record_fp_nd('PRES', fin_obu.g_kol_dely, 51, DAT_);
-	
+
 end;
 
 
 
--- Корегування класу позичальника (Постанова 351)				   
+-- Корегування класу позичальника (Постанова 351)
 procedure adjustment_class (RNK_  number,
                             ND_   number,
 					        DAT_  date,
@@ -5329,18 +5328,18 @@ begin
 	exception when NO_DATA_FOUND THEN
 					    null; -- raise_application_error(-(20000),'\ ' ||'     Не знайдено угоду з ND - '||nd_,TRUE);
 	END;
-	
+
   aOKPO_   := okpo_;      -- активный код ОКПО
   aND_     := ND_ ;      -- активный код ND
   aRNK_    := RNK_;      -- активный код RNK
   aDAT_    := zDAT_;     -- активна дата звітності
 
-  -- 3.3.Дата реєстрації Контрагента менше одного року з дати державної реєстрації 
-  
+  -- 3.3.Дата реєстрації Контрагента менше одного року з дати державної реєстрації
+
    Case
       when ZN_P_ND('INV', 32, DAT_) = 2 then null;  -- Інвестиційний проект
 	  when ZN_P_ND('KSR', 52, DAT_) = 1 then null;  -- Клієнт стоворений шляхом реорганізації
-      when ZN_P_ND('NGRK', 51, DAT_) = 1 and ZN_P_ND('NKZV', 51, DAT_) = 1 then null;  -- Клієнт належить до групи під спільним контролем	                                               
+      when ZN_P_ND('NGRK', 51, DAT_) = 1 and ZN_P_ND('NKZV', 51, DAT_) = 1 then null;  -- Клієнт належить до групи під спільним контролем
 	  when ZN_P_ND('NGRK', 51, DAT_) = 1 and ZN_P_ND('NKZV', 51, DAT_) = 0 then null;  -- Клієнт належить до групи що несуть спільний економічний ризик
 	  when (sysdate-datea_) < 366  then l_klass := greatest(l_klass, 5); -- клас не менше 5
       else null;
@@ -5363,98 +5362,98 @@ begin
 	case 
        when ZN_P_ND('PVKZ', 52, DAT_) = 1 then l_klass := greatest(l_klass, 9); -- не менше 8	змінено в 2018 році на 9
 	   else null;
-	end case;		  
-	  
-	  
-  -- 3.7 наданим Контрагентом в іноземній валюті, обсяг документально підтверджених очікуваних надходжень виручки в іноземній валюті	  
+	end case;
+
+
+  -- 3.7 наданим Контрагентом в іноземній валюті, обсяг документально підтверджених очікуваних надходжень виручки в іноземній валюті
   -- вилучили показник 23/01/2017
   /*   case
          when  CC_val( ND_ , RNK_, zDAT_,'351') = 1 and  ZN_P_ND('KP61', 5, DAT_) = 0 then  l_klass := greatest(l_klass, 9);
 	     else null;
-     end case;		 
-  */	  
-  -- 3.8 Значення параметру встановлюється «ТАК» та Контрагенту встановлюється клас 10 якщо виконався хоча б один із таких параметрів або параметру «Наявність ознак для визнання події дефолту» встановлено значення «ТАК»:	  
-     -- якщо ознаки припинення дефолту всі так то не коригуємо на 10  
-	 -- 180 перевірить для незаблокованих 
+     end case;
+  */
+  -- 3.8 Значення параметру встановлюється «ТАК» та Контрагенту встановлюється клас 10 якщо виконався хоча б один із таких параметрів або параметру «Наявність ознак для визнання події дефолту» встановлено значення «ТАК»:
+     -- якщо ознаки припинення дефолту всі так то не коригуємо на 10
+	 -- 180 перевірить для незаблокованих
 	 -- якщо більше 180 днів  не коригуємо на 10 інакше корегуємо на 10
-	if   ZN_P_ND('ZD1', 55, DAT_) = 1 and ZN_P_ND('ZD2', 55, DAT_) = 1  and ZN_P_ND('ZD3', 55, DAT_)  = 1  
+	if   ZN_P_ND('ZD1', 55, DAT_) = 1 and ZN_P_ND('ZD2', 55, DAT_) = 1  and ZN_P_ND('ZD3', 55, DAT_)  = 1
 	    then  null;
 		else
-	  
-			case 
+
+			case
 				when  ZN_P_ND('RK1', 56, DAT_) = 1  then l_klass := greatest(l_klass, 10);
 				else null;
-			end case;		
+			end case;
 	end if;
-  
-  
+
+
   -- 3.11. Якщо значення параметру «Припинення визнання дефолту» - «ТАК», то коригування класу на параметри, зазначені у пункті 3.9., не відбувається. Якщо значення параметру «Припинення визнання дефолту» - «НІ» - клас 10.
-    if   ZN_P_ND('ZD1', 55, DAT_) = 1 and ZN_P_ND('ZD2', 55, DAT_) = 1  and ZN_P_ND('ZD3', 55, DAT_)  = 1  
+    if   ZN_P_ND('ZD1', 55, DAT_) = 1 and ZN_P_ND('ZD2', 55, DAT_) = 1  and ZN_P_ND('ZD3', 55, DAT_)  = 1
 	    then  null;
 		else
-				case 
+				case
 					when  ZN_P_ND('RK2', 56, DAT_) = 1  and ZN_P_ND('RK3', 56, DAT_) = 0 then l_klass := greatest(l_klass, 10);
 					else null;
-				end case;		
+				end case;
 	end if;
-	 
- 
+
+
  -- 3.12. У разі наявності у Банку інформації щодо кредитної історії Контрагента в частині його класифікації за класом 10 – понижується клас такого Контрагента на три класи.
-    -- Клас визначений на основі інтегрального показника (зберіг для звіту) 
+    -- Клас визначений на основі інтегрального показника (зберіг для звіту)
 	l_cls := ZN_P('CLAS', 6, zDAT_);
 	fin_nbu.record_fp_nd('CLAS', l_cls, 56, DAT_);
-	
+
 	-- клас скоригований на групу під спільним контролем
 	if ( ZN_P_ND('NGRK', 51, DAT_) = 1)
 	    then  l_cls := ZN_P_ND('CLS1', 56, DAT_);
 		else  fin_nbu.record_fp_nd('CLS1', null, 56, DAT_);
 	end if;
-	
+
 	-- клас скоригований на групу повязаних контрагентів
 	if ( ZN_P_ND('NGRP', 51, DAT_) = 1)
 	    then  l_cls := ZN_P_ND('CLS2', 56, DAT_);
 		else fin_nbu.record_fp_nd('CLS2', null, 56, DAT_);
-	end if;	
-	
-	 
+	end if;
+
+
     l_cls := least(greatest(nvl(l_cls,0),  l_klass),10);
-   
-    --Наявність у Банку інформації щодо кредитної історії Контрагента в частині його класифікації за класом 10 
+
+    --Наявність у Банку інформації щодо кредитної історії Контрагента в частині його класифікації за класом 10
 	-- 23/01/2017 відключили вплив
 	/*
-    case 
+    case
 	    when  ZN_P_ND('KIKK', 52, DAT_) = 1  then l_cls := LEAST(l_cls + 3, 10);
         else null;
-    end case;	
+    end case;
     */
-	
- --   зберігаємо скорегований клас. CLS/56  
+
+ --   зберігаємо скорегований клас. CLS/56
      fin_nbu.record_fp_nd('CLS', l_cls, 56, DAT_);
-    
-	
-  -- врахування кількості днів прострочки	
+
+
+  -- врахування кількості днів прострочки
 	fin_obu.days_of_delay(ND_, gl.bd);
-  
-  Case  
+
+  Case
 	when FIN_OBU.G_KOL_DELY  between 31 and 60 then  fin_nbu.record_fp_nd('CLSP', greatest(l_cls,  5 ), 56, DAT_);
 	when FIN_OBU.G_KOL_DELY  between 61 and 90 then  fin_nbu.record_fp_nd('CLSP', greatest(l_cls,  8 ), 56, DAT_);
 	when FIN_OBU.G_KOL_DELY  >  90             then  fin_nbu.record_fp_nd('CLSP', greatest(l_cls,  10), 56, DAT_);
 	                                           else  fin_nbu.record_fp_nd('CLSP',                l_cls, 56, DAT_);
-  end case;	     
-	
-	
-	
-	record_fp_ND_date('GLBD',gl.bd, 32, DAT_);
-	
-	
+  end case;
 
-end adjustment_class; 						   
+
+
+	record_fp_ND_date('GLBD',gl.bd, 32, DAT_);
+
+
+
+end adjustment_class;
 
 
 
 function  get_pd (  p_rnk   IN  number,
                     p_nd    IN  number,
-					p_dat   IN  date,   
+					p_dat   IN  date,
 					p_clas  in  number,
 					p_vncr  in  varchar2,
 					p_idf   in  number
@@ -5499,31 +5498,31 @@ begin
 		  into l_vncr
 		  from cck_rating
 		 where code = p_vncr;
-      exception when no_data_found then 
+      exception when no_data_found then
 	    if p_vncr is null then  l_vncr := 33;
-		 else raise_application_error(-(20001),'/' ||'     Вказано не існуючий внутрішній кредитний рейтинг - '||p_vncr,TRUE);  	  
+		 else raise_application_error(-(20001),'/' ||'     Вказано не існуючий внутрішній кредитний рейтинг - '||p_vncr,TRUE);
 		End if;
    end;
 
     if nvl(p_clas,l_cls_max) not between 1 and l_cls_max then return null; end if;
-	
+
    for x in (
-                    select  kod, val, IDF, k, k2     
+                    select  kod, val, IDF, k, k2
               from fin_pd UNPIVOT INCLUDE NULLS (VAL FOR KOD IN (ip1, ip2, ip3, ip4, ip5))
                 where (idf,fin, vncrr, alg, ved) in (select idf, fin, max(vncrr), alg, ved
-                                             from fin_pd p 
+                                             from fin_pd p
                                             where idf = p_idf and
                                                   fin = nvl(p_clas,l_cls_max) and vncrr <= l_vncr and
 			 									  alg = G_ALG_351 and
 												  ved = l_ved
                                             group by idf, fin , alg, ved  
                                                        )
-				and val is not null									   
+				and val is not null
              )
 	loop
     l_k  := x.k;
-    l_k2 := x.k2;   	
-    
+    l_k2 := x.k2;
+
 		begin
 
            select  s
@@ -5532,22 +5531,22 @@ begin
 			where rnk = p_rnk    and
 			      nd  = p_nd     and
 				  kod  = x.kod   and
-				  idf  = l_idf;										  
-		   exception when no_data_found then 
+				  idf  = l_idf;
+		   exception when no_data_found then
 		      l_repl := 100;
 		end;
-		 
+
 	    if l_repl <= x.val then  l_Y := l_Y+1;
 		                   else  l_N := l_N+1;
-        end if;						   
-	
+        end if;
+
 	end loop;
 
-   Begin	 
+   Begin
 	l_tmp := l_Y/(l_Y+l_N);
-    exception when ZERO_DIVIDE          
+    exception when ZERO_DIVIDE
          then raise_application_error(-(20000),'      '||'Відсутні Скоринг для idf='||p_idf,TRUE);
-   End;		
+   End;
 
 	if l_tmp >= 0.5 then  l_ := l_k;
 	                else  l_ := l_k2;
@@ -5587,22 +5586,22 @@ as
  l_rez     number;
  l_ost     number :=0;
  l_datb    date;
- 
+
 begin
-  
+
 	  select max(fdat)
 		into l_datb
-		from fdat 
+		from fdat
 	   where fdat < p_dat;
-	   
+
     tp_pawns.acc.delete();
 	tp_pawns := null;
-	
+
 	-- список договорів забезпечень
     t_pawn := tp_pawns.acc.count();
-    for x in (SELECT distinct pp.acc, pp.pawn, nvl(sv,GL.P_ICURVAL(a.kv, abs(fost(a.acc, l_datb)), l_datb)) AS ostc               
+    for x in (SELECT distinct pp.acc, pp.pawn, nvl(sv,GL.P_ICURVAL(a.kv, abs(fost(a.acc, l_datb)), l_datb)) AS ostc
                 FROM pawn_acc pp, cc_accp cc, accounts a
-               WHERE cc.acc = pp.acc AND pp.acc = a.acc 
+               WHERE cc.acc = pp.acc AND pp.acc = a.acc
                  and nd = p_nd)
     loop
 	        Begin
@@ -5611,46 +5610,46 @@ begin
                   from CC_PAWN23ADD
                   where pawn = x.pawn;
 	         exception when no_data_found then null;
-            end;		 
-				  
-		CONTINUE when l_kpz=0;		  
-				  
+            end;
+
+		CONTINUE when l_kpz=0;
+
 	t_pawn:=t_pawn+1;
 	tp_pawns.acc(t_pawn).acc  := x.acc;
 	tp_pawns.acc(t_pawn).ostc := x.ostc;
 	tp_pawns.acc(t_pawn).kof  := l_kpz;
 	tp_pawns.acc(t_pawn).kl   := l_kl;
 	tp_pawns.acc(t_pawn).pawn := x.pawn;
-	
-	
+
+
 	         --список кредиторки по договору застави
 		   t_row_ind :=tp_pawns.acc(t_pawn).nd.count();
 		   for k in(SELECT cc.nd
 					  FROM pawn_acc pp, cc_accp cc
 					 WHERE cc.acc = pp.acc
-					   and pp.acc = x.acc 
-				     group by nd) 
+					   and pp.acc = x.acc
+				     group by nd)
 			loop
 				t_row_ind:= t_row_ind+1;
 				tp_pawns.acc(t_pawn).nd(t_row_ind).nd   := k.nd;
-				
+
 				select sum( GL.P_ICURVAL(a.kv, -1* fost(a.acc,l_datb), l_datb)) ostc
 				  into l_ost
 				  from cc_deal c , nd_acc n, accounts a
 				 where c.nd = n.nd and n.acc = a.acc
 				   and c.nd = k.nd and tip in ('SNO','SN ','SL ','SLN','SPN','SS ','SP ','SK9','SK0');
-				   
-				  tp_pawns.acc(t_pawn).nd(t_row_ind).ostc := nvl(l_ost,0); 
-				   
+
+				  tp_pawns.acc(t_pawn).nd(t_row_ind).ostc := nvl(l_ost,0);
+
 			end loop;
 	end loop;
 
 
-    G_coun := 0;	
-	
+    G_coun := 0;
+
   for f in 1 .. tp_pawns.acc.count()
   loop
-	   --кількість договорів 
+	   --кількість договорів
 	   G_coun := greatest(G_coun,  tp_pawns.acc(f).nd.count() );
        -- загальна сума кредзаборгованості по договору застави
 	   p_s := 0;
@@ -5658,56 +5657,56 @@ begin
 	   loop
 	   p_s := p_s + tp_pawns.acc(f).nd(s).ostc;
 	   end loop;
-	   
-	   --сума застави до договору кредзабогованості   
+
+	   --сума застави до договору кредзабогованості
 	   for s in 1 .. tp_pawns.acc(f).nd.count()
 	   loop
 	      begin
 	        tp_pawns.acc(f).nd(s).ost_pawn := round( tp_pawns.acc(f).ostc * (tp_pawns.acc(f).nd(s).ostc * 100/ p_s )/100);
-		  exception when ZERO_DIVIDE 
+		  exception when ZERO_DIVIDE
 		    then tp_pawns.acc(f).nd(s).ost_pawn := 0;
 		  end;
 	   end loop;
   end loop;
-  
-      
+
+
  for f in 1 .. tp_pawns.acc.count()
  loop
        trace(l_mod,'  > застава acc='||tp_pawns.acc(f).acc||' ostc='||tp_pawns.acc(f).ostc||' kof='||tp_pawns.acc(f).kof );
 	   for s in 1 .. tp_pawns.acc(f).nd.count()
 	   loop
 	     trace(l_mod,'   nd> договір кредиту  nd='||tp_pawns.acc(f).nd(s).nd||' ostc='||tp_pawns.acc(f).nd(s).ostc||' ost_pawn='||tp_pawns.acc(f).nd(s).ost_pawn);
-		if tp_pawns.acc(f).nd(s).nd = p_nd and tp_pawns.acc(f).kof != 0 then 
-		   
-		   case 
+		if tp_pawns.acc(f).nd(s).nd = p_nd and tp_pawns.acc(f).kof != 0 then
+
+		   case
 		       when tp_pawns.acc(f).pawn in (11,13,14,16,17,19,26)   then g_pawn := greatest(nvl(g_pawn,0),1);
 		       when tp_pawns.acc(f).pawn in (12,18)                  then g_pawn := greatest(nvl(g_pawn,0),2);
 		                                                             else g_pawn := greatest(nvl(g_pawn,0),3);
            end case;
-		   
+
 		   l_zb := tp_pawns.acc(f).nd(s).ostc;
 		   l_kpzi:= l_kpzi + round( ( tp_pawns.acc(f).nd(s).ost_pawn * tp_pawns.acc(f).kl)/tp_pawns.acc(f).kof );
 		 -- trace(l_mod,'   nd> договір кредиту  nd='||tp_pawns.acc(f).nd(s).nd||' ostc='||tp_pawns.acc(f).nd(s).ostc||' ost_pawn='||tp_pawns.acc(f).nd(s).ost_pawn);
 		end if;
 	   end loop;
   end loop;
- 
+
     g_pawn := nvl(g_pawn,3);
-	
-    trace(l_mod,'   nd= '||p_nd||'>  l_kpzi='||l_kpzi||' l_zb='||l_zb||' G_coun='||G_coun); 
-	
+
+    trace(l_mod,'   nd= '||p_nd||'>  l_kpzi='||l_kpzi||' l_zb='||l_zb||' G_coun='||G_coun);
+
     begin
       l_rez := round(l_kpzi/(l_zb),2);
-	exception when ZERO_DIVIDE 
+	exception when ZERO_DIVIDE
 	  then  l_rez := null;
 	end;
-	
+
 	return l_rez;
-	
- 
+
+
 end;
 
--- Автоматизоване визначення показників	 type 3					   
+-- Автоматизоване визначення показників	 type 3
 procedure get_subpok_fo (RNK_  number,
                          ND_   number,
 					     DAT_  date)
@@ -5720,28 +5719,28 @@ begin
 l_kpz := f_kpz_nd(ND_,DAT_);
 fin_nbu.record_fp_nd('KPZ', l_kpz, 60, DAT_);
 --Зважений коефіцієнт покриття боргу забезпеченням
-  if  1.3 <= l_kpz                 then   fin_nbu.record_fp_nd('IP2', 1, 60, DAT_); 
+  if  1.3 <= l_kpz                 then   fin_nbu.record_fp_nd('IP2', 1, 60, DAT_);
   elsif 1 <= l_kpz and l_kpz < 1.3 then   fin_nbu.record_fp_nd('IP2', 2, 60, DAT_);
                                    else   fin_nbu.record_fp_nd('IP2', 3, 60, DAT_);
   end if;
- 
+
   --ZKD 1 checked  спільна застава
  if g_coun > 1 then  fin_nbu.record_fp_nd('ZKD', 1, 60, DAT_);
                else  fin_nbu.record_fp_nd('ZKD', 0, 60, DAT_);
  end if;
 
  -- тип застави
- fin_nbu.record_fp_nd('PAWN', g_pawn, 60, DAT_); 
- 
- 
- 
+ fin_nbu.record_fp_nd('PAWN', g_pawn, 60, DAT_);
+
+
+
 end;
 
 procedure calc_pd_fl(RNK_ number,
                      ND_  number,
                      DAT_ date,
 					 CLS_ number,
-					 VNCR_ varchar2)	
+					 VNCR_ varchar2)
 as
 l_pd   number;
 l_val  number;
@@ -5751,12 +5750,12 @@ begin
   aND_     := ND_ ;      -- активный код ND
   aRNK_    := RNK_;      -- активный код RNK
   aDAT_    := DAT_;      -- активна дата звітності
-  
-  
+
+
   l_val := CC_val( ND_ , RNK_, DAT_,'351');
   l_pawn:= ZN_P_ND('PAWN', 60, DAT_);
-  
-  case 
+
+  case
       when  l_val = 0 and l_pawn = 1 then l_idf := 60;
 	  when  l_val = 0 and l_pawn = 2 then l_idf := 61;
 	  when  l_val = 0 and l_pawn = 3 then l_idf := 62;
@@ -5765,7 +5764,7 @@ begin
 	  when  l_val = 1 and l_pawn = 3 then l_idf := 65;
 	                                 else l_idf := 62;
   end case;
-  
+
 
  -- врахування кількості днів прострочки
 	fin_obu.days_of_delay(ND_, gl.bd);
@@ -5778,12 +5777,12 @@ begin
 	                                           else  fin_nbu.record_fp_nd('CLSP',               CLS_ , 60, DAT_);
   end case;
 
-  
-  
-    
+
+
+
   l_pd := get_pd (  p_rnk   => RNK_,
                     p_nd    => ND_,
-					p_dat   => DAT_,   
+					p_dat   => DAT_,
 					p_clas  => ZN_P_ND('CLSP', 60, DAT_),
 					p_vncr  => VNCR_,
 					p_idf   => l_idf);
@@ -5792,10 +5791,10 @@ fin_nbu.record_fp_nd('PD', l_pd, 60, DAT_);
 
 
 
-end;					 
+end;
 
 
--- Автоматизоване визначення показників						   
+-- Автоматизоване визначення показників
 procedure get_subpok_bud (RNK_  number,
                           ND_   number,
 					      DAT_  date)
@@ -5809,7 +5808,7 @@ Is
 	sTmp1   number := 0;
 	sTmp2   number := 0;
 	sTmp3   number := 0;
-	
+
 	l_bv  number;
 	l_rez number;
 	l_period int;
@@ -5836,159 +5835,159 @@ begin
 	exception when NO_DATA_FOUND THEN
 					     null; --raise_application_error(-(20000),'\ ' ||'     Не знайдено угоду з ND - '||nd_,TRUE);
 	END;
-	
+
   aOKPO_   := okpo_;    -- активный код ОКПО
   aND_     := ND_ ;     -- активный код ND
   aRNK_    := RNK_;     -- активный код RNK
   aDAT_    := DAT_;     -- активна дата звітності
-  
+
   --з дати держреєстрації менше 1-го року (крім випадків реорганізації боржника та розгляду інвестпроекту)', 1,'KR1', 72
-   if add_months(sysdate,-12) < datea_  and 
+   if add_months(sysdate,-12) < datea_  and
       ZN_P_ND('INV', 71, DAT_) != 2    and
-	  ZN_P_ND('KSR', 71, DAT_) != 1  
+	  ZN_P_ND('KSR', 71, DAT_) != 1
 	  then  fin_nbu.record_fp_nd('KR1', 1, 72, DAT_);
-      else  fin_nbu.record_fp_nd('KR1', 0, 72, DAT_); 
-   end if;	  
-  
+      else  fin_nbu.record_fp_nd('KR1', 0, 72, DAT_);
+   end if;
+
   fin_obu.days_of_delay(ND_, gl.bd);
- 
- 
-  fin_nbu.record_fp_nd('BO1', 0, 71, DAT_); 
-  fin_nbu.record_fp_nd('KR2', 0, 72, DAT_); 
-  fin_nbu.record_fp_nd('KR4', 0, 72, DAT_); 
- 
+
+
+  fin_nbu.record_fp_nd('BO1', 0, 71, DAT_);
+  fin_nbu.record_fp_nd('KR2', 0, 72, DAT_);
+  fin_nbu.record_fp_nd('KR4', 0, 72, DAT_);
+
   /*
-  Case  
+  Case
 	when FIN_OBU.G_KOL_DELY  between  31 and 60   then   fin_nbu.record_fp_nd('KR2', 1, 72, DAT_);  --прострочення боргу від 31 до 60 днів (включно) з дати виконання зобов’язання за договором (застосовується за урахованим векселем та факторингом)', 2,'KR2', 72, '', 1 );
 	when FIN_OBU.G_KOL_DELY  between  61 and 90   then   fin_nbu.record_fp_nd('KR4', 1, 72, DAT_);  --прострочення боргу від 61 до 90 днів (включно) з дати виконання зобов’язання за договором (застосовується за урахованим векселем та факторингом)', 4,'KR4', 72, '', 1 );
 	when FIN_OBU.G_KOL_DELY  between  91 and 9999 then   fin_nbu.record_fp_nd('BO1', 1, 73, DAT_);  -- прострочення боргу більш ніж на 90 днів, в.ч. за урахованим векселем та факторингом (з дати виконання зобов’язання за договором)
     else null;
   End case;
    */
-	 
-	 
-  
+
+
+
   l_kpz := f_kpz_nd(ND_,DAT_);
   fin_nbu.record_fp_nd('KPZ', l_kpz, 70, DAT_);
 --Зважений коефіцієнт покриття боргу забезпеченням
-  if  1.3 <= l_kpz                 then   fin_nbu.record_fp_nd('IP2', 1, 70, DAT_); 
+  if  1.3 <= l_kpz                 then   fin_nbu.record_fp_nd('IP2', 1, 70, DAT_);
   elsif 1 <= l_kpz and l_kpz < 1.3 then   fin_nbu.record_fp_nd('IP2', 2, 70, DAT_);
                                    else   fin_nbu.record_fp_nd('IP2', 3, 70, DAT_);
   end if;
- 
+
   --ZKD 1 checked  спільна застава
  if g_coun > 1 then  fin_nbu.record_fp_nd('ZKD', 1, 70, DAT_);
                else  fin_nbu.record_fp_nd('ZKD', 0, 70, DAT_);
  end if;
-  
-  
+
+
    -- Сформований резерв у відсотках
         Begin
           select sum(bv),  sum(rez39)
 		    into l_bv   ,  l_rez
-            from nbu23_rez 
-           where rnk = RNK_          and 
+            from nbu23_rez
+           where rnk = RNK_          and
                  nd  = ND_           and
-                 tip in ('SS', 'SP','SN','SPN','SNO','SL') and 
+                 tip in ('SS', 'SP','SN','SPN','SNO','SL') and
                  fdat = add_months(DAT_,-1);
            exception when NO_DATA_FOUND then l_bv := 0; l_rez := 0;
-		end; 
-		
+		end;
+
 	If 	l_bv!= 0 then
           sTmp0 := 	(l_rez*100) / l_bv;
 	else  sTmp0 := 	0;
-    end if;	
-	
-	if sTmp0>50 then fin_nbu.record_fp_nd('BO2', 1, 73, DAT_);  
-	            else fin_nbu.record_fp_nd('BO2', 0, 73, DAT_);  
-    end if;	
-  
- 
+    end if;
+
+	if sTmp0>50 then fin_nbu.record_fp_nd('BO2', 1, 73, DAT_);
+	            else fin_nbu.record_fp_nd('BO2', 0, 73, DAT_);
+    end if;
+
+
  --  Сплата боргу Контрагентом в обсязі, меншому, ніж обсяг доходів, визнаних Банком', 1,'VD1', 54,
     sTmp0 := 0;
 	if  fin_obu.g_kol_dely > 0
 	    then sTmp0 := 1;
 	end if;
-	   
+
 	if  (greatest(0, sTmp0) = 1 and
-	    ZN_P_ND ('INV', 70, DAT_)  != 2 --and  ZN_P_ND ('TIP', 70, DAT_)  != 1 
-		) 
-	then fin_nbu.record_fp_nd('VD1', 1, 74, DAT_); 
-	else fin_nbu.record_fp_nd('VD1', 0, 74, DAT_); 
-	end if; 
-  
-  
+	    ZN_P_ND ('INV', 70, DAT_)  != 2 --and  ZN_P_ND ('TIP', 70, DAT_)  != 1
+		)
+	then fin_nbu.record_fp_nd('VD1', 1, 74, DAT_);
+	else fin_nbu.record_fp_nd('VD1', 0, 74, DAT_);
+	end if;
+
+
    -- Зменшення відсоткової ставки більш ніж на 30% від первинних умов договору
-   
+
     If  ZN_P_ND('KRES', 71, DAT_) > 0 then
 			Begin
 				select  acrn.fprocn (a.acc, 0, ''), a.acc
 				  into  sTmp0, sTmp2
 				  from nd_acc n, accounts a
 				 where n.acc = a.acc
-				   and n.nd = ND_ 
+				   and n.nd = ND_
 				   and a.tip = 'LIM';
 			 exception when NO_DATA_FOUND THEN null;
-			END;	   
-		  
+			END;
+
 			BEGIN
 			  SELECT ir
 				INTO sTmp1
-				FROM int_ratn 
+				FROM int_ratn
 			   WHERE acc=sTmp2 AND id=0 AND
-				     bdat = (SELECT MIN(bdat) 
+				     bdat = (SELECT MIN(bdat)
 					           FROM int_ratn
 						      WHERE acc=sTmp2 AND id=0);
 		   EXCEPTION WHEN NO_DATA_FOUND THEN null;
 		   END;
-  
-        if    sTmp0 > 0  then       
-		     sTmp3 := sTmp1*100/sTmp0; 
+
+        if    sTmp0 > 0  then
+		     sTmp3 := sTmp1*100/sTmp0;
 		else sTmp3 := 0;
 		end if;
-		
-		if sTmp3 < 70 then fin_nbu.record_fp_nd('VD4', 1, 74, DAT_); 
-		              else fin_nbu.record_fp_nd('VD4', 0, 74, DAT_);           
+
+		if sTmp3 < 70 then fin_nbu.record_fp_nd('VD4', 1, 74, DAT_);
+		              else fin_nbu.record_fp_nd('VD4', 0, 74, DAT_);
 		end if;
-  
-    else fin_nbu.record_fp_nd('VD4', 0, 74, DAT_);           
+
+    else fin_nbu.record_fp_nd('VD4', 0, 74, DAT_);
     end if;
-	
-	--  Контрагент поновив регулярні платежі  
+
+	--  Контрагент поновив регулярні платежі
 		 If  ZN_P_ND('KRES', 71, DAT_) > 0 then
 					   sTmp0 := 0;
 					   sTmp1 := 0;
 						for k in 1..12
-						loop 
+						loop
 						fin_obu.days_of_delay(ND_, add_months(trunc(sdate_ , 'MM'), k) );
 
-							if k<= 6 
-							  then sTmp0:= greatest(sTmp0,FIN_OBU.G_KOL_DELY); 
+							if k<= 6
+							  then sTmp0:= greatest(sTmp0,FIN_OBU.G_KOL_DELY);
 							end if;
 
 							if  add_months(trunc(sdate_ , 'MM'), k) =  trunc(add_months(trunc(sdate_ , 'MM'), k),'MM')
-							  then sTmp1:= greatest(sTmp1,FIN_OBU.G_KOL_DELY); 
+							  then sTmp1:= greatest(sTmp1,FIN_OBU.G_KOL_DELY);
 							end if;
-						end loop;    
+						end loop;
 
 					 If  sTmp0>0 or sTmp1> 0
 						 then fin_nbu.record_fp_nd('ZD1', 0, 75, DAT_);
 						 else fin_nbu.record_fp_nd('ZD1', 1, 75, DAT_);
-					 End if; 		 
+					 End if;
 
 		End if;
-	  
-  
-  -- Жодне з зобов’язань Контрагента на дату ухвалення рішення про припинення визнання дефолту не є простроченим більше ніж на 30 календарних днів 
-      if fin_obu.g_kol_dely > 30 then  fin_nbu.record_fp_nd('ZD1', 0, 75, DAT_);            
-	                             else  fin_nbu.record_fp_nd('ZD1', 1, 75, DAT_);            
+
+
+  -- Жодне з зобов’язань Контрагента на дату ухвалення рішення про припинення визнання дефолту не є простроченим більше ніж на 30 календарних днів
+      if fin_obu.g_kol_dely > 30 then  fin_nbu.record_fp_nd('ZD1', 0, 75, DAT_);
+	                             else  fin_nbu.record_fp_nd('ZD1', 1, 75, DAT_);
       end if;
-  
-  
+
+
 End get_subpok_bud;
 
 
--- Корегування класу позичальника (Постанова 351)				  BUD  
+-- Корегування класу позичальника (Постанова 351)				  BUD
 procedure adjustment_class_bud(RNK_  number,
                                ND_   number,
 					           DAT_  date)
@@ -6019,61 +6018,61 @@ begin
 	exception when NO_DATA_FOUND THEN
 					    null; -- raise_application_error(-(20000),'\ ' ||'     Не знайдено угоду з ND - '||nd_,TRUE);
 	END;
-	
+
   aOKPO_   := okpo_;      -- активный код ОКПО
   aND_     := ND_ ;      -- активный код ND
   aRNK_    := RNK_;      -- активный код RNK
   aDAT_    := DAT_;     -- активна дата звітності
 
-  -- 3.3.Дата реєстрації Контрагента менше одного року з дати державної реєстрації 
-  
+  -- 3.3.Дата реєстрації Контрагента менше одного року з дати державної реєстрації
+
    Case
-      when  ZN_P_ND('KR1', 72, DAT_) = 1  or ZN_P_ND('KR2', 72, DAT_) = 1 
+      when  ZN_P_ND('KR1', 72, DAT_) = 1  or ZN_P_ND('KR2', 72, DAT_) = 1
       	  then l_klass := greatest(l_klass, 3); -- клас не менше 5
       else null;
-   end case;	  
-	  
+   end case;
+
    if sysdate < to_date('01-01-2019','dd-mm-yyyy')
        then
 	    Case
-			  when  ZN_P_ND('KR3', 72, DAT_) = 1  or ZN_P_ND('KR4', 72, DAT_) = 1     
+			  when  ZN_P_ND('KR3', 72, DAT_) = 1  or ZN_P_ND('KR4', 72, DAT_) = 1
 				  then l_klass := greatest(l_klass, 4); -- клас не менше 5
 			  else null;
 		   end case;
        else
 		   Case
-			  when  ZN_P_ND('KR3', 72, DAT_) = 1  or ZN_P_ND('KR4', 72, DAT_) = 1  or ZN_P_ND('KR5', 72, DAT_) = 1    
+			  when  ZN_P_ND('KR3', 72, DAT_) = 1  or ZN_P_ND('KR4', 72, DAT_) = 1  or ZN_P_ND('KR5', 72, DAT_) = 1
 				  then l_klass := greatest(l_klass, 4); -- клас не менше 5
 			  else null;
-		   end case;	  
-    end if;		
-	  
-	  
-  -- 3.7 наданим Контрагентом в іноземній валюті, обсяг документально підтверджених очікуваних надходжень виручки в іноземній валюті	  
-/*  -- вилучено 23/01/2017    
+		   end case;
+    end if;
+
+
+  -- 3.7 наданим Контрагентом в іноземній валюті, обсяг документально підтверджених очікуваних надходжень виручки в іноземній валюті
+/*  -- вилучено 23/01/2017
 	case
          when  CC_val( ND_ , RNK_, DAT_,'351') = 1 and  ZN_P_ND('KR6', 72, DAT_) = 0 then  l_klass := greatest(l_klass, 4);
 	     else null;
-     end case;		 
-*/	 
-	 
-	  
-  -- 2.2 Значення параметру встановлюється «ТАК» та Контрагенту встановлюється клас 10 якщо виконався хоча б один із таких параметрів або параметру «Наявність ознак для визнання події дефолту» встановлено значення «ТАК»:	  
-    case 
+     end case;
+*/
+
+
+  -- 2.2 Значення параметру встановлюється «ТАК» та Контрагенту встановлюється клас 10 якщо виконався хоча б один із таких параметрів або параметру «Наявність ознак для визнання події дефолту» встановлено значення «ТАК»:
+    case
 	    when  ZN_P_ND('RK1', 76, DAT_) = 1  then l_klass := greatest(l_klass, 5);
         else null;
-    end case;		
+    end case;
 
-  
+
   -- 2.3. Якщо значення параметру «Припинення визнання дефолту» - «ТАК», то коригування класу на параметри, зазначені у пункті 3.9., не відбувається. Якщо значення параметру «Припинення визнання дефолту» - «НІ» - клас 10.
-    case 
+    case
 	    when  ZN_P_ND('RK2', 76, DAT_) = 1  and ZN_P_ND('RK3', 76, DAT_) = 0  then l_klass := greatest(l_klass, 5);
         else null;
-    end case;		
-	 
-	 
-  ---2.4  
-   /* 
+    end case;
+
+
+  ---2.4
+   /*
 	select count(1) cs, count(case when s = 1 then s else null end) cy, count(case when s = 0 then s else null end) cn
 	  into  l_cs, l_cy, l_cn
       from fin_nd
@@ -6082,7 +6081,7 @@ begin
        and kod like  'ZD_'
        and idf = 75;
 
-	     
+
 	if l_cs = l_cy and  ZN_P_ND('RK1', 76, DAT_) = 1  and (ZN_P_ND('RK2', 76, DAT_) = 1 and ZN_P_ND('RK22', 76, DAT_) = 0)
 	                        then  l_klass := nvl(ZN_P_ND('CLAS', 71, DAT_),0);
     elsif l_cs != l_cy and l_cs != l_cn and  ZN_P_ND('RK1', 76, DAT_) = 1  and (ZN_P_ND('RK2', 76, DAT_) = 1 and ZN_P_ND('RK22', 76, DAT_) = 1)
@@ -6091,52 +6090,52 @@ begin
 	                       else null;
 	end if;
   */
-	 
- 
+
+
  -- 3.12. У разі наявності у Банку інформації щодо кредитної історії Контрагента в частині його класифікації за класом 10 – понижується клас такого Контрагента на три класи.
     l_cls := greatest(nvl(ZN_P_ND('CLAS', 71, DAT_),0),  l_klass);
     /*  вилучено від 23/01/2017
-    case 
-	    when  ZN_P_ND('RK4', 76, DAT_) = 1  then l_cls := LEAST((l_cls + 2), 5); 
+    case
+	    when  ZN_P_ND('RK4', 76, DAT_) = 1  then l_cls := LEAST((l_cls + 2), 5);
         else null;
-    end case;	
+    end case;
     */
- --   зберігаємо скорегований клас. CLS/56  
+ --   зберігаємо скорегований клас. CLS/56
      fin_nbu.record_fp_nd('CLS', l_cls, 56, DAT_);
-     fin_nbu.record_fp_nd('CLS', l_cls, 70, DAT_); 
+     fin_nbu.record_fp_nd('CLS', l_cls, 70, DAT_);
 	 fin_nbu.record_fp_nd('CLS', l_cls, 76, DAT_);
-    
-	
-  -- врахування кількості днів прострочки	
+
+
+  -- врахування кількості днів прострочки
 	fin_obu.days_of_delay(ND_, gl.bd);
     fin_nbu.record_fp_nd('KKDP', FIN_OBU.G_KOL_DELY, 76, DAT_);
-  Case  
+  Case
     when FIN_OBU.G_KOL_DELY  between 8  and 30 then  fin_nbu.record_fp_nd('CLSP', greatest(l_cls,  2 ), 76, DAT_);
 	when FIN_OBU.G_KOL_DELY  between 31 and 60 then  fin_nbu.record_fp_nd('CLSP', greatest(l_cls,  3 ), 76, DAT_);
 	when FIN_OBU.G_KOL_DELY  between 61 and 90 then  fin_nbu.record_fp_nd('CLSP', greatest(l_cls,  4 ), 76, DAT_);
 	when FIN_OBU.G_KOL_DELY  >  90             then  fin_nbu.record_fp_nd('CLSP', greatest(l_cls,  5 ), 76, DAT_);
 	                                           else  fin_nbu.record_fp_nd('CLSP',               l_cls , 76, DAT_);
-  end case;	     
- 
- 
- 
+  end case;
+
+
+
     l_pd :=get_pd (  p_rnk   => aRNK_,
                      p_nd    => aND_,
-		   			 p_dat   => aDAT_,   
+		   			 p_dat   => aDAT_,
 					 p_clas  => l_cls,
 					 p_vncr  => fin_zp.zn_vncrr(aRNK_, aND_),
 					 p_idf   => 70
 					);
-  
-  fin_nbu.record_fp_nd('PD', l_pd, 76, DAT_);
-	
 
-end adjustment_class_bud; 
+  fin_nbu.record_fp_nd('PD', l_pd, 76, DAT_);
+
+
+end adjustment_class_bud;
 
 
 /* **********************************************
 *  Визначення показників для клієнта  консолідованої звітності
-**************************************************/ 
+**************************************************/
 procedure get_subpok_kons (RNK_  number,
                            ND_ number,
 					       DAT_  date )
@@ -6153,13 +6152,13 @@ begin
   aND_     := ND_ ;      -- активный код ND
   aRNK_    := RNK_;      -- активный код RNK
   aDAT_    := DAT_;      -- активна дата звітності
-  
-  
+
+
   fin_nbu.calculation_class(RNK_, DAT_);
-  
-  
+
+
    --Контрагент має від`ємне значення капіталу протягом 3 останніх років'
-  
+
 		 if  (
 					   ZN_P(1495,1) < 0 and
 					   ZN_P(1495,1, add_months(DAT_,-12)) < 0 and
@@ -6173,10 +6172,10 @@ begin
 					then  fin_nbu.record_fp_nd('RG1', 1, 59, DAT_); -- Так
 					else  fin_nbu.record_fp_nd('RG1', 0, 59, DAT_); -- No
 		end if;
-		
-		
-  
-  
+
+
+
+
 	 --Чиста кредитна заборгованість до чистої виручки від реалізації
 		begin
 		            sTmp0 :=     ( ZN_F1('1510',4) + ZN_F1('1515',4) + ZN_F1('1600',4) + ZN_F1('1610',4) - ZN_F1('1165',4) )  /
@@ -6186,36 +6185,36 @@ begin
 		end;
 
 		fin_nbu.record_fp_nd('KZDV', sTmp0, 59, DAT_);
-		
+
 		if  sTmp0 > 2.5   then  fin_nbu.record_fp_nd('RG2', 1, 59, DAT_);
 		                  else  fin_nbu.record_fp_nd('RG2', 0, 59, DAT_);
         End if;
-		
-		
-		
+
+
+
       --Чиста кредитна заборгованість до значення EBITDA
 		begin
 		            sTmp1 :=     ( ZN_F1('1510',4) + ZN_F1('1515',4) + ZN_F1('1600',4) + ZN_F1('1610',4) - ZN_F1('1165',4) )  /
 					             ( ZN_F2('2190',4) - ZN_F2('2195',4) + ZN_F2('2515',4) );
 			exception when ZERO_DIVIDE then   sTmp1 :=  null;
 		end;
-	    
-        fin_nbu.record_fp_nd('KZDE', sTmp1, 59, DAT_);	
-		
+
+        fin_nbu.record_fp_nd('KZDE', sTmp1, 59, DAT_);
+
 	if  DAT_ < to_date('03-01-2017','dd-mm-yyyy')
 	    then x_ := 7;
 	    else x_ := 5;
 	end if;
-	
-        if  sTmp1 > x_ or  sTmp1 <=0 
+
+        if  sTmp1 > x_ or  sTmp1 <=0
                    		then  fin_nbu.record_fp_nd('RG3', 1, 59, DAT_);
 		                else  fin_nbu.record_fp_nd('RG3', 0, 59, DAT_);
         End if;
-		
-		
-		
-		
-		
+
+
+
+
+
 end get_subpok_kons;
 
 
@@ -6236,35 +6235,35 @@ begin
   aDAT_    := DAT_;      -- активна дата звітності
 
   l_cls := ZN_P('CLAS', 6, DAT_);
-  
-  
+
+
     -- «Контрагент має від'ємне значення капіталу на кінець року протягом трьох останніх років поспіль».
 	/*
 	case
        when ZN_P_ND('RG1', 59, DAT_) = 1 then l_klass := greatest(l_klass, 8); -- не менше 8
 	   else null;
-	end case;  
+	end case;
 	*/
 
     -- Чиста кредитна заборгованість до чистої виручки від реалізації >2.5
 	case
        when ZN_P_ND('RG2', 59, DAT_) = 1 then l_klass := greatest(l_klass, 8); -- не менше 8
 	   else null;
-	end case; 
-	
+	end case;
+
 	    -- Чиста кредитна заборгованість до значення EBITDA >5 or <=0
 	case
        when ZN_P_ND('RG3', 59, DAT_) = 1 then l_klass := greatest(l_klass, 8); -- не менше 8
 	   else null;
-	end case; 
-	
+	end case;
+
 	    -- Відсутність достатність виручки
  /*	case
        when ZN_P_ND('RG4', 59, DAT_) = 1 then l_klass := greatest(l_klass, 9); -- не менше 9
 	   else null;
-	end case; 
- */ 
-  
+	end case;
+ */
+
 fin_nbu.record_fp_nd('CLS', greatest(l_cls,l_klass), 59, DAT_);
 
 
@@ -6275,8 +6274,8 @@ end;
 
 --З моменту усунення подій на підставі яких було визнано дефолт минуло щонайменше 180 днів
 -- elimination_events(p_rnk, p_nd, p_fdat, '53,54', 55)
-procedure  elimination_events (  p_rnk        fin_nd.rnk%type 
-                                ,p_nd         fin_nd.nd%type 
+procedure  elimination_events (  p_rnk        fin_nd.rnk%type
+                                ,p_nd         fin_nd.nd%type
 								,p_fdat       date
 								,p_idf_list   varchar2
 								,p_idf        number
@@ -6285,7 +6284,7 @@ is
 l_events      number := 0;
 l_passed180   number := 6;
 begin
- 
+
    for k in (
          Select nd, rnk, idf, kod, sum(s) kol_m
 		   from fin_nd_hist
@@ -6297,20 +6296,20 @@ begin
 											  and nd   = p_nd
 											  and rnk  = p_rnk
 											  and fdat = p_fdat
-											  and h.s= 1)  
-		  Group by nd, rnk, idf, kod 
+											  and h.s= 1)
+		  Group by nd, rnk, idf, kod
              )
     loop
 	l_events    := 1;
 	l_passed180 :=  least(l_passed180,k.kol_m);
     end loop;
-	
-  if  l_events = 0 
+
+  if  l_events = 0
    then  fin_nbu.record_fp_nd('ZD5', 0, p_idf, p_fdat, p_nd, p_rnk);     -- немає подій дефолту
          fin_nbu.record_fp_nd('ZD4', null, p_idf, p_fdat, p_nd, p_rnk);
-   else                     -- наявні події дефолту   
+   else                     -- наявні події дефолту
          fin_nbu.record_fp_nd('ZD5', 1, p_idf, p_fdat, p_nd, p_rnk);
-			if l_passed180 >= 6    
+			if l_passed180 >= 6
 			 then   fin_nbu.record_fp_nd('ZD4', 1, p_idf, p_fdat, p_nd, p_rnk);   -- 6 звітних період ів подія дефолту і більше
 			 else   fin_nbu.record_fp_nd('ZD4', 0, p_idf, p_fdat, p_nd, p_rnk);   -- менше 180 днів подія дефолту
 			end if;
@@ -6318,14 +6317,14 @@ begin
 
 end;
 
-	
+
 	--*Цінні папери   (бюджетники)
 
--- Автоматизоване визначення показників						   
+-- Автоматизоване визначення показників
 procedure get_subpok_bud_cp (RNK_  number,
                              ND_   number,
 					         DAT_  date)
-							 
+
 Is
 	okpo_  number;
 	datea_ date;
@@ -6336,7 +6335,7 @@ Is
 	sTmp1   number := 0;
 	sTmp2   number := 0;
 	sTmp3   number := 0;
-	
+
 	l_bv  number;
 	l_rez number;
 	l_period int;
@@ -6355,25 +6354,25 @@ begin
 					     raise_application_error(-(20000),'\ ' ||'     Не знайдено клієнта з RNK - '||rnk_,TRUE);
 	END;
 
-	
+
   aOKPO_   := okpo_;    -- активный код ОКПО
   aND_     := ND_ ;     -- активный код ND
   aRNK_    := RNK_;     -- активный код RNK
   aDAT_    := DAT_;     -- активна дата звітності
-  
+
   --'KR1', 82
   case
-      when datea_ between  add_months(sysdate,-12) and sysdate                   then fin_nbu.record_fp_nd('KR1', 0, 82, DAT_); 
+      when datea_ between  add_months(sysdate,-12) and sysdate                   then fin_nbu.record_fp_nd('KR1', 0, 82, DAT_);
       when datea_ between  add_months(sysdate,-24) and add_months(sysdate,-12)   then fin_nbu.record_fp_nd('KR1', 1, 82, DAT_);
 	  when datea_ between  add_months(sysdate,-36) and add_months(sysdate,-24)   then fin_nbu.record_fp_nd('KR1', 2, 82, DAT_);
 	                                                                             else fin_nbu.record_fp_nd('KR1', 3, 82, DAT_);
-  end case; 
-  
-  
+  end case;
+
+
 End get_subpok_bud_cp;
 
 
--- Корегування класу позичальника (Постанова 351)				  BUD  
+-- Корегування класу позичальника (Постанова 351)				  BUD
 procedure adjustment_class_bud_cp(RNK_  number,
                                   ND_   number,
 					              DAT_  date)
@@ -6396,41 +6395,41 @@ begin
 					     raise_application_error(-(20000),'\ ' ||'     Не знайдено клієнта з RNK - '||rnk_,TRUE);
 	END;
 
-	
+
   aOKPO_   := okpo_;      -- активный код ОКПО
   aND_     := ND_ ;      -- активный код ND
   aRNK_    := RNK_;      -- активный код RNK
   aDAT_    := DAT_;     -- активна дата звітності
 
-  -- 3.3.Дата реєстрації Контрагента менше одного року з дати державної реєстрації 
-  
+  -- 3.3.Дата реєстрації Контрагента менше одного року з дати державної реєстрації
+
    Case
-      when  ZN_P_ND('KR1', 82, DAT_) = 0  
+      when  ZN_P_ND('KR1', 82, DAT_) = 0
       	  then l_klass := greatest(l_klass, 3); -- клас не менше 5
       else null;
-   end case;	  
-	  
-     
-	  
-  -- 2.2 Значення параметру встановлюється «ТАК» та Контрагенту встановлюється клас 10 якщо виконався хоча б один із таких параметрів або параметру «Наявність ознак для визнання події дефолту» встановлено значення «ТАК»:	  
-    case 
+   end case;
+
+
+
+  -- 2.2 Значення параметру встановлюється «ТАК» та Контрагенту встановлюється клас 10 якщо виконався хоча б один із таких параметрів або параметру «Наявність ознак для визнання події дефолту» встановлено значення «ТАК»:
+    case
 	    when  ZN_P_ND('RK1', 86, DAT_) = 1  then l_klass := greatest(l_klass, 5);
         else null;
-    end case;		
+    end case;
 
-  
+
   -- 2.3. Якщо значення параметру «Припинення визнання дефолту» - «ТАК», то коригування класу на параметри, зазначені у пункті 3.9., не відбувається. Якщо значення параметру «Припинення визнання дефолту» - «НІ» - клас 10.
-    case 
+    case
 	    when  ZN_P_ND('RK2', 86, DAT_) = 1  and ZN_P_ND('RK3', 86, DAT_) = 0  then l_klass := greatest(l_klass, 5);
         else null;
-    end case;		
-	  
- 
+    end case;
+
+
  -- 3.12. У разі наявності у Банку інформації щодо кредитної історії Контрагента в частині його класифікації за класом 10 – понижується клас такого Контрагента на три класи.
     l_cls := greatest(nvl(ZN_P_ND('CLAS', 81, DAT_),0),  l_klass);
 
 -- Корегуємо на  ознаки високого кредитного ризику
-    for k in 
+    for k in
          (   Select r.repl_s
 			  from fin_question q,
 				   fin_question_reply r,
@@ -6440,23 +6439,23 @@ begin
 			   and n.rnk  = RNK_
 			   and n.nd   = ND_
 			   and n.fdat = DAT_
-							   )   
+							   )
 	loop
 	    l_cls := greatest( k.repl_s,  l_cls);
 	end loop;
-  
-  
 
-    
- --   зберігаємо скорегований клас. CLS/56  
-     fin_nbu.record_fp_nd('CLS', l_cls, 81, DAT_); 
-    
-	
+
+
+
+ --   зберігаємо скорегований клас. CLS/56
+     fin_nbu.record_fp_nd('CLS', l_cls, 81, DAT_);
+
+
   -- врахування кількості днів прострочки
 /*
 select  accexpr into l_accexpr from cp_deal where ref = d.ref AND ACCEXPR IS NOT NULL;
          l_kol := f_days_past_due (p_dat01, l_accexpr,0);
-*/  
+*/
         select max(f_days_past_due (DAT_, accexpr,0))
 	      into FIN_OBU.G_KOL_DELY
 		  from cp_deal d
@@ -6470,16 +6469,16 @@ select  accexpr into l_accexpr from cp_deal where ref = d.ref AND ACCEXPR IS NOT
 
 /*	fin_obu.days_of_delay(ND_, gl.bd);
     fin_nbu.record_fp_nd('KKDP', FIN_OBU.G_KOL_DELY, 76, DAT_);*/
-  Case  
+  Case
     when FIN_OBU.G_KOL_DELY  between 8  and 30 then  fin_nbu.record_fp_nd('CLSP', greatest(l_cls,  2 ), 86, DAT_);
 	when FIN_OBU.G_KOL_DELY  between 31 and 60 then  fin_nbu.record_fp_nd('CLSP', greatest(l_cls,  3 ), 86, DAT_);
 	when FIN_OBU.G_KOL_DELY  between 61 and 90 then  fin_nbu.record_fp_nd('CLSP', greatest(l_cls,  4 ), 86, DAT_);
 	when FIN_OBU.G_KOL_DELY  >  90             then  fin_nbu.record_fp_nd('CLSP', greatest(l_cls,  5 ), 86, DAT_);
 	                                           else  fin_nbu.record_fp_nd('CLSP',               l_cls , 86, DAT_);
-  end case;	     
- 
-   fin_nbu.record_fp_nd('CLSP',               l_cls , 86, DAT_); 
- 
+  end case;
+
+   fin_nbu.record_fp_nd('CLSP',               l_cls , 86, DAT_);
+
  /*
     if      d.custtype = 1 and d.RZ =2   THEN l_idf := 80; l_tip := 1;
       elsif d.custtype = 1 and d.RZ =1   THEN l_idf := 80; l_tip := 1;
@@ -6488,48 +6487,48 @@ select  accexpr into l_accexpr from cp_deal where ref = d.ref AND ACCEXPR IS NOT
       else                                    l_idf := 60; l_tip := 1;
       end if;
  */
- 
+
  /*
     l_pd :=get_pd (  p_rnk   => aRNK_,
                      p_nd    => aND_,
-		   			 p_dat   => aDAT_,   
+		   			 p_dat   => aDAT_,
 					 p_clas  => l_cls,
 					 p_vncr  => fin_zp.zn_vncrr(aRNK_, aND_),
 					 p_idf   => 86
 					);
   */
   fin_nbu.record_fp_nd('PD', l_pd, 86, DAT_);
-	
 
-end adjustment_class_bud_cp; 	
-	
+
+end adjustment_class_bud_cp;
+
 function get_vnkr_cp (RNK_  number,
-                      ND_   number, 
+                      ND_   number,
 					  DAT_  date   ,
 					  p_idf   number ) return varchar2
 as
-l_vncrr    cck_rating.code%type; 
+l_vncrr    cck_rating.code%type;
 l_id_vnkr  cck_rating.ord%type;
 begin
     l_id_vnkr :=  ZN_P_ND('VNKR', p_idf, DAT_, ND_, RNK_, null);
-    case 
-	when l_id_vnkr is not null then 
-	     null; 
+    case
+	when l_id_vnkr is not null then
+	     null;
     when nd_ = -1 then
 
-		  select max(V.ORD) 
-			into l_id_vnkr 
+		  select max(V.ORD)
+			into l_id_vnkr
 			from cp_deal d
 			join cp_kod  k on d.id = k.id
 			join accounts a on d.acc = a.acc
 			join customer c on a.rnk = c.rnk
 			join cck_rating v on k.vncrr = V.CODE
 		   where d.dazs is null
-			 and c.rnk = RNK_; 
+			 and c.rnk = RNK_;
 
-    else     
-		  select max(V.ORD) 
-			into l_id_vnkr 
+    else
+		  select max(V.ORD)
+			into l_id_vnkr
 			from cp_deal d
 			join cp_kod  k on d.id = k.id
 			join accounts a on d.acc = a.acc
@@ -6539,51 +6538,50 @@ begin
 			 and c.rnk = RNK_
 			 and d.id  = ND_;
     end case;
-	
-	 Begin 
+
+	 Begin
 		select code
-		  into l_vncrr	
+		  into l_vncrr
 		  from cck_rating
 		  where ord = l_id_vnkr;
-		exception when no_data_found then 
+		exception when no_data_found then
 		  null;
-	 end;   
-        
+	 end;
+
 	return 	l_vncrr;
 
 end;
-	
+
 procedure set_vnkr_cp (RNK_   number,
-                       ND_    number, 
+                       ND_    number,
 				 	   DAT_   date   ,
-					   p_idf  number, 
+					   p_idf  number,
 					   p_vnkr varchar2)
 as
 l_id_vnkr  cck_rating.ord%type;
 begin
 
-	 Begin 
+	 Begin
 		select ord
-		  into l_id_vnkr	
+		  into l_id_vnkr
 		  from cck_rating
 		  where code = p_vnkr;
-		exception when no_data_found then 
+		exception when no_data_found then
 		  null;
 	 end;
 
-	record_fp_ND(KOD_   => 'VNKR', 
-                 S_     => l_id_vnkr,  
+	record_fp_ND(KOD_   => 'VNKR',
+                 S_     => l_id_vnkr,
                  IDF_   => p_idf,
 				 DAT_   => DAT_,
 				 ND_    => ND_,
                  RNK_   => RNK_
 				 );
-	 
+
 	 --//************************************
 	 --  прописуємо в портфель
 
-end;					   
-	
+end;
 function  export_to_script_fin_que (p_idf number) return blob
   is
        nlchr      char(2) := chr(13)||chr(10);
@@ -6737,7 +6735,7 @@ Begin
 		   into spPKdR_
 		   from params
 		  where PAR = 'FIN_NBU_RV';  -- Вид приведення до річного виміру
-      exception when NO_DATA_FOUND THEN 
+      exception when NO_DATA_FOUND THEN
 	        spPKdR_:= 3;
 
 END fin_nbu;

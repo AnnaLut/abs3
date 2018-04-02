@@ -3421,13 +3421,13 @@ UNION ALL
 select 1,NVL(SUM(decode(KOD,'1425',S,0)),0),
          NVL(SUM(decode(KOD,'1425',0,S)),0)
 from fin_rnk where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_ and
-     kod in ('1425')
+     kod in ('1425') and  FDAT >=  to_date('01-04-2018','dd-mm-yyyy') 
   having NVL(SUM(decode(KOD,'1425',S,0)),0)>0
 UNION ALL
 select 1,NVL(SUM(decode(KOD,'1430',S,0)),0),
          NVL(SUM(decode(KOD,'1430',0,S)),0)
 from fin_rnk where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_ and
-     kod in ('1430')
+     kod in ('1430') and  FDAT >=  to_date('01-04-2018','dd-mm-yyyy') 
   having NVL(SUM(decode(KOD,'1430',S,0)),0)>0
 	
 			);  

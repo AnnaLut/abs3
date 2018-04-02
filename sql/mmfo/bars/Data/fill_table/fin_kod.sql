@@ -20,6 +20,12 @@ Begin
 End;
 Begin
 
+
+delete from fin_kod  where idf = 6 and kod like 'PK%' and fm = '0';
+delete from fin_kod  where idf in (11,12,13)  and fm = '0';
+
+
+
 l_FIN_KOD.NAME :='K10, МK10 – коефіцієнт оборот. позич. кап.за фінрез-ми від звичайної діяльності (EBITDA) ';
 l_FIN_KOD.ORD :=10;
 l_FIN_KOD.KOD :='K10';
@@ -416,6 +422,15 @@ l_FIN_KOD.FM :='F';
  p_merge( l_FIN_KOD);
 
 
+l_FIN_KOD.NAME :='Зкорегований клас з врахуванням прострочки';
+l_FIN_KOD.ORD :=1;
+l_FIN_KOD.KOD :='CLSP';
+l_FIN_KOD.IDF :=60;
+l_FIN_KOD.FM :='0';
+
+ p_merge( l_FIN_KOD);
+
+
 l_FIN_KOD.NAME :='Зкорегований клас позичальника';
 l_FIN_KOD.ORD :=607;
 l_FIN_KOD.KOD :='CLS';
@@ -437,6 +452,15 @@ l_FIN_KOD.FM :='0';
 l_FIN_KOD.NAME :='Зкорегований клас позичальника врахуванням групи повязаних контронтрагентів';
 l_FIN_KOD.ORD :=613;
 l_FIN_KOD.KOD :='CLS2';
+l_FIN_KOD.IDF :=56;
+l_FIN_KOD.FM :='0';
+
+ p_merge( l_FIN_KOD);
+
+
+l_FIN_KOD.NAME :='Зкорегований клас позичальника врахуванянм групи під спільним контролем';
+l_FIN_KOD.ORD :=614;
+l_FIN_KOD.KOD :='KKDP';
 l_FIN_KOD.IDF :=56;
 l_FIN_KOD.FM :='0';
 
@@ -861,6 +885,15 @@ l_FIN_KOD.NAME :='Код групи повязаних осіб';
 l_FIN_KOD.ORD :=610;
 l_FIN_KOD.KOD :='NUMG';
 l_FIN_KOD.IDF :=51;
+l_FIN_KOD.FM :='0';
+
+ p_merge( l_FIN_KOD);
+
+
+l_FIN_KOD.NAME :='Коофіциент PD';
+l_FIN_KOD.ORD :=1;
+l_FIN_KOD.KOD :='PD';
+l_FIN_KOD.IDF :=60;
 l_FIN_KOD.FM :='0';
 
  p_merge( l_FIN_KOD);
@@ -1615,6 +1648,15 @@ l_FIN_KOD.FM :='0';
 
 l_FIN_KOD.NAME :='Рішення колегіального органу data (ознак визнання дефолту)';
 l_FIN_KOD.ORD :=621;
+l_FIN_KOD.KOD :='VDD1';
+l_FIN_KOD.IDF :=74;
+l_FIN_KOD.FM :='0';
+
+ p_merge( l_FIN_KOD);
+
+
+l_FIN_KOD.NAME :='Рішення колегіального органу data (ознак визнання дефолту)';
+l_FIN_KOD.ORD :=621;
 l_FIN_KOD.KOD :='ZDD1';
 l_FIN_KOD.IDF :=75;
 l_FIN_KOD.FM :='0';
@@ -1624,8 +1666,8 @@ l_FIN_KOD.FM :='0';
 
 l_FIN_KOD.NAME :='Рішення колегіального органу data (ознак визнання дефолту)';
 l_FIN_KOD.ORD :=621;
-l_FIN_KOD.KOD :='VDD1';
-l_FIN_KOD.IDF :=56;
+l_FIN_KOD.KOD :='ZDD1';
+l_FIN_KOD.IDF :=57;
 l_FIN_KOD.FM :='0';
 
  p_merge( l_FIN_KOD);
@@ -1633,8 +1675,8 @@ l_FIN_KOD.FM :='0';
 
 l_FIN_KOD.NAME :='Рішення колегіального органу data (ознак визнання дефолту)';
 l_FIN_KOD.ORD :=621;
-l_FIN_KOD.KOD :='ZDD1';
-l_FIN_KOD.IDF :=57;
+l_FIN_KOD.KOD :='VDD1';
+l_FIN_KOD.IDF :=56;
 l_FIN_KOD.FM :='0';
 
  p_merge( l_FIN_KOD);
@@ -1669,8 +1711,8 @@ l_FIN_KOD.FM :='0';
 
 l_FIN_KOD.NAME :='Рішення колегіального органу № (ознак визнання дефолту)';
 l_FIN_KOD.ORD :=620;
-l_FIN_KOD.KOD :='ZDN1';
-l_FIN_KOD.IDF :=75;
+l_FIN_KOD.KOD :='VDN1';
+l_FIN_KOD.IDF :=74;
 l_FIN_KOD.FM :='0';
 
  p_merge( l_FIN_KOD);
@@ -1680,6 +1722,15 @@ l_FIN_KOD.NAME :='Рішення колегіального органу № (ознак визнання дефолту)';
 l_FIN_KOD.ORD :=620;
 l_FIN_KOD.KOD :='VDN1';
 l_FIN_KOD.IDF :=56;
+l_FIN_KOD.FM :='0';
+
+ p_merge( l_FIN_KOD);
+
+
+l_FIN_KOD.NAME :='Рішення колегіального органу № (ознак визнання дефолту)';
+l_FIN_KOD.ORD :=620;
+l_FIN_KOD.KOD :='ZDN1';
+l_FIN_KOD.IDF :=75;
 l_FIN_KOD.FM :='0';
 
  p_merge( l_FIN_KOD);
@@ -1816,6 +1867,15 @@ l_FIN_KOD.ORD :=14;
 l_FIN_KOD.KOD :='AZ14';
 l_FIN_KOD.IDF :=11;
 l_FIN_KOD.FM :='F';
+
+ p_merge( l_FIN_KOD);
+
+
+l_FIN_KOD.NAME :='кількість днів прострочки';
+l_FIN_KOD.ORD :=1;
+l_FIN_KOD.KOD :='KKDP';
+l_FIN_KOD.IDF :=60;
+l_FIN_KOD.FM :='0';
 
  p_merge( l_FIN_KOD);
 
