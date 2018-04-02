@@ -15,7 +15,7 @@ create or replace package nbu_601_formed_xml  as
  function get_xml_pledge_dep  return clob;
  function get_user_name  return varchar2;
  function get_xml_groupur_uo return clob;
- function get_xml_finperformancepr_uo return clob;
+ -- function get_xml_finperformancepr_uo return clob;
  procedure run_formated_xml_job (p_kf in varchar2, p_user_id in varchar2);
  procedure run_formated_xml;
 
