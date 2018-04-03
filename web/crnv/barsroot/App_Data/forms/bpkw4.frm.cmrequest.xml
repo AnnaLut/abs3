@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xmlform captiontype="OnlyTitle" caption="Запити до CardMake">
+  <grids>
+    <grid table="v_cm_request " id="gCmRequest" pagesize="10" showpagesizebox="true" title="Way4. Запити до CardMake">
+      <filters caption="Пошук запиту" buttontext="Знайти" columnscount="2" width ="100%">
+        <filter field="datein" caption="Дата запиту" columnindex="1" condition="Equal" id="fltrdatein">
+          <uicontrol type="DateInput" align="Center">
+            <defaultvalue type="PlSqlFunction" value="sysdate"></defaultvalue>
+          </uicontrol>
+        </filter>
+        <filter field="oper_status" caption="Статус запиту" columnindex="1" condition="Equal" id="fltrstatus" >
+          <uicontrol type="DropDownList" table="cm_operstatus" keyfield="id" valuefield="name" addemptyitem="true">
+          </uicontrol>
+        </filter>
+        <filter field="rnk" caption="РНК" columnindex="2" condition="Equal" id="fltrrnk" >
+          <uicontrol></uicontrol>
+        </filter>
+        <filter field="okpo" caption="ЗКПО клієнта" columnindex="2" condition="Equal" id="fltrokpo" >
+          <uicontrol></uicontrol>
+        </filter>
+        <filter field="name" caption="ПІБ клієнта" columnindex="2" condition="LikeBoth" useupperfunc="true" id="fltrname" >
+          <uicontrol></uicontrol>
+        </filter>
+      </filters>
+      <buttons defaulttype="Button">
+        <button id="btnDeleteRequest" caption="Видалити запит" hint="Видалити запит" >
+          <command type="PlSqlBlock" successmessage="Видалено запит">
+            <sql>
+              begin
+              bars_ow.form_request(:id,-1);
+              end;
+            </sql>
+            <parameters>
+              <parameter type="DataField" name="id"></parameter>
+            </parameters>
+          </command>
+        </button>
+        <button id="btnUnFormStatus10" caption="Переформувати запит" hint="Переформувати запит">
+          <command type="PlSqlBlock" successmessage="Переформовано запит">
+            <sql>
+              begin
+              bars_ow.form_request(:id,null);
+              end;
+            </sql>
+            <parameters>
+              <parameter type="DataField" name="id"></parameter>
+            </parameters>
+          </command>
+        </button>
+        <button id="btnFormRequest" caption="Сформувати запит" hint="Сформувати запит" >
+          <command type="PlSqlBlock" successmessage="Сформовано запит">
+            <sql>
+              begin
+              bars_ow.form_request(:id,:oper_type);
+              end;
+            </sql>
+            <parameters>
+              <parameter type="DataField" name="id"></parameter>
+            </parameters>
+            <customfields title="Виберіть операцію" oktext="Вибрати" canceltext="Відмінити">
+              <customfield name="oper_type" datatype="Int64">
+                <uicontrol type="DropDownList" table="cm_opertype" keyfield="id" valuefield="name">
+                </uicontrol>
+              </customfield>
+            </customfields>
+          </command>
+        </button>
+      </buttons>
+      <rowselection method="SingleRow" />
+      <fields>
+        <field name="id" key="true" datatype="Int64" sort="Desc">
+          <column show="true" caption="Ід. запиту" align="Right" />
+        </field>
+        <field name="datein" key="false" datatype="DateTime" sort="Default">
+          <column show="true" caption="Дата запиту" align="Center" />
+        </field>
+        <field name="datemod" key="false" datatype="DateTime" sort="Default">
+          <column show="true" caption="Дата модифікації" align="Center" />
+        </field>
+        <field name="oper_status" key="false" datatype="Int64" sort="Default">
+          <column show="false" caption="Статус запиту" align="Right" />
+          <layout>
+            <colors scope="EntireRow">
+              <color color="clRed" operation="Equal" value="10"></color>/>
+            </colors>
+          </layout>
+        </field>
+        <field name="operstatus_name" key="false" datatype="String" sort="Default">
+          <column show="true" caption="Статус запиту" align="Left" />
+        </field>
+        <field name="opertype_name" key="false" datatype="String" sort="Default">
+          <column show="true" caption="Тип запиту" align="Left" />
+        </field>
+        <field name="resp_txt" key="false" datatype="String" sort="Default">
+          <column show="true" caption="Опис помилки" align="Left" />
+        </field>
+        <field name="branch" key="false" datatype="String" sort="Default">
+          <column show="true" caption="Відділення" align="Left" />
+        </field>
+        <field name="rnk" key="false" datatype="Int64" sort="Default">
+          <column show="true" caption="РНК" align="Right" />
+        </field>
+        <field name="okpo" key="false" datatype="String" sort="default">
+          <column show="true" caption="ЗКПО" align="left" />
+        </field>
+        <field name="name" key="false" datatype="String" sort="default">
+          <column show="true" caption="ПІБ клієнта" align="left" />
+        </field>
+        <field name="nls" key="false" datatype="String" sort="Default">
+          <column show="true" caption="Рахунок" align="Left" />
+        </field>
+        <field name="card_tip" key="false" datatype="String" sort="Default">
+          <column show="true" caption="Тип (W4/LC)" align="Left" />
+        </field>
+        <field name="product_code" key="false" datatype="String" sort="Default">
+          <column show="true" caption="Продукт" align="Left" />
+        </field>
+        <field name="card_code" key="false" datatype="String" sort="Default">
+          <column show="true" caption="Картка" align="Left" />
+        </field>
+      </fields>
+    </grid>
+  </grids>
+</xmlform>

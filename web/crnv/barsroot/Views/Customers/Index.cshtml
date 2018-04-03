@@ -1,0 +1,483 @@
+@inherits System.Web.Mvc.WebViewPage
+@using System.Web.Mvc.Html
+@{
+    if (Convert.ToBoolean(ViewBag.IsPartinal))
+    {
+        Layout = null;
+    }
+    ViewBag.Title = "Перегляд контрагентів " + ViewBag.Type;
+}
+    <link href="/common/themes/modernui/css/jungGridView.css" type="text/css" rel="stylesheet" />
+    <script src="/Common/jquery/jquery.maskedinput-1.3.1.js" type="text/javascript"></script>
+    <script src="/common/jquery/jungGridView.js?v" type="text/javascript"></script>
+     
+<style>
+    /*#tabsCustomer ul li a
+    {
+        padding-left:2px;padding-right:2px;
+    }
+    #viewSelCustomer,#addFilterDialog
+    {
+        padding:5px 0 0 0;
+    }*/
+.spanBtСancel{
+    cursor:pointer;
+    margin:0 5px 0 0px;
+    background-image:url(/Common/images/default/16/cancel.png);
+    background-repeat:no-repeat;
+}
+    .ui-widget-header {
+        /*border:0 0 0 0;*/
+        /*border-bottom: 1px solid #aed0ea;*/
+        /*background:none;*/
+    }
+</style>
+<script type="text/javascript">
+    var customerType = '@ViewBag.Id';
+    var obj = new Object; obj.SYS = null; obj.USER = null; obj.STR = ''; obj.TABLE = '';
+    var checkClContragent = false;
+
+    $(document).ready(function () {
+        //$('input:submit, input:button, button').button();
+        $('#tableCustomers').jungGridView({
+            updateTableUrl: '/barsroot/customers/customersload/' + customerType,
+            userUpdateParamFunc: updateParam,
+            updateTableFunc: function () { showBtRereg(null); },
+            viewTfoot: true,
+            buttonToUpdateId: 'btSubmitFilter'
+        });
+    });
+
+    function showBtRereg(status) {
+        if (status==true) {
+            $('#setCustomerTable img[name="reregico"]').removeClass('displayNone');
+            $('#setCustomerTable img[name="closeico"]').addClass('displayNone');
+        }
+        if (status==false) {
+            $('#setCustomerTable img[name="reregico"]').addClass('displayNone');
+            $('#setCustomerTable img[name="closeico"]').removeClass('displayNone');
+        }
+        if (status==null) {
+            $('#setCustomerTable img[name="reregico"]').addClass('displayNone');
+            $('#setCustomerTable img[name="closeico"]').addClass('displayNone');
+        }
+    }
+    function reregCustomer() {
+        var rnk = $('#table tbody tr.selectedRow').attr('data-id');
+        if (rnk != undefined) {
+            ResurectCustomer(rnk);
+        }
+    }
+
+    function ResurectCustomer(rnk) {
+        addLoader($('#table'));
+        $.post('/barsroot/customers/ResurectCustomer/', { id: rnk }, function (data) {
+            switch (data) {
+                case 'ok': barsUiAlert('Клієнт ' + rnk + ' успішно перереєстрований.', 'Повідомлення!');
+                    $('#table').jungGridView('refresh');
+                    break;
+                default: barsUiAlert(data, 'Помилка!', 'error');
+                    break;
+            }
+            removeLoader($('#table'));
+        });
+    }
+
+    function closeCust() {
+        var rnk = $('#table tbody tr.selectedRow').attr('data-id');
+        if (rnk != undefined) {
+            CloseCustomer(rnk);
+        }
+    }
+
+    function CloseCustomer(rnk) {
+        addLoader($('#table'));
+        $.post('/barsroot/customers/CloseCustomer/', { id: rnk }, function (data) {
+            switch (data) {
+                case 'ok': barsUiAlert('Клієнт ' + rnk + ' успішно закритий.', 'Повідомлення!');
+                    $('#table').jungGridView('refresh');
+                    break;
+                default: barsUiAlert(data, 'Помилка!', 'error');
+                    break;
+            }
+            removeLoader($('#table'));
+        });
+    }
+
+    function updateParam(type, pageNum) {
+        if (window.filterObject !== undefined) {
+            obj = filterObject;
+        }
+        $('#setCustomerTable').removeClass('visibilityNone');
+        if (type == 'start') {
+            typeDocumAllIn = $('input[name="typeContragentSeach"]:checked').val();
+            pageNum = 1;
+            sort = 'RNK';
+            sortDir = 'ASC';
+            checkClContragent = document.getElementById("CheckClContragent").checked;
+            if (window.filterObject !== undefined) {
+                obj = filterObject;
+            }
+        }
+        var param = {
+            id: $('input[name="typeContragentSeach"]:checked').val(),
+            spd:$('input[name="typeContragentSeach"]:checked').attr('data-spd'),
+            pageNum: pageNum,
+            pageSize: $('#rowNumber').val() == undefined ? 10 : $('#rowNumber').val(),
+            sort: sort,
+            sortDir: sortDir,
+            filterSysId: obj.SYS,
+            filterUserId: obj.USER,
+            filterStr: obj.STR,
+            filterTable: obj.TABLE,
+            viewClosedCustomer: checkClContragent 
+        };
+        return param;
+    }
+
+    function viewSelCustomer(rnk) {
+        $('#mainDocument').loader();
+        $('#childDocumentContent')
+            .load('/barsroot/customers/customer/?id=' + rnk, {},
+                function () {
+                    $('#mainDocument').hide().loader('remove');
+                    $('#childDocument').show();
+                }
+            );
+    }
+    function viewSelCustomer2(rnk) {
+        $('#viewSelCustomer').load('/barsroot/customers/customer/?id=' + rnk, {}, function () { removeLoader($('#viewSelCustomer')); })
+                          .dialog({ autoOpen: true, position: 'center', title: 'Перегляд/редагування карточки контрагента RNK: ' + rnk, modal: true, resizable: false, width: '770', height: '600', close: function () { $.ajax().abort(); $(this).html(''); } });
+        addLoader($('#viewSelCustomer'));
+    }
+    function viewSelCustomerHistory(rnk) {
+        var newDiv = $('<div/>');
+        newDiv.load('/barsroot/customers/customerupdatehistory/', {id:rnk}, function () { removeLoader(newDiv); })
+                          .dialog({ autoOpen: true, position: 'center', title: 'Історія змін параметрів клієнта RNK: ' + rnk, modal: true, resizable: false, width: '770', height: '600', close: function () { $.ajax().abort(); $(this).html(''); newDiv.remove(); } });
+        addLoader(newDiv);
+    }
+
+    function addFilter() {
+        if ($('#addFilterDialog').html() == '') {
+            $('#addFilterDialog').load('/barsroot/Webservices/filter/', { table: 'customer' }, function () { removeLoader($('#addFilterDialog')); /*$('#addFilterDialog input[name="btSelFilter"]').click(function () { btSelFilterClick(); });*/ })
+                                 .dialog({
+                                     autoOpen: true, modal: true, resizable: false,
+                                     position: 'center',
+                                     title: 'Встановлення додаткового фільтру',
+                                     width: '600', height: '500',
+                                     close: function () { /*$(this).html('');*/},
+                                     buttons: [{ text: 'Застосувати', click: function () { btSelFilterClick(); }, name: 'btSelFilter' }],
+                                     open: function () { }
+                                 });
+            addLoader($('#addFilterDialog'));
+        }
+        else {
+            $('#addFilterDialog').dialog('open');
+        }
+    }
+    /*
+    function btSelFilterClick() {
+        var res = CheckFilter();
+        if (res) {
+            filterSysId = $('table#sysFilter tbody input:checkbox:checked').first().val();
+            var sf = ''; var uf = ''; var str = '';
+            if (filterSysId == undefined) {
+                filterSysId = null; sf = '';
+            } else {
+                var t = $('table#sysFilter tbody input:checkbox:checked').parent().parent().find('td[data-name="name"]').html();
+                sf += '<fieldset style="display: inline;"><legend><span class="spanBtСancel" onclick="removeFilter(this,\'s\');">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>Системнийqqqq</legend>' + t + '</fieldset>';
+            }
+            filterUserId = $('table#userFilter tbody input:checkbox:checked').first().val();
+            if (filterUserId == undefined) {
+                filterUserId = null; uf = '';
+            } else {
+                var et = $('table#userFilter tbody input:checkbox:checked').parent().parent().find('td[data-name="name"]').html();
+                uf += '<fieldset style="display: inline;"><legend><span class="spanBtСancel" onclick="removeFilter(this,\'u\');">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>Фільтр користувача</legend>' + et + '</fieldset>';
+            }
+            if ($('#filterString tbody tr').length > 0) {
+                var rows = $('#filterString tbody tr');
+                var strhtml = '';
+                rows.each(function (i, e) {
+                    strhtml += $(e).find('td select option:selected').eq(0).html() + ' ';
+                    strhtml += $(e).find('td select option:selected').eq(1).html() + ' ';
+                    strhtml += $(e).find('td select option:selected').eq(2).html() + ' ';
+                    strhtml += $(e).find('td input[type="text"]').val() + ' ';
+                });
+                str += '<fieldset style="display: inline;"><legend><span class="spanBtСancel" onclick="removeFilter(this,\'str\');">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>Додатковий фільтр</legend>' + strhtml + '</fieldset>';
+            }
+
+            $('#fieldsetNewFilter div.fieldsetContent').html(sf + uf + str);
+        }
+        updateFilterObjrct(function () { $('#btSubmitFilter').click(); });
+    }
+
+    function removeFilter(elem, filt) {
+        $(elem).parent().parent().remove();
+        if (filt == 's') {
+            $('table#sysFilter tbody tr td input:checkbox').removeAttr('checked');
+            $('table#sysFilter tbody tr td div.checkbox').removeClass('checked');
+            filterSysId = null;
+        }
+        if (filt == 'u') {
+            $('table#userFilter tbody tr td input:checkbox').removeAttr('checked');
+            $('table#userFilter tbody tr td div.checkbox').removeClass('checked');
+            filterUserId = null;
+        }
+
+        if (filt == 'str') {
+            delAllRow();
+        }
+
+        updateFilterObjrct();
+        $('#btSubmitFilter').click();
+    }
+    */
+    function btSelFilterClick() {
+        var res = CheckFilter();
+        if (res) {
+            filterSysId = $('table#sysFilter tbody input:checkbox:checked').first().val();
+            var sf = ''; var uf = ''; var str = '';
+            if (filterSysId == undefined) {
+                filterSysId = null; sf = '';
+            } else {
+                var t = $('table#sysFilter tbody input:checkbox:checked').parent().parent().find('td[data-name="name"]').html();
+                sf += '<fieldset class="filter"><legend>Системний</legend><span class="ico-cancel" onclick="removeFilter(this,\'s\');"></span>' + t + '</fieldset>';
+            }
+            filterUserId = $('table#userFilter tbody input:checkbox:checked').first().val();
+            if (filterUserId == undefined) {
+                filterUserId = null; uf = '';
+            } else {
+                var et = $('table#userFilter tbody input:checkbox:checked').parent().parent().find('td[data-name="name"]').html();
+                uf += '<fieldset class="filter"><legend>Фільтр користувача</legend><span class="ico-cancel" onclick="removeFilter(this,\'u\');"></span>' + et + '</fieldset>';
+            }
+            if ($('#filterString tbody tr').length > 0) {
+                var rows = $('#filterString tbody tr');
+                var strhtml = '';
+                rows.each(function (i, e) {
+                    strhtml += $(e).find('td select option:selected').eq(0).html() + ' ';
+                    strhtml += $(e).find('td select option:selected').eq(1).html() + ' ';
+                    strhtml += $(e).find('td select option:selected').eq(2).html() + ' ';
+                    strhtml += $(e).find('td input[type="text"]').val() + ' ';
+                });
+                str += '<fieldset class="filter"><legend>Додатковий фільтр</legend><span class="ico-cancel" onclick="removeFilter(this,\'str\');"></span>' + strhtml + '</fieldset>';
+            }
+            if (sf + uf + str == '')
+                $('#fieldsetNewFilter .filterContent').html('<span class="dim">Додатковий фільтр не встановлено</span>');
+            else
+                $('#fieldsetNewFilter div.filterContent').html(sf + uf + str);
+        }
+        var test = GetCustFilter();
+        updateFilterObjrct(function () { $('#btSubmitFilter').click(); });
+    }
+
+    function removeFilter(elem, filt) {
+        $(elem).parent().remove();
+        if ($('#fieldsetNewFilter .filterContent').html() == '') {
+            $('#fieldsetNewFilter .filterContent').html('<span class="dim">Додатковий фільтр не встановлено</span>');
+        }
+        if (filt == 's') {
+            $('table#sysFilter tbody tr td input:checkbox').removeAttr('checked');
+            $('table#sysFilter tbody tr td div.checkbox').removeClass('checked');
+            filterSysId = null;
+        }
+        if (filt == 'u') {
+            $('table#userFilter tbody tr td input:checkbox').removeAttr('checked');
+            $('table#userFilter tbody tr td div.checkbox').removeClass('checked');
+            filterUserId = null;
+        }
+
+        if (filt == 'str') {
+            delAllRow();
+        }
+
+        updateFilterObjrct();
+        $('#btSubmitFilter').click();
+    }
+
+
+
+
+    function selCustonerType() {
+        $('#typeNewCustomer').dialog({
+            autoOpen: true,
+            position: 'center',
+            title: 'Вибір типу контрагента',
+            modal: true,
+            resizable: false,
+            width: '200',
+            buttons: [{ text: 'Реєстрація', click: function () { addCustomer(); $('#typeNewCustomer').dialog('close'); }, name: 'btSelCustType' }],
+            close: function () { }
+        });
+    }
+
+    function addCustomer() {
+        var custtype = $('input[name="typeContragentAdd"]:checked').val();
+        var spd = $('input[name="typeContragentAdd"]:checked').attr('data-spd');
+        var rezid = $('input[name="tipeClientRezIdAdd"]:checked').val();
+        $('#viewSelCustomer').load('/barsroot/customers/customer/', {custtype:custtype,spd:spd,rezid:rezid}, function () { removeLoader($('#viewSelCustomer')); })
+                  .dialog({ autoOpen: true, position: 'center', title: 'Перегляд/редагування карточки контрагента RNK: ', modal: true, resizable: false, width: '770', height: '600', close: function () { $.ajax().abort(); $(this).html(''); } });
+        addLoader($('#viewSelCustomer'));
+    }
+
+
+    function pdfPrint() {
+        var test = document.getElementById('iframe');
+        test.contentWindow.focus();
+        test.contentWindow.print();
+    }
+    function addEvent() {
+        var WshShell = new ActiveXObject("WScript.Shell");
+        WshShell.Run("c:\\barsweb\\PrintPdf.exe http://localhost/common/css/default.pdf", 2);
+    }
+
+</script>
+
+<h1>Перегляд контрагентів @ViewBag.Type</h1>
+	<fieldset style="margin:15px;border:0px solid red;">
+		<legend>
+			<span class="ico-filter16"></span>Основний фільтр
+		</legend>
+        <div style="margin:5px 10px 10px 20px" class="mainFilter" id="mainFilter">
+            <div>
+                @if (ViewBag.Id == 0)
+                {
+                <label class="block">
+                    <input checked="checked" class="checkboxUI" name="typeContragentSeach" id="RadioAllContragent" value="0" type="radio" />
+                    <label for="RadioAllContragent">Крнтрагенти всіх типів</label>
+                </label>
+                <label class="block">
+                    <input class="checkboxUI" name="typeContragentSeach" id="RadioBancsContragent" value="1" type="radio" />
+                    <label for="RadioBancsContragent">Банки</label> 
+                </label>
+                <label class="block">                   
+                    <input class="checkboxUI" name="typeContragentSeach" id="RadioUOContragent" value="2" type="radio" />
+                    <label for="RadioUOContragent">Юридичні особи</label>
+                </label>
+                <label class="block">
+                    <input class="checkboxUI" name="typeContragentSeach" id="RadioFOContragent" value="3" type="radio" />
+                    <label for="RadioFOContragent">Фізичні особи</label>  
+                </label>
+                <label class="block">            
+                    <input class="checkboxUI" name="typeContragentSeach" id="RadioFOSPDContragent" value="3" data-spd="1" type="radio" />
+                    <label for="RadioFOSPDContragent">Фізичні особи-СПД</label>
+                </label>
+                }
+                @if (ViewBag.Id == 1)
+                {
+                <label class="block">
+                    <input class="checkboxUI" checked="checked" name="typeContragentSeach" id="RadioBancsContragent" value="1" type="radio" />
+                    <label for="RadioBancsContragent">Крнтрагенти-Банки</label>  
+                </label> 
+                }
+                @if (ViewBag.Id == 2)
+                {
+                <label class="block">
+                    <input class="checkboxUI" checked="checked" name="typeContragentSeach" id="RadioUOContragent" value="2" type="radio" />
+                    <label for="RadioUOContragent">Крнтрагенти-Юридичні особи</label>
+                </label>
+                }
+                @if (ViewBag.Id == 3)
+                {
+                    if (ViewBag.Spd == 1)
+                    {
+                    <label class="block">
+                        <input class="checkboxUI" checked="checked" name="typeContragentSeach" id="RadioFOSPDContragent" value="3" data-spd="1" type="radio" />
+                        <label for="RadioFOSPDContragent">Крнтрагенти-Фізичні особи-СПД</label>             
+                    </label>
+                    }
+                    else
+                    {
+                    <label class="block">
+                        <input class="checkboxUI" checked="checked" name="typeContragentSeach" id="RadioFOContragent" value="3" type="radio" />
+                        <label for="RadioFOContragent">Крнтрагенти-Фізичні особи</label>   
+                    </label>
+                    <label class="block">
+                        <input class="checkboxUI" name="typeContragentSeach" id="RadioFOSPDContragent" value="3" data-spd="1" type="radio" />
+                        <label for="RadioFOSPDContragent">Крнтрагенти-Фізичні особи-СПД</label>  
+                    </label>
+                    }
+                }
+            </div>
+            <label class="block">
+                <input type="checkbox" name="CheckClContragent" id="CheckClContragent" class="checkboxUI" />
+                <label for="CheckClContragent">Показувати закритих контрагентів</label>
+            </label>
+        </div>
+    </fieldset>
+    <fieldset id="fieldsetNewFilter" style="margin:15px;border:0px solid red;">
+        <legend class="txtBtn" onclick="addFilter();">
+            <span class="ico-filter16"></span>Додатковий фільтр
+        </legend>
+        <div class="filterContent" style="margin:5px 10px 10px 20px">
+            <span class="dim">Додатковий фільтр не встановлено</span>
+        </div>
+        <div id="addFilterDialog" class="dialog" style="display:none;"></div>
+    </fieldset>
+
+    <div style="margin:5px 0 0 0px;" class="buttons">
+         <button id="btSubmitFilter" type="button" class="action green" style="margin:0px 0 0 0;" >Переглянути</button>
+    </div>
+
+<div class="visibilityNone" style="margin:10px 0 0 0" id="setCustomerTable">
+    <div id="viewSelCustomer" class="dialog" style="display: none;"></div>
+    @barsroot.HtmlHelpers.CreateTable(capTableBtn: new string[,] { /*{ "rfr", "" },{"xls","exportToExel();"},{"prn","printSelectDocum();"}*/},
+                                /*capTableCotrolBtn: new string[][,]{new[,]{{"src","/common/images/default/16/businessman_add.png"},{"title","Зареєструвати нового контрагента"},{"alt","Зареєструвати нового контрагента"},{"onclick","selCustonerType();"}},
+                                                                   new[,]{{"src","/common/images/default/16/businessman_delete.png"},{"title","Закрити контрагента"},{"alt","Закрити контрагента"},{"onclick","closeCust();"},{"class","displayNone"},{"name","closeico"}},
+                                                                   new[,]{{"src","/common/images/default/16/businessman_preferences.png"},{"title","Перереєструвати закритого контрагента"},{"alt","Перереєструвати закритого контрагента"},{"onclick","reregCustomer();"},{"class","displayNone"},{"name","reregico"}}},*/
+                                columnName: new string[,] {/*{"checkbox",""},*/{ "", "" }, { "", "" }, { "Реєстр. Номер", "RNK" }, { "Номер договору", "ND" }, { "Код ЗКПО", "OKPO" }, { "Тип контрагента", "CUSTTYPE" }/*,{"Підпр.",""}*/, { "Найменування", "NMK" }, { "Дата реєстрації", "DATE_ON" }, { "Дата закриття", "DATE_OFF" }, { "Код безбал. відділення", "BRANCH" } },
+                                tableId:"tableCustomers")
+    <div id="typeNewCustomer" style="display: none;">
+        @if (ViewBag.Id == 0)
+        {
+            <input checked="checked" name="typeContragentAdd" id="RadioBancAdd" value="1" type="radio" />
+            <label for="RadioBancAdd">Банк</label><br />
+            <br />
+            <input name="typeContragentAdd" id="RadioUOAdd" value="2" type="radio" />
+            <label for="RadioUOAdd">Юридична особа</label><br />
+            <br />
+            <input name="typeContragentAdd" id="RadioFOAdd" value="3" type="radio" />
+            <label for="RadioFOAdd">Фізична особа</label><br />
+            <br />
+            <input name="typeContragentAdd" id="RadioFOSPDAdd" value="3" data-spd="1" type="radio" />
+            <label for="RadioFOSPDAdd">Фізична особа-СПД</label><br />
+            <br />
+                }
+        @if (ViewBag.Id == 1)
+        {
+            <input checked="checked" name="typeContragentAdd" id="RadioBancAdd" value="1" type="radio" />
+            <label for="RadioBancAdd">Банк</label><br />
+            <br />
+                }
+        @if (ViewBag.Id == 2)
+        {
+            <input checked="checked" name="typeContragentAdd" id="RadioUOAdd" value="2" type="radio" />
+            <label for="RadioUOAdd">Юридична особа</label><br />
+            <br />
+                }
+        @if (ViewBag.Id == 3)
+        {
+            if (ViewBag.Spd == 1)
+            {
+            <input checked="checked" name="typeContragentAdd" id="RadioFOSPDAdd" value="3" data-spd="1" type="radio" />
+            <label for="RadioFOSPDAdd">Фізична особа-СПД</label><br />
+            <br />         
+                    }
+                    else
+                    {
+            <input checked="checked" name="typeContragentAdd" id="RadioFOAdd" value="3" type="radio" />
+            <label for="RadioFOAdd">Фізична особа</label><br />
+            <br />
+            <input name="typeContragentAdd" id="RadioFOSPDAdd" value="3" data-spd="1" type="radio" />
+            <label for="RadioFOSPDAdd">Фізична особа-СПД</label><br />
+            <br />
+                    }
+                }
+        <div class="hr"></div>
+        <br />
+        <input checked="checked" name="tipeClientRezIdAdd" id="RadioRezAdd" value="1" type="radio" />
+        <label for="RadioRezAdd">Резидент</label><br />
+        <br />
+        <input name="tipeClientRezIdAdd" id="RadioNoRezAdd" value="2" type="radio" />
+        <label for="RadioNoRezAdd">Нерезидент</label>
+    </div>
+</div>

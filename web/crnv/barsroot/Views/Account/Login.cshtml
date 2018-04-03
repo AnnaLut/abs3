@@ -1,0 +1,257 @@
+﻿@inherits System.Web.Mvc.WebViewPage
+@using System.Web.Optimization
+@{ 
+    if (Convert.ToBoolean(ViewBag.IsPartinal)){
+        Layout = null;
+    }
+    else{
+        Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+    }
+    ViewBag.Title = "АБС \"Bars-Millennium\"-авторизація";
+}
+
+<div style="width: 350px;height:500px; position: relative;padding-left:50px;" class="floatLeft loginBloc" id="signInTD">
+    <div style="height: 40px;"></div>
+    <div class="signInHeader" style="" id="i0272">
+        <h1 class="loginhead">Вхід в систему</h1>
+    </div>
+    @*<div style="height: 30px;width: 320px;">*@
+        <div style="height: 30px;width: 320px;margin-bottom:10px;" id="messSumary" class="errorDiv first">
+            @Html.Raw(ViewBag.ErrorSumary)
+        </div>
+    @*</div>*@
+    
+    <div style="width: 320px;" class="floatLeft">
+        <div id="rightTD">
+            <form name="AuthFormInput" target="_top" method="POST" novalidate="">
+                <div class="section">
+                    <div aria-atomic="true" aria-relevant="text" aria-live="assertive" id="idTd_Tile_Error">
+                        @*<div id="messSumary" class="errorDiv first">
+                            @Html.Raw(ViewBag.ErrorSumary)
+
+                        </div>*@
+                    </div>
+                    <div aria-atomic="true" aria-relevant="text" aria-live="assertive" id="idTd_PWD_Error">
+                        <div id="messLogin" class="errorDiv first">
+                            @ViewBag.ErrorLogin
+                        </div>
+                    </div>
+                    <div class="row label" id="">
+                        <span>Користувач
+                        </span>
+                    </div>
+                    <div class="row textbox" id="idDiv_PWD_UsernameTb">
+                        <div style="position: relative; width: 100%;">
+                            <input id="txtUserName" name="txtUserName" class="login" maxlength="100" type="text" />
+                        </div>
+                    </div>
+                    <div aria-atomic="true" aria-relevant="text" aria-live="assertive" id="idTd_PWD_Error_Password">
+                        <div id="messPassword" class="errorDiv">
+                            @ViewBag.ErrorPassword
+                        </div>
+                    </div>
+                    <div class="row label" id="idTd_PWD_UsernameLbl">
+                        <span role="heading" id="idLbl_PWD_Username">Пароль
+                        </span>
+                    </div>
+                    <div class="row textbox" id="idDiv_PWD_PasswordTb">
+                        <div style="position: relative; width: 100%;">
+                            <input autocomplete="off" id="txtPassword" name="txtPassword" class="password" type="password" value="qwerty"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="section" id="idTd_PWD_SubmitCancelTbl">
+                    <input class="default" value="Вхід" id="btLogIn" name="SI" type="submit"/>
+                </div>
+            </form>
+            <form name="AuthForm" action="/barsroot/account/login/" target="_top" method="POST" novalidate="">
+
+                <input type="hidden" id="encdata" name="encdata" />
+                <input type="hidden" id="challenge" name="challenge" />
+            </form>
+            <div class="section">
+                <div class="row small">
+                    <a id="ForgotPassword" href="/barsroot/account/changepassword/">Змінити пароль користувача?</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="SignUp signUpFloat" style="" id="SignUpTD">
+        <span>Для створення облікового запису зверніться до адміністрвтора.</span>
+        <a class="TextSemiBold" href="/barsroot/support/" id="idA_SignUp">Подати заявку</a>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#btLogIn').click(function () {
+            validateForm();
+            return false;
+        });
+        
+        $('a#ForgotPassword').click(function () {
+            $('#messSumary').html('<div class="loader"></div>');
+            $('#signInTD').find('*').unbind();
+            $('#signInTD').load($(this).attr('href') + '?partinal=true', function () {
+                //history.pushState(state, state.title, state.url);
+            });
+            return false;
+        });
+
+        // получаем нормальный объект Location
+        /*$('a#ForgotPassword').click(function () {
+            $('#messSumary').html('<div class="loader"></div>');
+            var state = {
+                title: this.getAttribute("title"),
+                url: this.getAttribute("href", 2) // двоечка нужна для ИЕ6-7
+            }
+            $("#signInTD").find("*").unbind();
+            $('#signInTD').load($(this).attr('href') + '?partinal=true', function () {
+                history.pushState(state, state.title, state.url);
+            });
+            return false;
+        });
+        
+        $(window).on("popstate", function (e) {
+            var returnLocation = history.location || document.location;
+            //window.history.pushState(stateParameters, 'АБС "Bars-Millennium"-зміна пароля', $(this).attr('href'));
+            $('#messSumary').html('<div class="loader"></div>');
+            $('#signInTD').load(returnLocation.href + '?partinal=true');
+            alert(returnLocation.href);
+            return false;
+        });
+        */
+
+        $('#txtUserName').change(function () {
+            $('#messLogin').html('');
+        });
+        $('#txtPassword').change(function () {
+            $('#messPassword').html('');
+        });
+
+        DisablePrnScr();
+
+        /*if (document.getElementById('txtUserName')) {
+            try {
+                document.getElementById('txtUserName').focus();
+                document.getElementById('txtUserName').select();
+            }
+            catch (e) { };
+        }
+        else if (document.getElementById('btNext'))
+            document.getElementById('btNext').focus();*/
+    });
+
+    function getCookie(par) {
+        var pageCookie = document.cookie;
+        var pos = pageCookie.indexOf(par + '=');
+        if (pos != -1) {
+            var start = pos + par.length + 1;
+            var end = pageCookie.indexOf(';', start);
+            if (end == -1) end = pageCookie.length;
+            var value = pageCookie.substring(start, end);
+            value = unescape(value);
+            return value;
+        }
+    }
+
+    function DisablePrnScr() {
+        window.history.forward(-1);
+        //Get login from cookies
+        var login = getCookie('userLogin');
+        if (login && document.all.txtUserName) {
+            document.all.txtUserName.value = login;
+            document.all.txtPassword.focus();
+        }
+
+        if (document.all.hDisPrnScr && document.all.hDisPrnScr.value == "On") {
+            try {
+                var ax = new ActiveXObject("BARSIE.BARSPRINT");
+                ax.DisablePrintScr();
+            }
+            catch (e) {
+                return;
+            }
+        }
+    }
+
+    function doLogin(userName, password) {
+        with (document.AuthForm) {
+            challenge.value = "@ViewBag.Challenge";
+            var user_key = "@ViewBag.UserKey";
+            var const_key = "@ViewBag.ConstKey";
+            encdata.value = base$encodeBase64(rc4Encrypt(user_key,
+                            const_key + "\\"
+                            + challenge.value + "\\"
+                            + user_key + "\\"
+                            + base$encodeBase64(userName) + "\\"
+                            + base$encodeBase64(hex_sha1(password))));
+        }
+        return;
+    }
+
+
+    function validateForm() {
+        var validLogin = validateUserame();
+        var validPass = validatePassword();
+        if (!validLogin || !validPass)
+            return false;
+        $('#btLogIn').attr('disabled', 'disabled');
+        $('#txtUserName').attr('disabled', 'disabled');
+        $('#txtPassword').attr('disabled', 'disabled');
+
+        with (document.AuthForm) {
+            doLogin(AuthFormInput.txtUserName.value.toLowerCase(), AuthFormInput.txtPassword.value.toLowerCase());
+            var date = new Date((new Date()).getTime() + 24 * 3600000);
+            document.cookie = 'userLogin=' + AuthFormInput.txtUserName.value.toLowerCase() + "; expires=" + date.toGMTString();
+            //txtUserName.value = "";
+            //txtPassword.value = "";
+            $('#messSumary').html('<div class="loader"></div>');
+
+            $('form[name="AuthForm"]').submit();
+        }
+        return true;
+    }
+
+    function validateUserame() {
+        var tempName = $('#txtUserName');
+
+        if (isEmpty(tempName.val())) {
+            $('#messLogin').html("Задайте ім'я користувача.");
+            //alert("Задайте ім'я користувача.");
+            tempName.focus();
+            tempName.select();
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+    function validatePassword() {
+        var tempName = $('#txtPassword');
+
+        if (isEmpty(tempName.val())) {
+            $('#messPassword').html("Задайте пароль користувача.");
+            //alert("Задайте пароль користувача.");
+            tempName.focus();
+            tempName.select();
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+    function isEmpty(strTextField) {
+        if (strTextField == "" || strTextField == null)
+            return true;
+
+        var re = /\s/g;
+        RegExp.multiline = true;
+        var str = strTextField.replace(re, "");
+
+        if (str.length == 0)
+            return true;
+        else
+            return false;
+    }
+</script>

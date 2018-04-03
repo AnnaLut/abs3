@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xmlform captiontype="OnlyTitle">
+  <grids>
+    <grid id="gv" pagesize="30" showpagesizebox="true" title="Монітор роботи Веб сервісів" showfilter="true">
+      <rowselection method="SingleRow" />
+      <datasource>
+        <sql>
+          SELECT s.service_id service_id,
+          w.name name_service,
+          s.abonent_id abonent_id,
+          a.name name_abonent,
+          to_char(s.refresh_last_time,'dd.mm.yyyy HH24:MI:SS') refresh_last_time,
+          case when sysdate-s.refresh_last_time>1/96 then 1 else 0 end err,
+          case when sysdate-s.refresh_last_time>1/96 then 'Відсутня активність більше 15 хв.' else 'ОК' end comments
+          FROM status_web_services s, abonent_web_services a, web_services w
+          WHERE S.SERVICE_ID = w.id AND s.abonent_id = a.id
+        </sql>
+      </datasource>
+      <fields>
+        <field name="SERVICE_ID" key="true" datatype="String" sort="default">
+          <column show="true" caption="Код сервісу" align="left" />
+          <form show="true" rwmode="RO" required="true">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="name_service" key="true" datatype="String" sort="default">
+          <column show="true" caption="Назва сервісу" align="left" />
+          <form show="true" rwmode="RO" required="true">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="ABONENT_ID" key="true" datatype="String" sort="default">
+          <column show="true" caption="Код абонента" align="left" />
+          <form show="true" rwmode="RO" required="true">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="name_abonent" key="true" datatype="String" sort="default">
+          <column show="true" caption="Назва абонента" align="left" />
+          <form show="true" rwmode="RO" required="true">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="REFRESH_LAST_TIME" key="false" datatype="String" sort="default">
+          <column show="true" caption="Час останнього звернення" align="center" />
+          <form show="true" rwmode="RO">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="ERR" key="true" datatype="Int64" sort="default">
+          <layout>
+            <colors scope="EntireRow">
+              <color operation="Equal" color="clRed" columnindex="6" value="1"></color>
+            </colors>
+          </layout>
+          <column show="false" caption="" align="center" />
+          <form show="true" rwmode="RO">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="COMMENTS" key="false" datatype="String" sort="default">
+          <column show="true" caption="Коментар" align="center" />
+          <form show="true" rwmode="RO">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+      </fields>
+    </grid>
+  </grids>
+</xmlform>

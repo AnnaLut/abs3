@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="labDlinaParoliaNeMenee6Sivolov" xml:space="preserve">
+    <value>Довжина паролю не меньше 6-ти символів!</value>
+  </data>
+  <data name="labOwibkaPodtvergdeniaParolia" xml:space="preserve">
+    <value>Помилка підтвердження паролю! Введіть заново.</value>
+  </data>
+  <data name="labZapolniteFIOPolzovatelia" xml:space="preserve">
+    <value>Заповніть ПІБ користувача!</value>
+  </data>
+  <data name="labZapolniteLoginPolzovatelia" xml:space="preserve">
+    <value>Заповніть логін користувача!</value>
+  </data>
+  <data name="labZapolnitePodrazdelenie" xml:space="preserve">
+    <value>Заповніть підрозділ користувача!</value>
+  </data>
+  <data name="labZapolniteTabN" xml:space="preserve">
+    <value>Заповніть табельний номер(співпадає с ідентифікатором підпису)!</value>
+  </data>
+  <data name="labZapolniteTipPolzovatelia" xml:space="preserve">
+    <value>Заповніть тип користувача!</value>
+  </data>
+  <data name="msgArchiveCorrupt" xml:space="preserve">
+    <value>Архів пошкоджений.</value>
+  </data>
+  <data name="msgArchiveOk" xml:space="preserve">
+    <value>Файл обновлення корректний. Опис обновлення:</value>
+  </data>
+  <data name="msgCheckVersion" xml:space="preserve">
+    <value>Перевірка відповідності версій в реєстрі і файлі пройшла успішно.</value>
+  </data>
+  <data name="msgDiffVersions" xml:space="preserve">
+    <value>Не співпадають номера версій в реєстрі і файлі версій.</value>
+  </data>
+  <data name="msgErrorReadArchive" xml:space="preserve">
+    <value>Помилка чиитання архіву.</value>
+  </data>
+  <data name="msgFailFileCrc" xml:space="preserve">
+    <value>Файл [PATH] не відповідає контрольній сумі, ймовірно він був змінений.</value>
+  </data>
+  <data name="msgFailHashSum" xml:space="preserve">
+    <value>Контрольна сума файла не співпадає з вказаною.\nФайл version.xml змінили вручну.</value>
+  </data>
+  <data name="msgIncorrectPassword" xml:space="preserve">
+    <value>Невірний пароль на архів</value>
+  </data>
+  <data name="msgIncorrectPswRollback" xml:space="preserve">
+    <value>Неверний пароль відкату (повинен співпадать з паролем останього обновлення).</value>
+  </data>
+  <data name="msgIntegrOk" xml:space="preserve">
+    <value>Перевірка цілісності завершена.\nВкажіть файл обновлення: для даної версії це повинен бути файл з іменем update#[VERALL](*).zip або update[TYPE]#[VER](*).zip (* - число).</value>
+  </data>
+  <data name="msgMissFile" xml:space="preserve">
+    <value>Не знайдено файл версії!</value>
+  </data>
+  <data name="msgNameArchiveChange" xml:space="preserve">
+    <value>Ім'я архіву змінювалось вручну.</value>
+  </data>
+  <data name="msgNameArchiveFailed" xml:space="preserve">
+    <value>Ім'я архіву не відповідає потрібній  масці.</value>
+  </data>
+  <data name="msgNoFileUpdate" xml:space="preserve">
+    <value>Не вказано файлу обновлення.</value>
+  </data>
+  <data name="msgNoPasswordArchive" xml:space="preserve">
+    <value>Не вказано пароль на архів.</value>
+  </data>
+  <data name="msgNotSupport" xml:space="preserve">
+    <value>Даний тип обновлення не підтримується.</value>
+  </data>
+  <data name="msgNotZipFile" xml:space="preserve">
+    <value>Файл обновлення повинен бути з розширенням zip.</value>
+  </data>
+  <data name="msgRollbackConfirm" xml:space="preserve">
+    <value>Ви дійсно хочете повернути версію назад?</value>
+  </data>
+  <data name="msgRollbackOk" xml:space="preserve">
+    <value>Повернення на одну версію назад успішно завершено.</value>
+  </data>
+  <data name="msgUpdateOk" xml:space="preserve">
+    <value>Обновлення успішно завершено.</value>
+  </data>
+</root>

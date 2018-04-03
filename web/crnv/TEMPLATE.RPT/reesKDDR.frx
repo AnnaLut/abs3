@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="04/09/2013 18:54:47" ReportInfo.Modified="04/10/2013 17:23:14" ReportInfo.CreatorVersion="1.9.1.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlq9SEZoacNJntaKIKp6mVF10Zi3fUc4TkUTfAEqxJ1CMrjV/tdqr1ISqEXCIufBhZxYQfmrAzO9EwU+P1jpI63a9ZgdumaDGO6c3/II2o2Jp8=">
+      <TableDataSource Name="Table" Alias="cen_9819" DataType="System.Int32" Enabled="true" SelectCommand="  SELECT NUM00 REF,&#13;&#10;         CHAR00 FIO,&#13;&#10;         CHAR01 ND,&#13;&#10;         CHAR02 VA_KC,&#13;&#10;         NUM01 S,&#13;&#10;         DAT00 FDAT,  CHAR03 REKV&#13;&#10;    FROM rs_tmp_report_data&#13;&#10;   WHERE session_id = :SESSION_ID&#13;&#10;ORDER BY id">
+        <Column Name="REF" DataType="System.Decimal"/>
+        <Column Name="FDAT" DataType="System.DateTime"/>
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="ND" DataType="System.String"/>
+        <Column Name="VA_KC" DataType="System.String"/>
+        <Column Name="S" DataType="System.Decimal"/>
+        <Column Name="REKV" DataType="System.String"/>
+        <CommandParameter Name="SESSION_ID" DataType="107" Expression="[session_id]" DefaultValue="-1"/>
+      </TableDataSource>
+      <TableDataSource Name="Table2" Alias="Rekv_tvbv" DataType="System.Int32" Enabled="true" SelectCommand="select&#13;&#10;BRANCH_USR.GET_BRANCH_PARAM2('NAME_BRANCH')  name,&#13;&#10;(SELECT val  FROM params where par = 'NAME') name_bank,&#13;&#10;(select fio from staff$base where id = user_id) fio&#13;&#10;from dual;">
+        <Column Name="NAME" DataType="System.String"/>
+        <Column Name="NAME_BANK" DataType="System.String"/>
+        <Column Name="FIO" DataType="System.String"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.Int32"/>
+    <Total Name="Всього по НД" Expression="[cen_9819.S]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="Всього КД" Expression="[cen_9819.S]" Evaluator="Data1"/>
+    <Total Name="Sum-9819-03" Expression="IIf(Substring([cen_9819.VA_KC],6,2) == &quot;03&quot;,[cen_9819.S],0)" Evaluator="Data1"/>
+    <Total Name="Sum-9819-02" Expression="IIf(Substring([cen_9819.VA_KC],6,2) == &quot;02&quot;,[cen_9819.S],0)" Evaluator="Data1"/>
+    <Total Name="Sum-9819-79" Expression="IIf(Substring([cen_9819.VA_KC],6,2) == &quot;79&quot;,[cen_9819.S],0)" Evaluator="Data1"/>
+    <Total Name="Sum-9819-83" Expression="IIf(Substring([cen_9819.VA_KC],6,2) == &quot;03&quot;,[cen_9819.S],0)" Evaluator="Data1"/>
+    <Total Name="Sum-9819-B8" Expression="IIf(Substring([cen_9819.VA_KC],6,2) == &quot;B8&quot;,[cen_9819.S],0)" Evaluator="Data1"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Guides="85.05,595.35,18.9,141.75,529.2,623.7,189,699.3,37.8,47.25,519.75,670.95,321.3,708.75">
+    <ReportTitleBand Name="ReportTitle1" Top="20" Width="718.2" Height="113.4" Guides="0,94.5">
+      <RichObject Name="Rich1" Left="85.05" Width="510.3" Height="94.5" Text="{\rtf1\ansi\ansicpg1251\deff0\deflang1049{\fonttbl{\f0\fnil\fcharset204{\*\fname Times New Roman;}Times New Roman CYR;}{\f1\fnil\fcharset0 Times New Roman;}}&#13;&#10;{\*\generator Msftedit 5.41.21.2509;}\viewkind4\uc1\pard\qc\lang1058\f0\fs28\'d0\'e5\'ba\'f1\'f2\'f0\fs20\par&#13;&#10;\'f6\'b3\'ed\'ed\'ee\'f1\'f2\'e5\'e9 \'ef\'ee \'ea\'f0\'e5\'e4\'e8\'f2\'ed\'e8\'f5 \'f1\'ef\'f0\'e0\'e2\'e0\'f5\lang1033\f1  [Rekv_tvbv.NAME]\lang1058\f0  \'ef\'e5\'f0\'e5\'e4\'e0\'ed\'e8\'f5 \'e4\'ee \'f1\'f5\'ee\'e2\'e8\'f9\'e0  [Rekv_tvbv.NAME_BANK]\lang1049\fs17\par&#13;&#10;}&#13;&#10;"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="153.4" Width="718.2" Height="18.9" Guides="0,18.9">
+      <TextObject Name="Text2" Left="18.9" Width="122.85" Height="18.9" Border.Lines="All" Text="Реф. документа" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text4" Left="141.75" Width="387.45" Height="18.9" Border.Lines="All" Text="Вид цінності" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text6" Left="529.2" Width="94.5" Height="18.9" Border.Lines="All" Text="Кількість" HorzAlign="Center" VertAlign="Center"/>
+    </PageHeaderBand>
+    <GroupHeaderBand Name="GroupHeader1" Top="192.3" Width="718.2" Height="37.8" Guides="18.9,37.8" Condition="[cen_9819.ND]">
+      <TextObject Name="Text7" Left="189" Top="18.9" Width="510.3" Height="18.9" Text="[cen_9819.FIO] [cen_9819.REKV]" Font="Arial, 10pt, style=Italic, Underline" TextFill.Color="SteelBlue"/>
+      <TextObject Name="Text8" Left="18.9" Top="18.9" Width="170.1" Height="18.9" Text="Реф. угоди   [cen_9819.ND]" Font="Arial, 10pt, style=Italic, Underline" TextFill.Color="SteelBlue"/>
+      <DataBand Name="Data1" Top="250.1" Width="718.2" Height="18.9" Guides="0,18.9" DataSource="Table">
+        <TextObject Name="Text1" Left="18.9" Width="122.85" Height="18.9" Text="[cen_9819.REF]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" WordWrap="false" Trimming="EllipsisCharacter"/>
+        <TextObject Name="Text3" Left="141.75" Width="387.45" Height="18.9" Text="[cen_9819.VA_KC]" VertAlign="Center"/>
+        <TextObject Name="Text5" Left="529.2" Width="94.5" Height="18.9" Text="[cen_9819.S]" Format="Currency" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator="" Format.CurrencySymbol=" шт." Format.PositivePattern="1" Format.NegativePattern="5" HorzAlign="Right" VertAlign="Center" WordWrap="false" Trimming="EllipsisCharacter"/>
+      </DataBand>
+      <GroupFooterBand Name="GroupFooter1" Top="289" Width="718.2" Height="18.9" Guides="0,18.9">
+        <TextObject Name="Text9" Left="529.2" Width="94.5" Height="18.9" Text="[Всього по НД]" Format="Currency" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.CurrencySymbol=" шт." Format.PositivePattern="1" Format.NegativePattern="5" HorzAlign="Right" VertAlign="Center" Font="Arial, 10pt, style=Underline"/>
+        <TextObject Name="Text10" Left="37.8" Width="491.4" Height="18.9" Text="Всього по реф. КД [cen_9819.ND]" HorzAlign="Right" VertAlign="Center" Font="Arial, 10pt, style=Bold, Italic, Underline"/>
+      </GroupFooterBand>
+    </GroupHeaderBand>
+    <DataBand Name="Data2" Top="327.9" Width="718.2" Height="292.95" Guides="189,283.5,94.5,113.4,75.6,132.3,151.2,170.1,56.7">
+      <RichObject Name="Rich2" Left="47.25" Top="189" Width="576.45" Height="94.5" Text="{\rtf1\ansi\ansicpg1251\deff0\deflang1049{\fonttbl{\f0\fnil\fcharset204{\*\fname Arial;}Arial CYR;}{\f1\fnil\fcharset204 Tahoma;}}&#13;&#10;{\*\generator Msftedit 5.41.21.2509;}\viewkind4\uc1\pard\lang1058\f0\fs20\par&#13;&#10;\pard\qc\par&#13;&#10;\par&#13;&#10;\'c2\'e8\'ea\'ee\'ed\'e0\'e2\'e5\'f6\'fc               ________________              /__________/\lang1049\f1\fs17\par&#13;&#10;}&#13;&#10;"/>
+      <TextObject Name="Text15" Left="529.2" Top="94.5" Width="94.5" Height="18.9" Text="[Sum-9819-03]" Format="Currency" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator="" Format.CurrencySymbol="  шт." Format.PositivePattern="1" Format.NegativePattern="5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold, Italic" TextFill.Color="MidnightBlue"/>
+      <TextObject Name="Text16" Left="529.2" Top="75.6" Width="94.5" Height="18.9" Text="[Sum-9819-02]" Format="Currency" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator="" Format.CurrencySymbol="  шт." Format.PositivePattern="1" Format.NegativePattern="5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold, Italic" TextFill.Color="MidnightBlue"/>
+      <TextObject Name="Text17" Left="529.2" Top="113.4" Width="94.5" Height="18.9" Text="[Sum-9819-79]" Format="Currency" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator="" Format.CurrencySymbol="  шт." Format.PositivePattern="1" Format.NegativePattern="5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold, Italic" TextFill.Color="MidnightBlue"/>
+      <TextObject Name="Text18" Left="529.2" Top="132.3" Width="94.5" Height="18.9" Text="[Sum-9819-83]" Format="Currency" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator="" Format.CurrencySymbol="  шт." Format.PositivePattern="1" Format.NegativePattern="5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold, Italic" TextFill.Color="MidnightBlue"/>
+      <TextObject Name="Text19" Left="529.2" Top="151.2" Width="94.5" Height="18.9" Text="[Sum-9819-B8]" Format="Currency" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator="" Format.CurrencySymbol="  шт." Format.PositivePattern="1" Format.NegativePattern="5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold, Italic" TextFill.Color="MidnightBlue"/>
+      <TextObject Name="Text20" Left="85.05" Top="75.6" Width="434.7" Height="18.9" Text="(9819/02)-кредитні угоди " VertAlign="Center" Font="Times New Roman, 10pt, style=Bold, Italic" TextFill.Color="MidnightBlue"/>
+      <TextObject Name="Text21" Left="85.05" Top="94.5" Width="434.7" Height="18.9" Text="(9819/03)-договори страхування та страхові по" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold, Italic" TextFill.Color="MidnightBlue"/>
+      <TextObject Name="Text22" Left="85.05" Top="113.4" Width="434.7" Height="18.9" Text="(9819/79)-інші договори (договір застави, поруки)" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold, Italic" TextFill.Color="MidnightBlue"/>
+      <TextObject Name="Text23" Left="85.05" Top="132.3" Width="434.7" Height="18.9" Text="(9819/83)-договори іпотеки за кредитними угод" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold, Italic" TextFill.Color="MidnightBlue"/>
+      <TextObject Name="Text24" Left="85.05" Top="151.2" Width="434.7" Height="18.9" Text="(9819/B8)-правовстановлюючі док. за дог. іпотеки" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold, Italic" TextFill.Color="MidnightBlue"/>
+      <TextObject Name="Text25" Left="85.05" Top="170.1" Width="434.7" Height="18.9" Text="Всього :" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold, Italic" TextFill.Color="MidnightBlue"/>
+      <TextObject Name="Text26" Left="529.2" Top="170.1" Width="94.5" Height="18.9" Text="[Всього КД]" Format="Currency" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator="" Format.CurrencySymbol="  шт." Format.PositivePattern="1" Format.NegativePattern="5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold, Italic" TextFill.Color="MidnightBlue"/>
+      <TextObject Name="Text27" Left="85.05" Top="56.7" Width="585.9" Height="18.9" Text="Всього передано до сховища [Rekv_tvbv.NAME_BANK] :" VertAlign="Center" Font="Times New Roman, 10.5pt, style=Bold, Italic" TextFill.Color="MidnightBlue"/>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="640.85" Width="718.2" Height="18.9" Guides="0,18.9">
+      <TextObject Name="Text12" Left="321.3" Width="274.05" Height="18.9" Text="[Date]     [Rekv_tvbv.FIO]" VertAlign="Center" Font="Arial, 6pt" TextFill.Color="Gray"/>
+      <TextObject Name="Text13" Left="18.9" Width="302.4" Height="18.9" Text="[Rekv_tvbv.NAME]" VertAlign="Center" Font="Arial, 6pt" TextFill.Color="Gray"/>
+      <TextObject Name="Text14" Left="670.95" Width="37.8" Height="18.9" Text=" із [TotalPages#]" VertAlign="Center" Font="Arial, 6pt" TextFill.Color="Gray"/>
+      <TextObject Name="Text11" Left="623.7" Width="47.25" Height="18.9" Text="Ст. [Page#]" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt" TextFill.Color="Gray"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

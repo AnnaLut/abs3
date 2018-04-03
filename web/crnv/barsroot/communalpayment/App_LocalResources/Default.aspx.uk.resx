@@ -1,0 +1,233 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+<xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+<xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+<xsd:element name="root" msdata:IsDataSet="true">
+<xsd:complexType>
+<xsd:choice maxOccurs="unbounded">
+<xsd:element name="metadata">
+<xsd:complexType>
+<xsd:sequence>
+<xsd:element name="value" type="xsd:string" minOccurs="0" />
+</xsd:sequence>
+<xsd:attribute name="name" use="required" type="xsd:string" />
+<xsd:attribute name="type" type="xsd:string" />
+<xsd:attribute name="mimetype" type="xsd:string" />
+<xsd:attribute ref="xml:space" />
+</xsd:complexType>
+</xsd:element>
+<xsd:element name="assembly">
+<xsd:complexType>
+<xsd:attribute name="alias" type="xsd:string" />
+<xsd:attribute name="name" type="xsd:string" />
+</xsd:complexType>
+</xsd:element>
+<xsd:element name="data">
+<xsd:complexType>
+<xsd:sequence>
+<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+<xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+</xsd:sequence>
+<xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+<xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+<xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+<xsd:attribute ref="xml:space" />
+</xsd:complexType>
+</xsd:element>
+<xsd:element name="resheader">
+<xsd:complexType>
+<xsd:sequence>
+<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+</xsd:sequence>
+<xsd:attribute name="name" type="xsd:string" use="required" />
+</xsd:complexType>
+</xsd:element>
+</xsd:choice>
+</xsd:complexType>
+</xsd:element>
+</xsd:schema>
+<resheader name="resmimetype">
+<value>text/microsoft-resx</value>
+</resheader>
+<resheader name="version">
+<value>2.0</value>
+</resheader>
+<resheader name="reader">
+<value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+</resheader>
+<resheader name="writer">
+<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+</resheader>
+<data name="spCashier.InnerText" xml:space="preserve">
+<value>Касир:</value>
+</data>
+<data name="spCashBox.InnerText" xml:space="preserve">
+<value>Каса:</value>
+</data>
+<data name="spSum.InnerText" xml:space="preserve">
+<value>Сума платежів:</value>
+</data>
+<data name="spCount.InnerText" xml:space="preserve">
+<value>Кількість платежів:</value>
+</data>
+<data name="spFIO.InnerText" xml:space="preserve">
+<value>ПІБ платника:</value>
+</data>
+<data name="btNewClient.Value" xml:space="preserve">
+<value>Новий (F7)</value>
+</data>
+<data name="btOplata.Value" xml:space="preserve">
+<value>Оплата (F8) 
+</value>
+</data>
+<data name="btPrintAll.Alt" xml:space="preserve">
+<value>Надрукувати пачку сплачених документів (F9)</value>
+</data>
+<data name="spDep.InnerText" xml:space="preserve">
+<value>Прийнято у клієнта:</value>
+</data>
+<data name="spReturn.InnerText" xml:space="preserve">
+<value>Повернути клієнту:</value>
+</data>
+<data name="btOplAll.Value" xml:space="preserve">
+<value>Сплатити</value>
+</data>
+<data name="btHidePay.Value" xml:space="preserve">
+<value>Закрити</value>
+</data>
+<data name="spTrAcc.InnerText" xml:space="preserve">
+<value>Транзитний рахунок:</value>
+</data>
+<data name="tdBank.InnerText" xml:space="preserve">
+<value>Банк:</value>
+</data>
+<data name="tdAcc.InnerText" xml:space="preserve">
+<value>Рахунок:</value>
+</data>
+<data name="tdSCP.InnerText" xml:space="preserve">
+<value>СКП:</value>
+</data>
+<data name="lbFroup.InnerText" xml:space="preserve">
+<value>Групувати</value>
+</data>
+<data name="divRekv.InnerText" xml:space="preserve">
+<value>Реквізити</value>
+</data>
+<data name="spS.InnerText" xml:space="preserve">
+<value>Сума:</value>
+</data>
+<data name="btS.Value" xml:space="preserve">
+<value>Зберегти</value>
+</data>
+<data name="btCancel.Value" xml:space="preserve">
+<value>Відміна</value>
+</data>
+<data name="forMFO.Value" xml:space="preserve">
+<value>МФО банку</value>
+</data>
+<data name="forNLSB.Value" xml:space="preserve">
+<value>Номер рахунку</value>
+</data>
+<data name="forSK.Value" xml:space="preserve">
+<value>Символ кас-плану</value>
+</data>
+<data name="forNB.Value" xml:space="preserve">
+<value>Найменування банку</value>
+</data>
+<data name="forNMSB.Value" xml:space="preserve">
+<value>Найменування рахунку</value>
+</data>
+<data name="forSKN.Value" xml:space="preserve">
+<value>Найменування кас-плану</value>
+</data>
+<data name="forOKPO.Value" xml:space="preserve">
+<value>ЄДРПОУ банку</value>
+</data>
+<data name="forNAZN.Value" xml:space="preserve">
+<value>Призначення платежа</value>
+</data>
+<data name="titleDefault.Value" xml:space="preserve">
+<value>Комунальні платежі</value>
+</data>
+<data name="Mes01.Value" xml:space="preserve">
+<value>Невірний контрольний розряд!</value>
+</data>
+<data name="Mes02.Value" xml:space="preserve">
+<value>Платежі за договорами</value>
+</data>
+<data name="Mes03.Value" xml:space="preserve">
+<value>Введені операції</value>
+</data>
+<data name="Mes04.Value" xml:space="preserve">
+<value>Почати нову пачку?</value>
+</data>
+<data name="Mes05.Value" xml:space="preserve">
+<value>Жодного платежу не введено!</value>
+</data>
+<data name="Mes06.Value" xml:space="preserve">
+<value>Сума менша необхідної!</value>
+</data>
+<data name="Mes07.Value" xml:space="preserve">
+<value>Помилка суми!</value>
+</data>
+<data name="Mes08.Value" xml:space="preserve">
+<value>Додати документ на суму</value>
+</data>
+<data name="Mes09.Value" xml:space="preserve">
+<value>комісія з платника:</value>
+</data>
+<data name="Mes10.Value" xml:space="preserve">
+<value>Не заповнене поле:</value>
+</data>
+<data name="Mes11.Value" xml:space="preserve">
+<value>Не заповнений реквізит [ МФО ]</value>
+</data>
+<data name="Mes12.Value" xml:space="preserve">
+<value>Не заповнений реквізит [ Рахунок ]</value>
+</data>
+<data name="Mes13.Value" xml:space="preserve">
+<value>Не заповнений реквізит [ Назва рахунку ]</value>
+</data>
+<data name="Mes14.Value" xml:space="preserve">
+<value>Не заповнений реквізит [ ЄДРПОУ ]</value>
+</data>
+<data name="Mes15.Value" xml:space="preserve">
+<value>Не заповнений реквізит [ СК ]</value>
+</data>
+<data name="Mes16.Value" xml:space="preserve">
+<value>Не заповнений реквізит [ Призначення платежу ]</value>
+</data>
+<data name="Mes17.Value" xml:space="preserve">
+<value>Платник:</value>
+</data>
+<data name="Mes18.Value" xml:space="preserve">
+<value>Пачка документів успішно оплачена!</value>
+</data>
+<data name="Mes19.Value" xml:space="preserve">
+<value>Видалити операцію (DEL)</value>
+</data>
+<data name="Mes20.Value" xml:space="preserve">
+<value>Роздрукувати тікет (ALT+CTRL+P)</value>
+</data>
+<data name="Mes21.Value" xml:space="preserve">
+<value>Картка документу (ALT+CTRL+D)</value>
+</data>
+<data name="Mes22.Value" xml:space="preserve">
+<value>Надрукувати відтиск (ALT+CTRL+T)</value>
+</data>
+<data name="Mes23.Value" xml:space="preserve">
+<value> грн, ком. </value>
+</data>
+<data name="Mes24.Value" xml:space="preserve">
+<value> грн</value>
+</data>
+<data name="Mes25.Value" xml:space="preserve">
+<value>Неіснуючий МФО!</value>
+</data>
+<data name="Mes26.Value" xml:space="preserve">
+<value>Невірний контрольний розряд!</value>
+</data>
+<data name="Mes27.Value" xml:space="preserve">
+<value>Неіснуючий СКП!</value>
+</data>
+</root>

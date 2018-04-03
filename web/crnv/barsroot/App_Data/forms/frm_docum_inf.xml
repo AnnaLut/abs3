@@ -1,0 +1,153 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<xmlform caption="Інформаційні документи" minwidth="2000" maxwidth="3000">
+  <grids>
+    <grid id="inf_doc" pagesize="10" showpagesizebox="true" width="3000">
+      <filters caption="Швидкий пошук" buttontext="Знайти" columnscount="3" width="800">
+       
+        <filter field="stmp" caption="Дата*" columnindex="1" condition="Equal" id="fltrname" allowemptyvalue="false">
+          <uicontrol type="DateInput">
+
+          </uicontrol>
+        </filter>
+
+        
+        
+        <filter field="nlsa" caption ="Рахунок в банку А" columnindex="2" condition="LikeRight" id="fltrkv">
+          <uicontrol></uicontrol>
+        </filter>
+        <filter field="nlsb" caption ="Рахунок в банку Б" columnindex="3" condition="LikeRight" id="fltrnls">
+          <uicontrol></uicontrol>
+        </filter>
+
+      </filters>
+      <datasource>
+        <sql>
+          select /*+ opt_param('_optimizer_use_feedback' 'false')*/
+          r.rec, r.mfoa, r.nlsa, r.mfob, r.nlsb, r.s/100 as s, r.kv, r.nd, r.datd, r.datp, t.stmp, r.nam_a, r.nam_b, r.nazn, r.id_a, r.id_b, to_date(t.stmp,'dd/mm/yyyy') as dat_a
+          from arc_rrp r, tzapros t
+          where t.rec= r.rec
+         -- and t.stmp between gl.bd - 1900 and gl.bd
+          and fn_b is null
+          and ( exists (select 1 from v_gl where nls = r.nlsa and kv = r.kv and kf = f_ourmfo )
+          or exists (select 1 from v_gl where nls = r.nlsb and kv = r.kv and kf = f_ourmfo ))
+		  	  
+        </sql>
+      </datasource>
+
+      <buttons defaulttype="Button"   >
+      <button caption="Друк" hint="Сформувати докумет"  id="id" type="Image" imagename="check2" > 
+        <command type="FastReport"  frtemplate="DOC_INFO_ONE"  checkselectedrow="true" target="Blank">
+          <parameters>
+            
+            <parameter type="DataField" name="rec" altname="r_rec"  ></parameter>
+            
+          </parameters>
+        </command>
+      </button>
+
+        <button caption="Друк"   hint="Сформувати документи"   id="id1" type="Image" imagename="checks" >
+          <command type="FastReport"  frtemplate="DOC_INFO_ALL"  checkselectedrow="false" target="Blank">
+            <customfields title="Параметри документів" oktext="Сформувати" canceltext="Відмінити">
+              <customfield name="dat" label="Дата"  datatype="String"></customfield>
+              <customfield name="p_nlsa" label="Рахунок А"  datatype="String"></customfield>
+              <customfield name="p_nlsb" label="Рахунок В" datatype="String"></customfield>
+            </customfields>
+           
+          </command>
+        </button>   
+      </buttons>
+      
+      <fields>
+
+        <field name="nd" datatype="String" >
+          <column caption="Номер документу" align="Center"></column>
+        </field>
+
+        <field name="mfoa" datatype="String" >
+          <column caption="МФО відправника" align="Center"></column>
+        </field>
+
+        <field name="nlsa" datatype="String" key="true">
+          <column caption="Рахунок в банку А" align="Left"></column>
+        </field>
+
+        <field name="mfob" datatype="String">
+          <column caption="МФО Отримувача" align="Center"></column>
+        </field>
+
+        <field name="nlsb" datatype="String" key="true">
+          <column caption="Рахунок в банку Б" align="Left"></column>
+        </field>
+
+        <field name="s" datatype="Int64" >
+          <column caption="Сумма" align="Center"></column>
+        </field>
+
+        <field name="kv" datatype="Int64"  >
+          <column caption="Валюта" align="Center"></column>
+        </field>
+
+        <field name="stmp" datatype="DateTime" key="true" >
+          <column caption="Дата" align="Center"></column>
+        </field>
+
+        <field name="nazn" datatype="String" >
+          <column caption="Призначення платежу" width="375" align="Left"></column>
+        </field>
+        
+        <field name="nam_a" datatype="String" >
+          <column caption="Найменування платника" width="260" align="Center"></column>
+        </field>
+
+        <field name="nam_b" datatype="String" >
+          <column caption="Найменування отримувача" width="260" align="Center"></column>
+        </field> 
+        
+
+        <field name="rec" datatype="Int64"  key="true">
+          <column caption="Індетифікатор документа" align="Center"></column>
+        </field>
+        
+        <field name="nlsa" datatype="String">
+          <column caption="Рахунок в банку А" align="Left"></column>
+        </field>
+                          
+        <field name="dat_a" datatype="DateTime" >
+          <column caption="Дата створення файлу $A в банку А" align="Center"></column>
+        </field>
+        
+        <field name="datd" datatype="DateTime" >
+          <column caption="Дата платіжного документу" align="Center"></column>
+        </field>
+
+        <field name="datp" datatype="DateTime" >
+          <column caption="Дата надходження в банк А" align="Center"></column>
+        </field>
+                       
+        <field name="id_a" datatype="String" key="false">
+          <column caption="Іден. код відправника" align="Center"></column>
+        </field>
+
+        <field name="id_b" datatype="String" key="false">
+          <column caption="Іден. код отримувача" align="Center"></column>
+        </field>
+      
+      </fields>
+      <rowselection method="SingleRow" ></rowselection>
+    </grid>
+  </grids>
+</xmlform>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

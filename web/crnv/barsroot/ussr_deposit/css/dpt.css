@@ -1,0 +1,162 @@
+@media Screen
+{
+	.print_action{DISPLAY: none}
+} 
+@media Print
+{
+	.screen_action {DISPLAY: none}
+}
+.MainTable
+{
+	width: 100%;
+	top:8px;
+	bottom:8px;
+	border:0px;
+}
+.InnerTable
+{
+	width: 100%;
+	border:0px;
+}
+.DirectionButton
+{
+	width:160px;
+	height:25px;
+	font-family: Arial;
+	font-size: 10pt;
+}
+.AcceptButton
+{
+	width:200px;
+	font-family: Arial;
+	font-size: 10pt;	
+}
+.HelpButton
+{
+	width:15px;
+	height:25px;
+}
+.InfoHeader
+{
+	font-family: Arial;
+	font-size: 14pt;
+	font-style: italic;
+	font-weight:bold;
+	width: 90%;
+	height: 100%;
+}
+.InfoLabel
+{
+	font-family: Arial;
+	font-size: 11pt;
+	font-style: italic;
+	font-weight:bold;
+	width: 100%;
+	height: 100%;
+}
+.SmallLabel
+{
+    font-family:Verdana;
+    font-size:8pt;
+    width:100%;
+    height:100%;
+}
+.InfoText
+{
+	width:100%;
+	font-family: Arial;
+	font-size: 10pt;
+}
+.InfoText95
+{
+	width:95%;
+	font-family: Arial;
+	font-size: 10pt;
+}
+.FileUpload
+{
+	width:100%;
+	font-family: Arial;
+	font-size: 10pt;
+}
+.HeaderText
+{
+	font-family: Arial;
+	font-size: 11pt;
+	font-style: italic;
+	font-weight:bold;
+	width:100px;
+}
+.RadioText
+{
+	width:50%;
+	font-family: Arial;
+	font-size: 10pt;
+}
+.InfoDateSum
+{
+	width:100px;
+	font-family: Arial;
+	font-size: 10pt;
+	vertical-align:middle;
+	text-align:center;
+	border-style: solid;
+	border-width: 1px;
+}
+.RadioText
+{
+	width:150px;	
+	font-family: Arial;
+	font-size: 10pt;
+}
+.BaseGrid
+{
+	font-family: Arial;
+	font-size: 10pt;
+	width:100%;
+	cursor:hand;
+	border-style:outset;
+}
+.BaseDropDownList
+{
+	font-family: Arial;
+	font-size: 10pt;
+	width:100%;
+}
+.BaseCheckBox
+{
+	font-family: Arial;
+	font-size: 10pt;
+	width:50%;
+}
+.Validator
+{
+	font-family: Arial;
+	font-size: 10pt;
+	color:Red;
+	width:100%;
+}
+.Img
+{
+	BORDER-RIGHT: black 1px solid; 
+	BORDER-TOP: black 1px solid; 
+	BORDER-LEFT: black 1px solid; 
+	BORDER-BOTTOM: black 1px solid;	
+	vertical-align:middle;
+	cursor:hand;
+	height:18px;
+	width:18px;
+}
+.ImgButton
+{
+	BORDER-RIGHT: black 1px solid; 
+	BORDER-TOP: black 1px solid; 
+	BORDER-LEFT: black 1px solid; 
+	BORDER-BOTTOM: black 1px solid;	
+	vertical-align:middle;
+	cursor:hand;
+	height:20px;
+	width:20px;
+}
+.mo {DISPLAY: none;}
+.mn {DISPLAY: block;}

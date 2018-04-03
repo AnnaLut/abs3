@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="btFile.ToolTip" xml:space="preserve">
+    <value>Print ticket in text mode</value>
+  </data>
+  <data name="DocN.ToolTip" xml:space="preserve">
+    <value>Number of document</value>
+  </data>
+  <data name="LabelDocDate.Text" xml:space="preserve">
+    <value>from</value>
+  </data>
+  <data name="DocD_TextBox.ToolTip" xml:space="preserve">
+    <value>Date of document</value>
+  </data>
+  <data name="LabelSum.Text" xml:space="preserve">
+    <value>Sum of payment</value>
+  </data>
+  <data name="SumA.ToolTip" xml:space="preserve">
+    <value>A sum is</value>
+  </data>
+  <data name="SumC.ToolTip" xml:space="preserve">
+    <value>Sum of payment</value>
+  </data>
+  <data name="SumB.ToolTip" xml:space="preserve">
+    <value>A sum is</value>
+  </data>
+  <data name="CrossRat.ToolTip" xml:space="preserve">
+    <value>A cross rat</value>
+  </data>
+  <data name="Sk.ToolTip" xml:space="preserve">
+    <value>Character of CashPlan</value>
+  </data>
+  <data name="LabelNarrative.Text" xml:space="preserve">
+    <value>Setting of payment</value>
+  </data>
+  <data name="lbHint.Text" xml:space="preserve">
+    <value>(click by the right button is a default value)</value>
+  </data>
+  <data name="Nazn.ToolTip" xml:space="preserve">
+    <value>Setting  of payment</value>
+  </data>
+  <data name="lbDatVal.Text" xml:space="preserve">
+    <value>Дата вал.</value>
+  </data>
+  <data name="DatV.ToolTip" xml:space="preserve">
+    <value>Date of currency transaction</value>
+  </data>
+  <data name="lbDatVal2.Text" xml:space="preserve">
+    <value>Дата вал. 2</value>
+  </data>
+  <data name="DatV2.ToolTip" xml:space="preserve">
+    <value>Date of currency transaction</value>
+  </data>
+  <data name="Message1.Value" xml:space="preserve">
+    <value>Incorrect check bit!</value>
+  </data>
+  <data name="Message2.Value" xml:space="preserve">
+    <value>Information is successfully stored in a reference book!</value>
+  </data>
+  <data name="Message3.Value" xml:space="preserve">
+    <value>A document is successfully accepted!</value>
+  </data>
+  <data name="Message4.Value" xml:space="preserve">
+    <value>Reference</value>
+  </data>
+  <data name="Message5.Value" xml:space="preserve">
+    <value>It is impossible to calculate setting by default!</value>
+  </data>
+  <data name="Message6.Value" xml:space="preserve">
+    <value>It is impossible to calculate a formula!</value>
+  </data>
+  <data name="Message7.Value" xml:space="preserve">
+    <value>An account is not found </value>
+  </data>
+  <data name="Message8.Value" xml:space="preserve">
+    <value>You indeed want to enter a document with ticket </value>
+  </data>
+  <data name="Message9.Value" xml:space="preserve">
+    <value>The sum of document exceeds the amount of balance. To continue?</value>
+  </data>
+  <data name="Message10.Value" xml:space="preserve">
+    <value>Less </value>
+  </data>
+  <data name="Message11.Value" xml:space="preserve">
+    <value> characters.</value>
+  </data>
+  <data name="Message12.Value" xml:space="preserve">
+    <value>A value must be numerical.</value>
+  </data>
+  <data name="Message13.Value" xml:space="preserve">
+    <value>Error of check bit of OKPO.</value>
+  </data>
+  <data name="Message14.Value" xml:space="preserve">
+    <value>Error of sum.</value>
+  </data>
+  <data name="Message15.Value" xml:space="preserve">
+    <value>It is necessary to fill an additional essential element!</value>
+  </data>
+  <data name="Message16.Value" xml:space="preserve">
+    <value>Impermissible value of essential element</value>
+  </data>
+  <data name="Message17.Value" xml:space="preserve">
+    <value>The fields of accounts and codes of currencies is filled incorrectly.</value>
+  </data>
+  <data name="Message18.Value" xml:space="preserve">
+    <value>Character of cashplan must be numerical!</value>
+  </data>
+  <data name="Message19.Value" xml:space="preserve">
+    <value>Illegal character of cashplan!</value>
+  </data>
+  <data name="Message20.Value" xml:space="preserve">
+    <value>It is not discovered necessary for a digital signature components. Call administrator.</value>
+  </data>
+  <data name="Message21.Value" xml:space="preserve">
+    <value>The system of safety is not initialized. Necessary all of the tools are not set possibly. Call administrator.</value>
+  </data>
+  <data name="Message22.Value" xml:space="preserve">
+    <value>Errors at imposition of EDS</value>
+  </data>
+  <data name="Message23.Value" xml:space="preserve">
+    <value>It is impossible to create the element of ACTIVEX for determination of version of Windows Installer.</value>
+  </data>
+  <data name="Message24.Value" xml:space="preserve">
+    <value>Length more then 160 symbols (current length </value>
+  </data>
+  <data name="forbtPayIt.Value" xml:space="preserve">
+    <value>To pay (Alt + F10)</value>
+  </data>
+  <data name="forbtMenuPrint.Value" xml:space="preserve">
+    <value>Print menu</value>
+  </data>
+  <data name="forbtNewDoc.Value" xml:space="preserve">
+    <value>To pass to other operation</value>
+  </data>
+  <data name="forbtPrintDoc.Value" xml:space="preserve">
+    <value>To print a document  (Alt + F5)</value>
+  </data>
+  <data name="forbtSameDoc.Value" xml:space="preserve">
+    <value>To begin the input of new document  (Alt + F11)</value>
+  </data>
+  <data name="forbtSaveAlien.Value" xml:space="preserve">
+    <value>To save in a reference book</value>
+  </data>
+  <data name="dF12.InnerText" xml:space="preserve">
+    <value>F12 - Reference Book</value>
+  </data>
+  <data name="Message25.Value" xml:space="preserve">
+    <value>Value of sum must be no more 15 symbols</value>
+  </data>
+  <data name="PageResource.Title" xml:space="preserve">
+    <value>Input document</value>
+  </data>
+  <data name="Message26.Value" xml:space="preserve">
+    <value>A primary document fully coincides with an information query. Delete the information query?</value>
+  </data>
+  <data name="Message27.Value" xml:space="preserve">
+    <value>Make information query, specifying OKPO(code) of recipient?</value>
+  </data>
+  <data name="Message28.Value" xml:space="preserve">
+    <value>Make information query, specifying ACCOUNT of recipient?</value>
+  </data>
+  <data name="Message29.Value" xml:space="preserve">
+    <value>It is edited more than one element. Make information query for the refund of document?</value>
+  </data>
+  <data name="Message30.Value" xml:space="preserve">
+    <value>Unable to determinate the SEP essential element (QDocs)</value>
+  </data>
+  <data name="lbNominal.Text" xml:space="preserve">
+    <value>Nominal</value>
+  </data>
+  <data name="Message31.Value" xml:space="preserve">
+    <value>Cannot find code currency </value>
+  </data>
+  <data name="Message32.Value" xml:space="preserve">
+    <value>Date must be in 10 days range from bankdate</value>
+  </data>
+  <data name="Message33.Value" xml:space="preserve">
+    <value>Date currency different from the current. Continue?</value>
+  </data>
+  <data name="lbFixValues.Text" xml:space="preserve">
+    <value>Extraction is on.</value>
+  </data>
+  <data name="cbPriority.Text" xml:space="preserve">
+    <value>Urgent</value>
+  </data>
+  <data name="cbPriority.ToolTip" xml:space="preserve">
+    <value>Urgent payment</value>
+  </data>
+</root>
