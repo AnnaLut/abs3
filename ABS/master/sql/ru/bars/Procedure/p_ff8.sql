@@ -1,9 +1,18 @@
+ 
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_FF8.sql =========*** Run *** ===
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure P_FF8 ***
+
 CREATE OR REPLACE PROCEDURE BARS.p_ff8 (Dat_ DATE) IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 DESCRIPTION : Процедура формирования файла #F8 для КБ
 COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 
-VERSION     :   v.18.001    31.01.2018
+VERSION     :   v.18.002    03.04.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
 
@@ -20,6 +29,7 @@ VERSION     :   v.18.001    31.01.2018
 16   L          S245 узагальнений строк погашення
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+03.04.2018  для 1502 выбирается поле DOSQ вместо R_DOS
 23.01.2018  -новый сегмент в показателе: L(S245)
                -расширена рабочая таблица otc_ff8_history_acc
             -для сегмента CC новая разбивка по балансовым
@@ -1367,7 +1377,7 @@ from (
                          nvl(nkd, nd) comm,
                          decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_) ) nbuc,
                          1 cnt,
-                         sum((case when substr(nls,1,4)='1502' and r_dos = 0 then dosq else r_dos end)) ost -- выдача
+                         sum((case when substr(nls,1,4)='1502' then dosq else r_dos end)) ost -- выдача
                          --sum(r_dos) ost -- выдача
                          ,min (accc) isp, s080
                     from OTC_FF7_HISTORY_ACC f
@@ -1498,7 +1508,7 @@ from (
                         nvl(nkd,nd) comm,
                         decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_) ) nbuc,
                         1 cnt, sum(ostq) ost,
-                        sum((case when substr(nls,1,4)='1502' and r_dos = 0 then dosq else r_dos end)) r_dos -- выдача
+                        sum((case when substr(nls,1,4)='1502' then dosq else r_dos end)) r_dos -- выдача
                         --sum (r_dos) r_dos
                          ,sum(kosq) kos
                          ,min (accc)  isp
@@ -1989,4 +1999,10 @@ logger.info ('P_FF8: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 --        logger.info ('P_FF8: errors '||sqlerrm||' for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 END;
 /
+ 
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_FF8.sql =========*** End *** ===
+PROMPT ===================================================================================== 
+
 
