@@ -1,9 +1,18 @@
-CREATE OR REPLACE PROCEDURE BARS.P_F6B_NN (Dat_ DATE, sheme_ Varchar2 DEFAULT 'G' )
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_F6B_NN.sql =========*** Run *** 
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure P_F6B_NN ***
+
+ CREATE OR REPLACE PROCEDURE BARS.P_F6B_NN (Dat_ DATE, sheme_ Varchar2 DEFAULT 'G' )
 IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  % DESCRIPTION : процедура #6B
  %
- % VERSION     :   v.18.001      25.01.2018
+ % VERSION     :   v.18.002      03.04.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 /*
    Структура показателя    GGG CC N H I OO R VVV
@@ -19,6 +28,7 @@ IS
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+03.04.2018  отдельная обработка счетов SNA из nbu23_rez  (CC=40)
 25.01.2018  изменение распределения счетов для сегмента GGG
 15.11.2017  переход на новый план счетов
 27.10.2017  сегмент N равен 5 при установленном доп.параметре клиента "юр.лицо SPE"
@@ -560,6 +570,147 @@ BEGIN
        end if;
 
     end loop;
+
+     for k in ( select /*+leading(nb) index(nb I3_NBU23REZ)*/
+                       nb.acc, NVL(nb.rnk,0) RNK, nb.nbs, nb.nls, nb.kv,
+                       nb.nd, nb.id, NVL(trim(nb.kat),'0') kat,
+                       NVL(round(nb.bvq*100,0),0) BV,
+                       NVL(round(nb.pvzq*100,0),0) ZAL,
+                       nb.s080 FIN, nvl(nb.pd_0,0) pd_0,
+                       c.codcagent, c.custtype,
+                       2-MOD(c.codcagent,2) REZ, NVL(trim(c.sed),'00') sed,
+                       NVL(nb.s250_23,'0') s250, nb.tip
+                  from nbu23_rez nb, customer c
+                 where nb.fdat = z.fdat1
+                   and nb.rnk = z.rnk1
+                   and nb.nd = z.nd1
+                   and nb.kat = z.kat1
+                   and nb.kv = z.kv1
+                   and nvl(nb.rz,0) = z.rz1
+                   and nb.tip ='SNA'
+                   and nb.rnk = c.rnk
+     ) loop
+
+         select max(ddd) into ddd_
+           from kl_f3_29
+          where kf='6B' and r020 like substr(k.nbs,1,3)||'%';
+
+         kv_ := lpad(to_char(k.kv),3,'0');
+
+         IF typ_>0 THEN
+            nbuc_ := NVL(F_Codobl_Tobo (k.acc, typ_), nbuc1_);
+         ELSE
+            nbuc_ := nbuc1_;
+         END IF;
+
+         comm_ := 'ID='||k.id||' RNK='||k.rnk||' ND='||k.nd||' DDD='||ddd_||' TIP='||k.tip;
+
+         CC_ := '40';
+
+       if k.codcagent in (1, 2)               -- банки
+       then
+          N_ := '3';                          
+       elsif k.codcagent in (3, 4)            -- юр.лица
+       then
+
+--   проверка наличия доп.параметра ISSPE
+          begin
+            select nvl(trim(value),'0')   into is_spe_
+              from customerw
+             where rnk =k.rnk
+               and tag ='ISSPE';
+          exception
+            when others
+               then is_spe_ :='0';
+          end;
+
+          if is_spe_ ='1'  then
+
+             N_ := '5';
+          else
+
+             if k.nls like '21%'    or
+                k.nls like '236%'   or
+                k.nls like '237%'   or
+                k.nls like '238%'   
+             then
+                     is_budg_ := 1;
+             else    is_budg_ := 0;
+             end if;
+
+             -- временно на 01.02.2017
+             -- для контрагента Министерство финансов ........
+             if    is_budg_ !=0  or
+                   ( mfo_ = 300465 and k.rnk in (90092301, 94312801) ) then
+
+                  N_ := '4';                  --бюджет
+             elsif k.sed = '56'  then
+                  N_ := '6';                  --юр.лицо ОСББ
+             else
+                  N_ := '2';                  --юр.лицо
+             end if;
+
+          end if;
+
+       elsif k.codcagent in (5,6) and k.sed <> '91'
+       then
+          N_ := '1';                          --физ.лицо
+       elsif k.codcagent in (5,6) and k.sed = '91'
+       then
+          N_ := '1';                    --физ.лицо предприниматель (ранее =2)
+       else
+
+          if    k.custtype ='1'  then   N_ := '3';
+          elsif k.custtype ='2'  then   N_ := '2';
+          elsif k.custtype ='3'  then   N_ := '1';
+          else
+               N_ := 'X';
+          end if;
+
+       end if;
+
+       H_ := '0';
+
+       if k.pd_0 !=1 and k.s250 = '8' then
+          H_ := '2';
+       elsif k.pd_0 !=1  then
+          H_ := '1';
+       else
+          H_ := '0';
+       end if;
+
+       I_ := k.fin;
+       if ddd_ like '15%'  and  trim(I_) is null  then
+          I_ := 'K';
+       end if;
+       -- для контрагента Министерство финансов ........
+       if mfo_ = 300465 and k.rnk in (90092301, 94312801)
+       then
+          I_ := 'M';
+       end if;
+
+       if    k.pd_0 =1  and
+             k.nbs in ('1500','1502','1508','1600','1607') 
+       then  
+           ddd_ :='120';   
+           H_ := '0';
+
+       end if;
+
+          kodp_:= CC_|| N_|| H_|| I_||'00'|| to_char(k.rez) || kv_;
+          znap_:= TO_CHAR(ABS(k.bv));
+
+             INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, rnk, nd, comm, acc)
+             VALUES (k.nls, k.kv, dat_, ddd_||kodp_, znap_, nbuc_, k.rnk, k.nd, comm_, k.acc);
+
+          if ddd_ = '121' and k.pd_0 =1 then
+
+             INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, rnk, nd, comm, acc)
+             VALUES (k.nls, k.kv, dat_, '120'||kodp_, znap_, nbuc_, k.rnk, k.nd, comm_, k.acc);
+          end if;
+
+     end loop;
+
    end loop;
 
    -- для балансовых рахунків з пасивними залишками
@@ -614,5 +765,10 @@ BEGIN
   logger.info ('P_F6B_NN: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 END p_f6b_nn;
 /
+show err;
 
 
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_F6B_NN.sql =========*** End *** 
+PROMPT ===================================================================================== 
