@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="07/08/2014 10:32:01" ReportInfo.Modified="12/29/2015 14:13:18" ReportInfo.CreatorVersion="2013.2.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="ETALON" ConnectionString="rijcmlquZfNzAlbe2EyTG4qAkUw0xBpdkG6UNIjl2GGu3gUCwujIGCB8ndGEU/CZWhT/EwlSy+LN3Yuu31BtR9vM2EY4w==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select a.branch,&#13;&#10;        ai.fio as fio,&#13;&#10;        ai.okpob as idcode,&#13;&#10;        a.nls,&#13;&#10;        to_char(a.dato,'DD/MM/YYYY') dat_o,&#13;&#10;        to_char(O.PDAT,'DD/MM/YYYY') p_dat,&#13;&#10;        fl.status&#13;&#10;from &#13;&#10;    asvo_immobile a, asvo_immobile_fl fl, alien_immobile ai, oper o &#13;&#10;    where &#13;&#10;    a.fl=fl.fl&#13;&#10;    and a.fl not in(14,15)&#13;&#10;    and refpay is not null&#13;&#10;    and a.key=ai.key(+)&#13;&#10;    and a.refpay=o.ref&#13;&#10;    and pdat between :dat1 and :dat2&#13;&#10;    and a.branch LIKE&#13;&#10;                     substr(SYS_CONTEXT ('bars_context', 'user_branch_mask'),8)">
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="IDCODE" DataType="System.String"/>
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="STATUS" DataType="System.String"/>
+        <Column Name="DAT_O" DataType="System.String"/>
+        <Column Name="P_DAT" DataType="System.String"/>
+        <CommandParameter Name="Dat1" DataType="106" Expression="[sFdat1]" DefaultValue="01.01.2015"/>
+        <CommandParameter Name="Dat2" DataType="106" Expression="[sFdat2]" DefaultValue="01.01.2015"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sFdat1" DataType="System.DateTime" Expression="ToDateTime(&quot;31/12/2014&quot;)"/>
+    <Parameter Name="sFdat2" DataType="System.DateTime" Expression="ToDateTime(&quot;31/12/2015&quot;)"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="66.15">
+      <TextObject Name="Text1" Left="9.45" Top="9.45" Width="699.3" Height="56.7" Text="Звіт по виплаті нерухомих за період з [sFdat1] по [sFdat2]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt, style=Bold"/>
+    </ReportTitleBand>
+    <GroupHeaderBand Name="GroupHeader1" Top="68.73" Width="718.2" Height="18.9" Condition="[Table.BRANCH]">
+      <TextObject Name="Text6" Width="302.4" Height="18.9" Border.Lines="All" Text="Бранч: [Table.BRANCH]"/>
+      <DataBand Name="Data1" Top="111.69" Width="718.2" Height="18.9" CanGrow="true" CanShrink="true" CanBreak="true" DataSource="Table">
+        <TableObject Name="Table2" Width="718.22" Height="18.9" GrowToBottom="true">
+          <TableColumn Name="Column6" Width="48.84"/>
+          <TableColumn Name="Column7" Width="105.5"/>
+          <TableColumn Name="Column12" Width="96.05"/>
+          <TableColumn Name="Column14" Width="162.25"/>
+          <TableColumn Name="Column8" Width="114.98"/>
+          <TableColumn Name="Column9" Width="124.45"/>
+          <TableColumn Name="Column22"/>
+          <TableRow Name="Row2" AutoSize="true">
+            <TableCell Name="Cell6" Border.Lines="All" Text="[Row#]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 7pt"/>
+            <TableCell Name="Cell7" Border.Lines="All" Text="[Table.NLS]" VertAlign="Center" Font="Times New Roman, 7pt"/>
+            <TableCell Name="Cell12" Border.Lines="All" Text="[Table.IDCODE]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 7pt"/>
+            <TableCell Name="Cell14" Border.Lines="All" Text="[Table.FIO]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 7pt"/>
+            <TableCell Name="Cell8" Border.Lines="All" Text="[Table.P_DAT]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 7pt"/>
+            <TableCell Name="Cell9" Border.Lines="All" Text="[Table.DAT_O]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 7pt"/>
+            <TableCell Name="Cell22" Border.Lines="All" Text="[Table.STATUS]" HorzAlign="Right" Font="Times New Roman, 7pt"/>
+          </TableRow>
+        </TableObject>
+        <DataHeaderBand Name="DataHeader1" Top="90.21" Width="718.2" Height="18.9">
+          <TableObject Name="Table1" Width="718.22" Height="18.9" GrowToBottom="true">
+            <TableColumn Name="Column15" Width="48.84"/>
+            <TableColumn Name="Column16" Width="105.5"/>
+            <TableColumn Name="Column17" Width="96.05"/>
+            <TableColumn Name="Column18" Width="162.25"/>
+            <TableColumn Name="Column19" Width="114.98"/>
+            <TableColumn Name="Column20" Width="124.45"/>
+            <TableColumn Name="Column21"/>
+            <TableRow Name="Row3" AutoSize="true">
+              <TableCell Name="Cell15" Border.Lines="All" Text="№ п/п" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 9pt"/>
+              <TableCell Name="Cell16" Border.Lines="All" Text="Номер рахунку&#13;&#10;" VertAlign="Center" Font="Times New Roman, 9pt"/>
+              <TableCell Name="Cell17" Border.Lines="All" Text="ІД Код" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+              <TableCell Name="Cell18" Border.Lines="All" Text="ФІО&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+              <TableCell Name="Cell19" Border.Lines="All" Text="Дата виплати" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+              <TableCell Name="Cell20" Border.Lines="All" Text="Дата вкладу" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+              <TableCell Name="Cell21" Border.Lines="All" Text="Статус" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+            </TableRow>
+          </TableObject>
+        </DataHeaderBand>
+      </DataBand>
+      <GroupFooterBand Name="GroupFooter1" Top="133.17" Width="718.2"/>
+    </GroupHeaderBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="135.75" Width="718.2" Height="18.9"/>
+  </ReportPage>
+</Report>

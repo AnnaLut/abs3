@@ -1,0 +1,221 @@
+body { font-size: 10pt; font-family: arial; }
+
+a
+{
+	color: #2778C9;
+}
+
+a:visited
+{
+	color: #2778C9;
+}
+
+a:hover
+{
+	color:	#2778C9;
+	text-decoration: none;
+}
+
+
+.parentTable
+{
+	width:100%;
+	padding-left: 10px;
+	padding-right: 10px;
+	border-color: #e0dfe3;
+	border-collapse: collapse;
+}
+
+.parentTable tr
+{
+	border-color: #e0dfe3;	
+}
+
+.parentTable tr td
+{
+	border-color: #e0dfe3;	
+}
+
+.parentTable tr th
+{
+
+}
+
+.footerTable 
+{
+	
+}
+
+table, table td {border-color: #e0dfe3;}
+
+.barsGridView
+{
+	width: 100%;
+	font-size:8pt;
+	border: solid 1px #e0dfe3;
+}
+
+.barsGridView th
+{
+	padding: 3px 3px 3px 3px;
+	border-color: #e0dfe3;	
+}
+
+.barsGridView tr
+{
+	
+}
+
+.barsGridView td
+{
+	padding: 3px 3px 3px 3px;
+	white-space:nowrap;
+}
+
+
+/*ширина контролов добавления новой записи
+.barsGridView tr td table
+{
+	border-collapse: collapse;
+	border-width:0px;
+	width:150px;
+}
+*/
+
+.barsGridView tr a
+{
+
+}
+
+.selectedRow
+{
+	background-color: #0977B9 ;
+	color: White;
+}
+.headerRow
+{
+	font-weight: bold;
+}
+
+.headerRow th
+{
+   
+}
+
+.footerRow
+{
+	border-width:0px;
+}
+
+.footerRow td
+{
+	padding: 0px 1px 0px 0px;
+	font-size:8pt;
+	border-width:0px;
+}
+
+.footerRow td input
+{
+	font-size:8pt;
+}
+
+.normalRow
+{
+	background-color: White;
+}
+
+.alternateRow
+{
+	background-color: #F4F4F4;
+}
+
+.selectedRow
+{
+}
+
+.newRow
+{
+}
+
+.newRow td
+{
+	padding: 0px 1px 0px 0px;
+}
+
+.editRow
+{
+}
+
+.pagerRow
+{
+}
+
+.pagerRow td
+{
+	padding: 1px 1px 1px 1px;
+   font-size:9pt;
+}
+
+.filterRow input
+{
+	font-size:x-small;
+}
+
+.filterRow select
+{
+	font-size:x-small;
+}
+
+.captionHeader
+{	
+	display : block;
+    overflow : hidden;
+	background-color: #94ABD9;
+	border-width:0px;
+}
+
+.captionBody
+{
+	width: 100%;
+	text-align:justify;
+	background-image:url(/common/images/skin/gradient_grid.png);
+	padding-bottom: 3px;
+	border-collapse: collapse;
+}
+.captionBody tr td
+{
+	white-space: nowrap;
+}
+
+.captionBodySimple
+{
+	width: 100%;
+	text-align:justify;
+	padding-bottom: 3px;
+}
+
+.captionText
+{
+	width: 100%;
+	font-size: 10pt;
+	font-weight:bold;
+	color:White;
+	vertical-align:middle;
+	text-align: center;
+}
+
+.emptyMessage
+{
+	border: 1px solid #efebde;
+	padding: 3px 50px 3px 50px;
+	text-align: center;
+}
+
+.tableTitle
+{
+	font-size: 11pt;
+	border-bottom: 1px solid #CCD7ED;
+	color: #1C4B75;
+	margin-bottom: 15px;
+	margin-top: 7px;
+}

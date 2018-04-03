@@ -1,0 +1,50 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="default.master.cs" Inherits="cim_master" %>
+
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajax" %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>Модуль валютного контролю</title>
+    <link href="/Common/CSS/BarsGridView.css" type="text/css" rel="stylesheet" />
+    <link href="/Common/CSS/jquery/jquery.css" type="text/css" rel="stylesheet" />
+    <link href="/Common/CSS/jquery/custom.css" type="text/css" rel="stylesheet" />
+    <link href="style/cim.css" type="text/css" rel="stylesheet" />
+    <asp:ContentPlaceHolder ID="HeadContent" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="formCimMaster" runat="server">
+    <ajax:ToolkitScriptManager ID="MainScriptManager" runat="server" AllowCustomErrorsRedirect="false"
+        OnAsyncPostBackError="MainScriptManager_AsyncPostBackError" EnablePartialRendering="true"
+        EnablePageMethods="true">
+        <Services>
+        </Services>
+        <Scripts>
+            <asp:ScriptReference Path="/Common/jquery/jquery.js" />
+            <asp:ScriptReference Path="/Common/jquery/jquery-ui.js" />
+            <asp:ScriptReference Path="/Common/jquery/jquery.ui.datepicker-uk.js" />
+            <asp:ScriptReference Path="/Common/jquery/jquery.validate.js" />
+            <asp:ScriptReference Path="/Common/jquery/additional-methods.js" />
+            <asp:ScriptReference Path="/Common/jquery/jquery.cookies.js" />
+            <asp:ScriptReference Path="/Common/jquery/jquery.blockUI.js" />
+            <asp:ScriptReference Path="/Common/jquery/jquery.custom.js" />
+            <asp:ScriptReference Path="/Common/jquery/jquery.alerts.js" />
+            <asp:ScriptReference Path="/Common/jquery/jquery.numeric.js " />
+            <asp:ScriptReference Path="~/cim/scripts/common.js" />
+        </Scripts>
+    </ajax:ToolkitScriptManager>
+    <div>
+        <asp:Label CssClass="titleLabel" ID="lbPageTitle" runat="server"></asp:Label>
+        <hr />
+    </div>
+    <div>
+        <asp:UpdatePanel ID="MainUpdatePanel" runat="server">
+            <ContentTemplate>
+                <asp:ContentPlaceHolder ID="MainContent" runat="server">
+                </asp:ContentPlaceHolder>
+            </ContentTemplate>
+        </asp:UpdatePanel>
+    </div>
+    </form>
+</body>
+</html>

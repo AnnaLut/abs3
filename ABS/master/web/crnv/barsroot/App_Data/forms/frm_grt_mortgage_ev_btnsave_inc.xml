@@ -1,0 +1,58 @@
+﻿<button caption="Зберегти" hint="Зберегти зміни" id="btnSave">
+  <command type="PlSqlBlock"  successmessage="Дані збережено">
+    <sql>
+      begin
+      grt_mgr.iu_mortgage(
+      p_deal_id => :p_deal_id,
+      p_rooms_cnt => :p_rooms_cnt,
+      p_app_num => :p_app_num,
+      p_total_space => :p_total_space,
+      p_living_space => :p_living_space,
+      p_floor => :p_floor,
+      p_addr => :p_addr,
+      p_buiding_type => :p_buiding_type,
+      p_building_num => :p_building_num,
+      p_building_lit => :p_building_lit,
+      p_city => :p_city,
+      p_city_distr => :p_city_distr,
+      p_living_distr => :p_living_distr,
+      p_micro_distr => :p_micro_distr,
+      p_area_num => :p_area_num,
+      p_build_sect_count => :p_build_sect_count,
+      p_add_grt_addr => :p_add_grt_addr,
+      p_mort_doc_num => :p_mort_doc_num,
+      p_mort_doc_date => :p_mort_doc_date,
+      p_ownship_reg_num => :p_ownship_reg_num,
+      p_ownship_reg_checksum => :p_ownship_reg_checksum
+      );
+      grt_mgr.update_event(:p_EV_ID, :p_ACTUAL_DATE, :p_COMMENT_TEXT);
+      end;
+    </sql>
+    <parameters>
+      <parameter type="FormField" name="P_DEAL_ID"/>
+      <parameter type="FormField" name="P_ROOMS_CNT" />
+      <parameter type="FormField" name="P_APP_NUM" />
+      <parameter type="FormField" name="P_TOTAL_SPACE" />
+      <parameter type="FormField" name="P_LIVING_SPACE" />
+      <parameter type="FormField" name="P_FLOOR" />
+      <parameter type="FormField" name="P_ADDR" />
+      <parameter type="FormField" name="P_BUIDING_TYPE" />
+      <parameter type="FormField" name="P_BUILDING_NUM" />
+      <parameter type="FormField" name="P_BUILDING_LIT" />
+      <parameter type="FormField" name="P_CITY" />
+      <parameter type="FormField" name="P_CITY_DISTR" />
+      <parameter type="FormField" name="P_LIVING_DISTR" />
+      <parameter type="FormField" name="P_MICRO_DISTR" />
+      <parameter type="FormField" name="P_AREA_NUM" />
+      <parameter type="FormField" name="P_BUILD_SECT_COUNT" />
+      <parameter type="FormField" name="P_ADD_GRT_ADDR" />
+      <parameter type="FormField" name="P_MORT_DOC_NUM" />
+      <parameter type="FormField" name="P_MORT_DOC_DATE" />
+      <parameter type="FormField" name="P_OWNSHIP_REG_NUM" />
+      <parameter type="FormField" name="P_OWNSHIP_REG_CHECKSUM" />
+      <parameter type="FormField" name="p_EV_ID" />
+      <parameter type="FormField" name="p_ACTUAL_DATE" />
+      <parameter type="FormField" name="p_COMMENT_TEXT" />
+    </parameters>
+  </command>
+</button>

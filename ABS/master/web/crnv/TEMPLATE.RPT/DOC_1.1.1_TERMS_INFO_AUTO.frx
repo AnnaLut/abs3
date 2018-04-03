@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="04/15/2011 18:11:20" ReportInfo.Modified="10/26/2011 18:18:48" ReportInfo.CreatorVersion="1.6.19.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqD6nWZEExUJ9MEhdFZpB1A6ZfSeiTM+6WLeB8pW5aURqkGwhV134I2SUIQGUGXcXiH/W9SwY2/pFEXk6UOnI3aA==">
+      <TableDataSource Name="Table1" Alias="WCS_SBP_DETAILS" DataType="System.Int32" Enabled="true" SelectCommand="select sd.*,&#13;&#10;       decode(substr(sd.subproduct_id, 11, 1),&#13;&#10;              '1',&#13;&#10;              'I',&#13;&#10;              '2',&#13;&#10;              'II(3)',&#13;&#10;              '3',&#13;&#10;              'III',&#13;&#10;              null) as grp,&#13;&#10;       decode(substr(sd.subproduct_id, 11, 1),&#13;&#10;              '1',&#13;&#10;              'За надання кредиту- встановлюється рішенням кредитного комітету регіонального управління, але не менше 150 грн.',&#13;&#10;              '2',&#13;&#10;              'За надання кредиту – 2% від суми кредиту',&#13;&#10;              '3',&#13;&#10;              'За надання кредиту- встановлюється рішенням кредитного комітету регіонального управління, але не менше 150 грн.',&#13;&#10;              null) as fees,&#13;&#10;       to_number(wcs_utl.get_sbp_mac(sd.subproduct_id, 'MAC_RISK_MAX')) as cr&#13;&#10;  from v_wcs_sbp_details sd&#13;&#10; where sd.subproduct_id = :p_subproduct_id">
+        <Column Name="PRODUCT_ID" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_ID" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_NAME" DataType="System.String"/>
+        <Column Name="SUM_MIN" DataType="System.Decimal"/>
+        <Column Name="SUM_MAX" DataType="System.Decimal"/>
+        <Column Name="SUM_INITIAL_MIN" DataType="System.Decimal"/>
+        <Column Name="SUM_INITIAL_MAX" DataType="System.Decimal"/>
+        <Column Name="TERM_MIN" DataType="System.Decimal"/>
+        <Column Name="TERM_MAX" DataType="System.Decimal"/>
+        <Column Name="CURRENCY" DataType="System.String"/>
+        <Column Name="INTEREST_RATE_MIN" DataType="System.Decimal"/>
+        <Column Name="INTEREST_RATE_MAX" DataType="System.Decimal"/>
+        <Column Name="GARANTEES" DataType="System.String"/>
+        <Column Name="DESCRIPTION" DataType="System.String"/>
+        <Column Name="DOCS" DataType="System.String"/>
+        <Column Name="ICO" DataType="System.Byte[]" BindableControl="Picture"/>
+        <Column Name="GRP" DataType="System.String"/>
+        <Column Name="CR" DataType="System.Decimal"/>
+        <Column Name="PRT_TPL" DataType="System.String"/>
+        <Column Name="FEES" DataType="System.String"/>
+        <CommandParameter Name="p_subproduct_id" DataType="126" Expression="[p_subproduct_id]"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_subproduct_id" DataType="System.String" Expression="&quot;SBP_AUTO_G2_84_EP&quot;"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9" FirstPageSource="15" OtherPagesSource="15">
+    <DataBand Name="Data1" Width="1047.06" Height="718.2">
+      <TextObject Name="Text2" Left="9.45" Top="9.45" Width="982.8" Height="56.7" Text="Умови кредитування на купівлю транспортного засобу за стандартизованим банківським продуктом&#13;&#10;&quot;Кредитування фізичних осіб на купівлю транспортного засобу&quot;" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TableObject Name="Table2" Left="9.45" Top="66.15" Width="982.8" Height="170.1" Border.Lines="All">
+        <TableColumn Name="Column1" Width="123.66"/>
+        <TableColumn Name="Column2" Width="133.11"/>
+        <TableColumn Name="Column3" Width="123.66"/>
+        <TableColumn Name="Column6" Width="78.3"/>
+        <TableColumn Name="Column7" Width="97.2"/>
+        <TableColumn Name="Column4" Width="170.91"/>
+        <TableColumn Name="Column5" Width="255.96"/>
+        <TableRow Name="Row1" Height="37.8">
+          <TableCell Name="Cell1" Border.Lines="All" Text="Група транспортних засобів (2)" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" RowSpan="3"/>
+          <TableCell Name="Cell2" Border.Lines="All" Text="Строк користування кредитом (кількість місяців)" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" RowSpan="3"/>
+          <TableCell Name="Cell3" Border.Lines="All" Text="Розмір власних коштів (1) (мінімальний)" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" RowSpan="3"/>
+          <TableCell Name="Cell26" Border.Lines="All" Text="Відсоткова ставка" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell31" Border.Lines="All"/>
+          <TableCell Name="Cell4" Border.Lines="All" Text="Максимальне значення кредитного ризику, при якому може бути прийняте рішення про надання кредиту" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" RowSpan="3"/>
+          <TableCell Name="Cell5" Border.Lines="All" Text="Комісійні  винагороди банку (одноразово)" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" RowSpan="3"/>
+        </TableRow>
+        <TableRow Name="Row2">
+          <TableCell Name="Cell6" Border.Lines="All"/>
+          <TableCell Name="Cell7" Border.Lines="All"/>
+          <TableCell Name="Cell8" Border.Lines="All"/>
+          <TableCell Name="Cell27" Border.Lines="All" Text="грн." HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell32" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell9" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell10" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row3" Height="37.8">
+          <TableCell Name="Cell11" Border.Lines="All"/>
+          <TableCell Name="Cell12" Border.Lines="All"/>
+          <TableCell Name="Cell13" Border.Lines="All"/>
+          <TableCell Name="Cell28" Border.Lines="All" Text="Акційні умови" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell33" Border.Lines="All" Text="Стандартні умови" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell14" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell15" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row4" Height="75.6">
+          <TableCell Name="Cell16" Border.Lines="All" Text="[WCS_SBP_DETAILS.GRP]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell17" Border.Lines="All" Text="до [WCS_SBP_DETAILS.TERM_MAX] включно" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell18" Border.Lines="All" Text="[WCS_SBP_DETAILS.SUM_INITIAL_MIN]%" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell29" Border.Lines="All" Text="Згідно акційних умов (2)" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell34" Border.Lines="All" Text="[WCS_SBP_DETAILS.INTEREST_RATE_MAX]%" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell19" Border.Lines="All" Text="[FormatNumber([WCS_SBP_DETAILS.CR],2)]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell20" Border.Lines="All" Text="[WCS_SBP_DETAILS.FEES]" HorzAlign="Center" VertAlign="Center"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text1" Left="9.45" Top="236.25" Width="982.8" Height="283.5" Border.Lines="Top" Text="1 - У відсотках від вартості транспортного засобу з урахуванням платоспроможності позичальника. Сплачується після прийняття кредитним комітетом позитивного рішення щодо надання кредиту позичальнику.&#13;&#10;&lt;b&gt;I група (нові транспортні засоби, дозволена маса, яких не перевищує 3500 кг (7700 фунтів) та кількість сидячих місць, за винятком сидіння водія, не перевищує 8, витрати на доукомплектацію кредитуванню не підлягають): &lt;/b&gt;                                                                                                          &#13;&#10;&lt;b&gt;I.1&lt;/b&gt; – торгові марки: „ЗАЗ”, „Богдан”, „ВАЗ” „ГАЗ”, „АЗЛК”, „УАЗ”;&#13;&#10;&lt;b&gt;I.2&lt;/b&gt;–  торгові марки Китаю, Індії, Ірану (&quot;Great Wall&quot;, &quot;Chery&quot;, &quot;Geely &quot;, &quot;Landmark&quot;, &quot;Brilliance&quot;, „BYD”, „Lifan”, „JAC”,  „Golden Dragon”, „Foton”, „Dadi”, „BAW”, „Shuchi”, „Hafei”, „JinBei”, „DongFeng”, „King Long”, „Yutong”, „Higer”, „Shen Long”, „Chana Benni”, „TATA”, „Samand”, інші).&#13;&#10;&lt;b&gt;II група (нові транспортні засоби, дозволена маса, яких не перевищує 3500 кг (7700 фунтів) та кількість сидячих місць, за винятком сидіння водія, не перевищує 8, витрати на доукомплектацію кредитуванню не підлягають)&lt;/b&gt; – іноземні торгові марки, що не входять до I групи;&#13;&#10;III група (транспортні засоби, що перебували у користуванні)&lt;/b&gt; – транспортні засоби, що перебувають у заставі банку (кредит надається на транспортні засоби  вартістю від 60000 грн., дозволена маса транспортних засобів не перевищує 2400 кг, термін експлуатації транспортного засобу на момент закінчення кредитного договору не повинен перевищувати 7 років)&#13;&#10;2 - Окремі умови (акції) затверджуються кредитним комітетом банку на певний період.&#13;&#10;&lt;b&gt;Примітка:&lt;/b&gt;  Для  сплати страхових платежів за пакетом &quot;повне КАСКО&quot;  можливе відкриття відновлюваної кредитної лінії  згідно умов, затверджених кредитним комітетом Банку.&#13;&#10;3 – процентні  ставки збільшуються на 0,1 п.п. при виборі клієнтом ануїтетного методу погашення кредиту  та процентів." VertAlign="Bottom" HtmlTags="true"/>
+    </DataBand>
+  </ReportPage>
+  <ReportPage Name="Page2">
+    <DataBand Name="Data2" Width="718.2" Height="1039.29">
+      <TableObject Name="Table3" Left="18.9" Top="9.45" Width="543.47" Height="955.26" Border.Lines="All">
+        <TableColumn Name="Column8" Width="43.47"/>
+        <TableColumn Name="Column12" Width="500"/>
+        <TableRow Name="Row5" Height="46.23">
+          <TableCell Name="Cell35" Border.Lines="All" Text="&quot;Кредитування фізичних осіб на купівлю транспортного засобу&quot; та &quot;Відновлювана кредитна лінія на сплату страхових платежів за пакетом &quot;повне КАСКО&quot; &quot;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell39" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row6" Height="17.88">
+          <TableCell Name="Cell40" Border.Lines="All" Fill.Color="LightGray" Text="№з/п" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell44" Fill.Color="LightGray" Text="Найменування документа" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row7" Height="17.88">
+          <TableCell Name="Cell45" Border.Lines="All" Fill.Color="LightGray" Text="Документи Позичальника:" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell49" Border.Lines="All" Fill.Color="LightGray" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row8" Height="65.13">
+          <TableCell Name="Cell50" Text="1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell54" Border.Lines="All" Text="Паспорти та картки платника податків з реєстраційним номером облікової картки в Державному реєстрі фізичних осіб - платників податків (довідок про присвоєння ідентифікаційного номера)  Позичальника та його дружини/чоловіка (якщо Позичальник одружений) засвідчені власниками документів" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row9" Height="17.88">
+          <TableCell Name="Cell55" Border.Lines="All" Text="2" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell59" Border.Lines="All" Text="Свідоцтво про одруження (розлучення) (за наявності)" VertAlign="Center" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row10" Height="46.23">
+          <TableCell Name="Cell60" Border.Lines="All" Text="3" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell61" Border.Lines="All" Text="Довідка з місця роботи  (надрукована на фірмовому бланку) із зазначенням посади, терміну роботи на даному місці, отриманої суми доходів та утримання з них за останні 6 місяців (з розбивкою по місяцях)" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row11" Height="36.78">
+          <TableCell Name="Cell62" Border.Lines="All" Text="4" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell63" Border.Lines="All" Text="Документи, що підтверджують інші доходи позичальника (за наявності інших доходів)" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row12" Height="36.78">
+          <TableCell Name="Cell64" Border.Lines="All" Text="5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell65" Border.Lines="All" Text="Документи, що підтверджують доходи членів сім`ї  позичальника (у випадках, коли в розрахунок кредитоспроможності приймаються доходи членів сім’ї)" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row13" Height="17.88">
+          <TableCell Name="Cell66" Border.Lines="All" Text="6" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell67" Border.Lines="All" Text="Для фізичних осіб - підприємців:" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row14" Height="36.78">
+          <TableCell Name="Cell68" Border.Lines="All" Text="6.1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell69" Border.Lines="All" Text="Виписка з Єдиного державного реєстру юридичних осіб та фізичних осіб-підприємців " Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row15" Height="36.78">
+          <TableCell Name="Cell70" Border.Lines="All" Text="6.2" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell71" Border.Lines="All" Text="Документи про вид оподаткування (патент, свідоцтво платника єдиного податку – дійсні на момент подачі заявки та отримання кредиту)" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row16" Height="65.13">
+          <TableCell Name="Cell72" Border.Lines="All" Text="6.3" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell73" Border.Lines="All" Text="Декларація  про доходи за попередній рік (для осіб на загальній системі оподаткування та для платників фіксованого податку) або звіти платника єдиного податку мінімум за попередні два квартали (для платників єдиного податку) з відміткою ДПІ про отримання" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row17" Height="36.78">
+          <TableCell Name="Cell74" Border.Lines="All" Text="6.4" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell75" Border.Lines="All" Text="Книга обліку доходів і витрат (для платників фіксованого податку – за наявності) не менше ніж за попередні 6 місяців" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row18" Height="36.78">
+          <TableCell Name="Cell76" Border.Lines="All" Text="7" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell77" Border.Lines="All" Text="Довідки з банків, де обслуговується Клієнт, про наявність  кредитної заборгованості (у тому числі простроченої)" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row19" Height="17.88">
+          <TableCell Name="Cell78" Border.Lines="All" Text="8" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell79" Border.Lines="All" Text="Документ про  оцінку ТЗ (якщо перебував у користуванні)" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row20" Height="65.13">
+          <TableCell Name="Cell80" Border.Lines="All" Text="9" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell81" Border.Lines="All" Text="Копії документів суб’єкта  оціночної діяльності (якщо ТЗ перебував у користуванні): - свідоцтво про реєстрацію в Державному реєстрі оцінювачів; - кваліфікаційне свідоцтво оцінювача; - свідоцтво про підвищення кваліфікації оцінювача." Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row21" Height="17.88">
+          <TableCell Name="Cell82" Border.Lines="All" Text="10" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell83" Border.Lines="All" Text="Посвідчення водія (за наявності) " Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row22" Height="17.88">
+          <TableCell Name="Cell84" Border.Lines="All" Text="11" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell85" Border.Lines="All" Text="Довідка - рахунок про вартість Транспортного засобу" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row23" Height="17.88">
+          <TableCell Name="Cell86" Border.Lines="All" Fill.Color="LightGray" Text="Документи фінансового Поручителя (за наявності):" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell87" Border.Lines="All" Fill.Color="LightGray" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row26" Height="46.23">
+          <TableCell Name="Cell92" Border.Lines="All" Text="1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell93" Border.Lines="All" Text="Паспорту та картки платника податків з реєстраційним номером облікової картки в Державному реєстрі фізичних осіб - платників податків (довідок про присвоєння ідентифікаційного номера)  Поручителя " Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row24" Height="46.23">
+          <TableCell Name="Cell88" Border.Lines="All" Text="2" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell89" Border.Lines="All" Text="Довідка з місця роботи  (надрукована на фірмовому бланку) із зазначенням посади, терміну роботи на даному місці, отриманої суми доходів та утримання з них за останні 6 місяців (з розбивкою по місяцях)" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row25" Height="17.88">
+          <TableCell Name="Cell90" Border.Lines="All" Text="3" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell91" Border.Lines="All" Text="Документи, що підтверджують інші доходи поручителя (за наявності інших доходів)" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row27" Height="17.88">
+          <TableCell Name="Cell94" Border.Lines="All" Text="4" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell95" Border.Lines="All" Text="Для фізичних осіб - підприємців:" VertAlign="Center" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row28" Height="36.78">
+          <TableCell Name="Cell96" Border.Lines="All" Text="4.1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell97" Border.Lines="All" Text="Виписка з Єдиного державного реєстру юридичних осіб та фізичних осіб-підприємців " Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row29" Height="36.78">
+          <TableCell Name="Cell98" Border.Lines="All" Text="4.2" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell99" Border.Lines="All" Text="Документи про вид оподаткування (патент, свідоцтво платника єдиного податку – дійсні на момент подачі заявки та отримання кредиту)" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row30" Height="65.13">
+          <TableCell Name="Cell100" Border.Lines="All" Text="4.3" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell101" Border.Lines="All" Text="Декларація  про доходи за попередній рік (для осіб на загальній системі оподаткування та для платників фіксованого податку) або звіти платника єдиного податку мінімум за попередні два квартали (для платників єдиного податку) з відміткою ДПІ про отримання" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row31" Height="36.78">
+          <TableCell Name="Cell102" Border.Lines="All" Text="4.4" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell103" Border.Lines="All" Text="Книга обліку доходів і витрат (для платників фіксованого податку – за наявності) не менше ніж за попередні 6 місяців" Font="Times New Roman, 10pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+  </ReportPage>
+</Report>

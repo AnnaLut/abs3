@@ -1,0 +1,427 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="04/15/2011 18:11:20" ReportInfo.Modified="06/20/2012 12:03:29" ReportInfo.CreatorVersion="1.7.1.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqD6nWZEExUJ9MEhdFZpB1A6ZfSeiTM+6WLeB8pW5aURqkGwhV134I2SUIQGUGXcXiZOw+ve6DY3PlI6vPxpt6fQ==">
+      <TableDataSource Name="BANK_NAME" DataType="System.Int32" Enabled="true" SelectCommand="select nvl( f_doc_attr('BANK_NAME', :p1, :p2), 'null') as VAL from dual">
+        <Column Name="VAL" DataType="System.String"/>
+        <CommandParameter Name="p1" DataType="113" Expression="[p_bid_id]" DefaultValue="-1"/>
+        <CommandParameter Name="p2" DataType="113" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="BRANCH_NAME" DataType="System.Int32" Enabled="true" SelectCommand="select nvl( f_doc_attr('BRANCH_NAME', :p1, :p2), 'null') as VAL from dual">
+        <Column Name="VAL" DataType="System.String"/>
+        <CommandParameter Name="p1" DataType="113" Expression="[p_bid_id]" DefaultValue="-1"/>
+        <CommandParameter Name="p2" DataType="113" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table2" Alias="WCS_BID_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select b.*,&#13;&#10;       case&#13;&#10;         when wcs_utl.get_answ(b.bid_id, 'CL_13') in (26, 27) then&#13;&#10;          wcs_utl.get_answ_refer_text(b.bid_id, 'CL_13') || ', ' ||&#13;&#10;          wcs_utl.get_answ(b.bid_id, 'CL_16')&#13;&#10;         else&#13;&#10;          'обл. ' || wcs_utl.get_answ_refer_text(b.bid_id, 'CL_13') || ', ' ||&#13;&#10;          decode(wcs_utl.has_answ(b.bid_id, 'CL_14'),&#13;&#10;                 1,&#13;&#10;                 'р. ' || wcs_utl.get_answ(b.bid_id, 'CL_14') || ', ',&#13;&#10;                 null) || decode(wcs_utl.has_answ(b.bid_id, 'CL_15'),&#13;&#10;                                 1,&#13;&#10;                                 wcs_utl.get_answ(b.bid_id, 'CL_15') || ', ',&#13;&#10;                                 null) ||&#13;&#10;          wcs_utl.get_answ(b.bid_id, 'CL_16')&#13;&#10;       end as adr&#13;&#10;  from v_wcs_bids b&#13;&#10; where b.bid_id = :p_bid_id">
+        <Column Name="BID_ID" DataType="System.Decimal"/>
+        <Column Name="SUBPRODUCT_ID" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_NAME" DataType="System.String"/>
+        <Column Name="CRT_DATE" DataType="System.DateTime"/>
+        <Column Name="F" DataType="System.String"/>
+        <Column Name="I" DataType="System.String"/>
+        <Column Name="O" DataType="System.String"/>
+        <Column Name="BDATE" DataType="System.DateTime"/>
+        <Column Name="INN" DataType="System.String"/>
+        <Column Name="SUMM" DataType="System.Decimal"/>
+        <Column Name="OWN_FUNDS" DataType="System.Decimal"/>
+        <Column Name="TERM" DataType="System.String"/>
+        <Column Name="CREDIT_CURRENCY" DataType="System.Decimal"/>
+        <Column Name="SINGLE_FEE" DataType="System.Decimal"/>
+        <Column Name="MONTHLY_FEE" DataType="System.Decimal"/>
+        <Column Name="INTEREST_RATE" DataType="System.Decimal"/>
+        <Column Name="REPAYMENT_METHOD" DataType="System.String"/>
+        <Column Name="REPAYMENT_DAY" DataType="System.Decimal"/>
+        <Column Name="GARANTEES" DataType="System.String"/>
+        <Column Name="MGR_ID" DataType="System.Decimal"/>
+        <Column Name="MGR_FIO" DataType="System.String"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="BRANCH_NAME" DataType="System.String"/>
+        <Column Name="STATES" DataType="System.String"/>
+        <Column Name="ADR" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_DESC" DataType="System.String"/>
+        <Column Name="REPAYMENT_METHOD_TEXT" DataType="System.String"/>
+        <CommandParameter Name="p_bid_id" DataType="107" Expression="[p_bid_id]" DefaultValue="-1"/>
+      </TableDataSource>
+      <TableDataSource Name="Table4" Alias="WCS_BID_GARANTEES" DataType="System.Int32" Enabled="true" SelectCommand="select rownum as rn,&#13;&#10;       bg.bid_id,&#13;&#10;       bg.garantee_id,&#13;&#10;       bg.garantee_name,&#13;&#10;       bg.garantee_num,&#13;&#10;       bg.ws_id,&#13;&#10;       bg.type_obu_id,&#13;&#10;       bg.type_obu_name,&#13;&#10;       bg.subj_obu_id,&#13;&#10;       bg.subj_obu_name,&#13;&#10;       bg.grt_name,&#13;&#10;       bg.grt_cost,&#13;&#10;       decode(bg.garantee_id,&#13;&#10;              'VEHICLE',&#13;&#10;              wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                                    'GRT_3_14',&#13;&#10;                                    bg.ws_id,&#13;&#10;                                    bg.garantee_num),&#13;&#10;              wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                                    'GRT_4_6',&#13;&#10;                                    bg.ws_id,&#13;&#10;                                    bg.garantee_num)) as adr,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                             'GRT_2_7',&#13;&#10;                             bg.ws_id,&#13;&#10;                             bg.garantee_num) as full_name,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                             'IQ_CONCL_ASSETS_S_Q2_' || rownum,&#13;&#10;                             w.id,&#13;&#10;                             0) as Q2,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                             'IQ_CONCL_ASSETS_S_Q3_' || rownum,&#13;&#10;                             w.id,&#13;&#10;                             0) as Q3,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                             'IQ_CONCL_ASSETS_S_Q5_' || rownum,&#13;&#10;                             w.id,&#13;&#10;                             0) as Q5,&#13;&#10;       wcs_utl.get_answ_date(bg.bid_id,&#13;&#10;                             'IQ_CONCL_ASSETS_S_Q6_' || rownum,&#13;&#10;                             w.id,&#13;&#10;                             0) as Q6,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                             'IQ_CONCL_ASSETS_S_Q7_' || rownum,&#13;&#10;                             w.id,&#13;&#10;                             0) as Q7,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                             'IQ_CONCL_ASSETS_S_Q8_0_' || rownum,&#13;&#10;                             w.id,&#13;&#10;                             0) as Q8_0,&#13;&#10;       wcs_utl.get_answ_date(bg.bid_id,&#13;&#10;                             'IQ_CONCL_ASSETS_S_Q8_1_' || rownum,&#13;&#10;                             w.id,&#13;&#10;                             0) as Q8_1,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                             'IQ_CONCL_ASSETS_S_Q8_3_' || rownum,&#13;&#10;                             w.id,&#13;&#10;                             0) as Q8_3,&#13;&#10;       wcs_utl.get_answ_decimal(bg.bid_id,&#13;&#10;                                'IQ_CONCL_ASSETS_S_Q8_4_' || rownum,&#13;&#10;                                w.id,&#13;&#10;                                0) as Q8_4,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                             'IQ_CONCL_ASSETS_S_Q8_' || rownum,&#13;&#10;                             w.id,&#13;&#10;                             0) as Q8,&#13;&#10;       decode(wcs_utl.get_answ(bg.bid_id,&#13;&#10;                               'GRT_0',&#13;&#10;                               bg.ws_id,&#13;&#10;                               bg.garantee_num),&#13;&#10;              '1',&#13;&#10;              wcs_utl.get_answ(bg.bid_id, 'CL_1') || ' ' ||&#13;&#10;              wcs_utl.get_answ(bg.bid_id, 'CL_2') || ' ' ||&#13;&#10;              wcs_utl.get_answ(bg.bid_id, 'CL_3'),&#13;&#10;              wcs_utl.get_answ(bg.bid_id, 'CL_1', bg.ws_id, bg.garantee_num) || ' ' ||&#13;&#10;              wcs_utl.get_answ(bg.bid_id, 'CL_2', bg.ws_id, bg.garantee_num) || ' ' ||&#13;&#10;              wcs_utl.get_answ(bg.bid_id, 'CL_3', bg.ws_id, bg.garantee_num)) as owner_fio,&#13;&#10;       gg.group_id,&#13;&#10;       gg.group_name,&#13;&#10;       gt.kv,&#13;&#10;       gt.tp,&#13;&#10;       gt.kl,&#13;&#10;       gt.kz,&#13;&#10;       gt.kn,&#13;&#10;       round(1 * (1 + gt.kv) * power(1 + gt.kz * gt.tp / 12, 2) /&#13;&#10;             (gt.kl * gt.kn *&#13;&#10;             (1 +&#13;&#10;             gt.kz *&#13;&#10;             to_number(wcs_utl.get_creditdata(bg.bid_id, 'CREDIT_TERM')) / 12)),&#13;&#10;             2) as kr,&#13;&#10;       round(bg.grt_cost /&#13;&#10;             round(1 * (1 + gt.kv) * power(1 + gt.kz * gt.tp / 12, 2) /&#13;&#10;                   (gt.kl * gt.kn * (1 +&#13;&#10;                   gt.kz *&#13;&#10;                   to_number(wcs_utl.get_creditdata(bg.bid_id,&#13;&#10;                                                                      'CREDIT_TERM')) / 12)),&#13;&#10;                   2),&#13;&#10;             2) as ki&#13;&#10;  from v_wcs_bid_garantees bg,&#13;&#10;       grt_types           gt,&#13;&#10;       grt_groups          gg,&#13;&#10;       wcs_workspaces      w&#13;&#10; where bg.bid_id = :p_bid_id&#13;&#10;   and bg.garantee_id != 'GUARANTOR'&#13;&#10;   and bg.type_obu_id = gt.type_id&#13;&#10;   and gt.group_id = gg.group_id&#13;&#10;   and w.id = :p_ws_id&#13;&#10; order by bg.garantee_id, bg.garantee_num">
+        <Column Name="BID_ID" DataType="System.Decimal"/>
+        <Column Name="GARANTEE_ID" DataType="System.String"/>
+        <Column Name="GARANTEE_NAME" DataType="System.String"/>
+        <Column Name="GARANTEE_NUM" DataType="System.Decimal"/>
+        <Column Name="WS_ID" DataType="System.String"/>
+        <Column Name="TYPE_OBU_ID" DataType="System.String"/>
+        <Column Name="TYPE_OBU_NAME" DataType="System.String"/>
+        <Column Name="GRT_NAME" DataType="System.String"/>
+        <Column Name="GRT_COST" DataType="System.Decimal"/>
+        <Column Name="GARANTEE_NO" DataType="System.Decimal" PropName="Column" Calculated="true" Expression="[WCS_BID_GARANTEES.GARANTEE_NUM] + 1"/>
+        <Column Name="ADR" DataType="System.String"/>
+        <Column Name="FULL_NAME" DataType="System.String"/>
+        <Column Name="Q2" DataType="System.String"/>
+        <Column Name="Q3" DataType="System.String"/>
+        <Column Name="Q5" DataType="System.String"/>
+        <Column Name="Q6" DataType="System.DateTime"/>
+        <Column Name="Q7" DataType="System.String"/>
+        <Column Name="Q8" DataType="System.String"/>
+        <Column Name="RN" DataType="System.Decimal"/>
+        <Column Name="SUBJ_OBU_ID" DataType="System.String"/>
+        <Column Name="SUBJ_OBU_NAME" DataType="System.String"/>
+        <Column Name="Q8_0" DataType="System.String"/>
+        <Column Name="Q8_1" DataType="System.DateTime"/>
+        <Column Name="Q8_3" DataType="System.String"/>
+        <Column Name="Q8_4" DataType="System.Decimal"/>
+        <Column Name="OWNER_FIO" DataType="System.String"/>
+        <Column Name="GROUP_ID" DataType="System.Int16"/>
+        <Column Name="GROUP_NAME" DataType="System.String"/>
+        <Column Name="KV" DataType="System.Decimal"/>
+        <Column Name="TP" DataType="System.Decimal"/>
+        <Column Name="KL" DataType="System.Decimal"/>
+        <Column Name="KZ" DataType="System.Decimal"/>
+        <Column Name="KN" DataType="System.Decimal"/>
+        <Column Name="KR" DataType="System.Decimal"/>
+        <Column Name="KI" DataType="System.Decimal"/>
+        <CommandParameter Name="p_bid_id" DataType="107" Expression="[p_bid_id]" DefaultValue="-1"/>
+        <CommandParameter Name="p_ws_id" DataType="126" Expression="[p_ws_id]" DefaultValue="&quot;MAIN&quot;"/>
+      </TableDataSource>
+      <TableDataSource Name="Table" Alias="WCS_IQ_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q1', w.id, 0) as Q1,&#13;&#10;       wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q2_1', w.id, 0) as Q2_1,&#13;&#10;       wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q3_1', w.id, 0) as Q3_1,&#13;&#10;       wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q2_2', w.id, 0) as Q2_2,&#13;&#10;       wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q3_2', w.id, 0) as Q3_2,&#13;&#10;       wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q2_3', w.id, 0) as Q2_3,&#13;&#10;       wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q3_3', w.id, 0) as Q3_3,&#13;&#10;       wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q4', w.id, 0) as Q4,&#13;&#10;       wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q5_1', w.id, 0) as Q5_1,&#13;&#10;       wcs_utl.get_answ_date(b.id, 'IQ_CONCL_ASSETS_S_Q6_1', w.id, 0) as Q6_1,&#13;&#10;       wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q7_1', w.id, 0) as Q7_1,&#13;&#10;       wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q5_2', w.id, 0) as Q5_2,&#13;&#10;       wcs_utl.get_answ_date(b.id, 'IQ_CONCL_ASSETS_S_Q6_2', w.id, 0) as Q6_2,&#13;&#10;       wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q7_2', w.id, 0) as Q7_2,&#13;&#10;       wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q5_3', w.id, 0) as Q5_3,&#13;&#10;       wcs_utl.get_answ_date(b.id, 'IQ_CONCL_ASSETS_S_Q6_3', w.id, 0) as Q6_3,&#13;&#10;       wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q7_3', w.id, 0) as Q7_3,&#13;&#10;       wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q8_0_1', w.id, 0) as Q8_0_1,&#13;&#10;       wcs_utl.get_answ_date(b.id, 'IQ_CONCL_ASSETS_S_Q8_1_1', w.id, 0) as Q8_1_1,&#13;&#10;       wcs_utl.get_answ_decimal(b.id, 'IQ_CONCL_ASSETS_S_Q8_2_1', w.id, 0) as Q8_2_1,&#13;&#10;       wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q8_3_1', w.id, 0) as Q8_3_1,&#13;&#10;       wcs_utl.get_answ_decimal(b.id, 'IQ_CONCL_ASSETS_S_Q8_4_1', w.id, 0) as Q8_4_1,&#13;&#10;       wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q8_1', w.id, 0) as Q8_1,&#13;&#10;       wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q8_0_2', w.id, 0) as Q8_0_2,&#13;&#10;       wcs_utl.get_answ_date(b.id, 'IQ_CONCL_ASSETS_S_Q8_1_2', w.id, 0) as Q8_1_2,&#13;&#10;       wcs_utl.get_answ_decimal(b.id, 'IQ_CONCL_ASSETS_S_Q8_2_2', w.id, 0) as Q8_2_2,&#13;&#10;       wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q8_3_2', w.id, 0) as Q8_3_2,&#13;&#10;       wcs_utl.get_answ_decimal(b.id, 'IQ_CONCL_ASSETS_S_Q8_4_2', w.id, 0) as Q8_4_2,&#13;&#10;       wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q8_2', w.id, 0) as Q8_2,&#13;&#10;       wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q8_0_3', w.id, 0) as Q8_0_3,&#13;&#10;       wcs_utl.get_answ_date(b.id, 'IQ_CONCL_ASSETS_S_Q8_1_3', w.id, 0) as Q8_1_3,&#13;&#10;       wcs_utl.get_answ_decimal(b.id, 'IQ_CONCL_ASSETS_S_Q8_2_3', w.id, 0) as Q8_2_3,&#13;&#10;       wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q8_3_3', w.id, 0) as Q8_3_3,&#13;&#10;       wcs_utl.get_answ_decimal(b.id, 'IQ_CONCL_ASSETS_S_Q8_4_3', w.id, 0) as Q8_4_3,&#13;&#10;       wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q8_3', w.id, 0) as Q8_3,&#13;&#10;       wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q9', w.id, 0) as Q9,&#13;&#10;       wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q10', w.id, 0) as Q10,&#13;&#10;       wcs_utl.get_answ_list(b.id, 'IQ_CONCL_ASSETS_S_Q11_1', w.id, 0) as Q11_1,&#13;&#10;       wcs_utl.get_answ_list_text(b.id, 'IQ_CONCL_ASSETS_S_Q11_1', w.id, 0) as Q11_1_text,&#13;&#10;       wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q11', w.id, 0) as Q11,&#13;&#10;       wcs_utl.get_answ_list(b.id, 'IQ_CONCL_ASSETS_S_Q13_1', w.id, 0) as Q13_1,&#13;&#10;       wcs_utl.get_answ_list_text(b.id, 'IQ_CONCL_ASSETS_S_Q13_1', w.id, 0) as Q13_1_text,&#13;&#10;       wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q13', w.id, 0) as Q13,&#13;&#10;       wcs_utl.get_answ_list(b.id, 'IQ_CONCL_ASSETS_S_Q14_1', w.id, 0) as Q14_1,&#13;&#10;       wcs_utl.get_answ_list_text(b.id, 'IQ_CONCL_ASSETS_S_Q14_1', w.id, 0) as Q14_1_text,&#13;&#10;       wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q14', w.id, 0) as Q14,&#13;&#10;       wcs_utl.get_answ_list(b.id, 'IQ_CONCL_ASSETS_S_Q15_1', w.id, 0) as Q15_1,&#13;&#10;       wcs_utl.get_answ_list_text(b.id, 'IQ_CONCL_ASSETS_S_Q15_1', w.id, 0) as Q15_1_text,&#13;&#10;       wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q15', w.id, 0) as Q15,&#13;&#10;       wcs_utl.get_answ_list(b.id, 'IQ_CONCL_ASSETS_S_Q16_1', w.id, 0) as Q16_1,&#13;&#10;       wcs_utl.get_answ_list_text(b.id, 'IQ_CONCL_ASSETS_S_Q16_1', w.id, 0) as Q16_1_text,&#13;&#10;       wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q16', w.id, 0) as Q16,&#13;&#10;       wcs_utl.get_answ_list(b.id, 'IQ_CONCL_ASSETS_S_Q17_1', w.id, 0) as Q17_1,&#13;&#10;       wcs_utl.get_answ_list_text(b.id, 'IQ_CONCL_ASSETS_S_Q17_1', w.id, 0) as Q17_1_text,&#13;&#10;       wcs_utl.get_answ_list(b.id, 'IQ_CONCL_ASSETS_S_Q18_1', w.id, 0) as Q18_1,&#13;&#10;       wcs_utl.get_answ_list_text(b.id, 'IQ_CONCL_ASSETS_S_Q18_1', w.id, 0) as Q18_1_text,&#13;&#10;       wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q18', w.id, 0) as Q18,&#13;&#10;       wcs_utl.get_answ_list(b.id, 'IQ_CONCL_ASSETS_S_Q19_1', w.id, 0) as Q19_1,&#13;&#10;       wcs_utl.get_answ_list_text(b.id, 'IQ_CONCL_ASSETS_S_Q19_1', w.id, 0) as Q19_1_text,&#13;&#10;       wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q19', w.id, 0) as Q19,&#13;&#10;       wcs_utl.get_answ_list(b.id, 'IQ_CONCL_ASSETS_S_Q20', w.id, 0) as Q20,&#13;&#10;       wcs_utl.get_answ_list_text(b.id, 'IQ_CONCL_ASSETS_S_Q20', w.id, 0) as Q20_text,&#13;&#10;       wcs_utl.get_answ_list(b.id, 'IQ_CONCL_ASSETS_S_Q12_1', w.id, 0) as Q12_1,&#13;&#10;       wcs_utl.get_answ_list_text(b.id, 'IQ_CONCL_ASSETS_S_Q12_1', w.id, 0) as Q12_1_text,&#13;&#10;       wcs_utl.get_answ(b.id, 'IQ_CONCL_ASSETS_S_Q12', w.id, 0) as Q12,&#13;&#10;       (select dbms_lob.substr(wm_concat(bg.subj_obu_name), 4000, 1)&#13;&#10;          from v_wcs_bid_garantees bg&#13;&#10;         where bg.bid_id = b.id&#13;&#10;           and bg.garantee_id != 'GUARANTOR') as grt_names,&#13;&#10;       (select decode(sum(wcs_utl.has_answ(b.id,&#13;&#10;                                           'IQ_CONCL_ASSETS_S_Q8_' || rownum,&#13;&#10;                                           w.id,&#13;&#10;                                           0)),&#13;&#10;                      0,&#13;&#10;                      1)&#13;&#10;          from v_wcs_bid_garantees bg&#13;&#10;         where bg.bid_id = b.id&#13;&#10;           and bg.garantee_id != 'GUARANTOR') as has_Q8,&#13;&#10;       (select dbms_lob.substr(wm_concat('№' || rownum || ': ' ||&#13;&#10;                       wcs_utl.get_answ(b.id,&#13;&#10;                                        'IQ_CONCL_ASSETS_S_Q8_' || rownum,&#13;&#10;                                        w.id,&#13;&#10;                                        0)), 4000, 1)&#13;&#10;          from v_wcs_bid_garantees bg&#13;&#10;         where bg.bid_id = b.id&#13;&#10;           and bg.garantee_id != 'GUARANTOR') as Q8,&#13;&#10;       (select sum(wcs_utl.get_answ_decimal(b.id,&#13;&#10;                                            'IQ_CONCL_ASSETS_S_Q8_4_' ||&#13;&#10;                                            rownum,&#13;&#10;                                            w.id,&#13;&#10;                                            0))&#13;&#10;          from v_wcs_bid_garantees bg&#13;&#10;         where bg.bid_id = b.id&#13;&#10;           and bg.garantee_id != 'GUARANTOR') as Q8_4&#13;&#10;  from wcs_bids b, wcs_workspaces w&#13;&#10; where b.id = :p_bid_id&#13;&#10;   and w.id = :p_ws_id">
+        <Column Name="Q1" DataType="System.String"/>
+        <Column Name="Q4" DataType="System.String"/>
+        <Column Name="Q9" DataType="System.String"/>
+        <Column Name="Q10" DataType="System.String"/>
+        <Column Name="Q11" DataType="System.String"/>
+        <Column Name="Q12" DataType="System.String"/>
+        <Column Name="Q2_1" DataType="System.String"/>
+        <Column Name="Q3_1" DataType="System.String"/>
+        <Column Name="Q2_2" DataType="System.String"/>
+        <Column Name="Q3_2" DataType="System.String"/>
+        <Column Name="Q2_3" DataType="System.String"/>
+        <Column Name="Q3_3" DataType="System.String"/>
+        <Column Name="Q5_1" DataType="System.String"/>
+        <Column Name="Q6_1" DataType="System.DateTime"/>
+        <Column Name="Q7_1" DataType="System.String"/>
+        <Column Name="Q5_2" DataType="System.String"/>
+        <Column Name="Q6_2" DataType="System.DateTime"/>
+        <Column Name="Q7_2" DataType="System.String"/>
+        <Column Name="Q5_3" DataType="System.String"/>
+        <Column Name="Q6_3" DataType="System.DateTime"/>
+        <Column Name="Q7_3" DataType="System.String"/>
+        <Column Name="Q8_0_1" DataType="System.String"/>
+        <Column Name="Q8_1_1" DataType="System.DateTime"/>
+        <Column Name="Q8_2_1" DataType="System.Decimal"/>
+        <Column Name="Q8_3_1" DataType="System.String"/>
+        <Column Name="Q8_4_1" DataType="System.Decimal"/>
+        <Column Name="Q8_1" DataType="System.String"/>
+        <Column Name="Q8_0_2" DataType="System.String"/>
+        <Column Name="Q8_1_2" DataType="System.DateTime"/>
+        <Column Name="Q8_2_2" DataType="System.Decimal"/>
+        <Column Name="Q8_3_2" DataType="System.String"/>
+        <Column Name="Q8_4_2" DataType="System.Decimal"/>
+        <Column Name="Q8_2" DataType="System.String"/>
+        <Column Name="Q8_0_3" DataType="System.String"/>
+        <Column Name="Q8_1_3" DataType="System.DateTime"/>
+        <Column Name="Q8_2_3" DataType="System.Decimal"/>
+        <Column Name="Q8_3_3" DataType="System.String"/>
+        <Column Name="Q8_4_3" DataType="System.Decimal"/>
+        <Column Name="Q8_3" DataType="System.String"/>
+        <Column Name="Q11_1" DataType="System.Decimal"/>
+        <Column Name="Q11_1_TEXT" DataType="System.String"/>
+        <Column Name="Q13_1" DataType="System.Decimal"/>
+        <Column Name="Q13_1_TEXT" DataType="System.String"/>
+        <Column Name="Q13" DataType="System.String"/>
+        <Column Name="Q14_1" DataType="System.Decimal"/>
+        <Column Name="Q14_1_TEXT" DataType="System.String"/>
+        <Column Name="Q14" DataType="System.String"/>
+        <Column Name="Q15_1" DataType="System.Decimal"/>
+        <Column Name="Q15_1_TEXT" DataType="System.String"/>
+        <Column Name="Q15" DataType="System.String"/>
+        <Column Name="Q16_1" DataType="System.Decimal"/>
+        <Column Name="Q16_1_TEXT" DataType="System.String"/>
+        <Column Name="Q16" DataType="System.String"/>
+        <Column Name="Q17_1" DataType="System.Decimal"/>
+        <Column Name="Q17_1_TEXT" DataType="System.String"/>
+        <Column Name="Q18_1" DataType="System.Decimal"/>
+        <Column Name="Q18_1_TEXT" DataType="System.String"/>
+        <Column Name="Q18" DataType="System.String"/>
+        <Column Name="Q19_1" DataType="System.Decimal"/>
+        <Column Name="Q19_1_TEXT" DataType="System.String"/>
+        <Column Name="Q19" DataType="System.String"/>
+        <Column Name="Q20" DataType="System.Decimal"/>
+        <Column Name="Q20_TEXT" DataType="System.String"/>
+        <Column Name="Q12_1" DataType="System.Decimal"/>
+        <Column Name="Q12_1_TEXT" DataType="System.String"/>
+        <Column Name="GRT_NAMES" DataType="System.String"/>
+        <Column Name="HAS_Q8" DataType="System.Decimal"/>
+        <Column Name="Q8" DataType="System.String"/>
+        <Column Name="Q8_4" DataType="System.Decimal"/>
+        <CommandParameter Name="p_bid_id" DataType="107" Expression="[p_bid_id]" DefaultValue="-1"/>
+        <CommandParameter Name="p_ws_id" DataType="126" Expression="[p_ws_id]" DefaultValue="&quot;MAIN&quot;"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_bid_id" DataType="System.Decimal" Expression="103764"/>
+    <Parameter Name="p_ws_id" DataType="System.String" Expression="&quot;MAIN&quot;"/>
+    <Parameter Name="p_ws_number" DataType="System.Decimal" Expression="0"/>
+    <Total Name="Total1" Expression="[WCS_BID_GARANTEES.GRT_COST]" Evaluator="d1" PrintOn="df1"/>
+    <Total Name="Total2" Expression="[WCS_BID_GARANTEES.GRT_COST]" Evaluator="d4" PrintOn="df4"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <DataBand Name="BndMain1" Width="718.2" Height="538.65" CanGrow="true">
+      <TextObject Name="Text2" Left="18.9" Top="292.95" Width="661.5" Height="47.25" Text="щодо забезпечення по кредитній заявці №[WCS_BID_DATA.BID_ID]&#13;&#10;([BRANCH_NAME.VAL])" Font="Arial, 10pt, style=Italic"/>
+      <TextObject Name="Text3" Left="18.9" Top="340.2" Width="661.5" Height="18.9" Text="1. Основні дані  про позичальника і кредит" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TableObject Name="Table1" Left="18.9" Top="359.1" Width="663.39" Height="170.1" Border.Lines="All">
+        <TableColumn Name="Column1" Width="37.8"/>
+        <TableColumn Name="Column2" Width="285.39"/>
+        <TableColumn Name="Column3" Width="28.35"/>
+        <TableColumn Name="Column4" Width="28.35"/>
+        <TableColumn Name="Column5" Width="283.5"/>
+        <TableRow Name="Row1" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell1" Border.Lines="All" Text="1.1." HorzAlign="Center"/>
+          <TableCell Name="Cell2" Border.Lines="All" Text="Назва позичальника, код ЄДРПОУ / ПІБ фізичної особи"/>
+          <TableCell Name="Cell3" Border.Lines="All" Text="[WCS_BID_DATA.F] [WCS_BID_DATA.I] [WCS_BID_DATA.O], [WCS_BID_DATA.INN]" Font="Arial, 10pt, style=Bold" ColSpan="3"/>
+          <TableCell Name="Cell4" Border.Lines="All"/>
+          <TableCell Name="Cell5" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row2" AutoSize="true">
+          <TableCell Name="Cell6" Border.Lines="All" Text="1.2." HorzAlign="Center"/>
+          <TableCell Name="Cell7" Border.Lines="All" Text="Вид кредиту"/>
+          <TableCell Name="Cell8" Border.Lines="All" Text="[WCS_BID_DATA.SUBPRODUCT_NAME]" Font="Arial, 10pt, style=Bold" ColSpan="3"/>
+          <TableCell Name="Cell9" Border.Lines="All" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell10" Border.Lines="All" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row3" AutoSize="true">
+          <TableCell Name="Cell11" Border.Lines="All" Text="1.3." HorzAlign="Center"/>
+          <TableCell Name="Cell12" Border.Lines="All" Text="Ліміт кредитування, грн., % ставка"/>
+          <TableCell Name="Cell13" Border.Lines="All" Text="[FormatNumber([WCS_BID_DATA.SUMM],2)] ([WCS_BID_DATA.CREDIT_CURRENCY])" Font="Arial, 10pt, style=Bold" ColSpan="3"/>
+          <TableCell Name="Cell14" Border.Lines="All" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell15" Border.Lines="All" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row4" AutoSize="true">
+          <TableCell Name="Cell16" Border.Lines="All" Text="1.4." HorzAlign="Center"/>
+          <TableCell Name="Cell17" Border.Lines="All" Text="Термін дії договору"/>
+          <TableCell Name="Cell18" Border.Lines="All" Text="[WCS_BID_DATA.TERM] (міс.)" Font="Arial, 10pt, style=Bold" ColSpan="3"/>
+          <TableCell Name="Cell19" Border.Lines="All" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell20" Border.Lines="All" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row5" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell21" Border.Lines="All" Text="1.5." HorzAlign="Center"/>
+          <TableCell Name="Cell22" Border.Lines="All" Text="Керівник підприємства/ ПІБ фізичної особи"/>
+          <TableCell Name="Cell23" Border.Lines="All" Text="[WCS_BID_DATA.F] [WCS_BID_DATA.I] [WCS_BID_DATA.O]" Font="Arial, 10pt, style=Bold" ColSpan="3"/>
+          <TableCell Name="Cell24" Border.Lines="All" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell25" Border.Lines="All" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row6" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell26" Border.Lines="All" Text="1.6." HorzAlign="Center"/>
+          <TableCell Name="Cell27" Border.Lines="All" Text="Юридична адреса/фактична адреса позичальника"/>
+          <TableCell Name="Cell28" Border.Lines="All" Text="[WCS_BID_DATA.ADR]" Font="Arial, 10pt, style=Bold" ColSpan="3"/>
+          <TableCell Name="Cell29" Border.Lines="All"/>
+          <TableCell Name="Cell30" Border.Lines="All"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text10" Left="18.9" Top="66.15" Width="661.5" Height="28.35" Text="Банківська таємниця" HorzAlign="Right" Font="Arial, 10pt, style=Bold"/>
+      <PictureObject Name="Picture1" Left="311.85" Top="18.9" Width="75.6" Height="47.25" Image="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"/>
+      <TextObject Name="Text11" Left="18.9" Top="94.5" Width="661.5" Height="28.35" Text="ДЕРЖАВНИЙ ОЩАДНИЙ БАНК УКРАЇНИ" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text12" Left="18.9" Top="122.85" Width="661.5" Height="18.9" Text="                 _________________________________________________________________________________" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text13" Left="18.9" Top="141.75" Width="661.5" Height="18.9" Border.Lines="Bottom" Border.Style="Double" Text="(назва підрозділу - служби по роботі з проблемними активами, що готував висновок)*" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text1" Left="18.9" Top="160.65" Width="349.65" Height="75.6" Text="вих.№__________  від ___.___.20__ р.&#13;&#10;&#13;&#10;на №___________  від ___.___.20__р.&#13;&#10;" HorzAlign="Center" VertAlign="Bottom"/>
+      <TextObject Name="Text14" Left="18.9" Top="207.9" Width="661.5" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text15" Left="18.9" Top="236.25" Width="661.5" Height="56.7" Text="ВИСНОВОК" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text16" Left="368.55" Top="160.65" Width="311.85" Height="75.6" Text="Кому: ________________________________&#13;&#10;&#13;&#10;_____________________________________&#13;&#10;" HorzAlign="Center" VertAlign="Bottom"/>
+      <DataBand Name="d1" Top="613.13" Width="718.2" Height="56.7" CanGrow="true" DataSource="Table4">
+        <TableObject Name="Table3" Left="18.9" Width="661.5" Height="56.7">
+          <TableColumn Name="Column6" Width="28.35"/>
+          <TableColumn Name="Column7" Width="170.1"/>
+          <TableColumn Name="Column8" Width="160.65"/>
+          <TableColumn Name="Column9" Width="179.55"/>
+          <TableColumn Name="Column10" Width="122.85"/>
+          <TableRow Name="Row8" Height="56.7" AutoSize="true">
+            <TableCell Name="Cell36" Border.Lines="All" Text="2.[WCS_BID_GARANTEES.RN]"/>
+            <TableCell Name="Cell37" Border.Lines="All" Text="[WCS_BID_GARANTEES.OWNER_FIO]/[WCS_BID_GARANTEES.GROUP_NAME]"/>
+            <TableCell Name="Cell38" Border.Lines="All" Text="[WCS_BID_GARANTEES.ADR]"/>
+            <TableCell Name="Cell39" Border.Lines="All" Text="[WCS_BID_GARANTEES.FULL_NAME]"/>
+            <TableCell Name="Cell40" Border.Lines="All" Text="[FormatNumber([WCS_BID_GARANTEES.GRT_COST],2)]" HorzAlign="Right"/>
+          </TableRow>
+        </TableObject>
+        <DataHeaderBand Name="dh1" Top="542.82" Width="718.2" Height="66.15">
+          <TableObject Name="Table5" Left="18.9" Top="18.9" Width="661.5" Height="47.25">
+            <TableColumn Name="Column11" Width="28.35"/>
+            <TableColumn Name="Column12" Width="170.1"/>
+            <TableColumn Name="Column13" Width="160.65"/>
+            <TableColumn Name="Column14" Width="179.55"/>
+            <TableColumn Name="Column15" Width="122.85"/>
+            <TableRow Name="Row9" Height="47.25">
+              <TableCell Name="Cell41" Border.Lines="All" Text="№" HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell42" Border.Lines="All" Text="Заставодавець/Предмет застави" HorzAlign="Center"/>
+              <TableCell Name="Cell43" Border.Lines="All" Text="Адреса місцезнаходження застави" HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell44" Border.Lines="All" Text="Інформація про предмет застави" HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell45" Border.Lines="All" Text="Вартість згідно оцінки, грн." HorzAlign="Center" VertAlign="Center"/>
+            </TableRow>
+          </TableObject>
+          <TextObject Name="Text4" Left="18.9" Width="661.5" Height="18.9" Text="2. Запропоноване в заставу майно" VertAlign="Bottom" Font="Arial, 10pt, style=Bold"/>
+        </DataHeaderBand>
+        <DataFooterBand Name="df1" Top="674" Width="718.2" Height="18.9">
+          <TableObject Name="Table6" Left="18.9" Width="661.5" Height="18.9">
+            <TableColumn Name="Column16" Width="28.35"/>
+            <TableColumn Name="Column17" Width="170.1"/>
+            <TableColumn Name="Column18" Width="160.65"/>
+            <TableColumn Name="Column19" Width="179.55"/>
+            <TableColumn Name="Column20" Width="122.85"/>
+            <TableRow Name="Row10">
+              <TableCell Name="Cell46" Border.Lines="All"/>
+              <TableCell Name="Cell47" Border.Lines="All" Text="Всього" Font="Arial, 10pt, style=Bold"/>
+              <TableCell Name="Cell48" Border.Lines="All"/>
+              <TableCell Name="Cell49" Border.Lines="All"/>
+              <TableCell Name="Cell50" Border.Lines="All" Text="[FormatNumber([Total1],2)]" HorzAlign="Right"/>
+            </TableRow>
+          </TableObject>
+        </DataFooterBand>
+      </DataBand>
+    </DataBand>
+    <DataBand Name="BndMain2" Top="697.07" Width="718.2" Height="47.25">
+      <TextObject Name="Text5" Left="18.9" Width="661.5" Height="28.35" Text="Зауваження: [WCS_IQ_DATA.Q1]" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <DataBand Name="d2" Top="818.8" Width="718.2" Height="56.7" CanGrow="true" DataSource="Table4">
+        <TableObject Name="Table1" Left="18.9" Width="661.46" Height="56.7">
+          <TableColumn Name="Column25" Width="28.34"/>
+          <TableColumn Name="Column26" Width="132.29"/>
+          <TableColumn Name="Column27" Width="264.59"/>
+          <TableColumn Name="Column28" Width="236.24"/>
+          <TableRow Name="Row12" Height="56.7" AutoSize="true">
+            <TableCell Name="Cell55" Border.Lines="All" Text="3.[WCS_BID_GARANTEES.RN]"/>
+            <TableCell Name="Cell56" Border.Lines="All" Text="[WCS_BID_GARANTEES.GROUP_NAME]/[WCS_BID_GARANTEES.SUBJ_OBU_NAME]"/>
+            <TableCell Name="Cell57" Border.Lines="All" Text="[WCS_BID_GARANTEES.Q2]"/>
+            <TableCell Name="Cell58" Border.Lines="All" Text="[WCS_BID_GARANTEES.Q3]"/>
+          </TableRow>
+        </TableObject>
+        <DataHeaderBand Name="dh2" Top="748.48" Width="718.2" Height="66.15">
+          <TableObject Name="Table1" Left="18.9" Top="18.9" Width="661.46" Height="47.25">
+            <TableColumn Name="Column21" Width="28.34"/>
+            <TableColumn Name="Column22" Width="132.29"/>
+            <TableColumn Name="Column23" Width="264.59"/>
+            <TableColumn Name="Column24" Width="236.24"/>
+            <TableRow Name="Row11" Height="47.25">
+              <TableCell Name="Cell51" Border.Lines="All" Text="№" HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell52" Border.Lines="All" Text="Предмет застави" HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell53" Border.Lines="All" Text="Надані документи (вид документу, №, дата, найменування)" HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell54" Border.Lines="All" Text="Зауваження до документів" HorzAlign="Center" VertAlign="Center"/>
+            </TableRow>
+          </TableObject>
+          <TextObject Name="Text6" Left="18.9" Width="661.5" Height="18.9" Text="3. Перелік наданих документів" Font="Arial, 10pt, style=Bold"/>
+        </DataHeaderBand>
+      </DataBand>
+    </DataBand>
+    <DataBand Name="BndMain3" Top="879.67" Width="718.2" Height="66.15">
+      <TextObject Name="Text7" Left="18.9" Width="661.5" Height="28.35" Text="Зауваження: [WCS_IQ_DATA.Q4]" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <DataBand Name="d3" Top="1010.85" Width="718.2" Height="67.15" CanGrow="true" DataSource="Table4">
+        <TableObject Name="Table1" Left="18.9" Width="661.46" Height="57.7">
+          <TableColumn Name="Column34" Width="28.34"/>
+          <TableColumn Name="Column35" Width="132.29"/>
+          <TableColumn Name="Column36" Width="151.19"/>
+          <TableColumn Name="Column37" Width="103.94"/>
+          <TableColumn Name="Column38" Width="245.7"/>
+          <TableRow Name="Row14" Height="57.7" AutoSize="true">
+            <TableCell Name="Cell64" Border.Lines="All" Text="4.[WCS_BID_GARANTEES.RN]"/>
+            <TableCell Name="Cell65" Border.Lines="All" Text="[WCS_BID_GARANTEES.GROUP_NAME]/[WCS_BID_GARANTEES.SUBJ_OBU_NAME]"/>
+            <TableCell Name="Cell66" Border.Lines="All" Text="[WCS_BID_GARANTEES.Q5]"/>
+            <TableCell Name="Cell67" Border.Lines="All" Text="[FormatDateTime([WCS_BID_GARANTEES.Q6],&quot;Short Date&quot;)]" HorzAlign="Center"/>
+            <TableCell Name="Cell68" Border.Lines="All" Text="[WCS_BID_GARANTEES.Q7]"/>
+          </TableRow>
+        </TableObject>
+        <DataHeaderBand Name="dh3" Top="949.98" Width="718.2" Height="56.7">
+          <TableObject Name="Table1" Left="18.9" Top="18.9" Width="661.46" Height="37.8">
+            <TableColumn Name="Column29" Width="28.34"/>
+            <TableColumn Name="Column30" Width="132.29"/>
+            <TableColumn Name="Column31" Width="151.19"/>
+            <TableColumn Name="Column32" Width="103.94"/>
+            <TableColumn Name="Column33" Width="245.7"/>
+            <TableRow Name="Row13" Height="37.8">
+              <TableCell Name="Cell59" Border.Lines="All" Text="№" HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell60" Border.Lines="All" Text="Предмет застави" HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell61" Border.Lines="All" Text="Назва комісії" HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell62" Border.Lines="All" Text="Дата перевірки" HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell63" Border.Lines="All" Text="Результат перевірки" HorzAlign="Center" VertAlign="Center"/>
+            </TableRow>
+          </TableObject>
+          <TextObject Name="Text8" Left="18.9" Width="661.5" Height="18.9" Text="4. Результати перевірки наявності та стану майна" Font="Arial, 10pt, style=Bold"/>
+        </DataHeaderBand>
+      </DataBand>
+    </DataBand>
+    <DataBand Name="BndMain4" Top="1082.17" Width="718.2" Height="9.45">
+      <DataBand Name="d4" Top="1185" Width="718.2" Height="56.7" CanGrow="true" DataSource="Table4">
+        <TableObject Name="Table1" Left="18.9" Width="661.31" Height="56.7">
+          <TableColumn Name="Column43" Width="28.3"/>
+          <TableColumn Name="Column44" Width="132.26"/>
+          <TableColumn Name="Column45" Width="141.7"/>
+          <TableColumn Name="Column46" Width="359.05"/>
+          <TableRow Name="Row16" Height="56.7" AutoSize="true">
+            <TableCell Name="Cell73" Border.Lines="All" Text="5.[WCS_BID_GARANTEES.RN]"/>
+            <TableCell Name="Cell74" Border.Lines="All" Text="[WCS_BID_GARANTEES.GROUP_NAME]/[WCS_BID_GARANTEES.SUBJ_OBU_NAME]"/>
+            <TableCell Name="Cell75" Border.Lines="All" Text="[FormatNumber([WCS_BID_GARANTEES.GRT_COST],2)]" HorzAlign="Right"/>
+            <TableCell Name="Cell76" Border.Lines="All" Text="[WCS_BID_GARANTEES.Q8]"/>
+          </TableRow>
+        </TableObject>
+        <DataHeaderBand Name="dh4" Top="1095.78" Width="718.2" Height="85.05">
+          <TableObject Name="Table1" Left="18.9" Top="28.35" Width="661.31" Height="56.7">
+            <TableColumn Name="Column39" Width="28.3"/>
+            <TableColumn Name="Column40" Width="132.26"/>
+            <TableColumn Name="Column41" Width="141.7"/>
+            <TableColumn Name="Column42" Width="359.05"/>
+            <TableRow Name="Row15" Height="56.7">
+              <TableCell Name="Cell69" Border.Lines="All" Text="№" HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell70" Border.Lines="All" Text="Предмет застави" HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell71" Border.Lines="All" Text="Вартість застави, використаний метод оцінки" HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell72" Border.Lines="All" Text="Зауваження до вартості майна, визначеної в звіті про оцінку" HorzAlign="Center" VertAlign="Center"/>
+            </TableRow>
+          </TableObject>
+          <TextObject Name="Text9" Left="18.9" Top="9.45" Width="661.5" Height="18.9" Text="5. Результати перевірки вартості майна" Font="Arial, 10pt, style=Bold"/>
+        </DataHeaderBand>
+        <DataFooterBand Name="df4" Top="1245.87" Width="718.2" Height="18.9" Guides="9.45">
+          <TableObject Name="Table1" Left="18.9" Width="661.31" Height="18.9">
+            <TableColumn Name="Column47" Width="28.3"/>
+            <TableColumn Name="Column48" Width="132.26"/>
+            <TableColumn Name="Column49" Width="141.7"/>
+            <TableColumn Name="Column50" Width="359.05"/>
+            <TableRow Name="Row17">
+              <TableCell Name="Cell77" Border.Lines="All"/>
+              <TableCell Name="Cell78" Border.Lines="All" Text="Всього" Font="Arial, 10pt, style=Bold"/>
+              <TableCell Name="Cell79" Border.Lines="All" Text="[FormatNumber([Total2],2)]" HorzAlign="Right"/>
+              <TableCell Name="Cell80" Border.Lines="All"/>
+            </TableRow>
+          </TableObject>
+        </DataFooterBand>
+      </DataBand>
+    </DataBand>
+    <DataBand Name="BndMain5" Top="1268.93" Width="718.2" Height="529.2" CanGrow="true">
+      <TableObject Name="Table7" Left="18.9" Top="9.45" Width="660.65" Height="415.8">
+        <TableColumn Name="Column51" Width="223.65"/>
+        <TableColumn Name="Column52" Width="195.3"/>
+        <TableColumn Name="Column53" Width="241.7"/>
+        <TableRow Name="Row18" Height="28.35">
+          <TableCell Name="Cell81" Text="6. Загальна оцінка забезпечення" Font="Arial, 10pt, style=Bold" ColSpan="3"/>
+          <TableCell Name="Cell82"/>
+          <TableCell Name="Cell83"/>
+        </TableRow>
+        <TableRow Name="Row19" Height="28.35" AutoSize="true">
+          <TableCell Name="Cell86" Text="6.1. Характеристика ліквідності: [WCS_IQ_DATA.Q11_1_TEXT]; [WCS_IQ_DATA.Q11]" ColSpan="3"/>
+          <TableCell Name="Cell87"/>
+          <TableCell Name="Cell88"/>
+        </TableRow>
+        <TableRow Name="Row20" Height="28.35" AutoSize="true">
+          <TableCell Name="Cell91" Text="6.2. Характеристика надійності: [WCS_IQ_DATA.Q13_1_TEXT]; [WCS_IQ_DATA.Q13]" ColSpan="3"/>
+          <TableCell Name="Cell92"/>
+          <TableCell Name="Cell93"/>
+        </TableRow>
+        <TableRow Name="Row23" Height="28.35" AutoSize="true">
+          <TableCell Name="Cell104" Text="6.3. Характеристика прийнятності: [WCS_IQ_DATA.Q19_1_TEXT]; [WCS_IQ_DATA.Q19]" ColSpan="3"/>
+          <TableCell Name="Cell105"/>
+          <TableCell Name="Cell106"/>
+        </TableRow>
+        <TableRow Name="Row21" Height="132.3" AutoSize="true">
+          <TableCell Name="Cell96" Text="7. Висновок про надане забезпечення (заставу) за кредитом:&#13;&#10;&#13;&#10;[IIf([WCS_IQ_DATA.Q12_1] == 0, &quot;Враховуючи, що майно є прийнятним і достатнім для забезпечення кредитної операції, &quot; + [BRANCH_NAME.VAL] + &quot; не заперечує щодо видачі кредиту під запропоноване забезпечення з рекомендованою вартістю &quot; + FormatNumber([WCS_IQ_DATA.Q8_4],2) + &quot; грн.&quot;, [BRANCH_NAME.VAL] + &quot; заперечує щодо видачі кредиту під запропоноване забезпечення з рекомендованою вартістю &quot; + FormatNumber([WCS_IQ_DATA.Q8_4],2) + &quot; грн. на підставі того, що: &quot; + [WCS_IQ_DATA.Q12])]" Font="Arial, 10pt, style=Bold" ColSpan="3"/>
+          <TableCell Name="Cell97"/>
+          <TableCell Name="Cell98"/>
+        </TableRow>
+        <TableRow Name="Row22" Height="170.1">
+          <TableCell Name="Cell101" Text="__________________________&#13;&#10;Посада керівника&#13;&#10;(департаменту проблемних активів, або керівник  підрозділу по роботі з проблемними активами РУ, або начальник відділення)&#13;&#10;" Padding="2, 50, 2, 1" HorzAlign="Center"/>
+          <TableCell Name="Cell102" Text="________________&#13;&#10;Підпис, дата" Padding="2, 50, 2, 1" HorzAlign="Center"/>
+          <TableCell Name="Cell103" Text="_____________________________&#13;&#10;Прізвище, ініціали  керівника" Padding="2, 50, 2, 1" HorzAlign="Center"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+  </ReportPage>
+</Report>

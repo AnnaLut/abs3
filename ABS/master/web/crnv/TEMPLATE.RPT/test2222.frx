@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" StartReportEvent="_StartReport" ReportInfo.Created="05/26/2011 14:55:15" ReportInfo.Modified="04/26/2013 10:42:13" ReportInfo.CreatorVersion="1.9.1.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+using System.Data.Sql;
+using Oracle.DataAccess.Client;
+using Oracle.DataAccess.Types;
+
+
+
+
+
+
+namespace FastReport
+{
+  
+      
+  
+  public static class MyFun
+  {
+    
+    public static string Fun()
+    {
+          return &quot;Hello!&quot;;
+     // return FastReport.ReportScript.Val1;
+    }
+    
+  }
+  
+  public class ReportScript
+  {
+                                    
+ //   string Var1 = &quot;9999~8888~7777~aaaa~bbbb&quot;;
+ //   string Val1 = &quot;aaaa~bbbb~cccc~1111~22&quot;;
+    string Var1 = &quot;&quot;;
+    string Val1 = &quot;&quot;;
+          
+    public static string Rek(string s, string Val, string Var)
+    {
+      StringDictionary TagSub = new StringDictionary();
+
+      
+     // string Var = Convert.ToString(MyClas.Var1);
+     // string Val = Convert.ToString(MyClas.Val1);          
+      
+      //string Val = &quot;9999~8888~7777~aaaa&quot;;
+      //string Var = &quot;aaaa~bbbb~cccc~1111&quot;;
+      
+     // string Val = ((String)Report.GetColumnValue(&quot;Table.VAL&quot;));
+      //string Var1 = ((String)Report.GetParameterValue(&quot;Parameter1&quot;));
+      
+         
+  //    string[] VarArray = Var.Split('~');
+  //    string[] ValArray = Val.Split('~');
+      
+      //string Vets =  Text1.Text;
+      
+      string[] VarArray = Var.Split('~');
+      string[] ValArray = Val.Split('~');
+
+      int length = (VarArray.Length &gt;= ValArray.Length) ? (ValArray.Length) : (VarArray.Length);
+
+      for (int i = 0; i &lt; length; i++)
+      {
+        if (!TagSub.ContainsKey(VarArray[i]))
+          TagSub.Add(VarArray[i], ValArray[i]);
+      }
+      string rez = &quot;&quot;;
+      {
+     
+      string varName = s;
+      int varLen = 0;
+
+      if (s.Length &gt; 0)
+      {
+               Int32.TryParse(s.Trim(), out varLen);
+      }
+      
+      if (TagSub.ContainsKey(varName)) 
+       rez = TagSub[varName].PadRight(varLen); 
+      else rez = &quot;&quot;;
+   
+      return rez;
+    }
+                              
+        
+    }
+    
+ 
+    private void _StartReport(object sender, EventArgs e)
+    {
+       //Var1 = &quot;9999~8888~7777~aaaa~bbbb&quot;;
+       //Val1 = &quot;aaaa~bbbb~cccc~1111~22&quot;;
+       Val1 = ((String)Report.GetColumnValue(&quot;Table.VAL&quot;));
+       Var1 = ((String)Report.GetColumnValue(&quot;Table.VAR&quot;));
+      
+    }
+    
+
+
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqD6nWZEExUJ9MEhdFZpB1A+RsALYQnkrx1bqUugr9bZmM+vm2A2A73LUw+BfeY2K4LWcLJjrQkCYry1fSTwPKXA==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select '9999~8888~7777~aaaa' as Val,&#13;&#10;          'aaaa~bbbb~cccc~1111' as var&#13;&#10;from dual">
+        <Column Name="VAL" DataType="System.String"/>
+        <Column Name="VAR" DataType="System.String"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="Parameter1" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Guides="56.7,151.2,0,94.5">
+    <DataBand Name="Data1" Top="20" Width="718.2" Height="1918.35" CanGrow="true" CanShrink="true" CanBreak="true" Guides="0,18.9,37.8,56.7,75.6,94.5,113.4,132.3,170.1,189" DataSource="Table">
+      <TextObject Name="Text1" Left="56.7" Width="94.5" Height="18.9" Text="[Rek(&quot;aaaa&quot;,[Table.VAL],[Table.VAR])]"/>
+      <TextObject Name="Text2" Width="94.5" Height="18.9" Text="aaaa"/>
+      <TextObject Name="Text3" Left="56.7" Top="37.8" Width="94.5" Height="18.9" Text="[Rek(&quot;bbbb&quot;,[Table.VAL],[Table.VAR])]"/>
+      <TextObject Name="Text4" Top="37.8" Width="94.5" Height="18.9" Text="bbbb"/>
+      <TextObject Name="Text5" Left="56.7" Top="75.6" Width="94.5" Height="18.9" Text="[Rek(&quot;cccc&quot;,[Table.VAL],[Table.VAR])]"/>
+      <TextObject Name="Text6" Top="75.6" Width="94.5" Height="18.9" Text="cccc"/>
+      <TextObject Name="Text7" Left="56.7" Top="113.4" Width="94.5" Height="18.9" Text="[Rek(&quot;1111&quot;,[Table.VAL],[Table.VAR])]"/>
+      <TextObject Name="Text8" Top="113.4" Width="94.5" Height="18.9" Text="1111"/>
+      <TextObject Name="Text9" Left="56.7" Top="170.1" Width="94.5" Height="18.9" Text="[MyFun.Fun()]"/>
+    </DataBand>
+  </ReportPage>
+</Report>

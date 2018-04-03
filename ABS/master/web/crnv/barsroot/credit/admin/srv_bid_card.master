@@ -1,0 +1,286 @@
+﻿<%@ Master Language="C#" MasterPageFile="~/credit/admin/master.master" AutoEventWireup="true"
+    CodeFile="srv_bid_card.master.cs" Inherits="credit_adm_bid_card" %>
+
+<%@ MasterType VirtualPath="~/credit/admin/master.master" %>
+<%@ Register Assembly="Bars.DataComponentsEx" Namespace="Bars.DataComponents" TagPrefix="Bars" %>
+<%@ Register Src="/barsroot/UserControls/LabelTooltip.ascx" TagName="LabelTooltip"
+    TagPrefix="Bars" %>
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="body" runat="Server">
+    <table border="0" cellpadding="3" cellspacing="0">
+        <col style="vertical-align: top" />
+        <col style="vertical-align: top" />
+        <tr>
+            <td>
+                <asp:Panel ID="pnlClient" runat="server" GroupingText="Базовая информация про клиента"
+                    meta:resourcekey="pnlClientResource1">
+                    <table class="dataTable">
+                        <colgroup>
+                            <col class="titleCell" />
+                            <tr>
+                                <td>
+                                    <asp:Label ID="RNKTitle" runat="server" Text="РНК :" />
+                                </td>
+                                <td>
+                                    <asp:Label ID="RNK" runat="server" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <asp:Label ID="FTitle" runat="server" Text="Фамилия :" meta:resourcekey="FTitleResource1" />
+                                </td>
+                                <td>
+                                    <asp:Label ID="F" runat="server" meta:resourcekey="FResource1" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <asp:Label ID="ITitle" runat="server" Text="Имя :" meta:resourcekey="ITitleResource1" />
+                                </td>
+                                <td>
+                                    <asp:Label ID="I" runat="server" meta:resourcekey="IResource1" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <asp:Label ID="OTitle" runat="server" Text="Отчество :" meta:resourcekey="OTitleResource1" />
+                                </td>
+                                <td>
+                                    <asp:Label ID="O" runat="server" meta:resourcekey="OResource1" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <asp:Label ID="INNTitle" runat="server" Text="Идентификационный код клиента :" meta:resourcekey="INNTitleResource1" />
+                                </td>
+                                <td>
+                                    <asp:Label ID="INN" runat="server" meta:resourcekey="INNResource1" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <asp:Label ID="BDATETitle" runat="server" Text="Дата рождения :" meta:resourcekey="BDATETitleResource1" />
+                                </td>
+                                <td>
+                                    <asp:Label ID="BDATE" runat="server" meta:resourcekey="BDATEResource1" />
+                                </td>
+                            </tr>
+                        </colgroup>
+                    </table>
+                </asp:Panel>
+            </td>
+            <td>
+                <asp:Panel ID="pnlStates" runat="server" GroupingText="Статусы заявки" meta:resourcekey="pnlStatesResource1">
+                    <table class="dataTable">
+                        <tr>
+                            <td>
+                                <bars:BarsObjectDataSource ID="odsVWcsBidStates" runat="server" SelectMethod="SelectDispBidStates"
+                                    TypeName="credit.VWcsBidStates" SortParameterName="SortExpression">
+                                    <SelectParameters>
+                                        <asp:QueryStringParameter Name="BID_ID" QueryStringField="bid_id" Size="100" Type="Decimal" />
+                                    </SelectParameters>
+                                </bars:BarsObjectDataSource>
+                                <bars:BarsGridViewEx ID="gv" runat="server" AutoGenerateColumns="False" CaptionText=""
+                                    ClearFilterImageUrl="mvwres://Bars.DataComponentsEx, Version=1.0.0.0, Culture=neutral, PublicKeyToken=464dd68da967e56c/Bars.DataComponents.Resources.filter_delete.png"
+                                    CloseFilterImageUrl="mvwres://Bars.DataComponentsEx, Version=1.0.0.0, Culture=neutral, PublicKeyToken=464dd68da967e56c/Bars.DataComponents.Resources.filter_close.png"
+                                    CssClass="barsGridView" DataSourceID="odsVWcsBidStates" DateMask="dd.MM.yyyy"
+                                    EnableModelValidation="True" ExcelImageUrl="mvwres://Bars.DataComponentsEx, Version=1.0.0.0, Culture=neutral, PublicKeyToken=464dd68da967e56c/Bars.DataComponents.Resources.export_excel.png"
+                                    FilterImageUrl="mvwres://Bars.DataComponentsEx, Version=1.0.0.0, Culture=neutral, PublicKeyToken=464dd68da967e56c/Bars.DataComponents.Resources.filter_open.png"
+                                    HoverRowCssClass="hoverRow" MetaFilterImageUrl="mvwres://Bars.DataComponentsEx, Version=1.0.0.0, Culture=neutral, PublicKeyToken=464dd68da967e56c/Bars.DataComponents.Resources.filter_open.png"
+                                    MetaTableName="" RefreshImageUrl="mvwres://Bars.DataComponentsEx, Version=1.0.0.0, Culture=neutral, PublicKeyToken=464dd68da967e56c/Bars.DataComponents.Resources.refresh.png"
+                                    ShowExportExcelButton="True" ShowPageSizeBox="False" meta:resourcekey="gvResource1">
+                                    <NewRowStyle CssClass="" />
+                                    <AlternatingRowStyle CssClass="alternateRow" />
+                                    <Columns>
+                                        <asp:BoundField DataField="STATE_NAME" HeaderText="Состояние" SortExpression="STATE_NAME"
+                                            meta:resourcekey="BoundFieldResource1"></asp:BoundField>
+                                        <asp:BoundField DataField="CHECKOUT_DAT" HeaderText="Дата/Время" SortExpression="CHECKOUT_DAT"
+                                            DataFormatString="{0:dd/MM/yyyy HH:mm:ss}" meta:resourcekey="BoundFieldResource2">
+                                            <ItemStyle HorizontalAlign="Center" />
+                                        </asp:BoundField>
+                                        <asp:BoundField DataField="CHECKOUT_USER_F" HeaderText="Пользователь" SortExpression="CHECKOUT_USER_F"
+                                            meta:resourcekey="BoundFieldResource3"></asp:BoundField>
+                                        <asp:TemplateField HeaderText="Комментарий" SortExpression="USER_COMMENT" meta:resourcekey="BoundFieldResource4">
+                                            <ItemTemplate>
+                                                <bars:LabelTooltip ID="Label1" runat="server" Text='<%# Eval("USER_COMMENT") %>'
+                                                    TextLength="30" UseTextForTooltip="true" />
+                                            </ItemTemplate>
+                                        </asp:TemplateField>
+                                    </Columns>
+                                    <EditRowStyle CssClass="editRow" />
+                                    <FooterStyle CssClass="footerRow" />
+                                    <HeaderStyle CssClass="headerRow" />
+                                    <PagerStyle CssClass="pagerRow" />
+                                    <RowStyle CssClass="normalRow" />
+                                    <SelectedRowStyle CssClass="selectedRow" />
+                                </bars:BarsGridViewEx>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right">
+                                <asp:LinkButton ID="lbStatesHistory" runat="server" Text="История статусов" CommandName="STATESHISTORY"
+                                    OnClick="lbStatesHistory_Click" meta:resourcekey="lbStatesHistoryResource1"></asp:LinkButton>
+                            </td>
+                        </tr>
+                    </table>
+                </asp:Panel>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <asp:Panel ID="pnlCredit" runat="server" GroupingText="Информация про кредит" meta:resourcekey="pnlCreditResource1">
+                    <table class="dataTable">
+                        <colgroup>
+                            <col class="titleCell" />
+                            <tr>
+                                <td>
+                                    <asp:Label ID="SUBPRODUCTTitle" runat="server" Text="Субпродукт :" meta:resourcekey="SUBPRODUCTTitleResource1" />
+                                </td>
+                                <td>
+                                    <asp:Label ID="SUBPRODUCT" runat="server" meta:resourcekey="SUBPRODUCTResource1" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <asp:Label ID="SUMMTitle" runat="server" Text="Сумма кредита :" meta:resourcekey="SUMMTitleResource1" />
+                                </td>
+                                <td>
+                                    <asp:Label ID="SUMM" runat="server" meta:resourcekey="SUMMResource1" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <asp:Label ID="OWN_FUNDSTitle" runat="server" Text="Сумма собственных средств :"
+                                        meta:resourcekey="OWN_FUNDSTitleResource1" />
+                                </td>
+                                <td>
+                                    <asp:Label ID="OWN_FUNDS" runat="server" meta:resourcekey="OWN_FUNDSResource1" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <asp:Label ID="TERMTitle" runat="server" Text="Срок кредита :" meta:resourcekey="TERMTitleResource1" />
+                                </td>
+                                <td>
+                                    <asp:Label ID="TERM" runat="server" meta:resourcekey="TERMResource1" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <asp:Label ID="CREDIT_CURRENCYTitle" runat="server" Text="Валюта кредита :" meta:resourcekey="CREDIT_CURRENCYTitleResource1" />
+                                </td>
+                                <td>
+                                    <asp:Label ID="CREDIT_CURRENCY" runat="server" meta:resourcekey="CREDIT_CURRENCYResource1" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <asp:Label ID="SINGLE_FEETitle" runat="server" Text="Комиссия банка разовая :" meta:resourcekey="SINGLE_FEETitleResource1" />
+                                </td>
+                                <td>
+                                    <asp:Label ID="SINGLE_FEE" runat="server" meta:resourcekey="SINGLE_FEEResource1" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <asp:Label ID="MONTHLY_FEETitle" runat="server" Text="Комиссия банка ежемесячная :"
+                                        meta:resourcekey="MONTHLY_FEETitleResource1" />
+                                </td>
+                                <td>
+                                    <asp:Label ID="MONTHLY_FEE" runat="server" meta:resourcekey="MONTHLY_FEEResource1" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <asp:Label ID="INTEREST_RATETitle" runat="server" Text="Процентная ставка :" meta:resourcekey="INTEREST_RATETitleResource1" />
+                                </td>
+                                <td>
+                                    <asp:Label ID="INTEREST_RATE" runat="server" meta:resourcekey="INTEREST_RATEResource1" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <asp:Label ID="REPAYMENT_METHODTitle" runat="server" Text="Метод погашения :" meta:resourcekey="REPAYMENT_METHODTitleResource1" />
+                                </td>
+                                <td>
+                                    <asp:Label ID="REPAYMENT_METHOD" runat="server" meta:resourcekey="REPAYMENT_METHODResource1" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <asp:Label ID="REPAYMENT_DAYTitle" runat="server" Text="День погашения :" meta:resourcekey="REPAYMENT_DAYTitleResource1" />
+                                </td>
+                                <td>
+                                    <asp:Label ID="REPAYMENT_DAY" runat="server" meta:resourcekey="REPAYMENT_DAYResource1" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <asp:Label ID="INIT_PAYMENT_MTDTitle" runat="server" Text="Шлях видачі :" />
+                                </td>
+                                <td>
+                                    <asp:Label ID="INIT_PAYMENT_MTD" runat="server" Text='<%# Bind("INIT_PAYMENT_MTD") %>' />
+                                </td>
+                            </tr>
+                        </colgroup>
+                    </table>
+                </asp:Panel>
+            </td>
+            <td>
+                <asp:Panel ID="pnlBidData" runat="server" GroupingText="Данные заявки" meta:resourcekey="pnlBidDataResource1">
+                    <table class="dataTable">
+                        <tr>
+                            <td>
+                                <asp:LinkButton ID="lbSURVEY" runat="server" Text="Анкета клиента" CommandName="SURVEY"
+                                    OnClick="lbSURVEY_Click" meta:resourcekey="lbSURVEYResource1"></asp:LinkButton>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <asp:LinkButton ID="lbSCANCOPY" runat="server" Text="Сканированые документы" CommandName="SCANCOPY"
+                                    OnClick="lbSCANCOPY_Click" meta:resourcekey="lbSCANCOPYResource1"></asp:LinkButton>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <asp:LinkButton ID="lbGARANTEE" runat="server" Text="Обеспечение" CommandName="GARANTEE"
+                                    OnClick="lbGARANTEE_Click" meta:resourcekey="lbGARANTEEResource1"></asp:LinkButton>
+                            </td>
+                        </tr>
+                    </table>
+                </asp:Panel>
+                <asp:Panel ID="pnlCalcData" runat="server" GroupingText="Расчетные данные" meta:resourcekey="pnlCalcDataResource1">
+                    <table class="dataTable">
+                        <tr>
+                            <td>
+                                <asp:LinkButton ID="lbSCORING" runat="server" Text="Скоринг" CommandName="SCORING"
+                                    OnClick="lbSCORING_Click" meta:resourcekey="lbSCORINGResource1"></asp:LinkButton>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <asp:LinkButton ID="lbINFOQUERIES" runat="server" Text="Информационные запросы" CommandName="INFOQUERIES"
+                                    OnClick="lbINFOQUERIES_Click" meta:resourcekey="lbINFOQUERIESResource1"></asp:LinkButton>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <asp:LinkButton ID="lbSTOPS" runat="server" Text="Стоп-факторы" CommandName="STOPS"
+                                    OnClick="lbSTOPS_Click" meta:resourcekey="lbSTOPSResource1"></asp:LinkButton>
+                            </td>
+                        </tr>
+                    </table>
+                </asp:Panel>
+                <asp:ContentPlaceHolder ID="cphProcess" runat="server">
+                </asp:ContentPlaceHolder>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <asp:ContentPlaceHolder ID="cphCommands" runat="server">
+                </asp:ContentPlaceHolder>
+            </td>
+        </tr>
+    </table>
+</asp:Content>

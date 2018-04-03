@@ -1,0 +1,555 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="05/26/2011 14:55:15" ReportInfo.Modified="10/09/2012 15:41:43" ReportInfo.CreatorVersion="1.7.1.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlq9SEZoacNJntaKIKp6mVF15TE2eO7inhdLIlr+Rbwy/GgnU+vHq81YWUF8rPvJ16PX4HV5dkQ+zo/anfNuFKSfKf6cRJD7wrywZtFkGjGqHQ=">
+      <TableDataSource Name="Table2" Alias="klient_info" DataType="System.Int32" Enabled="true" SelectCommand="select decode(wcs_utl.get_answ(b.bid_id, 'GRT_0', p.ws_id, p.ws_number),&#13;&#10;              0,&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_1', p.ws_id, p.ws_number) || ' ' ||&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_2', p.ws_id, p.ws_number) || ' ' ||&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_3', p.ws_id, p.ws_number),&#13;&#10;              b.fio) as fio,&#13;&#10;             wcs_utl.get_answ(b.bid_id, 'CL_123_O', p.ws_id, p.ws_number) as fio_o,&#13;&#10;       decode(wcs_utl.get_answ(b.bid_id, 'GRT_0', p.ws_id, p.ws_number),&#13;&#10;              0,&#13;&#10;              substr(wcs_utl.get_answ(b.bid_id, 'CL_2', p.ws_id, p.ws_number),&#13;&#10;                     1,&#13;&#10;                     1) || '. ' ||&#13;&#10;              substr(wcs_utl.get_answ(b.bid_id, 'CL_3', p.ws_id, p.ws_number),&#13;&#10;                     1,&#13;&#10;                     1) || '.  ' ||&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_1', p.ws_id, p.ws_number),&#13;&#10;              substr(b.i, 1, 1) || '. ' || substr(b.o, 1, 1) || '. ' || b.f) as fio_short,&#13;&#10;       decode(wcs_utl.get_answ(b.bid_id, 'GRT_0', p.ws_id, p.ws_number),&#13;&#10;              0,&#13;&#10;              decode(wcs_utl.get_answ(b.bid_id,&#13;&#10;                                      'CL_0_7',&#13;&#10;                                      p.ws_id,&#13;&#10;                                      p.ws_number),&#13;&#10;                     0,&#13;&#10;                     case&#13;&#10;                       when wcs_utl.get_answ(b.bid_id, 'CL_18', p.ws_id, p.ws_number) in&#13;&#10;                            (26, 27) then&#13;&#10;                        wcs_utl.get_answ_refer_text(b.bid_id,&#13;&#10;                                                    'CL_18',&#13;&#10;                                                    p.ws_id,&#13;&#10;                                                    p.ws_number) || ', ' ||&#13;&#10;                        wcs_utl.get_answ(b.bid_id, 'CL_21', p.ws_id, p.ws_number)&#13;&#10;                       else&#13;&#10;                        'обл. ' || wcs_utl.get_answ_refer_text(b.bid_id,&#13;&#10;                                                               'CL_18',&#13;&#10;                                                               p.ws_id,&#13;&#10;                                                               p.ws_number) || ', ' ||&#13;&#10;                        decode(wcs_utl.has_answ(b.bid_id, 'CL_19', p.ws_id, p.ws_number),&#13;&#10;                               1,&#13;&#10;                               'р. ' ||&#13;&#10;                               wcs_utl.get_answ(b.bid_id, 'CL_19', p.ws_id, p.ws_number) || ', ',&#13;&#10;                               null) ||&#13;&#10;                        decode(wcs_utl.has_answ(b.bid_id, 'CL_20', p.ws_id, p.ws_number),&#13;&#10;                               1,&#13;&#10;                               wcs_utl.get_answ(b.bid_id, 'CL_20', p.ws_id, p.ws_number) || ', ',&#13;&#10;                               null) ||&#13;&#10;                        wcs_utl.get_answ(b.bid_id, 'CL_21', p.ws_id, p.ws_number)&#13;&#10;                     end,&#13;&#10;                     case&#13;&#10;                       when wcs_utl.get_answ(b.bid_id, 'CL_13', p.ws_id, p.ws_number) in&#13;&#10;                            (26, 27) then&#13;&#10;                        wcs_utl.get_answ_refer_text(b.bid_id,&#13;&#10;                                                    'CL_13',&#13;&#10;                                                    p.ws_id,&#13;&#10;                                                    p.ws_number) || ', ' ||&#13;&#10;                        wcs_utl.get_answ(b.bid_id, 'CL_16', p.ws_id, p.ws_number)&#13;&#10;                       else&#13;&#10;                        'обл. ' || wcs_utl.get_answ_refer_text(b.bid_id,&#13;&#10;                                                               'CL_13',&#13;&#10;                                                               p.ws_id,&#13;&#10;                                                               p.ws_number) || ', ' ||&#13;&#10;                        decode(wcs_utl.has_answ(b.bid_id, 'CL_14', p.ws_id, p.ws_number),&#13;&#10;                               1,&#13;&#10;                               'р. ' ||&#13;&#10;                               wcs_utl.get_answ(b.bid_id, 'CL_14', p.ws_id, p.ws_number) || ', ',&#13;&#10;                               null) ||&#13;&#10;                        decode(wcs_utl.has_answ(b.bid_id, 'CL_15', p.ws_id, p.ws_number),&#13;&#10;                               1,&#13;&#10;                               wcs_utl.get_answ(b.bid_id, 'CL_15', p.ws_id, p.ws_number) || ', ',&#13;&#10;                               null) ||&#13;&#10;                        wcs_utl.get_answ(b.bid_id, 'CL_16', p.ws_id, p.ws_number)&#13;&#10;                     end),&#13;&#10;              decode(wcs_utl.get_answ(b.bid_id, 'CL_0_7'),&#13;&#10;                     0,&#13;&#10;                     case&#13;&#10;                       when wcs_utl.get_answ(b.bid_id, 'CL_18') in (26, 27) then&#13;&#10;                        wcs_utl.get_answ_refer_text(b.bid_id, 'CL_18') || ', ' ||&#13;&#10;                        wcs_utl.get_answ(b.bid_id, 'CL_21')&#13;&#10;                       else&#13;&#10;                        'обл. ' || wcs_utl.get_answ_refer_text(b.bid_id, 'CL_18') || ', ' ||&#13;&#10;                        decode(wcs_utl.has_answ(b.bid_id, 'CL_19'),&#13;&#10;                               1,&#13;&#10;                               'р. ' || wcs_utl.get_answ(b.bid_id, 'CL_19') || ', ',&#13;&#10;                               null) || decode(wcs_utl.has_answ(b.bid_id, 'CL_20'),&#13;&#10;                                               1,&#13;&#10;                                               wcs_utl.get_answ(b.bid_id, 'CL_20') || ', ',&#13;&#10;                                               null) ||&#13;&#10;                        wcs_utl.get_answ(b.bid_id, 'CL_21')&#13;&#10;                     end,&#13;&#10;                     case&#13;&#10;                       when wcs_utl.get_answ(b.bid_id, 'CL_13') in (26, 27) then&#13;&#10;                        wcs_utl.get_answ_refer_text(b.bid_id, 'CL_13') || ', ' ||&#13;&#10;                        wcs_utl.get_answ(b.bid_id, 'CL_16')&#13;&#10;                       else&#13;&#10;                        'обл. ' || wcs_utl.get_answ_refer_text(b.bid_id, 'CL_13') || ', ' ||&#13;&#10;                        decode(wcs_utl.has_answ(b.bid_id, 'CL_14'),&#13;&#10;                               1,&#13;&#10;                               'р. ' || wcs_utl.get_answ(b.bid_id, 'CL_14') || ', ',&#13;&#10;                               null) || decode(wcs_utl.has_answ(b.bid_id, 'CL_15'),&#13;&#10;                                               1,&#13;&#10;                                               wcs_utl.get_answ(b.bid_id, 'CL_15') || ', ',&#13;&#10;                                               null) ||&#13;&#10;                        wcs_utl.get_answ(b.bid_id, 'CL_16')&#13;&#10;                     end)) as adress,&#13;&#10;       decode(wcs_utl.get_answ(b.bid_id, 'GRT_0', p.ws_id, p.ws_number),&#13;&#10;              0,&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CODE_002', p.ws_id, p.ws_number),&#13;&#10;              b.inn) idcode,&#13;&#10;       decode(wcs_utl.get_answ(b.bid_id, 'GRT_0', p.ws_id, p.ws_number),&#13;&#10;              0,&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_7', p.ws_id, p.ws_number) ||&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_8', p.ws_id, p.ws_number) ||&#13;&#10;              ' виданий ' ||&#13;&#10;              trim(wcs_utl.get_answ(b.bid_id, 'CL_9', p.ws_id, p.ws_number)) || ' ' ||&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_11', p.ws_id, p.ws_number),&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_7') ||&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_8') || ' виданий ' ||&#13;&#10;              trim(wcs_utl.get_answ(b.bid_id, 'CL_9')) || ' ' ||&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_11')) pasport&#13;&#10;  from v_wcs_bids b,&#13;&#10;       (select :p_ws_id as ws_id, :p_ws_number as ws_number from dual) p&#13;&#10; where b.bid_id = :p_bid_id">
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="FIO_SHORT" DataType="System.String"/>
+        <Column Name="ADRESS" DataType="System.String"/>
+        <Column Name="IDCODE" DataType="System.String"/>
+        <Column Name="PASPORT" DataType="System.String"/>
+        <Column Name="FIO_O" DataType="System.String"/>
+        <CommandParameter Name="p_ws_id" DataType="126" Expression="[p_ws_id]" DefaultValue="&quot;MAIN&quot;"/>
+        <CommandParameter Name="p_ws_number" DataType="107" Expression="[p_ws_number]" DefaultValue="0"/>
+        <CommandParameter Name="p_bid_id" DataType="107" Expression="[p_bid_id]" DefaultValue="-1"/>
+      </TableDataSource>
+      <TableDataSource Name="Table4" Alias="DataSubProdukt" DataType="System.Int32" Enabled="true" SelectCommand="select b.*,&#13;&#10;       wcs_utl.get_answ_formated(b.bid_id, 'CL_13') || ' ' ||&#13;&#10;       wcs_utl.get_answ_formated(b.bid_id, 'CL_14') || ' ' ||&#13;&#10;       wcs_utl.get_answ_formated(b.bid_id, 'CL_15') || ' ' ||&#13;&#10;       wcs_utl.get_answ_formated(b.bid_id, 'CL_16') as adr,&#13;&#10;       wcs_utl.get_answ_formated(b.bid_id, 'REPAYMENT_METHOD') as REPAYMENT_METHOD_P,&#13;&#10;       wcs_utl.get_answ_formated(b.bid_id, 'CREDIT_CURRENCY') as CREDIT_CURRENCY_P,&#13;&#10;       f_sumpr(b.summ * 100, t.kv, T.GENDER) as ssum_pr,&#13;&#10;       B.OWN_FUNDS + b.summ as all_sum_t,&#13;&#10;       f_sumpr((B.OWN_FUNDS + b.summ) * 100, t.kv, T.GENDER) as ALL_ssum_pr,&#13;&#10;       f_sumpr(B.OWN_FUNDS * 100, t.kv, T.GENDER) as OWN_FUNDS_pr,&#13;&#10;       d.sdate,&#13;&#10;       substr(f_dat_lit(d.sdate), 1, 25) as dat_dog_pr,&#13;&#10;       d.wdate,&#13;&#10;       substr(f_dat_lit(d.wdate), 1, 25) dat_dog_ret_pr,&#13;&#10;       substr(f_sumpr(interest_rate, '', 'M'), 1, 100) interest_rate_pr,&#13;&#10;       substr(f_sumpr(term, '', 'M'), 1, 100) term_pr,&#13;&#10;       substr(f_sumpr(SINGLE_FEE, '', 'M'), 1, 100) SINGLE_FEE_PR,&#13;&#10;       substr(f_sumpr(MONTHLY_FEE, '', 'M'), 1, 100) MONTHLY_FEE_PR,&#13;&#10;       d.cc_id as deal_number&#13;&#10;  from v_wcs_bids b, tabval t, cc_deal d&#13;&#10; where b.bid_id = :p_bid_id&#13;&#10;   and b.bid_id = d.nd(+)&#13;&#10;   and B.CREDIT_CURRENCY = T.lcv">
+        <Column Name="BID_ID" DataType="System.Decimal"/>
+        <Column Name="SUBPRODUCT_ID" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_NAME" DataType="System.String"/>
+        <Column Name="CRT_DATE" DataType="System.DateTime"/>
+        <Column Name="F" DataType="System.String"/>
+        <Column Name="I" DataType="System.String"/>
+        <Column Name="O" DataType="System.String"/>
+        <Column Name="BDATE" DataType="System.DateTime"/>
+        <Column Name="INN" DataType="System.String"/>
+        <Column Name="SUMM" DataType="System.Decimal"/>
+        <Column Name="OWN_FUNDS" DataType="System.Decimal"/>
+        <Column Name="TERM" DataType="System.String"/>
+        <Column Name="CREDIT_CURRENCY" DataType="System.String"/>
+        <Column Name="SINGLE_FEE" DataType="System.Decimal"/>
+        <Column Name="MONTHLY_FEE" DataType="System.Decimal"/>
+        <Column Name="INTEREST_RATE" DataType="System.Decimal"/>
+        <Column Name="REPAYMENT_METHOD" DataType="System.String"/>
+        <Column Name="REPAYMENT_DAY" DataType="System.Decimal"/>
+        <Column Name="GARANTEES" DataType="System.String"/>
+        <Column Name="MGR_ID" DataType="System.Decimal"/>
+        <Column Name="MGR_FIO" DataType="System.String"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="BRANCH_NAME" DataType="System.String"/>
+        <Column Name="STATES" DataType="System.String"/>
+        <Column Name="ADR" DataType="System.String"/>
+        <Column Name="REPAYMENT_METHOD_P" DataType="System.String"/>
+        <Column Name="CREDIT_CURRENCY_P" DataType="System.String"/>
+        <Column Name="SSUM_PR" DataType="System.String"/>
+        <Column Name="ALL_SUM_T" DataType="System.Decimal"/>
+        <Column Name="ALL_SSUM_PR" DataType="System.String"/>
+        <Column Name="OWN_FUNDS_PR" DataType="System.String"/>
+        <Column Name="DAT_DOG_PR" DataType="System.String"/>
+        <Column Name="REPAYMENT_METHOD_TEXT" DataType="System.String"/>
+        <Column Name="INTEREST_RATE_PR" DataType="System.String"/>
+        <Column Name="SDATE" DataType="System.DateTime"/>
+        <Column Name="WDATE" DataType="System.DateTime"/>
+        <Column Name="DAT_DOG_RET_PR" DataType="System.String"/>
+        <Column Name="TERM_PR" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_DESC" DataType="System.String"/>
+        <Column Name="SINGLE_FEE_PR" DataType="System.String"/>
+        <Column Name="MONTHLY_FEE_PR" DataType="System.String"/>
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="BRANCH_HIERARCHY" DataType="System.String"/>
+        <Column Name="DEAL_NUMBER" DataType="System.String"/>
+        <Column Name="INIT_PAYMENT_MTD" DataType="System.String"/>
+        <CommandParameter Name="P1" DataType="126" Expression="[p_bid_id]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table12" Alias="Branch_Info" DataType="System.Int32" Enabled="true" SelectCommand="select *&#10;  from (select poa.fio            as br_boss,&#10;     poa.post_r as post_r,           poa.fio_r          as br_boss_r,&#10;               poa.branch_adr     as adr_branch,&#10;               poa.poa_doc        as br_boss_doc_r,&#10;               poa.poa_notary_num as br_boss_doc,&#10;               poa_notary         as br_boss_doc_n,&#10;               poa_notary_num     as br_boss_doc_n_r,&#10;               poa_date           as br_boss_doc_d,&#10;               branch_loc         as br_location,&#10;               branch_name        as name_branch,&#10;               f_ourmfo_g         as mfo,&#10;               f_ourokpo          as okpo&#10;          from wcs_bids b, wcs_power_of_attorneys poa&#10;         where b.id = :p1&#10;           and b.branch = poa.branch&#10;           and poa.active = 1&#10;         order by poa.ord)&#10; where rownum = 1">
+        <Column Name="BR_BOSS_R" DataType="System.String"/>
+        <Column Name="BR_BOSS" DataType="System.String"/>
+        <Column Name="ADR_BRANCH" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC_R" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC_N" DataType="System.String"/>
+        <Column Name="BR_LOCATION" DataType="System.String"/>
+        <Column Name="NAME_BRANCH" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC_N_R" DataType="System.String"/>
+        <Column Name="MFO" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC_D" DataType="System.DateTime"/>
+        <Column Name="POST_R" DataType="System.String"/>
+        <CommandParameter Name="P1" DataType="126" Expression="[p_bid_id]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table1" Alias="Direct_many" DataType="System.Int32" Enabled="true" SelectCommand=" select &#10;( case when da.kv=980  and da.acckred is not null and substr(da.acckred,1,1)&lt;&gt;'1'  then &#10;'шляхом перерахування коштів в національній валюті з рахунку наданого кредиту на поточний рахунок продавця товару на підставі платіжного доручення Позичальника'&#10;                    when da.kv=980  and (da.acckred is null or substr(da.acckred,1,1)='1')  then&#10;'готівкою шляхом надання Позичальнику  готівки з каси Банку'&#10;                     else &#10;'готівкою шляхом надання готівкової іноземної валюти Позичальнику з подальшим зарахуванням гривні, отриманої Позичальником від операції купівлі-продажу Банком готівкової іноземної валюти, на його поточний рахунок та перерахуванням цих коштів на підставі платіжного доручення Позичальника на поточний рахунок продавця товару (або готівкою шляхом надання готівкової іноземної валюти Позичальнику)'&#10;end) vid_vid&#10;from cc_add da where da.nd=:p_bid_id&#10;">
+        <Column Name="VID_VID" DataType="System.String"/>
+        <CommandParameter Name="P1" DataType="126" Expression="[p_bid_id]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table3" Alias="target_dog" DataType="System.Int32" Enabled="true" SelectCommand="select  wcs_utl.get_answ(:p_bid_id, 'CL_2_0_01', :p_ws_id , :p_ws_number ) as   target_dog,&#10;          wcs_utl.get_answ(:p_bid_id, 'CL_2_0_02', :p_ws_id , :p_ws_number ) as   description_dog,&#10;          wcs_utl.get_answ(:p_bid_id, 'CL_2_0_03', :p_ws_id , :p_ws_number ) as   num_description_dog,&#10;          wcs_utl.get_answ(:p_bid_id, 'CL_2_0_04', :p_ws_id , :p_ws_number ) as   date_description_dog&#10;  from dual">
+        <Column Name="TARGET_DOG" DataType="System.String"/>
+        <Column Name="DESCRIPTION_DOG" DataType="System.String"/>
+        <Column Name="NUM_DESCRIPTION_DOG" DataType="System.String"/>
+        <Column Name="DATE_DESCRIPTION_DOG" DataType="System.String"/>
+        <CommandParameter Name="P1" DataType="126" Expression="[p_bid_id]"/>
+        <CommandParameter Name="P2" DataType="126" Expression="[p_ws_id]"/>
+        <CommandParameter Name="P3" DataType="126" Expression="[p_ws_number]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table" Alias="Current_Accounts" DataType="System.Int32" Enabled="true" SelectCommand="select nls current_acc from accounts where acc=(select to_number(wcs_utl.get_answ(:p_bid_id, 'PI_CURACC_ACCNO')) from dual)">
+        <Column Name="CURRENT_ACC" DataType="System.Decimal"/>
+        <CommandParameter Name="P1" DataType="126" Expression="[p_bid_id]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table5" Alias="DATA_LIM" DataType="System.Int32" Enabled="true" SelectCommand="select trim(to_char(lpad(i.s, 2, '0'))) as day_ss,&#13;&#10;       first_value(l.fdat) over(order by l.fdat) as first_dat_g,&#13;&#10;       trim(substr(f_dat_lit(first_value(l.fdat) over(order by l.fdat)),&#13;&#10;                   1,&#13;&#10;                   25)) as first_dat_g_pr,&#13;&#10;       first_value(l.sumg) over(order by l.fdat) / 100 as sumg,&#13;&#10;       trim(substr(f_sumpr(first_value(l.sumg) over(order by l.fdat) / 100,&#13;&#10;                           '',&#13;&#10;                           'M'),&#13;&#10;                   1,&#13;&#10;                   100)) as sumg_pr&#13;&#10;  from nd_acc n, accounts a, int_accn i, cc_lim l&#13;&#10; where n.nd = :p_bid_id&#13;&#10;   and n.acc = a.acc&#13;&#10;   and a.acc = i.acc&#13;&#10;   and a.tip = 'LIM'&#13;&#10;   and i.id = 0&#13;&#10;   and l.nd = n.nd&#13;&#10;   and a.acc = l.acc&#13;&#10;   and l.sumo != 0">
+        <Column Name="DAY_SS" DataType="System.String"/>
+        <Column Name="FIRST_DAT_G" DataType="System.DateTime"/>
+        <Column Name="SUMG" DataType="System.Decimal"/>
+        <Column Name="SUMG_PR" DataType="System.String"/>
+        <Column Name="FIRST_DAT_G_PR" DataType="System.String"/>
+        <CommandParameter Name="P1" DataType="126" Expression="[p_bid_id]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table7" Alias="Marital_status" DataType="System.Int32" Enabled="true" SelectCommand="select decode(wcs_utl.get_answ(b.bid_id, 'CL_34', p.ws_id, p.ws_number),&#13;&#10;              0,&#13;&#10;              1,&#13;&#10;              4,&#13;&#10;              1,&#13;&#10;              0) as is_married,&#13;&#10;       wcs_utl.get_answ(b.bid_id, 'CL_1', p.ws_id, p.ws_number) || ' ' ||&#13;&#10;       wcs_utl.get_answ(b.bid_id, 'CL_2', p.ws_id, p.ws_number) || ' ' ||&#13;&#10;       wcs_utl.get_answ(b.bid_id, 'CL_3', p.ws_id, p.ws_number) as cl_fio,&#13;&#10;       wcs_utl.get_answ(b.bid_id, 'CL_123_O', p.ws_id, p.ws_number) as cl_fio_o,&#13;&#10;       wcs_utl.get_answ(b.bid_id, 'CL_0_176', p.ws_id, p.ws_number) as spouse_fio,&#13;&#10;       'серії ' ||&#13;&#10;       wcs_utl.get_answ(b.bid_id, 'CL_0_179', p.ws_id, p.ws_number) ||&#13;&#10;       ' № ' ||&#13;&#10;       wcs_utl.get_answ(b.bid_id, 'CL_0_179_1', p.ws_id, p.ws_number) ||&#13;&#10;       ', виданий ' ||&#13;&#10;       trim(wcs_utl.get_answ(b.bid_id, 'CL_0_180', p.ws_id, p.ws_number)) || ' ' ||&#13;&#10;       trim(f_dat_lit(wcs_utl.get_answ_date(b.bid_id,&#13;&#10;                                            'CL_0_181',&#13;&#10;                                            p.ws_id,&#13;&#10;                                            p.ws_number))) as spouse_passp,&#13;&#10;       wcs_utl.get_answ(b.bid_id, 'CL_0_178', p.ws_id, p.ws_number) as spouse_inn&#13;&#10;  from v_wcs_bids b,&#13;&#10;       (select :p_ws_id as ws_id, :p_ws_number as ws_number from dual) p&#13;&#10; where b.bid_id = :p_bid_id">
+        <Column Name="IS_MARRIED" DataType="System.Decimal"/>
+        <Column Name="CL_FIO" DataType="System.String"/>
+        <Column Name="SPOUSE_FIO" DataType="System.String"/>
+        <Column Name="SPOUSE_PASSP" DataType="System.String"/>
+        <Column Name="SPOUSE_INN" DataType="System.String"/>
+        <Column Name="CL_FIO_O" DataType="System.String"/>
+        <CommandParameter Name="p_ws_id" DataType="126" Expression="[p_ws_id]" DefaultValue="&quot;MAIN&quot;"/>
+        <CommandParameter Name="p_ws_number" DataType="107" Expression="[p_ws_number]" DefaultValue="0"/>
+        <CommandParameter Name="p_bid_id" DataType="107" Expression="[p_bid_id]" DefaultValue="-1"/>
+      </TableDataSource>
+      <TableDataSource Name="Table8" Alias="Target_Many" DataType="System.Int32" Enabled="true" SelectCommand="select ( &#10; case  when to_number(wcs_utl.get_answ(:p_bid_id, 'PI_FREE_SELECTED'))=1 then &#10;' шляхом перерахування коштів в національній валюті з рахунку наданого кредиту на поточний (вкладний) рахунок Продавця '||&#10;wcs_utl.get_answ(:p_bid_id, 'CL_2_0_02', 'MAIN' , 0 )||' - '||&#10;wcs_utl.get_answ(:p_bid_id, 'PI_FREE_NAME')||' (ПІБ Продавця) № '||&#10;wcs_utl.get_answ(:p_bid_id, 'PI_FREE_NLS')||&#10;' відкритий в '||&#10;nvl((select trim(fullName)  from rcukru where mfo=wcs_utl.get_answ(:p_bid_id, 'PI_FREE_MFO') ),'')||&#10;' Банку,'||    &#10;' МФО '||wcs_utl.get_answ(:p_bid_id, 'PI_FREE_MFO')||&#10;' на підставі платіжного доручення Позичальника'&#10;else&#10;' готівкою шляхом надання Позичальнику готівки з каси Банку'&#10;end) target from dual&#10;&#10;">
+        <Column Name="TARGET" DataType="System.String"/>
+        <CommandParameter Name="P1" DataType="126" Expression="[p_bid_id]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table9" Alias="Garantees" DataType="System.Int32" Enabled="true" SelectCommand="select concatstr(&#13;&#10;--select&#13;&#10;  (case when ws_id='GRT_MORTGAGE' then  &#13;&#10; 'з прийняттям в іпотеку нерухомого майна, яке  '||(case when val_bool!=1    &#13;&#10; then&#13;&#10; 'є власністю  Майнового поручителя – '||&#13;&#10; wcs_utl.get_answ(bid_id, 'CL_1', ws_id , ws_number )||' '||&#13;&#10; wcs_utl.get_answ(bid_id, 'CL_2', ws_id , ws_number )||' '||&#13;&#10; wcs_utl.get_answ(bid_id, 'CL_3', ws_id , ws_number )||' і '&#13;&#10; else &#13;&#10; ' '&#13;&#10; end)||&#13;&#10;'знаходиться за адресою : '||&#13;&#10; wcs_utl.get_answ(bid_id, 'GRT_4_6', ws_id , ws_number )||&#13;&#10; ' буд. '||(wcs_utl.get_answ(bid_id, 'GRT_4_8', ws_id , ws_number ))||&#13;&#10;' кв. '||(wcs_utl.get_answ(bid_id, 'GRT_4_2', ws_id , ws_number ))--||'; ' --)&#13;&#10;||'; із укладенням договору страхування предмету іпотеки на користь Банку;'&#13;&#10;when ws_id='GRT_VEHICLE' then --GRT_VEHICLE&#13;&#10;'договору застави рухомого майна, а саме: '||&#13;&#10;wcs_utl.get_answ(bid_id, 'GRT_2_7', 'GRT_VEHICLE' ,  ws_number)||' '||&#13;&#10;', Марка, модель ТЗ: '||wcs_utl.get_answ(bid_id, 'GRT_3_2', 'GRT_VEHICLE' ,  ws_number)||' '||&#13;&#10;', Реєстраційний номер ТЗ: '||wcs_utl.get_answ(bid_id, 'GRT_2_7', 'GRT_VEHICLE' ,  ws_number)||' '||&#13;&#10;'; із укладенням договору страхування предмету застави на користь Банку;'&#13;&#10;when ws_id='GRT_DEPOSIT' then --GRT_VEHICLE&#13;&#10;'договору застави депозиту, а саме: '||&#13;&#10;'; із укладенням договору страхування предмету застави на користь Банку;'&#13;&#10;when ws_id='GRT_MORTGAGE_LAND' then -- GRT_MORTGAGE_LAND&#13;&#10;'договору застави земельної ділянки, а саме: '||&#13;&#10;'що  знаходиться за адресою : '||&#13;&#10; wcs_utl.get_answ(bid_id, 'GRT_4_6', ws_id , ws_number )||&#13;&#10; ' буд. '||(wcs_utl.get_answ(bid_id, 'GRT_4_8', ws_id , ws_number ))||&#13;&#10;' кв. '||(wcs_utl.get_answ(bid_id, 'GRT_4_2', ws_id , ws_number ))|| --)&#13;&#10;'; із укладенням договору страхування предмету застави на користь Банку;'&#13;&#10;when ws_id='GRT_GUARANTOR' then -- GRT_GUARANTOR-&#13;&#10;'договору поруки :'||&#13;&#10; wcs_utl.get_answ(bid_id, 'CL_1', ws_id , ws_number )||' '||&#13;&#10; wcs_utl.get_answ(bid_id, 'CL_2', ws_id , ws_number )||' '||&#13;&#10; wcs_utl.get_answ(bid_id, 'CL_3', ws_id , ws_number )||'  '&#13;&#10;when ws_id='GRT_PRODUCT' then -- GRT_PRODUCT&#13;&#10;'договору застави промислових товарів; '&#13;&#10;when ws_id='GRT_VALUABLES' then -- GRT_VALUABLES&#13;&#10;'договору застави цінностей; '&#13;&#10;else &#13;&#10;bid_id||'  '||ws_id&#13;&#10;end))&#13;&#10;GARANTEES&#13;&#10;--MORTGAGE &#13;&#10;from WCS_ANSWERS where --ws_id='GRT_MORTGAGE' &#13;&#10;--and &#13;&#10;question_id='GRT_0' &#13;&#10;and  &#13;&#10;bid_id=:p_bid_id">
+        <Column Name="GARANTEES" DataType="System.String"/>
+        <CommandParameter Name="P1" DataType="126" Expression="[p_bid_id]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table11" Alias="Guarantors" DataType="System.Int32" Enabled="true" SelectCommand="select bg.garantee_num,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id, 'CL_1', bg.ws_id, bg.garantee_num) || ' ' ||&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id, 'CL_2', bg.ws_id, bg.garantee_num) || ' ' ||&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id, 'CL_3', bg.ws_id, bg.garantee_num) as fio,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                             'CL_123_R',&#13;&#10;                             bg.ws_id,&#13;&#10;                             bg.garantee_num) as fio_r,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                             'CL_123_O',&#13;&#10;                             bg.ws_id,&#13;&#10;                             bg.garantee_num) as fio_o&#13;&#10;  from v_wcs_bid_garantees bg&#13;&#10; where bg.bid_id = :p_bid_id&#13;&#10;   and bg.garantee_id = 'GUARANTOR'&#13;&#10; order by bg.garantee_num">
+        <Column Name="GARANTEE_NUM" DataType="System.Decimal"/>
+        <Column Name="FIO_R" DataType="System.String"/>
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="FIO_O" DataType="System.String"/>
+        <CommandParameter Name="p_bid_id" DataType="107" Expression="[p_bid_id]" DefaultValue="-1"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_bid_id" DataType="System.Decimal" Expression="113502"/>
+    <Parameter Name="p_ws_id" DataType="System.String" Expression="&quot;MAIN&quot;"/>
+    <Parameter Name="p_ws_number" DataType="System.Decimal" Expression="0"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <DataBand Name="Main1" Width="718.2" Height="660.65" CanGrow="true" CanShrink="true" CanBreak="true">
+      <TableObject Name="Table13" Left="9.45" Top="9.45" Width="689.8" Height="651.2">
+        <TableColumn Name="Column5" Width="344.9"/>
+        <TableColumn Name="Column6" Width="344.9"/>
+        <TableRow Name="Row10" Height="28.35" AutoSize="true">
+          <TableCell Name="Cell22" Text="КРЕДИТНИЙ ДОГОВІР №[DataSubProdukt.DEAL_NUMBER]" Padding="2, 1, 2, 10" HorzAlign="Center" Font="Times New Roman, 11pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell23" Font="Times New Roman, 11pt"/>
+        </TableRow>
+        <TableRow Name="Row11" Height="28.35" AutoSize="true">
+          <TableCell Name="Cell27" Text="[Branch_Info.BR_LOCATION]" Font="Times New Roman, 11pt"/>
+          <TableCell Name="Cell28" Text="[DataSubProdukt.DAT_DOG_PR]" HorzAlign="Right" Font="Times New Roman, 11pt"/>
+        </TableRow>
+        <TableRow Name="Row12" Height="179.55" AutoSize="true">
+          <TableCell Name="Cell32" Text="    Цей Кредитний договір (далі - Договір) укладений між: &lt;b&gt;&lt;i&gt;Публічним акціонерним товариством «Державний ощадний банк України»&lt;/i&gt;&lt;/b&gt; (далі - Банк), що є юридичною особою за законодавством України, в особі  [Branch_Info.POST_R]&lt;b&gt;[Branch_Info.BR_BOSS_R]&lt;/b&gt;, повноваження якого підтверджені &lt;b&gt;[Branch_Info.BR_BOSS_DOC_R]&lt;/b&gt; від &lt;b&gt;[FormatDateTime([Branch_Info.BR_BOSS_DOC_D],&quot;Short Date&quot;)] року&lt;/b&gt;, посвідченою &lt;b&gt;[Branch_Info.BR_BOSS_DOC_N]&lt;/b&gt;, зареєстрованою в реєстрі за № &lt;b&gt;[Branch_Info.BR_BOSS_DOC_N_R]&lt;/b&gt;, з однієї сторони, та фізичною особою &lt;b&gt;[klient_info.FIO_O]&lt;/b&gt;, паспорт &lt;b&gt;[klient_info.PASPORT]&lt;/b&gt; (далі - Позичальник), з другої сторони, (разом за текстом Договору - Сторони), свідчить що Сторони досягли згоди щодо врегулювання всіх майнових та організаційних аспектів на нижченаведених умовах і уклали цей Договір про наступне:" Padding="2, 10, 2, 20" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell33" Font="Times New Roman, 11pt"/>
+        </TableRow>
+        <TableRow Name="Row13" Height="414.95" AutoSize="true">
+          <TableCell Name="Cell37" Text="&lt;b&gt;&lt;u&gt;1. ПРЕДМЕТ ДОГОВОРУ&lt;/u&gt;&lt;/b&gt;&#13;&#10;&#13;&#10;    1.1. Банк зобов’язується надати Позичальнику на умовах цього Договору Кредит в сумі &lt;b&gt;[Format(&quot;{0:N}&quot;, [DataSubProdukt.SUMM])]&lt;/b&gt; (&lt;b&gt;[DataSubProdukt.SSUM_PR]&lt;/b&gt;) гривень, а Позичальник зобов’язується прийняти, належним чином використати та повернути Кредит в сумі &lt;b&gt;[Format(&quot;{0:N}&quot;, [DataSubProdukt.SUMM])]&lt;/b&gt; (&lt;b&gt;[DataSubProdukt.SSUM_PR]&lt;/b&gt;) гривень, сплатити проценти за користування Кредитом в розмірі &lt;b&gt;[Format(&quot;{0:P}&quot;, [DataSubProdukt.INTEREST_RATE] / 100)]&lt;/b&gt; (&lt;b&gt;[DataSubProdukt.INTEREST_RATE_PR]&lt;/b&gt;) процентів річних та комісійні винагороди в порядку, на умовах та в строки, визначені цим Договором. Зазначена в цьому пункті процентна ставка за користування Кредитом є фіксованою.&#13;&#10;    1.2. Кредит надається на &lt;b&gt;[DataSubProdukt.TERM]&lt;/b&gt; (&lt;b&gt;[DataSubProdukt.TERM_PR]&lt;/b&gt;) місяців з терміном остаточного погашення Кредиту не пізніше &lt;b&gt;[DataSubProdukt.DAT_DOG_RET_PR]&lt;/b&gt; на споживчі цілі.&#13;&#10;    1.3. Надання Кредиту здійснюється одноразово у &lt;b&gt;[Branch_Info.NAME_BRANCH]&lt;/b&gt; АТ «Ощадбанк» готівкою або шляхом безготівкового перерахування коштів на поточний рахунок Позичальника, відкритий в &lt;b&gt;[Branch_Info.NAME_BRANCH]&lt;/b&gt; АТ «Ощадбанк» протягом 1 (одного) робочого дня з моменту виконання Позичальником умов, що зазначені в п. 1.4. цього Договору. Детальний розпис сукупної вартості кредиту (у процентному значенні та грошовому виразі), графік платежів, вид і предмет кожної супутньої послуги, пов’язаної з одержанням, обслуговуванням, погашенням Кредиту та укладенням цього Договору та їх обґрунтування визначені в додатках №1-3 до цього Договору, що є його невід’ємною частиною.   &#13;&#10;   1.4. Сторони погоджуються з тим, що зобов’язання Банку надати Кредит виникає з моменту виконання всіх та кожної з наведених нижче умов (надалі по тексту використовуватиметься скорочення – «Загальні умови надання Кредиту»):&#13;&#10;   1.4.1. Укладення в забезпечення виконання зобов’язань за цим Договором:" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell38" HorzAlign="Justify" Font="Times New Roman, 11pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <DataBand Name="Guarantors1" Top="664.95" Width="718.2" Height="18.9" DataSource="Table11">
+      <TableObject Name="Table14" Left="9.45" Width="689.86" Height="18.9">
+        <TableColumn Name="Column10" Width="344.93"/>
+        <TableColumn Name="Column11" Width="344.93"/>
+        <TableRow Name="Row20" AutoSize="true">
+          <TableCell Name="Cell62" Text="         - договору поруки з &lt;b&gt;[Guarantors.FIO_O]&lt;/b&gt;" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell63"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <DataBand Name="Main2" Top="688.15" Width="718.2" Height="2085.05" CanGrow="true" CanShrink="true" CanBreak="true">
+      <TableObject Name="Table15" Left="9.45" Width="689.86" Height="2085.05">
+        <TableColumn Name="Column8" Width="344.93"/>
+        <TableColumn Name="Column9" Width="344.93"/>
+        <TableRow Name="Row15" AutoSize="true">
+          <TableCell Name="Cell40" Text="в день укладення цього Договору (надалі – Договори забезпечення)." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell41" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row16" Height="55.85" AutoSize="true">
+          <TableCell Name="Cell45" Text="    1.4.2. Сплати Позичальником комісійної винагороди за надання Кредиту в розмірі &lt;b&gt;[Format(&quot;{0:N}&quot;, [DataSubProdukt.SINGLE_FEE])]&lt;/b&gt; (&lt;b&gt;[DataSubProdukt.SINGLE_FEE_PR]&lt;/b&gt;)  грн. в день укладення цього Договору." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell46" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row22" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell66" Text="    1.4.3. Відкриття Позичальником поточного рахунку в Банку № &lt;b&gt;[Current_Accounts.CURRENT_ACC]&lt;/b&gt; для здійснення розрахунково-касового обслуговування, в тому числі з обслуговування кредиту." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell67" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row23" Height="122.85" AutoSize="true">
+          <TableCell Name="Cell68" Text="    1.5. Позичальник зобов’язується здійснювати погашення кредиту рівними частинами в сумі &lt;b&gt;[Format(&quot;{0:N}&quot;, [DATA_LIM.SUMG])]&lt;/b&gt; (&lt;b&gt;[DATA_LIM.SUMG_PR]&lt;/b&gt;) грн. та сплату процентів, нарахованих Банком на залишок заборгованості за Кредитом, щомісячно до &lt;b&gt;[DATA_LIM.DAY_SS]&lt;/b&gt; числа місяця, наступного за звітним починаючи з &lt;b&gt;[DATA_LIM.FIRST_DAT_G_PR]&lt;/b&gt; шляхом внесення коштів на поточний рахунок, зазначений в п. 1.4.3., які Банк надалі списує в рахунок погашення кредиту відповідно до п. 1.7. цього Договору. Останній платіж в рахунок погашення Кредиту та сплати нарахованих Банком процентів здійснити не пізніше &lt;b&gt;[DataSubProdukt.DAT_DOG_RET_PR]&lt;/b&gt;. " HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell69" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row24" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell70" Text="    1.6. За користування Кредитом Позичальник зобов’язаний сплачувати Банку відповідну плату (проценти) в порядку, розмірах та строки, визначені в цьому Договорі." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell71" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row25" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell72" Text="    1.6.1. При нарахуванні та сплаті процентів за користування Кредитом Сторони повинні керуватись наступним:" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell73" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row26" Height="85.05" AutoSize="true">
+          <TableCell Name="Cell74" Text="    1.6.1.1. На період з дня видачі Кредиту та до моменту закінчення строку, на який було надано Кредит, а саме: до &lt;b&gt;[DataSubProdukt.DAT_DOG_RET_PR]&lt;/b&gt; включно, проценти за користування Кредитом нараховуються Банком на підставі процентної ставки в розмірі &lt;b&gt;[Format(&quot;{0:P}&quot;, [DataSubProdukt.INTEREST_RATE] / 100)]&lt;/b&gt; (&lt;b&gt;[DataSubProdukt.INTEREST_RATE_PR]&lt;/b&gt;) процентів річних. " HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell75" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row27" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell76" Text="    1.6.1.2. При нарахуванні процентів за користування Кредитом враховується перший і не враховується останній день користування Кредитом." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell77" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row17" Height="93.65" AutoSize="true">
+          <TableCell Name="Cell50" Text="    1.6.1.3. Проценти нараховуються Банком щомісячно за методом факт/факт на фактичний залишок заборгованості за Кредитом, що був отриманий Позичальником, починаючи з дати видачі Кредиту до моменту закінчення строку, на який надано Кредит. Сплата процентів здійснюється Позичальником  згідно з Графіком платежів або достроково відповідно до порядку визначеному Розділом 3 цього Договору." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell51" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row28" Height="94.5" AutoSize="true">
+          <TableCell Name="Cell78" Text="   1.6.1.4. При здійсненні Позичальником останнього платежу в погашення заборгованості за Кредитом Позичальник та Банк здійснюють звірку погашення заборгованості за Кредитом та сплати процентів за користування ним в повному обсязі та визначають остаточну суму залишку заборгованості за Кредитом, починаючи з першого дня видачі включно, та до дня повернення кредитних коштів, що були фактично отримані Позичальником." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell79" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row29" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell80" Text="   1.6.1.5. Всі платежі за цим Договором (погашення Кредиту, сплата процентів за його користування, комісійних винагород, штрафних санкцій тощо) здійснюються шляхом списання Банком коштів з поточного рахунку, зазначеного у п. 1.4.3." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell81" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row30" Height="217.35" AutoSize="true">
+          <TableCell Name="Cell82" Text="   1.6.1.6. Сторони погоджуються з тим, що Банк не дає жодних гарантій щодо незмінності розміру процентів за користування Кредитом, а тому розмір процентів за користування Кредитом за цим Договором внаслідок настання події, яка має безпосередній вплив на вартість кредитних ресурсів, в тому числі,  залежно від зміни облікової ставки Національного банку України або процентних ставок за активними і пасивними операціями Національного банку України, зміни процентних ставок на кредитному ринку України, внаслідок прийняття компетентними державними органами України рішень, що безпосередньо впливають на стан кредитного ринку України, може бути змінений. Банк має право ініціювати зміну розміру  процентів за користування Кредитом по цьому Договору. В такому разі Банк направляє Позичальнику та Поручителю(-ям) Позичальника відповідне повідомлення з зазначенням нової процентної ставки, а також, причин, з якими Банк пов’язує необхідність зміни процентів за користування Кредитом та пропозицію укласти додатковий договір до цього Договору та договорів забезпечення виконання зобов’язання." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell83" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row18" Height="103.1" AutoSize="true">
+          <TableCell Name="Cell55" Text="    1.6.1.7. Якщо запропонований Банком розмір процентів за користування кредитом задовольнить Позичальника та Поручителя(-ів),  то Позичальник та Поручитель(-лі) протягом 15 (п’ятнадцяти) календарних днів з моменту отримання відповідної пропозиції укладають додатковий договір до цього Договору про зміну процентної ставки за користування Кредитом одночасно з підписанням додаткових договорів до Договорів забезпечення із Поручителем(-ями) Позичальника." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell56" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row31" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell84" Text="    1.6.2. Сплата нарахованих процентів здійснюється Позичальником в валюті Кредиту та в порядку передбаченому цим Договором." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell85" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row32" Height="94.5" AutoSize="true">
+          <TableCell Name="Cell86" Text="    1.6.3. Якщо сума платежу, що надійшла в погашення кредиту, менша розміру, вказаного у п. 1.5. цього Договору та Графіку платежів, то платіж та нараховані проценти, що мають бути сплаченими, вважаються простроченими. Наступна сума платежу повинна додатково включати погашення простроченого платежу та нарахованої пені за прострочені платежі з урахуванням вимог п. 5.2. цього Договору." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell87" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row33" Height="330.75" AutoSize="true">
+          <TableCell Name="Cell88" Text="    1.7. Цим Договором Позичальник доручає Банку проводити договірне списання коштів з його поточного рахунку № &lt;b&gt;[Current_Accounts.CURRENT_ACC]&lt;/b&gt;, відкритого відповідно до п. 1.4.3. цього Договору:&#13;&#10;        - коштів, що підлягають сплаті Позичальником на користь Банку за цим Договором в дату погашення згідно з Графіком платежів;&#13;&#10;        - коштів, що підлягають сплаті Позичальником на користь Банку за цим Договором при достроковому погашенні Кредиту згідно заяви Позичальника, зазначеній у п. 3.2.3. та/або при простроченні виконання зобов’язань.&#13;&#10;    Цим Договором Позичальник також доручає Банку проводити договірне списання коштів з поточних рахунків № &lt;b&gt;[Current_Accounts.CURRENT_ACC]&lt;/b&gt;, відкритих в &lt;b&gt;[Branch_Info.NAME_BRANCH]&lt;/b&gt; у разі невиконання Позичальником своїх зобов’язань за цим Договором.&#13;&#10;    У разі, якщо поточний рахунок клієнта використовується для обслуговування двох та більше кредитів черговість списання коштів з рахунку здійснюється у порядку настання планової дати погашення кредитів у черговості, визначеній п. 1.8. цього Договору. Якщо на одну планову дату припадає погашення за двома та більше кредитами, то порядок списання здійснюється у черговості, визначеній п. 1.8. цього Договору відповідно у порядку укладення кредитних договорів. Якщо на одну планову дату припадає погашення за двома та більше кредитами, дата укладання кредитних договорів, за якими співпадає, в першу чергу списуються кошти з рахунку для погашення заборгованості за тим кредитним договором, строк дії якого/строк погашення траншу за яким коротший." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell89" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row19" Height="197.6" AutoSize="true">
+          <TableCell Name="Cell60" Text="    1.8. При надходженні від Позичальника коштів у рахунок погашення Кредиту та сплати процентів за користування ним, виконання Позичальником грошових зобов’язань за цим Договором здійснюється у наступній черговості:&#13;&#10;        - погашення прострочених процентів за користування Кредитом (якщо прострочення буде мати місце);&#13;&#10;        - погашення простроченої заборгованості за Кредитом (якщо прострочення буде мати місце);&#13;&#10;        - погашення нарахованих строкових процентів за користування Кредитом;&#13;&#10;        - погашення строкової заборгованості за Кредитом;&#13;&#10;        - сплата пені за непогашення в строк  платежів по Кредиту (якщо непогашення буде мати місце);&#13;&#10;        - сплата штрафів, передбачених цим Договором;&#13;&#10;        - сплата інших платежів відповідно до умов цього Договору." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell61" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row34" Height="113.4" AutoSize="true">
+          <TableCell Name="Cell90" Text="    1.9. Банк має право самостійно без отримання попередньої згоди Позичальника змінювати послідовність погашення Зобов’язань Позичальником за цим Договором і спрямовувати кошти, отримані від Позичальника/Поручителя на виконання Зобов’язань Позичальника без  дотримання послідовності, передбаченої  умовами п. 1.8. Договору. Про зміну порядку (послідовності) виконання Зобов’язання, Банк повідомляє Позичальника шляхом надання Позичальникові письмового повідомлення у відповідь на його (Позичальника) письмове звернення до Банку." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell91" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row35" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell92" Text="    1.10. Погашення заборгованості, внаслідок отримання Банком грошових коштів за результатами виконання виконавчого документа, здійснюється в порядку, визначеному таким виконавчим документом." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell93" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row21" Height="179.55" AutoSize="true">
+          <TableCell Name="Cell64" Text="    1.11. У випадку неналежного виконання зобов’язань за цим Договором Позичальник надає згоду на розкриття Банком інформації щодо діяльності та фінансового стану Позичальника, яка стала відомою Банку у процесі обслуговування Позичальника та є банківською таємницею в обсязі, необхідному для захисту інтересів Банку та стягнення заборгованості, а також  в обсязі, необхідному для відступлення майнових прав за цим Договором та Договором поруки на користь інших осіб. Розкриття Банком інформації, що становить банківську таємницю, відповідно до цього пункту Договору, може бути здійснено на користь будь-яких осіб, в тому числі, але не виключно, правоохоронних органів, а також юридичних осіб, що надаватимуть послуги Банку, пов’язані з поверненням простроченої заборгованості за цим Договором." Padding="2, 1, 2, 20" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell65" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row36" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell94" Text="&lt;b&gt;&lt;u&gt;2. ЗАБЕЗПЕЧЕННЯ ВИКОНАННЯ ЗОБОВ’ЯЗАНЬ ЗА ДОГОВОРОМ&lt;/u&gt;&lt;/b&gt;&#13;&#10;&#13;&#10;   2.1. Виконання Позичальником зобов’язань за цим Договором (в тому числі і додатковими угодами до нього) забезпечується наступними Договорами:" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell95" HorzAlign="Justify" Font="Times New Roman, 11pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <DataBand Name="Guarantors2" Top="2777.5" Width="718.2" Height="18.9" DataSource="Table11">
+      <TableObject Name="Table16" Left="9.45" Width="689.86" Height="18.9">
+        <TableColumn Name="Column12" Width="344.93"/>
+        <TableColumn Name="Column13" Width="344.93"/>
+        <TableRow Name="Row37" AutoSize="true">
+          <TableCell Name="Cell96" Text="        - Договором поруки, укладеним з &lt;b&gt;[Guarantors.FIO_O]&lt;/b&gt;" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell97"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <DataBand Name="Main3" Top="2800.7" Width="718.2" Height="5269.7">
+      <TableObject Name="Table12" Left="9.45" Width="689.86" Height="5213">
+        <TableColumn Name="Column14" Width="344.93"/>
+        <TableColumn Name="Column15" Width="344.93"/>
+        <TableRow Name="Row38" Height="151.2" AutoSize="true">
+          <TableCell Name="Cell98" Text="&lt;b&gt;&lt;u&gt;3. ДОСТРОКОВЕ ПОГАШЕННЯ КРЕДИТУ&lt;/u&gt;&lt;/b&gt;&#13;&#10;&#13;&#10;    3.1 Позичальник має право в будь-який час провести дострокове погашення всієї суми або частини суми наданого Кредиту, за умови, що нараховані Банком проценти за користування Кредитом, та всі інші суми, які повинні бути сплачені, будуть сплачені Позичальником в той же час. В разі дострокового повернення Позичальником частини суми заборгованості за Кредитом Банк зобов’язаний здійснити відповідне коригування кредитних зобов’язань Позичальника в бік її зменшення." Padding="2, 20, 2, 1" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell99" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row39" Height="27.5" AutoSize="true">
+          <TableCell Name="Cell100" Text="    3.2. Сторони домовились встановити наступний порядок дострокового погашення Кредиту:" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell101" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row40" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell102" Text="    3.2.1. Достроковим повним погашенням вважається повернення Позичальником суми Кредиту та нарахованих процентів за його користуванням в повному обсязі на дату погашення до настання кінцевого терміну погашення за цим Договором." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell103" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row41" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell104" Text="    3.2.2. Достроковим частковим погашенням Кредиту вважається сплата Позичальником чергових платежів у розмірах більших, ніж це передбачено Графіком платежів." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell105" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row42" Height="56.7" AutoSize="true">
+          <TableCell Name="Cell106" Text="    3.2.3. В разі прийняття Позичальником рішення здійснити дострокове повне або часткове погашення Кредиту, він зобов’язується письмово попередити Банк про намір здійснити дострокове погашення не менш ніж за 5 (п’ять) календарних днів." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell107" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row43" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell108" Text="    3.2.4. При достроковому погашенні Кредиту нарахування та сплата процентів за користування Кредитом здійснюється у відповідності до положень п. 1.6. цього Договору." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell109" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row44" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell110" Text="    3.2.5. Здійснення дострокового часткового погашення Кредиту у поточному платіжному періоді не звільняє Позичальника від сплати чергового платежу у наступному платіжному періоді." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell111" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row45" Height="160.65" AutoSize="true">
+          <TableCell Name="Cell112" Text="    3.2.6. Впродовж 1 (одного) календарного дня після здійснення Позичальником дострокового часткового погашення  Кредиту Сторони, залежно від змісту поданої Позичальником відповідно до п. 3.2.3. заяви, вносять наступні зміни до цього Договору:&#13;&#10;    - в частині зміни терміну остаточного погашення Кредиту (в бік зменшення) із встановленням відповідного нового Графіку платежів – у разі прийняття Позичальником рішення збереження розміру чергових платежів по Кредиту, що визначені у п. 1.5. цього Договору; &#13;&#10;    - в частині перерахунку розміру чергових платежів по Кредиту із встановленням відповідного нового Графіку платежів – у разі прийняття Позичальником рішення збереження первинного терміну остаточного погашення Кредиту." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell113" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row46" Height="84.2" AutoSize="true">
+          <TableCell Name="Cell114" Text="    3.2.7. У разі, якщо Позичальником, після здійснення дострокового часткового погашення  Кредиту, не укладено з Банком додатковий договір відповідно до п. 3.2.6. цього Договору, у будь-якому разі Банк здійснює перерахунок Графіка платежів із скороченням первинного терміну остаточного погашення Кредиту, новий Графік платежів надається Позичальнику за першою вимогою." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell115" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row47" Height="75.6" AutoSize="true">
+          <TableCell Name="Cell116" Text="    3.3. При достроковому погашенні Кредиту або будь – якої його частини платежі за цим Договором вносяться Позичальником в такій послідовності: &#13;&#10;    - нараховані  проценти за час фактичного користування Кредитом; &#13;&#10;    - основна  сума Кредиту." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell117" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row48" Height="217.35" AutoSize="true">
+          <TableCell Name="Cell118" Text="    3.4. Банк має право вимагати від Позичальника дострокового повернення суми Кредиту в цілому, або у визначеній Банком частині, сплати процентів за його користування та інших платежів, що належать до сплати за цим Договором, у випадку невиконання або неналежного виконання Позичальником будь-яких зобов’язань за цим Договором або невиконання чи неналежного виконання Поручителем(-ями) (хоча б одним з Поручителів) будь-яких зобов’язань за Договором поруки, в тому числі, але не виключно, у випадку:&#13;&#10;    - затримання сплати частини Кредиту та/або процентів за користування Кредитом, належних до сплати інших платежів за цим Договором на один календарний місяць;&#13;&#10;    - використання Кредиту не за цільовим призначенням;&#13;&#10;    - виникнення обставин, які за обґрунтованим висновком Банку призведуть до того, що Позичальник не виконає свої зобов’язання по цьому Договору;&#13;&#10;    - неподання Позичальником та/або Поручителем(-ями) (хоча б одним з Поручителів), на вимогу Банку, даних, що стосуються їх фінансового стану." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell119" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row49" Height="75.6" AutoSize="true">
+          <TableCell Name="Cell120" Text="    3.5. Виконання Позичальником вимоги Банку щодо дострокового повернення суми Кредиту належних до сплати процентів, та інших платежів відповідно до умов цього Договору повинно бути проведено Позичальником протягом 30 (тридцяти) календарних днів з дати одержання такої вимоги від Банку." Padding="2, 1, 2, 20" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell121" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row50" Height="55.85" AutoSize="true">
+          <TableCell Name="Cell122" Text="&lt;b&gt;&lt;u&gt;4. ПРАВА ТА ЗОБОВ’ЯЗАННЯ СТОРІН&lt;/b&gt;&lt;/u&gt;&#13;&#10;&#13;&#10;&lt;b&gt;    4.1. Зобов’язання Банку:&lt;/b&gt;" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell123" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row51" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell124" Text="    4.1.1. При умові виконання «Загальних умов надання Кредиту», надати Позичальнику Кредит в порядку і на умовах, викладених в цьому Договорі." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell125" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row52" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell126" Text="    4.1.2. Відкрити Позичальнику рахунок для обліку наданого Кредиту та обліку нарахованих процентів за Кредитом відповідно до правил, що діють у Банку." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell127" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row53" AutoSize="true">
+          <TableCell Name="Cell128" Text="    4.1.3. Відкрити Позичальнику поточний рахунок згідно п. 1.4.3." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell129" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row54" Height="36.95" AutoSize="true">
+          <TableCell Name="Cell130" Text="    4.1.4. Здійснити видачу Кредиту готівкою або шляхом безготівкового перерахування коштів на поточний рахунок Позичальника.&#13;&#10;" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell131" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row55" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell132" Text="    4.1.5. Забезпечити Позичальника консультативними послугами, що необхідні для видачі кредиту та виконання умов цього Договору." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell133" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row56" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell134" Text="    4.1.6. Здійснювати нарахування процентів за користування Кредитом з моменту його видачі та до терміну, зазначеного в п. 1.6.1.1. цього Договору." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell135" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row57" Height="56.7" AutoSize="true">
+          <TableCell Name="Cell136" Text="    4.1.7. За вимогою Позичальника надавати йому довідку щодо стану заборгованості за цим Договором. Вартість послуг Банку щодо надання довідки щодо стану заборгованості за цим Договором визначена в Додатку №3, що є невід’ємною його частиною." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell137" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row58" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell138" Text="    4.1.8. Не розголошувати інформацію щодо діяльності та фінансового стану Позичальника, яка складає банківську таємницю, за виключенням випадків, коли розкриття банківської таємниці без погодження з Позичальником є обов’язковим для Банку у відповідності з чинним законодавством України та у випадках, передбачених п. 1.11., п. 4.2.4., п. 7.5., п. 7.6. та п. 7.7. цього Договору." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell139" HorzAlign="Justify" Font="Times New Roman, 11pt"/>
+        </TableRow>
+        <TableRow Name="Row59" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell140" Text="    4.1.9. У разі передачі Банком своїх прав за цим Договором третій стороні - завчасно повідомити Позичальника про таку передачу." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell141" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row60" Height="56.7" AutoSize="true">
+          <TableCell Name="Cell142" Text="&lt;b&gt;    4.2. Права Банку:&lt;/b&gt;&#13;&#10;    4.2.1. Вимагати від Позичальника належного виконання останнім взятих на себе зобов’язань по цьому Договору." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell143" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row61" Height="85.05" AutoSize="true">
+          <TableCell Name="Cell144" Text="    4.2.2. При виникненні простроченої заборгованості за Кредитом чи процентами, а також в інших випадках, передбачених цим Договором, вимагати дострокового повернення Кредиту, нарахованих процентів та інших платежів за цим Договором, та стягнути заборгованість за цим Договором в примусовому порядку. " HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell145" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row62" Height="85.05" AutoSize="true">
+          <TableCell Name="Cell146" Text="    4.2.3. Вимагати від Позичальника укладення нових Договорів забезпечення повернення Кредиту у разі, якщо укладені договори не в повному обсязі відповідно до правил Банку забезпечують повернення отриманого Позичальником Кредиту згідно з умовами цього Договору. Висновок Банку щодо необхідності укласти нові Договори забезпечення є безспірним і не підлягає оскарженню." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell147" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row63" Height="160.65" AutoSize="true">
+          <TableCell Name="Cell148" Text="    4.2.4. У випадку неналежного виконання зобов’язань за цим Договором Позичальник надає згоду на розкриття Банком інформації щодо діяльності та фінансового стану Позичальника, яка стала відомою Банку у процесі обслуговування Позичальника та є банківською таємницею в обсязі, необхідному для захисту інтересів Банку та стягнення заборгованості, а також  в обсязі, необхідному для відступлення майнових прав за цим Договором та Договорами забезпечення на користь інших осіб. Розкриття Банком інформації, що становить банківську таємницю, відповідно до цього пункту Договору, може бути здійснено на користь будь-яких осіб, в тому числі, але не виключно, правоохоронних органів, а також юридичних осіб, що надаватимуть послуги Банку, пов’язані з поверненням простроченої заборгованості за цим Договором." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell149" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row64" Height="75.6" AutoSize="true">
+          <TableCell Name="Cell150" Text="    4.2.5. Банк має право припинити видачу Кредиту у разі істотної зміни кон’юнктури кредитного ринку або інших фінансових ринків, якщо така зміна може спричинити істотне погіршення фінансового результату від виконання кредитних операцій за цим Договором для Банку відносно очікуваного фінансового результату на момент укладення цього Договору." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell151" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row65" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell152" Text="&lt;b&gt;    4.3. Зобов’язання Позичальника:&lt;/b&gt;&#13;&#10;    4.3.1. Належним чином виконувати взяті на себе зобов’язання за цим Договором." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell153" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row66" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell154" Text="    4.3.2. Завчасно забезпечувати наявність коштів для сплати чергових платежів за цим Кредитним договором на поточному рахунку, визначеному п. 1.4.3. цього Договору до платіжної дати, визначеної Графіком платежів." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell155" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row67" Height="103.95" AutoSize="true">
+          <TableCell Name="Cell156" Text="    4.3.3. Повернути Кредит в сумі &lt;b&gt;[Format(&quot;{0:N}&quot;, [DataSubProdukt.SUMM])]&lt;/b&gt; (&lt;b&gt;[DataSubProdukt.SSUM_PR]&lt;/b&gt;) грн., своєчасно сплачувати проценти за користування Кредитом, своєчасно сплатити комісійну винагороду, встановлену цим Договором, а у випадку невиконання або неналежного виконання взятих на себе зобов’язань по цьому Договору сплатити штрафні санкції, у строки та на умовах, що визначені цим Договором." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell157" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row68" Height="85.05" AutoSize="true">
+          <TableCell Name="Cell158" Text="    4.3.4. У разі порушення умов цього Договору та/або Договору(-ів) поруки достроково повернути Кредит з одночасною сплатою процентів за фактичний час користування кредитними ресурсами та штрафних санкцій відповідно до чинного законодавства України. Сторони домовилися, що розмір збитків визначатиметься Банком самостійно, на що Позичальник цим надає згоду." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell159" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row69" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell160" Text="    4.3.5. До моменту отримання кредитних коштів надати документи, що підтверджують виконання «Загальних умов надання Кредиту»." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell161" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row70" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell162" Text="    4.3.6. Відповідати всіма власними коштами та майном по своїх зобов’язаннях, що випливають з цього Договору." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell163" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row71" Height="141.75" AutoSize="true">
+          <TableCell Name="Cell164" Text="    4.3.7. З метою здійснення Банком контролю за фінансовим станом та кредитоспроможністю Позичальника, за станом забезпечення повернення Кредиту протягом дії цього Договору, надавати Банку кожні 12 (дванадцять) місяців з моменту укладення цього Договору, або на першу вимогу Банку, документи, що підтверджують фінансовий стан Позичальника, а в разі прострочення Позичальником строку повернення будь-якої частини Кредиту та/або сплати процентів за його користування, негайно подати Банку документи, що підтверджують фінансовий стан Позичальника або документи, що підтверджують причини, що об’єктивно унеможливлюють виконання зобов’язань Позичальника за цим Договором." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell165" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row72" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell166" Text="    4.3.8. У 30 (тридцяти) денний  строк повідомити Банк про зміну реєстрації свого постійного місця проживання (реєстрації),  зміни місця працевлаштування, прізвища, імені, по-батькові, та інші обставини, що можуть вплинути на виконання зобов’язань за цим Договором." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell167" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row73" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell168" Text="    4.3.9. Впродовж строку дії цього Договору своєчасно та самостійно ознайомлюватись із Тарифами банку, що пов’язані із обслуговуванням та погашенням Кредиту, в &lt;b&gt;[Branch_Info.NAME_BRANCH]&lt;/b&gt; установі Банку." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell169" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row74" Height="56.7" AutoSize="true">
+          <TableCell Name="Cell170" Text="    4.3.10. Після здійснення дострокового часткового погашення  Кредиту впродовж 1 (одного) календарного дня укласти з Банком Додатковий договір до цього Договору відповідно до п. 3.2.6. цього Договору." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell171" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row106" Height="113.4" AutoSize="true">
+          <TableCell Name="Cell234" Text="    4.3.11. Протягом строку дії цього Договору без попередньої письмової згоди Банку:&#13;&#10;        - не укладати будь-які інші кредитні договори чи договори позики, договори поруки, фінансової допомоги (їх різновидів) або інші договори, що встановлюють зобов’язання для Позичальника з повернення грошових коштів;&#13;&#10;        - не відчужувати, не продавати, не здавати в оренду (найм), не встановлювати інші обтяження щодо власного майна." Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell235" Font="Times New Roman, 11pt"/>
+        </TableRow>
+        <TableRow Name="Row75" Height="75.6" AutoSize="true">
+          <TableCell Name="Cell172" Text="&lt;b&gt;    4.4. Права Позичальника:&lt;/b&gt;&#13;&#10;    4.4.1. В порядку, передбаченому цим Договором, одержувати від Банку інформацію про стан заборгованості за Кредитом,  процентами за його користування, комісійними винагородами та іншими платежами за цим Договором." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell173" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row76" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell174" Text="    4.4.2. Порушувати перед Банком питання про перенесення строку погашення Кредиту у разі виникнення тимчасових фінансових або інших ускладнень з незалежних від нього (Позичальника) причин." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell175" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row77" Height="56.7" AutoSize="true">
+          <TableCell Name="Cell176" Text="    4.4.3. Достроково погасити Кредит або будь-яку його частину в порядку, передбаченому цим Договором." Padding="2, 1, 2, 20" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell177" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row78" AutoSize="true">
+          <TableCell Name="Cell178" Text="&lt;b&gt;&lt;u&gt;5. ВІДПОВІДАЛЬНІСТЬ СТОРІН&lt;/u&gt;&lt;/b&gt;&#13;&#10;&#13;&#10;    5.1. За невиконання або неналежне виконання взятих на себе зобов’язань по цьому Договору, Сторони несуть відповідальність в порядку та на умовах, обумовлених в цьому Договорі та чинним законодавством України та відшкодовують завдані збитки понад неустойку (пеню, штраф)." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell179" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row79" Height="94.5" AutoSize="true">
+          <TableCell Name="Cell180" Text="    5.2. За порушення взятих на себе зобов’язань по поверненню основної суми Кредиту та своєчасній сплаті процентів за користування Кредитом, комісійної винагороди та інших платежів за цим Договором, Позичальник зобов’язується сплатити на користь Банку пеню в розмірі подвійної облікової ставки Національного банку України, яка діяла в період, за який сплачується пеня, від суми платежу за кожний день прострочення." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell181" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row80" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell182" Text="    5.3. У разі документального підтвердження використання Позичальником Кредиту не за цільовим призначенням, Позичальник повинен сплатити на користь Банку штраф в розмірі 5 (п’ять) процентів від суми Кредиту, використаного не за цільовим призначенням, обумовленим цим Договором." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell183" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row81" Height="75.6" AutoSize="true">
+          <TableCell Name="Cell184" Text="    5.4. У разі ненадання Позичальником документів, що передбачені умовами цього Договору, Позичальник повинен сплатити на користь Банку неустойку в розмірі 0,05 (нуль цілих п’ять сотих) процентів від суми Кредиту." Padding="2, 1, 2, 20" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell185" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row82" Height="75.6" AutoSize="true">
+          <TableCell Name="Cell186" Text="&lt;b&gt;&lt;u&gt;6. ПОРЯДОК РОЗГЛЯДУ СПОРІВ&lt;/u&gt;&lt;/b&gt;&#13;&#10;&#13;&#10;    6.1. У разі виникнення між Сторонами спорів за цим Договором або у зв’язку з ним, Сторони зроблять все необхідне для врегулювання вказаних спорів шляхом переговорів." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell187" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row83" Height="75.6" AutoSize="true">
+          <TableCell Name="Cell188" Text="    6.2. Спори за цим Договором, врегулювання яких неможливо досягнути шляхом переговорів протягом 30 (тридцяти) календарних днів, вирішуються в судовому порядку відповідно до чинного законодавства України." Padding="2, 1, 2, 20" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell189" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row84" Height="75.6" AutoSize="true">
+          <TableCell Name="Cell190" Text="&lt;b&gt;&lt;u&gt;7. ОСОБЛИВІ ПОЛОЖЕННЯ ДОГОВОРУ&lt;/u&gt;&lt;/b&gt;&#13;&#10;&#13;&#10;    7.1. Цей Договір може бути змінений або доповнений за взаємною згодою Сторін." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell191" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row85" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell192" Text="    7.2. Всі зміни та доповнення до цього Договору викладаються в письмовій формі та набувають чинності з моменту їх підписання." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell193" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row86" Height="85.05" AutoSize="true">
+          <TableCell Name="Cell194" Text="    7.3. Будь-які повідомлення, які направляються Сторонами одна одній в рамках цього Договору, повинні бути здійснені в письмовій формі та будуть вважатись поданими належним чином, якщо вони надіслані листом на замовлення або доставлені особисто на адресу Сторін, окрім випадків, що передбачені окремими положеннями цього Договору." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell195" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row87" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell196" Text="    7.4. Додаткові договори до цього Договору, які можуть бути укладені в майбутньому, є його невід’ємною частиною." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell197" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row89" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell200" Text="    7.5. Банк повідомляє Позичальника, а Позичальник цим надає згоду на те, що інформація про Позичальника зберігатиметься в центральній базі даних Національного банку України а також в інших базах даних, що передбачені чинним законодавством України." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell201" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row90" Height="217.35" AutoSize="true">
+          <TableCell Name="Cell202" Text="    7.6. Позичальник надає Банку необмежену строком письмову згоду на обробку його персональних даних в обсязі, що міститься в цьому Договорі та інших документах, підписаних/засвідчених та поданих ним Банку для отримання Кредиту згідно цього Договору, та/або буде отримано Банком під час обслуговування Кредиту від Позичальника або третіх осіб, у т.ч. змінювати його персональні дані за інформацією від третіх осіб. &#13;&#10;    Також, Позичальник надає Банку згоду поширювати його персональні дані та/або здійснювати їх передачу чи надання доступу до них третім особам у випадках, передбачених законодавством України, цим договором та/або договорами, що укладені (будуть укладені) між Позичальником та Банком. Без отримання додаткової письмової згоди Позичальник надає право Банку передавати його персональні данні для обробки третім особам та здійснювати відносно його персональних даних будь-які інші дії, якщо це пов’язано із виконанням укладених між Позичальником та Банком договорів та/або із захистом прав Банку за ними, або необхідно для реалізації повноважень Банку за законом." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell203" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row91" Height="94.5" AutoSize="true">
+          <TableCell Name="Cell204" Text="    7.7. Банк повідомляє Позичальника, а Позичальник цим надає згоду на те, що інформація про Позичальника надаватиметься товариству з обмеженою  відповідальністю «Перше всеукраїнське бюро кредитних історій», яке знаходиться за адресою: 02002, м. Київ, вул. М.Раскової, 11, в обсязі, необхідному для формування кредитної історії відповідно до Закону України «Про організацію формування та обігу кредитних історій»." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell205" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row92" Height="85.05" AutoSize="true">
+          <TableCell Name="Cell206" Text="    7.8. Сторони домовились про збільшення строків позовної давності відповідно до ч.1 ст. 259 Цивільного кодексу України до 3 (трьох) років для всіх грошових зобов’язань Позичальника (в тому числі, але не виключно, щодо повернення суми Кредиту, сплати процентів за його користування, комісійних винагород, штрафів, пені тощо), що передбачені умовами цього Договору." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell207" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row93" Height="56.7" AutoSize="true">
+          <TableCell Name="Cell208" Text="    7.9. Цей Договір може бути розірваний за взаємною згодою Сторін шляхом підписання додаткового договору про розірвання цього Договору або в порядку встановленому чинним законодавством України." Padding="2, 1, 2, 20" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell209" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row94" Height="75.6" AutoSize="true">
+          <TableCell Name="Cell210" Text="&lt;b&gt;&lt;u&gt;8. ЗАКЛЮЧНІ ПОЛОЖЕННЯ&lt;/u&gt;&lt;/b&gt;&#13;&#10;&#13;&#10;    8.1. Цей Договір набуває чинності з моменту його підписання Сторонами та діє до повного виконання Сторонами взятих на себе зобов’язань цьому за цим Договором." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell211" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row95" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell212" Text="    8.2. У випадках, не передбачених цим Договором, Сторони керуються чинним законодавством України." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell213" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row96" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell214" Text="    8.3. Цей Договір складений у 2 (двох) оригінальних примірниках (по одному примірнику для кожної Сторони), що мають однакову юридичну силу та є автентичним за змістом." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell215" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row97" Height="56.7" AutoSize="true">
+          <TableCell Name="Cell216" Text="    8.4. Сторони зобов’язані вчасно повідомляти одна одну про зміни адреси, місця проживання, номерів телефонів, всі інші зміни, які здатні вплинути на реалізацію Договору та виконання зобов’язань по ньому." HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell217" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row98" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell218" Text="    8.5. Невід’ємною частиною цього Договору є Додатки №1, №2, №3." Padding="2, 1, 2, 20" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell219" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row99" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell220" Text="&lt;b&gt;&lt;u&gt;9. РЕКВІЗИТИ ТА ПІДПИСИ СТОРІН&lt;/u&gt;&lt;/b&gt;&#13;&#10;" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell221" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row101" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell224" Text="&lt;b&gt;Банк:&lt;/b&gt;" Font="Times New Roman, 11pt" HtmlTags="true"/>
+          <TableCell Name="Cell225" Text="&lt;b&gt;Позичальник:&lt;/b&gt;&#13;&#10;Фізична особа (ПІБ)" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row100" Height="94.5" AutoSize="true">
+          <TableCell Name="Cell222" Text="Адреса: [Branch_Info.ADR_BRANCH],&#13;&#10;МФО: [Branch_Info.MFO],&#13;&#10;код ЄДРПОУ: [Branch_Info.OKPO]." Font="Times New Roman, 11pt" HtmlTags="true"/>
+          <TableCell Name="Cell223" Text="[klient_info.FIO]&#13;&#10;[klient_info.PASPORT]&#13;&#10;[klient_info.ADRESS]&#13;&#10;Реєстраційний номер облікової картки платника податку [klient_info.IDCODE]" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row88" Height="103.95" AutoSize="true">
+          <TableCell Name="Cell198" Text="    9.1. Цей Договір Сторонами прочитаний, відповідає їх намірам та досягнутим домовленостям, що засвідчується підписами Сторін, що діють у повній відповідності з наданими їм повноваженнями та повним розумінням предмета та змісту Договору." Padding="2, 20, 2, 20" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell199" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row102" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell226" Text="&lt;b&gt;БАНК&lt;/b&gt;&#13;&#10;Підпис, печатка" Font="Times New Roman, 11pt" HtmlTags="true"/>
+          <TableCell Name="Cell227" Text="&lt;b&gt;ПОЗИЧАЛЬНИК&lt;/b&gt;&#13;&#10;Підпис" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row103" Height="245.7" AutoSize="true">
+          <TableCell Name="Cell228" Text="[IIf([Marital_status.IS_MARRIED] == 0, &quot;Я, &quot; + [Marital_status.CL_FIO] + &quot;, цим засвідчую, що на момент укладення цього Кредитного договору в шлюбі не перебуваю та однією сім`єю з будь-якою особою без реєстрації шлюбу не проживаю.&quot;, &quot;Я, &quot; + [Marital_status.SPOUSE_FIO] + &quot;, паспорт громадянина України &quot; + [Marital_status.SPOUSE_PASSP] + &quot;, реєстраційний номер облікової картки платника податку &quot; + [Marital_status.SPOUSE_INN] + &quot;, надаю свою згоду на укладання моїм(-єю) чоловіком (дружиною) &quot; + [Marital_status.CL_FIO_O] + &quot;цього Кредитного договору. Підтверджую, що з умовами цього Кредитного договору ознайомлений(-на), ніяких заперечень щодо його положень та укладання не маю. Надання згоди на укладення моїм(-єю) чоловіком (дружиною) цього Кредитного договору засвідчую власним підписом.&quot;)]" Padding="2, 50, 2, 20" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell229" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row104" Height="85.05" AutoSize="true">
+          <TableCell Name="Cell230" Text="«__» ____________ 20____ року" Font="Times New Roman, 11pt" HtmlTags="true"/>
+          <TableCell Name="Cell231" Text="____________________________&#13;&#10;(ініціали та прізвище [IIf([Marital_status.IS_MARRIED] == 0, &quot;Позичальника&quot;, &quot;чоловіка/дружини Позичальника&quot;)] власноручний підпис та напис)" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row105" Height="113.4" AutoSize="true">
+          <TableCell Name="Cell232" Text="      Оригінальний примірник цього Договору разом зі всіма додатками отримано після його підписання ______________________________________ &#10;(дата, підпис, ПІБ Позичальника)&#10;" Padding="2, 50, 2, 1" HorzAlign="Justify" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell233" Font="Times New Roman, 11pt" HtmlTags="true"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="8074.71" Width="718.2" Height="37.8">
+      <TextObject Name="Text1" Left="37.8" Top="9.45" Width="661.5" Height="18.9" Text="підпис Позичальника ____________________                                                                      підпис Банку _____________________ " HorzAlign="Center" Font="Times New Roman, 8pt"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

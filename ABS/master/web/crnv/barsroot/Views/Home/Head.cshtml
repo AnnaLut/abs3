@@ -1,0 +1,350 @@
+﻿@{
+    Layout = null;
+ }
+@inherits System.Web.Mvc.WebViewPage
+
+
+
+@*<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" >
+<html>
+<head>
+    <title>Титульная часть</title>
+    <script language="javascript" src="/Common/Script/Localization.js" type="text/jscript"></script>
+    <script language="JavaScript" src="head.js" type="text/jscript"></script>
+    <link href="head.css" type="text/css" rel="stylesheet" />
+</head>
+<body class="headBody">
+    <form name="HeaderForm" method="post" action="head.aspx" id="HeaderForm">
+<div>
+<input type="hidden" name="hGlobalTimeout" id="hGlobalTimeout" value="600" />
+<input type="hidden" name="__EVENTTARGET" id="__EVENTTARGET" value="" />
+<input type="hidden" name="__EVENTARGUMENT" id="__EVENTARGUMENT" value="" />
+<input type="hidden" name="__LASTFOCUS" id="__LASTFOCUS" value="" />
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="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" />
+</div>
+
+<script type="text/javascript">
+    //<![CDATA[
+    var theForm = document.forms['HeaderForm'];
+    if (!theForm) {
+        theForm = document.HeaderForm;
+    }
+    function __doPostBack(eventTarget, eventArgument) {
+        if (!theForm.onsubmit || (theForm.onsubmit() != false)) {
+            theForm.__EVENTTARGET.value = eventTarget;
+            theForm.__EVENTARGUMENT.value = eventArgument;
+            theForm.submit();
+        }
+    }
+    //]]>
+</script>
+*@
+
+    <table style="border-bottom:1px solid #808080" cellspacing="0" cellpadding="0" width="100%" border="0">
+        <tr>
+            <td>
+                <div>
+                    <img src="images/companylogo.jpg" id="imgCompanyLogo" />
+                </div>
+            </td>
+            <td valign="middle" width="100%">
+                <table cellspacing="0" cellpadding="0" border="0" width="100%">
+                    <tr>
+                        <td style="width: 20px">
+                        </td>
+                        <td valign="middle" align="left">
+                            <div style="white-space: nowrap">
+                                <span id="ed_Tobo" class="headTextbox" style="display:inline-block;width:100%;">Відділення /302076/000000/</span>
+                                
+                            </div>
+                        </td>
+                        <td id="tdProductTitle" align="center" class="headTextbox" rowspan="2" style="font-size: 12pt;">АРМ фр.-оф. АТ "Ощадбанк"</td>
+
+                        <td align="right" nowrap="nowrap" width="30%">
+                            <span id="P1" class="headTitle" nowrap="nowrap">  Банківська дата </span>
+                            <input name="textBankDate" type="text" value="31.07.2013" readonly="readonly" id="textBankDate" title="Банківська дата" class="headTextbox" style="font-weight:bold;width:80px;text-align: center" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 20px">
+                        </td>
+                        <td style="white-space: nowrap">
+                            <span id="textLogin" title="Ім&#39;я користувача" class="headTextBox" style="display:inline-block;width:90%;">Користувач ABSADM, id=20094</span>
+                        </td>
+                        <td align="right">
+                            <div style="font-family: Arial; color: #1C4B75; font-size: 8pt; margin-right: 10px;"
+                                nowrap="nowrap">
+                                &nbsp;Сервер:&nbsp;SERGPC(::1),
+                                DB:&nbsp;SBERDEV
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+                <table id="T" cellspacing="0" cellpadding="0" border="0" width="100%">
+                    <tr>
+                        <td style="width: 20px">
+                        </td>
+                        <td style="white-space: nowrap; text-align: left">
+                            <a href="#" style="font-family: Arial; font-size: 8pt;" onclick="parent.frames.main.location.replace('/barsroot/barsweb/welcome.aspx');"
+                                title="Перейти на дошку об`яв">Дошка об`яв</a>
+                        </td>
+                        <td id="tdUserBranches" style="white-space: nowrap; text-align: center">
+                            <span id="lbUserBranches" class="headTitle">Поточне відділення:</span>
+                            <select name="ddUserBranches" onchange="javascript:setTimeout(&#39;__doPostBack(\&#39;ddUserBranches\&#39;,\&#39;\&#39;)&#39;, 0)" id="ddUserBranches">
+	<option value="/302076/">/302076/</option>
+	<option selected="selected" value="/302076/000000/">/302076/000000/</option>
+	<option value="/302076/000000/060000/">/302076/000000/060000/</option>
+	<option value="/302076/000001/">/302076/000001/</option>
+	<option value="/302076/000001/000011/">/302076/000001/000011/</option>
+	<option value="/302076/000001/000012/">/302076/000001/000012/</option>
+	<option value="/302076/000001/000013/">/302076/000001/000013/</option>
+	<option value="/302076/000001/000014/">/302076/000001/000014/</option>
+	<option value="/302076/000001/000015/">/302076/000001/000015/</option>
+	<option value="/302076/000001/060001/">/302076/000001/060001/</option>
+	<option value="/302076/000002/">/302076/000002/</option>
+	<option value="/302076/000002/000021/">/302076/000002/000021/</option>
+	<option value="/302076/000002/000022/">/302076/000002/000022/</option>
+	<option value="/302076/000002/000023/">/302076/000002/000023/</option>
+	<option value="/302076/000002/000024/">/302076/000002/000024/</option>
+	<option value="/302076/000002/000147/">/302076/000002/000147/</option>
+	<option value="/302076/000002/060002/">/302076/000002/060002/</option>
+	<option value="/302076/000003/">/302076/000003/</option>
+	<option value="/302076/000003/000031/">/302076/000003/000031/</option>
+	<option value="/302076/000003/000032/">/302076/000003/000032/</option>
+	<option value="/302076/000003/000033/">/302076/000003/000033/</option>
+	<option value="/302076/000003/060003/">/302076/000003/060003/</option>
+	<option value="/302076/000035/">/302076/000035/</option>
+	<option value="/302076/000035/000036/">/302076/000035/000036/</option>
+	<option value="/302076/000035/000037/">/302076/000035/000037/</option>
+	<option value="/302076/000035/000038/">/302076/000035/000038/</option>
+	<option value="/302076/000035/000039/">/302076/000035/000039/</option>
+	<option value="/302076/000035/000040/">/302076/000035/000040/</option>
+	<option value="/302076/000035/060035/">/302076/000035/060035/</option>
+	<option value="/302076/000041/">/302076/000041/</option>
+	<option value="/302076/000041/000042/">/302076/000041/000042/</option>
+	<option value="/302076/000041/000043/">/302076/000041/000043/</option>
+	<option value="/302076/000041/000044/">/302076/000041/000044/</option>
+	<option value="/302076/000041/000045/">/302076/000041/000045/</option>
+	<option value="/302076/000041/000046/">/302076/000041/000046/</option>
+	<option value="/302076/000041/000050/">/302076/000041/000050/</option>
+	<option value="/302076/000041/060041/">/302076/000041/060041/</option>
+	<option value="/302076/000047/">/302076/000047/</option>
+	<option value="/302076/000047/000048/">/302076/000047/000048/</option>
+	<option value="/302076/000047/000049/">/302076/000047/000049/</option>
+	<option value="/302076/000047/060047/">/302076/000047/060047/</option>
+	<option value="/302076/000051/">/302076/000051/</option>
+	<option value="/302076/000051/000052/">/302076/000051/000052/</option>
+	<option value="/302076/000051/000053/">/302076/000051/000053/</option>
+	<option value="/302076/000051/000054/">/302076/000051/000054/</option>
+	<option value="/302076/000051/000055/">/302076/000051/000055/</option>
+	<option value="/302076/000051/000099/">/302076/000051/000099/</option>
+	<option value="/302076/000051/000100/">/302076/000051/000100/</option>
+	<option value="/302076/000051/060051/">/302076/000051/060051/</option>
+	<option value="/302076/000056/">/302076/000056/</option>
+	<option value="/302076/000056/000057/">/302076/000056/000057/</option>
+	<option value="/302076/000056/000058/">/302076/000056/000058/</option>
+	<option value="/302076/000056/000059/">/302076/000056/000059/</option>
+	<option value="/302076/000056/000060/">/302076/000056/000060/</option>
+	<option value="/302076/000056/060056/">/302076/000056/060056/</option>
+	<option value="/302076/000061/">/302076/000061/</option>
+	<option value="/302076/000061/000062/">/302076/000061/000062/</option>
+	<option value="/302076/000061/000063/">/302076/000061/000063/</option>
+	<option value="/302076/000061/000064/">/302076/000061/000064/</option>
+	<option value="/302076/000061/000065/">/302076/000061/000065/</option>
+	<option value="/302076/000061/000066/">/302076/000061/000066/</option>
+	<option value="/302076/000061/060061/">/302076/000061/060061/</option>
+	<option value="/302076/000067/">/302076/000067/</option>
+	<option value="/302076/000067/000068/">/302076/000067/000068/</option>
+	<option value="/302076/000067/000069/">/302076/000067/000069/</option>
+	<option value="/302076/000067/000070/">/302076/000067/000070/</option>
+	<option value="/302076/000067/000071/">/302076/000067/000071/</option>
+	<option value="/302076/000067/000072/">/302076/000067/000072/</option>
+	<option value="/302076/000067/000073/">/302076/000067/000073/</option>
+	<option value="/302076/000067/000074/">/302076/000067/000074/</option>
+	<option value="/302076/000067/000075/">/302076/000067/000075/</option>
+	<option value="/302076/000067/060067/">/302076/000067/060067/</option>
+	<option value="/302076/000076/">/302076/000076/</option>
+	<option value="/302076/000076/000077/">/302076/000076/000077/</option>
+	<option value="/302076/000076/000078/">/302076/000076/000078/</option>
+	<option value="/302076/000076/000079/">/302076/000076/000079/</option>
+	<option value="/302076/000076/000080/">/302076/000076/000080/</option>
+	<option value="/302076/000076/000137/">/302076/000076/000137/</option>
+	<option value="/302076/000076/060076/">/302076/000076/060076/</option>
+	<option value="/302076/000081/">/302076/000081/</option>
+	<option value="/302076/000081/000082/">/302076/000081/000082/</option>
+	<option value="/302076/000081/000083/">/302076/000081/000083/</option>
+	<option value="/302076/000081/000084/">/302076/000081/000084/</option>
+	<option value="/302076/000081/000085/">/302076/000081/000085/</option>
+	<option value="/302076/000081/000086/">/302076/000081/000086/</option>
+	<option value="/302076/000081/000087/">/302076/000081/000087/</option>
+	<option value="/302076/000081/000088/">/302076/000081/000088/</option>
+	<option value="/302076/000081/060081/">/302076/000081/060081/</option>
+	<option value="/302076/000089/">/302076/000089/</option>
+	<option value="/302076/000089/000090/">/302076/000089/000090/</option>
+	<option value="/302076/000089/000091/">/302076/000089/000091/</option>
+	<option value="/302076/000089/000092/">/302076/000089/000092/</option>
+	<option value="/302076/000089/000093/">/302076/000089/000093/</option>
+	<option value="/302076/000089/000094/">/302076/000089/000094/</option>
+	<option value="/302076/000089/000095/">/302076/000089/000095/</option>
+	<option value="/302076/000089/000096/">/302076/000089/000096/</option>
+	<option value="/302076/000089/000097/">/302076/000089/000097/</option>
+	<option value="/302076/000089/060089/">/302076/000089/060089/</option>
+	<option value="/302076/000101/">/302076/000101/</option>
+	<option value="/302076/000101/000102/">/302076/000101/000102/</option>
+	<option value="/302076/000101/000103/">/302076/000101/000103/</option>
+	<option value="/302076/000101/000104/">/302076/000101/000104/</option>
+	<option value="/302076/000101/000105/">/302076/000101/000105/</option>
+	<option value="/302076/000101/060101/">/302076/000101/060101/</option>
+	<option value="/302076/000106/">/302076/000106/</option>
+	<option value="/302076/000106/000098/">/302076/000106/000098/</option>
+	<option value="/302076/000106/000107/">/302076/000106/000107/</option>
+	<option value="/302076/000106/000108/">/302076/000106/000108/</option>
+	<option value="/302076/000106/000109/">/302076/000106/000109/</option>
+	<option value="/302076/000106/000110/">/302076/000106/000110/</option>
+	<option value="/302076/000106/000111/">/302076/000106/000111/</option>
+	<option value="/302076/000106/060106/">/302076/000106/060106/</option>
+	<option value="/302076/000112/">/302076/000112/</option>
+	<option value="/302076/000112/000113/">/302076/000112/000113/</option>
+	<option value="/302076/000112/000114/">/302076/000112/000114/</option>
+	<option value="/302076/000112/000115/">/302076/000112/000115/</option>
+	<option value="/302076/000112/000116/">/302076/000112/000116/</option>
+	<option value="/302076/000112/000117/">/302076/000112/000117/</option>
+	<option value="/302076/000112/000118/">/302076/000112/000118/</option>
+	<option value="/302076/000112/000119/">/302076/000112/000119/</option>
+	<option value="/302076/000112/060112/">/302076/000112/060112/</option>
+	<option value="/302076/000120/">/302076/000120/</option>
+	<option value="/302076/000120/000121/">/302076/000120/000121/</option>
+	<option value="/302076/000120/000122/">/302076/000120/000122/</option>
+	<option value="/302076/000120/000123/">/302076/000120/000123/</option>
+	<option value="/302076/000120/000124/">/302076/000120/000124/</option>
+	<option value="/302076/000120/000125/">/302076/000120/000125/</option>
+	<option value="/302076/000120/060120/">/302076/000120/060120/</option>
+	<option value="/302076/000126/">/302076/000126/</option>
+	<option value="/302076/000126/000127/">/302076/000126/000127/</option>
+	<option value="/302076/000126/000128/">/302076/000126/000128/</option>
+	<option value="/302076/000126/000129/">/302076/000126/000129/</option>
+	<option value="/302076/000126/000130/">/302076/000126/000130/</option>
+	<option value="/302076/000126/000131/">/302076/000126/000131/</option>
+	<option value="/302076/000126/060126/">/302076/000126/060126/</option>
+	<option value="/302076/000132/">/302076/000132/</option>
+	<option value="/302076/000132/000133/">/302076/000132/000133/</option>
+	<option value="/302076/000132/000134/">/302076/000132/000134/</option>
+	<option value="/302076/000132/000135/">/302076/000132/000135/</option>
+	<option value="/302076/000132/000136/">/302076/000132/000136/</option>
+	<option value="/302076/000132/000138/">/302076/000132/000138/</option>
+	<option value="/302076/000132/000139/">/302076/000132/000139/</option>
+	<option value="/302076/000132/000140/">/302076/000132/000140/</option>
+	<option value="/302076/000132/000141/">/302076/000132/000141/</option>
+	<option value="/302076/000132/000142/">/302076/000132/000142/</option>
+	<option value="/302076/000132/000143/">/302076/000132/000143/</option>
+	<option value="/302076/000132/000144/">/302076/000132/000144/</option>
+	<option value="/302076/000132/000145/">/302076/000132/000145/</option>
+	<option value="/302076/000132/000146/">/302076/000132/000146/</option>
+	<option value="/302076/000132/060132/">/302076/000132/060132/</option>
+	<option value="/302076/000148/">/302076/000148/</option>
+	<option value="/302076/000148/000149/">/302076/000148/000149/</option>
+	<option value="/302076/000148/000150/">/302076/000148/000150/</option>
+	<option value="/302076/000148/060148/">/302076/000148/060148/</option>
+	<option value="/302076/000151/">/302076/000151/</option>
+	<option value="/302076/000151/000152/">/302076/000151/000152/</option>
+	<option value="/302076/000151/000153/">/302076/000151/000153/</option>
+	<option value="/302076/000151/000154/">/302076/000151/000154/</option>
+	<option value="/302076/000151/000155/">/302076/000151/000155/</option>
+	<option value="/302076/000151/000156/">/302076/000151/000156/</option>
+	<option value="/302076/000151/000157/">/302076/000151/000157/</option>
+	<option value="/302076/000151/000158/">/302076/000151/000158/</option>
+	<option value="/302076/000151/000159/">/302076/000151/000159/</option>
+	<option value="/302076/000151/060151/">/302076/000151/060151/</option>
+	<option value="/302076/000160/">/302076/000160/</option>
+	<option value="/302076/000160/000162/">/302076/000160/000162/</option>
+	<option value="/302076/000160/000163/">/302076/000160/000163/</option>
+	<option value="/302076/000160/000165/">/302076/000160/000165/</option>
+	<option value="/302076/000160/000170/">/302076/000160/000170/</option>
+	<option value="/302076/000160/000171/">/302076/000160/000171/</option>
+	<option value="/302076/000160/000172/">/302076/000160/000172/</option>
+	<option value="/302076/000160/000173/">/302076/000160/000173/</option>
+	<option value="/302076/000160/060160/">/302076/000160/060160/</option>
+	<option value="/302076/000166/">/302076/000166/</option>
+	<option value="/302076/000166/000167/">/302076/000166/000167/</option>
+	<option value="/302076/000166/000168/">/302076/000166/000168/</option>
+	<option value="/302076/000166/060166/">/302076/000166/060166/</option>
+	<option value="/302076/000175/">/302076/000175/</option>
+	<option value="/302076/000175/000161/">/302076/000175/000161/</option>
+	<option value="/302076/000175/000164/">/302076/000175/000164/</option>
+	<option value="/302076/000175/000169/">/302076/000175/000169/</option>
+	<option value="/302076/000175/000174/">/302076/000175/000174/</option>
+	<option value="/302076/000175/000176/">/302076/000175/000176/</option>
+	<option value="/302076/000175/000177/">/302076/000175/000177/</option>
+	<option value="/302076/000175/000178/">/302076/000175/000178/</option>
+	<option value="/302076/000175/000179/">/302076/000175/000179/</option>
+	<option value="/302076/000175/000180/">/302076/000175/000180/</option>
+	<option value="/302076/000175/000181/">/302076/000175/000181/</option>
+	<option value="/302076/000175/000182/">/302076/000175/000182/</option>
+	<option value="/302076/000175/000183/">/302076/000175/000183/</option>
+	<option value="/302076/000175/000184/">/302076/000175/000184/</option>
+	<option value="/302076/000175/000185/">/302076/000175/000185/</option>
+	<option value="/302076/000175/000186/">/302076/000175/000186/</option>
+	<option value="/302076/000175/000187/">/302076/000175/000187/</option>
+	<option value="/302076/000175/000188/">/302076/000175/000188/</option>
+	<option value="/302076/000175/000189/">/302076/000175/000189/</option>
+	<option value="/302076/000175/000190/">/302076/000175/000190/</option>
+	<option value="/302076/000175/000191/">/302076/000175/000191/</option>
+	<option value="/302076/000175/000192/">/302076/000175/000192/</option>
+	<option value="/302076/000175/060175/">/302076/000175/060175/</option>
+
+</select>
+                        </td>
+
+                        <td valign="top" align="right" nowrap="nowrap" style="margin-right: 10px">
+                        	
+                            
+                            <div style="font-family: Arial; color: #1C4B75; font-size: 8pt; margin-right: 10px;"
+                                nowrap="nowrap">
+                                Ідентифікатор ключа: <span id="spanTabN" style="font-weight:bold">UALA99</span>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td>
+                <a onclick="return confirm(&#39;Ви дійсно хочете вийти?&#39;);" id="lnExitSystem" title="Завершити работу і вийти з системи" href="javascript:__doPostBack(&#39;lnExitSystem&#39;,&#39;&#39;)" style="font-family:Verdana;font-size:8pt;">Вихід</a>
+                <img src="/Common/Images/goBack.gif" id="imgBack" title="Возврат на уровень назад" style="cursor: hand; margin-top: 5px;" onclick="goBack()" width="32" />
+            </td>
+        </tr>
+        @*<tr>
+            <td colspan="4" class="mainGradient">
+                <div>
+                    <img id="imgHSMenu" title="Спрятать меню приложений" style="cursor: hand; margin-left: 10px;"
+                        onclick="toggleFrame()" src="images/hide_menu.gif"></div>
+            </td>
+        </tr>*@
+    </table>
+
+    <div style="display: none">
+        @*<input name="forimgHSLogo" type="hidden" id="forimgHSLogo" value="Заховати логотип" />
+        <input name="forimgHSMenu" type="hidden" id="forimgHSMenu" value="Заховати меню додатків" />
+        <input name="forlnkBack" type="hidden" id="forlnkBack" value="Повернення на рівень назад" />
+        <input name="forimgBack" type="hidden" id="forimgBack" value="Повернення на рівень назад" />
+        <input name="fored_Tobo" type="hidden" id="fored_Tobo" value="Відділення" />
+        <input name="Mes1" type="hidden" id="Mes1" value="Банківська дата змінена!" />
+        <input name="Mes2" type="hidden" id="Mes2" value="Стара дата:" />
+        <input name="Mes3" type="hidden" id="Mes3" value="Нова дата:" />
+        <input name="Mes4" type="hidden" id="Mes4" value="Сховати меню додатків" />
+        <input name="Mes5" type="hidden" id="Mes5" value="Показати меню додатків" />
+        <input name="Mes6" type="hidden" id="Mes6" value="Сховати логотип" />
+        <input name="Mes7" type="hidden" id="Mes7" value="Показати логотип" />
+        <input name="Mes8" type="hidden" id="Mes8" value="Відбулась зміна залишку на рахунках:" />
+        <input name="Mes9" type="hidden" id="Mes9" value="Рахунок" />
+        <input name="Mes10" type="hidden" id="Mes10" value="Присутні незавізовані документи на контролі." />
+        <input name="Mes11" type="hidden" id="Mes11" value="Наявні не підписані проводки для експорту. Підписати?" />
+        <input name="Mes12" type="hidden" id="Mes12" value="Текущая банковская дата недоступна." />*@
+        <input name="EDocsActive" type="hidden" id="EDocsActive" value="Off" />
+        <input name="EDocsTimeOut" type="hidden" id="EDocsTimeOut" value="180" />
+        <input name="hCustomAuthentication" type="hidden" id="hCustomAuthentication" value="On" />
+        <input name="hCookieName" type="hidden" id="hCookieName" value=".BARS_AUTH" />
+        <div class="webservice" id="webService">
+        </div>
+        <div id="global_obj">
+        </div>
+    </div>
+

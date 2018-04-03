@@ -1,0 +1,28 @@
+﻿<button caption="Зберегти" hint="Зберегти зміни" id="btnSave">
+  <command type="PlSqlBlock" successmessage="Дані збережено">
+    <sql>
+      begin
+      grt_mgr.iu_products(
+      p_deal_id => :p_deal_id,
+      p_type_txt => :p_type_txt,
+      p_name => :p_name,
+      p_model => :p_model,
+      p_modification => :p_modification,
+      p_serial_num => :p_serial_num,
+      p_made_date => :p_made_date,
+      p_other_comments => :p_other_comments
+      );
+      end;
+    </sql>
+    <parameters>
+      <parameter type="FormField" name="P_DEAL_ID"/>
+      <parameter type="FormField" name="P_TYPE_TXT" />
+      <parameter type="FormField" name="P_NAME" />
+      <parameter type="FormField" name="P_MODEL" />
+      <parameter type="FormField" name="P_MODIFICATION" />
+      <parameter type="FormField" name="P_SERIAL_NUM" />
+      <parameter type="FormField" name="P_MADE_DATE" />
+      <parameter type="FormField" name="P_OTHER_COMMENTS" />
+    </parameters>
+  </command>
+</button>

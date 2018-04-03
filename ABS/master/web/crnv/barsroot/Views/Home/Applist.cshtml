@@ -1,0 +1,122 @@
+﻿@{
+    Layout = null;
+ }
+@inherits System.Web.Mvc.WebViewPage<IEnumerable<Models.V_OPERAPP>>
+
+		<script type="text/javascript">
+			  var last_select_app = null;	
+			  var blockArms = false;
+		      function subMenu(id,img)
+		      {
+					var obj = document.getElementById(id);
+		            if(obj.style.display == 'none'){
+						obj.style.display = '';			
+						img.src = "/common/images/default/16/navigate_up.png";
+						$(img).parent().parent().addClass('menu-title-active');
+		            }
+		            else {
+						obj.style.display = 'none';
+						img.src = "/common/images/default/16/navigate_down.png";
+						$(img).parent().parent().removeClass('menu-title-active');
+					}	
+		      }
+		      function go(url)
+		      {
+		        if(blockArms){
+		            alert('Дочекайтесь завантаження попередньої функції');
+		            return;
+		        }
+		        if (url.split('.aspx').length > 1 || url.split('.htm').length>1||url.split('.html').length>1) {
+		            $('#main').loader().find('*').unbind();
+		            var frameset = $('<frameset/>').attr({ id: 'masterFrameset', cols: '100%',rows:'100%', frameSpacing: '1' });
+		            var frame = $('<frame/>').attr({name:'main',src:url,frameBorder:'0',scrolling:'auto'});
+		            frameset.append(frame);
+		            $('#mainDocument').empty().append(frameset).show();
+		            //frame.location.replace(url);
+
+		            $('#main').loader('remove');
+		            alert($('#main').html());
+
+                    /*
+		            var frame = $('<div />');
+		            frame.load(url, function () {
+		                //alert(frame.html());
+		                $('#childDocument').hide().find('#childDocumentContent').empty();
+		                $('#mainDocument').html(frame.html()).show();
+		                //$('#mainDocument').show();
+		                $('#main').loader('remove');
+		            });
+                    /*
+		            parent.visit_urls = new Array();
+		            if (parent.frames['header'].last_top_app)
+		                parent.frames['header'].last_top_app.className = "";
+		            if (null != last_select_app)
+		                last_select_app.className = "menuItem";
+		            last_select_app = event.srcElement;
+		            last_select_app.className = "menuItemSelected";
+		            parent.frames['main'].location.replace(url);
+		            blockArms = true;
+		            //
+		            parent.frames['header'].document.getElementById("global_obj").value = null;*/
+		        }
+		        else {
+		            var main=$('#main');
+		            main.loader().find('*').unbind();
+		            //$('#mainDocument').find('*').unbind().loader();
+
+		            $('#mainDocument').load(url, { partinal: true }, function () {
+                        
+		                $('#childDocument').hide().find('#childDocumentContent').empty();
+		                $('#mainDocument').show();
+		                main.loader('remove');
+		                $('#mainDocument .tiptip a.button, .tiptip button').tipTip();
+		            });
+		        }
+            }
+		</script>
+<div class="menu">
+
+    <div class="menu-title">
+        <span style="float:right;"><img onclick="subMenu('TEST',this)" align="absmiddle" src="/common/images/default/16/navigate_down.png" /></span>
+        <div class="menu-title-name" style="">
+            TEST
+        </div> 
+    </div>
+    <ul id='TEST' class="menu-title-item" style="display:none ">
+        <li class="menuItem" onclick="go('/barsroot/koshtoris/document/')" >Введення планових показникав</li>
+        <li class="menuItem" onclick="go('/barsroot/documents/index/0')" >перегляд документів відділення (TEST)</li>
+        <li class="menuItem" onclick="go('/barsroot/documents/index/1')" >перегляд документів користувача (TEST)</li>
+        <li class="menuItem" onclick="go('/barsroot/customers/index/0')" >Реєстрація клієнтів і рахунків (загальна)</li>
+        <li class="menuItem" onclick="go('/barsroot/customers/index/1')" >Реєстрація клієнтів і рахунків (Банки)</li>
+        <li class="menuItem" onclick="go('/barsroot/customers/index/3')" >Реєстрація клієнтів і рахунків(ФО)</li>
+        <li class="menuItem" onclick="go('/barsroot/customers/index/3?spd=1')" >Реєстрація клієнтів і рахунків(ФО-СПД)</li>
+        <li class="menuItem" onclick="go('/barsroot/customers/index/2')" >Реєстрація клієнтів і рахунків(ЮО)</li>   
+    </ul>
+           
+
+
+
+@foreach(var item in Model.GroupBy(i=>i.CODEAPP).Select(i=>i.FirstOrDefault()))
+{
+    <div class="menu-title">
+        <span style="float:right;"><img onclick="subMenu('@item.CODEAPP',this)" align="absmiddle" src="/common/images/default/16/navigate_down.png" /></span>
+        <div class="menu-title-name">
+            @item.APPNAME.Replace("(WEB)","").Replace("(Web)","")
+        </div>
+
+        @*<table cellspacing="0" cellpadding="0" border="0" >
+	        <tr style="cursor:pointer;">
+		        <td style="width:98%;"></td>
+                <td valign="top"><img onclick="subMenu('@item.CODEAPP',this)" align="absmiddle" src="/common/images/default/16/navigate_down.png" /></td>
+	        </tr>
+        </table>*@
+    </div>
+    <ul id='@item.CODEAPP' class="menu-title-item" style="display:none ">
+        @foreach (var row in Model.Where(i => i.CODEAPP == item.CODEAPP))
+        { 
+        <li class="menuItem" onclick="go('@row.FUNCNAME');">@row.OPERNAME.Replace("(WEB)","").Replace("(Web)","")</li>
+        }
+    </ul>
+}
+<!--***********************************************-->
+</div>

@@ -1,0 +1,15 @@
+﻿<customfield name="p_EV_ID" label="Код події" datatype="Int64" datasourcefield="ev_id" columnindex="2" groupname="6. Подія">
+  <uicontrol type="TextBox"  readonly="true"></uicontrol>
+</customfield>
+<customfield name="p_EVENT_TYPE" label="Тип" datatype="Int64" datasourcefield="ev_type_id" columnindex="2" groupname="6. Подія">
+  <uicontrol type="DropDownList" table="grt_event_types" keyfield="event_id" valuefield="event_name" readonly="true"></uicontrol>
+</customfield>
+<customfield name="p_PLANNED_DATE" datatype="DateTime" label="Планова дата" datasourcefield="planned_date" columnindex="2" groupname="6. Подія">
+  <uicontrol type="DateInput" readonly="true"></uicontrol>
+</customfield>
+<customfield name="p_ACTUAL_DATE" required="true" datatype="DateTime" label="Фактична дата" datasourcefield="actual_date" columnindex="2" groupname="6. Подія">
+  <uicontrol type="DateInput" readonly="false"></uicontrol>
+</customfield>
+<customfield name="p_COMMENT_TEXT" required="true" datatype="String" size="128" label="Коментар користувача" datasourcefield="comment_text" columnindex="2" groupname="6. Подія">
+  <uicontrol type="TextBox" controlwidth="250" linescount="7"></uicontrol>
+</customfield>

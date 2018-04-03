@@ -1,0 +1,37 @@
+﻿.MainTable
+{
+	width: 100%;
+	top:8px;
+	bottom:8px;
+	border:0px;
+}
+.InnerTable
+{
+	width:100%;
+}
+.HeaderText
+{
+	font-family:Verdana;
+	font-size:16;
+	width:100%;
+}
+.InfoText
+{
+	font-family:Verdana;
+	font-size:12;
+	width:100%;
+}
+.ErrorText
+{
+	font-family:Verdana;
+	font-size:9;
+	width:100%;
+}
+
+.NextButton
+{
+	width:200px;
+	height:25px;
+	font-family: Arial;
+	font-size: 10pt;
+}

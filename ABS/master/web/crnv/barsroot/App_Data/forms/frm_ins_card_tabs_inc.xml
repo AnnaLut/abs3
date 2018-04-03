@@ -1,0 +1,5 @@
+﻿<tabcontainer id="tab" tabcount="2" title="title" visible="true">
+  <tab caption="Загальні дані" id="t1" index="0"></tab>
+  <tab caption="Пов`язані договори" id="t2" index="1"></tab>
+  <tab caption="Додаткові реквізти" id="t3" index="2"></tab>
+</tabcontainer>

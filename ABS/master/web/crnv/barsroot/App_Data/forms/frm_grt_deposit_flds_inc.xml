@@ -1,0 +1,12 @@
+﻿<customfield name="P_DOC_NUM" label="Номер договору" required="true" datatype="String" size="100" datasourcefield="DOC_NUM"  columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="TextBox" controlwidth="250" />
+</customfield>
+<customfield name="P_DOC_DATE" label="Дата договору" required="true" datatype="DateTime" size="100" datasourcefield="DOC_DATE" columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="DateInput" controlwidth="150" />
+</customfield>
+<customfield name="P_DOC_ENDDATE" label="Дата закінчення дії договору" datatype="DateTime" datasourcefield="DOC_ENDDATE" columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="DateInput" controlwidth="150" />
+</customfield>
+<customfield name="P_DPT_ACC" label="ID депозитного рахунку" required="false" datatype="Int64" datasourcefield="DPT_ACC" columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="DecimalInput" controlwidth="150" readonly="false" />
+</customfield>

@@ -1,0 +1,227 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="04/15/2011 18:11:20" ReportInfo.Modified="07/13/2012 16:43:02" ReportInfo.CreatorVersion="1.7.1.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqD6nWZEExUJ9MEhdFZpB1A6ZfSeiTM+6WLeB8pW5aURqkGwhV134I2SUIQGUGXcXipP6fgCM9Ufy+12JiO5OM1g==">
+      <TableDataSource Name="Table2" Alias="WCS_BID_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select b.*,&#13;&#10;       wcs_utl.get_answ_formated(b.bid_id, 'CL_13') || ' ' ||&#13;&#10;       wcs_utl.get_answ_formated(b.bid_id, 'CL_14') || ' ' ||&#13;&#10;       wcs_utl.get_answ_formated(b.bid_id, 'CL_15') || ' ' ||&#13;&#10;       wcs_utl.get_answ_formated(b.bid_id, 'CL_16') as adr&#13;&#10;  from v_wcs_bids b&#13;&#10; where b.bid_id = :p_bid_id">
+        <Column Name="BID_ID" DataType="System.Decimal"/>
+        <Column Name="SUBPRODUCT_ID" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_NAME" DataType="System.String"/>
+        <Column Name="CRT_DATE" DataType="System.DateTime"/>
+        <Column Name="F" DataType="System.String"/>
+        <Column Name="I" DataType="System.String"/>
+        <Column Name="O" DataType="System.String"/>
+        <Column Name="BDATE" DataType="System.DateTime"/>
+        <Column Name="INN" DataType="System.String"/>
+        <Column Name="SUMM" DataType="System.Decimal"/>
+        <Column Name="OWN_FUNDS" DataType="System.Decimal"/>
+        <Column Name="TERM" DataType="System.String"/>
+        <Column Name="CREDIT_CURRENCY" DataType="System.Decimal"/>
+        <Column Name="SINGLE_FEE" DataType="System.Decimal"/>
+        <Column Name="MONTHLY_FEE" DataType="System.Decimal"/>
+        <Column Name="INTEREST_RATE" DataType="System.Decimal"/>
+        <Column Name="REPAYMENT_METHOD" DataType="System.String"/>
+        <Column Name="REPAYMENT_DAY" DataType="System.Decimal"/>
+        <Column Name="GARANTEES" DataType="System.String"/>
+        <Column Name="MGR_ID" DataType="System.Decimal"/>
+        <Column Name="MGR_FIO" DataType="System.String"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="BRANCH_NAME" DataType="System.String"/>
+        <Column Name="STATES" DataType="System.String"/>
+        <Column Name="ADR" DataType="System.String"/>
+        <Column Name="REPAYMENT_METHOD_TEXT" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_DESC" DataType="System.String"/>
+        <CommandParameter Name="p_bid_id" DataType="107" Expression="[p_bid_id]" DefaultValue="-1"/>
+      </TableDataSource>
+      <TableDataSource Name="Table4" Alias="WCS_BID_GARANTEES" DataType="System.Int32" Enabled="true" SelectCommand="select rownum as rn,&#13;&#10;       bg.bid_id,&#13;&#10;       bg.garantee_id,&#13;&#10;       bg.garantee_name,&#13;&#10;       bg.garantee_num,&#13;&#10;       bg.ws_id,&#13;&#10;       bg.type_obu_id,&#13;&#10;       bg.type_obu_name,&#13;&#10;       bg.subj_obu_id,&#13;&#10;       bg.subj_obu_name,&#13;&#10;       bg.grt_name,&#13;&#10;       bg.grt_cost,&#13;&#10;       decode(bg.garantee_id,&#13;&#10;              'VEHICLE',&#13;&#10;              wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                                    'GRT_3_14',&#13;&#10;                                    bg.ws_id,&#13;&#10;                                    bg.garantee_num),&#13;&#10;              wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                                    'GRT_4_6',&#13;&#10;                                    bg.ws_id,&#13;&#10;                                    bg.garantee_num)) as adr,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                             'GRT_2_7',&#13;&#10;                             bg.ws_id,&#13;&#10;                             bg.garantee_num) as full_name,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                             'IQ_CONCL_ASSETS_S_Q2_' || rownum,&#13;&#10;                             w.id,&#13;&#10;                             0) as Q2,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                             'IQ_CONCL_ASSETS_S_Q3_' || rownum,&#13;&#10;                             w.id,&#13;&#10;                             0) as Q3,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                             'IQ_CONCL_ASSETS_S_Q5_' || rownum,&#13;&#10;                             w.id,&#13;&#10;                             0) as Q5,&#13;&#10;       wcs_utl.get_answ_date(bg.bid_id,&#13;&#10;                             'IQ_CONCL_ASSETS_S_Q6_' || rownum,&#13;&#10;                             w.id,&#13;&#10;                             0) as Q6,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                             'IQ_CONCL_ASSETS_S_Q7_' || rownum,&#13;&#10;                             w.id,&#13;&#10;                             0) as Q7,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                             'IQ_CONCL_ASSETS_S_Q8_0_' || rownum,&#13;&#10;                             w.id,&#13;&#10;                             0) as Q8_0,&#13;&#10;       wcs_utl.get_answ_date(bg.bid_id,&#13;&#10;                             'IQ_CONCL_ASSETS_S_Q8_1_' || rownum,&#13;&#10;                             w.id,&#13;&#10;                             0) as Q8_1,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                             'IQ_CONCL_ASSETS_S_Q8_3_' || rownum,&#13;&#10;                             w.id,&#13;&#10;                             0) as Q8_3,&#13;&#10;       wcs_utl.get_answ_decimal(bg.bid_id,&#13;&#10;                                'IQ_CONCL_ASSETS_S_Q8_4_' || rownum,&#13;&#10;                                w.id,&#13;&#10;                                0) as Q8_4,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                             'IQ_CONCL_ASSETS_S_Q8_' || rownum,&#13;&#10;                             w.id,&#13;&#10;                             0) as Q8,&#13;&#10;       decode(wcs_utl.get_answ(bg.bid_id,&#13;&#10;                               'GRT_0',&#13;&#10;                               bg.ws_id,&#13;&#10;                               bg.garantee_num),&#13;&#10;              '1',&#13;&#10;              wcs_utl.get_answ(bg.bid_id, 'CL_1') || ' ' ||&#13;&#10;              wcs_utl.get_answ(bg.bid_id, 'CL_2') || ' ' ||&#13;&#10;              wcs_utl.get_answ(bg.bid_id, 'CL_3'),&#13;&#10;              wcs_utl.get_answ(bg.bid_id, 'CL_1', bg.ws_id, bg.garantee_num) || ' ' ||&#13;&#10;              wcs_utl.get_answ(bg.bid_id, 'CL_2', bg.ws_id, bg.garantee_num) || ' ' ||&#13;&#10;              wcs_utl.get_answ(bg.bid_id, 'CL_3', bg.ws_id, bg.garantee_num)) as owner_fio,&#13;&#10;       gg.group_id,&#13;&#10;       gg.group_name,&#13;&#10;       gt.kv,&#13;&#10;       gt.tp,&#13;&#10;       gt.kl,&#13;&#10;       gt.kz,&#13;&#10;       gt.kn,&#13;&#10;       round(1 * (1 + gt.kv) * power(1 + gt.kz * gt.tp / 12, 2) /&#13;&#10;             (gt.kl * gt.kn *&#13;&#10;             (1 +&#13;&#10;             gt.kz *&#13;&#10;             to_number(wcs_utl.get_creditdata(bg.bid_id, 'CREDIT_TERM')) / 12)),&#13;&#10;             2) as kr,&#13;&#10;       round(bg.grt_cost /&#13;&#10;             round(1 * (1 + gt.kv) * power(1 + gt.kz * gt.tp / 12, 2) /&#13;&#10;                   (gt.kl * gt.kn * (1 +&#13;&#10;                   gt.kz *&#13;&#10;                   to_number(wcs_utl.get_creditdata(bg.bid_id,&#13;&#10;                                                                      'CREDIT_TERM')) / 12)),&#13;&#10;                   2),&#13;&#10;             2) as ki&#13;&#10;  from v_wcs_bid_garantees bg,&#13;&#10;       grt_types           gt,&#13;&#10;       grt_groups          gg,&#13;&#10;       wcs_workspaces      w&#13;&#10; where bg.bid_id = :p_bid_id&#13;&#10;   and bg.garantee_id != 'GUARANTOR'&#13;&#10;   and bg.type_obu_id = gt.type_id&#13;&#10;   and gt.group_id = gg.group_id&#13;&#10;   and w.id = :p_ws_id&#13;&#10; order by bg.garantee_id, bg.garantee_num">
+        <Column Name="GARANTEE_NO" DataType="System.Decimal" PropName="Column" Calculated="true" Expression="[WCS_BID_GARANTEES.GARANTEE_NUM] + 1"/>
+        <Column Name="Q8" DataType="System.String"/>
+        <Column Name="Q8_1" DataType="System.DateTime"/>
+        <Column Name="Q8_3" DataType="System.String"/>
+        <Column Name="Q8_4" DataType="System.Decimal"/>
+        <Column Name="GRT_COST" DataType="System.Decimal"/>
+        <Column Name="RN" DataType="System.Decimal"/>
+        <Column Name="BID_ID" DataType="System.Decimal"/>
+        <Column Name="GARANTEE_ID" DataType="System.String"/>
+        <Column Name="GARANTEE_NAME" DataType="System.String"/>
+        <Column Name="GARANTEE_NUM" DataType="System.Decimal"/>
+        <Column Name="WS_ID" DataType="System.String"/>
+        <Column Name="TYPE_OBU_ID" DataType="System.String"/>
+        <Column Name="TYPE_OBU_NAME" DataType="System.String"/>
+        <Column Name="SUBJ_OBU_ID" DataType="System.String"/>
+        <Column Name="SUBJ_OBU_NAME" DataType="System.String"/>
+        <Column Name="GRT_NAME" DataType="System.String"/>
+        <Column Name="ADR" DataType="System.String"/>
+        <Column Name="FULL_NAME" DataType="System.String"/>
+        <Column Name="Q2" DataType="System.String"/>
+        <Column Name="Q3" DataType="System.String"/>
+        <Column Name="Q5" DataType="System.String"/>
+        <Column Name="Q6" DataType="System.DateTime"/>
+        <Column Name="Q7" DataType="System.String"/>
+        <Column Name="Q8_0" DataType="System.String"/>
+        <Column Name="OWNER_FIO" DataType="System.String"/>
+        <Column Name="GROUP_ID" DataType="System.Int16"/>
+        <Column Name="GROUP_NAME" DataType="System.String"/>
+        <Column Name="KV" DataType="System.Decimal"/>
+        <Column Name="TP" DataType="System.Decimal"/>
+        <Column Name="KL" DataType="System.Decimal"/>
+        <Column Name="KZ" DataType="System.Decimal"/>
+        <Column Name="KN" DataType="System.Decimal"/>
+        <Column Name="KR" DataType="System.Decimal"/>
+        <Column Name="KI" DataType="System.Decimal"/>
+        <CommandParameter Name="p_bid_id" DataType="107" Expression="[p_bid_id]" DefaultValue="-1"/>
+        <CommandParameter Name="p_ws_id" DataType="126" Expression="[p_ws_id]" DefaultValue="&quot;MAIN&quot;"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_bid_id" DataType="System.Decimal" Expression="484415"/>
+    <Parameter Name="p_ws_id" DataType="System.String" Expression="&quot;SRV_TOBO&quot;"/>
+    <Parameter Name="p_ws_number" DataType="System.Decimal" Expression="0"/>
+    <Total Name="grt_cost_total" Expression="[WCS_BID_GARANTEES.GRT_COST]"/>
+    <Total Name="grt_ki_cost_total" Expression="[WCS_BID_GARANTEES.KI]"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <DataBand Name="BndMain1" Width="718.2" Height="179.55" CanGrow="true" CanShrink="true" CanBreak="true">
+      <TextObject Name="Text3" Left="18.9" Top="113.4" Width="680.4" Height="18.9" Text="1.Інформація про Клієнта Банку" VertAlign="Center" Font="Arial, 11pt, style=Bold"/>
+      <TableObject Name="Table1" Left="18.9" Top="132.3" Width="682.29" Height="37.8" Border.Lines="All">
+        <TableColumn Name="Column1" Width="41.58"/>
+        <TableColumn Name="Column2" Width="289.17"/>
+        <TableColumn Name="Column3" Width="32.13"/>
+        <TableColumn Name="Column4" Width="32.13"/>
+        <TableColumn Name="Column5" Width="287.28"/>
+        <TableRow Name="Row1" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell1" Border.Lines="All" Text="1.1." HorzAlign="Center"/>
+          <TableCell Name="Cell2" Border.Lines="All" Text="Назва позичальника, код ЄДРПОУ / ПІБ фізичної особи" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell3" Border.Lines="All" Text="[WCS_BID_DATA.F] [WCS_BID_DATA.I] [WCS_BID_DATA.O], [WCS_BID_DATA.INN]" ColSpan="3"/>
+          <TableCell Name="Cell4" Border.Lines="All"/>
+          <TableCell Name="Cell5" Border.Lines="All"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text20" Left="18.9" Top="28.35" Width="680.4" Height="47.25" Text="А К Т&#13;&#10;перевірки запропонованого в заставу майна " HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt"/>
+      <TextObject Name="Text45" Left="18.9" Top="85.05" Width="680.4" Height="18.9" Text="Дата перевірки:" VertAlign="Center" Font="Arial, 11pt, style=Bold"/>
+      <DataBand Name="d1" Top="283.04" Width="718.2" Height="56.7" CanGrow="true" CanShrink="true" CanBreak="true" DataSource="Table4">
+        <TableObject Name="Table3" Left="18.9" Width="680.4" Height="56.7">
+          <TableColumn Name="Column6" Width="41.58"/>
+          <TableColumn Name="Column7" Width="173.88"/>
+          <TableColumn Name="Column8" Width="136.08"/>
+          <TableColumn Name="Column9" Width="211.68"/>
+          <TableColumn Name="Column10" Width="117.18"/>
+          <TableRow Name="Row8" Height="56.7" AutoSize="true">
+            <TableCell Name="Cell36" Border.Lines="All" Text="2.[WCS_BID_GARANTEES.RN]" HorzAlign="Center"/>
+            <TableCell Name="Cell37" Border.Lines="All" Text="[WCS_BID_GARANTEES.OWNER_FIO]/[WCS_BID_GARANTEES.SUBJ_OBU_NAME]"/>
+            <TableCell Name="Cell38" Border.Lines="All" Text="[WCS_BID_GARANTEES.ADR]"/>
+            <TableCell Name="Cell39" Border.Lines="All"/>
+            <TableCell Name="Cell40" Border.Lines="All" Text="[FormatNumber([WCS_BID_GARANTEES.GRT_COST],2)]" HorzAlign="Right"/>
+          </TableRow>
+        </TableObject>
+        <DataHeaderBand Name="dh1" Top="184.04" Width="718.2" Height="94.5" CanGrow="true" CanShrink="true" CanBreak="true">
+          <TextObject Name="Text4" Left="18.9" Top="9.45" Width="680.4" Height="18.9" Text="2. Дані про майно" VertAlign="Center" Font="Arial, 11pt, style=Bold"/>
+          <TableObject Name="Table5" Left="18.9" Top="28.35" Width="680.4" Height="66.15">
+            <TableColumn Name="Column11" Width="41.58"/>
+            <TableColumn Name="Column12" Width="173.88"/>
+            <TableColumn Name="Column13" Width="136.08"/>
+            <TableColumn Name="Column14" Width="211.68"/>
+            <TableColumn Name="Column15" Width="117.18"/>
+            <TableRow Name="Row9" Height="66.15">
+              <TableCell Name="Cell41" Border.Lines="All" Text="№" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+              <TableCell Name="Cell42" Border.Lines="All" Text="Заставодавець/ Предмет застави" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+              <TableCell Name="Cell43" Border.Lines="All" Text="Адреса місцезнаходження застави" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+              <TableCell Name="Cell44" Border.Lines="All" Text="Інформація про майно&#13;&#10;родові  (кількість, вага, міра) та індивідуальні ознаки (номери, ім’я тощо)" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+              <TableCell Name="Cell45" Border.Lines="All" Text="Договірна вартість застави" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+            </TableRow>
+          </TableObject>
+        </DataHeaderBand>
+        <DataFooterBand Name="df1" Top="344.23" Width="718.2" Height="66.15" CanGrow="true" CanShrink="true" CanBreak="true">
+          <TextObject Name="Text46" Left="18.9" Width="680.4" Height="66.15" Text="Відповідність місцезнаходження майна до визначеного у правовстановлювальних документах і договорі застави:&#13;&#10;_____________________________________________________________________________" Font="Arial, 11pt, style=Bold"/>
+        </DataFooterBand>
+      </DataBand>
+    </DataBand>
+    <DataBand Name="d2" Top="494.97" Width="718.2" Height="56.7" CanGrow="true" CanShrink="true" CanBreak="true" DataSource="Table4">
+      <TableObject Name="Table1" Left="18.9" Width="680.34" Height="56.7">
+        <TableColumn Name="Column25" Width="42.51"/>
+        <TableColumn Name="Column26" Width="146.46"/>
+        <TableColumn Name="Column27" Width="250.41"/>
+        <TableColumn Name="Column28" Width="240.96"/>
+        <TableRow Name="Row12" Height="56.7" AutoSize="true">
+          <TableCell Name="Cell55" Border.Lines="All" Text="3.[WCS_BID_GARANTEES.RN]" HorzAlign="Center"/>
+          <TableCell Name="Cell56" Border.Lines="All" Text="[WCS_BID_GARANTEES.SUBJ_OBU_NAME]"/>
+          <TableCell Name="Cell57" Border.Lines="All"/>
+          <TableCell Name="Cell58" Border.Lines="All"/>
+        </TableRow>
+      </TableObject>
+      <DataHeaderBand Name="dh2" Top="414.88" Width="718.2" Height="75.6" CanGrow="true" CanShrink="true" CanBreak="true">
+        <TextObject Name="Text6" Left="18.9" Top="9.45" Width="680.4" Height="18.9" Text="3. Перелік правовстановлювальних документів на майно" Font="Arial, 11pt, style=Bold"/>
+        <TableObject Name="Table1" Left="18.9" Top="28.35" Width="680.34" Height="47.25">
+          <TableColumn Name="Column21" Width="42.51"/>
+          <TableColumn Name="Column22" Width="146.46"/>
+          <TableColumn Name="Column23" Width="250.41"/>
+          <TableColumn Name="Column24" Width="240.96"/>
+          <TableRow Name="Row11" Height="47.25">
+            <TableCell Name="Cell51" Border.Lines="All" Text="№" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+            <TableCell Name="Cell52" Border.Lines="All" Text="Предмет застави" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+            <TableCell Name="Cell53" Border.Lines="All" Text="Найменування правовстановлювального документа, №, дата" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+            <TableCell Name="Cell54" Border.Lines="All" Text="Відповідність первісним копіям, зауваження" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          </TableRow>
+        </TableObject>
+      </DataHeaderBand>
+    </DataBand>
+    <DataBand Name="d3" Top="674.06" Width="718.2" Height="57.7" CanGrow="true" CanShrink="true" CanBreak="true" DataSource="Table4">
+      <TableObject Name="Table1" Left="18.9" Width="680.26" Height="57.7">
+        <TableColumn Name="Column34" Width="44.85"/>
+        <TableColumn Name="Column35" Width="139.35"/>
+        <TableColumn Name="Column36" Width="252.75"/>
+        <TableColumn Name="Column38" Width="243.31"/>
+        <TableRow Name="Row14" Height="57.7" AutoSize="true">
+          <TableCell Name="Cell64" Border.Lines="All" Text="4.[WCS_BID_GARANTEES.RN]" HorzAlign="Center"/>
+          <TableCell Name="Cell65" Border.Lines="All" Text="[WCS_BID_GARANTEES.SUBJ_OBU_NAME]"/>
+          <TableCell Name="Cell66" Border.Lines="All"/>
+          <TableCell Name="Cell68" Border.Lines="All"/>
+        </TableRow>
+      </TableObject>
+      <DataHeaderBand Name="dh3" Top="556.17" Width="718.2" Height="113.4" CanGrow="true" CanShrink="true" CanBreak="true">
+        <TextObject Name="Text8" Left="18.9" Top="9.45" Width="680.4" Height="18.9" Text="4. Перелік інших документів на майно" Font="Arial, 11pt, style=Bold"/>
+        <TableObject Name="Table1" Left="18.9" Top="28.35" Width="680.26" Height="75.6">
+          <TableColumn Name="Column29" Width="44.85"/>
+          <TableColumn Name="Column30" Width="139.35"/>
+          <TableColumn Name="Column31" Width="252.75"/>
+          <TableColumn Name="Column33" Width="243.31"/>
+          <TableRow Name="Row13" Height="75.6">
+            <TableCell Name="Cell59" Border.Lines="All" Text="№" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+            <TableCell Name="Cell60" Border.Lines="All" Text="Предмет застави" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+            <TableCell Name="Cell61" Border.Lines="All" Text="Найменування документа, №, дата&#13;&#10;(технічний паспорт, специфікації, накладні, складські довідки та ін.);&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+            <TableCell Name="Cell63" Border.Lines="All" Text="Відповідність родових та індивідуальних ознак, зауваження" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          </TableRow>
+        </TableObject>
+      </DataHeaderBand>
+    </DataBand>
+    <DataBand Name="d4" Top="806.9" Width="718.2" Height="56.7" CanGrow="true" CanShrink="true" CanBreak="true" DataSource="Table4">
+      <TableObject Name="Table1" Left="18.9" Width="679.45" Height="56.7">
+        <TableColumn Name="Column43" Width="42.47"/>
+        <TableColumn Name="Column44" Width="136.98"/>
+        <TableColumn Name="Column45" Width="500"/>
+        <TableRow Name="Row16" Height="56.7" AutoSize="true">
+          <TableCell Name="Cell73" Border.Lines="All" Text="5.[WCS_BID_GARANTEES.RN]" HorzAlign="Center"/>
+          <TableCell Name="Cell74" Border.Lines="All" Text="[WCS_BID_GARANTEES.SUBJ_OBU_NAME]"/>
+          <TableCell Name="Cell75" Border.Lines="All" HorzAlign="Right"/>
+        </TableRow>
+      </TableObject>
+      <DataHeaderBand Name="dh4" Top="736.26" Width="718.2" Height="66.15" CanGrow="true" CanShrink="true" CanBreak="true">
+        <TextObject Name="Text9" Left="18.9" Top="9.45" Width="680.4" Height="18.9" Text="5. Результати огляду майна" Font="Arial, 11pt, style=Bold"/>
+        <TableObject Name="Table1" Left="18.9" Top="28.35" Width="679.45" Height="37.8">
+          <TableColumn Name="Column39" Width="42.47"/>
+          <TableColumn Name="Column40" Width="136.98"/>
+          <TableColumn Name="Column41" Width="500"/>
+          <TableRow Name="Row15" Height="37.8">
+            <TableCell Name="Cell69" Border.Lines="All" Text="№" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+            <TableCell Name="Cell70" Border.Lines="All" Text="Предмет застави" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+            <TableCell Name="Cell71" Border.Lines="All" Text="Забезпечення необхідних умов зберігання, використання, охорони, безперешкодного контролю майна, виявлені зауваження" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          </TableRow>
+        </TableObject>
+      </DataHeaderBand>
+    </DataBand>
+    <DataBand Name="BndMain3" Top="868.09" Width="718.2" Height="217.35" CanGrow="true" CanShrink="true" CanBreak="true">
+      <TextObject Name="Text34" Left="18.9" Top="141.75" Width="94.5" Height="18.9" Text="Від Банку" Font="Arial, 11pt, style=Bold"/>
+      <TextObject Name="Text48" Left="604.8" Top="141.75" Width="94.5" Height="18.9" Text="Від Клієнта" Font="Arial, 11pt, style=Bold"/>
+      <TextObject Name="Text49" Left="18.9" Top="9.45" Width="680.4" Height="18.9" Text="6. Загальний висновок, рекомендації" Font="Arial, 11pt, style=Bold"/>
+      <TextObject Name="Text50" Left="18.9" Top="28.35" Width="680.4" Height="85.05" Border.Lines="All" Font="Arial, 11pt, style=Bold"/>
+    </DataBand>
+  </ReportPage>
+</Report>

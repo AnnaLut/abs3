@@ -1,0 +1,45 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="LoginPage.master.cs" Inherits="barsweb.MasterMain" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>BarsWeb - Авторизація</title>
+    <link rel="shortcut icon" href="../content/ico.ico">
+    <meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR">
+    <meta content="C#" name="CODE_LANGUAGE">
+    <meta content="JavaScript" name="vs_defaultClientScript">
+    <meta content="http://schemas.microsoft.com/intellisense/ie5" name="vs_targetSchema">
+    <link href="css/loginPage.css" rel="stylesheet" />
+    <script type="text/javascript" language="javascript" src="/Common/Script/Encrypt/sha1.js"></script>
+    <script type="text/javascript" language="javascript" src="/Common/Script/Encrypt/rc4.js"></script>
+    <script type="text/javascript" language="javascript" src="/Common/Script/BaseFunc.js"></script>
+
+    <asp:ContentPlaceHolder ID="head" runat="server"></asp:ContentPlaceHolder>
+</head>
+<body>
+    <div class="header">
+        <div class="client-logo">
+            <img alt="" src="../content/oshad.png" style="width: 150px" />
+        </div>
+        <div class="logo">
+            <img alt="" src="../content/logo.png" style="width: 150px" />
+        </div>
+    </div>
+    <div class="login-form">
+        <div class="app-name">
+            <div class="app-version color-blue">
+                ЦЕНТРАЛЬНИЙ РЕЄСТР НЕРУХОМИХ ВКЛАДІВ
+            </div>
+        </div>
+        <hr />
+
+        <asp:ContentPlaceHolder ID="body" runat="server"></asp:ContentPlaceHolder>
+
+    </div>
+    <div class="footer">
+        <div>Розроблено ТОВ "UNITY-BARS"</div>
+        <div>2003 - <%=System.DateTime.Now.Year%> рік</div>
+    </div>
+
+</body>
+</html>

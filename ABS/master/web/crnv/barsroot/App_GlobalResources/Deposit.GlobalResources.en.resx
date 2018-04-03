@@ -1,0 +1,1011 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="al01" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al02" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al03" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al04" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al05" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al06" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al07" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al08" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al09" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al10" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al11" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al12" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al13" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al14" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al15" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al16" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al17" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al18" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al19" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al20" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al21" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al22" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al23" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al24" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al25" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al26" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al27" xml:space="preserve">
+    <value>0\n0\n0</value>
+  </data>
+  <data name="al28" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al29" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al30" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al31" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al32" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al33" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al34" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al35" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al36" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al37" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al38" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al39" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al40" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al41" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al42" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="al43" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="btAddAgreement" xml:space="preserve">
+    <value>Add agreement</value>
+  </data>
+  <data name="btUpdate2" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="client_address" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="client_city" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="client_district" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="client_region" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="h01" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="h02" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hAsk" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hCmd" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hController" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDefault" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositAccount" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositAddSum" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositAddSumComplete" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositAgreement" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositAgreementBeneficiary" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositAgreementTemplate" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositBFRowCorrection" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositCancelAgreement" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositCardAcc" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositClient" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositCloseComplete" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositClosePayIt" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositContract" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositContractInfo" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositContractSelect" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositContractTemplate" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositDelete" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositEditAccount" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositEditComplete" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositFile" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositFileShow" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositHistory" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositLetters" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositLettersPrint" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositPercentPay" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositPercentPayComplete" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositPrint" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositPrintContract" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositProlongation" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositRateEdit" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositReturn" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositReturnComplete" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositSearch" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositSelectTrustee" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositSelectTT" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositShowClients" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositSignDialog" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDepositTermRateEdit" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hDptField" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hSearchResults" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="hSelectCountry" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="lbActionResult2" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="lbDepositAccount2" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="lbFIO" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="lbInfo" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="lbInfo16" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="lbInfo17" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="lbInfo2" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="lbSearchInfo" xml:space="preserve">
+    <value>Search of deposit contract</value>
+  </data>
+  <data name="Mes0" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes1" xml:space="preserve">
+    <value>0123</value>
+  </data>
+  <data name="Mes10" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes11" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes12" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes13" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes14" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes15" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes16" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes17" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes18" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes19" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes2" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes20" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes21" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes22" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes23" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes24" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes25" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes26" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes27" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes28" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes29" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes3" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes30" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes31" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes32" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes33" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes34" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes35" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes36" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes37" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes38" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes39" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes4" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes40" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes41" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes42" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes43" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes44" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes45" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="mes46" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes5" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes6" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes7" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes8" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Mes9" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="ora01" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="ora02" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="reg" xml:space="preserve">
+    <value>Client</value>
+  </data>
+  <data name="reg1" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="reg2" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="reg3" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="sh01" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="sh02" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="sh03" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="sh04" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="sh05" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <data name="sh06" xml:space="preserve">
+    <value>6</value>
+  </data>
+  <data name="sh07" xml:space="preserve">
+    <value>7</value>
+  </data>
+  <data name="sh08" xml:space="preserve">
+    <value>8</value>
+  </data>
+  <data name="sh09" xml:space="preserve">
+    <value>9</value>
+  </data>
+  <data name="sh10" xml:space="preserve">
+    <value>10</value>
+  </data>
+  <data name="sh11" xml:space="preserve">
+    <value>11</value>
+  </data>
+  <data name="sh12" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb1" xml:space="preserve">
+    <value>Deposit</value>
+  </data>
+  <data name="tb10" xml:space="preserve">
+    <value>Balance</value>
+  </data>
+  <data name="tb100" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb101" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb102" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb103" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb104" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb105" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb106" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb107" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb108" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb109" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb11" xml:space="preserve">
+    <value>Date of birth</value>
+  </data>
+  <data name="tb110" xml:space="preserve">
+    <value>Currency</value>
+  </data>
+  <data name="tb111" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb112" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb113" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb114" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb115" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb116" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb117" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb118" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb119" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb12" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="tb120" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb121" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb122" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb13" xml:space="preserve">
+    <value>Template</value>
+  </data>
+  <data name="tb14" xml:space="preserve">
+    <value>Comment</value>
+  </data>
+  <data name="tb15" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb16" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb17" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb18" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb19" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb2" xml:space="preserve">
+    <value>Type of deposit</value>
+  </data>
+  <data name="tb20" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb21" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb22" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb23" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb24" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb25" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb26" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb27" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb28" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb29" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb3" xml:space="preserve">
+    <value>Sign</value>
+  </data>
+  <data name="tb30" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb31" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb32" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb33" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb34" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb35" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb36" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb37" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb38" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb39" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb4" xml:space="preserve">
+    <value>Completion</value>
+  </data>
+  <data name="tb40" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb41" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb42" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb43" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb44" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb45" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb46" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb47" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb48" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb49" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb5" xml:space="preserve">
+    <value>RNC</value>
+  </data>
+  <data name="tb50" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb51" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb52" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb53" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb54" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb55" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb56" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb57" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb58" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb59" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb6" xml:space="preserve">
+    <value>Id. code</value>
+  </data>
+  <data name="tb60" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb61" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb62" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb63" xml:space="preserve">
+    <value>Currency</value>
+  </data>
+  <data name="tb64" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb65" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb66" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb67" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb68" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb69" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb7" xml:space="preserve">
+    <value>Full name</value>
+  </data>
+  <data name="tb70" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb71" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb72" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb73" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb74" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb75" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb76" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb77" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb78" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb79" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb8" xml:space="preserve">
+    <value>Account</value>
+  </data>
+  <data name="tb80" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb81" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb82" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb83" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb84" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb85" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb86" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb87" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb88" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb89" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb9" xml:space="preserve">
+    <value>Currency</value>
+  </data>
+  <data name="tb90" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb91" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb92" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb93" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb94" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb95" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb96" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb97" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb98" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tb99" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="validatorContractSum" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="w00" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="w01" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="w02" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="w03" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="w04" xml:space="preserve">
+    <value>0</value>
+  </data>
+</root>
