@@ -42,53 +42,30 @@ begin
     l_zpr.name         := 'Виписка за рахунком клієнта';
     l_zpr.namef        := '= ''VP''||substr(:sFdat1,1,2)||substr(:sFdat1,4,2)||''_''||''RUHA''||''_''||user_id||''.''||''csv''';
     l_zpr.bindvars     := ':sFdat1='''',:sFdat2='''',:Param0=''Рахунок кл.'',:KV=''Код валюти'',:NODOCS=''Вкл. без оборотiв (1-вкл.)''';
-    l_zpr.create_stmt  := 'ref     [0,'' '',L];'||nlchr||
-                           ''||nlchr||
-                           'datd    [0,'' '',L];'||nlchr||
-                           ''||nlchr||
-                           'ostf    [0,'' '',L];'||nlchr||
-                           ''||nlchr||
-                           'ostc    [0,'' '',L];'||nlchr||
-                           ''||nlchr||
-                           'ostfq   [0,'' '',L];'||nlchr||
-                           ''||nlchr||
-                           'ostcq   [0,'' '',L];'||nlchr||
-                           ''||nlchr||
-                           's       [0,'' '',L];'||nlchr||
-                           ''||nlchr||
-                           'sq      [0,'' '',L];'||nlchr||
-                           ''||nlchr||
-                           'kv      [0,'' '',L];'||nlchr||
-                           ''||nlchr||
-                           'nls_p   [0,'' '',L];'||nlchr||
-                           ''||nlchr||
-                           'mfo_p   [0,'' '',L];'||nlchr||
-                           ''||nlchr||
-                           'bank_p  [0,'' '',L];'||nlchr||
-                           ''||nlchr||
-                           'nmk_p   [0,'' '',L];'||nlchr||
-                           ''||nlchr||
-                           'okpo_p  [0,'' '',L];'||nlchr||
-                           ''||nlchr||
-                           'nls_r   [0,'' '',L];'||nlchr||
-                           ''||nlchr||
-                           'mfo_r   [0,'' '',L];'||nlchr||
-                           ''||nlchr||
-                           'bank_r  [0,'' '',L];'||nlchr||
-                           ''||nlchr||
-                           'nmk_r   [0,'' '',L];'||nlchr||
-                           ''||nlchr||
-                           'okpo_r  [0,'' '',L];'||nlchr||
-                           ''||nlchr||
-                           'nazn    [0,'' '',L];'||nlchr||
-                           ''||nlchr||
-                           'nls     [0,'' '',L];'||nlchr||
-                           ''||nlchr||
-                           'paydate [0,'' '',L];'||nlchr||
-                           ''||nlchr||
-                           'paytime [0,'' '',L];'||nlchr||
-                           ''||nlchr||
-                           'Delim='';''';
+    l_zpr.create_stmt  := 'ref     [0,'' '',L];'||nlchr||
+                          'datd    [0,'' '',L];'||nlchr||
+                          'ostf    [0,'' '',L];'||nlchr||
+                          'ostc    [0,'' '',L];'||nlchr||
+                          'ostfq   [0,'' '',L];'||nlchr||
+                          'ostcq   [0,'' '',L];'||nlchr||
+                          's       [0,'' '',L];'||nlchr||
+                          'sq      [0,'' '',L];'||nlchr||
+                          'kv      [0,'' '',L];'||nlchr||
+                          'nls_p   [0,'' '',L];'||nlchr||
+                          'mfo_p   [0,'' '',L];'||nlchr||
+                          'bank_p  [0,'' '',L];'||nlchr||
+                          'nmk_p   [0,'' '',L];'||nlchr||
+                          'okpo_p  [0,'' '',L];'||nlchr||
+                          'nls_r   [0,'' '',L];'||nlchr||
+                          'mfo_r   [0,'' '',L];'||nlchr||
+                          'bank_r  [0,'' '',L];'||nlchr||
+                          'nmk_r   [0,'' '',L];'||nlchr||
+                          'okpo_r  [0,'' '',L];'||nlchr||
+                          'nazn    [0,'' '',L];'||nlchr||
+                          'nls     [0,'' '',L];'||nlchr||
+                          'paydate [0,'' '',L];'||nlchr||
+                          'paytime [0,'' '',L];'||nlchr||
+                          'Delim='';''';
     l_zpr.rpt_template := '';
     l_zpr.form_proc    := 'rptlic_nls(to_date(:sFdat1), to_date(:sFdat2) , :Param0, :KV)';
     l_zpr.default_vars := ':SRT=''датi'',:NODOCS=''0''';
