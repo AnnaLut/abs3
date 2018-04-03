@@ -409,13 +409,11 @@ end;
            AND SUBSTR (nbs_, 1,3) IN ('140', '301')
       THEN
          IF  s180_ ='0'  THEN
-
-            s180_ := '1';
+             s180_ := '1';
          END IF;
 
          IF  s242_ ='0'  THEN
-
-            s242_ := '1';
+             s242_ := '1';
          END IF;
       END IF;
 
@@ -506,6 +504,10 @@ end;
                comm_ := SUBSTR (comm_ || ' +Заміна (Контроль 3 НБУ)', 1, 200);
             end if;
          end if;
+      end if;
+      
+      if s242_ = '0' then
+         s242_ := 'I';
       end if;
    END pp_doda;
 
@@ -1638,7 +1640,7 @@ BEGIN
                 then
                    s242_ := 'B';
                 end if;
-                
+
                 if tips_ in ('SK9','SP','SPN','OFR','KSP','KK9','KPN', 'SNA') then
                    s242_ :='Z';
                 end if;
@@ -1945,7 +1947,7 @@ BEGIN
                    s242_ :='Z';
                    comm_ := comm_ || ' тип '||trim(tips_);
                 end if;
-                
+
                 IF tips_ = 'NL8'
                 THEN
                    SELECT COUNT (*)
@@ -2796,6 +2798,143 @@ BEGIN
       end if;
    end loop;
 
+   declare
+     sk_        number := 0;
+     sz_        number := 0;
+     sz0_       number := 0;
+     sz1_       number := 0;
+     sk_all_    number := 0;
+     ostc_      number := 0;
+     s02_       number := 0;
+     s04_       number := 0;
+   begin
+       insert into otcn_f42_zalog(ACC, ACCS, ND, NBS, R013, OST)
+       SELECT /*+ leading(z) */
+               z.acc, z.accs, z.nd, a.nbs, nvl(p.r013, '0'),
+               gl.p_icurval (a.kv, a.ost, dat_) ost
+          FROM cc_accp z, sal a, specparam p
+         WHERE z.acc in (select acc from rnbu_trace where substr(kodp,2,4)||substr(kodp,7,1) in ('26021','26221','90301','90311','90361','95001','95003'))
+           AND z.accs = a.acc
+           and a.fdat=dat_
+           AND a.acc = p.acc
+           AND a.nbs || p.r013 <> '91299'
+           and a.nbs not in (select r020 from otcn_fa7_temp)
+           and a.ost<0;
+
+       -- сумма задолженности, кот. покрывает данный залог
+       for p in (select * from rnbu_trace where substr(kodp,2,4)||substr(kodp,7,1) in ('26021','26221','90301','90311','90361','95001','95003'))
+       loop
+          acc_ := p.acc;
+          rnk_ := p.rnk;
+          sk_ := 0;
+          sz_ := 0;
+          sz0_ := 0;
+          se_ := to_number(p.znap);
+
+         -- сумма активов, которые обеспечивает данный залог (т.е. к которым он ""привязан")
+          begin
+            select sum(OST)
+               into sk_all_
+            from otcn_f42_zalog
+            where acc=acc_;
+          exception
+                   WHEN NO_DATA_FOUND THEN
+            sk_all_ := 0;
+          end;
+
+         -- выбираем все активы, к которым "привязан" данный залог
+          For k in (select z.ACC, z.ACCS, z.ND, z.NBS, z.R013, z.OST, c.rnk
+                   from OTCN_F42_ZALOG z, cust_acc ca, customer c
+                   WHERE z.ACC = acc_ and
+                         z.accs = ca.acc and
+                         ca.rnk = c.rnk)
+          loop
+             ostc_:=0;
+             nd_ := k.nd;
+
+             -- вычисляем процент залога на данный актив
+             if abs(k.ost) < abs(sk_all_) then -- не один актив
+                sz1_ := round(abs(k.ost / sk_all_) * se_, 0);
+             else
+                sz1_ :=  se_;
+             end if;
+
+            -- определяем остаток счетов дисконта или премии
+             BEGIN
+               select SUM(NVL(Gl.P_Icurval( s.KV, s.ost, dat_ ) ,0))
+                  INTO s04_
+               from sal s
+               where s.fdat=dat_
+                 AND s.acc in (select d.acc
+                               from nd_acc d, accounts s
+                               where d.acc<>acc_ and
+                                     d.nd = k.nd and
+                                     d.acc=s.acc and
+                                     s.rnk=rnk_  and
+                                     substr(s.nbs,4,1) in ('5','6','9')
+                                     and substr(s.nbs,1,3)=substr(k.nbs,1,3));
+             EXCEPTION WHEN NO_DATA_FOUND THEN
+               s04_ := 0;
+             END;
+
+             ostc_ := abs(k.ost + NVL(s04_,0));
+
+             -- депозиты, которые выступают залогами, привязаны к другим РНК
+             if k.rnk <> rnk_ then
+                rnk_ := k.rnk;
+             end if;
+
+             -- не включаем, т.к. дважды уменьшаются активы на эту сумму (еще в С5) - ПЕТРОКОММЕРЦ
+             if nls_ like '9010%' and k.nbs='9023' and k.r013='1' then
+                null;
+             else
+                BEGIN
+                    select nvl(SUM(ost_eqv),0)
+                    INTO s02_
+                    from otcn_f42_temp
+                    where accc=k.accs
+                      AND ap=1;
+                EXCEPTION WHEN NO_DATA_FOUND THEN
+                    s02_ := 0;
+                END;
+
+                if s02_ < ostc_ then
+                   if s02_ + sz1_ >= ostc_ then
+                      sz0_ := ostc_ - s02_;
+                   else
+                      sz0_ := sz1_;
+                   end if;
+
+                   if sz0_ <> 0 then
+                      sz_ := sz_ + sz0_;
+                      sk_ := sk_ + abs(ostc_);
+
+                      insert into otcn_f42_temp(ACC, ACCC, OST_EQV, ap, kv)
+                      values(acc_, k.accs, sz0_, 1, kv_);
+                   end if;
+                end if;
+             end if;
+          end loop;
+
+          sz0_ := se_ - sz_;
+
+          if sz0_ > 0 then
+             update rnbu_trace
+             set znap = to_char(to_number(znap) - sz0_),
+                 comm = substr(comm || ' + розбивка по активу (1)',1,200),
+                 nd = nd_
+             where recid = p.recid;
+                       
+             kodp_ := SUBSTR(p.kodp, 1,6) || '9' || SUBSTR(p.kodp, 8);
+             znap_ := TO_CHAR (sz0_);
+
+             INSERT INTO RNBU_TRACE(recid, userid, nls, kv, odate, kodp, znap, rnk, acc, comm, nbuc, isp, tobo, nd)
+             VALUES (s_rnbu_record.nextval, userid_, p.nls, p.kv, p.odate, kodp_, znap_, rnk_, acc_,
+                'Перевищення над залишком по активу (2)', p.nbuc, p.isp, p.tobo, nd_);
+          end if;
+      end loop;
+   end;
+   
    logger.info ('P_FA7_NN: End etap 1 for '||to_char(dat_,'dd.mm.yyyy'));
 
        -- дата розрахунку резервiв
@@ -3306,8 +3445,12 @@ BEGIN
          nbuc_ := nbuc1_;
       END IF;
 
-      s240_ := 'Z';
+      s240_ := nvl(fs240 (datn_, k.acc, dathb_, dathe_, k.mdate, k.s240), '0');
 
+      if s240_ = '0' then
+         s240_ := '1';
+      end if;
+      
       if nvl(k.s180, '0') = '0' then
          s180_ := fs180 (k.acc, SUBSTR (k.nbs, 1, 1), dat_);
       else
@@ -4427,7 +4570,7 @@ BEGIN
         when others then
             logger.info ('P_FA7_NN: Errors '||sqlerrm);
       end;
-      
+
       delete from NBUR_TMP_A7_S245 where report_date = dat_;
       insert into NBUR_TMP_A7_S245(report_date, acc_id, s245, ost)
       select dat_, acc, (case when substr(kodp,9,1)='Z' then '2' else '1' end) s245, sum(znap) ost

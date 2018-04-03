@@ -4,7 +4,7 @@ IS
 % DESCRIPTION : Процедура формирования #С5 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.17.017  30/03/2018 (03/03/2018)
+% VERSION     : v.17.019  02/04/2018 (30/03/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
 
@@ -240,19 +240,26 @@ IS
    fl_cp_   number:=0;
 
    sum_zal  number:=0;
-   
+
    sum_z0   number:=0;
    sum_z1   number:=0;
    sum_z2   number:=0;
-  
+
    koef_z0   number:=1;
    koef_z1   number:=1;
-   koef_z2   number:=1; 
-   
+   koef_z2   number:=1;
+
    sum_se0   number:=0;
    sum_sel   number:=0;
-   sum_se2   number:=0;   
-
+   sum_se2   number:=0;
+   
+   dc_   number;
+   
+   dat_beg_ date;
+   dat_end_ date;
+   
+   datd_    date;
+   
     procedure P_Set_S580_Def(r020_ in varchar2, t020_ in varchar2, r011_ in varchar2, s245_ in varchar2) is
        invk_ varchar2(1);
     begin
@@ -269,6 +276,11 @@ IS
            s580_ := s580r_;
        end if;
 
+       if r020_ in ('4410', '3400', '3408', '3500', '3508', '9129', '2066', '2920') and s580_ = '9' then
+          s580_ := '5';
+       end if;
+       
+       
 --       if r020_ in ('1500','1502','1508','1509',
 --                    '1510','1512','1513','1515','1516','1517','1518','1519',
 --                    '1520','1521','1523','1524','1525','1526','1528')
@@ -328,16 +340,57 @@ IS
 BEGIN
    commit;
 
+  -- фактическая дата конца декады
+   dc_ := TO_NUMBER (LTRIM (TO_CHAR (dat_, 'DD'), '0'));
+
+   FOR i IN 1 .. 3
+   LOOP
+     IF dc_ BETWEEN 10 * (i - 1) + 1 AND 10 * i + iif (i, 3, 0, 1, 0)
+     THEN
+       IF i < 3
+       THEN
+          dat_beg_ := TO_DATE (LPAD (10 * (i - 1) + 1, 2, '0')
+                      || TO_CHAR (dat_, 'mmyyyy'),
+                      'ddmmyyyy'
+                     );
+          dat_end_ :=
+             TO_DATE (LPAD (10 * i, 2, '0')
+                      || TO_CHAR (dat_, 'mmyyyy'),
+                      'ddmmyyyy'
+                     );
+       ELSE
+          dat_beg_ := to_date('21'|| TO_CHAR (dat_, 'mmyyyy'), 'ddmmyyyy');
+          dat_end_ := LAST_DAY (dat_);
+       END IF;
+
+       EXIT;
+     END IF;
+   END LOOP;
+   
+   select max(fdat) 
+   into dat_end_
+   from fdat 
+   where fdat<=dat_end_;
+      
+   if dat_ = dat_end_ then
+      datd_ := dat_;
+   else
+       select max(report_date)
+       into datd_
+       from NBUR_TMP_A7_S245
+       where report_date < dat_beg_;
+   end if;
+      
    select count(*)
    into cnt_
-   from NBUR_TMP_A7_S245 
-   where report_date = dat_;
+   from NBUR_TMP_A7_S245
+   where report_date = datd_;
 
-   if cnt_ = 0 and dat_ = to_date('30032018','ddmmyyyy') then
-      p_fa7_nn(dat_);
+   if cnt_ = 0 then
+      p_fa7_nn(datd_);
       commit;
    end if;
-   
+
    EXECUTE IMMEDIATE 'ALTER SESSION ENABLE PARALLEL DML';
 -------------------------------------------------------------------
    logger.info ('P_FC5: Begin for datf = '||to_char(dat_, 'dd/mm/yyyy'));
@@ -614,11 +667,8 @@ BEGIN
           if   trim(tips_) in ('SK9','SP','SPN','OFR','KSP','KK9','KPN', 'SNA')
           then
                s245_ :='2';
-          elsif  nbs_ like '150_'
-             or  nbs_ like '34__' or  nbs_ like '36__'
-             or  nbs_ like '44__' or  nbs_ like '45__'
-             or  nbs_ like '9___'
-             or  nbs_ in ('2920','3500')
+          elsif nbs_ in ('1200','1203','3500','4400','4409','4410','4419','4430','4431','4500','4509','4530')
+             or  nbs_ like '34__' or  nbs_ like '36__' --or  nbs_ like '9%'
           then
               s245_ :='0';
           else
@@ -652,7 +702,7 @@ BEGIN
 
           pr_accc := 0;
 
-          IF     mfou_ IN (300205, 300465)
+          IF     mfou_ = 300465
              AND SUBSTR (nls_, 1, 3) IN
                     ('140', '141', '142', '143', '144', '300', '301', '310',
                      '311', '312', '313', '321', '330', '331','354')
@@ -720,6 +770,54 @@ BEGIN
               sum_z0:=sn_;
               sum_z1:=0; 
               sum_z2:=0;          
+          end if;
+          
+          if not (nbs_ in ('1200','1203','3500','4400','4409','4410','4419','4430','4431','4500','4509','4530') or
+                  nbs_ like '34__' or  nbs_ like '36__' --or  nbs_ like '9%'
+                  ) or
+             nbs_ is null
+          then
+              begin
+                  select sign(se_)*nvl(sum(decode(s245, '0', ost, 0)), 0),
+                         sign(se_)*nvl(sum(decode(s245, '1', ost, 0)), 0),
+                         sign(se_)*nvl(sum(decode(s245, '2', ost, 0)), 0)
+                  into sum_z0, sum_z1, sum_z2
+                  from NBUR_TMP_A7_S245
+                  where report_date = dat_ and
+                        acc_id = acc_;
+              exception
+                when no_data_found then
+                    sum_z0:=(case when s245_ = '0' then se_ else 0 end);
+                    sum_z1:=(case when s245_ = '1' then se_ else 0 end);
+                    sum_z2:=(case when s245_ = '2' then se_ else 0 end);
+              end;              
+              
+              if sum_z0 + sum_z1 + sum_z2 = 0 then
+                 sum_z0:=(case when s245_ = '0' then se_ else 0 end);
+                 sum_z1:=(case when s245_ = '1' then se_ else 0 end);
+                 sum_z2:=(case when s245_ = '2' then se_ else 0 end);
+              end if;
+              
+              koef_z1 := sum_z1 / se_;
+              koef_z2 := sum_z2 / se_;
+              koef_z0 := sum_z0 / se_;
+
+              if sum_z1 <> 0 then
+                 s245_ := '1';
+                 koef_z1 := 1;
+              elsif sum_z2 <> 0 then
+                 s245_ := '2';
+                 koef_z2 := 1;
+              elsif sum_z0 <> 0 then
+                 s245_ := '0';
+                 koef_z0 := 1;
+              end if;
+          else
+              s245_ := '0';
+
+              sum_z0:=se_;
+              sum_z1:=0;
+              sum_z2:=0;
           end if;
           
           IF    (    mfou_ IN (300205, 300465)
@@ -849,7 +947,7 @@ BEGIN
                     end if;
 
                     p_set_s580_def(nbs_, dk_, r011_, s245_);
-                    
+
                     if sum_zal <> 0 then
                        kodp_ := dk_ || nbs_ || r011_||r013_ || LPAD (kv_,3,'0') || s580_||r017_||segm_WWW||s245_||k077_;
                        znap_ := TO_CHAR (ABS (se_ - sum_zal));
@@ -1227,11 +1325,11 @@ BEGIN
           end if;
 
           if znap_ <> '0' then
-             if nbs_ in ('3690','3692') then
-                znap_ := to_char(k.szq);
-                comm_ := '';
-                srezp_ := 0;
-             end if;
+--             if nbs_ in ('3690','3692') then
+--                znap_ := to_char(k.szq);
+--                comm_ := '';
+--                srezp_ := 0;
+--             end if;
 
              INSERT INTO rnbu_trace
                       ( recid, userid, nls, kv, odate,
@@ -1287,7 +1385,7 @@ BEGIN
    end loop;
 
    for k in (select acc, nbs, nls, kv, rnk, s080, szq, isp, mdate, tobo, r031, r030,
-                    r011, r013, s580, rez, discont, prem, nd, id, ob22, custtype, accr, tip
+                    r011, r013, s580, rez, discont, prem, nd, id, ob22, custtype, accr, tip, s240
                from ( select t.acc, t.nls, decode(t.kv, 974, 933, t.kv) kv, t.rnk, t.s080,
                              gl.p_icurval(t.kv, t.sz - t.rez_30, dat_) szq,
                              a.isp, a.mdate, a.tobo, nvl(a.nbs, substr(a.nls, 1,4)) nbs,
@@ -1295,7 +1393,8 @@ BEGIN
                              nvl(s.r011, '0') r011, nvl(s.r013, '0') r013, t.rz rez,
                              nvl(gl.p_icurval(t.kv, t.discont, dat_),0) discont,
                              nvl(gl.p_icurval(t.kv, t.prem, dat_),0) prem,
-                             t.nd, t.id, nvl(s.s580, '0') s580, a.ob22, c.custtype, t.accr, a.tip
+                             t.nd, t.id, nvl(s.s580, '0') s580, a.ob22, c.custtype, t.accr, 
+                             a.tip, nvl(s.s240, '0') s240
                         from v_tmp_rez_risk_c5 t,
                              accounts a, specparam s, customer c, kl_r030 l
                        where t.dat = datr_
@@ -1325,7 +1424,8 @@ BEGIN
                              nvl(s.r011, '0') r011, nvl(s.r013, '0') r013, t.rz rez,
                              nvl(gl.p_icurval(t.kv, t.discont, dat_),0) discont,
                              nvl(gl.p_icurval(t.kv, t.prem, dat_),0) prem,
-                             t.nd, t.id, nvl(s.s580, '0') s580, a.ob22, c.custtype, t.accr_30 accr, a.tip
+                             t.nd, t.id, nvl(s.s580, '0') s580, a.ob22, c.custtype, t.accr_30 accr, 
+                             a.tip, nvl(s.s240, '0') s240
                         from v_tmp_rez_risk_c5 t,
                              accounts a, specparam s, customer c, kl_r030 l
                        where t.dat = datr_
@@ -1390,6 +1490,7 @@ BEGIN
       r013_ := substr(nbs_r013_, 5, 1);
 
       s245_ :='2';
+          
       r011_ := k.r011;
 
 --   проверка наличия для счета значений R011
@@ -1504,11 +1605,11 @@ BEGIN
           end if;
 
           if znap_ <> '0' then
-              if nbs_ in('3690','3692') then
-                 znap_ := to_char(k.szq);
-                 comm_ := '';
-                 srezp_ := 0;
-              end if;
+--              if nbs_ in('3690','3692') then
+--                 znap_ := to_char(k.szq);
+--                 comm_ := '';
+--                 srezp_ := 0;
+--              end if;
 
               INSERT INTO rnbu_trace
                           (recid, userid,
@@ -1526,7 +1627,7 @@ BEGIN
           if srezp_ <> 0 and not TP_SND then
              r012_ :='B';
 
-             kodp_ := '2'||nbs_||r011_||r013_||k.r030||s580a_||r017_||segm_WWW||s245_||k077_;
+             kodp_ := '2'||nbs_||r011_||r013_||k.r030||s580a_||r017_||segm_WWW||'2'||k077_;
              znap_ := srezp_;
 
 
@@ -1559,11 +1660,12 @@ BEGIN
       recid_    number;
       granica_  number := 100;
       mask_     varchar2(100);
+      diff_     number;
    begin
       for k in (select fdat, ref, acc, nls, kv, sq, nbs, acca, nlsa, rnka,
                        sum(sq) over (partition by acc) sum_all
                 from (select /*+ leading(a) index(o,IDX_OPLDOK_KF_FDAT_ACC)  */
-                             o.fdat, o.ref, o.acc, a.nls, a.kv,
+                             o.fdat, o.ref, o.acc, a.nls, a.kv, 
                              decode(o.dk, 0, -1, 1) * gl.p_icurval(a.kv, o.s, dat_) sq,
                              a.nbs, z.acc acca, x.nls nlsa, x.rnk rnka
                       from accounts a, opldok o, opldok z, accounts x, oper p
@@ -1601,9 +1703,11 @@ BEGIN
                end;
 
                if recid_ is not null then
-
+              
+                  diff_ :=0;
                   if abs(k.sq) > znap_ then
-                     znap_ := -1 * znap_;
+                     diff_ := -1 *(abs(k.sq) - znap_);
+                     znap_ := -1 *znap_;
                   else
                      znap_ := k.sq;
                   end if;
@@ -1621,6 +1725,35 @@ BEGIN
                           nbuc, tobo
                    from rnbu_trace
                    where recid = recid_;
+
+                   if diff_ != 0  then       --списано больше чем остаток, ищем еще счета клиента
+                       begin
+                           select recid, kodp, znap
+                           into recid_, kodp_, znap_
+                           from rnbu_trace
+                           where rnk =k.rnka and acc != k.acca and
+                                 kodp like '2'||substr(k.nls,1,4)||'%' and
+                                 rownum = 1;
+                       exception
+                          when no_data_found then
+                              recid_ := null;
+                       end;
+                       if recid_ is not null then
+                              INSERT INTO rnbu_trace
+                                        ( recid, userid, nls, kv, odate, kodp,
+                                          znap, acc, rnk, isp, mdate, ref,
+                                          comm, nbuc, tobo )
+                               select s_rnbu_record.NEXTVAL recid,
+                                      userid, nls, kv, odate, kodp,
+                                      to_char(diff_), acc,
+                                      rnk, isp, mdate, k.ref,
+                                      'Списання за рахунок резерву РЕФ = '||to_char(k.ref) comm,
+                                      nbuc, tobo
+                               from rnbu_trace
+                               where recid = recid_;
+                       end if;
+
+                   end if;
                end if;
            end if;
        end loop;
