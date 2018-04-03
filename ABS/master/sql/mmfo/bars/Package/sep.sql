@@ -3740,7 +3740,7 @@ BEGIN
                                          AND dat_b>=ADD_MONTHS(gl.bDATE,-1);
       EXCEPTION WHEN OTHERS THEN NULL;
       END;
-   ELSIF dir_ IN (4,6,14) AND INSTR('!+*-',SUBSTR(d_rec_,2,1))>0 THEN -- Branch reply
+  /* ELSIF dir_ IN (4,6,14) AND INSTR('!+*-',SUBSTR(d_rec_,2,1))>0 THEN -- Branch reply
 
       BEGIN
          SELECT fn_b||LPAD(TO_CHAR(rec_b),6) INTO tmp_
@@ -3748,7 +3748,7 @@ BEGIN
           WHERE fn_a=SUBSTR(d_rec_,3,12) AND rec_a=SUBSTR(d_rec_,15,6)
                                          AND dat_a>=ADD_MONTHS(gl.bDATE,-1);
       EXCEPTION WHEN OTHERS THEN NULL;
-      END;
+      END; */
    END IF;
 
    RETURN SUBSTR(d_rec_,1,2)||tmp_||SUBSTR(d_rec_,21);
