@@ -12,7 +12,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_f26 (Dat_ DATE )  IS
 % DESCRIPTION :    Процедура формирование файла #26 для КБ
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 %
-% VERSION     :   v.16.006 10/01/2018 (28.12.2017, 14.11.2017) 
+% VERSION     :   v.16.012 02/04/2018 (01/02/2018) 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
      параметры:  Dat_ - отчетная дата
 
@@ -31,6 +31,10 @@ CREATE OR REPLACE PROCEDURE BARS.p_f26 (Dat_ DATE )  IS
 28     S580         код розподілу активів за групами ризику
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 02/04/2018 -будемо додатково включати бал.рах. 1509 з типом 'SNA' 
+ 19/01/2018 -для бал.счетов 36 раздела убрали присвоение параметру S245 
+             значения ноль 
+ 17/01/2018 -не включаются счета НБУ RNK=10009201 
  28/12/2017 -новая структура показателя
  14/11/2017 -несущественные изменения
  20/02/2017 -для бал.счета 1502 будет формироваться различные значения 
@@ -81,6 +85,7 @@ nbs_o    Varchar2(4);
 nls_     Varchar2(15);
 dat1_    Date;
 data_    Date;
+datb_    date;
 datr_    date;
 kv_      SMALLINT;
 dk_      Varchar2(2);
@@ -124,11 +129,14 @@ s240s_   Varchar2(1);
 s245_    Varchar2(1);
 s580_    Varchar2(1);
 s580s_   Varchar2(1);
+s580r_   Varchar2(1);
 s580a_   Varchar2(1);
 kod_j_   Varchar2(1);
 
 rnk_     Number;
 userid_    NUMBER;
+
+nbs_r013_   varchar2(20);
 
 comm_           rnbu_trace.comm%TYPE;
 l_znak          smallint;
@@ -152,9 +160,10 @@ CURSOR SALDO IS
           NVL(trim(sp.s580),'0'), 
           c.rnk
    FROM (SELECT s.acc, s.nls, s.kv, aa.fdat, s.nbs, aa.ostf,
-         aa.dos, aa.kos, s.rnk, s.mdate
+         aa.dos, aa.kos, s.rnk, s.mdate, s.tip 
          FROM saldoa aa, accounts s
-         WHERE aa.acc=s.acc     AND
+         WHERE aa.acc = s.acc    AND
+               s.rnk <> 10009201 AND
               (s.acc,aa.fdat) =
                (select c.acc,max(c.fdat)
                 from saldoa c
@@ -163,7 +172,8 @@ CURSOR SALDO IS
         customer c, custbank cb, kl_k040 l, kod_r020 k, 
         rcukru rc, specparam sp 
    WHERE a.nbs=k.r020                   AND
-         a.nbs not in ('1509','1519','1529')  AND 
+         (a.nbs not in ('1509','1519','1529') OR 
+          (a.nbs = '1509' and a.tip='SNA') ) AND 
          trim(k.prem) = 'КБ'            AND
          k.a010 = '26'                  AND
          (k.d_close is null OR 
@@ -175,151 +185,67 @@ CURSOR SALDO IS
          c.country = TO_NUMBER(l.k040)  AND
          a.ostf-a.dos+a.kos <> 0 ;
 
+CURSOR SALDO_ACC(pacc_ in number) IS
+   SELECT a.acc, a.nls, a.kv, a.fdat, a.nbs, c.country, c.codcagent,
+          cb.mfo, NVL(rc.glb,0), cb.alt_bic, NVL(cb.rating,' '),
+          decode(f_ourmfo, 300205, LTRIM(RTRIM(substr(c.nmkk,1,60))), 
+                                   LTRIM(RTRIM(substr(c.nmk,1,60)))), 
+          a.ostf-a.dos+a.kos, 
+          NVL(trim(sp.r011),'0'),
+          NVL(trim(sp.r013),'0'),
+          NVL(trim(sp.s180),'0'),
+          NVL(trim(sp.s240),'0'),
+          NVL(trim(sp.s580),'0'), 
+          c.rnk
+   FROM (SELECT s.acc, s.nls, s.kv, aa.fdat, s.nbs, aa.ostf,
+         aa.dos, aa.kos, s.rnk, s.mdate, s.tip 
+         FROM saldoa aa, accounts s
+         WHERE aa.acc = s.acc    AND
+               s.rnk <> 10009201 AND
+              (s.acc,aa.fdat) =
+               (select c.acc,max(c.fdat)
+                from saldoa c
+                where s.acc=c.acc and c.fdat <= Dat_
+                group by c.acc)) a,    
+        customer c, custbank cb, kl_k040 l, kod_r020 k, 
+        rcukru rc, specparam sp 
+   WHERE a.acc = pacc_ and
+         a.nbs=k.r020                   AND
+         (a.nbs not in ('1509','1519','1529') OR 
+          (a.nbs = '1509' and a.tip='SNA') ) AND 
+         trim(k.prem) = 'КБ'            AND
+         k.a010 = '26'                  AND
+         (k.d_close is null OR 
+          k.d_close > Dat_)             AND
+         a.acc = sp.acc(+)              AND 
+         a.rnk = c.rnk                  AND
+         c.rnk = cb.rnk                 AND
+         cb.mfo = rc.mfo(+)             AND 
+         c.country = TO_NUMBER(l.k040);
+         
 CURSOR BaseL IS
     SELECT kodp, znap
     FROM rnbu_trace
 order by kodp;
 
-
-    procedure P_Set_S580_Def(r020_ in varchar2, r013_ in varchar2) is
-       invk_ varchar2(1);
-    begin
-       if r020_ = '9500' then
-          if r013_ in ('1','3') then
-             s580_ := '5';
-          end if;
-
-          if r013_ = '9' then
-             s580_ := '9';
-          end if;
-       end if;
-
-       if r020_ in ('3570','3578')  then
-          if r013_ in ('3','4')  then   s580_ :='5';  end if;
-          if r013_ in ('5','6')  then   s580_ :='1';  end if;
-       end if;
-
-       if mfou_ = 353575 and r020_ in ('1518', '1520', '1521') or
-          mfou_ <> 353575 and r020_ in ('1500','1502','1508','1509',
-                                        '1510','1512','1513','1515','1516','1517','1518','1519',
-                                        '1520','1521','1523','1524','1525','1526','1528')
-       then
-           begin
-             select nvl(trim(VALUE), '2')
-             into invk_
-             from customerw
-             where rnk = rnk_ and
-                   tag = 'INVCL';
-           exception
-                when no_data_found then
-                    invk_:= null;
-           end;
-       else
-           invk_:= null;
-       end if;
-
-       invk_:= nvl(invk_, '2');
-
-       s580_ := (case
-                   when r020_||invk_ in ('15003','15083','15103','15123') then '1'
-                   when r020_||invk_ in ('15001','15081','15101','15121') then '3'
-                   when r020_||invk_ in ('15002','15082','15102','15122') then '4'
-                   ---
-                   when r020_||r013_ in ('15023') then '1'
-                   when r020_||r013_ in ('15021','15022','15029') and invk_ ='3'  then '1'
-                   when r020_||r013_ in ('15021')         and invk_ in ('1','2')  then '4'
-                   when r020_||r013_ in ('15022','15029') and invk_ in ('1','2')  then '5'
-                   ---
-                   when r020_||invk_ in ('15133') then '1'
-                   when r020_||invk_ in ('15131','15132') then '5'
-                   ---
-                   when r020_||r013_ in ('15185','15186','15187','15188') and invk_ ='3'  then '1'
-                   when r020_||r013_ in ('15185','15187') and invk_ ='1'  then '3'
-                   when r020_||r013_ in ('15186','15188') and invk_ ='2'  then '5'
-                   when r020_||invk_ in ('15182') then '5'
-                   when r020_ in ('1509','1519')  then '5'
-                   ---
-                   when r020_||r013_ in ('15151','15154','15161','15164') and invk_ ='3'  then '1'
-                   when r020_||r013_ in ('15151','15154','15161','15164') and invk_ ='1'  then '3'
-                   when r020_||r013_ in ('15151','15154','15161','15164') and invk_ ='2'  then '4'
-                   when r020_||r013_ in ('15152','15162')  and invk_ ='3'          then '1'
-                   when r020_||r013_ in ('15152','15162')  and invk_ in ('1','2')  then '5'
-                   ---
-                   when r020_||invk_ in ('15203', '15213', '15223','15233') then '1'
-                   when r020_||invk_ in ('15201', '15202', '15221', '15222') then '5'
-                   when r020_||invk_ in ('15211', '15231') then '3'
-                   when r020_||invk_ in ('15212') then '4'
-                   when r020_||invk_ in ('15232') then '5'
-                   ---
-                   when r020_||r013_||invk_ in ('152433') then '1'
-                   when r020_||r013_||invk_ in ('152411', '152412') then '5'
-                   ---
-                   when r020_||invk_ in ('15253') and r013_ in ('1','2','3','4','5','7') then '1'
-                   when r020_||invk_ in ('15251') and r013_ in ('1','4') then '3'
-                   when r020_||invk_ in ('15251') and r013_ in ('2','3','5','7') then '5'
-                   when r020_||r013_ in ('15254') then '4'
-                   when r020_||r013_ in ('15251','15252','15253','15255','15257') and invk_ = '2' then '5'
-                   ---
-                   when r020_||invk_ in ('15263') and r013_ in ('1','2','3','4','5','7')  then '1'
-                   when r020_||invk_ in ('15261') and r013_ in ('1','4') then '3'
-                   when r020_||invk_ in ('15261') and r013_ in ('2','3','5','7')  then '5'
-                   when r020_||r013_ in ('15264') then '4'
-                   when r020_||r013_ in ('15261','15262','15263','15265','15267') and invk_ = '2' then '5'
-                   ---
-                   when r020_||invk_ in ('15283') then '1'
-                   when r020_||invk_ in ('15281') then '3'
-                   when r020_||r013_ in ('15285','15287') then '4'
-                   when r020_||r013_ in ('15286','15288') and invk_ = '2' then '5'
-                     else
-                         s580_
-                   end);
-    end;
-
-BEGIN
--------------------------------------------------------------------
-EXECUTE IMMEDIATE 'truncate table rnbu_trace';
-
-userid_ := user_id;
--------------------------------------------------------------------
-EXECUTE IMMEDIATE 'alter session set NLS_NUMERIC_CHARACTERS=''.,''';
-
-
--- свой МФО
-mfob_:=f_ourmfo();
-
--- МФО "родителя"
-BEGIN
-   SELECT NVL(trim(mfou), mfob_)
-      INTO mfou_
-   FROM BANKS
-   WHERE mfo = mfob_;
-EXCEPTION WHEN NO_DATA_FOUND THEN
-   mfou_ := mfob_;
-END;
-
-den_ := to_char(Dat_,'DD');
-
-if to_number(den_) <=10 then
-   Dat1_ := to_date('01'||to_char(Dat_,'MM')||to_char(Dat_,'YYYY'),'ddmmyyyy');
-elsif to_number(den_)<=20 then
-   Dat1_ := to_date('11'||to_char(Dat_,'MM')||to_char(Dat_,'YYYY'),'ddmmyyyy');
-else
-   Dat1_ := to_date('21'||to_char(Dat_,'MM')||to_char(Dat_,'YYYY'),'ddmmyyyy');
-end if;
-
-datr_ := trunc(Dat_, 'MM');
-
-sump_ := 0 ;
-znap1_ := '0' ;
-kodp1_ := '0' ;
-
-OPEN SALDO;
-LOOP
-   FETCH SALDO INTO acc_, nls_, kv_, data_, nbs_, cs_, agent_, mfo_,
-                    glb_, kb_, rb_, nb_, sn_, r011s_, r013s_, 
-                    s180s_, s240s_,  s580s_, rnk_ ;
-   EXIT WHEN SALDO%NOTFOUND;
-
+procedure P_Set_S580_Def(r020_ in varchar2, t020_ in varchar2, r011_ in varchar2, s245_ in varchar2) is
+begin
+   if s580s_ = '0' or r020_ in ('2233', '2238', '2625', '3114', '3570') then
+       select nvl(max(s580), '9')
+       into s580r_
+       from nbur_ref_risk_s580
+       where r020 = r020_ and 
+            (t020 = t020_ or t020 = '*') and
+            (r011 = r011_ or r011 = '*') and
+            (S245 = s245_ or S245 = '*') and
+            (t097 = invk_ or t097 = '*');
+           
+       s580_ := s580r_;
+   end if;
+end;
+    
+procedure prepare_data(nbs_ in varchar2) is
+begin
    r1518_ := 0;
    r1528_ := 0;
    r013_ :='0';
@@ -429,36 +355,6 @@ LOOP
 
       s240_ := s240s_;
 
-      begin
-         select S580
-            into s580a_
-         from otc_risk_s580
-         where s580 <> 'R' and
-               R020 = nbs_ and
-               T020 in ('1', '3') and
-               (r013 = r013_ or r013 = '0') and 
-               rownum = 1;
-      exception
-        when no_data_found then
-         s580a_ := '0';
-      end;
-
-      if s580a_ = '0' then
-         s580_ := null;
-
-         p_set_s580_def(substr(nls_, 1, 4), r013_);
-
-         if s580_ is not null then
-            s580a_ := s580_;
-         else
-            s580a_ := '9';
-         end if;
-      end if;
-
-      if s580s_ <> '0' then
-         s580a_ := s580s_;
-      end if;
-
       kod_j_ := '0';
 
       s245_ :='1';
@@ -466,13 +362,70 @@ LOOP
          s240_ = 'Z'
       then
          s245_ :='2';
-      elsif  nbs_ like '150_'
-         or  nbs_ like '34__' or  nbs_ like '36__'
+      elsif  nbs_ like '34__' 
          or  nbs_ like '44__' or  nbs_ like '45__'
          or  nbs_ like '9___'
          or  nbs_ in ('2920','3500')
       then
          s245_ :='0';
+      end if;
+      
+      IF agent_ in (2,4) and (substr(rb_,1,1) = 'A' or substr(rb_,1,1) = 'T' or 
+                              substr(rb_,1,1) = 'F' or 
+                              rb_ in ('BBB','BBB+','BBB-','Baa1','Baa2','Baa3'))
+      THEN
+        invk_ := '1';
+      ELSE
+        invk_ := '2';
+      END IF;      
+      
+      select nvl(max(s580), '9')
+            into s580a_
+           from nbur_ref_risk_s580
+           where r020 = substr(nls_, 1, 4) and 
+                (t020 = '1' or t020 = '*') and
+                (r011 = r011_ or r011 = '*') and
+                (S245 = s245_ or S245 = '*') and
+                (t097 = invk_ or t097 = '*');
+
+      if s580a_ = '0' then
+         s580_ := null;
+
+         p_set_s580_def(nbs_, (case when sn_<0 then '1' else '2' end), r011s_, s245_);
+
+         if s580_ is not null then
+            s580a_ := s580_;
+         else
+            s580a_ := '9';
+         end if;
+      end if;
+      
+      if substr(nls_, 1, 4) in ('1500', '1502') and s245_ = '1' and invk_ = '1' and
+         kb_ in ('8260000013', '8400000053', '8400000054')
+      then
+         s580a_ := '1';
+      end if;
+      
+      if substr(nls_, 1, 4) in ('3540') and r011_ = '2' 
+      then
+         if s245_ = '1' then
+             if r013_ = '1' then
+                s580a_ := '3';
+             else
+                s580a_ := '4';
+             end if;
+         else
+             s580a_ := '5';
+         end if;
+      end if;   
+
+      if substr(nls_, 1, 4) in ('9200') 
+      then
+          s580a_ := (case when r013_ = '4' then '3' 
+                          when r013_ in ('5', '6') then '4'
+                          when r013_ in ('3','8','A') then '1'
+                          else '9'
+                    end);
       end if;
    END IF;
       
@@ -667,21 +620,11 @@ LOOP
 
       -- инвестиционный класс только для банков нерезидентов
       if se_ <> 0 or (kv_<> 980 and sn_ <> 0) then
-
-         IF agent_ in (2,4) and (substr(rb_,1,1) = 'A' or substr(rb_,1,1) = 'T' or 
-                                 substr(rb_,1,1) = 'F' or 
-                                 rb_ in ('BBB','BBB+','BBB-','Baa1','Baa2','Baa3'))
-         THEN
-            invk_ := '1';
-         ELSE
-            invk_ := '2';
-         END IF;
-
          IF Dat_ < dat_izm1 
          THEN
             kodp_ := '97' || LPAD(to_char(cs_),3,'0') || kb_ || '00000000' ;
          ELSE
-            kodp_ := '97' || LPAD(to_char(cs_),3,'0') || kb_ || '000000000000'||s580a_ ;
+            kodp_ := '97' || LPAD(to_char(cs_),3,'0') || kb_ || '0000000000009';
          END IF;
             INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, acc, rnk) VALUES
                                 (nls_, kv_, data_, kodp_, invk_, acc_, rnk_);
@@ -710,7 +653,7 @@ LOOP
          THEN
             kodp_ := '98' || LPAD(to_char(cs_),3,'0') || kb_ || '00000000' ;
          ELSE
-            kodp_ := '98' || LPAD(to_char(cs_),3,'0') || kb_ || '000000000000'||s580a_ ;
+            kodp_ := '98' || LPAD(to_char(cs_),3,'0') || kb_ || '0000000000009';
          END IF;
 
          INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, acc, rnk) VALUES
@@ -720,14 +663,75 @@ LOOP
          THEN
             kodp_ := '99' || LPAD(to_char(cs_),3,'0') || kb_ || '00000000' ;
          ELSE
-            kodp_ := '99' || LPAD(to_char(cs_),3,'0') || kb_ || '000000000000'||s580a_ ;
+            kodp_ := '99' || LPAD(to_char(cs_),3,'0') || kb_ || '0000000000009';
          END IF;
 
          INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, acc, rnk) VALUES
                                 (nls_, kv_, data_, kodp_, rb_, acc_, rnk_);
       end if;
 
-   END IF;
+   end if;
+end;
+
+
+BEGIN
+-------------------------------------------------------------------
+EXECUTE IMMEDIATE 'truncate table rnbu_trace';
+
+userid_ := user_id;
+-------------------------------------------------------------------
+EXECUTE IMMEDIATE 'alter session set NLS_NUMERIC_CHARACTERS=''.,''';
+
+-- свой МФО
+mfob_:=f_ourmfo();
+
+-- МФО "родителя"
+BEGIN
+   SELECT NVL(trim(mfou), mfob_)
+      INTO mfou_
+   FROM BANKS
+   WHERE mfo = mfob_;
+EXCEPTION WHEN NO_DATA_FOUND THEN
+   mfou_ := mfob_;
+END;
+
+den_ := to_char(Dat_,'DD');
+
+if to_number(den_) <=10 then
+   Dat1_ := to_date('01'||to_char(Dat_,'MM')||to_char(Dat_,'YYYY'),'ddmmyyyy');
+elsif to_number(den_)<=20 then
+   Dat1_ := to_date('11'||to_char(Dat_,'MM')||to_char(Dat_,'YYYY'),'ddmmyyyy');
+else
+   Dat1_ := to_date('21'||to_char(Dat_,'MM')||to_char(Dat_,'YYYY'),'ddmmyyyy');
+end if;
+
+-- дата розрахунку резервiв
+select  max(dat)
+into datb_
+from rez_protocol
+where dat_bank is not null and
+     dat_bank <= dat_ and
+     dat <= dat_  ;
+
+if datb_ is null then
+  datr_ := add_months(last_day(dat_)+1,-1);
+else
+  datr_ := last_day(datb_) + 1;
+end if;
+
+sump_ := 0 ;
+znap1_ := '0' ;
+kodp1_ := '0' ;
+
+OPEN SALDO;
+LOOP
+   FETCH SALDO INTO acc_, nls_, kv_, data_, nbs_, cs_, agent_, mfo_,
+                    glb_, kb_, rb_, nb_, sn_, r011s_, r013s_, 
+                    s180s_, s240s_,  s580s_, rnk_ ;
+   EXIT WHEN SALDO%NOTFOUND;
+
+   prepare_data(nbs_);
+
 END LOOP;
 CLOSE SALDO;
 ---------------------------------------------------
@@ -737,8 +741,10 @@ CLOSE SALDO;
                 t.nd, nvl(nvl(t.nls_rez, t.nls_rezn), t.nls_rez_30) nls_rez, 
                 t.rez*100 rez, 
                 gl.p_icurval(t.kv, t.rez*100, dat_) rezq, 
-                NVL(sp.r013,'0') r013
-              from nbu23_rez t, specparam sp
+                NVL(sp.r013,'0') r013,
+                t.s080, t.id, t.ob22, c.custtype,
+                nvl(nvl(t.acc_rez, t.acc_rezn), t.acc_rez_30) accr 
+              from nbu23_rez t, specparam sp, customer c
               where t.fdat = datr_ 
                 and t.id not like 'NLO%' 
                 and t.id not like 'CAC%' 
@@ -748,11 +754,13 @@ CLOSE SALDO;
                     ) 
                 and (t.rez <> 0 or t.rezq <> 0)
                 and nvl(nvl(t.acc_rez, t.acc_rezn), t.acc_rez_30) = sp.acc(+) 
+                and t.rnk = c.rnk
             )
    loop
-
-      nbs_ := substr(k.nls_rez, 1, 4);
-      r013_ := k.r013;
+      nbs_r013_ := f_ret_nbsr_rez(k.nls, k.r013, k.s080, k.id, k.kv, k.ob22, k.custtype, k.accr);
+      
+      nbs_ := substr(nbs_r013_, 1, 4);
+      r013_ := substr(nbs_r013_, 5, 1);
 
       begin
          select max(kodp) 
@@ -767,47 +775,65 @@ CLOSE SALDO;
                                        
       exception 
          when no_data_found then
-         null;
+              kodp_ := null;
       end;
+      
+      if kodp_ is not null then
+         znap_ := to_char(k.rezq);
+         comm_ := ' розшифровка рахунку резерву ';
+            
+         kodp_ := '20' || substr(kodp_,3,13) || nbs_ || substr(kodp_,20,1) || 
+                        r013_ || substr(kodp_,22);
 
-      znap_ := to_char(k.rezq);
-      comm_ := ' розшифровка рахунку резерву ';
-
-      kodp_ := '20' || substr(kodp_,3,13) || nbs_ || substr(kodp_,20,1) || 
-                    r013_ || substr(kodp_,22);
-
-      INSERT INTO rnbu_trace
-                       ( recid, userid,
-                         nls, kv, odate, kodp,
-                         znap, acc,
-                         rnk, isp, 
-                         comm, nd
-                       )
-           VALUES (s_rnbu_record.NEXTVAL, userid_,
+         INSERT INTO rnbu_trace
+                           ( recid, userid,
+                             nls, kv, odate, kodp,
+                             znap, acc,
+                             rnk, isp, 
+                             comm, nd
+                           )
+          VALUES (s_rnbu_record.NEXTVAL, userid_,
                   k.nls, k.kv, dat_, kodp_,
                   znap_, k.acc, k.rnk, k.isp, 
                   comm_, k.nd );
-  
-      if k.kv <> 980 
-      then
-         kodp_ := '21' || substr(kodp_,3,13) || nbs_ || substr(kodp_,20,1) || 
-                    r013_ || substr(kodp_,22);
+      
+          if k.kv <> 980 
+          then
+             kodp_ := '21' || substr(kodp_,3,13) || nbs_ || substr(kodp_,20,1) || 
+                        r013_ || substr(kodp_,22);
 
-         znap_ := to_char(k.rez);
+             znap_ := to_char(k.rez);
 
-         INSERT INTO rnbu_trace
-                          ( recid, userid,
-                            nls, kv, odate, kodp,
-                            znap, acc,
-                            rnk, isp, 
-                            comm, nd
-                          )
-           VALUES (s_rnbu_record.NEXTVAL, userid_,
-                  k.nls, k.kv, dat_, kodp_,
-                  znap_, k.acc, k.rnk, k.isp, 
-                  comm_, k.nd);
+             INSERT INTO rnbu_trace
+                              ( recid, userid,
+                                nls, kv, odate, kodp,
+                                znap, acc,
+                                rnk, isp, 
+                                comm, nd
+                              )
+               VALUES (s_rnbu_record.NEXTVAL, userid_,
+                      k.nls, k.kv, dat_, kodp_,
+                      znap_, k.acc, k.rnk, k.isp, 
+                      comm_, k.nd);
+          end if;
+      else
+         OPEN SALDO_ACC(k.acc);
+         LOOP
+            FETCH SALDO_ACC INTO acc_, nls_, kv_, data_, nbs_, cs_, agent_, mfo_,
+                        glb_, kb_, rb_, nb_, sn_, r011s_, r013s_, 
+                        s180s_, s240s_,  s580s_, rnk_ ;
+            EXIT WHEN SALDO_ACC%NOTFOUND;
+
+            nbs_ := substr(nbs_r013_, 1, 4);
+            r013s_ := substr(nbs_r013_, 5, 1);
+            
+            sn_ := k.rez;
+            se_ := k.rezq;
+            
+            prepare_data(nbs_);
+         END LOOP;
+         CLOSE SALDO_ACC;
       end if;
-
    end loop;
 ---------------------------------------------------
 DELETE FROM tmp_nbu where kodf='26' and datf= dat_;
@@ -864,3 +890,4 @@ grant EXECUTE                                                                on 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_F26.sql =========*** End *** ===
 PROMPT ===================================================================================== 
+
