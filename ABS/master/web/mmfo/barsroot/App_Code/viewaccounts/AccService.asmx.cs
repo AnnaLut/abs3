@@ -1237,7 +1237,7 @@ namespace ViewAccounts
                 InitOraConnection(Context);
                 SetRole(base_role);
                 SetParameters("NBS", DB_TYPE.Varchar2, nbs, DIRECTION.Input);
-                result = Convert.ToString(SQL_SELECT_scalar("SELECT nbsn FROM proc_dr WHERE nbs=:NBS and sour=4"));
+                result = Convert.ToString(SQL_SELECT_scalar("SELECT nbsn FROM proc_dr$base WHERE nbs=:NBS and sour=4"));
                 if (result != "")
                     result = KeyAccount(mfo, result + "0" + nls.Substring(5, (nls.Length > 13) ? (9) : (nls.Length - 5)))[0];
             }
