@@ -188,8 +188,8 @@ namespace DocInput
 
                 if ("0" == __DK.Value || "2" == __DK.Value)
                 {
-                    //Если параметр DEP_UP не пустой, то поле дебет всегда верху
-                    if (!string.IsNullOrEmpty(PAR_DEPUP))
+                    //Если параметр TT_Flags[19] равен '1', то поле дебет всегда верху
+                    if ('1'==TT_Flags[19])
                     {
                         //SideA.Style.Add("position", "absolute");
                         //SideB.Style.Add("position", "absolute");
@@ -746,7 +746,7 @@ namespace DocInput
             }
             else
                 s_dateD = bDATE.ToString("dd/MM/yyyy");
-            DocD_TextBox.Text = s_dateD.Replace(".", "/");
+            DocD_TextBox.Text = !string.IsNullOrEmpty(s_dateD)? s_dateD.Replace(".", "/"):PAR_SYSDATE;
         }
         /// <summary>
         /// Заполнение списка видов документов
@@ -2030,6 +2030,9 @@ namespace DocInput
             if (Request.Params["Drec"] != null)
             {
                 Drec.Value = Request.Params["Drec"];
+                SetReadOnly(DocN, DocN.Text);
+                SetReadOnly(DocD_TextBox, DocD_TextBox.Text);
+                VobList.Enabled=false;
             }
 
             return;
