@@ -4,7 +4,7 @@ IS
 % DESCRIPTION : Процедура формирования #С5 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.17.019  02/04/2018 (30/03/2018)
+% VERSION     : v.17.020  04/04/2018 (02/04/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
 
@@ -252,14 +252,14 @@ IS
    sum_se0   number:=0;
    sum_sel   number:=0;
    sum_se2   number:=0;
-   
+
    dc_   number;
-   
+
    dat_beg_ date;
    dat_end_ date;
-   
+
    datd_    date;
-   
+
     procedure P_Set_S580_Def(r020_ in varchar2, t020_ in varchar2, r011_ in varchar2, s245_ in varchar2) is
        invk_ varchar2(1);
     begin
@@ -272,15 +272,15 @@ IS
                 (t020 = t020_ or t020 = '*') and
                 (r011 = r011_ or r011 = '*') and
                 (S245 = s245_ or S245 = '*');
-           
+
            s580_ := s580r_;
        end if;
 
        if r020_ in ('4410', '3400', '3408', '3500', '3508', '9129', '2066', '2920') and s580_ = '9' then
           s580_ := '5';
        end if;
-       
-       
+
+
 --       if r020_ in ('1500','1502','1508','1509',
 --                    '1510','1512','1513','1515','1516','1517','1518','1519',
 --                    '1520','1521','1523','1524','1525','1526','1528')
@@ -366,12 +366,12 @@ BEGIN
        EXIT;
      END IF;
    END LOOP;
-   
-   select max(fdat) 
+
+   select max(fdat)
    into dat_end_
-   from fdat 
+   from fdat
    where fdat<=dat_end_;
-      
+
    if dat_ = dat_end_ then
       datd_ := dat_;
    else
@@ -380,7 +380,7 @@ BEGIN
        from NBUR_TMP_A7_S245
        where report_date < dat_beg_;
    end if;
-      
+
    select count(*)
    into cnt_
    from NBUR_TMP_A7_S245
@@ -668,7 +668,6 @@ BEGIN
           then
                s245_ :='2';
           elsif nbs_ in ('1200','1203','3500','4400','4409','4410','4419','4430','4431','4500','4509','4530')
-             or  nbs_ like '34__' or  nbs_ like '36__' --or  nbs_ like '9%'
           then
               s245_ :='0';
           else
@@ -729,32 +728,42 @@ BEGIN
              END IF;
           END IF;
 
-          if not (nbs_ in ('1200','1203','3500','4400','4409','4410','4419','4430','4431','4500','4509','4530') or
-                  nbs_ like '34__' or  nbs_ like '36__' --or  nbs_ like '9%'
-                  ) or
+          if nbs_ not in ('1200','1203','3500','4400','4409','4410','4419','4430','4431','4500','4509','4530') or
              nbs_ is null
           then
               begin
-                  select sign(se_)*nvl(sum(decode(s245, '0', ost, 0)), 0),
-                         sign(se_)*nvl(sum(decode(s245, '1', ost, 0)), 0),
-                         sign(se_)*nvl(sum(decode(s245, '2', ost, 0)), 0)
-                  into sum_z0, sum_z1, sum_z2
-                  from NBUR_TMP_A7_S245
-                  where report_date = dat_ and
-                        acc_id = acc_;
+                  if tips_ = 'NL8'then
+                      select sign(se_)*nvl(sum(decode(s245, '0', ost, 0)), 0),
+                             sign(se_)*nvl(sum(decode(s245, '1', ost, 0)), 0),
+                             sign(se_)*nvl(sum(decode(s245, '2', ost, 0)), 0)
+                      into sum_z0, sum_z1, sum_z2
+                      from NBUR_TMP_A7_S245
+                      where report_date = dat_ and
+                            acc_id in (select dep_acc
+                                       from V_DPU_REL_ACC_ALL
+                                       where gen_acc = acc_);
+                  else
+                      select sign(se_)*nvl(sum(decode(s245, '0', ost, 0)), 0),
+                             sign(se_)*nvl(sum(decode(s245, '1', ost, 0)), 0),
+                             sign(se_)*nvl(sum(decode(s245, '2', ost, 0)), 0)
+                      into sum_z0, sum_z1, sum_z2
+                      from NBUR_TMP_A7_S245
+                      where report_date = dat_ and
+                            acc_id = acc_;
+                  end if;
               exception
                 when no_data_found then
                     sum_z0:=(case when s245_ = '0' then se_ else 0 end);
                     sum_z1:=(case when s245_ = '1' then se_ else 0 end);
                     sum_z2:=(case when s245_ = '2' then se_ else 0 end);
-              end;              
-              
+              end;
+
               if sum_z0 + sum_z1 + sum_z2 = 0 then
                  sum_z0:=(case when s245_ = '0' then se_ else 0 end);
                  sum_z1:=(case when s245_ = '1' then se_ else 0 end);
                  sum_z2:=(case when s245_ = '2' then se_ else 0 end);
               end if;
-              
+
               koef_z1 := sum_z1 / se_;
               koef_z2 := sum_z2 / se_;
               koef_z0 := sum_z0 / se_;
@@ -776,7 +785,7 @@ BEGIN
               sum_z1:=0;
               sum_z2:=0;
           end if;
-          
+
           IF    (    mfou_ IN (300205, 300465)
                  AND (   (    nbs_ IS NULL
                           AND (mfo_ = 300465 and SUBSTR (nls_, 1, 4) NOT IN
@@ -1350,7 +1359,7 @@ BEGIN
                              nvl(s.r011, '0') r011, nvl(s.r013, '0') r013, t.rz rez,
                              nvl(gl.p_icurval(t.kv, t.discont, dat_),0) discont,
                              nvl(gl.p_icurval(t.kv, t.prem, dat_),0) prem,
-                             t.nd, t.id, nvl(s.s580, '0') s580, a.ob22, c.custtype, t.accr, 
+                             t.nd, t.id, nvl(s.s580, '0') s580, a.ob22, c.custtype, t.accr,
                              a.tip, nvl(s.s240, '0') s240
                         from v_tmp_rez_risk_c5 t,
                              accounts a, specparam s, customer c, kl_r030 l
@@ -1381,7 +1390,7 @@ BEGIN
                              nvl(s.r011, '0') r011, nvl(s.r013, '0') r013, t.rz rez,
                              nvl(gl.p_icurval(t.kv, t.discont, dat_),0) discont,
                              nvl(gl.p_icurval(t.kv, t.prem, dat_),0) prem,
-                             t.nd, t.id, nvl(s.s580, '0') s580, a.ob22, c.custtype, t.accr_30 accr, 
+                             t.nd, t.id, nvl(s.s580, '0') s580, a.ob22, c.custtype, t.accr_30 accr,
                              a.tip, nvl(s.s240, '0') s240
                         from v_tmp_rez_risk_c5 t,
                              accounts a, specparam s, customer c, kl_r030 l
@@ -1446,8 +1455,12 @@ BEGIN
       nbs_ := substr(nbs_r013_, 1, 4);
       r013_ := substr(nbs_r013_, 5, 1);
 
-      s245_ :='2';
-          
+      select nvl(max(s245), '1')
+      into s245_
+      from NBUR_TMP_A7_S245
+      where report_date = datd_ and
+            acc_id = k.acc;
+
       r011_ := k.r011;
 
 --   проверка наличия для счета значений R011
@@ -1568,6 +1581,8 @@ BEGIN
 --                 srezp_ := 0;
 --              end if;
 
+              comm_ := comm_ || '(!)';
+
               INSERT INTO rnbu_trace
                           (recid, userid,
                            nls, kv, odate, kodp,
@@ -1622,21 +1637,21 @@ BEGIN
       for k in (select fdat, ref, acc, nls, kv, sq, nbs, acca, nlsa, rnka,
                        sum(sq) over (partition by acc) sum_all
                 from (select /*+ leading(a) index(o,IDX_OPLDOK_KF_FDAT_ACC)  */
-                             o.fdat, o.ref, o.acc, a.nls, a.kv, 
+                             o.fdat, o.ref, o.acc, a.nls, a.kv,
                              decode(o.dk, 0, -1, 1) * gl.p_icurval(a.kv, o.s, dat_) sq,
                              a.nbs, z.acc acca, x.nls nlsa, x.rnk rnka
                       from accounts a, opldok o, opldok z, accounts x, oper p
                       where o.fdat = any (select fdat from fdat
                                            where fdat between datb_+1 and dat_
                                              and fdat !=to_date('20171218','yyyymmdd')  ) and
-                        o.acc = a.acc 
-                        and a.tip = 'REZ' 
+                        o.acc = a.acc
+                        and a.tip = 'REZ'
                         and o.tt not like 'AR%'
                         and o.ref = z.ref
                         and o.fdat = z.fdat
                         and o.stmt = z.stmt
                         and o.dk <> z.dk
-                        and o.dk = 0 
+                        and o.dk = 0
                         and z.acc = x.acc
                         and x.nls not like '7%'
                         and x.nls not like '3800%'
@@ -1660,7 +1675,7 @@ BEGIN
                end;
 
                if recid_ is not null then
-              
+
                   diff_ :=0;
                   if abs(k.sq) > znap_ then
                      diff_ := -1 *(abs(k.sq) - znap_);
