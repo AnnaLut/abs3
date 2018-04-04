@@ -46,7 +46,7 @@ begin
     l_zpr.rpt_template := 'CRNV978.frx';
     l_zpr.form_proc    := '';
     l_zpr.default_vars := ':Param1=''%'',:Param2=''%''';
-    l_zpr.bind_sql     := ':Param1=''V_BRANCH_OWN|BRANCH|NAME'',:Param2=''TABVAL|KV|NAME''';
+    l_zpr.bind_sql     := '';
     l_zpr.xml_encoding := 'CL8MSWIN1251';
     l_zpr.txt          := '  SELECT ROWNUM as RN,'||nlchr||
                            '         b.mfo ,'||nlchr||
@@ -125,7 +125,7 @@ begin
     l_rep.name        :='Empty';
     l_rep.description :='Звіт з розшифровки залишків ЦРНВ на дату';
     l_rep.form        :='frm_FastReport';
-    l_rep.param       :=l_zpr.kodz||',3,sFdat,sFdat,"",TRUE,FALSE';
+    l_rep.param       :=l_zpr.kodz||',19,sFdat,sFdat,"",TRUE,FALSE';
     l_rep.ndat        :=1;
     l_rep.mask        :='';
     l_rep.usearc      :=0;
