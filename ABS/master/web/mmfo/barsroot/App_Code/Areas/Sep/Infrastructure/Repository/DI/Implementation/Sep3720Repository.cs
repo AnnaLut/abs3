@@ -49,7 +49,7 @@ namespace BarsWeb.Areas.Sep.Infrastructure.Repository.DI.Implementation
         public List<Sep3720Register> GetSep3720RegisterList(Int32 register_tp, String register_dt_from, String register_dt_to)
         {
             String sql_query = @"SELECT dat_a DAT, mfoa MFOA, nlsa NLSA, mfob MFOB, nlsb NLSB, dk DK,
-                                        s S, vob VOB, nd ND, kv KV, datd DATD, nam_a NAMA, nam_b NAMB,
+                                        s/100 S, vob VOB, nd ND, kv KV, datd DATD, nam_a NAMA, nam_b NAMB,
                                         nazn NAZN, d_rec DREC, id_a ID_A, id_b ID_B, rec REC
                                  FROM arc_rrp
                                  WHERE {0} AND trunc(dat_a) between to_date(:p_register_dt_from, 'dd/MM/yyyy') AND to_date(:p_register_dt_to, 'dd/MM/yyyy')

@@ -395,7 +395,6 @@
     }
 
     function printAnswer() {
-        debugger;
         grid = registerGrid.data("kendoGrid");
         gridSelected = registerGrid.data("kendoGrid").select();
         if (gridSelected.length > 0)
@@ -989,6 +988,11 @@
             columns: [
                 // порядок колонок відрізняється
                 {
+                    title: "",
+                    width: "30px",
+                    template: "<div #=daysBetween(Date.parse(new Date()), kendo.parseDate(FDAT, \"dd/MM/yyyy\"))<4? 'style=\"visibility: hidden;\"':'style=\"text-align: center;\"'#>&\\#9830;</div>"
+                },
+                {
                     field: "REF",
                     title: "Референція",
                     width: "120px",
@@ -1263,6 +1267,14 @@
             }
         });
     });
+
+    var daysBetween = function(date1, date2) {
+        var dt1 = new Date(date1);
+        var dt2 = new Date(date2);
+        var timeDiff = Math.abs(dt2.getTime() - dt1.getTime());
+        var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+        return diffDays;
+    }
 
 </script>
 <style>

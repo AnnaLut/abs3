@@ -86,7 +86,7 @@ window.onload = function () {
     if (document.getElementById("reqv_SCPFU")) {
         document.getElementById("SumA").execFunc = true;
     }
-    if (document.getElementById("__DEPUP").value == "1" && ("0" == document.getElementById("__DK").value || "2" == document.getElementById("__DK").value)) 
+    if (document.getElementById("__FLAGS").value.substr(19, 1) == "1" && ("0" == document.getElementById("__DK").value || "2" == document.getElementById("__DK").value)) 
     {
         document.getElementById("SideA").style.position = "absolute";
         document.getElementById("SideB").style.position = "absolute";

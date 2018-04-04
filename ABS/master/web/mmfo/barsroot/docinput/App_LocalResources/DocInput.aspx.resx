@@ -304,6 +304,6 @@
     <value>Срочный платеж</value>
   </data>
   <data name="Message34.Text" xml:space="preserve">
-    <value>Необходимо внести изменения либо в ОКПО, либо в МФО.</value>
+    <value>Необходимо внести изменения либо в ОКПО, либо в номер счета.</value>
   </data>
 </root>
