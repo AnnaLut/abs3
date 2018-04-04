@@ -1165,7 +1165,7 @@ begin
                             '//SOGL.DOG.n' || p_fxdeal.kvb || '/' || p_fxdeal.kva || '/' || p_fxdeal.ntik || chr(13) || chr(10) ||
                             '//OT.' || to_char(p_fxdeal.dat,'dd.MM.yyyy') || ' BEZ NDS');
   else
-     set_operw(p_ref, '72', '/BNF/FOREX AGR NO.' || p_fxdeal.kva || '/' || p_fxdeal.kvb || '/' || p_fxdeal.ntik || chr(13) || chr(10) ||
+     set_operw(p_ref, '72', '/BNF/FOREX AGR NO.' || p_fxdeal.kvb || '/' || p_fxdeal.kva || '/' || p_fxdeal.ntik || chr(13) || chr(10) ||
                             '//DD.' || to_char(p_fxdeal.dat,'dd.MM.yyyy'));
   end if;
 end f_dopr_b;
