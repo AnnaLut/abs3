@@ -505,9 +505,14 @@ end;
             end if;
          end if;
       end if;
-      
+
       if s242_ = '0' then
          s242_ := 'I';
+         x_ := '1';
+      end if;
+      
+      if s242_ in ('9', 'C', 'D', 'E', 'F', 'G', 'H','K','L','M') then
+         x_ := '2';
       end if;
    END pp_doda;
 
@@ -2928,7 +2933,7 @@ BEGIN
                  comm = substr(comm || ' + розбивка по активу (1)',1,200),
                  nd = nd_
              where recid = p.recid;
-                       
+
              kodp_ := SUBSTR(p.kodp, 1,6) || '9' || SUBSTR(p.kodp, 8);
              znap_ := TO_CHAR (sz0_);
 
@@ -2938,7 +2943,7 @@ BEGIN
           end if;
       end loop;
    end;
-   
+
    logger.info ('P_FA7_NN: End etap 1 for '||to_char(dat_,'dd.mm.yyyy'));
 
        -- дата розрахунку резервiв
@@ -3454,7 +3459,7 @@ BEGIN
       if s240_ = '0' then
          s240_ := '1';
       end if;
-      
+
       if nvl(k.s180, '0') = '0' then
          s180_ := fs180 (k.acc, SUBSTR (k.nbs, 1, 1), dat_);
       else
@@ -4219,13 +4224,15 @@ BEGIN
    declare
       recid_    number;
       granica_  number := 100;
+      mask_     varchar2(100);
+      diff_     number;
    begin
-      for k in (select fdat, ref, acc, nls, kv, sq, nbs, acca,
+      for k in (select fdat, ref, acc, nls, kv, sq, nbs, acca, nlsa, rnka,
                        sum(sq) over (partition by acc) sum_all
                 from (select /*+ leading(a) index(o,IDX_OPLDOK_KF_FDAT_ACC)  */
                              o.fdat, o.ref, o.acc, a.nls, a.kv,
                              decode(o.dk, 0, -1, 1) * gl.p_icurval(a.kv, o.s, dat_) sq,
-                             a.nbs, z.acc acca
+                             a.nbs, z.acc acca, x.nls nlsa, x.rnk rnka
                       from accounts a, opldok o, opldok z, accounts x, oper p
                       where o.fdat = any (select fdat from fdat
                                            where fdat between datb_+1 and dat_
@@ -4241,12 +4248,11 @@ BEGIN
                         and z.acc = x.acc
                         and x.nls not like '7%'
                         and x.nls not like '3800%'
-                        and x.nbs is not null
                         and o.ref = p.ref
                         and p.sos in (-2, 5)
                         and p.vdat between datb_ and dat_
                        )
-                   )
+                    )
        loop
            if k.sum_all <> 0 then
                begin
@@ -4262,8 +4268,11 @@ BEGIN
                end;
 
                if recid_ is not null then
+
+                  diff_ :=0;
                   if abs(k.sq) > znap_ then
-                     znap_ := -1 * znap_;
+                     diff_ := -1 *(abs(k.sq) - znap_);
+                     znap_ := -1 *znap_;
                   else
                      znap_ := k.sq;
                   end if;
@@ -4281,6 +4290,35 @@ BEGIN
                           nbuc, tobo
                    from rnbu_trace
                    where recid = recid_;
+
+                   if diff_ != 0  then       --списано больше чем остаток, ищем еще счета клиента
+                       begin
+                           select recid, kodp, znap
+                           into recid_, kodp_, znap_
+                           from rnbu_trace
+                           where rnk =k.rnka and acc != k.acca and
+                                 kodp like '2'||substr(k.nls,1,4)||'%' and
+                                 rownum = 1;
+                       exception
+                          when no_data_found then
+                              recid_ := null;
+                       end;
+                       if recid_ is not null then
+                              INSERT INTO rnbu_trace
+                                        ( recid, userid, nls, kv, odate, kodp,
+                                          znap, acc, rnk, isp, mdate, ref,
+                                          comm, nbuc, tobo )
+                               select s_rnbu_record.NEXTVAL recid,
+                                      userid, nls, kv, odate, kodp,
+                                      to_char(diff_), acc,
+                                      rnk, isp, mdate, k.ref,
+                                      'Списання за рахунок резерву РЕФ = '||to_char(k.ref) comm,
+                                      nbuc, tobo
+                               from rnbu_trace
+                               where recid = recid_;
+                       end if;
+
+                   end if;
                end if;
            end if;
        end loop;
@@ -4575,11 +4613,24 @@ BEGIN
             logger.info ('P_FA7_NN: Errors '||sqlerrm);
       end;
 
-      delete from NBUR_TMP_A7_S245 where report_date = dat_;
+      delete from NBUR_TMP_A7_S245 where report_date = dat_ and kf = mfo_;
       insert into NBUR_TMP_A7_S245(report_date, acc_id, s245, ost)
       select dat_, acc, (case when substr(kodp,9,1)='Z' then '2' else '1' end) s245, sum(znap) ost
       from rnbu_trace
-      where substr(kodp,2,4) = substr(nls,1,4)
+      where substr(kodp,2,4) = substr(nls,1,4)            
+      group by acc, (case when substr(kodp,9,1)='Z' then '2' else '1' end);
+
+      insert into NBUR_TMP_A7_S245(report_date, acc_id, s245, ost)
+      select dat_, acc, (case when substr(kodp,9,1)='Z' then '2' else '1' end) s245, sum(znap) ost
+      from rnbu_trace
+      where (kodp like '_2610%' or
+             kodp like '_2651%' or
+             kodp like '_3692%' or
+             kodp like '____9%') and
+             acc not in (select acc_id 
+                         from NBUR_TMP_A7_S245 
+                         where report_date = dat_ and
+                               kf = mfo_)
       group by acc, (case when substr(kodp,9,1)='Z' then '2' else '1' end);
    end if;
 
