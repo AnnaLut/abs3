@@ -9,7 +9,7 @@ IS
 % DESCRIPTION :  Процедура формирования #A7 для КБ (универсальная)
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.18.007  30/03/2018 (22.03.2018)
+% VERSION     :  v.18.007  04/04/2018 (30/03/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%/%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                pmode_ = режим (0 - для отчетности, 1 - для ANI-отчетов, 2 - для @77)
@@ -3057,7 +3057,14 @@ BEGIN
          WHEN NO_DATA_FOUND THEN
             cnt_ := 0;
       END;
-
+      
+      -- тимчасово, поки НБУ не зніме контроль на 3590
+      if nbs_ = '3590' and k.nbs not in ('3510', '3511', '3519') then
+         s242_ := 'Z';
+      else 
+         s242_ := substr(k.kodp, 9, 1); 
+      end if;
+      
       r011_ := substr(k.kodp,6,1);
 
       if nbs_ in ('2609','2629','2659') then
@@ -3105,13 +3112,7 @@ BEGIN
              r012_:='B';
 
              -- для рахунків нарахованих %, де є розбивка по R013
-             if datn_ < zm_date2_ then
-                kodp_ := '2'||nbs_||r013_||substr(k.kodp, 7, 3)||k.rz||r012_;
-             elsif datn_ < zm_date3_ then
-                kodp_ := '2'||nbs_||r013_||substr(k.kodp, 7, 2)||k.rz||r012_||substr(k.kodp, 11, 3);
-             else
-                kodp_ := '2'||nbs_||r011_||r013_||substr(k.kodp, 8,2)||k.rz||substr(k.kodp, 11, 4);
-             end if;
+             kodp_ := '2'||nbs_||r011_||r013_||substr(k.kodp, 8,1)||s242_||k.rz||substr(k.kodp, 11, 4);
 
              srez_ := k.szq;
 
@@ -3132,13 +3133,7 @@ BEGIN
           else
              r012_:='A';
 
-             if datn_ < zm_date2_ then
-                kodp_ := '2'||nbs_||r013_||substr(k.kodp, 7, 3)||k.rz||r012_;
-             elsif datn_ < zm_date3_ then
-                kodp_ := '2'||nbs_||r013_||substr(k.kodp, 7, 2)||k.rz||r012_||substr(k.kodp, 11,3);
-             else
-                kodp_ := '2'||nbs_||r011_||r013_||substr(k.kodp, 8,2)||k.rz||substr(k.kodp, 11,4);
-             end if;
+             kodp_ := '2'||nbs_||r011_||r013_||substr(k.kodp, 8,1)||s242_||k.rz||substr(k.kodp, 11,4);
 
              if k.rnum = 1 then
                  discont_ := k.discont;
@@ -3199,7 +3194,6 @@ BEGIN
 
           if srezp_ <> 0 and not TP_SND and k.cnt = k.rnum then
              s181_ := substr(k.kodp, 8, 1);
-             s242_ := substr(k.kodp, 9, 1);
 
 -- превышение резерва при наличии только одной строки проц.счета
              if k.cnt =1 and k.nls like '3118%' then
@@ -3210,11 +3204,7 @@ BEGIN
                    nbs_r013_ := f_ret_nbsr_rez(k.nls, k.r013, k.s080, k.id, k.kv, k.ob22, k.custtype, k.accr_30);
                    sum_ := least ( k.szq_30, srezp_ );
 
-                   if datn_ < zm_date3_ then
-                     kodp_ := '2'||nbs_||substr(nbs_r013_, 5,1)||s181_||s242_||k.rz||'B'||substr(k.kodp, 11, 3);
-                   else
-                     kodp_ := '2'||nbs_||r011_||substr(nbs_r013_, 5,1)||s181_||s242_||k.rz||substr(k.kodp, 11,4);
-                   end if;
+                   kodp_ := '2'||nbs_||r011_||substr(nbs_r013_, 5,1)||s181_||s242_||k.rz||substr(k.kodp, 11,4);
 
                    znap_ := sum_;
 
@@ -3235,11 +3225,7 @@ BEGIN
                    nbs_r013_ := f_ret_nbsr_rez(k.nls, k.r013, k.s080, k.id, k.kv, k.ob22, k.custtype, k.accr);
                    sum_ := least ( k.szq-k.szq_30, srezp_ );
 
-                   if datn_ < zm_date3_ then
-                   kodp_ := '2'||nbs_||substr(nbs_r013_, 5,1)||s181_||s242_||k.rz||'B'||substr(k.kodp, 11, 3);
-                   else
                    kodp_ := '2'||nbs_||r011_||substr(nbs_r013_, 5,1)||s181_||s242_||k.rz||substr(k.kodp, 11,4);
-                   end if;
 
                    znap_ := sum_;
 
@@ -3260,13 +3246,7 @@ BEGIN
              if srezp_ <> 0  then
                r012_:='B';
 
-               if datn_ < zm_date2_ then
-                  kodp_ := '2'||nbs_||r013_||s181_||s242_||substr(k.kodp, 9, 1)||k.rz||r012_;
-               elsif datn_ < zm_date3_ then
-                  kodp_ := '2'||nbs_||r013_||s181_||s242_||k.rz||r012_||substr(k.kodp, 11, 3);
-               else
-                  kodp_ := '2'||nbs_||r011_||r013_||s181_||'Z'||k.rz||substr(k.kodp, 11,4);
-               end if;
+               kodp_ := '2'||nbs_||r011_||r013_||s181_||'Z'||k.rz||substr(k.kodp, 11,4);
 
                znap_ := srezp_;
                comm_ := SUBSTR (k.tobo || ' перевищення резерву над осн. боргом до R012='||r012_, 1, 200);
@@ -3284,13 +3264,7 @@ BEGIN
 
           end if;
       else
-         if datn_ < zm_date2_ then
-            kodp_ := '2'||nbs_||r013_||substr(k.kodp, 7, 3)||k.rz||'B';
-         elsif datn_ < zm_date3_ then
-            kodp_ := '2'||nbs_||r013_||substr(k.kodp, 7, 2)||k.rz||'B'||substr(k.kodp, 11, 3);
-         else
-            kodp_ := '2'||nbs_||r011_||r013_||substr(k.kodp, 8,2)||k.rz||substr(k.kodp, 11,4);
-         end if;
+         kodp_ := '2'||nbs_||r011_||r013_||substr(k.kodp, 8,1)||s242_||k.rz||substr(k.kodp, 11,4);
 
          if k.rnum = 1 then
             discont_ := k.discont;
@@ -3459,7 +3433,7 @@ BEGIN
       if s240_ = '0' then
          s240_ := '1';
       end if;
-
+      
       if nvl(k.s180, '0') = '0' then
          s180_ := fs180 (k.acc, SUBSTR (k.nbs, 1, 1), dat_);
       else
@@ -3493,7 +3467,12 @@ BEGIN
 
       nbs_ := substr(nbs_r013_, 1, 4);
       r013_ := substr(nbs_r013_, 5, 1);
-
+      
+      -- тимчасово, поки НБУ не зніме контроль на 3590
+      if nbs_ = '3590' and k.nbs not in ('3510', '3511', '3519') then
+         s242_ := 'Z';
+      end if;
+      
       r011_ := k.r011;
 
       if nbs_ in ('2609','2629','2659') then
@@ -3607,16 +3586,9 @@ BEGIN
                 comm_ := SUBSTR (k.tobo || ' резерв під прострочені проценти відносимо до R012='||r012_, 1, 200);
              end if;
 
---             if s240_ !='Z'  then s190_ :='0';  end if;
              if s240_ ='Z' and s190_ ='0'  then  s190_ :='A';  end if;
 
-             if datn_ < zm_date2_ then
-                kodp_ := '2'||nbs_||r013_||s181_||s240_||k.r031||k.rez||r012_;
-             elsif datn_ < zm_date3_ then
-                kodp_ := '2'||nbs_||r013_||s181_||s240_||k.rez||r012_||k.r030;
-             else
-                kodp_ := '2'||nbs_||r011_||r013_||s181_||s240_||k.rez||s190_||k.r030;
-             end if;
+            kodp_ := '2'||nbs_||r011_||r013_||s181_||s240_||k.rez||s190_||k.r030;
 
              znap_ := to_char(k.szq);
           else
@@ -3624,15 +3596,9 @@ BEGIN
              then
                 s240_ := 'Z';
 
-                if datn_ < zm_date2_ then
-                   kodp_ := '2'||nbs_||r013_||s181_||s240_||k.r031||k.rez||'B';
-                elsif datn_ < zm_date3_ then
-                   kodp_ := '2'||nbs_||r013_||s181_||s240_||k.rez||'B'||k.r030;
-                else
-                if s240_ ='Z' and s190_ ='0'  then  s190_ :='A';  end if;
+                if s190_ ='0'  then  s190_ :='A';  end if;
 
-                   kodp_ := '2'||nbs_||r011_||r013_||s181_||s240_||k.rez||s190_||k.r030;
-                end if;
+                kodp_ := '2'||nbs_||r011_||r013_||s181_||s240_||k.rez||s190_||k.r030;
 
                 znap_ := to_char(k.szq);
 
@@ -3640,22 +3606,12 @@ BEGIN
              else
                 r012_:='A';
 
-                if datn_ < zm_date2_ then
-                   kodp_ := '2'||nbs_||r013_||s181_||s240_||k.r031||k.rez||r012_;
-                elsif datn_ < zm_date3_ then
-                   kodp_ := '2'||nbs_||r013_||s181_||s240_||k.rez||r012_||k.r030;
-                else
-                  if s240_ ='Z' and s190_ ='0'  then  s190_ :='A';  end if;
-
-                   kodp_ := '2'||nbs_||r011_||r013_||s181_||s240_||k.rez||s190_||k.r030;
-                end if;
+                if s240_ ='Z' and s190_ ='0'  then  s190_ :='A';  end if;
+                
+                kodp_ := '2'||nbs_||r011_||r013_||s181_||s240_||k.rez||s190_||k.r030;
 
                 if k.nls like '3710%'  then
-                   if datn_ < zm_date3_ then
-                   kodp_ := '2'||nbs_||r013_||s181_||s240_||k.rez||'B'||k.r030;
-                   else
                    kodp_ := '2'||nbs_||r011_||r013_||s181_||s240_||k.rez||s190_||k.r030;
-                   end if;
                 end if;
 
                 znap_ := to_char(srez_);
@@ -3696,15 +3652,9 @@ BEGIN
                 comm_ := SUBSTR (k.tobo || ' перевищення резерву над осн.боргом до R012='||r012_ , 1, 200);
              end if;
 
-             if datn_ < zm_date2_ then
-                kodp_ := '2'||nbs_||r013_||s181_||s240_||k.r031||k.rez||r012_;
-             elsif datn_ < zm_date3_ then
-                kodp_ := '2'||nbs_||r013_||s181_||s240_||k.rez||r012_||k.r030;
-             else
-                if s240_ ='Z' and s190_ ='0'  then  s190_ :='A';  end if;
+             if s240_ ='Z' and s190_ ='0'  then  s190_ :='A';  end if;
 
-                kodp_ := '2'||nbs_||r011_||r013_||s181_||s240_||k.rez||s190_||k.r030;
-             end if;
+             kodp_ := '2'||nbs_||r011_||r013_||s181_||s240_||k.rez||s190_||k.r030;
 
              INSERT INTO rnbu_trace
                           (recid, userid,
@@ -3740,15 +3690,9 @@ BEGIN
 
          r012_ := 'B';
 
-         if datn_ < zm_date2_ then
-            kodp_ := '2'||nbs_||r013_||s181_||s240_||k.r031||k.rez||r012_;
-         elsif  datn_ < zm_date3_ then
-            kodp_ := '2'||nbs_||r013_||s181_||s240_||k.rez||r012_||k.r030;
-         else
-             if s240_ ='Z' and s190_ ='0'  then  s190_ :='A';  end if;
+         if s240_ ='Z' and s190_ ='0'  then  s190_ :='A';  end if;
 
-            kodp_ := '2'||nbs_||r011_||r013_||s181_||s240_||k.rez||s190_||k.r030;
-         end if;
+         kodp_ := '2'||nbs_||r011_||r013_||s181_||s240_||k.rez||s190_||k.r030;
 
          discont_ := k.discont;
          premiy_ := k.prem;
@@ -4453,94 +4397,78 @@ BEGIN
                  order by 1, 2 )
         loop
             begin
-               if k.nbs not in ('2400','2401') then
-                   begin
-                      select recid
-                       into recid_
-                      from rnbu_trace
-                      where nbuc = k.nbuc and
-                            kodp like k.t020||k.nbs||'____'||k.rez||'_'||lpad(k.kv, 3,'0')||'%' and
-                            substr(kodp, 6,2) = substr(k.R013_s580,2,2) and
-                            (sign(k.rizn) = -1 and to_number(znap) >= abs(k.rizn) or
-                            sign(k.rizn) = 1 and to_number(znap) > 0) and
-                            rownum = 1;
-                   exception
-                      when no_data_found then
-                           begin
-                              select recid
-                               into recid_
-                              from rnbu_trace
-                              where nbuc = k.nbuc and
-                                    kodp like k.t020||k.nbs||'____'||k.rez||'_'||lpad(k.kv, 3,'0')||'%' and
-                                    substr(kodp, 6,2) = substr(k.R013_s580_A,2,2) and
-                                    (sign(k.rizn) = -1 and to_number(znap) >= abs(k.rizn) or
-                                    sign(k.rizn) = 1 and to_number(znap) > 0) and
-                                    rownum = 1;
-                           exception
-                              when no_data_found then
-                                  begin
-                                     select recid
-                                      into recid_
-                                     from rnbu_trace
-                                     where nbuc = k.nbuc and
-                                           kodp like k.t020||k.nbs||'____'||k.rez||'_'||lpad(k.kv, 3,'0')||'%' and
-                                           substr(kodp, 6,2) = substr(k.R013_s580,2,2) and
-                                           (sign(k.rizn) = -1 and to_number(znap) >= abs(k.rizn) or
-                                           sign(k.rizn) = 1 and to_number(znap) > 0) and
-                                           rownum = 1;
-                                  exception
-                                     when no_data_found then
-                                       recid_ := null;
-                                  end;
-                           end;
-                   end;
-               else
-                  begin
-                     select recid
-                      into recid_
-                     from rnbu_trace
-                     where nbuc = k.nbuc and
-                           kodp like k.t020||k.nbs||'_2__'||k.rez||'_'||lpad(k.kv, 3,'0')||'%' and
-                           substr(kodp, 6,2) = substr(k.R013_s580,2,2) and
-                           (sign(k.rizn) = -1 and to_number(znap) >= abs(k.rizn) or
-                           sign(k.rizn) = 1 and to_number(znap) > 0) and
-                           rownum = 1;
-                  exception
-                     when no_data_found then
-                        begin
-                           select recid
-                            into recid_
-                           from rnbu_trace
-                           where nbuc = k.nbuc and
-                                 kodp like k.t020||k.nbs||'_3__'||k.rez||'_'||lpad(k.kv, 3,'0')||'%' and
-                                 substr(kodp, 6,2) = substr(k.R013_s580,2,2) and
-                                 (sign(k.rizn) = -1 and to_number(znap) >= abs(k.rizn) or
-                                 sign(k.rizn) = 1 and to_number(znap) > 0) and
-                                 rownum = 1;
-                        exception
-                           when no_data_found then
-                              select recid
-                               into recid_
-                              from rnbu_trace
-                              where nbuc = k.nbuc and
-                                    kodp like k.t020||k.nbs||'____'||k.rez||'_'||lpad(k.kv, 3,'0')||'%' and
-                                    substr(kodp, 6,2) = substr(k.R013_s580_A,2,2) and
-                                    (sign(k.rizn) = -1 and to_number(znap) >= abs(k.rizn) or
-                                    sign(k.rizn) = 1 and to_number(znap) > 0) and
-                                    rownum = 1;
-                        end;
-                  end;
-               end if;
+               begin
+                  select recid
+                   into recid_
+                  from rnbu_trace
+                  where nbuc = k.nbuc and
+                        kodp like k.t020||k.nbs||'____'||k.rez||'_'||lpad(k.kv, 3,'0')||'%' and
+                        substr(kodp, 6,2) = substr(k.R013_s580,2,2) and
+                        (sign(k.rizn) = -1 and to_number(znap) >= abs(k.rizn) or
+                        sign(k.rizn) = 1 and to_number(znap) > 0) and
+                        rownum = 1;
+               exception
+                  when no_data_found then
+                       begin
+                          select recid
+                           into recid_
+                          from rnbu_trace
+                          where nbuc = k.nbuc and
+                                kodp like k.t020||k.nbs||'____'||k.rez||'_'||lpad(k.kv, 3,'0')||'%' and
+                                substr(kodp, 6,2) = substr(k.R013_s580_A,2,2) and
+                                (sign(k.rizn) = -1 and to_number(znap) >= abs(k.rizn) or
+                                sign(k.rizn) = 1 and to_number(znap) > 0) and
+                                rownum = 1;
+                       exception
+                          when no_data_found then
+                              begin
+                                 select recid
+                                  into recid_
+                                 from rnbu_trace
+                                 where nbuc = k.nbuc and
+                                       kodp like k.t020||k.nbs||'____'||k.rez||'_'||lpad(k.kv, 3,'0')||'%' and
+                                       substr(kodp, 6,2) = substr(k.R013_s580,2,2) and
+                                       (sign(k.rizn) = -1 and to_number(znap) >= abs(k.rizn) or
+                                       sign(k.rizn) = 1 and to_number(znap) > 0) and
+                                       rownum = 1;
+                              exception
+                                 when no_data_found then
+                                   recid_ := null;
+                              end;
+                       end;
+               end;
             exception
                when no_data_found then
                   recid_ := null;
             end;
 
             if recid_ is not null then
-               update rnbu_trace
-               set znap = to_char(to_number(znap) + k.rizn),
-                 comm = substr(comm || ' + вирів-ня з балансом на '||to_char(k.rizn), 1, 200)
-               where recid = recid_;
+               -- вирівнювання по рахунках резерву в бік збільшення
+               if k.nbs in ('1090','1190','1419','1429','1509','1519','1529',
+                            '1549','1609','1890','2019','2029','2039','2049',
+                            '2069','2079','2089','2109','2119','2129','2139',
+                            '2149','2209','2219','2229','2239','2249','2309',
+                            '2319','2329','2339','2349','2359','2369','2379',
+                            '2409','2419','2429','2439','2609','2629','2659',
+                            '2890','3119','3219','3569','3590','3599','3690','3692') and
+                  k.t020 = '2' and 
+                  k.rizn > 0  
+               then 
+                   insert into rnbu_trace(recid, userid, nls, kv, odate, kodp, znap, nbuc, 
+                        isp, rnk, acc, ref, comm, nd, mdate, tobo)
+                   select s_rnbu_record.nextval, userid, nls, kv, odate, 
+                        substr(kodp, 1, 8)||'Z'||substr(kodp, 10), 
+                        to_char(k.rizn) znap, nbuc, 
+                        isp, rnk, acc, ref, 'Вирів-ня з балансом на '||to_char(k.rizn) comm, 
+                        nd, mdate, tobo
+                   from rnbu_trace
+                   where recid = recid_;
+               else -- вирівнювання в інших випадках
+                   update rnbu_trace
+                   set znap = to_char(to_number(znap) + k.rizn),
+                     comm = substr(comm || ' + вирів-ня з балансом на '||to_char(k.rizn), 1, 200)
+                   where recid = recid_;
+               end if;
             end if;
         end loop;
     end;
@@ -4625,6 +4553,8 @@ BEGIN
       from rnbu_trace
       where (kodp like '_2610%' or
              kodp like '_2651%' or
+             kodp like '_2890%' or
+             kodp like '_3590%' or
              kodp like '_3692%' or
              kodp like '____9%') and
              acc not in (select acc_id 
