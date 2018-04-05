@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_CIG_EVENTS ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_CIG_EVENTS ("EVT_ID", "EVT_DATE", "USER_ID", "USER_NAME", "EVT_STATE_ID", "GROUP_ID", "GROUP_NAME", "STATE_NAME", "EVT_MESSAGE", "EVT_ORAERR", "EVT_ND", "EVT_RNK", "EVT_DTYPE", "EVT_CUSTTYPE", "BRANCH", "BRANCH_DOG") AS 
+  CREATE OR REPLACE FORCE VIEW BARS.V_CIG_EVENTS ("EVT_ID", "EVT_DATE", "EVT_UNAME", "USER_NAME", "EVT_STATE_ID", "GROUP_ID", "GROUP_NAME", "STATE_NAME", "EVT_MESSAGE", "EVT_ORAERR", "EVT_ND", "EVT_RNK", "EVT_DTYPE", "EVT_CUSTTYPE", "BRANCH", "BRANCH_DOG") AS 
   SELECT ce.evt_id,
           ce.evt_date,
           ce.evt_uname AS user_id,
