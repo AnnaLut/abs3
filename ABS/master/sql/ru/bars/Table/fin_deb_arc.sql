@@ -70,30 +70,6 @@ exception when others then
  end;
 /
 
-
-PROMPT *** Create  index UK_FINDEBARC_ACCSS ***
-begin   
- execute immediate '
-  CREATE UNIQUE INDEX BARS.UK_FINDEBARC_ACCSS ON BARS.FIN_DEB_ARC (mdat, ACC_SS) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-PROMPT *** Create  index I1_FINDEBARC_ACCSP ***
-begin   
- execute immediate '
-
-  CREATE INDEX BARS.I1_FINDEBARC_ACCSP ON BARS.FIN_DEB_ARC (mdat, ACC_SP) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
 PROMPT *** Create  index IDX_FINDEBARC_EFFECTDT_ACCSS ***
 begin   
  execute immediate '
@@ -108,10 +84,53 @@ exception when others then
 PROMPT *** Create  constraint CC_PRVNFINDEB_KF_NN ***
 begin   
  execute immediate '
-   ALTER TABLE BARS.FIN_DEB_ARC ADD (CONSTRAINT CC_FINDEBARC_ACCSS_NN       CHECK ("ACC_SS" IS NOT NULL)      ENABLE NOVALIDATE,
-                                     CONSTRAINT UK_FINDEBARC_ACCSS  UNIQUE (mdat, ACC_SS)  USING INDEX BARS.UK_FINDEBARC_ACCSS  ENABLE NOVALIDATE)';
+   ALTER TABLE BARS.FIN_DEB_ARC ADD (CONSTRAINT CC_FINDEBARC_ACCSS_NN       CHECK ("ACC_SS" IS NOT NULL)      ENABLE NOVALIDATE)';
 exception when others then
-  if  sqlcode=-02261  then null; else raise; end if;
+  if  sqlcode=-2261 or sqlcode=-2264  then null; else raise; end if;
+ end;
+/
+
+begin   
+ execute immediate '
+    alter table fin_deb_arc drop constraint UK_FINDEBARC_ACCSS cascade';
+exception when others then
+  if  sqlcode=-2443  then null; else raise; end if;
+ end;
+/
+begin   
+ execute immediate 'drop index UK_FINDEBARC_ACCSS';
+exception when others then
+  if  sqlcode=-1418  then null; else raise; end if;
+ end;
+/
+begin   
+ execute immediate 'drop index I1_FINDEBARC_ACCSP';
+exception when others then
+  if  sqlcode=-1418  then null; else raise; end if;
+ end;
+/
+
+
+PROMPT *** Create  index UK_FINDEBARC_ACCSS ***
+begin   
+ execute immediate '
+  CREATE UNIQUE INDEX BARS.UK_FINDEBARC_ACCSS ON BARS.FIN_DEB_ARC (ACC_SS,mdat) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+PROMPT *** Create  index I1_FINDEBARC_ACCSP ***
+begin   
+ execute immediate '
+
+  CREATE INDEX BARS.I1_FINDEBARC_ACCSP ON BARS.FIN_DEB_ARC (ACC_SP,mdat) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
  end;
 /
 

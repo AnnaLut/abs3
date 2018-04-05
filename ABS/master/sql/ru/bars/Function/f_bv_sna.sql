@@ -19,10 +19,10 @@ begin
    l_dat31 := Dat_last_work (p_dat01 -1 );  -- последний рабочий день мес€ца
    for k in (select tip, nls, acc, kv,  nbs,  S, ss,  nvl(SD,0), s - sd bv
              from  (select tip, nls, acc, kv,  nbs,  S, ss, round(ss * s / sum(s) over  (partition by 1),0) SD
-                    from (select a.tip, a.nls, a.acc, a.kv,  a.nbs, - ost_korr(a.acc,l_dat31,null,a.nbs) S,
-                                (select nvl(sum(ost_korr(a.acc,l_dat31,null,a.nbs) ),0)  from   nd_acc n, accounts a
-                                 where  n.nd = p_nd and a.kv = p_kv and n.acc = a.acc and a.nls not like '3%' and a.nbs<>'2620' and  a.tip in  ('SNA')
-                                        and  ost_korr(a.acc,l_dat31,null,a.nbs) >0) ss
+                    from (select a.tip, a.nls, a.acc, a.kv,  a.nbs, - ost_korr(a.acc,l_dat31,null,a.nbs) S, 0 SS
+                                 --(select nvl(sum(ost_korr(a.acc,l_dat31,null,a.nbs) ),0)  from   nd_acc n, accounts a
+                                 --where  n.nd = p_nd and a.kv = p_kv and n.acc = a.acc and a.nls not like '3%' and a.nbs<>'2620' and  a.tip in  ('SNA')
+                                 --       and  ost_korr(a.acc,l_dat31,null,a.nbs) >0) ss
                           from   nd_acc n, accounts a
                           where  n.nd = p_nd and a.kv = p_kv and n.acc = a.acc and nls not like '3%' and a.nbs<>'2620' and
                                  ( a.tip in  ('SN ','SL ','SLN','SPN','SNO','SS ','SP ','SK9','SK0') or a.nbs like '15%' or a.nbs in ('2600','2607','9129')) and
