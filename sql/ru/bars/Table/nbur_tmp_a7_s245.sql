@@ -12,8 +12,9 @@ exec bpa.refresh_policies('NBUR_TMP_A7_S245');
 BEGIN 
         execute immediate  
           'begin  
-               bpa.alter_policy_info(''NBUR_TMP_A7_S245'', ''WHOLE'' , null, null, null, null);
-               bpa.alter_policy_info(''NBUR_TMP_A7_S245'', ''FILIAL'' , null, null, null, null);
+               bpa.alter_policy_info(''NBUR_TMP_A7_S245'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
+               bpa.alter_policy_info(''NBUR_TMP_A7_S245'', ''WHOLE'' , null, ''E'', ''E'', ''E'');
+               null;
            end; 
           '; 
 END; 
