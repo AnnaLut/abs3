@@ -8,7 +8,7 @@ IS
 % DESCRIPTION :   Процедура формирования 3KX     для КБ (универсальная)
 % COPYRIGHT   :   Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :   v.18.005          30.03.2018
+% VERSION     :   v.18.004          27.03.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
       sheme_ - схема формирования
@@ -17,7 +17,6 @@ IS
                                  3 - всi операцii
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-30.03.2018  zayavka.f092 может выбираться и по параметрам проводки (дата,сумма,валюта)
 27.03.2018  -новые корреспонденции дт2900-кт2531, дт2545-кт2900
             -отдельная обработка rnk=93073101 (банк как юр.лицо)
 12.03.2018  уточнениe по консолидации операций по 3739
@@ -879,26 +878,21 @@ BEGIN
 
                    if is_f092_ >=1  then
 
---                      sql_z := 'SELECT F092 '
---                            || 'FROM ZAYAVKA  '
---                            || 'WHERE :ref_ in (ref, ref_sps) and nvl(dk, 1) = 2';
-                      sql_z := 'select max(F092)  from zayavka '
-                            || ' where nvl(dk, 1) =2 '
-                            || '   and ( :ref_ in (ref, ref_sps) '
-                            || '      or   vdate = :vdate_ and s2 = :s2_ '
-                            || '       and kv2 = :kv_ and rnk = :rnk_ ) )';
+                      sql_z := 'SELECT F092 '
+                            || 'FROM ZAYAVKA  '
+                            || 'WHERE :ref_ in (ref, ref_sps) and nvl(dk, 1) = 2';
 
                       begin
                           EXECUTE IMMEDIATE sql_z
                              INTO d1#3K_
-                            USING ref_, dat_, sum0_, kv_, rnk_ ;
+                            USING ref_ ;
                       exception
                           WHEN NO_DATA_FOUND  THEN
                              if refd_ is not null  then
                                begin     
                                   EXECUTE IMMEDIATE sql_z
                                      INTO d1#3K_
-                                    USING refd_, dat_, sum0_, kv_, rnk_ ;
+                                    USING refd_ ;
                                exception
                                   WHEN NO_DATA_FOUND  THEN
                                          d1#3K_ := NULL;
