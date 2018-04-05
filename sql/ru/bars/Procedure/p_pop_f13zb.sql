@@ -4,7 +4,7 @@ CREATE OR REPLACE PROCEDURE BARS.P_POP_F13ZB(datb_ IN DATE, date_ IN DATE,
 % DESCRIPTION :    Процедура наполнения позабалансовых символов в табл.
 %             :    OTCN_F13_ZBSK для файла #13 (КБ)
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :    21/11/2017 (21/09/2017, 02/08/2017)
+% VERSION     :    29/03/2018 (21/11/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Datb_  - начальная дата
                Date_  - конечная дата
@@ -13,22 +13,22 @@ CREATE OR REPLACE PROCEDURE BARS.P_POP_F13ZB(datb_ IN DATE, date_ IN DATE,
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 21.11.2017 добавлены изменения выполненные Вирко для оптимизации
 21.09.2017 поле SK_ZB (позабалансовый символ) не будет изменяться при повторном
-           наполнении чтобы не изменять откоректированные значения 
-02.08.2017 изменены некоторые условия для отбора документов из OPLDOK 
-11.07.2017 для формирования символа 97 добавил  p.NLSB like '2600%' из OPER 
-10.07.2017 для формирования символа 97 убрал условие nazn like '%ПТКС%' 
-           а добавил  p.NLSB like '2650%' из OPER 
+           наполнении чтобы не изменять откоректированные значения
+02.08.2017 изменены некоторые условия для отбора документов из OPLDOK
+11.07.2017 для формирования символа 97 добавил  p.NLSB like '2600%' из OPER
+10.07.2017 для формирования символа 97 убрал условие nazn like '%ПТКС%'
+           а добавил  p.NLSB like '2650%' из OPER
 07.07.2017 для формирования символа 97 добавлено условия наличия данного REF
            в OTCN_F13_ZBSK (при повторном наполнении были двойники)
 16.06.2017 данная версия работает на ММФО и она будет работать в РУ.
            Добавлен блок для наполнения симвода 97 (Дт 2909 OB22='43' и наличие
-           контрагента в таблице CUST_PTKC). 
+           контрагента в таблице CUST_PTKC).
 11.01.2017 в табл. OTCN_F13_ZBSK добавлено поле STMT и при вставке проверяем
-           два поля REF и STMT  
+           два поля REF и STMT
            добавлена обработка Дт 3739 Кт 2620 и назначение "%оплата пенсійних
            реєстрів%" (символ 87)
-23.08.2016 для переменнной "kol_" будем присваивать 1 если не изменилось 
-           значение REFеренса (получили задвоение REF). 
+23.08.2016 для переменнной "kol_" будем присваивать 1 если не изменилось
+           значение REFеренса (получили задвоение REF).
 24.04.2015 для проводок Дт 2924 Кт 2625 назначения платежа '%дохід підприємця%'
            или '%доход предпринимателя%' или '%перерах%відпскні%'
            будем формировать значение 84
@@ -68,7 +68,7 @@ BEGIN
 
    EXECUTE IMMEDIATE 'ALTER SESSION ENABLE PARALLEL DML';
    EXECUTE IMMEDIATE 'ALTER SESSION SET SORT_AREA_SIZE = 131072';
-   
+
    -------------------------------------------------------------------
    logger.info ('P_POPF13: Begin for '||to_char(datb_,'dd.mm.yyyy')||' '||
         to_char(date_,'dd.mm.yyyy')||' mode = '||to_char(nmode_));
@@ -76,12 +76,12 @@ BEGIN
    mfo_ := F_OURMFO();
    dat1_ := TRUNC(date_,'MM');
 
-   select trim(val) 
+   select trim(val)
       into tobo_b
    from params
    where par = 'OUR_TOBO';
 
-   if length(tobo_b) = 20 
+   if length(tobo_b) = 20
    then
       tobo_b := substr(tobo_b, 9, 12);
    elsif length(tobo_b) <> 12 then
@@ -90,41 +90,41 @@ BEGIN
 
    ko_b := substr(tobo_b,2,2);
 
-   if nmode_ = 0 
+   if nmode_ = 0
    then
       delete from otcn_f13_zbsk o where fdat between datb_ and date_ ;
       kol1_ := 0;
    elsif nmode_ = 2 then
-      select count(*) 
+      select count(*)
          into kol1_
       from otcn_f13_zbsk o where fdat between datb_ and date_;
    end if;
 
-    if kol1_ > 0 
+    if kol1_ > 0
     then
        delete from otcn_f13_zbsk z
        where z.ref in (select a.ref
                        from otcn_f13_zbsk a, oper b
-                       where a.fdat between dat1_ and date_ 
-                         and a.ref = b.ref 
+                       where a.fdat between dat1_ and date_
+                         and a.ref = b.ref
                          and b.sos <> 5);
     end if;
 
-    if nmode_ <> 2 or (nmode_ = 2 and kol1_ = 0) 
+    if nmode_ <> 2 or (nmode_ = 2 and kol1_ = 0)
     then
-       for k in (SELECT o.fdat, 
-                       o.ref, 
-                       o.tt, 
-                       (case when o.dk = 0 then o.acc else o1.acc end) accd, 
-                       (case when o.dk = 0 then a.nls else a1.nls end) nlsd, 
-                       a.kv, 
-                       (case when o.dk = 1 then o.acc else o1.acc end) acck, 
-                       (case when o.dk = 1 then a.nls else a1.nls end) nlsk, 
-                       o.s, o.sq, 
+       for k in (SELECT o.fdat,
+                       o.ref,
+                       o.tt,
+                       (case when o.dk = 0 then o.acc else o1.acc end) accd,
+                       (case when o.dk = 0 then a.nls else a1.nls end) nlsd,
+                       a.kv,
+                       (case when o.dk = 1 then o.acc else o1.acc end) acck,
+                       (case when o.dk = 1 then a.nls else a1.nls end) nlsk,
+                       o.s, o.sq,
                        p.nazn,
-                       p.userid isp, 
-                       o.stmt, 
-                       o.kf  
+                       p.userid isp,
+                       o.stmt,
+                       o.kf
                   FROM opldok o,
                        accounts a,
                        opldok o1,
@@ -146,25 +146,25 @@ BEGIN
 
         loop
            if substr(k.nlsd,1,4) not in ('1001','1002','1003','1004') and
-              substr(k.nlsk,1,4) not in ('1001','1002','1003','1004') 
+              substr(k.nlsk,1,4) not in ('1001','1002','1003','1004')
            then
 
               acc_ := k.accd;
 
-              IF substr(k.nlsd,1,3) not in ('262','263') and k.nlsd not like '2909%' 
+              IF substr(k.nlsd,1,3) not in ('262','263') and k.nlsd not like '2909%'
               THEN
                 acc_ := k.acck;
               END IF;
 
               tobo_ := NVL(substr(F_Codobl_Tobo(acc_,5),3,12),tobo_b);
 
-              if tobo_ = tobo_b 
+              if tobo_ = tobo_b
               then
                 ko_ := ko_b;
               ELSE
                 ko_ := substr(tobo_,7,2);
               END IF;
-              
+
               sk_zb_ := 0;
               comm_ := null;
 
@@ -194,20 +194,20 @@ BEGIN
 
               isp_:=k.isp;
 
-              if sk_zb_ >= 0 
+              if sk_zb_ >= 0
               then
                  sk_zb_k := sk_zb_;
 
                  acc_ := k.accd;
 
-                 IF substr(k.nlsd,1,3) not in ('262','263') 
+                 IF substr(k.nlsd,1,3) not in ('262','263')
                  THEN
                     acc_ := k.acck;
                  END IF;
 
                  tobo_ := NVL(substr(F_Codobl_Tobo(acc_,5),3,12),tobo_b);
 
-                 if tobo_=tobo_b 
+                 if tobo_=tobo_b
                  then
                     ko_:=ko_b;
                  ELSE
@@ -222,12 +222,12 @@ BEGIN
                       and o.ref = w.ref(+)
                       and w.tag(+) = 'SK_ZB';
 
-                    if sk_zb_d in ('84','86','87','88','93','94','95','96') 
+                    if sk_zb_d in ('84','86','87','88','93','94','95','96')
                     then
                        sk_zb_ := sk_zb_d;
                     end if;
 
-                    if sk_zb_o in ('84','86','87','88','93','94','95','96') 
+                    if sk_zb_o in ('84','86','87','88','93','94','95','96')
                     then
                        sk_zb_ := sk_zb_o;
                     end if;
@@ -244,7 +244,7 @@ BEGIN
                     k.nazn like '%Отмена покупки%' OR
                     k.nazn like 'Отмена покупки%' OR
                     k.nazn like 'в_дм_на зняття гот%' OR
-                    k.nazn like '_овернено зайв_ зарах%' 
+                    k.nazn like '_овернено зайв_ зарах%'
                  then
                     sk_zb_ := 0;
                  end if;
@@ -375,7 +375,7 @@ BEGIN
                     (LOWER(k.nazn) like '%процент%' or
                      LOWER(k.nazn) like '%внесение нал%' or
                      LOWER(k.nazn) like '%другие платежи%' or
-                     LOWER(k.nazn) like '%відрядження%' or 
+                     LOWER(k.nazn) like '%відрядження%' or
                      LOWER(k.nazn) like '%_нш_ платеж_%' ) and sk_zb_ <> 88
                  then
                      sk_zb_ := 88;
@@ -448,7 +448,7 @@ BEGIN
                  where o.ref = k.ref
                    and o.stmt = k.stmt;
 
-                 IF SQL%ROWCOUNT = 0 
+                 IF SQL%ROWCOUNT = 0
                  THEN
                     insert into otcn_f13_zbsk
                       (fdat, ref, tt, accd, nlsd, kv, acck, nlsk, s, sq, nazn, isp,
@@ -474,45 +474,45 @@ BEGIN
            (fdat, ref, tt, accd, nlsd, kv, acck, nlsk, s, sq, nazn, isp,
             sk_zb, ko, tobo, stmt )
            SELECT /*+ leading(a) */
-                  o.fdat, 
-                  o.ref, 
-                  o.tt, 
-                  (case when o.dk = 0 then o.acc else o1.acc end) accd, 
-                  (case when o.dk = 0 then a.nls else a1.nls end) nlsd, 
-                  a.kv, 
-                  (case when o.dk = 1 then o.acc else o1.acc end) acck, 
-                  (case when o.dk = 1 then a.nls else a1.nls end) nlsk, 
-                  o.s, o.sq, 
+                  o.fdat,
+                  o.ref,
+                  o.tt,
+                  (case when o.dk = 0 then o.acc else o1.acc end) accd,
+                  (case when o.dk = 0 then a.nls else a1.nls end) nlsd,
+                  a.kv,
+                  (case when o.dk = 1 then o.acc else o1.acc end) acck,
+                  (case when o.dk = 1 then a.nls else a1.nls end) nlsk,
+                  o.s, o.sq,
                   p.nazn,
                   p.userid isp,
-                  97, 
+                  97,
                   ko_b,
-                  tobo_b,  
-                  o.stmt 
+                  tobo_b,
+                  o.stmt
              FROM opldok o,
                   accounts a,
                   opldok o1,
                   accounts a1,
                   oper p,
-                  cust_ptkc c 
+                  cust_ptkc c
              WHERE    o.fdat = any (select fdat from fdat where fdat BETWEEN datb_ AND date_)
                   AND o.acc = a.acc
                   AND a.kv = 980
                   AND REGEXP_LIKE (a.NLS, '^(2909)')
-                  AND a.ob22 = '43' 
-                  AND o.dk = 0 
+                  AND a.ob22 = '43'
+                  AND o.dk = 0
                   AND o.REF = o1.REF
                   AND o.stmt = o1.stmt
                   AND o.dk <> o1.dk
                   AND o1.acc = a1.acc
                   and o.ref = p.ref
-                  and (p.nlsb like '2600%' OR p.nlsb like '2650%')
+                  and REGEXP_LIKE (p.nlsb, '^(26(00|50|54))')
                   and p.vob not in (96, 99)
-                  and p.sos = 5 
+                  and p.sos = 5
                   and a.rnk = c.rnk
                   and (o.ref, o.stmt) not in (select ref, stmt
                                               from otcn_f13_zbsk
-                                              where sk_zb = 97 
+                                              where sk_zb = 97
                                                 and fdat BETWEEN datb_ AND date_);
 
         for k in (select fdat from fdat where fdat between dat1_ and date_)
