@@ -117,6 +117,9 @@ function listOb22(ddlist, control) {
     var url = url_dlg_mod + "v_sb_ob22&tail=";
     if (document.all.tbNbs.value)
         url += "'R020 = " + document.all.tbNbs.value + " and CLS_DT is null" + "'";
+    else if (document.all.tbNls.value) {
+        url +="'R020 = " + document.all.tbNls.value.slice(0,4) + " and CLS_DT is null" + "'";
+    }
     else
 		return;
     var result = window.showModalDialog(url, "", "dialogWidth:600px;center:yes;edge:sunken;help:no;status:no;");
