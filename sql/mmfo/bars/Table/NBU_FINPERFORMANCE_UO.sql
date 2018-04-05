@@ -68,6 +68,15 @@ COMMENT ON COLUMN BARS.NBU_FINPERFORMANCE_UO.kf IS 'Код филиала';
 
 exec bpa.alter_policies('NBU_FINPERFORMANCE_UO');
 
+begin 
+  execute immediate ' alter table NBU_FINPERFORMANCE_UO add status_message VARCHAR(4000) ';
+exception when others then
+  if  sqlcode=-1430 then null; else raise; end if;
+ end;
+/
+
+
+
 declare
     name_already_used exception;
     pragma exception_init(name_already_used, -955);

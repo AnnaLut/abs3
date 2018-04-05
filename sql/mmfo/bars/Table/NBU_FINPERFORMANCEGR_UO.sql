@@ -68,6 +68,14 @@ COMMENT ON COLUMN BARS.NBU_FINPERFORMANCEGR_UO.status IS 'Статус';
 COMMENT ON COLUMN BARS.NBU_FINPERFORMANCEGR_UO.status_message IS 'Статус помилок';
 COMMENT ON COLUMN BARS.NBU_FINPERFORMANCEGR_UO.kf IS 'Код филиала';
 
+begin 
+  execute immediate ' alter table NBU_FINPERFORMANCEGR_UO add status_message VARCHAR(4000) ';
+exception when others then
+  if  sqlcode=-1430 then null; else raise; end if;
+ end;
+/
+
+
 exec bpa.alter_policies('NBU_FINPERFORMANCEGR_UO');
 
 declare
