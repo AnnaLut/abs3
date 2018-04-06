@@ -1,3 +1,7 @@
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Package/DPT_WEB.sql =============*** Run ***
+PROMPT ===================================================================================== 
+
 create or replace package DPT_WEB
 is
   --
@@ -1043,7 +1047,7 @@ show errors;
 create or replace package body DPT_WEB
 is
 
-  g_body_version  constant varchar2(32)  := 'version 48.07  15.02.2018';
+  g_body_version  constant varchar2(32)  := 'version 48.08  05.03.2018';
   g_awk_body_defs constant varchar2(512) := 'Сбербанк' || chr(10) ||
                                             'KF - мульти-МФО схема с доступом по филиалам' || chr(10) ||
                                             'MULTIFUNC - расширенный функционал' || chr(10) ||
@@ -7230,6 +7234,8 @@ is
                                     160);
           end if;
         else
+          /* === COBUMMFO-7002 === убрать проверку пополнения при начислении %%
+          
           -- якщо мін. сума поповнення більша нуля то вклад з поповненням  і це виплата на депозитний рахунок, а НЕ КАПІТАЛІЗАЦІЯ
           if (l_dptlist(i).min_add > 0) then
           
@@ -7274,6 +7280,8 @@ is
           
           else
             -- якщо мін. сума поповнення нуль или пусто
+          
+          === COBUMMFO-7002 === */  
             if (check_nls4pay(l_payrec.nlsb, l_payrec.dptacc)) then
               begin
                 select d.vidd
@@ -7296,8 +7304,8 @@ is
                                         160);
               end if;
             end if;
+          -- end if; === COBUMMFO-7002 ===
           end if;
-        end if;
       
         if not l_errflg then
         
@@ -19202,6 +19210,10 @@ end dpt_web;
 
 show errors;
 
+PROMPT ===================================================================================== 
+PROMPT *** Grants *** ======= Scripts /Sql/BARS/Package/DPT_WEB.sql ==========*** Grants ***
+PROMPT ===================================================================================== 
+
 grant EXECUTE on DPT_WEB to ABS_ADMIN;
 grant EXECUTE on DPT_WEB to BARSUPL;
 grant EXECUTE on DPT_WEB to BARS_ACCESS_DEFROLE;
@@ -19210,3 +19222,7 @@ grant EXECUTE on DPT_WEB to DPT_ADMIN;
 grant EXECUTE on DPT_WEB to DPT_ROLE;
 grant EXECUTE on DPT_WEB to VKLAD;
 grant EXECUTE on DPT_WEB to WR_ALL_RIGHTS;
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Package/DPT_WEB.sql =============*** End ***
+PROMPT ===================================================================================== 

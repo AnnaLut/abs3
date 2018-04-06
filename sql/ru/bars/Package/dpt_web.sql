@@ -1,8 +1,7 @@
-
  
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/dpt_web.sql =========*** Run *** ===
- PROMPT ===================================================================================== 
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/package/dpt_web.sql =========*** Run *** ===
+PROMPT ===================================================================================== 
 
 create or replace package dpt_web is
   --
@@ -1052,7 +1051,7 @@ create or replace package dpt_web is
 end dpt_web;
 /
 create or replace package body dpt_web is
-  g_body_version  constant varchar2(64) := 'version 48.054 11.09.2017 - not mmfo';
+  g_body_version  constant varchar2(64) := 'version 48.055 05.04.2018 - not mmfo';
   g_awk_body_defs constant varchar2(512) := '' || 'Сбербанк' || chr(10) ||
                                             'KF - мульти-МФО схема с доступом по филиалам' ||
                                             chr(10) ||
@@ -7147,6 +7146,7 @@ create or replace package body dpt_web is
                                     160);
           end if;
         else
+	  /* === COBUMMFO-7002 === убрать проверку пополнения при начислении %%		
           -- якщо мін. сума поповнення більша нуля то вклад з поповненням  і це виплата на депозитний рахунок, а НЕ КАПІТАЛІЗАЦІЯ
           if (l_dptlist(i).min_add > 0) then
             -- якщо сума %% менша за мін. суму поповнення
@@ -7187,6 +7187,8 @@ create or replace package body dpt_web is
           
           else
             -- якщо мін. сума поповнення нуль или пусто
+	    === COBUMMFO-7002 === */
+	
             if (check_nls4pay(l_payrec.nlsb, l_payrec.dptacc)) then
               begin
                 select d.vidd
@@ -7209,7 +7211,7 @@ create or replace package body dpt_web is
                                         160);
               end if;
             end if;
-          end if;
+          -- end if;  === COBUMMFO-7002 ===
         end if;
       
         if not l_errflg then
@@ -19048,7 +19050,7 @@ create or replace package body dpt_web is
 
 end dpt_web;
 /
- show err;
+show err;
  
 PROMPT *** Create  grants  DPT_WEB ***
 grant EXECUTE                                                                on DPT_WEB         to ABS_ADMIN;
@@ -19061,8 +19063,8 @@ grant EXECUTE                                                                on 
 
  
  
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/dpt_web.sql =========*** End *** ===
- PROMPT ===================================================================================== 
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/package/dpt_web.sql =========*** End *** ===
+PROMPT ===================================================================================== 
  
 
