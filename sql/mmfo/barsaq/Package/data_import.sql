@@ -4057,7 +4057,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
 
         -- перевірка рахунка отримувача
         begin
-          select 1 into l_is_nls_closed from v_kf_accounts a where kf=l_doc.mfo_b and a.nls = l_doc.nls_b and kv=l_doc.kv and dazs is not null;
+          select /*INDEX UK_ACCOUNTS_KF_NLS_KV*/ 1 into l_is_nls_closed from v_kf_accounts a where kf=l_doc.mfo_b and a.nls = l_doc.nls_b and kv=l_doc.kv and dazs is not null;
 
           if l_is_nls_closed = 1 then
             raise_application_error(-20000, 'Рахунок отримувача закритий');
@@ -5460,7 +5460,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
                                     pdat
                              from bars.oper p) o
                          where i.insertion_date >= p_startdate
-                           and o.status != e.status_id
+                       --  and o.status != e.status_id --заремлено, не прокидалися статуси в схему bank.
                            and i.ref is not null -- только документы АБС
                            and e.doc_id=to_number(i.ext_ref) and i.ref=o.ref
                          ) as of scn l_scn
