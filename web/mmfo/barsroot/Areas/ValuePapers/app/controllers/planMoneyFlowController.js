@@ -5,6 +5,10 @@ function planMoneyFlowController($scope, paramsService) {
 
     $scope.gridDate = {};
 
+    //$('.k-grid-add').on('click', function () {
+    //    debugger;
+    //    $scope.planMoneyFlowGrid.dataSource.options.schema.model.fields.P_FDAT.editable = true;
+    //});
 
     var gridDataSource = new kendo.data.DataSource({
         transport: {
@@ -38,7 +42,7 @@ function planMoneyFlowController($scope, paramsService) {
                     $scope.gridData.DAT_UG = kendo.toString($scope.gridData.DAT_UG, "yyyy-MM-ddTHH:mm:sszzz");
                     return $scope.gridData;
                 }
-
+                
                 if (options) {
                     var action = -1;
                     switch (operation) {
@@ -67,7 +71,7 @@ function planMoneyFlowController($scope, paramsService) {
             model: {
                 id: "P_FDAT",
                 fields: {
-                    P_FDAT: { type: "date", editable: false },
+                    P_FDAT: { type: "date" }, 
                     P_SS1: { type: "number" },
                     P_SDP: { type: "number" },
                     P_SN2: { type: "number" },
@@ -135,6 +139,7 @@ function planMoneyFlowController($scope, paramsService) {
             //    width: "150px"
             //}
         ],
+        edit: function (e) { e.container.find("input[name=P_FDAT]").data("kendoDatePicker").enable(e.model.isNew()); },
         dataSource: gridDataSource,
         columnMenu: false,
         pageable: false,
@@ -184,4 +189,5 @@ function planMoneyFlowController($scope, paramsService) {
     $scope.refreshM = function () {
             $scope.planMoneyFlowGrid.dataSource.read();        
     }
+
 }
