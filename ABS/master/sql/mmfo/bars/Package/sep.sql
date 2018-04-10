@@ -315,7 +315,7 @@ procedure check_t902_dok(p_ref in number);
 
 END;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.SEP IS
+                                          CREATE OR REPLACE PACKAGE BODY BARS.SEP IS
 --***************************************************************--
 --              Communication with NBU Payment System
 --                     (C) Unity-BARS (2000-2013)
@@ -328,7 +328,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.SEP IS
 
 --***************************************************************--
 
-G_BODY_VERSION  CONSTANT VARCHAR2(100)  := '$Ver: 6.59 2016-10-21 09:43:25Z vitalii.khomida$';
+G_BODY_VERSION  CONSTANT VARCHAR2(100)  := '$Ver: 6.61 2018-04-10 vitalii.khomida$';
 
 G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := ''
 
@@ -3724,12 +3724,15 @@ END pz3_grc;
 FUNCTION zap_reqv(dir_ NUMBER, mfob_ VARCHAR2, d_rec_ VARCHAR2) RETURN VARCHAR2 IS
 
 tmp_ VARCHAR2(18);
+l_cnt pls_integer;
 
 BEGIN
 
    IF mfob_=gl.aMFO OR INSTR('!+*-?',SUBSTR(d_rec_,2,1))=0 THEN RETURN d_rec_; END IF;
 
    tmp_:=SUBSTR(d_rec_,3,18);
+   
+   select count(*) into l_cnt from banks where mfop='300465' and mfo = mfob_;
 
    IF dir_=3 AND SUBSTR(d_rec_,2,1)='?' THEN   --  NBU Request
 
@@ -3740,7 +3743,8 @@ BEGIN
                                          AND dat_b>=ADD_MONTHS(gl.bDATE,-1);
       EXCEPTION WHEN OTHERS THEN NULL;
       END;
-  /* ELSIF dir_ IN (4,6,14) AND INSTR('!+*-',SUBSTR(d_rec_,2,1))>0 THEN -- Branch reply
+   ELSIF dir_ IN (4,6,14) AND INSTR('!+*-',SUBSTR(d_rec_,2,1))>0 
+   and l_cnt = 0 THEN -- Branch reply
 
       BEGIN
          SELECT fn_b||LPAD(TO_CHAR(rec_b),6) INTO tmp_
@@ -3748,7 +3752,7 @@ BEGIN
           WHERE fn_a=SUBSTR(d_rec_,3,12) AND rec_a=SUBSTR(d_rec_,15,6)
                                          AND dat_a>=ADD_MONTHS(gl.bDATE,-1);
       EXCEPTION WHEN OTHERS THEN NULL;
-      END; */
+      END; 
    END IF;
 
    RETURN SUBSTR(d_rec_,1,2)||tmp_||SUBSTR(d_rec_,21);
