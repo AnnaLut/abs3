@@ -5328,20 +5328,16 @@ namespace Areas.Payreg.Models
         /// Create a new V_STO_PAYMENTS object.
         /// </summary>
         /// <param name="pAYMENT_ID">Initial value of the PAYMENT_ID property.</param>
-        /// <param name="pAYER_ACCOUNT">Initial value of the PAYER_ACCOUNT property.</param>
-        /// <param name="pAYMENT_CURRENCY">Initial value of the PAYMENT_CURRENCY property.</param>
-        /// <param name="pAYER_MFO">Initial value of the PAYER_MFO property.</param>
         /// <param name="pAYMENT_STATE_ID">Initial value of the PAYMENT_STATE_ID property.</param>
+        /// <param name="pRODUCT_ID">Initial value of the PRODUCT_ID property.</param>
         /// <param name="oRDER_ID">Initial value of the ORDER_ID property.</param>
         /// <param name="rNK">Initial value of the RNK property.</param>
-        public static V_STO_PAYMENTS CreateV_STO_PAYMENTS(global::System.Int64 pAYMENT_ID, global::System.String pAYER_ACCOUNT, global::System.Int16 pAYMENT_CURRENCY, global::System.String pAYER_MFO, global::System.Int32 pAYMENT_STATE_ID, global::System.Int64 oRDER_ID, global::System.Decimal rNK)
+        public static V_STO_PAYMENTS CreateV_STO_PAYMENTS(global::System.Int64 pAYMENT_ID, global::System.Int32 pAYMENT_STATE_ID, global::System.Int32 pRODUCT_ID, global::System.Decimal oRDER_ID, global::System.Decimal rNK)
         {
             V_STO_PAYMENTS v_STO_PAYMENTS = new V_STO_PAYMENTS();
             v_STO_PAYMENTS.PAYMENT_ID = pAYMENT_ID;
-            v_STO_PAYMENTS.PAYER_ACCOUNT = pAYER_ACCOUNT;
-            v_STO_PAYMENTS.PAYMENT_CURRENCY = pAYMENT_CURRENCY;
-            v_STO_PAYMENTS.PAYER_MFO = pAYER_MFO;
             v_STO_PAYMENTS.PAYMENT_STATE_ID = pAYMENT_STATE_ID;
+            v_STO_PAYMENTS.PRODUCT_ID = pRODUCT_ID;
             v_STO_PAYMENTS.ORDER_ID = oRDER_ID;
             v_STO_PAYMENTS.RNK = rNK;
             return v_STO_PAYMENTS;
@@ -5405,7 +5401,7 @@ namespace Areas.Payreg.Models
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
         [DataMemberAttribute()]
         public global::System.String PAYER_ACCOUNT
         {
@@ -5415,14 +5411,11 @@ namespace Areas.Payreg.Models
             }
             set
             {
-                if (_PAYER_ACCOUNT != value)
-                {
-                    OnPAYER_ACCOUNTChanging(value);
-                    ReportPropertyChanging("PAYER_ACCOUNT");
-                    _PAYER_ACCOUNT = StructuralObject.SetValidValue(value, false);
-                    ReportPropertyChanged("PAYER_ACCOUNT");
-                    OnPAYER_ACCOUNTChanged();
-                }
+                OnPAYER_ACCOUNTChanging(value);
+                ReportPropertyChanging("PAYER_ACCOUNT");
+                _PAYER_ACCOUNT = StructuralObject.SetValidValue(value, true);
+                ReportPropertyChanged("PAYER_ACCOUNT");
+                OnPAYER_ACCOUNTChanged();
             }
         }
         private global::System.String _PAYER_ACCOUNT;
@@ -5528,9 +5521,9 @@ namespace Areas.Payreg.Models
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
         [DataMemberAttribute()]
-        public global::System.Int16 PAYMENT_CURRENCY
+        public Nullable<global::System.Int16> PAYMENT_CURRENCY
         {
             get
             {
@@ -5538,24 +5531,21 @@ namespace Areas.Payreg.Models
             }
             set
             {
-                if (_PAYMENT_CURRENCY != value)
-                {
-                    OnPAYMENT_CURRENCYChanging(value);
-                    ReportPropertyChanging("PAYMENT_CURRENCY");
-                    _PAYMENT_CURRENCY = StructuralObject.SetValidValue(value);
-                    ReportPropertyChanged("PAYMENT_CURRENCY");
-                    OnPAYMENT_CURRENCYChanged();
-                }
+                OnPAYMENT_CURRENCYChanging(value);
+                ReportPropertyChanging("PAYMENT_CURRENCY");
+                _PAYMENT_CURRENCY = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("PAYMENT_CURRENCY");
+                OnPAYMENT_CURRENCYChanged();
             }
         }
-        private global::System.Int16 _PAYMENT_CURRENCY;
-        partial void OnPAYMENT_CURRENCYChanging(global::System.Int16 value);
+        private Nullable<global::System.Int16> _PAYMENT_CURRENCY;
+        partial void OnPAYMENT_CURRENCYChanging(Nullable<global::System.Int16> value);
         partial void OnPAYMENT_CURRENCYChanged();
     
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
         [DataMemberAttribute()]
         public global::System.String PAYER_MFO
         {
@@ -5565,14 +5555,11 @@ namespace Areas.Payreg.Models
             }
             set
             {
-                if (_PAYER_MFO != value)
-                {
-                    OnPAYER_MFOChanging(value);
-                    ReportPropertyChanging("PAYER_MFO");
-                    _PAYER_MFO = StructuralObject.SetValidValue(value, false);
-                    ReportPropertyChanged("PAYER_MFO");
-                    OnPAYER_MFOChanged();
-                }
+                OnPAYER_MFOChanging(value);
+                ReportPropertyChanging("PAYER_MFO");
+                _PAYER_MFO = StructuralObject.SetValidValue(value, true);
+                ReportPropertyChanged("PAYER_MFO");
+                OnPAYER_MFOChanged();
             }
         }
         private global::System.String _PAYER_MFO;
@@ -5726,7 +5713,7 @@ namespace Areas.Payreg.Models
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
         public global::System.Int32 PAYMENT_STATE_ID
         {
@@ -5736,14 +5723,11 @@ namespace Areas.Payreg.Models
             }
             set
             {
-                if (_PAYMENT_STATE_ID != value)
-                {
-                    OnPAYMENT_STATE_IDChanging(value);
-                    ReportPropertyChanging("PAYMENT_STATE_ID");
-                    _PAYMENT_STATE_ID = StructuralObject.SetValidValue(value);
-                    ReportPropertyChanged("PAYMENT_STATE_ID");
-                    OnPAYMENT_STATE_IDChanged();
-                }
+                OnPAYMENT_STATE_IDChanging(value);
+                ReportPropertyChanging("PAYMENT_STATE_ID");
+                _PAYMENT_STATE_ID = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("PAYMENT_STATE_ID");
+                OnPAYMENT_STATE_IDChanged();
             }
         }
         private global::System.Int32 _PAYMENT_STATE_ID;
@@ -5777,9 +5761,9 @@ namespace Areas.Payreg.Models
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
-        public Nullable<global::System.Decimal> PRODUCT_ID
+        public global::System.Int32 PRODUCT_ID
         {
             get
             {
@@ -5794,8 +5778,8 @@ namespace Areas.Payreg.Models
                 OnPRODUCT_IDChanged();
             }
         }
-        private Nullable<global::System.Decimal> _PRODUCT_ID;
-        partial void OnPRODUCT_IDChanging(Nullable<global::System.Decimal> value);
+        private global::System.Int32 _PRODUCT_ID;
+        partial void OnPRODUCT_IDChanging(global::System.Int32 value);
         partial void OnPRODUCT_IDChanged();
     
         /// <summary>
@@ -5825,9 +5809,9 @@ namespace Areas.Payreg.Models
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
-        public global::System.Int64 ORDER_ID
+        public global::System.Decimal ORDER_ID
         {
             get
             {
@@ -5835,24 +5819,21 @@ namespace Areas.Payreg.Models
             }
             set
             {
-                if (_ORDER_ID != value)
-                {
-                    OnORDER_IDChanging(value);
-                    ReportPropertyChanging("ORDER_ID");
-                    _ORDER_ID = StructuralObject.SetValidValue(value);
-                    ReportPropertyChanged("ORDER_ID");
-                    OnORDER_IDChanged();
-                }
+                OnORDER_IDChanging(value);
+                ReportPropertyChanging("ORDER_ID");
+                _ORDER_ID = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("ORDER_ID");
+                OnORDER_IDChanged();
             }
         }
-        private global::System.Int64 _ORDER_ID;
-        partial void OnORDER_IDChanging(global::System.Int64 value);
+        private global::System.Decimal _ORDER_ID;
+        partial void OnORDER_IDChanging(global::System.Decimal value);
         partial void OnORDER_IDChanged();
     
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
         public global::System.Decimal RNK
         {
@@ -5862,14 +5843,11 @@ namespace Areas.Payreg.Models
             }
             set
             {
-                if (_RNK != value)
-                {
-                    OnRNKChanging(value);
-                    ReportPropertyChanging("RNK");
-                    _RNK = StructuralObject.SetValidValue(value);
-                    ReportPropertyChanged("RNK");
-                    OnRNKChanged();
-                }
+                OnRNKChanging(value);
+                ReportPropertyChanging("RNK");
+                _RNK = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RNK");
+                OnRNKChanged();
             }
         }
         private global::System.Decimal _RNK;
