@@ -9644,6 +9644,8 @@ end if;
     n_commit INT := 100;
     i_commit INT := 0;
 
+    v_block_flag integer;
+
   BEGIN
     -- Проводки по 9129
 
@@ -9891,6 +9893,23 @@ end if;
           nazn_ := 'Списання суми забов`язань з кредитування згiдно ';
         END IF;
       END IF;
+
+      select case dk_
+               when 1 then blkd
+               when 0 then blkk
+               else null
+             end
+        into v_block_flag
+        from accounts
+        where nls = nls9_
+          and kv = k.kv;
+          
+      if v_block_flag >0 then 
+        bars_audit.info('CCK.CC_9129: Вирівнювання неможливе, рахунок '||nls9_||' блокований на '||case dk_ when 1 then 'дебетування' when 0 then 'кредитування' end||'!');
+        continue;
+      end if;        
+
+
       nazn_ := nazn_ || 'угоди N' || k.cc_id || ' вiд ' ||
                to_char(k.sdate, 'DD.MM.YYYY');
 
