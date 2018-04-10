@@ -247,22 +247,22 @@ warning 6002: The table/view 'BARS.V_STO_PAYMENTS' does not have a primary key d
         <EntityType Name="V_STO_PAYMENTS">
           <Key>
             <PropertyRef Name="PAYMENT_ID" />
-            <PropertyRef Name="PAYER_ACCOUNT" />
+            <!--<PropertyRef Name="PAYER_ACCOUNT" />
             <PropertyRef Name="PAYMENT_CURRENCY" />
             <PropertyRef Name="PAYER_MFO" />
             <PropertyRef Name="PAYMENT_STATE_ID" />
             <PropertyRef Name="ORDER_ID" />
-            <PropertyRef Name="RNK" />
+            <PropertyRef Name="RNK" />-->
           </Key>
           <Property Name="PAYMENT_ID" Nullable="false" Precision="10" Scale="0" Type="number" />
           <Property Name="VALUE_DATE" Type="date" />
-          <Property Name="PAYER_ACCOUNT" Nullable="false" MaxLength="15" Type="varchar2" />
+          <Property Name="PAYER_ACCOUNT" MaxLength="15" Type="varchar2" />
           <Property Name="PAYER_IPN" MaxLength="14" Type="varchar2" />
           <Property Name="PAYMENT_AMOUNT" Precision="22" Scale="2" Type="number" />
           <Property Name="FEE_AMOUNT" Precision="22" Scale="2" Type="number" />
           <Property Name="DEBT_AMOUNT" Precision="22" Scale="2" Type="number" />
-          <Property Name="PAYMENT_CURRENCY" Nullable="false" Precision="3" Scale="0" Type="number" />
-          <Property Name="PAYER_MFO" Nullable="false" MaxLength="6" Type="varchar2" />
+          <Property Name="PAYMENT_CURRENCY" Precision="3" Scale="0" Type="number" />
+          <Property Name="PAYER_MFO" MaxLength="6" Type="varchar2" />
           <Property Name="RECEIVER_ACCOUNT" MaxLength="34" Type="varchar2" />
           <Property Name="RECEIVER_MFO" MaxLength="6" Type="varchar2" />
           <Property Name="RECEIVER_NAME" MaxLength="300" Type="varchar2" />
@@ -270,10 +270,10 @@ warning 6002: The table/view 'BARS.V_STO_PAYMENTS' does not have a primary key d
           <Property Name="PURPOSE" MaxLength="4000" Type="varchar2" />
           <Property Name="CUSTOMER_ACCOUNT" MaxLength="30" Type="varchar2" />
           <Property Name="PAYMENT_STATE_ID" Nullable="false" Precision="5" Scale="0" Type="number" />
-          <Property Name="PAYMENT_STATE" MaxLength="2" Type="char" />
-          <Property Name="PRODUCT_ID" Precision="38" Scale="0" Type="number" />
+          <Property Name="PAYMENT_STATE" MaxLength="45" Type="varchar2" />
+          <Property Name="PRODUCT_ID" Nullable="false" Precision="5" Scale="0" Type="number" />
           <Property Name="PRODUCT_NAME" MaxLength="300" Type="varchar2" />
-          <Property Name="ORDER_ID" Nullable="false" Precision="10" Scale="0" Type="number" />
+          <Property Name="ORDER_ID" Nullable="false" Precision="38" Scale="0" Type="number" />
           <Property Name="RNK" Nullable="false" Precision="38" Scale="0" Type="number" />
         </EntityType>
         <!--Errors Found During Generation:
@@ -865,22 +865,22 @@ FROM "BARS"."V_STO_SBON_PROVIDER" "V_STO_SBON_PROVIDER"</DefiningQuery>
         <EntityType Name="V_STO_PAYMENTS">
           <Key>
             <PropertyRef Name="PAYMENT_ID" />
-            <PropertyRef Name="PAYER_ACCOUNT" />
+            <!--<PropertyRef Name="PAYER_ACCOUNT" />
             <PropertyRef Name="PAYMENT_CURRENCY" />
             <PropertyRef Name="PAYER_MFO" />
             <PropertyRef Name="PAYMENT_STATE_ID" />
             <PropertyRef Name="ORDER_ID" />
-            <PropertyRef Name="RNK" />
+            <PropertyRef Name="RNK" />-->
           </Key>
           <Property Name="PAYMENT_ID" Type="Int64" Nullable="false" />
           <Property Name="VALUE_DATE" Type="DateTime" />
-          <Property Name="PAYER_ACCOUNT" Type="String" Nullable="false" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="PAYER_ACCOUNT" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
           <Property Name="PAYER_IPN" Type="String" MaxLength="14" FixedLength="false" Unicode="false" />
           <Property Name="PAYMENT_AMOUNT" Type="Decimal" Precision="22" Scale="2" />
           <Property Name="FEE_AMOUNT" Type="Decimal" Precision="22" Scale="2" />
           <Property Name="DEBT_AMOUNT" Type="Decimal" Precision="22" Scale="2" />
-          <Property Name="PAYMENT_CURRENCY" Type="Int16" Nullable="false" />
-          <Property Name="PAYER_MFO" Type="String" Nullable="false" MaxLength="6" FixedLength="false" Unicode="false" />
+          <Property Name="PAYMENT_CURRENCY" Type="Int16" />
+          <Property Name="PAYER_MFO" Type="String" MaxLength="6" FixedLength="false" Unicode="false" />
           <Property Name="RECEIVER_ACCOUNT" Type="String" MaxLength="34" FixedLength="false" Unicode="false" />
           <Property Name="RECEIVER_MFO" Type="String" MaxLength="6" FixedLength="false" Unicode="false" />
           <Property Name="RECEIVER_NAME" Type="String" MaxLength="300" FixedLength="false" Unicode="false" />
@@ -888,10 +888,10 @@ FROM "BARS"."V_STO_SBON_PROVIDER" "V_STO_SBON_PROVIDER"</DefiningQuery>
           <Property Name="PURPOSE" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
           <Property Name="CUSTOMER_ACCOUNT" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
           <Property Name="PAYMENT_STATE_ID" Type="Int32" Nullable="false" />
-          <Property Name="PAYMENT_STATE" Type="String" MaxLength="2" FixedLength="true" Unicode="false" />
-          <Property Name="PRODUCT_ID" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="PAYMENT_STATE" Type="String" MaxLength="45" FixedLength="false" Unicode="false" />
+          <Property Name="PRODUCT_ID" Type="Int32" Nullable="false" />
           <Property Name="PRODUCT_NAME" Type="String" MaxLength="300" FixedLength="false" Unicode="false" />
-          <Property Name="ORDER_ID" Type="Int64" Nullable="false" />
+          <Property Name="ORDER_ID" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
           <Property Name="RNK" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
         </EntityType>
         <EntityType Name="V_STO_SBON_PROVIDER">

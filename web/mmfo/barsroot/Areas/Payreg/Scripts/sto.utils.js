@@ -25,7 +25,12 @@ bars.utils.sto = bars.utils.sto || {
     },
     showPayments: function () {
         var grid = $('#cust_orders').data('kendoGrid');
-        var row = grid.dataItem(grid.select());
+        try {
+            var row = grid.dataItem(grid.select());
+        } catch (e) {
+            bars.ui.error({ text: 'Виникла помилка на сторінці. Повторіть дії знову або перезавантажте сторінку.' });
+            throw e;
+        }
         bars.utils.sto.currentOrderId = row.ID;
         var wnd = $("#paymentsWnd").data("kendoWindow");
         bars.utils.sto.preparePaymentsWindow();
@@ -649,7 +654,12 @@ bars.utils.sto.closeCurrentOrder = function () {
 
 bars.utils.sto.refreshOrdersToolbar = function () {
     var grid = $('#cust_orders').data('kendoGrid');
-    var row = grid.dataItem(grid.select());
+    try {
+        var row = grid.dataItem(grid.select());
+    } catch (e) {
+        bars.ui.error({ text: 'Виникла помилка на сторінці. Повторіть дії знову або перезавантажте сторінку.' });
+        throw e;
+    }
     bars.utils.sto.enableStoButton("edit_order", row && row.ORD_STATE < 3);
     bars.utils.sto.enableStoButton("printF190", row && row.ORD_STATE < 3);
     bars.utils.sto.enableStoButton("preview_order", row && row.ORD_STATE < 3);

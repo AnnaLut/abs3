@@ -489,7 +489,12 @@
             $("#frmSbonOrder input, #frmSepOrder input").prop("disabled", false);
             setTimeout(function () {
                 $('input[name=sbonShiftHolidayRadio][value=-1]').prop('checked', true);
-                $('#sbonStartDate').data("kendoDatePicker").value(bankDate);
+                try {
+                    $('#sbonStartDate').data("kendoDatePicker").value(bankDate);
+                } catch (e) {
+                    bars.ui.error({ text: 'Виникла помилка на сторінці. Повторіть дії знову або перезавантажте сторінку.' });
+                    throw e;
+                }
                 var $provList = $('#sbonProvaiderId').data("kendoDropDownList");
                 $provList.select(0);
                 var $accList = $('#sbonAccountId').data("kendoDropDownList");
