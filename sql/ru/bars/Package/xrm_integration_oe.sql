@@ -9,7 +9,7 @@ IS
 
    TYPE t_cursor IS REF CURSOR;
 
-   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.59 02.10.2017';
+   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.60 11.04.2018';
 
    FUNCTION header_version
       RETURN VARCHAR2;
@@ -541,7 +541,7 @@ function get_risklist (p_rnk IN NUMBER) return t_risks pipelined;
      ;
          -- опытувальнык дкбо
     PROCEDURE p_quest_answ_ins(p_transactionid   IN NUMBER
-                              ,p_object_id       IN NUMBER
+                              ,p_object_id       IN VARCHAR2
                               ,p_attribute_code  IN attribute_kind.attribute_code%TYPE
                               ,p_attribute_value IN VARCHAR2);
 
@@ -655,7 +655,7 @@ end;
 /
 CREATE OR REPLACE PACKAGE BODY "XRM_INTEGRATION_OE"
 IS
-   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.94 23.01.2018';
+   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.95 11.04.2018';
    g_null_date      CONSTANT DATE := null;
 
    g_ismmfo         CONSTANT params$base.val%type := nvl(getglobaloption('IS_MMFO'), '0');
@@ -3702,15 +3702,27 @@ PROCEDURE CreateDepositAgreement (
 
     -- опытувальнык дкбо
     PROCEDURE p_quest_answ_ins(p_transactionid   IN NUMBER
-                              ,p_object_id       IN NUMBER
+                              ,p_object_id       IN VARCHAR2
                               ,p_attribute_code  IN attribute_kind.attribute_code%TYPE
                               ,p_attribute_value IN VARCHAR2) IS
+     -- l_object_id number := bars_sqnc.rukey(p_object_id);
+     l_object_type_id object_type.id%type := object_utl.get_object_type_id('DKBO');
+     l_deal_id deal.id%type;
     BEGIN
-
-
-      pkg_dkbo_utl.p_quest_answ_ins(in_object_id       => p_object_id,
+      begin
+        select t.id
+          into l_deal_id
+          from deal t
+         where t.deal_type_id = l_object_type_id
+           and t.deal_number = p_object_id;
+      exception
+        when no_data_found then
+          raise_application_error(-20001, 'Номер договору ('||p_object_id||') не заданий!');
+      end;
+                
+      pkg_dkbo_utl.p_quest_answ_ins(in_object_id       => l_deal_id,
                                     in_attribute_code  => p_attribute_code,
-                                    in_attribute_value => p_attribute_value);
+                                    in_attribute_value => p_attribute_value);                                    
     END p_quest_answ_ins;
 
   -- процедура обработки полученного запроса на партийное создание счетов
