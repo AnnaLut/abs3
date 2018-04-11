@@ -81,6 +81,7 @@ begin
                            '       AND t.type_code= v.type_cod'||nlchr||
                            '       and p.passp=s.passp'||nlchr||
                            '       and D.KV=b.kv'||nlchr||
+						   '       and a.nbs!=''2620'''||nlchr||
                            '       and a.nls = decode(:Param0,''%'',a.nls,:Param0)'||nlchr||
                            '       and c.okpo = decode(:Param1,''%'',c.okpo,:Param1)'||nlchr||
                            '       and a.kv = decode(:Param2,''%'',a.kv,:Param2)'||nlchr||
