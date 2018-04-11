@@ -5,14 +5,14 @@ CREATE OR REPLACE PROCEDURE BARS.P_FD5_NN (Dat_   DATE,
 % DESCRIPTION :    #D5 for KB
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.17.009      09/02/2018 (06/02/2018)
+% VERSION     : v.17.012      10/04/2018 (06/04/2018, 13/03/2108)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
            prnk_ - РНК контрагента
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-   Структура показника    L D BBBB Z LL Y 9 Ц R QQ Ч VVV MMM T ГГ N I
+   Структура показника    L D BBBB Z LL YY 9 Ц R QQ Ч VVV MMM T ГГ N I
 
   1     L          1/2    (сума/%ставка)
   2     D          1/2/6  (залишок ДТ/залишок КТ/оборот КТ)
@@ -33,6 +33,11 @@ CREATE OR REPLACE PROCEDURE BARS.P_FD5_NN (Dat_   DATE,
  27     I          S190 код строку прострочення погашення боргу
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 10/04/2018 - змінений блок для вирівнювання залишків по рах. резервів
+              (параметр K072 вибирається 2 символи замість одного)
+ 02/04/2018 - будемо додатково включати бал.рах. '***9' з типом 'SNA' 
+ 13/03/2018 - для резидентов и бал. счета 2625 параметр K072 = '42' 
+ 12/03/2018 - для нерезидентов и бал. счета 2625 параметр K072 = 'N8' 
  09/02/2018 - для ФЛ резидента и бал.счета 9129 изменяем K072 на '42' 
               если K072='00'
               для 2203, 2206, 2208 R011='1'
@@ -458,6 +463,16 @@ BEGIN
       EXCEPTION WHEN NO_DATA_FOUND THEN
          null;
       END ;
+   end if;
+
+   if nbs_ = '2625' and re_ = 1 and k072_ not in ('42','43')
+   then
+      k072_ := '42';
+   end if;
+
+   if nbs_ = '2625' and re_ = 0 and k072_ <> 'N8'
+   then
+      k072_ := 'N8';
    end if;
 
    BEGIN
@@ -1071,8 +1086,10 @@ BEGIN
               start_date <= dat_ and
               nvl(finish_date, dat_ + 1) > dat_;
 
-       if nbs_ not in ('1590', '1592', '2400', '2401', '3690', '3692') and
-          acc_type_ not like 'RZ%'
+       if ( (nbs_ not in ('1590', '1592', '2400', '2401', '3690', '3692') and
+             acc_type_ not like 'RZ%') OR 
+            (acc_type_ like 'RZ%' and tips_ = 'SNA')
+          )
        then
 
            IF kv_ <> 980 THEN
@@ -1275,7 +1292,7 @@ BEGIN
              select NVL(sum(to_number(r.znap)),0)
                 into sn_
              from rnbu_trace r
-             where r.kodp like '1_' || k.nbs || '______' || k.rez || '___' || k.kv || '___'|| '_' || '__2_'
+             where r.kodp like '1_' || k.nbs || '_______' || k.rez || '___' || k.kv || '___'|| '_' || '__2_'
                --and r.nls not like '9129%'
                and r.nls not like '351%'
                and r.nls not like '354%'
@@ -1295,7 +1312,7 @@ BEGIN
                       INTO recid_
                    from rnbu_trace r
                    where r.kodp like '12'||k.nbs||decode(k.nbs, '1590', '1', '0')||
-                                            '_____'||k.rez||'___'||k.kv||'___'||'_'|| '__2_'
+                                            '______'||k.rez||'___'||k.kv||'___'||'_'|| '__2_'
                      and rownum=1;
                 EXCEPTION WHEN NO_DATA_FOUND THEN
                    recid_ := null;
