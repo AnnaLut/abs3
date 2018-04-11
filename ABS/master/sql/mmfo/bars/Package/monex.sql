@@ -532,7 +532,7 @@ begin
               if oo.ref >'999999999' then oo.nd := substr(to_char(oo.REF), -10);
               else                        oo.nd :=        to_char(oo.REF)      ;
               end if ;
-              oo.nlsb  := vkrzn( substr( gl.Amfo,1,5),'191992' )  ;
+              oo.nlsb  := vkrzn( substr( gl.Amfo,1,5),'37391192' )  ;
               oo.nam_b := 'Транзит для закорд.переказiв';
               gl.in_doc3(ref_ => oo.ref  , tt_   => oo.TT  , vob_  => oo.VOB  , nd_   => oo.nd   , pdat_  => SYSDATE,
                          vdat_=> gl.BDATE, dk_   => 1      , kv_   => z.kv    , s_    => z.S     , kv2_   => z.kv,
