@@ -537,7 +537,7 @@ is
   --
   --***************************************************************--
 
-  G_BODY_VERSION  CONSTANT VARCHAR2(100)  := '$7.13 2017-12-29';
+  G_BODY_VERSION  CONSTANT VARCHAR2(100)  := '$7.14 2018-04-12';
 
   G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := '';
 
@@ -1767,50 +1767,73 @@ IF p_flag IN (1,2,3) THEN -- Pay cleared
             RAISE err;
          END IF;
 
-         IF vob_=96 THEN   -- Виконати накопичення виправних
+         IF ( vob_ = 96 )
+         THEN -- Виконати накопичення виправних
 
-            DECLARE
+           DECLARE
+             fdat_   DATE   := TRUNC(gl.bDATE,'MM')-1;  -- ост число мин міс
+             dosq_   NUMBER := CASE dk_ WHEN 0 THEN s_q ELSE 0 END;
+             kosq_   NUMBER := CASE dk_ WHEN 0 THEN 0 ELSE s_q END;
+           BEGIN
 
-            fdat_   DATE   := TRUNC(gl.bDATE,'MM')-1;  -- ост число мин міс
-            dosq_   NUMBER := CASE dk_ WHEN 0 THEN s_q ELSE 0 END;
-            kosq_   NUMBER := CASE dk_ WHEN 0 THEN 0 ELSE s_q END;
+             fdat_ := TRUNC(fdat_,'MM');  -- 1е число
 
-            BEGIN
+             UPDATE saldoz
+                SET dos  = dos  + dos_
+                  , kos  = kos  + kos_
+                  , dosq = dosq + dosq_
+                  , kosq = kosq + kosq_
+              WHERE acc  = acc_
+                AND fdat=fdat_;
 
-               fdat_:=TRUNC(fdat_,'MM');  -- 1е число
+             IF SQL%ROWCOUNT=0 THEN
+               insert into SALDOZ ( ACC, FDAT, DOS, KOS ,DOSQ, KOSQ )
+               values ( acc_,fdat_,dos_,kos_,dosq_,kosq_);
+             END IF;
 
-               UPDATE saldoz
-                  SET dos  = dos  + dos_, kos  = kos  + kos_,
-                      dosq = dosq + dosq_,kosq = kosq + kosq_
-                WHERE acc=acc_ AND fdat=fdat_;
-               IF SQL%ROWCOUNT=0 THEN
-                  INSERT INTO saldoz( acc, fdat, dos, kos ,dosq, kosq)
-                         VALUES     ( acc_,fdat_,dos_,kos_,dosq_,kosq_);
-               END IF;
-            END;
+           END;
 
          END IF;
 
-         IF vob_=99 THEN   -- Виконати накопичення виправних за рік
+         IF ( vob_ = 99 )
+         THEN -- Виконати накопичення виправних за рік
 
-            DECLARE
+           DECLARE
+             fdat_   DATE   := TRUNC(gl.bDATE,'YYYY')-1;  -- ост число мин рок
+             dosq_   NUMBER := CASE dk_ WHEN 0 THEN s_q ELSE 0 END;
+             kosq_   NUMBER := CASE dk_ WHEN 0 THEN 0 ELSE s_q END;
+           BEGIN
 
-            fdat_   DATE   := TRUNC(gl.bDATE,'YYYY')-1;  -- ост число мин рок
-            dosq_   NUMBER := CASE dk_ WHEN 0 THEN s_q ELSE 0 END;
-            kosq_   NUMBER := CASE dk_ WHEN 0 THEN 0 ELSE s_q END;
-
-            BEGIN
-
-               fdat_:=TRUNC(fdat_,'YYYY');  -- 1е число
+               fdat_ := TRUNC(fdat_,'YYYY'); -- 1е число минулого року
 
                UPDATE saldoy
-                  SET dos  = dos  + dos_, kos  = kos  + kos_,
-                      dosq = dosq + dosq_,kosq = kosq + kosq_
-                WHERE acc=acc_ AND fdat=fdat_;
+                  SET dos  = dos  + dos_
+                    , kos  = kos  + kos_
+                    , dosq = dosq + dosq_
+                    , kosq = kosq + kosq_
+                WHERE acc  = acc_
+                  AND fdat = fdat_;
+
                IF SQL%ROWCOUNT=0 THEN
-                  INSERT INTO saldoy( acc, fdat, dos, kos ,dosq, kosq)
-                         VALUES     ( acc_,fdat_,dos_,kos_,dosq_,kosq_);
+                 insert into SALDOY ( ACC, FDAT, DOS, KOS ,DOSQ, KOSQ )
+                 values ( acc_, fdat_, dos_, kos_, dosq_, kosq_ );
                END IF;
+
+               fdat_ := add_months( trunc( gl.bDATE, 'MM' ), -1 ); -- 1е число минулого міс.
+
+               update SALDOZ
+                  set DOS_YR  = DOS_YR  + dos_
+                    , DOSQ_YR = DOSQ_YR + dosq_
+                    , KOS_YR  = KOS_YR  + kos_
+                    , KOSQ_YR = KOSQ_YR + kosq_
+                where ACC     = acc_
+                  and FDAT    = fdat_;
+               
+               IF SQL%ROWCOUNT=0 THEN
+                  insert into SALDOZ ( ACC, FDAT, DOS, DOSQ, KOS, KOSQ, DOS_YR, DOSQ_YR, KOS_YR, KOSQ_YR )
+                  values ( acc_, fdat_, 0, 0, 0, 0, dos_, dosq_, kos_, kosq_ );
+               END IF;
+
             END;
 
          END IF;
@@ -2102,13 +2125,14 @@ BEGIN
 
                IF j=0 THEN mkv_:=kv_; j:=1; END IF;
 
-               IF mkv_=kv_ THEN ms_:=c.s;
+               IF mkv_=kv_ THEN
+                 ms_:=c.s;
                ELSE
-                  gl.x_rat ( rato_,ratb_,rats_,mkv_,kv_,c.fdat );
-                  ms_ := c.s * rato_;
+                 gl.x_rat ( rato_,ratb_,rats_,mkv_,kv_,c.fdat );
+                 ms_ := c.s * rato_;
                END IF;
 
-               de_sal (acc_,c.fdat,ms_,c.sq);
+               de_sal( acc_,c.fdat,ms_,c.sq );
 
                IF vob_=96 THEN   -- Виконати вилучення виправних
 
@@ -2141,32 +2165,48 @@ BEGIN
 
                END IF;
 
-               IF vob_=99 THEN   -- Виконати вилучення виправних за рік
+               IF ( vob_ = 99 ) 
+               THEN -- Виконати вилучення виправних за рік
 
-                  DECLARE
+                 DECLARE
+                   fdat_   DATE :=TRUNC(c.fdat,'YYYY')-1;
+                   dosq0_  NUMBER;
+                   kosq0_  NUMBER;
+                   dosq_   NUMBER := gl.p_icurval(kv_,ms_,fdat_); -- завжди по курсу ост. роб. дня року
+                   kosq_   NUMBER := gl.p_icurval(kv_,ms_,fdat_); -- завжди по курсу ост. роб. дня року
+                 BEGIN
 
-                     fdat_   DATE :=TRUNC(c.fdat,'YYYY')-1;
-                     dosq0_  NUMBER;
-                     kosq0_  NUMBER;
-                     dosq_   NUMBER := gl.p_icurval(kv_,ms_,fdat_);
-                     kosq_   NUMBER := gl.p_icurval(kv_,ms_,fdat_);
+                   fdat_ := TRUNC(fdat_,'YYYY');
 
-                  BEGIN
-
-                     fdat_:=TRUNC(fdat_,'YYYY');
-
-                     dos_:=NULL; kos_:=NULL; dosq0_:=NULL; kosq0_:=NULL;
+                   dos_   := NULL;
+                   kos_   := NULL;
+                   dosq0_ := NULL;
+                   kosq0_ := NULL;
 
                      UPDATE saldoy
-                        SET dos  = dos  - ms_,  kos  = kos  - ms_,
-                            dosq = dosq - dosq_,kosq = kosq - kosq_
-                      WHERE acc=acc_ AND fdat=fdat_
-                     RETURNING dos, kos, dosq,  kosq
-                          INTO dos_,kos_,dosq0_,kosq0_;
+                        SET dos  = dos  - ms_
+                          , kos  = kos  - ms_
+                          , dosq = dosq - dosq_
+                          , kosq = kosq - kosq_
+                      WHERE acc  = acc_
+                        AND fdat = fdat_
+                     RETURN dos, kos, dosq,  kosq
+                       INTO dos_,kos_,dosq0_,kosq0_;
 
-                     IF dos_=0 AND kos_=0 AND dosq0_=0 AND kosq0_=0 THEN
-                        DELETE FROM saldoy WHERE acc=acc_ AND fdat=fdat_;
+                     IF ( dos_ = 0 AND kos_ = 0 AND dosq0_ = 0 AND kosq0_ = 0 )
+                     THEN
+                       delete from SALDOY where ACC = acc_ and FDAT = fdat_;
                      END IF;
+
+                     fdat_ := add_months( trunc( c.fdat, 'MM' ), -1 ); -- 1е число минулого міс.
+
+                     update SALDOZ
+                        set DOS_YR  = DOS_YR  - ms_
+                          , DOSQ_YR = DOSQ_YR - dosq_
+                          , KOS_YR  = KOS_YR  - ms_
+                          , KOSQ_YR = KOSQ_YR - kosq_
+                      where ACC     = acc_
+                        and FDAT    = fdat_;
 
                   END;
 
