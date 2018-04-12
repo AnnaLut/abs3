@@ -9,7 +9,7 @@ IS
 
    TYPE t_cursor IS REF CURSOR;
 
-   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.60 11.04.2018';
+   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.61 12.04.2018';
 
    FUNCTION header_version
       RETURN VARCHAR2;
