@@ -1,340 +1,203 @@
+-- ======================================================================================
+-- Module : GL
+-- Author : BAA
+-- Date   : 12.05.2017
+-- ===================================== <Comments> =====================================
+-- create table SALDOZ
+-- ======================================================================================
 
+SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
+SET ECHO         OFF
+SET LINES        500
+SET PAGES        500
+SET FEEDBACK     OFF
+SET TIMING       OFF
+SET TRIMSPOOL    ON
 
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/SALDOZ.sql =========*** Run *** ======
-PROMPT ===================================================================================== 
+prompt -- ======================================================
+prompt -- create table SALDOZ
+prompt -- ======================================================
 
-
-PROMPT *** ALTER_POLICY_INFO to SALDOZ ***
-
-
-BEGIN 
-        execute immediate  
-          'begin  
-               bpa.alter_policy_info(''SALDOZ'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''SALDOZ'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
-               bpa.alter_policy_info(''SALDOZ'', ''WHOLE'' , null, ''E'', ''E'', ''E'');
-               null;
-           end; 
-          '; 
-END; 
+begin
+  bars.bpa.alter_policy_info( 'SALDOZ', 'WHOLE' , NULL, 'E', 'E', 'E' );
+  bars.bpa.alter_policy_info( 'SALDOZ', 'FILIAL',  'M', 'M', 'M', 'M' );
+  bars.bpa.alter_policy_info( 'SALDOZ', 'CENTER', NULL, 'E', 'E', 'E' );
+end;
 /
 
-PROMPT *** Create  table SALDOZ ***
-begin 
-  execute immediate '
-  CREATE TABLE BARS.SALDOZ 
-   (	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo''), 
-	FDAT DATE, 
-	ACC NUMBER, 
-	DOS NUMBER(24,0), 
-	DOSQ NUMBER(24,0), 
-	KOS NUMBER(24,0), 
-	KOSQ NUMBER(24,0)
-   ) PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
-  TABLESPACE BRSMDLD 
-  PARTITION BY LIST (KF) 
- (PARTITION P_300465  VALUES (''300465'') SEGMENT CREATION IMMEDIATE 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING 
-  TABLESPACE BRSMDLD , 
- PARTITION P_302076  VALUES (''302076'') SEGMENT CREATION DEFERRED 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING 
-  TABLESPACE BRSMDLD , 
- PARTITION P_303398  VALUES (''303398'') SEGMENT CREATION DEFERRED 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING 
-  TABLESPACE BRSMDLD , 
- PARTITION P_304665  VALUES (''304665'') SEGMENT CREATION IMMEDIATE 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING 
-  TABLESPACE BRSMDLD , 
- PARTITION P_305482  VALUES (''305482'') SEGMENT CREATION DEFERRED 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING 
-  TABLESPACE BRSMDLD , 
- PARTITION P_311647  VALUES (''311647'') SEGMENT CREATION DEFERRED 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING 
-  TABLESPACE BRSMDLD , 
- PARTITION P_312356  VALUES (''312356'') SEGMENT CREATION DEFERRED 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING 
-  TABLESPACE BRSMDLD , 
- PARTITION P_313957  VALUES (''313957'') SEGMENT CREATION DEFERRED 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING 
-  TABLESPACE BRSMDLD , 
- PARTITION P_315784  VALUES (''315784'') SEGMENT CREATION DEFERRED 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING 
-  TABLESPACE BRSMDLD , 
- PARTITION P_322669  VALUES (''322669'') SEGMENT CREATION IMMEDIATE 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING 
-  TABLESPACE BRSMDLD , 
- PARTITION P_323475  VALUES (''323475'') SEGMENT CREATION DEFERRED 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING 
-  TABLESPACE BRSMDLD , 
- PARTITION P_324805  VALUES (''324805'') SEGMENT CREATION IMMEDIATE 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING 
-  TABLESPACE BRSMDLD , 
- PARTITION P_325796  VALUES (''325796'') SEGMENT CREATION DEFERRED 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING 
-  TABLESPACE BRSMDLD , 
- PARTITION P_326461  VALUES (''326461'') SEGMENT CREATION DEFERRED 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING 
-  TABLESPACE BRSMDLD , 
- PARTITION P_328845  VALUES (''328845'') SEGMENT CREATION DEFERRED 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING 
-  TABLESPACE BRSMDLD , 
- PARTITION P_331467  VALUES (''331467'') SEGMENT CREATION DEFERRED 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING 
-  TABLESPACE BRSMDLD , 
- PARTITION P_333368  VALUES (''333368'') SEGMENT CREATION DEFERRED 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING 
-  TABLESPACE BRSMDLD , 
- PARTITION P_335106  VALUES (''335106'') SEGMENT CREATION IMMEDIATE 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING 
-  TABLESPACE BRSMDLD , 
- PARTITION P_336503  VALUES (''336503'') SEGMENT CREATION DEFERRED 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING 
-  TABLESPACE BRSMDLD , 
- PARTITION P_337568  VALUES (''337568'') SEGMENT CREATION DEFERRED 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING 
-  TABLESPACE BRSMDLD , 
- PARTITION P_338545  VALUES (''338545'') SEGMENT CREATION DEFERRED 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING 
-  TABLESPACE BRSMDLD , 
- PARTITION P_351823  VALUES (''351823'') SEGMENT CREATION IMMEDIATE 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING 
-  TABLESPACE BRSMDLD , 
- PARTITION P_352457  VALUES (''352457'') SEGMENT CREATION DEFERRED 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING 
-  TABLESPACE BRSMDLD , 
- PARTITION P_353553  VALUES (''353553'') SEGMENT CREATION DEFERRED 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING 
-  TABLESPACE BRSMDLD , 
- PARTITION P_354507  VALUES (''354507'') SEGMENT CREATION DEFERRED 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING 
-  TABLESPACE BRSMDLD , 
- PARTITION P_356334  VALUES (''356334'') SEGMENT CREATION DEFERRED 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING 
-  TABLESPACE BRSMDLD ) ';
-exception when others then       
-  if sqlcode=-955 then null; else raise; end if; 
-end; 
+declare
+  e_tab_exists exception;
+  pragma exception_init( e_tab_exists, -00955 );
+begin
+  
+  execute immediate q'[create table SALDOZ
+( KF         VARCHAR2(6) default SYS_CONTEXT('BARS_CONTEXT','USER_MFO')
+                         constraint CC_SALDOZ_KF_NN   NOT NULL
+, FDAT       DATE        constraint CC_SALDOZ_FDAT_NN NOT NULL
+, ACC        NUMBER(38)  constraint CC_SALDOZ_ACC_NN  NOT NULL
+, DOS        NUMBER(24)  constraint CC_SALDOZ_DOS_NN  NOT NULL
+, DOSQ       NUMBER(24)  constraint CC_SALDOZ_DOSQ_NN NOT NULL
+, KOS        NUMBER(24)  constraint CC_SALDOZ_KOS_NN  NOT NULL
+, KOSQ       NUMBER(24)  constraint CC_SALDOZ_KOSQ_NN NOT NULL
+, DOS_YR     NUMBER(24)  default 0
+, DOSQ_YR    NUMBER(24)  default 0
+, KOS_YR     NUMBER(24)  default 0
+, KOSQ_YR    NUMBER(24)  default 0
+) TABLESPACE BRSMDLD
+  STORAGE( INITIAL 32K NEXT 32K )
+  PARTITION BY LIST (KF)
+( PARTITION P_300465 VALUES ('300465')
+, PARTITION P_302076 VALUES ('302076')
+, PARTITION P_303398 VALUES ('303398')
+, PARTITION P_304665 VALUES ('304665')
+, PARTITION P_305482 VALUES ('305482')
+, PARTITION P_311647 VALUES ('311647')
+, PARTITION P_312356 VALUES ('312356')
+, PARTITION P_313957 VALUES ('313957')
+, PARTITION P_315784 VALUES ('315784')
+, PARTITION P_322669 VALUES ('322669')
+, PARTITION P_323475 VALUES ('323475')
+, PARTITION P_324805 VALUES ('324805')
+, PARTITION P_325796 VALUES ('325796')
+, PARTITION P_326461 VALUES ('326461')
+, PARTITION P_328845 VALUES ('328845')
+, PARTITION P_331467 VALUES ('331467')
+, PARTITION P_333368 VALUES ('333368')
+, PARTITION P_335106 VALUES ('335106')
+, PARTITION P_336503 VALUES ('336503')
+, PARTITION P_337568 VALUES ('337568')
+, PARTITION P_338545 VALUES ('338545')
+, PARTITION P_351823 VALUES ('351823')
+, PARTITION P_352457 VALUES ('352457')
+, PARTITION P_353553 VALUES ('353553')
+, PARTITION P_354507 VALUES ('354507')
+, PARTITION P_356334 VALUES ('356334') 
+)]';
+  
+  dbms_output.put_line( 'Table "SALDOZ" created.' );
+  
+exception
+  when e_tab_exists then
+    dbms_output.put_line( 'Table "SALDOZ" already exists.' );
+end;
 /
 
+prompt -- ======================================================
+prompt -- Alters
+prompt -- ======================================================
 
+exec BPA.DISABLE_POLICIES( 'SALDOZ' );
 
-
-PROMPT *** ALTER_POLICIES to SALDOZ ***
- exec bpa.alter_policies('SALDOZ');
-
-
-COMMENT ON TABLE BARS.SALDOZ IS 'Накопичення місячних корегуючих оборотів (OPER.VOB=96)';
-COMMENT ON COLUMN BARS.SALDOZ.KF IS 'Код філіалу (МФО)';
-COMMENT ON COLUMN BARS.SALDOZ.FDAT IS 'Дата';
-COMMENT ON COLUMN BARS.SALDOZ.ACC IS 'Ідентифікатор рахунку';
-COMMENT ON COLUMN BARS.SALDOZ.DOS IS 'Дебетові  обороти';
-COMMENT ON COLUMN BARS.SALDOZ.DOSQ IS 'Дебетові  обороти (в еквіваленті)';
-COMMENT ON COLUMN BARS.SALDOZ.KOS IS 'Кредитові обороти';
-COMMENT ON COLUMN BARS.SALDOZ.KOSQ IS 'Кредитові обороти (в еквіваленті)';
-
-
-
-
-PROMPT *** Create  constraint CC_SALDOZ_ACC_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SALDOZ MODIFY (ACC CONSTRAINT CC_SALDOZ_ACC_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
+declare
+  e_col_exists           exception;
+  pragma exception_init( e_col_exists, -01430 );
+begin
+  execute immediate q'[alter table SALDOZ add DOS_YR number(24) default 0]';
+  dbms_output.put_line( 'Table altered.' );
+exception
+  when e_col_exists
+  then null;
+end;
 /
 
-
-
-
-PROMPT *** Create  constraint CC_SALDOZ_DOS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SALDOZ MODIFY (DOS CONSTRAINT CC_SALDOZ_DOS_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
+declare
+  e_col_exists           exception;
+  pragma exception_init( e_col_exists, -01430 );
+begin
+  execute immediate q'[alter table SALDOZ add DOSQ_YR number(24) default 0]';
+  dbms_output.put_line( 'Table altered.' );
+exception
+  when e_col_exists
+  then null;
+end;
 /
 
-
-
-
-PROMPT *** Create  constraint CC_SALDOZ_DOSQ_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SALDOZ MODIFY (DOSQ CONSTRAINT CC_SALDOZ_DOSQ_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
+declare
+  e_col_exists           exception;
+  pragma exception_init( e_col_exists, -01430 );
+begin
+  execute immediate q'[alter table SALDOZ add KOS_YR number(24) default 0]';
+  dbms_output.put_line( 'Table altered.' );
+exception
+  when e_col_exists
+  then null;
+end;
 /
 
-
-
-
-PROMPT *** Create  constraint CC_SALDOZ_KOS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SALDOZ MODIFY (KOS CONSTRAINT CC_SALDOZ_KOS_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
+declare
+  e_col_exists           exception;
+  pragma exception_init( e_col_exists, -01430 );
+begin
+  execute immediate q'[alter table SALDOZ add KOSQ_YR number(24) default 0]';
+  dbms_output.put_line( 'Table altered.' );
+exception
+  when e_col_exists
+  then null;
+end;
 /
 
+-- exec BPA.ENABLE_POLICIES( 'SALDOZ' );
 
+prompt -- ======================================================
+prompt -- Indexes
+prompt -- ======================================================
 
-
-PROMPT *** Create  constraint CC_SALDOZ_KOSQ_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SALDOZ MODIFY (KOSQ CONSTRAINT CC_SALDOZ_KOSQ_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
+begin
+  execute immediate q'[create unique index UK_SALDOZ ON SALDOZ ( KF, FDAT, ACC )
+  TABLESPACE BRSMDLI
+  LOCAL
+  COMPRESS 2 ]';
+  dbms_output.put_line( 'Index "UK_SALDOZ" created.' );
+exception
+  when OTHERS then
+    case
+      when (sqlcode = -00955)
+      then dbms_output.put_line( 'Index "UK_SALDOZ" already exists in the table.' );
+      when (sqlcode = -01408)
+      then dbms_output.put_line( 'Column(s) "KF", "FDAT", "ACC" already indexed.' );
+      else raise;
+    end case;
+end;
 /
 
+SET FEEDBACK ON
 
+prompt -- ======================================================
+prompt -- Apply policies
+prompt -- ======================================================
 
-
-PROMPT *** Create  constraint CC_SALDOZ_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SALDOZ MODIFY (KF CONSTRAINT CC_SALDOZ_KF_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
+begin
+  BARS.BPA.ALTER_POLICIES( 'SALDOZ' );
+end;
 /
 
+commit;
 
+prompt -- ======================================================
+prompt -- Comments
+prompt -- ======================================================
 
+comment on table  SALDOZ         IS 'Накопичення місячних корегуючих оборотів (OPER.VOB=96)';
 
-PROMPT *** Create  index UK_SALDOZ ***
-begin   
- execute immediate '
-  CREATE UNIQUE INDEX BARS.UK_SALDOZ ON BARS.SALDOZ (KF, FDAT, ACC) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 
-  TABLESPACE BRSMDLI  LOCAL
- (PARTITION P_300465 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
-  TABLESPACE BRSMDLI , 
- PARTITION P_302076 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
-  TABLESPACE BRSMDLI , 
- PARTITION P_303398 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
-  TABLESPACE BRSMDLI , 
- PARTITION P_304665 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
-  TABLESPACE BRSMDLI , 
- PARTITION P_305482 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
-  TABLESPACE BRSMDLI , 
- PARTITION P_311647 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
-  TABLESPACE BRSMDLI , 
- PARTITION P_312356 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
-  TABLESPACE BRSMDLI , 
- PARTITION P_313957 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
-  TABLESPACE BRSMDLI , 
- PARTITION P_315784 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
-  TABLESPACE BRSMDLI , 
- PARTITION P_322669 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
-  TABLESPACE BRSMDLI , 
- PARTITION P_323475 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
-  TABLESPACE BRSMDLI , 
- PARTITION P_324805 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
-  TABLESPACE BRSMDLI , 
- PARTITION P_325796 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
-  TABLESPACE BRSMDLI , 
- PARTITION P_326461 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
-  TABLESPACE BRSMDLI , 
- PARTITION P_328845 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
-  TABLESPACE BRSMDLI , 
- PARTITION P_331467 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
-  TABLESPACE BRSMDLI , 
- PARTITION P_333368 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
-  TABLESPACE BRSMDLI , 
- PARTITION P_335106 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
-  TABLESPACE BRSMDLI , 
- PARTITION P_336503 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
-  TABLESPACE BRSMDLI , 
- PARTITION P_337568 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
-  TABLESPACE BRSMDLI , 
- PARTITION P_338545 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
-  TABLESPACE BRSMDLI , 
- PARTITION P_351823 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
-  TABLESPACE BRSMDLI , 
- PARTITION P_352457 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
-  TABLESPACE BRSMDLI , 
- PARTITION P_353553 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
-  TABLESPACE BRSMDLI , 
- PARTITION P_354507 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
-  TABLESPACE BRSMDLI , 
- PARTITION P_356334 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
-  TABLESPACE BRSMDLI ) COMPRESS 2 ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
+comment on column SALDOZ.KF      IS 'Код філіалу (МФО)';
+comment on column SALDOZ.FDAT    IS 'Дата';
+comment on column SALDOZ.ACC     IS 'Ідентифікатор рахунку';
+comment on column SALDOZ.DOS     IS 'Дебетовi обороти по коригуючих мiсячних';
+comment on column SALDOZ.DOSQ    IS 'Дебетовi обороти по коригуючих мiсячних (в еквіваленті)';
+comment on column SALDOZ.KOS     IS 'Кредитовi обороти по коригуючих мiсячних';
+comment on column SALDOZ.KOSQ    IS 'Кредитовi обороти по коригуючих мiсячних (в еквіваленті)';
+comment on column SALDOZ.DOS_YR  IS 'Дебетовi обороти по коригуючих рiчних';
+comment on column SALDOZ.DOSQ_YR IS 'Дебетовi обороти по коригуючих рiчних (в еквіваленті)';
+comment on column SALDOZ.KOS_YR  IS 'Кредитовi обороти по коригуючих рiчних';
+comment on column SALDOZ.KOSQ_YR IS 'Кредитовi обороти по коригуючих рiчних (в еквіваленті)';
 
+prompt -- ======================================================
+prompt -- Grants
+prompt -- ======================================================
 
-
-PROMPT *** Create  grants  SALDOZ ***
-grant SELECT                                                                 on SALDOZ          to BARSREADER_ROLE;
-grant SELECT                                                                 on SALDOZ          to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on SALDOZ          to BARS_DM;
-grant SELECT                                                                 on SALDOZ          to DM;
-grant SELECT                                                                 on SALDOZ          to START1;
-grant SELECT                                                                 on SALDOZ          to UPLD;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Table/SALDOZ.sql =========*** End *** ======
-PROMPT ===================================================================================== 
+grant SELECT ON SALDOZ to BARS_ACCESS_DEFROLE;
+grant SELECT ON SALDOZ to START1;
+grant SELECT on SALDOZ to BARSREADER_ROLE;
+grant SELECT on SALDOZ to BARS_DM;
+grant SELECT on SALDOZ to DM;
+grant SELECT on SALDOZ to UPLD;
