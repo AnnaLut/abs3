@@ -1,92 +1,107 @@
-
-
-
 PROMPT BARS/Table/SPARAM_LIST.sql
 
 PROMPT *** ALTER_POLICY_INFO to SPARAM_LIST ***
 
-
-BEGIN 
-        execute immediate  
-          'begin  
-               bpa.alter_policy_info(''SPARAM_LIST'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''SPARAM_LIST'', ''FILIAL'' , null, ''E'', ''E'', ''E'');
-               bpa.alter_policy_info(''SPARAM_LIST'', ''WHOLE'' , null, null, null, null);
-               null;
-           end; 
-          '; 
-END; 
+begin
+  bpa.alter_policy_info( 'SPARAM_LIST', 'CENTER', null, null, null, null );
+  bpa.alter_policy_info( 'SPARAM_LIST', 'FILIAL', null,  'E',  'E',  'E' );
+  bpa.alter_policy_info( 'SPARAM_LIST', 'WHOLE' , null, null, null, null );
+end;
 /
 
 PROMPT *** Create  table SPARAM_LIST ***
 begin 
-  execute immediate '
-  CREATE TABLE BARS.SPARAM_LIST 
-   (	SPID NUMBER(38,0), 
-	NAME VARCHAR2(30), 
-	SEMANTIC VARCHAR2(60), 
-	TABNAME VARCHAR2(30), 
-	TYPE CHAR(1), 
-	NSINAME VARCHAR2(60), 
-	INUSE NUMBER(1,0), 
-	PKNAME VARCHAR2(60), 
-	DELONNULL NUMBER(1,0), 
-	NSISQLWHERE VARCHAR2(250), 
-	SQLCONDITION VARCHAR2(250), 
-	TAG VARCHAR2(8), 
-	TABCOLUMN_CHECK VARCHAR2(30), 
-	CODE VARCHAR2(30) DEFAULT ''OTHERS'', 
-	HIST NUMBER(1,0), 
-	MAX_CHAR NUMBER(10,0), 
-	BRANCH VARCHAR2(30) DEFAULT sys_context(''bars_context'',''user_branch''),
-	DEF_FLAG varchar2(1) default ''N''
-   ) SEGMENT CREATION IMMEDIATE 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING
-  TABLESPACE BRSSMLD ';
-exception when others then       
-  if sqlcode=-955 then null; else raise; end if; 
-end; 
-/
-
-prompt add def_flag column
-begin
-	execute immediate q'[alter table bars.sparam_list add def_flag varchar2(1) default 'N']';
+  execute immediate 'create table SPARAM_LIST 
+( SPID            NUMBER(38), 
+  NAME            VARCHAR2(30), 
+  SEMANTIC        VARCHAR2(60), 
+  TABNAME         VARCHAR2(30), 
+  TYPE            CHAR(1), 
+  NSINAME         VARCHAR2(60), 
+  INUSE           NUMBER(1), 
+  PKNAME          VARCHAR2(60), 
+  DELONNULL       NUMBER(1,0), 
+  NSISQLWHERE     VARCHAR2(250), 
+  SQLCONDITION    VARCHAR2(250), 
+  TAG             VARCHAR2(8), 
+  TABCOLUMN_CHECK VARCHAR2(30), 
+  CODE            VARCHAR2(30) default ''OTHERS'', 
+  HIST            NUMBER(1), 
+  MAX_CHAR        NUMBER(10), 
+  BRANCH          varchar2(30) default sys_context(''BARS_CONTEXT'',''USER_BRANCH''),
+  DEF_FLAG        varchar2(1)  default ''N'',
+  EDITABLE        number(1)    default 1
+) tablespace BRSSMLD';
 exception
-	when others then
-		if sqlcode = -1430 then null; else raise; end if;
+  when others then
+    if sqlcode=-955 then null; else raise; end if; 
 end;
 /
 
+prompt -- ======================================================
+prompt -- Alters
+prompt -- ======================================================
+
+prompt *** add column DEF_FLAG ***
+
+declare
+  e_col_exists           exception;
+  pragma exception_init( e_col_exists, -01430 );
+begin
+  execute immediate q'[alter table SPARAM_LIST add DEF_FLAG varchar2(1) default 'N']';
+  dbms_output.put_line( 'Table altered.' );
+exception
+  when e_col_exists
+  then null;
+end;
+/
+
+prompt *** add column EDITABLE ***
+
+declare
+  e_col_exists           exception;
+  pragma exception_init( e_col_exists, -01430 );
+begin
+  execute immediate q'[alter table SPARAM_LIST add EDITABLE number(1) default 1]';
+  dbms_output.put_line( 'Table altered.' );
+exception
+  when e_col_exists
+  then null;
+end;
+/
 
 PROMPT *** ALTER_POLICIES to SPARAM_LIST ***
- exec bpa.alter_policies('SPARAM_LIST');
+exec bpa.alter_policies('SPARAM_LIST');
 
+prompt -- ======================================================
+prompt -- Comments
+prompt -- ======================================================
 
-COMMENT ON TABLE BARS.SPARAM_LIST IS 'Таблица описания спецпараметров счета в системе';
-COMMENT ON COLUMN BARS.SPARAM_LIST.SPID IS 'Идентификатор Параметра';
-COMMENT ON COLUMN BARS.SPARAM_LIST.NAME IS 'Наименование';
-COMMENT ON COLUMN BARS.SPARAM_LIST.SEMANTIC IS 'Описание';
-COMMENT ON COLUMN BARS.SPARAM_LIST.TABNAME IS 'Имя таблицы хранилища параметра';
-COMMENT ON COLUMN BARS.SPARAM_LIST.TYPE IS 'Тип параметра';
-COMMENT ON COLUMN BARS.SPARAM_LIST.NSINAME IS 'Имя таблицы справочника';
-COMMENT ON COLUMN BARS.SPARAM_LIST.INUSE IS 'В использовании';
-COMMENT ON COLUMN BARS.SPARAM_LIST.PKNAME IS 'Ключ';
-COMMENT ON COLUMN BARS.SPARAM_LIST.DELONNULL IS 'Флаг: удалять строку из справочника если значение спецпар-ра is null';
-COMMENT ON COLUMN BARS.SPARAM_LIST.NSISQLWHERE IS 'Условие фильтра для справочника';
-COMMENT ON COLUMN BARS.SPARAM_LIST.SQLCONDITION IS 'Условие для отбора параметра';
-COMMENT ON COLUMN BARS.SPARAM_LIST.TAG IS 'Наименование поля';
-COMMENT ON COLUMN BARS.SPARAM_LIST.TABCOLUMN_CHECK IS 'Контроль значения по полю';
-COMMENT ON COLUMN BARS.SPARAM_LIST.CODE IS '';
-COMMENT ON COLUMN BARS.SPARAM_LIST.HIST IS 'Признак: используется в историзированной таблице параметров';
-COMMENT ON COLUMN BARS.SPARAM_LIST.MAX_CHAR IS 'Max кол-во символов';
-COMMENT ON COLUMN BARS.SPARAM_LIST.BRANCH IS 'Hierarchical Branch Code';
-COMMENT ON COLUMN BARS.SPARAM_LIST.DEF_FLAG IS 'Признак установки значения по-умолчанию (acc_reg.set_default_sparams)';
+COMMENT ON TABLE  SPARAM_LIST IS 'Таблица описания спецпараметров счета в системе';
 
-
+COMMENT ON COLUMN SPARAM_LIST.SPID IS 'Идентификатор Параметра';
+COMMENT ON COLUMN SPARAM_LIST.NAME IS 'Наименование';
+COMMENT ON COLUMN SPARAM_LIST.SEMANTIC IS 'Описание';
+COMMENT ON COLUMN SPARAM_LIST.TABNAME IS 'Имя таблицы хранилища параметра';
+COMMENT ON COLUMN SPARAM_LIST.TYPE IS 'Тип параметра';
+COMMENT ON COLUMN SPARAM_LIST.NSINAME IS 'Имя таблицы справочника';
+COMMENT ON COLUMN SPARAM_LIST.INUSE IS 'В использовании';
+COMMENT ON COLUMN SPARAM_LIST.PKNAME IS 'Ключ';
+COMMENT ON COLUMN SPARAM_LIST.DELONNULL IS 'Флаг: удалять строку из справочника если значение спецпар-ра is null';
+COMMENT ON COLUMN SPARAM_LIST.NSISQLWHERE IS 'Условие фильтра для справочника';
+COMMENT ON COLUMN SPARAM_LIST.SQLCONDITION IS 'Условие для отбора параметра';
+COMMENT ON COLUMN SPARAM_LIST.TAG IS 'Наименование поля';
+COMMENT ON COLUMN SPARAM_LIST.TABCOLUMN_CHECK IS 'Контроль значения по полю';
+COMMENT ON COLUMN SPARAM_LIST.CODE IS '';
+COMMENT ON COLUMN SPARAM_LIST.HIST IS 'Признак: используется в историзированной таблице параметров';
+COMMENT ON COLUMN SPARAM_LIST.MAX_CHAR IS 'Max кол-во символов';
+COMMENT ON COLUMN SPARAM_LIST.BRANCH IS 'Hierarchical Branch Code';
+COMMENT ON COLUMN SPARAM_LIST.DEF_FLAG IS 'Признак установки значения по-умолчанию (acc_reg.set_default_sparams)';
+comment on column SPARAM_LIST.EDITABLE is 'Сan be edited by the user (1-Yes/0-No)';
 
 
 PROMPT *** Create  constraint CC_SPARAMLIST_TYPE ***
+
 begin   
  execute immediate '
   ALTER TABLE BARS.SPARAM_LIST ADD CONSTRAINT CC_SPARAMLIST_TYPE CHECK (type in (''S'',''N'',''D'')) ENABLE';
@@ -95,10 +110,44 @@ exception when others then
  end;
 /
 
+PROMPT *** Create constraint CC_SPARAMLIST_DELONNULL ***
 
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SPARAM_LIST ADD CONSTRAINT CC_SPARAMLIST_DELONNULL CHECK (delonnull in (0,1)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+PROMPT *** Create constraint CC_SPARAMLIST_INUSE ***
+
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SPARAM_LIST ADD CONSTRAINT CC_SPARAMLIST_INUSE CHECK (inuse in (0, 1)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+PROMPT *** Create constraint CC_SPARAMLIST_EDITABLE ***
+
+declare
+  E_CHK_CNSTRN_EXISTS exception;
+  pragma exception_init( E_CHK_CNSTRN_EXISTS, -02264 );
+begin
+  execute immediate q'[alter table SPARAM_LIST add constraint CC_SPARAMLIST_EDITABLE check ( EDITABLE in (0,1) )]';
+  dbms_output.put_line( 'Table altered.' );
+exception
+  when E_CHK_CNSTRN_EXISTS
+  then null;
+end;
+/
 
 
 PROMPT *** Create  constraint PK_SPARAMLIST ***
+
 begin   
  execute immediate '
   ALTER TABLE BARS.SPARAM_LIST ADD CONSTRAINT PK_SPARAMLIST PRIMARY KEY (SPID)
@@ -243,32 +292,6 @@ exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
-
-
-
-
-PROMPT *** Create  constraint CC_SPARAMLIST_DELONNULL ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SPARAM_LIST ADD CONSTRAINT CC_SPARAMLIST_DELONNULL CHECK (delonnull in (0,1)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SPARAMLIST_INUSE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SPARAM_LIST ADD CONSTRAINT CC_SPARAMLIST_INUSE CHECK (inuse in (0, 1)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
 
 
 PROMPT *** Create  index PK_SPARAMLIST ***
