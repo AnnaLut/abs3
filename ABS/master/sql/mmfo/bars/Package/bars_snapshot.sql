@@ -65,7 +65,7 @@ is
   --
   -- constants
   --
-  g_body_version          constant varchar2(64)  := 'version 1.8  06.02.2018';
+  g_body_version          constant varchar2(64)  := 'version 1.9  12.04.2018';
 
   --
   -- types
@@ -375,11 +375,10 @@ is
   %param p_snapshot_dt - 
   %param p_auto_daily  - 
 
-  %version 1.0
+  %version 1.1
   %usage   створенн€ м≥с€чних зн≥мк≥в балансу.
   */
-    -- ћ≥с€чн≥ драпси Ver: 5.7  12/02/2016
-    title       constant   varchar2(60) := $$PLSQL_UNIT||'.CREATE_MONTHLY_SNAPSHOT';
+    title       constant   varchar2(64) := $$PLSQL_UNIT||'.CREATE_MONTHLY_SNAPSHOT';
     dat0_                  DATE; -- останн≥й банк≥вський день зв≥тного м≥с€ц€
     dat1_                  DATE; -- перший   календарний день зв≥тного м≥с€ц€
     dat2_                  DATE; -- останн≥й календарний день зв≥тного м≥с€ц€
@@ -450,7 +449,8 @@ is
       select max(FDAT)
         into dat0_
         from SNAP_BALANCES
-       where FDAT between dat1_ and dat2_;
+       where FDAT between dat1_ and dat2_
+         and KF = l_kf;
 
       IF ( dat0_ Is Null )
       THEN
@@ -469,30 +469,36 @@ is
 
       dbms_application_info.set_client_info( '‘ормуванн€ м≥с€чного зн≥мку балансу за ' || F_MONTH_LIT(dat1_,1,2) || 'м≥с.' );
 
-      execute immediate 'TRUNCATE TABLE AGG_MONBALS_EXCHANGE';
+      execute immediate 'truncate table AGG_MONBALS_EXCHANGE';
 
       -- ‘≥ксуЇмо SCN на €кому формуЇмо зн≥мок балансу по табл. SALDOZ
       BARS_UTL_SNAPSHOT.SET_TABLE_SCN( 'SALDOZ', dat1_, l_kf, dbms_flashback.get_system_change_number() );
 
       insert /*+ APPEND */
         into AGG_MONBALS_EXCHANGE
-           ( FDAT, KF, ACC, RNK, OST, OSTQ, DOS, KOS, DOSQ, KOSQ,
-             CRDOS, CRKOS, CRDOSQ, CRKOSQ, CUDOS, CUKOS, CUDOSQ, CUKOSQ )
-      select dat1_,                 NVL(b.KF,z.KF) as KF,
-             NVL(b.ACC, z.ACC) acc, NVL(b.RNK,  1) as RNK,
-             NVL(b.OST,  0) ost,    NVL(b.OSTQ, 0) as OSTQ,
-             NVL(b.DOS,  0) dos,    NVL(b.KOS,  0) as KOS,
-             NVL(b.DOSQ, 0) dosq,   NVL(b.KOSQ, 0) as KOSQ,
-             NVL(z.RDOS, 0) crdos,  NVL(z.RKOS, 0) as CRKOS,
-             NVL(z.RDOSQ,0) crdosq, NVL(z.RKOSQ,0) as CRKOSQ,
-             NVL(z.UDOS, 0) cudos,  NVL(z.UKOS, 0) as CUKOS,
-             NVL(z.UDOSQ,0) cudosq, NVL(z.UKOSQ,0) as CUKOSQ
+           ( FDAT, KF, ACC, RNK, OST, OSTQ
+           , DOS,    DOSQ,       KOS,    KOSQ
+           , CRDOS,  CRDOSQ,     CRKOS,  CRKOSQ
+           , CUDOS,  CUDOSQ,     CUKOS,  CUKOSQ
+           , YR_DOS, YR_DOS_UAH, YR_KOS, YR_KOS_UAH 
+           )
+      select dat1_,                   NVL(b.KF,z.KF) as KF
+           , NVL(b.ACC, z.ACC) ACC,   NVL(b.RNK,  1) as RNK
+           , NVL(b.OST, 0) as OST,    NVL(b.OSTQ, 0) as OSTQ
+           , NVL(b.DOS, 0) as DOS,    NVL(b.DOSQ, 0) as DOSQ
+           , NVL(b.KOS, 0) as KOS,    NVL(b.KOSQ, 0) as KOSQ
+           , NVL(z.RDOS,0) as CRDOS,  NVL(z.RDOSQ,0) as CRDOSQ
+           , NVL(z.RKOS,0) as CRKOS,  NVL(z.RKOSQ,0) as CRKOSQ
+           , NVL(z.UDOS,0) as CUDOS,  NVL(z.UDOSQ,0) as CUDOSQ
+           , NVL(z.UKOS,0) as CUKOS,  NVL(z.UKOSQ,0) as CUKOSQ
+           , NVL(z.YDOS,0) as YR_DOS, NVL(z.YDOSQ,0) as YR_DOS_UAH
+           , NVL(z.YKOS,0) as YR_KOS, NVL(z.YKOSQ,0) as YR_KOS_UAH
         from ( select KF, ACC
                     , sum(decode(fdat, dat0_, ost,  0)) ost
                     , sum(decode(fdat, dat0_, ostq, 0)) ostq
                     , sum(dos) dos, sum(dosq) dosq
-                    , sum(kos) kos, sum(kosq) kosq,
-                      abs(max(decode(fdat, dat0_, rnk, -rnk))) rnk
+                    , sum(kos) kos, sum(kosq) kosq
+                    , abs(max(decode(fdat, dat0_, rnk, -rnk))) rnk
                  from SNAP_BALANCES
                 where FDAT between dat1_ and dat2_
                 group by KF, ACC
@@ -500,13 +506,24 @@ is
         full
         join ( select nvl(r.KF, u.KF ) as KF
                     , nvl(r.acc,u.acc) as ACC
-                    , r.dos as RDOS, r.dosq as RDOSQ
-                    , r.kos as RKOS, r.kosq as RKOSQ
-                    , u.dos as UDOS, u.dosq as UDOSQ
-                    , u.kos as UKOS, u.kosq as UKOSQ
-                 from ( select * from SALDOZ where FDAT = dat1_ ) r
+                    , r.dos    as RDOS, r.dosq    as RDOSQ
+                    , r.kos    as RKOS, r.kosq    as RKOSQ
+                    , u.dos    as UDOS, u.dosq    as UDOSQ
+                    , u.kos    as UKOS, u.kosq    as UKOSQ
+                    , u.DOS_YR as YDOS, u.DOSQ_YR as YDOSQ
+                    , u.KOS_YR as YKOS, u.KOSQ_YR as YKOSQ
+                 from ( select KF, ACC, DOS, DOSQ, KOS, KOSQ
+                          from SALDOZ
+                         where FDAT = dat1_ -- перший календарний день зв≥тного м≥с€ц€ 
+                           and KF   = l_kf
+                      ) r
                  full
-                 join ( select * from SALDOZ where FDAT = dat3_ ) u
+                 join ( select KF, ACC, DOS, DOSQ, KOS, KOSQ
+                             , DOS_YR, DOSQ_YR, KOS_YR, KOSQ_YR
+                          from SALDOZ
+                         where FDAT = dat3_ -- перший календарний день попереднього м≥с€ц€
+                           and KF   = l_kf
+                      ) u
                    on ( u.ACC = r.ACC )
              ) z
           on ( z.ACC = b.ACC );
