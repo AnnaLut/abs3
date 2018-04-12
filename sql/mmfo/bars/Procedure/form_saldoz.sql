@@ -1,59 +1,67 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/FORM_SALDOZ.sql =========*** Run *
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure FORM_SALDOZ ***
-
-  CREATE OR REPLACE PROCEDURE BARS.FORM_SALDOZ 
+CREATE OR REPLACE PROCEDURE BARS.FORM_SALDOZ
 ( z_dat31 DATE
 , p_acc   number default null
 ) IS
--- ѕеренакопиченн€ виправних оборот≥в за зв≥тну дату
--- $Ver: 0.0.21716 2017-04-12 09:35:54Z% $
+  /**
+  <b>FORM_SALDOZ</b> - перенакопиченн€ коригуючих оборот≥в за зв≥тну дату
+  %param p_dat31 - 
+  %param p_acc   - 
+  
+  %version 3.0
+  %usage   перенакопиченн€ м≥с€чних виправних оборот≥в.
+  */
   l_dat    DATE := trunc( z_dat31, 'MM' ); -- 1e число зв≥тного м≥с€ц€
 -- ≤нтервал накопиченн€:
   l_dat0   DATE := add_months( l_dat, 1 );
   l_dat1   DATE := last_day(l_dat0);
 BEGIN
   
-  bars_audit.info('FORM_SALDOZ START:'||to_char(l_dat,'dd/mm/yyyy')||' по '||to_char(z_dat31,'dd/mm/yyyy'));
-  bars_audit.info('FORM_SALDOZ обороти:'||to_char(l_dat0,'dd/mm/yyyy')||' < '||to_char(l_dat1,'dd/mm/yyyy')); 
-    
-  if p_acc is null 
+  bars_audit.info( $$PLSQL_UNIT||': Start '  ||to_char(l_dat, 'dd/mm/yyyy')||' по '||to_char(z_dat31,'dd/mm/yyyy') );
+  bars_audit.info( $$PLSQL_UNIT||': обороти '||to_char(l_dat0,'dd/mm/yyyy')||' < ' ||to_char(l_dat1, 'dd/mm/yyyy') ); 
+  
+  if ( p_acc is null )
   then
       
-    bars_audit.info('FORM_SALDOZ -- all accounts --'); 
+    bars_audit.info( $$PLSQL_UNIT||': for all accounts.' ); 
 
-    DELETE FROM saldoz WHERE fdat = l_dat;
+    delete SALDOZ
+     where FDAT = l_dat;
     
-    INSERT INTO saldoz ( KF, FDAT, ACC, DOS, KOS, DOSQ, KOSQ )
-    SELECT o.KF, l_dat, o.ACC,
-           SUM (DECODE (o.dk, 0, o.s, 0)) dos,
-           SUM (DECODE (o.dk, 1, o.s, 0)) kos,
-           SUM (DECODE (o.dk, 0, o.sq, 0)) dosq,
-           SUM (DECODE (o.dk, 1, o.sq, 0)) kosq
-      FROM opldok o
-      join oper d
+    insert 
+      into SALDOZ
+         ( KF, FDAT, ACC, DOS, DOSQ, KOS, KOSQ, DOS_YR, DOSQ_YR, KOS_YR, KOSQ_YR )
+    select /*+ FULL( o ) */ o.KF, l_dat, o.ACC
+         , sum( case when ( o.DK = 0 and d.VOB = 96 ) then o.S  else 0 end ) as DOS
+         , sum( case when ( o.DK = 0 and d.VOB = 96 ) then o.SQ else 0 end ) as DOSQ
+         , sum( case when ( o.DK = 1 and d.VOB = 96 ) then o.S  else 0 end ) as KOS
+         , sum( case when ( o.DK = 1 and d.VOB = 96 ) then o.SQ else 0 end ) as KOSQ
+         , sum( case when ( o.DK = 0 and d.VOB = 99 ) then o.S  else 0 end ) as DOS_YR
+         , sum( case when ( o.DK = 0 and d.VOB = 99 ) then o.SQ else 0 end ) as DOSQ_YR
+         , sum( case when ( o.DK = 1 and d.VOB = 99 ) then o.S  else 0 end ) as KOS_YR
+         , sum( case when ( o.DK = 1 and d.VOB = 99 ) then o.SQ else 0 end ) as KOSQ_YR
+      from OPLDOK o
+      join OPER   d
         on ( d.KF = o.KF and d.REF = o.REF )
-     WHERE o.FDAT between l_dat0 AND l_dat1
---     and o.kf = '300465'
-       AND o.sos = 5
+     where o.FDAT between l_dat0 AND l_dat1
+       and o.SOS  = 5
        and d.VDAT = z_dat31 
-       and d.VOB = 96
-     GROUP BY o.KF, o.ACC;
+       and d.VOB  = any ( 96, 99 )
+     group BY o.KF, o.ACC;
     
     insert
-      into SALDOZ ( KF, FDAT, ACC, DOS, KOS, DOSQ, KOSQ ) 
+      into SALDOZ
+         ( KF, FDAT, ACC, DOS, DOSQ, KOS, KOSQ, DOS_YR, DOSQ_YR, KOS_YR, KOSQ_YR )
     select s.KF, s.FDAT, a.ACCC
-         , sum(s.DOS)  as DOS
-         , sum(s.KOS)  as KOS
-         , sum(s.DOSQ) as DOSQ
-         , sum(s.KOSQ) as KOSQ  
-      from saldoz s
-      join accounts a
+         , sum(s.DOS    ) as DOS
+         , sum(s.DOSQ   ) as DOSQ
+         , sum(s.KOS    ) as KOS
+         , sum(s.KOSQ   ) as KOSQ
+         , sum(s.DOS_YR ) as DOS_YR
+         , sum(s.DOSQ_YR) as DOSQ_YR
+         , sum(s.KOS_YR ) as KOS_YR
+         , sum(s.KOSQ_YR) as KOSQ_YR
+      from SALDOZ   s
+      join ACCOUNTS a
         on ( a.KF = s.KF and a.ACC = s.ACC )
      WHERE s.FDAT = l_dat
        and a.NBS Is Null
@@ -61,40 +69,41 @@ BEGIN
      
   else
     
-    bars_audit.info('FORM_SALDOZ -- acc = '||p_acc||' --' ); 
+    bars_audit.info( $$PLSQL_UNIT||': for acc = '||to_char(p_acc) ); 
     
-    DELETE FROM saldoz WHERE fdat = l_dat and acc = p_acc;
+    delete SALDOZ
+     where FDAT = l_dat
+       and ACC  = p_acc;
     
-    INSERT INTO saldoz (acc, fdat,dos,kos,dosq,kosq)
-    SELECT acc, l_dat,
-           SUM(DECODE( dk, 0, s,  0 )) dos,
-           SUM(DECODE( dk, 1, s,  0 )) kos,
-           SUM(DECODE( dk, 0, sq, 0 )) dosq,
-           SUM(DECODE( dk, 1, sq, 0 )) kosq
-      FROM OPLDOK o
-     WHERE o.FDAT between l_dat0 AND l_dat1 
-       AND o.SOS = 5
-       and o.ACC = p_acc
-       AND EXISTS ( SELECT 1 FROM oper
-                     WHERE vob = 96
-                       AND REF = o.REF
-                       AND ( (vdat >= l_dat AND vdat<=z_dat31) OR vdat=to_date('01012017','ddmmyyyy') )
-                  )
-     GROUP BY acc;
+    insert
+      into SALDOZ
+         ( KF, FDAT, ACC, DOS, DOSQ, KOS, KOSQ, DOS_YR, DOSQ_YR, KOS_YR, KOSQ_YR )
+    select o.KF, l_dat, o.ACC
+         , sum( case when ( o.DK = 0 and d.VOB = 96 ) then o.S  else 0 end ) as DOS
+         , sum( case when ( o.DK = 0 and d.VOB = 96 ) then o.SQ else 0 end ) as DOSQ
+         , sum( case when ( o.DK = 1 and d.VOB = 96 ) then o.S  else 0 end ) as KOS
+         , sum( case when ( o.DK = 1 and d.VOB = 96 ) then o.SQ else 0 end ) as KOSQ
+         , sum( case when ( o.DK = 0 and d.VOB = 99 ) then o.S  else 0 end ) as DOS_YR
+         , sum( case when ( o.DK = 0 and d.VOB = 99 ) then o.SQ else 0 end ) as DOSQ_YR
+         , sum( case when ( o.DK = 1 and d.VOB = 99 ) then o.S  else 0 end ) as KOS_YR
+         , sum( case when ( o.DK = 1 and d.VOB = 99 ) then o.SQ else 0 end ) as KOSQ_YR
+      from OPLDOK o
+      join OPER   d
+        on ( d.KF = o.KF and d.REF = o.REF )
+     where o.FDAT between l_dat0 AND l_dat1
+       and o.SOS  = 5
+       and o.ACC  = p_acc
+       and d.VDAT = z_dat31 
+       and d.VOB  = any ( 96, 99 )
+     group BY o.KF, o.ACC;
     
   end if;
-  
-  bars_audit.info( 'FORM_SALDOZ: Finish: сформовано '||to_char(sql%rowcount)||' запис≥в.' );
-   
-END;
+
+  bars_audit.info( $$PLSQL_UNIT||': Finish (сформовано '||to_char(sql%rowcount)||' запис≥в).' );
+
+END FORM_SALDOZ;
 /
-show err;
 
-PROMPT *** Create  grants  FORM_SALDOZ ***
-grant EXECUTE                                                                on FORM_SALDOZ     to BARS_ACCESS_DEFROLE;
+show err
 
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/FORM_SALDOZ.sql =========*** End *
-PROMPT ===================================================================================== 
+grant execute on FORM_SALDOZ to BARS_ACCESS_DEFROLE;
