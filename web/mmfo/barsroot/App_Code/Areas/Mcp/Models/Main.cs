@@ -13,7 +13,7 @@ namespace Areas.Mcp.Models
         public decimal? BALANCE_2909 { get; set; }
         public decimal? BALANCE_2560 { get; set; }
         public DateTime? LAST_BALANCE_REQ { get; set; }
-        public string FACT_PAYMENT_DATE { get; set; }
+        public DateTime? FACT_PAYMENT_DATE { get; set; }
         public string FACT_PAYMENT_SUM { get; set; }
         public string RETURN_PAYMENT_SUM { get; set; }
         public string FILE_BANK_NUM { get; set; }

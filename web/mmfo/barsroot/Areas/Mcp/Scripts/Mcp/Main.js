@@ -269,7 +269,7 @@ mainApp.controller("McpCtrl", function ($controller, $scope, $http, $timeout, ke
                         BALANCE_2909: { type: 'number' },
                         BALANCE_2560: { type: 'number' },
                         LAST_BALANCE_REQ: { type: 'date' },
-                        FACT_PAYMENT_DATE: { type: 'string' },
+                        FACT_PAYMENT_DATE: { type: 'date' },
                         FACT_PAYMENT_SUM: { type: 'string' },
                         RETURN_PAYMENT_SUM: { type: 'string' },
                         FILE_BANK_NUM: { type: 'string' },
