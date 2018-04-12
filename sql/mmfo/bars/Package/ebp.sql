@@ -9,7 +9,7 @@ IS
   --
   -- пакет процедур для роботи Еталонного Бізнес Процесу (ЕБП) Ощадбанк
   --
-  g_header_version  CONSTANT  VARCHAR2(64)  := 'version 1.15  17.05.2017';
+  g_header_version  CONSTANT  VARCHAR2(64)  := 'version 1.16  12.04.2018';
   g_awk_header_defs CONSTANT  VARCHAR2(512) := '';
 
   REQUEST_ALLOWED   CONSTANT  number(1)     :=  1;
@@ -280,6 +280,7 @@ IS
     l_branch       branch.branch%type;
     type t_reqlist is table of cust_req_access%rowtype;
     l_req_access   t_reqlist;
+	l_iscrm      varchar2(1) := nvl(sys_context('CLIENTCONTEXT','ISCRM'), '0');
   begin
 
     l_bdate := gl.bdate;
@@ -295,7 +296,13 @@ IS
     Then -- Запит на доступ до ДЕПОЗИТУ
 
       select null, -- REQ_ID
-             to_number(ContractID),
+             case to_number(l_iscrm)
+                  when 1 then
+                      to_number(bars_sqnc.rukey(ContractID))
+                  else
+                      to_number(ContractID)
+                  end as ContractID,
+             to_number(Amount,'FM999999990D0099'),
              to_number(Amount,'FM999999990D0099'),
              Flags
         bulk collect
