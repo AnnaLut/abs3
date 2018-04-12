@@ -693,13 +693,14 @@ is
   --
   -- глобальные переменные и константы
   -- 
-  g_body_version  constant varchar2(64)          := 'version 44.18  30.03.2018';
+  g_body_version  constant varchar2(64)          := 'version 44.19  12.04.2018';
   
   modcode         constant varchar2(3)           := 'DPU';
   accispparam     constant varchar2(16)          := 'DPU_ISP';
   accgrpparam     constant varchar2(16)          := 'DPU_GRP';
   dpavid          constant accounts.vid%type     := 4;  -- депозитный счет
   dptop_tag       constant op_field.tag%type     := 'DPTOP';
+  c_baseval       constant number(3)             := GL.BASEVAL;
   c_naticur_vob   constant vob.vob%type          := 6;  -- вид документа "мемориальный ордер" 
   c_frgncur_vob   constant vob.vob%type          := 46; -- вид документа "валютный мемориальный ордер" 
   c_multcur_vob   constant vob.vob%type          := 16; -- вид документа "разновалютный мемориальный ордер" 
@@ -3963,7 +3964,6 @@ function get_tt (p_operid in number,          -- тип операции из спр-ка dpt_op
   return tts.tt%type
 is
   c_title   constant varchar2(60)   := 'dpu.gett:';
-  c_baseval constant oper.kv%type   := gl.baseval;
   c_ourmfo  constant oper.mfob%type := gl.amfo;
   l_fli     tts.fli%type;
   l_tt      tts.tt%type;
@@ -4327,7 +4327,6 @@ function get_vob (p_tt  in oper.tt%type,
 return oper.vob%type
 is
   c_title   constant varchar2(60)   := 'dpu.getvob:'; 
-  c_baseval constant tabval.kv%type := gl.baseval;
   l_vob     oper.vob%type;
 begin
   
@@ -4942,7 +4941,6 @@ procedure get_penalty_ex
 ) is
   -- constants
   c_title     constant varchar2(64)     := 'dpu.getpenalty:';
-  c_baseval   constant tabval.kv%type   := gl.baseval;
   c_getintid  constant int_accn.id%type := 1;
   c_addintid  constant int_accn.id%type := 3;
   -- types
@@ -6648,15 +6646,19 @@ $then
     l_rec_B := l_rec_B8;
   end if;
 $end
-  
-  -- якщо мультивалютна
+
   if ( l_rec_A.acc_cur != l_rec_B.acc_cur )
-  then
-    l_vob  := 16;
-  else  
-    l_vob  :=  6;
+  then -- мультивалютна
+    l_vob := c_multcur_vob;
+  else -- моновалютна
+    if ( l_rec_A.acc_cur = c_baseval )
+    then -- нацвалюта
+      l_vob := c_naticur_vob;
+    else -- інвалюта
+      l_vob := c_frgncur_vob;
+    end if;
   end if;
-  
+
   begin
     gl.ref(l_ref);
     gl.in_doc3 (ref_    => l_ref,                           mfoa_   => gl.amfo,
