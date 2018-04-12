@@ -1,16 +1,19 @@
-﻿using BarsWeb.Areas.Cdm.Models.Transport;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using BarsWeb.Areas.Kernel.Infrastructure.DI.Implementation;
-using BarsWeb.Core.Logger;
-using Newtonsoft.Json;
+﻿using BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Abstract;
+using BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation;
+using BarsWeb.Areas.Cdm.Models.Transport;
 using BarsWeb.Areas.Cdm.Models.Transport.Individual;
 using BarsWeb.Areas.Cdm.Models.Transport.Legal;
 using BarsWeb.Areas.Cdm.Models.Transport.PrivateEn;
 using BarsWeb.Areas.Cdm.Utils;
-using BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation;
+using BarsWeb.Areas.Kernel.Infrastructure.DI.Implementation;
+using BarsWeb.Core.Infrastructure;
+using Newtonsoft.Json;
+using Ninject;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Web.Http;
 
 namespace clientregister
 {
@@ -22,6 +25,16 @@ namespace clientregister
     {
 
         readonly ClientAdditionalUtil _clientAdditionalUtil =  new ClientAdditionalUtil();
+
+        public IEbkFindRepository repo
+        {
+            get
+            {
+                var ninjectKernel = (INinjectDependencyResolver)GlobalConfiguration.Configuration.DependencyResolver;
+                var kernel = ninjectKernel.GetKernel();
+                return kernel.Get<IEbkFindRepository>();
+            }
+        }
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
@@ -107,21 +120,33 @@ namespace clientregister
                     try
                     {
                         var ebkClientRnk = Request.Params.Get("rnk");
-                        var repo = new EbkFindRepository(DbLoggerConstruct.NewDbLogger());
-                        var client = repo.RequestEbkClient(param).FirstOrDefault(c => (c.ClientCard != null && c.ClientCard.Rnk == Convert.ToDecimal(ebkClientRnk) || c.ClientPrivateEnCard != null && c.ClientPrivateEnCard.Rnk == Convert.ToDecimal(ebkClientRnk) || c.ClientLegalCard != null && c.ClientLegalCard.Rnk == Convert.ToDecimal(ebkClientRnk)));
-                        if (client != null)
+                        ErrorMessage errorMsg=new ErrorMessage();
+                        QualityClientsContainer[] qualityClientsContainers = repo.RequestEbkClient(param, errorMsg);
+                        if (!string.IsNullOrEmpty(errorMsg.Message))
                         {
-                            if (client.ClientCard != null)
+                            throw new Exception(message:errorMsg.Message);
+                        }
+                        {
+                            var client = qualityClientsContainers.FirstOrDefault(c =>
+                                (c.ClientCard != null && c.ClientCard.Rnk == Convert.ToDecimal(ebkClientRnk) ||
+                                 c.ClientPrivateEnCard != null &&
+                                 c.ClientPrivateEnCard.Rnk == Convert.ToDecimal(ebkClientRnk) ||
+                                 c.ClientLegalCard != null &&
+                                 c.ClientLegalCard.Rnk == Convert.ToDecimal(ebkClientRnk)));
+                            if (client != null)
                             {
-                                SetEbkClientParamToClient(client.ClientCard, MyClient);
-                            }
-                            else if (client.ClientPrivateEnCard != null)
-                            {
-                                SetEbkClientPeParamToClient(client.ClientPrivateEnCard, MyClient);
-                            }
-                            else if (client.ClientLegalCard != null)
-                            {
-                                SetEbkClientLpParamToClient(client.ClientLegalCard, MyClient);
+                                if (client.ClientCard != null)
+                                {
+                                    SetEbkClientParamToClient(client.ClientCard, MyClient);
+                                }
+                                else if (client.ClientPrivateEnCard != null)
+                                {
+                                    SetEbkClientPeParamToClient(client.ClientPrivateEnCard, MyClient);
+                                }
+                                else if (client.ClientLegalCard != null)
+                                {
+                                    SetEbkClientLpParamToClient(client.ClientLegalCard, MyClient);
+                                }
                             }
                         }
                     }
