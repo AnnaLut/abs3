@@ -36,18 +36,18 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
         private ICorp2RelatedCustomersRepository _corp2RelatedCustomers;
         private readonly string corp2ExMessage = "Виникла помилка під час запросу до сервісу Corp2. Зверніться до адміністратора.";
         private readonly string corpLightExMessage = "Виникла помилка під час запросу до сервісу CorpLight. Зверніться до адміністратора.";
-        //private readonly IDbLogger _logger;
+        private readonly IDbLogger _logger;
 
         public C2RelatedCustomersController(
             ICLRelatedCustomersRepository relaredCustRepository,
             ICorp2RelatedCustomerValidator corp2RelatedCustomerValidator,
             ICorp2RelatedCustomersRepository corp2RelatedCustomers
-            /*,IDbLogger logger*/)
+            ,IDbLogger logger)
         {
             _clrelaredCustRepository = relaredCustRepository;
             _corp2RelatedCustomerValidator = corp2RelatedCustomerValidator;
             _corp2RelatedCustomers = corp2RelatedCustomers;
-            //_logger = logger;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -74,9 +74,9 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
                         }
                     }
                 }
-                decimal dataCount = _corp2RelatedCustomers.CountGlobal(request, sql);
+                //decimal dataCount = _corp2RelatedCustomers.CountGlobal(request, sql);
 
-                return Request.CreateResponse(HttpStatusCode.OK, new { Data = data, Total = dataCount });
+                return Request.CreateResponse(HttpStatusCode.OK, data.ToDataSourceResult(request));
             }
             catch (Exception ex)
             {
@@ -121,9 +121,9 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
             {
                 BarsSql sql = SqlCreator.SelectCorp2CustomerAccounts(custId);
                 var data = _corp2RelatedCustomers.ExecuteStoreQuery<Corp2CustomerAccount>(sql).ToList();
-                decimal dataCount = _corp2RelatedCustomers.CountGlobal(request, sql);
+                //decimal dataCount = _corp2RelatedCustomers.CountGlobal(request, sql);
 
-                return Request.CreateResponse(HttpStatusCode.OK, new { Data = data, Total = dataCount });
+                return Request.CreateResponse(HttpStatusCode.OK, data.ToDataSourceResult(request));
             }
             catch (Exception ex)
             {
@@ -196,11 +196,15 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
                 BankingUser userCorpLight = null;
                 try
                 {
-                    userCorpLight = _clrelaredCustRepository.GetExistUsers().Where(bu => bu.TaxCode == taxCode).FirstOrDefault();
+                    var clUsers = _clrelaredCustRepository.GetExistUsers();
+                    if (clUsers != null) userCorpLight = clUsers.Where(bu => bu.TaxCode == taxCode).FirstOrDefault();
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception(corpLightExMessage + Environment.NewLine + ex.Message);
+                    var erNumber = _logger.Exception(ex);
+                    return Request.CreateResponse(HttpStatusCode.OK, 
+                        new { error = string.Format("{0}<br> Запис в sec_audit №{1} від {2}", corpLightExMessage, erNumber, DateTime.Now ) });
+                    //throw new Exception(corpLightExMessage + Environment.NewLine + ex.Message);
                 }
                 if (userCorpLight != null)
                 {
@@ -235,7 +239,7 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
             try
             {
                 if (_corp2RelatedCustomerValidator.IsExistByParameters(
-                    relatedCustomer.TaxCode, relatedCustomer.CellPhone, relatedCustomer.Email))
+                    relatedCustomer.TaxCode, /*relatedCustomer.CellPhone, */relatedCustomer.Email))
                 {
                     return Request.CreateResponse(
                         HttpStatusCode.BadRequest,
@@ -313,18 +317,18 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
         }
         [HttpGet]
         [GET("api/cdo/corp2/getaccvisacounts")]
-        public HttpResponseMessage GetCustomerAccountVisaCounts([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request, decimal? accId)
+        public HttpResponseMessage GetCustomerAccountVisaCounts(/*[ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request, */decimal? accId)
         {
             try
             {
                 BarsSql sql = SqlCreator.SelectCustomerAccountVisaCounts((int)accId.Value);
                 var data = _corp2RelatedCustomers.ExecuteStoreQuery<CustAccVisaCount>(sql).ToList();
-                decimal dataCount = _corp2RelatedCustomers.CountGlobal(request, sql);
+                //decimal dataCount = _corp2RelatedCustomers.CountGlobal(request, sql);
                 if (null == data)
                 {
                     return Request.CreateResponse(HttpStatusCode.OK);
                 }
-                return Request.CreateResponse(HttpStatusCode.OK, new { Data = data, Total = dataCount });
+                return Request.CreateResponse(HttpStatusCode.OK, new { Data = data });
             }
             catch (Exception ex)
             {
@@ -428,14 +432,14 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
         }
         [HttpGet]
         [GET("api/cdo/corp2/getavailablemodules")]
-        public HttpResponseMessage GetAvailableModules([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request, decimal? userId)
+        public HttpResponseMessage GetAvailableModules(/*[ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request, */decimal? userId)
         {
             BarsSql sql = SqlCreator.SelectAvailableModules(userId);
             try
             {
                 var data = _corp2RelatedCustomers.ExecuteStoreQuery<ModuleViewModel>(sql).ToList();
-                decimal dataCount = _corp2RelatedCustomers.CountGlobal(request, sql);
-                return Request.CreateResponse(HttpStatusCode.OK, new { Data = data, Total = dataCount });
+                //decimal dataCount = _corp2RelatedCustomers.CountGlobal(request, sql);
+                return Request.CreateResponse(HttpStatusCode.OK, new { Data = data });
             }
             catch (Exception ex)
             {
@@ -533,7 +537,7 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
         }
         [HttpGet]
         [GET("api/cdo/corp2/getcorp2useraccspermissions")]
-        public HttpResponseMessage GetCorp2UserAccsPermissions(/*[ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request, */decimal? custId, decimal? userId)
+        public HttpResponseMessage GetCorp2UserAccsPermissions([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request, decimal? custId, decimal? userId)
         {
             try
             {
@@ -541,7 +545,7 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
                 var data = _corp2RelatedCustomers.SelectCorp2UserAccsPermissions(custId, userId);
                 //decimal dataCount = _corp2RelatedCustomers.CountGlobal(request, sql);
 
-                return Request.CreateResponse(HttpStatusCode.OK, new { Data = data/*, Total = dataCount*/ });
+                return Request.CreateResponse(HttpStatusCode.OK, data.ToDataSourceResult(request));
                 //return Request.CreateResponse(HttpStatusCode.OK, new { Data = relatedCustomers, Total = relatedCustomers.Count });
             }
             catch (Exception ex)

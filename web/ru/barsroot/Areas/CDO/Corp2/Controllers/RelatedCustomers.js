@@ -143,20 +143,28 @@ angular.module(globalSettings.modulesAreas)
                     function (response) {
                         bars.ui.loader(userForm, false);
                         if (response) {
-                            vm.currentUser = new RelatedCustomer();
-                            bars.ui.confirm({
-                                text: 'Користувач з ІПН ' + taxCode + ' вже існує. Бажаєте відкрити його дані?',
-                                func: function () {
-                                    vm.currentUser = response;
-                                    vm.currentUser.SignNumber = 0;
-                                    //Якщо знайшли не в АБС Корп2, то Id буде дорівнювати null -> vm.saveUser -> relatedCustomersService.create,
-                                    //де корисувач також буде прив'язаний до клієнта.
-                                    //Якщо знайшли в АБС Корп2, то -> relatedCustomersService.updateAndMap
-                                    vm.currentUser.isNotMaped = (response.Id && response.CustId != custId);
-                                    vm.currentUser.CustId = custId;
-                                    $scope.$apply();
-                                }
-                            });
+                            if (response.error) {
+                                bars.ui.error({
+                                    text: response.error +
+                                    "<br> <span style='color:red;'>Ви можете продовжити процедуру заведення користувача, але це може призвести до видачі ще одного ключа одному користувачу, який можливо вже є в системі CorpLight!<span>"
+                                });
+                            }
+                            else {
+                                vm.currentUser = new RelatedCustomer();
+                                bars.ui.confirm({
+                                    text: 'Користувач з ІПН ' + taxCode + ' вже існує. Бажаєте відкрити його дані?',
+                                    func: function () {
+                                        vm.currentUser = response;
+                                        vm.currentUser.SignNumber = 0;
+                                        //Якщо знайшли не в АБС Корп2, то Id буде дорівнювати null -> vm.saveUser -> relatedCustomersService.create,
+                                        //де корисувач також буде прив'язаний до клієнта.
+                                        //Якщо знайшли в АБС Корп2, то -> relatedCustomersService.updateAndMap
+                                        vm.currentUser.isNotMaped = (response.Id && response.CustId != custId);
+                                        vm.currentUser.CustId = custId;
+                                        $scope.$apply();
+                                    }
+                                });
+                            }
                         }
                     },
                     function (response) {
@@ -233,14 +241,14 @@ angular.module(globalSettings.modulesAreas)
                     return false;
                 }
 
-                if (!vm.currentUser.CellPhone) {
-                    bars.ui.error({ text: 'не заповнено телефон користувача' });
-                    return false;
-                }
+                //if (!vm.currentUser.CellPhone) {
+                //    bars.ui.error({ text: 'не заповнено телефон користувача' });
+                //    return false;
+                //}
 
-                var docNumber = vm.currentUser.DocNumber.toString();
-                while (docNumber.length < 6) docNumber = "0" + docNumber;
-                vm.currentUser.DocNumber = docNumber;
+                //var docNumber = vm.currentUser.DocNumber.toString();
+                //while (docNumber.length < 6) docNumber = "0" + docNumber;
+                //vm.currentUser.DocNumber = docNumber;
 
                 return true;
             }
@@ -834,22 +842,27 @@ angular.module(globalSettings.modulesAreas)
                 columns: [
                     {
                         title: ' ',
-                        width: '150px',
+                        width: '60px',
                         template: function (data) {
                             var html = '';
                             html += "<button class='btn btn-default' ng-click=\"showEditUserForm("
                                 + data.Id + ");\" title='Редагувати'><i class='fa fa-pencil fa-lg text-success'></i></button>";
+                            return html;
+                        },
+                        attributes: { "class": "cell-horiz-align-center" }
+                    }, {
+                        title: 'Статус в Corp2',
+                        width: '110px',
+                        template: function (data) {
+                            var html = '';
                             if (data.UserId && data.IsApproved) {
-                                //html += '<button class="btn btn-default" style="margin-left:5px; width:15px;" ng-click="' + ((data.LockoutEnabled ? 'unL' : 'l') + 'ockUser(\'' + data.UserId + '\')') + '" title="' + (data.LockoutEnabled ? 'Роз' : 'За') + 'блокувати">\
-                                //                <i style="font-size:18px;" class="fa fa-' + (data.LockoutEnabled ? 'un' : '') + 'lock text-warning"></i>\
-                                //            </button>';
-                                html += '<label style="margin-left:5px; width:15px; " class="text-' + (data.LockoutEnabled ? 'danger' : 'success')+ '">\
+                                html += '<label style="width:15px; " class="text-' + (data.LockoutEnabled ? 'danger' : 'success') + '">\
                                                 <i >' + (data.LockoutEnabled ? 'за' : 'роз') + 'блокований' + '</i>\
                                             </label>';
                             }
                             return html;
                         }
-                    }, {
+                    },{
                         title: 'ПІБ Користувача',
                         width: '280px',
                         template: function (data) {
@@ -967,6 +980,8 @@ angular.module(globalSettings.modulesAreas)
             $scope.viewUser = vm.viewUser = function (userId) {
                 vm.SignNumber = null;
                 vm.currentUser = vm.relCustsGridCorp2.dataSource.get(userId);
+                vm.custBirthDate.enable(false);
+                vm.custDocDate.enable(false);
                 vm.currentUser.isReadOnly = true;
                 vm.userDetailWindow.center().open();
             }
@@ -1120,7 +1135,7 @@ angular.module(globalSettings.modulesAreas)
                         template: function (data) {
                             var html = '';
                             if (data.IS_CORP2_ACC) {
-                                html += "<button class='btn btn-default' ng-click='openCustAccVisaSettingWindow(" + data.BANK_ACC + ", " + data.CORP2_ACC + ", " + data.KF + ", " + data.VISA_COUNT + ")' title='Перегляд/редагування'><i class='fa fa-pencil fa-lg' style='color:green;'></i></button>";
+                                html += "<button class='btn btn-default' ng-click='openCustAccVisaSettingWindow(" + data.NUM_ACC + ", " + data.BANK_ACC + ", " + data.CORP2_ACC + ", " + data.KF + ", " + data.VISA_COUNT + ")' title='Перегляд/редагування'><i class='fa fa-pencil fa-lg' style='color:green;'></i></button>";
                             }
                             return html;
                         },
@@ -1167,8 +1182,9 @@ angular.module(globalSettings.modulesAreas)
                     vm.currentCustomerAccount = null;
                 }
             }
-            $scope.openCustAccVisaSettingWindow = function openCustAccVisaSettingWindow(bankAccId, corp2AccId, kf, visaQty) {
+            $scope.openCustAccVisaSettingWindow = function openCustAccVisaSettingWindow(numAcc, bankAccId, corp2AccId, kf, visaQty) {
                 vm.currentCustomerAccount = {};
+                vm.currentCustomerAccount.NUM_ACC = numAcc;
                 vm.currentCustomerAccount.BANK_ACC = bankAccId;
                 vm.currentCustomerAccount.CORP2_ACC = corp2AccId;
                 vm.currentCustomerAccount.KF = kf;
@@ -1189,7 +1205,7 @@ angular.module(globalSettings.modulesAreas)
                     model: {
                         id: 'Id',
                         fields: {
-                            ACC_ID: { type: "number" },
+                            //ACC_ID: { type: "number" },
                             VISA_ID: { type: "number" },
                             COUNT: { type: "number" }
                         }
@@ -1207,14 +1223,14 @@ angular.module(globalSettings.modulesAreas)
                     }
                 ],
                 autoBind: false,
+                filterable: false,
+                sortable: false,
                 dataBound: function (e) {
                     $.each(e.sender._data, function (i, el) { el.CORP2_ACC_ID = vm.currentCustomerAccount.CORP2_ACC; });
                     bars.ext.kendo.grid.noDataRow(e);
                 },
                 columns: [
                     {
-                        filterable: false,
-                        sortable: false,
                         field: 'Edit',
                         title: 'Налаштування',
                         width: '65px',
@@ -1227,10 +1243,10 @@ angular.module(globalSettings.modulesAreas)
                             return html;
                         },
                         attributes: { "class": "cell-horiz-align-center" }
-                    }, {
-                        field: 'ACC_ID',
-                        title: 'Номер рахунку',
-                        width: '80px'
+                    //}, {
+                    //    field: 'ACC_ID',
+                    //    title: 'Номер рахунку',
+                    //    width: '80px'
                     }, {
                         field: 'VISA_ID',
                         title: 'Рівень візи',
@@ -1274,6 +1290,8 @@ angular.module(globalSettings.modulesAreas)
                 //Edit
                 if (rowId) {
                     vm.currentAccountVisa = vm.custAccVisaSettingGrid.dataSource.get(rowId);
+                    vm.currentAccountVisa.ACC_ID = vm.currentCustomerAccount.BANK_ACC;
+                    vm.currentAccountVisa.NUM_ACC = vm.currentCustomerAccount.NUM_ACC;
                     vm.currentAccountVisa.Old_VISA_ID = vm.currentAccountVisa.VISA_ID;
                     vm.currentAccountVisa.EditMode = true;
                 }
@@ -1281,6 +1299,7 @@ angular.module(globalSettings.modulesAreas)
                 else {
                     vm.currentAccountVisa = {
                         Id: 0,
+                        NUM_ACC: vm.currentCustomerAccount.NUM_ACC,
                         ACC_ID: vm.currentCustomerAccount.BANK_ACC,
                         CORP2_ACC_ID: vm.currentCustomerAccount.CORP2_ACC,
                         VISA_ID: 1,
@@ -1668,6 +1687,8 @@ angular.module(globalSettings.modulesAreas)
                 selectable: "multiple, row",
                 pageable: false,
                 autoBind: false,
+                filterable: false,
+                sortable: false,
                 columns: [{
                     field: 'Name',
                     title: 'Перелік виданих модулів',
@@ -1702,6 +1723,8 @@ angular.module(globalSettings.modulesAreas)
                     //total: 0
                 }),
                 //height: 50,
+                filterable: false,
+                sortable: false,
                 pageable: false,
                 editable: "popup",
                 selectable: "multiple, row",
@@ -1735,6 +1758,8 @@ angular.module(globalSettings.modulesAreas)
             vm.corp2_UserConnParamsWindow_userFuncsGridOptions = createGridOptions({
                 editable: "popup",
                 selectable: "multiple, row",
+                filterable: false,
+                sortable: false,
                 pageable: false,
                 //autoBind: false,
                 columns: [{
@@ -1746,6 +1771,8 @@ angular.module(globalSettings.modulesAreas)
             vm.corp2_UserConnParamsWindow_availableFuncsGridOptions = createGridOptions({
                 editable: "popup",
                 selectable: "multiple, row",
+                filterable: false,
+                sortable: false,
                 pageable: false,
                 //autoBind: false,
                 columns: [{

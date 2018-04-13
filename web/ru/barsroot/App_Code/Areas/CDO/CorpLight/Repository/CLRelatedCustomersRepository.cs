@@ -158,7 +158,9 @@ namespace BarsWeb.Areas.CDO.CorpLight.Repository
                 }
                 foreach (var item in result.Where(i => i.UserId != null))
                 {
-                    var clUser = clUsers.FirstOrDefault(i => i.Id == item.UserId);
+                    BankingUser clUser = null;
+                    if (clUsers != null)
+                        clUser = clUsers.FirstOrDefault(i => i.Id == item.UserId);
                     if (clUser != null)
                     {
                         //item.CellPhone = clUser.PhoneNumber;
@@ -450,23 +452,24 @@ namespace BarsWeb.Areas.CDO.CorpLight.Repository
         {
             try
             {
-                var user = _usersManage
-                    .GetAllUsers(relCust.CellPhone, relCust.Email)
-                    .FirstOrDefault();
+                var users = _usersManage
+                    .GetAllUsers(relCust.CellPhone, relCust.Email);
 
-                return user;
+                if (users != null)
+                    return users.FirstOrDefault();
             }
             catch (Exception ex)
             {
                 throw new Exception(corpLightExMessage + Environment.NewLine + ex.Message);
             }
+            return null;
         }
         public List<BankingUser> GetExistUsers()
         {
             try
             {
                 var users = _usersManage
-                    .GetAllUsers().ToList();
+                    .GetAllUsers();
 
                 return users;
             }
@@ -779,8 +782,11 @@ namespace BarsWeb.Areas.CDO.CorpLight.Repository
             var result = _entities.ExecuteStoreQuery<decimal>(sql, email).FirstOrDefault();
             try
             {
-                var IsClUsers = _usersManage.GetAllUsers().FirstOrDefault(x => x.Email == email);
-                return result > 0 || IsClUsers != null ? true : false;
+                var users = _usersManage.GetAllUsers();
+                BankingUser clUser = null;
+                if(users != null)
+                    clUser = users.FirstOrDefault(x => x.Email == email);
+                return result > 0 || clUser != null ? true : false;
             }
             catch (Exception ex)
             {
@@ -798,8 +804,11 @@ namespace BarsWeb.Areas.CDO.CorpLight.Repository
             var result = _entities.ExecuteStoreQuery<decimal>(sql, phone).FirstOrDefault();
             try
             {
-                var IsClUsers = _usersManage.GetAllUsers().FirstOrDefault(x => x.PhoneNumber == phone);
-                return result > 0 || IsClUsers != null ? true : false;
+                BankingUser clUser = null;
+                var users = _usersManage.GetAllUsers();
+                if(users != null)
+                    clUser = users.FirstOrDefault(x => x.PhoneNumber == phone);
+                return result > 0 || clUser != null ? true : false;
             }
             catch (Exception ex)
             {

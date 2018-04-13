@@ -54,7 +54,7 @@ namespace BarsWeb.Areas.CDO.Corp2.Services
         /// <param name="phoneNumber"></param>
         /// <param name="email"></param>
         /// <returns></returns>
-        public bool IsExistByParameters(string taxCode, string phoneNumber, string email)
+        public bool IsExistByParameters(string taxCode, /*string phoneNumber,*/ string email)
         {
             var sql = @"select 
                             count(1) 
@@ -62,9 +62,8 @@ namespace BarsWeb.Areas.CDO.Corp2.Services
                             corp2_REL_CUSTOMERS
                         where 
                             tax_code = :p_tax_code 
-                            or cell_phone = :p_cell_phone
-                            or email = :p_email";
-            var result = _entities.ExecuteStoreQuery<decimal>(sql, taxCode, phoneNumber, email).FirstOrDefault();
+                            or email = :p_email";//or cell_phone = :p_cell_phone
+            var result = _entities.ExecuteStoreQuery<decimal>(sql, taxCode, /*phoneNumber,*/ email).FirstOrDefault();
             if (result > 0)
             {
                 return true;
@@ -93,7 +92,7 @@ namespace BarsWeb.Areas.CDO.Corp2.Services
     public interface ICorp2RelatedCustomerValidator
     {
         bool CustomerIsMapped(decimal id, decimal custId);
-        bool IsExistByParameters(string taxCode, string phoneNumber, string email);
+        bool IsExistByParameters(string taxCode, /*string phoneNumber, */string email);
         bool IsExistAccountVisa(CustAccVisaCount visa);
     }
 }
