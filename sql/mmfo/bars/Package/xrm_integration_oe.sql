@@ -2809,6 +2809,7 @@ IS
    is
    begin
    begin
+    dbms_session.set_context('clientcontext','iscrm','1');
     ebp.CREATE_ACCESS_REQUEST
       ( p_type         =>  p_type,
         p_trustee      =>  bars_sqnc.rukey(p_trustee),
@@ -2824,6 +2825,7 @@ IS
              then bars_audit.error(title||'request failed with mess:' || sqlerrm);
                   p_errormessage := sqlerrm;
    end;
+    dbms_session.clear_context('clientcontext','iscrm');
    end;
 
 /*сформировать буфер из данных клиента и сохранить*/

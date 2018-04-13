@@ -303,7 +303,6 @@ IS
                       to_number(ContractID)
                   end as ContractID,
              to_number(Amount,'FM999999990D0099'),
-             to_number(Amount,'FM999999990D0099'),
              Flags
         bulk collect
         into l_req_access
