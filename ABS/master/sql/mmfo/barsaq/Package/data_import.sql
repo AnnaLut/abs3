@@ -251,6 +251,11 @@ CREATE OR REPLACE PACKAGE BARSAQ.data_import is
   --
   procedure sync_doc_export(p_startdate in date default trunc(sysdate-1));
 
+   ----
+  -- sync_doc_export - синхронизирует зависшие документы 
+  --  
+  procedure sync_doc_export_open;
+
   ----
   -- sync_doc_export_mod - синхронизирует документы (модифицированнная версия)
   --
@@ -451,13 +456,11 @@ CREATE OR REPLACE PACKAGE BARSAQ.data_import is
   -- sync_acctariffs - Синхронизация тарифов между схемами BANK -> CORE
   --
   procedure sync_acctariffs;
-  
 
 
 procedure sync_acc_transactions2_TEST(
     p_startdate in date    default null,
     p_scn       in number  default null);
-
 
   ----
   -- sync_acctariffs - синхронизация клиентов
@@ -2654,7 +2657,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     --
   end sync_acc_transactions2_TEST;
 
-  
+
   ----
   -- sync_acc_period_transactions2 - синхронизирует проводки в АБС для передачи в систему
   --
@@ -3314,6 +3317,8 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     );*/
     --
     -- точка отсчета
+    
+    
     if p_acc is null
     then -- по всем счетам до текущей точки
         l_scn := dbms_flashback.get_system_change_number();
@@ -3819,7 +3824,8 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     p_bank_back_reason        varchar2 default null,
     p_bank_back_reason_aux    varchar2 default null,
     p_bank_syserr_date        date     default null,
-    p_bank_syserr_msg         varchar2 default null)
+    p_bank_syserr_msg         varchar2 default null,
+    p_is_open                 number   default null)
   is
     l_local_tag raw(2000); l_remote_tag raw(2000);
   begin
@@ -3841,7 +3847,11 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         bank_syserr_msg         = p_bank_syserr_msg
     where doc_id=p_docid;
     -- модифицируем удаленную таблицу
-    rpc_sync.update_doc_export_status(p_docid);
+    if p_is_open = 1 then
+      rpc_sync.update_doc_export_status_open(p_docid);
+    else 
+      rpc_sync.update_doc_export_status(p_docid);
+    end if;
     --
     restore_tags(l_local_tag, l_remote_tag);
     --
@@ -3978,6 +3988,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     l_doc.s         := get_attr_number(l_body, 'DOC_SUM')*l_denom;
     -- назначение платежа
     l_doc.nazn      := substr(get_attr_varchar2(l_body, 'DOC_NARRATIVE'),1,160);
+    
     -- дата документа
     l_doc.datd      := get_attr_date(l_body, 'DOC_DATE');
     -- номер документа
@@ -5460,7 +5471,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
                                     pdat
                              from bars.oper p) o
                          where i.insertion_date >= p_startdate
-                       --  and o.status != e.status_id --заремлено, не прокидалися статуси в схему bank.
+                           and o.status != e.status_id
                            and i.ref is not null -- только документы АБС
                            and e.doc_id=to_number(i.ext_ref) and i.ref=o.ref
                          ) as of scn l_scn
@@ -5562,6 +5573,118 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     write_sync_status(TAB_DOC_EXPORT, JOB_STATUS_FAILED, null, SQLCODE, get_error_msg());
     --
   end sync_doc_export;
+  
+  ---
+  -- get_doc_export_old_state
+  --
+  procedure get_doc_export_old_state
+    is
+  begin
+    insert into tmp_old_state
+    select doc_id, status_id from ibank.v_doc_export_open t where t.status_id = 45;
+    logger.info('doc_export_old_state'||sql%rowcount);
+  end;
+  
+  ----
+  -- sync_doc_export_open - синхронизирует документы
+  --
+  procedure sync_doc_export_open is
+    l_local_tag raw(2000); l_remote_tag raw(2000);
+    l_change_time   date;
+    l_back_reason   varchar2(4000);
+    l_docid         integer;
+    l_scn           number;
+  begin
+    --
+    write_sync_status(TAB_DOC_EXPORT, JOB_STATUS_STARTED);
+    --
+    -- apply-процесс должен быть приостановлен на время ручной синхронизации
+    check_requirements(TAB_DOC_EXPORT);
+    --
+    begin
+        -- точка отката
+        savepoint sp;
+        -- точка отсчета
+        
+        --
+        replace_tags(l_local_tag, l_remote_tag);
+        --
+        -- инстанцируем таблицу схемы BARSAQ базы АБС БАРС в базе IBANK
+        rpc_sync.instantiate_alien_table(SYNC_SCHEMA||'.'||TAB_DOC_EXPORT, g_global_name, l_scn);
+        --
+        for c in (select kf from v_kf)
+        loop
+            -- устанавливаем точку синхронизации для удаленной таблицы на текущий момент
+            rpc_sync.manual_instantiate_now(TAB_DOC_EXPORT, c.kf);
+        end loop;
+        
+        -- загружаем зависшие статусы в временную таблицу
+        get_doc_export_old_state; 
+        
+     --   l_scn := dbms_flashback.get_system_change_number();
+        
+        -- идем по платежным документам
+        for c in (select i.ref, e.doc_id, tos.status_id, e.bank_ref,
+                       e.status_change_time, e.bank_accept_date, e.bank_back_date,
+                       o.status, o.change_time, o.back_reason, o.pdat
+                         from doc_import i, doc_export e, tmp_old_state tos,
+                            (select ref,case
+                                        when sos<0 then -20
+                                        when sos>=5 then 50
+                                        else 45
+                                        end as status,
+                                    (select value from bars.operw where ref=p.ref and tag='BACKR')
+                                    as back_reason,
+                                    (select change_time from bars.sos_track s
+                                     where old_sos<>new_sos and sos_tracker=
+                                        (select max(sos_tracker) from bars.sos_track
+                                         where ref=s.ref and new_sos=s.new_sos and old_sos<>new_sos)
+                                        and ref=p.ref and new_sos=p.sos
+                                    ) change_time,
+                                    pdat
+                             from bars.oper p) o
+                         where i.insertion_date between sysdate - 30 and sysdate - 2
+                           and o.status != tos.status_id
+                           and i.ref is not null -- только документы АБС
+                           and tos.doc_id=to_number(i.ext_ref) and i.ref=o.ref
+                           and e.doc_id = tos.doc_id)
+        loop
+            -- блокируем строку в doc_export
+            select doc_id into l_docid from doc_export where doc_id=c.doc_id for update nowait;
+            -- если нету истории изменений по oper.sos, то ставим время создания документа
+            l_change_time := nvl(c.change_time, c.pdat);
+            --
+            l_back_reason := nvl(c.back_reason, 'Причину сторнування не вказано');
+            --
+            set_status_info(
+                p_docid                   => c.doc_id,
+                p_statusid                => c.status,
+                p_status_change_time      => l_change_time,
+                p_bank_accept_date        => case when c.status=50 then l_change_time else null end,
+                p_bank_ref                => c.ref,
+                p_bank_back_date          => case when c.status<0 then l_change_time else null end,
+                p_bank_back_reason        => case when c.status<0 then l_back_reason else null end, 
+                p_is_open                 => 1
+                );
+            commit;
+        end loop;
+        -- идем по заявкам на покупку/продажу валюты
+    exception when others then
+        --
+        rollback to sp;
+        --
+        restore_tags(l_local_tag, l_remote_tag);
+        --
+        raise_application_error(-20000, get_error_msg());
+    end;
+    --
+    write_sync_status(TAB_DOC_EXPORT, JOB_STATUS_SUCCEEDED);
+    --
+  exception when others then
+    --
+    write_sync_status(TAB_DOC_EXPORT, JOB_STATUS_FAILED, null, SQLCODE, get_error_msg());
+    --
+  end sync_doc_export_open;
 
 
   ----
