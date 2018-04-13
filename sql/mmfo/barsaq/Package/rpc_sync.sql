@@ -182,6 +182,11 @@
   -- update_doc_export_status
   --
   procedure update_doc_export_status(p_docid in number);
+  
+  ----
+  -- update_doc_export_status_open
+  --
+  procedure update_doc_export_status_open(p_docid in number);
 
   ----
   -- extract_doc_export
@@ -839,7 +844,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.RPC_SYNC is
    using p_docid;
   end extract_doc_export_single;
 
-  ----
+ ----
   -- update_doc_export_status
   --
   procedure update_doc_export_status(p_docid in number)
@@ -858,6 +863,26 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.RPC_SYNC is
     where doc_id=:p_docid'
     using p_docid, p_docid;
   end update_doc_export_status;
+  
+  ----
+  -- update_doc_export_status
+  --
+  procedure update_doc_export_status_open(p_docid in number)
+  is
+  begin
+    execute immediate
+   'update ibank.v_doc_export_open d set
+       (status_id, status_change_time, bank_accept_date, bank_ref, bank_back_date,
+        bank_back_reason, bank_back_reason_aux, bank_syserr_date, bank_syserr_msg
+       ) =
+       (select nvl(status_id, d.status_id), status_change_time, nvl(bank_accept_date, d.bank_accept_date),
+               bank_ref, bank_back_date, bank_back_reason, bank_back_reason_aux, bank_syserr_date, bank_syserr_msg
+          from doc_export
+         where doc_id=:p_docid
+       )
+    where doc_id=:p_docid'
+    using p_docid, p_docid;
+  end update_doc_export_status_open;
 
   ----
   -- extract_doc_export
@@ -1835,8 +1860,10 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.RPC_SYNC is
           from acc_transactions
          where trans_date >= :p_startdate'
         using p_startdate;
+        
     elsif p_bankid is not null and p_accnum is null and p_curid is null
     then
+
         execute immediate
         'insert
           into ibank.tmp_acc_transactions (
@@ -1867,6 +1894,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.RPC_SYNC is
            and cur_id  = :p_curid
            and trans_date >= :p_startdate'
         using p_bankid, p_accnum, p_curid, p_startdate;
+        
     end if;
   end fill_tmp_acc_transactions;
 
