@@ -37,7 +37,6 @@ declare
   e_tab_exists exception;
   pragma exception_init( e_tab_exists, -00955 );
 begin
-  
   execute immediate q'[CREATE TABLE BARS.AGG_MONBALS_EXCHANGE
 ( FDAT       DATE       constraint CC_AGG_MONBALS_EXG_FDAT_NN NOT NULL
 , KF         CHAR(6)    constraint CC_AGG_MONBALS_EXG_KF_NN   NOT NULL
@@ -68,12 +67,12 @@ STORAGE( INITIAL 128K NEXT 128K )
 PCTUSED  0
 PCTFREE  0
 ]';
-  
+
   dbms_output.put_line( 'Table "AGG_MONBALS_EXCHANGE" created.' );
-  
+
 exception
-  when e_tab_exists then
-    dbms_output.put_line( 'Table "AGG_MONBALS_EXCHANGE" already exists.' );
+  when e_tab_exists
+  then dbms_output.put_line( 'Table "AGG_MONBALS_EXCHANGE" already exists.' );
 end;
 /
 
