@@ -2,7 +2,7 @@ PROMPT =========================================================================
 PROMPT *** Run *** ========== Scripts /sql/msp/package/msp_utl.sql =========*** Run *** 
 PROMPT ===================================================================================== 
  
-create or replace package msp_utl is
+create or replace package msp.msp_utl is
 
   gc_header_version constant varchar2(64)  := 'version 1.3 02.03.2018';
 
@@ -234,9 +234,9 @@ create or replace package msp_utl is
 
 end msp_utl;
 /
-create or replace package body msp_utl is
+create or replace package body msp.msp_utl is
 
-  gc_body_version constant varchar2(64) := 'version 1.35 02.03.2018';
+  gc_body_version constant varchar2(64) := 'version 1.351 13.04.2018';
   gc_mod_code     constant varchar2(3)  := 'MSP';
   -----------------------------------------------------------------------------------------
 
@@ -1290,9 +1290,9 @@ create or replace package body msp_utl is
     --dbms_output.put_line('l_cnt='||to_char(l_cnt));
 
     case
-      when p_matching_tp = 1 and l_state in (0,11,13,15) and l_cnt_10 = 0 /*відсутні оплачені реєстри*/ then
+      when p_matching_tp = 1 and l_state in (0,11,13,14,15) and l_cnt_10 = 0 /*відсутні оплачені реєстри*/ then
         l_new_state := msp_const.st_env_MATCH1_PROCESSING; /*9 - Квитанція 1 в процесі формування*/
-      when p_matching_tp = 2 and l_state in (0,11,14,16,18,20) and l_cnt_10 = l_cnt /*всі реєстри оплачені*/ then
+      when p_matching_tp = 2 and l_state in (0,11,14,16,18,19,20) and l_cnt_10 = l_cnt /*всі реєстри оплачені*/ then
         l_new_state := msp_const.st_env_MATCH2_PROCESSING; /*10 - Квитанція 2 в процесі формування*/
       else
         raise_application_error(-20000, 'Формування квитанції заборонено в такому статусі конверта ("' || l_state_name || '")');
@@ -3063,7 +3063,7 @@ end msp_utl;
 show err;
  
 PROMPT *** Create  grants  msp_utl ***
-grant execute on msp_utl to bars_access_defrole;
+grant execute on msp.msp_utl to bars_access_defrole;
   
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /sql/msp/package/msp_utl.sql =========*** End *** 
