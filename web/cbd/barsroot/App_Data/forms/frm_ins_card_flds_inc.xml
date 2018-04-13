@@ -1,0 +1,77 @@
+﻿<customfield groupname="1. Договір страхування" name="P_ID" label="Ідентифікатор попереднього договору" index="-10" datatype="Int64" datasourcefield="ID" titleindex="0">
+  <uicontrol type="DecimalInput" controlwidth="150" readonly="true" />
+</customfield>
+
+<customfield groupname="1. Договір страхування" name="P_ND" label="Номер першого кредитного договору прив`язки" index="60" datatype="Int64" datasourcefield="ND">
+  <uicontrol type="DecimalInput" controlwidth="150" readonly="true"/>
+</customfield>
+
+<customfield groupname="1. Договір страхування" name="P_RENEW_NEED"  label="Чи необхідно перезаключати новий договір після його закінчення" index="70" required="false" datatype="String" size="100" datasourcefield="RENEW_NEED">
+  <uicontrol type="CheckBox" truevalue="Y" falsevalue="N" controlwidth="150" />
+</customfield>
+<customfield groupname="1. Договір страхування" name="P_RENEW_NEWID" label="Ідентифікатор нового договору страхування" index="80" datatype="Int64" datasourcefield="RENEW_NEWID">
+  <uicontrol type="DecimalInput" controlwidth="150" readonly="true" />
+</customfield>
+<customfield groupname="1. Договір страхування" name="P_RENEW_ALERTDAYS" label="Кількість днів за скільки треба розіслати нагадування про необхідність перезаключення"  index="90" datatype="Int64" datasourcefield="RENEW_ALERTDAYS">
+  <uicontrol type="DecimalInput" controlwidth="150" />
+</customfield>
+
+<customfield groupname="1. Договір страхування" name="P_PAY_FREQ" label="Періодничність платежів"  index="91" datatype="Int64" datasourcefield="PAY_FREQ" required="true">
+  <uicontrol type="DropDownList" table="freq" keyfield="freq"  valuefield="name" addemptyitem="true" controlwidth="150" />
+</customfield>
+
+
+<customfield groupname="3.Страхова компанія" columnindex="2" name="P_PARTNER_ID" label="Ідентифікатор" datatype="Int64" datasourcefield="PARTNER_ID" >
+  <uicontrol type="DecimalInput" controlwidth="150" readonly="true" />
+</customfield>
+<customfield groupname="3.Страхова компанія" columnindex="2" name="P_P_RNK" label="RNK" datatype="Int64" datasourcefield="P_RNK">
+  <uicontrol type="DecimalInput" controlwidth="150" readonly="true"/>
+</customfield>
+<customfield groupname="3.Страхова компанія" columnindex="2" name="P_P_RNK_NAME" label="Назва" datatype="String" size="100" datasourcefield="P_RNK_NAME">
+  <uicontrol type="TextBox" controlwidth="250" linescount="4" readonly="true"/>
+</customfield>
+<customfield groupname="3.Страхова компанія" columnindex="2" name="P_P_RNK_OKPO" label="Ідентифікаційний код" datatype="String" size="100" datasourcefield="P_RNK_OKPO">
+  <uicontrol type="TextBox" controlwidth="150" readonly="true"/>
+</customfield>
+<customfield groupname="3.Страхова компанія" columnindex="2" name="P_P_ACTIVE" label="Ознака активності" required="false" datatype="Int64" datasourcefield="P_ACTIVE">
+  <uicontrol type="CheckBox" truevalue="1" falsevalue="0" controlwidth="150" readonly="true"/>
+</customfield>
+<customfield groupname="3.Страхова компанія" columnindex="2" name="P_PT_LIMIT_SUM" label="Ліміт максимальної суми договорів страхування даного типу даної СК" datatype="Decimal" datasourcefield="PT_LIMIT_SUM">
+  <uicontrol type="DecimalInput" controlwidth="150" readonly="true"/>
+</customfield>
+<customfield groupname="3.Страхова компанія" columnindex="2" name="P_PT_LIMIT_SUM_PERC" label="Ліміт процентного відношення суми всіх договорів страхування даної СК даного типу до суми договорів страхування даної СК" datatype="Decimal" datasourcefield="PT_LIMIT_SUM_PERC">
+  <uicontrol type="DecimalInput" controlwidth="150" readonly="true"/>
+</customfield>
+
+<customfield groupname="1. Договір страхування" name="P_TYPE_ID" label="Ідентифікатор типу страхового договору" index="-2" datatype="Int64" datasourcefield="TYPE_ID">
+  <uicontrol type="DecimalInput" controlwidth="150" readonly="true" />
+</customfield>
+<customfield groupname="1. Договір страхування" name="P_TYPE_NAME" label="Тип страхового договору" index="-1" datatype="String" size="100" datasourcefield="TYPE_NAME">
+  <uicontrol type="TextBox" controlwidth="250" linescount="2" readonly="true" />
+</customfield>
+<customfield groupname="1. Договір страхування" name="P_TYPE_OBJ_NAME" label="Тип об`єкту страхування (0 - контрагент, 1 - застава)" index="100" required="true" datatype="Int64" datasourcefield="TYPE_OBJ_NAME">
+  <uicontrol type="DecimalInput" controlwidth="150" readonly="true"/>
+</customfield>
+
+
+<customfield groupname="1. Договір страхування" name="P_SER" label="Серія договору страхування" index="1" required="true" datatype="String" size="100" datasourcefield="SER">
+  <uicontrol type="TextBox" controlwidth="150" />
+</customfield>
+<customfield groupname="1. Договір страхування" name="P_NUM" label="Номер договору страхування" index="2" required="true" datatype="String" size="100" datasourcefield="NUM">
+  <uicontrol type="TextBox" controlwidth="150" />
+</customfield>
+<customfield groupname="1. Договір страхування" name="P_DATE_ON" label="Дата початку дії договору" index="3" required="true" datatype="DateTime" datasourcefield="DATE_ON">
+  <uicontrol type="DateInput" controlwidth="150" />
+</customfield>
+<customfield groupname="1. Договір страхування" name="P_DATE_OFF" label="Дата кінця дії договору" index="4" required="true" datatype="DateTime" datasourcefield="DATE_OFF">
+  <uicontrol type="DateInput" controlwidth="150" />
+</customfield>
+<customfield groupname="1. Договір страхування" name="P_SUM" label="Страхова сума (нац. валюта)" index="5" required="true" datatype="Decimal" datasourcefield="SUM">
+  <uicontrol type="DecimalInput" controlwidth="150" />
+</customfield>
+<customfield groupname="1. Договір страхування" name="P_INSU_TARIFF" label="Страховий тариф (%) (у випадку фіксованого тарифу)" index="6" datatype="Decimal" datasourcefield="INSU_TARIFF">
+  <uicontrol type="DecimalInput" controlwidth="150" />
+</customfield>
+<customfield groupname="1. Договір страхування" name="P_INSU_SUM" label="Страхова премія (у випадку фіксованої премії)" index="7" datatype="Decimal" datasourcefield="INSU_SUM">
+  <uicontrol type="DecimalInput" controlwidth="150" />
+</customfield>

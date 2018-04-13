@@ -1,0 +1,398 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;&#13;&#10;System.Drawing.dll&#13;&#10;&#13;&#10;System.Windows.Forms.dll&#13;&#10;&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" StartReportEvent="_StartReport" ReportInfo.Created="05/26/2011 14:55:15" ReportInfo.Modified="10/27/2014 12:33:31" ReportInfo.CreatorVersion="2013.3.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+using Oracle.DataAccess.Client;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+
+    private void _StartReport(object sender, EventArgs e)
+    {
+      OracleDataConnection frxconn = (OracleDataConnection)Report.Dictionary.Connections[0];
+      OracleConnection connection = (OracleConnection)frxconn.GetConnection();
+      OracleCommand command = connection.CreateCommand();
+      command.CommandText = &quot;begin bars.cc_gpk_svk(:p_nd); end;&quot;;
+      
+      Parameter par = Report.GetParameter(&quot;ND&quot;);
+      command.Parameters.Add(&quot;p_nd&quot;, par.Value);
+      
+      connection.Open();
+      try
+      {
+        command.ExecuteNonQuery();
+      }
+      finally
+      {
+        connection.Close();
+      }
+    }
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRDX4nq2oxRoV1FvVMCHirpxga72w6LsDR6qcvE0ii2S2vSy7Cque6G1jx2YUZuEeKw==">
+      <TableDataSource Name="Table4" Alias="WCS_BID" DataType="System.Int32" Enabled="true" SelectCommand="select b.*,&#13;&#10;       f_dat_lit(to_date(wcs_utl.get_creditdata(b.bid_id, 'DEAL_DATE'))) as deal_date_pr,&#13;&#10;       wcs_utl.get_creditdata(b.bid_id, 'DEAL_NUMBER') as deal_number&#13;&#10;  from v_wcs_bids b&#13;&#10; where b.bid_id = :p_bid_id">
+        <Column Name="BID_ID" DataType="System.Decimal"/>
+        <Column Name="SUBPRODUCT_ID" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_NAME" DataType="System.String"/>
+        <Column Name="CRT_DATE" DataType="System.DateTime"/>
+        <Column Name="F" DataType="System.String"/>
+        <Column Name="I" DataType="System.String"/>
+        <Column Name="O" DataType="System.String"/>
+        <Column Name="BDATE" DataType="System.DateTime"/>
+        <Column Name="INN" DataType="System.String"/>
+        <Column Name="SUMM" DataType="System.Decimal"/>
+        <Column Name="OWN_FUNDS" DataType="System.Decimal"/>
+        <Column Name="TERM" DataType="System.String"/>
+        <Column Name="CREDIT_CURRENCY" DataType="System.String"/>
+        <Column Name="SINGLE_FEE" DataType="System.Decimal"/>
+        <Column Name="MONTHLY_FEE" DataType="System.Decimal"/>
+        <Column Name="INTEREST_RATE" DataType="System.Decimal"/>
+        <Column Name="REPAYMENT_METHOD" DataType="System.String"/>
+        <Column Name="REPAYMENT_DAY" DataType="System.Decimal"/>
+        <Column Name="GARANTEES" DataType="System.String"/>
+        <Column Name="MGR_ID" DataType="System.Decimal"/>
+        <Column Name="MGR_FIO" DataType="System.String"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="BRANCH_NAME" DataType="System.String"/>
+        <Column Name="STATES" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_DESC" DataType="System.String"/>
+        <Column Name="REPAYMENT_METHOD_TEXT" DataType="System.String"/>
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="BRANCH_HIERARCHY" DataType="System.String"/>
+        <Column Name="DEAL_DATE_PR" DataType="System.String"/>
+        <Column Name="DEAL_NUMBER" DataType="System.String"/>
+        <CommandParameter Name="p_bid_id" DataType="107" Expression="[ND]" DefaultValue="-1"/>
+      </TableDataSource>
+      <TableDataSource Name="Table11" Alias="TMP_GPK" DataType="System.Int32" Enabled="true" SelectCommand="select l.fdat,&#13;&#10;       sum(lim2) / 100 as lim,&#13;&#10;       sum(sumg) / 100 as sum_g,&#13;&#10;       sum(greatest((sumo - sumg) / 100, 0)) as sum_pr,&#13;&#10;       sum(lim2 - sumg) / 100 as lim_i,&#13;&#10;       sum(greatest(sumo, 0)) / 100 as sum_o,&#13;&#10;       sum(l.sv0k1) sv0k1,&#13;&#10;       sum(l.sv2pw) sv2pw,&#13;&#10;       sum(l.sv6no) sv6no,&#13;&#10;       sum(l.sv7re) sv7re,&#13;&#10;       sum(l.svbt) svbt&#13;&#10;  from tmp_gpk l&#13;&#10; group by l.fdat&#13;&#10; order by 1">
+        <Column Name="SUM_PR" DataType="System.Decimal"/>
+        <Column Name="LIM_I" DataType="System.Decimal"/>
+        <Column Name="LIM" DataType="System.Decimal"/>
+        <Column Name="SUM_G" DataType="System.Decimal"/>
+        <Column Name="SUM_O" DataType="System.Decimal"/>
+        <Column Name="SV6NO" DataType="System.Decimal"/>
+        <Column Name="SV7RE" DataType="System.Decimal"/>
+        <Column Name="SV0K1" DataType="System.Decimal"/>
+        <Column Name="SVBT" DataType="System.Decimal"/>
+        <Column Name="FDAT" DataType="System.DateTime"/>
+        <Column Name="SV2PW" DataType="System.Decimal"/>
+      </TableDataSource>
+      <TableDataSource Name="Table14" Alias="IRR" DataType="System.Int32" Enabled="true" SelectCommand="select irr_bank bank, irr_kl kl from tmp_gpk where rownum = 1">
+        <Column Name="BANK" DataType="System.Decimal"/>
+        <Column Name="KL" DataType="System.Decimal"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="ND" DataType="System.Int32" Expression="3513921"/>
+    <Parameter Name="p_ws_id" DataType="System.String"/>
+    <Parameter Name="p_ws_number" DataType="System.Decimal"/>
+    <Total Name="Total_SUM_O" Expression="[TMP_GPK.SUM_O]" Evaluator="d"/>
+    <Total Name="Total_SUM_G" Expression="[TMP_GPK.SUM_G]" Evaluator="d"/>
+    <Total Name="Total_SUM_PR" Expression="[TMP_GPK.SUM_PR]" Evaluator="d"/>
+    <Total Name="Total_SV0K1" Expression="[TMP_GPK.SV0K1]" Evaluator="d"/>
+    <Total Name="Total_SV7RE" Expression="[TMP_GPK.SV7RE]" Evaluator="d"/>
+    <Total Name="Total_SV2PW" Expression="[TMP_GPK.SV2PW]" Evaluator="d"/>
+    <Total Name="Total_SV6NO" Expression="[TMP_GPK.SV6NO]" Evaluator="d"/>
+    <Total Name="Total_SVBT" Expression="[TMP_GPK.SVBT]" Evaluator="d" ResetAfterPrint="false"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="8" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle1" Width="1047.06" Height="132.3" CanShrink="true" CanBreak="true">
+      <TableObject Name="Table1" Left="18.9" Width="1011.15" Height="132.3">
+        <TableColumn Name="Column70" Restrictions="HideAllProperties" MaxWidth="1011.15" Width="1011.15"/>
+        <TableRow Name="Row24">
+          <TableCell Name="Cell290" Text="Додаток 1 до [WCS_BID.SUBPRODUCT_NAME]&#13;&#10;" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row25">
+          <TableCell Name="Cell295" Text="№[WCS_BID.DEAL_NUMBER] від [WCS_BID.DEAL_DATE_PR]&#13;&#10;" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row26" Height="37.8">
+          <TableCell Name="Cell300" Text="Публічне акціонерне товариство &quot;Державний ошадний банк України&quot;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 14pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row27" Height="56.7">
+          <TableCell Name="Cell305" Text="Таблиця визначення сукупної вартості споживчого кредиту та реальної процентної ставки станом &#13;&#10;на [WCS_BID.DEAL_DATE_PR](1)" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 14pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <DataBand Name="d" Top="317.91" Width="1047.06" Height="18.9" DataSource="Table11" KeepTogether="true">
+      <TableObject Name="Table16" Left="18.9" Width="1011.15" Height="18.9" Border.Lines="All">
+        <TableColumn Name="Column57" Width="85.05"/>
+        <TableColumn Name="Column58" Width="85.05"/>
+        <TableColumn Name="Column59" Width="94.5"/>
+        <TableColumn Name="Column60" Width="85.05"/>
+        <TableColumn Name="Column61" Width="75.6"/>
+        <TableColumn Name="Column62"/>
+        <TableColumn Name="Column63"/>
+        <TableColumn Name="Column64"/>
+        <TableColumn Name="Column65"/>
+        <TableColumn Name="Column66"/>
+        <TableColumn Name="Column67"/>
+        <TableColumn Name="Column68" Width="94.5"/>
+        <TableColumn Name="Column69" Width="94.5"/>
+        <TableRow Name="Row20">
+          <TableCell Name="Cell238" Border.Lines="All" Text="[FormatDateTime([TMP_GPK.FDAT],&quot;Short Date&quot;)]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell239" Border.Lines="All" Text="[FormatNumber([TMP_GPK.SUM_O],2)]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell240" Border.Lines="All" Text="[FormatNumber([TMP_GPK.SUM_G],2)]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell241" Border.Lines="All" Text="[FormatNumber([TMP_GPK.SUM_PR],2)]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell242" Border.Lines="All" Text="[FormatNumber([TMP_GPK.SV0K1],2)]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell243" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell244" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell245" Border.Lines="All" Text="[FormatNumber([TMP_GPK.SV7RE],2)]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell246" Border.Lines="All" Text="[FormatNumber([TMP_GPK.SV2PW],2)]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell247" Border.Lines="All" Text="[FormatNumber([TMP_GPK.SV6NO],2)]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell248" Border.Lines="All" Text="[FormatNumber([TMP_GPK.SVBT],2)]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell249" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell250" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+        </TableRow>
+      </TableObject>
+      <DataHeaderBand Name="dh" Top="135.33" Width="1047.06" Height="179.55">
+        <TableObject Name="Table13" Left="18.9" Width="1011.15" Height="179.55">
+          <TableColumn Name="Column5" Width="85.05"/>
+          <TableColumn Name="Column6" Width="85.05"/>
+          <TableColumn Name="Column7" Width="94.5"/>
+          <TableColumn Name="Column8" Width="85.05"/>
+          <TableColumn Name="Column9" Width="75.6"/>
+          <TableColumn Name="Column10"/>
+          <TableColumn Name="Column11"/>
+          <TableColumn Name="Column12"/>
+          <TableColumn Name="Column13"/>
+          <TableColumn Name="Column14"/>
+          <TableColumn Name="Column15"/>
+          <TableColumn Name="Column16" Width="94.5"/>
+          <TableColumn Name="Column17" Width="94.5"/>
+          <TableRow Name="Row23">
+            <TableCell Name="Cell277"/>
+            <TableCell Name="Cell278"/>
+            <TableCell Name="Cell279"/>
+            <TableCell Name="Cell280"/>
+            <TableCell Name="Cell281"/>
+            <TableCell Name="Cell282"/>
+            <TableCell Name="Cell283"/>
+            <TableCell Name="Cell284"/>
+            <TableCell Name="Cell285"/>
+            <TableCell Name="Cell286"/>
+            <TableCell Name="Cell287"/>
+            <TableCell Name="Cell288" Text="Гривень" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 8pt"/>
+            <TableCell Name="Cell289"/>
+          </TableRow>
+          <TableRow Name="Row4">
+            <TableCell Name="Cell10" Border.Lines="All" Text="Дата платежу" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" RowSpan="4"/>
+            <TableCell Name="Cell11" Border.Lines="All" Text="Сума платежу за розрахунковий період" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" RowSpan="4"/>
+            <TableCell Name="Cell12" Border.Lines="All" Text="У тому числі" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" ColSpan="9"/>
+            <TableCell Name="Cell13" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell14" Border.Lines="All"/>
+            <TableCell Name="Cell35" Border.Lines="All"/>
+            <TableCell Name="Cell36" Border.Lines="All"/>
+            <TableCell Name="Cell37" Border.Lines="All"/>
+            <TableCell Name="Cell38" Border.Lines="All"/>
+            <TableCell Name="Cell39" Border.Lines="All"/>
+            <TableCell Name="Cell40" Border.Lines="All"/>
+            <TableCell Name="Cell41" Border.Lines="All" Text="Реальна процентна ставка, %" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" RowSpan="4"/>
+            <TableCell Name="Cell42" Border.Lines="All" Text="Абсолютне значення подорожчення кредиту" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" RowSpan="4"/>
+          </TableRow>
+          <TableRow Name="Row5" Height="28.35">
+            <TableCell Name="Cell15" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell16" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell17" Border.Lines="All" Text="Погашення основної суми кредиту" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" RowSpan="3"/>
+            <TableCell Name="Cell18" Border.Lines="All" Text="Проценти за користування кредитом" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" RowSpan="3"/>
+            <TableCell Name="Cell19" Border.Lines="All" Text="Платежі за надані супутні послуги" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" ColSpan="7"/>
+            <TableCell Name="Cell43" Border.Lines="All"/>
+            <TableCell Name="Cell44" Border.Lines="All"/>
+            <TableCell Name="Cell45" Border.Lines="All"/>
+            <TableCell Name="Cell46" Border.Lines="All"/>
+            <TableCell Name="Cell47" Border.Lines="All"/>
+            <TableCell Name="Cell48" Border.Lines="All"/>
+            <TableCell Name="Cell49" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+            <TableCell Name="Cell50" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          </TableRow>
+          <TableRow Name="Row6" Height="28.35">
+            <TableCell Name="Cell20" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell21" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell22" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell23" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell24" Border.Lines="All" Text="на користь банку, у тому числі за" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" ColSpan="3"/>
+            <TableCell Name="Cell51" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell52" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell53" Border.Lines="All" Text="на користь третіх осіб  (2), пов'язані із" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" ColSpan="4"/>
+            <TableCell Name="Cell54" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell55" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell56" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell57" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+            <TableCell Name="Cell58" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          </TableRow>
+          <TableRow Name="Row7" Height="47.25">
+            <TableCell Name="Cell25" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell26" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell27" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell28" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell29" Border.Lines="All" Text="надання кредиту" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+            <TableCell Name="Cell59" Border.Lines="All" Text="обслуговування кредиту" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+            <TableCell Name="Cell60" Border.Lines="All" Text="інші платежі" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+            <TableCell Name="Cell61" Border.Lines="All" Text="послугами оцінювачів заставного майна" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+            <TableCell Name="Cell62" Border.Lines="All" Text="страхуванням" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+            <TableCell Name="Cell63" Border.Lines="All" Text="послугами нотаріусів" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+            <TableCell Name="Cell64" Border.Lines="All" Text="інші платежі" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+            <TableCell Name="Cell65" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+            <TableCell Name="Cell66" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          </TableRow>
+          <TableRow Name="Row8">
+            <TableCell Name="Cell30" Border.Lines="All" Text="1&#10;" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" RowSpan="2"/>
+            <TableCell Name="Cell31" Border.Lines="All" Text="2&#10;" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" RowSpan="2"/>
+            <TableCell Name="Cell32" Border.Lines="All" Text="3*" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" RowSpan="2"/>
+            <TableCell Name="Cell33" Border.Lines="All" Text="4*" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" RowSpan="2"/>
+            <TableCell Name="Cell34" Border.Lines="All" Text="5*" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" ColSpan="3"/>
+            <TableCell Name="Cell67" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell68" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell69" Border.Lines="All" Text="6" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" ColSpan="4"/>
+            <TableCell Name="Cell70" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+            <TableCell Name="Cell71" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+            <TableCell Name="Cell72" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+            <TableCell Name="Cell73" Border.Lines="All" Text="7" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" RowSpan="2"/>
+            <TableCell Name="Cell74" Border.Lines="All" Text="8" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" RowSpan="2"/>
+          </TableRow>
+          <TableRow Name="Row9">
+            <TableCell Name="Cell75" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell76" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell77" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell78" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell79" Border.Lines="All" Text="5.1&#10;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+            <TableCell Name="Cell80" Border.Lines="All" Text="5.2" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+            <TableCell Name="Cell81" Border.Lines="All" Text="5.3" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+            <TableCell Name="Cell82" Border.Lines="All" Text="6.1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+            <TableCell Name="Cell83" Border.Lines="All" Text="6.2" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+            <TableCell Name="Cell84" Border.Lines="All" Text="6.3" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+            <TableCell Name="Cell85" Border.Lines="All" Text="6.4" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+            <TableCell Name="Cell86" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+            <TableCell Name="Cell87" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          </TableRow>
+        </TableObject>
+      </DataHeaderBand>
+      <DataFooterBand Name="df" Top="339.84" Width="1047.06" Height="18.9">
+        <TableObject Name="Table16" Left="18.9" Width="1011.15" Height="18.9" Border.Lines="All" GrowToBottom="true">
+          <TableColumn Name="Column44" Width="85.05"/>
+          <TableColumn Name="Column45" Width="85.05"/>
+          <TableColumn Name="Column46" Width="94.5"/>
+          <TableColumn Name="Column47" Width="85.05"/>
+          <TableColumn Name="Column48" Width="75.6"/>
+          <TableColumn Name="Column49"/>
+          <TableColumn Name="Column50"/>
+          <TableColumn Name="Column51"/>
+          <TableColumn Name="Column52"/>
+          <TableColumn Name="Column53"/>
+          <TableColumn Name="Column54"/>
+          <TableColumn Name="Column55" Width="94.5"/>
+          <TableColumn Name="Column56" Width="94.5"/>
+          <TableRow Name="Row14">
+            <TableCell Name="Cell160" Border.Lines="All" Text="Усього" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt, style=Bold"/>
+            <TableCell Name="Cell161" Border.Lines="All" Text="[FormatNumber([Total_SUM_O],2)]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt"/>
+            <TableCell Name="Cell162" Border.Lines="All" Text="[FormatNumber([Total_SUM_G],2)]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt"/>
+            <TableCell Name="Cell163" Border.Lines="All" Text="[FormatNumber([Total_SUM_PR],2)]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt"/>
+            <TableCell Name="Cell164" Border.Lines="All" Text="[FormatNumber([Total_SV0K1],2)]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt"/>
+            <TableCell Name="Cell165" Format="Number" Format.UseLocale="true" VertAlign="Center" Font="Times New Roman, 8pt"/>
+            <TableCell Name="Cell166" Border.Lines="All" Format="Number" Format.UseLocale="true" VertAlign="Center" Font="Times New Roman, 8pt"/>
+            <TableCell Name="Cell167" Border.Lines="All" Text="[FormatNumber([Total_SV7RE],2)]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt"/>
+            <TableCell Name="Cell168" Border.Lines="All" Text="[FormatNumber([Total_SV2PW],2)]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt"/>
+            <TableCell Name="Cell169" Border.Lines="All" Text="[FormatNumber([Total_SV6NO],2)]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt"/>
+            <TableCell Name="Cell170" Border.Lines="All" Text="[FormatNumber([Total_SVBT],2)]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt"/>
+            <TableCell Name="Cell171" Border.Lines="All" Text="[FormatPercent([IRR.KL]/100,2)]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt"/>
+            <TableCell Name="Cell172" Border.Lines="All" Text="[FormatNumber([Total_SUM_PR]+[Total_SV0K1]+[Total_SV7RE]+[Total_SV2PW]+[Total_SV6NO]+[Total_SVBT],2)]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          </TableRow>
+        </TableObject>
+      </DataFooterBand>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="361.77" Width="1047.06" Height="359.1" CanBreak="true" FirstRowStartsNewPage="true">
+      <TableObject Name="Table13" Left="18.9" Width="1011.15" Height="151.2" Border.Lines="All">
+        <TableColumn Name="Column31" Width="85.05"/>
+        <TableColumn Name="Column32" Width="85.05"/>
+        <TableColumn Name="Column33" Width="94.5"/>
+        <TableColumn Name="Column34" Width="85.05"/>
+        <TableColumn Name="Column35" Width="75.6"/>
+        <TableColumn Name="Column36"/>
+        <TableColumn Name="Column37"/>
+        <TableColumn Name="Column38"/>
+        <TableColumn Name="Column39"/>
+        <TableColumn Name="Column40"/>
+        <TableColumn Name="Column41"/>
+        <TableColumn Name="Column42" Width="94.5"/>
+        <TableColumn Name="Column43" Width="94.5"/>
+        <TableRow Name="Row12" Height="37.8">
+          <TableCell Name="Cell134"/>
+          <TableCell Name="Cell135"/>
+          <TableCell Name="Cell136"/>
+          <TableCell Name="Cell137"/>
+          <TableCell Name="Cell138"/>
+          <TableCell Name="Cell139"/>
+          <TableCell Name="Cell140"/>
+          <TableCell Name="Cell141"/>
+          <TableCell Name="Cell142"/>
+          <TableCell Name="Cell143" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell144" Border.Lines="All" Text="складова банку" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" RowSpan="2"/>
+          <TableCell Name="Cell145" Border.Lines="All" Text="грошовий вираз" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell146" Border.Lines="All" Text="[FormatNumber([Total_SUM_PR]+[Total_SV0K1],2)]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row22" Height="37.8">
+          <TableCell Name="Cell264"/>
+          <TableCell Name="Cell265"/>
+          <TableCell Name="Cell266"/>
+          <TableCell Name="Cell267"/>
+          <TableCell Name="Cell268"/>
+          <TableCell Name="Cell269"/>
+          <TableCell Name="Cell270"/>
+          <TableCell Name="Cell271"/>
+          <TableCell Name="Cell272"/>
+          <TableCell Name="Cell273" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell274" HorzAlign="Center"/>
+          <TableCell Name="Cell275" Border.Lines="All" Text="процентне значення" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell276" Border.Lines="All" Text="[FormatPercent(([Total_SUM_PR]+[Total_SV0K1])/([Total_SUM_PR]+[Total_SV0K1]+[Total_SV7RE]+[Total_SV2PW]+[Total_SV6NO]+[Total_SVBT]),2)]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row21" Height="37.8">
+          <TableCell Name="Cell251"/>
+          <TableCell Name="Cell252"/>
+          <TableCell Name="Cell253"/>
+          <TableCell Name="Cell254"/>
+          <TableCell Name="Cell255"/>
+          <TableCell Name="Cell256"/>
+          <TableCell Name="Cell257"/>
+          <TableCell Name="Cell258"/>
+          <TableCell Name="Cell259"/>
+          <TableCell Name="Cell260" Text="у т.ч." HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt" RowSpan="2"/>
+          <TableCell Name="Cell261" Border.Lines="All" Text="3-ті особи" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" RowSpan="2"/>
+          <TableCell Name="Cell262" Border.Lines="All" Text="грошовий вираз" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell263" Text="[FormatNumber([Total_SV7RE]+[Total_SV2PW]+[Total_SV6NO]+[Total_SVBT],2)]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row13" Height="37.8">
+          <TableCell Name="Cell147"/>
+          <TableCell Name="Cell148"/>
+          <TableCell Name="Cell149"/>
+          <TableCell Name="Cell150"/>
+          <TableCell Name="Cell151"/>
+          <TableCell Name="Cell152"/>
+          <TableCell Name="Cell153"/>
+          <TableCell Name="Cell154"/>
+          <TableCell Name="Cell155"/>
+          <TableCell Name="Cell156" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell157" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell158" Border.Lines="All" Text="процентне значення" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell159" Border.Lines="All" Text="[FormatPercent(([Total_SV7RE]+[Total_SV2PW]+[Total_SV6NO]+[Total_SVBT])/([Total_SUM_PR]+[Total_SV0K1]+[Total_SV7RE]+[Total_SV2PW]+[Total_SV6NO]+[Total_SVBT]),2)]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text2" Left="18.9" Top="160.65" Width="1011.15" Height="198.45" Border.Lines="All" Text="(1) -  Таблиця визначення сукупної вартості споживчого кредиту та реальної процентної ставки визначена з метою запобігання завданню позичальнику моральної та матеріальної шкоди через надання недостовірної чи неповної інформації та є довідковою та складеною на дату укладення Договору. Реальна процентна ставка і абсолютне значення подорожчання кредиту визначаються за плановими платежами згідно графіку. Фактичні строки та суми платежів можуть відрізнятись від планових в залежності від змін у датах, сумах платежів та їх цільового призначення, реальна процентна ставка та абсолютне подорожчання кредиту можуть змінюватись.  &#10;(2) - Вартість супутніх послуг на користь 3-х осіб (колонка 6) визначається в залежності від строків сплати з урахуванням інформації, наданої Позичальником у заявці на отримання кредиту, а також з урахуванням тарифів на послуги третіх осіб, які діють на момент розрахунку. Відповідальність за достовірність інформації, стосовно вартості платежів за надані супутні послуги на користь 3-х осіб, наданої Позичальником Банк не несе.&#10;(*) - Інформація про платежі, які мають бути сплачені на користь банку (Графік платежів за кредитом). У випадку внесення змін за ініціативою Банку та/або Позичальника до умов Договору, що передбачають зміну планових платежів за кредитом, новий графік платежів за кредитом може бути змінений шляхом підписання Сторонами відповідної додаткової угоди. У випадку дострокового (часткового) погашення кредиту за вимогою Банку або за ініціативою Позичальника, новий графік платежів може бути розрахований за ініціативою Позичальника шляхом внесення відповідних змін до колонки 3,4,5 даної таблиці.&#13;&#10;&#10;Примітка: Ця таблиця визначення сукупної вартості споживчого кредиту та реальної процентної ставки заповнюється із припущення, що на дату укладення Договору кредитні кошти Позичальнику надано в повному обсязі ліміту кредитної лінії (кредиту)." VertAlign="Center" Font="Times New Roman, 8pt"/>
+    </ReportSummaryBand>
+    <PageFooterBand Name="PageFooter1" Top="723.9" Width="1047.06" Height="23.35" CanGrow="true" CanShrink="true" CanBreak="true">
+      <TextObject Name="Text1" Left="18.9" Top="4.45" Width="198.45" Height="18.9" Text="БАНК  _________________" HorzAlign="Center" Font="Times New Roman, 8pt"/>
+      <TextObject Name="Text3" Left="831.6" Top="4.45" Width="198.45" Height="18.9" Text="ПОЗИЧАЛЬНИК _________________" HorzAlign="Center" Font="Times New Roman, 8pt"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

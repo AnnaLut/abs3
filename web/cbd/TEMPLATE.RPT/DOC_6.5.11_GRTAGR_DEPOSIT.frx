@@ -1,0 +1,469 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="05/26/2011 14:55:15" ReportInfo.Modified="04/15/2013 16:30:43" ReportInfo.CreatorVersion="1.7.1.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqD6nWZEExUJ9MEhdFZpB1A6ZfSeiTM+6WLeB8pW5aURqkGwhV134I2SUIQGUGXcXi5DDxSvztfyWOAGaQnji6DA==">
+      <TableDataSource Name="Table2" Alias="klient_info" DataType="System.Int32" Enabled="true" SelectCommand="select b.fio,&#13;&#10;       wcs_utl.get_answ(b.bid_id, 'CL_123_O') as fio_o,&#13;&#10;       substr(b.i, 1, 1) || '. ' || substr(b.o, 1, 1) || '. ' || b.f as fio_short,&#13;&#10;       decode(wcs_utl.get_answ(b.bid_id, 'CL_0_7'),&#13;&#10;              0,&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_17') || ', ' || case&#13;&#10;                when wcs_utl.get_answ(b.bid_id, 'CL_18') in (26, 27) then&#13;&#10;                 wcs_utl.get_answ_refer_text(b.bid_id, 'CL_18') || ', ' ||&#13;&#10;                 wcs_utl.get_answ(b.bid_id, 'CL_21')&#13;&#10;                else&#13;&#10;                 'обл. ' || wcs_utl.get_answ_refer_text(b.bid_id, 'CL_18') || ', ' ||&#13;&#10;                 decode(wcs_utl.has_answ(b.bid_id, 'CL_19'),&#13;&#10;                        1,&#13;&#10;                        'р. ' || wcs_utl.get_answ(b.bid_id, 'CL_19') || ', ',&#13;&#10;                        null) || decode(wcs_utl.has_answ(b.bid_id, 'CL_20'),&#13;&#10;                                        1,&#13;&#10;                                        wcs_utl.get_answ(b.bid_id, 'CL_20') || ', ',&#13;&#10;                                        null) ||&#13;&#10;                 wcs_utl.get_answ(b.bid_id, 'CL_21')&#13;&#10;              end,&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_12') || ', ' || case&#13;&#10;                when wcs_utl.get_answ(b.bid_id, 'CL_13') in (26, 27) then&#13;&#10;                 wcs_utl.get_answ_refer_text(b.bid_id, 'CL_13') || ', ' ||&#13;&#10;                 wcs_utl.get_answ(b.bid_id, 'CL_16')&#13;&#10;                else&#13;&#10;                 'обл. ' || wcs_utl.get_answ_refer_text(b.bid_id, 'CL_13') || ', ' ||&#13;&#10;                 decode(wcs_utl.has_answ(b.bid_id, 'CL_14'),&#13;&#10;                        1,&#13;&#10;                        'р. ' || wcs_utl.get_answ(b.bid_id, 'CL_14') || ', ',&#13;&#10;                        null) || decode(wcs_utl.has_answ(b.bid_id, 'CL_15'),&#13;&#10;                                        1,&#13;&#10;                                        wcs_utl.get_answ(b.bid_id, 'CL_15') || ', ',&#13;&#10;                                        null) ||&#13;&#10;                 wcs_utl.get_answ(b.bid_id, 'CL_16')&#13;&#10;              end) as adress,&#13;&#10;       b.inn as idcode,&#13;&#10;       wcs_utl.get_answ(b.bid_id, 'CL_7') ||&#13;&#10;       wcs_utl.get_answ(b.bid_id, 'CL_8') || ' виданий ' ||&#13;&#10;       trim(wcs_utl.get_answ(b.bid_id, 'CL_9')) || ' ' ||&#13;&#10;       wcs_utl.get_answ(b.bid_id, 'CL_11') pasport,&#13;&#10;       wcs_utl.get_answ(b.bid_id, 'CL_199') as phone&#13;&#10;  from v_wcs_bids b&#13;&#10; where b.bid_id = :p_bid_id">
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="FIO_SHORT" DataType="System.String"/>
+        <Column Name="ADRESS" DataType="System.String"/>
+        <Column Name="IDCODE" DataType="System.String"/>
+        <Column Name="PASPORT" DataType="System.String"/>
+        <Column Name="FIO_O" DataType="System.String"/>
+        <Column Name="PHONE" DataType="System.String"/>
+        <CommandParameter Name="p_bid_id" DataType="107" Expression="[p_bid_id]" DefaultValue="-1"/>
+      </TableDataSource>
+      <TableDataSource Name="Table4" Alias="DataSubProdukt" DataType="System.Int32" Enabled="true" SelectCommand="select b.*,&#13;&#10;       wcs_utl.get_answ_formated(b.bid_id, 'REPAYMENT_METHOD') as repayment_method_p,&#13;&#10;       wcs_utl.get_answ_formated(b.bid_id, 'CREDIT_CURRENCY') as credit_currency_p,&#13;&#10;       f_sumpr(b.summ * 100, t.kv, t.gender) as ssum_pr,&#13;&#10;       b.own_funds + b.summ as all_sum_t,&#13;&#10;       f_sumpr((b.own_funds + b.summ) * 100, t.kv, t.gender) as all_ssum_pr,&#13;&#10;       f_sumpr(b.own_funds * 100, t.kv, t.gender) as own_funds_pr,&#13;&#10;       wcs_utl.get_creditdata(b.bid_id, 'DEAL_NUMBER') as deal_number,&#13;&#10;       to_date(wcs_utl.get_creditdata(b.bid_id, 'DEAL_DATE')) as sdate,&#13;&#10;       substr(f_dat_lit(to_date(wcs_utl.get_creditdata(b.bid_id,&#13;&#10;                                                       'DEAL_DATE'))),&#13;&#10;              1,&#13;&#10;              25) as dat_dog_pr,&#13;&#10;       add_months(to_date(wcs_utl.get_creditdata(b.bid_id, 'DEAL_DATE')),&#13;&#10;                  b.term) as wdate,&#13;&#10;       substr(f_dat_lit(add_months(to_date(wcs_utl.get_creditdata(b.bid_id,&#13;&#10;                                                                  'DEAL_DATE')),&#13;&#10;                                   b.term)),&#13;&#10;              1,&#13;&#10;              25) as dat_dog_ret_pr,&#13;&#10;       substr(f_sumpr(b.interest_rate, '', 'M'), 1, 100) as interest_rate_pr,&#13;&#10;       substr(f_sumpr(b.term, '', 'M'), 1, 100) as term_pr,&#13;&#10;       substr(f_sumpr(b.single_fee, '', 'M'), 1, 100) as single_fee_pr,&#13;&#10;       substr(f_sumpr(b.monthly_fee, '', 'M'), 1, 100) as monthly_fee_pr&#13;&#10;  from v_wcs_bids b, tabval t&#13;&#10; where b.bid_id = :p_bid_id&#13;&#10;   and b.credit_currency = t.lcv">
+        <Column Name="BID_ID" DataType="System.Decimal"/>
+        <Column Name="SUBPRODUCT_ID" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_NAME" DataType="System.String"/>
+        <Column Name="CRT_DATE" DataType="System.DateTime"/>
+        <Column Name="F" DataType="System.String"/>
+        <Column Name="I" DataType="System.String"/>
+        <Column Name="O" DataType="System.String"/>
+        <Column Name="BDATE" DataType="System.DateTime"/>
+        <Column Name="INN" DataType="System.String"/>
+        <Column Name="SUMM" DataType="System.Decimal"/>
+        <Column Name="OWN_FUNDS" DataType="System.Decimal"/>
+        <Column Name="TERM" DataType="System.String"/>
+        <Column Name="CREDIT_CURRENCY" DataType="System.String"/>
+        <Column Name="SINGLE_FEE" DataType="System.Decimal"/>
+        <Column Name="MONTHLY_FEE" DataType="System.Decimal"/>
+        <Column Name="INTEREST_RATE" DataType="System.Decimal"/>
+        <Column Name="REPAYMENT_METHOD" DataType="System.String"/>
+        <Column Name="REPAYMENT_DAY" DataType="System.Decimal"/>
+        <Column Name="GARANTEES" DataType="System.String"/>
+        <Column Name="MGR_ID" DataType="System.Decimal"/>
+        <Column Name="MGR_FIO" DataType="System.String"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="BRANCH_NAME" DataType="System.String"/>
+        <Column Name="STATES" DataType="System.String"/>
+        <Column Name="REPAYMENT_METHOD_P" DataType="System.String"/>
+        <Column Name="CREDIT_CURRENCY_P" DataType="System.String"/>
+        <Column Name="SSUM_PR" DataType="System.String"/>
+        <Column Name="ALL_SUM_T" DataType="System.Decimal"/>
+        <Column Name="ALL_SSUM_PR" DataType="System.String"/>
+        <Column Name="OWN_FUNDS_PR" DataType="System.String"/>
+        <Column Name="DAT_DOG_PR" DataType="System.String"/>
+        <Column Name="REPAYMENT_METHOD_TEXT" DataType="System.String"/>
+        <Column Name="INTEREST_RATE_PR" DataType="System.String"/>
+        <Column Name="SDATE" DataType="System.DateTime"/>
+        <Column Name="WDATE" DataType="System.DateTime"/>
+        <Column Name="DAT_DOG_RET_PR" DataType="System.String"/>
+        <Column Name="TERM_PR" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_DESC" DataType="System.String"/>
+        <Column Name="SINGLE_FEE_PR" DataType="System.String"/>
+        <Column Name="MONTHLY_FEE_PR" DataType="System.String"/>
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="BRANCH_HIERARCHY" DataType="System.String"/>
+        <Column Name="DEAL_NUMBER" DataType="System.String"/>
+        <Column Name="RNK" DataType="System.Decimal"/>
+        <Column Name="INIT_PAYMENT_MTD" DataType="System.String"/>
+        <CommandParameter Name="P1" DataType="126" Expression="[p_bid_id]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table12" Alias="Branch_Info" DataType="System.Int32" Enabled="true" SelectCommand="select *&#13;&#10;  from (select poa.fio            as br_boss,&#13;&#10;               poa.fio_r          as br_boss_r,&#13;&#10;               poa.post_r         as post_r,&#13;&#10;               poa.branch_adr     as adr_branch,&#13;&#10;               poa.poa_doc        as br_boss_doc_r,&#13;&#10;               poa.poa_notary_num as br_boss_doc,&#13;&#10;               poa_notary         as br_boss_doc_n,&#13;&#10;               poa_notary_num     as br_boss_doc_n_r,&#13;&#10;               poa_date           as br_boss_doc_d,&#13;&#10;               branch_loc         as br_location,&#13;&#10;               branch_name        as name_branch,&#13;&#10;               f_ourmfo_g         as mfo,&#13;&#10;               f_ourokpo          as okpo&#13;&#10;          from wcs_bids b, wcs_power_of_attorneys poa&#13;&#10;         where b.id = :p1&#13;&#10;           and b.branch = poa.branch&#13;&#10;           and poa.active = 1&#13;&#10;         order by poa.ord)&#13;&#10; where rownum = 1">
+        <Column Name="BR_BOSS_R" DataType="System.String"/>
+        <Column Name="BR_BOSS" DataType="System.String"/>
+        <Column Name="ADR_BRANCH" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC_R" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC_N" DataType="System.String"/>
+        <Column Name="BR_LOCATION" DataType="System.String"/>
+        <Column Name="NAME_BRANCH" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC_N_R" DataType="System.String"/>
+        <Column Name="MFO" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC_D" DataType="System.DateTime"/>
+        <Column Name="POST_R" DataType="System.String"/>
+        <CommandParameter Name="P1" DataType="126" Expression="[p_bid_id]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table11" Alias="CARD_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select a.acc,&#13;&#10;       a.nls,&#13;&#10;       t.name as kv_name,&#13;&#10;       t.lcv,&#13;&#10;       w4.nd as doc_number,&#13;&#10;       a.daos as sdate,&#13;&#10;       f_dat_lit(a.daos) as sdate_in_words,&#13;&#10;       (select add_months(a.daos, to_number(aw.value))&#13;&#10;          from accountsw aw&#13;&#10;         where aw.acc = a.acc&#13;&#10;           and aw.tag = 'PK_TERM') as edate,&#13;&#10;       wcs_utl.get_answ_list(b.id, 'CL_BPK_PACK') as project&#13;&#10;  from wcs_bids b, accounts a, tabval t, w4_acc w4&#13;&#10; where b.id = :p_bid_id&#13;&#10;   and a.acc = wcs_utl.get_answ_refer(b.id, 'PI_CARDACC_ACCNO')&#13;&#10;   and a.acc = w4.acc_pk&#13;&#10;   and a.kv = t.kv">
+        <Column Name="ACC" DataType="System.Decimal"/>
+        <Column Name="DOC_NUMBER" DataType="System.Decimal"/>
+        <Column Name="SDATE" DataType="System.DateTime"/>
+        <Column Name="SDATE_IN_WORDS" DataType="System.String"/>
+        <Column Name="EDATE" DataType="System.DateTime"/>
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="KV_NAME" DataType="System.String"/>
+        <Column Name="LCV" DataType="System.String"/>
+        <Column Name="PROJECT" DataType="System.Decimal"/>
+        <CommandParameter Name="p_bid_id" DataType="107" Expression="[p_bid_id]" DefaultValue="-1"/>
+      </TableDataSource>
+      <TableDataSource Name="Table" Alias="WCS_GRT_DEPOSIT" DataType="System.Int32" Enabled="true" SelectCommand="select bg.*,&#13;&#10;       f_dat_lit(bg.agr_date) as agr_date_pr,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                             'GRT_6_1',&#13;&#10;                             bg.ws_id,&#13;&#10;                             bg.garantee_num) as dpt_agr_num,&#13;&#10;       wcs_utl.get_answ_date(bg.bid_id,&#13;&#10;                             'GRT_6_2',&#13;&#10;                             bg.ws_id,&#13;&#10;                             bg.garantee_num) as dpt_agr_sdate,&#13;&#10;       f_dat_lit(wcs_utl.get_answ_date(bg.bid_id,&#13;&#10;                                       'GRT_6_2',&#13;&#10;                                       bg.ws_id,&#13;&#10;                                       bg.garantee_num)) as dpt_agr_sdate_pr,&#13;&#10;       wcs_utl.get_answ_date(bg.bid_id,&#13;&#10;                             'GRT_6_3',&#13;&#10;                             bg.ws_id,&#13;&#10;                             bg.garantee_num) as dpt_agr_edate,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                             'GRT_6_4',&#13;&#10;                             bg.ws_id,&#13;&#10;                             bg.garantee_num) as dpt_account,&#13;&#10;       wcs_utl.get_answ_refer(bg.bid_id,&#13;&#10;                              'GRT_6_5',&#13;&#10;                              bg.ws_id,&#13;&#10;                              bg.garantee_num) as dpt_currency,&#13;&#10;       wcs_utl.get_answ_refer_text(bg.bid_id,&#13;&#10;                                   'GRT_6_5',&#13;&#10;                                   bg.ws_id,&#13;&#10;                                   bg.garantee_num) as dpt_currency_pr,&#13;&#10;       wcs_utl.get_answ_decimal(bg.bid_id,&#13;&#10;                                'GRT_6_6',&#13;&#10;                                bg.ws_id,&#13;&#10;                                bg.garantee_num) as dpt_intrate,&#13;&#10;       wcs_utl.get_answ_decimal(bg.bid_id,&#13;&#10;                                'GRT_2_12',&#13;&#10;                                bg.ws_id,&#13;&#10;                                bg.garantee_num) as init_value,&#13;&#10;       wcs_utl.get_answ_decimal(bg.bid_id,&#13;&#10;                                'GRT_2_13',&#13;&#10;                                bg.ws_id,&#13;&#10;                                bg.garantee_num) as est_value,&#13;&#10;       f_sumpr(wcs_utl.get_answ_decimal(bg.bid_id,&#13;&#10;                                        'GRT_2_13',&#13;&#10;                                        bg.ws_id,&#13;&#10;                                        bg.garantee_num) * 100,&#13;&#10;               wcs_utl.get_answ_refer(bg.bid_id,&#13;&#10;                                      'GRT_2_11',&#13;&#10;                                      bg.ws_id,&#13;&#10;                                      bg.garantee_num),&#13;&#10;               'F') as est_value_pr&#13;&#10;  from v_wcs_bid_garantees bg&#13;&#10; where bg.bid_id = :p_bid_id&#13;&#10;   and bg.garantee_id = 'DEPOSIT'&#13;&#10;   and bg.garantee_num = :p_ws_number">
+        <Column Name="BID_ID" DataType="System.Decimal"/>
+        <Column Name="GARANTEE_ID" DataType="System.String"/>
+        <Column Name="GARANTEE_NAME" DataType="System.String"/>
+        <Column Name="GARANTEE_NUM" DataType="System.Decimal"/>
+        <Column Name="WS_ID" DataType="System.String"/>
+        <Column Name="STATUS_ID" DataType="System.Decimal"/>
+        <Column Name="STATUS_NAME" DataType="System.String"/>
+        <Column Name="TYPE_OBU_ID" DataType="System.String"/>
+        <Column Name="TYPE_OBU_NAME" DataType="System.String"/>
+        <Column Name="SUBJ_OBU_ID" DataType="System.String"/>
+        <Column Name="SUBJ_OBU_NAME" DataType="System.String"/>
+        <Column Name="GRT_NAME" DataType="System.String"/>
+        <Column Name="AGR_NUMBER" DataType="System.String"/>
+        <Column Name="AGR_DATE" DataType="System.DateTime"/>
+        <Column Name="GRT_COST" DataType="System.Decimal"/>
+        <Column Name="AGR_DATE_PR" DataType="System.String"/>
+        <Column Name="DPT_AGR_NUM" DataType="System.String"/>
+        <Column Name="DPT_AGR_SDATE" DataType="System.DateTime"/>
+        <Column Name="DPT_AGR_SDATE_PR" DataType="System.String"/>
+        <Column Name="DPT_AGR_EDATE" DataType="System.DateTime"/>
+        <Column Name="DPT_ACCOUNT" DataType="System.String"/>
+        <Column Name="DPT_CURRENCY" DataType="System.String"/>
+        <Column Name="DPT_INTRATE" DataType="System.Decimal"/>
+        <Column Name="DPT_CURRENCY_PR" DataType="System.String"/>
+        <Column Name="INIT_VALUE" DataType="System.Decimal"/>
+        <Column Name="EST_VALUE" DataType="System.Decimal"/>
+        <Column Name="EST_VALUE_PR" DataType="System.String"/>
+        <CommandParameter Name="p_bid_id" DataType="107" Expression="[p_bid_id]" DefaultValue="-1"/>
+        <CommandParameter Name="p_ws_number" DataType="107" Expression="[p_ws_number]" DefaultValue="0"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_bid_id" DataType="System.Decimal" Expression="1241502"/>
+    <Parameter Name="p_ws_id" DataType="System.String" Expression="&quot;MAIN&quot;"/>
+    <Parameter Name="p_ws_number" DataType="System.Decimal" Expression="0"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <DataBand Name="Data1" Width="718.2" Height="4437.25" CanGrow="true" CanShrink="true" CanBreak="true" DataSource="Table11">
+      <TableObject Name="Table6" Left="9.45" Top="9.45" Width="699.3" Height="4418.35">
+        <TableColumn Name="Column3" Width="349.65"/>
+        <TableColumn Name="Column4" Width="349.65"/>
+        <TableRow Name="Row12" Height="28.35">
+          <TableCell Name="Cell26" Text="ДОГОВІР ЗАСТАВИ №[WCS_GRT_DEPOSIT.AGR_NUMBER]" HorzAlign="Center" Font="Times New Roman, 12pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell27" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row13" Height="28.35">
+          <TableCell Name="Cell31" Text="[Branch_Info.BR_LOCATION]" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell32" Text="[WCS_GRT_DEPOSIT.AGR_DATE_PR]" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row14" Height="113.4" AutoSize="true">
+          <TableCell Name="Cell36" Text="	&lt;b&gt;АТ «Ощадбанк»&lt;/b&gt; (в подальшому - &lt;b&gt;Заставодержатель&lt;/b&gt;), що є юридичною особою за законодавством України, в особі &lt;b&gt;[Branch_Info.POST_R] [Branch_Info.BR_BOSS_R]&lt;/b&gt;, повноваження якого (якої) підтверджені [Branch_Info.BR_BOSS_DOC_R] посвідченою [Branch_Info.BR_BOSS_DOC_N] від [FormatDateTime([Branch_Info.BR_BOSS_DOC_D],&quot;Short Date&quot;)] р. № [Branch_Info.BR_BOSS_DOC_N_R], &#13;&#10;	з однієї сторони і &#13;&#10;	&lt;b&gt;[klient_info.FIO]&lt;/b&gt;(в подальшому - &lt;b&gt;Заставодавець&lt;/b&gt;), з іншої сторони (в подальшому - Сторони), уклали цей Договір застави (надалі – Договір) про нижченаведене:" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell37" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row15" Height="28.35">
+          <TableCell Name="Cell41" Text="Визначення" Padding="30, 1, 2, 1" VertAlign="Bottom" Font="Times New Roman, 10pt, style=Bold, Underline" ColSpan="2"/>
+          <TableCell Name="Cell42" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row71" Height="216.5" AutoSize="true">
+          <TableCell Name="Cell156" Text="	В цьому Договорі наведені нижче визначення вживаються в такому значенні:&#13;&#10;	&lt;i&gt;Договір про відкриття карткового рахунку&lt;/i&gt; - Договір про відкриття та обслуговування рахунку і випуск платіжної картки №&lt;b&gt;[CARD_DATA.DOC_NUMBER]&lt;/b&gt; від &lt;b&gt;[CARD_DATA.SDATE_IN_WORDS]&lt;/b&gt;, укладений між Заставодержателем та Заставодавцем, а також усі  зміни, доповнення, додаткові договори та додатки до нього, як такі, що є чинними на дату набуття чинності цим Договором, так і ті, що будуть укладені після підписання цього Договору. &#13;&#10;	&lt;i&gt;Зобов’язання&lt;/i&gt; - Зобов'язання Заставодавця, що випливає з Договору про відкриття карткового рахунку, а саме: здійснити погашення заборгованості за Овердрафтом  який встановлений в сумі &lt;b&gt;[FormatNumber([DataSubProdukt.SUMM],2)]&lt;/b&gt;, сплатити Заставодержателю проценти за користування Овердрафтом в розмірі, що визначається на основі процентної ставки &lt;b&gt;[FormatNumber([DataSubProdukt.INTEREST_RATE],2)]%&lt;/b&gt; річних,  штрафи, пені   в порядку та на умовах, визначених у Договорі про відкриття карткового рахунку.&#13;&#10;	&lt;i&gt;Строк/термін виконання Зобов’язання&lt;/i&gt; - визначені Сторонами в Договорі про відкриття карткового рахунку часові умови (календарні дати, проміжки часу або настання певної події) виконання Зобов’язання.  &#13;&#10;	&lt;i&gt;Боржник&lt;/i&gt; – АТ “Ощадбанк&quot;." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell157" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row72" Height="255.15" AutoSize="true">
+          <TableCell Name="Cell158" Text="	&lt;i&gt;Депозитний договір&lt;/i&gt; – Договір №&lt;b&gt;[WCS_GRT_DEPOSIT.DPT_AGR_NUM]&lt;/b&gt; банківського вкладу від &lt;b&gt;[WCS_GRT_DEPOSIT.DPT_AGR_SDATE_PR]&lt;/b&gt;, згідно з яким Боржник повинен у визначений строк повернути депозит та нараховані проценти Заставодавцю. В термін &quot;Депозитний договір&quot;, окрім зазначеного договору, включаються також усі зміни, додатки, доповнення та додаткові договори до зазначеного договору, як  чинні на дату набуття чинності цим Договором, так і ті, що будуть укладені після підписання цього Договору. &#13;&#10;	&lt;i&gt;Майнові права&lt;/i&gt; - належні 3аставодавцю на підставі Депозитного договору майнові права, що полягають у праві вимагати від Боржника повернення депозиту, а також сплати нарахованих процентів у розмірах та в строки, передбачені умовами Депозитного договору.&#13;&#10;	&lt;i&gt;Право застави&lt;/i&gt; - безумовне та безспірне право Заставодержателя, у разі невиконання Заставодавцем  Зобов’язання в цілому або в частині, задовольнити свої вимоги до Заставодавця, які випливають з Договору про відкриття карткового рахунку, з вартості Предмета застави переважно перед іншими кредиторами Заставодавця в порядку, визначеному цим Договором.&#13;&#10;	&lt;i&gt;Схвалення, згода&lt;/i&gt; - попередньо отримані схвалення, згода в письмовій формі.&#13;&#10;	&lt;i&gt;Договір&lt;/i&gt; - цей Договір з усіма змінами, доповненнями, додатками та додатковими договорами до нього.&#13;&#10;	Заголовки та назви статей не є їх складовою частиною і не можуть братись до уваги при тлумаченні Договору." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell159" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row16" Height="28.35">
+          <TableCell Name="Cell46" Text="1. ПРЕДМЕТ ДОГОВОРУ" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell47" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row17" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell48" BreakTo="Cell46" Text="	1.1. Заставодавець з метою забезпечення належного виконання Зобов'язання, що випливає з Договору про відкриття карткового рахунку , передає в заставу, а Заставодержатель цим приймає в заставу на умовах, визначених цим Договором, Предмет застави – рухоме майно, а саме:" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell49" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row96" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell206" Text="	- грошові кошти, що розміщені на вкладному (депозитному) рахунку згідно Депозитного договору в сумі &lt;b&gt;[FormatNumber([WCS_GRT_DEPOSIT.EST_VALUE],2)] ([WCS_GRT_DEPOSIT.EST_VALUE_PR]) [WCS_GRT_DEPOSIT.DPT_CURRENCY_PR]&lt;/b&gt;," Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell207" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row97" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell208" Text="	- майнові права - право вимоги грошових коштів в розмірі &lt;b&gt;[FormatNumber([DataSubProdukt.SUMM],2)] ([DataSubProdukt.SSUM_PR]) [DataSubProdukt.CREDIT_CURRENCY_P]&lt;/b&gt;, які розміщені на вкладному (депозитному) рахунку №&lt;b&gt;[WCS_GRT_DEPOSIT.DPT_ACCOUNT]&lt;/b&gt;, відкритого у Заставодержателя, а також нарахованих  процентів за  Депозитним договором." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell209" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row98" Height="75.6" AutoSize="true">
+          <TableCell Name="Cell210" Text="	1.2.  За домовленістю Сторін Предмет застави оцінено у &lt;b&gt;[FormatNumber([WCS_GRT_DEPOSIT.EST_VALUE],2)] ([WCS_GRT_DEPOSIT.EST_VALUE_PR]) [WCS_GRT_DEPOSIT.DPT_CURRENCY_PR]&lt;/b&gt;. При цьому Сторони погоджуються з тим, що оціночна вартість Предмета застави, зазначена у цьому пункті Договору, є реальною вартістю Предмета застави на момент передачі його у заставу." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell211" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row99" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell212" Text="	1.3. При частковому виконанні Зобов’язання застава, встановлена цим Договором, зберігається у повному обсязі." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell213" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row100" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell214" Text="	1.4. Запис про обтяження предмета застави вноситься Заставодержателем до Державного реєстру обтяжень рухомого майна не пізніше наступного робочого дня після укладення Сторонами цього Договору за рахунок Заставодавця." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell215" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row73" Height="28.35">
+          <TableCell Name="Cell160" Text="2. ОБМЕЖЕННЯ ТА ЗАСТЕРЕЖЕННЯ" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell161" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row75" Height="65.3" AutoSize="true">
+          <TableCell Name="Cell164" Text="	2.1. До виконання Зобов'язання в повному обсязі Заставодавець зобов'язується без згоди Заставодержателя не уступати (не відчужувати) третім особам  Предмет застави в цілому або його частини, а будь-які документи, що свідчать про уступку (відчуження) Заставодавцем Предмета застави третім особам (крім Заставодержателя), якщо така уступка (відчуження) була здійснена без згоди Заставодержателя, вважаються недійсними від дати їх укладення." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell165" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row109" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell232" Text="	2.2. Наступні застави Предмета застави не допускаються, крім випадків, коли наступним заставодержателем виступає АТ „Ощадбанк”." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell233" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row110" Height="94.5" AutoSize="true">
+          <TableCell Name="Cell234" Text="	2.3. Предмет застави за цим Договором може бути замінений виключно за письмовою згодою та/або на вимогу Заставодержателя іншим майном, що надається Заставодавцем та/або його майновим поручителем, за умови попереднього узгодження з Заставодержателем якісних та кількісних  характеристик майна, яким буде замінений Предмет  застави, і виконання Заставодавцем та/або його майновим поручителем зобов’язань стосовно надання ним документів, що підтверджують наявність такого майна та право власності на нього або інших правовстановлюючих документів на таке майно." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell235" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row76" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell166" Text="	2.4. Заставодержатель вправі в будь-який час відмовитися від цього Договору,  в разі якщо в будь-який час до чи після настання Строку виконання Зобов'язання з будь-яких причин ліквідність Предмета застави буде втрачена, в тому числі, але не виключно, буде мати місце будь-яка з наведених нижче обставин, яка може викликати труднощі або зробити повністю неможливим задоволення вимог Заставодержателя з вартості Предмета застави:" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell167" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row105" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell224" Text="	- інфляція, падіння цін, курсу валют або будь-які інші обставини, які можуть тією чи іншою мірою  вплинути на вартість та/або ліквідність Предмета застави;" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell225" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row106" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell226" Text="	- пред'явлення третіми особами претензій на Предмет застави та/або накладення у зв'язку з такими претензіями за рішенням судових чи інших органів будь-якого арешту чи іншої заборони (обмеження) відносно розпорядження Предметом застави;" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell227" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row107" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell228" Text="	- порушення Заставодавцем будь-якої з гарантій, запевнень, а також застережень чи обмежень, які містяться в цьому Договорі;" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell229" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row108" Height="113.4" AutoSize="true">
+          <TableCell Name="Cell230" Text="	- будь-які інші обставини, які, на думку Заставодержателя, можуть суттєво вплинути на ліквідність Предмета застави та можливість задоволення вимог Заставодержателя з його вартості.&#13;&#10;&lt;b&gt;Застереження&lt;/b&gt;: Висновок Заставодержателя відносно наявності перерахованих вище обставин, які загрожують втраті Предметом застави ліквідності, можуть викликати складнощі та/або зробити неможливим стягнення Предмета застави і задоволення вимог з його вартості, є остаточним та узгодженню із Заставодавцем не підлягає. Заставодавець цим підтверджує свою згоду з тим, що цей Договір є розірваним з дати, яка буде зазначена у відповідному повідомленні Заставодержателя на адресу Заставодавця про припинення дії цього Договору." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell231" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row77" Height="28.35">
+          <TableCell Name="Cell168" Text="3. ВИНИКНЕННЯ ТА ПРИПИНЕННЯ ПРАВА ЗАСТАВИ" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell169" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row78" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell170" Text="	3.1. Право застави виникає у Заставодержателя з моменту підписання цього Договору. Пріоритет Заставодержателя відносно Предмета застави за цим Договором перед іншими особами виникає з моменту реєстрації Предмета застави в Державному реєстрі застав рухомого майна (Державному реєстрі обтяжень рухомого майна)." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell171" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row111" Height="85.05" AutoSize="true">
+          <TableCell Name="Cell236" Text="	3.2. У разі якщо при настанні строку/терміну виконання Зобов'язання воно (Зобов’язання) або будь-яка його частина не будуть виконані, або в разі порушення Заставодавцем умов цього Договору, або в разі невиконання Заставодавцем Зобов’язань, встановлених ст.50 Закону України “Про заставу”, а також в інших випадках, передбачених цим Договором, 3аставодержатель реалізує своє Право застави шляхом звернення стягнення на Предмет застави в порядку, визначеному цим Договором." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell237" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row112" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell238" Text="	3.3. Право застави припиняється виконанням в повному обсязі Зобов'язання, а також з інших підстав, передбачених чинним законодавством України про заставу." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell239" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row79" Height="28.35">
+          <TableCell Name="Cell172" Text="4. ПРАВА ТА ЗОБОВ’ЯЗАННЯ СТОРІН" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell173" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row80" Height="36.95" AutoSize="true">
+          <TableCell Name="Cell174" Text="	4.1. Заставодавець та Заставодержатель мають права та зобов’язання, що визначені Законом України “Про заставу” та цим Договором, у тому числі, але не виключно:" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell175" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row101" Height="141.75" AutoSize="true">
+          <TableCell Name="Cell216" Text="	4.1.1. Заставодавець зобов’язаний виконувати дії, необхідні для забезпечення дійсності заставлених прав та збереження Предмета застави; не здійснювати уступку (відчуження) Предмета застави іншим особам без згоди на те Заставодержателя; не виконувати дії, що тягнуть припинення Предмета застави чи зменшення його вартості; вживати заходів, необхідних для захисту Предмета застави від неправомірних дій третіх осіб; надавати Заставодержателю відомості про зміни, що сталися або можуть статися в Предметі застави, про претензії (вимоги) третіх осіб щодо Предмета застави;  задовольнити вимогу Заставодержателя про заміну Предмета застави або збільшення його розміру та внесення відповідних змін в цей Договір та/або укладення нових договорів застави; виконувати інші обов’язки, передбачені цим Договором. Заставодавець на період дії цього Договору не має права самостійно, без згоди Заставодержателя, розпоряджатися Предметом застави." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell217" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row102" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell218" Text="	4.1.2. Заставодавець зобов’язаний письмово попередити Заставодержателя у випадку, коли він (Заставодавець) має намір вилучити Депозит (або його частину) до настання строку його повернення, не пізніше ніж за 5 (п’ять) робочих днів до моменту вилучення Депозиту." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell219" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row103" Height="94.5" AutoSize="true">
+          <TableCell Name="Cell220" Text="	4.1.3. Заставодавець зобов’язаний повідомити Заставодержателя письмово протягом 3 (трьох) банківських днів з дня, коли про такі обставини стало Заставодавцю відомо, про прийняття відповідного рішення судами рішень про стягнення з Заставодавця коштів або про звернення стягнення на його майно, про прийняття судами або будь-якими державними органами рішень щодо застосування у відношенні Заставодавця  санкцій, про прийняття будь-якими органами та особами рішень, що обмежують дієздатність Заставодавця, про порушення кримінальних справ у відношенні Заставодавця." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell221" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row104" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell222" Text="	4.1.4. Заставодавець зобов’язаний протягом 5 (п’яти) банківських днів повідомити Заставодержателя про зміну адреси місця проживання, номерів телефонів та про всі інші зміни, які здатні вплинути на реалізацію Договору та виконання зобов’язань за ним." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell223" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row81" Height="122.85" AutoSize="true">
+          <TableCell Name="Cell176" Text="	4.1.5. Заставодержатель має право у разі порушення Заставодавцем зобов’язань, передбачених ст.50 Закону України “Про заставу”, вступати у справу як третя особа в судовому спорі право щодо Предмета застави; самостійно вживати всіх заходів, необхідних для захисту Предмета застави від неправомірних дій з боку третіх осіб; незалежно від настання строку виконання забезпеченого заставою Зобов’язання вимагати в судовому порядку переводу на себе прав на Предмет застави, якщо Заставодавець порушив обов’язки щодо вчинення дії, необхідні для забезпечення дійсності заставлених прав та збереження Предмета застави; звернути стягнення на Предмет застави в порядку та на умовах, визначених цим Договором, або в судовому порядку; здійснити реєстрацію Предмета застави в Державному реєстрі обтяжень рухомого майна." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell177" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row113" Height="85.05" AutoSize="true">
+          <TableCell Name="Cell240" Text="	4.1.6. Заставодержатель має право здійснити договірне списання належних Заставодавцю грошових коштів, що є Предметом застави за цим Договором, з вкладного (депозитного ) рахунку, відкритого відповідно до Депозитного договору, у випадку невиконання повністю чи частково Зобов’язання та обрання Заставодержателем позасудового порядку звернення стягнення на Предмет застави не пізніше наступного робочого дня за днем укладення цього Договору, з врахуванням положень п.4.1.7. цього Договору." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell241" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row114" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell242" Text="	4.1.7. Заставодавець зобов’язаний сплатити Заставодержателю комісію за надання інформаційно – технічних послуг, пов’язаних з відображенням обтяження (змін та доповнень щодо обтяження) Предмета застави в Державному реєстрі обтяжень рухомого майна у відповідності до Тарифів за послуги установ АТ „Ощадбанк”, оприлюднених шляхом їх розміщення на інформаційних стендах установи Заставодержателя." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell243" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row82" Height="28.35" AutoSize="true">
+          <TableCell Name="Cell178" Text="5. ОБСЯГ ЗАДОВОЛЕННЯ ВИМОГ ЗАСТАВОДЕРЖАТЕЛЯ" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell179" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row83" Height="141.75">
+          <TableCell Name="Cell180" Text="	5.1. Заставодержатель вправі задовольнити за рахунок Предмета застави свої вимоги по виконанню Зобов’язання в повному обсязі, який визначається Заставодержателем самостійно на момент реалізації Права застави, включаючи вимоги щодо погашення  суми Овердрафту, сплати процентів за користування Овердрафтом, та інших платежів на користь Заставодержателя, сплати штрафних санкцій за порушення виконання Зобов’язання, передбачені Договором про відкриття карткового рахунку, а також компенсації завданих збитків. Всі документально підтверджені витрати Заставодержателя, понесені ним у зв’язку із здійсненням заходів з реалізації Права застави та погашення Зобов’язання (в тому числі витрати на аудиторів, адвокатів, витрати на конвертацію коштів, та всі інші витрати, якщо вони будуть мати місце), відшкодовуються Заставодержателю за рахунок Предмета Застави або з іншого майна чи коштів Заставодавця." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell181" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row84" Height="28.35">
+          <TableCell Name="Cell182" Text="6. ПОРЯДОК ЗАДОВОЛЕННЯ ВИМОГ ЗАСТАВОДЕРЖАТЕЛЯ З ВАРТОСТІ ПРЕДМЕТА ЗАСТАВИ" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell183" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row85" Height="46.4" AutoSize="true">
+          <TableCell Name="Cell184" Text="	6.1. Заставодержатель набуває право звернення стягнення на Предмет застави у випадках, передбачених умовами цього Договору та Законодавством, в тому числі якщо у момент настання Строку/терміну виконання Зобов’язання воно не буде виконано, в тому числі:" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell185" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row115" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell244" Text="	при повному або частковому непогашенні суми овердрафту та/або при несплаті або частковій несплаті в строк суми процентів за користування овердрафтом та/або при несплаті або частковій несплаті в строк сум комісій та/або штрафних санкцій та/або компенсації збитків Заставодержателя передбачених Договором  про відкриття карткового рахунку," Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell245" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row116" Height="85.05" AutoSize="true">
+          <TableCell Name="Cell246" Text="	а також у будь-який час незалежно від настання строку виконання Зобов’язання у разі зменшення вартості Предмета застави, а також у випадках, якщо будь-яка з гарантій або запевнень, наданих Заставодавцем у відповідності з цим Договором, виявиться (стане) недійсною. Заставодержатель також набуває право звернення стягнення на Предмет застави у будь-який час незалежно від настання строку виконання Зобов’язання в разі, якщо інша особа набула права звернення стягнення на Предмет застави." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell247" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row117" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell248" Text="	6.2. Звернення стягнення на Предмет застави здійснюється на підставі рішення суду в порядку, встановленому законом, або в позасудовому порядку згідно Законодавства та цього Договору." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell249" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row118" Height="113.4" AutoSize="true">
+          <TableCell Name="Cell250" Text="	6.3. Про намір звернути стягнення на предмет застави в позасудовому порядку, передбаченому цим Договором, Заставодержатель повідомляє Заставодавця шляхом надіслання повідомлення про порушення Зобов’язань (невиконання вимог Заставодержателя), забезпечення виконання яких передбачено цим Договором. При цьому, Сторони досягли згоди, що посилання в зазначеному повідомленні на право іншої особи, яка має право на обтяження предмету застави, здійснюється лише у випадку наявності у Заставодержателя на момент відправлення вказаного повідомлення такої інформації, отриманої Заставодержателем із Державного реєстру обтяжень рухомого майна (далі – Державний реєстр)." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell251" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row119" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell252" Text="Вказане у першому абзаці цього пункту Договору повідомлення направляється Заставодержателем одночасно з реєстрацією в Державному реєстрі відомостей про звернення стягнення на Предмет застави за адресою Заставодавця, зазначеною в реквізитах цього Договору." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell253" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row120" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell254" Text="	6.4. У разі звернення стягнення на Предмет застави за рішенням суду Заставодержатель до моменту подання відповідного позову зобов’язаний письмово повідомити всіх зареєстрованих обтяжувачів, якщо такі будуть встановлені, про початок судового провадження у справі про звернення стягнення на Предмет застави." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell255" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row74" Height="65.3" AutoSize="true">
+          <TableCell Name="Cell162" Text="	6.5. Заставодержатель має право на власний розсуд визначити позасудовий спосіб звернення стягнення на Предмет застави, в тому числі здійснити переказ на користь Заставодержателя відповідної грошової суми що є Предметом застави, в порядку договірного списання з вкладного (депозитного) рахунку, відкритого на підставі Депозитного договору, у випадках, передбачених умовами цього Договору." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell163" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row121" Height="85.05" AutoSize="true">
+          <TableCell Name="Cell256" Text="	6.6. Цим Договором Заставодавець доручає Заставодержателю проводити договірне списання коштів на рахунок Заставодержателя з вкладного (депозитного) рахунка №&lt;b&gt;[WCS_GRT_DEPOSIT.DPT_ACCOUNT]&lt;/b&gt;, відкритого згідно з Депозитним договором, при наявності фактів невиконання чи неналежного виконання Заставодавцем Зобов’язання за Договором про відкриття карткового рахунку та/або зобов’язань, передбачених цим Договором, а також в інших випадках звернення стягнення на Предмет застави, встановлених відповідно до цього Договору." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell257" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row122" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell258" Text="	6.7.  Грошові кошти, отримані Заставодержателем в результаті звернення стягнення на Предмет застави, спрямовуються на задоволення вимог Заставодержателя, що випливають з Договору про відкриття карткового рахунку та/або цього Договору." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell259" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row123" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell260" Text="	6.8. У випадках, коли суми, отриманої Заставодержателем в результаті звернення стягнення на Предмет застави, недостатньо для повного виконання Зобов’язання і сплати витрат та збитків, що понесені Заставодержателем, Заставодержатель має право одержати суму, якої не вистачає для повного виконання Зобов’язання та задоволення понесених ним витрат, з іншого майна Заставодавця." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell261" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row124" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell262" Text="	6.9. У випадку, якщо Овердрафт встановлений в національній валюті, а грошові кошти, розміщені на вкладному (депозитному) рахунку, що відкритий на підставі Депозитного договору, в іноземній валюті, Заставодержателем здійснюється продаж іноземної валюти з подальшим погашенням заборгованості за Договором про відкриття карткового рахунку відповідно до чинного законодавства України." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell263" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row86" Height="28.35">
+          <TableCell Name="Cell186" Text="7. ЗАПЕВНЕННЯ ТА ГАРАНТІЇ" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell187" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row87" AutoSize="true">
+          <TableCell Name="Cell188" Text="	7.1. Цим Заставодавець підтверджує та засвідчує, що на момент набуття чинності цим Договором:" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell189" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row125" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell264" Text="	- Предмет застави є власністю Заставодавця і він (Заставодавець) вправі ним розпоряджатися, і на нього (Предмет застави) може бути звернуто стягнення; отримано всі необхідні Схвалення, згоди на укладення цього Договору;" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell265" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row126" Height="75.6" AutoSize="true">
+          <TableCell Name="Cell266" Text="	- Предмет застави нікому не відчужений, у спорі та/або під арештом та забороною чи в податковій заставі не перебуває, на нього не розповсюджуються будь-які права третіх осіб, що підтверджується Витягом з Державного реєстру обтяжень рухомого майна, не існує довіреностей (інших уповноважуючих документів), виданих Заставодавцем третім особам, що свідчать про право останніх розпоряджатись тим чи іншим чином Предметом застави;" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell267" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row127" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell268" Text="	- Вартість Предмета застави на дату укладення цього Договору складає в повному обсязі суму, зазначену в пункті 1.2. цього Договору;" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell269" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row128" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell270" Text="	- На момент укладення цього Договору відсутні будь-які обмеження (в тому числі у вигляді рішень, ухвал суду, укладених правочинів тощо), які б забороняли та/або унеможливлювали укладання цього Договору;" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell271" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row129" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell272" Text="	- Під час укладання цього Договору Заставодавець не знаходиться під впливом обману, насильства, погрози, угоди, вчиненої внаслідок  зловмисної домовленості або збігу тяжких обставин;" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell273" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row130" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell274" Text="	7.2. Сторони домовились, що у випадку пред’явлення будь-яких претензій третіх осіб стосовно Предмета застави за цим Договором такі претензії повинні бути врегульовані за рахунок Заставодавця." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell275" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row88" Height="28.35" AutoSize="true">
+          <TableCell Name="Cell190" Text="8. ВІДПОВІДАЛЬНІСТЬ СТОРІН" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell191" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row89" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell192" Text="	8.1. У разі невиконання або неналежного виконання зобов’язань за цим Договором винна Сторона відшкодовує другій Стороні завдані у зв’язку з цим збитки." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell193" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row131" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell276" Text="	8.2. За надання Заставодавцем неправдивої інформації, зазначеної у пунктах 4.1.4. та/або 7.1. цього Договору, Заставодавець сплачує Заставодержателю штраф у розмірі 1% від вартості Предмету застави, зазначеної у пункті 1.2. цього Договору, а також відшкодовує нанесені цим збитки." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell277" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row132" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell278" Text="	8.3. За порушення Заставодавцем зобов’язання, передбаченого пунктом 4.1.1. цього Договору застави, Заставодавець сплачує Заставодержателю штраф у розмірі 1% від вартості Предмету застави, зазначеної у пункті 1.2. цього Договору." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell279" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row133" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell280" Text="	8.4. Сторони домовились, що нарахування штрафних санкцій за невиконання або неналежне виконання Заставодавцем зобов'язань, передбачених цим Договором, здійснюється з моменту невиконання або неналежного виконання Заставодавцем відповідного зобов’язання, встановленого цим Договором, до повного його виконання Заставодавцем." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell281" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row90" Height="28.35" AutoSize="true">
+          <TableCell Name="Cell194" Text="9. СУДОВЕ ЗАСТЕРЕЖЕННЯ" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell195" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row91" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell196" Text="	9.1. Відносини, що виникають при укладенні та виконанні цього Договору та не врегульовані в ньому, регулюються чинним законодавством України." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell197" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row134" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell282" Text="	9.2. У разі виникнення між Сторонами спорів та суперечок за цим Договором або у зв'язку з ним  Сторони зроблять усе необхідне для врегулювання вказаних спорів та суперечок шляхом переговорів." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell283" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row135" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell284" Text="	9.3. Спори та суперечки в рамках цього Договору, врегулювання яких неможливо досягнути шляхом переговорів, вирішуються у встановленому чинним законодавством порядку." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell285" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row136" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell286" Text="	9.4. Сторони цього Договору погодили, що з укладанням цього Договору вони досягли згоди з усіх його істотних умов та не існує будь-яких умов, які можуть бути істотними та необхідними за змістом цього Договору." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell287" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row137" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell288" Text="	9.5. У відповідності до ст. 259 Цивільного кодексу України Сторони за взаємною згодою погодили, що строк позовної давності за будь – якими вимогами Заставодержателя, що випливають з цього Договору, встановлюється тривалістю 3 (три) роки." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell289" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row92" Height="28.35">
+          <TableCell Name="Cell198" Text="10. ЗАКЛЮЧНІ ПОЛОЖЕННЯ" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell199" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row93" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell200" Text="	10.1. Цей Договір набуває чинності з моменту його підписання і діє до виконання Зобов’язання за Договором про відкриття карткового рахунку в повному обсязі." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell201" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row138" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell290" Text="	10.2. До цього Договору можуть вноситися зміни і доповнення за взаємною згодою Сторін, які викладаються в письмовій формі та набувають чинності з моменту їх підписання повноважними представниками Сторін." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell291" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row139" Height="85.05" AutoSize="true">
+          <TableCell Name="Cell292" Text="	10.3. Будь-які повідомлення, які направляються Сторонами одна одній в рамках цього Договору, повинні бути здійснені в письмовій формі та будуть вважатися наданими належним чином, якщо вони надіслані листом на замовлення або доставлені особисто на адресу Сторін. Повідомлення можуть також направлятись по факсу, при цьому вони мають попередній характер і повинні бути підтверджені належним чином відповідно до положень цього пункту Договору." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell293" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row140" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell294" Text="	10.4. Цей Договір складений у двох оригінальних примірниках (по одному для кожної Сторони),  кожний з яких має однакову юридичну силу." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell295" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row141" AutoSize="true">
+          <TableCell Name="Cell296" Text="	10.5. Витрати, пов’язані з укладенням цього договору, несе Заставодавець." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell297" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="4442.58" Width="718.2" Height="341.2">
+      <TableObject Name="Table13" Left="9.45" Width="699.3" Height="331.75">
+        <TableColumn Name="Column5" Width="349.65"/>
+        <TableColumn Name="Column6" Width="349.65"/>
+        <TableRow Name="Row65" Height="28.35">
+          <TableCell Name="Cell144" Text="11. РЕКВІЗИТИ ТА ПІДПИСИ СТОРІН" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell145" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row66" Height="47.25">
+          <TableCell Name="Cell146" Text="&lt;b&gt;Заставодержатель:&lt;/b&gt;&#13;&#10;АТ “ОЩАДБАНК”" HorzAlign="Center" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell147" Text="Заставодавець:" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row67" AutoSize="true">
+          <TableCell Name="Cell148" Text="[Branch_Info.NAME_BRANCH]" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell149" Text="Прізвище, ім’я, по батькові [klient_info.FIO]&#13;&#10;Ідентифікаційний номер [klient_info.IDCODE]&#13;&#10;Адреса [klient_info.ADRESS]&#13;&#10;Паспорт (паспортний документ) [klient_info.PASPORT]&#13;&#10;Телефон [klient_info.PHONE]" Font="Times New Roman, 10pt" RowSpan="2"/>
+        </TableRow>
+        <TableRow Name="Row68" Height="95.5" AutoSize="true">
+          <TableCell Name="Cell150" Text="Україна, [Branch_Info.ADR_BRANCH]&#13;&#10;Ідентифікаційний код [Branch_Info.OKPO]&#13;&#10;п/р________________________в __________________&#13;&#10;___________________ код банку [Branch_Info.MFO]" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell151" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row94" Height="37.8">
+          <TableCell Name="Cell202" Text="Підписи Сторін" VertAlign="Bottom" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell203" VertAlign="Bottom" Font="Times New Roman, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row95" Height="56.7">
+          <TableCell Name="Cell204" Text="	Цей Договір Сторонами прочитаний, відповідає їх намірам та досягнутим домовленостям, засвідчується власними підписами уповноважених Сторін, які діють у повній відповідності з наданими їм повноваженнями та повним розумінням предмета та змісту Договору." Font="Times New Roman, 10pt" ColSpan="2"/>
+          <TableCell Name="Cell205" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row69" Height="47.25">
+          <TableCell Name="Cell152" Text="_________________/_________________/" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell153" Text="_________________/_________________/" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+        </TableRow>
+      </TableObject>
+    </ReportSummaryBand>
+  </ReportPage>
+</Report>

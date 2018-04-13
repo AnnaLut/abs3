@@ -1,0 +1,528 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="bindDocResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="bindDocResource1.ToolTip" xml:space="preserve">
+    <value>Привязать / Отвязать документы</value>
+  </data>
+  <data name="BoundFieldResource1.AccessibleHeaderText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BoundFieldResource1.FooterText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BoundFieldResource1.HeaderText" xml:space="preserve">
+    <value>№ сейфа</value>
+  </data>
+  <data name="BoundFieldResource10.AccessibleHeaderText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BoundFieldResource10.FooterText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BoundFieldResource10.HeaderText" xml:space="preserve">
+    <value>№ дог.</value>
+  </data>
+  <data name="BoundFieldResource11.AccessibleHeaderText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BoundFieldResource11.FooterText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BoundFieldResource11.HeaderText" xml:space="preserve">
+    <value>*</value>
+  </data>
+  <data name="BoundFieldResource12.AccessibleHeaderText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BoundFieldResource12.FooterText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BoundFieldResource12.HeaderText" xml:space="preserve">
+    <value>Кем занято</value>
+  </data>
+  <data name="BoundFieldResource13.AccessibleHeaderText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BoundFieldResource13.FooterText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BoundFieldResource13.HeaderText" xml:space="preserve">
+    <value>ЮЛ-2, ФЛ-3</value>
+  </data>
+  <data name="BoundFieldResource14.AccessibleHeaderText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BoundFieldResource14.FooterText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BoundFieldResource14.HeaderText" xml:space="preserve">
+    <value>Начало договора</value>
+  </data>
+  <data name="BoundFieldResource15.AccessibleHeaderText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BoundFieldResource15.FooterText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BoundFieldResource15.HeaderText" xml:space="preserve">
+    <value>Завершение договора</value>
+  </data>
+  <data name="BoundFieldResource16.AccessibleHeaderText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BoundFieldResource16.FooterText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BoundFieldResource16.HeaderText" xml:space="preserve">
+    <value>Дов. лицо</value>
+  </data>
+  <data name="BoundFieldResource2.AccessibleHeaderText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BoundFieldResource2.FooterText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BoundFieldResource2.HeaderText" xml:space="preserve">
+    <value>Размер</value>
+  </data>
+  <data name="BoundFieldResource3.AccessibleHeaderText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BoundFieldResource3.FooterText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BoundFieldResource3.HeaderText" xml:space="preserve">
+    <value>Ключ выдан</value>
+  </data>
+  <data name="BoundFieldResource4.AccessibleHeaderText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BoundFieldResource4.FooterText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BoundFieldResource4.HeaderText" xml:space="preserve">
+    <value>Залог (в грн)</value>
+  </data>
+  <data name="BoundFieldResource5.AccessibleHeaderText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BoundFieldResource5.FooterText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BoundFieldResource5.HeaderText" xml:space="preserve">
+    <value>Внесен залог (факт.)</value>
+  </data>
+  <data name="BoundFieldResource6.AccessibleHeaderText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BoundFieldResource6.FooterText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BoundFieldResource6.HeaderText" xml:space="preserve">
+    <value>Внесен залог (план.)</value>
+  </data>
+  <data name="BoundFieldResource7.AccessibleHeaderText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BoundFieldResource7.FooterText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BoundFieldResource7.HeaderText" xml:space="preserve">
+    <value>Вал.</value>
+  </data>
+  <data name="BoundFieldResource8.AccessibleHeaderText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BoundFieldResource8.FooterText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BoundFieldResource8.HeaderText" xml:space="preserve">
+    <value>Счет</value>
+  </data>
+  <data name="BoundFieldResource9.AccessibleHeaderText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BoundFieldResource9.FooterText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BoundFieldResource9.HeaderText" xml:space="preserve">
+    <value>Сист. №  дог.</value>
+  </data>
+  <data name="btArchiveResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="btArchiveResource1.ToolTip" xml:space="preserve">
+    <value>Архив</value>
+  </data>
+  <data name="btDeleteResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="btDeleteResource1.ToolTip" xml:space="preserve">
+    <value>Закрыть сейф</value>
+  </data>
+  <data name="btDocsResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="btDocsResource1.ToolTip" xml:space="preserve">
+    <value>Документы по договору</value>
+  </data>
+  <data name="btNewResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="btNewResource1.ToolTip" xml:space="preserve">
+    <value>Создать новый сейф</value>
+  </data>
+  <data name="btOpenResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="btOpenResource1.ToolTip" xml:space="preserve">
+    <value>Открыть карточку сейфа</value>
+  </data>
+  <data name="btPayResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="btPayResource1.ToolTip" xml:space="preserve">
+    <value>Оплатить</value>
+  </data>
+  <data name="btPrintResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="btPrintResource1.ToolTip" xml:space="preserve">
+    <value>Печать</value>
+  </data>
+  <data name="btSearchResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="btSearchResource1.ToolTip" xml:space="preserve">
+    <value>Обновить</value>
+  </data>
+  <data name="DAT_BEGINResource1.Text" xml:space="preserve">
+    <value>01/01/0001 00:00:00</value>
+  </data>
+  <data name="DAT_BEGINResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="DAT_ENDResource1.Text" xml:space="preserve">
+    <value>01/01/0001 00:00:00</value>
+  </data>
+  <data name="DAT_ENDResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="gridSafeDepositResource1.Caption" xml:space="preserve">
+    <value />
+  </data>
+  <data name="gridSafeDepositResource1.EmptyDataText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="gridSafeDepositResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="HOTResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="HOTResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ImageTextButton1Resource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ImageTextButton1Resource1.ToolTip" xml:space="preserve">
+    <value>Посещение хранилища</value>
+  </data>
+  <data name="Label2Resource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Label2Resource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Label4Resource1.Text" xml:space="preserve">
+    <value>Просроченные</value>
+  </data>
+  <data name="Label4Resource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbColor1Resource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbColor1Resource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbColor2Resource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbColor2Resource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbCurrency.Text" xml:space="preserve">
+    <value>Отделение</value>
+  </data>
+  <data name="lbCurrency.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbdat_begin.Text" xml:space="preserve">
+    <value>Начало договора</value>
+  </data>
+  <data name="lbdat_begin.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbdat_end.Text" xml:space="preserve">
+    <value>Завершение договора</value>
+  </data>
+  <data name="lbdat_end.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbHotResource1.Text" xml:space="preserve">
+    <value>Горячие</value>
+  </data>
+  <data name="lbHotResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbLeftResource1.Text" xml:space="preserve">
+    <value>Ост. 7 дней</value>
+  </data>
+  <data name="lbLeftResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbNLS.Text" xml:space="preserve">
+    <value>Счет</value>
+  </data>
+  <data name="lbNLS.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbNmk.Text" xml:space="preserve">
+    <value>Кем занят</value>
+  </data>
+  <data name="lbNmk.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbNum.Text" xml:space="preserve">
+    <value>№ договора</value>
+  </data>
+  <data name="lbNum.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbOcupiedResource1.Text" xml:space="preserve">
+    <value>Используется</value>
+  </data>
+  <data name="lbOcupiedResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbRef.Text" xml:space="preserve">
+    <value>Сист. №  дог.</value>
+  </data>
+  <data name="lbRef.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbSafeNum.Text" xml:space="preserve">
+    <value>№ сейфа</value>
+  </data>
+  <data name="lbSafeNum.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbSafeType.Text" xml:space="preserve">
+    <value>Вид сейфа</value>
+  </data>
+  <data name="lbSafeType.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbTitle.Text" xml:space="preserve">
+    <value>Депозитные сейфы: Портфель</value>
+  </data>
+  <data name="lbTitle.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbTrustee.Text" xml:space="preserve">
+    <value>Довереное лицо</value>
+  </data>
+  <data name="lbTrustee.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbUsedResource1.Text" xml:space="preserve">
+    <value>Заняты</value>
+  </data>
+  <data name="lbUsedResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="listKVResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="listSafeTypeResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="NLSResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="NLSResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="NUMResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="NUMResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="PageResource1.Title" xml:space="preserve">
+    <value>Депозитные сейфы: Портфель</value>
+  </data>
+  <data name="PERSONResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="PERSONResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="REFResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="REFResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="SAFENUMResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="SAFENUMResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Separator1Resource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Separator2Resource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Separator3Resource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Separator4Resource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="TRUSTEEResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="TRUSTEEResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="USEDResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="USEDResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+</root>

@@ -1,0 +1,70 @@
+.webservice { behavior: url(/Common/WebService/js/WebService.htc); }
+.frame {BORDER-RIGHT: black 1px solid; PADDING-RIGHT: 0px; BORDER-TOP: black 1px solid; DISPLAY: block; PADDING-LEFT: 0px; Z-INDEX: 2; BACKGROUND: #f7f6f6; VISIBILITY: hidden; PADDING-BOTTOM: 0px; BORDER-LEFT: black 1px solid; WIDTH: 0px; PADDING-TOP: 0px; BORDER-BOTTOM: black 1px solid; POSITION: absolute }
+body
+{
+	font-size: 10pt;
+	font-family: Arial;
+}
+.mainTextStyle
+{
+	font-size: 10pt;
+	font-family: Arial;
+}
+.mainCellStyle
+{ 
+	border : black 1px solid;
+	padding : 2px;
+	font-size: 10pt;
+	font-family: Arial;
+	text-align: center;	
+}
+.minorCellStyle
+{	
+	border-right: 0px;
+	padding-right: 2px;
+	padding-left: 2px;
+	font-size: 10pt;
+	border-bottom: 0px;
+	font-family: Arial;
+	text-align: center;	
+}
+.dllStyle
+{
+	font-size: 10pt;
+	width: 150px;
+	font-family: Arial;
+}
+.dllStyleSmall
+{
+	font-size: 10pt;
+	width: 60px;
+	font-family: Arial;
+}
+.editStyle
+{
+	width: 150px;
+	font-family: Arial;
+}
+.okButtonStyle
+{
+	FONT-SIZE: 10pt; 
+	WIDTH: 100px; 
+	COLOR: green; 
+	FONT-FAMILY: Arial;
+}
+.cancelButtonStyle
+{
+	font-size: 10pt;
+	width: 100px;
+	color: red;
+	font-family: Arial;
+}
+.appButtonStyle
+{
+	border-right: black 1px solid;
+	border-top: black 1px solid;
+	border-left: black 1px solid;
+	cursor: hand;
+	border-bottom: black 1px solid;
+	background-color: transparent;
+}

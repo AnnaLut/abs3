@@ -1,0 +1,16 @@
+﻿@using BarsWeb.HtmlHelpers
+@inherits System.Web.Mvc.WebViewPage<IEnumerable<BarsWeb.Models.BARS_BOARD>>
+@{
+  ViewBag.Title = "Оголошення";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h1>Оголошення</h1>
+<div class="board">
+  @foreach (var item in Model)
+  {
+    @Html.Partial("News",item)
+  }
+  <div style="margin-top: 10px;">
+    @HtmlHelpers.Pager(count: ViewBag.count, pageNum: ViewBag.pageNum, pageSize: ViewBag.pageSize)
+  </div>
+</div>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="LicAcc" targetNamespace="http://tempuri.org/LicAcc.xsd" xmlns:mstns="http://tempuri.org/LicAcc.xsd" xmlns="http://tempuri.org/LicAcc.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+        </Connections>
+        <Tables>
+        </Tables>
+        <Sources>
+        </Sources>
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="LicAcc" msdata:IsDataSet="true" msdata:Locale="en-US">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="dataLicAcc">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ACC" type="xs:string" minOccurs="0" />
+              <xs:element name="NMK" type="xs:string" />
+              <xs:element name="NLS" type="xs:string" minOccurs="0" />
+              <xs:element name="RNK" type="xs:long" minOccurs="0" />
+              <xs:element name="NMS" type="xs:string" minOccurs="0" />
+              <xs:element name="ISP" type="xs:string" minOccurs="0" />
+              <xs:element name="FIO" type="xs:string" minOccurs="0" />
+              <xs:element name="FDAT" type="xs:string" minOccurs="0" />
+              <xs:element name="DAPP" type="xs:string" minOccurs="0" />
+              <xs:element name="OSTF_STR" type="xs:string" minOccurs="0" />
+              <xs:element name="OSTF" type="xs:double" minOccurs="0" />
+              <xs:element name="TT" type="xs:string" minOccurs="0" />
+              <xs:element name="REF" type="xs:long" minOccurs="0" />
+              <xs:element name="MFO" type="xs:string" minOccurs="0" />
+              <xs:element name="VOB" type="xs:string" minOccurs="0" />
+              <xs:element name="ND" type="xs:string" minOccurs="0" />
+              <xs:element name="SK" type="xs:string" minOccurs="0" />
+              <xs:element name="NLSK" type="xs:string" minOccurs="0" />
+              <xs:element name="S1" type="xs:double" minOccurs="0" />
+              <xs:element name="S2" type="xs:double" minOccurs="0" />
+              <xs:element name="USERID" type="xs:string" minOccurs="0" />
+              <xs:element name="NB" type="xs:string" minOccurs="0" />
+              <xs:element name="OKPO" type="xs:string" minOccurs="0" />
+              <xs:element name="NAMK" type="xs:string" minOccurs="0" />
+              <xs:element name="OUR_MFO_NB" type="xs:string" minOccurs="0" />
+              <xs:element name="OUR_MFO" type="xs:string" minOccurs="0" />
+              <xs:element name="NAZN" type="xs:string" minOccurs="0" />
+              <xs:element name="DAPP_STR" type="xs:string" minOccurs="0" />
+              <xs:element name="FDAT_STR" type="xs:string" minOccurs="0" />
+              <xs:element name="KV" type="xs:short" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

@@ -1,0 +1,21 @@
+﻿@inherits System.Web.Mvc.WebViewPage<BarsWeb.Models.BARS_BOARD>
+@{
+  ViewBag.Title = "Оголошення";
+  Layout = null;
+}
+<div class="board-news" >
+  <table style="width: 100%;">
+    <tr>
+      <td style="width: 100%">
+        <h2 class="board-news-title">@Html.Raw(Model.MSG_TITLE)</h2>
+        <p>@Html.Raw(Model.MSG_TEXT)</p>
+      </td>
+      <td valign="top" style="vertical-align: top;width: 10px;">
+        <div class="board-news-ebout">
+          <div class="board-news-fio">@Model.WRITER_FIO</div>
+          <div class="board-news-date">@Model.MSG_DATE</div>
+        </div>
+      </td>
+    </tr>
+  </table>
+</div>

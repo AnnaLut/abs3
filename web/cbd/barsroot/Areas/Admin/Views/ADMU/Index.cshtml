@@ -1,0 +1,916 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "АДМІНІСТРУВАННЯ КОРИСТУВАЧІВ";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<div id="UserEditWindow">
+    <div id="UserEditTabStrip">
+        <ul>
+            <li>Реквізити користувача</li>
+            <li>Параметри з'єднання</li>
+        </ul>
+        <div id="UsersInfoTab">
+            <div id="panels">
+
+            </div>
+        </div>
+        <div id="UsersConnectionsTab">
+            <div id="panels">
+
+            </div>
+        </div>
+    </div>
+    <div id="UserEditWindowBtns">
+        <button>Go!</button>
+        <button>Cancel</button>
+    </div>
+</div>
+
+<div id="UsersConfigToolBar"></div>
+<div id="ADMUGrid"></div><br />
+
+<div id="tabstrip">
+    <ul>
+        <li>АРМи</li>
+        <li>Банківські операції</li>
+        <li>Групи контролю</li>
+        <li>Звіти НБУ</li>
+    </ul>
+    <div id="admTab">
+        <div id="panels">
+            <div id="grid1"></div>
+            <div id="commands">
+                <div><a href="#" id="copySelectedToGrid1" class="k-button">&lt;</a></div>
+                <div><a href="#" id="copySelectedToGrid2" class="k-button">&gt;</a></div>
+            </div>
+            <div id="grid2"></div>
+        </div>
+    </div>
+    <div id="ttsTab">
+        <div id="panels">
+            <div id="grid3"></div>
+            <div id="commands">
+                <div><a href="#" id="copySelectedToGrid3" class="k-button">&lt;</a></div>
+                <div><a href="#" id="copySelectedToGrid4" class="k-button">&gt;</a></div>
+            </div>
+            <div id="grid4"></div>
+        </div>
+    </div>
+    <div id="chkgrpsTab">
+        <div id="panels">
+            <div id="grid5"></div>
+            <div id="commands">
+                <div><a href="#" id="copySelectedToGrid5" class="k-button">&lt;</a></div>
+                <div><a href="#" id="copySelectedToGrid6" class="k-button">&gt;</a></div>
+            </div>
+            <div id="grid6"></div>
+        </div>
+    </div>
+    <div id="nburepsTab">
+        <div id="panels">
+            <div id="grid7"></div>
+            <div id="commands">
+                <div><a href="#" id="copySelectedToGrid7" class="k-button">&lt;</a></div>
+                <div><a href="#" id="copySelectedToGrid8" class="k-button">&gt;</a></div>
+            </div>
+            <div id="grid8"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // *******************************
+
+    var tabstrip = $("#UserEditTabStrip").kendoTabStrip().data("kendoTabStrip");
+    tabstrip.select(0);
+
+    $('#UserEditWindow').kendoWindow({
+        title: "Введення даних - [користувач]",
+        visible: false,
+        width: "500px",
+        resizable: false,
+        actions: ["Close"]
+    });
+
+    $('#ADMUGrid').on("dblclick", "tbody > tr", openUserEditWindow);
+
+    function openUserEditWindow() {
+        var window = $("#UserEditWindow").data("kendoWindow");
+        window.center();
+        window.open();
+    }
+
+    // *******************************
+
+    // ******************************* UsersConfigToolBar
+
+    $('#UsersConfigToolBar').kendoToolBar({
+        items: [
+            {
+                template: "<button id='pbAddUser' type='button' class='k-button' onclick='' title='Додати користувача'><i class='pf-icon pf-16 pf-add_button'></i></button>"
+            },
+            {
+                template: "<button id='pbEditUser' type='button' class='k-button' onclick='' title='Редагувати користувача'><i class='pf-icon pf-16 pf-tool_pencil'></i></button>"
+            },
+            {
+                template: "<button id='pbDropUser' type='button' class='k-button' onclick='' title='Видалити користувача'><i class='pf-icon pf-16 pf-delete_button_error'></i></button>"
+            },
+            {
+                template: "<button id='pbCloneUser' type='button' class='k-button' onclick='' title='Клонувати користувача'><i class='pf-icon pf-16 pf-accept_doc'></i></button>"
+            },
+            {
+                template: "<button id='pbSendUsersActives' type='button' class='k-button' onclick='' title='Передати рахунки користувача'><i class='pf-icon pf-16 pf-list-arrow_right'></i></button>"
+            },
+            {
+                template: "<button id='pbUnblockUser' type='button' class='k-button' onclick='' title='Розблокувати користувача'><i class='pf-icon pf-16 pf-ok'></i></button>"
+            },
+            {
+                template: "<button id='pbBlockUser' type='button' class='k-button' onclick='' title='Заблокувати користувача'><i class='pf-icon pf-16 pf-delete'></i></button>"
+            },
+            {
+                template: "<button id='pbLoadUsersRes' type='button' class='k-button' onclick='' title='Вигрузити ресурси користувача'><i class='pf-icon pf-16 pf-arrow_download'></i></button>"
+            }
+        ]
+    });
+    $('#pbAddUser').kendoButton();
+    $('#pbEditUser').kendoButton();
+    $('#pbDropUser').kendoButton();
+    $('#pbCloneUser').kendoButton();
+    $('#pbSendUsersActives').kendoButton();
+    $('#pbUnblockUser').kendoButton();
+    $('#pbBlockUser').kendoButton();
+    $('#pbLoadUsersRes').kendoButton();
+
+    // ***************************************************
+    var admuGrid = null;
+
+    var grid1 = null;
+    var grid2 = null;
+    var grid3 = null;
+    var grid4 = null;
+    var grid5 = null;
+    var grid6 = null;
+    var grid7 = null;
+    var grid8 = null;
+
+    function getADMUGrid() {
+        if (admuGrid == null) {
+            admuGrid = $('#ADMUGrid').data('kendoGrid');
+        }
+        return admuGrid;
+    }
+
+    function setGrid1_data() {
+        if (grid1 == null) {
+            grid1 = $('#grid1').data('kendoGrid');
+        }
+        return grid1;
+    }
+    function setGrid2_data() {
+        if (grid2 == null) {
+            grid2 = $('#grid2').data('kendoGrid');
+        }
+        return grid2;
+    }
+    function setGrid3_data() {
+        if (grid3 == null) {
+            grid3 = $('#grid3').data('kendoGrid');
+        }
+        return grid3;
+    }
+    function setGrid4_data() {
+        if (grid4 == null) {
+            grid4 = $('#grid4').data('kendoGrid');
+        }
+        return grid4;
+    }
+    function setGrid5_data() {
+        if (grid5 == null) {
+            grid5 = $('#grid5').data('kendoGrid');
+        }
+        return grid5;
+    }
+    function setGrid6_data() {
+        if (grid6 == null) {
+            grid6 = $('#grid6').data('kendoGrid');
+        }
+        return grid6;
+    }
+    function setGrid7_data() {
+        if (grid7 == null) {
+            grid7 = $('#grid7').data('kendoGrid');
+        }
+        return grid7;
+    }
+    function setGrid8_data() {
+        if (grid8 == null) {
+            grid8 = $('#grid8').data('kendoGrid');
+        }
+        return grid8;
+    }
+
+    function refreshADMTab() {
+        $('#grid1').data('kendoGrid').dataSource.read();
+        $('#grid1').data('kendoGrid').refresh();
+        $('#grid2').data('kendoGrid').dataSource.read();
+        $('#grid2').data('kendoGrid').refresh();
+    }
+    function refreshTTsTab() {
+        $('#grid3').data('kendoGrid').dataSource.read();
+        $('#grid3').data('kendoGrid').refresh();
+        $('#grid4').data('kendoGrid').dataSource.read();
+        $('#grid4').data('kendoGrid').refresh();
+    }
+    function refreshCHKGRPsTab() {
+        $('#grid5').data('kendoGrid').dataSource.read();
+        $('#grid5').data('kendoGrid').refresh();
+        $('#grid6').data('kendoGrid').dataSource.read();
+        $('#grid6').data('kendoGrid').refresh();
+    }
+    function refreshNBURPsTab() {
+        $('#grid7').data('kendoGrid').dataSource.read();
+        $('#grid7').data('kendoGrid').refresh();
+        $('#grid8').data('kendoGrid').dataSource.read();
+        $('#grid8').data('kendoGrid').refresh();
+    }
+
+    function setAppContext() {
+        var gridADMU = getADMUGrid();
+        var currentRow = gridADMU.dataItem(gridADMU.select());
+        var userID = { userID: currentRow.ID };
+
+        if (currentRow != null) {
+            $.get('@Url.Action("SetADMUContext")', userID);
+            refreshADMTab();
+            refreshTTsTab();
+            refreshCHKGRPsTab();
+            refreshNBURPsTab();
+        }
+    }
+
+    var tabstrip = $("#tabstrip").kendoTabStrip().data("kendoTabStrip");
+    tabstrip.select(0);
+
+    function setDefaultSelectedRow() {
+        var grid = $("#ADMUGrid").data("kendoGrid");
+        if (grid != null) {
+            grid.select("tr:eq(1)");
+        }
+    }
+
+    function addResource() {
+        var gridADMU = getADMUGrid();
+        var admuRow = gridADMU.dataItem(gridADMU.select());
+        var tabID = $("#tabstrip").data("kendoTabStrip").select().index();
+
+        var gridApps = setGrid2_data();
+        var appRow = gridApps.dataItem(gridApps.select());
+
+        var gridTTs = setGrid4_data();
+        var ttsRow = gridTTs.dataItem(gridTTs.select());
+
+        var gridCHKGrps = setGrid6_data();
+        var chkgrpRow = gridCHKGrps.dataItem(gridCHKGrps.select());
+
+        var gridNBUReps = setGrid8_data();
+        var nburepROW = gridNBUReps.dataItem(gridNBUReps.select());
+
+        var rowID;
+        switch (tabID) {
+            case 0:
+                rowID = { userID: admuRow.ID, resVal: appRow.CODEAPP, tabID: tabID, nbuA017: "" };
+                break;
+            case 1:
+                rowID = { userID: admuRow.ID, resVal: ttsRow.TT, tabID: tabID, nbuA017: "" };
+                break;
+            case 2:
+                rowID = { userID: admuRow.ID, resVal: chkgrpRow.CHKID, tabID: tabID, nbuA017: "" }; // to String ?
+                break;
+            case 3:
+                rowID = { userID: admuRow.ID, resVal: nburepROW.KODF, tabID: tabID, nbuA017: nburepROW.A017 };
+                break;
+        }
+        if (tabID != null && admuRow != null && (appRow != null || ttsRow != null || chkgrpRow != null || nburepROW != null)) {
+            $.get('@Url.Action("AddResourceToUser")', rowID).done(function () {
+                if (tabID == 0) {
+                    refreshADMTab();
+                } else if (tabID == 1) {
+                    refreshTTsTab();
+                } else if (tabID == 2) {
+                    refreshCHKGRPsTab();
+                } else if (tabID == 3) {
+                    refreshNBURPsTab();
+                }
+            });
+        }
+    }
+    function removeResource() {
+        var gridADMU = getADMUGrid();
+        var admuRow = gridADMU.dataItem(gridADMU.select());
+        var tabID = $("#tabstrip").data("kendoTabStrip").select().index();
+
+        var gridApps = setGrid1_data();
+        var appRow = gridApps.dataItem(gridApps.select());
+
+        var gridTTs = setGrid3_data();
+        var ttsRow = gridTTs.dataItem(gridTTs.select());
+
+        var gridCHKGrps = setGrid5_data();
+        var chkgrpRow = gridCHKGrps.dataItem(gridCHKGrps.select());
+
+        var gridNBUReps = setGrid7_data();
+        var nburepROW = gridNBUReps.dataItem(gridNBUReps.select());
+
+        var rowID;
+        switch (tabID) {
+            case 0:
+                rowID = { userID: admuRow.ID, resVal: appRow.CODEAPP, tabID: tabID, nbuA017: "" };
+                break;
+            case 1:
+                rowID = { userID: admuRow.ID, resVal: ttsRow.TT, tabID: tabID, nbuA017: "" };
+                break;
+            case 2:
+                rowID = { userID: admuRow.ID, resVal: chkgrpRow.CHKID, tabID: tabID, nbuA017: "" }; // to String ?
+                break;
+            case 3:
+                rowID = { userID: admuRow.ID, resVal: nburepROW.KODF, tabID: tabID, nbuA017: nburepROW.A017 };
+                break;
+        }
+        if (tabID != null && admuRow != null && (appRow != null || ttsRow != null || chkgrpRow != null || nburepROW != null)) {
+            $.get('@Url.Action("RemoveResourceFromUser")', rowID).done(function () {
+                if (tabID == 0) {
+                    refreshADMTab();
+                } else if (tabID == 1) {
+                    refreshTTsTab();
+                } else if (tabID == 2) {
+                    refreshCHKGRPsTab();
+                } else if (tabID == 3) {
+                    refreshNBURPsTab();
+                }
+            });
+        }
+    }
+
+    $("#copySelectedToGrid1").on("click", function () {
+        var gridApps = setGrid2_data();
+        var appRow = gridApps.dataItem(gridApps.select());
+        if (appRow != null) {
+            addResource();
+        }
+        else {
+            bars.ui.alert({ text: 'Не обрано ресурс для виконання операції!' });
+        }
+    });
+    $("#copySelectedToGrid3").on("click", function () {
+        var gridTTs = setGrid4_data();
+        var ttsRow = gridTTs.dataItem(gridTTs.select());
+        if (ttsRow != null) {
+            addResource();
+        }
+        else {
+            bars.ui.alert({ text: 'Не обрано ресурс для виконання операції!' });
+        }
+    });
+    $("#copySelectedToGrid5").on("click", function () {
+        var gridCHKGrps = setGrid6_data();
+        var chkgrpRow = gridCHKGrps.dataItem(gridCHKGrps.select());
+        if (chkgrpRow != null) {
+            addResource();
+        }
+        else {
+            bars.ui.alert({ text: 'Не обрано ресурс для виконання операції!' });
+        }
+    });
+    $("#copySelectedToGrid7").on("click", function () {
+        var gridNBUReps = setGrid8_data();
+        var nburepROW = gridNBUReps.dataItem(gridNBUReps.select());
+        if (nburepROW != null) {
+            addResource();
+        }
+        else {
+            bars.ui.alert({ text: 'Не обрано ресурс для виконання операції!' });
+        }
+    });
+    $("#grid2").on("dblclick", "tbody > tr", addResource);
+    $("#grid4").on("dblclick", "tbody > tr", addResource);
+    $("#grid6").on("dblclick", "tbody > tr", addResource);
+    $("#grid8").on("dblclick", "tbody > tr", addResource);
+
+    $("#copySelectedToGrid2").on("click", function () {
+        var gridApps = setGrid1_data();
+        var appRow = gridApps.dataItem(gridApps.select());
+        if (appRow != null) {
+            removeResource();
+        }
+        else {
+            bars.ui.alert({ text: 'Не обрано ресурс для виконання операції!' });
+        }
+    });
+    $("#copySelectedToGrid4").on("click", function () {
+        var gridTTs = setGrid3_data();
+        var ttsRow = gridTTs.dataItem(gridTTs.select());
+        if (ttsRow != null) {
+            removeResource();
+        }
+        else {
+            bars.ui.alert({ text: 'Не обрано ресурс для виконання операції!' });
+        }
+    });
+    $("#copySelectedToGrid6").on("click", function () {
+        var gridCHKGrps = setGrid5_data();
+        var chkgrpRow = gridCHKGrps.dataItem(gridCHKGrps.select());
+        if (chkgrpRow != null) {
+            removeResource();
+        }
+        else {
+            bars.ui.alert({ text: 'Не обрано ресурс для виконання операції!' });
+        }
+    });
+    $("#copySelectedToGrid8").on("click", function () {
+        var gridNBUReps = setGrid7_data();
+        var nburepROW = gridNBUReps.dataItem(gridNBUReps.select());
+        if (nburepROW != null) {
+            removeResource();
+        }
+        else {
+            bars.ui.alert({ text: 'Не обрано ресурс для виконання операції!' });
+        }
+    });
+    $("#grid1").on("dblclick", "tbody > tr", removeResource);
+    $("#grid3").on("dblclick", "tbody > tr", removeResource);
+    $("#grid5").on("dblclick", "tbody > tr", removeResource);
+    $("#grid7").on("dblclick", "tbody > tr", removeResource);
+
+    function setAPPsRowBackColor() {
+        var gridApps = setGrid1_data();
+        var appRow = gridApps.dataItem(gridApps.select());
+
+        gridApps.tbody.find('>tr').each(function () {
+            var dataItem = gridApps.dataItem(this);
+            if (dataItem.REVOKED == 1 && dataItem.REVOKED != appRow) {
+                $(this).addClass('k-row-isRevoked');
+            }
+            if (dataItem.APPROVED == 0 && dataItem.APPROVED != appRow) {
+                $(this).addClass('k-row-isApproved');
+            }
+            if (dataItem.DISABLED == 1 && dataItem.DISABLED != appRow) {
+                $(this).addClass('k-row-isDisabled');
+            }
+        });
+    }
+
+    function setTTSsRowBackColor() {
+        var gridTTs = setGrid3_data();
+        var ttsRow = gridTTs.dataItem(gridTTs.select());
+
+        gridTTs.tbody.find('>tr').each(function () {
+            var dataItem = gridTTs.dataItem(this);
+            if (dataItem.REVOKED == 1 && dataItem.REVOKED != ttsRow) {
+                $(this).addClass('k-row-isRevoked');
+            }
+            if (dataItem.APPROVED == 0 && dataItem.APPROVED != ttsRow) {
+                $(this).addClass('k-row-isApproved');
+            }
+            if (dataItem.DISABLED == 1 && dataItem.DISABLED != ttsRow) {
+                $(this).addClass('k-row-isDisabled');
+            }
+        });
+    }
+
+    function setCHKGrpsRowBackColor() {
+        var gridCHKGrps = setGrid5_data();
+        var chkgrpRow = gridCHKGrps.dataItem(gridCHKGrps.select());
+
+        gridCHKGrps.tbody.find('>tr').each(function () {
+            var dataItem = gridCHKGrps.dataItem(this);
+            if (dataItem.REVOKED == 1 && dataItem.REVOKED != chkgrpRow) {
+                $(this).addClass('k-row-isRevoked');
+            }
+            if (dataItem.APPROVED == 0 && dataItem.APPROVED != chkgrpRow) {
+                $(this).addClass('k-row-isApproved');
+            }
+            if (dataItem.DISABLED == 1 && dataItem.DISABLED != chkgrpRow) {
+                $(this).addClass('k-row-isDisabled');
+            }
+        });
+    }
+
+    function setNBURepsRowBackColor() {
+        var gridNBUReps = setGrid7_data();
+        var nburepROW = gridNBUReps.dataItem(gridNBUReps.select());
+
+        gridNBUReps.tbody.find('>tr').each(function () {
+            var dataItem = gridNBUReps.dataItem(this);
+            if (dataItem.REVOKED == 1 && dataItem.REVOKED != nburepROW) {
+                $(this).addClass('k-row-isRevoked');
+            }
+            if (dataItem.APPROVED == 0 && dataItem.APPROVED != nburepROW) {
+                $(this).addClass('k-row-isApproved');
+            }
+            if (dataItem.DISABLED == 1 && dataItem.DISABLED != nburepROW) {
+                $(this).addClass('k-row-isDisabled');
+            }
+        });
+    }
+
+    $('#ADMUGrid').kendoGrid({
+        autobind: true,
+        selectable: "row",
+        sortable: true,
+        pageable: {
+            refresh: true,
+            buttonCount: 5
+        },
+        columns: [
+            {
+                field: "FIO",
+                title: "ПІБ",
+                width: "30%"
+            },
+            {
+                field: "ID",
+                title: "Код #",
+                width: "10%"
+            },
+            {
+                field: "LOGNAME",
+                title: "Логін",
+                width: "20%"
+            },
+            {
+                field: "TABN",
+                title: "Табельний номер",
+                width: "20%"
+            },
+            {
+                field: "BRANCH",
+                title: "Відділ",
+                width: "20%"
+            }
+        ],
+        dataSource: {
+            type: "aspnetmvc-ajax",
+            pageSize: 10,
+            transport: {
+                read: {
+                    dataType: 'json',
+                    url: bars.config.urlContent('/admin/ADMU/GetADMUList')
+                }
+            },
+            schema: {
+                data: "Data",
+                total: "Total"
+            }
+        },
+        change: setAppContext,
+        dataBound: setDefaultSelectedRow
+    });
+
+    // TabGrids: APPs
+    $("#grid1").kendoGrid({
+        height: 400,
+        selectable: "row",
+        sortable: true,
+        dataSource: {
+            type: "aspnetmvc-ajax",
+            transport: {
+                read: {
+                    dataType: 'json',
+                    url: bars.config.urlContent('/admin/APP/GetCurrentUserAPPs')
+                }
+            },
+            schema: {
+                data: "Data"
+            }
+        },
+        editable: "popup",
+        pageable: {
+            refresh: true
+        },
+        columns: [
+            {
+                field: "CODEAPP",
+                title: "Код АРМу",
+                width: "40%"
+            },
+            {
+                field: "NAME",
+                title: "Назва",
+                width: "60%"
+            }
+        ],
+        dataBound: setAPPsRowBackColor
+    });
+    $("#grid2").kendoGrid({
+        height: 400,
+        selectable: "row",
+        sortable: true,
+        dataSource: {
+            type: "aspnetmvc-ajax",
+            transport: {
+                read: {
+                    dataType: 'json',
+                    url: bars.config.urlContent('/admin/APP/GetAllAPPsGrid')
+                }
+            },
+            schema: {
+                data: "Data",
+                total: "Total"
+            }
+        },
+        editable: "popup",
+        pageable: {
+            refresh: true
+        },
+        columns: [
+            {
+                field: "CODEAPP",
+                title: "Код АРМу",
+                width: "30%"
+            },
+            {
+                field: "NAME",
+                title: "Назва",
+                width: "70%"
+            }
+        ]
+    });
+
+    // TabGrids: TTS
+    $("#grid3").kendoGrid({
+        height: 400,
+        selectable: "row",
+        sortable: true,
+        dataSource: {
+            type: "aspnetmvc-ajax",
+            transport: {
+                read: {
+                    dataType: 'json',
+                    url: bars.config.urlContent('/admin/TTS/GetCurrentUserTTS')
+                }
+            },
+            schema: {
+                data: "Data"
+            }
+        },
+        editable: "popup",
+        pageable: {
+            refresh: true
+        },
+        columns: [
+            {
+                field: "TT",
+                title: "Код операції",
+                width: "40%"
+            },
+            {
+                field: "NAME",
+                title: "Назва",
+                width: "60%"
+            }
+        ],
+        dataBound: setTTSsRowBackColor
+    });
+    $("#grid4").kendoGrid({
+        height: 400,
+        selectable: "row",
+        sortable: true,
+        dataSource: {
+            type: "aspnetmvc-ajax",
+            transport: {
+                read: {
+                    dataType: 'json',
+                    url: bars.config.urlContent('/admin/TTS/GetAllTTSGrid')
+                }
+            },
+            schema: {
+                data: "Data",
+                total: "Total"
+            }
+        },
+        editable: "popup",
+        pageable: {
+            refresh: true
+        },
+        columns: [
+           {
+               field: "TT",
+               title: "Код операції",
+               width: "30%"
+           },
+           {
+               field: "NAME",
+               title: "Назва",
+               width: "70%"
+           }
+        ]
+    });
+
+    // TabGrids: CHKGRPS
+    $("#grid5").kendoGrid({
+        height: 400,
+        selectable: "row",
+        sortable: true,
+        dataSource: {
+            type: "aspnetmvc-ajax",
+            transport: {
+                read: {
+                    dataType: 'json',
+                    url: bars.config.urlContent('/admin/CHKGrps/GetCurrentUserCHKGrps')
+                }
+            },
+            schema: {
+                data: "Data"
+            }
+        },
+        editable: "popup",
+        pageable: {
+            refresh: true
+        },
+        columns: [
+            {
+                field: "CHKID",
+                title: "Код групи",
+                width: "40%"
+            },
+            {
+                field: "NAME",
+                title: "Назва",
+                width: "60%"
+            }
+        ],
+        dataBound: setCHKGrpsRowBackColor
+    });
+    $("#grid6").kendoGrid({
+        height: 400,
+        selectable: "row",
+        sortable: true,
+        dataSource: {
+            type: "aspnetmvc-ajax",
+            transport: {
+                read: {
+                    dataType: 'json',
+                    url: bars.config.urlContent('/admin/CHKGrps/GetAllCHKGrpsGrid')
+                }
+            },
+            schema: {
+                data: "Data",
+                total: "Total"
+            }
+        },
+        editable: "popup",
+        pageable: {
+            refresh: true
+        },
+        columns: [
+           {
+               field: "CHKID",
+               title: "Код групи",
+               width: "30%"
+           },
+           {
+               field: "NAME",
+               title: "Назва",
+               width: "70%"
+           }
+        ]
+    });
+
+    // TabGrids: NBUREPS
+    $("#grid7").kendoGrid({
+        height: 400,
+        selectable: "row",
+        sortable: true,
+        dataSource: {
+            type: "aspnetmvc-ajax",
+            transport: {
+                read: {
+                    dataType: 'json',
+                    url: bars.config.urlContent('/admin/NBUReps/GetCurrentUserNBUReps')
+                }
+            },
+            schema: {
+                data: "Data"
+            }
+        },
+        editable: "popup",
+        pageable: {
+            refresh: true
+        },
+        columns: [
+            {
+                field: "KODF",
+                title: "Код звіту",
+                width: "20%"
+            },
+            {
+                field: "A017",
+                title: "Схема",
+                width: "20%"
+            },
+            {
+                field: "NAME",
+                title: "Назва",
+                width: "60%"
+            }
+        ],
+        dataBound: setNBURepsRowBackColor
+    });
+    $("#grid8").kendoGrid({
+        height: 400,
+        selectable: "row",
+        sortable: true,
+        dataSource: {
+            type: "aspnetmvc-ajax",
+            transport: {
+                read: {
+                    dataType: 'json',
+                    url: bars.config.urlContent('/admin/NBUReps/GetNBURepsGrid')
+                }
+            },
+            schema: {
+                data: "Data",
+                total: "Total"
+            }
+        },
+        editable: "popup",
+        pageable: {
+            refresh: true
+        },
+        columns: [
+           {
+               field: "KODF",
+               title: "Код звіту",
+               width: "30%"
+           },
+           {
+               field: "A017",
+               title: "Схема",
+               width: "30%"
+           },
+           {
+               field: "NAME",
+               title: "Назва",
+               width: "40%"
+           }
+        ]
+    });
+</script>
+
+<style>
+    /*TabDivsPosition:*/
+    #panels {
+        display: table-row;
+    }
+
+    #grid1, #grid2 {
+        display: table-cell;
+    }
+
+    #commands {
+        text-align: center;
+        width: 50px;
+        vertical-align: middle;
+        display: table-cell;
+    }
+
+    #commands div {
+        padding: 5px;
+    }
+
+    #commands div a {
+        width: 35px;
+        text-align: center;
+    }
+
+    /*---------- RowBG Color -----*/
+    .k-row-isRevoked {
+        background-color: #00ccff;
+    }
+    .k-row-isApproved {
+        background-color: #ccccff;
+    }
+    .k-row-isDisabled {
+        background-color: #ff0000;
+    }
+    /*---------- defaultSelectedRowColor ----*/
+    .k-grid table tr.k-state-selected
+    {
+        background-color: #428bca !important;
+    }
+    .k-grid table tr.k-state-selected td
+    {
+        background-color: #428bca !important;
+    }
+    .k-grid table tr.k-state-selected td div
+    {
+        background-color: #428bca !important;
+    }
+    /*-------------------------------------*/
+    #UserEditWindowBtns {
+        margin: 5px;
+        text-align: center;
+    }
+</style>

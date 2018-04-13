@@ -1,0 +1,18 @@
+﻿@using System.Web.Mvc.Html
+@using System.Web.Mvc
+@inherits System.Web.Mvc.WebViewPage<string>
+@{
+    Layout = null;
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#tableKatalog').jungGridView({
+            updateTableUrl: '/barsroot/customers/katalogload/' + '@Model',
+            viewTfoot: true
+        });
+    });
+</script>
+@BarsWeb.HtmlHelpers.HtmlHelpers.CreateTable(capTableBtn: new string[,] { { "rfr", "" } },
+                                columnName: new string[,] {{ "1", "" }, { "2", "" }, { "3", "" }},
+                                preTableDivId:"tableKatalog",
+                                tableContent: Html.Action("KatalogLoad", new { id=Model}).ToString())

@@ -1,0 +1,46 @@
+﻿.tbl_style1
+{
+    font-family: 'Lucida Grande' , Geneva, Arial, Tahoma, Verdana, Helvetica, sans-serif;
+    font-size: 12px;
+    text-align: left;
+    border-collapse: collapse;
+    margin: 10px;
+}
+.tbl_style1 th
+{
+    padding: 8px 13px 8px 13px;
+    font-weight: normal;
+    font-size: 14px;
+    color: #039;
+    border-bottom: 1px dashed #69c;
+}
+.tbl_style1 td
+{
+    padding: 5px 7px 5px 7px;
+    color: #669;
+}
+.tbl_style1 tfoot td
+{
+    color: #039;
+    border-top: 1px dashed #69c;
+}
+.tbl_style1 td.command
+{
+    text-align: center;
+    width: 40px;
+}
+
+.tbl_style1 tbody tr.edit
+{
+    color: #039;
+    border: 1px dashed #69c;
+    background-image: url(/common/images/skin/pattern.png);
+    background-repeat: repeat;
+}
+.tbl_style1 tbody tr.new
+{
+    color: #039;
+    border: 1px dashed #69c;
+    background-image: url(/common/images/skin/pattern.png);
+    background-repeat: repeat;
+}

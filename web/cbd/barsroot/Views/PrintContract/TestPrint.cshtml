@@ -1,0 +1,16 @@
+﻿@{
+  //Layout = null;
+}
+
+<a href ="/barsroot/PrintContract/Index/?multiSelection=true">Click me</a>
+<br>
+<form method="post" action="~/PrintContract/MultiPrint">
+    <input type="checkbox" name="ids" value="800"/>800<br>
+    <input type="checkbox" name="ids" value="900"/>900<br>
+    <br>
+    <input type="checkbox" name="templates" value="CUST_DOGOVOR"/>CUST_DOGOVOR<br>
+    <input type="checkbox" name="templates" value="CUST_FM_FO"/>CUST_FM_FO<br>
+    <input type="checkbox" name="templates" value="CUST_DOGOV_INN"/>CUST_DOGOV_INN<br>
+    <br>
+    <input type="submit" value ="ok"/>
+</form>

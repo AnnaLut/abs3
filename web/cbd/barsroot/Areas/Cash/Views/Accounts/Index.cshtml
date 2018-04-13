@@ -1,0 +1,324 @@
+﻿@using BarsWeb.Areas.Cash.ViewModels
+@using Kendo.Mvc.UI
+@model List<Mfo>
+
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    const string title = "Рахунки";
+}
+<script src="@Url.Content("~/lib/jsZip/jszip.min.js")"></script>
+<h1>@title</h1>
+
+<div id="childRecordsTabStrip">
+    @*Шаблон дочерней строки*@
+    <script id="template_Child" type="text/x-kendo-template">
+        @(Html.Kendo().TabStrip()
+                             .Name("tabstripChildRows_#=AccountId#")
+                              .Items(tabstrip =>
+                              {
+                                  tabstrip.Add().Text("Архів залишків")
+                                      .Content(@<text>
+                                        @(Html.Kendo().Grid<AccountRest>()
+                                         .Name("grid_ChildRows_#=AccountId#")
+                                         .ToolBar(tools => tools.Excel())
+                                         .Excel(i => i.FileName("Accounts.xlsx")
+                                              //.AllPages(true)
+                                              .Filterable(true)
+                                              .ProxyURL(Url.Content("~/cash/Accounts/ConvertBase64ToFile/"))
+                                              )
+                                          .Columns(columns =>
+                                          {
+                                              columns.Bound(c => c.BalanceDate)
+                                                  .Format("{0:dd.MM.yyyy}");
+                                              columns.Bound(c => c.Balance)
+                                                  .HtmlAttributes(new { @class = "rightField" })
+                                                  .Format("{0:n}");
+                                              columns.Bound(c => c.OpenDate)
+                                                  .Format("{0:dd.MM.yyyy}");
+                                          })
+                                          .DataSource(dataSource => dataSource
+                                              .Ajax()
+                                              .Sort(sort => sort.Add(p => p.BalanceDate).Descending())
+                                              .PageSize(10)
+                                              .Read(read => read.Action("GetAccountsRest", "Accounts", new { accountId = "#=AccountId#" })
+                                              )
+                                              .Events(e => e.Error("onError"))
+                                          )
+                                        .Pageable(pager => pager
+                                            .PageSizes(new []{ 10,20,50,100, 200, 500})
+                                            .Refresh(true))
+                                          .Sortable()
+                                          .Selectable()
+                                          .Resizable(resize => resize.Columns(true))
+                                          .Reorderable(reorder => reorder.Columns(true))
+                                          .ToClientTemplate()
+                                        )
+                                    </text>);
+
+                                  tabstrip.Add().Text("Динаміка зміни")
+                                      .Selected(true)
+                                      .Content(@<text>
+                                        <div class="chart-wrapper">
+                                            @(Html.Kendo().Chart<AccountRest>()
+                                                  .HtmlAttributes(new { style = "height:500px;" })
+                                                  .Name("Chart#=AccountId#")
+                                                  .Legend(legend => legend
+                                                      .Visible(false)
+                                                      .Position(ChartLegendPosition.Top)
+                                                  )
+                                                  .DataSource(ds => ds.Read(read => read.Action("GetAccountsRestData", "Accounts", new { accountId = "#=AccountId#" })))
+                                                   .SeriesDefaults(seriesDefaults =>
+                                                        seriesDefaults.Area().Line(line => line.Style(ChartAreaStyle.Smooth))
+                                                    )
+                                                  .Series(series => series.Area(model => model.Balance).Name("AccountId"))
+                                                  .CategoryAxis(axis => axis
+                                                      .Categories(model => model.BalanceDate)
+                                                              .Labels(labels => labels.Rotation(-90).Format("{0:dd.MM.yyyy}"))
+                                                      .Justify()
+                                                      .Crosshair(c => c.Visible(true))
+                                                  )
+                                                  .ValueAxis(axis => axis.Numeric()
+                                                      .Labels(labels => labels.Format("{0:N0}"))
+                                                  )
+                                                  .Tooltip(tooltip => tooltip
+                                                      .Visible(true)
+                                                     .Template("\\#= value \\#")
+                                                  ).ToClientTemplate())
+                                        </div>
+                                    </text>);
+                              }).ToClientTemplate()
+        )
+    </script>
+</div>
+
+<table class="acc-table1">
+    <tr>
+        <td valign="top">
+            @*Частичное представление добавляет на страницу объект mfoFilter, в котором можно подписаться на событие изменения перечня выбранных МФО*@
+            @{ Html.RenderPartial("MfoFilter", Model); }
+        </td>
+        
+        <td valign="top">
+            @(Html.Kendo().TabStrip()
+                .Name("tabstrip")
+                .Items(tabstrip =>
+                {
+                    tabstrip.Add().Text("Рахунки")
+                        .Selected(true)
+                        .Content(@<text>
+                            <div style="padding: 5px;">Інформація на поточну дату (@DateTime.Now.ToShortDateString())</div>
+                            @(Html.Kendo().Grid<Account>()
+                                           .Name("grid_Accounts")
+                                           //.Events(i => i.DataBound("onAccountGridDataBound"))
+                                           .ToolBar(tools => tools.Excel())
+                                           .Excel(i => i.FileName("Accounts.xlsx")
+                                               .AllPages(true)
+                                               .Filterable(true)
+                                               .ProxyURL(Url.Content("~/cash/Accounts/ConvertBase64ToFile/"))
+                                           )
+                                           .Columns(columns =>
+                                           {
+                                               columns.Bound(c => c.Mfo);
+                                               columns.Bound(c => c.MfoName);
+                                               columns.Bound(c => c.Branch);
+                                               columns.Bound(c => c.CashTypeName);
+                                               columns.Bound(c => c.BalNumber);
+                                               columns.Bound(c => c.AccountNumber);
+                                               columns.Bound(c => c.Ob22);
+                                               columns.Bound(c => c.Currency);
+                                               columns.Bound(c => c.Balance)
+                                                   .HtmlAttributes(new { @class = "rightField" })
+                                                   .Format("{0:n}");
+                                               columns.Bound(c => c.OpenDate)
+                                                   .Format("{0:dd.MM.yyyy}");
+                                               columns.Bound(c => c.LastDate)
+                                                   .Format("{0:dd.MM.yyyy hh:mm:ss}");
+                                           })
+                                           .ClientDetailTemplateId("template_Child")
+                                           .Resizable(resize => resize.Columns(true))
+                                           .Reorderable(reorder => reorder.Columns(true))
+
+                                           .Pageable(pager => pager
+                                               .PageSizes(new[] { 10, 20, 50, 100, 200, 500 })
+                                               .Refresh(true))
+                                           .Selectable()
+                                           .Sortable()
+                                           .Filterable(ftb => ftb.Mode(GridFilterMode.Menu))
+                                           //.Groupable()
+                                           .DataSource(dataSource => dataSource
+                                               .Ajax()
+                                               .Sort(sort => sort.Add(x => x.LastDate).Descending())
+                                               .Read(read => read.Action("GetAccounts", "Accounts").Data("getAccountsFilter")
+                                               ).Events(e => e.Error("onError"))
+                                           ))
+                        </text>);
+                    tabstrip.Add().Text("Архів залишків по рахункам")
+                        .Content(@<text>
+                        <div style="padding: 5px;">Фільтр: інформація на дату - <input id="accountsRestDate" /></div>
+                        @(Html.Kendo().Grid<AccountRest>()
+                                           .Name("grid_AccountsRest")
+                                           .ToolBar(i=>i.Template("<button class=\"k-button\" onclick=\"uploadAccountsRestExcel();\"><i class=\"pf-icon pf-16 pf-exel\"></i> Вигрузити в EXCEL</button>"))
+                                           /*.ToolBar(tools => tools.Excel())
+                                    .Excel(i => i.FileName("AccountsRest.xlsx")
+                                        //.AllPages(true)
+                                        .Filterable(true)
+                                        .ProxyURL(Url.Content("~/cash/Accounts/ConvertBase64ToFile/"))
+                                        )*/
+                                           .Columns(columns =>
+                                           {
+                                               columns.Bound(c => c.Mfo);
+                                               columns.Bound(c => c.MfoName);
+                                               columns.Bound(c => c.Branch);
+                                               columns.Bound(c => c.CashType);
+                                               columns.Bound(c => c.BalNumber);
+                                               columns.Bound(c => c.AccountNumber);
+                                               columns.Bound(c => c.Ob22);
+                                               columns.Bound(c => c.Currency);
+                                               columns.Bound(c => c.Balance)
+                                                   .HtmlAttributes(new { @class = "rightField" })
+                                                   .Format("{0:n}");
+                                               columns.Bound(c => c.OpenDate)
+                                                   .Format("{0:dd.MM.yyyy}");
+                                               columns.Bound(c => c.BalanceDate)
+                                                   .Format("{0:dd.MM.yyyy}");
+                                           })
+                                           .Resizable(resize => resize.Columns(true))
+                                           .Reorderable(reorder => reorder.Columns(true))
+
+                                           .Pageable(pager => pager
+                                               .PageSizes(new[] { 10, 20, 50, 100, 200, 500 })
+                                               .Refresh(true))
+                                           .Selectable()
+                                           .Sortable()
+                                           .Filterable(ftb => ftb.Mode(GridFilterMode.Menu))
+                                           //.Groupable()
+                                           .DataSource(dataSource => dataSource
+                                               .Ajax()
+                                               .Read(read => read.Action("GetAccountsRest", "Accounts").Data("getAccountsRestFilter")
+                                               ).Events(e => e.Error("onError"))
+                                           ))
+                        </text>);
+                })
+            )
+        </td>
+
+    </tr>
+</table>
+
+
+
+<script type="text/javascript">
+    function uploadAccountsRestExcel() {
+        if ($('#accountsRestDate').val() == '') {
+            bars.ui.error({ text: 'Виберіть дату для завантаження' });
+            return false;
+        } else {
+            var filter = $.param(getAccountsRestFilter());
+            document.location.href = bars.config.urlContent('/Cash/Accounts/GetAccountsRestFile/') + '?' + filter;
+            return false;
+        }
+    }
+
+    $(document).ready(function () {
+        $('#accountsRestDate').kendoMaskedDatePicker({
+            format: '{0:dd/MM/yyyy}',
+            mask: '00/00/0000',
+            change:function() {
+                var grid = $('#grid_AccountsRest').data('kendoGrid');
+                grid.dataSource.read();
+                grid.refresh();
+            }
+        });
+
+        window.mfoFilter.registerObserver(function (filterList) {
+            model.filterList = filterList;
+            model.rereadGrids();
+        });
+    });
+
+    function onAccountGridDataBound(e) {
+        /*alert()
+        var gr = e.sender.dataSource.group();
+        if (gr.length > 1) {
+            gr.shift();
+            e.sender.dataSource.fetch();
+        }*/
+        var grid = this;
+        this.lockedTable.find(".k-grouping-row").each(function(index) {
+            var arrow = $(this).find("a");
+            grid.tbody.find(".k-grouping-row:eq(" + index + ") td").text($(this).text());
+            $(this).find("p").text(" ").append(arrow);
+        });
+    }
+
+    /* Хранит состояние страницы и позволяет переключаться между функциями*/
+    var model = {
+        // ассоциативный массив отмеченных МФО (код - true/false)
+        filterList: {},
+        // массив отмеченных МФО
+        getMfoList: function () {
+            var mfos = [];
+            for (key in model.filterList) {
+                if (model.filterList[key] == true) {
+                    mfos.push(key);
+                }
+            }
+            return mfos;
+        },
+
+        // перечитать все гриды
+        rereadGrids: function () {
+            this.rereadGrid("grid_Accounts");
+            this.rereadGrid("grid_AccountsRest");
+        },
+
+        // перечитать грид
+        rereadGrid: function (gridId) {
+            var curGrid = $("#" + gridId);
+            if (curGrid.length != 0) {
+                curGrid.data("kendoGrid").dataSource.read();
+            }
+        }
+    };
+
+    function onError(e) {
+        if (e.status == "customerror") {
+            var exception = e.errors;
+            bars.ui.error({ text: exception.message, width:500 , height:400 });
+            //showModalWindow(exception.message);
+        }
+        else {
+            bars.ui.error({ text: 'Помилка сервера' });
+        }
+    }
+
+    function getAccountsFilter() {
+        return {
+            mfoList: model.getMfoList()
+        };
+    }
+
+    function getAccountsRestFilter() {
+        var date = $('#accountsRestDate').val();
+        return {
+            mfoList: model.getMfoList(),
+            date: date
+        };
+    }
+
+    function showModalWindow(content) {
+        var wnd = $("#Details").data("kendoWindow");
+        wnd.content(content);
+        wnd.center().open();
+    }
+</script>
+
+<style>
+table.acc-table tr td {
+    vertical-align: top;
+}
+
+    .rightField {
+        text-align: right;
+    }
+</style>

@@ -1,0 +1,71 @@
+﻿<xmlform captiontype="OnlyTitle">
+  <grids>
+    <grid id="gv" pagesize="10" showpagesizebox="true" title="Перевищення лімітів СК" showfilter="true">
+      <datasource>
+        <sql>
+          select t.*, decode(object_type, 0, 'Контрагент',1, 'Застава') object_name from MV_INS_BROKEN_LIMITS t
+        </sql>
+      </datasource>
+      <rowselection method="SingleRow" />
+      <filters buttontext="Пошук" caption="Фільтри" columnscount="1" width="100%">
+        <filter field="PARTNER_ID" caption="Ідентифікатор СК" condition="Equal" columnindex="1" id="f1"></filter>
+        <filter field="NMK" caption="Найменування СК" condition="LikeRight" columnindex="1" id="f1">
+          <uicontrol controlwidth="350"></uicontrol>
+        </filter>
+      </filters>
+      <fields>
+        <field name="PARTNER_ID" key="false" datatype="Int64" sort="default">
+          <column show="true" caption="Ідентифікатор СК" align="right" />
+        </field>
+        <field name="RNK" key="false" datatype="Int64" sort="default">
+          <column show="false" caption="РНК контрагента-компанії" align="right" />
+        </field>
+        <field name="NMK" key="false" datatype="String" sort="default">
+          <column show="true" caption="Найменування CK" align="left" />
+        </field>
+        <field name="AGR_NO" key="false" datatype="String" sort="default">
+          <column show="true" caption="Номер договору про співробітництво" align="left" />
+        </field>
+        <field name="AGR_DATE" key="false" datatype="DateTime" sort="default">
+          <column show="true" caption="Дата договору про співробітництво" align="center" />
+        </field>
+        <field name="FEE_MIN" key="false" datatype="Decimal" sort="default">
+          <column show="false" caption="Мінімальний розмір агентської винагороди" align="right" />
+        </field>
+        <field name="FEE_PERC" key="false" datatype="Decimal" sort="default">
+          <column show="false" caption="Процентний розмір агентської винагороди" align="right" />
+        </field>
+        <field name="FEE_MAX" key="false" datatype="Decimal" sort="default">
+          <column show="false" caption="Максимальний розмір агентської винагороди" align="right" />
+        </field>
+        <field name="PARTNER_ACTIVE" key="false" datatype="Int64" sort="default">
+          <column show="false" caption="Флаг активності відносин" align="right" />
+        </field>
+        <field name="TYPE_ID" key="false" datatype="Int64" sort="default">
+          <column show="false" caption="Ідентифікатор типу страхового договору" align="right" />
+        </field>
+        <field name="TYPE_NAME" key="false" datatype="String" sort="default">
+          <column show="true" caption="Тип страхового договору" align="left" />
+        </field>
+        <field name="OBJECT_NAME" key="false" datatype="String" sort="default">
+          <column show="true" caption="Тип об`єкту страхування" align="left" />
+        </field>
+        <field name="TYPE_ACTIVE" key="false" datatype="Int64" sort="default">
+          <column show="false" caption="Флаг активності відносин по даному типу страхового договору" align="right" />
+        </field>
+        <field name="LIM" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="Значення ліміту" align="right" />
+        </field>
+        <field name="ACTUAL" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="Актуальне значення" align="right" />
+        </field>
+        <field name="LIMIT_TYPE_ID" key="false" datatype="Decimal" sort="default">
+          <column show="false" caption="Ідентифікатор типу ліміту" align="right" />
+        </field>
+        <field name="LIMIT_TYPE_NAME" key="false" datatype="String" sort="default">
+          <column show="true" caption="Найменування ліміту" align="left" />
+        </field>
+      </fields>
+    </grid>
+  </grids>
+</xmlform>

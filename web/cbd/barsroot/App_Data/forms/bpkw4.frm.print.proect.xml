@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<xmlform caption="Виберіть групу продуктів або зарплатний проект">
+  <grids>
+    <grid id="gProect" pagesize="10" showpagesizebox="true">
+      <filters caption="Пошук зарплатного проекту" buttontext="Знайти" columnscount="2" width="100%">
+        <filter field="okpo" caption="ЗКПО" columnindex="1" condition="Equal" id="fltrokpo">
+          <uicontrol></uicontrol>
+        </filter>
+        <filter field="name" caption="Назва проекту" columnindex="2" condition="LikeBoth" id="fltrname">
+          <uicontrol></uicontrol>
+        </filter>
+      </filters>
+      <datasource>
+        <sql>
+          select id, name, nvl(okpo,grp_code) okpo, product_code, product_name, grp_code
+          from v_bpk_proect
+          order by id
+        </sql>
+      </datasource>
+      <buttons defaulttype="Button">
+        <button id="btnDone" caption="Далі" hint="Перейти до вибору угод БПК">
+          <command type="Redirect" url="/barsroot/barsweb/dynform.aspx?form=bpkw4.frm.print.accounts">
+            <parameters>
+              <parameter type="DataField" name="okpo" altname="proect_okpo"></parameter>
+              <parameter type="DataField" name="name" altname="proect_name"></parameter>
+            </parameters>
+          </command>
+        </button>
+      </buttons>
+      <rowselection method="SingleRow"></rowselection>
+      <fields>
+        <field name="id" datatype="Int64" key="true">
+          <column caption="Код" align="Right" width="50"></column>
+        </field>
+        <field name="okpo" datatype="String" key="true">
+          <column caption="Група продуктів/ ЗКПО З/П проекту" align="Left" width="100"></column>
+        </field>
+        <field name="name" datatype="String" key="true">
+          <column caption="Назва" align="Left" width="400"></column>
+        </field>
+        <field name="product_code" datatype="String" key="true">
+          <column caption="Продукт" align="Left" show="false"></column>
+        </field>
+        <field name="product_name" datatype="String">
+          <column caption="Назва продукту" align="Left" show="false"></column>
+        </field>
+        <field name="grp_code" datatype="String" key="true">
+          <column caption="Продукт" align="Left" show="false"></column>
+        </field>
+      </fields>
+    </grid>
+  </grids>
+</xmlform>

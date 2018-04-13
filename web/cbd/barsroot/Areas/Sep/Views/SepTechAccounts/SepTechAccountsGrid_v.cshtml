@@ -1,0 +1,242 @@
+﻿@{
+    Layout = null;
+}
+@model BarsWeb.Areas.Sep.Models.SepTechAccountsFilterParams
+    <div id="SepTechAccountsGridV2"></div>
+    <script>
+        $(document).ready(function () { 
+            $("#SepTechAccountsGridV2").kendoGrid({
+                columns: [
+                    {
+                        field: "ACC",
+                        hidden: true
+                    },
+                    {
+                        field: "TOBO",
+                        title: "Код безбал. отделения",
+                        width: "90px",
+                        headerAttributes: { style: "white-space: normal;" }
+                    },
+                    {
+                        field: "NLS",
+                        title: "Номер счета",
+                        headerAttributes: { style: "white-space: normal;" },
+                        width: "135px"
+                    },
+                    {
+                        field: "LCV",
+                        title: "Валюта",
+                        headerAttributes: { style: "white-space: normal;" },
+                        width: "70px"
+                    },
+                    {
+                        field: "NMS",
+                        title: "Наименование счета",
+                        headerAttributes: { style: "white-space: normal;" },
+                        width: "205px"
+                    },
+                    {
+                        field: "ISF",
+                        title: "Входящий остаток",
+                        headerAttributes: { style: "white-space: normal;" },
+                        template: "#=CellPaint(ISF)#",
+                        width: "100px"
+                    },
+                    {
+                        field: "DOSF",
+                        title: "Обороты Дебет",
+                        headerAttributes: { style: "white-space: normal;" },
+                        template: "#=moneyFormat(DOSF)#",
+                        width: "100px"
+                    },
+                    {
+                        field: "KOSF",
+                        title: "Обороты Кредит",
+                        headerAttributes: { style: "white-space: normal;" },
+                        template: "#=moneyFormat(KOSF)#",
+                        width: "100px"
+                    },
+                    {
+                        field: "OSTCF",
+                        title: "Фактический остаток",
+                        headerAttributes: { style: "white-space: normal;" },
+                        template: "#=CellPaint(OSTCF)#",
+                        width: "100px"
+                    },
+                    {
+                        field: "OSTBF",
+                        title: "Плановый остаток",
+                        headerAttributes: { style: "white-space: normal;" },
+                        template: "#=CellPaint(OSTBF)#",
+                        width: "100px"
+                    },
+                    {
+                        field: "OSTFF",
+                        title: "Будущий остаток",
+                        headerAttributes: { style: "white-space: normal;" },
+                        template: "#=CellPaint(OSTFF)#",
+                        width: "100px"
+                    },
+                    {
+                        field: "DAPP",
+                        title: "Дата последнего движения",
+                        headerAttributes: { style: "white-space: normal;" },
+                        template: "<div style='text-align:left;'>#=kendo.toString(DAPP,'dd/MM/yyyy') != null ? kendo.toString(DAPP,'dd/MM/yyyy') : '' #</div>",
+                        width: "100px"
+                    },
+                    {
+                        field: "NBS",
+                        title: "Баланс счет",
+                        attributes: { "class": "text-center" },
+                        headerAttributes: { style: "white-space: normal;" },
+                        width: "90px"
+                    },
+                    {
+                        field: "PAP",
+                        title: "Акт Пас",
+                        attributes: { "class": "text-center" },
+                        headerAttributes: { style: "white-space: normal;" },
+                        width: "70px",
+                        template: "#=PAPCaseHandle(PAP)#",
+                        attributes: { "class": "text-center" }
+                    },
+                    {
+                        field: "TIP",
+                        title: "Тип счета",
+                        attributes: { "class": "text-center" },
+                        headerAttributes: { style: "white-space: normal;" },
+                        width: "80px",                       
+                        attributes: { "class": "text-center" }
+                    },
+                    {
+                        field: "OB22",
+                        title: "ОБ22",
+                        attributes: { "class": "text-center" },
+                        headerAttributes: { style: "white-space: normal;" },
+                        width: "80px"
+                    },
+                    {
+                        field: "ISP",
+                        title: "ID исполнителя",
+                        attributes: { "class": "text-center" },
+                        headerAttributes: { style: "white-space: normal;" },
+                        width: "90px"
+                    },
+                    {
+                        field: "FIO",
+                        title: "ФИО Исполнителя",
+                        headerAttributes: { style: "white-space: normal;" },
+                        width: "190px"
+                    },
+                    {
+                        field: "DAOS",  
+                        title: "Дата открытия",
+                        headerAttributes: { style: "white-space: normal;" },
+                        template: "<div style='text-align:left;'>#=kendo.toString(DAOS,'dd/MM/yyyy') != null ? kendo.toString(DAOS,'dd/MM/yyyy') : '' #</div>",
+                        width: "100px"
+                    },
+                    {
+                        field: "DAZS",
+                        title: "Дата закрытия",
+                        headerAttributes: { style: "white-space: normal;" },
+                        template: "<div style='text-align:left;'>#=kendo.toString(DAZS,'dd/MM/yyyy')#</div>",
+                        width: "100px",
+                        hidden: true
+                    },
+                    {
+                        field: "RNK",
+                        title: "РНК",
+                        attributes: { "class": "text-center" },
+                        headerAttributes: { style: "white-space: normal;" },
+                        width: "70px"
+                    }
+                ],
+                dataSource: {
+                    type: "aspnetmvc-ajax",
+                    serverPaging: true,
+                    serverSorting: true,
+                    serverFiltering: true,
+                    pageSize: 10,
+                    transport: {
+                        read: {
+                            dataType: 'json',
+                            url: bars.config.urlContent('/sep/SepTechAccounts/@Model.GridVariantString'),                     
+                            data: SepTechAccountsGridData
+                        }
+                    },
+                    schema: {
+                        data: "Data",
+                        total: "Total",
+                        errors: "Errors",
+                        model: {
+                            fields: {
+                                ACC: { type: "number" },
+                                TOBO: { type: "string" },
+                                NLS: { type: "string" },
+                                LCV: { type: "string" },
+                                NMS: { type: "string" },
+                                ISF: { type: "number" },
+                                DOSF: { type: "number" },
+                                KOSF: { type: "number" },
+                                OSTCF: { type: "number" },
+                                OSTBF: { type: "number" },
+                                OSTFF: { type: "number" },
+                                DAOS: { type: "date" },
+                                NBS: { type: "number" },
+                                PAP: { type: "string" },
+                                TIP: { type: "number" },
+                                ISP: { type: "number" },
+                                FIO: { type: "string" },
+                                DAPP: { type: "date" },
+                                DAZS: { type: "date" },
+                                RNK: { type: "number" }
+                            }
+                        }
+                    }                   
+                },
+                sortable: true,
+                filterable: true,
+                resizable: true,
+                autobind: true,
+                selectable: "multiple",
+                pageable: {
+                    refresh: true,
+                    pageSizes: true,
+                    buttonCount: 5
+                },
+                change: SepTechAccountsGridonRowSelected,
+                dataBound: grid_dataBound
+            });
+
+           
+
+            if ("@Model.GridVariantString" == "GetSEPTECHACCOUNT_V1") {
+                $('#SepTechAccountsGridV2').data('kendoGrid').hideColumn("DAZS");
+            }
+              
+            if (GetCurrentSepTechAccountsGrid().id != "SepTechAccountsGridVQF") {
+                var state = JSON.parse($.cookie("sepTechState"));
+                var grid = GetCurrentGrid();
+                if (state) {
+                    if (state.filter) {
+                        parseFilterDates(state.filter, grid.dataSource.options.schema.model.fields);
+                    }
+                    grid.dataSource.query(state);
+                }
+                else {
+                    grid.dataSource.read();
+                }
+            }
+
+        });
+
+     /*   $(document).ready(function () {
+            var dataSource = $('#SepTechAccountsGridV2').data('kendoGrid').dataSource;
+            var size = dataSource.pageSize();
+        });*/
+
+        function refreshGrid() {
+            $('#SepTechAccountsGridV2').data('kendoGrid').dataSource.read();
+            $('#SepTechAccountsGridV2').data('kendoGrid').refresh();
+        }
+    </script>

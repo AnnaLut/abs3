@@ -1,0 +1,202 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" DoublePass="true" ReportInfo.Created="05/17/2013 18:06:00" ReportInfo.Modified="04/28/2014 17:28:07" ReportInfo.CreatorVersion="2013.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqZLE460ApuhBq9nxfsVEDUt7EIVCkoC3X/ERlONNLojZ8kDSQwa4lhTH6IVJHLHAjIscSUxzI4zyRd1OeECMk9A==">
+      <TableDataSource Name="Table" Alias="DPT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select nvl(d.nd, to_char(d.deposit_id)) as id,&#13;&#10;       tp.type_name,&#13;&#10;       f_dat_lit(d.datz) as dealdate,&#13;&#10;       f_dat_lit(d.dat_end) as end_date,&#13;&#10;       a.nls as nlsd,&#13;&#10;       d.limit / 100 as summ,&#13;&#10;       f_sumpr(d.limit, d.kv, 'F') as sum_w,&#13;&#10;       decode(d.kv, 980, 'грн.', t.lcv) as kv,&#13;&#10;       f_doc_dpt(d.deposit_id, 3, 1) as term_calc,&#13;&#10;       f_doc_dpt(d.deposit_id, 3, 2) as term_calc_w,&#13;&#10;       dpt.fproc(d.acc, bankdate) as rate,&#13;&#10;       f_sumpr(dpt.fproc(d.acc, bankdate), '', 'M', 3) as rate_w,&#13;&#10;       nvl(trim(d.mfo_p), '_________________') as paym_mfo,&#13;&#10;       nvl(trim(b.nb), '____') as paym_nb,&#13;&#10;       nvl(trim(d.nls_p), '_________________') as paym_nls&#13;&#10;  from dpt_deposit d,&#13;&#10;       dpt_vidd    v,&#13;&#10;       dpt_types   tp,&#13;&#10;       tabval      t,&#13;&#10;       accounts    a,&#13;&#10;       banks       b&#13;&#10; where d.acc = a.acc&#13;&#10;   and d.vidd = v.vidd&#13;&#10;   and v.type_id = tp.type_id&#13;&#10;   and d.kv = t.kv&#13;&#10;   and d.mfo_p = b.mfo(+)&#13;&#10;   and d.deposit_id in (select ra.contract_id&#13;&#10;                         from CUST_REQ_ACCESS ra&#13;&#10;                        where ra.req_id = :p_req_id)">
+        <Column Name="ID" DataType="System.String"/>
+        <Column Name="DEALDATE" DataType="System.String"/>
+        <Column Name="END_DATE" DataType="System.String"/>
+        <Column Name="NLSD" DataType="System.String"/>
+        <Column Name="SUMM" DataType="System.Decimal"/>
+        <Column Name="SUM_W" DataType="System.String"/>
+        <Column Name="KV" DataType="System.String"/>
+        <Column Name="TERM_CALC" DataType="System.String"/>
+        <Column Name="TERM_CALC_W" DataType="System.String"/>
+        <Column Name="RATE" DataType="System.Decimal"/>
+        <Column Name="RATE_W" DataType="System.String"/>
+        <Column Name="PAYM_MFO" DataType="System.String"/>
+        <Column Name="PAYM_NB" DataType="System.String"/>
+        <Column Name="PAYM_NLS" DataType="System.String"/>
+        <Column Name="TYPE_NAME" DataType="System.String"/>
+        <CommandParameter Name="p_req_id" DataType="113" Expression="[p_req_id]" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table2" Alias="COMMON_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select b.name as name_branch,&#13;&#10;       nvl(nvl(trim(d.adress), b.name), '___') as adres_branch,&#13;&#10;       tobopack.get_branch_param('DPT_PHON') as phones_branch,&#13;&#10;       nvl(d.dover, '________') as staff_dover,&#13;&#10;       nvl(d.fio_r, '________') as staff_fio_r,&#13;&#10;       NVL(d.posada_r, '________') as staff_status_r,&#13;&#10;       nvl(d.town, tobopack.get_branch_param('TOWN')) as staff_town,&#13;&#10;       f_dat_lit(trunc(sysdate)) as today_w&#13;&#10;  from branch b, dpt_staff d&#13;&#10; where b.branch = tobopack.get_branch&#13;&#10;   and d.userid(+) = user_id&#13;&#10;   and d.branch(+) = b.branch">
+        <Column Name="NAME_BRANCH" DataType="System.String"/>
+        <Column Name="ADRES_BRANCH" DataType="System.String"/>
+        <Column Name="PHONES_BRANCH" DataType="System.String"/>
+        <Column Name="STAFF_DOVER" DataType="System.String"/>
+        <Column Name="STAFF_FIO_R" DataType="System.String"/>
+        <Column Name="STAFF_STATUS_R" DataType="System.String"/>
+        <Column Name="STAFF_TOWN" DataType="System.String"/>
+        <Column Name="TODAY_W" DataType="System.String"/>
+      </TableDataSource>
+      <TableDataSource Name="Table4" Alias="CLIENT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select c.nmk as fio,&#13;&#10;       f_get_custw_h(c.rnk, 'SN_GC', sysdate) as fio_r,&#13;&#10;       c.okpo as okpo,&#13;&#10;       case c.codcagent&#13;&#10;         when 5 then 'резидент'&#13;&#10;         when 6 then 'нерезидент'&#13;&#10;         else '--'&#13;&#10;       end as codcagent,&#13;&#10;       p.ser || ' ' || p.numdoc as pasp_no,&#13;&#10;       f_dat_lit(p.pdate) as pasp_date,&#13;&#10;       p.organ as pasp_atrt,&#13;&#10;       c.adr as address,&#13;&#10;       nvl(p.teld, nvl(p.telw, '________')) as phone&#13;&#10;  from customer c, person p&#13;&#10; where c.rnk = p.rnk(+)&#13;&#10;   and c.rnk = (select ar.trustee_rnk&#13;&#10;                  from CUST_REQUESTS ar&#13;&#10;                 where ar.req_id = :p_req_id)">
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="CODCAGENT" DataType="System.String"/>
+        <Column Name="PASP_NO" DataType="System.String"/>
+        <Column Name="PASP_DATE" DataType="System.String"/>
+        <Column Name="PASP_ATRT" DataType="System.String"/>
+        <Column Name="ADDRESS" DataType="System.String"/>
+        <Column Name="PHONE" DataType="System.String"/>
+        <Column Name="FIO_R" DataType="System.String"/>
+        <CommandParameter Name="p_req_id" DataType="113" Expression="[p_req_id]" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table6" Alias="OWNER_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select c.nmk as fio,&#13;&#10;       f_get_custw_h(c.rnk, 'SN_GC', sysdate) as fio_r,&#13;&#10;       c.okpo as okpo,&#13;&#10;       case c.codcagent&#13;&#10;         when 5 then 'резидент'&#13;&#10;         when 6 then 'нерезидент'&#13;&#10;         else '--'&#13;&#10;       end as codcagent,&#13;&#10;       p.ser || ' ' || p.numdoc as pasp_no,&#13;&#10;       f_dat_lit(p.pdate) as pasp_date,&#13;&#10;       p.organ as pasp_atrt,&#13;&#10;       c.adr as address,&#13;&#10;       nvl(p.teld, nvl(p.telw, '________')) as phone&#13;&#10;  from customer c, person p&#13;&#10; where c.rnk = p.rnk(+)&#13;&#10;   and c.rnk = (select max(d.rnk)&#13;&#10;                  from dpt_deposit d, &#13;&#10;                       CUST_REQ_ACCESS ra&#13;&#10;                 where d.deposit_id = ra.contract_id &#13;&#10;                   and ra.req_id = :p_req_id)">
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="CODCAGENT" DataType="System.String"/>
+        <Column Name="PASP_NO" DataType="System.String"/>
+        <Column Name="PASP_DATE" DataType="System.String"/>
+        <Column Name="PASP_ATRT" DataType="System.String"/>
+        <Column Name="ADDRESS" DataType="System.String"/>
+        <Column Name="PHONE" DataType="System.String"/>
+        <Column Name="FIO_R" DataType="System.String"/>
+        <CommandParameter Name="p_req_id" DataType="113" Expression="[p_req_id]" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table7" Alias="REQUEST_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select r.TRUSTEE_TYPE,&#13;&#10;       r.REQ_ID,&#13;&#10;       r.CERTIF_NUM,&#13;&#10;       r.CERTIF_DATE,&#13;&#10;       f_dat_lit(r.certif_date) as cert_date_w&#13;&#10;  from CUST_REQUESTS r&#13;&#10; where r.req_id = :p_req_id">
+        <Column Name="CERTIF_NUM" DataType="System.String" PropName="CERT_NUM"/>
+        <Column Name="CERTIF_DATE" DataType="System.DateTime" PropName="CERT_DATE"/>
+        <Column Name="CERT_DATE_W" DataType="System.String"/>
+        <Column Name="TRUSTEE_TYPE" DataType="System.String"/>
+        <Column Name="REQ_ID" DataType="System.Decimal"/>
+        <CommandParameter Name="p_req_id" DataType="113" Expression="[p_req_id]" DefaultValue="0"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_req_id" DataType="System.Int32" Expression="60"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Guides="718.2,9.45">
+    <DataBand Name="Data1" Width="718.2" Height="217.35" CanGrow="true" CanShrink="true" CanBreak="true">
+      <TableObject Name="Table1" Left="9.45" Top="9.45" Width="699.23" Height="146.69" GrowToBottom="true">
+        <TableColumn Name="Column1" Width="335.43"/>
+        <TableColumn Name="Column2" Width="363.8"/>
+        <TableRow Name="Row1" MinHeight="75.6" Height="75.6" AutoSize="true">
+          <TableCell Name="Cell1" Text="Установа банку № [COMMON_DATA.NAME_BRANCH]" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2" Text="Від [CLIENT_DATA.FIO_R]&#13;&#10;Паспорт [CLIENT_DATA.PASP_NO] &#13;&#10;Виданий [CLIENT_DATA.PASP_ATRT] [CLIENT_DATA.PASP_DATE]" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row3" Height="49.72">
+          <TableCell Name="Cell11" Text="ЗАЯВА №[REQUEST_DATA.REQ_ID]&#13;&#10;НА ДОСТУП ЧЕРЕЗ БЕК-ОФІС" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell12" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row4" Height="21.37" AutoSize="true">
+          <TableCell Name="Cell16" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell17" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row54" Height="0">
+          <TableCell Name="Cell119" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell120" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table8" Left="9.45" Top="151.2" Width="702.54" Height="56.7">
+        <TableColumn Name="Column20" Width="22.98"/>
+        <TableColumn Name="Column21" Width="51.33"/>
+        <TableColumn Name="Column22" Width="41.88"/>
+        <TableColumn Name="Column23" Width="89.13"/>
+        <TableColumn Name="Column24" Width="22.98"/>
+        <TableColumn Name="Column25" Width="66.18"/>
+        <TableColumn Name="Column26" Width="7.08"/>
+        <TableColumn Name="Column27" Width="400.98"/>
+        <TableRow Name="Row160" Height="56.7">
+          <TableCell Name="Cell352" Text="	У зв’язку з ____________________________________________________________ &#13;&#10;	Прошу надати мені доступ до вкладного(них) рахунку(ів), відкритих на ім’я &lt;b&gt;[OWNER_DATA.FIO_R]&lt;/b&gt;" Padding="0, 0, 0, 0" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="8"/>
+          <TableCell Name="Cell353" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell354" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell355" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell356" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell357" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell358" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell359" Padding="0, 0, 0, 0" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <DataBand Name="Data3" Top="250.07" Width="718.2" Height="28.35" CanGrow="true" CanShrink="true" DataSource="Table">
+      <TableObject Name="Table8" Left="9.45" Width="699.27" Height="28.35" GrowToBottom="true">
+        <TableColumn Name="Column9" Width="162.18"/>
+        <TableColumn Name="Column10" Width="190.53"/>
+        <TableColumn Name="Column11" Width="190.53"/>
+        <TableColumn Name="Column12" Width="86.58"/>
+        <TableColumn Name="Column13" Width="23.15"/>
+        <TableColumn Name="Column14" Width="23.15"/>
+        <TableColumn Name="Column16" Width="23.15"/>
+        <TableRow Name="Row167" Height="28.35" AutoSize="true">
+          <TableCell Name="Cell46" Border.Lines="All" Text="[DPT_DATA.NLSD]" HorzAlign="Center" Font="Arial, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell47" Border.Lines="All" Text="[DPT_DATA.TYPE_NAME]" HorzAlign="Center" Font="Arial, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell48" Border.Lines="All" Text="[DPT_DATA.ID]" HorzAlign="Center" Font="Arial, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell49" Border.Lines="All" Text="[DPT_DATA.DEALDATE]" HorzAlign="Center" Font="Arial, 8pt" HtmlTags="true" ColSpan="4"/>
+          <TableCell Name="Cell50" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell51" Border.Lines="All" HorzAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell53" Border.Lines="All" NullValue="-" HorzAlign="Right" Font="Arial, 8pt"/>
+        </TableRow>
+      </TableObject>
+      <DataHeaderBand Name="DataHeader1" Top="219.54" Width="718.2" Height="28.35">
+        <TableObject Name="Table8" Left="9.45" Width="699.16" Height="28.35" Border.Lines="All">
+          <TableColumn Name="Column33" Width="161.98"/>
+          <TableColumn Name="Column34" Width="190.33"/>
+          <TableColumn Name="Column3" Width="190.33"/>
+          <TableColumn Name="Column4" Width="76.93"/>
+          <TableColumn Name="Column5" Width="29.68"/>
+          <TableColumn Name="Column6" Width="20.23"/>
+          <TableColumn Name="Column35" Width="29.68"/>
+          <TableRow Name="Row166" Height="28.35">
+            <TableCell Name="Cell385" Border.Lines="All" Fill.Color="Gainsboro" Text="№ рахунку" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell386" Border.Lines="All" Fill.Color="Gainsboro" Text="відкритий по вкладу" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell3" Border.Lines="All" Fill.Color="Gainsboro" Text="за договором" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell4" Border.Lines="All" Fill.Color="Gainsboro" Text="від" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold" ColSpan="4"/>
+            <TableCell Name="Cell5" Border.Lines="All" Fill.Color="Gainsboro" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell26" Border.Lines="All" Fill.Color="Gainsboro" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell36" Border.Lines="All" Fill.Color="Gainsboro" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          </TableRow>
+        </TableObject>
+      </DataHeaderBand>
+    </DataBand>
+    <DataBand Name="Data2" Top="280.61" Width="718.2" Height="245.7" CanGrow="true" CanShrink="true" CanBreak="true" StartNewPage="true">
+      <TableObject Name="Table3" Left="18.9" Top="9.45" Width="699.3" Height="236.25">
+        <TableColumn Name="Column28" Width="115.29"/>
+        <TableColumn Name="Column29" Width="238.14"/>
+        <TableColumn Name="Column30" Width="115.29"/>
+        <TableColumn Name="Column31" Width="115.29"/>
+        <TableColumn Name="Column32" Width="115.29"/>
+        <TableRow Name="Row161" Height="28.35">
+          <TableCell Name="Cell360" Text="&#13;&#10;" VertAlign="Center" HtmlTags="true" ColSpan="5"/>
+          <TableCell Name="Cell361"/>
+          <TableCell Name="Cell362"/>
+          <TableCell Name="Cell363"/>
+          <TableCell Name="Cell364"/>
+        </TableRow>
+        <TableRow Name="Row162" Height="122.85">
+          <TableCell Name="Cell365" Text="	Підстава для надання доступу: &lt;b&gt;[IIf([REQUEST_DATA.TRUSTEE_TYPE] == &quot;T&quot;, &quot;довіреність&quot;, IIf([REQUEST_DATA.TRUSTEE_TYPE] == &quot;H&quot;, &quot;спадковий документ&quot;, &quot;документу що посвідчує особу&quot;))]&lt;/b&gt; № &lt;b&gt;[REQUEST_DATA.CERTIF_NUM]&lt;/b&gt; від &lt;b&gt;[REQUEST_DATA.CERT_DATE_W]&lt;/b&gt;" HtmlTags="true" ColSpan="5">
+            <Formats>
+              <GeneralFormat/>
+              <GeneralFormat/>
+              <GeneralFormat/>
+            </Formats>
+          </TableCell>
+          <TableCell Name="Cell366"/>
+          <TableCell Name="Cell367"/>
+          <TableCell Name="Cell368"/>
+          <TableCell Name="Cell369"/>
+        </TableRow>
+        <TableRow Name="Row163" Height="47.25">
+          <TableCell Name="Cell370" Text="[COMMON_DATA.TODAY_W]" HorzAlign="Center" VertAlign="Center" ColSpan="2"/>
+          <TableCell Name="Cell371"/>
+          <TableCell Name="Cell372" Text="_____________________&#13;&#10;(підпис клієнта)" HorzAlign="Center" VertAlign="Center" ColSpan="3"/>
+          <TableCell Name="Cell373"/>
+          <TableCell Name="Cell374"/>
+        </TableRow>
+        <TableRow Name="Row164">
+          <TableCell Name="Cell375"/>
+          <TableCell Name="Cell376"/>
+          <TableCell Name="Cell377"/>
+          <TableCell Name="Cell378"/>
+          <TableCell Name="Cell379"/>
+        </TableRow>
+        <TableRow Name="Row165">
+          <TableCell Name="Cell380"/>
+          <TableCell Name="Cell381"/>
+          <TableCell Name="Cell382"/>
+          <TableCell Name="Cell383"/>
+          <TableCell Name="Cell384"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+  </ReportPage>
+</Report>

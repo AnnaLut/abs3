@@ -1,0 +1,224 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="AdminModel.Store" Provider="Oracle.DataAccess.Client" ProviderManifestToken="11.2" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+        <EntityType Name="APPLIST">
+          <Key>
+            <PropertyRef Name="CODEAPP" />
+          </Key>
+          <Property Name="CODEAPP" Type="char" MaxLength="4" Nullable="false" />
+          <Property Name="NAME" Type="varchar2" MaxLength="140" Nullable="false" />
+          <Property Name="HOTKEY" Type="char" MaxLength="1" />
+          <Property Name="FRONTEND" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="ID" Type="number" Precision="38" Scale="0" />
+          <Property Name="ICON" Type="varchar2" MaxLength="200" />
+        </EntityType>
+        <EntityType Name="STAFF$BASE">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="FIO" Type="varchar2" MaxLength="60" Nullable="false" />
+          <Property Name="LOGNAME" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="TYPE" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="TABN" Type="varchar2" MaxLength="10" />
+          <Property Name="BAX" Type="number" Precision="1" Scale="0" />
+          <Property Name="TBAX" Type="date" />
+          <Property Name="DISABLE" Type="number" Precision="1" Scale="0" />
+          <Property Name="ADATE1" Type="date" />
+          <Property Name="ADATE2" Type="date" />
+          <Property Name="RDATE1" Type="date" />
+          <Property Name="RDATE2" Type="date" />
+          <Property Name="CLSID" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="APPROVE" Type="number" Precision="1" Scale="0" />
+          <Property Name="BRANCH" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="COUNTCONN" Type="number" Precision="10" Scale="0" />
+          <Property Name="COUNTPASS" Type="number" Precision="10" Scale="0" />
+          <Property Name="PROFILE" Type="varchar2" MaxLength="30" />
+          <Property Name="USEARC" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="CSCHEMA" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="WEB_PROFILE" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="POLICY_GROUP" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="ACTIVE" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="CREATED" Type="date" Nullable="false" />
+          <Property Name="EXPIRED" Type="date" />
+          <Property Name="CHKSUM" Type="varchar2" MaxLength="50" />
+          <Property Name="USEGTW" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="BLK" Type="char" MaxLength="1" />
+          <Property Name="TBLK" Type="date" />
+          <Property Name="TEMPL_ID" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="CAN_SELECT_BRANCH" Type="varchar2" MaxLength="1" />
+          <Property Name="CHGPWD" Type="char" MaxLength="1" />
+          <Property Name="TIP" Type="number" Precision="22" Scale="0" />
+          <Property Name="CURRENT_BRANCH" Type="varchar2" MaxLength="30" />
+        </EntityType>
+        <Function Name="BARS_USERADM_GRANT_APP_RESOURCE" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="BARS" StoreFunctionName="BARS_USERADM.GRANT_APP_RESOURCE">
+          <Parameter Name="P_APPID" Type="char" Mode="In" />
+          <Parameter Name="P_RESID" Type="number" Mode="In" />
+        </Function>
+        <Function Name="BARS_USERADM_SET_APP_CONTEXT" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="BARS" StoreFunctionName="BARS_USERADM.SET_APP_CONTEXT">
+          <Parameter Name="P_CODEAPP" Type="char" Mode="In" />
+        </Function>
+        <EntityContainer Name="AdminModelStoreContainer">
+          <EntitySet Name="APPLIST" EntityType="Self.APPLIST" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="STAFF$BASE" EntityType="Self.STAFF$BASE" Schema="BARS" store:Type="Tables" />
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="AdminModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+        <EntityContainer Name="Entities" annotation:LazyLoadingEnabled="true">
+          <FunctionImport Name="FUNC_MGR_ADD_APPLICATION">
+            <Parameter Name="P_CODEAPP" Mode="In" Type="String" />
+            <Parameter Name="P_NAME" Mode="In" Type="String" />
+            <Parameter Name="P_HOTKEY" Mode="In" Type="String" />
+            <Parameter Name="P_FRONTEND" Mode="In" Type="Decimal" />
+            <Parameter Name="P_ICON" Mode="In" Type="String" />
+          </FunctionImport>
+          <EntitySet Name="APPLIST" EntityType="AdminModel.APPLIST" />
+          <EntitySet Name="STAFF_BASE" EntityType="AdminModel.STAFF_BASE" />
+          <FunctionImport Name="BARS_USERADM_SET_APP_CONTEXT">
+            <Parameter Name="P_CODEAPP" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="BARS_USERADM_GRANT_APP_RESOURCE">
+            <Parameter Name="P_APPID" Mode="In" Type="String" />
+            <Parameter Name="P_RESID" Mode="In" Type="Decimal" />
+          </FunctionImport>
+        </EntityContainer>
+        <EntityType Name="APPLIST">
+          <Key>
+            <PropertyRef Name="CODEAPP" />
+          </Key>
+          <Property Name="CODEAPP" Type="String" Nullable="false" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="NAME" Type="String" Nullable="false" MaxLength="140" FixedLength="false" Unicode="false" />
+          <Property Name="HOTKEY" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="FRONTEND" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="ID" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="ICON" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="STAFF_BASE">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="FIO" Type="String" Nullable="false" MaxLength="60" FixedLength="false" Unicode="false" />
+          <Property Name="LOGNAME" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="TYPE" Type="Int16" Nullable="false" />
+          <Property Name="TABN" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="BAX" Type="Int16" />
+          <Property Name="TBAX" Type="DateTime" />
+          <Property Name="DISABLE" Type="Int16" />
+          <Property Name="ADATE1" Type="DateTime" />
+          <Property Name="ADATE2" Type="DateTime" />
+          <Property Name="RDATE1" Type="DateTime" />
+          <Property Name="RDATE2" Type="DateTime" />
+          <Property Name="CLSID" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="APPROVE" Type="Int16" />
+          <Property Name="BRANCH" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="COUNTCONN" Type="Int64" />
+          <Property Name="COUNTPASS" Type="Int64" />
+          <Property Name="PROFILE" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="USEARC" Type="Int16" Nullable="false" />
+          <Property Name="CSCHEMA" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="WEB_PROFILE" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="POLICY_GROUP" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="ACTIVE" Type="Int16" Nullable="false" />
+          <Property Name="CREATED" Type="DateTime" Nullable="false" />
+          <Property Name="EXPIRED" Type="DateTime" />
+          <Property Name="CHKSUM" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="USEGTW" Type="Int16" Nullable="false" />
+          <Property Name="BLK" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="TBLK" Type="DateTime" />
+          <Property Name="TEMPL_ID" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="CAN_SELECT_BRANCH" Type="String" MaxLength="1" FixedLength="false" Unicode="false" />
+          <Property Name="CHGPWD" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="TIP" Type="Decimal" Precision="22" Scale="0" />
+          <Property Name="CURRENT_BRANCH" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+        </EntityType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="AdminModelStoreContainer" CdmEntityContainer="Entities">
+          <EntitySetMapping Name="APPLIST">
+            <EntityTypeMapping TypeName="AdminModel.APPLIST">
+              <MappingFragment StoreEntitySet="APPLIST">
+                <ScalarProperty Name="ICON" ColumnName="ICON" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="FRONTEND" ColumnName="FRONTEND" />
+                <ScalarProperty Name="HOTKEY" ColumnName="HOTKEY" />
+                <ScalarProperty Name="NAME" ColumnName="NAME" />
+                <ScalarProperty Name="CODEAPP" ColumnName="CODEAPP" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="STAFF_BASE">
+            <EntityTypeMapping TypeName="AdminModel.STAFF_BASE">
+              <MappingFragment StoreEntitySet="STAFF$BASE">
+                <ScalarProperty Name="CURRENT_BRANCH" ColumnName="CURRENT_BRANCH" />
+                <ScalarProperty Name="TIP" ColumnName="TIP" />
+                <ScalarProperty Name="CHGPWD" ColumnName="CHGPWD" />
+                <ScalarProperty Name="CAN_SELECT_BRANCH" ColumnName="CAN_SELECT_BRANCH" />
+                <ScalarProperty Name="TEMPL_ID" ColumnName="TEMPL_ID" />
+                <ScalarProperty Name="TBLK" ColumnName="TBLK" />
+                <ScalarProperty Name="BLK" ColumnName="BLK" />
+                <ScalarProperty Name="USEGTW" ColumnName="USEGTW" />
+                <ScalarProperty Name="CHKSUM" ColumnName="CHKSUM" />
+                <ScalarProperty Name="EXPIRED" ColumnName="EXPIRED" />
+                <ScalarProperty Name="CREATED" ColumnName="CREATED" />
+                <ScalarProperty Name="ACTIVE" ColumnName="ACTIVE" />
+                <ScalarProperty Name="POLICY_GROUP" ColumnName="POLICY_GROUP" />
+                <ScalarProperty Name="WEB_PROFILE" ColumnName="WEB_PROFILE" />
+                <ScalarProperty Name="CSCHEMA" ColumnName="CSCHEMA" />
+                <ScalarProperty Name="USEARC" ColumnName="USEARC" />
+                <ScalarProperty Name="PROFILE" ColumnName="PROFILE" />
+                <ScalarProperty Name="COUNTPASS" ColumnName="COUNTPASS" />
+                <ScalarProperty Name="COUNTCONN" ColumnName="COUNTCONN" />
+                <ScalarProperty Name="BRANCH" ColumnName="BRANCH" />
+                <ScalarProperty Name="APPROVE" ColumnName="APPROVE" />
+                <ScalarProperty Name="CLSID" ColumnName="CLSID" />
+                <ScalarProperty Name="RDATE2" ColumnName="RDATE2" />
+                <ScalarProperty Name="RDATE1" ColumnName="RDATE1" />
+                <ScalarProperty Name="ADATE2" ColumnName="ADATE2" />
+                <ScalarProperty Name="ADATE1" ColumnName="ADATE1" />
+                <ScalarProperty Name="DISABLE" ColumnName="DISABLE" />
+                <ScalarProperty Name="TBAX" ColumnName="TBAX" />
+                <ScalarProperty Name="BAX" ColumnName="BAX" />
+                <ScalarProperty Name="TABN" ColumnName="TABN" />
+                <ScalarProperty Name="TYPE" ColumnName="TYPE" />
+                <ScalarProperty Name="LOGNAME" ColumnName="LOGNAME" />
+                <ScalarProperty Name="FIO" ColumnName="FIO" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="BARS_USERADM_SET_APP_CONTEXT" FunctionName="AdminModel.Store.BARS_USERADM_SET_APP_CONTEXT" />
+          <FunctionImportMapping FunctionImportName="BARS_USERADM_GRANT_APP_RESOURCE" FunctionName="AdminModel.Store.BARS_USERADM_GRANT_APP_RESOURCE" />
+          </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="False" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="False" />
+        <DesignerProperty Name="UseLegacyProvider" Value="true" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Default" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

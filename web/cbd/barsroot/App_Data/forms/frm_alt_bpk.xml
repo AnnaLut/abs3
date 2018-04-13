@@ -1,0 +1,207 @@
+<xmlform captiontype="OnlyTitle">
+  <grids>
+    <grid id="gv" pagesize="10" showpagesizebox="true" title="Зарахування на БПК" showfilter="true">
+      <filters caption="Фільтри" width="100%" buttontext="Пошук" columnscount="4">
+        <filter caption="Стан документів" columnindex="1" field="fl"  condition="Equal" id="fltrFL">
+          <uicontrol type="DropDownList" table="alt_bpk_sos" keyfield="id" valuefield="name" addemptyitem="true">
+            <defaultvalue type="Constant" value="0"/>
+          </uicontrol>
+        </filter>
+        <filter caption="Рахунок А" columnindex="2" field="NLSA" condition="Equal" id="fltrNLSA">
+          <uicontrol type="IntegerInput"/>
+        </filter>
+        <filter caption="Рахунок Б" columnindex="3" field="NLSB" condition="Equal" id="fltrNLSB">
+          <uicontrol type="IntegerInput"/>
+        </filter>
+        <filter caption="Референс" columnindex="4" field="REF" condition="Equal" id="fltrREF">
+          <uicontrol type="IntegerInput"/>
+        </filter>
+       </filters>
+      <buttons defaulttype="Button">
+        <button id="btn" caption="Оплатити"  type="Button" linebreak="true"
+                hint="Виконує оплату всіх коректних проводок" confirmmessage="Підтвердіть операцію оплати">
+          <command type="PlSqlBlock" successmessage="Процедуру оплати виконано" checkselectedrow="false">
+            <sql>
+              begin p_bpk_altpay(USER_ID); end;
+            </sql>
+           </command>
+        </button>
+      </buttons>
+      <datasource>
+        <sql>
+          select ID, NLSA, S, NAZN, NLSB, SK_ZB, 
+          BRANCH, USERID, REF, ERROR, DECODE(REF, null, 0, 1) FL
+          from alt_bpk
+          where BRANCH like SYS_CONTEXT ('bars_context', 'user_branch')||'%'
+          AND USERID= USER_ID
+          order by id desc
+        </sql>
+      </datasource>
+      <rowselection method="None" />
+      <editform style="Dialog" title="Введіть платіжні реквізити" height="500" width="650" columnscount="2">
+        <buttons defaulttype="button">
+          <button id="btnEdit" caption="Редагувати|Зберегти|Вiдмiнити" hint="Редагувати рядок|Зберегти рядок|Вiдмiнити редагування" confirmmessage="">
+            <command type="Edit">
+              <sql>
+                declare
+                ref_ number;
+                G_MODULE constant varchar2(4) :='BPK';
+                app_error exception;
+                pragma exception_init(app_error, -12899);
+                begin
+                select ref into ref_ from alt_bpk where ID=:ID;
+                if  REF_ IS NULL then
+                update ALT_BPK
+                set
+                NLSA= :NLSA,
+                S= :S,
+                NAZN= :NAZN,
+                NLSB= :NLSB,
+                SK_ZB= :SK_ZB
+                where ID=:ID;
+                else
+                bars_error.raise_error(G_MODULE, 45);
+                end if;
+                exception when app_error
+                then bars_error.raise_error(G_MODULE, 47);
+                end;
+              </sql>
+              <parameters>
+                <parameter type="DataField" name="ID" />
+                <parameter type="DataField" name="NLSA" />
+                <parameter type="DataField" name="S" />
+                <parameter type="DataField" name="NAZN" />
+                <parameter type="DataField" name="NLSB" />
+                <parameter type="DataField" name="SK_ZB" />
+              </parameters>
+            </command>
+          </button>
+          <button id="btnInsert" caption="Додати|Зберегти|Вiдмiнити" hint="Додати рядок|Зберегти рядок|Вiдмiнити додавання" confirmmessage="">
+            <command type="Insert">
+              <sql>
+             declare
+                l_id number;
+                G_MODULE constant varchar2(4) :='BPK';
+                app_error exception;
+                pragma exception_init(app_error, -12899);
+             begin
+                select s_alt_bpk.nextval into l_id from dual;
+                insert into ALT_BPK(id,NLSA, S, NAZN, NLSB, SK_ZB, USERID, BRANCH)
+                   values (l_id,:NLSA, :S, :NAZN, :NLSB, :SK_ZB,  user_id, SYS_CONTEXT ('bars_context', 'user_branch'));
+                exception when app_error 
+                   then bars_error.raise_error(G_MODULE, 47);
+             END;
+              </sql>
+              <parameters>
+                <parameter type="DataField" name="NLSA" />
+                <parameter type="DataField" name="S" />
+                <parameter type="DataField" name="NAZN" />
+                <parameter type="DataField" name="NLSB" />
+                <parameter type="DataField" name="SK_ZB" />
+              </parameters>
+            </command>
+          </button>
+          <button id="btnDel" caption="Видалити|Зберегти|Вiдмiнити" hint="Видалити рядок|Зберегти рядок|Вiдмiнити видалення" confirmmessage="Увага!!! Якщо документ оплачений, він видалятися не буде!!!!">
+            <command type="Delete">
+              <sql>
+                declare
+                ref_ number;
+                G_MODULE constant varchar2(4) :='BPK';
+                begin
+                select ref into ref_ from alt_bpk where ID=:ID;
+                if  REF_ IS NULL then
+                delete from ALT_BPK where ID=:ID;
+                else
+                bars_error.raise_error(G_MODULE, 46);
+                end if;
+                end;
+              </sql>
+              <parameters>
+                <parameter type="DataField" name="ID" />
+              </parameters>
+            </command>
+          </button>
+          <button caption="Закрити" id="btnClose">
+            <command type="Close" />
+          </button>
+        </buttons>
+      </editform>
+      <fields>
+        <field name="ID" key="true" datatype="Int64" sort="default">
+          <column show="true" caption="Системний № (заповнюється автоматично)" align="right" width="15"/>
+          <form show="true" rwmode="RO" required="false">
+            <uicontrol type="Text"  readonly="true"/>
+          </form>
+        </field>
+        <field name="NLSA" key="false" datatype="Int64" sort="default">
+          <column show="true" caption="Рахунок А" align="left" />
+          <form show="true" rwmode="RW" required="true" columnindex="1">
+            <uicontrol type="IntegerInput" />
+          </form>
+        </field>
+        <field name="S" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="Сума" align="right" />
+          <form show="true" rwmode="RW" required="true" columnindex="2">
+            <uicontrol type="DecimalInput"/>
+          </form>
+        </field>
+        <field name="NLSB" key="false" datatype="Int64" sort="default">
+          <column show="true" caption="Рахунок Б" align="left" />
+          <form show="true" rwmode="RW" required="true" columnindex="1">
+            <uicontrol type="IntegerInput"/>
+          </form>
+        </field>
+        <field name="NAZN" key="false" datatype="String" sort="default">
+          <column show="true" caption="Призначення" align="left" width="250"/>
+          <form show="true" rwmode="RW" required="true" columnindex="1">
+            <uicontrol type="Text">
+              <defaultvalue type="Constant" value="Зарахування на БПК"/> 
+            </uicontrol>
+          </form>
+        </field>
+        <field name="SK_ZB" key="false" datatype="Int64" sort="default">
+          <column show="true" caption="Позабал. символ" align="Center"  width="50"/>
+          <form show="true" rwmode="RW" required="true" columnindex="2">
+            <uicontrol type="IntegerInput" />
+          </form>
+        </field>
+        <field name="BRANCH" key="false" datatype="String" sort="default">
+          <column show="true" caption="Відділення" align="left" />
+          <form show="false" rwmode="RW" columnindex="1">
+            <uicontrol type="Text" readonly="true" />
+          </form>
+        </field>
+        <field name="USERID" key="false" datatype="Int64" sort="default">
+          <column show="false" caption="Код користувача" align="Center" />
+          <form show="false" rwmode="RW" columnindex="1">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="REF" key="false" datatype="Int64" sort="default">
+          <column show="TRUE" caption="Референс оплаченого документа" align="Center" width="50">
+            <link url="/barsroot/documentview/">
+              <parameters>
+                <parameter name="REF" altname="REF" type="DataField" datatype="Int64"></parameter>
+              </parameters>
+            </link>
+          </column>
+          <form show="false" rwmode="RW" columnindex="1">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="ERROR" key="false" datatype="String" sort="default">
+          <column show="true" caption="Помилка оплати" align="left" width="250" />
+          <form show="false" rwmode="RW" columnindex="1">
+            <uicontrol type="Text" readonly="true" />
+          </form>
+        </field>
+        <field name="FL" key="false" datatype="Int64" sort="default">
+          <column show="false" caption="Стан платежа" align="Center" />
+          <form show="false" rwmode="RW" columnindex="1">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+      </fields>
+    </grid>
+  </grids>
+</xmlform>

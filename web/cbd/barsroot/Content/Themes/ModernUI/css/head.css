@@ -1,0 +1,280 @@
+.mainGradient {
+    background-color: #4e78ae;
+	height: 25px;
+}
+.headTextbox{
+	border-width: 0;
+	border-color: #94ABD9;
+	font-size: 8pt;
+	color: #1C4B75;
+	text-align: justify;
+	vertical-align: middle;
+	background-color: #CCD7ED;
+	font-weight: bold;
+}
+.headTitle{
+	vertical-align: middle;
+	text-align: justify;
+	display: inline; 
+	font-size: 8pt; 
+	width: 70px; 
+	color: #1C4B75; 
+	font-family: Arial; 
+	height: 15px;
+	text-align: right;
+}
+.headBody{
+	background-color: #4e78ae;
+	margin: 0;
+}
+
+.applistBody{
+    margin: 0;
+	background-color: #4e78ae;
+}
+
+b.rtop b {display:block; height: 1px; overflow: hidden; background-color: #3b5998 }
+b.r1{margin: 0 0 0 5px}
+b.r2{margin: 0 0 0 3px}
+b.r3{margin: 0 0 0 2px}
+b.rtop b.r4 {margin: 0 0 0 1px;height: 2px; }
+  
+.menu-block-hover b.rtop b {
+  background-color: #ffffff;
+}
+.menu-block-hover .menuTitle,
+.menu-block-hover .menuItem {
+  background-color: #ffffff;
+}
+.menu-block-hover .menuTitle table tbody tr {
+  color: #395b8d;
+}
+
+.menu-block-hover .menuItem {
+    color: #395b8d;
+}
+.icon {
+  display: inline-block;
+  background-repeat: no-repeat;
+  width: 16px;
+  height: 16px;
+}
+.icon.arm {
+  background-image: url(images/16/folder.png);
+}
+.icon.arm.open {
+  background-image: url(images/16/folder-opened.png);
+}
+.icon.arm-last {
+  background-image: url(images/star_grey.png);
+}
+.icon.arm-last.open-last {
+  background-image: url(images/star_green.png);
+}
+.icon.arm-top {
+  background-image: url(images/star_grey.png);
+}
+.icon.arm-top.open-top {
+  background-image: url(images/star_red.png);
+}
+.icon.func {
+  float: left;
+  background-image: url(images/right.gif);
+}
+.icon.find {
+  background-image: url(images/find.jpg);
+}
+.icon.find:hover {
+  background-image: url(images/find-hover.jpg);
+}
+.icon.find-active {
+  margin-top: 5px;
+  background-image: url(images/find-hover.jpg);
+}
+.icon.clase-active {
+  margin-top: 7px;
+  background-image: url(images/close-hover.gif);
+}
+.oper-name {
+  margin-left: 16px;
+}
+.menu {
+  width: 100%; 
+}  
+
+.menuItem 
+{  background-color: #3b5998;
+   	font-family:tahoma, arial, sans-serif;
+    font-size:13px;
+    color: #dee7f5;
+	padding-top:5px;
+	padding-bottom:5px;	
+	padding-left: 5px;
+	padding-right: 5px;
+	cursor: pointer;   
+}
+.menuItem .menu-item-row {
+  padding: 6px;
+  border-top:1px dotted #9dbdd6;
+}
+
+.menuItem .menu-item-row.menuItemSelected 
+{
+	border: 1px solid #CCD9FF;
+    border-top:1px solid #CCD9FF;
+    color: #395b8d;
+	padding:5px;
+	background-color: #EAF3FF;
+}
+
+.menuTitle
+{
+	margin-top : 0; 
+	background-color: #3b5998;
+    padding: 3px 5px 3px 5px;
+    cursor: default;
+}
+
+.menuTitle table tbody tr {
+    font-weight: bold;
+	font-family:tahoma, arial, sans-serif;
+	font-size:13px;
+    color: #dee7f5;
+    padding-left: 3px;
+}
+.menuWarn
+{
+	float:left;
+	font-size: 7pt; 
+	color: Red;
+	text-align: left;	
+	white-space:nowrap;
+}
+.menuInfo
+{
+	float:left;
+	font-size: 7pt; 
+	text-align: left;	
+	white-space:nowrap;
+}
+div.search {
+  margin: 3px 0 3px 0;
+  padding: 0;
+  word-wrap: normal;
+  white-space: nowrap;
+  border: 1px solid #d8d8d8; 
+  width: 181px;
+  overflow: hidden;
+  background-color: #fff;
+}
+div.search input{
+  display: inline;
+  padding: 1px;
+  width: 160px;
+  margin: 0; 
+  border: 0;
+  float: left;
+}
+div.search .icon{
+  display: inline;
+  float: left;
+  cursor: pointer;
+}
+.hasPlaceholder {
+  color: #d8d8d8;
+}
+.find-opers-title {
+  font-size: 10px;
+  color: #4a4a4a;
+}
+.logo {
+  float: left;
+  height: 55px;
+  width: 185px;
+  background-color: #fff
+}
+/* ---------- UserMenu ------------- */
+.toolbar {
+  float: right;
+}
+
+.toolbar a {
+  display: inline-block;
+  width: 55px;
+  height: 55px;
+  margin: 0;
+  float: right;
+  background-position: 15px 5px;
+  cursor: pointer;
+  background-repeat: no-repeat;
+  margin: 0 0 0 5px;
+}
+.toolbar a:hover {
+  background-color: #2F477A;
+}
+.toolbar a.active {
+  background-color: #2F477A;
+}
+.toolbar a .count {
+  float: right;
+  margin-right: 5px;
+  margin-top: 5px;
+  padding: 0;
+  width: 14px;
+  height: 14px;
+  color: #ffffff;
+  font-size: 10px;
+  text-align: center;
+  background-color: red;
+  display: block;
+}
+
+.toolbar a .label {
+  text-align: center;
+  display: block;
+  margin-top: 35px;
+  color: #f2f2f2;
+  font-size: 10px;
+}
+
+.btn_mypage { background-image: url('images/24/user.png'); }
+.btn_gatges{background-image: url('images/24/gatges.png'); }
+.btn_calc { background-image: url('images/24/calculator.png'); }
+.btn_euro { background-image: url('images/24/euro_currency_sign.png'); }
+.btn_mess { background-image: url('images/24/mail.png'); }
+.btn_news { background-image: url('images/24/newsletter.png'); }
+.btn_audit { background-image: url('images/24/warning.png'); }
+.btn_world { background-image: url('/content/jsoc/Modules/UM/img/btn_world.png'); }
+.btn_stack { background-image: url('/content/jsoc/Modules/UM/img/btn_stack.png'); }
+
+  .head {
+    border: 5px solid #3b5998;
+
+    height: 65px;
+    background: #3b5998;
+  }
+  .applist, .main {
+    top: 65px; 
+    right: 0;
+    bottom: 0;
+    border: 5px solid #3b5998;
+    border-top: 0;
+    overflow: hidden;
+    position: absolute;
+  }
+
+  .applist {
+    padding-bottom:46px ;
+    border-right: 0;
+    background-color: #3b5998;
+    width: 190px;
+    float: left;
+    left: 0;
+    z-index: 2;
+  }
+  .main {
+    border-left: 0;
+    left: 195px;
+    background: #fff;
+    z-index: 1;
+  }

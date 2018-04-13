@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="10/14/2014 17:15:10" ReportInfo.Modified="10/14/2014 18:25:30" ReportInfo.CreatorVersion="2013.2.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqD6nWZEExUJ9MEhdFZpB1A6ZfSeiTM+6WLeB8pW5aURqkGwhV134I2SUIQGUGXcXiVRum4DI1fvQbDB5UYHClEw==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="        select  d.deposit_id, d.nd, v.vidd, v.type_name, t.kv, t.lcv, t.name, &#13;&#10;	c.rnk, c.nmk, &#13;&#10;	to_char(:sFdat1,'dd.mm.yyyy') Dat1, &#13;&#10;	to_char(:sFdat2,'dd.mm.yyyy') Dat2, &#13;&#10;	a.nls,           &#13;&#10;                 sum(  case when o.tt ='%%1' and dk = 1 then o.s&#13;&#10;                  else 0 end)/100 nar,&#13;&#10;                 sum(  case when o.tt ='%%1' and dk = 1 then o.sq&#13;&#10;                 else 0 end)/100 narq,&#13;&#10;                 sum(  case when o.tt ='%15' and dk = 0 then o.s&#13;&#10;                          else 0 end)/100 tax,&#13;&#10;                 sum(  case when o.tt ='%15' and dk = 0 then o.sq&#13;&#10;                 else 0 end)/100 taxq,	&#13;&#10;	sum(  case when o.tt ='%%1' and dk = 1 then o.s&#13;&#10;                else 0 end)/100 - &#13;&#10;	sum(  case when o.tt ='%15' and dk = 0 then o.s&#13;&#10;                          else 0 end)/100 pay,&#13;&#10;	sum(  case when o.tt ='%%1' and dk = 1 then o.sq&#13;&#10;                else 0 end)/100 - &#13;&#10;	sum(  case when o.tt ='%15' and dk = 0 then o.sq&#13;&#10;                          else 0 end)/100 payq&#13;&#10;         from dpt_deposit_clos d,&#13;&#10;                accounts        a,&#13;&#10;                int_accn         i,&#13;&#10;                dpt_vidd         v,&#13;&#10;                customer         c,&#13;&#10;                tabval           t,&#13;&#10;                opldok          o            &#13;&#10;          where i.acra = o.acc&#13;&#10;            and A.ACC =i.acra&#13;&#10;            and o.fdat between :sFdat1 and :sFdat2&#13;&#10;            and d.acc    = i.acc&#13;&#10;            and i.id     = 1&#13;&#10;            and d.kv     = t.kv&#13;&#10;            and d.vidd   = v.vidd&#13;&#10;            and o.tt in ('%%1','%15')            &#13;&#10;            and d.rnk    = c.rnk            &#13;&#10;            and d.action_id = 0            &#13;&#10;            and d.deposit_id = :Param0&#13;&#10;            group by d.deposit_id, d.nd, v.vidd, v.type_name, t.kv, t.lcv, t.name, a.nls,c.rnk, c.nmk, d.kv">
+        <Column Name="DEPOSIT_ID" DataType="System.Decimal"/>
+        <Column Name="ND" DataType="System.String"/>
+        <Column Name="RNK" DataType="System.Decimal"/>
+        <Column Name="NMK" DataType="System.String"/>
+        <Column Name="DAT1" DataType="System.String"/>
+        <Column Name="DAT2" DataType="System.String"/>
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="NAR" DataType="System.Decimal"/>
+        <Column Name="NARQ" DataType="System.Decimal"/>
+        <Column Name="TAX" DataType="System.Decimal"/>
+        <Column Name="TAXQ" DataType="System.Decimal"/>
+        <Column Name="PAY" DataType="System.Decimal"/>
+        <Column Name="PAYQ" DataType="System.Decimal"/>
+        <Column Name="KV" DataType="System.Int16"/>
+        <Column Name="VIDD" DataType="System.Decimal"/>
+        <Column Name="TYPE_NAME" DataType="System.String"/>
+        <Column Name="LCV" DataType="System.String"/>
+        <Column Name="NAME" DataType="System.String"/>
+        <CommandParameter Name="Param0" DataType="113" Expression="[Param0]" DefaultValue="7335001"/>
+        <CommandParameter Name="sFdat1" DataType="106" Expression="[sFdat1]" DefaultValue="01.08.2014"/>
+        <CommandParameter Name="sFdat2" DataType="106" Expression="[sFdat2]" DefaultValue="01.10.2014"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="Param0" DataType="System.Int32" Expression="7335001" Description="7335001"/>
+    <Parameter Name="sFdat1" DataType="System.DateTime"/>
+    <Parameter Name="sFdat2" DataType="System.DateTime"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="56.7" Guides="30.24,32.13">
+      <TextObject Name="Text1" Left="-7.56" Top="11.34" Width="449.82" Height="45.36" Text="Виписка по вкладному (депозитному рахунку)&#13;&#10;за період з [Table.DAT1] по [Table.DAT2] " HorzAlign="Center" VertAlign="Center"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="58.99" Width="718.2" Height="5.67"/>
+    <DataBand Name="Data1" Top="66.94" Width="718.2" Height="207.9">
+      <TextObject Name="Text2" Left="7.56" Top="13.23" Width="149.31" Height="83.16" Text="ПІБ                     &#13;&#10;&#13;&#10;Вклад                   &#13;&#10;Рахунок №                &#13;&#10;Валюта рахунку"/>
+      <TextObject Name="Text3" Left="156.87" Top="13.23" Width="285.39" Height="85.05" Text="[Table.NMK]&#13;&#10;&#13;&#10;[Table.DEPOSIT_ID]&#13;&#10;[Table.NLS]&#13;&#10;[Table.NAME]"/>
+      <TextObject Name="Text4" Left="7.56" Top="105.84" Width="317.52" Height="47.25" Text="Нараховано відсотків за період &#13;&#10;Утримано податок на доходи з депозиту (15%)&#13;&#10;Сума % до виплати за період"/>
+      <TextObject Name="Text5" Left="326.97" Top="105.84" Width="94.5" Height="49.14" Text="[Table.NAR]&#13;&#10;[Table.TAX]&#13;&#10;[Table.PAY]"/>
+      <TextObject Name="Text6" Left="9.45" Top="183.33" Width="224.91" Height="18.9" Text="Дата [Date]&#13;&#10;"/>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="277.13" Width="718.2" Height="18.9"/>
+  </ReportPage>
+</Report>

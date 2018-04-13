@@ -1,0 +1,809 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="05/17/2013 18:06:00" ReportInfo.Modified="11/10/2014 12:26:02" ReportInfo.CreatorVersion="2013.3.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+using Oracle.DataAccess.Client;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+    private void _FinishReport(object sender, EventArgs e)
+    {
+      OracleDataConnection frxconn = (OracleDataConnection)Report.Dictionary.Connections[0];
+      OracleConnection connection = (OracleConnection)frxconn.GetConnection();
+      
+      OracleCommand command = connection.CreateCommand();
+      command.CommandType = CommandType.StoredProcedure;
+      command.CommandText = &quot;ead_pack.doc_page_count&quot;;
+      
+      Parameter DocID = Report.GetParameter(&quot;p_doc_id&quot;);
+      command.Parameters.Add(&quot;p_doc_id&quot;, DocID.Value);
+      command.Parameters.Add(&quot;p_page_count&quot;, Report.Engine.TotalPages);
+      
+      connection.Open();
+      try
+      {
+        command.ExecuteNonQuery();
+      }
+      finally
+      {
+        connection.Close();
+      }
+    }
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqZLE460ApuhBq9nxfsVEDUjsnvJzXtSTPbWY4MKJi2yK6Cw7h6oGX20YJkb5YAkRnLfTnDu8khmIye46MG2Xb8g==">
+      <TableDataSource Name="Table" Alias="DPT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select nvl(d.nd, to_char(d.deposit_id)) as id,&#13;&#10;       f_dat_lit(d.datz) as dealdate,&#13;&#10;       f_dat_lit(d.dat_end) as end_date,&#13;&#10;       a.nls as nlsd,&#13;&#10;       d.limit / 100 as summ,&#13;&#10;       f_sumpr(d.limit, d.kv, 'F') as sum_w,&#13;&#10;       decode(d.kv, 980, 'грн.', t.lcv) as kv,&#13;&#10;       f_doc_dpt(d.deposit_id, 3, 1) as term_calc,&#13;&#10;       f_doc_dpt(d.deposit_id, 3, 2) as term_calc_w,&#13;&#10;       dpt.fproc(d.acc, bankdate) as rate,&#13;&#10;       f_sumpr(dpt.fproc(d.acc, bankdate), '', 'M', 3) as rate_w,&#13;&#10;       nvl(trim(d.mfo_p), '_________________') as paym_mfo,&#13;&#10;       nvl(trim(b.nb), '____') as paym_nb,&#13;&#10;       nvl(trim(d.nls_p), '_________________') as paym_nls&#13;&#10;  from dpt_deposit d, tabval t, accounts a, banks b&#13;&#10; where d.acc = a.acc&#13;&#10;   and d.kv = t.kv&#13;&#10;   and d.mfo_p = b.mfo(+)&#13;&#10;   and d.deposit_id = :p_agr_id">
+        <Column Name="ID" DataType="System.String"/>
+        <Column Name="DEALDATE" DataType="System.String"/>
+        <Column Name="END_DATE" DataType="System.String"/>
+        <Column Name="NLSD" DataType="System.String"/>
+        <Column Name="SUMM" DataType="System.Decimal"/>
+        <Column Name="SUM_W" DataType="System.String"/>
+        <Column Name="KV" DataType="System.String"/>
+        <Column Name="TERM_CALC" DataType="System.String"/>
+        <Column Name="TERM_CALC_W" DataType="System.String"/>
+        <Column Name="RATE" DataType="System.Decimal"/>
+        <Column Name="RATE_W" DataType="System.String"/>
+        <Column Name="PAYM_MFO" DataType="System.String"/>
+        <Column Name="PAYM_NB" DataType="System.String"/>
+        <Column Name="PAYM_NLS" DataType="System.String"/>
+        <CommandParameter Name="p_agr_id" DataType="113" Expression="[p_agr_id]" DefaultValue="-1"/>
+      </TableDataSource>
+      <TableDataSource Name="Table2" Alias="COMMON_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select b.name as name_branch,&#13;&#10;       nvl(nvl(trim(d.adress), b.name), '___') as adres_branch,&#13;&#10;       tobopack.get_branch_param('DPT_PHON') as phones_branch,&#13;&#10;       nvl(d.dover, '________') as staff_dover,&#13;&#10;       nvl(d.fio_r, '________') as staff_fio_r,&#13;&#10;       NVL(d.posada_r, '________') as staff_status_r,&#13;&#10;       nvl(d.town, tobopack.get_branch_param('TOWN')) as staff_town,&#13;&#10;       f_dat_lit(trunc(sysdate)) as today_w&#13;&#10;  from branch b, dpt_staff d&#13;&#10; where b.branch = tobopack.get_branch&#13;&#10;   and d.userid(+) = user_id&#13;&#10;   and d.branch(+) = b.branch">
+        <Column Name="NAME_BRANCH" DataType="System.String"/>
+        <Column Name="ADRES_BRANCH" DataType="System.String"/>
+        <Column Name="PHONES_BRANCH" DataType="System.String"/>
+        <Column Name="STAFF_DOVER" DataType="System.String"/>
+        <Column Name="STAFF_FIO_R" DataType="System.String"/>
+        <Column Name="STAFF_STATUS_R" DataType="System.String"/>
+        <Column Name="STAFF_TOWN" DataType="System.String"/>
+        <Column Name="TODAY_W" DataType="System.String"/>
+      </TableDataSource>
+      <TableDataSource Name="Table3" Alias="TICKET_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select ed.doc_id,&#13;&#10;       ed.crt_date,&#13;&#10;       ed.ea_struct_id,&#13;&#10;       ed.rnk,&#13;&#10;       ed.cl_fio,&#13;&#10;       ed.agr_id,&#13;&#10;       ed.agr_num,&#13;&#10;       ed.crt_staff_logname,&#13;&#10;       ed.crt_staff_fio,&#13;&#10;       ed.crt_branch&#13;&#10;  from v_ead_docs ed&#13;&#10; where ed.doc_id = :p_doc_id">
+        <Column Name="RNK" DataType="System.Decimal"/>
+        <Column Name="DOC_ID" DataType="System.Decimal"/>
+        <Column Name="CRT_DATE" DataType="System.DateTime"/>
+        <Column Name="CL_FIO" DataType="System.String"/>
+        <Column Name="AGR_ID" DataType="System.Decimal"/>
+        <Column Name="AGR_NUM" DataType="System.String"/>
+        <Column Name="CRT_BRANCH" DataType="System.String"/>
+        <Column Name="CRT_STAFF_LOGNAME" DataType="System.String"/>
+        <Column Name="CRT_STAFF_FIO" DataType="System.String"/>
+        <Column Name="EA_STRUCT_ID" DataType="System.Decimal"/>
+        <CommandParameter Name="p_doc_id" DataType="113" Expression="[p_doc_id]" DefaultValue="-1"/>
+      </TableDataSource>
+      <TableDataSource Name="Table4" Alias="CLIENT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select c.nmk as fio,&#13;&#10;       c.okpo as okpo,&#13;&#10;       decode(c.codcagent,&#13;&#10;              5,&#13;&#10;              'резидент',&#13;&#10;              6,&#13;&#10;              'нерезидент',&#13;&#10;              '--') as codcagent,&#13;&#10;       p.ser || ' ' || p.numdoc as pasp_no,&#13;&#10;       f_dat_lit(p.pdate) as pasp_date,&#13;&#10;       p.organ as pasp_atrt,&#13;&#10;       c.adr as address,&#13;&#10;      coalesce(p.cellphone, p.teld, p.telw, '________') as phone&#13;&#10;  from customer c, person p&#13;&#10; where c.rnk = p.rnk(+)&#13;&#10;   and c.rnk = :p_rnk">
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="CODCAGENT" DataType="System.String"/>
+        <Column Name="PASP_NO" DataType="System.String"/>
+        <Column Name="PASP_DATE" DataType="System.String"/>
+        <Column Name="PASP_ATRT" DataType="System.String"/>
+        <Column Name="ADDRESS" DataType="System.String"/>
+        <Column Name="PHONE" DataType="System.String"/>
+        <CommandParameter Name="p_rnk" DataType="113" Expression="[p_rnk]" DefaultValue="-1"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_doc_id" DataType="System.Int32" Expression="1025"/>
+    <Parameter Name="p_rnk" DataType="System.Int32" Expression="1064574"/>
+    <Parameter Name="p_agr_id" DataType="System.Int64" Expression="7335001"/>
+  </Dictionary>
+  <ReportPage Name="Page1" RawPaperSize="9" TopMargin="5" BottomMargin="5">
+    <DataBand Name="Data1" Width="718.2" Height="1285.2" CanGrow="true" CanShrink="true" CanBreak="true" DataSource="Table4">
+      <TableObject Name="Table1" Left="9.45" Width="698.42" Height="236.25">
+        <TableColumn Name="Column1" Width="198.42"/>
+        <TableColumn Name="Column2" Width="500"/>
+        <TableRow Name="Row111" Height="103.95">
+          <TableCell Name="Cell233" Font="Times New Roman, 10pt" RowSpan="2">
+            <BarcodeObject Name="Barcode2" Left="18.9" Width="153.8" Height="153.8" AutoSize="false" Expression="[TICKET_DATA.DOC_ID]+&quot;;&quot;+FormatDateTime([TICKET_DATA.CRT_DATE])+&quot;;&quot;+[TICKET_DATA.EA_STRUCT_ID]+&quot;;&quot;+[TotalPages]+&quot;;&quot;+[TICKET_DATA.RNK]+&quot;;&quot;+[TICKET_DATA.CL_FIO]+&quot;;&quot;+[TICKET_DATA.AGR_ID]+&quot;;&quot;+[TICKET_DATA.AGR_NUM]+&quot;;&quot;+[TICKET_DATA.CRT_STAFF_LOGNAME]+&quot;;&quot;+[TICKET_DATA.CRT_STAFF_FIO]+&quot;;&quot;+[TICKET_DATA.CRT_BRANCH]" ShowText="false" Barcode="QR Code" Barcode.ErrorCorrection="L" Barcode.Encoding="UTF8" Barcode.QuietZone="true"/>
+          </TableCell>
+          <TableCell Name="Cell234" Text="AТ «ОЩАДБАНК»&#13;&#10;ОПИТУВАЛЬНИЙ ЛИСТ&#13;&#10;" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 14pt, style=Bold">
+            <PictureObject Name="Picture2" Left="28.35" Top="56.7" Width="56.7" Height="47.25" Image="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"/>
+          </TableCell>
+        </TableRow>
+        <TableRow Name="Row112" Height="47.25">
+          <TableCell Name="Cell235" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell236" Text="клієнта – фізичної особи&#13;&#10;" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row3">
+          <TableCell Name="Cell11" Text="&lt;b&gt;1&lt;/b&gt;. Ваше Прізвище, Ім’я, По батькові &lt;b&gt;[CLIENT_DATA.FIO]&lt;/b&gt;" VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell12" VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row114">
+          <TableCell Name="Cell239" Text="&lt;b&gt;2&lt;/b&gt;. Місце проживання  або перебування:  &lt;b&gt; [CLIENT_DATA.ADDRESS]&lt;/b&gt;." VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell240" VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row115" Height="28.35">
+          <TableCell Name="Cell241" Text="&lt;b&gt;3&lt;/b&gt;. Ваше місце роботи, посада: ______________________________________________________________________________________________________&#13;&#10;________________________________________________________________________________________________________________________________" VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell242" VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row123">
+          <TableCell Name="Cell257" Text="&lt;b&gt;4&lt;/b&gt;. № телефону: &lt;b&gt;[CLIENT_DATA.PHONE]&lt;/b&gt;    E-mail (за наявності):________________________________" VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell258" VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table6" Left="47.25" Top="306.18" Width="660.36" Height="56.72" GrowToBottom="true">
+        <TableColumn Name="Column5" Width="163.42"/>
+        <TableColumn Name="Column6" Width="163.42"/>
+        <TableColumn Name="Column7" Width="333.52"/>
+        <TableRow Name="Row153" Height="23.63">
+          <TableCell Name="Cell317" Border.Lines="All" Text="заробітна плата (пенсія, соціальні виплати, &#13;&#10;стипендія тощо):  " VertAlign="Center" Font="Arial, 8pt" ColSpan="2" RowSpan="2">
+            <ShapeObject Name="Shape8" Left="255.15" Top="9.45" Width="9.45" Height="9.45"/>
+          </TableCell>
+          <TableCell Name="Cell318" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell319" Border.Lines="All" Text="кредитні кошти: " VertAlign="Center" Font="Arial, 8pt" RowSpan="2">
+            <ShapeObject Name="Shape9" Left="207.9" Top="9.45" Width="9.45" Height="9.45"/>
+          </TableCell>
+        </TableRow>
+        <TableRow Name="Row154" Height="4.73">
+          <TableCell Name="Cell322" Border.Lines="Left, Top, Bottom" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell323" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell324" Border.Lines="All" VertAlign="Center" Font="Arial, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row155" Height="14.18">
+          <TableCell Name="Cell327" Border.Lines="All" Text="надходження від інших осіб:      &#13;&#10;якщо &quot;Так&quot; - вкажіть які) __________________" VertAlign="Center" Font="Arial, 8pt" ColSpan="2" RowSpan="2">
+            <ShapeObject Name="Shape10" Left="255.15" Top="9.45" Width="9.45" Height="9.45"/>
+          </TableCell>
+          <TableCell Name="Cell328" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell329" Border.Lines="All" Text="інші джерела:&#13;&#10;(якщо &quot;Так&quot; - вкажіть які) __________________________" VertAlign="Center" Font="Arial, 8pt" RowSpan="2">
+            <ShapeObject Name="Shape11" Left="207.9" Top="9.45" Width="9.45" Height="9.45"/>
+          </TableCell>
+        </TableRow>
+        <TableRow Name="Row156" Height="14.18">
+          <TableCell Name="Cell332" Border.Lines="Left, Top, Bottom" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell333" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell334" Border.Lines="All" VertAlign="Center" Font="Arial, 8pt"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text1" Left="9.45" Top="294.84" Width="699.3" Height="9.45" Text="&lt;b&gt;6&lt;/b&gt;. З яких джерел  будуть  надходити  кошти на Ваш рахунок/рахунки?" VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true"/>
+      <TextObject Name="Text3" Left="9.45" Top="360.99" Width="699.3" Height="18.9" Text="&lt;b&gt;7&lt;/b&gt;. Очікувані обсяги  щомісячних  надходжень  коштів на рахунки" VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true"/>
+      <TextObject Name="Text4" Left="9.45" Top="493.29" Width="699.3" Height="18.9" Text="    8.2. &lt;i&gt;Сума Вашого основного доходу становить:&lt;/i&gt;" Font="Times New Roman, 8pt" HtmlTags="true"/>
+      <TextObject Name="Text5" Left="9.45" Top="519.75" Width="699.3" Height="18.9" Text="    8.3. &lt;i&gt;Орієнтований  місячний сукупний дохід  &lt;b&gt;вашої сім’ї&lt;/b&gt;  становить:&lt;/i&gt;" VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true"/>
+      <TextObject Name="Text6" Left="9.45" Top="557.55" Width="699.3" Height="18.9" Text="    8.4. &lt;i&gt;Чи маєте  Ви у власності?&lt;/i&gt;" VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true"/>
+      <TableObject Name="Table5" Left="47.25" Top="576.45" Width="660.36" Height="37.8">
+        <TableColumn Name="Column20" Width="157.12"/>
+        <TableColumn Name="Column21" Width="157.12"/>
+        <TableColumn Name="Column22" Width="346.12"/>
+        <TableRow Name="Row165">
+          <TableCell Name="Cell359" Border.Lines="All" Text="- нерухомість: " Format="Number" Format.UseLocale="false" Format.DecimalDigits="3" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" VertAlign="Center" Font="Arial, 8pt" ColSpan="2">
+            <ShapeObject Name="Shape20" Left="217.35" Top="5.67" Width="9.45" Height="9.45"/>
+          </TableCell>
+          <TableCell Name="Cell360" Border.Lines="All" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell361" Border.Lines="All" Text="- земельну ділянку: " VertAlign="Center" Font="Arial, 8pt">
+            <ShapeObject Name="Shape29" Left="189" Top="5.67" Width="9.45" Height="9.45"/>
+          </TableCell>
+        </TableRow>
+        <TableRow Name="Row166">
+          <TableCell Name="Cell362" Border.Lines="All" Text="- автомобіль: " VertAlign="Center" Font="Arial, 8pt" ColSpan="2">
+            <ShapeObject Name="Shape21" Left="217.35" Top="5.67" Width="9.45" Height="9.45"/>
+          </TableCell>
+          <TableCell Name="Cell363" Border.Lines="Right, Top, Bottom" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell364" Border.Lines="All" Text="- цінні папери: " VertAlign="Center" Font="Arial, 8pt">
+            <ShapeObject Name="Shape30" Left="189" Top="5.67" Width="9.45" Height="9.45"/>
+          </TableCell>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table5" Left="9.45" Top="655.83" Width="698.42" Height="75.6">
+        <TableColumn Name="Column26" Width="340.17"/>
+        <TableColumn Name="Column27" Width="358.25"/>
+        <TableRow Name="Row171" Height="56.7">
+          <TableCell Name="Cell374" Text="&lt;b&gt;9&lt;/b&gt;. Чи зареєстровані  Ви як приватний  підприємець?    Так           / Ні    &#13;&#10;Якщо так, вкажіть, будь-ласка  дату та номер запису про проведення  державної  реєстрації  та вид підприємницької  діяльності ________________________________________________________________________________________________________________________________&#13;&#10;________________________________________________________________________________________________________________________________" VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true" ColSpan="2">
+            <ShapeObject Name="Shape31" Left="283.5" Top="5.67" Width="9.45" Height="9.45"/>
+            <ShapeObject Name="Shape32" Left="330.75" Top="5.67" Width="9.45" Height="9.45"/>
+          </TableCell>
+          <TableCell Name="Cell375" Font="Times New Roman, 8pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row172">
+          <TableCell Name="Cell376" Text="&lt;b&gt;10&lt;/b&gt;. Чи належите  Ви до публічних  діячів  або пов’язаних з ними осіб*?        Так          / Ні " VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true" ColSpan="2">
+            <ShapeObject Name="Shape33" Left="387.45" Top="5.67" Width="9.45" Height="9.45"/>
+            <ShapeObject Name="Shape34" Left="434.7" Top="5.67" Width="9.45" Height="9.45"/>
+            <TextObject Name="Text13" Top="13.23" Width="699.3" Height="28.35" Text="&lt;b&gt;11&lt;/b&gt;.Чи є особа, яка  має  можливість  вірішального  впливу  на  Ваші  фінансові  операції  незалежно  від  фактичного  володіння  Вашими  активами." VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          </TableCell>
+          <TableCell Name="Cell377" Font="Times New Roman, 8pt" HtmlTags="true"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text7" Left="9.45" Top="236.25" Width="699.3" Height="18.9" Text="&lt;b&gt;5&lt;/b&gt;. Вкажіть Ваш соціальний  статус:" VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true"/>
+      <TableObject Name="Table5" Left="47.25" Top="253.26" Width="660.39" Height="37.8">
+        <TableColumn Name="Column28" Width="204.52"/>
+        <TableColumn Name="Column29" Width="12.8"/>
+        <TableColumn Name="Column30" Width="232.87"/>
+        <TableColumn Name="Column31" Width="210.2"/>
+        <TableRow Name="Row176" Height="12.6">
+          <TableCell Name="Cell384" Border.Lines="All" Text="Службовець:                       " VertAlign="Center" Font="Arial, 8pt" ColSpan="2">
+            <ShapeObject Name="Shape1" Left="151.2" Top="2.27" Width="9.45" Height="9.45"/>
+          </TableCell>
+          <TableCell Name="Cell385" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell386" Border.Lines="All" Text="Робітник:                     " VertAlign="Center" Font="Arial, 8pt">
+            <ShapeObject Name="Shape3" Left="141.75" Top="2.27" Width="9.45" Height="9.45"/>
+          </TableCell>
+          <TableCell Name="Cell396" Border.Lines="All" Text="Підприємець:                " VertAlign="Center" Font="Arial, 8pt">
+            <ShapeObject Name="Shape6" Left="122.85" Top="2.27" Width="9.45" Height="9.45"/>
+          </TableCell>
+        </TableRow>
+        <TableRow Name="Row177" Height="12.6">
+          <TableCell Name="Cell387" Border.Lines="All" Text="Пенсіонер:                          " VertAlign="Center" Font="Arial, 8pt" ColSpan="2">
+            <ShapeObject Name="Shape2" Left="151.2" Top="2.27" Width="9.45" Height="9.45"/>
+          </TableCell>
+          <TableCell Name="Cell388" Border.Lines="Right, Top, Bottom" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell389" Border.Lines="All" Text="Студент:                      " VertAlign="Center" Font="Arial, 8pt">
+            <ShapeObject Name="Shape5" Left="141.75" Top="2.27" Width="9.45" Height="9.45"/>
+          </TableCell>
+          <TableCell Name="Cell397" Border.Lines="All" Text="Безробітний:                 " VertAlign="Center" Font="Arial, 8pt">
+            <ShapeObject Name="Shape7" Left="122.85" Top="2.27" Width="9.45" Height="9.45"/>
+          </TableCell>
+        </TableRow>
+        <TableRow Name="Row178" Height="12.6">
+          <TableCell Name="Cell390" Border.Lines="All" Text="Домогосподарка:                " VertAlign="Center" Font="Arial, 8pt" ColSpan="2">
+            <ShapeObject Name="Shape4" Left="151.2" Top="2.27" Width="9.45" Height="9.45"/>
+          </TableCell>
+          <TableCell Name="Cell391" Border.Lines="Right, Top, Bottom" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell392" Border.Lines="All" Text="інше ______________________________________(вкажіть)" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 8pt" ColSpan="2">
+            <ShapeObject Name="Shape28" Left="18.9" Top="2.27" Width="9.45" Height="9.45"/>
+          </TableCell>
+          <TableCell Name="Cell398" Border.Lines="All" VertAlign="Center" Font="Arial, 8pt"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table5" Left="47.25" Top="378" Width="660.44" Height="37.8">
+        <TableColumn Name="Column32" Width="147.36"/>
+        <TableColumn Name="Column33" Width="12.34"/>
+        <TableColumn Name="Column34" Width="166.26"/>
+        <TableColumn Name="Column35" Width="171.94"/>
+        <TableColumn Name="Column36" Width="162.54"/>
+        <TableRow Name="Row179">
+          <TableCell Name="Cell399" Border.Lines="All" Text="До 2тис.грн.      " HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" ColSpan="2">
+            <ShapeObject Name="Shape12" Left="132.3" Top="5.67" Width="9.45" Height="9.45"/>
+          </TableCell>
+          <TableCell Name="Cell400" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell401" Border.Lines="All" Text="2 - 5тис.грн.         " HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt">
+            <ShapeObject Name="Shape14" Left="141.75" Top="5.67" Width="9.45" Height="9.45"/>
+          </TableCell>
+          <TableCell Name="Cell402" Border.Lines="All" Text="10 - 15тис.грн.      " HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt">
+            <ShapeObject Name="Shape16" Left="132.3" Top="5.67" Width="9.45" Height="9.45"/>
+          </TableCell>
+          <TableCell Name="Cell407" Border.Lines="All" Text="15 - 20тис.грн.     " HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt">
+            <ShapeObject Name="Shape18" Left="141.75" Top="5.67" Width="9.45" Height="9.45"/>
+          </TableCell>
+        </TableRow>
+        <TableRow Name="Row180">
+          <TableCell Name="Cell403" Border.Lines="All" Text="20 - 100тис.грн.  " HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" ColSpan="2">
+            <ShapeObject Name="Shape13" Left="132.3" Top="5.67" Width="9.45" Height="9.45"/>
+          </TableCell>
+          <TableCell Name="Cell404" Border.Lines="Right, Top, Bottom" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell405" Border.Lines="All" Text="100 - 500тис.грн.  " HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt">
+            <ShapeObject Name="Shape15" Left="141.75" Top="5.67" Width="9.45" Height="9.45"/>
+          </TableCell>
+          <TableCell Name="Cell406" Border.Lines="All" Text="500тис - 1млн.грн.     " HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt">
+            <ShapeObject Name="Shape17" Left="132.3" Top="5.67" Width="9.45" Height="9.45"/>
+          </TableCell>
+          <TableCell Name="Cell408" Border.Lines="All" Text="Понад 1млн.грн.   " HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt">
+            <ShapeObject Name="Shape19" Left="141.75" Top="5.67" Width="9.45" Height="9.45"/>
+          </TableCell>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text8" Left="9.45" Top="415.8" Width="699.3" Height="24.57" Text="&lt;b&gt;8&lt;/b&gt;. Охарактеризуйте  Ваш фінансовий  стан:&#13;&#10;   8.1. &lt;i&gt;Основні джерела  Ваших  доходів:&lt;/i&gt;" Font="Times New Roman, 8pt" HtmlTags="true"/>
+      <TableObject Name="Table5" Left="47.25" Top="440.37" Width="660.36" Height="51.98">
+        <TableColumn Name="Column37" Width="147.67"/>
+        <TableColumn Name="Column38" Width="176.02"/>
+        <TableColumn Name="Column39" Width="336.67"/>
+        <TableRow Name="Row181" Height="16.54">
+          <TableCell Name="Cell409" Border.Lines="All" Text="заробітна плата (пенсія, соціальні виплати, &#13;&#10;стипендія тощо):  " VertAlign="Center" Font="Arial, 8pt" ColSpan="2" RowSpan="2">
+            <CheckBoxObject Name="CheckBox5" Left="255.15" Top="9.45" Width="9.45" Height="9.45" Border.Lines="All" CheckColor="Transparent"/>
+          </TableCell>
+          <TableCell Name="Cell410" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell411" Border.Lines="All" Text="дивіденди (доходи від цінних паперів): " VertAlign="Center" Font="Arial, 8pt" RowSpan="2">
+            <CheckBoxObject Name="CheckBox6" Left="245.7" Top="9.45" Width="9.45" Height="9.45" Border.Lines="All" CheckColor="Transparent"/>
+          </TableCell>
+        </TableRow>
+        <TableRow Name="Row182" Height="7.09">
+          <TableCell Name="Cell412" Border.Lines="Left, Top, Bottom" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell413" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell414" Border.Lines="All" VertAlign="Center" Font="Arial, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row183" Height="16.54">
+          <TableCell Name="Cell415" Border.Lines="All" Text="доходи від здійснення підприємницької &#13;&#10;діяльності:" VertAlign="Center" Font="Arial, 8pt" ColSpan="2" RowSpan="2">
+            <CheckBoxObject Name="CheckBox7" Left="255.15" Top="9.45" Width="9.45" Height="9.45" Border.Lines="All" CheckColor="Transparent"/>
+          </TableCell>
+          <TableCell Name="Cell416" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell417" Border.Lines="All" Text="інші:&#13;&#10;(якщо &quot;Так&quot; - вкажіть які) __________________________" VertAlign="Center" Font="Arial, 8pt" RowSpan="2">
+            <CheckBoxObject Name="CheckBox8" Left="37.8" Top="2.27" Width="9.45" Height="9.45" Border.Lines="All" CheckColor="Transparent"/>
+          </TableCell>
+        </TableRow>
+        <TableRow Name="Row184" Height="11.81">
+          <TableCell Name="Cell418" Border.Lines="Left, Top, Bottom" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell419" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell420" Border.Lines="All" VertAlign="Center" Font="Arial, 8pt"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text9" Left="9.45" Top="614.25" Width="699.3" Height="18.9" Text="    8.5. &lt;i&gt;Наявність  кредиторської  заборгованості  перед  банками&lt;/i&gt;" VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true"/>
+      <TextObject Name="Text10" Left="9.45" Top="627.48" Width="699.3" Height="18.9" Text="    8.6. &lt;i&gt;Наявність депозитів в інших банках&lt;/i&gt;" VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true"/>
+      <TextObject Name="Text11" Left="9.45" Top="640.71" Width="699.3" Height="18.9" Text="    8.7. &lt;i&gt;Чи є Ви засновником/учасником  юридичних  осіб?&lt;/i&gt;" VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true"/>
+      <CheckBoxObject Name="CheckBox9" Left="330.75" Top="619.92" Width="9.45" Height="9.45" Border.Lines="All" CheckColor="Transparent"/>
+      <CheckBoxObject Name="CheckBox10" Left="292.95" Top="632.39" Width="9.45" Height="9.45" Border.Lines="All" CheckColor="Transparent"/>
+      <CheckBoxObject Name="CheckBox11" Left="330.75" Top="646.38" Width="9.45" Height="9.45" Border.Lines="All" CheckColor="Transparent"/>
+      <TableObject Name="Table5" Left="9.45" Top="1086.75" Width="698.43" Height="198.45">
+        <TableColumn Name="Column40" Width="335.45"/>
+        <TableColumn Name="Column41" Width="362.98"/>
+        <TableRow Name="Row185" Height="28.35">
+          <TableCell Name="Cell421" Text="&lt;b&gt;13&lt;/b&gt;. Місце тимчасового  перебування  на території України______________________________________________________________________________&#13;&#10;________________________________________________________________________________________________________________________________" Font="Times New Roman, 8pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell422" Font="Times New Roman, 8pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row186">
+          <TableCell Name="Cell423" Text="&lt;b&gt;14&lt;/b&gt;. Громадянство __________________________________________" Font="Times New Roman, 8pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell424" Font="Times New Roman, 8pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row187">
+          <TableCell Name="Cell425" Text="[COMMON_DATA.TODAY_W]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell426" Text="                      ______________________Підпис" VertAlign="Center" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row205" Height="47.25">
+          <TableCell Name="Cell792" Text="[COMMON_DATA.TODAY_W]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell793" Text="                      ______________________Підпис &#13;&#10;                                                                   працівника   банку" VertAlign="Bottom" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row188">
+          <TableCell Name="Cell427" Text="Дякуємо Вам за участь в опитуванні! " HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell428" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row189" Height="66.15">
+          <TableCell Name="Cell429" Text="* &lt;b&gt;публічні діячі&lt;/b&gt; - особи, що виконують або виконували визначені публічні функції в іноземних державах, а саме чи обіймають(ли) такі посади: &#13;&#10;- глава держави, керівник уряду, міністри та їх заступники; - депутати парламенту; - члени верховного суду, конституційного суду або інших судових органів високого рівня, рішення яких не підлягають оскарженню, крім як за виняткових обставин; - члени суду аудиторів або правлінь центральних банків; - надзвичайні та повноважні посли, повірені у справах та високі посадовці збройних сил; - члени адміністративних, управлінських чи наглядових органів державних підприємств, що мають стратегічне значення.&lt;b&gt;Пов’язані особи&lt;/b&gt; – члени сім’ї та інші близькі родичі (подружжя, діти, батьки, рідні брати і сестри, дід, баба, онуки, усиновлювачі, усиновлені), юридичні особи, власниками істотної участі або контролерами яких є публічні діячі або їхні близькі родичі." HorzAlign="Justify" Font="Arial, 6pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell430" Font="Times New Roman, 6pt"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table7" Left="9.45" Top="763.56" Width="670.68" Height="94.56" Border.Lines="All">
+        <TableColumn Name="Column42" Width="95.58"/>
+        <TableColumn Name="Column43" Width="38.88"/>
+        <TableColumn Name="Column44" Width="19.98"/>
+        <TableColumn Name="Column45" Width="19.98"/>
+        <TableColumn Name="Column46" Width="48.33"/>
+        <TableColumn Name="Column47" Width="19.98"/>
+        <TableColumn Name="Column48" Width="19.98"/>
+        <TableColumn Name="Column49" Width="29.43"/>
+        <TableColumn Name="Column50" Width="19.98"/>
+        <TableColumn Name="Column51" Width="19.98"/>
+        <TableColumn Name="Column52" Width="19.98"/>
+        <TableColumn Name="Column53" Width="19.98"/>
+        <TableColumn Name="Column54" Width="38.88"/>
+        <TableColumn Name="Column55" Width="19.98"/>
+        <TableColumn Name="Column56" Width="19.98"/>
+        <TableColumn Name="Column57" Width="19.98"/>
+        <TableColumn Name="Column58" Width="19.98"/>
+        <TableColumn Name="Column59" Width="19.98"/>
+        <TableColumn Name="Column60" Width="19.98"/>
+        <TableColumn Name="Column61" Width="19.98"/>
+        <TableColumn Name="Column62" Width="19.98"/>
+        <TableColumn Name="Column63" Width="19.98"/>
+        <TableColumn Name="Column64" Width="19.98"/>
+        <TableColumn Name="Column65" Width="19.98"/>
+        <TableColumn Name="Column66" Width="19.98"/>
+        <TableColumn Name="Column67" Width="19.98"/>
+        <TableRow Name="Row190" Height="15.76">
+          <TableCell Name="Cell431" Border.Lines="All" Text="Прізвище, ім'я по батькові:" Font="Arial, 8pt" ColSpan="3"/>
+          <TableCell Name="Cell432" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell433" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell434" Border.Lines="All" Font="Arial, 8pt" ColSpan="23"/>
+          <TableCell Name="Cell435" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell456" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell457" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell458" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell459" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell460" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell461" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell462" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell463" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell464" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell465" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell466" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell467" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell468" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell469" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell470" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell471" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell472" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell563" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell569" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell575" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell576" Border.Lines="All" Font="Arial, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row191" Height="15.76">
+          <TableCell Name="Cell436" Border.Lines="All" Text="Дата народження:" Font="Arial, 8pt"/>
+          <TableCell Name="Cell437" Border.Lines="All" Text="число" Font="Arial, 8pt"/>
+          <TableCell Name="Cell438" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell439" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell440" Border.Lines="All" Text="місяць" Font="Arial, 8pt"/>
+          <TableCell Name="Cell473" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell474" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell475" Border.Lines="All" Text="рік" Font="Arial, 8pt"/>
+          <TableCell Name="Cell476" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell477" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell478" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell479" Border.Lines="All" HorzAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell480" Border.Lines="All" Text="ІПН" HorzAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell481" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell482" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell483" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell484" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell485" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell486" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell487" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell488" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell489" Font="Arial, 8pt"/>
+          <TableCell Name="Cell564" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell570" Border.Lines="All" Font="Arial, 8pt" ColSpan="3"/>
+          <TableCell Name="Cell577" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell578" Border.Lines="All" Font="Arial, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row192" Height="15.76">
+          <TableCell Name="Cell441" Border.Lines="All" Text="Адреса місця проживання" Font="Arial, 8pt" ColSpan="2"/>
+          <TableCell Name="Cell442" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell443" Border.Lines="All" Font="Arial, 8pt" ColSpan="24"/>
+          <TableCell Name="Cell444" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell445" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell490" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell491" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell492" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell493" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell494" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell495" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell496" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell497" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell498" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell499" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell500" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell501" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell502" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell503" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell504" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell505" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell506" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell565" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell571" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell579" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell580" Border.Lines="All" Font="Arial, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row193" Height="15.76">
+          <TableCell Name="Cell446" Border.Lines="All" Text="Паспортні дані:" Font="Arial, 8pt"/>
+          <TableCell Name="Cell447" Border.Lines="All" Text="серія" Font="Arial, 8pt"/>
+          <TableCell Name="Cell448" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell449" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell450" Border.Lines="All" Text="номер" Font="Arial, 8pt"/>
+          <TableCell Name="Cell507" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell508" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell509" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell510" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell511" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell512" Border.Lines="All" Text="дата видачі:" Font="Arial, 8pt" ColSpan="3"/>
+          <TableCell Name="Cell513" Border.Lines="All" HorzAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell514" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell515" Border.Lines="All" Text="число" Font="Arial, 8pt" ColSpan="2"/>
+          <TableCell Name="Cell516" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell517" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell518" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell519" Border.Lines="All" Text="місяць" Font="Arial, 8pt" ColSpan="2"/>
+          <TableCell Name="Cell520" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell521" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell522" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell523" Border.Lines="All" Text="рік" Font="Arial, 7pt"/>
+          <TableCell Name="Cell566" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell572" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell581" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell582" Border.Lines="All" Font="Arial, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row194" Height="15.76">
+          <TableCell Name="Cell451" Border.Lines="All" Text="Найменування органу, що видав паспорт:" Font="Arial, 8pt" ColSpan="5"/>
+          <TableCell Name="Cell452" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell453" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell454" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell455" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell524" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell525" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell526" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell527" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell528" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell529" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell530" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell531" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell532" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell533" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell534" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell535" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell536" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell537" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell538" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell539" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell540" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell567" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell573" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell583" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell584" Border.Lines="All" Font="Arial, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row195" Height="15.76">
+          <TableCell Name="Cell620" Format="Number" Format.UseLocale="false" Format.DecimalDigits="1" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" ColSpan="26"/>
+          <TableCell Name="Cell595"/>
+          <TableCell Name="Cell596"/>
+          <TableCell Name="Cell597"/>
+          <TableCell Name="Cell598"/>
+          <TableCell Name="Cell599"/>
+          <TableCell Name="Cell600"/>
+          <TableCell Name="Cell601"/>
+          <TableCell Name="Cell602"/>
+          <TableCell Name="Cell603"/>
+          <TableCell Name="Cell604"/>
+          <TableCell Name="Cell605"/>
+          <TableCell Name="Cell606"/>
+          <TableCell Name="Cell607"/>
+          <TableCell Name="Cell608"/>
+          <TableCell Name="Cell609"/>
+          <TableCell Name="Cell610"/>
+          <TableCell Name="Cell611"/>
+          <TableCell Name="Cell612"/>
+          <TableCell Name="Cell613"/>
+          <TableCell Name="Cell614"/>
+          <TableCell Name="Cell615"/>
+          <TableCell Name="Cell616"/>
+          <TableCell Name="Cell617"/>
+          <TableCell Name="Cell618"/>
+          <TableCell Name="Cell619"/>
+        </TableRow>
+      </TableObject>
+      <ShapeObject Name="Shape22" Left="207.9" Top="510.3" Width="9.45" Height="9.45"/>
+      <TextObject Name="Text16" Left="255.15" Top="506.52" Width="255.15" Height="15.12" Border.Lines="All" Text="- від 5 до 10 тис.грн.: " HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+      <ShapeObject Name="Shape24" Left="472.5" Top="510.3" Width="9.45" Height="9.45"/>
+      <TextObject Name="Text17" Left="510.3" Top="506.52" Width="198.45" Height="15.12" Border.Lines="All" Text="- більше 10 тис.грн.: " HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+      <ShapeObject Name="Shape26" Left="680.4" Top="510.3" Width="9.45" Height="9.45"/>
+      <TextObject Name="Text15" Left="47.25" Top="506.52" Width="207.9" Height="15.12" Border.Lines="All" Text="- до 5 тис.грн.: " HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text19" Left="255.15" Top="538.65" Width="255.15" Height="18.9" Border.Lines="All" Text="- від 10 до 20 тис.грн.: " HorzAlign="Center" VertAlign="Bottom" Font="Arial, 8pt"/>
+      <TextObject Name="Text20" Left="510.3" Top="538.65" Width="198.45" Height="18.9" Border.Lines="All" Text="- більше 20 тис.грн.: " HorzAlign="Center" VertAlign="Bottom" Font="Arial, 8pt"/>
+      <TextObject Name="Text18" Left="47.25" Top="538.65" Width="207.9" Height="18.9" Border.Lines="All" Text="- до 10 тис.грн.: " HorzAlign="Center" VertAlign="Bottom" Font="Arial, 8pt"/>
+      <ShapeObject Name="Shape23" Left="207.9" Top="544.32" Width="9.45" Height="9.45"/>
+      <ShapeObject Name="Shape25" Left="472.5" Top="544.32" Width="9.45" Height="9.45"/>
+      <ShapeObject Name="Shape27" Left="680.4" Top="544.32" Width="9.45" Height="9.45"/>
+      <TextObject Name="Text12" Left="-245.7" Top="748.44" Width="727.65" Height="28.35" Text=" Так          /  Ні         (Якщо «Так» зазначте ії)&#13;&#10;            " Padding="2, 1, 2, 1" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 8pt" HtmlTags="true"/>
+      <ShapeObject Name="Shape35" Left="47.25" Top="752.22" Width="9.45" Height="9.45"/>
+      <ShapeObject Name="Shape36" Left="90.72" Top="752.22" Width="9.45" Height="9.45"/>
+      <TextObject Name="Text14" Left="-9.45" Top="1064.07" Width="699.3" Height="18.9" Text="&#13;&#10;Для заповнення не резидентами:" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt, style=Underline" HtmlTags="true"/>
+      <TableObject Name="Table8" Left="9.45" Top="859.95" Width="689.85" Height="170.1">
+        <TableColumn Name="Column68"/>
+        <TableColumn Name="Column69"/>
+        <TableColumn Name="Column70"/>
+        <TableColumn Name="Column71"/>
+        <TableColumn Name="Column72" Width="425.25"/>
+        <TableRow Name="Row196" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell621" Text="&#13;&#10; Для заповнення особами, що здійснюють разові операції без відкриття рахунку&#13;&#10;на суму що дорівнює або перевищує 150 тис. грн. або еквівалент в іноземній валюті:" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 8pt, style=Underline" ColSpan="5"/>
+          <TableCell Name="Cell622"/>
+          <TableCell Name="Cell623"/>
+          <TableCell Name="Cell624"/>
+          <TableCell Name="Cell625"/>
+        </TableRow>
+        <TableRow Name="Row197">
+          <TableCell Name="Cell626" Text="&lt;b&gt;12&lt;/b&gt;.Особа,від імені або за дорученням чи в інтересах якої проводиться фінансова операція (за наявності)" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true" ColSpan="5"/>
+          <TableCell Name="Cell627" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell628" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell629" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell630" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row198" Height="113.4">
+          <TableCell Name="Cell631" ColSpan="5"/>
+          <TableCell Name="Cell632"/>
+          <TableCell Name="Cell633"/>
+          <TableCell Name="Cell634"/>
+          <TableCell Name="Cell635"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table5" Left="9.45" Top="916.65" Width="670.68" Height="94.56" Border.Lines="All">
+        <TableColumn Name="Column73" Width="95.58"/>
+        <TableColumn Name="Column74" Width="38.88"/>
+        <TableColumn Name="Column75" Width="19.98"/>
+        <TableColumn Name="Column76" Width="19.98"/>
+        <TableColumn Name="Column77" Width="48.33"/>
+        <TableColumn Name="Column78" Width="19.98"/>
+        <TableColumn Name="Column79" Width="19.98"/>
+        <TableColumn Name="Column80" Width="29.43"/>
+        <TableColumn Name="Column81" Width="19.98"/>
+        <TableColumn Name="Column82" Width="19.98"/>
+        <TableColumn Name="Column83" Width="19.98"/>
+        <TableColumn Name="Column84" Width="19.98"/>
+        <TableColumn Name="Column85" Width="38.88"/>
+        <TableColumn Name="Column86" Width="19.98"/>
+        <TableColumn Name="Column87" Width="19.98"/>
+        <TableColumn Name="Column88" Width="19.98"/>
+        <TableColumn Name="Column89" Width="19.98"/>
+        <TableColumn Name="Column90" Width="19.98"/>
+        <TableColumn Name="Column91" Width="19.98"/>
+        <TableColumn Name="Column92" Width="19.98"/>
+        <TableColumn Name="Column93" Width="19.98"/>
+        <TableColumn Name="Column94" Width="19.98"/>
+        <TableColumn Name="Column95" Width="19.98"/>
+        <TableColumn Name="Column96" Width="19.98"/>
+        <TableColumn Name="Column97" Width="19.98"/>
+        <TableColumn Name="Column98" Width="19.98"/>
+        <TableRow Name="Row199" Height="15.76">
+          <TableCell Name="Cell636" Border.Lines="All" Text="Прізвище, ім'я по батькові:" Font="Arial, 8pt" ColSpan="3"/>
+          <TableCell Name="Cell637" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell638" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell639" Border.Lines="All" Font="Arial, 8pt" ColSpan="23"/>
+          <TableCell Name="Cell640" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell641" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell642" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell643" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell644" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell645" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell646" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell647" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell648" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell649" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell650" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell651" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell652" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell653" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell654" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell655" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell656" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell657" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell658" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell659" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell660" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell661" Border.Lines="All" Font="Arial, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row200" Height="15.76">
+          <TableCell Name="Cell662" Border.Lines="All" Text="Дата народження:" Font="Arial, 8pt"/>
+          <TableCell Name="Cell663" Border.Lines="All" Text="число" Font="Arial, 8pt"/>
+          <TableCell Name="Cell664" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell665" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell666" Border.Lines="All" Text="місяць" Font="Arial, 8pt"/>
+          <TableCell Name="Cell667" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell668" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell669" Border.Lines="All" Text="рік" Font="Arial, 8pt"/>
+          <TableCell Name="Cell670" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell671" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell672" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell673" Border.Lines="All" HorzAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell674" Border.Lines="All" Text="ІПН" HorzAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell675" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell676" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell677" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell678" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell679" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell680" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell681" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell682" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell683" Font="Arial, 8pt"/>
+          <TableCell Name="Cell684" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell685" Border.Lines="All" Font="Arial, 8pt" ColSpan="3"/>
+          <TableCell Name="Cell686" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell687" Border.Lines="All" Font="Arial, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row201" Height="15.76">
+          <TableCell Name="Cell688" Border.Lines="All" Text="Адреса місця проживання" Font="Arial, 8pt" ColSpan="2"/>
+          <TableCell Name="Cell689" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell690" Border.Lines="All" Font="Arial, 8pt" ColSpan="24"/>
+          <TableCell Name="Cell691" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell692" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell693" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell694" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell695" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell696" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell697" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell698" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell699" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell700" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell701" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell702" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell703" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell704" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell705" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell706" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell707" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell708" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell709" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell710" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell711" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell712" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell713" Border.Lines="All" Font="Arial, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row202" Height="15.76">
+          <TableCell Name="Cell714" Border.Lines="All" Text="Паспортні дані:" Font="Arial, 8pt"/>
+          <TableCell Name="Cell715" Border.Lines="All" Text="серія" Font="Arial, 8pt"/>
+          <TableCell Name="Cell716" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell717" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell718" Border.Lines="All" Text="номер" Font="Arial, 8pt"/>
+          <TableCell Name="Cell719" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell720" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell721" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell722" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell723" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell724" Border.Lines="All" Text="дата видачі:" Font="Arial, 8pt" ColSpan="3"/>
+          <TableCell Name="Cell725" Border.Lines="All" HorzAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell726" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell727" Border.Lines="All" Text="число" Font="Arial, 8pt" ColSpan="2"/>
+          <TableCell Name="Cell728" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell729" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell730" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell731" Border.Lines="All" Text="місяць" Font="Arial, 8pt" ColSpan="2"/>
+          <TableCell Name="Cell732" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell733" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell734" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell735" Border.Lines="All" Text="рік" Font="Arial, 7pt"/>
+          <TableCell Name="Cell736" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell737" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell738" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell739" Border.Lines="All" Font="Arial, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row203" Height="15.76">
+          <TableCell Name="Cell740" Border.Lines="All" Text="Найменування органу, що видав паспорт:" Font="Arial, 8pt" ColSpan="5"/>
+          <TableCell Name="Cell741" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell742" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell743" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell744" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell745" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell746" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell747" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell748" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell749" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell750" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell751" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell752" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell753" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell754" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell755" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell756" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell757" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell758" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell759" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell760" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell761" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell762" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell763" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell764" Border.Lines="All" Font="Arial, 8pt"/>
+          <TableCell Name="Cell765" Border.Lines="All" Font="Arial, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row204" Height="15.76">
+          <TableCell Name="Cell766" Format="Number" Format.UseLocale="false" Format.DecimalDigits="1" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" ColSpan="26"/>
+          <TableCell Name="Cell767"/>
+          <TableCell Name="Cell768"/>
+          <TableCell Name="Cell769"/>
+          <TableCell Name="Cell770"/>
+          <TableCell Name="Cell771"/>
+          <TableCell Name="Cell772"/>
+          <TableCell Name="Cell773"/>
+          <TableCell Name="Cell774"/>
+          <TableCell Name="Cell775"/>
+          <TableCell Name="Cell776"/>
+          <TableCell Name="Cell777"/>
+          <TableCell Name="Cell778"/>
+          <TableCell Name="Cell779"/>
+          <TableCell Name="Cell780"/>
+          <TableCell Name="Cell781"/>
+          <TableCell Name="Cell782"/>
+          <TableCell Name="Cell783"/>
+          <TableCell Name="Cell784"/>
+          <TableCell Name="Cell785"/>
+          <TableCell Name="Cell786"/>
+          <TableCell Name="Cell787"/>
+          <TableCell Name="Cell788"/>
+          <TableCell Name="Cell789"/>
+          <TableCell Name="Cell790"/>
+          <TableCell Name="Cell791"/>
+        </TableRow>
+      </TableObject>
+      <ShapeObject Name="Shape37" Left="47.25" Top="5.67" Width="9.45" Height="9.45"/>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="1289.2" Width="718.2" Height="18.9">
+      <BarcodeObject Name="Barcode1" Left="96.52" Width="126.25" Height="18.9" Anchor="Top, Right" Expression="[TICKET_DATA.DOC_ID]+&quot;:&quot;+[TotalPages]+&quot;:&quot;+[Page]" ShowText="false" Barcode="Codabar"/>
+      <TextObject Name="Text2" Left="236.25" Width="472.5" Height="18.9" Text="№ друку [TICKET_DATA.DOC_ID] сторінка [Page] з [TotalPages]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

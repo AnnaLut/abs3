@@ -1,0 +1,36 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="ins_master.master.cs" Inherits="ins_ins_master" %>
+
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajx" %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+    <link href="/Common/CSS/default.css" type="text/css" rel="stylesheet" />
+    <link href="/Common/CSS/jquery/jquery.css" type="text/css" rel="stylesheet" />
+    <link href="/Common/CSS/barsextenders.css" type="text/css" rel="stylesheet" />
+    <link href="/Common/CSS/BarsGridView.css" type="text/css" rel="stylesheet" />
+    <link href="/barsroot/ins/ins.css" type="text/css" rel="stylesheet" />
+    <script language="javascript" type="text/javascript" src="/barsroot/ins/ins.js?v=1.9"></script>
+    <script language="javascript" type="text/javascript" src="/Common/jquery/jquery.js"></script>
+    <script language="javascript" type="text/javascript" src="/Common/jquery/jquery-ui.js"></script>
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div class="pageTitle">
+            <asp:Label ID="lbPageTitle" runat="server" 
+                 meta:resourcekey="lbPageTitleResource1"></asp:Label>
+        </div>
+        <div>
+            <ajx:ToolkitScriptManager ID="sm" runat="server">
+                <Scripts>
+                    <asp:ScriptReference Path="/barsroot/credit/JScript/JScript.js?v1" />
+                </Scripts>
+            </ajx:ToolkitScriptManager>
+            <asp:ContentPlaceHolder ID="cph" runat="server">
+            </asp:ContentPlaceHolder>
+        </div>
+    </form>
+</body>
+</html>

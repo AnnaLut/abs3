@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="11/12/2013 12:59:19" ReportInfo.Modified="01/14/2014 10:05:41" ReportInfo.CreatorVersion="1.7.1.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+
+    private void Label1_Click(object sender, EventArgs e)
+    {
+      
+    }
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <OracleDataConnection Name="BARSDEV_NEW" ConnectionString="rijcmlq9SEZoacNJntaKIKp6mVF1+kSHs9h2FEASDb2ziQ1rMUybLG+C6jbSqka/GGQeZKaQSbrDjBY4KltUNuVSQtSEw==">
+      <TableDataSource Name="Table" Alias="t" DataType="System.Int32" Enabled="true" SelectCommand="select b.bound_id, c.okpo, c.nmkk, c.adr, decode(c.custtype,3,'ДРФО','ЄДРПОУ') as kod_name, k.num, to_char(k.open_date,'dd/mm/yyyy') as open_date&#13;&#10;from cim_act_bound b, cim_contracts k, customer c&#13;&#10;where c.rnk=k.rnk&#13;&#10;and k.contr_id=b.contr_id&#13;&#10;and b.bound_id=to_number(:p_mail_id)&#13;&#10;&#13;&#10;">
+        <Column Name="NMKK" DataType="System.String"/>
+        <Column Name="ADR" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="KOD_NAME" DataType="System.String"/>
+        <Column Name="NUM" DataType="System.String"/>
+        <Column Name="OPEN_DATE" DataType="System.String"/>
+        <Column Name="Column" Enabled="false" DataType="System.Int32" Calculated="true" Expression=""/>
+        <Column Name="BOUND_ID" DataType="System.Decimal"/>
+        <CommandParameter Name="p_mail_id" DataType="126" Expression="[mail_id]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table1" Alias="b" DataType="System.Int32" Enabled="true" SelectCommand="select * from (&#13;&#10;select l.act_id, to_char(o.vdat,'dd/mm/yyyy') as vdat, o.kv, to_char(round(o.s/100,2),'999999990.00') as s, &#13;&#10;to_char(round(l.s*b.s/b.s_cv/100,2),'999999990.00') as bound_s,&#13;&#10;o.vdat as dat&#13;&#10;from cim_link l, cim_payments_bound b, oper o&#13;&#10;where l.delete_date is null and o.ref=b.ref and b.bound_id=l.payment_id &#13;&#10;union all&#13;&#10;select l.act_id, to_char(o.val_date,'dd/mm/yyyy') as vdat, o.kv, to_char(round(o.s/100,2),'999999990.00') as s,&#13;&#10;to_char(round(l.s*b.s/b.s_cv/100,2),'999999990.00') as bound_s,   &#13;&#10; o.val_date as dat&#13;&#10;from cim_link l, cim_fantoms_bound b, cim_fantom_payments o&#13;&#10;where l.delete_date is null and o.fantom_id=b.fantom_id and b.bound_id=l.fantom_id )&#13;&#10;order by dat">
+        <Column Name="ACT_ID" DataType="System.Decimal"/>
+        <Column Name="VDAT" DataType="System.String"/>
+        <Column Name="KV" DataType="System.Decimal"/>
+        <Column Name="S" DataType="System.String"/>
+        <Column Name="BOUND_S" DataType="System.String"/>
+        <Column Name="DAT" DataType="System.DateTime"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Relation Name="Table_Table1" ParentDataSource="Table" ChildDataSource="Table1" ParentColumns="BOUND_ID" ChildColumns="ACT_ID" Enabled="true"/>
+    <Parameter Name="zap_date" DataType="System.Char"/>
+    <Parameter Name="zap_num" DataType="System.String"/>
+    <Parameter Name="control_bank" DataType="System.String"/>
+    <Parameter Name="director" DataType="System.String"/>
+    <Parameter Name="vik_name" DataType="System.String"/>
+    <Parameter Name="vik_tel" DataType="System.String"/>
+    <Parameter Name="director_name" DataType="System.String"/>
+    <Parameter Name="control_bank_mfo" DataType="System.String"/>
+    <Parameter Name="mail_id" DataType="System.String"/>
+    <Parameter Name="mfo" DataType="System.String"/>
+    <Parameter Name="bank_name" DataType="System.String"/>
+    <Parameter Name="bank_name_ov" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Guides="37.8,66.15">
+    <DataBand Name="Data1" Width="718.2" Height="406.35" CanGrow="true" CanShrink="true" CanBreak="true" DataSource="Table">
+      <TextObject Name="Text22" Left="368.55" Top="66.15" Width="349.65" Height="18.9" Text="(поштова адреса клієнта)" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text23" Left="368.55" Top="47.25" Width="349.65" Height="18.9" Text="[t.ADR]" HorzAlign="Center" Font="Times New Roman, 12pt, style=Underline"/>
+      <TextObject Name="Text24" Left="368.55" Top="18.9" Width="349.65" Height="18.9" Text="(зазначається назва клієнта)" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text25" Left="368.55" Width="349.65" Height="18.9" Text="[t.NMKK]&#13;&#10;" HorzAlign="Center" Font="Times New Roman, 12pt, style=Underline"/>
+      <TextObject Name="Text26" Top="151.2" Width="718.2" Height="151.2" CanGrow="true" CanShrink="true" Text="	У відповідь на Ваш запит від [zap_date] р. №[zap_num] та згідно п.2.3 розділу 2 Інструкції про порядок здійснення контролю за експортними, імпортними операціями, затвердженої постановою Правління Національного банку України від 24 березня 1999 року №136, зареєстрованої в Міністерстві юстиції України 28 травня 1999 р. за №338/3631 (із змінами і доповненнями) [bank_name] АТ „Ощадбанк” (код банку [mfo]) повідомляє, що на поточний рахунок [t.NMKK] (код [t.KOD_NAME] [t.OKPO]) надходила виручка за контрактом №[t.NUM] від [t.OPEN_DATE] р., а саме:" HorzAlign="Justify" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text27" Top="311.85" Width="103.95" Height="94.5" Border.Lines="All" Text="Дата надходження коштів" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text28" Left="170.1" Top="311.85" Width="151.2" Height="94.5" Border.Lines="All" Text="Сума платежу, згідно поля  SWIFT-повідомлення 33В, в ін. валюті" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text29" Left="321.3" Top="311.85" Width="141.75" Height="94.5" Border.Lines="All" Text="Інформація у полі SWIFT-повідомлення 71F, в ін. валюті" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text30" Left="463.05" Top="311.85" Width="255.15" Height="94.5" Border.Lines="All" Text="Сума коштів, згідно поля SWIFT-повідомлення 32А (фактично зараховані кошти на поточний рахунок клієнта), в тій частині, що передається на контроль" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text31" Left="103.95" Top="311.85" Width="66.15" Height="94.5" Border.Lines="All" Text="Код валюти" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt"/>
+      <DataBand Name="Data2" Top="410.56" Width="718.2" Height="37.8" DataSource="Table1">
+        <TextObject Name="Text11" Width="103.95" Height="37.8" Border.Lines="All" Text="[b.VDAT]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt"/>
+        <TextObject Name="Text12" Left="103.95" Width="66.15" Height="37.8" Border.Lines="All" Text="[b.KV]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt"/>
+        <TextObject Name="Text13" Left="170.1" Width="151.2" Height="37.8" Border.Lines="All" Text="[b.S]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt"/>
+        <TextObject Name="Text14" Left="321.3" Width="141.75" Height="37.8" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt"/>
+        <TextObject Name="Text15" Left="463.05" Width="255.15" Height="37.8" Border.Lines="All" Text="[b.BOUND_S]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt"/>
+      </DataBand>
+    </DataBand>
+    <ColumnFooterBand Name="ColumnFooter1" Top="452.57" Width="718.2" Height="94.5">
+      <TextObject Name="Text16" Top="18.9" Width="718.2" Height="75.6" CanGrow="true" CanShrink="true" Text="	Зазначена у таблиці виручка не використовувалась [bank_name_ov] АТ „Ощадбанк” (код банку [mfo]) у валютному контролі та інформація щодо неї в повному обсязі передається на контроль до [control_bank] (код банку [control_bank_mfo]).&#13;&#10;Довідку видано для надання до [control_bank]. &#13;&#10;" HorzAlign="Justify" Font="Times New Roman, 12pt"/>
+    </ColumnFooterBand>
+    <PageFooterBand Name="PageFooter1" Top="551.28" Width="718.2" Height="236.25">
+      <TextObject Name="Text17" Left="207.9" Top="103.95" Width="226.8" Height="56.7" Text="_______________________&#13;&#10;(підпис)" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text18" Top="160.65" Width="274.05" Height="75.6" Text="Виконавець&#13;&#10;[vik_name]&#13;&#10;тел. [vik_tel]&#13;&#10;" Font="Arial, 10pt, style=Italic"/>
+      <TextObject Name="Text20" Left="500.85" Top="122.85" Width="66.15" Height="18.9" Text="П.І.Б." HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text21" Top="103.95" Width="207.9" Height="56.7" Text="[director] " Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text19" Left="434.7" Top="103.95" Width="170.1" Height="18.9" Border.Lines="Bottom" Text="[director_name]" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

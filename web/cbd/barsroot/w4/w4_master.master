@@ -1,0 +1,28 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="w4_master.master.cs" Inherits="w4_w4_master" %>
+
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajx" %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+    <link href="/Common/CSS/default.css" type="text/css" rel="stylesheet" />
+    <link href="/Common/CSS/barsextenders.css" type="text/css" rel="stylesheet" />
+    <link href="/Common/CSS/BarsGridView.css" type="text/css" rel="stylesheet" />
+    <link href="/barsroot/w4/w4.css" type="text/css" rel="stylesheet" />
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server">
+    <div>
+        <ajx:ToolkitScriptManager ID="sm" runat="server">
+            <Scripts>
+                <asp:ScriptReference Path="/barsroot/credit/JScript/JScript.js?v1" />
+            </Scripts>
+        </ajx:ToolkitScriptManager>
+        <asp:ContentPlaceHolder ID="cph" runat="server">
+        </asp:ContentPlaceHolder>
+    </div>
+    </form>
+</body>
+</html>

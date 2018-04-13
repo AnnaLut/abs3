@@ -1,0 +1,43 @@
+﻿@model Exception
+@{
+    Layout = null;
+}
+<div style="font-family:  sans-serif">
+    <h2 style="color:red;font-weight:lighter ">@Model.Message</h2>
+    <p>Ви можете :</p>
+    <ul>
+        <li>Повернутись на головну @Html.ActionLink("Home", "index", "board"). </li>
+        <li>
+            Написати повідомлення розробникам @Html.ActionLink("написати", "Feedback", "Home", new { area = "" }, new { onclick = "showFeedBackGorm(); return false;" }).
+        </li>
+    </ul>
+    @if (Model.InnerException != null)
+    {
+        <div style="margin-left: 30px;">
+            <p style="font-weight: bold;">@Model.InnerException.Message</p>
+            <fieldset style="font-size: .85em;">
+                <legend>Стек</legend>
+                @if (Model.InnerException.StackTrace != null)
+                {
+                    @Html.Raw(Model.InnerException.StackTrace.Replace("\r\n", "<br>"))
+                }
+            </fieldset>
+        </div>
+
+    }
+    <fieldset style="font-size: .85em;">
+        <legend>Інформація для розробників</legend>
+        @if (Model.StackTrace != null)
+        {
+            @Html.Raw(Model.StackTrace.Replace("\r\n", "<br>"))
+        }
+    </fieldset>
+</div>
+
+<script>
+    function showFeedBackGorm() {
+        $.get(bars.config.appName + '/home/feedback/?partial=true', function (request) {
+            $('body').append(request);
+        });
+    }
+</script>

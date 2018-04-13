@@ -1,0 +1,39 @@
+﻿@{
+    Layout = null;
+}
+@inherits System.Web.Mvc.WebViewPage<Models.CUSTOMER_ADDRESS>
+<table class="address" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+        <td class="label">Індекс:</td>
+        <td>
+            <input value="@Model.ZIP" type="text" id="FGIDX1" class="edit composite part1" maxlength="20" tabindex="101" />
+            <button type="button" id="ref1" class="ref composite part2" value="..." onclick="ShowAdrManual(1); ">...</button>
+        </td>
+    </tr>
+    <tr>
+        <td class="label">Область:</td>
+        <td>
+            <input value="@Model.DOMAIN" type="text" id="FGOBL1" class="edit long" maxlength="30" tabindex="102" />
+        </td>
+    </tr>
+    <tr>
+        <td class="label">Район:</td>
+        <td>
+            <input value="@Model.REGION" type="text" id="FGDST1" class="edit long" maxlength="30" tabindex="103" />
+        </td>
+    </tr>
+    <tr>
+        <td class="label">Населений пункт:</td>
+        <td>
+            <input value="@Model.LOCALITY" type="text" id="FGTWN1" class="edit long @(Model.TYPE_ID==1?"required":"")" maxlength="60" tabindex="104" />
+            @if(Model.TYPE_ID==1){<span class="required">*</span>}
+        </td>
+    </tr>
+    <tr>
+        <td class="label">Вулиця, будинок, кв.:</td>
+        <td>
+            <input value="@Model.ADDRESS" type="text" id="FGADR1" class="edit long @(Model.TYPE_ID==1?"required":"")" maxlength="100" tabindex="105" />
+            @if(Model.TYPE_ID==1){<span class="required">*</span>}
+        </td>
+    </tr>
+</table>

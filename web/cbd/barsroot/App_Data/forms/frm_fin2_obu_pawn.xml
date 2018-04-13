@@ -1,0 +1,150 @@
+﻿<xmlform captiontype="OnlyTitle">
+  <grids>
+    <grid  id="gv" pagesize="10" showpagesizebox="true" title="Застава  РНК клієнта №\QS[RNK_] референс КД №\QS[ND_] "  showfilter="true">
+      <datasource>
+        <sql>
+          select * from V_FIN_OBU_PAWN  
+        </sql>
+        <parameters>
+          <parameter type="QueryString" name="ND" altname="ND_"></parameter>
+          <parameter type="QueryString" name="RNK" altname="RNK_"></parameter>
+        </parameters>
+      </datasource>
+      <rowselection method="SingleRow" />
+      <editform style="Dialog" title="" height="350" width="700" columnscount="1">
+        <buttons defaulttype="button">
+          <button id="btnEdit" caption="Редагувати|Зберегти|Вiдмiнити" hint="Редагувати рядок|Зберегти рядок|Вiдмiнити редагування" confirmmessage="">
+            <command type="Edit">
+              <sql>update V_FIN_OBU_PAWN set ND= :ND, RNK= :RNK, PAWN= :PAWN,   KV= :KV, S_SPV= :S_SPV,  P_ZAST= :P_ZAST, DATP= :DATP, ACC= :ACC where ID = : ID</sql>
+              <parameters>
+                <parameter type="DataField" name="ID" />
+                <parameter type="DataField" name="ND" />
+                <parameter type="DataField" name="RNK" />
+                <parameter type="DataField" name="PAWN" />
+                <parameter type="DataField" name="KV" />
+                <parameter type="DataField" name="S_SPV" />
+                <parameter type="DataField" name="P_ZAST" />
+                <parameter type="DataField" name="DATP" />
+                <parameter type="DataField" name="ACC" />
+              </parameters>
+            </command>
+          </button>
+          <button id="btnInsert" caption="Додати|Зберегти|Вiдмiнити" hint="Додати рядок|Зберегти рядок|Вiдмiнити додавання" confirmmessage="">
+            <command type="Insert">
+              <sql>insert into V_FIN_OBU_PAWN( ND, RNK, PAWN, KV, S_SPV, P_ZAST, DATP) values (:ND, :RNK, :PAWN, :KV, :S_SPV, :P_ZAST, :DATP)</sql>
+              <parameters>
+                <parameter type="QueryString" name="ND" altname="ND_" />
+                <parameter type="QueryString" name="RNK" altname="RNK_" />
+                <parameter type="DataField" name="PAWN" />
+                <parameter type="DataField" name="KV" />
+                <parameter type="DataField" name="S_SPV" />
+                <parameter type="DataField" name="P_ZAST" />
+                <parameter type="DataField" name="DATP" />
+                </parameters>
+            </command>
+          </button>
+          <button id="btnDel" caption="Видалити|Зберегти|Вiдмiнити" hint="Видалити рядок|Зберегти рядок|Вiдмiнити видалення" confirmmessage="Необхідно підтвердити видалення рядка">
+            <command type="Delete">
+              <sql>delete from V_FIN_OBU_PAWN where id = :ID</sql>
+              <parameters>
+                <parameter name="ID" type="DataField"></parameter>
+              </parameters>
+            </command>
+          </button>
+          <button caption="Закрити" id="btnClose">
+            <command type="Close" />
+          </button>
+        </buttons>
+      </editform>
+      <fields>
+        <field name="ID" key="true" datatype="Int64" sort="default">
+          <column show="false" caption="Ключ" align="right" />
+          <form show="false" rwmode="RW">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="ND" key="false" datatype="Int64" sort="default">
+          <column show="false" caption="РНК боржника" align="right" />
+          <form show="false" rwmode="RW">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="RNK" key="false" datatype="Int64" sort="default">
+          <column show="false" caption="" align="right" />
+          <form show="false" rwmode="RW">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="PAWN" key="false" datatype="Int64" sort="default">
+          <column show="true" caption="Код вида застави" align="right" />
+          <form show="true" rwmode="ROI">
+            <uicontrol type="DropDownList" table="(select pawn, substr(name,1,30) as name from cc_pawn where d_close is null order by pawn)" keyfield="PAWN" valuefield="NAME" />
+          </form>
+        </field>
+        <field name="NAME" key="false" datatype="String" sort="default" >
+          <column show="true" caption="Назва вида застави" align="left" width="350" />
+          <form show="false" rwmode="RW">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <!--<field name="PR" key="false" datatype="Int64" sort="default">
+          <column show="true" caption="% забезпечення" align="right" />
+          <form show="false" rwmode="ROI">
+            <uicontrol type="Text" />
+          </form>
+        </field>-->
+        <field name="KV" key="false" datatype="Int64" sort="default">
+          <column show="true" caption="Код валюти" align="right" />
+          <form show="true" rwmode="ROI">
+            <uicontrol type="DropDownList" table="(select kv, substr(name,1,30) as name from TABVAL$GLOBAL order by grp)" keyfield="KV" valuefield="NAME" />
+          </form>
+        </field>
+        <field name="S_SPV" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="Договірна вартість" align="right" />
+          <form show="true" rwmode="ROI">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="SV" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="Справедлива вартість" align="right" />
+          <form show="true" rwmode="ROI">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <!--<field name="SUMP_E" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="Вартість забезпечення з врахуванням коофіциэнтів" align="right" />
+          <form show="false" rwmode="RW">
+            <uicontrol type="Text" />
+          </form>
+        </field>-->
+        <field name="P_ZAST" key="false" datatype="String" sort="default">
+          <column show="true" caption="Предмет застави" align="left" width="350" />
+          <form show="true" rwmode="RW">
+            <uicontrol type="Text" controlwidth="350"  linescount="3" />
+          </form>
+        </field>
+        <field name="DATP" key="false" datatype="DateTime" sort="default">
+          <column show="true" caption="Дата останньої перевірки" align="center" />
+          <form show="true" rwmode="RW">
+            <uicontrol type="DateInput" />
+          </form>
+        </field>
+        <field name="ACC" key="false" datatype="Int64" sort="default">
+          <column show="false" caption="ACC" align="right" />
+          <layout>
+            <colors scope="EntireRow">
+              <color color="clNone" bold="true" operation="GreatEqual" value="1"/>
+            </colors>
+          </layout>
+          <form show="false" rwmode="RW">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="NLS" key="false" datatype="String">
+          <column caption="Рахунок обліку" show="true" width="30"></column>
+          <form show="false"></form>
+        </field>
+      </fields>
+    </grid>
+  </grids>
+</xmlform>

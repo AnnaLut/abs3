@@ -1,0 +1,142 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Стан платежів";
+}
+@model BarsWeb.Areas.Sep.Models.AccessType
+
+<h2>@ViewBag.Title</h2>
+<div id="SepPaymentToolBar1"></div>
+<div id="SepPaymentStateGrid"></div>
+
+
+<script>     
+    $('#SepPaymentToolBar1').kendoToolBar({
+        resizable: true,
+        items: [
+             {
+                template: "<button type='button' class='k-button' onclick='refreshGrid()' title='Перечитати дані'><i class='pf-icon pf-16 pf-reload_rotate'></i></button>"
+             },            
+             {
+                 template: "<button id='pbViewDoc' type='button' class='k-button' onclick='openSepDocs()' title='Переглянути документ'><i class='pf-icon pf-16 pf-folder_open'></i></button>"
+             }
+        ]
+    });
+
+    $("#pbViewDoc").kendoButton();
+     
+    $("#SepPaymentStateGrid").kendoGrid({        
+        columns: [
+            {
+                field: "NN",
+                title: "№",
+                width: 10
+            },
+            {
+                field: "TT",
+                title: "Тип счета",
+                width: 40
+            },
+            {
+                field: "NAME",
+                title: "Состояние документов",
+                width: 140
+            },
+            {
+                field: "CNT",
+                title: "Количество документов",
+                width: 40
+            },
+            {
+                field: "SUMA",
+                title: "Сумма документов (кол.)",
+                width: 40
+            },
+            {
+                field: "KV",
+                hidden: true
+            },
+
+        ],        
+        dataSource: {
+            type: "aspnetmvc-ajax",
+            transport: {
+                read: {
+                    dataType: 'json',
+                    url: bars.config.urlContent('/sep/SepPaymentState/GetSepPaymentStateList')
+                }
+            },
+            schema: {
+                data: "Data"
+            }
+        },
+        selectable: "single",
+        filterable: true,
+        sortable: true,
+        change: function (e) {
+            var selectedRows = this.select();
+            var selectedDataItem = {};
+            for (var i = 0; i < selectedRows.length; i++) {
+                selectedDataItem = this.dataItem(selectedRows[i]); 
+            }
+            if (selectedDataItem.CNT > 0) {
+                enableButton("pbViewDoc", true);
+            }
+            else {
+                enableButton("pbViewDoc", false);
+            }
+        }
+    } );
+
+    function refreshGrid() { 
+        var grid = $('#SepPaymentStateGrid').data('kendoGrid');
+        grid.dataSource.page(1);
+        grid.dataSource.read();
+    }
+
+    function openSepDocs() {
+        var grid = $('#SepPaymentStateGrid').data('kendoGrid');
+        var record = grid.dataItem(grid.select());
+        openFileDocs(record);
+    }
+
+    function openFileDocs(Row) {
+        var docParams = {
+            isIncoming: incomingPushed(),
+            fileName: Row.FileName,
+            fileCreated: kendo.toString(Row.FileCreated, "dd/MM/yyyy HH:mm"),
+            accessFlags: "fa",
+            mode: "RW",
+            PaymentStateFlag: true,
+            NN: Row.NN,
+            KV: Row.KV
+        };
+        window.location = '@Url.Action("Index", "SepDocuments")' + '?' + jQuery.param(docParams);
+    }
+     
+    function incomingPushed() {
+        return $('#incomingFilesRadioBtn.k-state-active').length > 0;
+    }
+    
+    function enableButton(buttonId, enabled) {
+        if (typeof (enabled) === 'undefined') {
+            enabled = true;
+        }
+        var $button = $('#' + buttonId);
+        $button.data('kendoButton').enable(enabled);
+        if (enabled) {
+            $button.find('i').removeClass("pf-disabled");
+        } else {
+            $button.find('i').addClass("pf-disabled");
+        }
+    }
+
+    $(document).ready(function () {
+        enableButton("pbViewDoc", false);       
+    });
+
+</script>
+
+
+
+
+ 

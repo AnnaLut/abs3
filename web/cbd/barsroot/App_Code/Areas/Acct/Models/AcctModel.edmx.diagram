@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="124b7d3c97a34a2985718e7060c4cad2" Name="Diagram1" ZoomLevel="51">
+        <EntityTypeShape EntityType="Areas.Acct.AcctModel.ACCOUNT" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Areas.Acct.AcctModel.ACCOUNTS_UPDATE" Width="1.5" PointX="2.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Areas.Acct.AcctModel.ACCOUNTSW" Width="1.5" PointX="4.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Areas.Acct.AcctModel.ACCOUNTSW_UPDATE" Width="1.5" PointX="4.75" PointY="3.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Areas.Acct.AcctModel.V_ACCOUNTS" Width="1.5" PointX="6.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Areas.Acct.AcctModel.V_TOBO_ACCOUNTS" Width="1.5" PointX="9.375" PointY="0.75" />
+        <EntityTypeShape EntityType="Areas.Acct.AcctModel.V_TOBO_ACCOUNTS_LITE" Width="1.5" PointX="11.125" PointY="0.75" />
+        <EntityTypeShape EntityType="Areas.Acct.AcctModel.GROUPS_ACC" Width="1.5" PointX="0.75" PointY="13" />
+        <EntityTypeShape EntityType="Areas.Acct.AcctModel.GROUPS_NBS" Width="1.5" PointX="3" PointY="14.375" />
+        <EntityTypeShape EntityType="Areas.Acct.AcctModel.GROUPS_STAFF" Width="1.5" PointX="5.125" PointY="12" />
+        <EntityTypeShape EntityType="Areas.Acct.AcctModel.GROUPS_STAFF_ACC" Width="1.5" PointX="3" PointY="12" />
+        <AssociationConnector Association="Areas.Acct.AcctModel.FK_GROUPSNBS_GROUPSACC" />
+        <AssociationConnector Association="Areas.Acct.AcctModel.FK_GROUPSSTAFFACC_GROUPSACC" />
+        <EntityTypeShape EntityType="Areas.Acct.AcctModel.TARIF" Width="1.5" PointX="7.375" PointY="12" />
+        <EntityTypeShape EntityType="Areas.Acct.AcctModel.TARIF_HISTORY" Width="1.5" PointX="12.375" PointY="11.75" />
+        <EntityTypeShape EntityType="Areas.Acct.AcctModel.TARIF_SCALE" Width="1.5" PointX="9.625" PointY="13" />
+        <EntityTypeShape EntityType="Areas.Acct.AcctModel.TARIF_SCHEME" Width="1.5" PointX="13.25" PointY="0.75" />
+        <EntityTypeShape EntityType="Areas.Acct.AcctModel.TABVAL" Width="1.5" PointX="13.25" PointY="3.25" />
+        <EntityTypeShape EntityType="Areas.Acct.AcctModel.V_ACC_TARIF_SCALE" Width="2.125" PointX="14.625" PointY="10.75" />
+        <EntityTypeShape EntityType="Areas.Acct.AcctModel.V_SH_TARIF" Width="2.125" PointX="18.625" PointY="10.125" />
+        <EntityTypeShape EntityType="Areas.Acct.AcctModel.V_ACC_TARIF" Width="2" PointX="18.625" PointY="13.125" />
+        <AssociationConnector Association="Areas.Acct.AcctModel.FK_TARIFSCALE_TARIF" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

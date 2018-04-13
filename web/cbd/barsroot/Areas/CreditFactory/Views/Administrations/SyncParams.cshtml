@@ -1,0 +1,129 @@
+﻿@using Areas.CreditFactory.Models
+@using Kendo.Mvc.UI
+@model IQueryable<V_CF_SETINGS>
+
+@{
+    Layout = null;
+    const string title = "Налаштування параметрів синхронізації";
+}
+<script type="text/javascript">
+    function formatStatus(item, errMsg) {
+        return formatStatusBase(item, "CONN_STATES", errMsg);
+    }
+
+    function formatStatusBase(item, fieldName, errMsg) {
+        var statusClass;
+        switch (item[fieldName]) {
+            case "SUCCESS":
+                statusClass = "success";
+                break;
+            case "ERROR":
+                statusClass = "error";
+                break;
+        }
+        return kendo.format("<div class='k-block k-{0}-colored statusField centerField' >{1}</div>", statusClass, item[fieldName]);
+    }
+
+    function refreshGridOnRequestEnd(e)
+    {
+        if (e.type == "update" || e.type == "create") {
+            $("#grid_SyncParams").data("kendoGrid").dataSource.read();
+        }
+    }
+
+    function formatSyncEnabled(item) {
+        return item.IS_ACTIVE == 1
+            ? "<div class='k-block k-success-colored centerField'>Активний</div>"
+            : "<div class='k-block k-error-colored centerField'>Не активний</div>";
+    }
+
+    $(document).ready(function () {
+        $("#grid_Connections_AddRow").click(function () {
+            var grid = $("#grid_SyncParams").data("kendoGrid");
+            grid.addRow();
+        });
+
+        $("#btPing").click(function () {
+            $.ajax({
+                async: false,
+                url: bars.config.urlContent('/CreditFactory/Administrations/Ping'),
+                success: function (request) {
+                    var grid = $("#grid_SyncParams").data("kendoGrid");
+                    grid.dataSource.read();
+                }
+            });
+        });
+    })
+</script>
+<div id="childRecordsLevel1">
+    @*Шаблон дочерней строки протокола*@
+    <script id="template_ChildLevelParams1" type="text/x-kendo-template">
+        @(Html.Kendo().TabStrip()
+                    .Name("tabstripChildRowsLevelParams1_#=MFO#")
+                              .Items(tabstrip =>
+                              {
+                                  tabstrip.Add().Text("Опис статусу")
+                                      .Selected(true)
+                                                .Content(@<text>
+                                        <div class='employee-details' style="word-wrap:break-word;width:800px">
+                                            <xmp>#= CONN_ERR_MSG #</xmp>
+                                        </div>
+                                                </text>);
+                              }).ToClientTemplate()
+        )
+    </script>
+</div>
+<div id="gvSyncParams">
+    @(Html.Kendo().Grid<V_CF_SETINGS>()
+          .Name("grid_SyncParams")
+          .ToolBar(toolbar => toolbar.Template(
+               "<button id='grid_Connections_AddRow' class='k-button' title='Додати новий запис'>" +
+               "<span class='pf-icon pf-16 pf-add_button'></span> Додати" +
+               "</button>"+
+               "<button id='btPing' class='k-button' title='Перевірка зв`язку з РУ'>" +
+               "<span class='pf-icon pf-16 pf-execute'></span> Пінг" +
+               "</button>"
+          ))
+          .Columns(columns =>
+          {
+              columns.Bound(c => c.CONN_STATES).Title("Статус<br>синхронізації").ClientTemplate("#= formatStatus(data, CONN_ERR_MSG) #");
+              columns.Bound(c => c.MFO).Title("Номер<br>відділення");
+              columns.Bound(c => c.NB).Title("Найменування відділення");
+              columns.Bound(c => c.URL_SERVICE).Title("URL адреса РУ").ClientTemplate("<a target=\"_blank\" href=\"#= URL_SERVICE#\">#= URL_SERVICE#</a>");
+              columns.Bound(c => c.USERNAME).Title("Ім`я<br>користувача");
+              columns.Bound(c => c.PASSWORD).Title("Пароль").ClientTemplate("******").Filterable(false);
+              columns.Bound(c => c.IS_ACTIVE).Title("Статус").ClientTemplate("#= formatSyncEnabled(data) #");
+              columns.Command(command =>
+              {
+                  command.Edit();
+                  command.Destroy();
+              }).Width(100);
+          })
+          .ClientDetailTemplateId("template_ChildLevelParams1")
+          .Editable(editable => editable.Mode(GridEditMode.InLine))
+          .Resizable(resize => resize.Columns(true))
+          .Reorderable(reorder => reorder.Columns(true))
+          .Pageable(pager => pager
+                      .PageSizes(new[] { 10, 20, 50, 100 })
+              .Refresh(true))
+          .Filterable(ftb => ftb.Mode(GridFilterMode.Menu))
+          .DataSource(dataSource => dataSource
+              .Ajax()
+              .Sort(sort => sort.Add(p => p.MFO).Descending())
+              .Events(events =>
+                    {
+                        events.RequestEnd("refreshGridOnRequestEnd");
+                    })
+              .Model(model =>
+              {
+                  model.Id(p => p.MFO);
+                  model.Field(p => p.CONN_STATES).Editable(false);
+                  model.Field(p => p.NB).Editable(false);
+                  model.Field(p => p.CONN_ERR_MSG).Editable(false);
+              })
+              .Create(create => create.Action("CreateSyncParam", "Administrations"))
+              .Update(update => update.Action("UpdateSyncParam", "Administrations"))
+              .Destroy(destroy => destroy.Action("DestroySyncParam", "Administrations"))
+                 .Read(read => read.Action("GetSyncParam", "Administrations")))
+    )
+</div>

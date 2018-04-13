@@ -1,0 +1,54 @@
+﻿<button caption="Зберегти" hint="Зберегти зміни" id="btnSave">
+  <command type="PlSqlBlock" successmessage="Дані збережено">
+    <sql>
+      begin
+      grt_mgr.iu_vehicles(
+      p_deal_id => :p_deal_id,
+      p_type => :p_veh_type,
+      p_model => :p_model,
+      p_mileage => :p_mileage,
+      p_veh_reg_num => :p_veh_reg_num,
+      p_made_date => :p_made_date,
+      p_color => :p_color,
+      p_vin => :p_vin,
+      p_engine_num => :p_engine_num,
+      p_reg_doc_ser => :p_reg_doc_ser,
+      p_reg_doc_num => :p_reg_doc_num,
+      p_reg_doc_date => :p_reg_doc_date,
+      p_reg_doc_organ => :p_reg_doc_organ,
+      p_reg_owner_addr => :p_reg_owner_addr,
+      p_reg_spec_marks => :p_reg_spec_marks,
+      p_parking_addr => :p_parking_addr,
+      p_crd_end_date => :p_crd_end_date,
+      p_ownship_reg_num => :p_ownship_reg_num,
+      p_ownship_reg_checksum => :p_ownship_reg_checksum
+      );
+      grt_mgr.update_event(:p_EV_ID, :p_ACTUAL_DATE, :p_COMMENT_TEXT);
+      end;
+    </sql>
+    <parameters>
+      <parameter type="FormField" name="P_DEAL_ID"/>
+      <parameter type="FormField" name="P_VEH_TYPE" />
+      <parameter type="FormField" name="P_MODEL" />
+      <parameter type="FormField" name="P_MILEAGE" />
+      <parameter type="FormField" name="P_VEH_REG_NUM" />
+      <parameter type="FormField" name="P_MADE_DATE" />
+      <parameter type="FormField" name="P_COLOR" />
+      <parameter type="FormField" name="P_VIN" />
+      <parameter type="FormField" name="P_ENGINE_NUM" />
+      <parameter type="FormField" name="P_REG_DOC_SER" />
+      <parameter type="FormField" name="P_REG_DOC_NUM" />
+      <parameter type="FormField" name="P_REG_DOC_DATE" />
+      <parameter type="FormField" name="P_REG_DOC_ORGAN" />
+      <parameter type="FormField" name="P_REG_OWNER_ADDR" />
+      <parameter type="FormField" name="P_REG_SPEC_MARKS" />
+      <parameter type="FormField" name="P_PARKING_ADDR" />
+      <parameter type="FormField" name="P_CRD_END_DATE" />
+      <parameter type="FormField" name="P_OWNSHIP_REG_NUM" />
+      <parameter type="FormField" name="P_OWNSHIP_REG_CHECKSUM" />
+      <parameter type="FormField" name="p_EV_ID" />
+      <parameter type="FormField" name="p_ACTUAL_DATE" />
+      <parameter type="FormField" name="p_COMMENT_TEXT" />
+    </parameters>
+  </command>
+</button>

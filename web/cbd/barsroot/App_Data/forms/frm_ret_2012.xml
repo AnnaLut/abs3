@@ -1,0 +1,111 @@
+﻿<xmlform   captiontype="OnlyTitle" minwidth="1300"  maxwidth="3000">
+  <grids>
+    <grid id="id_f1" table="ret_2012" pagesize="10" width="3000"  showpagesizebox="true"  title="Повернення суми виплат компенсацій" showfilter="false">
+      <rowselection method="SingleRow"/>
+      <filters caption="Фільтри"   buttontext="Пошук" width="50%"  columnscount="1">
+        <filter id="id_f1" caption="№ рахунку." columnindex="1" field="NLS" condition="Equal" allowemptyvalue="false" >
+          <uicontrol controlwidth="150"></uicontrol>
+        </filter>
+      </filters>
+
+      <buttons defaulttype="Button">
+        <button id="BT1" type="Button" caption="Перегляд"  hint="Перегляд вхідного документа">
+          <command type="Redirect" url="/barsroot/documentview/default.aspx"  >
+            <parameters>
+              <parameter name="REF" altname="ref"  type="DataField"></parameter>
+            </parameters>
+          </command>
+        </button>
+
+        <button id="BT2" type="Button" caption="Повернути платіж"  hint="Повернути платіж" >
+          <command type="Redirect" url="/barsroot/docinput/docinput.aspx?tt=OWK" >
+            <parameters>
+              <parameter type="DataField" name="ND" altname="Nd"></parameter>
+              <parameter type="DataField" name="NLS" altname="Nls_A"></parameter>
+              <parameter type="Constant" name="KV" altname="Kv_A">
+                <defaultvalue type="Constant" value="980"/>
+              </parameter>
+              <parameter type="DataField" name="NAZN" altname="Nazn"></parameter>
+              <parameter type="Constant" name="MFOB" altname="Mfo_B">
+                <defaultvalue type="Constant" value="300465"/>
+              </parameter>
+              <parameter type="DataField" name="S" altname="SumC"></parameter>
+              <parameter type="Constant" name="NLSB" altname="Nls_B" >
+                <defaultvalue type="Constant" value="290642012"/>
+              </parameter>
+              <parameter type="Constant" name="NAM_B" altname="Nam_B">
+                <defaultvalue type="Constant" value="Повернення суми компенсацiйних виплат"/>
+              </parameter>
+              <parameter type="Constant" name="ID_B" altname="Id_B">
+                <defaultvalue type="Constant" value="00032129"/>
+              </parameter>
+              <parameter type="Constant" name="VOB" altname="Vob">
+                <defaultvalue type="Constant" value="1"/>
+              </parameter>
+              <parameter type="DataField" name="PROC" altname="APROC"></parameter>
+              
+                
+                
+            </parameters>
+          </command>
+          
+        </button>
+        
+        
+        
+        
+      </buttons>
+      
+      
+      
+      <fields>
+        <field name="ND" datatype="String" key="true">
+          <column caption="№ документа" show="true" width="90" align="Right"></column> 
+        </field>
+
+        <field name="VDAT" datatype="DateTime" key="false">
+          <column caption="Дата надходження" show="true" width="90" align="Center"></column>
+        </field>
+
+        <field name="NLS" key="true" >
+          <column caption="Рахунок" show="true"></column>
+        </field>
+
+        <field name="S" key="true" >
+          <column caption="Сума" show="true" formatstring="{0:N2} грн." width="90"></column>
+        </field>
+
+        <field name="REF" datatype="Int64" key="true">
+          <column caption="Реф вхідного" show="false"></column>
+        </field>
+
+        <field name="NAZN" key="true">
+          <column caption="Призначення платежу" show="true" ></column>
+        </field>
+
+        <field name="BRANCH" key="false">
+          <column caption="Бранч" show="true"></column>
+        </field>
+
+        <!--<field name="MFOB" key="true" >
+          <column caption="MFOA" show="false"></column>
+        </field>-->
+        <field name="NLSA" key="true" >
+          <column caption="NLSA" show="false"></column>
+        </field>
+
+        <!--<field name="KV" key="true" >
+          <column caption="KV" show="false"></column>
+        </field>-->
+
+
+        <field name="PROC" key="true" >
+          <column caption="PROC" show="false"></column>
+        </field>
+      </fields>
+      
+      
+      
+    </grid> 
+  </grids>
+</xmlform>

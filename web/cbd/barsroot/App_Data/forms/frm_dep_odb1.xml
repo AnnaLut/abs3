@@ -1,0 +1,314 @@
+﻿<xmlform captiontype="OnlyTitle">
+  <grids>
+      <grid table="v_dep_odb" id="gv" pagesize="15" showpagesizebox="true" title="Облік операцій по вкладах АСВО" showfilter="true">
+        <filters buttontext="Знайти" caption="Пошук котлового рахунку АСВО" columnscount="2" width ="100%">
+          <filter field="NBSOB22" caption="Бал.Рах/ОБ22" columnindex="1" condition="Equal" id="fltrnls">
+            <uicontrol></uicontrol>
+          </filter>
+          <filter field="KV" caption="Код валюти" columnindex="2" condition="Equal" id="fltrkv" >
+            <uicontrol type="IntegerInput"/>
+          </filter>
+          <filter field="NLS" caption="Рахунок " columnindex="1" condition="Equal" id="fltrnls">
+            <uicontrol></uicontrol>
+          </filter>
+          <filter field="NMS" caption="Назва рахунку" columnindex="2" condition="LikeBoth" id="fltrnms" >
+            <uicontrol></uicontrol>
+          </filter>
+         </filters>
+        <buttons>
+         <button id="btn428" caption="Прихід на вклад                 " hint="Прихід на вклад" type="Button" linebreak="true">
+            <command type="Redirect" url="/barsroot/docinput/docinput.aspx?tt=428">
+             <parameters>
+               <parameter  type="DataField" name="KV" altname="Kv_A"/>
+               <parameter  type="DataField" name="KV" altname="Kv_B"/>
+               <parameter  type="DataField" name="NLS" altname="NLS_A"/>
+               <parameter  type="DataField" name="NLS_CASE" altname="NLS_B"/>
+               <parameter  type="DataField" name="A1" altname="NAZN"/>
+               <parameter  type="DataField" name="SK2" altname="SK"/>
+             </parameters>
+           </command>
+          </button>
+         <button id="btn429" caption="Видано з вкладу" hint="Видано з вкладу" type="Button">
+           <command type="Redirect" url="/barsroot/docinput/docinput.aspx?tt=429">
+             <parameters>
+               <parameter  type="DataField" name="KV" altname="Kv_A"/>
+               <parameter  type="DataField" name="KV" altname="Kv_B"/>
+               <parameter  type="DataField" name="NLS" altname="NLS_A"/>
+               <parameter  type="DataField" name="NLS_CASE" altname="NLS_B"/>
+               <parameter  type="DataField" name="A2" altname="NAZN"/>
+               <parameter  type="DataField" name="SK1" altname="SK"/>
+             </parameters>
+           </command>
+         </button>
+         <button id="btn4291" caption="Видано відсотки  " hint="Видано відсотки" type="Button">
+           <command type="Redirect" url="/barsroot/docinput/docinput.aspx?tt=429">
+             <parameters>
+               <parameter  type="DataField" name="KV" altname="Kv_A"/>
+               <parameter  type="DataField" name="KV" altname="Kv_B"/>
+               <parameter  type="DataField" name="ZACH" altname="NLS_A"/>
+               <parameter  type="DataField" name="NLS_CASE" altname="NLS_B"/>
+               <parameter  type="DataField" name="A3" altname="NAZN"/>
+               <parameter  type="DataField" name="SK1" altname="SK"/>
+             </parameters>
+           </command>
+         </button>
+         <button id="btn425" caption="Зараховано на вклад   " hint="Зарахування на вклади" type="Button">
+           <command type="Redirect" url="/barsroot/docinput/docinput.aspx?tt=425">
+             <parameters>
+               <parameter  type="DataField" name="KV" altname="Kv_A"/>
+               <parameter  type="DataField" name="KV" altname="Kv_B"/>
+               <parameter  type="DataField" name="NLS" altname="NLS_B"/>
+               <parameter  type="DataField" name="A4" altname="NAZN"/>
+             </parameters>
+           </command>
+         </button>
+          <button id="btn427_2" caption="Списано зайво зарах%%" hint="Списання зайво зарахованих відсотків" type="Button"  linebreak="true">
+            <command type="Redirect" url="/barsroot/docinput/docinput.aspx">
+              <parameters>
+                <parameter  type="DataField" name="TT_P" altname="tt"/>
+                <parameter  type="DataField" name="KV_980" altname="Kv_A"/>
+			        	<parameter  type="DataField" name="TT_dk" altname="Dk"/>
+                <parameter  type="DataField" name="KV" altname="Kv_B"/>
+                <parameter  type="DataField" name="RV7_S" altname="NLS_A"/>
+                <parameter  type="DataField" name="ZACH" altname="NLS_B"/>
+                <parameter  type="DataField" name="A9" altname="NAZN"/>
+              </parameters>
+            </command>
+          </button>
+         <button id="btn427" caption="Нараховано %%" hint="Нарахування відсотків" type="Button">
+           <command type="Redirect" url="/barsroot/docinput/docinput.aspx">
+             <parameters>
+               <parameter  type="DataField" name="TT_P" altname="tt"/>
+               <parameter  type="DataField" name="KV" altname="Kv_A"/>
+			         <parameter  type="DataField" name="TT_dk" altname="Dk"/>
+               <parameter  type="DataField" name="KV_980" altname="Kv_B"/>
+               <parameter  type="DataField" name="NACH" altname="NLS_A"/>
+               <parameter  type="DataField" name="RV7_N" altname="NLS_B"/>
+               <parameter  type="DataField" name="A6" altname="NAZN"/>
+             </parameters>
+           </command>
+         </button>
+         <button id="btn515_1" caption="Зараховано %% " hint="Зарахування відсотків" type="Button">
+           <command type="Redirect" url="/barsroot/docinput/docinput.aspx?tt=515">
+             <parameters>
+               <parameter  type="DataField" name="KV" altname="Kv_A"/>
+               <parameter  type="DataField" name="KV" altname="Kv_B"/>
+               <parameter  type="DataField" name="NACH" altname="NLS_A"/>
+               <parameter  type="DataField" name="ZACH" altname="NLS_B"/>
+               <parameter  type="DataField" name="A7" altname="NAZN"/>
+             </parameters>
+           </command>
+         </button>
+         <button id="btn515" caption="Списано з вкладу           " hint="Списання з вкладів" type="Button">
+           <command type="Redirect" url="/barsroot/docinput/docinput.aspx?tt=515">
+             <parameters>
+               <parameter  type="DataField" name="KV" altname="Kv_A"/>
+               <parameter  type="DataField" name="KV" altname="Kv_B"/>
+               <parameter  type="DataField" name="NLS" altname="NLS_A"/>
+               <parameter  type="DataField" name="A5" altname="NAZN"/>
+             </parameters>
+           </command>
+         </button>
+         <button id="btn427_1" caption="Списано зайво нар%%   " hint="Списання зайво нарахованих відсотків" type="Button"  linebreak="true">
+           <command type="Redirect" url="/barsroot/docinput/docinput.aspx">
+             <parameters>
+               <parameter  type="DataField" name="TT_P" altname="tt"/>
+               <parameter  type="DataField" name="KV_980" altname="Kv_A"/>
+			         <parameter  type="DataField" name="TT_dk" altname="Dk"/>
+               <parameter  type="DataField" name="KV" altname="Kv_B"/>
+               <parameter  type="DataField" name="RV7_S" altname="NLS_A"/>
+               <parameter  type="DataField" name="NACH" altname="NLS_B"/>
+               <parameter  type="DataField" name="A8" altname="NAZN"/>
+             </parameters>
+           </command>
+         </button>
+          <button id="btn427_3" caption="Списано зайво випл%%  " hint="Списання зайво виплачених відсотків" type="Button">
+           <command type="Redirect" url="/barsroot/docinput/docinput.aspx">
+             <parameters>
+               <parameter  type="DataField" name="TT_P" altname="tt"/>
+               <parameter  type="DataField" name="KV_980" altname="Kv_A"/>
+			         <parameter  type="DataField" name="TT_dk" altname="Dk"/>
+               <parameter  type="DataField" name="KV" altname="Kv_B"/>
+               <parameter  type="DataField" name="RV7_S" altname="NLS_A"/>
+               <parameter  type="DataField" name="NLS" altname="NLS_B"/>
+               <parameter  type="DataField" name="A10" altname="NAZN"/>
+             </parameters>
+           </command>
+         </button>
+          <button id="btn5159" caption="Капіталізація %%" hint="Капіталізація %%" type="Button">
+            <command type="Redirect" url="/barsroot/docinput/docinput.aspx?tt=515">
+              <parameters>
+                <parameter  type="DataField" name="KV" altname="Kv_A"/>
+                <parameter  type="DataField" name="TT_dk" altname="Dk"/>
+                <parameter  type="DataField" name="KV" altname="Kv_B"/>
+                <parameter  type="DataField" name="NLS" altname="NLS_A"/>
+                <parameter  type="DataField" name="NACH" altname="NLS_B"/>
+                <parameter datatype="String" type="Constant" name="nazn">
+                  <defaultvalue type="Constant" value="Капіталізація відсотків"></defaultvalue>
+                </parameter>
+              </parameters>
+            </command>
+          </button>
+       </buttons>
+       <rowselection method="SingleRow"/>
+        <fields>
+         <field name="ACC" key="false" sort="Default" datatype="Int64">
+          <column show="false" caption="Код" align="Left"/>
+               <form show="true">
+             <uicontrol type="IntegerInput"/>
+           </form>
+         </field>
+        <field name="NBSOB22" key="false" datatype="String" sort="default">
+          <column show="true" caption="Бал/ОБ22" align="Center" />
+          <form show="true">
+            <uicontrol type="TextBox" readonly="true" />
+          </form>
+        </field>
+        <field name="NLS" key="true" datatype="String" sort="default">
+          <column show="true" caption="Рахунок" align="Right" width="200"/>
+          <form show="true">
+            <uicontrol type="TextBox" readonly="true" />
+          </form>
+        </field>
+        <field name="KV" key="true" datatype="Int64" sort="default">
+          <column show="true" caption="Код валюти" align="Center" />
+          <form show="true">
+            <uicontrol type="IntegerInput" readonly="true" />
+          </form>
+        </field>
+          <field name="KV_980" key="true" datatype="Int64" sort="default">
+            <column show="false" caption="Код валюти980" align="right" />
+            <form show="true">
+              <uicontrol type="IntegerInput" readonly="true" />
+            </form>
+          </field>  
+        <field name="NMS" key="false" datatype="String" sort="default">
+          <column show="true" caption="Назва рахунку" align="Left" width="400"/>
+          <form show="true">
+              <uicontrol type="Text" readonly="true" />
+          </form>
+        </field>
+        <field name="A1" key="true" datatype="String" sort="default">
+          <column show="false" caption="" align="right" />
+          <form show="true">
+            <uicontrol type="TextBox" readonly="true"/>
+          </form>
+        </field>
+        <field name="A2" key="true" datatype="String" sort="default">
+          <column show="false" caption="" align="right" />
+          <form show="true">
+            <uicontrol type="TextBox" readonly="true" />
+          </form>
+        </field>
+        <field name="A3" key="true" datatype="String" sort="default">
+          <column show="false" caption="" align="right" />
+          <form show="true">
+            <uicontrol type="TextBox" readonly="true"/>
+          </form>
+        </field>
+        <field name="A4" key="true" datatype="String" sort="default">
+          <column show="false" caption="" align="right" />
+          <form show="true">
+            <uicontrol type="TextBox" readonly="true"/>
+          </form>
+        </field>
+        <field name="A5" key="true" datatype="String" sort="default">
+          <column show="false" caption="" align="right" />
+          <form show="true">
+            <uicontrol type="TextBox" readonly="true"/>
+          </form>
+        </field>
+        <field name="A6" key="true" datatype="String" sort="default">
+          <column show="false" caption="" align="right" />
+          <form show="true">
+            <uicontrol type="TextBox" readonly="true"/>
+          </form>
+        </field>
+        <field name="A7" key="true" datatype="String" sort="default">
+          <column show="false" caption="" align="right" />
+          <form show="true">
+            <uicontrol type="TextBox" readonly="true"/>
+          </form>
+        </field>
+        <field name="A8" key="true" datatype="String" sort="default">
+          <column show="false" caption="" align="right" />
+          <form show="true">
+            <uicontrol type="TextBox" readonly="true"/>
+          </form>
+        </field>
+        <field name="A9" key="true" datatype="String" sort="default">
+          <column show="false" caption="" align="right" />
+          <form show="true">
+            <uicontrol type="TextBox" readonly="true"/>
+          </form>
+        </field>
+        <field name="A10" key="true" datatype="String" sort="default">
+          <column show="false" caption="" align="right" />
+          <form show="true">
+            <uicontrol type="TextBox" readonly="true"/>
+          </form>
+        </field>
+          <field name="NACH" key="true" datatype="String" sort="default">
+            <column show="false" caption="Рахунок нарах" align="right" />
+            <form show="true">
+              <uicontrol type="TextBox" readonly="true" />
+            </form>
+          </field>
+          <field name="ZACH" key="true" datatype="String" sort="default">
+            <column show="false" caption="Рахунок зарах" align="right" />
+            <form show="true">
+              <uicontrol type="TextBox" readonly="true" />
+            </form>
+          </field>
+          <field name="RV7_N" key="true" datatype="String" sort="default">
+            <column show="false" caption="Рахунок 7 нарах" align="right" />
+            <form show="true">
+              <uicontrol type="TextBox" readonly="true" />
+            </form>
+          </field>
+          <field name="RV7_S" key="true" datatype="String" sort="default">
+            <column show="false" caption="Рахунок 7 зарах " align="right" />
+            <form show="true">
+              <uicontrol type="TextBox" readonly="true" />
+            </form>
+          </field>
+          <field name="RMV_OB" key="true" datatype="String" sort="default">
+            <column show="false" caption="Рах амортизація" align="right" />
+            <form show="true">
+              <uicontrol type="TextBox" readonly="true" />
+            </form>
+          </field>
+          <field name="NLS_CASE" key="true" datatype="String" sort="default">
+            <column show="false" caption="Рах каси" align="right" />
+            <form show="true">
+              <uicontrol type="TextBox" readonly="true" />
+            </form>
+          </field>
+          <field name="SK1" key="true" datatype="Int64" sort="default">
+            <column show="false" caption="" align="right" />
+            <form show="true">
+              <uicontrol type="IntegerInput" readonly="true" />
+            </form>
+          </field>
+          <field name="SK2" key="true" datatype="Int64" sort="default">
+            <column show="false" caption="" align="right" />
+            <form show="true">
+              <uicontrol type="IntegerInput" readonly="true" />
+            </form>
+          </field>
+          <field name="TT_P" key="true" datatype="String" sort="default">
+            <column show="false" caption="" align="right" />
+            <form show="true">
+              <uicontrol type="TextBox" readonly="true" />
+            </form>
+			</field>
+          <field name="TT_dk" key="true" datatype="String" sort="default">
+            <column show="false" caption="" align="right" />
+            <form show="true">
+              <uicontrol type="TextBox" readonly="true" />
+            </form>
+          </field>
+        </fields>
+     </grid>
+  </grids>
+</xmlform>

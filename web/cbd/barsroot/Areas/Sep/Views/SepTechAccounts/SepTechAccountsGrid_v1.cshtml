@@ -1,0 +1,71 @@
+﻿ @{
+     Layout = null;
+}
+@model string
+<text>
+    v1
+</text>
+<br />
+@(Html.Kendo().Grid<Areas.Sep.Models.SEPTECHACCOUNT_V1>()
+  .Name("SepTechAccountsGridV1")
+  .Events(e => e.DataBound("grid_dataBound"))     
+  .Columns(columns =>
+    {
+        columns.Bound(p => p.ACC).Hidden();
+        columns.Bound(p => p.TOBO).Title("Код безбал. вiддiлення");
+        columns.Bound(p => p.NLS).Title("Номер рахунку");
+        columns.Bound(p => p.LCV).Title("Валюта");
+        columns.Bound(p => p.NMS).Title("Найменування рахунку").HtmlAttributes(new { style = "min-width:180px" });
+        columns.Bound(p => p.ISF).Title("Входящий остаток").HtmlAttributes(new { @class = "money" }).ClientTemplate("#=CellPaint(ISF)#");
+        columns.Bound(p => p.DOSF).Title("Обороты Дебет").HtmlAttributes(new { @class = "money" }).ClientTemplate("#=CellPaint(DOSF)#");
+        columns.Bound(p => p.KOSF).Title("Обороты Кредит").HtmlAttributes(new { @class = "money" }).ClientTemplate("#=CellPaint(KOSF)#");
+        columns.Bound(p => p.OSTCF).Title("Фактический остаток").HtmlAttributes(new { @class = "money" }).ClientTemplate("#=CellPaint(OSTCF)#");
+        columns.Bound(p => p.OSTBF).Title("Плановый остаток").HtmlAttributes(new { @class = "money" }).ClientTemplate("#=CellPaint(OSTBF)#");
+        columns.Bound(p => p.OSTFF).Title("Будущий остаток").HtmlAttributes(new { @class = "money" }).ClientTemplate("#=CellPaint(OSTFF)#");
+        columns.Bound(p => p.DAOS).Title("Дата последнего платежа").Format("{0:dd.MM.yyyy}");
+        columns.Bound(p => p.NBS).Title("Баланс счет");
+        columns.Bound(p => p.PAP).Title("Акт Пас");
+        columns.Bound(p => p.TIP).Title("Тип счета");
+        columns.Bound(p => p.OB22).Title("ОБ22");
+        columns.Bound(p => p.ISP).Title("ID исполнителя");
+        columns.Bound(p => p.FIO).Title("ФИО Исполнителя").Width(300).HtmlAttributes(new { style = "min-width:180px" });
+        columns.Bound(p => p.DAPP).Title("Дата последнего движения").Format("{0:dd/MM/yyyy}");
+        columns.Bound(p => p.DAZS).Title("Дата закрытия").Format("{0:dd/MM/yyyy}").Hidden();
+        columns.Bound(p => p.RNK).Title("РНК");     
+    })
+      .Pageable(pager => pager
+      .Input(true)
+      .Numeric(true)
+      .Info(false)
+      .PreviousNext(true)
+      .Refresh(true)
+      .PageSizes(true)
+    )
+    .Sortable()    
+    .Filterable(filterable => filterable.Extra(false))
+    .Selectable()
+    .Resizable(resize => resize.Columns(true))
+    .DataSource
+    (
+        dataSource => dataSource
+        .WebApi()
+        //.Ajax()        
+        .Model(i => i.Id("ACC"))
+        .PageSize(10)
+        .Read(read => read             
+            .Data("SepTechAccountsGridData")
+            .Url(Url.Content(Url.Encode(Model))))                                 
+       // .Destroy("Delete", "Accounts")
+      //  .Update("Update", "Accounts")
+    )
+)
+
+ <script>
+     
+     function refreshGrid() {
+         $('#SepTechAccountsGridV1').data('kendoGrid').dataSource.read();
+         $('#SepTechAccountsGridV1').data('kendoGrid').refresh();
+     }
+</script>
+
+ 

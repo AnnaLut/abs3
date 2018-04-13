@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+<xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+<xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+<xsd:element name="root" msdata:IsDataSet="true">
+<xsd:complexType>
+<xsd:choice maxOccurs="unbounded">
+<xsd:element name="metadata">
+<xsd:complexType>
+<xsd:sequence>
+<xsd:element name="value" type="xsd:string" minOccurs="0" />
+</xsd:sequence>
+<xsd:attribute name="name" use="required" type="xsd:string" />
+<xsd:attribute name="type" type="xsd:string" />
+<xsd:attribute name="mimetype" type="xsd:string" />
+<xsd:attribute ref="xml:space" />
+</xsd:complexType>
+</xsd:element>
+<xsd:element name="assembly">
+<xsd:complexType>
+<xsd:attribute name="alias" type="xsd:string" />
+<xsd:attribute name="name" type="xsd:string" />
+</xsd:complexType>
+</xsd:element>
+<xsd:element name="data">
+<xsd:complexType>
+<xsd:sequence>
+<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+<xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+</xsd:sequence>
+<xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+<xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+<xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+<xsd:attribute ref="xml:space" />
+</xsd:complexType>
+</xsd:element>
+<xsd:element name="resheader">
+<xsd:complexType>
+<xsd:sequence>
+<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+</xsd:sequence>
+<xsd:attribute name="name" type="xsd:string" use="required" />
+</xsd:complexType>
+</xsd:element>
+</xsd:choice>
+</xsd:complexType>
+</xsd:element>
+</xsd:schema>
+<resheader name="resmimetype">
+<value>text/microsoft-resx</value>
+</resheader>
+<resheader name="version">
+<value>2.0</value>
+</resheader>
+<resheader name="reader">
+<value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+</resheader>
+<resheader name="writer">
+<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+</resheader>
+<data name="cbSPOpt.InnerText" xml:space="preserve">
+<value>Check up filling of the required special parameters</value>
+</data>
+<data name="ToolTip5.InnerText" xml:space="preserve">
+<value>Double cliques on a line is a change of value</value>
+</data>
+<data name="Message1.Value" xml:space="preserve">
+<value>Filling in of rights for access for users "Other" are substantially promoted by the risk of undesirable access to the account. To continue with current options?</value>
+</data>
+<data name="Message34.UniqueID" xml:space="preserve">
+<value>You entered an impermissible value!</value>
+</data>
+<data name="currentPageCulture.Value" xml:space="preserve">
+<value>en</value>
+</data>
+<data name="wgAscending.Value" xml:space="preserve">
+<value>Ascending sort</value>
+</data>
+<data name="wgCancel.Value" xml:space="preserve">
+<value>Cancel</value>
+</data>
+<data name="wgDescending.Value" xml:space="preserve">
+<value>Descending sort</value>
+</data>
+<data name="wgNextPage.Value" xml:space="preserve">
+<value>Next page</value>
+</data>
+<data name="wgPageSizeText.Value" xml:space="preserve">
+<value>Rows on a page:</value>
+</data>
+<data name="wgPrevPage.Value" xml:space="preserve">
+<value>Previous page</value>
+</data>
+<data name="wgRowsInTable.Value" xml:space="preserve">
+<value>Quantity of rows in a table</value>
+</data>
+<data name="wgSave.Value" xml:space="preserve">
+<value>Save</value>
+</data>
+<data name="wgSetFilter.Value" xml:space="preserve">
+<value>Set a filter</value>
+</data>
+</root>

@@ -1,0 +1,198 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" DoublePass="true" ReportInfo.Created="05/17/2013 18:06:00" ReportInfo.Modified="09/19/2014 18:42:14" ReportInfo.CreatorVersion="2013.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqZLE460ApuhBq9nxfsVEDUjsnvJzXtSTPbWY4MKJi2yK6Cw7h6oGX20YJkb5YAkRn34sKYIuIzS5cnJoZJHkwfg==">
+      <TableDataSource Name="Table" Alias="DPT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select nvl(d.nd, to_char(d.deposit_id)) as id,&#13;&#10;       f_dat_lit(d.datz) as dealdate,&#13;&#10;       f_dat_lit(d.dat_end) as end_date,&#13;&#10;       a.nls as nlsd,&#13;&#10;       d.limit / 100 as summ,&#13;&#10;       f_sumpr(d.limit, d.kv, 'F') as sum_w,&#13;&#10;       decode(d.kv, 980, 'грн.', t.lcv) as kv,&#13;&#10;       f_doc_dpt(d.deposit_id, 3, 1) as term_calc,&#13;&#10;       f_doc_dpt(d.deposit_id, 3, 2) as term_calc_w,&#13;&#10;       dpt.fproc(d.acc, bankdate) as rate,&#13;&#10;       f_sumpr(dpt.fproc(d.acc, bankdate), '', 'M', 3) as rate_w,&#13;&#10;       decode(d.freq,&#13;&#10;              5,&#13;&#10;              'щомісячно',&#13;&#10;              7,&#13;&#10;              'щоквартально',&#13;&#10;              360,&#13;&#10;              'щорічно',&#13;&#10;              400,&#13;&#10;              'разом з поверненням Депозиту',&#13;&#10;              (select name from freq where freq = d.freq)) as freq_w,&#13;&#10;       nvl(trim(d.mfo_p), '_________________') as paym_mfo,&#13;&#10;       nvl(trim(b.nb), '____') as paym_nb,&#13;&#10;       nvl(trim(d.nls_p), '_________________') as paym_nls&#13;&#10;  from dpt_deposit d, tabval t, accounts a, banks b&#13;&#10; where d.acc = a.acc&#13;&#10;   and d.kv = t.kv&#13;&#10;   and d.mfo_p = b.mfo(+)&#13;&#10;   and d.deposit_id = :p_agr_id">
+        <Column Name="ID" DataType="System.String"/>
+        <Column Name="DEALDATE" DataType="System.String"/>
+        <Column Name="END_DATE" DataType="System.String"/>
+        <Column Name="NLSD" DataType="System.String"/>
+        <Column Name="SUMM" DataType="System.Decimal"/>
+        <Column Name="SUM_W" DataType="System.String"/>
+        <Column Name="KV" DataType="System.String"/>
+        <Column Name="TERM_CALC" DataType="System.String"/>
+        <Column Name="TERM_CALC_W" DataType="System.String"/>
+        <Column Name="RATE" DataType="System.Decimal"/>
+        <Column Name="RATE_W" DataType="System.String"/>
+        <Column Name="PAYM_MFO" DataType="System.String"/>
+        <Column Name="PAYM_NB" DataType="System.String"/>
+        <Column Name="PAYM_NLS" DataType="System.String"/>
+        <Column Name="FREQ_W" DataType="System.String"/>
+        <CommandParameter Name="p_agr_id" DataType="113" Expression="[p_agr_id]" DefaultValue="-1"/>
+      </TableDataSource>
+      <TableDataSource Name="Table2" Alias="COMMON_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select F_OURMFO_G as bank_mfo,&#13;&#10;       f_ourokpo as bank_okpo,&#13;&#10;       F_OURNAME_G as bank_name,&#13;&#10;       F_OURADDRESS as bank_address,&#13;&#10;       nvl(branch_edit.get_branch_parameter(b.branch, 'NAME_BRANCH'), b.name) as BRANCH_NAME,&#13;&#10;       nvl(branch_edit.get_branch_parameter(b.branch, 'ADR_BRANCH' ), '________') as BRANCH_ADDRESS,&#13;&#10;       nvl(branch_edit.get_branch_parameter(b.branch, 'DPT_PHON'   ), branch_edit.get_branch_parameter(b.branch, 'BPK_PHONE')) as BRANCH_PHONE,&#13;&#10;       nvl(branch_edit.get_branch_parameter(b.branch, 'TOWN'       ), '________') as BRANCH_TOWN,&#13;&#10;       decode(poa_doc, null,'________', poa_doc || ' від ' || to_char(poa_date, 'dd/mm/yyyy')) as STAFF_DOVER,&#13;&#10;       nvl(fio_r, '________') as STAFF_FIO_R,&#13;&#10;       nvl(post_r, '________') as STAFF_STATUS_R       &#13;&#10;  from branch b,&#13;&#10;       (select *&#13;&#10;          from (select *&#13;&#10;                  from dpt_poa_branches pb, dpt_poas p&#13;&#10;                 where pb.branch = branch_usr.get_branch()&#13;&#10;                   and pb.active = 1&#13;&#10;                   and pb.poa_id = p.id&#13;&#10;                 order by decode(p.staff_id, user_id, 0, pb.ord))&#13;&#10;         where rownum = 1) t&#13;&#10; where b.branch = t.branch(+)&#13;&#10;   and b.branch = branch_usr.get_branch()&#13;&#10;">
+        <Column Name="STAFF_DOVER" DataType="System.String"/>
+        <Column Name="STAFF_FIO_R" DataType="System.String"/>
+        <Column Name="STAFF_STATUS_R" DataType="System.String"/>
+        <Column Name="BANK_MFO" DataType="System.String"/>
+        <Column Name="BANK_OKPO" DataType="System.String"/>
+        <Column Name="BANK_NAME" DataType="System.String"/>
+        <Column Name="BANK_ADDRESS" DataType="System.String"/>
+        <Column Name="BRANCH_NAME" DataType="System.String"/>
+        <Column Name="BRANCH_ADDRESS" DataType="System.String"/>
+        <Column Name="BRANCH_PHONE" DataType="System.String"/>
+        <Column Name="BRANCH_TOWN" DataType="System.String"/>
+      </TableDataSource>
+      <TableDataSource Name="Table3" Alias="TICKET_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select ed.doc_id,&#13;&#10;       ed.crt_date,&#13;&#10;       ed.ea_struct_id,&#13;&#10;       ed.rnk,&#13;&#10;       ed.cl_fio,&#13;&#10;       ed.agr_id,&#13;&#10;       ed.agr_num,&#13;&#10;       ed.crt_staff_logname,&#13;&#10;       ed.crt_staff_fio,&#13;&#10;       ed.crt_branch&#13;&#10;  from v_ead_docs ed&#13;&#10; where ed.doc_id = :p_doc_id">
+        <Column Name="RNK" DataType="System.Decimal"/>
+        <Column Name="DOC_ID" DataType="System.Decimal"/>
+        <Column Name="CRT_DATE" DataType="System.DateTime"/>
+        <Column Name="CL_FIO" DataType="System.String"/>
+        <Column Name="AGR_ID" DataType="System.Decimal"/>
+        <Column Name="AGR_NUM" DataType="System.String"/>
+        <Column Name="CRT_BRANCH" DataType="System.String"/>
+        <Column Name="CRT_STAFF_LOGNAME" DataType="System.String"/>
+        <Column Name="CRT_STAFF_FIO" DataType="System.String"/>
+        <Column Name="EA_STRUCT_ID" DataType="System.Decimal"/>
+        <CommandParameter Name="p_doc_id" DataType="113" Expression="[p_doc_id]" DefaultValue="-1"/>
+      </TableDataSource>
+      <TableDataSource Name="Table4" Alias="CLIENT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select c.nmk as fio,&#13;&#10;       c.okpo as okpo,&#13;&#10;       case c.codcagent&#13;&#10;         when 5 then 'резидент'&#13;&#10;         when 6 then 'нерезидент'&#13;&#10;         else '--'&#13;&#10;       end as codcagent,&#13;&#10;       p.ser || ' ' || p.numdoc as pasp_no,&#13;&#10;       f_dat_lit(p.pdate) as pasp_date,&#13;&#10;       p.organ as pasp_atrt,&#13;&#10;       f_customer_address(c.rnk, 1) as address_registration,&#13;&#10;       f_customer_address(c.rnk, 2) as address_residence,&#13;&#10;       coalesce(p.cellphone, p.teld, p.telw, '________') as phone,&#13;&#10;       (select VALUE from CUSTOMERW where RNK = c.rnk and TAG = 'EMAIL') as EMAIL&#13;&#10;  from customer c&#13;&#10;  left join person p on (p.rnk = c.rnk)&#13;&#10; where c.rnk = :p_rnk&#13;&#10;">
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="CODCAGENT" DataType="System.String"/>
+        <Column Name="PASP_NO" DataType="System.String"/>
+        <Column Name="PASP_DATE" DataType="System.String"/>
+        <Column Name="PASP_ATRT" DataType="System.String"/>
+        <Column Name="PHONE" DataType="System.String"/>
+        <Column Name="ADDRESS_REGISTRATION" DataType="System.String"/>
+        <Column Name="ADDRESS_RESIDENCE" DataType="System.String"/>
+        <Column Name="EMAIL" DataType="System.String"/>
+        <CommandParameter Name="p_rnk" DataType="113" Expression="[p_rnk]" DefaultValue="-1"/>
+      </TableDataSource>
+      <TableDataSource Name="Table6" Alias="RATES_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select months_between(ia.bdat, d.dat_begin) + 1 as month_from,&#13;&#10;       lead(months_between(ia.bdat, d.dat_begin),&#13;&#10;            1,&#13;&#10;            months_between(d.dat_end, d.dat_begin)) over(order by ia.bdat) as month_to,&#13;&#10;       ia.ir,&#13;&#10;       f_sumpr(ia.ir, '', 'M', 3) as ir_w&#13;&#10;  from dpt_deposit d, int_ratn ia&#13;&#10; where d.deposit_id = :p_agr_id&#13;&#10;   and d.acc = ia.acc&#13;&#10; order by ia.bdat">
+        <Column Name="MONTH_FROM" DataType="System.Decimal"/>
+        <Column Name="MONTH_TO" DataType="System.Decimal"/>
+        <Column Name="IR" DataType="System.Decimal"/>
+        <Column Name="IR_W" DataType="System.String"/>
+        <CommandParameter Name="p_agr_id" DataType="113" Expression="[p_agr_id]" DefaultValue="-1"/>
+      </TableDataSource>
+      <TableDataSource Name="Table9" Alias="AGRMNT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="SELECT da.agrmnt_id,&#13;&#10;       da.agrmnt_date,&#13;&#10;       f_dat_lit (da.agrmnt_date) AS agrmnt_date_w,&#13;&#10;       da.agrmnt_num,&#13;&#10;       NVL (da.date_begin, d.DAT_BEGIN) AS date_begin,&#13;&#10;       NVL (da.date_end, d.dat_end) AS date_end,&#13;&#10;       f_dat_lit (NVL (da.date_end, d.dat_end)) AS date_end_w,&#13;&#10;        F_DOC_ADD(da.agrmnt_id, 5) as term_calc,&#13;&#10;       NVL (F_DOC_ADD (da.agrmnt_id, 1), f_doc_dpt (d.deposit_id, 3, 2))&#13;&#10;          AS term_calc_w,&#13;&#10;       fost (D.ACC, bankdate) / 100 AS summ,&#13;&#10;       f_sumpr (fost (D.ACC, bankdate), d.kv, 'F') AS sum_w,&#13;&#10;       NVL (DA.RATE_VALUE, dpt.fproc (d.acc, bankdate)) AS rate,&#13;&#10;       f_sumpr (NVL (DA.RATE_VALUE, dpt.fproc (d.acc, bankdate)),&#13;&#10;                '',&#13;&#10;                'M',&#13;&#10;                3)&#13;&#10;          AS rate_w&#13;&#10;  FROM dpt_agreements da, DPT_DEPOSIT d&#13;&#10; WHERE da.agrmnt_id = :p_agrmnt_id AND da.dpt_id = d.deposit_id">
+        <Column Name="AGRMNT_ID" DataType="System.Decimal"/>
+        <Column Name="AGRMNT_DATE" DataType="System.DateTime"/>
+        <Column Name="AGRMNT_NUM" DataType="System.Int64"/>
+        <Column Name="DATE_BEGIN" DataType="System.DateTime"/>
+        <Column Name="DATE_END" DataType="System.DateTime"/>
+        <Column Name="DATE_END_W" DataType="System.String"/>
+        <Column Name="AGRMNT_DATE_W" DataType="System.String"/>
+        <Column Name="SUMM" DataType="System.Decimal"/>
+        <Column Name="SUM_W" DataType="System.String"/>
+        <Column Name="RATE" DataType="System.Decimal"/>
+        <Column Name="RATE_W" DataType="System.String"/>
+        <Column Name="TERM_CALC" DataType="System.String"/>
+        <Column Name="TERM_CALC_W" DataType="System.String"/>
+        <CommandParameter Name="p_agrmnt_id" DataType="113" Expression="[p_agrmnt_id]" DefaultValue="-1"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_doc_id" DataType="System.Int32" Expression="10240"/>
+    <Parameter Name="p_rnk" DataType="System.Int32" Expression="991405"/>
+    <Parameter Name="p_agr_id" DataType="System.Int32" Expression="5577326"/>
+    <Parameter Name="p_agrmnt_id" DataType="System.Int32" Expression="396551"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <DataBand Name="Data1" Width="718.2" Height="1048.95" CanGrow="true" CanShrink="true" CanBreak="true">
+      <TableObject Name="Table1" Left="9.45" Top="9.45" Width="699.24" Height="396.9">
+        <TableColumn Name="Column1" Width="349.62"/>
+        <TableColumn Name="Column2" Width="349.62"/>
+        <TableRow Name="Row1" Height="160.65">
+          <TableCell Name="Cell1" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold" ColSpan="2">
+            <TextObject Name="Text1" Left="170.1" Top="9.45" Width="519.75" Height="141.75" Text="ДОДАТКОВИЙ ДОГОВІР № [AGRMNT_DATA.AGRMNT_NUM]&#13;&#10;до договору № [DPT_DATA.ID] від [DPT_DATA.DEALDATE] на вклад &#13;&#10;&quot;НАКОПИЧУВАЛЬНИЙ&quot; на ім’я фізичної особи" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+            <BarcodeObject Name="Barcode2" Width="153.8" Height="153.8" AutoSize="false" Expression="[TICKET_DATA.DOC_ID]+&quot;;&quot;+FormatDateTime([TICKET_DATA.CRT_DATE])+&quot;;&quot;+[TICKET_DATA.EA_STRUCT_ID]+&quot;;&quot;+[TotalPages]+&quot;;&quot;+[TICKET_DATA.RNK]+&quot;;&quot;+[TICKET_DATA.CL_FIO]+&quot;;&quot;+[TICKET_DATA.AGR_ID]+&quot;;&quot;+[TICKET_DATA.AGR_NUM]+&quot;;&quot;+[TICKET_DATA.CRT_STAFF_LOGNAME]+&quot;;&quot;+[TICKET_DATA.CRT_STAFF_FIO]+&quot;;&quot;+[TICKET_DATA.CRT_BRANCH]" ShowText="false" Barcode="QR Code" Barcode.ErrorCorrection="L" Barcode.Encoding="UTF8" Barcode.QuietZone="true"/>
+          </TableCell>
+          <TableCell Name="Cell2" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row2" Height="56.7">
+          <TableCell Name="Cell6" Text="[COMMON_DATA.BRANCH_TOWN]" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell7" Text="[AGRMNT_DATA.AGRMNT_DATE_W]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row3" Height="94.5" AutoSize="true">
+          <TableCell Name="Cell11" Text="	АТ “Ощадбанк” (в подальшому – Банк) в особі &lt;b&gt;[COMMON_DATA.STAFF_STATUS_R]&lt;/b&gt;, &lt;b&gt;[COMMON_DATA.STAFF_FIO_R]&lt;/b&gt;, який(яка) діє на підставі &lt;b&gt;[COMMON_DATA.STAFF_DOVER]&lt;/b&gt;, з однієї сторони і &lt;b&gt;[CLIENT_DATA.FIO]&lt;/b&gt; (в подальшому – Вкладник), який є &lt;b&gt;[CLIENT_DATA.CODCAGENT]&lt;/b&gt;, з другої сторони (в подальшому – Сторони), уклали цей Додатковий Договір № &lt;b&gt;[AGRMNT_DATA.AGRMNT_NUM]&lt;/b&gt; від &lt;b&gt;[AGRMNT_DATA.AGRMNT_DATE_W]&lt;/b&gt; до Договору № &lt;b&gt;[DPT_DATA.ID]&lt;/b&gt; від &lt;b&gt;[DPT_DATA.DEALDATE]&lt;/b&gt; на вклад &lt;b&gt;&quot;НАКОПИЧУВАЛЬНИЙ&quot;&lt;/b&gt; на ім’я фізичної особи (в подальшому – Додатковий договір) про наступне:" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell12" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row157" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell331" Text="	1. Сторони домовились внести зміни до п.3.3 Договору № &lt;b&gt;[DPT_DATA.ID]&lt;/b&gt; від &lt;b&gt;[DPT_DATA.DEALDATE]&lt;/b&gt; на вклад &quot;НАКОПИЧУВАЛЬНИЙ&quot; на ім’я фізичної особи (в подальшому – Договір) і викласти його у наступній редакції:" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell332"/>
+        </TableRow>
+        <TableRow Name="Row5" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell21" Text="	  &quot;3.3. Банк зобов’язується повернути Депозит та сплатити нараховані проценти, обумовлені Договором, шляхом перерахування на поточний рахунок № &lt;b&gt;[DPT_DATA.PAYM_NLS]&lt;/b&gt;, відкритий в установі Банку або шляхом видачі готівкою в день повернення Депозиту, зазначений в п.1.1 Договору&quot;.	" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell22" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table7" Left="9.45" Top="406.35" Width="699.24" Height="113.55">
+        <TableColumn Name="Column5" Width="349.62"/>
+        <TableColumn Name="Column6" Width="349.62"/>
+        <TableRow Name="Row158" Height="1">
+          <TableCell Name="Cell333" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell334"/>
+        </TableRow>
+        <TableRow Name="Row121" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell253" Text="	2. Цей Додатковий договір набирає чинності з дати підписання його Сторонами, є невід’ємною частиною Договору і діє протягом строку дії Договору." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell254" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row123" Height="36.95" AutoSize="true">
+          <TableCell Name="Cell257" Text="	3. Всі інші умови Договору, не передбачені цим Додатковим договором, залишаються незмінними, і Сторони підтверджують свої зобов’язання за ними." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell258" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row125" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell261" Text="	4. Цей Додатковий договір складений у двох примірниках, що мають однакову юридичну силу, по одному для кожної із Сторін. " HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell262" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table10" Left="9.45" Top="519.75" Width="718.16" Height="294.95" CanBreak="false">
+        <TableColumn Name="Column7" Width="359.08"/>
+        <TableColumn Name="Column8" Width="359.08"/>
+        <TableRow Name="Row101" AutoSize="true">
+          <TableCell Name="Cell354" Border.Lines="All" Text="БАНК:" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 9pt, style=Bold" RowSpan="3"/>
+          <TableCell Name="Cell355" Border.Lines="All" Text="ВКЛАДНИК:" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 9pt, style=Bold" RowSpan="3"/>
+        </TableRow>
+        <TableRow Name="Row102" Height="1">
+          <TableCell Name="Cell356"/>
+          <TableCell Name="Cell357"/>
+        </TableRow>
+        <TableRow Name="Row159" Height="1">
+          <TableCell Name="Cell335" Border.Lines="All" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 9pt, style=Bold"/>
+          <TableCell Name="Cell336" Border.Lines="All" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 9pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row160" AutoSize="true">
+          <TableCell Name="Cell337" Border.Lines="All" Text="&lt;b&gt;[COMMON_DATA.BANK_NAME]&lt;/b&gt;" Font="Times New Roman, 9pt" HtmlTags="true"/>
+          <TableCell Name="Cell338" Border.Lines="All" Text="ПІБ &lt;b&gt;[CLIENT_DATA.FIO]&lt;/b&gt;" Font="Times New Roman, 9pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row161" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell339" Border.Lines="All" Text="Адреса: &lt;b&gt;[COMMON_DATA.BANK_ADDRESS]&lt;/b&gt;" Font="Times New Roman, 9pt" HtmlTags="true"/>
+          <TableCell Name="Cell340" Border.Lines="All" Text="Паспорт № &lt;b&gt;[CLIENT_DATA.PASP_NO]&lt;/b&gt;, виданий  &lt;b&gt;[CLIENT_DATA.PASP_ATRT]&lt;/b&gt;, &lt;b&gt;[CLIENT_DATA.PASP_DATE]&lt;/b&gt;" Font="Times New Roman, 9pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row162" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell341" Border.Lines="All" Text="Код ЄДРПОУ &lt;b&gt;[COMMON_DATA.BANK_OKPO]&lt;/b&gt;&#13;&#10;Код банку &lt;b&gt;[COMMON_DATA.BANK_MFO]&lt;/b&gt;" Font="Times New Roman, 9pt" HtmlTags="true"/>
+          <TableCell Name="Cell342" Border.Lines="All" Text="Адреса реєстрації: &lt;b&gt;[CLIENT_DATA.ADDRESS_REGISTRATION]&lt;/b&gt;" Font="Times New Roman, 9pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row163" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell343" Border.Lines="All" Text="Назва: &lt;b&gt;[COMMON_DATA.BRANCH_NAME]&lt;/b&gt;" Font="Times New Roman, 9pt" HtmlTags="true"/>
+          <TableCell Name="Cell344" Border.Lines="All" Text="Адреса проживання: &lt;b&gt;[CLIENT_DATA.ADDRESS_RESIDENCE]&lt;/b&gt;" Font="Times New Roman, 9pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row164" AutoSize="true">
+          <TableCell Name="Cell345" Border.Lines="All" Text="Адреса відділення: &lt;b&gt;[COMMON_DATA.BRANCH_ADDRESS]&lt;/b&gt;" Font="Times New Roman, 9pt" HtmlTags="true"/>
+          <TableCell Name="Cell346" Border.Lines="All" Text="Ідентифікаційний номер ДРФО: &lt;b&gt;[CLIENT_DATA.OKPO]&lt;/b&gt;" Font="Times New Roman, 9pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row165" Height="47.25">
+          <TableCell Name="Cell347" Border.Lines="All" Text="Сайт банку  &lt;b&gt;&lt;i&gt;www.oschadnybank.com&lt;/b&gt;&lt;/i&gt;&#13;&#13;&#10;Контакт-центр: 0800210800 (дзвінки зі стаціонарних та мобільних телефонів по території України – безкоштовні), +38-044-363-01-33&#13;&#10;" Font="Times New Roman, 9pt" HtmlTags="true"/>
+          <TableCell Name="Cell348" Border.Lines="All" Text="Телефон  &lt;b&gt;[CLIENT_DATA.PHONE]&lt;/b&gt;&#13;&#10;Електронна пошта: &lt;b&gt;[CLIENT_DATA.EMAIL]&lt;/b&gt;&#13;&#10;" Font="Times New Roman, 9pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row166" Height="28.35">
+          <TableCell Name="Cell349" Border.Lines="All" Text="     М. п&#13;&#10;                   Банк __________________________ПІБ, Підпис" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 9pt" RowSpan="2"/>
+          <TableCell Name="Cell350" Border.Lines="All" Text="&#13;&#10;               Вкладник_____________________ПІБ, Підпис&#13;&#10;" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 9pt" RowSpan="2"/>
+        </TableRow>
+        <TableRow Name="Row167" Height="9.45">
+          <TableCell Name="Cell351" Border.Lines="All" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell352" Border.Lines="All" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row120" Height="37.8">
+          <TableCell Name="Cell252" Border.Lines="All" Text="                                                Примірник Договору отримав(ла) __________________________________________&#13;&#10;                                                                                                            (підпис Вкладника / представника Вкладника)" HorzAlign="Justify" VertAlign="Bottom" Font="Arial, 9pt" ColSpan="2"/>
+          <TableCell Name="Cell353" Border.Lines="All" Font="Arial, 9pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="1051.91" Width="718.2" Height="18.9">
+      <BarcodeObject Name="Barcode1" Left="96.52" Width="126.25" Height="18.9" Anchor="Top, Right" Expression="[TICKET_DATA.DOC_ID]+&quot;:&quot;+[TotalPages]+&quot;:&quot;+[Page]" ShowText="false" Barcode="Codabar"/>
+      <TextObject Name="Text2" Left="434.7" Width="217.35" Height="18.9" Text="Сторінка [Page] з [TotalPages]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

@@ -1,0 +1,1822 @@
+﻿.pf-icon{display:inline-block;background-repeat:no-repeat}
+  
+/*==========16==========*/
+.pf-16{width:16px;height:16px}
+.pf-16.pf-add{background-image:url(16/add.png)}
+.pf-16.pf-add_button{background-image:url(16/add_button.png)}
+.pf-16.pf-address_book-design{background-image:url(16/address_book-design.png)}
+.pf-16.pf-application-update{background-image:url(16/application-update.png)}
+.pf-16.pf-accept_doc{background-image:url(16/accept_doc.png)}
+.pf-16.pf-alert{background-image:url(16/alert.png)}
+.pf-16.pf-arrow_down{background-image:url(16/arrow_down.png)}
+.pf-16.pf-arrow_download{background-image:url(16/arrow_download.png)}
+.pf-16.pf-arrow_left{background-image:url(16/arrow_left.png)}
+.pf-16.pf-arrow_right{background-image:url(16/arrow_right.png)}
+.pf-16.pf-bank{background-image:url(16/bank.png)}
+.pf-16.pf-bank-update{background-image:url(16/bank-update.png)}
+.pf-16.pf-bank-account{background-image:url(16/bank-account.png)}
+.pf-16.pf-book{background-image:url(16/book.png)}
+.pf-16.pf-bookmark-ok{background-image:url(16/bookmark-ok.png)}
+.pf-16.pf-business_report{background-image:url(16/business_report.png)}
+.pf-16.pf-calendar{background-image:url(16/calendar.png)}
+.pf-16.pf-calendar-update{background-image:url(16/calendar-update.png)}
+.pf-16.pf-currency_conversion{background-image:url(16/currency_conversion.png)}
+.pf-16.pf-clock{background-image:url(16/clock.png)}
+.pf-16.pf-database-arrow_right{background-image:url(16/database-arrow_right.png)}
+.pf-16.pf-database-import{background-image:url(16/database-import.png)}
+.pf-16.pf-delete_button_error{background-image:url(16/delete_button_error.png)}
+.pf-16.pf-execute{background-image:url(16/execute.png)}
+.pf-16.pf-exel{background-image:url(16/exel.png)}
+.pf-16.pf-delete{background-image:url(16/delete.png)}
+.pf-16.pf-document_header_footer-ok2{background-image:url(16/document_header_footer-ok2.png)}
+.pf-16.pf-folder{background-image:url(16/folder.png)}
+.pf-16.pf-folder_open{background-image:url(16/folder_open.png)}
+.pf-16.pf-folder-execute{background-image:url(16/folder-execute.png)}
+.pf-16.pf-folder_open-execute{background-image:url(16/folder_open-execute.png)}
+.pf-16.pf-folder-favorite{background-image:url(16/folder-favorite.png)}
+.pf-16.pf-folder_open-favorite{background-image:url(16/folder_open-favorite.png)}
+.pf-16.pf-filter-ok{background-image:url(16/filter-ok.png)}
+.pf-16.pf-filter-remove{background-image:url(16/filter-remove.png)}
+.pf-16.pf-find{background-image:url(16/find.png)}
+.pf-16.pf-gear{background-image:url(16/gear.png)}
+.pf-16.pf-gears{background-image:url(16/gears.png)}
+.pf-16.pf-help{background-image:url(16/help.png)}
+.pf-16.pf-key{background-image:url(16/key.png)}
+.pf-16.pf-link-info{background-image:url(16/link-info.png)}
+.pf-16.pf-list-arrow_right{background-image:url(16/list-arrow_right.png)}
+.pf-16.pf-list-ok{background-image:url(16/list-ok.png)}
+.pf-16.pf-mail{background-image:url(16/mail.png)}
+.pf-16.pf-mail-arrow_right{background-image:url(16/mail-arrow_right.png)}
+.pf-16.pf-money{background-image:url(16/money.png)}
+.pf-16.pf-phone{background-image:url(16/phone.png)}
+.pf-16.pf-phone-ok{background-image:url(16/phone-ok.png)}
+.pf-16.pf-phone-ok2{background-image:url(16/phone-ok2.png)}
+.pf-16.pf-phone-error{background-image:url(16/phone-error.png)}
+.pf-16.pf-percentage{background-image:url(16/percentage.png)}
+.pf-16.pf-percentage_green{background-image:url(16/percentage_green.png)}
+.pf-16.pf-percentage_red{background-image:url(16/percentage_red.png)}
+.pf-16.pf-piece{background-image:url(16/piece.png)}
+.pf-16.pf-print{background-image:url(16/print.png)}
+.pf-16.pf-reload_rotate{background-image:url(16/reload_rotate.png)}
+.pf-16.pf-report_open{background-image:url(16/report_open.png)}
+.pf-16.pf-report_open-import{background-image:url(16/report_open-import.png)}
+.pf-16.pf-table_column{background-image:url(16/table_column.png)}
+.pf-16.pf-table{background-image:url(16/table.png)}
+.pf-16.pf-table_row-add2{background-image:url(16/table_row-add2.png)}
+.pf-16.pf-table_row-delete2{background-image:url(16/table_row-delete2.png)}
+.pf-16.pf-tabs-export{background-image:url(16/tabs-export.png)}
+.pf-16.pf-tool_pencil{background-image:url(16/tool_pencil.png)}
+.pf-16.pf-tree{background-image:url(16/tree.png)}
+.pf-16.pf-money_banknote-server{background-image:url(16/money_banknote-server.png)}
+.pf-16.pf-user{background-image:url(16/user.png)}
+.pf-16.pf-save{background-image:url(16/save.png)}
+.pf-16.pf-user_symbol_blue-picture{background-image:url(16/user_symbol_blue-picture.png)}
+.pf-16.pf-info{background-image:url(16/info.png)}
+.pf-16.pf-search{background-image:url(16/search.png)}
+.pf-16.pf-stop{background-image:url(16/stop.png)}
+.pf-16.pf-sort_za{background-image:url(16/sort_za.png)}
+.pf-16.pf-sort_az{background-image:url(16/sort_az.png)}
+.pf-16.pf-slide-arrow_right{background-image:url(16/slide-arrow_right.png)}
+.pf-16.pf-slide-arrow_left{background-image:url(16/slide-arrow_left.png)}
+.pf-16.pf-view_options{background-image:url(16/view_options.png)}
+.pf-16.pf-warning{background-image:url(16/warning.png)}
+.pf-16.pf-help{background-image:url(16/help.png)}
+.pf-16.pf-ov_arrow_left{background-image:url(16/ov_arrow_left.png)}
+.pf-16.pf-ov_arrow_right{background-image:url(16/ov_arrow_right.png)}
+.pf-16.pf-ok_button{background-image:url(16/ok_button.png)}
+.pf-16.pf-ok{background-image:url(16/ok.png)}
+.pf-16.pf-ov_customer{background-image:url(16/ov_customer.png)}
+.pf-16.pf-ov_link{background-image:url(16/ov_link.png)}
+.pf-16.pf-ov_update{background-image:url(16/ov_update.png)}
+.pf-16.pf-add.pf-hot{background-image:url(16/hot/add.png)}
+.pf-16.pf-add_button.pf-hot{background-image:url(16/hot/add_button.png)}
+.pf-16.pf-address_book-design.pf-hot{background-image:url(16/hot/address_book-design.png)}
+.pf-16.pf-application-update.pf-hot{background-image:url(16/hot/application-update.png)}
+.pf-16.pf-accept_doc.pf-hot{background-image:url(16/hot/accept_doc.png)}
+.pf-16.pf-alert.pf-hot{background-image:url(16/hot/alert.png)}
+.pf-16.pf-arrow_down.pf-hot{background-image:url(16/hot/arrow_down.png)}
+.pf-16.pf-arrow_download.pf-hot{background-image:url(16/hot/arrow_download.png)}
+.pf-16.pf-arrow_left.pf-hot{background-image:url(16/hot/arrow_left.png)}
+.pf-16.pf-arrow_right.pf-hot{background-image:url(16/hot/arrow_right.png)}
+.pf-16.pf-bank.pf-hot{background-image:url(16/hot/bank.png)}
+.pf-16.pf-bank-update.pf-hot{background-image:url(16/hot/bank-update.png)}
+.pf-16.pf-bank-account.pf-hot{background-image:url(16/hot/bank-account.png)}
+.pf-16.pf-book.pf-hot{background-image:url(16/hot/book.png)}
+.pf-16.pf-bookmark-ok.pf-hot{background-image:url(16/hot/bookmark-ok.png)}
+.pf-16.pf-business_report.pf-hot{background-image:url(16/hot/business_report.png)}
+.pf-16.pf-calendar.pf-hot{background-image:url(16/hot/calendar.png)}
+.pf-16.pf-calendar-update.pf-hot{background-image:url(16/hot/calendar-update.png)}
+.pf-16.pf-currency_conversion.pf-hot{background-image:url(16/hot/currency_conversion.png)}
+.pf-16.pf-clock.pf-hot{background-image:url(16/hot/clock.png)}
+.pf-16.pf-database-arrow_right.pf-hot{background-image:url(16/hot/database-arrow_right.png)}
+.pf-16.pf-database-import.pf-hot{background-image:url(16/hot/database-import.png)}
+.pf-16.pf-delete_button_error.pf-hot{background-image:url(16/hot/delete_button_error.png)}
+.pf-16.pf-execute.pf-hot{background-image:url(16/hot/execute.png)}
+.pf-16.pf-exel.pf-hot{background-image:url(16/hot/exel.png)}
+.pf-16.pf-delete.pf-hot{background-image:url(16/hot/delete.png)}
+.pf-16.pf-document_header_footer-ok2.pf-hot{background-image:url(16/hot/document_header_footer-ok2.png)}
+.pf-16.pf-folder.pf-hot{background-image:url(16/hot/folder.png)}
+.pf-16.pf-folder_open.pf-hot{background-image:url(16/hot/folder_open.png)}
+.pf-16.pf-folder-execute.pf-hot{background-image:url(16/hot/folder-execute.png)}
+.pf-16.pf-folder_open-execute.pf-hot{background-image:url(16/hot/folder_open-execute.png)}
+.pf-16.pf-folder-favorite.pf-hot{background-image:url(16/hot/folder-favorite.png)}
+.pf-16.pf-folder_open-favorite.pf-hot{background-image:url(16/hot/folder_open-favorite.png)}
+.pf-16.pf-filter-ok.pf-hot{background-image:url(16/hot/filter-ok.png)}
+.pf-16.pf-filter-remove.pf-hot{background-image:url(16/hot/filter-remove.png)}
+.pf-16.pf-find.pf-hot{background-image:url(16/hot/find.png)}
+.pf-16.pf-gear.pf-hot{background-image:url(16/hot/gear.png)}
+.pf-16.pf-gears.pf-hot{background-image:url(16/hot/gears.png)}
+.pf-16.pf-help.pf-hot{background-image:url(16/hot/help.png)}
+.pf-16.pf-key.pf-hot{background-image:url(16/hot/key.png)}
+.pf-16.pf-link-info.pf-hot{background-image:url(16/hot/link-info.png)}
+.pf-16.pf-list-arrow_right.pf-hot{background-image:url(16/hot/list-arrow_right.png)}
+.pf-16.pf-list-ok.pf-hot{background-image:url(16/hot/list-ok.png)}
+.pf-16.pf-mail.pf-hot{background-image:url(16/hot/mail.png)}
+.pf-16.pf-mail-arrow_right.pf-hot{background-image:url(16/hot/mail-arrow_right.png)}
+.pf-16.pf-money.pf-hot{background-image:url(16/hot/money.png)}
+.pf-16.pf-phone.pf-hot{background-image:url(16/hot/phone.png)}
+.pf-16.pf-phone-ok.pf-hot{background-image:url(16/hot/phone-ok.png)}
+.pf-16.pf-phone-ok2.pf-hot{background-image:url(16/hot/phone-ok2.png)}
+.pf-16.pf-phone-error.pf-hot{background-image:url(16/hot/phone-error.png)}
+.pf-16.pf-percentage.pf-hot{background-image:url(16/hot/percentage.png)}
+.pf-16.pf-percentage_green.pf-hot{background-image:url(16/hot/percentage_green.png)}
+.pf-16.pf-percentage_red.pf-hot{background-image:url(16/hot/percentage_red.png)}
+.pf-16.pf-piece.pf-hot{background-image:url(16/hot/piece.png)}
+.pf-16.pf-print.pf-hot{background-image:url(16/hot/print.png)}
+.pf-16.pf-reload_rotate.pf-hot{background-image:url(16/hot/reload_rotate.png)}
+.pf-16.pf-report_open.pf-hot{background-image:url(16/hot/report_open.png)}
+.pf-16.pf-report_open-import.pf-hot{background-image:url(16/hot/report_open-import.png)}
+.pf-16.pf-table_column.pf-hot{background-image:url(16/hot/table_column.png)}
+.pf-16.pf-table.pf-hot{background-image:url(16/hot/table.png)}
+.pf-16.pf-table_row-add2.pf-hot{background-image:url(16/hot/table_row-add2.png)}
+.pf-16.pf-table_row-delete2.pf-hot{background-image:url(16/hot/table_row-delete2.png)}
+.pf-16.pf-tabs-export.pf-hot{background-image:url(16/hot/tabs-export.png)}
+.pf-16.pf-tool_pencil.pf-hot{background-image:url(16/hot/tool_pencil.png)}
+.pf-16.pf-tree.pf-hot{background-image:url(16/hot/tree.png)}
+.pf-16.pf-money_banknote-server.pf-hot{background-image:url(16/hot/money_banknote-server.png)}
+.pf-16.pf-user.pf-hot{background-image:url(16/hot/user.png)}
+.pf-16.pf-save.pf-hot{background-image:url(16/hot/save.png)}
+.pf-16.pf-user_symbol_blue-picture.pf-hot{background-image:url(16/hot/user_symbol_blue-picture.png)}
+.pf-16.pf-info.pf-hot{background-image:url(16/hot/info.png)}
+.pf-16.pf-search.pf-hot{background-image:url(16/hot/search.png)}
+.pf-16.pf-stop.pf-hot{background-image:url(16/hot/stop.png)}
+.pf-16.pf-sort_za.pf-hot{background-image:url(16/hot/sort_za.png)}
+.pf-16.pf-sort_az.pf-hot{background-image:url(16/hot/sort_az.png)}
+.pf-16.pf-slide-arrow_right.pf-hot{background-image:url(16/hot/slide-arrow_right.png)}
+.pf-16.pf-slide-arrow_left.pf-hot{background-image:url(16/hot/slide-arrow_left.png)}
+.pf-16.pf-view_options.pf-hot{background-image:url(16/hot/view_options.png)}
+.pf-16.pf-warning.pf-hot{background-image:url(16/hot/warning.png)}
+.pf-16.pf-help.pf-hot{background-image:url(16/hot/help.png)}
+.pf-16.pf-ov_arrow_left.pf-hot{background-image:url(16/hot/ov_arrow_left.png)}
+.pf-16.pf-ov_arrow_right.pf-hot{background-image:url(16/hot/ov_arrow_right.png)}
+.pf-16.pf-ok_button.pf-hot{background-image:url(16/hot/ok_button.png)}
+.pf-16.pf-ok.pf-hot{background-image:url(16/hot/ok.png)}
+.pf-16.pf-ov_customer.pf-hot{background-image:url(16/hot/ov_customer.png)}
+.pf-16.pf-ov_link.pf-hot{background-image:url(16/hot/ov_link.png)}
+.pf-16.pf-ov_update.pf-hot{background-image:url(16/hot/ov_update.png)}
+.disabled .pf-16.pf-add,.k-state-disabled .pf-16.pf-add,[disabled] .pf-16.pf-add,.pf-16.pf-add.pf-disabled{background-image:url(16/disabled/add.png)}
+.disabled .pf-16.pf-add_button,.k-state-disabled .pf-16.pf-add_button,[disabled] .pf-16.pf-add_button,.pf-16.pf-add_button.pf-disabled{background-image:url(16/disabled/add_button.png)}
+.disabled .pf-16.pf-address_book-design,.k-state-disabled .pf-16.pf-address_book-design,[disabled] .pf-16.pf-address_book-design,.pf-16.pf-address_book-design.pf-disabled{background-image:url(16/disabled/address_book-design.png)}
+.disabled .pf-16.pf-application-update,.k-state-disabled .pf-16.pf-application-update,[disabled] .pf-16.pf-application-update,.pf-16.pf-application-update.pf-disabled{background-image:url(16/disabled/application-update.png)}
+.disabled .pf-16.pf-accept_doc,.k-state-disabled .pf-16.pf-accept_doc,[disabled] .pf-16.pf-accept_doc,.pf-16.pf-accept_doc.pf-disabled{background-image:url(16/disabled/accept_doc.png)}
+.disabled .pf-16.pf-alert,.k-state-disabled .pf-16.pf-alert,[disabled] .pf-16.pf-alert,.pf-16.pf-alert.pf-disabled{background-image:url(16/disabled/alert.png)}
+.disabled .pf-16.pf-arrow_down,.k-state-disabled .pf-16.pf-arrow_down,[disabled] .pf-16.pf-arrow_down,.pf-16.pf-arrow_down.pf-disabled{background-image:url(16/disabled/arrow_down.png)}
+.disabled .pf-16.pf-arrow_download,.k-state-disabled .pf-16.pf-arrow_download,[disabled] .pf-16.pf-arrow_download,.pf-16.pf-arrow_download.pf-disabled{background-image:url(16/disabled/arrow_download.png)}
+.disabled .pf-16.pf-arrow_left,.k-state-disabled .pf-16.pf-arrow_left,[disabled] .pf-16.pf-arrow_left,.pf-16.pf-arrow_left.pf-disabled{background-image:url(16/disabled/arrow_left.png)}
+.disabled .pf-16.pf-arrow_right,.k-state-disabled .pf-16.pf-arrow_right,[disabled] .pf-16.pf-arrow_right,.pf-16.pf-arrow_right.pf-disabled{background-image:url(16/disabled/arrow_right.png)}
+.disabled .pf-16.pf-bank,.k-state-disabled .pf-16.pf-bank,[disabled] .pf-16.pf-bank,.pf-16.pf-bank.pf-disabled{background-image:url(16/disabled/bank.png)}
+.disabled .pf-16.pf-bank-update,.k-state-disabled .pf-16.pf-bank-update,[disabled] .pf-16.pf-bank-update,.pf-16.pf-bank-update.pf-disabled{background-image:url(16/disabled/bank-update.png)}
+.disabled .pf-16.pf-bank-account,.k-state-disabled .pf-16.pf-bank-account,[disabled] .pf-16.pf-bank-account,.pf-16.pf-bank-account.pf-disabled{background-image:url(16/disabled/bank-account.png)}
+.disabled .pf-16.pf-book,.k-state-disabled .pf-16.pf-book,[disabled] .pf-16.pf-book,.pf-16.pf-book.pf-disabled{background-image:url(16/disabled/book.png)}
+.disabled .pf-16.pf-bookmark-ok,.k-state-disabled .pf-16.pf-bookmark-ok,[disabled] .pf-16.pf-bookmark-ok,.pf-16.pf-bookmark-ok.pf-disabled{background-image:url(16/disabled/bookmark-ok.png)}
+.disabled .pf-16.pf-business_report,.k-state-disabled .pf-16.pf-business_report,[disabled] .pf-16.pf-business_report,.pf-16.pf-business_report.pf-disabled{background-image:url(16/disabled/business_report.png)}
+.disabled .pf-16.pf-calendar,.k-state-disabled .pf-16.pf-calendar,[disabled] .pf-16.pf-calendar,.pf-16.pf-calendar.pf-disabled{background-image:url(16/disabled/calendar.png)}
+.disabled .pf-16.pf-calendar-update,.k-state-disabled .pf-16.pf-calendar-update,[disabled] .pf-16.pf-calendar-update,.pf-16.pf-calendar-update.pf-disabled{background-image:url(16/disabled/calendar-update.png)}
+.disabled .pf-16.pf-currency_conversion,.k-state-disabled .pf-16.pf-currency_conversion,[disabled] .pf-16.pf-currency_conversion,.pf-16.pf-currency_conversion.pf-disabled{background-image:url(16/disabled/currency_conversion.png)}
+.disabled .pf-16.pf-clock,.k-state-disabled .pf-16.pf-clock,[disabled] .pf-16.pf-clock,.pf-16.pf-clock.pf-disabled{background-image:url(16/disabled/clock.png)}
+.disabled .pf-16.pf-database-arrow_right,.k-state-disabled .pf-16.pf-database-arrow_right,[disabled] .pf-16.pf-database-arrow_right,.pf-16.pf-database-arrow_right.pf-disabled{background-image:url(16/disabled/database-arrow_right.png)}
+.disabled .pf-16.pf-database-import,.k-state-disabled .pf-16.pf-database-import,[disabled] .pf-16.pf-database-import,.pf-16.pf-database-import.pf-disabled{background-image:url(16/disabled/database-import.png)}
+.disabled .pf-16.pf-delete_button_error,.k-state-disabled .pf-16.pf-delete_button_error,[disabled] .pf-16.pf-delete_button_error,.pf-16.pf-delete_button_error.pf-disabled{background-image:url(16/disabled/delete_button_error.png)}
+.disabled .pf-16.pf-execute,.k-state-disabled .pf-16.pf-execute,[disabled] .pf-16.pf-execute,.pf-16.pf-execute.pf-disabled{background-image:url(16/disabled/execute.png)}
+.disabled .pf-16.pf-exel,.k-state-disabled .pf-16.pf-exel,[disabled] .pf-16.pf-exel,.pf-16.pf-exel.pf-disabled{background-image:url(16/disabled/exel.png)}
+.disabled .pf-16.pf-delete,.k-state-disabled .pf-16.pf-delete,[disabled] .pf-16.pf-delete,.pf-16.pf-delete.pf-disabled{background-image:url(16/disabled/delete.png)}
+.disabled .pf-16.pf-document_header_footer-ok2,.k-state-disabled .pf-16.pf-document_header_footer-ok2,[disabled] .pf-16.pf-document_header_footer-ok2,.pf-16.pf-document_header_footer-ok2.pf-disabled{background-image:url(16/disabled/document_header_footer-ok2.png)}
+.disabled .pf-16.pf-folder,.k-state-disabled .pf-16.pf-folder,[disabled] .pf-16.pf-folder,.pf-16.pf-folder.pf-disabled{background-image:url(16/disabled/folder.png)}
+.disabled .pf-16.pf-folder_open,.k-state-disabled .pf-16.pf-folder_open,[disabled] .pf-16.pf-folder_open,.pf-16.pf-folder_open.pf-disabled{background-image:url(16/disabled/folder_open.png)}
+.disabled .pf-16.pf-folder-execute,.k-state-disabled .pf-16.pf-folder-execute,[disabled] .pf-16.pf-folder-execute,.pf-16.pf-folder-execute.pf-disabled{background-image:url(16/disabled/folder-execute.png)}
+.disabled .pf-16.pf-folder_open-execute,.k-state-disabled .pf-16.pf-folder_open-execute,[disabled] .pf-16.pf-folder_open-execute,.pf-16.pf-folder_open-execute.pf-disabled{background-image:url(16/disabled/folder_open-execute.png)}
+.disabled .pf-16.pf-folder-favorite,.k-state-disabled .pf-16.pf-folder-favorite,[disabled] .pf-16.pf-folder-favorite,.pf-16.pf-folder-favorite.pf-disabled{background-image:url(16/disabled/folder-favorite.png)}
+.disabled .pf-16.pf-folder_open-favorite,.k-state-disabled .pf-16.pf-folder_open-favorite,[disabled] .pf-16.pf-folder_open-favorite,.pf-16.pf-folder_open-favorite.pf-disabled{background-image:url(16/disabled/folder_open-favorite.png)}
+.disabled .pf-16.pf-filter-ok,.k-state-disabled .pf-16.pf-filter-ok,[disabled] .pf-16.pf-filter-ok,.pf-16.pf-filter-ok.pf-disabled{background-image:url(16/disabled/filter-ok.png)}
+.disabled .pf-16.pf-filter-remove,.k-state-disabled .pf-16.pf-filter-remove,[disabled] .pf-16.pf-filter-remove,.pf-16.pf-filter-remove.pf-disabled{background-image:url(16/disabled/filter-remove.png)}
+.disabled .pf-16.pf-find,.k-state-disabled .pf-16.pf-find,[disabled] .pf-16.pf-find,.pf-16.pf-find.pf-disabled{background-image:url(16/disabled/find.png)}
+.disabled .pf-16.pf-gear,.k-state-disabled .pf-16.pf-gear,[disabled] .pf-16.pf-gear,.pf-16.pf-gear.pf-disabled{background-image:url(16/disabled/gear.png)}
+.disabled .pf-16.pf-gears,.k-state-disabled .pf-16.pf-gears,[disabled] .pf-16.pf-gears,.pf-16.pf-gears.pf-disabled{background-image:url(16/disabled/gears.png)}
+.disabled .pf-16.pf-help,.k-state-disabled .pf-16.pf-help,[disabled] .pf-16.pf-help,.pf-16.pf-help.pf-disabled{background-image:url(16/disabled/help.png)}
+.disabled .pf-16.pf-key,.k-state-disabled .pf-16.pf-key,[disabled] .pf-16.pf-key,.pf-16.pf-key.pf-disabled{background-image:url(16/disabled/key.png)}
+.disabled .pf-16.pf-link-info,.k-state-disabled .pf-16.pf-link-info,[disabled] .pf-16.pf-link-info,.pf-16.pf-link-info.pf-disabled{background-image:url(16/disabled/link-info.png)}
+.disabled .pf-16.pf-list-arrow_right,.k-state-disabled .pf-16.pf-list-arrow_right,[disabled] .pf-16.pf-list-arrow_right,.pf-16.pf-list-arrow_right.pf-disabled{background-image:url(16/disabled/list-arrow_right.png)}
+.disabled .pf-16.pf-list-ok,.k-state-disabled .pf-16.pf-list-ok,[disabled] .pf-16.pf-list-ok,.pf-16.pf-list-ok.pf-disabled{background-image:url(16/disabled/list-ok.png)}
+.disabled .pf-16.pf-mail,.k-state-disabled .pf-16.pf-mail,[disabled] .pf-16.pf-mail,.pf-16.pf-mail.pf-disabled{background-image:url(16/disabled/mail.png)}
+.disabled .pf-16.pf-mail-arrow_right,.k-state-disabled .pf-16.pf-mail-arrow_right,[disabled] .pf-16.pf-mail-arrow_right,.pf-16.pf-mail-arrow_right.pf-disabled{background-image:url(16/disabled/mail-arrow_right.png)}
+.disabled .pf-16.pf-money,.k-state-disabled .pf-16.pf-money,[disabled] .pf-16.pf-money,.pf-16.pf-money.pf-disabled{background-image:url(16/disabled/money.png)}
+.disabled .pf-16.pf-phone,.k-state-disabled .pf-16.pf-phone,[disabled] .pf-16.pf-phone,.pf-16.pf-phone.pf-disabled{background-image:url(16/disabled/phone.png)}
+.disabled .pf-16.pf-phone-ok,.k-state-disabled .pf-16.pf-phone-ok,[disabled] .pf-16.pf-phone-ok,.pf-16.pf-phone-ok.pf-disabled{background-image:url(16/disabled/phone-ok.png)}
+.disabled .pf-16.pf-phone-ok2,.k-state-disabled .pf-16.pf-phone-ok2,[disabled] .pf-16.pf-phone-ok2,.pf-16.pf-phone-ok2.pf-disabled{background-image:url(16/disabled/phone-ok2.png)}
+.disabled .pf-16.pf-phone-error,.k-state-disabled .pf-16.pf-phone-error,[disabled] .pf-16.pf-phone-error,.pf-16.pf-phone-error.pf-disabled{background-image:url(16/disabled/phone-error.png)}
+.disabled .pf-16.pf-percentage,.k-state-disabled .pf-16.pf-percentage,[disabled] .pf-16.pf-percentage,.pf-16.pf-percentage.pf-disabled{background-image:url(16/disabled/percentage.png)}
+.disabled .pf-16.pf-percentage_green,.k-state-disabled .pf-16.pf-percentage_green,[disabled] .pf-16.pf-percentage_green,.pf-16.pf-percentage_green.pf-disabled{background-image:url(16/disabled/percentage_green.png)}
+.disabled .pf-16.pf-percentage_red,.k-state-disabled .pf-16.pf-percentage_red,[disabled] .pf-16.pf-percentage_red,.pf-16.pf-percentage_red.pf-disabled{background-image:url(16/disabled/percentage_red.png)}
+.disabled .pf-16.pf-piece,.k-state-disabled .pf-16.pf-piece,[disabled] .pf-16.pf-piece,.pf-16.pf-piece.pf-disabled{background-image:url(16/disabled/piece.png)}
+.disabled .pf-16.pf-print,.k-state-disabled .pf-16.pf-print,[disabled] .pf-16.pf-print,.pf-16.pf-print.pf-disabled{background-image:url(16/disabled/print.png)}
+.disabled .pf-16.pf-reload_rotate,.k-state-disabled .pf-16.pf-reload_rotate,[disabled] .pf-16.pf-reload_rotate,.pf-16.pf-reload_rotate.pf-disabled{background-image:url(16/disabled/reload_rotate.png)}
+.disabled .pf-16.pf-report_open,.k-state-disabled .pf-16.pf-report_open,[disabled] .pf-16.pf-report_open,.pf-16.pf-report_open.pf-disabled{background-image:url(16/disabled/report_open.png)}
+.disabled .pf-16.pf-report_open-import,.k-state-disabled .pf-16.pf-report_open-import,[disabled] .pf-16.pf-report_open-import,.pf-16.pf-report_open-import.pf-disabled{background-image:url(16/disabled/report_open-import.png)}
+.disabled .pf-16.pf-table_column,.k-state-disabled .pf-16.pf-table_column,[disabled] .pf-16.pf-table_column,.pf-16.pf-table_column.pf-disabled{background-image:url(16/disabled/table_column.png)}
+.disabled .pf-16.pf-table,.k-state-disabled .pf-16.pf-table,[disabled] .pf-16.pf-table,.pf-16.pf-table.pf-disabled{background-image:url(16/disabled/table.png)}
+.disabled .pf-16.pf-table_row-add2,.k-state-disabled .pf-16.pf-table_row-add2,[disabled] .pf-16.pf-table_row-add2,.pf-16.pf-table_row-add2.pf-disabled{background-image:url(16/disabled/table_row-add2.png)}
+.disabled .pf-16.pf-table_row-delete2,.k-state-disabled .pf-16.pf-table_row-delete2,[disabled] .pf-16.pf-table_row-delete2,.pf-16.pf-table_row-delete2.pf-disabled{background-image:url(16/disabled/table_row-delete2.png)}
+.disabled .pf-16.pf-tabs-export,.k-state-disabled .pf-16.pf-tabs-export,[disabled] .pf-16.pf-tabs-export,.pf-16.pf-tabs-export.pf-disabled{background-image:url(16/disabled/tabs-export.png)}
+.disabled .pf-16.pf-tool_pencil,.k-state-disabled .pf-16.pf-tool_pencil,[disabled] .pf-16.pf-tool_pencil,.pf-16.pf-tool_pencil.pf-disabled{background-image:url(16/disabled/tool_pencil.png)}
+.disabled .pf-16.pf-tree,.k-state-disabled .pf-16.pf-tree,[disabled] .pf-16.pf-tree,.pf-16.pf-tree.pf-disabled{background-image:url(16/disabled/tree.png)}
+.disabled .pf-16.pf-money_banknote-server,.k-state-disabled .pf-16.pf-money_banknote-server,[disabled] .pf-16.pf-money_banknote-server,.pf-16.pf-money_banknote-server.pf-disabled{background-image:url(16/disabled/money_banknote-server.png)}
+.disabled .pf-16.pf-user,.k-state-disabled .pf-16.pf-user,[disabled] .pf-16.pf-user,.pf-16.pf-user.pf-disabled{background-image:url(16/disabled/user.png)}
+.disabled .pf-16.pf-save,.k-state-disabled .pf-16.pf-save,[disabled] .pf-16.pf-save,.pf-16.pf-save.pf-disabled{background-image:url(16/disabled/save.png)}
+.disabled .pf-16.pf-user_symbol_blue-picture,.k-state-disabled .pf-16.pf-user_symbol_blue-picture,[disabled] .pf-16.pf-user_symbol_blue-picture,.pf-16.pf-user_symbol_blue-picture.pf-disabled{background-image:url(16/disabled/user_symbol_blue-picture.png)}
+.disabled .pf-16.pf-info,.k-state-disabled .pf-16.pf-info,[disabled] .pf-16.pf-info,.pf-16.pf-info.pf-disabled{background-image:url(16/disabled/info.png)}
+.disabled .pf-16.pf-search,.k-state-disabled .pf-16.pf-search,[disabled] .pf-16.pf-search,.pf-16.pf-search.pf-disabled{background-image:url(16/disabled/search.png)}
+.disabled .pf-16.pf-stop,.k-state-disabled .pf-16.pf-stop,[disabled] .pf-16.pf-stop,.pf-16.pf-stop.pf-disabled{background-image:url(16/disabled/stop.png)}
+.disabled .pf-16.pf-sort_za,.k-state-disabled .pf-16.pf-sort_za,[disabled] .pf-16.pf-sort_za,.pf-16.pf-sort_za.pf-disabled{background-image:url(16/disabled/sort_za.png)}
+.disabled .pf-16.pf-sort_az,.k-state-disabled .pf-16.pf-sort_az,[disabled] .pf-16.pf-sort_az,.pf-16.pf-sort_az.pf-disabled{background-image:url(16/disabled/sort_az.png)}
+.disabled .pf-16.pf-slide-arrow_right,.k-state-disabled .pf-16.pf-slide-arrow_right,[disabled] .pf-16.pf-slide-arrow_right,.pf-16.pf-slide-arrow_right.pf-disabled{background-image:url(16/disabled/slide-arrow_right.png)}
+.disabled .pf-16.pf-slide-arrow_left,.k-state-disabled .pf-16.pf-slide-arrow_left,[disabled] .pf-16.pf-slide-arrow_left,.pf-16.pf-slide-arrow_left.pf-disabled{background-image:url(16/disabled/slide-arrow_left.png)}
+.disabled .pf-16.pf-view_options,.k-state-disabled .pf-16.pf-view_options,[disabled] .pf-16.pf-view_options,.pf-16.pf-view_options.pf-disabled{background-image:url(16/disabled/view_options.png)}
+.disabled .pf-16.pf-warning,.k-state-disabled .pf-16.pf-warning,[disabled] .pf-16.pf-warning,.pf-16.pf-warning.pf-disabled{background-image:url(16/disabled/warning.png)}
+.disabled .pf-16.pf-help,.k-state-disabled .pf-16.pf-help,[disabled] .pf-16.pf-help,.pf-16.pf-help.pf-disabled{background-image:url(16/disabled/help.png)}
+.disabled .pf-16.pf-ov_arrow_left,.k-state-disabled .pf-16.pf-ov_arrow_left,[disabled] .pf-16.pf-ov_arrow_left,.pf-16.pf-ov_arrow_left.pf-disabled{background-image:url(16/disabled/ov_arrow_left.png)}
+.disabled .pf-16.pf-ov_arrow_right,.k-state-disabled .pf-16.pf-ov_arrow_right,[disabled] .pf-16.pf-ov_arrow_right,.pf-16.pf-ov_arrow_right.pf-disabled{background-image:url(16/disabled/ov_arrow_right.png)}
+.disabled .pf-16.pf-ok_button,.k-state-disabled .pf-16.pf-ok_button,[disabled] .pf-16.pf-ok_button,.pf-16.pf-ok_button.pf-disabled{background-image:url(16/disabled/ok_button.png)}
+.disabled .pf-16.pf-ok,.k-state-disabled .pf-16.pf-ok,[disabled] .pf-16.pf-ok,.pf-16.pf-ok.pf-disabled{background-image:url(16/disabled/ok.png)}
+.disabled .pf-16.pf-ov_customer,.k-state-disabled .pf-16.pf-ov_customer,[disabled] .pf-16.pf-ov_customer,.pf-16.pf-ov_customer.pf-disabled{background-image:url(16/disabled/ov_customer.png)}
+.disabled .pf-16.pf-ov_link,.k-state-disabled .pf-16.pf-ov_link,[disabled] .pf-16.pf-ov_link,.pf-16.pf-ov_link.pf-disabled{background-image:url(16/disabled/ov_link.png)}
+.disabled .pf-16.pf-ov_update,.k-state-disabled .pf-16.pf-ov_update,[disabled] .pf-16.pf-ov_update,.pf-16.pf-ov_update.pf-disabled{background-image:url(16/disabled/ov_update.png)}
+/*==========20==========*/
+.pf-20{width:20px;height:20px}
+.pf-20.pf-add{background-image:url(20/add.png)}
+.pf-20.pf-add_button{background-image:url(20/add_button.png)}
+.pf-20.pf-address_book-design{background-image:url(20/address_book-design.png)}
+.pf-20.pf-application-update{background-image:url(20/application-update.png)}
+.pf-20.pf-accept_doc{background-image:url(20/accept_doc.png)}
+.pf-20.pf-alert{background-image:url(20/alert.png)}
+.pf-20.pf-arrow_down{background-image:url(20/arrow_down.png)}
+.pf-20.pf-arrow_download{background-image:url(20/arrow_download.png)}
+.pf-20.pf-arrow_left{background-image:url(20/arrow_left.png)}
+.pf-20.pf-arrow_right{background-image:url(20/arrow_right.png)}
+.pf-20.pf-bank{background-image:url(20/bank.png)}
+.pf-20.pf-bank-update{background-image:url(20/bank-update.png)}
+.pf-20.pf-bank-account{background-image:url(20/bank-account.png)}
+.pf-20.pf-book{background-image:url(20/book.png)}
+.pf-20.pf-bookmark-ok{background-image:url(20/bookmark-ok.png)}
+.pf-20.pf-business_report{background-image:url(20/business_report.png)}
+.pf-20.pf-calendar{background-image:url(20/calendar.png)}
+.pf-20.pf-calendar-update{background-image:url(20/calendar-update.png)}
+.pf-20.pf-currency_conversion{background-image:url(20/currency_conversion.png)}
+.pf-20.pf-clock{background-image:url(20/clock.png)}
+.pf-20.pf-database-arrow_right{background-image:url(20/database-arrow_right.png)}
+.pf-20.pf-database-import{background-image:url(20/database-import.png)}
+.pf-20.pf-delete_button_error{background-image:url(20/delete_button_error.png)}
+.pf-20.pf-execute{background-image:url(20/execute.png)}
+.pf-20.pf-exel{background-image:url(20/exel.png)}
+.pf-20.pf-delete{background-image:url(20/delete.png)}
+.pf-20.pf-document_header_footer-ok2{background-image:url(20/document_header_footer-ok2.png)}
+.pf-20.pf-folder{background-image:url(20/folder.png)}
+.pf-20.pf-folder_open{background-image:url(20/folder_open.png)}
+.pf-20.pf-folder-execute{background-image:url(20/folder-execute.png)}
+.pf-20.pf-folder_open-execute{background-image:url(20/folder_open-execute.png)}
+.pf-20.pf-folder-favorite{background-image:url(20/folder-favorite.png)}
+.pf-20.pf-folder_open-favorite{background-image:url(20/folder_open-favorite.png)}
+.pf-20.pf-filter-ok{background-image:url(20/filter-ok.png)}
+.pf-20.pf-filter-remove{background-image:url(20/filter-remove.png)}
+.pf-20.pf-find{background-image:url(20/find.png)}
+.pf-20.pf-gear{background-image:url(20/gear.png)}
+.pf-20.pf-gears{background-image:url(20/gears.png)}
+.pf-20.pf-help{background-image:url(20/help.png)}
+.pf-20.pf-key{background-image:url(20/key.png)}
+.pf-20.pf-link-info{background-image:url(20/link-info.png)}
+.pf-20.pf-list-arrow_right{background-image:url(20/list-arrow_right.png)}
+.pf-20.pf-list-ok{background-image:url(20/list-ok.png)}
+.pf-20.pf-mail{background-image:url(20/mail.png)}
+.pf-20.pf-mail-arrow_right{background-image:url(20/mail-arrow_right.png)}
+.pf-20.pf-money{background-image:url(20/money.png)}
+.pf-20.pf-phone{background-image:url(20/phone.png)}
+.pf-20.pf-phone-ok{background-image:url(20/phone-ok.png)}
+.pf-20.pf-phone-ok2{background-image:url(20/phone-ok2.png)}
+.pf-20.pf-phone-error{background-image:url(20/phone-error.png)}
+.pf-20.pf-percentage{background-image:url(20/percentage.png)}
+.pf-20.pf-percentage_green{background-image:url(20/percentage_green.png)}
+.pf-20.pf-percentage_red{background-image:url(20/percentage_red.png)}
+.pf-20.pf-piece{background-image:url(20/piece.png)}
+.pf-20.pf-print{background-image:url(20/print.png)}
+.pf-20.pf-reload_rotate{background-image:url(20/reload_rotate.png)}
+.pf-20.pf-report_open{background-image:url(20/report_open.png)}
+.pf-20.pf-report_open-import{background-image:url(20/report_open-import.png)}
+.pf-20.pf-table_column{background-image:url(20/table_column.png)}
+.pf-20.pf-table{background-image:url(20/table.png)}
+.pf-20.pf-table_row-add2{background-image:url(20/table_row-add2.png)}
+.pf-20.pf-table_row-delete2{background-image:url(20/table_row-delete2.png)}
+.pf-20.pf-tabs-export{background-image:url(20/tabs-export.png)}
+.pf-20.pf-tool_pencil{background-image:url(20/tool_pencil.png)}
+.pf-20.pf-tree{background-image:url(20/tree.png)}
+.pf-20.pf-money_banknote-server{background-image:url(20/money_banknote-server.png)}
+.pf-20.pf-user{background-image:url(20/user.png)}
+.pf-20.pf-save{background-image:url(20/save.png)}
+.pf-20.pf-user_symbol_blue-picture{background-image:url(20/user_symbol_blue-picture.png)}
+.pf-20.pf-info{background-image:url(20/info.png)}
+.pf-20.pf-search{background-image:url(20/search.png)}
+.pf-20.pf-stop{background-image:url(20/stop.png)}
+.pf-20.pf-sort_za{background-image:url(20/sort_za.png)}
+.pf-20.pf-sort_az{background-image:url(20/sort_az.png)}
+.pf-20.pf-slide-arrow_right{background-image:url(20/slide-arrow_right.png)}
+.pf-20.pf-slide-arrow_left{background-image:url(20/slide-arrow_left.png)}
+.pf-20.pf-view_options{background-image:url(20/view_options.png)}
+.pf-20.pf-warning{background-image:url(20/warning.png)}
+.pf-20.pf-help{background-image:url(20/help.png)}
+.pf-20.pf-ov_arrow_left{background-image:url(20/ov_arrow_left.png)}
+.pf-20.pf-ov_arrow_right{background-image:url(20/ov_arrow_right.png)}
+.pf-20.pf-ok_button{background-image:url(20/ok_button.png)}
+.pf-20.pf-ok{background-image:url(20/ok.png)}
+.pf-20.pf-ov_customer{background-image:url(20/ov_customer.png)}
+.pf-20.pf-ov_link{background-image:url(20/ov_link.png)}
+.pf-20.pf-ov_update{background-image:url(20/ov_update.png)}
+.pf-20.pf-add.pf-hot{background-image:url(20/hot/add.png)}
+.pf-20.pf-add_button.pf-hot{background-image:url(20/hot/add_button.png)}
+.pf-20.pf-address_book-design.pf-hot{background-image:url(20/hot/address_book-design.png)}
+.pf-20.pf-application-update.pf-hot{background-image:url(20/hot/application-update.png)}
+.pf-20.pf-accept_doc.pf-hot{background-image:url(20/hot/accept_doc.png)}
+.pf-20.pf-alert.pf-hot{background-image:url(20/hot/alert.png)}
+.pf-20.pf-arrow_down.pf-hot{background-image:url(20/hot/arrow_down.png)}
+.pf-20.pf-arrow_download.pf-hot{background-image:url(20/hot/arrow_download.png)}
+.pf-20.pf-arrow_left.pf-hot{background-image:url(20/hot/arrow_left.png)}
+.pf-20.pf-arrow_right.pf-hot{background-image:url(20/hot/arrow_right.png)}
+.pf-20.pf-bank.pf-hot{background-image:url(20/hot/bank.png)}
+.pf-20.pf-bank-update.pf-hot{background-image:url(20/hot/bank-update.png)}
+.pf-20.pf-bank-account.pf-hot{background-image:url(20/hot/bank-account.png)}
+.pf-20.pf-book.pf-hot{background-image:url(20/hot/book.png)}
+.pf-20.pf-bookmark-ok.pf-hot{background-image:url(20/hot/bookmark-ok.png)}
+.pf-20.pf-business_report.pf-hot{background-image:url(20/hot/business_report.png)}
+.pf-20.pf-calendar.pf-hot{background-image:url(20/hot/calendar.png)}
+.pf-20.pf-calendar-update.pf-hot{background-image:url(20/hot/calendar-update.png)}
+.pf-20.pf-currency_conversion.pf-hot{background-image:url(20/hot/currency_conversion.png)}
+.pf-20.pf-clock.pf-hot{background-image:url(20/hot/clock.png)}
+.pf-20.pf-database-arrow_right.pf-hot{background-image:url(20/hot/database-arrow_right.png)}
+.pf-20.pf-database-import.pf-hot{background-image:url(20/hot/database-import.png)}
+.pf-20.pf-delete_button_error.pf-hot{background-image:url(20/hot/delete_button_error.png)}
+.pf-20.pf-execute.pf-hot{background-image:url(20/hot/execute.png)}
+.pf-20.pf-exel.pf-hot{background-image:url(20/hot/exel.png)}
+.pf-20.pf-delete.pf-hot{background-image:url(20/hot/delete.png)}
+.pf-20.pf-document_header_footer-ok2.pf-hot{background-image:url(20/hot/document_header_footer-ok2.png)}
+.pf-20.pf-folder.pf-hot{background-image:url(20/hot/folder.png)}
+.pf-20.pf-folder_open.pf-hot{background-image:url(20/hot/folder_open.png)}
+.pf-20.pf-folder-execute.pf-hot{background-image:url(20/hot/folder-execute.png)}
+.pf-20.pf-folder_open-execute.pf-hot{background-image:url(20/hot/folder_open-execute.png)}
+.pf-20.pf-folder-favorite.pf-hot{background-image:url(20/hot/folder-favorite.png)}
+.pf-20.pf-folder_open-favorite.pf-hot{background-image:url(20/hot/folder_open-favorite.png)}
+.pf-20.pf-filter-ok.pf-hot{background-image:url(20/hot/filter-ok.png)}
+.pf-20.pf-filter-remove.pf-hot{background-image:url(20/hot/filter-remove.png)}
+.pf-20.pf-find.pf-hot{background-image:url(20/hot/find.png)}
+.pf-20.pf-gear.pf-hot{background-image:url(20/hot/gear.png)}
+.pf-20.pf-gears.pf-hot{background-image:url(20/hot/gears.png)}
+.pf-20.pf-help.pf-hot{background-image:url(20/hot/help.png)}
+.pf-20.pf-key.pf-hot{background-image:url(20/hot/key.png)}
+.pf-20.pf-link-info.pf-hot{background-image:url(20/hot/link-info.png)}
+.pf-20.pf-list-arrow_right.pf-hot{background-image:url(20/hot/list-arrow_right.png)}
+.pf-20.pf-list-ok.pf-hot{background-image:url(20/hot/list-ok.png)}
+.pf-20.pf-mail.pf-hot{background-image:url(20/hot/mail.png)}
+.pf-20.pf-mail-arrow_right.pf-hot{background-image:url(20/hot/mail-arrow_right.png)}
+.pf-20.pf-money.pf-hot{background-image:url(20/hot/money.png)}
+.pf-20.pf-phone.pf-hot{background-image:url(20/hot/phone.png)}
+.pf-20.pf-phone-ok.pf-hot{background-image:url(20/hot/phone-ok.png)}
+.pf-20.pf-phone-ok2.pf-hot{background-image:url(20/hot/phone-ok2.png)}
+.pf-20.pf-phone-error.pf-hot{background-image:url(20/hot/phone-error.png)}
+.pf-20.pf-percentage.pf-hot{background-image:url(20/hot/percentage.png)}
+.pf-20.pf-percentage_green.pf-hot{background-image:url(20/hot/percentage_green.png)}
+.pf-20.pf-percentage_red.pf-hot{background-image:url(20/hot/percentage_red.png)}
+.pf-20.pf-piece.pf-hot{background-image:url(20/hot/piece.png)}
+.pf-20.pf-print.pf-hot{background-image:url(20/hot/print.png)}
+.pf-20.pf-reload_rotate.pf-hot{background-image:url(20/hot/reload_rotate.png)}
+.pf-20.pf-report_open.pf-hot{background-image:url(20/hot/report_open.png)}
+.pf-20.pf-report_open-import.pf-hot{background-image:url(20/hot/report_open-import.png)}
+.pf-20.pf-table_column.pf-hot{background-image:url(20/hot/table_column.png)}
+.pf-20.pf-table.pf-hot{background-image:url(20/hot/table.png)}
+.pf-20.pf-table_row-add2.pf-hot{background-image:url(20/hot/table_row-add2.png)}
+.pf-20.pf-table_row-delete2.pf-hot{background-image:url(20/hot/table_row-delete2.png)}
+.pf-20.pf-tabs-export.pf-hot{background-image:url(20/hot/tabs-export.png)}
+.pf-20.pf-tool_pencil.pf-hot{background-image:url(20/hot/tool_pencil.png)}
+.pf-20.pf-tree.pf-hot{background-image:url(20/hot/tree.png)}
+.pf-20.pf-money_banknote-server.pf-hot{background-image:url(20/hot/money_banknote-server.png)}
+.pf-20.pf-user.pf-hot{background-image:url(20/hot/user.png)}
+.pf-20.pf-save.pf-hot{background-image:url(20/hot/save.png)}
+.pf-20.pf-user_symbol_blue-picture.pf-hot{background-image:url(20/hot/user_symbol_blue-picture.png)}
+.pf-20.pf-info.pf-hot{background-image:url(20/hot/info.png)}
+.pf-20.pf-search.pf-hot{background-image:url(20/hot/search.png)}
+.pf-20.pf-stop.pf-hot{background-image:url(20/hot/stop.png)}
+.pf-20.pf-sort_za.pf-hot{background-image:url(20/hot/sort_za.png)}
+.pf-20.pf-sort_az.pf-hot{background-image:url(20/hot/sort_az.png)}
+.pf-20.pf-slide-arrow_right.pf-hot{background-image:url(20/hot/slide-arrow_right.png)}
+.pf-20.pf-slide-arrow_left.pf-hot{background-image:url(20/hot/slide-arrow_left.png)}
+.pf-20.pf-view_options.pf-hot{background-image:url(20/hot/view_options.png)}
+.pf-20.pf-warning.pf-hot{background-image:url(20/hot/warning.png)}
+.pf-20.pf-help.pf-hot{background-image:url(20/hot/help.png)}
+.pf-20.pf-ov_arrow_left.pf-hot{background-image:url(20/hot/ov_arrow_left.png)}
+.pf-20.pf-ov_arrow_right.pf-hot{background-image:url(20/hot/ov_arrow_right.png)}
+.pf-20.pf-ok_button.pf-hot{background-image:url(20/hot/ok_button.png)}
+.pf-20.pf-ok.pf-hot{background-image:url(20/hot/ok.png)}
+.pf-20.pf-ov_customer.pf-hot{background-image:url(20/hot/ov_customer.png)}
+.pf-20.pf-ov_link.pf-hot{background-image:url(20/hot/ov_link.png)}
+.pf-20.pf-ov_update.pf-hot{background-image:url(20/hot/ov_update.png)}
+.disabled .pf-20.pf-add,.k-state-disabled .pf-20.pf-add,[disabled] .pf-20.pf-add,.pf-20.pf-add.pf-disabled{background-image:url(20/disabled/add.png)}
+.disabled .pf-20.pf-add_button,.k-state-disabled .pf-20.pf-add_button,[disabled] .pf-20.pf-add_button,.pf-20.pf-add_button.pf-disabled{background-image:url(20/disabled/add_button.png)}
+.disabled .pf-20.pf-address_book-design,.k-state-disabled .pf-20.pf-address_book-design,[disabled] .pf-20.pf-address_book-design,.pf-20.pf-address_book-design.pf-disabled{background-image:url(20/disabled/address_book-design.png)}
+.disabled .pf-20.pf-application-update,.k-state-disabled .pf-20.pf-application-update,[disabled] .pf-20.pf-application-update,.pf-20.pf-application-update.pf-disabled{background-image:url(20/disabled/application-update.png)}
+.disabled .pf-20.pf-accept_doc,.k-state-disabled .pf-20.pf-accept_doc,[disabled] .pf-20.pf-accept_doc,.pf-20.pf-accept_doc.pf-disabled{background-image:url(20/disabled/accept_doc.png)}
+.disabled .pf-20.pf-alert,.k-state-disabled .pf-20.pf-alert,[disabled] .pf-20.pf-alert,.pf-20.pf-alert.pf-disabled{background-image:url(20/disabled/alert.png)}
+.disabled .pf-20.pf-arrow_down,.k-state-disabled .pf-20.pf-arrow_down,[disabled] .pf-20.pf-arrow_down,.pf-20.pf-arrow_down.pf-disabled{background-image:url(20/disabled/arrow_down.png)}
+.disabled .pf-20.pf-arrow_download,.k-state-disabled .pf-20.pf-arrow_download,[disabled] .pf-20.pf-arrow_download,.pf-20.pf-arrow_download.pf-disabled{background-image:url(20/disabled/arrow_download.png)}
+.disabled .pf-20.pf-arrow_left,.k-state-disabled .pf-20.pf-arrow_left,[disabled] .pf-20.pf-arrow_left,.pf-20.pf-arrow_left.pf-disabled{background-image:url(20/disabled/arrow_left.png)}
+.disabled .pf-20.pf-arrow_right,.k-state-disabled .pf-20.pf-arrow_right,[disabled] .pf-20.pf-arrow_right,.pf-20.pf-arrow_right.pf-disabled{background-image:url(20/disabled/arrow_right.png)}
+.disabled .pf-20.pf-bank,.k-state-disabled .pf-20.pf-bank,[disabled] .pf-20.pf-bank,.pf-20.pf-bank.pf-disabled{background-image:url(20/disabled/bank.png)}
+.disabled .pf-20.pf-bank-update,.k-state-disabled .pf-20.pf-bank-update,[disabled] .pf-20.pf-bank-update,.pf-20.pf-bank-update.pf-disabled{background-image:url(20/disabled/bank-update.png)}
+.disabled .pf-20.pf-bank-account,.k-state-disabled .pf-20.pf-bank-account,[disabled] .pf-20.pf-bank-account,.pf-20.pf-bank-account.pf-disabled{background-image:url(20/disabled/bank-account.png)}
+.disabled .pf-20.pf-book,.k-state-disabled .pf-20.pf-book,[disabled] .pf-20.pf-book,.pf-20.pf-book.pf-disabled{background-image:url(20/disabled/book.png)}
+.disabled .pf-20.pf-bookmark-ok,.k-state-disabled .pf-20.pf-bookmark-ok,[disabled] .pf-20.pf-bookmark-ok,.pf-20.pf-bookmark-ok.pf-disabled{background-image:url(20/disabled/bookmark-ok.png)}
+.disabled .pf-20.pf-business_report,.k-state-disabled .pf-20.pf-business_report,[disabled] .pf-20.pf-business_report,.pf-20.pf-business_report.pf-disabled{background-image:url(20/disabled/business_report.png)}
+.disabled .pf-20.pf-calendar,.k-state-disabled .pf-20.pf-calendar,[disabled] .pf-20.pf-calendar,.pf-20.pf-calendar.pf-disabled{background-image:url(20/disabled/calendar.png)}
+.disabled .pf-20.pf-calendar-update,.k-state-disabled .pf-20.pf-calendar-update,[disabled] .pf-20.pf-calendar-update,.pf-20.pf-calendar-update.pf-disabled{background-image:url(20/disabled/calendar-update.png)}
+.disabled .pf-20.pf-currency_conversion,.k-state-disabled .pf-20.pf-currency_conversion,[disabled] .pf-20.pf-currency_conversion,.pf-20.pf-currency_conversion.pf-disabled{background-image:url(20/disabled/currency_conversion.png)}
+.disabled .pf-20.pf-clock,.k-state-disabled .pf-20.pf-clock,[disabled] .pf-20.pf-clock,.pf-20.pf-clock.pf-disabled{background-image:url(20/disabled/clock.png)}
+.disabled .pf-20.pf-database-arrow_right,.k-state-disabled .pf-20.pf-database-arrow_right,[disabled] .pf-20.pf-database-arrow_right,.pf-20.pf-database-arrow_right.pf-disabled{background-image:url(20/disabled/database-arrow_right.png)}
+.disabled .pf-20.pf-database-import,.k-state-disabled .pf-20.pf-database-import,[disabled] .pf-20.pf-database-import,.pf-20.pf-database-import.pf-disabled{background-image:url(20/disabled/database-import.png)}
+.disabled .pf-20.pf-delete_button_error,.k-state-disabled .pf-20.pf-delete_button_error,[disabled] .pf-20.pf-delete_button_error,.pf-20.pf-delete_button_error.pf-disabled{background-image:url(20/disabled/delete_button_error.png)}
+.disabled .pf-20.pf-execute,.k-state-disabled .pf-20.pf-execute,[disabled] .pf-20.pf-execute,.pf-20.pf-execute.pf-disabled{background-image:url(20/disabled/execute.png)}
+.disabled .pf-20.pf-exel,.k-state-disabled .pf-20.pf-exel,[disabled] .pf-20.pf-exel,.pf-20.pf-exel.pf-disabled{background-image:url(20/disabled/exel.png)}
+.disabled .pf-20.pf-delete,.k-state-disabled .pf-20.pf-delete,[disabled] .pf-20.pf-delete,.pf-20.pf-delete.pf-disabled{background-image:url(20/disabled/delete.png)}
+.disabled .pf-20.pf-document_header_footer-ok2,.k-state-disabled .pf-20.pf-document_header_footer-ok2,[disabled] .pf-20.pf-document_header_footer-ok2,.pf-20.pf-document_header_footer-ok2.pf-disabled{background-image:url(20/disabled/document_header_footer-ok2.png)}
+.disabled .pf-20.pf-folder,.k-state-disabled .pf-20.pf-folder,[disabled] .pf-20.pf-folder,.pf-20.pf-folder.pf-disabled{background-image:url(20/disabled/folder.png)}
+.disabled .pf-20.pf-folder_open,.k-state-disabled .pf-20.pf-folder_open,[disabled] .pf-20.pf-folder_open,.pf-20.pf-folder_open.pf-disabled{background-image:url(20/disabled/folder_open.png)}
+.disabled .pf-20.pf-folder-execute,.k-state-disabled .pf-20.pf-folder-execute,[disabled] .pf-20.pf-folder-execute,.pf-20.pf-folder-execute.pf-disabled{background-image:url(20/disabled/folder-execute.png)}
+.disabled .pf-20.pf-folder_open-execute,.k-state-disabled .pf-20.pf-folder_open-execute,[disabled] .pf-20.pf-folder_open-execute,.pf-20.pf-folder_open-execute.pf-disabled{background-image:url(20/disabled/folder_open-execute.png)}
+.disabled .pf-20.pf-folder-favorite,.k-state-disabled .pf-20.pf-folder-favorite,[disabled] .pf-20.pf-folder-favorite,.pf-20.pf-folder-favorite.pf-disabled{background-image:url(20/disabled/folder-favorite.png)}
+.disabled .pf-20.pf-folder_open-favorite,.k-state-disabled .pf-20.pf-folder_open-favorite,[disabled] .pf-20.pf-folder_open-favorite,.pf-20.pf-folder_open-favorite.pf-disabled{background-image:url(20/disabled/folder_open-favorite.png)}
+.disabled .pf-20.pf-filter-ok,.k-state-disabled .pf-20.pf-filter-ok,[disabled] .pf-20.pf-filter-ok,.pf-20.pf-filter-ok.pf-disabled{background-image:url(20/disabled/filter-ok.png)}
+.disabled .pf-20.pf-filter-remove,.k-state-disabled .pf-20.pf-filter-remove,[disabled] .pf-20.pf-filter-remove,.pf-20.pf-filter-remove.pf-disabled{background-image:url(20/disabled/filter-remove.png)}
+.disabled .pf-20.pf-find,.k-state-disabled .pf-20.pf-find,[disabled] .pf-20.pf-find,.pf-20.pf-find.pf-disabled{background-image:url(20/disabled/find.png)}
+.disabled .pf-20.pf-gear,.k-state-disabled .pf-20.pf-gear,[disabled] .pf-20.pf-gear,.pf-20.pf-gear.pf-disabled{background-image:url(20/disabled/gear.png)}
+.disabled .pf-20.pf-gears,.k-state-disabled .pf-20.pf-gears,[disabled] .pf-20.pf-gears,.pf-20.pf-gears.pf-disabled{background-image:url(20/disabled/gears.png)}
+.disabled .pf-20.pf-help,.k-state-disabled .pf-20.pf-help,[disabled] .pf-20.pf-help,.pf-20.pf-help.pf-disabled{background-image:url(20/disabled/help.png)}
+.disabled .pf-20.pf-key,.k-state-disabled .pf-20.pf-key,[disabled] .pf-20.pf-key,.pf-20.pf-key.pf-disabled{background-image:url(20/disabled/key.png)}
+.disabled .pf-20.pf-link-info,.k-state-disabled .pf-20.pf-link-info,[disabled] .pf-20.pf-link-info,.pf-20.pf-link-info.pf-disabled{background-image:url(20/disabled/link-info.png)}
+.disabled .pf-20.pf-list-arrow_right,.k-state-disabled .pf-20.pf-list-arrow_right,[disabled] .pf-20.pf-list-arrow_right,.pf-20.pf-list-arrow_right.pf-disabled{background-image:url(20/disabled/list-arrow_right.png)}
+.disabled .pf-20.pf-list-ok,.k-state-disabled .pf-20.pf-list-ok,[disabled] .pf-20.pf-list-ok,.pf-20.pf-list-ok.pf-disabled{background-image:url(20/disabled/list-ok.png)}
+.disabled .pf-20.pf-mail,.k-state-disabled .pf-20.pf-mail,[disabled] .pf-20.pf-mail,.pf-20.pf-mail.pf-disabled{background-image:url(20/disabled/mail.png)}
+.disabled .pf-20.pf-mail-arrow_right,.k-state-disabled .pf-20.pf-mail-arrow_right,[disabled] .pf-20.pf-mail-arrow_right,.pf-20.pf-mail-arrow_right.pf-disabled{background-image:url(20/disabled/mail-arrow_right.png)}
+.disabled .pf-20.pf-money,.k-state-disabled .pf-20.pf-money,[disabled] .pf-20.pf-money,.pf-20.pf-money.pf-disabled{background-image:url(20/disabled/money.png)}
+.disabled .pf-20.pf-phone,.k-state-disabled .pf-20.pf-phone,[disabled] .pf-20.pf-phone,.pf-20.pf-phone.pf-disabled{background-image:url(20/disabled/phone.png)}
+.disabled .pf-20.pf-phone-ok,.k-state-disabled .pf-20.pf-phone-ok,[disabled] .pf-20.pf-phone-ok,.pf-20.pf-phone-ok.pf-disabled{background-image:url(20/disabled/phone-ok.png)}
+.disabled .pf-20.pf-phone-ok2,.k-state-disabled .pf-20.pf-phone-ok2,[disabled] .pf-20.pf-phone-ok2,.pf-20.pf-phone-ok2.pf-disabled{background-image:url(20/disabled/phone-ok2.png)}
+.disabled .pf-20.pf-phone-error,.k-state-disabled .pf-20.pf-phone-error,[disabled] .pf-20.pf-phone-error,.pf-20.pf-phone-error.pf-disabled{background-image:url(20/disabled/phone-error.png)}
+.disabled .pf-20.pf-percentage,.k-state-disabled .pf-20.pf-percentage,[disabled] .pf-20.pf-percentage,.pf-20.pf-percentage.pf-disabled{background-image:url(20/disabled/percentage.png)}
+.disabled .pf-20.pf-percentage_green,.k-state-disabled .pf-20.pf-percentage_green,[disabled] .pf-20.pf-percentage_green,.pf-20.pf-percentage_green.pf-disabled{background-image:url(20/disabled/percentage_green.png)}
+.disabled .pf-20.pf-percentage_red,.k-state-disabled .pf-20.pf-percentage_red,[disabled] .pf-20.pf-percentage_red,.pf-20.pf-percentage_red.pf-disabled{background-image:url(20/disabled/percentage_red.png)}
+.disabled .pf-20.pf-piece,.k-state-disabled .pf-20.pf-piece,[disabled] .pf-20.pf-piece,.pf-20.pf-piece.pf-disabled{background-image:url(20/disabled/piece.png)}
+.disabled .pf-20.pf-print,.k-state-disabled .pf-20.pf-print,[disabled] .pf-20.pf-print,.pf-20.pf-print.pf-disabled{background-image:url(20/disabled/print.png)}
+.disabled .pf-20.pf-reload_rotate,.k-state-disabled .pf-20.pf-reload_rotate,[disabled] .pf-20.pf-reload_rotate,.pf-20.pf-reload_rotate.pf-disabled{background-image:url(20/disabled/reload_rotate.png)}
+.disabled .pf-20.pf-report_open,.k-state-disabled .pf-20.pf-report_open,[disabled] .pf-20.pf-report_open,.pf-20.pf-report_open.pf-disabled{background-image:url(20/disabled/report_open.png)}
+.disabled .pf-20.pf-report_open-import,.k-state-disabled .pf-20.pf-report_open-import,[disabled] .pf-20.pf-report_open-import,.pf-20.pf-report_open-import.pf-disabled{background-image:url(20/disabled/report_open-import.png)}
+.disabled .pf-20.pf-table_column,.k-state-disabled .pf-20.pf-table_column,[disabled] .pf-20.pf-table_column,.pf-20.pf-table_column.pf-disabled{background-image:url(20/disabled/table_column.png)}
+.disabled .pf-20.pf-table,.k-state-disabled .pf-20.pf-table,[disabled] .pf-20.pf-table,.pf-20.pf-table.pf-disabled{background-image:url(20/disabled/table.png)}
+.disabled .pf-20.pf-table_row-add2,.k-state-disabled .pf-20.pf-table_row-add2,[disabled] .pf-20.pf-table_row-add2,.pf-20.pf-table_row-add2.pf-disabled{background-image:url(20/disabled/table_row-add2.png)}
+.disabled .pf-20.pf-table_row-delete2,.k-state-disabled .pf-20.pf-table_row-delete2,[disabled] .pf-20.pf-table_row-delete2,.pf-20.pf-table_row-delete2.pf-disabled{background-image:url(20/disabled/table_row-delete2.png)}
+.disabled .pf-20.pf-tabs-export,.k-state-disabled .pf-20.pf-tabs-export,[disabled] .pf-20.pf-tabs-export,.pf-20.pf-tabs-export.pf-disabled{background-image:url(20/disabled/tabs-export.png)}
+.disabled .pf-20.pf-tool_pencil,.k-state-disabled .pf-20.pf-tool_pencil,[disabled] .pf-20.pf-tool_pencil,.pf-20.pf-tool_pencil.pf-disabled{background-image:url(20/disabled/tool_pencil.png)}
+.disabled .pf-20.pf-tree,.k-state-disabled .pf-20.pf-tree,[disabled] .pf-20.pf-tree,.pf-20.pf-tree.pf-disabled{background-image:url(20/disabled/tree.png)}
+.disabled .pf-20.pf-money_banknote-server,.k-state-disabled .pf-20.pf-money_banknote-server,[disabled] .pf-20.pf-money_banknote-server,.pf-20.pf-money_banknote-server.pf-disabled{background-image:url(20/disabled/money_banknote-server.png)}
+.disabled .pf-20.pf-user,.k-state-disabled .pf-20.pf-user,[disabled] .pf-20.pf-user,.pf-20.pf-user.pf-disabled{background-image:url(20/disabled/user.png)}
+.disabled .pf-20.pf-save,.k-state-disabled .pf-20.pf-save,[disabled] .pf-20.pf-save,.pf-20.pf-save.pf-disabled{background-image:url(20/disabled/save.png)}
+.disabled .pf-20.pf-user_symbol_blue-picture,.k-state-disabled .pf-20.pf-user_symbol_blue-picture,[disabled] .pf-20.pf-user_symbol_blue-picture,.pf-20.pf-user_symbol_blue-picture.pf-disabled{background-image:url(20/disabled/user_symbol_blue-picture.png)}
+.disabled .pf-20.pf-info,.k-state-disabled .pf-20.pf-info,[disabled] .pf-20.pf-info,.pf-20.pf-info.pf-disabled{background-image:url(20/disabled/info.png)}
+.disabled .pf-20.pf-search,.k-state-disabled .pf-20.pf-search,[disabled] .pf-20.pf-search,.pf-20.pf-search.pf-disabled{background-image:url(20/disabled/search.png)}
+.disabled .pf-20.pf-stop,.k-state-disabled .pf-20.pf-stop,[disabled] .pf-20.pf-stop,.pf-20.pf-stop.pf-disabled{background-image:url(20/disabled/stop.png)}
+.disabled .pf-20.pf-sort_za,.k-state-disabled .pf-20.pf-sort_za,[disabled] .pf-20.pf-sort_za,.pf-20.pf-sort_za.pf-disabled{background-image:url(20/disabled/sort_za.png)}
+.disabled .pf-20.pf-sort_az,.k-state-disabled .pf-20.pf-sort_az,[disabled] .pf-20.pf-sort_az,.pf-20.pf-sort_az.pf-disabled{background-image:url(20/disabled/sort_az.png)}
+.disabled .pf-20.pf-slide-arrow_right,.k-state-disabled .pf-20.pf-slide-arrow_right,[disabled] .pf-20.pf-slide-arrow_right,.pf-20.pf-slide-arrow_right.pf-disabled{background-image:url(20/disabled/slide-arrow_right.png)}
+.disabled .pf-20.pf-slide-arrow_left,.k-state-disabled .pf-20.pf-slide-arrow_left,[disabled] .pf-20.pf-slide-arrow_left,.pf-20.pf-slide-arrow_left.pf-disabled{background-image:url(20/disabled/slide-arrow_left.png)}
+.disabled .pf-20.pf-view_options,.k-state-disabled .pf-20.pf-view_options,[disabled] .pf-20.pf-view_options,.pf-20.pf-view_options.pf-disabled{background-image:url(20/disabled/view_options.png)}
+.disabled .pf-20.pf-warning,.k-state-disabled .pf-20.pf-warning,[disabled] .pf-20.pf-warning,.pf-20.pf-warning.pf-disabled{background-image:url(20/disabled/warning.png)}
+.disabled .pf-20.pf-help,.k-state-disabled .pf-20.pf-help,[disabled] .pf-20.pf-help,.pf-20.pf-help.pf-disabled{background-image:url(20/disabled/help.png)}
+.disabled .pf-20.pf-ov_arrow_left,.k-state-disabled .pf-20.pf-ov_arrow_left,[disabled] .pf-20.pf-ov_arrow_left,.pf-20.pf-ov_arrow_left.pf-disabled{background-image:url(20/disabled/ov_arrow_left.png)}
+.disabled .pf-20.pf-ov_arrow_right,.k-state-disabled .pf-20.pf-ov_arrow_right,[disabled] .pf-20.pf-ov_arrow_right,.pf-20.pf-ov_arrow_right.pf-disabled{background-image:url(20/disabled/ov_arrow_right.png)}
+.disabled .pf-20.pf-ok_button,.k-state-disabled .pf-20.pf-ok_button,[disabled] .pf-20.pf-ok_button,.pf-20.pf-ok_button.pf-disabled{background-image:url(20/disabled/ok_button.png)}
+.disabled .pf-20.pf-ok,.k-state-disabled .pf-20.pf-ok,[disabled] .pf-20.pf-ok,.pf-20.pf-ok.pf-disabled{background-image:url(20/disabled/ok.png)}
+.disabled .pf-20.pf-ov_customer,.k-state-disabled .pf-20.pf-ov_customer,[disabled] .pf-20.pf-ov_customer,.pf-20.pf-ov_customer.pf-disabled{background-image:url(20/disabled/ov_customer.png)}
+.disabled .pf-20.pf-ov_link,.k-state-disabled .pf-20.pf-ov_link,[disabled] .pf-20.pf-ov_link,.pf-20.pf-ov_link.pf-disabled{background-image:url(20/disabled/ov_link.png)}
+.disabled .pf-20.pf-ov_update,.k-state-disabled .pf-20.pf-ov_update,[disabled] .pf-20.pf-ov_update,.pf-20.pf-ov_update.pf-disabled{background-image:url(20/disabled/ov_update.png)}
+/*==========24==========*/
+.pf-24{width:24px;height:24px}
+.pf-24.pf-add{background-image:url(24/add.png)}
+.pf-24.pf-add_button{background-image:url(24/add_button.png)}
+.pf-24.pf-address_book-design{background-image:url(24/address_book-design.png)}
+.pf-24.pf-application-update{background-image:url(24/application-update.png)}
+.pf-24.pf-accept_doc{background-image:url(24/accept_doc.png)}
+.pf-24.pf-alert{background-image:url(24/alert.png)}
+.pf-24.pf-arrow_down{background-image:url(24/arrow_down.png)}
+.pf-24.pf-arrow_download{background-image:url(24/arrow_download.png)}
+.pf-24.pf-arrow_left{background-image:url(24/arrow_left.png)}
+.pf-24.pf-arrow_right{background-image:url(24/arrow_right.png)}
+.pf-24.pf-bank{background-image:url(24/bank.png)}
+.pf-24.pf-bank-update{background-image:url(24/bank-update.png)}
+.pf-24.pf-bank-account{background-image:url(24/bank-account.png)}
+.pf-24.pf-book{background-image:url(24/book.png)}
+.pf-24.pf-bookmark-ok{background-image:url(24/bookmark-ok.png)}
+.pf-24.pf-business_report{background-image:url(24/business_report.png)}
+.pf-24.pf-calendar{background-image:url(24/calendar.png)}
+.pf-24.pf-calendar-update{background-image:url(24/calendar-update.png)}
+.pf-24.pf-currency_conversion{background-image:url(24/currency_conversion.png)}
+.pf-24.pf-clock{background-image:url(24/clock.png)}
+.pf-24.pf-database-arrow_right{background-image:url(24/database-arrow_right.png)}
+.pf-24.pf-database-import{background-image:url(24/database-import.png)}
+.pf-24.pf-delete_button_error{background-image:url(24/delete_button_error.png)}
+.pf-24.pf-execute{background-image:url(24/execute.png)}
+.pf-24.pf-exel{background-image:url(24/exel.png)}
+.pf-24.pf-delete{background-image:url(24/delete.png)}
+.pf-24.pf-document_header_footer-ok2{background-image:url(24/document_header_footer-ok2.png)}
+.pf-24.pf-folder{background-image:url(24/folder.png)}
+.pf-24.pf-folder_open{background-image:url(24/folder_open.png)}
+.pf-24.pf-folder-execute{background-image:url(24/folder-execute.png)}
+.pf-24.pf-folder_open-execute{background-image:url(24/folder_open-execute.png)}
+.pf-24.pf-folder-favorite{background-image:url(24/folder-favorite.png)}
+.pf-24.pf-folder_open-favorite{background-image:url(24/folder_open-favorite.png)}
+.pf-24.pf-filter-ok{background-image:url(24/filter-ok.png)}
+.pf-24.pf-filter-remove{background-image:url(24/filter-remove.png)}
+.pf-24.pf-find{background-image:url(24/find.png)}
+.pf-24.pf-gear{background-image:url(24/gear.png)}
+.pf-24.pf-gears{background-image:url(24/gears.png)}
+.pf-24.pf-help{background-image:url(24/help.png)}
+.pf-24.pf-key{background-image:url(24/key.png)}
+.pf-24.pf-link-info{background-image:url(24/link-info.png)}
+.pf-24.pf-list-arrow_right{background-image:url(24/list-arrow_right.png)}
+.pf-24.pf-list-ok{background-image:url(24/list-ok.png)}
+.pf-24.pf-mail{background-image:url(24/mail.png)}
+.pf-24.pf-mail-arrow_right{background-image:url(24/mail-arrow_right.png)}
+.pf-24.pf-money{background-image:url(24/money.png)}
+.pf-24.pf-phone{background-image:url(24/phone.png)}
+.pf-24.pf-phone-ok{background-image:url(24/phone-ok.png)}
+.pf-24.pf-phone-ok2{background-image:url(24/phone-ok2.png)}
+.pf-24.pf-phone-error{background-image:url(24/phone-error.png)}
+.pf-24.pf-percentage{background-image:url(24/percentage.png)}
+.pf-24.pf-percentage_green{background-image:url(24/percentage_green.png)}
+.pf-24.pf-percentage_red{background-image:url(24/percentage_red.png)}
+.pf-24.pf-piece{background-image:url(24/piece.png)}
+.pf-24.pf-print{background-image:url(24/print.png)}
+.pf-24.pf-reload_rotate{background-image:url(24/reload_rotate.png)}
+.pf-24.pf-report_open{background-image:url(24/report_open.png)}
+.pf-24.pf-report_open-import{background-image:url(24/report_open-import.png)}
+.pf-24.pf-table_column{background-image:url(24/table_column.png)}
+.pf-24.pf-table{background-image:url(24/table.png)}
+.pf-24.pf-table_row-add2{background-image:url(24/table_row-add2.png)}
+.pf-24.pf-table_row-delete2{background-image:url(24/table_row-delete2.png)}
+.pf-24.pf-tabs-export{background-image:url(24/tabs-export.png)}
+.pf-24.pf-tool_pencil{background-image:url(24/tool_pencil.png)}
+.pf-24.pf-tree{background-image:url(24/tree.png)}
+.pf-24.pf-money_banknote-server{background-image:url(24/money_banknote-server.png)}
+.pf-24.pf-user{background-image:url(24/user.png)}
+.pf-24.pf-save{background-image:url(24/save.png)}
+.pf-24.pf-user_symbol_blue-picture{background-image:url(24/user_symbol_blue-picture.png)}
+.pf-24.pf-info{background-image:url(24/info.png)}
+.pf-24.pf-search{background-image:url(24/search.png)}
+.pf-24.pf-stop{background-image:url(24/stop.png)}
+.pf-24.pf-sort_za{background-image:url(24/sort_za.png)}
+.pf-24.pf-sort_az{background-image:url(24/sort_az.png)}
+.pf-24.pf-slide-arrow_right{background-image:url(24/slide-arrow_right.png)}
+.pf-24.pf-slide-arrow_left{background-image:url(24/slide-arrow_left.png)}
+.pf-24.pf-view_options{background-image:url(24/view_options.png)}
+.pf-24.pf-warning{background-image:url(24/warning.png)}
+.pf-24.pf-help{background-image:url(24/help.png)}
+.pf-24.pf-ov_arrow_left{background-image:url(24/ov_arrow_left.png)}
+.pf-24.pf-ov_arrow_right{background-image:url(24/ov_arrow_right.png)}
+.pf-24.pf-ok_button{background-image:url(24/ok_button.png)}
+.pf-24.pf-ok{background-image:url(24/ok.png)}
+.pf-24.pf-ov_customer{background-image:url(24/ov_customer.png)}
+.pf-24.pf-ov_link{background-image:url(24/ov_link.png)}
+.pf-24.pf-ov_update{background-image:url(24/ov_update.png)}
+.pf-24.pf-add.pf-hot{background-image:url(24/hot/add.png)}
+.pf-24.pf-add_button.pf-hot{background-image:url(24/hot/add_button.png)}
+.pf-24.pf-address_book-design.pf-hot{background-image:url(24/hot/address_book-design.png)}
+.pf-24.pf-application-update.pf-hot{background-image:url(24/hot/application-update.png)}
+.pf-24.pf-accept_doc.pf-hot{background-image:url(24/hot/accept_doc.png)}
+.pf-24.pf-alert.pf-hot{background-image:url(24/hot/alert.png)}
+.pf-24.pf-arrow_down.pf-hot{background-image:url(24/hot/arrow_down.png)}
+.pf-24.pf-arrow_download.pf-hot{background-image:url(24/hot/arrow_download.png)}
+.pf-24.pf-arrow_left.pf-hot{background-image:url(24/hot/arrow_left.png)}
+.pf-24.pf-arrow_right.pf-hot{background-image:url(24/hot/arrow_right.png)}
+.pf-24.pf-bank.pf-hot{background-image:url(24/hot/bank.png)}
+.pf-24.pf-bank-update.pf-hot{background-image:url(24/hot/bank-update.png)}
+.pf-24.pf-bank-account.pf-hot{background-image:url(24/hot/bank-account.png)}
+.pf-24.pf-book.pf-hot{background-image:url(24/hot/book.png)}
+.pf-24.pf-bookmark-ok.pf-hot{background-image:url(24/hot/bookmark-ok.png)}
+.pf-24.pf-business_report.pf-hot{background-image:url(24/hot/business_report.png)}
+.pf-24.pf-calendar.pf-hot{background-image:url(24/hot/calendar.png)}
+.pf-24.pf-calendar-update.pf-hot{background-image:url(24/hot/calendar-update.png)}
+.pf-24.pf-currency_conversion.pf-hot{background-image:url(24/hot/currency_conversion.png)}
+.pf-24.pf-clock.pf-hot{background-image:url(24/hot/clock.png)}
+.pf-24.pf-database-arrow_right.pf-hot{background-image:url(24/hot/database-arrow_right.png)}
+.pf-24.pf-database-import.pf-hot{background-image:url(24/hot/database-import.png)}
+.pf-24.pf-delete_button_error.pf-hot{background-image:url(24/hot/delete_button_error.png)}
+.pf-24.pf-execute.pf-hot{background-image:url(24/hot/execute.png)}
+.pf-24.pf-exel.pf-hot{background-image:url(24/hot/exel.png)}
+.pf-24.pf-delete.pf-hot{background-image:url(24/hot/delete.png)}
+.pf-24.pf-document_header_footer-ok2.pf-hot{background-image:url(24/hot/document_header_footer-ok2.png)}
+.pf-24.pf-folder.pf-hot{background-image:url(24/hot/folder.png)}
+.pf-24.pf-folder_open.pf-hot{background-image:url(24/hot/folder_open.png)}
+.pf-24.pf-folder-execute.pf-hot{background-image:url(24/hot/folder-execute.png)}
+.pf-24.pf-folder_open-execute.pf-hot{background-image:url(24/hot/folder_open-execute.png)}
+.pf-24.pf-folder-favorite.pf-hot{background-image:url(24/hot/folder-favorite.png)}
+.pf-24.pf-folder_open-favorite.pf-hot{background-image:url(24/hot/folder_open-favorite.png)}
+.pf-24.pf-filter-ok.pf-hot{background-image:url(24/hot/filter-ok.png)}
+.pf-24.pf-filter-remove.pf-hot{background-image:url(24/hot/filter-remove.png)}
+.pf-24.pf-find.pf-hot{background-image:url(24/hot/find.png)}
+.pf-24.pf-gear.pf-hot{background-image:url(24/hot/gear.png)}
+.pf-24.pf-gears.pf-hot{background-image:url(24/hot/gears.png)}
+.pf-24.pf-help.pf-hot{background-image:url(24/hot/help.png)}
+.pf-24.pf-key.pf-hot{background-image:url(24/hot/key.png)}
+.pf-24.pf-link-info.pf-hot{background-image:url(24/hot/link-info.png)}
+.pf-24.pf-list-arrow_right.pf-hot{background-image:url(24/hot/list-arrow_right.png)}
+.pf-24.pf-list-ok.pf-hot{background-image:url(24/hot/list-ok.png)}
+.pf-24.pf-mail.pf-hot{background-image:url(24/hot/mail.png)}
+.pf-24.pf-mail-arrow_right.pf-hot{background-image:url(24/hot/mail-arrow_right.png)}
+.pf-24.pf-money.pf-hot{background-image:url(24/hot/money.png)}
+.pf-24.pf-phone.pf-hot{background-image:url(24/hot/phone.png)}
+.pf-24.pf-phone-ok.pf-hot{background-image:url(24/hot/phone-ok.png)}
+.pf-24.pf-phone-ok2.pf-hot{background-image:url(24/hot/phone-ok2.png)}
+.pf-24.pf-phone-error.pf-hot{background-image:url(24/hot/phone-error.png)}
+.pf-24.pf-percentage.pf-hot{background-image:url(24/hot/percentage.png)}
+.pf-24.pf-percentage_green.pf-hot{background-image:url(24/hot/percentage_green.png)}
+.pf-24.pf-percentage_red.pf-hot{background-image:url(24/hot/percentage_red.png)}
+.pf-24.pf-piece.pf-hot{background-image:url(24/hot/piece.png)}
+.pf-24.pf-print.pf-hot{background-image:url(24/hot/print.png)}
+.pf-24.pf-reload_rotate.pf-hot{background-image:url(24/hot/reload_rotate.png)}
+.pf-24.pf-report_open.pf-hot{background-image:url(24/hot/report_open.png)}
+.pf-24.pf-report_open-import.pf-hot{background-image:url(24/hot/report_open-import.png)}
+.pf-24.pf-table_column.pf-hot{background-image:url(24/hot/table_column.png)}
+.pf-24.pf-table.pf-hot{background-image:url(24/hot/table.png)}
+.pf-24.pf-table_row-add2.pf-hot{background-image:url(24/hot/table_row-add2.png)}
+.pf-24.pf-table_row-delete2.pf-hot{background-image:url(24/hot/table_row-delete2.png)}
+.pf-24.pf-tabs-export.pf-hot{background-image:url(24/hot/tabs-export.png)}
+.pf-24.pf-tool_pencil.pf-hot{background-image:url(24/hot/tool_pencil.png)}
+.pf-24.pf-tree.pf-hot{background-image:url(24/hot/tree.png)}
+.pf-24.pf-money_banknote-server.pf-hot{background-image:url(24/hot/money_banknote-server.png)}
+.pf-24.pf-user.pf-hot{background-image:url(24/hot/user.png)}
+.pf-24.pf-save.pf-hot{background-image:url(24/hot/save.png)}
+.pf-24.pf-user_symbol_blue-picture.pf-hot{background-image:url(24/hot/user_symbol_blue-picture.png)}
+.pf-24.pf-info.pf-hot{background-image:url(24/hot/info.png)}
+.pf-24.pf-search.pf-hot{background-image:url(24/hot/search.png)}
+.pf-24.pf-stop.pf-hot{background-image:url(24/hot/stop.png)}
+.pf-24.pf-sort_za.pf-hot{background-image:url(24/hot/sort_za.png)}
+.pf-24.pf-sort_az.pf-hot{background-image:url(24/hot/sort_az.png)}
+.pf-24.pf-slide-arrow_right.pf-hot{background-image:url(24/hot/slide-arrow_right.png)}
+.pf-24.pf-slide-arrow_left.pf-hot{background-image:url(24/hot/slide-arrow_left.png)}
+.pf-24.pf-view_options.pf-hot{background-image:url(24/hot/view_options.png)}
+.pf-24.pf-warning.pf-hot{background-image:url(24/hot/warning.png)}
+.pf-24.pf-help.pf-hot{background-image:url(24/hot/help.png)}
+.pf-24.pf-ov_arrow_left.pf-hot{background-image:url(24/hot/ov_arrow_left.png)}
+.pf-24.pf-ov_arrow_right.pf-hot{background-image:url(24/hot/ov_arrow_right.png)}
+.pf-24.pf-ok_button.pf-hot{background-image:url(24/hot/ok_button.png)}
+.pf-24.pf-ok.pf-hot{background-image:url(24/hot/ok.png)}
+.pf-24.pf-ov_customer.pf-hot{background-image:url(24/hot/ov_customer.png)}
+.pf-24.pf-ov_link.pf-hot{background-image:url(24/hot/ov_link.png)}
+.pf-24.pf-ov_update.pf-hot{background-image:url(24/hot/ov_update.png)}
+.disabled .pf-24.pf-add,.k-state-disabled .pf-24.pf-add,[disabled] .pf-24.pf-add,.pf-24.pf-add.pf-disabled{background-image:url(24/disabled/add.png)}
+.disabled .pf-24.pf-add_button,.k-state-disabled .pf-24.pf-add_button,[disabled] .pf-24.pf-add_button,.pf-24.pf-add_button.pf-disabled{background-image:url(24/disabled/add_button.png)}
+.disabled .pf-24.pf-address_book-design,.k-state-disabled .pf-24.pf-address_book-design,[disabled] .pf-24.pf-address_book-design,.pf-24.pf-address_book-design.pf-disabled{background-image:url(24/disabled/address_book-design.png)}
+.disabled .pf-24.pf-application-update,.k-state-disabled .pf-24.pf-application-update,[disabled] .pf-24.pf-application-update,.pf-24.pf-application-update.pf-disabled{background-image:url(24/disabled/application-update.png)}
+.disabled .pf-24.pf-accept_doc,.k-state-disabled .pf-24.pf-accept_doc,[disabled] .pf-24.pf-accept_doc,.pf-24.pf-accept_doc.pf-disabled{background-image:url(24/disabled/accept_doc.png)}
+.disabled .pf-24.pf-alert,.k-state-disabled .pf-24.pf-alert,[disabled] .pf-24.pf-alert,.pf-24.pf-alert.pf-disabled{background-image:url(24/disabled/alert.png)}
+.disabled .pf-24.pf-arrow_down,.k-state-disabled .pf-24.pf-arrow_down,[disabled] .pf-24.pf-arrow_down,.pf-24.pf-arrow_down.pf-disabled{background-image:url(24/disabled/arrow_down.png)}
+.disabled .pf-24.pf-arrow_download,.k-state-disabled .pf-24.pf-arrow_download,[disabled] .pf-24.pf-arrow_download,.pf-24.pf-arrow_download.pf-disabled{background-image:url(24/disabled/arrow_download.png)}
+.disabled .pf-24.pf-arrow_left,.k-state-disabled .pf-24.pf-arrow_left,[disabled] .pf-24.pf-arrow_left,.pf-24.pf-arrow_left.pf-disabled{background-image:url(24/disabled/arrow_left.png)}
+.disabled .pf-24.pf-arrow_right,.k-state-disabled .pf-24.pf-arrow_right,[disabled] .pf-24.pf-arrow_right,.pf-24.pf-arrow_right.pf-disabled{background-image:url(24/disabled/arrow_right.png)}
+.disabled .pf-24.pf-bank,.k-state-disabled .pf-24.pf-bank,[disabled] .pf-24.pf-bank,.pf-24.pf-bank.pf-disabled{background-image:url(24/disabled/bank.png)}
+.disabled .pf-24.pf-bank-update,.k-state-disabled .pf-24.pf-bank-update,[disabled] .pf-24.pf-bank-update,.pf-24.pf-bank-update.pf-disabled{background-image:url(24/disabled/bank-update.png)}
+.disabled .pf-24.pf-bank-account,.k-state-disabled .pf-24.pf-bank-account,[disabled] .pf-24.pf-bank-account,.pf-24.pf-bank-account.pf-disabled{background-image:url(24/disabled/bank-account.png)}
+.disabled .pf-24.pf-book,.k-state-disabled .pf-24.pf-book,[disabled] .pf-24.pf-book,.pf-24.pf-book.pf-disabled{background-image:url(24/disabled/book.png)}
+.disabled .pf-24.pf-bookmark-ok,.k-state-disabled .pf-24.pf-bookmark-ok,[disabled] .pf-24.pf-bookmark-ok,.pf-24.pf-bookmark-ok.pf-disabled{background-image:url(24/disabled/bookmark-ok.png)}
+.disabled .pf-24.pf-business_report,.k-state-disabled .pf-24.pf-business_report,[disabled] .pf-24.pf-business_report,.pf-24.pf-business_report.pf-disabled{background-image:url(24/disabled/business_report.png)}
+.disabled .pf-24.pf-calendar,.k-state-disabled .pf-24.pf-calendar,[disabled] .pf-24.pf-calendar,.pf-24.pf-calendar.pf-disabled{background-image:url(24/disabled/calendar.png)}
+.disabled .pf-24.pf-calendar-update,.k-state-disabled .pf-24.pf-calendar-update,[disabled] .pf-24.pf-calendar-update,.pf-24.pf-calendar-update.pf-disabled{background-image:url(24/disabled/calendar-update.png)}
+.disabled .pf-24.pf-currency_conversion,.k-state-disabled .pf-24.pf-currency_conversion,[disabled] .pf-24.pf-currency_conversion,.pf-24.pf-currency_conversion.pf-disabled{background-image:url(24/disabled/currency_conversion.png)}
+.disabled .pf-24.pf-clock,.k-state-disabled .pf-24.pf-clock,[disabled] .pf-24.pf-clock,.pf-24.pf-clock.pf-disabled{background-image:url(24/disabled/clock.png)}
+.disabled .pf-24.pf-database-arrow_right,.k-state-disabled .pf-24.pf-database-arrow_right,[disabled] .pf-24.pf-database-arrow_right,.pf-24.pf-database-arrow_right.pf-disabled{background-image:url(24/disabled/database-arrow_right.png)}
+.disabled .pf-24.pf-database-import,.k-state-disabled .pf-24.pf-database-import,[disabled] .pf-24.pf-database-import,.pf-24.pf-database-import.pf-disabled{background-image:url(24/disabled/database-import.png)}
+.disabled .pf-24.pf-delete_button_error,.k-state-disabled .pf-24.pf-delete_button_error,[disabled] .pf-24.pf-delete_button_error,.pf-24.pf-delete_button_error.pf-disabled{background-image:url(24/disabled/delete_button_error.png)}
+.disabled .pf-24.pf-execute,.k-state-disabled .pf-24.pf-execute,[disabled] .pf-24.pf-execute,.pf-24.pf-execute.pf-disabled{background-image:url(24/disabled/execute.png)}
+.disabled .pf-24.pf-exel,.k-state-disabled .pf-24.pf-exel,[disabled] .pf-24.pf-exel,.pf-24.pf-exel.pf-disabled{background-image:url(24/disabled/exel.png)}
+.disabled .pf-24.pf-delete,.k-state-disabled .pf-24.pf-delete,[disabled] .pf-24.pf-delete,.pf-24.pf-delete.pf-disabled{background-image:url(24/disabled/delete.png)}
+.disabled .pf-24.pf-document_header_footer-ok2,.k-state-disabled .pf-24.pf-document_header_footer-ok2,[disabled] .pf-24.pf-document_header_footer-ok2,.pf-24.pf-document_header_footer-ok2.pf-disabled{background-image:url(24/disabled/document_header_footer-ok2.png)}
+.disabled .pf-24.pf-folder,.k-state-disabled .pf-24.pf-folder,[disabled] .pf-24.pf-folder,.pf-24.pf-folder.pf-disabled{background-image:url(24/disabled/folder.png)}
+.disabled .pf-24.pf-folder_open,.k-state-disabled .pf-24.pf-folder_open,[disabled] .pf-24.pf-folder_open,.pf-24.pf-folder_open.pf-disabled{background-image:url(24/disabled/folder_open.png)}
+.disabled .pf-24.pf-folder-execute,.k-state-disabled .pf-24.pf-folder-execute,[disabled] .pf-24.pf-folder-execute,.pf-24.pf-folder-execute.pf-disabled{background-image:url(24/disabled/folder-execute.png)}
+.disabled .pf-24.pf-folder_open-execute,.k-state-disabled .pf-24.pf-folder_open-execute,[disabled] .pf-24.pf-folder_open-execute,.pf-24.pf-folder_open-execute.pf-disabled{background-image:url(24/disabled/folder_open-execute.png)}
+.disabled .pf-24.pf-folder-favorite,.k-state-disabled .pf-24.pf-folder-favorite,[disabled] .pf-24.pf-folder-favorite,.pf-24.pf-folder-favorite.pf-disabled{background-image:url(24/disabled/folder-favorite.png)}
+.disabled .pf-24.pf-folder_open-favorite,.k-state-disabled .pf-24.pf-folder_open-favorite,[disabled] .pf-24.pf-folder_open-favorite,.pf-24.pf-folder_open-favorite.pf-disabled{background-image:url(24/disabled/folder_open-favorite.png)}
+.disabled .pf-24.pf-filter-ok,.k-state-disabled .pf-24.pf-filter-ok,[disabled] .pf-24.pf-filter-ok,.pf-24.pf-filter-ok.pf-disabled{background-image:url(24/disabled/filter-ok.png)}
+.disabled .pf-24.pf-filter-remove,.k-state-disabled .pf-24.pf-filter-remove,[disabled] .pf-24.pf-filter-remove,.pf-24.pf-filter-remove.pf-disabled{background-image:url(24/disabled/filter-remove.png)}
+.disabled .pf-24.pf-find,.k-state-disabled .pf-24.pf-find,[disabled] .pf-24.pf-find,.pf-24.pf-find.pf-disabled{background-image:url(24/disabled/find.png)}
+.disabled .pf-24.pf-gear,.k-state-disabled .pf-24.pf-gear,[disabled] .pf-24.pf-gear,.pf-24.pf-gear.pf-disabled{background-image:url(24/disabled/gear.png)}
+.disabled .pf-24.pf-gears,.k-state-disabled .pf-24.pf-gears,[disabled] .pf-24.pf-gears,.pf-24.pf-gears.pf-disabled{background-image:url(24/disabled/gears.png)}
+.disabled .pf-24.pf-help,.k-state-disabled .pf-24.pf-help,[disabled] .pf-24.pf-help,.pf-24.pf-help.pf-disabled{background-image:url(24/disabled/help.png)}
+.disabled .pf-24.pf-key,.k-state-disabled .pf-24.pf-key,[disabled] .pf-24.pf-key,.pf-24.pf-key.pf-disabled{background-image:url(24/disabled/key.png)}
+.disabled .pf-24.pf-link-info,.k-state-disabled .pf-24.pf-link-info,[disabled] .pf-24.pf-link-info,.pf-24.pf-link-info.pf-disabled{background-image:url(24/disabled/link-info.png)}
+.disabled .pf-24.pf-list-arrow_right,.k-state-disabled .pf-24.pf-list-arrow_right,[disabled] .pf-24.pf-list-arrow_right,.pf-24.pf-list-arrow_right.pf-disabled{background-image:url(24/disabled/list-arrow_right.png)}
+.disabled .pf-24.pf-list-ok,.k-state-disabled .pf-24.pf-list-ok,[disabled] .pf-24.pf-list-ok,.pf-24.pf-list-ok.pf-disabled{background-image:url(24/disabled/list-ok.png)}
+.disabled .pf-24.pf-mail,.k-state-disabled .pf-24.pf-mail,[disabled] .pf-24.pf-mail,.pf-24.pf-mail.pf-disabled{background-image:url(24/disabled/mail.png)}
+.disabled .pf-24.pf-mail-arrow_right,.k-state-disabled .pf-24.pf-mail-arrow_right,[disabled] .pf-24.pf-mail-arrow_right,.pf-24.pf-mail-arrow_right.pf-disabled{background-image:url(24/disabled/mail-arrow_right.png)}
+.disabled .pf-24.pf-money,.k-state-disabled .pf-24.pf-money,[disabled] .pf-24.pf-money,.pf-24.pf-money.pf-disabled{background-image:url(24/disabled/money.png)}
+.disabled .pf-24.pf-phone,.k-state-disabled .pf-24.pf-phone,[disabled] .pf-24.pf-phone,.pf-24.pf-phone.pf-disabled{background-image:url(24/disabled/phone.png)}
+.disabled .pf-24.pf-phone-ok,.k-state-disabled .pf-24.pf-phone-ok,[disabled] .pf-24.pf-phone-ok,.pf-24.pf-phone-ok.pf-disabled{background-image:url(24/disabled/phone-ok.png)}
+.disabled .pf-24.pf-phone-ok2,.k-state-disabled .pf-24.pf-phone-ok2,[disabled] .pf-24.pf-phone-ok2,.pf-24.pf-phone-ok2.pf-disabled{background-image:url(24/disabled/phone-ok2.png)}
+.disabled .pf-24.pf-phone-error,.k-state-disabled .pf-24.pf-phone-error,[disabled] .pf-24.pf-phone-error,.pf-24.pf-phone-error.pf-disabled{background-image:url(24/disabled/phone-error.png)}
+.disabled .pf-24.pf-percentage,.k-state-disabled .pf-24.pf-percentage,[disabled] .pf-24.pf-percentage,.pf-24.pf-percentage.pf-disabled{background-image:url(24/disabled/percentage.png)}
+.disabled .pf-24.pf-percentage_green,.k-state-disabled .pf-24.pf-percentage_green,[disabled] .pf-24.pf-percentage_green,.pf-24.pf-percentage_green.pf-disabled{background-image:url(24/disabled/percentage_green.png)}
+.disabled .pf-24.pf-percentage_red,.k-state-disabled .pf-24.pf-percentage_red,[disabled] .pf-24.pf-percentage_red,.pf-24.pf-percentage_red.pf-disabled{background-image:url(24/disabled/percentage_red.png)}
+.disabled .pf-24.pf-piece,.k-state-disabled .pf-24.pf-piece,[disabled] .pf-24.pf-piece,.pf-24.pf-piece.pf-disabled{background-image:url(24/disabled/piece.png)}
+.disabled .pf-24.pf-print,.k-state-disabled .pf-24.pf-print,[disabled] .pf-24.pf-print,.pf-24.pf-print.pf-disabled{background-image:url(24/disabled/print.png)}
+.disabled .pf-24.pf-reload_rotate,.k-state-disabled .pf-24.pf-reload_rotate,[disabled] .pf-24.pf-reload_rotate,.pf-24.pf-reload_rotate.pf-disabled{background-image:url(24/disabled/reload_rotate.png)}
+.disabled .pf-24.pf-report_open,.k-state-disabled .pf-24.pf-report_open,[disabled] .pf-24.pf-report_open,.pf-24.pf-report_open.pf-disabled{background-image:url(24/disabled/report_open.png)}
+.disabled .pf-24.pf-report_open-import,.k-state-disabled .pf-24.pf-report_open-import,[disabled] .pf-24.pf-report_open-import,.pf-24.pf-report_open-import.pf-disabled{background-image:url(24/disabled/report_open-import.png)}
+.disabled .pf-24.pf-table_column,.k-state-disabled .pf-24.pf-table_column,[disabled] .pf-24.pf-table_column,.pf-24.pf-table_column.pf-disabled{background-image:url(24/disabled/table_column.png)}
+.disabled .pf-24.pf-table,.k-state-disabled .pf-24.pf-table,[disabled] .pf-24.pf-table,.pf-24.pf-table.pf-disabled{background-image:url(24/disabled/table.png)}
+.disabled .pf-24.pf-table_row-add2,.k-state-disabled .pf-24.pf-table_row-add2,[disabled] .pf-24.pf-table_row-add2,.pf-24.pf-table_row-add2.pf-disabled{background-image:url(24/disabled/table_row-add2.png)}
+.disabled .pf-24.pf-table_row-delete2,.k-state-disabled .pf-24.pf-table_row-delete2,[disabled] .pf-24.pf-table_row-delete2,.pf-24.pf-table_row-delete2.pf-disabled{background-image:url(24/disabled/table_row-delete2.png)}
+.disabled .pf-24.pf-tabs-export,.k-state-disabled .pf-24.pf-tabs-export,[disabled] .pf-24.pf-tabs-export,.pf-24.pf-tabs-export.pf-disabled{background-image:url(24/disabled/tabs-export.png)}
+.disabled .pf-24.pf-tool_pencil,.k-state-disabled .pf-24.pf-tool_pencil,[disabled] .pf-24.pf-tool_pencil,.pf-24.pf-tool_pencil.pf-disabled{background-image:url(24/disabled/tool_pencil.png)}
+.disabled .pf-24.pf-tree,.k-state-disabled .pf-24.pf-tree,[disabled] .pf-24.pf-tree,.pf-24.pf-tree.pf-disabled{background-image:url(24/disabled/tree.png)}
+.disabled .pf-24.pf-money_banknote-server,.k-state-disabled .pf-24.pf-money_banknote-server,[disabled] .pf-24.pf-money_banknote-server,.pf-24.pf-money_banknote-server.pf-disabled{background-image:url(24/disabled/money_banknote-server.png)}
+.disabled .pf-24.pf-user,.k-state-disabled .pf-24.pf-user,[disabled] .pf-24.pf-user,.pf-24.pf-user.pf-disabled{background-image:url(24/disabled/user.png)}
+.disabled .pf-24.pf-save,.k-state-disabled .pf-24.pf-save,[disabled] .pf-24.pf-save,.pf-24.pf-save.pf-disabled{background-image:url(24/disabled/save.png)}
+.disabled .pf-24.pf-user_symbol_blue-picture,.k-state-disabled .pf-24.pf-user_symbol_blue-picture,[disabled] .pf-24.pf-user_symbol_blue-picture,.pf-24.pf-user_symbol_blue-picture.pf-disabled{background-image:url(24/disabled/user_symbol_blue-picture.png)}
+.disabled .pf-24.pf-info,.k-state-disabled .pf-24.pf-info,[disabled] .pf-24.pf-info,.pf-24.pf-info.pf-disabled{background-image:url(24/disabled/info.png)}
+.disabled .pf-24.pf-search,.k-state-disabled .pf-24.pf-search,[disabled] .pf-24.pf-search,.pf-24.pf-search.pf-disabled{background-image:url(24/disabled/search.png)}
+.disabled .pf-24.pf-stop,.k-state-disabled .pf-24.pf-stop,[disabled] .pf-24.pf-stop,.pf-24.pf-stop.pf-disabled{background-image:url(24/disabled/stop.png)}
+.disabled .pf-24.pf-sort_za,.k-state-disabled .pf-24.pf-sort_za,[disabled] .pf-24.pf-sort_za,.pf-24.pf-sort_za.pf-disabled{background-image:url(24/disabled/sort_za.png)}
+.disabled .pf-24.pf-sort_az,.k-state-disabled .pf-24.pf-sort_az,[disabled] .pf-24.pf-sort_az,.pf-24.pf-sort_az.pf-disabled{background-image:url(24/disabled/sort_az.png)}
+.disabled .pf-24.pf-slide-arrow_right,.k-state-disabled .pf-24.pf-slide-arrow_right,[disabled] .pf-24.pf-slide-arrow_right,.pf-24.pf-slide-arrow_right.pf-disabled{background-image:url(24/disabled/slide-arrow_right.png)}
+.disabled .pf-24.pf-slide-arrow_left,.k-state-disabled .pf-24.pf-slide-arrow_left,[disabled] .pf-24.pf-slide-arrow_left,.pf-24.pf-slide-arrow_left.pf-disabled{background-image:url(24/disabled/slide-arrow_left.png)}
+.disabled .pf-24.pf-view_options,.k-state-disabled .pf-24.pf-view_options,[disabled] .pf-24.pf-view_options,.pf-24.pf-view_options.pf-disabled{background-image:url(24/disabled/view_options.png)}
+.disabled .pf-24.pf-warning,.k-state-disabled .pf-24.pf-warning,[disabled] .pf-24.pf-warning,.pf-24.pf-warning.pf-disabled{background-image:url(24/disabled/warning.png)}
+.disabled .pf-24.pf-help,.k-state-disabled .pf-24.pf-help,[disabled] .pf-24.pf-help,.pf-24.pf-help.pf-disabled{background-image:url(24/disabled/help.png)}
+.disabled .pf-24.pf-ov_arrow_left,.k-state-disabled .pf-24.pf-ov_arrow_left,[disabled] .pf-24.pf-ov_arrow_left,.pf-24.pf-ov_arrow_left.pf-disabled{background-image:url(24/disabled/ov_arrow_left.png)}
+.disabled .pf-24.pf-ov_arrow_right,.k-state-disabled .pf-24.pf-ov_arrow_right,[disabled] .pf-24.pf-ov_arrow_right,.pf-24.pf-ov_arrow_right.pf-disabled{background-image:url(24/disabled/ov_arrow_right.png)}
+.disabled .pf-24.pf-ok_button,.k-state-disabled .pf-24.pf-ok_button,[disabled] .pf-24.pf-ok_button,.pf-24.pf-ok_button.pf-disabled{background-image:url(24/disabled/ok_button.png)}
+.disabled .pf-24.pf-ok,.k-state-disabled .pf-24.pf-ok,[disabled] .pf-24.pf-ok,.pf-24.pf-ok.pf-disabled{background-image:url(24/disabled/ok.png)}
+.disabled .pf-24.pf-ov_customer,.k-state-disabled .pf-24.pf-ov_customer,[disabled] .pf-24.pf-ov_customer,.pf-24.pf-ov_customer.pf-disabled{background-image:url(24/disabled/ov_customer.png)}
+.disabled .pf-24.pf-ov_link,.k-state-disabled .pf-24.pf-ov_link,[disabled] .pf-24.pf-ov_link,.pf-24.pf-ov_link.pf-disabled{background-image:url(24/disabled/ov_link.png)}
+.disabled .pf-24.pf-ov_update,.k-state-disabled .pf-24.pf-ov_update,[disabled] .pf-24.pf-ov_update,.pf-24.pf-ov_update.pf-disabled{background-image:url(24/disabled/ov_update.png)}
+/*==========32==========*/
+.pf-32{width:32px;height:32px}
+.pf-32.pf-add{background-image:url(32/add.png)}
+.pf-32.pf-add_button{background-image:url(32/add_button.png)}
+.pf-32.pf-address_book-design{background-image:url(32/address_book-design.png)}
+.pf-32.pf-application-update{background-image:url(32/application-update.png)}
+.pf-32.pf-accept_doc{background-image:url(32/accept_doc.png)}
+.pf-32.pf-alert{background-image:url(32/alert.png)}
+.pf-32.pf-arrow_down{background-image:url(32/arrow_down.png)}
+.pf-32.pf-arrow_download{background-image:url(32/arrow_download.png)}
+.pf-32.pf-arrow_left{background-image:url(32/arrow_left.png)}
+.pf-32.pf-arrow_right{background-image:url(32/arrow_right.png)}
+.pf-32.pf-bank{background-image:url(32/bank.png)}
+.pf-32.pf-bank-update{background-image:url(32/bank-update.png)}
+.pf-32.pf-bank-account{background-image:url(32/bank-account.png)}
+.pf-32.pf-book{background-image:url(32/book.png)}
+.pf-32.pf-bookmark-ok{background-image:url(32/bookmark-ok.png)}
+.pf-32.pf-business_report{background-image:url(32/business_report.png)}
+.pf-32.pf-calendar{background-image:url(32/calendar.png)}
+.pf-32.pf-calendar-update{background-image:url(32/calendar-update.png)}
+.pf-32.pf-currency_conversion{background-image:url(32/currency_conversion.png)}
+.pf-32.pf-clock{background-image:url(32/clock.png)}
+.pf-32.pf-database-arrow_right{background-image:url(32/database-arrow_right.png)}
+.pf-32.pf-database-import{background-image:url(32/database-import.png)}
+.pf-32.pf-delete_button_error{background-image:url(32/delete_button_error.png)}
+.pf-32.pf-execute{background-image:url(32/execute.png)}
+.pf-32.pf-exel{background-image:url(32/exel.png)}
+.pf-32.pf-delete{background-image:url(32/delete.png)}
+.pf-32.pf-document_header_footer-ok2{background-image:url(32/document_header_footer-ok2.png)}
+.pf-32.pf-folder{background-image:url(32/folder.png)}
+.pf-32.pf-folder_open{background-image:url(32/folder_open.png)}
+.pf-32.pf-folder-execute{background-image:url(32/folder-execute.png)}
+.pf-32.pf-folder_open-execute{background-image:url(32/folder_open-execute.png)}
+.pf-32.pf-folder-favorite{background-image:url(32/folder-favorite.png)}
+.pf-32.pf-folder_open-favorite{background-image:url(32/folder_open-favorite.png)}
+.pf-32.pf-filter-ok{background-image:url(32/filter-ok.png)}
+.pf-32.pf-filter-remove{background-image:url(32/filter-remove.png)}
+.pf-32.pf-find{background-image:url(32/find.png)}
+.pf-32.pf-gear{background-image:url(32/gear.png)}
+.pf-32.pf-gears{background-image:url(32/gears.png)}
+.pf-32.pf-help{background-image:url(32/help.png)}
+.pf-32.pf-key{background-image:url(32/key.png)}
+.pf-32.pf-link-info{background-image:url(32/link-info.png)}
+.pf-32.pf-list-arrow_right{background-image:url(32/list-arrow_right.png)}
+.pf-32.pf-list-ok{background-image:url(32/list-ok.png)}
+.pf-32.pf-mail{background-image:url(32/mail.png)}
+.pf-32.pf-mail-arrow_right{background-image:url(32/mail-arrow_right.png)}
+.pf-32.pf-money{background-image:url(32/money.png)}
+.pf-32.pf-phone{background-image:url(32/phone.png)}
+.pf-32.pf-phone-ok{background-image:url(32/phone-ok.png)}
+.pf-32.pf-phone-ok2{background-image:url(32/phone-ok2.png)}
+.pf-32.pf-phone-error{background-image:url(32/phone-error.png)}
+.pf-32.pf-percentage{background-image:url(32/percentage.png)}
+.pf-32.pf-percentage_green{background-image:url(32/percentage_green.png)}
+.pf-32.pf-percentage_red{background-image:url(32/percentage_red.png)}
+.pf-32.pf-piece{background-image:url(32/piece.png)}
+.pf-32.pf-print{background-image:url(32/print.png)}
+.pf-32.pf-reload_rotate{background-image:url(32/reload_rotate.png)}
+.pf-32.pf-report_open{background-image:url(32/report_open.png)}
+.pf-32.pf-report_open-import{background-image:url(32/report_open-import.png)}
+.pf-32.pf-table_column{background-image:url(32/table_column.png)}
+.pf-32.pf-table{background-image:url(32/table.png)}
+.pf-32.pf-table_row-add2{background-image:url(32/table_row-add2.png)}
+.pf-32.pf-table_row-delete2{background-image:url(32/table_row-delete2.png)}
+.pf-32.pf-tabs-export{background-image:url(32/tabs-export.png)}
+.pf-32.pf-tool_pencil{background-image:url(32/tool_pencil.png)}
+.pf-32.pf-tree{background-image:url(32/tree.png)}
+.pf-32.pf-money_banknote-server{background-image:url(32/money_banknote-server.png)}
+.pf-32.pf-user{background-image:url(32/user.png)}
+.pf-32.pf-save{background-image:url(32/save.png)}
+.pf-32.pf-user_symbol_blue-picture{background-image:url(32/user_symbol_blue-picture.png)}
+.pf-32.pf-info{background-image:url(32/info.png)}
+.pf-32.pf-search{background-image:url(32/search.png)}
+.pf-32.pf-stop{background-image:url(32/stop.png)}
+.pf-32.pf-sort_za{background-image:url(32/sort_za.png)}
+.pf-32.pf-sort_az{background-image:url(32/sort_az.png)}
+.pf-32.pf-slide-arrow_right{background-image:url(32/slide-arrow_right.png)}
+.pf-32.pf-slide-arrow_left{background-image:url(32/slide-arrow_left.png)}
+.pf-32.pf-view_options{background-image:url(32/view_options.png)}
+.pf-32.pf-warning{background-image:url(32/warning.png)}
+.pf-32.pf-help{background-image:url(32/help.png)}
+.pf-32.pf-ov_arrow_left{background-image:url(32/ov_arrow_left.png)}
+.pf-32.pf-ov_arrow_right{background-image:url(32/ov_arrow_right.png)}
+.pf-32.pf-ok_button{background-image:url(32/ok_button.png)}
+.pf-32.pf-ok{background-image:url(32/ok.png)}
+.pf-32.pf-ov_customer{background-image:url(32/ov_customer.png)}
+.pf-32.pf-ov_link{background-image:url(32/ov_link.png)}
+.pf-32.pf-ov_update{background-image:url(32/ov_update.png)}
+.pf-32.pf-add.pf-hot{background-image:url(32/hot/add.png)}
+.pf-32.pf-add_button.pf-hot{background-image:url(32/hot/add_button.png)}
+.pf-32.pf-address_book-design.pf-hot{background-image:url(32/hot/address_book-design.png)}
+.pf-32.pf-application-update.pf-hot{background-image:url(32/hot/application-update.png)}
+.pf-32.pf-accept_doc.pf-hot{background-image:url(32/hot/accept_doc.png)}
+.pf-32.pf-alert.pf-hot{background-image:url(32/hot/alert.png)}
+.pf-32.pf-arrow_down.pf-hot{background-image:url(32/hot/arrow_down.png)}
+.pf-32.pf-arrow_download.pf-hot{background-image:url(32/hot/arrow_download.png)}
+.pf-32.pf-arrow_left.pf-hot{background-image:url(32/hot/arrow_left.png)}
+.pf-32.pf-arrow_right.pf-hot{background-image:url(32/hot/arrow_right.png)}
+.pf-32.pf-bank.pf-hot{background-image:url(32/hot/bank.png)}
+.pf-32.pf-bank-update.pf-hot{background-image:url(32/hot/bank-update.png)}
+.pf-32.pf-bank-account.pf-hot{background-image:url(32/hot/bank-account.png)}
+.pf-32.pf-book.pf-hot{background-image:url(32/hot/book.png)}
+.pf-32.pf-bookmark-ok.pf-hot{background-image:url(32/hot/bookmark-ok.png)}
+.pf-32.pf-business_report.pf-hot{background-image:url(32/hot/business_report.png)}
+.pf-32.pf-calendar.pf-hot{background-image:url(32/hot/calendar.png)}
+.pf-32.pf-calendar-update.pf-hot{background-image:url(32/hot/calendar-update.png)}
+.pf-32.pf-currency_conversion.pf-hot{background-image:url(32/hot/currency_conversion.png)}
+.pf-32.pf-clock.pf-hot{background-image:url(32/hot/clock.png)}
+.pf-32.pf-database-arrow_right.pf-hot{background-image:url(32/hot/database-arrow_right.png)}
+.pf-32.pf-database-import.pf-hot{background-image:url(32/hot/database-import.png)}
+.pf-32.pf-delete_button_error.pf-hot{background-image:url(32/hot/delete_button_error.png)}
+.pf-32.pf-execute.pf-hot{background-image:url(32/hot/execute.png)}
+.pf-32.pf-exel.pf-hot{background-image:url(32/hot/exel.png)}
+.pf-32.pf-delete.pf-hot{background-image:url(32/hot/delete.png)}
+.pf-32.pf-document_header_footer-ok2.pf-hot{background-image:url(32/hot/document_header_footer-ok2.png)}
+.pf-32.pf-folder.pf-hot{background-image:url(32/hot/folder.png)}
+.pf-32.pf-folder_open.pf-hot{background-image:url(32/hot/folder_open.png)}
+.pf-32.pf-folder-execute.pf-hot{background-image:url(32/hot/folder-execute.png)}
+.pf-32.pf-folder_open-execute.pf-hot{background-image:url(32/hot/folder_open-execute.png)}
+.pf-32.pf-folder-favorite.pf-hot{background-image:url(32/hot/folder-favorite.png)}
+.pf-32.pf-folder_open-favorite.pf-hot{background-image:url(32/hot/folder_open-favorite.png)}
+.pf-32.pf-filter-ok.pf-hot{background-image:url(32/hot/filter-ok.png)}
+.pf-32.pf-filter-remove.pf-hot{background-image:url(32/hot/filter-remove.png)}
+.pf-32.pf-find.pf-hot{background-image:url(32/hot/find.png)}
+.pf-32.pf-gear.pf-hot{background-image:url(32/hot/gear.png)}
+.pf-32.pf-gears.pf-hot{background-image:url(32/hot/gears.png)}
+.pf-32.pf-help.pf-hot{background-image:url(32/hot/help.png)}
+.pf-32.pf-key.pf-hot{background-image:url(32/hot/key.png)}
+.pf-32.pf-link-info.pf-hot{background-image:url(32/hot/link-info.png)}
+.pf-32.pf-list-arrow_right.pf-hot{background-image:url(32/hot/list-arrow_right.png)}
+.pf-32.pf-list-ok.pf-hot{background-image:url(32/hot/list-ok.png)}
+.pf-32.pf-mail.pf-hot{background-image:url(32/hot/mail.png)}
+.pf-32.pf-mail-arrow_right.pf-hot{background-image:url(32/hot/mail-arrow_right.png)}
+.pf-32.pf-money.pf-hot{background-image:url(32/hot/money.png)}
+.pf-32.pf-phone.pf-hot{background-image:url(32/hot/phone.png)}
+.pf-32.pf-phone-ok.pf-hot{background-image:url(32/hot/phone-ok.png)}
+.pf-32.pf-phone-ok2.pf-hot{background-image:url(32/hot/phone-ok2.png)}
+.pf-32.pf-phone-error.pf-hot{background-image:url(32/hot/phone-error.png)}
+.pf-32.pf-percentage.pf-hot{background-image:url(32/hot/percentage.png)}
+.pf-32.pf-percentage_green.pf-hot{background-image:url(32/hot/percentage_green.png)}
+.pf-32.pf-percentage_red.pf-hot{background-image:url(32/hot/percentage_red.png)}
+.pf-32.pf-piece.pf-hot{background-image:url(32/hot/piece.png)}
+.pf-32.pf-print.pf-hot{background-image:url(32/hot/print.png)}
+.pf-32.pf-reload_rotate.pf-hot{background-image:url(32/hot/reload_rotate.png)}
+.pf-32.pf-report_open.pf-hot{background-image:url(32/hot/report_open.png)}
+.pf-32.pf-report_open-import.pf-hot{background-image:url(32/hot/report_open-import.png)}
+.pf-32.pf-table_column.pf-hot{background-image:url(32/hot/table_column.png)}
+.pf-32.pf-table.pf-hot{background-image:url(32/hot/table.png)}
+.pf-32.pf-table_row-add2.pf-hot{background-image:url(32/hot/table_row-add2.png)}
+.pf-32.pf-table_row-delete2.pf-hot{background-image:url(32/hot/table_row-delete2.png)}
+.pf-32.pf-tabs-export.pf-hot{background-image:url(32/hot/tabs-export.png)}
+.pf-32.pf-tool_pencil.pf-hot{background-image:url(32/hot/tool_pencil.png)}
+.pf-32.pf-tree.pf-hot{background-image:url(32/hot/tree.png)}
+.pf-32.pf-money_banknote-server.pf-hot{background-image:url(32/hot/money_banknote-server.png)}
+.pf-32.pf-user.pf-hot{background-image:url(32/hot/user.png)}
+.pf-32.pf-save.pf-hot{background-image:url(32/hot/save.png)}
+.pf-32.pf-user_symbol_blue-picture.pf-hot{background-image:url(32/hot/user_symbol_blue-picture.png)}
+.pf-32.pf-info.pf-hot{background-image:url(32/hot/info.png)}
+.pf-32.pf-search.pf-hot{background-image:url(32/hot/search.png)}
+.pf-32.pf-stop.pf-hot{background-image:url(32/hot/stop.png)}
+.pf-32.pf-sort_za.pf-hot{background-image:url(32/hot/sort_za.png)}
+.pf-32.pf-sort_az.pf-hot{background-image:url(32/hot/sort_az.png)}
+.pf-32.pf-slide-arrow_right.pf-hot{background-image:url(32/hot/slide-arrow_right.png)}
+.pf-32.pf-slide-arrow_left.pf-hot{background-image:url(32/hot/slide-arrow_left.png)}
+.pf-32.pf-view_options.pf-hot{background-image:url(32/hot/view_options.png)}
+.pf-32.pf-warning.pf-hot{background-image:url(32/hot/warning.png)}
+.pf-32.pf-help.pf-hot{background-image:url(32/hot/help.png)}
+.pf-32.pf-ov_arrow_left.pf-hot{background-image:url(32/hot/ov_arrow_left.png)}
+.pf-32.pf-ov_arrow_right.pf-hot{background-image:url(32/hot/ov_arrow_right.png)}
+.pf-32.pf-ok_button.pf-hot{background-image:url(32/hot/ok_button.png)}
+.pf-32.pf-ok.pf-hot{background-image:url(32/hot/ok.png)}
+.pf-32.pf-ov_customer.pf-hot{background-image:url(32/hot/ov_customer.png)}
+.pf-32.pf-ov_link.pf-hot{background-image:url(32/hot/ov_link.png)}
+.pf-32.pf-ov_update.pf-hot{background-image:url(32/hot/ov_update.png)}
+.disabled .pf-32.pf-add,.k-state-disabled .pf-32.pf-add,[disabled] .pf-32.pf-add,.pf-32.pf-add.pf-disabled{background-image:url(32/disabled/add.png)}
+.disabled .pf-32.pf-add_button,.k-state-disabled .pf-32.pf-add_button,[disabled] .pf-32.pf-add_button,.pf-32.pf-add_button.pf-disabled{background-image:url(32/disabled/add_button.png)}
+.disabled .pf-32.pf-address_book-design,.k-state-disabled .pf-32.pf-address_book-design,[disabled] .pf-32.pf-address_book-design,.pf-32.pf-address_book-design.pf-disabled{background-image:url(32/disabled/address_book-design.png)}
+.disabled .pf-32.pf-application-update,.k-state-disabled .pf-32.pf-application-update,[disabled] .pf-32.pf-application-update,.pf-32.pf-application-update.pf-disabled{background-image:url(32/disabled/application-update.png)}
+.disabled .pf-32.pf-accept_doc,.k-state-disabled .pf-32.pf-accept_doc,[disabled] .pf-32.pf-accept_doc,.pf-32.pf-accept_doc.pf-disabled{background-image:url(32/disabled/accept_doc.png)}
+.disabled .pf-32.pf-alert,.k-state-disabled .pf-32.pf-alert,[disabled] .pf-32.pf-alert,.pf-32.pf-alert.pf-disabled{background-image:url(32/disabled/alert.png)}
+.disabled .pf-32.pf-arrow_down,.k-state-disabled .pf-32.pf-arrow_down,[disabled] .pf-32.pf-arrow_down,.pf-32.pf-arrow_down.pf-disabled{background-image:url(32/disabled/arrow_down.png)}
+.disabled .pf-32.pf-arrow_download,.k-state-disabled .pf-32.pf-arrow_download,[disabled] .pf-32.pf-arrow_download,.pf-32.pf-arrow_download.pf-disabled{background-image:url(32/disabled/arrow_download.png)}
+.disabled .pf-32.pf-arrow_left,.k-state-disabled .pf-32.pf-arrow_left,[disabled] .pf-32.pf-arrow_left,.pf-32.pf-arrow_left.pf-disabled{background-image:url(32/disabled/arrow_left.png)}
+.disabled .pf-32.pf-arrow_right,.k-state-disabled .pf-32.pf-arrow_right,[disabled] .pf-32.pf-arrow_right,.pf-32.pf-arrow_right.pf-disabled{background-image:url(32/disabled/arrow_right.png)}
+.disabled .pf-32.pf-bank,.k-state-disabled .pf-32.pf-bank,[disabled] .pf-32.pf-bank,.pf-32.pf-bank.pf-disabled{background-image:url(32/disabled/bank.png)}
+.disabled .pf-32.pf-bank-update,.k-state-disabled .pf-32.pf-bank-update,[disabled] .pf-32.pf-bank-update,.pf-32.pf-bank-update.pf-disabled{background-image:url(32/disabled/bank-update.png)}
+.disabled .pf-32.pf-bank-account,.k-state-disabled .pf-32.pf-bank-account,[disabled] .pf-32.pf-bank-account,.pf-32.pf-bank-account.pf-disabled{background-image:url(32/disabled/bank-account.png)}
+.disabled .pf-32.pf-book,.k-state-disabled .pf-32.pf-book,[disabled] .pf-32.pf-book,.pf-32.pf-book.pf-disabled{background-image:url(32/disabled/book.png)}
+.disabled .pf-32.pf-bookmark-ok,.k-state-disabled .pf-32.pf-bookmark-ok,[disabled] .pf-32.pf-bookmark-ok,.pf-32.pf-bookmark-ok.pf-disabled{background-image:url(32/disabled/bookmark-ok.png)}
+.disabled .pf-32.pf-business_report,.k-state-disabled .pf-32.pf-business_report,[disabled] .pf-32.pf-business_report,.pf-32.pf-business_report.pf-disabled{background-image:url(32/disabled/business_report.png)}
+.disabled .pf-32.pf-calendar,.k-state-disabled .pf-32.pf-calendar,[disabled] .pf-32.pf-calendar,.pf-32.pf-calendar.pf-disabled{background-image:url(32/disabled/calendar.png)}
+.disabled .pf-32.pf-calendar-update,.k-state-disabled .pf-32.pf-calendar-update,[disabled] .pf-32.pf-calendar-update,.pf-32.pf-calendar-update.pf-disabled{background-image:url(32/disabled/calendar-update.png)}
+.disabled .pf-32.pf-currency_conversion,.k-state-disabled .pf-32.pf-currency_conversion,[disabled] .pf-32.pf-currency_conversion,.pf-32.pf-currency_conversion.pf-disabled{background-image:url(32/disabled/currency_conversion.png)}
+.disabled .pf-32.pf-clock,.k-state-disabled .pf-32.pf-clock,[disabled] .pf-32.pf-clock,.pf-32.pf-clock.pf-disabled{background-image:url(32/disabled/clock.png)}
+.disabled .pf-32.pf-database-arrow_right,.k-state-disabled .pf-32.pf-database-arrow_right,[disabled] .pf-32.pf-database-arrow_right,.pf-32.pf-database-arrow_right.pf-disabled{background-image:url(32/disabled/database-arrow_right.png)}
+.disabled .pf-32.pf-database-import,.k-state-disabled .pf-32.pf-database-import,[disabled] .pf-32.pf-database-import,.pf-32.pf-database-import.pf-disabled{background-image:url(32/disabled/database-import.png)}
+.disabled .pf-32.pf-delete_button_error,.k-state-disabled .pf-32.pf-delete_button_error,[disabled] .pf-32.pf-delete_button_error,.pf-32.pf-delete_button_error.pf-disabled{background-image:url(32/disabled/delete_button_error.png)}
+.disabled .pf-32.pf-execute,.k-state-disabled .pf-32.pf-execute,[disabled] .pf-32.pf-execute,.pf-32.pf-execute.pf-disabled{background-image:url(32/disabled/execute.png)}
+.disabled .pf-32.pf-exel,.k-state-disabled .pf-32.pf-exel,[disabled] .pf-32.pf-exel,.pf-32.pf-exel.pf-disabled{background-image:url(32/disabled/exel.png)}
+.disabled .pf-32.pf-delete,.k-state-disabled .pf-32.pf-delete,[disabled] .pf-32.pf-delete,.pf-32.pf-delete.pf-disabled{background-image:url(32/disabled/delete.png)}
+.disabled .pf-32.pf-document_header_footer-ok2,.k-state-disabled .pf-32.pf-document_header_footer-ok2,[disabled] .pf-32.pf-document_header_footer-ok2,.pf-32.pf-document_header_footer-ok2.pf-disabled{background-image:url(32/disabled/document_header_footer-ok2.png)}
+.disabled .pf-32.pf-folder,.k-state-disabled .pf-32.pf-folder,[disabled] .pf-32.pf-folder,.pf-32.pf-folder.pf-disabled{background-image:url(32/disabled/folder.png)}
+.disabled .pf-32.pf-folder_open,.k-state-disabled .pf-32.pf-folder_open,[disabled] .pf-32.pf-folder_open,.pf-32.pf-folder_open.pf-disabled{background-image:url(32/disabled/folder_open.png)}
+.disabled .pf-32.pf-folder-execute,.k-state-disabled .pf-32.pf-folder-execute,[disabled] .pf-32.pf-folder-execute,.pf-32.pf-folder-execute.pf-disabled{background-image:url(32/disabled/folder-execute.png)}
+.disabled .pf-32.pf-folder_open-execute,.k-state-disabled .pf-32.pf-folder_open-execute,[disabled] .pf-32.pf-folder_open-execute,.pf-32.pf-folder_open-execute.pf-disabled{background-image:url(32/disabled/folder_open-execute.png)}
+.disabled .pf-32.pf-folder-favorite,.k-state-disabled .pf-32.pf-folder-favorite,[disabled] .pf-32.pf-folder-favorite,.pf-32.pf-folder-favorite.pf-disabled{background-image:url(32/disabled/folder-favorite.png)}
+.disabled .pf-32.pf-folder_open-favorite,.k-state-disabled .pf-32.pf-folder_open-favorite,[disabled] .pf-32.pf-folder_open-favorite,.pf-32.pf-folder_open-favorite.pf-disabled{background-image:url(32/disabled/folder_open-favorite.png)}
+.disabled .pf-32.pf-filter-ok,.k-state-disabled .pf-32.pf-filter-ok,[disabled] .pf-32.pf-filter-ok,.pf-32.pf-filter-ok.pf-disabled{background-image:url(32/disabled/filter-ok.png)}
+.disabled .pf-32.pf-filter-remove,.k-state-disabled .pf-32.pf-filter-remove,[disabled] .pf-32.pf-filter-remove,.pf-32.pf-filter-remove.pf-disabled{background-image:url(32/disabled/filter-remove.png)}
+.disabled .pf-32.pf-find,.k-state-disabled .pf-32.pf-find,[disabled] .pf-32.pf-find,.pf-32.pf-find.pf-disabled{background-image:url(32/disabled/find.png)}
+.disabled .pf-32.pf-gear,.k-state-disabled .pf-32.pf-gear,[disabled] .pf-32.pf-gear,.pf-32.pf-gear.pf-disabled{background-image:url(32/disabled/gear.png)}
+.disabled .pf-32.pf-gears,.k-state-disabled .pf-32.pf-gears,[disabled] .pf-32.pf-gears,.pf-32.pf-gears.pf-disabled{background-image:url(32/disabled/gears.png)}
+.disabled .pf-32.pf-help,.k-state-disabled .pf-32.pf-help,[disabled] .pf-32.pf-help,.pf-32.pf-help.pf-disabled{background-image:url(32/disabled/help.png)}
+.disabled .pf-32.pf-key,.k-state-disabled .pf-32.pf-key,[disabled] .pf-32.pf-key,.pf-32.pf-key.pf-disabled{background-image:url(32/disabled/key.png)}
+.disabled .pf-32.pf-link-info,.k-state-disabled .pf-32.pf-link-info,[disabled] .pf-32.pf-link-info,.pf-32.pf-link-info.pf-disabled{background-image:url(32/disabled/link-info.png)}
+.disabled .pf-32.pf-list-arrow_right,.k-state-disabled .pf-32.pf-list-arrow_right,[disabled] .pf-32.pf-list-arrow_right,.pf-32.pf-list-arrow_right.pf-disabled{background-image:url(32/disabled/list-arrow_right.png)}
+.disabled .pf-32.pf-list-ok,.k-state-disabled .pf-32.pf-list-ok,[disabled] .pf-32.pf-list-ok,.pf-32.pf-list-ok.pf-disabled{background-image:url(32/disabled/list-ok.png)}
+.disabled .pf-32.pf-mail,.k-state-disabled .pf-32.pf-mail,[disabled] .pf-32.pf-mail,.pf-32.pf-mail.pf-disabled{background-image:url(32/disabled/mail.png)}
+.disabled .pf-32.pf-mail-arrow_right,.k-state-disabled .pf-32.pf-mail-arrow_right,[disabled] .pf-32.pf-mail-arrow_right,.pf-32.pf-mail-arrow_right.pf-disabled{background-image:url(32/disabled/mail-arrow_right.png)}
+.disabled .pf-32.pf-money,.k-state-disabled .pf-32.pf-money,[disabled] .pf-32.pf-money,.pf-32.pf-money.pf-disabled{background-image:url(32/disabled/money.png)}
+.disabled .pf-32.pf-phone,.k-state-disabled .pf-32.pf-phone,[disabled] .pf-32.pf-phone,.pf-32.pf-phone.pf-disabled{background-image:url(32/disabled/phone.png)}
+.disabled .pf-32.pf-phone-ok,.k-state-disabled .pf-32.pf-phone-ok,[disabled] .pf-32.pf-phone-ok,.pf-32.pf-phone-ok.pf-disabled{background-image:url(32/disabled/phone-ok.png)}
+.disabled .pf-32.pf-phone-ok2,.k-state-disabled .pf-32.pf-phone-ok2,[disabled] .pf-32.pf-phone-ok2,.pf-32.pf-phone-ok2.pf-disabled{background-image:url(32/disabled/phone-ok2.png)}
+.disabled .pf-32.pf-phone-error,.k-state-disabled .pf-32.pf-phone-error,[disabled] .pf-32.pf-phone-error,.pf-32.pf-phone-error.pf-disabled{background-image:url(32/disabled/phone-error.png)}
+.disabled .pf-32.pf-percentage,.k-state-disabled .pf-32.pf-percentage,[disabled] .pf-32.pf-percentage,.pf-32.pf-percentage.pf-disabled{background-image:url(32/disabled/percentage.png)}
+.disabled .pf-32.pf-percentage_green,.k-state-disabled .pf-32.pf-percentage_green,[disabled] .pf-32.pf-percentage_green,.pf-32.pf-percentage_green.pf-disabled{background-image:url(32/disabled/percentage_green.png)}
+.disabled .pf-32.pf-percentage_red,.k-state-disabled .pf-32.pf-percentage_red,[disabled] .pf-32.pf-percentage_red,.pf-32.pf-percentage_red.pf-disabled{background-image:url(32/disabled/percentage_red.png)}
+.disabled .pf-32.pf-piece,.k-state-disabled .pf-32.pf-piece,[disabled] .pf-32.pf-piece,.pf-32.pf-piece.pf-disabled{background-image:url(32/disabled/piece.png)}
+.disabled .pf-32.pf-print,.k-state-disabled .pf-32.pf-print,[disabled] .pf-32.pf-print,.pf-32.pf-print.pf-disabled{background-image:url(32/disabled/print.png)}
+.disabled .pf-32.pf-reload_rotate,.k-state-disabled .pf-32.pf-reload_rotate,[disabled] .pf-32.pf-reload_rotate,.pf-32.pf-reload_rotate.pf-disabled{background-image:url(32/disabled/reload_rotate.png)}
+.disabled .pf-32.pf-report_open,.k-state-disabled .pf-32.pf-report_open,[disabled] .pf-32.pf-report_open,.pf-32.pf-report_open.pf-disabled{background-image:url(32/disabled/report_open.png)}
+.disabled .pf-32.pf-report_open-import,.k-state-disabled .pf-32.pf-report_open-import,[disabled] .pf-32.pf-report_open-import,.pf-32.pf-report_open-import.pf-disabled{background-image:url(32/disabled/report_open-import.png)}
+.disabled .pf-32.pf-table_column,.k-state-disabled .pf-32.pf-table_column,[disabled] .pf-32.pf-table_column,.pf-32.pf-table_column.pf-disabled{background-image:url(32/disabled/table_column.png)}
+.disabled .pf-32.pf-table,.k-state-disabled .pf-32.pf-table,[disabled] .pf-32.pf-table,.pf-32.pf-table.pf-disabled{background-image:url(32/disabled/table.png)}
+.disabled .pf-32.pf-table_row-add2,.k-state-disabled .pf-32.pf-table_row-add2,[disabled] .pf-32.pf-table_row-add2,.pf-32.pf-table_row-add2.pf-disabled{background-image:url(32/disabled/table_row-add2.png)}
+.disabled .pf-32.pf-table_row-delete2,.k-state-disabled .pf-32.pf-table_row-delete2,[disabled] .pf-32.pf-table_row-delete2,.pf-32.pf-table_row-delete2.pf-disabled{background-image:url(32/disabled/table_row-delete2.png)}
+.disabled .pf-32.pf-tabs-export,.k-state-disabled .pf-32.pf-tabs-export,[disabled] .pf-32.pf-tabs-export,.pf-32.pf-tabs-export.pf-disabled{background-image:url(32/disabled/tabs-export.png)}
+.disabled .pf-32.pf-tool_pencil,.k-state-disabled .pf-32.pf-tool_pencil,[disabled] .pf-32.pf-tool_pencil,.pf-32.pf-tool_pencil.pf-disabled{background-image:url(32/disabled/tool_pencil.png)}
+.disabled .pf-32.pf-tree,.k-state-disabled .pf-32.pf-tree,[disabled] .pf-32.pf-tree,.pf-32.pf-tree.pf-disabled{background-image:url(32/disabled/tree.png)}
+.disabled .pf-32.pf-money_banknote-server,.k-state-disabled .pf-32.pf-money_banknote-server,[disabled] .pf-32.pf-money_banknote-server,.pf-32.pf-money_banknote-server.pf-disabled{background-image:url(32/disabled/money_banknote-server.png)}
+.disabled .pf-32.pf-user,.k-state-disabled .pf-32.pf-user,[disabled] .pf-32.pf-user,.pf-32.pf-user.pf-disabled{background-image:url(32/disabled/user.png)}
+.disabled .pf-32.pf-save,.k-state-disabled .pf-32.pf-save,[disabled] .pf-32.pf-save,.pf-32.pf-save.pf-disabled{background-image:url(32/disabled/save.png)}
+.disabled .pf-32.pf-user_symbol_blue-picture,.k-state-disabled .pf-32.pf-user_symbol_blue-picture,[disabled] .pf-32.pf-user_symbol_blue-picture,.pf-32.pf-user_symbol_blue-picture.pf-disabled{background-image:url(32/disabled/user_symbol_blue-picture.png)}
+.disabled .pf-32.pf-info,.k-state-disabled .pf-32.pf-info,[disabled] .pf-32.pf-info,.pf-32.pf-info.pf-disabled{background-image:url(32/disabled/info.png)}
+.disabled .pf-32.pf-search,.k-state-disabled .pf-32.pf-search,[disabled] .pf-32.pf-search,.pf-32.pf-search.pf-disabled{background-image:url(32/disabled/search.png)}
+.disabled .pf-32.pf-stop,.k-state-disabled .pf-32.pf-stop,[disabled] .pf-32.pf-stop,.pf-32.pf-stop.pf-disabled{background-image:url(32/disabled/stop.png)}
+.disabled .pf-32.pf-sort_za,.k-state-disabled .pf-32.pf-sort_za,[disabled] .pf-32.pf-sort_za,.pf-32.pf-sort_za.pf-disabled{background-image:url(32/disabled/sort_za.png)}
+.disabled .pf-32.pf-sort_az,.k-state-disabled .pf-32.pf-sort_az,[disabled] .pf-32.pf-sort_az,.pf-32.pf-sort_az.pf-disabled{background-image:url(32/disabled/sort_az.png)}
+.disabled .pf-32.pf-slide-arrow_right,.k-state-disabled .pf-32.pf-slide-arrow_right,[disabled] .pf-32.pf-slide-arrow_right,.pf-32.pf-slide-arrow_right.pf-disabled{background-image:url(32/disabled/slide-arrow_right.png)}
+.disabled .pf-32.pf-slide-arrow_left,.k-state-disabled .pf-32.pf-slide-arrow_left,[disabled] .pf-32.pf-slide-arrow_left,.pf-32.pf-slide-arrow_left.pf-disabled{background-image:url(32/disabled/slide-arrow_left.png)}
+.disabled .pf-32.pf-view_options,.k-state-disabled .pf-32.pf-view_options,[disabled] .pf-32.pf-view_options,.pf-32.pf-view_options.pf-disabled{background-image:url(32/disabled/view_options.png)}
+.disabled .pf-32.pf-warning,.k-state-disabled .pf-32.pf-warning,[disabled] .pf-32.pf-warning,.pf-32.pf-warning.pf-disabled{background-image:url(32/disabled/warning.png)}
+.disabled .pf-32.pf-help,.k-state-disabled .pf-32.pf-help,[disabled] .pf-32.pf-help,.pf-32.pf-help.pf-disabled{background-image:url(32/disabled/help.png)}
+.disabled .pf-32.pf-ov_arrow_left,.k-state-disabled .pf-32.pf-ov_arrow_left,[disabled] .pf-32.pf-ov_arrow_left,.pf-32.pf-ov_arrow_left.pf-disabled{background-image:url(32/disabled/ov_arrow_left.png)}
+.disabled .pf-32.pf-ov_arrow_right,.k-state-disabled .pf-32.pf-ov_arrow_right,[disabled] .pf-32.pf-ov_arrow_right,.pf-32.pf-ov_arrow_right.pf-disabled{background-image:url(32/disabled/ov_arrow_right.png)}
+.disabled .pf-32.pf-ok_button,.k-state-disabled .pf-32.pf-ok_button,[disabled] .pf-32.pf-ok_button,.pf-32.pf-ok_button.pf-disabled{background-image:url(32/disabled/ok_button.png)}
+.disabled .pf-32.pf-ok,.k-state-disabled .pf-32.pf-ok,[disabled] .pf-32.pf-ok,.pf-32.pf-ok.pf-disabled{background-image:url(32/disabled/ok.png)}
+.disabled .pf-32.pf-ov_customer,.k-state-disabled .pf-32.pf-ov_customer,[disabled] .pf-32.pf-ov_customer,.pf-32.pf-ov_customer.pf-disabled{background-image:url(32/disabled/ov_customer.png)}
+.disabled .pf-32.pf-ov_link,.k-state-disabled .pf-32.pf-ov_link,[disabled] .pf-32.pf-ov_link,.pf-32.pf-ov_link.pf-disabled{background-image:url(32/disabled/ov_link.png)}
+.disabled .pf-32.pf-ov_update,.k-state-disabled .pf-32.pf-ov_update,[disabled] .pf-32.pf-ov_update,.pf-32.pf-ov_update.pf-disabled{background-image:url(32/disabled/ov_update.png)}
+/*==========40==========*/
+.pf-40{width:40px;height:40px}
+.pf-40.pf-add{background-image:url(40/add.png)}
+.pf-40.pf-add_button{background-image:url(40/add_button.png)}
+.pf-40.pf-address_book-design{background-image:url(40/address_book-design.png)}
+.pf-40.pf-application-update{background-image:url(40/application-update.png)}
+.pf-40.pf-accept_doc{background-image:url(40/accept_doc.png)}
+.pf-40.pf-alert{background-image:url(40/alert.png)}
+.pf-40.pf-arrow_down{background-image:url(40/arrow_down.png)}
+.pf-40.pf-arrow_download{background-image:url(40/arrow_download.png)}
+.pf-40.pf-arrow_left{background-image:url(40/arrow_left.png)}
+.pf-40.pf-arrow_right{background-image:url(40/arrow_right.png)}
+.pf-40.pf-bank{background-image:url(40/bank.png)}
+.pf-40.pf-bank-update{background-image:url(40/bank-update.png)}
+.pf-40.pf-bank-account{background-image:url(40/bank-account.png)}
+.pf-40.pf-book{background-image:url(40/book.png)}
+.pf-40.pf-bookmark-ok{background-image:url(40/bookmark-ok.png)}
+.pf-40.pf-business_report{background-image:url(40/business_report.png)}
+.pf-40.pf-calendar{background-image:url(40/calendar.png)}
+.pf-40.pf-calendar-update{background-image:url(40/calendar-update.png)}
+.pf-40.pf-currency_conversion{background-image:url(40/currency_conversion.png)}
+.pf-40.pf-clock{background-image:url(40/clock.png)}
+.pf-40.pf-database-arrow_right{background-image:url(40/database-arrow_right.png)}
+.pf-40.pf-database-import{background-image:url(40/database-import.png)}
+.pf-40.pf-delete_button_error{background-image:url(40/delete_button_error.png)}
+.pf-40.pf-execute{background-image:url(40/execute.png)}
+.pf-40.pf-exel{background-image:url(40/exel.png)}
+.pf-40.pf-delete{background-image:url(40/delete.png)}
+.pf-40.pf-document_header_footer-ok2{background-image:url(40/document_header_footer-ok2.png)}
+.pf-40.pf-folder{background-image:url(40/folder.png)}
+.pf-40.pf-folder_open{background-image:url(40/folder_open.png)}
+.pf-40.pf-folder-execute{background-image:url(40/folder-execute.png)}
+.pf-40.pf-folder_open-execute{background-image:url(40/folder_open-execute.png)}
+.pf-40.pf-folder-favorite{background-image:url(40/folder-favorite.png)}
+.pf-40.pf-folder_open-favorite{background-image:url(40/folder_open-favorite.png)}
+.pf-40.pf-filter-ok{background-image:url(40/filter-ok.png)}
+.pf-40.pf-filter-remove{background-image:url(40/filter-remove.png)}
+.pf-40.pf-find{background-image:url(40/find.png)}
+.pf-40.pf-gear{background-image:url(40/gear.png)}
+.pf-40.pf-gears{background-image:url(40/gears.png)}
+.pf-40.pf-help{background-image:url(40/help.png)}
+.pf-40.pf-key{background-image:url(40/key.png)}
+.pf-40.pf-link-info{background-image:url(40/link-info.png)}
+.pf-40.pf-list-arrow_right{background-image:url(40/list-arrow_right.png)}
+.pf-40.pf-list-ok{background-image:url(40/list-ok.png)}
+.pf-40.pf-mail{background-image:url(40/mail.png)}
+.pf-40.pf-mail-arrow_right{background-image:url(40/mail-arrow_right.png)}
+.pf-40.pf-money{background-image:url(40/money.png)}
+.pf-40.pf-phone{background-image:url(40/phone.png)}
+.pf-40.pf-phone-ok{background-image:url(40/phone-ok.png)}
+.pf-40.pf-phone-ok2{background-image:url(40/phone-ok2.png)}
+.pf-40.pf-phone-error{background-image:url(40/phone-error.png)}
+.pf-40.pf-percentage{background-image:url(40/percentage.png)}
+.pf-40.pf-percentage_green{background-image:url(40/percentage_green.png)}
+.pf-40.pf-percentage_red{background-image:url(40/percentage_red.png)}
+.pf-40.pf-piece{background-image:url(40/piece.png)}
+.pf-40.pf-print{background-image:url(40/print.png)}
+.pf-40.pf-reload_rotate{background-image:url(40/reload_rotate.png)}
+.pf-40.pf-report_open{background-image:url(40/report_open.png)}
+.pf-40.pf-report_open-import{background-image:url(40/report_open-import.png)}
+.pf-40.pf-table_column{background-image:url(40/table_column.png)}
+.pf-40.pf-table{background-image:url(40/table.png)}
+.pf-40.pf-table_row-add2{background-image:url(40/table_row-add2.png)}
+.pf-40.pf-table_row-delete2{background-image:url(40/table_row-delete2.png)}
+.pf-40.pf-tabs-export{background-image:url(40/tabs-export.png)}
+.pf-40.pf-tool_pencil{background-image:url(40/tool_pencil.png)}
+.pf-40.pf-tree{background-image:url(40/tree.png)}
+.pf-40.pf-money_banknote-server{background-image:url(40/money_banknote-server.png)}
+.pf-40.pf-user{background-image:url(40/user.png)}
+.pf-40.pf-save{background-image:url(40/save.png)}
+.pf-40.pf-user_symbol_blue-picture{background-image:url(40/user_symbol_blue-picture.png)}
+.pf-40.pf-info{background-image:url(40/info.png)}
+.pf-40.pf-search{background-image:url(40/search.png)}
+.pf-40.pf-stop{background-image:url(40/stop.png)}
+.pf-40.pf-sort_za{background-image:url(40/sort_za.png)}
+.pf-40.pf-sort_az{background-image:url(40/sort_az.png)}
+.pf-40.pf-slide-arrow_right{background-image:url(40/slide-arrow_right.png)}
+.pf-40.pf-slide-arrow_left{background-image:url(40/slide-arrow_left.png)}
+.pf-40.pf-view_options{background-image:url(40/view_options.png)}
+.pf-40.pf-warning{background-image:url(40/warning.png)}
+.pf-40.pf-help{background-image:url(40/help.png)}
+.pf-40.pf-ov_arrow_left{background-image:url(40/ov_arrow_left.png)}
+.pf-40.pf-ov_arrow_right{background-image:url(40/ov_arrow_right.png)}
+.pf-40.pf-ok_button{background-image:url(40/ok_button.png)}
+.pf-40.pf-ok{background-image:url(40/ok.png)}
+.pf-40.pf-ov_customer{background-image:url(40/ov_customer.png)}
+.pf-40.pf-ov_link{background-image:url(40/ov_link.png)}
+.pf-40.pf-ov_update{background-image:url(40/ov_update.png)}
+.pf-40.pf-add.pf-hot{background-image:url(40/hot/add.png)}
+.pf-40.pf-add_button.pf-hot{background-image:url(40/hot/add_button.png)}
+.pf-40.pf-address_book-design.pf-hot{background-image:url(40/hot/address_book-design.png)}
+.pf-40.pf-application-update.pf-hot{background-image:url(40/hot/application-update.png)}
+.pf-40.pf-accept_doc.pf-hot{background-image:url(40/hot/accept_doc.png)}
+.pf-40.pf-alert.pf-hot{background-image:url(40/hot/alert.png)}
+.pf-40.pf-arrow_down.pf-hot{background-image:url(40/hot/arrow_down.png)}
+.pf-40.pf-arrow_download.pf-hot{background-image:url(40/hot/arrow_download.png)}
+.pf-40.pf-arrow_left.pf-hot{background-image:url(40/hot/arrow_left.png)}
+.pf-40.pf-arrow_right.pf-hot{background-image:url(40/hot/arrow_right.png)}
+.pf-40.pf-bank.pf-hot{background-image:url(40/hot/bank.png)}
+.pf-40.pf-bank-update.pf-hot{background-image:url(40/hot/bank-update.png)}
+.pf-40.pf-bank-account.pf-hot{background-image:url(40/hot/bank-account.png)}
+.pf-40.pf-book.pf-hot{background-image:url(40/hot/book.png)}
+.pf-40.pf-bookmark-ok.pf-hot{background-image:url(40/hot/bookmark-ok.png)}
+.pf-40.pf-business_report.pf-hot{background-image:url(40/hot/business_report.png)}
+.pf-40.pf-calendar.pf-hot{background-image:url(40/hot/calendar.png)}
+.pf-40.pf-calendar-update.pf-hot{background-image:url(40/hot/calendar-update.png)}
+.pf-40.pf-currency_conversion.pf-hot{background-image:url(40/hot/currency_conversion.png)}
+.pf-40.pf-clock.pf-hot{background-image:url(40/hot/clock.png)}
+.pf-40.pf-database-arrow_right.pf-hot{background-image:url(40/hot/database-arrow_right.png)}
+.pf-40.pf-database-import.pf-hot{background-image:url(40/hot/database-import.png)}
+.pf-40.pf-delete_button_error.pf-hot{background-image:url(40/hot/delete_button_error.png)}
+.pf-40.pf-execute.pf-hot{background-image:url(40/hot/execute.png)}
+.pf-40.pf-exel.pf-hot{background-image:url(40/hot/exel.png)}
+.pf-40.pf-delete.pf-hot{background-image:url(40/hot/delete.png)}
+.pf-40.pf-document_header_footer-ok2.pf-hot{background-image:url(40/hot/document_header_footer-ok2.png)}
+.pf-40.pf-folder.pf-hot{background-image:url(40/hot/folder.png)}
+.pf-40.pf-folder_open.pf-hot{background-image:url(40/hot/folder_open.png)}
+.pf-40.pf-folder-execute.pf-hot{background-image:url(40/hot/folder-execute.png)}
+.pf-40.pf-folder_open-execute.pf-hot{background-image:url(40/hot/folder_open-execute.png)}
+.pf-40.pf-folder-favorite.pf-hot{background-image:url(40/hot/folder-favorite.png)}
+.pf-40.pf-folder_open-favorite.pf-hot{background-image:url(40/hot/folder_open-favorite.png)}
+.pf-40.pf-filter-ok.pf-hot{background-image:url(40/hot/filter-ok.png)}
+.pf-40.pf-filter-remove.pf-hot{background-image:url(40/hot/filter-remove.png)}
+.pf-40.pf-find.pf-hot{background-image:url(40/hot/find.png)}
+.pf-40.pf-gear.pf-hot{background-image:url(40/hot/gear.png)}
+.pf-40.pf-gears.pf-hot{background-image:url(40/hot/gears.png)}
+.pf-40.pf-help.pf-hot{background-image:url(40/hot/help.png)}
+.pf-40.pf-key.pf-hot{background-image:url(40/hot/key.png)}
+.pf-40.pf-link-info.pf-hot{background-image:url(40/hot/link-info.png)}
+.pf-40.pf-list-arrow_right.pf-hot{background-image:url(40/hot/list-arrow_right.png)}
+.pf-40.pf-list-ok.pf-hot{background-image:url(40/hot/list-ok.png)}
+.pf-40.pf-mail.pf-hot{background-image:url(40/hot/mail.png)}
+.pf-40.pf-mail-arrow_right.pf-hot{background-image:url(40/hot/mail-arrow_right.png)}
+.pf-40.pf-money.pf-hot{background-image:url(40/hot/money.png)}
+.pf-40.pf-phone.pf-hot{background-image:url(40/hot/phone.png)}
+.pf-40.pf-phone-ok.pf-hot{background-image:url(40/hot/phone-ok.png)}
+.pf-40.pf-phone-ok2.pf-hot{background-image:url(40/hot/phone-ok2.png)}
+.pf-40.pf-phone-error.pf-hot{background-image:url(40/hot/phone-error.png)}
+.pf-40.pf-percentage.pf-hot{background-image:url(40/hot/percentage.png)}
+.pf-40.pf-percentage_green.pf-hot{background-image:url(40/hot/percentage_green.png)}
+.pf-40.pf-percentage_red.pf-hot{background-image:url(40/hot/percentage_red.png)}
+.pf-40.pf-piece.pf-hot{background-image:url(40/hot/piece.png)}
+.pf-40.pf-print.pf-hot{background-image:url(40/hot/print.png)}
+.pf-40.pf-reload_rotate.pf-hot{background-image:url(40/hot/reload_rotate.png)}
+.pf-40.pf-report_open.pf-hot{background-image:url(40/hot/report_open.png)}
+.pf-40.pf-report_open-import.pf-hot{background-image:url(40/hot/report_open-import.png)}
+.pf-40.pf-table_column.pf-hot{background-image:url(40/hot/table_column.png)}
+.pf-40.pf-table.pf-hot{background-image:url(40/hot/table.png)}
+.pf-40.pf-table_row-add2.pf-hot{background-image:url(40/hot/table_row-add2.png)}
+.pf-40.pf-table_row-delete2.pf-hot{background-image:url(40/hot/table_row-delete2.png)}
+.pf-40.pf-tabs-export.pf-hot{background-image:url(40/hot/tabs-export.png)}
+.pf-40.pf-tool_pencil.pf-hot{background-image:url(40/hot/tool_pencil.png)}
+.pf-40.pf-tree.pf-hot{background-image:url(40/hot/tree.png)}
+.pf-40.pf-money_banknote-server.pf-hot{background-image:url(40/hot/money_banknote-server.png)}
+.pf-40.pf-user.pf-hot{background-image:url(40/hot/user.png)}
+.pf-40.pf-save.pf-hot{background-image:url(40/hot/save.png)}
+.pf-40.pf-user_symbol_blue-picture.pf-hot{background-image:url(40/hot/user_symbol_blue-picture.png)}
+.pf-40.pf-info.pf-hot{background-image:url(40/hot/info.png)}
+.pf-40.pf-search.pf-hot{background-image:url(40/hot/search.png)}
+.pf-40.pf-stop.pf-hot{background-image:url(40/hot/stop.png)}
+.pf-40.pf-sort_za.pf-hot{background-image:url(40/hot/sort_za.png)}
+.pf-40.pf-sort_az.pf-hot{background-image:url(40/hot/sort_az.png)}
+.pf-40.pf-slide-arrow_right.pf-hot{background-image:url(40/hot/slide-arrow_right.png)}
+.pf-40.pf-slide-arrow_left.pf-hot{background-image:url(40/hot/slide-arrow_left.png)}
+.pf-40.pf-view_options.pf-hot{background-image:url(40/hot/view_options.png)}
+.pf-40.pf-warning.pf-hot{background-image:url(40/hot/warning.png)}
+.pf-40.pf-help.pf-hot{background-image:url(40/hot/help.png)}
+.pf-40.pf-ov_arrow_left.pf-hot{background-image:url(40/hot/ov_arrow_left.png)}
+.pf-40.pf-ov_arrow_right.pf-hot{background-image:url(40/hot/ov_arrow_right.png)}
+.pf-40.pf-ok_button.pf-hot{background-image:url(40/hot/ok_button.png)}
+.pf-40.pf-ok.pf-hot{background-image:url(40/hot/ok.png)}
+.pf-40.pf-ov_customer.pf-hot{background-image:url(40/hot/ov_customer.png)}
+.pf-40.pf-ov_link.pf-hot{background-image:url(40/hot/ov_link.png)}
+.pf-40.pf-ov_update.pf-hot{background-image:url(40/hot/ov_update.png)}
+.disabled .pf-40.pf-add,.k-state-disabled .pf-40.pf-add,[disabled] .pf-40.pf-add,.pf-40.pf-add.pf-disabled{background-image:url(40/disabled/add.png)}
+.disabled .pf-40.pf-add_button,.k-state-disabled .pf-40.pf-add_button,[disabled] .pf-40.pf-add_button,.pf-40.pf-add_button.pf-disabled{background-image:url(40/disabled/add_button.png)}
+.disabled .pf-40.pf-address_book-design,.k-state-disabled .pf-40.pf-address_book-design,[disabled] .pf-40.pf-address_book-design,.pf-40.pf-address_book-design.pf-disabled{background-image:url(40/disabled/address_book-design.png)}
+.disabled .pf-40.pf-application-update,.k-state-disabled .pf-40.pf-application-update,[disabled] .pf-40.pf-application-update,.pf-40.pf-application-update.pf-disabled{background-image:url(40/disabled/application-update.png)}
+.disabled .pf-40.pf-accept_doc,.k-state-disabled .pf-40.pf-accept_doc,[disabled] .pf-40.pf-accept_doc,.pf-40.pf-accept_doc.pf-disabled{background-image:url(40/disabled/accept_doc.png)}
+.disabled .pf-40.pf-alert,.k-state-disabled .pf-40.pf-alert,[disabled] .pf-40.pf-alert,.pf-40.pf-alert.pf-disabled{background-image:url(40/disabled/alert.png)}
+.disabled .pf-40.pf-arrow_down,.k-state-disabled .pf-40.pf-arrow_down,[disabled] .pf-40.pf-arrow_down,.pf-40.pf-arrow_down.pf-disabled{background-image:url(40/disabled/arrow_down.png)}
+.disabled .pf-40.pf-arrow_download,.k-state-disabled .pf-40.pf-arrow_download,[disabled] .pf-40.pf-arrow_download,.pf-40.pf-arrow_download.pf-disabled{background-image:url(40/disabled/arrow_download.png)}
+.disabled .pf-40.pf-arrow_left,.k-state-disabled .pf-40.pf-arrow_left,[disabled] .pf-40.pf-arrow_left,.pf-40.pf-arrow_left.pf-disabled{background-image:url(40/disabled/arrow_left.png)}
+.disabled .pf-40.pf-arrow_right,.k-state-disabled .pf-40.pf-arrow_right,[disabled] .pf-40.pf-arrow_right,.pf-40.pf-arrow_right.pf-disabled{background-image:url(40/disabled/arrow_right.png)}
+.disabled .pf-40.pf-bank,.k-state-disabled .pf-40.pf-bank,[disabled] .pf-40.pf-bank,.pf-40.pf-bank.pf-disabled{background-image:url(40/disabled/bank.png)}
+.disabled .pf-40.pf-bank-update,.k-state-disabled .pf-40.pf-bank-update,[disabled] .pf-40.pf-bank-update,.pf-40.pf-bank-update.pf-disabled{background-image:url(40/disabled/bank-update.png)}
+.disabled .pf-40.pf-bank-account,.k-state-disabled .pf-40.pf-bank-account,[disabled] .pf-40.pf-bank-account,.pf-40.pf-bank-account.pf-disabled{background-image:url(40/disabled/bank-account.png)}
+.disabled .pf-40.pf-book,.k-state-disabled .pf-40.pf-book,[disabled] .pf-40.pf-book,.pf-40.pf-book.pf-disabled{background-image:url(40/disabled/book.png)}
+.disabled .pf-40.pf-bookmark-ok,.k-state-disabled .pf-40.pf-bookmark-ok,[disabled] .pf-40.pf-bookmark-ok,.pf-40.pf-bookmark-ok.pf-disabled{background-image:url(40/disabled/bookmark-ok.png)}
+.disabled .pf-40.pf-business_report,.k-state-disabled .pf-40.pf-business_report,[disabled] .pf-40.pf-business_report,.pf-40.pf-business_report.pf-disabled{background-image:url(40/disabled/business_report.png)}
+.disabled .pf-40.pf-calendar,.k-state-disabled .pf-40.pf-calendar,[disabled] .pf-40.pf-calendar,.pf-40.pf-calendar.pf-disabled{background-image:url(40/disabled/calendar.png)}
+.disabled .pf-40.pf-calendar-update,.k-state-disabled .pf-40.pf-calendar-update,[disabled] .pf-40.pf-calendar-update,.pf-40.pf-calendar-update.pf-disabled{background-image:url(40/disabled/calendar-update.png)}
+.disabled .pf-40.pf-currency_conversion,.k-state-disabled .pf-40.pf-currency_conversion,[disabled] .pf-40.pf-currency_conversion,.pf-40.pf-currency_conversion.pf-disabled{background-image:url(40/disabled/currency_conversion.png)}
+.disabled .pf-40.pf-clock,.k-state-disabled .pf-40.pf-clock,[disabled] .pf-40.pf-clock,.pf-40.pf-clock.pf-disabled{background-image:url(40/disabled/clock.png)}
+.disabled .pf-40.pf-database-arrow_right,.k-state-disabled .pf-40.pf-database-arrow_right,[disabled] .pf-40.pf-database-arrow_right,.pf-40.pf-database-arrow_right.pf-disabled{background-image:url(40/disabled/database-arrow_right.png)}
+.disabled .pf-40.pf-database-import,.k-state-disabled .pf-40.pf-database-import,[disabled] .pf-40.pf-database-import,.pf-40.pf-database-import.pf-disabled{background-image:url(40/disabled/database-import.png)}
+.disabled .pf-40.pf-delete_button_error,.k-state-disabled .pf-40.pf-delete_button_error,[disabled] .pf-40.pf-delete_button_error,.pf-40.pf-delete_button_error.pf-disabled{background-image:url(40/disabled/delete_button_error.png)}
+.disabled .pf-40.pf-execute,.k-state-disabled .pf-40.pf-execute,[disabled] .pf-40.pf-execute,.pf-40.pf-execute.pf-disabled{background-image:url(40/disabled/execute.png)}
+.disabled .pf-40.pf-exel,.k-state-disabled .pf-40.pf-exel,[disabled] .pf-40.pf-exel,.pf-40.pf-exel.pf-disabled{background-image:url(40/disabled/exel.png)}
+.disabled .pf-40.pf-delete,.k-state-disabled .pf-40.pf-delete,[disabled] .pf-40.pf-delete,.pf-40.pf-delete.pf-disabled{background-image:url(40/disabled/delete.png)}
+.disabled .pf-40.pf-document_header_footer-ok2,.k-state-disabled .pf-40.pf-document_header_footer-ok2,[disabled] .pf-40.pf-document_header_footer-ok2,.pf-40.pf-document_header_footer-ok2.pf-disabled{background-image:url(40/disabled/document_header_footer-ok2.png)}
+.disabled .pf-40.pf-folder,.k-state-disabled .pf-40.pf-folder,[disabled] .pf-40.pf-folder,.pf-40.pf-folder.pf-disabled{background-image:url(40/disabled/folder.png)}
+.disabled .pf-40.pf-folder_open,.k-state-disabled .pf-40.pf-folder_open,[disabled] .pf-40.pf-folder_open,.pf-40.pf-folder_open.pf-disabled{background-image:url(40/disabled/folder_open.png)}
+.disabled .pf-40.pf-folder-execute,.k-state-disabled .pf-40.pf-folder-execute,[disabled] .pf-40.pf-folder-execute,.pf-40.pf-folder-execute.pf-disabled{background-image:url(40/disabled/folder-execute.png)}
+.disabled .pf-40.pf-folder_open-execute,.k-state-disabled .pf-40.pf-folder_open-execute,[disabled] .pf-40.pf-folder_open-execute,.pf-40.pf-folder_open-execute.pf-disabled{background-image:url(40/disabled/folder_open-execute.png)}
+.disabled .pf-40.pf-folder-favorite,.k-state-disabled .pf-40.pf-folder-favorite,[disabled] .pf-40.pf-folder-favorite,.pf-40.pf-folder-favorite.pf-disabled{background-image:url(40/disabled/folder-favorite.png)}
+.disabled .pf-40.pf-folder_open-favorite,.k-state-disabled .pf-40.pf-folder_open-favorite,[disabled] .pf-40.pf-folder_open-favorite,.pf-40.pf-folder_open-favorite.pf-disabled{background-image:url(40/disabled/folder_open-favorite.png)}
+.disabled .pf-40.pf-filter-ok,.k-state-disabled .pf-40.pf-filter-ok,[disabled] .pf-40.pf-filter-ok,.pf-40.pf-filter-ok.pf-disabled{background-image:url(40/disabled/filter-ok.png)}
+.disabled .pf-40.pf-filter-remove,.k-state-disabled .pf-40.pf-filter-remove,[disabled] .pf-40.pf-filter-remove,.pf-40.pf-filter-remove.pf-disabled{background-image:url(40/disabled/filter-remove.png)}
+.disabled .pf-40.pf-find,.k-state-disabled .pf-40.pf-find,[disabled] .pf-40.pf-find,.pf-40.pf-find.pf-disabled{background-image:url(40/disabled/find.png)}
+.disabled .pf-40.pf-gear,.k-state-disabled .pf-40.pf-gear,[disabled] .pf-40.pf-gear,.pf-40.pf-gear.pf-disabled{background-image:url(40/disabled/gear.png)}
+.disabled .pf-40.pf-gears,.k-state-disabled .pf-40.pf-gears,[disabled] .pf-40.pf-gears,.pf-40.pf-gears.pf-disabled{background-image:url(40/disabled/gears.png)}
+.disabled .pf-40.pf-help,.k-state-disabled .pf-40.pf-help,[disabled] .pf-40.pf-help,.pf-40.pf-help.pf-disabled{background-image:url(40/disabled/help.png)}
+.disabled .pf-40.pf-key,.k-state-disabled .pf-40.pf-key,[disabled] .pf-40.pf-key,.pf-40.pf-key.pf-disabled{background-image:url(40/disabled/key.png)}
+.disabled .pf-40.pf-link-info,.k-state-disabled .pf-40.pf-link-info,[disabled] .pf-40.pf-link-info,.pf-40.pf-link-info.pf-disabled{background-image:url(40/disabled/link-info.png)}
+.disabled .pf-40.pf-list-arrow_right,.k-state-disabled .pf-40.pf-list-arrow_right,[disabled] .pf-40.pf-list-arrow_right,.pf-40.pf-list-arrow_right.pf-disabled{background-image:url(40/disabled/list-arrow_right.png)}
+.disabled .pf-40.pf-list-ok,.k-state-disabled .pf-40.pf-list-ok,[disabled] .pf-40.pf-list-ok,.pf-40.pf-list-ok.pf-disabled{background-image:url(40/disabled/list-ok.png)}
+.disabled .pf-40.pf-mail,.k-state-disabled .pf-40.pf-mail,[disabled] .pf-40.pf-mail,.pf-40.pf-mail.pf-disabled{background-image:url(40/disabled/mail.png)}
+.disabled .pf-40.pf-mail-arrow_right,.k-state-disabled .pf-40.pf-mail-arrow_right,[disabled] .pf-40.pf-mail-arrow_right,.pf-40.pf-mail-arrow_right.pf-disabled{background-image:url(40/disabled/mail-arrow_right.png)}
+.disabled .pf-40.pf-money,.k-state-disabled .pf-40.pf-money,[disabled] .pf-40.pf-money,.pf-40.pf-money.pf-disabled{background-image:url(40/disabled/money.png)}
+.disabled .pf-40.pf-phone,.k-state-disabled .pf-40.pf-phone,[disabled] .pf-40.pf-phone,.pf-40.pf-phone.pf-disabled{background-image:url(40/disabled/phone.png)}
+.disabled .pf-40.pf-phone-ok,.k-state-disabled .pf-40.pf-phone-ok,[disabled] .pf-40.pf-phone-ok,.pf-40.pf-phone-ok.pf-disabled{background-image:url(40/disabled/phone-ok.png)}
+.disabled .pf-40.pf-phone-ok2,.k-state-disabled .pf-40.pf-phone-ok2,[disabled] .pf-40.pf-phone-ok2,.pf-40.pf-phone-ok2.pf-disabled{background-image:url(40/disabled/phone-ok2.png)}
+.disabled .pf-40.pf-phone-error,.k-state-disabled .pf-40.pf-phone-error,[disabled] .pf-40.pf-phone-error,.pf-40.pf-phone-error.pf-disabled{background-image:url(40/disabled/phone-error.png)}
+.disabled .pf-40.pf-percentage,.k-state-disabled .pf-40.pf-percentage,[disabled] .pf-40.pf-percentage,.pf-40.pf-percentage.pf-disabled{background-image:url(40/disabled/percentage.png)}
+.disabled .pf-40.pf-percentage_green,.k-state-disabled .pf-40.pf-percentage_green,[disabled] .pf-40.pf-percentage_green,.pf-40.pf-percentage_green.pf-disabled{background-image:url(40/disabled/percentage_green.png)}
+.disabled .pf-40.pf-percentage_red,.k-state-disabled .pf-40.pf-percentage_red,[disabled] .pf-40.pf-percentage_red,.pf-40.pf-percentage_red.pf-disabled{background-image:url(40/disabled/percentage_red.png)}
+.disabled .pf-40.pf-piece,.k-state-disabled .pf-40.pf-piece,[disabled] .pf-40.pf-piece,.pf-40.pf-piece.pf-disabled{background-image:url(40/disabled/piece.png)}
+.disabled .pf-40.pf-print,.k-state-disabled .pf-40.pf-print,[disabled] .pf-40.pf-print,.pf-40.pf-print.pf-disabled{background-image:url(40/disabled/print.png)}
+.disabled .pf-40.pf-reload_rotate,.k-state-disabled .pf-40.pf-reload_rotate,[disabled] .pf-40.pf-reload_rotate,.pf-40.pf-reload_rotate.pf-disabled{background-image:url(40/disabled/reload_rotate.png)}
+.disabled .pf-40.pf-report_open,.k-state-disabled .pf-40.pf-report_open,[disabled] .pf-40.pf-report_open,.pf-40.pf-report_open.pf-disabled{background-image:url(40/disabled/report_open.png)}
+.disabled .pf-40.pf-report_open-import,.k-state-disabled .pf-40.pf-report_open-import,[disabled] .pf-40.pf-report_open-import,.pf-40.pf-report_open-import.pf-disabled{background-image:url(40/disabled/report_open-import.png)}
+.disabled .pf-40.pf-table_column,.k-state-disabled .pf-40.pf-table_column,[disabled] .pf-40.pf-table_column,.pf-40.pf-table_column.pf-disabled{background-image:url(40/disabled/table_column.png)}
+.disabled .pf-40.pf-table,.k-state-disabled .pf-40.pf-table,[disabled] .pf-40.pf-table,.pf-40.pf-table.pf-disabled{background-image:url(40/disabled/table.png)}
+.disabled .pf-40.pf-table_row-add2,.k-state-disabled .pf-40.pf-table_row-add2,[disabled] .pf-40.pf-table_row-add2,.pf-40.pf-table_row-add2.pf-disabled{background-image:url(40/disabled/table_row-add2.png)}
+.disabled .pf-40.pf-table_row-delete2,.k-state-disabled .pf-40.pf-table_row-delete2,[disabled] .pf-40.pf-table_row-delete2,.pf-40.pf-table_row-delete2.pf-disabled{background-image:url(40/disabled/table_row-delete2.png)}
+.disabled .pf-40.pf-tabs-export,.k-state-disabled .pf-40.pf-tabs-export,[disabled] .pf-40.pf-tabs-export,.pf-40.pf-tabs-export.pf-disabled{background-image:url(40/disabled/tabs-export.png)}
+.disabled .pf-40.pf-tool_pencil,.k-state-disabled .pf-40.pf-tool_pencil,[disabled] .pf-40.pf-tool_pencil,.pf-40.pf-tool_pencil.pf-disabled{background-image:url(40/disabled/tool_pencil.png)}
+.disabled .pf-40.pf-tree,.k-state-disabled .pf-40.pf-tree,[disabled] .pf-40.pf-tree,.pf-40.pf-tree.pf-disabled{background-image:url(40/disabled/tree.png)}
+.disabled .pf-40.pf-money_banknote-server,.k-state-disabled .pf-40.pf-money_banknote-server,[disabled] .pf-40.pf-money_banknote-server,.pf-40.pf-money_banknote-server.pf-disabled{background-image:url(40/disabled/money_banknote-server.png)}
+.disabled .pf-40.pf-user,.k-state-disabled .pf-40.pf-user,[disabled] .pf-40.pf-user,.pf-40.pf-user.pf-disabled{background-image:url(40/disabled/user.png)}
+.disabled .pf-40.pf-save,.k-state-disabled .pf-40.pf-save,[disabled] .pf-40.pf-save,.pf-40.pf-save.pf-disabled{background-image:url(40/disabled/save.png)}
+.disabled .pf-40.pf-user_symbol_blue-picture,.k-state-disabled .pf-40.pf-user_symbol_blue-picture,[disabled] .pf-40.pf-user_symbol_blue-picture,.pf-40.pf-user_symbol_blue-picture.pf-disabled{background-image:url(40/disabled/user_symbol_blue-picture.png)}
+.disabled .pf-40.pf-info,.k-state-disabled .pf-40.pf-info,[disabled] .pf-40.pf-info,.pf-40.pf-info.pf-disabled{background-image:url(40/disabled/info.png)}
+.disabled .pf-40.pf-search,.k-state-disabled .pf-40.pf-search,[disabled] .pf-40.pf-search,.pf-40.pf-search.pf-disabled{background-image:url(40/disabled/search.png)}
+.disabled .pf-40.pf-stop,.k-state-disabled .pf-40.pf-stop,[disabled] .pf-40.pf-stop,.pf-40.pf-stop.pf-disabled{background-image:url(40/disabled/stop.png)}
+.disabled .pf-40.pf-sort_za,.k-state-disabled .pf-40.pf-sort_za,[disabled] .pf-40.pf-sort_za,.pf-40.pf-sort_za.pf-disabled{background-image:url(40/disabled/sort_za.png)}
+.disabled .pf-40.pf-sort_az,.k-state-disabled .pf-40.pf-sort_az,[disabled] .pf-40.pf-sort_az,.pf-40.pf-sort_az.pf-disabled{background-image:url(40/disabled/sort_az.png)}
+.disabled .pf-40.pf-slide-arrow_right,.k-state-disabled .pf-40.pf-slide-arrow_right,[disabled] .pf-40.pf-slide-arrow_right,.pf-40.pf-slide-arrow_right.pf-disabled{background-image:url(40/disabled/slide-arrow_right.png)}
+.disabled .pf-40.pf-slide-arrow_left,.k-state-disabled .pf-40.pf-slide-arrow_left,[disabled] .pf-40.pf-slide-arrow_left,.pf-40.pf-slide-arrow_left.pf-disabled{background-image:url(40/disabled/slide-arrow_left.png)}
+.disabled .pf-40.pf-view_options,.k-state-disabled .pf-40.pf-view_options,[disabled] .pf-40.pf-view_options,.pf-40.pf-view_options.pf-disabled{background-image:url(40/disabled/view_options.png)}
+.disabled .pf-40.pf-warning,.k-state-disabled .pf-40.pf-warning,[disabled] .pf-40.pf-warning,.pf-40.pf-warning.pf-disabled{background-image:url(40/disabled/warning.png)}
+.disabled .pf-40.pf-help,.k-state-disabled .pf-40.pf-help,[disabled] .pf-40.pf-help,.pf-40.pf-help.pf-disabled{background-image:url(40/disabled/help.png)}
+.disabled .pf-40.pf-ov_arrow_left,.k-state-disabled .pf-40.pf-ov_arrow_left,[disabled] .pf-40.pf-ov_arrow_left,.pf-40.pf-ov_arrow_left.pf-disabled{background-image:url(40/disabled/ov_arrow_left.png)}
+.disabled .pf-40.pf-ov_arrow_right,.k-state-disabled .pf-40.pf-ov_arrow_right,[disabled] .pf-40.pf-ov_arrow_right,.pf-40.pf-ov_arrow_right.pf-disabled{background-image:url(40/disabled/ov_arrow_right.png)}
+.disabled .pf-40.pf-ok_button,.k-state-disabled .pf-40.pf-ok_button,[disabled] .pf-40.pf-ok_button,.pf-40.pf-ok_button.pf-disabled{background-image:url(40/disabled/ok_button.png)}
+.disabled .pf-40.pf-ok,.k-state-disabled .pf-40.pf-ok,[disabled] .pf-40.pf-ok,.pf-40.pf-ok.pf-disabled{background-image:url(40/disabled/ok.png)}
+.disabled .pf-40.pf-ov_customer,.k-state-disabled .pf-40.pf-ov_customer,[disabled] .pf-40.pf-ov_customer,.pf-40.pf-ov_customer.pf-disabled{background-image:url(40/disabled/ov_customer.png)}
+.disabled .pf-40.pf-ov_link,.k-state-disabled .pf-40.pf-ov_link,[disabled] .pf-40.pf-ov_link,.pf-40.pf-ov_link.pf-disabled{background-image:url(40/disabled/ov_link.png)}
+.disabled .pf-40.pf-ov_update,.k-state-disabled .pf-40.pf-ov_update,[disabled] .pf-40.pf-ov_update,.pf-40.pf-ov_update.pf-disabled{background-image:url(40/disabled/ov_update.png)}
+/*==========48==========*/
+.pf-48{width:48px;height:48px}
+.pf-48.pf-add{background-image:url(48/add.png)}
+.pf-48.pf-add_button{background-image:url(48/add_button.png)}
+.pf-48.pf-address_book-design{background-image:url(48/address_book-design.png)}
+.pf-48.pf-application-update{background-image:url(48/application-update.png)}
+.pf-48.pf-accept_doc{background-image:url(48/accept_doc.png)}
+.pf-48.pf-alert{background-image:url(48/alert.png)}
+.pf-48.pf-arrow_down{background-image:url(48/arrow_down.png)}
+.pf-48.pf-arrow_download{background-image:url(48/arrow_download.png)}
+.pf-48.pf-arrow_left{background-image:url(48/arrow_left.png)}
+.pf-48.pf-arrow_right{background-image:url(48/arrow_right.png)}
+.pf-48.pf-bank{background-image:url(48/bank.png)}
+.pf-48.pf-bank-update{background-image:url(48/bank-update.png)}
+.pf-48.pf-bank-account{background-image:url(48/bank-account.png)}
+.pf-48.pf-book{background-image:url(48/book.png)}
+.pf-48.pf-bookmark-ok{background-image:url(48/bookmark-ok.png)}
+.pf-48.pf-business_report{background-image:url(48/business_report.png)}
+.pf-48.pf-calendar{background-image:url(48/calendar.png)}
+.pf-48.pf-calendar-update{background-image:url(48/calendar-update.png)}
+.pf-48.pf-currency_conversion{background-image:url(48/currency_conversion.png)}
+.pf-48.pf-clock{background-image:url(48/clock.png)}
+.pf-48.pf-database-arrow_right{background-image:url(48/database-arrow_right.png)}
+.pf-48.pf-database-import{background-image:url(48/database-import.png)}
+.pf-48.pf-delete_button_error{background-image:url(48/delete_button_error.png)}
+.pf-48.pf-execute{background-image:url(48/execute.png)}
+.pf-48.pf-exel{background-image:url(48/exel.png)}
+.pf-48.pf-delete{background-image:url(48/delete.png)}
+.pf-48.pf-document_header_footer-ok2{background-image:url(48/document_header_footer-ok2.png)}
+.pf-48.pf-folder{background-image:url(48/folder.png)}
+.pf-48.pf-folder_open{background-image:url(48/folder_open.png)}
+.pf-48.pf-folder-execute{background-image:url(48/folder-execute.png)}
+.pf-48.pf-folder_open-execute{background-image:url(48/folder_open-execute.png)}
+.pf-48.pf-folder-favorite{background-image:url(48/folder-favorite.png)}
+.pf-48.pf-folder_open-favorite{background-image:url(48/folder_open-favorite.png)}
+.pf-48.pf-filter-ok{background-image:url(48/filter-ok.png)}
+.pf-48.pf-filter-remove{background-image:url(48/filter-remove.png)}
+.pf-48.pf-find{background-image:url(48/find.png)}
+.pf-48.pf-gear{background-image:url(48/gear.png)}
+.pf-48.pf-gears{background-image:url(48/gears.png)}
+.pf-48.pf-help{background-image:url(48/help.png)}
+.pf-48.pf-key{background-image:url(48/key.png)}
+.pf-48.pf-link-info{background-image:url(48/link-info.png)}
+.pf-48.pf-list-arrow_right{background-image:url(48/list-arrow_right.png)}
+.pf-48.pf-list-ok{background-image:url(48/list-ok.png)}
+.pf-48.pf-mail{background-image:url(48/mail.png)}
+.pf-48.pf-mail-arrow_right{background-image:url(48/mail-arrow_right.png)}
+.pf-48.pf-money{background-image:url(48/money.png)}
+.pf-48.pf-phone{background-image:url(48/phone.png)}
+.pf-48.pf-phone-ok{background-image:url(48/phone-ok.png)}
+.pf-48.pf-phone-ok2{background-image:url(48/phone-ok2.png)}
+.pf-48.pf-phone-error{background-image:url(48/phone-error.png)}
+.pf-48.pf-percentage{background-image:url(48/percentage.png)}
+.pf-48.pf-percentage_green{background-image:url(48/percentage_green.png)}
+.pf-48.pf-percentage_red{background-image:url(48/percentage_red.png)}
+.pf-48.pf-piece{background-image:url(48/piece.png)}
+.pf-48.pf-print{background-image:url(48/print.png)}
+.pf-48.pf-reload_rotate{background-image:url(48/reload_rotate.png)}
+.pf-48.pf-report_open{background-image:url(48/report_open.png)}
+.pf-48.pf-report_open-import{background-image:url(48/report_open-import.png)}
+.pf-48.pf-table_column{background-image:url(48/table_column.png)}
+.pf-48.pf-table{background-image:url(48/table.png)}
+.pf-48.pf-table_row-add2{background-image:url(48/table_row-add2.png)}
+.pf-48.pf-table_row-delete2{background-image:url(48/table_row-delete2.png)}
+.pf-48.pf-tabs-export{background-image:url(48/tabs-export.png)}
+.pf-48.pf-tool_pencil{background-image:url(48/tool_pencil.png)}
+.pf-48.pf-tree{background-image:url(48/tree.png)}
+.pf-48.pf-money_banknote-server{background-image:url(48/money_banknote-server.png)}
+.pf-48.pf-user{background-image:url(48/user.png)}
+.pf-48.pf-save{background-image:url(48/save.png)}
+.pf-48.pf-user_symbol_blue-picture{background-image:url(48/user_symbol_blue-picture.png)}
+.pf-48.pf-info{background-image:url(48/info.png)}
+.pf-48.pf-search{background-image:url(48/search.png)}
+.pf-48.pf-stop{background-image:url(48/stop.png)}
+.pf-48.pf-sort_za{background-image:url(48/sort_za.png)}
+.pf-48.pf-sort_az{background-image:url(48/sort_az.png)}
+.pf-48.pf-slide-arrow_right{background-image:url(48/slide-arrow_right.png)}
+.pf-48.pf-slide-arrow_left{background-image:url(48/slide-arrow_left.png)}
+.pf-48.pf-view_options{background-image:url(48/view_options.png)}
+.pf-48.pf-warning{background-image:url(48/warning.png)}
+.pf-48.pf-help{background-image:url(48/help.png)}
+.pf-48.pf-ov_arrow_left{background-image:url(48/ov_arrow_left.png)}
+.pf-48.pf-ov_arrow_right{background-image:url(48/ov_arrow_right.png)}
+.pf-48.pf-ok_button{background-image:url(48/ok_button.png)}
+.pf-48.pf-ok{background-image:url(48/ok.png)}
+.pf-48.pf-ov_customer{background-image:url(48/ov_customer.png)}
+.pf-48.pf-ov_link{background-image:url(48/ov_link.png)}
+.pf-48.pf-ov_update{background-image:url(48/ov_update.png)}
+.pf-48.pf-add.pf-hot{background-image:url(48/hot/add.png)}
+.pf-48.pf-add_button.pf-hot{background-image:url(48/hot/add_button.png)}
+.pf-48.pf-address_book-design.pf-hot{background-image:url(48/hot/address_book-design.png)}
+.pf-48.pf-application-update.pf-hot{background-image:url(48/hot/application-update.png)}
+.pf-48.pf-accept_doc.pf-hot{background-image:url(48/hot/accept_doc.png)}
+.pf-48.pf-alert.pf-hot{background-image:url(48/hot/alert.png)}
+.pf-48.pf-arrow_down.pf-hot{background-image:url(48/hot/arrow_down.png)}
+.pf-48.pf-arrow_download.pf-hot{background-image:url(48/hot/arrow_download.png)}
+.pf-48.pf-arrow_left.pf-hot{background-image:url(48/hot/arrow_left.png)}
+.pf-48.pf-arrow_right.pf-hot{background-image:url(48/hot/arrow_right.png)}
+.pf-48.pf-bank.pf-hot{background-image:url(48/hot/bank.png)}
+.pf-48.pf-bank-update.pf-hot{background-image:url(48/hot/bank-update.png)}
+.pf-48.pf-bank-account.pf-hot{background-image:url(48/hot/bank-account.png)}
+.pf-48.pf-book.pf-hot{background-image:url(48/hot/book.png)}
+.pf-48.pf-bookmark-ok.pf-hot{background-image:url(48/hot/bookmark-ok.png)}
+.pf-48.pf-business_report.pf-hot{background-image:url(48/hot/business_report.png)}
+.pf-48.pf-calendar.pf-hot{background-image:url(48/hot/calendar.png)}
+.pf-48.pf-calendar-update.pf-hot{background-image:url(48/hot/calendar-update.png)}
+.pf-48.pf-currency_conversion.pf-hot{background-image:url(48/hot/currency_conversion.png)}
+.pf-48.pf-clock.pf-hot{background-image:url(48/hot/clock.png)}
+.pf-48.pf-database-arrow_right.pf-hot{background-image:url(48/hot/database-arrow_right.png)}
+.pf-48.pf-database-import.pf-hot{background-image:url(48/hot/database-import.png)}
+.pf-48.pf-delete_button_error.pf-hot{background-image:url(48/hot/delete_button_error.png)}
+.pf-48.pf-execute.pf-hot{background-image:url(48/hot/execute.png)}
+.pf-48.pf-exel.pf-hot{background-image:url(48/hot/exel.png)}
+.pf-48.pf-delete.pf-hot{background-image:url(48/hot/delete.png)}
+.pf-48.pf-document_header_footer-ok2.pf-hot{background-image:url(48/hot/document_header_footer-ok2.png)}
+.pf-48.pf-folder.pf-hot{background-image:url(48/hot/folder.png)}
+.pf-48.pf-folder_open.pf-hot{background-image:url(48/hot/folder_open.png)}
+.pf-48.pf-folder-execute.pf-hot{background-image:url(48/hot/folder-execute.png)}
+.pf-48.pf-folder_open-execute.pf-hot{background-image:url(48/hot/folder_open-execute.png)}
+.pf-48.pf-folder-favorite.pf-hot{background-image:url(48/hot/folder-favorite.png)}
+.pf-48.pf-folder_open-favorite.pf-hot{background-image:url(48/hot/folder_open-favorite.png)}
+.pf-48.pf-filter-ok.pf-hot{background-image:url(48/hot/filter-ok.png)}
+.pf-48.pf-filter-remove.pf-hot{background-image:url(48/hot/filter-remove.png)}
+.pf-48.pf-find.pf-hot{background-image:url(48/hot/find.png)}
+.pf-48.pf-gear.pf-hot{background-image:url(48/hot/gear.png)}
+.pf-48.pf-gears.pf-hot{background-image:url(48/hot/gears.png)}
+.pf-48.pf-help.pf-hot{background-image:url(48/hot/help.png)}
+.pf-48.pf-key.pf-hot{background-image:url(48/hot/key.png)}
+.pf-48.pf-link-info.pf-hot{background-image:url(48/hot/link-info.png)}
+.pf-48.pf-list-arrow_right.pf-hot{background-image:url(48/hot/list-arrow_right.png)}
+.pf-48.pf-list-ok.pf-hot{background-image:url(48/hot/list-ok.png)}
+.pf-48.pf-mail.pf-hot{background-image:url(48/hot/mail.png)}
+.pf-48.pf-mail-arrow_right.pf-hot{background-image:url(48/hot/mail-arrow_right.png)}
+.pf-48.pf-money.pf-hot{background-image:url(48/hot/money.png)}
+.pf-48.pf-phone.pf-hot{background-image:url(48/hot/phone.png)}
+.pf-48.pf-phone-ok.pf-hot{background-image:url(48/hot/phone-ok.png)}
+.pf-48.pf-phone-ok2.pf-hot{background-image:url(48/hot/phone-ok2.png)}
+.pf-48.pf-phone-error.pf-hot{background-image:url(48/hot/phone-error.png)}
+.pf-48.pf-percentage.pf-hot{background-image:url(48/hot/percentage.png)}
+.pf-48.pf-percentage_green.pf-hot{background-image:url(48/hot/percentage_green.png)}
+.pf-48.pf-percentage_red.pf-hot{background-image:url(48/hot/percentage_red.png)}
+.pf-48.pf-piece.pf-hot{background-image:url(48/hot/piece.png)}
+.pf-48.pf-print.pf-hot{background-image:url(48/hot/print.png)}
+.pf-48.pf-reload_rotate.pf-hot{background-image:url(48/hot/reload_rotate.png)}
+.pf-48.pf-report_open.pf-hot{background-image:url(48/hot/report_open.png)}
+.pf-48.pf-report_open-import.pf-hot{background-image:url(48/hot/report_open-import.png)}
+.pf-48.pf-table_column.pf-hot{background-image:url(48/hot/table_column.png)}
+.pf-48.pf-table.pf-hot{background-image:url(48/hot/table.png)}
+.pf-48.pf-table_row-add2.pf-hot{background-image:url(48/hot/table_row-add2.png)}
+.pf-48.pf-table_row-delete2.pf-hot{background-image:url(48/hot/table_row-delete2.png)}
+.pf-48.pf-tabs-export.pf-hot{background-image:url(48/hot/tabs-export.png)}
+.pf-48.pf-tool_pencil.pf-hot{background-image:url(48/hot/tool_pencil.png)}
+.pf-48.pf-tree.pf-hot{background-image:url(48/hot/tree.png)}
+.pf-48.pf-money_banknote-server.pf-hot{background-image:url(48/hot/money_banknote-server.png)}
+.pf-48.pf-user.pf-hot{background-image:url(48/hot/user.png)}
+.pf-48.pf-save.pf-hot{background-image:url(48/hot/save.png)}
+.pf-48.pf-user_symbol_blue-picture.pf-hot{background-image:url(48/hot/user_symbol_blue-picture.png)}
+.pf-48.pf-info.pf-hot{background-image:url(48/hot/info.png)}
+.pf-48.pf-search.pf-hot{background-image:url(48/hot/search.png)}
+.pf-48.pf-stop.pf-hot{background-image:url(48/hot/stop.png)}
+.pf-48.pf-sort_za.pf-hot{background-image:url(48/hot/sort_za.png)}
+.pf-48.pf-sort_az.pf-hot{background-image:url(48/hot/sort_az.png)}
+.pf-48.pf-slide-arrow_right.pf-hot{background-image:url(48/hot/slide-arrow_right.png)}
+.pf-48.pf-slide-arrow_left.pf-hot{background-image:url(48/hot/slide-arrow_left.png)}
+.pf-48.pf-view_options.pf-hot{background-image:url(48/hot/view_options.png)}
+.pf-48.pf-warning.pf-hot{background-image:url(48/hot/warning.png)}
+.pf-48.pf-help.pf-hot{background-image:url(48/hot/help.png)}
+.pf-48.pf-ov_arrow_left.pf-hot{background-image:url(48/hot/ov_arrow_left.png)}
+.pf-48.pf-ov_arrow_right.pf-hot{background-image:url(48/hot/ov_arrow_right.png)}
+.pf-48.pf-ok_button.pf-hot{background-image:url(48/hot/ok_button.png)}
+.pf-48.pf-ok.pf-hot{background-image:url(48/hot/ok.png)}
+.pf-48.pf-ov_customer.pf-hot{background-image:url(48/hot/ov_customer.png)}
+.pf-48.pf-ov_link.pf-hot{background-image:url(48/hot/ov_link.png)}
+.pf-48.pf-ov_update.pf-hot{background-image:url(48/hot/ov_update.png)}
+.disabled .pf-48.pf-add,.k-state-disabled .pf-48.pf-add,[disabled] .pf-48.pf-add,.pf-48.pf-add.pf-disabled{background-image:url(48/disabled/add.png)}
+.disabled .pf-48.pf-add_button,.k-state-disabled .pf-48.pf-add_button,[disabled] .pf-48.pf-add_button,.pf-48.pf-add_button.pf-disabled{background-image:url(48/disabled/add_button.png)}
+.disabled .pf-48.pf-address_book-design,.k-state-disabled .pf-48.pf-address_book-design,[disabled] .pf-48.pf-address_book-design,.pf-48.pf-address_book-design.pf-disabled{background-image:url(48/disabled/address_book-design.png)}
+.disabled .pf-48.pf-application-update,.k-state-disabled .pf-48.pf-application-update,[disabled] .pf-48.pf-application-update,.pf-48.pf-application-update.pf-disabled{background-image:url(48/disabled/application-update.png)}
+.disabled .pf-48.pf-accept_doc,.k-state-disabled .pf-48.pf-accept_doc,[disabled] .pf-48.pf-accept_doc,.pf-48.pf-accept_doc.pf-disabled{background-image:url(48/disabled/accept_doc.png)}
+.disabled .pf-48.pf-alert,.k-state-disabled .pf-48.pf-alert,[disabled] .pf-48.pf-alert,.pf-48.pf-alert.pf-disabled{background-image:url(48/disabled/alert.png)}
+.disabled .pf-48.pf-arrow_down,.k-state-disabled .pf-48.pf-arrow_down,[disabled] .pf-48.pf-arrow_down,.pf-48.pf-arrow_down.pf-disabled{background-image:url(48/disabled/arrow_down.png)}
+.disabled .pf-48.pf-arrow_download,.k-state-disabled .pf-48.pf-arrow_download,[disabled] .pf-48.pf-arrow_download,.pf-48.pf-arrow_download.pf-disabled{background-image:url(48/disabled/arrow_download.png)}
+.disabled .pf-48.pf-arrow_left,.k-state-disabled .pf-48.pf-arrow_left,[disabled] .pf-48.pf-arrow_left,.pf-48.pf-arrow_left.pf-disabled{background-image:url(48/disabled/arrow_left.png)}
+.disabled .pf-48.pf-arrow_right,.k-state-disabled .pf-48.pf-arrow_right,[disabled] .pf-48.pf-arrow_right,.pf-48.pf-arrow_right.pf-disabled{background-image:url(48/disabled/arrow_right.png)}
+.disabled .pf-48.pf-bank,.k-state-disabled .pf-48.pf-bank,[disabled] .pf-48.pf-bank,.pf-48.pf-bank.pf-disabled{background-image:url(48/disabled/bank.png)}
+.disabled .pf-48.pf-bank-update,.k-state-disabled .pf-48.pf-bank-update,[disabled] .pf-48.pf-bank-update,.pf-48.pf-bank-update.pf-disabled{background-image:url(48/disabled/bank-update.png)}
+.disabled .pf-48.pf-bank-account,.k-state-disabled .pf-48.pf-bank-account,[disabled] .pf-48.pf-bank-account,.pf-48.pf-bank-account.pf-disabled{background-image:url(48/disabled/bank-account.png)}
+.disabled .pf-48.pf-book,.k-state-disabled .pf-48.pf-book,[disabled] .pf-48.pf-book,.pf-48.pf-book.pf-disabled{background-image:url(48/disabled/book.png)}
+.disabled .pf-48.pf-bookmark-ok,.k-state-disabled .pf-48.pf-bookmark-ok,[disabled] .pf-48.pf-bookmark-ok,.pf-48.pf-bookmark-ok.pf-disabled{background-image:url(48/disabled/bookmark-ok.png)}
+.disabled .pf-48.pf-business_report,.k-state-disabled .pf-48.pf-business_report,[disabled] .pf-48.pf-business_report,.pf-48.pf-business_report.pf-disabled{background-image:url(48/disabled/business_report.png)}
+.disabled .pf-48.pf-calendar,.k-state-disabled .pf-48.pf-calendar,[disabled] .pf-48.pf-calendar,.pf-48.pf-calendar.pf-disabled{background-image:url(48/disabled/calendar.png)}
+.disabled .pf-48.pf-calendar-update,.k-state-disabled .pf-48.pf-calendar-update,[disabled] .pf-48.pf-calendar-update,.pf-48.pf-calendar-update.pf-disabled{background-image:url(48/disabled/calendar-update.png)}
+.disabled .pf-48.pf-currency_conversion,.k-state-disabled .pf-48.pf-currency_conversion,[disabled] .pf-48.pf-currency_conversion,.pf-48.pf-currency_conversion.pf-disabled{background-image:url(48/disabled/currency_conversion.png)}
+.disabled .pf-48.pf-clock,.k-state-disabled .pf-48.pf-clock,[disabled] .pf-48.pf-clock,.pf-48.pf-clock.pf-disabled{background-image:url(48/disabled/clock.png)}
+.disabled .pf-48.pf-database-arrow_right,.k-state-disabled .pf-48.pf-database-arrow_right,[disabled] .pf-48.pf-database-arrow_right,.pf-48.pf-database-arrow_right.pf-disabled{background-image:url(48/disabled/database-arrow_right.png)}
+.disabled .pf-48.pf-database-import,.k-state-disabled .pf-48.pf-database-import,[disabled] .pf-48.pf-database-import,.pf-48.pf-database-import.pf-disabled{background-image:url(48/disabled/database-import.png)}
+.disabled .pf-48.pf-delete_button_error,.k-state-disabled .pf-48.pf-delete_button_error,[disabled] .pf-48.pf-delete_button_error,.pf-48.pf-delete_button_error.pf-disabled{background-image:url(48/disabled/delete_button_error.png)}
+.disabled .pf-48.pf-execute,.k-state-disabled .pf-48.pf-execute,[disabled] .pf-48.pf-execute,.pf-48.pf-execute.pf-disabled{background-image:url(48/disabled/execute.png)}
+.disabled .pf-48.pf-exel,.k-state-disabled .pf-48.pf-exel,[disabled] .pf-48.pf-exel,.pf-48.pf-exel.pf-disabled{background-image:url(48/disabled/exel.png)}
+.disabled .pf-48.pf-delete,.k-state-disabled .pf-48.pf-delete,[disabled] .pf-48.pf-delete,.pf-48.pf-delete.pf-disabled{background-image:url(48/disabled/delete.png)}
+.disabled .pf-48.pf-document_header_footer-ok2,.k-state-disabled .pf-48.pf-document_header_footer-ok2,[disabled] .pf-48.pf-document_header_footer-ok2,.pf-48.pf-document_header_footer-ok2.pf-disabled{background-image:url(48/disabled/document_header_footer-ok2.png)}
+.disabled .pf-48.pf-folder,.k-state-disabled .pf-48.pf-folder,[disabled] .pf-48.pf-folder,.pf-48.pf-folder.pf-disabled{background-image:url(48/disabled/folder.png)}
+.disabled .pf-48.pf-folder_open,.k-state-disabled .pf-48.pf-folder_open,[disabled] .pf-48.pf-folder_open,.pf-48.pf-folder_open.pf-disabled{background-image:url(48/disabled/folder_open.png)}
+.disabled .pf-48.pf-folder-execute,.k-state-disabled .pf-48.pf-folder-execute,[disabled] .pf-48.pf-folder-execute,.pf-48.pf-folder-execute.pf-disabled{background-image:url(48/disabled/folder-execute.png)}
+.disabled .pf-48.pf-folder_open-execute,.k-state-disabled .pf-48.pf-folder_open-execute,[disabled] .pf-48.pf-folder_open-execute,.pf-48.pf-folder_open-execute.pf-disabled{background-image:url(48/disabled/folder_open-execute.png)}
+.disabled .pf-48.pf-folder-favorite,.k-state-disabled .pf-48.pf-folder-favorite,[disabled] .pf-48.pf-folder-favorite,.pf-48.pf-folder-favorite.pf-disabled{background-image:url(48/disabled/folder-favorite.png)}
+.disabled .pf-48.pf-folder_open-favorite,.k-state-disabled .pf-48.pf-folder_open-favorite,[disabled] .pf-48.pf-folder_open-favorite,.pf-48.pf-folder_open-favorite.pf-disabled{background-image:url(48/disabled/folder_open-favorite.png)}
+.disabled .pf-48.pf-filter-ok,.k-state-disabled .pf-48.pf-filter-ok,[disabled] .pf-48.pf-filter-ok,.pf-48.pf-filter-ok.pf-disabled{background-image:url(48/disabled/filter-ok.png)}
+.disabled .pf-48.pf-filter-remove,.k-state-disabled .pf-48.pf-filter-remove,[disabled] .pf-48.pf-filter-remove,.pf-48.pf-filter-remove.pf-disabled{background-image:url(48/disabled/filter-remove.png)}
+.disabled .pf-48.pf-find,.k-state-disabled .pf-48.pf-find,[disabled] .pf-48.pf-find,.pf-48.pf-find.pf-disabled{background-image:url(48/disabled/find.png)}
+.disabled .pf-48.pf-gear,.k-state-disabled .pf-48.pf-gear,[disabled] .pf-48.pf-gear,.pf-48.pf-gear.pf-disabled{background-image:url(48/disabled/gear.png)}
+.disabled .pf-48.pf-gears,.k-state-disabled .pf-48.pf-gears,[disabled] .pf-48.pf-gears,.pf-48.pf-gears.pf-disabled{background-image:url(48/disabled/gears.png)}
+.disabled .pf-48.pf-help,.k-state-disabled .pf-48.pf-help,[disabled] .pf-48.pf-help,.pf-48.pf-help.pf-disabled{background-image:url(48/disabled/help.png)}
+.disabled .pf-48.pf-key,.k-state-disabled .pf-48.pf-key,[disabled] .pf-48.pf-key,.pf-48.pf-key.pf-disabled{background-image:url(48/disabled/key.png)}
+.disabled .pf-48.pf-link-info,.k-state-disabled .pf-48.pf-link-info,[disabled] .pf-48.pf-link-info,.pf-48.pf-link-info.pf-disabled{background-image:url(48/disabled/link-info.png)}
+.disabled .pf-48.pf-list-arrow_right,.k-state-disabled .pf-48.pf-list-arrow_right,[disabled] .pf-48.pf-list-arrow_right,.pf-48.pf-list-arrow_right.pf-disabled{background-image:url(48/disabled/list-arrow_right.png)}
+.disabled .pf-48.pf-list-ok,.k-state-disabled .pf-48.pf-list-ok,[disabled] .pf-48.pf-list-ok,.pf-48.pf-list-ok.pf-disabled{background-image:url(48/disabled/list-ok.png)}
+.disabled .pf-48.pf-mail,.k-state-disabled .pf-48.pf-mail,[disabled] .pf-48.pf-mail,.pf-48.pf-mail.pf-disabled{background-image:url(48/disabled/mail.png)}
+.disabled .pf-48.pf-mail-arrow_right,.k-state-disabled .pf-48.pf-mail-arrow_right,[disabled] .pf-48.pf-mail-arrow_right,.pf-48.pf-mail-arrow_right.pf-disabled{background-image:url(48/disabled/mail-arrow_right.png)}
+.disabled .pf-48.pf-money,.k-state-disabled .pf-48.pf-money,[disabled] .pf-48.pf-money,.pf-48.pf-money.pf-disabled{background-image:url(48/disabled/money.png)}
+.disabled .pf-48.pf-phone,.k-state-disabled .pf-48.pf-phone,[disabled] .pf-48.pf-phone,.pf-48.pf-phone.pf-disabled{background-image:url(48/disabled/phone.png)}
+.disabled .pf-48.pf-phone-ok,.k-state-disabled .pf-48.pf-phone-ok,[disabled] .pf-48.pf-phone-ok,.pf-48.pf-phone-ok.pf-disabled{background-image:url(48/disabled/phone-ok.png)}
+.disabled .pf-48.pf-phone-ok2,.k-state-disabled .pf-48.pf-phone-ok2,[disabled] .pf-48.pf-phone-ok2,.pf-48.pf-phone-ok2.pf-disabled{background-image:url(48/disabled/phone-ok2.png)}
+.disabled .pf-48.pf-phone-error,.k-state-disabled .pf-48.pf-phone-error,[disabled] .pf-48.pf-phone-error,.pf-48.pf-phone-error.pf-disabled{background-image:url(48/disabled/phone-error.png)}
+.disabled .pf-48.pf-percentage,.k-state-disabled .pf-48.pf-percentage,[disabled] .pf-48.pf-percentage,.pf-48.pf-percentage.pf-disabled{background-image:url(48/disabled/percentage.png)}
+.disabled .pf-48.pf-percentage_green,.k-state-disabled .pf-48.pf-percentage_green,[disabled] .pf-48.pf-percentage_green,.pf-48.pf-percentage_green.pf-disabled{background-image:url(48/disabled/percentage_green.png)}
+.disabled .pf-48.pf-percentage_red,.k-state-disabled .pf-48.pf-percentage_red,[disabled] .pf-48.pf-percentage_red,.pf-48.pf-percentage_red.pf-disabled{background-image:url(48/disabled/percentage_red.png)}
+.disabled .pf-48.pf-piece,.k-state-disabled .pf-48.pf-piece,[disabled] .pf-48.pf-piece,.pf-48.pf-piece.pf-disabled{background-image:url(48/disabled/piece.png)}
+.disabled .pf-48.pf-print,.k-state-disabled .pf-48.pf-print,[disabled] .pf-48.pf-print,.pf-48.pf-print.pf-disabled{background-image:url(48/disabled/print.png)}
+.disabled .pf-48.pf-reload_rotate,.k-state-disabled .pf-48.pf-reload_rotate,[disabled] .pf-48.pf-reload_rotate,.pf-48.pf-reload_rotate.pf-disabled{background-image:url(48/disabled/reload_rotate.png)}
+.disabled .pf-48.pf-report_open,.k-state-disabled .pf-48.pf-report_open,[disabled] .pf-48.pf-report_open,.pf-48.pf-report_open.pf-disabled{background-image:url(48/disabled/report_open.png)}
+.disabled .pf-48.pf-report_open-import,.k-state-disabled .pf-48.pf-report_open-import,[disabled] .pf-48.pf-report_open-import,.pf-48.pf-report_open-import.pf-disabled{background-image:url(48/disabled/report_open-import.png)}
+.disabled .pf-48.pf-table_column,.k-state-disabled .pf-48.pf-table_column,[disabled] .pf-48.pf-table_column,.pf-48.pf-table_column.pf-disabled{background-image:url(48/disabled/table_column.png)}
+.disabled .pf-48.pf-table,.k-state-disabled .pf-48.pf-table,[disabled] .pf-48.pf-table,.pf-48.pf-table.pf-disabled{background-image:url(48/disabled/table.png)}
+.disabled .pf-48.pf-table_row-add2,.k-state-disabled .pf-48.pf-table_row-add2,[disabled] .pf-48.pf-table_row-add2,.pf-48.pf-table_row-add2.pf-disabled{background-image:url(48/disabled/table_row-add2.png)}
+.disabled .pf-48.pf-table_row-delete2,.k-state-disabled .pf-48.pf-table_row-delete2,[disabled] .pf-48.pf-table_row-delete2,.pf-48.pf-table_row-delete2.pf-disabled{background-image:url(48/disabled/table_row-delete2.png)}
+.disabled .pf-48.pf-tabs-export,.k-state-disabled .pf-48.pf-tabs-export,[disabled] .pf-48.pf-tabs-export,.pf-48.pf-tabs-export.pf-disabled{background-image:url(48/disabled/tabs-export.png)}
+.disabled .pf-48.pf-tool_pencil,.k-state-disabled .pf-48.pf-tool_pencil,[disabled] .pf-48.pf-tool_pencil,.pf-48.pf-tool_pencil.pf-disabled{background-image:url(48/disabled/tool_pencil.png)}
+.disabled .pf-48.pf-tree,.k-state-disabled .pf-48.pf-tree,[disabled] .pf-48.pf-tree,.pf-48.pf-tree.pf-disabled{background-image:url(48/disabled/tree.png)}
+.disabled .pf-48.pf-money_banknote-server,.k-state-disabled .pf-48.pf-money_banknote-server,[disabled] .pf-48.pf-money_banknote-server,.pf-48.pf-money_banknote-server.pf-disabled{background-image:url(48/disabled/money_banknote-server.png)}
+.disabled .pf-48.pf-user,.k-state-disabled .pf-48.pf-user,[disabled] .pf-48.pf-user,.pf-48.pf-user.pf-disabled{background-image:url(48/disabled/user.png)}
+.disabled .pf-48.pf-save,.k-state-disabled .pf-48.pf-save,[disabled] .pf-48.pf-save,.pf-48.pf-save.pf-disabled{background-image:url(48/disabled/save.png)}
+.disabled .pf-48.pf-user_symbol_blue-picture,.k-state-disabled .pf-48.pf-user_symbol_blue-picture,[disabled] .pf-48.pf-user_symbol_blue-picture,.pf-48.pf-user_symbol_blue-picture.pf-disabled{background-image:url(48/disabled/user_symbol_blue-picture.png)}
+.disabled .pf-48.pf-info,.k-state-disabled .pf-48.pf-info,[disabled] .pf-48.pf-info,.pf-48.pf-info.pf-disabled{background-image:url(48/disabled/info.png)}
+.disabled .pf-48.pf-search,.k-state-disabled .pf-48.pf-search,[disabled] .pf-48.pf-search,.pf-48.pf-search.pf-disabled{background-image:url(48/disabled/search.png)}
+.disabled .pf-48.pf-stop,.k-state-disabled .pf-48.pf-stop,[disabled] .pf-48.pf-stop,.pf-48.pf-stop.pf-disabled{background-image:url(48/disabled/stop.png)}
+.disabled .pf-48.pf-sort_za,.k-state-disabled .pf-48.pf-sort_za,[disabled] .pf-48.pf-sort_za,.pf-48.pf-sort_za.pf-disabled{background-image:url(48/disabled/sort_za.png)}
+.disabled .pf-48.pf-sort_az,.k-state-disabled .pf-48.pf-sort_az,[disabled] .pf-48.pf-sort_az,.pf-48.pf-sort_az.pf-disabled{background-image:url(48/disabled/sort_az.png)}
+.disabled .pf-48.pf-slide-arrow_right,.k-state-disabled .pf-48.pf-slide-arrow_right,[disabled] .pf-48.pf-slide-arrow_right,.pf-48.pf-slide-arrow_right.pf-disabled{background-image:url(48/disabled/slide-arrow_right.png)}
+.disabled .pf-48.pf-slide-arrow_left,.k-state-disabled .pf-48.pf-slide-arrow_left,[disabled] .pf-48.pf-slide-arrow_left,.pf-48.pf-slide-arrow_left.pf-disabled{background-image:url(48/disabled/slide-arrow_left.png)}
+.disabled .pf-48.pf-view_options,.k-state-disabled .pf-48.pf-view_options,[disabled] .pf-48.pf-view_options,.pf-48.pf-view_options.pf-disabled{background-image:url(48/disabled/view_options.png)}
+.disabled .pf-48.pf-warning,.k-state-disabled .pf-48.pf-warning,[disabled] .pf-48.pf-warning,.pf-48.pf-warning.pf-disabled{background-image:url(48/disabled/warning.png)}
+.disabled .pf-48.pf-help,.k-state-disabled .pf-48.pf-help,[disabled] .pf-48.pf-help,.pf-48.pf-help.pf-disabled{background-image:url(48/disabled/help.png)}
+.disabled .pf-48.pf-ov_arrow_left,.k-state-disabled .pf-48.pf-ov_arrow_left,[disabled] .pf-48.pf-ov_arrow_left,.pf-48.pf-ov_arrow_left.pf-disabled{background-image:url(48/disabled/ov_arrow_left.png)}
+.disabled .pf-48.pf-ov_arrow_right,.k-state-disabled .pf-48.pf-ov_arrow_right,[disabled] .pf-48.pf-ov_arrow_right,.pf-48.pf-ov_arrow_right.pf-disabled{background-image:url(48/disabled/ov_arrow_right.png)}
+.disabled .pf-48.pf-ok_button,.k-state-disabled .pf-48.pf-ok_button,[disabled] .pf-48.pf-ok_button,.pf-48.pf-ok_button.pf-disabled{background-image:url(48/disabled/ok_button.png)}
+.disabled .pf-48.pf-ok,.k-state-disabled .pf-48.pf-ok,[disabled] .pf-48.pf-ok,.pf-48.pf-ok.pf-disabled{background-image:url(48/disabled/ok.png)}
+.disabled .pf-48.pf-ov_customer,.k-state-disabled .pf-48.pf-ov_customer,[disabled] .pf-48.pf-ov_customer,.pf-48.pf-ov_customer.pf-disabled{background-image:url(48/disabled/ov_customer.png)}
+.disabled .pf-48.pf-ov_link,.k-state-disabled .pf-48.pf-ov_link,[disabled] .pf-48.pf-ov_link,.pf-48.pf-ov_link.pf-disabled{background-image:url(48/disabled/ov_link.png)}
+.disabled .pf-48.pf-ov_update,.k-state-disabled .pf-48.pf-ov_update,[disabled] .pf-48.pf-ov_update,.pf-48.pf-ov_update.pf-disabled{background-image:url(48/disabled/ov_update.png)}
+/*==========64==========*/
+.pf-64{width:64px;height:64px}
+.pf-64.pf-add{background-image:url(64/add.png)}
+.pf-64.pf-add_button{background-image:url(64/add_button.png)}
+.pf-64.pf-address_book-design{background-image:url(64/address_book-design.png)}
+.pf-64.pf-application-update{background-image:url(64/application-update.png)}
+.pf-64.pf-accept_doc{background-image:url(64/accept_doc.png)}
+.pf-64.pf-alert{background-image:url(64/alert.png)}
+.pf-64.pf-arrow_down{background-image:url(64/arrow_down.png)}
+.pf-64.pf-arrow_download{background-image:url(64/arrow_download.png)}
+.pf-64.pf-arrow_left{background-image:url(64/arrow_left.png)}
+.pf-64.pf-arrow_right{background-image:url(64/arrow_right.png)}
+.pf-64.pf-bank{background-image:url(64/bank.png)}
+.pf-64.pf-bank-update{background-image:url(64/bank-update.png)}
+.pf-64.pf-bank-account{background-image:url(64/bank-account.png)}
+.pf-64.pf-book{background-image:url(64/book.png)}
+.pf-64.pf-bookmark-ok{background-image:url(64/bookmark-ok.png)}
+.pf-64.pf-business_report{background-image:url(64/business_report.png)}
+.pf-64.pf-calendar{background-image:url(64/calendar.png)}
+.pf-64.pf-calendar-update{background-image:url(64/calendar-update.png)}
+.pf-64.pf-currency_conversion{background-image:url(64/currency_conversion.png)}
+.pf-64.pf-clock{background-image:url(64/clock.png)}
+.pf-64.pf-database-arrow_right{background-image:url(64/database-arrow_right.png)}
+.pf-64.pf-database-import{background-image:url(64/database-import.png)}
+.pf-64.pf-delete_button_error{background-image:url(64/delete_button_error.png)}
+.pf-64.pf-execute{background-image:url(64/execute.png)}
+.pf-64.pf-exel{background-image:url(64/exel.png)}
+.pf-64.pf-delete{background-image:url(64/delete.png)}
+.pf-64.pf-document_header_footer-ok2{background-image:url(64/document_header_footer-ok2.png)}
+.pf-64.pf-folder{background-image:url(64/folder.png)}
+.pf-64.pf-folder_open{background-image:url(64/folder_open.png)}
+.pf-64.pf-folder-execute{background-image:url(64/folder-execute.png)}
+.pf-64.pf-folder_open-execute{background-image:url(64/folder_open-execute.png)}
+.pf-64.pf-folder-favorite{background-image:url(64/folder-favorite.png)}
+.pf-64.pf-folder_open-favorite{background-image:url(64/folder_open-favorite.png)}
+.pf-64.pf-filter-ok{background-image:url(64/filter-ok.png)}
+.pf-64.pf-filter-remove{background-image:url(64/filter-remove.png)}
+.pf-64.pf-find{background-image:url(64/find.png)}
+.pf-64.pf-gear{background-image:url(64/gear.png)}
+.pf-64.pf-gears{background-image:url(64/gears.png)}
+.pf-64.pf-help{background-image:url(64/help.png)}
+.pf-64.pf-key{background-image:url(64/key.png)}
+.pf-64.pf-link-info{background-image:url(64/link-info.png)}
+.pf-64.pf-list-arrow_right{background-image:url(64/list-arrow_right.png)}
+.pf-64.pf-list-ok{background-image:url(64/list-ok.png)}
+.pf-64.pf-mail{background-image:url(64/mail.png)}
+.pf-64.pf-mail-arrow_right{background-image:url(64/mail-arrow_right.png)}
+.pf-64.pf-money{background-image:url(64/money.png)}
+.pf-64.pf-phone{background-image:url(64/phone.png)}
+.pf-64.pf-phone-ok{background-image:url(64/phone-ok.png)}
+.pf-64.pf-phone-ok2{background-image:url(64/phone-ok2.png)}
+.pf-64.pf-phone-error{background-image:url(64/phone-error.png)}
+.pf-64.pf-percentage{background-image:url(64/percentage.png)}
+.pf-64.pf-percentage_green{background-image:url(64/percentage_green.png)}
+.pf-64.pf-percentage_red{background-image:url(64/percentage_red.png)}
+.pf-64.pf-piece{background-image:url(64/piece.png)}
+.pf-64.pf-print{background-image:url(64/print.png)}
+.pf-64.pf-reload_rotate{background-image:url(64/reload_rotate.png)}
+.pf-64.pf-report_open{background-image:url(64/report_open.png)}
+.pf-64.pf-report_open-import{background-image:url(64/report_open-import.png)}
+.pf-64.pf-table_column{background-image:url(64/table_column.png)}
+.pf-64.pf-table{background-image:url(64/table.png)}
+.pf-64.pf-table_row-add2{background-image:url(64/table_row-add2.png)}
+.pf-64.pf-table_row-delete2{background-image:url(64/table_row-delete2.png)}
+.pf-64.pf-tabs-export{background-image:url(64/tabs-export.png)}
+.pf-64.pf-tool_pencil{background-image:url(64/tool_pencil.png)}
+.pf-64.pf-tree{background-image:url(64/tree.png)}
+.pf-64.pf-money_banknote-server{background-image:url(64/money_banknote-server.png)}
+.pf-64.pf-user{background-image:url(64/user.png)}
+.pf-64.pf-save{background-image:url(64/save.png)}
+.pf-64.pf-user_symbol_blue-picture{background-image:url(64/user_symbol_blue-picture.png)}
+.pf-64.pf-info{background-image:url(64/info.png)}
+.pf-64.pf-search{background-image:url(64/search.png)}
+.pf-64.pf-stop{background-image:url(64/stop.png)}
+.pf-64.pf-sort_za{background-image:url(64/sort_za.png)}
+.pf-64.pf-sort_az{background-image:url(64/sort_az.png)}
+.pf-64.pf-slide-arrow_right{background-image:url(64/slide-arrow_right.png)}
+.pf-64.pf-slide-arrow_left{background-image:url(64/slide-arrow_left.png)}
+.pf-64.pf-view_options{background-image:url(64/view_options.png)}
+.pf-64.pf-warning{background-image:url(64/warning.png)}
+.pf-64.pf-help{background-image:url(64/help.png)}
+.pf-64.pf-ov_arrow_left{background-image:url(64/ov_arrow_left.png)}
+.pf-64.pf-ov_arrow_right{background-image:url(64/ov_arrow_right.png)}
+.pf-64.pf-ok_button{background-image:url(64/ok_button.png)}
+.pf-64.pf-ok{background-image:url(64/ok.png)}
+.pf-64.pf-ov_customer{background-image:url(64/ov_customer.png)}
+.pf-64.pf-ov_link{background-image:url(64/ov_link.png)}
+.pf-64.pf-ov_update{background-image:url(64/ov_update.png)}
+.pf-64.pf-add.pf-hot{background-image:url(64/hot/add.png)}
+.pf-64.pf-add_button.pf-hot{background-image:url(64/hot/add_button.png)}
+.pf-64.pf-address_book-design.pf-hot{background-image:url(64/hot/address_book-design.png)}
+.pf-64.pf-application-update.pf-hot{background-image:url(64/hot/application-update.png)}
+.pf-64.pf-accept_doc.pf-hot{background-image:url(64/hot/accept_doc.png)}
+.pf-64.pf-alert.pf-hot{background-image:url(64/hot/alert.png)}
+.pf-64.pf-arrow_down.pf-hot{background-image:url(64/hot/arrow_down.png)}
+.pf-64.pf-arrow_download.pf-hot{background-image:url(64/hot/arrow_download.png)}
+.pf-64.pf-arrow_left.pf-hot{background-image:url(64/hot/arrow_left.png)}
+.pf-64.pf-arrow_right.pf-hot{background-image:url(64/hot/arrow_right.png)}
+.pf-64.pf-bank.pf-hot{background-image:url(64/hot/bank.png)}
+.pf-64.pf-bank-update.pf-hot{background-image:url(64/hot/bank-update.png)}
+.pf-64.pf-bank-account.pf-hot{background-image:url(64/hot/bank-account.png)}
+.pf-64.pf-book.pf-hot{background-image:url(64/hot/book.png)}
+.pf-64.pf-bookmark-ok.pf-hot{background-image:url(64/hot/bookmark-ok.png)}
+.pf-64.pf-business_report.pf-hot{background-image:url(64/hot/business_report.png)}
+.pf-64.pf-calendar.pf-hot{background-image:url(64/hot/calendar.png)}
+.pf-64.pf-calendar-update.pf-hot{background-image:url(64/hot/calendar-update.png)}
+.pf-64.pf-currency_conversion.pf-hot{background-image:url(64/hot/currency_conversion.png)}
+.pf-64.pf-clock.pf-hot{background-image:url(64/hot/clock.png)}
+.pf-64.pf-database-arrow_right.pf-hot{background-image:url(64/hot/database-arrow_right.png)}
+.pf-64.pf-database-import.pf-hot{background-image:url(64/hot/database-import.png)}
+.pf-64.pf-delete_button_error.pf-hot{background-image:url(64/hot/delete_button_error.png)}
+.pf-64.pf-execute.pf-hot{background-image:url(64/hot/execute.png)}
+.pf-64.pf-exel.pf-hot{background-image:url(64/hot/exel.png)}
+.pf-64.pf-delete.pf-hot{background-image:url(64/hot/delete.png)}
+.pf-64.pf-document_header_footer-ok2.pf-hot{background-image:url(64/hot/document_header_footer-ok2.png)}
+.pf-64.pf-folder.pf-hot{background-image:url(64/hot/folder.png)}
+.pf-64.pf-folder_open.pf-hot{background-image:url(64/hot/folder_open.png)}
+.pf-64.pf-folder-execute.pf-hot{background-image:url(64/hot/folder-execute.png)}
+.pf-64.pf-folder_open-execute.pf-hot{background-image:url(64/hot/folder_open-execute.png)}
+.pf-64.pf-folder-favorite.pf-hot{background-image:url(64/hot/folder-favorite.png)}
+.pf-64.pf-folder_open-favorite.pf-hot{background-image:url(64/hot/folder_open-favorite.png)}
+.pf-64.pf-filter-ok.pf-hot{background-image:url(64/hot/filter-ok.png)}
+.pf-64.pf-filter-remove.pf-hot{background-image:url(64/hot/filter-remove.png)}
+.pf-64.pf-find.pf-hot{background-image:url(64/hot/find.png)}
+.pf-64.pf-gear.pf-hot{background-image:url(64/hot/gear.png)}
+.pf-64.pf-gears.pf-hot{background-image:url(64/hot/gears.png)}
+.pf-64.pf-help.pf-hot{background-image:url(64/hot/help.png)}
+.pf-64.pf-key.pf-hot{background-image:url(64/hot/key.png)}
+.pf-64.pf-link-info.pf-hot{background-image:url(64/hot/link-info.png)}
+.pf-64.pf-list-arrow_right.pf-hot{background-image:url(64/hot/list-arrow_right.png)}
+.pf-64.pf-list-ok.pf-hot{background-image:url(64/hot/list-ok.png)}
+.pf-64.pf-mail.pf-hot{background-image:url(64/hot/mail.png)}
+.pf-64.pf-mail-arrow_right.pf-hot{background-image:url(64/hot/mail-arrow_right.png)}
+.pf-64.pf-money.pf-hot{background-image:url(64/hot/money.png)}
+.pf-64.pf-phone.pf-hot{background-image:url(64/hot/phone.png)}
+.pf-64.pf-phone-ok.pf-hot{background-image:url(64/hot/phone-ok.png)}
+.pf-64.pf-phone-ok2.pf-hot{background-image:url(64/hot/phone-ok2.png)}
+.pf-64.pf-phone-error.pf-hot{background-image:url(64/hot/phone-error.png)}
+.pf-64.pf-percentage.pf-hot{background-image:url(64/hot/percentage.png)}
+.pf-64.pf-percentage_green.pf-hot{background-image:url(64/hot/percentage_green.png)}
+.pf-64.pf-percentage_red.pf-hot{background-image:url(64/hot/percentage_red.png)}
+.pf-64.pf-piece.pf-hot{background-image:url(64/hot/piece.png)}
+.pf-64.pf-print.pf-hot{background-image:url(64/hot/print.png)}
+.pf-64.pf-reload_rotate.pf-hot{background-image:url(64/hot/reload_rotate.png)}
+.pf-64.pf-report_open.pf-hot{background-image:url(64/hot/report_open.png)}
+.pf-64.pf-report_open-import.pf-hot{background-image:url(64/hot/report_open-import.png)}
+.pf-64.pf-table_column.pf-hot{background-image:url(64/hot/table_column.png)}
+.pf-64.pf-table.pf-hot{background-image:url(64/hot/table.png)}
+.pf-64.pf-table_row-add2.pf-hot{background-image:url(64/hot/table_row-add2.png)}
+.pf-64.pf-table_row-delete2.pf-hot{background-image:url(64/hot/table_row-delete2.png)}
+.pf-64.pf-tabs-export.pf-hot{background-image:url(64/hot/tabs-export.png)}
+.pf-64.pf-tool_pencil.pf-hot{background-image:url(64/hot/tool_pencil.png)}
+.pf-64.pf-tree.pf-hot{background-image:url(64/hot/tree.png)}
+.pf-64.pf-money_banknote-server.pf-hot{background-image:url(64/hot/money_banknote-server.png)}
+.pf-64.pf-user.pf-hot{background-image:url(64/hot/user.png)}
+.pf-64.pf-save.pf-hot{background-image:url(64/hot/save.png)}
+.pf-64.pf-user_symbol_blue-picture.pf-hot{background-image:url(64/hot/user_symbol_blue-picture.png)}
+.pf-64.pf-info.pf-hot{background-image:url(64/hot/info.png)}
+.pf-64.pf-search.pf-hot{background-image:url(64/hot/search.png)}
+.pf-64.pf-stop.pf-hot{background-image:url(64/hot/stop.png)}
+.pf-64.pf-sort_za.pf-hot{background-image:url(64/hot/sort_za.png)}
+.pf-64.pf-sort_az.pf-hot{background-image:url(64/hot/sort_az.png)}
+.pf-64.pf-slide-arrow_right.pf-hot{background-image:url(64/hot/slide-arrow_right.png)}
+.pf-64.pf-slide-arrow_left.pf-hot{background-image:url(64/hot/slide-arrow_left.png)}
+.pf-64.pf-view_options.pf-hot{background-image:url(64/hot/view_options.png)}
+.pf-64.pf-warning.pf-hot{background-image:url(64/hot/warning.png)}
+.pf-64.pf-help.pf-hot{background-image:url(64/hot/help.png)}
+.pf-64.pf-ov_arrow_left.pf-hot{background-image:url(64/hot/ov_arrow_left.png)}
+.pf-64.pf-ov_arrow_right.pf-hot{background-image:url(64/hot/ov_arrow_right.png)}
+.pf-64.pf-ok_button.pf-hot{background-image:url(64/hot/ok_button.png)}
+.pf-64.pf-ok.pf-hot{background-image:url(64/hot/ok.png)}
+.pf-64.pf-ov_customer.pf-hot{background-image:url(64/hot/ov_customer.png)}
+.pf-64.pf-ov_link.pf-hot{background-image:url(64/hot/ov_link.png)}
+.pf-64.pf-ov_update.pf-hot{background-image:url(64/hot/ov_update.png)}
+.disabled .pf-64.pf-add,.k-state-disabled .pf-64.pf-add,[disabled] .pf-64.pf-add,.pf-64.pf-add.pf-disabled{background-image:url(64/disabled/add.png)}
+.disabled .pf-64.pf-add_button,.k-state-disabled .pf-64.pf-add_button,[disabled] .pf-64.pf-add_button,.pf-64.pf-add_button.pf-disabled{background-image:url(64/disabled/add_button.png)}
+.disabled .pf-64.pf-address_book-design,.k-state-disabled .pf-64.pf-address_book-design,[disabled] .pf-64.pf-address_book-design,.pf-64.pf-address_book-design.pf-disabled{background-image:url(64/disabled/address_book-design.png)}
+.disabled .pf-64.pf-application-update,.k-state-disabled .pf-64.pf-application-update,[disabled] .pf-64.pf-application-update,.pf-64.pf-application-update.pf-disabled{background-image:url(64/disabled/application-update.png)}
+.disabled .pf-64.pf-accept_doc,.k-state-disabled .pf-64.pf-accept_doc,[disabled] .pf-64.pf-accept_doc,.pf-64.pf-accept_doc.pf-disabled{background-image:url(64/disabled/accept_doc.png)}
+.disabled .pf-64.pf-alert,.k-state-disabled .pf-64.pf-alert,[disabled] .pf-64.pf-alert,.pf-64.pf-alert.pf-disabled{background-image:url(64/disabled/alert.png)}
+.disabled .pf-64.pf-arrow_down,.k-state-disabled .pf-64.pf-arrow_down,[disabled] .pf-64.pf-arrow_down,.pf-64.pf-arrow_down.pf-disabled{background-image:url(64/disabled/arrow_down.png)}
+.disabled .pf-64.pf-arrow_download,.k-state-disabled .pf-64.pf-arrow_download,[disabled] .pf-64.pf-arrow_download,.pf-64.pf-arrow_download.pf-disabled{background-image:url(64/disabled/arrow_download.png)}
+.disabled .pf-64.pf-arrow_left,.k-state-disabled .pf-64.pf-arrow_left,[disabled] .pf-64.pf-arrow_left,.pf-64.pf-arrow_left.pf-disabled{background-image:url(64/disabled/arrow_left.png)}
+.disabled .pf-64.pf-arrow_right,.k-state-disabled .pf-64.pf-arrow_right,[disabled] .pf-64.pf-arrow_right,.pf-64.pf-arrow_right.pf-disabled{background-image:url(64/disabled/arrow_right.png)}
+.disabled .pf-64.pf-bank,.k-state-disabled .pf-64.pf-bank,[disabled] .pf-64.pf-bank,.pf-64.pf-bank.pf-disabled{background-image:url(64/disabled/bank.png)}
+.disabled .pf-64.pf-bank-update,.k-state-disabled .pf-64.pf-bank-update,[disabled] .pf-64.pf-bank-update,.pf-64.pf-bank-update.pf-disabled{background-image:url(64/disabled/bank-update.png)}
+.disabled .pf-64.pf-bank-account,.k-state-disabled .pf-64.pf-bank-account,[disabled] .pf-64.pf-bank-account,.pf-64.pf-bank-account.pf-disabled{background-image:url(64/disabled/bank-account.png)}
+.disabled .pf-64.pf-book,.k-state-disabled .pf-64.pf-book,[disabled] .pf-64.pf-book,.pf-64.pf-book.pf-disabled{background-image:url(64/disabled/book.png)}
+.disabled .pf-64.pf-bookmark-ok,.k-state-disabled .pf-64.pf-bookmark-ok,[disabled] .pf-64.pf-bookmark-ok,.pf-64.pf-bookmark-ok.pf-disabled{background-image:url(64/disabled/bookmark-ok.png)}
+.disabled .pf-64.pf-business_report,.k-state-disabled .pf-64.pf-business_report,[disabled] .pf-64.pf-business_report,.pf-64.pf-business_report.pf-disabled{background-image:url(64/disabled/business_report.png)}
+.disabled .pf-64.pf-calendar,.k-state-disabled .pf-64.pf-calendar,[disabled] .pf-64.pf-calendar,.pf-64.pf-calendar.pf-disabled{background-image:url(64/disabled/calendar.png)}
+.disabled .pf-64.pf-calendar-update,.k-state-disabled .pf-64.pf-calendar-update,[disabled] .pf-64.pf-calendar-update,.pf-64.pf-calendar-update.pf-disabled{background-image:url(64/disabled/calendar-update.png)}
+.disabled .pf-64.pf-currency_conversion,.k-state-disabled .pf-64.pf-currency_conversion,[disabled] .pf-64.pf-currency_conversion,.pf-64.pf-currency_conversion.pf-disabled{background-image:url(64/disabled/currency_conversion.png)}
+.disabled .pf-64.pf-clock,.k-state-disabled .pf-64.pf-clock,[disabled] .pf-64.pf-clock,.pf-64.pf-clock.pf-disabled{background-image:url(64/disabled/clock.png)}
+.disabled .pf-64.pf-database-arrow_right,.k-state-disabled .pf-64.pf-database-arrow_right,[disabled] .pf-64.pf-database-arrow_right,.pf-64.pf-database-arrow_right.pf-disabled{background-image:url(64/disabled/database-arrow_right.png)}
+.disabled .pf-64.pf-database-import,.k-state-disabled .pf-64.pf-database-import,[disabled] .pf-64.pf-database-import,.pf-64.pf-database-import.pf-disabled{background-image:url(64/disabled/database-import.png)}
+.disabled .pf-64.pf-delete_button_error,.k-state-disabled .pf-64.pf-delete_button_error,[disabled] .pf-64.pf-delete_button_error,.pf-64.pf-delete_button_error.pf-disabled{background-image:url(64/disabled/delete_button_error.png)}
+.disabled .pf-64.pf-execute,.k-state-disabled .pf-64.pf-execute,[disabled] .pf-64.pf-execute,.pf-64.pf-execute.pf-disabled{background-image:url(64/disabled/execute.png)}
+.disabled .pf-64.pf-exel,.k-state-disabled .pf-64.pf-exel,[disabled] .pf-64.pf-exel,.pf-64.pf-exel.pf-disabled{background-image:url(64/disabled/exel.png)}
+.disabled .pf-64.pf-delete,.k-state-disabled .pf-64.pf-delete,[disabled] .pf-64.pf-delete,.pf-64.pf-delete.pf-disabled{background-image:url(64/disabled/delete.png)}
+.disabled .pf-64.pf-document_header_footer-ok2,.k-state-disabled .pf-64.pf-document_header_footer-ok2,[disabled] .pf-64.pf-document_header_footer-ok2,.pf-64.pf-document_header_footer-ok2.pf-disabled{background-image:url(64/disabled/document_header_footer-ok2.png)}
+.disabled .pf-64.pf-folder,.k-state-disabled .pf-64.pf-folder,[disabled] .pf-64.pf-folder,.pf-64.pf-folder.pf-disabled{background-image:url(64/disabled/folder.png)}
+.disabled .pf-64.pf-folder_open,.k-state-disabled .pf-64.pf-folder_open,[disabled] .pf-64.pf-folder_open,.pf-64.pf-folder_open.pf-disabled{background-image:url(64/disabled/folder_open.png)}
+.disabled .pf-64.pf-folder-execute,.k-state-disabled .pf-64.pf-folder-execute,[disabled] .pf-64.pf-folder-execute,.pf-64.pf-folder-execute.pf-disabled{background-image:url(64/disabled/folder-execute.png)}
+.disabled .pf-64.pf-folder_open-execute,.k-state-disabled .pf-64.pf-folder_open-execute,[disabled] .pf-64.pf-folder_open-execute,.pf-64.pf-folder_open-execute.pf-disabled{background-image:url(64/disabled/folder_open-execute.png)}
+.disabled .pf-64.pf-folder-favorite,.k-state-disabled .pf-64.pf-folder-favorite,[disabled] .pf-64.pf-folder-favorite,.pf-64.pf-folder-favorite.pf-disabled{background-image:url(64/disabled/folder-favorite.png)}
+.disabled .pf-64.pf-folder_open-favorite,.k-state-disabled .pf-64.pf-folder_open-favorite,[disabled] .pf-64.pf-folder_open-favorite,.pf-64.pf-folder_open-favorite.pf-disabled{background-image:url(64/disabled/folder_open-favorite.png)}
+.disabled .pf-64.pf-filter-ok,.k-state-disabled .pf-64.pf-filter-ok,[disabled] .pf-64.pf-filter-ok,.pf-64.pf-filter-ok.pf-disabled{background-image:url(64/disabled/filter-ok.png)}
+.disabled .pf-64.pf-filter-remove,.k-state-disabled .pf-64.pf-filter-remove,[disabled] .pf-64.pf-filter-remove,.pf-64.pf-filter-remove.pf-disabled{background-image:url(64/disabled/filter-remove.png)}
+.disabled .pf-64.pf-find,.k-state-disabled .pf-64.pf-find,[disabled] .pf-64.pf-find,.pf-64.pf-find.pf-disabled{background-image:url(64/disabled/find.png)}
+.disabled .pf-64.pf-gear,.k-state-disabled .pf-64.pf-gear,[disabled] .pf-64.pf-gear,.pf-64.pf-gear.pf-disabled{background-image:url(64/disabled/gear.png)}
+.disabled .pf-64.pf-gears,.k-state-disabled .pf-64.pf-gears,[disabled] .pf-64.pf-gears,.pf-64.pf-gears.pf-disabled{background-image:url(64/disabled/gears.png)}
+.disabled .pf-64.pf-help,.k-state-disabled .pf-64.pf-help,[disabled] .pf-64.pf-help,.pf-64.pf-help.pf-disabled{background-image:url(64/disabled/help.png)}
+.disabled .pf-64.pf-key,.k-state-disabled .pf-64.pf-key,[disabled] .pf-64.pf-key,.pf-64.pf-key.pf-disabled{background-image:url(64/disabled/key.png)}
+.disabled .pf-64.pf-link-info,.k-state-disabled .pf-64.pf-link-info,[disabled] .pf-64.pf-link-info,.pf-64.pf-link-info.pf-disabled{background-image:url(64/disabled/link-info.png)}
+.disabled .pf-64.pf-list-arrow_right,.k-state-disabled .pf-64.pf-list-arrow_right,[disabled] .pf-64.pf-list-arrow_right,.pf-64.pf-list-arrow_right.pf-disabled{background-image:url(64/disabled/list-arrow_right.png)}
+.disabled .pf-64.pf-list-ok,.k-state-disabled .pf-64.pf-list-ok,[disabled] .pf-64.pf-list-ok,.pf-64.pf-list-ok.pf-disabled{background-image:url(64/disabled/list-ok.png)}
+.disabled .pf-64.pf-mail,.k-state-disabled .pf-64.pf-mail,[disabled] .pf-64.pf-mail,.pf-64.pf-mail.pf-disabled{background-image:url(64/disabled/mail.png)}
+.disabled .pf-64.pf-mail-arrow_right,.k-state-disabled .pf-64.pf-mail-arrow_right,[disabled] .pf-64.pf-mail-arrow_right,.pf-64.pf-mail-arrow_right.pf-disabled{background-image:url(64/disabled/mail-arrow_right.png)}
+.disabled .pf-64.pf-money,.k-state-disabled .pf-64.pf-money,[disabled] .pf-64.pf-money,.pf-64.pf-money.pf-disabled{background-image:url(64/disabled/money.png)}
+.disabled .pf-64.pf-phone,.k-state-disabled .pf-64.pf-phone,[disabled] .pf-64.pf-phone,.pf-64.pf-phone.pf-disabled{background-image:url(64/disabled/phone.png)}
+.disabled .pf-64.pf-phone-ok,.k-state-disabled .pf-64.pf-phone-ok,[disabled] .pf-64.pf-phone-ok,.pf-64.pf-phone-ok.pf-disabled{background-image:url(64/disabled/phone-ok.png)}
+.disabled .pf-64.pf-phone-ok2,.k-state-disabled .pf-64.pf-phone-ok2,[disabled] .pf-64.pf-phone-ok2,.pf-64.pf-phone-ok2.pf-disabled{background-image:url(64/disabled/phone-ok2.png)}
+.disabled .pf-64.pf-phone-error,.k-state-disabled .pf-64.pf-phone-error,[disabled] .pf-64.pf-phone-error,.pf-64.pf-phone-error.pf-disabled{background-image:url(64/disabled/phone-error.png)}
+.disabled .pf-64.pf-percentage,.k-state-disabled .pf-64.pf-percentage,[disabled] .pf-64.pf-percentage,.pf-64.pf-percentage.pf-disabled{background-image:url(64/disabled/percentage.png)}
+.disabled .pf-64.pf-percentage_green,.k-state-disabled .pf-64.pf-percentage_green,[disabled] .pf-64.pf-percentage_green,.pf-64.pf-percentage_green.pf-disabled{background-image:url(64/disabled/percentage_green.png)}
+.disabled .pf-64.pf-percentage_red,.k-state-disabled .pf-64.pf-percentage_red,[disabled] .pf-64.pf-percentage_red,.pf-64.pf-percentage_red.pf-disabled{background-image:url(64/disabled/percentage_red.png)}
+.disabled .pf-64.pf-piece,.k-state-disabled .pf-64.pf-piece,[disabled] .pf-64.pf-piece,.pf-64.pf-piece.pf-disabled{background-image:url(64/disabled/piece.png)}
+.disabled .pf-64.pf-print,.k-state-disabled .pf-64.pf-print,[disabled] .pf-64.pf-print,.pf-64.pf-print.pf-disabled{background-image:url(64/disabled/print.png)}
+.disabled .pf-64.pf-reload_rotate,.k-state-disabled .pf-64.pf-reload_rotate,[disabled] .pf-64.pf-reload_rotate,.pf-64.pf-reload_rotate.pf-disabled{background-image:url(64/disabled/reload_rotate.png)}
+.disabled .pf-64.pf-report_open,.k-state-disabled .pf-64.pf-report_open,[disabled] .pf-64.pf-report_open,.pf-64.pf-report_open.pf-disabled{background-image:url(64/disabled/report_open.png)}
+.disabled .pf-64.pf-report_open-import,.k-state-disabled .pf-64.pf-report_open-import,[disabled] .pf-64.pf-report_open-import,.pf-64.pf-report_open-import.pf-disabled{background-image:url(64/disabled/report_open-import.png)}
+.disabled .pf-64.pf-table_column,.k-state-disabled .pf-64.pf-table_column,[disabled] .pf-64.pf-table_column,.pf-64.pf-table_column.pf-disabled{background-image:url(64/disabled/table_column.png)}
+.disabled .pf-64.pf-table,.k-state-disabled .pf-64.pf-table,[disabled] .pf-64.pf-table,.pf-64.pf-table.pf-disabled{background-image:url(64/disabled/table.png)}
+.disabled .pf-64.pf-table_row-add2,.k-state-disabled .pf-64.pf-table_row-add2,[disabled] .pf-64.pf-table_row-add2,.pf-64.pf-table_row-add2.pf-disabled{background-image:url(64/disabled/table_row-add2.png)}
+.disabled .pf-64.pf-table_row-delete2,.k-state-disabled .pf-64.pf-table_row-delete2,[disabled] .pf-64.pf-table_row-delete2,.pf-64.pf-table_row-delete2.pf-disabled{background-image:url(64/disabled/table_row-delete2.png)}
+.disabled .pf-64.pf-tabs-export,.k-state-disabled .pf-64.pf-tabs-export,[disabled] .pf-64.pf-tabs-export,.pf-64.pf-tabs-export.pf-disabled{background-image:url(64/disabled/tabs-export.png)}
+.disabled .pf-64.pf-tool_pencil,.k-state-disabled .pf-64.pf-tool_pencil,[disabled] .pf-64.pf-tool_pencil,.pf-64.pf-tool_pencil.pf-disabled{background-image:url(64/disabled/tool_pencil.png)}
+.disabled .pf-64.pf-tree,.k-state-disabled .pf-64.pf-tree,[disabled] .pf-64.pf-tree,.pf-64.pf-tree.pf-disabled{background-image:url(64/disabled/tree.png)}
+.disabled .pf-64.pf-money_banknote-server,.k-state-disabled .pf-64.pf-money_banknote-server,[disabled] .pf-64.pf-money_banknote-server,.pf-64.pf-money_banknote-server.pf-disabled{background-image:url(64/disabled/money_banknote-server.png)}
+.disabled .pf-64.pf-user,.k-state-disabled .pf-64.pf-user,[disabled] .pf-64.pf-user,.pf-64.pf-user.pf-disabled{background-image:url(64/disabled/user.png)}
+.disabled .pf-64.pf-save,.k-state-disabled .pf-64.pf-save,[disabled] .pf-64.pf-save,.pf-64.pf-save.pf-disabled{background-image:url(64/disabled/save.png)}
+.disabled .pf-64.pf-user_symbol_blue-picture,.k-state-disabled .pf-64.pf-user_symbol_blue-picture,[disabled] .pf-64.pf-user_symbol_blue-picture,.pf-64.pf-user_symbol_blue-picture.pf-disabled{background-image:url(64/disabled/user_symbol_blue-picture.png)}
+.disabled .pf-64.pf-info,.k-state-disabled .pf-64.pf-info,[disabled] .pf-64.pf-info,.pf-64.pf-info.pf-disabled{background-image:url(64/disabled/info.png)}
+.disabled .pf-64.pf-search,.k-state-disabled .pf-64.pf-search,[disabled] .pf-64.pf-search,.pf-64.pf-search.pf-disabled{background-image:url(64/disabled/search.png)}
+.disabled .pf-64.pf-stop,.k-state-disabled .pf-64.pf-stop,[disabled] .pf-64.pf-stop,.pf-64.pf-stop.pf-disabled{background-image:url(64/disabled/stop.png)}
+.disabled .pf-64.pf-sort_za,.k-state-disabled .pf-64.pf-sort_za,[disabled] .pf-64.pf-sort_za,.pf-64.pf-sort_za.pf-disabled{background-image:url(64/disabled/sort_za.png)}
+.disabled .pf-64.pf-sort_az,.k-state-disabled .pf-64.pf-sort_az,[disabled] .pf-64.pf-sort_az,.pf-64.pf-sort_az.pf-disabled{background-image:url(64/disabled/sort_az.png)}
+.disabled .pf-64.pf-slide-arrow_right,.k-state-disabled .pf-64.pf-slide-arrow_right,[disabled] .pf-64.pf-slide-arrow_right,.pf-64.pf-slide-arrow_right.pf-disabled{background-image:url(64/disabled/slide-arrow_right.png)}
+.disabled .pf-64.pf-slide-arrow_left,.k-state-disabled .pf-64.pf-slide-arrow_left,[disabled] .pf-64.pf-slide-arrow_left,.pf-64.pf-slide-arrow_left.pf-disabled{background-image:url(64/disabled/slide-arrow_left.png)}
+.disabled .pf-64.pf-view_options,.k-state-disabled .pf-64.pf-view_options,[disabled] .pf-64.pf-view_options,.pf-64.pf-view_options.pf-disabled{background-image:url(64/disabled/view_options.png)}
+.disabled .pf-64.pf-warning,.k-state-disabled .pf-64.pf-warning,[disabled] .pf-64.pf-warning,.pf-64.pf-warning.pf-disabled{background-image:url(64/disabled/warning.png)}
+.disabled .pf-64.pf-help,.k-state-disabled .pf-64.pf-help,[disabled] .pf-64.pf-help,.pf-64.pf-help.pf-disabled{background-image:url(64/disabled/help.png)}
+.disabled .pf-64.pf-ov_arrow_left,.k-state-disabled .pf-64.pf-ov_arrow_left,[disabled] .pf-64.pf-ov_arrow_left,.pf-64.pf-ov_arrow_left.pf-disabled{background-image:url(64/disabled/ov_arrow_left.png)}
+.disabled .pf-64.pf-ov_arrow_right,.k-state-disabled .pf-64.pf-ov_arrow_right,[disabled] .pf-64.pf-ov_arrow_right,.pf-64.pf-ov_arrow_right.pf-disabled{background-image:url(64/disabled/ov_arrow_right.png)}
+.disabled .pf-64.pf-ok_button,.k-state-disabled .pf-64.pf-ok_button,[disabled] .pf-64.pf-ok_button,.pf-64.pf-ok_button.pf-disabled{background-image:url(64/disabled/ok_button.png)}
+.disabled .pf-64.pf-ok,.k-state-disabled .pf-64.pf-ok,[disabled] .pf-64.pf-ok,.pf-64.pf-ok.pf-disabled{background-image:url(64/disabled/ok.png)}
+.disabled .pf-64.pf-ov_customer,.k-state-disabled .pf-64.pf-ov_customer,[disabled] .pf-64.pf-ov_customer,.pf-64.pf-ov_customer.pf-disabled{background-image:url(64/disabled/ov_customer.png)}
+.disabled .pf-64.pf-ov_link,.k-state-disabled .pf-64.pf-ov_link,[disabled] .pf-64.pf-ov_link,.pf-64.pf-ov_link.pf-disabled{background-image:url(64/disabled/ov_link.png)}
+.disabled .pf-64.pf-ov_update,.k-state-disabled .pf-64.pf-ov_update,[disabled] .pf-64.pf-ov_update,.pf-64.pf-ov_update.pf-disabled{background-image:url(64/disabled/ov_update.png)}

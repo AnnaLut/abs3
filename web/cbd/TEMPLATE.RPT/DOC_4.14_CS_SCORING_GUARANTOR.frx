@@ -1,0 +1,358 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="04/15/2011 18:11:20" ReportInfo.Modified="09/29/2014 14:33:41" ReportInfo.CreatorVersion="2013.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlq+9hnNSQPLgulRUamKJQ17C03/CZb4Yq7PXOCgTEY5YlsOWhQc5OMGGNjX3Aap6RdL2dnh7HwR6bbR2WnOvEyjQ==">
+      <TableDataSource Name="BANK_MFO" DataType="System.Int32" Enabled="true" SelectCommand="select nvl( f_doc_attr('BANK_MFO', :p1, :p2), 'null') as VAL from dual">
+        <Column Name="VAL" DataType="System.String"/>
+        <CommandParameter Name="p1" DataType="107" Expression="[p_bid_id]" DefaultValue="-1"/>
+        <CommandParameter Name="p2" DataType="113" Expression="0" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="BANK_NAME" DataType="System.Int32" Enabled="true" SelectCommand="select nvl( f_doc_attr('BANK_NAME', :p1, :p2), 'null') as VAL from dual">
+        <Column Name="VAL" DataType="System.String"/>
+        <CommandParameter Name="p1" DataType="107" Expression="[p_bid_id]" DefaultValue="-1"/>
+        <CommandParameter Name="p2" DataType="113" Expression="0" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="OUR_BANK_NAME" DataType="System.Int32" Enabled="true" SelectCommand="select nvl( f_doc_attr('OUR_BANK_NAME', :p1, :p2), 'null') as VAL from dual">
+        <Column Name="VAL" DataType="System.String"/>
+        <CommandParameter Name="p1" DataType="107" Expression="[p_bid_id]" DefaultValue="-1"/>
+        <CommandParameter Name="p2" DataType="113" Expression="0" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="OUR_MFO" DataType="System.Int32" Enabled="true" SelectCommand="select nvl( f_doc_attr('OUR_MFO', :p1, :p2), 'null') as VAL from dual">
+        <Column Name="VAL" DataType="System.String"/>
+        <CommandParameter Name="p1" DataType="107" Expression="[p_bid_id]" DefaultValue="-1"/>
+        <CommandParameter Name="p2" DataType="113" Expression="0" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="STAFF_FIO" DataType="System.Int32" Enabled="true" SelectCommand="select nvl( f_doc_attr('STAFF_FIO', :p1, :p2), 'null') as VAL from dual">
+        <Column Name="VAL" DataType="System.String"/>
+        <CommandParameter Name="p1" DataType="113" Expression="[p_bid_id]" DefaultValue="-1"/>
+        <CommandParameter Name="p2" DataType="113" Expression="0" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table" Alias="WCS_GUARANTOR_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select bg.*,&#13;&#10;       wcs_utl.get_answ(bg.bid_id, 'CL_1', bg.ws_id, bg.garantee_num) as f,&#13;&#10;       wcs_utl.get_answ(bg.bid_id, 'CL_2', bg.ws_id, bg.garantee_num) as i,&#13;&#10;       wcs_utl.get_answ(bg.bid_id, 'CL_3', bg.ws_id, bg.garantee_num) as o,&#13;&#10;       to_date(wcs_utl.get_answ(bg.bid_id,&#13;&#10;                                'CL_4',&#13;&#10;                                bg.ws_id,&#13;&#10;                                bg.garantee_num)) as bdate,&#13;&#10;       wcs_utl.get_answ(bg.bid_id, 'CODE_002', bg.ws_id, bg.garantee_num) as inn,&#13;&#10;       to_number(wcs_utl.get_creditdata(bg.bid_id, 'CREDIT_SUM')) as summ,&#13;&#10;       to_number(wcs_utl.get_creditdata(bg.bid_id, 'OWN_FUNDS')) as own_funds,&#13;&#10;       wcs_utl.get_creditdata(bg.bid_id, 'CREDIT_TERM') as term,&#13;&#10;       wcs_utl.get_creditdata(bg.bid_id, 'CREDIT_CURRENCY') as credit_currency,&#13;&#10;       to_number(wcs_utl.get_creditdata(bg.bid_id, 'SINGLE_FEE')) as single_fee,&#13;&#10;       to_number(wcs_utl.get_creditdata(bg.bid_id, 'MONTHLY_FEE')) as monthly_fee,&#13;&#10;       to_number(wcs_utl.get_creditdata(bg.bid_id, 'INTEREST_RATE')) as interest_rate,&#13;&#10;       wcs_utl.get_creditdata(bg.bid_id, 'REPAYMENT_METHOD') as repayment_method,&#13;&#10;       wcs_utl.get_answ_list_text(bg.bid_id,&#13;&#10;                                  wcs_utl.get_creditdata_qid(bg.bid_id,&#13;&#10;                                                             'REPAYMENT_METHOD'),&#13;&#10;                                  'MAIN',&#13;&#10;                                  0) as repayment_method_text,&#13;&#10;       to_number(wcs_utl.get_creditdata(bg.bid_id, 'REPAYMENT_DAY')) as repayment_day,&#13;&#10;       wcs_utl.get_bid_garantees(bg.bid_id) as garantees,&#13;&#10;       &#13;&#10;       decode(wcs_utl.get_answ(bg.bid_id, 'CL_0_188', bg.ws_id, bg.garantee_num),&#13;&#10;              0,&#13;&#10;              case&#13;&#10;                when wcs_utl.get_answ(bg.bid_id, 'CL_13', bg.ws_id, bg.garantee_num) in (26, 27) then&#13;&#10;                 wcs_utl.get_answ_refer_text(bg.bid_id, 'CL_13', bg.ws_id, bg.garantee_num) || ', ' ||&#13;&#10;                 wcs_utl.get_answ(bg.bid_id, 'CL_16', bg.ws_id, bg.garantee_num)&#13;&#10;                else&#13;&#10;                 'обл. ' || wcs_utl.get_answ_refer_text(bg.bid_id, 'CL_13', bg.ws_id, bg.garantee_num) || ', ' ||&#13;&#10;                 decode(wcs_utl.has_answ(bg.bid_id, 'CL_14', bg.ws_id, bg.garantee_num),&#13;&#10;                        1,&#13;&#10;                        'р. ' || wcs_utl.get_answ(bg.bid_id, 'CL_14', bg.ws_id, bg.garantee_num) || ', ',&#13;&#10;                        null) || decode(wcs_utl.has_answ(bg.bid_id, 'CL_15', bg.ws_id, bg.garantee_num),&#13;&#10;                                        1,&#13;&#10;                                        wcs_utl.get_answ(bg.bid_id, 'CL_15', bg.ws_id, bg.garantee_num) || ', ',&#13;&#10;                                        null) || wcs_utl.get_answ(bg.bid_id, 'CL_16', bg.ws_id, bg.garantee_num)&#13;&#10;              end,&#13;&#10;              case&#13;&#10;                when wcs_utl.get_answ(bg.bid_id, 'CL_18', bg.ws_id, bg.garantee_num) in (26, 27) then&#13;&#10;                 wcs_utl.get_answ_refer_text(bg.bid_id, 'CL_18', bg.ws_id, bg.garantee_num) || ', ' ||&#13;&#10;                 wcs_utl.get_answ(bg.bid_id, 'CL_21', bg.ws_id, bg.garantee_num)&#13;&#10;                else&#13;&#10;                 'обл. ' || wcs_utl.get_answ_refer_text(bg.bid_id, 'CL_18', bg.ws_id, bg.garantee_num) || ', ' ||&#13;&#10;                 decode(wcs_utl.has_answ(bg.bid_id, 'CL_19', bg.ws_id, bg.garantee_num),&#13;&#10;                        1,&#13;&#10;                        'р. ' || wcs_utl.get_answ(bg.bid_id, 'CL_19', bg.ws_id, bg.garantee_num) || ', ',&#13;&#10;                        null) || decode(wcs_utl.has_answ(bg.bid_id, 'CL_20', bg.ws_id, bg.garantee_num),&#13;&#10;                                        1,&#13;&#10;                                        wcs_utl.get_answ(bg.bid_id, 'CL_20', bg.ws_id, bg.garantee_num) || ', ',&#13;&#10;                                        null) || wcs_utl.get_answ(bg.bid_id, 'CL_21', bg.ws_id, bg.garantee_num)&#13;&#10;              end) || decode(wcs_utl.has_answ(bg.bid_id, 'CL_22', bg.ws_id, bg.garantee_num),&#13;&#10;                             1,&#13;&#10;                             ', тел. ' || wcs_utl.get_answ(bg.bid_id, 'CL_22', bg.ws_id, bg.garantee_num),&#13;&#10;                             null) as adr_live,&#13;&#10;       case when wcs_utl.get_answ(bg.bid_id, 'CL_18', bg.ws_id, bg.garantee_num) in (26, 27) then&#13;&#10;                 wcs_utl.get_answ_refer_text(bg.bid_id, 'CL_18', bg.ws_id, bg.garantee_num) || ', ' ||&#13;&#10;                 wcs_utl.get_answ(bg.bid_id, 'CL_21', bg.ws_id, bg.garantee_num)&#13;&#10;                else&#13;&#10;                 'обл. ' || wcs_utl.get_answ_refer_text(bg.bid_id, 'CL_18', bg.ws_id, bg.garantee_num) || ', ' ||&#13;&#10;                 decode(wcs_utl.has_answ(bg.bid_id, 'CL_19', bg.ws_id, bg.garantee_num),&#13;&#10;                        1,&#13;&#10;                        'р. ' || wcs_utl.get_answ(bg.bid_id, 'CL_19', bg.ws_id, bg.garantee_num) || ', ',&#13;&#10;                        null) || decode(wcs_utl.has_answ(bg.bid_id, 'CL_20', bg.ws_id, bg.garantee_num),&#13;&#10;                                        1,&#13;&#10;                                        wcs_utl.get_answ(bg.bid_id, 'CL_20', bg.ws_id, bg.garantee_num) || ', ',&#13;&#10;                                        null) || wcs_utl.get_answ(bg.bid_id, 'CL_21', bg.ws_id, bg.garantee_num)&#13;&#10;              end || decode(wcs_utl.has_answ(bg.bid_id, 'CL_23', bg.ws_id, bg.garantee_num),&#13;&#10;                     1,&#13;&#10;                     ', тел. ' || wcs_utl.get_answ(bg.bid_id, 'CL_23', bg.ws_id, bg.garantee_num),&#13;&#10;                     null) as adr_reg,&#13;&#10;       wcs_utl.get_answ(bg.bid_id, 'CL_25', bg.ws_id, bg.garantee_num) as work_place,&#13;&#10;       wcs_utl.get_answ(bg.bid_id, 'CL_26', bg.ws_id, bg.garantee_num) as work_post,&#13;&#10;       wcs_utl.get_answ_list_text(bg.bid_id,&#13;&#10;                                  'CL_34',&#13;&#10;                                  bg.ws_id,&#13;&#10;                                  bg.garantee_num) as fam_status,&#13;&#10;       wcs_utl.get_answ(bg.bid_id, 'CL_0_46', bg.ws_id, bg.garantee_num) ||&#13;&#10;       decode(wcs_utl.get_answ(bg.bid_id,&#13;&#10;                               'CL_0_52',&#13;&#10;                               bg.ws_id,&#13;&#10;                               bg.garantee_num),&#13;&#10;              null,&#13;&#10;              null,&#13;&#10;              ', ' || wcs_utl.get_answ(bg.bid_id,&#13;&#10;                                       'CL_0_46',&#13;&#10;                                       bg.ws_id,&#13;&#10;                                       bg.garantee_num)) ||&#13;&#10;       decode(wcs_utl.get_answ(bg.bid_id,&#13;&#10;                               'CL_0_55',&#13;&#10;                               bg.ws_id,&#13;&#10;                               bg.garantee_num),&#13;&#10;              null,&#13;&#10;              null,&#13;&#10;              ', ' || wcs_utl.get_answ(bg.bid_id,&#13;&#10;                                       'CL_0_46',&#13;&#10;                                       bg.ws_id,&#13;&#10;                                       bg.garantee_num)) ||&#13;&#10;       decode(wcs_utl.get_answ(bg.bid_id,&#13;&#10;                               'CL_0_58',&#13;&#10;                               bg.ws_id,&#13;&#10;                               bg.garantee_num),&#13;&#10;              null,&#13;&#10;              null,&#13;&#10;              ', ' || wcs_utl.get_answ(bg.bid_id,&#13;&#10;                                       'CL_0_46',&#13;&#10;                                       bg.ws_id,&#13;&#10;                                       bg.garantee_num)) as family,&#13;&#10;       add_months(to_date(wcs_utl.get_creditdata(bg.bid_id, 'DEAL_DATE')),&#13;&#10;                  to_number(wcs_utl.get_creditdata(bg.bid_id, 'CREDIT_TERM'))) as deal_end_date&#13;&#10;  from v_wcs_bid_garantees bg&#13;&#10; where bg.bid_id = :p_bid_id&#13;&#10;   and bg.garantee_id = 'GUARANTOR'&#13;&#10;   and bg.garantee_num = :p_ws_number">
+        <Column Name="GRT_COST" DataType="System.Decimal"/>
+        <Column Name="BID_ID" DataType="System.Decimal"/>
+        <Column Name="GARANTEE_ID" DataType="System.String"/>
+        <Column Name="GARANTEE_NAME" DataType="System.String"/>
+        <Column Name="GARANTEE_NUM" DataType="System.Decimal"/>
+        <Column Name="WS_ID" DataType="System.String"/>
+        <Column Name="STATUS_ID" DataType="System.Decimal"/>
+        <Column Name="STATUS_NAME" DataType="System.String"/>
+        <Column Name="TYPE_OBU_ID" DataType="System.String"/>
+        <Column Name="TYPE_OBU_NAME" DataType="System.String"/>
+        <Column Name="GRT_NAME" DataType="System.String"/>
+        <Column Name="AGR_NUMBER" DataType="System.String"/>
+        <Column Name="AGR_DATE" DataType="System.DateTime"/>
+        <Column Name="F" DataType="System.String"/>
+        <Column Name="I" DataType="System.String"/>
+        <Column Name="O" DataType="System.String"/>
+        <Column Name="BDATE" DataType="System.DateTime"/>
+        <Column Name="INN" DataType="System.String"/>
+        <Column Name="SUMM" DataType="System.Decimal"/>
+        <Column Name="OWN_FUNDS" DataType="System.Decimal"/>
+        <Column Name="TERM" DataType="System.String"/>
+        <Column Name="CREDIT_CURRENCY" DataType="System.String"/>
+        <Column Name="SINGLE_FEE" DataType="System.Decimal"/>
+        <Column Name="MONTHLY_FEE" DataType="System.Decimal"/>
+        <Column Name="INTEREST_RATE" DataType="System.Decimal"/>
+        <Column Name="REPAYMENT_METHOD" DataType="System.String"/>
+        <Column Name="REPAYMENT_METHOD_TEXT" DataType="System.String"/>
+        <Column Name="REPAYMENT_DAY" DataType="System.Decimal"/>
+        <Column Name="GARANTEES" DataType="System.String"/>
+        <Column Name="ADR_LIVE" DataType="System.String"/>
+        <Column Name="ADR_REG" DataType="System.String"/>
+        <Column Name="WORK_PLACE" DataType="System.String"/>
+        <Column Name="WORK_POST" DataType="System.String"/>
+        <Column Name="FAM_STATUS" DataType="System.String"/>
+        <Column Name="FAMILY" DataType="System.String"/>
+        <Column Name="SUBJ_OBU_ID" DataType="System.String"/>
+        <Column Name="SUBJ_OBU_NAME" DataType="System.String"/>
+        <Column Name="DEAL_END_DATE" DataType="System.DateTime"/>
+        <Column Name="TYPE_ID" DataType="System.Decimal"/>
+        <Column Name="TYPE_NAME" DataType="System.String"/>
+        <CommandParameter Name="p_bid_id" DataType="107" Expression="[p_bid_id]" DefaultValue="-1"/>
+        <CommandParameter Name="p_ws_number" DataType="107" Expression="[p_ws_number]" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table6" Alias="WCS_SCORING_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select wcs_utl.get_score(bg.bid_id,&#10;                         ss.scoring_id,&#10;                         'DP',&#10;                         bg.ws_id,&#10;                         bg.garantee_num) as dp,&#10;       wcs_utl.get_score(bg.bid_id,&#10;                         ss.scoring_id,&#10;                         'CL_31',&#10;                         bg.ws_id,&#10;                         bg.garantee_num) as cl_31,&#10;       wcs_utl.get_score(bg.bid_id,&#10;                         ss.scoring_id,&#10;                         'CL_0_135',&#10;                         bg.ws_id,&#10;                         bg.garantee_num) as cl_0_135,&#10;       wcs_utl.get_score(bg.bid_id,&#10;                         ss.scoring_id,&#10;                         'MZ_VMAINA',&#10;                         bg.ws_id,&#10;                         bg.garantee_num) as mz_vmaina,&#10;       wcs_utl.get_score(bg.bid_id,&#10;                         ss.scoring_id,&#10;                         'KPP',&#10;                         bg.ws_id,&#10;                         bg.garantee_num) as kpp,&#10;       wcs_utl.get_score(bg.bid_id,&#10;                         ss.scoring_id,&#10;                         'KPP',&#10;                         bg.ws_id,&#10;                         bg.garantee_num) as kps,&#10;       wcs_utl.get_score(bg.bid_id,&#10;                         ss.scoring_id,&#10;                         '4P',&#10;                         bg.ws_id,&#10;                         bg.garantee_num) as chp,&#10;       wcs_utl.get_score(bg.bid_id,&#10;                         ss.scoring_id,&#10;                         'VN',&#10;                         bg.ws_id,&#10;                         bg.garantee_num) as vn,&#10;       wcs_utl.get_score(bg.bid_id,&#10;                         ss.scoring_id,&#10;                         'PR',&#10;                         bg.ws_id,&#10;                         bg.garantee_num) as pr,&#10;       wcs_utl.get_score(bg.bid_id,&#10;                         ss.scoring_id,&#10;                         'SM',&#10;                         bg.ws_id,&#10;                         bg.garantee_num) as sm,&#10;       wcs_utl.get_score(bg.bid_id,&#10;                         ss.scoring_id,&#10;                         'VVK',&#10;                         bg.ws_id,&#10;                         bg.garantee_num) as vvk,&#10;       wcs_utl.get_score(bg.bid_id,&#10;                         ss.scoring_id,&#10;                         'VPK',&#10;                         bg.ws_id,&#10;                         bg.garantee_num) as vpk,&#10;       wcs_utl.get_score(bg.bid_id,&#10;                         ss.scoring_id,&#10;                         'SZDOR',&#10;                         bg.ws_id,&#10;                         bg.garantee_num) as szdor,&#10;       wcs_utl.get_score(bg.bid_id,&#10;                         ss.scoring_id,&#10;                         'R',&#10;                         bg.ws_id,&#10;                         bg.garantee_num) as r,&#10;       wcs_utl.get_score(bg.bid_id,&#10;                         ss.scoring_id,&#10;                         'PKRED',&#10;                         bg.ws_id,&#10;                         bg.garantee_num) as pkred,&#10;       wcs_utl.get_answ(bg.bid_id, 'DP', bg.ws_id, bg.garantee_num) as dp_val,&#10;       wcs_utl.get_answ(bg.bid_id, 'CL_31', bg.ws_id, bg.garantee_num) as cl_31_val,&#10;       wcs_utl.get_answ(bg.bid_id, 'CL_0_135', bg.ws_id, bg.garantee_num) as cl_0_135_val,&#10;       wcs_utl.get_answ(bg.bid_id, 'MZ_VMAINA', bg.ws_id, bg.garantee_num) as mz_vmaina_val,&#10;       to_number(wcs_utl.get_answ(bg.bid_id,&#10;                                  'KPP',&#10;                                  bg.ws_id,&#10;                                  bg.garantee_num)) as kpp_val,&#10;       null as kps_val,&#10;       wcs_utl.get_answ(bg.bid_id, '4P', bg.ws_id, bg.garantee_num) as chp_val,&#10;       wcs_utl.get_answ(bg.bid_id, 'VN', bg.ws_id, bg.garantee_num) as vn_val,&#10;       wcs_utl.get_answ(bg.bid_id, 'PR', bg.ws_id, bg.garantee_num) as pr_val,&#10;       wcs_utl.get_answ(bg.bid_id, 'SM', bg.ws_id, bg.garantee_num) as sm_val,&#10;       wcs_utl.get_answ(bg.bid_id, 'VVK', bg.ws_id, bg.garantee_num) as vvk_val,&#10;       wcs_utl.get_answ(bg.bid_id, 'VPK', bg.ws_id, bg.garantee_num) as vpk_val,&#10;       wcs_utl.get_answ(bg.bid_id, 'SZDOR', bg.ws_id, bg.garantee_num) as szdor_val,&#10;       wcs_utl.get_answ(bg.bid_id, 'R', bg.ws_id, bg.garantee_num) as r_val,&#10;       wcs_utl.get_answ(bg.bid_id, 'PKRED', bg.ws_id, bg.garantee_num) as pkred_val,&#10;       to_number(wcs_utl.get_answ(bg.bid_id, 'S', bg.ws_id, bg.garantee_num)) as s,&#10;       to_number(wcs_utl.get_answ(bg.bid_id,&#10;                                  'CR',&#10;                                  bg.ws_id,&#10;                                  bg.garantee_num)) as cr,&#10;       wcs_utl.get_answ_list_text(bg.bid_id,&#10;                                  'CRISK_NBU',&#10;                                  bg.ws_id,&#10;                                  bg.garantee_num) as crisk_nbu,&#10;       wcs_utl.get_answ_list_text(bg.bid_id,&#10;                                  'CRISK_OBU',&#10;                                  bg.ws_id,&#10;                                  bg.garantee_num) as crisk_obu&#10;  from v_wcs_bid_garantees bg, wcs_bids b, wcs_subproduct_scoring ss&#10; where bg.bid_id = :p_bid_id&#10;   and bg.bid_id = b.id&#10;   and b.subproduct_id = ss.subproduct_id&#10;   and bg.garantee_id = 'GUARANTOR'&#10;   and bg.garantee_num = :p_ws_number">
+        <Column Name="DP" DataType="System.Decimal"/>
+        <Column Name="CL_31" DataType="System.Decimal"/>
+        <Column Name="CL_0_135" DataType="System.Decimal"/>
+        <Column Name="MZ_VMAINA" DataType="System.Decimal"/>
+        <Column Name="KPP" DataType="System.Decimal"/>
+        <Column Name="KPS" DataType="System.Decimal"/>
+        <Column Name="CHP" DataType="System.Decimal"/>
+        <Column Name="VN" DataType="System.Decimal"/>
+        <Column Name="PR" DataType="System.Decimal"/>
+        <Column Name="SM" DataType="System.Decimal"/>
+        <Column Name="VVK" DataType="System.Decimal"/>
+        <Column Name="VPK" DataType="System.Decimal"/>
+        <Column Name="SZDOR" DataType="System.Decimal"/>
+        <Column Name="R" DataType="System.Decimal"/>
+        <Column Name="PKRED" DataType="System.Decimal"/>
+        <Column Name="S" DataType="System.Decimal"/>
+        <Column Name="CR" DataType="System.Decimal"/>
+        <Column Name="CRISK_NBU" DataType="System.String"/>
+        <Column Name="DP_VAL" DataType="System.String"/>
+        <Column Name="CL_31_VAL" DataType="System.String"/>
+        <Column Name="CL_0_135_VAL" DataType="System.String"/>
+        <Column Name="MZ_VMAINA_VAL" DataType="System.String"/>
+        <Column Name="KPS_VAL" DataType="System.String"/>
+        <Column Name="CHP_VAL" DataType="System.String"/>
+        <Column Name="VN_VAL" DataType="System.String"/>
+        <Column Name="PR_VAL" DataType="System.String"/>
+        <Column Name="SM_VAL" DataType="System.String"/>
+        <Column Name="VVK_VAL" DataType="System.String"/>
+        <Column Name="VPK_VAL" DataType="System.String"/>
+        <Column Name="SZDOR_VAL" DataType="System.String"/>
+        <Column Name="R_VAL" DataType="System.String"/>
+        <Column Name="PKRED_VAL" DataType="System.String"/>
+        <Column Name="CRISK_OBU" DataType="System.String"/>
+        <Column Name="KPP_VAL" DataType="System.Decimal"/>
+        <CommandParameter Name="p_bid_id" DataType="107" Expression="[p_bid_id]" DefaultValue="-1"/>
+        <CommandParameter Name="p_ws_number" DataType="107" Expression="[p_ws_number]" DefaultValue="0"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_bid_id" DataType="System.Int32" Expression="3560421 "/>
+    <Parameter Name="p_ws_id" DataType="System.String" Expression="&quot;GRT_GUARANTOR&quot;"/>
+    <Parameter Name="p_ws_number" DataType="System.Int32" Expression="0"/>
+    <Parameter Name="ND" DataType="System.Int32" Expression="324921"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <DataBand Name="Data1" Width="718.2" Height="1256.85">
+      <TableObject Name="Table1" Left="9.45" Top="9.45" Width="701.12" Height="434.7" Border.Lines="All">
+        <TableColumn Name="Column1" Width="165.83"/>
+        <TableColumn Name="Column2" Width="175.28"/>
+        <TableColumn Name="Column3" Width="175.28"/>
+        <TableColumn Name="Column4" Width="184.73"/>
+        <TableRow Name="Row1">
+          <TableCell Name="Cell1" Border.Lines="All" Text="Назва регіон.управл."/>
+          <TableCell Name="Cell2" Border.Lines="All" Text="[BANK_NAME.VAL]" ColSpan="3"/>
+          <TableCell Name="Cell3" Border.Lines="All"/>
+          <TableCell Name="Cell4" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row2" Height="37.8">
+          <TableCell Name="Cell6" Border.Lines="All" Text="Висновок щодо оцінки фінансового стану поручителя - фізичної особи" ColSpan="2"/>
+          <TableCell Name="Cell7" Border.Lines="All"/>
+          <TableCell Name="Cell8" Border.Lines="All" Text="МФО установи"/>
+          <TableCell Name="Cell9" Border.Lines="All" Text="[OUR_MFO.VAL]"/>
+        </TableRow>
+        <TableRow Name="Row3" Height="37.8">
+          <TableCell Name="Cell11" Border.Lines="All" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell12" Border.Lines="All" HorzAlign="Right" Font="Arial, 12pt, style=Bold"/>
+          <TableCell Name="Cell13" Border.Lines="All" Text="Висновок: Попередній" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell14" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row4">
+          <TableCell Name="Cell16" Border.Lines="All" Text="Дата"/>
+          <TableCell Name="Cell17" Border.Lines="All" Text="[FormatDateTime([Date],&quot;Short Date&quot;)]"/>
+          <TableCell Name="Cell18" Border.Lines="All" Text="Ідентифікаційний номер"/>
+          <TableCell Name="Cell19" Border.Lines="All" Text="[WCS_GUARANTOR_DATA.INN]"/>
+        </TableRow>
+        <TableRow Name="Row5">
+          <TableCell Name="Cell21" Border.Lines="All" Text="[WCS_GUARANTOR_DATA.F] [WCS_GUARANTOR_DATA.I] [WCS_GUARANTOR_DATA.O]" Font="Arial, 10pt, style=Bold" ColSpan="4"/>
+          <TableCell Name="Cell22" Border.Lines="All"/>
+          <TableCell Name="Cell23" Border.Lines="All"/>
+          <TableCell Name="Cell24" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row6">
+          <TableCell Name="Cell26" Border.Lines="All" Text="(прізвище, ім'я, по батькові)" HorzAlign="Center" ColSpan="2"/>
+          <TableCell Name="Cell27" Border.Lines="All" HorzAlign="Center"/>
+          <TableCell Name="Cell28" Border.Lines="All" Text="Номер кредитної заявки"/>
+          <TableCell Name="Cell29" Border.Lines="All" Text="[WCS_GUARANTOR_DATA.BID_ID]"/>
+        </TableRow>
+        <TableRow Name="Row7" Height="37.8">
+          <TableCell Name="Cell31" Border.Lines="All" Text="Ознака інсайдера"/>
+          <TableCell Name="Cell32" Border.Lines="All"/>
+          <TableCell Name="Cell33" Border.Lines="All" Text="Дата погашення за угодою"/>
+          <TableCell Name="Cell34" Border.Lines="All" Text="[FormatDateTime(AddMonths([Date],ToInt32([WCS_GUARANTOR_DATA.TERM])),&quot;Short Date&quot;)]"/>
+        </TableRow>
+        <TableRow Name="Row8" Height="47.25">
+          <TableCell Name="Cell36" Border.Lines="All" Text="Категорія громадян, які постраждали від Чорноб.катастрофи"/>
+          <TableCell Name="Cell37" Border.Lines="All"/>
+          <TableCell Name="Cell38" Border.Lines="All" Text="Проблемний кредит (код)"/>
+          <TableCell Name="Cell39" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row9" Height="37.8">
+          <TableCell Name="Cell41" Border.Lines="All" Text="Місце прописки"/>
+          <TableCell Name="Cell42" Border.Lines="All" Text="[WCS_GUARANTOR_DATA.ADR_REG]" ColSpan="3"/>
+          <TableCell Name="Cell43" Border.Lines="All"/>
+          <TableCell Name="Cell44" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row10" Height="37.8">
+          <TableCell Name="Cell46" Border.Lines="All" Text="Фактичне місце проживання"/>
+          <TableCell Name="Cell47" Border.Lines="All" Text="[WCS_GUARANTOR_DATA.ADR_LIVE]" ColSpan="3"/>
+          <TableCell Name="Cell48" Border.Lines="All"/>
+          <TableCell Name="Cell49" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row11">
+          <TableCell Name="Cell51" Border.Lines="All" Text="Дата народження:"/>
+          <TableCell Name="Cell52" Border.Lines="All" Text="[FormatDateTime([WCS_GUARANTOR_DATA.BDATE],&quot;Short Date&quot;)]" ColSpan="3"/>
+          <TableCell Name="Cell53" Border.Lines="All"/>
+          <TableCell Name="Cell54" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row12">
+          <TableCell Name="Cell56" Border.Lines="All" Text="Місце роботи"/>
+          <TableCell Name="Cell57" Border.Lines="All" Text="[WCS_GUARANTOR_DATA.WORK_PLACE]" ColSpan="3"/>
+          <TableCell Name="Cell58" Border.Lines="All"/>
+          <TableCell Name="Cell59" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row13">
+          <TableCell Name="Cell61" Border.Lines="All" Text="Займана посада"/>
+          <TableCell Name="Cell62" Border.Lines="All" Text="[WCS_GUARANTOR_DATA.WORK_POST]" ColSpan="3"/>
+          <TableCell Name="Cell63" Border.Lines="All"/>
+          <TableCell Name="Cell64" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row14">
+          <TableCell Name="Cell66" Border.Lines="All" Text="Сімейний стан"/>
+          <TableCell Name="Cell67" Border.Lines="All" Text="[WCS_GUARANTOR_DATA.FAM_STATUS]" ColSpan="3"/>
+          <TableCell Name="Cell68" Border.Lines="All"/>
+          <TableCell Name="Cell69" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row15" Height="47.25">
+          <TableCell Name="Cell71" Border.Lines="All" Text="Родинний стан"/>
+          <TableCell Name="Cell72" Border.Lines="All" Text="[WCS_GUARANTOR_DATA.FAMILY]" ColSpan="3"/>
+          <TableCell Name="Cell73" Border.Lines="All"/>
+          <TableCell Name="Cell74" Border.Lines="All"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table3" Left="9.45" Top="463.05" Width="700.16" Height="94.5" Border.Lines="All">
+        <TableColumn Name="Column6" Width="350.08"/>
+        <TableColumn Name="Column7" Width="350.08"/>
+        <TableRow Name="Row16">
+          <TableCell Name="Cell76" Border.Lines="All" Text="Сума кредиту"/>
+          <TableCell Name="Cell77" Border.Lines="All" Text="[FormatNumber([WCS_GUARANTOR_DATA.SUMM],2)] ([WCS_GUARANTOR_DATA.CREDIT_CURRENCY])"/>
+        </TableRow>
+        <TableRow Name="Row17">
+          <TableCell Name="Cell81" Border.Lines="All" Text="Строк користування"/>
+          <TableCell Name="Cell82" Border.Lines="All" Text="[WCS_GUARANTOR_DATA.TERM] (міс.)"/>
+        </TableRow>
+        <TableRow Name="Row18">
+          <TableCell Name="Cell86" Border.Lines="All" Text="Процентна ставка"/>
+          <TableCell Name="Cell87" Border.Lines="All" Text="[FormatPercent([WCS_GUARANTOR_DATA.INTEREST_RATE]/100,2)]"/>
+        </TableRow>
+        <TableRow Name="Row19">
+          <TableCell Name="Cell91" Border.Lines="All" Text="Сума поруки"/>
+          <TableCell Name="Cell92" Border.Lines="All" Text="[FormatNumber([WCS_GUARANTOR_DATA.GRT_COST],2)]"/>
+        </TableRow>
+        <TableRow Name="Row20">
+          <TableCell Name="Cell96" Border.Lines="All" Text="Коефіцієнт платоспроможності поручителя (Кпп)"/>
+          <TableCell Name="Cell97" Border.Lines="All" Text="[FormatNumber([WCS_SCORING_DATA.KPP_VAL],2)]"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table4" Left="9.45" Top="576.45" Width="693.63" Height="472.5">
+        <TableColumn Name="Column11" Width="61.11"/>
+        <TableColumn Name="Column12" Width="335.16"/>
+        <TableColumn Name="Column13" Width="297.36"/>
+        <TableRow Name="Row21">
+          <TableCell Name="Cell101"/>
+          <TableCell Name="Cell102" Text="Оцінка ризику" HorzAlign="Right" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell103" Border.Lines="All" Border.Width="1.5" Fill.Color="Gainsboro" Text="[FormatNumber([WCS_SCORING_DATA.CR],3)]"/>
+        </TableRow>
+        <TableRow Name="Row22">
+          <TableCell Name="Cell106" Border.Lines="All" Border.Width="1.5" Fill.Color="Gainsboro" Text="№ пор." HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell107" Border.Lines="All" Border.Width="1.5" Fill.Color="Gainsboro" Text="Назва показника" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell108" Border.Lines="All" Border.Width="1.5" Fill.Color="Gainsboro" Text="Оцінка показника" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row23">
+          <TableCell Name="Cell111" Border.Lines="All" Border.Width="1.5" Fill.Color="Gainsboro" Text="1" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell112" Border.Lines="All" Border.Width="1.5" Fill.Color="Gainsboro" Text="2" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell113" Border.Lines="All" Border.Width="1.5" Fill.Color="Gainsboro" Text="3" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row24">
+          <TableCell Name="Cell116" Border.Lines="All" Text="1" HorzAlign="Center"/>
+          <TableCell Name="Cell117" Border.Lines="All" Text="Коефіцієнт платоспроможності поручителя"/>
+          <TableCell Name="Cell118" Border.Lines="All" Text="[WCS_SCORING_DATA.KPP]"/>
+        </TableRow>
+        <TableRow Name="Row25">
+          <TableCell Name="Cell121" Border.Lines="All" Text="2" HorzAlign="Center"/>
+          <TableCell Name="Cell122" Border.Lines="All" Text="Коефіцієнт платоспроможності сім'ї"/>
+          <TableCell Name="Cell123" Border.Lines="All" Text="[WCS_SCORING_DATA.KPS]"/>
+        </TableRow>
+        <TableRow Name="Row26" Height="37.8">
+          <TableCell Name="Cell126" Border.Lines="All" Text="3" HorzAlign="Center"/>
+          <TableCell Name="Cell127" Border.Lines="All" Text="Частка погашення кредиту в чистому сукупному доході поручителя"/>
+          <TableCell Name="Cell128" Border.Lines="All" Text="[WCS_SCORING_DATA.CHP]"/>
+        </TableRow>
+        <TableRow Name="Row27">
+          <TableCell Name="Cell131" Border.Lines="All" Text="4" HorzAlign="Center"/>
+          <TableCell Name="Cell132" Border.Lines="All" Text="Наявність власної нерухомості"/>
+          <TableCell Name="Cell133" Border.Lines="All" Text="[WCS_SCORING_DATA.VN]"/>
+        </TableRow>
+        <TableRow Name="Row28">
+          <TableCell Name="Cell136" Border.Lines="All" Text="5" HorzAlign="Center"/>
+          <TableCell Name="Cell137" Border.Lines="All" Text="Наявність постійної роботи"/>
+          <TableCell Name="Cell138" Border.Lines="All" Text="[WCS_SCORING_DATA.PR]"/>
+        </TableRow>
+        <TableRow Name="Row29">
+          <TableCell Name="Cell141" Border.Lines="All" Text="6" HorzAlign="Center"/>
+          <TableCell Name="Cell142" Border.Lines="All" Text="Загальний стаж роботи"/>
+          <TableCell Name="Cell143" Border.Lines="All" Text="[WCS_SCORING_DATA.CL_31]"/>
+        </TableRow>
+        <TableRow Name="Row30">
+          <TableCell Name="Cell146" Border.Lines="All" Text="7" HorzAlign="Center"/>
+          <TableCell Name="Cell147" Border.Lines="All" Text="Сімейний стан та місцепроживання"/>
+          <TableCell Name="Cell148" Border.Lines="All" Text="[WCS_SCORING_DATA.SM]"/>
+        </TableRow>
+        <TableRow Name="Row31">
+          <TableCell Name="Cell151" Border.Lines="All" Text="8" HorzAlign="Center"/>
+          <TableCell Name="Cell152" Border.Lines="All" Text="Професійні якості"/>
+          <TableCell Name="Cell153" Border.Lines="All" Text="[WCS_SCORING_DATA.CL_0_135]"/>
+        </TableRow>
+        <TableRow Name="Row32">
+          <TableCell Name="Cell156" Border.Lines="All" Text="9" HorzAlign="Center"/>
+          <TableCell Name="Cell157" Border.Lines="All" Text="Вік поручителя на момент видачі кредиту"/>
+          <TableCell Name="Cell158" Border.Lines="All" Text="[WCS_SCORING_DATA.VVK]"/>
+        </TableRow>
+        <TableRow Name="Row33">
+          <TableCell Name="Cell161" Border.Lines="All" Text="10" HorzAlign="Center"/>
+          <TableCell Name="Cell162" Border.Lines="All" Text="Вік поручителя на момент погашення кредиту"/>
+          <TableCell Name="Cell163" Border.Lines="All" Text="[WCS_SCORING_DATA.VPK]"/>
+        </TableRow>
+        <TableRow Name="Row34">
+          <TableCell Name="Cell166" Border.Lines="All" Text="11" HorzAlign="Center"/>
+          <TableCell Name="Cell167" Border.Lines="All" Text="Працездатність (стан здоров'я) поручителя "/>
+          <TableCell Name="Cell168" Border.Lines="All" Text="[WCS_SCORING_DATA.SZDOR]"/>
+        </TableRow>
+        <TableRow Name="Row35">
+          <TableCell Name="Cell171" Border.Lines="All" Text="12" HorzAlign="Center"/>
+          <TableCell Name="Cell172" Border.Lines="All" Text="Наявність та вид рахунку в Банку"/>
+          <TableCell Name="Cell173" Border.Lines="All" Text="[WCS_SCORING_DATA.R]"/>
+        </TableRow>
+        <TableRow Name="Row36">
+          <TableCell Name="Cell176" Border.Lines="All" Text="13" HorzAlign="Center"/>
+          <TableCell Name="Cell177" Border.Lines="All" Text="Погашення кредитів"/>
+          <TableCell Name="Cell178" Border.Lines="All" Text="[WCS_SCORING_DATA.PKRED]"/>
+        </TableRow>
+        <TableRow Name="Row37">
+          <TableCell Name="Cell181" Border.Lines="All" Text="14" HorzAlign="Center"/>
+          <TableCell Name="Cell182" Border.Lines="All" Text="Місцезнаходження об'єкта застави/Вид майна"/>
+          <TableCell Name="Cell183" Border.Lines="All" Text="[WCS_SCORING_DATA.MZ_VMAINA]"/>
+        </TableRow>
+        <TableRow Name="Row38">
+          <TableCell Name="Cell186" Border.Lines="All" Text="15" HorzAlign="Center"/>
+          <TableCell Name="Cell187" Border.Lines="All" Text="Наявність джерел погашення кредиту"/>
+          <TableCell Name="Cell188" Border.Lines="All" Text="[WCS_SCORING_DATA.DP]"/>
+        </TableRow>
+        <TableRow Name="Row39" Height="37.8">
+          <TableCell Name="Cell191"/>
+          <TableCell Name="Cell192" Border.Lines="All" Text="Загальний показник (сума балів) оцінки фінансового стану / кредитного ризику (S1)" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell193" Border.Lines="All" Fill.Color="Gainsboro" Text="[WCS_SCORING_DATA.S]"/>
+        </TableRow>
+        <TableRow Name="Row40">
+          <TableCell Name="Cell196"/>
+          <TableCell Name="Cell197" Border.Lines="All" Text="Значення кредитного ризику" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell198" Border.Lines="All" Fill.Color="Gainsboro" Text="[FormatNumber([WCS_SCORING_DATA.CR],3)]"/>
+        </TableRow>
+        <TableRow Name="Row41" Height="37.8">
+          <TableCell Name="Cell201"/>
+          <TableCell Name="Cell202" Text="* Уразі якщо позичальник не має сім'ї оцінка коефіцієнту Кпс приймає значення оцінки коефіцієнта Кпп" ColSpan="2"/>
+          <TableCell Name="Cell203"/>
+        </TableRow>
+        <TableRow Name="Row42">
+          <TableCell Name="Cell206" Text="Фінансовий стан (клас)" ColSpan="2"/>
+          <TableCell Name="Cell207"/>
+          <TableCell Name="Cell208" Border.Lines="All" Fill.Color="Gainsboro" Text="[WCS_SCORING_DATA.CRISK_NBU]" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+      <RichObject Name="Rich1" Left="9.45" Top="1067.85" Width="689.85" Height="160.65" Text="{\rtf1\ansi\ansicpg1251\deff0\deflang1049{\fonttbl{\f0\fnil\fcharset204{\*\fname Times New Roman;}Times New Roman CYR;}{\f1\fnil Times New Roman;}{\f2\fnil\fcharset204 Tahoma;}{\f3\fnil\fcharset0 Times New Roman;}}&#10;{\colortbl ;\red0\green0\blue0;}&#10;{\*\generator Msftedit 5.41.21.2509;}\viewkind4\uc1\pard\cf1\b\f0\fs20\'c2\'e8\'f1\'ed\'ee\'e2\'ee\'ea\f1  \f0\'ea\'f0\'e5\'e4\'e8\'f2\'ed\'ee\'e3\'ee\f1  \f0\'ef\'f0\'e0\'f6\'b3\'e2\'ed\'e8\'ea\'e0 \par&#10;_______________________________________________________________________________________________\par&#10;_______________________________________________________________________________________________\cf0\b0\f2\fs17\par&#10;\cf1\b\f0\fs20 _______________________________________________________________________________________________\cf0\b0\f2\fs17\par&#10;\cf1\b\f0\fs20 _______________________________________________________________________________________________\cf0\b0\f2\fs17\par&#10;\cf1\b\f0\fs20 _______________________________________________________________________________________________\cf0\b0\f2\fs17\par&#10;\cf1\b\f0\fs20 _______________________________________________________________________________________________\cf0\b0\f2\fs17\par&#10;\par&#10;\cf1\f0\fs20\par&#10;\'ca\'f0\'e5\'e4\'e8\'f2\'ed\'e8\'e9\f1  \f0\'ef\'f0\'e0\'f6\'b3\'e2\'ed\'e8\'ea\tab\tab\tab\tab\tab\tab\lang1033\f3            \lang1049\f0        \b __________/__________________/\par&#10;\tab\tab\tab\tab\tab\tab\tab\tab\tab        \b0\f1\fs16 (\f0\'ef\'b3\'e4\'ef\'e8\'f1\f1 )\lang1033\f3          \lang1058\f0  \lang1049\f1 (\f0\'b3\'ed\'b3\'f6\'b3\'e0\'eb\'e8\f1  \f0\'f2\'e0\f1  \f0\'ef\'f0\'b3\'e7\'e2\'e8\'f9\'e5\f1 )\cf0\f2\fs17\par&#10;}&#10;"/>
+    </DataBand>
+  </ReportPage>
+</Report>

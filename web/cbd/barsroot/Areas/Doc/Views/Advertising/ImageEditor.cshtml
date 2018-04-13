@@ -1,0 +1,86 @@
+﻿@{
+    Layout = null;
+}
+<h2>Редагування зображення</h2>
+<div style="overflow: auto;width: 100%;">
+    <h4>Виберіть файл:<input style="display: inline" id="inputImage" name="file" type="file" accept="image/*" /></h4>
+    <div class="img-container">
+        <img id="imageCropper" src="" alt="">
+    </div>
+    <h4>Попередній перегляд</h4>
+    
+    <div class="col-xs-6 col-sm-6 col-md-6">
+        <div id="imagePreview" class="img-preview" style="width: 200px;height: 100px"></div>        
+    </div>
+    <div class="col-xs-4 col-sm-4 col-md-4">
+        <div>Ширина:</div>
+        <input id="dataWidth" type="text" class="k-textbox" data-ng-model="advertisingImage.Width" />        
+        <div>Висота:</div> 
+        <input id="dataHeight" type="text" class="k-textbox" data-ng-model="advertisingImage.Height" />
+    </div>
+</div>
+
+<div class="window-footer">
+    <button type="button" class="k-select k-button" data-ng-click="saveImageUrl()"><i class="pf-icon pf-16 pf-ok"></i>Зберегти</button>
+    <button type="button" class="k-button" data-ng-click="imageEditorWindow.close()">Відмінити</button>
+</div>
+
+<script>
+    $(function() {
+        var $image = $("#imageCropper");
+        //$dataX = $("#dataX"),
+        //$dataY = $("#dataY");
+
+
+        $image.cropper({
+            aspectRatio: 'auto',
+            data: {
+                x: 480,
+                y: 60,
+                width: 600,
+                height: 300
+            },
+            preview: "#imagePreview",
+            done: function(data) {
+                //$dataX.val(data.x);
+                //$dataY.val(data.y);
+                document.getElementById('dataHeight').value = data.height;
+                document.getElementById('dataWidth').value = data.width;
+            }
+        });
+
+        var $inputImage = $("#inputImage");
+
+        if (window.FileReader) {
+            $inputImage.change(function() {
+                var fileReader = new FileReader(),
+                    files = this.files,
+                    file;
+
+                if (!files.length) {
+                    return;
+                }
+
+                file = files[0];
+
+                if (/^image\/\w+$/.test(file.type)) {
+                    fileReader.readAsDataURL(file);
+                    fileReader.onload = function() {
+                        $inputImage.val("");
+                        $image.cropper("reset", true).cropper("replace", this.result);
+                    };
+                } else {
+                    bars.ui.error({ text: "Будь ласка, виберіть файл зображення." });
+                }
+            });
+        } else {
+            $inputImage.addClass("hide");
+            $inputImage.after('<span style="color:red">не підтримується поточною версією браузера</span>');
+        }
+
+    });
+    function replaceImage(image) {
+        $("#inputImage").cropper("replace", image);
+    }
+</script>
+

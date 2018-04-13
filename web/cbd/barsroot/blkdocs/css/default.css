@@ -1,0 +1,79 @@
+﻿body { font-size: 10pt; font-family: arial; }
+.gv 
+{
+	margin-top :5px;
+	font-size: 10pt; 
+	font-family: arial; 
+	background-color: #f0f0f0 ;
+	border-color: #dcdcdc;
+	border-width:1px;
+}
+.gv th
+{
+	padding-right : 5px; 
+	padding-left: 5px; 
+	border-color:   #dcdcdc;
+	border-width:1px;
+	font-weight: bold; color: #707070;
+}
+.gv td
+{ 
+	padding-right: 5px; 
+	padding-left: 5px; 
+	border-color:   #dcdcdc;
+	border-width:1px;
+}
+.gvSelectedRowStyle
+{
+	background-color: #0977B9 ;
+	color: White;
+}
+.gvAlternatingRowStyle 
+{
+ background-color: #e0e0e0; 
+}
+.gvNormalRowStyle
+{ 
+	border-color:   #dcdcdc;
+	border-width:1px;
+
+}
+.gvHeaderRowStyle
+{
+	border-color:   #dcdcdc;
+	border-width:1px;
+	font-weight: bold; color: #707070;
+}
+.gvHiddenCol{display:none;}
+
+.PageTitle
+{
+	font-size: 12pt;
+}
+.gvSelectedRowStyle a
+{
+	color:White;
+}
+.gvSelectedRowStyle a:visited
+{
+	color:White;
+}
+.gvSelectedRowStyle a:hover
+{
+	color:White;
+}
+a
+{
+	color: #2778C9;
+}
+
+a:visited
+{
+	color: #2778C9;
+}
+
+a:hover
+{
+	color:	#2778C9;
+	text-decoration: none;
+}

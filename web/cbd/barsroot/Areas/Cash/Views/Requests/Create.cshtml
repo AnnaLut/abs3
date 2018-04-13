@@ -1,0 +1,102 @@
+﻿@{
+    Layout = null;
+}
+
+<style>
+    .form-group > div > input,
+    .form-group > div > textarea,
+    .form-group > div > .k-widget {
+        margin-bottom: 5px;
+        margin-top: 5px;
+    }
+    .form-group > div > textarea,
+    .form-group > div > table textarea,
+    .form-group > div > table input {
+        margin-bottom: 5px;
+    }
+</style>
+<script>
+    $(function() {
+        $("#CurrentLimit,#MaxLimit").kendoNumericTextBox({
+            min: 0,
+            step: 1
+        });
+    })
+</script>
+
+<h2>Створення нової заявки</h2>
+           
+@*<div class="form-group">
+    <label class="control-label col-xs-4 col-sm-4">Відділення</label>
+    <div class="col-xs-6 col-sm-6 col-md-6">
+        <input type="text" class="k-textbox" data-ng-model="advertising.Name" required validationmessage="Заповніть назву" />
+    </div>
+</div>*@
+
+<div class="form-group">
+    <label class="control-label col-xs-4 col-sm-4">Валюта</label>
+    <div class="col-xs-6 col-sm-6 col-md-6">
+        <table style="width: 100%">
+            <tr>
+                <td style="width: 100%">
+                    <input id="CurrencyCode" disabled="disabled" class="k-textbox" type="text" />
+                </td>
+                <td style="vertical-align: top;">
+                    <a class="k-button" onclick="showCurrencyHandBook()">
+                        <i class="pf-icon pf-16 pf-book"></i>
+                    </a>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div class="form-group">
+    <label class="control-label col-xs-4 col-sm-4">Рахунок</label>
+    <div class="col-xs-6 col-sm-6 col-md-6">
+        <table style="width: 100%">
+            <tr>
+                <td style="width: 100%">
+                    <input id="PrivateAccount" rows="2" disabled="disabled" class="k-textbox" type="text" />
+                    <input type="hidden" id="PrivateAccountId" />
+                </td>
+                <td style="vertical-align: top;">
+                    <a class="k-button" onclick="showAccountsHandBook()">
+                        <i class="pf-icon pf-16 pf-book"></i>
+                    </a>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div class="form-group">
+    <label class="control-label col-xs-4 col-sm-4">Поточний ліміт</label>
+    <div class="col-xs-6 col-sm-6 col-md-6">
+        <input id="CurrentLimit" type="text" required validationmessage="Заповніть на поточний ліміт" />
+    </div>
+</div>
+<div class="form-group">
+    <label class="control-label col-xs-4 col-sm-4">Максимальний ліміт</label>
+    <div class="col-xs-6 col-sm-6 col-md-6">
+        <input id="MaxLimit" type="text" required validationmessage="Заповніть максимальний ліміт" />
+    </div>
+</div>
+
+@*<div class="form-group">
+    <label class="control-label col-xs-4 col-sm-4">Дата заявки</label>
+    <div class="col-xs-6 col-sm-6 col-md-6">
+        <input type="text" class="k-textbox" data-ng-model="advertising.Name" required validationmessage="Заповніть назву" />
+    </div>
+</div>
+<div class="form-group">
+    <label class="control-label col-xs-4 col-sm-4">Запросив</label>
+    <div class="col-xs-6 col-sm-6 col-md-6">
+        <input type="text" class="k-textbox" data-ng-model="advertising.Name" required validationmessage="Заповніть назву" />
+    </div>
+</div>
+<div class="form-group">
+    <label class="control-label col-xs-4 col-sm-4">Статус</label>
+    <div class="col-xs-6 col-sm-6 col-md-6">
+        <input type="text" class="k-textbox" data-ng-model="advertising.Name" required validationmessage="Заповніть назву" />
+    </div>
+</div>*@
+

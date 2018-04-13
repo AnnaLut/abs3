@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<xmlform caption="Конфігураційні параметри WEB" captiontype="OnlyTitle">
+  <grids>
+    <grid id="gv" pagesize="10" showpagesizebox="true" title="Конфігураційні параметри WEB">
+      <datasource>
+        <sql>
+          select key,val,comm from web_barsconfig where key in ('Product.Title','VAL.Url','VAL.Wallet_dir','VAL.Wallet_pass','Ner.Url','Ner.Wallet_dir','Ner.Wallet_pass','SMPP.Description','SMPP.Host','SMPP.Password','SMPP.Port','SMPP.Sender','SMPP.SystemId','SMPP.Url','LCS.Url','LCS.WalletDir','LCS.WalletPass','SMPP.Wallet_dir','SMPP.Wallet_pass','ead.WSProxy.Url','ead.WSProxy.NS','ead.WSProxy.UserName','ead.WSProxy.Password','ead.User_Login','ead.User_Fio','ead.User_Password','ead.ServiceUrl','ead.TimeOut','ead.WSProxy.WalletDir','ead.WSProxy.WalletPass')
+          or key like 'CustomAuthentication.Pass%' or key like 'CustomAuthentication.Session%' order by key
+        </sql>
+      </datasource>
+      <editform style="Dialog" title="Редагування типу"  width="800" height="350" >
+        <buttons defaulttype="Link">
+          <button id="cmdEdit" caption="Редагувати|Зберегти|Вiдмiнити" hint="Редагувати|Зберегти|Вiдмiнити">
+            <command type="Edit">
+              <sql>begin bars.web_utl_adm.set_configparam('appSettings', :KEY, :VAL); end; </sql>
+              <parameters>
+                <parameter type="DataField" name="KEY" />
+                <parameter type="DataField" name="VAL" />
+              </parameters>
+            </command>
+          </button>
+          <button id="cmdClose" caption="Закрити" hint="Закрити форму">
+            <command type="Close"/>
+          </button>
+        </buttons>
+      </editform>
+      <fields>
+        <field datatype="String" name="COMM">
+          <column show="true" caption="Коментар" />
+          <form rwmode="RO">
+            <uicontrol controlwidth="400"></uicontrol>
+          </form>
+        </field>
+        <field datatype="String" name="VAL">
+          <column show="true" align="Left" caption="Значення" />
+          <form rwmode="RW" required="true">
+            <uicontrol controlwidth="200" ></uicontrol>
+          </form>
+        </field>
+        <field datatype="String" name="KEY" key="true" >
+          <column show="true" caption="Код" />
+          <form rwmode="RO" required="true">
+            <uicontrol controlwidth="200"></uicontrol>
+          </form>
+        </field>
+      </fields>
+      <rowselection method="SingleRow" />
+    </grid>
+  </grids>
+</xmlform>

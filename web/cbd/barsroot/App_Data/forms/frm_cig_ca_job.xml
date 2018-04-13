@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<xmlform>
+  <customforms>
+    <customform name="frmTEST_CIG_JOB" buttonsposition="Bottom" title="Стан завдання збору даних">
+      <buttons defaulttype="Button">
+        <button caption="Перечитати" hint="Перечитати" id="btnr">
+          <command type="Redirect" url="dynform.aspx?form=frm_cig_ca_job"></command>
+        </button>
+        <button caption="Журнал"  hint="Переглянути журнал подій" id="btnj">
+          <command type="Redirect" url="dynform.aspx?form=frm_cig_events"></command>
+        </button>
+        <button caption="Виконати" hint="Виконати завдання негайно" id="btns" confirmmessage="Для виконання завдання натисніть кнопку ОК\nДля перегляду журналу натисніть кнопку Журнал\nДля перегляду результату роботи натисніть кнопку Перечитати">
+          <command type="PlSqlBlock" successmessage="Завдання запущене">
+            <sql>begin cig_ca_mgr.job_run(:P_JOB); end;</sql>
+            <parameters>
+              <parameter type="FormField" name="P_JOB" />
+            </parameters>
+          </command>
+        </button>
+        <button caption="Зберегти" hint="Зберегти" id="btni">
+          <command type="PlSqlBlock" successmessage="Інтервал змінено">
+            <sql>begin cig_ca_mgr.job_interval(:P_JOB, :P_INTERVAL); end;</sql>
+            <parameters>
+              <parameter type="FormField" name="P_JOB" />
+              <parameter type="FormField" name="P_INTERVAL" />
+            </parameters>
+          </command>
+        </button>
+      </buttons>
+      <datasource>
+        <sql>
+          select
+          JOB,LAST_DATE,LAST_SEC,
+          THIS_DATE,THIS_SEC,
+          NEXT_DATE,NEXT_SEC,
+          to_char(TOTAL_TIME) as TOTAL_TIME,BROKEN,
+          INTERVAL,FAILURES,
+          WHAT from v_cig_ca_job</sql>
+        <parameters />
+      </datasource>
+      <customfields>
+        <customfield name="P_JOB" label="Код завдання" required="true" datatype="Int64" datasourcefield="JOB">
+          <uicontrol type="IntegerInput" controlwidth="150" readonly="true" />
+        </customfield>
+        <customfield name="P_LAST_DATE" label="Дата останнього успішного виконання" datatype="DateTime" datasourcefield="LAST_DATE">
+          <uicontrol type="DateInput" controlwidth="150" readonly="true" />
+        </customfield>
+        <customfield name="P_LAST_SEC" label="Час останнього успішного виконання" datatype="String" size="100" datasourcefield="LAST_SEC">
+          <uicontrol type="TextBox" controlwidth="150" readonly="true" align="Center" />
+        </customfield>
+        <customfield name="P_THIS_DATE" label="Дата запуску (якщо виконується зараз)" datatype="DateTime" datasourcefield="THIS_DATE">
+          <uicontrol type="DateInput" controlwidth="150" readonly="true"/>
+        </customfield>
+        <customfield name="P_THIS_SEC" label="Час запуску (якщо виконується зараз)" datatype="String" size="100" datasourcefield="THIS_SEC">
+          <uicontrol type="TextBox" controlwidth="150" readonly="true" align="Center"/>
+        </customfield>
+        <customfield name="P_NEXT_DATE" label="Дата наступного запуску" required="true" datatype="DateTime" datasourcefield="NEXT_DATE">
+          <uicontrol type="DateInput" controlwidth="150" readonly="true"/>
+        </customfield>
+        <customfield name="P_NEXT_SEC" label="Час наступного запуску" datatype="String" size="100" datasourcefield="NEXT_SEC">
+          <uicontrol type="TextBox" controlwidth="150" readonly="true" align="Center"/>
+        </customfield>
+        <customfield name="P_TOTAL_TIME" label="Загальний час останнього виконання (сек)" datatype="String" datasourcefield="TOTAL_TIME">
+          <uicontrol type="TextBox" controlwidth="150" readonly="true" align="Right"/>
+        </customfield>
+        <customfield name="P_BROKEN" label="Флаг активності" datatype="String" size="100" datasourcefield="BROKEN">
+          <uicontrol type="CheckBox" truevalue="N" falsevalue="Y" controlwidth="150" readonly="true"/>
+        </customfield>
+        <customfield name="P_INTERVAL" label="Інтервал" required="true" datatype="String" size="100" datasourcefield="INTERVAL">
+          <uicontrol type="TextBox" controlwidth="250" readonly="false" linescount="3"/>
+        </customfield>
+        <customfield name="P_FAILURES" label="Кількість виконань з помилками" datatype="Int64" datasourcefield="FAILURES">
+          <uicontrol type="IntegerInput" controlwidth="150" readonly="true"/>
+        </customfield>
+        <customfield name="P_WHAT" label="Процедура, що виконується" datatype="String" size="100" datasourcefield="WHAT">
+          <uicontrol type="TextBox" controlwidth="250" readonly="true" linescount="3"/>
+        </customfield>
+      </customfields>
+    </customform>
+  </customforms>
+</xmlform>

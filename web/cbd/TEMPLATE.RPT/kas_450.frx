@@ -1,0 +1,169 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="11/04/2014 09:09:37" ReportInfo.Modified="11/04/2014 15:36:47" ReportInfo.CreatorVersion="2013.2.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqD6nWZEExUJ9MEhdFZpB1A6ZfSeiTM+6WLeB8pW5aURqkGwhV134I2SUIQGUGXcXiktngpZFWF4YYHftauDvYow==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select * from table(get_kasdoc(:sFdat1, :sFdat2, 0))&#13;&#10;">
+        <Column Name="PDAT" DataType="System.DateTime"/>
+        <Column Name="REF" DataType="System.Decimal"/>
+        <Column Name="VDAT" DataType="System.DateTime"/>
+        <Column Name="TT" DataType="System.String"/>
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="PTIME" DataType="System.String"/>
+        <Column Name="SQ" DataType="System.Decimal"/>
+        <Column Name="S" DataType="System.Decimal"/>
+        <Column Name="BR_NAME" DataType="System.String"/>
+        <CommandParameter Name="sFdat1" DataType="106" Expression="[sFdat1]" DefaultValue="15.10.2014"/>
+        <CommandParameter Name="sFdat2" DataType="106" Expression="[sFdat2]" DefaultValue="04.11.2014"/>
+      </TableDataSource>
+      <TableDataSource Name="Table3" Alias="Table2" DataType="System.Int32" Enabled="true" SelectCommand="select * from table(get_kasdoc(:sFdat1, :sFdat2, 1))">
+        <Column Name="PDAT" DataType="System.DateTime"/>
+        <Column Name="REF" DataType="System.Decimal"/>
+        <Column Name="VDAT" DataType="System.DateTime"/>
+        <Column Name="TT" DataType="System.String"/>
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="PTIME" DataType="System.String"/>
+        <Column Name="SQ" DataType="System.Decimal"/>
+        <Column Name="S" DataType="System.Decimal"/>
+        <Column Name="BR_NAME" DataType="System.String"/>
+        <CommandParameter Name="sFdat1" DataType="106" Expression="[sFdat1]" DefaultValue="15.10.2014"/>
+        <CommandParameter Name="sFdat2" DataType="106" Expression="[sFdat2]" DefaultValue="03.11.2014"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sFdat1" DataType="System.DateTime"/>
+    <Parameter Name="sFdat2" DataType="System.DateTime"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle1" Width="1047.06" Height="66.15">
+      <TextObject Name="Text1" Width="1048.95" Height="66.15" Text="Звіт про касові документи, &#13;&#10;що створено одним користувачем протягом 1-3 хвилин &#13;&#10;за період з [sFdat1] р. по [sFdat2] р." HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+    </ReportTitleBand>
+    <DataBand Name="Data1" Top="70.15" Width="1047.06" Height="18.9">
+      <SubreportObject Name="Subreport1" Left="9.45" Width="94.5" Height="18.9" ReportPage="Page2"/>
+    </DataBand>
+    <DataBand Name="Data4" Top="93.05" Width="1047.06" Height="37.8">
+      <SubreportObject Name="Subreport2" Left="9.45" Top="18.9" Width="94.5" Height="18.9" ReportPage="Page3"/>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="134.85" Width="1047.06" Height="18.9"/>
+  </ReportPage>
+  <ReportPage Name="Page2" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9" FirstPageSource="15" OtherPagesSource="15">
+    <DataBand Name="Data2" Top="89.25" Width="1047.06" Height="18.9" CanGrow="true" DataSource="Table">
+      <TableObject Name="Table2" Width="1030.05" Height="18.9" GrowToBottom="true">
+        <TableColumn Name="Column6" Width="85.05"/>
+        <TableColumn Name="Column7" Width="85.05"/>
+        <TableColumn Name="Column8" Width="94.5"/>
+        <TableColumn Name="Column9"/>
+        <TableColumn Name="Column10" Width="236.25"/>
+        <TableColumn Name="Column15"/>
+        <TableColumn Name="Column16" Width="94.5"/>
+        <TableColumn Name="Column17" Width="94.5"/>
+        <TableColumn Name="Column18" Width="207.9"/>
+        <TableRow Name="Row6" AutoSize="true">
+          <TableCell Name="Cell26" Border.Lines="All" Text="[Table.REF]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell27" Border.Lines="All" Text="[Table.PDAT]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell28" Border.Lines="All" Text="[Table.VDAT]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell29" Border.Lines="All" Text="[Table.TT]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell30" Border.Lines="All" Text="[Table.FIO]" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell55" Border.Lines="All" Text="[Table.PTIME]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell56" Border.Lines="All" Text="[Table.SQ]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell57" Border.Lines="All" Text="[Table.S]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell58" Border.Lines="All" Text="[Table.BR_NAME]" VertAlign="Center" Font="Arial, 9pt"/>
+        </TableRow>
+      </TableObject>
+      <DataHeaderBand Name="DataHeader1" Width="1047.06" Height="85.25">
+        <TableObject Name="Table1" Top="0.2" Width="1030.05" Height="85.04">
+          <TableColumn Name="Column1" Width="85.05"/>
+          <TableColumn Name="Column2" Width="85.05"/>
+          <TableColumn Name="Column3" Width="94.5"/>
+          <TableColumn Name="Column4"/>
+          <TableColumn Name="Column5" Width="236.25"/>
+          <TableColumn Name="Column11"/>
+          <TableColumn Name="Column12" Width="94.5"/>
+          <TableColumn Name="Column13" Width="94.5"/>
+          <TableColumn Name="Column14" Width="207.9"/>
+          <TableRow Name="Row1" Height="33.07">
+            <TableCell Name="Cell86" Border.Lines="All" Fill.Color="Gray" Text="Документи з купівлі ін. валюти" VertAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="9"/>
+            <TableCell Name="Cell87" Border.Lines="All"/>
+            <TableCell Name="Cell88" Border.Lines="All"/>
+            <TableCell Name="Cell89" Border.Lines="All"/>
+            <TableCell Name="Cell90" Border.Lines="All"/>
+            <TableCell Name="Cell91" Border.Lines="All"/>
+            <TableCell Name="Cell92" Border.Lines="All"/>
+            <TableCell Name="Cell93" Border.Lines="All"/>
+            <TableCell Name="Cell94" Border.Lines="All"/>
+          </TableRow>
+          <TableRow Name="Row9" Height="51.97">
+            <TableCell Name="Cell95" Border.Lines="All" Fill.Color="Silver" Text="№ документа&#13;&#10;(референс)" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell96" Border.Lines="All" Fill.Color="Silver" Text="Дата документа" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell97" Border.Lines="All" Fill.Color="Silver" Text="Дата валютування" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell98" Border.Lines="All" Fill.Color="Silver" Text="Код операції" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell99" Border.Lines="All" Fill.Color="Silver" Text="ПІБ користувача" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell100" Border.Lines="All" Fill.Color="Silver" Text="Час вводу" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell101" Border.Lines="All" Fill.Color="Silver" Text="Сума" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell102" Border.Lines="All" Fill.Color="Silver" Text="Сума в ін. валюті" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell103" Border.Lines="All" Fill.Color="Silver" Text="№ ТВБВ" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          </TableRow>
+        </TableObject>
+      </DataHeaderBand>
+    </DataBand>
+  </ReportPage>
+  <ReportPage Name="Page3" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9" FirstPageSource="15" OtherPagesSource="15">
+    <DataBand Name="Data3" Top="89.04" Width="1047.06" Height="18.9" CanGrow="true" DataSource="Table3">
+      <TableObject Name="Table4" Width="1030.05" Height="18.9" GrowToBottom="true">
+        <TableColumn Name="Column28" Width="85.05"/>
+        <TableColumn Name="Column29" Width="85.05"/>
+        <TableColumn Name="Column30" Width="94.5"/>
+        <TableColumn Name="Column31"/>
+        <TableColumn Name="Column32" Width="236.25"/>
+        <TableColumn Name="Column33"/>
+        <TableColumn Name="Column34" Width="94.5"/>
+        <TableColumn Name="Column35" Width="94.5"/>
+        <TableColumn Name="Column36" Width="207.9"/>
+        <TableRow Name="Row8" AutoSize="true">
+          <TableCell Name="Cell68" Border.Lines="All" Text="[Table2.REF]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell69" Border.Lines="All" Text="[Table2.PDAT]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell70" Border.Lines="All" Text="[Table2.VDAT]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell71" Border.Lines="All" Text="[Table2.TT]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell72" Border.Lines="All" Text="[Table2.FIO]" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell73" Border.Lines="All" Text="[Table2.PTIME]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell74" Border.Lines="All" Text="[Table2.SQ]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell75" Border.Lines="All" Text="[Table2.S]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell76" Border.Lines="All" Text="[Table2.BR_NAME]" VertAlign="Center" Font="Arial, 9pt"/>
+        </TableRow>
+      </TableObject>
+      <DataHeaderBand Name="DataHeader2" Width="1047.06" Height="85.04">
+        <TableObject Name="Table4" Width="1030.05" Height="85.04">
+          <TableColumn Name="Column37" Width="85.05"/>
+          <TableColumn Name="Column38" Width="85.05"/>
+          <TableColumn Name="Column39" Width="94.5"/>
+          <TableColumn Name="Column40"/>
+          <TableColumn Name="Column41" Width="236.25"/>
+          <TableColumn Name="Column42"/>
+          <TableColumn Name="Column43" Width="94.5"/>
+          <TableColumn Name="Column44" Width="94.5"/>
+          <TableColumn Name="Column45" Width="207.9"/>
+          <TableRow Name="Row10" Height="33.07">
+            <TableCell Name="Cell104" Border.Lines="All" Fill.Color="Gray" Text="Документи з продажу ін. валюти" VertAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="9"/>
+            <TableCell Name="Cell105" Border.Lines="All"/>
+            <TableCell Name="Cell106" Border.Lines="All"/>
+            <TableCell Name="Cell107" Border.Lines="All"/>
+            <TableCell Name="Cell108" Border.Lines="All"/>
+            <TableCell Name="Cell109" Border.Lines="All"/>
+            <TableCell Name="Cell110" Border.Lines="All"/>
+            <TableCell Name="Cell111" Border.Lines="All"/>
+            <TableCell Name="Cell112" Border.Lines="All"/>
+          </TableRow>
+          <TableRow Name="Row11" Height="51.97">
+            <TableCell Name="Cell113" Border.Lines="All" Fill.Color="Silver" Text="№ документа&#13;&#10;(референс)" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell114" Border.Lines="All" Fill.Color="Silver" Text="Дата документа" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell115" Border.Lines="All" Fill.Color="Silver" Text="Дата валютування" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell116" Border.Lines="All" Fill.Color="Silver" Text="Код операції" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell117" Border.Lines="All" Fill.Color="Silver" Text="ПІБ користувача" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell118" Border.Lines="All" Fill.Color="Silver" Text="Час вводу" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell119" Border.Lines="All" Fill.Color="Silver" Text="Сума" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell120" Border.Lines="All" Fill.Color="Silver" Text="Сума в ін. валюті" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell121" Border.Lines="All" Fill.Color="Silver" Text="№ ТВБВ" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          </TableRow>
+        </TableObject>
+      </DataHeaderBand>
+    </DataBand>
+  </ReportPage>
+</Report>

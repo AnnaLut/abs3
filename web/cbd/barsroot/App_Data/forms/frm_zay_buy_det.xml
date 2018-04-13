@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xmlform>
+  <customforms>
+    <customform name="frmbopokupka" buttonsposition="Bottom" title="Детальна інформація по заявці на купівлю" columnscount="2">
+      <datasource>
+        <sql>
+          SELECT  v.id, to_char(meta,'09')||' '||v.aim_name name_pokup,         v.contract,     v.dat2_vmd,      v.dat_vmd,
+          v.dat5_vmd,     c.name name_perech,         v.basis,         bc.name name_benef,
+          v.bank_code,    v.bank_name,    to_char(v.product_group,'09')||' '||v.product_group_name product_group, v.num_vmd
+          FROM  v_zay_queue v,
+          country     c,
+          country     bc
+          WHERE v.id          = :ID
+          AND v.country      = c.country(+)
+          AND v.benefcountry = bc.country(+)
+        </sql>
+        <parameters>
+          <parameter datatype="Int64" type="QueryString" name="ID" altname="ID"></parameter>
+        </parameters>
+      </datasource>
+      <customfields>
+        <customfield datatype="Int64" name="p_id" altname="ID" datasourcefield="ID" label="Номер заявки" columnindex="1">
+          <uicontrol readonly="true">
+          </uicontrol>
+        </customfield>
+        <customfield datatype="String" name="p_name_pokup" altname="name_pokup" datasourcefield="name_pokup" label="Ціль покупки" columnindex="1">
+          <uicontrol readonly="true">
+          </uicontrol>  
+        </customfield>
+        <customfield datatype="String" name="p_contract" altname="contract" datasourcefield="contract" label="№ контракту" columnindex="1">
+          <uicontrol readonly="true"></uicontrol>
+        </customfield>
+        <customfield name="p_dat2_vmd" altname="dat2_vmd" datasourcefield="dat2_vmd" datatype="DateTime" label="Дата контракта" columnindex="1"> 
+          <uicontrol readonly="true"></uicontrol>
+        </customfield>
+        <customfield name="p_dat_vmd" altname="dat_vmd" datasourcefield="dat_vmd" datatype="DateTime" label="Дата останньої ВМД" columnindex="1">
+          <uicontrol readonly="true"></uicontrol>
+        </customfield>
+        <customfield name="p_dat5_vmd" altname="dat5_vmd" datasourcefield="dat5_vmd" label="Дати інших ВМД" datatype="DateTime" columnindex="1">
+          <uicontrol readonly="true">
+            </uicontrol>
+        </customfield>
+        <customfield name="p_name_perech" altname="name_perech" datasourcefield="name_perech" datatype="String" label="Країна перерахування валюти" columnindex="1"> 
+          <uicontrol readonly="true"></uicontrol>
+        </customfield>
+        <customfield name="p_basis" datatype="String" altname="basis" datasourcefield="basis" label="Підстава для покупки валюти" columnindex="2">
+          <uicontrol readonly="true"></uicontrol>
+        </customfield>
+        <customfield name="p_name_benef" altname="name_benef" datasourcefield="name_benef" datatype="String" label="Країна бенефеціара" columnindex="2">
+          <uicontrol readonly="true"></uicontrol>
+        </customfield>
+        <customfield name="p_bank_code" altname="bank_code" datasourcefield="bank_code" datatype="String" label="Код іноземного банку" columnindex="2">
+          <uicontrol readonly="true"></uicontrol>
+        </customfield>
+        <customfield name="p_bank_name" altname="bank_name" datasourcefield="bank_name" datatype="String" label="Назва іноземного банку" columnindex="2">
+          <uicontrol readonly="true"></uicontrol>
+        </customfield>
+        <customfield name="p_product_group" altname="product_group" datasourcefield="product_group" datatype="String" label="Товарна група" columnindex="2">
+          <uicontrol readonly="true"></uicontrol>
+        </customfield>
+        <customfield name="p_num_vmd" altname="num_vmd" datasourcefield="num_vmd" datatype="String" label="№ останньої декларації" columnindex="2">
+          <uicontrol readonly="true"></uicontrol>
+        </customfield>
+       </customfields>
+     </customform>
+  </customforms>
+</xmlform>

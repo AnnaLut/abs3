@@ -1,0 +1,13 @@
+﻿
+@{
+    ViewBag.Title = "";
+}
+@Scripts.Render("~/Async/bundles/tasksCtrl")
+<div data-ng-controller="Async.Tasks">
+    <h1 ng-bind="Title"></h1>
+    <div data-kendo-toolbar="" k-options="toolbarOptions" style="margin-bottom: 10px;"></div>
+    <div data-kendo-grid="tasksGrid" k-options="tasksGridOptions"></div>
+
+
+</div>
+

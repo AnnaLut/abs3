@@ -1,0 +1,382 @@
+/** Custom styles */
+
+/* »тогова€ строка */
+.x-grid-row-summary {
+    /*background-color: #f0f0f0;*/
+    background-image: url(../images/column-header-bg.gif);
+    background-image: -webkit-linear-gradient(bottom,#f6f6f6,#e6e7e8);
+}
+.x-grid-row-summary .x-grid-cell-inner {
+    font-weight: bold;
+    font-size: 12px;
+}
+/*писали что в IE6 была проблема с отображением header-ов, котора€ решаетс€ таким образом*/
+.x-grid3-header-offset {
+    width: auto;
+}
+/*в IE 11 стили header-ов колонок грида брались через -webkit а не background, поэтому не отображались*/
+.x-column-header {
+    background-image: -ms-linear-gradient(top, #f9f9f9, #e3e4e6);
+    /*background-image: url(../images/column-header-bg.gif);*/
+ }
+.x-grid-header-ct {
+    background-image: -ms-linear-gradient(top, #f9f9f9, #e3e4e6);
+    /*background-image: url(../images/column-header-bg.gif);*/
+ }
+
+/*делаем так потому что при установке align колонки в конфиге устанавливаетс€ как aligh €чеек так и header-а*/
+.x-column-header-inner{
+    text-align:left;
+ }
+
+
+/** Icons */
+.save {
+  background-image:url('../icons/disk.png') !important;
+}
+
+.cancel {
+  background-image:url('../icons/delete.png') !important;
+}
+
+.add-sample {
+  background-image:url('../icons/add_sample.png') !important;
+}
+
+.edit {
+  background-image:url('../icons/pencil.png') !important;
+}
+
+.plus {
+  background-image:url('../icons/plus.png') !important;
+}
+
+.minus {
+  background-image:url('../icons/minus.png') !important;
+}
+
+.page { 
+  background-image:url('../icons/page.png') !important;
+}
+
+.download {
+  background-image:url('../icons/download.png') !important;
+}
+
+.excel {
+  background-image:url('../icons/ms-excel.gif') !important;
+}
+
+.arrow_right {
+    background-image:url('../icons/arrow_right.png') !important;
+}
+ 
+.table-edit {
+  background-image:url('../icons/table_edit.png') !important;
+}
+
+.del_filter {
+  background-image:url('../icons/filter_del.gif') !important;
+}
+
+.clear_filter {
+    background-image:url('../icons/filter_clear.png') !important;
+}
+
+.document_view {
+  background-image:url('../icons/document_view.png') !important;
+}
+
+.book_open {
+  background-image:url('../icons/book_open.png') !important;
+}
+
+
+.func_each {
+  background-image:url('../icons/book_open.png') !important;
+}
+.book_open {
+  background-image:url('../icons/book_open.png') !important;
+}
+.book_open {
+  background-image:url('../icons/book_open.png') !important;
+}
+
+
+/*ќтключим крестик очистки полей ввода дл€ новых IE*/
+input::-ms-clear {
+   display: none;
+}
+
+/*кнопку раскрыти€ панели внешнего расширенного фильтра подвинем к левому краю панели */
+.extfilter-panel .x-tool {
+    left: 0 !important;
+}
+.extfilter-panel .x-panel-header-text-container {
+    padding-left: 18px;
+}
+
+/*стили условной раскраски строк(€чеек грида)*/
+/*цвета шрифтов*/
+.font_color_black {
+    color: #000000 !important;
+}
+
+.font_color_blue {
+    color: #0000FF !important;
+}
+
+.font_color_burgundy {
+    color: #900020 !important;
+}
+
+.font_color_charcoal {
+    color: #36454F !important;
+}
+
+.font_color_chartreuse {
+    color: #7FFF00 !important;
+}
+
+.font_color_cyan {
+    color: #00FFFF !important;
+}
+
+.font_color_darkaqua {
+    color: #1799B5 !important;
+}
+
+.font_color_darkblue {
+    color: #00008B !important;
+}
+
+.font_color_darkgray {
+    color: #A9A9A9 !important;
+}
+
+.font_color_darkgreen {
+    color: #013220 !important;
+}
+
+.font_color_darkred {
+    color: #8B0000 !important;
+}
+
+.font_color_gray {
+    color: #808080 !important;
+}
+
+.font_color_green {
+    color: #008000 !important;
+}
+
+.font_color_jade {
+    color: #00A86B !important;
+}
+
+.font_color_lightaqua {
+    color: #B3FFFF !important;
+}
+
+.font_color_lightgray {
+    color: #D3D3D3 !important;
+}
+
+.font_color_lightgreen {
+    color: #90EE90 !important;
+}
+
+.font_color_lightperiwinkle {
+    color: #D0D9E1 !important;
+}
+
+.font_color_magenta {
+    color: #FF00FF !important;
+}
+
+.font_color_maize {
+    color: #FBEC5D !important;
+}
+
+.font_color_marigold {
+    color: #B57D29 !important;
+}
+
+.font_color_midnightblue {
+    color: #191970 !important;
+}
+
+.font_color_orchid {
+    color: #DA70D6 !important;
+}
+
+.font_color_periwinkle {
+    color: #CCCCFF !important;
+}
+
+.font_color_purple {
+    color: #BF00FF !important;
+}
+
+.font_color_red {
+    color: #FF0000 !important;
+}
+
+.font_color_royalblue {
+    color: #4169E1 !important;
+}
+
+.font_color_salmon {
+    color: #FA8072 !important;
+}
+
+.font_color_sky {
+    color: #87CEEB !important;
+}
+
+.font_color_teal {
+    color: #008080 !important;
+}
+
+.font_color_white {
+    color: #FFFFFF !important;
+}
+
+/*цвета фона*/
+.bg_color_black {
+    background-color: #000000 !important;
+}
+
+.bg_color_blue {
+    background-color: #0000FF !important;
+}
+
+.bg_color_burgundy {
+    background-color: #900020 !important;
+}
+
+.bg_color_charcoal {
+    background-color: #36454F !important;
+}
+
+.bg_color_chartreuse {
+    background-color: #7FFF00 !important;
+}
+
+.bg_color_cyan {
+    background-color: #00FFFF !important;
+}
+
+.bg_color_darkaqua {
+    background-color: #1799B5 !important;
+}
+
+.bg_color_darkblue {
+    background-color: #00008B !important;
+}
+
+.bg_color_darkgray {
+    background-color: #A9A9A9 !important;
+}
+
+.bg_color_darkgreen {
+    background-color: #013220 !important;
+}
+
+.bg_color_darkred {
+    background-color: #8B0000 !important;
+}
+
+.bg_color_gray {
+    background-color: #808080 !important;
+}
+
+.bg_color_green {
+    background-color: #008000 !important;
+}
+
+.bg_color_jade {
+    background-color: #00A86B !important;
+}
+
+.bg_color_lightaqua {
+    background-color: #B3FFFF !important;
+}
+
+.bg_color_lightgray {
+    background-color: #D3D3D3 !important;
+}
+
+.bg_color_lightgreen {
+    background-color: #90EE90 !important;
+}
+
+.bg_color_lightperiwinkle {
+    background-color: #D0D9E1 !important;
+}
+
+.bg_color_magenta {
+    background-color: #FF00FF !important;
+}
+
+.bg_color_maize {
+    background-color: #FBEC5D !important;
+}
+
+.bg_color_marigold {
+    background-color: #B57D29 !important;
+}
+
+.bg_color_midnightblue {
+    background-color: #191970 !important;
+}
+
+.bg_color_orchid {
+    background-color: #DA70D6 !important;
+}
+
+.bg_color_periwinkle {
+    background-color: #CCCCFF !important;
+}
+
+.bg_color_purple {
+    background-color: #BF00FF !important;
+}
+
+.bg_color_red {
+    background-color: #FF0000 !important;
+}
+
+.bg_color_royalblue {
+    background-color: #4169E1 !important;
+}
+
+.bg_color_salmon {
+    background-color: #FA8072 !important;
+}
+
+.bg_color_sky {
+    background-color: #87CEEB !important;
+}
+
+.bg_color_teal {
+    background-color: #008080 !important;
+}
+
+.bg_color_white {
+    background-color: #FFFFFF !important;
+}
+
+.x-grid-cell, .x-tree-node-text {
+    font-family: tahoma, arial, sans-serif;
+    font-size: 12px;
+}
+
+a.x-tree-node-text  {
+    text-decoration: none;
+}
+
+/*поднимем панельку плагина редактора над остальными элементами*/
+.x-grid-row-editor {
+    z-index: 2;
+}

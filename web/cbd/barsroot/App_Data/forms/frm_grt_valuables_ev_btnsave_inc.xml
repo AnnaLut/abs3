@@ -1,0 +1,36 @@
+﻿<button caption="Зберегти" hint="Зберегти зміни" id="btnSave">
+  <command type="PlSqlBlock" successmessage="Дані збережено">
+    <sql>
+      begin
+      grt_mgr.iu_valuables(
+      p_deal_id => :p_deal_id,
+      p_name => :p_name,
+      p_descr => :p_descr,
+      p_weight => :p_weight,
+      p_part_cnt => :p_part_cnt,
+      p_part_disc_weig => :p_part_disc_weig,
+      p_value_weight => :p_value_weight,
+      p_tariff_price => :p_tariff_price,
+      p_expert_price => :p_expert_price,
+      p_estimate_price => :p_estimate_price
+      );
+      grt_mgr.update_event(:p_EV_ID, :p_ACTUAL_DATE, :p_COMMENT_TEXT);
+      end;
+    </sql>
+    <parameters>
+      <parameter type="FormField" name="P_DEAL_ID"/>
+      <parameter type="FormField" name="P_NAME" />
+      <parameter type="FormField" name="P_DESCR" />
+      <parameter type="FormField" name="P_WEIGHT" />
+      <parameter type="FormField" name="P_PART_CNT" />
+      <parameter type="FormField" name="P_PART_DISC_WEIG" />
+      <parameter type="FormField" name="P_VALUE_WEIGHT" />
+      <parameter type="FormField" name="P_TARIFF_PRICE" />
+      <parameter type="FormField" name="P_EXPERT_PRICE" />
+      <parameter type="FormField" name="P_ESTIMATE_PRICE" />
+      <parameter type="FormField" name="p_EV_ID" />
+      <parameter type="FormField" name="p_ACTUAL_DATE" />
+      <parameter type="FormField" name="p_COMMENT_TEXT" />
+    </parameters>
+  </command>
+</button>

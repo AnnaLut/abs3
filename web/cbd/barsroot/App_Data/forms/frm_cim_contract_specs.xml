@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<xmlform caption="Спеціалізації контрактів" captiontype="OnlyTitle">
+  <grids>
+    <grid id="gv" pagesize="10" showpagesizebox="true" title="Спеціалізації контрактів">
+      <datasource>
+        <sql>
+          select * from cim_contract_specs order by SPEC_ID
+        </sql>
+      </datasource>
+      <editform style="Dialog" title="Редагування типу"  width="550" height="180" >
+        <buttons defaulttype="Link">
+          <button id="cmdInsert" caption="Додати рядок|Зберегти|Вiдмiнити" hint="Додати рядок|Зберегти рядок|Вiдмiнити додавання">
+            <command type="Insert" successmessage="Дані збережено">
+               <sql>insert into cim_contract_specs(SPEC_ID, SPEC_NAME) values(:SPEC_ID, :SPEC_NAME)</sql>
+              <parameters>
+                <parameter type="DataField" name="SPEC_ID" />
+                <parameter type="DataField" name="SPEC_NAME" />
+              </parameters>
+            </command>
+          </button>
+          <button id="cmdEdit" caption="Редагувати|Зберегти|Вiдмiнити" hint="Редагувати|Зберегти|Вiдмiнити">
+            <command type="Edit">
+              <sql>update cim_contract_specs set SPEC_NAME=:SPEC_NAME where SPEC_ID =:SPEC_ID</sql>
+              <parameters>
+                <parameter type="DataField" name="SPEC_NAME" />
+                <parameter type="DataField" name="SPEC_ID" />
+              </parameters>
+            </command>
+          </button>
+          <button id="cmdDel" caption="Видалити" hint="Видалити" confirmmessage="Ви дійсно хочете видалити специфікацію ?">
+            <command type="Delete">
+              <sql>delete from cim_contract_specs where SPEC_ID =:SPEC_ID</sql>
+              <parameters>
+                <parameter type="DataField" name="SPEC_ID" />
+              </parameters>
+            </command>
+          </button>
+          <button id="cmdClose" caption="Закрити" hint="Закрити форму">
+            <command type="Close"/>
+          </button>
+        </buttons>
+      </editform>
+      <fields>
+        <field datatype="Int64" name="SPEC_ID" key="true" >
+          <column show="true" caption="Код" />
+          <form rwmode="RW" required="true">
+            <uicontrol></uicontrol>
+          </form>
+        </field>
+        <field datatype="String" size="256" name="SPEC_NAME">
+          <column show="true" align="Left" caption="Назва" />
+          <form rwmode="RW" required="true">
+            <uicontrol controlwidth="400" linescount="2"></uicontrol>
+          </form>
+        </field>
+      </fields>
+      <rowselection method="SingleRow" />
+    </grid>
+  </grids>
+</xmlform>

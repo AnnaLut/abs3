@@ -1,0 +1,187 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Технологiчнi флаги СЕП.";
+}
+
+<h2>@ViewBag.Title</h2>
+<div>
+    <div id="winPass">
+        <input type="password" id="winPassValue" autofocus />
+        <button id="btnOk" type="button" onclick="passValid()">Ok</button>
+    </div>
+    <div id="window">
+        <label class="radio-inline"><input class="option" id="rbK0" type="radio" value="rbK0">Сформировать файлы "K0"</label> <hr />
+        <label class="radio-inline"><input class="option" id="rbPauseInt" type="radio" value="rbPauseInt">Пауза файл-процессингу (ВПС)</label><br />
+        <label class="radio-inline"><input class="option" id="rbPauseExt" type="radio" value="rbPauseExt">Пауза Файл-процессингу (НБУ)</label><hr />
+        <label class="radio-inline"><input class="option" id="rbIpsInt" type="radio" value="rbIpsInt">Сформировать запрос в ИПС (ВПС)</label><br />
+        <label class="radio-inline"><input class="option" id="rbIpsExt" type="radio" value="rbIpsExt">Сформировать запрос в ИПС (НБУ)</label><hr />
+        <label class="radio-inline"><input class="option" id="rbVall" type="radio" value="rbVall">Сформировать файлы выписки "V"</label><br />
+        <label class="radio-inline">
+            <input class="option" id="rbVbank" type="radio" name="rbVbank">Сформировать файлы выписки "V" банка
+            <select id="select1" style="width:200px">
+                <option> </option>
+            </select>
+        </label>
+        <hr />
+        <label class="radio-inline">
+            <input class="option" id="rbZ" type="radio" value="rbZ">Сформировать файл "Z" для НБУ (ГРЦ)
+            &nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;
+            &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;
+            &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;
+            <label class="radio-inline">
+                <input class="option" type="checkbox" id="cb01" value="cb01">001
+            </label>
+        </label>
+        <hr />
+        <label class="radio-inline"><input class="option" id="rbZ3" type="radio" value="rbZ3">Сформировать файл "Z3"</label><hr />
+        <label class="radio-inline">
+            <input class="option" id="rbLimits" type="radio" value="rbLimits">Сформировать файлы-лимиты для филиалов по 1-ой модели
+        </label>
+        <hr />
+        @*//onclick="onBtnSubmitClick() *@
+        <dir id="dirSubmit">
+            <button id="btnSubmit" type="button" onclick="onBtnSubmitClick()">Выполнить</button>
+            &nbsp; &nbsp;
+            <button id="btnCancel" type="button" onclick="onBtnCancelClick()">Отменить</button>
+        </dir> 
+    </div>
+</div>
+<script>
+
+    function onBtnCancelClick() {
+        $("#window").data("kendoWindow").close();
+    }
+
+    function onBtnSubmitClick() {
+        var elem1 = GetCheckedElement();
+       
+        $.get('@Url.Action("GetParam", "SepTechFlag")', { p: elem1.value }).done(function (fileName) {
+            
+        bars.ui.confirm({ text: 'Сформировать технологический файл СЭП: ' + fileName + ' ?' }, function () { 
+            $.get('@Url.Action("SetFlag", "SepTechFlag")', { radioVal: elem1.value }).done(function (result) {
+                bars.ui.loader('#window', false);
+                if (result.status == 'ok') {
+                    bars.ui.alert({ title: 'Файл сформирован.', text: 'Файл ' + fileName + ' успешно сформирован!' }, function () {
+                        refreshMainForm();
+                    });
+                }
+                else {
+                    bars.ui.error({ title: 'Ошибка', text: 'Ошибка создания файла-флага K в директории: ' + result.data.Value });
+                    $("#window").data("kendoWindow").close();
+                }
+            });
+        });
+       });        
+    }
+
+    $("#rbIpsExt").click(function () {
+        document.getElementById("rbZ").checked = false;
+        document.getElementById("rbIpsExt").checked = true;
+
+    });
+
+    $("#rbZ").click(function () {
+        document.getElementById("rbIpsExt").checked = false;
+        document.getElementById("rbZ").checked = true;
+
+    });
+
+    function GetCheckedElement() {
+        if (document.getElementById("rbK0").checked) {
+            return document.getElementById("rbK0");
+        }
+        if (document.getElementById("rbPauseInt").checked) {
+            return document.getElementById("rbPauseInt");
+        }
+        if (document.getElementById("rbPauseExt").checked) {
+            return document.getElementById("rbPauseExt");
+        }
+        if (document.getElementById("rbIpsInt").checked) {
+            return document.getElementById("rbIpsInt");
+        }
+        if (document.getElementById("rbIpsExt").checked) {
+            return document.getElementById("rbIpsExt");
+        }
+        if (document.getElementById("rbVall").checked) {
+            return document.getElementById("rbVall");
+        }
+        if (document.getElementById("rbVbank").checked) {
+            return document.getElementById("rbVbank");
+        }
+        if (document.getElementById("rbZ").checked && document.getElementById("cb01").checked) {
+            return document.getElementById("cb01");
+        } else
+        if (document.getElementById("rbZ").checked) {
+            return document.getElementById("rbZ");
+        }
+       
+        if (document.getElementById("rbZ3").checked) {
+            return document.getElementById("rbZ3");
+        }
+        if (document.getElementById("rbLimits").checked) {
+            return document.getElementById("rbLimits");
+        }
+    }
+
+    $("#rbK0").attr("disabled", "disabled");
+    $("#rbPauseInt").attr("disabled", "disabled");
+    $("#rbPauseExt").attr("disabled", "disabled");
+    $("#rbIpsInt").attr("disabled", "disabled");
+    //   $("#rbIpsExt").attr("disabled", "disabled");
+    $("#rbVall").attr("disabled", "disabled");
+    $("#rbVbank").attr("disabled", "disabled");
+    //  $("#optradio8").aпомнttr("disabled", "disabled");
+    // $("#rbZ").attr("disabled", "disabled");
+    $("#rbZ3").attr("disabled", "disabled");
+    $("#rbLimits").attr("disabled", "disabled");
+    $("#select1").attr("disabled", "disabled");
+
+    var dd = new Date().getDate();
+    var mm = new Date().getMonth() + 1;
+    if (dd < 10) {
+        dd = '0' + dd
+    }
+    if (mm < 10) {
+        mm = '0' + mm
+    }
+    var datePass = mm + dd;
+
+    function passValid() {
+        var PassValue = document.getElementById("winPassValue").value;
+        if (PassValue == datePass) {
+            $("#winPass").data("kendoWindow").close();
+            $("#window").data("kendoWindow").center().open();
+        }
+        else {
+            bars.ui.error({ title: 'Помилка', text: 'Введено невірний пароль.' });
+            $("#winPass").load(location.href + " #winPass");
+        }
+    }
+
+    function refreshMainForm() {
+        $("#window").data("kendoWindow").close();
+        $("#winPassValue").val("");
+        $("#winPass").data("kendoWindow").open();
+    }
+
+    $("#winPass").keyup(function (event) {
+        if (event.keyCode == 13) {
+            $("#btnOk").click();
+        }
+    });
+
+    $(document).ready(function () {
+        $("#window").kendoWindow({
+            width: "550px",
+            title: "@ViewBag.Title",
+            actions: [
+                "Maximize"
+            ],
+            visible: false
+        });
+        $("#winPass").kendoWindow({
+            width: "210px",
+            title: "Введіть пароль"
+        }).data("kendoWindow").center().open();
+    });
+</script>

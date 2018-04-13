@@ -1,0 +1,100 @@
+<xmlform>
+  <customforms>
+    <customform name="frmCC_DEAL" buttonsposition="Bottom" title="Картка кредитної угоди">
+      <!--
+      <buttons defaulttype="Button">
+        <button caption="Назад" hint="На попередню сторінку" id="btnBack">
+          <command type="Redirect" url="/barsroot/barsweb/dynform.aspx?form=frm_cig_events"></command>
+        </button>
+      </buttons>
+      -->
+      <datasource>
+        <sql>
+          select ND,
+          case
+          when sos=0 then 'Новий'
+          when sos=10 then 'Нормальний'
+          when sos=11 then 'Пролонгований'
+          when sos=13 then 'Просрочений'
+          when sos=15 then 'Закритий'
+          when sos=14 then 'Техн.видалений'
+          else null
+          end as
+          SOS,
+          CC_ID, SDATE, WDATE, RNK,
+          case
+          when vidd=1    then 'ЮЛ Стандартный кредит'
+          when vidd=2    then 'ЮЛ Кредитная линия'
+          when vidd=3    then 'ЮЛ  М/В Кред.линия'
+          when vidd=11   then 'ФЛ Стандартный кредит'
+          when vidd=12   then 'ФЛ  Кред.линия'
+          when vidd=13   then 'ФЛ  М/В Кред.линия'
+          when vidd=17   then 'Договор со страховой компанией (СК)'
+          when vidd=101  then 'Депозитні договори фізичних осіб'
+          when vidd=102  then 'Депозитні договори юридичних осіб'
+          when vidd=103  then 'Договори пенсіонерів та безробітних'
+          when vidd=3902 then '3902 Розміщення кредитних ресурсів філій'
+          when vidd=3903 then '3903 Залучення   кредитних ресурсів філій'
+		  when vidd=1524 then 'Розміщення 1524 - Кредити довгострокові'
+		  when vidd=1521 then 'Розміщення 1521 - Кредити овернайт'
+		  when vidd=1523 then 'Розміщення 1523 - Кредити  короткострокові'
+		  when vidd=1526 then 'Розміщення 1526 -Кредити пролонговані'
+		  when vidd=1510 then 'Розміщення 1510 - Депозит овернайт'
+		  when vidd=1511 then 'Розміщення 1511 - Гарантійний депозит та грошове покриття'
+		  when vidd=1512 then 'Розміщення 1512 - Інші короткострокові депозити'
+		  when vidd=1515 then 'Розміщення 1515 - Довгострокові депозити'
+		  when vidd=1527 then 'Розміщення 1527 -Просрочена заборгованість за кредитами'
+		  when vidd=1502 then 'МБК-1502 Грошове покриття в інших банках'
+		  when vidd=1517 then 'Розміщення 1517 -Просрочена заборгованість за депо. в інших банках'
+		  when vidd=1522 then 'Розмiщення  1522-Кредити наданi за операцiями репо'
+          else null
+          end as
+          VIDD, LIMIT,
+          USER_ID, BRANCH, PROD, SDOG from CC_DEAL
+          where nd = :ND 
+        </sql>
+        <parameters>
+          <parameter name="ND" datatype="Int64" type="QueryString"></parameter>
+        </parameters>
+      </datasource>
+      <customfields>
+        <customfield name="P_ND" label="Номер договора (референс)" required="true" datatype="Int64" datasourcefield="ND">
+          <uicontrol type="Label" readonly="true" align="Right" controlwidth="250" />
+        </customfield>
+        <customfield name="P_SOS" label="Стан договора" required="true" datatype="String" datasourcefield="SOS">
+          <uicontrol type="Label" readonly="true" align="Right" controlwidth="250" />
+        </customfield>
+        <customfield name="P_CC_ID" label="Ідентифікатор договора" datatype="String" size="100" datasourcefield="CC_ID">
+          <uicontrol type="Label" readonly="true" align="Right" controlwidth="250" />
+        </customfield>
+        <customfield name="P_SDATE" label="Дата укладання договора" datatype="DateTime" datasourcefield="SDATE">
+          <uicontrol type="Label" readonly="true" align="Right" controlwidth="250" />
+        </customfield>
+        <customfield name="P_WDATE" label="Дата завершення" datatype="DateTime" datasourcefield="WDATE">
+          <uicontrol type="Label" readonly="true" align="Right" controlwidth="250" />
+        </customfield>
+        <customfield name="P_RNK" label="Код клієнта" required="true" datatype="Int64" datasourcefield="RNK">
+          <uicontrol type="Label" readonly="true" align="Right" controlwidth="250" />
+        </customfield>
+        <customfield name="P_VIDD" label="Вид договора" required="true" datatype="String" datasourcefield="VIDD">
+          <uicontrol type="Label" readonly="true" align="Right" controlwidth="250" />
+        </customfield>
+        <customfield name="P_LIMIT" label="Ліміт договора" datatype="Decimal" datasourcefield="LIMIT">
+          <uicontrol type="Label" readonly="true" align="Right" controlwidth="250" />
+        </customfield>
+        <customfield name="P_USER_ID" label="Виконавець" required="true" datatype="Int64" datasourcefield="USER_ID">
+          <uicontrol type="Label" readonly="true" align="Right" controlwidth="250" />
+        </customfield>
+        <customfield name="P_BRANCH" label="Відділення" required="true" datatype="String" size="100" datasourcefield="BRANCH">
+          <uicontrol type="Label" readonly="true" align="Right" controlwidth="250" />
+        </customfield>
+        <customfield name="P_PROD" label="Код продукта" datatype="String" size="100" datasourcefield="PROD">
+          <uicontrol type="Label" readonly="true" align="Right" controlwidth="250" />
+        </customfield>
+        <customfield name="P_SDOG" label="Початкова сума" datatype="Decimal" datasourcefield="SDOG">
+          <uicontrol type="Label" readonly="true" align="Right" controlwidth="250" />
+        </customfield>
+       </customfields>
+    </customform>
+  </customforms>
+</xmlform>

@@ -1,0 +1,2 @@
+.webservice { behavior: url(/Common/WebService/js/WebService.htc); }
+.frame {BORDER-RIGHT: black 1px solid; PADDING-RIGHT: 0px; BORDER-TOP: black 1px solid; DISPLAY: block; PADDING-LEFT: 0px; Z-INDEX: 2; BACKGROUND: #f7f6f6; VISIBILITY: hidden; PADDING-BOTTOM: 0px; BORDER-LEFT: black 1px solid; WIDTH: 0px; PADDING-TOP: 0px; BORDER-BOTTOM: black 1px solid; POSITION: absolute }

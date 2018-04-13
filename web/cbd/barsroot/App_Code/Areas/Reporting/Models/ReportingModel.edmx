@@ -1,0 +1,383 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="BarsWeb.Areas.Reporting.Models.Store" Provider="Oracle.DataAccess.Client" ProviderManifestToken="11.2" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+        <EntityType Name="FORM_STRU">
+          <Key>
+            <PropertyRef Name="KODF" />
+            <PropertyRef Name="NATR" />
+          </Key>
+          <Property Name="KODF" Type="char" MaxLength="2" Nullable="false" />
+          <Property Name="NATR" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="NAME" Type="varchar2" MaxLength="70" />
+          <Property Name="VAL" Type="varchar2" MaxLength="70" />
+          <Property Name="ISCODE" Type="char" MaxLength="1" />
+          <Property Name="A017" Type="char" MaxLength="1" Nullable="false" />
+          <Property Name="CODE_SORT" Type="number" Precision="38" Scale="0" />
+        </EntityType>
+        <EntityType Name="FORM_STRU_INT">
+          <Key>
+            <PropertyRef Name="KODF" />
+            <PropertyRef Name="NATR" />
+          </Key>
+          <Property Name="KODF" Type="char" MaxLength="2" Nullable="false" />
+          <Property Name="NATR" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="NAME" Type="varchar2" MaxLength="70" />
+          <Property Name="VAL" Type="varchar2" MaxLength="70" />
+          <Property Name="ISCODE" Type="char" MaxLength="1" />
+          <Property Name="A017" Type="char" MaxLength="1" Nullable="false" />
+          <Property Name="CODE_SORT" Type="number" Precision="38" Scale="0" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6013: The table/view 'BARS.RNBU_TRACE' does not have a primary key defined and no valid primary key could be inferred. This table/view has been excluded. To use the entity, you will need to review your schema, add the correct keys, and uncomment it.
+        <EntityType Name="RNBU_TRACE">
+          <Property Name="RECID" Type="number" Precision="38" Scale="0" />
+          <Property Name="USERID" Type="number" Precision="38" Scale="0" />
+          <Property Name="NLS" Type="varchar2" MaxLength="15" />
+          <Property Name="KV" Type="number" Precision="38" Scale="0" />
+          <Property Name="ODATE" Type="date" />
+          <Property Name="KODP" Type="varchar2" MaxLength="35" />
+          <Property Name="ZNAP" Type="varchar2" MaxLength="70" />
+          <Property Name="NBUC" Type="varchar2" MaxLength="30" />
+          <Property Name="ISP" Type="number" Precision="38" Scale="0" />
+          <Property Name="RNK" Type="number" Precision="38" Scale="0" />
+          <Property Name="ACC" Type="number" Precision="38" Scale="0" />
+          <Property Name="REF" Type="number" Precision="38" Scale="0" />
+          <Property Name="COMM" Type="varchar2" MaxLength="200" />
+          <Property Name="ND" Type="number" Precision="38" Scale="0" />
+          <Property Name="MDATE" Type="date" />
+          <Property Name="TOBO" Type="varchar2" MaxLength="30" />
+        </EntityType>-->
+        <!--Errors Found During Generation:
+warning 6013: The table/view 'BARS.RNBU_TRACE_ARCH' does not have a primary key defined and no valid primary key could be inferred. This table/view has been excluded. To use the entity, you will need to review your schema, add the correct keys, and uncomment it.
+        <EntityType Name="RNBU_TRACE_ARCH">
+          <Property Name="KODF" Type="varchar2" MaxLength="2" />
+          <Property Name="DATF" Type="date" />
+          <Property Name="NLS" Type="varchar2" MaxLength="15" />
+          <Property Name="KV" Type="number" Precision="38" Scale="0" />
+          <Property Name="ODATE" Type="date" />
+          <Property Name="KODP" Type="varchar2" MaxLength="35" />
+          <Property Name="ZNAP" Type="varchar2" MaxLength="70" />
+          <Property Name="NBUC" Type="varchar2" MaxLength="30" />
+          <Property Name="ISP" Type="number" Precision="38" Scale="0" />
+          <Property Name="RNK" Type="number" Precision="38" Scale="0" />
+          <Property Name="ACC" Type="number" Precision="38" Scale="0" />
+          <Property Name="REF" Type="number" Precision="38" Scale="0" />
+          <Property Name="COMM" Type="varchar2" MaxLength="200" />
+          <Property Name="ND" Type="number" Precision="38" Scale="0" />
+          <Property Name="MDATE" Type="date" />
+          <Property Name="TOBO" Type="varchar2" MaxLength="30" />
+        </EntityType>-->
+        <!--Errors Found During Generation:
+warning 6013: The table/view 'BARS.RNBU_TRACE_INT_ARCH' does not have a primary key defined and no valid primary key could be inferred. This table/view has been excluded. To use the entity, you will need to review your schema, add the correct keys, and uncomment it.
+        <EntityType Name="RNBU_TRACE_INT_ARCH">
+          <Property Name="KODF" Type="varchar2" MaxLength="2" />
+          <Property Name="DATF" Type="date" />
+          <Property Name="NLS" Type="varchar2" MaxLength="15" />
+          <Property Name="KV" Type="number" Precision="38" Scale="0" />
+          <Property Name="ODATE" Type="date" />
+          <Property Name="KODP" Type="varchar2" MaxLength="35" />
+          <Property Name="ZNAP" Type="varchar2" MaxLength="70" />
+          <Property Name="NBUC" Type="varchar2" MaxLength="30" />
+          <Property Name="ISP" Type="number" Precision="38" Scale="0" />
+          <Property Name="RNK" Type="number" Precision="38" Scale="0" />
+          <Property Name="ACC" Type="number" Precision="38" Scale="0" />
+          <Property Name="REF" Type="number" Precision="38" Scale="0" />
+          <Property Name="COMM" Type="varchar2" MaxLength="200" />
+          <Property Name="ND" Type="number" Precision="38" Scale="0" />
+          <Property Name="MDATE" Type="date" />
+          <Property Name="TOBO" Type="varchar2" MaxLength="30" />
+        </EntityType>-->
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.TMP_NBU' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="TMP_NBU">
+          <Key>
+            <PropertyRef Name="KODP" />
+            <PropertyRef Name="DATF" />
+            <PropertyRef Name="KODF" />
+            <PropertyRef Name="KF" />
+          </Key>
+          <Property Name="KODP" Type="varchar2" MaxLength="50" Nullable="false" />
+          <Property Name="DATF" Type="date" Nullable="false" />
+          <Property Name="KODF" Type="char" MaxLength="2" Nullable="false" />
+          <Property Name="ZNAP" Type="varchar2" MaxLength="70" />
+          <Property Name="NBUC" Type="varchar2" MaxLength="30" />
+          <Property Name="KF" Type="varchar2" MaxLength="6" Nullable="false" />
+          <Property Name="ERR_MSG" Type="varchar2" MaxLength="1000" />
+          <Property Name="FL_MOD" Type="number" Precision="38" Scale="0" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.TTS' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="TTS">
+          <Key>
+            <PropertyRef Name="TT" />
+            <PropertyRef Name="NAME" />
+            <PropertyRef Name="FLC" />
+            <PropertyRef Name="FLI" />
+            <PropertyRef Name="FLV" />
+            <PropertyRef Name="FLR" />
+            <PropertyRef Name="FLAGS" />
+          </Key>
+          <Property Name="TT" Type="char" MaxLength="3" Nullable="false" />
+          <Property Name="NAME" Type="varchar2" MaxLength="70" Nullable="false" />
+          <Property Name="DK" Type="number" Precision="1" Scale="0" />
+          <Property Name="NLSM" Type="varchar2" MaxLength="90" />
+          <Property Name="KV" Type="number" Precision="3" Scale="0" />
+          <Property Name="NLSK" Type="varchar2" MaxLength="128" />
+          <Property Name="KVK" Type="number" Precision="3" Scale="0" />
+          <Property Name="NLSS" Type="varchar2" MaxLength="15" />
+          <Property Name="NLSA" Type="varchar2" MaxLength="55" />
+          <Property Name="NLSB" Type="varchar2" MaxLength="55" />
+          <Property Name="MFOB" Type="varchar2" MaxLength="12" />
+          <Property Name="FLC" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="FLI" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="FLV" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="FLR" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="S" Type="varchar2" MaxLength="254" />
+          <Property Name="S2" Type="varchar2" MaxLength="254" />
+          <Property Name="SK" Type="number" Precision="24" Scale="0" />
+          <Property Name="PROC" Type="number" Precision="7" Scale="2" />
+          <Property Name="S3800" Type="varchar2" MaxLength="55" />
+          <Property Name="S6201" Type="number" Precision="38" Scale="0" />
+          <Property Name="S7201" Type="number" Precision="38" Scale="0" />
+          <Property Name="RANG" Type="number" Precision="10" Scale="0" />
+          <Property Name="FLAGS" Type="char" MaxLength="64" Nullable="false" />
+          <Property Name="NAZN" Type="varchar2" MaxLength="160" />
+        </EntityType>
+        <EntityContainer Name="BarsWebAreasReportingModelsStoreContainer">
+          <EntitySet Name="FORM_STRU" EntityType="Self.FORM_STRU" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="FORM_STRU_INT" EntityType="Self.FORM_STRU_INT" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="TMP_NBU" EntityType="Self.TMP_NBU" store:Type="Tables" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"TMP_NBU"."KODP" AS "KODP", 
+"TMP_NBU"."DATF" AS "DATF", 
+"TMP_NBU"."KODF" AS "KODF", 
+"TMP_NBU"."ZNAP" AS "ZNAP", 
+"TMP_NBU"."NBUC" AS "NBUC", 
+"TMP_NBU"."KF" AS "KF", 
+"TMP_NBU"."ERR_MSG" AS "ERR_MSG", 
+"TMP_NBU"."FL_MOD" AS "FL_MOD"
+FROM "BARS"."TMP_NBU" "TMP_NBU"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="TTS" EntityType="Self.TTS" store:Type="Tables" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"TTS"."TT" AS "TT", 
+"TTS"."NAME" AS "NAME", 
+"TTS"."DK" AS "DK", 
+"TTS"."NLSM" AS "NLSM", 
+"TTS"."KV" AS "KV", 
+"TTS"."NLSK" AS "NLSK", 
+"TTS"."KVK" AS "KVK", 
+"TTS"."NLSS" AS "NLSS", 
+"TTS"."NLSA" AS "NLSA", 
+"TTS"."NLSB" AS "NLSB", 
+"TTS"."MFOB" AS "MFOB", 
+"TTS"."FLC" AS "FLC", 
+"TTS"."FLI" AS "FLI", 
+"TTS"."FLV" AS "FLV", 
+"TTS"."FLR" AS "FLR", 
+"TTS"."S" AS "S", 
+"TTS"."S2" AS "S2", 
+"TTS"."SK" AS "SK", 
+"TTS"."PROC" AS "PROC", 
+"TTS"."S3800" AS "S3800", 
+"TTS"."S6201" AS "S6201", 
+"TTS"."S7201" AS "S7201", 
+"TTS"."RANG" AS "RANG", 
+"TTS"."FLAGS" AS "FLAGS", 
+"TTS"."NAZN" AS "NAZN"
+FROM "BARS"."TTS" "TTS"</DefiningQuery>
+          </EntitySet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="BarsWeb.Areas.Reporting.Models" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+        <EntityType Name="TT">
+          <Key>
+            <PropertyRef Name="TT1" />
+            <PropertyRef Name="NAME" />
+            <PropertyRef Name="FLC" />
+            <PropertyRef Name="FLI" />
+            <PropertyRef Name="FLV" />
+            <PropertyRef Name="FLR" />
+            <PropertyRef Name="FLAGS" />
+          </Key>
+          <Property Name="TT1" Type="String" MaxLength="3" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="NAME" Type="String" MaxLength="70" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="DK" Type="Int16" />
+          <Property Name="NLSM" Type="String" MaxLength="90" FixedLength="false" Unicode="false" />
+          <Property Name="KV" Type="Int16" />
+          <Property Name="NLSK" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
+          <Property Name="KVK" Type="Int16" />
+          <Property Name="NLSS" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="NLSA" Type="String" MaxLength="55" FixedLength="false" Unicode="false" />
+          <Property Name="NLSB" Type="String" MaxLength="55" FixedLength="false" Unicode="false" />
+          <Property Name="MFOB" Type="String" MaxLength="12" FixedLength="false" Unicode="false" />
+          <Property Name="FLC" Type="Int16" Nullable="false" />
+          <Property Name="FLI" Type="Int16" Nullable="false" />
+          <Property Name="FLV" Type="Int16" Nullable="false" />
+          <Property Name="FLR" Type="Int16" Nullable="false" />
+          <Property Name="S" Type="String" MaxLength="254" FixedLength="false" Unicode="false" />
+          <Property Name="S2" Type="String" MaxLength="254" FixedLength="false" Unicode="false" />
+          <Property Name="SK" Type="Decimal" Precision="24" Scale="0" />
+          <Property Name="PROC" Type="Decimal" Precision="7" Scale="2" />
+          <Property Name="S3800" Type="String" MaxLength="55" FixedLength="false" Unicode="false" />
+          <Property Name="S6201" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="S7201" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="RANG" Type="Int64" />
+          <Property Name="FLAGS" Type="String" MaxLength="64" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="NAZN" Type="String" MaxLength="160" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityContainer Name="ReportingEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="TTS" EntityType="Self.TT" />
+          <EntitySet Name="FORM_STRU" EntityType="BarsWeb.Areas.Reporting.Models.FORM_STRU" />
+          <EntitySet Name="FORM_STRU_INT" EntityType="BarsWeb.Areas.Reporting.Models.FORM_STRU_INT" />
+          <EntitySet Name="TMP_NBU" EntityType="BarsWeb.Areas.Reporting.Models.TMP_NBU" />
+        </EntityContainer>
+        <EntityType Name="FORM_STRU">
+          <Key>
+            <PropertyRef Name="KODF" />
+            <PropertyRef Name="NATR" />
+          </Key>
+          <Property Name="KODF" Type="String" Nullable="false" MaxLength="2" FixedLength="true" Unicode="false" />
+          <Property Name="NATR" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="NAME" Type="String" MaxLength="70" FixedLength="false" Unicode="false" />
+          <Property Name="VAL" Type="String" MaxLength="70" FixedLength="false" Unicode="false" />
+          <Property Name="ISCODE" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="A017" Type="String" Nullable="false" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="CODE_SORT" Type="Decimal" Precision="38" Scale="0" />
+        </EntityType>
+        <EntityType Name="FORM_STRU_INT">
+          <Key>
+            <PropertyRef Name="KODF" />
+            <PropertyRef Name="NATR" />
+          </Key>
+          <Property Name="KODF" Type="String" Nullable="false" MaxLength="2" FixedLength="true" Unicode="false" />
+          <Property Name="NATR" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="NAME" Type="String" MaxLength="70" FixedLength="false" Unicode="false" />
+          <Property Name="VAL" Type="String" MaxLength="70" FixedLength="false" Unicode="false" />
+          <Property Name="ISCODE" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="A017" Type="String" Nullable="false" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="CODE_SORT" Type="Decimal" Precision="38" Scale="0" />
+        </EntityType>
+        <EntityType Name="TMP_NBU">
+          <Key>
+            <PropertyRef Name="KODP" />
+            <PropertyRef Name="DATF" />
+            <PropertyRef Name="KODF" />
+            <PropertyRef Name="KF" />
+          </Key>
+          <Property Name="KODP" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="DATF" Type="DateTime" Nullable="false" />
+          <Property Name="KODF" Type="String" Nullable="false" MaxLength="2" FixedLength="true" Unicode="false" />
+          <Property Name="ZNAP" Type="String" MaxLength="70" FixedLength="false" Unicode="false" />
+          <Property Name="NBUC" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="KF" Type="String" Nullable="false" MaxLength="6" FixedLength="false" Unicode="false" />
+          <Property Name="ERR_MSG" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
+          <Property Name="FL_MOD" Type="Decimal" Precision="38" Scale="0" />
+        </EntityType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="BarsWebAreasReportingModelsStoreContainer" CdmEntityContainer="ReportingEntities">
+          <EntitySetMapping Name="TTS">
+            <EntityTypeMapping TypeName="BarsWeb.Areas.Reporting.Models.TT">
+              <MappingFragment StoreEntitySet="TTS">
+                <ScalarProperty Name="TT1" ColumnName="TT" />
+                <ScalarProperty Name="NAME" ColumnName="NAME" />
+                <ScalarProperty Name="DK" ColumnName="DK" />
+                <ScalarProperty Name="NLSM" ColumnName="NLSM" />
+                <ScalarProperty Name="KV" ColumnName="KV" />
+                <ScalarProperty Name="NLSK" ColumnName="NLSK" />
+                <ScalarProperty Name="KVK" ColumnName="KVK" />
+                <ScalarProperty Name="NLSS" ColumnName="NLSS" />
+                <ScalarProperty Name="NLSA" ColumnName="NLSA" />
+                <ScalarProperty Name="NLSB" ColumnName="NLSB" />
+                <ScalarProperty Name="MFOB" ColumnName="MFOB" />
+                <ScalarProperty Name="FLC" ColumnName="FLC" />
+                <ScalarProperty Name="FLI" ColumnName="FLI" />
+                <ScalarProperty Name="FLV" ColumnName="FLV" />
+                <ScalarProperty Name="FLR" ColumnName="FLR" />
+                <ScalarProperty Name="S" ColumnName="S" />
+                <ScalarProperty Name="S2" ColumnName="S2" />
+                <ScalarProperty Name="SK" ColumnName="SK" />
+                <ScalarProperty Name="PROC" ColumnName="PROC" />
+                <ScalarProperty Name="S3800" ColumnName="S3800" />
+                <ScalarProperty Name="S6201" ColumnName="S6201" />
+                <ScalarProperty Name="S7201" ColumnName="S7201" />
+                <ScalarProperty Name="RANG" ColumnName="RANG" />
+                <ScalarProperty Name="FLAGS" ColumnName="FLAGS" />
+                <ScalarProperty Name="NAZN" ColumnName="NAZN" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="FORM_STRU">
+            <EntityTypeMapping TypeName="BarsWeb.Areas.Reporting.Models.FORM_STRU">
+              <MappingFragment StoreEntitySet="FORM_STRU">
+                <ScalarProperty Name="CODE_SORT" ColumnName="CODE_SORT" />
+                <ScalarProperty Name="A017" ColumnName="A017" />
+                <ScalarProperty Name="ISCODE" ColumnName="ISCODE" />
+                <ScalarProperty Name="VAL" ColumnName="VAL" />
+                <ScalarProperty Name="NAME" ColumnName="NAME" />
+                <ScalarProperty Name="NATR" ColumnName="NATR" />
+                <ScalarProperty Name="KODF" ColumnName="KODF" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="FORM_STRU_INT">
+            <EntityTypeMapping TypeName="BarsWeb.Areas.Reporting.Models.FORM_STRU_INT">
+              <MappingFragment StoreEntitySet="FORM_STRU_INT">
+                <ScalarProperty Name="CODE_SORT" ColumnName="CODE_SORT" />
+                <ScalarProperty Name="A017" ColumnName="A017" />
+                <ScalarProperty Name="ISCODE" ColumnName="ISCODE" />
+                <ScalarProperty Name="VAL" ColumnName="VAL" />
+                <ScalarProperty Name="NAME" ColumnName="NAME" />
+                <ScalarProperty Name="NATR" ColumnName="NATR" />
+                <ScalarProperty Name="KODF" ColumnName="KODF" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TMP_NBU">
+            <EntityTypeMapping TypeName="BarsWeb.Areas.Reporting.Models.TMP_NBU">
+              <MappingFragment StoreEntitySet="TMP_NBU">
+                <ScalarProperty Name="FL_MOD" ColumnName="FL_MOD" />
+                <ScalarProperty Name="ERR_MSG" ColumnName="ERR_MSG" />
+                <ScalarProperty Name="KF" ColumnName="KF" />
+                <ScalarProperty Name="NBUC" ColumnName="NBUC" />
+                <ScalarProperty Name="ZNAP" ColumnName="ZNAP" />
+                <ScalarProperty Name="KODF" ColumnName="KODF" />
+                <ScalarProperty Name="DATF" ColumnName="DATF" />
+                <ScalarProperty Name="KODP" ColumnName="KODP" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="true" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Default" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

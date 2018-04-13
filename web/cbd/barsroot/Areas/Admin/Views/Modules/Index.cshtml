@@ -1,0 +1,218 @@
+﻿@inherits System.Web.Mvc.WebViewPage
+@{
+  ViewBag.Title = "Адміністрування АРМів";
+  Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+      /*string theme = "uniform";
+      var cook = HttpContext.Current.Request.Cookies["theme"];
+      if (cook != null)
+      {
+        theme = cook.Value;
+      }*/
+}
+@using Kendo.Mvc.UI
+  @*<link href="~/Content/Themes/Kendo/kendo.common.min.css" rel="stylesheet" />
+      <link href="~/Content/Themes/Kendo/kendo.rtl.min.css" rel="stylesheet" />
+
+      <link href="~/Content/Themes/Kendo/kendo.@(theme).min.css" rel="stylesheet" />
+        <link href="~/Content/Themes/Kendo/kendo.@(theme).mobile.min.css" rel="stylesheet" />
+
+    <link href="~/Content/Themes/Kendo/kendo.dataviz.min.css" rel="stylesheet" />
+    <link href="~/Content/Themes/Kendo/kendo.dataviz.@(theme).min.css" rel="stylesheet" />
+
+    <link href="~/Content/Themes/Kendo/kendo.mobile.all.min.css" rel="stylesheet" />*@
+
+    <style>
+        .k-widget {
+          font-size: 12.5px;
+        }
+        .k-link .k-icon,
+        .k-select .k-icon,
+        .k-pager-nav .k-icon {
+          margin-top: 4px;
+        }
+        .k-window-action.k-link .k-icon,
+        .k-list-filter > .k-icon {
+          margin-top: 0px;
+        }
+        .k-list-filter > .k-icon {
+          top: 0px;
+        }
+        .align-right {
+          text-align: right;
+        }
+    </style>
+
+  <script src="~/Scripts/kendo/kendo.all.min.js"></script>
+  <script src="~/Scripts/kendo/kendo.aspnetmvc.min.js"></script>
+  <script src="~/Scripts/kendo/kendo.timezones.min.js"></script>
+
+  <script src="~/Scripts/kendo/cultures/kendo.culture.uk.min.js"></script>
+  <script src="~/Scripts/kendo/cultures/kendo.culture.uk-UA.min.js"></script>
+
+  <style>
+        #example h2 {
+          font-weight: normal;
+        }
+
+        #cap-view {
+          border-radius: 10px 10px 10px 10px;
+          border-style: solid;
+          border-width: 1px;
+          overflow: hidden;
+          margin: 10px auto;
+          padding: 0 5px 0 10px;
+        }
+
+        .black-cap {
+          background-position: 0 0;
+        }
+
+        .grey-cap {
+          background-position: 0 -225px;
+        }
+
+        .orange-cap {
+          background-position: 0 -450px;
+        }
+
+        #options {
+          padding: 0 5px 5px 5px;
+        }
+
+        .options-nblock {
+          float: left;
+          margin-right: 10px;
+        }
+
+        #options h3 {
+          font-size: 1em;
+          font-weight: bold;
+          margin: 0px 0 8px 0;
+        }
+
+        #get {
+          margin-top: 25px;
+        }
+    </style>
+<script type="text/javascript">
+
+    function showDetails(e) {
+        e.preventDefault();
+
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        var wnd = $("#Details").data("kendoWindow");
+        var content = {};
+        content.url = '/barsroot/admin/modules/detail' + '?codeapp=' + dataItem.CODEAPP + '&partial=true';
+
+        wnd.options.content = content;
+        //wnd.content(content);
+        wnd.center().open().refresh();
+    }
+  function onRefreshDetail(e) {
+    //if (e.sender.options.content == null) e.sender.options.content = {};
+    //e.sender.options.content.url = '/barsroot/acct/accounts/detail' + '?id=1&partial=true';
+    //debugger;
+    //$("#Details").load();
+  }
+  function onCloseDetail(e) {
+    e.sender.element.context.innerHTML = "";
+    //debugger;
+  }
+</script>
+  <h1>@ViewBag.Title</h1>
+
+  <div id="cap-view" class="k-header">
+  @*<table>
+      <tr>
+        <td>
+          @(Html.Kendo().Button()
+            .Name("txtButtonOpen")
+            .HtmlAttributes( new {type = "button", title = "Детально"} )
+            .Icon("note")
+            .Content(""))
+        </td>
+        <td>|</td>
+        <td>
+          @(Html.Kendo().Button()
+            .Name("txtButtonNew")
+            .HtmlAttributes( new {type = "button", title = "Додати"} )
+            .Icon("plus")
+            .Content(""))
+        </td>
+        <td>
+          @(Html.Kendo().Button()
+            .Name("txtButtonEdit")
+            .HtmlAttributes( new {type = "button", title = "Редагувати"} )
+            .Icon("pencil")
+            .Content(""))
+        </td>
+        <td>
+          @(Html.Kendo().Button()
+            .Name("txtButtonDel")
+            .HtmlAttributes( new {type = "button", title = "Видалити"} )
+            .Icon("close")
+            .Content(""))
+        </td>
+      </tr>
+    </table>*@
+@(Html.Kendo().Grid<Areas.Admin.Models.APPLIST>()
+        .Name("gridModules")
+        .Columns(columns =>
+        {
+            columns.Command(i =>
+            {
+                i.Custom(" ").Text("<span class=\"k-icon k-i-pencil\"></span>")
+                    .HtmlAttributes(new { style = "min-width:20px;width:22px;" }).Click("showDetails");
+                @*i.Edit()
+                    .Text(" ").HtmlAttributes(new { style = "min-width:18px;width:22px;" })
+                    .UpdateText(" ")
+                    .CancelText(" ");*@
+                i.Destroy().Text(" ").HtmlAttributes(new { style = "min-width:18px;width:22px;" });
+            }).Width(80).HtmlAttributes(new { style = "min-width:80px" }).Title("Дії");
+            columns.Bound(p => p.CODEAPP).Title("Код").EditorTemplateName("АРМ");
+            columns.Bound(p => p.NAME).Title("Назва");
+        })
+        .Filterable(f => f.Extra(false))
+        //.ToolBar(t => t.Custom())
+        .Pageable(pager => pager
+            .Input(true)
+            .Numeric(true)
+            .Info(false)
+            .PreviousNext(true)
+            .Refresh(true)
+            .PageSizes(true)
+        )
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .PageSize(20)
+            .Model(i => i.Id("CODEAPP"))
+            .Read("GridData", "Modules")
+            .Update("GridDataUpd", "Modules")
+            .Destroy("d", "d")
+            .Create("c", "c")
+        )
+    )
+
+@(Html.Kendo().Window().Name("Details")
+    .Title("Перегляд модуля")
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .Width(800).Height(600)
+    .Content("Завантаження...")
+    //.LoadContentFrom("Detail","Modules",new{id = 1,partil=true})
+    .HtmlAttributes(new {})
+    .Actions(actions => actions
+            .Refresh()
+            .Minimize()
+            .Maximize()
+            .Close()
+    )
+    .Resizable()
+    .Events(events => events
+      .Refresh("onRefreshDetail")
+      .Close("onCloseDetail")
+    )
+  )
+
+    </div>

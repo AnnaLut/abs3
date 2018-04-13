@@ -1,0 +1,171 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="05/26/2011 14:55:15" ReportInfo.Modified="09/29/2014 15:10:35" ReportInfo.CreatorVersion="2013.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="khrsn72" ConnectionString="rijcmlq9SEZoacNJntaKIKp6mVF12Jc6VA4pf/8RrGHV3rJ5fRI/+1i800gk2EU5LvmIVqP4R0Cw2jEV17btBGSD0tx9A==">
+      <TableDataSource Name="Table12" Alias="Branch_Info" DataType="System.Int32" Enabled="true" SelectCommand="select *&#10;  from (select poa.fio            as br_boss,&#10;               poa.fio_r          as br_boss_r,&#10;               poa.branch_adr     as adr_branch,&#10;               poa.poa_doc        as br_boss_doc_r,&#10;               poa.poa_notary_num as br_boss_doc,&#10;               poa_notary         as br_boss_doc_n,&#10;               poa_notary_num     as br_boss_doc_n_r,&#10;               poa_date           as br_boss_doc_d,&#10;               branch_loc         as br_location,&#10;               branch_name        as name_branch,&#10;               f_ourmfo_g         as mfo,&#10;               f_ourokpo          as okpo&#10;          from wcs_bids b, wcs_power_of_attorneys poa&#10;         where b.id = :p1&#10;           and b.branch = poa.branch&#10;           and poa.active = 1&#10;         order by poa.ord)&#10; where rownum = 1">
+        <Column Name="BR_BOSS_R" DataType="System.String"/>
+        <Column Name="BR_BOSS" DataType="System.String"/>
+        <Column Name="ADR_BRANCH" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC_D" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC_R" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC_N" DataType="System.String"/>
+        <Column Name="BR_LOCATION" DataType="System.String"/>
+        <Column Name="NAME_BRANCH" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC_N_R" DataType="System.String"/>
+        <Column Name="MFO" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <CommandParameter Name="P1" DataType="126" Expression="[ND]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table14" Alias="Klient_info" DataType="System.Int32" Enabled="true" SelectCommand="SELECT  wcs_utl.get_answ(:ND, 'CL_1' )||' '|| wcs_utl.get_answ(:ND, 'CL_2')||' '||wcs_utl.get_answ(:ND, 'CL_3') as    FIO,&#10;substr(wcs_utl.get_answ(:ND, 'CL_2' ),1,1)||'. '||substr( wcs_utl.get_answ(:ND, 'CL_3'),1,1)||'. '||wcs_utl.get_answ(:ND, 'CL_1') as    FIO_short,&#10;'адреса : '||DECODE( wcs_utl.get_answ(:ND, 'CL_0_7'),0,wcs_utl.get_answ(:ND, 'CL_17')||','||wcs_utl.get_answ_formated(:ND, 'CL_18' )||' обл., район '||wcs_utl.get_answ(:ND, 'CL_19')||', '||wcs_utl.get_answ(:ND, 'CL_20')||', вул. '||wcs_utl.get_answ(:ND, 'CL_21'),wcs_utl.get_answ(:ND, 'CL_12')||','||wcs_utl.get_answ_formated(:ND, 'CL_13' )||' обл., район '||wcs_utl.get_answ(:ND, 'CL_14')||', '||wcs_utl.get_answ(:ND, 'CL_15')||', вул. '||wcs_utl.get_answ(:ND, 'CL_16')) as Adress,&#10;wcs_utl.get_answ(:ND, 'CODE_002' ) IdCode,&#10;'паспорт : '||wcs_utl.get_answ(:ND, 'CL_7' )||' № '||wcs_utl.get_answ(:ND, 'CL_8' )||' '||wcs_utl.get_answ(:ND, 'CL_9')||' '||wcs_utl.get_answ(:ND, 'CL_10')||' '||wcs_utl.get_answ(:ND, 'CL_11') Pasport&#10; FROM DUAL &#10;">
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="FIO_SHORT" DataType="System.String"/>
+        <Column Name="ADRESS" DataType="System.String"/>
+        <Column Name="IDCODE" DataType="System.String"/>
+        <Column Name="PASPORT" DataType="System.String"/>
+        <CommandParameter Name="P1" DataType="126" Expression="[ND]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table" Alias="WCS_BIDS" DataType="System.Int32" Enabled="true" SelectCommand="select b.*,&#13;&#10;       f_dat_lit(to_date(wcs_utl.get_creditdata(b.bid_id, 'DEAL_DATE'))) as deal_date_pr,&#13;&#10;       wcs_utl.get_creditdata(b.bid_id, 'DEAL_NUMBER') as deal_number&#13;&#10;  from v_wcs_bids b&#13;&#10; where b.bid_id = :p_bid_id">
+        <Column Name="BID_ID" DataType="System.Decimal"/>
+        <Column Name="SUBPRODUCT_ID" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_NAME" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_DESC" DataType="System.String"/>
+        <Column Name="CRT_DATE" DataType="System.DateTime"/>
+        <Column Name="F" DataType="System.String"/>
+        <Column Name="I" DataType="System.String"/>
+        <Column Name="O" DataType="System.String"/>
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="BDATE" DataType="System.DateTime"/>
+        <Column Name="INN" DataType="System.String"/>
+        <Column Name="SUMM" DataType="System.Decimal"/>
+        <Column Name="OWN_FUNDS" DataType="System.Decimal"/>
+        <Column Name="TERM" DataType="System.String"/>
+        <Column Name="CREDIT_CURRENCY" DataType="System.String"/>
+        <Column Name="SINGLE_FEE" DataType="System.Decimal"/>
+        <Column Name="MONTHLY_FEE" DataType="System.Decimal"/>
+        <Column Name="INTEREST_RATE" DataType="System.Decimal"/>
+        <Column Name="REPAYMENT_METHOD" DataType="System.String"/>
+        <Column Name="REPAYMENT_METHOD_TEXT" DataType="System.String"/>
+        <Column Name="REPAYMENT_DAY" DataType="System.Decimal"/>
+        <Column Name="GARANTEES" DataType="System.String"/>
+        <Column Name="MGR_ID" DataType="System.Decimal"/>
+        <Column Name="MGR_FIO" DataType="System.String"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="BRANCH_NAME" DataType="System.String"/>
+        <Column Name="BRANCH_HIERARCHY" DataType="System.String"/>
+        <Column Name="STATES" DataType="System.String"/>
+        <Column Name="DEAL_DATE_PR" DataType="System.String"/>
+        <Column Name="DEAL_NUMBER" DataType="System.String"/>
+        <CommandParameter Name="p_bid_id" DataType="107" Expression="[ND]" DefaultValue="-1"/>
+      </TableDataSource>
+      <TableDataSource Name="Table1" Alias="Dog_info" DataType="System.Int32" Enabled="true" SelectCommand="select  wcs_utl.get_answ(:p_bid_id, 'GRT_2_3', :p_ws_id , :p_ws_number ) as   num_dog,          wcs_utl.get_answ(:p_bid_id, 'GRT_2_4', :p_ws_id , :p_ws_number ) as   data_dog,          substr(f_dat_lit(  wcs_utl.get_answ(:p_bid_id, 'GRT_2_4', :p_ws_id , :p_ws_number )),1,25) as   data_dog_pr,          wcs_utl.get_answ(:p_bid_id, 'GRT_2_5', :p_ws_id , :p_ws_number ) as   name_dog,          wcs_utl.get_answ(:p_bid_id, 'GRT_2_6', :p_ws_id , :p_ws_number ) as   state_dog  from dual ">
+        <Column Name="NUM_DOG" DataType="System.String"/>
+        <Column Name="DATA_DOG" DataType="System.String"/>
+        <Column Name="DATA_DOG_PR" DataType="System.String"/>
+        <Column Name="NAME_DOG" DataType="System.String"/>
+        <Column Name="STATE_DOG" DataType="System.String"/>
+        <CommandParameter Name="p_bid_id" DataType="126" Expression="[ND]"/>
+        <CommandParameter Name="p_ws_id" DataType="126" Expression="[p_ws_id]"/>
+        <CommandParameter Name="p_ws_number" DataType="126" Expression="[p_ws_number]"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="ND" DataType="System.Int32" Expression="3548521"/>
+    <Parameter Name="p_ws_id" DataType="System.String" Expression="&quot;GRT_MORTGAGE&quot;"/>
+    <Parameter Name="p_ws_number" DataType="System.Decimal" Expression="0"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="56.7">
+      <TableObject Name="Table2" Left="9.45" Width="699.3" Height="56.7">
+        <TableColumn Name="Column1" MaxWidth="1134" Width="699.3"/>
+        <TableRow Name="Row1" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell1" Text="Додаток 2 до Договору про іпотечний кредит&#13;&#10;№&lt;b&gt;[WCS_BIDS.DEAL_NUMBER]&lt;/b&gt; від &lt;b&gt;[WCS_BIDS.DEAL_DATE_PR]&lt;/b&gt;&#13;&#10;&#13;&#10;" HorzAlign="Right" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row2" AutoSize="true">
+          <TableCell Name="Cell2" Text="Вид та предмет супутніх послуг та обґрунтування їх вартості" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <DataBand Name="Data1" Top="59.8" Width="718.2" Height="1682.1" CanGrow="true" CanShrink="true" CanBreak="true">
+      <TableObject Name="Table3" Left="9.45" Width="699.3" Height="1672.65">
+        <TableColumn Name="Column2" MaxWidth="1134" Width="699.3"/>
+        <TableRow Name="Row3" AutoSize="true">
+          <TableCell Name="Cell3" Text="Платежі за надані супутні послуги визначаються:" HorzAlign="Justify" Font="Times New Roman, 10pt, style=Underline" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row4" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell8" Text="А)&lt;b&gt;На користь 3-х осіб з урахуванням інформації, наданої Позичальником у заявці на отримання Кредиту, а також з урахуванням тарифів на послуги третіх осіб&lt;/b&gt;. Платежі за надані супутні послуги на користь 3-х осіб можуть включати:&#13;&#10;" Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row5" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell13" Text="&lt;b&gt;- &lt;i&gt;послуги оцінювачів заставного майна&lt;/i&gt;&lt;/b&gt; – послуги суб’єктів оціночної діяльності за проведення оцінки рухомого/нерухомого майна, що надається у якості забезпечення Кредиту (якщо вимога проведення такої оцінки передбачена умовами кредитування за відповідним банківським продуктом/умовами)." Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row6" Height="75.6" AutoSize="true">
+          <TableCell Name="Cell18" Text="Вартість послуги визначається в згідно тарифів суб’єкта оціночної діяльності у відповідності до Закону України &quot;Про оцінку майна, майнових прав та професійну оціночну діяльність в Україні&quot;, Закону України &quot;Про оцінку земель”, Національним стандартом №1 &quot;Загальні засади оцінки майна і майнових прав&quot;, що затверджений постановою Кабінету Міністрів України 10 вересня 2003 р. N 1440 та Національним стандартом N 2 &quot;Оцінка нерухомого майна&quot;, затвердженого постановою Кабінету Міністрів України від 28 жовтня 2004 р. N 1442." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row7" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell23" Text="&lt;b&gt;- &lt;i&gt;страхування&lt;/i&gt;&lt;/b&gt; - страхування нерухомого майна, страхування рухомого майна, страхування життя Позичальника, страхування титулу, страхування відповідальності Позичальника, страхування фінансового ризику тощо (в залежності від умов кредитування за відповідним банківським продуктом/умовами)." Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row8" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell24" Text="Вартість послуги визначається в згідно тарифів та правил добровільного страхування в залежності від виду страхування відповідної страхової компанії у відповідності до Закону України “Про страхування”." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row9" Height="141.75" AutoSize="true">
+          <TableCell Name="Cell25" Text="&lt;b&gt;- &lt;i&gt;послуги нотаріусів&lt;/i&gt;&lt;/b&gt; – нотаріальне посвідчення договору купівлі-продажу, в тому числі державне мито та внески до Пенсійного фонду; нотаріальне посвідчення договору застави/ іпотечного договору, в тому числі Державне мито; здійснення під час вчинення нотаріальної дії пошуку відомостей про зареєстровані речові права, їх обтяження на об'єкт нерухомого майна у Державному реєстрі речових прав на нерухоме майно;  видача Витягу з Державного реєстру обтяжень рухомого майна,; внесення до Державного реєстру обтяжень рухомого майна запису, змін і додаткових відомостей до запису про обтяження рухомого майна; видачу Витягу з Державного земельного кадастру про земельну ділянку при здійсненні нотаріальних дій; плата за вчинення виконавчого напису; інші послуги нотаріусів (в залежності від умов кредитування за відповідним банківським продуктом/умовами).&#13;&#10;" Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row10" Height="170.1" AutoSize="true">
+          <TableCell Name="Cell26" Text="Вартість послуги визначається в згідно тарифів нотаріуса у відповідності до Закону України “Про нотаріат ”, Декрету Кабінету Міністрів України “Про державне мито”, Закон України “Про судовий збір”,  Закону України “Про виконавче провадження”, Закону України «Про державну реєстрацію речових прав на нерухоме майно та їх обтяжень», Постанови Кабінету Міністрів України від 5 липня 2004 р. N 830 “Про затвердження Порядку ведення Державного реєстру обтяжень рухомого майна”, Постанови Кабінету Міністрів України від 22 червня 2011 р. № 703 «Про затвердження Порядку державної реєстрації прав на нерухоме майно та їх обтяжень і Порядку надання інформації з Державного реєстру речових прав на нерухоме майно», Постанови Кабінету Міністрів від 21 листопада 2012 року № 1204 «Про затвердження розміру і порядок використання плати за внесення змін до записів Державного реєстру речових прав на нерухоме майно та надання інформації із зазначеного реєстру», наказу Міністерства юстиції України від 29.12.2012 № 1994/5 “Про встановлення розміру плати за пошук нотаріусами відомостей у Державному реєстрі речових прав на нерухоме майно”, інших нормативно - правових актів України." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row11" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell27" Text="&lt;b&gt;- &lt;i&gt;послуги ДП „Інформаційний центр”&lt;/i&gt;&lt;/b&gt; - внесення до Державного реєстру обтяжень рухомого майна запису, змін і додаткових відомостей до запису про обтяження рухомого майна; видача Витягу з Державного реєстру обтяжень рухомого майна.&#13;&#10;" Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row12" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell28" Text="Вартість послуги визначається  у відповідності до Закону України «Про забезпечення вимог кредиторів та реєстрацію обтяжень», Постанови Кабінету Міністрів України від 5 липня 2004 р. N 830 “Про затвердження Порядку ведення Державного реєстру обтяжень рухомого майна, інших нормативно - правових актів України." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row13" Height="122.85" AutoSize="true">
+          <TableCell Name="Cell29" Text="&lt;b&gt;- &lt;i&gt;плата за надання Державним агентством земельних ресурсів та його територіальними органами платних адміністративних послуг&lt;/i&gt;&lt;/b&gt; -надання відомостей з Державного земельного кадастру у формі витягів з Державного земельного кадастру про земельну ділянку. Вартість послуг визначається у відповідності до Закону України «Про Державний земельний кадастр», Постанови Кабінету Міністрів України від 17 жовтня 2012 № 1051 «Про затвердження Порядку ведення Державного земельного кадастру», Постанови Кабінету Міністрів України від 01 серпня 2011 № 835 «Деякі питання надання Державним агентством земельних ресурсів та його територіальними органами адміністративних послуг»,  інших нормативно - правових актів України." Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row17" Height="94.5" AutoSize="true">
+          <TableCell Name="Cell33" Text="&lt;b&gt;- &lt;i&gt;плата за здійснення органом державної реєстрації речових прав на нерухоме майно/нотаріусом як спеціальним суб’єктом, що здійснює функції державного реєстратора, реєстраційних дій/надання інформації з Державного реєстру речових прав на нерухоме майно&lt;/i&gt;&lt;/b&gt; - плата (державне мито) за проведення державної реєстрації права власності на нерухоме майно; видачу витягів з Державного реєстру речових прав на нерухоме майно (витяг, який надається власнику нерухомого майна, його спадкоємцям (правонаступникам)/витяг, який надається в процедурі державної реєстрації прав" Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row16" Height="141.75" AutoSize="true">
+          <TableCell Name="Cell32" Text="Вартість послуги визначається  у відповідності до Закону України Декрету Кабінету Міністрів України “Про державне мито”, Постанови Кабінету Міністрів України від 21 листопада 2012 року № 1204 “Про затвердження розміру і порядок використання плати за внесення змін до записів Державного реєстру речових прав на нерухоме майно та надання інформації із зазначеного реєстру”, Закону України ”Про державну реєстрацію речових прав на нерухоме майно та їх обтяжень”,   Постанови Кабінету Міністрів України від 22 червня 2011 р. № 703 “Про затвердження Порядку державної реєстрації прав на нерухоме майно та їх обтяжень і Порядку надання інформації з Державного реєстру речових прав на нерухоме майно”, наказу Міністерства юстиції України від 29.12.2012 № 1994/5 «Про встановлення розміру плати за пошук нотаріусами відомостей у Державному реєстрі речових прав на нерухоме майно» інших нормативно - правових актів України.&#13;&#10;" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row15" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell31" Text="&lt;b&gt;- &lt;i&gt;інші платежі&lt;/i&gt;&lt;/b&gt; - витяг з Державного реєстру речових прав на нерухоме майно тощо (в залежності від умов кредитування за відповідним банківським продуктом/умовами)." Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row14" Height="113.4" AutoSize="true">
+          <TableCell Name="Cell30" Text="Вартість послуги визначається в згідно тарифів у відповідності до Вартість послуги та інших фінансових витрат визначається відповідно до Закону України “Про нотаріат”, Закон України «Про державний земельний кадастр»,  Постанови Кабінету Міністрів від 21 листопада 2012 року № 1204 «Про затвердження розміру і порядок використання плати за внесення змін до записів Державного реєстру речових прав на нерухоме майно та надання інформації із зазначеного реєстру», Наказу Міністерства юстиції України «Про встановлення розміру плати за пошук нотаріусами відомостей у Державному реєстрі речових прав на нерухоме майно» від 29.12.2012 р.  № 1994/5 у відповідності до чинного законодавства України." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row22" AutoSize="true">
+          <TableCell Name="Cell38" Text="Б) на користь Банку:" Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row21" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell37" Text="&lt;b&gt;- &lt;i&gt;за надання Кредиту&lt;/i&gt;&lt;/b&gt; – згідно Тарифів Банку та умов кредитування за відповідним банківським продуктом/умовами, що визначені в цьому Кредитному договорі;" Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row26" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell42" Text="&lt;b&gt;- &lt;i&gt;за обслуговування Кредиту&lt;/i&gt;&lt;/b&gt; – згідно Тарифів Банку умов за відповідним банківським продуктом/умовами кредитування, що визначені в цьому Кредитному договорі;" Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row25" Height="189" AutoSize="true">
+          <TableCell Name="Cell41" Text="&lt;b&gt;- &lt;i&gt;у зв’язку з укладенням іпотечного договору&lt;/i&gt;&lt;/b&gt; - плата (державне мито) за проведення державної реєстрації права іпотеки, заборони на відчуження майно предмета іпотеки; внесення змін до записів Державного реєстру речових прав на нерухоме майно; припинення права іпотеки; припинення заборони на відчуження предмета іпотеки; плата за надання витягів з Державного реєстру речових прав на нерухоме майно про державну реєстрацію іпотеки; плата за видачу витягів з Державного реєстру речових прав на нерухоме майно про державну реєстрацію обтяження речових прав на нерухоме майно (заборони на відчуження); плата за надання витягів з Державного реєстру речових прав на нерухоме майно про державну реєстрацію внесення змін до записів вказаного реєстру; плата за надання витягів з Державного реєстру речових прав на нерухоме майно про державну реєстрацію припинення іпотеки; плата за надання витягів з Державного реєстру речових прав на нерухоме майно про державну реєстрацію припинення заборони на відчуження предмета іпотеки; плата за пошук Банком відомостей про іпотеку та обтяження речових прав на предмет іпотеки в Державному реєстрі речових прав на нерухоме майно&#13;&#10;" Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row23" Height="85.05" AutoSize="true">
+          <TableCell Name="Cell39" Text="&lt;b&gt;- &lt;i&gt;інші платежі&lt;/i&gt;&lt;/b&gt; - згідно умов кредитування за відповідним банківським продуктом/умовами кредитування та з урахуванням інформації, наданої позичальником (у разі, якщо відповідні платежі здійснюватимуться з використанням послуг іншого банку). Інші платежі визначено в цьому Кредитному договорі та/або в Тарифах Банку згідно з додатком №3, який є його невід’ємною частиною, та з якими в подальшому позичальник зобов’язаний ознайомлюватися самостійно відповідно до умов Кредитного договору." Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row20" Height="122.85" AutoSize="true">
+          <TableCell Name="Cell36" Text="При відкриття, веденні та закритті поточного банківського рахунку позичальника у зв’язку з отриманням Кредиту, його обслуговуванням і поверненням, Банк керується вимогами Закону України “Про переказ коштів та платіжні системи в Україні”, Інструкції Національного банку України про порядок відкриття, використання і закриття рахунків у національній та іноземних валютах, Інструкції про безготівкові розрахунки в Україні в національній валюті та інших нормативно – правових актів України. Тарифи, які Позичальник повинен сплатити на користь Банку за договором банківського рахунку в зв’язку з отриманням Кредиту, його обслуговуванням і поверненням, визначені в додатку №3, який є невід’ємною частиною цього Кредитного договору, та з якими в подальшому позичальник зобов’язаний ознайомлюватися самостійно відповідно до умов Кредитного договору." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="1745" Width="718.2" Height="47.25" CanGrow="true" CanShrink="true" CanBreak="true" Guides="9.45,0">
+      <TableObject Name="Table4" Left="9.45" Width="699.36" Height="37.8">
+        <TableColumn Name="Column3" Width="349.68"/>
+        <TableColumn Name="Column4" Width="349.68"/>
+        <TableRow Name="Row28">
+          <TableCell Name="Cell45"/>
+          <TableCell Name="Cell46"/>
+        </TableRow>
+        <TableRow Name="Row27" AutoSize="true">
+          <TableCell Name="Cell43" Text="Банк _____________________" Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true"/>
+          <TableCell Name="Cell44" Text="Позичальник _____________________" HorzAlign="Justify" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true"/>
+        </TableRow>
+      </TableObject>
+    </ReportSummaryBand>
+  </ReportPage>
+</Report>

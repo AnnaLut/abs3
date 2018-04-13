@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xmlform captiontype="OnlyTitle" caption="Way4. Рахунки по договору">
+  <grids>
+    <grid id="gv" pagesize="10" showpagesizebox="true" title="Way4. Рахунки по договору \QS[nd]" showfilter="false">
+      <datasource>
+        <sql>
+          select w.nd, a.acc, a.branch, a.ob22, a.nls, a.kv, a.nms, a.ostc/100 ost, dapp, a.tip, a.daos, a.dazs, a.rnk
+          from accounts a, v_w4_nd_acc w
+          where a.acc = w.acc and w.nd = :nd
+          order by a.nls
+        </sql>
+        <parameters>
+          <parameter type="QueryString" name="nd" datatype="Int64"></parameter>
+        </parameters>
+      </datasource>
+      <rowselection method="SingleRow" />
+      <fields>
+        <field name="nd" key="true" datatype="Int64" sort="default">
+          <column show="false" caption="Номер договору" align="right" />
+        </field>
+        <field name="acc" key="true" datatype="Int64" sort="default">
+          <column show="false" caption="ACC" align="right" />
+        </field>
+        <field name="branch" key="false" datatype="String" sort="default">
+          <column show="true" caption="Відділення" align="left" />
+        </field>
+        <field name="ob22" key="false" datatype="String" sort="default">
+          <column show="true" caption="ОБ22" align="center" />
+        </field>
+        <field name="nls" key="false" datatype="String" sort="default">
+          <column show="true" caption="Рахунок" align="left">
+            <link url="/barsroot/viewaccounts/accountform.aspx?type=0">
+              <parameters>
+                <parameter type="DataField" name="acc"></parameter>
+                <parameter type="DataField" name="rnk"></parameter>
+                <parameter type="Constant" name="accessmode">
+                  <defaultvalue type="Constant" value="1"></defaultvalue>
+                </parameter>
+              </parameters>
+            </link>
+          </column>
+        </field>
+        <field name="kv" key="false" datatype="Int64" sort="default">
+          <column show="true" caption="Вал." align="center" />
+        </field>
+        <field name="nms" key="false" datatype="String" sort="default">
+          <column show="true" caption="Назва рахунку" align="left" />
+        </field>
+        <field name="ost" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="Залишок" align="right" />
+        </field>        
+        <field name="dapp" key="false" datatype="DateTime" sort="default">
+          <column show="true" caption="Дата останнього руху" align="center" />
+        </field>
+        <field name="tip" key="false" datatype="String" sort="default">
+          <column show="true" caption="Тип" align="left" />
+        </field>
+        <field name="daos" key="false" datatype="DateTime" sort="default">
+          <column show="true" caption="Дата відкриття" align="center" />
+        </field>
+        <field name="dazs" key="false" datatype="DateTime" sort="default">
+          <column show="true" caption="Дата закриття" align="center" />
+        </field>
+        <field name="rnk" key="true" datatype="Decimal" sort="default">
+          <column show="false" caption="RNK" align="right" />
+        </field>
+      </fields>
+    </grid>
+  </grids>
+</xmlform>

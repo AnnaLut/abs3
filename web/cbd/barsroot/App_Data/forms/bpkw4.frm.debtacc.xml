@@ -1,0 +1,131 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xmlform captiontype="OnlyTitle" caption="Way4. Карткові рахунки з заборгованості БПК">
+  <grids>
+    <grid table="V_W4_DEBTACC" id="gv" pagesize="10" showpagesizebox="true" title="Way4. Карткові рахунки з заборгованості БПК" showfilter="false">
+      <filters caption="Фільтри" buttontext="Застосувати" columnscount="2" width ="100%">
+        <filter field="daos1" caption="Період З" columnindex="1" condition="GreatEqual" id="fltrdaos1" allowemptyvalue="false">
+          <uicontrol type="DateInput" align="Center">
+            <defaultvalue type="PlSqlFunction" value="sysdate"/>
+          </uicontrol>
+        </filter>
+        <filter field="daos2" caption="Період ПО" columnindex="1" condition="LessEqual" id="fltrdaos2" allowemptyvalue="false">
+          <uicontrol type="DateInput" align="Center">
+            <defaultvalue type="PlSqlFunction" value="sysdate"/>
+          </uicontrol>
+        </filter>
+        <filter field="nls" caption="Рахунок" columnindex="2" condition="Equal" id="fltrnls" >
+          <uicontrol></uicontrol>
+        </filter>
+        <filter field="okpo" caption="ІНН" columnindex="2" condition="Equal" id="fltrokpo">
+          <uicontrol></uicontrol>
+        </filter>
+      </filters>
+      <buttons defaulttype="Button">
+        <button id="btnAccs" caption="Рахунки угоди" hint="Рахунки угоди">
+          <command type="Redirect" url="/barsroot/barsweb/dynform.aspx?form=bpkw4.frm.ndacc">
+            <parameters>
+              <parameter type="DataField" name="nd" altname="nd"></parameter>
+            </parameters>
+          </command>
+        </button>
+      </buttons>
+      <rowselection method="SingleRow" />
+      <fields>
+        <field name="nd" key="true" datatype="Int64" sort="default">
+          <column show="true" caption="Номер договору" align="right" />
+        </field>
+        <field name="branch" key="false" datatype="String" sort="default">
+          <column show="true" caption="Відділення" align="left" />
+        </field>
+        <field name="rnk" key="true" datatype="Int64" sort="default">
+          <column show="false" caption="РНК" align="right" />
+        </field>
+        <field name="nmk" key="false" datatype="String" sort="default">
+          <column show="true" caption="ПІБ клієнта" align="left">
+            <link url="/barsroot/clientregister/registration.aspx?readonly=0">
+              <parameters>
+                <parameter type="DataField" name="rnk" altname="rnk"></parameter>
+              </parameters>
+            </link>
+          </column>
+        </field>
+        <field name="okpo" key="false" datatype="String" sort="default">
+          <column show="true" caption="ІНН" align="left" />
+        </field>
+        <field name="acc" key="true" datatype="Int64" sort="default">
+          <column show="false" caption="ACC" align="right" />
+        </field>
+        <field name="ob22" key="false" datatype="String" sort="default">
+          <column show="true" caption="ОБ22" align="Center" />
+        </field>
+        <field name="nls" key="false" datatype="String" sort="default">
+          <column show="true" caption="Картковий рахунок" align="left">
+            <link url="/barsroot/viewaccounts/accountform.aspx?type=0">
+              <parameters>
+                <parameter type="DataField" name="acc" altname="acc"></parameter>
+                <parameter type="DataField" name="rnk" altname="rnk"></parameter>
+                <parameter type="Constant" name="accessmode">
+                  <defaultvalue type="Constant" value="1"></defaultvalue>
+                </parameter>
+              </parameters>
+            </link>
+          </column>
+        </field>
+        <field name="daos1" key="false" datatype="DateTime" sort="default">
+          <column show="false" caption="daos1" align="center" />
+        </field>
+        <field name="daos2" key="false" datatype="DateTime" sort="default">
+          <column show="false" caption="daos2" align="center" />
+        </field>
+        <field name="dapp_pk" key="false" datatype="DateTime" sort="default">
+          <column show="true" caption="2625 Дата останньго руху" align="center" />
+        </field>
+        <field name="ost_pk" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="2625 Залишок" align="right" />
+        </field>
+        <field name="dapp_2627" key="false" datatype="DateTime" sort="default">
+          <column show="true" caption="2627 Дата останньго руху" align="center" />
+        </field>
+        <field name="ost_2627" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="2627 Залишок" align="right" />
+        </field>
+        <field name="dapp_ovr" key="false" datatype="DateTime" sort="default">
+          <column show="true" caption="2202/2203 Дата останньго руху" align="center" />
+        </field>
+        <field name="ost_ovr" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="2202/2203 Залишок" align="right" />
+        </field>
+        <field name="dapp_2207" key="false" datatype="DateTime" sort="default">
+          <column show="true" caption="2207 Дата останньго руху" align="center" />
+        </field>
+        <field name="ost_2207" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="2207 Залишок" align="right" />
+        </field>
+        <field name="dapp_2208" key="false" datatype="DateTime" sort="default">
+          <column show="true" caption="2208 Дата останньго руху" align="center" />
+        </field>
+        <field name="ost_2208" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="2208 Залишок" align="right" />
+        </field>
+        <field name="dapp_2209" key="false" datatype="DateTime" sort="default">
+          <column show="true" caption="2209 Дата останньго руху" align="center" />
+        </field>
+        <field name="ost_2209" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="2209 Залишок" align="right" />
+        </field>
+        <field name="dapp_3570" key="false" datatype="DateTime" sort="default">
+          <column show="true" caption="3570 Дата останньго руху" align="center" />
+        </field>
+        <field name="ost_3570" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="3570 Залишок" align="right" />
+        </field>
+        <field name="dapp_3579" key="false" datatype="DateTime" sort="default">
+          <column show="true" caption="3579 Дата останньго руху" align="center" />
+        </field>
+        <field name="ost_3579" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="3579 Залишок" align="right" />
+        </field>
+      </fields>
+    </grid>
+  </grids>
+</xmlform>

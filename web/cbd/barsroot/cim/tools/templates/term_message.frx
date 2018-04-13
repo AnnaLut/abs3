@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="10/03/2014 16:02:53" ReportInfo.Modified="10/09/2014 15:00:11" ReportInfo.CreatorVersion="1.7.1.0">
+  <Dictionary>
+    <OracleDataConnection Name="barsdev" ConnectionString="rijcmlq9SEZoacNJntaKIKp6mVF1+kSHs9h2FEASDb2ziQ1rMUybLG+C6jbSqka/GGQeZKaQSbrDjBY4KltUNuVSQtSEw==">
+      <TableDataSource Name="Table" Alias="t" DataType="System.Int32" Enabled="true" SelectCommand="select x.*, c.nmk, c.adr, decode(x.contr_type, 0, 'екс', 'ім') as t1, decode(x.contr_type, 0, '2.3', '3.3') as t6,       &#13;&#10;       decode(x.contr_type, 0, 'Номер та дата МД / Акту', 'Дата платежу') as t7, &#13;&#10;       decode(x.contr_type, 0, 'Сума, що не надійшла', 'Сума заборгованості') as t8,&#13;&#10;       decode(x.contr_type, 0, 'Дата закінчення законодавчо встановлених строків розрахунків', &#13;&#10;                               'Граничний термін поставки продукції') as t9,&#13;&#10;       decode(x.contr_type, 0, 'зарахування виручки за цією операцією на поточний рахунок останнього', &#13;&#10;                               'імпорту товару з увезенням його на територію України') as t2,&#13;&#10;       decode(x.contr_type, 0, 'зарахування виручки', 'надходження товару') as t3,&#13;&#10;       decode(x.contr_type, 0,&#13;&#10;                ' про зарахування виручки за цією операцією на відкритий у цьому банку поточний рахунок резидента', &#13;&#10;                ', якому митний орган надіслав інформацію про цю операцію резидента, про отримання такого реєстру')&#13;&#10;             as t4,&#13;&#10;       decode(x.contr_type, 0, &#13;&#10;                'зазначається вся наявна в реквізитах платежу інформація: номер і дата договору, сума платежу -', &#13;&#10;                'зазначаються номер і дата реєстру, вся наявна в реєстрі інформація про операцію резидента, а також вартість продукції') &#13;&#10;             as t5,   &#13;&#10;       to_char(last_day(to_date(:p_date_end,'dd/mm/yyyy'))+1,'dd.mm.yyyy') as end_date, b.name, b.phone       &#13;&#10;from &#13;&#10;  (select c.branch, c.rnk, c.contr_type, c.num, to_char(c.open_date, 'dd.mm.yyyy') as open_date, &#13;&#10;          b.benef_name, b.benef_adr, null as doc_num, to_char(p.vdat,'dd.mm.yyyy') as dat, &#13;&#10;          v.lcv as v, p.zs_vp as z, to_char(p.control_date,'dd.mm.yyyy') as txt_control_date, p.control_date &#13;&#10;   from v_cim_trade_payments p&#13;&#10;        join cim_contracts c on p.contr_id=c.contr_id and c.contr_type=1&#13;&#10;        join cim_beneficiaries b on c.benef_id=b.benef_id&#13;&#10;        join tabval$global v on p.v_pl=v.kv&#13;&#10;   where (:p_date_begin is null or  p.control_date &gt;= to_date(:p_date_begin,'dd/mm/yyyy')) and p.control_date &lt;= to_date(:p_date_end,'dd/mm/YYYY') and &#13;&#10;    p.zs_vk&gt;0 &#13;&#10;        and c.branch=sys_context('bars_context','user_branch')&#13;&#10;   union all&#13;&#10;   select c.branch, c.rnk, c.contr_type, c.num, to_char(c.open_date, 'dd.mm.yyyy') as open_date,&#13;&#10;          b.benef_name, b.benef_adr, p.num as doc_num, to_char(p.allow_date,'dd.mm.yyyy') as dat, &#13;&#10;          v.lcv as v, p.z_vt as z, to_char(p.control_date,'dd.mm.yyyy') as txt_control_date, p.control_date&#13;&#10;   from v_cim_bound_vmd p&#13;&#10;        join cim_contracts c on p.contr_id=c.contr_id and c.contr_type=0&#13;&#10;        join cim_beneficiaries b on c.benef_id=b.benef_id&#13;&#10;        join tabval$global v on p.vt=v.kv&#13;&#10;   where (:p_date_begin is null or  p.control_date &gt;= to_date(:p_date_begin,'dd/mm/yyyy')) and p.control_date &lt;= to_date(:p_date_end,'dd/mm/yyyy') and&#13;&#10;   p.z_vk&gt;0 &#13;&#10;         and c.branch=sys_context('bars_context','user_branch')&#13;&#10;  ) x     &#13;&#10;  join customer c on c.rnk=x.rnk  &#13;&#10;  join cim_journal_num b on b.branch=x.branch --sys_context('bars_context','user_branch')&#13;&#10;--where x.contr_type=0&#13;&#10;order by x.rnk, x.contr_type, x.open_date, x.num, x.control_date">
+        <Column Name="NMK" DataType="System.String"/>
+        <Column Name="ADR" DataType="System.String"/>
+        <Column Name="T1" DataType="System.String"/>
+        <Column Name="T6" DataType="System.String"/>
+        <Column Name="T2" DataType="System.String"/>
+        <Column Name="T3" DataType="System.String"/>
+        <Column Name="T4" DataType="System.String"/>
+        <Column Name="T5" DataType="System.String"/>
+        <Column Name="END_DATE" DataType="System.String"/>
+        <Column Name="NAME" DataType="System.String"/>
+        <Column Name="PHONE" DataType="System.String"/>
+        <Column Name="RNK" DataType="System.Decimal"/>
+        <Column Name="CONTR_TYPE" DataType="System.Decimal"/>
+        <Column Name="NUM" DataType="System.String"/>
+        <Column Name="OPEN_DATE" DataType="System.Char"/>
+        <Column Name="BENEF_NAME" DataType="System.String"/>
+        <Column Name="BENEF_ADR" DataType="System.String"/>
+        <Column Name="DAT" DataType="System.String"/>
+        <Column Name="V" DataType="System.String"/>
+        <Column Name="Z" DataType="System.Decimal"/>
+        <Column Name="TXT_CONTROL_DATE" DataType="System.String"/>
+        <Column Name="CONTROL_DATE" DataType="System.DateTime"/>
+        <Column Name="DOC_NUM" DataType="System.String"/>
+        <Column Name="T7" DataType="System.String"/>
+        <Column Name="T8" DataType="System.String"/>
+        <Column Name="T9" DataType="System.String"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <CommandParameter Name="p_date_end" DataType="126" Expression="[p_date_end]"/>
+        <CommandParameter Name="p_date_begin" DataType="126" Expression="[p_date_begin]"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_date_end" DataType="System.String" Expression="&quot;30/10/2014&quot;"/>
+    <Parameter Name="p_date_begin" DataType="System.String" Expression="&quot;01/01/2009&quot;"/>
+  </Dictionary>
+  <ReportPage Name="Page1" RawPaperSize="9" RightMargin="15">
+    <GroupHeaderBand Name="GroupHeader1" Width="699.3" Height="274.05" CanGrow="true" CanShrink="true" StartNewPage="true" Condition="[t.RNK]*10+[t.CONTR_TYPE]">
+      <TextObject Name="Text1" Left="340.2" Width="359.1" Height="18.9" CanGrow="true" CanShrink="true" Text="[t.NMK]" HorzAlign="Center" Font="Times New Roman, 12pt, style=Underline"/>
+      <TextObject Name="Text2" Left="340.2" Top="18.9" Width="359.1" Height="37.8" Text="(найменування організації)" HorzAlign="Center" Font="Times New Roman, 12pt, style=Italic"/>
+      <TextObject Name="Text3" Left="340.2" Top="56.7" Width="359.1" Height="18.9" CanGrow="true" CanShrink="true" Text="[t.ADR]" HorzAlign="Center" Font="Times New Roman, 12pt, style=Underline"/>
+      <TextObject Name="Text4" Left="340.2" Top="75.6" Width="359.1" Height="75.6" Text="(адреса)&#13;&#10;" HorzAlign="Center" Font="Times New Roman, 12pt, style=Italic"/>
+      <TextObject Name="Text5" Top="151.2" Width="699.3" Height="66.15" CanShrink="true" Text="	Вважаємо за необхідне повідомити про закінчення граничного строку законодавчо встановлених термінів розрахунків за [t.T1]портними операціями [t.NMK]:&#13;&#10;" HorzAlign="Justify" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text6" Top="226.8" Width="94.5" Height="47.25" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="Номер і дата договору" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text7" Left="94.5" Top="226.8" Width="198.45" Height="47.25" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="Найменування та місцезнаходження нерезиддента" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text8" Left="292.95" Top="226.8" Width="151.2" Height="47.25" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[t.T7]" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text9" Left="444.15" Top="226.8" Width="122.85" Height="47.25" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[t.T8], назва іноземної валюти" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text10" Left="567" Top="226.8" Width="132.3" Height="47.25" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[t.T9]" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+      <DataBand Name="Data1" Top="278.05" Width="699.3" Height="47.25" DataSource="Table">
+        <TextObject Name="Text11" Width="94.5" Height="47.25" Border.Lines="All" Text="[t.NUM],&#13;&#10;[t.OPEN_DATE]" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+        <TextObject Name="Text12" Left="94.5" Width="198.45" Height="47.25" Border.Lines="All" Text="[t.BENEF_NAME], &#13;&#10;[t.BENEF_ADR]" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+        <TextObject Name="Text13" Left="292.95" Width="151.2" Height="47.25" Border.Lines="All" Text="[t.DAT],&#13;&#10;[t.DOC_NUM]" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+        <TextObject Name="Text14" Left="444.15" Width="122.85" Height="47.25" Border.Lines="All" Text="[t.Z] &#13;&#10;[t.V]" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+        <TextObject Name="Text15" Left="567" Width="132.3" Height="47.25" Border.Lines="All" Text="[t.TXT_CONTROL_DATE]" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+      </DataBand>
+      <GroupFooterBand Name="GroupFooter1" Top="329.3" Width="699.3" Height="415.8" CanGrow="true" CanShrink="true" CanBreak="true">
+        <TextObject Name="Text16" Top="226.8" Width="699.3" Height="189" CanGrow="true" CanShrink="true" CanBreak="false" Text="	У разі ненадання документів до [t.END_DATE] року установі [t.NAME] відповідно до вимог пунктів 5.1 та 5.9 розділу 5 Інструкції №136 АТ «Ощадбанк» повідомить про це податковий орган за місцем реєстрації [t.ADR].&#13;&#10;&#13;&#10;&#13;&#10;Керівник 					         ___________________________&#13;&#10;								(підпис)&#13;&#10;&#13;&#10;Виконавець:&#13;&#10;Тел. [t.PHONE]&#13;&#10;" HorzAlign="Justify" Font="Times New Roman, 12pt"/>
+        <TextObject Name="Text17" Width="699.3" Height="94.5" CanGrow="true" CanShrink="true" Text="&#13;&#10;	Відповідно до вимог п. [t.T6] Інструкції про порядок здійснення контролю за експортними, імпортними операціями, затвердженої постановою Правління Національного банку України від 24.03.1999 р. №136 (далі – Інструкція № 136), банк знімає [t.T1]портну операцію резидента з контролю після [t.T2]." HorzAlign="Justify" Font="Times New Roman, 12pt"/>
+        <TextObject Name="Text18" Top="94.5" Width="699.3" Height="75.6" CanGrow="true" CanShrink="true" Text="	Додатковою підставою для зняття [t.T1]портної операції з контролю, крім [t.T3], може бути письмове повідомлення іншого банку[t.T4], засвідчене підписом відповідальної особи іта відбитком печатки банку (в повідомленні [t.T5] у тій частині, в якій відомості передаються іншому банку)." HorzAlign="Justify" Font="Times New Roman, 12pt"/>
+        <TextObject Name="Text19" Top="170.1" Width="699.3" Height="56.7" CanGrow="true" CanShrink="true" Text="	Враховуючи вищевикладене, просимо Вас надати до установи [t.NAME] належним чином оформлені копії документів, згідно з якими зазначена операція з контролю може бути знята." HorzAlign="Justify" Font="Times New Roman, 12pt"/>
+      </GroupFooterBand>
+    </GroupHeaderBand>
+  </ReportPage>
+</Report>

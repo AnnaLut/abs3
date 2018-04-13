@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<xmlform caption="Справочник продуктов БПК">
+  <grids>
+    <grid id="gBpkProduct" table="v_bpk_product" pagesize="2" showpagesizebox="true">
+      <filters caption="Виберіть тип картки та категорію клієнта" buttontext="Знайти" columnscount="2" width="100%">
+        <filter field="type" caption ="Тип картки" columnindex="1" condition="Equal" id="fltrtype" >
+          <uicontrol type="DropDownList" table="demand_acc_type" keyfield="type" valuefield="name" addemptyitem="true">
+          </uicontrol>
+        </filter>
+        <filter field="kk" caption ="Категорія клієнта" columnindex="2" condition="Equal" id="fltrkk">
+          <uicontrol type="DropDownList" table="demand_kk" keyfield="kk" valuefield="name" addemptyitem="true"></uicontrol>
+        </filter>
+      </filters>
+      <fields>
+        <field name="id" datatype="Int64" key="true">
+          <column caption="Ид." align="Right"></column>
+        </field>
+        <field name="name" datatype="String">
+          <column caption="Назва" align="Left"></column>
+        </field>
+        <field name="type" datatype="String">
+          <column caption="Тип картки" align="Right"></column>
+        </field>
+        <field name="type_name" datatype="String">
+          <column caption="Тип картки" align="Left"></column>
+        </field>
+        <field name="kv" datatype="Int64">
+          <column caption="Вал" align="Right"></column>
+        </field>
+        <field name="kk" datatype="String">
+          <column caption="Кат. кл." align="Left"></column>
+        </field>
+        <field name="ob22" datatype="String">
+          <column caption="ОБ22" align="Left"></column>
+        </field>
+        <field name="cond_set" datatype="Int64">
+          <column caption="Код умови" align="Right"></column>
+        </field>
+        <field name="c_validity" datatype="Int64">
+          <column caption="Трив. (міс.)" align="Right"></column>
+        </field>
+        <field name="deb_intr" datatype="Decimal">
+          <column caption="%% кред." align="Right"></column>
+        </field>
+        <field name="olim_intr" datatype="Decimal">
+          <column caption="%% оверд." align="Right"></column>
+        </field>
+        <field name="cred_intr" datatype="Decimal">
+          <column caption="%% на залишок" align="Right"></column>
+        </field>
+      </fields>
+      <rowselection method="SingleRow"></rowselection>
+    </grid>
+  </grids>
+</xmlform>
+

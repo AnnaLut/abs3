@@ -1,0 +1,256 @@
+﻿@using System.Text
+@using GridMvc.Columns
+@model GridMvc.IGrid
+@{
+  int originalPageSize = Model.Pager.PageSize;
+
+  if (HttpContext.Current.Request.Params["grid-page-size"] != null)
+  {
+    originalPageSize = Convert.ToInt32(HttpContext.Current.Request.Params["grid-page-size"]);
+    //Model.Pager.PageSize = Convert.ToInt32(HttpContext.Current.Request.Params["grid-page-size"]);
+  }
+  Model.Pager.PageSize = originalPageSize ;
+}
+
+
+@if (Model == null) { return; }
+@if (HttpContext.Current.Request.Params["export-type"] != null && HttpContext.Current.Request.Params["export-type"].ToLower() == "xls")
+{
+    Response.ClearContent();
+    Response.ClearHeaders();
+    Response.Clear();
+    Response.BufferOutput = true;
+    Response.AddHeader("content-disposition", "attachment; filename=" + Model.RenderOptions.GridName + ".xls");
+    Response.Charset = "utf-8";
+    Response.ContentEncoding = Encoding.UTF8;
+    Response.ContentType = "application/vnd.ms-excel";
+    <head>
+        <title>File From EA System</title>
+        <meta http-equiv=Content-Type content="text/html; charset=utf-8">
+    </head>
+    <style>
+        td{border:1px solid gray;}
+    </style>
+    <table>
+        @RenderGridHeader()
+        @RenderGridBody(originalPageSize)
+    </table>
+}
+else if (Model.RenderOptions.RenderRowsOnly)
+{
+    @RenderGrid(originalPageSize)
+}
+else
+{
+    <div class="grid-mvc" data-lang="@Model.Language" id="@Model.RenderOptions.GridName" data-gridname="@Model.RenderOptions.GridName" data-selectable="@Model.RenderOptions.Selectable.ToString().ToLower()" data-multiplefilters="@Model.RenderOptions.AllowMultipleFilters.ToString().ToLower()">
+      <div class="grid-wrap">
+        @RenderGrid(originalPageSize)
+      </div>
+      <script type="text/javascript">
+        //extend onRowSelect
+        //для можливості повішати кілька функцій на обробник події
+        if (window['GridMvc']) {
+          GridMvc.prototype.notifyEvent = function (eventName, e) {
+            for (var i = 0; i < this.events.length; i++) {
+              if (this.events[i].name == eventName) {
+                if (!this.events[i].callback(e)) // break; - remove this code
+                  if (eventName != 'onRowSelect') break;
+              }
+            }
+          };
+          GridMvc.prototype.selectedRow = function() {
+            return this.jqContainer.data('selected-row');
+          };
+        }
+
+        $(function () {
+          var grid = $('#@Model.RenderOptions.GridName');
+          grid.gridmvc();
+          initClearFilterButton(grid);
+          //initHoverFilter(grid);
+          pageGrids['@Model.RenderOptions.GridName'].onRowSelect(function (e) { pageGrids['@Model.RenderOptions.GridName'].jqContainer.data('selected-row', e.row); });
+        });
+
+        function initClearFilterButton(grid) {
+          grid.find('thead .filtered').each(function () {
+            var $thisParent = $(this).parent();
+            $thisParent.before('<span title="Очистити фільтр" class="filtered grid-filter-btn-close grid-filter-clear" onclick="ClearFilter(this);"></span>');
+            $thisParent.parent().find('.grid-header-title').css('margin-left', '35px');
+          });
+        }
+
+        function ClearFilter(elem) {
+          var $parent = $(elem).parent();
+          var filter = $parent.find('.grid-filter');
+          pageGrids['@Model.RenderOptions.GridName'].applyFilterValues(filter.data('url') == null ? '' : filter.data('url'), filter.data('name'), "", true);
+        }
+
+        function initHoverFilter(grid) {
+          grid.find('thead tr th div.grid-filter').hover(function () {
+            var $this = $(this);
+            var filter = $this.find('.grid-dropdown');
+            $this.data('ishovered', 'true');
+            var timer = setTimeout(
+              function () {
+                if (!filter.hasClass('opened') && $this.data('ishovered') == 'true') {
+                  $this.find('.grid-filter-btn').click();
+                }
+                clearTimeout(timer);
+              }, 500);
+          }, function (event) {
+            var $this = $(this);
+            $this.data('ishovered', 'false');
+            var filter = $this.find('.grid-dropdown');
+            var timer = setTimeout(
+              function () {
+                //fix для наведення на тег SELECT
+                event = event || window.event;
+                var t = event.target || event.srcElement;
+                if (filter.hasClass('opened') && $this.data('ishovered') == 'false' && t.nodeName != 'SELECT') {
+                  $this.find('.grid-filter-btn').click();
+                }
+                clearTimeout(timer);
+              }, 500);
+          });
+        }
+      </script>
+</div>
+}
+@helper RenderGrid(int pageSize)
+{
+  <table class="table table-striped grid-table">
+    @RenderGridHeader()
+    @RenderGridBody(pageSize)
+    @RenderGridPager(pageSize, Model.Pager.PageSize, Model.Pager.CurrentPage, Model.ItemsToDisplay.Count())
+  </table>
+}
+@helper RenderGridBody(int pageSize)
+{
+  <tbody>
+    @if (!Model.ItemsToDisplay.Any())
+    {
+      <tr class="grid-empty-text">
+        <td colspan="@Model.Columns.Count()">
+          Немає даних для відображення
+        </td>
+      </tr>
+    }
+    else
+    {
+      foreach (object item in Model.ItemsToDisplay)
+      {
+        <tr class="grid-row @Model.GetRowCssClasses(item)">
+          @foreach (IGridColumn column in Model.Columns)
+          {
+            @column.CellRenderer.Render(column, column.GetCell(item))
+          }
+        </tr>
+      }
+    }
+  </tbody>
+}
+@helper RenderGridHeader()
+{
+  <thead>
+    <tr>
+      @foreach (IGridColumn column in Model.Columns)
+      {
+        @Html.Raw(column.HeaderRenderer.Render(column).ToHtmlString().Replace("partial=true", "").Replace("Filter this column","Встановити фільтр по полю"))
+      }
+    </tr>
+  </thead>
+}
+@helper RenderGridPager()
+{
+  if (Model.EnablePaging && Model.Pager != null)
+  {
+    <tfoot>
+      <tr>
+        <td colspan="@Model.Columns.Count()">
+          <div class="grid-footer">
+            @Html.Partial(Model.Pager.TemplateName, Model.Pager)
+          </div>
+        </td>
+      </tr>        
+    </tfoot>
+  }
+}
+@helper RenderGridPager(int pageSize, int selectPageSize, int currentPage, int selectedCount)
+{
+  int[] defaultPagesSize = { 10, 20, 50, 100 };   
+  var gridPager = new GridMvc.Pagination.GridPager();
+ // ViewBag.GridPagerExData = new { pageSize, selectPageSize, curentPage };
+  if (Model.EnablePaging)
+  {
+    <tfoot>
+      <tr>
+        <td colspan="@Model.Columns.Count()">
+          <div class="grid-footer">
+            <div class="grid-pager">
+              <ul class="pagination" style="margin-left: 10px;">
+                <li>
+                  <a class="btn btn-white" data-use="gridrefresh" href="@gridPager.GetLinkForPage(currentPage).Replace("partial=true","")">
+                    <i class="icon-refresh"></i>
+                  </a>
+                </li>
+              </ul>
+              <ul class="pagination" style="margin-left: 10px;">
+                @if (currentPage > 1)
+                {
+                  <li>
+                    <a href="@gridPager.GetLinkForPage(currentPage - 1).Replace("partial=true", "")"><</a>
+                  </li>
+                }
+                <li class="active"><span>@currentPage</span></li>
+                @if (selectedCount>(selectPageSize - 1))
+                {
+                  <li>
+                    <a href="@gridPager.GetLinkForPage(currentPage + 1).Replace("partial=true", "")">></a>
+                  </li>
+                }                
+              </ul>
+              
+              <ul class="pagination" style="padding-left: 10px;">
+                <li>
+                  <select style="position: relative; float: left;" onchange="gridMvcChangePageSize(this);">
+                    @if (!defaultPagesSize.Where(i => i == selectPageSize).Any())
+                    {
+                      <option value="@pageSize">@pageSize</option>
+                    }
+                    @foreach (var item in defaultPagesSize)
+                    {
+                      <option @(item == selectPageSize ? "selected=selected" : "") value="@item">@item</option>
+                    }
+                  </select>
+                </li>
+              </ul>
+              <ul class="pagination" style="margin-left: 40px;">
+                <li>
+                  <a class="btn btn-white" data-use="gridexpexel" href="@Url.RouteUrl(ViewContext.RequestContext.RouteData.Values)@gridPager.GetLinkForPage(currentPage).Replace("partial=true","")&export-type=xls">
+                    <i class="icon-file-type size-16 type-xls" style="display:inline-block;margin-right: 0"></i>
+                    Експорт в Exel
+                  </a>
+                </li>
+              </ul>
+              <script>
+                function gridMvcChangePageSize(elem) {
+                  var $elem = $(elem);
+                  var url = document.location.href;
+                  url = url.replace(/grid-page-size=\d*/, '').replace(/grid-page-size=\d*/, '').replace(/grid-page=\d*/, 'grid-page=1');
+                  if (url.split('?').length > 1) {
+                    url = url + '&grid-page-size=' + $elem.val();
+                  } else {
+                    url = url + '?grid-page-size=' + $elem.val();
+                  }
+                  document.location.href = url;                   
+                }
+              </script>
+              @*@Html.Partial("_GridPagerEx", Model.Pager)*@
+            </div>
+            
+          </div>
+        </td>
+      </tr>        
+    </tfoot>
+  }
+}

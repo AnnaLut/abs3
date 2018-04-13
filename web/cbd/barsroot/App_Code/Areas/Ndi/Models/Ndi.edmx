@@ -1,0 +1,315 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="NdiModel.Store" Provider="Oracle.DataAccess.Client" ProviderManifestToken="11.2" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+        <EntityType Name="META_COLTYPES">
+          <Key>
+            <PropertyRef Name="COLTYPE" />
+          </Key>
+          <Property Name="COLTYPE" Type="char" MaxLength="1" Nullable="false" />
+          <Property Name="TYPENAME" Type="varchar2" MaxLength="15" Nullable="false" />
+        </EntityType>
+        <EntityType Name="META_COLUMNS">
+          <Key>
+            <PropertyRef Name="TABID" />
+            <PropertyRef Name="COLID" />
+          </Key>
+          <Property Name="TABID" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="COLID" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="COLNAME" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="COLTYPE" Type="char" MaxLength="1" Nullable="false" />
+          <Property Name="SEMANTIC" Type="varchar2" MaxLength="80" />
+          <Property Name="SHOWWIDTH" Type="number" Precision="3" Scale="1" />
+          <Property Name="SHOWMAXCHAR" Type="number" Precision="5" Scale="0" />
+          <Property Name="SHOWPOS" Type="number" Precision="3" Scale="0" />
+          <Property Name="SHOWIN_RO" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="SHOWRETVAL" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="INSTNSSEMANTIC" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="EXTRNVAL" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="SHOWREL_CTYPE" Type="char" MaxLength="1" />
+          <Property Name="SHOWFORMAT" Type="varchar2" MaxLength="30" />
+          <Property Name="SHOWIN_FLTR" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="SHOWREF" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="SHOWRESULT" Type="varchar2" MaxLength="254" />
+          <Property Name="CASE_SENSITIVE" Type="number" Precision="1" Scale="0" />
+          <Property Name="NOT_TO_EDIT" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="NOT_TO_SHOW" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="SIMPLE_FILTER" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="FORM_NAME" Type="varchar2" MaxLength="254" />
+        </EntityType>
+        <EntityType Name="META_RELTYPES">
+          <Key>
+            <PropertyRef Name="CODE" />
+          </Key>
+          <Property Name="CODE" Type="char" MaxLength="1" Nullable="false" />
+          <Property Name="NAME" Type="varchar2" MaxLength="35" Nullable="false" />
+        </EntityType>
+        <EntityType Name="META_TABLES">
+          <Key>
+            <PropertyRef Name="TABID" />
+          </Key>
+          <Property Name="TABID" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="TABNAME" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="SEMANTIC" Type="varchar2" MaxLength="80" Nullable="false" />
+          <Property Name="TABRELATION" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="TABLDEL" Type="number" Precision="1" Scale="0" />
+        </EntityType>
+        <Association Name="FK_METACOLUMNS_METACOLTYPES">
+          <End Role="META_COLTYPES" Type="Self.META_COLTYPES" Multiplicity="1" />
+          <End Role="META_COLUMNS" Type="Self.META_COLUMNS" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="META_COLTYPES">
+              <PropertyRef Name="COLTYPE" />
+            </Principal>
+            <Dependent Role="META_COLUMNS">
+              <PropertyRef Name="COLTYPE" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_METACOLUMNS_METARELTYPES">
+          <End Role="META_RELTYPES" Type="Self.META_RELTYPES" Multiplicity="0..1" />
+          <End Role="META_COLUMNS" Type="Self.META_COLUMNS" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="META_RELTYPES">
+              <PropertyRef Name="CODE" />
+            </Principal>
+            <Dependent Role="META_COLUMNS">
+              <PropertyRef Name="SHOWREL_CTYPE" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_METACOLUMNS_METATABLES">
+          <End Role="META_TABLES" Type="Self.META_TABLES" Multiplicity="1" />
+          <End Role="META_COLUMNS" Type="Self.META_COLUMNS" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="META_TABLES">
+              <PropertyRef Name="TABID" />
+            </Principal>
+            <Dependent Role="META_COLUMNS">
+              <PropertyRef Name="TABID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="NdiModelStoreContainer">
+          <EntitySet Name="META_COLTYPES" EntityType="Self.META_COLTYPES" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="META_COLUMNS" EntityType="Self.META_COLUMNS" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="META_RELTYPES" EntityType="Self.META_RELTYPES" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="META_TABLES" EntityType="Self.META_TABLES" Schema="BARS" store:Type="Tables" />
+          <AssociationSet Name="FK_METACOLUMNS_METACOLTYPES" Association="Self.FK_METACOLUMNS_METACOLTYPES">
+            <End Role="META_COLTYPES" EntitySet="META_COLTYPES" />
+            <End Role="META_COLUMNS" EntitySet="META_COLUMNS" />
+          </AssociationSet>
+          <AssociationSet Name="FK_METACOLUMNS_METARELTYPES" Association="Self.FK_METACOLUMNS_METARELTYPES">
+            <End Role="META_RELTYPES" EntitySet="META_RELTYPES" />
+            <End Role="META_COLUMNS" EntitySet="META_COLUMNS" />
+          </AssociationSet>
+          <AssociationSet Name="FK_METACOLUMNS_METATABLES" Association="Self.FK_METACOLUMNS_METATABLES">
+            <End Role="META_TABLES" EntitySet="META_TABLES" />
+            <End Role="META_COLUMNS" EntitySet="META_COLUMNS" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="BarsWeb.Areas.Ndi.Models" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+        <EntityContainer Name="NdiModel" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="META_COLTYPES" EntityType="BarsWeb.Areas.Ndi.Models.META_COLTYPES" />
+          <EntitySet Name="META_COLUMNS" EntityType="BarsWeb.Areas.Ndi.Models.META_COLUMNS" />
+          <EntitySet Name="META_RELTYPES" EntityType="BarsWeb.Areas.Ndi.Models.META_RELTYPES" />
+          <EntitySet Name="META_TABLES" EntityType="BarsWeb.Areas.Ndi.Models.META_TABLES" />
+          <AssociationSet Name="FK_METACOLUMNS_METACOLTYPES" Association="BarsWeb.Areas.Ndi.Models.FK_METACOLUMNS_METACOLTYPES">
+            <End Role="META_COLTYPES" EntitySet="META_COLTYPES" />
+            <End Role="META_COLUMNS" EntitySet="META_COLUMNS" />
+          </AssociationSet>
+          <AssociationSet Name="FK_METACOLUMNS_METARELTYPES" Association="BarsWeb.Areas.Ndi.Models.FK_METACOLUMNS_METARELTYPES">
+            <End Role="META_RELTYPES" EntitySet="META_RELTYPES" />
+            <End Role="META_COLUMNS" EntitySet="META_COLUMNS" />
+          </AssociationSet>
+          <AssociationSet Name="FK_METACOLUMNS_METATABLES" Association="BarsWeb.Areas.Ndi.Models.FK_METACOLUMNS_METATABLES">
+            <End Role="META_TABLES" EntitySet="META_TABLES" />
+            <End Role="META_COLUMNS" EntitySet="META_COLUMNS" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="META_COLTYPES">
+          <Key>
+            <PropertyRef Name="COLTYPE" />
+          </Key>
+          <Property Name="COLTYPE" Type="String" Nullable="false" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="TYPENAME" Type="String" Nullable="false" MaxLength="15" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="META_COLUMNS" Relationship="BarsWeb.Areas.Ndi.Models.FK_METACOLUMNS_METACOLTYPES" FromRole="META_COLTYPES" ToRole="META_COLUMNS" />
+        </EntityType>
+        <EntityType Name="META_COLUMNS">
+          <Key>
+            <PropertyRef Name="TABID" />
+            <PropertyRef Name="COLID" />
+          </Key>
+          <Property Name="TABID" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="COLID" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="COLNAME" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="COLTYPE" Type="String" Nullable="false" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="SEMANTIC" Type="String" MaxLength="80" FixedLength="false" Unicode="false" />
+          <Property Name="SHOWWIDTH" Type="Decimal" Precision="3" Scale="1" />
+          <Property Name="SHOWMAXCHAR" Type="Int32" />
+          <Property Name="SHOWPOS" Type="Int16" />
+          <Property Name="SHOWIN_RO" Type="Int16" Nullable="false" />
+          <Property Name="SHOWRETVAL" Type="Int16" Nullable="false" />
+          <Property Name="INSTNSSEMANTIC" Type="Int16" Nullable="false" />
+          <Property Name="EXTRNVAL" Type="Int16" Nullable="false" />
+          <Property Name="SHOWREL_CTYPE" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="SHOWFORMAT" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="SHOWIN_FLTR" Type="Int16" Nullable="false" />
+          <Property Name="SHOWREF" Type="Int16" Nullable="false" />
+          <Property Name="SHOWRESULT" Type="String" MaxLength="254" FixedLength="false" Unicode="false" />
+          <Property Name="CASE_SENSITIVE" Type="Int16" />
+          <Property Name="NOT_TO_EDIT" Type="Int16" Nullable="false" />
+          <Property Name="NOT_TO_SHOW" Type="Int16" Nullable="false" />
+          <Property Name="SIMPLE_FILTER" Type="Int16" Nullable="false" />
+          <Property Name="FORM_NAME" Type="String" MaxLength="254" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="META_COLTYPES" Relationship="BarsWeb.Areas.Ndi.Models.FK_METACOLUMNS_METACOLTYPES" FromRole="META_COLUMNS" ToRole="META_COLTYPES" />
+          <NavigationProperty Name="META_RELTYPES" Relationship="BarsWeb.Areas.Ndi.Models.FK_METACOLUMNS_METARELTYPES" FromRole="META_COLUMNS" ToRole="META_RELTYPES" />
+          <NavigationProperty Name="META_TABLES" Relationship="BarsWeb.Areas.Ndi.Models.FK_METACOLUMNS_METATABLES" FromRole="META_COLUMNS" ToRole="META_TABLES" />
+        </EntityType>
+        <EntityType Name="META_RELTYPES">
+          <Key>
+            <PropertyRef Name="CODE" />
+          </Key>
+          <Property Name="CODE" Type="String" Nullable="false" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="NAME" Type="String" Nullable="false" MaxLength="35" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="META_COLUMNS" Relationship="BarsWeb.Areas.Ndi.Models.FK_METACOLUMNS_METARELTYPES" FromRole="META_RELTYPES" ToRole="META_COLUMNS" />
+        </EntityType>
+        <EntityType Name="META_TABLES">
+          <Key>
+            <PropertyRef Name="TABID" />
+          </Key>
+          <Property Name="TABID" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="TABNAME" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="SEMANTIC" Type="String" Nullable="false" MaxLength="80" FixedLength="false" Unicode="false" />
+          <Property Name="TABRELATION" Type="Int16" Nullable="false" />
+          <Property Name="TABLDEL" Type="Int16" />
+          <NavigationProperty Name="META_COLUMNS" Relationship="BarsWeb.Areas.Ndi.Models.FK_METACOLUMNS_METATABLES" FromRole="META_TABLES" ToRole="META_COLUMNS" />
+        </EntityType>
+        <Association Name="FK_METACOLUMNS_METACOLTYPES">
+          <End Type="BarsWeb.Areas.Ndi.Models.META_COLTYPES" Role="META_COLTYPES" Multiplicity="1" />
+          <End Type="BarsWeb.Areas.Ndi.Models.META_COLUMNS" Role="META_COLUMNS" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="META_COLTYPES">
+              <PropertyRef Name="COLTYPE" />
+            </Principal>
+            <Dependent Role="META_COLUMNS">
+              <PropertyRef Name="COLTYPE" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_METACOLUMNS_METARELTYPES">
+          <End Type="BarsWeb.Areas.Ndi.Models.META_RELTYPES" Role="META_RELTYPES" Multiplicity="0..1" />
+          <End Type="BarsWeb.Areas.Ndi.Models.META_COLUMNS" Role="META_COLUMNS" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="META_RELTYPES">
+              <PropertyRef Name="CODE" />
+            </Principal>
+            <Dependent Role="META_COLUMNS">
+              <PropertyRef Name="SHOWREL_CTYPE" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_METACOLUMNS_METATABLES">
+          <End Type="BarsWeb.Areas.Ndi.Models.META_TABLES" Role="META_TABLES" Multiplicity="1" />
+          <End Type="BarsWeb.Areas.Ndi.Models.META_COLUMNS" Role="META_COLUMNS" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="META_TABLES">
+              <PropertyRef Name="TABID" />
+            </Principal>
+            <Dependent Role="META_COLUMNS">
+              <PropertyRef Name="TABID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="NdiModelStoreContainer" CdmEntityContainer="NdiModel">
+          <EntitySetMapping Name="META_COLTYPES">
+            <EntityTypeMapping TypeName="BarsWeb.Areas.Ndi.Models.META_COLTYPES">
+              <MappingFragment StoreEntitySet="META_COLTYPES">
+                <ScalarProperty Name="TYPENAME" ColumnName="TYPENAME" />
+                <ScalarProperty Name="COLTYPE" ColumnName="COLTYPE" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="META_COLUMNS">
+            <EntityTypeMapping TypeName="BarsWeb.Areas.Ndi.Models.META_COLUMNS">
+              <MappingFragment StoreEntitySet="META_COLUMNS">
+                <ScalarProperty Name="FORM_NAME" ColumnName="FORM_NAME" />
+                <ScalarProperty Name="SIMPLE_FILTER" ColumnName="SIMPLE_FILTER" />
+                <ScalarProperty Name="NOT_TO_SHOW" ColumnName="NOT_TO_SHOW" />
+                <ScalarProperty Name="NOT_TO_EDIT" ColumnName="NOT_TO_EDIT" />
+                <ScalarProperty Name="CASE_SENSITIVE" ColumnName="CASE_SENSITIVE" />
+                <ScalarProperty Name="SHOWRESULT" ColumnName="SHOWRESULT" />
+                <ScalarProperty Name="SHOWREF" ColumnName="SHOWREF" />
+                <ScalarProperty Name="SHOWIN_FLTR" ColumnName="SHOWIN_FLTR" />
+                <ScalarProperty Name="SHOWFORMAT" ColumnName="SHOWFORMAT" />
+                <ScalarProperty Name="SHOWREL_CTYPE" ColumnName="SHOWREL_CTYPE" />
+                <ScalarProperty Name="EXTRNVAL" ColumnName="EXTRNVAL" />
+                <ScalarProperty Name="INSTNSSEMANTIC" ColumnName="INSTNSSEMANTIC" />
+                <ScalarProperty Name="SHOWRETVAL" ColumnName="SHOWRETVAL" />
+                <ScalarProperty Name="SHOWIN_RO" ColumnName="SHOWIN_RO" />
+                <ScalarProperty Name="SHOWPOS" ColumnName="SHOWPOS" />
+                <ScalarProperty Name="SHOWMAXCHAR" ColumnName="SHOWMAXCHAR" />
+                <ScalarProperty Name="SHOWWIDTH" ColumnName="SHOWWIDTH" />
+                <ScalarProperty Name="SEMANTIC" ColumnName="SEMANTIC" />
+                <ScalarProperty Name="COLTYPE" ColumnName="COLTYPE" />
+                <ScalarProperty Name="COLNAME" ColumnName="COLNAME" />
+                <ScalarProperty Name="COLID" ColumnName="COLID" />
+                <ScalarProperty Name="TABID" ColumnName="TABID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="META_RELTYPES">
+            <EntityTypeMapping TypeName="BarsWeb.Areas.Ndi.Models.META_RELTYPES">
+              <MappingFragment StoreEntitySet="META_RELTYPES">
+                <ScalarProperty Name="NAME" ColumnName="NAME" />
+                <ScalarProperty Name="CODE" ColumnName="CODE" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="META_TABLES">
+            <EntityTypeMapping TypeName="BarsWeb.Areas.Ndi.Models.META_TABLES">
+              <MappingFragment StoreEntitySet="META_TABLES">
+                <ScalarProperty Name="TABLDEL" ColumnName="TABLDEL" />
+                <ScalarProperty Name="TABRELATION" ColumnName="TABRELATION" />
+                <ScalarProperty Name="SEMANTIC" ColumnName="SEMANTIC" />
+                <ScalarProperty Name="TABNAME" ColumnName="TABNAME" />
+                <ScalarProperty Name="TABID" ColumnName="TABID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="True" />
+        <DesignerProperty Name="UseLegacyProvider" Value="true" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Default" />
+        <DesignerProperty Name="ProcessDependentTemplatesOnSave" Value="True" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

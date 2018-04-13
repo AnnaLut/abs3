@@ -1,0 +1,220 @@
+﻿@{
+    Layout = null;
+}
+@using Kendo.Mvc.UI
+@model List<Areas.Admin.Models.V_OPERAPP>
+<style>
+  #listAccess, #listHandbook{
+    width: 210px;
+    min-height: 40px;
+    margin: 0;
+    padding: 0;
+    border-radius: 4px;
+  }
+
+      .list-item {
+        list-style-type: none;
+        margin-top: 5px;
+        width: 300px;
+        line-height: 20px;
+        background-color: #fcfcfc;
+        color: #000;
+        border: 1px solid #cccccc;
+        border-radius: 3px;
+        cursor: default;
+    }
+  /* WIDGETS */
+    .widget {
+        margin: 0 0 20px;
+        padding: 0;
+        background-color: #ffffff;
+        border: 1px solid #cccccc;
+        border-radius: 3px;
+    }
+
+    .widget:hover {
+        background-color: #fcfcfc;
+        border-color: #cccccc;
+    }
+
+    .widget div {
+        padding: 10px;
+        min-height: 50px;
+    }
+
+    .widget h3 {
+        font-size: 12px;
+        padding: 8px 10px;
+      margin: 0;
+        text-transform: uppercase;
+        border-bottom: 1px solid #e7e7e7;
+    }
+
+    .widget h3 span {
+        float: right;
+    }
+
+    .widget h3 span:hover {
+        cursor: pointer;
+        background-color: #e7e7e7;
+        border-radius: 20px;
+    }
+
+
+    .list-wrapper table td {
+      vertical-align: top;
+    }
+    .hint {
+      border-color: aqua;
+    }
+</style>
+<script>
+    function placeholder(element) {
+        return $("<li class='list-item' id='placeholder'>Drop Here!</li>");
+    }
+    function hint(element) {
+        return element.clone().addClass("hint");
+    }
+    function set(element)
+    {
+        var listHandbookLi = $('#listHandbook > li');
+        debugger;
+        for (var i = 0; i < listHandbookLi.length; i++) {
+            var tmp = $(listHandbookLi[i]).find('input:checked');
+            if (tmp.length > 0) {
+                $('#listAccess').prepend('<li class="list-item" data-id="' + tmp[0].defaultValue + '">' + listHandbookLi[i].innerHTML + '</li>');
+                $('#listHandbook > li').remove(":contains('" + listHandbookLi[i].innerText + "')");
+            }
+        }
+    }
+    function get(element)
+    {
+        var listAccessLi = $('#listAccess > li');
+        debugger;
+        for (var i = 0; i < listAccessLi.length; i++)
+        {
+            var tmp = $(listAccessLi[i]).find('input:checked');
+            if (tmp.length > 0)
+            {
+                $('#listHandbook').prepend('<li class="list-item" data-id="' + tmp[0].defaultValue + '">' + listAccessLi[i].innerHTML + '</li>');
+                $('#listAccess > li').remove(":contains('" + listAccessLi[i].innerText + "')");
+            }
+        }
+    }
+</script>
+@*<table>
+      <tr>
+        <td>
+          @(Html.Kendo().Button()
+            .Name("textButton")
+            .HtmlAttributes( new {type = "button", title = "Зберегти"} )
+            .Icon("tick")
+            .Content(""))
+        </td>
+      </tr>
+    </table>*@
+<div class="list-wrapper" >
+    <table style="width: 100%">
+      <tr>
+        <td>
+          <div class="widget">
+            <h3>
+                <table width="100%">
+                    <tr>
+                        <td>
+                            Видані функції
+                        </td>
+                        <td>
+                            <span class="k-textbox k-space-right">
+                                <input ID="SearchSF" type="text" maxlength="14" title="Пошук функції" tabindex="1" />
+                                <input id="btSearchSF" type="hidden" runat="server" />
+                                <a href="#" onclick="return  false;" class="k-icon k-i-search">&nbsp;</a>
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+            </h3>
+            <div style="max-height:350px;overflow: auto;">
+              <ul id="listAccess" class="widget-container" style="min-height: 110px;">
+                @foreach (var item in Model)
+                {
+                  <li class="list-item" data-id="@item.CODEOPER"><input type="checkbox" value="@item.CODEOPER"> @item.CODEOPER @item.OPERNAME</li>
+                }
+              </ul>
+            </div>
+          </div>
+        </td>
+        <td align="center" style="vertical-align:middle">
+          <div id="commandPanel">
+              <table>
+                  <tr>
+                      <td>
+                          @(Html.Kendo().Button()
+                                .Name("textButtonLeft")
+                                .HtmlAttributes(new { type = "button", title = "Додати", onclick = "set(); return false;" })
+                                .Icon("arrowhead-w")
+                                .Content(""))
+                      </td>
+                  </tr>
+                  <tr><td style="height:5px"></td></tr>
+                  <tr>
+                      <td>
+                          @(Html.Kendo().Button()
+                                .Name("textButtonRight")
+                                .HtmlAttributes(new { type = "button", title = "Видалити", onclick = "get(); return false;" })
+                                .Icon("arrowhead-e")
+                                .Content(""))
+                      </td>
+                  </tr>
+              </table>
+          </div>
+        </td>
+        <td>
+          <div class="widget">
+            <h3>
+                <table width="100%">
+                    <tr>
+                        <td>
+                            Доступні функції
+                        </td>
+                        <td>
+                            <span class="k-textbox k-space-right">
+                                <input id="SearchGF" type="text" maxlength="14" title="Пошук функції" tabindex="1" />
+                                <input id="btSearchGF" type="hidden" runat="server" />
+                                <a href="#" onclick="return  false;" class="k-icon k-i-search">&nbsp;</a>
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+              
+            </h3>
+            <div style="max-height:350px;overflow: auto;">
+              <ul id="listHandbook" style="min-height: 110px;">
+                @foreach (var item in ViewBag.handbookGroupsAcc)
+                {
+                  <li class="list-item" data-id="@item.CODEOPER"><input type="checkbox" value="@item.CODEOPER"> @item.CODEOPER @item.NAME</li>
+                }
+              </ul>
+            </div>
+          </div>
+        </td>     
+      </tr>
+    </table>
+  </div>
+
+@(Html.Kendo().Sortable()
+    .For("#listAccess")
+    .ConnectWith("#listHandbook")
+    //.PlaceholderHandler("placeholder")
+    .Cursor("move")
+    .HintHandler("hint")
+)
+
+@(Html.Kendo().Sortable()
+    .For("#listHandbook")
+    .ConnectWith("#listAccess")
+    //.PlaceholderHandler("placeholder")
+    .Cursor("move")
+    .HintHandler("hint")
+    )
+

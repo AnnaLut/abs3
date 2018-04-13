@@ -1,0 +1,278 @@
+﻿@using BarsWeb.HtmlHelpers
+@inherits System.Web.Mvc.WebViewPage
+
+@*<link href="/common/themes/standart/css/jungGridView.css" type="text/css" rel="stylesheet" />
+<script src="/common/jquery/jungGridView.js?v" type="text/javascript"></script>*@
+
+<style>
+    .dialog-button {width: 250px; margin: 0;}
+    .dialog-controls {width: 150px; padding: 0; border-spacing: 0;}
+</style>
+
+<h1>Шаблони договорів</h1>
+<div style="margin:5px 0 5px 0;" class="buttons tiptip">
+    <a href="#" id="btnUpdate" onclick="return false;" title="Оновити дані" class="button hover"><span class="icon icon157"></span></a>
+    
+    <a id="btnPrint"  onclick="print(); return false;" class="button left" title="Друк"><span class="icon icon153"></span><span class="label">Друк</span></a>
+    <a id="btnFilter" onclick="filter();return false;" class="button middle hover" title="Фільтр"><span class="icon icon206"></span><span class="label">Фільтр</span></a>
+</div>
+<div>
+    @*@barsroot.HtmlHelpers.CreateTable(capTableBtn: new string[,] { },
+        columnName: new [,] { { "", "chkId" }, { "Код", "Id" }, { "Назва шаблону", "Name" } },
+        tableId:"tableContracts",
+        tableContent:Html.Action("ContractList", 
+            new { defaultFilter = ViewBag.Filter, multiSelection = true}).ToString())*@
+    
+    @JGridView.Create(new List<JGridView.Column>
+                             {
+                               JGridView.Columns.Add("checkbox","",TypeCode.Boolean),
+                               JGridView.Columns.Add("Код", "a.ID",TypeCode.String),
+                               JGridView.Columns.Add("Назва шаблону", "a.NAME",TypeCode.String)
+                              },
+                      tableId: "tableContracts"/*,
+                      tableContent: Html.Action("ContractList", new { defaultFilter = ViewBag.Filter }).ToString()*/)
+</div>
+
+<div class="jung-grid">
+    <table id="tableSelContracts" class="jungGridView" cellpadding="0" cellspacing="0" style="margin-top: 10px ">
+        <caption style = "text-align: left">Вибрані шаблони</caption>
+        <thead class ="headerRow">
+            <tr>
+                <td></td>
+                <td>Код</td>
+                <td>Назва шаблону</td>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<div id="dialog-filter" title="Фільтр">
+    <form>
+        <select id = "selAttr">
+            <option value="id">Код шаблону</option>
+            <option value="name">Назва шаблону</option>
+        </select>
+        <select id = "selFilter">
+            <option value="=">=</option>
+            <option value="<="><=</option>
+            <option value=">=">>=</option>
+            <option value="<>"><></option>
+            <option value="like">схожий на</option>
+            <option value="not like">не схожий на</option>
+            <option value="in">один з</option>
+            <option value="not in">жоден з</option>
+        </select>
+        <input type="text" id="txtValue"/>
+    </form>
+</div>
+
+<script type="text/javascript">
+    
+    //ID шаблона выбранной строки таблицы
+    var selectedRows = new Array();
+    //ширина первого столбца таблицы, нужна для одинакового отображения по ширине двух таблиц на странице 
+    var firstColWidth;
+
+    $(document).ready(function () {
+        $('.tiptip a.button, .tiptip button').tipTip();
+
+       /*$('#tableContracts').jungGridView({
+            updateTableUrl: '/barsroot/PrintContract/ContractList/',
+            sort: "ID",
+            sortDir: "ASC",
+            userUpdateParamFunc: tableParam,
+            updateTableFunc: function () { refreshTableContracts(); },
+            viewTfoot: true,
+            buttonToUpdateId: 'btnUpdate',
+            trClickFunk: function () { }
+        });*/
+
+                
+        $('#tableContracts').jungGridView({
+            updateTableUrl: '/barsroot/PrintContract/ContractList/',
+            userUpdateParamFunc: tableParam,
+            updateTableFunc: function () { refreshTableContracts(); },
+            viewTfoot: true,
+            viewFilter: true,
+            buttonToUpdateId: 'btnUpdate',
+            trClickFunk: function () { },
+            sort: 'a.ID',
+            sortDir: 'ASC',
+            autoLoad: true
+        });
+
+        firstColWidth = $("#tableContracts tr").find("td:first").width();
+
+        $("#dialog-filter").dialog({
+            autoOpen: false,
+            minHeight: 150,
+            width: 520,
+            modal: true,
+            buttons: {
+                "Застосувати фільтр": function () { applyFilter(); $(this).dialog("close");},
+                "Відмінити фільтр": function () { cancelFilter(); $(this).dialog("close");}
+            },
+            close: function () {
+            }
+        });
+    });
+
+    //печать по выбранным шаблонам
+    function print() {
+        if (selectedRows != null && selectedRows.length>0) {
+            //формируем url с нужными параметрами
+            var url = '@Url.Action("CreateReportFile")';
+            var idArray = @Html.Raw(Json.Encode(ViewBag.Id));
+            //коды договоров
+            var idsUrlParams = "";
+            //коды шаблонов
+            var templatesUrlParams = "";
+            for(var i=0; i<idArray.length; i++){
+                idsUrlParams += "&ids=" + idArray[i].toString();
+            }
+            for(var i=0; i<selectedRows.length; i++){
+                templatesUrlParams += "&templates=" + selectedRows[i];
+            }
+            
+            $('body').loader();
+            //формируем ссылку для вызова метода действия CreateReportFile, который вернет файл для скачивания
+            $.post(url + "?" + idsUrlParams + templatesUrlParams + '&random=' + Math.random(), { }, function (data) {
+                $('body').loader('remove');
+                if (data)
+                {
+                    document.location.href = '@Url.Action("DownloadReportFile")';
+                }
+            });
+        }
+        else {
+            barsUiAlert("Не вибрано документи для друку", "Не вибрано документи", "warning");
+        }
+    };
+
+    function filter() {
+        $( "#dialog-filter" ).dialog( "open" );
+    };
+
+    //пользовательский фильтр
+    var userFilter = "";
+    
+    //применить пользовательский фильтр
+    function applyFilter() {
+        //считываем параметры из полей и формируем строку фильтра
+        var attribute = $("#selAttr :selected").val();
+        var operand = $("#selFilter :selected").val();
+        var value = $("#txtValue").val();
+        userFilter = getFilterString(attribute, operand, value);
+        $('#tableContracts').jungGridView('refresh');
+    };
+    
+    //отменить пользовательский фильтр
+    function cancelFilter() {
+        userFilter = "";
+        $('#tableContracts').jungGridView('refresh');
+    }
+
+    //действия при checked или unchecked строки таблицы
+    function selectRow(chkClicked) {
+        var selectedRow = $(chkClicked).parent().parent();
+
+        var templateId = selectedRow.attr('id');
+        var templateName = selectedRow.attr('name');
+        
+        //если выбрали строку, то добавляем новую строку в таблицу выбранных строк
+        if (chkClicked.checked) {
+            $('#tableSelContracts > tbody:last').append(
+                "<tr id = '"+templateId+"'>" +
+                    "<td width = '"+firstColWidth+"px' align='center'>" +
+                        "<img src='/common/themes/modernui/css/images/close12.gif' "+
+                            "onclick='deleteSelectedRow($(this).parent().parent());'></img></td>" +
+                    "<td>"+templateId+"</td>" +
+                    "<td>"+templateName+"</td>" +
+                "</tr>"
+                );
+            selectedRows.push(templateId);
+        //иначе удаляем строку из выбранных
+        } else {
+            var rowForDel = $("#tableSelContracts tr[id="+templateId+"]");
+            deleteSelectedRow(rowForDel);
+        }
+        
+        $('#tableSelContracts').jungGridView({pageSize:1000000});
+        $('#tableSelContracts .infoRow').remove();
+
+        $('#btnPrint').addClass('hover');
+    }
+    
+    //удалить строку из таблицы выбранных строк и отменить check в основной таблице
+    function deleteSelectedRow(tableRow) {
+        var templateId = tableRow.attr('id');
+        for(var i = 0; i < selectedRows.length; i++){  
+            if(selectedRows[i] == templateId){              
+                selectedRows.splice(i, 1);
+                break;
+            }
+        }
+        tableRow.remove();
+        
+        var rowForUncheck = $("#tableContracts tr[id="+templateId+"]");
+        rowForUncheck.find("input:checkbox").attr('checked', false);
+    }
+
+    //действия при обновлении основной таблицы: проставить check-и, если среди отобранных строк есть выбранные
+    function refreshTableContracts() {
+        var tableRows = $('#tableContracts tbody tr');
+        tableRows.each(function() {
+            var currentTableRow = $(this);
+            for(var i = 0; i < selectedRows.length; i++){
+                if (selectedRows[i] == currentTableRow.attr('id')) {
+                    currentTableRow.find("input:checkbox").attr('checked', true);
+                    break;
+                }
+            }
+        });
+        
+        $('#btnPrint').removeClass('hover');
+    }
+    
+    //параметры для передачи методу действия
+    function tableParam(type, pageNum) {
+        var param = {
+            defaultFilter: @Html.Raw(Json.Encode(ViewBag.Filter)),
+            userFilter: userFilter,
+            multiSelection: true
+        };
+        return param;
+    }
+    
+    //получить строку фильтра по переданным параметрам
+    function getFilterString(attribute, operand, value) {
+        
+        var filter = "";
+        switch (operand) {
+            case "=" :  
+            case "<=" :  
+            case ">=" :  
+            case "<>" : 
+                filter = attribute + operand + "'" + value + "'"; 
+                break;
+            case "like" : 
+            case "not like" : 
+                filter = attribute + " " + operand + " " + "'%" + value + "%'"; 
+                break;
+            case "in" :
+            case "not in" : 
+                var arrValues = value.split(",");
+                var strValues = "";
+                for (var i=0; i<arrValues.length; i++) {
+                    strValues += "'" + arrValues[i] + "'" + ",";
+                }
+                //обрезать последнюю запятую
+                strValues = strValues.slice(0, -1);
+                filter = attribute + " " + operand + "(" + strValues + ")";
+                break;
+        }
+        return filter;
+    }
+</script>

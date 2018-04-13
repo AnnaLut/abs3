@@ -1,0 +1,1075 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Заблоковані документи СЕП";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<style>
+    .k-textbox.small {
+        width: 50px !important;
+    }
+
+    .k-textbox.medium {
+        width: 120px !important;
+    }
+
+    .k-textbox.large {
+        width: 320px !important;
+    }
+
+    .tb_container {
+        width: 100%;
+        padding: .333em 0 .333em .250em;
+        margin-right: 15px;
+    }
+    .tb-col-1 {
+        float: left;
+        width: 40%;
+    }
+    .tb-col-3 {
+        float: left;
+        width: 60%;
+    }
+    .tb_row {
+        width: 100%;
+        height: 30px;
+        margin: 3px;
+    }
+</style>
+
+<div id="SepLockDocsBar"></div>
+<div id="SepLockDocsGrid"></div>
+<div id="SepLockDocsInfo"></div>
+<div id="bpReasonsWindow">
+    <div id="bpReasonsGrid"></div>
+    <div style="margin-top: 4px;text-align: center;">
+        <button id="btnSelectReason" class="k-button k-primary">Обрати</button>
+        <button id="btnCloseReason" class="k-button">Відмінити</button>
+    </div>
+</div>
+
+<div id="bpRulesWindow">
+    <div style="padding: 7px;text-align: center;">
+        <button id="btnAddRules" class="k-button k-primary"><i class="pf-icon pf-16 pf-table_row-add2"></i> Додати</button>
+        <button id="btnDelRules" class="k-button"><i class="pf-icon pf-16 pf-table_row-delete2"></i> Видалити</button>
+        <button id="btnSaveRules" class="k-button"><i class="pf-icon pf-16 pf-save"></i> Зберегти</button>
+    </div>
+    <div id="bpRulesGrid"></div>
+</div>
+
+<div id="bpEditRulesWindow">
+    <div id="bpEditRulesButtonsToolbar"></div>
+    <h4>Номер правила</h4>
+    <input type="number" class='k-textbox medium' style="width: 99% !important;" data-bind="value: RULE" />
+    <h4>Умови блокування</h4>
+    <textarea id="bpEditRulesEditor" style="width: 99%;height: 100px;" data-bind="value: BODY"></textarea>
+    <div id="bpEditRulesLogicToolbar"></div>
+    <h4>Призначення блокування</h4>
+    <input class='k-textbox medium' style="width: 99% !important; margin-bottom: 15px;" data-bind="value: NAME" />
+</div>
+
+<div id="bpInputWindow">
+    <h4>Значення <input id="bpInputEditor" class='k-textbox medium' style="width: 99% !important;" value="" /></h4>
+    <button id="btnInputSave" class="k-button"><i class="pf-icon pf-16 pf-save"></i> Зберегти</button>
+</div>
+
+<div id="bpDomenWindow">
+    <div id="SepDomenGrid"></div>
+    <button id="btnDomenChoose" class="k-button" style="margin: 10px;"><i class="pf-icon pf-16 pf-ok"></i> Обрати</button>
+</div>
+
+
+    <script type="text/x-kendo-template" id="LockDocsTemplate">
+        <table>
+            <tr>
+                <td colspan="2"><b>Відправник:</b> #=nam_a#</td>
+            </tr>
+            <tr>
+                <td><b>МФО: </b>#=mfoa#</td>
+                <td><b>Рахунок: </b>#=nlsa#</td>
+            </tr>
+            <tr>
+                <td colspan="2"><b>Отримувач: </b>#=nam_b#</td>
+            </tr>
+            <tr>
+                <td><b>МФО: </b>#=mfob#</td>
+                <td><b>Рахунок: </b>#=nlsb#</td>
+            </tr>
+            <tr>
+                <td colspan="2"><b>Призначення платежу: </b>#=nazn#</td>
+            </tr>
+        </table>
+    </script>
+
+
+
+    <script>
+
+        function getUrlParameter(param) {
+            var PageURL = window.location.search.substring(1);
+            var URLVariables = PageURL.split('&');
+            for (var i = 0; i < URLVariables.length; i++) {
+                var ParameterName = URLVariables[i].split('=');
+                if (ParameterName[0] == param) {
+                    return ParameterName[1];
+                }
+            }
+        }
+
+        function refreshGrid() {
+            $(".k-pager-refresh").trigger('click');
+        }
+
+        var numberFormat = '#,###.00';
+
+        function showBpRules() {
+            $('#bpRulesWindow').data('kendoWindow').center().open();
+        }
+
+        var isByCodeChecked = false;
+        var currentBpReason = null;
+
+        function removeDoc() {
+            var kGrid = grid.data('kendoGrid');
+            var rows = kGrid.select();
+            if (rows.length == 0)
+                return;
+
+            if (rows.length == 1) {
+                if (isByCodeChecked) {
+                    var row = rows[0];
+                    bars.ui.confirm({
+                        title: "Увага",
+                        text: 'Видалити усі документи СЕП по коду ' + kGrid.dataItem(row).blk + '?'
+                    }, function () {
+                        $.post('@Url.Action("GeSepLockDocsByCodeCount")',
+                            { DefCode: getUrlParameter('DefinedCode'), Code: kGrid.dataItem(row).blk })
+                            .done(function (res) {
+                                if (res.status == 'ok') {
+                                    bars.ui.confirm({
+                                        title: "Увага",
+                                        text: 'Видалити ' + res.Count + ' документа СЕП?'
+                                    }, function () {
+                                        //проверить эцп
+                                        $.post('@Url.Action("DeleteSepLockDocsByCode")',
+                                            { DefCode: getUrlParameter('DefinedCode'), Code: kGrid.dataItem(row).blk })
+                                            .done(function (res) {
+                                                if (res.status != 'ok') {
+                                                    bars.ui.error({ title: 'Помилка!', width: '650', height: '200', text: 'Помилка видалення докуменів!!<br>' + res.message });
+                                                }
+
+                                                kGrid.dataSource.read();
+                                                kGrid.refresh();
+                                            });
+                                    });
+                                } else {
+                                    bars.ui.error({ title: 'Помилка!', text: 'Помилка отримання кількості документів.' });
+                                }
+                            });
+                    });
+                    return;
+                }
+            }
+
+            bars.ui.confirm({ title: "Увага", text: 'Видалити відмічені документи СЕП?' },
+                function () {
+                    var params = {};
+                    var Docs = [];
+
+                    rows.each(function (index, row) {
+                        Docs[index] = kGrid.dataItem(row);
+                        if (Docs[index].s == 0) {
+                            bars.ui.error({ title: 'Помилка!', text: 'Не указана сумма Блокируемых документов СЭП !' });
+                            return false;
+                        }
+                    });
+                    params.Docs = JSON.stringify(Docs);
+
+                    //проверить эцп
+                    $.post('@Url.Action("DeleteSepLockDocs")', params).done(function (res) {
+                        if (res.status != 'ok') {
+                            bars.ui.error({ title: 'Помилка!', width: '650', height: '200', text: 'Помилка видалення докуменів!<br>' + res.message });
+                        }
+                        kGrid.dataSource.read();
+                        kGrid.refresh();
+                    });
+
+                }
+            );
+        }
+
+        function retDocs() {
+            dialogReason.data('kendoWindow').refresh();
+            dialogReason.data('kendoWindow').close();
+
+
+            var kGrid = grid.data('kendoGrid');
+            var rows = kGrid.select();
+            var params = { Reason: currentBpReason };
+            var Docs = [];
+
+            rows.each(function (index, row) {
+                Docs[index] = kGrid.dataItem(row);
+                if (Docs[index].blk == 131313) {
+                    bars.ui.error({ title: 'Помилка!', text: 'Документы с кодом 131313 могут разблокировать только ответственные лица по Фин. Мониторингу!' });
+                    return false;
+                }
+            });
+
+            if (isByCodeChecked) {
+                var row = rows[0];
+                //проверить эцп
+                $.post('@Url.Action("ReturnSepLockDocsByCode")',
+                    { Reason: currentBpReason, DefCode: getUrlParameter('DefinedCode'), Code: kGrid.dataItem(row).blk })
+                    .done(function (res) {
+                        if (res.status != 'ok') {
+                            bars.ui.error({ title: 'Помилка!', width: '650', height: '200', text: 'Помилка повернення докуменів!!<br>' + res.message });
+                        }
+
+                        kGrid.dataSource.read();
+                        kGrid.refresh();
+                    });
+                return;
+            }
+
+            params.Docs = JSON.stringify(Docs);
+
+            //проверить эцп
+            $.post('@Url.Action("ReturnSepLockDocs")', params).done(function (res) {
+                if (res.status != 'ok') {
+                    bars.ui.error({ title: 'Помилка!', width: '650', height: '200', text: 'Помилка повернення докуменів!<br>' + res.message});
+                }
+
+                kGrid.dataSource.read();
+                kGrid.refresh();
+            });
+        }
+
+        function retSepDoc() {
+            var kGrid = grid.data('kendoGrid');
+            var rows = kGrid.select();
+
+            if (kGrid.select().length == 0)
+                return;
+
+            if (rows.length == 1) {
+                if (isByCodeChecked) {
+                    var row = rows[0];
+                    bars.ui.confirm({
+                        title: "Увага",
+                        text: 'Повернути усі документи СЕП по коду ' + kGrid.dataItem(row).blk + '?'
+                    }, function () {
+                        $.post('@Url.Action("GeSepLockDocsByCodeCount")',
+                            { DefCode: getUrlParameter('DefinedCode'), Code: kGrid.dataItem(row).blk })
+                            .done(function (res) {
+                                if (res.status == 'ok') {
+                                    bars.ui.confirm({
+                                        title: "Увага",
+                                        text: 'Повернути ' + res.Count + ' документа СЕП?'
+                                    }, function () {
+                                        $('#bpReasonsWindow').data('kendoWindow').center().open();
+                                    });
+                                } else {
+                                    bars.ui.error({ title: 'Помилка!', text: 'Помилка отримання кількості документів.' });
+                                }
+                            });
+                    });
+                    return;
+                }
+            }
+
+            bars.ui.confirm({ title: "Увага", text: 'Повернути відмічені документи СЕП?' },
+                function () {
+                    $('#bpReasonsWindow').data('kendoWindow').center().open();
+                });
+        }
+
+        function unlockSepDoc() {
+            var kGrid = grid.data('kendoGrid');
+            var rows = kGrid.select();
+            if (rows.length == 0)
+                return;
+
+            if (rows.length == 1) {
+                if (isByCodeChecked) {
+                    var row = rows[0];
+                    bars.ui.confirm({
+                        title: "Увага",
+                        text: 'Розблокувати усі документи СЕП по коду ' + kGrid.dataItem(row).blk + '?'
+                    }, function () {
+                        $.post('@Url.Action("GeSepLockDocsByCodeCount")',
+                            { DefCode: getUrlParameter('DefinedCode'), Code: kGrid.dataItem(row).blk })
+                            .done(function (res) {
+                            if (res.status == 'ok') {
+                                bars.ui.confirm({
+                                    title: "Увага",
+                                    text: 'Розблокувати ' + res.Count + ' документа СЕП?'
+                                }, function () {
+                                    //проверить эцп
+                                    $.post('@Url.Action("UnLockSepLockDocsByCode")',
+                                        { DefCode: getUrlParameter('DefinedCode'), Code: kGrid.dataItem(row).blk })
+                                        .done(function (res) {
+                                        if (res.status != 'ok') {
+                                            bars.ui.error({ title: 'Помилка!', width: '650', height: '200', text: 'Помилка повернення докуменів!!<br>' + res.message });
+                                        }
+
+                                        kGrid.dataSource.read();
+                                        kGrid.refresh();
+                                    });
+                                });
+                            } else {
+                                bars.ui.error({ title: 'Помилка!', text: 'Помилка отримання кількості документів.' });
+                            }
+                        });
+                    });
+                    return;
+                }
+            }
+
+            bars.ui.confirm({ title: "Увага", text: 'Розблокувати відмічені документи СЕП?' },
+                function () {
+                    var params = {};
+                    var Docs = [];
+
+                    rows.each(function (index, row) {
+                        Docs[index] = kGrid.dataItem(row);
+                        if (Docs[index].blk == 131313) {
+                            bars.ui.error({ title: 'Помилка!', text: 'Документы с кодом 131313 могут разблокировать только ответственные лица по Фин. Мониторингу!' });
+                            return false;
+                        }
+                    });
+
+                    params.Docs = JSON.stringify(Docs);
+                    //проверить эцп
+                    $.post('@Url.Action("UnLockSepLockDocs")', params).done(function (res) {
+                        if (res.status != 'ok') {
+                            bars.ui.error({ title: 'Помилка!', width: '650', height: '200', text: 'Помилка повернення докуменів!<br>' + res.message });
+                        }
+
+                        kGrid.dataSource.read();
+                        kGrid.refresh();
+                    });
+                });
+        }
+
+        function acceptDoc() {
+            var kGrid = grid.data('kendoGrid');
+            var rows = kGrid.select();
+            if (rows.length == 0)
+                return;
+
+            if (rows.length == 1) {
+                if (isByCodeChecked) {
+                    var row = rows[0];
+                    bars.ui.confirm({
+                        title: "Увага",
+                        text: 'Прийняти усі документи СЕП по коду ' + kGrid.dataItem(row).blk + '?'
+                    }, function () {
+                        $.post('@Url.Action("GeSepLockDocsByCodeCount")',
+                            { DefCode: getUrlParameter('DefinedCode'), Code: kGrid.dataItem(row).blk })
+                            .done(function (res) {
+                                if (res.status == 'ok') {
+                                    bars.ui.confirm({
+                                        title: "Увага",
+                                        text: 'Прийняти ' + res.Count + ' документа СЕП?'
+                                    }, function () {
+                                        //проверить эцп
+                                        $.post('@Url.Action("AcceptSepLockDocsByCode")',
+                                            { DefCode: getUrlParameter('DefinedCode'), Code: kGrid.dataItem(row).blk })
+                                            .done(function (res) {
+                                                if (res.status != 'ok') {
+                                                    bars.ui.error({ title: 'Помилка!', width: '650', height: '200', text: 'Помилка приймання докуменів!!<br>' + res.message });
+                                                }
+
+                                                kGrid.dataSource.read();
+                                                kGrid.refresh();
+                                            });
+                                    });
+                                } else {
+                                    bars.ui.error({ title: 'Помилка!', text: 'Помилка отримання кількості документів.' });
+                                }
+                            });
+                    });
+                    return;
+                }
+            }
+
+            bars.ui.confirm({ title: "Увага", text: 'Принять отмеченные документы СЭП \"До выяснения\"?' },
+                function () {
+                    var params = {};
+                    var Docs = [];
+
+                    rows.each(function (index, row) {
+                        Docs[index] = kGrid.dataItem(row);
+                        if (Docs[index].blk == 131313) {
+                            bars.ui.error({ title: 'Помилка!', text: 'Документы с кодом 131313 могут разблокировать только ответственные лица по Фин. Мониторингу!' });
+                            return false;
+                        }
+                    });
+                    params.Docs = JSON.stringify(Docs);
+
+                    //проверить эцп
+                    $.post('@Url.Action("AcceptSepLockDocs")', params).done(function (res) {
+                        if (res.status != 'ok') {
+                            bars.ui.error({ title: 'Помилка!', width: '650', height: '200', text: 'Помилка прийняття докуменів!<br>' + res.message });
+                        }
+                        kGrid.dataSource.read();
+                        kGrid.refresh();
+                    });
+
+                }
+            );
+        }
+
+        var _timer = null;
+        function scan() {
+            var speed = 60000;
+            if (_timer != null) {
+                clearTimeout(_timer);
+                _timer = null;
+            } else {
+                _timer = setTimeout(function run() {
+                    grid.data('kendoGrid').refresh();
+                    _timer = setTimeout(run, speed);
+                }, speed);
+            }
+        }
+
+        $('#SepLockDocsBar').kendoToolBar({
+            resizable: true,
+            items: [
+                {
+                    type: 'button', icon: 'pf-icon pf-16 pf-arrow_left', attributes: { 'title': 'Повернути платнику' },
+                    click: retSepDoc,
+                    id: 'btnRetDoc'
+                },
+                {
+                    type: 'button', icon: 'pf-icon pf-16 pf-ok', attributes: { 'title': 'Розблокувати' },
+                    click: unlockSepDoc
+                },
+                {
+                    type: 'button', icon: 'pf-icon pf-16 pf-accept_doc', attributes: { 'title': 'Прийняти до з\'ясування' },
+                    click: acceptDoc,
+                    id: 'btnAcceptDoc'
+                },
+                {
+                    type: 'button', icon: 'pf-icon pf-16 pf-delete', attributes: { 'title': 'Вилучити' },
+                    click: removeDoc,
+                    id: 'deleteDoc'
+                    
+                },
+                { type: "separator" },
+
+                {
+                    template: "<button type='button' class='k-button' onclick='refreshGrid()' title='Перечитати записи в таблиці'><i class='pf-icon pf-16 pf-reload_rotate'></i></button>"
+                },
+
+                {
+                    template: "<button type='button' class='k-button' onclick='openGrid()' title='Відкрити документ в таблиці'><i class='pf-icon pf-16 pf-folder_open'></i></button>"
+                },
+
+
+
+                { type: "separator" },
+                { template: '<label><input id="byCode" type="checkbox" /> По коду</label>'},
+                { template: 
+                    '<div class="tb_container">' +
+                    '    <div class="tb_row">' +
+                    '        <div class="tb-col-1">&nbsp;Ресурс</div>' +
+                    '        <div class="tb-col-3">Док: <input id="tmldocCount" class="k-textbox small" disabled /><input id="tmlGlobalSum" class="k-textbox medium" disabled /></div>' +
+                    '    </div>' +
+                    '    <div class="tb_row">' +
+                    '        <div class="tb-col-1"><input id="tmlResource" class="k-textbox medium" disabled /></div>' +
+                    '        <div class="tb-col-3">Отм: <input id="tmlSelectCount" class="k-textbox small" disabled /><input id="tmlCurrentSum" class="k-textbox medium" disabled /></div>' +
+                    '    </div>' +
+                    '</div>' },
+                { type: 'separator' },
+
+                {
+                    type: 'button', icon: 'pf-icon pf-16 pf-help', attributes: { 'title': 'Редагування правил блокування документів' },
+                    click: showBpRules
+                },
+                {
+                    type: 'button', icon: 'pf-icon pf-16 pf-clock', attributes: { 'title': 'Включити пересканування' },
+                    togglable: true, toggle: scan
+                }
+            ]
+        });
+
+        var grid = $("#SepLockDocsGrid").kendoGrid({
+            columns: [
+                {
+                    field: "blk",
+                    title: "Код блокировки",
+                    width: 90,
+                    headerAttributes: {
+                        style: "white-space: normal;"
+                    }
+                },
+                {
+                    field: "mfoa",
+                    title: "МФО банка Плательщика",
+                    width: 115,
+                    headerAttributes: {
+                        style: "white-space: normal;"
+                    }
+                },
+                {
+                    field: "nlsa",
+                    title: "Счет Плательщика",
+                    width: 115,
+                    headerAttributes: {
+                        style: "white-space: normal;"
+                    }
+                },
+                {
+                    field: "nam_a",
+                    title: "Наименование Плательщика",
+                    width: 110,
+                    headerAttributes: {
+                        style: "white-space: normal;"
+                    }
+                },
+                {
+                    field: "kv",
+                    title: "Код Вал",
+                    width: 45,
+                    headerAttributes: {
+                        style: "white-space: normal;"
+                    }
+                },
+                {
+                    field: "dk",
+                    title: "Дб Кр",
+                    width: 45,
+                    headerAttributes: {
+                        style: "white-space: normal;"
+                    }
+                },
+                {
+                    field: "s",
+                    title: "Сумма",
+                    width: 70,
+                    template: "#=kendo.toString((s / 100), numberFormat)#",
+                    headerAttributes: {
+                        style: "white-space: normal;"
+                    }
+                },
+                {
+                    field: "mfob",
+                    title: "МФО банка Получателя",
+                    width: 85,
+                    headerAttributes: {
+                        style: "white-space: normal;"
+                    }
+                },
+                {
+                    field: "nlsb",
+                    title: "Счет Получателя",
+                    width: 105,
+                    headerAttributes: {
+                        style: "white-space: normal;"
+                    }
+                },
+                {
+                    field: "nam_b",
+                    title: "Наименование Получателя",
+                    width: 105,
+                    headerAttributes: {
+                        style: "white-space: normal;"
+                    }
+                },
+                {
+                    field: "nazn",
+                    title: "Назначение платежа",
+                    width: 135,
+                    headerAttributes: {
+                        style: "white-space: normal;"
+                    },
+                    attributes: {
+                        style: "text-overflow: ellipsis; white-space: nowrap;"
+                    }
+                },
+                {
+                    field: "datd",//datd dat_a
+                    title: "Дата платежного документа",
+                    format: "{0:dd.MM.yyyy}",
+                    width: 120,
+                    headerAttributes: {
+                        style: "white-space: normal;"
+                    }
+                },
+                {
+                    field: "prty",
+                    title: "Признак срочности",
+                    width: 15,
+                    hidden: true,
+                    headerAttributes: {
+                        style: "white-space: normal;"
+                    }
+                }
+            ],
+            filterable: true,
+            columnMenu: true,
+            dataSource: {
+                type: "aspnetmvc-ajax",
+                sort: {
+                    field: "blk",
+                    dir: "asc"
+                },
+                transport: {
+                    read: {
+                        dataType: 'json',
+                        url: bars.config.urlContent('/sep/SepLockDocs/GetSepLockDoc'),
+                        data: { "DefCode": getUrlParameter('DefinedCode') }
+                    }
+                },
+                schema: {
+                    data: "Data",
+                    total: "Total",
+                    errors: "Errors",
+                    model: {
+                        fields: {
+                            s: { type: "number" },
+                            prty: { type: "number" },
+                            datd: { type: "date" }
+                        }
+                    }
+                },
+                pageSize: 10,
+                serverPaging: true,
+                serverFiltering: true,
+                serverSorting: true
+            },
+
+            sortable: { allowUnsort: false },
+            resizable: true,
+            selectable: "multiple row",
+            dataBound: function () {
+                var data = this.dataSource.data();
+                $('#tmldocCount').val(data.length);
+
+                var Sum = 0;
+                for (var i = 0; i < data.length; i++) {
+                    if (data[i].dk == 0 || data[i].dk == 1)
+                        Sum += data[i].s;
+                }
+
+                $('#tmlGlobalSum').val(kendo.toString((Sum / 100), numberFormat));
+            },
+            change: function () {
+                var kgrid = this;
+                var rows = this.select();
+
+                var record = this.dataItem(rows);
+                var div = $("#SepLockDocsInfo");
+                if (record) {
+                    div.show();
+                    var template = kendo.template($("#LockDocsTemplate").html());
+                    div.html(template(record));
+                }
+                else {
+                    div.hide();
+                }
+
+                $('#tmlSelectCount').val(rows.length);
+                var Sum = 0,
+                    hideBtnRet = false,
+                    hideBtnAccept = true,
+                    hideBtnDel = true;
+                rows.each(function (index, row) {
+                    var row_line = kgrid.dataItem(row);
+                    Sum += row_line.s;
+                    if (row_line.mfob == '@ViewBag.MFO') {
+                        hideBtnRet = true;
+                    }
+
+                    if (row_line.dk == 0 || row_line.dk == 1) {
+                        hideBtnAccept = false;
+                    }
+
+                    if (row_line.dk == 2 || row_line.dk == 3) {
+                        hideBtnDel = false;
+                    }
+                });
+                var toolbar = $("#SepLockDocsBar").data("kendoToolBar");
+                if (hideBtnRet) {
+                    toolbar.enable("#btnRetDoc", false);
+                } else {
+                    toolbar.enable("#btnRetDoc");
+                }
+
+                if (hideBtnAccept) {
+                    toolbar.enable("#btnAcceptDoc", false);
+                } else {
+                    toolbar.enable("#btnAcceptDoc");
+                }
+
+                if (hideBtnDel) {
+                    toolbar.enable("#deleteDoc", false);
+                } else {
+                    toolbar.enable("#deleteDoc");
+                }
+
+
+                $('#tmlCurrentSum').val(kendo.toString((Sum / 100), numberFormat));
+            },
+            pageable: {
+                refresh: true,
+                pageSizes: true,
+                buttonCount: 5
+            }
+
+        });
+
+        $('#SepLockDocsGrid').on('dblclick', ' tbody > tr', function () {
+            openGrid();
+        });
+
+        function openGrid() {
+            var grid = $("#SepLockDocsGrid").data("kendoGrid");
+            var item = grid.dataItem(grid.select());
+            if (item != null) {
+                var docUrl = bars.config.urlContent("/documents/item/" + item.Ref + "/");
+                window.location = docUrl;
+            }
+        }
+
+        $('#tmlSelectCount').val('0');
+
+        $.get('@Url.Action("GetSepLockDocResource")').done(function (res) {
+            $('#tmlResource').val(kendo.toString((res.Resource / 100), numberFormat));
+        });
+
+        $('#bpReasonsGrid').kendoGrid({
+            selectable: "single",
+            columns: [
+                {
+                    field: "ID",
+                    title: "Код",
+                    width: 80
+                },
+                {
+                    field: "REASON",
+                    title: "Найменування причини",
+                    width: 250
+                }
+            ],
+            dataSource: {
+                transport: {
+                    read: {
+                        dataType: 'json',
+                        url: bars.config.urlContent('/api/Sep/bpreasons')
+                    }
+                },
+            },
+            change: function () {
+                currentBpReason = this.dataItem(this.select()).REASON;
+                if (currentBpReason) {
+                    btnSelectReason.data('kendoButton').enable(true);
+                }
+            }
+        });
+
+        var dialogReason = $('#bpReasonsWindow').kendoWindow({
+            width: "400px",
+            title: "Оберіть причину повернення документу",
+            modal: true,
+            visible: false
+        });
+
+        var btnSelectReason = $("#btnSelectReason").kendoButton({
+            enable: false,
+            click: retDocs
+        });
+
+        $("#btnCloseReason").kendoButton({
+            click: function () {
+                dialogReason.data('kendoWindow').close();
+            }
+        });
+
+        $('#bpRulesGrid').kendoGrid({
+            height: 300,
+            selectable: "single",
+            columns: [
+                {
+                    field: "FA",
+                    title: "Акт.",
+                    template: '<input type="checkbox" class="checkbox" #= FA == 1 ? "checked=checked" : "" # ></input>',
+                    width: 30
+                },
+                {
+                    field: "RULE",
+                    title: "№ прав.",
+                    width: 30
+                },
+                {
+                    field: "BODY",
+                    title: "Умови блокування",
+                    width: 120,
+                    attributes: {
+                        style: "text-overflow: ellipsis; white-space: nowrap;"
+                    }
+                },
+                {
+                    field: "NAME",
+                    title: "Призначення блокування",
+                    width: 80,
+                    attributes: {
+                        style: "text-overflow: ellipsis; white-space: nowrap;"
+                    }
+                }
+            ],
+            dataSource: {
+                id: 0,
+                type: "webapi",
+                sort: {
+                    field: "RULE",
+                    dir: "asc"
+                },
+                transport: {
+                    read: {
+                        dataType: 'json',
+                        url: bars.config.urlContent('/api/Sep/bprules/')
+                    },
+                    create : {
+                        dataType: 'json',
+                        type: 'POST',
+                        url: bars.config.urlContent('/api/Sep/bprules/')                    
+                    },
+                    update: {
+                        dataType: 'json',
+                        type: 'PUT',
+                        url: bars.config.urlContent('/api/Sep/bprules/')
+                    },
+                    destroy: {
+                        dataType: 'json',
+                        type: 'DELETE',
+                        url: bars.config.urlContent('/api/Sep/bprules/')
+                    }
+                },
+                schema: {
+                    data: "Data",
+                    total: "Total",
+                    errors: "Errors",
+                    model: {
+                        id: "ID",
+                        fields: {
+                            ID: { type: "string" },
+                            FA: { type: "number" },
+                            RULE: { type: "number" },
+                            BODY: { type: "string" },
+                            NAME: { type: "string" }
+                        }
+                    }
+                }
+            }
+
+        });
+
+        $('#bpRulesGrid').on('dblclick', ' tbody > tr', function () {
+            var grid = $("#bpRulesGrid").data("kendoGrid");
+            addedItem = grid.dataItem(grid.select());
+            editMode = true;
+            kendo.bind($('#bpEditRulesWindow'), addedItem);
+            $('#bpEditRulesWindow').data('kendoWindow').center().open();
+        });
+
+        $('#bpRulesGrid').data('kendoGrid').table.on('click', '.checkbox', function () {
+            var checked = this.checked;
+            var row = $(this).closest("tr");
+            var grid = $("#bpRulesGrid").data("kendoGrid");
+            var dataItem = grid.dataItem(row);
+            if (checked) {
+                dataItem.set("FA", 1);
+            } else {
+                dataItem.set("FA", 0);
+            }
+        });
+
+        $('#bpRulesWindow').kendoWindow({
+            width: '700px',
+            title: 'Редагування правил блокування документів',
+            modal: true,
+            visible: false,
+            open: function () {
+                var grid = $('#bpRulesGrid').data('kendoGrid');
+                grid.dataSource.read();
+                grid.refresh();
+            }
+        });
+
+        $('body').on('click', '#byCode', function () {
+            isByCodeChecked = $(this).is(':checked');
+        });
+
+        $('#btnAddRules').click(function () {
+            var grid = $('#bpRulesGrid').data('kendoGrid');
+            addedItem = grid.dataSource.add({ FA: 0, RULE: 0, BODY: '', NAME: '' });
+            kendo.bind($('#bpEditRulesWindow'), addedItem);
+            needRollBack = true;
+            $('#bpEditRulesWindow').data('kendoWindow').center().open();
+        });
+
+        $('#btnDelRules').click(function () {
+            var grid = $("#bpRulesGrid").data('kendoGrid');
+            grid.select().each(function () {
+                grid.removeRow($(this));
+            });
+        });
+
+        $('#btnSaveRules').click(function () {
+            bars.ui.confirm({ title: "Увага", text: 'Змінити "Бізнес-правила" блокування документів СЭП?' },
+                function () {
+                    var grid = $("#bpRulesGrid").data("kendoGrid");
+                    grid.saveChanges();
+                    $('#bpRulesWindow').data('kendoWindow').close();
+                });
+        });
+
+        var needRollBack = false;
+        var editMode = false;
+        var addedItem = {};
+        $('#bpEditRulesWindow').kendoWindow({
+            width: "615px",
+            title: "Редагування правила",
+            modal: true,
+            visible: false,
+            close: function () {
+                var grid = $('#bpRulesGrid').data('kendoGrid');
+                if (editMode) {
+                    editMode = false;
+                } else if (needRollBack) {
+                    grid.dataSource.remove(addedItem);
+                } else {
+                    addedItem.BODY = $('#bpEditRulesEditor').val();
+                    grid.refresh();
+                }
+            }
+        });
+
+        $("#bpEditRulesButtonsToolbar").kendoToolBar({
+            items: [
+                {
+                    type: 'buttonGroup',
+                    buttons: [
+                        {
+                            text: 'Зберегти', icon: 'pf-icon pf-16 pf-ok',
+                            click: function () {
+                                needRollBack = false;
+                                editMode = false;
+                                $('#bpEditRulesWindow').data('kendoWindow').close();
+                            }
+                        },
+                        {
+                            text: "Поле", icon: "pf-icon pf-16 pf-table",
+                            click: function () {
+                                $('#bpDomenWindow').data('kendoWindow').center().open();
+                            }
+                        },
+                        {
+                            text: "Значення", icon: "pf-icon pf-16 pf-help",
+                            click: function () {
+                                $('#bpInputWindow').data('kendoWindow').center().open();
+                            }
+                        }
+                    ]
+                }
+            ]
+        });
+
+        var $rulesEditor = $("#bpEditRulesEditor");
+
+        $("#bpEditRulesLogicToolbar").kendoToolBar({
+            resizable: false,
+            items: [
+                {
+                    type: "buttonGroup",
+                    buttons: [
+                        { text: "И", click: function () { $rulesEditor.val($rulesEditor.val() + ' AND '); } },
+                        { text: "ИЛИ", click: function () { $rulesEditor.val($rulesEditor.val() + ' OR '); } },
+                        { text: "НЕ", click: function () { $rulesEditor.val($rulesEditor.val() + ' NOT '); } }
+                    ]
+                },
+                {
+                    type: "buttonGroup",
+                    buttons: [
+                        { text: "&lt;", click: function () { $rulesEditor.val($rulesEditor.val() + ' < '); } },
+                        { text: "&gt;", click: function () { $rulesEditor.val($rulesEditor.val() + ' > '); } },
+                        { text: "&lt;=", click: function () { $rulesEditor.val($rulesEditor.val() + ' <= '); } },
+                        { text: "&gt;=", click: function () { $rulesEditor.val($rulesEditor.val() + ' >= '); } },
+                        { text: "=", click: function () { $rulesEditor.val($rulesEditor.val() + ' = '); } },
+                        { text: "!=", click: function () { $rulesEditor.val($rulesEditor.val() + ' <> '); } },
+                        { text: "По маске", click: function () { $rulesEditor.val($rulesEditor.val() + ' LIKE '); } }
+                    ]
+                }
+            ]
+        });
+
+        $('#bpInputWindow').kendoWindow({
+            width: "160px",
+            title: "Введіть значення",
+            modal: true,
+            visible: false,
+            open: function () {
+                $('#bpInputEditor').val('');
+            }
+        });
+
+        $('#btnInputSave').click(function () {
+            var $rulesEditor = $("#bpEditRulesEditor");
+            $rulesEditor.val($rulesEditor.val() + ' ' + $('#bpInputEditor').val());
+            $('#bpInputWindow').data('kendoWindow').close();
+        });
+
+        $('#SepDomenGrid').kendoGrid({
+            height: 300,
+            selectable: "single",
+            columns: [
+                {
+                    field: "Atr",
+                    title: "ім'я реквізиту",
+                    width: 30
+                },
+                {
+                    field: "Name",
+                    title: "Опис",
+                    width: 30
+                }
+            ],
+            dataSource: {
+                type: "webapi",
+                transport: {
+                    read: {
+                        dataType: 'json',
+                        url: bars.config.urlContent('/api/Sep/bpdomen/')
+                    }
+                },
+                schema: {
+                    model: {
+                        fields: {
+                            Atr: { type: "string" },
+                            Name: { type: "string" }
+                        }
+                    }
+                }
+            }
+
+        });
+
+        $('#bpDomenWindow').kendoWindow({
+            width: "615px",
+            title: "Оберіть значення",
+            modal: true,
+            visible: false
+        });
+
+        $('#btnDomenChoose').click(function () {
+            var grid = $("#SepDomenGrid").data("kendoGrid");
+            var $rulesEditor = $("#bpEditRulesEditor");
+            $rulesEditor.val($rulesEditor.val() + ' ' + grid.dataItem(grid.select()).Atr);
+            $('#bpDomenWindow').data('kendoWindow').close();
+        });
+    </script>

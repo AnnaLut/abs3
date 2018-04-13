@@ -1,0 +1,302 @@
+﻿@model BarsWeb.Areas.Sep.Models.SepFileDocParams
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = String.Format("Стан платежiв: {0}", Model.FileName);
+
+}
+
+<h2>@ViewBag.Title</h2>
+<div id="sepDocsToolBar"></div>
+<div id="sepDocumentsGrid"></div>
+<script type="text/javascript" src="/barsroot/Scripts/Bars/bars.utils.js"></script>
+<script>
+    @{
+        var fa = "false";
+        if (!String.IsNullOrEmpty(Model.Mode) && Model.Mode.ToUpper() == "RW")
+        {
+            fa = "true";
+        }
+    }
+    var fullAccess = @fa;
+    var accessFlags = "@Model.AccessFlags";
+    var sepDocsGrid = null;
+
+    function getSepDocsGrid() {
+        if (sepDocsGrid == null) {
+            sepDocsGrid = $('#sepDocumentsGrid').data('kendoGrid');
+        }
+        return sepDocsGrid;
+    }
+
+    function sepDocumentsData() {
+        return {
+            accessFlags: accessFlags,
+            mode: fullAccess ? "RW" : "RO",
+            fileName: "@Model.FileName",
+            fileCreated: "@Model.FileCreated",
+            isIncoming: @Model.IsIncoming.ToString().ToLower()
+            }
+    }
+
+    function refreshToolbar() {
+        var grid = getSepDocsGrid();
+        var selection = grid.select();
+        enableButton('pbViewDoc', selection.length == 1);
+    }
+
+
+    function enableButton(buttonId, enabled) {
+        if (typeof(enabled) === 'undefined') {
+            enabled = true;
+        }
+        var $button = $('#' + buttonId);
+        $button.data('kendoButton').enable(enabled);
+        if (enabled) {
+            $button.find('i').removeClass("pf-disabled");
+        } else {
+            $button.find('i').addClass("pf-disabled");
+        }
+    }
+
+
+    function goBack() {
+        window.location = bars.config.urlContent('/Sep/SepPaymentState/Index?isBack=true');
+    }
+
+
+    function openDoc() {
+        var grid = getSepDocsGrid();
+        var record = grid.dataItem(grid.select());
+        var docUrl = bars.config.urlContent("/documents/item/"+ record.REF +"/");
+        window.location = docUrl;
+    }
+
+
+    $(document).ready(function() {
+        $("#sepDocumentsGrid").kendoGrid({
+            columns: [
+            {
+                field: "REF",
+                title: "Document reference",
+                width: "100px",
+                headerAttributes: {
+                    style: "white-space: normal;"
+                }
+            },
+            {
+                field: "ND",
+                title: "Document number",
+                width: "110px"
+            },
+            {
+                field: "MFOA",
+                title: "MFO - A",
+                width: "100px"
+            },
+            {
+                field: "NLSA",
+                title: "Account - A",
+                width: "120px"
+            },
+            {
+                field: "S",
+                title: "Amount",
+                template: "<div style='text-align:right;'>#=(S/100).toFixed(2)#</div>",
+                width: "150px"
+            },
+            {
+                field: "LCV",
+                title: "Curr ency",
+                width: "60px",
+                headerAttributes: {
+                    style: "white-space: normal;"
+                }
+            },
+            {
+                field: "MFOB",
+                title: "MFO - B",
+                width: "80px"
+            },
+            {
+                field: "NLSB",
+                title: "Account - B",
+                width: "120px"
+            },
+            {
+                field: "DK",
+                title: "Db Cr",
+                width: "32px",
+                headerAttributes: {
+                    style: "white-space: normal;"
+                }
+            },
+            {
+                field: "VOB",
+                title: "Type",
+                width: "55px"
+            },
+            {
+                field: "DATP",
+                title: "Document date",
+                width: "80px", //kendo.toString(kendo.parseDate(DATK),'dd.MM.yyyy hh:mm:ss')
+                template: "<div style='text-align:right;'>#=DATP==null ? '' : kendo.toString(kendo.parseDate(DATP),'dd.MM.yyyy')#</div>",
+                headerAttributes: {
+                    style: "white-space: normal;"
+                }
+            },
+            {
+                field: "FN_A",
+                title: "EPS. Inbound filename",
+                width: "120px",
+                headerAttributes: {
+                    style: "white-space: normal;"
+                }
+            },
+            {
+                field: "DAT_A",
+                title: "File date",
+                width: "80px",
+                template: "<div style='text-align:right;'>#=DAT_A == null ? '' :kendo.toString(kendo.parseDate(DAT_A),'dd.MM.yyyy')#</div>"
+            },
+            {
+                field: "REC_A",
+                title: "Record number",
+                width: "70px",
+                template: "<div style='text-align:right;'>#=Rec_A == null ? '' : Rec_A #</div>",
+                headerAttributes: {
+                    style: "white-space: normal;"
+                }
+            },
+            {
+                field: "FN_B",
+                title: "EPS. Outgoing filename",
+                width: "100px",
+                headerAttributes: {
+                    style: "white-space: normal;"
+                }
+            },
+            {
+                field: "DAT_B",
+                title: "File date",
+                width: "80px",
+                template: "<div style='text-align:right;'>#=Dat_B == null ? '' : kendo.toString(Dat_B,'dd.MM.yyyy')#</div>"
+            },
+            {
+                field: "REC_B",
+                title: "Record number",
+                width: "70px",
+                template: "<div style='text-align:right;'>#=Rec_B == null ? '' : Rec_B #</div>",
+                headerAttributes: {
+                    style: "white-space: normal;"
+                }
+            },
+            {
+                field: "NAZN",
+                title: "Transaction layout",
+                width: "700px"
+            },
+            {
+                field: "NAMA",
+                title: "Sender",
+                width: "400px"
+            },
+            {
+                field: "NBA",
+                title: "Sender Bank",
+                width: "400px"
+            },
+            {
+                field: "NAMB",
+                title: "Receiver",
+                width: "400px"
+            },
+            {
+                field: "NBB",
+                title: "Receiver Bank",
+                width: "400px"
+            }
+
+
+            ],
+            dataSource: {
+                type: "aspnetmvc-ajax",               
+                transport: {
+                    read: {
+                        dataType: 'json',
+                        url: bars.config.urlContent('/sep/SepDocuments/GetSepPaymentStateDocs?nn=@Model.nn&kv=@Model.kv'),
+                        data: self.sepFilesData
+                    }
+                },
+                schema: {
+                    data: "Data",
+                    total: "Total",
+                    errors: "Errors",
+                    model: {
+                        fields: {
+                            MfoA: { type: "string" },
+                            MfoB: { type: "string" },
+                            NlsA: { type: "string" },
+                            NlsB: { type: "string" },
+                            S: { type: "number" },
+                            Kv: { type: "number" },
+                            Lcv: { type: "string" },
+                            Dig: { type: "number" },
+                            Dk: {type: "number"},
+                            Vob: {type: "number"},
+                            DatP: {type: "date"},
+                            Rec: {type: "number"},
+                            Fn_A: { type: "string" },
+                            Dat_A: {type: "date"},
+                            Rec_A: {type: "number"},
+                            Fn_B: { type: "string" },
+                            Dat_B: {type: "date"},
+                            Rec_B: {type: "number"},
+                            Ref: {type: "number"},
+                            Sos: {type: "number"},
+                            Nd: { type: "string" },
+                            Nazn: { type: "string" },
+                            NamA: { type: "string" },
+                            NbA: { type: "string" },
+                            NamB: { type: "string" },
+                            NbB: { type: "string" }
+                        }
+                    }
+                },
+                serverPaging: true,
+                serverSorting: true,
+                pageSize: self.initRequest == null ? 10 : self.initRequest.pageSize
+            },
+            filterable: true,
+            sortable: true,
+            resizable: true,
+            selectable: "single",
+            pageable: {
+                refresh: true,
+                pageSizes: true,
+                buttonCount: 5
+            },
+            change: refreshToolbar,
+            dataBound: refreshToolbar
+
+        });
+        $('#sepDocsToolBar').kendoToolBar({
+            items: [
+                {
+                    template: "<button id='pbGoBack' type='button' class='k-button' onclick='goBack()' title='Повернутись до переліку файлів'><i class='pf-icon pf-16 pf-arrow_left'></i> Назад</button>"
+                },
+                {
+                    template: "<button id='pbViewDoc' type='button' class='k-button' onclick='openDoc()' title='Переглянути документ'><i class='pf-icon pf-16 pf-folder_open'></i></button>"
+                }
+            ]
+        });
+
+        $("#pbGoBack").kendoButton();
+        $("#pbViewDoc").kendoButton();
+        $("#pbFilter").kendoButton();
+
+    });
+</script>
+
+<style>
+
+</style>

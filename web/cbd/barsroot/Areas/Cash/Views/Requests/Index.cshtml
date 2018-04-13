@@ -1,0 +1,1537 @@
+﻿@using BarsWeb.Areas.Cash.ViewModels
+@using Kendo.Mvc.UI
+@model List<Mfo>
+
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    bool itIsCenter = ViewBag.ItIsCenter;
+    ViewBag.Region = !itIsCenter;
+}
+<script src="@Url.Content("~/lib/jsZip/jszip.min.js")"></script>
+<h1>Заявки на зміну лімітів</h1>
+
+<div id="tooltip-section">
+    @(Html.Kendo().Tooltip()
+        .For("#grid_Cash")
+         .Filter(".statusField")
+        .ContentHandler("gridCash_getTooltipStatus")
+    )
+
+    @(Html.Kendo().Tooltip()
+        .For("#grid_ATM")
+        .Filter(".statusField")
+        .ContentHandler("gridATM_getTooltipStatus")
+    )
+
+
+</div>
+
+<div id="notify-section">
+    @(Html.Kendo().Notification()
+    .Name("notification")
+    .Position(p => p.Pinned(true).Top(30).Right(30))
+    .Stacking(NotificationStackingSettings.Down)
+    .AutoHideAfter(1000)
+    .Templates(t =>
+    {
+        t.Add().Type("upload-success").ClientTemplateID("successTemplate");
+        t.Add().Type("upload-unsuccess").ClientTemplateID("unsuccessTemplate");
+    })
+    )
+
+    <script id="successTemplate" type="text/x-kendo-template">
+        <div class="upload-success">
+            <img src="/barsroot/content/images/notify/success-icon.png" />
+            <h3>#= message #</h3>
+        </div>
+    </script>
+    <script id="unsuccessTemplate" type="text/x-kendo-template">
+        <div class="upload-unsuccess">
+            <img src="/barsroot/content/images/notify/error-icon.png" />
+            <h3>#= message #</h3>
+        </div>
+    </script>
+
+    @*@(Html.Kendo().Window().Name("Details")
+        .Title("Неуспішно")
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .Width(600)
+        )*@
+</div>
+
+<div id="table">
+    <div id="row">
+        @if (itIsCenter)
+        {
+            <div id="nav">
+                @*Частичное представление добавляет на страницу объект mfoFilter, в котором можно подписаться на событие изменения перечня выбранных МФО*@
+                @{ Html.RenderPartial("MfoFilter", Model); }
+            </div>
+        }
+        <div id="tabStripDiv">
+            @*Панель навигации*@
+            <div id="navigationBar">
+                <div id="navigationScope">
+                    <button id='requestsForProcess' class='k-button nav-button'>Для обробки</button>
+                    <button id='requestsprocessed' class='k-button nav-button'>Оброблені</button>
+                    <button id='requestsAll' class='k-button nav-button'>Усі</button>
+                </div>
+                <br>
+            </div>
+
+            <div id="tabstrip">
+                <ul>
+                    @*<li class="k-state-active">
+                        Каса
+                    </li>*@
+                    <li class="k-state-active">
+                        Банкомати
+                    </li>
+                </ul>
+                @*<div style="padding: 10px">
+                    <div id="toolbarAcc"></div>
+                    <div id="grid_Cash"></div>
+                    @(Html.Kendo().Grid<Request>()
+                        .Name("grid_Cash")
+                        .AutoBind(false)
+                        /*.ToolBar(toolbar =>
+                        {
+                            if (!itIsCenter)
+                            {
+                                toolbar.Create();
+                            }
+                        })*/
+                        .Columns(columns =>
+                        {
+                            columns.Bound(c => c.Branch);
+                            columns.Bound(c => c.PrivateAccount);
+                            columns.Bound(c => c.CurrencyCode);
+                            columns.Bound(c => c.ID);
+                            columns.Bound(c => c.AccountId);
+                            columns.Bound(c => c.CurrentLimit)
+                                .HtmlAttributes(new { @class = "rightField" })
+                                .Format("{0:n}");
+                            columns.Bound(c => c.MaxLimit)
+                                .HtmlAttributes(new { @class = "rightField" })
+                                .Format("{0:n}");
+                            columns.Bound(c => c.RequestDate)
+                                .Format("{0:dd.MM.yyyy hh:mm:ss}");
+                            columns.Bound(c => c.RequestStaffName).Width(100000);
+                            columns.Bound(c => c.RequestStatus)
+                                .ClientTemplate("#= formatRequestStatus(data) #");
+                            columns.Bound(c => c.ApproveDate)
+                                .Format("{0:dd.MM.yyyy hh:mm:ss}");
+                            columns.Bound(c => c.ApproveStaffName);
+                            /*columns.Command(command =>
+                            {
+                                if (itIsCenter)
+                                {
+                                    command.Custom("approveRequest").Text("<span class='k-sprite k-icon k-i-tick'></span> Підтвердити").Click("grid_Cash_approveRequest");
+                                    command.Custom("rejectRequest").Text("<span class='k-sprite k-icon k-i-cancel'></span> Відхилити").Click("grid_Cash_rejectRequest");
+                                }
+                                else
+                                {
+                                    command.Edit();
+                                    command.Destroy();
+                                }
+                            }).Width(250);*/
+                        })
+                        .Editable(editable => editable.Mode(GridEditMode.InLine))
+                        .Resizable(resize => resize.Columns(true))
+                        .Reorderable(reorder => reorder.Columns(true))
+                        .Pageable(pager => pager
+                            .PageSizes(true)
+                            .Refresh(true))
+                        .Sortable().Selectable()
+                        .Filterable(ftb => ftb.Mode(GridFilterMode.Menu))
+                        .Events(e => e.DataBound("grid_Cash_onDataBound"))
+                        .DataSource(dataSource => dataSource
+                            .Ajax()
+                            .Sort(sort => sort.Add(p => p.RequestDate).Descending())
+                            .Model(model =>
+                            {
+                                model.Id(p => p.ID);
+                                model.Field(p => p.ID).Editable(false);
+                                model.Field(p => p.RequestStatus).Editable(false);
+                                model.Field(p => p.RequestDate).Editable(false);
+                                model.Field(p => p.RequestStaffName).Editable(false);
+                                model.Field(p => p.ApproveDate).Editable(false);
+                                model.Field(p => p.ApproveStaffName).Editable(false);
+
+                                model.Field(p => p.Mfo).Editable(false);
+                                model.Field(p => p.Branch).Editable(false);
+                                model.Field(p => p.LimitType).Editable(false);
+                                //  model.Field(p => p.PrivateAccount).Editable(false);
+                            })
+                            .Read(read => read.Action("GetRequests", "Requests").Data("getCashFilter"))
+                            .Create(update => update.Action("CreateRequest", "Requests"))
+                            .Update(read => read.Action("UpdateRequest", "Requests"))
+                            .Destroy(read => read.Action("DeleteRequest", "Requests"))
+                            .Events(e => e.Error("onError"))
+
+                        ))
+                </div>*@
+                <div style="padding: 10px">
+                    <div id="toolbarAtm"></div>
+                    <div id="grid_ATM"></div>
+                    @*@(Html.Kendo().Grid<Request>()
+                        .Name("grid_ATM")
+                        .AutoBind(false)
+                        .ToolBar(toolbar =>
+                        {
+                            if (!itIsCenter)
+                            {
+                                toolbar.Create();
+                            }
+                        })
+                        .Columns(columns =>
+                        {
+                            columns.Bound(c => c.Branch);
+                            columns.Bound(c => c.PrivateAccount);
+                            columns.Bound(c => c.CurrencyCode);
+                            columns.Bound(c => c.ID);
+                            columns.Bound(c => c.AccountId);
+                            columns.Bound(c => c.CurrentLimit)
+                                .HtmlAttributes(new { @class = "rightField" })
+                                .Format("{0:n}")
+                                .Title("Ліміт макс. загрузки");
+                            columns.Bound(c => c.RequestDate)
+                                .Format("{0:dd.MM.yyyy hh:mm:ss}");
+                            columns.Bound(c => c.RequestStaffName);
+                            columns.Bound(c => c.RequestStatus)
+                                .ClientTemplate("#= formatRequestStatus(data) #");
+                            columns.Bound(c => c.ApproveDate)
+                                .Format("{0:dd.MM.yyyy hh:mm:ss}");
+                            columns.Bound(c => c.ApproveStaffName);
+                            columns.Command(command =>
+                            {
+                                if (itIsCenter)
+                                {
+                                    command.Custom("approveRequest").Text("<span class='k-sprite k-icon k-i-tick'></span> Підтвердити").Click   ("grid_ATM_approveRequest");
+                                    command.Custom("rejectRequest").Text("<span class='k-sprite k-icon k-i-cancel'></span> Відхилити").Click("grid_ATM_rejectRequest");
+                                }
+                                else
+                                {
+                                    command.Edit();
+                                    command.Destroy();
+                                }
+                            }).Width(250);
+
+                        })
+                        .Editable(editable => editable.Mode(GridEditMode.InLine))
+                        .Resizable(resize => resize.Columns(true))
+                        .Reorderable(reorder => reorder.Columns(true))
+                        .Pageable(pager => pager
+                            .PageSizes(true)
+                            .Refresh(true))
+                        .Sortable()
+                        .Filterable(ftb => ftb.Mode(GridFilterMode.Menu))
+                        .Events(e => e.DataBound("grid_ATM_onDataBound"))
+                        .DataSource(dataSource => dataSource
+                            .Ajax()
+                            .Sort(sort => sort.Add(p => p.RequestDate).Descending())
+                            .Model(model =>
+                            {
+                                model.Id(p => p.ID);
+                                model.Field(p => p.ID).Editable(false);
+                                model.Field(p => p.RequestStatus).Editable(false);
+                                model.Field(p => p.RequestDate).Editable(false);
+                                model.Field(p => p.RequestStaffName).Editable(false);
+                                model.Field(p => p.ApproveDate).Editable(false);
+                                model.Field(p => p.ApproveStaffName).Editable(false);
+
+                                model.Field(p => p.Mfo).Editable(false);
+                                model.Field(p => p.Branch).Editable(false);
+                                model.Field(p => p.LimitType).Editable(false);
+                                // model.Field(p => p.PrivateAccount).Editable(false);
+                            })
+                            .Read(read => read.Action("GetRequests", "Requests").Data("getAtmFilter"))
+                            .Create(update => update.Action("CreateRequest", "Requests"))
+                            .Update(read => read.Action("UpdateRequest", "Requests"))
+                            .Destroy(read => read.Action("DeleteRequest", "Requests"))
+                            .Events(e => e.Error("onError"))
+
+                        ))*@
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal"><!-- Place at bottom of page --></div>
+
+<script type="text/javascript">
+    var isCenter = @itIsCenter.ToString().ToLower();
+
+    function getDataItem(e, gridId) {
+        var row = e.target.closest("tr");
+        var grid = $("#" + gridId).getKendoGrid();
+        var item = grid.dataItem(row);
+        return item;
+    }
+
+    function gridCash_getTooltipStatus(e) {
+        return getDataItem(e, "grid_Cash").RequestStatusName;
+    }
+
+    function gridATM_getTooltipStatus(e) {
+        return getDataItem(e, "grid_ATM").RequestStatusName;
+    }
+
+
+    function formatRequestStatus(item) {
+        var statusClass;
+        var text;
+        switch (item.RequestStatus) {
+            case "APPROVED":
+                statusClass = "success";
+                text = item.RequestStatusName;
+                break;
+            case "REJECTED":
+                statusClass = "error";
+                text = item.RequestStatusName;
+                break;
+            default:
+                statusClass = "info";
+                text = item.RequestStatusName;
+        }
+        return kendo.format("<div class='k-block k-{0}-colored statusField' >{1}</div>", statusClass, text);
+    }
+
+    $(document).ready(function () {
+
+        $("#tabstrip").kendoTabStrip({});
+        /*$("#toolbarAcc").kendoToolBar({
+            items: [{
+                type: "button",
+                text: '<i class="pf-icon pf-16 pf-add_button"></i>Створити',
+                click: function () {
+                    showCreateAccReqestWindow();
+                }
+            },{
+                type: "button",
+                text: '<i class="pf-icon pf-16 pf-tool_pencil"></i>Редагувати',
+                click: function () {
+                    $scope.showEdit();
+                }
+            },{
+                type: "button",
+                text: '<i class="pf-icon pf-16 pf-delete_button_error"></i>Видалити',
+                click: function () {
+                    $scope.showDelete();
+                }
+            }]
+        });*/
+        if (isCenter) {
+            $("#toolbarAtm").kendoToolBar({
+                resizable: false,
+                items: [{
+                    type: "button",
+                    text: '<i class="pf-icon pf-16 pf-ok"></i> Підтвердити',
+                    click: function () {
+                        approveRequestAtm();
+                    }
+                }, {
+                    type: "button",
+                    text: '<i class="pf-icon pf-16 pf-delete"></i> Відхилити',
+                    click: function () {
+                        rejectRequestAtm();
+                    }
+                }]
+            });
+        } else{
+            $("#toolbarAtm").kendoToolBar({
+                resizable: false,
+                items: [{
+                    type: "button",
+                    text: '<i class="pf-icon pf-16 pf-add_button"></i>Створити',
+                    click: function () {
+                        showCreateAtmReqestWindow();
+                    }
+                }, {
+                    type: "button",
+                    text: '<i class="pf-icon pf-16 pf-tool_pencil"></i>Редагувати',
+                    click: function () {
+                        showEditAtmReqestWindow();
+                    }
+                }, {
+                    type: "button",
+                    text: '<i class="pf-icon pf-16 pf-delete_button_error"></i>Видалити',
+                    click: function () {
+                        showDeleteAtmReqestWindow();
+                    }
+                }]
+            });
+        }
+        $("#grid_Cash").kendoGrid({
+            toolbar: ["excel"],
+            excel: {
+                fileName: "cashRequestsAcc.xlsx",
+                allPages: true,
+                filterable: true,
+                proxyURL: bars.config.urlContent('/cash/requests/ConvertBase64ToFile/')
+            },
+            columns: [
+            {
+                "title": "ID",
+                "field": "ID",
+                "encoded": true,
+                width:70
+            },{
+                "title": "МФО",
+                "field": "Mfo",
+                "encoded": true,
+                width:70
+            },{
+                "title": "Назва РУ",
+                "field": "MfoName",
+                "encoded": true,
+                width:150
+            }, {
+                "title": "Відділення",
+                width: "200px",
+                "field": "Branch",
+                "encoded": true
+            }, {
+                "title": "Рахунок",
+                "field": "PrivateAccount",
+                "encoded": true,
+                width: "120px"
+                //"editor": "\u003cinput class=\"text-box single-line\" id=\"PrivateAccount\" name=\"PrivateAccount\" type=\"text\" value=\"\" /\u003e\u003cspan class=\"field-validation-    valid\" data-valmsg-for=\"PrivateAccount\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e"
+            }, {
+                "title": "Код валюти",
+                "field": "CurrencyCode",
+                "encoded": true,
+                width: "70px"
+                //"editor": "\u003cinput class=\"text-box single-line\" data-val=\"true\" data-val-number=\"The field Код валюти must be a number.\" data-val-required=\"The Код валюти field  is required.\" id=\"CurrencyCode\" name=\"CurrencyCode\" type=\"text\" value=\"0\" /\u003e\u003cspan class=\"field-validation-valid\" data-valmsg-for=\"CurrencyCode\"  data-valmsg-replace=\"true\"\u003e\u003c/span\u003e"
+            }, /*{
+                "title": "ID рахунку",
+                "field": "AccountId",
+                "encoded": true,
+                width: "120px"
+                //"editor": "\u003cinput class=\"text-box single-line\" data-val=\"true\" data-val-number=\"The field ID рахунку must be a number.\" data-val-required=\"The ID рахунку field  is required.\" id=\"AccountId\" name=\"AccountId\" type=\"text\" value=\"0,00\" /\u003e\u003cspan class=\"field-validation-valid\" data-valmsg-for=\"AccountId\" data-  valmsg-replace=\"true\"\u003e\u003c/span\u003e"
+            }, */{
+                "title": "Поточний ліміт",
+                "attributes": { "class": "rightField" },
+                "field": "CurrentLimit",
+                "format": "{0:n}",
+                "encoded": true,
+                width: "120px"
+                //"editor": "\u003cinput class=\"text-box single-line\" data-val=\"true\" data-val-number=\"The field Поточний ліміт must be a number.\" data-val-required=\"The Поточний     ліміт field is required.\" id=\"CurrentLimit\" name=\"CurrentLimit\" type=\"text\" value=\"0,00\" /\u003e\u003cspan class=\"field-validation-valid\" data-valmsg-for=   \"CurrentLimit\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e"
+            }, {
+                "title": "Максимальний ліміт",
+                "attributes": { "class": "rightField" },
+                "field": "MaxLimit",
+                "format": "{0:n}",
+                "encoded": true,
+                width: "120px"
+                //"editor": "\u003cinput class=\"text-box single-line\" data-val=\"true\" data-val-number=\"The field Максимальний ліміт must be a number.\" id=\"MaxLimit\" name=\"MaxLimit  \" type=\"text\" value=\"\" /\u003e\u003cspan class=\"field-validation-valid\" data-valmsg-for=\"MaxLimit\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e"
+            }, {
+                "title": "Дата створуння заявки",
+                "field": "RequestDate",
+                width: "120px",
+                "format": "{0:dd.MM.yyyy hh:mm:ss}",
+                "encoded": true
+            }, {
+                "title": "Запросив",
+                "width": "200px",
+                "field": "RequestStaffName",
+                "encoded": true
+            }, {
+                "title": "Статус заявки",
+                width: "130px",
+                "template": "#= formatRequestStatus(data) #",
+                "field": "RequestStatusName",
+                "encoded": true
+            }, {
+                "title": "Дата обробки заявки",
+                "field": "ApproveDate",
+                width: "120px",
+                "format": "{0:dd.MM.yyyy hh:mm:ss}",
+                "encoded": true
+            }, {
+                "title": "Обробив",
+                width: "200px",
+                "field": "ApproveStaffName",
+                "encoded": true
+            }],
+            "pageable": {
+                "autoBind": false,
+                "refresh": true,
+                "pageSizes": [ 10, 20,50,100,200],
+                "buttonCount": 10
+            },
+            "sortable": true,
+            filterable: true,
+            "resizable": true,
+            "reorderable": true,
+            "scrollable": true,
+            "editable": {
+                "confirmation": "Ви впевнені, що бажаєте видалити даний запис?",
+                "confirmDelete": "Видалити",
+                "cancelDelete": "Скасувати",
+                "mode": "inline",
+                "create": true,
+                "update": true,
+                "destroy": true
+            },
+            "autoBind": false,
+            "dataSource": {
+                "type": "webapi",
+                "transport": {
+                    "read": {
+                        "url": "/barsroot/Cash/Requests/GetRequests/",
+                        "data": getCashFilter
+                    },
+                    "prefix": "",
+                    "update": { "url": "/barsroot/Cash/Requests/UpdateRequest/" },
+                    "create": { "url": "/barsroot/Cash/Requests/CreateRequest/" },
+                    "destroy": { "url": "/barsroot/Cash/Requests/DeleteRequest/" }
+                },
+                "pageSize": 10,
+                "page": 1,
+                "total": 0,
+                "dataBound": grid_Cash_onDataBound,
+                "serverPaging": true,
+                "serverSorting": true,
+                "serverFiltering": true,
+                "serverGrouping": true,
+                "serverAggregates": true,
+                "sort": [{
+                    "field": "RequestDate",
+                    "dir": "desc"
+                }],
+                "filter": [],
+                "error": onError,
+                "schema": {
+                    "data": "Data",
+                    "total": "Total",
+                    "errors": "Errors",
+                    "model": {
+                        "id": "ID",
+                        "fields": {
+                            "ID": {
+                                "editable": false,
+                                "type": "number"
+                            },
+                            "AccountId": {
+                                "type": "number"
+                            },
+                            "CurrentLimit": {
+                                "type": "number"
+                            },
+                            "MaxLimit": {
+                                "type": "number",
+                                "defaultValue": null
+                            },
+                            "RequestDate": {
+                                "editable": false,
+                                "type": "date",
+                                "defaultValue": null
+                            },
+                            "RequestStaffId": {
+                                "type": "number",
+                                "defaultValue": null
+                            },
+                            "RequestStaffName": {
+                                "editable": false,
+                                "type": "string"
+                            },
+                            "RequestStatus": {
+                                "editable": false,
+                                "type": "string"
+                            },
+                            "ApproveDate": {
+                                "editable": false,
+                                "type": "date",
+                                "defaultValue": null
+                            },
+                            "ApproveStaffId": {
+                                "type": "number",
+                                "defaultValue": null
+                            },
+                            "ApproveStaffName": {
+                                "editable": false,
+                                "type": "string"
+                            },
+                            "Branch": {
+                                "editable": false,
+                                "type": "string"
+                            },
+                            "PrivateAccount": {
+                                "type": "string"
+                            },
+                            "CurrencyCode": {
+                                "type": "number"
+                            },
+                            "LimitType": {
+                                "editable": false,
+                                "type": "string"
+                            },
+                            "Mfo": {
+                                "editable": false,
+                                "type": "string"
+                            },
+                            MfoName: {
+                                "editable": false,
+                                "type": "string"
+                            },
+                            "Editable": {
+                                "editable": false,
+                                "type": "boolean"
+                            },
+                            "Deletable": {
+                                "editable": false,
+                                "type": "boolean"
+                            },
+                            "Submitable": {
+                                "editable": false,
+                                "type": "boolean"
+                            },
+                            "RequestStatusName": {
+                                "editable": false,
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        jQuery("#grid_ATM").kendoGrid({
+            toolbar: ["excel"],
+            excel: {
+                fileName: "cashRequestsAtm.xlsx",
+                allPages: true,
+                filterable: true,
+                proxyURL: bars.config.urlContent('/cash/requests/ConvertBase64ToFile/')
+            },
+            "dataBound": grid_ATM_onDataBound,
+            "columns": [{
+                "title": "№",
+                "field": "ID",
+                "encoded": true
+            },{
+                "title": "МФО",
+                "field": "Mfo",
+                "encoded": true,
+                width:70
+            },{
+                "title": "Назва РУ",
+                "field": "MfoName",
+                "encoded": true,
+                width:150
+            }, {
+                "title": "Відділення",
+                "field": "Branch",
+                "encoded": true
+            }, {
+                "title": "Рахунок",
+                "field": "PrivateAccount",
+                "encoded": true
+                //"editor": "\u003cinput class=\"text-box single-line\" id=\"PrivateAccount\" name=\"PrivateAccount\" type=\"text\" value=\"\" /\u003e\u003cspan class=\"field-validation-valid\" data-valmsg-for=\"PrivateAccount\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e"
+            }, {
+                "title": "Код валюти",
+                "field": "CurrencyCode",
+                "encoded": true
+                //"editor": "\u003cinput class=\"text-box single-line\" data-val=\"true\" data-val-number=\"The field Код валюти must be a number.\" data-val-required=\"The Код валюти field is required.\" id=\"CurrencyCode\" name=\"CurrencyCode\" type=\"text\" value=\"0\" /\u003e\u003cspan class=\"field-validation-valid\" data-valmsg-for=\"CurrencyCode\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e"
+            },/* {
+                "title": "ID рахунку",
+                "field": "AccountId",
+                "encoded": true
+                //"editor": "\u003cinput class=\"text-box single-line\" data-val=\"true\" data-val-number=\"The field ID рахунку must be a number.\" data-val-required=\"The ID рахунку field is required.\" id=\"AccountId\" name=\"AccountId\" type=\"text\" value=\"0,00\" /\u003e\u003cspan class=\"field-validation-valid\" data-valmsg-for=\"AccountId\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e"
+            },*/ {
+                "title": "Ліміт макс. загрузки",
+                "attributes": { "class": "rightField" },
+                "field": "MaxLoadLimit",
+                "format": "{0:n}",
+                "encoded": true
+                //"editor": "\u003cinput class=\"text-box single-line\" data-val=\"true\" data-val-number=\"The field Поточний ліміт must be a number.\" data-val-required=\"The Поточний ліміт field is required.\" id=\"CurrentLimit\" name=\"CurrentLimit\" type=\"text\" value=\"0,00\" /\u003e\u003cspan class=\"field-validation-valid\" data-valmsg-for=\"CurrentLimit\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e"
+            }, {
+                "title": "Статус заявки",
+                "template": "#= formatRequestStatus(data) #",
+                "field": "RequestStatusName",
+                "encoded": true
+            }, {
+                "title": "Дата створення заявки",
+                width: "120px",
+                "field": "RequestDate",
+                "attributes": { "class": "text-nowrap" },
+                "format": "{0:dd.MM.yyyy hh:mm}",
+                filterable: {
+                    ui: "datetimepicker",
+                    "format": "{0:dd.MM.yyyy hh:mm}"
+                },
+                "encoded": true
+            },  {
+                "title": "Дата обробки заявки",
+                "field": "ApproveDate",
+                "attributes": { "class": "text-nowrap" },
+                width: "120px",
+                "format": "{0:dd.MM.yyyy hh:mm}",
+                "encoded": true
+            }, {
+                "title": "Запросив",
+                "field": "RequestStaffName",
+                "attributes": { "class": "text-nowrap" },
+                "encoded": true
+            },{
+                "title": "Обробив",
+                "field": "ApproveStaffName",
+                "attributes": { "class": "text-nowrap" },
+                "encoded": true
+            }/*, {
+                "width": "250px",
+                "command": [{
+                    "name": "edit",
+                    "buttonType": "ImageAndText",
+                    "text": "Edit"
+                }, {
+                    "name": "destroy",
+                    "buttonType": "ImageAndText",
+                    "text": "Delete"
+                }]
+            }*/],
+            "pageable": {
+                "autoBind": false,
+                "refresh": true,
+                "pageSizes": [10, 20,50,100,200],
+                "buttonCount": 10
+            },
+            "sortable": true,
+            selectable: "single",
+            "filterable": true,
+            "resizable": true,
+            "reorderable": true,
+            "scrollable": false,
+            /*"editable": {
+                "confirmation": "Are you sure you want to delete this record?",
+                "confirmDelete": "Delete",
+                "cancelDelete": "Cancel",
+                "mode": "inline",
+                "create": true,
+                "update": true,
+                "destroy": true
+            },*/
+            /*"toolbar": {
+                "command": [{
+                    "name": null,
+                    "buttonType": "ImageAndText",
+                    "text": "Add new record"
+                }]
+            },*/
+            "autoBind": false,
+            "dataSource": {
+                "type": 'aspnetmvc-ajax',
+                "transport": {
+                    "read": {
+                        "url": "/barsroot/Cash/Requests/GetRequests",
+                        "data": getAtmFilter
+                    },
+                    "prefix": "",
+                    "update": { "url": "/barsroot/Cash/Requests/UpdateRequest" },
+                    "create": { "url": "/barsroot/Cash/Requests/CreateRequest" },
+                    "destroy": { "url": "/barsroot/Cash/Requests/DeleteRequest" }
+                },
+                "pageSize": 10,
+                "page": 1,
+                "total": 0,
+                "serverPaging": true,
+                "serverSorting": true,
+                "serverFiltering": true,
+                "serverGrouping": true,
+                "serverAggregates": true,
+                "sort": [{
+                    "field": "RequestDate",
+                    "dir": "desc"
+                }],
+                "filter": [],
+                "error": onError,
+                "schema": {
+                    "data": "Data",
+                    "total": "Total",
+                    "errors": "Errors",
+                    "model": {
+                        "id": "ID",
+                        "fields": {
+                            "ID": {
+                                "editable": false,
+                                "type": "number"
+                            },
+                            AtmCode:{
+                                "editable": false,
+                                "type": "string"
+                            },
+                            "AccountId": {
+                                "type": "number"
+                            },
+                            "CurrentLimit": {
+                                "type": "number"
+                            },
+                            "MaxLimit": {
+                                "type": "number",
+                                "defaultValue": null
+                            },
+                            "MaxLoadLimit": {
+                                "type": "number",
+                                "defaultValue": null
+                            },
+                            "RequestDate": {
+                                "editable": false,
+                                "type": "date",
+                                "defaultValue": null
+                            },
+                            "RequestStaffId": {
+                                "type": "number",
+                                "defaultValue": null
+                            },
+                            "RequestStaffName": {
+
+                            },
+                            "RequestStatus": {
+                                "editable": false,
+                                "type": "string"
+                            },
+                            "ApproveDate": {
+                                "editable": false,
+                                "type": "date",
+                                "defaultValue": null
+                            },
+                            "ApproveStaffId": {
+                                "type": "number",
+                                "defaultValue": null
+                            },
+                            "ApproveStaffName": {
+                                "editable": false,
+                                "type": "string"
+                            },
+                            "Branch": {
+                                "editable": false,
+                                "type": "string"
+                            },
+                            "PrivateAccount": {
+                                "type": "string"
+                            },
+                            "CurrencyCode": {
+                                "type": "number"
+                            },
+                            "LimitType": {
+                                "editable": false,
+                                "type": "string"
+                            },
+                            "Mfo": {
+                                "editable": false,
+                                "type": "string"
+                            },
+                            MfoName: {
+                                "editable": false,
+                                "type": "string"
+                            },
+                            "Editable": {
+                                "editable": false,
+                                "type": "boolean"
+                            },
+                            "Deletable": {
+                                "editable": false,
+                                "type": "boolean"
+                            },
+                            "Submitable": {
+                                "editable": false,
+                                "type": "boolean"
+                            },
+                            "RequestStatusName": {
+                                "editable": false,
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        //bars.ui.handBook('clim_accounts', afterAccountSelect);
+
+        //function afterAccountSelect(data) {
+        //   // alert(data[0].Id);
+        //    var result = {}
+        //    result.privateNumber = data[0].Id;
+
+        //    var afterCurrencySelect = function (info) {
+        //     //   alert(info[0].Id);
+        //        result.currency = info[0].Id;
+        //    }
+
+        //    //bars.ui.handBook('clim_currencies', afterCurrencySelect);
+        //    result.currency = 980;
+        //}
+
+
+
+        //alert(selectedAccount.privateNumber + " " + selectedAccount.currency);
+
+
+        $("#requestsForProcess").click(function () {
+            model.setState(this.id, 'NEW', false);
+        });
+
+        $("#requestsprocessed").click(function () {
+            model.setState(this.id, 'NEW', true);
+        });
+
+        $("#requestsAll").click(function () {
+            model.setState(this.id);
+        });
+
+        model.setState("requestsAll");
+
+        // если страница открыта из региона, то фильтра на МФО нет
+        if (window.mfoFilter) {
+            window.mfoFilter.registerObserver(function (filterList) {
+                model.filterList = filterList;
+                model.rereadGrids();
+            });
+        }
+    });
+
+
+    /* Хранит состояние страницы*/
+    var model = {
+        // ассоциативный массив отмеченных МФО (код - true/false)
+        filterList: {},
+        // массив отмеченных МФО
+        getMfoList: function () {
+            var mfos = [];
+            for (key in model.filterList) {
+                if (model.filterList[key] == true) {
+                    mfos.push(key);
+                }
+            }
+            return mfos;
+        },
+        requestStatus: undefined,
+        exceptThisStatus: undefined,
+        currentButtonId: undefined,
+        setState: function (currentButtonId, requestStatus, exceptThisStatus) {
+            this.requestStatus = requestStatus;
+            this.exceptThisStatus = exceptThisStatus;
+            this.currentButtonId = currentButtonId;
+            $(".nav-button").removeClass("k-primary");
+            $("#" + currentButtonId).addClass("k-primary");
+            this.rereadGrids();
+        },
+
+        // перечитать все гриды
+        rereadGrids: function () {
+            this.rereadGrid("grid_Cash");
+            this.rereadGrid("grid_ATM");
+        },
+
+        // перечитать грид
+        rereadGrid: function (gridId) {
+            var curGrid = $("#" + gridId);
+            if (curGrid.length != 0) {
+                curGrid.data("kendoGrid").dataSource.read();
+            }
+        },
+    }
+
+    function getCashFilter() {
+        return {
+            requestStatus: model.requestStatus,
+            exceptThisStatus: model.exceptThisStatus,
+            cashType: "CASH",
+            mfoList: model.getMfoList()
+        }
+    }
+
+    function getAtmFilter() {
+        return {
+            requestStatus: model.requestStatus,
+            exceptThisStatus: model.exceptThisStatus,
+            cashType: "ATM",
+            mfoList: model.getMfoList()
+        }
+    }
+
+    function grid_Cash_onDataBound(e) {
+        lockUnsubmitableRows("grid_Cash");
+    }
+
+    function grid_ATM_onDataBound(e) {
+        lockUnsubmitableRows("grid_ATM");
+    }
+
+    function lockUnsubmitableRows(gridId) {
+        var grid = $("#" + gridId).data("kendoGrid");
+        var gridData = grid.dataSource.view();
+
+        if (isCenter)
+        {
+            for (var i = 0; i < gridData.length; i++) {
+                var currentUid = gridData[i].uid;
+                var currentRow;
+                if (gridData[i].Submitable == false) {
+                    currentRow = grid.table.find("tr[data-uid='" + currentUid + "']");
+                    var submitButton = $(currentRow).find(".k-grid-approveRequest");
+                    submitButton.hide();
+
+                    var discardButton = $(currentRow).find(".k-grid-rejectRequest");
+                    discardButton.hide();
+                }
+            }
+
+        }
+        else
+        {
+            for (var i = 0; i < gridData.length; i++) {
+                var currentUid = gridData[i].uid;
+                var currentRow;
+                if (gridData[i].Editable == false) {
+                    currentRow = grid.table.find("tr[data-uid='" + currentUid + "']");
+                    var editButton = $(currentRow).find(".k-grid-edit");
+                    editButton.hide();
+                }
+                if (gridData[i].Deletable == false) {
+                    currentRow = currentRow || grid.table.find("tr[data-uid='" + currentUid + "']");
+                    var deleteButton = $(currentRow).find(".k-grid-delete");
+                    deleteButton.hide();
+                }
+            }
+        }
+    }
+
+    /*function grid_Cash_approveRequest(e) {
+        approveRequest(e, "grid_Cash", this);
+    }
+
+    function grid_Cash_rejectRequest(e) {
+        rejectRequest(e, "grid_Cash", this);
+    }
+
+    function grid_ATM_approveRequest(e) {
+        approveRequest(e, "grid_ATM", this);
+    }
+
+    function grid_ATM_rejectRequest(e) {
+        rejectRequest(e, "grid_ATM", this);
+    }*/
+    /*function approveRequest(e, gridId, clickedObject) {
+        e.preventDefault();
+        var dataItem = clickedObject.dataItem($(e.currentTarget).closest("tr"));
+
+        $.ajax({
+            type: "POST",
+            url: bars.config.urlContent('/cash/Requests/ApproveRequest/') ,
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({
+                requestId: dataItem.ID,
+                accountId: dataItem.AccountId,
+                currentLimit: dataItem.CurrentLimit,
+                maxLimit: dataItem.MaxLimit,
+            }),
+            dataType: "json",
+            success: function (data) {
+                successFunc(data, gridId);
+            },
+            error: errorFunc
+        });
+    }*/
+    function approveRequestAtm() {
+        var grid = $('#grid_ATM').data('kendoGrid');
+        var selectedRow = grid.dataItem(grid.select());
+        if (!selectedRow) {
+            bars.ui.error({ text: 'Не вибрано рядок для підтвердження.' });
+        } else if (selectedRow.RequestStatus != 'NEW') {
+            bars.ui.error({ text: 'Підтвердити можна лише заявку в статусі "NEW"' });
+        } else {
+            bars.ui.confirm(
+                { text: 'Ви дійсно бажаєте підтвердити заявку № ' + selectedRow.ID },
+                function () {
+                    $.post(bars.config.urlContent('/cash/Requests/ApproveRequest/'), { requestId: selectedRow.ID }, function (data) {
+                        if (data.Status == 'ok') {
+                            bars.ui.notify('Заявка № ' + selectedRow.ID + ' підтверджена', '', 'success');
+                            grid.dataSource.read();
+                        } else {
+                            bars.ui.error({text: data.Message});
+                        }
+                    });
+                }
+            );
+        }
+    }
+    /*function rejectRequest(e, gridId, clickedObject) {
+        e.preventDefault();
+        var dataItem = clickedObject.dataItem($(e.currentTarget).closest("tr"));
+
+        $.ajax({
+            type: "POST",
+            url: bars.config.urlContent('/cash/Requests/RejectRequest/') ,
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({
+                requestId: dataItem.ID,
+                currentLimit: dataItem.CurrentLimit,
+                maxLimit: dataItem.MaxLimit,
+            }),
+            dataType: "json",
+            success: function(data) {
+                successFunc(data, gridId);
+            },
+            error: errorFunc
+        });
+    }*/
+    function rejectRequestAtm() {
+        var grid = $('#grid_ATM').data('kendoGrid');
+        var selectedRow = grid.dataItem(grid.select());
+        if (!selectedRow) {
+            bars.ui.error({ text: 'Не вибрано рядок.' });
+        } else if (selectedRow.RequestStatus != 'NEW') {
+            bars.ui.error({ text: 'Відхилити можна лише заявку в статусі "NEW"' });
+        } else {
+            bars.ui.confirm(
+                { text: 'Ви дійсно бажаєте відхилити заявку № ' + selectedRow.ID },
+                function () {
+                    $.post(bars.config.urlContent('/cash/Requests/RejectRequest/'), { requestId: selectedRow.ID }, function (data) {
+                        if (data.Status == 'ok') {
+                            bars.ui.notify('Заявка № ' + selectedRow.ID + ' відхилена', '', 'success');
+                            grid.dataSource.read();
+                        } else {
+                            bars.ui.error({text: data.Message});
+                        }
+                    });
+                }
+            );
+        }
+
+    }
+
+    function successFunc(data, gridId) {
+        if (data.success == true) {
+            // todo перечитывать только текущую строку
+            $("#" + gridId).data("kendoGrid").dataSource.read();
+            showSuccessNotification(data.message);
+        } else {
+            showModalWindow(data.errorMessage);
+        }
+    }
+
+    function errorFunc() {
+        showModalWindow('<b>Неуспішно</b>');
+    }
+
+    function onError(e) {
+        if (e.status == "customerror") {
+            var exception = e.errors;
+            showModalWindow(exception.message);
+        } else {
+            alert("Generic server error.");
+        }
+    }
+
+    function showModalWindow(content) {
+        bars.ui.error({text:content, width:500 , height:500});
+
+        /*var wnd = $("#Details").data("kendoWindow");
+        wnd.content(content);
+        wnd.center().open();*/
+    }
+
+    function showSuccessNotification(message) {
+        var notification = $("#notification").data("kendoNotification");
+        notification.show({
+            message: message
+        }, "upload-success");
+    }
+
+    function showUnsuccessNotification(message) {
+        var notification = $("#notification").data("kendoNotification");
+        notification.show({
+            message: message
+        }, "upload-unsuccess");
+    }
+
+    function showCreateAccReqestWindow() {
+        bars.ui.dialog({
+            content: {
+                url: bars.config.urlContent('/cash/requests/create/')
+            },
+            iframe: false,
+            width: '450px',
+            height:'250px',
+            buttons: [{
+                text: 'Відмінити',
+                click: function () { this.close(); }
+            },
+            {
+                text: '<span class="k-icon k-i-tick" ></span> Зберегти',
+                click: function () {
+                    var win = this;
+                    CreateReqest(function () { win.close(); });
+                },
+                cssClass: 'k-primary'
+            }]
+        });
+    }
+
+    function showCreateAtmReqestWindow() {
+        bars.ui.dialog({
+            content: {
+                url: bars.config.urlContent('/cash/requests/createAtm/')
+            },
+            iframe: false,
+            width: '450px',
+            height: '250px',
+            buttons: [{
+                text: 'Відмінити',
+                click: function () { this.close(); }
+            },
+            {
+                text: '<span class="k-icon k-i-tick" ></span> Зберегти',
+                click: function () {
+                    var win = this;
+                    CreateRequestAtm(function () { win.close(); });
+                },
+                cssClass: 'k-primary'
+            }]
+        });
+    }
+
+    function showEditAtmReqestWindow() {
+        var grid = $('#grid_ATM').data('kendoGrid');
+        var selectedRow = grid.dataItem(grid.select());
+        if (!selectedRow) {
+            bars.ui.error({ text: 'Не вибрано рядок для редагування.' });
+        } else if (selectedRow.RequestStatus != 'NEW') {
+            bars.ui.error({ text: 'Дозволено редагування заявок тільки в статусі "NEW"' });
+        } else {
+            bars.ui.dialog({
+                content: {
+                    url: bars.config.urlContent('/cash/requests/createAtm/' + selectedRow.ID)
+                },
+                iframe: false,
+                width: '450px',
+                height: '250px',
+                buttons: [{
+                    text: 'Відмінити',
+                    click: function () { this.close(); }
+                },
+                {
+                    text: '<span class="k-icon k-i-tick" ></span> Зберегти',
+                    click: function () {
+                        var win = this;
+                        EditRequestAtm(function () { win.close(); });
+                    },
+                    cssClass: 'k-primary'
+                }]
+            });
+        }
+    }
+
+    function showDeleteAtmReqestWindow() {
+        var grid = $('#grid_ATM').data('kendoGrid');
+        var selectedRow = grid.dataItem(grid.select());
+        if (!selectedRow) {
+            bars.ui.error({ text: 'Не вибрано рядок для видалення.' });
+        } else if (selectedRow.RequestStatus != 'NEW') {
+            bars.ui.error({ text: 'Дозволено видаляти заявки тільки в статусі "NEW"' });
+        } else {
+            bars.ui.confirm(
+                { text: 'Ви дійсно бажаєте видалити заявку № ' + selectedRow.ID },
+                function () {
+                    $.post(bars.config.urlContent('/cash/requests/DeleteRequest/'), { requestId: selectedRow.ID }, function (data) {
+                        if (data.Status == 'ok') {
+                            bars.ui.notify('Заявка № ' + selectedRow.ID + ' видалена', '', 'success');
+                            grid.dataSource.read();
+                        } else {
+                            bars.ui.error({text: data.Message});
+                        }
+                    });
+                }
+            );
+        }
+    }
+
+    function showAtmHandBook() {
+        bars.ui.handBook("V_CLIM_ATM_LIMIT", function (data) {
+            if (data.length > 0) {
+                $('#atmRequestForm #AtmCode').val(data[0].COD_ATM);
+                $('#atmRequestForm #AccountId').val(data[0].ACC_ID);
+                $('#atmRequestForm #AccountNumber').val(data[0].ACC_NUMBER);
+                $('#atmRequestForm #CurrencyCode').val(data[0].ACC_CURRENCY);
+            } else {
+
+            }
+        }, {
+            modal: false
+            //columns: "KV,LCV,NAME"
+        });
+    }
+
+    function showCurrencyHandBook() {
+        bars.ui.handBook("TABVAL", function (data) {
+            if (data.length > 0) {
+                $('#CurrencyCode').val(data[0].KV);
+            } else {
+                $('#CurrencyCode').val('');
+            }
+        }, {
+            modal: false,
+            columns: "KV,LCV,NAME"
+        });
+    }
+    function showAccountsHandBook() {
+        bars.ui.handBook("CLIM_ACCOUNTS", function (data) {
+            if (data.length > 0) {
+                $('#PrivateAccount').val(data[0].ACC_NUMBER);
+                $('#PrivateAccountId').val(data[0].ACC_ID);
+                $('#CurrencyCode').val(data[0].ACC_CURRENCY);
+            } else {
+                $('#PrivateAccount').val('');
+            }
+        }, {
+            clause: ($('#CurrencyCode').val() == '' ? '1=1' : "acc_currency=" + $('#CurrencyCode').val()),
+            //columns:'ACC_NUMBER,ACC_',
+            modal: false
+        });
+    }
+    function CreateRequestAtm(func) {
+        var request = {};
+        var form = $('#atmRequestForm');
+
+        request.AtmCode = form.find('#AtmCode').val();
+        request.AccountId = $('#AccountId').val();
+        request.MaxLoadLimit = $('#MaxLoadLimit').val();
+        //request.CurrentLimit = $('#CurrentLimit').val();
+
+        var validate = validateAtmRequest(request);
+        if (validate.status == 'ok') {
+            $.post(bars.config.urlContent('/cash/requests/createAtm/'), request, function (data) {
+                if (data.Status && data.Status == 'ok') {
+                    bars.ui.loader('#advertisingWindow', false);
+                    bars.ui.notify('Заявку створено. № ' + data.Data.ID, '', 'success');
+                    var grid = $('#grid_ATM').data('kendoGrid');
+                    grid.dataSource.read();
+                    //grid.refresh();
+                    if (func) {
+                        func.call();
+                    }
+
+                } else {
+                    bars.ui.error({ text: data.Message });
+                }
+
+            });
+        } else {
+            bars.ui.error({text:validate.message});
+        }
+    }
+
+    function EditRequestAtm(func) {
+        var request = {};
+        var form = $('#atmRequestForm');
+
+        request.Id = $('#Id').val();
+        request.MaxLoadLimit = $('#MaxLoadLimit').val();
+        if (request.MaxLoadLimit == '') {
+            bars.ui.error({ text: 'Не заповнено поле Ліміт максимального завантаження' });
+        } else {
+            $.post(bars.config.urlContent('/cash/requests/UpdateAtm/'), request, function (data) {
+                if (data.Status && data.Status == 'ok') {
+                    bars.ui.loader('#advertisingWindow', false);
+                    bars.ui.notify('Заявку № ' + request.Id + ' оновлено', '', 'success');
+                    var grid = $('#grid_ATM').data('kendoGrid');
+                    grid.dataSource.read();
+                    //grid.refresh();
+                    if (func) {
+                        func.call();
+                    }
+                } else {
+                    bars.ui.error({ text: data.Message });
+                }
+
+            });
+        }
+    }
+
+    function validateAtmRequest(request) {
+        var result = {
+            status : 'ok',
+            message:''
+        }
+        if (request.AtmCode == '') {
+            result.status = 'error';
+            result.message += 'Не заповнено поле Код банкомату<br>';
+        }
+        if (request.MaxLoadLimit == '') {
+            result.status = 'error';
+            result.message += 'Не заповнено поле Ліміт максимального завантаження<br>';
+        }
+        /*if (request.CurrentLimit == '') {
+            result.status = 'error';
+            result.message += 'Не заповнено поле Поточний ліміт<br>';
+        }*/
+        return result;
+    }
+    function CreateReqest(func) {
+        var request = {};
+        request.CurrencyCode = $('#CurrencyCode').val();
+        request.PrivateAccount = $('#PrivateAccount').val();
+        request.accountId = $('#PrivateAccountId').val();
+        request.CurrentLimit = $('#CurrentLimit').val();
+        request.MaxLimit = $('#MaxLimit').val();
+
+        var valid = validateNewRequest(request);
+
+        if (valid.status == 'ok') {
+            $.post(bars.config.urlContent('/cash/requests/create/'), request, function(data) {
+                if (data.Errors && data.Errors != null) {
+                    bars.ui.error({ text: data.Errors.message });
+                } else {
+                    bars.ui.loader('#advertisingWindow', false);
+                    bars.ui.notify('Заявку створено. № ' + data.ID, '', 'success');
+                    var grid = $('#grid_Cash').data('kendoGrid');
+                    grid.dataSource.read();
+                    grid.refresh();
+                    if (func) {
+                        func.call();
+                    }
+                }
+
+            });
+        } else {
+            bars.ui.error({text:valid.message});
+        }
+
+    }
+    function validateNewRequest(request) {
+        var result = {
+            status: 'ok',
+            message: ''
+        }
+        if (request.CurrencyCode == '') {
+            result.status = 'error';
+            result.message += 'Не заповнено поле Валюта<br>';
+        }
+        if (request.PrivateAccount == '') {
+            result.status = 'error';
+            result.message += 'Не заповнено поле Рахунок<br>';
+        }
+        if (request.CurrentLimit == '') {
+            result.status = 'error';
+            result.message += 'Не заповнено поле Поточний ліміт<br>';
+        }
+        if (request.MaxLimit == '') {
+            result.status = 'error';
+            result.message += 'Не заповнено поле Максимальний ліміт<br>';
+        }
+
+        return result;
+    }
+</script>
+
+<style>
+    /*body {
+        font-size: 1.15em;
+    }*/
+
+    #table {
+        display: table;
+    }
+
+    #row {
+        display: table-row;
+    }
+
+    #nav {
+        padding: 5px;
+        display: table-cell;
+    }
+
+    #tabStripDiv {
+        padding: 5px;
+        display: table-cell;
+    }
+
+    .k-notification {
+        border: 0;
+    }
+
+    /* Success template */
+    .k-notification-upload-success.k-group {
+        background: #009900;
+        background: rgba(0,60%,0,.7);
+        color: #fff;
+    }
+
+    /*.k-notification-upload-success.k-group {
+                        background: rgba(0%,0%,0%,.7);
+                        color: #fff;
+                    }*/
+
+    .upload-success {
+        width: 300px;
+        height: 100px;
+        padding: 0 30px;
+        line-height: 100px;
+    }
+
+        .upload-success h3 {
+            font-size: 1.3em;
+            font-weight: normal;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .upload-success img {
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+
+
+    /* error template */
+    .k-notification-upload-unsuccess.k-group {
+        background: #ff0000;
+        background: rgba(100%,0,0,.7);
+        color: #ffffff;
+    }
+
+    /*.k-notification-upload-unsuccess.k-group {
+                            background: rgba(0%,0%,0%,.7);
+                            color: #fff;
+                        }*/
+
+    .upload-unsuccess {
+        width: 300px;
+        height: 100px;
+        padding: 0 30px;
+        line-height: 100px;
+    }
+
+        .upload-unsuccess h3 {
+            font-size: 1.3em;
+            font-weight: normal;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .upload-unsuccess img {
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+
+    .rightField {
+        text-align: right;
+    }
+
+    .statusField {
+        text-align: center;
+    }
+
+    .k-grid .k-pager-info.k-label {
+        padding: 0 2px 0 5px;
+    }
+</style>
