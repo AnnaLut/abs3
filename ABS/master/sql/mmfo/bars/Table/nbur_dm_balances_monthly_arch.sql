@@ -23,8 +23,11 @@ begin
 end;
 /
 
+declare
+  e_tab_exists exception;
+  pragma exception_init( e_tab_exists, -00955 );
 begin
-  execute immediate q'[CREATE TABLE BARS.NBUR_DM_BALANCES_MONTHLY_ARCH
+  execute immediate q'[create table NBUR_DM_BALANCES_MONTHLY_ARCH
 ( REPORT_DATE     DATE       CONSTRAINT CC_DMBALSMONTHARCH_REPORTDT_NN NOT NULL
 , KF              CHAR(6)    CONSTRAINT CC_DMBALSMONTHARCH_KF_NN       NOT NULL
 , VERSION_ID      NUMBER(38) CONSTRAINT CC_DMBALSMONTHARCH_VERSION_NN  NOT NULL
@@ -86,20 +89,74 @@ SUBPARTITION TEMPLATE
 , SUBPARTITION SP_354507 VALUES ('354507')
 , SUBPARTITION SP_356334 VALUES ('356334') )
 ( PARTITION P_MINVALUE VALUES LESS THAN ( TO_DATE('01/01/2016','DD/MM/YYYY') ) )]';
-  
+
   dbms_output.put_line('table "NBUR_DM_BALANCES_MONTHLY_ARCH" created.');
-  
+
 exception
-  when OTHERS then
-    if ( sqlcode = -00955 )
-    then dbms_output.put_line( 'Table "NBUR_DM_BALANCES_MONTHLY_ARCH" already exists.' );
-    else raise;
-    end if;  
+  when e_tab_exists
+  then dbms_output.put_line( 'Table "NBUR_DM_BALANCES_MONTHLY_ARCH" already exists.' );
 end;
 /
 
 prompt -- ======================================================
-prompt -- Create index
+prompt -- Alters
+prompt -- ======================================================
+
+declare
+  e_col_exists           exception;
+  pragma exception_init( e_col_exists, -01430 );
+begin
+  execute immediate q'[alter table NBUR_DM_BALANCES_MONTHLY_ARCH add YR_DOS number(24)]';
+  -- When adding a column on compressed tables, do not specify a default value.
+  execute immediate q'[alter table NBUR_DM_BALANCES_MONTHLY_ARCH modify YR_DOS default 0 ]';
+  dbms_output.put_line( 'Table altered.' );
+exception
+  when e_col_exists
+  then null;
+end;
+/
+
+declare
+  e_col_exists           exception;
+  pragma exception_init( e_col_exists, -01430 );
+begin
+  execute immediate q'[alter table NBUR_DM_BALANCES_MONTHLY_ARCH add YR_DOS_UAH number(24)]';
+  execute immediate q'[alter table NBUR_DM_BALANCES_MONTHLY_ARCH modify YR_DOS_UAH default 0 ]';
+  dbms_output.put_line( 'Table altered.' );
+exception
+  when e_col_exists
+  then null;
+end;
+/
+
+declare
+  e_col_exists           exception;
+  pragma exception_init( e_col_exists, -01430 );
+begin
+  execute immediate q'[alter table NBUR_DM_BALANCES_MONTHLY_ARCH add YR_KOS number(24)]';
+  execute immediate q'[alter table NBUR_DM_BALANCES_MONTHLY_ARCH modify YR_KOS default 0 ]';
+  dbms_output.put_line( 'Table altered.' );
+exception
+  when e_col_exists
+  then null;
+end;
+/
+
+declare
+  e_col_exists           exception;
+  pragma exception_init( e_col_exists, -01430 );
+begin
+  execute immediate q'[alter table NBUR_DM_BALANCES_MONTHLY_ARCH add YR_KOS_UAH number(24)]';
+  execute immediate q'[alter table NBUR_DM_BALANCES_MONTHLY_ARCH modify YR_KOS_UAH default 0 ]';
+  dbms_output.put_line( 'Table altered.' );
+exception
+  when e_col_exists
+  then null;
+end;
+/
+
+prompt -- ======================================================
+prompt -- Indexes
 prompt -- ======================================================
 
 begin
@@ -132,44 +189,41 @@ end;
 commit;
 
 prompt -- ======================================================
-prompt -- Table comments
+prompt -- Comments
 prompt -- ======================================================
 
-COMMENT ON TABLE  BARS.NBUR_DM_BALANCES_MONTHLY_ARCH             IS 'Щомісячні знімки балансу РУ на звітну дату  (архів версій)';
+COMMENT ON TABLE  NBUR_DM_BALANCES_MONTHLY_ARCH             IS 'Щомісячні знімки балансу РУ на звітну дату  (архів версій)';
 
-COMMENT ON COLUMN BARS.NBUR_DM_BALANCES_MONTHLY_ARCH.REPORT_DATE IS 'Звітна дата';
-COMMENT ON COLUMN BARS.NBUR_DM_BALANCES_MONTHLY_ARCH.KF          IS 'Код фiлiалу (МФО)';
-COMMENT ON COLUMN BARS.NBUR_DM_BALANCES_MONTHLY_ARCH.VERSION_ID  IS 'Iдентифiкатор версії';
-COMMENT ON COLUMN BARS.NBUR_DM_BALANCES_MONTHLY_ARCH.ACC_ID      IS 'Iдентифiкатор рахунку (ACC)';
-COMMENT ON COLUMN BARS.NBUR_DM_BALANCES_MONTHLY_ARCH.CUST_ID     IS 'Iдентифiкатор контрагента (RNK)';
-COMMENT ON COLUMN BARS.NBUR_DM_BALANCES_MONTHLY_ARCH.DOS         IS 'Оборот дебет, номiнал';
-COMMENT ON COLUMN BARS.NBUR_DM_BALANCES_MONTHLY_ARCH.KOS         IS 'Оборот кредит, номiнал';
-COMMENT ON COLUMN BARS.NBUR_DM_BALANCES_MONTHLY_ARCH.OST         IS 'Вихiдний залишок, номiнал';
-COMMENT ON COLUMN BARS.NBUR_DM_BALANCES_MONTHLY_ARCH.DOSQ        IS 'Оборот дебет, еквiвалент';
-COMMENT ON COLUMN BARS.NBUR_DM_BALANCES_MONTHLY_ARCH.KOSQ        IS 'Оборот кредит, еквiвалент';
-COMMENT ON COLUMN BARS.NBUR_DM_BALANCES_MONTHLY_ARCH.OSTQ        IS 'Вихiдний залишок, еквiвалент';
-COMMENT ON COLUMN BARS.NBUR_DM_BALANCES_MONTHLY_ARCH.CRDOS       IS 'Коригуючі обороти дебет, номiнал';
-COMMENT ON COLUMN BARS.NBUR_DM_BALANCES_MONTHLY_ARCH.CRKOS       IS 'Коригуючі обороти кредит, номiнал';
-COMMENT ON COLUMN BARS.NBUR_DM_BALANCES_MONTHLY_ARCH.CRDOSQ      IS 'Коригуючі обороти дебет, еквiвалент';
-COMMENT ON COLUMN BARS.NBUR_DM_BALANCES_MONTHLY_ARCH.CRKOSQ      IS 'Коригуючі обороти кредит, еквiвалент';
-COMMENT ON COLUMN BARS.NBUR_DM_BALANCES_MONTHLY_ARCH.CUDOS       IS 'Коригуючі обороти попереднього перiоду дебет (номiнал)';
-COMMENT ON COLUMN BARS.NBUR_DM_BALANCES_MONTHLY_ARCH.CUKOS       IS 'Коригуючі обороти попереднього перiоду кредит (номiнал)';
-COMMENT ON COLUMN BARS.NBUR_DM_BALANCES_MONTHLY_ARCH.CUDOSQ      IS 'Коригуючі обороти попереднього перiоду дебет  (гривневий еквiвалент)';
-COMMENT ON COLUMN BARS.NBUR_DM_BALANCES_MONTHLY_ARCH.CUKOSQ      IS 'Коригуючі обороти попереднього перiоду кредит (гривневий еквiвалент)';
-COMMENT ON COLUMN BARS.NBUR_DM_BALANCES_MONTHLY_ARCH.YR_DOS      IS 'YR_ADJ_AMNT_DB     - Сума річних виправних Дт. оборотів (номiнал)';
-COMMENT ON COLUMN BARS.NBUR_DM_BALANCES_MONTHLY_ARCH.YR_DOS_UAH  IS 'YR_ADJ_AMNT_DB_UAH - Сума річних виправних Дт. оборотів (гривневий еквiвалент)';
-COMMENT ON COLUMN BARS.NBUR_DM_BALANCES_MONTHLY_ARCH.YR_KOS      IS 'YR_ADJ_AMNT_CR     - Сума річних виправних Кт. оборотів (номiнал)';
-COMMENT ON COLUMN BARS.NBUR_DM_BALANCES_MONTHLY_ARCH.YR_KOS_UAH  IS 'YR_ADJ_AMNT_CR_UAH - Сума річних виправних Кт. оборотів (гривневий еквiвалент)';
-COMMENT ON COLUMN BARS.NBUR_DM_BALANCES_MONTHLY_ARCH.ADJ_BAL     IS 'Вихiдний залишок з урахуванням кориг. оборотів (номінал)';
-COMMENT ON COLUMN BARS.NBUR_DM_BALANCES_MONTHLY_ARCH.ADJ_BAL_UAH IS 'Вихiдний залишок з урахуванням кориг. оборотів (гривневий еквiвалент)';
-
-prompt -- ======================================================
-prompt -- Table grants
-prompt -- ======================================================
-
-GRANT SELECT ON BARS.NBUR_DM_BALANCES_MONTHLY_ARCH TO BARSUPL;
-GRANT SELECT ON BARS.NBUR_DM_BALANCES_MONTHLY_ARCH TO BARS_ACCESS_DEFROLE;
+COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY_ARCH.REPORT_DATE IS 'Звітна дата';
+COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY_ARCH.KF          IS 'Код фiлiалу (МФО)';
+COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY_ARCH.VERSION_ID  IS 'Iдентифiкатор версії';
+COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY_ARCH.ACC_ID      IS 'Iдентифiкатор рахунку (ACC)';
+COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY_ARCH.CUST_ID     IS 'Iдентифiкатор контрагента (RNK)';
+COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY_ARCH.DOS         IS 'Оборот дебет, номiнал';
+COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY_ARCH.KOS         IS 'Оборот кредит, номiнал';
+COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY_ARCH.OST         IS 'Вихiдний залишок, номiнал';
+COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY_ARCH.DOSQ        IS 'Оборот дебет, еквiвалент';
+COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY_ARCH.KOSQ        IS 'Оборот кредит, еквiвалент';
+COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY_ARCH.OSTQ        IS 'Вихiдний залишок, еквiвалент';
+COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY_ARCH.CRDOS       IS 'Коригуючі обороти дебет, номiнал';
+COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY_ARCH.CRKOS       IS 'Коригуючі обороти кредит, номiнал';
+COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY_ARCH.CRDOSQ      IS 'Коригуючі обороти дебет, еквiвалент';
+COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY_ARCH.CRKOSQ      IS 'Коригуючі обороти кредит, еквiвалент';
+COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY_ARCH.CUDOS       IS 'Коригуючі обороти попереднього перiоду дебет (номiнал)';
+COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY_ARCH.CUKOS       IS 'Коригуючі обороти попереднього перiоду кредит (номiнал)';
+COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY_ARCH.CUDOSQ      IS 'Коригуючі обороти попереднього перiоду дебет  (гривневий еквiвалент)';
+COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY_ARCH.CUKOSQ      IS 'Коригуючі обороти попереднього перiоду кредит (гривневий еквiвалент)';
+COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY_ARCH.YR_DOS      IS 'YR_ADJ_AMNT_DB     - Сума Дт. річних коригуючих оборотів (номiнал)';
+COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY_ARCH.YR_DOS_UAH  IS 'YR_ADJ_AMNT_DB_UAH - Сума Дт. річних коригуючих оборотів (гривневий еквiвалент)';
+COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY_ARCH.YR_KOS      IS 'YR_ADJ_AMNT_CR     - Сума Кт. річних коригуючих оборотів (номiнал)';
+COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY_ARCH.YR_KOS_UAH  IS 'YR_ADJ_AMNT_CR_UAH - Сума Кт. річних коригуючих оборотів (гривневий еквiвалент)';
+COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY_ARCH.ADJ_BAL     IS 'Вихiдний залишок з урахуванням кориг. оборотів (номінал)';
+COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY_ARCH.ADJ_BAL_UAH IS 'Вихiдний залишок з урахуванням кориг. оборотів (гривневий еквiвалент)';
 
 prompt -- ======================================================
-prompt -- FINISH
+prompt -- Grants
 prompt -- ======================================================
+
+grant SELECT on NBUR_DM_BALANCES_MONTHLY_ARCH to BARSUPL;
+grant SELECT on NBUR_DM_BALANCES_MONTHLY_ARCH to BARS_ACCESS_DEFROLE;
+grant SELECT on NBUR_DM_BALANCES_MONTHLY_ARCH to BARSREADER_ROLE;
