@@ -1,0 +1,56 @@
+﻿form ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+    form ul li input {
+        width: 200px !important;
+        margin-right: 3px;
+    }
+
+        form ul li input[type=radio] {
+            width: 10px !important;
+        }
+
+    form ul li .k-dropdown-wrap,
+    form ul li .k-picker-wrap,
+    form ul li .k-numeric-wrap {
+        width: 176px !important;
+        margin-right: 32px;
+    }
+
+    form ul li.long-combo .k-dropdown-wrap {
+        width: 400px !important;
+    }
+
+    form ul li textarea {
+        width: 400px !important;
+        margin-top: 3px;
+    }
+
+    form ul li label {
+        display: inline-block;
+        padding-right: 4px;
+        width: 300px;
+    }
+
+#sbonProvaiderId-list {
+    width: 300px !important;
+}
+
+.required-star {
+    color: red;
+}
+
+#custSearchForm td {
+    padding-top: 3px;
+}
+
+hr {
+    color: #555; /*для IE */
+    background-color: #555; /*для Firefox, Opera, Safari*/
+    border: 0px none;
+    height: 1px; /* высота 1px IE, Firefox, Opera, Safari */
+    clear: both; /* для очистки, если тег идет после float елемента */
+}

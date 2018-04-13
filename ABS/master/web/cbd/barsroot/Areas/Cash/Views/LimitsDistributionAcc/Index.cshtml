@@ -1,0 +1,40 @@
+﻿@{
+    ViewBag.Title = "";
+}
+
+@Scripts.Render("~/bundles/Cash/scripts/LimitsDistributionAccCtrl")
+<style>
+    [kendo-grid="limitsGrid"] table tbody tr td{
+        padding-top: .2em;
+        padding-bottom: .2em;
+    }
+    .red {
+        color: #d14;
+    }
+</style>
+
+<div data-ng-controller="Cash.LimitsDistributionAcc">
+    <h1 ng-bind="Title"></h1>
+    <div data-kendo-toolbar="" k-options="toolbarFilterOptions"></div>  
+    
+    <h3>Ліміти на відділення</h3>
+    <div kendo-grid="limitsGrid" data-options="limitsGridOptions"></div>
+
+    <h3>Розподіл лімітів</h3>
+    <div data-kendo-toolbar="" k-options="toolbarOptions"></div>  
+    <div data-kendo-grid="limDistGrid" data-options="limDistGridOptions"></div>
+    
+    <div data-kendo-window="historyWindow" data-options="historyWindowOptions">
+        <h2 ng-bind="historyWindowTitle"></h2>
+        <div data-kendo-grid="historyGrid" data-options="historyGridOptions"></div>
+    </div>
+    
+    @*<div class="box-col" style="width: 340px">
+        <h2>Upload files</h2>
+        <input name="files"
+               type="file"
+               k-options="uploadOptions"
+               kendo-upload />
+    </div>*@
+
+</div>

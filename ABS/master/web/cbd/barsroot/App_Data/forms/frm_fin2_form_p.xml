@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<xmlform captiontype="OnlyTitle" caption="Динаміка інтегрованих показників боржника" version="1.0">
+  <grids>
+    <grid id="tb1" title="Динаміка інтегрованих показників боржника" pagesize="25" showpagesizebox="true">
+      <datasource>
+        <sql>
+          select r.okpo, r.kod, k.name, fin_nbu.ZN_P(r.kod, 6, add_months(trunc(fdat),-9), okpo) s1, add_months(trunc(fdat),-9) dat1,
+          fin_nbu.ZN_P(r.kod, 6, add_months(trunc(fdat),-6), okpo) s2, add_months(trunc(fdat),-6) dat2,
+          fin_nbu.ZN_P(r.kod, 6, add_months(trunc(fdat),-3), okpo) s3,  add_months(trunc(fdat),-3) dat3,
+          s s4, fdat,:dat as dat
+          from fin_rnk r, fin_kod k
+          where   okpo = :okpo  and
+          r.idf in (5,6,8,9)
+          and r.idf = k.idf and r.kod = k.kod 
+          --and fdat = (select max(fdat) from fin_fm where okpo = r.okpo)
+          and fdat = to_date(:dat,'dd/mm/yyyy')
+          order by r.idf, k.ord
+        </sql>
+        <parameters>
+          <parameter name="okpo" datatype="Int64" type="QueryString"></parameter> 
+          <parameter name="dat"  datatype="String" type="QueryString"></parameter> 
+        </parameters>
+      </datasource>
+      <fields>
+        <field name="OKPO" datatype="String" key="false">
+          <column caption="OKPO" show="true"></column> 
+        </field> 
+        
+         <field name="KOD" datatype="String" key="true">
+          <column caption="KOD" show="true"></column> 
+        </field>
+
+        <field name="NAME"  datatype="String" key="false">
+          <column caption="Назва показника" show="true"></column>
+        </field>
+
+  
+         <field name="S1" datatype="String" key="false">
+          <column caption="Значення показника" show="true"></column> 
+        </field> 
+
+         <field name="DAT1" datatype="DateTime" key="false">
+          <column caption="Звітна дата" show="true"></column> 
+        </field>
+
+        <field name="S2" datatype="String" key="false">
+          <column caption="Значення показника" show="true"></column>
+        </field>
+
+        <field name="DAT2" datatype="DateTime" key="false">
+          <column caption="Звітна дата" show="true"></column>
+        </field>
+
+        <field name="S3" datatype="String" key="false">
+          <column caption="Значення показника" show="true"></column>
+        </field>
+
+        <field name="DAT3" datatype="DateTime" key="false">
+          <column caption="Звітна дата" show="true"></column>
+        </field>
+
+        <field name="S4" datatype="String" key="false">
+          <column caption="Значення показника" show="true"></column>
+        </field>
+
+        <field name="FDAT" datatype="DateTime" key="false">
+          <column caption="Звітна дата" show="true"></column>
+        </field>
+
+
+      </fields>
+      
+    </grid>
+  </grids>
+</xmlform>

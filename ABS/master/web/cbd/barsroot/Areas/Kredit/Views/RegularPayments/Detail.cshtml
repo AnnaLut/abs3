@@ -1,0 +1,30 @@
+﻿@inherits System.Web.Mvc.WebViewPage<Areas.Admin.Models.APPLIST>
+@{
+
+}
+@using Kendo.Mvc.UI
+@using System.Web.Mvc.Html
+<div id="forecast">
+  @(Html.Kendo().TabStrip()
+          .Name("tabstrip")
+          .Animation(false)
+          .Items(tabstrip =>
+          {
+            tabstrip.Add().Text("Функції")
+              .Selected(true)
+              .Content(Html.Action("Function","Modules", new {codeapp = Model.CODEAPP}).ToHtmlString());
+
+            tabstrip.Add().Text("Довідники")
+              .Selected(false)
+              .Content(Html.Action("References","Modules").ToHtmlString());
+
+            tabstrip.Add().Text("Друковані звіти")
+              .Selected(false)
+              .Content(Html.Action("PrintDocs","Modules").ToHtmlString());
+
+            tabstrip.Add().Text("Користувачі")
+              .Selected(false)
+              .Content(Html.Action("Users","Modules").ToHtmlString());
+          })
+)
+</div>

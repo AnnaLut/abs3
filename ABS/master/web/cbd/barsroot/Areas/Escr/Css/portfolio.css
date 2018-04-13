@@ -1,0 +1,82 @@
+﻿.form-control {
+    padding: 0px 0px;
+}
+
+.k-window-content.k-content button {
+    float: right;
+}
+
+.k-state-selected {
+    color: #fff !important;
+    background-color: #428bca !important;
+    border-color: #428bca !important;
+}
+
+.k-widget.k-window {
+    transform: scale(1) !important;
+}
+
+.group-btn .km-buttongroup {
+    margin: .5em auto;
+    border-color: transparent;
+}
+
+    .group-btn .km-buttongroup :first-child {
+        border-radius: 6px 0 0 6px;
+    }
+
+    .group-btn .km-buttongroup :last-child {
+        border-radius: 0 6px 6px 0;
+    }
+
+    .group-btn .km-buttongroup :not(:first-child):not(:last-child) {
+        border-radius: 0;
+    }
+
+    .group-btn .km-buttongroup .km-button {
+        display: table-cell;
+    }
+
+.group-btn .km-button {
+    text-align: center;
+}
+
+.group-btn .km-widget.km-buttongroup .km-button.km-state-active {
+    border-width: 1px 1px 1px 1px;
+    border-color: #bfbfbf;
+    background-color: #eee;
+    margin: 0;
+    padding: .48em .9em .44em;
+    color: #454545;
+}
+
+.group-btn .km-widget.km-buttongroup .km-button {
+    border-width: 1px 1px 1px 1px;
+    border-color: #bfbfbf;
+    margin: 0;
+    padding: .48em .9em .44em;
+    color: #454545;
+}
+
+.group-btn li {
+    list-style-type: none;
+}
+
+.group-btn ul {
+    margin-left: 0;
+    padding-left: 0;
+}
+
+.k-grid-header TH.k-header {
+        white-space: normal !important;
+        padding: .3em .4em .2em .4em;
+        text-align: center;
+    }
+
+    .reg-filter td {
+        padding: 5px 0px 0px 15px;
+    }
+
+.show-dialog {
+    width: 100px;
+}

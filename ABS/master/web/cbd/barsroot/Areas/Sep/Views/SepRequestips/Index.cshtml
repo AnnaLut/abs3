@@ -1,0 +1,194 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Вiдповiдi IПС";
+}
+@Scripts.Render("~/bundles/sep/scripts/allsep")
+<h2>@ViewBag.Title</h2>
+<div id="RequestIpsToolBar1"></div>
+<div id="RequestGrid1"></div>
+
+<script>
+    $(document).ready(function () {
+        $("#RequestGrid1").kendoGrid({
+            columns: [
+                {
+                    field: "DAT_QB",
+                    title: "Дата вiдповiдi",
+                    width: "40px",
+                    headerAttributes: { style: "white-space: normal;" },
+                    template: "<div style='text-align:left;'>#=kendo.toString(kendo.parseDate(DAT_QB),'dd/MM/yyyy')  != null ? kendo.toString(kendo.parseDate(DAT_QB),'dd/MM/yyyy') : ''#</div>",
+                },
+                {
+                    field: "FN_QB",
+                    title: "Iм'я файлу QB",
+                    width: "50px",
+                    headerAttributes: { style: "white-space: normal;" } 
+                },
+                {
+                    field: "DAT_SEP",
+                    title: "Дата платежу",
+                    width: "40px",
+                    headerAttributes: { style: "white-space: normal;" },
+                    template: "<div style='text-align:left;'>#=kendo.toString(kendo.parseDate(DAT_SEP),'dd/MM/yyyy')#</div>"
+                   
+                },
+                {
+                    field: "MFOA",
+                    title: "МФО банку А",
+                    width: "40px",
+                    headerAttributes: { style: "white-space: normal;" }
+                },
+                {
+                    field: "NLSA",
+                    title: "Рахунок в банку А",
+                    width: "40px",
+                    headerAttributes: { style: "white-space: normal;" }
+                },
+                {
+                    field: "MFOB",
+                    title: "МФО банку Б",
+                    width: "40px",
+                    headerAttributes: { style: "white-space: normal;" }
+                },
+                {
+                    field: "NLSB",
+                    title: "Рахунок в банку Б",
+                    width: "40px",
+                    headerAttributes: { style: "white-space: normal;" }
+                },
+                {
+                    field: "DK",
+                    title: "ДК",
+                    width: "20px",
+                    headerAttributes: { style: "white-space: normal;" }
+                },
+                {
+                    field: "S",
+                    title: "Сума платежу (в коп.)",
+                    width: "50px",
+                    headerAttributes: { style: "white-space: normal;" }
+                },
+                {
+                    field: "KV",
+                    title: "Вал.",
+                    width: "30px",
+                    headerAttributes: { style: "white-space: normal;" }
+                },
+                {
+                    field: "FN_QA",
+                    title: "Iм'я файлу QA",
+                    width: "50px",
+                    headerAttributes: { style: "white-space: normal;" }
+                },
+                {
+                    field: "FN_A",
+                    title: "Iм'я файлу джерела",
+                    width: "50px",
+                    headerAttributes: { style: "white-space: normal;" }
+                },
+                {
+                    field: "FN_B",
+                    title: "Iм'я файлу одержувача",
+                    width: "50px",
+                    headerAttributes: { style: "white-space: normal;" }
+                }
+
+            ],
+            dataSource: {
+                type: "aspnetmvc-ajax",               
+                serverPaging: true,
+                serverSorting: true,
+                pageSize: 10,
+                transport: {
+                    read: {
+                        dataType: 'json',
+                        url: bars.config.urlContent('/sep/SepRequestips/GetRequestips')
+                    }
+                },
+                schema: {
+                    data: "Data",
+                    total: "Total",
+                    errors: "Errors",
+                    model: {
+                        fields: {
+                            DAT_QB: { type: "date" },
+                            FN_QB: { type: "string" },
+                            DAT_SEP: { type: "date" },
+                            MFOA: { type: "string" },
+                            NLSA: { type: "string" },
+                            MFOB: { type: "string" },
+                            NLSB: { type: "string" },
+                            DK: { type: "string" },
+                            S: { type: "number" },
+                            KV: { type: "number" },
+                            FN_QA: { type: "string" },
+                            FN_A: { type: "string" },
+                            FN_B: { type: "string" }
+
+                        }
+                    }
+                },              
+            },
+            sortable: true,
+            filterable: true,
+            resizable: true,
+            autobind: true,
+            selectable: "multiple",
+            pageable: {
+                refresh: true,
+                pageSizes: true,
+                buttonCount: 5
+            },
+            change: RequestGrid1RowSelected,
+            dataBound: grid_dataBound
+        });
+    });
+     
+
+    $('#RequestIpsToolBar1').kendoToolBar({
+        resizable: true,
+        items: [             
+             {
+                 template: "<button type='button' id='btn_ReloadGrid' onclick='ReloadCurrentGrid()' class='k-button' title='Перечитати дані'><i class='pf-icon pf-16 pf-reload_rotate'></i></button>"
+             },
+             {
+                 template: "<button id='btn_GetFile' type='button' class='k-button'  title='Друк квитанцii'><i class='pf-icon pf-16 pf-folder_open'></i></button>"
+             }
+        ]
+    });
+    
+    $('#btn_GetFile').click(function () {
+        var grid = $("#RequestGrid1").data("kendoGrid");
+        var record = grid.dataItem(grid.select());
+        if (record) {
+            if (record.FN_QA!=null && record.FN_QB != null) {
+                var fn_qa = record.FN_QA;
+                var fn_qb = record.FN_QB;
+                var docUrl = bars.config.urlContent("/sep/SepRequestips/GetFile?FN_QA=" + fn_qa + "&FN_QB=" + fn_qb);
+                window.location = docUrl;
+            }
+        }
+    });
+
+    function RequestGrid1RowSelected(e) {
+        bars.utils.sep.enableButton('btn_GetFile', GetGridSelectRowState());
+    }
+
+    function GetGridSelectRowState() {
+        var grid = $("#RequestGrid1").data("kendoGrid");
+        var selection = grid.select();
+        return selection.length === 1;
+    }
+
+    function grid_dataBound() {
+        bars.utils.sep.enableButton('btn_GetFile', GetGridSelectRowState());
+    }
+   
+    $("#btn_GetFile").kendoButton();
+
+    function ReloadCurrentGrid() {
+        var grid = $("#RequestGrid1").data("kendoGrid");
+        grid.dataSource.page(1);
+        grid.dataSource.read();
+    }
+</script>

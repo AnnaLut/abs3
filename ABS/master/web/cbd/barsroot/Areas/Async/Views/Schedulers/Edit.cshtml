@@ -1,0 +1,136 @@
+﻿@{
+    ViewBag.Title = "";
+    Layout = null;
+}
+
+<script>
+    /*function AdvertisingEditCtrl($scope,$http) {
+        $scope.Title = 'Редагування повідомлення';
+        $scope.appName = '/barsroot';
+        $scope.data = {ID:5};
+        $http.get($scope.appName + '/api/advertising/6').then(function (request) {
+            $scope.data = request.data;
+        });
+        $scope.test = function() {
+            alert($scope.data.ID);
+        }
+    }*/
+</script>
+<style>
+    .form-group > div > input,
+    .form-group > div > textarea,
+    .form-group > div > .k-widget {
+        margin-bottom: 5px;
+        margin-top: 5px;
+    }
+
+    .form-group > div > textarea,
+    .form-group > div > table textarea {
+        margin-bottom: 5px;
+    }
+
+    .form-group .k-datepicker {
+        width: 140px !important;
+    }
+
+    .form-group .k-datetimepicker {
+        width: 180px !important;
+    }
+
+    .form-group .k-tool-group .k-combobox,
+    .form-group .k-tool-group .k-dropdown {
+        width: 120px;
+    }
+
+    .form-group .k-tool-group .k-colorpicker {
+        width: 60px;
+        float: left;
+    }
+
+    .window-footer {
+        position: absolute;
+        bottom: 0;
+        display: block;
+        width: 98%;
+        margin-top: 10px;
+        padding: 10px 0 10px 0;
+        text-align: right;
+        border-top: 1px solid #e5e5e5;
+        background-color: #fff;
+    }
+</style>
+
+<h2 ng-bind="schedulerWindowTitle()"></h2>
+
+<div class="form-group">
+    <label class="control-label col-xs-4 col-sm-4">Код</label>
+    <div class="col-xs-6 col-sm-6 col-md-6">
+        <input type="text" class="k-textbox" data-ng-model="scheduler.Code" />
+    </div>
+</div>
+<div class="form-group">
+    <label class="control-label col-xs-4 col-sm-4">Тип</label>
+    <div class="col-xs-6 col-sm-6 col-md-6">
+        <select kendo-drop-down-list style="width: 200px" data-ng-model="scheduler.Type">
+            <option selected="selected" value="PLSQL">PLSQL</option>
+            <option value="SQL">SQL</option>
+            <option value="WEBUI">WEBUI</option>
+        </select>
+    </div>
+</div>
+<div class="form-group">
+    <label class="control-label col-xs-4 col-sm-4">Sql запит</label>
+    <div class="col-xs-6 col-sm-6 col-md-6">
+        <textarea rows="5" class="k-textbox" data-ng-model="scheduler.SqlText"></textarea>
+    </div>
+</div>
+<div class="form-group">
+    <label class="control-label col-xs-4 col-sm-4">ID веб сервісу</label>
+    <div class="col-xs-6 col-sm-6 col-md-6">
+        <input kendo-numeric-text-box k-min="0" k-format="'{0:n0}'" k-ng-model="scheduler.WebUiId" />
+    </div>
+</div>
+<div class="form-group">
+    <label class="control-label col-xs-4 col-sm-4">BARS логін</label>
+    <div class="col-xs-6 col-sm-6 col-md-6">
+        <input type="checkbox" data-ng-model="scheduler.IsBarsLogin" />
+    </div>
+</div>
+<div class="form-group">
+    <label class="control-label col-xs-4 col-sm-4">Режим запуску</label>
+    <div class="col-xs-6 col-sm-6 col-md-6">
+        <select kendo-drop-down-list style="width: 200px" data-ng-model="scheduler.ExclusionMode">
+            <option value="NONE">перевірка не виконується</option>
+            <option value="FILIAL">допускається один одночасний запуск на один филиал</option>
+            <option value="BRANCH">допускається один одночасний запуск на один бранч</option>
+            <option value="USER">допускається один одночасний запуск на одного користувача</option>
+        </select>
+    </div>
+</div>
+<div class="form-group">
+    <label class="control-label col-xs-4 col-sm-4">Макс. час вик.(сек)</label>
+    <div class="col-xs-6 col-sm-6 col-md-6">
+        <input kendo-numeric-text-box k-min="0" k-format="'{0:n0}'" k-ng-model="scheduler.MaxExecutionTime" />
+    </div>
+</div>
+<div class="form-group">
+    <label class="control-label col-xs-4 col-sm-4">Повідомлення для користувача</label>
+    <div class="col-xs-6 col-sm-6 col-md-6">
+        <input class="k-textbox" k-ng-model="scheduler.UserMessages" />
+    </div>
+</div>
+<div class="form-group">
+    <label class="control-label col-xs-4 col-sm-4">Параметри</label>
+    <div class="col-xs-11 col-sm-11 col-md-11">
+        <div data-kendo-grid="parametersListGrid" data-options="parametersListGridOptions"></div>
+    </div>
+</div>
+
+<div class="window-footer">
+    <button type="button" class="k-primary k-button" data-ng-click="saveScheduler()">
+        <i class="pf-icon pf-16 pf-save"></i> Зберегти
+    </button>
+    <button type="button" class="k-button" data-ng-click="schedulerWindow.close()">
+        Відмінити
+    </button>
+</div>

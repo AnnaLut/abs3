@@ -1,0 +1,134 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Інформація про файли СЕП";
+}
+@model BarsWeb.Areas.Sep.Models.AccessType
+<h2>@ViewBag.Title</h2>
+<div id="sepToolBar1"></div>
+<div id="sepToolBar2"></div>
+<div id="sepFilesGrid"></div>
+<div id="bpReasonsWindow">
+    <div id="bpReasonsGrid"></div>
+    <div style="margin-top: 4px;text-align: center;">
+        <button id="selectBpReason" class="k-button k-primary">Обрати</button>
+        <button id="closeBpReasons" class="k-button" >Відмінити</button>
+    </div>
+</div>
+       
+@Scripts.Render("~/bundles/sep/scripts/allsep")
+<script>
+    @if (ViewBag.Request != null)
+    {
+    <text>
+    bars.sepfiles.initRequest =
+    {
+        page: @ViewBag.Request.Page,
+        pageSize: @ViewBag.Request.PageSize
+    };
+    </text>
+    }
+    
+    @if (ViewBag.CustomFilter != null)
+    {
+        <text>
+    bars.sepfiles.initFilter =
+        {
+        fileNameMask: "@ViewBag.CustomFilter.FileNameMask.Replace('%', '*').Replace('_', '?')",
+        isMatched: @ViewBag.CustomFilter.IsMatched.ToString().ToLower(),
+        incoming: @ViewBag.CustomFilter.Incoming.ToString().ToLower(),
+        fileDate: "@ViewBag.CustomFilter.FileDate",
+        currency: "@ViewBag.CustomFilter.Currency"
+        };
+    </text>
+    }
+    
+    @{
+        var fa = "false";
+        if (!String.IsNullOrEmpty(Model.Mode) && Model.Mode.ToUpper() == "RW")
+        {
+            fa = "true";
+        }
+        else if (ViewBag.AccessType != null && ViewBag.AccessType.Mode.ToUpper() == "RW")
+        {
+            fa = "true";
+        }
+    }
+    bars.sepfiles.fullAccess = @fa;
+    @{
+        var af = "1111111";
+        if (Model.AccessFlags != null)
+        {
+            af = Model.AccessFlags + af;
+        }
+    }
+    bars.sepfiles.accessFlags = "@af";
+
+    $(document).ready(function () {
+
+        $('#sepToolBar1').kendoToolBar({
+            resizable: true,
+            items: [
+                { template: "<input id='sepDateDropDown' style='width: 130px;' />" },
+                { template: "<input class = 'k-textbox' id='sepFileNameMask' style='width: 100px;' />" },
+                { template: "<button type='button' class='k-button' onclick='bars.sepfiles.refreshGrid()' title='Задіяти маску пошуку'><i class='pf-icon pf-16 pf-execute'></i></button>" },
+                { template: "<input id='currencyDropDown' style='width: 100px;' />" },
+                { template: "<br /><input id='bankDropDown' style='width: 420px;' />" }
+            ]
+        });
+
+        $('#sepToolBar2').kendoToolBar({
+            resizable: true,
+            items: [
+                {
+                    type: "buttonGroup",
+                    buttons: [
+                        { text: "Вхідні", togglable: true, group: "fileDirection", id: "incomingFilesRadioBtn", selected: true, toggle: function() { bars.sepfiles.refreshGrid() }},
+                        { text: "Вихідні", togglable: true, group: "fileDirection", id: "notIsIncomingFilesRadioBtn", attributes: { "data-incoming": "false" }, toggle: function() { bars.sepfiles.refreshGrid() }}
+                    ]
+                },
+                {
+                    type: "buttonGroup",
+                    buttons: [
+                        { text: "Сквитовані", togglable: true, group: "fileKind", id: "matchedFiles", selected: true, toggle: function() { bars.sepfiles.refreshGrid() }},
+                        { text: "Не сквитовані", togglable: true, group: "fileKind", id: "notMatchedFiles", toggle: function() { bars.sepfiles.refreshGrid() }}
+                    ]
+                },
+                {
+                    type: "separator"
+                },
+                {
+                    template: "<button id='pbDel' type='button' class='k-button' onclick='bars.sepfiles.deleteSepFile()' title='Вилучити файл'><i class='pf-icon pf-16 pf-delete'></i></button>"
+                },
+                {
+                    template: "<button id='pbUnCreate' type='button' class='k-button' onclick='bars.sepfiles.unCreateSepFile()' title='Розформувати файл'><i class='pf-icon pf-16 pf-piece'></i></button>"
+                },
+                {
+                    template: "<button id='pbNewCreate' type='button' class='k-button' onclick='bars.sepfiles.recreateSepFile()' title='Переформувати файл'><i class='pf-icon pf-16 pf-gears'></i></button>"
+                },
+                {
+                    template: "<button id='pbOk' type='button' class='k-button' onclick='bars.sepfiles.matchSepFile()' title='Сквитувати файл'><i class='pf-icon pf-16 pf-bookmark-ok'></i></button>"
+                },
+                {
+                    type: "separator"
+                },
+                {
+                    template: "<button type='button' class='k-button' onclick='bars.sepfiles.refreshGrid()' title='Перечитати дані'><i class='pf-icon pf-16 pf-reload_rotate'></i></button>"
+                },
+                {
+                    template: "<button id='pbDocs' type='button' class='k-button' onclick='bars.sepfiles.openSepDocs()' title='Переглянути документи файлу'><i class='pf-icon pf-16 pf-folder_open'></i></button>"
+                },
+                {
+                    template: "<button id='pbSave' type='button' class='k-button' onclick='bars.sepfiles.refreshGrid()' title='Зберегти зміни'><i class='pf-icon pf-16 pf-save pf-disabled'></i></button>"
+                }
+            ]
+        });
+
+        bars.sepfiles.initSepFilesPage();
+    });
+
+</script>
+
+<style> 
+</style>
+
+

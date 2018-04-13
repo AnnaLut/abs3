@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xmlform captiontype="OnlyTitle">
+<grids>
+<grid id="gv1" pagesize="10" showpagesizebox="true" title ="ПЕРЕГЛЯД заявок на КОНВЕРСІЮ валют (CORP2)">
+  <filters caption="Фільтри" width="50%" buttontext="Знайти" columnscount="2">
+    <filter caption="Вибір валюти КУПІВЛІ" columnindex="1" field="KV1"  condition="Equal" id="fltrKV1">
+      <uicontrol type="DropDownList" table="(select t.lcv lcv, (t.lcv||' '||t.name) name from tabval t, 
+                             (select user_id, kv, sort_ord from tabval_sort where user_id = USER_ID()) s
+                         WHERE t.kv != 980 
+                         AND t.kv = s.kv(+) 
+                        ORDER BY s.sort_ord, t.kv)" keyfield="lcv" valuefield="name" addemptyitem="true">
+      </uicontrol>
+    </filter>
+    <filter caption="Вибір валюти ПРОДАЖУ" columnindex="1" field="KV2"  condition="Equal" id="fltrKV2">
+      <uicontrol type="DropDownList" table="(select t.lcv lcv, (t.lcv||' '||t.name) name from tabval t, 
+                             (select user_id, kv, sort_ord from tabval_sort where user_id = USER_ID()) s
+                         WHERE t.kv != 980 
+                         AND t.kv = s.kv(+) 
+                        ORDER BY s.sort_ord, t.kv)" keyfield="lcv" valuefield="name" addemptyitem="true">
+      </uicontrol>
+    </filter>
+    <filter caption="Номер заявки" columnindex="2" field="ZAY_NUM"  condition="Equal" id="fltrID">
+      <uicontrol type="TextBox"></uicontrol>
+    </filter>
+    <filter caption="РНК" columnindex="2" field="RNK"  condition="Equal" id="fltrRNK">
+      <uicontrol type="IntegerInput"></uicontrol>
+    </filter>
+  </filters>
+  <datasource>
+    <sql>
+      SELECT doc_id,  cust_id RNK, c.nmk NMK, payer_account KV2_NLS, t2.lcv KV2, payer_bank_code KV2_MFO,
+             payee_account KV1_NLS, t1.lcv KV1,  payee_bank_code KV1_MFO,
+             purchasing_cur_rate CROSS_KURS, purchasing_comiss COMISS, purchasing_reason META, doc_sum KV1_SUM, doc_number ZAY_NUM, doc_date ZAY_DATE
+        FROM V_ZAY_CONVERSION, customer c, tabval t1, tabval t2
+       WHERE c.rnk = cust_id
+         AND PAYEE_CURRENCY = t1.kv
+         AND PAYER_CURRENCY = t2.kv
+      ORDER BY doc_id desc
+    </sql>
+  </datasource>
+  <rowselection method="SingleRow"/>
+  <fields>
+    <field datatype="Blob" key="false" name="DOC_DESC" lobtable="v_zay_conversion" lobfilename="zay\QS[doc_ID].doc"  lobrowtext="Завантажити" >
+      <column caption="Файл заявки CORP2" show ="true"></column>
+    </field>
+    <field datatype="Int64" key="true" name="doc_ID">
+      <column show="true"  caption="Ід.заявки"></column>
+    </field>
+    <field datatype="String" key="false" name="ZAY_NUM">
+      <column show="true"  caption="№ заявки"></column>
+    </field>
+    <field datatype="DateTime" key="false" name="ZAY_DATE">
+      <column show="true"  caption="Дата заявки"></column>
+    </field>
+    <field datatype="Int64" key="false" name="RNK">
+      <column caption="РНК клієнта" show ="true"></column>
+    </field>
+    <field datatype="String" key="false" name="NMK">
+      <column caption="Найменування клієнта" show ="true"></column>
+    </field>
+    <field datatype="String" key="false" name="KV2_MFO">
+      <column caption="МФО рахунку купівлі" show ="true"></column>
+    </field>
+    <field datatype="String" key="false" name="KV2_NLS">
+      <column caption="Рахунок купівлі" show ="true"></column>
+    </field>
+    <field datatype="String" key="false" name="KV2">
+      <column caption="Валюта купівлі" show ="true"></column>
+    </field>
+    <field datatype="String" key="false" name="KV1_SUM">
+      <column caption="Сума в вал купівлі" show ="true"></column>
+    </field>
+    <field datatype="String" key="false" name="KV1_MFO">
+      <column caption="МФО рахунку продажу" show ="true"></column>
+    </field>
+    <field datatype="String" key="false" name="KV1_NLS">
+      <column caption="Рахунок продажу" show ="true"></column>
+    </field>
+    <field datatype="String" key="false" name="KV1">
+      <column caption="Валюта продажу" show ="true"></column>
+    </field>
+    <field datatype="String" key="false" name="CROSS_KURS">
+      <column caption="Крос-курс в вал купівлі" show ="true"></column>
+    </field>
+    <field datatype="String" key="false" name="COMISS">
+      <column caption="% комісії" show ="true"></column>
+    </field>
+    <field datatype="String" key="false" name="META">
+      <column caption="Код мети конверсії" show ="true"></column>
+    </field>
+  </fields>
+</grid>
+</grids>
+</xmlform>

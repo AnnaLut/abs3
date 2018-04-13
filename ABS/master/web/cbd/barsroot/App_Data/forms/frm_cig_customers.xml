@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xmlform captiontype="OnlyTitle">
+  <grids>
+    <grid id="gv" pagesize="10" showpagesizebox="true" title="Перегляд клієнтів" showfilter="true">
+      <filters buttontext="Пошук" caption="Фільтри" columnscount="3" width="100%" >
+        <filter field="CUST_NAME" caption="Назва" allowemptyvalue="true" columnindex="1" condition="LikeRight" id="f1">
+          <uicontrol controlwidth="250"></uicontrol>
+        </filter>
+        <filter field="CUST_CODE" caption="Ідентифікаційний номер" allowemptyvalue="true" columnindex="1" condition="LikeRight" id="f4">
+          <uicontrol controlwidth="250"></uicontrol>
+        </filter>
+        <filter field="CUST_ID" caption="Код клієнта" allowemptyvalue="true" columnindex="2" condition="Equal" id="f2">
+          <uicontrol></uicontrol>
+        </filter>
+        <filter field="RNK" caption="Код клієнта(АБС)" allowemptyvalue="true" columnindex="3" condition="Equal" id="f3">
+          <uicontrol></uicontrol>
+        </filter>
+        <filter columnindex="1" id="fbranch" field="BRANCH" condition="Equal" caption="Код відділення" allowemptyvalue="true">
+          <uicontrol type="EditableReference" formname="frm_cig_branches" formfieldname="BRANCH" formheight="450" formwidth="500"></uicontrol>
+        </filter>
+      </filters>
+      <datasource>
+        <sql>
+          select cust_id, cust_name, cust_type, rnk, upd_date, sync_date, branch,
+          decode(cust_type, 1, 'Юридична особа - банк', 2,'Юридична особа', 3, 'Фізична особа', null) as cust_type_name,
+          decode(c.cust_type, 2, 'frm_cig_compview', 1, 'frm_cig_compview', 'frm_cig_indview') as frm_name, cust_code
+          from cig_customers c
+        </sql>
+      </datasource>
+      <rowselection method="SingleRow" />
+      <fields>
+        <field name="UPD_DATE" key="false" datatype="DateTime" sort="Default">
+          <column show="true" formatstring="{0:dd.MM.yyyy HH:mm:ss}" caption="Дата оновлення" align="center" />
+        </field>
+        <field name="SYNC_DATE" key="false" datatype="DateTime" sort="Default">
+          <column show="true" caption="Дата синхронізації"  formatstring="{0:dd.MM.yyyy HH:mm:ss}" align="Center" />
+        </field>
+        <field name="BRANCH" key="false" datatype="String" sort="Default">
+          <column show="true" caption="Відділення" align="Left" />
+        </field>
+        <field name="CUST_ID" key="true" datatype="Int64" sort="Default">
+          <column show="true" caption="Код клієнта" align="right">
+            <link url="/barsroot/barsweb/dynform.aspx" target="Blank">
+              <parameters>
+                <parameter type="DataField" name="FRM_NAME" altname="form" datatype="Int64" ></parameter>
+                <parameter type="DataField" name="CUST_ID" altname="cust_id" datatype="Int64" ></parameter>
+                <parameter type="DataField" name="BRANCH" altname="branch" datatype="String" ></parameter>
+              </parameters>
+            </link>
+          </column>
+        </field>
+        <field name="CUST_NAME" key="false" datatype="String" sort="Default">
+          <column show="true" caption="Назва" align="Left" width="300" />
+        </field>
+        <field name="CUST_TYPE" key="false" datatype="Int64" sort="Default">
+          <column show="false" caption="Тип клієнта" align="Right" />
+        </field>
+        <field name="CUST_TYPE_NAME" key="false" datatype="String" sort="Default">
+          <column show="true" caption="Тип клієнта" align="Right" />
+        </field>
+        <field name="CUST_CODE" key="false" datatype="String" sort="Default">
+          <column show="true" caption="Ідентифікаційний номер" align="Left" width="300" />
+        </field>
+        <field name="RNK" key="false" datatype="Int64" sort="Default">
+          <column show="true" caption="Код клієнта (АБС)" align="Right" />
+        </field>
+        <field name="FRM_NAME" key="true" datatype="String" >
+          <column show="false" caption="frm_name" align="Left" />
+        </field>
+      </fields>
+    </grid>
+  </grids>
+</xmlform>

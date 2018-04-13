@@ -1,0 +1,841 @@
+﻿@model  BarsWeb.Areas.Sep.Models.AccessType
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Одержанi iнф-нi: Запити на уточ.рекв.по платежах";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<div id="sepTZToolBar"></div>
+<div id="sepTZGrid"></div>
+<div id="reportWin">
+    <input id="modeReq" style="width: 430px" />
+    <h4>Оберіть період формування запиту:</h4>
+        <p>
+            <label for="start">Дата початку: &nbsp</label><input id="start" style="width: 100px"   /> @* value="@ViewBag.BankDate" *@
+        &nbsp
+            <label for="end">Дата завершення: &nbsp</label><input id="end" style="width: 100px"  />@* value="@ViewBag.BankDate" *@
+        </p>
+    <button class="k-button" id="get">Сформувати</button>
+</div>
+<div id="reportView">
+    <div id="reportToolBar"></div>
+    <div id="reportGrid"></div>
+</div>
+
+@Html.Partial("~/Areas/Sep/Views/Shared/_sepDocViewer.cshtml")
+
+<script type="text/javascript" src="@Url.Content("~/lib/jsZip/jszip.min.js")"></script>
+<script>
+    var obFixed = "@Model.obFixed";
+    var sepTZGrid = null;
+    var sepNum = "@ViewBag.SepNum";
+    var bankOKPO = "@ViewBag.BankOKPO";
+    var firstLoad = true;
+    var gridMode = "@Model.Mode";
+    var reportGrid = null;
+
+    var s902 = "@ViewBag.S902";
+    var nms902 = "@ViewBag.NMS902";
+
+    function getSepTZGrid() {
+        if (sepTZGrid == null) {
+            sepTZGrid = $('#sepTZGrid').data("kendoGrid");
+        }
+        return sepTZGrid;
+    }
+
+    function getReportGrid() {
+        if (reportGrid == null) {
+            reportGrid = $('#reportGrid').data("kendoGrid");
+        }
+        return reportGrid;
+    }
+
+    function showGridLoader() {
+        if (firstLoad) {
+            bars.ui.loader('#sepTZGrid', true);
+            firstLoad = false;
+        }
+    }
+    function endGridLoader() {
+        bars.ui.loader('#sepTZGrid', false)
+    }
+
+    function enableButton(buttonId, enabled) {
+        if (typeof (enabled) === 'undefined') {
+            enabled = true;
+        }
+        var $button = $('#' + buttonId);
+        $button.data('kendoButton').enable(enabled);
+        if (enabled) {
+            $button.find('i').removeClass("pf-disabled");
+        } else {
+            $button.find('i').addClass("pf-disabled");
+        }
+    }
+
+    function refreshToolbar() {
+        var grid = getSepTZGrid();
+        var currentRowData = null;
+        var index = -1;
+
+        var startDate = document.getElementById('start');
+        var endDate = document.getElementById('end');
+
+        if (grid.select().length > 0) {
+            currentRowData = grid.dataItem(grid.select());
+            index = currentRowData.D_REC != null ? currentRowData.D_REC.indexOf('#?') : -1;
+        }
+
+        enableButton('pbDel', currentRowData != null);
+        enableButton('pbDetails', currentRowData != null);
+        enableButton('pbRun', currentRowData != null && currentRowData.DK == 2 && index < 0 && (currentRowData.PAP == 3 || currentRowData.PAP == 1 || currentRowData.PAP == 2 && currentRowData.S <= (currentRowData.OSTC + currentRowData.LIM)));
+        enableButton('pbReply', currentRowData != null && currentRowData.DK == 2 && index >= 0);
+    }
+
+    function refreshGrid() {
+        var grid = getSepTZGrid();
+        firstLoad = true;
+        grid.dataSource.read();
+        grid.refresh();
+    }
+
+    function refreshReportGrid() {
+        var grid = getReportGrid();
+        grid.dataSource.read();
+        grid.refresh();
+    }
+
+    function markedRow() {
+        var grid = $('#sepTZGrid').data("kendoGrid");
+        var data = grid.dataSource.data();
+        var currentRow = grid.dataItem(grid.select());
+
+        grid.tbody.find('>tr').each(function () {
+            var dataItem = grid.dataItem(this);
+
+            var index = dataItem.D_REC != null ? dataItem.D_REC.indexOf('#?') : -1;
+            if (sepNum == 2) {
+                if (dataItem.DK == 2 && index >= 0) {
+                    $(this).addClass('k-rowDK_2');
+                }
+                if (dataItem.DK == 3) {
+                    $(this).addClass('k-rowDK_3');
+                }
+            }
+        });
+        refreshToolbar();
+    }
+
+    // ToolBarButtonFunction Region  ---------------------------
+
+    function deleteRow() {
+        var grid = getSepTZGrid();
+        var row = grid.dataItem(grid.select());
+        var rowREC = { rowREC: row.REC };
+        var ss1 = "ВИЛУЧИТИ з картотеки запитів ?<br/>"
+        var ss2 = "Задоволення запиту відміняється."
+        bars.ui.confirm({ text: ss1 + ss2 },
+            function () {
+                $.get('@Url.Action("DeleteRow")', rowREC).done(function (data) {
+                    if (data.status == 'ok') {
+                        refreshGrid();
+                    }
+                    else {
+                        bars.ui.error('Помилка вилучення файлу');
+                    }
+                });
+            });
+    }
+
+    function rowInfo() {
+        var grid = getSepTZGrid();
+        var row = grid.dataItem(grid.select());
+        var rowRef = row.REF;
+        var arcFn = row.FN_A;
+        var arcDateA = kendo.toString(row.DAT_A, 'dd/MM/yyyy hh:mm:ss');
+        var sepDocViewer = bars.sepfiles.sepDocViewer;
+        if (rowRef != null) {
+            var docUrl = bars.config.urlContent("/documents/item/" + rowRef + "/");
+            window.location = docUrl;
+        }
+        else {
+            var data = {
+                NBA: '@ViewBag.BankNAME',
+                MFOB: '@ViewBag.BankMFO'
+            };
+            $.extend(data, row);
+            sepDocViewer.loadFirstTab(data);
+            sepDocViewer.loadSecondTab.part1(data);
+            $.get('@Url.Action("GetZagA")', { arcFn: arcFn, arcDate_a: arcDateA }).done(function (result) {
+                sepDocViewer.loadSecondTab.part2(result.data);
+            });
+            sepDocViewer.show();
+        }
+    }
+
+    function pbRun() {
+        var grid = getSepTZGrid();
+        var row = grid.dataItem(grid.select());
+
+        var nS = row.S * 100;
+        var strNAMb = row.NAM_A;
+        var s2 = row.NLSA;
+        var s3 = row.MFOA;
+        var s4 = 'На Вашу вимогу/' + row.NAM_B;
+        var strNAMa = row.NAMB2;
+        var strOKPOb = row.ID_A;
+        var s6 = row.NLSB;
+        var s7 = '';
+        var nDk = 1;
+        var nKv = row.KV;
+        var nVob = Date.parse(null) || 0;
+        var dDatD = Date.parse(null) || 0;
+        var dDatP = Date.parse(null) || 0;
+        var sNazn = s4 + '/' + row.NAZN;
+        var sDrec = '';
+        var ss1 = "Задовольнити вимогу на списання коштів ?<br/>";
+        var ss2 = "Буде сформовано кредитовий міжбанківський платіж<br/>";
+        bars.ui.confirm({ text: row.OTM > 0 ? ss1 + ss2 + " Повторно." : ss1 + ss2 },
+            function () {
+                var formParams = {
+                    tt: 'PS2',
+                    Nls_A: s6,
+                    mode_nam_a: 1,
+                    SumC_t: nS.toFixed(2),
+                    Nls_B: s2,
+                    Nam_B: strNAMb,
+                    Kv_B: nKv,
+                    Id_B: strOKPOb,
+                    Mfo_B: s3,
+                    Nazn: sNazn
+                }
+                window.location = '/barsroot/docinput/docinput.aspx?' + jQuery.param(formParams);
+            });
+    }
+
+    function pbReply() {
+        var grid = getSepTZGrid();
+        var row = grid.dataItem(grid.select());
+        var s6, s3, s4, s2, nS, strNAMa, strOKPOa, strNAMb, strOKPOb, s7, nVob, sNazn, dDatD, dDatP, sDrec, nDk, nKv, ss1, ss2;
+        $.get('@Url.Action("RowReply")', { dRec: row.D_REC }).done(function (result) {
+            if (result.data != null) {
+                s6 = result.data.NLSA;
+                s3 = result.data.MFOB;
+                s2 = result.data.NLSB;
+                nS = result.data.S;
+                strNAMa = result.data.NAM_A;
+                strOKPOa = result.data.ID_A;
+                strNAMb = result.data.NAM_B;
+                strOKPOb = result.data.ID_B;
+                s7 = result.data.ND;
+                nVob = result.data.VOB;
+                sNazn = result.data.NAZN;
+                dDatD = kendo.toString(row.DATD, 'dd/MM/yyyy');
+                dDatP = kendo.toString(row.DATP, 'dd/MM/yyyy');
+                if (nS == row.S && s3 == row.MFOA && s6 == row.NLSB && s7 == row.ND && dDatD == row.DATD && nVob == row.VOB/* && sepNum == 2*/) {
+                    s4 = 'Уточнення реквізитів документа';
+                    sDrec = row.D_REC;
+                    nDk = 3;
+                    nKv = row.KV;
+                    ss1 = "СФОРМУВАТИ відповідь на уточнення реквізитів документа ?";
+                    ss2 = "Буде сформировано інформаційне повідомлення";
+                }
+                else {
+                    nDk = 3;
+                    nKv = row.KV;
+                    dDatD = kendo.toString(row.DATD, 'dd/MM/yyyy');
+                    dDatP = kendo.toString(row.DATP, 'dd/MM/yyyy');
+                    //s4 = '';
+                    sDrec = row.D_REC != null ? row.D_REC.replace(row.D_REC.charAt(1), '*') : '';
+                    sNazn = row.NAZN;
+                    strOKPOa = bankOKPO + '00000000';
+                    strOKPOb = row.OKPOA;
+                    s3 = row.MFOA;
+                    s2 = row.NLSA;
+                    s6 = s902;
+                    strNAMa = nms902;
+                    strNAMb = row.NAMA;
+                    nVob = row.VOB;
+                    nS = row.S;
+                    s7 = row.ND;
+                    if (sepNum == 2) {
+                        ss1 = "Не співпадають реквізити запиту і первинного документу<br/>" +
+                        "ЗАП: № " + row.ND + ", від " + kendo.toString(row.DATD, 'dd/MM/yyyy') + ", Сума " + row.S.toFixed(2) + "<br/>" +
+                        "ДОК: № " + s7 + ", від " + kendo.toString(row.DATD, 'dd/MM/yyyy') + ", Сума " + nS.toFixed(2) + "<br/>" +
+                        "ЗАП: МФО-А " + row.MFOA + ", Рах.-Б " + row.NLSB + ", Код " + row.VOB + "<br/>" +
+                        "ДОК: МФО-А " + s3 + ", Рах.-Б " + s6 + ", Код " + nVob + "<br/>"
+                    }
+                    else {
+                        ss1 = "Не співпадають реквізити запиту і первинного документу" + "<br/>" +
+                        " Док " + row.ND + ", від " + kendo.toString(row.DATD, 'dd/MM/yyyy') + ", Сума " + row.S.toFixed(2) + "<br/>" +
+                        " Док " + s7 + ", від " + kendo.toString(row.DATD, 'dd/MM/yyyy') + ", Сума " + nS.toFixed(2) + "<br/>"
+                    }
+                    ss2 = "СФОРМУВАТИ відповідь, що платежу немає в банку-відправнику ?";
+                }
+            }
+            else {
+                nDk = 3;
+                nKv = row.KV;
+                dDatD = kendo.toString(row.DATD, 'dd/MM/yyyy');
+                dDatP = kendo.toString(row.DATP, 'dd/MM/yyyy');
+                sDrec = row.D_REC != null ? row.D_REC.replace(row.D_REC.charAt(1), '*') : '';
+                sNazn = row.NAZN;
+                strOKPOa = bankOKPO + '00000000';
+                strOKPOb = row.OKPOA;
+                s3 = row.MFOA;
+                s2 = row.NLSA;
+                s6 = s902;
+                strNAMb = row.NAMA;
+                nVob = row.VOB;
+                nS = row.S;
+                //s4 = '';
+                s7 = row.ND;
+                ss1 = "Не знайдено документа з файла " + row.D_REC.substr(2, 18) + " за останні 30 днів!<br/>";
+                ss2 = "СФОРМУВАТИ відповідь, що платежу немає в банку-відправнику ?";
+            }
+            bars.ui.confirm({ text: row.OTM > 0 ? ss1 + ss2 + " Повторно." : ss1 + ss2 },
+            function () {
+                var formParams = {
+                    tt: '014',
+                    Nls_A: s6,
+                    Nam_A: strNAMa,
+                    //mode_nam_a: 1,
+                    Id_A: strOKPOa,
+                    SumC_t: (nS * 100).toFixed(2),
+                    Nls_B: s2,
+                    Nam_B: strNAMb,
+                    Kv_B: nKv,
+                    Id_B: strOKPOb,
+                    Mfo_B: s3,
+                    Nazn: sNazn
+                }
+                window.location = '/barsroot/docinput/docinput.aspx?' + jQuery.param(formParams);
+            });
+        });
+    }
+
+    function pbReport() {
+        $("#pbReport").click(function () {
+            var win = $("#reportWin").data("kendoWindow");
+            win.center();
+            win.open();
+        });
+    }
+
+    function passParams() {
+        return {
+            mode: $("#modeReq").data("kendoDropDownList").value(),
+            dStart: $("#start").data("kendoDatePicker").value(),
+            dEnd: $("#end").data("kendoDatePicker").value()
+        };
+    }
+
+    function obFixedFunc() {
+        return { obFixed: $('#obFixedOn.k-state-active').length > 0, mode: gridMode }
+    }
+
+    function exportToExcel() {
+        var reportGrid = $('#reportGrid').data("kendoGrid");
+        bars.ui.confirm({ text: 'Експортувати таблицю в Excel?' }, function () {
+            reportGrid.saveAsExcel();
+        });
+    }
+    // end ToolBarButtonFunction Region  -----------------------
+
+    // ToolBarRegion  ------------------------------------------
+    $('#sepTZToolBar').kendoToolBar({
+        items: [
+            /*{
+                template: "<button id='pbIns' type='button' class='k-button' disabled onclick='' title='Додати новий запис'><i class='pf-icon pf-16 pf-add_button pf-disabled'></i></button>"
+            },*/
+            {
+                template: "<button id='pbDel' type='button' class='k-button' onclick='deleteRow()' title='Вилучити'><i class='pf-icon pf-16 pf-delete_button_error'></i></button>"
+            },
+            {
+                template: "<button id='pbRefresh' type='button' class='k-button' onclick='refreshGrid()' title='Перерахувати записи в таблиці'><i class='pf-icon pf-16 pf-application-update'></i></button>"
+            },
+            /*{
+                template: "<button id='pbUpdate' type='button' class='k-button' disabled onclick='' title='Зберегти'><i class='pf-icon pf-16 pf-disabled pf-save'></i></button>"
+            },*/
+            {
+                type: "separator"
+            },
+            /*{
+                template: "<button id='pbSearch' type='button' class='k-button' disabled onclick='' title='Пошук'><i class='pf-icon pf-16 pf-disabled pf-search'></i></button>"
+            },
+            {
+                template: "<button id='pbFilter' type='button' class='k-button' disabled onclick='' title='Встановити фільтр'><i class='pf-icon pf-16 pf-disabled pf-filter-ok'></i></button>"
+            },*/
+            {
+                template: "<button id='pbDetails' type='button' class='k-button' onclick='rowInfo()' title='Детальна інформація'><i class='pf-icon pf-16 pf-info'></i></button>"
+            },
+            /*{
+                template: "<button id='pbPrint' type='button' class='k-button' disabled onclick='' title='Друк'><i class='pf-icon pf-16 pf-disabled pf-print'></i></button>"
+            },*/
+            {
+                type: "separator"
+            },
+            {
+                template: "<button id='pbRun' type='button' class='k-button' onclick='pbRun()' title='Задовільнити запит'><i class='pf-icon pf-16 pf-document_header_footer-ok2'></i></button>"
+            },
+            /*{
+                template: "<button id='pbDoc' type='button' class='k-button' disabled onclick='' title='Породжений документ'><i class='pf-icon pf-16 pf-disabled pf-link-info'></i></button>"
+            },*/
+            {
+                template: "<button id='pbReply' type='button' class='k-button' onclick='pbReply()' title='Відповідь на уточнення реквізитів'><i class='pf-icon pf-16 pf-mail-arrow_right'></i></button>"
+            },
+            /*{
+                type: "separator"
+            },
+            {
+                template: "<button id='pbExit' type='button' class='k-button' disabled onclick='' title='Завершити роботу та вийти'><i class='pf-icon pf-16 pf-disabled pf-delete'></i></button>"
+            },*/
+            {
+                type: "separator"
+            },
+            /*{
+                template: "<button id='pbPreView' type='button' class='k-button' disabled onclick='' title='Перегляд звіту'><i class='pf-icon pf-16 pf-disabled pf-find'></i></button>"
+            },*/
+            {
+                template: "<button id='pbReport' type='button' class='k-button' onclick='pbReport()' title='Cформувати реєстр'><i class='pf-icon pf-16 pf-list-arrow_right'></i></button>"
+            },
+            {
+                type: "separator"
+            },
+            {
+                type: "button",
+                text: "Оброблені за місяць",
+                id: "obFixedOn",
+                togglable: true,
+                selected: false,
+                toggle: refreshGrid
+            }
+        ]
+    });
+    $("#pbIns").kendoButton();
+    $("#pbDel").kendoButton();
+    $("#pbRefresh").kendoButton();
+    $("#pbUpdate").kendoButton();
+
+    $("#pbSearch").kendoButton();
+    $("#pbFilter").kendoButton();
+    $("#pbDetails").kendoButton();
+    $("#pbPrint").kendoButton();
+
+    $("#pbRun").kendoButton();
+    $("#pbDoc").kendoButton();
+    $("#pbReply").kendoButton();
+
+    $("#pbExit").kendoButton();
+
+    $("#pbPreView").kendoButton();
+    $("#pbReport").kendoButton();
+
+    $("#obFixedOn").kendoButton();
+
+    $('#reportToolBar').kendoToolBar({
+        items: [
+            {
+                template: "<button id='btnExport' type='button' class='k-button' onclick='exportToExcel()' title='Експортувати в Excel'><i class='pf-icon pf-16 pf-exel'></i></button>"
+            }
+        ]
+    });
+    $('#btnExport').kendoButton();
+
+    // end ToolBarRegion  --------------------------------------
+
+    // GridRegion ----------------------------------------------
+
+    $(document).ready(function () {
+
+        $("#start").kendoDatePicker({
+            format: "dd/MM/yyyy",
+            @*value: kendo.toString(@ViewBag.BankDate,'dd/MM/yyyy'),*@
+            change: function () {
+                var start = $("#start").data("kendoDatePicker");
+                var end = $("#end").data("kendoDatePicker");
+                var startDate = start.value(),
+                endDate = end.value();
+
+                if (startDate) {
+                    startDate = new Date(startDate);
+                    startDate.setDate(startDate.getDate());
+                    end.min(startDate);
+                } else if (endDate) {
+                    start.max(new Date(endDate));
+                } else {
+                    endDate = new Date();
+                    start.max(endDate);
+                    end.min(endDate);
+                }
+            }
+        });
+
+        $("#end").kendoDatePicker({
+            format: "dd/MM/yyyy",
+            change: function () {
+                var start = $("#start").data("kendoDatePicker");
+                var end = $("#end").data("kendoDatePicker");
+                var endDate = end.value(),
+                startDate = start.value();
+
+                if (endDate) {
+                    endDate = new Date(endDate);
+                    endDate.setDate(endDate.getDate());
+                    start.max(endDate);
+                } else if (startDate) {
+                    end.min(new Date(startDate));
+                } else {
+                    endDate = new Date();
+                    start.max(endDate);
+                    end.min(endDate);
+                }
+            }
+        });
+
+        $("#modeReq").kendoDropDownList({
+            dataTextField: "text",
+            dataValueField: "value",
+            dataSource: [
+               { text: "ОТРИМАНІ ЗАПИТИ на УТОЧНЕННЯ РЕКВІЗИТІВ", value: "1" },
+               { text: "ВІДПРАВЛЕНІ ВІДПОВІДІ на УТОЧНЕННЯ РЕКВІЗИТІВ", value: "2" }
+            ],
+            index: 0,
+            change: function () {
+                var value = $("#modeReq").val();
+            }
+        });
+
+        $("#reportWin").kendoWindow({
+            height: "150px",
+            title: " Друк реєстрів по уточненню реквізитів",
+            visible: false,
+            width: "450px",
+            resizable: false,
+            actions: ["Close"]
+        });
+        $("#reportView").kendoWindow({
+            title: " Реєстр по уточненню реквізитів",
+            visible: false,
+            width: "1500px",
+            resizable: false,
+            actions: ["Close"],
+            content: {
+                template: $("#reportGrid").data("kendoGrid")
+            }
+        });
+        $("#reportGrid").kendoGrid({
+            autobind: true,
+            excel: {
+                fileName: "Реєстр по уточненню реквізитів.xlsx",
+                filterable:true,
+                allPages:true
+            },
+            pageable: {
+                refresh: true,
+                pageSizes: true,
+                buttonCount: 5
+            },
+            columns: [
+                {
+                    field: "MFOA",
+                    title: "МФО А",
+                    width: "100px"
+                },
+                {
+                    field: "NLSA",
+                    title: "Рахунок А",
+                    width: "200px"
+                },
+                {
+                    field: "MFOB",
+                    title: "МФО Б",
+                    width: "100px"
+                },
+                {
+                    field: "NLSB",
+                    title: "Рахунок Б",
+                    width: "200px"
+                },
+                {
+                    field: "ND",
+                    title: "Номер документу",
+                    width: "80px"
+                },
+                {
+                    field: "S",
+                    title: "Сума",
+                    width: "80px",
+                    template: "<div style='text-align:right;'>#=S.toFixed(2)#</div>"
+                },
+                {
+                    field: "NAM_A",
+                    title: "Назва клієнта",
+                    width: "300px"
+                },
+                {
+                    field: "DAT_A",
+                    title: "Дата",
+                    width: "100px",
+                    template: "<div style='text-align:right;'>#=kendo.toString(DAT_A,'dd/MM/yyyy')#</div>"
+                }
+            ],
+            dataSource:
+            {
+                type: "aspnetmvc-ajax",
+                pageSize: 10,
+                transport: {
+                    read: {
+                        dataType: 'json',
+                        url: bars.config.urlContent('/sep/SepTZ/GetReport'),
+                        data: passParams,
+                        type: "POST"
+                    }
+                },
+                schema: {
+                    data: "Data",
+                    total: "Total",
+                    model: {
+                        fields: {
+                            DAT_A: { type: "date" },
+                            S: { type: "number" }
+                        }
+                    }
+                }
+            },
+            autoBind: true,
+            change: refreshReportGrid
+        });
+
+        // ------------------------------------------------------------------------
+        // Main Grid
+
+        $("#sepTZGrid").kendoGrid({
+            autobind: true,
+            selectable: "row",
+            resizable: true,
+            pageable: {
+                refresh: true,
+                pageSizes: true,
+                buttonCount: 25
+            },
+            columns: [
+                {
+                    field: "REF",
+                    title: "Реф.",
+                    width: "100px"
+                },
+                {
+                    field: "DAT_A",
+                    title: "Дата надходження",
+                    width: "160px",
+                    template: "<div style='text-align:center;'>#=kendo.toString(DAT_A,'dd/MM/yyyy')#</div>"
+                },
+                {
+                    field: "DK",
+                    title: "ДК",
+                    width: "80px",
+                    template: "<div style='text-align:center;'>#=DK==2 ? 'Д' : 'К'#</div>"
+                },
+                {
+                    field: "MFOA",
+                    title: "МФО А",
+                    width: "90px"
+                },
+                {
+                    field: "NLSA",
+                    title: "Рахунок А",
+                    width: "150px"
+                },
+                {
+                    field: "KV",
+                    title: "Вал.",
+                    width: "80px",
+                    template: "<div style='text-align:center;'>#=KV#</div>"
+                },
+                {
+                    field: "ID_A",
+                    title: "ОКПО А",
+                    width: "100px"
+                },
+                {
+                    field: "NAM_A",
+                    title: "Назва",
+                    width: "400px"
+                },
+                {
+                    field: "S",
+                    title: "Сума",
+                    width: "100px",
+                    template: "<div style='text-align:right;'>#=S.toFixed(2)#</div>"
+                },
+                {
+                    field: "NLSB",
+                    title: "Наш рахунок",
+                    width: "200px"
+                },
+                {
+                    field: "ID_B",
+                    title: "ОКПО Б",
+                    width: "100px"
+                },
+                {
+                    field: "NAM_B",
+                    title: "Назва рахунку з повідомлення",
+                    width: "300px"
+                },
+                {
+                    field: "OSTC",
+                    title: "Залишок",
+                    width: "100px",
+                    template: "<div style='text-align:right;'>#=OSTC.toFixed(2)#</div>"
+                },
+                {
+                    field: "NAZN",
+                    title: "Призначення платежу",
+                    width: "1000px"
+                },
+                {
+                    field: "NMS",
+                    title: "Назва рахунку у нас",
+                    width: "200px"
+                }
+                /* -------- Дані моделі SepTZ, що не відображаються, згідно центурі
+                ,
+                {
+                    field: "REC",
+                    title: "REC_title",
+                    width: "100px"
+                },
+                {
+                    field: "DATD",
+                    title: "DATD_title",
+                    width: "100px",
+                    template: "<div style='text-align:right;'>#=kendo.toString(DATD,'dd/MM/yyyy hh:mm:ss')#</div>"
+                },
+                {
+                    field: "ND",
+                    title: "ND_title",
+                    width: "100px"
+                },
+                {
+                    field: "NB",
+                    title: "NB_title",
+                    width: "100px"
+                },
+                {
+                    field: "FN_A",
+                    title: "FN_A_title",
+                    width: "100px"
+                },
+                {
+                    field: "VOB",
+                    title: "VOB_title",
+                    width: "100px"
+                },
+                {
+                    field: "D_REC",
+                    title: "D_REC_title",
+                    width: "100px"
+                },
+                {
+                    field: "DATP",
+                    title: "DATP_title",
+                    width: "100px",
+                    template: "<div style='text-align:right;'>#=kendo.toString(DATP,'dd/MM/yyyy hh:mm:ss')#</div>"
+                },
+                {
+                    field: "DAT_B",
+                    title: "DAT_B_title",
+                    width: "100px",
+                    template: "<div style='text-align:right;'>#=kendo.toString(kendo.parseDate(DAT_B),'dd.MM.yyyy hh:mm:ss')#</div>"
+                },
+                {
+                    field: "LIM",
+                    title: "LIM_title",
+                    width: "100px"/*
+                },
+                {
+                    field: "PAP",
+                    title: "PAP_title",
+                    width: "100px"
+                },
+                {
+                    field: "OTM",
+                    title: "OTM_title",
+                    width: "100px"
+                } ---------------------------------------------*/
+            ],
+            filterable: true,
+            dataSource: {
+                type: "aspnetmvc-ajax",
+                serverSorting: true,
+                serverPaging: true,
+                pageSize: 20,
+                requestStart: showGridLoader,
+                requestEnd: endGridLoader,
+                transport: {
+                    read: {
+                        dataType: 'json',
+                        url: bars.config.urlContent('/sep/SepTZ/GetSepTZList'),
+                        data: obFixedFunc
+                    }
+                },
+                schema: {
+                    data: "Data",
+                    total: "Total",
+                    model: {
+                        fields: {
+                            DATD: { type: "date" },
+                            DAT_A: { type: "date" },
+                            DATP: { type: "date" },
+                            S: { type: "number" },
+                            OSTC: { type: "number" },
+                            MFOA: { type: "number" },
+                            NLSA: { type: "number" },
+                            KV: { type: "number" },
+                            ID_A: { type: "number" },
+                            NLSB: { type: "number" },
+                            ID_B: { type: "number" }
+                        }
+                    }
+                }
+            },
+            columnMenu: true,
+            columnHide: function(e) {
+                console.log(e.column.field); // displays the field of the hidden column
+            },
+            sortable: true,
+            autoBind: true,
+            change: refreshToolbar,
+            dataBound: markedRow
+        });
+    });
+
+    $('<div class="k-loading-mask" style="width: 100%; height: 100%; top: 0px; left: 0px;"><span class="k-loading-text">Loading...</span><div class="k-loading-image"></div><div class="k-loading-color"></div></div>').appendTo('#sepTZGrid .k-grid-content');
+
+    $("#sepTZGrid").on("dblclick", "tbody > tr", rowInfo);
+
+    $("#get").click(function () {
+        var win = $("#reportWin").data("kendoWindow");
+        win.close();
+        var winView = $("#reportView").data("kendoWindow");
+        var grid = getReportGrid();
+        refreshReportGrid();
+        winView.center();
+        winView.open();
+    });
+
+    // end GridRegion --------------------------------------------
+</script>
+
+<style>
+.k-rowDK_2 {
+    background-color: #7aeb7a;
+    }
+.k-rowDK_3 {
+    background-color: #a6a6a6;
+    }
+</style>

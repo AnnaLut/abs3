@@ -1,0 +1,356 @@
+﻿@using Kendo.Mvc.UI;
+@{
+    //для роботи з _LayoutKendo
+    bool isKendo = false;
+    var getType = HttpContext.Current.Request.Params.GetValues("type");
+    if (getType != null)
+    {
+        isKendo = (getType[0].ToLower() == "kendo");
+    }
+}
+@if (!isKendo)
+{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    <link href="~/Content/Themes/ModernUI/css/head.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery/jquery.slimscroll.js"></script>
+    <style>
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        #body {
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+        .bottom {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 100px;
+            background: #999;
+            z-index: 3;
+        }
+        .ui-resizable-helper {
+            border: 2px dotted #00F;
+        }
+    </style>
+    <script>
+        if (bars && bars.test && bars.test.hasIE < 7) {
+            $(function() {
+                var height = parseInt($(window).height(), 10);
+                $('#menuApp').height(height - 75 + 'px');
+                $('#main').height(height - 75 + 'px');
+            });
+        }
+        window.onerror = function(message, source, lineno) { showErrorJS(message, source, lineno); };
+
+        $(function() {
+            var appList = $("#applist");
+            var main = $('#main');
+            appList.resizable({
+                start: function(event, ui) {
+                    appList.loader({ type: 'block' });
+                    main.loader({ type: 'block' });
+                },
+                stop: function(event, ui) {
+                    appList.loader('remove').css('height', 'auto');
+                    main.loader('remove');
+                    main.css({ 'left': appList.width() + 5 + 'px' });
+                },
+                maxWidth: 460,
+                minWidth: 150,
+                helper: "ui-resizable-helper",
+                handles: 'e, w'
+            });
+
+            windowResize();
+            $(window).on('resizestop', function() {
+                windowResize();
+                document.getElementById('mainFrame').height = $('#main').height();
+            });
+        });
+
+        function windowResize() {
+            $('#menuApp').slimScroll({
+                height: 'auto',
+                railVisible: true,
+                size: '10px',
+                alwaysVisible: true,
+                distance: '2px'
+            });
+        }
+
+        function showErrorJS(message, source, lineno) {
+            var text = 'Помилка виконання JavaScript.<br/>\
+                  <div style=font-size:12px >\
+                    <b>повідомлення: </b>' + message + '<br/>\
+                    <b>файл: </b>' + source + '<br/>\
+                    <b>рядок: </b>' + lineno + '</div>';
+            barsUiError({ text: text });
+            var post = $.post('/barsroot/account/registryerror/',
+                {
+                    stack: 'Помилка виконання JavaScript. повідомлення: ' + message + ' . файл: ' + source + ' . рядок: ' + lineno
+                },
+                function() { post = null; }
+            );
+        }
+
+        function onLoadMainFrame(mainFrame) {
+            try {
+                var loadWinHeight = mainFrame.contentWindow.document.body.scrollHeight;
+                var parentHeight = $(mainFrame).parent().parent().height();
+                mainFrame.height = loadWinHeight > parentHeight ? parentHeight : parentHeight;
+
+                var scriptError = mainFrame.contentWindow.document.createElement('script');
+                scriptError.type = 'text/javascript';
+                scriptError.text = 'window.onerror=function(message, source, lineno){parent.showErrorJS(message, source, lineno);};';
+                mainFrame.contentWindow.document.getElementsByTagName('body')[0].appendChild(scriptError);
+            } catch (e) {
+
+            }
+
+            $('#main').loader('remove');
+            blockArms = false;
+        }
+
+    </script>
+    <div class="head" >
+        @Html.Action("Head", "Home")
+    </div>
+    <div class="applist" id="applist">
+        @Html.Action("Applist", "Home")
+    </div>
+    <div class="main" id="main">
+        <div id="main1" style="overflow: hidden; height: 100%;">
+            <iframe id="mainFrame" src="about:blank" onload=" onLoadMainFrame(this); " width="100%" height="100%" frameborder="0"></iframe>
+        </div>
+    </div>
+}
+else
+{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+
+    <style>
+        html {
+            padding-bottom: 2px;
+        }
+
+        body {
+            padding: 0;
+        }
+
+        #main-pane > .k-tabstrip-wrapper {
+            height: 100%;
+        }
+
+        #mainPaneTabs {
+            border-width: 0;
+            height: 100%;
+        }
+
+            #mainPaneTabs > .k-tabstrip-items {
+                padding: 0;
+            }
+
+                #mainPaneTabs > .k-tabstrip-items > .k-item > .k-link {
+                    padding: .3em .5em;
+                }
+
+            #mainPaneTabs > .k-content {
+                padding: 0;
+                margin: 0;
+                height: 100%;
+                height: calc(100% - 30px);
+            }
+
+            #mainPaneTabs > .k-tabstrip-items > .k-item > .k-tabstrip-action.k-link {
+                padding-left: 0;
+                padding-right: 0;
+            }
+            /*bug: невідповідність MVC хелпра та JS при створенні табів*/
+            #mainPaneTabs > .k-tabstrip-items > .k-item > .k-link > .k-tabstrip-action {
+                padding-left: .3em;
+                padding-right: -0.5em;
+            }
+    </style>
+    
+    @helper BindIframe(string url)
+    {
+        <iframe id="mainFrame" src="@url" onload="onLoadMainPane(this);" width="100%" height="100%" style="margin-bottom:   -3px" frameborder="0"></iframe>
+    }
+    @helper BindMainPaneContent()
+    {
+        if (!false)
+        {
+            @*<div id="mainPaneTabs"></div>*@
+            @(Html.Kendo().TabStrip()
+          .Name("mainPaneTabs")
+          .Animation(false)
+          .Items(items =>
+          {
+              items.Add().Selected(true)
+                .Content(BindIframe(Url.Content("~/board/index/")).ToHtmlString())
+                  //.Content("")
+                .Text("Oголошення <a class=\"k-tabstrip-action\" onclick=\"removeTab($(this).parent());return false;\" role=    \"button\" href=\"#\"><span class=\"k-icon k-i-close\" role=\"presentation\">Close</span></a>").Encoded (false);
+          }))
+    @(Html.Kendo().Sortable()
+                .For("#mainPaneTabs ul.k-tabstrip-items")
+                .Filter("li.k-item")
+                .Axis(SortableAxis.X)
+                .ContainerSelector("ul.k-tabstrip-items"))
+        }
+        else
+        {
+            @BindIframe(Url.Content("~/board/index/"))
+        }
+    }
+
+    @Html.Action("Head", "Home")
+
+    @(Html.Kendo().Splitter().HtmlAttributes(new { style = "height: 100%;border:0;" })
+      .Name("mainSplitter")
+      .Orientation(SplitterOrientation.Vertical)
+      .Panes(verticalPanes =>
+      {
+          verticalPanes.Add()
+              .Size("50px")
+              .HtmlAttributes(new { id = "bottom-pane", style = "border-bottom:1px solid #ccc;" })
+              .Resizable(false)
+              .Collapsible(false)
+              .Content("");
+          verticalPanes.Add()
+              .HtmlAttributes(new { id = "head-pane", style = "top:51px !important" })
+              .Scrollable(false)
+              .Collapsible(false)
+              .Content(Html.Kendo().Splitter()
+                    .Name("mainHorizontalSplitter")
+                    .HtmlAttributes(new { style = "height: 100%;" })
+                    .Panes(horizontalPanes =>
+                    {
+                        horizontalPanes.Add()
+                            .HtmlAttributes(new { id = "modules-pane", style = "border-right:1px solid #ccc;" })
+                            .Size("220px")
+                            .Collapsible(true)
+                            .Content(Html.Action("Applist", "Home").ToHtmlString());
+                        horizontalPanes.Add()
+                            .HtmlAttributes(new { id = "main-pane" })
+                            .Content(BindMainPaneContent().ToHtmlString());
+                        horizontalPanes.Add()
+                            .HtmlAttributes(new { id = "right-pane" })
+                            .Collapsible(true)
+                            .Size("200px").Collapsed(true)
+                            .Content("");
+                    }).ToHtmlString()
+                );
+
+          verticalPanes.Add()
+              .Resizable(false)
+              .Size("16px")
+              .HtmlAttributes(new { id = "middle-pane", style = "border-top:1px solid #ccc;" })
+              .Collapsible(false)
+              .Content(@<div style="text-align: center;font-size:12px;"> © 2003-@DateTime.Now.Year UNITY-BARS</div>);
+      })
+    )
+    <script>
+        /*$(function() {
+            var tabStrip = $('#mainPaneTabs').kendoTabStrip({
+                animation: false,
+                dataTextField: "text",
+                //dataImageUrlField: "imageUrl",
+                dataContentField: "content",
+                dataEncodedField: 'encoded',
+                dataSource: [
+                    /*{
+                        //selected: true,
+                        content: '<iframe id="mainFrame" src="' + bars.config.urlContent('/board/index/') + '" onload="onLoadMainPane(this);" width="100%" height="100%" style="margin-bottom: -3px" frameborder="0"></iframe>',
+                        text: 'Oголошення <a class="k-tabstrip-action" onclick="removeTab($(this).parent());return false;" role="button" href="#"><span class="k-icon k-i-close" role="presentation">Close</span></a>',
+                        encoded: false
+                    }* /
+                ]
+            }).data("kendoTabStrip");
+            tabStrip.append({
+                //selected: true,
+                content: '<iframe id="mainFrame" src="' + bars.config.urlContent('/board/index/') + '" onload="onLoadMainPane(this);" width="100%" height="100%" style="margin-bottom: -3px" frameborder="0"></iframe>',
+                text: 'Oголошення <a class="k-tabstrip-action" onclick="removeTab($(this).parent());return false;" role="button" href="#"><span class="k-icon k-i-close" role="presentation">Close</span></a>',
+                encoded: false
+            });
+            tabStrip.select(0);
+            $("#mainPaneTabs ul.k-tabstrip-items").kendoSortable({
+                filter: "li.k-item",
+                axis: "x",
+                container: "ul.k-tabstrip-items",
+                hint: function (element) {
+                    return $('<div id="hint" style="border:0px;padding:0" class="k-widget k-header k-tabstrip"><ul class="k-tabstrip-items k-reset" style="border:0;padding:0" ><li style="margin:0;padding:0;" class="k-item k-state-active k-tab-on-top">' + element.html() + '</li></ul></div>');
+                },
+                change: function(e) {
+                    var reference = tabStrip.tabGroup.children().eq(e.newIndex);
+
+                    if (e.oldIndex < e.newIndex) {
+                        tabStrip.insertAfter(e.item, reference);
+                    } else {
+                        tabStrip.insertBefore(e.item, reference);
+                    }
+                }
+            });
+        });*/
+
+        function onLoadMainPane(mainFrame) {
+            var mainPane = $('#main-pane');
+            mainPane.data('isload', false);
+            kendo.ui.progress(mainPane, false);
+            /*var loadWinHeight = mainFrame.contentWindow.document.body.scrollHeight;
+            var parentHeight = $(mainFrame).parent().parent().height();
+            mainFrame.height = loadWinHeight > parentHeight ? parentHeight : parentHeight;
+
+            var scriptError = mainFrame.contentWindow.document.createElement('script');
+            scriptError.type = 'text/javascript';
+            scriptError.text = 'window.onerror=function(message, source, lineno){parent.showErrorJS(message, source, lineno);};';
+            mainFrame.contentWindow.document.getElementsByTagName('body')[0].appendChild(scriptError);
+
+            $('#main').loader('remove');
+            blockArms = false;*/
+        }
+
+        function removeTab(item) {
+            var tabStrip = $('#mainPaneTabs').data('kendoTabStrip');
+            var curentSelTab = tabStrip.tabGroup.children('li.k-state-active');
+            if (item.attr('aria-controls') == curentSelTab.attr('aria-controls')) {
+                var otherTab = item.next();
+                otherTab = otherTab.length ? otherTab : item.prev();
+                tabStrip.select(otherTab);
+            }
+            tabStrip.remove(item);
+        }
+        function appendTab(url, text, operId, isFrame) {
+
+            var tabStrip = $('#mainPaneTabs').data('kendoTabStrip');
+            var tab = tabStrip.tabGroup.children('li[data-operid="' + operId + '"]');
+            if (tab.length == 0) {
+                var tabContent = '';
+                if (isFrame) {
+                    tabContent = '<iframe id="mainFrame" src="' + url + '" onload="onLoadMainPane(this);" width="100%" height="100%" style="margin-bottom: -3px" frameborder="0"></iframe>';
+                }
+                var textLenght = text.length;
+                tabStrip.append({
+                    text: '<span title="' + text + '">' + (textLenght > 30 ? text.substring(0, 30) + '...' : text) + '</span>' + '<a class="k-tabstrip-action" onclick="removeTab($(this).parent().parent());return false;" role="button" href="#"><span class="k-icon k-i-close" role="presentation">Close</span></a>',
+                    content: tabContent,
+                    encoded: false,
+                    cssClass: 'test'
+                });
+                tab = tabStrip.tabGroup.children("li.k-last");
+                tab.attr('data-operid', operId);
+            } else {
+                onLoadMainPane();
+            }
+            tabStrip.select(tab);
+
+            /*var otherTab = item.prev();
+            otherTab = otherTab.length ? otherTab : item.prev();
+            tabStrip.remove(item);*/
+            //tabStrip.select(tab);
+        }
+    </script>
+}

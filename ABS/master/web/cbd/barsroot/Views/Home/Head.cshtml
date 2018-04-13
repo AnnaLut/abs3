@@ -1,0 +1,775 @@
+﻿@using Kendo.Mvc.UI
+@using Newtonsoft.Json
+@model BarsWeb.Models.USER_PARAM
+@{
+    Layout = null;
+    var theme = Session["theme"] != null ? Session["theme"].ToString() : "bootstrap";
+    var isBkackTheme = BarsWeb.Infrastructure.Constants.ThemesList.FirstOrDefault(i => i.Pattern == "Kendo" && i.Name == theme && i.IsBlack) != null;
+    var btTheme = isBkackTheme ? "inverse" : "default";
+    var logo = isBkackTheme ? "_white": "";
+
+
+    System.Globalization.DateTimeFormatInfo cultureInfo = System.Globalization.CultureInfo.GetCultureInfo("uk-UA").DateTimeFormat;
+    DateTime bdate = Convert.ToDateTime(Model.BANKDATE);
+
+
+    //для роботи з _LayoutKendo
+    bool isKendo = false;
+    var getType = HttpContext.Current.Request.Params.GetValues("type");
+    if (getType != null)
+    {
+        isKendo = (getType[0].ToLower() == "kendo");
+    }
+}
+
+@if (barsroot.ServicesClass.GetGlobalParam("ENABLE_COMET_JS") == "1")
+{
+  <script src="@Url.Content("~/comet/js/comet.js")"></script>
+}
+else
+{
+  <script>
+      $(function() {
+          getMessCount();
+      });
+      function getMessCount() {
+          var url = '/barsroot/messagesctrl/count/';
+          $.ajax({
+              type: 'POST',
+              url: url,
+              success: function (data) {
+                  var count = parseInt(data,10);
+                  if (count != NaN) {
+                      var buttMess = $('#btnMessage');
+                      var messCount = buttMess.find('.count');
+                      if (count == 0) {
+                          messCount.remove();
+                      } else {
+                          if (messCount.length == 0) {
+                              messCount = $('<div/>', { 'class': 'count', id: '#btnMessageCount' });
+                              buttMess.prepend(messCount);
+                          }
+                          var oldCount = parseInt(messCount.eq(0).text(), 10) || 0;
+                          if (oldCount < count) {
+                              barsUiMess('Перевірте нові повідомлення', '<div class="btn_mess" style="width: 24px; height: 24px;float:left;margin:3px 4px 0 0;"></div>Нові повідомлення',
+                                  1,
+                                  function() {
+                                      showMessage();
+                                  });
+                          }
+                          messCount.html(count);
+                      }
+                  }
+                  window.setTimeout(function () { getMessCount(); },60000);
+              },
+              error: function() {
+          
+              }
+          });
+      }
+  </script>
+}
+<script>
+    function showProfile() {
+        var butt = $('#btnProfile');
+        $('.toolbar a').not(butt).removeClass('active');
+        if (!butt.hasClass('active')) {
+            butt.addClass('active');
+            $('#userProfile').popupBox({ selector: butt, rightMargin: 5, onClose: function () { butt.removeClass('active'); } });
+        } else {
+            $.fn.popupBox('close',{ onClose: function() { butt.removeClass('active'); } });
+        }
+    }
+    function changeCounter(count) {
+        var buttMess = $('#btnMessage');
+        var messCount = buttMess.find('.count');
+        var oldCount = parseInt(messCount.html()) || 0;
+        if (messCount.length == 0) {
+            messCount = $('<div/>', { 'class': 'count', id: '#btnMessageCount' });
+            buttMess.prepend(messCount);
+        }
+        var newCount = oldCount + parseInt(count);
+        if (newCount < 1) {
+            messCount.remove();
+        } else {
+            messCount.html(newCount);
+        }
+    }
+    function showMessage() {
+        var butt = $('#btnMessage');
+        $('.toolbar a').not(butt).removeClass('active');
+        if (!butt.hasClass('active')) {
+            butt.addClass('active');
+            var messBlock = $('#userMessage');
+
+            //messBlock.loader();
+            messBlock.load('/barsroot/messagesctrl/index/', function() {
+                messBlock.parent().loader('remove');
+            });
+
+            messBlock.popupBox({ selector: butt, rightMargin: 65, onClose: function () { butt.removeClass('active'); } });
+            messBlock.parent().loader();
+        } else {
+            $.fn.popupBox('close', { onClose: function () { butt.removeClass('active'); } });
+        } 
+    }
+  
+    function showAudit() {
+        var buttAudit = $('#btnAudit');
+        $('.toolbar a').not(buttAudit).removeClass('active');
+        if (!buttAudit.hasClass('active')) {
+            buttAudit.addClass('active');
+            var auditBlock = $('#userAudit');
+            auditBlock.load('/barsroot/account/audit/', function () {
+                auditBlock.parent().loader('remove');
+            });
+            auditBlock.popupBox({ selector: buttAudit, rightMargin: 125, onClose: function () { buttAudit.removeClass('active'); } });
+            auditBlock.parent().loader();
+        } else {
+            $.fn.popupBox('close', { onClose: function () { buttAudit.removeClass('active'); } });
+        }
+    }
+    function showGatges() {
+        var butt = $('#btnGatges');
+        $('.toolbar a').not(butt).removeClass('active');
+        if (!butt.hasClass('active')) {
+            butt.addClass('active');
+            $('#userGatges').popupBox({ selector: butt, rightMargin: 185, onClose: function () { butt.removeClass('active'); } });
+        } else {
+            $.fn.popupBox('close', { onClose: function () { butt.removeClass('active'); } });
+        }
+    }
+  
+    function showConverter() {
+        $.fn.popupBox('close', { onClose: function () { $('#btnGatges').removeClass('active'); } });
+        var convertor = $('<div/>');
+        convertor.dialog({
+            width: '230',
+            height: '358',
+            title: 'Конвертер',
+            position: { at: 'right bottom' },
+            close: function () { convertor.remove(); }
+        }).css('padding', '0').loader();
+        convertor.load('/barsroot/webservices/converter/', function () {
+            convertor.loader('remove');
+        });
+    }
+
+    function showCalc() {
+        $.fn.popupBox('close', { onClose: function () { $('#btnGatges').removeClass('active'); } });
+        var calc = $('<div/>');
+        calc.dialog({
+            width: '200',
+            height: '358',
+            title: 'Калькулятор',
+            position: { at: 'right bottom' },
+            close:function(){calc.remove();}
+        }).css('padding', '0').loader();
+        calc.load('/barsroot/webservices/calculator/',function() {
+            calc.loader('remove');
+        });
+    }
+
+    function showNews() {
+        $.fn.popupBox('close', { onClose: function () { $('#btnGatges').removeClass('active'); } });
+        go('/barsroot/board/index/',this);
+    }
+
+    function changeBranch(branch) {
+        $('#main').loader();
+        document.location.href();
+    }
+    function changePassword() {
+        var dialog = $('<div />');
+        dialog.load('/barsroot/account/changepassword/',{partial:true},function() {
+            dialog.loader('remove');
+        });
+        dialog.dialog({
+            width: 450,
+            height: 500,
+            modal: true,
+            close:function (){dialog.remove();}
+        }).loader();
+    }
+</script>
+@if (!isKendo)
+{
+    <link href="~/Content/Themes/ModernUI/css/popbox.css" rel="stylesheet" />
+    <style>
+        #userProfile {
+            font-family: arial, sans-serif;
+            font-size: small;
+
+        }
+        #userProfile .user-data {
+            margin: 10px;
+        }
+        #userProfile .user-control {
+            margin: 0;
+            background-color: #f4f4f4;
+            border-top: 1px solid #ccc;
+            padding: 7px 0;
+        }
+        #userProfile a {
+            font-size: small;
+        }
+        #userProfile a:hover {
+            text-decoration: underline;
+        }
+        .bf_bold {
+            font-weight: bold;
+        }
+        .bf_w {
+            color: #666;
+        }
+        #userGatges .toolbar a {
+            background-color: #5f9be8;
+            margin: 10px;
+        }
+        #userGatges .toolbar a:hover {
+            background-color: #3b5997;
+        }
+    </style>
+    <div>
+
+        <div class="toolbar" style="width: 250px;">
+            <a id="btnProfile" class="btn_mypage" href="#" onclick=" showProfile();return false; ">
+                <div>
+                    <span class="label">Профіль</span>
+                </div>
+            </a>
+            <a id="btnMessage" class="btn_mess" href="#" onclick=" showMessage();return false; ">
+                <div>
+                    <span class="label">Повідомл...</span>
+                </div>
+            </a>
+            <a id="btnAudit" class="btn_audit" href="#" onclick=" showAudit();return false; ">
+                <div>
+                    <span class="label">Журнал</span>
+                </div>
+            </a>
+            <a id="btnGatges" class="btn_gatges" href="#" onclick=" showGatges();return false; ">
+                <div>
+                    <span class="label">Додатки</span>
+                </div>
+            </a>
+        </div>
+  
+        <div class="logo">
+            <a href="@Url.Content("~/")">
+                <img alt="logo" id="imgCompanyLogo" src="@Url.Content("~/Content/logo.gif")" />
+            </a>
+        </div>
+        <div title="Банківська дата @Model.BANKDATE" style="display: inline-block; width: 55px; height: 55px; background-color: #fff; float: left; margin-left: 5px;">
+            <div style="width: 55px; height: 17px; background-color: #e0ecfc; color: #535b5e; font-size: 12px; text-align: center;">@bdate.ToString("MMMM", cultureInfo)</div>
+            <div style="width: 55px; height: 22px; line-height: 1; font-size: 22px; color: #05b7f9; text-align: center;">@bdate.ToString("dd")</div>
+            <div style="width: 55px; height: 16px; font-size: 12px; color: #195e8d; text-align: center; font-weight: bold;">@bdate.ToString("yyyy")</div>
+        </div>
+        <div style="float: left; margin-left: 5px; color: #dee7f5;">
+            @Html.Action("Branches", "Home", new {selectedBranch = Model.TOBO, selectedBranchName = Model.TOBONAME})
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Bars.Configuration.ConfigurationSettings.AppSettings["Product.Title"]))
+        {
+            <div style="float: left; text-align: center; margin-left: 5px; color: #fff; overflow: hidden; width: 200px;">
+                @Html.Raw(Bars.Configuration.ConfigurationSettings.AppSettings["Product.Title"])
+            </div>
+        }  
+    </div>
+
+
+
+    <div  style="display: none" id="userProfile">
+        <div class="user-data">
+            <table style="text-align: left;">
+                <tr>
+                    <td><span class="bf_w">Користувач:</span></td>
+                    <td><span class="bf_bold">@User.Identity.Name</span></td>
+                </tr>
+                <tr>
+                    <td><span class="bf_w">ПІБ:</span></td>
+                    <td><span class="bf_bold">@Model.USER_FULLNAME</span></td>
+                </tr>
+                <tr>
+                    <td><span class="bf_w">Ідентифікатор:</span></td>
+                    <td><span class="bf_bold">@Model.USER_ID</span></td>
+                </tr>    
+                <tr>
+                    <td><span class="bf_w">Ключ:</span></td>
+                    <td><span class="bf_bold">@Model.IDOPER</span></td>
+                </tr>     
+                <tr>
+                    <td><span class="bf_w">Відділення:</span></td>
+                    <td><span class="bf_bold" title="@Model.TOBONAME">@Model.TOBO</span></td>
+                </tr>    
+            </table>
+            <div style="background-color: #f4f4f4; border: 1px solid #ccc; margin-top: 10px;">
+                <div style="text-align: center">Технічна іформація</div>
+                <table>
+                    <tr>
+                        <td><span class="bf_w">WEB-сервер:</span></td>
+                        <td><span class="bf_bold">@Server.MachineName (@Dns.GetHostAddresses(Server.MachineName).FirstOrDefault(i => i.AddressFamily.ToString() == "InterNetwork"))</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="bf_w">База даних:</span></td>
+                        <td><span class="bf_bold">@ViewBag.DbName</span></td>
+                    </tr>
+                </table>
+            </div>
+
+        </div>
+        <div class="user-control" style="text-align: center;">
+            <a href="@Url.Content("~/account/changepassword/")" style="margin-right: 30px;">змінити пароль</a>
+            <a href="@Url.Content("~/account/logout/")" onclick=" $('body').loader();$('#btnProfile').click(); ">вихід</a>
+        </div>
+    </div>
+
+    <div  id="userMessage" style="width: 300px; height: 400px; padding: 0; display: none;"></div>
+
+    <div id="userAudit" style="width: 350px; height: 400px; padding: 0; display: none;"></div>
+
+    <div id="userGatges" style="width: 240px; height: 75px; padding: 10px 10px 10px 0; display: none">
+        <div class="toolbar">
+            <a id="btnCalc"  class="btn_calc" href="#" onclick=" showCalc();return false; ">
+                <div>
+                    <span class="label">Кальк...</span>
+                </div>
+            </a>
+            <a id="btnConv" class="btn_euro" href="#" onclick=" showConverter();return false; ">
+                <div>
+                    <span class="label">Конверт...</span>
+                </div>
+            </a>
+            <a id="btnNews" class="btn_news" href="#" onclick=" showNews();return false; ">
+                <div>
+                    <span class="label">Оголош...</span>
+                </div>
+            </a>
+        </div>
+    </div>
+
+
+}
+else
+{
+
+    <style>
+        #navBar {
+            margin-bottom: 0;
+            border: none;
+            position: absolute;
+            width: 100%;
+            z-index: 2;
+        }
+        #navBar .container-fluid {
+            padding-right: 0;
+            padding-left: 0;
+        }
+        #navBar .container-fluid > .navbar-header {
+            margin-right: 0;
+            margin-left: 0;
+        }
+
+        #navBar .nav-bar-image-button {
+            padding: 5px 10px 0 10px;
+            text-align: center;
+        }
+        #navBar .nav-bar-image-button-text {
+            font-size: 10px;
+            display: block;
+            line-height: 15px;
+        }
+
+        .userProfile-controls {
+            border-width: 1px 0 0 0;
+            border-radius: 0;
+            padding: 10px 0;
+            width: 100%;
+            margin-bottom: 0
+        }
+
+        .bf-w {
+            font-size: 12px;
+        }
+        .bf-bold {
+            font-weight: bold;
+        }
+        .bf-block {
+            margin: 0 0 5px 10px;
+        }
+
+        .bank-date-button {
+            text-align: center;
+            display: inline-block; 
+            width: 60px; 
+            height: 50px;
+            margin: 0;
+            padding: 0;
+            background-color: #fff;
+            float: left; 
+            border:1px solid #ccc; 
+            border-radius: 4px
+        }
+        .bank-date-button-month {
+            line-height: 1;
+            height: 14px; 
+            background-color: #485e87; 
+            color: #fff; 
+            font-size: 12px; 
+            border-radius: 4px;
+            border-bottom-left-radius: 0 4px;
+            border-bottom-right-radius:4px 0;
+        }
+        .bank-date-button-day {
+            height: 18px; 
+            line-height: 1; 
+            font-size: 20px; 
+            color: #05b7f9; 
+            text-align: center;
+        }
+        .bank-date-button-year {
+            margin: 2px 4px 0 4px;
+            border-top: 1px dotted #ccc;
+            line-height: 1;
+            font-size: 12px; 
+            color: #485e87; 
+            font-weight: bold;
+        }
+    </style>
+
+    <div class="navbar navbar-@btTheme k-header" id="navBar" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header" style="width:220px;">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="@Url.Content("~/")" style="margin-left: 10px">
+                    <img alt="logo" id="imgCompanyLogo" src="@Url.Content("~/Content/logo" + logo + ".png")" />
+                </a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-left">
+                    @*<li>
+                        <a href="#" style="padding:0 5px 0 10px;">
+                            <div title="Банківська дата @Model.BANKDATE" class="bank-date-button">
+                                <div class="bank-date-button-month">@bdate.ToString("MMMM", _cultureInfo)</div>
+                                <div class="bank-date-button-day">
+                                    @bdate.ToString("dd")@*<span class="bank-date-button-year">/@bdate.ToString("yyyy")</span>* @
+                                </div>
+                                <div class="bank-date-button-year" style="">@bdate.ToString("yyyy")</div>
+                            </div>
+                        </a>
+                    </li>*@
+                    <li>
+                        <div id="branchesList" style="margin-top: 5px;width: 250px"></div>
+                    </li>
+                </ul>
+                @*<ul class="nav navbar-nav">
+                              <li class="active"><a href="#">Link</a></li>
+                              <li><a href="#">Link</a></li>
+                              <li><a href="#">Link</a></li>
+                              <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <span class="caret"></span></a>
+                                <ul class="dropdown-menu" role="menu">
+                                  <li><a href="#">Action</a></li>
+                                  <li><a href="#">Another action</a></li>
+                                  <li><a href="#">Something else here</a></li>
+                                  <li class="divider"></li>
+                                  <li class="dropdown-header">Nav header</li>
+                                  <li><a href="#">Separated link</a></li>
+                                  <li><a href="#">One more separated link</a></li>
+                                </ul>
+                              </li>
+                            </ul>*@
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="#" style="padding:0 5px 0 10px;">
+                            <div title="Банківська дата @Model.BANKDATE" class="bank-date-button">
+                                <div class="bank-date-button-month">@bdate.ToString("MMMM", cultureInfo)</div>
+                                <div class="bank-date-button-day">
+                                    @bdate.ToString("dd")
+                                </div>
+                                <div class="bank-date-button-year" style="">@bdate.ToString("yyyy")</div>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-bar-image-button">
+                            <div class="pf-icon pf-24 pf-alert"></div><span class="nav-bar-image-button-text">Сповіщення</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" onclick=" onBtUserMailClick(this); return false; " class="nav-bar-image-button">
+                            <div class="pf-icon pf-24 pf-mail"></div>
+                            <span class="nav-bar-image-button-text">Повідомлення</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" onclick=" onBtUserProfileClick(this); return false; " id="bt-userProfile" class="nav-bar-image-button">
+                            <div class="pf-icon pf-24 pf-user"></div>
+                            <span class="nav-bar-image-button-text">Профіль</span>
+                        </a>
+                    </li>
+                </ul>
+            </div><!--/.nav-collapse -->
+        </div><!--/.container-fluid -->
+    </div>
+
+    <div id="userProfile" style="display:none">
+        <table>
+            <tr>
+                <td style="vertical-align: top;">
+                    <div style="width: 64px; height: 64px; border: 1px solid red;border-radius: 50%;overflow: hidden">
+                        <div class="pf-icon pf-64 pf-user_symbol_blue-picture"></div>
+                    </div>
+                </td>
+                <td style="vertical-align: top;">
+                    <div class="bf-block">
+                        <div class="bf-w">Користувач:</div>
+                        <div class="bf-bold">@User.Identity.Name</div>
+                    </div>
+                    <div class="bf-block">
+                        <div class="bf-w">ПІБ:</div>
+                        <div class="bf-bold">@Model.USER_FULLNAME</div>
+                    </div>
+                    <div class="bf-block">
+                        <div class="bf-w">Ідентифікатор:</div>
+                        <div class="bf-bold">@Model.USER_ID</div>
+                    </div>
+                    <div class="bf-block">
+                        <div class="bf-w">Ключ:</div>
+                        <div class="bf-bold">@Model.IDOPER</div>
+                    </div>
+                    <div class="bf-block">
+                        <div class="bf-w">Відділення:</div>
+                        <div class="bf-bold" title="@Model.TOBONAME">@Model.TOBO</div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <div class="well" style="padding: 5px;">
+            <div style="text-align: center">Технічна іформація</div>
+            <table>
+                <tr>
+                    <td><span class="bf-w">WEB-сервер:</span></td>
+                    <td><span class="bf-bold">@Server.MachineName (@Dns.GetHostAddresses(Server.MachineName).FirstOrDefault(i => i.AddressFamily.ToString() == "InterNetwork"))</span></td>
+                </tr>
+                <tr>
+                    <td><span class="bf-w">База даних:</span></td>
+                    <td><span class="bf-bold">@ViewBag.DbName</span></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="userProfile-controls well" style="text-align: center;">
+            <a href="@Url.Content("~/account/changepassword/")" style="margin-right: 30px;">редагувати профіль</a>
+            <a href="@Url.Content("~/account/changepassword/")" style="margin-right: 30px;">змінити пароль</a>
+            <a href="@Url.Content("~/account/logout/")" onclick="bars.ui.loader($('body'),true); /*$('body').loader();*/$('#btnProfile').click();">вихід</a>
+        </div>
+    </div>
+
+@*    @(Html.Kendo().Window()
+          .Name("profileWindow1")
+          .Title(false)
+          .Resizable()
+          .Visible(false)
+          .Modal(false)
+          .Draggable(true)
+          .Width(350).Height(327)
+          .Content(ProfileWindowContent().ToHtmlString())
+          .Position(position => position.Top(50).Left(100))
+          .Animation(animation =>
+          {
+              animation.Open(open =>
+              {
+                  open.Expand(ExpandDirection.Vertical);
+                  open.Fade(FadeDirection.In);
+              });
+              animation.Close(close =>
+              {
+                  close.Reverse(true);
+                  close.Expand(ExpandDirection.Vertical);
+                  close.Fade(FadeDirection.In);
+              });
+          }))
+    
+@helper ProfileWindowContent()
+{
+    <div id="userProfile" >
+        <table>
+            <tr>
+                <td style="vertical-align: top;">
+                    <div style="width: 64px; height: 64px; border: 1px solid red;border-radius: 50%;overflow: hidden">
+                        <div class="pf-icon pf-64 pf-user_symbol_blue-picture"></div>
+                    </div>
+                </td>
+                <td style="vertical-align: top;">
+                    <div class="bf-block">
+                        <div class="bf-w">Користувач:</div>
+                        <div class="bf-bold">@User.Identity.Name</div>          
+                    </div>
+                    <div class="bf-block">
+                        <div class="bf-w">ПІБ:</div>
+                        <div class="bf-bold">@Model.USER_FULLNAME</div>
+                    </div>
+                    <div class="bf-block">
+                        <div class="bf-w">Ідентифікатор:</div>
+                        <div class="bf-bold">@Model.USER_ID</div>
+                    </div>        
+                    <div class="bf-block">
+                        <div class="bf-w">Ключ:</div>
+                        <div class="bf-bold">@Model.IDOPER</div>
+                    </div>   
+                    <div class="bf-block">
+                        <div class="bf-w">Відділення:</div>
+                        <div class="bf-bold" title="@Model.TOBONAME">@Model.TOBO</div>
+                    </div>   
+                </td>
+            </tr>
+        </table>
+        <div class="well" style="padding: 5px;">
+            <div style="text-align: center">Технічна іформація</div>
+            <table>
+                <tr>
+                    <td><span class="bf-w">WEB-сервер:</span></td>
+                    <td><span class="bf-bold">@Server.MachineName (@Dns.GetHostAddresses(Server.MachineName).FirstOrDefault(i => i.AddressFamily.ToString() == "InterNetwork"))</span></td>
+                </tr>
+                <tr>
+                    <td><span class="bf-w">База даних:</span></td>
+                    <td><span class="bf-bold">@ViewBag.DbName</span></td>
+                </tr>
+            </table>
+        </div>    
+
+        <div class="userProfile-controls well" style="text-align: center;">
+            <a href="@Url.Content("~/account/changepassword/")" style="margin-right: 30px;">редагувати профіль</a>      
+            <a href="@Url.Content("~/account/changepassword/")" style="margin-right: 30px;">змінити пароль</a>
+            <a href="@Url.Content("~/account/logout/")" onclick=" $('body').loader();$('#btnProfile').click(); ">вихід</a>
+        </div>
+
+    </div>
+}*@
+
+    <script>
+        var userParameters = @Html.Raw(JsonConvert.SerializeObject(Model)) ;
+        $(function () {
+            $("#branchesList").kendoDropDownList({
+                dataTextField: "Branch",
+                dataValueField: "Branch",
+                autoBind: false,
+                value: userParameters.TOBO,
+                dataSource: {
+                    transport: {
+                        read: {
+                            dataType: "json",
+                            url: bars.config.urlContent('/api/kernel/branches/')
+                        }
+                    },
+                    schema: {
+                        data: "Data"
+                    }
+                },
+                filter: 'contains',
+                width: '250px',
+                //valueTemplate: '<div>#= Branch #</div>' +
+                // '<div style="font-size:10px;border-bottom:1px solid \\#ссс">#= Name #</div>',
+                template: '<div>#= Branch #</div>' +
+                    '<div style="font-size:10px;border-bottom:1px solid \\#ссс">#= Name #</div>',
+                change:function() {
+                    bars.ui.loader($('body'), true);
+                    var dataItem = this.dataItem(this.selectedIndex);
+                    document.location.replace(bars.config.urlContent('/home/changebranch/') + '?branch=' + dataItem.Branch);
+                }
+            });
+        });
+
+        function onBtUserProfileClick(elem) {
+            if ($(elem).parent().hasClass('active')) {
+                closeProfile();
+            } else {
+                showProfile();
+            }
+        }
+
+        function showProfile() {
+            bars.ui.dialog({
+                    id: 'profileWindow',
+                    title: false,
+                    modal: false,
+                    position: {
+                        top: 50,
+                        right:10,
+                        left: 'inherit'
+                    },
+                    width: 350,
+                    height:330,
+                    /*buttons: [
+                    {
+                        text:'bt1'
+                    }, {
+                        text:'bt2'
+                    }, {
+                        text: 'bt3'
+                    }
+                ],*/
+                    "animation":{
+                        "open":
+                        {
+                            "effects": "expand:vertical fade:in",
+                            "duration": 400
+                        },
+                        "close": {
+                            "effects": "expand:vertical fade:in",
+                            "duration": 400,
+                            "reverse": true
+                        }
+                    }
+                }).html($('#userProfile').html())
+                .parent().css({ right: '5px', left: 'inherit' });
+
+
+            var profile = $("#profileWindow");
+            $('#bt-userProfile').parent().addClass('active');
+            //profile.parent().css({ right: '5px', left: 'inherit' });
+
+            $(document).bind('click.popupBox', function(event) {
+                closeProfile(event);
+            });
+            $('iframe').contents().bind('click.popupBox', function(event) {
+                closeProfile(event);
+            });
+            profile.data("kendoWindow").open();
+        }
+
+        function closeProfile(event) {
+            if (!event || ($(event.target).closest('#bt-userProfile').length == 0 && $(event.target).closest('#profileWindow').length == 0)) {
+                var profile = $("#profileWindow");
+                $('#bt-userProfile').parent().removeClass('active');
+                profile.data("kendoWindow").close();
+                $(document).unbind('click.profileClose');
+                $('iframe').contents().unbind('click.popupBox');
+            }
+        }
+
+        function onBtUserMailClick(elem) {
+            var splitter = $("#mainSplitter #mainHorizontalSplitter").data("kendoSplitter");
+            var pane = $("#right-pane");
+            var $elem = $(elem);
+            if ($elem.parent().hasClass('active')) {
+                $elem.parent().removeClass('active');
+                splitter.toggle("#right-pane", false);
+                kendo.ui.progress(pane, false);
+            } else {
+                $elem.parent().addClass('active');
+                splitter.toggle("#right-pane", true);
+                kendo.ui.progress(pane, true);
+                pane.load('/barsroot/messagesctrl/index/', function() {
+                    kendo.ui.progress(pane, false);
+                });
+            }
+        }
+    </script>
+}

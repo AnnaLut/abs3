@@ -1,0 +1,190 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xmlform caption="Розрахунок фінансового стану клієнта"  captiontype="OnlyTitle" version="1.0.0" minwidth="1000" maxwidth="1000">
+  <grids>
+    <grid id="id1" title="Розрахунок фінансового стану клієнта(Постанова НБУ №23)" width="100"  >
+            
+      
+      
+      <datasource>
+        <sql>
+          SELECT  2, customer.rnk, customer.rnkp,
+          customer.okpo, customer.nmk, p.RUK,  s.NAME, fin_nbu.get_ved(customer.rnk) ved, ved as ved1
+          FROM customer, corps p,  stan_fin S
+          WHERE customer.RNK = p.RNK (+) and
+          customer.DATE_OFF is null and
+          NVL(customer.crisk,0) = s.FIN (+) and
+          (customer.custtype =2)
+          and customer.rnk = :RNK
+          ORDER BY 1,2,3
+        </sql>
+        <parameters>
+          <parameter name="RNK" datatype="Int64" type="QueryString" altname="rnk"></parameter>
+        </parameters>
+        </datasource>
+      <rowselection method="SingleRowServer"/>
+
+      <buttons>
+        <!--<button id="Bt92" type="Image" imagename="magic_wand"  hint="Розрахунок коефіцієнів" caption="Розрахунок коефіцієнів" >
+          <command type="Redirect" url="\barsroot\credit\fin_nbu\fin_form_kpb.aspx">
+            <parameters>
+              <parameter name="OKPO" altname="okpo" datatype="Int64" type="DataField"></parameter>
+              <parameter name="RNK"  altname="rnk"  datatype="Int64" type="DataField" ></parameter>
+              <parameter name="ND"  altname="frm"  datatype="Int64"  type="Constant" >
+                <defaultvalue type="Constant" value="0"/>
+              </parameter>
+              <parameter name="dat" type="Constant" datatype="String">
+                <defaultvalue type="SqlText" value="select to_char(gl.bd, 'DD/MM/YYYY') from dual"/>
+              </parameter>
+              <parameter name="custype" type="Constant" datatype="Int64">
+                <defaultvalue type="Constant" value="4"/>
+              </parameter>
+            </parameters>
+          </command>
+        </button>-->
+        <button id="Bt10" type="Image" hint="Повернутися до списку клієнтів" imagename="arrow_left"  >
+          <command type="Redirect" url="/barsroot/barsweb/dynform.aspx?form=frm_fin2_cust_bd"></command>
+        </button>
+      </buttons>
+      
+     <!--Опис колонок-->
+      
+      <fields>
+        <field name="RNK" datatype="Int64" key="true" >
+          <column caption="РНК"  show="true" width="90" />
+        </field>
+
+        <field name="OKPO" datatype="String" key="true" >
+          <column caption="ОКПО"  show="true" width="100" />
+        </field>
+        
+        <field name="NMK" datatype="String" key="false" >
+          <column caption="Назва клієнта"  show="true"  width="450"/>
+        </field>
+
+        <field name="RUK" datatype="String" key="false" >
+          <column caption="Керівник"  show="true" width="180" />
+        </field>
+
+        <field name="NAME" datatype="String" key="false" >
+          <column caption="Фін.стан з БД"  show="true" width="180" />
+        </field>
+
+        <field name="VED" datatype="String" key="true" >
+          <column caption="Група ВЕД"  show="true" width="180" />
+        </field>
+
+        <field name="VED1" datatype="String" key="true" >
+          <column caption="ВЕД"  show="true" width="180" />
+        </field>
+
+
+
+
+      </fields>
+      
+      
+    </grid>
+
+
+    <grid id="Id3" title="Кредитні угоди клієнта" pagesize="5" showpagesizebox="true" >
+      <datasource>
+        <sql>
+          select c.*, :okpo as okpo, :rnk1 as rnk1,  fin_zp.zn_vncrr(rnk, nd) as vncrr  from v_fin_cc_deal c where c.rnk = :rnk1 and substr(prod,1,2) = '21'
+          /*
+          select :okpo as okpo, c.rnk, c.nd, c.cc_id, c.sdate, c.wdate, c.branch, c.fin23, c.obs23, c.kat23, c.k23, :rnk1 as rnk1,  substr(f_get_nd_txt(c.ND, 'VNCRR', gl.bd),1,3) as vncrr, d.kv
+          from cc_deal c, cc_add d
+          where c.rnk = :rnk1  and c.nd = d.nd and 15 > sos
+          */
+        </sql>
+        <parameters>
+          <parameter name="OKPO" altname="okpo" datatype="Int64" masterid="Id1" masterkeyfield="OKPO" type="MasterGrid"></parameter>
+          <parameter name="RNK1" altname="rnk1" datatype="Int64" masterid="Id1" masterkeyfield="RNK" type="MasterGrid"></parameter>
+        </parameters>
+      </datasource>
+      <rowselection method="SingleRow"></rowselection>/>
+      <buttons>
+        <button id="Bt91" type="Image" imagename="magic_wand"  hint="Розрахунок коефіцієнів" caption="Розрахунок коефіцієнів" >
+          <command type="Redirect" url="\barsroot\credit\fin_nbu\fin_form_kpb.aspx">
+            <parameters>
+              <parameter name="OKPO" altname="okpo" datatype="Int64" type="DataField"></parameter>
+              <parameter name="RNK"  altname="rnk"  datatype="Int64" type="DataField" ></parameter>
+              <parameter name="ND"  altname="frm"  datatype="Int64"  type="DataField"  >
+                         </parameter>
+              <parameter name="dat" type="Constant" datatype="String">
+                <defaultvalue type="SqlText" value="select to_char(gl.bd, 'DD/MM/YYYY') from dual"/>
+              </parameter>
+              <parameter name="custype" type="Constant" datatype="Int64">
+                <defaultvalue type="Constant" value="4"/>
+              </parameter>
+               </parameters>
+                </command>
+        </button>
+      </buttons>
+      <fields>
+
+        <field name="TIP" key="true" datatype="String">
+          <column caption="TIP" show="true"></column>
+        </field>
+        
+        <field name="OKPO" key="true" datatype="Int64">
+          <column caption="OKPO" show="true"></column> 
+        </field>
+        
+        <field name="RNK" key="true" datatype="Int64">
+          <column caption="rnk" show="false" width="30"></column>
+        </field>
+          
+        <field name="ND" key="true" datatype="Int64" >
+          <column caption="REF КД" width="50" show="true"></column>
+        </field>
+
+        <field name="CC_ID" key="false" datatype="String">
+          <column caption="№ договора" show="true" width="70"></column>
+        </field>
+
+        <field name="SDATE" key="false" datatype="DateTime">
+          <column caption="Дата початку дії" show="true" width="50"></column>
+        </field>
+
+        <field name="WDATE"  key="false" datatype="DateTime">
+          <column caption="Дата завершення" show="true" width="50"></column>
+        </field>
+        
+        <field name="KV" key="false" datatype="Int64">
+          <column caption="Код валюти" show="true" width="20"></column>
+        </field>
+
+        <field name="branch" key="false" datatype="String">
+          <column caption="Бранч" show="true" width="70"></column>
+        </field>
+
+        <field name="FIN23" key="false" datatype="Int64">
+          <column caption="Клас боржника" show="true" width="15"></column>
+        </field>
+
+        <field name="OBS23" key="false" datatype="Int64">
+          <column caption="Стан обслуговування боргу" show="true" width="15"></column>
+        </field>
+        
+        <field name="KAT23" key="false" datatype="Int64">
+          <column caption="Категорія якості" show="true" width="15"></column>
+        </field>
+
+        <field name="K23" key="false" datatype="Int64">
+          <column caption="Значення показника ризику" show="true" width="15"></column>
+        </field>
+
+        <field name="VNCRR" key="false" datatype="String">
+          <column caption="Внутрішній кредитний рейтинг" show="true" width="15"></column>
+        </field>
+
+
+
+      </fields>
+    </grid>
+
+
+    
+  </grids>
+  
+</xmlform>

@@ -1,0 +1,77 @@
+﻿<xmlform captiontype="OnlyTitle">
+  <grids>
+    <grid id="gv" pagesize="15" showpagesizebox="true" title="Імпорт З/П (XML)" showfilter="false">
+      <datasource>
+        <sql>
+          select v.kf kf, v.nls nls, v.kv kv, v.nms nms, v.branch branch, v.ostc/100 fact, v.ostb/100 plan, c.okpo okpo   
+          from v_gl v, customer c
+          where v.nbs ='2924' and v.ob22 in ('01','03')
+          and v.branch = SYS_CONTEXT ('bars_context', 'user_branch')
+          and v.rnk=c.rnk
+        </sql>
+      </datasource>
+      <filters buttontext="Знайти" caption="Пошук транзитного рахунку" columnscount="3" width ="100%">
+        <filter field="NLS" caption="Рахунок" columnindex="1" condition="Equal" id="fltrnls">
+          <uicontrol></uicontrol>
+        </filter>
+        <filter field="KV" caption="Валюта" columnindex="2" condition="Equal" id="fltrkv">
+          <uicontrol type="IntegerInput"/>
+        </filter>
+        <filter field="NMS" caption="Назва рахунку" columnindex="3" condition="LikeBoth" id="fltrnmk" >
+          <uicontrol></uicontrol>
+        </filter>
+      </filters>
+        <rowselection method="SingleRowServer"/>
+      <fields>
+        <field name="KF" key="true" sort="Default" datatype="Int64">
+          <column show="false" caption="МФО" align="Center"/>
+          <form show="true">
+            <uicontrol type="IntegerInput"/>
+          </form>
+        </field>
+        <field name="NLS" key="true" sort="Default" datatype="String">
+          <column show="true" caption="Транзитний рахунок" align="Right"/>
+          <form show="true">
+            <uicontrol type="TextBox"/>
+          </form>
+        </field>
+        <field name="KV" key="true" sort="Default" datatype="Int64">
+          <column show="true" caption="Валюта" align="Center"/>
+          <form show="true">
+            <uicontrol type="IntegerInput"/>
+          </form>
+        </field>
+        <field name="NMS" key="true" sort="Default" datatype="String">
+          <column show="true" caption="Назва транзитного рахунку" align="Left"/>
+          <form show="true">
+            <uicontrol type="TextBox"/>
+          </form>
+        </field>
+        <field name="BRANCH" key="true" sort="Default" datatype="String">
+          <column show="true" caption="Відділення" align="Left"/>
+          <form show="true">
+            <uicontrol type="TextBox"/>
+          </form>
+        </field>
+        <field name="FACT" key="true" sort="Default" datatype="Decimal">
+          <column show="true" caption="Фактичний залишок(грн.)" align="Right"/>
+          <form show="true">
+            <uicontrol type="DecimalInput"/>
+          </form>
+        </field>
+        <field name="PLAN" key="true" sort="Default" datatype="Decimal">
+          <column show="true" caption="Плановий залишок(грн.)" align="Right"/>
+          <form show="true">
+            <uicontrol type="DecimalInput"/>
+          </form>
+        </field>
+        <field name="OKPO" key="true" sort="Default" datatype="String">
+          <column show="false" caption="ОКПО" align="Left"/>
+          <form show="true">
+            <uicontrol type="TextBox"/>
+          </form>
+        </field>
+       </fields>
+    </grid>
+  </grids>
+</xmlform>

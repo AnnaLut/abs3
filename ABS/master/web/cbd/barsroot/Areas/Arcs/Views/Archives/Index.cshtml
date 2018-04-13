@@ -1,0 +1,88 @@
+﻿@{
+  ViewBag.Title = "Arcs";
+  Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+  string theme = "bootstrap";
+  var cook = HttpContext.Current.Request.Cookies["theme"];
+  if (cook != null)
+  {
+    theme = cook.Value;
+  }
+}
+
+  <script type="text/javascript">
+    $(function() {
+      var grid = $("#stateArchiversGrid");
+      grid.kendoGrid({
+        dataSource: {
+            //type: 'aspnetmvc-ajax',
+          type:'webapi',
+          transport: {
+            read: '/barsroot/arcs/archives/gettablestatedata/'
+          },
+          //data: $this.response.data,
+          schema: {
+            data: "Data",
+            total: "Total",
+            errors: "Errors",
+            model: {
+              fields: {
+                PRT_TABNAME: { type: "string" },
+                LAST_ARC_DATE: { type: "date" }
+              }
+            }
+          },
+          pageSize: 10,
+          "page": 1,
+          "total": 0,
+          "serverPaging": true,
+          "serverSorting": true,
+          "serverFiltering": true,
+          "serverGrouping": true,
+          "serverAggregates": true
+        },
+        height: 250,
+        selectable: "multiple",
+        change: onArchiversGridRowSelect,
+        groupable: false,
+        sortable: true,
+        filterable: true,
+        pageable: {
+          refresh: true,
+          pageSizes: true,
+          buttonCount: 5
+        },
+        columns: [
+          {
+            field: "PRT_TABNAME",
+            title: "Таблиця"
+          }, {
+            field: "LAST_ARC_DATE",
+            title: "Дата до якої заархівовано дані",
+            format: '{0:dd/MM/yyyy}',
+            width: 250
+          }
+        ]
+      });
+    });
+    var test = null;
+    function onArchiversGridRowSelect(e) {
+      test = kendo.ui.progress($('body'), true);
+      e.preventDefault();
+      var dataItem = this.dataItem(this.select());
+      $('#detailOnTableView').load('/barsroot/arcs/archives/detailontable/' + dataItem.PRT_TABNAME, { partial: true }, function () {
+        $('body').children('.k-loading-mask').remove();
+      });
+    }
+  </script>
+
+<h1>Стан архівації таблиць</h1>
+
+<div id="stateArchiversGrid"></div>
+
+<div id="detailOnTableView" style="margin-top: 10px"></div>
+
+
+
+
+
+

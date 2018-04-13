@@ -1,0 +1,103 @@
+﻿/* ----------------------------------------------
+ * Стиль страницы
+ */
+body
+{
+    font-size: 10pt;
+    font-family: Arial;
+}
+
+/* ----------------------------------------------
+ * Стили относящиеся к таблице
+ */
+table
+{
+    width: 100%;
+}
+/* Стиль заголовка страницы */
+th
+{
+    padding-right: 5px;
+    padding-left: 5px;
+    font-weight: bold;
+    background-color: lightgrey;
+    white-space: nowrap;
+}
+/* Стиль строки */
+tr
+{
+    height: 20px;
+}
+
+/* Стиль ячейки */
+td
+{
+    font-size: 10pt;
+    font-family: Arial;
+    white-space: nowrap;
+    padding-left: 3px;
+    padding-right: 3px;
+}
+/* Стиль ячейки с заглавным текстом */
+td.title
+{
+    font-weight: bold;
+    padding-right: 10px;
+    padding-left: 10px;
+    vertical-align: middle;
+    text-align: center;
+}
+/* Стиль ячейки с обычным текстом */
+td.text
+{
+    padding-right: 5px;
+    padding-left: 5px;
+}
+/* Стиль ячейки с назначением */
+td.nazn
+{
+    padding-right: 5px;
+    padding-left: 5px;
+    color: Blue;
+    padding-left: 10px;
+    word-wrap: break-word;
+    word-break: break-all;
+    table-layout: fixed;
+}
+
+/* ----------------------------------------------
+ * Стиль контролов ввода
+ */
+input
+{
+    border-right: black 1px solid;
+    border-top: black 1px solid;
+    border-left: black 1px solid;
+    border-bottom: black 1px solid;
+    padding-left: 2px;
+    padding-right: 2px;
+    width: 150px;
+}
+
+/* ----------------------------------------------
+ * Стиль контролов ввода
+ */
+span
+{
+    font-size: 10pt;
+    font-family: Arial;
+}
+span.title
+{
+    font-weight: bold;
+}
+a
+{
+    font-size: 10pt;
+    font-family: Arial;
+}
+/* Не удалять, нужно для GridView */
+.GridViewHiddenCol
+{
+    display: none;
+}

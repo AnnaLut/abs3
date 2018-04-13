@@ -1,0 +1,141 @@
+﻿@{
+    Layout = null;
+}
+@using System.Windows.Forms.VisualStyles
+@model List<Areas.Admin.Models.V_OPERAPP>
+<style>
+  #listAccess, #listHandbook{
+    width: 210px;
+    min-height: 40px;
+    margin: 0;
+    padding: 0;
+    border-radius: 4px;
+  }
+
+      .list-item {
+        list-style-type: none;
+        margin-top: 5px;
+        width: 300px;
+        line-height: 20px;
+        background-color: #fcfcfc;
+        color: #000;
+        border: 1px solid #cccccc;
+        border-radius: 3px;
+        cursor: default;
+    }
+  /* WIDGETS */
+    .widget {
+        margin: 0 0 20px;
+        padding: 0;
+        background-color: #ffffff;
+        border: 1px solid #cccccc;
+        border-radius: 3px;
+    }
+
+    .widget:hover {
+        background-color: #fcfcfc;
+        border-color: #cccccc;
+    }
+
+    .widget div {
+        padding: 10px;
+        min-height: 50px;
+    }
+
+    .widget h3 {
+        font-size: 12px;
+        padding: 8px 10px;
+      margin: 0;
+        text-transform: uppercase;
+        border-bottom: 1px solid #e7e7e7;
+    }
+
+    .widget h3 span {
+        float: right;
+    }
+
+    .widget h3 span:hover {
+        cursor: pointer;
+        background-color: #e7e7e7;
+        border-radius: 20px;
+    }
+
+
+    .list-wrapper table td {
+      vertical-align: top;
+    }
+    .hint {
+      border-color: aqua;
+    }
+</style>
+<script>
+    function placeholder(element) {
+        return $("<li class='list-item' id='placeholder'>Drop Here!</li>");
+    }
+    function hint(element) {
+        return element.clone().addClass("hint");
+    }
+</script>
+<table>
+  <tr>
+    <td>
+      @(Html.Kendo().Button()
+        .Name("textButton")
+        .HtmlAttributes( new {type = "button", title = "Зберегти"} )
+        .Icon("tick")
+        .Content(""))
+    </td>
+  </tr>
+</table>
+<div class="list-wrapper" >
+    <table style="width: 100%">
+      <tr>
+        <td>
+          <div class="widget">
+            <h3>Видані функції</h3>
+            <div style="max-height:350px;overflow: auto;">
+              <ul id="listAccess" class="widget-container" style="min-height: 110px;">
+                @foreach (var item in Model)
+                {
+                  <li class="list-item" data-id="@item.CODEOPER"><input type="checkbox" value="@item.CODEOPER"> @item.CODEOPER @item.OPERNAME</li>
+                }
+              </ul>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div id="commandPanel"></div>
+        </td>
+        <td>
+          <div class="widget">
+            <h3>Доступні функції</h3>
+            <div style="max-height:350px;overflow: auto;">
+              <ul id="listHandbook" style="min-height: 110px;">
+                @foreach (var item in ViewBag.handbookGroupsAcc)
+                {
+                  <li class="list-item" data-id="@item.CODEOPER"><input type="checkbox" value="@item.CODEOPER"> @item.CODEOPER @item.NAME</li>
+                }
+              </ul>
+            </div>
+          </div>
+        </td>     
+      </tr>
+    </table>
+  </div>
+
+@(Html.Kendo().Sortable()
+    .For("#listAccess")
+    .ConnectWith("#listHandbook")
+    //.PlaceholderHandler("placeholder")
+    .Cursor("move")
+    .HintHandler("hint")
+)
+
+@(Html.Kendo().Sortable()
+    .For("#listHandbook")
+    .ConnectWith("#listAccess")
+    //.PlaceholderHandler("placeholder")
+    .Cursor("move")
+    .HintHandler("hint")
+    )
+

@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2007 rel. 3 (http://www.altova.com) by anny (bars) -->
+<!-- edited with XMLSPY v2004 rel. 2 U (http://www.xmlspy.com) by Dennis Syroporshnev (Unity-Bars, Ltd) -->
+<xs:schema xmlns:xdb="http://xmlns.oracle.com/xdb" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.unity-bars.com.ua/iBank" targetNamespace="http://www.unity-bars.com.ua/iBank" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.6" xdb:schemaURL="Payment.xsd">
+	<xs:include schemaLocation="Finance.xsd"/>
+	<xs:include schemaLocation="Message.xsd"/>
+	<xs:annotation>
+		<xs:documentation>Описание типов и структур платежного документа. Copyright (c) 2003, Unity-Bars.</xs:documentation>
+	</xs:annotation>
+	<xs:complexType name="PaymentType">
+		<xs:annotation>
+			<xs:documentation>Структура Платежного поручения</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Reference" nillable="false">
+				<xs:annotation>
+					<xs:documentation>Идентификатор документа в системе, который его породил</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:whiteSpace value="collapse"/>
+						<xs:maxLength value="20"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="DocNumber">
+				<xs:annotation>
+					<xs:documentation>Номер документа</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:whiteSpace value="collapse"/>
+						<xs:maxLength value="10"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="DocDate" type="xs:date">
+				<xs:annotation>
+					<xs:documentation>Дата документа</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Payer" type="ContragentType" nillable="false">
+				<xs:annotation>
+					<xs:documentation>Плательщик</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Payee" type="ContragentType" nillable="false">
+				<xs:annotation>
+					<xs:documentation>Получатель</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Amount1" type="AmountType" nillable="false">
+				<xs:annotation>
+					<xs:documentation>Сумма платежа</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Amount2" type="AmountType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Сумма платежа - 2</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ValueDate" type="xs:date">
+				<xs:annotation>
+					<xs:documentation>Дата валютирования</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="VOB" nillable="false">
+				<xs:annotation>
+					<xs:documentation>Вид документа</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:nonNegativeInteger">
+						<xs:whiteSpace value="collapse"/>
+						<xs:totalDigits value="3"/>
+						<xs:maxInclusive value="999"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Details" nillable="false">
+				<xs:annotation>
+					<xs:documentation>Назначения платежа</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="512"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="AddAttributes" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Дополнительные реквизиты</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Attribute" type="AttributeType" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Реквизит</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="PaymentMessage" nillable="false">
+		<xs:annotation>
+			<xs:documentation>Платежный документ</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:restriction base="MessageType">
+					<xs:sequence>
+						<xs:element name="Header" type="HeaderType">
+							<xs:annotation>
+								<xs:documentation>Заголовок сообщения</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Body">
+							<xs:annotation>
+								<xs:documentation>Тело сообщения</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="Body_PMNT">
+										<xs:complexType>
+											<xs:sequence>
+												<xs:element name="PMNT">
+													<xs:complexType>
+														<xs:sequence>
+															<xs:element name="Payment" nillable="false">
+																<xs:complexType>
+																	<xs:complexContent>
+																		<xs:extension base="PaymentType">
+																			<xs:attribute name="LineNumber">
+																				<xs:annotation>
+																					<xs:documentation>Последовательній номер документа</xs:documentation>
+																				</xs:annotation>
+																			</xs:attribute>
+																		</xs:extension>
+																	</xs:complexContent>
+																</xs:complexType>
+															</xs:element>
+														</xs:sequence>
+														<xs:attribute name="SIGN">
+															<xs:annotation>
+																<xs:documentation>Строка подписи в HEX</xs:documentation>
+															</xs:annotation>
+														</xs:attribute>
+														<xs:attribute name="KEY">
+															<xs:annotation>
+																<xs:documentation>Ключ</xs:documentation>
+															</xs:annotation>
+														</xs:attribute>
+													</xs:complexType>
+												</xs:element>
+											</xs:sequence>
+										</xs:complexType>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:restriction>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

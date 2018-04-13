@@ -1,0 +1,117 @@
+﻿body
+{
+}
+
+/* контерйнер для наполнения страници */
+.content_container
+{
+    padding: 10px 5px 5px 3px;
+}
+
+/* заголовок */
+.title_text
+{
+    font-weight: bold;
+    font-size: 11pt;
+}
+
+
+
+
+/* контерйнер для основного грида */
+.gridview_container
+{
+}
+
+/* таблица */
+.data_table
+{
+    text-align: left;
+}
+
+/* разделитель строк */
+.rows_separator
+{
+    height: 10px;
+}
+
+/* разделитель столбцов */
+.columns_separator
+{
+    width: 20px;
+}
+
+/* заглавная колонка */
+.data_table .header_column
+{
+    text-align: right;
+}
+
+/* колонка - значение */
+.data_table .value_column
+{
+}
+
+/* ячейка с кнопками */
+.data_table .buttons_container
+{
+    padding: 10px 0px 10px 0px;
+    text-align: center;
+    border-top: 1px solid #BDCFF7;
+}
+
+/* заголовок визарда */
+.wizard_header_container
+{
+    padding: 10px 10px 10px 10px;
+    text-align: center;
+    width: 100%;
+}
+.wizard_header_container .subcontainer
+{
+    border-bottom: 1px solid #BDCFF7;
+    padding: 5px 30px 5px 5px;
+    text-align: left;
+    width: 100%;
+}
+/* навигация визарда */
+.wizard_navigation_container
+{
+    padding: 10px 10px 10px 10px;
+    text-align: center;
+    width: 100%;
+}
+.wizard_navigation_container .subcontainer
+{
+    border-top: 1px solid #BDCFF7;
+    padding: 5px 30px 5px 5px;
+    text-align: right;
+    width: 100%;
+}
+/* шаг визарда */
+.wizard_step_container
+{
+    padding: 5px 0px 5px 30px;
+}
+
+/* табличная форма на базе ListView */
+.lv_grid
+{
+    border: 1px solid #BDCFF7;
+}
+.lv_grid .header_row
+{
+    background-color: #0977B9;
+    color: White;
+    font-weight: bold;
+    text-align: center;
+}
+.lv_grid .selected_row_hdr
+{
+    font-weight: bold;
+}
+
+.lv_grid .edit_row_hdr
+{
+    font-weight: bold;
+}

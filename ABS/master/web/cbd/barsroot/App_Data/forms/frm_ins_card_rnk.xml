@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<xmlform>
+  <!--#include(frm_ins_card_tabs_inc.xml)-->
+  <customforms>
+    <customform name="frmV_INS_DEALS" buttonsposition="Top" title="Перезаключення договору страхування {0}" columnscount="2" readonly="false" tabindex="0">
+      <buttons defaulttype="Button">
+        <!--#include(frm_ins_btnback_inc.xml)-->
+        <!--#include(frm_ins_btn_sched_inc.xml)-->
+        <button caption="Зберегти" hint="Зберегти зміни" id="btnSave">
+          <command type="PlSqlBlock" successmessage="Договір перезаключено">
+            <sql>
+              declare
+              l_id number;
+              begin
+              l_id := ins_pack.f_create_deal(
+              p_partner_id => :p_partner_id,
+              p_type_id => :p_type_id,
+              p_ser => :p_ser,
+              p_num => :p_num,
+              p_date_on => :p_date_on,
+              p_date_off => :p_date_off,
+              p_sum => :p_sum,
+              p_insu_tariff => :p_insu_tariff,
+              p_insu_sum => :p_insu_sum,
+              p_rnk => :p_rnk,
+              p_grt_id => null,
+              p_nd => :p_nd,
+              p_renew_need => :p_renew_need,
+              p_renew_alertdays => :p_renew_alertdays
+              );
+              ins_pack.p_mark_deal_as_renewed(p_deal_id => :P_ID, p_renew_newid => l_id);
+              end;
+            </sql>
+            <parameters>
+              <parameter type="FormField" name="P_ID" />
+              <parameter type="FormField" name="P_PARTNER_ID" />
+              <parameter type="FormField" name="P_TYPE_ID" />
+              <parameter type="FormField" name="P_SER" />
+              <parameter type="FormField" name="P_NUM" />
+              <parameter type="FormField" name="P_DATE_ON" />
+              <parameter type="FormField" name="P_DATE_OFF" />
+              <parameter type="FormField" name="P_SUM" />
+              <parameter type="FormField" name="P_INSU_TARIFF" />
+              <parameter type="FormField" name="P_INSU_SUM" />
+              <parameter type="FormField" name="P_RNK" />
+              <parameter type="FormField" name="P_ND" />
+              <parameter type="FormField" name="P_RENEW_NEED" />
+              <parameter type="FormField" name="P_RENEW_ALERTDAYS" />
+            </parameters>
+          </command>
+        </button>
+        
+      </buttons>
+      
+       <!--#include(frm_ins_card_ds_inc.xml)-->
+      
+      <customfields>
+
+        <!--#include(frm_ins_card_flds_inc.xml)-->
+        
+        <customfield groupname="6. Контрагент" columnindex="2" name="P_RNK" label="РНК контрагента" datatype="Int64" datasourcefield="RNK">
+          <uicontrol type="ReadOnlyReference" controlwidth="150" formname="frm_ins_ref_customers" formfieldname="RNK" readonly="true">
+            <rels>
+              <rel srcname="RNK" destname="P_RNK_NMK"/>
+              <rel srcname="OKPO" destname="P_RNK_OKPO"/>
+            </rels>
+          </uicontrol>
+        </customfield>
+        <customfield groupname="6. Контрагент" columnindex="2" name="P_RNK_NMK" label="Назва контрагента" datatype="String" size="100" datasourcefield="RNK_NMK">
+          <uicontrol type="TextBox" controlwidth="250" linescount="5" readonly="true" />
+        </customfield>
+        <customfield groupname="6. Контрагент" columnindex="2" name="P_RNK_OKPO" label="Ідентифікаційний код контрагента" datatype="String" size="100" datasourcefield="RNK_OKPO">
+          <uicontrol type="TextBox" controlwidth="150" readonly="true" />
+        </customfield>
+
+      </customfields>
+    </customform>
+  </customforms>
+</xmlform>

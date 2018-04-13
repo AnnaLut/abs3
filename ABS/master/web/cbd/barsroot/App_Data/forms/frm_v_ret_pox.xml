@@ -1,0 +1,109 @@
+﻿<xmlform   captiontype="OnlyTitle">
+  <grids>
+    <grid id="id_f1" table="v_ret_pox" pagesize="10" width="700"  showpagesizebox="true"  title="Повернення суми виплат на поховання" showfilter="false">
+      <rowselection method="SingleRow"/>
+      
+      <filters caption="Фільтри"  width="100" buttontext="Пошук" columnscount="1"  >
+        <filter id="id_f1" caption="Референс документа"  columnindex="1" field="REF" allowemptyvalue="false" condition="Equal" ></filter>
+        <!--<filter id="id_f2" caption="Дата надходження"  columnindex="2" field="VDAT" allowemptyvalue="true"   condition="Equal" >
+          <uicontrol type="DateInput">
+            <defaultvalue type="SqlText" value="(select gl.bd from dual)"></defaultvalue>
+          </uicontrol> 
+        </filter>
+        <filter id="id_f3" caption="Призначення платежу"  columnindex="3" field="NAZN" condition="LikeBoth"  >
+          <uicontrol linescount="3" controlwidth="150"></uicontrol>
+        </filter>
+        <filter id="id_f4" caption="Бранч" columnindex="4" field="BRANCH" condition="Equal">
+          <uicontrol type="DropDownList" table="(select branch, branch as name from branch where branch like SYS_CONTEXT ('bars_context', 'user_branch')||'%' order by branch asc )"   keyfield="branch"  valuefield="name"   >
+            <defaultvalue type="SqlText" value="(select SYS_CONTEXT ('bars_context', 'user_branch') from dual)" />
+          </uicontrol>  
+        </filter>-->
+      </filters>
+
+      <buttons defaulttype="Button">
+        <button id="BT1" type="Image" caption="Перегляд" imagename="folder" hint="Перегляд вхідного документа">
+          <command type="Redirect" url="/barsroot/documentview/default.aspx" target="Blank" >
+            <parameters>
+              <parameter name="REF" altname="ref"  type="DataField"></parameter>
+            </parameters>
+          </command>
+        </button>
+
+        <button id="BT2" type="Image" caption="Повернути платіж" imagename="checks" hint="Повернути платіж" >
+          <command type="Redirect" url="/barsroot/docinput/docinput.aspx?tt=PS2" >
+            <parameters>
+              <parameter type="DataField" name="ND" altname="Nd"></parameter>
+              <parameter type="DataField" name="NLSA" altname="Nls_A"></parameter>
+              <parameter type="DataField" name="KV" altname="Kv_A"></parameter>
+              <parameter type="DataField" name="NAZN" altname="Nazn"></parameter>
+              <parameter type="DataField" name="MFOB" altname="Mfo_B"></parameter>
+              <parameter type="DataField" name="S" altname="SumC"></parameter>
+              <parameter type="Constant" name="NLSB" altname="Nls_B">
+                <defaultvalue type="Constant" value="2906603"/>
+              </parameter>
+              <parameter type="Constant" name="NAM_B" altname="Nam_B">
+                <defaultvalue type="Constant" value="повернення суми виплат на поховання"/>
+              </parameter>
+              <parameter type="Constant" name="ID_B" altname="Id_B">
+                <defaultvalue type="Constant" value="00032129"/>
+              </parameter>
+              <parameter type="Constant" name="VOB" altname="Vob">
+                <defaultvalue type="Constant" value="1"/>
+              </parameter>
+              
+              
+                
+                
+            </parameters>
+          </command>
+          
+        </button>
+        
+        
+        
+        
+      </buttons>
+      
+      
+      
+      <fields>
+        <field name="REF" datatype="Int64" key="true">
+          <column caption="Реф вхідного" show="true"></column>
+        </field>
+        
+        <field name="ND" datatype="String" key="true">
+          <column caption="№ документа" show="true"></column> 
+        </field>
+
+        <field name="VDAT" datatype="DateTime" key="false">
+          <column caption="Дата надходження" show="true"></column>
+        </field>
+
+        <field name="NAZN" key="true">
+          <column caption="призначення платежу" show="true"></column>
+        </field>
+
+        <field name="BRANCH" key="false">
+          <column caption="Бранч" show="true"></column>
+        </field>
+
+        <field name="MFOB" key="true" >
+          <column caption="MFOA" show="false"></column>
+        </field>
+        <field name="NLSA" key="true" >
+          <column caption="NLSA" show="false"></column>
+        </field>
+        <field name="KV" key="true" >
+          <column caption="KV" show="false"></column>
+        </field>
+        <field name="S" key="true" >
+          <column caption="Сума" show="true"></column>
+        </field>
+
+      </fields>
+      
+      
+      
+    </grid> 
+  </grids>
+</xmlform>

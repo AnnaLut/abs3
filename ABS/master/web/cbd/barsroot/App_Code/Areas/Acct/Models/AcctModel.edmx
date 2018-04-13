@@ -1,0 +1,1882 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="AcctModel.Store" Provider="Oracle.DataAccess.Client" ProviderManifestToken="11.2" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+        <EntityType Name="ACCOUNTS">
+          <Key>
+            <PropertyRef Name="ACC" />
+          </Key>
+          <Property Name="ACC" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="KF" Type="varchar2" MaxLength="6" Nullable="false" />
+          <Property Name="NLS" Type="varchar2" MaxLength="15" Nullable="false" />
+          <Property Name="KV" Type="number" Precision="3" Scale="0" Nullable="false" />
+          <Property Name="BRANCH" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="NLSALT" Type="varchar2" MaxLength="15" />
+          <Property Name="NBS" Type="char" MaxLength="4" />
+          <Property Name="NBS2" Type="char" MaxLength="4" />
+          <Property Name="DAOS" Type="date" Nullable="false" />
+          <Property Name="DAPP" Type="date" />
+          <Property Name="ISP" Type="number" Precision="38" Scale="0" />
+          <Property Name="NMS" Type="varchar2" MaxLength="70" Nullable="false" />
+          <Property Name="LIM" Type="number" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="OSTB" Type="number" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="OSTC" Type="number" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="OSTF" Type="number" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="OSTQ" Type="number" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="DOS" Type="number" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="KOS" Type="number" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="DOSQ" Type="number" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="KOSQ" Type="number" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="PAP" Type="number" Precision="1" Scale="0" />
+          <Property Name="TIP" Type="char" MaxLength="3" />
+          <Property Name="VID" Type="number" Precision="2" Scale="0" Nullable="false" />
+          <Property Name="TRCN" Type="number" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="MDATE" Type="date" />
+          <Property Name="DAZS" Type="date" />
+          <Property Name="SEC" Type="raw" MaxLength="64" />
+          <Property Name="ACCC" Type="number" Precision="38" Scale="0" />
+          <Property Name="BLKD" Type="number" Precision="3" Scale="0" Nullable="false" />
+          <Property Name="BLKK" Type="number" Precision="3" Scale="0" Nullable="false" />
+          <Property Name="POS" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="SECI" Type="number" Precision="38" Scale="0" />
+          <Property Name="SECO" Type="number" Precision="38" Scale="0" />
+          <Property Name="GRP" Type="number" Precision="38" Scale="0" />
+          <Property Name="OSTX" Type="number" Precision="24" Scale="0" />
+          <Property Name="RNK" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="NOTIFIER_REF" Type="number" Precision="38" Scale="0" />
+          <Property Name="TOBO" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="BDATE" Type="date" />
+          <Property Name="OPT" Type="number" Precision="38" Scale="0" />
+          <Property Name="OB22" Type="char" MaxLength="2" />
+          <Property Name="DAPPQ" Type="date" />
+          <Property Name="SEND_SMS" Type="varchar2" MaxLength="1" />
+        </EntityType>
+        <EntityType Name="ACCOUNTS_UPDATE">
+          <Key>
+            <PropertyRef Name="IDUPD" />
+          </Key>
+          <Property Name="ACC" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="NLS" Type="varchar2" MaxLength="15" Nullable="false" />
+          <Property Name="NLSALT" Type="varchar2" MaxLength="15" />
+          <Property Name="KV" Type="number" Precision="3" Scale="0" Nullable="false" />
+          <Property Name="NBS" Type="char" MaxLength="4" />
+          <Property Name="NBS2" Type="char" MaxLength="4" />
+          <Property Name="DAOS" Type="date" Nullable="false" />
+          <Property Name="ISP" Type="number" Precision="38" Scale="0" />
+          <Property Name="NMS" Type="varchar2" MaxLength="70" Nullable="false" />
+          <Property Name="PAP" Type="number" Precision="1" Scale="0" />
+          <Property Name="VID" Type="number" Precision="2" Scale="0" />
+          <Property Name="DAZS" Type="date" />
+          <Property Name="BLKD" Type="number" Precision="3" Scale="0" />
+          <Property Name="BLKK" Type="number" Precision="3" Scale="0" />
+          <Property Name="CHGDATE" Type="date" Nullable="false" />
+          <Property Name="CHGACTION" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="POS" Type="number" Precision="38" Scale="0" />
+          <Property Name="TIP" Type="char" MaxLength="3" />
+          <Property Name="GRP" Type="number" Precision="38" Scale="0" />
+          <Property Name="SECI" Type="number" Precision="38" Scale="0" />
+          <Property Name="SECO" Type="number" Precision="38" Scale="0" />
+          <Property Name="DONEBY" Type="varchar2" MaxLength="64" Nullable="false" />
+          <Property Name="IDUPD" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="LIM" Type="number" Precision="24" Scale="0" />
+          <Property Name="ACCC" Type="number" Precision="38" Scale="0" />
+          <Property Name="TOBO" Type="varchar2" MaxLength="30" />
+          <Property Name="BRANCH" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="MDATE" Type="date" />
+          <Property Name="OSTX" Type="number" Precision="24" Scale="0" />
+          <Property Name="SEC" Type="raw" MaxLength="64" />
+          <Property Name="RNK" Type="number" Precision="22" Scale="0" />
+          <Property Name="KF" Type="varchar2" MaxLength="6" Nullable="false" />
+          <Property Name="EFFECTDATE" Type="date" />
+          <Property Name="SEND_SMS" Type="varchar2" MaxLength="1" />
+          <Property Name="OB22" Type="char" MaxLength="2" />
+        </EntityType>
+        <EntityType Name="ACCOUNTSW">
+          <Key>
+            <PropertyRef Name="ACC" />
+            <PropertyRef Name="TAG" />
+          </Key>
+          <Property Name="ACC" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="TAG" Type="varchar2" MaxLength="8" Nullable="false" />
+          <Property Name="VALUE" Type="varchar2" MaxLength="254" />
+          <Property Name="KF" Type="varchar2" MaxLength="6" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ACCOUNTSW_UPDATE">
+          <Key>
+            <PropertyRef Name="IDUPD" />
+          </Key>
+          <Property Name="IDUPD" Type="number" Precision="15" Scale="0" Nullable="false" />
+          <Property Name="CHGACTION" Type="char" MaxLength="1" />
+          <Property Name="EFFECTDATE" Type="date" />
+          <Property Name="CHGDATE" Type="date" />
+          <Property Name="DONEBY" Type="number" Precision="38" Scale="0" />
+          <Property Name="ACC" Type="number" Precision="38" Scale="0" />
+          <Property Name="TAG" Type="varchar2" MaxLength="8" />
+          <Property Name="VALUE" Type="varchar2" MaxLength="254" />
+          <Property Name="KF" Type="varchar2" MaxLength="6" Nullable="false" />
+        </EntityType>
+        <EntityType Name="GROUPS_ACC">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="NAME" Type="varchar2" MaxLength="50" Nullable="false" />
+          <Property Name="SCOPE" Type="varchar2" MaxLength="6" Nullable="false" />
+          <Property Name="NOTUSED" Type="number" Precision="1" Scale="0" />
+        </EntityType>
+        <EntityType Name="GROUPS_NBS">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="NBS" />
+          </Key>
+          <Property Name="ID" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="NBS" Type="char" MaxLength="4" Nullable="false" />
+          <Property Name="NOTUSED" Type="number" Precision="1" Scale="0" />
+        </EntityType>
+        <EntityType Name="GROUPS_STAFF">
+          <Key>
+            <PropertyRef Name="IDU" />
+            <PropertyRef Name="IDG" />
+          </Key>
+          <Property Name="IDU" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="IDG" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="SECG" Type="number" Precision="1" Scale="0" />
+          <Property Name="APPROVE" Type="number" Precision="1" Scale="0" />
+          <Property Name="ADATE1" Type="date" />
+          <Property Name="ADATE2" Type="date" />
+          <Property Name="RDATE1" Type="date" />
+          <Property Name="RDATE2" Type="date" />
+          <Property Name="REVOKED" Type="number" Precision="1" Scale="0" />
+          <Property Name="GRANTOR" Type="number" Precision="38" Scale="0" />
+          <Property Name="SEC_SEL" Type="number" Precision="1" Scale="0" />
+          <Property Name="SEC_CRE" Type="number" Precision="1" Scale="0" />
+          <Property Name="SEC_DEB" Type="number" Precision="1" Scale="0" />
+        </EntityType>
+        <EntityType Name="GROUPS_STAFF_ACC">
+          <Key>
+            <PropertyRef Name="IDA" />
+            <PropertyRef Name="IDG" />
+          </Key>
+          <Property Name="IDA" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="IDG" Type="number" Precision="38" Scale="0" Nullable="false" />
+        </EntityType>
+        <EntityType Name="TARIF">
+          <Key>
+            <PropertyRef Name="KOD" />
+            <PropertyRef Name="KF" />
+          </Key>
+          <Property Name="KOD" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="KV" Type="number" Precision="3" Scale="0" Nullable="false" />
+          <Property Name="NAME" Type="varchar2" MaxLength="50" Nullable="false" />
+          <Property Name="TAR" Type="number" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="PR" Type="number" Precision="20" Scale="4" Nullable="false" />
+          <Property Name="SMIN" Type="number" Precision="24" Scale="0" />
+          <Property Name="SMAX" Type="number" Precision="24" Scale="0" />
+          <Property Name="TIP" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="NBS" Type="char" MaxLength="4" />
+          <Property Name="OB22" Type="char" MaxLength="2" />
+          <Property Name="KF" Type="varchar2" MaxLength="6" Nullable="false" />
+          <Property Name="PDV" Type="number" Precision="38" Scale="0" />
+          <Property Name="RAZOVA" Type="number" Precision="38" Scale="0" />
+          <Property Name="DAT_BEGIN" Type="date" />
+          <Property Name="DAT_END" Type="date" />
+        </EntityType>
+        <EntityType Name="TARIF_HISTORY">
+          <Key>
+            <PropertyRef Name="IDS" />
+            <PropertyRef Name="KOD" />
+            <PropertyRef Name="DAT_OPEN" />
+          </Key>
+          <Property Name="IDS" Type="number" Precision="22" Scale="0" Nullable="false" />
+          <Property Name="KOD" Type="number" Precision="22" Scale="0" Nullable="false" />
+          <Property Name="TAR" Type="number" Precision="22" Scale="0" Nullable="false" />
+          <Property Name="PR" Type="number" Precision="20" Scale="4" Nullable="false" />
+          <Property Name="SMIN" Type="number" Precision="22" Scale="0" />
+          <Property Name="SMAX" Type="number" Precision="22" Scale="0" />
+          <Property Name="NBS_OB22" Type="char" MaxLength="6" />
+          <Property Name="DAT_OPEN" Type="date" Nullable="false" />
+          <Property Name="FL" Type="number" Precision="38" Scale="0" />
+        </EntityType>
+        <EntityType Name="TARIF_SCALE">
+          <Key>
+            <PropertyRef Name="KOD" />
+            <PropertyRef Name="SUM_LIMIT" />
+            <PropertyRef Name="KF" />
+          </Key>
+          <Property Name="KOD" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="SUM_LIMIT" Type="number" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="SUM_TARIF" Type="number" Precision="24" Scale="0" />
+          <Property Name="PR" Type="number" Precision="20" Scale="4" />
+          <Property Name="KF" Type="varchar2" MaxLength="6" Nullable="false" />
+        </EntityType>
+        <EntityType Name="TARIF_SCHEME">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="number" Precision="22" Scale="0" Nullable="false" />
+          <Property Name="NAME" Type="varchar2" MaxLength="100" />
+          <Property Name="D_CLOSE" Type="date" />
+          <Property Name="OPRTIME" Type="char" MaxLength="4" />
+          <Property Name="DOC_NOPAY" Type="number" Precision="38" Scale="0" />
+          <Property Name="FLAG_EDIT" Type="number" Precision="1" Scale="0" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.TABVAL' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="TABVAL">
+          <Key>
+            <PropertyRef Name="KV" />
+            <PropertyRef Name="NAME" />
+            <PropertyRef Name="LCV" />
+            <PropertyRef Name="NOMINAL" />
+            <PropertyRef Name="DENOM" />
+            <PropertyRef Name="PRV" />
+          </Key>
+          <Property Name="COIN" Type="number" Precision="10" Scale="0" />
+          <Property Name="KV" Type="number" Precision="3" Scale="0" Nullable="false" />
+          <Property Name="GRP" Type="number" Precision="1" Scale="0" />
+          <Property Name="NAME" Type="varchar2" MaxLength="35" Nullable="false" />
+          <Property Name="LCV" Type="char" MaxLength="3" Nullable="false" />
+          <Property Name="NOMINAL" Type="number" Precision="10" Scale="0" Nullable="false" />
+          <Property Name="SV" Type="char" MaxLength="1" />
+          <Property Name="DIG" Type="number" Precision="10" Scale="0" Nullable="false" />
+          <Property Name="DENOM" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="UNIT" Type="char" MaxLength="3" />
+          <Property Name="COUNTRY" Type="number" Precision="3" Scale="0" />
+          <Property Name="BASEY" Type="number" Precision="38" Scale="0" />
+          <Property Name="GENDER" Type="char" MaxLength="1" />
+          <Property Name="PRV" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="D_CLOSE" Type="date" />
+          <Property Name="SKV" Type="number" Precision="5" Scale="0" />
+          <Property Name="S0000" Type="varchar2" MaxLength="15" />
+          <Property Name="S3800" Type="varchar2" MaxLength="15" />
+          <Property Name="S3801" Type="number" Precision="38" Scale="0" />
+          <Property Name="S3802" Type="varchar2" MaxLength="15" />
+          <Property Name="S6201" Type="varchar2" MaxLength="15" />
+          <Property Name="S7201" Type="varchar2" MaxLength="15" />
+          <Property Name="S9282" Type="varchar2" MaxLength="15" />
+          <Property Name="S9280" Type="varchar2" MaxLength="15" />
+          <Property Name="S9281" Type="varchar2" MaxLength="15" />
+          <Property Name="S0009" Type="varchar2" MaxLength="15" />
+          <Property Name="G0000" Type="varchar2" MaxLength="15" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.V_ACC_TARIF_SCALE' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="V_ACC_TARIF_SCALE">
+          <Key>
+            <PropertyRef Name="ACC" />
+          </Key>
+          <Property Name="ACC" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="IDS" Type="number" Precision="38" Scale="0" />
+          <Property Name="KOD" Type="number" Precision="38" Scale="0" />
+          <Property Name="SUM_LIMIT" Type="number" Precision="38" Scale="0" />
+          <Property Name="SUM_TARIF" Type="number" Precision="38" Scale="0" />
+          <Property Name="PR" Type="number" Precision="20" Scale="4" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.V_ACCOUNTS' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="V_ACCOUNTS">
+          <Key>
+            <PropertyRef Name="ACC" />
+            <PropertyRef Name="NLS" />
+            <PropertyRef Name="KV" />
+            <PropertyRef Name="LCV" />
+            <PropertyRef Name="DIG" />
+            <PropertyRef Name="DENOM" />
+            <PropertyRef Name="KF" />
+            <PropertyRef Name="BRANCH" />
+            <PropertyRef Name="TOBO" />
+            <PropertyRef Name="DAOS" />
+            <PropertyRef Name="RNK" />
+            <PropertyRef Name="NMS" />
+            <PropertyRef Name="LIM" />
+            <PropertyRef Name="OSTB" />
+            <PropertyRef Name="OSTC" />
+            <PropertyRef Name="OSTF" />
+            <PropertyRef Name="OSTQ" />
+            <PropertyRef Name="VID" />
+            <PropertyRef Name="BLKD" />
+            <PropertyRef Name="BLKK" />
+            <PropertyRef Name="POS" />
+          </Key>
+          <Property Name="ACC" Type="number" Precision="38" Nullable="false" />
+          <Property Name="NLS" Type="varchar2" MaxLength="15" Nullable="false" />
+          <Property Name="NLSALT" Type="varchar2" MaxLength="15" />
+          <Property Name="KV" Type="number" Precision="3" Scale="0" Nullable="false" />
+          <Property Name="LCV" Type="char" MaxLength="3" Nullable="false" />
+          <Property Name="DIG" Type="number" Precision="10" Scale="0" Nullable="false" />
+          <Property Name="DENOM" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="KF" Type="varchar2" MaxLength="6" Nullable="false" />
+          <Property Name="BRANCH" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="TOBO" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="NBS" Type="char" MaxLength="4" />
+          <Property Name="NBS2" Type="char" MaxLength="4" />
+          <Property Name="DAOS" Type="date" Nullable="false" />
+          <Property Name="DAPP" Type="date" />
+          <Property Name="ISP" Type="number" Precision="38" Scale="0" />
+          <Property Name="RNK" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="NMS" Type="varchar2" MaxLength="70" Nullable="false" />
+          <Property Name="LIM" Type="number" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="OST" Type="number" Precision="38" Scale="0" />
+          <Property Name="OSTB" Type="number" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="OSTC" Type="number" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="OSTF" Type="number" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="OSTQ" Type="number" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="OSTX" Type="number" Precision="24" Scale="0" />
+          <Property Name="DOS" Type="number" Precision="38" Scale="0" />
+          <Property Name="KOS" Type="number" Precision="38" Scale="0" />
+          <Property Name="DOSQ" Type="number" Precision="38" Scale="0" />
+          <Property Name="KOSQ" Type="number" Precision="38" Scale="0" />
+          <Property Name="PAP" Type="number" Precision="1" Scale="0" />
+          <Property Name="TIP" Type="char" MaxLength="3" />
+          <Property Name="VID" Type="number" Precision="2" Scale="0" Nullable="false" />
+          <Property Name="TRCN" Type="number" Precision="38" Scale="0" />
+          <Property Name="MDATE" Type="date" />
+          <Property Name="DAZS" Type="date" />
+          <Property Name="SEC" Type="raw" MaxLength="64" />
+          <Property Name="ACCC" Type="number" Precision="38" Scale="0" />
+          <Property Name="BLKD" Type="number" Precision="3" Scale="0" Nullable="false" />
+          <Property Name="BLKK" Type="number" Precision="3" Scale="0" Nullable="false" />
+          <Property Name="POS" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="SECI" Type="number" Precision="38" Scale="0" />
+          <Property Name="SECO" Type="number" Precision="38" Scale="0" />
+          <Property Name="GRP" Type="number" Precision="38" Scale="0" />
+          <Property Name="OB22" Type="char" MaxLength="2" />
+          <Property Name="NOTIFIER_REF" Type="number" Precision="38" Scale="0" />
+          <Property Name="BDATE" Type="date" />
+          <Property Name="OPT" Type="number" Precision="38" Scale="0" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6013: The table/view 'BARS.V_SH_TARIF' does not have a primary key defined and no valid primary key could be inferred. This table/view has been excluded. To use the entity, you will need to review your schema, add the correct keys, and uncomment it.-->
+        <EntityType Name="V_SH_TARIF">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="KOD" Type="number" Precision="38" Scale="0" />
+          <Property Name="KV" Type="number" Precision="3" Scale="0" />
+          <Property Name="NAME" Type="varchar2" MaxLength="50" />
+          <Property Name="TAR" Type="number" Precision="38" Scale="0" />
+          <Property Name="PR" Type="number" Precision="20" Scale="4" />
+          <Property Name="SMIN" Type="number" Precision="38" Scale="0" />
+          <Property Name="SMAX" Type="number" Precision="38" Scale="0" />
+        </EntityType>
+        <EntityType Name="V_ACC_TARIF">
+          <Key>
+            <PropertyRef Name="ACC" />
+          </Key>
+          <Property Name="ACC" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="TYPE" Type="number" Precision="38" Scale="0" />
+          <Property Name="KOD" Type="number" Precision="38" Scale="0" />
+          <Property Name="TAR" Type="number" Precision="38" Scale="0" />
+          <Property Name="PR" Type="number" Precision="20" Scale="4" />
+          <Property Name="SMIN" Type="number" Precision="38" Scale="0" />
+          <Property Name="SMAX" Type="number" Precision="38" Scale="0" />
+          <Property Name="BDATE" Type="date" />
+          <Property Name="EDATE" Type="date" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.V_TOBO_ACCOUNTS' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="V_TOBO_ACCOUNTS">
+          <Key>
+            <PropertyRef Name="ACC" />
+            <PropertyRef Name="NLS" />
+            <PropertyRef Name="KV" />
+            <PropertyRef Name="KF" />
+            <PropertyRef Name="BRANCH" />
+            <PropertyRef Name="DAOS" />
+            <PropertyRef Name="RNK" />
+            <PropertyRef Name="NMS" />
+            <PropertyRef Name="LIM" />
+            <PropertyRef Name="OSTB" />
+            <PropertyRef Name="OSTF" />
+            <PropertyRef Name="OSTQ" />
+            <PropertyRef Name="DOSQ" />
+            <PropertyRef Name="KOSQ" />
+            <PropertyRef Name="VID" />
+            <PropertyRef Name="TRCN" />
+            <PropertyRef Name="BLKD" />
+            <PropertyRef Name="BLKK" />
+            <PropertyRef Name="POS" />
+            <PropertyRef Name="TOBO" />
+            <PropertyRef Name="LCV" />
+            <PropertyRef Name="DIG" />
+            <PropertyRef Name="DENOM" />
+          </Key>
+          <Property Name="ACC" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="NLS" Type="varchar2" MaxLength="15" Nullable="false" />
+          <Property Name="NLSALT" Type="varchar2" MaxLength="15" />
+          <Property Name="KV" Type="number" Precision="3" Scale="0" Nullable="false" />
+          <Property Name="KF" Type="varchar2" MaxLength="6" Nullable="false" />
+          <Property Name="BRANCH" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="NBS" Type="char" MaxLength="4" />
+          <Property Name="NBS2" Type="char" MaxLength="4" />
+          <Property Name="DAOS" Type="date" Nullable="false" />
+          <Property Name="DAPP" Type="date" />
+          <Property Name="ISP" Type="number" Precision="38" Scale="0" />
+          <Property Name="RNK" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="NMS" Type="varchar2" MaxLength="70" Nullable="false" />
+          <Property Name="LIM" Type="number" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="OSTB" Type="number" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="OSTC" Type="number" Precision="38" Scale="0" />
+          <Property Name="OSTF" Type="number" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="OSTQ" Type="number" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="OSTX" Type="number" Precision="24" Scale="0" />
+          <Property Name="DOS" Type="number" Precision="38" Scale="0" />
+          <Property Name="KOS" Type="number" Precision="38" Scale="0" />
+          <Property Name="DOSQ" Type="number" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="KOSQ" Type="number" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="PAP" Type="number" Precision="1" Scale="0" />
+          <Property Name="TIP" Type="char" MaxLength="3" />
+          <Property Name="VID" Type="number" Precision="2" Scale="0" Nullable="false" />
+          <Property Name="TRCN" Type="number" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="MDATE" Type="date" />
+          <Property Name="DAZS" Type="date" />
+          <Property Name="SEC" Type="raw" MaxLength="64" />
+          <Property Name="ACCC" Type="number" Precision="38" Scale="0" />
+          <Property Name="BLKD" Type="number" Precision="3" Scale="0" Nullable="false" />
+          <Property Name="BLKK" Type="number" Precision="3" Scale="0" Nullable="false" />
+          <Property Name="POS" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="SECI" Type="number" Precision="38" Scale="0" />
+          <Property Name="SECO" Type="number" Precision="38" Scale="0" />
+          <Property Name="GRP" Type="number" Precision="38" Scale="0" />
+          <Property Name="TOBO" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="LCV" Type="char" MaxLength="3" Nullable="false" />
+          <Property Name="DIG" Type="number" Precision="10" Scale="0" Nullable="false" />
+          <Property Name="DENOM" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="OST" Type="number" Precision="38" Scale="0" />
+          <Property Name="OB22" Type="char" MaxLength="2" />
+          <Property Name="NOTIFIER_REF" Type="number" Precision="38" Scale="0" />
+          <Property Name="BDATE" Type="date" />
+          <Property Name="OPT" Type="number" Precision="38" Scale="0" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.V_TOBO_ACCOUNTS_LITE' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="V_TOBO_ACCOUNTS_LITE">
+          <Key>
+            <PropertyRef Name="ACC" />
+            <PropertyRef Name="NLS" />
+            <PropertyRef Name="KV" />
+            <PropertyRef Name="LCV" />
+            <PropertyRef Name="DIG" />
+            <PropertyRef Name="DENOM" />
+            <PropertyRef Name="KF" />
+            <PropertyRef Name="BRANCH" />
+            <PropertyRef Name="TOBO" />
+            <PropertyRef Name="DAOS" />
+            <PropertyRef Name="RNK" />
+            <PropertyRef Name="NMS" />
+            <PropertyRef Name="LIM" />
+            <PropertyRef Name="OSTB" />
+            <PropertyRef Name="OSTC" />
+            <PropertyRef Name="OSTF" />
+            <PropertyRef Name="OSTQ" />
+            <PropertyRef Name="VID" />
+            <PropertyRef Name="BLKD" />
+            <PropertyRef Name="BLKK" />
+            <PropertyRef Name="POS" />
+          </Key>
+          <Property Name="ACC" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="NLS" Type="varchar2" MaxLength="15" Nullable="false" />
+          <Property Name="NLSALT" Type="varchar2" MaxLength="15" />
+          <Property Name="KV" Type="number" Precision="3" Scale="0" Nullable="false" />
+          <Property Name="LCV" Type="char" MaxLength="3" Nullable="false" />
+          <Property Name="DIG" Type="number" Precision="10" Scale="0" Nullable="false" />
+          <Property Name="DENOM" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="KF" Type="varchar2" MaxLength="6" Nullable="false" />
+          <Property Name="BRANCH" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="TOBO" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="NBS" Type="char" MaxLength="4" />
+          <Property Name="NBS2" Type="char" MaxLength="4" />
+          <Property Name="DAOS" Type="date" Nullable="false" />
+          <Property Name="DAPP" Type="date" />
+          <Property Name="ISP" Type="number" Precision="38" Scale="0" />
+          <Property Name="RNK" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="NMS" Type="varchar2" MaxLength="70" Nullable="false" />
+          <Property Name="LIM" Type="number" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="OST" Type="number" Precision="38" Scale="0" />
+          <Property Name="OSTB" Type="number" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="OSTC" Type="number" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="OSTF" Type="number" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="OSTQ" Type="number" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="OSTX" Type="number" Precision="24" Scale="0" />
+          <Property Name="DOS" Type="number" Precision="38" Scale="0" />
+          <Property Name="KOS" Type="number" Precision="38" Scale="0" />
+          <Property Name="DOSQ" Type="number" Precision="38" Scale="0" />
+          <Property Name="KOSQ" Type="number" Precision="38" Scale="0" />
+          <Property Name="PAP" Type="number" Precision="1" Scale="0" />
+          <Property Name="TIP" Type="char" MaxLength="3" />
+          <Property Name="VID" Type="number" Precision="2" Scale="0" Nullable="false" />
+          <Property Name="TRCN" Type="number" Precision="38" Scale="0" />
+          <Property Name="MDATE" Type="date" />
+          <Property Name="DAZS" Type="date" />
+          <Property Name="SEC" Type="raw" MaxLength="64" />
+          <Property Name="ACCC" Type="number" Precision="38" Scale="0" />
+          <Property Name="BLKD" Type="number" Precision="3" Scale="0" Nullable="false" />
+          <Property Name="BLKK" Type="number" Precision="3" Scale="0" Nullable="false" />
+          <Property Name="POS" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="SECI" Type="number" Precision="38" Scale="0" />
+          <Property Name="SECO" Type="number" Precision="38" Scale="0" />
+          <Property Name="GRP" Type="number" Precision="38" Scale="0" />
+          <Property Name="OB22" Type="char" MaxLength="2" />
+          <Property Name="NOTIFIER_REF" Type="number" Precision="38" Scale="0" />
+          <Property Name="BDATE" Type="date" />
+          <Property Name="OPT" Type="number" Precision="38" Scale="0" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6035: The relationship 'FK_ACCOUNTS_ACCOUNTS2' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+        <Association Name="FK_ACCOUNTS_ACCOUNTS2" />-->
+        <!--Errors Found During Generation:
+warning 6035: The relationship 'FK_ACCOUNTSUPD_ACCOUNTS2' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+        <Association Name="FK_ACCOUNTSUPD_ACCOUNTS2" />-->
+        <!--Errors Found During Generation:
+warning 6035: The relationship 'FK_ACCOUNTSUPD_ACCOUNTS3' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+        <Association Name="FK_ACCOUNTSUPD_ACCOUNTS3" />-->
+        <!--Errors Found During Generation:
+warning 6035: The relationship 'FK_ACCOUNTSW_ACCOUNTS2' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+        <Association Name="FK_ACCOUNTSW_ACCOUNTS2" />-->
+        <Association Name="FK_GROUPSNBS_GROUPSACC">
+          <End Role="GROUPS_ACC" Type="Self.GROUPS_ACC" Multiplicity="1" />
+          <End Role="GROUPS_NBS" Type="Self.GROUPS_NBS" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="GROUPS_ACC">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="GROUPS_NBS">
+              <PropertyRef Name="ID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_GROUPSSTAFFACC_GROUPSACC">
+          <End Role="GROUPS_ACC" Type="Self.GROUPS_ACC" Multiplicity="1" />
+          <End Role="GROUPS_STAFF_ACC" Type="Self.GROUPS_STAFF_ACC" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="GROUPS_ACC">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="GROUPS_STAFF_ACC">
+              <PropertyRef Name="IDA" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <!--Errors Found During Generation:
+warning 6035: The relationship 'FK_TARIFSCALE_TARIF' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+        <Association Name="FK_TARIFSCALE_TARIF" />-->
+        <EntityContainer Name="AcctModelStoreContainer">
+          <EntitySet Name="ACCOUNTS" EntityType="Self.ACCOUNTS" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="ACCOUNTS_UPDATE" EntityType="Self.ACCOUNTS_UPDATE" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="ACCOUNTSW" EntityType="Self.ACCOUNTSW" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="ACCOUNTSW_UPDATE" EntityType="Self.ACCOUNTSW_UPDATE" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="GROUPS_ACC" EntityType="Self.GROUPS_ACC" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="GROUPS_NBS" EntityType="Self.GROUPS_NBS" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="GROUPS_STAFF" EntityType="Self.GROUPS_STAFF" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="GROUPS_STAFF_ACC" EntityType="Self.GROUPS_STAFF_ACC" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="TARIF" EntityType="Self.TARIF" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="TARIF_HISTORY" EntityType="Self.TARIF_HISTORY" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="TARIF_SCALE" EntityType="Self.TARIF_SCALE" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="TARIF_SCHEME" EntityType="Self.TARIF_SCHEME" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="TABVAL" EntityType="Self.TABVAL" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"TABVAL"."COIN" AS "COIN", 
+"TABVAL"."KV" AS "KV", 
+"TABVAL"."GRP" AS "GRP", 
+"TABVAL"."NAME" AS "NAME", 
+"TABVAL"."LCV" AS "LCV", 
+"TABVAL"."NOMINAL" AS "NOMINAL", 
+"TABVAL"."SV" AS "SV", 
+"TABVAL"."DIG" AS "DIG", 
+"TABVAL"."DENOM" AS "DENOM", 
+"TABVAL"."UNIT" AS "UNIT", 
+"TABVAL"."COUNTRY" AS "COUNTRY", 
+"TABVAL"."BASEY" AS "BASEY", 
+"TABVAL"."GENDER" AS "GENDER", 
+"TABVAL"."PRV" AS "PRV", 
+"TABVAL"."D_CLOSE" AS "D_CLOSE", 
+"TABVAL"."SKV" AS "SKV", 
+"TABVAL"."S0000" AS "S0000", 
+"TABVAL"."S3800" AS "S3800", 
+"TABVAL"."S3801" AS "S3801", 
+"TABVAL"."S3802" AS "S3802", 
+"TABVAL"."S6201" AS "S6201", 
+"TABVAL"."S7201" AS "S7201", 
+"TABVAL"."S9282" AS "S9282", 
+"TABVAL"."S9280" AS "S9280", 
+"TABVAL"."S9281" AS "S9281", 
+"TABVAL"."S0009" AS "S0009", 
+"TABVAL"."G0000" AS "G0000"
+FROM "BARS"."TABVAL" "TABVAL"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="V_ACC_TARIF_SCALE" EntityType="Self.V_ACC_TARIF_SCALE" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"V_ACC_TARIF_SCALE"."ACC" AS "ACC", 
+"V_ACC_TARIF_SCALE"."IDS" AS "IDS", 
+"V_ACC_TARIF_SCALE"."KOD" AS "KOD", 
+"V_ACC_TARIF_SCALE"."SUM_LIMIT" AS "SUM_LIMIT", 
+"V_ACC_TARIF_SCALE"."SUM_TARIF" AS "SUM_TARIF", 
+"V_ACC_TARIF_SCALE"."PR" AS "PR"
+FROM "BARS"."V_ACC_TARIF_SCALE" "V_ACC_TARIF_SCALE"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="V_ACCOUNTS" EntityType="Self.V_ACCOUNTS" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"V_ACCOUNTS"."ACC" AS "ACC", 
+"V_ACCOUNTS"."NLS" AS "NLS", 
+"V_ACCOUNTS"."NLSALT" AS "NLSALT", 
+"V_ACCOUNTS"."KV" AS "KV", 
+"V_ACCOUNTS"."LCV" AS "LCV", 
+"V_ACCOUNTS"."DIG" AS "DIG", 
+"V_ACCOUNTS"."DENOM" AS "DENOM", 
+"V_ACCOUNTS"."KF" AS "KF", 
+"V_ACCOUNTS"."BRANCH" AS "BRANCH", 
+"V_ACCOUNTS"."TOBO" AS "TOBO", 
+"V_ACCOUNTS"."NBS" AS "NBS", 
+"V_ACCOUNTS"."NBS2" AS "NBS2", 
+"V_ACCOUNTS"."DAOS" AS "DAOS", 
+"V_ACCOUNTS"."DAPP" AS "DAPP", 
+"V_ACCOUNTS"."ISP" AS "ISP", 
+"V_ACCOUNTS"."RNK" AS "RNK", 
+"V_ACCOUNTS"."NMS" AS "NMS", 
+"V_ACCOUNTS"."LIM" AS "LIM", 
+"V_ACCOUNTS"."OST" AS "OST", 
+"V_ACCOUNTS"."OSTB" AS "OSTB", 
+"V_ACCOUNTS"."OSTC" AS "OSTC", 
+"V_ACCOUNTS"."OSTF" AS "OSTF", 
+"V_ACCOUNTS"."OSTQ" AS "OSTQ", 
+"V_ACCOUNTS"."OSTX" AS "OSTX", 
+"V_ACCOUNTS"."DOS" AS "DOS", 
+"V_ACCOUNTS"."KOS" AS "KOS", 
+"V_ACCOUNTS"."DOSQ" AS "DOSQ", 
+"V_ACCOUNTS"."KOSQ" AS "KOSQ", 
+"V_ACCOUNTS"."PAP" AS "PAP", 
+"V_ACCOUNTS"."TIP" AS "TIP", 
+"V_ACCOUNTS"."VID" AS "VID", 
+"V_ACCOUNTS"."TRCN" AS "TRCN", 
+"V_ACCOUNTS"."MDATE" AS "MDATE", 
+"V_ACCOUNTS"."DAZS" AS "DAZS", 
+"V_ACCOUNTS"."SEC" AS "SEC", 
+"V_ACCOUNTS"."ACCC" AS "ACCC", 
+"V_ACCOUNTS"."BLKD" AS "BLKD", 
+"V_ACCOUNTS"."BLKK" AS "BLKK", 
+"V_ACCOUNTS"."POS" AS "POS", 
+"V_ACCOUNTS"."SECI" AS "SECI", 
+"V_ACCOUNTS"."SECO" AS "SECO", 
+"V_ACCOUNTS"."GRP" AS "GRP", 
+"V_ACCOUNTS"."OB22" AS "OB22", 
+"V_ACCOUNTS"."NOTIFIER_REF" AS "NOTIFIER_REF", 
+"V_ACCOUNTS"."BDATE" AS "BDATE", 
+"V_ACCOUNTS"."OPT" AS "OPT"
+FROM "BARS"."V_ACCOUNTS" "V_ACCOUNTS"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="V_TOBO_ACCOUNTS" EntityType="Self.V_TOBO_ACCOUNTS" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"V_TOBO_ACCOUNTS"."ACC" AS "ACC", 
+"V_TOBO_ACCOUNTS"."NLS" AS "NLS", 
+"V_TOBO_ACCOUNTS"."NLSALT" AS "NLSALT", 
+"V_TOBO_ACCOUNTS"."KV" AS "KV", 
+"V_TOBO_ACCOUNTS"."KF" AS "KF", 
+"V_TOBO_ACCOUNTS"."BRANCH" AS "BRANCH", 
+"V_TOBO_ACCOUNTS"."NBS" AS "NBS", 
+"V_TOBO_ACCOUNTS"."NBS2" AS "NBS2", 
+"V_TOBO_ACCOUNTS"."DAOS" AS "DAOS", 
+"V_TOBO_ACCOUNTS"."DAPP" AS "DAPP", 
+"V_TOBO_ACCOUNTS"."ISP" AS "ISP", 
+"V_TOBO_ACCOUNTS"."RNK" AS "RNK", 
+"V_TOBO_ACCOUNTS"."NMS" AS "NMS", 
+"V_TOBO_ACCOUNTS"."LIM" AS "LIM", 
+"V_TOBO_ACCOUNTS"."OSTB" AS "OSTB", 
+"V_TOBO_ACCOUNTS"."OSTC" AS "OSTC", 
+"V_TOBO_ACCOUNTS"."OSTF" AS "OSTF", 
+"V_TOBO_ACCOUNTS"."OSTQ" AS "OSTQ", 
+"V_TOBO_ACCOUNTS"."OSTX" AS "OSTX", 
+"V_TOBO_ACCOUNTS"."DOS" AS "DOS", 
+"V_TOBO_ACCOUNTS"."KOS" AS "KOS", 
+"V_TOBO_ACCOUNTS"."DOSQ" AS "DOSQ", 
+"V_TOBO_ACCOUNTS"."KOSQ" AS "KOSQ", 
+"V_TOBO_ACCOUNTS"."PAP" AS "PAP", 
+"V_TOBO_ACCOUNTS"."TIP" AS "TIP", 
+"V_TOBO_ACCOUNTS"."VID" AS "VID", 
+"V_TOBO_ACCOUNTS"."TRCN" AS "TRCN", 
+"V_TOBO_ACCOUNTS"."MDATE" AS "MDATE", 
+"V_TOBO_ACCOUNTS"."DAZS" AS "DAZS", 
+"V_TOBO_ACCOUNTS"."SEC" AS "SEC", 
+"V_TOBO_ACCOUNTS"."ACCC" AS "ACCC", 
+"V_TOBO_ACCOUNTS"."BLKD" AS "BLKD", 
+"V_TOBO_ACCOUNTS"."BLKK" AS "BLKK", 
+"V_TOBO_ACCOUNTS"."POS" AS "POS", 
+"V_TOBO_ACCOUNTS"."SECI" AS "SECI", 
+"V_TOBO_ACCOUNTS"."SECO" AS "SECO", 
+"V_TOBO_ACCOUNTS"."GRP" AS "GRP", 
+"V_TOBO_ACCOUNTS"."TOBO" AS "TOBO", 
+"V_TOBO_ACCOUNTS"."LCV" AS "LCV", 
+"V_TOBO_ACCOUNTS"."DIG" AS "DIG", 
+"V_TOBO_ACCOUNTS"."DENOM" AS "DENOM", 
+"V_TOBO_ACCOUNTS"."OST" AS "OST", 
+"V_TOBO_ACCOUNTS"."OB22" AS "OB22", 
+"V_TOBO_ACCOUNTS"."NOTIFIER_REF" AS "NOTIFIER_REF", 
+"V_TOBO_ACCOUNTS"."BDATE" AS "BDATE", 
+"V_TOBO_ACCOUNTS"."OPT" AS "OPT"
+FROM "BARS"."V_TOBO_ACCOUNTS" "V_TOBO_ACCOUNTS"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="V_TOBO_ACCOUNTS_LITE" EntityType="Self.V_TOBO_ACCOUNTS_LITE" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"V_TOBO_ACCOUNTS_LITE"."ACC" AS "ACC", 
+"V_TOBO_ACCOUNTS_LITE"."NLS" AS "NLS", 
+"V_TOBO_ACCOUNTS_LITE"."NLSALT" AS "NLSALT", 
+"V_TOBO_ACCOUNTS_LITE"."KV" AS "KV", 
+"V_TOBO_ACCOUNTS_LITE"."LCV" AS "LCV", 
+"V_TOBO_ACCOUNTS_LITE"."DIG" AS "DIG", 
+"V_TOBO_ACCOUNTS_LITE"."DENOM" AS "DENOM", 
+"V_TOBO_ACCOUNTS_LITE"."KF" AS "KF", 
+"V_TOBO_ACCOUNTS_LITE"."BRANCH" AS "BRANCH", 
+"V_TOBO_ACCOUNTS_LITE"."TOBO" AS "TOBO", 
+"V_TOBO_ACCOUNTS_LITE"."NBS" AS "NBS", 
+"V_TOBO_ACCOUNTS_LITE"."NBS2" AS "NBS2", 
+"V_TOBO_ACCOUNTS_LITE"."DAOS" AS "DAOS", 
+"V_TOBO_ACCOUNTS_LITE"."DAPP" AS "DAPP", 
+"V_TOBO_ACCOUNTS_LITE"."ISP" AS "ISP", 
+"V_TOBO_ACCOUNTS_LITE"."RNK" AS "RNK", 
+"V_TOBO_ACCOUNTS_LITE"."NMS" AS "NMS", 
+"V_TOBO_ACCOUNTS_LITE"."LIM" AS "LIM", 
+"V_TOBO_ACCOUNTS_LITE"."OST" AS "OST", 
+"V_TOBO_ACCOUNTS_LITE"."OSTB" AS "OSTB", 
+"V_TOBO_ACCOUNTS_LITE"."OSTC" AS "OSTC", 
+"V_TOBO_ACCOUNTS_LITE"."OSTF" AS "OSTF", 
+"V_TOBO_ACCOUNTS_LITE"."OSTQ" AS "OSTQ", 
+"V_TOBO_ACCOUNTS_LITE"."OSTX" AS "OSTX", 
+"V_TOBO_ACCOUNTS_LITE"."DOS" AS "DOS", 
+"V_TOBO_ACCOUNTS_LITE"."KOS" AS "KOS", 
+"V_TOBO_ACCOUNTS_LITE"."DOSQ" AS "DOSQ", 
+"V_TOBO_ACCOUNTS_LITE"."KOSQ" AS "KOSQ", 
+"V_TOBO_ACCOUNTS_LITE"."PAP" AS "PAP", 
+"V_TOBO_ACCOUNTS_LITE"."TIP" AS "TIP", 
+"V_TOBO_ACCOUNTS_LITE"."VID" AS "VID", 
+"V_TOBO_ACCOUNTS_LITE"."TRCN" AS "TRCN", 
+"V_TOBO_ACCOUNTS_LITE"."MDATE" AS "MDATE", 
+"V_TOBO_ACCOUNTS_LITE"."DAZS" AS "DAZS", 
+"V_TOBO_ACCOUNTS_LITE"."SEC" AS "SEC", 
+"V_TOBO_ACCOUNTS_LITE"."ACCC" AS "ACCC", 
+"V_TOBO_ACCOUNTS_LITE"."BLKD" AS "BLKD", 
+"V_TOBO_ACCOUNTS_LITE"."BLKK" AS "BLKK", 
+"V_TOBO_ACCOUNTS_LITE"."POS" AS "POS", 
+"V_TOBO_ACCOUNTS_LITE"."SECI" AS "SECI", 
+"V_TOBO_ACCOUNTS_LITE"."SECO" AS "SECO", 
+"V_TOBO_ACCOUNTS_LITE"."GRP" AS "GRP", 
+"V_TOBO_ACCOUNTS_LITE"."OB22" AS "OB22", 
+"V_TOBO_ACCOUNTS_LITE"."NOTIFIER_REF" AS "NOTIFIER_REF", 
+"V_TOBO_ACCOUNTS_LITE"."BDATE" AS "BDATE", 
+"V_TOBO_ACCOUNTS_LITE"."OPT" AS "OPT"
+FROM "BARS"."V_TOBO_ACCOUNTS_LITE" "V_TOBO_ACCOUNTS_LITE"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="V_SH_TARIF" EntityType="Self.V_SH_TARIF" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>
+              SELECT
+              "V_SH_TARIF"."ID" AS "ID",
+              "V_SH_TARIF"."KOD" AS "KOD",
+              "V_SH_TARIF"."KV" AS "KV",
+              "V_SH_TARIF"."NAME" AS "NAME",
+              "V_SH_TARIF"."TAR" AS "TAR",
+              "V_SH_TARIF"."PR" AS "PR"
+              "V_SH_TARIF"."SMIN" AS "SMIN",
+              "V_SH_TARIF"."SMAX" AS "SMAX"
+              FROM "BARS"."V_SH_TARIF" "V_SH_TARIF"
+            </DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="V_ACC_TARIF" EntityType="Self.V_ACC_TARIF" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>
+              SELECT
+              "V_ACC_TARIF"."ACC" AS "ACC",
+              "V_ACC_TARIF"."TYPE" AS "TYPE",
+              "V_ACC_TARIF"."KOD" AS "KOD",
+              "V_ACC_TARIF"."TAR" AS "TAR",
+              "V_ACC_TARIF"."PR" AS "PR",
+              "V_ACC_TARIF"."SMIN" AS "SMIN"
+              "V_ACC_TARIF"."SMAX" AS "SMAX",
+              "V_ACC_TARIF"."BDATE" AS "BDATE"
+              "V_ACC_TARIF"."EDATE" AS "EDATE"
+              FROM "BARS"."V_ACC_TARIF" "V_ACC_TARIF"
+            </DefiningQuery>
+          </EntitySet>
+          <AssociationSet Name="FK_GROUPSNBS_GROUPSACC" Association="Self.FK_GROUPSNBS_GROUPSACC">
+            <End Role="GROUPS_ACC" EntitySet="GROUPS_ACC" />
+            <End Role="GROUPS_NBS" EntitySet="GROUPS_NBS" />
+          </AssociationSet>
+          <AssociationSet Name="FK_GROUPSSTAFFACC_GROUPSACC" Association="Self.FK_GROUPSSTAFFACC_GROUPSACC">
+            <End Role="GROUPS_ACC" EntitySet="GROUPS_ACC" />
+            <End Role="GROUPS_STAFF_ACC" EntitySet="GROUPS_STAFF_ACC" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="Areas.Acct.AcctModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+        <EntityType Name="ACCOUNT">
+          <Key>
+            <PropertyRef Name="ACC" />
+          </Key>
+          <Property Name="ACC" Type="Decimal" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="KF" Type="String" MaxLength="6" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="NLS" Type="String" MaxLength="15" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="KV" Type="Int16" Nullable="false" />
+          <Property Name="BRANCH" Type="String" MaxLength="30" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="NLSALT" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="NBS" Type="String" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="NBS2" Type="String" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="DAOS" Type="DateTime" Nullable="false" />
+          <Property Name="DAPP" Type="DateTime" />
+          <Property Name="ISP" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="NMS" Type="String" MaxLength="70" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="LIM" Type="Decimal" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="OSTB" Type="Decimal" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="OSTC" Type="Decimal" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="OSTF" Type="Decimal" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="OSTQ" Type="Decimal" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="DOS" Type="Decimal" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="KOS" Type="Decimal" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="DOSQ" Type="Decimal" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="KOSQ" Type="Decimal" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="PAP" Type="Int16" />
+          <Property Name="TIP" Type="String" MaxLength="3" FixedLength="true" Unicode="false" />
+          <Property Name="VID" Type="Int16" Nullable="false" />
+          <Property Name="TRCN" Type="Decimal" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="MDATE" Type="DateTime" />
+          <Property Name="DAZS" Type="DateTime" />
+          <Property Name="SEC" Type="Binary" MaxLength="64" FixedLength="false" />
+          <Property Name="ACCC" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="BLKD" Type="Int16" Nullable="false" />
+          <Property Name="BLKK" Type="Int16" Nullable="false" />
+          <Property Name="POS" Type="Decimal" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="SECI" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="SECO" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="GRP" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="OSTX" Type="Decimal" Precision="24" Scale="0" />
+          <Property Name="RNK" Type="Decimal" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="NOTIFIER_REF" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="TOBO" Type="String" MaxLength="30" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="BDATE" Type="DateTime" />
+          <Property Name="OPT" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="OB22" Type="String" MaxLength="2" FixedLength="true" Unicode="false" />
+          <Property Name="DAPPQ" Type="DateTime" />
+          <Property Name="SEND_SMS" Type="String" MaxLength="1" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="ACCOUNTS_UPDATE">
+          <Key>
+            <PropertyRef Name="IDUPD" />
+          </Key>
+          <Property Name="ACC" Type="Decimal" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="NLS" Type="String" MaxLength="15" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="NLSALT" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="KV" Type="Int16" Nullable="false" />
+          <Property Name="NBS" Type="String" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="NBS2" Type="String" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="DAOS" Type="DateTime" Nullable="false" />
+          <Property Name="ISP" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="NMS" Type="String" MaxLength="70" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="PAP" Type="Int16" />
+          <Property Name="VID" Type="Int16" />
+          <Property Name="DAZS" Type="DateTime" />
+          <Property Name="BLKD" Type="Int16" />
+          <Property Name="BLKK" Type="Int16" />
+          <Property Name="CHGDATE" Type="DateTime" Nullable="false" />
+          <Property Name="CHGACTION" Type="Int16" Nullable="false" />
+          <Property Name="POS" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="TIP" Type="String" MaxLength="3" FixedLength="true" Unicode="false" />
+          <Property Name="GRP" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="SECI" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="SECO" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="DONEBY" Type="String" MaxLength="64" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="IDUPD" Type="Decimal" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="LIM" Type="Decimal" Precision="24" Scale="0" />
+          <Property Name="ACCC" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="TOBO" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="BRANCH" Type="String" MaxLength="30" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="MDATE" Type="DateTime" />
+          <Property Name="OSTX" Type="Decimal" Precision="24" Scale="0" />
+          <Property Name="SEC" Type="Binary" MaxLength="64" FixedLength="false" />
+          <Property Name="RNK" Type="Decimal" Precision="22" Scale="0" />
+          <Property Name="KF" Type="String" MaxLength="6" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="EFFECTDATE" Type="DateTime" />
+          <Property Name="SEND_SMS" Type="String" MaxLength="1" FixedLength="false" Unicode="false" />
+          <Property Name="OB22" Type="String" MaxLength="2" FixedLength="true" Unicode="false" />
+        </EntityType>
+        <EntityType Name="ACCOUNTSW">
+          <Key>
+            <PropertyRef Name="ACC" />
+            <PropertyRef Name="TAG" />
+          </Key>
+          <Property Name="ACC" Type="Decimal" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="TAG" Type="String" MaxLength="8" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="VALUE" Type="String" MaxLength="254" FixedLength="false" Unicode="false" />
+          <Property Name="KF" Type="String" MaxLength="6" FixedLength="false" Unicode="false" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ACCOUNTSW_UPDATE">
+          <Key>
+            <PropertyRef Name="IDUPD" />
+          </Key>
+          <Property Name="IDUPD" Type="Int64" Nullable="false" />
+          <Property Name="CHGACTION" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="EFFECTDATE" Type="DateTime" />
+          <Property Name="CHGDATE" Type="DateTime" />
+          <Property Name="DONEBY" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="ACC" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="TAG" Type="String" MaxLength="8" FixedLength="false" Unicode="false" />
+          <Property Name="VALUE" Type="String" MaxLength="254" FixedLength="false" Unicode="false" />
+          <Property Name="KF" Type="String" MaxLength="6" FixedLength="false" Unicode="false" Nullable="false" />
+        </EntityType>
+        <EntityType Name="V_ACCOUNTS">
+          <Key>
+            <PropertyRef Name="ACC" />
+            <PropertyRef Name="NLS" />
+            <PropertyRef Name="KV" />
+            <PropertyRef Name="LCV" />
+            <PropertyRef Name="DIG" />
+            <PropertyRef Name="DENOM" />
+            <PropertyRef Name="KF" />
+            <PropertyRef Name="BRANCH" />
+            <PropertyRef Name="TOBO" />
+            <PropertyRef Name="DAOS" />
+            <PropertyRef Name="RNK" />
+            <PropertyRef Name="NMS" />
+            <PropertyRef Name="LIM" />
+            <PropertyRef Name="OSTB" />
+            <PropertyRef Name="OSTC" />
+            <PropertyRef Name="OSTF" />
+            <PropertyRef Name="OSTQ" />
+            <PropertyRef Name="VID" />
+            <PropertyRef Name="BLKD" />
+            <PropertyRef Name="BLKK" />
+            <PropertyRef Name="POS" />
+          </Key>
+          <Property Name="ACC" Type="Decimal" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="NLS" Type="String" MaxLength="15" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="NLSALT" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="KV" Type="Int16" Nullable="false" />
+          <Property Name="LCV" Type="String" MaxLength="3" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="DIG" Type="Int64" Nullable="false" />
+          <Property Name="DENOM" Type="Decimal" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="KF" Type="String" MaxLength="6" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="BRANCH" Type="String" MaxLength="30" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="TOBO" Type="String" MaxLength="30" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="NBS" Type="String" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="NBS2" Type="String" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="DAOS" Type="DateTime" Nullable="false" />
+          <Property Name="DAPP" Type="DateTime" />
+          <Property Name="ISP" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="RNK" Type="Decimal" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="NMS" Type="String" MaxLength="70" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="LIM" Type="Decimal" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="OST" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="OSTB" Type="Decimal" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="OSTC" Type="Decimal" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="OSTF" Type="Decimal" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="OSTQ" Type="Decimal" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="OSTX" Type="Decimal" Precision="24" Scale="0" />
+          <Property Name="DOS" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="KOS" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="DOSQ" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="KOSQ" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="PAP" Type="Int16" />
+          <Property Name="TIP" Type="String" MaxLength="3" FixedLength="true" Unicode="false" />
+          <Property Name="VID" Type="Int16" Nullable="false" />
+          <Property Name="TRCN" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="MDATE" Type="DateTime" />
+          <Property Name="DAZS" Type="DateTime" />
+          <Property Name="SEC" Type="Binary" MaxLength="64" FixedLength="false" />
+          <Property Name="ACCC" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="BLKD" Type="Int16" Nullable="false" />
+          <Property Name="BLKK" Type="Int16" Nullable="false" />
+          <Property Name="POS" Type="Decimal" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="SECI" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="SECO" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="GRP" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="OB22" Type="String" MaxLength="2" FixedLength="true" Unicode="false" />
+          <Property Name="NOTIFIER_REF" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="BDATE" Type="DateTime" />
+          <Property Name="OPT" Type="Decimal" Precision="38" Scale="0" />
+        </EntityType>
+        <EntityContainer Name="AcctEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="ACCOUNTS" EntityType="Self.ACCOUNT" />
+          <EntitySet Name="ACCOUNTS_UPDATE" EntityType="Self.ACCOUNTS_UPDATE" />
+          <EntitySet Name="ACCOUNTSWs" EntityType="Self.ACCOUNTSW" />
+          <EntitySet Name="ACCOUNTSW_UPDATE" EntityType="Self.ACCOUNTSW_UPDATE" />
+          <EntitySet Name="V_ACCOUNTS" EntityType="Self.V_ACCOUNTS" />
+          <EntitySet Name="V_TOBO_ACCOUNTS" EntityType="Areas.Acct.AcctModel.V_TOBO_ACCOUNTS" />
+          <EntitySet Name="V_TOBO_ACCOUNTS_LITE" EntityType="Areas.Acct.AcctModel.V_TOBO_ACCOUNTS_LITE" />
+          <EntitySet Name="GROUPS_ACC" EntityType="Areas.Acct.AcctModel.GROUPS_ACC" />
+          <EntitySet Name="GROUPS_NBS" EntityType="Areas.Acct.AcctModel.GROUPS_NBS" />
+          <EntitySet Name="GROUPS_STAFF" EntityType="Areas.Acct.AcctModel.GROUPS_STAFF" />
+          <EntitySet Name="GROUPS_STAFF_ACC" EntityType="Areas.Acct.AcctModel.GROUPS_STAFF_ACC" />
+          <AssociationSet Name="FK_GROUPSNBS_GROUPSACC" Association="Areas.Acct.AcctModel.FK_GROUPSNBS_GROUPSACC">
+            <End Role="GROUPS_ACC" EntitySet="GROUPS_ACC" />
+            <End Role="GROUPS_NBS" EntitySet="GROUPS_NBS" />
+          </AssociationSet>
+          <AssociationSet Name="FK_GROUPSSTAFFACC_GROUPSACC" Association="Areas.Acct.AcctModel.FK_GROUPSSTAFFACC_GROUPSACC">
+            <End Role="GROUPS_ACC" EntitySet="GROUPS_ACC" />
+            <End Role="GROUPS_STAFF_ACC" EntitySet="GROUPS_STAFF_ACC" />
+          </AssociationSet>
+          <EntitySet Name="TARIFs" EntityType="Areas.Acct.AcctModel.TARIF" />
+          <EntitySet Name="TARIF_HISTORY" EntityType="Areas.Acct.AcctModel.TARIF_HISTORY" />
+          <EntitySet Name="TARIF_SCALE" EntityType="Areas.Acct.AcctModel.TARIF_SCALE" />
+          <EntitySet Name="TARIF_SCHEME" EntityType="Areas.Acct.AcctModel.TARIF_SCHEME" />
+          <EntitySet Name="TABVALs" EntityType="Areas.Acct.AcctModel.TABVAL" />
+          <EntitySet Name="V_ACC_TARIF_SCALE" EntityType="Areas.Acct.AcctModel.V_ACC_TARIF_SCALE" />
+          <EntitySet Name="V_SH_TARIF" EntityType="Areas.Acct.AcctModel.V_SH_TARIF" /> 
+          <EntitySet Name="V_ACC_TARIF" EntityType="Areas.Acct.AcctModel.V_ACC_TARIF" />           
+          <AssociationSet Name="FK_TARIFSCALE_TARIF" Association="Areas.Acct.AcctModel.FK_TARIFSCALE_TARIF">
+            <End Role="TARIF" EntitySet="TARIFs" />
+            <End Role="TARIF_SCALE" EntitySet="TARIF_SCALE" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="V_TOBO_ACCOUNTS">
+          <Key>
+            <PropertyRef Name="ACC" />
+            <PropertyRef Name="NLS" />
+            <PropertyRef Name="KV" />
+            <PropertyRef Name="KF" />
+            <PropertyRef Name="BRANCH" />
+            <PropertyRef Name="DAOS" />
+            <PropertyRef Name="RNK" />
+            <PropertyRef Name="NMS" />
+            <PropertyRef Name="LIM" />
+            <PropertyRef Name="OSTB" />
+            <PropertyRef Name="OSTF" />
+            <PropertyRef Name="OSTQ" />
+            <PropertyRef Name="DOSQ" />
+            <PropertyRef Name="KOSQ" />
+            <PropertyRef Name="VID" />
+            <PropertyRef Name="TRCN" />
+            <PropertyRef Name="BLKD" />
+            <PropertyRef Name="BLKK" />
+            <PropertyRef Name="POS" />
+            <PropertyRef Name="TOBO" />
+            <PropertyRef Name="LCV" />
+            <PropertyRef Name="DIG" />
+            <PropertyRef Name="DENOM" />
+          </Key>
+          <Property Name="ACC" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="NLS" Type="String" Nullable="false" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="NLSALT" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="KV" Type="Int16" Nullable="false" />
+          <Property Name="KF" Type="String" Nullable="false" MaxLength="6" FixedLength="false" Unicode="false" />
+          <Property Name="BRANCH" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="NBS" Type="String" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="NBS2" Type="String" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="DAOS" Type="DateTime" Nullable="false" />
+          <Property Name="DAPP" Type="DateTime" />
+          <Property Name="ISP" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="RNK" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="NMS" Type="String" Nullable="false" MaxLength="70" FixedLength="false" Unicode="false" />
+          <Property Name="LIM" Type="Decimal" Nullable="false" Precision="24" Scale="0" />
+          <Property Name="OSTB" Type="Decimal" Nullable="false" Precision="24" Scale="0" />
+          <Property Name="OSTC" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="OSTF" Type="Decimal" Nullable="false" Precision="24" Scale="0" />
+          <Property Name="OSTQ" Type="Decimal" Nullable="false" Precision="24" Scale="0" />
+          <Property Name="OSTX" Type="Decimal" Precision="24" Scale="0" />
+          <Property Name="DOS" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="KOS" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="DOSQ" Type="Decimal" Nullable="false" Precision="24" Scale="0" />
+          <Property Name="KOSQ" Type="Decimal" Nullable="false" Precision="24" Scale="0" />
+          <Property Name="PAP" Type="Int16" />
+          <Property Name="TIP" Type="String" MaxLength="3" FixedLength="true" Unicode="false" />
+          <Property Name="VID" Type="Int16" Nullable="false" />
+          <Property Name="TRCN" Type="Decimal" Nullable="false" Precision="24" Scale="0" />
+          <Property Name="MDATE" Type="DateTime" />
+          <Property Name="DAZS" Type="DateTime" />
+          <Property Name="SEC" Type="Binary" MaxLength="64" FixedLength="false" />
+          <Property Name="ACCC" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="BLKD" Type="Int16" Nullable="false" />
+          <Property Name="BLKK" Type="Int16" Nullable="false" />
+          <Property Name="POS" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="SECI" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="SECO" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="GRP" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="TOBO" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="LCV" Type="String" Nullable="false" MaxLength="3" FixedLength="true" Unicode="false" />
+          <Property Name="DIG" Type="Int64" Nullable="false" />
+          <Property Name="DENOM" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="OST" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="OB22" Type="String" MaxLength="2" FixedLength="true" Unicode="false" />
+          <Property Name="NOTIFIER_REF" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="BDATE" Type="DateTime" />
+          <Property Name="OPT" Type="Decimal" Precision="38" Scale="0" />
+        </EntityType>
+        <EntityType Name="V_TOBO_ACCOUNTS_LITE">
+          <Key>
+            <PropertyRef Name="ACC" />
+            <PropertyRef Name="NLS" />
+            <PropertyRef Name="KV" />
+            <PropertyRef Name="LCV" />
+            <PropertyRef Name="DIG" />
+            <PropertyRef Name="DENOM" />
+            <PropertyRef Name="KF" />
+            <PropertyRef Name="BRANCH" />
+            <PropertyRef Name="TOBO" />
+            <PropertyRef Name="DAOS" />
+            <PropertyRef Name="RNK" />
+            <PropertyRef Name="NMS" />
+            <PropertyRef Name="LIM" />
+            <PropertyRef Name="OSTB" />
+            <PropertyRef Name="OSTC" />
+            <PropertyRef Name="OSTF" />
+            <PropertyRef Name="OSTQ" />
+            <PropertyRef Name="VID" />
+            <PropertyRef Name="BLKD" />
+            <PropertyRef Name="BLKK" />
+            <PropertyRef Name="POS" />
+          </Key>
+          <Property Name="ACC" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="NLS" Type="String" Nullable="false" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="NLSALT" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="KV" Type="Int16" Nullable="false" />
+          <Property Name="LCV" Type="String" Nullable="false" MaxLength="3" FixedLength="true" Unicode="false" />
+          <Property Name="DIG" Type="Int64" Nullable="false" />
+          <Property Name="DENOM" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="KF" Type="String" Nullable="false" MaxLength="6" FixedLength="false" Unicode="false" />
+          <Property Name="BRANCH" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="TOBO" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="NBS" Type="String" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="NBS2" Type="String" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="DAOS" Type="DateTime" Nullable="false" />
+          <Property Name="DAPP" Type="DateTime" />
+          <Property Name="ISP" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="RNK" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="NMS" Type="String" Nullable="false" MaxLength="70" FixedLength="false" Unicode="false" />
+          <Property Name="LIM" Type="Decimal" Nullable="false" Precision="24" Scale="0" />
+          <Property Name="OST" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="OSTB" Type="Decimal" Nullable="false" Precision="24" Scale="0" />
+          <Property Name="OSTC" Type="Decimal" Nullable="false" Precision="24" Scale="0" />
+          <Property Name="OSTF" Type="Decimal" Nullable="false" Precision="24" Scale="0" />
+          <Property Name="OSTQ" Type="Decimal" Nullable="false" Precision="24" Scale="0" />
+          <Property Name="OSTX" Type="Decimal" Precision="24" Scale="0" />
+          <Property Name="DOS" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="KOS" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="DOSQ" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="KOSQ" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="PAP" Type="Int16" />
+          <Property Name="TIP" Type="String" MaxLength="3" FixedLength="true" Unicode="false" />
+          <Property Name="VID" Type="Int16" Nullable="false" />
+          <Property Name="TRCN" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="MDATE" Type="DateTime" />
+          <Property Name="DAZS" Type="DateTime" />
+          <Property Name="SEC" Type="Binary" MaxLength="64" FixedLength="false" />
+          <Property Name="ACCC" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="BLKD" Type="Int16" Nullable="false" />
+          <Property Name="BLKK" Type="Int16" Nullable="false" />
+          <Property Name="POS" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="SECI" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="SECO" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="GRP" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="OB22" Type="String" MaxLength="2" FixedLength="true" Unicode="false" />
+          <Property Name="NOTIFIER_REF" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="BDATE" Type="DateTime" />
+          <Property Name="OPT" Type="Decimal" Precision="38" Scale="0" />
+        </EntityType>
+        <EntityType Name="GROUPS_ACC">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="NAME" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="SCOPE" Type="String" Nullable="false" MaxLength="6" FixedLength="false" Unicode="false" />
+          <Property Name="NOTUSED" Type="Int16" />
+          <NavigationProperty Name="GROUPS_NBS" Relationship="Areas.Acct.AcctModel.FK_GROUPSNBS_GROUPSACC" FromRole="GROUPS_ACC" ToRole="GROUPS_NBS" />
+          <NavigationProperty Name="GROUPS_STAFF_ACC" Relationship="Areas.Acct.AcctModel.FK_GROUPSSTAFFACC_GROUPSACC" FromRole="GROUPS_ACC" ToRole="GROUPS_STAFF_ACC" />
+        </EntityType>
+        <EntityType Name="GROUPS_NBS">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="NBS" />
+          </Key>
+          <Property Name="ID" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="NBS" Type="String" Nullable="false" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="NOTUSED" Type="Int16" />
+          <NavigationProperty Name="GROUPS_ACC" Relationship="Areas.Acct.AcctModel.FK_GROUPSNBS_GROUPSACC" FromRole="GROUPS_NBS" ToRole="GROUPS_ACC" />
+        </EntityType>
+        <EntityType Name="GROUPS_STAFF">
+          <Key>
+            <PropertyRef Name="IDU" />
+            <PropertyRef Name="IDG" />
+          </Key>
+          <Property Name="IDU" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="IDG" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="SECG" Type="Int16" />
+          <Property Name="APPROVE" Type="Int16" />
+          <Property Name="ADATE1" Type="DateTime" />
+          <Property Name="ADATE2" Type="DateTime" />
+          <Property Name="RDATE1" Type="DateTime" />
+          <Property Name="RDATE2" Type="DateTime" />
+          <Property Name="REVOKED" Type="Int16" />
+          <Property Name="GRANTOR" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="SEC_SEL" Type="Int16" />
+          <Property Name="SEC_CRE" Type="Int16" />
+          <Property Name="SEC_DEB" Type="Int16" />
+        </EntityType>
+        <EntityType Name="GROUPS_STAFF_ACC">
+          <Key>
+            <PropertyRef Name="IDA" />
+            <PropertyRef Name="IDG" />
+          </Key>
+          <Property Name="IDA" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="IDG" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <NavigationProperty Name="GROUPS_ACC" Relationship="Areas.Acct.AcctModel.FK_GROUPSSTAFFACC_GROUPSACC" FromRole="GROUPS_STAFF_ACC" ToRole="GROUPS_ACC" />
+        </EntityType>
+        <Association Name="FK_GROUPSNBS_GROUPSACC">
+          <End Type="Areas.Acct.AcctModel.GROUPS_ACC" Role="GROUPS_ACC" Multiplicity="1" />
+          <End Type="Areas.Acct.AcctModel.GROUPS_NBS" Role="GROUPS_NBS" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="GROUPS_ACC">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="GROUPS_NBS">
+              <PropertyRef Name="ID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_GROUPSSTAFFACC_GROUPSACC">
+          <End Type="Areas.Acct.AcctModel.GROUPS_ACC" Role="GROUPS_ACC" Multiplicity="1" />
+          <End Type="Areas.Acct.AcctModel.GROUPS_STAFF_ACC" Role="GROUPS_STAFF_ACC" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="GROUPS_ACC">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="GROUPS_STAFF_ACC">
+              <PropertyRef Name="IDA" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="TARIF">
+          <Key>
+            <PropertyRef Name="KOD" />
+            <PropertyRef Name="KF" />
+          </Key>
+          <Property Name="KOD" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="KV" Type="Int16" Nullable="false" />
+          <Property Name="NAME" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="TAR" Type="Decimal" Nullable="false" Precision="24" Scale="0" />
+          <Property Name="PR" Type="Decimal" Nullable="false" Precision="20" Scale="4" />
+          <Property Name="SMIN" Type="Decimal" Precision="24" Scale="0" />
+          <Property Name="SMAX" Type="Decimal" Precision="24" Scale="0" />
+          <Property Name="TIP" Type="Int16" Nullable="false" />
+          <Property Name="NBS" Type="String" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="OB22" Type="String" MaxLength="2" FixedLength="true" Unicode="false" />
+          <Property Name="KF" Type="String" Nullable="false" MaxLength="6" FixedLength="false" Unicode="false" />
+          <Property Name="PDV" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="RAZOVA" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="DAT_BEGIN" Type="DateTime" />
+          <Property Name="DAT_END" Type="DateTime" />
+          <NavigationProperty Name="TARIF_SCALE" Relationship="Areas.Acct.AcctModel.FK_TARIFSCALE_TARIF" FromRole="TARIF" ToRole="TARIF_SCALE" />
+        </EntityType>
+        <EntityType Name="TARIF_HISTORY">
+          <Key>
+            <PropertyRef Name="IDS" />
+            <PropertyRef Name="KOD" />
+            <PropertyRef Name="DAT_OPEN" />
+          </Key>
+          <Property Name="IDS" Type="Decimal" Nullable="false" Precision="22" Scale="0" />
+          <Property Name="KOD" Type="Decimal" Nullable="false" Precision="22" Scale="0" />
+          <Property Name="TAR" Type="Decimal" Nullable="false" Precision="22" Scale="0" />
+          <Property Name="PR" Type="Decimal" Nullable="false" Precision="20" Scale="4" />
+          <Property Name="SMIN" Type="Decimal" Precision="22" Scale="0" />
+          <Property Name="SMAX" Type="Decimal" Precision="22" Scale="0" />
+          <Property Name="NBS_OB22" Type="String" MaxLength="6" FixedLength="true" Unicode="false" />
+          <Property Name="DAT_OPEN" Type="DateTime" Nullable="false" />
+          <Property Name="FL" Type="Decimal" Precision="38" Scale="0" />
+        </EntityType>
+        <EntityType Name="TARIF_SCALE">
+          <Key>
+            <PropertyRef Name="KOD" />
+            <PropertyRef Name="SUM_LIMIT" />
+            <PropertyRef Name="KF" />
+          </Key>
+          <Property Name="KOD" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="SUM_LIMIT" Type="Decimal" Nullable="false" Precision="24" Scale="0" />
+          <Property Name="SUM_TARIF" Type="Decimal" Precision="24" Scale="0" />
+          <Property Name="PR" Type="Decimal" Precision="20" Scale="4" />
+          <Property Name="KF" Type="String" Nullable="false" MaxLength="6" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="TARIF" Relationship="Areas.Acct.AcctModel.FK_TARIFSCALE_TARIF" FromRole="TARIF_SCALE" ToRole="TARIF" />
+        </EntityType>
+        <EntityType Name="TARIF_SCHEME">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Decimal" Nullable="false" Precision="22" Scale="0" />
+          <Property Name="NAME" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="D_CLOSE" Type="DateTime" />
+          <Property Name="OPRTIME" Type="String" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="DOC_NOPAY" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="FLAG_EDIT" Type="Int16" />
+        </EntityType>
+        <EntityType Name="TABVAL">
+          <Key>
+            <PropertyRef Name="KV" />
+            <PropertyRef Name="NAME" />
+            <PropertyRef Name="LCV" />
+            <PropertyRef Name="NOMINAL" />
+            <PropertyRef Name="DENOM" />
+            <PropertyRef Name="PRV" />
+          </Key>
+          <Property Name="COIN" Type="Int64" />
+          <Property Name="KV" Type="Int16" Nullable="false" />
+          <Property Name="GRP" Type="Int16" />
+          <Property Name="NAME" Type="String" Nullable="false" MaxLength="35" FixedLength="false" Unicode="false" />
+          <Property Name="LCV" Type="String" Nullable="false" MaxLength="3" FixedLength="true" Unicode="false" />
+          <Property Name="NOMINAL" Type="Int64" Nullable="false" />
+          <Property Name="SV" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="DIG" Type="Int64" Nullable="false" />
+          <Property Name="DENOM" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="UNIT" Type="String" MaxLength="3" FixedLength="true" Unicode="false" />
+          <Property Name="COUNTRY" Type="Int16" />
+          <Property Name="BASEY" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="GENDER" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="PRV" Type="Int16" Nullable="false" />
+          <Property Name="D_CLOSE" Type="DateTime" />
+          <Property Name="SKV" Type="Int32" />
+          <Property Name="S0000" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="S3800" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="S3801" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="S3802" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="S6201" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="S7201" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="S9282" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="S9280" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="S9281" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="S0009" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="G0000" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="V_ACC_TARIF_SCALE">
+          <Key>
+            <PropertyRef Name="ACC" />
+          </Key>
+          <Property Name="ACC" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="IDS" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="KOD" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="SUM_LIMIT" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="SUM_TARIF" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="PR" Type="Decimal" Precision="20" Scale="4" />
+        </EntityType>
+
+        <EntityType Name="V_SH_TARIF">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="KOD" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="KV" Type="Int16" />
+          <Property Name="NAME" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="TAR" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="PR" Type="Decimal" Precision="20" Scale="4" />
+          <Property Name="SMIN" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="SMAX" Type="Decimal" Precision="38" Scale="0" />
+        </EntityType>
+        <EntityType Name="V_ACC_TARIF">
+          <Key>
+            <PropertyRef Name="ACC" />
+          </Key>
+          <Property Name="ACC" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="TYPE" Type="Decimal" Precision="38" Scale="0" />          
+          <Property Name="KOD" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="TAR" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="PR" Type="Decimal" Precision="20" Scale="4" />
+          <Property Name="SMIN" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="SMAX" Type="Decimal" Precision="38" Scale="0" />          
+          <Property Name="BDATE" Type="DateTime" />
+          <Property Name="EDATE" Type="DateTime" />
+        </EntityType> 
+        
+        <Association Name="FK_TARIFSCALE_TARIF">
+          <End Type="Areas.Acct.AcctModel.TARIF" Role="TARIF" Multiplicity="1" />
+          <End Type="Areas.Acct.AcctModel.TARIF_SCALE" Role="TARIF_SCALE" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TARIF">
+              <PropertyRef Name="KF" />
+              <PropertyRef Name="KOD" />
+            </Principal>
+            <Dependent Role="TARIF_SCALE">
+              <PropertyRef Name="KF" />
+              <PropertyRef Name="KOD" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="AcctModelStoreContainer" CdmEntityContainer="AcctEntities">
+          <EntitySetMapping Name="ACCOUNTS">
+            <EntityTypeMapping TypeName="Areas.Acct.AcctModel.ACCOUNT">
+              <MappingFragment StoreEntitySet="ACCOUNTS">
+                <ScalarProperty Name="ACC" ColumnName="ACC" />
+                <ScalarProperty Name="KF" ColumnName="KF" />
+                <ScalarProperty Name="NLS" ColumnName="NLS" />
+                <ScalarProperty Name="KV" ColumnName="KV" />
+                <ScalarProperty Name="BRANCH" ColumnName="BRANCH" />
+                <ScalarProperty Name="NLSALT" ColumnName="NLSALT" />
+                <ScalarProperty Name="NBS" ColumnName="NBS" />
+                <ScalarProperty Name="NBS2" ColumnName="NBS2" />
+                <ScalarProperty Name="DAOS" ColumnName="DAOS" />
+                <ScalarProperty Name="DAPP" ColumnName="DAPP" />
+                <ScalarProperty Name="ISP" ColumnName="ISP" />
+                <ScalarProperty Name="NMS" ColumnName="NMS" />
+                <ScalarProperty Name="LIM" ColumnName="LIM" />
+                <ScalarProperty Name="OSTB" ColumnName="OSTB" />
+                <ScalarProperty Name="OSTC" ColumnName="OSTC" />
+                <ScalarProperty Name="OSTF" ColumnName="OSTF" />
+                <ScalarProperty Name="OSTQ" ColumnName="OSTQ" />
+                <ScalarProperty Name="DOS" ColumnName="DOS" />
+                <ScalarProperty Name="KOS" ColumnName="KOS" />
+                <ScalarProperty Name="DOSQ" ColumnName="DOSQ" />
+                <ScalarProperty Name="KOSQ" ColumnName="KOSQ" />
+                <ScalarProperty Name="PAP" ColumnName="PAP" />
+                <ScalarProperty Name="TIP" ColumnName="TIP" />
+                <ScalarProperty Name="VID" ColumnName="VID" />
+                <ScalarProperty Name="TRCN" ColumnName="TRCN" />
+                <ScalarProperty Name="MDATE" ColumnName="MDATE" />
+                <ScalarProperty Name="DAZS" ColumnName="DAZS" />
+                <ScalarProperty Name="SEC" ColumnName="SEC" />
+                <ScalarProperty Name="ACCC" ColumnName="ACCC" />
+                <ScalarProperty Name="BLKD" ColumnName="BLKD" />
+                <ScalarProperty Name="BLKK" ColumnName="BLKK" />
+                <ScalarProperty Name="POS" ColumnName="POS" />
+                <ScalarProperty Name="SECI" ColumnName="SECI" />
+                <ScalarProperty Name="SECO" ColumnName="SECO" />
+                <ScalarProperty Name="GRP" ColumnName="GRP" />
+                <ScalarProperty Name="OSTX" ColumnName="OSTX" />
+                <ScalarProperty Name="RNK" ColumnName="RNK" />
+                <ScalarProperty Name="NOTIFIER_REF" ColumnName="NOTIFIER_REF" />
+                <ScalarProperty Name="TOBO" ColumnName="TOBO" />
+                <ScalarProperty Name="BDATE" ColumnName="BDATE" />
+                <ScalarProperty Name="OPT" ColumnName="OPT" />
+                <ScalarProperty Name="OB22" ColumnName="OB22" />
+                <ScalarProperty Name="DAPPQ" ColumnName="DAPPQ" />
+                <ScalarProperty Name="SEND_SMS" ColumnName="SEND_SMS" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ACCOUNTS_UPDATE">
+            <EntityTypeMapping TypeName="Areas.Acct.AcctModel.ACCOUNTS_UPDATE">
+              <MappingFragment StoreEntitySet="ACCOUNTS_UPDATE">
+                <ScalarProperty Name="ACC" ColumnName="ACC" />
+                <ScalarProperty Name="NLS" ColumnName="NLS" />
+                <ScalarProperty Name="NLSALT" ColumnName="NLSALT" />
+                <ScalarProperty Name="KV" ColumnName="KV" />
+                <ScalarProperty Name="NBS" ColumnName="NBS" />
+                <ScalarProperty Name="NBS2" ColumnName="NBS2" />
+                <ScalarProperty Name="DAOS" ColumnName="DAOS" />
+                <ScalarProperty Name="ISP" ColumnName="ISP" />
+                <ScalarProperty Name="NMS" ColumnName="NMS" />
+                <ScalarProperty Name="PAP" ColumnName="PAP" />
+                <ScalarProperty Name="VID" ColumnName="VID" />
+                <ScalarProperty Name="DAZS" ColumnName="DAZS" />
+                <ScalarProperty Name="BLKD" ColumnName="BLKD" />
+                <ScalarProperty Name="BLKK" ColumnName="BLKK" />
+                <ScalarProperty Name="CHGDATE" ColumnName="CHGDATE" />
+                <ScalarProperty Name="CHGACTION" ColumnName="CHGACTION" />
+                <ScalarProperty Name="POS" ColumnName="POS" />
+                <ScalarProperty Name="TIP" ColumnName="TIP" />
+                <ScalarProperty Name="GRP" ColumnName="GRP" />
+                <ScalarProperty Name="SECI" ColumnName="SECI" />
+                <ScalarProperty Name="SECO" ColumnName="SECO" />
+                <ScalarProperty Name="DONEBY" ColumnName="DONEBY" />
+                <ScalarProperty Name="IDUPD" ColumnName="IDUPD" />
+                <ScalarProperty Name="LIM" ColumnName="LIM" />
+                <ScalarProperty Name="ACCC" ColumnName="ACCC" />
+                <ScalarProperty Name="TOBO" ColumnName="TOBO" />
+                <ScalarProperty Name="BRANCH" ColumnName="BRANCH" />
+                <ScalarProperty Name="MDATE" ColumnName="MDATE" />
+                <ScalarProperty Name="OSTX" ColumnName="OSTX" />
+                <ScalarProperty Name="SEC" ColumnName="SEC" />
+                <ScalarProperty Name="RNK" ColumnName="RNK" />
+                <ScalarProperty Name="KF" ColumnName="KF" />
+                <ScalarProperty Name="EFFECTDATE" ColumnName="EFFECTDATE" />
+                <ScalarProperty Name="SEND_SMS" ColumnName="SEND_SMS" />
+                <ScalarProperty Name="OB22" ColumnName="OB22" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ACCOUNTSWs">
+            <EntityTypeMapping TypeName="Areas.Acct.AcctModel.ACCOUNTSW">
+              <MappingFragment StoreEntitySet="ACCOUNTSW">
+                <ScalarProperty Name="ACC" ColumnName="ACC" />
+                <ScalarProperty Name="TAG" ColumnName="TAG" />
+                <ScalarProperty Name="VALUE" ColumnName="VALUE" />
+                <ScalarProperty Name="KF" ColumnName="KF" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ACCOUNTSW_UPDATE">
+            <EntityTypeMapping TypeName="Areas.Acct.AcctModel.ACCOUNTSW_UPDATE">
+              <MappingFragment StoreEntitySet="ACCOUNTSW_UPDATE">
+                <ScalarProperty Name="IDUPD" ColumnName="IDUPD" />
+                <ScalarProperty Name="CHGACTION" ColumnName="CHGACTION" />
+                <ScalarProperty Name="EFFECTDATE" ColumnName="EFFECTDATE" />
+                <ScalarProperty Name="CHGDATE" ColumnName="CHGDATE" />
+                <ScalarProperty Name="DONEBY" ColumnName="DONEBY" />
+                <ScalarProperty Name="ACC" ColumnName="ACC" />
+                <ScalarProperty Name="TAG" ColumnName="TAG" />
+                <ScalarProperty Name="VALUE" ColumnName="VALUE" />
+                <ScalarProperty Name="KF" ColumnName="KF" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="V_ACCOUNTS">
+            <EntityTypeMapping TypeName="Areas.Acct.AcctModel.V_ACCOUNTS">
+              <MappingFragment StoreEntitySet="V_ACCOUNTS">
+                <ScalarProperty Name="ACC" ColumnName="ACC" />
+                <ScalarProperty Name="NLS" ColumnName="NLS" />
+                <ScalarProperty Name="NLSALT" ColumnName="NLSALT" />
+                <ScalarProperty Name="KV" ColumnName="KV" />
+                <ScalarProperty Name="LCV" ColumnName="LCV" />
+                <ScalarProperty Name="DIG" ColumnName="DIG" />
+                <ScalarProperty Name="DENOM" ColumnName="DENOM" />
+                <ScalarProperty Name="KF" ColumnName="KF" />
+                <ScalarProperty Name="BRANCH" ColumnName="BRANCH" />
+                <ScalarProperty Name="TOBO" ColumnName="TOBO" />
+                <ScalarProperty Name="NBS" ColumnName="NBS" />
+                <ScalarProperty Name="NBS2" ColumnName="NBS2" />
+                <ScalarProperty Name="DAOS" ColumnName="DAOS" />
+                <ScalarProperty Name="DAPP" ColumnName="DAPP" />
+                <ScalarProperty Name="ISP" ColumnName="ISP" />
+                <ScalarProperty Name="RNK" ColumnName="RNK" />
+                <ScalarProperty Name="NMS" ColumnName="NMS" />
+                <ScalarProperty Name="LIM" ColumnName="LIM" />
+                <ScalarProperty Name="OST" ColumnName="OST" />
+                <ScalarProperty Name="OSTB" ColumnName="OSTB" />
+                <ScalarProperty Name="OSTC" ColumnName="OSTC" />
+                <ScalarProperty Name="OSTF" ColumnName="OSTF" />
+                <ScalarProperty Name="OSTQ" ColumnName="OSTQ" />
+                <ScalarProperty Name="OSTX" ColumnName="OSTX" />
+                <ScalarProperty Name="DOS" ColumnName="DOS" />
+                <ScalarProperty Name="KOS" ColumnName="KOS" />
+                <ScalarProperty Name="DOSQ" ColumnName="DOSQ" />
+                <ScalarProperty Name="KOSQ" ColumnName="KOSQ" />
+                <ScalarProperty Name="PAP" ColumnName="PAP" />
+                <ScalarProperty Name="TIP" ColumnName="TIP" />
+                <ScalarProperty Name="VID" ColumnName="VID" />
+                <ScalarProperty Name="TRCN" ColumnName="TRCN" />
+                <ScalarProperty Name="MDATE" ColumnName="MDATE" />
+                <ScalarProperty Name="DAZS" ColumnName="DAZS" />
+                <ScalarProperty Name="SEC" ColumnName="SEC" />
+                <ScalarProperty Name="ACCC" ColumnName="ACCC" />
+                <ScalarProperty Name="BLKD" ColumnName="BLKD" />
+                <ScalarProperty Name="BLKK" ColumnName="BLKK" />
+                <ScalarProperty Name="POS" ColumnName="POS" />
+                <ScalarProperty Name="SECI" ColumnName="SECI" />
+                <ScalarProperty Name="SECO" ColumnName="SECO" />
+                <ScalarProperty Name="GRP" ColumnName="GRP" />
+                <ScalarProperty Name="OB22" ColumnName="OB22" />
+                <ScalarProperty Name="NOTIFIER_REF" ColumnName="NOTIFIER_REF" />
+                <ScalarProperty Name="BDATE" ColumnName="BDATE" />
+                <ScalarProperty Name="OPT" ColumnName="OPT" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="V_TOBO_ACCOUNTS">
+            <EntityTypeMapping TypeName="Areas.Acct.AcctModel.V_TOBO_ACCOUNTS">
+              <MappingFragment StoreEntitySet="V_TOBO_ACCOUNTS">
+                <ScalarProperty Name="OPT" ColumnName="OPT" />
+                <ScalarProperty Name="BDATE" ColumnName="BDATE" />
+                <ScalarProperty Name="NOTIFIER_REF" ColumnName="NOTIFIER_REF" />
+                <ScalarProperty Name="OB22" ColumnName="OB22" />
+                <ScalarProperty Name="OST" ColumnName="OST" />
+                <ScalarProperty Name="DENOM" ColumnName="DENOM" />
+                <ScalarProperty Name="DIG" ColumnName="DIG" />
+                <ScalarProperty Name="LCV" ColumnName="LCV" />
+                <ScalarProperty Name="TOBO" ColumnName="TOBO" />
+                <ScalarProperty Name="GRP" ColumnName="GRP" />
+                <ScalarProperty Name="SECO" ColumnName="SECO" />
+                <ScalarProperty Name="SECI" ColumnName="SECI" />
+                <ScalarProperty Name="POS" ColumnName="POS" />
+                <ScalarProperty Name="BLKK" ColumnName="BLKK" />
+                <ScalarProperty Name="BLKD" ColumnName="BLKD" />
+                <ScalarProperty Name="ACCC" ColumnName="ACCC" />
+                <ScalarProperty Name="SEC" ColumnName="SEC" />
+                <ScalarProperty Name="DAZS" ColumnName="DAZS" />
+                <ScalarProperty Name="MDATE" ColumnName="MDATE" />
+                <ScalarProperty Name="TRCN" ColumnName="TRCN" />
+                <ScalarProperty Name="VID" ColumnName="VID" />
+                <ScalarProperty Name="TIP" ColumnName="TIP" />
+                <ScalarProperty Name="PAP" ColumnName="PAP" />
+                <ScalarProperty Name="KOSQ" ColumnName="KOSQ" />
+                <ScalarProperty Name="DOSQ" ColumnName="DOSQ" />
+                <ScalarProperty Name="KOS" ColumnName="KOS" />
+                <ScalarProperty Name="DOS" ColumnName="DOS" />
+                <ScalarProperty Name="OSTX" ColumnName="OSTX" />
+                <ScalarProperty Name="OSTQ" ColumnName="OSTQ" />
+                <ScalarProperty Name="OSTF" ColumnName="OSTF" />
+                <ScalarProperty Name="OSTC" ColumnName="OSTC" />
+                <ScalarProperty Name="OSTB" ColumnName="OSTB" />
+                <ScalarProperty Name="LIM" ColumnName="LIM" />
+                <ScalarProperty Name="NMS" ColumnName="NMS" />
+                <ScalarProperty Name="RNK" ColumnName="RNK" />
+                <ScalarProperty Name="ISP" ColumnName="ISP" />
+                <ScalarProperty Name="DAPP" ColumnName="DAPP" />
+                <ScalarProperty Name="DAOS" ColumnName="DAOS" />
+                <ScalarProperty Name="NBS2" ColumnName="NBS2" />
+                <ScalarProperty Name="NBS" ColumnName="NBS" />
+                <ScalarProperty Name="BRANCH" ColumnName="BRANCH" />
+                <ScalarProperty Name="KF" ColumnName="KF" />
+                <ScalarProperty Name="KV" ColumnName="KV" />
+                <ScalarProperty Name="NLSALT" ColumnName="NLSALT" />
+                <ScalarProperty Name="NLS" ColumnName="NLS" />
+                <ScalarProperty Name="ACC" ColumnName="ACC" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="V_TOBO_ACCOUNTS_LITE">
+            <EntityTypeMapping TypeName="Areas.Acct.AcctModel.V_TOBO_ACCOUNTS_LITE">
+              <MappingFragment StoreEntitySet="V_TOBO_ACCOUNTS_LITE">
+                <ScalarProperty Name="OPT" ColumnName="OPT" />
+                <ScalarProperty Name="BDATE" ColumnName="BDATE" />
+                <ScalarProperty Name="NOTIFIER_REF" ColumnName="NOTIFIER_REF" />
+                <ScalarProperty Name="OB22" ColumnName="OB22" />
+                <ScalarProperty Name="GRP" ColumnName="GRP" />
+                <ScalarProperty Name="SECO" ColumnName="SECO" />
+                <ScalarProperty Name="SECI" ColumnName="SECI" />
+                <ScalarProperty Name="POS" ColumnName="POS" />
+                <ScalarProperty Name="BLKK" ColumnName="BLKK" />
+                <ScalarProperty Name="BLKD" ColumnName="BLKD" />
+                <ScalarProperty Name="ACCC" ColumnName="ACCC" />
+                <ScalarProperty Name="SEC" ColumnName="SEC" />
+                <ScalarProperty Name="DAZS" ColumnName="DAZS" />
+                <ScalarProperty Name="MDATE" ColumnName="MDATE" />
+                <ScalarProperty Name="TRCN" ColumnName="TRCN" />
+                <ScalarProperty Name="VID" ColumnName="VID" />
+                <ScalarProperty Name="TIP" ColumnName="TIP" />
+                <ScalarProperty Name="PAP" ColumnName="PAP" />
+                <ScalarProperty Name="KOSQ" ColumnName="KOSQ" />
+                <ScalarProperty Name="DOSQ" ColumnName="DOSQ" />
+                <ScalarProperty Name="KOS" ColumnName="KOS" />
+                <ScalarProperty Name="DOS" ColumnName="DOS" />
+                <ScalarProperty Name="OSTX" ColumnName="OSTX" />
+                <ScalarProperty Name="OSTQ" ColumnName="OSTQ" />
+                <ScalarProperty Name="OSTF" ColumnName="OSTF" />
+                <ScalarProperty Name="OSTC" ColumnName="OSTC" />
+                <ScalarProperty Name="OSTB" ColumnName="OSTB" />
+                <ScalarProperty Name="OST" ColumnName="OST" />
+                <ScalarProperty Name="LIM" ColumnName="LIM" />
+                <ScalarProperty Name="NMS" ColumnName="NMS" />
+                <ScalarProperty Name="RNK" ColumnName="RNK" />
+                <ScalarProperty Name="ISP" ColumnName="ISP" />
+                <ScalarProperty Name="DAPP" ColumnName="DAPP" />
+                <ScalarProperty Name="DAOS" ColumnName="DAOS" />
+                <ScalarProperty Name="NBS2" ColumnName="NBS2" />
+                <ScalarProperty Name="NBS" ColumnName="NBS" />
+                <ScalarProperty Name="TOBO" ColumnName="TOBO" />
+                <ScalarProperty Name="BRANCH" ColumnName="BRANCH" />
+                <ScalarProperty Name="KF" ColumnName="KF" />
+                <ScalarProperty Name="DENOM" ColumnName="DENOM" />
+                <ScalarProperty Name="DIG" ColumnName="DIG" />
+                <ScalarProperty Name="LCV" ColumnName="LCV" />
+                <ScalarProperty Name="KV" ColumnName="KV" />
+                <ScalarProperty Name="NLSALT" ColumnName="NLSALT" />
+                <ScalarProperty Name="NLS" ColumnName="NLS" />
+                <ScalarProperty Name="ACC" ColumnName="ACC" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="GROUPS_ACC">
+            <EntityTypeMapping TypeName="Areas.Acct.AcctModel.GROUPS_ACC">
+              <MappingFragment StoreEntitySet="GROUPS_ACC">
+                <ScalarProperty Name="NOTUSED" ColumnName="NOTUSED" />
+                <ScalarProperty Name="SCOPE" ColumnName="SCOPE" />
+                <ScalarProperty Name="NAME" ColumnName="NAME" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="GROUPS_NBS">
+            <EntityTypeMapping TypeName="Areas.Acct.AcctModel.GROUPS_NBS">
+              <MappingFragment StoreEntitySet="GROUPS_NBS">
+                <ScalarProperty Name="NOTUSED" ColumnName="NOTUSED" />
+                <ScalarProperty Name="NBS" ColumnName="NBS" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="GROUPS_STAFF">
+            <EntityTypeMapping TypeName="Areas.Acct.AcctModel.GROUPS_STAFF">
+              <MappingFragment StoreEntitySet="GROUPS_STAFF">
+                <ScalarProperty Name="SEC_DEB" ColumnName="SEC_DEB" />
+                <ScalarProperty Name="SEC_CRE" ColumnName="SEC_CRE" />
+                <ScalarProperty Name="SEC_SEL" ColumnName="SEC_SEL" />
+                <ScalarProperty Name="GRANTOR" ColumnName="GRANTOR" />
+                <ScalarProperty Name="REVOKED" ColumnName="REVOKED" />
+                <ScalarProperty Name="RDATE2" ColumnName="RDATE2" />
+                <ScalarProperty Name="RDATE1" ColumnName="RDATE1" />
+                <ScalarProperty Name="ADATE2" ColumnName="ADATE2" />
+                <ScalarProperty Name="ADATE1" ColumnName="ADATE1" />
+                <ScalarProperty Name="APPROVE" ColumnName="APPROVE" />
+                <ScalarProperty Name="SECG" ColumnName="SECG" />
+                <ScalarProperty Name="IDG" ColumnName="IDG" />
+                <ScalarProperty Name="IDU" ColumnName="IDU" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="GROUPS_STAFF_ACC">
+            <EntityTypeMapping TypeName="Areas.Acct.AcctModel.GROUPS_STAFF_ACC">
+              <MappingFragment StoreEntitySet="GROUPS_STAFF_ACC">
+                <ScalarProperty Name="IDG" ColumnName="IDG" />
+                <ScalarProperty Name="IDA" ColumnName="IDA" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TARIFs">
+            <EntityTypeMapping TypeName="Areas.Acct.AcctModel.TARIF">
+              <MappingFragment StoreEntitySet="TARIF">
+                <ScalarProperty Name="DAT_END" ColumnName="DAT_END" />
+                <ScalarProperty Name="DAT_BEGIN" ColumnName="DAT_BEGIN" />
+                <ScalarProperty Name="RAZOVA" ColumnName="RAZOVA" />
+                <ScalarProperty Name="PDV" ColumnName="PDV" />
+                <ScalarProperty Name="KF" ColumnName="KF" />
+                <ScalarProperty Name="OB22" ColumnName="OB22" />
+                <ScalarProperty Name="NBS" ColumnName="NBS" />
+                <ScalarProperty Name="TIP" ColumnName="TIP" />
+                <ScalarProperty Name="SMAX" ColumnName="SMAX" />
+                <ScalarProperty Name="SMIN" ColumnName="SMIN" />
+                <ScalarProperty Name="PR" ColumnName="PR" />
+                <ScalarProperty Name="TAR" ColumnName="TAR" />
+                <ScalarProperty Name="NAME" ColumnName="NAME" />
+                <ScalarProperty Name="KV" ColumnName="KV" />
+                <ScalarProperty Name="KOD" ColumnName="KOD" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TARIF_HISTORY">
+            <EntityTypeMapping TypeName="Areas.Acct.AcctModel.TARIF_HISTORY">
+              <MappingFragment StoreEntitySet="TARIF_HISTORY">
+                <ScalarProperty Name="FL" ColumnName="FL" />
+                <ScalarProperty Name="DAT_OPEN" ColumnName="DAT_OPEN" />
+                <ScalarProperty Name="NBS_OB22" ColumnName="NBS_OB22" />
+                <ScalarProperty Name="SMAX" ColumnName="SMAX" />
+                <ScalarProperty Name="SMIN" ColumnName="SMIN" />
+                <ScalarProperty Name="PR" ColumnName="PR" />
+                <ScalarProperty Name="TAR" ColumnName="TAR" />
+                <ScalarProperty Name="KOD" ColumnName="KOD" />
+                <ScalarProperty Name="IDS" ColumnName="IDS" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TARIF_SCALE">
+            <EntityTypeMapping TypeName="Areas.Acct.AcctModel.TARIF_SCALE">
+              <MappingFragment StoreEntitySet="TARIF_SCALE">
+                <ScalarProperty Name="KF" ColumnName="KF" />
+                <ScalarProperty Name="PR" ColumnName="PR" />
+                <ScalarProperty Name="SUM_TARIF" ColumnName="SUM_TARIF" />
+                <ScalarProperty Name="SUM_LIMIT" ColumnName="SUM_LIMIT" />
+                <ScalarProperty Name="KOD" ColumnName="KOD" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TARIF_SCHEME">
+            <EntityTypeMapping TypeName="Areas.Acct.AcctModel.TARIF_SCHEME">
+              <MappingFragment StoreEntitySet="TARIF_SCHEME">
+                <ScalarProperty Name="FLAG_EDIT" ColumnName="FLAG_EDIT" />
+                <ScalarProperty Name="DOC_NOPAY" ColumnName="DOC_NOPAY" />
+                <ScalarProperty Name="OPRTIME" ColumnName="OPRTIME" />
+                <ScalarProperty Name="D_CLOSE" ColumnName="D_CLOSE" />
+                <ScalarProperty Name="NAME" ColumnName="NAME" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TABVALs">
+            <EntityTypeMapping TypeName="Areas.Acct.AcctModel.TABVAL">
+              <MappingFragment StoreEntitySet="TABVAL">
+                <ScalarProperty Name="G0000" ColumnName="G0000" />
+                <ScalarProperty Name="S0009" ColumnName="S0009" />
+                <ScalarProperty Name="S9281" ColumnName="S9281" />
+                <ScalarProperty Name="S9280" ColumnName="S9280" />
+                <ScalarProperty Name="S9282" ColumnName="S9282" />
+                <ScalarProperty Name="S7201" ColumnName="S7201" />
+                <ScalarProperty Name="S6201" ColumnName="S6201" />
+                <ScalarProperty Name="S3802" ColumnName="S3802" />
+                <ScalarProperty Name="S3801" ColumnName="S3801" />
+                <ScalarProperty Name="S3800" ColumnName="S3800" />
+                <ScalarProperty Name="S0000" ColumnName="S0000" />
+                <ScalarProperty Name="SKV" ColumnName="SKV" />
+                <ScalarProperty Name="D_CLOSE" ColumnName="D_CLOSE" />
+                <ScalarProperty Name="PRV" ColumnName="PRV" />
+                <ScalarProperty Name="GENDER" ColumnName="GENDER" />
+                <ScalarProperty Name="BASEY" ColumnName="BASEY" />
+                <ScalarProperty Name="COUNTRY" ColumnName="COUNTRY" />
+                <ScalarProperty Name="UNIT" ColumnName="UNIT" />
+                <ScalarProperty Name="DENOM" ColumnName="DENOM" />
+                <ScalarProperty Name="DIG" ColumnName="DIG" />
+                <ScalarProperty Name="SV" ColumnName="SV" />
+                <ScalarProperty Name="NOMINAL" ColumnName="NOMINAL" />
+                <ScalarProperty Name="LCV" ColumnName="LCV" />
+                <ScalarProperty Name="NAME" ColumnName="NAME" />
+                <ScalarProperty Name="GRP" ColumnName="GRP" />
+                <ScalarProperty Name="KV" ColumnName="KV" />
+                <ScalarProperty Name="COIN" ColumnName="COIN" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="V_ACC_TARIF_SCALE">
+            <EntityTypeMapping TypeName="Areas.Acct.AcctModel.V_ACC_TARIF_SCALE">
+              <MappingFragment StoreEntitySet="V_ACC_TARIF_SCALE">
+                <ScalarProperty Name="PR" ColumnName="PR" />
+                <ScalarProperty Name="SUM_TARIF" ColumnName="SUM_TARIF" />
+                <ScalarProperty Name="SUM_LIMIT" ColumnName="SUM_LIMIT" />
+                <ScalarProperty Name="KOD" ColumnName="KOD" />
+                <ScalarProperty Name="IDS" ColumnName="IDS" />
+                <ScalarProperty Name="ACC" ColumnName="ACC" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="V_SH_TARIF">
+            <EntityTypeMapping TypeName="Areas.Acct.AcctModel.V_SH_TARIF">
+              <MappingFragment StoreEntitySet="V_SH_TARIF">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="KOD" ColumnName="KOD" />
+                <ScalarProperty Name="KV" ColumnName="KV" />
+                <ScalarProperty Name="NAME" ColumnName="NAME" />
+                <ScalarProperty Name="TAR" ColumnName="TAR" />
+                <ScalarProperty Name="PR" ColumnName="PR" />
+                <ScalarProperty Name="SMIN" ColumnName="SMIN" />
+                <ScalarProperty Name="SMAX" ColumnName="SMAX" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="V_ACC_TARIF">
+            <EntityTypeMapping TypeName="Areas.Acct.AcctModel.V_ACC_TARIF">
+              <MappingFragment StoreEntitySet="V_ACC_TARIF">
+                <ScalarProperty Name="ACC" ColumnName="ACC" />
+                <ScalarProperty Name="TYPE" ColumnName="TYPE" />
+                <ScalarProperty Name="KOD" ColumnName="KOD" />
+                <ScalarProperty Name="TAR" ColumnName="TAR" />
+                <ScalarProperty Name="PR" ColumnName="PR" />
+                <ScalarProperty Name="SMIN" ColumnName="SMIN" />
+                <ScalarProperty Name="SMAX" ColumnName="SMAX" />
+                <ScalarProperty Name="BDATE" ColumnName="BDATE" />
+                <ScalarProperty Name="EDATE" ColumnName="EDATE" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="True" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="true" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Default" />
+        <DesignerProperty Name="ProcessDependentTemplatesOnSave" Value="True" />
+        <DesignerProperty Name="SynchronizePropertyFacets" Value="False" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

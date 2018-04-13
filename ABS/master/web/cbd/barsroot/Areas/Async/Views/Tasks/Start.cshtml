@@ -1,0 +1,119 @@
+﻿@model BarsWeb.Areas.Async.Models.TaskParamViewModel
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Відкладений запуск процедури";
+    var count = 0;
+}
+
+<h1>@ViewBag.Title</h1>
+
+@if (ViewBag.Code != null)
+{
+    <div class="alert alert-success">
+        <div>Задача @ViewBag.Code стартована!</div>
+    </div>
+}
+
+@using (Html.BeginForm("Start", "Tasks", FormMethod.Post, new { name = "Form", novalidate=true }))
+{
+    <input type="hidden" name="schedulerCode" value="@Model.SchedelerCode" />
+
+    <div id="errorMsg" style="display: none;">
+        <div class="alert alert-danger">Не всі поля заповнено! <br /> Запуск не можливий.</div>
+    </div>
+    <table>
+
+
+        @foreach (var item in Model.Parameters.OrderBy(i => i.Position))
+        {
+        <tr>
+            <td style="padding:5px">
+                <div class="editor-label">
+                    <label for="@item.Name">@item.Description</label>
+                </div>
+            </td>
+            <td style="padding:5px">
+                <div id="editDiv" class="editor-field">
+                    <input type="text" name="parameters[@count].Value" id="@item.Name" value="@item.Value" required class="k-textbox" />
+
+                    <input type="hidden" name="parameters[@count].Name" value="@item.Name" />
+                    <input type="hidden" name="parameters[@count].Type" value="@item.Type.ToString()" />
+                    <input type="hidden" name="parameters[@count].Description" value="@item.Description" />
+                    <input type="hidden" name="parameters[@count].Position" value="@item.Position" />
+                    <input type="hidden" name="parameters[@count].SchedulerCode" value="@item.SchedulerCode" />
+
+                    @if (item.Type == TypeCode.DateTime)
+                    {
+                        <script>
+                            $(function () {
+                                var elem = $('#@item.Name');
+                                elem.kendoDatePicker({ format: '{0:dd/MM/yyyy}' });
+                                elem.parentsUntil('.k-widget').parent().removeClass('k-textbox');
+                                elem.removeClass('k-textbox').prop("readonly", "readonly").on('click', function () {
+                                    $(this).parent().find('span.k-select').click();
+                                });
+                            })
+                        </script>
+                    }
+                    else if (item.Type == TypeCode.Decimal)
+                    {
+                        <script>
+                            $(function () {
+                                var elem = $('#@item.Name');
+                                elem.removeClass('k-textbox').parentsUntil('.k-widget').parent().removeClass('k-textbox');
+                                elem.kendoNumericTextBox({ format: '{0:n0}' });
+                            })
+                        </script>
+                    }
+                </div>
+
+            </td>
+        </tr>
+        count++;
+        }
+        <tr>
+            <td></td>
+            <td style="padding:5px">
+                
+                <button id="submit" type="submit" class="k-button"><i class="pf-icon pf-16 pf-gears"></i> Запуск</button>
+            </td>
+        </tr>
+    </table>
+}
+
+<script>
+    $(function () {
+        $('form').on("submit", function () {
+            $("#errorMsg").hide();
+            $('form input[type="text"]').not('.k-formatted-value').map(function () {
+                if ($(this).val() == "") {
+                    $("#errorMsg").show();
+                }
+            });
+            if ($("#errorMsg").is(":visible")) {
+                return false;
+            } 
+        });
+    })
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

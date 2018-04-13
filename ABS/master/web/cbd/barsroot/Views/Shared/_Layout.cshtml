@@ -1,0 +1,96 @@
+﻿@using System.Threading
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="ru" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>
+    @ViewBag.Title
+  </title>
+  <noscript>
+    Нажаль ваш браузер на підтримує сценарії JavaScript, або вони заборонені в налаштуваннях.
+    <br /><br />
+    Будьласка змініть ваш браузер або перевірте його налаштування згідно з <a href="/barsroot/help/">інструкцією</a>.
+  </noscript>
+  <link rel="shortcut icon" href="@Url.Content("~/content/ico.ico")" />
+
+  @Styles.Render("~/content/themes/modernui/css/modernui")
+  @Styles.Render("~/content/themes/modernui/css/gridmvc")
+
+  @Html.Partial("_html5shiv")
+  @Scripts.Render("~/bundles/jquery")
+  @Scripts.Render("~/bundles/jquery-ui")
+  @*<script src="~/Scripts/jquery/jquery-ui-1.9.2.no-datepicker.min.js" type="text/javascript"></script>*@
+  @Scripts.Render("~/bundles/jquery-bars-ui")
+  @Scripts.Render("~/bundles/junggridview")
+  @Scripts.Render("~/bundles/gridmvc")
+  <script src="@Url.Content("~/Scripts/GridMvc/locales/gridmvc.lang." + Thread.CurrentThread.CurrentCulture.Parent.Name + ".js")"></script>
+  <script src="@Url.Content("~/Scripts/jquery/locales/ui.datepicker-" + Thread.CurrentThread.CurrentCulture.Parent.Name + ".js")"></script>
+
+  @Scripts.Render("~/bundles/jquery-masked")
+  <script src="~/Content/Themes/ModernUI/scripts/jquery.tiptip.js" type="text/javascript"></script>
+</head>
+  <body>
+    <div style="position: absolute;right: 0;top:0; font-size: 9px;color:#5e5e5e;">версія @barsroot.ServicesClass.GetVersionWeb() </div>
+    @RenderSection("scriptsHeader", false)
+    <header></header>
+    <div id="body" class="body">
+       @RenderBody()
+    </div>
+    <footer></footer>
+    @*<script src="/Common/Script/BarsIe.js" type="text/javascript"></script>*@
+    <script type="text/javascript">
+      $(function () {
+        $('.tiptip a.button, .tiptip button').tipTip();
+      });
+      //функція для реагування на відповівдь сервера з помилкою для AJAX
+      $(function () {
+        $.ajaxSetup({ cache: false });
+        $(document).ajaxSuccess(function (data, xhr, options) {
+          if (xhr.statusText == '401') {
+            document.location.reload();
+          } else if (xhr.statusText == 'BRS-500') {
+            barsUiAlert({
+              text: replaseResponseText(xhr.responseText),
+              title: 'Помилка !!!',
+              winType: 'error',
+              width: '550',
+              height: '450'
+            });
+          }
+        })
+          .ajaxError(function (e, xhr) {
+            if (xhr.status == 401) {
+              document.location.reload();
+            } else if (xhr.status == 403) {
+              var response = $.parseJSON(xhr.responseText);
+              window.location = response.LogOnUrl;
+            } else if (xhr.status == 400 || xhr.status == 404 || xhr.status == 500 ) {
+              barsUiAlert({
+                text: replaseResponseText(xhr.responseText),
+                title: 'Помилка !',
+                winType: 'error',
+                width: '550',
+                height: '450'
+              });
+              $('#detail').css('width','450px');
+            } else if (xhr.status == 502) {
+              document.location.refresh();
+            }
+          });
+      });
+      function replaseResponseText(text) {
+        var result = text.match(/.*<body.*>([\s\S]*)<\/body>.*/);
+        if (result == null) {
+          return text;
+        }
+        if (result.length && result.length > 1) {
+          result = result[0];
+        }
+        return result;
+      }
+    </script>
+
+    @RenderSection("scriptsFooter", required: false)
+  </body>
+</html>
+

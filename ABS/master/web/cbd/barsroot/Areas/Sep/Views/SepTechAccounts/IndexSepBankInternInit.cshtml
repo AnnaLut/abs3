@@ -1,0 +1,283 @@
+﻿@model BarsWeb.Areas.Sep.Models.SepTechAccountsFilterParams
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "ОДБ Документы Внутр. и Нач. Межбанковские "+ Model.NLS+" за " + Model.bankdate;
+}
+<h2>@ViewBag.Title</h2>
+<div id="sepDocsToolBar"></div>
+<div id="sepDocumentsGrid"></div>
+<script type="text/javascript" src="/barsroot/Scripts/Bars/bars.utils.js"></script>
+<script>
+    var sepDocsGrid = null;
+    function getSepDocsGrid() {
+        if (sepDocsGrid == null) {
+            sepDocsGrid = $('#sepDocumentsGrid').data('kendoGrid');
+        }
+        return sepDocsGrid;
+    }
+
+    function refreshToolbar() {
+        var grid = getSepDocsGrid();
+        var selection = grid.select();
+        enableButton('pbViewDoc', selection.length == 1);
+
+    }
+
+    function enableButton(buttonId, enabled) {
+        if (typeof(enabled) === 'undefined') {
+            enabled = true;
+        }
+        var $button = $('#' + buttonId);
+        $button.data('kendoButton').enable(enabled);
+        if (enabled) {
+            $button.find('i').removeClass("pf-disabled");
+        } else {
+            $button.find('i').addClass("pf-disabled");
+        }
+    }
+
+    function goBack() {
+        window.location = bars.config.urlContent('/Sep/SepTechAccounts/Index');
+    }
+
+    function openDoc() {
+        var grid = getSepDocsGrid();
+        var record = grid.dataItem(grid.select());
+        var docUrl = bars.config.urlContent("/documents/item/"+record.Ref+"/");
+        window.location = docUrl;
+    }
+
+    $(document).ready(function() {
+        $("#sepDocumentsGrid").kendoGrid({
+            autobind: true,
+            selectable: "multiple",
+            filterable: true,
+            pageable: {
+                refresh: true,
+                pageSizes: true,
+                buttonCount: 5
+            },
+            columns: [
+            {
+                field: "Ref",
+                title: "Document reference",
+                width: "100px",
+                headerAttributes: {
+                    style: "white-space: normal;"
+                }
+            },
+            {
+                field: "Nd",
+                title: "№ документа",
+                width: "110px"
+            },
+            {
+                field: "MfoA",
+                title: "MFO - A",
+                width: "100px"
+            },
+            {
+                field: "NlsA",
+                title: "Account - A",
+                width: "120px"
+            },
+            {
+                field: "S",
+                title: "Amount",
+                template: "<div style='text-align:right;'>#=(S/100).toFixed(2)#</div>",
+                width: "150px"
+            },
+            {
+                field: "Lcv",
+                title: "Curr ency",
+                width: "60px",
+                headerAttributes: {
+                    style: "white-space: normal;"
+                }
+            },
+            {
+                field: "MfoB",
+                title: "MFO - B",
+                width: "80px"
+            },
+            {
+                field: "NlsB",
+                title: "Account - B",
+                width: "120px"
+            },
+            {
+                field: "Dk",
+                title: "Db Cr",
+                width: "32px",
+                headerAttributes: {
+                    style: "white-space: normal;"
+                }
+            },
+            {
+                field: "Vob",
+                title: "Type",
+                width: "55px"
+            },
+            {
+                field: "DatP",
+                title: "Document date",
+                width: "80px",
+                template: "<div style='text-align:right;'>#=kendo.toString(DatP,'dd.MM.yyyy')#</div>",
+                headerAttributes: {
+                    style: "white-space: normal;"
+                }
+            },
+            {
+                field: "Fn_A",
+                title: "EPS. Inbound filename",
+                width: "120px",
+                headerAttributes: {
+                    style: "white-space: normal;"
+                }
+            },
+            {
+                field: "Dat_A",
+                title: "File date",
+                width: "80px",
+                template: "<div style='text-align:right;'>#=kendo.toString(Dat_A,'dd.MM.yyyy')#</div>"
+            },
+            {
+                field: "Rec_A",
+                title: "Record number",
+                width: "70px",
+                template: "<div style='text-align:right;'>#=Rec_A#</div>",
+                headerAttributes: {
+                    style: "white-space: normal;"
+                }
+            },
+            {
+                field: "Fn_B",
+                title: "EPS. Outgoing filename",
+                width: "100px",
+                headerAttributes: {
+                    style: "white-space: normal;"
+                }
+            },
+            {
+                field: "Dat_B",
+                title: "File date",
+                width: "80px",
+                template: "<div style='text-align:right;'>#=kendo.toString(Dat_B,'dd.MM.yyyy')#</div>"
+            },
+            {
+                field: "Rec_B",
+                title: "Record number",
+                width: "70px",
+                template: "<div style='text-align:right;'>#=Rec_B#</div>",
+                headerAttributes: {
+                    style: "white-space: normal;"
+                }
+            },
+            {
+                field: "Nazn",
+                title: "Transaction layout",
+                width: "700px"
+            },
+            {
+                field: "NamA",
+                title: "Sender",
+                width: "400px"
+            },
+            {
+                field: "NbA",
+                title: "Sender Bank",
+                width: "400px"
+            },
+            {
+                field: "NamB",
+                title: "Receiver",
+                width: "400px"
+            },
+            {
+                field: "NbB",
+                title: "Receiver Bank",
+                width: "400px"
+            }
+
+
+            ],
+            dataSource: {
+                type: 'webapi',
+                serverPaging: true,
+                serverSorting: true,
+                serverFiltering: true,
+                pageSize: 10,
+                transport: {
+                    read: {
+                        dataType: 'json',
+                        url: bars.config.urlContent('/sep/SepTechAccounts/GetSepInternInitDocsData'),
+                        data: sepTecAccDocData
+                    }
+                },
+                schema: {
+                    data: "Data",
+                    total: "Total",
+                    errors: "Errors",
+                    model: {
+                        fields: {
+                            MfoA: { type: "string" },
+                            MfoB: { type: "string" },
+                            NlsA: { type: "string" },
+                            NlsB: { type: "string" },
+                            S: { type: "number" },
+                            Kv: { type: "number" },
+                            Lcv: { type: "string" },
+                            Dig: { type: "number" },
+                            Dk: {type: "number"},
+                            Vob: {type: "number"},
+                            DatP: {type: "date"},
+                            Rec: {type: "number"},
+                            Fn_A: { type: "string" },
+                            Dat_A: {type: "date"},
+                            Rec_A: {type: "number"},
+                            Fn_B: { type: "string" },
+                            Dat_B: {type: "date"},
+                            Rec_B: {type: "number"},
+                            Ref: {type: "number"},
+                            Sos: {type: "number"},
+                            Nd: { type: "string" },
+                            Nazn: { type: "string" },
+                            NamA: { type: "string" },
+                            NbA: { type: "string" },
+                            NamB: { type: "string" },
+                            NbB: { type: "string" }
+                        }
+                    }
+                }
+            },
+            change: refreshToolbar,
+            dataBound: refreshToolbar
+
+        });
+
+        $('#sepDocsToolBar').kendoToolBar({
+            items: [
+                {
+                    template: "<button id='pbGoBack' type='button' class='k-button' onclick='goBack()' title='Повернутись до переліку файлів'><i class='pf-icon pf-16 pf-arrow_left'></i> Назад</button>"
+                },
+                {
+                    template: "<button id='pbViewDoc' type='button' class='k-button' onclick='openDoc()' title='Переглянути документ'><i class='pf-icon pf-16 pf-folder_open'></i></button>"
+                }
+            ]
+        });
+
+        $("#pbGoBack").kendoButton();
+        $("#pbViewDoc").kendoButton();
+        $("#pbFilter").kendoButton();
+        
+        function sepTecAccDocData() {
+            return {
+                NACC: "@Model.NACC"
+            }
+        }
+    });
+</script>
+
+<style>
+
+</style>

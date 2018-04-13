@@ -1,0 +1,1055 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Технологiчнi рахунки.";
+} 
+@model BarsWeb.Areas.Sep.Models.SepTechAccountsFilterParams
+<h2>@ViewBag.Title</h2>
+<div id="SepTechAccountToolBar1"></div>
+<div id="dialogTableViewOptions">
+    @Scripts.Render("~/bundles/sep/scripts/allsep")
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <label id="lbl_CheckboxVO1">
+                <input id="CheckboxVO1" onclick='checkboxV01_handler(this)' type="checkbox" checked="checked" /> Показать финансовые атрибуты
+            </label>
+            <br />
+            <form id="f1">
+                <text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</text>
+                @if (string.IsNullOrEmpty(Model.ShowEquivalents)) 
+                { 
+                    <label>
+                        <input id="CheckboxVO3" onclick='chk03_handler(this)' type="checkbox" name="ShowEquivalents" /> Показать эквиваленты 
+                    </label>
+                }
+                else
+                {
+                    <label>
+                        <input id="CheckboxVO3" onclick='chk03_handler(this)' checked="checked" type="checkbox" name="ShowEquivalents" /> Показать эквиваленты
+                    </label>
+                }
+            </form>
+            <text> <input type="checkbox" disabled="disabled" /> Показать %% ставки</text>
+            <br />
+            <text> <input type="checkbox" disabled="disabled" /> Показать информацию о лимитах</text>
+            <br />
+            <text> <input type="checkbox" disabled="disabled" /> Показать спецпараметры счетов</text>
+            <br />
+            <text> <input type="checkbox" disabled="disabled" /> Показать связанные счета</text>
+            <br />
+            <text> <input type="checkbox" disabled="disabled" /> Показать информацию по блокировкам счетов</text>
+            <br />
+            <br />
+            <label> <input id="checkboxV04" type="checkbox" onclick='checkboxV04_handler(this)' /> Показывать закрытые счета</label>
+            <br />
+            <br />
+            <div align="right">
+                <div id="acceptCancelBtnToolbar1"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="dialogCashFlowPeriod">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <text>З: </text><input id="datepicker1" /> &nbsp;<text>По:</text> <input id="datepicker2" />
+        </div>
+        <div align="right">
+            <div id="dialogCashFlowBtnToolbar1"></div>
+        </div>
+    </div>
+</div>
+<div id="dialogHistoryAcc">
+    <div class="panel panel-default">
+        <div id="HistoryAccToolbar1">
+        </div>
+        <div id="GridHistoryAcc">
+        </div>
+    </div>
+</div>
+<div id="dialogHistoryAccChangeParam">
+    <div id="HistoryAccChangeParamToolbar1">
+    </div>
+    <div class="panel panel-default">
+        <div id="GridHistoryAccChangeParam">
+        </div>
+    </div>
+</div>
+<div id="dialogCurrencySummary">
+    <div class="panel panel-default">
+        <div id="GridCurrencySummary">
+        </div>
+    </div>
+</div>
+
+@Html.Partial(Model.PartialVariantString)
+
+@(Html.Kendo().Window()
+    .Name("Details")
+    .Title("Перегляд рахунку")
+    .Resizable()
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .Width(700).Height(570)
+    .Content("<span class=\"k-icon k-i-refresh k-loading\" role=\"presentation\"></span> Завантаження...")
+    .HtmlAttributes(new { })
+    .Actions(actions => actions
+            .Refresh()
+            .Minimize()
+            .Maximize()
+            .Close()
+    )
+    .Events(events => events
+    .Refresh("onRefreshDetail")
+    .Close("onCloseDetail")
+    )
+)
+<script>
+    $('#HistoryAccToolbar1').kendoToolBar({
+        resizable: false,
+        items: [
+              { template: "<text>&nbsp;C&nbsp;&nbsp;</text>" },
+              { template: "<input type='text' id='datepicker31'></input>" },
+              { template: "<text>&nbsp;По&nbsp;&nbsp;</text>" },
+              { template: "<input type='text' id='datepicker32'></input>" },
+              { template: "<text>&nbsp;&nbsp;&nbsp;</text>" },
+              {
+                  template: "<button type='button' id='btn_ReloadGrid' onclick='ReloadCurrentGrid()' class='k-button' title='Перечитати дані'><i class='pf-icon pf-16 pf-reload_rotate'></i></button>"
+              }
+        ]
+    });
+
+    $('#HistoryAccChangeParamToolbar1').kendoToolBar({
+        resizable: false,
+        items: [
+              { template: "<text>&nbsp;C&nbsp;&nbsp;</text>" },
+              { template: "<input type='text' id='datepicker41'></input>" },
+              { template: "<text>&nbsp;По&nbsp;&nbsp;</text>" },
+              { template: "<input type='text' id='datepicker42'></input>" },
+              { template: "<text>&nbsp;&nbsp;&nbsp;</text>" },
+              { template: "<input id='HistoryParamsDropDown1'/>" },
+              { template: "<input id='HistoryParamsDropDown2'/>" },
+              {
+                  template: "<button type='button' id='btn_ReloadGrid' onclick='ReloadCurrentGrid()' class='k-button' title='Перечитати дані'><i class='pf-icon pf-16 pf-reload_rotate'></i></button>"
+              }
+        ]
+    });
+
+    $('#datepicker31').change(function () {
+        var grid =$("#GridHistoryAcc").data("kendoGrid");
+        grid.dataSource.page(1);
+        grid.dataSource.read();
+    });
+    $('#datepicker32').change(function () {
+        var grid =$("#GridHistoryAcc").data("kendoGrid");
+        grid.dataSource.page(1);
+        grid.dataSource.read();
+    });
+    $('#datepicker41').change(function () {
+        var grid =$("#GridHistoryAccChangeParam").data("kendoGrid");
+        grid.dataSource.page(1);
+        grid.dataSource.read();
+    });
+    $('#datepicker42').change(function () {
+        var grid =$("#GridHistoryAccChangeParam").data("kendoGrid");
+        grid.dataSource.page(1);
+        grid.dataSource.read();
+    });
+
+    $('#SepTechAccountToolBar1').kendoToolBar({
+        resizable: true,
+        items: [
+             {
+                 template: "<button id='btn_tableViewOpt' type='button' class='k-button' onclick='openDialogViewTable()' title='Параметри перегляду'><i class='pf-icon pf-16 pf-view_options'></i></button>"
+             },
+             { type: "separator" },
+             {
+                 template: "<button id='btn_AccountDetailsView' type='button' onclick='openAccountDetailsView(this)'  class='k-button'  title='Просмотр/редактирование атрибутов счета'><i class='pf-icon pf-16 pf-folder_open'></i></button>"
+             },
+             {
+                 template: "<button type='button' id='btn_ReloadGrid' onclick='ReloadCurrentGrid()' class='k-button' title='Перечитати дані'><i class='pf-icon pf-16 pf-reload_rotate'></i></button>"
+             },
+             { type: "separator" },
+             {
+                 template: "<button type='button' class='k-button' id='btn_DocAccOtvetSep' title='Документы по счету ОТВЕТНЫЙ СЭП'><i class='pf-icon pf-16 pf-slide-arrow_right'></i></button>"
+             },
+             {
+                 template: "<button type='button' class='k-button' id='btn_DocAccBankInternInit' title='Документы по счету ВНУТРЕННИЕ и НАЧАЛЬНЫЙ МЕЖБАНК'><i class='pf-icon pf-16 pf-slide-arrow_left'></i></button>"
+             },
+             {
+                 template: "<button type='button' class='k-button' id='btn_CashFlowPeriod' title='Обороты за Период дат'><i class='pf-icon pf-16 pf-tabs-export'></i></button>"
+             },
+             {
+                 template: "<button type='button' class='k-button' id='btn_TurnOverAcc' title='Обороты по счету'><i class='pf-icon pf-16 pf-ov_update'></i></button>"
+             },
+             {
+                 template: "<button type='button' class='k-button' id='btn_HistoryAcc' title='История счета'><i class='pf-icon pf-16 pf-book'></i></button>"
+             },
+             {
+                 template: "<button type='button' class='k-button' id='btn_HistoryAccChangeParam' title='История изменения параметров счета'><i class='pf-icon pf-16 pf-address_book-design'></i></button>"
+             },
+             {
+                 template: "<button type='button' class='k-button' id='btn_LinkedAcc' title='Показывать связанные счета'><i class='pf-icon pf-16 pf-ov_link'></i></button>"
+             },
+             {
+                 template: "<button type='button' class='k-button' id='btn_CurrencySummary' title='Итоги по валютам'><i class='pf-icon pf-16 pf-currency_conversion'></i></button>"
+             },
+             {
+                 type: "button", icon: "pf-icon pf-16 pf-table_column", id: "btn_SortWithoutKR", name: "btn_SortWithoutKR",
+                 attributes: { "class": "k-button", "title": "Сортировать счета без учета КР" }, togglable: true
+             },
+             {
+                 template:
+                 "<button type='button' class='k-button' id='btn_Customer' onclick='open_CustomerCard()' title='Карточка клиента'><i class='pf-icon pf-16 pf-ov_customer'></i></button>"
+             },
+             { type: "separator" },
+             { template: "<text id='lbl_QtyRecords'></text>" }
+        ]
+    });
+
+    function onRefreshDetail(e) { }
+
+    function onCloseDetail(e) {
+        e.sender.element.context.innerHTML = '<span class="k-icon k-i-refresh k-loading" role="presentation"></span> Завантаження...';
+    }
+
+    function dialogTableViewOptionsClose(button) {
+        var window = $("#dialogTableViewOptions").data("kendoWindow");
+        window.close();
+    }
+
+    function dialogTableCashFlowClose(button) {
+        var window = $("#dialogCashFlowPeriod").data("kendoWindow");
+        window.close();
+    }
+
+    function acceptViewTableHandler(button) {
+        // Показывать закрытые счета
+        //  checkboxV04_handler(checkboxV04);
+        dialogTableViewOptionsClose();
+        if (chk03 != null) {
+            document.forms["f1"].submit();
+        }
+    }
+
+    function checkboxV01_handler(element) {
+        chk03 = null;
+        var grid = $("#" + GetCurrentSepTechAccountsGrid().id + "").data("kendoGrid");
+        GridColumnsHideShow(grid, 4, 10, element.checked);
+    }
+
+    var chk03 = null;
+    function chk03_handler(element) {
+        if (element.checked) {
+            chk03 = true;
+        }
+        if (!element.checked) {
+            chk03 = false;
+        }
+    }
+
+    function checkboxV04_handler(element) {
+        chk03 = null;
+        // Дата закрытия
+        // показывать скрывать
+        var grid = GetCurrentGrid();
+        if (element.checked) {
+            grid.showColumn(19);
+        } else {
+            grid.hideColumn(19);
+        }
+    }
+
+    function GridColumnsHideShow(grid, columnFirst, columnLast, showHide) {
+        for (i = columnFirst; i <= columnLast; i++) {
+            if (showHide) {
+                grid.showColumn(i);
+            } else {
+                grid.hideColumn(i);
+            }
+        }
+    }
+
+    function GetCurrentGrid() {
+        var grid = $("#" + GetCurrentSepTechAccountsGrid().id + "").data("kendoGrid");
+        return grid;
+    }
+
+    $("#CheckboxVO1").change(function () {
+        if (document.getElementById("CheckboxVO3").checked && !this.checked) {
+            document.getElementById("CheckboxVO3").checked = false;
+        }
+    });
+
+    $("#GridHistoryAcc").kendoGrid({
+        columns: [
+            {
+                field: "ACC",
+                hidden: true
+            },
+            {
+                field: "NN",
+                title: "-",
+                width: 60
+            },
+            {
+                field: "FDAT",
+                headerAttributes: { style: "white-space: normal;" },
+                title: "Дата движения",
+                template: "#=FDAT != null ? kendo.toString(kendo.parseDate(FDAT),'dd.MM.yyyy') : ''#",
+                width: 50
+            },
+            {
+                field: "SV",
+                title: "Залишок вхiдний",
+                headerAttributes: { style: "white-space: normal;" },
+                aggregates: ["sum"],
+                template: "#=CellPaint(SV)#",
+                width: 50
+            },
+            {
+                field: "SVQ",
+                headerAttributes: { style: "white-space: normal;" },
+                title: "Обороти Дебет",
+                template: "#=moneyFormat(SVQ)#",
+                width: 50
+            },
+            {
+                field: "OD",
+                headerAttributes: { style: "white-space: normal;" },
+                title: "Обороти Кредит",
+                template: "#=moneyFormat(OD)#",
+                width: 50
+            },
+            {
+                field: "ODQ",
+                headerAttributes: { style: "white-space: normal;" },
+                title: "Залишок вихiдний",
+                template: "#=CellPaint(ODQ)#",
+                width: 50
+            }
+        ],
+        dataSource: {
+            type: "aspnetmvc-ajax",
+            transport: {
+                read: {
+                    dataType: 'json',
+                    url: bars.config.urlContent('/sep/SepTechAccounts/GetGridHistoryAccList'),
+                    data: GridHistoryAccData
+                }
+            },
+            schema: {
+                data: "Data",
+                total: "Total",
+                errors: "Errors",
+                model: {
+                    fields: {
+                        NN: { type: "string" },
+                        FDAT: { type: "date" },
+                        ACC: { type: "number" },
+                        SV: { type: "number" },
+                        SVQ: { type: "number" },
+                        OD: { type: "number" },
+                        ODQ: { type: "number" }
+                    }
+                }
+            }
+        },
+        autoBind: false,
+        sortable: true,
+        resizable: true,
+        selectable: "multiple"
+    });
+    
+    $("#GridHistoryAccChangeParam").kendoGrid({
+        columns: [
+            {
+                field: "PARNAME",
+                title: "Параметр",
+                width: 50
+            },
+            {
+                field: "VALOLD",
+                title: "Старое значение",
+                width: 50
+            },
+            {
+                field: "VALNEW",
+                title: "Новое значение",
+                width: 50
+            },
+            {
+                field: "DAT",
+                title: "Дата изменения",
+                width: 50
+            },
+            {
+                field: "ISP",
+                title: "Внес изменения",
+                width: 50
+            },
+            {
+                field: "FIO",
+                title: "ФИО пользователя",
+                width: 50
+            }
+        ],
+        dataSource: {
+            type: "aspnetmvc-ajax",
+            transport: {
+                read: {
+                    dataType: 'json',
+                    url: bars.config.urlContent('/sep/SepTechAccounts/GetGridHistoryAccChangeParamList'),
+                    cache: false,
+                    data: HistoryAccChangeParamData
+                }
+            },
+            schema: {
+                data: "Data"
+            }
+        },      
+        autoBind: false,
+        selectable: "single",
+        scrollable: true
+    });
+
+    function HistoryAccChangeParamData() {
+        return {
+            NACC: nAcc,
+            TABID:  $("#HistoryParamsDropDown1").data("kendoDropDownList").value(),
+            COLID:  $("#HistoryParamsDropDown2").data("kendoDropDownList").value()
+        };
+    }
+
+    $("#GridCurrencySummary").kendoGrid({
+        columns: [
+            {
+                field: "LCV",
+                title: "Валюта",
+                width: 50
+            },
+            {
+                field: "ISDF",
+                title: "Входящий остаток ДЕБЕТ",
+                width: 50,
+                template: "#=CellPaint(ISDF)#",
+                headerAttributes: { style: "white-space: normal" }
+            },
+            {
+                field: "ISKF",
+                title: "Входящий остаток КРЕДИТ",
+                width: 50,
+                template: "#=CellPaint(ISKF)#",
+                headerAttributes: { style: "white-space: normal" }
+            },
+            {
+                field: "DOS",
+                title: "Обороты Дебет",
+                width: 50,
+                template: "#=CellPaint(DOS)#",
+                headerAttributes: { style: "white-space: normal" }
+            },
+            {
+                field: "KOS",
+                title: "Обороты Кредит",
+                width: 50,
+                template: "#=CellPaint(KOS)#",
+                headerAttributes: { style: "white-space: normal" }
+            },
+            {
+                field: "OSTCD",
+                title: "Исходящий остаток ДЕБЕТ",
+                width: 50,
+                template: "#=CellPaint(OSTCD)#",
+                headerAttributes: { style: "white-space: normal" }
+            },
+            {
+                field: "OSTCK",
+                title: "Исходящий остаток КРЕДИТ",
+                width: 50,
+                template: "#=CellPaint(OSTCK)#",
+                headerAttributes: { style: "white-space: normal" }
+            },
+            {
+                field: "RATQ",
+                title: "Средневзвешенная ставка",
+                width: 50,
+                template: "#=CellPaint(RATQ)#",
+                headerAttributes: { style: "white-space: normal" }
+            }
+        ],
+        dataSource: {
+            type: "aspnetmvc-ajax",
+            transport: {
+                read: {
+                    dataType: 'json',
+                    url: bars.config.urlContent('/sep/SepTechAccounts/GetGridCurrencySummaryList')
+                }
+            },
+            schema: {
+                data: "Data"
+            }
+        },
+        autoBind: false,
+        selectable: "single",
+        scrollable: true
+    });
+
+    $("#dialogTableViewOptions").kendoWindow({
+        actions: ["Close"],
+        draggable: true,
+        height: "350px",
+        visible: false,
+        modal: true,
+        resizable: false,
+        title: "Параметри перегляду",
+        width: "520px"
+    });
+
+    $("#dialogCashFlowPeriod").kendoWindow({
+        actions: ["Close"],
+        draggable: true,
+        height: "150px",
+        visible: false,
+        modal: true,
+        resizable: false,
+        title: "Обороты за период дат",
+        width: "520px"
+    });
+
+    $("#dialogHistoryAcc").kendoWindow({
+        actions: ["Close"],
+        draggable: true,
+        height: "650px",
+        visible: false,
+        modal: true,
+        resizable: false,
+        title: "История счета №",
+        width: "720px"
+    });
+
+    $("#dialogHistoryAccChangeParam").kendoWindow({
+        actions: ["Close"],
+        draggable: true,
+        height: "950px",
+        visible: false,
+        modal: true,
+        resizable: false,
+        title: "История изменения парамтеров счета №",
+        width: "950px"
+    });
+
+    $("#dialogCurrencySummary").kendoWindow({
+        actions: ["Close"],
+        draggable: true,
+        height: "580px",
+        visible: false,
+        modal: true,
+        resizable: false,
+        title: "Таблица итогов по валютам",
+        width: "820px"
+    });
+
+    var DateCashFlowPeriod1 = null;
+    var DateCashFlowPeriod2 = null;    
+    $(document).ready(function () {       
+        // create DateTimePicker from input HTML element
+        $("#datepicker1").kendoDatePicker({
+            animation: false,
+            value: GetBankDate(),
+            format: "dd.MM.yyyy"
+        });
+
+        $("#datepicker2").kendoDatePicker({
+            animation: false,
+            value: GetBankDate(),
+            format: "dd.MM.yyyy"
+        });
+
+        $("#datepicker31").kendoDatePicker({
+            animation: false,
+            value: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(this.Model.dat11.Value.ToString("dd.MM.yyyy"))),
+            format: "dd.MM.yyyy"
+        });
+
+        $("#datepicker32").kendoDatePicker({
+            animation: false,
+            value: GetBankDate(),
+            format: "dd.MM.yyyy"
+        });
+         
+        $("#datepicker41").kendoDatePicker({
+            animation: false,
+            value: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(this.Model.dat11.Value.ToString("dd.MM.yyyy"))),
+            format: "dd.MM.yyyy"
+        });
+         
+        $("#datepicker42").kendoDatePicker({
+            animation: false,
+            value: GetBankDate(),
+            format: "dd.MM.yyyy"
+        });
+
+        $(document).ready(function () {
+            var dropdownlist = $("#HistoryParamsDropDown2").data("kendoDropDownList");
+            if ($("#HistoryParamsDropDown1").data("kendoDropDownList").value()==0)
+            { 
+                dropdownlist.enable(false); 
+            } else {
+                dropdownlist.enable(true); 
+            } 
+        });
+                
+        $("#HistoryParamsDropDown1").kendoDropDownList({
+            dataTextField: "SEMANTIC",
+            dataValueField: "TABID",
+            optionLabel: "Все",
+            dataSource: {
+                type: "aspnetmvc-ajax",
+                transport: {
+                    read: {
+                        dataType: 'json',
+                        url: bars.config.urlContent('/sep/SepTechAccounts/GetHistoryParamSelectData')
+                    }
+                },
+                schema: {
+                    data: "Data"
+                }
+            }, 
+            change: onChangeSelected1
+        }); 
+
+        $("#HistoryParamsDropDown2").kendoDropDownList({
+       //     cascadeFrom: "HistoryParamsDropDown1",
+        //    cascadeFromField: "HistoryParamsDropDown1Id",
+            dataTextField: "SEMANTIC",
+            dataValueField: "COLID", 
+            optionLabel: "Все",
+            dataSource: {
+                type: "aspnetmvc-ajax",
+                transport: {
+                    read: {
+                        dataType: 'json',
+                        url: bars.config.urlContent
+                            ('/sep/SepTechAccounts/GetHistoryParamSelectData2'),
+                        cache: false,
+                        data: SelectData
+                    }
+                },
+                schema: {
+                    data: "Data"
+                }
+            },
+            change: onChangeSelected2
+        }); 
+    });
+
+    function SelectData() {
+        return {
+            TABID:  $("#HistoryParamsDropDown1").data("kendoDropDownList").value()
+        };
+    }
+
+    function onChangeSelected1() {
+        $("#HistoryParamsDropDown2").data("kendoDropDownList").dataSource.read();
+        $('#GridHistoryAccChangeParam').data('kendoGrid').dataSource.read();
+
+        if ($("#HistoryParamsDropDown1").data("kendoDropDownList").value()>0) { 
+            $("#HistoryParamsDropDown2").data("kendoDropDownList").enable(true); 
+        } else {
+            $("#HistoryParamsDropDown2").data("kendoDropDownList").enable(false); 
+        }
+    }
+
+    function onChangeSelected2() { 
+        $('#GridHistoryAccChangeParam').data('kendoGrid').dataSource.read();
+    
+    }
+      
+     
+    function GetBankDate() {
+        var result = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(this.Model.bankdate));
+        return result;
+    }
+
+    function GetCurrentSepTechAccountsGrid() {
+        var septechaccountGridv1 = document.getElementById("SepTechAccountsGridV1");
+        var septechaccountGridv2 = document.getElementById("SepTechAccountsGridV2");
+        var septechaccountGridvQF = document.getElementById("SepTechAccountsGridVQF");
+        return septechaccountGridv1 || septechaccountGridv2 || septechaccountGridvQF;
+    }
+
+    $('#acceptCancelBtnToolbar1').kendoToolBar({
+        resizable: false,
+        items: [
+             {
+                 template: "<button id='acceptViewTable_btn' type='button' class='filter-ok' onclick='acceptViewTableHandler(this)' title='Применить'><i class='pf-icon pf-16 pf-filter-ok'></i></button>"
+             },
+             {
+                 template: "<button id='cancelViewTable_btn' type='button' class='filter-remove' onclick='dialogTableViewOptionsClose()' title='Отменить'><i class='pf-icon pf-16 pf-filter-remove'></i></button>"
+             }
+        ]
+    });
+
+    $('#dialogCashFlowBtnToolbar1').kendoToolBar({
+        resizable: false,
+        items: [
+             {
+                 template: "<button id='btn_acceptCashFlowBtn' type='button' class='filter-ok'  title='Применить'><i class='pf-icon pf-16 pf-filter-ok'></i></button>"
+             },
+             {
+                 template: "<button id='btn_cancelCashFlowBtn' type='button' class='filter-remove' title='Отменить' onclick='dialogTableCashFlowClose()'><i class='pf-icon pf-16 pf-filter-remove'></i></button>"
+             }
+        ]
+    });
+
+    $('#btn_CurrencySummary').click(function () {
+        var dialog = $("#dialogCurrencySummary").data("kendoWindow");
+        dialog.center().open();
+
+        var grid = $("#GridCurrencySummary").data("kendoGrid");
+        grid.dataSource.read();
+        grid.refresh();
+    });
+
+
+    $('#btn_DocAccOtvetSep').click(function () {
+        var grid = GetCurrentGrid();
+        var record = grid.dataItem(grid.select());
+        if (record) {
+            var nAcc = record.ACC;
+            //  var bankdate = bars.utils.sep.formatDate(record.DAPP, "MM/dd/yyyy");
+            var bankdate = GetBankDate();
+            grid.dataSource.read();
+            grid.refresh();
+            var docUrl = bars.config.urlContent("/sep/SepTechAccounts/GetSepReplyTechDocs?NACC=" + nAcc + "&bankdate=" + bankdate + "");
+            window.location = docUrl;
+        }
+    });
+
+    $('#btn_DocAccBankInternInit').click(function () {
+        var grid = GetCurrentGrid();
+        var record = grid.dataItem(grid.select());
+        if (record) {
+            var nAcc = record.ACC;
+            var NLS = record.NLS;
+            grid.dataSource.read();
+            grid.refresh();
+            var docUrl = bars.config.urlContent("/sep/SepTechAccounts/GetSepBankInternInitDocs?NACC=" + nAcc + "&NLS='" + NLS + "'");
+            window.location = docUrl;
+        }
+    });
+
+    $('#btn_TurnOverAcc').click(function () {
+        // var docUrl = bars.config.urlContent("/clientregister/registration.aspx?readonly=1&rnk=" + record.RNK + "");
+        var grid = GetCurrentGrid();
+        var record = grid.dataItem(grid.select());
+        if (record) {
+            var acc = record.ACC;
+            //  var bdate = new Date(GetBankDate().getTime() - 30 * 24 * 60 * 60 * 1000);
+            var bdate = GetBankDate();
+            //kendo.toString(kendo.parseDate(record.DAPP), 'dd.MM.yyyy');
+            grid.dataSource.read();
+            grid.refresh();
+            var docUrl = bars.config.urlContent("/customerlist/AccExtract.aspx?type=2&acc=" + acc + "&date=" + bdate + "");
+            window.location = docUrl;
+        }
+    });
+
+
+    var NACC_GridHistoryAcc = null;
+    function GridHistoryAccData() {
+        return {
+            NACC: NACC_GridHistoryAcc,
+            dat11: $("#datepicker31").data("kendoDatePicker").value(),
+            dat22:  $("#datepicker32").data("kendoDatePicker").value()
+        }
+    }
+
+    $('#btn_HistoryAcc').click(function () {
+        openDialogHistoryAcc();
+    });
+
+    function openDialogHistoryAcc() {
+        var dialog = $("#dialogHistoryAcc").data("kendoWindow");
+        dialog.center().open();
+        // Refresh history Acc List:
+
+        var grid = $("#GridHistoryAcc").data("kendoGrid");
+        grid.dataSource.read();
+    }
+
+    function openDialogAccExtract() {
+        var grid = $("#GridHistoryAcc").data("kendoGrid");
+        var selectedItem = grid.dataItem(grid.select());
+
+        if (selectedItem.FDAT != null && selectedItem.acc != null) {
+            window.location.replace("/barsroot/customerlist/accextract.aspx?type=1&acc="
+                + selectedItem.acc + "&date=" + (kendo.toString(kendo.parseDate(selectedItem.FDAT), 'dd.MM.yyyy').replace('/', '.')).replace('/', '.'));
+        }
+    }
+
+    $("#GridHistoryAcc").on("dblclick", " tbody > tr", function () {
+        openDialogAccExtract();
+    });
+
+
+    $("#" + GetCurrentSepTechAccountsGrid().id + "").on("dblclick", " tbody > tr", function () {
+        openDialogHistoryAcc();
+    });
+
+
+    $('#btn_HistoryAccChangeParam').click(function () {
+        var dialog = $("#dialogHistoryAccChangeParam").data("kendoWindow");
+        dialog.center().open();
+        // Refresh history Acc List:
+        $('#GridHistoryAccChangeParam').data('kendoGrid').dataSource.read({ "nAcc": nAcc });
+
+        var grid = $("#GridHistoryAccChangeParam").data("kendoGrid");
+        grid.dataSource.read();
+        grid.refresh();
+    });
+
+    $('#btn_acceptCashFlowBtn').click(function () {
+        var datepicker1 = $("#datepicker1").data("kendoDatePicker");
+        var datepicker2 = $("#datepicker2").data("kendoDatePicker");
+        DateCashFlowPeriod1 = datepicker1.value();
+        DateCashFlowPeriod2 = datepicker2.value();       
+        var grid = GetCurrentGrid(); 
+        grid.dataSource.read();
+        grid.refresh();
+        dialogTableCashFlowClose(this);
+    });
+
+
+    $('#btn_CashFlowPeriod').click(function () {
+        var dialog = $("#dialogCashFlowPeriod").data("kendoWindow");
+        dialog.center().open();
+    });
+
+    var SortWithoutKR = null;
+    $('#btn_SortWithoutKR').click(function () {
+        if (SortWithoutKR == false) {
+            SortWithoutKR = null;
+        }
+        if (SortWithoutKR == true) {
+            SortWithoutKR = false;
+        }
+        if (SortWithoutKR == null) {
+            SortWithoutKR = true;
+        }
+        ReloadCurrentGrid();
+    });
+
+    //btn_LinkedAcc
+    var LinkedAccFlag = false;
+    var nAcc;
+    $('#btn_LinkedAcc').click(function () {
+        LinkedAccFlag = true
+        var grid = GetCurrentGrid();
+        var record = grid.dataItem(grid.select());
+        if (record) {
+            nAcc = record.ACC;
+            grid.dataSource.read();
+            grid.refresh();
+        }
+        else {
+            alert('Номер счета не выбран!');
+        }
+    });
+
+    function SepTechAccountsGridData() {
+        return {
+            SortWithoutKR: SortWithoutKR,
+            DateCashFlowPeriod1: DateCashFlowPeriod1,
+            DateCashFlowPeriod2: DateCashFlowPeriod2,
+            LinkedAccFlag: LinkedAccFlag,
+            nAcc: nAcc
+        }
+    }
+
+    function SepTechAccountsGridonRowSelected(e) {
+
+        SetDialohHistoryAccTitle(this.dataItem(this.select()));
+        SetDialohHistoryAccChangeParamTitle(this.dataItem(this.select()));
+
+        bars.utils.sep.enableButton('btn_AccountDetailsView', GetGridSelectRowState());
+        bars.utils.sep.enableButton('btn_DocAccOtvetSep', GetGridSelectRowState());
+        bars.utils.sep.enableButton('btn_DocAccBankInternInit', GetGridSelectRowState());
+        bars.utils.sep.enableButton('btn_TurnOverAcc', GetGridSelectRowState());
+        bars.utils.sep.enableButton('btn_HistoryAcc', GetGridSelectRowState());
+        bars.utils.sep.enableButton('btn_HistoryAccChangeParam', GetGridSelectRowState());
+        bars.utils.sep.enableButton('btn_LinkedAcc', GetGridSelectRowState());
+        bars.utils.sep.enableButton('btn_Customer', GetGridSelectRowState());
+
+        var grid = GetCurrentGrid();
+        var selectedItem = grid.dataItem(grid.select());
+        NACC_GridHistoryAcc = selectedItem.ACC;
+
+        if (GetCurrentSepTechAccountsGrid().id != "SepTechAccountsGridVQF") {
+            var ids = grid.select().map(function () {
+                return grid.dataItem($(this)).Id
+            }).toArray();
+            $.cookie('sepTechRows', JSON.stringify(ids));
+        }
+    }
+
+    // Изменение Title для истории Счета:
+    function SetDialohHistoryAccTitle(item) {
+        var dialog = $("#dialogHistoryAcc").data("kendoWindow");
+        // startDate = new Date(GetBankDate().getTime() - 30 * 24 * 60 * 60 * 1000);
+        startDate = GetBankDate();
+        nAcc = item.ACC;     // record acc number
+        // dialog.title("История счета №" + item.NLS + " (" + item.LCV + ") С:" + bars.utils.sep.formatDate(startDate) + " По:" + bars.utils.sep.formatDate(GetBankDate()));
+        dialog.title("История счета №" + item.NLS + " (" + item.LCV + ") С:" + startDate + " По:" + startDate);
+
+    }
+
+    // Изменение Title для истории изменения парамтеров Счета:
+    function SetDialohHistoryAccChangeParamTitle(item) {
+        var dialog = $("#dialogHistoryAccChangeParam").data("kendoWindow");
+        //startDate = new Date(GetBankDate().getTime() - 30 * 24 * 60 * 60 * 1000);
+        startDate = GetBankDate();
+        nAcc = item.ACC;     // record acc number
+        //dialog.title("История изменения паратров счета №" + item.NLS + " (" + item.LCV + ") С:" + bars.utils.sep.formatDate(startDate) + " По:" + bars.utils.sep.formatDate(GetBankDate()));
+        dialog.title("История изменения паратров счета №" + item.NLS + " (" + item.LCV + ") С:" + startDate + " По:" + startDate);
+
+    }
+
+    //Просмотр атрибутов счета
+    function openAccountDetailsView(e) {
+        var grid = GetCurrentGrid();
+        var selectedItem = grid.dataItem(grid.select());
+        showDetails(selectedItem);
+    }
+
+    function showDetails(item) {
+        //  var wnd = $("#Details").data("kendoWindow");
+        // var content = {};
+        var docUrl = bars.config.urlContent("/viewaccounts/accountform.aspx?acc=" + item.ACC + "&rnk="+item.RNK+"&accessmode=0&type=0");
+        window.location = docUrl;
+        //  content.url = '/barsroot/viewaccounts/accountform.aspx?type=0&acc=' + item.ACC + '&rnk='+item.RNK+'&accessmode=1/?id=&partial=true';
+        //   wnd.options.content = content;
+        //   wnd.center().open().refresh();
+    }
+
+    function openDialogViewTable() {
+        var dialog = $("#dialogTableViewOptions").data("kendoWindow");
+        dialog.center().open();
+    }
+
+    function CellPaintQF(data) {
+        data = data / 100;
+        if (data == 0) {
+            return moneyFormat(data);
+        }
+        else {
+            if (data < 0) {
+                return "<font color=\"red\">" + moneyFormat(Math.abs(data)) + "</font>";
+            }
+            else if (data > 0) {
+                return "<font color=\"blue\">" + moneyFormat(data) + "</font>";
+            }
+        }
+    }
+
+    // Set Qty records on a gread to label
+    function lbl_QtyRecords_SetValue() {
+        var grid = GetCurrentGrid();
+        var dataSource = grid.dataSource;
+        // document.getElementById('lbl_QtyRecords').innerHTML = 'Счетов всего: ' + dataSource.total().toString();
+    }
+
+    function grid_dataBound(e) {
+        lbl_QtyRecords_SetValue();
+        bars.utils.sep.enableButton('btn_AccountDetailsView', GetGridSelectRowState());
+        bars.utils.sep.enableButton('btn_DocAccOtvetSep', GetGridSelectRowState());
+        bars.utils.sep.enableButton('btn_DocAccBankInternInit', GetGridSelectRowState());
+        bars.utils.sep.enableButton('btn_TurnOverAcc', GetGridSelectRowState());
+        bars.utils.sep.enableButton('btn_HistoryAcc', GetGridSelectRowState());
+        bars.utils.sep.enableButton('btn_HistoryAccChangeParam', GetGridSelectRowState());
+        bars.utils.sep.enableButton('btn_LinkedAcc', GetGridSelectRowState());
+        bars.utils.sep.enableButton('btn_Customer', GetGridSelectRowState());
+
+        var grid = this;
+        var dataSource = this.dataSource;
+
+        var state = kendo.stringify({
+            page: dataSource.page(),
+            pageSize: dataSource.pageSize(),
+            sort: dataSource.sort(),
+            group: dataSource.group(),
+            filter: dataSource.filter()
+        });
+
+        if (GetCurrentSepTechAccountsGrid().id != "SepTechAccountsGridVQF") {
+            $.cookie("sepTechState", state);
+            if ($.cookie('sepTechRows')) {
+                $.each(JSON.parse($.cookie('sepTechRows')), function () {
+                    var item = dataSource.get(this);
+                    var row = grid.tbody.find('[data-uid=' + item.uid + ']');
+                    row.addClass('k-state-selected');
+                })
+            }
+        }
+    }
+
+    function GetGridSelectRowState() {
+        var grid = GetCurrentGrid();
+        var selection = grid.select();
+        return selection.length === 1;
+    }
+
+    function ReloadCurrentGrid() {
+        var grid = GetCurrentGrid();
+        grid.dataSource.page(1);
+        grid.dataSource.read();
+    }
+
+    function open_CustomerCard() {
+        var grid = GetCurrentGrid();
+        var record = grid.dataItem(grid.select());
+        var docUrl = bars.config.urlContent("/clientregister/registration.aspx?readonly=1&rnk=" + record.RNK + "");
+        window.location = docUrl;
+    }
+
+    // Раскраска и преобразование данных в формат отображения счетов
+    function CellPaint(data) {
+        if (data == 0) {
+            return moneyFormat(data);
+        }
+        else {
+            if (data < 0) {
+                return "<font color=\"red\">" + moneyFormat(Math.abs(data)) + "</font>";
+
+            }
+            else if (data > 0) {
+                return "<font color=\"blue\">" + moneyFormat(data) + "</font>";
+            }
+        }
+    }
+
+    // Преобразование в формать отображения денег
+    function moneyFormat(money) {
+        return kendo.toString(money, '###,##0.00').replace(new RegExp(",", 'g'), ' ');
+    }
+
+    function PAPCaseHandle(data) {
+        switch (data) {
+            case "1": return "А"; break;
+            case "2": return "П"; break;
+            case "3": return "А/П"; break;
+            default: break;
+        }
+    }
+
+    $("#btn_AccountDetailsView").kendoButton();
+    $("#btn_DocAccOtvetSep").kendoButton();
+    $("#btn_DocAccBankInternInit").kendoButton();
+    $("#btn_TurnOverAcc").kendoButton();
+    $("#btn_HistoryAcc").kendoButton();
+    $("#btn_HistoryAccChangeParam").kendoButton();
+    $("#btn_LinkedAcc").kendoButton();
+    $("#btn_Customer").kendoButton();
+
+</script>

@@ -1,0 +1,1187 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="Models.Store" Provider="Oracle.DataAccess.Client" ProviderManifestToken="11.2" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+        <EntityType Name="CUSTOMER">
+          <Key>
+            <PropertyRef Name="RNK" />
+          </Key>
+          <Property Name="RNK" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="TGR" Type="number" Precision="1" Scale="0" />
+          <Property Name="CUSTTYPE" Type="number" Precision="1" Scale="0" />
+          <Property Name="COUNTRY" Type="number" Precision="3" Scale="0" />
+          <Property Name="NMK" Type="varchar2" MaxLength="70" />
+          <Property Name="NMKV" Type="varchar2" MaxLength="70" />
+          <Property Name="NMKK" Type="varchar2" MaxLength="38" />
+          <Property Name="CODCAGENT" Type="number" Precision="1" Scale="0" />
+          <Property Name="PRINSIDER" Type="number" Precision="38" Scale="0" />
+          <Property Name="OKPO" Type="varchar2" MaxLength="14" />
+          <Property Name="ADR" Type="varchar2" MaxLength="70" />
+          <Property Name="SAB" Type="varchar2" MaxLength="6" />
+          <Property Name="C_REG" Type="number" Precision="2" Scale="0" />
+          <Property Name="C_DST" Type="number" Precision="2" Scale="0" />
+          <Property Name="RGTAX" Type="varchar2" MaxLength="30" />
+          <Property Name="DATET" Type="date" />
+          <Property Name="ADM" Type="varchar2" MaxLength="70" />
+          <Property Name="DATEA" Type="date" />
+          <Property Name="STMT" Type="number" Precision="5" Scale="0" />
+          <Property Name="DATE_ON" Type="date" Nullable="false" />
+          <Property Name="DATE_OFF" Type="date" />
+          <Property Name="NOTES" Type="varchar2" MaxLength="140" />
+          <Property Name="NOTESEC" Type="varchar2" MaxLength="256" />
+          <Property Name="CRISK" Type="number" Precision="38" Scale="0" />
+          <Property Name="PINCODE" Type="varchar2" MaxLength="10" />
+          <Property Name="ND" Type="varchar2" MaxLength="10" />
+          <Property Name="RNKP" Type="number" Precision="38" Scale="0" />
+          <Property Name="ISE" Type="char" MaxLength="5" />
+          <Property Name="FS" Type="char" MaxLength="2" />
+          <Property Name="OE" Type="char" MaxLength="5" />
+          <Property Name="VED" Type="char" MaxLength="5" />
+          <Property Name="SED" Type="char" MaxLength="4" />
+          <Property Name="LIM" Type="number" Precision="24" Scale="0" />
+          <Property Name="MB" Type="char" MaxLength="1" />
+          <Property Name="RGADM" Type="varchar2" MaxLength="30" />
+          <Property Name="BC" Type="number" Precision="1" Scale="0" />
+          <Property Name="BRANCH" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="TOBO" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="ISP" Type="number" Precision="38" Scale="0" />
+          <Property Name="TAXF" Type="varchar2" MaxLength="12" />
+          <Property Name="NOMPDV" Type="varchar2" MaxLength="9" />
+          <Property Name="K050" Type="char" MaxLength="3" />
+          <Property Name="NREZID_CODE" Type="varchar2" MaxLength="20" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.PASSP' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="PASSP">
+          <Key>
+            <PropertyRef Name="PASSP" />
+            <PropertyRef Name="NAME" />
+            <PropertyRef Name="PSPTYP" />
+          </Key>
+          <Property Name="PASSP" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="NAME" Type="varchar2" MaxLength="35" Nullable="false" />
+          <Property Name="PSPTYP" Type="char" MaxLength="2" Nullable="false" />
+          <Property Name="NRF" Type="varchar2" MaxLength="64" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.PERSON' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="PERSON">
+          <Key>
+            <PropertyRef Name="RNK" />
+          </Key>
+          <Property Name="RNK" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="SEX" Type="char" MaxLength="1" />
+          <Property Name="PASSP" Type="number" Precision="38" Scale="0" />
+          <Property Name="SER" Type="varchar2" MaxLength="10" />
+          <Property Name="NUMDOC" Type="varchar2" MaxLength="20" />
+          <Property Name="PDATE" Type="date" />
+          <Property Name="ORGAN" Type="varchar2" MaxLength="70" />
+          <Property Name="BDAY" Type="date" />
+          <Property Name="BPLACE" Type="varchar2" MaxLength="70" />
+          <Property Name="TELD" Type="varchar2" MaxLength="20" />
+          <Property Name="TELW" Type="varchar2" MaxLength="20" />
+          <Property Name="CELLPHONE" Type="varchar2" MaxLength="20" />
+          <Property Name="BDOV" Type="date" />
+          <Property Name="EDOV" Type="date" />
+          <Property Name="DATE_PHOTO" Type="date" />
+          <Property Name="DOV" Type="varchar2" MaxLength="35" />
+        </EntityType>
+        <EntityType Name="STO_ORDER_EXTRA_ATTRIBUTES">
+          <Key>
+            <PropertyRef Name="ORDER_ID" />
+          </Key>
+          <Property Name="ORDER_ID" Type="number" Precision="10" Scale="0" Nullable="false" />
+          <Property Name="EXTRA_ATTRIBUTES" Type="clob" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.V_STO_ACCOUNTS' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="V_STO_ACCOUNTS">
+          <Key>
+            <PropertyRef Name="ACC" />
+            <PropertyRef Name="RNK" />
+            <PropertyRef Name="NLS" />
+            <PropertyRef Name="NMS" />
+            <PropertyRef Name="KV" />
+            <PropertyRef Name="BRANCH" />
+            <PropertyRef Name="DAOS" />
+            <PropertyRef Name="OSTC" />
+          </Key>
+          <Property Name="ACC" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="RNK" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="NLS" Type="varchar2" MaxLength="15" Nullable="false" />
+          <Property Name="NMS" Type="varchar2" MaxLength="70" Nullable="false" />
+          <Property Name="KV" Type="number" Precision="3" Scale="0" Nullable="false" />
+          <Property Name="BRANCH" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="DAOS" Type="date" Nullable="false" />
+          <Property Name="OSTC" Type="number" Precision="24" Scale="0" Nullable="false" />
+          <Property Name="TIP" Type="char" MaxLength="3" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.V_STO_FREQ' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="V_STO_FREQ">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="NAME" />
+          </Key>
+          <Property Name="ID" Type="number" Precision="3" Scale="0" Nullable="false" />
+          <Property Name="NAME" Type="varchar2" MaxLength="35" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.V_STO_ORDER' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="V_STO_ORDER">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="CUSTOMER_ID" />
+            <PropertyRef Name="PAYER_ACCOUNT" />
+            <PropertyRef Name="CURRENCY_ID" />
+            <PropertyRef Name="ORDER_KIND_ID" />
+            <PropertyRef Name="ORDER_KIND_NAME" />
+          </Key>
+          <Property Name="ID" Type="number" Precision="10" Scale="0" Nullable="false" />
+          <Property Name="CUSTOMER_ID" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="PAYER_ACCOUNT" Type="varchar2" MaxLength="15" Nullable="false" />
+          <Property Name="CURRENCY_ID" Type="number" Precision="3" Scale="0" Nullable="false" />
+          <Property Name="ORDER_KIND_ID" Type="number" Precision="5" Scale="0" Nullable="false" />
+          <Property Name="ORDER_KIND_NAME" Type="varchar2" MaxLength="300" Nullable="false" />
+          <Property Name="REGULAR_AMOUNT" Type="number" Precision="38" Scale="0" />
+          <Property Name="STOP_DATE" Type="date" />
+          <Property Name="RECEIVER" Type="varchar2" MaxLength="4000" />
+          <Property Name="PAYMENT_DETAILS" Type="varchar2" MaxLength="4000" />
+          <Property Name="PRIORITY" Type="number" Precision="38" Scale="0" />
+          <Property Name="USER_NAME" Type="varchar2" MaxLength="60" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.V_STO_ORDER_SBON_CONTR' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="V_STO_ORDER_SBON_CONTR">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="CUSTOMER_ID" />
+            <PropertyRef Name="PAYER_ACCOUNT_ID" />
+            <PropertyRef Name="START_DATE" />
+            <PropertyRef Name="PROVIDER_ID" />
+          </Key>
+          <Property Name="ID" Type="number" Precision="10" Scale="0" Nullable="false" />
+          <Property Name="CUSTOMER_ID" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="PAYER_ACCOUNT_ID" Type="number" Precision="10" Scale="0" Nullable="false" />
+          <Property Name="START_DATE" Type="date" Nullable="false" />
+          <Property Name="STOP_DATE" Type="date" />
+          <Property Name="HOLIDAY_SHIFT" Type="number" Precision="5" Scale="0" />
+          <Property Name="PAYMENT_FREQUENCY" Type="number" Precision="5" Scale="0" />
+          <Property Name="PROVIDER_ID" Type="number" Precision="5" Scale="0" Nullable="false" />
+          <Property Name="REGULAR_AMOUNT" Type="number" Precision="22" Scale="2" />
+          <Property Name="CEILING_AMOUNT" Type="number" Precision="22" Scale="2" />
+          <Property Name="CUSTOMER_ACCOUNT" Type="varchar2" MaxLength="30" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.V_STO_ORDER_SBON_FREE' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="V_STO_ORDER_SBON_FREE">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="CUSTOMER_ID" />
+            <PropertyRef Name="PAYER_ACCOUNT_ID" />
+            <PropertyRef Name="START_DATE" />
+            <PropertyRef Name="PROVIDER_ID" />
+            <PropertyRef Name="RECEIVER_MFO" />
+            <PropertyRef Name="RECEIVER_ACCOUNT" />
+            <PropertyRef Name="RECEIVER_NAME" />
+            <PropertyRef Name="RECEIVER_EDRPOU" />
+          </Key>
+          <Property Name="ID" Type="number" Precision="10" Scale="0" Nullable="false" />
+          <Property Name="CUSTOMER_ID" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="PAYER_ACCOUNT_ID" Type="number" Precision="10" Scale="0" Nullable="false" />
+          <Property Name="START_DATE" Type="date" Nullable="false" />
+          <Property Name="STOP_DATE" Type="date" />
+          <Property Name="HOLIDAY_SHIFT" Type="number" Precision="5" Scale="0" />
+          <Property Name="PAYMENT_FREQUENCY" Type="number" Precision="5" Scale="0" />
+          <Property Name="PROVIDER_ID" Type="number" Precision="5" Scale="0" Nullable="false" />
+          <Property Name="REGULAR_AMOUNT" Type="number" Precision="22" Scale="2" />
+          <Property Name="RECEIVER_MFO" Type="varchar2" MaxLength="6" Nullable="false" />
+          <Property Name="RECEIVER_ACCOUNT" Type="varchar2" MaxLength="34" Nullable="false" />
+          <Property Name="RECEIVER_NAME" Type="varchar2" MaxLength="300" Nullable="false" />
+          <Property Name="RECEIVER_EDRPOU" Type="varchar2" MaxLength="12" Nullable="false" />
+          <Property Name="PURPOSE" Type="varchar2" MaxLength="4000" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.V_STO_ORDER_SBON_NO_CONTR' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="V_STO_ORDER_SBON_NO_CONTR">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="CUSTOMER_ID" />
+            <PropertyRef Name="PAYER_ACCOUNT_ID" />
+            <PropertyRef Name="START_DATE" />
+            <PropertyRef Name="PROVIDER_ID" />
+          </Key>
+          <Property Name="ID" Type="number" Precision="10" Scale="0" Nullable="false" />
+          <Property Name="CUSTOMER_ID" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="PAYER_ACCOUNT_ID" Type="number" Precision="10" Scale="0" Nullable="false" />
+          <Property Name="START_DATE" Type="date" Nullable="false" />
+          <Property Name="STOP_DATE" Type="date" />
+          <Property Name="HOLIDAY_SHIFT" Type="number" Precision="5" Scale="0" />
+          <Property Name="PAYMENT_FREQUENCY" Type="number" Precision="5" Scale="0" />
+          <Property Name="PROVIDER_ID" Type="number" Precision="5" Scale="0" Nullable="false" />
+          <Property Name="REGULAR_AMOUNT" Type="number" Precision="22" Scale="2" />
+          <Property Name="CUSTOMER_ACCOUNT" Type="varchar2" MaxLength="30" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.V_STO_ORDER_SEP' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="V_STO_ORDER_SEP">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="CUSTOMER_ID" />
+            <PropertyRef Name="PAYER_ACCOUNT_ID" />
+            <PropertyRef Name="START_DATE" />
+            <PropertyRef Name="RECEIVER_MFO" />
+            <PropertyRef Name="RECEIVER_ACCOUNT" />
+            <PropertyRef Name="RECEIVER_NAME" />
+            <PropertyRef Name="RECEIVER_EDRPOU" />
+          </Key>
+          <Property Name="ID" Type="number" Precision="10" Scale="0" Nullable="false" />
+          <Property Name="CUSTOMER_ID" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="PAYER_ACCOUNT_ID" Type="number" Precision="10" Scale="0" Nullable="false" />
+          <Property Name="START_DATE" Type="date" Nullable="false" />
+          <Property Name="STOP_DATE" Type="date" />
+          <Property Name="HOLIDAY_SHIFT" Type="number" Precision="5" Scale="0" />
+          <Property Name="PAYMENT_FREQUENCY" Type="number" Precision="5" Scale="0" />
+          <Property Name="REGULAR_AMOUNT" Type="number" Precision="22" Scale="2" />
+          <Property Name="RECEIVER_MFO" Type="varchar2" MaxLength="6" Nullable="false" />
+          <Property Name="RECEIVER_ACCOUNT" Type="varchar2" MaxLength="34" Nullable="false" />
+          <Property Name="RECEIVER_NAME" Type="varchar2" MaxLength="300" Nullable="false" />
+          <Property Name="RECEIVER_EDRPOU" Type="varchar2" MaxLength="12" Nullable="false" />
+          <Property Name="PURPOSE" Type="varchar2" MaxLength="4000" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.V_STO_SBON_PROVIDER' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="V_STO_SBON_PROVIDER">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="TRANSIT_ACCOUNT" />
+          </Key>
+          <Property Name="ID" Type="number" Precision="5" Scale="0" Nullable="false" />
+          <Property Name="SBON_CONTRACT_NUMBER" Type="varchar2" MaxLength="30" />
+          <Property Name="WORK_MODE_ID" Type="number" Precision="38" Scale="0" />
+          <Property Name="WORK_MODE" Type="varchar2" MaxLength="25" />
+          <Property Name="RECEIVER_MFO" Type="varchar2" MaxLength="6" />
+          <Property Name="RECEIVER_ACCOUNT" Type="varchar2" MaxLength="34" />
+          <Property Name="RECEIVER_NAME" Type="varchar2" MaxLength="300" />
+          <Property Name="RECEIVER_EDRPOU" Type="varchar2" MaxLength="12" />
+          <Property Name="PAYMENT_NAME" Type="varchar2" MaxLength="4000" />
+          <Property Name="TRANSIT_ACCOUNT" Type="varchar2" MaxLength="15" Nullable="false" />
+          <Property Name="STATE" Type="varchar2" MaxLength="10" />
+          <Property Name="UPDATE_DATE" Type="date" />
+          <Property Name="EXTRA_ATTRIBUTES_METADATA" Type="clob" />
+        </EntityType>
+        <Function Name="STO_UI_CLOSE_ORDER" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="BARS" StoreFunctionName="STO_UI.CLOSE_ORDER">
+          <Parameter Name="P_ORDER_ID" Type="number" Mode="In" />
+          <Parameter Name="P_CLOSE_DATE" Type="date" Mode="In" />
+        </Function>
+        <Function Name="STO_UI_EDIT_FREE_SBON_ORDER" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="BARS" StoreFunctionName="STO_UI.EDIT_FREE_SBON_ORDER">
+          <Parameter Name="P_ORDER_ID" Type="number" Mode="In" />
+          <Parameter Name="P_PAYER_ACCOUNT_ID" Type="number" Mode="In" />
+          <Parameter Name="P_START_DATE" Type="date" Mode="In" />
+          <Parameter Name="P_STOP_DATE" Type="date" Mode="In" />
+          <Parameter Name="P_PAYMENT_FREQUENCY" Type="number" Mode="In" />
+          <Parameter Name="P_HOLIDAY_SHIFT" Type="number" Mode="In" />
+          <Parameter Name="P_PROVIDER_ID" Type="number" Mode="In" />
+          <Parameter Name="P_REGULAR_AMOUNT" Type="number" Mode="In" />
+          <Parameter Name="P_RECEIVER_MFO" Type="varchar2" Mode="In" />
+          <Parameter Name="P_RECEIVER_ACCOUNT" Type="varchar2" Mode="In" />
+          <Parameter Name="P_RECEIVER_NAME" Type="varchar2" Mode="In" />
+          <Parameter Name="P_RECEIVER_EDRPOU" Type="varchar2" Mode="In" />
+          <Parameter Name="P_PURPOSE" Type="varchar2" Mode="In" />
+          <Parameter Name="P_EXTRA_ATTRIBUTES" Type="clob" Mode="In" />
+        </Function>
+        <Function Name="STO_UI_EDIT_SBON_ORDER_WITH_CONTR" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="BARS" StoreFunctionName="STO_UI.EDIT_SBON_ORDER_WITH_CONTR">
+          <Parameter Name="P_ORDER_ID" Type="number" Mode="In" />
+          <Parameter Name="P_PAYER_ACCOUNT_ID" Type="number" Mode="In" />
+          <Parameter Name="P_START_DATE" Type="date" Mode="In" />
+          <Parameter Name="P_STOP_DATE" Type="date" Mode="In" />
+          <Parameter Name="P_PAYMENT_FREQUENCY" Type="number" Mode="In" />
+          <Parameter Name="P_HOLIDAY_SHIFT" Type="number" Mode="In" />
+          <Parameter Name="P_PROVIDER_ID" Type="number" Mode="In" />
+          <Parameter Name="P_PERSONAL_ACCOUNT" Type="varchar2" Mode="In" />
+          <Parameter Name="P_REGULAR_AMOUNT" Type="number" Mode="In" />
+          <Parameter Name="P_CEILING_AMOUNT" Type="number" Mode="In" />
+          <Parameter Name="P_EXTRA_ATTRIBUTES" Type="clob" Mode="In" />
+        </Function>
+        <Function Name="STO_UI_EDIT_SBON_ORDER_WITH_NO_CONTR" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="BARS" StoreFunctionName="STO_UI.EDIT_SBON_ORDER_WITH_NO_CONTR">
+          <Parameter Name="P_ORDER_ID" Type="number" Mode="In" />
+          <Parameter Name="P_PAYER_ACCOUNT_ID" Type="number" Mode="In" />
+          <Parameter Name="P_START_DATE" Type="date" Mode="In" />
+          <Parameter Name="P_STOP_DATE" Type="date" Mode="In" />
+          <Parameter Name="P_PAYMENT_FREQUENCY" Type="number" Mode="In" />
+          <Parameter Name="P_HOLIDAY_SHIFT" Type="number" Mode="In" />
+          <Parameter Name="P_PROVIDER_ID" Type="number" Mode="In" />
+          <Parameter Name="P_PERSONAL_ACCOUNT" Type="varchar2" Mode="In" />
+          <Parameter Name="P_REGULAR_AMOUNT" Type="number" Mode="In" />
+          <Parameter Name="P_EXTRA_ATTRIBUTES" Type="clob" Mode="In" />
+        </Function>
+        <Function Name="STO_UI_EDIT_SEP_ORDER" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="BARS" StoreFunctionName="STO_UI.EDIT_SEP_ORDER">
+          <Parameter Name="P_ORDER_ID" Type="number" Mode="In" />
+          <Parameter Name="P_PAYER_ACCOUNT_ID" Type="number" Mode="In" />
+          <Parameter Name="P_START_DATE" Type="date" Mode="In" />
+          <Parameter Name="P_STOP_DATE" Type="date" Mode="In" />
+          <Parameter Name="P_PAYMENT_FREQUENCY" Type="number" Mode="In" />
+          <Parameter Name="P_HOLIDAY_SHIFT" Type="number" Mode="In" />
+          <Parameter Name="P_REGULAR_AMOUNT" Type="number" Mode="In" />
+          <Parameter Name="P_RECEIVER_MFO" Type="varchar2" Mode="In" />
+          <Parameter Name="P_RECEIVER_ACCOUNT" Type="varchar2" Mode="In" />
+          <Parameter Name="P_RECEIVER_NAME" Type="varchar2" Mode="In" />
+          <Parameter Name="P_RECEIVER_EDRPOU" Type="varchar2" Mode="In" />
+          <Parameter Name="P_PURPOSE" Type="varchar2" Mode="In" />
+        </Function>
+        <Function Name="STO_UI_NEW_FREE_SBON_ORDER" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="BARS" StoreFunctionName="STO_UI.NEW_FREE_SBON_ORDER">
+          <Parameter Name="P_PAYER_ACCOUNT_ID" Type="number" Mode="In" />
+          <Parameter Name="P_START_DATE" Type="date" Mode="In" />
+          <Parameter Name="P_STOP_DATE" Type="date" Mode="In" />
+          <Parameter Name="P_PAYMENT_FREQUENCY" Type="number" Mode="In" />
+          <Parameter Name="P_HOLIDAY_SHIFT" Type="number" Mode="In" />
+          <Parameter Name="P_PROVIDER_ID" Type="number" Mode="In" />
+          <Parameter Name="P_REGULAR_AMOUNT" Type="number" Mode="In" />
+          <Parameter Name="P_RECEIVER_MFO" Type="varchar2" Mode="In" />
+          <Parameter Name="P_RECEIVER_ACCOUNT" Type="varchar2" Mode="In" />
+          <Parameter Name="P_RECEIVER_NAME" Type="varchar2" Mode="In" />
+          <Parameter Name="P_RECEIVER_EDRPOU" Type="varchar2" Mode="In" />
+          <Parameter Name="P_PURPOSE" Type="varchar2" Mode="In" />
+          <Parameter Name="P_EXTRA_ATTRIBUTES" Type="clob" Mode="In" />
+        </Function>
+        <Function Name="STO_UI_NEW_SBON_ORDER_WITH_CONTR" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="BARS" StoreFunctionName="STO_UI.NEW_SBON_ORDER_WITH_CONTR">
+          <Parameter Name="P_PAYER_ACCOUNT_ID" Type="number" Mode="In" />
+          <Parameter Name="P_START_DATE" Type="date" Mode="In" />
+          <Parameter Name="P_STOP_DATE" Type="date" Mode="In" />
+          <Parameter Name="P_PAYMENT_FREQUENCY" Type="number" Mode="In" />
+          <Parameter Name="P_HOLIDAY_SHIFT" Type="number" Mode="In" />
+          <Parameter Name="P_PROVIDER_ID" Type="number" Mode="In" />
+          <Parameter Name="P_PERSONAL_ACCOUNT" Type="varchar2" Mode="In" />
+          <Parameter Name="P_REGULAR_AMOUNT" Type="number" Mode="In" />
+          <Parameter Name="P_CEILING_AMOUNT" Type="number" Mode="In" />
+          <Parameter Name="P_EXTRA_ATTRIBUTES" Type="clob" Mode="In" />
+        </Function>
+        <Function Name="STO_UI_NEW_SBON_ORDER_WITH_NO_CONTR" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="BARS" StoreFunctionName="STO_UI.NEW_SBON_ORDER_WITH_NO_CONTR">
+          <Parameter Name="P_PAYER_ACCOUNT_ID" Type="number" Mode="In" />
+          <Parameter Name="P_START_DATE" Type="date" Mode="In" />
+          <Parameter Name="P_STOP_DATE" Type="date" Mode="In" />
+          <Parameter Name="P_PAYMENT_FREQUENCY" Type="number" Mode="In" />
+          <Parameter Name="P_HOLIDAY_SHIFT" Type="number" Mode="In" />
+          <Parameter Name="P_PROVIDER_ID" Type="number" Mode="In" />
+          <Parameter Name="P_PERSONAL_ACCOUNT" Type="varchar2" Mode="In" />
+          <Parameter Name="P_REGULAR_AMOUNT" Type="number" Mode="In" />
+          <Parameter Name="P_EXTRA_ATTRIBUTES" Type="clob" Mode="In" />
+        </Function>
+        <Function Name="STO_UI_NEW_SEP_ORDER" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="BARS" StoreFunctionName="STO_UI.NEW_SEP_ORDER">
+          <Parameter Name="P_PAYER_ACCOUNT_ID" Type="number" Mode="In" />
+          <Parameter Name="P_START_DATE" Type="date" Mode="In" />
+          <Parameter Name="P_STOP_DATE" Type="date" Mode="In" />
+          <Parameter Name="P_PAYMENT_FREQUENCY" Type="number" Mode="In" />
+          <Parameter Name="P_HOLIDAY_SHIFT" Type="number" Mode="In" />
+          <Parameter Name="P_REGULAR_AMOUNT" Type="number" Mode="In" />
+          <Parameter Name="P_RECEIVER_MFO" Type="varchar2" Mode="In" />
+          <Parameter Name="P_RECEIVER_ACCOUNT" Type="varchar2" Mode="In" />
+          <Parameter Name="P_RECEIVER_NAME" Type="varchar2" Mode="In" />
+          <Parameter Name="P_RECEIVER_EDRPOU" Type="varchar2" Mode="In" />
+          <Parameter Name="P_PURPOSE" Type="varchar2" Mode="In" />
+        </Function>
+        <Function Name="STO_UI_SHIFT_PRIORITY" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="BARS" StoreFunctionName="STO_UI.SHIFT_PRIORITY">
+          <Parameter Name="P_ORDER_ID" Type="number" Mode="In" />
+          <Parameter Name="P_SHIFT_DIRECTION" Type="number" Mode="In" />
+        </Function>
+        <Function Name="STO_UTL_SET_ORDER_PRIORITY" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="BARS" StoreFunctionName="STO_UTL.SET_ORDER_PRIORITY">
+          <Parameter Name="P_ORDER_ID" Type="number" Mode="In" />
+          <Parameter Name="P_PRIORITY" Type="number" Mode="In" />
+        </Function>
+        <EntityContainer Name="ModelsStoreContainer">
+          <EntitySet Name="CUSTOMER" EntityType="Self.CUSTOMER" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="STO_ORDER_EXTRA_ATTRIBUTES" EntityType="Self.STO_ORDER_EXTRA_ATTRIBUTES" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="PASSP" EntityType="Self.PASSP" store:Type="Tables" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"PASSP"."PASSP" AS "PASSP", 
+"PASSP"."NAME" AS "NAME", 
+"PASSP"."PSPTYP" AS "PSPTYP", 
+"PASSP"."NRF" AS "NRF"
+FROM "BARS"."PASSP" "PASSP"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="PERSON" EntityType="Self.PERSON" store:Type="Tables" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"PERSON"."RNK" AS "RNK", 
+"PERSON"."SEX" AS "SEX", 
+"PERSON"."PASSP" AS "PASSP", 
+"PERSON"."SER" AS "SER", 
+"PERSON"."NUMDOC" AS "NUMDOC", 
+"PERSON"."PDATE" AS "PDATE", 
+"PERSON"."ORGAN" AS "ORGAN", 
+"PERSON"."BDAY" AS "BDAY", 
+"PERSON"."BPLACE" AS "BPLACE", 
+"PERSON"."TELD" AS "TELD", 
+"PERSON"."TELW" AS "TELW", 
+"PERSON"."CELLPHONE" AS "CELLPHONE", 
+"PERSON"."BDOV" AS "BDOV", 
+"PERSON"."EDOV" AS "EDOV", 
+"PERSON"."DATE_PHOTO" AS "DATE_PHOTO", 
+"PERSON"."DOV" AS "DOV"
+FROM "BARS"."PERSON" "PERSON"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="V_STO_ACCOUNTS" EntityType="Self.V_STO_ACCOUNTS" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"V_STO_ACCOUNTS"."ACC" AS "ACC", 
+"V_STO_ACCOUNTS"."RNK" AS "RNK", 
+"V_STO_ACCOUNTS"."NLS" AS "NLS", 
+"V_STO_ACCOUNTS"."NMS" AS "NMS", 
+"V_STO_ACCOUNTS"."KV" AS "KV", 
+"V_STO_ACCOUNTS"."BRANCH" AS "BRANCH", 
+"V_STO_ACCOUNTS"."DAOS" AS "DAOS", 
+"V_STO_ACCOUNTS"."OSTC" AS "OSTC", 
+"V_STO_ACCOUNTS"."TIP" AS "TIP"
+FROM "BARS"."V_STO_ACCOUNTS" "V_STO_ACCOUNTS"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="V_STO_FREQ" EntityType="Self.V_STO_FREQ" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"V_STO_FREQ"."ID" AS "ID", 
+"V_STO_FREQ"."NAME" AS "NAME"
+FROM "BARS"."V_STO_FREQ" "V_STO_FREQ"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="V_STO_ORDER" EntityType="Self.V_STO_ORDER" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"V_STO_ORDER"."ID" AS "ID", 
+"V_STO_ORDER"."CUSTOMER_ID" AS "CUSTOMER_ID", 
+"V_STO_ORDER"."PAYER_ACCOUNT" AS "PAYER_ACCOUNT", 
+"V_STO_ORDER"."CURRENCY_ID" AS "CURRENCY_ID", 
+"V_STO_ORDER"."ORDER_KIND_ID" AS "ORDER_KIND_ID", 
+"V_STO_ORDER"."ORDER_KIND_NAME" AS "ORDER_KIND_NAME", 
+"V_STO_ORDER"."REGULAR_AMOUNT" AS "REGULAR_AMOUNT", 
+"V_STO_ORDER"."STOP_DATE" AS "STOP_DATE", 
+"V_STO_ORDER"."RECEIVER" AS "RECEIVER", 
+"V_STO_ORDER"."PAYMENT_DETAILS" AS "PAYMENT_DETAILS", 
+"V_STO_ORDER"."PRIORITY" AS "PRIORITY", 
+"V_STO_ORDER"."USER_NAME" AS "USER_NAME"
+FROM "BARS"."V_STO_ORDER" "V_STO_ORDER"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="V_STO_ORDER_SBON_CONTR" EntityType="Self.V_STO_ORDER_SBON_CONTR" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"V_STO_ORDER_SBON_CONTR"."ID" AS "ID", 
+"V_STO_ORDER_SBON_CONTR"."CUSTOMER_ID" AS "CUSTOMER_ID", 
+"V_STO_ORDER_SBON_CONTR"."PAYER_ACCOUNT_ID" AS "PAYER_ACCOUNT_ID", 
+"V_STO_ORDER_SBON_CONTR"."START_DATE" AS "START_DATE", 
+"V_STO_ORDER_SBON_CONTR"."STOP_DATE" AS "STOP_DATE", 
+"V_STO_ORDER_SBON_CONTR"."HOLIDAY_SHIFT" AS "HOLIDAY_SHIFT", 
+"V_STO_ORDER_SBON_CONTR"."PAYMENT_FREQUENCY" AS "PAYMENT_FREQUENCY", 
+"V_STO_ORDER_SBON_CONTR"."PROVIDER_ID" AS "PROVIDER_ID", 
+"V_STO_ORDER_SBON_CONTR"."REGULAR_AMOUNT" AS "REGULAR_AMOUNT", 
+"V_STO_ORDER_SBON_CONTR"."CEILING_AMOUNT" AS "CEILING_AMOUNT", 
+"V_STO_ORDER_SBON_CONTR"."CUSTOMER_ACCOUNT" AS "CUSTOMER_ACCOUNT"
+FROM "BARS"."V_STO_ORDER_SBON_CONTR" "V_STO_ORDER_SBON_CONTR"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="V_STO_ORDER_SBON_FREE" EntityType="Self.V_STO_ORDER_SBON_FREE" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"V_STO_ORDER_SBON_FREE"."ID" AS "ID", 
+"V_STO_ORDER_SBON_FREE"."CUSTOMER_ID" AS "CUSTOMER_ID", 
+"V_STO_ORDER_SBON_FREE"."PAYER_ACCOUNT_ID" AS "PAYER_ACCOUNT_ID", 
+"V_STO_ORDER_SBON_FREE"."START_DATE" AS "START_DATE", 
+"V_STO_ORDER_SBON_FREE"."STOP_DATE" AS "STOP_DATE", 
+"V_STO_ORDER_SBON_FREE"."HOLIDAY_SHIFT" AS "HOLIDAY_SHIFT", 
+"V_STO_ORDER_SBON_FREE"."PAYMENT_FREQUENCY" AS "PAYMENT_FREQUENCY", 
+"V_STO_ORDER_SBON_FREE"."PROVIDER_ID" AS "PROVIDER_ID", 
+"V_STO_ORDER_SBON_FREE"."REGULAR_AMOUNT" AS "REGULAR_AMOUNT", 
+"V_STO_ORDER_SBON_FREE"."RECEIVER_MFO" AS "RECEIVER_MFO", 
+"V_STO_ORDER_SBON_FREE"."RECEIVER_ACCOUNT" AS "RECEIVER_ACCOUNT", 
+"V_STO_ORDER_SBON_FREE"."RECEIVER_NAME" AS "RECEIVER_NAME", 
+"V_STO_ORDER_SBON_FREE"."RECEIVER_EDRPOU" AS "RECEIVER_EDRPOU", 
+"V_STO_ORDER_SBON_FREE"."PURPOSE" AS "PURPOSE"
+FROM "BARS"."V_STO_ORDER_SBON_FREE" "V_STO_ORDER_SBON_FREE"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="V_STO_ORDER_SBON_NO_CONTR" EntityType="Self.V_STO_ORDER_SBON_NO_CONTR" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"V_STO_ORDER_SBON_NO_CONTR"."ID" AS "ID", 
+"V_STO_ORDER_SBON_NO_CONTR"."CUSTOMER_ID" AS "CUSTOMER_ID", 
+"V_STO_ORDER_SBON_NO_CONTR"."PAYER_ACCOUNT_ID" AS "PAYER_ACCOUNT_ID", 
+"V_STO_ORDER_SBON_NO_CONTR"."START_DATE" AS "START_DATE", 
+"V_STO_ORDER_SBON_NO_CONTR"."STOP_DATE" AS "STOP_DATE", 
+"V_STO_ORDER_SBON_NO_CONTR"."HOLIDAY_SHIFT" AS "HOLIDAY_SHIFT", 
+"V_STO_ORDER_SBON_NO_CONTR"."PAYMENT_FREQUENCY" AS "PAYMENT_FREQUENCY", 
+"V_STO_ORDER_SBON_NO_CONTR"."PROVIDER_ID" AS "PROVIDER_ID", 
+"V_STO_ORDER_SBON_NO_CONTR"."REGULAR_AMOUNT" AS "REGULAR_AMOUNT", 
+"V_STO_ORDER_SBON_NO_CONTR"."CUSTOMER_ACCOUNT" AS "CUSTOMER_ACCOUNT"
+FROM "BARS"."V_STO_ORDER_SBON_NO_CONTR" "V_STO_ORDER_SBON_NO_CONTR"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="V_STO_ORDER_SEP" EntityType="Self.V_STO_ORDER_SEP" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"V_STO_ORDER_SEP"."ID" AS "ID", 
+"V_STO_ORDER_SEP"."CUSTOMER_ID" AS "CUSTOMER_ID", 
+"V_STO_ORDER_SEP"."PAYER_ACCOUNT_ID" AS "PAYER_ACCOUNT_ID", 
+"V_STO_ORDER_SEP"."START_DATE" AS "START_DATE", 
+"V_STO_ORDER_SEP"."STOP_DATE" AS "STOP_DATE", 
+"V_STO_ORDER_SEP"."HOLIDAY_SHIFT" AS "HOLIDAY_SHIFT", 
+"V_STO_ORDER_SEP"."PAYMENT_FREQUENCY" AS "PAYMENT_FREQUENCY", 
+"V_STO_ORDER_SEP"."REGULAR_AMOUNT" AS "REGULAR_AMOUNT", 
+"V_STO_ORDER_SEP"."RECEIVER_MFO" AS "RECEIVER_MFO", 
+"V_STO_ORDER_SEP"."RECEIVER_ACCOUNT" AS "RECEIVER_ACCOUNT", 
+"V_STO_ORDER_SEP"."RECEIVER_NAME" AS "RECEIVER_NAME", 
+"V_STO_ORDER_SEP"."RECEIVER_EDRPOU" AS "RECEIVER_EDRPOU", 
+"V_STO_ORDER_SEP"."PURPOSE" AS "PURPOSE"
+FROM "BARS"."V_STO_ORDER_SEP" "V_STO_ORDER_SEP"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="V_STO_SBON_PROVIDER" EntityType="Self.V_STO_SBON_PROVIDER" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"V_STO_SBON_PROVIDER"."ID" AS "ID", 
+"V_STO_SBON_PROVIDER"."SBON_CONTRACT_NUMBER" AS "SBON_CONTRACT_NUMBER", 
+"V_STO_SBON_PROVIDER"."WORK_MODE_ID" AS "WORK_MODE_ID", 
+"V_STO_SBON_PROVIDER"."WORK_MODE" AS "WORK_MODE", 
+"V_STO_SBON_PROVIDER"."RECEIVER_MFO" AS "RECEIVER_MFO", 
+"V_STO_SBON_PROVIDER"."RECEIVER_ACCOUNT" AS "RECEIVER_ACCOUNT", 
+"V_STO_SBON_PROVIDER"."RECEIVER_NAME" AS "RECEIVER_NAME", 
+"V_STO_SBON_PROVIDER"."RECEIVER_EDRPOU" AS "RECEIVER_EDRPOU", 
+"V_STO_SBON_PROVIDER"."PAYMENT_NAME" AS "PAYMENT_NAME", 
+"V_STO_SBON_PROVIDER"."TRANSIT_ACCOUNT" AS "TRANSIT_ACCOUNT", 
+"V_STO_SBON_PROVIDER"."STATE" AS "STATE", 
+"V_STO_SBON_PROVIDER"."UPDATE_DATE" AS "UPDATE_DATE", 
+"V_STO_SBON_PROVIDER"."EXTRA_ATTRIBUTES_METADATA" AS "EXTRA_ATTRIBUTES_METADATA"
+FROM "BARS"."V_STO_SBON_PROVIDER" "V_STO_SBON_PROVIDER"</DefiningQuery>
+          </EntitySet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="BarsWeb.Areas.Payreg.Models" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+        <EntityContainer Name="PayregEntities" annotation:LazyLoadingEnabled="true">
+          <FunctionImport Name="STO_UI_CLOSE_ORDER">
+            <Parameter Name="P_ORDER_ID" Mode="In" Type="Decimal" />
+            <Parameter Name="P_CLOSE_DATE" Mode="In" Type="DateTime" />
+          </FunctionImport>
+          <FunctionImport Name="STO_UI_SHIFT_PRIORITY">
+            <Parameter Name="P_ORDER_ID" Mode="In" Type="Decimal" />
+            <Parameter Name="P_SHIFT_DIRECTION" Mode="In" Type="Decimal" />
+          </FunctionImport>
+          <FunctionImport Name="STO_UTL_SET_ORDER_PRIORITY">
+            <Parameter Name="P_ORDER_ID" Mode="In" Type="Decimal" />
+            <Parameter Name="P_PRIORITY" Mode="In" Type="Decimal" />
+          </FunctionImport>
+          <EntitySet Name="PASSP" EntityType="BarsWeb.Areas.Payreg.Models.PASSP" />
+          <EntitySet Name="PERSON" EntityType="BarsWeb.Areas.Payreg.Models.PERSON" />
+          <EntitySet Name="V_STO_FREQ" EntityType="BarsWeb.Areas.Payreg.Models.V_STO_FREQ" />
+          <FunctionImport Name="STO_UI_NEW_SEP_ORDER">
+            <Parameter Name="P_PAYER_ACCOUNT_ID" Mode="In" Type="Decimal" />
+            <Parameter Name="P_START_DATE" Mode="In" Type="DateTime" />
+            <Parameter Name="P_STOP_DATE" Mode="In" Type="DateTime" />
+            <Parameter Name="P_PAYMENT_FREQUENCY" Mode="In" Type="Decimal" />
+            <Parameter Name="P_HOLIDAY_SHIFT" Mode="In" Type="Decimal" />
+            <Parameter Name="P_REGULAR_AMOUNT" Mode="In" Type="Decimal" />
+            <Parameter Name="P_RECEIVER_MFO" Mode="In" Type="String" />
+            <Parameter Name="P_RECEIVER_ACCOUNT" Mode="In" Type="String" />
+            <Parameter Name="P_RECEIVER_NAME" Mode="In" Type="String" />
+            <Parameter Name="P_RECEIVER_EDRPOU" Mode="In" Type="String" />
+            <Parameter Name="P_PURPOSE" Mode="In" Type="String" />
+          </FunctionImport>
+          <EntitySet Name="V_STO_ACCOUNTS" EntityType="BarsWeb.Areas.Payreg.Models.V_STO_ACCOUNTS" />
+          <EntitySet Name="V_STO_SBON_PROVIDER" EntityType="BarsWeb.Areas.Payreg.Models.V_STO_SBON_PROVIDER" />
+          <EntitySet Name="CUSTOMER" EntityType="BarsWeb.Areas.Payreg.Models.CUSTOMER" />
+          <FunctionImport Name="STO_UI_NEW_FREE_SBON_ORDER">
+            <Parameter Name="P_PAYER_ACCOUNT_ID" Mode="In" Type="Decimal" />
+            <Parameter Name="P_START_DATE" Mode="In" Type="DateTime" />
+            <Parameter Name="P_STOP_DATE" Mode="In" Type="DateTime" />
+            <Parameter Name="P_PAYMENT_FREQUENCY" Mode="In" Type="Decimal" />
+            <Parameter Name="P_HOLIDAY_SHIFT" Mode="In" Type="Decimal" />
+            <Parameter Name="P_PROVIDER_ID" Mode="In" Type="Decimal" />
+            <Parameter Name="P_REGULAR_AMOUNT" Mode="In" Type="Decimal" />
+            <Parameter Name="P_RECEIVER_MFO" Mode="In" Type="String" />
+            <Parameter Name="P_RECEIVER_ACCOUNT" Mode="In" Type="String" />
+            <Parameter Name="P_RECEIVER_NAME" Mode="In" Type="String" />
+            <Parameter Name="P_RECEIVER_EDRPOU" Mode="In" Type="String" />
+            <Parameter Name="P_PURPOSE" Mode="In" Type="String" />
+            <Parameter Name="P_EXTRA_ATTRIBUTES" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="STO_UI_NEW_SBON_ORDER_WITH_CONTR">
+            <Parameter Name="P_PAYER_ACCOUNT_ID" Mode="In" Type="Decimal" />
+            <Parameter Name="P_START_DATE" Mode="In" Type="DateTime" />
+            <Parameter Name="P_STOP_DATE" Mode="In" Type="DateTime" />
+            <Parameter Name="P_PAYMENT_FREQUENCY" Mode="In" Type="Decimal" />
+            <Parameter Name="P_HOLIDAY_SHIFT" Mode="In" Type="Decimal" />
+            <Parameter Name="P_PROVIDER_ID" Mode="In" Type="Decimal" />
+            <Parameter Name="P_PERSONAL_ACCOUNT" Mode="In" Type="String" />
+            <Parameter Name="P_REGULAR_AMOUNT" Mode="In" Type="Decimal" />
+            <Parameter Name="P_CEILING_AMOUNT" Mode="In" Type="Decimal" />
+            <Parameter Name="P_EXTRA_ATTRIBUTES" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="STO_UI_NEW_SBON_ORDER_WITH_NO_CONTR">
+            <Parameter Name="P_PAYER_ACCOUNT_ID" Mode="In" Type="Decimal" />
+            <Parameter Name="P_START_DATE" Mode="In" Type="DateTime" />
+            <Parameter Name="P_STOP_DATE" Mode="In" Type="DateTime" />
+            <Parameter Name="P_PAYMENT_FREQUENCY" Mode="In" Type="Decimal" />
+            <Parameter Name="P_HOLIDAY_SHIFT" Mode="In" Type="Decimal" />
+            <Parameter Name="P_PROVIDER_ID" Mode="In" Type="Decimal" />
+            <Parameter Name="P_PERSONAL_ACCOUNT" Mode="In" Type="String" />
+            <Parameter Name="P_REGULAR_AMOUNT" Mode="In" Type="Decimal" />
+            <Parameter Name="P_EXTRA_ATTRIBUTES" Mode="In" Type="String" />
+          </FunctionImport>
+          <EntitySet Name="STO_ORDER_EXTRA_ATTRIBUTES" EntityType="BarsWeb.Areas.Payreg.Models.STO_ORDER_EXTRA_ATTRIBUTES" />
+          <EntitySet Name="V_STO_ORDER_SBON_CONTR" EntityType="BarsWeb.Areas.Payreg.Models.V_STO_ORDER_SBON_CONTR" />
+          <EntitySet Name="V_STO_ORDER_SBON_NO_CONTR" EntityType="BarsWeb.Areas.Payreg.Models.V_STO_ORDER_SBON_NO_CONTR" />
+          <EntitySet Name="V_STO_ORDER_SEP" EntityType="BarsWeb.Areas.Payreg.Models.V_STO_ORDER_SEP" />
+          <FunctionImport Name="STO_UI_EDIT_FREE_SBON_ORDER">
+            <Parameter Name="P_ORDER_ID" Mode="In" Type="Decimal" />
+            <Parameter Name="P_PAYER_ACCOUNT_ID" Mode="In" Type="Decimal" />
+            <Parameter Name="P_START_DATE" Mode="In" Type="DateTime" />
+            <Parameter Name="P_STOP_DATE" Mode="In" Type="DateTime" />
+            <Parameter Name="P_PAYMENT_FREQUENCY" Mode="In" Type="Decimal" />
+            <Parameter Name="P_HOLIDAY_SHIFT" Mode="In" Type="Decimal" />
+            <Parameter Name="P_PROVIDER_ID" Mode="In" Type="Decimal" />
+            <Parameter Name="P_REGULAR_AMOUNT" Mode="In" Type="Decimal" />
+            <Parameter Name="P_RECEIVER_MFO" Mode="In" Type="String" />
+            <Parameter Name="P_RECEIVER_ACCOUNT" Mode="In" Type="String" />
+            <Parameter Name="P_RECEIVER_NAME" Mode="In" Type="String" />
+            <Parameter Name="P_RECEIVER_EDRPOU" Mode="In" Type="String" />
+            <Parameter Name="P_PURPOSE" Mode="In" Type="String" />
+            <Parameter Name="P_EXTRA_ATTRIBUTES" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="STO_UI_EDIT_SBON_ORDER_WITH_CONTR">
+            <Parameter Name="P_ORDER_ID" Mode="In" Type="Decimal" />
+            <Parameter Name="P_PAYER_ACCOUNT_ID" Mode="In" Type="Decimal" />
+            <Parameter Name="P_START_DATE" Mode="In" Type="DateTime" />
+            <Parameter Name="P_STOP_DATE" Mode="In" Type="DateTime" />
+            <Parameter Name="P_PAYMENT_FREQUENCY" Mode="In" Type="Decimal" />
+            <Parameter Name="P_HOLIDAY_SHIFT" Mode="In" Type="Decimal" />
+            <Parameter Name="P_PROVIDER_ID" Mode="In" Type="Decimal" />
+            <Parameter Name="P_PERSONAL_ACCOUNT" Mode="In" Type="String" />
+            <Parameter Name="P_REGULAR_AMOUNT" Mode="In" Type="Decimal" />
+            <Parameter Name="P_CEILING_AMOUNT" Mode="In" Type="Decimal" />
+            <Parameter Name="P_EXTRA_ATTRIBUTES" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="STO_UI_EDIT_SBON_ORDER_WITH_NO_CONTR">
+            <Parameter Name="P_ORDER_ID" Mode="In" Type="Decimal" />
+            <Parameter Name="P_PAYER_ACCOUNT_ID" Mode="In" Type="Decimal" />
+            <Parameter Name="P_START_DATE" Mode="In" Type="DateTime" />
+            <Parameter Name="P_STOP_DATE" Mode="In" Type="DateTime" />
+            <Parameter Name="P_PAYMENT_FREQUENCY" Mode="In" Type="Decimal" />
+            <Parameter Name="P_HOLIDAY_SHIFT" Mode="In" Type="Decimal" />
+            <Parameter Name="P_PROVIDER_ID" Mode="In" Type="Decimal" />
+            <Parameter Name="P_PERSONAL_ACCOUNT" Mode="In" Type="String" />
+            <Parameter Name="P_REGULAR_AMOUNT" Mode="In" Type="Decimal" />
+            <Parameter Name="P_EXTRA_ATTRIBUTES" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="STO_UI_EDIT_SEP_ORDER">
+            <Parameter Name="P_ORDER_ID" Mode="In" Type="Decimal" />
+            <Parameter Name="P_PAYER_ACCOUNT_ID" Mode="In" Type="Decimal" />
+            <Parameter Name="P_START_DATE" Mode="In" Type="DateTime" />
+            <Parameter Name="P_STOP_DATE" Mode="In" Type="DateTime" />
+            <Parameter Name="P_PAYMENT_FREQUENCY" Mode="In" Type="Decimal" />
+            <Parameter Name="P_HOLIDAY_SHIFT" Mode="In" Type="Decimal" />
+            <Parameter Name="P_REGULAR_AMOUNT" Mode="In" Type="Decimal" />
+            <Parameter Name="P_RECEIVER_MFO" Mode="In" Type="String" />
+            <Parameter Name="P_RECEIVER_ACCOUNT" Mode="In" Type="String" />
+            <Parameter Name="P_RECEIVER_NAME" Mode="In" Type="String" />
+            <Parameter Name="P_RECEIVER_EDRPOU" Mode="In" Type="String" />
+            <Parameter Name="P_PURPOSE" Mode="In" Type="String" />
+          </FunctionImport>
+          <EntitySet Name="V_STO_ORDER_SBON_FREE" EntityType="BarsWeb.Areas.Payreg.Models.V_STO_ORDER_SBON_FREE" />
+          <EntitySet Name="V_STO_ORDER" EntityType="BarsWeb.Areas.Payreg.Models.V_STO_ORDER" />
+        </EntityContainer>
+        <EntityType Name="PASSP">
+          <Key>
+            <PropertyRef Name="PASSP1" />
+            <PropertyRef Name="NAME" />
+            <PropertyRef Name="PSPTYP" />
+          </Key>
+          <Property Name="PASSP1" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="NAME" Type="String" Nullable="false" MaxLength="35" FixedLength="false" Unicode="false" />
+          <Property Name="PSPTYP" Type="String" Nullable="false" MaxLength="2" FixedLength="true" Unicode="false" />
+          <Property Name="NRF" Type="String" MaxLength="64" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="PERSON">
+          <Key>
+            <PropertyRef Name="RNK" />
+          </Key>
+          <Property Name="RNK" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="SEX" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="PASSP" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="SER" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="NUMDOC" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="PDATE" Type="DateTime" />
+          <Property Name="ORGAN" Type="String" MaxLength="70" FixedLength="false" Unicode="false" />
+          <Property Name="BDAY" Type="DateTime" />
+          <Property Name="BPLACE" Type="String" MaxLength="70" FixedLength="false" Unicode="false" />
+          <Property Name="TELD" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="TELW" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="CELLPHONE" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="BDOV" Type="DateTime" />
+          <Property Name="EDOV" Type="DateTime" />
+          <Property Name="DATE_PHOTO" Type="DateTime" />
+          <Property Name="DOV" Type="String" MaxLength="35" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="V_STO_FREQ">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="NAME" />
+          </Key>
+          <Property Name="ID" Type="Int16" Nullable="false" />
+          <Property Name="NAME" Type="String" Nullable="false" MaxLength="35" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="V_STO_ACCOUNTS">
+          <Key>
+            <PropertyRef Name="ACC" />
+            <PropertyRef Name="RNK" />
+            <PropertyRef Name="NLS" />
+            <PropertyRef Name="NMS" />
+            <PropertyRef Name="KV" />
+            <PropertyRef Name="BRANCH" />
+            <PropertyRef Name="DAOS" />
+            <PropertyRef Name="OSTC" />
+          </Key>
+          <Property Name="ACC" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="RNK" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="NLS" Type="String" Nullable="false" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="NMS" Type="String" Nullable="false" MaxLength="70" FixedLength="false" Unicode="false" />
+          <Property Name="KV" Type="Int16" Nullable="false" />
+          <Property Name="BRANCH" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="DAOS" Type="DateTime" Nullable="false" />
+          <Property Name="OSTC" Type="Decimal" Nullable="false" Precision="24" Scale="0" />
+          <Property Name="TIP" Type="String" MaxLength="3" FixedLength="true" Unicode="false" />
+        </EntityType>
+        <EntityType Name="V_STO_SBON_PROVIDER">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="TRANSIT_ACCOUNT" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="SBON_CONTRACT_NUMBER" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="WORK_MODE_ID" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="WORK_MODE" Type="String" MaxLength="25" FixedLength="false" Unicode="false" />
+          <Property Name="RECEIVER_MFO" Type="String" MaxLength="6" FixedLength="false" Unicode="false" />
+          <Property Name="RECEIVER_ACCOUNT" Type="String" MaxLength="34" FixedLength="false" Unicode="false" />
+          <Property Name="RECEIVER_NAME" Type="String" MaxLength="300" FixedLength="false" Unicode="false" />
+          <Property Name="RECEIVER_EDRPOU" Type="String" MaxLength="12" FixedLength="false" Unicode="false" />
+          <Property Name="PAYMENT_NAME" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
+          <Property Name="TRANSIT_ACCOUNT" Type="String" Nullable="false" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="STATE" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="UPDATE_DATE" Type="DateTime" />
+          <Property Name="EXTRA_ATTRIBUTES_METADATA" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="CUSTOMER">
+          <Key>
+            <PropertyRef Name="RNK" />
+          </Key>
+          <Property Name="RNK" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="TGR" Type="Int16" />
+          <Property Name="CUSTTYPE" Type="Int16" />
+          <Property Name="COUNTRY" Type="Int16" />
+          <Property Name="NMK" Type="String" MaxLength="70" FixedLength="false" Unicode="false" />
+          <Property Name="NMKV" Type="String" MaxLength="70" FixedLength="false" Unicode="false" />
+          <Property Name="NMKK" Type="String" MaxLength="38" FixedLength="false" Unicode="false" />
+          <Property Name="CODCAGENT" Type="Int16" />
+          <Property Name="PRINSIDER" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="OKPO" Type="String" MaxLength="14" FixedLength="false" Unicode="false" />
+          <Property Name="ADR" Type="String" MaxLength="70" FixedLength="false" Unicode="false" />
+          <Property Name="SAB" Type="String" MaxLength="6" FixedLength="false" Unicode="false" />
+          <Property Name="C_REG" Type="Int16" />
+          <Property Name="C_DST" Type="Int16" />
+          <Property Name="RGTAX" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="DATET" Type="DateTime" />
+          <Property Name="ADM" Type="String" MaxLength="70" FixedLength="false" Unicode="false" />
+          <Property Name="DATEA" Type="DateTime" />
+          <Property Name="STMT" Type="Int32" />
+          <Property Name="DATE_ON" Type="DateTime" Nullable="false" />
+          <Property Name="DATE_OFF" Type="DateTime" />
+          <Property Name="NOTES" Type="String" MaxLength="140" FixedLength="false" Unicode="false" />
+          <Property Name="NOTESEC" Type="String" MaxLength="256" FixedLength="false" Unicode="false" />
+          <Property Name="CRISK" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="PINCODE" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="ND" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="RNKP" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="ISE" Type="String" MaxLength="5" FixedLength="true" Unicode="false" />
+          <Property Name="FS" Type="String" MaxLength="2" FixedLength="true" Unicode="false" />
+          <Property Name="OE" Type="String" MaxLength="5" FixedLength="true" Unicode="false" />
+          <Property Name="VED" Type="String" MaxLength="5" FixedLength="true" Unicode="false" />
+          <Property Name="SED" Type="String" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="LIM" Type="Decimal" Precision="24" Scale="0" />
+          <Property Name="MB" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="RGADM" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="BC" Type="Int16" />
+          <Property Name="BRANCH" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="TOBO" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="ISP" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="TAXF" Type="String" MaxLength="12" FixedLength="false" Unicode="false" />
+          <Property Name="NOMPDV" Type="String" MaxLength="9" FixedLength="false" Unicode="false" />
+          <Property Name="K050" Type="String" MaxLength="3" FixedLength="true" Unicode="false" />
+          <Property Name="NREZID_CODE" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="STO_ORDER_EXTRA_ATTRIBUTES">
+          <Key>
+            <PropertyRef Name="ORDER_ID" />
+          </Key>
+          <Property Name="ORDER_ID" Type="Int64" Nullable="false" />
+          <Property Name="EXTRA_ATTRIBUTES" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="V_STO_ORDER_SBON_CONTR">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="CUSTOMER_ID" />
+            <PropertyRef Name="PAYER_ACCOUNT_ID" />
+            <PropertyRef Name="START_DATE" />
+            <PropertyRef Name="PROVIDER_ID" />
+          </Key>
+          <Property Name="ID" Type="Int64" Nullable="false" />
+          <Property Name="CUSTOMER_ID" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="PAYER_ACCOUNT_ID" Type="Int64" Nullable="false" />
+          <Property Name="START_DATE" Type="DateTime" Nullable="false" />
+          <Property Name="STOP_DATE" Type="DateTime" />
+          <Property Name="HOLIDAY_SHIFT" Type="Int32" />
+          <Property Name="PAYMENT_FREQUENCY" Type="Int32" />
+          <Property Name="PROVIDER_ID" Type="Int32" Nullable="false" />
+          <Property Name="REGULAR_AMOUNT" Type="Decimal" Precision="22" Scale="2" />
+          <Property Name="CEILING_AMOUNT" Type="Decimal" Precision="22" Scale="2" />
+          <Property Name="CUSTOMER_ACCOUNT" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="V_STO_ORDER_SBON_NO_CONTR">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="CUSTOMER_ID" />
+            <PropertyRef Name="PAYER_ACCOUNT_ID" />
+            <PropertyRef Name="START_DATE" />
+            <PropertyRef Name="PROVIDER_ID" />
+          </Key>
+          <Property Name="ID" Type="Int64" Nullable="false" />
+          <Property Name="CUSTOMER_ID" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="PAYER_ACCOUNT_ID" Type="Int64" Nullable="false" />
+          <Property Name="START_DATE" Type="DateTime" Nullable="false" />
+          <Property Name="STOP_DATE" Type="DateTime" />
+          <Property Name="HOLIDAY_SHIFT" Type="Int32" />
+          <Property Name="PAYMENT_FREQUENCY" Type="Int32" />
+          <Property Name="PROVIDER_ID" Type="Int32" Nullable="false" />
+          <Property Name="REGULAR_AMOUNT" Type="Decimal" Precision="22" Scale="2" />
+          <Property Name="CUSTOMER_ACCOUNT" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="V_STO_ORDER_SEP">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="CUSTOMER_ID" />
+            <PropertyRef Name="PAYER_ACCOUNT_ID" />
+            <PropertyRef Name="START_DATE" />
+            <PropertyRef Name="RECEIVER_MFO" />
+            <PropertyRef Name="RECEIVER_ACCOUNT" />
+            <PropertyRef Name="RECEIVER_NAME" />
+            <PropertyRef Name="RECEIVER_EDRPOU" />
+          </Key>
+          <Property Name="ID" Type="Int64" Nullable="false" />
+          <Property Name="CUSTOMER_ID" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="PAYER_ACCOUNT_ID" Type="Int64" Nullable="false" />
+          <Property Name="START_DATE" Type="DateTime" Nullable="false" />
+          <Property Name="STOP_DATE" Type="DateTime" />
+          <Property Name="HOLIDAY_SHIFT" Type="Int32" />
+          <Property Name="PAYMENT_FREQUENCY" Type="Int32" />
+          <Property Name="REGULAR_AMOUNT" Type="Decimal" Precision="22" Scale="2" />
+          <Property Name="RECEIVER_MFO" Type="String" Nullable="false" MaxLength="6" FixedLength="false" Unicode="false" />
+          <Property Name="RECEIVER_ACCOUNT" Type="String" Nullable="false" MaxLength="34" FixedLength="false" Unicode="false" />
+          <Property Name="RECEIVER_NAME" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="false" />
+          <Property Name="RECEIVER_EDRPOU" Type="String" Nullable="false" MaxLength="12" FixedLength="false" Unicode="false" />
+          <Property Name="PURPOSE" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="V_STO_ORDER_SBON_FREE" Abstract="false">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="CUSTOMER_ID" />
+            <PropertyRef Name="PAYER_ACCOUNT_ID" />
+            <PropertyRef Name="START_DATE" />
+            <PropertyRef Name="PROVIDER_ID" />
+            <PropertyRef Name="RECEIVER_MFO" />
+            <PropertyRef Name="RECEIVER_ACCOUNT" />
+            <PropertyRef Name="RECEIVER_NAME" />
+            <PropertyRef Name="RECEIVER_EDRPOU" />
+          </Key>
+          <Property Name="ID" Type="Int64" Nullable="false" />
+          <Property Name="CUSTOMER_ID" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="PAYER_ACCOUNT_ID" Type="Int64" Nullable="false" />
+          <Property Name="START_DATE" Type="DateTime" Nullable="false" />
+          <Property Name="STOP_DATE" Type="DateTime" />
+          <Property Name="HOLIDAY_SHIFT" Type="Int32" />
+          <Property Name="PAYMENT_FREQUENCY" Type="Int32" />
+          <Property Name="PROVIDER_ID" Type="Int32" Nullable="false" />
+          <Property Name="REGULAR_AMOUNT" Type="Decimal" Precision="22" Scale="2" />
+          <Property Name="RECEIVER_MFO" Type="String" Nullable="false" MaxLength="6" FixedLength="false" Unicode="false" />
+          <Property Name="RECEIVER_ACCOUNT" Type="String" Nullable="false" MaxLength="34" FixedLength="false" Unicode="false" />
+          <Property Name="RECEIVER_NAME" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="false" />
+          <Property Name="RECEIVER_EDRPOU" Type="String" Nullable="false" MaxLength="12" FixedLength="false" Unicode="false" />
+          <Property Name="PURPOSE" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="V_STO_ORDER">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="CUSTOMER_ID" />
+            <PropertyRef Name="PAYER_ACCOUNT" />
+            <PropertyRef Name="CURRENCY_ID" />
+            <PropertyRef Name="ORDER_KIND_ID" />
+            <PropertyRef Name="ORDER_KIND_NAME" />
+          </Key>
+          <Property Name="ID" Type="Int64" Nullable="false" />
+          <Property Name="CUSTOMER_ID" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="PAYER_ACCOUNT" Type="String" Nullable="false" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="CURRENCY_ID" Type="Int16" Nullable="false" />
+          <Property Name="ORDER_KIND_ID" Type="Int32" Nullable="false" />
+          <Property Name="ORDER_KIND_NAME" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="false" />
+          <Property Name="REGULAR_AMOUNT" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="STOP_DATE" Type="DateTime" />
+          <Property Name="RECEIVER" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
+          <Property Name="PAYMENT_DETAILS" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
+          <Property Name="PRIORITY" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="USER_NAME" Type="String" MaxLength="60" FixedLength="false" Unicode="false" />
+        </EntityType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="ModelsStoreContainer" CdmEntityContainer="PayregEntities">
+          <FunctionImportMapping FunctionImportName="STO_UI_CLOSE_ORDER" FunctionName="Models.Store.STO_UI_CLOSE_ORDER" />
+          <FunctionImportMapping FunctionImportName="STO_UI_SHIFT_PRIORITY" FunctionName="Models.Store.STO_UI_SHIFT_PRIORITY" />
+          <FunctionImportMapping FunctionImportName="STO_UTL_SET_ORDER_PRIORITY" FunctionName="Models.Store.STO_UTL_SET_ORDER_PRIORITY" />
+          <EntitySetMapping Name="PASSP">
+            <EntityTypeMapping TypeName="BarsWeb.Areas.Payreg.Models.PASSP">
+              <MappingFragment StoreEntitySet="PASSP">
+                <ScalarProperty Name="NRF" ColumnName="NRF" />
+                <ScalarProperty Name="PSPTYP" ColumnName="PSPTYP" />
+                <ScalarProperty Name="NAME" ColumnName="NAME" />
+                <ScalarProperty Name="PASSP1" ColumnName="PASSP" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PERSON">
+            <EntityTypeMapping TypeName="BarsWeb.Areas.Payreg.Models.PERSON">
+              <MappingFragment StoreEntitySet="PERSON">
+                <ScalarProperty Name="DOV" ColumnName="DOV" />
+                <ScalarProperty Name="DATE_PHOTO" ColumnName="DATE_PHOTO" />
+                <ScalarProperty Name="EDOV" ColumnName="EDOV" />
+                <ScalarProperty Name="BDOV" ColumnName="BDOV" />
+                <ScalarProperty Name="CELLPHONE" ColumnName="CELLPHONE" />
+                <ScalarProperty Name="TELW" ColumnName="TELW" />
+                <ScalarProperty Name="TELD" ColumnName="TELD" />
+                <ScalarProperty Name="BPLACE" ColumnName="BPLACE" />
+                <ScalarProperty Name="BDAY" ColumnName="BDAY" />
+                <ScalarProperty Name="ORGAN" ColumnName="ORGAN" />
+                <ScalarProperty Name="PDATE" ColumnName="PDATE" />
+                <ScalarProperty Name="NUMDOC" ColumnName="NUMDOC" />
+                <ScalarProperty Name="SER" ColumnName="SER" />
+                <ScalarProperty Name="PASSP" ColumnName="PASSP" />
+                <ScalarProperty Name="SEX" ColumnName="SEX" />
+                <ScalarProperty Name="RNK" ColumnName="RNK" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="V_STO_FREQ">
+            <EntityTypeMapping TypeName="BarsWeb.Areas.Payreg.Models.V_STO_FREQ">
+              <MappingFragment StoreEntitySet="V_STO_FREQ">
+                <ScalarProperty Name="NAME" ColumnName="NAME" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="STO_UI_NEW_SEP_ORDER" FunctionName="Models.Store.STO_UI_NEW_SEP_ORDER" />
+          <EntitySetMapping Name="V_STO_ACCOUNTS">
+            <EntityTypeMapping TypeName="BarsWeb.Areas.Payreg.Models.V_STO_ACCOUNTS">
+              <MappingFragment StoreEntitySet="V_STO_ACCOUNTS">
+                <ScalarProperty Name="TIP" ColumnName="TIP" />
+                <ScalarProperty Name="OSTC" ColumnName="OSTC" />
+                <ScalarProperty Name="DAOS" ColumnName="DAOS" />
+                <ScalarProperty Name="BRANCH" ColumnName="BRANCH" />
+                <ScalarProperty Name="KV" ColumnName="KV" />
+                <ScalarProperty Name="NMS" ColumnName="NMS" />
+                <ScalarProperty Name="NLS" ColumnName="NLS" />
+                <ScalarProperty Name="RNK" ColumnName="RNK" />
+                <ScalarProperty Name="ACC" ColumnName="ACC" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="V_STO_SBON_PROVIDER">
+            <EntityTypeMapping TypeName="BarsWeb.Areas.Payreg.Models.V_STO_SBON_PROVIDER">
+              <MappingFragment StoreEntitySet="V_STO_SBON_PROVIDER">
+                <ScalarProperty Name="EXTRA_ATTRIBUTES_METADATA" ColumnName="EXTRA_ATTRIBUTES_METADATA" />
+                <ScalarProperty Name="UPDATE_DATE" ColumnName="UPDATE_DATE" />
+                <ScalarProperty Name="STATE" ColumnName="STATE" />
+                <ScalarProperty Name="TRANSIT_ACCOUNT" ColumnName="TRANSIT_ACCOUNT" />
+                <ScalarProperty Name="PAYMENT_NAME" ColumnName="PAYMENT_NAME" />
+                <ScalarProperty Name="RECEIVER_EDRPOU" ColumnName="RECEIVER_EDRPOU" />
+                <ScalarProperty Name="RECEIVER_NAME" ColumnName="RECEIVER_NAME" />
+                <ScalarProperty Name="RECEIVER_ACCOUNT" ColumnName="RECEIVER_ACCOUNT" />
+                <ScalarProperty Name="RECEIVER_MFO" ColumnName="RECEIVER_MFO" />
+                <ScalarProperty Name="WORK_MODE" ColumnName="WORK_MODE" />
+                <ScalarProperty Name="WORK_MODE_ID" ColumnName="WORK_MODE_ID" />
+                <ScalarProperty Name="SBON_CONTRACT_NUMBER" ColumnName="SBON_CONTRACT_NUMBER" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CUSTOMER">
+            <EntityTypeMapping TypeName="BarsWeb.Areas.Payreg.Models.CUSTOMER">
+              <MappingFragment StoreEntitySet="CUSTOMER">
+                <ScalarProperty Name="NREZID_CODE" ColumnName="NREZID_CODE" />
+                <ScalarProperty Name="K050" ColumnName="K050" />
+                <ScalarProperty Name="NOMPDV" ColumnName="NOMPDV" />
+                <ScalarProperty Name="TAXF" ColumnName="TAXF" />
+                <ScalarProperty Name="ISP" ColumnName="ISP" />
+                <ScalarProperty Name="TOBO" ColumnName="TOBO" />
+                <ScalarProperty Name="BRANCH" ColumnName="BRANCH" />
+                <ScalarProperty Name="BC" ColumnName="BC" />
+                <ScalarProperty Name="RGADM" ColumnName="RGADM" />
+                <ScalarProperty Name="MB" ColumnName="MB" />
+                <ScalarProperty Name="LIM" ColumnName="LIM" />
+                <ScalarProperty Name="SED" ColumnName="SED" />
+                <ScalarProperty Name="VED" ColumnName="VED" />
+                <ScalarProperty Name="OE" ColumnName="OE" />
+                <ScalarProperty Name="FS" ColumnName="FS" />
+                <ScalarProperty Name="ISE" ColumnName="ISE" />
+                <ScalarProperty Name="RNKP" ColumnName="RNKP" />
+                <ScalarProperty Name="ND" ColumnName="ND" />
+                <ScalarProperty Name="PINCODE" ColumnName="PINCODE" />
+                <ScalarProperty Name="CRISK" ColumnName="CRISK" />
+                <ScalarProperty Name="NOTESEC" ColumnName="NOTESEC" />
+                <ScalarProperty Name="NOTES" ColumnName="NOTES" />
+                <ScalarProperty Name="DATE_OFF" ColumnName="DATE_OFF" />
+                <ScalarProperty Name="DATE_ON" ColumnName="DATE_ON" />
+                <ScalarProperty Name="STMT" ColumnName="STMT" />
+                <ScalarProperty Name="DATEA" ColumnName="DATEA" />
+                <ScalarProperty Name="ADM" ColumnName="ADM" />
+                <ScalarProperty Name="DATET" ColumnName="DATET" />
+                <ScalarProperty Name="RGTAX" ColumnName="RGTAX" />
+                <ScalarProperty Name="C_DST" ColumnName="C_DST" />
+                <ScalarProperty Name="C_REG" ColumnName="C_REG" />
+                <ScalarProperty Name="SAB" ColumnName="SAB" />
+                <ScalarProperty Name="ADR" ColumnName="ADR" />
+                <ScalarProperty Name="OKPO" ColumnName="OKPO" />
+                <ScalarProperty Name="PRINSIDER" ColumnName="PRINSIDER" />
+                <ScalarProperty Name="CODCAGENT" ColumnName="CODCAGENT" />
+                <ScalarProperty Name="NMKK" ColumnName="NMKK" />
+                <ScalarProperty Name="NMKV" ColumnName="NMKV" />
+                <ScalarProperty Name="NMK" ColumnName="NMK" />
+                <ScalarProperty Name="COUNTRY" ColumnName="COUNTRY" />
+                <ScalarProperty Name="CUSTTYPE" ColumnName="CUSTTYPE" />
+                <ScalarProperty Name="TGR" ColumnName="TGR" />
+                <ScalarProperty Name="RNK" ColumnName="RNK" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="STO_UI_NEW_FREE_SBON_ORDER" FunctionName="Models.Store.STO_UI_NEW_FREE_SBON_ORDER" />
+          <FunctionImportMapping FunctionImportName="STO_UI_NEW_SBON_ORDER_WITH_CONTR" FunctionName="Models.Store.STO_UI_NEW_SBON_ORDER_WITH_CONTR" />
+          <FunctionImportMapping FunctionImportName="STO_UI_NEW_SBON_ORDER_WITH_NO_CONTR" FunctionName="Models.Store.STO_UI_NEW_SBON_ORDER_WITH_NO_CONTR" />
+          <EntitySetMapping Name="STO_ORDER_EXTRA_ATTRIBUTES">
+            <EntityTypeMapping TypeName="BarsWeb.Areas.Payreg.Models.STO_ORDER_EXTRA_ATTRIBUTES">
+              <MappingFragment StoreEntitySet="STO_ORDER_EXTRA_ATTRIBUTES">
+                <ScalarProperty Name="EXTRA_ATTRIBUTES" ColumnName="EXTRA_ATTRIBUTES" />
+                <ScalarProperty Name="ORDER_ID" ColumnName="ORDER_ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="V_STO_ORDER_SBON_CONTR">
+            <EntityTypeMapping TypeName="BarsWeb.Areas.Payreg.Models.V_STO_ORDER_SBON_CONTR">
+              <MappingFragment StoreEntitySet="V_STO_ORDER_SBON_CONTR">
+                <ScalarProperty Name="CUSTOMER_ACCOUNT" ColumnName="CUSTOMER_ACCOUNT" />
+                <ScalarProperty Name="CEILING_AMOUNT" ColumnName="CEILING_AMOUNT" />
+                <ScalarProperty Name="REGULAR_AMOUNT" ColumnName="REGULAR_AMOUNT" />
+                <ScalarProperty Name="PROVIDER_ID" ColumnName="PROVIDER_ID" />
+                <ScalarProperty Name="PAYMENT_FREQUENCY" ColumnName="PAYMENT_FREQUENCY" />
+                <ScalarProperty Name="HOLIDAY_SHIFT" ColumnName="HOLIDAY_SHIFT" />
+                <ScalarProperty Name="STOP_DATE" ColumnName="STOP_DATE" />
+                <ScalarProperty Name="START_DATE" ColumnName="START_DATE" />
+                <ScalarProperty Name="PAYER_ACCOUNT_ID" ColumnName="PAYER_ACCOUNT_ID" />
+                <ScalarProperty Name="CUSTOMER_ID" ColumnName="CUSTOMER_ID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="V_STO_ORDER_SBON_NO_CONTR">
+            <EntityTypeMapping TypeName="BarsWeb.Areas.Payreg.Models.V_STO_ORDER_SBON_NO_CONTR">
+              <MappingFragment StoreEntitySet="V_STO_ORDER_SBON_NO_CONTR">
+                <ScalarProperty Name="CUSTOMER_ACCOUNT" ColumnName="CUSTOMER_ACCOUNT" />
+                <ScalarProperty Name="REGULAR_AMOUNT" ColumnName="REGULAR_AMOUNT" />
+                <ScalarProperty Name="PROVIDER_ID" ColumnName="PROVIDER_ID" />
+                <ScalarProperty Name="PAYMENT_FREQUENCY" ColumnName="PAYMENT_FREQUENCY" />
+                <ScalarProperty Name="HOLIDAY_SHIFT" ColumnName="HOLIDAY_SHIFT" />
+                <ScalarProperty Name="STOP_DATE" ColumnName="STOP_DATE" />
+                <ScalarProperty Name="START_DATE" ColumnName="START_DATE" />
+                <ScalarProperty Name="PAYER_ACCOUNT_ID" ColumnName="PAYER_ACCOUNT_ID" />
+                <ScalarProperty Name="CUSTOMER_ID" ColumnName="CUSTOMER_ID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="V_STO_ORDER_SEP">
+            <EntityTypeMapping TypeName="BarsWeb.Areas.Payreg.Models.V_STO_ORDER_SEP">
+              <MappingFragment StoreEntitySet="V_STO_ORDER_SEP">
+                <ScalarProperty Name="PURPOSE" ColumnName="PURPOSE" />
+                <ScalarProperty Name="RECEIVER_EDRPOU" ColumnName="RECEIVER_EDRPOU" />
+                <ScalarProperty Name="RECEIVER_NAME" ColumnName="RECEIVER_NAME" />
+                <ScalarProperty Name="RECEIVER_ACCOUNT" ColumnName="RECEIVER_ACCOUNT" />
+                <ScalarProperty Name="RECEIVER_MFO" ColumnName="RECEIVER_MFO" />
+                <ScalarProperty Name="REGULAR_AMOUNT" ColumnName="REGULAR_AMOUNT" />
+                <ScalarProperty Name="PAYMENT_FREQUENCY" ColumnName="PAYMENT_FREQUENCY" />
+                <ScalarProperty Name="HOLIDAY_SHIFT" ColumnName="HOLIDAY_SHIFT" />
+                <ScalarProperty Name="STOP_DATE" ColumnName="STOP_DATE" />
+                <ScalarProperty Name="START_DATE" ColumnName="START_DATE" />
+                <ScalarProperty Name="PAYER_ACCOUNT_ID" ColumnName="PAYER_ACCOUNT_ID" />
+                <ScalarProperty Name="CUSTOMER_ID" ColumnName="CUSTOMER_ID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="STO_UI_EDIT_FREE_SBON_ORDER" FunctionName="Models.Store.STO_UI_EDIT_FREE_SBON_ORDER" />
+          <FunctionImportMapping FunctionImportName="STO_UI_EDIT_SBON_ORDER_WITH_CONTR" FunctionName="Models.Store.STO_UI_EDIT_SBON_ORDER_WITH_CONTR" />
+          <FunctionImportMapping FunctionImportName="STO_UI_EDIT_SBON_ORDER_WITH_NO_CONTR" FunctionName="Models.Store.STO_UI_EDIT_SBON_ORDER_WITH_NO_CONTR" />
+          <FunctionImportMapping FunctionImportName="STO_UI_EDIT_SEP_ORDER" FunctionName="Models.Store.STO_UI_EDIT_SEP_ORDER" />
+          <EntitySetMapping Name="V_STO_ORDER_SBON_FREE">
+            <EntityTypeMapping TypeName="BarsWeb.Areas.Payreg.Models.V_STO_ORDER_SBON_FREE">
+              <MappingFragment StoreEntitySet="V_STO_ORDER_SBON_FREE">
+                <ScalarProperty Name="PURPOSE" ColumnName="PURPOSE" />
+                <ScalarProperty Name="RECEIVER_EDRPOU" ColumnName="RECEIVER_EDRPOU" />
+                <ScalarProperty Name="RECEIVER_NAME" ColumnName="RECEIVER_NAME" />
+                <ScalarProperty Name="RECEIVER_ACCOUNT" ColumnName="RECEIVER_ACCOUNT" />
+                <ScalarProperty Name="RECEIVER_MFO" ColumnName="RECEIVER_MFO" />
+                <ScalarProperty Name="REGULAR_AMOUNT" ColumnName="REGULAR_AMOUNT" />
+                <ScalarProperty Name="PROVIDER_ID" ColumnName="PROVIDER_ID" />
+                <ScalarProperty Name="PAYMENT_FREQUENCY" ColumnName="PAYMENT_FREQUENCY" />
+                <ScalarProperty Name="HOLIDAY_SHIFT" ColumnName="HOLIDAY_SHIFT" />
+                <ScalarProperty Name="STOP_DATE" ColumnName="STOP_DATE" />
+                <ScalarProperty Name="START_DATE" ColumnName="START_DATE" />
+                <ScalarProperty Name="PAYER_ACCOUNT_ID" ColumnName="PAYER_ACCOUNT_ID" />
+                <ScalarProperty Name="CUSTOMER_ID" ColumnName="CUSTOMER_ID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="V_STO_ORDER">
+            <EntityTypeMapping TypeName="BarsWeb.Areas.Payreg.Models.V_STO_ORDER">
+              <MappingFragment StoreEntitySet="V_STO_ORDER">
+                <ScalarProperty Name="USER_NAME" ColumnName="USER_NAME" />
+                <ScalarProperty Name="PRIORITY" ColumnName="PRIORITY" />
+                <ScalarProperty Name="PAYMENT_DETAILS" ColumnName="PAYMENT_DETAILS" />
+                <ScalarProperty Name="RECEIVER" ColumnName="RECEIVER" />
+                <ScalarProperty Name="STOP_DATE" ColumnName="STOP_DATE" />
+                <ScalarProperty Name="REGULAR_AMOUNT" ColumnName="REGULAR_AMOUNT" />
+                <ScalarProperty Name="ORDER_KIND_NAME" ColumnName="ORDER_KIND_NAME" />
+                <ScalarProperty Name="ORDER_KIND_ID" ColumnName="ORDER_KIND_ID" />
+                <ScalarProperty Name="CURRENCY_ID" ColumnName="CURRENCY_ID" />
+                <ScalarProperty Name="PAYER_ACCOUNT" ColumnName="PAYER_ACCOUNT" />
+                <ScalarProperty Name="CUSTOMER_ID" ColumnName="CUSTOMER_ID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="false" />
+        <DesignerProperty Name="UseLegacyProvider" Value="true" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Default" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

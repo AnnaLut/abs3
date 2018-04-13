@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="09/22/2014 20:41:01" ReportInfo.Modified="10/27/2014 13:57:24" ReportInfo.CreatorVersion="2013.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqZLE460ApuhBq9nxfsVEDUjsnvJzXtSTPbWY4MKJi2yK6Cw7h6oGX20YJkb5YAkRnsbDabGyGIkwNKaTxHQlCEA==">
+      <TableDataSource Name="Table" Alias="COMMON_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select F_OURMFO_G as bank_mfo,&#13;&#10;       f_ourokpo as bank_okpo,&#13;&#10;       F_OURNAME_G as bank_name,&#13;&#10;       F_OURADDRESS as bank_address,&#13;&#10;       nvl(branch_edit.get_branch_parameter(b.branch, 'NAME_BRANCH'), b.name) as BRANCH_NAME,&#13;&#10;       nvl(branch_edit.get_branch_parameter(b.branch, 'ADR_BRANCH' ), '________') as BRANCH_ADDRESS,&#13;&#10;       nvl(branch_edit.get_branch_parameter(b.branch, 'DPT_PHON'   ), branch_edit.get_branch_parameter(b.branch, 'BPK_PHONE')) as BRANCH_PHONE,&#13;&#10;       nvl(branch_edit.get_branch_parameter(b.branch, 'TOWN'       ), '________') as BRANCH_TOWN,&#13;&#10;       decode(poa_doc, null,'________', poa_doc || ' від ' || to_char(poa_date, 'dd/mm/yyyy')) as STAFF_DOVER,&#13;&#10;       nvl(fio_r, '________') as STAFF_FIO_R,&#13;&#10;       nvl(post_r, '________') as STAFF_STATUS_R       &#13;&#10;  from branch b,&#13;&#10;       (select *&#13;&#10;          from (select *&#13;&#10;                  from dpt_poa_branches pb, dpt_poas p&#13;&#10;                 where pb.branch = branch_usr.get_branch()&#13;&#10;                   and pb.active = 1&#13;&#10;                   and pb.poa_id = p.id&#13;&#10;                 order by decode(p.staff_id, user_id, 0, pb.ord))&#13;&#10;         where rownum = 1) t&#13;&#10; where b.branch = t.branch(+)&#13;&#10;   and b.branch = branch_usr.get_branch()&#13;&#10;">
+        <Column Name="BANK_MFO" DataType="System.String"/>
+        <Column Name="BANK_OKPO" DataType="System.String"/>
+        <Column Name="BANK_NAME" DataType="System.String"/>
+        <Column Name="BANK_ADDRESS" DataType="System.String"/>
+        <Column Name="BRANCH_NAME" DataType="System.String"/>
+        <Column Name="BRANCH_ADDRESS" DataType="System.String"/>
+        <Column Name="BRANCH_PHONE" DataType="System.String"/>
+        <Column Name="BRANCH_TOWN" DataType="System.String"/>
+        <Column Name="STAFF_DOVER" DataType="System.String"/>
+        <Column Name="STAFF_FIO_R" DataType="System.String"/>
+        <Column Name="STAFF_STATUS_R" DataType="System.String"/>
+      </TableDataSource>
+      <TableDataSource Name="Table2" Alias="CLIENT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select c.nmk as fio,&#13;&#10;       DECODE (c.okpo, '0000000000', p.ser || ' ' || p.numdoc, c.okpo) as okpo_pasp_no,&#13;&#10;       case c.codcagent&#13;&#10;         when 5 then 'резидент'&#13;&#10;         when 6 then 'нерезидент'&#13;&#10;         else '--'&#13;&#10;       end as codcagent,&#13;&#10;       p.ser || ' ' || p.numdoc as pasp_no,&#13;&#10;       f_dat_lit(p.pdate) as pasp_date,&#13;&#10;       p.organ as pasp_atrt,&#13;&#10;       f_customer_address(c.rnk, 1) as address_registration,&#13;&#10;       f_customer_address(c.rnk, 2) as address_residence,&#13;&#10;       coalesce(p.cellphone, p.teld, p.telw, '________') as phone,&#13;&#10;       (select VALUE from CUSTOMERW where RNK = c.rnk and TAG = 'EMAIL') as EMAIL&#13;&#10;  from customer c&#13;&#10;  left join person p on (p.rnk = c.rnk)&#13;&#10; where c.rnk = :p_rnk&#13;&#10;">
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="CODCAGENT" DataType="System.String"/>
+        <Column Name="PASP_NO" DataType="System.String"/>
+        <Column Name="PASP_DATE" DataType="System.String"/>
+        <Column Name="PASP_ATRT" DataType="System.String"/>
+        <Column Name="ADDRESS_REGISTRATION" DataType="System.String"/>
+        <Column Name="ADDRESS_RESIDENCE" DataType="System.String"/>
+        <Column Name="PHONE" DataType="System.String"/>
+        <Column Name="EMAIL" DataType="System.String"/>
+        <Column Name="OKPO_PASP_NO" DataType="System.String"/>
+        <CommandParameter Name="p_rnk" DataType="113" Expression="[p_rnk]" DefaultValue="-1"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_doc_id" DataType="System.Int32" Expression="1025"/>
+    <Parameter Name="p_rnk" DataType="System.Int32" Expression="1662463"/>
+    <Parameter Name="p_agr_id" DataType="System.Int32" Expression="7335001"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <DataBand Name="Data1" Width="718.2" Height="557.5" CanGrow="true" CanShrink="true" CanBreak="true">
+      <TableObject Name="Table1" Left="18.9" Top="9.45" Width="674.73" Height="529.15">
+        <TableColumn Name="Column1" Width="126.63"/>
+        <TableColumn Name="Column2" Width="126.63"/>
+        <TableColumn Name="Column3" Width="202.23"/>
+        <TableColumn Name="Column4" Width="126.63"/>
+        <TableColumn Name="Column5" Width="92.61"/>
+        <TableRow Name="Row1" Height="34.01">
+          <TableCell Name="Cell1" Text="КАРТКА ІЗ ЗРАЗКАМИ ПІДПИСІВ&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" ColSpan="5"/>
+          <TableCell Name="Cell2" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell3" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell4" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row2" Height="100.18">
+          <TableCell Name="Cell6" Text="Реєстраційний номер облікової картки платника податків або серія та номер паспорта (для фізичних осіб, які через свої релігійні переконання відмовляються від прийняття реєстраційного номера облікової картки платника податків та офіційно повідомили про це відповідний орган державної податкової служби і мають відмітку у&#13;&#10;паспорті): &lt;b&gt; [CLIENT_DATA.OKPO_PASP_NO]&lt;/b&gt;&#13;&#10;" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell7" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell8" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell9" Border.Lines="Left" Text="Відмітка банку&#13;&#10;Рахунок __________________&#13;&#10;                    (номер рахунку)&#13;&#10;&#13;&#10;Дозвіл на прийняття зразка підпису&#13;&#10;" HorzAlign="Justify" Font="Times New Roman, 10pt" ColSpan="2"/>
+          <TableCell Name="Cell10" Border.Lines="Left" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row3" Height="34.01">
+          <TableCell Name="Cell11" Text="Власник рахунку: &lt;u&gt;&lt;b&gt; [CLIENT_DATA.FIO]&lt;/b&gt;&lt;/u&gt;&#13;&#10;		(прізвище, ім'я, по батькові)&#13;&#10;" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell12" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell13" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell14" Border.Lines="Left" HorzAlign="Justify" Font="Times New Roman, 10pt" ColSpan="2"/>
+          <TableCell Name="Cell15" Border.Lines="Left" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row4" Height="34.01">
+          <TableCell Name="Cell16" Text="Місце проживання: &lt;b&gt; [CLIENT_DATA.ADDRESS_RESIDENCE]&lt;/b&gt;" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell17" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell18" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell19" Border.Lines="Left" Text="Головний бухгалтер&#13;&#10;(або інша уповноважена на це &#13;&#10;особа банку)&#13;&#10;  __________________________&#13;&#10;           (підпис та прізвище)&#13;&#10;" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="2" RowSpan="3"/>
+          <TableCell Name="Cell20" Border.Lines="Left" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row5" Height="24.56">
+          <TableCell Name="Cell21" Text="Телефон: &lt;b&gt; [CLIENT_DATA.PHONE]&lt;/b&gt;" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell22" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell23" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell24" Border.Lines="Left" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell25" Border.Lines="Left" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row6" Height="35.9" AutoSize="true">
+          <TableCell Name="Cell26" Text="Найменування банку &lt;b&gt;[COMMON_DATA.BRANCH_NAME]&lt;/b&gt;" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell27" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell28" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell29" Border.Lines="Left" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell30" Border.Lines="Left" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row7" Height="26.45" AutoSize="true">
+          <TableCell Name="Cell31" Text="Місцезнаходження банку &lt;b&gt;[COMMON_DATA.BRANCH_ADDRESS]&lt;/b&gt;" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell32" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell33" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell34" Border.Lines="Left" Text="&quot;___&quot; ____________ 20__ року" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="2"/>
+          <TableCell Name="Cell35" Border.Lines="Left" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row8" Height="54.8">
+          <TableCell Name="Cell36" Text="Зразок підпису власника рахунку" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="3">
+            <ShapeObject Name="Shape3" Left="349.65" Top="1.51" Width="94.5" Height="45.36" Border.Width="2"/>
+          </TableCell>
+          <TableCell Name="Cell37" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell38" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell39" Border.Lines="Left" Text="Інші відмітки _________________________&#13;&#10;" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="2"/>
+          <TableCell Name="Cell40" Border.Lines="Left" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row9" Height="111.52">
+          <TableCell Name="Cell41" Text="Зразки підписів довірених осіб" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="3">
+            <ShapeObject Name="Shape4" Left="349.65" Width="94.5" Height="45.36" Border.Width="2"/>
+            <ShapeObject Name="Shape5" Left="349.65" Top="52.92" Width="94.5" Height="45.36" Border.Width="2"/>
+          </TableCell>
+          <TableCell Name="Cell42" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell43" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell44" Border.Lines="Left" Text="Засвідчую справжність підпису (підписів)&#13;&#10;_________________________,&#13;&#10;(прізвище, ім'я, по батькові)&#13;&#10;&#13;&#10;який (які) зроблено в &#13;&#10;моїй присутності.&#13;&#10;" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="2"/>
+          <TableCell Name="Cell45" Border.Lines="Left" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row10" Height="73.71">
+          <TableCell Name="Cell46" Text="Наведений (наведені) зразок (зразки) підпису (підписів) прошу вважати обов'язковим (обов'язковими) під час здійснення операцій за рахунком." HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="3"/>
+          <TableCell Name="Cell47" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell48" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell49" Border.Lines="Left" Text="&#13;&#10;_________________________&#13;&#10;(підпис та прізвище працівника&#13;&#10;банку, який відкриває рахунок)&#13;&#10;" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="2"/>
+          <TableCell Name="Cell50" Border.Lines="Left" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt"/>
+        </TableRow>
+      </TableObject>
+      <ShapeObject Name="Shape2" Left="-9450" Top="-9450" Width="94.5" Height="18.9"/>
+    </DataBand>
+  </ReportPage>
+</Report>

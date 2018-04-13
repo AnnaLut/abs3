@@ -1,0 +1,259 @@
+﻿body
+{
+}
+
+/* заголовок */
+.title_text
+{
+    font-weight: bold;
+    font-size: 11pt;
+}
+
+/* контерйнер для наполнения страници */
+.content_container
+{
+    padding: 10px 5px 5px 3px;
+}
+
+/* контерйнер для основного грида */
+.gridview_container
+{
+}
+
+/* контерйнер для основного formview */
+.formview_container
+{
+    padding: 3px 0px 0px 3px;
+    margin: 10px 10px 0px 10px;
+    border: 1px solid #BDCFF7;
+}
+
+/* контерйнер для панели фильтров */
+.filter_container
+{
+    margin: 0px 10px 10px 10px;
+}
+
+/* контерйнер для template formview */
+.template_container
+{
+}
+
+/* таблица */
+.data_table
+{
+    text-align: left;
+}
+
+/* разделитель строк */
+.rows_separator
+{
+    height: 10px;
+}
+
+/* разделитель столбцов */
+.columns_separator
+{
+    width: 20px;
+}
+
+/* заглавная колонка */
+.data_table .header_column
+{
+    text-align: right;
+}
+
+/* колонка - значение */
+.data_table .value_column
+{
+}
+
+/* ячейка с кнопками */
+.data_table .buttons_container
+{
+    padding: 10px 0px 10px 0px;
+    text-align: center;
+    border-top: 1px solid #BDCFF7;
+}
+.data_table .buttons_container2
+{
+    padding: 10px 0px 10px 0px;
+    text-align: center;
+}
+
+/* заголовок визарда */
+.wizard_header_container
+{
+    padding: 10px 10px 10px 10px;
+    text-align: center;
+    width: 600px;
+}
+.wizard_header_container .subcontainer
+{
+    border-bottom: 1px solid #BDCFF7;
+    padding: 5px 0px 5px 5px;
+    text-align: left;
+    width: 100%;
+}
+/* навигация визарда */
+.wizard_navigation_container
+{
+    padding: 10px 10px 10px 10px;
+    text-align: center;
+    width: 600px;
+}
+.wizard_navigation_container .subcontainer
+{
+    border-top: 1px solid #BDCFF7;
+    padding: 5px 0px 5px 5px;
+    text-align: right;
+    width: 100%;
+}
+/* шаг визарда */
+.wizard_step_container
+{
+    padding: 20px 0px 20px 30px;
+}
+
+/* табличная форма на базе ListView */
+.lv_grid
+{
+    border: 1px solid #BDCFF7;
+}
+.lv_grid .header_row
+{
+    background-color: #0977B9;
+    color: White;
+    font-weight: bold;
+    text-align: center;
+}
+.lv_grid .selected_row_hdr
+{
+    font-weight: bold;
+}
+
+.lv_grid .edit_row_hdr
+{
+    font-weight: bold;
+}
+
+
+/* Таблица */
+.tbl_style1
+{
+    font-family: 'Lucida Grande' , Geneva, Arial, Tahoma, Verdana, Helvetica, sans-serif;
+    font-size: 12px;
+    text-align: left;
+    border-collapse: collapse;
+    margin: 10px;
+}
+.tbl_style1 th
+{
+    padding: 8px 13px 8px 13px;
+    font-weight: normal;
+    font-size: 14px;
+    color: #039;
+    border-bottom: 1px dashed #69c;
+}
+.tbl_style1 td
+{
+    padding: 5px 7px 5px 7px;
+    color: #669;
+}
+
+.tbl_style1 td td
+{
+    padding: 0px 0px 0px 0px;
+}
+.tbl_style1 tfoot td
+{
+    color: #039;
+    border-top: 1px dashed #69c;
+}
+.tbl_style1 td.command
+{
+    text-align: center;
+    width: 40px;
+}
+
+.tbl_style1 tbody tr.edit
+{
+    color: #039;
+    border: 1px dashed #69c;
+    background-image: url(/common/images/skin/pattern.png);
+    background-repeat: repeat;
+}
+.tbl_style1 tbody tr.new
+{
+    color: #039;
+    border: 1px dashed #69c;
+    background-image: url(/common/images/skin/pattern.png);
+    background-repeat: repeat;
+}
+
+
+.tbl_style2
+{
+    font-family: 'Lucida Grande' , Geneva, Arial, Tahoma, Verdana, Helvetica, sans-serif;
+    font-size: 12px;
+    text-align: left;
+    border-collapse: collapse;
+    margin: 10px;
+	border: 1px solid #69c;
+}
+.tbl_style2 th
+{
+    padding: 8px 13px 8px 13px;
+    font-weight: normal;
+    font-size: 14px;
+    color: #039;
+    border-bottom: 1px dashed #69c;
+}
+.tbl_style2 td
+{
+    padding: 5px 7px 5px 7px;
+    color: #669;
+}
+.tbl_style2 tfoot td
+{
+    color: #039;
+    border-top: 1px dashed #69c;
+}
+.tbl_style2 td.command
+{
+    text-align: center;
+    width: 40px;
+}
+
+.tbl_style2 tbody tr.edit
+{
+    color: #039;
+    border: 1px dashed #69c;
+    background-image: url(/common/images/skin/pattern.png);
+    background-repeat: repeat;
+}
+.tbl_style2 tbody tr.new
+{
+    color: #039;
+    border: 1px dashed #69c;
+    background-image: url(/common/images/skin/pattern.png);
+    background-repeat: repeat;
+}
+
+/* === Форма аккредитованых СК === */
+
+/* Табличка */
+#tblPartners
+{
+    width: 99%;
+}
+
+#tblPartners td.stl1
+{
+    width: 20%;
+    text-align: right;
+}
+#tblPartners td.stl2
+{
+    text-align: left;
+}

@@ -1,0 +1,283 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="04/18/2013 18:20:22" ReportInfo.Modified="04/30/2013 09:57:55" ReportInfo.CreatorVersion="2013.2.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+    private void _StartReport(object sender, EventArgs e)
+    {
+      Parameter buh = Report.GetParameter(&quot;p_buh&quot;);
+      BUH_MODEL_H.Visible = (Convert.ToInt32(buh.Value) == 1 ? true : false);
+      BUH_MODEL_B.Visible = (Convert.ToInt16(buh.Value) == 1 ? true : false);
+
+    }
+    
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlq9SEZoacNJntaKIKp6mVF18t3N5WTocA0ARXAZ2I9tsXqxlsPHbqkZZ8j2333FaUp7NEZKfwRzqgcHIjxaWbZy6NHhSJoN03evudS0Q1yVFM=">
+      <TableDataSource Name="Table2" Alias="TIC" DataType="System.Int32" Enabled="true" SelectCommand="SELECT &#13;&#10;   tic.get_static_attr ('BANKO',   o.REF)   AS &quot;BANKO&quot;,&#13;&#10;   tic.get_static_attr ('DR_OB40', o.REF)   AS &quot;DR_OB40&quot;,&#13;&#10;   tic.get_static_attr ('FIO1',    o.REF)   AS &quot;FIO1&quot;,&#13;&#10;   tic.get_static_attr ('FIO2',    o.REF)   AS &quot;FIO2&quot;,&#13;&#10;   tic.get_static_attr ('KURS4',   o.REF)   AS &quot;KURS4&quot;,&#13;&#10;   tic.get_static_attr ('KV_SK0',  o.REF)   AS &quot;KV_SK0&quot;,&#13;&#10;   tic.get_static_attr ('MFOBO',   o.REF)   AS &quot;MFOBO&quot;,&#13;&#10;   tic.get_static_attr ('NAME_TT', o.REF)   AS &quot;NAME_TT&quot;,&#13;&#10;   tic.get_static_attr ('NLS_INK9D', o.REF) AS &quot;NLS_INK9D&quot;,&#13;&#10;   tic.get_static_attr ('NLS_INK9K', o.REF) AS &quot;NLS_INK9K&quot;,&#13;&#10;   tic.get_static_attr ('NLS_INKD', o.REF)  AS &quot;NLS_INKD&quot;,&#13;&#10;   tic.get_static_attr ('NLS_INKK', o.REF)  AS &quot;NLS_INKK&quot;,&#13;&#10;   tic.get_static_attr ('NLS_KOM6', o.REF)  AS &quot;NLS_KOM6&quot;,&#13;&#10;   tic.get_static_attr ('NLS_KONV', o.REF)  AS &quot;NLS_KONV&quot;,&#13;&#10;   tic.get_static_attr ('NLS_SG',   o.REF)  AS &quot;NLS_SG&quot;,&#13;&#10;   tic.get_static_attr ('NLS_SG_980', o.REF) AS &quot;NLS_SG_980&quot;,&#13;&#10;   tic.get_static_attr ('NLS_SK0',  o.REF)  AS &quot;NLS_SK0&quot;,&#13;&#10;   tic.get_static_attr ('NLS_SK1', o.REF)   AS &quot;NLS_SK1&quot;,&#13;&#10;   tic.get_static_attr ('NLS_SK9', o.REF)   AS &quot;NLS_SK9&quot;,&#13;&#10;   tic.get_static_attr ('OAccMan', o.REF)   AS &quot;OAccMan&quot;,&#13;&#10;   tic.get_static_attr ('OBank-A', o.REF)   AS &quot;OBank-A&quot;,&#13;&#10;   tic.get_static_attr ('OBank-B', o.REF)   AS &quot;OBank-B&quot;,&#13;&#10;   tic.get_static_attr ('OBoss',   o.REF)   AS &quot;OBoss&quot;,&#13;&#10;   tic.get_static_attr ('OBSumm',  o.REF)   AS &quot;OBSumm&quot;,&#13;&#10;   tic.get_static_attr ('OCashSymb', o.REF) AS &quot;OCashSymb&quot;,&#13;&#10;   tic.get_static_attr ('OCcyCode', o.REF)  AS &quot;OCcyCode &quot;,&#13;&#10;   tic.get_static_attr ('OCcyCode-B', o.REF) AS &quot;OCcyCode-B&quot;,&#13;&#10;   tic.get_static_attr ('OCcyISO',   o.REF) AS &quot;OCcyISO&quot;,&#13;&#10;   tic.get_static_attr ('OCcyISO-B', o.REF) AS &quot;OCcyISO-B&quot;,&#13;&#10;   tic.get_static_attr ('ODay',      o.REF) AS &quot;ODay&quot;,&#13;&#10;   tic.get_static_attr ('ODocProp', o.REF)  AS &quot;ODocProp&quot;,&#13;&#10;   tic.get_static_attr ('ODocument', o.REF) AS &quot;ODocument&quot;,&#13;&#10;   tic.get_static_attr ('OFSumm', o.REF)    AS &quot;OFSumm&quot;,&#13;&#10;   tic.get_static_attr ('OFSumm2', o.REF)   AS &quot;OFSumm2&quot;,&#13;&#10;   tic.get_static_attr ('OFSummLit', o.REF) AS &quot;OFSummLit&quot;,&#13;&#10;   tic.get_static_attr ('OFSummLit2', o.REF) AS &quot;OFSummLit2&quot;,&#13;&#10;   tic.get_static_attr ('OKMonth',  o.REF)   AS &quot;OKMonth&quot;,&#13;&#10;   tic.get_static_attr ('OKYear',   o.REF)   AS &quot;OKYear&quot;,&#13;&#10;   tic.get_static_attr ('OMFO-A',   o.REF)   AS &quot;OMFO-A&quot;,&#13;&#10;   tic.get_static_attr ('OMFO-B',   o.REF)   AS &quot;OMFO-B&quot;,&#13;&#10;   tic.get_static_attr ('OMonth',   o.REF)   AS &quot;OMonth&quot;,&#13;&#10;   tic.get_static_attr ('OMyBankAdres', o.REF) AS &quot;OMyBankAdres&quot;,&#13;&#10;   tic.get_static_attr ('OMyBankMFO', o.REF)   AS &quot;OMyBankMFO &quot;,&#13;&#10;   tic.get_static_attr ('OMyBankName', o.REF)  AS &quot;OMyBankName &quot;,&#13;&#10;   tic.get_static_attr ('ONazn',   o.REF)   AS &quot;ONazn&quot;,&#13;&#10;   tic.get_static_attr ('ONLS-A',  o.REF)   AS &quot;ONLS-A&quot;,&#13;&#10;   tic.get_static_attr ('ONLS-Aa', o.REF)   AS &quot;ONLS-Aa&quot;,&#13;&#10;   tic.get_static_attr ('ONLS-B',  o.REF)   AS &quot;ONLS-B&quot;,&#13;&#10;   tic.get_static_attr ('ONLS-Ba', o.REF)   AS &quot;ONLS-Ba&quot;,&#13;&#10;   tic.get_static_attr ('ONMS-Aa', o.REF)   AS &quot;ONMS-Aa&quot;,&#13;&#10;   tic.get_static_attr ('ONMS-Ba', o.REF)   AS &quot;ONMS-Ba&quot;,&#13;&#10;   tic.get_static_attr ('ONumber', o.REF)   AS &quot;ONumber&quot;,&#13;&#10;   tic.get_static_attr ('OOKPO',   o.REF)   AS &quot;OOKPO&quot;,&#13;&#10;   tic.get_static_attr ('OOKPO-A', o.REF)   AS &quot;OOKPO-A&quot;,&#13;&#10;   tic.get_static_attr ('OOKPO-B', o.REF)   AS &quot;OOKPO-B&quot;,&#13;&#10;   tic.get_static_attr ('OPAdres', o.REF)   AS &quot;OPAdres&quot;,&#13;&#10;   tic.get_static_attr ('OPayer',  o.REF)   AS &quot;OPayer&quot;,&#13;&#10;   tic.get_static_attr ('OPayer2', o.REF)   AS &quot;OPayer2&quot;,&#13;&#10;   tic.get_static_attr ('OPBrDate', o.REF)  AS &quot;OPBrDate&quot;,&#13;&#10;   tic.get_static_attr ('OPDat',   o.REF)   AS &quot;OPDat&quot;,&#13;&#10;   tic.get_static_attr ('OPmtDet', o.REF)   AS &quot;OPmtDet&quot;,&#13;&#10;   tic.get_static_attr ('OPOKPO',  o.REF)   AS &quot;OPOKPO&quot;,&#13;&#10;   tic.get_static_attr ('OPrintStamp', o.REF) AS &quot;OPrintStamp&quot;,&#13;&#10;   tic.get_static_attr ('OPTime',  o.REF)   AS &quot;OPTime&quot;,&#13;&#10;   tic.get_static_attr ('ORat2',   o.REF)   AS &quot;ORat2&quot;,&#13;&#10;   tic.get_static_attr ('ORatB',   o.REF)   AS &quot;ORatB&quot;,&#13;&#10;   tic.get_static_attr ('ORatBA',  o.REF)   AS &quot;ORatBA&quot;,&#13;&#10;   tic.get_static_attr ('ORatBB',  o.REF)   AS &quot;ORatBB&quot;,&#13;&#10;   tic.get_static_attr ('ORatBV',  o.REF)   AS &quot;ORatBV&quot;,&#13;&#10;   tic.get_static_attr ('ORatBVA', o.REF)   AS &quot;ORatBVA&quot;,&#13;&#10;   tic.get_static_attr ('ORatBVB', o.REF)   AS &quot;ORatBVB&quot;,&#13;&#10;   tic.get_static_attr ('ORatO',   o.REF)   AS &quot;ORatO&quot;,&#13;&#10;   tic.get_static_attr ('ORatOA',  o.REF)   AS &quot;ORatOA&quot;,&#13;&#10;   tic.get_static_attr ('ORatOB',  o.REF)   AS &quot;ORatOB&quot;,&#13;&#10;   tic.get_static_attr ('ORatOVA', o.REF)   AS &quot;ORatOVA&quot;,&#13;&#10;   tic.get_static_attr ('ORatOVB', o.REF)   AS &quot;ORatOVB&quot;,&#13;&#10;   tic.get_static_attr ('ORatSA',  o.REF)   AS &quot;ORatSA&quot;,&#13;&#10;   tic.get_static_attr ('ORatSB',  o.REF)   AS &quot;ORatSB&quot;,&#13;&#10;   tic.get_static_attr ('ORatSORatOV', o.REF) AS &quot;ORatSORatOV&quot;,&#13;&#10;   tic.get_static_attr ('ORatSVA', o.REF)   AS &quot;ORatSVA&quot;,&#13;&#10;   tic.get_static_attr ('ORatSVB', o.REF)   AS &quot;ORatSVB&quot;,&#13;&#10;   tic.get_static_attr ('ORatSVORat1', o.REF) AS &quot;ORatSVORat1&quot;,&#13;&#10;   tic.get_static_attr ('OReceiver', o.REF) AS &quot;OReceiver&quot;,&#13;&#10;   tic.get_static_attr ('OS3800', o.REF)    AS &quot;OS3800&quot;,&#13;&#10;   tic.get_static_attr ('OS3801', o.REF)    AS &quot;OS3801&quot;,&#13;&#10;   tic.get_static_attr ('OS3801B', o.REF)   AS &quot;OS3801B&quot;,&#13;&#10;   tic.get_static_attr ('OSender', o.REF)   AS &quot;OSender&quot;,&#13;&#10;   tic.get_static_attr ('OSumm', o.REF)     AS &quot;OSumm&quot;,&#13;&#10;   tic.get_static_attr ('OSumm-B', o.REF)   AS &quot;OSumm-B&quot;,&#13;&#10;   tic.get_static_attr ('OSummLit', o.REF)  AS &quot;OSummLit&quot;,&#13;&#10;   tic.get_static_attr ('OSummLit-B', o.REF) AS &quot;OSummLit-B&quot;,&#13;&#10;   tic.get_static_attr ('oTest', o.REF)     AS &quot;oTest&quot;,&#13;&#10;   tic.get_static_attr ('OTRIM', o.REF)     AS &quot;OTRIM&quot;,&#13;&#10;   tic.get_static_attr ('OUserID', o.REF)   AS &quot;OUserID&quot;,&#13;&#10;   tic.get_static_attr ('OUserName', o.REF) AS &quot;OUserName&quot;,&#13;&#10;   tic.get_static_attr ('OValDate', o.REF)  AS &quot;OValDate&quot;,&#13;&#10;   tic.get_static_attr ('OVDay', o.REF)     AS &quot;OVDay&quot;,&#13;&#10;   tic.get_static_attr ('OVMonth', o.REF)   AS &quot;OVMonth&quot;,&#13;&#10;   tic.get_static_attr ('OVSumm', o.REF)    AS &quot;OVSumm&quot;,&#13;&#10;   tic.get_static_attr ('OVSumm2', o.REF)   AS &quot;OVSumm2&quot;,&#13;&#10;   tic.get_static_attr ('OVSummLit', o.REF) AS &quot;OVSummLit&quot;,&#13;&#10;   tic.get_static_attr ('OVSummLit2', o.REF) AS &quot;OVSummLit2&quot;,&#13;&#10;   tic.get_static_attr ('OVYear', o.REF)    AS &quot;OVYear&quot;,&#13;&#10;   tic.get_static_attr ('OYear', o.REF)     AS &quot;OYear&quot;,&#13;&#10;   tic.get_static_attr ('OZvitDate', o.REF) AS &quot;OZvitDate&quot;,&#13;&#10;   tic.get_static_attr ('R_SD8', o.REF)     AS &quot;R_SD8&quot;,&#13;&#10;   tic.get_static_attr ('R_SD8Lit', o.REF)  AS &quot;R_SD8Lit&quot;,&#13;&#10;   tic.get_static_attr ('R_SK0Lit', o.REF)  AS &quot;R_SK0Lit&quot;,&#13;&#10;   tic.get_static_attr ('R_SK1Lit', o.REF)  AS &quot;R_SK1Lit&quot;,&#13;&#10;   tic.get_static_attr ('R_SK9Lit', o.REF)  AS &quot;R_SK9Lit&quot;,&#13;&#10;   tic.get_static_attr ('REZIDN', o.REF)    AS &quot;REZIDN&quot;,&#13;&#10;   tic.get_static_attr ('S_INKK', o.REF)    AS &quot;S_INKK&quot;,&#13;&#10;   tic.get_static_attr ('S_INKKLit', o.REF) AS &quot;S_INKKLit&quot;,&#13;&#10;   tic.get_static_attr ('S_KONV', o.REF)    AS &quot;S_KONV&quot;,&#13;&#10;   tic.get_static_attr ('S_KONVLit', o.REF) AS &quot;S_KONVLit&quot;,&#13;&#10;   tic.get_static_attr ('S_SD8', o.REF)     AS &quot;S_SD8&quot;,&#13;&#10;   tic.get_static_attr ('S_SG', o.REF)      AS &quot;S_SG&quot;,&#13;&#10;   tic.get_static_attr ('S_SGLit', o.REF)   AS &quot;S_SGLit&quot;,&#13;&#10;   tic.get_static_attr ('S_SGQ', o.REF)     AS &quot;S_SGQ&quot;,&#13;&#10;   tic.get_static_attr ('S_SGQLit', o.REF)  AS &quot;S_SGQLit&quot;,&#13;&#10;   tic.get_static_attr ('S_SK0', o.REF)     AS &quot;S_SK0&quot;,&#13;&#10;   tic.get_static_attr ('S_SK0Q', o.REF)    AS &quot;S_SK0Q&quot;,&#13;&#10;   tic.get_static_attr ('S_SK0QLit', o.REF) AS &quot;S_SK0QLit&quot;,&#13;&#10;   tic.get_static_attr ('S_SK1', o.REF)     AS &quot;S_SK1&quot;,&#13;&#10;   tic.get_static_attr ('S_SK1Q', o.REF)    AS &quot;S_SK1Q&quot;,&#13;&#10;   tic.get_static_attr ('S_SK9', o.REF)     AS &quot;S_SK9&quot;,&#13;&#10;   tic.get_static_attr ('S_SK9Q', o.REF)    AS &quot;S_SK9Q&quot;,&#13;&#10;   tic.get_static_attr ('S_SK9QLit', o.REF) AS &quot;S_SK9QLit&quot;,&#13;&#10;   tic.get_static_attr ('S_SN', o.REF)      AS &quot;S_SN&quot;,&#13;&#10;   tic.get_static_attr ('S_SNM', o.REF)     AS &quot;S_SNM&quot;,&#13;&#10;   tic.get_static_attr ('S_SS', o.REF)      AS &quot;S_SS&quot;,&#13;&#10;   tic.get_static_attr ('SG_SG', o.REF)     AS &quot;SG_SG&quot;,&#13;&#10;   tic.get_static_attr ('SG_SG_980', o.REF) AS &quot;SG_SG_980&quot;,&#13;&#10;   tic.get_static_attr ('SG_SG_980LIT', o.REF) AS &quot;SG_SG_980LIT&quot;,&#13;&#10;   tic.get_static_attr ('SG_SGLIT', o.REF)  AS &quot;SG_SGLIT&quot;,&#13;&#10;   tic.get_static_attr ('SK_CC8', o.REF)    AS &quot;SK_CC8&quot;,&#13;&#10;   tic.get_static_attr ('SK_CCD', o.REF)    AS &quot;SK_CCD&quot;,&#13;&#10;   tic.get_static_attr ('SK_CCK', o.REF)    AS &quot;SK_CCK&quot;,&#13;&#10;   tic.get_static_attr ('UBR_ADR', o.REF)   AS &quot;UBR_ADR&quot;,&#13;&#10;   tic.get_static_attr ('UBR_NAME', o.REF)  AS &quot;UBR_NAME&quot;,&#13;&#10;   tic.get_static_attr ('UCashSymbO', o.REF) AS &quot;UCashSymbO&quot;,&#13;&#10;   tic.get_static_attr ('UCDAC', o.REF)     AS &quot;UCDAC&quot;,&#13;&#10;   tic.get_static_attr ('UDATE', o.REF)     AS &quot;UDATE&quot;,&#13;&#10;   tic.get_static_attr ('UISO2', o.REF)     AS &quot;UISO2&quot;,&#13;&#10;   tic.get_static_attr ('UKURSV2', o.REF)   AS &quot;UKURSV2&quot;,&#13;&#10;   tic.get_static_attr ('UKV2', o.REF)      AS &quot;UKV2&quot;,&#13;&#10;   tic.get_static_attr ('UNAMKV', o.REF)    AS &quot;UNAMKV&quot;,&#13;&#10;   tic.get_static_attr ('UNazF1', o.REF)    AS &quot;UNazF1&quot;,&#13;&#10;   tic.get_static_attr ('UNazF2', o.REF)    AS &quot;UNazF2&quot;,&#13;&#10;   tic.get_static_attr ('UNAZN_P', o.REF)   AS &quot;UNAZN_P&quot;,&#13;&#10;   tic.get_static_attr ('UNAZN_P1', o.REF)  AS &quot;UNAZN_P1&quot;,&#13;&#10;   tic.get_static_attr ('UNAZN_P2', o.REF)  AS &quot;UNAZN_P2&quot;,&#13;&#10;   tic.get_static_attr ('UNAZN_P3', o.REF)  AS &quot;UNAZN_P3&quot;,&#13;&#10;   tic.get_static_attr ('UNAZN_P4', o.REF)  AS &quot;UNAZN_P4&quot;,&#13;&#10;   tic.get_static_attr ('UNazn1', o.REF)    AS &quot;UNazn1&quot;,&#13;&#10;   tic.get_static_attr ('UNAZN1L', o.REF)   AS &quot;UNAZN1L&quot;,&#13;&#10;   tic.get_static_attr ('UNazn2', o.REF)    AS &quot;UNazn2&quot;,&#13;&#10;   tic.get_static_attr ('UNAZN2L', o.REF)   AS &quot;UNAZN2L&quot;,&#13;&#10;   tic.get_static_attr ('UNazn3', o.REF)    AS &quot;UNazn3&quot;,&#13;&#10;   tic.get_static_attr ('UNKTO1', o.REF)    AS &quot;UNKTO1&quot;,&#13;&#10;   tic.get_static_attr ('UNKTO2', o.REF)    AS &quot;UNKTO2&quot;,&#13;&#10;   tic.get_static_attr ('UNKTO3', o.REF)    AS &quot;UNKTO3&quot;,&#13;&#10;   tic.get_static_attr ('UNKTO4', o.REF)    AS &quot;UNKTO4&quot;,&#13;&#10;   tic.get_static_attr ('UNKTO5', o.REF)    AS &quot;UNKTO5&quot;,&#13;&#10;   tic.get_static_attr ('UNLS3800', o.REF)  AS &quot;UNLS3800&quot;,&#13;&#10;   tic.get_static_attr ('UNLS3801', o.REF)  AS &quot;UNLS3801 &quot;,&#13;&#10;   tic.get_static_attr ('UNLS6110', o.REF)  AS &quot;UNLS6110&quot;,&#13;&#10;   tic.get_static_attr ('UNMCH1', o.REF)    AS &quot;UNMCH1&quot;,&#13;&#10;   tic.get_static_attr ('UNMCH2', o.REF)    AS &quot;UNMCH2&quot;,&#13;&#10;   tic.get_static_attr ('UNMCH3', o.REF)    AS &quot;UNMCH3&quot;,&#13;&#10;   tic.get_static_attr ('UNMCH4', o.REF)    AS &quot;UNMCH4&quot;,&#13;&#10;   tic.get_static_attr ('UNMCH5', o.REF)    AS &quot;UNMCH5&quot;,&#13;&#10;   tic.get_static_attr ('UNNCH1', o.REF)    AS &quot;UNNCH1&quot;,&#13;&#10;   tic.get_static_attr ('UNNCH2', o.REF)    AS &quot;UNNCH2&quot;,&#13;&#10;   tic.get_static_attr ('UNNCH3', o.REF)    AS &quot;UNNCH3&quot;,&#13;&#10;   tic.get_static_attr ('UNNCH4', o.REF)    AS &quot;UNNCH4&quot;,&#13;&#10;   tic.get_static_attr ('UNNCH5', o.REF)    AS &quot;UNNCH5&quot;,&#13;&#10;   tic.get_static_attr ('UORndSumD', o.REF) AS &quot;UORndSumD&quot;,&#13;&#10;   tic.get_static_attr ('UOSummDKo', o.REF) AS &quot;UOSummDKo&quot;,&#13;&#10;   tic.get_static_attr ('UOSummDKq', o.REF) AS &quot;UOSummDKq&quot;,&#13;&#10;   tic.get_static_attr ('UOSummDKqLit', o.REF) AS &quot;UOSummDKqLit&quot;,&#13;&#10;   tic.get_static_attr ('UOSummDo', o.REF)  AS &quot;UOSummDo&quot;,&#13;&#10;   tic.get_static_attr ('UOSummDoLit', o.REF) AS &quot;UOSummDoLit&quot;,&#13;&#10;   tic.get_static_attr ('UPO_K1', o.REF)    AS &quot;UPO_K1&quot;,&#13;&#10;   tic.get_static_attr ('UReceiver', o.REF) AS &quot;UReceiver&quot;,&#13;&#10;   tic.get_static_attr ('USUM6110',  o.REF)  AS &quot;USUM6110&quot;,&#13;&#10;   tic.get_static_attr ('USumC',     o.REF)  AS &quot;USumC&quot;,&#13;&#10;   tic.get_static_attr ('USumCN',    o.REF)  AS &quot;USumCN&quot;,&#13;&#10;   tic.get_static_attr ('USumCNLit', o.REF)  AS &quot;USumCNLit&quot;,&#13;&#10;   tic.get_static_attr ('USummD2',   o.REF)   AS &quot;USummD2&quot;,&#13;&#10;   tic.get_static_attr ('USummD2Lit', o.REF) AS &quot;USummD2Lit&quot;,&#13;&#10;   tic.get_static_attr ('USummDQ2',   o.REF) AS &quot;USummDQ2&quot;,&#13;&#10;   tic.get_static_attr ('USummDQ2Lit', o.REF) AS &quot;USummDQ2Lit&quot;,&#13;&#10;   tic.get_static_attr ('USUMPR6110', o.REF)  AS &quot;USUMPR6110&quot;,&#13;&#10;   tic.get_static_attr ('UTARDCH', o.REF)  AS &quot;UTARDCH&quot;,&#13;&#10;   tic.get_static_attr ('UTARSMIN', o.REF) AS &quot;UTARSMIN&quot;,&#13;&#10;   tic.get_static_attr ('UTIME', o.REF)    AS &quot;UTIME&quot;,&#13;&#10;   tic.get_static_attr ('Uvdat', o.REF)    AS &quot;Uvdat&quot;,&#13;&#10;   tic.get_static_attr ('VA_KK', o.REF)    AS &quot;VA_KK&quot;,&#13;&#10;   tic.get_static_attr ('VA_NC', o.REF)    AS &quot;VA_NC&quot;,&#13;&#10;   tic.get_static_attr ('SK_CCM', o.REF)   AS &quot;SK_CCM&quot;&#13;&#10;  FROM oper o&#13;&#10;  where o.ref=:p_ref">
+        <Column Name="BANKO" DataType="System.String"/>
+        <Column Name="FIO1" DataType="System.String"/>
+        <Column Name="FIO2" DataType="System.String"/>
+        <Column Name="KURS4" DataType="System.String"/>
+        <Column Name="KV_SK0" DataType="System.String"/>
+        <Column Name="MFOBO" DataType="System.String"/>
+        <Column Name="NAME_TT" DataType="System.String"/>
+        <Column Name="NLS_INK9D" DataType="System.String"/>
+        <Column Name="NLS_INK9K" DataType="System.String"/>
+        <Column Name="NLS_INKD" DataType="System.String"/>
+        <Column Name="NLS_KOM6" DataType="System.String"/>
+        <Column Name="NLS_KONV" DataType="System.String"/>
+        <Column Name="NLS_SG" DataType="System.String"/>
+        <Column Name="NLS_SG_980" DataType="System.String"/>
+        <Column Name="NLS_SK0" DataType="System.String"/>
+        <Column Name="NLS_SK1" DataType="System.String"/>
+        <Column Name="NLS_SK9" DataType="System.String"/>
+        <Column Name="OAccMan" DataType="System.String"/>
+        <Column Name="OBank-A" DataType="System.String"/>
+        <Column Name="OBank-B" DataType="System.String"/>
+        <Column Name="OBoss" DataType="System.String"/>
+        <Column Name="OBSumm" DataType="System.String"/>
+        <Column Name="OCashSymb" DataType="System.String"/>
+        <Column Name="OCcyCode " DataType="System.String"/>
+        <Column Name="OCcyCode-B" DataType="System.String"/>
+        <Column Name="OCcyISO" DataType="System.String"/>
+        <Column Name="OCcyISO-B" DataType="System.String"/>
+        <Column Name="ODay" DataType="System.String"/>
+        <Column Name="ODocProp" DataType="System.String"/>
+        <Column Name="ODocument" DataType="System.String"/>
+        <Column Name="OFSumm" DataType="System.String"/>
+        <Column Name="OFSumm2" DataType="System.String"/>
+        <Column Name="OFSummLit" DataType="System.String"/>
+        <Column Name="OFSummLit2" DataType="System.String"/>
+        <Column Name="OKMonth" DataType="System.String"/>
+        <Column Name="OKYear" DataType="System.String"/>
+        <Column Name="OMFO-A" DataType="System.String"/>
+        <Column Name="OMFO-B" DataType="System.String"/>
+        <Column Name="OMonth" DataType="System.String"/>
+        <Column Name="OMyBankAdres" DataType="System.String"/>
+        <Column Name="OMyBankMFO " DataType="System.String"/>
+        <Column Name="OMyBankName " DataType="System.String"/>
+        <Column Name="ONazn" DataType="System.String"/>
+        <Column Name="ONLS-A" DataType="System.String"/>
+        <Column Name="ONLS-Aa" DataType="System.String"/>
+        <Column Name="ONLS-B" DataType="System.String"/>
+        <Column Name="ONMS-Aa" DataType="System.String"/>
+        <Column Name="UNLS3800" DataType="System.String"/>
+        <Column Name="UNLS3801 " DataType="System.String"/>
+        <Column Name="USummDQ2" DataType="System.String"/>
+        <Column Name="UTARDCH" DataType="System.String"/>
+        <Column Name="UTIME" DataType="System.String"/>
+        <Column Name="Uvdat" DataType="System.String"/>
+        <Column Name="VA_KK" DataType="System.String"/>
+        <Column Name="VA_NC" DataType="System.String"/>
+        <Column Name="SK_CCM" DataType="System.String"/>
+        <Column Name="ONMS-Ba" DataType="System.String"/>
+        <Column Name="OOKPO-A" DataType="System.String"/>
+        <Column Name="OOKPO-B" DataType="System.String"/>
+        <Column Name="OPAdres" DataType="System.String"/>
+        <Column Name="OPayer" DataType="System.String"/>
+        <Column Name="OPayer2" DataType="System.String"/>
+        <Column Name="OPBrDate" DataType="System.String"/>
+        <Column Name="OPDat" DataType="System.String"/>
+        <Column Name="OPmtDet" DataType="System.String"/>
+        <Column Name="OPOKPO" DataType="System.String"/>
+        <Column Name="OPrintStamp" DataType="System.String"/>
+        <Column Name="OPTime" DataType="System.String"/>
+        <Column Name="ORat2" DataType="System.String"/>
+        <Column Name="ORatB" DataType="System.String"/>
+        <Column Name="ORatBA" DataType="System.String"/>
+        <Column Name="ORatBB" DataType="System.String"/>
+        <Column Name="ORatBV" DataType="System.String"/>
+        <Column Name="ORatBVA" DataType="System.String"/>
+        <Column Name="ORatBVB" DataType="System.String"/>
+        <Column Name="ORatO" DataType="System.String"/>
+        <Column Name="ORatOA" DataType="System.String"/>
+        <Column Name="ORatOB" DataType="System.String"/>
+        <Column Name="ORatOVA" DataType="System.String"/>
+        <Column Name="ORatOVB" DataType="System.String"/>
+        <Column Name="ORatSA" DataType="System.String"/>
+        <Column Name="ORatSB" DataType="System.String"/>
+        <Column Name="ORatSORatOV" DataType="System.String"/>
+        <Column Name="ORatSVA" DataType="System.String"/>
+        <Column Name="ORatSVB" DataType="System.String"/>
+        <Column Name="ORatSVORat1" DataType="System.String"/>
+        <Column Name="OReceiver" DataType="System.String"/>
+        <Column Name="OS3800" DataType="System.String"/>
+        <Column Name="OS3801" DataType="System.String"/>
+        <Column Name="OS3801B" DataType="System.String"/>
+        <Column Name="OSender" DataType="System.String"/>
+        <Column Name="OSumm" DataType="System.String"/>
+        <Column Name="OSumm-B" DataType="System.String"/>
+        <Column Name="OSummLit" DataType="System.String"/>
+        <Column Name="OSummLit-B" DataType="System.String"/>
+        <Column Name="oTest" DataType="System.String"/>
+        <Column Name="OTRIM" DataType="System.String"/>
+        <Column Name="OUserID" DataType="System.String"/>
+        <Column Name="OUserName" DataType="System.String"/>
+        <Column Name="OValDate" DataType="System.String"/>
+        <Column Name="OVDay" DataType="System.String"/>
+        <Column Name="OVMonth" DataType="System.String"/>
+        <Column Name="OVSumm" DataType="System.String"/>
+        <Column Name="OVSumm2" DataType="System.String"/>
+        <Column Name="OVSummLit" DataType="System.String"/>
+        <Column Name="OVSummLit2" DataType="System.String"/>
+        <Column Name="OVYear" DataType="System.String"/>
+        <Column Name="OYear" DataType="System.String"/>
+        <Column Name="OZvitDate" DataType="System.String"/>
+        <Column Name="R_SD8" DataType="System.String"/>
+        <Column Name="R_SD8Lit" DataType="System.String"/>
+        <Column Name="R_SK0Lit" DataType="System.String"/>
+        <Column Name="R_SK1Lit" DataType="System.String"/>
+        <Column Name="R_SK9Lit" DataType="System.String"/>
+        <Column Name="REZIDN" DataType="System.String"/>
+        <Column Name="S_INKK" DataType="System.String"/>
+        <Column Name="S_INKKLit" DataType="System.String"/>
+        <Column Name="S_KONV" DataType="System.String"/>
+        <Column Name="S_KONVLit" DataType="System.String"/>
+        <Column Name="S_SD8" DataType="System.String"/>
+        <Column Name="S_SG" DataType="System.String"/>
+        <Column Name="S_SGLit" DataType="System.String"/>
+        <Column Name="S_SGQ" DataType="System.String"/>
+        <Column Name="S_SGQLit" DataType="System.String"/>
+        <Column Name="S_SK0" DataType="System.String"/>
+        <Column Name="S_SK0Q" DataType="System.String"/>
+        <Column Name="S_SK0QLit" DataType="System.String"/>
+        <Column Name="S_SK1" DataType="System.String"/>
+        <Column Name="S_SK1Q" DataType="System.String"/>
+        <Column Name="S_SK9" DataType="System.String"/>
+        <Column Name="S_SK9Q" DataType="System.String"/>
+        <Column Name="S_SK9QLit" DataType="System.String"/>
+        <Column Name="S_SN" DataType="System.String"/>
+        <Column Name="S_SNM" DataType="System.String"/>
+        <Column Name="S_SS" DataType="System.String"/>
+        <Column Name="SG_SG" DataType="System.String"/>
+        <Column Name="SG_SG_980" DataType="System.String"/>
+        <Column Name="SG_SG_980LIT" DataType="System.String"/>
+        <Column Name="SG_SGLIT" DataType="System.String"/>
+        <Column Name="SK_CC8" DataType="System.String"/>
+        <Column Name="SK_CCD" DataType="System.String"/>
+        <Column Name="SK_CCK" DataType="System.String"/>
+        <Column Name="UBR_ADR" DataType="System.String"/>
+        <Column Name="UBR_NAME" DataType="System.String"/>
+        <Column Name="UCashSymbO" DataType="System.String"/>
+        <Column Name="UCDAC" DataType="System.String"/>
+        <Column Name="UDATE" DataType="System.String"/>
+        <Column Name="UISO2" DataType="System.String"/>
+        <Column Name="UKURSV2" DataType="System.String"/>
+        <Column Name="UKV2" DataType="System.String"/>
+        <Column Name="UNAMKV" DataType="System.String"/>
+        <Column Name="UNazF1" DataType="System.String"/>
+        <Column Name="UNazF2" DataType="System.String"/>
+        <Column Name="UNAZN_P" DataType="System.String"/>
+        <Column Name="UNAZN_P1" DataType="System.String"/>
+        <Column Name="UNAZN_P2" DataType="System.String"/>
+        <Column Name="UNAZN_P3" DataType="System.String"/>
+        <Column Name="UNAZN_P4" DataType="System.String"/>
+        <Column Name="UNazn1" DataType="System.String"/>
+        <Column Name="UNAZN1L" DataType="System.String"/>
+        <Column Name="UNazn2" DataType="System.String"/>
+        <Column Name="UNAZN2L" DataType="System.String"/>
+        <Column Name="UNazn3" DataType="System.String"/>
+        <Column Name="UNKTO1" DataType="System.String"/>
+        <Column Name="UNKTO2" DataType="System.String"/>
+        <Column Name="UNKTO3" DataType="System.String"/>
+        <Column Name="UNKTO4" DataType="System.String"/>
+        <Column Name="UNKTO5" DataType="System.String"/>
+        <Column Name="UNMCH1" DataType="System.String"/>
+        <Column Name="UNMCH2" DataType="System.String"/>
+        <Column Name="UNMCH3" DataType="System.String"/>
+        <Column Name="UNMCH4" DataType="System.String"/>
+        <Column Name="UNMCH5" DataType="System.String"/>
+        <Column Name="UNNCH1" DataType="System.String"/>
+        <Column Name="UNNCH2" DataType="System.String"/>
+        <Column Name="UNNCH3" DataType="System.String"/>
+        <Column Name="UNNCH4" DataType="System.String"/>
+        <Column Name="UNNCH5" DataType="System.String"/>
+        <Column Name="UORndSumD" DataType="System.String"/>
+        <Column Name="UOSummDKo" DataType="System.String"/>
+        <Column Name="UOSummDKq" DataType="System.String"/>
+        <Column Name="UOSummDKqLit" DataType="System.String"/>
+        <Column Name="UOSummDo" DataType="System.String"/>
+        <Column Name="UOSummDoLit" DataType="System.String"/>
+        <Column Name="UPO_K1" DataType="System.String"/>
+        <Column Name="UReceiver" DataType="System.String"/>
+        <Column Name="USUM6110" DataType="System.String"/>
+        <Column Name="USumC" DataType="System.String"/>
+        <Column Name="USumCN" DataType="System.String"/>
+        <Column Name="USumCNLit" DataType="System.String"/>
+        <Column Name="USummD2" DataType="System.String"/>
+        <Column Name="USummD2Lit" DataType="System.String"/>
+        <Column Name="USummDQ2Lit" DataType="System.String"/>
+        <Column Name="USUMPR6110" DataType="System.String"/>
+        <Column Name="DR_OB40" DataType="System.String"/>
+        <Column Name="NLS_INKK" DataType="System.String"/>
+        <Column Name="ONLS-Ba" DataType="System.String"/>
+        <Column Name="ONumber" DataType="System.String"/>
+        <Column Name="OOKPO" DataType="System.String"/>
+        <Column Name="UNLS6110" DataType="System.String"/>
+        <Column Name="UTARSMIN" DataType="System.String"/>
+        <CommandParameter Name="p_ref" DataType="107" Expression="[p_ref]" DefaultValue="-1"/>
+      </TableDataSource>
+      <TableDataSource Name="Table" Alias="BUH_MODEL" DataType="System.Int32" Enabled="true" SelectCommand="SELECT o.tt,o.dk,a.nls,a.kv,t.dig, trunc(o.fdat) fdat1,o.s/t.denom,gl.p_icurval(a.kv, o.s, o.fdat)/100,o.txt,r.nls,r.kv&#13;&#10;                                             FROM opldok o, accounts a, tabval$global t, accounts r &#13;&#10;                                             WHERE t.kv=a.kv and a.acc=o.acc and r.acc(+)=a.accc and o.ref=:p_ref and o.sos is not null&#13;&#10;                                             ORDER BY o.fdat, a.kv, o.stmt, o.tt, o.dk">
+        <Column Name="TT" DataType="System.String"/>
+        <Column Name="DK" DataType="System.Int16"/>
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="KV" DataType="System.Int16"/>
+        <Column Name="DIG" DataType="System.Int64"/>
+        <Column Name="FDAT1" DataType="System.DateTime"/>
+        <Column Name="O.S/T.DENOM" DataType="System.Decimal"/>
+        <Column Name="GL.P_ICURVAL(A.KV,O.S,O.FDAT)/100" DataType="System.Decimal"/>
+        <Column Name="TXT" DataType="System.String"/>
+        <Column Name="NLS1" DataType="System.String"/>
+        <Column Name="KV1" DataType="System.Int16"/>
+        <CommandParameter Name="p_ref" DataType="107" Expression="[p_ref]" DefaultValue="-1"/>
+      </TableDataSource>
+      <TableDataSource Name="Table6" Alias="DK" DataType="System.Int32" Enabled="true" SelectCommand="select o.dk as &quot;DK&quot; &#13;&#10;    from oper o&#13;&#10;where o.ref=:p_ref">
+        <Column Name="DK" DataType="System.Int16"/>
+        <CommandParameter Name="p_ref" DataType="107" Expression="[p_ref]" DefaultValue="-1"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_ref" DataType="System.Decimal"/>
+    <Parameter Name="p_buh" DataType="System.Int32" Expression="1"/>
+  </Dictionary>
+  <ReportPage Name="Page1" StartPageEvent="_StartReport">
+    <DataBand Name="Data1" Width="718.2" Height="434.7" DataSource="Table2"/>
+    <DataBand Name="BUH_MODEL_B" Top="499.17" Width="718.2" Height="18.9" CanGrow="true" Guides="0,0" DataSource="Table">
+      <TextObject Name="Text3" Left="75.98" Width="86.94" Height="18.9" Border.Lines="Right, Top, Bottom" Text="[BUH_MODEL.FDAT1]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text1" Left="9.45" Width="66.15" Height="18.9" Border.Lines="All" Text="[BUH_MODEL.TT]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text4" Left="162.54" Width="113.4" Height="18.9" Border.Lines="Right, Top, Bottom" Text="[BUH_MODEL.NLS]" VertAlign="Center" Font="Arial, 9pt" TabWidth="55"/>
+      <TextObject Name="Text2" Left="275.56" Width="66.15" Height="18.9" Border.Lines="Right, Top, Bottom" Text="[BUH_MODEL.KV]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text5" Left="342.09" Width="122.85" Height="18.9" Border.Lines="Right, Top, Bottom" Text="[IIf([BUH_MODEL.DK]==0,[BUH_MODEL.O.S/T.DENOM],null)]" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text6" Left="464.56" Width="124.74" Height="18.9" Border.Lines="Right, Top, Bottom" Text="[IIf([BUH_MODEL.DK]==0,null,[BUH_MODEL.O.S/T.DENOM])]" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text7" Left="589.3" Width="121.34" Height="18.9" Border.Lines="Right, Top, Bottom" Text="[BUH_MODEL.GL.P_ICURVAL(A.KV,O.S,O.FDAT)/100]" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt"/>
+      <DataHeaderBand Name="BUH_MODEL_H" Top="438.58" Width="718.2" Height="56.7">
+        <TextObject Name="Text8" Left="9.45" Top="28.35" Width="66.15" Height="28.35" Border.Lines="All" Text="Тип&#13;&#10;трн." HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+        <TextObject Name="Text15" Left="9.45" Width="699.3" Height="28.35" Border.Lines="Top" Border.Style="Dash" Text="     Перелік транзакцій для документа # [p_ref]" VertAlign="Center" Font="Arial, 9pt"/>
+        <TextObject Name="Text9" Left="75.6" Top="28.35" Width="86.94" Height="28.35" Border.Lines="Top, Bottom" Text="Дата &#13;&#10;валютування" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+        <TextObject Name="Text10" Left="162.54" Top="28.35" Width="113.4" Height="28.35" Border.Lines="All" Text="Рахунок" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TabWidth="55"/>
+        <TextObject Name="Text11" Left="275.56" Top="28.35" Width="66.15" Height="28.35" Border.Lines="Right, Top, Bottom" Text="Валюта" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+        <TextObject Name="Text12" Left="340.2" Top="28.35" Width="124.74" Height="28.35" Border.Lines="Right, Top, Bottom" Text="Дебет" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+        <TextObject Name="Text13" Left="464.56" Top="28.35" Width="124.74" Height="28.35" Border.Lines="Right, Top, Bottom" Text="Кредит" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+        <TextObject Name="Text14" Left="585.9" Top="28.35" Width="124.74" Height="28.35" Border.Lines="Right, Top, Bottom" Text="Еквівалент" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      </DataHeaderBand>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="521.95" Width="718.2" Height="18.9"/>
+  </ReportPage>
+</Report>

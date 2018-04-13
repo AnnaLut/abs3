@@ -1,0 +1,182 @@
+﻿@using System.Globalization
+@model IEnumerable<DateTime>
+@{
+  Layout = Layout==null ? null : "~/Views/Shared/_LayoutLogin.cshtml";
+  ViewBag.Title = "АБС \"BARS-WEB\"-вибір банківської дати";
+}
+<style>
+  .calendar-main {
+    font-family: 'Segoe UI Semilight','Open Sans',Verdana,Arial,Helvetica,sans-serif;
+    width: 280px;
+    border-left: 1px solid #ccc;
+    border-collapse: collapse;
+    font-size: 14px;
+    text-align: center;
+    cursor: default;
+  }
+  .calendar-main caption {
+    font-size: 16px;
+    border: 1px solid #ccc;
+  }
+  .calendar-main tbody tr{
+    border: 0;
+  }
+  .calendar-main tbody tr td {
+    padding: 0;
+    font-weight: bold;
+    background-color: #f6f6f6;
+    border: 1px #ccc solid !important;
+    height: 100%;
+
+  }
+  .calendar-main tbody tr td .day {
+
+    padding: 4px 0;
+    display: block;
+    color: #000;
+  }
+  .calendar-main tbody tr td .day.curent {
+    cursor: pointer;
+    background-color: #6f8de9;
+    color: #fff;
+  }
+  .calendar-main tbody tr td .day.curent:hover {
+    background-color: #84a0ee;
+  }
+  .calendar-main tbody tr td .day.work {
+    cursor: pointer;
+    background-color: #b8ee88;
+  }
+  .calendar-main tbody tr td .day.work:hover {
+    background-color: #a6e173;
+  }
+
+  .calendar a {
+    color: #2e92cf;
+  }
+
+
+</style>
+<script>
+  $(function () {
+    $('#btChangDate').focus().bind('click', function () { addLoader();});
+  });
+  function addLoader() {
+    $('#messSumary').html('<div class="loader"></div>');
+  };
+</script>
+@{
+  var model = Model.ToList();
+  int curentYear = Convert.ToInt32(ViewBag.curentYear);
+  int curentMonth = Convert.ToInt32(ViewBag.curentMonth);
+
+  var bDate = Convert.ToDateTime(ViewBag.bankDate);
+  DateTimeFormatInfo cultureInfo = CultureInfo.GetCultureInfo("uk-UA").DateTimeFormat;
+  DateTime dateStartDayOfMonth = new DateTime(curentYear, curentMonth, 1);
+  var dow = dateStartDayOfMonth.DayOfWeek;
+  var startDayofWeek = dow == DayOfWeek.Sunday ? 6 : Convert.ToDecimal(dow) - 1;
+  var daysInMonth = DateTime.DaysInMonth(curentYear, curentMonth);
+  int dat = 1;
+}
+<div style="width: 350px; position: relative;padding-left:50px;" class="floatLeft loginBloc" id="signInTD">
+  <div style="">
+    <h1 class="loginhead">Банківська дата</h1>
+  </div>
+  <div style="height: 30px;width: 320px;margin-bottom:10px;" id="messSumary" class="errorDiv first">
+    @Html.Raw(ViewBag.ErrorSumary)
+  </div>
+  <div style="width: 320px;" class="floatLeft">
+    <div id="rightTD">
+      <form method="GET" action="@Url.Content("~/account/changebankdate/")">
+        <input type="hidden" name="date" value="@bDate.ToShortDateString()" />
+        <table class="calendar-main" cellpadding="0" cellspacing="0" border="0">
+          <caption>
+            <a href="@Url.Content("~/account/calendar/?year="+dateStartDayOfMonth.AddMonths(-1).Year+"&month="+dateStartDayOfMonth.AddMonths(-1).Month)" onclick="addLoader();" style="float:left;width: 24px;height: 24px;" title=Prev class="ui-datepicker-prev ui-corner-all"><span style="margin-top: 4px;" class="ui-icon ui-icon-circle-triangle-w">Prev</span></a>
+            <a href="@Url.Content("~/account/calendar/?year="+dateStartDayOfMonth.AddMonths(1).Year+"&month="+dateStartDayOfMonth.AddMonths(1).Month)" onclick="addLoader();" style="float: right; width: 24px; height: 24px;" title=Next class="ui-datepicker-next ui-corner-all"><span style="margin-top: 4px;" class="ui-icon ui-icon-circle-triangle-e">Next</span></a>
+            @dateStartDayOfMonth.ToString("MMMM", cultureInfo) @curentYear
+          </caption>
+          <thead>
+            <tr></tr>
+            <tr>
+              <td>П</td>
+              <td>В</td>
+              <td>С</td>
+              <td>Ч</td>
+              <td>П</td>
+              <td>С</td>
+              <td style="border-right: 1px solid #ccc;">Н</td>
+            </tr>
+          </thead>
+          <tbody>
+            @for (var tr = 0; tr < 6; tr++)
+            {
+              if (dat <= daysInMonth)
+              {
+                <tr>
+                  @for (var i = 0; i < 7; i++)
+                  {
+                    if (tr == 0)
+                    {
+                      if (i >= startDayofWeek && dat <= daysInMonth)
+                      {
+                        DateTime date = new DateTime(curentYear, curentMonth, dat);
+                        if (date == bDate)
+                        {
+                          <td><a href="@Url.Content("~/account/changebankdate/?date=" + date.ToShortDateString())" onclick="addLoader();" class="day curent">@dat</a></td>
+                        }
+                        else if (model.Where(d => d == date).Count() != 0)
+                        {
+                          <td><a href="@Url.Content("~/account/changebankdate/?date=" + date.ToShortDateString())" onclick="addLoader();" class="day work">@dat</a></td>
+                        }
+                        else
+                        {
+                          <td><a href="#" onclick=" return false; " class="day">@dat</a></td>
+                        }
+                        dat++;
+                      }
+                      else
+                      {
+                        <td></td>
+                      }
+                    }
+                    else
+                    {
+                      if (dat <= daysInMonth)
+                      {
+                        DateTime date = new DateTime(curentYear, curentMonth, dat);
+                        if (date == bDate)
+                        {
+                          <td><a href="@Url.Content("~/account/changebankdate/?date=" + date.ToShortDateString())" onclick="addLoader();" class="day curent">@dat</a></td>
+                        }
+                        else if (model.Where(d => d == date).Count() != 0)
+                        {
+                          <td><a href="@Url.Content("~/account/changebankdate/?date="+date.ToShortDateString())" onclick="addLoader();" class="day work">@dat</a></td>
+                        }
+                        else
+                        {
+                          <td><a href="#" onclick=" return false; " class="day">@dat</a></td>
+                        }
+                        dat++;
+                      }
+                      else
+                      {
+                        <td></td>
+                      }
+                    }
+
+                  }
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+        <input class="default" value="Продовжити" id="btChangDate" type="submit" tabindex="1" style="width: 100px;margin-top: 20px;margin-left: 90px;" />
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
+
+    

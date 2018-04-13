@@ -1,0 +1,436 @@
+﻿@using Kendo.Mvc.UI
+@{
+    string title = "Формування реєстру";
+}
+
+<h1>@title</h1>
+<table id="filter">
+    <tr>
+        <td>
+            <label for="dtFrom" class="control-label">Дата з:</label>
+        </td>
+        <td>
+            <input type="text" id="dtFrom" style="width:200px" required />
+        </td>
+        <td>
+            <label for="dtTo" class="control-label">Дата по:</label>
+        </td>
+        <td>
+            <input type="text" id="dtTo" style="width:200px" disabled />
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label for="ddlType" class="control-label">Тип реєстру:</label>
+        </td>
+        <td>
+            <select id="ddlType" style="width:250px"></select>
+        </td>
+        <td>
+            <label for="ddlView" class="control-label">Вид реєстру:</label>
+        </td>
+        <td>
+            <select id="ddlView" style="width:250px"></select>
+        </td>
+    </tr>
+</table>
+<div style="margin-top:20px">
+    <div id="gridEnergo"></div>
+</div>
+<script id="events-template" type="text/x-kendo-template">
+    <div id="gridEvents"></div>
+</script>
+    
+<script type="text/javascript">
+    $(document).ready(function () {
+        var grid = $("#gridEnergo").kendoGrid({
+            //dataSource: dataSource,
+            toolbar: [{
+                name: "btCreate",
+                type: "button",
+                text: "<span class='pf-icon pf-16 pf-add_button'></span> Сформувати"
+            },
+            {
+                name: "btSave",
+                type: "button",
+                text: "<span class='pf-icon pf-16 pf-save'></span> Зберегти"
+            },
+            {
+                name: "btGo",
+                type: "button",
+                text: "<span class='pf-icon pf-16 pf-user_group'></span> Портфель реєстрів"
+            }],
+            dataBound: function (e) {
+                var grid = e.sender;
+                var data = grid.dataSource.data();
+                if (data.length === 0) {
+                    var colCount = grid.columns.length;
+                    var message = 'немає записів або не сформовано реєстр';
+                    $(e.sender.wrapper).find('tbody').append('<tr class="kendo-data-row"><td colspan="' + colCount + '" class="no-data">' + message + ' :(</td></tr>');
+                }
+                grid.element.height("auto");
+                grid.element.find(".k-grid-content").height("auto");
+                kendo.resize(grid.element);
+                $(".checkbox").bind("change", function (e) {
+                    $(e.target).closest("tr").toggleClass("k-state-selected");
+                });
+            },
+            detailTemplate: kendo.template($("#events-template").html()),
+            detailInit: detailInit,
+            filterable: true,
+            selectable: true,
+            pageable: {
+                refresh: true,
+                pageSizes: [10, 20, 50, 100],
+                buttonCount: 10
+            },
+            columns: [{ 
+                template: "<input type='checkbox' class='checkbox' />",
+                width: 30
+            },
+            {
+                title: "№ п/п",
+                width: 50,
+                field: "NUM"
+            },
+            {
+                title: "Реєстраційний номер картки платника",
+                field: "CUSTOMER_ID",
+                width: 100
+            },
+            {
+                title: "Прізвище, ім`я, по-батькові фізичної особи-позичальника",
+                field: "CUSTOMER_NAME",
+                width: 200
+            },
+            {
+                title: "ІНН",
+                field: "CUSTOMER_OKPO",
+                width: 100
+            },
+            {
+                title: "Місце проживання фізичної особи - позичальника (із зазначенням адреси реєстрації, якщо вона відрізняється від адреси місця проживання)",
+                columns: [{
+                    title: "область",
+                    field: "CUSTOMER_REGION",
+                    width: 200
+                },
+                {
+                    title: "район, населений пункт, вулиця, номер: будинку, корпусу, квартири",
+                    field: "CUSTOMER_FULL_ADDRESS",
+                    width: 250
+                }]
+            },
+            {
+                title: "Документ про субсидію",
+                field: "SUBS_DOC_TYPE",
+                width: 200
+            },
+            {
+                title: "Кредитний договір",
+                columns: [{
+                    title: "дата укладення",
+                    field: "DEAL_DATE_FROM",
+                    format: "{0:d}",
+                    width: 100
+                },
+                {
+                    title: "номер договору",
+                    field: "DEAL_NUMBER",
+                    width: 100
+                },
+                {
+                    title: "строк дії (у місяцях)",
+                    field: "DEAL_TERM",
+                    width: 60
+                }]
+            },
+            {
+                title: "Загальна вартість придбаного енергоефективного обладнання та/або матеріалів та відповідних робіт з їх впровадження (у гривнях)",
+                field: "GOOD_COST",
+                format: "{0:#.00}",
+                width: 100
+            },
+            {
+                title: "Сума кредиту",
+                field: "DEAL_SUM",
+                format: "{0:#.00}",
+                width: 100
+            },
+            {
+                title: "Розмір відшкодування частини суми кредиту, розрахований відповідно до Порядку (у гривнях)",
+                field: "COMP_SUM",
+                format: "{0:#.00}",
+                width: 100
+            },
+            {
+                title: "Дата передачі документів до банку про цільове використання коштів",
+                field: "DOC_DATE",
+                format: "{0:d}",
+                width: 100
+            },
+            {
+                title: "МФО",
+                field: "MFO",
+                width: 60
+            },
+            {
+                title: "Відділення",
+                field: "BRANCH_CODE",
+                width: 170
+            },
+            //{
+            //    title: "Поточний рахунок",
+            //    field: "NLS",
+            //    width: 150
+            //},
+            {
+                title: "Статус КД",
+                field: "CREDIT_STATUS_NAME",
+                width: 100
+            },
+            {
+                title: "Статус заявки",
+                field: "VALID_STATUS",
+                width: 50
+            },
+            {
+                title: "Коментар",
+                width: 200
+            },
+            {
+            title: "Відповідальний співробітник",
+            field: "USER_NAME",
+            width: 200
+        }]
+        });
+
+        $(".k-grid-btCreate").click(create);
+        $(".k-grid-btSave").bind("click", save);
+        $(".k-grid-btGo").click(function () {
+            window.location = bars.config.urlContent('/escr/PortfolioData/Portfolio/');
+        });
+
+        $("#dtFrom").kendoMaskedTextBox({
+            mask: "99.99.9999"
+        }).kendoDatePicker({
+            culture: "uk-UA",
+            format: "dd.MM.yyyy",
+            change: function () {
+                var value = this.value();
+                var dateTo = $("#dtTo").data("kendoDatePicker");
+                if (value) {
+                    var firstDay = new Date(value.getFullYear(), value.getMonth(), 1);
+                    var lastDay = new Date(value.getFullYear(), value.getMonth() + 1, 0);
+                    this.value(firstDay);
+                    dateTo.value(lastDay);
+                }
+                else {
+                    this.value("");
+                    dateTo.value("");
+                }
+            }
+        }).removeClass('k-textbox').parent().parent().removeClass('k-textbox');
+
+        $("#dtTo").kendoMaskedTextBox({
+            mask: "99.99.9999"
+        }).kendoDatePicker({
+            culture: "uk-UA",
+            format: "dd.MM.yyyy"
+        }).removeClass('k-textbox').parent().parent().removeClass('k-textbox');
+
+        $("#ddlType").kendoDropDownList({
+            dataTextField: "NAME",
+            dataValueField: "ID",
+            dataSource: {
+                transport: {
+                    read: {
+                        url: bars.config.urlContent('/escr/portfoliodata/GetProd/')
+                    }
+                },
+                schema: {
+                    model: {
+                        fields: {
+                            ID: { type: "number" },
+                            TYPE: { type: "string" },
+                            PROD: { type: "string" }
+                        }
+                    }
+                }
+            },
+            optionLabel: "Всі",
+        });
+        $("#ddlView").kendoDropDownList({
+            dataTextField: "NAME",
+            dataValueField: "ID",
+            dataSource: {
+                transport: {
+                    read: {
+                        url: bars.config.urlContent('/escr/portfoliodata/GetViddRee/')
+                    }
+                },
+                schema: {
+                    model: {
+                        fields: {
+                            ID: { type: "number" },
+                            NAME: { type: "string" }
+                        }
+                    }
+                }
+            },
+            optionLabel: "Всі"
+        });
+    });
+
+    function create() {
+        var grid = $("#gridEnergo").data("kendoGrid");
+        var dateF = $("#dtFrom").data("kendoDatePicker").value();
+        var dateT = $("#dtTo").data("kendoDatePicker").value();
+        var dateFrom = (dateF.getDate() < 10 ? "0" + dateF.getDate() : dateF.getDate()) + "." + ((dateF.getMonth() + 1) < 10 ? "0" + (dateF.getMonth() + 1) : (dateF.getMonth() + 1)) + "." + dateF.getFullYear();
+        var dateTo = (dateT.getDate() < 10 ? "0" + dateT.getDate() : dateT.getDate()) + "." + ((dateT.getMonth() + 1) < 10 ? "0" + (dateT.getMonth() + 1) : (dateT.getMonth() + 1)) + "." + dateT.getFullYear();
+        var type = $("#ddlType").data("kendoDropDownList").value();
+        var dataSource = new kendo.data.DataSource({
+            transport: {
+                read: {
+                    url: bars.config.urlContent('/escr/portfoliodata/GetRegisterMain/?dateFrom=' + dateFrom + '&dateTo=' + dateTo + '&type=' + type)
+                }
+            },
+            schema: {
+                model: {
+                    fields: {
+                        NUM: { type: "number" },
+                        CUSTOMER_ID: { type: "number" },
+                        CUSTOMER_NAME: { type: "string" },
+                        CUSTOMER_OKPO: { type: "string" },
+                        SUBS_NUMB: { type: "string" },
+                        SUBS_DATE: { type: "string" },
+                        SUBS_DOC_TYPE: { type: "string" },
+                        CUSTOMER_REGION: { type: "string" },
+                        CUSTOMER_FULL_ADDRESS: { type: "string" },
+                        CUSTOMER_TYPE: { type: "number" },
+                        DEAL_ID: { type: "number" },
+                        DEAL_NUMBER: { type: "string" },
+                        DEAL_DATE_FROM: { type: "date" },
+                        DEAL_DATE_TO: { type: "date" },
+                        DEAL_TERM: { type: "number" },
+                        DEAL_PRODUCT: { type: "string" },
+                        DEAL_STATE: { type: "string" },
+                        DEAL_TYPE_CODE: { type: "number" },
+                        DEAL_TYPE_NAME: { type: "string" },
+                        DEAL_SUM: { type: "number" },
+                        GOOD_COST: { type: "string" },
+                        NLS: { type: "string" },
+                        ACC: { type: "number" },
+                        DOC_DATE: { type: "date" },
+                        MONEY_DATE: { type: "string" },
+                        COMP_SUM: { type: "number" },
+                        VALID_STATUS: { type: "string" },
+                        BRANCH_CODE: { type: "string" },
+                        BRANCH_NAME: { type: "string" },
+                        MFO: { type: "string" },
+                        USER_ID: { type: "number" },
+                        USER_NAME: { type: "string" },
+                        REG_TYPE_NAME: { type: "string" },
+                        REG_TYPE_ID: { type: "number" },
+                        REG_KIND_NAME: { type: "string" },
+                        REG_KIND_ID: { type: "number" }
+                    }
+                }
+            },
+            pageSize: 10
+        });
+
+        grid.setDataSource(dataSource);
+    }
+
+    function save() {
+        var dateF = $("#dtFrom").data("kendoDatePicker").value();
+        var dateT = $("#dtTo").data("kendoDatePicker").value();
+        var dateFrom = (dateF.getDate() < 10 ? "0" + dateF.getDate() : dateF.getDate()) + "." + ((dateF.getMonth() + 1) < 10 ? "0" + (dateF.getMonth() + 1) : (dateF.getMonth() + 1)) + "." + dateF.getFullYear();
+        var dateTo = (dateT.getDate() < 10 ? "0" + dateT.getDate() : dateT.getDate()) + "." + ((dateT.getMonth() + 1) < 10 ? "0" + (dateT.getMonth() + 1) : (dateT.getMonth() + 1)) + "." + dateT.getFullYear();
+        var jsonItems = { dateFrom: dateFrom, dateTo: dateTo, deals: [] };
+        var rows = $(".k-state-selected[role=row]");
+        var grid = $("#gridEnergo").data("kendoGrid");
+        rows.each(function (index, row) {
+            var selectedItem = grid.dataItem(row).toJSON();
+            jsonItems.deals.push(selectedItem);
+        });
+        $.ajax({
+            async: true,
+            type: "POST",
+            contentType: "application/json",
+            url: bars.config.urlContent("/escr/PortfolioData/SaveRegister/"),
+            data: JSON.stringify(jsonItems),
+            success: function () {
+                var grid = $("#gridEnergo").data("kendoGrid");
+                grid.dataSource.read();
+            }
+        });
+        //console.log(JSON.stringify(jsonItems));
+    }
+
+    function detailInit(e) {
+        var detailRow = e.detailRow;
+        var data = e.data;
+        detailRow.find("#gridEvents").kendoGrid({
+            dataSource: {
+                transport: {
+                    read: {
+                        url: bars.config.urlContent('/escr/portfoliodata/GetEvents/?customerId=' + data.CUSTOMER_ID + '&dealId=' + data.DEAL_ID)
+                    }
+                },
+                schema: {
+                    model: {
+                        fields: {
+                            NUM: { type: "number" },
+                            CUSTOMER_ID: { type: "nember" },
+                            DEAL_ID: { type: "number" },
+                            BRANCH: { type: "string" },
+                            DOMAIN: { type: "string" },
+                            ZAHADDR: { type: "string" },
+                            HOME_TYPE: { type: "string" },
+                            EVENTS: { type: "string" }                            
+                        }
+                    }
+                },
+                pageSize: 5
+            },
+            pageable: {
+                refresh: true,
+                pageSizes: [5, 10, 20],
+                selectable: true,
+                buttonCount: 5
+            },
+            columns: [{
+                title: "№ п/п",
+                width: 30
+            },
+            {
+                title: "Адреса будинку, в якому впроваджується захід, відповідно до підпункту 4 пункту 3 Порядку (згідно з даними, повідомленими уповноваженій установі позичальником)",
+                columns: [{
+                    title: "область",
+                    field: "DOMAIN",
+                    width: 200
+                },
+                {
+                    title: "район, населений пункт, вулиця, номер: будинку, корпусу, квартири",
+                    field: "ZAHADDR",
+                    width: 250
+                },
+                {
+                    title: "Тип будинку (одно-, дво-, багато квартирний)",
+                    field: "HOME_TYPE",
+                    width: 100
+                }]
+            },
+            {
+                title: "Цілі кредитування відповідно до підпункту 4 пункту 3 Порядку",
+                field: "EVENTS",
+                width: 300
+            }]
+        });
+    }
+</script>
+
+
+

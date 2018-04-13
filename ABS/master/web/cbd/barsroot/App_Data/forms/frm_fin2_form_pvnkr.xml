@@ -1,0 +1,94 @@
+﻿<xmlform captiontype="OnlyTitle">
+  <grids>
+    <grid  id="gv" pagesize="25" showpagesizebox="true" title="Оцінка фінстану РНК \QS[RNK_]  Реф КД \QS[ND_]    на дату \QS[DAT_]  " showfilter="true">
+      <datasource>
+        <sql>
+          SELECT kod, name,
+          FIN_OBU.F_GET_FIN_ND(rnk_, nd_, kod, idf, add_months(trunc(dat_),-6)) as zn2,
+          FIN_OBU.F_GET_FIN_ND(rnk_, nd_, kod, idf, add_months(trunc(dat_),-3)) as zn1,
+          FIN_OBU.F_GET_FIN_ND(rnk_, nd_, kod, idf, dat_) as zn,
+          FIN_OBU.CALC_SCOR_BAL(kod, idf, add_months(trunc(dat_),-6), rnk_, nd_) as dat2 ,
+          FIN_OBU.CALC_SCOR_BAL(kod, idf, add_months(trunc(dat_),-3), rnk_, nd_) as dat1 ,
+          FIN_OBU.CALC_SCOR_BAL(kod, idf, dat_, rnk_, nd_) as dat, nd_, rnk_, ord, :dat_ as dat_
+          FROM FIN_QUESTION f, (select :rnk_ as rnk_, :nd_ as nd_ ,  to_date(:dat_,'dd/mm/yyyy') as dat_ from dual) d
+          WHERE idf IN (33 )
+          ORDER BY idf DESC, ord ASC
+        </sql>
+        <parameters>
+          <parameter type="QueryString" name="rnk_"  altname="rnk_"></parameter>
+          <parameter type="QueryString" name="nd_"   altname="nd_"></parameter>
+          <parameter type="QueryString" name="dat_" altname="dat_"></parameter>
+        </parameters>
+      </datasource>
+      <rowselection method="SingleRow" />
+      <fields>
+        <field name="KOD" key="false" datatype="String" sort="default">
+          <column show="true" caption="" align="left" />
+          <form show="true" rwmode="RW" required="true">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="NAME" key="false" datatype="String" sort="default">
+          <column show="true" caption="Назва показника" align="left" />
+          <form show="true" rwmode="RW">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="ZN2" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="Розрахункове значення Дата 1" align="right" width="100" />
+          <form show="true" rwmode="RW">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="ZN1" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="Розрахункове значення Дата 2" align="right" width="100" />
+          <form show="true" rwmode="RW">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="ZN" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="Розрахункове значення Дата 3" align="right" width="100" />
+          <form show="true" rwmode="RW">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="DAT2" key="false" datatype="Int64" sort="default">
+          <column show="true" caption="Бали Дата 1" align="right" width="60" />
+          <form show="true" rwmode="RW">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="DAT1" key="false" datatype="Int64" sort="default">
+          <column show="true" caption="Бали Дата 2" align="right" width="60"  />
+          <form show="true" rwmode="RW">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="DAT" key="false" datatype="Int64" sort="default">
+          <column show="true" caption="Бали Дата 3" align="right" width="60" />
+          <form show="true" rwmode="RW">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="ND_" key="false" datatype="Decimal" sort="default">
+          <column show="false" caption="" align="right" />
+          <form show="true" rwmode="RW">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="RNK_" key="false" datatype="Decimal" sort="default">
+          <column show="false" caption="" align="right" />
+          <form show="true" rwmode="RW">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="ORD" key="false" datatype="Decimal" sort="default">
+          <column show="false" caption="" align="right" />
+          <form show="true" rwmode="RW">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+      </fields>
+    </grid>
+  </grids>
+</xmlform>

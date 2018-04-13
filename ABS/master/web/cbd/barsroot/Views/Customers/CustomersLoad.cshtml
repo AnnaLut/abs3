@@ -1,0 +1,36 @@
+﻿@inherits System.Web.Mvc.WebViewPage<IEnumerable<Models.V_TOBO_CUST>>
+@{
+    Layout = null;
+    string styleSOS = "";
+    int take = ViewBag.RowNumber;
+}
+@foreach (var item in Model)
+{styleSOS = item.DATE_OFF != null ? "#FF0000" : "#4c5967";
+<tr data-id="@item.RNK" style="color: @styleSOS" onclick="showBtRereg(@(item.DATE_OFF == null ? "false" : "true"));" >
+  <td>
+      <a style="border:0;" onclick="addLoader($(body));" href="/barsroot/customerlist/CustAcc.aspx?type=0&rnk=@item.RNK">
+          <img border="0" onclick="/*addLoader($(body));*/" alt="" src="/Common/Images/default/16/reference_open.png" title="Показати рахунки контрагента" />
+      </a>
+  </td>
+  <td>
+      <a style="border:0;" onclick="viewSelCustomerHistory(@item.RNK);return false;" href="/barsroot/customerlist/CustHistory.aspx?mode=2&rnk=@item.RNK&type=0">
+          <img border="0" onclick="/*addLoader($(body));*/" alt="" src="/Common/Images/default/16/text_tree.png" title="Показати історію змін контрагента" />
+      </a>
+  </td>
+  <td class="link" onClick="viewSelCustomer(@item.RNK);">@item.RNK</td>
+  <td>@item.ND</td>
+  <td>@item.OKPO</td>
+  @switch (item.CUSTTYPE)
+  {
+      case 1:<td>Юридична особа-Банк</td>; break;
+      case 2:<td>Юридична особа</td>; break;
+      case 3:<td>Фізична особа</td>; break;
+      default:<td></td>; break;
+  }
+  <td>@item.NMK</td>
+  <td>@item.DATE_ON.ToShortDateString()</td>
+  <td>@(item.DATE_OFF == null ? "" : Convert.ToDateTime(item.DATE_OFF).ToShortDateString())</td>
+  <td>@item.BRANCH</td>
+</tr>}
+
+

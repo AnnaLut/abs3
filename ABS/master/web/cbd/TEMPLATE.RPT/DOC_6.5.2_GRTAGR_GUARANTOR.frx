@@ -1,0 +1,1182 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="05/26/2011 14:55:15" ReportInfo.Modified="10/01/2014 12:12:08" ReportInfo.CreatorVersion="2013.3.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+    private void Cell49_BeforePrint(object sender, EventArgs e)
+    {
+//      NewPage(); 
+      Engine.StartNewPage();
+    }
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <OracleDataConnection Name="KHRSN72" ConnectionString="rijcmlq9SEZoacNJntaKIKp6mVF12Jc6VA4pf/8RrGHV3rJ5fRI/+1i800gk2EU5LvmIVqP4R0Cw2jEV17btBGSD0tx9A==">
+      <TableDataSource Name="Table" Alias="Dog_info" DataType="System.Int32" Enabled="true" SelectCommand="select  wcs_utl.get_answ(:p_bid_id, 'GRT_2_3', :p_ws_id , :p_ws_number ) as   num_dog,          wcs_utl.get_answ(:p_bid_id, 'GRT_2_4', :p_ws_id , :p_ws_number ) as   data_dog,          substr(f_dat_lit(  wcs_utl.get_answ(:p_bid_id, 'GRT_2_4', :p_ws_id , :p_ws_number )),1,25) as   data_dog_pr,          wcs_utl.get_answ(:p_bid_id, 'GRT_2_5', :p_ws_id , :p_ws_number ) as   name_dog,          wcs_utl.get_answ(:p_bid_id, 'GRT_2_6', :p_ws_id , :p_ws_number ) as   state_dog  from dual ">
+        <Column Name="NUM_DOG" DataType="System.String"/>
+        <Column Name="DATA_DOG" DataType="System.String"/>
+        <Column Name="NAME_DOG" DataType="System.String"/>
+        <Column Name="STATE_DOG" DataType="System.String"/>
+        <Column Name="DATA_DOG_PR" DataType="System.String"/>
+        <CommandParameter Name="p_bid_id" DataType="126" Expression="[p_bid_id]"/>
+        <CommandParameter Name="p_ws_id" DataType="126" Expression="[p_ws_id]"/>
+        <CommandParameter Name="p_ws_number" DataType="126" Expression="[p_ws_number]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table2" Alias="klient_info" DataType="System.Int32" Enabled="true" SelectCommand="select decode(wcs_utl.get_answ(b.bid_id, 'GRT_0'),&#13;&#10;              0,&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_1') || ' ' ||&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_2') || ' ' ||&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_3'),&#13;&#10;              b.fio) as fio,&#13;&#10;             wcs_utl.get_answ(b.bid_id, 'CL_123_O') as fio_o,&#13;&#10;       decode(wcs_utl.get_answ(b.bid_id, 'GRT_0'),&#13;&#10;              0,&#13;&#10;              substr(wcs_utl.get_answ(b.bid_id, 'CL_2'),&#13;&#10;                     1,&#13;&#10;                     1) || '. ' ||&#13;&#10;              substr(wcs_utl.get_answ(b.bid_id, 'CL_3'),&#13;&#10;                     1,&#13;&#10;                     1) || '.  ' ||&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_1'),&#13;&#10;              substr(b.i, 1, 1) || '. ' || substr(b.o, 1, 1) || '. ' || b.f) as fio_short,&#13;&#10;       decode(wcs_utl.get_answ(b.bid_id, 'GRT_0'),&#13;&#10;              0,&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CODE_002'),&#13;&#10;              b.inn) idcode,&#13;&#10;       'паспорт : '||decode(wcs_utl.get_answ(b.bid_id, 'GRT_0'),&#13;&#10;              0,&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_7') || ' №' ||&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_8') ||&#13;&#10;              ' виданий ' ||&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_9') || ' №' ||&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_11'),&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_7') || ' №' ||&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_8') || ' виданий ' ||&#13;&#10;              rtrim(wcs_utl.get_answ(b.bid_id, 'CL_9')) || ' ' ||&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_11')||' р.') pasport,&#13;&#10;case when wcs_utl.get_answ(b.bid_id, 'CL_18') in (26, 27) then&#13;&#10;                 wcs_utl.get_answ_refer_text(b.bid_id, 'CL_18') || ', ' ||&#13;&#10;                 wcs_utl.get_answ(b.bid_id, 'CL_21')&#13;&#10;                else&#13;&#10;                 'обл. ' || wcs_utl.get_answ_refer_text(b.bid_id, 'CL_18') || ', ' ||&#13;&#10;                 decode(wcs_utl.has_answ(b.bid_id, 'CL_19'),&#13;&#10;                        1,&#13;&#10;                        'р. ' || wcs_utl.get_answ(b.bid_id, 'CL_19') || ', ',&#13;&#10;                        null) || decode(wcs_utl.has_answ(b.bid_id, 'CL_20'),&#13;&#10;                                        1,&#13;&#10;                                        wcs_utl.get_answ(b.bid_id, 'CL_20') || ', ',&#13;&#10;                                        null) || wcs_utl.get_answ(b.bid_id, 'CL_21')&#13;&#10;              end || decode(wcs_utl.has_answ(b.bid_id, 'CL_23'),&#13;&#10;                     1,&#13;&#10;                     ', тел. ' || wcs_utl.get_answ(b.bid_id, 'CL_23'),&#13;&#10;                     null) as adr_reg,&#13;&#10;       decode(wcs_utl.get_answ(b.bid_id, 'CL_0_188'),&#13;&#10;              0,&#13;&#10;              case&#13;&#10;                when wcs_utl.get_answ(b.bid_id, 'CL_13') in (26, 27) then&#13;&#10;                 wcs_utl.get_answ_refer_text(b.bid_id, 'CL_13') || ', ' ||&#13;&#10;                 wcs_utl.get_answ(b.bid_id, 'CL_16')&#13;&#10;                else&#13;&#10;                 'обл. ' || wcs_utl.get_answ_refer_text(b.bid_id, 'CL_13') || ', ' ||&#13;&#10;                 decode(wcs_utl.has_answ(b.bid_id, 'CL_14'),&#13;&#10;                        1,&#13;&#10;                        'р. ' || wcs_utl.get_answ(b.bid_id, 'CL_14') || ', ',&#13;&#10;                        null) || decode(wcs_utl.has_answ(b.bid_id, 'CL_15'),&#13;&#10;                                        1,&#13;&#10;                                        wcs_utl.get_answ(b.bid_id, 'CL_15') || ', ',&#13;&#10;                                        null) || wcs_utl.get_answ(b.bid_id, 'CL_16')&#13;&#10;              end,&#13;&#10;              case&#13;&#10;                when wcs_utl.get_answ(b.bid_id, 'CL_18') in (26, 27) then&#13;&#10;                 wcs_utl.get_answ_refer_text(b.bid_id, 'CL_18') || ', ' ||&#13;&#10;                 wcs_utl.get_answ(b.bid_id, 'CL_21')&#13;&#10;                else&#13;&#10;                 'обл. ' || wcs_utl.get_answ_refer_text(b.bid_id, 'CL_18') || ', ' ||&#13;&#10;                 decode(wcs_utl.has_answ(b.bid_id, 'CL_19'),&#13;&#10;                        1,&#13;&#10;                        'р. ' || wcs_utl.get_answ(b.bid_id, 'CL_19') || ', ',&#13;&#10;                        null) || decode(wcs_utl.has_answ(b.bid_id, 'CL_20'),&#13;&#10;                                        1,&#13;&#10;                                        wcs_utl.get_answ(b.bid_id, 'CL_20') || ', ',&#13;&#10;                                        null) || wcs_utl.get_answ(b.bid_id, 'CL_21')&#13;&#10;              end) || decode(wcs_utl.has_answ(b.bid_id, 'CL_22'),&#13;&#10;                             1,&#13;&#10;                             ', тел. ' || wcs_utl.get_answ(b.bid_id, 'CL_22'),&#13;&#10;                             null) as adr_live                                   &#13;&#10;  from v_wcs_bids b where b.bid_id = :p_bid_id">
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="FIO_SHORT" DataType="System.String"/>
+        <Column Name="IDCODE" DataType="System.String"/>
+        <Column Name="PASPORT" DataType="System.String"/>
+        <Column Name="FIO_O" DataType="System.String"/>
+        <Column Name="ADR_REG" DataType="System.String"/>
+        <Column Name="ADR_LIVE" DataType="System.String"/>
+        <CommandParameter Name="p_bid_id" DataType="126" Expression="[p_bid_id]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table4" Alias="DataSubProdukt" DataType="System.Int32" Enabled="true" SelectCommand="  select b.*,&#13;&#10;       wcs_utl.get_answ_formated(b.bid_id, 'CL_13') || ' ' ||&#13;&#10;       wcs_utl.get_answ_formated(b.bid_id, 'CL_14') || ' ' ||&#13;&#10;       wcs_utl.get_answ_formated(b.bid_id, 'CL_15') || ' ' ||&#13;&#10;       wcs_utl.get_answ_formated(b.bid_id, 'CL_16') as adr,&#13;&#10;       wcs_utl.get_answ_formated(b.bid_id, 'REPAYMENT_METHOD') as REPAYMENT_METHOD_P,&#13;&#10;       wcs_utl.get_answ_formated(b.bid_id, 'CREDIT_CURRENCY') as CREDIT_CURRENCY_P,&#13;&#10;      to_char(b.summ,'999,999,999.99') as summ_str,&#13;&#10;       f_sumpr(b.summ * 100, t.kv, T.GENDER) as ssum_pr,&#13;&#10;       B.OWN_FUNDS + b.summ as all_sum_t,&#13;&#10;       f_sumpr((B.OWN_FUNDS + b.summ) * 100, t.kv, T.GENDER) as ALL_ssum_pr,&#13;&#10;       f_sumpr(B.OWN_FUNDS * 100, t.kv, T.GENDER) as OWN_FUNDS_pr,&#13;&#10;       d.sdate,&#13;&#10;       substr(f_dat_lit(d.sdate), 1, 25) as dat_dog_pr,&#13;&#10;       d.wdate,&#13;&#10;       substr(f_dat_lit(d.wdate), 1, 25) dat_dog_ret_pr,&#13;&#10;       substr(f_sumpr(interest_rate, '', 'M'), 1, 100) interest_rate_pr,&#13;&#10;       to_char(interest_rate,'999.99') as interest_rate_str,&#13;&#10;       substr(f_sumpr(term, '', 'M'), 1, 100) term_pr,&#13;&#10;       substr(f_sumpr(SINGLE_FEE, '', 'M'), 1, 100) SINGLE_FEE_PR,&#13;&#10;       substr(f_sumpr(MONTHLY_FEE, '', 'M'), 1, 100) MONTHLY_FEE_PR,&#13;&#10;       wcs_utl.get_creditdata(b.bid_id, 'DEAL_NUMBER') as deal_number,&#13;&#10;       wcs_utl.get_answ_bool(b.bid_id, 'CL_34_1') as is_mar_for_scor&#13;&#10;  from v_wcs_bids b, tabval t, cc_deal d&#13;&#10; where b.bid_id = :p_bid_id&#13;&#10;   and b.bid_id = d.nd(+)&#13;&#10;   and B.CREDIT_CURRENCY = T.lcv">
+        <Column Name="BID_ID" DataType="System.Decimal"/>
+        <Column Name="SUBPRODUCT_ID" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_NAME" DataType="System.String"/>
+        <Column Name="CRT_DATE" DataType="System.DateTime"/>
+        <Column Name="F" DataType="System.String"/>
+        <Column Name="I" DataType="System.String"/>
+        <Column Name="O" DataType="System.String"/>
+        <Column Name="BDATE" DataType="System.DateTime"/>
+        <Column Name="INN" DataType="System.String"/>
+        <Column Name="SUMM" DataType="System.Decimal"/>
+        <Column Name="OWN_FUNDS" DataType="System.Decimal"/>
+        <Column Name="TERM" DataType="System.String"/>
+        <Column Name="CREDIT_CURRENCY" DataType="System.String"/>
+        <Column Name="SINGLE_FEE" DataType="System.Decimal"/>
+        <Column Name="MONTHLY_FEE" DataType="System.Decimal"/>
+        <Column Name="INTEREST_RATE" DataType="System.Decimal"/>
+        <Column Name="REPAYMENT_METHOD" DataType="System.String"/>
+        <Column Name="REPAYMENT_DAY" DataType="System.Decimal"/>
+        <Column Name="GARANTEES" DataType="System.String"/>
+        <Column Name="MGR_ID" DataType="System.Decimal"/>
+        <Column Name="MGR_FIO" DataType="System.String"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="BRANCH_NAME" DataType="System.String"/>
+        <Column Name="STATES" DataType="System.String"/>
+        <Column Name="ADR" DataType="System.String"/>
+        <Column Name="REPAYMENT_METHOD_P" DataType="System.String"/>
+        <Column Name="CREDIT_CURRENCY_P" DataType="System.String"/>
+        <Column Name="SSUM_PR" DataType="System.String"/>
+        <Column Name="ALL_SUM_T" DataType="System.Decimal"/>
+        <Column Name="ALL_SSUM_PR" DataType="System.String"/>
+        <Column Name="OWN_FUNDS_PR" DataType="System.String"/>
+        <Column Name="DAT_DOG_PR" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_DESC" DataType="System.String"/>
+        <Column Name="REPAYMENT_METHOD_TEXT" DataType="System.String"/>
+        <Column Name="SDATE" DataType="System.DateTime"/>
+        <Column Name="WDATE" DataType="System.DateTime"/>
+        <Column Name="DAT_DOG_RET_PR" DataType="System.String"/>
+        <Column Name="INTEREST_RATE_PR" DataType="System.String"/>
+        <Column Name="TERM_PR" DataType="System.String"/>
+        <Column Name="SINGLE_FEE_PR" DataType="System.String"/>
+        <Column Name="MONTHLY_FEE_PR" DataType="System.String"/>
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="BRANCH_HIERARCHY" DataType="System.String"/>
+        <Column Name="DEAL_NUMBER" DataType="System.String"/>
+        <Column Name="RNK" DataType="System.Decimal"/>
+        <Column Name="INIT_PAYMENT_MTD" DataType="System.String"/>
+        <Column Name="SUMM_STR" DataType="System.String"/>
+        <Column Name="INTEREST_RATE_STR" DataType="System.String"/>
+        <Column Name="IS_MAR_FOR_SCOR" DataType="System.Decimal"/>
+        <CommandParameter Name="p_bid_id" DataType="126" Expression="[p_bid_id]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table12" Alias="Branch_Info" DataType="System.Int32" Enabled="true" SelectCommand="select *  &#13;&#10;  from (select &#13;&#10;               poa.ord as br_boss_ord,&#13;&#10;               poa.fio as br_boss, &#13;&#10;               poa.fio_r as br_boss_r, &#13;&#10;               poa.post_r as post_r, &#13;&#10;               poa.branch_adr as adr_branch,&#13;&#10;               poa.poa_doc as br_boss_doc_r,&#13;&#10;               poa.poa_notary_num as br_boss_doc,&#13;&#10;               substr(f_dat_lit(POA.POA_CERT), 1, 25) as br_bos_doc_cert_d, &#13;&#10;               poa_notary as br_boss_doc_n,&#13;&#10;               POA.DISTRICT_NAME as br_boss_doc_name_not,&#13;&#10;               poa_notary_num as br_boss_doc_n_r,&#13;&#10;               poa_date br_boss_doc_date,&#13;&#10;               substr(f_dat_lit(poa_date), 1, 25) as br_boss_doc_d,&#13;&#10;               branch_loc as br_location,&#13;&#10;               branch_name as name_branch,&#13;&#10;               f_ourmfo_g as mfo,&#13;&#10;               (select val from params$base where par = 'OKPO') as okpo,&#13;&#10;               f_doc_attr('BANK_NAME', :p_bid_id) as bank_name&#13;&#10;          from wcs_bids b, &#13;&#10;               wcs_power_of_attorneys poa&#13;&#10;         where b.id = :p_bid_id&#13;&#10;           and b.branch = poa.branch&#13;&#10;           and poa.active = 1&#13;&#10;      order by poa.ord) &#13;&#10; where rownum = 1">
+        <Column Name="BR_BOSS_R" DataType="System.String"/>
+        <Column Name="BR_BOSS" DataType="System.String"/>
+        <Column Name="ADR_BRANCH" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC_R" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC_N" DataType="System.String"/>
+        <Column Name="BR_LOCATION" DataType="System.String"/>
+        <Column Name="NAME_BRANCH" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC_N_R" DataType="System.String"/>
+        <Column Name="MFO" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC_D" DataType="System.String"/>
+        <Column Name="POST_R" DataType="System.String"/>
+        <Column Name="BR_BOSS_ORD" DataType="System.Decimal"/>
+        <Column Name="BANK_NAME" DataType="System.String"/>
+        <Column Name="BR_BOS_DOC_CERT_D" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC_NAME_NOT" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC_DATE" DataType="System.DateTime"/>
+        <CommandParameter Name="p_bid_id" DataType="126" Expression="[p_bid_id]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table20" Alias="Marital_status" DataType="System.Int32" Enabled="true" SelectCommand=" select decode(wcs_utl.get_answ(:p_bid_id, 'CL_34', :p_ws_id , :p_ws_number),&#13;&#10;              0,1,&#13;&#10;              4,1,&#13;&#10;              5,2,&#13;&#10;              0) as is_married,&#13;&#10;       wcs_utl.get_answ_bool(:p_bid_id, 'CL_35', :p_ws_id , :p_ws_number) as is_Marital_kontr,    &#13;&#10;       wcs_utl.get_answ(:p_bid_id, 'CL_1', :p_ws_id , :p_ws_number) || ' ' ||&#13;&#10;       wcs_utl.get_answ(:p_bid_id, 'CL_2', :p_ws_id , :p_ws_number) || ' ' ||&#13;&#10;       wcs_utl.get_answ(:p_bid_id, 'CL_3', :p_ws_id , :p_ws_number) as cl_fio,&#13;&#10;       wcs_utl.get_answ(:p_bid_id, 'CL_123_O', :p_ws_id , :p_ws_number) as cl_fio_o,&#13;&#10;       wcs_utl.get_answ(:p_bid_id, 'CL_0_176', :p_ws_id , :p_ws_number) as spouse_fio,&#13;&#10;       'серії ' ||&#13;&#10;       wcs_utl.get_answ(:p_bid_id, 'CL_0_179', :p_ws_id , :p_ws_number) ||&#13;&#10;       ' № ' ||&#13;&#10;       wcs_utl.get_answ(:p_bid_id, 'CL_0_179_1', :p_ws_id , :p_ws_number) ||&#13;&#10;       ', виданий ' ||&#13;&#10;       trim(wcs_utl.get_answ(:p_bid_id, 'CL_0_180', :p_ws_id , :p_ws_number)) || ' ' ||&#13;&#10;       trim(f_dat_lit(wcs_utl.get_answ_date(:p_bid_id,&#13;&#10;                                            'CL_0_181',&#13;&#10;                                            :p_ws_id , :p_ws_number))) as spouse_passp,&#13;&#10;       wcs_utl.get_answ(:p_bid_id, 'CL_0_178', :p_ws_id , :p_ws_number) as spouse_inn&#13;&#10;  from dual">
+        <Column Name="IS_MARRIED" DataType="System.Decimal"/>
+        <Column Name="CL_FIO" DataType="System.String"/>
+        <Column Name="CL_FIO_O" DataType="System.String"/>
+        <Column Name="SPOUSE_FIO" DataType="System.String"/>
+        <Column Name="SPOUSE_PASSP" DataType="System.String"/>
+        <Column Name="SPOUSE_INN" DataType="System.String"/>
+        <Column Name="IS_MARITAL_KONTR" DataType="System.Decimal"/>
+        <CommandParameter Name="p_bid_id" DataType="126" Expression="[p_bid_id]"/>
+        <CommandParameter Name="p_ws_id" DataType="126" Expression="[p_ws_id]"/>
+        <CommandParameter Name="p_ws_number" DataType="126" Expression="[p_ws_number]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table21" Alias="GUARANTOR_info" DataType="System.Int32" Enabled="true" SelectCommand=" SELECT substr(wcs_utl.get_answ(:p_bid_id, 'CL_2', :p_ws_id , :p_ws_number ),1,1)||'. '||substr(wcs_utl.get_answ(:p_bid_id, 'CL_3', :p_ws_id , :p_ws_number ),1,1)||'.  '||wcs_utl.get_answ(:p_bid_id, 'CL_1', :p_ws_id , :p_ws_number )  as    FIO_short,&#13;&#10;       wcs_utl.get_answ(:p_bid_id, 'CL_1', :p_ws_id , :p_ws_number )||' '|| wcs_utl.get_answ(:p_bid_id, 'CL_2', :p_ws_id , :p_ws_number )||' '||wcs_utl.get_answ(:p_bid_id, 'CL_3', :p_ws_id , :p_ws_number )  as    FIO,&#13;&#10;       wcs_utl.get_answ(:p_bid_id, 'CODE_002', :p_ws_id , :p_ws_number ) IdCode,&#13;&#10;       'паспорт : '||wcs_utl.get_answ(:p_bid_id, 'CL_7', :p_ws_id , :p_ws_number )||' № '||wcs_utl.get_answ(:p_bid_id, 'CL_8', :p_ws_id , :p_ws_number )||' виданий  '||trim(wcs_utl.get_answ(:p_bid_id, 'CL_9', :p_ws_id , :p_ws_number ))||' '||wcs_utl.get_answ(:p_bid_id, 'CL_10', :p_ws_id , :p_ws_number )||' '||wcs_utl.get_answ(:p_bid_id, 'CL_11', :p_ws_id , :p_ws_number )||'р.' Pasport,&#13;&#10;       case when wcs_utl.get_answ(:p_bid_id, 'CL_18', :p_ws_id , :p_ws_number ) in (26, 27) then&#13;&#10;                 wcs_utl.get_answ_refer_text(:p_bid_id, 'CL_18', :p_ws_id , :p_ws_number ) || ', ' ||&#13;&#10;                 wcs_utl.get_answ(:p_bid_id, 'CL_21', :p_ws_id , :p_ws_number )&#13;&#10;                else&#13;&#10;                 'обл. ' || wcs_utl.get_answ_refer_text(:p_bid_id, 'CL_18', :p_ws_id , :p_ws_number ) || ', ' ||&#13;&#10;                 decode(wcs_utl.has_answ(:p_bid_id, 'CL_19', :p_ws_id , :p_ws_number ),&#13;&#10;                        1,&#13;&#10;                        'р. ' || wcs_utl.get_answ(:p_bid_id, 'CL_19', :p_ws_id , :p_ws_number ) || ', ',&#13;&#10;                        null) || decode(wcs_utl.has_answ(:p_bid_id, 'CL_20', :p_ws_id , :p_ws_number ),&#13;&#10;                                        1,&#13;&#10;                                        wcs_utl.get_answ(:p_bid_id, 'CL_20', :p_ws_id , :p_ws_number ) || ', ',&#13;&#10;                                        null) || wcs_utl.get_answ(:p_bid_id, 'CL_21', :p_ws_id , :p_ws_number )&#13;&#10;              end || decode(wcs_utl.has_answ(:p_bid_id, 'CL_23', :p_ws_id , :p_ws_number ),&#13;&#10;                     1,&#13;&#10;                     ', тел. ' || wcs_utl.get_answ(:p_bid_id, 'CL_23', :p_ws_id , :p_ws_number ),&#13;&#10;                     null) as adr_reg, &#13;&#10;       decode(wcs_utl.get_answ(:p_bid_id, 'CL_0_188', :p_ws_id , :p_ws_number),&#13;&#10;              0,&#13;&#10;              case&#13;&#10;                when wcs_utl.get_answ(:p_bid_id, 'CL_13', :p_ws_id , :p_ws_number) in (26, 27) then&#13;&#10;                 wcs_utl.get_answ_refer_text(:p_bid_id, 'CL_13', :p_ws_id , :p_ws_number) || ', ' ||&#13;&#10;                 wcs_utl.get_answ(:p_bid_id, 'CL_16', :p_ws_id , :p_ws_number)&#13;&#10;                else&#13;&#10;                 'обл. ' || wcs_utl.get_answ_refer_text(:p_bid_id, 'CL_13', :p_ws_id , :p_ws_number) || ', ' ||&#13;&#10;                 decode(wcs_utl.has_answ(:p_bid_id, 'CL_14', :p_ws_id , :p_ws_number),&#13;&#10;                        1,&#13;&#10;                        'р. ' || wcs_utl.get_answ(:p_bid_id, 'CL_14', :p_ws_id , :p_ws_number) || ', ',&#13;&#10;                        null) || decode(wcs_utl.has_answ(:p_bid_id, 'CL_15', :p_ws_id , :p_ws_number),&#13;&#10;                                        1,&#13;&#10;                                        wcs_utl.get_answ(:p_bid_id, 'CL_15', :p_ws_id , :p_ws_number) || ', ',&#13;&#10;                                        null) || wcs_utl.get_answ(:p_bid_id, 'CL_16', :p_ws_id , :p_ws_number)&#13;&#10;              end,&#13;&#10;              case&#13;&#10;                when wcs_utl.get_answ(:p_bid_id, 'CL_18', :p_ws_id , :p_ws_number) in (26, 27) then&#13;&#10;                 wcs_utl.get_answ_refer_text(:p_bid_id, 'CL_18', :p_ws_id , :p_ws_number) || ', ' ||&#13;&#10;                 wcs_utl.get_answ(:p_bid_id, 'CL_21', :p_ws_id , :p_ws_number)&#13;&#10;                else&#13;&#10;                 'обл. ' || wcs_utl.get_answ_refer_text(:p_bid_id, 'CL_18', :p_ws_id , :p_ws_number) || ', ' ||&#13;&#10;                 decode(wcs_utl.has_answ(:p_bid_id, 'CL_19', :p_ws_id , :p_ws_number),&#13;&#10;                        1,&#13;&#10;                        'р. ' || wcs_utl.get_answ(:p_bid_id, 'CL_19', :p_ws_id , :p_ws_number) || ', ',&#13;&#10;                        null) || decode(wcs_utl.has_answ(:p_bid_id, 'CL_20', :p_ws_id , :p_ws_number),&#13;&#10;                                        1,&#13;&#10;                                        wcs_utl.get_answ(:p_bid_id, 'CL_20', :p_ws_id , :p_ws_number) || ', ',&#13;&#10;                                        null) || wcs_utl.get_answ(:p_bid_id, 'CL_21', :p_ws_id , :p_ws_number)&#13;&#10;              end) || decode(wcs_utl.has_answ(:p_bid_id, 'CL_22', :p_ws_id , :p_ws_number),&#13;&#10;                             1,&#13;&#10;                             ', тел. ' || wcs_utl.get_answ(:p_bid_id, 'CL_22', :p_ws_id , :p_ws_number),&#13;&#10;                             null) as adr_live                     &#13;&#10; FROM DUAL">
+        <Column Name="FIO_SHORT" DataType="System.String"/>
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="IDCODE" DataType="System.String"/>
+        <Column Name="PASPORT" DataType="System.String"/>
+        <Column Name="ADR_REG" DataType="System.String"/>
+        <Column Name="ADR_LIVE" DataType="System.String"/>
+        <CommandParameter Name="p_bid_id" DataType="126" Expression="[p_bid_id]"/>
+        <CommandParameter Name="p_ws_id" DataType="126" Expression="[p_ws_id]"/>
+        <CommandParameter Name="p_ws_number" DataType="126" Expression="[p_ws_number]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table23" Alias="GARANTEES" DataType="System.Int32" Enabled="true" SelectCommand="select G.BID_ID, listagg(G.list_gar, ', ') WITHIN GROUP(ORDER BY G.BID_ID) as list_gar,count(*) cunt_gar&#13;&#10;from (select G.BID_ID,'&lt;b&gt;'||decode(G.GARANTEE_ID,'GUARANTOR','договору Поруки','VEHICLE','договору Заставного майна','Іпотечного договору')||'&lt;/b&gt; №&lt;b&gt;'||G.AGR_NUMBER||'&lt;/b&gt; від &lt;b&gt;'||substr(f_dat_lit(G.AGR_DATE), 1, 25)||'&lt;/b&gt;' as list_gar&#13;&#10;      from BARS.V_WCS_BID_GARANTEES g where G.BID_ID = :p_bid_id and not(g.WS_ID = :p_ws_id and G.GARANTEE_NUM = :p_ws_number)&#13;&#10;     ) g&#13;&#10;group by G.BID_ID">
+        <Column Name="BID_ID" DataType="System.Decimal"/>
+        <Column Name="LIST_GAR" DataType="System.String"/>
+        <Column Name="CUNT_GAR" DataType="System.Decimal"/>
+        <CommandParameter Name="p_bid_id" DataType="126" Expression="[p_bid_id]"/>
+        <CommandParameter Name="p_ws_id" DataType="126" Expression="[p_ws_id]"/>
+        <CommandParameter Name="p_ws_number" DataType="126" Expression="[p_ws_number]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table25" Alias="acc" DataType="System.Int32" Enabled="true" SelectCommand=" select rownum, t.* from (select vb.branch_name, a.kf, a.nls, v.txt,a.kv &#13;&#10; from v_wcs_bids vb,customer c , accounts a , kl_r030 v&#13;&#10; where C.OKPO=wcs_utl.get_answ(:p_bid_id, 'CODE_002', :p_ws_id , :p_ws_number ) and&#13;&#10;  a.rnk=C.RNK  and V.R030=a.kv and vb.bid_id = :p_bid_id&#13;&#10;   order by a.nls) t">
+        <Column Name="ROWNUM" DataType="System.Decimal"/>
+        <Column Name="KF" DataType="System.String"/>
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="KV" DataType="System.Int16"/>
+        <Column Name="BRANCH_NAME" DataType="System.String"/>
+        <Column Name="TXT" DataType="System.String"/>
+        <CommandParameter Name="p_bid_id" DataType="126" Expression="[p_bid_id]"/>
+        <CommandParameter Name="p_ws_id" DataType="126" Expression="[p_ws_id]"/>
+        <CommandParameter Name="p_ws_number" DataType="126" Expression="[p_ws_number]"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_bid_id" DataType="System.Int32" Expression="3550821"/>
+    <Parameter Name="p_ws_id" DataType="System.String" Expression="&quot;GRT_GUARANTOR&quot;"/>
+    <Parameter Name="p_ws_number" DataType="System.Int32" Expression="0"/>
+  </Dictionary>
+  <ReportPage Name="Page1" RawPaperSize="9" BottomMargin="15" FirstPageSource="15" OtherPagesSource="15" Guides="9.45,708.75,359.1,706.86,247.59,253.26,224.91,463.05,708.73,316.57,406.34,533.91,184.27,99.21999,137.02">
+    <DataBand Name="Data1" Width="718.2" Height="9109.8" CanGrow="true" CanShrink="true" CanBreak="true" Guides="0,9081.45,18.9,37.8,56.7,75.6,94.5,189,255.15,66.15,321.3,368.55,47.25,387.45,406.35,453.6,510.3,567,633.15,652.05,689.85,746.55,803.25,822.15,859.95,897.75,935.55,973.35,1011.15,1048.95,1067.85,1124.55,1162.35,1200.15,1219.05,1237.95,1332.45,1351.35,1398.6,1417.5,1436.4,1474.2,1493.1,1530.9,1549.8,1587.6,1672.65,85.05,1786.05,113.4,1804.95,1823.85,1871.1,1946.7,2012.85,2050.65,2097.9,2135.7,2173.5,2211.3,2249.1,2315.25,2353.05,2400.3,2447.55,2485.35,2523.15,2560.95,2674.35,2749.95,2787.75,2806.65,2844.45,2929.5,3042.9,3090.15,3203.55,3420.9,217.35,3439.8,3496.5,3553.2,3591,3628.8,3647.7,3685.5,3751.65,3780,28.35,3798.9,3836.7,3874.5,3912.3,3950.1,3969,4006.8,4063.5,4129.65,4148.55,4167.45,4186.35,4233.6,4252.5,4290.3,4337.55,4432.05,4517.1,4536,4592.7,4677.75,4696.65,4715.55,4753.35,4800.6,4838.4,4857.3,4895.1,4932.9,4970.7,4989.6,5027.4,5065.2,5084.1,5103,5140.8,5178.6,5197.5,5263.65,5301.45,5320.35,5367.6,5433.75,5471.55,5518.8,5566.05,5613.3,5679.45,5736.15,5773.95,5840.1,5859,5877.9,5896.8,5944.05,5981.85,6019.65,6057.45,6095.25,6142.5,6180.3,6199.2,6246.45,6265.35,6284.25,6350.4,6435.45,6577.19,141.75,6662.24,6756.74,6822.89,6860.69,6898.49,7059.14,160.65,7125.29,7219.79,7361.54,7380.44,7418.24,7465.49,7484.39,7503.29,7522.19,7578.89,7626.14,7645.04,7692.29,7730.09,7767.89,7786.79,7824.59,7871.84,7909.64,7975.79,8041.94,8060.84,8098.64,8136.44,8155.34,8174.24,8221.49,8287.641,8325.439,8344.341,8382.14,8429.39,8448.29,8467.19,8504.99,8542.79,8561.69,8599.49,8637.29,8656.19,8703.44,8769.591,8788.49,8807.391,8845.189,8864.091,8901.89,8968.04,8986.94,9024.75" KeepTogether="true">
+      <TableObject Name="Table10" Left="9.45" Width="699.3" Height="9081.45">
+        <TableColumn Name="Column1" Width="349.65"/>
+        <TableColumn Name="Column2" Width="349.65"/>
+        <TableRow Name="Row1">
+          <TableCell Name="Cell1"/>
+          <TableCell Name="Cell2"/>
+        </TableRow>
+        <TableRow Name="Row2" AutoSize="true">
+          <TableCell Name="Cell6" Fill.Color="Gainsboro" Text="Договір поруки №[Dog_info.NUM_DOG]" HorzAlign="Center" Font="Times New Roman, 12pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell7" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row3">
+          <TableCell Name="Cell11" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell12" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row457" AutoSize="true">
+          <TableCell Name="Cell928" Text="[Branch_Info.BR_LOCATION]" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell929" Text="[Dog_info.DATA_DOG_PR]" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row458">
+          <TableCell Name="Cell930"/>
+          <TableCell Name="Cell931"/>
+        </TableRow>
+        <TableRow Name="Row4" Height="94.5" AutoSize="true">
+          <TableCell Name="Cell16" Text="	&lt;b&gt;Публічне  акціонерне товариство «Державний ощадний банк України&quot;&lt;/b&gt; (надалі - &lt;b&gt;Кредитор або Банк&lt;/b&gt;), в особі &lt;b&gt;[Branch_Info.POST_R]  [Branch_Info.BR_BOSS_R]&lt;/b&gt;, , який (яка) діє на підставі довіреності від &lt;b&gt;[Branch_Info.BR_BOSS_DOC_D]&lt;/b&gt;, посвідченої &lt;b&gt;[Branch_Info.BR_BOS_DOC_CERT_D]&lt;/b&gt;  &lt;b&gt;[Branch_Info.BR_BOSS_DOC_N]&lt;/b&gt; приватним нотаріусом &lt;b&gt;[Branch_Info.BR_BOSS_DOC_NAME_NOT]&lt;/b&gt;нотаріального округу, за реєстровим №&lt;b&gt;[Branch_Info.BR_BOSS_DOC_N_R]&lt;/b&gt;, з однієї сторони, &#13;&#10;та" HorzAlign="Justify" Font="Times New Roman, 10pt" FirstTabOffset="37.8" HtmlTags="true" ParagraphOffset="37.8" ColSpan="2"/>
+          <TableCell Name="Cell17" HorzAlign="Justify" Font="Times New Roman, 12pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row5" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell21" Text="&lt;b&gt;громадянин України &lt;/b&gt; - &lt;b&gt;[klient_info.FIO]&lt;/b&gt;, &lt;b&gt;[klient_info.PASPORT]&lt;/b&gt;, реєстраційний номер облікової картки платника податків згідно з даними Державного реєстру фізичних осіб - платників податків &lt;b&gt;[klient_info.IDCODE]&lt;/b&gt;,  (надалі – &lt;b&gt;Боржник&lt;/b&gt;), з другої сторони, &#13;&#10;та" HorzAlign="Justify" Font="Times New Roman, 10pt" FirstTabOffset="37.8" HtmlTags="true" ParagraphOffset="37.8" ColSpan="2"/>
+          <TableCell Name="Cell22" HorzAlign="Justify" Font="Times New Roman, 10pt" FirstTabOffset="37.8" HtmlTags="true" ParagraphOffset="37.8"/>
+        </TableRow>
+        <TableRow Name="Row6" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell23" Text="&lt;b&gt;громадянин України &lt;/b&gt; - &lt;b&gt;[GUARANTOR_info.FIO]&lt;/b&gt;, &lt;b&gt;[GUARANTOR_info.PASPORT]&lt;/b&gt;, реєстраційний номер облікової картки платника податків згідно з даними Державного реєстру фізичних осіб - платників податків &lt;b&gt;[GUARANTOR_info.IDCODE]&lt;/b&gt;, (надалі – &lt;b&gt;Поручитель&lt;/b&gt;) з третьої сторони, разом за текстом цього Договору поруки іменовані – &lt;b&gt;Сторони&lt;/b&gt;, а кожен окремо – &lt;b&gt;Сторона&lt;/b&gt;," HorzAlign="Justify" Font="Times New Roman, 10pt" FirstTabOffset="37.8" HtmlTags="true" ParagraphOffset="37.8" ColSpan="2"/>
+          <TableCell Name="Cell24" HorzAlign="Justify" Font="Times New Roman, 10pt" FirstTabOffset="37.8" HtmlTags="true" ParagraphOffset="37.8"/>
+        </TableRow>
+        <TableRow Name="Row7" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell25" Text="досягли згоди щодо врегулювання усіх майнових та організаційних аспектів на нижченаведених умовах та уклали цей Договір поруки майна (надалі - &lt;b&gt;Договір&lt;/b&gt;) про наступне:" HorzAlign="Justify" Font="Times New Roman, 10pt" FirstTabOffset="37.8" HtmlTags="true" ParagraphOffset="37.8" ColSpan="2"/>
+          <TableCell Name="Cell26" HorzAlign="Justify" Font="Times New Roman, 10pt" FirstTabOffset="37.8" HtmlTags="true" ParagraphOffset="37.8"/>
+        </TableRow>
+        <TableRow Name="Row8" AutoSize="true">
+          <TableCell Name="Cell27" Fill.Color="Gainsboro" Text="1. Терміни та скорочення" HorzAlign="Center" Font="Times New Roman, 12pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell28" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row9" AutoSize="true">
+          <TableCell Name="Cell29" Text="1.1. Терміни та скорочення використовуються в цьому Договорі у такому значенні:" Font="Times New Roman, 10pt, style=Bold, Underline" ColSpan="2"/>
+          <TableCell Name="Cell30" HorzAlign="Justify" Font="Times New Roman, 10pt" FirstTabOffset="37.8" HtmlTags="true" ParagraphOffset="37.8"/>
+        </TableRow>
+        <TableRow Name="Row12" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell35" Text="&lt;b&gt;1.1.1. &lt;i&gt;Договір&lt;/i&gt;&lt;/b&gt; - цей Договір поруки, укладений між Поручителем, Кредитором та Боржником, з усіма додатками та додатковими договорами до нього, у тому числі тими, які можуть бути укладені Сторонами в майбутньому." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell36" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row13" Height="56.7" AutoSize="true">
+          <TableCell Name="Cell37" Text="&lt;b&gt;1.1.2. &lt;i&gt;Кредитний договір&lt;/i&gt;&lt;/b&gt; - Кредитний договір №&lt;b&gt;[DataSubProdukt.DEAL_NUMBER]&lt;/b&gt; від &lt;b&gt;[DataSubProdukt.DAT_DOG_PR]&lt;/b&gt; який укладений між Кредитором та Боржником, з усіма додатками та додатковими договорами до нього, у тому числі тими, які можуть бути укладені в майбутньому." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell38" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row496" Height="56.7" AutoSize="true">
+          <TableCell Name="Cell1006" Text="&lt;b&gt;1.1.3.&lt;i&gt; Боржник&lt;/i&gt;&lt;/b&gt; - сторона Договору, яка має право отримати та/або отримала Кредит згідно з Кредитним договором, а також будь-яка третя особа (новий боржник), яка набула статусу боржника на підставах, визначених Законодавством та цим Договором." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1007"/>
+        </TableRow>
+        <TableRow Name="Row497" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell1008" Text="&lt;b&gt;1.1.4.&lt;i&gt; Вимога&lt;/i&gt;&lt;/b&gt; - письмовий документ (в тому числі письмове повідомлення з вимогою виконати Зобов’язання/будь-яку його частину, вимога про відкликання Кредиту (дострокового повернення Кредиту з ініціативи Кредитора), який направляється Кредитором Поручителю та містить вимогу про виконання Поручителем порушеного Зобов’язання, його зміст, розмір та валюту на дату складання Вимоги." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1009"/>
+        </TableRow>
+        <TableRow Name="Row14" AutoSize="true">
+          <TableCell Name="Cell39" Text="&lt;b&gt;1.1.5. &lt;i&gt;Законодавство&lt;/i&gt;&lt;/b&gt; - чинне законодавство України." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell40" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row19" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell49" Text="&lt;b&gt;1.1.6. &lt;i&gt;Зобов’язання&lt;/i&gt;&lt;/b&gt; - зобов’язання (в повному обсязі або окремій його частині), що випливають з умов Кредитного договору, в тому числі, але не виключно:" Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell50" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row20" Height="56.7" AutoSize="true">
+          <TableCell Name="Cell51" Text="- повернути Кредитору Кредитнаданий у розмірі &lt;b&gt;[DataSubProdukt.SUMM_STR]&lt;/b&gt; (&lt;b&gt;[DataSubProdukt.SSUM_PR]&lt;/b&gt;) гривень із терміном повернення не пізніше [DataSubProdukt.DAT_DOG_RET_PR], із погашенням згідно графіку, зазначеного у Кредитному договорі; " Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell52" HorzAlign="Justify" Font="Times New Roman, 10pt" FirstTabOffset="37.8" HtmlTags="true" ParagraphOffset="37.8"/>
+        </TableRow>
+        <TableRow Name="Row21" Height="56.7" AutoSize="true">
+          <TableCell Name="Cell53" Text="- сплатити Кредитору проценти за користування Кредитом в розмірі, що визначений на основі процентної ставки &lt;b&gt;[DataSubProdukt.INTEREST_RATE_STR]&lt;/b&gt; (&lt;b&gt;[DataSubProdukt.INTEREST_RATE_PR]&lt;/b&gt;) процентів річних у гривні;" Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell54" HorzAlign="Justify" Font="Times New Roman, 10pt" FirstTabOffset="37.8" HtmlTags="true" ParagraphOffset="37.8"/>
+        </TableRow>
+        <TableRow Name="Row22" AutoSize="true">
+          <TableCell Name="Cell55" Text="- сплатити Кредитору комісійні винагороди;" Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell56" HorzAlign="Justify" Font="Times New Roman, 10pt" FirstTabOffset="37.8" HtmlTags="true" ParagraphOffset="37.8"/>
+        </TableRow>
+        <TableRow Name="Row24" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell59" Text="- сплатити на користь Кредитора штрафні санкції у випадку неналежного виконання зобов'язань за Кредитним договором, а також інші платежі, що підлягають сплаті згідно умов Кредитного договору." Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell60" HorzAlign="Justify" Font="Times New Roman, 10pt" FirstTabOffset="37.8" HtmlTags="true" ParagraphOffset="37.8"/>
+        </TableRow>
+        <TableRow Name="Row27" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell65" Text="&lt;b&gt;1.1.7. &lt;i&gt;Кредит&lt;/i&gt;&lt;/b&gt;  - грошові кошти Банку, що підлягають видачі Боржнику та поверненню в порядку та на умовах, визначених Кредитним договором." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell66" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row28" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell67" Text="&lt;b&gt;1.1.8. &lt;i&gt;Кредитор&lt;/i&gt;&lt;/b&gt;  - Сторона Договору, яка зобов’язується надати та/або надала Кредит Боржнику згідно з умовами Кредитного договору" Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell68" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row29" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell69" Text="&lt;b&gt;1.1.9. &lt;i&gt;Поручитель&lt;/i&gt;&lt;/b&gt;  – Сторона Договору, яка бере на себе прямі зобов’язання відповідати перед Кредитором по зобов’язаннях Боржника за Кредитним договором, а також будь-якої третьої особи (нового боржника), яка набула статусу Боржника на підставах, визначених Законодавством та цим Договором." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell70" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row33" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell77" Text="&lt;b&gt;1.1.10. &lt;i&gt;Cтрок&lt;/i&gt;&lt;/b&gt; - визначені часові умови (календарні дати, проміжки часу або настання певної події) виконання Сторонами зобов’язань за цим Договором та/або Боржником та Кредитором за Кредитним договором." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell78" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row35" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell81" Text="&lt;b&gt;1.2.&lt;/b&gt; Інші терміни, скорочення та їх тлумачення, що використовуються по тексту цього Договору, визначаються Законодавством та/або Кредитним договором." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell82" HorzAlign="Justify" Font="Times New Roman, 10pt" FirstTabOffset="37.8" HtmlTags="true" ParagraphOffset="37.8"/>
+        </TableRow>
+        <TableRow Name="Row36" AutoSize="true">
+          <TableCell Name="Cell83" Fill.Color="Gainsboro" Text="2. Предмет Договору" HorzAlign="Center" Font="Times New Roman, 12pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell84" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row37" Height="56.7" AutoSize="true">
+          <TableCell Name="Cell85" Text="&lt;b&gt;2.1.&lt;/b&gt; Поручитель безумовно, безвідклично та безоплатно зобов`язується перед Кредитором відповідати солідарно з Боржником за виконання в повному обсязі Зобов`язання, у тому числі того, що виникне у майбутньому відповідно до умов Кредитного договору та додаткових договорів до нього." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell86" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row465" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell944" Text="&lt;b&gt;2.2.&lt;/b&gt; Поручитель відповідає перед Кредитором за виконання Зобов’язання у тому ж обсязі, що і Боржник, в порядку та строки, визначені Кредитним договором, у тому числі, але не виключно у разі:" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell945"/>
+        </TableRow>
+        <TableRow Name="Row39" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell89" Text="&lt;b&gt;2.2.1.&lt;/b&gt; часткового невиконання Боржником Зобов’язання, зокрема, щодо сплати процентів та/або повернення частини Кредиту в строки, визначені графіком погашення Кредиту;" Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell90" HorzAlign="Justify" Font="Times New Roman, 10pt" FirstTabOffset="37.8" HtmlTags="true" ParagraphOffset="37.8"/>
+        </TableRow>
+        <TableRow Name="Row40" AutoSize="true">
+          <TableCell Name="Cell91" Text="&lt;b&gt;2.2.2.&lt;/b&gt; невиконання Боржником зобов’язання щодо повернення Кредиту при закінченні строку користування ним;  " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell92" HorzAlign="Justify" Font="Times New Roman, 10pt" FirstTabOffset="37.8" HtmlTags="true" ParagraphOffset="37.8"/>
+        </TableRow>
+        <TableRow Name="Row41" AutoSize="true">
+          <TableCell Name="Cell93" Text="&lt;b&gt;2.2.3.&lt;/b&gt; виникнення підстав для дострокового повного/часткового погашення Зобов’язання за вимогою Кредитора.   " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell94" HorzAlign="Justify" Font="Times New Roman, 10pt" FirstTabOffset="37.8" HtmlTags="true" ParagraphOffset="37.8"/>
+        </TableRow>
+        <TableRow Name="Row81" Height="94.5" AutoSize="true">
+          <TableCell Name="Cell173" Text="&lt;b&gt;2.3.&lt;/b&gt; Порукою за цим Договором без отримання додаткової згоди Поручителя у повному обсязі також забезпечуються зміни умов Зобов’язання, які виникнуть (зміняться) відповідно до умов Кредитного договору (зокрема, внаслідок внесення змін до Кредитного договору), та не впливають на обсяг відповідальності Поручителя. Поручитель безумовно погоджується, що відповідно до умов цього пункту Договору змінами умов Зобов’язання, які не збільшують обсягу відповідальності Поручителя та забезпечуються порукою за цим Договором вважаються, у тому числі, але не виключно:" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell174" HorzAlign="Justify" Font="Times New Roman, 10pt" FirstTabOffset="37.8" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row82" AutoSize="true">
+          <TableCell Name="Cell175" Text="&lt;b&gt;2.3.1.&lt;/b&gt; будь-яке збільшення розміру Кредиту, наданого Боржнику;" Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell176" HorzAlign="Justify" Font="Times New Roman, 10pt" FirstTabOffset="37.8" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row93" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell197" Text="&lt;b&gt;2.3.2.&lt;/b&gt; продовження строку користування Кредитом (його частинами), зміни строків виконання повністю або частково Зобов’язання, збільшення заборгованості за Кредитом на суму нарахованих та несплачених процентів (капіталізація процентів); " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell198" HorzAlign="Justify" Font="Times New Roman, 10pt" FirstTabOffset="37.8" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row498" AutoSize="true">
+          <TableCell Name="Cell1010" Text="&lt;b&gt;2.3.3.&lt;/b&gt; відстрочення виконання Зобов’язання/будь-якої його частини;" Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1011"/>
+        </TableRow>
+        <TableRow Name="Row113" AutoSize="true">
+          <TableCell Name="Cell237" Text="&lt;b&gt;2.3.4.&lt;/b&gt; будь-яке збільшення/зменшення розміру процентів за Кредитним договором; " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell238" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row499" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell1012" Text="&lt;b&gt;2.3.5.&lt;/b&gt; встановлення нових умов щодо порядку зміни процентної ставки, зокрема, зміна будь-яким чином методу (способу) нарахування процентів за користування Кредитом; " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1013"/>
+        </TableRow>
+        <TableRow Name="Row500" AutoSize="true">
+          <TableCell Name="Cell1014" Text="&lt;b&gt;2.3.6.&lt;/b&gt; зміна будь-яким чином графіку погашення заборгованості за Кредитним договором;" Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1015"/>
+        </TableRow>
+        <TableRow Name="Row501" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell1016" Text="&lt;b&gt;2.3.7.&lt;/b&gt; доповнення/зміна  комісій та/або неустойок, що підлягають сплаті Кредитору, та/або збільшення/зменшення їх видів та розмірів;" Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1017"/>
+        </TableRow>
+        <TableRow Name="Row502" AutoSize="true">
+          <TableCell Name="Cell1018" Text="&lt;b&gt;2.3.8.&lt;/b&gt; будь-які інші зміни Кредитного договору. " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1019"/>
+        </TableRow>
+        <TableRow Name="Row114" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell239" Text="&lt;b&gt;2.4.&lt;/b&gt; Обсяг зобов’язань Поручителя за цим Договором не є фіксованою сумою і може збільшуватися або зменшуватися в залежності від виконання Боржником та/або Поручителем (на умовах, визначених цим Договором) Зобов’язання за Кредитним договором, а також черговості направлення Кредитором отриманих грошових коштів в погашення Зобов’язання. " HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell240" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row115" Height="85.05" AutoSize="true">
+          <TableCell Name="Cell241" Text="&lt;b&gt;2.5.&lt;/b&gt; Поручитель також відповідає перед Кредитором за повернення Боржником грошової суми (включаючи проценти, нараховані на неї в порядку, визначеному Законодавством за користування чужими грошовими коштами), отриманої за Кредитним договором, у разі визнання Кредитного договору відповідно до чинного Законодавства недійсним повністю або частково недійсним із застосуванням наслідків двосторонньої реституції (повернення всього отриманого за Кредитним договором). " HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell242" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row116" Height="113.4" AutoSize="true">
+          <TableCell Name="Cell243" Text="&lt;b&gt;2.6.&lt;/b&gt; Поручитель погоджується та зобов’язується солідарно відповідати за виконання Зобов’язання  спадкоємцями Боржника чи будь-якою іншою особою, на яку буде переведено борг за Кредитним договором та/або яка буде визначена боржником за Зобов’язаннями відповідно до Законодавства. &#13;&#10;При цьому Поручитель погоджується та зобов’язується солідарно відповідати за виконання Зобов’язання у випадку відсутності спадкоємців Боржника як за законом, так і за заповітом, в тому числі, у разі відсторонення всіх або будь-якого із спадкоємців від спадкування, у разі неприйняття жодною вказаною особою спадщини, відмови всіх спадкоємців від спадкування.  &#13;&#10;" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell244" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row117" AutoSize="true">
+          <TableCell Name="Cell245" Fill.Color="Gainsboro" Text="3. Порядок виконання Договору" HorzAlign="Center" Font="Times New Roman, 12pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell246" Font="Times New Roman, 12pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row118" AutoSize="true">
+          <TableCell Name="Cell247" Text="3.1.&lt;u&gt; Право Поручителя на повне або часткове виконання Зобов’язання Боржника &lt;/u&gt;" HorzAlign="Justify" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell248" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row503" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell1020" Text="&lt;b&gt;3.1.1.&lt;/b&gt; У разі неможливості вчасно здійснити черговий платіж у відповідності з Кредитним договором, Боржник письмово повідомляє про це Поручителя та Кредитора не пізніше ніж за 3 (три) Банківські дні до моменту настання Строку виконання Зобов’язання." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1021"/>
+        </TableRow>
+        <TableRow Name="Row504" Height="75.6" AutoSize="true">
+          <TableCell Name="Cell1022" Text="&lt;b&gt;3.1.2.&lt;/b&gt; Після отримання від Боржника письмового повідомлення щодо неможливості вчасного виконання ним (Боржником) Зобов’язання за Кредитним договором, Поручитель має право не пізніше настання Строку виконання Зобов’язання сплатити Кредитору суму боргу шляхом перерахування її на рахунок Кредитора.  &#13;&#10;При цьому моментом виконання Зобов’язання Поручителем є дата надходження грошових коштів на вказаний рахунок Кредитора. &#13;&#10;" Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1023"/>
+        </TableRow>
+        <TableRow Name="Row505" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell1024" Text="&lt;b&gt;3.1.3.&lt;/b&gt; На підставах та з наслідками, що визначені статтею 528 Цивільного кодексу України, Поручитель має право за власною ініціативою здійснювати повне або часткове виконання Зобов’язання Боржника, у тому числі до настання або до закінчення Строків його виконання за Кредитним договором. Кредитор приймає таке виконання при дотриманні кожної з наступних умов: " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1025"/>
+        </TableRow>
+        <TableRow Name="Row506" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell1026" Text="&lt;b&gt;1)&lt;/b&gt; умови Кредитного договору не містять прямої заборони на дострокове виконання Кредитних зобов’язань або на виконання Зобов’язання третіми особами;" Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1027" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row507" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell1028" Text="&lt;b&gt;2)&lt;/b&gt; Боржник або Поручитель виконали умови Кредитного договору щодо порядку здійснення дострокового виконання Зобов’язання (зокрема, направлення попереднього повідомлення та/або сплата комісій за дострокове погашення);" Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1029" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row508" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell1030" Text="&lt;b&gt;3)&lt;/b&gt; Кредитор отримав письмову згоду Боржника на дострокове виконання Поручителем Зобов’язання/його частини із зазначенням його виду та розміру." Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1031" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row509" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell1032" Text="Поручитель усвідомлює та звільняє Кредитора від будь-якої відповідальності, пов’язаної з достроковим виконанням Поручителем Зобов’язання." Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1033" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row119" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell249" Text="3.2. &lt;u&gt;Виконання Поручителем Договору у зв’язку з невиконанням (неналежним виконанням) Боржником Зобов`язання:&lt;/u&gt;" HorzAlign="Justify" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell250" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row510" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell1034" Text="&lt;b&gt;3.2.1.&lt;/b&gt; Поручитель зобов‘язується самостійно контролювати дотримання та своєчасне виконання Боржником Зобов‘язання перед Кредитором.  " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1035"/>
+        </TableRow>
+        <TableRow Name="Row516" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell1046" Text="&lt;b&gt;3.2.2.&lt;/b&gt; У випадку повного або часткового невиконання (неналежного виконання) Боржником Зобов`язання в порядку та строки, встановлені Кредитним договором, Кредитор набуває права вимоги до Боржника і Поручителя щодо сплати заборгованості за порушеним Зобов’язанням, а Поручитель та Боржник відповідають перед Кредитором як солідарні боржники." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1047"/>
+        </TableRow>
+        <TableRow Name="Row517" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell1048" Text="&lt;b&gt;3.2.3.&lt;/b&gt; Кредитор має право вимагати виконання Зобов’язання за Кредитним договором на власний вибір, як від Боржника і Поручителя спільно, так від будь-якого з них окремо, причому як в повному обсязі, так і частково." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1049"/>
+        </TableRow>
+        <TableRow Name="Row515" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell1044" Text="&lt;b&gt;3.2.4.&lt;/b&gt; З метою реалізації відповідно до умов цього Договору права вимоги до Поручителя Кредитор має право пред’явити (направити) Поручителю Вимогу. Ненаправлення Кредитором Вимоги не позбавляє Кредитора права вимагати у Поручителя виконання Зобов’язання відповідно до умов цього Договору та Законодавства." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1045"/>
+        </TableRow>
+        <TableRow Name="Row520" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell1054" Text="&lt;b&gt;3.2.5.&lt;/b&gt; Порука на підставі цього Договору діє незалежно від інших способів виконання Зобов’язання Боржника перед Кредитором за Кредитним договором. Кредитор не зобов’язаний перед відправленням Вимоги та/або реалізацією будь-яких інших прав відповідно до умов цього Договору:" Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1055"/>
+        </TableRow>
+        <TableRow Name="Row519" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell1052" Text="&lt;b&gt;1)&lt;/b&gt; пред’являти будь-які вимоги/претензії, подавати будь-які позови та/або отримувати будь-які судові рішення щодо Боржника;" Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1053"/>
+        </TableRow>
+        <TableRow Name="Row518" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell1050" Text="&lt;b&gt;2)&lt;/b&gt; стягувати заборгованість за Кредитним договором за рахунок будь-якого іншого виду забезпечення виконання Зобов’язання;" Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1051"/>
+        </TableRow>
+        <TableRow Name="Row514" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell1042" Text="&lt;b&gt;3)&lt;/b&gt; вчиняти будь-які інші дії щодо Боржника та/або попередньо звертатися до Боржника з вимогою про виконання порушеного Зобов’язання.   " Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1043"/>
+        </TableRow>
+        <TableRow Name="Row513" Height="113.4" AutoSize="true">
+          <TableCell Name="Cell1040" Text="&lt;b&gt;3.2.6.&lt;/b&gt; Поручитель зобов’язується здійснити виконання порушеного Зобов’язання протягом тридцяти календарних  днів з дати отримання Вимоги від Кредитора та в обсязі, зазначеному у Вимозі. &#13;&#10;Сторони досягли згоди, що датою, з якої починається відлік зазначеного вище тридцятиденного строку, вважається дата, зазначена на квитанції, яка надається Кредитору відділенням зв’язку при відправленні Кредитором Поручителю зазначеного вище письмового повідомлення листом з повідомленням про вручення або дата, зазначена  на вказаному вище повідомленні Кредитора, при особистому його отриманні Поручителем (представником Поручителя)  від Кредитора.&#13;&#10;" Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1041"/>
+        </TableRow>
+        <TableRow Name="Row512" Height="75.6" AutoSize="true">
+          <TableCell Name="Cell1038" Text="&lt;b&gt;3.2.7.&lt;/b&gt; Вимога Кредитора є єдиним та достатнім доказом настання підстав для виконання Поручителем Зобов’язання в розмірі, визначеному Кредитором у Вимозі. Єдиною підставою для визначення Кредитором в Вимозі розміру Зобов’язання, що підлягають виконанню Поручителем, є дані аналітичного обліку та рахунки, що ведуться установою Кредитора для визначення грошових зобов’язань Боржника перед Кредитором за Кредитним договором." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1039"/>
+        </TableRow>
+        <TableRow Name="Row511" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell1036" Text="&lt;b&gt;3.2.8.&lt;/b&gt; Кредитор має право направляти Вимоги Поручителю будь-яку кількість разів до повного виконання Зобов’язання." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1037"/>
+        </TableRow>
+        <TableRow Name="Row120" AutoSize="true">
+          <TableCell Name="Cell251" Text="3.3. &lt;u&gt;Порядок та Валюта виконання Зобов’язання Поручителем:&lt;/u&gt;" HorzAlign="Justify" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell252" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row521" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell1056" Text="&lt;b&gt;3.3.1.&lt;/b&gt; Поручитель зобов’язаний здійснювати виконання Зобов’язання в валюті, визначеній умовами Кредитного договору. " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1057"/>
+        </TableRow>
+        <TableRow Name="Row522" Height="85.05" AutoSize="true">
+          <TableCell Name="Cell1058" Text="&lt;b&gt;3.3.2.&lt;/b&gt; Якщо Зобов’язання виражені в іноземній валюті, Поручитель за згодою Кредитора може здійснювати їх виконання в національній валюті із застосуванням курсу гривні до відповідної іноземної валюти, що зазначений Кредитором у Вимозі або іншим чином погоджений Сторонами (зазначена сума повинна бути збільшена на суму пенсійного збору/інших обов’язкових платежів при купівлі іноземної валюти, якщо такі збори/платежі визначені Законодавством).         " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1059"/>
+        </TableRow>
+        <TableRow Name="Row523" Height="113.4" AutoSize="true">
+          <TableCell Name="Cell1060" Text="&lt;b&gt;3.3.3.&lt;/b&gt; Погашення заборгованості Боржника за Кредитним договором здійснюється із застосуванням правил черговості, визначених Кредитним договором. &#13;&#10;Банк має право самостійно без отримання попередньої згоди Поручителя змінювати послідовність погашення Зобов’язання за Кредитним договором і спрямовувати кошти, отримані від Поручителя, на виконання Зобов’язання за Кредитним договором без дотримання послідовності, передбаченої умовами Кредитного договору. За письмовим запитом Поручителя та/або Боржника Кредитор інформує Поручителя та/або Боржника про застосовану черговість погашення заборгованості.&#13;&#10;" Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1061"/>
+        </TableRow>
+        <TableRow Name="Row524" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell1062" Text="&lt;b&gt;3.3.4.&lt;/b&gt; Виконання Зобов’язання здійснюється Поручителем шляхом переказу грошових коштів на рахунок Кредитора. Зобов’язання Поручителя вважаються виконаними в день надходження грошових коштів на відповідний рахунок Кредитора.  " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1063"/>
+        </TableRow>
+        <TableRow Name="Row525" Height="113.4" AutoSize="true">
+          <TableCell Name="Cell1064" Text="&lt;b&gt;3.3.5.&lt;/b&gt; З метою виконання зобов’язань Поручителя за цим Договором Кредитор має право здійснювати договірне списання з рахунків Поручителя в будь-якій валюті в АТ «Ощадбанк» (Банку) будь-яких сум, належних до сплати Поручителем за цим Договором, в тому числі в рахунок погашення порушеного Зобов’язання Боржника. Таке договірне списання може здійснюватися Кредитором на підставі цього Договору будь-яку кількість разів, починаючи з останнього дня (включно) строку виконання відповідних зобов’язань Поручителя за цим Договором та до повного виконання Зобов’язання Боржника, а також грошових зобов’язань Поручителя за цим Договором. Перелік рахунків Поручителя, відкритих в установах Кредитора, визначені в Додатку № 1 до цього Договору." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1065"/>
+        </TableRow>
+        <TableRow Name="Row526" Height="217.35" AutoSize="true">
+          <TableCell Name="Cell1066" Text="&lt;b&gt;3.3.6.&lt;/b&gt; У разі відсутності або недостатності у Поручителя коштів на рахунках у національній валюті для виконання зобов’язань за цим Договором, Поручитель, надаючи Кредитору  право договірного списання коштів в будь-яких валютах з будь-яких рахунків Поручителя, відкритих в установах Кредитора, також доручає Кредитору здійснити від свого імені продаж списаних коштів в іноземній валюті (додаток № 1) на міжбанківському валютному ринку України за курсом продажу в гривнях - „за курсом уповноваженого банку”, що визначається Кредитором.&#13;&#10;Списання відповідно до умов цього підпункту Договору здійснюється Кредитором в розмірі, еквівалентному розміру зобов’язань (платежів) Поручителя за цим Договором в національній валюті на дату здійснення договірного списання з урахуванням витрат Кредитора, пов’язаних з продажем іноземної валюти на дату договірного списання коштів відповідно до пп.3.3.5  цього Договору. Із суми гривневого еквівалента проданої іноземної валюти згідно з умовами цього підпункту Договору Кредитор утримує відповідну комісійну винагороду згідно тарифів Кредитора, та зараховує залишок коштів на поточний рахунок Поручителя, відкритий у національній валюті (додаток № 1). &#13;&#10;Договірне списання зарахованих на поточний рахунок коштів з метою виконання платежів за цим Договором здійснюється Кредитором відповідно до пп.3.3.5. Договору.&#13;&#10;" Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1067"/>
+        </TableRow>
+        <TableRow Name="Row121" AutoSize="true">
+          <TableCell Name="Cell253" Text="3.4.&lt;u&gt;Набуття Поручителем прав Кредитора:&lt;/u&gt;" HorzAlign="Justify" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell254" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row527" Height="56.7" AutoSize="true">
+          <TableCell Name="Cell1068" Text="&lt;b&gt;3.4.1.&lt;/b&gt; Поручитель набуває всіх прав Кредитора по Кредитному договору, в тому числі й тих, що забезпечували його виконання, лише після повного виконання Зобов‘язання та взятих на себе зобов`язань по цьому Договору. Часткове виконання не надає Поручителю зазначених прав. " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1069" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row528" Height="56.7" AutoSize="true">
+          <TableCell Name="Cell1070" Text="&lt;b&gt;3.4.2.&lt;/b&gt; Протягом 3-х (трьох) днів з моменту повного виконання Зобов‘язання та взятих Поручителем на себе зобов`язань по цьому Договору Кредитор передає Поручителю всі документи, що підтверджують права Кредитора за Зобов’язанням, яке виконане Поручителем, а саме: " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1071" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row529" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell1072" Text="&lt;b&gt;1)&lt;/b&gt; Копію Кредитного договору, з усіма додатками, додатковими договорами, які є його невід’ємною частиною;" Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1073" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row530" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell1074" Text="[IIf([GARANTEES.CUNT_GAR]&gt;0,&quot;&lt;b&gt;2)&lt;/b&gt; Копію &quot;+[GARANTEES.LIST_GAR]+&quot; з усіма додатками, додатковими договорами, які є його невід’ємною частиною.&quot;,&quot;&quot;)]" Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1075" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row533" AutoSize="true">
+          <TableCell Name="Cell1080" Text="Всі документи, зазначені в цьому пункті, повинні бути засвідчені печаткою Кредитора та підписом уповноваженої особи Кредитора." Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1081"/>
+        </TableRow>
+        <TableRow Name="Row532" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell1078" Text="&lt;b&gt;3.4.3.&lt;/b&gt; Передача документів оформляється двостороннім Актом приймання – передачі, який підписується Сторонами (їх уповноваженими представниками) та скріплюється печатками Сторін (за наявності)." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1079"/>
+        </TableRow>
+        <TableRow Name="Row122" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell255" Text="&lt;b&gt;3.4.4.&lt;/b&gt; Місцем виконання зобов’язання щодо передачі документів є місцезнаходження Кредитора, зазначене в статті 13 «Реквізити та підписи Сторін» цього Договору. У випадку неприбуття Поручителя у вказаний час для передачі документів Кредитор не несе відповідальності за настання обставин, внаслідок яких у Поручителя можуть виникнути перешкоди/складнощі  щодо пред’явлення вимоги до Боржника. " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell256" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row125" Height="28.35" AutoSize="true">
+          <TableCell Name="Cell261" Fill.Color="Gainsboro" Text="4. Права та обов’язки Сторін" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell262" Font="Times New Roman, 12pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row126" AutoSize="true">
+          <TableCell Name="Cell263" Text="4.1. &lt;u&gt;Права Поручителя:&lt;/u&gt;" HorzAlign="Justify" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell264" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row127" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell265" Text="&lt;b&gt;4.1.1.&lt;/b&gt; Отримувати від Боржника інформацію щодо стану обслуговування Зобов’язання, у тому числі щодо наявності простроченої заборгованості за ним." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell266" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row128" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell267" Text="&lt;b&gt;4.1.2.&lt;/b&gt; За власною ініціативою здійснювати повне або часткове виконання Зобов’язання Боржника відповідно до умов, визначених цим Договором." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell268" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row129" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell269" Text="&lt;b&gt;4.1.3.&lt;/b&gt; У разі зміни Кредитором послідовності погашення Зобов’язання за Кредитним договором звертатися до Кредитора з запитом про застосовану Кредитором черговість погашення заборгованості. " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell270" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row466" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell946" Text="&lt;b&gt;4.1.4.&lt;/b&gt; У разі повного виконання Зобов’язання перед Банком - вимагати від Кредитора передачі документів, які засвідчують право вимоги до Боржника на умовах, визначених цим Договором. " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell947"/>
+        </TableRow>
+        <TableRow Name="Row467" AutoSize="true">
+          <TableCell Name="Cell948" Text="4.2. &lt;u&gt;Обов’язки Поручителя:&lt;/u&gt;" HorzAlign="Justify" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell949"/>
+        </TableRow>
+        <TableRow Name="Row130" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell271" Text="&lt;b&gt;4.2.1.&lt;/b&gt; Незалежно від зміни фінансового стану безумовно та безвідклично на умовах, визначених цим Договором, виконати в повному обсязі Зобов’язання за Кредитним договором. " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell272" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row131" Height="56.7" AutoSize="true">
+          <TableCell Name="Cell273" Text="&lt;b&gt;4.2.2.&lt;/b&gt; Забезпечити до моменту повного виконання статус пріоритетності будь-якому зобов’язанню щодо Кредитора за цим Договором по відношенню до всіх інших чинних та майбутніх зобов’язань Поручителя перед будь-якими третіми особами (крім випадків, визначених Законодавством)." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell274" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row132" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell275" Text="&lt;b&gt;4.2.3.&lt;/b&gt; Підтримувати дійсність зазначених у цьому Договорі засвідчень і гарантій протягом всього строку дії Договору, а в разі зміни обставин, що впливають на зміст відповідних засвідчень і гарантій, - негайно інформувати про це Кредитора та вжити всіх необхідних заходів для приведення їх змісту до первісних намірів, якими Сторони керувались при визначенні відповідних засвідчень і гарантій. " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell276" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row133" AutoSize="true">
+          <TableCell Name="Cell277" Text="&lt;b&gt;4.2.4.&lt;/b&gt; &lt;u&gt;Протягом строку дії цього Договору без попередньої письмової згоди Банку:&lt;/u&gt;" Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell278" Font="Times New Roman, 10pt" HtmlTags="true" ParagraphOffset="37.8"/>
+        </TableRow>
+        <TableRow Name="Row134" AutoSize="true">
+          <TableCell Name="Cell279" Text="&lt;b&gt;1)&lt;/b&gt; Не передавати повністю або частково свої права та зобов’язання за цим Договором третім особам;" Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell280" Font="Times New Roman, 10pt" HtmlTags="true" ParagraphOffset="37.8"/>
+        </TableRow>
+        <TableRow Name="Row135" AutoSize="true">
+          <TableCell Name="Cell281" Text="&lt;b&gt;2)&lt;/b&gt; Не закривати рахунки, відкриті в Кредитора." Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell282" Font="Times New Roman, 10pt" HtmlTags="true" ParagraphOffset="37.8"/>
+        </TableRow>
+        <TableRow Name="Row137" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell285" Text="&lt;b&gt;4.2.5.&lt;/b&gt; У строк, що не перевищує 10-ти (десяти) календарних днів з дати настання обставин, зазначених у цьому пункті (а у випадку, якщо відповідні обставини вимагають негайного реагування, то при першій можливості), письмово повідомляти Кредитора з наданням (за наявності) підтверджуючих документів про:  " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell286" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row138" AutoSize="true">
+          <TableCell Name="Cell287" Text="&lt;b&gt;1)&lt;/b&gt; зміну змісту засвідчень і гарантій, вказаних у цьому Договорі;" Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell288" Font="Times New Roman, 10pt" HtmlTags="true" ParagraphOffset="37.8"/>
+        </TableRow>
+        <TableRow Name="Row139" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell289" Text="&lt;b&gt;2)&lt;/b&gt; зміну свого прізвища, ім‘я, по-батькові, фактичного місця проживання та реєстрації, його контактних реквізитів (номерів телефонів, факсу), складу сім’ї, зміну місця роботи;" Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell290" Font="Times New Roman, 10pt" HtmlTags="true" ParagraphOffset="37.8"/>
+        </TableRow>
+        <TableRow Name="Row140" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell291" Text="&lt;b&gt;3)&lt;/b&gt; настання обставин, що тягнуть істотні (негативні) зміни у платоспроможності і кредитоспроможності Поручителя, у т.ч. непрацездатність Поручителя, втрату або зміну постійного місця працевлаштування Поручителем або займаної посади;" Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell292" Font="Times New Roman, 10pt" HtmlTags="true" ParagraphOffset="37.8"/>
+        </TableRow>
+        <TableRow Name="Row141" Height="94.5" AutoSize="true">
+          <TableCell Name="Cell293" Text="&lt;b&gt;4)&lt;/b&gt; будь-які судові провадження, претензії та вимоги третіх осіб до Поручителя або притягнення Поручителя до кримінальної відповідальності, накладення арешту на майно (кошти) Поручителя або звернення стягнення на майно Поручителя іншими кредиторами, обтяження майна Поручителя заставою, іпотекою або іншим способом (зобов‘язанням), який передбачає можливість відчуження відповідних активів або інші обставини, що загрожують майновому положенню Поручителя,  створюють ризик стягнення майна Поручителя, або іншим чином свідчать про загрозу невиконання Поручителем умов цього Договору." Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell294" Font="Times New Roman, 10pt" HtmlTags="true" ParagraphOffset="37.8"/>
+        </TableRow>
+        <TableRow Name="Row148" Height="85.05" AutoSize="true">
+          <TableCell Name="Cell307" Text="[IIf([DataSubProdukt.IS_MAR_FOR_SCOR] == 1,IIf([Marital_status.IS_MARRIED]&gt;0,IIf([Marital_status.SPOUSE_INN] == [klient_info.IDCODE],&quot;&lt;b&gt;4.2.6.&lt;/b&gt; Надавати Кредитору кожні 12 (дванадцять) місяців з моменту укладення цього Договору, або на першу вимогу Кредитора, документи, що підтверджують фінансовий стан Поручителя (документи щодо отримуваних доходів, документи про кредитну заборгованість в Банку/інших банках).&quot;,&quot;&quot;),&quot;&quot;),&quot;&quot;)]" Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell308" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row149" AutoSize="true">
+          <TableCell Name="Cell309" Text="4.3. &lt;u&gt;Права Кредитора:&lt;/u&gt;" HorzAlign="Justify" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell310" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row154" Height="56.7" AutoSize="true">
+          <TableCell Name="Cell319" Text="&lt;b&gt;4.1.1.&lt;/b&gt; На умовах, визначених цим Договором, змінювати послідовність погашення Зобов’язання за Кредитним договором і спрямовувати кошти, отримані від Поручителя, на виконання Зобов’язання за Кредитним договором без дотримання послідовності, передбаченої умовами Кредитного договору. " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell320" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row155" Height="85.05" AutoSize="true">
+          <TableCell Name="Cell321" Text="&lt;b&gt;4.3.2.&lt;/b&gt; Без повідомлення Поручителя та будь-яких змін цього Договору здійснювати у будь-який час будь-яким способом право (права), передбачене(і) Кредитним договором, вимагати погашення Кредиту (будь-якої його частини), процентів чи інших платежів, які підлягають сплаті відповідно до умов Кредитного договору, застосовувати будь-які способи правового захисту або забезпечення виконання Зобов’язання, укладати будь-які мирові (компромісні) угоди (правочини), або надавати будь-які відстрочення чи інші пільги Боржнику." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell322" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row156" AutoSize="true">
+          <TableCell Name="Cell323" Text="&lt;b&gt;4.3.3&lt;/b&gt;. Пред’явити (направити) Поручителю Вимогу(и) відповідно до умов цього Договору. " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell324" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row157" AutoSize="true">
+          <TableCell Name="Cell325" Text="&lt;b&gt;4.3.4.&lt;/b&gt; Вимагати у Поручителя виконання Зобов’язання відповідно до умов цього Договору та Законодавства." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell326" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row158" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell327" Text="&lt;b&gt;4.3.5.&lt;/b&gt; Прийняти повне або часткове виконання Зобов’язання від Поручителя до настання Строків виконання Зобов’язання у випадках, визначених цим Договором." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell328" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row159" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell329" Text="&lt;b&gt;4.3.6.&lt;/b&gt; Без будь-якої попередньої згоди Поручителя та/або Боржника здійснити відступлення права вимоги за Кредитним договором та цим Договором будь-якій особі, погоджувати переведення боргу Боржника за Кредитним договором на підставі відповідного правочину." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell330" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row160" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell331" Text="&lt;b&gt;4.3.7.&lt;/b&gt; Обробляти персональні дані, розкривати конфіденційну інформацію щодо Боржника та/або Поручителя на умовах, визначених цим Договором. " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell332" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row161" AutoSize="true">
+          <TableCell Name="Cell333" Text="4.4. &lt;u&gt;Обов’язки Кредитора:&lt;/u&gt;" HorzAlign="Justify" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell334" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row162" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell335" Text="&lt;b&gt;4.4.1.&lt;/b&gt; Інформувати Поручителя та/або Боржника про застосовану черговість погашення заборгованості у разі зміни послідовності погашення Зобов’язання за Кредитним договором. " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell336" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row163" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell337" Text="&lt;b&gt;4.4.2.&lt;/b&gt; У строки та на умовах, визначених Договором, передати Поручителю всі документи, що підтверджують права Кредитора за Зобов’язанням, яке виконане Поручителем." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell338" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row164" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell339" Text="&lt;b&gt;4.4.3.&lt;/b&gt; Повідомляти Поручителя про факт переведення боргу Боржника за Кредитним договором на підставі відповідного правочину в порядку, визначеному цим Договором." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell340" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row166" AutoSize="true">
+          <TableCell Name="Cell343" Text="4.5. &lt;u&gt;Права Боржника::&lt;/u&gt;" HorzAlign="Justify" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell344" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row167" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell345" Text="&lt;b&gt;4.5.1.&lt;/b&gt; Надати письмову згоду Кредитору на дострокове виконання Поручителем Зобов’язання/його частини із зазначенням його виду та розміру в порядку, визначеному цим Договором." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell346" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row168" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell347" Text="&lt;b&gt;4.5.2.&lt;/b&gt; У разі зміни Кредитором послідовності погашення Зобов’язання за Кредитним договором, звертатися до Кредитора з запитом про застосовану Кредитором черговість погашення заборгованості. " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell348" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row169" AutoSize="true">
+          <TableCell Name="Cell349" Text="4.6. &lt;u&gt;Обов’язки Боржника:&lt;/u&gt;" HorzAlign="Justify" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell350" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row170" AutoSize="true">
+          <TableCell Name="Cell351" Text="&lt;b&gt;4.6.1.&lt;/b&gt; Виконати Зобов’язання належним чином у строки та на умовах, визначених Кредитним договором." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell352" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row468" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell950" Text="&lt;b&gt;4.6.2.&lt;/b&gt; Інформувати Поручителя на його вимогу про стан обслуговування Зобов’язання, у тому числі щодо наявності/виникнення простроченої заборгованості за ним." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" TabWidth="24" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell951" HorzAlign="Justify" Font="Times New Roman, 10pt" FirstTabOffset="37.8" HtmlTags="true" ParagraphOffset="37.8"/>
+        </TableRow>
+        <TableRow Name="Row469" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell952" Text="&lt;b&gt;4.6.3.&lt;/b&gt; Повідомити Поручителя та Кредитора про неможливість вчасно здійснити черговий платіж у відповідності з Кредитним договором у строки, визначені цим Договором." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" TabWidth="24" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell953"/>
+        </TableRow>
+        <TableRow Name="Row204" AutoSize="true">
+          <TableCell Name="Cell419" Fill.Color="Gainsboro" Text="5. Засвідчення та гарантії" HorzAlign="Center" Font="Times New Roman, 12pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell420" Font="Times New Roman, 12pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row205" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell421" Text="&lt;b&gt;5.1.&lt;/b&gt; Сторони засвідчують однакове розуміння ними умов цього Договору та його правових наслідків, підтверджують дійсність їх намірів при його укладанні, а також те, що Договір не містить ознак фіктивного чи удаваного правочину, що він не укладений під впливом помилки щодо його природи, прав та обов’язків Сторін, а також під впливом обману чи збігу тяжких обставин." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell422" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row206" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell423" Text="&lt;b&gt;5.2.&lt;/b&gt; З укладанням цього Договору Сторони досягли згоди з усіх його істотних умов та не існує будь-яких умов, які можуть бути істотними та необхідними за змістом цього Договору." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell424" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row208" AutoSize="true">
+          <TableCell Name="Cell427" Text="5.3. &lt;u&gt;Інші засвідчення та гарантії Поручителя:&lt;/u&gt;" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell428" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row209" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell429" Text="&lt;b&gt;5.3.1.&lt;/b&gt; Поручитель має необхідний обсяг дієздатності та правоздатності, платоспроможності для укладення та виконання цього Договору, умови цього Договору не суперечать жодним положенням договорів, укладених Поручителем з іншими особами, або положенням інших правочинів, дія яких поширюється на Поручителя." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell430" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row210" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell431" Text="&lt;b&gt;5.3.2.&lt;/b&gt; Не існує жодного відомого Поручителю судового провадження або розслідування з боку державних чи інших органів (у тому числі кримінального), які можуть суттєво негативно вплинути на фінансовий стан Поручителя, обсяг його правоздатності або дієздатності та про які Кредитор не був попереджений до укладання цього Договору в письмовій формі." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell432" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row211" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell433" Text="&lt;b&gt;5.3.3.&lt;/b&gt; Не існує будь-яких інших поточних або майбутніх зобов’язань Поручителя, які можуть мати пріоритет над виконанням зобов’язань за цим Договором (крім зобов’язань, що можуть мати пріоритет в силу Законодавства)." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell434" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row212" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell435" Text="&lt;b&gt;5.3.4.&lt;/b&gt; Поручитель належним чином і в повному обсязі ознайомлений з положеннями Кредитного договору та договорів, що забезпечують його виконання, цілком розуміє їх зміст і будь-яке посилання в тексті цього Договору на Кредитний договір чи окремі його положення є достатньою підставою вважати, що ці положення застосовуються рівною мірою до виконання прав і обов’язків Сторін за цим Договором і Поручитель не має будь-яких заперечень щодо виконання умов Кредитного договору. Надана Поручителю інформація є повною, необхідною, доступною, достовірною та своєчасною." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell436" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row213" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell437" Text="&lt;b&gt;5.3.5.&lt;/b&gt; Поручитель володіє всією необхідною інформацією про Боржника, його правовий статус та фінансовий стан, у тому числі щодо його спроможності здійснювати виконання Зобов‘язання, а також має всі можливості для самостійного, без участі Кредитора, отримання інформації щодо стану виконання Боржником Зобов‘язання." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell438" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row214" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell439" Text="&lt;b&gt;5.3.6.&lt;/b&gt; Поручителю відомі всі випадки, при настанні яких у Кредитора виникає право вимагати від Боржника дострокового повернення Кредиту/його частини, сплати процентів за користування Кредитом та виконання всіх інших Зобов’язань." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell440" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row215" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell441" Text="&lt;b&gt;5.3.7.&lt;/b&gt; Поручитель усвідомлює та  підтверджує, що Кредитор не має за цим Договором будь-яких обов’язків та не несе будь-якої відповідальності перед Поручителем за надання/ненадання Поручителю інформації та документів про Боржника, його  фінансовий стан, спроможність здійснювати виконання Зобов’язання та стан їх фактичного виконання, крім визначеного цим Договором обов’язку направлення Поручителю Вимог. " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell442" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row216" Height="56.7" AutoSize="true">
+          <TableCell Name="Cell443" Text="&lt;b&gt;5.3.8.&lt;/b&gt; Поручитель свідчить, що йому розтлумачено (зрозуміло) та він згоден, що у разі зміни курсу гривні до іноземної валюти, всі пов‘язані із цим ризики у зв’язку з виконанням Договору несе Поручитель, та що зміна курсів гривні до іноземної валюти може привести до збитків та погіршення фінансового стану Поручителя. " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell444" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row217" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell445" Text="&lt;b&gt;5.3.9.&lt;/b&gt; Поручитель свідчить, що всі ризики, пов’язані з істотною зміною обставин, з яких Поручитель виходив при укладанні цього Договору, Поручитель приймає на себе, і такі обставини не є підставою для зміни або розірвання Поручителем цього Договору." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell446" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row222" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell455" Text="[IIf([Marital_status.IS_MARRIED] ==0,&quot;&lt;b&gt;5.3.10.&lt;/b&gt; Поручитель свідчить, що він/вона не проживає однією сім’єю з жодною особою і немає осіб, які б стверджували наявність такого факту та заявляли свої права на майно, яке набуте ними з Поручителем за час спільного проживання і належить їм на праві спільної сумісної власності, та заперечували б право Поручителя одноособово на власний розсуд укласти цей Договір. &quot;,&quot;&quot;)]" Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell456" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row224" AutoSize="true">
+          <TableCell Name="Cell459" Text="[IIf([Marital_status.IS_MARRIED] ==1,&quot;&lt;b&gt;5.3.10.&lt;/b&gt; Поручитель свідчить, що на момент укладення цього Договору:&quot;,&quot;&quot;)]" Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell460" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row225" AutoSize="true">
+          <TableCell Name="Cell461" Text="[IIf([Marital_status.IS_MARRIED] ==1,&quot;&lt;b&gt;1)&lt;/b&gt; Поручитель одружений;,&quot;,&quot;&quot;)]" Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell462" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row479" AutoSize="true">
+          <TableCell Name="Cell972" Text="[IIf([Marital_status.IS_MARRIED] == 1,&quot;&lt;b&gt;2)&lt;/b&gt; Цей Договір укладений в інтересах сім’ї Поручителя і одержане за цим Договором буде використане на її потреби,&quot;,&quot;&quot;)]" Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell973"/>
+        </TableRow>
+        <TableRow Name="Row480" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell974" Text="[IIf([Marital_status.IS_MARRIED] == 1,&quot;&lt;b&gt;3)&lt;/b&gt; Чоловік/дружина Поручителя згоден/згодна з укладанням Поручителем цього Договору, та підтверджує що з умовами цього Договору ознайомлений (-на), ніяких заперечень щодо його положень та укладення не має. &quot;,&quot;&quot;)]" Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell975"/>
+        </TableRow>
+        <TableRow Name="Row534" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell1082" Text="[IIf([Marital_status.IS_MARRIED] == 1,&quot;На підтвердження цього чоловік/дружина Поручителя надав(ла) письмову заяву про таку згоду від &lt;b&gt;&quot;+[Dog_info.DATA_DOG_PR]+&quot;&lt;/b&gt;&quot;,&quot;&quot;)]" Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1083"/>
+        </TableRow>
+        <TableRow Name="Row226" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell463" Text="[IIf([Marital_status.IS_MARRIED] ==2,&quot;&lt;b&gt;5.3.10.&lt;/b&gt;  Поручитель свідчить, що на момент укладення цього Договору:&quot;,&quot;&quot;)]" Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell464" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row227" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell465" Text="[IIf([Marital_status.IS_MARRIED] ==2,&quot;&lt;b&gt;1)&lt;/b&gt; Поручитель неодружений, він/вона проживає з відповідною особою однією сім‘єю,&quot;,&quot;&quot;)]" Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell466" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row228" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell467" Text="[IIf([Marital_status.IS_MARRIED] ==2,&quot;&lt;b&gt;2)&lt;/b&gt; Цей Договір укладений в інтересах сім’ї Поручителя і одержане за цим Договором буде використане на її потреби,&quot;,&quot;&quot;)]" Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell468" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row229" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell469" Text="[IIf([Marital_status.IS_MARRIED] ==2,&quot;&lt;b&gt;3)&lt;/b&gt; Особа, з якою Поручитель проживає сім‘єю, згоден/згодна з укладанням Поручителем цього Договору, та підтверджує, що з умовами цього Договору ознайомлений (-на), ніяких заперечень щодо його положень та укладення не має. договором.&quot;,&quot;&quot;)]" Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell470" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row230" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell471" Text="[IIf([Marital_status.IS_MARRIED] ==2,&quot;	На підтвердження цього особа, з якою Поручитель проживає сім‘єю, надав(ла) письмову заяву про таку згоду від &lt;b&gt;&quot;+[Dog_info.DATA_DOG_PR]+&quot;&lt;/b&gt;&quot;,&quot;&quot;)]" Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" TabWidth="24" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell472" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row580" AutoSize="true">
+          <TableCell Name="Cell1233" Text="5.4. &lt;u&gt;Інші засвідчення та гарантії Боржника: &lt;/u&gt;" HorzAlign="Justify" Font="Times New Roman, 10pt, style=Bold" TabWidth="24" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1234"/>
+        </TableRow>
+        <TableRow Name="Row581" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell1235" Text="&lt;b&gt;5.4.1.&lt;/b&gt; Божник підтверджує, що цей Договір не звужує його права чи обов’язки за Кредитним договором. Укладаючи цей Договір, Боржник усвідомлює наявність у Кредитора прав прийняти виконання Зобов’язання (повністю або частково) від Поручителя на умовах, визначених цим Договором." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" TabWidth="24" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1236"/>
+        </TableRow>
+        <TableRow Name="Row582" AutoSize="true">
+          <TableCell Name="Cell1237" Fill.Color="Gainsboro" Text="6. Конфіденційна інформація та згода на обробку персональних даних" HorzAlign="Center" Font="Times New Roman, 12pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1238"/>
+        </TableRow>
+        <TableRow Name="Row583" AutoSize="true">
+          <TableCell Name="Cell1239" Text="6.1. &lt;u&gt;Конфіденційна інформація&lt;/u&gt;" HorzAlign="Justify" Font="Times New Roman, 10pt, style=Bold" TabWidth="24" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1240"/>
+        </TableRow>
+        <TableRow Name="Row584" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell1241" Text="&lt;b&gt;6.1.1.&lt;/b&gt; Сторони визнають, що будь-яка інформація, отримана однією із Сторін щодо іншої Сторони в ході переддоговірних відносин по укладенню цього Договору або в ході виконання цього Договору, становить собою конфіденційну інформацію (банківську та/або комерційну таємницю), крім інформації, що може бути отримана будь-якою особою з загальнодоступних джерел. " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" TabWidth="24" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1242"/>
+        </TableRow>
+        <TableRow Name="Row585" Height="85.05" AutoSize="true">
+          <TableCell Name="Cell1243" Text="&lt;b&gt;6.1.2.&lt;/b&gt; Сторони зобов’язуються, не обмежуючись строком, забезпечити конфіденційність та збереження інформації, що відповідно до Законодавства та цього Договору становить банківську або комерційну таємницю (зокрема, інформація щодо Боржника, Кредитного договору, осіб та договорів, що забезпечують його виконання, особи Поручителя тощо), та здійснювати її розкриття третім особам лише за згодою іншої Сторони Договору, крім випадків, передбачених Законодавством або цим Договором." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" TabWidth="24" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1244"/>
+        </TableRow>
+        <TableRow Name="Row586" Height="141.75" AutoSize="true">
+          <TableCell Name="Cell1245" Text="&lt;b&gt;6.1.3.&lt;/b&gt; Поручитель та Боржник надають Кредитору безвідкличну та безумовну згоду, а Кредитор відповідно до цього Договору набуває право розкрити (передати) будь-яку або всю інформацію стосовно Божника, Поручителя, його фінансового стану, умов цього Договору та порядку виконання зобов’язань за ним (включаючи, але не обмежуючись будь-якою фінансовою, економічною чи іншою інформацією, що складає банківську таємницю відповідно до Закону України &quot;Про банки і банківську діяльність&quot; або конфіденційну інформацію, у тому числі інформацію про причини невиконання Поручителем зобов’язань за цим Договором, про дисконт, за яким права вимоги за Кредитним договором та цим Договором можуть бути відчужені іншому кредитору, про результати незалежної оцінки вартості цих прав вимоги), яка стала відома Кредитору в процесі укладання та виконання цього Договору, &lt;u&gt;таким особам у нижченаведених випадках:&lt;/u&gt;" Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" TabWidth="24" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1246"/>
+        </TableRow>
+        <TableRow Name="Row587" Height="85.05" AutoSize="true">
+          <TableCell Name="Cell1247" Text="&lt;b&gt;1)&lt;/b&gt; Боржнику за Кредитним договором, будь-якій особі резиденту України чи нерезиденту, що має намір набути або набуває права вимоги за Кредитним договором з будь-яких підстав, що не суперечать законодавству, повністю чи частково приймає на себе відповідальність за виконання Боржником Зобов’язання за Кредитним договором та/або пов’язані із цим ризики, або обтяжує права вимоги за Кредитним договором на свою користь будь-яким іншим чином;" Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" TabWidth="24" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1248"/>
+        </TableRow>
+        <TableRow Name="Row588" Height="94.5" AutoSize="true">
+          <TableCell Name="Cell1249" Text="&lt;b&gt;2)&lt;/b&gt; аудиторам, суб’єктам оціночної діяльності, рейтинговим агентствам, незалежним юридичним радникам, інвестиційним, фінансовим посередникам та іншим юридичним та фізичним особам у разі, якщо відповідна інформація за цим Договором, є необхідною для здійснення Кредитором фінансових чи інших операцій в ході своєї звичайної діяльності, а також у випадку, якщо вони надають Кредитору послуги, пов‘язані з основною діяльністю Кредитора та повинні бути обізнаними з інформацією, що стосується діяльності Кредитора за Кредитним договором та цим Договором;" Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" TabWidth="24" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1250"/>
+        </TableRow>
+        <TableRow Name="Row589" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell1251" Text="&lt;b&gt;3)&lt;/b&gt; державним органам влади та управління, іншим органам та організаціям, які відповідно до чинного законодавства України мають право здійснювати перевірки фінансово-господарської та іншої діяльності Кредитора на підставі їх офіційного запиту та/або у процесі здійснення перевірки фінансово-господарської та іншої діяльності Кредитора;" Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" TabWidth="24" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1252"/>
+        </TableRow>
+        <TableRow Name="Row590" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell1253" Text="&lt;b&gt;4)&lt;/b&gt; Іншим банківським установам на їх запит у процесі здійснення ними фінансового моніторингу та/або у разі прийняття рішення про надання фінансових послуг Поручителю." Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" TabWidth="24" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1254"/>
+        </TableRow>
+        <TableRow Name="Row591" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell1255" Text="&lt;b&gt;6.1.4.&lt;/b&gt; Інформація, що підлягає розкриттю у випадках, передбачених пп.6.1.3 цього Договору, розкривається (передається) Кредитором в обсязі, необхідному для досягнення цілей, у відповідності до яких вона передається." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" TabWidth="24" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1256"/>
+        </TableRow>
+        <TableRow Name="Row592" Height="160.65" AutoSize="true">
+          <TableCell Name="Cell1257" Text="&lt;b&gt;6.1.5.&lt;/b&gt; Поручитель погоджується, що умови, передбачені пп.6.1.3 цього Договору, не поширюються на випадки розкриття Кредитором третім особам інформації щодо Поручителя, у випадках порушення Боржником умов Кредитного договору або Поручителем умов цього Договору або у випадку наявності фактів невиконання  Боржником/Поручителем своїх фінансових зобов’язань перед іншими кредиторами. У зазначених випадках Поручитель цим Договором надає згоду Кредитору розкривати інформацію, що складає конфіденційну інформацію, шляхом надання її способом та в обсягах, визначених Кредитором, необмеженому колу третіх осіб, у т.ч. правоохоронним, судовим органам, органам нотаріату, фінансовим установам, іншим установам, підприємствам, організаціям, у т.ч. шляхом розміщення в електронних базах даних (наприклад, ЕІС «Реєстр позичальників»), на сайтах в мережі Інтернет, шляхом розповсюдження засобами масової інформації та каналами електронної пошти, тощо." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" TabWidth="24" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1258"/>
+        </TableRow>
+        <TableRow Name="Row593" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell1259" Text="&lt;b&gt;6.1.6.&lt;/b&gt; Підписанням цього Договору Поручитель надає Кредитору право без отримання додаткової письмової згоди Поручителя звертатися з метою отримання інформації про Поручителя та його фінансовий стан до третіх осіб. Кредитор зобов’язується отримувати та використовувати отриману інформацію лише з метою захисту та реалізації прав Кредитора за цим Договором." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" TabWidth="24" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1260"/>
+        </TableRow>
+        <TableRow Name="Row594" Height="94.5" AutoSize="true">
+          <TableCell Name="Cell1261" Text="&lt;b&gt;6.1.7.&lt;/b&gt; Поручитель надає Кредитору право на передачу, збір, зберігання, використання та поширення інформації, яка складає його кредитну історію, через ТОВ «Перше всеукраїнське бюро кредитних історій» (02002, м.Київ, вул. М. Раскової, 11) Також Поручитель надає згоду на доступ до його кредитної історії та отримання Кредитором інформації в повному обсязі кредитної історії Поручителя у будь-якому бюро кредитних історій. Ця згода діє до моменту повного погашення всіх зобов’язань Поручителя перед Кредитором, незалежно від часу та підстав їх виникнення." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" TabWidth="24" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1262"/>
+        </TableRow>
+        <TableRow Name="Row595" Height="141.75" AutoSize="true">
+          <TableCell Name="Cell1263" Text="&lt;b&gt;6.1.8.&lt;/b&gt; Поручитель цим Договором надає Кредитору  згоду на власний розсуд останнього будь-яку кількість разів телефонувати, направляти відомості з питань виконання/неналежного виконання Поручителем умов цього Договору, іншу інформацію та повідомлення, пов’язані/передбачені цим Договором, а також комерційні пропозиції Кредитора та рекламні матеріали, за допомогою звичайних поштових відправлень та листів-звернень, електронних засобів зв’язку, SMS – повідомлень, тощо, на адреси, номери телефонів, електронну пошту, надані (зазначені ним в будь-яких документах) Поручителем Кредитору або які стали відомі Кредитору іншим чином. При цьому, Поручитель звільняє Кредитора від будь-якої відповідальності, пов’язаної з тим, що направлена таким способом інформація стане доступною третім особам та відповідальності за відшкодування збитків, пов’язаних з розкриттям інформації в порядку, встановленому даним Договором. " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" TabWidth="24" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1264"/>
+        </TableRow>
+        <TableRow Name="Row596" AutoSize="true">
+          <TableCell Name="Cell1265" Text="6.2. &lt;u&gt;Згода на обробку персональних даних &lt;/u&gt;" HorzAlign="Justify" Font="Times New Roman, 10pt, style=Bold" TabWidth="24" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1266"/>
+        </TableRow>
+        <TableRow Name="Row597" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell1267" Text="&lt;b&gt;6.2.1.&lt;/b&gt; Сторони або їх повноважні представники, які підписують цей Договір від імені Сторін, керуючись Законом України «Про захист персональних даних», своїми підписами підтверджують: " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" TabWidth="24" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1268"/>
+        </TableRow>
+        <TableRow Name="Row598" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell1269" Text="&lt;b&gt;1)&lt;/b&gt; згоду (дозвіл) на збирання, обробку, накопичення, реєстрацію, адаптування, зміну, поновлення своїх персональних даних та подальше їх  використання виключно з метою виконання даного Договору протягом строку його дії;" Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" TabWidth="24" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1270"/>
+        </TableRow>
+        <TableRow Name="Row599" AutoSize="true">
+          <TableCell Name="Cell1271" Text="&lt;b&gt;2)&lt;/b&gt; що вони повідомлені про свої права відповідно до ст.8 Закону України «Про захист персональних даних»." Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" TabWidth="24" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1272"/>
+        </TableRow>
+        <TableRow Name="Row251" AutoSize="true">
+          <TableCell Name="Cell513" Fill.Color="Gainsboro" Text="7. Відступлення права вимоги та переведення боргу за Договором" HorzAlign="Center" Font="Times New Roman, 12pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell514" Font="Times New Roman, 12pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row252" AutoSize="true">
+          <TableCell Name="Cell515" Text="7.1. &lt;u&gt;Відступлення права вимоги за Договором&lt;/u&gt;" HorzAlign="Justify" Font="Times New Roman, 10pt, style=Bold" TabWidth="24" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell516" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row253" Height="56.7" AutoSize="true">
+          <TableCell Name="Cell517" Text="&lt;b&gt;7.1.1.&lt;/b&gt; Кредитор, у встановленому чинним законодавством України та цим Договором порядку, має право без згоди Поручителя відступити своє право вимоги за Кредитним договором та цим Договором будь-якій особі, у зв’язку з чим відбувається заміна сторони – кредитора за цим Договором. " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell518" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row482" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell978" Text="&lt;b&gt;7.1.2.&lt;/b&gt; Новий кредитор набуває усі права та обов’язки Кредитора за Кредитним договором та цим Договором в повному обсязі, у тому числі право отримати від Поручителя задоволення вимог Кредитора щодо виконання Зобов’язання." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell979"/>
+        </TableRow>
+        <TableRow Name="Row255" AutoSize="true">
+          <TableCell Name="Cell521" Text="7.2. &lt;u&gt;Переведення боргу за Договором&lt;/u&gt;" HorzAlign="Justify" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell522" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row256" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell523" Text="&lt;b&gt;7.2.1.&lt;/b&gt; Підписанням цього Договору Поручитель надає безумовну та безвідкличну, без будь-яких додаткових погоджень зі сторони Боржника, згоду на переведення боргу Боржника за Кредитним договором на підставі відповідного правочину." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell524" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row257" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell525" Text="&lt;b&gt;7.2.2.&lt;/b&gt; У випадку переведення боргу Боржника за Кредитним договором на підставі правочину Кредитор направляє Поручителю письмове повідомлення." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell526" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row258" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell527" Text="&lt;b&gt;7.2.3.&lt;/b&gt; Поручитель зобов’язаний протягом 10-ти (десяти) календарних днів з моменту отримання повідомлення Кредитора укласти з Кредитором договір поруки за зобов’язаннями нового боржника по Кредитному договору." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell528" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row315" AutoSize="true">
+          <TableCell Name="Cell641" Fill.Color="Gainsboro" Text="8. Відповідальність Сторін" HorzAlign="Center" Font="Times New Roman, 12pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell642" HorzAlign="Justify" Font="Times New Roman, 12pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row316" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell643" Text="&lt;b&gt;8.1.&lt;/b&gt; У разі невиконання або неналежного виконання зобов’язань, встановлених цим Договором, Сторони несуть відповідальність згідно чинного Законодавства та положень цього Договору. " HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell644" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row317" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell645" Text="&lt;b&gt;8.2.&lt;/b&gt; Якщо інше не встановлено чинним Законодавством, Поручитель несе відповідальність за невиконання цього Договору, зокрема, за завдані Кредитору таким невиконанням збитки, всім своїм майном, у тому числі тим, що належить Поручителю та третім особам на праві спільної власності, на яке відповідно до Законодавства може бути звернене стягнення." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell646" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row318" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell647" Text="&lt;b&gt;8.3.&lt;/b&gt; За порушення, невиконання або неналежне виконання Поручителем пп. 3.2.6 Договору, Поручитель сплачує Кредитору за кожен випадок порушення штраф в розмірі 5 (п’ять) % від суми несплаченого платежу." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell648" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row535" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell1084" Text="&lt;b&gt;8.4.&lt;/b&gt; Кредитор не несе відповідальності за відшкодування будь-якої моральної шкоди, не отриманих доходів (вигоди), майнових збитків, в т.ч. судових витрат та витрат на консультаційні послуги, що виникли внаслідок недотримання Поручителем порядку збереження, використання та розкриття конфіденційної інформації за цим Договором, у т.ч. щодо Боржника, Кредитного договору, осіб та договорів, що забезпечують його виконання тощо." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1085"/>
+        </TableRow>
+        <TableRow Name="Row536" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell1086" Text="&lt;b&gt;8.5.&lt;/b&gt; Поручитель звільняє Кредитора від відповідальності за будь-яку моральну шкоду, майнові збитки, неотримані доходи (вигоду), завдані Поручителю внаслідок невиконання Боржником своїх зобов’язань за Кредитним договором, або внаслідок реалізації Кредитором прав, передбачених цим Договором, або внаслідок будь-яких суперечок (претензій, судових спорів) між Поручителем та Боржником з приводу виконання Зобов’язання." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1087"/>
+        </TableRow>
+        <TableRow Name="Row320" AutoSize="true">
+          <TableCell Name="Cell651" Fill.Color="Gainsboro" Text="9. Юрисдикція та порядок вирішення спорів." HorzAlign="Center" Font="Times New Roman, 12pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell652" HorzAlign="Justify" Font="Times New Roman, 12pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row321" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell653" Text="&lt;b&gt;9.1.&lt;/b&gt; Всі спори щодо строків та порядку виконання зобов’язань Боржника перед Поручителем, який виконав повністю або частково Зобов’язання перед Кредитором, вирішуються між Боржником та Поручителем без участі Кредитора." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell654" HorzAlign="Justify" Font="Times New Roman, 12pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row537" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell1088" Text="&lt;b&gt;9.2.&lt;/b&gt; Всі спори між Сторонами, які виникають у зв’язку з цим Договором, вирішуються  шляхом переговорів, а при недосягненні домовленості - у судовому порядку відповідно до Законодавства." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1089"/>
+        </TableRow>
+        <TableRow Name="Row322" AutoSize="true">
+          <TableCell Name="Cell655" Fill.Color="Gainsboro" Text="10. Дія Договору та позовна давність" HorzAlign="Center" Font="Times New Roman, 12pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell656" HorzAlign="Justify" Font="Times New Roman, 12pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row323" AutoSize="true">
+          <TableCell Name="Cell657" Text="10.1. &lt;u&gt;Дія Договору в часі:&lt;/u&gt;" HorzAlign="Justify" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell658" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row324" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell659" Text="&lt;b&gt;10.1.1.&lt;/b&gt; Цей Договір вступає в силу з моменту його підписання Сторонами і скріплення печатками Сторін (за наявності) та діє протягом 30 (тридцяти) років з моменту підписання Договору, але в будь-якому разі до повного виконання Зобов’язання за Кредитним договором та зобов‘язань Поручителя за цим Договором." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell660" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row325" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell661" Text="&lt;b&gt;10.1.2.&lt;/b&gt; До всіх правовідносин, пов’язаних з укладанням та виконанням цього Договору (у тому числі щодо всіх грошових зобов’язань Поручителя - повернення суми Кредиту, сплати процентів за його користування, комісійних винагород, штрафів, пені тощо), застосовується строк позовної давності тривалістю у 30 (тридцять) років. " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell662" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row326" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell663" Text="&lt;b&gt;10.1.3.&lt;/b&gt; Закінчення строку дії Договору не звільняє Сторони від відповідальності за порушення його умов, якщо такі мали місце при виконанні Договору." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell664" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row327" AutoSize="true">
+          <TableCell Name="Cell665" Text="10.2. &lt;u&gt;Зміна умов та розірвання Договору:&lt;/u&gt;" HorzAlign="Justify" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell666" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row328" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell667" Text="&lt;b&gt;10.2.1.&lt;/b&gt; Цей Договір може бути змінений або розірваний за взаємною згодою Сторін або в інших випадках, прямо визначених Законодавством." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell668" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row329" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell669" Text="&lt;b&gt;10.2.2.&lt;/b&gt; Будь-які зміни до Договору (у тому числі щодо продовження строку дії Договору), а також розірвання Договору оформляються у вигляді додаткових договорів до цього Договору та вступають в силу з моменту їх підписання та скріплення печаткою Кредитора. " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell670" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row330" AutoSize="true">
+          <TableCell Name="Cell671" Text="&lt;b&gt;10.2.3.&lt;/b&gt; Всі додаткові договори та додатки до Договору є його невід’ємною частиною. " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell672" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row538" AutoSize="true">
+          <TableCell Name="Cell1090" Text="10.3. &lt;u&gt;Припинення поруки:&lt;/u&gt;" HorzAlign="Justify" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1091"/>
+        </TableRow>
+        <TableRow Name="Row539" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell1092" Text="&lt;b&gt;10.3.1.&lt;/b&gt; Порука за цим Договором припиняється з  моменту повного виконання Зобов’язання за Кредитним договором;" Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1093"/>
+        </TableRow>
+        <TableRow Name="Row540" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell1094" Text="&lt;b&gt;10.3.2.&lt;/b&gt; Не допускається припинення поруки без припинення забезпеченого нею Зобов’язання, крім випадків, прямо передбачених Законодавством та/або цим Договором." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1095"/>
+        </TableRow>
+        <TableRow Name="Row541" AutoSize="true">
+          <TableCell Name="Cell1096" Text="&lt;b&gt;10.3.3.&lt;/b&gt; &lt;u&gt;Не вважаються підставою для припинення поруки наступні обставини:&lt;/u&gt;" Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1097"/>
+        </TableRow>
+        <TableRow Name="Row542" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell1098" Text="&lt;b&gt;1)&lt;/b&gt; Смерть Боржника (у випадку смерті Боржника зобов’язання Поручителя щодо поруки, визначені цим Договором є чинними);" Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1099"/>
+        </TableRow>
+        <TableRow Name="Row543" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell1100" Text="&lt;b&gt;2)&lt;/b&gt; Визнання Боржника недієздатним або обмежено дієздатним, безвісно відсутнім або померлим в порядку, визначеному Законодавством." Padding="40, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1101"/>
+        </TableRow>
+        <TableRow Name="Row544" AutoSize="true">
+          <TableCell Name="Cell1102" Fill.Color="Gainsboro" Text="11. Повідомлення" HorzAlign="Center" Font="Times New Roman, 12pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1103"/>
+        </TableRow>
+        <TableRow Name="Row545" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell1104" Text="&lt;b&gt;11.1.&lt;/b&gt; Повідомлення та інша кореспонденція між Сторонами за цим Договором здійснюються у письмовій формі шляхом направлення рекомендованих листів та/або вручення відповідних документів під особистий підпис іншої Сторони, або іншим способом, який дозволяє достовірно довести дату та зміст відправлення. " HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1105"/>
+        </TableRow>
+        <TableRow Name="Row546" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell1106" Text="&lt;b&gt;11.2&lt;/b&gt; Сторони зобов’язані своєчасно письмово інформувати одна одну про будь-які зміни, що сталися в їх поштових та інших реквізитах. У випадку порушення цієї вимоги відповідна кореспонденція вважається направленою та отриманою належним чином, якщо її було направлено за адресою Сторони, зазначеною у цьому Договорі або останньому письмовому повідомлені відповідної Сторони. " HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1107"/>
+        </TableRow>
+        <TableRow Name="Row334" AutoSize="true">
+          <TableCell Name="Cell679" Fill.Color="Gainsboro" Text="12. Заключні положення" HorzAlign="Center" Font="Times New Roman, 12pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell680" HorzAlign="Justify" Font="Times New Roman, 12pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row335" AutoSize="true">
+          <TableCell Name="Cell681" Text="&lt;b&gt;12.1.&lt;/b&gt; Датою підписання цього Договору є дата, зазначена на його першій сторінці." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell682" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row336" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell683" Text="&lt;b&gt;12.2.&lt;/b&gt; Заголовки та назви розділів не є їх складовою частиною та не можуть братись до уваги при тлумаченні Договору." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell684" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row337" AutoSize="true">
+          <TableCell Name="Cell685" Text="&lt;b&gt;12.3.&lt;/b&gt; &lt;u&gt;Наслідки недійсності окремих положень (частин) Договору:&lt;/u&gt;" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell686" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row338" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell687" Text="&lt;b&gt;12.3.1.&lt;/b&gt; Якщо будь-яке положення (частина) цього Договору є або стає недійсним з будь-яких підстав, цей факт не впливає на дійсність інших положень цього Договору чи Договору в цілому. " Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell688" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row339" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell689" Text="&lt;b&gt;12.3.2.&lt;/b&gt; У випадку недійсності будь-якого положення цього Договору Сторони зобов’язані, у разі необхідності, без зволікань на першу вимогу Кредитора внести зміни (доповнення) до відповідного положення таким чином, щоб після такої зміни це положення було дійсним і максимально відображало наміри Сторін, які існували на момент укладення цього Договору з відповідного питання." Padding="20, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell690" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row340" AutoSize="true">
+          <TableCell Name="Cell691" Text="&lt;b&gt;12.4.&lt;/b&gt; Взаємовідносини Сторін, не врегульовані цим Договором, регламентуються Законодавством." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell692" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row343" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell697" Text="&lt;b&gt;12.5.&lt;/b&gt; Цей Договір укладено українською мовою в 3-х (трьох) примірниках, що мають однакову юридичну силу: один - для Заставодержателя, один - для Застаодавця та один – для зберігання у справах нотаріуса." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell698" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row344" Height="56.7" AutoSize="true">
+          <TableCell Name="Cell699" Text="&lt;b&gt;12.6.&lt;/b&gt; Цей Договір Сторонами прочитаний, відповідає їх намірам та досягнутим домовленостям, що засвідчується власними підписами Сторін (уповноважених представників Сторін), що діють у повній відповідності з наданими їм повноваженнями та повним розумінням предмету та змісту Договору." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell700" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <DataBand Name="Data2" Top="9112.83" Width="718.2" Height="585.9" CanGrow="true" CanShrink="true" StartNewPage="true" KeepChild="true" Guides="0,557.55,18.9,37.8,56.7,141.75,236.25,274.05,292.95,311.85,359.1,434.7,75.6,472.5">
+      <TableObject Name="Table22" Left="9.45" Width="697.41" Height="557.55">
+        <TableColumn Name="Column3" Width="215.46"/>
+        <TableColumn Name="Column4" Width="238.14"/>
+        <TableColumn Name="Column5" Width="243.81"/>
+        <TableRow Name="Row547">
+          <TableCell Name="Cell1108" Fill.Color="Gainsboro" Text="13. Реквізити та підписи Сторін" HorzAlign="Center" Font="Times New Roman, 12pt, style=Bold" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell1109"/>
+          <TableCell Name="Cell1110"/>
+        </TableRow>
+        <TableRow Name="Row548">
+          <TableCell Name="Cell1113"/>
+          <TableCell Name="Cell1114"/>
+          <TableCell Name="Cell1115"/>
+        </TableRow>
+        <TableRow Name="Row549">
+          <TableCell Name="Cell1118" Border.Lines="All" Fill.Color="Gainsboro" Text="Кредитор" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt, style=Bold" HtmlTags="true"/>
+          <TableCell Name="Cell1119" Border.Lines="All" Fill.Color="Gainsboro" Text="Боржник" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt, style=Bold" HtmlTags="true"/>
+          <TableCell Name="Cell1120" Border.Lines="All" Fill.Color="Gainsboro" Text="Поручитель" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt, style=Bold" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row550" Height="85.05" AutoSize="true">
+          <TableCell Name="Cell1123" Border.Lines="All" Border.Color="Gray" Text="публічне акціонерне товариство „Державний ощадний банк України”&#13;&#10;Філія - [Branch_Info.NAME_BRANCH]" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true"/>
+          <TableCell Name="Cell1124" Border.Lines="All" Border.Color="Gray" Text="[klient_info.FIO]" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true"/>
+          <TableCell Name="Cell1125" Border.Lines="All" Border.Color="Gray" Text="[GUARANTOR_info.FIO]" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row551" Height="94.5" AutoSize="true">
+          <TableCell Name="Cell1128" Border.Lines="All" Border.Color="Gray" Text="Адреса: &lt;b&gt;[Branch_Info.ADR_BRANCH]&lt;/b&gt;,&#13;&#10;код ЄДРПОУ: &lt;b&gt;[Branch_Info.OKPO]&lt;/b&gt;,&#13;&#10;код банку: &lt;b&gt;[Branch_Info.MFO]&lt;/b&gt;.&#13;&#10;" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell1129" Border.Lines="All" Border.Color="Gray" Text="&lt;b&gt;[klient_info.PASPORT]&lt;/b&gt;,&#13;&#10;Реєстраційний номер облікової картки платника податків: &lt;b&gt;[klient_info.IDCODE]&lt;/b&gt;, &#13;&#10;Адреса: &lt;b&gt;[klient_info.ADR_LIVE]&lt;/b&gt;" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell1130" Border.Lines="All" Border.Color="Gray" Text="&lt;b&gt;[GUARANTOR_info.PASPORT]&lt;/b&gt;,&#13;&#10;Реєстраційний номер облікової картки платника податків: &lt;b&gt;[GUARANTOR_info.IDCODE]&lt;/b&gt;,&#13;&#10;Адреса: &lt;b&gt;[GUARANTOR_info.ADR_LIVE]&lt;/b&gt;" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row601" Height="37.8">
+          <TableCell Name="Cell1276" Border.Lines="Left, Right, Top" Border.Color="Gray" Text="__________________________" VertAlign="Center" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell1277" Border.Lines="Left, Right, Top" Border.Color="Gray" Text="__________________________" VertAlign="Center" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell1278" Border.Lines="Left, Right, Top" Border.Color="Gray" Text="__________________________" VertAlign="Center" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row552" AutoSize="true">
+          <TableCell Name="Cell1131" Border.Lines="Left, Right" Border.Color="Gray" Text="[Branch_Info.BR_BOSS]" HorzAlign="Right" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true"/>
+          <TableCell Name="Cell1132" Border.Lines="Left, Right" Border.Color="Gray" Text="[klient_info.FIO]" HorzAlign="Right" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true"/>
+          <TableCell Name="Cell1133" Border.Lines="Left, Right" Border.Color="Gray" Text="[GUARANTOR_info.FIO]" HorzAlign="Right" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row602">
+          <TableCell Name="Cell1279" Border.Lines="Left, Right, Bottom" Border.Color="Gray" Text="м.п." Font="Times New Roman, 10pt, style=Bold" HtmlTags="true"/>
+          <TableCell Name="Cell1280" Border.Lines="Left, Right, Bottom"/>
+          <TableCell Name="Cell1281" Border.Lines="Left, Right, Bottom"/>
+        </TableRow>
+        <TableRow Name="Row553" Height="47.25">
+          <TableCell Name="Cell1134"/>
+          <TableCell Name="Cell1135"/>
+          <TableCell Name="Cell1136"/>
+        </TableRow>
+        <TableRow Name="Row554" Height="75.6" AutoSize="true">
+          <TableCell Name="Cell1137" Text="[IIf([Marital_status.IS_MARRIED] &gt; 0 , &quot;Я, &quot; + [Marital_status.SPOUSE_FIO] + &quot;, паспорт громадянина України &quot; + [Marital_status.SPOUSE_PASSP] + &quot;, реєстраційний номер облікової картки платника податку &quot; + [Marital_status.SPOUSE_INN] + &quot;, надаю свою згоду на укладання моїм(-єю) чоловіком (дружиною) &quot; +[Marital_status.CL_FIO_O] + &quot; цього Договору поруки. Підтверджую, що з умовами цього Договору поруки ознайомлений (-на), ніяких заперечень щодо його положень та укладання не маю. &quot;,&quot;&quot;)]" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell1138"/>
+          <TableCell Name="Cell1139"/>
+        </TableRow>
+        <TableRow Name="Row555" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell1140" Text="[IIf([Marital_status.IS_MARRIED] &gt; 0 , &quot;Надання згоди на укладення моїм (-єю)  чоловіком (дружиною) цього Договору поруки засвідчую власним підписом&quot;,&quot;&quot;)]" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell1141"/>
+          <TableCell Name="Cell1142"/>
+        </TableRow>
+        <TableRow Name="Row556" Height="85.05" AutoSize="true">
+          <TableCell Name="Cell1143" Text="[IIf([Marital_status.IS_MARRIED] &gt; 0 , [Dog_info.DATA_DOG_PR],&quot;&quot;)]" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true"/>
+          <TableCell Name="Cell1144" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell1145" Text="[IIf([Marital_status.IS_MARRIED] &gt; 0 , &quot;______________________________ (ініціали та прізвище чоловіка/дружини Поручителя – власноручний підпис та напис)&quot;,&quot;&quot;)]" HorzAlign="Center" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <DataBand Name="Data3" Top="9701.76" Width="718.2" Height="132.36" CanBreak="true" KeepChild="true" Guides="0,132.36,18.91,37.82,56.73,75.64,94.55">
+      <TableObject Name="Table24" Left="9.45" Width="699.28" Height="132.36">
+        <TableColumn Name="Column6" Width="307.12"/>
+        <TableColumn Name="Column7" Width="89.77"/>
+        <TableColumn Name="Column8" Width="127.57"/>
+        <TableColumn Name="Column9" Width="174.82"/>
+        <TableRow Name="Row558" Height="18.91">
+          <TableCell Name="Cell1149" BeforePrintEvent="Cell49_BeforePrint"/>
+          <TableCell Name="Cell1150"/>
+          <TableCell Name="Cell1151"/>
+          <TableCell Name="Cell1152" Text="Додаток  № 1 " HorzAlign="Right" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row559" Height="18.91">
+          <TableCell Name="Cell1154"/>
+          <TableCell Name="Cell1155"/>
+          <TableCell Name="Cell1156" Text="до Договору поруки №[Dog_info.NUM_DOG]" HorzAlign="Center" ColSpan="2"/>
+          <TableCell Name="Cell1157" HorzAlign="Center"/>
+        </TableRow>
+        <TableRow Name="Row560" Height="18.91">
+          <TableCell Name="Cell1159"/>
+          <TableCell Name="Cell1160"/>
+          <TableCell Name="Cell1161" Text="від [Dog_info.DATA_DOG_PR]" HorzAlign="Center" ColSpan="2"/>
+          <TableCell Name="Cell1162"/>
+        </TableRow>
+        <TableRow Name="Row561" Height="18.91">
+          <TableCell Name="Cell1164" Fill.Color="Gainsboro" Text="Перелік рахунків Поручителя" HorzAlign="Center" Font="Times New Roman, 12pt, style=Bold" HtmlTags="true" ColSpan="4"/>
+          <TableCell Name="Cell1165"/>
+          <TableCell Name="Cell1166"/>
+          <TableCell Name="Cell1167"/>
+        </TableRow>
+        <TableRow Name="Row562" Height="18.91">
+          <TableCell Name="Cell1169"/>
+          <TableCell Name="Cell1170"/>
+          <TableCell Name="Cell1171"/>
+          <TableCell Name="Cell1172"/>
+        </TableRow>
+        <TableRow Name="Row563" Height="37.81">
+          <TableCell Name="Cell1173" Border.Lines="All" Text="Назва Установи Кредитора" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell1174" Border.Lines="All" Text="Код банку" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell1175" Border.Lines="All" Text="№ рахунку" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell1176" Border.Lines="All" Text="Назва валюти, в якій відкритий рахунок" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <DataBand Name="Data4" Top="9837.15" Width="718.2" Height="18.9" Guides="0,18.9" DataSource="Table25">
+      <TableObject Name="Table26" Left="9.45" Width="699.28" Height="18.9">
+        <TableColumn Name="Column10" Width="307.12"/>
+        <TableColumn Name="Column11" Width="89.77"/>
+        <TableColumn Name="Column12" Width="127.57"/>
+        <TableColumn Name="Column13" Width="174.82"/>
+        <TableRow Name="Row571">
+          <TableCell Name="Cell1205" Border.Lines="All" Text="[acc.BRANCH_NAME]"/>
+          <TableCell Name="Cell1206" Border.Lines="All" Text="[acc.KF]"/>
+          <TableCell Name="Cell1207" Border.Lines="All" Text="[acc.NLS]"/>
+          <TableCell Name="Cell1208" Border.Lines="All" Text="[acc.TXT] ([acc.KV])"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <DataBand Name="Data5" Top="9859.08" Width="718.2" Height="302.4" Guides="0,292.95,18.9,37.8,122.85,217.35,255.15,274.05">
+      <TableObject Name="Table26" Left="9.45" Width="697.41" Height="292.95">
+        <TableColumn Name="Column14" Width="215.46"/>
+        <TableColumn Name="Column15" Width="238.14"/>
+        <TableColumn Name="Column16" Width="243.81"/>
+        <TableRow Name="Row579">
+          <TableCell Name="Cell1230"/>
+          <TableCell Name="Cell1231"/>
+          <TableCell Name="Cell1232"/>
+        </TableRow>
+        <TableRow Name="Row574" AutoSize="true">
+          <TableCell Name="Cell1215" Border.Lines="All" Fill.Color="Gainsboro" Text="Кредитор" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt, style=Bold" HtmlTags="true"/>
+          <TableCell Name="Cell1216" Border.Lines="All" Fill.Color="Gainsboro" Text="Боржник" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt, style=Bold" HtmlTags="true"/>
+          <TableCell Name="Cell1217" Border.Lines="All" Fill.Color="Gainsboro" Text="Поручитель" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt, style=Bold" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row575" Height="85.05" AutoSize="true">
+          <TableCell Name="Cell1218" Border.Lines="All" Border.Color="Gray" Text="публічне акціонерне товариство „Державний ощадний банк України”&#13;&#10;Філія - [Branch_Info.NAME_BRANCH]" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true"/>
+          <TableCell Name="Cell1219" Border.Lines="All" Border.Color="Gray" Text="[klient_info.FIO]" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true"/>
+          <TableCell Name="Cell1220" Border.Lines="All" Border.Color="Gray" Text="[GUARANTOR_info.FIO]" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row576" Height="94.5" AutoSize="true">
+          <TableCell Name="Cell1221" Border.Lines="All" Border.Color="Gray" Text="Адреса: &lt;b&gt;[Branch_Info.ADR_BRANCH]&lt;/b&gt;,&#13;&#10;код ЄДРПОУ: &lt;b&gt;[Branch_Info.OKPO]&lt;/b&gt;,&#13;&#10;код банку: &lt;b&gt;[Branch_Info.MFO]&lt;/b&gt;.&#13;&#10;" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell1222" Border.Lines="All" Border.Color="Gray" Text="&lt;b&gt;[klient_info.PASPORT]&lt;/b&gt;,&#13;&#10;Реєстраційний номер облікової картки платника податків: &lt;b&gt;[klient_info.IDCODE]&lt;/b&gt;, &#13;&#10;Адреса: &lt;b&gt;[klient_info.ADR_LIVE]&lt;/b&gt;" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell1223" Border.Lines="All" Border.Color="Gray" Text="&lt;b&gt;[GUARANTOR_info.PASPORT]&lt;/b&gt;,&#13;&#10;Реєстраційний номер облікової картки платника податків: &lt;b&gt;[GUARANTOR_info.IDCODE]&lt;/b&gt;,&#13;&#10;Адреса: &lt;b&gt;[GUARANTOR_info.ADR_LIVE]&lt;/b&gt;" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row577" Height="37.8">
+          <TableCell Name="Cell1224" Border.Lines="Left, Right, Top" Border.Color="Gray" Text="__________________________" VertAlign="Center" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell1225" Border.Lines="Left, Right, Top" Border.Color="Gray" Text=" ______________________________ " VertAlign="Center" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell1226" Border.Lines="Left, Right, Top" Border.Color="Gray" Text="_______________________________" VertAlign="Center" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row578" AutoSize="true">
+          <TableCell Name="Cell1227" Border.Lines="Left, Right" Border.Color="Gray" Text="[Branch_Info.BR_BOSS]" HorzAlign="Right" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true"/>
+          <TableCell Name="Cell1228" Border.Lines="Left, Right" Border.Color="Gray" Text="[klient_info.FIO]" HorzAlign="Right" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true"/>
+          <TableCell Name="Cell1229" Border.Lines="Left, Right" Border.Color="Gray" Text="[GUARANTOR_info.FIO]" HorzAlign="Right" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row600">
+          <TableCell Name="Cell1273" Border.Lines="Left, Right, Bottom" Border.Color="Gray" Text="м.п." Font="Times New Roman, 10pt, style=Bold" HtmlTags="true"/>
+          <TableCell Name="Cell1274" Border.Lines="Left, Right, Bottom"/>
+          <TableCell Name="Cell1275" Border.Lines="Left, Right, Bottom"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="10164.51" Width="718.2" Height="47.25" Guides="0,47.25">
+      <TableObject Name="Table1" Left="9.45" Width="697.41" Height="47.25">
+        <TableColumn Name="Column17" Width="215.46"/>
+        <TableColumn Name="Column18" Width="238.14"/>
+        <TableColumn Name="Column19" Width="243.81"/>
+        <TableRow Name="Row603" Height="47.25">
+          <TableCell Name="Cell1282" Text="Кредитор ___________________" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1283" Text="Боржник __________________" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1284" Text="Поручитель _______________" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+        </TableRow>
+      </TableObject>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

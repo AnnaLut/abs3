@@ -1,0 +1,605 @@
+
+
+
+/*.preTableDiv
+{
+
+	position:relative;
+	padding: 0px 0 0px 0;
+	width:100%;
+	font-size:1em;
+	font-family: Arial;
+	color: #4C5967;
+}*/
+.gridView
+{
+    border-collapse:collapse; 
+    /*background-color:#fff;*/
+	width: 100%;
+    min-height:50px;
+	border:none;
+	border-left:solid 1px #bdcff7;
+	border-right:solid 1px #bdcff7;
+	border-top:dotted 1px #bdcff7;
+	border-bottom:solid 1px #bdcff7;
+}
+.gridView th
+{
+	color: #1a4784;
+	cursor:pointer;
+	padding: 3px 3px 3px 3px;
+	border: none;
+	border-right: dotted 1px #bdcff7;
+	border-bottom: dotted 1px #bdcff7;
+}
+.gridView tr
+{
+    border:none;
+    margin:0 0 0 0;
+}
+.gridView td
+{
+    margin:0 0 0 0;
+	padding: 4px 3px 4px 3px;
+	white-space:nowrap;
+	border: none;
+	border-right:solid 1px #E0E0E0;
+}
+
+/*table
+{
+    /*border-collapse: collapse;* /
+    border:none;
+}*/
+
+.barsGridView tr
+{
+
+}
+
+.barsGridView tr a
+{
+
+}
+
+/*.selectedRow
+{
+	background-color: #adddff; /* #0977B9 ;* /
+	/*color: #fff;* /
+}*/
+.headerRow
+{
+}
+
+.headerRow th
+{
+    font-size:9pt;
+    text-align: center;
+}
+
+.headerRow th a
+{
+    text-decoration: none;
+    color: #1a4784;
+}
+
+
+
+.footerRow
+{
+}
+
+.footerRow td
+{
+    padding: 0;
+	font-size:12px;
+	/*border:none;*/
+}
+
+ td input
+{
+	font-size:12pt;
+}
+
+.gridView tfoot td{
+    border-top: solid 1px #bdcff7;
+    padding: 0;
+	font-size:12px;
+}
+.gridView tfoot td img{
+    cursor:pointer;
+    margin:2px 0 -3px 0;
+}
+.footerTable
+{
+    border-top: solid 1px #bdcff7;
+}
+/*???*/
+    .footerDiv
+    {
+        border-top: solid 1px #bdcff7;
+    }
+    .footerDiv img
+    {
+        cursor:pointer;
+        margin:2px 0 -3px 0;
+
+    }
+    .footerDiv div
+    {
+        float:left;
+    }
+/*---*/
+/*
+.normalRow
+{
+	background-color: #F0F0F0;
+}
+
+.alternateRow
+{
+    
+    background-color:White;
+}
+.alternateRow, .normalRow, .selectedRow
+{
+    cursor:pointer;
+}
+.alternateRow:hover, .normalRow:hover
+{
+    background-color:#d7ebf9;
+}
+*/
+
+
+
+.newRow
+{
+	  
+}
+
+.newRow td
+{
+	padding: 0 1px 0 0;
+}
+
+.editRow
+{
+}
+
+.pagerRow
+{
+    font-size:12pt;
+    padding: 0;
+
+}
+.pagerRow
+{
+    padding: 0;
+}
+
+/*€чейка пейджера*/
+.pagerRow td table tr td
+{
+   padding: 1px 1px 1px 1px;
+   border:none;
+}
+
+/*линк пейджера*/
+.pagerRow td table tr td a
+{
+    font-size:8pt;
+    padding: 0 3px 0 3px;
+}
+/*текуща€ страница пейджера*/
+.pagerRow td table tr td span
+{
+    font-size:10pt;
+}
+
+.filterRow input
+{
+	font-size:x-small;
+    margin-top:2px;	
+    width:100%;
+}
+
+.filterRow select
+{
+	font-size: x-small;
+}
+
+.captionHeader
+{	
+	
+	background-color: #94ABD9;
+}
+
+/*.captionBody
+{
+	width: 100%;
+	/*text-align:justify;* /
+    text-align:left;
+	/*background-image:url(/common/images/skin/gradient_main.png);* /
+	/*background: url(/common/images/skin/title_bg.gif) no-repeat;
+	background-repeat:repeat-x;* /
+	min-height:20px;
+	border-right:solid 1px #bdcff7;
+    border-top:solid 1px #bdcff7;
+    border-left:solid 1px #bdcff7;
+}*/
+.captionBody img
+{
+    cursor:pointer;
+    margin:3px 5px 0 5px;
+}
+.captionBody div
+{
+    text-align:center;
+    margin:0 0 3px 0;
+}
+
+.captionBody tr td
+{
+	white-space: nowrap;
+}
+
+.captionBodySimple
+{
+	width: 100%;
+	text-align:justify;
+	padding-bottom: 3px;
+	height:20px;
+    border-left :solid 1px #bdcff7;
+	border-right:solid 1px #bdcff7;
+	border-top:solid 1px #bdcff7;
+}
+
+.captionBodySimple tr td
+{
+	white-space: nowrap;
+}
+
+.captionText
+{
+	width: 100%;
+	font-size: 10pt;
+	font-weight:bold;
+	color:White;
+	vertical-align:middle;
+	text-align: center;
+}
+
+.emptyMessage
+{
+	padding: 3px 50px 3px 50px;
+	text-align: center;
+}
+
+.tableTitle
+{
+	font-size: 11pt;
+
+	color: #1C4B75;
+	margin-bottom: 15px;
+	margin-top: 7px;
+}
+.spanIcoSortASC
+{
+    background-image:url(images/sort_asc.png);
+}
+.spanIcoSortDESC
+{
+    background-image:url(images/sort_desc.png);
+}
+
+
+
+/*.preTableDiv
+{
+	position:relative;
+	padding: 0px 0 0px 0;
+	width:100%;
+}
+*/
+.jungGridView,
+.jungGridView table {
+    position:relative;
+    border-collapse:collapse;
+    border:none;
+    width:100%;
+    display:block;
+    font-family: Verdana,'Segoe UI Semilight', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+    /*background-color:#42cb52;/*зелений*/
+    /*background-color:#f6ba17;/*желтый*/
+    /*background-color:#f6174f;/*розовый*/
+    /*background-color:#c944c8;/*фиолетовый*/
+    /*background-color:#00bbf1;/*голубой*/
+    /*background-color:#0072c6;/*синий*/
+    /*background-color:#2672ec;/*синий*/
+}
+
+/*стили дл€ лоадера*/
+.jung-grid {
+  position: relative;
+}
+.jung-grid .divPreloader{
+    position:absolute; width:98%;
+}
+.jung-grid .divPreloader .overlay{
+    position:absolute;width:100% ;left:0; background-image:url(images/onepixel.gif);
+}
+.jung-grid .divPreloader .loading{
+    padding:10px;margin:0 auto;width:230px;border:2px solid #2672ec /*#e3f1fb #bdcff7 #00bbf1*/;background-color:#fff;
+}
+.jung-grid .divPreloader .loading #lbStatus{}
+.jung-grid .divPreloader .loading #lbImgLoading{
+    background-image:url(images/load-line12-0072c6.gif);background-repeat:no-repeat;height:25px;
+}
+/*.preTableDiv {
+    border: 1px solid red;
+}
+.divPreloader{
+  border: 1px solid red;
+    position:absolute; width:98%;
+}
+.divPreloader .overlay{
+    border: 1px solid red;
+    position:absolute;width:100% ;left:0; background-image:url(img/onepixel.gif);
+}
+.divPreloader .loading{
+    border: 1px solid red;
+    padding:10px;margin:0 auto;width:230px;border:2px solid #2672ec;background-color:#fff;
+}
+.divPreloader .loading #lbStatus{}
+.divPreloader .loading #lbImgLoading{
+    border: 1px solid red;
+    background-image:url(img/load-line12-0072c6.gif);background-repeat:no-repeat;height:25px;
+}
+.jungGridView caption {
+
+}*/
+
+.jungGridView thead tr th,
+.jungGridView thead tr td {
+  display: table-cell;
+  vertical-align: bottom;
+  padding-bottom: 2px;
+  padding-top: 2px;
+  padding-left: 2px;
+  padding-right: 2px;
+  border-bottom: 1px #bdcff7 solid;
+  border-right: 1px #bdcff7 solid;
+  border-left: 1px #bdcff7 solid;
+  border-top: 1px #bdcff7 solid;
+  font-size: 12px;
+  letter-spacing: 0.01em;
+  line-height: 13pt;
+  font-smooth: always;
+  font-weight:600;
+  text-align: right;
+  color:#fff;
+  color:#2672ec;
+  white-space:nowrap;
+}
+.jungGridView thead tr th span,
+.jungGridView thead tr td span{
+    font-size:12px;
+}
+.jungGridView thead tr th div,
+.jungGridView thead tr td div{
+    cursor:pointer;
+}
+
+.jungGridView tbody tr td {
+  font-family:  Verdana, 'Segoe UI Light', 'Open Sans',Arial, Helvetica, sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  letter-spacing: 0.01em;
+  line-height: 14pt;
+  font-smooth: always;
+  padding: 2px 5px;
+  border-right: 1px #d4d4d4 solid;
+  border-bottom: 1px #d4d4d4 solid;
+  border-left: 1px #d4d4d4 solid;
+  border-top: 1px #d4d4d4 solid;
+  box-sizing: border-box;
+  color:#000;
+  white-space:nowrap;
+}
+.jungGridView tbody tr.statusRow td{
+  text-align:center;
+  background-color:#fff;
+}
+
+.jungGridView tbody tr.selectedRow,
+.jungGridView tbody tr.normalRow.selectedRow,
+.jungGridView tbody tr.alternateRow.selectedRow
+{
+	background-color: #adddff;
+}
+.jungGridView tbody tr.selectedRow:hover,
+.jungGridView tbody tr.normalRow.selectedRow:hover,
+.jungGridView tbody tr.alternateRow.selectedRow:hover
+{
+	background-color: #adddff;
+}
+
+.jungGridView tbody tr.normalRow
+{
+  background-color: #F0F0F0;
+}
+.jungGridView tbody tr.alternateRow
+{
+    background-color:White;
+}
+.jungGridView tbody tr.alternateRow, 
+.jungGridView tbody tr.normalRow, 
+.jungGridView tbody tr.selectedRow
+{
+    cursor:pointer;
+}
+.jungGridView tbody tr.alternateRow:hover, 
+.jungGridView tbody tr.normalRow:hover
+{
+    background-color:#d7ebf9;
+}
+.jungGridView tbody tr.insert td {
+padding:1px;
+}
+.jungGridView tbody tr.insert td input {
+margin:0px;
+}
+
+.jungGridView tfoot tr td {
+  background-color:#2672ec;
+  font-weight: 300;
+  font-size: 11pt;
+  letter-spacing: 0.02em;
+  line-height: 14pt;
+  font-smooth: always;
+  padding: 0px 10px;
+  border-bottom: 1px #bdcff7 solid;
+  border-right: 1px #bdcff7 solid;
+  border-left: 1px #bdcff7 solid;
+  border-top: 1px #bdcff7 solid;
+  box-sizing: border-box;
+  color: #fff;
+  word-wrap:normal;
+}
+
+.jungGridView tfoot tr td input
+{
+	font-size:11pt;
+    margin:0;
+    padding:1px;
+    background-color:#fff;
+}
+.jungGridView tfoot tr td .button,
+.jungGridView thead tr td .button,
+.jungGridView thead tr th .button,
+.jungGridView caption .button {   
+    float: left;
+    display:inline-block;
+    border:0 solid;
+    padding:0;
+    margin:0 0 0 0;
+    background:none;
+}
+.jungGridView tfoot tr td .button .icon,
+.jungGridView thead tr td .button .icon,
+.jungGridView thead tr th .button .icon,
+.jungGridView caption .button .icon {
+    background-image: url("images/sprite.png");    
+    display:inline-block;
+    padding:0;
+    margin:0;
+}
+.jungGridView thead tr td .button,
+.jungGridView thead tr th .button,
+.jungGridView thead tr td .button .icon,
+.jungGridView thead tr th .button .icon{
+    height: 16px;
+    width: 16px;
+    max-width:16px;
+}
+.jungGridView tfoot tr td .button,
+.jungGridView caption .button,
+.jungGridView tfoot tr td .button .icon,
+.jungGridView caption .button .icon {
+    height: 24px;
+    width: 24px;
+    max-width:24px;
+}
+.jungGridView tfoot tr td span {
+    display:inline-block;float:left;
+}
+.jungGridView tfoot tr td span.text {
+    margin:3px 5px 0 5px;
+}
+.jungGridView tfoot tr td span.pageNum {
+    font-size:16px;
+}
+
+
+.jungGridView caption .button .navigateRefresh
+{
+    background-position: -200px -640px;
+}
+.jungGridView caption .button .navigateRefresh:active
+{
+    background-position: -200px -680px;
+}
+
+.jungGridView tfoot tr td .button .navigateRight
+{
+    /*background-position: -40px -640px;*/
+    background-position: -24px -157px;
+}
+.jungGridView tfoot tr td .button .navigateRight:active
+{
+    background-position: -24px -181px;
+}
+.jungGridView tfoot tr td .button .navigateLeft
+{
+    /*background-position: -160px -640px;*/
+    background-position: -96px -157px;
+}
+.jungGridView tfoot tr td .button .navigateLeft:active
+{
+    background-position: -96px -181px;
+}
+.jungGridView thead tr td .button .icon.sortASC,
+.jungGridView thead tr th .button .icon.sortASC
+{
+    background-position: -280px -524px;
+}
+.jungGridView thead tr td .button .icon.sortDESC,
+.jungGridView thead tr th .button .icon.sortDESC
+{
+    background-position: -296px -524px;
+}
+
+.jungGridView tfoot tr td input.rowNumber
+{
+    width:30px;text-align:center;
+    padding:1px 2px !important;
+    font-size:1em;
+}
+
+.jungGridView tfoot tr td span.text-error {
+color:red !important;
+}
+.jungGridView tfoot tr td {
+white-space: nowrap;
+}
+
+/*
+.preTableDiv table.hovered {
+  border-collapse: separate !important;
+}
+.preTableDiv table.hovered thead tr th:hover,
+.preTableDiv table.hovered thead tr td:hover {
+  border: 1px #1c98cc solid;
+  background: rgba(28, 183, 236, 0.1);
+}
+.preTableDiv table.hovered tbody tr:hover {
+  background-color: rgba(28, 183, 236, 0.1);
+}
+.preTableDiv table.hovered tbody tr:hover td:first-child {
+  border-left: 1px #1c98cc solid;
+}
+.preTableDiv table.hovered tbody tr:hover td:last-child {
+  border-right: 1px #1c98cc solid;
+}
+.preTableDiv table.hovered tbody tr:hover td {
+  border-top: 1px #1c98cc solid;
+  border-bottom: 1px #1c98cc solid;
+}
+.preTableDiv table.bordered {
+  border-collapse: separate !important;
+  border: 1px #ccc solid !important;
+}
+.preTableDiv table.bordered tbody tr:last-child td {
+  border-bottom: 0;
+}*/

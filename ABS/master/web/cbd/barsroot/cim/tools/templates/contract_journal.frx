@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="11/20/2012 15:46:20" ReportInfo.Modified="04/07/2015 18:02:46" ReportInfo.CreatorVersion="2013.2.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="barsdev" ConnectionString="rijcmlq9SEZoacNJntaKIKp6mVF1+kSHs9h2FEASDb2ziQ1rMUybLG+C6jbSqka/GGQeZKaQSbrDjBY4KltUNuVSQtSEw==">
+      <TableDataSource Name="Table" Alias="p" DataType="System.Int32" Enabled="true" ForceLoadData="true" SelectCommand="select * from &#13;&#10;(SELECT branch, /*decode(str_level, -1, num_txt||', ', num_txt)*/nvl2(num_txt,num_txt||', ',null)||TO_CHAR (create_date,'dd.mm.yy') as num_txt,&#13;&#10;        TO_CHAR (val_date, 'dd.mm.yy') AS val_date,&#13;&#10;        kv_p,&#13;&#10;        s_p,&#13;&#10;        conclusion,&#13;&#10;        comments,&#13;&#10;        TO_CHAR (allow_date, 'dd.mm.yy') AS allow_date,&#13;&#10;        kv_v,&#13;&#10;        s_v,&#13;&#10;        vmd_num,&#13;&#10;        control_date,&#13;&#10;        bound_id, num,  decode(comiss, null, null, 'в т.ч. комісія '||comiss) as comiss, journal_num, str_level        &#13;&#10;    FROM v_cim_journal&#13;&#10;   WHERE journal_num is not null and contr_id = :p_contr_id&#13;&#10;union all &#13;&#10;  select '/11', null, null, null, null, &#13;&#10;          decode((select contr_type from cim_contracts where contr_id=:p_contr_id), 0, 'Еекспортний журнал', 1, 'Імпортний журнал'), &#13;&#10;                                                           null, null, null, null, null, null, null, null, null, &#13;&#10;                                                           (select contr_type from cim_contracts where contr_id=:p_contr_id)+1, null from dual &#13;&#10;union all &#13;&#10;  select '/11', null, null, null, null, 'Незакриті МД', null, null, null, null, null, null, null, null, null, 5, null &#13;&#10;    from dual where (select contr_type from cim_contracts where contr_id=:p_contr_id)=1&#13;&#10;union all &#13;&#10;  select '/1', null, null, null, null,                null, null, null, null, null, null, null, null, null, null, 5, null from dual&#13;&#10;union all &#13;&#10;  select null, null, null, null, null, null, comments, TO_CHAR (allow_date, 'dd.mm.yy') AS allow_date, to_char(vt,'009'), to_char(z_vt), num, null, &#13;&#10;         bound_id, null, null, 5, null &#13;&#10;    from v_cim_bound_vmd where z_vt&gt;0 and contr_id = :p_contr_id and (select contr_type from cim_contracts where contr_id=:p_contr_id)=1&#13;&#10;) order by journal_num, branch, num, bound_id, num_txt, val_date, allow_date">
+        <Column Name="VAL_DATE" DataType="System.String"/>
+        <Column Name="COMMENTS" DataType="System.String"/>
+        <Column Name="S_P" DataType="System.String"/>
+        <Column Name="ALLOW_DATE" DataType="System.String"/>
+        <Column Name="S_V" DataType="System.String"/>
+        <Column Name="KV_P" DataType="System.String"/>
+        <Column Name="KV_V" DataType="System.String"/>
+        <Column Name="VMD_NUM" DataType="System.String"/>
+        <Column Name="NUM_TXT" DataType="System.String"/>
+        <Column Name="CONCLUSION" DataType="System.String"/>
+        <Column Name="CONTROL_DATE" DataType="System.String"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="JOURNAL_NUM" DataType="System.Char"/>
+        <Column Name="BOUND_ID" DataType="System.Decimal"/>
+        <Column Name="NUM" DataType="System.Decimal"/>
+        <Column Name="COMISS" DataType="System.String"/>
+        <Column Name="STR_LEVEL" DataType="System.Decimal"/>
+        <CommandParameter Name="p_contr_id" DataType="126" Expression="[p_contr_id]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table1" Alias="с" DataType="System.Int32" Enabled="true" SelectCommand="select k.contr_type, decode(k.contr_type, 0, 'екс', 1, 'ім') as type_txt, k.num, to_char(k.open_date,'dd.mm.yyyy') as open_date, &#13;&#10;       k.rnk, c.okpo, c.nmk, b.BENEF_NAME, u.name  &#13;&#10;  from cim_contracts k&#13;&#10;       join customer c on c.rnk=k.rnk&#13;&#10;       join cim_beneficiaries b on b.benef_id=k.benef_id&#13;&#10;       join country u on u.country=b.country_id &#13;&#10; where k.contr_id=:p_contr_id">
+        <Column Name="CONTR_TYPE" DataType="System.Decimal"/>
+        <Column Name="NUM" DataType="System.String"/>
+        <Column Name="OPEN_DATE" DataType="System.Char"/>
+        <Column Name="TYPE_TXT" DataType="System.String"/>
+        <Column Name="RNK" DataType="System.Decimal"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="NMK" DataType="System.String"/>
+        <Column Name="BENEF_NAME" DataType="System.String"/>
+        <Column Name="NAME" DataType="System.String"/>
+        <CommandParameter Name="p_contr_id" DataType="126" Expression="[p_contr_id]"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Relation Name="Table_Table1" ParentDataSource="Table" ChildDataSource="null" ParentColumns="BOUND_ID&#13;&#10;PTYPE_ID" ChildColumns="BOUND_ID&#13;&#10;PAYMENT_TYPE" Enabled="true"/>
+    <Parameter Name="p_contr_id" DataType="System.Int32"/>
+  </Dictionary>
+  <ReportPage Name="Page1" RawPaperSize="9" LeftMargin="7.5" BottomMargin="7.5" Guides="0">
+    <ReportTitleBand Name="ReportTitle1" Width="727.65" Height="66.15">
+      <TextObject Name="Text1" Width="718.2" Height="28.35" Text="Витяг з журналів реєстрації [с.TYPE_TXT]портних операцій по контракту №[с.NUM] від [с.OPEN_DATE]р. (#[p_contr_id])&#13;&#10;" Format="Date" Format.Format="d" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text9" Top="28.35" Width="708.75" Height="37.8" Text="Резидент:      [с.OKPO], [с.NMK] (RNK [с.RNK])&#13;&#10;Нерезидент:  [с.BENEF_NAME], країна: [с.NAME]" Font="Times New Roman, 10pt, style=Bold"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="70.15" Width="727.65" Height="85.05" Guides="0">
+      <TextObject Name="Text2" Width="56.7" Height="85.05" Border.Lines="All" Text="№ з/п, дата реєстрації" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Times New Roman, 8pt, style=Bold"/>
+      <TextObject Name="Text50" Left="613.7" Width="113.4" Height="85.05" Border.Lines="All" Text="Примітка" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt, style=Bold"/>
+      <TextObject Name="Text44" Left="56.7" Width="66.15" Height="85.05" Border.Lines="All" Text="Дата закінчен-ня аконодавчо встановлених строків розрахунків" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Times New Roman, 8pt, style=Bold"/>
+      <TextObject Name="Text52" Left="207.35" Width="170.1" Height="28.35" Border.Lines="All" Text="Перерахування/отримання коштів за договором" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt, style=Bold"/>
+      <TextObject Name="Text53" Left="207.35" Top="28.35" Width="56.7" Height="56.7" Border.Lines="All" Text="Дата опера-ції" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt, style=Bold"/>
+      <TextObject Name="Text54" Left="264.05" Top="28.35" Width="37.8" Height="56.7" Border.Lines="All" Text="Валюта" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt, style=Bold"/>
+      <TextObject Name="Text55" Left="301.85" Top="28.35" Width="75.6" Height="56.7" Border.Lines="All" Text="Сума коштів" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt, style=Bold"/>
+      <TextObject Name="Text81" Left="122.3" Width="85.05" Height="85.05" Border.Lines="All" Text="Інформація про одержані за цим договором резидента висновки" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt, style=Bold"/>
+      <TextObject Name="Text51" Left="377.45" Width="236.25" Height="28.35" Border.Lines="All" Text="Акт або інший документ, що засвідчує виконання робіт (надання послуг, тощо)" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt, style=Bold"/>
+      <TextObject Name="Text49" Left="538.1" Top="28.35" Width="75.6" Height="56.7" Border.Lines="All" Text="Сума коштів, зазначених в акті" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt, style=Bold"/>
+      <TextObject Name="Text48" Left="500.3" Top="28.35" Width="37.8" Height="56.7" Border.Lines="All" Text="Код валюти" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt, style=Bold"/>
+      <TextObject Name="Text47" Left="377.45" Top="28.35" Width="56.7" Height="56.7" Border.Lines="All" Text="Дата" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt, style=Bold"/>
+      <TextObject Name="Text46" Left="434.15" Top="28.35" Width="66.15" Height="56.7" Border.Lines="All" Text="Номер" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt, style=Bold"/>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="159.2" Width="727.65" Height="18.9" CanGrow="true" Guides="9.45,0" DataSource="Table" KeepTogether="true" KeepDetail="true">
+      <TextObject Name="Text3" Width="56.7" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.NUM_TXT]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+        <Highlight>
+          <Condition Expression="[p.STR_LEVEL] == -1" TextFill.Color="ControlText" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
+        </Highlight>
+      </TextObject>
+      <TextObject Name="Text34" Left="613.7" Width="113.4" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.COMMENTS]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+        <Highlight>
+          <Condition Expression="[p.STR_LEVEL] == -1" TextFill.Color="ControlText" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
+        </Highlight>
+      </TextObject>
+      <TextObject Name="Text68" Left="56.7" Width="66.15" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.CONTROL_DATE]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+        <Highlight>
+          <Condition Expression="[p.STR_LEVEL] == -1" TextFill.Color="ControlText" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
+        </Highlight>
+      </TextObject>
+      <TextObject Name="Text56" Left="207.35" Width="56.7" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.VAL_DATE]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+        <Highlight>
+          <Condition Expression="[p.STR_LEVEL] == -1" TextFill.Color="ControlText" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
+        </Highlight>
+      </TextObject>
+      <TextObject Name="Text58" Left="301.85" Width="75.6" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.S_P]&#13;&#10;[p.COMISS]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt">
+        <Highlight>
+          <Condition Expression="[p.STR_LEVEL] == -1" TextFill.Color="ControlText" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
+        </Highlight>
+      </TextObject>
+      <TextObject Name="Text57" Left="264.05" Width="37.8" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.KV_P]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+        <Highlight>
+          <Condition Expression="[p.STR_LEVEL] == -1" TextFill.Color="ControlText" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
+        </Highlight>
+      </TextObject>
+      <TextObject Name="Text12" Left="122.3" Width="85.05" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.CONCLUSION]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+        <Highlight>
+          <Condition Expression="[p.STR_LEVEL] == -1" TextFill.Color="ControlText" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
+        </Highlight>
+      </TextObject>
+      <TextObject Name="Text31" Left="377.45" Width="56.7" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.ALLOW_DATE]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+        <Highlight>
+          <Condition Expression="[p.STR_LEVEL] == -1" TextFill.Color="ControlText" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
+        </Highlight>
+      </TextObject>
+      <TextObject Name="Text35" Left="500.3" Width="37.8" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.KV_V]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+        <Highlight>
+          <Condition Expression="[p.STR_LEVEL] == -1" TextFill.Color="ControlText" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
+        </Highlight>
+      </TextObject>
+      <TextObject Name="Text32" Left="538.1" Width="75.6" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.S_V]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt">
+        <Highlight>
+          <Condition Expression="[p.STR_LEVEL] == -1" TextFill.Color="ControlText" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
+        </Highlight>
+      </TextObject>
+      <TextObject Name="Text30" Left="434.15" Width="66.15" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.VMD_NUM]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+        <Highlight>
+          <Condition Expression="[p.STR_LEVEL] == -1" TextFill.Color="ControlText" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
+        </Highlight>
+      </TextObject>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="182.1" Width="727.65" Height="18.9" Guides="9.45">
+      <TextObject Name="Text11" Left="9.45" Width="718.2" Height="18.9" Text="[Page]" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 8pt"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

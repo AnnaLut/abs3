@@ -1,0 +1,125 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="11/21/2014 16:18:20" ReportInfo.Modified="11/24/2014 17:10:32" ReportInfo.CreatorVersion="2013.2.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqD6nWZEExUJ9MEhdFZpB1A+RsALYQnkrx1bqUugr9bZmM+vm2A2A73LUw+BfeY2K4ywyq6YkKRslmYd5fK9LRoA==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select :sFdat1, :sFdat2, a.branch, o.type, (SELECT p.sq/100&#13;&#10;                                                               FROM opldok p&#13;&#10;                                                             WHERE p.REF = o.REF&#13;&#10;                                                                  AND rownum = 1) sq,&#13;&#10;       c.nmku, (select s.okpo from customer s where s.rnk = c.rnk) okpo, c.rnk, o.nam, o.okpo_k,&#13;&#10;       (select a1.rnk from accounts a1 where a1.nls = o.nlsa and a1.kv = o.kv) rnk_k,&#13;&#10;       a.nbs, a.nls, a.kv, a.nms, o.tt, (select t.name from tts t where t.tt = o.tt) tt_name, o.nazn&#13;&#10;  from corps c, accounts a, (select o1.ref, 'Вхідний' type, o1.s, o1.nlsa, o1.nlsb, o1.nam_b nam, o1.id_a okpo_k, o1.kv, o1.tt, o1.nazn&#13;&#10;                                           from oper o1&#13;&#10;                                         where o1.pdat between :sFdat1 and :sFdat2 and o1.tt &lt;&gt; 'МГР'&#13;&#10;                                          union all&#13;&#10;                                         select o2.ref, 'Вихідний' type, o2.s, o2.nlsb nlsa, o2.nlsa nlsb, o2.nam_a nam, o2.id_b okpo_k, o2.kv, o2.tt, o2.nazn&#13;&#10;                                           from oper o2&#13;&#10;                                         where o2.pdat between :sFdat1 and :sFdat2 and o2.tt &lt;&gt; 'МГР') o &#13;&#10;where c.rnk=a.rnk&#13;&#10;    and a.nbs in (2020, 2027, 2028, 2029, 2030, 2037, 2038, 2039, 2062, 2063, 2067, 2068, 2069, 2071, 2077, 2078, 2079, 2082, 2083, 2087, 2088, 2089, 2102, 2103, 2107, 2108, 2512, 2513, 2520, 2523, 2525, 2526, 2530, 2531, 2541, 2542, 2544, 2545, 2546, 2552, 2553, 2554, 2555, 2560, 2561, 2562, 2565, 2570, 2571, 2572, 2600, 2601, 2602, 2603, 2604, 2605, 2606, 2610, 2615, 2640, 2641, 2642, 2643, 2644, 2650, 2651, 2652)&#13;&#10;    and a.daos &lt;= :sFdat2 and (a.dazs is null or a.dazs &gt;=  :sFdat1)&#13;&#10;    and o.nlsb = a.nls and o.kv = a.kv">
+        <Column Name=":SFDAT1" DataType="System.DateTime"/>
+        <Column Name=":SFDAT2" DataType="System.DateTime"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="TYPE" DataType="System.String"/>
+        <Column Name="SQ" DataType="System.Decimal"/>
+        <Column Name="NMKU" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="RNK" DataType="System.Decimal"/>
+        <Column Name="NAM" DataType="System.String"/>
+        <Column Name="OKPO_K" DataType="System.String"/>
+        <Column Name="RNK_K" DataType="System.Decimal"/>
+        <Column Name="NBS" DataType="System.String"/>
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="KV" DataType="System.Int16"/>
+        <Column Name="NMS" DataType="System.String"/>
+        <Column Name="TT" DataType="System.String"/>
+        <Column Name="TT_NAME" DataType="System.String"/>
+        <Column Name="NAZN" DataType="System.String"/>
+        <CommandParameter Name="sFdat1" DataType="106" Expression="[sFdat1]" DefaultValue="24.11.2011"/>
+        <CommandParameter Name="sFdat2" DataType="106" Expression="[sFdat2]" DefaultValue="30.11.2011"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sFdat1" DataType="System.DateTime"/>
+    <Parameter Name="sFdat2" DataType="System.DateTime"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="500" PaperHeight="210" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle1" Width="1814.4" Height="37.8">
+      <TextObject Name="Text1" Top="9.45" Width="1190.7" Height="18.9" Text="Перелік операцій за період з [sFdat1] по [sFdat2]" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt">
+        <Formats>
+          <DateFormat/>
+          <DateFormat/>
+        </Formats>
+      </TextObject>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="41.8" Width="1814.4" Height="66.15">
+      <TableObject Name="Table1" Width="1814.4" Height="66.15" Border.Lines="All" PrintOn="FirstPage">
+        <TableColumn Name="Column1"/>
+        <TableColumn Name="Column2"/>
+        <TableColumn Name="Column3" Width="113.4"/>
+        <TableColumn Name="Column4"/>
+        <TableColumn Name="Column5" Width="75.6"/>
+        <TableColumn Name="Column6" Width="94.5"/>
+        <TableColumn Name="Column7"/>
+        <TableColumn Name="Column8"/>
+        <TableColumn Name="Column9" Width="103.95"/>
+        <TableColumn Name="Column10" Width="75.6"/>
+        <TableColumn Name="Column11" Width="75.6"/>
+        <TableColumn Name="Column12" Width="47.25"/>
+        <TableColumn Name="Column13" Width="85.05"/>
+        <TableColumn Name="Column14" Width="47.25"/>
+        <TableColumn Name="Column15" Width="170.1"/>
+        <TableColumn Name="Column16" Width="47.25"/>
+        <TableColumn Name="Column17" Width="207.9"/>
+        <TableColumn Name="Column18" Width="340.2"/>
+        <TableRow Name="Row1" Height="66.15">
+          <TableCell Name="Cell1" Border.Lines="All" Text="Перший день звітного періоду" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell2" Border.Lines="All" Text="Останній день звітного періоду" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell3" Border.Lines="All" Text="Код безбаланс. відділення" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell4" Border.Lines="All" Text="Тип платежу (вхідний/&#13;&#10;вихідний)" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell5" Border.Lines="All" Text="Сума платежу, грн. екв." HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell11" Border.Lines="All" Text="Назва власника рахунку" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell12" Border.Lines="All" Text="ЄДРПОУ власника рахунку" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell13" Border.Lines="All" Text="РНК власника  рахунку" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell14" Border.Lines="All" Text="Назва контрагента" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell15" Border.Lines="All" Text="ЄДРПОУ контрагента" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell16" Border.Lines="All" Text="РНК контрагента" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell17" Border.Lines="All" Text="Баланс. рахунок" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+          <TableCell Name="Cell18" Border.Lines="All" Text="Особовий номер рахунку" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell19" Border.Lines="All" Text="Валюта" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+          <TableCell Name="Cell20" Border.Lines="All" Text="Назва рахунку" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell21" Border.Lines="All" Text="Код банк-кої операції" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+          <TableCell Name="Cell22" Border.Lines="All" Text="Назва операції" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell23" Border.Lines="All" Text="Призначення платежу" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="111.95" Width="1814.4" Height="18.9" CanGrow="true" DataSource="Table">
+      <TableObject Name="Table2" Width="1814.4" Height="18.9" Border.Lines="All" GrowToBottom="true">
+        <TableColumn Name="Column19"/>
+        <TableColumn Name="Column20"/>
+        <TableColumn Name="Column21" Width="113.4"/>
+        <TableColumn Name="Column22"/>
+        <TableColumn Name="Column23" Width="75.6"/>
+        <TableColumn Name="Column24" Width="94.5"/>
+        <TableColumn Name="Column25"/>
+        <TableColumn Name="Column26"/>
+        <TableColumn Name="Column27" Width="103.95"/>
+        <TableColumn Name="Column28" Width="75.6"/>
+        <TableColumn Name="Column29" Width="75.6"/>
+        <TableColumn Name="Column30" Width="47.25"/>
+        <TableColumn Name="Column31" Width="85.05"/>
+        <TableColumn Name="Column32" Width="47.25"/>
+        <TableColumn Name="Column33" Width="170.1"/>
+        <TableColumn Name="Column34" Width="47.25"/>
+        <TableColumn Name="Column35" Width="207.9"/>
+        <TableColumn Name="Column36" Width="340.2"/>
+        <TableRow Name="Row2">
+          <TableCell Name="Cell24" Border.Lines="All" Text="[Table.:SFDAT1]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell25" Border.Lines="All" Text="[Table.:SFDAT2]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell26" Border.Lines="All" Text="[Table.BRANCH]" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell27" Border.Lines="All" Text="[Table.TYPE]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell28" Border.Lines="All" Text="[Table.SQ]" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell29" Border.Lines="All" Text="[Table.NMKU]" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell30" Border.Lines="All" Text="[Table.OKPO]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell31" Border.Lines="All" Text="[Table.RNK]" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell32" Border.Lines="All" Text="[Table.NAM]" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell33" Border.Lines="All" Text="[Table.OKPO_K]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell34" Border.Lines="All" Text="[Table.RNK_K]" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell35" Border.Lines="All" Text="[Table.NBS]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell36" Border.Lines="All" Text="[Table.NLS]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell37" Border.Lines="All" Text="[Table.KV]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell38" Border.Lines="All" Text="[Table.NMS]" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell39" Border.Lines="All" Text="[Table.TT]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell40" Border.Lines="All" Text="[Table.TT_NAME]" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell41" Border.Lines="All" Text="[Table.NAZN]" VertAlign="Center" Font="Arial, 7pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+  </ReportPage>
+</Report>

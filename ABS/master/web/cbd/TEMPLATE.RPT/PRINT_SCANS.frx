@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="04/15/2011 18:11:20" ReportInfo.Modified="09/01/2011 10:24:58" ReportInfo.CreatorVersion="1.6.19.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqD6nWZEExUJ9MEhdFZpB1A6ZfSeiTM+6WLeB8pW5aURqkGwhV134I2SUIQGUGXcXihyb2sVkWWzzeazV/tHQQdQ==">
+      <TableDataSource Name="Table" Alias="SCANS" DataType="System.Int32" Enabled="true" SelectCommand="select * from wcs_print_scans ps where ps.print_session_id = :p_ps_id order by ord">
+        <Column Name="ORD" DataType="System.Decimal"/>
+        <Column Name="SCAN_DATA" DataType="System.Byte[]" BindableControl="Picture"/>
+        <Column Name="PRINT_SESSION_ID" DataType="System.String"/>
+        <CommandParameter Name="p_ps_id" DataType="126" Expression="[p_ps_id]"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_ps_id" DataType="System.String" Expression="&quot;PS_de09d8bf-2402-40b3-bbaa-b2a237e29a0b&quot;"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <DataBand Name="dMain" Width="718.2" Height="75.6" CanGrow="true" DataSource="Table">
+      <PictureObject Name="Picture1" Width="75.6" Height="75.6" CanGrow="true" SizeMode="AutoSize" MaxWidth="680.4" MaxHeight="945" DataColumn="SCANS.SCAN_DATA"/>
+    </DataBand>
+  </ReportPage>
+</Report>

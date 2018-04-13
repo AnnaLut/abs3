@@ -1,0 +1,569 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = String.Format("Обов'язковий продаж валюти клієнтів");
+}
+
+
+<h2>@ViewBag.Title</h2>
+<div id="zayToolbar"></div>
+<div id="mandatorySaleGrid"></div>
+
+<div id="singleSumInput">
+    <label>Сума заявки: <input id="singleSum" type="text" required data-required-msg="Введіть суму." data-toomuch-msg="Сума завелика"  data-numbergreatherzero-msg="Сума має бути > 0" style="margin-right: 10px;" /> </label>
+    <div class="k-header">
+        <button class="k-button" style="float: right; margin: 7px 5px 7px 5px;" onclick=" $('#singleSumInput').data('kendoWindow').close(); ">Відмінити</button>
+        <button class="k-button k-primary" style="float: right; margin: 7px 5px 7px 5px;" onclick="createBidShowDlg2();">
+            <span class="k-icon k-i-tick"></span> Ok
+        </button>
+    </div>
+</div>
+
+<div id="dlgD27">
+    <h4>Значення показника D#27</h4>
+    <div style="margin: 4px; border-color: grey; border-style: solid; padding-top: 4px;">
+        <ul style="list-style-type: none;">
+            <li>
+                <label for="d27MandatorySale">обов'язковий продаж валюти:</label>
+                <input id="d27MandatorySale" type="text" value="01" class="k-textbox"/>
+            </li>
+            <li>
+                <label for="d27Pay">перерахування валюти 2603->2600:</label>
+                <input id="d27Pay" type="text" value="" class="k-textbox" disabled/>
+            </li>
+        </ul>
+    </div>
+    <h4>Призначення платежу 2600->2603:</h4>
+    <div style="padding: 4px 20px; border-color: grey; border-style: solid;">
+        <textarea id="d27Nazn" type="text" value="" class="k-textbox"></textarea>
+    </div>
+    <div class="k-header">
+        <button class="k-button" style="float: right; margin: 7px 5px 7px 5px;">Відмінити</button>
+        <button id="d27Ok" class="k-button k-primary" style="float: right; margin: 7px 5px 7px 5px;">
+            <span class="k-icon k-i-tick"></span> Ok
+        </button>
+    </div>
+</div>
+
+<div id="dlgBankZay">
+    
+</div>
+
+<script type="text/javascript" src="/barsroot/Scripts/Bars/bars.utils.js"></script>
+<script>
+    var nObz1919 = "@ViewBag.nObz1919";
+    var baseVal = @ViewBag.baseVal;
+    var lastMaxSum = 0;
+
+    var grid = null;
+    function getGrid() {
+        if (grid == null) {
+            grid = $('#mandatorySaleGrid').data('kendoGrid');
+        }
+        return grid;
+    }
+
+    var inputSingleSumVavidation = $('#singleSumInput');
+    kendo.init(inputSingleSumVavidation);
+    inputSingleSumVavidation.kendoValidator({
+        rules: {
+            numberGreatherZero: function (input) {
+                if (input.is("[data-numberGreatherZero-msg]") && input.prop('required')) {
+                    return input.val() != "" && input.val() > 0;
+                }
+                return true;
+            },
+            toomuch: function (input) {
+                if (input.is("[data-toomuch-msg]")) {
+                    return input.val() <= lastMaxSum;
+                }
+                return true;
+            }
+        }
+
+    });
+
+    function createBidShowDlg() {
+        var grid = getGrid();
+        var row = grid.dataItem(grid.select());
+        bars.ui.confirm({ text: "Ви дісно хочете сформувати заявку <br /> на обов'язковий продаж валюти <br /> клієнта " + row.Nmk + "?" },
+            function () {
+                $("#singleSum").kendoNumericTextBox({
+                    value: 0/*,
+                    max: row.Suma,
+                    format: "#.00"*/
+                });
+                lastMaxSum = row.Suma;
+                $('#singleSumInput').data('kendoWindow').center().open();
+            });
+    }
+
+    function createBidShowDlg2() {
+        var grid = getGrid();
+        var currentRowData = grid.dataItem(grid.select());
+        if (!inputSingleSumVavidation.data("kendoValidator").validate())
+            return false;
+
+        var nSum1 = $("#singleSum").val();
+        var nTip = 2;
+        if (nSum1 > 0) {
+            nTip = 1;
+        }
+        var nazn = '';
+        $.get(bars.config.urlContent('/Zay/MandatorySale/GetD27Params'), { docref: currentRowData.Ref }).done(
+                function(data) {
+                    nazn = data.nazn;
+                    if (nObz1919 !== '1') {
+                        dlgD27(nTip, nazn, createBidStep3);
+                    } else {
+                        createBidStep3(nTip, nazn);
+                    }
+                }
+            );
+        $('#singleSumInput').data('kendoWindow').close();
+        return false;
+    }
+
+    function createBidStep3(ntip, nazn) {
+        var grid = getGrid();
+        var row = grid.dataItem(grid.select());
+        var params = {
+            nMod: row.Tip,
+            nAcc: row.Acc,
+            nRef: row.Ref,
+            nSum1: $("#singleSum").val() * Math.pow(10, row.Dig),
+            nSum2: 0,
+            d27_1: $('#d27MandatorySale').val(),
+            d27_2: $('#d27Pay').val(),
+            sFnameKb: null,
+            sIdKb: null,
+            nNazn: nazn,
+            nSumOper: row.Suma * Math.pow(10, row.Dig)
+        }
+        createBid(params, grid);
+    }
+
+    function transfer() {
+        var grid = getGrid();
+        var row = grid.dataItem(grid.select());
+        bars.ui.confirm({ text: "Ви дісно хочете сформувати зарахувати " + row.Suma + row.Iso + "<br/> на розрахунковий рахунок " + row.Nmk + "?" },
+            function () {
+                transferStep2();
+            });        
+    }
+
+    function transferStep2() {
+        var grid = getGrid();
+        var row = grid.dataItem(grid.select());        
+        var nazn = '';
+        $.get(bars.config.urlContent('/Zay/MandatorySale/GetD27Params'), { docref: row.Ref }).done(
+                function(data) {
+                    nazn = data.nazn;
+                    if (nObz1919 !== '1') {
+                        dlgD27(2, nazn, transferStep3);
+                    } else {
+                        transferStep3(2, nazn);
+                    }
+                }
+            );
+    }
+
+    function transferStep3(nTip, nazn) {
+        var grid = getGrid();
+        var row = grid.dataItem(grid.select());
+        var params = {
+            nMod: row.Tip,
+            nAcc: row.Acc,
+            nRef: row.Ref,
+            nSum1: 0,
+            nSum2: row.S2s * Math.pow(10, row.Dig),
+            d27_1: null,
+            d27_2: null,
+            sFnameKb: null,
+            sIdKb: null,
+            nNazn: nazn,
+            nSumOper: row.Suma * Math.pow(10, row.Dig)
+        }
+        createBid(params, grid);
+    }
+
+    function createBid(bidParams, grid) {
+        $('#dlgD27').data('kendoWindow').close();
+        bars.ui.loader('body', true);
+        $.get(bars.config.urlContent('/Zay/MandatorySale/CreateBid'), bidParams).done(function(data) {
+            bars.ui.loader('body', false);
+            if (data.status === 'ok') {
+                grid.dataSource.read();
+                grid.refresh();
+            } else {
+                bars.ui.error({ text: data.message });
+            }
+        });           
+    }
+
+    function dlgD27(nTip, nazn, funcOk) {
+        $('#d27Nazn').text(nazn);
+        $('#d27Nazn').data('nTip', nTip);
+        $('#d27Ok').unbind('click').on('click', 
+            function() {
+                funcOk(nTip, nazn);
+            });
+        if (nTip === 0) {
+            $('#d27MandatorySale').val('');
+            $('#d27MandatorySale').prop("disabled", true).addClass("k-state-disabled");
+            $('#d27Pay').val('');
+            $('#d27Pay').prop("disabled", true).addClass("k-state-disabled");
+        } else if (nTip === 1) {
+            $('#d27MandatorySale').val('01');
+            $('#d27MandatorySale').prop("disabled", false).removeClass("k-state-disabled");
+            $('#d27Pay').prop("disabled", true).addClass("k-state-disabled");
+        } else if (nTip === 2) {
+            $('#d27MandatorySale').val('');
+            $('#d27MandatorySale').prop("disabled", true).addClass("k-state-disabled");
+            $('#d27Pay').val('99');
+            $('#d27Pay').prop("disabled", false).removeClass("k-state-disabled");
+        } else {
+            $('#d27MandatorySale').val('01');
+            $('#d27MandatorySale').prop("disabled", false).removeClass("k-state-disabled");
+            $('#d27Pay').val('99');
+            $('#d27Pay').prop("disabled", false).removeClass("k-state-disabled");
+        }
+        $('#dlgD27').data('kendoWindow').center().open();
+    }
+
+    function openBankZay() {
+        $('#dlgBankZay').data('kendoWindow').center().open();
+    }
+
+    function createBidAndTransfer() {
+        var grid = getGrid();
+        var row = grid.dataItem(grid.select());
+        if (row.zayData > 0) {
+            if (row.S2s > 0) {
+                transfer();
+            }
+        } else {
+            if (row.S2s > 0) {
+                bidAndTransfer();
+            } else {
+                createBidShowDlg();
+            }
+        }
+            
+    }
+
+    function bidAndTransfer() {
+        var grid = getGrid();
+        var row = grid.dataItem(grid.select());
+        bars.ui.confirm({ text: "Ви дісно хочете <br/> сформувати заявку на продаж " + row.S1s + row.Iso + "<br/> зарахувати " + row.S2s + row.Iso + "на розрахунковий рахунок " + row.Nmk + "?" },
+            function() {
+                var nazn = '';
+                $.get(bars.config.urlContent('/Zay/MandatorySale/GetD27Params'), { docref: row.Ref }).done(
+                        function(data) {
+                            nazn = data.nazn;
+                            if (nObz1919 !== '1') {
+                                dlgD27(3, nazn, bidAndTransfer2);
+                            } else {
+                                bidAndTransfer2(3, nazn);
+                            }
+                        }
+                    );
+            });
+    }
+
+    function bidAndTransfer2(nTip, nazn) {
+        var grid = getGrid();
+        var row = grid.dataItem(grid.select());
+        var params = {
+            nMod: row.Tip,
+            nAcc: row.Acc,
+            nRef: row.Ref,
+            nSum1: row.S1s * Math.pow(10, row.Dig),
+            nSum2: row.S2s * Math.pow(10, row.Dig),
+            d27_1: $('#d27MandatorySale').val(),
+            d27_2: $('#d27Pay').val(),
+            sFnameKb: null,
+            sIdKb: null,
+            nNazn: nazn,
+            nSumOper: row.Suma * Math.pow(10, row.Dig)
+        }
+        createBid(params, grid);
+    }
+
+    function linkedDocs() {
+        var grid = getGrid();
+        var currentRowData = grid.dataItem(grid.select());
+        window.location = bars.config.urlContent('/Zay/MandatorySale/LinkedDocs?docref=' + currentRowData.Ref);
+    }
+
+    function refreshToolbar() {
+        var currentRowData = null;
+        var grid = getGrid();
+        if (grid.select().length > 0) {
+            currentRowData = grid.dataItem(grid.select());
+        }
+        enableButton('pbBidAndTransfer', currentRowData && currentRowData.Tip === 2 && currentRowData.Zay === 0);
+        enableButton('pbTransfer', currentRowData && currentRowData.S2s !== 0);
+        enableButton('pbBid', currentRowData && currentRowData.Tip === 2 && currentRowData.Zay === 0);
+        enableButton('pbOpen', currentRowData);
+        enableButton('pbLinked', currentRowData);
+        enableButton('pbDel', currentRowData);
+        //enableButton('pbKbank', currentRowData && currentRowData.KbFlag);
+    }
+
+    function enableButton(buttonId, enabled) {
+        if (typeof (enabled) === 'undefined') {
+            enabled = true;
+        }
+        var $button = $('#' + buttonId);
+        $button.data('kendoButton').enable(enabled);
+        if (enabled) {
+            $button.find('i').removeClass("pf-disabled");
+        } else {
+            $button.find('i').addClass("pf-disabled");
+        }
+    }
+
+    function openDoc() {
+        var grid = getGrid();
+        var record = grid.dataItem(grid.select());
+        var docUrl = bars.config.urlContent("/documents/item/" + record.Ref + "/");
+        window.location = docUrl;
+    }
+
+    function delDoc() {
+        var grid = getGrid();
+        var record = grid.dataItem(grid.select());
+        bars.ui.confirm({ text: 'Ви дійсно хочете зняти з контролю документ на суму ' + record.Suma + record.Iso + '?' },
+            function() {
+                $.get(bars.config.urlContent('/Zay/MandatorySale/DelItem'), { refDoc: record.Ref }).done(function(data) {
+                    if (data.status == 'ok') {
+                        grid.dataSource.read();
+                        grid.refresh();
+                    } else {
+                        bars.ui.error({ text: data.message });
+                    }
+                });
+            });
+    }
+
+    $("#mandatorySaleGrid").kendoGrid({
+        columns: [
+            {
+                field: "Iso",
+                title: "Вал",
+                width: 35,
+                template: "<div #= Dni > 2 ? 'class=\"old-debt\"' : Dni == 2 ? 'class=\"norm-debt\"' : ''#>#=Iso#</div>"
+            },
+            {
+                field: "Rnk",
+                title: "РНК",
+                width: 70,
+                template: "<div #= Dni > 2 ? 'class=\"old-debt\"' : Dni == 2 ? 'class=\"norm-debt\"' : ''#>#=Rnk#</div>"
+            },
+            {
+                field: "Nmk",
+                title: "Найменування клієнта",
+                headerAttributes: {
+                    style: "white-space: normal;"
+                },
+                width: 250,
+                template: "<div #= Dni > 2 ? 'class=\"old-debt\"' : Dni == 2 ? 'class=\"norm-debt\"' : ''#>#=Nmk#</div>"
+            },
+            {
+                field: "Nls",
+                title: "№ рахунку",
+                headerAttributes: {
+                    style: "white-space: normal;"
+                },
+                width: 100,
+                template: "<div #= Dni > 2 ? 'class=\"old-debt\"' : Dni == 2 ? 'class=\"norm-debt\"' : ''#>#=Nls#</div>"
+            },
+            {
+                field: "Vdat",
+                title: "Дата надходження",
+                width: 100,
+                template: "<div #= Dni > 2 ? 'class=\"old-debt\"' : Dni == 2 ? 'class=\"norm-debt\"' : ''#>#=kendo.toString(Vdat,'dd/MM/yyyy')#</div>"
+            },
+            {
+                field: "Ref",
+                title: "Реф. документа",
+                headerAttributes: {
+                    style: "white-space: normal;"
+                },
+                width: 100,
+                template: "<div #= Dni > 2 ? 'class=\"old-debt\"' : Dni == 2 ? 'class=\"norm-debt\"' : ''#>#=Ref#</div>"
+            },
+            {
+                field: "Suma",
+                title: "Сума Документа",
+                template: "<div style='text-align:right;'>#=Suma.toFixed(2)#</div>",
+                width: 100
+            },
+            {
+                field: "Dat5",
+                title: "Гранич. дата (1 дн.)",
+                template: "<div style='text-align:right;'>#=kendo.toString(Dat5,'dd/MM/yyyy')#</div>",
+                headerAttributes: {
+                    style: "white-space: normal;"
+                },
+                width: 100
+            },/*
+            {
+                field: "KbFlag",
+                title: "Заявка КБ",
+                headerAttributes: {
+                    style: "white-space: normal;"
+                },
+                template: "<div style='text-align:center;'><input type='checkbox' #= KbFlag ? 'checked=checked' : '' # disabled='disabled' ></input></div>",
+                width: 40,
+                sortable: false
+            },*/
+            {
+                field: "S1s",
+                title: "Сума обовязк. продажу",
+                template: "<div style='text-align:right;#=Zay>0 ? 'color:rgb(51,187,68);' : '' #'>#=S1s.toFixed(2)#</div>",
+                width: 80,
+                headerAttributes: {
+                    style: "white-space: normal;"
+                },
+                sortable: false
+            },
+            {
+                field: "S2s",
+                title: "Сума до зарах. на 2600",
+                template: "<div style='text-align:right;'>#=S2s.toFixed(2)#</div>",
+                width: 80,
+                headerAttributes: {
+                    style: "white-space: normal;"
+                },
+                sortable: false
+            },
+            {
+                field: "Dni",
+                title: "День",
+                width: 40,
+                template: "<div style='text-align:right;'>#=Dni#</div>",
+
+            }
+        ],
+        dataSource: {
+            type: "aspnetmvc-ajax",
+            sort: {
+                field: "FileCreated"
+            },
+            transport: {
+                read: {
+                    dataType: 'json',
+                    url: bars.config.urlContent('/Zay/MandatorySale/GetMandatoryCurrSaleList')
+                }
+            },
+            schema: {
+                data: "Data",
+                total: "Total",
+                errors: "Errors",
+                model: {
+                    fields: {
+                        Iso: { type: "string" },
+                        Rnk: { type: "number" },
+                        Nmk: { type: "string" },
+                        Acc: { type: "number" },
+                        Vdat: { type: "date" },
+                        Ref: { type: "number" },
+                        Dat5: { type: "date" },
+                        Suma: { type: "number" },
+                        Tip: { type: "number" },
+                        KbFlag: { type: "boolean" },
+                        Dni: {type: "number"}
+                    }
+                }
+            },
+            serverPaging: true,
+            serverSorting: true,
+            pageSize: 10
+        },
+        sortable: true,
+        resizable: true,
+        selectable: "single",
+        pageable: {
+            refresh: true,
+            pageSizes: true,
+            buttonCount: 5
+        },
+        change: refreshToolbar,
+        dataBound: refreshToolbar
+    });
+
+    $('#zayToolbar').kendoToolBar({
+        resizable: true,
+        items: [
+            { template: "<button id='pbBidAndTransfer' type='button' class='k-button' onclick='createBidAndTransfer()' title='Створити заявку + Зарахувати на розрах. рахунок'><i class='pf-icon pf-16 pf-arrow_down'></i></button>" },
+            { template: "<button id='pbTransfer' type='button' class='k-button' onclick='transfer()' title='Зарахувати на розрах. рахунок'><i class='pf-icon pf-16 pf-arrow_left'></i></button>" },
+            { template: "<button id='pbBid' type='button' class='k-button' onclick='createBidShowDlg()' title=\"Створити заявку на обов'язковий продаж\"><i class='pf-icon pf-16 pf-arrow_right'></i></button>" },
+            {
+                type: "separator"
+            },
+            { template: "<button id='pbOpen' type='button' class='k-button' onclick='openDoc()' title='Переглянути документ'><i class='pf-icon pf-16 pf-folder_open''></i></button>" },
+            { template: "<button id='pbLinked' type='button' class='k-button' onclick='linkedDocs()' title=\"Перейти до пов'язаних документів\"><i class='pf-icon pf-16 pf-link-info''></i></button>" },
+            { template: "<button id='pbDel' type='button' class='k-button' onclick='delDoc()' title=\"Зняти з контроля\"><i class='pf-icon pf-16 pf-ok'></i></button>" }/*,
+            { template: "<button id='pbKbank' type='button' class='k-button' onclick='openBankZay()' title=\"Переглянути заявки отримані із системи Клієнт-Банк\"><i class='pf-icon pf-16 pf-mail-arrow_right'></i></button>" }*/
+
+        ]
+    });
+
+    $("#pbBidAndTransfer").kendoButton();
+    $("#pbTransfer").kendoButton();
+    $("#pbBid").kendoButton();
+    $("#pbOpen").kendoButton();
+    $("#pbLinked").kendoButton();
+    $("#pbDel").kendoButton();
+    $("#pbKbank").kendoButton();
+
+    $("#singleSumInput").kendoWindow({
+        width: "400px",
+        title: "Сума валюти на продаж",
+        visible: false
+    });
+
+    $('#dlgD27').kendoWindow({
+        width: "570px",
+        title: "Показники для файла #27",
+        visible: false
+    });
+
+    $('#dlgBankZay').kendoWindow({
+        width: "570px",
+        title: "Перегляд заявок, що надійшли по системі Клієнт-Банк",
+        visible: false
+    });
+
+    
+
+    $('#singleSum').kendoNumericTextBox({
+        format: "#.00"
+    });
+
+
+</script>
+
+<style>
+    .old-debt {
+        color: #8B0000;
+    }
+    .norm-debt {
+        color: #191970
+    }
+    .k-window ul li label {
+        display: inline-block;
+        padding-right: 4px;
+        width: 260px;
+    }
+    .k-window  ul li input  {
+        width: 200px !important;
+        margin-right: 3px;
+    }
+    .k-window textarea  {
+        width: 100% !important;
+        margin-right: 3px;
+    }
+
+</style>

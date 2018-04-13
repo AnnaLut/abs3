@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<xmlform captiontype="OnlyTitle">
+  <grids>
+    <grid id="gv" pagesize="10" showpagesizebox="true" title="Найближчі події за договорами страхування" showfilter="true">
+      <datasource>
+        <sql>
+          select t.*, decode(t.OBJECT_TYPE,1,'frm_ins_card_grt',0,'frm_ins_card_rnk') as form
+          from MV_INS_SCHEDULE_TASKS t
+        </sql>
+        <parameters>
+          <parameter type="QueryString" name="portfolio_type" altname="mode"  />
+        </parameters>
+      </datasource>
+      <rowselection method="SingleRow" />
+      <filters buttontext="Пошук" caption="Фільтри" columnscount="2" width="100%">
+        <filter id="f1" caption="Код страхового договору" columnindex="1" condition="Equal" allowemptyvalue="true" field="ID">
+          <uicontrol type="IntegerInput"></uicontrol>
+        </filter>
+        <filter id="f2" caption="Тип страхового договору" columnindex="1" condition="Equal" allowemptyvalue="true" field="TYPE_ID">
+          <uicontrol type="DropDownList" table="INS_TYPES" keyfield="ID" valuefield="NAME" addemptyitem="true"></uicontrol>
+        </filter>
+        <filter id="f4" caption="Серія договору" columnindex="2" condition="Equal" allowemptyvalue="true" field="SER">
+          <uicontrol type="TextBox" controlwidth="100"></uicontrol>
+        </filter>
+        <filter id="f5" caption="Номер договору" columnindex="2" condition="Equal" allowemptyvalue="true" field="NUM">
+          <uicontrol type="TextBox" controlwidth="100"></uicontrol>
+        </filter>
+      </filters>
+      <buttons defaulttype="Button">
+        <!--#include(frm_ins_btnrenew_inc.xml)-->
+        <!--#include(frm_ins_btnpay_inc.xml)-->
+      </buttons>
+      <fields>
+        <field name="PLAN_DATE" key="true" datatype="DateTime" sort="default">
+          <column show="true" caption="Планова дата" align="center" />
+        </field>
+        <field name="form" datatype="String" key="true">
+          <column show="false"></column>
+        </field>
+        <field name="TASK_TYPE_ID" key="false" datatype="Int64" sort="default">
+          <column show="false" caption="" align="right" />
+        </field>
+        <field name="TASK_TYPE_NAME" key="false" datatype="String" sort="default">
+          <column show="true" caption="Подія" align="left" />
+        </field>
+        <field name="TASK_STATUS_ID" key="false" datatype="Int64" sort="default">
+          <column show="false" caption="" align="right" />
+        </field>
+        <field name="TASK_STATUS_NAME" key="false" datatype="String" sort="default">
+          <column show="true" caption="Стан" align="left" />
+        </field>
+        <field name="PARTNER_ID" key="false" datatype="Int64" sort="default">
+          <column show="false" caption="" align="right" />
+        </field>
+        <field name="PARTNER_NAME" key="false" datatype="String" sort="default">
+          <column show="true" caption="СК" align="left" />
+        </field>
+        <field name="TYPE_ID" key="false" datatype="Int64" sort="default">
+          <column show="false" caption="" align="right" />
+        </field>
+        <field name="TYPE_NAME" key="false" datatype="String" sort="default">
+          <column show="true" caption="Тип" align="left" />
+        </field>
+        <field name="OBJECT_TYPE" key="false" datatype="Int64" sort="default">
+          <column show="false" caption="" align="right" />
+        </field>
+        <field name="SER" key="false" datatype="String" sort="default">
+          <column show="true" caption="Серія" align="left" />
+        </field>
+        <field name="NUM" key="false" datatype="String" sort="default">
+          <column show="true" caption="Номер" align="left" />
+        </field>
+        <field name="DATE_ON" key="false" datatype="DateTime" sort="default">
+          <column show="true" caption="Дата початку" align="center" />
+        </field>
+        <field name="DATE_OFF" key="false" datatype="DateTime" sort="default">
+          <column show="true" caption="Дата закінчення" align="center" />
+        </field>
+        <field name="SUM" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="Страхова сума" align="right" />
+        </field>
+        <field name="INSU_TARIFF" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="Страховий тариф (%) (у випадку фіксованого тарифу)" align="right" />
+        </field>
+        <field name="INSU_SUM" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="Страхова премія (у випадку фіксованої премії)" align="right" />
+        </field>
+        <field name="INS_OBJECT" key="false" datatype="String" sort="default">
+          <column show="true" caption="Об`єкт страхування" align="left" />
+        </field>
+        <field name="ND" key="false" datatype="Int64" sort="default">
+          <column show="false" caption="" align="right" />
+        </field>
+        <field name="ID" key="true" datatype="Int64" sort="default">
+          <column show="false" caption="" align="right" />
+        </field>
+        <field name="BRANCH" key="false" datatype="String" sort="default">
+          <column show="false" caption="" align="left" />
+        </field>
+        <field name="BRANCH_NAME" key="false" datatype="String" sort="default">
+          <column show="false" caption="" align="left" />
+        </field>
+        <field name="STAFF_ID" key="false" datatype="Int64" sort="default">
+          <column show="false" caption="" align="right" />
+        </field>
+        <field name="STAFF_FIO" key="false" datatype="String" sort="default">
+          <column show="false" caption="" align="left" />
+        </field>
+      </fields>
+    </grid>
+  </grids>
+</xmlform>

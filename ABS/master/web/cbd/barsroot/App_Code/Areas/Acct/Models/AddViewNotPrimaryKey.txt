@@ -1,0 +1,138 @@
+Under SSDL
+
+        <EntityType Name="V_SH_TARIF">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="KOD" Type="number" Precision="38" Scale="0" />
+          <Property Name="KV" Type="number" Precision="3" Scale="0" />
+          <Property Name="NAME" Type="varchar2" MaxLength="50" />
+          <Property Name="TAR" Type="number" Precision="38" Scale="0" />
+          <Property Name="PR" Type="number" Precision="20" Scale="4" />
+          <Property Name="SMIN" Type="number" Precision="38" Scale="0" />
+          <Property Name="SMAX" Type="number" Precision="38" Scale="0" />
+        </EntityType>
+
+        <EntityType Name="V_ACC_TARIF">
+          <Key>
+            <PropertyRef Name="ACC" />
+          </Key>
+          <Property Name="ACC" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="TYPE" Type="number" Precision="38" Scale="0" />          
+          <Property Name="KOD" Type="number" Precision="38" Scale="0" />
+          <Property Name="TAR" Type="number" Precision="38" Scale="0" />
+          <Property Name="PR" Type="number" Precision="20" Scale="4" />  
+          <Property Name="SMIN" Type="number" Precision="38" Scale="0" />
+          <Property Name="SMAX" Type="number" Precision="38" Scale="0" />          
+          <Property Name="BDATE" Type="date" />
+          <Property Name="EDATE" Type="date" />
+        </EntityType>
+
+       <EntityContainer Name="AcctModelStoreContainer">
+          ..........................
+          <EntitySet Name="V_SH_TARIF" EntityType="Self.V_SH_TARIF" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>
+              SELECT
+              "V_SH_TARIF"."ID" AS "ID",
+              "V_SH_TARIF"."KOD" AS "KOD",
+              "V_SH_TARIF"."KV" AS "KV",
+              "V_SH_TARIF"."NAME" AS "NAME",
+              "V_SH_TARIF"."TAR" AS "TAR",
+              "V_SH_TARIF"."PR" AS "PR"
+              "V_SH_TARIF"."SMIN" AS "SMIN",
+              "V_SH_TARIF"."SMAX" AS "SMAX"
+              FROM "BARS"."V_SH_TARIF" "V_SH_TARIF"
+            </DefiningQuery>
+          </EntitySet>
+
+          <EntitySet Name="V_ACC_TARIF" EntityType="Self.V_ACC_TARIF" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>
+              SELECT
+              "V_ACC_TARIF"."ACC" AS "ACC",
+              "V_ACC_TARIF"."TYPE" AS "TYPE",
+              "V_ACC_TARIF"."KOD" AS "KOD",
+              "V_ACC_TARIF"."TAR" AS "TAR",
+              "V_ACC_TARIF"."PR" AS "PR",
+              "V_ACC_TARIF"."SMIN" AS "SMIN"
+              "V_ACC_TARIF"."SMAX" AS "SMAX",
+              "V_ACC_TARIF"."BDATE" AS "BDATE"
+              "V_ACC_TARIF"."EDATE" AS "EDATE"
+              FROM "BARS"."V_ACC_TARIF" "V_ACC_TARIF"
+            </DefiningQuery>
+          </EntitySet>         
+         
+        <EntityContainer Name="AcctEntities" annotation:LazyLoadingEnabled="true">
+	    ..............................
+            <EntitySet Name="V_SH_TARIF" EntityType="Areas.Acct.AcctModel.V_SH_TARIF" /> 
+            <EntitySet Name="V_ACC_TARIF" EntityType="Areas.Acct.AcctModel.V_ACC_TARIF" />           
+
+Under CSDL
+
+        <EntityType Name="V_SH_TARIF">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="KOD" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="KV" Type="Decimal" Precision="3" Scale="0" />
+          <Property Name="NAME" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="TAR" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="PR" Type="Decimal" Precision="20" Scale="4" />
+          <Property Name="SMIN" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="SMAX" Type="Decimal" Precision="38" Scale="0" />
+        </EntityType>
+          
+        <EntityType Name="V_ACC_TARIF">
+          <Key>
+            <PropertyRef Name="ACC" />
+          </Key>
+          <Property Name="ACC" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="TYPE" Type="Decimal" Precision="38" Scale="0" />          
+          <Property Name="KOD" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="TAR" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="PR" Type="Decimal" Precision="20" Scale="4" />
+          <Property Name="SMIN" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="SMAX" Type="Decimal" Precision="38" Scale="0" />          
+          <Property Name="BDATE" Type="DateTime" />
+          <Property Name="EDATE" Type="DateTime" />
+        </EntityType>          
+
+Under MSL 
+
+          <EntitySetMapping Name="V_SH_TARIF">
+            <EntityTypeMapping TypeName="Areas.Acct.AcctModel.V_SH_TARIF">
+              <MappingFragment StoreEntitySet="V_SH_TARIF">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="KOD" ColumnName="KOD" />
+                <ScalarProperty Name="KV" ColumnName="KV" />
+                <ScalarProperty Name="NAME" ColumnName="NAME" />
+                <ScalarProperty Name="TAR" ColumnName="TAR" />
+                <ScalarProperty Name="PR" ColumnName="PR" />
+                <ScalarProperty Name="SMIN" ColumnName="SMIN" />
+                <ScalarProperty Name="SMAX" ColumnName="SMAX" />                
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          
+          <EntitySetMapping Name="V_ACC_TARIF">
+            <EntityTypeMapping TypeName="Areas.Acct.AcctModel.V_ACC_TARIF">
+              <MappingFragment StoreEntitySet="V_ACC_TARIF">
+                <ScalarProperty Name="ACC" ColumnName="ACC" />
+                <ScalarProperty Name="TYPE" ColumnName="TYPE" />                
+                <ScalarProperty Name="KOD" ColumnName="KOD" />
+                <ScalarProperty Name="TAR" ColumnName="TAR" />
+                <ScalarProperty Name="PR" ColumnName="PR" />
+                <ScalarProperty Name="SMIN" ColumnName="SMIN" />
+                <ScalarProperty Name="SMAX" ColumnName="SMAX" />                 
+                <ScalarProperty Name="BDATE" ColumnName="BDATE" />
+                <ScalarProperty Name="EDATE" ColumnName="EDATE" />               
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>          
+
+
+Under Diagram
+
+	   <EntityTypeShape EntityType="Areas.Acct.AcctModel.V_SH_TARIF" Width="2.125" PointX="18.5" PointY="11" />    
+	   <EntityTypeShape EntityType="Areas.Acct.AcctModel.V_ACC_TARIF" Width="2" PointX="18" PointY="11" />

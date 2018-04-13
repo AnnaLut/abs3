@@ -1,0 +1,2116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" ReportInfo.Version="0.2.3" ReportInfo.Created="04/18/2013 18:20:22" ReportInfo.Modified="01/08/2015 10:54:50" ReportInfo.CreatorVersion="2013.2.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Globalization;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+using System.Data.Sql;
+using Oracle.DataAccess.Client;
+using Oracle.DataAccess.Types;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+    // Коллекция пар тег - значение параметров тикета 
+    StringDictionary TicParams = new StringDictionary();
+
+    private void _StartReport(object sender, EventArgs e)
+    {
+      // Обработка флага отображения бух. модели
+      Parameter buh = Report.GetParameter(&quot;p_buh_c&quot;);
+      BUH_MODEL_H.Visible = (Convert.ToInt32(buh.Value) == 1 ? true : false);
+      BUH_MODEL_B.Visible = (Convert.ToInt16(buh.Value) == 1 ? true : false);
+
+      // Инициализация массива параметров тикета     
+      string StrVar = &quot;&quot;; 
+      string StrVal = &quot;&quot;; 
+      
+      OracleDataConnection frxcon = (OracleDataConnection)Report.Dictionary.Connections[0];
+      OracleConnection con = (OracleConnection)frxcon.GetConnection();
+      OracleCommand cmd = con.CreateCommand();
+      
+      cmd.CommandType = CommandType.StoredProcedure;
+      cmd.CommandText = &quot;tic.getListAttr&quot;;
+
+      Parameter parRef = Report.GetParameter(&quot;p_ref_c&quot;);
+      cmd.Parameters.Add(&quot;ref&quot;, OracleDbType.Decimal, parRef.Value, ParameterDirection.Input);  //0
+      cmd.Parameters.Add(&quot;tab&quot;, OracleDbType.Varchar2, &quot;OPER&quot;, ParameterDirection.Input);  //1
+      cmd.Parameters.Add(&quot;mode&quot;, OracleDbType.Decimal, 0, ParameterDirection.Input);  //2
+      cmd.Parameters.Add(&quot;name&quot;, OracleDbType.Varchar2, 20, null, ParameterDirection.InputOutput); //3
+      cmd.Parameters.Add(&quot;vars&quot;, OracleDbType.Varchar2, 20000, StrVar, ParameterDirection.InputOutput); //4
+      cmd.Parameters.Add(&quot;vals&quot;, OracleDbType.Varchar2, 20000, StrVal, ParameterDirection.InputOutput); //5
+      cmd.Parameters.Add(&quot;tt&quot;, OracleDbType.Varchar2, 3, null, ParameterDirection.InputOutput); //6
+      cmd.Parameters.Add(&quot;ext&quot;, OracleDbType.Decimal, null, ParameterDirection.InputOutput); //7
+      
+      con.Open();
+      try
+      {
+        cmd.ExecuteNonQuery();
+        StrVar = cmd.Parameters[&quot;vars&quot;].Value.ToString();
+        StrVal = cmd.Parameters[&quot;vals&quot;].Value.ToString();
+      }
+      finally
+      {
+        con.Close();
+      }
+      
+      // Инициализация коллекции параметров тикета
+      InitTicParams(StrVar, StrVal);
+    }
+
+    // Инициализация коллекции параметров тикета
+    private void InitTicParams(string StrVar, string StrVal)
+    {
+      // разбиваем строки по разделителю '~'
+      string[] VarArray = StrVar.Split('~');
+      string[] ValArray = StrVal.Split('~');
+
+      // берем длину по меньшей
+      int length = Math.Min(VarArray.Length, ValArray.Length);
+
+      // добавляем параметры в коллекцию
+      for (int i = 0; i &lt; length; i++)
+      {
+        if (!TicParams.ContainsKey(VarArray[i]))
+          TicParams.Add(VarArray[i], ValArray[i]);
+      }
+    }
+    // Получение значения параметра тикета
+  /* 
+    public string Tag(string Var)
+    {
+      if (TicParams.ContainsKey(Var)) 
+        return TicParams[Var]; 
+      else 
+        return &quot;&quot;;
+    }
+  */
+    
+    public string Tag( string Var, string Type)
+    {
+      string  Var_;
+      CultureInfo Culture = new CultureInfo(&quot;uk-UA&quot;);
+      
+      if (TicParams.ContainsKey(Var))
+      {  
+        //(G) General:. . . . . . . . . -1234
+        //(N) Number: . . . . . . . . . -1,234.00
+        //(P) Percent:. . . . . . . . . -123,456.50 %
+        
+        Var_ = TicParams[Var].Trim();
+        
+        
+        if      (Type == &quot;N&quot;) {return  Format(&quot;{0:N}\n&quot;, Convert.ToDecimal( Var_.Replace(&quot;.&quot;,&quot;,&quot;), Culture))      ;}
+        else if (Type == &quot;G&quot;) {return  Format(&quot;{0:G}\n&quot;, Convert.ToDecimal( Var_.Replace(&quot;.&quot;,&quot;,&quot;), Culture))      ;}
+        else if (Type == &quot;P&quot;) {return  Format(&quot;{0:P}\n&quot;, Convert.ToDecimal( Var_.Replace(&quot;.&quot;,&quot;,&quot;), Culture)/100)  ;}  
+        else    {return  (Var_).Trim() ;}  
+        
+      } 
+      else 
+         return &quot;&quot;;
+    }
+    
+    public string Tag(string Var, bool Par )
+    {
+      if (TicParams.ContainsKey(Var) &amp;&amp; Par) 
+        return Tag(Var,&quot;&quot;); 
+      else 
+        return &quot;&quot;;
+    }
+    
+    // перевірка SummB &gt; Limm вертаємо true
+   public bool IFF_SummB (decimal Lim)
+    {
+      CultureInfo Culture = new CultureInfo(&quot;uk-UA&quot;);
+      
+      if ( Convert.ToDecimal(Tag(&quot;OSumm-B&quot;),Culture) &gt; Lim)   return true;
+      else return false ;
+    }
+  
+    public string Tag(string Var)
+    {
+      if (TicParams.ContainsKey(Var)) 
+        return Tag(Var,&quot;&quot;); 
+      else 
+        return &quot;&quot;;
+    }
+
+    private void Data1_AfterPrint(object sender, EventArgs e)
+    {
+      Table8.Visible  = (!String.IsNullOrEmpty(Tag(&quot;SUM_05K&quot;)))  ? true : false;
+      Table9.Visible  = (!String.IsNullOrEmpty(Tag(&quot;SUM_05K&quot;)))  ? true : false;
+      Line3.Visible   = (!String.IsNullOrEmpty(Tag(&quot;SUM_05K&quot;)))  ? true : false;
+      Cell191.Visible = (!String.IsNullOrEmpty(Tag(&quot;SUM_05K&quot;)));
+      Cell591.Visible = (!String.IsNullOrEmpty(Tag(&quot;SUM_05K&quot;)));
+      
+    }                            
+
+
+
+
+
+    private void ReportTitle1_BeforePrint(object sender, EventArgs e)
+    {            
+      if   (  ((Decimal)Report.GetColumnValue(&quot;DK.LENG&quot;)) == 0 )
+           { ReportTitle1.Visible =  false;}
+    }
+  }  
+}
+</ScriptText>
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlq9SEZoacNJntaKIKp6mVF18t3N5WTocA0ARXAZ2I9tsXqxlsPHbqkZZ8j2333FaUp7NEZKfwRzqgcHIjxaWbZy1ouBesV/Qtl8w7i82fv1sA=">
+      <TableDataSource Name="Table" Alias="BUH_MODEL" DataType="System.Int32" Enabled="true" SelectCommand="SELECT o.tt,o.dk,a.nls,a.kv,t.dig, trunc(o.fdat) fdat1,o.s/t.denom,gl.p_icurval(a.kv, o.s, o.fdat)/100,o.txt,r.nls,r.kv&#13;&#10;                                             FROM opldok o, accounts a, tabval$global t, accounts r &#13;&#10;                                             WHERE t.kv=a.kv and a.acc=o.acc and r.acc(+)=a.accc and o.ref=:p_ref and o.sos is not null&#13;&#10;                                             ORDER BY o.fdat, a.kv, o.stmt, o.tt, o.dk">
+        <Column Name="TT" DataType="System.String"/>
+        <Column Name="DK" DataType="System.Int16"/>
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="KV" DataType="System.Int16"/>
+        <Column Name="DIG" DataType="System.Int64"/>
+        <Column Name="FDAT1" DataType="System.DateTime"/>
+        <Column Name="O.S/T.DENOM" DataType="System.Decimal"/>
+        <Column Name="GL.P_ICURVAL(A.KV,O.S,O.FDAT)/100" DataType="System.Decimal"/>
+        <Column Name="TXT" DataType="System.String"/>
+        <Column Name="NLS1" DataType="System.String"/>
+        <Column Name="KV1" DataType="System.Int16"/>
+        <CommandParameter Name="p_ref" DataType="107" Expression="[p_ref_c]" DefaultValue="-1"/>
+      </TableDataSource>
+      <TableDataSource Name="Table6" Alias="DK" DataType="System.Int32" Enabled="true" SelectCommand="select o.dk as &quot;DK&quot; ,&#13;&#10;          ADVT_PACK.GET_ADVT(o.tt) as Pict,&#13;&#10;          nvl(DBMS_LOB.GETLENGTH (ADVT_PACK.GET_ADVT(o.tt)),0) as leng&#13;&#10;    from oper o&#13;&#10;where o.ref=:p_ref">
+        <Column Name="DK" DataType="System.Int16" BindableControl="Picture"/>
+        <Column Name="PICT" DataType="System.Byte[]" BindableControl="Picture"/>
+        <Column Name="LENG" DataType="System.Decimal"/>
+        <CommandParameter Name="p_ref" DataType="107" Expression="[p_ref_c]" DefaultValue="-1"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_ref_c" DataType="System.Int32" Expression="38382201"/>
+    <Parameter Name="p_buh_c" DataType="System.Int32" Expression="1"/>
+  </Dictionary>
+  <ReportPage Name="Page1" RawPaperSize="9" TopMargin="5" RightMargin="5" BottomMargin="5" FirstPageSource="15" OtherPagesSource="15" Guides="75.98,162.92,9.45,75.6,162.54,275.94,275.56,341.71,342.09,464.94,464.56,589.3,710.64,708.75,340.2,585.9" StartPageEvent="_StartReport">
+    <ReportTitleBand Name="ReportTitle1" Top="20" Width="737.1" Height="28.35" CanGrow="true" CanShrink="true" BeforePrintEvent="ReportTitle1_BeforePrint">
+      <PictureObject Name="Picture1" Left="-0.55" Width="360.61" Height="28.35" CanGrow="true" DataColumn="DK.PICT"/>
+      <PictureObject Name="Picture2" Left="378.38" Width="360.61" Height="28.35" CanGrow="true" DataColumn="DK.PICT"/>
+    </ReportTitleBand>
+    <DataBand Name="Data1" Top="68.35" Width="737.1" Height="775.9" CanGrow="true" CanShrink="true" BeforePrintEvent="Data1_AfterPrint">
+      <TableObject Name="Table1" Width="359.1" Height="387.45" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" GrowToBottom="true">
+        <TableColumn Name="Column1" Width="35.91"/>
+        <TableColumn Name="Column2" Width="35.91"/>
+        <TableColumn Name="Column3" Width="35.91"/>
+        <TableColumn Name="Column4" Width="35.91"/>
+        <TableColumn Name="Column5" Width="35.91"/>
+        <TableColumn Name="Column6" Width="35.91"/>
+        <TableColumn Name="Column7" Width="35.91"/>
+        <TableColumn Name="Column8" Width="35.91"/>
+        <TableColumn Name="Column9" Width="35.91"/>
+        <TableColumn Name="Column10" Width="35.91"/>
+        <TableRow Name="Row1" Height="9.45">
+          <TableCell Name="Cell1" Text="Примiрник 1" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell2" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell3" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell4" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell5" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell26" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell27" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell28" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell29" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell30" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row2" Height="9.45">
+          <TableCell Name="Cell6" Text="[Tag(&quot;UBR_NAME&quot;)]" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell7" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell8" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell9" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell10" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell31" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell32" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell33" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell34" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell35" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row3" Height="9.45">
+          <TableCell Name="Cell11" Text="[Tag(&quot;UBR_ADR&quot;)]" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell12" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell13" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell14" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell15" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell36" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell37" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell38" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell39" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell40" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row4" Height="9.45">
+          <TableCell Name="Cell16" Border.Lines="Top" Border.LeftLine.Style="Dot" Border.TopLine.Style="Dot" Border.TopLine.Width="0.25" Text="(найменування та місцезнаходження структурного підрозділу банку)" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell17" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell18" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell19" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell20" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell41" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell42" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell43" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell44" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell45" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row5" Height="9.45">
+          <TableCell Name="Cell21" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell22" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell23" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell24" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell46" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell47" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell48" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell49" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell50" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row6" Height="9.45">
+          <TableCell Name="Cell51" Text="КВИТАНЦIЯ №[Tag(&quot;ONumber&quot;)]" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt, style=Bold" ColSpan="10"/>
+          <TableCell Name="Cell52" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell53" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell54" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell55" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell56" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell57" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell58" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell59" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell60" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row7" Height="9.45">
+          <TableCell Name="Cell61" Text="про здiйснення валютно-обмiнної операцiї*" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell62" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell63" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell64" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell65" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell66" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell67" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell68" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell69" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell70" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row8" Height="9.45">
+          <TableCell Name="Cell71" Text="Дата та час здiйснення операцiї: [Tag(&quot;UDATE&quot;)] [Tag(&quot;UTIME&quot;)]" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell72" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell73" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell74" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell75" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell76" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell77" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell78" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell79" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell80" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row9" Height="9.45">
+          <TableCell Name="Cell81" Text="Назва операцiї: &lt;b&gt;[IIf([DK.DK]==1,&quot;КУПІВЛЯ IНОЗЕМНОЇ ВАЛЮТИ&quot;,&quot;ПРОДАЖ IНОЗЕМНОЇ ВАЛЮТИ&quot;)] &lt;/b&gt;" VertAlign="Center" Font="Arial, 6pt" HtmlTags="true" ColSpan="10"/>
+          <TableCell Name="Cell82" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell83" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell84" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell85" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell86" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell87" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell88" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell89" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell90" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row10" Height="9.45">
+          <TableCell Name="Cell91" Border.Lines="Top" Border.TopLine.Style="Dot" Border.TopLine.Width="0.25" Text="(купівля, продаж, зворотний обмін, конвертація іноземної валюти)" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell92" Border.Lines="Top" Border.TopLine.Style="Dot" Border.TopLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell93" Border.Lines="Top" Border.TopLine.Style="Dot" Border.TopLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell94" Border.Lines="Top" Border.TopLine.Style="Dot" Border.TopLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell95" Border.Lines="Top" Border.TopLine.Style="Dot" Border.TopLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell96" Border.Lines="Top" Border.TopLine.Style="Dot" Border.TopLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell97" Border.Lines="Top" Border.TopLine.Style="Dot" Border.TopLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell98" Border.Lines="Top" Border.TopLine.Style="Dot" Border.TopLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell99" Border.Lines="Top" Border.TopLine.Style="Dot" Border.TopLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell100" Border.Lines="Top" Border.TopLine.Style="Dot" Border.TopLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row11" Height="9.45">
+          <TableCell Name="Cell101" Border.Lines="All" Border.Width="0.25" Text="Прийнято" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="4"/>
+          <TableCell Name="Cell102" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell103" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell104" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell105" Border.Lines="All" Border.Width="0.25" Text="Курс, &#13;&#10;крос-курс" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="2" RowSpan="2"/>
+          <TableCell Name="Cell106" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell107" Border.Lines="All" Border.Width="0.25" Text="До видачi" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="4"/>
+          <TableCell Name="Cell108" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell109" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell110" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row12" Height="9.45">
+          <TableCell Name="Cell111" Border.Lines="All" Border.Width="0.25" Text="Назва валюти та  Сума " HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="4"/>
+          <TableCell Name="Cell112" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell113" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell114" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell115" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell116" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell117" Border.Lines="All" Border.Width="0.25" Text="Назва валюти  та   Сума " HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="4"/>
+          <TableCell Name="Cell118" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell119" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell120" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row13" Height="9.45">
+          <TableCell Name="Cell121" Border.Lines="All" Border.Width="0.25" Text="[IIf([DK.DK]==0,Tag(&quot;OCcyISO-B&quot;),Tag(&quot;OCcyISO&quot;))]  [IIf([DK.DK]==0, Tag(&quot;OSumm-B&quot;,&quot;N&quot;), Tag(&quot;OSumm&quot;,&quot;N&quot;))]" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt, style=Bold" ColSpan="4"/>
+          <TableCell Name="Cell122" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell123" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell124" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell125" Border.Lines="All" Border.Width="0.25" Text="[Tag(&quot;KURS4&quot;)]" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="2"/>
+          <TableCell Name="Cell126" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell127" Border.Lines="All" Border.Width="0.25" Text="[IIf([DK.DK]==1,Tag(&quot;OCcyISO-B&quot;),Tag(&quot;OCcyISO&quot;))]  [IIf([DK.DK]==1,Tag(&quot;OSumm-B&quot;,&quot;N&quot;), Tag(&quot;OSumm&quot;,&quot;N&quot;))]" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt, style=Bold" ColSpan="4"/>
+          <TableCell Name="Cell128" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell129" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell130" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row14" Height="9.45">
+          <TableCell Name="Cell131" Border.Lines="All" Border.Width="0.25" Text="ДЕБЕТ" VertAlign="Center" Font="Arial, 6pt" ColSpan="2" RowSpan="2"/>
+          <TableCell Name="Cell132" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell133" Border.Lines="All" Border.Width="0.25" Text="Рахунок №" VertAlign="Center" Font="Arial, 6pt" ColSpan="2"/>
+          <TableCell Name="Cell134" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell135" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt" ColSpan="2" RowSpan="3"/>
+          <TableCell Name="Cell136" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell137" Border.Lines="All" Border.Width="0.25" Text="ДЕБЕТ" VertAlign="Center" Font="Arial, 6pt" ColSpan="2" RowSpan="2"/>
+          <TableCell Name="Cell138" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell139" Border.Lines="All" Border.Width="0.25" Text="Рахунок №" VertAlign="Center" Font="Arial, 6pt" ColSpan="2"/>
+          <TableCell Name="Cell140" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row15" Height="9.45">
+          <TableCell Name="Cell141" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell142" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell143" Border.Lines="All" Border.Width="0.25" Text="[Tag(&quot;ONLS-B&quot;)]" VertAlign="Center" Font="Arial, 6pt" ColSpan="2"/>
+          <TableCell Name="Cell144" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell145" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell146" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell147" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell148" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell149" Border.Lines="All" Border.Width="0.25" Text="[IIf( [DK.DK]==0,Tag(&quot;UNLS3800&quot;),Tag(&quot;UNLS3801&quot;) )]" VertAlign="Center" Font="Arial, 6pt" ColSpan="2"/>
+          <TableCell Name="Cell150" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row16" Height="9.45">
+          <TableCell Name="Cell151" Border.Lines="All" Border.Width="0.25" Text="КРЕДИТ" VertAlign="Center" Font="Arial, 6pt" ColSpan="2"/>
+          <TableCell Name="Cell152" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell153" Border.Lines="All" Border.Width="0.25" Text="[IIf( [DK.DK]==1,Tag(&quot;UNLS3800&quot;) ,Tag(&quot;UNLS3801&quot;) )]" VertAlign="Center" Font="Arial, 6pt" ColSpan="2"/>
+          <TableCell Name="Cell154" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell155" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell156" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell157" Border.Lines="All" Border.Width="0.25" Text="КРЕДИТ" VertAlign="Center" Font="Arial, 6pt" ColSpan="2"/>
+          <TableCell Name="Cell158" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell159" Border.Lines="All" Border.Width="0.25" Text="[Tag(&quot;ONLS-A&quot;)]" VertAlign="Center" Font="Arial, 6pt" ColSpan="2"/>
+          <TableCell Name="Cell160" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row17" Height="9.45">
+          <TableCell Name="Cell161" Border.Lines="Bottom" Border.BottomLine.Style="DashDot" Border.BottomLine.Width="0.25" Text="   Cума комiсiї:" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell162" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell163" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell164" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell165" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell166" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell167" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell168" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell169" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell170" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row18" Height="9.45">
+          <TableCell Name="Cell171" Text="   Клiєнт:  &lt;b&gt;&lt;i&gt; [Tag(&quot;OPayer&quot;)]&lt;/i&gt;&lt;/b&gt;" VertAlign="Center" Font="Arial, 6pt" HtmlTags="true" ColSpan="10"/>
+          <TableCell Name="Cell172" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell173" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell174" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell175" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell176" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell177" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell178" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell179" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell180" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row19" Height="9.45">
+          <TableCell Name="Cell181" Border.Lines="Top" Border.TopLine.Style="Dot" Border.TopLine.Width="0.25" Text=" (прiзвище, iм'я та по батьковi(за наявностi) фiзичної особи)" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell182" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell183" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell184" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell185" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell186" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell187" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell188" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell189" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell190" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row20" Height="9.45" AutoSize="true">
+          <TableCell Name="Cell191" Text="Сума збору на обов’язкове державне пенсійне страхування: &lt;b&gt;&lt;i&gt;[Tag(&quot;SUM_05K&quot;)] UAH ( [Tag(&quot;SUM_05KLit&quot;)]  )&lt;/i&gt;&lt;/b&gt;" VertAlign="Center" Font="Arial, 6pt" HtmlTags="true" ColSpan="10"/>
+          <TableCell Name="Cell192" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell193" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell194" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell195" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell196" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell197" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell198" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell199" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell200" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row21" Height="9.45" AutoSize="true">
+          <TableCell Name="Cell201" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" Text="&lt;i&gt;  [Tag(&quot;DR_PASPV&quot;,IFF_SummB(150000))]  [Tag(&quot;DR_PASPN&quot;,IFF_SummB(150000))] &lt;/i&gt; &lt;i&gt;[Tag(&quot;DR_ATRT&quot;,IFF_SummB(150000))]&lt;/i&gt;" VertAlign="Center" Font="Arial, 6pt" HtmlTags="true" ColSpan="10"/>
+          <TableCell Name="Cell202" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell203" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell204" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell205" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell206" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell207" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell208" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell209" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell210" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row23" Height="9.45">
+          <TableCell Name="Cell221" Text="(зазначаються додаткові реквізити, необхідні для проведення валютно-обмінних операцій)" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell222" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell223" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell224" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell225" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell226" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell227" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell228" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell229" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell230" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row24" Height="9.45">
+          <TableCell Name="Cell231" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell232" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell233" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell234" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell235" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell236" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell237" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell238" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell239" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell240" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row25" Height="9.45">
+          <TableCell Name="Cell241" Text="Пiдпис клiєнта  ____________________" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell242" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell243" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell244" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell245" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell246" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell247" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell248" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell249" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell250" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row26" Height="9.45">
+          <TableCell Name="Cell251" Text="Надаю згоду на проведення операції з купівлі іноземної валюти без оформлення " VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell252" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell253" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell254" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell255" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell256" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell257" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell258" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell259" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell260" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row27" Height="9.45">
+          <TableCell Name="Cell261" Text="довідки-certificate за формою № 377" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell262" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell263" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell264" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell265" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell266" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell267" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell268" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell269" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell270" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row28" Height="9.45">
+          <TableCell Name="Cell271" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell272" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell273" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell274" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell275" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell276" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt" ColSpan="5"/>
+          <TableCell Name="Cell277" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell278" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell279" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell280" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row29" Height="9.45">
+          <TableCell Name="Cell281" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell282" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell283" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell284" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell285" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell286" Text="(підпис клієнта-нерезидента проставляється " HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="5"/>
+          <TableCell Name="Cell287" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell288" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell289" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell290" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row30" Height="9.45">
+          <TableCell Name="Cell291" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell292" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell293" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell294" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell295" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell296" Text=" в разі надання такої згоди)" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="5"/>
+          <TableCell Name="Cell297" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell298" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell299" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell300" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row31" Height="9.45">
+          <TableCell Name="Cell301" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell302" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell303" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell304" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell305" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell306" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell307" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell308" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell309" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell310" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row32" Height="9.45">
+          <TableCell Name="Cell311" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell312" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell313" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell314" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell315" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell316" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell317" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell318" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell319" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell320" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row33" Height="9.45">
+          <TableCell Name="Cell321" Border.Lines="Bottom" Border.BottomLine.Style="Dash" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt" ColSpan="4"/>
+          <TableCell Name="Cell322" Border.Lines="Bottom" Border.BottomLine.Style="Dash" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell323" Border.Lines="Bottom" Border.BottomLine.Style="Dash" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell324" Border.Lines="Bottom" Border.BottomLine.Style="Dash" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell325" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell326" Text="Місце для відбитка штампа" VertAlign="Center" Font="Arial, 6pt" ColSpan="5"/>
+          <TableCell Name="Cell327" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell328" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell329" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell330" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row34" Height="9.45">
+          <TableCell Name="Cell331" Text="підпис працівника (ів) банку" VertAlign="Center" Font="Arial, 6pt" ColSpan="4"/>
+          <TableCell Name="Cell332" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell333" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell334" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell335" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell336" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell337" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell338" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell339" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell340" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row35" Height="9.45">
+          <TableCell Name="Cell341" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell342" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell343" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell344" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell345" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell346" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell347" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell348" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell349" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell350" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row36" Height="9.45">
+          <TableCell Name="Cell351" Text="* Здійснення операції з купівлі у фізичної особи-нерезидента готівкової іноземної валюти без оформлення довідки-certificate за формою № 377 не дає підстав для зворотного обміну.&#13;&#10;" VertAlign="Center" Font="Arial, 6pt" ColSpan="10" RowSpan="3"/>
+          <TableCell Name="Cell352" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell353" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell354" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell355" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell356" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell357" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell358" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell359" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell360" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row37" Height="9.45">
+          <TableCell Name="Cell361" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell362" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell363" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell364" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell365" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell366" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell367" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell368" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell369" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell370" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row38" Height="9.45">
+          <TableCell Name="Cell371" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell372" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell373" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell374" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell375" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell376" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell377" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell378" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell379" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell380" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row39" Height="9.45">
+          <TableCell Name="Cell381" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell382" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell383" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell384" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell385" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell386" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell387" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell388" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell389" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell390" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row40" Height="28.35">
+          <TableCell Name="Cell391" VertAlign="Center" Font="Arial, 6pt">
+            <TextObject Name="Text23" Left="9.45" Width="351.54" Height="28.35" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" CanGrow="true" Text="[Tag(&quot;REKLAMA&quot;)]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" TextFill.Color="Indigo" HtmlTags="true"/>
+          </TableCell>
+          <TableCell Name="Cell392" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell393" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell394" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell395" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell396" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell397" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell398" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell399" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell400" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table7" Left="376.89" Width="359.1" Height="368.55" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" GrowToBottom="true">
+        <TableColumn Name="Column11" Width="35.91"/>
+        <TableColumn Name="Column12" Width="35.91"/>
+        <TableColumn Name="Column13" Width="35.91"/>
+        <TableColumn Name="Column14" Width="35.91"/>
+        <TableColumn Name="Column15" Width="35.91"/>
+        <TableColumn Name="Column16" Width="35.91"/>
+        <TableColumn Name="Column17" Width="35.91"/>
+        <TableColumn Name="Column18" Width="35.91"/>
+        <TableColumn Name="Column19" Width="35.91"/>
+        <TableColumn Name="Column20" Width="35.91"/>
+        <TableRow Name="Row41" Height="9.45">
+          <TableCell Name="Cell401" Text="Примiрник 2" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell402" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell403" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell404" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell405" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell406" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell407" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell408" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell409" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell410" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row42" Height="9.45">
+          <TableCell Name="Cell411" Text="[Tag(&quot;UBR_NAME&quot;)]" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell412" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell413" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell414" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell415" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell416" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell417" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell418" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell419" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell420" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row43" Height="9.45">
+          <TableCell Name="Cell421" Text="[Tag(&quot;UBR_ADR&quot;)]" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell422" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell423" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell424" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell425" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell426" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell427" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell428" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell429" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell430" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row44" Height="9.45">
+          <TableCell Name="Cell431" Border.Lines="Top" Border.LeftLine.Style="Dot" Border.TopLine.Style="Dot" Border.TopLine.Width="0.25" Text="(найменування та місцезнаходження структурного підрозділу банку)" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell432" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell433" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell434" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell435" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell436" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell437" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell438" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell439" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell440" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row45" Height="9.45">
+          <TableCell Name="Cell441" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell442" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell443" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell444" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell445" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell446" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell447" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell448" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell449" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell450" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row46" Height="9.45">
+          <TableCell Name="Cell451" Text="КВИТАНЦIЯ №[Tag(&quot;ONumber&quot;)]" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt, style=Bold" ColSpan="10"/>
+          <TableCell Name="Cell452" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell453" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell454" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell455" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell456" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell457" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell458" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell459" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell460" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row47" Height="9.45">
+          <TableCell Name="Cell461" Text="про здiйснення валютно-обмiнної операцiї*" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell462" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell463" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell464" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell465" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell466" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell467" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell468" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell469" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell470" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row48" Height="9.45">
+          <TableCell Name="Cell471" Text="Дата та час здiйснення операцiї: [Tag(&quot;UDATE&quot;)] [Tag(&quot;UTIME&quot;)]" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell472" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell473" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell474" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell475" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell476" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell477" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell478" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell479" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell480" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row49" Height="9.45">
+          <TableCell Name="Cell481" Text="Назва операцiї: &lt;b&gt;[IIf([DK.DK]==1,&quot;КУПІВЛЯ IНОЗЕМНОЇ ВАЛЮТИ&quot;,&quot;ПРОДАЖ IНОЗЕМНОЇ ВАЛЮТИ&quot;)]&lt;/b&gt;" VertAlign="Center" Font="Arial, 6pt" HtmlTags="true" ColSpan="10"/>
+          <TableCell Name="Cell482" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell483" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell484" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell485" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell486" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell487" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell488" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell489" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell490" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row50" Height="9.45">
+          <TableCell Name="Cell491" Border.Lines="Top" Border.TopLine.Style="Dot" Border.TopLine.Width="0.25" Text="(купівля, продаж, зворотний обмін, конвертація іноземної валюти)" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell492" Border.Lines="Top" Border.TopLine.Style="Dot" Border.TopLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell493" Border.Lines="Top" Border.TopLine.Style="Dot" Border.TopLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell494" Border.Lines="Top" Border.TopLine.Style="Dot" Border.TopLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell495" Border.Lines="Top" Border.TopLine.Style="Dot" Border.TopLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell496" Border.Lines="Top" Border.TopLine.Style="Dot" Border.TopLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell497" Border.Lines="Top" Border.TopLine.Style="Dot" Border.TopLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell498" Border.Lines="Top" Border.TopLine.Style="Dot" Border.TopLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell499" Border.Lines="Top" Border.TopLine.Style="Dot" Border.TopLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell500" Border.Lines="Top" Border.TopLine.Style="Dot" Border.TopLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row51" Height="9.45">
+          <TableCell Name="Cell501" Border.Lines="All" Border.Width="0.25" Text="Прийнято" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="4"/>
+          <TableCell Name="Cell502" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell503" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell504" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell505" Border.Lines="All" Border.Width="0.25" Text="Курс, &#13;&#10;крос-курс" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="2" RowSpan="2"/>
+          <TableCell Name="Cell506" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell507" Border.Lines="All" Border.Width="0.25" Text="До видачi" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="4"/>
+          <TableCell Name="Cell508" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell509" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell510" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row52" Height="9.45">
+          <TableCell Name="Cell511" Border.Lines="All" Border.Width="0.25" Text="Назва валюти та  Сума " HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="4"/>
+          <TableCell Name="Cell512" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell513" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell514" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell515" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell516" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell517" Border.Lines="All" Border.Width="0.25" Text="Назва валюти  та   Сума " HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="4"/>
+          <TableCell Name="Cell518" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell519" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell520" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row53" Height="9.45">
+          <TableCell Name="Cell521" Border.Lines="All" Border.Width="0.25" Text="[IIf([DK.DK]==0,Tag(&quot;OCcyISO-B&quot;),Tag(&quot;OCcyISO&quot;))]  [IIf([DK.DK]==0, Tag(&quot;OSumm-B&quot;,&quot;N&quot;), Tag(&quot;OSumm&quot;,&quot;N&quot;))]" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt, style=Bold" ColSpan="4"/>
+          <TableCell Name="Cell522" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell523" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell524" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell525" Border.Lines="All" Border.Width="0.25" Text="[Tag(&quot;KURS4&quot;)]" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="2"/>
+          <TableCell Name="Cell526" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell527" Border.Lines="All" Border.Width="0.25" Text="[IIf([DK.DK]==1,Tag(&quot;OCcyISO-B&quot;),Tag(&quot;OCcyISO&quot;))]  [IIf([DK.DK]==1,Tag(&quot;OSumm-B&quot;,&quot;N&quot;), Tag(&quot;OSumm&quot;,&quot;N&quot;))]" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt, style=Bold" ColSpan="4"/>
+          <TableCell Name="Cell528" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell529" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell530" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row54" Height="9.45">
+          <TableCell Name="Cell531" Border.Lines="All" Border.Width="0.25" Text="ДЕБЕТ" VertAlign="Center" Font="Arial, 6pt" ColSpan="2" RowSpan="2"/>
+          <TableCell Name="Cell532" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell533" Border.Lines="All" Border.Width="0.25" Text="Рахунок №" VertAlign="Center" Font="Arial, 6pt" ColSpan="2"/>
+          <TableCell Name="Cell534" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell535" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt" ColSpan="2" RowSpan="3"/>
+          <TableCell Name="Cell536" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell537" Border.Lines="All" Border.Width="0.25" Text="ДЕБЕТ" VertAlign="Center" Font="Arial, 6pt" ColSpan="2" RowSpan="2"/>
+          <TableCell Name="Cell538" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell539" Border.Lines="All" Border.Width="0.25" Text="Рахунок №" VertAlign="Center" Font="Arial, 6pt" ColSpan="2"/>
+          <TableCell Name="Cell540" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row55" Height="9.45">
+          <TableCell Name="Cell541" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell542" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell543" Border.Lines="All" Border.Width="0.25" Text="[Tag(&quot;ONLS-B&quot;)]" VertAlign="Center" Font="Arial, 6pt" ColSpan="2"/>
+          <TableCell Name="Cell544" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell545" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell546" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell547" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell548" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell549" Border.Lines="All" Border.Width="0.25" Text="[IIf( [DK.DK]==0,Tag(&quot;UNLS3800&quot;),Tag(&quot;UNLS3801&quot;) )]" VertAlign="Center" Font="Arial, 6pt" ColSpan="2"/>
+          <TableCell Name="Cell550" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row56" Height="9.45">
+          <TableCell Name="Cell551" Border.Lines="All" Border.Width="0.25" Text="КРЕДИТ" VertAlign="Center" Font="Arial, 6pt" ColSpan="2"/>
+          <TableCell Name="Cell552" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell553" Border.Lines="All" Border.Width="0.25" Text="[IIf( [DK.DK]==1,Tag(&quot;UNLS3800&quot;) ,Tag(&quot;UNLS3801&quot;) )]" VertAlign="Center" Font="Arial, 6pt" ColSpan="2"/>
+          <TableCell Name="Cell554" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell555" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell556" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell557" Border.Lines="All" Border.Width="0.25" Text="КРЕДИТ" VertAlign="Center" Font="Arial, 6pt" ColSpan="2"/>
+          <TableCell Name="Cell558" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell559" Border.Lines="All" Border.Width="0.25" Text="[Tag(&quot;ONLS-A&quot;)]" VertAlign="Center" Font="Arial, 6pt" ColSpan="2"/>
+          <TableCell Name="Cell560" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row57" Height="9.45">
+          <TableCell Name="Cell561" Border.Lines="Bottom" Border.BottomLine.Style="DashDot" Border.BottomLine.Width="0.25" Text="   Cума комiсiї:" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell562" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell563" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell564" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell565" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell566" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell567" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell568" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell569" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell570" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row58" Height="9.45">
+          <TableCell Name="Cell571" Text="   Клiєнт:  &lt;b&gt;&lt;i&gt; [Tag(&quot;OPayer&quot;)]&lt;/i&gt;&lt;/b&gt;" VertAlign="Center" Font="Arial, 6pt" HtmlTags="true" ColSpan="10"/>
+          <TableCell Name="Cell572" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell573" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell574" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell575" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell576" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell577" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell578" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell579" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell580" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row59" Height="9.45">
+          <TableCell Name="Cell581" Border.Lines="Top" Border.TopLine.Style="Dot" Border.TopLine.Width="0.25" Text=" (прiзвище, iм'я та по батьковi(за наявностi) фiзичної особи)" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell582" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell583" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell584" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell585" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell586" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell587" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell588" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell589" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell590" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row60" Height="9.45" AutoSize="true">
+          <TableCell Name="Cell591" Text="Сума збору на обов’язкове державне пенсійне страхування: &lt;b&gt;&lt;i&gt;[Tag(&quot;SUM_05K&quot;)] UAH ( [Tag(&quot;SUM_05KLit&quot;)]  )&lt;/i&gt;&lt;/b&gt;" VertAlign="Center" Font="Arial, 6pt" HtmlTags="true" ColSpan="10"/>
+          <TableCell Name="Cell592" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell593" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell594" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell595" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell596" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell597" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell598" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell599" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell600" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row61" Height="9.45" AutoSize="true">
+          <TableCell Name="Cell601" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" Text="&lt;i&gt;  [Tag(&quot;DR_PASPV&quot;,IFF_SummB(150000))]  [Tag(&quot;DR_PASPN&quot;,IFF_SummB(150000))] &lt;/i&gt; &lt;i&gt;[Tag(&quot;DR_ATRT&quot;,IFF_SummB(150000))]&lt;/i&gt;" VertAlign="Center" Font="Arial, 6pt" HtmlTags="true" ColSpan="10"/>
+          <TableCell Name="Cell602" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell603" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell604" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell605" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell606" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell607" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell608" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell609" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell610" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row63" Height="9.45">
+          <TableCell Name="Cell621" Text="(зазначаються додаткові реквізити, необхідні для проведення валютно-обмінних операцій)" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell622" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell623" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell624" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell625" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell626" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell627" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell628" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell629" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell630" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row64" Height="9.45">
+          <TableCell Name="Cell631" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell632" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell633" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell634" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell635" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell636" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell637" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell638" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell639" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell640" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row65" Height="9.45">
+          <TableCell Name="Cell641" Text="Пiдпис клiєнта  ____________________" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell642" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell643" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell644" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell645" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell646" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell647" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell648" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell649" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell650" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row66" Height="9.45">
+          <TableCell Name="Cell651" Text="Надаю згоду на проведення операції з купівлі іноземної валюти без оформлення " VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell652" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell653" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell654" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell655" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell656" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell657" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell658" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell659" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell660" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row67" Height="9.45">
+          <TableCell Name="Cell661" Text="довідки-certificate за формою № 377" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell662" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell663" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell664" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell665" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell666" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell667" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell668" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell669" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell670" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row68" Height="9.45">
+          <TableCell Name="Cell671" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell672" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell673" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell674" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell675" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell676" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt" ColSpan="5"/>
+          <TableCell Name="Cell677" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell678" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell679" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell680" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row69" Height="9.45">
+          <TableCell Name="Cell681" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell682" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell683" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell684" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell685" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell686" Text="(підпис клієнта-нерезидента проставляється " HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="5"/>
+          <TableCell Name="Cell687" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell688" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell689" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell690" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row70" Height="9.45">
+          <TableCell Name="Cell691" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell692" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell693" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell694" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell695" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell696" Text=" в разі надання такої згоди)" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="5"/>
+          <TableCell Name="Cell697" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell698" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell699" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell700" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row71" Height="9.45">
+          <TableCell Name="Cell701" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell702" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell703" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell704" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell705" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell706" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell707" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell708" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell709" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell710" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row72" Height="9.45">
+          <TableCell Name="Cell711" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell712" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell713" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell714" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell715" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell716" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell717" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell718" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell719" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell720" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row73" Height="9.45">
+          <TableCell Name="Cell721" Border.Lines="Bottom" Border.BottomLine.Style="Dash" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt" ColSpan="4"/>
+          <TableCell Name="Cell722" Border.Lines="Bottom" Border.BottomLine.Style="Dash" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell723" Border.Lines="Bottom" Border.BottomLine.Style="Dash" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell724" Border.Lines="Bottom" Border.BottomLine.Style="Dash" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell725" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell726" Text="Місце для відбитка штампа" VertAlign="Center" Font="Arial, 6pt" ColSpan="5"/>
+          <TableCell Name="Cell727" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell728" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell729" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell730" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row74" Height="9.45">
+          <TableCell Name="Cell731" Text="підпис працівника (ів) банку" VertAlign="Center" Font="Arial, 6pt" ColSpan="4"/>
+          <TableCell Name="Cell732" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell733" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell734" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell735" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell736" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell737" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell738" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell739" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell740" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row75" Height="9.45">
+          <TableCell Name="Cell741" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell742" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell743" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell744" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell745" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell746" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell747" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell748" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell749" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell750" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row76" Height="9.45">
+          <TableCell Name="Cell751" Text="* Здійснення операції з купівлі у фізичної особи-нерезидента готівкової іноземної валюти без оформлення довідки-certificate за формою № 377 не дає підстав для зворотного обміну.&#13;&#10;" VertAlign="Center" Font="Arial, 6pt" ColSpan="10" RowSpan="3"/>
+          <TableCell Name="Cell752" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell753" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell754" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell755" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell756" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell757" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell758" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell759" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell760" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row77" Height="9.45">
+          <TableCell Name="Cell761" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell762" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell763" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell764" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell765" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell766" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell767" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell768" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell769" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell770" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row78" Height="9.45">
+          <TableCell Name="Cell771" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell772" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell773" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell774" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell775" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell776" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell777" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell778" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell779" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell780" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row79" Height="9.45">
+          <TableCell Name="Cell781" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell782" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell783" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell784" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell785" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell786" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell787" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell788" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell789" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell790" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row80" Height="9.45">
+          <TableCell Name="Cell791" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell792" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell793" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell794" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell795" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell796" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell797" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell798" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell799" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell800" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table8" Left="0.45" Top="388.45" Width="359.1" Height="378" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" GrowToBottom="true">
+        <TableColumn Name="Column21" Width="35.91"/>
+        <TableColumn Name="Column22" Width="35.91"/>
+        <TableColumn Name="Column23" Width="35.91"/>
+        <TableColumn Name="Column24" Width="35.91"/>
+        <TableColumn Name="Column25" Width="35.91"/>
+        <TableColumn Name="Column26" Width="35.91"/>
+        <TableColumn Name="Column27" Width="35.91"/>
+        <TableColumn Name="Column28" Width="35.91"/>
+        <TableColumn Name="Column29" Width="35.91"/>
+        <TableColumn Name="Column30" Width="35.91"/>
+        <TableRow Name="Row81" Height="9.45">
+          <TableCell Name="Cell801" Text=" " HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell802" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell803" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell804" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell805" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell806" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell807" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell808" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell809" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell810" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row82" Height="9.45">
+          <TableCell Name="Cell811" Text="[Tag(&quot;UBR_NAME&quot;)]" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell812" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell813" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell814" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell815" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell816" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell817" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell818" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell819" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell820" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row83" Height="9.45">
+          <TableCell Name="Cell821" Text="[Tag(&quot;UBR_ADR&quot;)]" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell822" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell823" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell824" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell825" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell826" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell827" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell828" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell829" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell830" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row84" Height="9.45">
+          <TableCell Name="Cell831" Border.Lines="Top" Border.LeftLine.Style="Dot" Border.TopLine.Style="Dot" Border.TopLine.Width="0.25" Text="(найменування та місцезнаходження структурного підрозділу банку)" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell832" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell833" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell834" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell835" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell836" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell837" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell838" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell839" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell840" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row85" Height="9.45">
+          <TableCell Name="Cell841" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell842" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell843" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell844" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell845" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell846" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell847" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell848" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell849" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell850" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row86" Height="9.45">
+          <TableCell Name="Cell851" Text="ЗАЯВА НА ПЕРЕКАЗ ГОТIВКИ № [Tag(&quot;ONumber&quot;)]" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt, style=Bold" ColSpan="10"/>
+          <TableCell Name="Cell852" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell853" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell854" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell855" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell856" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell857" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell858" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell859" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell860" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row87" Height="9.45">
+          <TableCell Name="Cell861" Text="Дата здiйснення касової операцiї: [Tag(&quot;ODay&quot;)]  [Tag(&quot;OMonth&quot;)]  [Tag(&quot;OYear&quot;)]р." VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell862" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell863" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell864" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell865" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell866" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell867" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell868" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell869" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell870" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row88" Height="9.45">
+          <TableCell Name="Cell871" Text="Дата валютування: [Tag(&quot;OVDay&quot;)] [Tag(&quot;OVMonth&quot;)] [Tag(&quot;OVYear&quot;)]р." VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell872" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell873" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell874" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell875" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell876" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell877" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell878" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell879" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell880" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row89" Height="9.45">
+          <TableCell Name="Cell881" Border.Lines="All" Border.Width="0.25" Text="Назва валюти" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" RowSpan="2"/>
+          <TableCell Name="Cell882" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" RowSpan="2"/>
+          <TableCell Name="Cell883" Border.Lines="All" Border.Width="0.25" Text="№ рахунку" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="2" RowSpan="2"/>
+          <TableCell Name="Cell884" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell885" Border.Lines="All" Border.Width="0.25" Text="Сума" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="3" RowSpan="2"/>
+          <TableCell Name="Cell886" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell887" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell888" Border.Lines="All" Border.Width="0.25" Text="Еквiвалент у гривнях" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="3" RowSpan="2"/>
+          <TableCell Name="Cell889" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell890" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row90" Height="9.45">
+          <TableCell Name="Cell891" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell892" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell893" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell894" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell895" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell896" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell897" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell898" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell899" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell900" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row91" Height="9.45">
+          <TableCell Name="Cell901" Border.Lines="All" Border.Width="0.25" Text="UAH" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" RowSpan="2"/>
+          <TableCell Name="Cell902" Border.Lines="All" Border.Width="0.25" Text="Дебет" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell903" Border.Lines="All" Border.Width="0.25" Text="[Tag(&quot;ONLS-A&quot;)]" VertAlign="Center" Font="Arial, 6pt" ColSpan="2"/>
+          <TableCell Name="Cell904" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell905" Border.Lines="All" Border.Width="0.25" Text="[Tag(&quot;SUM_05K&quot;)]" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt, style=Bold" ColSpan="3"/>
+          <TableCell Name="Cell906" Border.Lines="All" Border.Width="0.25" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell907" Border.Lines="All" Border.Width="0.25" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell908" Border.Lines="All" Border.Width="0.25" Text="[Tag(&quot;SUM_05K&quot;)]" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt, style=Bold" ColSpan="3"/>
+          <TableCell Name="Cell909" Border.Lines="All" Border.Width="0.25" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell910" Border.Lines="All" Border.Width="0.25" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row92" Height="9.45">
+          <TableCell Name="Cell911" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell912" Border.Lines="All" Border.Width="0.25" Text="Кредит" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell913" Border.Lines="All" Border.Width="0.25" Text="[Tag(&quot;NLS_05K&quot;)]" VertAlign="Center" Font="Arial, 6pt" ColSpan="2"/>
+          <TableCell Name="Cell914" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell915" Border.Lines="All" Border.Width="0.25" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt" ColSpan="3"/>
+          <TableCell Name="Cell916" Border.Lines="All" Border.Width="0.25" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell917" Border.Lines="All" Border.Width="0.25" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell918" Border.Lines="All" Border.Width="0.25" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt" ColSpan="3"/>
+          <TableCell Name="Cell919" Border.Lines="All" Border.Width="0.25" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell920" Border.Lines="All" Border.Width="0.25" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row93" Height="9.45">
+          <TableCell Name="Cell921" Border.Lines="All" Border.Width="0.25" Text="Загальна сума  (цифрами): " VertAlign="Center" Font="Arial, 6pt" ColSpan="4"/>
+          <TableCell Name="Cell922" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell923" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell924" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell925" Border.Lines="All" Border.Width="0.25" Text="[Tag(&quot;SUM_05K&quot;)]" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt, style=Bold" ColSpan="3"/>
+          <TableCell Name="Cell926" Border.Lines="All" Border.Width="0.25" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell927" Border.Lines="All" Border.Width="0.25" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell928" Border.Lines="All" Border.Width="0.25" Text="[Tag(&quot;SUM_05K&quot;)]" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt, style=Bold" ColSpan="3"/>
+          <TableCell Name="Cell929" Border.Lines="All" Border.Width="0.25" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell930" Border.Lines="All" Border.Width="0.25" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row94" Height="9.45">
+          <TableCell Name="Cell931" Text="Платник: &lt;b&gt;[Tag(&quot;OPayer&quot;)]&lt;/b&gt;" VertAlign="Center" Font="Arial, 6pt" HtmlTags="true" ColSpan="10"/>
+          <TableCell Name="Cell932" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell933" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell934" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell935" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell936" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell937" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell938" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell939" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell940" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row95" Height="9.45">
+          <TableCell Name="Cell941" Text="Код платника*: [Tag(&quot;DR_RNOKP&quot;,IFF_SummB(150000))]" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell942" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell943" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell944" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell945" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell946" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell947" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell948" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell949" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell950" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row96" Height="9.45">
+          <TableCell Name="Cell951" Text="Банк платника**: [Tag(&quot;OBank-A&quot;)]" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell952" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell953" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell954" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell955" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell956" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell957" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell958" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell959" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell960" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row97" Height="9.45">
+          <TableCell Name="Cell961" Text="Отримувач: [Tag(&quot;OSender&quot;)]" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell962" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell963" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell964" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell965" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell966" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell967" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell968" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell969" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell970" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row98" Height="9.45">
+          <TableCell Name="Cell971" Text="Код отримувача**: [Tag(&quot;OOKPO-A&quot;)]" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell972" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell973" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell974" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell975" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell976" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell977" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell978" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell979" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell980" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row99" Height="9.45">
+          <TableCell Name="Cell981" Text="Банк отримувача: [Tag(&quot;OBank-A&quot;)]" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell982" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell983" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell984" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell985" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell986" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell987" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell988" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell989" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell990" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row100" Height="9.45">
+          <TableCell Name="Cell991" Text="Код банку отримувача**: [Tag(&quot;OMFO-A&quot;)] " VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell992" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell993" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell994" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell995" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell996" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell997" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell998" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell999" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1000" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row101" Height="9.45">
+          <TableCell Name="Cell1001" Text="Загальна сума(словами):  &lt;b&gt;&lt;i&gt;[Tag(&quot;SUM_05KLit&quot;)]&lt;/b&gt;&lt;/i&gt; " VertAlign="Center" Font="Arial, 6pt" HtmlTags="true" ColSpan="10"/>
+          <TableCell Name="Cell1002" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1003" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1004" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1005" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1006" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1007" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1008" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1009" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1010" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row102" Height="9.45">
+          <TableCell Name="Cell1011" Text="Призначення платежу: &lt;b&gt;&lt;i&gt;Збір на обов'язкове державне пенсійне страхування&#13;&#10;від операції купівлі ІВ &lt;/i&gt;&lt;/b&gt;&#13;&#10;" VertAlign="Center" Font="Arial, 6pt" HtmlTags="true" ColSpan="10" RowSpan="2"/>
+          <TableCell Name="Cell1012" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1013" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1014" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1015" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1016" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1017" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1018" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1019" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1020" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row103" Height="9.45">
+          <TableCell Name="Cell1021" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1022" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1023" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1024" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1025" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1026" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1027" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1028" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1029" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1030" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row104" Height="9.45" AutoSize="true">
+          <TableCell Name="Cell1031" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" Text="Пред'явлений документ*:  &lt;b&gt;&lt;i&gt; [Tag(&quot;DR_PASPV&quot;,IFF_SummB(150000) )]  &lt;/i&gt;&lt;/b&gt;" VertAlign="Center" Font="Arial, 6pt" HtmlTags="true" ColSpan="10"/>
+          <TableCell Name="Cell1032" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1033" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1034" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1035" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1036" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1037" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1038" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1039" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1040" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row105" Height="9.45">
+          <TableCell Name="Cell1041" Text="                                                  (паспорт або документ, що його замінює)" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell1042" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1043" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1044" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1045" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1046" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1047" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1048" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1049" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1050" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row106" Height="9.45">
+          <TableCell Name="Cell1051" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" Text="серiя:    &lt;i&gt;&lt;b&gt;[Tag(&quot;DR_PASPN&quot;,IFF_SummB(150000))]  &lt;/i&gt;&lt;/b&gt;" VertAlign="Center" Font="Arial, 6pt" HtmlTags="true" ColSpan="10"/>
+          <TableCell Name="Cell1052" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1053" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1054" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1055" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1056" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1057" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1058" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1059" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1060" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row107" Height="9.45">
+          <TableCell Name="Cell1061" Text="                              (номер документа)" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell1062" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1063" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1064" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1065" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1066" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1067" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1068" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1069" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1070" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row108" Height="9.45" AutoSize="true">
+          <TableCell Name="Cell1071" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" Text="виданий:  &lt;i&gt;&lt;b&gt;  [Tag(&quot;DR_ATRT&quot;,IFF_SummB(150000))]  &lt;/i&gt;&lt;/b&gt;" VertAlign="Center" Font="Arial, 6pt" HtmlTags="true" ColSpan="10"/>
+          <TableCell Name="Cell1072" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1073" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1074" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1075" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1076" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1077" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1078" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1079" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1080" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row109" Height="9.45">
+          <TableCell Name="Cell1081" Text="                (найменування установи,яка видала документ)" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell1082" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1083" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1084" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1085" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1086" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1087" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1088" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1089" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1090" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row110" Height="9.45">
+          <TableCell Name="Cell1091" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" Text="дата видачі документу:" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell1092" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1093" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1094" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1095" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1096" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1097" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1098" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1099" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1100" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row111" Height="9.45">
+          <TableCell Name="Cell1101" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt" ColSpan="5"/>
+          <TableCell Name="Cell1102" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1103" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1104" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1105" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1106" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt" ColSpan="5"/>
+          <TableCell Name="Cell1107" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1108" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1109" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1110" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row112" Height="9.45">
+          <TableCell Name="Cell1111" Text="(дата народження) " HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="5"/>
+          <TableCell Name="Cell1112" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1113" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1114" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1115" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1116" Text="(міcце проживання)" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="5"/>
+          <TableCell Name="Cell1117" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1118" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1119" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1120" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row113" Height="9.45">
+          <TableCell Name="Cell1121" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1122" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1123" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1124" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1125" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1126" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1127" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1128" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1129" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1130" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row114" Height="9.45">
+          <TableCell Name="Cell1131" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" Text="Додатковi реквiзити:" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell1132" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1133" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1134" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1135" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1136" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1137" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1138" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1139" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1140" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row115" Height="9.45">
+          <TableCell Name="Cell1141" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell1142" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1143" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1144" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1145" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1146" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1147" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1148" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1149" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1150" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row116" Height="9.45">
+          <TableCell Name="Cell1151" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1152" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1153" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1154" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1155" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1156" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1157" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1158" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1159" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1160" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row117" Height="9.45">
+          <TableCell Name="Cell1161" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" Text="Пiдпис платника" VertAlign="Center" Font="Arial, 6pt" ColSpan="5"/>
+          <TableCell Name="Cell1162" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1163" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1164" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1165" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1166" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1167" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" Text="Пiдписи банку" VertAlign="Center" Font="Arial, 6pt" ColSpan="4"/>
+          <TableCell Name="Cell1168" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1169" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1170" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row118" Height="9.45">
+          <TableCell Name="Cell1171" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1172" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1173" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1174" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1175" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1176" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1177" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1178" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1179" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1180" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row119" Height="9.45">
+          <TableCell Name="Cell1181" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1182" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1183" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1184" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1185" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1186" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1187" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1188" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1189" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1190" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row120" Height="9.45">
+          <TableCell Name="Cell1191" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1192" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1193" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1194" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1195" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1196" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1197" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1198" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1199" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1200" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table9" Left="377.89" Top="387.45" Width="359.1" Height="378" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" GrowToBottom="true">
+        <TableColumn Name="Column31" Width="35.91"/>
+        <TableColumn Name="Column32" Width="35.91"/>
+        <TableColumn Name="Column33" Width="35.91"/>
+        <TableColumn Name="Column34" Width="35.91"/>
+        <TableColumn Name="Column35" Width="35.91"/>
+        <TableColumn Name="Column36" Width="35.91"/>
+        <TableColumn Name="Column37" Width="35.91"/>
+        <TableColumn Name="Column38" Width="35.91"/>
+        <TableColumn Name="Column39" Width="35.91"/>
+        <TableColumn Name="Column40" Width="35.91"/>
+        <TableRow Name="Row121" Height="9.45">
+          <TableCell Name="Cell1201" Text=" " HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell1202" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1203" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1204" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1205" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1206" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1207" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1208" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1209" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1210" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row122" Height="9.45">
+          <TableCell Name="Cell1211" Text="[Tag(&quot;UBR_NAME&quot;)]" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell1212" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1213" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1214" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1215" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1216" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1217" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1218" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1219" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1220" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row123" Height="9.45">
+          <TableCell Name="Cell1221" Text="[Tag(&quot;UBR_ADR&quot;)]" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell1222" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1223" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1224" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1225" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1226" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1227" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1228" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1229" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1230" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row124" Height="9.45">
+          <TableCell Name="Cell1231" Border.Lines="Top" Border.LeftLine.Style="Dot" Border.TopLine.Style="Dot" Border.TopLine.Width="0.25" Text="(найменування та місцезнаходження структурного підрозділу банку)" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell1232" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1233" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1234" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1235" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1236" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1237" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1238" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1239" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1240" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row125" Height="9.45">
+          <TableCell Name="Cell1241" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1242" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1243" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1244" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1245" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1246" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1247" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1248" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1249" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1250" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row126" Height="9.45">
+          <TableCell Name="Cell1251" Text="КВИТАНЦIЯ № [Tag(&quot;ONumber&quot;)]" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt, style=Bold" ColSpan="10"/>
+          <TableCell Name="Cell1252" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1253" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1254" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1255" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1256" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1257" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1258" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1259" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1260" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row127" Height="9.45">
+          <TableCell Name="Cell1261" Text="Дата здiйснення касової операцiї: [Tag(&quot;ODay&quot;)]  [Tag(&quot;OMonth&quot;)]  [Tag(&quot;OYear&quot;)]р." VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell1262" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1263" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1264" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1265" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1266" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1267" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1268" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1269" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1270" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row128" Height="9.45">
+          <TableCell Name="Cell1271" Text="Дата валютування: [Tag(&quot;OVDay&quot;)] [Tag(&quot;OVMonth&quot;)] [Tag(&quot;OVYear&quot;)]р." VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell1272" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1273" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1274" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1275" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1276" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1277" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1278" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1279" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1280" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row129" Height="9.45">
+          <TableCell Name="Cell1281" Border.Lines="All" Border.Width="0.25" Text="Назва валюти" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" RowSpan="2"/>
+          <TableCell Name="Cell1282" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" RowSpan="2"/>
+          <TableCell Name="Cell1283" Border.Lines="All" Border.Width="0.25" Text="№ рахунку" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="2" RowSpan="2"/>
+          <TableCell Name="Cell1284" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1285" Border.Lines="All" Border.Width="0.25" Text="Сума" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="3" RowSpan="2"/>
+          <TableCell Name="Cell1286" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1287" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1288" Border.Lines="All" Border.Width="0.25" Text="Еквiвалент у гривнях" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="3" RowSpan="2"/>
+          <TableCell Name="Cell1289" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1290" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row130" Height="9.45">
+          <TableCell Name="Cell1291" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1292" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1293" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1294" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1295" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1296" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1297" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1298" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1299" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1300" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row131" Height="9.45">
+          <TableCell Name="Cell1301" Border.Lines="All" Border.Width="0.25" Text="UAH" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" RowSpan="2"/>
+          <TableCell Name="Cell1302" Border.Lines="All" Border.Width="0.25" Text="Дебет" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1303" Border.Lines="All" Border.Width="0.25" Text="[Tag(&quot;ONLS-A&quot;)]" VertAlign="Center" Font="Arial, 6pt" ColSpan="2"/>
+          <TableCell Name="Cell1304" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1305" Border.Lines="All" Border.Width="0.25" Text="[Tag(&quot;SUM_05K&quot;)]" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt, style=Bold" ColSpan="3"/>
+          <TableCell Name="Cell1306" Border.Lines="All" Border.Width="0.25" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1307" Border.Lines="All" Border.Width="0.25" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1308" Border.Lines="All" Border.Width="0.25" Text="[Tag(&quot;SUM_05K&quot;)]" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt, style=Bold" ColSpan="3"/>
+          <TableCell Name="Cell1309" Border.Lines="All" Border.Width="0.25" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1310" Border.Lines="All" Border.Width="0.25" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row132" Height="9.45">
+          <TableCell Name="Cell1311" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1312" Border.Lines="All" Border.Width="0.25" Text="Кредит" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1313" Border.Lines="All" Border.Width="0.25" Text="[Tag(&quot;NLS_05K&quot;)]" VertAlign="Center" Font="Arial, 6pt" ColSpan="2"/>
+          <TableCell Name="Cell1314" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1315" Border.Lines="All" Border.Width="0.25" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt" ColSpan="3"/>
+          <TableCell Name="Cell1316" Border.Lines="All" Border.Width="0.25" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1317" Border.Lines="All" Border.Width="0.25" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1318" Border.Lines="All" Border.Width="0.25" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt" ColSpan="3"/>
+          <TableCell Name="Cell1319" Border.Lines="All" Border.Width="0.25" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1320" Border.Lines="All" Border.Width="0.25" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row133" Height="9.45">
+          <TableCell Name="Cell1321" Border.Lines="All" Border.Width="0.25" Text="Загальна сума  (цифрами): " VertAlign="Center" Font="Arial, 6pt" ColSpan="4"/>
+          <TableCell Name="Cell1322" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1323" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1324" Border.Lines="All" Border.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1325" Border.Lines="All" Border.Width="0.25" Text="[Tag(&quot;SUM_05K&quot;)]" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt, style=Bold" ColSpan="3"/>
+          <TableCell Name="Cell1326" Border.Lines="All" Border.Width="0.25" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1327" Border.Lines="All" Border.Width="0.25" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1328" Border.Lines="All" Border.Width="0.25" Text="[Tag(&quot;SUM_05K&quot;)]" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt, style=Bold" ColSpan="3"/>
+          <TableCell Name="Cell1329" Border.Lines="All" Border.Width="0.25" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1330" Border.Lines="All" Border.Width="0.25" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row134" Height="9.45">
+          <TableCell Name="Cell1331" Text="Платник: &lt;b&gt;[Tag(&quot;OPayer&quot;)]&lt;/b&gt;" VertAlign="Center" Font="Arial, 6pt" HtmlTags="true" ColSpan="10"/>
+          <TableCell Name="Cell1332" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1333" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1334" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1335" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1336" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1337" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1338" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1339" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1340" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row135" Height="9.45">
+          <TableCell Name="Cell1341" Text="Код платника*: [Tag(&quot;DR_RNOKP&quot;,IFF_SummB(150000))]" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell1342" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1343" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1344" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1345" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1346" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1347" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1348" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1349" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1350" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row136" Height="9.45">
+          <TableCell Name="Cell1351" Text="Банк платника**: [Tag(&quot;OBank-A&quot;)]" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell1352" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1353" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1354" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1355" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1356" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1357" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1358" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1359" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1360" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row137" Height="9.45">
+          <TableCell Name="Cell1361" Text="Отримувач: [Tag(&quot;OSender&quot;)]" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell1362" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1363" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1364" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1365" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1366" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1367" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1368" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1369" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1370" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row138" Height="9.45">
+          <TableCell Name="Cell1371" Text="Код отримувача**: [Tag(&quot;OOKPO-A&quot;)]" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell1372" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1373" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1374" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1375" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1376" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1377" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1378" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1379" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1380" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row139" Height="9.45">
+          <TableCell Name="Cell1381" Text="Банк отримувача: [Tag(&quot;OBank-A&quot;)]" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell1382" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1383" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1384" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1385" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1386" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1387" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1388" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1389" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1390" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row140" Height="9.45">
+          <TableCell Name="Cell1391" Text="Код банку отримувача**: [Tag(&quot;OMFO-A&quot;)] " VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell1392" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1393" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1394" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1395" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1396" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1397" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1398" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1399" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1400" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row141" Height="9.45">
+          <TableCell Name="Cell1401" Text="Загальна сума(словами):  &lt;b&gt;&lt;i&gt;[Tag(&quot;SUM_05KLit&quot;)]&lt;/b&gt;&lt;/i&gt; " VertAlign="Center" Font="Arial, 6pt" HtmlTags="true" ColSpan="10"/>
+          <TableCell Name="Cell1402" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1403" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1404" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1405" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1406" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1407" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1408" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1409" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1410" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row142" Height="9.45">
+          <TableCell Name="Cell1411" Text="Призначення платежу: &lt;b&gt;&lt;i&gt;Збір на обов'язкове державне пенсійне страхування&#13;&#10;від операції купівлі ІВ &lt;/i&gt;&lt;/b&gt;&#13;&#10;" VertAlign="Center" Font="Arial, 6pt" HtmlTags="true" ColSpan="10" RowSpan="2"/>
+          <TableCell Name="Cell1412" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1413" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1414" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1415" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1416" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1417" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1418" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1419" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1420" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row143" Height="9.45">
+          <TableCell Name="Cell1421" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1422" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1423" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1424" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1425" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1426" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1427" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1428" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1429" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1430" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row154" Height="9.45">
+          <TableCell Name="Cell1531" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" Text="Додатковi реквiзити:" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell1532" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1533" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1534" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1535" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1536" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1537" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1538" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1539" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1540" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row155" Height="9.45">
+          <TableCell Name="Cell1541" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+          <TableCell Name="Cell1542" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1543" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1544" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1545" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1546" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1547" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1548" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1549" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1550" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row156" Height="9.45">
+          <TableCell Name="Cell1551" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1552" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1553" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1554" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1555" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1556" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1557" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1558" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1559" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1560" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row157" Height="9.45">
+          <TableCell Name="Cell1561" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" Text="Пiдписи банку" VertAlign="Center" Font="Arial, 6pt" ColSpan="5"/>
+          <TableCell Name="Cell1562" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1563" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1564" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1565" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1566" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1567" VertAlign="Center" Font="Arial, 6pt" ColSpan="4"/>
+          <TableCell Name="Cell1568" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1569" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1570" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row158" Height="9.45">
+          <TableCell Name="Cell1571" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1572" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1573" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1574" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1575" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1576" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1577" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1578" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1579" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1580" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row159" Height="9.45">
+          <TableCell Name="Cell1581" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1582" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1583" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1584" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1585" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1586" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1587" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1588" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1589" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1590" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+        <TableRow Name="Row161">
+          <TableCell Name="Cell1601" Text="*  Заповнюються в разі ідентифікації клієнтів відповідно до вимог законодавства країни про запобігання та протидію легалізації (відмиванню) доходів, одержаних лочинним шляхом, або фінансуванню тероризму.&#13;&#10;** Реквiзити зазначаються в разi здiйснення переказу готiвки для  зарахування на рахунок, вiдкритий в iншому банку." Font="Arial, 5pt" ColSpan="10" RowSpan="3"/>
+          <TableCell Name="Cell1602"/>
+          <TableCell Name="Cell1603"/>
+          <TableCell Name="Cell1604"/>
+          <TableCell Name="Cell1605"/>
+          <TableCell Name="Cell1606"/>
+          <TableCell Name="Cell1607"/>
+          <TableCell Name="Cell1608"/>
+          <TableCell Name="Cell1609"/>
+          <TableCell Name="Cell1610"/>
+        </TableRow>
+        <TableRow Name="Row162">
+          <TableCell Name="Cell1611"/>
+          <TableCell Name="Cell1612"/>
+          <TableCell Name="Cell1613"/>
+          <TableCell Name="Cell1614"/>
+          <TableCell Name="Cell1615"/>
+          <TableCell Name="Cell1616"/>
+          <TableCell Name="Cell1617"/>
+          <TableCell Name="Cell1618"/>
+          <TableCell Name="Cell1619"/>
+          <TableCell Name="Cell1620"/>
+        </TableRow>
+        <TableRow Name="Row165">
+          <TableCell Name="Cell1641"/>
+          <TableCell Name="Cell1642"/>
+          <TableCell Name="Cell1643"/>
+          <TableCell Name="Cell1644"/>
+          <TableCell Name="Cell1645"/>
+          <TableCell Name="Cell1646"/>
+          <TableCell Name="Cell1647"/>
+          <TableCell Name="Cell1648"/>
+          <TableCell Name="Cell1649"/>
+          <TableCell Name="Cell1650"/>
+        </TableRow>
+        <TableRow Name="Row163">
+          <TableCell Name="Cell1621">
+            <TextObject Name="Text22" Top="9.45" Width="351.54" Height="37.8" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" CanGrow="true" Text="[Tag(&quot;REKLAMA&quot;)]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" TextFill.Color="Indigo" HtmlTags="true"/>
+          </TableCell>
+          <TableCell Name="Cell1622"/>
+          <TableCell Name="Cell1623"/>
+          <TableCell Name="Cell1624"/>
+          <TableCell Name="Cell1625"/>
+          <TableCell Name="Cell1626"/>
+          <TableCell Name="Cell1627"/>
+          <TableCell Name="Cell1628"/>
+          <TableCell Name="Cell1629"/>
+          <TableCell Name="Cell1630"/>
+        </TableRow>
+        <TableRow Name="Row164">
+          <TableCell Name="Cell1631"/>
+          <TableCell Name="Cell1632"/>
+          <TableCell Name="Cell1633"/>
+          <TableCell Name="Cell1634"/>
+          <TableCell Name="Cell1635"/>
+          <TableCell Name="Cell1636"/>
+          <TableCell Name="Cell1637"/>
+          <TableCell Name="Cell1638"/>
+          <TableCell Name="Cell1639"/>
+          <TableCell Name="Cell1640"/>
+        </TableRow>
+        <TableRow Name="Row160" Height="9.45">
+          <TableCell Name="Cell1591" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1592" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1593" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1594" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1595" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1596" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1597" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1598" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1599" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell1600" VertAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+      </TableObject>
+      <LineObject Name="Line2" Left="368.44" Height="378" Border.Style="Dot" Border.Width="0.25"/>
+      <LineObject Name="Line3" Left="368.44" Top="387.45" Height="378" Border.Style="Dot" Border.Width="0.25"/>
+    </DataBand>
+    <DataBand Name="BUH_MODEL_B" Top="940.95" Width="737.1" Height="18.9" CanGrow="true" CanShrink="true" Guides="0,18.9" DataSource="Table" KeepTogether="true" KeepDetail="true">
+      <TextObject Name="Text3" Left="75.98" Width="86.94" Height="18.9" Border.Lines="Right, Top, Bottom" Text="[BUH_MODEL.FDAT1]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text1" Left="9.45" Width="66.15" Height="18.9" Border.Lines="All" Text="[BUH_MODEL.TT]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text4" Left="162.54" Width="113.4" Height="18.9" Border.Lines="Right, Top, Bottom" Text="[BUH_MODEL.NLS]" VertAlign="Center" Font="Arial, 9pt" TabWidth="55"/>
+      <TextObject Name="Text2" Left="275.56" Width="66.15" Height="18.9" Border.Lines="Right, Top, Bottom" Text="[BUH_MODEL.KV]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text5" Left="342.09" Width="122.85" Height="18.9" Border.Lines="Right, Top, Bottom" Text="[IIf([BUH_MODEL.DK]==0,[BUH_MODEL.O.S/T.DENOM],null)]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text6" Left="464.56" Width="124.74" Height="18.9" Border.Lines="Right, Top, Bottom" Text="[IIf([BUH_MODEL.DK]==0,null,[BUH_MODEL.O.S/T.DENOM])]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text7" Left="589.3" Width="121.34" Height="18.9" Border.Lines="Right, Top, Bottom" Text="[BUH_MODEL.GL.P_ICURVAL(A.KV,O.S,O.FDAT)/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt"/>
+      <DataHeaderBand Name="BUH_MODEL_H" Top="864.25" Width="737.1" Height="56.7" CanShrink="true" Guides="28.35,56.7,0">
+        <TextObject Name="Text8" Left="9.45" Top="28.35" Width="66.15" Height="28.35" Border.Lines="All" Text="Тип&#13;&#10;трн." HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+        <TextObject Name="Text15" Left="9.45" Width="699.3" Height="28.35" Border.Lines="Top" Border.Style="Dash" Text="     Перелік транзакцій для документа # [p_ref_c]" VertAlign="Center" Font="Arial, 9pt"/>
+        <TextObject Name="Text9" Left="75.6" Top="28.35" Width="86.94" Height="28.35" Border.Lines="Top, Bottom" Text="Дата &#13;&#10;валютування" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+        <TextObject Name="Text10" Left="162.54" Top="28.35" Width="113.4" Height="28.35" Border.Lines="All" Text="Рахунок" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TabWidth="55"/>
+        <TextObject Name="Text11" Left="275.56" Top="28.35" Width="66.15" Height="28.35" Border.Lines="Right, Top, Bottom" Text="Валюта" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+        <TextObject Name="Text12" Left="340.2" Top="28.35" Width="124.74" Height="28.35" Border.Lines="Right, Top, Bottom" Text="Дебет" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+        <TextObject Name="Text13" Left="464.56" Top="28.35" Width="124.74" Height="28.35" Border.Lines="Right, Top, Bottom" Text="Кредит" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+        <TextObject Name="Text14" Left="585.9" Top="28.35" Width="124.74" Height="28.35" Border.Lines="Right, Top, Bottom" Text="Еквівалент" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      </DataHeaderBand>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="979.85" Width="737.1" Height="9.45"/>
+  </ReportPage>
+</Report>

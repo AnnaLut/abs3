@@ -1,0 +1,90 @@
+<xmlform captiontype="Default" caption="Депозит розірваний в період політичної нестабільності" >
+  <customforms >
+    <customform name="frm" buttonsposition="Bottom" width="600" title="" columnscount="2"  showborder="false"  >
+      <buttons defaulttype="Button" >
+        <button id="btBack" caption="Назад" hint="Повернутися назад">
+          <command type="Redirect" url="/barsroot/barsweb/dynform.aspx?form=frm_dep_broken_period_serch" target="Self"></command>
+        </button>
+        <button caption="Далі" hint="Далі" id="btnNext">
+          <command type="PlSqlBlock" successurl="/barsroot/barsweb/dynform.aspx?form=frm_dep_broken_period_new_search"  target="Self" >
+            <sql>
+              begin
+                null;
+              end;
+            </sql>
+           <parameters>
+             <parameter type="QueryString" datatype="String" name="dep_num" add2successurl="true"></parameter>
+             <parameter type="QueryString" datatype="String" name="dep_date" add2successurl="true"></parameter>
+             </parameters> 
+          </command> 
+        </button>
+      </buttons>
+      <!--<datasource>
+        <sql>
+          select 1 as DEP_NUM, trunc(sysdate) DEP_DATE,trunc(sysdate)-7 DEP_END_DATE, 980 KV, 0.1 SUM, 0.2 SUM2 from dual where 1 = :dep_num and to_date('02.02.2014','dd.mm.yyyy') = to_date(:dep_date,'dd.mm.yyyy')
+        </sql>
+        <parameters>
+          <parameter type="QueryString" name="dep_num"></parameter>
+          <parameter type="QueryString" name="dep_date"></parameter>
+        </parameters>
+      </datasource>-->
+      <customfields >
+        <customfield name="DEP_NUM" label="№ " required="false" datatype="String" columnindex="2" index="1">
+          <uicontrol controlwidth="120" type="TextBox" readonly="true" >
+            <defaultvalue type="Constant" value="\QS[dep_num]"></defaultvalue>
+          </uicontrol>
+        </customfield>
+        <!--<customfield name="DEP_DATE" datatype="String" label="Дата початку дії" columnindex="1" index="2">
+          <uicontrol controlwidth="120" type="TextBox" readonly="true">
+            <defaultvalue type="Constant" value="\QS[dep_date]"></defaultvalue>
+          </uicontrol>
+        </customfield>-->
+        <customfield name="DEP_END_DATE" label="Дата закінчення" required="false" datatype="DateTime" columnindex="2" index="1"  >
+          <uicontrol controlwidth="120" type="DateInput" readonly="true" >
+            <defaultvalue type="Constant" value="\SS[p_dat_end]"></defaultvalue>
+          </uicontrol>
+        </customfield>
+        <customfield name="TERMINATION_DATE" label="Дата дострокового розірвання" required="false" datatype="DateTime" columnindex="2" index="2"  >
+          <uicontrol controlwidth="120" type="DateInput" readonly="true" >
+            <defaultvalue type="Constant" value="\SS[p_termination_date]"></defaultvalue>
+          </uicontrol>
+        </customfield>
+        <customfield name="KV" datatype="String" label="Валюта" columnindex="2" index="3" >
+          <uicontrol controlwidth="120" type="TextBox" readonly="true">
+            <defaultvalue type="Constant" value="\SS[p_kv]"></defaultvalue>
+          </uicontrol>
+        </customfield>
+        <customfield name="BALANCE" label="Залишок на момент розірвання" required="false" datatype="Decimal" columnindex="2" index="4" >
+          <uicontrol controlwidth="120" type="IntegerInput" readonly="true" >
+            <defaultvalue type="Constant" value="\SS[p_balance]"></defaultvalue>
+          </uicontrol>
+        </customfield>
+        <customfield name="PENALTY_SUM" datatype="Decimal" label="Сума штрафу" columnindex="2" index="5">
+          <uicontrol controlwidth="120" type="IntegerInput" readonly="true">
+            <defaultvalue type="Constant" value="\SS[p_penalty_sum]"></defaultvalue>
+          </uicontrol>
+        </customfield>
+        <customfield name="FIO" datatype="String" label="ФІО" columnindex="1" index="1" >
+          <uicontrol controlwidth="120" type="TextBox" linescount="2" readonly="true">
+            <defaultvalue type="Constant" value="\SS[p_fio]"></defaultvalue>
+          </uicontrol>
+        </customfield>
+        <customfield name="INN" datatype="String" label="ІНН" columnindex="1" index="4" >
+          <uicontrol controlwidth="120" type="TextBox" readonly="true">
+            <defaultvalue type="Constant" value="\SS[p_inn]"></defaultvalue>
+          </uicontrol>
+        </customfield>
+        <customfield name="DOC" datatype="String" label="Документ клієнта" columnindex="1" index="3" >
+          <uicontrol controlwidth="120" type="TextBox" readonly="true">
+            <defaultvalue type="Constant" value="\SS[p_doc]"></defaultvalue>
+          </uicontrol>
+        </customfield>
+        <customfield name="BIRTH_DATE" datatype="DateTime" label="Дата народження клієнта" columnindex="1" index="2" >
+          <uicontrol controlwidth="120" type="DateInput" readonly="true">
+            <defaultvalue type="Constant" value="\SS[p_birth_date]"></defaultvalue>
+          </uicontrol>
+        </customfield>
+       </customfields>
+    </customform>
+  </customforms>
+</xmlform>

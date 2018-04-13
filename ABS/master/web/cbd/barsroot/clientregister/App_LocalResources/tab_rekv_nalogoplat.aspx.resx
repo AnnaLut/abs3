@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+<xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+<xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+<xsd:element name="root" msdata:IsDataSet="true">
+<xsd:complexType>
+<xsd:choice maxOccurs="unbounded">
+<xsd:element name="metadata">
+<xsd:complexType>
+<xsd:sequence>
+<xsd:element name="value" type="xsd:string" minOccurs="0" />
+</xsd:sequence>
+<xsd:attribute name="name" use="required" type="xsd:string" />
+<xsd:attribute name="type" type="xsd:string" />
+<xsd:attribute name="mimetype" type="xsd:string" />
+<xsd:attribute ref="xml:space" />
+</xsd:complexType>
+</xsd:element>
+<xsd:element name="assembly">
+<xsd:complexType>
+<xsd:attribute name="alias" type="xsd:string" />
+<xsd:attribute name="name" type="xsd:string" />
+</xsd:complexType>
+</xsd:element>
+<xsd:element name="data">
+<xsd:complexType>
+<xsd:sequence>
+<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+<xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+</xsd:sequence>
+<xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+<xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+<xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+<xsd:attribute ref="xml:space" />
+</xsd:complexType>
+</xsd:element>
+<xsd:element name="resheader">
+<xsd:complexType>
+<xsd:sequence>
+<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+</xsd:sequence>
+<xsd:attribute name="name" type="xsd:string" use="required" />
+</xsd:complexType>
+</xsd:element>
+</xsd:choice>
+</xsd:complexType>
+</xsd:element>
+</xsd:schema>
+<resheader name="resmimetype">
+<value>text/microsoft-resx</value>
+</resheader>
+<resheader name="version">
+<value>2.0</value>
+</resheader>
+<resheader name="reader">
+<value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+</resheader>
+<resheader name="writer">
+<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+</resheader>
+<data name="divNal.InnerText" xml:space="preserve">
+<value>Заполнять реквизиты Налогоплательщика</value>
+</data>
+<data name="tdRNI.InnerText" xml:space="preserve">
+<value>Областная НИ</value>
+</data>
+<data name="tdDNI.InnerText" xml:space="preserve">
+<value>Районная НИ</value>
+</data>
+<data name="tdAdm.InnerText" xml:space="preserve">
+<value>Адм. орган регистрации</value>
+</data>
+<data name="tdRegNumInAdm.InnerText" xml:space="preserve">
+<value>Рег. номер в Адм.</value>
+</data>
+<data name="tdRegNumInNI.InnerText" xml:space="preserve">
+<value>Рег. номер в НИ</value>
+</data>
+<data name="tdNalCode.InnerText" xml:space="preserve">
+<value>Налоговый код (К050)</value>
+</data>
+<data name="RegDateInNI.InnerText" xml:space="preserve">
+<value>Дата рег. в НИ</value>
+</data>
+<data name="RegDateInAdm.InnerText" xml:space="preserve">
+<value>Дата рег. в Адм.</value>
+</data>
+<data name="Mes01.Value" xml:space="preserve">
+<value>Сервис заблокирован. Попробуйте снова через несколько секунд.</value>
+</data>
+<data name="Mes13.Value" xml:space="preserve">
+<value>Дата введена с ошибкой.</value>
+</data>
+<data name="Mes14.Value" xml:space="preserve">
+<value>Месяц записан с ошибкой.</value>
+</data>
+<data name="Mes15.Value" xml:space="preserve">
+<value>Число указано с ошибкой.</value>
+</data>
+<data name="Mes16.Value" xml:space="preserve">
+<value>Неправильный формат даты. Используйте формат dd.MM.yyyy</value>
+</data>
+<data name="Mes17.Value" xml:space="preserve">
+<value>Введите число</value>
+</data>
+<data name="Mes18.Value" xml:space="preserve">
+<value>Введите число</value>
+</data>
+</root>

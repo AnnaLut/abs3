@@ -1,0 +1,512 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="05/11/2011 18:13:00" ReportInfo.Modified="11/19/2014 14:36:58" ReportInfo.CreatorVersion="2013.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqcFv7/QVsbsa1pDpr21P0mHLcRIZaiGfg6+KPJbWhg17RBpku0Rho4U71ZwGhUe+LR4QGCk1Zv9PH47tWWgA+dA==">
+      <TableDataSource Name="Table" Alias="BANK_NAME" DataType="System.Int32" Enabled="true" SelectCommand="select f_doc_attr('BANK_NAME', :ND) as val from dual">
+        <Column Name="VAL" DataType="System.String"/>
+        <Column Name="Column" Enabled="false" DataType="System.Int32" Calculated="true" Expression=""/>
+        <CommandParameter Name="ND" DataType="126" Expression="[ND]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table2" Alias="BANK_MFO" DataType="System.Int32" Enabled="true" SelectCommand="select f_doc_attr('BANK_MFO', :ND) as val from dual">
+        <Column Name="VAL" DataType="System.String"/>
+        <CommandParameter Name="ND" DataType="126" Expression="[ND]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table3" Alias="BANK_OKPO" DataType="System.Int32" Enabled="true" SelectCommand="select f_doc_attr('BANK_OKPO', :ND) as val from dual">
+        <Column Name="VAL" DataType="System.String"/>
+        <CommandParameter Name="ND" DataType="126" Expression="[ND]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table4" Alias="DataSubProduct" DataType="System.Int32" Enabled="true" SelectCommand="select b.*,   &#13;&#10;       wcs_utl.get_answ_formated(b.bid_id, 'CL_13') || ' ' || &#13;&#10;       wcs_utl.get_answ_formated(b.bid_id, 'CL_14') || ' ' || &#13;&#10;       wcs_utl.get_answ_formated(b.bid_id, 'CL_15') || ' ' || &#13;&#10;       wcs_utl.get_answ_formated(b.bid_id, 'CL_16') as adr, &#13;&#10;       wcs_utl.get_answ_formated(:ND,'REPAYMENT_METHOD') as REPAYMENT_METHOD_P,  &#13;&#10;       wcs_utl.get_answ_formated(:ND, 'CREDIT_CURRENCY') as CREDIT_CURRENCY_P,&#13;&#10;       f_sumpr(b.summ*100,t.kv, T.GENDER) as ssum_pr, &#13;&#10;       B.OWN_FUNDS + b.summ as all_sum_t ,&#13;&#10;       f_sumpr((B.OWN_FUNDS + b.summ)*100,t.kv, T.GENDER) as ALL_ssum_pr, &#13;&#10;       f_sumpr(B.OWN_FUNDS*100, t.kv, T.GENDER) as OWN_FUNDS_pr, &#13;&#10;       substr(f_dat_lit( B.CRT_DATE ),1,25)  as dat_dog_pr, &#13;&#10;       substr(f_dat_lit(b.BDATE),1,25)  as dat_bdate_pr,   &#13;&#10;       wcs_utl.get_answ(b.bid_id, 'CL_2_0_01') as CREDIT_TARGET,&#13;&#10;       wcs_utl.get_answ(b.bid_id, 'CL_2_0_02') AS CREDIT_DESCRIPTION,&#13;&#10;       decode((select s.PRODUCT_ID from v_wcs_subproducts s where s.SUBPRODUCT_ID=b.SUBPRODUCT_ID),&#13;&#10;              'PRD_MORTGAGE','придбання нерухомості на вторинному ринку'||&#13;&#10;                             case when exists(select * from BARS.V_WCS_BID_GARANTEES bg&#13;&#10;                                              where bg.bid_id = b.bid_id and bg.type_id=0 and bg.type_obu_id=25) &#13;&#10;                                  then ' ' else ' не' end|| 'житлового призначення',&#13;&#10;              'PRD_HULL_INSURANCE','сплату страхових платежўв за пакетом &quot;повне КАСКО',&#13;&#10;              'PRD_AUTO','придбання '||decode(wcs_utl.get_answ_list(b.bid_id, 'GRT_3_4_0', 'GRT_VEHICLE'),0,'нового ','')||&#13;&#10;                         'транспортного засобу '||&#13;&#10;                         wcs_utl.get_answ(b.bid_id, 'GRT_3_2', 'GRT_VEHICLE')||' '||&#13;&#10;                         wcs_utl.get_answ(b.bid_id, 'GRT_3_2_1', 'GRT_VEHICLE'),&#13;&#10;              'PRD_CONSUMER','споживчі цілі',&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_2_0_01')||' '||wcs_utl.get_answ(b.bid_id, 'CL_2_0_02')) AS CRED_TARGET &#13;&#10;from v_wcs_bids b, tabval t  where b.bid_id = :ND and B.CREDIT_CURRENCY =T.lcv  ">
+        <Column Name="BID_ID" DataType="System.Decimal"/>
+        <Column Name="SUBPRODUCT_ID" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_NAME" DataType="System.String"/>
+        <Column Name="CRT_DATE" DataType="System.DateTime"/>
+        <Column Name="F" DataType="System.String"/>
+        <Column Name="I" DataType="System.String"/>
+        <Column Name="O" DataType="System.String"/>
+        <Column Name="BDATE" DataType="System.DateTime"/>
+        <Column Name="INN" DataType="System.String"/>
+        <Column Name="SUMM" DataType="System.Decimal"/>
+        <Column Name="OWN_FUNDS" DataType="System.Decimal"/>
+        <Column Name="TERM" DataType="System.String"/>
+        <Column Name="CREDIT_CURRENCY" DataType="System.Decimal"/>
+        <Column Name="SINGLE_FEE" DataType="System.Decimal"/>
+        <Column Name="MONTHLY_FEE" DataType="System.Decimal"/>
+        <Column Name="INTEREST_RATE" DataType="System.Decimal"/>
+        <Column Name="REPAYMENT_METHOD" DataType="System.String"/>
+        <Column Name="REPAYMENT_DAY" DataType="System.Decimal"/>
+        <Column Name="GARANTEES" DataType="System.String"/>
+        <Column Name="MGR_ID" DataType="System.Decimal"/>
+        <Column Name="MGR_FIO" DataType="System.String"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="BRANCH_NAME" DataType="System.String"/>
+        <Column Name="STATES" DataType="System.String"/>
+        <Column Name="ADR" DataType="System.String"/>
+        <Column Name="REPAYMENT_METHOD_P" DataType="System.String"/>
+        <Column Name="CREDIT_CURRENCY_P" DataType="System.String"/>
+        <Column Name="SSUM_PR" DataType="System.String"/>
+        <Column Name="ALL_SUM_T" DataType="System.Decimal"/>
+        <Column Name="ALL_SSUM_PR" DataType="System.String"/>
+        <Column Name="OWN_FUNDS_PR" DataType="System.String"/>
+        <Column Name="DAT_DOG_PR" DataType="System.String"/>
+        <Column Name="DAT_BDATE_PR" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_DESC" DataType="System.String"/>
+        <Column Name="REPAYMENT_METHOD_TEXT" DataType="System.String"/>
+        <Column Name="CREDIT_TARGET" DataType="System.String"/>
+        <Column Name="CREDIT_DESCRIPTION" DataType="System.String"/>
+        <Column Name="RNK" DataType="System.Decimal"/>
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="BRANCH_HIERARCHY" DataType="System.String"/>
+        <Column Name="INIT_PAYMENT_MTD" DataType="System.String"/>
+        <Column Name="CRED_TARGET" DataType="System.String"/>
+        <CommandParameter Name="ND" DataType="126" Expression="[ND]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table5" Alias="CL_1" DataType="System.Int32" Enabled="true" SelectCommand="select wcs_utl.get_answ(:ND, 'CL_1', :p_ws_id , :p_ws_number ) as val FROM dual">
+        <Column Name="VAL" DataType="System.String"/>
+        <CommandParameter Name="ND" DataType="126" Expression="[ND]"/>
+        <CommandParameter Name="p_ws_id" DataType="126" Expression="[p_ws_id]"/>
+        <CommandParameter Name="p_ws_number" DataType="126" Expression="[p_ws_number]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table6" Alias="CL_2" DataType="System.Int32" Enabled="true" SelectCommand="select wcs_utl.get_answ(:ND, 'CL_2', :p_ws_id , :p_ws_number ) as val FROM dual">
+        <Column Name="VAL" DataType="System.String"/>
+        <Column Name="Column" Enabled="false" DataType="System.Int32" Calculated="true" Expression=""/>
+        <CommandParameter Name="ND" DataType="126" Expression="[ND]"/>
+        <CommandParameter Name="p_ws_id" DataType="126" Expression="[p_ws_id]"/>
+        <CommandParameter Name="p_ws_number" DataType="126" Expression="[p_ws_number]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table7" Alias="CL_3" DataType="System.Int32" Enabled="true" SelectCommand="select wcs_utl.get_answ(:ND, 'CL_3', :p_ws_id , :p_ws_number ) as val FROM dual">
+        <Column Name="VAL" DataType="System.String"/>
+        <CommandParameter Name="ND" DataType="126" Expression="[ND]"/>
+        <CommandParameter Name="p_ws_id" DataType="126" Expression="[p_ws_id]"/>
+        <CommandParameter Name="p_ws_number" DataType="126" Expression="[p_ws_number]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table8" Alias="PaspData" DataType="System.Int32" Enabled="true" SelectCommand="select wcs_utl.get_answ(:ND, 'CL_4', :p_ws_id, :p_ws_number) as CL_4,&#13;&#10;       wcs_utl.get_answ(:ND, 'CODE_002', :p_ws_id, :p_ws_number) as CODE_002,&#13;&#10;       wcs_utl.get_answ(:ND, 'CL_7', :p_ws_id, :p_ws_number) as CL_7,&#13;&#10;       wcs_utl.get_answ(:ND, 'CL_8', :p_ws_id, :p_ws_number) as CL_8,&#13;&#10;       wcs_utl.get_answ(:ND, 'CL_9', :p_ws_id, :p_ws_number) as CL_9,&#13;&#10;       wcs_utl.get_answ(:ND, 'CL_10', :p_ws_id, :p_ws_number) as CL_10,&#13;&#10;       wcs_utl.get_answ(:ND, 'CL_11', :p_ws_id, :p_ws_number) as CL_11,&#13;&#10;       wcs_utl.get_answ(:ND, 'CL_12', :p_ws_id, :p_ws_number) as CL_12,&#13;&#10;       wcs_utl.get_answ_formated(:ND, 'CL_13', 0, :p_ws_id, :p_ws_number) as CL_13,&#13;&#10;       wcs_utl.get_answ(:ND, 'CL_14', :p_ws_id, :p_ws_number) as CL_14,&#13;&#10;       wcs_utl.get_answ(:ND, 'CL_15', :p_ws_id, :p_ws_number) as CL_15,&#13;&#10;       wcs_utl.get_answ(:ND, 'CL_16', :p_ws_id, :p_ws_number) as CL_16,&#13;&#10;       decode(wcs_utl.get_answ(:ND, 'CL_0_7', :p_ws_id, :p_ws_number),&#13;&#10;              0,&#13;&#10;              wcs_utl.get_answ(:ND, 'CL_17', :p_ws_id, :p_ws_number),&#13;&#10;              wcs_utl.get_answ(:ND, 'CL_12', :p_ws_id, :p_ws_number)) as CL_17,&#13;&#10;       decode(wcs_utl.get_answ(:ND, 'CL_0_7', :p_ws_id, :p_ws_number),&#13;&#10;              0,&#13;&#10;              wcs_utl.get_answ_formated(:ND,&#13;&#10;                                        'CL_18',&#13;&#10;                                        0,&#13;&#10;                                        :p_ws_id,&#13;&#10;                                        :p_ws_number),&#13;&#10;              wcs_utl.get_answ_formated(:ND,&#13;&#10;                                        'CL_13',&#13;&#10;                                        0,&#13;&#10;                                        :p_ws_id,&#13;&#10;                                        :p_ws_number)) as CL_18,&#13;&#10;       decode(wcs_utl.get_answ(:ND, 'CL_0_7', :p_ws_id, :p_ws_number),&#13;&#10;              0,&#13;&#10;              wcs_utl.get_answ(:ND, 'CL_19', :p_ws_id, :p_ws_number),&#13;&#10;              wcs_utl.get_answ(:ND, 'CL_14', :p_ws_id, :p_ws_number)) as CL_19,&#13;&#10;       decode(wcs_utl.get_answ(:ND, 'CL_0_7', :p_ws_id, :p_ws_number),&#13;&#10;              0,&#13;&#10;              wcs_utl.get_answ(:ND, 'CL_20', :p_ws_id, :p_ws_number),&#13;&#10;              wcs_utl.get_answ(:ND, 'CL_15', :p_ws_id, :p_ws_number)) as CL_20,&#13;&#10;       decode(wcs_utl.get_answ(:ND, 'CL_0_7', :p_ws_id, :p_ws_number),&#13;&#10;              0,&#13;&#10;              wcs_utl.get_answ(:ND, 'CL_21', :p_ws_id, :p_ws_number),&#13;&#10;              wcs_utl.get_answ(:ND, 'CL_16', :p_ws_id, :p_ws_number)) as CL_21,&#13;&#10;       decode(wcs_utl.get_answ(:ND, 'CL_0_7', :p_ws_id, :p_ws_number),&#13;&#10;              0,&#13;&#10;              wcs_utl.get_answ(:ND, 'CL_22', :p_ws_id, :p_ws_number),&#13;&#10;              wcs_utl.get_answ(:ND, 'CL_23', :p_ws_id, :p_ws_number)) as CL_22,&#13;&#10;       wcs_utl.get_answ(:ND, 'CL_23', :p_ws_id, :p_ws_number) as CL_23,&#13;&#10;       decode(wcs_utl.get_answ(:ND, 'CL_0_188',:p_ws_id, :p_ws_number),&#13;&#10;              0,&#13;&#10;              case&#13;&#10;                when wcs_utl.get_answ(:ND, 'CL_13',:p_ws_id, :p_ws_number) in (26, 27) then&#13;&#10;                 wcs_utl.get_answ_refer_text(:ND, 'CL_13',:p_ws_id, :p_ws_number) || ', ' ||&#13;&#10;                 wcs_utl.get_answ(:ND, 'CL_16',:p_ws_id, :p_ws_number)&#13;&#10;                else&#13;&#10;                 'обл. ' || wcs_utl.get_answ_refer_text(:ND, 'CL_13',:p_ws_id, :p_ws_number) || ', ' ||&#13;&#10;                 decode(wcs_utl.has_answ(:ND, 'CL_14',:p_ws_id, :p_ws_number),&#13;&#10;                        1,&#13;&#10;                        'р. ' || wcs_utl.get_answ(:ND, 'CL_14',:p_ws_id, :p_ws_number) || ', ',&#13;&#10;                        null) || decode(wcs_utl.has_answ(:ND, 'CL_15',:p_ws_id, :p_ws_number),&#13;&#10;                                        1,&#13;&#10;                                        wcs_utl.get_answ(:ND, 'CL_15',:p_ws_id, :p_ws_number) || ', ',&#13;&#10;                                        null) || wcs_utl.get_answ(:ND, 'CL_16',:p_ws_id, :p_ws_number)&#13;&#10;              end,&#13;&#10;              case&#13;&#10;                when wcs_utl.get_answ(:ND, 'CL_18',:p_ws_id, :p_ws_number) in (26, 27) then&#13;&#10;                 wcs_utl.get_answ_refer_text(:ND, 'CL_18',:p_ws_id, :p_ws_number) || ', ' ||&#13;&#10;                 wcs_utl.get_answ(:ND, 'CL_21',:p_ws_id, :p_ws_number)&#13;&#10;                else&#13;&#10;                 'обл. ' || wcs_utl.get_answ_refer_text(:ND, 'CL_18',:p_ws_id, :p_ws_number) || ', ' ||&#13;&#10;                 decode(wcs_utl.has_answ(:ND, 'CL_19',:p_ws_id, :p_ws_number),&#13;&#10;                        1,&#13;&#10;                        'р. ' || wcs_utl.get_answ(:ND, 'CL_19',:p_ws_id, :p_ws_number) || ', ',&#13;&#10;                        null) || decode(wcs_utl.has_answ(:ND, 'CL_20',:p_ws_id, :p_ws_number),&#13;&#10;                                        1,&#13;&#10;                                        wcs_utl.get_answ(:ND, 'CL_20',:p_ws_id, :p_ws_number) || ', ',&#13;&#10;                                        null) || wcs_utl.get_answ(:ND, 'CL_21',:p_ws_id, :p_ws_number)&#13;&#10;              end) || decode(wcs_utl.has_answ(:ND, 'CL_22',:p_ws_id, :p_ws_number),&#13;&#10;                             1,&#13;&#10;                             ', тел. ' || wcs_utl.get_answ(:ND, 'CL_22',:p_ws_id, :p_ws_number),&#13;&#10;                             null) as adr_live,&#13;&#10;              case when wcs_utl.get_answ(:ND, 'CL_18',:p_ws_id, :p_ws_number) in (26, 27) then&#13;&#10;                 wcs_utl.get_answ_refer_text(:ND, 'CL_18',:p_ws_id, :p_ws_number) || ', ' ||&#13;&#10;                 wcs_utl.get_answ(:ND, 'CL_21',:p_ws_id, :p_ws_number)&#13;&#10;                else&#13;&#10;                 'обл. ' || wcs_utl.get_answ_refer_text(:ND, 'CL_18',:p_ws_id, :p_ws_number) || ', ' ||&#13;&#10;                 decode(wcs_utl.has_answ(:ND, 'CL_19',:p_ws_id, :p_ws_number),&#13;&#10;                        1,&#13;&#10;                        'р. ' || wcs_utl.get_answ(:ND, 'CL_19',:p_ws_id, :p_ws_number) || ', ',&#13;&#10;                        null) || decode(wcs_utl.has_answ(:ND, 'CL_20',:p_ws_id, :p_ws_number),&#13;&#10;                                        1,&#13;&#10;                                        wcs_utl.get_answ(:ND, 'CL_20',:p_ws_id, :p_ws_number) || ', ',&#13;&#10;                                        null) || wcs_utl.get_answ(:ND, 'CL_21',:p_ws_id, :p_ws_number)&#13;&#10;              end || decode(wcs_utl.has_answ(:ND, 'CL_23',:p_ws_id, :p_ws_number),&#13;&#10;                     1,&#13;&#10;                     ', тел. ' || wcs_utl.get_answ(:ND, 'CL_23',:p_ws_id, :p_ws_number),&#13;&#10;                     null) as adr_reg&#13;&#10;  FROM dual">
+        <Column Name="CL_4" DataType="System.String"/>
+        <Column Name="CODE_002" DataType="System.String"/>
+        <Column Name="CL_7" DataType="System.String"/>
+        <Column Name="CL_8" DataType="System.String"/>
+        <Column Name="CL_9" DataType="System.String"/>
+        <Column Name="CL_10" DataType="System.String"/>
+        <Column Name="CL_11" DataType="System.String"/>
+        <Column Name="CL_12" DataType="System.String"/>
+        <Column Name="CL_13" DataType="System.String"/>
+        <Column Name="CL_14" DataType="System.String"/>
+        <Column Name="CL_15" DataType="System.String"/>
+        <Column Name="CL_16" DataType="System.String"/>
+        <Column Name="CL_17" DataType="System.String"/>
+        <Column Name="CL_18" DataType="System.String"/>
+        <Column Name="CL_19" DataType="System.String"/>
+        <Column Name="CL_20" DataType="System.String"/>
+        <Column Name="CL_21" DataType="System.String"/>
+        <Column Name="CL_22" DataType="System.String"/>
+        <Column Name="CL_23" DataType="System.String"/>
+        <Column Name="ADR_LIVE" DataType="System.String"/>
+        <Column Name="ADR_REG" DataType="System.String"/>
+        <CommandParameter Name="ND" DataType="126" Expression="[ND]"/>
+        <CommandParameter Name="p_ws_id" DataType="126" Expression="[p_ws_id]"/>
+        <CommandParameter Name="p_ws_number" DataType="126" Expression="[p_ws_number]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table10" Alias="TD" DataType="System.Int32" Enabled="true" SelectCommand="select wcs_utl.get_answ(:ND, 'CL_25', :p_ws_id , :p_ws_number)  as CL_25,&#13;&#10; wcs_utl.get_answ(:ND, 'CL_0_9', :p_ws_id , :p_ws_number)  as CL_0_9,&#13;&#10;   wcs_utl.get_answ(:ND, 'CL_26', :p_ws_id , :p_ws_number)  as CL_26,&#13;&#10;    wcs_utl.get_answ(:ND, 'CL_27', :p_ws_id , :p_ws_number) as CL_27,  &#13;&#10;   wcs_utl.get_answ(:ND, 'CL_0_10', :p_ws_id , :p_ws_number ) as CL_0_10,&#13;&#10;    wcs_utl.get_answ(:ND, 'CL_0_11', :p_ws_id , :p_ws_number ) as CL_0_11,  &#13;&#10;    wcs_utl.get_answ(:ND, 'CL_28', :p_ws_id , :p_ws_number ) as CL_28, &#13;&#10;   wcs_utl.get_answ(:ND, 'CL_0_13', :p_ws_id , :p_ws_number ) as CL_0_13,&#13;&#10;         wcs_utl.get_answ(:ND, 'CL_29',:p_ws_id , :p_ws_number ) as CL_29, &#13;&#10;         wcs_utl.get_answ(:ND, 'CL_30', :p_ws_id , :p_ws_number ) as CL_30, &#13;&#10;          wcs_utl.get_answ(:ND, 'CL_0_14', :p_ws_id , :p_ws_number ) as CL_0_14, &#13;&#10;          wcs_utl.get_answ(:ND, 'CL_0_15', :p_ws_id , :p_ws_number ) as CL_0_15, &#13;&#10;           wcs_utl.get_answ(:ND, 'CL_32_0', :p_ws_id , :p_ws_number ) as CL_32,&#13;&#10;            wcs_utl.get_answ(:ND, 'CL_31_0',:p_ws_id , :p_ws_number ) as CL_31, &#13;&#10;         nvl(wcs_utl.get_answ_formated(:ND, 'CL_0_22',0, :p_ws_id , :p_ws_number ),'-') as CL_0_22, &#13;&#10;           nvl(wcs_utl.get_answ(:ND, 'CL_0_23', :p_ws_id , :p_ws_number ),'-') as CL_0_23,&#13;&#10;            nvl(wcs_utl.get_answ(:ND, 'CL_0_24', :p_ws_id , :p_ws_number ),'-') as CL_0_24,&#13;&#10;             nvl(wcs_utl.get_answ(:ND, 'CL_0_25', :p_ws_id , :p_ws_number ),'-') as CL_0_25,&#13;&#10;              nvl(wcs_utl.get_answ(:ND, 'CL_0_26', :p_ws_id , :p_ws_number ),'-') as CL_0_26,&#13;&#10;               nvl(wcs_utl.get_answ(:ND, 'CL_0_27', :p_ws_id , :p_ws_number ),'-') as CL_0_27,&#13;&#10;                nvl(wcs_utl.get_answ(:ND, 'CL_0_28', :p_ws_id , :p_ws_number ),'-') as CL_0_28,&#13;&#10;                 nvl(wcs_utl.get_answ(:ND, 'CL_0_29', :p_ws_id , :p_ws_number ),'-') as CL_0_29,&#13;&#10;         nvl(wcs_utl.get_answ_formated(:ND, 'CL_0_30',0, :p_ws_id , :p_ws_number ),'-') as CL_0_30, &#13;&#10;           nvl(wcs_utl.get_answ(:ND, 'CL_0_31', :p_ws_id , :p_ws_number ),'-') as CL_0_31, &#13;&#10;           nvl(wcs_utl.get_answ(:ND, 'CL_0_32', :p_ws_id , :p_ws_number ),'-') as CL_0_32, &#13;&#10;           nvl(wcs_utl.get_answ(:ND, 'CL_0_33', :p_ws_id , :p_ws_number ),'-') as CL_0_33, &#13;&#10;           nvl(wcs_utl.get_answ(:ND, 'CL_0_34', :p_ws_id , :p_ws_number ),'-') as CL_0_34, &#13;&#10;           nvl(wcs_utl.get_answ(:ND, 'CL_0_35', :p_ws_id , :p_ws_number ),'-') as CL_0_35,&#13;&#10;            nvl(wcs_utl.get_answ(:ND, 'CL_0_36', :p_ws_id , :p_ws_number ),'-') as CL_0_36,&#13;&#10;             nvl(wcs_utl.get_answ(:ND, 'CL_0_37', :p_ws_id , :p_ws_number ),'-') as CL_0_37,&#13;&#10;         nvl(wcs_utl.get_answ_formated(:ND, 'CL_0_38',0, :p_ws_id , :p_ws_number ),'-') as CL_0_38,  &#13;&#10;          nvl(wcs_utl.get_answ(:ND, 'CL_0_39', :p_ws_id , :p_ws_number ),'-') as CL_0_39,&#13;&#10;           nvl(wcs_utl.get_answ(:ND, 'CL_0_40', :p_ws_id , :p_ws_number ),'-') as CL_0_40, &#13;&#10;           nvl(wcs_utl.get_answ(:ND, 'CL_0_41', :p_ws_id , :p_ws_number ),'-') as CL_0_41,&#13;&#10;            nvl(wcs_utl.get_answ(:ND, 'CL_0_42', :p_ws_id , :p_ws_number ),'-') as CL_0_42, &#13;&#10;            nvl(wcs_utl.get_answ(:ND, 'CL_0_43', :p_ws_id , :p_ws_number ),'-') as CL_0_43,&#13;&#10;             nvl(wcs_utl.get_answ(:ND, 'CL_0_44', :p_ws_id , :p_ws_number ),'-') as CL_0_44,&#13;&#10;              nvl(wcs_utl.get_answ(:ND, 'CL_0_45', :p_ws_id , :p_ws_number ),'-') as CL_0_45&#13;&#10;  FROM dual">
+        <Column Name="CL_25" DataType="System.String"/>
+        <Column Name="CL_0_9" DataType="System.String"/>
+        <Column Name="CL_26" DataType="System.String"/>
+        <Column Name="CL_27" DataType="System.String"/>
+        <Column Name="CL_0_10" DataType="System.String"/>
+        <Column Name="CL_0_11" DataType="System.String"/>
+        <Column Name="CL_28" DataType="System.String"/>
+        <Column Name="CL_0_13" DataType="System.String"/>
+        <Column Name="CL_29" DataType="System.String"/>
+        <Column Name="CL_30" DataType="System.String"/>
+        <Column Name="CL_0_14" DataType="System.String"/>
+        <Column Name="CL_0_15" DataType="System.String"/>
+        <Column Name="CL_32" DataType="System.String"/>
+        <Column Name="CL_31" DataType="System.String"/>
+        <Column Name="CL_0_22" DataType="System.String"/>
+        <Column Name="CL_0_23" DataType="System.String"/>
+        <Column Name="CL_0_24" DataType="System.String"/>
+        <Column Name="CL_0_25" DataType="System.String"/>
+        <Column Name="CL_0_26" DataType="System.String"/>
+        <Column Name="CL_0_27" DataType="System.String"/>
+        <Column Name="CL_0_28" DataType="System.String"/>
+        <Column Name="CL_0_29" DataType="System.String"/>
+        <Column Name="CL_0_30" DataType="System.String"/>
+        <Column Name="CL_0_31" DataType="System.String"/>
+        <Column Name="CL_0_32" DataType="System.String"/>
+        <Column Name="CL_0_33" DataType="System.String"/>
+        <Column Name="CL_0_34" DataType="System.String"/>
+        <Column Name="CL_0_35" DataType="System.String"/>
+        <Column Name="CL_0_36" DataType="System.String"/>
+        <Column Name="CL_0_37" DataType="System.String"/>
+        <Column Name="CL_0_38" DataType="System.String"/>
+        <Column Name="CL_0_39" DataType="System.String"/>
+        <Column Name="CL_0_40" DataType="System.String"/>
+        <Column Name="CL_0_41" DataType="System.String"/>
+        <Column Name="CL_0_42" DataType="System.String"/>
+        <Column Name="CL_0_43" DataType="System.String"/>
+        <Column Name="CL_0_44" DataType="System.String"/>
+        <Column Name="CL_0_45" DataType="System.String"/>
+        <CommandParameter Name="ND" DataType="126" Expression="[ND]"/>
+        <CommandParameter Name="p_ws_id" DataType="126" Expression="[p_ws_id]"/>
+        <CommandParameter Name="p_ws_number" DataType="126" Expression="[p_ws_number]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table11" Alias="SS" DataType="System.Int32" Enabled="true" SelectCommand="select   wcs_utl.get_answ_formated(:ND, 'CL_34',0, :p_ws_id , :p_ws_number ) as CL_34,   wcs_utl.get_answ(:ND, 'CL_36', :p_ws_id , :p_ws_number ) as CL_36, wcs_utl.get_answ(:ND, 'CL_0_46', :p_ws_id , :p_ws_number ) as CL_0_46, wcs_utl.get_answ_formated(:ND, 'CL_0_47', 0, :p_ws_id , :p_ws_number ) as CL_0_47, wcs_utl.get_answ(:ND, 'CL_0_48', :p_ws_id , :p_ws_number ) as CL_0_48,&#10;             wcs_utl.get_answ(:ND, 'CL_0_49', :p_ws_id , :p_ws_number ) as CL_0_49, wcs_utl.get_answ_formated(:ND, 'CL_0_50', 0,:p_ws_id , :p_ws_number ) as CL_0_50, wcs_utl.get_answ(:ND, 'CL_0_51', :p_ws_id , :p_ws_number ) as CL_0_51,&#10;             wcs_utl.get_answ(:ND, 'CL_0_52', :p_ws_id , :p_ws_number ) as CL_0_52, wcs_utl.get_answ_formated(:ND, 'CL_0_53', 0, :p_ws_id , :p_ws_number ) as CL_0_53, wcs_utl.get_answ(:ND, 'CL_0_54', :p_ws_id , :p_ws_number ) as CL_0_54,&#10;             wcs_utl.get_answ(:ND, 'CL_0_55', :p_ws_id , :p_ws_number ) as CL_0_55, wcs_utl.get_answ_formated(:ND, 'CL_0_56', 0,:p_ws_id , :p_ws_number ) as CL_0_56, wcs_utl.get_answ(:ND, 'CL_0_57', :p_ws_id , :p_ws_number ) as CL_0_57,&#10;             wcs_utl.get_answ(:ND, 'CL_0_58', :p_ws_id , :p_ws_number ) as CL_0_58, wcs_utl.get_answ_formated(:ND, 'CL_0_59', 0,:p_ws_id , :p_ws_number ) as CL_0_59, wcs_utl.get_answ(:ND, 'CL_0_60', :p_ws_id , :p_ws_number ) as CL_0_60&#10;  from dual">
+        <Column Name="CL_34" DataType="System.String"/>
+        <Column Name="CL_36" DataType="System.String"/>
+        <Column Name="CL_0_46" DataType="System.String"/>
+        <Column Name="CL_0_47" DataType="System.String"/>
+        <Column Name="CL_0_48" DataType="System.String"/>
+        <Column Name="CL_0_49" DataType="System.String"/>
+        <Column Name="CL_0_50" DataType="System.String"/>
+        <Column Name="CL_0_51" DataType="System.String"/>
+        <Column Name="CL_0_52" DataType="System.String"/>
+        <Column Name="CL_0_53" DataType="System.String"/>
+        <Column Name="CL_0_54" DataType="System.String"/>
+        <Column Name="CL_0_55" DataType="System.String"/>
+        <Column Name="CL_0_56" DataType="System.String"/>
+        <Column Name="CL_0_57" DataType="System.String"/>
+        <Column Name="CL_0_58" DataType="System.String"/>
+        <Column Name="CL_0_59" DataType="System.String"/>
+        <Column Name="CL_0_60" DataType="System.String"/>
+        <CommandParameter Name="ND" DataType="126" Expression="[ND]"/>
+        <CommandParameter Name="p_ws_id" DataType="126" Expression="[p_ws_id]"/>
+        <CommandParameter Name="p_ws_number" DataType="126" Expression="[p_ws_number]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table12" Alias="Mayno" DataType="System.Int32" Enabled="true" SelectCommand="select  decode(nvl(wcs_utl.get_answ(:ND, 'CL_0_61', :p_ws_id , :p_ws_number), 0), 0, null, 'Будинок  ') as BigHouse,&#13;&#10;        decode(nvl(wcs_utl.get_answ(:ND, 'CL_0_62', :p_ws_id , :p_ws_number), 0), 0, null, 'Квартира  ') as House,&#13;&#10;        decode(nvl(wcs_utl.get_answ(:ND, 'CL_0_63', :p_ws_id , :p_ws_number), 0), 0, null, 'Садовий/дачний будинок  ') as OutHouse,&#13;&#10;        decode(nvl(wcs_utl.get_answ(:ND, 'CL_0_64', :p_ws_id , :p_ws_number), 0), 0, null, 'Автомобіль  ') as avto,&#13;&#10;        decode(nvl(wcs_utl.get_answ(:ND, 'CL_0_65', :p_ws_id , :p_ws_number), 0), 0, null, 'Мікроавтобус  ') as bus,&#13;&#10;        decode(nvl(wcs_utl.get_answ(:ND, 'CL_0_66', :p_ws_id , :p_ws_number), 0), 0, null, 'Вантажний автомобіль  ') as fura,&#13;&#10;        decode(nvl(wcs_utl.get_answ(:ND, 'CL_0_67', :p_ws_id , :p_ws_number), 0), 0, null, 'Катер/яхта  ') as boat,&#13;&#10;        decode(nvl(wcs_utl.get_answ(:ND, 'CL_0_68', :p_ws_id , :p_ws_number), 0), 0, null, 'Опис іншого майна: '||wcs_utl.get_answ(:ND, 'CL_0_69', :p_ws_id , :p_ws_number))   as  Othe&#13;&#10;FROM dual ">
+        <Column Name="BIGHOUSE" DataType="System.String"/>
+        <Column Name="HOUSE" DataType="System.String"/>
+        <Column Name="OUTHOUSE" DataType="System.String"/>
+        <Column Name="AVTO" DataType="System.String"/>
+        <Column Name="BUS" DataType="System.String"/>
+        <Column Name="FURA" DataType="System.String"/>
+        <Column Name="BOAT" DataType="System.String"/>
+        <Column Name="OTHE" DataType="System.String"/>
+        <CommandParameter Name="ND" DataType="126" Expression="[ND]"/>
+        <CommandParameter Name="p_ws_id" DataType="126" Expression="[p_ws_id]"/>
+        <CommandParameter Name="p_ws_number" DataType="126" Expression="[p_ws_number]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table14" Alias="DV" DataType="System.Int32" Enabled="true" SelectCommand="select decode(wcs_utl.has_answ(b.id, 'CL_0_70', w.id, c.idx),&#13;&#10;              1,&#13;&#10;              wcs_utl.get_val_formated(nvl(wcs_utl.get_answ_decimal(b.id,&#13;&#10;                                                                    'CL_0_70',&#13;&#10;                                                                    w.id,&#13;&#10;                                                                    c.idx),&#13;&#10;                                           0),&#13;&#10;                                       'DECIMAL') || ' (грн.)',&#13;&#10;              '') as CL_0_70,&#13;&#10;       decode(wcs_utl.has_answ(b.id, 'CL_0_71', w.id, c.idx),&#13;&#10;              1,&#13;&#10;              wcs_utl.get_val_formated(nvl(wcs_utl.get_answ_decimal(b.id,&#13;&#10;                                                                    'CL_0_71',&#13;&#10;                                                                    w.id,&#13;&#10;                                                                    c.idx),&#13;&#10;                                           0),&#13;&#10;                                       'DECIMAL') || ' (грн.)',&#13;&#10;              '') as CL_0_71,&#13;&#10;       decode(wcs_utl.has_answ(b.id, 'CL_0_72', w.id, c.idx),&#13;&#10;              1,&#13;&#10;              wcs_utl.get_val_formated(nvl(wcs_utl.get_answ_decimal(b.id,&#13;&#10;                                                                    'CL_0_72',&#13;&#10;                                                                    w.id,&#13;&#10;                                                                    c.idx),&#13;&#10;                                           0),&#13;&#10;                                       'DECIMAL') || ' (грн.)',&#13;&#10;              '') as CL_0_72,&#13;&#10;       decode(wcs_utl.has_answ(b.id, 'CL_0_73', w.id, c.idx),&#13;&#10;              1,&#13;&#10;              wcs_utl.get_val_formated(nvl(wcs_utl.get_answ_decimal(b.id,&#13;&#10;                                                                    'CL_0_73',&#13;&#10;                                                                    w.id,&#13;&#10;                                                                    c.idx),&#13;&#10;                                           0),&#13;&#10;                                       'DECIMAL') || ' (грн.)',&#13;&#10;              '') as CL_0_73,&#13;&#10;       decode(nvl(wcs_utl.get_answ(b.id, 'CL_0_75', w.id, c.idx), '0'),&#13;&#10;              '0',&#13;&#10;              '',&#13;&#10;              wcs_utl.get_answ_formated(b.id, 'CL_0_74', 0, w.id, c.idx)) as CL_0_74,&#13;&#10;       decode(wcs_utl.has_answ(b.id, 'CL_0_75', w.id, c.idx),&#13;&#10;              1,&#13;&#10;              wcs_utl.get_val_formated(nvl(wcs_utl.get_answ_decimal(b.id,&#13;&#10;                                                                    'CL_0_75',&#13;&#10;                                                                    w.id,&#13;&#10;                                                                    c.idx),&#13;&#10;                                           0),&#13;&#10;                                       'DECIMAL') || ' (грн.)',&#13;&#10;              '') as CL_0_75,&#13;&#10;       decode(nvl(wcs_utl.get_answ(b.id, 'CL_0_78', w.id, c.idx), '0'),&#13;&#10;              '0',&#13;&#10;              '',&#13;&#10;              wcs_utl.get_answ_formated(b.id, 'CL_0_76', 0, w.id, c.idx)) as CL_0_76,&#13;&#10;       decode(nvl(wcs_utl.get_answ(b.id, 'CL_0_78', w.id, c.idx), '0'),&#13;&#10;              '0',&#13;&#10;              '',&#13;&#10;              wcs_utl.get_answ_formated(b.id, 'CL_0_77', 0, w.id, c.idx)) as CL_0_77,&#13;&#10;       decode(wcs_utl.has_answ(b.id, 'CL_0_78', w.id, c.idx),&#13;&#10;              1,&#13;&#10;              wcs_utl.get_val_formated(nvl(wcs_utl.get_answ_decimal(b.id,&#13;&#10;                                                                    'CL_0_78',&#13;&#10;                                                                    w.id,&#13;&#10;                                                                    c.idx),&#13;&#10;                                           0),&#13;&#10;                                       'DECIMAL') || ' (грн.)',&#13;&#10;              '') as CL_0_78,&#13;&#10;       decode(wcs_utl.get_answ(b.id, 'CL_0_148', w.id, c.idx),&#13;&#10;              '1',&#13;&#10;              'Доходи СПД: ' ||&#13;&#10;              wcs_utl.get_val_formated(nvl(wcs_utl.get_answ_decimal(b.id,&#13;&#10;                                                                    'CL_0_152_1',&#13;&#10;                                                                    w.id,&#13;&#10;                                                                    c.idx),&#13;&#10;                                           0),&#13;&#10;                                       'DECIMAL') || ' (грн.) (щомісяця)',&#13;&#10;              '') as cl_0_148,&#13;&#10;       decode(wcs_utl.has_answ(b.id, 'CL_38', w.id, c.idx),&#13;&#10;              1,&#13;&#10;              wcs_utl.get_val_formated(nvl(wcs_utl.get_answ_decimal(b.id,&#13;&#10;                                                                    'CL_38',&#13;&#10;                                                                    w.id,&#13;&#10;                                                                    c.idx),&#13;&#10;                                           0),&#13;&#10;                                       'DECIMAL') || ' (грн.)',&#13;&#10;              '') as CL_38,&#13;&#10;       decode(wcs_utl.has_answ(b.id, 'CL_0_89', w.id, c.idx),&#13;&#10;              1,&#13;&#10;              wcs_utl.get_val_formated(nvl(wcs_utl.get_answ_decimal(b.id,&#13;&#10;                                                                    'CL_0_89',&#13;&#10;                                                                    w.id,&#13;&#10;                                                                    c.idx),&#13;&#10;                                           0),&#13;&#10;                                       'DECIMAL') || ' (грн.)',&#13;&#10;              '') as CL_0_89,&#13;&#10;       decode(wcs_utl.has_answ(b.id, 'CL_0_90', w.id, c.idx),&#13;&#10;              1,&#13;&#10;              wcs_utl.get_val_formated(nvl(wcs_utl.get_answ_decimal(b.id,&#13;&#10;                                                                    'CL_0_90',&#13;&#10;                                                                    w.id,&#13;&#10;                                                                    c.idx),&#13;&#10;                                           0),&#13;&#10;                                       'DECIMAL') || ' (грн.)',&#13;&#10;              '') as CL_0_90,&#13;&#10;       decode(wcs_utl.has_answ(b.id, 'CL_0_91', w.id, c.idx),&#13;&#10;              1,&#13;&#10;              wcs_utl.get_val_formated(nvl(wcs_utl.get_answ_decimal(b.id,&#13;&#10;                                                                    'CL_0_91',&#13;&#10;                                                                    w.id,&#13;&#10;                                                                    c.idx),&#13;&#10;                                           0),&#13;&#10;                                       'DECIMAL') || ' (грн.)',&#13;&#10;              '') as CL_0_91,&#13;&#10;       decode(wcs_utl.has_answ(b.id, 'CL_0_92', w.id, c.idx),&#13;&#10;              1,&#13;&#10;              wcs_utl.get_val_formated(nvl(wcs_utl.get_answ_decimal(b.id,&#13;&#10;                                                                    'CL_0_92',&#13;&#10;                                                                    w.id,&#13;&#10;                                                                    c.idx),&#13;&#10;                                           0),&#13;&#10;                                       'DECIMAL') || ' (грн.)',&#13;&#10;              '') as CL_0_92,&#13;&#10;       decode(wcs_utl.has_answ(b.id, 'CL_0_93', w.id, c.idx),&#13;&#10;              1,&#13;&#10;              wcs_utl.get_val_formated(nvl(wcs_utl.get_answ_decimal(b.id,&#13;&#10;                                                                    'CL_0_93',&#13;&#10;                                                                    w.id,&#13;&#10;                                                                    c.idx),&#13;&#10;                                           0),&#13;&#10;                                       'DECIMAL') || ' (грн.)',&#13;&#10;              '') as CL_0_93,&#13;&#10;       case&#13;&#10;         when wcs_utl.has_answ(b.id, 'CL_0_94', w.id, c.idx) = 1 or&#13;&#10;              wcs_utl.has_answ(b.id, 'CL_0_93_1', w.id, c.idx) = 1 then&#13;&#10;          trim(to_char(nvl(wcs_utl.get_answ_decimal(b.id,&#13;&#10;                                                    'CL_0_94',&#13;&#10;                                                    w.id,&#13;&#10;                                                    c.idx),&#13;&#10;                           0) + nvl(wcs_utl.get_answ_decimal(b.id,&#13;&#10;                                                             'CL_0_93_1',&#13;&#10;                                                             w.id,&#13;&#10;                                                             c.idx),&#13;&#10;                                    0),&#13;&#10;                       '9999999999999999990.00')) || ' (грн.)'&#13;&#10;         else&#13;&#10;          ''&#13;&#10;       end as CL_0_94,&#13;&#10;       decode(wcs_utl.has_answ(b.id, 'CL_39', w.id, c.idx),&#13;&#10;              1,&#13;&#10;              wcs_utl.get_val_formated(nvl(wcs_utl.get_answ_decimal(b.id,&#13;&#10;                                                                    'CL_39',&#13;&#10;                                                                    w.id,&#13;&#10;                                                                    c.idx),&#13;&#10;                                           0),&#13;&#10;                                       'DECIMAL') || ' (грн.)',&#13;&#10;              '') as CL_39&#13;&#10;  from wcs_bids b,&#13;&#10;       wcs_workspaces w,&#13;&#10;       (select idx - 1 as idx from wcs_counter) c&#13;&#10; where b.id = :p_bid_id&#13;&#10;   and w.id = :p_ws_id&#13;&#10;   and c.idx = :p_ws_number">
+        <Column Name="CL_0_70" DataType="System.String"/>
+        <Column Name="CL_0_71" DataType="System.String"/>
+        <Column Name="CL_0_72" DataType="System.String"/>
+        <Column Name="CL_0_73" DataType="System.String"/>
+        <Column Name="CL_0_74" DataType="System.String"/>
+        <Column Name="CL_0_75" DataType="System.String"/>
+        <Column Name="CL_0_76" DataType="System.String"/>
+        <Column Name="CL_0_77" DataType="System.String"/>
+        <Column Name="CL_0_78" DataType="System.String"/>
+        <Column Name="CL_0_148" DataType="System.String"/>
+        <Column Name="CL_38" DataType="System.String"/>
+        <Column Name="CL_0_89" DataType="System.String"/>
+        <Column Name="CL_0_90" DataType="System.String"/>
+        <Column Name="CL_0_91" DataType="System.String"/>
+        <Column Name="CL_0_92" DataType="System.String"/>
+        <Column Name="CL_0_93" DataType="System.String"/>
+        <Column Name="CL_0_94" DataType="System.String"/>
+        <Column Name="CL_39" DataType="System.String"/>
+        <CommandParameter Name="p_bid_id" DataType="107" Expression="[ND]" DefaultValue="-1"/>
+        <CommandParameter Name="p_ws_id" DataType="126" Expression="[p_ws_id]" DefaultValue="&quot;MAIN&quot;"/>
+        <CommandParameter Name="p_ws_number" DataType="107" Expression="[p_ws_number]" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table17" Alias="InfoCred" DataType="System.Int32" Enabled="true" SelectCommand="select wcs_utl.get_answ_formated(b.id, 'CL_40', 0, w.id, c.idx) || ' ' ||&#13;&#10;       decode(wcs_utl.get_answ(b.id, 'CL_40', w.id, c.idx),&#13;&#10;              0,&#13;&#10;              ' назва банку: ' ||&#13;&#10;              wcs_utl.get_answ(b.id, 'CL_41', w.id, c.idx),&#13;&#10;              '') as InfoCred,&#13;&#10;       decode(wcs_utl.get_answ(b.id, 'CL_40', w.id, c.idx),&#13;&#10;              2,&#13;&#10;              ' назва банку: ' ||&#13;&#10;              wcs_utl.get_answ(b.id, 'CL_41', w.id, c.idx),&#13;&#10;              '') as NameBank,&#13;&#10;       decode(wcs_utl.get_answ(b.id, 'CL_40', w.id, c.idx),&#13;&#10;              2,&#13;&#10;              ' сума кредиту: ' ||&#13;&#10;              wcs_utl.get_answ(b.id, 'CL_42', w.id, c.idx) || ' (' ||&#13;&#10;              f_sumpr(wcs_utl.get_answ(b.id, 'CL_42', w.id, c.idx) * 100,&#13;&#10;                      wcs_utl.get_answ(b.id, 'CL_44', w.id, c.idx),&#13;&#10;                      (select T.GENDER&#13;&#10;                         from tabval t&#13;&#10;                        where T.KV =&#13;&#10;                              wcs_utl.get_answ(b.id, 'CL_44', w.id, c.idx))) || ')',&#13;&#10;              '') as SumCred,&#13;&#10;       decode(wcs_utl.get_answ(b.id, 'CL_40', w.id, c.idx),&#13;&#10;              2,&#13;&#10;              ' вид забезпечення: ' ||&#13;&#10;              wcs_utl.get_answ_formated(b.id, 'CL_45', 0, w.id, c.idx),&#13;&#10;              '') as NameZal,&#13;&#10;       decode(wcs_utl.get_answ(b.id, 'CL_40', w.id, c.idx),&#13;&#10;              2,&#13;&#10;              ' заборгованість за кредитом: ' ||&#13;&#10;              wcs_utl.get_answ(b.id, 'CL_46', w.id, c.idx) || ' (' ||&#13;&#10;              f_sumpr(wcs_utl.get_answ(b.id, 'CL_46', w.id, c.idx) * 100,&#13;&#10;                      wcs_utl.get_answ(b.id, 'CL_44', w.id, c.idx),&#13;&#10;                      (select t.gender&#13;&#10;                         from tabval t&#13;&#10;                        where t.kv =&#13;&#10;                              wcs_utl.get_answ(b.id, 'CL_44', w.id, c.idx))) || ')',&#13;&#10;              '') as SumCredZal&#13;&#10;  from wcs_bids b,&#13;&#10;       wcs_workspaces w,&#13;&#10;       (select idx - 1 as idx from wcs_counter) c&#13;&#10; where b.id = :p_bid_id&#13;&#10;   and w.id = :p_ws_id&#13;&#10;   and c.idx = :p_ws_number">
+        <Column Name="INFOCRED" DataType="System.String"/>
+        <Column Name="NAMEBANK" DataType="System.String"/>
+        <Column Name="SUMCRED" DataType="System.String"/>
+        <Column Name="NAMEZAL" DataType="System.String"/>
+        <Column Name="SUMCREDZAL" DataType="System.String"/>
+        <CommandParameter Name="p_bid_id" DataType="107" Expression="[ND]" DefaultValue="-1"/>
+        <CommandParameter Name="p_ws_id" DataType="126" Expression="[p_ws_id]" DefaultValue="&quot;MAIN&quot;"/>
+        <CommandParameter Name="p_ws_number" DataType="107" Expression="[p_ws_number]" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table18" Alias="InfoPorHist" DataType="System.Int32" Enabled="true" SelectCommand="select decode( wcs_utl.get_answ(:ND, 'CL_0_102', :p_ws_id , :p_ws_number),0,'відсутня',1, wcs_utl.get_answ(:ND, 'CL_0_105', :p_ws_id , :p_ws_number)||' '|| wcs_utl.get_answ(:ND, 'CL_0_106', :p_ws_id , :p_ws_number)  ,2, wcs_utl.get_answ(:ND, 'CL_0_107', :p_ws_id , :p_ws_number)||' '|| wcs_utl.get_answ(:ND, 'CL_0_108', :p_ws_id , :p_ws_number)) as InfoPor,&#10;          decode( wcs_utl.get_answ(:ND, 'CL_0_102', :p_ws_id , :p_ws_number),0,'',wcs_utl.get_answ(:ND, 'CL_0_103', :p_ws_id , :p_ws_number)) as SumPor,&#10;          decode( wcs_utl.get_answ(:ND, 'CL_0_102', :p_ws_id , :p_ws_number),0,'',wcs_utl.get_answ_formated(:ND, 'CL_0_104',0, :p_ws_id , :p_ws_number)) as VidPor&#10;  from dual&#10; ">
+        <Column Name="INFOPOR" DataType="System.String"/>
+        <Column Name="SUMPOR" DataType="System.String"/>
+        <Column Name="VIDPOR" DataType="System.String"/>
+        <CommandParameter Name="ND" DataType="126" Expression="[ND]"/>
+        <CommandParameter Name="p_ws_id" DataType="126" Expression="[p_ws_id]"/>
+        <CommandParameter Name="p_ws_number" DataType="126" Expression="[p_ws_number]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table19" Alias="CL_4_0" DataType="System.Int32" Enabled="true" SelectCommand="select wcs_utl.get_answ(:ND, 'CL_4_0', :p_ws_id , :p_ws_number ) as val FROM dual">
+        <Column Name="VAL" DataType="System.String"/>
+        <CommandParameter Name="ND" DataType="126" Expression="[ND]"/>
+        <CommandParameter Name="p_ws_id" DataType="126" Expression="[p_ws_id]"/>
+        <CommandParameter Name="p_ws_number" DataType="126" Expression="[p_ws_number]"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="ND" DataType="System.Int32" Expression=" 3562421 "/>
+    <Parameter Name="p_ws_id" DataType="System.String" Expression="&quot;GRT_GUARANTOR&quot;"/>
+    <Parameter Name="p_ws_number" DataType="System.Int32" Expression="0"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Guides="37.8,689.85,689.84,363.82,689.42,198.87,528.35,688.85,689.08,198.73,359.66,520.59,688.84,255.73,470.91,255.77,363.32,38.56,690.61,689.12,259.54">
+    <DataBand Name="Data1" Width="718.2" Height="2513.7" CanGrow="true" CanShrink="true" CanBreak="true" Guides="0,47.25,160.65,18.9,37.8,56.7,75.6,94.5,113.4,311.85,926.1,132.3,151.2,198.45,255.15,340.2,28.35,396.9,453.6,510.3,567,614.25,945,1162.35,103.95,189,217.35,1200.15,1483.65,1984.5,274.05,292.95,330.75,349.65,368.55,387.45,425.25,444.15,463.05,500.85,2268,141.75,283.5,2513.7,245.7,1445.85,160.94,189.72">
+      <TextObject Name="Text21" Left="37.8" Width="652.05" Height="47.25" Text="Публічне акціонерне товариство «Державний ощадний банк України»" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TableObject Name="Table1" Left="37.8" Top="47.25" Width="652.04" Height="113.4">
+        <TableColumn Name="Column1" Width="326.02"/>
+        <TableColumn Name="Column2" Width="326.02"/>
+        <TableRow Name="Row1">
+          <TableCell Name="Cell1" Border.Lines="All" Text="[BANK_NAME.VAL]" AutoShrink="FontSize" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2" Border.Lines="All" Text="Установа банку № [BANK_MFO.VAL]" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row2">
+          <TableCell Name="Cell6" Border.Lines="All" Text="регіональне управління" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell7" Border.Lines="All" Text="Код банку [BANK_OKPO.VAL]" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row54">
+          <TableCell Name="Cell287" Border.Lines="Left, Right, Top" Text="Прізвище та підпис працівника, який прийняв анкету  _____________________/ [DataSubProduct.MGR_FIO] / &#10;" Font="Times New Roman, 10pt" ColSpan="2"/>
+          <TableCell Name="Cell288"/>
+        </TableRow>
+        <TableRow Name="Row55">
+          <TableCell Name="Cell289" Border.Lines="Left, Right, Bottom" Text=" Дата [DataSubProduct.DAT_DOG_PR]" Font="Times New Roman, 10pt" ColSpan="2"/>
+          <TableCell Name="Cell290"/>
+        </TableRow>
+        <TableRow Name="Row56">
+          <TableCell Name="Cell291" Border.Lines="Left, Right, Top" Text="1. ЗАЯВКА ПОРУЧИТЕЛЯ (МАЙНОВОГО ПОРУЧИТЕЛЯ)&#10;" HorzAlign="Center" Font="Times New Roman, 9.75pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell292"/>
+        </TableRow>
+        <TableRow Name="Row57">
+          <TableCell Name="Cell293" Border.Lines="Left, Right, Bottom" Text="[CL_1.VAL]   [CL_2.VAL]   [CL_3.VAL] " HorzAlign="Center" Font="Times New Roman, 9.75pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell294"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table20" Left="37.8" Top="311.85" Width="651.62" Height="614.25" Anchor="Top, Left, Right" Border.Lines="All" RepeatHeaders="false">
+        <TableColumn Name="Column14" Width="161.07"/>
+        <TableColumn Name="Column18" Width="490.55"/>
+        <TableRow Name="Row35" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell228" Border.Lines="All" Text="Прізвище&#10;Ім’я&#10;По батькові" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell232" Border.Lines="All" Text="[CL_1.VAL] [CL_2.VAL] [CL_3.VAL]" VertAlign="Center" Font="Times New Roman, 8pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row36" Height="28.35" AutoSize="true">
+          <TableCell Name="Cell233" Border.Lines="All" Text="Дата (чч. мм. рррр.) &#10;народження" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell237" Border.Lines="All" Text="[PaspData.CL_4]" VertAlign="Center" Font="Times New Roman, 8pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row37" AutoSize="true">
+          <TableCell Name="Cell238" Border.Lines="All" Text="Місце народження" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell242" Border.Lines="All" Text="[CL_4_0.VAL]" VertAlign="Center" Font="Times New Roman, 8pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row38" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell243" Border.Lines="All" Text="Реєстраційний номер облікової картки платника податку" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell247" Border.Lines="All" Text="[PaspData.CODE_002]" VertAlign="Center" Font="Times New Roman, 8pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row39" AutoSize="true">
+          <TableCell Name="Cell248" Border.Lines="All" Text="Паспорт" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell252" Border.Lines="All" Text="[PaspData.CL_7]№[PaspData.CL_8]" VertAlign="Center" Font="Times New Roman, 8pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row40" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell253" Border.Lines="All" Text="Ким, де та коли виданий" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell254" Border.Lines="All" Text="[PaspData.CL_9] [PaspData.CL_11] " VertAlign="Center" Font="Times New Roman, 8pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row41" Height="56.7" AutoSize="true">
+          <TableCell Name="Cell255" Border.Lines="All" Text="Адреса: за місцем реєстрації/прописки" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell256" Border.Lines="All" Text="[PaspData.ADR_REG]" VertAlign="Center" Font="Times New Roman, 8pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row42" Height="56.7" AutoSize="true">
+          <TableCell Name="Cell257" Border.Lines="All" Text="Адреса та телефон за місцем фактичного проживання" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell258" Border.Lines="All" Text="[PaspData.ADR_LIVE]" VertAlign="Center" Font="Times New Roman, 8pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row49" Height="28.35">
+          <TableCell Name="Cell271" Text="2.2.	Місце роботи" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 12pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell272"/>
+        </TableRow>
+        <TableRow Name="Row48" Height="56.7" AutoSize="true">
+          <TableCell Name="Cell269" Border.Lines="All" Text="Основне місце роботи (найменування, адреса, посада)" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell270" Border.Lines="All" Text="[TD.CL_25] [TD.CL_0_9] [TD.CL_26] [TD.CL_27]" VertAlign="Center" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row47" Height="56.7" AutoSize="true">
+          <TableCell Name="Cell267" Border.Lines="All" Text="Посадова особа за основним місцем роботи, що може підтвердити Ваш фінансовий стан" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell268" Border.Lines="All" Text="[TD.CL_0_10] [TD.CL_0_11]" VertAlign="Center" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row43" Height="56.7" AutoSize="true">
+          <TableCell Name="Cell259" Border.Lines="All" Text="Робота за сумісництвом (найменування, адреса, посада)" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell260" Border.Lines="All" Text="[TD.CL_28] [TD.CL_0_13] [TD.CL_29] [TD.CL_30]" VertAlign="Center" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row44" Height="56.7" AutoSize="true">
+          <TableCell Name="Cell261" Border.Lines="All" Text="Посадова особа за місцем роботи за сумісництвом, що може підтвердити Ваш фінансовий стан" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell262" Border.Lines="All" Text="[TD.CL_0_14] " VertAlign="Center" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row45" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell263" Border.Lines="All" Text="Інформація про трудову діяльність:" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell264" Border.Lines="All" Text="[IIf(ToString([TD.CL_31]) == &quot;&quot;, &quot;&quot;, &quot;безперервний стаж роботи на останньому місці: &quot; + [TD.CL_32] + &quot; (років) загальний стаж роботи: &quot; + [TD.CL_31] + &quot; (років)&quot;)]" VertAlign="Center" Font="Times New Roman, 8pt"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text35" Left="37.8" Top="926.1" Width="651.05" Height="18.9" Border.Lines="All" Text="Участь у створенні та/або керівництві комерційних структур" AllowExpressions="false" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+      <TableObject Name="Table9" Left="37.8" Top="945" Width="651.28" Height="217.35">
+        <TableColumn Name="Column3" Width="160.93"/>
+        <TableColumn Name="Column4" Width="160.93"/>
+        <TableColumn Name="Column5" Width="160.93"/>
+        <TableColumn Name="Column6" Width="168.49"/>
+        <TableRow Name="Row3" AutoSize="true">
+          <TableCell Name="Cell8" Border.Lines="Left, Right, Top" Text="Яким чином приймає участь" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell9" Border.Lines="All" Text="[TD.CL_0_22]" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell10" Border.Lines="Left, Right, Top" Text="[TD.CL_0_30]" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell11" Border.Lines="Left, Right, Top" Text="[TD.CL_0_38]" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row5" Height="28.35" AutoSize="true">
+          <TableCell Name="Cell18" Border.Lines="All" Text="Назва підприємства" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell19" Border.Lines="Bottom" Text="[TD.CL_0_23]" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell20" Border.Lines="All" Text="[TD.CL_0_31]" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell21" Border.Lines="All" Text="[TD.CL_0_39]&#10;" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row6" Height="28.35" AutoSize="true">
+          <TableCell Name="Cell23" Border.Lines="All" Text="Код за ЄДРПОУ" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell24" Border.Lines="All" Text="[TD.CL_0_24]" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell25" Border.Lines="All" Text="[TD.CL_0_32]" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell26" Border.Lines="All" Text="[TD.CL_0_40]" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row7" Height="28.35" AutoSize="true">
+          <TableCell Name="Cell28" Border.Lines="All" Text="Юридична адреса" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell29" Border.Lines="All" Text="[TD.CL_0_25]" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell30" Border.Lines="All" Text="[TD.CL_0_33]" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell31" Border.Lines="All" Text="[TD.CL_0_41]" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row8" Height="28.35" AutoSize="true">
+          <TableCell Name="Cell32" Border.Lines="All" Text="Фактична адреса" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell33" Border.Lines="All" Text="[TD.CL_0_26]" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell34" Border.Lines="All" Text="[TD.CL_0_34]" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell35" Border.Lines="All" Text="[TD.CL_0_42]" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row9" Height="28.35" AutoSize="true">
+          <TableCell Name="Cell36" Border.Lines="All" Text="Частка в статутному фонді (%)" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell37" Border.Lines="All" Text="[TD.CL_0_27]" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell38" Border.Lines="All" Text="[TD.CL_0_35]" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell39" Border.Lines="All" Text="[TD.CL_0_43]" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row10" Height="28.35" AutoSize="true">
+          <TableCell Name="Cell40" Border.Lines="All" Text="ПІБ директора" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell41" Border.Lines="All" Text="[TD.CL_0_28]" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell42" Border.Lines="All" Text="[TD.CL_0_36]" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell43" Border.Lines="All" Text="[TD.CL_0_44]" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row11" Height="28.35" AutoSize="true">
+          <TableCell Name="Cell44" Border.Lines="All" Text="ПІБ головного бухгалтера" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell45" Border.Lines="All" Text="[TD.CL_0_29]" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell46" Border.Lines="All" Text="[TD.CL_0_37]" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell47" Border.Lines="All" Text="[TD.CL_0_45]" Font="Times New Roman, 8pt"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text37" Left="37.8" Top="1162.35" Width="651.05" Height="37.8" Border.Lines="All" CanBreak="false" Text="2.3. Соціальний стан " HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt, style=Bold"/>
+      <TableObject Name="Table13" Left="37.8" Top="1483.65" Width="651.04" Height="500.85">
+        <TableColumn Name="Column7" Width="217.93"/>
+        <TableColumn Name="Column8" Width="433.11"/>
+        <TableRow Name="Row12">
+          <TableCell Name="Cell48" Border.Lines="All" Text="Доходи" Font="Times New Roman, 8pt, style=Bold"/>
+          <TableCell Name="Cell49" Border.Lines="All" Text="Поручитель" Font="Times New Roman, 8pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row13" AutoSize="true">
+          <TableCell Name="Cell52" Border.Lines="Left, Right, Bottom" Text="Основна заробітна плата" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell53" Border.Lines="Left, Right, Bottom" Text="[DV.CL_0_70]" HorzAlign="Right" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row14" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell56" Border.Lines="All" Text="Додаткова заробітна плата (наприклад за сумісництвом)" AutoShrink="FontSize" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell57" Border.Lines="All" Text="[DV.CL_0_71]" HorzAlign="Right" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row15" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell60" Border.Lines="All" Text="Дивіденди від вкладів та/або цінних паперів" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell61" Border.Lines="All" Text="[DV.CL_0_72]" HorzAlign="Right" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row16" AutoSize="true">
+          <TableCell Name="Cell64" Border.Lines="All" Text="Доходи від здачі майна в оренду" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell65" Border.Lines="All" Text="[DV.CL_0_73]" HorzAlign="Right" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row17" Height="56.7" AutoSize="true">
+          <TableCell Name="Cell68" Border.Lines="All" Text="Пенсія (для пенсіонерів)" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell69" Border.Lines="All" Text="[DV.CL_0_74] [DV.CL_0_75]" HorzAlign="Right" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row18" Height="85.05" AutoSize="true">
+          <TableCell Name="Cell72" Border.Lines="All" Text="Інші доходи, із зазначенням джерела отримання (періодичність отримання та сума)" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell73" Border.Lines="All" Text="[DV.CL_0_76] [DV.CL_0_77] [DV.CL_0_78] &#10;[DV.CL_0_148]" HorzAlign="Right" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row19" AutoSize="true">
+          <TableCell Name="Cell76" Border.Lines="All" Text="Загальна сума доходів" Font="Times New Roman, 8pt, style=Bold"/>
+          <TableCell Name="Cell77" Border.Lines="All" Text="[DV.CL_38]" HorzAlign="Right" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row20">
+          <TableCell Name="Cell80" Border.Lines="All" Text="Витрати" Font="Times New Roman, 8pt, style=Bold"/>
+          <TableCell Name="Cell81" Border.Lines="All" Font="Times New Roman, 8pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row21" AutoSize="true">
+          <TableCell Name="Cell83" Border.Lines="All" Text="Податкові платежі" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell84" Border.Lines="All" Text="[DV.CL_0_89]" HorzAlign="Right" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row22" AutoSize="true">
+          <TableCell Name="Cell86" Border.Lines="All" Text="Квартплата, комунальні платежі" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell87" Border.Lines="All" Text="[DV.CL_0_90]" HorzAlign="Right" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row23" AutoSize="true">
+          <TableCell Name="Cell89" Border.Lines="All" Text="Оренда майна" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell90" Border.Lines="All" Text="[DV.CL_0_91]" HorzAlign="Right" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row24" AutoSize="true">
+          <TableCell Name="Cell92" Border.Lines="All" Text="Аліменти " Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell93" Border.Lines="All" Text="[DV.CL_0_92]" HorzAlign="Right" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row25" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell95" Border.Lines="All" Text="Витрати по раніше отриманим кредитам" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell96" Border.Lines="All" Text="[DV.CL_0_93]" HorzAlign="Right" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row26" AutoSize="true">
+          <TableCell Name="Cell98" Border.Lines="All" Text="Інші витрати" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell99" Border.Lines="All" Text="[DV.CL_0_94]" HorzAlign="Right" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row27" AutoSize="true">
+          <TableCell Name="Cell101" Border.Lines="All" Text="Загальна сума витрат" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell102" Border.Lines="All" Text="[DV.CL_39]" HorzAlign="Right" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row34" Height="37.8">
+          <TableCell Name="Cell226" Border.Lines="All" Text="2.5 Кредитна історія" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell227" Border.Lines="All"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table15" Left="37.8" Top="1984.5" Width="651.05" Height="283.5" Border.Lines="All">
+        <TableColumn Name="Column10" Width="217.97"/>
+        <TableColumn Name="Column11" Width="433.08"/>
+        <TableRow Name="Row28" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell104" Border.Lines="All" Text="Інформація про кредитування" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell105" Border.Lines="All" Text="[InfoCred.INFOCRED]" VertAlign="Center" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row29" Height="103.95" AutoSize="true">
+          <TableCell Name="Cell109" Border.Lines="All" Text="Інформація про наявну кредитну заборгованість Позичальника &#10;(заповнюється за наявності такої заборгованості на дату складання заявки)&#10;" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell110" Border.Lines="All" Text="[InfoCred.NAMEBANK]&#10;[InfoCred.SUMCRED]&#10;[InfoCred.NAMEZAL]&#10;[InfoCred.SUMCREDZAL]&#10;&#10;" VertAlign="Center" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row50" Height="141.75" AutoSize="true">
+          <TableCell Name="Cell273" Border.Lines="All" Text="Інформація про наявність поруки: - за юридичних осіб (назва ,код за ЄДРПОУ); - за фізичних осіб (П.І.Б., реєстраційний номер облікової картки платника податку)&#10;(заповнюється за наявності такої заборгованості на дату складання заявки із зазначенням  суми заборгованості ,виду поруки – майнова чи фінансова )" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell274" Border.Lines="All" Text="[InfoPorHist.INFOPOR] [InfoPorHist.SUMPOR] [InfoPorHist.VIDPOR]" VertAlign="Center" Font="Times New Roman, 8pt"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table16" Left="37.8" Top="2268" Width="651.04" Height="226.8" Border.Lines="All">
+        <TableColumn Name="Column12" Width="325.52"/>
+        <TableColumn Name="Column13" Width="325.52"/>
+        <TableRow Name="Row31">
+          <TableCell Name="Cell214" Border.Lines="All" Text="Застереження" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="2"/>
+          <TableCell Name="Cell215"/>
+        </TableRow>
+        <TableRow Name="Row32" Height="151.2" AutoSize="true">
+          <TableCell Name="Cell219" Border.Lines="All" Text="Підтверджую, що вся інформація, наведена в цій заявці, є достовірною, стосовно мене не існували і не існують рішення про обмеження дієздатності. Є згода чоловіка/дружини на надання майна в заставу (іпотеку). Всі дані, наведені в заявці, відповідають дійсності і в разі прийняття позитивного рішення щодо кредитування будуть підтверджені документально. Про відповідальність за надання недостовірної інформації попереджений(а). В разі необхідності, не заперечую проти додаткової перевірки відомостей, викладених в цій заявці; а також проти передачі копій будь-яких документів страховій компанії для прийняття рішення щодо можливості укладення договорів страхування; до ТОВ “Перше всеукраїнське бюро кредитних історій” для формування кредитної історії; а також до колекторської компанії у випадку невиконання (неналежного виконання) позичальником своїх зобов’язань за кредитним договором для стягнення заборгованості.&#10;Інформацію з питань основних економічних та правових вимог щодо надання кредиту отримав  від Банку в письмовій формі. З методикою встановлення курсу гривні до іноземних валют в установах АТ “Ощадбанк”, а також із умовами кредитування ознайомлений(а) і визнаю їх прийнятними для себе.&#10;" HorzAlign="Justify" Font="Times New Roman, 8pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell220"/>
+        </TableRow>
+        <TableRow Name="Row33" Height="56.7">
+          <TableCell Name="Cell224" Border.Lines="All" Text="Дата складання заявки:      &#10;                                       &#10; “________” _______________ “20__”року&#10;&#10;" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell225" Border.Lines="All" Text="Прізвище та підпис  поручителя  _____________________________________&#10;/____________________________________/&#10;" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text4" Left="38.56" Top="189" Width="652.05" Height="66.15" Border.Lines="Left, Right, Bottom" CanGrow="true" Text="Висловлюю згоду надати  поруку за  кредитом на:&#13;&#10;[DataSubProduct.CRED_TARGET], &#13;&#10;що надається  АТ “Ощадбанк”  : [DataSubProduct.F] [DataSubProduct.I] [DataSubProduct.O]&#13;&#10;у розмірі:  [DataSubProduct.SUMM]   ( [DataSubProduct.SSUM_PR] ) гривень&#13;&#10;" VertAlign="Center" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text5" Left="37.8" Top="255.15" Width="652.05" Height="28.35" Border.Lines="All" Text="2. ІНФОРМАЦІЯ ПРО ПОРУЧИТЕЛЯ&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 11pt, style=Bold"/>
+      <TextObject Name="Text6" Left="37.8" Top="283.5" Width="652.05" Height="28.35" Border.Lines="Left, Right, Bottom" Text="2.1. Паспортні дані&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt, style=Bold"/>
+      <TableObject Name="Table21" Left="37.8" Top="1200.15" Width="651.32" Height="245.7">
+        <TableColumn Name="Column19" Width="221.74"/>
+        <TableColumn Name="Column20" Width="429.58"/>
+        <TableRow Name="Row51" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell275" Border.Lines="All" Text="Сімейний стан" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell276" Border.Lines="All" Text="[SS.CL_34]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row52" Height="85.05" AutoSize="true">
+          <TableCell Name="Cell280" Border.Lines="All" Text="Склад сім’ї (прізвище, ім’я та по-батькові) і кількість осіб, які знаходяться на утриманні (ПІБ, лінії спорідненості, для дітей – де навчаються, для інших – причина утримання (інвалід, пенсіонер, безробітний тощо)" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell281" Border.Lines="All" Text="[SS.CL_36]&#10;[SS.CL_0_46]  [SS.CL_0_47]  [SS.CL_0_48] &#10;  [SS.CL_0_49] [SS.CL_0_50] [SS.CL_0_51]  &#10;  [SS.CL_0_52] [SS.CL_0_53] [SS.CL_0_54]&#10;  [SS.CL_0_55] [SS.CL_0_56] [SS.CL_0_57]&#10;  [SS.CL_0_58] [SS.CL_0_59] [SS.CL_0_60] " HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row53" Height="113.4" AutoSize="true">
+          <TableCell Name="Cell285" Border.Lines="All" Text="Наявність власного майна&#10;(необхідне відмітити)" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell286" Border.Lines="All" Text="[Mayno.BIGHOUSE]&#10;[Mayno.HOUSE]&#10;[Mayno.OUTHOUSE]&#10;[Mayno.AVTO]&#10;[Mayno.BUS]&#10;[Mayno.FURA]&#10;[Mayno.BOAT]&#10;[Mayno.OTHE]" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text46" Left="37.8" Top="1445.85" Width="651.05" Height="37.8" Border.Lines="All" CanBreak="false" Text="2.4. Доходи та витрати, що будуть братись для розрахунку кредитоспроможності поручителя" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt, style=Bold"/>
+      <TextObject Name="Text3" Left="38.56" Top="160.94" Width="652.05" Height="28.78" Border.Lines="Left, Right, Top" Text="(прізвище, ім’я, по батькові поручителя)&#13;&#10;" HorzAlign="Center" Font="Times New Roman, 7pt, style=Italic"/>
+    </DataBand>
+  </ReportPage>
+</Report>

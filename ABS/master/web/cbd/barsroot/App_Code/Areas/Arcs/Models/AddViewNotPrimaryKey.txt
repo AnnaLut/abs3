@@ -1,0 +1,111 @@
+Under SSDL
+
+        <EntityType Name="V_ARCS_TAB_REP">
+          <Key>
+            <PropertyRef Name="YEAR" />
+            <PropertyRef Name="STATUS" />
+            <PropertyRef Name="TABLE_NAME" />
+            <PropertyRef Name="PARTITION_NAME" />
+          </Key>
+          <Property Name="YEAR" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="STATUS" Type="varchar2" MaxLength="8" Nullable="false" />
+          <Property Name="STATUS_NAME" Type="varchar2" MaxLength="21"/>
+          <Property Name="TABLE_NAME" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="PARTITION_NAME" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="TABLESPACE_NAME" Type="varchar2" MaxLength="30" />
+          <Property Name="PTN_NUM_ROWS" Type="number" Precision="38" Scale="0" />
+          <Property Name="PTN_STATUS" Type="varchar2" MaxLength="7" />
+          <Property Name="PTN_STATUS_NAME" Type="varchar2" MaxLength="26" />
+          <Property Name="ARC_TABLE_NAME" Type="varchar2" MaxLength="30" />
+          <Property Name="ARC_NUM_ROWS" Type="number" Precision="38" Scale="0" />
+          <Property Name="ARC_TABLESPACE_NAME" Type="varchar2" MaxLength="30" />
+          <Property Name="DATAFILE_NAME" Type="varchar2" MaxLength="4000" />
+          <Property Name="DATAFILE_STATE" Type="varchar2" MaxLength="4000" />
+          <Property Name="DATAFILE_STATE_NAME" Type="varchar2" MaxLength="11" />
+        </EntityType>
+
+       <EntityContainer Name="AcctModelStoreContainer">
+          ..........................
+          <EntitySet Name="V_ARCS_TAB_REP" EntityType="Self.V_ARCS_TAB_REP" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>
+              SELECT
+              "V_ARCS_TAB_REP"."YEAR" AS "YEAR",
+              "V_ARCS_TAB_REP"."STATUS" AS "STATUS",
+              "V_ARCS_TAB_REP"."STATUS_NAME" AS "STATUS_NAME",
+              "V_ARCS_TAB_REP"."TABLE_NAME" AS "TABLE_NAME",
+              "V_ARCS_TAB_REP"."PARTITION_NAME" AS "PARTITION_NAME",
+              "V_ARCS_TAB_REP"."TABLESPACE_NAME" AS "TABLESPACE_NAME"
+              "V_ARCS_TAB_REP"."PTN_NUM_ROWS" AS "PTN_NUM_ROWS",
+              "V_ARCS_TAB_REP"."PTN_STATUS" AS "PTN_STATUS"
+              "V_ARCS_TAB_REP"."PTN_STATUS_NAME" AS "PTN_STATUS_NAME"
+              "V_ARCS_TAB_REP"."ARC_TABLE_NAME" AS "ARC_TABLE_NAME",
+              "V_ARCS_TAB_REP"."ARC_NUM_ROWS" AS "ARC_NUM_ROWS",
+              "V_ARCS_TAB_REP"."ARC_TABLESPACE_NAME" AS "ARC_TABLESPACE_NAME"
+              "V_ARCS_TAB_REP"."DATAFILE_NAME" AS "DATAFILE_NAME",
+              "V_ARCS_TAB_REP"."DATAFILE_STATE" AS "DATAFILE_STATE",
+              "V_ARCS_TAB_REP"."DATAFILE_STATE_NAME" AS "DATAFILE_STATE_NAME"
+              FROM "BARS"."V_ARCS_TAB_REP" "V_ARCS_TAB_REP"
+            </DefiningQuery>
+          </EntitySet>      
+         
+        <EntityContainer Name="ArcsEntities" annotation:LazyLoadingEnabled="true">
+	    ..............................
+            <EntitySet Name="V_ARCS_TAB_REP" EntityType="Areas.Arcs.Model.AcctModel.V_ARCS_TAB_REP" />           
+
+Under CSDL
+
+        <EntityType Name="V_ARCS_TAB_REP">
+          <Key>
+            <PropertyRef Name="YEAR" />
+            <PropertyRef Name="STATUS" />
+            <PropertyRef Name="TABLE_NAME" />
+            <PropertyRef Name="PARTITION_NAME" />
+          </Key>
+          <Property Name="YEAR" Type="Decimal" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="STATUS" Type="String" MaxLength="8" FixedLength="false" Unicode="false" Nullable="false"/>
+          <Property Name="STATUS_NAME" Type="String" MaxLength="21" FixedLength="false" Unicode="false"/>
+          <Property Name="TABLE_NAME" Type="String" MaxLength="30" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="PARTITION_NAME" Type="String" MaxLength="30" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="TABLESPACE_NAME" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="PTN_NUM_ROWS" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="PTN_STATUS" Type="String" MaxLength="7" FixedLength="false" Unicode="false" />
+          <Property Name="PTN_STATUS_NAME" Type="String" MaxLength="26" FixedLength="false" Unicode="false" />
+          <Property Name="ARC_TABLE_NAME" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="ARC_NUM_ROWS" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="ARC_TABLESPACE_NAME" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="DATAFILE_NAME" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
+          <Property Name="DATAFILE_STATE" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
+          <Property Name="DATAFILE_STATE_NAME" Type="String" MaxLength="11" FixedLength="false" Unicode="false" />
+        </EntityType>
+        
+
+Under MSL 
+
+          <EntitySetMapping Name="V_ARCS_TAB_REP">
+            <EntityTypeMapping TypeName="Areas.Arcs.Models.ArcsModel.V_ARCS_TAB_REP">
+              <MappingFragment StoreEntitySet="V_ARCS_TAB_REP">
+                <ScalarProperty Name="YEAR" ColumnName="YEAR" />
+                <ScalarProperty Name="STATUS" ColumnName="STATUS" />
+                <ScalarProperty Name="STATUS_NAME" ColumnName="STATUS_NAME" />
+                <ScalarProperty Name="TABLE_NAME" ColumnName="TABLE_NAME" />
+                <ScalarProperty Name="PARTITION_NAME" ColumnName="PARTITION_NAME" />
+                <ScalarProperty Name="TABLESPACE_NAME" ColumnName="TABLESPACE_NAME" />
+                <ScalarProperty Name="PTN_NUM_ROWS" ColumnName="PTN_NUM_ROWS" />
+                <ScalarProperty Name="PTN_STATUS" ColumnName="PTN_STATUS" />
+                <ScalarProperty Name="PTN_STATUS_NAME" ColumnName="PTN_STATUS_NAME" />
+                <ScalarProperty Name="ARC_TABLE_NAME" ColumnName="ARC_TABLE_NAME" />
+                <ScalarProperty Name="ARC_NUM_ROWS" ColumnName="ARC_NUM_ROWS" />
+                <ScalarProperty Name="ARC_TABLESPACE_NAME" ColumnName="ARC_TABLESPACE_NAME" />
+                <ScalarProperty Name="DATAFILE_NAME" ColumnName="DATAFILE_NAME" />
+                <ScalarProperty Name="DATAFILE_STATE" ColumnName="DATAFILE_STATE" />
+                <ScalarProperty Name="DATAFILE_STATE_NAME" ColumnName="DATAFILE_STATE_NAME" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+                
+
+
+Under Diagram
+
+	   <EntityTypeShape EntityType="Areas.Arcs.Models.ArcsModel.V_ARCS_TAB_REP" Width="2.125" PointX="18.5" PointY="11" />    
+	   

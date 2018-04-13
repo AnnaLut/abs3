@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="11/12/2013 12:59:19" ReportInfo.Modified="12/16/2013 16:14:17" ReportInfo.CreatorVersion="1.7.1.0">
+  <Dictionary>
+    <OracleDataConnection Name="BARSDEV_NEW" ConnectionString="rijcmlq9SEZoacNJntaKIKp6mVF1+kSHs9h2FEASDb2ziQ1rMUybLG+C6jbSqka/GGQeZKaQSbrDjBY4KltUNuVSQtSEw==">
+      <TableDataSource Name="Table" Alias="t" DataType="System.Int32" Enabled="true" SelectCommand="select c.okpo, c.nmkk, c.adr, decode(c.custtype,3,'ДРФО','ЄДРПОУ') as kod_name,  u.name as bank_name, u.name_ov as bank_name_ov, f_ourmfo_g bank_mfo, to_char(m.allow_dat,'DD.MM.YYYY') as allow_date, m.num, m.kv, to_char(m.s,'fm9999999990.00') as s, m.f_name, to_char(m.f_date,'DD.MM.YYYY') as f_date, to_char(round(m.kurs/100000000,8),'fm990.00000000') as kurs, m.character&#13;&#10;from customer c, cim_journal_num u, v_cim_customs_decl m&#13;&#10;where &#13;&#10;u.branch=SYS_CONTEXT ('bars_context', 'user_branch') &#13;&#10;and c.rnk=to_number(:prnk) &#13;&#10;and m.cim_id=to_number(:pcimid)">
+        <Column Name="NMKK" DataType="System.String"/>
+        <Column Name="ADR" DataType="System.String"/>
+        <Column Name="BANK_NAME" DataType="System.String"/>
+        <Column Name="BANK_MFO" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="BANK_NAME_OV" DataType="System.String"/>
+        <Column Name="KOD_NAME" DataType="System.String"/>
+        <Column Name="ALLOW_DATE" DataType="System.String"/>
+        <Column Name="NUM" DataType="System.String"/>
+        <Column Name="KV" DataType="System.Int16"/>
+        <Column Name="S" DataType="System.Decimal"/>
+        <Column Name="F_NAME" DataType="System.String"/>
+        <Column Name="F_DATE" DataType="System.String"/>
+        <Column Name="KURS" DataType="System.String"/>
+        <Column Name="CHARACTER" DataType="System.Decimal"/>
+        <CommandParameter Name="prnk" DataType="126" Expression="[rnk]"/>
+        <CommandParameter Name="pcimid" DataType="126" Expression="[cim_id]"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="rnk" DataType="System.String"/>
+    <Parameter Name="zap_date" DataType="System.Char"/>
+    <Parameter Name="zap_num" DataType="System.String"/>
+    <Parameter Name="cim_id" DataType="System.String"/>
+    <Parameter Name="control_bank" DataType="System.String"/>
+    <Parameter Name="director" DataType="System.String"/>
+    <Parameter Name="vik_name" DataType="System.String"/>
+    <Parameter Name="vik_tel" DataType="System.String"/>
+    <Parameter Name="director_name" DataType="System.String"/>
+    <Parameter Name="control_bank_mfo" DataType="System.String"/>
+    <Parameter Name="bound_sum" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Guides="37.8,66.15">
+    <DataBand Name="Data1" Width="718.2" Height="803.25" DataSource="Table">
+      <TextObject Name="Text3" Left="368.55" Top="207.9" Width="349.65" Height="18.9" Border.Lines="Bottom" CanGrow="true" CanShrink="true" Text="[t.ADR]" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text1" Left="368.55" Top="160.65" Width="349.65" Height="18.9" Border.Lines="Bottom" CanGrow="true" CanShrink="true" Text="[t.NMKK]&#13;&#10;" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text5" Top="302.4" Width="718.2" Height="151.2" CanGrow="true" CanShrink="true" Text="	На Ваш запит від [zap_date]р. №[zap_num] та на виконання вимог Інструкції про порядок здійснення контролю за експортними, імпортними операціями, затвердженої постановою Правління Національного банку України від 24.03.1999 №136, [t.BANK_NAME] АТ „Ощадбанк” (код банку [t.BANK_MFO]) підтверджує наявність інформації про імпортні МД в реєстрі електронних копій МД що, оформлені на [t.NMKK] (код [t.KOD_NAME] [t.OKPO]), адреса: [t.ADR], та передає для зняття з контролю у сумі, зазначеній у таблиці: " HorzAlign="Justify" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text6" Top="463.05" Width="85.05" Height="113.4" Border.Lines="All" Text="Дата дозволу МД" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text8" Left="179.55" Top="463.05" Width="66.15" Height="113.4" Border.Lines="All" Text="Код валюти" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text9" Left="245.7" Top="463.05" Width="94.5" Height="113.4" Border.Lines="All" Text="Курс" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text10" Left="340.2" Top="463.05" Width="85.05" Height="113.4" Border.Lines="All" Text="Вартість в іноземній валюті" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text7" Left="85.05" Top="463.05" Width="94.5" Height="113.4" Border.Lines="All" Text="Номер МД" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text22" Left="425.25" Top="463.05" Width="103.95" Height="113.4" Border.Lines="All" Text="Інформація про реєстр МД (номер та дата)" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text24" Left="529.2" Top="463.05" Width="75.6" Height="113.4" Border.Lines="All" Text="Характер угоди" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text26" Left="604.8" Top="463.05" Width="113.4" Height="113.4" Border.Lines="All" Text="Вартість продукції, яка передається згідно з запитом (в ін. валюті)" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text11" Top="576.45" Width="85.05" Height="37.8" Border.Lines="All" Text="[t.ALLOW_DATE]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text12" Left="85.05" Top="576.45" Width="94.5" Height="37.8" Border.Lines="All" Text="[t.NUM]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text13" Left="179.55" Top="576.45" Width="66.15" Height="37.8" Border.Lines="All" Text="[t.KV]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text14" Left="245.7" Top="576.45" Width="94.5" Height="37.8" Border.Lines="All" Text="[t.KURS]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text15" Left="340.2" Top="576.45" Width="85.05" Height="37.8" Border.Lines="All" Text="[t.S]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text23" Left="425.25" Top="576.45" Width="103.95" Height="37.8" Border.Lines="All" Text="[t.F_NAME]&#13;&#10;[t.F_DATE]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text25" Left="529.2" Top="576.45" Width="75.6" Height="37.8" Border.Lines="All" Text="[t.CHARACTER]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text27" Left="604.8" Top="576.45" Width="113.4" Height="37.8" Border.Lines="All" Text="[bound_sum]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text16" Left="-9.45" Top="623.7" Width="727.65" Height="66.15" CanGrow="true" CanShrink="true" Text="	Довідку видано для надання в [control_bank] (код банку [control_bank_mfo])." Font="Times New Roman, 12pt"/>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="807.74" Width="718.2" Height="151.2">
+      <TextObject Name="Text18" Top="56.7" Width="274.05" Height="75.6" Text="Виконавець&#13;&#10;[vik_name]&#13;&#10;тел. [vik_tel]&#13;&#10;" Font="Times New Roman, 10pt, style=Italic"/>
+      <TextObject Name="Text20" Left="500.85" Top="18.9" Width="66.15" Height="18.9" Text="П.І.Б." HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text17" Left="207.9" Width="226.8" Height="66.15" Text="______________________&#13;&#10;(підпис)" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text21" Width="207.9" Height="56.7" Text="[director]" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text19" Left="434.7" Width="170.1" Height="18.9" Border.Lines="Bottom" Text="[director_name]" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

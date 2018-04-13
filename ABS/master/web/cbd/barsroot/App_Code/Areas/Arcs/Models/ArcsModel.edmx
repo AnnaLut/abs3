@@ -1,0 +1,165 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="ArcsModel.Store" Provider="Oracle.DataAccess.Client" ProviderManifestToken="11.2" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+        <EntityType Name="ARCS_META">
+          <Key>
+            <PropertyRef Name="PRT_TABNAME" />
+          </Key>
+          <Property Name="PRT_TABNAME" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="LAST_ARC_DATE" Type="date" />
+          <Property Name="ARCTAB_TEMPLATE" Type="varchar2" MaxLength="30" />
+          <Property Name="ARCTAB_TBS" Type="varchar2" MaxLength="30" />
+        </EntityType>
+        <EntityType Name="V_ARCS_TAB_REP">
+          <Key>
+            <PropertyRef Name="YEAR" />
+            <PropertyRef Name="STATUS" />
+            <PropertyRef Name="TABLE_NAME" />
+            <PropertyRef Name="PARTITION_NAME" />
+          </Key>
+          <Property Name="YEAR" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="STATUS" Type="varchar2" MaxLength="8" Nullable="false"/>
+          <Property Name="STATUS_NAME" Type="varchar2" MaxLength="21"/>
+          <Property Name="TABLE_NAME" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="PARTITION_NAME" Type="varchar2" MaxLength="30" Nullable="false"/>
+          <Property Name="TABLESPACE_NAME" Type="varchar2" MaxLength="30" />
+          <Property Name="PTN_NUM_ROWS" Type="number" Precision="38" Scale="0" />
+          <Property Name="PTN_STATUS" Type="varchar2" MaxLength="7" />
+          <Property Name="PTN_STATUS_NAME" Type="varchar2" MaxLength="26" />
+          <Property Name="ARC_TABLE_NAME" Type="varchar2" MaxLength="30" />
+          <Property Name="ARC_NUM_ROWS" Type="number" Precision="38" Scale="0" />
+          <Property Name="ARC_TABLESPACE_NAME" Type="varchar2" MaxLength="30" />
+          <Property Name="DATAFILE_NAME" Type="varchar2" MaxLength="4000" />
+          <Property Name="DATAFILE_STATE" Type="varchar2" MaxLength="4000" />
+          <Property Name="DATAFILE_STATE_NAME" Type="varchar2" MaxLength="11" />
+        </EntityType>
+        <EntityContainer Name="ArcsModelStoreContainer">
+          <EntitySet Name="ARCS_META" EntityType="Self.ARCS_META" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="V_ARCS_TAB_REP" EntityType="Self.V_ARCS_TAB_REP" store:Type="Views" store:Schema="BARS" />
+            <!--DefiningQuery>
+              SELECT
+              "V_ARCS_TAB_REP"."YEAR" AS "YEAR",
+              "V_ARCS_TAB_REP"."STATUS" AS "STATUS",
+              "V_ARCS_TAB_REP"."STATUS_NAME" AS "STATUS_NAME",
+              "V_ARCS_TAB_REP"."TABLE_NAME" AS "TABLE_NAME",
+              "V_ARCS_TAB_REP"."PARTITION_NAME" AS "PARTITION_NAME",
+              "V_ARCS_TAB_REP"."TABLESPACE_NAME" AS "TABLESPACE_NAME",
+              "V_ARCS_TAB_REP"."PTN_NUM_ROWS" AS "PTN_NUM_ROWS",
+              "V_ARCS_TAB_REP"."PTN_STATUS" AS "PTN_STATUS",
+              "V_ARCS_TAB_REP"."PTN_STATUS_NAME" AS "PTN_STATUS_NAME",
+              "V_ARCS_TAB_REP"."ARC_TABLE_NAME" AS "ARC_TABLE_NAME",
+              "V_ARCS_TAB_REP"."ARC_NUM_ROWS" AS "ARC_NUM_ROWS",
+              "V_ARCS_TAB_REP"."ARC_TABLESPACE_NAME" AS "ARC_TABLESPACE_NAME",
+              "V_ARCS_TAB_REP"."DATAFILE_NAME" AS "DATAFILE_NAME",
+              "V_ARCS_TAB_REP"."DATAFILE_STATE" AS "DATAFILE_STATE",
+              "V_ARCS_TAB_REP"."DATAFILE_STATE_NAME" AS "DATAFILE_STATE_NAME"
+              FROM "BARS"."V_ARCS_TAB_REP" "V_ARCS_TAB_REP"
+            </DefiningQuery-->
+            <!--/EntitySet-->
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="Areas.Arcs.Models.ArcsModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+        <EntityType Name="ARCS_META">
+          <Key>
+            <PropertyRef Name="PRT_TABNAME" />
+          </Key>
+          <Property Name="PRT_TABNAME" Type="String" MaxLength="30" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="LAST_ARC_DATE" Type="DateTime" />
+          <Property Name="ARCTAB_TEMPLATE" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="ARCTAB_TBS" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="V_ARCS_TAB_REP">
+          <Key>
+            <PropertyRef Name="YEAR" />
+            <PropertyRef Name="STATUS" />
+            <PropertyRef Name="TABLE_NAME" />
+            <PropertyRef Name="PARTITION_NAME" />
+          </Key>
+          <Property Name="YEAR" Type="Decimal" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="STATUS" Type="String" MaxLength="8" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="STATUS_NAME" Type="String" MaxLength="21" FixedLength="false" Unicode="false"/>
+          <Property Name="TABLE_NAME" Type="String" MaxLength="30" FixedLength="false" Unicode="false" Nullable="false"  />
+          <Property Name="PARTITION_NAME" Type="String" MaxLength="30" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="TABLESPACE_NAME" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="PTN_NUM_ROWS" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="PTN_STATUS" Type="String" MaxLength="7" FixedLength="false" Unicode="false" />
+          <Property Name="PTN_STATUS_NAME" Type="String" MaxLength="26" FixedLength="false" Unicode="false" />
+          <Property Name="ARC_TABLE_NAME" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="ARC_NUM_ROWS" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="ARC_TABLESPACE_NAME" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="DATAFILE_NAME" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
+          <Property Name="DATAFILE_STATE" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
+          <Property Name="DATAFILE_STATE_NAME" Type="String" MaxLength="11" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityContainer Name="ArcsEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="ARCS_META" EntityType="Self.ARCS_META" />
+          <EntitySet Name="V_ARCS_TAB_REP" EntityType="Self.V_ARCS_TAB_REP" />
+        </EntityContainer>        
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="ArcsModelStoreContainer" CdmEntityContainer="ArcsEntities">
+          <EntitySetMapping Name="ARCS_META">
+            <EntityTypeMapping TypeName="Areas.Arcs.Models.ArcsModel.ARCS_META">
+              <MappingFragment StoreEntitySet="ARCS_META">
+                <ScalarProperty Name="PRT_TABNAME" ColumnName="PRT_TABNAME" />
+                <ScalarProperty Name="LAST_ARC_DATE" ColumnName="LAST_ARC_DATE" />
+                <ScalarProperty Name="ARCTAB_TEMPLATE" ColumnName="ARCTAB_TEMPLATE" />
+                <ScalarProperty Name="ARCTAB_TBS" ColumnName="ARCTAB_TBS" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="V_ARCS_TAB_REP">
+            <EntityTypeMapping TypeName="Areas.Arcs.Models.ArcsModel.V_ARCS_TAB_REP">
+              <MappingFragment StoreEntitySet="V_ARCS_TAB_REP">
+                <ScalarProperty Name="YEAR" ColumnName="YEAR" />
+                <ScalarProperty Name="STATUS" ColumnName="STATUS" />
+                <ScalarProperty Name="STATUS_NAME" ColumnName="STATUS_NAME" />
+                <ScalarProperty Name="TABLE_NAME" ColumnName="TABLE_NAME" />
+                <ScalarProperty Name="PARTITION_NAME" ColumnName="PARTITION_NAME" />
+                <ScalarProperty Name="TABLESPACE_NAME" ColumnName="TABLESPACE_NAME" />
+                <ScalarProperty Name="PTN_NUM_ROWS" ColumnName="PTN_NUM_ROWS" />
+                <ScalarProperty Name="PTN_STATUS" ColumnName="PTN_STATUS" />
+                <ScalarProperty Name="PTN_STATUS_NAME" ColumnName="PTN_STATUS_NAME" />
+                <ScalarProperty Name="ARC_TABLE_NAME" ColumnName="ARC_TABLE_NAME" />
+                <ScalarProperty Name="ARC_NUM_ROWS" ColumnName="ARC_NUM_ROWS" />
+                <ScalarProperty Name="ARC_TABLESPACE_NAME" ColumnName="ARC_TABLESPACE_NAME" />
+                <ScalarProperty Name="DATAFILE_NAME" ColumnName="DATAFILE_NAME" />
+                <ScalarProperty Name="DATAFILE_STATE" ColumnName="DATAFILE_STATE" />
+                <ScalarProperty Name="DATAFILE_STATE_NAME" ColumnName="DATAFILE_STATE_NAME" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="true" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Default" />
+        <DesignerProperty Name="SynchronizePropertyFacets" Value="True" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

@@ -1,0 +1,320 @@
+﻿@using Areas.Finp.Models
+@using Kendo.Mvc.UI
+@model IQueryable<V_FINP_SURVEY_GROUPS_HIDE>
+
+@{
+    ViewBag.Title = "Розрахунок фін. стану";
+    var session_id = Convert.ToInt64(Request.Params["sessionId"]);
+}
+
+    <h1>
+        Розрахунок фін. стану
+    </h1>
+
+<table>
+    <tr>
+        <td style="width:400px" valign="top">
+            <ul class="nav nav-pills nav-stacked" id="pills-first">
+                @foreach (var item in Model.Where(i => i.SESSION_ID == session_id))
+                {
+                    /*var str = item.ID.ToString();*/
+                    if (item.HIDEN == 0)
+                    {
+                        <li id="@item.ID.ToString()"><a href="#tab_@item.ID.ToString()" data-toggle="pill" onclick="changePosition('@item.ID.ToString()')">@item.NAME</a></li>
+                    }
+                }
+            </ul>
+        </td>
+        <td style="width:80%">
+            <div class="tab-content col-md-10">
+                @foreach (var item in Model)
+                {
+                    <div class="tab-pane well" id="tab_@item.ID.ToString().Replace(".", "_")" disable="disable">
+                        <div class="section k-header">
+                            <form id="questionForm_@item.ID" name="questionForm">
+                                @Html.Action("QuestionsList", new { sessionId = session_id, surveyId = item.SURVEY_ID, groupId = item.ID })
+                            </form>
+                        </div>
+                    </div>
+                }
+                        <div class="row">
+                            <table>
+                                <tr>
+                                    <td>
+                                        <div class="col-md-1">
+                                            <button type="button" id="btnPrevious" style="width: 70px" onclick="previousClick()" class="btn k-button">&lt;Назад</button>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="col-md-1">
+                                            <button type="button" id="btnNext" style="width: 70px" onclick="nextClick()" class="btn k-button">Далі&gt;</button>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="col-md-1">
+                                            <button type="button" id="btnFinish" style="width: 70px" onclick='finishClick(&#39;@Request.Params["surveyId"].ToString()&#39;,@session_id)' class="btn k-button">Розрах.</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+        </td>
+    </tr>
+</table>
+
+<script>
+    var startIndex = 0;
+    $(document).ready(function () {
+        /*initial*/
+        $('.btn-toggle').click(function () {
+            $(this).find('.btn').toggleClass('active');
+            if ($(this).find('.btn-primary').size() > 0) {
+                $(this).find('.btn').toggleClass('btn-primary');
+            }
+            if ($(this).find('.btn-danger').size() > 0) {
+                $(this).find('.btn').toggleClass('btn-danger');
+            }
+            if ($(this).find('.btn-success').size() > 0) {
+                $(this).find('.btn').toggleClass('btn-success');
+            }
+            if ($(this).find('.btn-info').size() > 0) {
+                $(this).find('.btn').toggleClass('btn-info');
+            }
+            $(this).find('.btn').toggleClass('btn-default');
+        });
+        $($('#pills-first a')[startIndex]).tab('show');
+        $('#btnFinish')[0].style.display = "none";
+    });
+    function previousClick(e) {
+        startIndex = startIndex - 1;
+        $('#btnNext').removeAttr('disabled');
+        if (startIndex < 0) {
+            startIndex = startIndex + 1;
+        }
+        $($('#pills-first a')[startIndex]).tab('show');
+    }
+    function getURLParameter(name) {
+        return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null
+    }
+    function questPostSave(sId, qId, val) {
+        $.ajax({
+            async: false,
+            type: "POST",
+            url: bars.config.urlContent("/Finp/QuestionNaire/SetAnswers/"),
+            data: { sessionId: sId, questionId: qId, value: val }
+        });
+    }
+    function questPostDel(sId, qId) {
+        $.ajax({
+            async: false,
+            type: "POST",
+            url: bars.config.urlContent("/Finp/QuestionNaire/RemoveAnswers/"),
+            data: { sessionId: sId, questionId: qId }
+        });
+    }
+    function sessStatusSet(sId, stId, com) {
+        $.ajax({
+            async: false,
+            type: "POST",
+            url: bars.config.urlContent("/Finp/QuestionNaire/SetStatus/"),
+            data: { sessionId: sId, statusId: stId, comment: com }
+        });
+    }
+    function questionSave() {
+        /*TEXT;INTEGER;DECIMAL;DATE;REFERENCE;LIST*/
+        $(".tab-pane.well.active input").each(function (element) {
+            if ($(this).attr('id') != undefined){
+                console.log($(this).attr('class'));
+                var sId = getURLParameter('sessionId');
+                var qId = $(this).attr('id');
+                var val = $(this).val();
+                if ($(this).val() != "") {
+                    questPostSave(sId, qId, val);
+                }
+                else {
+                    questPostDel(sId, qId);
+                }
+            }
+        });
+        /*****************************************/
+        /******************BOOL*******************/
+        $(".tab-pane.well.active .btn.btn-xs.btn-primary.active").each(function (element) {
+            var sId = getURLParameter('sessionId');
+            var qId = $(this).attr('name');
+            var val = $(this).val();
+            if ($(this).val() != "") {
+                questPostSave(sId, qId, val);
+            }
+            else {
+                questPostDel(sId, qId);
+            }
+        });
+        /*****************************************/
+    }
+    function checkMinDate(input) {
+        var val_date = kendo.parseDate(input.val());
+        var min_date = kendo.parseDate(input.data("mindate"));
+        if (val_date < min_date) {
+            return false;
+        }
+        return true;
+    }
+    function checkMaxDate(input) {
+        var val_date = kendo.parseDate(input.val());
+        var max_date = kendo.parseDate(input.data("maxdate"));
+        if (val_date > max_date) {
+            return false;
+        }
+        return true;
+    }
+    function checkMinIntDec(input) {
+        var val_dec = kendo.parseFloat(input.val());
+        var min_dec = kendo.parseFloat(input.data("mindec"));
+        if (val_dec < min_dec) {
+            return false;
+        }
+        return true;
+    }
+    function checkMaxIntDec(input) {
+        var val_dec = kendo.parseFloat(input.val());
+        var max_dec = kendo.parseFloat(input.data("maxdec"));
+        if (val_dec > max_dec) {
+            return false;
+        }
+        return true;
+    }
+    function validQuestions() {
+        var validator = $(".tab-pane.well.active form").kendoValidator({
+            rules: {
+                dateminval: function (input) {
+                    if (input.is("[data-dateminval-msg]")) {
+                        return checkMinDate(input);
+                    }
+                    return true;
+                },
+                datemaxval: function (input) {
+                    if (input.is("[data-datemaxval-msg]")) {
+                        return checkMaxDate(input);
+                    }
+                    return true;
+                },
+                decminval: function (input) {
+                    if (input.is("[data-decminval-msg]") && $(input).val() != "") {
+                        return checkMinIntDec(input);
+                    }
+                    return true;
+                },
+                decmaxval: function (input) {
+                    if (input.is("[data-decmaxval-msg]") && $(input).val() != "") {
+                        return checkMaxIntDec(input);
+                    }
+                    return true;
+                }
+            }
+        }).getKendoValidator();
+        return validator;
+    }
+    function nextClick(e) {
+        var validator = validQuestions();
+        if (validator.validate()) {
+            questionSave();
+            if (startIndex < $('#pills-first a').length - 1) {
+                startIndex = startIndex + 1;
+            }
+
+            if (startIndex == $('#pills-first a').length - 1) {
+                $('#btnFinish')[0].style.display = "block";
+                $('#btnNext').attr('disabled', 'disabled');
+            }
+            $($('#pills-first a')[startIndex]).tab('show');
+        }
+    }
+    function finishClick(surveyId, sessionId) {
+        var validator = $(".tab-pane.well.active").kendoValidator().data("kendoValidator");
+        var url = bars.config.urlContent("/Finp/QuestionNaire/ResultList/?surveyId=" + surveyId + "&sessionId=" + sessionId);
+        if (validator.validate()) {
+            questionSave();
+            sessStatusSet(sessionId, 'PROC', null);
+            location.reload(url);
+        }
+    }
+    function changePosition(id) {
+        var validator = $(".tab-pane.well.active").kendoValidator().data("kendoValidator");
+        if (validator.validate()) {
+            var item = $('#' + id);
+            questionSave();
+            if (startIndex == $('#pills-first a').length - 1) {
+                $('#btnFinish')[0].style.display = "block";
+                $('#btnNext').attr('disabled', 'disabled');
+            }
+            startIndex = $("li").index(item);
+        }
+    }
+    function showReferen(elementId, tabName, whereClause, showFields) {
+        bars.ui.handBook(tabName, function (data) {
+            $('#'+elementId).val($(data).map(function () {
+                return this.PrimaryKeyColumn;
+            }).get());
+        },
+        {
+            multiSelect: false,
+            clause: whereClause,
+            columns: showFields
+        });
+    }
+</script>
+<style scoped>
+    form ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    form li {
+        margin-top: 10px;
+    }
+
+    form .k-datepicker {
+        vertical-align: middle;
+    }
+
+    label {
+        display: inline-block;
+        padding-right: 3px;
+        width: 200px;
+    }
+
+    span.k-tooltip {
+        margin-left: 6px;
+    }
+
+    .section {
+        width: auto;
+    }
+
+    .actions {
+        padding-left: 106px;
+        padding-top: 10px;
+    }
+
+    .k-datepicker {
+        width: 140px !important;
+    }
+    li div button {
+        width:40px;
+    }
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+

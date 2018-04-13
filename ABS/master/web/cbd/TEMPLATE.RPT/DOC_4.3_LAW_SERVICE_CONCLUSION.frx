@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="04/15/2011 18:11:20" ReportInfo.Modified="09/03/2014 14:33:16" ReportInfo.CreatorVersion="2013.2.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqcFv7/QVsbsa1pDpr21P0mHXdl2BpgMbYS4w+AnBeGDddnQ5MuNy1h3sM21aiXmM/uxsM2Lpu0HGVTumtLj/1QA==">
+      <TableDataSource Name="STAFF_FIO" DataType="System.Int32" Enabled="true" SelectCommand="select nvl( f_doc_attr('STAFF_FIO', :p1, :p2), 'null') as VAL from dual">
+        <Column Name="VAL" DataType="System.String"/>
+        <CommandParameter Name="p1" DataType="113" Expression="[p_bid_id]" DefaultValue="-1"/>
+        <CommandParameter Name="p2" DataType="113" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table" Alias="WCS_IQ_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select wcs_utl.get_answ_text(b.id, 'IQ_CONCL_LAW_S_Q1', w.id, 0) as q1, wcs_utl.get_answ_text(b.id, 'IQ_CONCL_LAW_S_Q1_1', w.id, 0) as q1_1,&#13;&#10;       wcs_utl.get_answ_text(b.id, 'IQ_CONCL_LAW_S_Q2', w.id, 0) as q2, wcs_utl.get_answ_text(b.id, 'IQ_CONCL_LAW_S_Q2_1', w.id, 0) as q2_1,&#13;&#10;       wcs_utl.get_answ_text(b.id, 'IQ_CONCL_LAW_S_Q3', w.id, 0) as q3, wcs_utl.get_answ_text(b.id, 'IQ_CONCL_LAW_S_Q3_1', w.id, 0) as q3_1,&#13;&#10;       wcs_utl.get_answ_text(b.id, 'IQ_CONCL_LAW_S_Q4', w.id, 0) as q4, wcs_utl.get_answ_text(b.id, 'IQ_CONCL_LAW_S_Q4_1', w.id, 0) as q4_1,&#13;&#10;       wcs_utl.get_answ_text(b.id, 'IQ_CONCL_LAW_S_Q5', w.id, 0) as q5, wcs_utl.get_answ_text(b.id, 'IQ_CONCL_LAW_S_Q5_1', w.id, 0) as q5_1,&#13;&#10;       wcs_utl.get_answ_text(b.id, 'IQ_CONCL_LAW_S_Q6', w.id, 0) as q6, wcs_utl.get_answ_text(b.id, 'IQ_CONCL_LAW_S_Q6_1', w.id, 0) as q6_1,&#13;&#10;       wcs_utl.get_answ_text(b.id, 'IQ_CONCL_LAW_S_Q7', w.id, 0) as q7, wcs_utl.get_answ_text(b.id, 'IQ_CONCL_LAW_S_Q7_1', w.id, 0) as q7_1&#13;&#10;  from wcs_bids b, wcs_workspaces w&#13;&#10; where b.id = :p_bid_id&#13;&#10;   and w.id = :p_ws_id">
+        <Column Name="Q1" DataType="System.String"/>
+        <Column Name="Q2" DataType="System.String"/>
+        <Column Name="Q3" DataType="System.String"/>
+        <Column Name="Q4" DataType="System.String"/>
+        <Column Name="Q5" DataType="System.String"/>
+        <Column Name="Q6" DataType="System.String"/>
+        <Column Name="Q7" DataType="System.String"/>
+        <Column Name="Q1_1" DataType="System.String"/>
+        <Column Name="Q2_1" DataType="System.String"/>
+        <Column Name="Q3_1" DataType="System.String"/>
+        <Column Name="Q4_1" DataType="System.String"/>
+        <Column Name="Q5_1" DataType="System.String"/>
+        <Column Name="Q6_1" DataType="System.String"/>
+        <Column Name="Q7_1" DataType="System.String"/>
+        <CommandParameter Name="p_bid_id" DataType="107" Expression="[p_bid_id]" DefaultValue="-1"/>
+        <CommandParameter Name="p_ws_id" DataType="126" Expression="[p_ws_id]" DefaultValue="&quot;MAIN&quot;"/>
+      </TableDataSource>
+      <TableDataSource Name="Table2" Alias="WCS_BID_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select * from v_wcs_bids b where b.bid_id = :p_bid_id">
+        <Column Name="BID_ID" DataType="System.Decimal"/>
+        <Column Name="SUBPRODUCT_ID" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_NAME" DataType="System.String"/>
+        <Column Name="CRT_DATE" DataType="System.DateTime"/>
+        <Column Name="F" DataType="System.String"/>
+        <Column Name="I" DataType="System.String"/>
+        <Column Name="O" DataType="System.String"/>
+        <Column Name="BDATE" DataType="System.DateTime"/>
+        <Column Name="INN" DataType="System.String"/>
+        <Column Name="SUMM" DataType="System.Decimal"/>
+        <Column Name="OWN_FUNDS" DataType="System.Decimal"/>
+        <Column Name="TERM" DataType="System.String"/>
+        <Column Name="CREDIT_CURRENCY" DataType="System.Decimal"/>
+        <Column Name="SINGLE_FEE" DataType="System.Decimal"/>
+        <Column Name="MONTHLY_FEE" DataType="System.Decimal"/>
+        <Column Name="INTEREST_RATE" DataType="System.Decimal"/>
+        <Column Name="REPAYMENT_METHOD" DataType="System.String"/>
+        <Column Name="REPAYMENT_DAY" DataType="System.Decimal"/>
+        <Column Name="GARANTEES" DataType="System.String"/>
+        <Column Name="MGR_ID" DataType="System.Decimal"/>
+        <Column Name="MGR_FIO" DataType="System.String"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="BRANCH_NAME" DataType="System.String"/>
+        <Column Name="STATES" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_DESC" DataType="System.String"/>
+        <Column Name="REPAYMENT_METHOD_TEXT" DataType="System.String"/>
+        <CommandParameter Name="p_bid_id" DataType="107" Expression="[p_bid_id]" DefaultValue="-1"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_bid_id" DataType="System.Int32" Expression="3507221"/>
+    <Parameter Name="p_ws_id" DataType="System.String" Expression="&quot;SRV_RU&quot;"/>
+    <Parameter Name="p_ws_number" DataType="System.Decimal" Expression="0"/>
+  </Dictionary>
+  <ReportPage Name="Page2">
+    <DataBand Name="Data2" Width="718.2" Height="727.65" CanGrow="true" CanShrink="true" CanBreak="true">
+      <TextObject Name="Text2" Left="9.45" Top="9.45" Width="699.3" Height="18.9" Text="Банківська таємниця" HorzAlign="Right" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text3" Left="9.45" Top="37.8" Width="699.3" Height="37.8" CanGrow="true" Text="       ІІІ. ВИСНОВКИ ЮРИДИЧНОЇ СЛУЖБИ ЩОДО НАДАННЯ КРЕДИТУ ПОЗИЧАЛЬНИКУ [WCS_BID_DATA.F] [WCS_BID_DATA.I] [WCS_BID_DATA.O]" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text5" Left="9.45" Top="94.5" Width="699.3" Height="18.9" Text="      І. Аналіз документів щодо встановлення особи Позичальника." Font="Arial, 10pt, style=Bold, Underline"/>
+      <TextObject Name="Text6" Left="9.45" Top="113.4" Width="699.3" Height="47.25" CanGrow="true" Text="  [WCS_IQ_DATA.Q1][WCS_IQ_DATA.Q1_1]" Padding="2, 0, 2, 10"/>
+      <TextObject Name="Text7" Left="9.45" Top="160.65" Width="699.3" Height="18.9" Text="      ІІ. Аналіз документів щодо визначення платоспроможності Позичальника" Font="Arial, 10pt, style=Bold, Underline"/>
+      <TextObject Name="Text8" Left="9.45" Top="179.55" Width="699.3" Height="47.25" CanGrow="true" Text="      [WCS_IQ_DATA.Q2][WCS_IQ_DATA.Q2_1]" Padding="2, 0, 2, 10"/>
+      <TextObject Name="Text9" Left="9.45" Top="226.8" Width="699.3" Height="18.9" Text="      ІII. Аналіз документів щодо ідентифікації Поручителя та його правового статусу" Font="Arial, 10pt, style=Bold, Underline"/>
+      <TextObject Name="Text10" Left="9.45" Top="245.7" Width="699.3" Height="47.25" CanGrow="true" Text="      [WCS_IQ_DATA.Q3][WCS_IQ_DATA.Q3_1]" Padding="2, 0, 2, 10"/>
+      <TextObject Name="Text11" Left="9.45" Top="292.95" Width="699.3" Height="18.9" Text="      IV. Аналіз документів щодо визначення платоспроможності Поручителя" Font="Arial, 10pt, style=Bold, Underline"/>
+      <TextObject Name="Text12" Left="9.45" Top="311.85" Width="699.3" Height="47.25" CanGrow="true" Text="      [WCS_IQ_DATA.Q4][WCS_IQ_DATA.Q4_1]" Padding="2, 0, 2, 10"/>
+      <TextObject Name="Text13" Left="9.45" Top="359.1" Width="699.3" Height="18.9" Text="      V. Аналіз документів щодо ідентифікації Заставодавця (Іпотекодавця) та його правового статусу" Font="Arial, 10pt, style=Bold, Underline"/>
+      <TextObject Name="Text14" Left="9.45" Top="378" Width="699.3" Height="47.25" CanGrow="true" Text="      [WCS_IQ_DATA.Q5][WCS_IQ_DATA.Q5_1]" Padding="2, 0, 2, 10"/>
+      <TextObject Name="Text15" Left="9.45" Top="425.25" Width="699.3" Height="18.9" Text="      VI. Аналіз документів щодо майна, яке пропонується Банку в заставу (іпотеку)" Font="Arial, 10pt, style=Bold, Underline"/>
+      <TextObject Name="Text16" Left="9.45" Top="444.15" Width="699.3" Height="37.8" CanGrow="true" Text="      [WCS_IQ_DATA.Q6][WCS_IQ_DATA.Q6_1]" Padding="2, 0, 2, 10"/>
+      <TextObject Name="Text17" Left="9.45" Top="481.95" Width="699.3" Height="18.9" Text="      VII. Основні ризики, загальні застереження, пов’язані з реалізацією кредитного проекту" Font="Arial, 10pt, style=Bold, Underline"/>
+      <TextObject Name="Text18" Left="9.45" Top="500.85" Width="699.3" Height="37.8" CanGrow="true" Text="      [WCS_IQ_DATA.Q7][WCS_IQ_DATA.Q7_1]" Padding="2, 0, 2, 10"/>
+      <TextObject Name="Text19" Left="18.9" Top="567" Width="330.75" Height="113.4" Text="Дата [FormatDateTime([Date],&quot;Short Date&quot;)]" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text20" Left="349.65" Top="567" Width="359.1" Height="113.4" Text="Керівник юридичної служби &#13;&#10;&#13;&#10;__________________________ (прізвище, підпис)&#13;&#10;&#13;&#10;Працівник юридичної служби&#13;&#10;&#13;&#10;__________________________ (прізвище, підпис)&#13;&#10;" Font="Arial, 10pt, style=Bold"/>
+    </DataBand>
+  </ReportPage>
+</Report>

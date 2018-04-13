@@ -1,0 +1,14 @@
+﻿@{
+    ViewBag.Title = "";
+}
+
+@Scripts.Render("~/Async/bundles/schedulersCtrl")
+
+<div data-ng-controller="Async.SchedulersCtrl">
+    <h1 ng-bind="Title"></h1>
+    <div data-kendo-toolbar="" k-options="toolbarOptions"></div>
+    <div data-kendo-grid="schedulersGrid" data-options="schedulersGridOptions"></div>
+    <div data-kendo-window="schedulerWindow" id="schedulerWindow" data-options="schedulerWindowOptions" style="display: none">
+        @Html.Partial("Edit")
+    </div>     
+</div>

@@ -1,0 +1,25 @@
+﻿@{
+    ViewBag.Title = "";
+}
+
+<style>
+    .k-toolbar .k-datepicker input {
+        height: 1.65em 
+    }
+
+    .k-header.ng-scope.k-with-icon.k-filterable {
+        vertical-align: top;
+    }
+</style>
+
+<script src="@Url.Content("~/Areas/Reporting/Scripts/nbu/Index.js")"></script>
+
+<div data-ng-controller="Reporting.Nbu">
+    <h1 ng-bind="Title"></h1>
+
+    <div data-kendo-toolbar="" k-options="toolbarReportOptions" style="margin-bottom: 10px"></div>
+
+    <div data-kendo-toolbar="" k-options="toolbarReportGridOptions"></div>
+    <div data-kendo-grid="reportGrid" k-options="reportGridOptions" k-rebind="reportGridOptions.dataSource.schema.model.fields"></div>
+    
+</div>

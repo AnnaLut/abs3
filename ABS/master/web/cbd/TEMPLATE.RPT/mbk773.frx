@@ -1,0 +1,525 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="02/12/2015 16:07:02" ReportInfo.Modified="02/19/2015 11:10:11" ReportInfo.CreatorVersion="2013.2.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="cobummfo_dev" ConnectionString="rijcmlq/aVeGBEd5IyArDSDpS1mnEQWiK8SQhsWDPMpCsry+zWhQeBbANOg072LKEsCrBsISCYFOFeY8cXnX35xnCMWEw==">
+      <TableDataSource Name="Table" Alias="table" DataType="System.Int32" Enabled="true" SelectCommand="select CHAR00 SROK, NUM00 KV, NUM01 S01, NUM02 S02, NUM03 S21, NUM04 S22, NUM05 S03, NUM06 S04, NUM07 S05, NUM08 S24, NUM09 S25, NUM10 S06, NUM11 S07, NUM12 S08, NUM13 S09, NUM14 S10, NUM15 S11, NUM16 P01, NUM17 P02, NUM18 P21, NUM19 P22, NUM20 P03, NUM21 P04, NUM22 P05, NUM23 P24, NUM24 P25, NUM25 P06, NUM26 P07, NUM27 P08, NUM28 P09, NUM29 P10, NUM30 P11, NUM31 SNET, NUM32 SAKT, NUM33 SPAS from rs_tmp_report_data where session_id=:SESSION_ID order by id">
+        <Column Name="SROK" DataType="System.String"/>
+        <Column Name="KV" DataType="System.Decimal"/>
+        <Column Name="S01" DataType="System.Decimal"/>
+        <Column Name="S02" DataType="System.Decimal"/>
+        <Column Name="S21" DataType="System.Decimal"/>
+        <Column Name="S22" DataType="System.Decimal"/>
+        <Column Name="S03" DataType="System.Decimal"/>
+        <Column Name="S04" DataType="System.Decimal"/>
+        <Column Name="S05" DataType="System.Decimal"/>
+        <Column Name="S24" DataType="System.Decimal"/>
+        <Column Name="S25" DataType="System.Decimal"/>
+        <Column Name="S06" DataType="System.Decimal"/>
+        <Column Name="S07" DataType="System.Decimal"/>
+        <Column Name="S08" DataType="System.Decimal"/>
+        <Column Name="S09" DataType="System.Decimal"/>
+        <Column Name="S10" DataType="System.Decimal"/>
+        <Column Name="S11" DataType="System.Decimal"/>
+        <Column Name="P01" DataType="System.Decimal"/>
+        <Column Name="P02" DataType="System.Decimal"/>
+        <Column Name="P21" DataType="System.Decimal"/>
+        <Column Name="P22" DataType="System.Decimal"/>
+        <Column Name="P03" DataType="System.Decimal"/>
+        <Column Name="P04" DataType="System.Decimal"/>
+        <Column Name="P05" DataType="System.Decimal"/>
+        <Column Name="P24" DataType="System.Decimal"/>
+        <Column Name="P25" DataType="System.Decimal"/>
+        <Column Name="P06" DataType="System.Decimal"/>
+        <Column Name="P07" DataType="System.Decimal"/>
+        <Column Name="P08" DataType="System.Decimal"/>
+        <Column Name="P09" DataType="System.Decimal"/>
+        <Column Name="P10" DataType="System.Decimal"/>
+        <Column Name="P11" DataType="System.Decimal"/>
+        <Column Name="SNET" DataType="System.Decimal"/>
+        <Column Name="SAKT" DataType="System.Decimal"/>
+        <Column Name="SPAS" DataType="System.Decimal"/>
+        <CommandParameter Name="session_id" DataType="113" Expression="[session_id]" DefaultValue="0"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.Int32"/>
+    <Parameter Name="sFdat1" DataType="System.DateTime"/>
+    <Parameter Name="sFdat2" DataType="System.DateTime"/>
+    <Total Name="TSO1" Expression="[table.S01]" Evaluator="Data1"/>
+    <Total Name="TSO2" Expression="[table.S02]" Evaluator="Data1"/>
+    <Total Name="TS21" Expression="[table.S21]" Evaluator="Data1"/>
+    <Total Name="TS22" Expression="[table.S22]" Evaluator="Data1"/>
+    <Total Name="TS03" Expression="[table.S03]" Evaluator="Data1"/>
+    <Total Name="TS04" Expression="[table.S04]" Evaluator="Data1"/>
+    <Total Name="TS05" Expression="[table.S05]" Evaluator="Data1"/>
+    <Total Name="TS24" Expression="[table.S25]" Evaluator="Data1"/>
+    <Total Name="TS25" Expression="[table.S25]" Evaluator="Data1"/>
+    <Total Name="TS06" Expression="[table.S06]" Evaluator="Data1"/>
+    <Total Name="TS07" Expression="[table.S07]" Evaluator="Data1"/>
+    <Total Name="TS08" Expression="[table.S08]" Evaluator="Data1"/>
+    <Total Name="TS09" Expression="[table.S09]" Evaluator="Data1"/>
+    <Total Name="TS10" Expression="[table.S10]" Evaluator="Data1"/>
+    <Total Name="TS11" Expression="[table.S11]" Evaluator="Data1"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="730" PaperHeight="400" FirstPageSource="15" OtherPagesSource="15">
+    <DataBand Name="Data1" Top="111.79" Width="2683.8" Height="18.9" CanShrink="true" DataSource="Table">
+      <TableObject Name="Table1" Width="2666.79" Height="18.9" GrowToBottom="true">
+        <TableColumn Name="Column31" Width="68.04"/>
+        <TableColumn Name="Column32" Width="47.25"/>
+        <TableColumn Name="Column33" Width="132.3"/>
+        <TableColumn Name="Column34" Width="37.8"/>
+        <TableColumn Name="Column35" Width="132.3"/>
+        <TableColumn Name="Column36" Width="37.8"/>
+        <TableColumn Name="Column37" Width="132.3"/>
+        <TableColumn Name="Column38" Width="37.8"/>
+        <TableColumn Name="Column39" Width="132.3"/>
+        <TableColumn Name="Column40" Width="37.8"/>
+        <TableColumn Name="Column41" Width="132.3"/>
+        <TableColumn Name="Column42" Width="37.8"/>
+        <TableColumn Name="Column43" Width="132.3"/>
+        <TableColumn Name="Column44" Width="37.8"/>
+        <TableColumn Name="Column45" Width="132.3"/>
+        <TableColumn Name="Column46" Width="37.8"/>
+        <TableColumn Name="Column47" Width="132.3"/>
+        <TableColumn Name="Column48" Width="37.8"/>
+        <TableColumn Name="Column49" Width="132.3"/>
+        <TableColumn Name="Column50" Width="37.8"/>
+        <TableColumn Name="Column51" Width="132.3"/>
+        <TableColumn Name="Column52" Width="37.8"/>
+        <TableColumn Name="Column53" Width="132.3"/>
+        <TableColumn Name="Column54" Width="37.8"/>
+        <TableColumn Name="Column55" Width="132.3"/>
+        <TableColumn Name="Column56" Width="37.8"/>
+        <TableColumn Name="Column57" Width="132.3"/>
+        <TableColumn Name="Column58" Width="37.8"/>
+        <TableColumn Name="Column62" Width="132.3"/>
+        <TableColumn Name="Column64" Width="37.8"/>
+        <TableColumn Name="Column59" Width="132.3"/>
+        <TableColumn Name="Column60" Width="37.8"/>
+        <TableRow Name="Row2" AutoSize="true">
+          <TableCell Name="Cell63" Border.Lines="All" Border.Style="Dash" Text="[table.SROK]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+            <Highlight>
+              <Condition Expression="[table.SROK] == &quot;*Срд.зваж.&quot;" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              <Condition Expression="[table.SROK]==&quot;*Всього:&quot;" Fill.Color="DarkGray" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell64" Border.Lines="All" Border.Style="Dash" Text="[table.KV]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+            <Highlight>
+              <Condition Expression="[table.SROK] == &quot;*Срд.зваж.&quot;" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              <Condition Expression="[table.SROK]==&quot;*Всього:&quot;" Fill.Color="DarkGray" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell65" Border.Lines="All" Border.Style="Dash" Text="[table.S01]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[table.SROK] == &quot;*Срд.зваж.&quot;" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              <Condition Expression="[table.SROK]==&quot;*Всього:&quot;" Fill.Color="DarkGray" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell66" Border.Lines="All" Border.Style="Dash" Text="[table.P01]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[table.SROK] == &quot;*Срд.зваж.&quot;" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              <Condition Expression="[table.SROK]==&quot;*Всього:&quot;" Fill.Color="DarkGray" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell67" Border.Lines="All" Border.Style="Dash" Text="[table.S02]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[table.SROK] == &quot;*Срд.зваж.&quot;" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              <Condition Expression="[table.SROK]==&quot;*Всього:&quot;" Fill.Color="DarkGray" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell68" Border.Lines="All" Border.Style="Dash" Text="[table.P02]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[table.SROK] == &quot;*Срд.зваж.&quot;" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              <Condition Expression="[table.SROK]==&quot;*Всього:&quot;" Fill.Color="DarkGray" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell69" Border.Lines="All" Border.Style="Dash" Text="[table.S21]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[table.SROK] == &quot;*Срд.зваж.&quot;" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              <Condition Expression="[table.SROK]==&quot;*Всього:&quot;" Fill.Color="DarkGray" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell70" Border.Lines="All" Border.Style="Dash" Text="[table.P21]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[table.SROK] == &quot;*Срд.зваж.&quot;" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              <Condition Expression="[table.SROK]==&quot;*Всього:&quot;" Fill.Color="DarkGray" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell71" Border.Lines="All" Border.Style="Dash" Text="[table.S22]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[table.SROK] == &quot;*Срд.зваж.&quot;" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              <Condition Expression="[table.SROK]==&quot;*Всього:&quot;" Fill.Color="DarkGray" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell72" Border.Lines="All" Border.Style="Dash" Text="[table.P22]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[table.SROK] == &quot;*Срд.зваж.&quot;" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              <Condition Expression="[table.SROK]==&quot;*Всього:&quot;" Fill.Color="DarkGray" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell73" Border.Lines="All" Border.Style="Dash" Text="[table.S03]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[table.SROK] == &quot;*Срд.зваж.&quot;" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              <Condition Expression="[table.SROK]==&quot;*Всього:&quot;" Fill.Color="DarkGray" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell74" Border.Lines="All" Border.Style="Dash" Text="[table.P03]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[table.SROK] == &quot;*Срд.зваж.&quot;" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              <Condition Expression="[table.SROK]==&quot;*Всього:&quot;" Fill.Color="DarkGray" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell75" Border.Lines="All" Border.Style="Dash" Text="[table.S04]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[table.SROK] == &quot;*Срд.зваж.&quot;" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              <Condition Expression="[table.SROK]==&quot;*Всього:&quot;" Fill.Color="DarkGray" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell76" Border.Lines="All" Border.Style="Dash" Text="[table.P05]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[table.SROK] == &quot;*Срд.зваж.&quot;" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              <Condition Expression="[table.SROK]==&quot;*Всього:&quot;" Fill.Color="DarkGray" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell77" Border.Lines="All" Border.Style="Dash" Text="[table.S05]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[table.SROK] == &quot;*Срд.зваж.&quot;" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              <Condition Expression="[table.SROK]==&quot;*Всього:&quot;" Fill.Color="DarkGray" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell78" Border.Lines="All" Border.Style="Dash" Text="[table.P05]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[table.SROK] == &quot;*Срд.зваж.&quot;" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              <Condition Expression="[table.SROK]==&quot;*Всього:&quot;" Fill.Color="DarkGray" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell79" Border.Lines="All" Border.Style="Dash" Text="[table.S24]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[table.SROK] == &quot;*Срд.зваж.&quot;" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              <Condition Expression="[table.SROK]==&quot;*Всього:&quot;" Fill.Color="DarkGray" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell80" Border.Lines="All" Border.Style="Dash" Text="[table.P24]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[table.SROK] == &quot;*Срд.зваж.&quot;" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              <Condition Expression="[table.SROK]==&quot;*Всього:&quot;" Fill.Color="DarkGray" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell81" Border.Lines="All" Border.Style="Dash" Text="[table.S25]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[table.SROK] == &quot;*Срд.зваж.&quot;" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              <Condition Expression="[table.SROK]==&quot;*Всього:&quot;" Fill.Color="DarkGray" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell82" Border.Lines="All" Border.Style="Dash" Text="[table.P25]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[table.SROK] == &quot;*Срд.зваж.&quot;" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              <Condition Expression="[table.SROK]==&quot;*Всього:&quot;" Fill.Color="DarkGray" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell83" Border.Lines="All" Border.Style="Dash" Text="[table.S06]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[table.SROK] == &quot;*Срд.зваж.&quot;" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              <Condition Expression="[table.SROK]==&quot;*Всього:&quot;" Fill.Color="DarkGray" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell84" Border.Lines="All" Border.Style="Dash" Text="[table.P06]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[table.SROK] == &quot;*Срд.зваж.&quot;" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              <Condition Expression="[table.SROK]==&quot;*Всього:&quot;" Fill.Color="DarkGray" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell85" Border.Lines="All" Border.Style="Dash" Text="[table.S07]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[table.SROK] == &quot;*Срд.зваж.&quot;" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              <Condition Expression="[table.SROK]==&quot;*Всього:&quot;" Fill.Color="DarkGray" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell86" Border.Lines="All" Border.Style="Dash" Text="[table.P07]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[table.SROK] == &quot;*Срд.зваж.&quot;" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              <Condition Expression="[table.SROK]==&quot;*Всього:&quot;" Fill.Color="DarkGray" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell87" Border.Lines="All" Border.Style="Dash" Text="[table.S08]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[table.SROK] == &quot;*Срд.зваж.&quot;" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              <Condition Expression="[table.SROK]==&quot;*Всього:&quot;" Fill.Color="DarkGray" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell88" Border.Lines="All" Border.Style="Dash" Text="[table.P08]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[table.SROK] == &quot;*Срд.зваж.&quot;" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              <Condition Expression="[table.SROK]==&quot;*Всього:&quot;" Fill.Color="DarkGray" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell89" Border.Lines="All" Border.Style="Dash" Text="[table.S09]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[table.SROK] == &quot;*Срд.зваж.&quot;" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              <Condition Expression="[table.SROK]==&quot;*Всього:&quot;" Fill.Color="DarkGray" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell90" Border.Lines="All" Border.Style="Dash" Text="[table.P09]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[table.SROK] == &quot;*Срд.зваж.&quot;" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              <Condition Expression="[table.SROK]==&quot;*Всього:&quot;" Fill.Color="DarkGray" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell94" Border.Lines="All" Border.Style="Dash" Text="[table.S10]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[table.SROK] == &quot;*Срд.зваж.&quot;" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              <Condition Expression="[table.SROK]==&quot;*Всього:&quot;" Fill.Color="DarkGray" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell96" Border.Lines="All" Border.Style="Dash" Text="[table.P10]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[table.SROK] == &quot;*Срд.зваж.&quot;" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              <Condition Expression="[table.SROK]==&quot;*Всього:&quot;" Fill.Color="DarkGray" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell91" Border.Lines="All" Border.Style="Dash" Text="[table.S11]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[table.SROK] == &quot;*Срд.зваж.&quot;" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              <Condition Expression="[table.SROK]==&quot;*Всього:&quot;" Fill.Color="DarkGray" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell92" Border.Lines="All" Border.Style="Dash" Text="[table.P11]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[table.SROK] == &quot;*Срд.зваж.&quot;" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              <Condition Expression="[table.SROK]==&quot;*Всього:&quot;" Fill.Color="DarkGray" TextFill.Color="Black" Font="Times New Roman, 8.25pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+        </TableRow>
+      </TableObject>
+      <DataHeaderBand Name="DataHeader1" Width="2683.8" Height="103.95">
+        <TableObject Name="Table1" Width="2666.79" Height="103.95">
+          <TableColumn Name="Column1" Width="68.04"/>
+          <TableColumn Name="Column2" Width="47.25"/>
+          <TableColumn Name="Column3" Width="132.3"/>
+          <TableColumn Name="Column4" Width="37.8"/>
+          <TableColumn Name="Column5" Width="132.3"/>
+          <TableColumn Name="Column6" Width="37.8"/>
+          <TableColumn Name="Column7" Width="132.3"/>
+          <TableColumn Name="Column8" Width="37.8"/>
+          <TableColumn Name="Column12" Width="132.3"/>
+          <TableColumn Name="Column11" Width="37.8"/>
+          <TableColumn Name="Column15" Width="132.3"/>
+          <TableColumn Name="Column14" Width="37.8"/>
+          <TableColumn Name="Column13" Width="132.3"/>
+          <TableColumn Name="Column10" Width="37.8"/>
+          <TableColumn Name="Column9" Width="132.3"/>
+          <TableColumn Name="Column16" Width="37.8"/>
+          <TableColumn Name="Column24" Width="132.3"/>
+          <TableColumn Name="Column23" Width="37.8"/>
+          <TableColumn Name="Column22" Width="132.3"/>
+          <TableColumn Name="Column17" Width="37.8"/>
+          <TableColumn Name="Column21" Width="132.3"/>
+          <TableColumn Name="Column20" Width="37.8"/>
+          <TableColumn Name="Column19" Width="132.3"/>
+          <TableColumn Name="Column18" Width="37.8"/>
+          <TableColumn Name="Column28" Width="132.3"/>
+          <TableColumn Name="Column27" Width="37.8"/>
+          <TableColumn Name="Column26" Width="132.3"/>
+          <TableColumn Name="Column25" Width="37.8"/>
+          <TableColumn Name="Column61" Width="132.3"/>
+          <TableColumn Name="Column63" Width="37.8"/>
+          <TableColumn Name="Column29" Width="132.3"/>
+          <TableColumn Name="Column30" Width="37.8"/>
+          <TableRow Name="Row3" Height="56.7">
+            <TableCell Name="Cell97" Text="ДИНАМІКА ОСНОВНИХ ПОКАЗНИКІВ ЛІКВІДНОСТІ &#13;&#10;за період з [sFdat1] р. по [sFdat2] р." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 11pt, style=Bold" ColSpan="32">
+              <Formats>
+                <DateFormat/>
+                <DateFormat/>
+              </Formats>
+            </TableCell>
+            <TableCell Name="Cell98"/>
+            <TableCell Name="Cell99"/>
+            <TableCell Name="Cell100"/>
+            <TableCell Name="Cell101"/>
+            <TableCell Name="Cell102"/>
+            <TableCell Name="Cell103"/>
+            <TableCell Name="Cell104"/>
+            <TableCell Name="Cell105"/>
+            <TableCell Name="Cell106"/>
+            <TableCell Name="Cell107"/>
+            <TableCell Name="Cell108"/>
+            <TableCell Name="Cell109"/>
+            <TableCell Name="Cell110"/>
+            <TableCell Name="Cell111"/>
+            <TableCell Name="Cell112"/>
+            <TableCell Name="Cell113"/>
+            <TableCell Name="Cell114"/>
+            <TableCell Name="Cell115"/>
+            <TableCell Name="Cell116"/>
+            <TableCell Name="Cell117"/>
+            <TableCell Name="Cell118"/>
+            <TableCell Name="Cell119"/>
+            <TableCell Name="Cell120"/>
+            <TableCell Name="Cell121"/>
+            <TableCell Name="Cell122"/>
+            <TableCell Name="Cell123"/>
+            <TableCell Name="Cell124"/>
+            <TableCell Name="Cell125"/>
+            <TableCell Name="Cell126"/>
+            <TableCell Name="Cell127"/>
+            <TableCell Name="Cell128"/>
+          </TableRow>
+          <TableRow Name="Row1" Height="47.25">
+            <TableCell Name="Cell1" Border.Lines="All" Text="Дата" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+            <TableCell Name="Cell2" Border.Lines="All" Text="Вал" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+            <TableCell Name="Cell3" Border.Lines="All" Text="+Залучено МБК овернайт" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+            <TableCell Name="Cell4" Border.Lines="All" Text="ср.%&#13;&#10;01-Б" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+            <TableCell Name="Cell5" Border.Lines="All" Text="+ Залучено MBK строкові сума 02-А" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+            <TableCell Name="Cell26" Border.Lines="All" Text="ср.% &#13;&#10;02-Б" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+            <TableCell Name="Cell31" Border.Lines="All" Text="+ Залучено DSW овернайт сума 03-А" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+            <TableCell Name="Cell36" Border.Lines="All" Text="ср.% &#13;&#10;03-Б" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+            <TableCell Name="Cell44" Border.Lines="All" Text="+ Залучено DSW строкові сума 04-А" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+            <TableCell Name="Cell43" Border.Lines="All" Text="ср.% 04-Б" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+            <TableCell Name="Cell47" Border.Lines="All" Text="+ Залучено MBK+DSW &#13;&#10;ВСЬОГО сума 05-А" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt, style=Bold"/>
+            <TableCell Name="Cell46" Border.Lines="All" Text="ср.% 05-Б" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+            <TableCell Name="Cell45" Border.Lines="All" Text="- Розмiщено MBK овернайт сума 06-А" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+            <TableCell Name="Cell42" Border.Lines="All" Text="ср.% &#13;&#10;06-Б" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+            <TableCell Name="Cell41" Border.Lines="All" Text="- Розмiщено MBK строкові сума 07-А" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+            <TableCell Name="Cell48" Border.Lines="All" Text="ср.% &#13;&#10;07-Б" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+            <TableCell Name="Cell56" Border.Lines="All" Text="- Розмiщено DSW овернайт сума 08-А" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+            <TableCell Name="Cell55" Border.Lines="All" Text="ср.% &#13;&#10;08-Б" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+            <TableCell Name="Cell54" Border.Lines="All" Text="- Розмiщено DSW строкові сума 09-А" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+            <TableCell Name="Cell49" Border.Lines="All" Text="ср.% &#13;&#10;09-Б" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+            <TableCell Name="Cell53" Border.Lines="All" Text="- Розмiщено MBK+DSW ВСЬОГО сума 10-А" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt, style=Bold"/>
+            <TableCell Name="Cell52" Border.Lines="All" Text="ср.% &#13;&#10;10-Б" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+            <TableCell Name="Cell51" Border.Lines="All" Text="- Розм.РЕПО з/без перех сума 11-А" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+            <TableCell Name="Cell50" Border.Lines="All" Text="ср.% &#13;&#10;11-Б" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+            <TableCell Name="Cell60" Border.Lines="All" Text="- Розмiщено НБУ ДЕП.C сума 12-А" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+            <TableCell Name="Cell59" Border.Lines="All" Text="ср.% &#13;&#10;12-Б" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+            <TableCell Name="Cell58" Border.Lines="All" Text="- Розмiщено НБУ РЕПО сума 13-А" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+            <TableCell Name="Cell57" Border.Lines="All" Text="ср.% 13-Б" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+            <TableCell Name="Cell93" Border.Lines="All" Text="+ Залучено НБУ &#13;&#10;овернайт сума 14-А" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+            <TableCell Name="Cell95" Border.Lines="All" Text="ср.%&#13;&#10;14-Б" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+            <TableCell Name="Cell61" Border.Lines="All" Text="+ Залучено НБУ РЕПО сума 15-А" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+            <TableCell Name="Cell62" Border.Lines="All" Text="ср.% 15-А" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+          </TableRow>
+        </TableObject>
+      </DataHeaderBand>
+    </DataBand>
+  </ReportPage>
+</Report>

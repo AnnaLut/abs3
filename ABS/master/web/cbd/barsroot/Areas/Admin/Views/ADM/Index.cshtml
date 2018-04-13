@@ -1,0 +1,922 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Конструктор АРМів";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<div id="ADMToolBar"></div>
+
+<div id="AddWindow">
+    <form id="editForm">
+        <table>
+            <tr>
+                <th>Код</th>
+                <th>Назва</th>
+            </tr>
+            <tr>   
+                <td><input type="text" class="k-textbox" id="ARMCode" name="ARMCode" required data-required-msg="Код АРМу обов'язковий." /></td>
+                <td><input type="text" class="k-textbox" id="ARMName" name="ARMName" required data-required-msg="Назва АРМу обов'язкова." /></td>
+            </tr>
+            <tr>
+                <th colspan="2">Код фронтального інтерфейсу</th>
+            </tr>
+            <tr>  
+                <td><input id="ARMFrontIntCode" type="text" class="k-textbox" name="ARMFrontIntCode" disabled/></td>
+                <td><input id="dropdownlist"></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <div id="btnBlock">
+                        <button id="btnSave" type="submit" class="k-button btnSave">Зберегти</button>
+                        <button id="btnCancel" type="button" class="k-button btnCancel">Відмінити</button>
+                    </div>
+                </td>
+            </tr>
+        </table>    
+    </form>
+</div>
+
+<div id="ADMGrid"></div><br />
+
+<div id="tabstrip">
+    <ul>
+        <li>Функції</li>
+        <li>Довідники</li>
+        <li>Друковані звіти</li>
+    </ul>
+    <div id="funcTab">
+                     <div id="panels">
+                         <div id="grid1"></div>
+                         <div id="commands">
+                             <div><a href="#" id="copySelectedToGrid1" class="k-button">&lt;</a></div>
+                             <div><a href="#" id="copySelectedToGrid2" class="k-button">&gt;</a></div>
+                         </div>
+                         <div id="grid2"></div>
+                     </div>
+    </div>
+    <div id="RefTab">
+                    <div id="panels">
+                        <div id="grid3"></div>
+                        <div id="commands">
+                            <div><a href="#" id="copySelectedToGrid3" class="k-button">&lt;</a></div>
+                            <div><a href="#" id="copySelectedToGrid4" class="k-button">&gt;</a></div>
+                        </div>
+                        <div id="grid4"></div>
+                    </div>
+    </div>
+    <div id="RepTab">
+                    <div id="panels">
+                        <div id="grid5"></div>
+                        <div id="commands">
+                            <div><a href="#" id="copySelectedToGrid5" class="k-button">&lt;</a></div>
+                            <div><a href="#" id="copySelectedToGrid6" class="k-button">&gt;</a></div>
+                        </div>
+                        <div id="grid6"></div>
+                    </div>
+    </div>
+</div>
+
+<script>
+    var admGrid = null;
+
+    var grid1 = null;
+    var grid2 = null;
+    var grid3 = null;
+    var grid4 = null;
+    var grid5 = null;
+    var grid6 = null;
+
+    function getADMGrid() {
+        if (admGrid == null) {
+            admGrid = $('#ADMGrid').data('kendoGrid');
+        }
+        return admGrid;
+    }
+
+    function setGrid1_data() {
+        if (grid1 == null) {
+            grid1 = $('#grid1').data('kendoGrid');
+        }
+        return grid1;
+    }
+    function setGrid2_data() {
+        if (grid2 == null) {
+            grid2 = $('#grid2').data('kendoGrid');
+        }
+        return grid2;
+    }
+
+    function setGrid3_data() {
+        if (grid3 == null) {
+            grid3 = $('#grid3').data('kendoGrid');
+        }
+        return grid3;
+    }
+    function setGrid4_data() {
+        if (grid4 == null) {
+            grid4 = $('#grid4').data('kendoGrid');
+        }
+        return grid4;
+    }
+
+    function setGrid5_data() {
+        if (grid5 == null) {
+            grid5 = $('#grid5').data('kendoGrid');
+        }
+        return grid5;
+    }
+    function setGrid6_data() {
+        if (grid6 == null) {
+            grid6 = $('#grid6').data('kendoGrid');
+        }
+        return grid6;
+    }
+
+    function refreshTabOper() {
+        $('#grid1').data('kendoGrid').dataSource.read();
+        $('#grid1').data('kendoGrid').refresh();
+        $('#grid2').data('kendoGrid').dataSource.read();
+        $('#grid2').data('kendoGrid').refresh();
+    }
+    function refreshTabRef() {
+        $('#grid3').data('kendoGrid').dataSource.read();
+        $('#grid3').data('kendoGrid').refresh();
+        $('#grid4').data('kendoGrid').dataSource.read();
+        $('#grid4').data('kendoGrid').refresh();
+    }
+    function refreshTabRep() {
+        $('#grid5').data('kendoGrid').dataSource.read();
+        $('#grid5').data('kendoGrid').refresh();
+        $('#grid6').data('kendoGrid').dataSource.read();
+        $('#grid6').data('kendoGrid').refresh();
+    }
+
+    function setAppContext() {
+        var gridADM = getADMGrid();
+        var currentRow = gridADM.dataItem(gridADM.select());
+        var codeApp = { codeApp: currentRow.CODEAPP };
+
+        if (currentRow != null) {
+            $.get('@Url.Action("SetCurrentApp")', codeApp);
+            refreshTabOper();
+            refreshTabRef();
+            refreshTabRep();
+        }
+    }
+
+    $("#copySelectedToGrid1").on("click", function () {
+        var gridOper = setGrid2_data();
+        var operRow = gridOper.dataItem(gridOper.select());
+        if (operRow != null) {
+            addResource();
+        }
+        else {
+            bars.ui.alert({ text: 'Не обрано ресурс для виконання операції!' });
+        }
+    });
+    $("#copySelectedToGrid3").on("click", function () {
+        var gridRef = setGrid4_data();
+        var refRow = gridRef.dataItem(gridRef.select());
+        if (refRow != null) {
+            addResource();
+        }
+        else {
+            bars.ui.alert({ text: 'Не обрано ресурс для виконання операції!' }); 
+        }
+    });
+    $("#copySelectedToGrid5").on("click", function () {
+        var gridRep = setGrid6_data();
+        var repRow = gridRep.dataItem(gridRep.select());
+        if (repRow != null) {
+            addResource();
+        }
+        else {
+            bars.ui.alert({ text: 'Не обрано ресурс для виконання операції!' });
+        }
+    });
+
+    $("#copySelectedToGrid2").on("click", function () {
+        var gridOper = setGrid1_data();
+        var operRow = gridOper.dataItem(gridOper.select());
+        if (operRow != null) {
+            removeResource();
+        }
+        else {
+            bars.ui.alert({ text: 'Не обрано ресурс для виконання операції!' });
+        } 
+    });
+    $("#copySelectedToGrid4").on("click", function () {
+        var gridRef = setGrid3_data();
+        var refRow = gridRef.dataItem(gridRef.select());
+        if (refRow != null) {
+            removeResource();
+        }
+        else {
+            bars.ui.alert({ text: 'Не обрано ресурс для виконання операції!' }); 
+        }
+    });
+    $("#copySelectedToGrid6").on("click", function () {
+        var gridRep = setGrid5_data();
+        var repRow = gridRep.dataItem(gridRep.select());
+        if (repRow != null) {
+            removeResource();
+        }
+        else {
+            bars.ui.alert({ text: 'Не обрано ресурс для виконання операції!' });
+        }
+    });
+
+    function addResource() {
+        var gridADM = getADMGrid();
+        var admRow = gridADM.dataItem(gridADM.select());
+        var tabID = $("#tabstrip").data("kendoTabStrip").select().index();
+
+        var gridOper = setGrid2_data();
+        var operRow = gridOper.dataItem(gridOper.select());
+
+        var gridRef = setGrid4_data();
+        var refRow = gridRef.dataItem(gridRef.select());
+
+        var gridRep = setGrid6_data();
+        var repRow = gridRep.dataItem(gridRep.select());
+
+        var rowID;
+        switch (tabID) {
+            case 0:
+                rowID = { admId: admRow.CODEAPP, resVal: operRow.CODEOPER, tabId: tabID };
+                break;
+            case 1:
+                rowID = { admId: admRow.CODEAPP, resVal: refRow.TABID, tabId: tabID };
+                break;
+            case 2:
+                rowID = { admId: admRow.CODEAPP, resVal: repRow.CODEREP, tabId: tabID };
+                break;
+        }
+        if (tabID != null && admRow != null && (operRow != null || refRow != null || repRow != null)) {
+            $.get('@Url.Action("AddResourceToADM")', rowID).done(function () {
+                if (tabID == 0) {
+                    refreshTabOper();
+                } else if (tabID == 1) {
+                    refreshTabRef();
+                } else if (tabID == 2) {
+                    refreshTabRep();
+                }
+            });
+        }
+    }
+    function removeResource() {
+        var gridADM = getADMGrid();
+        var admRow = gridADM.dataItem(gridADM.select());
+        var tabID = $("#tabstrip").data("kendoTabStrip").select().index();
+
+        var gridOper = setGrid1_data();
+        var operRow = gridOper.dataItem(gridOper.select());
+
+        var gridRef = setGrid3_data();
+        var refRow = gridRef.dataItem(gridRef.select());
+
+        var gridRep = setGrid5_data();
+        var repRow = gridRep.dataItem(gridRep.select());
+
+        var rowID;
+        switch (tabID) {
+            case 0:
+                rowID = { admId: admRow.CODEAPP, resVal: operRow.CODEOPER, tabId: tabID };
+                break;
+            case 1:
+                rowID = { admId: admRow.CODEAPP, resVal: refRow.TABID, tabId: tabID };
+                break;
+            case 2:
+                rowID = { admId: admRow.CODEAPP, resVal: repRow.CODEREP, tabId: tabID };
+                break;
+        }
+        if (tabID != null && admRow != null && (operRow != null || refRow != null || repRow != null)) {
+            $.get('@Url.Action("RemoveResourceFromADM")', rowID).done(function () {
+                if (tabID == 0) {
+                    refreshTabOper();
+                } else if (tabID == 1) {
+                    refreshTabRef();
+                } else if (tabID == 2) {
+                    refreshTabRep();
+                }
+            });
+        }
+    }
+
+    $("#grid1").on("dblclick", "tbody > tr", removeResource);
+    $("#grid3").on("dblclick", "tbody > tr", removeResource);
+    $("#grid5").on("dblclick", "tbody > tr", removeResource);
+
+    $("#grid2").on("dblclick", "tbody > tr", addResource);
+    $("#grid4").on("dblclick", "tbody > tr", addResource);
+    $("#grid6").on("dblclick", "tbody > tr", addResource);
+
+    function setOperRowBackColor() {
+        var gridOper = setGrid1_data();
+        var operRow = gridOper.dataItem(gridOper.select());
+
+        gridOper.tbody.find('>tr').each(function () {
+            var dataItem = gridOper.dataItem(this);
+            if (dataItem.REVOKED == 1 && dataItem.REVOKED != operRow) {
+                $(this).addClass('k-row-isRevoked');
+            }
+            if (dataItem.APPROVED == 0 && dataItem.APPROVED != operRow) {
+                $(this).addClass('k-row-isApproved');
+            }
+            if (dataItem.DISABLED == 1 && dataItem.DISABLED != operRow) {
+                $(this).addClass('k-row-isDisabled');
+            }
+        });
+    }
+    function setRefRowBackColor() {
+        var gridRef = setGrid3_data();
+        var refRow = gridRef.dataItem(gridRef.select());
+
+        gridRef.tbody.find('>tr').each(function () {
+            var dataItem = gridRef.dataItem(this);
+            if (dataItem.REVOKED == 1 && dataItem.REVOKED != refRow) {
+                $(this).addClass('k-row-isRevoked');
+            }
+            if (dataItem.APPROVED == 0 && dataItem.APPROVED != refRow) {
+                $(this).addClass('k-row-isApproved');
+            }
+            if (dataItem.DISABLED == 1 && dataItem.DISABLED != refRow) {
+                $(this).addClass('k-row-isDisabled');
+            }
+        });
+    }
+    function setRepRowBackColor() {
+        var gridRep = setGrid5_data();
+        var repRow = gridRep.dataItem(gridRep.select());
+
+        gridRep.tbody.find('>tr').each(function () {
+            var dataItem = gridRep.dataItem(this);
+            if (dataItem.REVOKED == 1 && dataItem.REVOKED != repRow) {
+                $(this).addClass('k-row-isRevoked');
+            }
+            if (dataItem.APPROVED == 0 && dataItem.APPROVED != repRow) {
+                $(this).addClass('k-row-isApproved');
+            }
+            if (dataItem.DISABLED == 1 && dataItem.DISABLED != repRow) {
+                $(this).addClass('k-row-isDisabled');
+            }
+        });
+    }
+
+    var tabstrip = $("#tabstrip").kendoTabStrip().data("kendoTabStrip");
+    tabstrip.select(0);
+
+    function setDefaultSelectedRow() {
+        var grid = $("#ADMGrid").data("kendoGrid");
+        if (grid != null) {
+            grid.select("tr:eq(1)");
+        }
+    }
+    // ---------------------- TooBar Btns and funcs ------------------------------------------------------------------
+    $('#ADMToolBar').kendoToolBar({
+        items:
+        [
+            {
+                template: "<button id='AddADM' type='button' class='k-button' onclick='openCreateADMForm()' title='Додати АРМ'><i class='pf-icon pf-16 pf-table_row-add2'></i></button>"
+            },
+            {
+                template: "<button id='EditADM' type='button' class='k-button' onclick='openEditADMForm()' title='Редагувати АРМ'><i class='pf-icon pf-16 pf-tool_pencil'></i></button>"
+            },
+            {
+                template: "<button id='RemoveADM' type='button' class='k-button' onclick='removeADM()' title='Видалити АРМ'><i class='pf-icon pf-16 pf-table_row-delete2'></i></button>"
+            },
+            {
+                template: "<button id='RefreshADMGrid' type='button' class='k-button' onclick='refreshADMGrid()' title='Оновити дані таблиці АРМів'><i class='pf-icon pf-16 pf-reload_rotate'></i></button>"
+            }
+        ]
+    });
+    $('#AddADM').kendoButton();
+    $('#EditADM').kendoButton();
+    $('#RemoveADM').kendoButton();
+    $('#RefreshADMGrid').kendoButton();
+
+    var funcType = "none";
+
+    function openCreateADMForm() {
+        funcType = "add";
+        var win = $("#AddWindow").data("kendoWindow");
+        $('#ARMCode').val('');
+        $('#ARMName').val('');
+        win.center();
+        win.open();
+    }
+    function openEditADMForm() {
+        funcType = "edit";
+        var win = $("#AddWindow").data("kendoWindow");
+        var gridADM = getADMGrid();
+        var currentRowDrop = gridADM.dataItem(gridADM.select());
+        var appCode = $('#ARMCode').val(currentRowDrop.CODEAPP);
+        var appName = $('#ARMName').val(currentRowDrop.NAME);
+        var frontID = $('#dropdownlist').val(currentRowDrop.FRONTEND);
+        win.center();
+        win.open();
+    }
+    function closeADMForm() {
+        var win = $("#AddWindow").data("kendoWindow");
+        win.close();
+    }
+
+    function addADM() {
+        var appCode = $('#ARMCode').val();
+        var appName = $('#ARMName').val();
+        
+        var frontID = $("#dropdownlist").val();
+
+        $.get('@Url.Action("CreateADM")', { appCode: appCode, appName: appName, frontID: frontID }).done(function (result) {
+            if (result.data == 1) {
+                bars.ui.alert({ text: 'АРМ "' + appName + '" успішно додано!' });
+
+            } else {
+                bars.ui.error({ text: 'АРМ "' + appCode + '" не можливо додати!' });
+            }
+        });
+        $("#AddWindow").data("kendoWindow").close();
+        refreshADMGrid();
+    }
+    function editADM() {
+        var appCode = $('#ARMCode').val();
+        var appName = $('#ARMName').val();
+        var frontID = $("#dropdownlist").val();
+        $.get('@Url.Action("EditADM")', { appCode: appCode, appName: appName, frontID: frontID }).done(function (result) {
+            if (result.data == 1) {
+                bars.ui.alert({ text: 'АРМ "' + appName + '" успішно змінено!' });
+            } else {
+                bars.ui.error({ text: 'До АРМу "' + appCode + '" не можливо додати зміни!' });
+            }
+        });
+        $("#AddWindow").data("kendoWindow").close();
+        refreshADMGrid();
+    }
+
+    function inOrderToFuncType() {
+        if (funcType == "add") {
+            addADM();
+        } else {
+            editADM();
+        }
+    }
+    $('#editForm').on('submit', inOrderToFuncType);
+    
+    $('#EditADM').click(function () {
+        $('#ARMCode').attr('disabled', 'disabled'); 
+        $('#ARMCode').removeAttr('required');
+    });
+    $('#AddADM').click(function () {
+        $('#ARMCode').removeAttr('disabled');
+        $('#ARMCode').attr('required', 'required');
+    });
+
+    $('#btnCancel').on('click', closeADMForm);
+
+    function removeADM() {
+        var gridADM = getADMGrid();
+        var currentRowDrop = gridADM.dataItem(gridADM.select());
+        $.get('@Url.Action("DropADM")', { appCode: currentRowDrop.CODEAPP }).done(function (result) {
+            if (result.data == 1) {
+                bars.ui.alert({ text: 'АРМ ' + currentRowDrop.NAME + ' успішно видалено!' });
+                refreshADMGrid();
+            }
+            else {
+                bars.ui.error({ text: 'Виникла помилка при видаленні АРМу : ' + currentRowDrop.NAME });
+                refreshADMGrid();
+            } 
+        });
+    }
+
+    function refreshADMGrid() {
+        $('#ADMGrid').data('kendoGrid').dataSource.read();
+        $('#ADMGrid').data('kendoGrid').refresh();
+    }
+
+    $('#AddWindow').kendoWindow({
+        title: "Налаштування АРМу",
+        visible: false,
+        width: "365px",
+        resizable: false,
+        actions: ["Close"]
+        /*deactivate: function () {
+            this.destroy();
+        }*/
+    });
+
+    $("#dropdownlist").kendoDropDownList({
+        dataTextField: "text",
+        dataValueField: "value",
+        dataSource: [
+          { text: "Centura Desktop", value: "0" },
+          { text: "Web Browser", value: "1" },
+          { text: "Mobile Device", value: "2" }
+        ]
+    });
+    $('#dropdownlist').change(function () {
+        var listVal = $('#dropdownlist').val();
+        $('#ARMFrontIntCode').val(listVal);
+    }).change();
+
+    // ---------------------- Validator -------------------------------------------------------------------
+
+    var validator = $('#AddWindow').kendoValidator().data("kendoValidator");
+    validator.validate();
+
+    $("#ARMCode").siblings("span.k-tooltip-validation").hide();
+    $("#ARMName").siblings("span.k-tooltip-validation").hide();
+
+    // ------------------------- Grids ---------------------------------------------------------------------
+    $('#ADMGrid').kendoGrid({
+        autobind: true,
+        selectable: "row",
+        sortable: true,
+        pageable: {
+            refresh: true,
+            buttonCount: 5
+        },
+        columns: [
+            {
+                field: "NAME",
+                title: "Назва",
+                width: "40%"
+            },
+            {
+                field: "CODEAPP",
+                title: "Код",
+                width: "20%"
+            },
+            {
+                field: "FRONTEND",
+                title: "Фронтальний інтерфейс",
+                width: "40%",
+                template: "<div>#= FRONTEND == 0 ? 'Centura Desktop' : FRONTEND == 1 ? 'Web Browser' : 'Mobile Device' #</div>"
+            }
+        ],
+        dataSource: {
+            type: "aspnetmvc-ajax",
+            pageSize: 10,
+            transport: {
+                read: {
+                    dataType: 'json',
+                    url: bars.config.urlContent('/admin/ADM/GetADMList')
+                }
+            },
+            schema: {
+                data: "Data",
+                total: "Total"
+            }
+        },
+        change: setAppContext,
+        dataBound: setDefaultSelectedRow
+    });
+
+    // Tab 1 - Functions (OPER)
+    $("#grid1").kendoGrid({
+        height: 400,
+        selectable: "row",
+        sortable: true,
+        dataSource: {
+            type: "aspnetmvc-ajax",
+            transport: {
+                read: {
+                    dataType: 'json',
+                    url: bars.config.urlContent('/admin/ADMOper/GetADMAppOperGrid')
+                }
+            },
+            schema: {
+                data: "Data"
+            }
+        },
+        editable: "popup",
+        pageable: {
+            refresh: true
+        },
+        columns: [
+           {
+               field: "CODEOPER",
+               title: "Код функції",
+               width: "15%"
+           },
+           {
+               field: "NAME",
+               title: "Назва",
+               width: "70%"
+           }/*,
+           {
+               field: "ROLENAME",
+               title: "ROLENAME_",
+               width: "15%"
+           }*/
+        ],
+        dataBound: setOperRowBackColor
+    });
+
+    $("#grid2").kendoGrid({
+        height: 400,
+        selectable: "row",
+        sortable: true,
+        dataSource: {
+            type: "aspnetmvc-ajax",
+            transport: {
+                read: {
+                    dataType: 'json',
+                    url: bars.config.urlContent('/admin/ADMOper/GetADMAllOperGrid')
+                }
+            },
+            schema: {
+                data: "Data",
+                total: "Total"
+            }
+        },
+        editable: "popup",
+        pageable: {
+            refresh: true
+        },
+        columns: [
+           {
+               field: "CODEOPER",
+               title: "Код функції",
+               width: "15%"
+           },
+           {
+               field: "NAME",
+               title: "Назва",
+               width: "70%"
+           }/*,
+           {
+               field: "ROLENAME",
+               title: "ROLENAME_",
+               width: "15%"
+           }*/
+        ]
+    });
+
+    // Tab 2 - References (REF)
+    $("#grid3").kendoGrid({
+        height: 400,
+        selectable: "row",
+        sortable: true,
+        dataSource: {
+            type: "aspnetmvc-ajax",
+            transport: {
+                read: {
+                    dataType: 'json',
+                    url: bars.config.urlContent('/admin/ADMRef/GetADMAppRefGrid')
+                }
+            },
+            schema: {
+                data: "Data"
+            }
+        },
+        editable: "popup",
+        pageable: {
+            refresh: true
+        },
+        columns: [
+           {
+               field: "TABID",
+               title: "Код довідника",
+               width: "10%"
+           },
+           {
+               field: "NAME",
+               title: "Назва",
+               width: "50%"
+           },
+           {
+               field: "ACODE",
+               title: "RO / RW",
+               width: "10%",
+               template: "<div style='text-align:center'><input name='OTM' type='checkbox' data-bind='checked: ACODE' #= ACODE ? checked='checked' : '' #/></div>"
+           },
+           {
+               field: "REFTYPE",
+               title: "Тип довідника",
+               width: "30%"
+           }
+        ],
+        dataBound: setRefRowBackColor
+    });
+    $("#grid4").kendoGrid({
+        height: 400,
+        selectable: "row",
+        sortable: true,
+        dataSource: {
+            type: "aspnetmvc-ajax",
+            transport: {
+                read: {
+                    dataType: 'json',
+                    url: bars.config.urlContent('/admin/ADMRef/GetADMAllRefGrid')
+                }
+            },
+            schema: {
+                data: "Data",
+                total: "Total"
+            }
+        },
+        editable: "popup",
+        pageable: {
+            refresh: true
+        },
+        columns: [
+           {
+               field: "TABID",
+               title: "Код довідника",
+               width: "10%"
+           },
+           {
+               field: "NAME",
+               title: "Назва",
+               width: "55%"
+           }/*,
+           {
+               field: "ROLENAME",
+               title: "ROLENAME_",
+               width: "15%"
+           }*/,
+           {
+               field: "REFTYPE",
+               title: "REFTYPE_",
+               width: "20%"
+           }
+        ]
+    });
+
+    // Tab 3 - Reports (REP)
+    $("#grid5").kendoGrid({
+        height: 400,
+        selectable: "row",
+        sortable: true,
+        dataSource: {
+            type: "aspnetmvc-ajax",
+            transport: {
+                read: {
+                    dataType: 'json',
+                    url: bars.config.urlContent('/admin/ADMRep/GetADMAppRepGrid')
+                }
+            },
+            schema: {
+                data: "Data"
+            }
+        },
+        editable: "popup",
+        pageable: {
+            refresh: true
+        },
+        columns: [
+           {
+               field: "CODEREP",
+               title: "Код звіту",
+               width: "15%"
+           },
+           {
+               field: "NAME",
+               title: "Назва",
+               width: "70%"
+           }/*,
+           {
+               field: "ROLENAME",
+               title: "ROLENAME_",
+               width: "15%"
+           }*/
+        ],
+        dataBound: setRepRowBackColor
+    });
+    $("#grid6").kendoGrid({
+        height: 400,
+        selectable: "row",
+        sortable: true,
+        dataSource: {
+            type: "aspnetmvc-ajax",
+            transport: {
+                read: {
+                    dataType: 'json',
+                    url: bars.config.urlContent('/admin/ADMRep/GetADMAllRepGrid')
+                }
+            },
+            schema: {
+                data: "Data",
+                total: "Total"
+            }
+        },
+        editable: "popup",
+        pageable: {
+            refresh: true
+        },
+        columns: [
+           {
+               field: "CODEREP",
+               title: "Код звіту",
+               width: "15%"
+           },
+           {
+               field: "NAME",
+               title: "Назва",
+               width: "70%"
+           }/*,
+           {
+               field: "ROLENAME",
+               title: "ROLENAME_",
+               width: "15%"
+           }*/
+        ]
+    });
+</script>
+
+<style>
+    #panels {
+        display: table-row;
+    }
+
+    #grid1, #grid2 {
+        display: table-cell;
+    }
+
+    #commands {
+        text-align: center;
+        width: 50px;
+        vertical-align: middle;
+        display: table-cell;
+    }
+
+    #commands div {
+        padding: 5px;
+    }
+
+    #commands div a {
+        width: 35px;
+        text-align: center;
+    }
+    /*---------- RowBG Color -----*/
+    .k-row-isRevoked {
+        background-color: #00ccff;
+    }
+    .k-row-isApproved {
+        background-color: #ccccff;
+    }
+    .k-row-isDisabled {
+        background-color: #ff0000;
+    }
+    /*---------- defaultSelectedRowColor ----*/
+    .k-grid table tr.k-state-selected
+    {
+        background-color: #428bca !important;
+    }
+    .k-grid table tr.k-state-selected td
+    {
+        background-color: #428bca !important;
+    }
+    .k-grid table tr.k-state-selected td div
+    {
+        background-color: #428bca !important;
+    }
+    /* --- Kendo Window EditForm style ----- */
+    /*#editForm {
+        width: 600px;
+        margin: 20px;
+        padding: 20px;
+        float: left;
+        border: 1px solid #c5c5c5;
+        border-radius: 10px;
+        font-size: 80%;
+    }
+    #editForm ul {
+        list-style-type: none;
+    }
+    #editForm ul li {
+        margin: 10px;
+    }
+    #editForm ul label {
+        font-weight: bold;
+        display: inline-block;
+        width: 90px;
+        text-align: right;
+    }
+    #editForm label {
+        display: block;
+        margin-bottom: 10px;
+    }
+    #editForm .buttons {
+        margin-top: 25px;
+    }
+    #editForm .k-button {
+        width: 100px;
+    }*/
+    #editForm .k-button {
+        margin: 5px;
+        width: 100px;
+    }
+    input[type="text"]:disabled {
+    background: #dddddd;
+    }
+    #btnBlock {
+        text-align: center;
+    }
+    tr > td
+    {
+      padding-bottom: 1em;
+      padding-right: 1em;
+    }
+</style>

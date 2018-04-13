@@ -1,0 +1,826 @@
+﻿@using Kendo.Mvc.UI
+@{
+    string title = "Портфель даних реєстру";
+}
+<script src="~/Areas/Escr/Scripts/portfolio.js"></script>
+<link href="~/Areas/Escr/Css/portfolio.css" rel="stylesheet" />
+
+<h1>@title</h1>
+
+
+
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Ссылки</title>
+    <style type="text/css">
+ 
+            A.link1 {
+                font-size: 15px;
+                font-weight: bold;
+                color: blue;
+            }
+
+    </style>
+</head>
+<body>
+    <p>
+        <a href="/barsroot/Areas/Escr/Docs/ESCR_USR_DOCS.docx" class="link1">Завантажити інструкцію користувача</a> 
+    </p>
+</body>
+</html>
+
+
+
+<table id="filter" class="reg-filter">
+    <tr>
+        <td>
+            <label for="dtFrom" class="control-label">Дата з:</label>
+        </td>
+        <td>
+            <input type="text" id="dtFrom" style="width:200px" required />
+        </td>
+        <td>
+            <label for="dtTo" class="control-label">Дата по:</label>
+        </td>
+        <td>
+            <input type="text" id="dtTo" style="width:200px" />
+        </td>
+        <td style="text-align:center">
+            <button id='btnClear' class='k-button' title='Очистити всі фільтри' style="width:120px">
+                <span class='pf-icon pf-16 pf-reload_rotate'></span> Очистити
+            </button>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label for="ddlType" class="control-label">Тип реєстру:</label>
+        </td>
+        <td>
+            <select id="ddlType" style="width:250px"></select>
+        </td>
+        <td>
+            <label for="ddlView" class="control-label">Вид реєстру:</label>
+        </td>
+        <td>
+            <select id="ddlView" style="width:250px"></select>
+        </td>
+        <td style="text-align:center">
+            <button id='btCreate' class='k-button' style="width:120px">
+                <span class='pf-icon pf-16 pf-add_button'></span> Вибрати
+            </button>
+        </td>
+    </tr>
+</table>
+<div id="separator"><br /></div>
+<div id="tabstrip">
+    <ul>
+        <li>Реєстри</li>
+        <li>Список кредитів</li>
+    </ul>
+    <div>
+        <div id="gridRegister"></div>
+    </div>
+    <div>
+        <div id="gridEnergo"></div>
+        <script id="events-template" type="text/x-kendo-template">
+            <div style="width:50%">
+                <div id="gridEvents"></div>
+            </div>
+        </script>
+    </div>
+</div>
+<div id="dialogOutNumber">
+    <div class="group-btn">
+    </div>
+    <div class="form-group">
+        <textarea class="form-control" rows="1" id="outNumber"></textarea>
+    </div>
+    <button id='btnOkDialogOutNumber' class='k-button'>
+        <span class='pf-icon pf-16 pf-ok'></span> Заповнити
+    </button>
+
+</div>
+<div id="dialogNewGoodCost">
+    <div class="group-btn">
+    </div>
+    <div class="form-group">
+        <textarea class="form-control" rows="1" id="NewCoodCost"></textarea>
+    </div>
+    <button id='btnOkdialogNewGoodCost' class='k-button'>
+        <span class='pf-icon pf-16 pf-ok'></span> Змінити
+    </button>
+</div>
+<div id="dialogComment">
+    <div class="group-btn">
+        <ul id="select-type">
+            <li>
+                Доопрацювання
+            </li>
+            <li>
+                Відхилено
+            </li>
+        </ul>
+    </div>
+    <div class="form-group">
+        <label for="message" class="control-label">Коментар:</label>
+        <textarea class="form-control" rows="5" id="message"></textarea>
+    </div>
+    <button id='btnOk' class='k-button'>
+        <span class='pf-icon pf-16 pf-ok'></span> Зберегти
+    </button>
+</div>
+<div id="importRegister">
+    <input name="files" id="files" type="file" accept=".xls,.xlsx" />
+</div>
+
+<script id="events-template" type="text/x-kendo-template">
+    <div id="gridEvents"></div>
+</script>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var tabstrip = $("#tabstrip").kendoTabStrip({
+            animation: false
+        });
+        tabstrip.data("kendoTabStrip").select(0);
+        tabstrip.data("kendoTabStrip").tabGroup.children().eq(1).bind("click", onClickTab);
+        var gridReg = $("#gridRegister").kendoGrid({
+            dataSource: {
+                transport: {
+                    read: {
+                        cache: false,
+                        url: bars.config.urlContent('/escr/portfoliodata/GetRegister/'),
+                    }
+                },
+                schema: {
+                    data: "Data",
+                    total: "Total",
+                    errors: "Errors",
+                    id: "ID",
+                    model: {
+                        fields: {
+                            ID: { type: "number" },
+                            INNER_NUMBER: { type: "string" },
+                            OUTER_NUMBER: { type: "string" },
+                            CREATE_DATE: { type: "date" },
+                            DATE_FROM: { type: "date" },
+                            DATE_TO: { type: "date" },
+                            REG_TYPE_ID: { type: "number" },
+                            REG_TYPE_CODE: { type: "string" },
+                            REG_TYPE_NAME: { type: "string" },
+                            REG_KIND_ID: { type: "number" },
+                            REG_KIND_CODE: { type: "string" },
+                            REG_KIND_NAME: { type: "string" },
+                            BRANCH: { type: "strring" },
+                            REG_LEVEL: { type: "number" },
+                            REG_LEVEL_CODE: { type: "string" },
+                            USER_ID: { type: "number" },
+                            USER_NAME: { type: "string" },
+                            REG_STATUS_ID: { type: "number" },
+                            REG_STATUS_CODE: { type: "string" },
+                            REG_STATUS_NAME: { type: "string" },
+                            REG_UNION_FLAG: { type: "boolean" },
+                            CREDIT_COUNT: { type: "number" },
+                            ERR_COUNT: { type: "number" },
+                            VALID_STATUS: { type: "number" }
+                        }
+                    }
+                },
+                pageSize: 10,
+                serverPaging: true,
+                serverSorting: true,
+                serverFiltering: true
+            },
+            dataBinding: function (e) {
+                uids = [];
+                $("#gridRegister .k-state-selected").each(function (e) {
+                    uids.push($(this).data("row-id"));
+                });
+            },
+            dataBound: function (e) {
+                gridDataBound(e)
+            },
+            toolbar: [{
+                name: "btExcel",
+                type: "button",
+                text: "<span class='pf-icon pf-16 pf-exel'></span> Сформувати реєстр"
+            },
+            {
+                name: "btSendRefinement",
+                type: "button",
+                text: "<span class='pf-icon pf-16 pf-bank-update'></span> Передати на доопрацювання",
+                enable: false
+            },
+            {
+                name: "btAddGroup",
+                type: "button",
+                text: "<span class='pf-icon pf-16 pf-folder-favorite'></span> Згрупувати реєстри"
+            },
+            {
+                name: "btDelGroup",
+                type: "button",
+                text: "<span class='pf-icon pf-16 pf-folder_open-favorite'></span> Розгрупувати реєстр"
+            },
+            {
+                template: " | "
+            },
+            {
+                name: "btImport",
+                type: "button",
+                text: "<span class='pf-icon pf-16 pf-database-import'></span> Імпортувати реєстри"
+            },
+            {
+                template: " | "
+            },
+            {
+                name: "btPay",
+                type: "button",
+                text: "<span class='pf-icon pf-16 pf-money'></span> Зарахувати кошти"
+            },
+            {
+                name: "btOut_Set",
+                type: "button",
+                text: "<span class='pf-icon pf-16 pf-add_button'></span>Заповнити зовнішній номер"
+            }],
+            pageable: {
+                refresh: true,
+                pageSizes: [10, 20, 50, 100]
+            },
+            height: getSizeGrid,
+            resizable: true,
+            selectable: true,
+            filterable: true,
+            change: onChange,
+            columns: [{
+                title: "<div style='width:100%'><input name=checkAllRow class=checkRow id=selectAll type=checkbox title='Обрати все..' /></div>",
+                template: "<input type=checkbox class=checkbox name=checkRow />",
+                width: 30
+            },
+            {
+                title: "Номер",
+                field: "ID",
+                width: 100
+            },
+            {
+                title: "Опис",
+                field: "INNER_NUMBER",
+                width: 200
+            },
+            {
+                title: "Зовнішній номер",
+                field: "OUTER_NUMBER",
+                width: 200
+            },
+            {
+                title: "Дата створення",
+                field: "CREATE_DATE",
+                format: "{0:dd.MM.yyyy HH:mm:ss}",
+                width: 150
+            },
+            {
+                title: "Початок періоду",
+                field: "DATE_FROM",
+                format: "{0:d}",
+                width: 100
+            },
+            {
+                title: "Кінець періоду",
+                field: "DATE_TO",
+                format: "{0:d}",
+                width: 100
+            },
+            {
+                title: "Тип реєстру",
+                field: "REG_TYPE_NAME",
+                width: 150
+            },
+            {
+                title: "Вид реєстру",
+                field: "REG_KIND_NAME",
+                width: 150
+            },
+            {
+                title: "Відділення",
+                field: "BRANCH",
+                width: 150
+            },
+            {
+                title: "Відповідальний користувач",
+                field: "USER_NAME",
+                width: 150
+            },
+            {
+                title: "Статус реєстру",
+                field: "REG_STATUS_NAME",
+                width: 100
+            },
+            {
+                title: "Згрупований",
+                field: "REG_UNION_FLAG",
+                template: "#= REG_UNION_FLAG ? 'Так' : 'Ні' #",
+                width: 100
+            },
+            {
+                title: "Кіл. кредитів",
+                field: "CREDIT_COUNT",
+                width: 100
+            },
+            {
+                title: "Кіл. помилкових кредитів",
+                field: "ERR_COUNT",
+                width: 100
+            }]
+        }).data("kendoGrid");
+
+        $("#gridRegister").find('#selectAll').on('change', function () {
+            var grid = $("#gridRegister");
+            var checkedRows = grid.find('input[type="checkbox"][name="checkRow"]');
+            var $this = $(this);
+            if ($this.is(':checked')) {
+                checkedRows.prop("checked", true);
+                $(".k-grid-btSendRefinement").removeAttr("disabled");
+                $(".k-grid-btAddGroup").removeAttr("disabled");
+                $(".k-grid-btDelGroup").ф("disabled");
+                $(".k-grid-btPay").removeAttr("disabled");
+            } else {
+                checkedRows.prop("checked", false);
+                $(".k-grid-btSendRefinement").attr("disabled", "disabled");
+                $(".k-grid-btAddGroup").attr("disabled", "disabled");
+                $(".k-grid-btDelGroup").attr("disabled", "disabled");
+                $(".k-grid-btPay").attr("disabled", "disabled");
+            }
+            for (var i = 0; i < checkedRows.length; i++) {
+                changeCheckRowPrtfl(checkedRows[i]);
+            }
+        });
+
+        var gridEnergo = $("#gridEnergo").kendoGrid({
+            dataBound: function (e) {
+                var grid = e.sender;
+                var data = grid.dataSource.data();
+                if (data.length === 0) {
+                    var colCount = grid.columns.length;
+                    var message = 'немає записів або не сформовано реєстр';
+                    $(e.sender.wrapper).find('tbody').append('<tr class="kendo-data-row"><td colspan="' + colCount + '" class="no-data">' + message + ' :(</td></tr>');
+                }
+                $(".k-grid-btComment").attr("disabled", "");
+                $(".k-grid-btNewGoodCost").attr("disabled", "");
+                $(".k-grid-btDelEvents").attr("disabled", "");
+            },
+            detailTemplate: kendo.template($("#events-template").html()),
+            detailInit: detailInit,
+            filterable: true,
+            sortable: true,
+            selectable: true,
+            height: getSizeGrid,
+            change: onChangeEnergo,
+            pageable: {
+                refresh: true,
+                pageSizes: [10, 20, 50, 100]
+            },
+            toolbar: [{
+                name: "btComment",
+                type: "button",
+                text: "<span class='pf-icon pf-16 pf-tool_pencil'></span> Коментар"
+            },
+            {
+                name: "btNewGoodCost",
+                type: "button",
+                text: "<span class='pf-icon pf-16 pf-bookmark-ok'></span> Скоригувати вартість товару"
+            },
+            {
+                name: "btDelEvents",
+                type: "button",
+                text: "<span class='pf-icon pf-16 pf-delete'></span> Видалити енерго захід"
+            }
+            ],
+            columns: [{
+                title: "№ п/п",
+                width: 50,
+                field: "NUM"
+            },
+            {
+                title: "ПІБ",
+                field: "CUSTOMER_NAME",
+                width: 200
+            },
+            {
+                title: "ІНН",
+                field: "CUSTOMER_OKPO",
+                width: 100
+            },
+            {
+                title: "РНК",
+                field: "CUSTOMER_ID",
+                width: 100
+            },
+            {
+                title: "Місце проживання позичальника",
+                columns: [{
+                    title: "область",
+                    field: "CUSTOMER_REGION",
+                    width: 200
+                },
+                {
+                    title: "район, нас. п., вул., буд.(кв.)",
+                    field: "CUSTOMER_FULL_ADDRESS",
+                    width: 250
+                }]
+            },
+            {
+                title: "Док. про субсидію",
+                field: "SUBS_DOC_TYPE",
+                width: 200
+            },
+            {
+                title: "Кредитний договір",
+                columns: [
+                    {
+                        title: "Референс в АБС",
+                        field: "DEAL_ID",
+                        width: 100
+                    },
+                    {
+                        title: "дата",
+                        field: "DEAL_DATE_FROM",
+                        format: "{0:d}",
+                        width: 100
+                    },
+                {
+                    title: "номер",
+                    field: "DEAL_NUMBER",
+                    width: 100
+                },
+                {
+                    title: "строк дії",
+                    field: "DEAL_TERM",
+                    width: 90
+                }]
+            },
+            {
+                title: "Вартість товару",
+                field: "GOOD_COST",
+                format: "{0:#.00}",
+                width: 100
+            },
+            {
+                title: "Сума кредиту",
+                field: "DEAL_SUM",
+                format: "{0:#.00}",
+                width: 100
+            },
+            {
+                title: "Сума відшкодування",
+                field: "COMP_SUM",
+                format: "{0:#.00}",
+                width: 100
+            },
+            {
+                title: "Дата док.ціл.викор.",
+                field: "DOC_DATE",
+                format: "{0:d}",
+                width: 100
+            },
+            {
+                title: "МФО",
+                field: "MFO",
+                width: 60
+            },
+            {
+                title: "Відділення",
+                field: "BRANCH_CODE",
+                width: 170
+            },
+            {
+                title: "Статус КД",
+                field: "CREDIT_STATUS_NAME",
+                width: 200
+            },
+            {
+                title: "Відповідальний співробітник",
+                field: "USER_NAME",
+                width: 200
+            },
+            {
+                title: "Коментар",
+                field: "CREDIT_COMMENT",
+                width: 200
+            }]
+        }).data("kendoGrid");
+
+        $(".k-grid-btExcel").click(function () {
+            var row = $(".k-state-selected[role=row]");
+            var grid = $("#gridRegister").data("kendoGrid");
+            var selectedItem = grid.dataItem(row);
+            bars.ui.confirm({
+                text: getInformation(selectedItem.ID),
+                width: "400px",
+                func: function () {
+                    var dateFrom = (selectedItem.DATE_FROM.getDate() < 10 ? "0" + selectedItem.DATE_FROM.getDate() : selectedItem.DATE_FROM.getDate()) + "." +
+                        (selectedItem.DATE_FROM.getMonth() + 1 < 10 ? "0" + (selectedItem.DATE_FROM.getMonth() + 1) : (selectedItem.DATE_FROM.getMonth() + 1)) + "." +
+                        selectedItem.DATE_FROM.getFullYear();
+                    var dateTo = (selectedItem.DATE_TO.getDate() < 10 ? "0" + selectedItem.DATE_TO.getDate() : selectedItem.DATE_TO.getDate()) + "." +
+                        (selectedItem.DATE_TO.getMonth() + 1 < 10 ? "0" + (selectedItem.DATE_TO.getMonth() + 1) : (selectedItem.DATE_TO.getMonth() + 1)) + "." +
+                        selectedItem.DATE_TO.getFullYear();
+                    window.location = bars.config.urlContent("/escr/PortfolioData/ExportExcel/") + "?reg_id=" + selectedItem.ID + "&dateFrom=" + dateFrom + "&dateTo=" + dateTo;
+                    grid.dataSource.read();
+                }
+            });
+        });
+
+        $(".k-grid-btImport").click(function () {
+            $("#importRegister").data("kendoWindow").open();
+        });
+
+        $(".k-grid-btPay").click(function () {
+            bars.ui.confirm({
+                text: "Зарахувати кошти по данним реєстрам",
+                func: function () {
+                    payReg();
+                }
+            });
+        });
+        $(".k-grid-btOut_Set").click(function () {
+            bars.ui.confirm({
+                text: "Встановити зовнішній номер",
+                func: function () {
+                    $("#dialogOutNumber").data("kendoWindow").open();
+                    //SetOutNumber(outNumber);
+                }
+            });
+        });
+
+        $(".k-grid-btNewGoodCost").click(function () {
+            var grid = $("#gridEnergo").data("kendoGrid");
+            var row = $("#gridEnergo").find(".k-state-selected[role=row]");
+            var selectedItem = grid.dataItem(row);
+            if (selectedItem.CREDIT_STATUS_CODE != "SENT_TO_CA") {
+                //CONFIRMED_GVI SENT_TO_CA
+                bars.ui.confirm({
+                    text: "Змінити початкову вартість товару",
+                    func: function () {
+                        $("#dialogNewGoodCost").data("kendoWindow").open();
+                    }
+                });
+            }
+            else {
+                bars.ui.alert({
+                    text: "Внесення змін в оплачений КД заборонено"
+                });
+            }
+        });
+        $(".k-grid-btAddGroup").click(function () {
+            groupByRegister('CA');
+        });
+        $(".k-grid-btDelGroup").click(delGroupRegister);
+
+
+        $(".k-grid-btDelEvents").click(function () {
+            var grid = $("#gridEnergo").data("kendoGrid");
+            var gridevent = $("#gridEvents").data("kendoGrid");
+            var row = $("#gridEnergo").find(".k-state-selected[role=row]");
+            var selectedItem = grid.dataItem(row);
+            //var eventcount = grid.it
+            //console.log(gridevent.dataSource.total);
+            if (selectedItem.CREDIT_STATUS_CODE != "SETTLE_ACCOUNT")
+                //CONFIRMED_GVI
+                //&& gridevent.dataSource.total >1
+                //
+            {
+                bars.ui.confirm({
+                    text: "Видалити енергоефективний захід?",
+                    func: function () {
+                        bars.ui.loader($('#gridEnergo'), true);
+                        DelRegEvent();
+                        bars.ui.loader($('#gridEnergo'), false);
+                    }
+                });
+            }
+            else if (selectedItem.CREDIT_STATUS_CODE == "SETTLE_ACCOUNT") {
+                bars.ui.alert({
+                    text: "Внесення змін в КД заборонено"
+                });
+            }
+        });
+
+
+        $(".k-grid-btComment").click(function () {
+            var grid = $("#gridEnergo").data("kendoGrid");
+            var row = $("#gridEnergo").find(".k-state-selected[role=row]");
+            var selectedItem = grid.dataItem(row);
+            if (selectedItem.CREDIT_STATUS_CODE == "RECEIVED" || "CONFIRMATION_GVI") {
+                $("#dialogComment").data("kendoWindow").open();
+            }
+            else {
+                bars.ui.alert({
+                    text: "Не можна внести коментар на даний кредит."
+                });
+            }
+        });
+
+        $("#btCreate").click(create);
+        $("#btnClear").click(function () {
+            $("#dtFrom").data("kendoDatePicker").value("");
+            $("#dtTo").data("kendoDatePicker").value("");
+            $("#ddlType").data("kendoDropDownList").value("");
+            $("#ddlView").data("kendoDropDownList").value("");
+            create();
+        });
+
+        $("#dtFrom").kendoMaskedTextBox({
+            mask: "99.99.9999"
+        }).kendoDatePicker({
+            culture: "uk-UA",
+            format: "dd.MM.yyyy",
+            change: function () {
+                var value = this.value();
+                var dateTo = $("#dtTo").data("kendoDatePicker");
+                if (value) {
+                    var firstDay = new Date(value.getFullYear(), value.getMonth(), 1);
+                    var lastDay = new Date(value.getFullYear(), value.getMonth() + 1, 0);
+                    this.value(firstDay);
+                    dateTo.value(lastDay);
+                }
+                else {
+                    this.value("");
+                    dateTo.value("");
+                }
+            }
+        }).removeClass('k-textbox').parent().parent().removeClass('k-textbox');
+
+        $("#dtTo").kendoMaskedTextBox({
+            mask: "99.99.9999"
+        }).kendoDatePicker({
+            culture: "uk-UA",
+            format: "dd.MM.yyyy"
+        }).removeClass('k-textbox').parent().parent().removeClass('k-textbox');
+
+        $("#ddlType").kendoDropDownList({
+            dataTextField: "NAME",
+            dataValueField: "CODE",
+            dataSource: {
+                transport: {
+                    read: {
+                        url: bars.config.urlContent('/escr/portfoliodata/GetProd/')
+                    }
+                },
+                schema: {
+                    model: {
+                        fields: {
+                            ID: { type: "number" },
+                            CODE: { type: "string" },
+                            NAME: { type: "string" }
+                        }
+                    }
+                }
+            },
+            optionLabel: "Всі",
+        });
+        $("#ddlView").kendoDropDownList({
+            dataTextField: "NAME",
+            dataValueField: "CODE",
+            dataSource: {
+                transport: {
+                    read: {
+                        url: bars.config.urlContent('/escr/portfoliodata/GetViddRee/')
+                    }
+                },
+                schema: {
+                    model: {
+                        fields: {
+                            ID: { type: "number" },
+                            CODE: { type: "string" },
+                            NAME: { type: "string" }
+                        }
+                    }
+                }
+            },
+            optionLabel: "Всі"
+        });
+
+        var dialog = $("#dialogComment").kendoWindow({
+            title: "Коментар",
+            modal: true,
+            draggable: false,
+            animation: {
+                open: false
+            },
+            visible: false,
+            width: "400px",
+            //close: clickBtnOk,
+            activate: function () {
+                var row = $("#gridEnergo .k-state-selected[role=row]");
+                var grid = $("#gridEnergo").data("kendoGrid");
+                var selectedItem = grid.dataItem(row);
+                if (selectedItem.COMMENT_DEAL != "") {
+                    $("#message").val(selectedItem.COMMENT_DEAL);
+                }
+                $("#message").focus();
+            }
+        }).data("kendoWindow");
+        dialog.center();
+
+        $("#select-type").kendoMobileButtonGroup({
+            index: 0
+        });
+
+        $("#btnOk").click(function () {
+            windowClose(dialog);
+            $("#dialogComment").data("kendoWindow").close();
+        });
+
+        var dialog = $("#dialogOutNumber").kendoWindow({
+            title: "Зовнішній номер",
+            modal: true,
+            draggable: false,
+            animation: {
+                open: false
+            },
+            visible: false,
+            width: "400px",
+            //close: btnOkDialogOutNumber,
+            activate: function () {
+                var row = $("#gridRegister.k-state-selected[role=row]");
+                var grid = $("#gridRegister").data("kendoGrid");
+                var selectedItem = grid.dataItem(row);
+                $("#outNumber").focus();
+            }
+        }).data("kendoWindow");
+        dialog.center();
+
+        var dialog = $("#dialogNewGoodCost").kendoWindow({
+            title: "Виправлена вартість товару",
+            modal: true,
+            draggable: false,
+            animation: {
+                open: false
+            },
+            visible: false,
+            width: "400px",
+            //close: ф,
+            activate: function () {
+                var row = $("#gridEnergo.k-state-selected[role=row]");
+                var grid = $("#gridEnergo").data("kendoGrid");
+                var selectedItem = grid.dataItem(row);
+                $("#NewCoodCost").focus();
+            }
+        }).data("kendoWindow");
+        dialog.center();
+        var dialogImport = $("#importRegister").kendoWindow({
+            title: "Імпорт реєстрів",
+            modal: true,
+            draggable: false,
+            animation: {
+                open: false
+            },
+            visible: false,
+            width: "400px",
+            close: function () {
+                $(".k-widget.k-upload").find("ul").remove();
+                $(".k-widget.k-window").css("transform", "scale(1)");
+                var gridRegister = $("#gridRegister").data("kendoGrid");
+                gridRegister.dataSource.read();
+            }
+        }).data("kendoWindow");
+        dialogImport.center();
+
+
+
+        $("#btnOkDialogOutNumber").click(function () {
+            var outNumber = $('#outNumber').text();
+            SetOutNumber(outNumber);
+        });
+        $("#btnOkdialogNewGoodCost").click(function () {
+            var NewGoodCost = $('#NewCoodCost').text();
+            ChangeCompSum(NewGoodCost);
+        });
+
+        $("#files").kendoUpload({
+            async: {
+                saveUrl: bars.config.urlContent('/escr/portfoliodata/Import'),
+                autoUpload: true,
+                allowmultiple: true
+            },
+            select: onSelectImport,
+            localization: {
+                select: "Обзор...",
+                headerStatusUploaded: "Виконано",
+                headerStatusUploading: "Завантаження..."
+            },
+            success: function () {
+                var gridRegister = $("#gridRegister").data("kendoGrid");
+                gridRegister.dataSource.read();
+                onChange();
+            },
+            error: function (e) {
+                var err = e.XMLHttpRequest.responseText;
+            }
+        });
+    });
+
+    $(window).resize(function () {
+        resizeGrid();
+    });
+
+</script>

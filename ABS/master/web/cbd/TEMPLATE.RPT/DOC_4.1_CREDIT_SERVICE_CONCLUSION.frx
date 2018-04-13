@@ -1,0 +1,169 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="04/15/2011 18:11:20" ReportInfo.Modified="10/16/2014 16:09:48" ReportInfo.CreatorVersion="2013.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqcFv7/QVsbsa1pDpr21P0mHXdl2BpgMbYS4w+AnBeGDddnQ5MuNy1h3sM21aiXmM/apUHTHDUdPqZKdJHDwfWXA==">
+      <TableDataSource Name="STAFF_FIO" DataType="System.Int32" Enabled="true" SelectCommand="select nvl( f_doc_attr('STAFF_FIO', :p1, :p2), 'null') as VAL from dual">
+        <Column Name="VAL" DataType="System.String"/>
+        <CommandParameter Name="p1" DataType="113" Expression="[p_bid_id]" DefaultValue="-1"/>
+        <CommandParameter Name="p2" DataType="113" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table" Alias="WCS_IQ_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select wcs_utl.get_answ_text(b.id, 'IQ_CONCL_CREDIT_S_Q1', w.id, c.idx) as q1,&#13;&#10;       wcs_utl.get_answ_text(b.id, 'IQ_CONCL_CREDIT_S_Q2', w.id, c.idx) as q2,&#13;&#10;       wcs_utl.get_answ_text(b.id, 'IQ_CONCL_CREDIT_S_Q3', w.id, c.idx) as q3,&#13;&#10;       wcs_utl.get_answ_text(b.id, 'IQ_CONCL_CREDIT_S_Q4', w.id, c.idx) as q4&#13;&#10;  from wcs_bids b,&#13;&#10;       wcs_workspaces w,&#13;&#10;       (select idx - 1 as idx from wcs_counter) c&#13;&#10; where b.id = :p_bid_id&#13;&#10;   and w.id = :p_ws_id&#13;&#10;   and c.idx = :p_ws_number">
+        <Column Name="Q1" DataType="System.String"/>
+        <Column Name="Q2" DataType="System.String"/>
+        <Column Name="Q3" DataType="System.String"/>
+        <Column Name="Q4" DataType="System.String"/>
+        <CommandParameter Name="p_bid_id" DataType="107" Expression="[p_bid_id]" DefaultValue="0"/>
+        <CommandParameter Name="p_ws_id" DataType="126" Expression="[p_ws_id]" DefaultValue="&quot;MAIN&quot;"/>
+        <CommandParameter Name="p_ws_number" DataType="107" Expression="[p_ws_number]" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table2" Alias="WCS_BID_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select b.*,&#13;&#10;       to_number(wcs_utl.get_answ(b.bid_id, 'KPP')) as kpp,&#13;&#10;       to_number(wcs_utl.get_answ(b.bid_id, 'KPS')) as kps,&#13;&#10;       to_number(wcs_utl.get_answ(b.bid_id, '4P')) as chp,&#13;&#10;       wcs_utl.get_answ_list_text(b.bid_id, 'CRISK_NBU') as crisk_nbu,&#13;&#10;       to_number(wcs_utl.get_answ(b.bid_id, 'SZ')) as sz,&#13;&#10;       wcs_utl.get_bid_garantees(b.bid_id) as grt_list,&#13;&#10;       wcs_utl.get_answ(b.bid_id, 'CRISK') || ' - ' ||&#13;&#10;       wcs_utl.get_answ_refer_text(b.bid_id, 'CRISK') as crisk,&#13;&#10;       to_number(wcs_utl.get_answ(b.bid_id, 'REZ_SUM')) as rez_sum,&#13;&#10;       decode(s.product_id,&#13;&#10;              'PRD_BPK','овердрафт',&#13;&#10;              'PRD_HULL_INSURANCE','кредитна лінія', &#13;&#10;              case when s.subproduct_id in('SBP_CONSUMER_0_5_2_EP','SBP_CONSUMER_5_10_2_EP') &#13;&#10;                   then 'кредитна лінія' &#13;&#10;                   else 'разовий кредит' end) as mac_crd_type,&#13;&#10;       b.summ + b.own_funds as property_cost,&#13;&#10;       round(b.own_funds / (b.summ + b.own_funds), 2) as own_funds_pr&#13;&#10;  from v_wcs_bids b, v_wcs_subproducts s&#13;&#10; where b.bid_id = :p_bid_id&#13;&#10;   and b.subproduct_id = s.subproduct_id">
+        <Column Name="BID_ID" DataType="System.Decimal"/>
+        <Column Name="SUBPRODUCT_ID" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_NAME" DataType="System.String"/>
+        <Column Name="CRT_DATE" DataType="System.DateTime"/>
+        <Column Name="F" DataType="System.String"/>
+        <Column Name="I" DataType="System.String"/>
+        <Column Name="O" DataType="System.String"/>
+        <Column Name="BDATE" DataType="System.DateTime"/>
+        <Column Name="INN" DataType="System.String"/>
+        <Column Name="SUMM" DataType="System.Decimal"/>
+        <Column Name="OWN_FUNDS" DataType="System.Decimal"/>
+        <Column Name="TERM" DataType="System.String"/>
+        <Column Name="CREDIT_CURRENCY" DataType="System.Decimal"/>
+        <Column Name="SINGLE_FEE" DataType="System.Decimal"/>
+        <Column Name="MONTHLY_FEE" DataType="System.Decimal"/>
+        <Column Name="INTEREST_RATE" DataType="System.Decimal"/>
+        <Column Name="REPAYMENT_METHOD" DataType="System.String"/>
+        <Column Name="REPAYMENT_DAY" DataType="System.Decimal"/>
+        <Column Name="GARANTEES" DataType="System.String"/>
+        <Column Name="MGR_ID" DataType="System.Decimal"/>
+        <Column Name="MGR_FIO" DataType="System.String"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="BRANCH_NAME" DataType="System.String"/>
+        <Column Name="STATES" DataType="System.String"/>
+        <Column Name="KPP" DataType="System.Decimal"/>
+        <Column Name="KPS" DataType="System.Decimal"/>
+        <Column Name="CHP" DataType="System.Decimal"/>
+        <Column Name="CRISK_NBU" DataType="System.String"/>
+        <Column Name="SZ" DataType="System.Decimal"/>
+        <Column Name="REPAYMENT_METHOD_TEXT" DataType="System.String"/>
+        <Column Name="GRT_LIST" DataType="System.String"/>
+        <Column Name="CRISK" DataType="System.String"/>
+        <Column Name="REZ_SUM" DataType="System.Decimal"/>
+        <Column Name="MAC_CRD_TYPE" DataType="System.String"/>
+        <Column Name="PROPERTY_COST" DataType="System.Decimal"/>
+        <Column Name="OWN_FUNDS_PR" DataType="System.Decimal"/>
+        <Column Name="SUBPRODUCT_DESC" DataType="System.String"/>
+        <Column Name="RNK" DataType="System.Decimal"/>
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="BRANCH_HIERARCHY" DataType="System.String"/>
+        <Column Name="INIT_PAYMENT_MTD" DataType="System.String"/>
+        <CommandParameter Name="p_bid_id" DataType="107" Expression="[p_bid_id]" DefaultValue="-1"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_bid_id" DataType="System.Int32" Expression="3561621"/>
+    <Parameter Name="p_ws_id" DataType="System.String" Expression="&quot;MAIN&quot;"/>
+    <Parameter Name="p_ws_number" DataType="System.Int32" Expression="0"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <DataBand Name="Data1" Width="718.2" Height="1039.54" CanGrow="true">
+      <TableObject Name="Table1" Left="28.35" Top="28.35" Width="661.4" Height="1001.74" Border.Lines="All">
+        <TableColumn Name="Column1" Width="330.7"/>
+        <TableColumn Name="Column2" Width="330.7"/>
+        <TableRow Name="Row1" Height="46.43">
+          <TableCell Name="Cell1" Border.Lines="All" Text="I. ВИСНОВКИ КРЕДИТНОЇ СЛУЖБИ ЗА РЕЗУЛЬТАТАМИ РОЗГЛЯДУ КРЕДИТНОЇ ЗАЯВКИ [WCS_BID_DATA.F] [WCS_BID_DATA.I] [WCS_BID_DATA.O]" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell2"/>
+        </TableRow>
+        <TableRow Name="Row2" Height="36.98" AutoSize="true">
+          <TableCell Name="Cell6" Border.Lines="All" Text="1. Перелік документів, на підставі яких складені висновки"/>
+          <TableCell Name="Cell7" Border.Lines="All" Text="[WCS_IQ_DATA.Q1]"/>
+        </TableRow>
+        <TableRow Name="Row3" Height="27.53" AutoSize="true">
+          <TableCell Name="Cell11" Border.Lines="All" Text="2. Опис заходу, що здійснюється за участю кредиту" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell12" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row4" Height="27.53" AutoSize="true">
+          <TableCell Name="Cell16" Border.Lines="All" Text="2.1. Мета кредиту"/>
+          <TableCell Name="Cell17" Border.Lines="All" Text="[WCS_BID_DATA.SUBPRODUCT_NAME]"/>
+        </TableRow>
+        <TableRow Name="Row5" Height="36.98" AutoSize="true">
+          <TableCell Name="Cell21" Border.Lines="All" Text="2.2. Вартість заходу  (товару, послуги), для оплати якого необхідний кредит (грн.)"/>
+          <TableCell Name="Cell22" Border.Lines="All" Text="[FormatNumber([WCS_BID_DATA.PROPERTY_COST],2)]"/>
+        </TableRow>
+        <TableRow Name="Row6" Height="74.78" AutoSize="true">
+          <TableCell Name="Cell23" Border.Lines="All" Text="2.3. Сума власних коштів позичальника, яку передбачається спрямувати на фінансування заходу (товару, послуги)  (грн.)&#13;&#10;     % від вартості заходу (товару, послуги)"/>
+          <TableCell Name="Cell24" Border.Lines="All" Text="[FormatNumber([WCS_BID_DATA.OWN_FUNDS],2)]&#13;&#10;&#13;&#10;&#13;&#10;[FormatPercent([WCS_BID_DATA.OWN_FUNDS_PR],2)]"/>
+        </TableRow>
+        <TableRow Name="Row7" Height="36.98" AutoSize="true">
+          <TableCell Name="Cell25" Border.Lines="All" Text="2.4. Необхідна сума кредиту (грн., доларів США, Євро)"/>
+          <TableCell Name="Cell26" Border.Lines="All" Text="[FormatNumber([WCS_BID_DATA.SUMM],2)] ([WCS_BID_DATA.CREDIT_CURRENCY])"/>
+        </TableRow>
+        <TableRow Name="Row8" Height="27.53" AutoSize="true">
+          <TableCell Name="Cell27" Border.Lines="All" Text="3. Результати аналізу фінансового стану позичальника" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell28" Border.Lines="All" HorzAlign="Center"/>
+        </TableRow>
+        <TableRow Name="Row10" Height="18.08" AutoSize="true">
+          <TableCell Name="Cell31" Border.Lines="All" Text="3.1. Оцінка платоспроможності позичальника"/>
+          <TableCell Name="Cell32" Border.Lines="All" Text="[FormatNumber([WCS_BID_DATA.KPP],2)]"/>
+        </TableRow>
+        <TableRow Name="Row11" Height="18.08" AutoSize="true">
+          <TableCell Name="Cell33" Border.Lines="All" Text="3.2. Оцінка платоспроможності сім’ї"/>
+          <TableCell Name="Cell34" Border.Lines="All" Text="[FormatNumber([WCS_BID_DATA.KPS],2)]"/>
+        </TableRow>
+        <TableRow Name="Row12" Height="36.98" AutoSize="true">
+          <TableCell Name="Cell35" Border.Lines="All" Text="3.3. Частка річного погашення кредиту в чистому сукупному річному доході позичальника"/>
+          <TableCell Name="Cell36" Border.Lines="All" Text="[FormatNumber([WCS_BID_DATA.CHP],2)]"/>
+        </TableRow>
+        <TableRow Name="Row13" Height="36.98" AutoSize="true">
+          <TableCell Name="Cell37" Border.Lines="All" Text="3.4. Клас позичальника за результатами аналізу його фінансового стану"/>
+          <TableCell Name="Cell38" Border.Lines="All" Text="[WCS_BID_DATA.CRISK_NBU]"/>
+        </TableRow>
+        <TableRow Name="Row14" Height="46.43" AutoSize="true">
+          <TableCell Name="Cell39" Border.Lines="All" Text="3.6. Висновок щодо достатності доходу позичальника для забезпечення погашення кредиту та сплати відсотків"/>
+          <TableCell Name="Cell40" Border.Lines="All" Text="[WCS_IQ_DATA.Q2]" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row15" Height="27.53">
+          <TableCell Name="Cell41" Border.Lines="All" Text="4. Результати аналізу забезпечення повернення кредиту та сплати відсотків" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell42" Border.Lines="All" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row16" Height="18.08" AutoSize="true">
+          <TableCell Name="Cell43" Border.Lines="All" Text="4.1. Вид забезпечення "/>
+          <TableCell Name="Cell44" Border.Lines="All" Text="[WCS_BID_DATA.GRT_LIST]"/>
+        </TableRow>
+        <TableRow Name="Row17" Height="18.08" AutoSize="true">
+          <TableCell Name="Cell45" Border.Lines="All" Text="4.2. Вартість забезпечення"/>
+          <TableCell Name="Cell46" Border.Lines="All" Text="[FormatNumber([WCS_BID_DATA.SZ],2)]"/>
+        </TableRow>
+        <TableRow Name="Row18" Height="18.08" AutoSize="true">
+          <TableCell Name="Cell47" Border.Lines="All" Text="4.3. Висновки щодо достатності забезпечення"/>
+          <TableCell Name="Cell48" Border.Lines="All" Text="[WCS_IQ_DATA.Q3]" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row19" Height="27.53">
+          <TableCell Name="Cell49" Border.Lines="All" Text="5. Розрахунок резерву під можливі втрати за кредитною операцією" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell50" Border.Lines="All" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row20" Height="36.98" AutoSize="true">
+          <TableCell Name="Cell51" Border.Lines="All" Text="5.1. Класифікація кредитної операції (визначення групи ризику)"/>
+          <TableCell Name="Cell52" Border.Lines="All" Text="[WCS_BID_DATA.CRISK]"/>
+        </TableRow>
+        <TableRow Name="Row21" Height="36.98" AutoSize="true">
+          <TableCell Name="Cell53" Border.Lines="All" Text="5.2. Розрахункова сума страхового резерву, що необхідно сформувати за даною операцією"/>
+          <TableCell Name="Cell54" Border.Lines="All" Text="[FormatNumber([WCS_BID_DATA.REZ_SUM],2)]"/>
+        </TableRow>
+        <TableRow Name="Row22" Height="27.53">
+          <TableCell Name="Cell55" Border.Lines="All" Text="6. Висновки щодо можливості надання кредиту" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell56" Border.Lines="All" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row23" Height="188.18" AutoSize="true">
+          <TableCell Name="Cell57" Border.Lines="All" Text="6.1. Висновок щодо можливості надання кредиту, виходячи із кредитоспроможності позичальника та забезпечення&#13;&#10;6.2. Умови надання кредиту:&#13;&#10;- вид кредиту (разовий кредит, кредитна лінія, овердрафт)&#13;&#10;- сума кредиту&#13;&#10;- строк кредиту&#13;&#10;- процентна ставки&#13;&#10;- періодичність сплати кредиту&#13;&#10;- періодичність сплати процентів&#13;&#10;- вид забезпечення&#13;&#10;"/>
+          <TableCell Name="Cell58" Border.Lines="All" Text="Висновок:&#13;&#10;[WCS_IQ_DATA.Q4]&#13;&#10;&#13;&#10;Умови:&#13;&#10;- [WCS_BID_DATA.MAC_CRD_TYPE]&#13;&#10;- [FormatNumber([WCS_BID_DATA.SUMM],2)] ([WCS_BID_DATA.CREDIT_CURRENCY])&#13;&#10;- [WCS_BID_DATA.TERM] міс.&#13;&#10;- [FormatPercent([WCS_BID_DATA.INTEREST_RATE]/100,2)]&#13;&#10;- щомісячно&#13;&#10;- щомісячно&#13;&#10;- [WCS_BID_DATA.GRT_LIST]" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row9" Height="131.48" AutoSize="true">
+          <TableCell Name="Cell29" Border.Lines="All" Text="Начальник кредитного підрозділу&#13;&#10;&#13;&#10;&#13;&#10;&#13;&#10;Кредитний працівник&#13;&#10;&#13;&#10;Дата" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell30" Border.Lines="All" Text="&#13;&#10;_________________________________ &#13;&#10;(прізвище , підпис)&#13;&#10;&#13;&#10;[STAFF_FIO.VAL]&#13;&#10;&#13;&#10;[FormatDateTime([Date],&quot;Short Date&quot;)]" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text1" Left="28.35" Width="661.5" Height="28.35" Text="Банківська таємниця" HorzAlign="Right" Font="Arial, 10pt, style=Bold"/>
+    </DataBand>
+  </ReportPage>
+</Report>

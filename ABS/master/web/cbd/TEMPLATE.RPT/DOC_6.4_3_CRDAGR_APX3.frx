@@ -1,0 +1,173 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="05/26/2011 14:55:15" ReportInfo.Modified="10/02/2014 12:45:20" ReportInfo.CreatorVersion="2013.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqcFv7/QVsbsa1pDpr21P0mHLcRIZaiGfg6+KPJbWhg17RBpku0Rho4U71ZwGhUe+L5+fGENJpHGJOkHOz7L9HsA==">
+      <TableDataSource Name="Table" Alias="BID_DATA" DataType="System.Int32" Enabled="true" SelectCommand=" SELECT b.*, 'від '|| substr(f_dat_lit(  d.sdate ),1,25)  as dat_dog_pr, d.cc_id as deal_num,&#13;&#10;         DECODE (&#13;&#10;             s.product_id,&#13;&#10;             'PRD_GUARANTOR',&#13;&#10;             'кредитний договір',&#13;&#10;             'PRD_AUTO',&#13;&#10;             'кредитний договір',&#13;&#10;             'PRD_CONSUMER',&#13;&#10;             'кредитний договір',&#13;&#10;             'PRD_MORTGAGE',&#13;&#10;             'договір про іпотечний кредит',&#13;&#10;             'PRD_MORTGAGE_YOUTH',&#13;&#10;             'договір про іпотечний кредит',&#13;&#10;             'PRD_HULL_INSURANCE',&#13;&#10;             'договір відновлюваної кредитної лінії')&#13;&#10;             AS agr_name&#13;&#10;  FROM v_wcs_bids b, v_wcs_subproducts s, cc_deal d&#13;&#10; WHERE b.bid_id = :p_bid_id AND b.subproduct_id = s.subproduct_id and  b.bid_id=d.nd(+)">
+        <Column Name="INN" DataType="System.String"/>
+        <Column Name="BID_ID" DataType="System.Decimal"/>
+        <Column Name="SUBPRODUCT_ID" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_NAME" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_DESC" DataType="System.String"/>
+        <Column Name="CRT_DATE" DataType="System.DateTime"/>
+        <Column Name="F" DataType="System.String"/>
+        <Column Name="I" DataType="System.String"/>
+        <Column Name="O" DataType="System.String"/>
+        <Column Name="BDATE" DataType="System.DateTime"/>
+        <Column Name="SUMM" DataType="System.Decimal"/>
+        <Column Name="OWN_FUNDS" DataType="System.Decimal"/>
+        <Column Name="TERM" DataType="System.String"/>
+        <Column Name="CREDIT_CURRENCY" DataType="System.String"/>
+        <Column Name="SINGLE_FEE" DataType="System.Decimal"/>
+        <Column Name="MONTHLY_FEE" DataType="System.Decimal"/>
+        <Column Name="INTEREST_RATE" DataType="System.Decimal"/>
+        <Column Name="REPAYMENT_METHOD" DataType="System.String"/>
+        <Column Name="REPAYMENT_METHOD_TEXT" DataType="System.String"/>
+        <Column Name="REPAYMENT_DAY" DataType="System.Decimal"/>
+        <Column Name="GARANTEES" DataType="System.String"/>
+        <Column Name="MGR_ID" DataType="System.Decimal"/>
+        <Column Name="MGR_FIO" DataType="System.String"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="BRANCH_NAME" DataType="System.String"/>
+        <Column Name="STATES" DataType="System.String"/>
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="BRANCH_HIERARCHY" DataType="System.String"/>
+        <Column Name="AGR_NAME" DataType="System.String"/>
+        <Column Name="DAT_DOG_PR" DataType="System.String"/>
+        <Column Name="DEAL_NUM" DataType="System.String"/>
+        <CommandParameter Name="p_bid_id" DataType="107" Expression="[p_bid_id]" DefaultValue="-1"/>
+      </TableDataSource>
+      <TableDataSource Name="Table1" Alias="Branch_Info" DataType="System.Int32" Enabled="true" SelectCommand=" select *  &#13;&#10;  from (select &#13;&#10;               poa.ord as br_boss_ord,&#13;&#10;               poa.fio as br_boss, &#13;&#10;               poa.fio_r as br_boss_r, &#13;&#10;               poa.post_r as post_r, &#13;&#10;               poa.branch_adr as adr_branch,&#13;&#10;               poa.poa_doc as br_boss_doc_r,&#13;&#10;               poa.poa_notary_num as br_boss_doc,&#13;&#10;               substr(f_dat_lit(POA.POA_CERT), 1, 25) as br_bos_doc_cert_d, &#13;&#10;               poa_notary as br_boss_doc_n,&#13;&#10;               POA.DISTRICT_NAME as br_boss_doc_name_not,&#13;&#10;               poa_notary_num as br_boss_doc_n_r,&#13;&#10;               poa_date br_boss_doc_date,&#13;&#10;               substr(f_dat_lit(poa_date), 1, 25) as br_boss_doc_d,&#13;&#10;               branch_loc as br_location,&#13;&#10;               branch_name as name_branch,&#13;&#10;               f_ourmfo_g as mfo,&#13;&#10;               (select val from params$base where par = 'OKPO') as okpo,&#13;&#10;               f_doc_attr('BANK_NAME', :p_bid_id) as bank_name&#13;&#10;          from wcs_bids b, &#13;&#10;               wcs_power_of_attorneys poa&#13;&#10;         where b.id = :p_bid_id&#13;&#10;           and b.branch = poa.branch&#13;&#10;           and poa.active = 1&#13;&#10;      order by poa.ord) &#13;&#10; where rownum = 1">
+        <Column Name="BR_BOSS_ORD" DataType="System.Decimal"/>
+        <Column Name="BR_BOSS" DataType="System.String"/>
+        <Column Name="BR_BOSS_R" DataType="System.String"/>
+        <Column Name="POST_R" DataType="System.String"/>
+        <Column Name="ADR_BRANCH" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC_R" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC" DataType="System.String"/>
+        <Column Name="BR_BOS_DOC_CERT_D" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC_N" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC_NAME_NOT" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC_N_R" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC_DATE" DataType="System.DateTime"/>
+        <Column Name="BR_BOSS_DOC_D" DataType="System.String"/>
+        <Column Name="BR_LOCATION" DataType="System.String"/>
+        <Column Name="NAME_BRANCH" DataType="System.String"/>
+        <Column Name="MFO" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="BANK_NAME" DataType="System.String"/>
+        <CommandParameter Name="p_bid_id" DataType="126" Expression="[p_bid_id]"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_bid_id" DataType="System.Int32" Expression="3550021 "/>
+    <Parameter Name="p_ws_id" DataType="System.String" Expression="&quot;MAIN&quot;"/>
+    <Parameter Name="p_ws_number" DataType="System.Decimal" Expression="0"/>
+  </Dictionary>
+  <ReportPage Name="Page1" RawPaperSize="9" FirstPageSource="15" OtherPagesSource="15" Guides="18.9,699.3,434.7,283.5">
+    <DataBand Name="Data2" Width="718.2" Height="661.5" Guides="0,642.6,18.9,37.8,56.7,75.6,94.5,113.4,132.3,151.2,189,226.8,245.7,264.6,302.4,340.2,359.1,378,396.9,415.8,453.6,529.2,567,585.9,604.8,623.7">
+      <TableObject Name="Table2" Left="18.9" Width="680.4" Height="642.6">
+        <TableColumn Name="Column3" Width="415.8"/>
+        <TableColumn Name="Column4" Width="264.6"/>
+        <TableRow Name="Row7">
+          <TableCell Name="Cell16"/>
+          <TableCell Name="Cell17" Text="Додаток 3 " HorzAlign="Right" Font="Times New Roman, 12pt, style=Italic"/>
+        </TableRow>
+        <TableRow Name="Row8">
+          <TableCell Name="Cell21"/>
+          <TableCell Name="Cell22" Text="[BID_DATA.AGR_NAME] " HorzAlign="Right" Font="Times New Roman, 12pt, style=Italic"/>
+        </TableRow>
+        <TableRow Name="Row9">
+          <TableCell Name="Cell26" Text="№ [BID_DATA.DEAL_NUM] [BID_DATA.DAT_DOG_PR]" HorzAlign="Right" Font="Times New Roman, 12pt, style=Italic" ColSpan="2"/>
+          <TableCell Name="Cell27"/>
+        </TableRow>
+        <TableRow Name="Row10">
+          <TableCell Name="Cell31"/>
+          <TableCell Name="Cell32"/>
+        </TableRow>
+        <TableRow Name="Row11">
+          <TableCell Name="Cell36" Text="Витяг з Ттарифів за послуги установ АТ “Ощадбанк”" HorzAlign="Center" Font="Times New Roman, 12pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell37" HorzAlign="Right" Font="Times New Roman, 12pt, style=Italic"/>
+        </TableRow>
+        <TableRow Name="Row12">
+          <TableCell Name="Cell38"/>
+          <TableCell Name="Cell39"/>
+        </TableRow>
+        <TableRow Name="Row13">
+          <TableCell Name="Cell40" Text="1.3. Послуги при кредитуванні  клієнтів" Font="Times New Roman, 12pt, style=Bold"/>
+          <TableCell Name="Cell41"/>
+        </TableRow>
+        <TableRow Name="Row14">
+          <TableCell Name="Cell42"/>
+          <TableCell Name="Cell43"/>
+        </TableRow>
+        <TableRow Name="Row15" Height="37.8">
+          <TableCell Name="Cell44" Border.Lines="All" Border.TopLine.Style="Double" Text="Послуги банку" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 11pt, style=Bold"/>
+          <TableCell Name="Cell45" Border.Lines="All" Border.TopLine.Style="Double" Text="Тариф-вартість послуги*" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 11pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row16" Height="37.8">
+          <TableCell Name="Cell46" Border.Lines="All" Text="І.3.1. Послуги банку по операціях з надання та обслуговування кредиту:" VertAlign="Center" Font="Times New Roman, 11pt, style=Bold"/>
+          <TableCell Name="Cell47" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 11pt"/>
+        </TableRow>
+        <TableRow Name="Row17">
+          <TableCell Name="Cell48" Border.Lines="All" Text="1.3.1.1.Надання кредиту" VertAlign="Center" Font="Times New Roman, 11pt"/>
+          <TableCell Name="Cell49" Border.Lines="All" Text="[Format(&quot;{0:N}&quot;, [BID_DATA.SINGLE_FEE])] грн." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 11pt"/>
+        </TableRow>
+        <TableRow Name="Row18">
+          <TableCell Name="Cell50" Border.Lines="All" Text="1.3.1.2. Обслуговування кредиту" VertAlign="Center" Font="Times New Roman, 11pt"/>
+          <TableCell Name="Cell51" Border.Lines="All" Text="[IIf([BID_DATA.MONTHLY_FEE] == 0,&quot;Не застосовується&quot;,Format(&quot;{0:N}&quot;, [BID_DATA.MONTHLY_FEE]))]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 11pt"/>
+        </TableRow>
+        <TableRow Name="Row19" Height="37.8">
+          <TableCell Name="Cell52" Border.Lines="All" Text="1.3.1.3. Резервування коштів на невикористану частину кредиту за кредитною лінією" VertAlign="Center" Font="Times New Roman, 11pt"/>
+          <TableCell Name="Cell53" Border.Lines="All" Text="Не застосовується" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 11pt"/>
+        </TableRow>
+        <TableRow Name="Row20" Height="37.8">
+          <TableCell Name="Cell54" Border.Lines="All" Text="1.3.1.4. Надання довідок та дублікатів довідок щодо виконання кредитних зобов’язань та розрахунків за ними" VertAlign="Center" Font="Times New Roman, 11pt"/>
+          <TableCell Name="Cell55" Border.Lines="All" Text="Не застосовується" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 11pt"/>
+        </TableRow>
+        <TableRow Name="Row21">
+          <TableCell Name="Cell56" Border.Lines="All" Text="1.3.1.4.1.	по діючих рахунках" VertAlign="Center" Font="Times New Roman, 11pt"/>
+          <TableCell Name="Cell57" Border.Lines="All" Text="25,00 грн." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 11pt"/>
+        </TableRow>
+        <TableRow Name="Row22">
+          <TableCell Name="Cell58" Border.Lines="All" Border.BottomLine.Style="Double" Text="1.3.1.4.2.	з використанням архівних даних" VertAlign="Center" Font="Times New Roman, 11pt"/>
+          <TableCell Name="Cell59" Border.Lines="All" Border.BottomLine.Style="Double" Text="50,00 грн" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 11pt"/>
+        </TableRow>
+        <TableRow Name="Row23">
+          <TableCell Name="Cell60"/>
+          <TableCell Name="Cell61"/>
+        </TableRow>
+        <TableRow Name="Row24">
+          <TableCell Name="Cell62" Text="З Тарифами за послуги установ АТ «Ощадбанк» ознайомлений _________________________________" VertAlign="Center" Font="Times New Roman, 11pt" ColSpan="2"/>
+          <TableCell Name="Cell63"/>
+        </TableRow>
+        <TableRow Name="Row25" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell64"/>
+          <TableCell Name="Cell65" Text="[BID_DATA.F] [BID_DATA.I] [BID_DATA.O]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 11pt"/>
+        </TableRow>
+        <TableRow Name="Row26" Height="75.6">
+          <TableCell Name="Cell66"/>
+          <TableCell Name="Cell67"/>
+        </TableRow>
+        <TableRow Name="Row27" Height="37.8">
+          <TableCell Name="Cell68" Text="* Зазначається Тариф - вартість послуги, згідно діючих Тарифів за послуги установ АТ «Ощадбанк» на момент укладення між Банком та позичальником кредитного договору.&#13;&#10;" VertAlign="Center" Font="Times New Roman, 11pt" ColSpan="2"/>
+          <TableCell Name="Cell69"/>
+        </TableRow>
+        <TableRow Name="Row28">
+          <TableCell Name="Cell70"/>
+          <TableCell Name="Cell71"/>
+        </TableRow>
+        <TableRow Name="Row29">
+          <TableCell Name="Cell72"/>
+          <TableCell Name="Cell73" VertAlign="Center" Font="Times New Roman, 11pt"/>
+        </TableRow>
+        <TableRow Name="Row30">
+          <TableCell Name="Cell74"/>
+          <TableCell Name="Cell75"/>
+        </TableRow>
+        <TableRow Name="Row31">
+          <TableCell Name="Cell76" Text="Банк   ___________________   [Branch_Info.BR_BOSS]" VertAlign="Center" Font="Times New Roman, 11pt"/>
+          <TableCell Name="Cell77"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+  </ReportPage>
+</Report>

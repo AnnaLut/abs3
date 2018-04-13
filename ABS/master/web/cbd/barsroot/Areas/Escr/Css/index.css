@@ -1,0 +1,32 @@
+﻿.k-grid-header TH.k-header {
+    white-space: normal !important;
+    padding: .3em .4em .2em .4em;
+    text-align: center;
+}
+
+.reg-filter td {
+    padding: 5px 0px 0px 15px;
+}
+
+.k-window-content.k-content button {
+    float: right;
+}
+
+.k-state-selected {
+    color: #fff !important;
+    background-color: #428bca !important;
+    border-color: #428bca !important;
+}
+
+.k-widget.k-window {
+    transform: scale(1) !important;
+}
+
+.toolbar-top-transporant {
+    position: fixed;
+    z-index: 100;
+    top: 0px;
+    border: 0;
+    filter: alpha(opacity=80);
+    opacity: 0.8;
+}

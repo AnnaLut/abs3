@@ -1,0 +1,96 @@
+<xmlform captiontype="OnlyTitle">
+  <grids>
+    <grid id="gv" pagesize="10" showpagesizebox="true" title="Журнал подій" showfilter="true">
+      <buttons defaulttype="Button">
+        <button caption="Стан завдання" hint="Перегляд стану завдання" id="btnr">
+          <command type="Redirect" url="dynform.aspx?form=frm_cig_job" checkselectedrow="false"> </command>
+        </button>
+      </buttons>
+      <datasource>
+        <sql>
+          select e.*, trunc(e.evt_date) as evt_date_t from V_CIG_EVENTS e order by evt_id desc
+        </sql>
+      </datasource>
+      <rowselection method="SingleRow" />
+      <filters caption="Фільтри" width="100%" buttontext="Пошук" columnscount="4">
+        <filter caption="Дата" columnindex="1" field="EVT_DATE_T" allowemptyvalue="false"  condition="Equal" id="fltrDT">
+          <uicontrol type="DateInput">
+            <defaultvalue type="PlSqlFunction" value="sysdate"></defaultvalue>
+          </uicontrol>
+        </filter>
+        <filter caption="Група" columnindex="2" field="GROUP_ID"  condition="Equal" id="fltrGID">
+          <uicontrol type="DropDownList" table="cig_state_groups" keyfield="group_id" valuefield="group_name" addemptyitem="true"></uicontrol>
+        </filter>
+        <filter caption="Код клієнта" columnindex="3" field="EVT_RNK"  condition="Equal" id="fltrRnk">
+          <uicontrol type="IntegerInput"></uicontrol>
+        </filter>
+        <filter caption="Код договора" columnindex="4" field="EVT_ND"  condition="Equal" id="fltrNd">
+          <uicontrol type="IntegerInput"></uicontrol>
+        </filter>
+      </filters>
+      <fields>
+        <field name="EVT_ID" key="true" datatype="Int64" sort="Desc">
+          <column show="true" caption="Код події" align="Right"  />
+        </field>
+        <field name="EVT_DATE" key="false" datatype="DateTime">
+          <column show="true" caption="Дата події" formatstring="{0:dd.MM.yyyy HH:mm:ss}" width="100"  align="Center" />
+        </field>
+        <field name="EVT_DATE_T" key="false" datatype="DateTime">
+          <column show="false" caption="Дата події" />
+        </field>
+        <field name="USER_NAME" key="false" datatype="String" sort="default">
+          <column show="true" caption="Користувач" align="left" />
+        </field>
+        <field name="GROUP_ID" key="false" datatype="Int64">
+          <column show="false" caption="Код групи події" align="Right" />
+        </field>
+        <field name="GROUP_NAME" key="false" datatype="String" sort="default">
+          <column show="true" caption="Група події" align="left" />
+        </field>
+        <field name="STATE_NAME" key="false" datatype="String" sort="default">
+          <column show="true" caption="Подія" align="left" />
+        </field>
+        <field name="EVT_MESSAGE" key="false" datatype="String" sort="default">
+          <column show="true" caption="Текст" align="left" />
+        </field>
+        <field name="EVT_ORAERR" key="false" datatype="String" sort="default">
+          <column show="true" caption="Текст системної помилки" align="left" />
+        </field>
+        <field name="EVT_ND" key="false" datatype="Int64" sort="default">
+          <column show="true" caption="Код кредитного договору" align="right">
+            <link url="/barsroot/barsweb/dynform.aspx?form=frm_cig_dogview" target="Blank">
+              <parameters>
+                <parameter name="EVT_ND" altname="nd" type="DataField"  datatype="Int64"></parameter>
+                <parameter type="DataField" name="BRANCH" altname="branch" datatype="String" ></parameter>
+              </parameters>  
+            </link>
+          </column>
+        </field>
+        <field name="EVT_RNK" key="false" datatype="Int64" sort="default">
+          <column show="true" caption="Код клієнта" align="right">
+            <link url="/barsroot/barsweb/dynform.aspx?form=frm_cig_custview" target="Blank">
+              <parameters>
+                <parameter name="EVT_RNK" altname="rnk" type="DataField"  datatype="Int64"></parameter>
+                <parameter type="DataField" name="BRANCH" altname="branch" datatype="String" ></parameter>
+              </parameters>
+            </link>
+          </column>
+        </field>
+		<field name="EVT_DTYPE" key="false" datatype="String" sort="default">
+          <column show="true" caption="Тип кредитного договору" align="left" />
+        </field>
+		<field name="EVT_CUSTTYPE" key="false" datatype="String" sort="default">
+          <column show="true" caption="Тип клієнта" align="left" />
+        </field>
+        <field name="BRANCH" key="false" datatype="String" sort="default">
+          <column show="false" caption="Код відділення" align="left" />
+        </field>
+        <field name="BRANCH_DOG" key="false" datatype="String" sort="default">
+          <column show="true" caption="Бранч відділення" align="left" />
+        </field>
+
+      </fields>
+    </grid>
+  </grids>
+</xmlform>
+

@@ -1,0 +1,92 @@
+﻿@{
+    ViewBag.Title = "";
+}
+
+@model string
+
+<style>
+    .form-group {
+        margin-bottom: 10px;
+    }
+
+    .form-group .k-colorpicker {
+        width: 55px;
+    }
+
+    .form-group > div > input,
+    .form-group > div > textarea,
+    .form-group > div > .k-widget {
+        margin-bottom: 5px;
+        margin-top: 5px;
+    }
+
+    .form-group > div > textarea,
+    .form-group > div > table textarea {
+        margin-bottom: 5px;
+    }
+
+    .form-group .k-datepicker {
+        width: 140px !important;
+    }
+
+    .form-group .k-datetimepicker {
+        width: 180px !important;
+    }
+
+    .form-group .k-tool-group .k-combobox,
+    .form-group .k-tool-group .k-dropdown {
+        width: 120px;
+    }
+
+    .form-group .k-tool-group .k-colorpicker {
+        width: 60px;
+        float: left;
+    }
+</style>
+<div>
+    <form method="POST" style="padding: 10px" enctype="multipart/form-data" onsubmit="if (document.getElementById('fileUpload') && document.getElementById('fileUpload').value == '') { return false; }">
+
+        <h2>Завантаження розподілу лімітів</h2>
+
+        <div class="form-group">
+            <label class="control-label col-xs-4 col-sm-4">Вкажіть дату:</label>
+            <div class="col-xs-6 col-sm-6 col-md-6">
+                <input type="text" name="date" id="date" value="@Model" required validationmessage="Виберіть дату" />
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 50px">
+            <label class="control-label col-xs-4 col-sm-4">Виберіть файл:</label>
+            <div class="col-xs-6 col-sm-6 col-md-6">
+                <input type="file" name="file" id="fileUpload" required validationmessage="Виберіть файл" />
+            </div>
+        </div>
+
+        <div class="window-footer">
+            <button type="submit" id="submitForm" class="k-button k-primary" style="margin-top: 50px; float: right">
+                <i class="pf-icon pf-16 pf-arrow_download"></i> Завантажити файл
+            </button>
+
+        </div>
+    </form>
+</div>
+
+
+<script>
+    $(function() {
+        $("#date").kendoDatePicker({
+            format: "dd/mm/yyyy"
+        });
+        $('#submitForm').on('click', function () {
+            alert()
+            $('#uploadForm').submit();
+        });
+        $("#fileUpload").kendoUpload({
+            async: {
+                saveUrl: "save",
+                removeUrl: "remove",
+                autoUpload: true
+            }
+        });
+    })
+</script>
