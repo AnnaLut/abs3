@@ -114,7 +114,6 @@ exception
   then null;
 end;
 /
--- When adding a column on compressed tables, do not specify a default value.
 
 declare
   e_col_exists           exception;
