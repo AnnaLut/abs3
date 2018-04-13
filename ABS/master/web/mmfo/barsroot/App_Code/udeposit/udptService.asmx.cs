@@ -1175,11 +1175,11 @@ namespace barsroot.udeposit
                 InitOraConnection();
                 SetRole(base_role);
                 SetParameters("ID", DB_TYPE.Decimal, id, DIRECTION.Input);
-                ArrayList reader = SQL_reader("select d.TERM_MAX, d.KV, t.lcv, t.name, d.freq_v, f.name, d.br_id, b.name, NVL(d.comproc,0), NVL(d.fl_extend,0)" + 
-                                              "     , d.id_stop, s.name, d.bsd, d.bsn, d.IRVK, br.branch, br.name, d.SHABLON" +
+                ArrayList reader = SQL_reader("select d.TERM_MAX, d.KV, t.lcv, t.name, d.freq_v, f.name, d.br_id, b.name, NVL(d.comproc,0), NVL(d.fl_extend,0)" +
+                                              "     , d.id_stop, s.name, d.bsd, d.bsn, d.DPU_TYPE, br.branch, br.name, d.SHABLON" +
                                               "     , nvl(d.MIN_SUMM,0)/100, nvl(d.MAX_SUMM,0)/100, nvl(d.TERM_TYPE,2)" +
                                               "  from TABVAL t, DPU_VIDD d, FREQ f, BRATES b, DPT_STOP s, BRANCH br " + 
-                                              " where br.BRANCH = sys_context('bars_context', 'user_branch') and d.kv=t.kv(+) and d.freq_v=f.freq(+) " +
+                                              " where br.BRANCH = sys_context('bars_context','user_branch') and d.kv=t.kv(+) and d.freq_v=f.freq(+) " +
                                               "   and d.BR_ID = b.BR_ID(+) and d.ID_STOP = s.ID(+) and d.VIDD = :id" );
                 if (reader.Count != 0)
                 {
