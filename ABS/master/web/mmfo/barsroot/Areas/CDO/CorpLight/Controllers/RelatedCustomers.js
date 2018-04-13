@@ -51,6 +51,8 @@ angular.module(globalSettings.modulesAreas)
                 if (customerData.DocType == '7') {
                     vm.currentUser.DocDateTo = customerData.DocDateTo ? new Date(parseInt(customerData.DocDateTo.substr(6))) : null;
                 }
+                vm.currentUser.DocType = customerData.DocType;
+                SetDropDocListValue();
                 vm.validateTaxCode();
             }
 
@@ -643,8 +645,8 @@ angular.module(globalSettings.modulesAreas)
                 bars.ui.loader(userForm, true);
                 $.ajax({
                     type: 'PUT',
-                    url: bars.config.urlContent('/api/cdo/corpLight/users/LockUser?userId=' + userId +
-                        '&customerId=' + custId),
+                    url: bars.config.urlContent('/api/cdo/corpLight/users/LockUser/' + userId +
+                        '/' + custId),
                     success: function (data, textStatus, jqXHR) {
                         bars.ui.loader(userForm, false);
                         bars.ui.notify('Успішно!', 'Користувача заблоковано', 'success');
@@ -664,9 +666,8 @@ angular.module(globalSettings.modulesAreas)
                 bars.ui.loader(userForm, true);
                 $.ajax({
                     type: 'PUT',
-                    url: bars.config.urlContent('/api/cdo/corpLight/users/unLockUser?userId=' + userId +
-                        '&customerId=' + custId +
-                        '&bankId=' + document.getElementById('bankId').value),
+                    url: bars.config.urlContent('/api/cdo/corpLight/users/unLockUser/' + userId +
+                        '/' + custId),
                     success: function (data, textStatus, jqXHR) {
                         bars.ui.loader(userForm, false);
                         bars.ui.notify('Успішно!', 'Користувача розблоковано', 'success');

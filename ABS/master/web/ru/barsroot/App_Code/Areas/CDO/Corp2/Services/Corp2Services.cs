@@ -1,6 +1,4 @@
-﻿//#define development_stage
-
-using BarsWeb.Areas.CDO.Common.Repository;
+﻿using BarsWeb.Areas.CDO.Common.Repository;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -29,12 +27,9 @@ namespace BarsWeb.Areas.CDO.Corp2.Services
         public Corp2Services(IParametersRepository parametersRepository)
         {
             this.parametersRepository = parametersRepository;
-#if development_stage
-            //Your path to corp2 services
-            url = "http://localhost:7777/ibank/service/";
-#else
+
             url = GetUrl();
-#endif
+
             secretService = new SecretService();
             secretService.Url = url + secretServiceName;
         }

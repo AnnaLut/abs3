@@ -58,6 +58,7 @@
                                @*kendo-numeric-text-box
                                k-options="{format: '000000', spinners: false}"*@
                                maxlength="10"
+                               numeric-only
                                id="TaxCode"
                                class="k-input k-textbox w-100"
                                name="TaxCode"
@@ -169,14 +170,15 @@
                             Номер паспорту
                             <span class="required">*</span>
                         </label>
-                        <input kendo-numeric-text-box
-                               k-options="{format: '000000', spinners: false}"
+                        <input numeric-only
+                                @*kendo-numeric-text-box
+                               k-options="{format: '000000', spinners: false}"*@
                                id="docNumber"
-                               class="k-input w-100"
+                               class="k-input k-textbox w-100"
                                maxlength="6"
                                ng-disabled="relCustCtrl.currentUser.isReadOnly"
                                name="docNumber"
-                               k-ng-model="relCustCtrl.currentUser.DocNumber"
+                               ng-model="relCustCtrl.currentUser.DocNumber"
                                required="required" />
                     </div>
                     <div class="col-sm-4">
@@ -316,7 +318,7 @@
                         <div>
                             <label for="CellPhone">
                                 Мобільний телефон
-                                <span class="required">*</span>
+                                @*<span class="required">*</span>*@
                             </label>
                             <input type="text"
                                    ng-model="relCustCtrl.currentUser.CellPhone"
@@ -326,7 +328,7 @@
                                    k-mask="'+389990000000'"
                                    id="CellPhone"
                                    class="k-input k-textbox" style="width: 150px"
-                                   name="LoginProviderValueMobilePhone" required="required" />
+                                   name="LoginProviderValueMobilePhone" @*required="required"*@ />
                         </div>
                     </div>
 

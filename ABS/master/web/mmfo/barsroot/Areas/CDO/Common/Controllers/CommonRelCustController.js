@@ -164,7 +164,7 @@ angular.module(globalSettings.modulesAreas)
                     template: function (data) {
                         var content = '';
                         if (data.Sdo && data.Sdo.toUpperCase() == 'CORP2') {
-                            content = '<a href="#" ng-click="open_userDetailWindow_back(' + data.Id + ')" style="text-decoration: underline; color: steelblue;">'
+                            content = '<a href="#" ng-click="open_userConnectionParamsWindow_back(' + data.Id + ')" style="text-decoration: underline; color: steelblue;">'
                                 + data.Sdo + '</a>';
                         }
                         else content = data.Sdo;
@@ -176,7 +176,7 @@ angular.module(globalSettings.modulesAreas)
                     template: function (data) {
                         var content = '';
                         if (data.Sdo && data.Sdo.toUpperCase() == 'CORP2') {
-                            content = '<a href="#" ng-click="open_userConnectionParamsWindow_back(' + data.Id + ')" style="text-decoration: underline; color: steelblue;">'
+                            content = '<a href="#" ng-click="open_userDetailWindow_back(' + data.Id + ')" style="text-decoration: underline; color: steelblue;">'
                                 + data.LastName + ' ' + data.FirstName + ' ' + data.SecondName + '</a>';
                         }
                         else content = data.LastName + ' ' + data.FirstName + ' ' + data.SecondName;

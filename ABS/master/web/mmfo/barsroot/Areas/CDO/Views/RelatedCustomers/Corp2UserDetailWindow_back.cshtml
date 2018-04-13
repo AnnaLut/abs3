@@ -18,7 +18,7 @@
                                id="TaxCode"
                                class="k-input k-textbox w-100"
                                name="TaxCode"
-                               ng-disabled="true"
+                               disabled
                                ng-model="relCustCtrl.currentUser.TaxCode"/>
                     </div>
                     <div class="col-sm-4">
@@ -27,7 +27,7 @@
                         </label>
                         <input kendo-masked-date-picker
                                k-options="{format: 'dd.MM.yyyy'}"
-                               ng-disabled="true"
+                               disabled
                                id="BirthDate"
                                class="k-input k-textbox w-100"
                                name="BirthDate"
@@ -45,7 +45,7 @@
                         <input id="DisplayNameLastName"
                                class="k-input k-textbox w-100"
                                name="DisplayNameLastName"
-                               ng-disabled="true"
+                               disabled
                                ng-model="relCustCtrl.currentUser.LastName"/>
                     </div>
                     <div class="col-xs-12 col-sm-4">
@@ -56,7 +56,7 @@
                                id="DisplayNameFirstName"
                                class="k-input k-textbox w-100"
                                name="DisplayNameFirstName"
-                               ng-disabled="true"
+                               disabled
                                ng-model="relCustCtrl.currentUser.FirstName"/>
                     </div>
                     <div class="col-xs-12 col-sm-4">
@@ -65,7 +65,7 @@
                         </label>
                         <input 
                                id="DisplayNamePatronymic"
-                               ng-disabled="true"
+                               disabled
                                class="k-input k-textbox w-100"
                                name="DisplayNamePatronymic"
                                ng-model="relCustCtrl.currentUser.SecondName"/>
@@ -79,7 +79,7 @@
                         <input 
                                id="DisplayNameFullNameGenitiveCase"
                                class="k-input k-textbox w-100"
-                               ng-disabled="true"
+                               disabled
                                name="DisplayNameFullNameGenitiveCase"
                                ng-model="relCustCtrl.currentUser.FullNameGenitiveCase" />
                     </div>
@@ -95,7 +95,7 @@
                         <input id="docSeries"
                                class="k-input k-textbox w-100"
                                name="docSeries"
-                               ng-disabled="true"
+                               disabled
                                ng-model="relCustCtrl.currentUser.DocSeries"/>
                     </div>
                     <div class="col-sm-4">
@@ -106,7 +106,7 @@
                                k-options="{format: '000000', spinners: false}"
                                id="docNumber"
                                class="k-input w-100"
-                               ng-disabled="true"
+                               disabled
                                name="docNumber"
                                k-ng-model="relCustCtrl.currentUser.DocNumber" />
                     </div>
@@ -117,7 +117,7 @@
                         <input id="docDate"
                                kendo-masked-date-picker
                                k-options="{format: 'dd.MM.yyyy'}"
-                               ng-disabled="true"
+                               disabled
                                class="k-input k-textbox w-100"
                                name="docDate"
                                k-ng-model="relCustCtrl.currentUser.DocDate"/>
@@ -131,7 +131,7 @@
                         <input id="DocOrganization"
                                class="k-input k-textbox w-100"
                                name="DocOrganization"
-                               ng-disabled="true"
+                               disabled
                                ng-model="relCustCtrl.currentUser.DocOrganization" />
                     </div>
                 </div>
@@ -148,7 +148,7 @@
                                 ng-model="relCustCtrl.currentUser.AddressRegionId"
                                 name="AddressRegionId"
                                 id="AddressRegionId"
-                                ng-disabled="true">
+                                disabled>
                             <option value="1" selected>Київ</option>
                             <option value="2">Волинська обл</option>
                             <option value="3">Вінницька обл</option>
@@ -183,7 +183,7 @@
                         </label>
                         <input 
                                id="AddressCity"
-                               ng-disabled="true"
+                               disabled
                                class="k-input k-textbox w-100"
                                name="AddressCity"
                                ng-model="relCustCtrl.currentUser.AddressCity" />
@@ -195,7 +195,7 @@
                         </label>
                         <input
                                id="AddressStreet"
-                               ng-disabled="true"
+                               disabled
                                class="k-input k-textbox w-100"
                                name="AddressStreet"
                                ng-model="relCustCtrl.currentUser.AddressStreet"/>
@@ -205,7 +205,7 @@
                         </label>
                         <input
                                id="AddressHouseNumber"
-                               ng-disabled="true"
+                               disabled
                                class="k-input k-textbox w-100"
                                name="AddressHouseNumber"
                                ng-model="relCustCtrl.currentUser.AddressHouseNumber" />
@@ -217,7 +217,7 @@
                         <label for="Address">Додатково</label>
                         <input
                                id="AddressAddition"
-                               ng-disabled="true"
+                               disabled
                                class="k-input k-textbox w-100"
                                name="AddressAddition"
                                ng-model="relCustCtrl.currentUser.AddressAddition" />
@@ -235,7 +235,7 @@
                             <input type="text"
                                    ng-model="relCustCtrl.currentUser.CellPhone"
                                    data-role="maskedtextbox"
-                                   ng-disabled="true"
+                                   disabled
                                    kendo-masked-text-box
                                    k-mask="'+389990000000'"
                                    id="CellPhone"
@@ -250,7 +250,7 @@
                         </label>
                         <input type="text"
                                id="Email"
-                               ng-disabled="true"
+                               disabled
                                maxlength="50"
                                class="k-input k-textbox w-100"
                                name="Email"

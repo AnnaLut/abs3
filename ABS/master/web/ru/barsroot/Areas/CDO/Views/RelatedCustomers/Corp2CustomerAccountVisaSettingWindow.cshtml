@@ -4,7 +4,7 @@
     <div id="custAccVisaSettingForm" class="cl-user-box k-popup-edit-form k-window-content k-content" tabindex="0">
         <div class="edit-box wrapper-sm">
             <div class="row">
-                <h4>Налаштування кількості віз по рахунку №{{relCustCtrl.currentCustomerAccount.BANK_ACC}}</h4>
+                <h4>Налаштування кількості віз по рахунку №{{relCustCtrl.currentCustomerAccount.NUM_ACC}}</h4>
                 <div style="display:inline">
                     <label style="width:100px;">
                         Кількість віз:
@@ -38,7 +38,7 @@
         </div>
         <div class="edit-box wrapper-sm">
             <div class="row">
-                <h4>Налаштування комбінованих віз по рахунку №{{relCustCtrl.currentCustomerAccount.BANK_ACC}}</h4>
+                <h4>Налаштування комбінованих віз по рахунку №{{relCustCtrl.currentCustomerAccount.NUM_ACC}}</h4>
                 <div kendo-grid="relCustCtrl.custAccVisaSettingGrid"
                      k-options="relCustCtrl.custAccVisaSettingGridOptions"></div>
             </div>
@@ -70,9 +70,9 @@
 
                     <input type="text"
                            class="k-input k-textbox w-100"
-                           name="ACC_ID"
+                           name="NUM_ACC"
                            ng-disabled="true"
-                           ng-model="relCustCtrl.currentAccountVisa.ACC_ID" />
+                           ng-model="relCustCtrl.currentAccountVisa.NUM_ACC" />
                 </div>
                 <div class="row">
 
@@ -89,7 +89,7 @@
                            k-ng-model="relCustCtrl.currentAccountVisa.VISA_ID" />*@
                     <select kendo-drop-down-list
                             class="k-input w-100"
-                            ng-disabled="relCustCtrl.currentAccountVisa.EditMode"
+                            k-ng-disabled="relCustCtrl.currentAccountVisa.EditMode"
                             data-value="[]"
                             name="VISA_ID"
                             ng-model="relCustCtrl.currentAccountVisa.VISA_ID">
