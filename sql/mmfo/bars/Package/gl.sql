@@ -3392,7 +3392,7 @@ BEGIN
           rollback to this#accountT00;
           vobO_ := 0;
           j := j + 1;
-          bars_audit.error( 'SOS0 ( ref='||to_char(ref_)||', acc='||to_char(acc_)||', fdat='||
+          bars_audit.error( 'SOS0 ( ref='||to_char(ref#)||', acc='||to_char(acc_)||', fdat='||
                             to_char(fdat_, 'dd.mm.yyyy')||', vob='||to_char(vob_)||' ) ERROR:'||
                             SubStr( sqlerrm||chr(10)||dbms_utility.format_error_backtrace, 1, 3000 ) );
       end;
