@@ -6,6 +6,11 @@
 -- create table SNAP_BALANCES_INTR_TBL (for MMFO scheme)
 -- ======================================================================================
 
+SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
+SET ECHO         OFF
+SET LINES        500
+SET PAGES        500
+SET FEEDBACK     OFF
 
 prompt -- ======================================================
 prompt -- create table SNAP_BALANCES_INTR_TBL
@@ -97,11 +102,11 @@ exception
 end;
 /
 
+SET FEEDBACK ON
+
 prompt -- ======================================================
 prompt -- Apply policies
 prompt -- ======================================================
-
-SET FEEDBACK ON
 
 begin
   bars.bpa.alter_policies( 'SNAP_BALANCES_INTR_TBL' );
@@ -113,8 +118,6 @@ commit;
 prompt -- ======================================================
 prompt -- Comments
 prompt -- ======================================================
-
-SET FEEDBACK ON
 
 COMMENT ON TABLE  SNAP_BALANCES_INTR_TBL          IS '«н≥мок балансу за день';
 
