@@ -693,7 +693,7 @@ is
   --
   -- глобальные переменные и константы
   -- 
-  g_body_version  constant varchar2(64)          := 'version 44.19  12.04.2018';
+  g_body_version  constant varchar2(64)          := 'version 44.20  16.04.2018';
   
   modcode         constant varchar2(3)           := 'DPU';
   accispparam     constant varchar2(16)          := 'DPU_ISP';
@@ -3897,32 +3897,32 @@ procedure SET_DEALSWTAGS
   p_tag59_adr   in  dpu_deal_swtags.tag59_adr%type,   -- бенефициар: адрес
   p_tag59_acc   in  dpu_deal_swtags.tag59_acc%type    -- бенефициар: счет
 ) is
-  c_title   constant varchar2(60) := 'dpu.setdealswtags:';
+  title   constant  varchar2(32) := 'dpu.setdealswtags';
 begin
-  
-  bars_audit.trace( '%s entry, dpuid=>%s, branch=>%s, tag56=>(%s,%s,%s), '||
+
+  bars_audit.trace( '%s: Entry, dpuid=>%s, branch=>%s, tag56=>(%s,%s,%s), '||
                     'tag57=>(%s,%s,%s,%s), tag59=>(%s,%s,%s)',
-                    bars_audit.args( c_title, to_char(p_dpuid),
+                    bars_audit.args( title, to_char(p_dpuid),
                                      p_tag56_name, p_tag56_adr, p_tag56_code,
-                                     p_tag57_name, p_tag57_adr, p_tag57_code, p_tag57_acc,  
+                                     p_tag57_name, p_tag57_adr, p_tag57_code, p_tag57_acc,
                                      p_tag59_name, p_tag59_adr, p_tag59_acc) );
 
-  update BARS.DPU_DEAL_SWTAGS
-     set tag56_name = SubStr(p_tag56_name, 1, 100)
-       , tag56_adr  = SubStr(p_tag56_adr , 1,  50)
-       , tag56_code = SubStr(p_tag56_code, 1,  11)
-       , tag57_name = SubStr(p_tag57_name, 1, 100)
-       , tag57_adr  = SubStr(p_tag57_adr , 1,  50)
-       , tag57_code = SubStr(p_tag57_code, 1,  11)
-       , tag57_acc  = SubStr(p_tag57_acc , 1,  20)
-       , tag59_name = SubStr(p_tag59_name, 1, 100)
-       , tag59_adr  = SubStr(p_tag59_adr , 1,  50)
-       , tag59_acc  = SubStr(p_tag59_acc , 1,  20)
-   where dpu_id     = p_dpuid;
-  
-  if sql%rowcount > 0 
+  update DPU_DEAL_SWTAGS
+     set TAG56_NAME = SubStr( trim(p_tag56_name), 1, 100 )
+       , TAG56_ADR  = SubStr( trim(p_tag56_adr ), 1,  50 )
+       , TAG56_CODE = SubStr( trim(p_tag56_code), 1,  11 )
+       , TAG57_NAME = SubStr( trim(p_tag57_name), 1, 100 )
+       , TAG57_ADR  = SubStr( trim(p_tag57_adr ), 1,  50 )
+       , TAG57_CODE = SubStr( trim(p_tag57_code), 1,  11 )
+       , TAG57_ACC  = SubStr( trim(p_tag57_acc ), 1,  20 )
+       , TAG59_NAME = SubStr( trim(p_tag59_name), 1, 100 )
+       , TAG59_ADR  = SubStr( trim(p_tag59_adr ), 1,  50 )
+       , TAG59_ACC  = SubStr( trim(p_tag59_acc ), 1,  20 )
+   where DPU_ID     = p_dpuid;
+
+  if ( sql%rowcount > 0 )
   then
-    bars_audit.trace( '%s sw-tags for deposit %s updated.', c_title, to_char(p_dpuid) );
+    bars_audit.trace( '%s: sw-tags for deposit %s updated.', title, to_char(p_dpuid) );
   else
     
     if coalesce( trim(p_tag56_name), trim(p_tag56_adr), trim(p_tag56_code),
@@ -3930,29 +3930,29 @@ begin
                  trim(p_tag59_name), trim(p_tag59_adr),                     trim(p_tag59_acc)
                ) is Null
     then 
-      bars_audit.trace( '%s all tags are null', c_title );
+      bars_audit.trace( '%s: all tags are null', title );
       null;
     else
-      bars_audit.trace('%s inserting sw-tags for deposit %s...', c_title, to_char(p_dpuid));
-      insert 
-        into dpu_deal_swtags 
-           ( dpu_id,
-             tag56_name, tag56_adr, tag56_code,
-             tag57_name, tag57_adr, tag57_code, tag57_acc,
-             tag59_name, tag59_adr,             tag59_acc ) 
+      bars_audit.trace( '%s: inserting sw-tags for deposit %s...', title, to_char(p_dpuid) );
+      insert
+        into DPU_DEAL_SWTAGS
+           ( DPU_ID,
+             TAG56_NAME, TAG56_ADR, TAG56_CODE,
+             TAG57_NAME, TAG57_ADR, TAG57_CODE, TAG57_ACC,
+             TAG59_NAME, TAG59_ADR,             TAG59_ACC )
       values
-        ( p_dpuid, 
-          substr(p_tag56_name, 1, 100), substr(p_tag56_adr, 1, 50), substr(p_tag56_code, 1, 11), 
-          substr(p_tag57_name, 1, 100), substr(p_tag57_adr, 1, 50), substr(p_tag57_code, 1, 11), substr(p_tag57_acc, 1, 20), 
-          substr(p_tag59_name, 1, 100), substr(p_tag59_adr, 1, 50),                              substr(p_tag59_acc, 1, 20) ); 
-     bars_audit.trace('%s sw-tags for deposit %s inserted.', c_title, to_char(p_dpuid));
+        ( p_dpuid
+        , substr(trim(p_tag56_name),1,100), substr( trim(p_tag56_adr),1, 50), substr(trim(p_tag56_code),1,11)
+        , substr(trim(p_tag57_name),1,100), substr( trim(p_tag57_adr),1, 50), substr(trim(p_tag57_code),1,11), substr(trim(p_tag57_acc),1,20)
+        , substr(trim(p_tag59_name),1,100), substr( trim(p_tag59_adr),1, 50),                                  substr(trim(p_tag59_acc),1,20) );
+     bars_audit.trace( '%s: sw-tags for deposit %s inserted.', title, to_char(p_dpuid) );
     end if;
     
   end if;
-  
-  bars_audit.trace('%s exit', c_title);
-  
-end set_dealswtags;
+
+  bars_audit.trace( '%s: Exit.', title );
+
+end SET_DEALSWTAGS;
 
 --
 -- функция возвращает код операции для формирования документа заданного типа
@@ -4782,10 +4782,7 @@ $end
                  when '56A  ' -- SWIFT-код Банка Посередника
                  then r_swtags.TAG56_CODE
                  when '57A  ' -- SWIFT-код Банка Посередника
-                 then case l_accrec.ACC_CUR
-                      when 643 then ''
-                      else '/' || r_swtags.TAG57_ACC || chr(10)
-                      end || r_swtags.TAG57_CODE
+                 then r_swtags.TAG57_CODE
                  when '59   ' -- Реквізити отримувача
                  then '/' || r_swtags.TAG59_ACC               || chr(10) -- Номер рахунку Отримувача 
                           || SubStr(r_swtags.TAG59_NAME,1,35) || chr(10) -- Назва Отримувача
