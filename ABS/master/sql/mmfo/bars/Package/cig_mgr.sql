@@ -205,8 +205,8 @@ create or replace package body cig_mgr is
   -- p_errormsg - текст ошибки
   --
   procedure add_event(p_errtype  in number,
-                      p_errormsg V_CIG_EVENTS.evt_message%type,
-                      p_oraerrm  V_CIG_EVENTS.evt_oraerr%type,
+                      p_errormsg V_CIG_EVENTS_INS.evt_message%type,
+                      p_oraerrm  V_CIG_EVENTS_INS.evt_oraerr%type,
                       p_nd       in cc_deal.nd%type := null,
                       p_rnk      in customer.rnk%type := null,
                       p_custtype in number default null,
@@ -216,7 +216,7 @@ create or replace package body cig_mgr is
     bars_audit.trace('%s: entry point', l_th);
 
     -- запись в журнал
-    insert into V_CIG_EVENTS c
+    insert into V_CIG_EVENTS_INS c
       (evt_id,
        evt_date,
        evt_uname,
