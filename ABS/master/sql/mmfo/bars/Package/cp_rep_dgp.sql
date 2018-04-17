@@ -13,7 +13,7 @@ create or replace package cp_rep_dgp is
 end cp_rep_dgp;
 /
 create or replace package body cp_rep_dgp is
-  G_BODY_VERSION constant varchar2(64) := 'v.1.7  27.03.2018';
+  G_BODY_VERSION constant varchar2(64) := 'v.1.8  17.04.2018';
   G_TRACE        constant varchar2(20) := 'CP_REP_DGP.';
   ---
   cursor G_CUR (p_nlsb_arr string_list, p_date_from date, p_date_to date)
@@ -29,6 +29,7 @@ create or replace package body cp_rep_dgp is
                      ar.sumb / 100 sumb,
                      ar.ref_repo,
                      ar.n / 100 sumn,
+                     ar.nom, 
                      ar.stiket,
                      ar.op,
                      ar.ref_main, -- rnbu
@@ -108,7 +109,7 @@ create or replace package body cp_rep_dgp is
                      k.dox > 1 or nvl(e.accd, e.accp) = a.acc and k.dox = 1)
                  --and (a.dapp > p_date_from - 3 or a.ostc != 0 or a.ostb != 0)
                  and substr(a.nls, 1, 4) in (select column_value from table( p_nlsb_arr ))
-                 and o.vdat <= p_date_to --
+                 and o.vdat between p_date_from and p_date_to --
                  and e.id = k.id
                  and k.rnk = c.rnk(+)
                  and o.ref = e.ref
@@ -122,7 +123,7 @@ create or replace package body cp_rep_dgp is
                  and k.spec_cond_id = ks.id(+)
                  and k.tip = 1 --and k.country=804  --and k.kv=980
                  --and nvl(k.datp, to_date('01/01/2050', 'dd/mm/yyyy')) > p_date_from
-                 and rez.ostc96(e.acc, p_date_from - 1) != 0
+                 --and rez.ostc96(e.acc, p_date_from - 1) != 0
                     --  and k.dox > 1        -- 1 - акції 2 - БЦП
                  and o.sos = 5 --- and k.emi in (0,6) -- держ/НЕ держ/інв
                order by 4; --1,3,4
@@ -860,6 +861,7 @@ create or replace package body cp_rep_dgp is
               and o.ref = ar.ref(+)
               and o.fdat between p_date_from and p_date_to
               and o.sos = 5
+              and pp.nazn like 'Продаж%'
             order by 1)
       loop
         l_cnt_prod := l_cnt_prod + 1;
@@ -1182,10 +1184,11 @@ create or replace package body cp_rep_dgp is
       l_cp_dgp_zv_row.g016 := to_char(nvl(get_hist_ir(k.id, p_date_from), k.ir),
                                       '99.99999');                                          --!Відсоткова ставка на початок звітного періоду
 
+      l_kl := k.sumn / k.nom; --кількість придбаних з cp_arch
       if k.kv = 980 then
-          l_cp_dgp_zv_row.g017 := k.s_kupl;                                                  --!тест--!!!!Ціна придбання
+          l_cp_dgp_zv_row.g017 := round(k.s_kupl / l_kl, 2);                                  --!тест--!!!!Ціна придбання (Фіалкович: Ощая цена верная, но цена покупки должна быть на 1 шт )
           else
-            l_cp_dgp_zv_row.g017 := gl.p_icurval(k.kv, k.s_kupl * 100, k.dat_k) / 100;     -- -//- (в эквіваленті)
+            l_cp_dgp_zv_row.g017 := round((gl.p_icurval(k.kv, k.s_kupl * 100, k.dat_k) / 100 ) / l_kl, 2);     -- -//- (в эквіваленті)
       end if;
 
       l_cp_dgp_zv_row.g018 := get_count_cp(k.id, p_date_from - 1, k.cena, k.cena_start, k.acc,  --!Кількість на початок звітного періоду, шт.
@@ -1499,7 +1502,8 @@ create or replace package body cp_rep_dgp is
                   pp.datp dat_ug,
                   ar.op ar_op,
                   nvl(ar.sumb, 0) / 100  ar_sumb,
-                  nvl(ar.n, 0) / 100 ar_n
+                  nvl(ar.n, 0) / 100 ar_n,
+                  pp.nazn
              from opldok o, oper pp, cp_arch ar
             where o.acc = k.acc
               and o.dk = 1
@@ -1507,10 +1511,11 @@ create or replace package body cp_rep_dgp is
               and o.ref = ar.ref(+)
               and o.fdat between p_date_from and p_date_to
               and o.sos = 5
+              and pp.nazn like 'Продаж%'
             order by 1)
       loop
         l_cnt_prod := l_cnt_prod + 1;
-        bars_audit.info(G_TRACE || l_title || ' l_cnt_prod =  '||l_cnt_prod||' k.acc='||k.acc||' ref_sale='||p.ref||' ref_buy='||k.ref);
+        bars_audit.info(G_TRACE || l_title || ' l_cnt_prod =  '||l_cnt_prod||' k.acc='||k.acc||' ref_sale='||p.ref||' ref_buy='||k.ref||' nazn='||p.nazn);
         /*Показники групи: Реалізація протягом звітного періоду*/
         /*системні*/
         l_cp_dgp_zv_row.ref_sale := p.ref;
