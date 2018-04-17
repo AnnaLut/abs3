@@ -1,5 +1,4 @@
 
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_SAL_SNP_KOR.sql =========*** Run
 PROMPT ===================================================================================== 
@@ -19,8 +18,8 @@ PROMPT *** Create  procedure P_SAL_SNP_KOR ***
 
    l_dat1  date;
    l_dat2  date;
-   L_dat1S  NUMBER;
-   L_dat2S  NUMBER;
+--   L_dat1S  NUMBER;
+--   L_dat2S  NUMBER;
 
    l_dat1K  date;
    l_dat2K  date;
@@ -42,8 +41,8 @@ SELECT MAX(FDAT) INTO l_dat2 FROM FDAT WHERE FDAT <= P_DAT2;
 IF l_dat1 IS NULL THEN l_dat1:= l_dat2; END IF;
 
 
-L_dat1S := F_SNAP_DATI(l_dat1, 1);
-L_dat2S := F_SNAP_DATI(l_dat2, 1);
+--L_dat1S := F_SNAP_DATI(l_dat1, 1);
+--L_dat2S := F_SNAP_DATI(l_dat2, 1);
 
 Logger.info(p_trace ||' l_dat1=' ||l_dat1);
 Logger.info(p_trace ||' l_dat2=' ||l_dat2);
@@ -128,17 +127,22 @@ SELECT
        a.ob22,
        a.acc,
        a.accc,
-               sum(decode(b1.CALDT_ID, L_dat1S, b1.ost+b1.dos-b1.kos,0)) OSTD,
-               sum(decode(b1.CALDT_ID, L_dat1S, b1.ostq+b1.dosq-b1.kosq,0)) OSTVD,
+               --sum(decode(b1.CALDT_ID, L_dat1S, b1.ost+b1.dos-b1.kos,0)) OSTD,
+               --sum(decode(b1.CALDT_ID, L_dat1S, b1.ostq+b1.dosq-b1.kosq,0)) OSTVD,
+               sum(decode(b1.fdat, l_dat1, b1.ost+b1.dos-b1.kos,0)) OSTD,
+               sum(decode(b1.fdat, l_dat1, b1.ostq+b1.dosq-b1.kosq,0)) OSTVD,
                sum(b1.dos) DOS,
                sum(b1.dosq) DOSq,
                sum(b1.kos) KOS,
                sum(b1.kosq) KOSq,
-               sum(decode(b1.CALDT_ID, L_dat2S, b1.ost,  0)) OSTID,
-               sum(decode(b1.CALDT_ID, L_dat2S, b1.ostq, 0)) OSTIVD,
+               --sum(decode(b1.CALDT_ID, L_dat2S, b1.ost,  0)) OSTID,
+               --sum(decode(b1.CALDT_ID, L_dat2S, b1.ostq, 0)) OSTIVD,
+               sum(decode(b1.fdat, l_dat2, b1.ost,  0)) OSTID,
+               sum(decode(b1.fdat, l_dat2, b1.ostq, 0)) OSTIVD,
                0
-          FROM accm_snap_balances b1,  accounts a, tmp_sal_acc ca
-         WHERE  b1.CALDT_ID between L_dat1S and L_dat2S
+          FROM snap_balances b1,  accounts a, tmp_sal_acc ca
+         WHERE  --b1.CALDT_ID between L_dat1S and L_dat2S
+                 b1.fdat between l_dat1 and l_dat2
            and b1.acc = a.acc
            and b1.acc = ca.acc
            AND A.ACC = CA.ACC
