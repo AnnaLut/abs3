@@ -303,4 +303,7 @@
   <data name="cbPriority.ToolTip" xml:space="preserve">
     <value>Терміновий платіж</value>
   </data>
+    <data name="Message34.Text" xml:space="preserve">
+    <value>Необхідно внести зміни або в ОКПО, або в номер рахунку.</value>
+  </data>
 </root>

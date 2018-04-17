@@ -370,7 +370,7 @@ namespace DocInput
                     cDocHandler.Bank bank = new cDocHandler.Bank(Context, TT_MfoB);
                     Bank_B.Text = bank.Nb;
 
-                    if ((TT_NlsB != string.Empty) && (TT_KvB != string.Empty))
+                    if (TT!="014" && (TT_NlsB != string.Empty) && (TT_KvB != string.Empty))
                         GetNlsNameAlien(Id_B, Nam_B, TT_NlsB, Convert.ToDecimal(TT_KvB), TT_MfoB);
                 }
                 /// Для правексу виключаємо перевірку
