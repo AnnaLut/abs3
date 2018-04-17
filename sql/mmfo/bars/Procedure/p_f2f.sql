@@ -12,7 +12,7 @@ PROMPT *** Create  procedure P_F2F ***
 % DESCRIPTION :    Процедура формирования файла                  MMFO
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 %
-% VERSION     :  v.17.005        13.11.2017
+% VERSION     :  v.18.001        17.04.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
    Структура показателя   L DDD N R E KKK ЛЛ MMM VVV H
@@ -30,6 +30,7 @@ PROMPT *** Create  procedure P_F2F ***
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+17.04.2018 из показателя DDD=211 исключаются операции с наличкой H=2  
 13.11.2017 переход на новый план счетов
 07.04.2017 DDD=208 исключена корреспонденция дт 2620,2625 -кт 3800
            DDD=211 сегмент MMM:  при счете кт=2900 код страны =804
@@ -667,6 +668,10 @@ IS
                  or mfo_ = 300465 and a.tt like 'IBO%'
                  or mfo_ = 344443 and a.nlsb like '29092000000001%' );
            commit;
+
+--    виключення готiвкових операцiй з показника 211  
+           delete from rnbu_trace
+            where kodp like '_211%2';
 
            -- відправка до інших країн для 209 показника
            insert into rnbu_trace(RECID, USERID, NLS, KV, ODATE, KODP, ZNAP, NBUC, ISP, RNK, ACC, REF, COMM, ND, MDATE, TOBO)
@@ -1818,10 +1823,10 @@ END;
 show err;
 
 PROMPT *** Create  grants  P_F2F ***
-grant EXECUTE                                                                on P_F2F           to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on P_F2F           to RPBN002;
-grant EXECUTE                                                                on P_F2F           to START1;
-grant EXECUTE                                                                on P_F2F           to WR_ALL_RIGHTS;
+grant EXECUTE          on P_F2F           to BARS_ACCESS_DEFROLE;
+grant EXECUTE          on P_F2F           to RPBN002;
+grant EXECUTE          on P_F2F           to START1;
+grant EXECUTE          on P_F2F           to WR_ALL_RIGHTS;
 
 
 
