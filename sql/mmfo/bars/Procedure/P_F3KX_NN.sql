@@ -1,22 +1,30 @@
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_F3KX_NN.sql =========*** Run ***
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure P_F3KX_NN ***
+
 CREATE OR REPLACE PROCEDURE BARS.p_f3kx_nn (
                     dat_     DATE,
-                    sheme_   VARCHAR2 DEFAULT 'G',
-                    pr_op_   NUMBER DEFAULT 1
+                    sheme_   VARCHAR2 DEFAULT 'G'
 )
 IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :   Процедура формирования 3KX     для КБ (универсальная)
 % COPYRIGHT   :   Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :   v.18.004          27.03.2018
+% VERSION     :   v.18.007          17.04.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
       sheme_ - схема формирования
-      pr_op_ - признак операции: 1 - купiвля/продаж валюти,
-                                 2 - надходження вiд нерезидентiв
-                                 3 - всi операцii
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+13.04.2018  -исключена корреспонденция дт2630-кт3800
+10.04.2018  -новые корреспонденции дт2530/2531-кт2900
+30.03.2018  zayavka.f092 может выбираться и по параметрам проводки (дата,сумма,валюта)
 27.03.2018  -новые корреспонденции дт2900-кт2531, дт2545-кт2900
             -отдельная обработка rnk=93073101 (банк как юр.лицо)
 12.03.2018  уточнениe по консолидации операций по 3739
@@ -30,8 +38,7 @@ IS
    ourOKPO_     varchar2(14);
    ourGLB_      varchar2(3);
 
-   gr_sumn_     number        := 1;        --  обмеження для продажу валюти
-   gr_sum_      number        := 1;        --  обмеження для купівлі валюти
+   gr_sum_      number        := 1;        --  обмеження по сумi для купівлі/продажу валюти
    kons_sum_    number;
 
    kodp_      varchar2(10);
@@ -40,11 +47,13 @@ IS
    nbuc_      varchar2(12);
    nbuc1_     varchar2(12);
    kurs_      number;
-   kurs1_     number;
 
    pr_s3_           number;               -- флаг для определение наличия поля S3 табл.ZAYAVKA
    is_swap_tag_     number;               -- флаг для определение наличия поля SWAP_TAG табл.FX_DEAL
    is_f092_         number;               -- флаг для определение наличия поля F092 табл.ZAYAVKA
+
+   dat_1_           date;                 -- fx_deal.dat 
+   dat_2_           date;                 -- fx_deal.dat_b
 
    sql_z      varchar2(200);
    typ_       number;
@@ -320,20 +329,6 @@ IS
 
       ELSIF p_i_ = 11
       THEN             null;
-         -- файл #70
-/*         IF dat_ >= TO_DATE ('01-09-2014','dd-mm-yyyy') and pr_op_ = 1
-         THEN
-            p_kodp_ := '71';
-            p_value_ :=
-                  NVL (SUBSTR (TRIM (p_value_), 1, 70), '01');
-         END IF;                   */
-         -- файл #D3
-/*         IF dat_ >= dat_Izm2_ and pr_op_ = 3
-         THEN
-            p_kodp_ := '42';
-            p_value_ :=
-                  NVL (SUBSTR (TRIM (p_value_), 1, 70), '01');
-         END IF;                   */
      ELSIF p_i_ = 13
      THEN
            p_kodp_ := 'Q006';
@@ -444,9 +439,8 @@ BEGIN
    p_proc_set (kodf_, sheme_, nbuc1_, typ_);
    --- выбор курса долара для пересчета суммы
    kurs_ := f_ret_kurs (840, dat_);
-   kurs1_ := f_ret_kurs (840, dat_);
 
-   kons_sum_ := gl.p_icurval (840, 100000, dat_);
+   kons_sum_ := gl.p_icurval (840, 100000, dat_);    -- 1000.00 usd для консолидации
 
    ourOKPO_ := lpad(F_Get_Params('OKPO',null), 8, '0');
 
@@ -481,7 +475,7 @@ BEGIN
    INSERT INTO OTCN_PROV_TEMP
                (ko, rnk, REF, acck, nlsk, kv, accd, nlsd, nazn, s_nom, s_eqv)
       SELECT *
-        FROM ( 		--купівля валюти
+        FROM ( 		--купівля валюти  (1)
                SELECT  '1' ko, o.rnkk, o.REF, o.acck, o.nlsk,
                        o.kv, o.accd, o.nlsd, o.nazn,
                        SUM (o.s * 100) s_nom,
@@ -489,22 +483,29 @@ BEGIN
                   FROM provodki_otc o
                  WHERE o.fdat = dat_
                    AND o.kv not in (959, 961, 962, 964, 980)
-                   AND (   (    SUBSTR (o.nlsd, 1, 4) = '2900'
-                            AND SUBSTR (o.nlsk, 1, 4) IN
+                   AND (        substr (o.nlsd, 1,4) = '2900'
+                            AND SUBSTR (o.nlsk, 1,4) IN
                                      ('1600', '1602', '2520', '2530', '2531',
                                       '2541', '2542', '2544', '2545',
                                       '2600', '2602', '2620', '2650')
                             AND LOWER (TRIM (o.nazn)) not like '%конверс%'
                             AND LOWER (TRIM (o.nazn)) not like '%конверт%'
                             AND LOWER (TRIM (o.nazn)) not like '%за рахунок _ншо_%'
-                           )
-                        OR (    SUBSTR (o.nlsd, 1, 4) = '2903'
-                            AND SUBSTR (o.nlsk, 1, 4) = '2900'
-                           )
-                        OR (    o.nlsd LIKE '29003%'    -- 21/11/2016 звернення SC-0007882 від УВК.zip
-                            AND o.nlsk LIKE '26039301886%'
-                            AND mfo_ = 300465
-                           )
+                       )
+              GROUP BY '1', o.rnkk, o.REF, o.acck, o.nlsk, o.kv, o.accd, o.nlsd, o.nazn
+              UNION ALL --купівля валюти  (2)
+               SELECT  '1' ko, o.rnkk, o.REF, o.acck, o.nlsk,
+                       o.kv, o.accd, o.nlsd, o.nazn,
+                       SUM (o.s * 100) s_nom,
+                       SUM (gl.p_icurval (o.kv, o.s * 100, dat_)) s_eqv
+                  FROM provodki_otc o
+                 WHERE o.fdat = dat_
+                   AND o.kv not in (959, 961, 962, 964, 980)
+                   AND (   (    substr (o.nlsd, 1,4) ='2903'
+                            AND substr (o.nlsk, 1,4) ='2900'  )
+                        OR (     o.nlsd like '29003%'
+                            AND  o.nlsk like '26039301886%'
+                            AND mfo_ = 300465 )
                        )
               GROUP BY '1', o.rnkk, o.REF, o.acck, o.nlsk, o.kv, o.accd, o.nlsd, o.nazn
               UNION ALL -- продаж валюти
@@ -514,9 +515,9 @@ BEGIN
                   FROM provodki_otc o
                  WHERE o.fdat = dat_
                    AND o.kv not in (959, 961, 962, 964, 980)
-                   AND (   (    SUBSTR (o.nlsk, 1, 4) = '2900'
+                   AND (   (    substr (o.nlsk, 1,4) ='2900'
                             AND
-                                SUBSTR (o.nlsd, 1, 4) IN
+                                SUBSTR (o.nlsd, 1,4) IN
                                      ('1600', '1602', '2520', '2530', '2531',
                                       '2541', '2544', '2545', '2555',
                                       '2600', '2603', '2620', '2650', '3640')
@@ -524,45 +525,39 @@ BEGIN
                             AND LOWER (TRIM (o.nazn)) not like '%конверт%'
                             AND LOWER (TRIM (o.nazn)) not like '%куп_вля%'
                            )
-                        OR (    SUBSTR (o.nlsk, 1,4) = '3739' and SUBSTR (o.nlsb, 1,4) = '2900'
+                        OR (    substr (o.nlsk, 1,4) ='3739'  and  substr (o.nlsb, 1,4) ='2900'
                             AND
-                                SUBSTR (o.nlsd, 1, 4) = '2545'
+                                SUBSTR (o.nlsd, 1,4) in ('2530','2531','2545')
                             AND LOWER (TRIM (o.nazn)) not like '%конверс%'
                             AND LOWER (TRIM (o.nazn)) not like '%конверт%'
                             AND LOWER (TRIM (o.nazn)) not like '%куп_вля%'
                            )
-                        OR (    SUBSTR (o.nlsk, 1, 4) = '2900'
-                            AND SUBSTR (o.nlsd, 1, 4) in ('2062','2063','2072','2073'))
-                        OR (    SUBSTR (o.nlsk, 1, 4) = '2903'
-                            AND SUBSTR (o.nlsd, 1, 4) = '2900'
-                           )
-                        OR (    SUBSTR (o.nlsk, 1, 4) = '2900' 
-                            AND SUBSTR (o.nlsd, 1, 4) = '2909' 
-                           )
-                        OR (    SUBSTR (o.nlsd, 1, 4) = '2900'
-                            AND SUBSTR (o.nlsk, 1, 4) = '2900'
+                        OR (    substr (o.nlsk, 1,4) ='2900'
+                            AND SUBSTR (o.nlsd, 1,4) in ('2062','2063','2072','2073'))
+                        OR (    o.nlsk like '2903%'  AND  o.nlsd like '2900%'   )
+                        OR (    o.nlsk like '2900%'  AND  o.nlsd like '2909%'   )
+                        OR (    o.nlsk like '2900%'  AND  o.nlsd like '2900%'   
                             AND mfou_ = 300465 AND mfou_ <> mfo_
                             AND LOWER (TRIM (o.nazn)) like '%продаж%'
                           )
-                        OR (    o.nlsd LIKE '2900205%'   
-                            AND o.nlsk LIKE '29003%'
+                        OR (    o.nlsd LIKE '2900205%'  AND  o.nlsk LIKE '29003%'
                             AND mfo_ = 300465
                            )
-                        OR (    SUBSTR (o.nlsd, 1, 4) = '2603'
-                            AND SUBSTR (o.nlsk, 1, 4) = '3739'
+                        OR (    substr (o.nlsd, 1,4) ='2603'
+                            AND substr (o.nlsk, 1,4) ='3739'
                             AND mfou_ = 300465
                             AND ( LOWER (TRIM (o.nazn)) like '%перерах%кошт_в для обов_язкового продажу%' OR
                                   LOWER (TRIM (o.nazn)) like '%перерах%кошт_в%продаж%'
                                 )
                            )
-                        OR (    SUBSTR (o.nlsd, 1, 4) in ('2900', '2600', '2620', '2650')
-                            AND SUBSTR (o.nlsk, 1, 4) = '3739'
+                        OR (    SUBSTR (o.nlsd, 1,4) in ('2900', '2600', '2620', '2650')
+                            AND substr (o.nlsk, 1,4) ='3739'
                             AND mfou_ = 300465
                             AND LOWER (TRIM (o.nazn)) like '%перерах%кошт_в%продаж%'
                            )
-                        OR (    SUBSTR (o.nlsd, 1, 4) in ('2610','2615', '2620','2625',
-                                                          '2630','2635', '2525','2546')
-                            AND SUBSTR (o.nlsk, 1, 4) = '3800'
+                        OR (    SUBSTR (o.nlsd, 1, 4) in ('2610','2620','2625','2630','2525','2546')
+                            AND substr (o.nlsk, 1,4) ='3800'
+                            AND o.tt !='DPT'
                             AND mfou_ = 300465
                            )
                        )
@@ -590,9 +585,9 @@ BEGIN
         and a.nlsk like '2900%'
         and a.ko = 2
         and a.ref not in (SELECT ref
-                          FROM provodki_otc
-                          WHERE ref=a.ref
-                            and (nlsd like '2901%' or nlsk like '2901%'))
+                            FROM provodki_otc
+                           WHERE ref=a.ref
+                             and (nlsd like '2901%' or nlsk like '2901%'))
         and a.ref not in (SELECT ref
                           FROM operw
                           WHERE ref=a.ref
@@ -601,22 +596,7 @@ BEGIN
                             and trim(value) not in ('110','120','131','132'));
    end if;
 
-   -- удаляем все проводки Дт 2909 Кт 2900 кроме Дт 2909 (OB22=56) Кт 2900 (OB22=01) Cбербанк
-   if mfou_ = 300465
-   then
-      delete from otcn_f70_temp a
-      where a.nlsd like '2900%'
-        and a.nlsk like '2909%'
-        and a.accd in ( select acc
-                        from specparam_int
-                        where acc in (select acc
-                                      from accounts
-                                      where nbs='2900')
-                          and NVL(trim(ob22),'00') <> '01'
-                      );
-   end if;
-
-   if mfou_ = 300465  then   --and pr_op_ =3  then
+   if mfou_ = 300465  then  
 
       delete from otcn_prov_temp a
       where a.nlsk like '2900%'
@@ -634,7 +614,7 @@ BEGIN
    -- 08.06.2017 для продажи
    -- для корреспонденции Дт 2625 Кт 3800 включаем проводки
    -- только с доп.реквизитом OW_AM и в значении есть текст "/980"
-   if mfou_ = 300465  then  -- and pr_op_ = 3
+   if mfou_ = 300465  then 
 
       delete from otcn_prov_temp a
       where a.nlsk like '2625%'
@@ -729,11 +709,10 @@ BEGIN
          END;
       end if;
 
-      IF (   ( ko_ = '1' AND ROUND (sum1_ / kurs_, 0) > gr_sum_ )
-          OR ( ko_ = '2' AND ROUND (sum1_ / kurs1_, 0) > gr_sumn_ )
-         )   THEN
+      IF ko_ in ('1','2')  and  ROUND (sum1_ / kurs_, 0) > gr_sum_ 
+      THEN
 
-         dig_ := f_ret_dig (kv_) * 100; -- сумма должна быть в единицах валюты
+         dig_ := f_ret_dig (kv_) * 100;   -- для отображения суммы в единицах валюты
 
          ---Покупка/Продажа безналичной валюты
          OPEN opl_dok;
@@ -744,9 +723,7 @@ BEGIN
 
             EXIT WHEN opl_dok%NOTFOUND;
 
-            IF ko_ = ko_1 and ( (ROUND (GL.P_ICURVAL(kv_, sum0_, dat_) / kurs1_, 0) > gr_sumn_) OR
-                                (ROUND (GL.P_ICURVAL(kv_, sum0_, dat_) / kurs_, 0) > gr_sum_)
-                              )
+            IF ko_ = ko_1  and  ROUND(gl.p_icurval(kv_, sum0_, dat_) / kurs_, 0) > gr_sum_
             THEN
 
                IF typ_ > 0  THEN
@@ -878,21 +855,26 @@ BEGIN
 
                    if is_f092_ >=1  then
 
-                      sql_z := 'SELECT F092 '
-                            || 'FROM ZAYAVKA  '
-                            || 'WHERE :ref_ in (ref, ref_sps) and nvl(dk, 1) = 2';
+--                      sql_z := 'SELECT F092 '
+--                            || 'FROM ZAYAVKA  '
+--                            || 'WHERE :ref_ in (ref, ref_sps) and nvl(dk, 1) = 2';
+                      sql_z := 'select max(F092)  from zayavka '
+                            || ' where nvl(dk, 1) =2 '
+                            || '   and ( :ref_ in (ref, ref_sps) '
+                            || '      or   vdate = :vdate_ and s2 = :s2_ '
+                            || '       and kv2 = :kv_ and rnk = :rnk_ )';
 
                       begin
                           EXECUTE IMMEDIATE sql_z
                              INTO d1#3K_
-                            USING ref_ ;
+                            USING ref_, dat_, sum0_, kv_, rnk_ ;
                       exception
                           WHEN NO_DATA_FOUND  THEN
                              if refd_ is not null  then
                                begin     
                                   EXECUTE IMMEDIATE sql_z
                                      INTO d1#3K_
-                                    USING refd_ ;
+                                    USING refd_, dat_, sum0_, kv_, rnk_ ;
                                exception
                                   WHEN NO_DATA_FOUND  THEN
                                          d1#3K_ := NULL;
@@ -970,9 +952,6 @@ BEGIN
                f089_ :='2';
 
          else
---               if (d6#70_ is null or d6#70_ <> '804') and ROUND (sum0_/dig_, 0) >= 1
---               if  round(sum0_, 0) >= 1
---               then
                   -- код операції
                   p_ins (nnnn_, 'F091', (case when ko_=1 then '3'  else '4'  end));
                   -- код валюти
@@ -1059,7 +1038,6 @@ BEGIN
                         p_ins (nnnn_, kodp_, val_);
                      END IF;
                   END LOOP;
---               end if;
 
          end if;
 
@@ -1135,6 +1113,7 @@ BEGIN
                                       ) );
                                     
    end loop;
+   nbuc_ := nbuc1_;
    f089_ :='2';
 
 --   операции из модуля FOREX
@@ -1145,11 +1124,8 @@ BEGIN
           ||'        (select nb from rcukru where glb=6) q001, '
           ||'        decode(kodb,''300001'',''3'',''2'') q024, '
           ||'        (case  when nvl(swap_tag,0) != 0  then  ''05'' '
-          ||'               when dat_a =dat     then  ''01'' '
-          ||'               when dat_a -dat =1  then  ''02'' '
-          ||'               when dat_a -dat =2  then  ''03'' '
-          ||'               when dat_a -dat >2  then  ''04'' '
-          ||'          end) d100, dat_a-dat k_days, ref '
+          ||'               else       ''00'' '
+          ||'          end) d100, dat_a, dat, ref '
           ||'   from fx_deal f'
           ||'  where dat =:1 '
           ||'    and kva != 980   and kvb =980 '
@@ -1159,11 +1135,8 @@ BEGIN
           ||'        (select nb from rcukru where glb=6) q001, '
           ||'        decode(kodb,''300001'',''3'',''2'') q024, '
           ||'        (case  when nvl(swap_tag,0) != 0  then  ''05'' '
-          ||'               when dat_b =dat     then  ''01'' '
-          ||'               when dat_b -dat =1  then  ''02'' '
-          ||'               when dat_b -dat =2  then  ''03'' '
-          ||'               when dat_b -dat >2  then  ''04'' '
-          ||'          end) d100, dat_b-dat k_days, ref '
+          ||'               else       ''00'' '
+          ||'          end) d100, dat_b, dat, ref '
           ||'   from fx_deal f'
           ||'  where dat =:2 '
           ||'    and kva = 980     and kvb !=980 '
@@ -1173,11 +1146,7 @@ BEGIN
             ' select ''3'' f091, kva r030, suma t071, ''0000000006'' k020, ''3'' k021, '
           ||'        (select nb from rcukru where glb=6) q001, '
           ||'        decode(kodb,''300001'',''3'',''2'') q024, '
-          ||'        (case  when dat_a =dat     then  ''01'' '
-          ||'               when dat_a -dat =1  then  ''02'' '
-          ||'               when dat_a -dat =2  then  ''03'' '
-          ||'               when dat_a -dat >2  then  ''04'' '
-          ||'          end) d100, dat_a-dat k_days, ref '
+          ||'         ''00''  d100, dat_a, dat, ref '
           ||'   from fx_deal f'
           ||'  where dat =:1 '
           ||'    and kva != 980     and kvb =980 '
@@ -1186,11 +1155,7 @@ BEGIN
           ||' select ''4'' f091, kvb r030, sumb t071, ''0000000006'' k020, ''3'' k021, '
           ||'        (select nb from rcukru where glb=6) q001, '
           ||'        decode(kodb,''300001'',''3'',''2'') q024, '
-          ||'        (case  when dat_b =dat     then  ''01'' '
-          ||'               when dat_b -dat =1  then  ''02'' '
-          ||'               when dat_b -dat =2  then  ''03'' '
-          ||'               when dat_b -dat >2  then  ''04'' '
-          ||'          end) d100, dat_b-dat k_days, ref '
+          ||'        ''00'' d100, dat_b, dat, ref '
           ||'   from fx_deal f'
           ||'  where dat =:2 '
           ||'    and kva = 980     and kvb !=980 '
@@ -1201,11 +1166,28 @@ BEGIN
     OPEN rfc1_  FOR v_sql_  USING dat_, dat_;
     LOOP
        FETCH rfc1_
-          INTO  f091_, r030_, t071_, k020_, k021_, q001_, q024_, d100_, k_days_, ref_;
+          INTO  f091_, r030_, t071_, k020_, k021_, q001_, q024_, d100_, dat_2_, dat_1_, ref_;
        EXIT WHEN rfc1_%NOTFOUND;
 
          nnnn_ :=nnnn_+1;
-         dig_ := f_ret_dig (r030_) * 100; -- сумма должна быть в единицах валюты
+         dig_ := f_ret_dig (r030_) * 100;      -- для отображения суммы в единицах валюты
+
+           begin
+              select dat_2_ - dat_1_ - (select count(*)  from holiday
+                                         where kv=980 and holiday between dat_1_ and dat_2_ )
+                into k_days_
+                from dual;
+           exception
+              when others  then  k_days_ :=0;
+           end;
+         if d100_ ='00'  then
+           if     k_days_ >2  then  d100_ :='04';
+           elsif  k_days_ =2  then  d100_ :='03';
+           elsif  k_days_ =1  then  d100_ :='02';
+           else                     d100_ :='01';
+           end if;
+
+         end if;
 
          nls_ := null;
          rnk_ := null;
@@ -1220,7 +1202,7 @@ BEGIN
 	 p_ins (nnnn_, 'K021', k021_);
          p_ins (nnnn_, 'Q001', q001_);
          p_ins (nnnn_, 'Q024', q024_);
-         p_ins (nnnn_, 'D100', d100_);
+         p_ins (nnnn_, 'D100', d100_||'f');
          if d100_ in ('04','05')  then
             p_ins (nnnn_, 'S180', f_s180_day(k_days_));
          else
@@ -1273,7 +1255,7 @@ BEGIN
 
          kv_ := u.kv;
          r030_ := u.kv;
-         dig_ := f_ret_dig (r030_) * 100; -- сумма должна быть в единицах валюты
+         dig_ := f_ret_dig (r030_) * 100;     -- для отображения суммы в единицах валюты
 
          f091_ := u.ko;
          if f091_ ='3'  then
@@ -1293,7 +1275,7 @@ BEGIN
 	 p_ins (nnnn_, 'K021', '3');
          p_ins (nnnn_, 'Q001', 'АТ Ощадбанк');
          p_ins (nnnn_, 'Q024', '1');
-         p_ins (nnnn_, 'D100', '01');
+         p_ins (nnnn_, 'D100', '01'||'i');
          p_ins (nnnn_, 'S180', '#');
          p_ins (nnnn_, 'F089', f089_);
          if f091_ ='3'  then
@@ -1341,3 +1323,7 @@ from rnbu_trace;
 
 END;
 /         
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_F3KX_NN.sql =========*** End ***
+PROMPT ===================================================================================== 
