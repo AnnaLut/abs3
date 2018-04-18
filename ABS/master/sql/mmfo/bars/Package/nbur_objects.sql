@@ -445,7 +445,7 @@ is
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 19.8  2018.04.13';
+  g_body_version  constant varchar2(64) := 'version 19.7  2018.03.27';
   fmt_dt          constant varchar2(10) := 'dd.mm.yyyy';
   fmt_tm          constant varchar2(21) := 'dd.mm.yyyy hh24:mi:ss';
 
@@ -1986,15 +1986,13 @@ is
 
       insert /*+ APPEND */
         into NBUR_DM_BALANCES_MONTHLY
-           ( REPORT_DATE, KF, ACC_ID, CUST_ID, DOS, KOS, OST, DOSQ, KOSQ, OSTQ
-           , CRDOS, CRKOS, CRDOSQ, CRKOSQ, CUDOS, CUKOS, CUDOSQ, CUKOSQ
-           , YR_DOS, YR_DOS_UAH, YR_KOS, YR_KOS_UAH, ADJ_BAL, ADJ_BAL_UAH )
-      select /*+ PARALLEL( 26 ) */ p_report_date, b.KF
-           , b.ACC, b.RNK, b.DOS, b.KOS, b.OST, b.DOSQ, b.KOSQ, b.OSTQ
-           , b.CRDOS, b.CRKOS, b.CRDOSQ, b.CRKOSQ, b.CUDOS, b.CUKOS, b.CUDOSQ, b.CUKOSQ
-           , b.YR_DOS, b.YR_DOS_UAH, b.YR_KOS, b.YR_KOS_UAH
-           , b.OST  - b.CRDOS  + b.CRKOS
-           , b.OSTQ - b.CRDOSQ + b.CRKOSQ
+           ( REPORT_DATE, KF, ACC_ID, CUST_ID, DOS,
+             KOS, OST, DOSQ, KOSQ, OSTQ, CRDOS, CRKOS, CRDOSQ, CRKOSQ, CUDOS, CUKOS,
+             CUDOSQ, CUKOSQ, ADJ_BAL, ADJ_BAL_UAH )
+      select /*+ PARALLEL( 8 ) */ p_report_date, b.KF,
+             b.ACC, b.RNK, b.DOS, b.KOS, b.OST, b.DOSQ, b.KOSQ, b.OSTQ,
+             b.CRDOS, b.CRKOS, b.CRDOSQ, b.CRKOSQ, b.CUDOS, b.CUKOS, b.CUDOSQ, b.CUKOSQ,
+             b.OST - b.CRDOS + b.CRKOS, b.OSTQ - b.CRDOSQ + b.CRKOSQ
         from AGG_MONBALS b
         join NBUR_QUEUE_OBJECTS q
           on ( q.KF = b.KF and q.REPORT_DATE = b.FDAT and q.ID = l_object_id )
@@ -2004,18 +2002,16 @@ is
 
       insert /* APPEND */
         into NBUR_DM_BALANCES_MONTHLY
-           ( REPORT_DATE, KF, ACC_ID, CUST_ID, DOS, KOS, OST, DOSQ, KOSQ, OSTQ
-           , CRDOS, CRKOS, CRDOSQ, CRKOSQ, CUDOS, CUKOS, CUDOSQ, CUKOSQ
-           , YR_DOS, YR_DOS_UAH, YR_KOS, YR_KOS_UAH, ADJ_BAL, ADJ_BAL_UAH )
-      select /*+ PARALLEL( 4 )*/ p_report_date, KF
-           , ACC, RNK, DOS, KOS, OST, DOSQ, KOSQ, OSTQ
-           , CRDOS, CRKOS, CRDOSQ, CRKOSQ, CUDOS, CUKOS, CUDOSQ, CUKOSQ
-           , YR_DOS, YR_DOS_UAH, YR_KOS, YR_KOS_UAH
-           , OST  - CRDOS  + CRKOS
-           , OSTQ - CRDOSQ + CRKOSQ
+           ( report_date, kf, acc_id, cust_id, dos,
+             kos, ost, dosq, kosq, ostq, crdos, crkos, crdosq, crkosq, cudos, cukos,
+             cudosq, cukosq, adj_bal, adj_bal_uah)
+      select /*+ PARALLEL( 4 )*/ p_report_date, kf,
+             acc, rnk, dos, kos, ost, dosq, kosq, ostq,
+             crdos, crkos, crdosq, crkosq, cudos, cukos, cudosq, cukosq,
+             ost - crdos + crkos, ostq - crdosq + crkosq
         from AGG_MONBALS
        where FDAT = trunc(p_report_date,'mm')
-         and KF   = p_kf;
+         and kf = p_kf;
 
     end if;
 
