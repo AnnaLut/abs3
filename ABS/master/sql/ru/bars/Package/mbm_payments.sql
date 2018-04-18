@@ -1097,12 +1097,18 @@ CREATE OR REPLACE package body mbm_payments is
 
           select decode(p_mfoa, p_mfob, 'CL1', 'CL2') into l_tt from dual;
 
-          select count(1) into l_nls_card
+/*          select count(1) into l_nls_card
           from MBM_NBS_ACC_TYPES
-          where TYPE_ID = 'CARD' and nbs = SUBSTR(p_nlsb,0,4);
+          where TYPE_ID = 'CARD' and nbs = SUBSTR(p_nlsb,0,4);*/
 
-          if (p_mfoa = p_mfob and l_nls_card > 0) then
-              l_tt := 'CL5';
+          if (p_mfoa = p_mfob) then
+            select * 
+              into l_acc
+              from accounts a
+             where a.nls = p_nlsb;
+            if l_acc.tip like 'W4%' then
+               l_tt := 'CL5';
+            end if;
           end if;
 
           bars_audit.trace('%s: l_tt = %s', l_th, l_tt);
