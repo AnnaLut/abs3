@@ -14,7 +14,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :  Процедура формирование файла #42 для КБ
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 17/11/2017 (19/10/2017)
+% VERSION     :  18/04/2018 (17/04/2018)
 %------------------------------------------------------------------------
 % 02/03/2017 - для МФО=380388 (Платинум банк) изменил признак PR_BANK 
 %              со значения "T" (временнаяй адм.) на "Л" (ликвидация)  
@@ -193,57 +193,26 @@ IS
    
    ---Остатки код 01, 02, 03, 04, 06
    CURSOR saldo  IS
-    select ddd, rnk, prins, sum(znap) znap, sum(tp_1) tp_1, sum(tp_2) tp_2, 
-                            sum(tp_3) tp_3, sum(tp_4) tp_4, sum(tp_5) tp_5, 
-                            sum(tp_6) tp_6, sum(tp_7) tp_7,
-           sum(sum_proc) sum_proc, 
-           sum(sum_kor) sum_kor 
+   select ddd, rnk, prins, znap
+   from (select '001' ddd,        
+                NVL(d.link_group, c.rnk) rnk, 
+                DECODE (c.PRINSIDER, NULL, 2, 0, 2, 99, 2, 1) prins,
+                abs(sum(decode(substr(kodp, 1, 1), '1', -1, 1)*znap)) znap
+        from otc_c5_proc o
+        join customer c
+        on (c.rnk = o.rnk)
+        left outer join d8_cust_link_groups d  
+        on (trim(c.okpo) = trim(d.okpo))                     
+        where o.datf = dat_
+        group by NVL(d.link_group, c.rnk), DECODE (c.PRINSIDER, NULL, 2, 0, 2, 99, 2, 1))
+    union all
+        select ddd, rnk, prins, sum(znap) znap
     from (
-        select a.ddd, a.rnk, a.prins, a.znap, a.tp_1, a.tp_2, a.tp_3, 
-               a.tp_4, a.tp_5, a.tp_6, a.tp_7, nvl(o.sum_proc, 0) sum_proc, 
-            znap - a.tp_7 - (case when tp_6 > 0 then tp_6 else 0 end) -
-            (case when a.prins = 1 then 0 else 
-                (case when tp_1 > 0 then tp_1 else 0 end) - 
-                (case when tp_2 > 0 then tp_2 else 0 end) - 
-                (case when tp_3 > 0 then tp_3 else 0 end) - 
-                (case when tp_4 > 0 then tp_4 else 0 end) -
-                (case when tp_5 > 0 then tp_5 else 0 end)
-             end) + 
-            nvl(o.sum_proc, 0) sum_kor
+        select a.ddd, a.rnk, a.prins, a.znap
         from (
            SELECT  a.ddd, NVL(d.link_group, c.rnk) rnk,  
                    DECODE (c.PRINSIDER, NULL, 2, 0, 2, 99, 2, 1) prins,
-                   NVL(ABS (SUM (a.ost_eqv)), 0) znap,
-                   ABS (NVL (sum((case when a.r020 IN ('1502') and NVL (p.r013, '0') NOT IN ('1', '2', '9') or
-                                            a.r020 IN ('1524') and NVL (p.r013, '0') NOT IN ('1', '3') 
-                                    then a.ost_eqv
-                                    else 0
-                                   end)),0)) tp_1,
-                   ABS (NVL (sum((case when a.r020 IN ('3003', '3005', '3007', '3010', '3011', '3015') AND NVL (p.r013, '0' ) NOT IN ('9') or
-                                            a.r020 IN ('3006', '3106') AND NVL (p.r013, '0' ) NOT IN ('1') or
-                                            a.r020 IN ('3012', '3014', '3040') AND NVL (p.r013, '0' ) NOT IN ('7', '9') or
-                                            a.r020 IN ('3013') AND NVL (p.r013, '0') NOT IN ('5','6','9','A','B','C') or
-                                            a.r020 IN ('3103', '3105', '3107') AND NVL (p.r013, '0') NOT IN ('1', '9')
-                                    then a.ost_eqv
-                                    else 0
-                                  end)),0)) tp_2,
-                   ABS (NVL (sum((case when a.r020 = '3212' AND NVL (p.r013, '0') not in ('2', '3')
-                                    then a.ost_eqv
-                                    else 0
-                                  end)),0)) tp_3,
-                   ABS (NVL (sum((case when a.r020 = '3540' and NVL (p.r013, '0') not in ('4','5','6','7')
-                                    then a.ost_eqv
-                                    else 0
-                                  end)),0)) tp_4,
-                                    0 tp_5,
-                   ABS (NVL (sum((case when a.r020 IN ('9500') and NVL (p.r013, '0') = 3
-                                    then a.ost_eqv
-                                    else 0
-                                   end)),0)) tp_6,
-                   ABS (NVL (sum((case when a.r020 IN ('9129') and NVL (p.r013, '0') NOT IN ('0', '1')
-                                    then a.ost_eqv
-                                    else 0
-                                   end)),0)) tp_7
+                   NVL(ABS (SUM (a.ost_eqv)), 0) znap
            FROM OTCN_F42_TEMP a
            left outer join specparam p
            on (a.acc = p.acc)
@@ -260,24 +229,13 @@ IS
                  ( ((our_rnk_ = -1 or c.rnk <> our_rnk_) and mfo_ <> 344443) or 
                             (c.rnk <> 0 and mfo_ = 344443) ) AND
                  (our_okpo_ = '0' or NVL(ltrim(c.okpo, '0'),'X') <> our_okpo_ or a.ddd='006' and (a.nls like '3%' or a.nls like '4%')) AND
-                 (prnk_ IS NULL OR c.rnk = prnk_)
+                 (prnk_ IS NULL OR c.rnk = prnk_) and
+                 a.ddd='006'
            GROUP BY a.ddd, NVL(d.link_group, c.rnk),  
                     DECODE (c.PRINSIDER, NULL, 2, 0, 2, 99, 2, 1)) a
-       left outer join
-       (select NVL(d.link_group, c.rnk) rnk, NVL(-1*sum(znap), 0) sum_proc
-          from otc_c5_proc o
-          join customer c
-          on (c.rnk = o.rnk)
-          left outer join d8_cust_link_groups d  
-          on (trim(c.okpo) = trim(d.okpo))                     
-          where o.datf = dat_
-            and o.nls not like '3570%' 
-          group by NVL(d.link_group, c.rnk)
-        ) o
-       on (a.rnk = o.rnk)
     ) s
     group by  s.ddd, s.rnk, s.prins
-    order by ddd, abs(to_number(sum_kor)) desc;
+    order by ddd, znap desc;
     -------------------------------------------------------------------------
 ---Остатки  код  "A0"
 -- с 13.11.2015 (за 12.11.2015) будет формироваться код A0 б/с 9110
@@ -402,6 +360,7 @@ BEGIN
    EXECUTE IMMEDIATE 'truncate table otcn_f42_temp';
    EXECUTE IMMEDIATE 'truncate table otcn_f42_zalog';
    EXECUTE IMMEDIATE 'TRUNCATE TABLE otcn_fa7_temp';
+   
 -------------------------------------------------------------------
 -- свой МФО
    mfo_ := F_Ourmfo ();
@@ -780,8 +739,7 @@ BEGIN
 
    LOOP
       FETCH saldo
-       INTO ddd_, rnk_, insider_, se_, fl_tp_1, fl_tp_2, fl_tp_3, fl_tp_4, 
-                           fl_tp_5, fl_tp_6, fl_tp_7, sum_proc_, sum_kor_ ;
+       INTO ddd_, rnk_, insider_, se_;
 
       EXIT WHEN saldo%NOTFOUND;
 
@@ -818,54 +776,6 @@ BEGIN
         
          IF se_ <> 0 AND f42_ = 0
          THEN
-            se_ := se_ - fl_tp_7;  -- вираховуємо 9129 (9)
-            
-            --- Максимальная сумма кредитов на одного заемщика (код 01)
-            --- вычитаем излишние суммы (параметр R013 только определенные значения)
-            if fl_tp_1 > 0 then
-               s02_ := fl_tp_1;
-            end if;
-
-            if fl_tp_2 > 0 then
-               s03_ := fl_tp_2;
-            end if;
-
-            --- вычитаем излишние суммы (параметр R013 только определенные значения)
-            if fl_tp_3 > 0 then
-               s04_ := fl_tp_3;
-            end if;
-
-            --- вычитаем излишние суммы (параметр R013 только определенные значения) 3540 R013 in (4,5,6)'
-            if fl_tp_4 > 0 then
-               s05_ := fl_tp_4;
-            end if;
-
-            if fl_tp_5 > 0 then
-               s05_ := s05_ - fl_tp_5;
-            end if;
-
-            -- 01.07.2014 для інсайдерів не виконуємо коригування сумі залишку 
-            -- зауваження ГОУ
-            IF insider_ <> 1 
-            THEN
-               se_ := se_ - s02_ - s03_ - s04_ - s05_;
-            end if;
-
-            --- вычитаем излишние суммы (параметр R013 только определенные значения) по 9500
-            if fl_tp_6 > 0 then
-               se_ := se_ - fl_tp_6;
-            end if;
-            
-            --- резервы нужно отнимать только по определенному набору параметров R013
-            if sum_proc_ <> 0 -- se_ <> 0 
-            then
-               se_ := se_ + sum_proc_;
-               
-               if se_ < 0 then
-                  se_ := 0;
-               end if;
-            end if;
-            
             if se_ <> 0 then
                 nlsp_ := 'RNK =' || TO_CHAR (rnk_);
                 comm_ := comm_ || ' PROC = '||  to_char(sum_proc_) ;
@@ -912,21 +822,6 @@ BEGIN
                                   )
                            VALUES (nlsp_, 0, dat_, kodp_, znap_, rnk_, rnk_, comm_
                                   );
-
-                      -- рассчитываем 61 показатель с 01.04.2006
-                      -- (Сукуп.заборг.за операцўями з контрагент.NNNN,що >20%РК до набуття статусу СОБ з Н/Кл.А <=10%)
-                      IF flag_ > 0 AND dat_ >= dat_Zm1_ AND vNKA_ <= 10 AND ABS(se_) > ROUND(sum_k_*0.2, 0) 
-                      THEN
-                         if dat_ < dat_Zm4_ then
-                            kodp_ := '61' || LPAD (nnnn01_, 4, '0');
-                         else
-                            kodp_ := '61' || LPAD (nnnn01_, 4, '0') || '000';
-                         end if;
-
-                         INSERT INTO RNBU_TRACE
-                                     (nls, kv, odate, kodp, znap, rnk, ref) VALUES
-                                     (nlsp_, 0, dat_, kodp_, znap_, rnk_, rnk_);
-                      END IF;
 
                       -- рассчитаем 47 показатель
                       begin
@@ -994,41 +889,6 @@ BEGIN
                                   (nls, kv, odate, kodp, znap, rnk, ref)
                            VALUES (nlsp_, 0, dat_, kodp_,  TO_CHAR (s_zal_), rnk_, rnk_);
                       END IF;
-
-                      if dat_ > dat_Zm2_ then
-                         SELECT ABS (NVL (SUM (s.ost_eqv), 0)) 
-                            INTO p71_
-                         FROM OTCN_F42_TEMP s, CUSTOMER c, SPECPARAM p,
-                              KL_F3_29 k
-                         WHERE s.rnk = c.rnk
-                           AND s.acc = p.acc(+)
-                           --AND NVL (c.rnkp, c.rnk) = rnk_
-                           AND c.rnk = rnk_ 
-                           AND s.nbs=k.r020
-                           AND k.kf='42'
-                           AND k.ddd='071'
-                           AND p.r013=k.r012 ;
-
-                         -- показник 71
-                         ksum_ := ROUND (sum_k_ * k1_, 0);  --ROUND (sum_k_ * 0.2, 0)
-
-                         IF ABS(p71_) > ksum_ and rgk_ >= 0
-                         THEN
-                            insert into otcn_log (kodf, userid, txt)
-                            values (kodf_, userid_, 'показник 71 rnk = '||
-                               to_char(rnk_)||'  p71 = '||to_char(p71_-ksum_));
-
-                            if dat_ < dat_Zm4_ then
-                               kodp_ := '71' || LPAD (nnnn01_, 4, '0');
-                            else
-                               kodp_ := '71' || LPAD (nnnn01_, 4, '0') || '000';                    
-                            end if;
-                            INSERT INTO RNBU_TRACE
-                              (nls, kv, odate, kodp, znap, rnk, ref)
-                            VALUES (nlsp_, 0, dat_, kodp_,  TO_CHAR (p71_-ksum_), rnk_, rnk_);
-                         END IF;
-
-                      end if;
 
                       flag_inc_ := TRUE;
                    else 
@@ -1152,7 +1012,6 @@ BEGIN
                                                               )
                                       and c.rnk = rnk_ 
                                   ); 
-                              --rnk = rnk_;
                      exception
                         when no_data_found then
                            p47_ := 0;
@@ -1176,7 +1035,6 @@ BEGIN
                                                               )
                                       and c.rnk = rnk_ 
                                   ); 
-                              --rnk = rnk_;
                      exception
                         when no_data_found then
                            p51_ := 0;
@@ -1540,70 +1398,12 @@ BEGIN
                          si1_ := ABS (se_);
                       END IF;
                    END IF;
-
-                   -- показник 42
-                   ksum_ := ROUND (sum_SK_ * k2_, 0);
-
-                   -- на 16.06.2015 показник не формується
-                   IF Dat_ < dat_Zm5_ 
-                   THEN
-
-                      IF ABS (se_) - s_zal_ > ksum_ and rgk_ >= 0
-                      THEN
-                         nnnn42_ := nnnn42_ + 1;
-                         if dat_ < dat_Zm4_ then
-                            kodp_ := '42' || LPAD (nnnn42_, 4, '0');
-                         else
-                            kodp_ := '42' || LPAD (nnnn42_, 4, '0') || '000';
-                         end if;
-                         znap_ := TO_CHAR (ABS (se_) - s_zal_ - ksum_);
-
-                         INSERT INTO RNBU_TRACE
-                                     (nls, kv, odate, kodp, znap, rnk, ref 
-                                     )
-                              VALUES (nlsp_, 0, dat_, kodp_, znap_, rnk_, rnk_ 
-                                     );
-                      END IF;
-                   END IF;
                END IF;
             end if;
          END IF;
       ELSE
          IF se_ <> 0
          THEN
-            --- Максимальная сумма, что инвестируется на покупку акций (код 06)
-            IF Dat_ < to_date('31032012','ddmmyyyy')
-            THEN
-
-               IF ABS (se_) > ROUND (sum_k_ * 0.15, 0) and rgk_ >= 0
-               THEN
-                  nnnn2_ := nnnn2_ + 1;
-                  if dat_ < dat_Zm4_ then
-                     kodp_ := '06' || LPAD (nnnn2_, 4, '0');
-                  else
-                     kodp_ := '06' || LPAD (nnnn2_, 4, '0') || '000';
-                  end if; 
-                  nlsu_ := 'RNK =' || TO_CHAR (rnk_);
-                  znap_ := TO_CHAR (abs(se_));
-
-                  INSERT INTO RNBU_TRACE
-                              (nls, kv, odate, kodp, znap, rnk, ref
-                              )
-                       VALUES (nlsu_, 0, dat_, kodp_, znap_, rnk_, rnk_ 
-                              );
-
-                  spp_ := se_;
-               END IF;
-
-               IF ABS (se_) < ROUND (sum_k_ * 0.15, 0) AND ABS (se_) >= spp_
-               THEN
-                  znapu_ := TO_CHAR (abs(se_));
-                  nlsu_ := 'RNK =' || TO_CHAR (rnk_);
-                  rnku_ := rnk_;
-                  spp_ := se_;
-               END IF;
-            END IF;
-
             --- Максимальная сумма, что инвестируется на покупку акций (код 72)
             IF Dat_ > to_date('31032012','ddmmyyyy')
             THEN
@@ -1746,17 +1546,6 @@ BEGIN
                   );
    END IF;
 
-   IF TO_NUMBER (znapu_) > 0
-   THEN
-      kodpp_ := '060001';
-
-      INSERT INTO RNBU_TRACE
-                  (nls, kv, odate, kodp, znap, rnk, ref 
-                  )
-           VALUES (nlsu_, 0, dat_, kodpp_, znapu_, rnku_, rnku_
-                  );
-   END IF;
-
    IF TO_NUMBER (znapu_72) > 0
    THEN
       kodpp_ := '720001';
@@ -1768,53 +1557,6 @@ BEGIN
                   );
    END IF;
 
-   -- показатель 65 как показатель 41 только при изменении курса валют
-   -- на 16.06.2015 показник не формується
-   IF Dat_ < dat_Zm5_ 
-   THEN
-
-      for k in ( select r.* from rnbu_trace r 
-                 where r.kodp like '41%'
-                   and exists ( select 1 from otcn_saldo o
-                                where o.rnk = r.rnk
-                                  and o.kv <> 980 
-                              )
-               )
-   
-         loop
-
-            INSERT INTO RNBU_TRACE
-                        (nls, kv, odate, kodp, znap, rnk, ref 
-                        )
-                 VALUES (k.nls, k.kv, dat_, '65'||substr(k.kodp,3,4), k.znap, k.rnk, k.rnk 
-                        );
-        
-      end loop;
-   END IF;
-
-   -- показатель 66 как показатель 42 только при изменении курса валют (інсайдери)
-   -- на 16.06.2015 показник не формується
-   IF Dat_ < dat_Zm5_ 
-   THEN
-
-      for k in ( select r.* from rnbu_trace r 
-                 where r.kodp like '42%'
-                   and exists ( select 1 from otcn_saldo o
-                                where o.rnk = r.rnk
-                                  and o.kv <> 980 
-                              )
-               )
-   
-         loop
-
-            INSERT INTO RNBU_TRACE
-                        (nls, kv, odate, kodp, znap, rnk, ref 
-                        )
-                 VALUES (k.nls, k.kv, dat_, '66'||substr(k.kodp,3,4), k.znap, k.rnk, k.rnk 
-                        );
-        
-      end loop;
-   END IF;
    ---------------------------------------------------------------------------
    if pmode_ = 0 then
        --------------------------------------------------------------------------
@@ -1985,136 +1727,8 @@ BEGIN
 
        CLOSE saldoost7;
 
-      if dat_ < to_date('30092013','ddmmyyyy') then
-         -----------------------------------------------------------------------
-         -- зм_на 27.12.2005 - при розрахунку норматив_в використовується нев_дкоригований кап_тал
-         sum_k_19 := NVL(Trim(F_Get_Params ('PK_1907', 0)), 0);
-
-         p_ins(' ----------------------------------------------------------------------------------------- ',NULL);
-
-         p_ins('Сума PK на дату 19072010: ', sum_k_19);
-         p_ins('Сума PK на поточну дату: ', rgk_);
-
-
-         if sum_k_19 <= 12000000000 then
-           ---- формирование кодов 82,83,84
-            sql_acc_ := 'SELECT r020 FROM KL_F3_29 WHERE kf = ''42'' AND ddd IN (''082'') ';
-
-            ret_ := F_Pop_Otcn(Dat_, 1, sql_acc_);
-            
-            OPEN saldoost8;
-            LOOP
-              FETCH saldoost8
-               INTO acc_, nls_, kv_, data_, r013_, s180_, rnk_, se_;
-
-              EXIT WHEN saldoost8%NOTFOUND;
-
-              nbs_ := substr(nls_,1,4);
-
-              IF (nbs_ like '262%' and se_ <> 0 and r013_='1') or
-                 (nbs_ like '263%' and se_ <> 0) or
-                 (nbs_ like '332%' and se_ <> 0 and r013_ in ('2','5')) or
-                 ((nbs_ like '333%' or nbs_ like '334%') and se_ <> 0 and r013_='5')
-              THEN
-
-                 IF se_ <> 0
-                 THEN
-                    if dat_ < dat_Zm4_ then
-                       kodp_ := '820000';
-                    else
-                       kodp_ := '820000' || '000';
-                    end if;
-                    znap_ := TO_CHAR (se_);
-
-                    INSERT INTO RNBU_TRACE
-                                (nls, kv, odate, kodp, znap, rnk, ref, acc
-                                )
-                         VALUES (nls_, kv_, data_, kodp_, znap_, rnk_, rnk_, acc_
-                                );
-                 END IF;
-                 -- пополнение вкладов
-                 BEGIN
-                    select NVL(SUM(a.kos),0)
-                       into se_
-                    from rnbu_history a
-                    where a.nls=nls_
-                      and a.kv=kv_
-                      and a.odate between to_date('20072010','ddmmyyyy') and Dat_;
-                 EXCEPTION WHEN NO_DATA_FOUND THEN
-                    se_ := 0;
-                 END;
-
-                 IF se_ <> 0
-                 THEN
-                    if dat_ < dat_Zm4_ then
-                       kodp_ := '830000';
-                    else
-                       kodp_ := '830000' || '000';
-                    end if;
-                    znap_ := TO_CHAR (se_);
-
-                    INSERT INTO RNBU_TRACE
-                                (nls, kv, odate, kodp, znap, rnk, ref, acc
-                                )
-                         VALUES (nls_, kv_, dat_, kodp_, znap_, rnk_, rnk_, acc_
-                                );
-                 END IF;
-
-                 IF substr(nbs_,1,1) <> '8' then
-                    vost_ := 0;
-
-                    BEGIN
-                        case
-                            when nbs_ in ('1610', '1612', '1615') then
-                                poisk_ := '1618%';
-                            when nbs_ in ('2546') then
-                                poisk_ := '2548%';
-                            when nbs_ in ('2610', '2615') then
-                                poisk_ := '2618%';
-                            when nbs_ in ('2620') then
-                                poisk_ := '2628%';
-                            when nbs_ in ('2630', '2635') then
-                                poisk_ := '2638%';
-                            else
-                                poisk_ := null;
-                                vost_ := 0;
-                        end case;
-
-                        if poisk_ is not null then
-                            SELECT NVL (SUM (Gl.P_Icurval (kv, s * 100, FDAT)), 0)
-                                INTO vost_
-                            FROM provodki
-                            WHERE FDAT between to_date('20072010','ddmmyyyy') and Dat_
-                               AND nlsd LIKE poisk_
-                               and acck = acc_;
-                        end if;
-                    EXCEPTION
-                        WHEN NO_DATA_FOUND THEN
-                            vost_ := 0;
-                    END;
-
-                    if vost_ <> 0 then
-                       if dat_ < dat_Zm4_ then 
-                          kodp_ := '840000';
-                       else
-                          kodp_ := '840000' || '000';
-                       end if;
-                       znap_ := TO_CHAR (vost_);
-
-                       INSERT INTO RNBU_TRACE(nls, kv, odate, kodp, znap, rnk, ref, acc)
-                       VALUES (nls_, kv_, dat_, kodp_, znap_, rnk_, rnk_, acc_);
-                    end if;
-                 end if;
-              end if;
-            END LOOP;
-
-           CLOSE saldoost8;
-         end if;
-      end if;
-
       -- формирование кодов 870000, 880000, 890000, 900000, 910000
       if dat_ >=to_date('01072012','ddmmyyyy') then
-
          pul_dat(to_char(Dat_,'dd-mm-yyyy'), '');
 
          -- проверка на наличие VIEW CP_V_ZAL_ACC
@@ -2298,15 +1912,12 @@ BEGIN
                     and substr(r1.kodp,1,2) in ('47','51')
                     and substr(r2.kodp,1,2) in ('02','04')
                 )
+       loop
+          kodp_ := k.ddd || '0000' || '000';
           
-          loop
-
-             kodp_ := k.ddd || '0000' || '000';
-             insert into rnbu_trace(nls, kv, odate, kodp, znap, rnk, acc)
-                VALUES (k.nls, k.kv, dat_, kodp_, k.znap, k.rnk, k.acc);
-
-      end loop;
-
+          insert into rnbu_trace(nls, kv, odate, kodp, znap, rnk, acc)
+          VALUES (k.nls, k.kv, dat_, kodp_, k.znap, k.rnk, k.acc);
+       end loop;
     end if;
 
     IF type_ = 0
@@ -2338,54 +1949,19 @@ BEGIN
    -- детальная расшифровка показателей 01 и 02 в разрезе лицевых счетов
    -- остатки по счетам и резерв
    insert into rnbu_trace (odate, nls, kv, kodp, znap, rnk, nd, ref, acc, comm)
-   select /*+ leading(a) */
-         dat_ odate, a.nls, a.kv, b.kodp, 
-         a.ost_eqv znap, a.rnk, n.nd, a.acc,
-         b.group_num, 'розшифровка з балансу' comm
-   from otcn_f42_temp a
-   left outer join specparam p 
-   on (a.acc = p.acc)
-   join customer c
-   on (a.rnk = c.rnk)
-   left outer join d8_cust_link_groups d  
-   on (trim(c.okpo) = trim(d.okpo))   
-   left outer join (select n.acc, max(n.nd) nd
-                   from nd_acc n, cc_deal e
-                   WHERE e.sdate <= dat_
-                     AND e.nd = n.nd
-                   group by n.acc ) n
-   on (a.acc = n.acc)               
-   join (select distinct k.rnk, (case when k.kodp like '01%' then 'R1'
-                                      when k.kodp like '02%' then 'R2'  
-                                      else 'R4' 
-                                 end)||substr(k.kodp,3) kodp,
-                to_number(substr(k.nls,6,9)) group_num
-        from rnbu_trace k
-        where (kodp like '01%' or kodp like '02%' or kodp like '04%')
-        order by substr(kodp,3,4), rnk) b
-   on (NVL(d.link_group, c.rnk) = b.rnk)
-   where a.ap = a.r012
-      and a.ddd = '001'
-      AND ((a.nbs = '9129' and NVL(p.r013,'9') = '1') or a.nbs <> '9129')
-      AND NOT exists (SELECT 1
-                      FROM OTCN_F42_TEMP b
-                      WHERE  b.ap=b.r012        AND
-                             b.nbs IS NULL      AND
-                             b.ACCC = a.acc );
-
-    insert into rnbu_trace (odate, nls, kv, kodp, znap, rnk, nd, ref, acc, comm)
     select /*+ leading(o) */
          dat_ odate, o.nls, o.kv, b.kodp, 
-         (case when abs(NVL(o.znap, 0)) >= abs(t.ost_eqv) and substr(o.kodp,2,4) <> '3690'
-            then 0 else NVL(o.znap, 0) end) znap, 
+         decode(substr(o.kodp,1,1),'1', -1, 1) * o.znap znap, 
          o.rnk, o.nd, o.acc,b.group_num ref,  
-         decode( substr(o.kodp,2,4), '2400', '(резерв з файлу #C5) ',
-                                     '2401', '(резерв з файлу #C5) ',
-                                     '3590', '(резерв з файлу #C5) ',
-                                     '3599', '(резерв з файлу #C5) ',
-                                     '3690', '(резерв з файлу #C5) ',
-                                     '(залишок з файлу #C5) ' 
-               ) || substr(o.kodp,2,4) || '/' || substr(o.kodp,6,1) comm 
+         (case when (substr(o.kodp,2,4) like '___9' or 
+                     substr(o.kodp,2,4) in ('1890','2890','3590','3690','3692')) and 
+                     substr(o.kodp,1,1) = '2' 
+                then '(резерв з файлу #C5) '
+               else '(залишок з файлу #C5) ' 
+          end) || substr(o.kodp,2,4) || 
+          ' / R011=' || substr(o.kodp,6,1) || 
+          ' / R013=' || substr(o.kodp,7,1) ||
+          ' / S245=' || substr(o.kodp,16,1) comm 
     from otc_c5_proc o
     join customer c
     on (o.rnk = c.rnk)
@@ -2402,9 +1978,8 @@ BEGIN
         where (kodp like '01%' or kodp like '02%' or kodp like '04%')
         order by substr(kodp,3,4), rnk) b
     on (NVL(d.link_group, c.rnk) = b.rnk)
-    where o.datf = dat_ 
-    and o.nls not like '3570%';
-                                 
+    where o.datf = dat_ ;
+
    delete  from rnbu_trace where kodp like '01%' or kodp like '02%' or kodp like '04%';
    
    update rnbu_trace 
@@ -2424,6 +1999,4 @@ grant EXECUTE                                                                on 
 
 
 
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_F42_NN.sql =========*** End *** 
 PROMPT ===================================================================================== 
