@@ -4,7 +4,7 @@ CREATE OR REPLACE PROCEDURE BARS.P_POP_F13ZB(datb_ IN DATE, date_ IN DATE,
 % DESCRIPTION :    Процедура наполнения позабалансовых символов в табл.
 %             :    OTCN_F13_ZBSK для файла #13 (КБ)
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :    29/03/2018 (21/11/2017)
+% VERSION     :    21/11/2017 (21/09/2017, 02/08/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Datb_  - начальная дата
                Date_  - конечная дата
@@ -498,7 +498,8 @@ BEGIN
              WHERE    o.fdat = any (select fdat from fdat where fdat BETWEEN datb_ AND date_)
                   AND o.acc = a.acc
                   AND a.kv = 980
-                  AND REGEXP_LIKE (a.NLS, '^(2909)')
+                  AND REGEXP_LIKE (a.NLS, '^(2909)|(1911)')
+                  AND (a.nbs = '2909' and a.ob22 = '43' or a.nbs = '1911' and a.ob22 = '01')
                   AND a.ob22 = '43'
                   AND o.dk = 0
                   AND o.REF = o1.REF
@@ -506,7 +507,7 @@ BEGIN
                   AND o.dk <> o1.dk
                   AND o1.acc = a1.acc
                   and o.ref = p.ref
-                  and REGEXP_LIKE (p.nlsb, '^(26(00|50|54))')
+                  and REGEXP_LIKE (p.nlsb, '^(26(00|50|54))|(2606)|(1811)|(1911)') 
                   and p.vob not in (96, 99)
                   and p.sos = 5
                   and a.rnk = c.rnk
