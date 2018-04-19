@@ -1,4 +1,4 @@
-create or replace function F_POP_OTCN_SNP
+CREATE OR REPLACE function BARS.F_POP_OTCN_SNP
 ( Dat_     DATE
 , type_    NUMBER
 , sql_acc_ VARCHAR2
@@ -10,7 +10,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Функция наполнения таблиц для формирования отчетности
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :    26.01.2018 (14.12.2017)
+% VERSION     :   12/04/2018 (10/04/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 06/02/2015 - в таблице OTCN_SALDO не формировались годовые Кт обороты
              Исправлено.
@@ -142,12 +142,12 @@ if add_KP_ >= 1 then
              'and (nlsb LIKE ''5040%'' OR nlsb LIKE ''5041%'')) or ' ||
              '((nlsa LIKE ''5040%'' OR nlsa LIKE ''5041%'') and '||
              '(nlsb LIKE ''3902%'' OR nlsb LIKE ''3903%'')))';
-             
-      type_kor_ := (case when add_KP_ = 1 
-                         then 1 
+
+      type_kor_ := (case when add_KP_ = 1
+                         then 1
                          when add_KP_ = 3
                          then 2
-                         else 0 
+                         else 0
                     end);
    ELSE
       sql_doda_ := '';
@@ -161,7 +161,7 @@ if add_KP_ >= 1 then
     ELSE
       P_Populate_Kor(dat1_kor_,dat2_kor_,sql_doda_,type_kor_);
     END IF;
-   
+
   end if;
 
   if type_ = 1 then
@@ -245,9 +245,9 @@ if add_KP_ >= 1 then
     from AGG_MONBALS b, OTCN_ACC a
     where b.fdat = trunc(dat_,'mm')
       and b.ACC = a.acc;
-      
+
     commit;
-    
+
     INSERT /*+APPEND */
       INTO OTCN_SALDO (ODATE, FDAT, ACC, NLS, KV, NBS, OB22, RNK,
            VOST, VOSTQ, OST, OSTQ,
@@ -269,7 +269,7 @@ if add_KP_ >= 1 then
 
    commit;
 
-    INSERT /*+APPEND */ 
+    INSERT /*+APPEND */
       INTO OTCN_SALDO (ODATE, FDAT, ACC, NLS, KV, NBS, OB22, RNK,
            VOST, VOSTQ, OST, OSTQ,
            DOS, DOSQ, KOS, KOSQ,
@@ -341,7 +341,7 @@ commit;
                       AND a.FDAT BETWEEN Dat1_ AND dat99_
                       AND a.acc=s.acc
                     GROUP BY '3', s.acc
-                    UNION ALL 
+                    UNION ALL
                    -- обороти по перекриттю на к_нець року
                    SELECT '4', s.acc,
                           NVL(SUM(DECODE(a.DK, 0, a.s, 0)),0),
