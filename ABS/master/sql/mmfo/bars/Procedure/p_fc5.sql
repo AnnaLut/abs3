@@ -4,7 +4,7 @@ IS
 % DESCRIPTION : Процедура формирования #С5 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.17.020  04/04/2018 (02/04/2018)
+% VERSION     : v.17.025  17/04/2018 (16/04/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
 
@@ -264,7 +264,6 @@ IS
        invk_ varchar2(1);
     begin
        if s580_ = '0' or r020_ in ('2233', '2238', '2625', '3114', '3570') then
-
            select nvl(max(s580), '9')
            into s580r_
            from nbur_ref_risk_s580
@@ -276,10 +275,44 @@ IS
            s580_ := s580r_;
        end if;
 
-       if r020_ in ('4410', '3400', '3408', '3500', '3508', '9129', '2066', '2920') and s580_ = '9' then
+       if r020_ in ('2066', '2920', '3400', '3408', '3500', '3508', '4410', '9129') and s580_ = '9' then
           s580_ := '5';
        end if;
-
+       
+       if r020_ = '9200' and t020_ = '1' then
+          s580_ := (case when r013_ in ('3', '8', 'A') then '1'
+                         when r013_ in ('4') then '3'
+                         when r013_ in ('5', '6') then '4'
+                         else '9'
+                    end); 
+       end if;
+       
+       if (r020_ in ('9201','9202','9204') or
+           r020_ between '9206' and '9208' or
+           r020_ between '9350' and '9359') and
+           t020_ = '1'
+       then
+          if r020_ <> '9355' and r013_ = '1' then
+              s580_ := '1';
+          elsif r013_ = '2' then
+              s580_ := '4'; 
+          else
+              s580_ := '9'; 
+          end if;
+       end if;
+       
+       if r020_ = '9300' and t020_ = '1' then
+          s580_ := (case when r013_ in ('3') then '1'
+                         when r013_ in ('1', '2') then '5'
+                         else '9'
+                    end); 
+       end if;       
+       
+       if r020_ in ('2602','2622','9030','9031','9036','9500') and
+          r020_ || r013_ not in ('26021','26221','90301','90311','90361','95001','95003')   
+       then
+          s580_ := '9'; 
+       end if; 
 
 --       if r020_ in ('1500','1502','1508','1509',
 --                    '1510','1512','1513','1515','1516','1517','1518','1519',
@@ -1109,11 +1142,11 @@ BEGIN
 
           if sz0_ > 0 then
              if nvl(s580a_,'0') = '0' then
-                s580a_ := '9';
-             end if;
-
-             if substr(p.kodp,2,4)||substr(p.kodp,7,1) = '95001' then
-                s580a_ := '5';
+                if substr(p.kodp,2,4)||substr(p.kodp,7,1) = '95001' then
+                   s580a_ := '5'; 
+                else
+                   s580a_ := '9';
+                end if;
              end if;
 
              update rnbu_trace
@@ -1123,16 +1156,43 @@ BEGIN
                  kodp = substr(kodp,1,10)|| s580a_||substr(kodp,12)
              where recid = p.recid;
 
-             if substr(p.kodp,2,4)||substr(p.kodp,7,1) = '95001' then
-                s580a_ := '9';
-             end if;
-
              kodp_ := SUBSTR(p.kodp, 1,6) || '9' || SUBSTR(p.kodp, 8,3) || s580a_||substr(p.kodp,12);
              znap_ := TO_CHAR (sz0_);
 
              INSERT INTO RNBU_TRACE(recid, userid, nls, kv, odate, kodp, znap, rnk, acc, comm, nbuc, isp, tobo, nd)
              VALUES (s_rnbu_record.nextval, userid_, p.nls, p.kv, p.odate, kodp_, znap_, rnk_, acc_,
                 'Перевищення над залишком по активу (2)', p.nbuc, p.isp, p.tobo, nd_);
+          else
+             if sk_all_ = 0 then -- немає відповідного активу
+                 update rnbu_trace
+                 set comm = substr(comm || ' + заміна по активу (2)',1,200),
+                     nd = nd_,
+                     kodp = substr(kodp,1,10) || '9' || substr(kodp,12)
+                 where recid = p.recid;
+             else -- забезпечення не перекриває актив
+                 for k in (select substr(r.kodp,11,1) s580a, sum(T.OST_EQV) ost,
+                                  nvl((count(*) over (partition by substr(r.kodp,11,1))), 0) cnt,
+                                  DENSE_RANK() over (partition by substr(r.kodp,11,1) order by substr(r.kodp,11,1)) rnum
+                           from otcn_f42_temp t, rnbu_trace r
+                           where t.acc = p.acc and
+                                 t.accc = r.acc  
+                          group by substr(r.kodp,11,1))
+                 loop
+                    if k.cnt = 1 or k.rnum = 1 then
+                       update rnbu_trace
+                       set znap = to_char(k.ost),
+                           comm = substr(comm || ' + розбивка по активу (3)',1,200),
+                           nd = nd_,
+                           kodp = substr(kodp,1,10)|| k.s580a ||substr(kodp,12)
+                       where recid = p.recid;
+                    else
+                       INSERT INTO RNBU_TRACE(recid, userid, nls, kv, odate, kodp, znap, rnk, acc, comm, nbuc, isp, tobo, nd)
+                       VALUES (s_rnbu_record.nextval, userid_, p.nls, p.kv, p.odate, 
+                            substr(p.kodp,1,10)|| k.s580a ||substr(p.kodp,12), to_char(k.ost), rnk_, acc_,
+                        'Розбивка по активу (4)', p.nbuc, p.isp, p.tobo, nd_);
+                    end if;
+                 end loop;               
+             end if;
           end if;
       end loop;
    end;
@@ -1794,55 +1854,66 @@ BEGIN
                 order by 1, 2 )
        loop
           begin
-             begin
                select r.recid
                into recid_
                from rnbu_trace r, customer c
                where r.nbuc = k.nbuc and
                      r.kodp like k.t020||k.nbs||'__'||lpad(k.kv,3,'0')||'%' and
+                     substr(kodp,16,1) = '2' and
                      substr(kodp,6,2) = substr(k.R013_s580,2,2) and
                     (sign(k.rizn) = -1 and to_number(r.znap) >= abs(k.rizn) or
                      sign(k.rizn) = 1 and to_number(r.znap) > 0) and
                      r.rnk = c.rnk and
                      2-MOD(c.codcagent,2) = k.rez and
                     rownum = 1;
-             exception
-                when no_data_found then
-                   begin
-                       select r.recid
-                       into recid_
-                       from rnbu_trace r, customer c
-                       where r.nbuc = k.nbuc and
-                             r.kodp like k.t020||k.nbs||'__'||lpad(k.kv, 3, '0')||'%' and
-                             substr(kodp, 6, 2) = substr(k.R013_s580_A,2,2) and
-                            (sign(k.rizn) = -1 and to_number(r.znap) >= abs(k.rizn) or
-                             sign(k.rizn) = 1 and to_number(r.znap) > 0) and
-                            r.rnk = c.rnk and
-                            2-MOD(c.codcagent,2) = k.rez and
-                            rownum = 1;
-                   exception
-                        when no_data_found then
-                          begin
-                               select r.recid
-                               into recid_
-                               from rnbu_trace r, customer c
-                               where r.nbuc = k.nbuc and
-                                     r.kodp like k.t020||k.nbs||'__'||lpad(k.kv, 3, '0')||'%' and
-                                     substr(kodp, 6, 2) = substr(k.R013_s580,2,2) and
-                                    (sign(k.rizn) = -1 and to_number(r.znap) >= abs(k.rizn) or
-                                     sign(k.rizn) = 1 and to_number(r.znap) > 0) and
-                                     r.rnk = c.rnk and
-                                     2-MOD(c.codcagent,2) = k.rez and
-                                     rownum = 1;
-                          exception
-                             when no_data_found then
-                               recid_ := null;
-                          end;
-                   end;
-             end;
           exception
              when no_data_found then
-                  recid_ := null;
+                 begin
+                   select r.recid
+                   into recid_
+                   from rnbu_trace r, customer c
+                   where r.nbuc = k.nbuc and
+                         r.kodp like k.t020||k.nbs||'__'||lpad(k.kv,3,'0')||'%' and
+                         substr(kodp,6,2) = substr(k.R013_s580,2,2) and
+                        (sign(k.rizn) = -1 and to_number(r.znap) >= abs(k.rizn) or
+                         sign(k.rizn) = 1 and to_number(r.znap) > 0) and
+                         r.rnk = c.rnk and
+                         2-MOD(c.codcagent,2) = k.rez and
+                        rownum = 1;
+                 exception
+                    when no_data_found then
+                       begin
+                           select r.recid
+                           into recid_
+                           from rnbu_trace r, customer c
+                           where r.nbuc = k.nbuc and
+                                 r.kodp like k.t020||k.nbs||'__'||lpad(k.kv, 3, '0')||'%' and
+                                 substr(kodp, 6, 2) = substr(k.R013_s580_A,2,2) and
+                                (sign(k.rizn) = -1 and to_number(r.znap) >= abs(k.rizn) or
+                                 sign(k.rizn) = 1 and to_number(r.znap) > 0) and
+                                r.rnk = c.rnk and
+                                2-MOD(c.codcagent,2) = k.rez and
+                                rownum = 1;
+                       exception
+                            when no_data_found then
+                              begin
+                                   select r.recid
+                                   into recid_
+                                   from rnbu_trace r, customer c
+                                   where r.nbuc = k.nbuc and
+                                         r.kodp like k.t020||k.nbs||'__'||lpad(k.kv, 3, '0')||'%' and
+                                         substr(kodp, 6, 2) = substr(k.R013_s580,2,2) and
+                                        (sign(k.rizn) = -1 and to_number(r.znap) >= abs(k.rizn) or
+                                         sign(k.rizn) = 1 and to_number(r.znap) > 0) and
+                                         r.rnk = c.rnk and
+                                         2-MOD(c.codcagent,2) = k.rez and
+                                         rownum = 1;
+                              exception
+                                 when no_data_found then
+                                   recid_ := null;
+                              end;
+                       end;
+                 end;
           end;
 
           if recid_ is not null then
@@ -1917,41 +1988,222 @@ BEGIN
    DELETE FROM OTC_C5_PROC WHERE datf = dat_;
 
    INSERT INTO otc_c5_proc
-            ( datf, rnk, nd, acc, nls, kv, kodp, znap )
-     SELECT dat_ datf,
-            r.rnk,
-            r.nd,
-            r.acc,
-            r.nls,
-            r.kv,
-            r.kodp,
-            DECODE (SUBSTR (r.kodp, 1, 1), '1', -1, 1) * r.znap znap
-       FROM rnbu_trace r
-      WHERE SUBSTR (r.kodp, 2, 5) IN
-                   (SELECT r020 || s240
-                      FROM kl_f3_29
-                     WHERE kf = '42' AND ddd IN ('101', '201'))
-        and r.kodp not like '23690%'
-        and r.kodp not like '23692%';
+            (datf, rnk, nd, acc, nls, kv, kodp, znap )
+    select /*+ parallel(8) */
+        dat_, cust_id, nd, acc_id, acc_num, kv, field_code, field_value
+    from V_NBUR_#C5_DTL_TMP v, kl_f3_29 k
+    where k.kf = '42' and k.ddd = '001' and
+        v.seg_02 = k.r020 and
+        (v.seg_01 = k.r012 or k.r012 = '3') and
+        (
+        (v.seg_02 like '___8' or v.seg_02 in ('1607','2607','2627','2657')) and 
+        v.seg_02 not in ('1508','3108','3108','3118','3218','3548','3578','3568') and
+        v.seg_04 = '2' 
+        or
+        (v.seg_02 like '___9') and 
+        v.seg_02 not in ('1509','1819','2809','3049','3119','3219','3519','3599','3569','9129') and
+        v.seg_04 in ('2', '4') 
+        or 
+        not (substr(v.seg_02,1,3) in ('150','300','301','310','311','321') or 
+             v.seg_02 in ('1607','2607','2627','2657','3040', '3692') or 
+             v.seg_02 like '___8'  or 
+             v.seg_02 like '___9')
+        )
+    order by seg_02, seg_01, acc_num;
+    -----------------------------------------------------
+
+     
+   INSERT INTO otc_c5_proc
+            (datf, rnk, nd, acc, nls, kv, kodp, znap )
+    select /*+ parallel(8) */
+        dat_, cust_id, nd, acc_id, acc_num, kv, field_code, field_value
+    from V_NBUR_#C5_DTL_TMP v, kl_f3_29 k
+    where k.kf = '42' and k.ddd = '001' and
+        v.seg_02 = k.r020 and
+        (v.seg_01 = k.r012 or k.r012 = '3') and
+        (
+        v.seg_02 = '1502' and v.seg_03 in ('2', '3', '6') 
+        or
+        v.seg_02 = '1508' and v.seg_03 in ('2', '3', '6') and v.seg_04 in ('2')
+        or
+        v.seg_02 = '1509' and v.seg_03 in ('2', '3', '6') and v.seg_04 in ('2', '4')  
+        )
+    order by seg_02, seg_01, acc_num;
+    -----------------------------------------------------
+
+     
+   INSERT INTO otc_c5_proc
+            (datf, rnk, nd, acc, nls, kv, kodp, znap )
+    select /*+ parallel(8) */
+        dat_, cust_id, nd, acc_id, acc_num, kv, field_code, field_value
+    from V_NBUR_#C5_DTL_TMP v, kl_f3_29 k
+    where k.kf = '42' and k.ddd = '001' and
+        v.seg_02 = k.r020 and
+        (v.seg_01 = k.r012 or k.r012 = '3') and
+        (
+        v.seg_02 = '3003' and v.seg_03 in ('6') and v.seg_04 in ('9')
+        or
+        v.seg_02 = '3005' and v.seg_03 in ('B') and v.seg_04 in ('9')
+        or
+        v.seg_02 = '3007' and v.seg_03 in ('6', 'B') and v.seg_04 in ('9')
+        or
+        v.seg_02 = '3008' and v.seg_03 in ('6', 'B') and v.seg_04 in ('2')
+        or
+        v.seg_02 = '3010' and v.seg_03 in ('2') and v.seg_04 in ('9')  
+        or
+        v.seg_02 = '3011' and v.seg_03 in ('5') and v.seg_04 in ('9')  
+        or
+        v.seg_02 = '3012' and v.seg_03 in ('8','9') and v.seg_04 in ('9')  
+        or
+        v.seg_02 = '3013' and v.seg_03 in ('A','B','E','F','J','K') and v.seg_04 in ('9')  
+        or
+        v.seg_02 = '3014' and v.seg_03 in ('N','O') and v.seg_04 in ('9')  
+        or
+        v.seg_02 = '3015' and v.seg_03 in ('2','5','8','9','A','B','E','F','J','K','N','O') and v.seg_04 in ('9')  
+        or
+        v.seg_02 = '3018' and v.seg_03 in ('2','8','A','J','K','N') and v.seg_04 in ('9') and v.seg_09 in ('1') 
+        or
+        v.seg_02 = '3018' and v.seg_03 in ('5','9','B','E','F','O') and v.seg_04 in ('2')  
+        or
+        v.seg_02 = '3040' and v.seg_03 in ('2', '4') 
+        )
+    order by seg_02, seg_01, acc_num;
+    -----------------------------------------------------
+
+     
+   INSERT INTO otc_c5_proc
+            (datf, rnk, nd, acc, nls, kv, kodp, znap )
+    select /*+ parallel(8) */
+        dat_, cust_id, nd, acc_id, acc_num, kv, field_code, field_value
+    from V_NBUR_#C5_DTL_TMP v, kl_f3_29 k
+    where k.kf = '42' and k.ddd = '001' and
+        v.seg_02 = k.r020 and
+        (v.seg_01 = k.r012 or k.r012 = '3') and
+        (
+        v.seg_02 = '3103' and v.seg_03 in ('2','5') and v.seg_04 in ('9')
+        or
+        v.seg_02 = '3105' and v.seg_03 in ('6','9') and v.seg_04 in ('9')
+        or
+        v.seg_02 = '3107' and v.seg_03 in ('2','5','6','9') and v.seg_04 in ('9')
+        or
+        v.seg_02 = '3108' and v.seg_03 in ('2','5','6','9') and v.seg_04 in ('2')
+        or
+        v.seg_02 = '3110' and v.seg_03 in ('2') and v.seg_04 in ('9')  
+        or
+        v.seg_02 = '3111' and v.seg_03 in ('5') and v.seg_04 in ('9')  
+        or
+        v.seg_02 = '3112' and v.seg_03 in ('6','7') and v.seg_04 in ('9')  
+        or
+        v.seg_02 = '3113' and v.seg_03 in ('A','B','C','D','E','F') and v.seg_04 in ('9')  
+        or
+        v.seg_02 = '3114' and v.seg_03 in ('K','L') and v.seg_04 in ('9')  
+        or
+        v.seg_02 = '3115' and v.seg_03 in ('2','5','6','7','A','B','C','D','E','F','K','L') and v.seg_04 in ('9')  
+        or
+        v.seg_02 = '3118' and v.seg_03 in ('2','6','A','C','D','K') and v.seg_04 in ('9') and v.seg_09 in ('1') 
+        or
+        v.seg_02 = '3118' and v.seg_03 in ('5','7','B','E','F','L') and v.seg_04 in ('2')  
+        or
+        v.seg_02 = '3119' and v.seg_03 in ('2','6','A','C','D','K') and v.seg_04 in ('1') and v.seg_09 in ('1') 
+        or
+        v.seg_02 = '3119' and v.seg_03 in ('2','6','A','C','D','K') and v.seg_04 in ('4') 
+        or
+        v.seg_02 = '3119' and v.seg_03 in ('5','7','B','E','F','L') and v.seg_04 in ('2','4')  
+        )
+    order by seg_02, seg_01, acc_num;
+    -----------------------------------------------------
+
+     
+   INSERT INTO otc_c5_proc
+            (datf, rnk, nd, acc, nls, kv, kodp, znap )
+    select /*+ parallel(8) */
+        dat_, cust_id, nd, acc_id, acc_num, kv, field_code, field_value
+    from V_NBUR_#C5_DTL_TMP v, kl_f3_29 k
+    where k.kf = '42' and k.ddd = '001' and
+        v.seg_02 = k.r020 and
+        (v.seg_01 = k.r012 or k.r012 = '3') and
+        (
+        v.seg_02 = '3210' and v.seg_03 in ('1') 
+        or
+        v.seg_02 = '3211' and v.seg_03 in ('2') 
+        or
+        v.seg_02 = '3212' and v.seg_03 in ('3','4') 
+        or
+        v.seg_02 = '3213' and v.seg_03 in ('5','6','7','8','9','A') 
+        or
+        v.seg_02 = '3214' and v.seg_03 in ('B','C') 
+        or
+        v.seg_02 = '3218' and v.seg_03 in ('1','4','5','7','8','B') and v.seg_04 in ('9') and v.seg_09 in ('1') 
+        or
+        v.seg_02 = '3218' and v.seg_03 in ('2','3','6','9','A','C') and v.seg_04 in ('2')  
+        or
+        v.seg_02 = '3219' and v.seg_03 in ('1','4','5','7','8','B') and v.seg_04 in ('1') and v.seg_09 in ('1') 
+        or
+        v.seg_02 = '3219' and v.seg_03 in ('1','4','5','7','8','B') and v.seg_04 in ('4') 
+        or
+        v.seg_02 = '3219' and v.seg_03 in ('2','3','6','9','A','C') and v.seg_04 in ('2','4')  
+        )
+    order by seg_02, seg_01, acc_num;
+    -----------------------------------------------------
 
    INSERT INTO otc_c5_proc
-            ( datf, rnk, nd, acc, nls, kv, kodp, znap )
-     SELECT dat_ datf,
-            r.rnk,
-            r.nd,
-            r.acc,
-            r.nls,
-            r.kv,
-            r.kodp,
-            DECODE (SUBSTR (r.kodp, 1, 1), '1', -1, 1) * r.znap znap
-       FROM rnbu_trace r
-      WHERE SUBSTR (r.kodp, 2, 5) IN
-                   (SELECT r020 || s240
-                      FROM kl_f3_29
-                     WHERE kf = '42' AND ddd IN ('101', '201'))
-        and ( r.kodp like '23690%' or r.kodp like '23692%' )
-        and r.acc not in ( select t.acc  from rnbu_trace t
-                          where t.kodp like '191299%' );
+            (datf, rnk, nd, acc, nls, kv, kodp, znap )
+    select /*+ parallel(8) */
+        dat_, cust_id, nd, acc_id, acc_num, kv, field_code, field_value
+    from V_NBUR_#C5_DTL_TMP v, kl_f3_29 k
+    where k.kf = '42' and k.ddd = '001' and
+        v.seg_02 = k.r020 and
+        (v.seg_01 = k.r012 or k.r012 = '3') and
+        (
+        v.seg_02 = '3599' and v.seg_03 in ('2') and v.seg_04 in ('9') and v.acc_num not like '3570%'
+        or
+        v.seg_02 = '3578' and v.seg_03 in ('1') and v.seg_04 in ('2') 
+        or
+        v.seg_02 = '3599' and v.seg_03 in ('1') and v.seg_04 in ('2') and v.acc_num not like '3570%'
+        or
+        v.seg_02 = '3560' and v.seg_03 in ('1','3') 
+        or
+        v.seg_02 = '3568' and v.seg_03 in ('1','3') and v.seg_04 in ('2')  
+        or
+        v.seg_02 = '3569' and v.seg_03 in ('1','3') and v.seg_04 in ('2','4')  
+        or
+        v.seg_02 = '9129' and v.seg_04 in ('1') 
+        or
+        v.seg_02 = '3692' and v.acc_num not like '9129%'
+        or
+        v.seg_02 in ('1819', '2809', '3049', '3519','3548')
+        )
+    order by seg_02, seg_01, acc_num;
+   -----------------------------------------------------
+
+   INSERT INTO otc_c5_proc
+            (datf, rnk, nd, acc, nls, kv, kodp, znap )
+    select /*+ parallel(8) */
+        dat_, cust_id, nd, acc_id, acc_num, kv, field_code, field_value
+    from V_NBUR_#C5_DTL_TMP v, kl_f3_29 k, specparam s
+    where k.kf = '42' and k.ddd = '001' and
+        v.seg_02 = k.r020 and
+        (v.seg_01 = k.r012 or k.r012 = '3') and
+        v.seg_02 = '3692' and v.acc_num like '9129%' and
+        v.acc_id = s.acc and
+        nvl(trim(s.r013), '0') = '1'
+    order by seg_02, seg_01, acc_num;
+    -----------------------------------------------------
+
+    delete 
+    FROM OTC_C5_PROC 
+    WHERE datf = dat_ and
+       substr(kodp,1,1) = '2' and
+       substr(kodp,2,4) in ('1090','1190','1419','1429','1509','1519','1529',
+                            '1549','1609','1890','2019','2029','2039','2049',
+                            '2069','2079','2089','2109','2119','2129','2139',
+                            '2149','2209','2219','2229','2239','2249','2309',
+                            '2319','2329','2339','2349','2359','2369','2379',
+                            '2409','2419','2429','2439','2609','2629','2659',
+                            '2890','3119','3219','3569','3590','3599','3690','3692') and
+       acc in (select acc from snap_balances where fdat = dat_ and ost=0);   
+    
+    commit;
 
    logger.info ('P_FC5: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 END;

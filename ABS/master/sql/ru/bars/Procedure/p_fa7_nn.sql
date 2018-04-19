@@ -9,7 +9,7 @@ IS
 % DESCRIPTION :  Процедура формирования #A7 для КБ (универсальная)
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.18.007  04/04/2018 (30/03/2018)
+% VERSION     :  v.18.008  05/04/2018 (04/04/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%/%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                pmode_ = режим (0 - для отчетности, 1 - для ANI-отчетов, 2 - для @77)
@@ -510,7 +510,7 @@ end;
          s242_ := 'I';
          x_ := '1';
       end if;
-      
+
       if s242_ in ('9', 'C', 'D', 'E', 'F', 'G', 'H','K','L','M') then
          x_ := '2';
       end if;
@@ -644,6 +644,34 @@ end;
       RETURN cnt_;
    END;
 BEGIN
+   IF pmode_ = 0
+   THEN                                                      -- для отчетности
+      -- фактическая дата конца декады
+      dc_ := extract( day from dat_ );
+
+      case
+          when dc_ <= 10
+          then 
+               datp_ := trunc(dat_,'MM');
+               datn_ := trunc(dat_,'MM') + 9;
+          when dc_ <= 20
+          then 
+               datp_ := trunc(dat_,'MM') + 10;
+               datn_ := trunc(dat_,'MM') + 19;
+          else 
+               datp_ := trunc(dat_,'MM') + 20;
+               datn_ := last_day(dat_);
+      end case;
+   ELSE                                    -- для ANI-отчетов и других отчетов
+      datp_ := dat_;
+      datn_ := dat_;
+   END IF;
+
+   if pmode_ = 2
+   then
+      datn_ := LAST_DAY (dat_);
+   end if;
+   
    if pmode_ = 2 then -- для файлу @77
       p_arc_otcn (dat_, 0);
    else
@@ -698,50 +726,6 @@ BEGIN
 
    -- признак исключения консолидированнных счетов дебит. задолженности и осн.средств
    FL_DO_ := F_Get_Params ('FLDO_A7', -1);
-
-   IF pmode_ = 0
-   THEN                                                      -- для отчетности
-      -- до 18.04.2008 для банков 300175 и 322498 расчета параметр S240 выполнялся
-      -- от даты окончания декады (возможно и выходной день) до даты погашения
-      -- остатка, а для других банков от даты формирования файла
-      -- с 18.04.2008 для всех банков кроме Демарка будет расчет от даты окончания
-      -- декады
-
-      -- фактическая дата конца декады
-      dc_ := TO_NUMBER (LTRIM (TO_CHAR (dat_, 'DD'), '0'));
-
-      FOR i IN 1 .. 3
-      LOOP
-         IF dc_ BETWEEN 10 * (i - 1) + 1 AND 10 * i + iif (i, 3, 0, 1, 0)
-         THEN
-           IF i < 3
-           THEN
-              datp_ := TO_DATE (LPAD (10 * (i - 1) + 1, 2, '0')
-                          || TO_CHAR (dat_, 'mmyyyy'),
-                          'ddmmyyyy'
-                         );
-              datn_ :=
-                 TO_DATE (LPAD (10 * i, 2, '0')
-                          || TO_CHAR (dat_, 'mmyyyy'),
-                          'ddmmyyyy'
-                         );
-           ELSE
-              datp_ := to_date('21'|| TO_CHAR (dat_, 'mmyyyy'), 'ddmmyyyy');
-              datn_ := LAST_DAY (dat_);
-           END IF;
-
-           EXIT;
-         END IF;
-      END LOOP;
-   ELSE                                    -- для ANI-отчетов и других отчетов
-      datp_ := dat_;
-      datn_ := dat_;
-   END IF;
-
-   if pmode_ = 2
-   then
-      datn_ := LAST_DAY (dat_);
-   end if;
 
    --  дата рсчета рзервов
     Dat23_ := TRUNC(add_months(Dat_,1),'MM');
@@ -3057,14 +3041,14 @@ BEGIN
          WHEN NO_DATA_FOUND THEN
             cnt_ := 0;
       END;
-      
+
       -- тимчасово, поки НБУ не зніме контроль на 3590
       if nbs_ = '3590' and k.nbs not in ('3510', '3511', '3519') then
          s242_ := 'Z';
-      else 
-         s242_ := substr(k.kodp, 9, 1); 
+      else
+         s242_ := substr(k.kodp, 9, 1);
       end if;
-      
+
       r011_ := substr(k.kodp,6,1);
 
       if nbs_ in ('2609','2629','2659') then
@@ -3433,7 +3417,7 @@ BEGIN
       if s240_ = '0' then
          s240_ := '1';
       end if;
-      
+
       if nvl(k.s180, '0') = '0' then
          s180_ := fs180 (k.acc, SUBSTR (k.nbs, 1, 1), dat_);
       else
@@ -3467,12 +3451,12 @@ BEGIN
 
       nbs_ := substr(nbs_r013_, 1, 4);
       r013_ := substr(nbs_r013_, 5, 1);
-      
+
       -- тимчасово, поки НБУ не зніме контроль на 3590
       if nbs_ = '3590' and k.nbs not in ('3510', '3511', '3519') then
          s242_ := 'Z';
       end if;
-      
+
       r011_ := k.r011;
 
       if nbs_ in ('2609','2629','2659') then
@@ -3607,7 +3591,7 @@ BEGIN
                 r012_:='A';
 
                 if s240_ ='Z' and s190_ ='0'  then  s190_ :='A';  end if;
-                
+
                 kodp_ := '2'||nbs_||r011_||r013_||s181_||s240_||k.rez||s190_||k.r030;
 
                 if k.nls like '3710%'  then
@@ -4346,7 +4330,8 @@ BEGIN
                                             t020||'0'||nbs||lpad(kv, 3, '0'), nbuc, typ_)
                              end) ostq
                        from (
-                           select nbuc, decode(t020, -1, '1', '2') t020, rez, nbs, kv, abs(ostq) ostq
+                           select nbuc, decode(t020, -1, '1', '2') t020, rez, 
+                                replace(nbs, '86','26') nbs, kv, abs(ostq) ostq
                            from (
                              select  /*+ parallel(8) */
                                      (case when typ_ > 0
@@ -4364,7 +4349,8 @@ BEGIN
                                            '2400','2401','2890','3190','3290','3590','3599','3690','3692',
                                            '9010','9015','9030','9031','9036','9500',
                                           '1419','1429','1509','1519','1529','2039','2069','2089','2109','2119','2129',
-                                          '2139','2209','2239','2609','2610','2615','2629','2651','2652','2659','3119','3219')
+                                          '2139','2209','2239','2609','2629','2659','3119','3219') 
+                                and tip <> 'NL8'
                                 and a.acc = s.acc
                                 and a.rnk = c.rnk
                              group by (case when typ_ > 0
@@ -4389,7 +4375,7 @@ BEGIN
                                            '2400','2401','2890','3190','3290','3590','3599','3690','3692',
                                            '9010','9015','9030','9031','9036','9500',
                                           '1419','1429','1509','1519','1529','2039','2069','2089','2109','2119','2129',
-                                          '2139','2209','2239','2609','2610','2615','2629','2651','2652',
+                                          '2139','2209','2239','2609','2629',
                                           '2659','3119','3219')
                          group by nbuc, substr(kodp, 1, 1), substr(kodp,10,1), substr(kodp, 2, 4), kv) b
                      on (a.nbuc = b.nbuc and a.rez = b.rez and a.t020 = b.t020 and a.nbs = b.nbs and a.kv = b.kv)
@@ -4402,19 +4388,19 @@ BEGIN
                    into recid_
                   from rnbu_trace
                   where nbuc = k.nbuc and
-                        kodp like k.t020||k.nbs||'____'||k.rez||'_'||lpad(k.kv, 3,'0')||'%' and
+                        kodp like k.t020||k.nbs||'___Z'||k.rez||'_'||lpad(k.kv, 3,'0')||'%' and
                         substr(kodp, 6,2) = substr(k.R013_s580,2,2) and
                         (sign(k.rizn) = -1 and to_number(znap) >= abs(k.rizn) or
                         sign(k.rizn) = 1 and to_number(znap) > 0) and
                         rownum = 1;
-               exception
-                  when no_data_found then
-                       begin
-                          select recid
-                           into recid_
-                          from rnbu_trace
-                          where nbuc = k.nbuc and
-                                kodp like k.t020||k.nbs||'____'||k.rez||'_'||lpad(k.kv, 3,'0')||'%' and
+            exception
+              when no_data_found then
+                   begin
+                      select recid
+                       into recid_
+                      from rnbu_trace
+                      where nbuc = k.nbuc and
+                            kodp like k.t020||k.nbs||'____'||k.rez||'_'||lpad(k.kv, 3,'0')||'%' and
                                 substr(kodp, 6,2) = substr(k.R013_s580_A,2,2) and
                                 (sign(k.rizn) = -1 and to_number(znap) >= abs(k.rizn) or
                                 sign(k.rizn) = 1 and to_number(znap) > 0) and
@@ -4428,15 +4414,15 @@ BEGIN
                                  where nbuc = k.nbuc and
                                        kodp like k.t020||k.nbs||'____'||k.rez||'_'||lpad(k.kv, 3,'0')||'%' and
                                        substr(kodp, 6,2) = substr(k.R013_s580,2,2) and
-                                       (sign(k.rizn) = -1 and to_number(znap) >= abs(k.rizn) or
-                                       sign(k.rizn) = 1 and to_number(znap) > 0) and
-                                       rownum = 1;
-                              exception
-                                 when no_data_found then
-                                   recid_ := null;
-                              end;
+                                (sign(k.rizn) = -1 and to_number(znap) >= abs(k.rizn) or
+                                sign(k.rizn) = 1 and to_number(znap) > 0) and
+                                rownum = 1;
+                            exception
+                               when no_data_found then
+                                  recid_ := null;
                        end;
-               end;
+                   end;
+            end;
             exception
                when no_data_found then
                   recid_ := null;
@@ -4472,6 +4458,110 @@ BEGIN
             end if;
         end loop;
     end;
+                      
+    if pmode_ = 0 then
+        declare
+           recid_    number;
+           granica_  number := 1000;
+        begin
+            for k in (select nvl(a.nbuc, b.nbuc) nbuc, nvl(a.t020, b.t020) t020,
+                             nvl(a.nbs, b.nbs) nbs, nvl(a.kv, b.kv) kv, nvl(a.rez, b.rez) rez,
+                             a.ostq ost1, b.ostq ost2, nvl(a.ostq, 0) - nvl(b.ostq, 0) rizn,
+                             R013_s580, R013_s580_A
+                     from (select nbuc, rez, t020, nbs, kv, ostq
+                           from (
+                               select nbuc, decode(t020, -1, '1', '2') t020, rez, 
+                                    nbs, kv, abs(ostq) ostq
+                               from (
+                                 select (case when typ_ > 0
+                                                 THEN NVL (F_Codobl_branch (s.tobo, typ_), nbuc1_)
+                                                 else nbuc1_
+                                         end) nbuc, 2-MOD(c.codcagent,2) rez,
+                                     sign(decode(s.kv, 980, a.ost, a.ostq)) t020,
+                                     s.nbs, s.kv,
+                                     sum(decode(s.kv, 980, a.ost, a.ostq)) ostq
+                                 from snap_balances a, accounts s, customer c
+                                 where  a.fdat = dat_ 
+                                    and s.nbs in ('2610','2615','2651','2652') 
+                                    and a.acc = s.acc
+                                    and s.rnk = c.rnk
+                                 group by (case when typ_ > 0
+                                                 THEN NVL (F_Codobl_branch (s.tobo, typ_), nbuc1_)
+                                                 else nbuc1_
+                                         end), 2-MOD(c.codcagent,2),
+                                         sign(decode(s.kv, 980, a.ost, a.ostq)), s.nbs, s.kv)
+                               where t020 <> 0)) a
+                         full outer join
+                         (select nbuc,
+                                 substr(kodp, 1, 1) t020,
+                                 substr(kodp,10, 1) rez,
+                                 substr(kodp, 2, 4) nbs, kv,
+                                 sum(to_number(znap)) ostq,
+                                 min('1'||substr(kodp, 6, 2)) R013_s580,
+                                 min('1'||substr(kodp, 6, 2)) R013_s580_A
+                             from rnbu_trace r
+                             where substr(kodp, 2, 4) in ('2610','2615','2651','2652')
+                             group by nbuc, substr(kodp, 1, 1), substr(kodp,10,1), substr(kodp, 2, 4), kv) b
+                         on (a.nbuc = b.nbuc and a.rez = b.rez and a.t020 = b.t020 and a.nbs = b.nbs and a.kv = b.kv)
+                     where abs(nvl(a.ostq, 0) - nvl(b.ostq, 0)) between 1 and granica_
+                     order by 1, 2 )
+            loop
+                begin
+                   begin
+                      select recid
+                       into recid_
+                      from rnbu_trace
+                      where nbuc = k.nbuc and
+                            kodp like k.t020||k.nbs||'____'||k.rez||'_'||lpad(k.kv, 3,'0')||'%' and
+                            substr(kodp, 6,2) = substr(k.R013_s580,2,2) and
+                            (sign(k.rizn) = -1 and to_number(znap) >= abs(k.rizn) or
+                            sign(k.rizn) = 1 and to_number(znap) > 0) and
+                            rownum = 1;
+                   exception
+                      when no_data_found then
+                           begin
+                              select recid
+                               into recid_
+                              from rnbu_trace
+                              where nbuc = k.nbuc and
+                                    kodp like k.t020||k.nbs||'____'||k.rez||'_'||lpad(k.kv, 3,'0')||'%' and
+                                    substr(kodp, 6,2) = substr(k.R013_s580_A,2,2) and
+                                    (sign(k.rizn) = -1 and to_number(znap) >= abs(k.rizn) or
+                                    sign(k.rizn) = 1 and to_number(znap) > 0) and
+                                    rownum = 1;
+                           exception
+                              when no_data_found then
+                                  begin
+                                     select recid
+                                      into recid_
+                                     from rnbu_trace
+                                     where nbuc = k.nbuc and
+                                           kodp like k.t020||k.nbs||'____'||k.rez||'_'||lpad(k.kv, 3,'0')||'%' and
+                                           substr(kodp, 6,2) = substr(k.R013_s580,2,2) and
+                                           (sign(k.rizn) = -1 and to_number(znap) >= abs(k.rizn) or
+                                           sign(k.rizn) = 1 and to_number(znap) > 0) and
+                                           rownum = 1;
+                                  exception
+                                     when no_data_found then
+                                       recid_ := null;
+                                  end;
+                           end;
+                   end;
+                exception
+                   when no_data_found then
+                      recid_ := null;
+                end;
+
+                if recid_ is not null then
+                   -- вирівнювання по рахунках резерву в бік збільшення
+                   update rnbu_trace
+                   set znap = to_char(to_number(znap) + k.rizn),
+                     comm = substr(comm || ' + вирів-ня з балансом на '||to_char(k.rizn), 1, 200)
+                   where recid = recid_;
+                end if;
+            end loop;
+        end;
+    end if;
 
    --------------------------------------------------
    if dat_ <to_date('20171226','yyyymmdd')  then
@@ -4545,7 +4635,7 @@ BEGIN
       insert into NBUR_TMP_A7_S245(report_date, acc_id, s245, ost)
       select dat_, acc, (case when substr(kodp,9,1)='Z' then '2' else '1' end) s245, sum(znap) ost
       from rnbu_trace
-      where substr(kodp,2,4) = substr(nls,1,4)            
+      where substr(kodp,2,4) = substr(nls,1,4)
       group by acc, (case when substr(kodp,9,1)='Z' then '2' else '1' end);
 
       insert into NBUR_TMP_A7_S245(report_date, acc_id, s245, ost)
@@ -4557,8 +4647,8 @@ BEGIN
              kodp like '_3590%' or
              kodp like '_3692%' or
              kodp like '____9%') and
-             acc not in (select acc_id 
-                         from NBUR_TMP_A7_S245 
+             acc not in (select acc_id
+                         from NBUR_TMP_A7_S245
                          where report_date = dat_ and
                                kf = mfo_)
       group by acc, (case when substr(kodp,9,1)='Z' then '2' else '1' end);
