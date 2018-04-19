@@ -12,7 +12,7 @@ PROMPT *** Create  procedure P_F81_NN ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Процедура формирование файла #81 для КБ
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :   27/03/2018 (09/02/2016)
+% VERSION     :   10/04/2018 (27/03/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -220,8 +220,6 @@ OPEN Saldo;
       nbuc_ := nbuc1_;
    end if;
 
---   k041_ := f_k041(f_country_hist(rnk_, dat_));
-
    --- после перехода на новые DRAPSы
    --- обороты по перекрытию 6,7 классов на 5040,5041
    IF to_char(Dat_,'MM')='12' and (nls_ like '6%' or nls_ like '7%' or nls_ like '390%' or nls_ like '504%') THEN
@@ -267,7 +265,7 @@ OPEN Saldo;
       end if;
       
       if nbs_ in ('5040','5041') then   
-         Ostn_ := Ostn_-Dos96zg_+Kos96zg_-Dos99zg_+Kos99zg_-Doszg_+Koszg_;
+         Ostn_ := Ostn_-Dos99_+Kos99_-Dos96zg_+Kos96zg_-Dos99zg_+Kos99zg_-Doszg_+Koszg_;
       end if;   
    end if;
 

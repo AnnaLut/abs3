@@ -12,7 +12,7 @@ PROMPT *** Create  procedure P_FA4_NN ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Процедура формирование файла #A4 для КБ
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :    28/03/2018 (20/04/2017)
+% VERSION     :    10/04/2018 (27/03/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -196,7 +196,12 @@ p_proc_set(kodf_,sheme_,nbuc1_,typ_);
 --- все эти действия выполняются в функции F_POP_OTCN
 
 sql_acc_ := 'select r020 from kod_r020 where trim(prem)=''КБ'' and a010=''02''';
-ret_ := f_pop_otcn(Dat_, 4, sql_acc_, Dat_, 2);
+
+if  to_char(Dat_,'MM')='12' then 
+    ret_ := f_pop_otcn(Dat_, 4, sql_acc_, Dat_, 2);
+else
+    ret_ := f_pop_otcn(Dat_, 3, sql_acc_, Dat_, 2);
+end if;    
 ----------------------------------------------------------------------------
 OPEN Saldo;
    LOOP
@@ -214,8 +219,6 @@ OPEN Saldo;
    else
       nbuc_ := nbuc1_;
    end if;
-   
---   k041_ := f_k041(f_country_hist(rnk_, dat_));
    
    --- после перехода на новые DRAPSы
    --- обороты по перекрытию 6,7 классов на 5040,5041
@@ -253,11 +256,11 @@ OPEN Saldo;
    END IF;
 
 --- корректирующие обороты за год
-   IF nbs_ not like '504%' and Dos99_ > 0 THEN
+   IF Dos99_ > 0 THEN
       p_ins(data_, '9', nls_, nbs_, kv_, k041_, TO_CHAR(Dos99_));
    END IF;
 
-   IF nbs_ not like '504%' and Kos99_ > 0 THEN
+   IF Kos99_ > 0 THEN
       p_ins(data_, '0', nls_, nbs_, kv_, k041_, TO_CHAR(Kos99_));
    END IF;
 
@@ -269,13 +272,8 @@ OPEN Saldo;
       p_ins(data_, '00', nls_, nbs_, kv_, k041_, TO_CHAR(Kosq99_));
    END IF;
 
-   if nbs_ in ('5040','5041') then
-      Ostn_ := Ostn_ - Dos96_ + Kos96_;
-      Ostq_ := Ostq_ - Dosq96_ + Kosq96_;
-   else
-      Ostn_ := Ostn_ - Dos96_ + Kos96_ - Dos99_ + Kos99_;
-      Ostq_ := Ostq_ - Dosq96_ + Kosq96_ - Dosq99_ + Kosq99_;
-   end if;
+   Ostn_ := Ostn_ - Dos96_ + Kos96_ - Dos99_ + Kos99_;
+   Ostq_ := Ostq_ - Dosq96_ + Kosq96_ - Dosq99_ + Kosq99_;
 
    IF Ostn_ <> 0 THEN
       dk_ := IIF_N(Ostn_,0,'1','2','2');

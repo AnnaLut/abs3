@@ -13,7 +13,7 @@ PROMPT *** Create  procedure P_POPULATE_KOR ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Процедура выбора корректирующих проводок и по закрытию года
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :   20/06/2017 (07/06/2017)
+% VERSION     :    25/01/2018 (20/06/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % -- tp_ = 0 - только корректирующие проводки (мес. и годовые)
 % -- tp_ = 1 - корректирующие проводки (мес. и годовые) + обороты ZG
@@ -88,14 +88,14 @@ BEGIN
           commit;
       end loop;
 
-      IF tp_ = 1 and to_char(p_date_,'yyyy') = '2017' THEN
+      IF tp_ = 1 and to_number(to_char(p_date_,'yyyy')) >= 2017 THEN
           INSERT
           INTO REF_KOR (REF, VOB, VDAT)
           SELECT /*+ index(o, IDX_OPER_VDAT_KF) */  REF, 100+VOB, vdat
           FROM OPER o
           WHERE SOS=5 AND
-                vdat = to_date('01012017','ddmmyyyy') AND
-                (TT LIKE 'ZG1%' OR TT LIKE 'ZG2%') AND
+                vdat = to_date('0101'||to_char(p_date_,'yyyy'),'ddmmyyyy') AND
+                (TT LIKE 'ZG%') AND
                  REF NOT IN (select ref from ref_kor);
           commit;
       end if;
