@@ -1,31 +1,22 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Trigger/TAU_OPER_KOMIS_NON_CASH.sql ========
-PROMPT ===================================================================================== 
-
-
 PROMPT *** Create  trigger TAU_OPER_KOMIS_NON_CASH ***
 
-  CREATE OR REPLACE TRIGGER BARS.TAU_OPER_KOMIS_NON_CASH 
-after update or insert of dk on oper
+create or replace trigger TAU_OPER_KOMIS_NON_CASH
+after insert on OPER
 for each row
-    WHEN (new.tt = 'R01'and substr(new.nlsb,1,4)='2620' and new.dk=1
-) begin
+WHEN ( new.TT = 'R01'         -- міжбанк
+   and new.KV = 980           -- нац.валюта
+   and new.DK = 1             -- надходження
+   and new.NLSB like '2620%'  -- поточні рах. / депозити навимогу ФО
+   and new.MFOA not like '8%' -- не від казначейства
+   and new.PDAT >= trunc(sysdate)
+     )
+begin
 
-  --if inserting then
-    -- добавляем документ в очередь на снятие комиссии
-     insert into komis_non_cash (ref) values (:new.ref);
+  insert -- добавляем документ в очередь на снятие комиссии
+    into KOMIS_NON_CASH (ref)
+  values (:new.ref);
 
-  --end if;
-
-end tau_oper_komis_non_cash;
-
-
+end TAU_OPER_KOMIS_NON_CASH;
 /
-ALTER TRIGGER BARS.TAU_OPER_KOMIS_NON_CASH ENABLE;
 
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Trigger/TAU_OPER_KOMIS_NON_CASH.sql ========
-PROMPT ===================================================================================== 
+show errors;
