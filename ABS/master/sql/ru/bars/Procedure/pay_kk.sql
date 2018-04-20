@@ -1,12 +1,9 @@
 
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/PAY_KK.sql =========*** Run *** ==
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure PAY_KK ***
-
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/procedure/pay_kk.sql =========*** Run *** ==
+ PROMPT ===================================================================================== 
+ 
   CREATE OR REPLACE PROCEDURE BARS.PAY_KK 
                (flg_ SMALLINT,  -- флаг оплаты
                 ref_ INTEGER,   -- референция
@@ -56,6 +53,8 @@ PROMPT *** Create  procedure PAY_KK ***
   l_nls26 accounts.nls%type   ;
   l_nls61 accounts.nls%type   ;
   l_s     oper.s%type         ;
+  l_ob22_2620 accounts.ob22%type;
+  l_262037_amn number;
   -----------------------------
 begin  ------Есть ли "свой-2620" ?
   if NEWNBS.GET_STATE = 1 then
@@ -66,7 +65,7 @@ begin  ------Есть ли "свой-2620" ?
      select n.nd             into l_ND          from nd_acc n, accounts a
      where n.acc=a.acc and a.kv=kv_ and a.nls = nlsm_ and a.dazs is null and rownum = 1 and a.tip = 'SS ' ;
 
-     select a.nls, a.branch  into l_nls26, l_br from nd_acc n, accounts a
+     select a.nls, a.branch, a.ob22  into l_nls26, l_br, l_ob22_2620 from nd_acc n, accounts a
      where n.acc=a.acc and a.kv=kv_ and a.nbs= '2620' and a.dazs is null and rownum = 1 and n.nd  = l_ND and a.nls <> nlsk_ ;
 
 
@@ -74,7 +73,16 @@ begin  ------Есть ли "свой-2620" ?
      gl.payv ( flg_, ref_, VDAT_, tt_, 1, kv_, l_nls26, sa_, kv_,   nlsk_, sa_ );
 
 
-     begin select f_tarif ( l_Kod, kv_, l_nls26, sa_, 0, null) ,    nbs_ob22_bra ( l_nbs, l_ob, substr( l_br,1,15) )
+     begin
+       -- 2018-04-19 VPogoda COBUMMFO-7553 - для 2620_37 - тариф выбирается по максимальному значению шкалы
+       if substr(l_nls26,1,4) = '2620' and l_ob22_2620 = '37' then
+         select vt.smax
+           into l_262037_amn
+           from v_tarif vt
+           where vt.kod = l_kod;
+       end if;
+       select coalesce(l_262037_amn,f_tarif ( l_Kod, kv_, l_nls26, sa_, 0, null)) ,
+              nbs_ob22_bra ( l_nbs, l_ob, substr( l_br,1,15) )
            into l_s, l_nls61
            from dual
            where  not exists (select 1 from banks_ru where mfo = GL.doc.mfob) -- МФО-Б не ОЩ.Банк
@@ -96,11 +104,13 @@ EXCEPTION WHEN NO_DATA_FOUND THEN    gl.payv(flg_,ref_, VDAT_, tt_,dk_,kv_,nlsm_
 END;
 
 END PAY_KK;
+
 /
-show err;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/PAY_KK.sql =========*** End *** ==
-PROMPT ===================================================================================== 
+ show err;
+ 
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/procedure/pay_kk.sql =========*** End *** ==
+ PROMPT ===================================================================================== 
+ 
