@@ -45,4 +45,5 @@ AS
           p.rnk CUST_ID,
           p.ND,
           p.REF
-     FROM rnbu_trace p
+     FROM rnbu_trace p;
+/	
