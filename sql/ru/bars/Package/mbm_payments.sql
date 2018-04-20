@@ -1029,6 +1029,7 @@ CREATE OR REPLACE package body mbm_payments is
     l_val operw.value%type;
     l_tmp varchar2(32767);
     l_str varchar2(32767);
+    l_acc accounts%rowtype;
 
   begin
     bars_audit.trace('%s: entry point', l_th);
