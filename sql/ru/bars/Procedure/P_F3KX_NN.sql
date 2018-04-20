@@ -16,7 +16,7 @@ IS
 % DESCRIPTION :   Процедура формирования 3KX     для КБ (универсальная)
 % COPYRIGHT   :   Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :   v.18.007          17.04.2018
+% VERSION     :   v.18.007          19.04.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
       sheme_ - схема формирования
@@ -1129,7 +1129,7 @@ BEGIN
           ||'   from fx_deal f'
           ||'  where dat =:1 '
           ||'    and kva != 980   and kvb =980 '
-          ||'    and exists (select 1 from oper o where o.ref=f.ref and sos=5) '
+          ||'    and exists (select 1 from oper o where o.ref=f.ref and sos in (3,5)) '
           ||' union all '
           ||' select ''4'' f091, kvb r030, sumb t071, ''0000000006'' k020, ''3'' k021, '
           ||'        (select nb from rcukru where glb=6) q001, '
@@ -1140,7 +1140,7 @@ BEGIN
           ||'   from fx_deal f'
           ||'  where dat =:2 '
           ||'    and kva = 980     and kvb !=980 '
-          ||'    and exists (select 1 from oper o where o.ref=f.ref and sos=5) ';
+          ||'    and exists (select 1 from oper o where o.ref=f.ref and sos in (3,5)) ';
     ELSE
          v_sql_ :=
             ' select ''3'' f091, kva r030, suma t071, ''0000000006'' k020, ''3'' k021, '
@@ -1150,7 +1150,7 @@ BEGIN
           ||'   from fx_deal f'
           ||'  where dat =:1 '
           ||'    and kva != 980     and kvb =980 '
-          ||'    and exists (select 1 from oper o where o.ref=f.ref and sos=5) '
+          ||'    and exists (select 1 from oper o where o.ref=f.ref and sos in (3,5)) '
           ||' union all '
           ||' select ''4'' f091, kvb r030, sumb t071, ''0000000006'' k020, ''3'' k021, '
           ||'        (select nb from rcukru where glb=6) q001, '
@@ -1159,7 +1159,7 @@ BEGIN
           ||'   from fx_deal f'
           ||'  where dat =:2 '
           ||'    and kva = 980     and kvb !=980 '
-          ||'    and exists (select 1 from oper o where o.ref=f.ref and sos=5) ' ;
+          ||'    and exists (select 1 from oper o where o.ref=f.ref and sos in (3,5)) ' ;
 
     END IF ;
                                                     --3 покупка, 4 продажа
@@ -1202,7 +1202,7 @@ BEGIN
 	 p_ins (nnnn_, 'K021', k021_);
          p_ins (nnnn_, 'Q001', q001_);
          p_ins (nnnn_, 'Q024', q024_);
-         p_ins (nnnn_, 'D100', d100_||'f');
+         p_ins (nnnn_, 'D100', d100_);
          if d100_ in ('04','05')  then
             p_ins (nnnn_, 'S180', f_s180_day(k_days_));
          else
@@ -1275,7 +1275,7 @@ BEGIN
 	 p_ins (nnnn_, 'K021', '3');
          p_ins (nnnn_, 'Q001', 'АТ Ощадбанк');
          p_ins (nnnn_, 'Q024', '1');
-         p_ins (nnnn_, 'D100', '01'||'i');
+         p_ins (nnnn_, 'D100', '01');
          p_ins (nnnn_, 'S180', '#');
          p_ins (nnnn_, 'F089', f089_);
          if f091_ ='3'  then
