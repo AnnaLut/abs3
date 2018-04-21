@@ -27,7 +27,8 @@ begin
 	RNK NUMBER, 
 	OKPO VARCHAR2(14), 
 	NMK VARCHAR2(70), 
-	NNNN VARCHAR2(4)
+	NNNN VARCHAR2(4), 
+	LINK_GROUP NUMBER
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -44,17 +45,18 @@ PROMPT *** ALTER_POLICIES to KL_F8B ***
  exec bpa.alter_policies('KL_F8B');
 
 
-COMMENT ON TABLE BARS.KL_F8B IS 'Љоди ё„ђЏЋ“ длЯ файлу звiтностi #8B (ЋЃ) ';
-COMMENT ON COLUMN BARS.KL_F8B.DATF IS '„ата включеннЯ в файл';
-COMMENT ON COLUMN BARS.KL_F8B.RNK IS 'ђЌЉ контрагента';
-COMMENT ON COLUMN BARS.KL_F8B.OKPO IS 'ЋЉЏЋ контрагента';
-COMMENT ON COLUMN BARS.KL_F8B.NMK IS 'Ќазва контрагента';
-COMMENT ON COLUMN BARS.KL_F8B.NNNN IS '“мовний код';
+COMMENT ON TABLE BARS.KL_F8B IS 'Коди ЄДРПОУ контрагентыв для файлу звiтностi #8B (ОБ) ';
+COMMENT ON COLUMN BARS.KL_F8B.DATF IS 'Дата включення в файл';
+COMMENT ON COLUMN BARS.KL_F8B.RNK IS 'РНК контрагента';
+COMMENT ON COLUMN BARS.KL_F8B.OKPO IS 'ОКПО контрагента';
+COMMENT ON COLUMN BARS.KL_F8B.NMK IS 'Назва контрагента';
+COMMENT ON COLUMN BARS.KL_F8B.NNNN IS 'Умовний номер в файлі (NNNN)';
+COMMENT ON COLUMN BARS.KL_F8B.LINK_GROUP IS 'Код групи контрагентів';
 
 
 
 
-PROMPT *** Create  constraint SYS_C002498350 ***
+PROMPT *** Create  constraint SYS_C00119250 ***
 begin   
  execute immediate '
   ALTER TABLE BARS.KL_F8B MODIFY (DATF NOT NULL ENABLE)';
@@ -65,23 +67,10 @@ exception when others then
 
 
 
-
-PROMPT *** Create  index XIE_KF_KL_F8B ***
-begin   
- execute immediate '
-  CREATE INDEX BARS.XIE_KF_KL_F8B ON BARS.KL_F8B (RNK, OKPO, NMK) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
 PROMPT *** Create  grants  KL_F8B ***
 grant SELECT                                                                 on KL_F8B          to RPBN002;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on KL_F8B          to START1;
+grant FLASHBACK,SELECT                                                       on KL_F8B          to WR_REFREAD;
 
 
 
