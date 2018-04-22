@@ -86,6 +86,11 @@ declare
 begin
   l_stmt := q'[CLOB LOB ( XML_FILE ) STORE AS SECUREFILE ( TABLESPACE BRSLOBD DISABLE STORAGE IN ROW COMPRESS HIGH NOCACHE NOLOGGING )]';
   NBUR_UTIL.SET_COL('NBUR_TMP_E9_CLOB','XML_FILE', l_stmt );
+exception 
+	when others then
+		if sqlcode in (-22859, -01430) then null;
+		else raise;
+		end if;
 end;
 /
 

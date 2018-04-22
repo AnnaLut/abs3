@@ -54,6 +54,11 @@ begin
 exception
   when E_COL_EXSTS
   then null;
+exception 
+	when others then
+		if sqlcode in (-22859, -01430) then null;
+		else raise;
+		end if;
 end;
 /
 
