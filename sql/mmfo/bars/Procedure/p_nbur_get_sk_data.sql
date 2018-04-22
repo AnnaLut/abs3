@@ -26,7 +26,7 @@ begin
   exception when no_data_found then
       raise_application_error(-20000, 'Параметр REPORT_SERVER_URL не задано');
   end;
-  
+
 --  l_url:= replace(l_url, 'https', 'http');
 
 --  l_url:= 'http://10.10.10.35:1212/barsroot/webservices/QuickMoneyService.asmx'; --jeka потом убрать
@@ -63,16 +63,16 @@ begin
     when others then null;
   end;
 
-  if instr(l_errtxt,'Exception') >0 then
-     raise_application_error(-20100, l_errtxt);
-  end if;
-
   l_clob := dbms_xmlgen.convert(l_clob, 1);
 
   delete from NBUR_TMP_E9_CLOB where report_date = p_ReportDateTo and kf = p_kf;
 
   insert into NBUR_TMP_E9_CLOB(report_date, kf, xml_file)
   values (p_ReportDateTo, p_kf, l_clob);
+  
+  if instr(l_errtxt,'Exception') >0 then
+     raise_application_error(-20100, l_errtxt);
+  end if;
 
 end;
 /
