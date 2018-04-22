@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/NBUR_P_FC9.sql =========*** Run **
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure NBUR_P_FC9 ***
-
-  CREATE OR REPLACE PROCEDURE BARS.NBUR_P_FC9 (p_kod_filii        varchar2,
+CREATE OR REPLACE PROCEDURE BARS.NBUR_P_FC9 (p_kod_filii        varchar2,
                                              p_report_date      date,
                                              p_form_id          number,
                                              p_scheme           varchar2 default 'C',
@@ -18,7 +9,7 @@ is
 % DESCRIPTION : Процедура формирования #C9 для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.16.021 22/10/2017
+% VERSION     : v.16.023 20/04/2018 (01/03/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 /*
    Структура показника DD NNN
@@ -112,7 +103,7 @@ BEGIN
                                        ), 3, '0') nnn,
                                   p10, 
                                   p20, 
-                                  (case when flag_kons = 0 then p31 else (case when p31 = '006' then p31 else '0' end) end) p31, 
+                                  (case when flag_kons = 0 then (case when p31 = '0' and p31_add is not null then p31_add else p31 end) else (case when p31 = '006' then p31 else '0' end) end) p31, 
                                   (case when flag_kons = 0 then p35 else '0' end) p35, 
                                   (case when flag_kons = 0 then p42 else '00' end) p42, 
                                   (case when flag_kons = 0 then p40 else '00' end) p40, 
@@ -155,6 +146,7 @@ BEGIN
                                               then '0'
                                               else '0'
                                             end) as P31,
+                                            (select trim(ser||' '||numdoc) from person where rnk=c.cust_id) p31_add,
                                             c.K030 as P35,
                                             (case
                                               when trim(p.d1#C9) is not null
@@ -201,11 +193,7 @@ BEGIN
                                                 end
                                             end) as P40,
                                             '00' as P42,
-                                            nvl((case 
-                                                  when trim(p.d6#70) is null
-                                                  then f_nbur_get_kod_g(t.ref, 1)
-                                                  else lpad(substr(trim(p.d6#70), 1, 3), 3, '0')
-                                             end), '000') P62,
+                                            (case when nvl(trim(w.value), '804') <> '804' then lpad(trim(w.value), 3, '0') else nvl(f_nbur_get_kod_g(t.ref, 1), '000') end) P62,
                                             coalesce((case 
                                                       when t.KF = '300465' and
                                                            t.ACC_NUM_DB like '1500%' and
@@ -361,6 +349,7 @@ BEGIN
                                               then '0'
                                               else '0'
                                             end) as P31,
+                                            (select trim(ser||' '||numdoc) from person where rnk=c.cust_id) p31_add,
                                             c.K030 as P35,
                                             (case
                                               when trim(p.d1#C9) is not null
@@ -407,11 +396,7 @@ BEGIN
                                                 end
                                             end) as P40,
                                             '00' as P42,
-                                            nvl((case 
-                                                  when trim(p.d6#70) is null
-                                                  then f_nbur_get_kod_g(t.ref, 1)
-                                                  else lpad(substr(trim(p.d6#70), 1, 3), 3, '0')
-                                             end), '000') P62,
+                                            (case when nvl(trim(w.value), '804') <> '804' then lpad(trim(w.value), 3, '0') else nvl(f_nbur_get_kod_g(t.ref, 1), '000') end) P62,
                                             coalesce((case 
                                                       when t.KF = '300465' and
                                                            t.ACC_NUM_DB like '1500%' and
@@ -670,10 +655,3 @@ BEGIN
 
 END;
 /
-show err;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/NBUR_P_FC9.sql =========*** End **
-PROMPT ===================================================================================== 
