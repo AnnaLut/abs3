@@ -1129,7 +1129,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.MBM_PAYMENTS is
             select * 
               into l_acc
               from accounts a
-             where a.nls = p_nlsb;
+             where a.nls = p_nlsb
+               and a.kv = l_kv;
             if l_acc.tip like 'W4%' then
                l_tt := 'CL5';
             end if;
