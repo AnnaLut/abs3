@@ -1,10 +1,3 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/PAY_TERMINAL_CLEARING.sql ========
-PROMPT ===================================================================================== 
-
-
 PROMPT *** Create  procedure PAY_TERMINAL_CLEARING ***
 
 CREATE OR REPLACE PROCEDURE BARS.PAY_TERMINAL_CLEARING
@@ -104,18 +97,35 @@ begin
       null;
   end;
   */
-  begin
-    select a.NLS, substr(a.NMS,1,37)
+  if     p_terminal_code != '-1' then  
+   begin
+     select a.NLS, substr(a.NMS,1,37)
+      into l_nlsa, l_nam_a
+      from BARS.ACCOUNTS a
+     where a.NLS like '2924_'||substr(p_terminal_code, -6)||'015'  --2924 К  FFF FFF ННН COBUMMFO-7560
+       and a.KV  = p_kv
+       and a.DAZS is Null;
+       
+   exception
+    when NO_DATA_FOUND then
+      raise_application_error( -20666, 'Не знайдено дійчий рахунок 2924/15('||to_char(p_kv)||
+                                       ') для відділення '||sys_context('bars_context','user_branch'), TRUE );
+    end;
+  else 
+   begin
+     select a.NLS, substr(a.NMS,1,37)
       into l_nlsa, l_nam_a
       from BARS.ACCOUNTS a
      where a.NLS = BARS.NBS_OB22('2924','15')
        and a.KV  = p_kv
        and a.DAZS is Null;
-  exception
+       
+   exception
     when NO_DATA_FOUND then
       raise_application_error( -20666, 'Не знайдено дійчий рахунок 2924/15('||to_char(p_kv)||
                                        ') для відділення '||sys_context('bars_context','user_branch'), TRUE );
-  end;
+   end;
+  end if;
   
   begin
     select a.NLS, substr(a.NMS,1,37)
@@ -192,8 +202,4 @@ end PAY_TERMINAL_CLEARING;
 /
 show err;
 
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/PAY_TERMINAL_CLEARING.sql ========
-PROMPT ===================================================================================== 
+grant EXECUTE on PAY_TERMINAL_CLEARING to BARS_ACCESS_DEFROLE;
