@@ -3,8 +3,7 @@ prompt == Щомісячний звіт по корпоративним клієнтам
 prompt ===================================== 
 
 set serveroutput on
-set feed off 
-
+set feed off       
 declare                               
 
    nlchr       char(2):=chr(13)||chr(10);
@@ -42,11 +41,11 @@ begin
     l_zpr.id           := 1;
     l_zpr.name         := 'Щомісячний звіт по корпоративним клієнтам';
     l_zpr.namef        := '';
-    l_zpr.bindvars     := ':sFdat1=''На дату(dd/mm/yyyy)''';
+    l_zpr.bindvars     := ':sFdat1=''На дату(dd/mm/yyyy)'',:KF=''МФО''';
     l_zpr.create_stmt  := '';
     l_zpr.rpt_template := 'rep5054.frx';
     l_zpr.form_proc    := '';
-    l_zpr.default_vars := '';
+    l_zpr.default_vars := ',:KF=''%''';
     l_zpr.bind_sql     := '';
     l_zpr.xml_encoding := 'CL8MSWIN1251';
     l_zpr.txt          := 'select trunc(sysdate) DATGEN, '||nlchr||
@@ -80,10 +79,11 @@ begin
                            '        group by a.rnk) aw'||nlchr||
                            'where c.rnk = p.rnk(+)'||nlchr||
                            '  and (c.date_off is null or (c.date_off >= trunc(add_months(:sFdat1,0),''MM'')-0 and c.date_off <= trunc(add_months(:sFdat1,1),''MM'')-1 ) ) '||nlchr||
+                           '  and case when trim(:KF) = ''%'' then substr(c.branch,2,6) else :KF end  = substr(c.branch,2,6)'||nlchr||
                            '  and (c.custtype = 2 or (c.custtype = 3 and trim(c.sed) =''91''))'||nlchr||
                            '  and c.isp = s.id(+)'||nlchr||
-                           '  and c.rnk = rk.rnk(+)'||nlchr||
-                           '  and c.rnk = aw.rnk(+)'||nlchr||
+                           '  and c.rnk = rk.rnk'||nlchr||
+                           '  and c.rnk = aw.rnk'||nlchr||
                            'order by 4,5,6,8';
     l_zpr.xsl_data     := '';
     l_zpr.xsd_data     := '';
@@ -121,12 +121,7 @@ begin
     l_rep.ndat        :=1;
     l_rep.mask        :='';
     l_rep.usearc      :=0;
-    begin                                                                        
-        select idf into l_repfolder from reportsf where idf = 210; 
-    exception when no_data_found then                                            
-        l_repfolder := null;                                                     
-    end;                         
-    l_rep.idf := l_repfolder;    
+    l_rep.idf         :=null;    
 
     -- Фиксированный № печатного отчета   
     l_rep.id          := 5054;
@@ -140,7 +135,8 @@ begin
            bars_error.raise_error('REP',14, to_char(l_rep.id));
        end;                                    
     else                                            
-       begin                                        
+       begin
+
           insert into reports values l_rep;         
           l_message:=l_message||nlchr||'Добавлен новый печ. отчет под №'||l_rep.id;
        exception when dup_val_on_index then         
@@ -161,4 +157,5 @@ begin
 end;                                        
 /                                           
                                             
-commit;                                     
+commit;
+/
