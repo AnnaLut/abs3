@@ -1,10 +1,3 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/XML_IMPDOCS.sql =========*** Run *** =
-PROMPT ===================================================================================== 
-
-
 PROMPT *** ALTER_POLICY_INFO to XML_IMPDOCS ***
 
 
@@ -164,6 +157,16 @@ exception when others then
  end;
 /
 
+PROMPT *** Create  index I_XMLIMPDOCS_REF ***
+begin   
+ execute immediate '
+  CREATE UNIQUE INDEX BARS.I_XMLIMPDOCS_REF ON BARS.XML_IMPDOCS (REF) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYNI ';
+exception when others then
+  if sqlcode=-955 then null; else raise; end if;
+end;
+/
 
 
 PROMPT *** Create  grants  XML_IMPDOCS ***
@@ -172,9 +175,3 @@ grant SELECT                                                                 on 
 grant SELECT                                                                 on XML_IMPDOCS     to OPER000;
 grant SELECT                                                                 on XML_IMPDOCS     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on XML_IMPDOCS     to WR_ALL_RIGHTS;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Table/XML_IMPDOCS.sql =========*** End *** =
-PROMPT ===================================================================================== 
