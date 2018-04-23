@@ -17,7 +17,11 @@ PROMPT *** Create  view V_FM_OSC_RULE25 ***
     WHERE     o.REF = p.REF
           AND p.acc = a.acc
           AND (   a.nbs IN ('2620','2522','2625','2630','2635', '2638')
-               OR a.nbs LIKE '22%')
+               OR a.nbs LIKE '22%'
+			   OR (a.nbs = '2600' 
+				   and c.custtype = 3 
+				   and C.ise in ('14100', '14200', '14101','14201') 
+				   and C.sed ='91'))
           AND a.rnk = c.rnk
           AND c.rnk = r.rnk
           AND r.risk_id = 2
