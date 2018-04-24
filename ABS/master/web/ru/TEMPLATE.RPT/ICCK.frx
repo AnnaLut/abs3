@@ -79,11 +79,11 @@ namespace FastReport
         <TableColumn Name="Column4" Width="83.64"/>
         <TableColumn Name="Column5" Width="83.62"/>
         <TableColumn Name="Column6" Width="83.64"/>
-        <TableColumn Name="Column6" Width="122.85"/>
-        <TableColumn Name="Column7" Width="74.18"/>
-        <TableColumn Name="Column8" Width="121.44"/>
-        <TableColumn Name="Column9" Width="67.1"/>
-        <TableColumn Name="Column10" Width="275"/>
+        <TableColumn Name="Column7" Width="122.85"/>
+        <TableColumn Name="Column8" Width="74.18"/>
+        <TableColumn Name="Column9" Width="121.44"/>
+        <TableColumn Name="Column10" Width="67.1"/>
+        <TableColumn Name="Column11" Width="275"/>
         <TableRow Name="Row9" Height="28.35">
           <TableCell Name="Cell168" Border.Lines="All" Text="Кредитнi&#13;&#10;02" HorzAlign="Right" Font="Times New Roman, 9pt"/>
           <TableCell Name="Cell169" Border.Lines="All" Text="Iпотечнi&#13;&#10;83" HorzAlign="Right" Font="Times New Roman, 9pt"/>
@@ -101,17 +101,17 @@ namespace FastReport
       <GroupHeaderBand Name="GroupHeader2" Top="128.48" Width="1171.8" Condition="[Table.BRANCH_KD]">
         <DataBand Name="Data1" Top="131.3" Width="1171.8" Height="18.9" DataSource="Table">
           <TableObject Name="Table1" Width="1162.39" Height="18.9" GrowToBottom="true">
-            <TableColumn Name="Column11" Width="83.64"/>
             <TableColumn Name="Column12" Width="83.64"/>
             <TableColumn Name="Column13" Width="83.64"/>
             <TableColumn Name="Column14" Width="83.64"/>
-            <TableColumn Name="Column15" Width="83.62"/>
-            <TableColumn Name="Column16" Width="83.64"/>
-            <TableColumn Name="Column17" Width="122.85"/>
-            <TableColumn Name="Column18" Width="74.18"/>
-            <TableColumn Name="Column19" Width="121.44"/>
-            <TableColumn Name="Column20" Width="67.1"/>
-            <TableColumn Name="Column21" Width="275"/>
+            <TableColumn Name="Column15" Width="83.64"/>
+            <TableColumn Name="Column16" Width="83.62"/>
+            <TableColumn Name="Column17" Width="83.64"/>
+            <TableColumn Name="Column18" Width="122.85"/>
+            <TableColumn Name="Column19" Width="74.18"/>
+            <TableColumn Name="Column20" Width="121.44"/>
+            <TableColumn Name="Column21" Width="67.1"/>
+            <TableColumn Name="Column22" Width="275"/>
             <TableRow Name="Row1">
               <TableCell Name="Cell1" Border.Lines="All" Text="[Table.K_02]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 9pt"/>
               <TableCell Name="Cell100" Border.Lines="All" Text="[Table.K_83]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 9pt"/>
@@ -129,16 +129,16 @@ namespace FastReport
         </DataBand>
         <GroupFooterBand Name="GroupFooter2" Top="153.02" Width="1171.8" Height="18.9">
           <TableObject Name="Table3" Width="1162.39" Height="18.9" GrowToBottom="true">
-            <TableColumn Name="Column37" Width="83.64"/>
-            <TableColumn Name="Column38" Width="83.64"/>
-            <TableColumn Name="Column39" Width="83.64"/>
-            <TableColumn Name="Column40" Width="83.64"/>
-            <TableColumn Name="Column41" Width="83.62"/>
-            <TableColumn Name="Column42" Width="83.64"/>
-            <TableColumn Name="Column100" Width="122.85"/>
-            <TableColumn Name="Column43" Width="74.18"/>
-            <TableColumn Name="Column44" Width="188.54"/>
-            <TableColumn Name="Column45" Width="275"/>
+            <TableColumn Name="Column23" Width="83.64"/>
+            <TableColumn Name="Column24" Width="83.64"/>
+            <TableColumn Name="Column25" Width="83.64"/>
+            <TableColumn Name="Column26" Width="83.64"/>
+            <TableColumn Name="Column27" Width="83.62"/>
+            <TableColumn Name="Column28" Width="83.64"/>
+            <TableColumn Name="Column29" Width="122.85"/>
+            <TableColumn Name="Column30" Width="74.18"/>
+            <TableColumn Name="Column31" Width="188.54"/>
+            <TableColumn Name="Column32" Width="275"/>
             <TableRow Name="Row4">
               <TableCell Name="Cell122" Border.Lines="All" Text="[SUM_K_02]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 9pt"/>
               <TableCell Name="Cell123" Border.Lines="All" Text="[SUM_K_83]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 9pt"/>
@@ -156,16 +156,16 @@ namespace FastReport
       </GroupHeaderBand>
       <GroupFooterBand Name="GroupFooter1" Top="174.73" Width="1171.8" Height="56.7">
         <TableObject Name="Table3" Width="1162.39" Height="56.7" GrowToBottom="true">
-          <TableColumn Name="Column46" Width="83.64"/>
-          <TableColumn Name="Column47" Width="83.64"/>
-          <TableColumn Name="Column48" Width="83.64"/>
-          <TableColumn Name="Column49" Width="83.64"/>
-          <TableColumn Name="Column50" Width="83.62"/>
-          <TableColumn Name="Column51" Width="83.64"/>
-          <TableColumn Name="Column101" Width="122.85"/>
-          <TableColumn Name="Column52" Width="74.18"/>
-          <TableColumn Name="Column53" Width="188.54"/>
-          <TableColumn Name="Column54" Width="275"/>
+          <TableColumn Name="Column33" Width="83.64"/>
+          <TableColumn Name="Column34" Width="83.64"/>
+          <TableColumn Name="Column35" Width="83.64"/>
+          <TableColumn Name="Column36" Width="83.64"/>
+          <TableColumn Name="Column37" Width="83.62"/>
+          <TableColumn Name="Column38" Width="83.64"/>
+          <TableColumn Name="Column39" Width="122.85"/>
+          <TableColumn Name="Column40" Width="74.18"/>
+          <TableColumn Name="Column41" Width="188.54"/>
+          <TableColumn Name="Column42" Width="275"/>
           <TableRow Name="Row5">
             <TableCell Name="Cell131" Border.Lines="All" Text="[TOTAL_K_02]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 9pt"/>
             <TableCell Name="Cell132" Border.Lines="All" Text="[TOTAL_K_83]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 9pt"/>
