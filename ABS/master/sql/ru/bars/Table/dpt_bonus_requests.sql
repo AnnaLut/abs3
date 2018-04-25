@@ -1,3 +1,5 @@
+
+
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/DPT_BONUS_REQUESTS.sql =========*** Ru
 PROMPT ===================================================================================== 
@@ -449,7 +451,7 @@ exception when others then
 
 PROMPT *** Create  grants  DPT_BONUS_REQUESTS ***
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_BONUS_REQUESTS to WR_ALL_RIGHTS;
-grant SELECT                                                                 on DPT_BONUS_REQUESTS to BARS_ACCESS_DEFROLE;
+
 
 
 PROMPT ===================================================================================== 

@@ -28,14 +28,7 @@ mainApp.controller("McpCtrl", function ($controller, $scope, $http, $timeout, ke
     ];
     var infoLinesGridToolbar = [
         { template: '<a class="k-button" ng-click="onClickToolbarGrid(\'infoLines\', \'excel\')" ng-disabled="disabledToolbarGrid(\'infoLines\', \'excel\')"><i class="pf-icon pf-16 pf-exel"></i>Рядки в Excel</a>' },
-        { template: '<a class="k-button" ng-click="onClickToolbarGrid(\'infoLines\', \'remove\')" ng-disabled="disabledToolbarGrid(\'infoLines\', \'remove\')"><i class="pf-icon pf-16 pf-delete_button_error"></i>Виключити з платежу</a>' },
-        {
-            template: '<a class="k-button" ng-click="onClickToolbarGrid(\'infoLines\', \'set_file_record_reverted\')" ng-disabled="disabledToolbarGrid(\'infoLines\', \'set_file_record_reverted\')"><i class="pf-icon pf-16 pf-REPLY"></i>Змінити статус на Повернутий</a>'
-        },
-        {
-            template: '<a class="k-button" style="position: absolute;" ng-click="onClickToolbarGrid(\'infoLines\', \'set_file_record_payed\')" ng-disabled="disabledToolbarGrid(\'infoLines\', \'set_file_record_payed\')"><i class="pf-icon pf-16 pf-list-ok"></i>Змінити статус на Оплачений</a>'
-            + '<input id="fileRecordsPayedDate" class="form-control" style="visibility: hidden; position: absolute;" kendo-date-picker="" k-options="fileRecordsPayedDateOptions" />'
-        }
+        { template: '<a class="k-button" ng-click="onClickToolbarGrid(\'infoLines\', \'remove\')" ng-disabled="disabledToolbarGrid(\'infoLines\', \'remove\')"><i class="pf-icon pf-16 pf-delete_button_error"></i>Виключити з платежу</a>' }
     ];
 
     $scope.visibleToolbarGrid = function(id, op){
@@ -52,29 +45,7 @@ mainApp.controller("McpCtrl", function ($controller, $scope, $http, $timeout, ke
         }
         return true;
     };
-    $scope.fileRecordsPayedDateOptions = {
-        max: new Date(),
-        change: function (event) {
-            var date = this.value();
-            bars.ui.loader("body", true);
-            var grid = $scope.infoLinesGrid;
-            var checkedArr = kendoService.findCheckedGrid(grid);
-            var fileRecords = [];
-            for (i = 0; i < checkedArr.length; i++) {
-                fileRecords.push(checkedArr[i].ID);
-            }
-            $http.put(bars.config.urlContent('/api/Mcp/Mcp/SetFileRecordsPayed'), { Date: date, FileRecords: fileRecords } )
-                .success(function (response) {
-                    bars.ui.loader("body", false);
-                    grid.dataSource.read();
-                    bars.ui.notify("До відома", "Статус інформаційних рядків змінено на Оплачено.",
-                        "info", { autoHideAfter: 5 * 1000 });
-                }).error(function (response) {
-                    bars.ui.loader("body", false);
-                });
-        }
-    };
-    var allowedForSelectStatuses = [17, 19, 20];
+
     $scope.disabledToolbarGrid = function (id, op){
         var grid = id === "files" ? $scope.filesGrid : $scope.infoLinesGrid;
         var row = grid.dataItem(grid.select());
@@ -97,10 +68,6 @@ mainApp.controller("McpCtrl", function ($controller, $scope, $http, $timeout, ke
             case 'excel':
                 return grid._data === undefined ? true : grid._data.length <= 0;
 
-            case 'set_file_record_payed':
-                var checked = kendoService.findCheckedGrid(grid);
-                return checked.length === 0 || checked.some(function (el) { return allowedForSelectStatuses.indexOf(el.STATE_ID) == -1 });
-            case 'set_file_record_reverted':
             case 'remove':
                 return kendoService.findCheckedGrid(grid).length === 0;
 
@@ -109,6 +76,7 @@ mainApp.controller("McpCtrl", function ($controller, $scope, $http, $timeout, ke
 
             case 'pay':
                 return _validate(FILE_STATES.CHECKING_PAY);
+
             case 'createPay':
                 return _validate(FILE_STATES.CHECKED);
         }
@@ -138,26 +106,7 @@ mainApp.controller("McpCtrl", function ($controller, $scope, $http, $timeout, ke
                 }
                 g.dataSource.data(data);
                 break;
-            case 'set_file_record_reverted':
-                bars.ui.loader("body", true);
-                var checkedArr = kendoService.findCheckedGrid(grid);
-                var fileRecordIds = [];
-                for (i = 0; i < checkedArr.length; i++) {
-                    fileRecordIds.push(checkedArr[i].ID);
-                }
-                $http.put(bars.config.urlContent('/api/Mcp/Mcp/SetFileRecordsReverted'), fileRecordIds )
-                    .success(function (response) {
-                        bars.ui.loader("body", false);
-                        grid.dataSource.read();
-                        bars.ui.notify("До відома", "Статус інформаційних рядків змінено на Повернутий.",
-                            "info", { autoHideAfter: 5 * 1000 });
-                    }).error(function (response) {
-                        bars.ui.loader("body", false);
-                    });
-                break;
-            case 'set_file_record_payed':
-                $("#fileRecordsPayedDate").data("kendoDatePicker").open();
-                break;
+
             case 'pay':
                 bars.ui.loader("body", true);
                 $http.post(bars.config.urlContent('/api/Mcp/Mcp/Pay'), {id: row.ID})

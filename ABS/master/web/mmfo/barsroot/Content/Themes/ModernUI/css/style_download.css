@@ -172,12 +172,12 @@ div#logobig-img {
       display: block;
     }
     .holy-span {
+      height: 30px;
       bottom: 0;
       color: white;
-      font-size: 15px;
-      padding: 5px;
+      font-size: 16px;
     }
-.holy-span-date {
-    color: #7fb900;
-    font-size: 25px;
-}
+    .holy-span-date {
+      color: #7fb900;
+      font-size: 30px;
+    }

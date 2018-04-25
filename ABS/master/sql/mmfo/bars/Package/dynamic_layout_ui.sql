@@ -1,5 +1,5 @@
 PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/package/dynamic_layout_ui.sql =========***
+PROMPT *** Run *** ========== Scripts /Sql/BARS/package/dynamic_layout_ui.sql =========*** R
 PROMPT ===================================================================================== 
  
 CREATE OR REPLACE PACKAGE BARS.dynamic_layout_ui is
@@ -122,7 +122,7 @@ CREATE OR REPLACE PACKAGE BARS.dynamic_layout_ui is
 end dynamic_layout_ui;
 
 /
-CREATE OR REPLACE PACKAGE BODY dynamic_layout_ui is
+CREATE OR REPLACE PACKAGE BODY BARS.dynamic_layout_ui is
 
   --
   -- Автор : VIT
@@ -141,7 +141,7 @@ CREATE OR REPLACE PACKAGE BODY dynamic_layout_ui is
   RES_ERR constant number(1) := -1;
 
   /*  Список изменений
-  30.01.2018 http://jira.unity-bars.com:11000/browse/COBUMMFO-6492 Для статичних макетів додано визначення okpo_a
+  27.10.2017 Гриценя Додано уточнення по коду валюти http://jira.unity-bars.com.ua:11000/browse/COBUMMFO-5296
   24.05.2017 Гриценя для процедур create_dynamic_layout, create_dynamic_layout_detail, add_static_layout
   додано параметр flag для специфічної роботи функції Макети юридичних осіб.
   26.09.2016 Сухова  Добавлена проц оплаты для статических макетов pay_Static_layout
@@ -804,18 +804,9 @@ CREATE OR REPLACE PACKAGE BODY dynamic_layout_ui is
         raise_application_error(-20001,
                                 'Вказаний вид документу не знайдено');
     end;
-   ----------------------*******Для макетів юр осіб********** 
+   ----------------------*******Для макетів юр осіб**********
     l_okpo_a := p_okpo_a;
-   
-    if ( flag = 1 and p_okpo_a is null) then
-        begin 
-        
-            select distinct okpo into l_okpo_a from customer 
-            where rnk = (select rnk from accounts where nls=p_nlsa and kv = p_kv)
-                  and date_off is null ;
-        end;         
-     end if;     
-    ------------------***************************************
+
     if ( flag = 1 and p_okpo_a is null) then
         begin
 
@@ -830,20 +821,7 @@ CREATE OR REPLACE PACKAGE BODY dynamic_layout_ui is
     l_mf1.s     := null;
     l_mf1.nam_b := p_nam_b;
     l_mf1.nazn  := p_nazn;
-    
-    if flag =1 then l_mf1.okpoa := l_okpo_a;
-               else begin 
-			        --http://jira.unity-bars.com:11000/browse/COBUMMFO-6492
-                    select distinct okpo into l_okpo_a from customer where rnk = (select rnk from accounts where nls=p_nlsa and kv = p_kv) and date_off is null;
-                    l_mf1.okpoa := l_okpo_a;
-                    end;
-    end if;
-    
---    l_mf1.okpoa := case when flag =1 then l_okpo_a else
---                                                        (select distinct okpo into l_okpo_a from customer 
---                                                        where rnk = (select rnk from accounts where nls=p_nlsa and kv = p_kv) and date_off is null) 
---                                                         
---                                                        end; /*f_ourokpo */
+    l_mf1.okpoa := case when flag =1 then l_okpo_a else f_ourokpo end;
     l_mf1.okpob := p_okpo_b;
 
     begin

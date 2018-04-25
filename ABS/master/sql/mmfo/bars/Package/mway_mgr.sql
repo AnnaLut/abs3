@@ -1776,9 +1776,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.MWAY_MGR is
                       
                       if l_count_mm = 0 then -- первый месяц
                        
-                        if kost(l_deposit.dpt_accid,trunc(sysdate - 1)) = 0 then -- первичный взнос
-                          null;
-                        else 
                          if l_summ > l_deposit.dpt_amount * 2 then
                             --731 Превышен лимит пополнения за период
                             rollback to savepoint sp_paystart;
@@ -1790,7 +1787,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.MWAY_MGR is
                          else
                             null;
                          end if;    
-                        end if; 
                       else  -- не первый месяц
                         if l_summ > l_deposit.dpt_amount then
                             --731 Превышен лимит пополнения за период
@@ -1986,9 +1982,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MWAY_MGR is
 
                       
                       if l_count_mm = 0 then -- первый месяц
-                        if kost(l_deposit.dpt_accid,trunc(sysdate - 1)) = 0 then -- первичный взнос
-                          null;
-                        else 
+                       
                          if l_summ > l_deposit.dpt_amount * 2 then
                             --731 Превышен лимит пополнения за период
                             rollback to savepoint sp_paystart;
@@ -2000,7 +1994,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.MWAY_MGR is
                          else
                             null;
                          end if;    
-                        end if; 
                       else  -- не первый месяц
                         if l_summ > l_deposit.dpt_amount then
                             --731 Превышен лимит пополнения за период

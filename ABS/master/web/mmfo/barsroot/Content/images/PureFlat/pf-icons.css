@@ -62,7 +62,6 @@
 .pf-16.pf-piece{background-image:url(16/piece.png)}
 .pf-16.pf-print{background-image:url(16/print.png)}
 .pf-16.pf-reload_rotate{background-image:url(16/reload_rotate.png)}
-.pf-16.pf-REPLY{background-image:url(16/REPLY.png)}
 .pf-16.pf-report_open{background-image:url(16/report_open.png)}
 .pf-16.pf-report_open-import{background-image:url(16/report_open-import.png)}
 .pf-16.pf-table_column{background-image:url(16/table_column.png)}
@@ -161,7 +160,6 @@
 .pf-16.pf-piece.pf-hot{background-image:url(16/hot/piece.png)}
 .pf-16.pf-print.pf-hot{background-image:url(16/hot/print.png)}
 .pf-16.pf-reload_rotate.pf-hot{background-image:url(16/hot/reload_rotate.png)}
-.pf-16.pf-REPLY.pf-hot{background-image:url(16/hot/REPLY.png)}
 .pf-16.pf-report_open.pf-hot{background-image:url(16/hot/report_open.png)}
 .pf-16.pf-report_open-import.pf-hot{background-image:url(16/hot/report_open-import.png)}
 .pf-16.pf-table_column.pf-hot{background-image:url(16/hot/table_column.png)}
@@ -260,7 +258,6 @@
 .disabled .pf-16.pf-piece,.k-state-disabled .pf-16.pf-piece,[disabled] .pf-16.pf-piece,.pf-16.pf-piece.pf-disabled{background-image:url(16/disabled/piece.png)}
 .disabled .pf-16.pf-print,.k-state-disabled .pf-16.pf-print,[disabled] .pf-16.pf-print,.pf-16.pf-print.pf-disabled{background-image:url(16/disabled/print.png)}
 .disabled .pf-16.pf-reload_rotate,.k-state-disabled .pf-16.pf-reload_rotate,[disabled] .pf-16.pf-reload_rotate,.pf-16.pf-reload_rotate.pf-disabled{background-image:url(16/disabled/reload_rotate.png)}
-.disabled .pf-16.pf-REPLY,.k-state-disabled .pf-16.pf-REPLY,[disabled] .pf-16.pf-REPLY,.pf-16.pf-REPLY.pf-disabled{background-image:url(16/disabled/REPLY.png)}
 .disabled .pf-16.pf-report_open,.k-state-disabled .pf-16.pf-report_open,[disabled] .pf-16.pf-report_open,.pf-16.pf-report_open.pf-disabled{background-image:url(16/disabled/report_open.png)}
 .disabled .pf-16.pf-report_open-import,.k-state-disabled .pf-16.pf-report_open-import,[disabled] .pf-16.pf-report_open-import,.pf-16.pf-report_open-import.pf-disabled{background-image:url(16/disabled/report_open-import.png)}
 .disabled .pf-16.pf-table_column,.k-state-disabled .pf-16.pf-table_column,[disabled] .pf-16.pf-table_column,.pf-16.pf-table_column.pf-disabled{background-image:url(16/disabled/table_column.png)}
@@ -361,7 +358,6 @@
 .pf-20.pf-piece{background-image:url(20/piece.png)}
 .pf-20.pf-print{background-image:url(20/print.png)}
 .pf-20.pf-reload_rotate{background-image:url(20/reload_rotate.png)}
-.pf-20.pf-REPLY{background-image:url(20/REPLY.png)}
 .pf-20.pf-report_open{background-image:url(20/report_open.png)}
 .pf-20.pf-report_open-import{background-image:url(20/report_open-import.png)}
 .pf-20.pf-table_column{background-image:url(20/table_column.png)}
@@ -460,7 +456,6 @@
 .pf-20.pf-piece.pf-hot{background-image:url(20/hot/piece.png)}
 .pf-20.pf-print.pf-hot{background-image:url(20/hot/print.png)}
 .pf-20.pf-reload_rotate.pf-hot{background-image:url(20/hot/reload_rotate.png)}
-.pf-20.pf-REPLY.pf-hot{background-image:url(20/hot/REPLY.png)}
 .pf-20.pf-report_open.pf-hot{background-image:url(20/hot/report_open.png)}
 .pf-20.pf-report_open-import.pf-hot{background-image:url(20/hot/report_open-import.png)}
 .pf-20.pf-table_column.pf-hot{background-image:url(20/hot/table_column.png)}
@@ -559,7 +554,6 @@
 .disabled .pf-20.pf-piece,.k-state-disabled .pf-20.pf-piece,[disabled] .pf-20.pf-piece,.pf-20.pf-piece.pf-disabled{background-image:url(20/disabled/piece.png)}
 .disabled .pf-20.pf-print,.k-state-disabled .pf-20.pf-print,[disabled] .pf-20.pf-print,.pf-20.pf-print.pf-disabled{background-image:url(20/disabled/print.png)}
 .disabled .pf-20.pf-reload_rotate,.k-state-disabled .pf-20.pf-reload_rotate,[disabled] .pf-20.pf-reload_rotate,.pf-20.pf-reload_rotate.pf-disabled{background-image:url(20/disabled/reload_rotate.png)}
-.disabled .pf-20.pf-REPLY,.k-state-disabled .pf-20.pf-REPLY,[disabled] .pf-20.pf-REPLY,.pf-20.pf-REPLY.pf-disabled{background-image:url(20/disabled/REPLY.png)}
 .disabled .pf-20.pf-report_open,.k-state-disabled .pf-20.pf-report_open,[disabled] .pf-20.pf-report_open,.pf-20.pf-report_open.pf-disabled{background-image:url(20/disabled/report_open.png)}
 .disabled .pf-20.pf-report_open-import,.k-state-disabled .pf-20.pf-report_open-import,[disabled] .pf-20.pf-report_open-import,.pf-20.pf-report_open-import.pf-disabled{background-image:url(20/disabled/report_open-import.png)}
 .disabled .pf-20.pf-table_column,.k-state-disabled .pf-20.pf-table_column,[disabled] .pf-20.pf-table_column,.pf-20.pf-table_column.pf-disabled{background-image:url(20/disabled/table_column.png)}
@@ -660,7 +654,6 @@
 .pf-24.pf-piece{background-image:url(24/piece.png)}
 .pf-24.pf-print{background-image:url(24/print.png)}
 .pf-24.pf-reload_rotate{background-image:url(24/reload_rotate.png)}
-.pf-24.pf-REPLY{background-image:url(24/REPLY.png)}
 .pf-24.pf-report_open{background-image:url(24/report_open.png)}
 .pf-24.pf-report_open-import{background-image:url(24/report_open-import.png)}
 .pf-24.pf-table_column{background-image:url(24/table_column.png)}
@@ -759,7 +752,6 @@
 .pf-24.pf-piece.pf-hot{background-image:url(24/hot/piece.png)}
 .pf-24.pf-print.pf-hot{background-image:url(24/hot/print.png)}
 .pf-24.pf-reload_rotate.pf-hot{background-image:url(24/hot/reload_rotate.png)}
-.pf-24.pf-REPLY.pf-hot{background-image:url(24/hot/REPLY.png)}
 .pf-24.pf-report_open.pf-hot{background-image:url(24/hot/report_open.png)}
 .pf-24.pf-report_open-import.pf-hot{background-image:url(24/hot/report_open-import.png)}
 .pf-24.pf-table_column.pf-hot{background-image:url(24/hot/table_column.png)}
@@ -858,7 +850,6 @@
 .disabled .pf-24.pf-piece,.k-state-disabled .pf-24.pf-piece,[disabled] .pf-24.pf-piece,.pf-24.pf-piece.pf-disabled{background-image:url(24/disabled/piece.png)}
 .disabled .pf-24.pf-print,.k-state-disabled .pf-24.pf-print,[disabled] .pf-24.pf-print,.pf-24.pf-print.pf-disabled{background-image:url(24/disabled/print.png)}
 .disabled .pf-24.pf-reload_rotate,.k-state-disabled .pf-24.pf-reload_rotate,[disabled] .pf-24.pf-reload_rotate,.pf-24.pf-reload_rotate.pf-disabled{background-image:url(24/disabled/reload_rotate.png)}
-.disabled .pf-24.pf-REPLY,.k-state-disabled .pf-24.pf-REPLY,[disabled] .pf-24.pf-REPLY,.pf-24.pf-REPLY.pf-disabled{background-image:url(24/disabled/REPLY.png)}
 .disabled .pf-24.pf-report_open,.k-state-disabled .pf-24.pf-report_open,[disabled] .pf-24.pf-report_open,.pf-24.pf-report_open.pf-disabled{background-image:url(24/disabled/report_open.png)}
 .disabled .pf-24.pf-report_open-import,.k-state-disabled .pf-24.pf-report_open-import,[disabled] .pf-24.pf-report_open-import,.pf-24.pf-report_open-import.pf-disabled{background-image:url(24/disabled/report_open-import.png)}
 .disabled .pf-24.pf-table_column,.k-state-disabled .pf-24.pf-table_column,[disabled] .pf-24.pf-table_column,.pf-24.pf-table_column.pf-disabled{background-image:url(24/disabled/table_column.png)}
@@ -959,7 +950,6 @@
 .pf-32.pf-piece{background-image:url(32/piece.png)}
 .pf-32.pf-print{background-image:url(32/print.png)}
 .pf-32.pf-reload_rotate{background-image:url(32/reload_rotate.png)}
-.pf-32.pf-REPLY{background-image:url(32/REPLY.png)}
 .pf-32.pf-report_open{background-image:url(32/report_open.png)}
 .pf-32.pf-report_open-import{background-image:url(32/report_open-import.png)}
 .pf-32.pf-table_column{background-image:url(32/table_column.png)}
@@ -1058,7 +1048,6 @@
 .pf-32.pf-piece.pf-hot{background-image:url(32/hot/piece.png)}
 .pf-32.pf-print.pf-hot{background-image:url(32/hot/print.png)}
 .pf-32.pf-reload_rotate.pf-hot{background-image:url(32/hot/reload_rotate.png)}
-.pf-32.pf-REPLY.pf-hot{background-image:url(32/hot/REPLY.png)}
 .pf-32.pf-report_open.pf-hot{background-image:url(32/hot/report_open.png)}
 .pf-32.pf-report_open-import.pf-hot{background-image:url(32/hot/report_open-import.png)}
 .pf-32.pf-table_column.pf-hot{background-image:url(32/hot/table_column.png)}
@@ -1157,7 +1146,6 @@
 .disabled .pf-32.pf-piece,.k-state-disabled .pf-32.pf-piece,[disabled] .pf-32.pf-piece,.pf-32.pf-piece.pf-disabled{background-image:url(32/disabled/piece.png)}
 .disabled .pf-32.pf-print,.k-state-disabled .pf-32.pf-print,[disabled] .pf-32.pf-print,.pf-32.pf-print.pf-disabled{background-image:url(32/disabled/print.png)}
 .disabled .pf-32.pf-reload_rotate,.k-state-disabled .pf-32.pf-reload_rotate,[disabled] .pf-32.pf-reload_rotate,.pf-32.pf-reload_rotate.pf-disabled{background-image:url(32/disabled/reload_rotate.png)}
-.disabled .pf-32.pf-REPLY,.k-state-disabled .pf-32.pf-REPLY,[disabled] .pf-32.pf-REPLY,.pf-32.pf-REPLY.pf-disabled{background-image:url(32/disabled/REPLY.png)}
 .disabled .pf-32.pf-report_open,.k-state-disabled .pf-32.pf-report_open,[disabled] .pf-32.pf-report_open,.pf-32.pf-report_open.pf-disabled{background-image:url(32/disabled/report_open.png)}
 .disabled .pf-32.pf-report_open-import,.k-state-disabled .pf-32.pf-report_open-import,[disabled] .pf-32.pf-report_open-import,.pf-32.pf-report_open-import.pf-disabled{background-image:url(32/disabled/report_open-import.png)}
 .disabled .pf-32.pf-table_column,.k-state-disabled .pf-32.pf-table_column,[disabled] .pf-32.pf-table_column,.pf-32.pf-table_column.pf-disabled{background-image:url(32/disabled/table_column.png)}
@@ -1258,7 +1246,6 @@
 .pf-40.pf-piece{background-image:url(40/piece.png)}
 .pf-40.pf-print{background-image:url(40/print.png)}
 .pf-40.pf-reload_rotate{background-image:url(40/reload_rotate.png)}
-.pf-40.pf-REPLY{background-image:url(40/REPLY.png)}
 .pf-40.pf-report_open{background-image:url(40/report_open.png)}
 .pf-40.pf-report_open-import{background-image:url(40/report_open-import.png)}
 .pf-40.pf-table_column{background-image:url(40/table_column.png)}
@@ -1357,7 +1344,6 @@
 .pf-40.pf-piece.pf-hot{background-image:url(40/hot/piece.png)}
 .pf-40.pf-print.pf-hot{background-image:url(40/hot/print.png)}
 .pf-40.pf-reload_rotate.pf-hot{background-image:url(40/hot/reload_rotate.png)}
-.pf-40.pf-REPLY.pf-hot{background-image:url(40/hot/REPLY.png)}
 .pf-40.pf-report_open.pf-hot{background-image:url(40/hot/report_open.png)}
 .pf-40.pf-report_open-import.pf-hot{background-image:url(40/hot/report_open-import.png)}
 .pf-40.pf-table_column.pf-hot{background-image:url(40/hot/table_column.png)}
@@ -1456,7 +1442,6 @@
 .disabled .pf-40.pf-piece,.k-state-disabled .pf-40.pf-piece,[disabled] .pf-40.pf-piece,.pf-40.pf-piece.pf-disabled{background-image:url(40/disabled/piece.png)}
 .disabled .pf-40.pf-print,.k-state-disabled .pf-40.pf-print,[disabled] .pf-40.pf-print,.pf-40.pf-print.pf-disabled{background-image:url(40/disabled/print.png)}
 .disabled .pf-40.pf-reload_rotate,.k-state-disabled .pf-40.pf-reload_rotate,[disabled] .pf-40.pf-reload_rotate,.pf-40.pf-reload_rotate.pf-disabled{background-image:url(40/disabled/reload_rotate.png)}
-.disabled .pf-40.pf-REPLY,.k-state-disabled .pf-40.pf-REPLY,[disabled] .pf-40.pf-REPLY,.pf-40.pf-REPLY.pf-disabled{background-image:url(40/disabled/REPLY.png)}
 .disabled .pf-40.pf-report_open,.k-state-disabled .pf-40.pf-report_open,[disabled] .pf-40.pf-report_open,.pf-40.pf-report_open.pf-disabled{background-image:url(40/disabled/report_open.png)}
 .disabled .pf-40.pf-report_open-import,.k-state-disabled .pf-40.pf-report_open-import,[disabled] .pf-40.pf-report_open-import,.pf-40.pf-report_open-import.pf-disabled{background-image:url(40/disabled/report_open-import.png)}
 .disabled .pf-40.pf-table_column,.k-state-disabled .pf-40.pf-table_column,[disabled] .pf-40.pf-table_column,.pf-40.pf-table_column.pf-disabled{background-image:url(40/disabled/table_column.png)}
@@ -1557,7 +1542,6 @@
 .pf-48.pf-piece{background-image:url(48/piece.png)}
 .pf-48.pf-print{background-image:url(48/print.png)}
 .pf-48.pf-reload_rotate{background-image:url(48/reload_rotate.png)}
-.pf-48.pf-REPLY{background-image:url(48/REPLY.png)}
 .pf-48.pf-report_open{background-image:url(48/report_open.png)}
 .pf-48.pf-report_open-import{background-image:url(48/report_open-import.png)}
 .pf-48.pf-table_column{background-image:url(48/table_column.png)}
@@ -1656,7 +1640,6 @@
 .pf-48.pf-piece.pf-hot{background-image:url(48/hot/piece.png)}
 .pf-48.pf-print.pf-hot{background-image:url(48/hot/print.png)}
 .pf-48.pf-reload_rotate.pf-hot{background-image:url(48/hot/reload_rotate.png)}
-.pf-48.pf-REPLY.pf-hot{background-image:url(48/hot/REPLY.png)}
 .pf-48.pf-report_open.pf-hot{background-image:url(48/hot/report_open.png)}
 .pf-48.pf-report_open-import.pf-hot{background-image:url(48/hot/report_open-import.png)}
 .pf-48.pf-table_column.pf-hot{background-image:url(48/hot/table_column.png)}
@@ -1755,7 +1738,6 @@
 .disabled .pf-48.pf-piece,.k-state-disabled .pf-48.pf-piece,[disabled] .pf-48.pf-piece,.pf-48.pf-piece.pf-disabled{background-image:url(48/disabled/piece.png)}
 .disabled .pf-48.pf-print,.k-state-disabled .pf-48.pf-print,[disabled] .pf-48.pf-print,.pf-48.pf-print.pf-disabled{background-image:url(48/disabled/print.png)}
 .disabled .pf-48.pf-reload_rotate,.k-state-disabled .pf-48.pf-reload_rotate,[disabled] .pf-48.pf-reload_rotate,.pf-48.pf-reload_rotate.pf-disabled{background-image:url(48/disabled/reload_rotate.png)}
-.disabled .pf-48.pf-REPLY,.k-state-disabled .pf-48.pf-REPLY,[disabled] .pf-48.pf-REPLY,.pf-48.pf-REPLY.pf-disabled{background-image:url(48/disabled/REPLY.png)}
 .disabled .pf-48.pf-report_open,.k-state-disabled .pf-48.pf-report_open,[disabled] .pf-48.pf-report_open,.pf-48.pf-report_open.pf-disabled{background-image:url(48/disabled/report_open.png)}
 .disabled .pf-48.pf-report_open-import,.k-state-disabled .pf-48.pf-report_open-import,[disabled] .pf-48.pf-report_open-import,.pf-48.pf-report_open-import.pf-disabled{background-image:url(48/disabled/report_open-import.png)}
 .disabled .pf-48.pf-table_column,.k-state-disabled .pf-48.pf-table_column,[disabled] .pf-48.pf-table_column,.pf-48.pf-table_column.pf-disabled{background-image:url(48/disabled/table_column.png)}
@@ -1856,7 +1838,6 @@
 .pf-64.pf-piece{background-image:url(64/piece.png)}
 .pf-64.pf-print{background-image:url(64/print.png)}
 .pf-64.pf-reload_rotate{background-image:url(64/reload_rotate.png)}
-.pf-64.pf-REPLY{background-image:url(64/REPLY.png)}
 .pf-64.pf-report_open{background-image:url(64/report_open.png)}
 .pf-64.pf-report_open-import{background-image:url(64/report_open-import.png)}
 .pf-64.pf-table_column{background-image:url(64/table_column.png)}
@@ -1955,7 +1936,6 @@
 .pf-64.pf-piece.pf-hot{background-image:url(64/hot/piece.png)}
 .pf-64.pf-print.pf-hot{background-image:url(64/hot/print.png)}
 .pf-64.pf-reload_rotate.pf-hot{background-image:url(64/hot/reload_rotate.png)}
-.pf-64.pf-REPLY.pf-hot{background-image:url(64/hot/REPLY.png)}
 .pf-64.pf-report_open.pf-hot{background-image:url(64/hot/report_open.png)}
 .pf-64.pf-report_open-import.pf-hot{background-image:url(64/hot/report_open-import.png)}
 .pf-64.pf-table_column.pf-hot{background-image:url(64/hot/table_column.png)}
@@ -2054,7 +2034,6 @@
 .disabled .pf-64.pf-piece,.k-state-disabled .pf-64.pf-piece,[disabled] .pf-64.pf-piece,.pf-64.pf-piece.pf-disabled{background-image:url(64/disabled/piece.png)}
 .disabled .pf-64.pf-print,.k-state-disabled .pf-64.pf-print,[disabled] .pf-64.pf-print,.pf-64.pf-print.pf-disabled{background-image:url(64/disabled/print.png)}
 .disabled .pf-64.pf-reload_rotate,.k-state-disabled .pf-64.pf-reload_rotate,[disabled] .pf-64.pf-reload_rotate,.pf-64.pf-reload_rotate.pf-disabled{background-image:url(64/disabled/reload_rotate.png)}
-.disabled .pf-64.pf-REPLY,.k-state-disabled .pf-64.pf-REPLY,[disabled] .pf-64.pf-REPLY,.pf-64.pf-REPLY.pf-disabled{background-image:url(64/disabled/REPLY.png)}
 .disabled .pf-64.pf-report_open,.k-state-disabled .pf-64.pf-report_open,[disabled] .pf-64.pf-report_open,.pf-64.pf-report_open.pf-disabled{background-image:url(64/disabled/report_open.png)}
 .disabled .pf-64.pf-report_open-import,.k-state-disabled .pf-64.pf-report_open-import,[disabled] .pf-64.pf-report_open-import,.pf-64.pf-report_open-import.pf-disabled{background-image:url(64/disabled/report_open-import.png)}
 .disabled .pf-64.pf-table_column,.k-state-disabled .pf-64.pf-table_column,[disabled] .pf-64.pf-table_column,.pf-64.pf-table_column.pf-disabled{background-image:url(64/disabled/table_column.png)}

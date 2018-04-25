@@ -1,7 +1,3 @@
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /sql/bars/package/zp.sql =========*** Run *** 
-PROMPT ===================================================================================== 
-
 create or replace package zp is
   g_head_version  constant varchar2(64)  := 'version 1.1 18.09.2017';
 
@@ -112,7 +108,7 @@ end;
 create or replace package body zp
 is
 
-g_body_version   constant varchar2(64)   := 'version 1.17 20.03.2018';
+g_body_version   constant varchar2(64)   := 'version 1.12 15.12.2017';
 
 g_modcode        constant varchar2(3)   := 'ZP';
 g_aac_tip        constant varchar2(3)   := 'ZRP';
@@ -125,6 +121,15 @@ g_notprint constant varchar2(32)   :=    chr(00)||chr(01)||chr(02)||chr(03)||chr
 g_fiocheck constant varchar2(128)   := 'јЅ¬√ƒ≈®∆«»… ЋћЌќѕ–—“”‘’÷„ЎўЏџ№Ёёя'||'јЅ¬√•ƒ≈™∆«»≤ѓ… ЋћЌќѕ–—“”‘’÷„Ўў№ёя'||chr(39)||'-'||' '||'ABCDEFGHIJKLMNOPQRSTUVWXYZ''"`';
 
 type t_operw is table of operw%rowtype;
+
+
+
+---
+---TO DO
+---
+---1/raise_application_error->bars_error
+---2/вынести хардкод в глобальные перементы и константы
+---3/ по хорошему нужно сцепливать ошибки при импорте ведомости,  а не выводить первую.
 
 -- определение версии заголовка пакета
 function header_version return varchar2 is
@@ -1740,21 +1745,6 @@ begin
 
 end;
 
-procedure set_doc_comment_async(p_doc_id      in zp_payroll_doc.id%type,
-                                p_doc_comment in zp_payroll_doc.doc_comment%type)
-is
-  pragma autonomous_transaction;
-begin
-  update zp_payroll_doc set doc_comment = p_doc_comment where id = p_doc_id;
-  commit;
-end set_doc_comment_async;
-
-function format_errmsg(p_sqlerrm in varchar2) return varchar2
-is
-begin
-  return regexp_replace(p_sqlerrm, 'ORA-\d{1,}: *','');
-end format_errmsg;
-
 --==============================
 --ѕ≥дтвердженн€ в≥домост≥(формуванн€ док≥в)
 --==============================
@@ -1764,33 +1754,33 @@ procedure pay_payroll(p_id       zp_payroll.id%type,
                       p_docbufer varchar2)
 is
 
-  l_zp_payroll      zp_payroll%rowtype;
-  l_zp_deals        zp_deals%rowtype;
-  l_accounts_3570   accounts%rowtype;
-  l_accounts_2909   accounts%rowtype;
-  l_oper_cms        oper%rowtype;
-  l_oper_zp         oper%rowtype;
+l_zp_payroll      zp_payroll%rowtype;
+l_zp_deals        zp_deals%rowtype;
+l_accounts_3570   accounts%rowtype;
+l_accounts_2909   accounts%rowtype;
+l_oper_cms        oper%rowtype;
+l_oper_zp         oper%rowtype;
 
-  l_okpoa           customer.okpo%type;
-  l_okpob           customer.okpo%type;
+l_okpoa           customer.okpo%type;
+l_okpob           customer.okpo%type;
 
-  l_sum_payroll     number;
-  l_cms             number;
-  l_ob22_6510       accounts.ob22%type;
+l_sum_payroll     number;
+l_cms             number;
+l_ob22_6510       accounts.ob22%type;
 
-  l_rnk             customer.rnk%type;
+l_rnk             customer.rnk%type;
 
-  l_mode            number;
+l_mode            number;
 
-  l_operw_tbl t_operw := t_operw();
+l_operw_tbl t_operw := t_operw();
 
-  type t_payroll_doc_ref is record (id zp_payroll_doc.id%type, ref zp_payroll_doc.ref%type );
-  type t_doc_ref is table of t_payroll_doc_ref;
+type t_payroll_doc_ref is record (id zp_payroll_doc.id%type, ref zp_payroll_doc.ref%type );
+type t_doc_ref is table of t_payroll_doc_ref;
 
-  l_docref t_doc_ref:=t_doc_ref();
+l_docref t_doc_ref:=t_doc_ref();
 
-  n              number;
-  l_doc_is_error boolean := false;
+n number;
+
 begin
 
 
@@ -1860,6 +1850,10 @@ begin
        savepoint sp_payroll;
 
 
+
+
+
+
         l_okpoa:= get_okpo(l_zp_deals.rnk);
 
         l_oper_cms.tt    := case when l_mode=2 then 'D66' when l_mode=1 then '01E' end;
@@ -1919,8 +1913,9 @@ begin
         set ref_cms=l_oper_cms.ref
         where id=p_id;
 
-        for c in  (select * from zp_payroll_doc where id_pr = p_id) loop
-          begin
+        for c in  (select * from zp_payroll_doc where id_pr = p_id)
+
+        loop
 
             if l_zp_payroll.corp2_id is null
               then
@@ -1932,26 +1927,17 @@ begin
                     raise_application_error(-20000, 'ћ‘ќ отримувача маЇ бути в ќщадбанку');
                 end;
             end if;
+           l_oper_zp.nlsb  := c.nlsb;
 
-           l_oper_zp.nlsb := c.nlsb;
-
-            if   c.mfob=gl.amfo then
-              l_rnk := null;
-              begin
-                select substr(nms,1,38), rnk into l_oper_zp.nam_b, l_rnk from accounts where nls=l_oper_zp.nlsb and kv=980 and dazs is null;
-              exception
-                when no_data_found then 
-                  rollback to sp_payroll;
-                  raise_application_error(-20000, 'Ќе знайдено рахунок  - '|| c.nlsb||', або рахунок закрито.') ;
-              end;
-
-              begin
-                select 1 into n
-                from customer
-                where rnk=l_rnk and okpo=c.okpob;
-              exception when no_data_found then
-                raise_application_error(-20000, 'ќ ѕќ кл≥Їнта - '||c.okpob||' не в≥дпов≥даЇ рахунку - '||l_oper_zp.nlsb);
-              end ;
+            if   c.mfob=gl.amfo
+              then
+                begin
+                      select substr(nms,1,38) into l_oper_zp.nam_b  from accounts where nls=l_oper_zp.nlsb and kv=980 and dazs is null;
+                exception
+                     when no_data_found
+                     then rollback to sp_payroll;
+                          raise_application_error(-20000, 'Ќе знайдено рахунок  - '|| c.nlsb||', або рахунок закрито.') ;
+                end;
             else
                 l_oper_zp.nam_b:=substr(c.namb,1,38);
             end if;
@@ -1984,63 +1970,50 @@ begin
             end if;
 
 
-            l_oper_zp.vob   := 6;
-            l_oper_zp.nd    := l_zp_deals.id;
-            l_oper_zp.pdat  := sysdate;
-            l_oper_zp.vdat  := gl.bdate;
-            l_oper_zp.dk    := 1;
-            l_oper_zp.kv    := l_accounts_2909.kv;
-            l_oper_zp.s     := c.s;
-            l_oper_zp.kv2   := l_accounts_2909.kv;
-            l_oper_zp.s2    := c.s;
-            l_oper_zp.sk    := null;
-            l_oper_zp.datp  := gl.bdate;
+        l_oper_zp.vob   := 6;
+        l_oper_zp.nd    := l_zp_deals.id;
+        l_oper_zp.pdat  := sysdate;
+        l_oper_zp.vdat  := gl.bdate;
+        l_oper_zp.dk    := 1;
+        l_oper_zp.kv    := l_accounts_2909.kv;
+        l_oper_zp.s     := c.s;
+        l_oper_zp.kv2   := l_accounts_2909.kv;
+        l_oper_zp.s2    := c.s;
+        l_oper_zp.sk    := null;
+        l_oper_zp.datp  := gl.bdate;
 
-            l_oper_zp.nam_a := substr(l_accounts_2909.nms,1,38);
-            l_oper_zp.nlsa  := l_accounts_2909.nls;
-            l_oper_zp.mfoa  := gl.amfo;
-            l_oper_zp.mfob  := c.mfob;
+        l_oper_zp.nam_a := substr(l_accounts_2909.nms,1,38);
+        l_oper_zp.nlsa  := l_accounts_2909.nls;
+        l_oper_zp.mfoa  := gl.amfo;
+        l_oper_zp.mfob  := c.mfob;
 
-            l_oper_zp.nazn  := substr (c.nazn,1,160);
-            l_oper_zp.id_a  := l_okpoa;
-            l_oper_zp.id_b  := c.okpob;
+        l_oper_zp.nazn  := substr (c.nazn,1,160);
+        l_oper_zp.d_rec := null;
+        l_oper_zp.id_a  := l_okpoa;
+        l_oper_zp.id_b  := c.okpob;
+        l_oper_zp.id_o  := null;
+        l_oper_zp.sign  := null;
+        l_oper_zp.sos   := 1;
+        l_oper_zp.prty  := 0;
 
-            if l_oper_zp.id_b = '0000000000' then
-              l_oper_zp.d_rec := '#ф'||c.passp_serial||c.passp_num||'#';
+        pay_doc (l_oper_zp);
+
+            if  c.mfob=gl.amfo and substr(c.nlsb,1,4)='2620'
+            then
+                fill_operw_tbl(l_operw_tbl, l_oper_zp.ref, 'SK_ZB', '84');
             end if;
 
-            l_oper_zp.id_o  := null;
-            l_oper_zp.sign  := null;
-            l_oper_zp.sos   := 1;
-            l_oper_zp.prty  := 0;
-
-            pay_doc (l_oper_zp);
-
-                if  c.mfob=gl.amfo and substr(c.nlsb,1,4)='2620'
-                then
-                    fill_operw_tbl(l_operw_tbl, l_oper_zp.ref, 'SK_ZB', '84');
-                end if;
-
-            l_docref.extend;
-            l_docref(l_docref.count).id  := c.id;
-            l_docref(l_docref.count).ref := l_oper_zp.ref;
+        l_docref.extend;
+        l_docref(l_docref.count).id  := c.id;
+        l_docref(l_docref.count).ref := l_oper_zp.ref;
 
             if   c.mfob=gl.amfo
               then
                     gl.pay(2,l_oper_zp.ref,gl.bdate);
             end if;
-          exception
-            when others then
-              set_doc_comment_async(p_doc_id      => c.id,
-                                    p_doc_comment => format_errmsg(sqlerrm));
-              l_doc_is_error := true;
-              --raise;
-          end;
+
         end loop;
 
-        if l_doc_is_error then
-          raise_application_error(-20000, '¬≥дом≥сть не зараховано. ¬иникли помилки оплати документ≥в');
-        end if;
 
         forall i in 1 .. l_operw_tbl.count
         insert into operw values l_operw_tbl(i);
@@ -2596,10 +2569,10 @@ begin
 end zp;
 /
 show err;
-
+/
 grant execute on bars.zp to  bars_access_defrole;
+/
 
 
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /sql/bars/package/zp.sql =========*** End *** 
-PROMPT ===================================================================================== 
+
+

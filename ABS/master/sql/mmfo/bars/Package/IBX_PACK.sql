@@ -4,10 +4,10 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/ibx_pack.sql =========*** Run *** ==
  PROMPT ===================================================================================== 
  
-CREATE OR REPLACE PACKAGE BARS.IBX_PACK is
+  CREATE OR REPLACE PACKAGE BARS.IBX_PACK is
 
   -- ===============================================================================================
-  g_header_version constant varchar2(64) := 'version 2.0.2 22.01.2018';
+  g_header_version constant varchar2(64) := 'version 2.0.1 14.02.2017';
   -- Имя пакета
   g_pack constant varchar2(100) := 'ibx_pack';
   -- Имя модуля для работы с ошибками
@@ -89,14 +89,12 @@ CREATE OR REPLACE PACKAGE BARS.IBX_PACK is
   procedure pay_osc(p_type_id    in ibx_recs.type_id%type, -- Тип интерфейса           bs_id
                 p_ext_ref    in ibx_recs.ext_ref%type, -- Референс документа в IBox    id
                 p_ext_date   in varchar2, -- Дата/время операции в IBox  date
-                p_ext_source in varchar2, --код  терминала
-                p_receipt_num in varchar2,--номер чека                
                 p_deal_id    in ibx_recs.deal_id%type, -- Ид. сделки                   acc_id
                 p_sum        in ibx_recs.summ%type, -- Сумма операции (в коп)          sum
-                p_sign       in clob,           --                                 hash
+                        p_sign       in clob,           --                                 hash
                 p_act        in decimal,
                 p_serv_id    in varchar2,
-                p_res_code   out number, -- Код результата
+                        p_res_code   out number, -- Код результата
                 p_res_text   out varchar2, -- Текст результата
                 p_res_ref    out oper.ref%type -- Референс-результат оплаты
                 );
@@ -174,7 +172,6 @@ CREATE OR REPLACE PACKAGE BARS.IBX_PACK is
                    p_deal_id  in varchar2,
                    p_sum      in number,
                    p_date     in date,
-                   p_receipt_num varchar2,
                    p_res_code out number,
                    p_res_text out varchar2,
                    p_res_ref  out oper.ref%type);
@@ -199,7 +196,7 @@ end ibx_pack;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.IBX_PACK is
   -- ================================== Константы ===============================================
-  g_body_version constant varchar2(64) := 'version 2.0.2 22.01.2018';
+  g_body_version constant varchar2(64) := 'version 2.0 15.02.2017';
 
   -- ===============================================================================================
   -- header_version - возвращает версию заголовка пакета
@@ -1028,14 +1025,12 @@ end Int_for_pay;
   procedure pay_osc(p_type_id    in ibx_recs.type_id%type, -- Тип интерфейса           bs_id
                 p_ext_ref    in ibx_recs.ext_ref%type, -- Референс документа в IBox    id
                 p_ext_date   in varchar2, -- Дата/время операции в IBox  date
-                p_ext_source in varchar2, --код  терминала
-                p_receipt_num in varchar2,--номер чека                
                 p_deal_id    in ibx_recs.deal_id%type, -- Ид. сделки                   acc_id
                 p_sum        in ibx_recs.summ%type, -- Сумма операции (в коп)          sum
-                p_sign       in clob,           --                                 hash
+                        p_sign       in clob,           --                                 hash
                 p_act        in decimal,
                 p_serv_id    in varchar2,
-                p_res_code   out number, -- Код результата
+                        p_res_code   out number, -- Код результата
                 p_res_text   out varchar2, -- Текст результата
                 p_res_ref    out oper.ref%type -- Референс-результат оплаты
                 ) is
@@ -1142,17 +1137,7 @@ end Int_for_pay;
       /*execute immediate 'begin ' || l_ibx_type.proc_pay ||
                         '(:p_src_nls, :l_nd, :p_sum, :p_date, :p_res_code, :p_res_text, :p_res_ref); end;'
         using l_ibx_type.nls, l_nd, p_sum, l_ext_date, out p_res_code, out p_res_text, out p_res_ref;
-*/ 
-       pay_gl( p_src_nls  => l_ibx_type.ext_nls,
-              p_trans_nls=> l_ibx_type.nls,
-              p_deal_id=> l_nd,
-              p_sum=>p_sum,
-              p_date=>l_ext_date,
-              p_receipt_num=>p_receipt_num,
-              p_res_code=>p_res_code,
-              p_res_text=>p_res_text,
-              p_res_ref=>p_res_ref);
-
+*/    pay_gl(l_ibx_type.ext_nls,l_ibx_type.nls,l_nd,p_sum,l_ext_date,p_res_code,p_res_text,p_res_ref);
       -- добавляем документ в таблицу квитовки
       if p_res_code <> 0 then
         return;
@@ -1815,7 +1800,6 @@ function get_md5 (input_string varchar2) return varchar2
         l_xml_text varchar2(4000);
         l_kf accounts.kf%type;
         l_kv accounts.kv%type;
-        l_rezid number;
     begin
         bars_audit.trace(g_pack || '. ' || l_proc ||
                      ': Start: Params: p_params => %s',
@@ -1912,24 +1896,6 @@ function get_md5 (input_string varchar2) return varchar2
         l_comment := 'Прием платежей для данного клиента невозможен, договор закрыт';
       end if;
     end if;
-
-    -- проверка клиента на нерезидента
-    if (l_status_code = 21) then
-      select cc.rezid
-      into l_rezid   --(1-резидент, 2-не резидент)
-      from  CODCAGENT cc      
-      where cc.codcagent=(
-      select c.codcagent from accounts a, customer c
-      where a.nls = l_pay_account
-           and a.rnk = c.rnk
-           and a.kv = 980
-                         );
-      if (l_rezid<>1) then      
-       l_status_code  := -41;
-       l_comment := 'Прийом платежів для даного клієнта неможливий (нерез.)';
-      end if; 
-    end if; 
---
 
     bars_audit.info('IBOX: NONSTOP24: Запит інформації (' || l_transaction_id ||
                     ') по договору № ' || l_pay_account ||
@@ -2238,7 +2204,6 @@ procedure get_info_doc(p_params in xmltype, -- XML c входящими параметрами
                    p_deal_id  in varchar2,
                    p_sum      in number,
                    p_date     in date,
-                   p_receipt_num varchar2,
                    p_res_code out number,
                    p_res_text out varchar2,
                    p_res_ref  out oper.ref%type)
@@ -2403,7 +2368,6 @@ procedure get_info_doc(p_params in xmltype, -- XML c входящими параметрами
                   p_deal_id  in varchar2,
                   p_sum      in number,
                   p_date     in date,
-                  p_receipt_num varchar2,
                   p_res_code out number,
                   p_res_text out varchar2,
                   p_res_ref  out oper.ref%type)
@@ -2596,10 +2560,6 @@ procedure get_info_doc(p_params in xmltype, -- XML c входящими параметрами
 
     gl.pay( 2, l_ref,l_bdate);
 
-       --Добавляем в доп. реквезит документа номер чека ТОМАС
-        insert into OPERW ( REF, TAG, VALUE ) values ( l_ref, 'NUMCH', p_receipt_num );
- 
-   
     p_res_ref := l_ref;
 
 
@@ -2637,7 +2597,6 @@ procedure get_info_doc(p_params in xmltype, -- XML c входящими параметрами
        l_fee_amount   number(32);
        l_pay_id       varchar2(300);
        l_transaction_info varchar2(1000);
-       l_receipt_num  varchar2(220);
 
        err_   NUMBER;    -- Return code
        rec_   NUMBER;    -- Record number
@@ -2713,10 +2672,8 @@ procedure get_info_doc(p_params in xmltype, -- XML c входящими параметрами
     p_res_text := l_nazn;
 
     for c0 in p_transaction_info.first..p_transaction_info.last loop
-       l_receipt_num := substr(p_transaction_info(c0),1,instr(p_transaction_info(c0),'@')-1);
+       l_pay_id := substr(p_transaction_info(c0),1,instr(p_transaction_info(c0),'@')-1);
        l_transaction_info := substr(p_transaction_info(c0),instr(p_transaction_info(c0),'@') + 1);
-       l_pay_id := substr(l_transaction_info,1,instr(l_transaction_info,'@')-1);
-       l_transaction_info := substr(l_transaction_info,instr(l_transaction_info,'@') + 1);
        l_pay_amount := to_number(substr(l_transaction_info,1,instr(l_transaction_info,'@')-1));
        l_transaction_info := substr(l_transaction_info,instr(l_transaction_info,'@') + 1);
        l_fee_amount := to_number(substr(l_transaction_info,1));
@@ -2764,10 +2721,6 @@ procedure get_info_doc(p_params in xmltype, -- XML c входящими параметрами
                       prty_   => 0,
                       uid_    => null);
 
-        --Добавляем в доп. реквезит документа номер чека ТОМАС
-        insert into OPERW ( REF, TAG, VALUE ) values ( l_ref, 'NUMCH', l_receipt_num );
-
-                      
           select ac.nls, ac.nms
             into l_trans_2902, l_trans_2902_nm
             from accounts ac

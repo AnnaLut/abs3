@@ -11,8 +11,8 @@ PROMPT *** ALTER_POLICY_INFO to PERSON_UPDATE ***
 BEGIN 
         execute immediate  
           'begin  
-               bpa.alter_policy_info(''PERSON_UPDATE'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
-               bpa.alter_policy_info(''PERSON_UPDATE'', ''WHOLE'' , null, ''E'', ''E'', ''E'');
+               bpa.alter_policy_info(''PERSON_UPDATE'', ''FILIAL'' , null, null, null, null);
+               bpa.alter_policy_info(''PERSON_UPDATE'', ''WHOLE'' , null, null, null, null);
                null;
            end; 
           '; 
@@ -39,13 +39,12 @@ begin
 	BPLACE VARCHAR2(70), 
 	TELD VARCHAR2(20), 
 	TELW VARCHAR2(20), 
-	CELLPHONE VARCHAR2(35), 
+	CELLPHONE VARCHAR2(20), 
 	BDOV DATE, 
 	EDOV DATE, 
 	DATE_PHOTO DATE, 
 	ACTUAL_DATE DATE, 
 	EDDR_ID VARCHAR2(20), 
-	KF VARCHAR2(6) DEFAULT NULL, 
 	GLOBAL_BDATE DATE
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
@@ -64,6 +63,11 @@ PROMPT *** ALTER_POLICIES to PERSON_UPDATE ***
 
 
 COMMENT ON TABLE BARS.PERSON_UPDATE IS '';
+COMMENT ON COLUMN BARS.PERSON_UPDATE.BDOV IS '';
+COMMENT ON COLUMN BARS.PERSON_UPDATE.EDOV IS '';
+COMMENT ON COLUMN BARS.PERSON_UPDATE.DATE_PHOTO IS 'Дата коли була вклеєна остання фотографія у паспорт';
+COMMENT ON COLUMN BARS.PERSON_UPDATE.ACTUAL_DATE IS 'Дійсний до';
+COMMENT ON COLUMN BARS.PERSON_UPDATE.EDDR_ID IS 'Унікальний номер запису в ЄДДР';
 COMMENT ON COLUMN BARS.PERSON_UPDATE.GLOBAL_BDATE IS 'Глобальна банківська дата';
 COMMENT ON COLUMN BARS.PERSON_UPDATE.IDUPD IS 'Первичный ключ для таблицы обновления';
 COMMENT ON COLUMN BARS.PERSON_UPDATE.CHGACTION IS 'Код обновления (I/U/D)';
@@ -82,48 +86,6 @@ COMMENT ON COLUMN BARS.PERSON_UPDATE.BPLACE IS '';
 COMMENT ON COLUMN BARS.PERSON_UPDATE.TELD IS '';
 COMMENT ON COLUMN BARS.PERSON_UPDATE.TELW IS '';
 COMMENT ON COLUMN BARS.PERSON_UPDATE.CELLPHONE IS 'Номер моб.телефону';
-COMMENT ON COLUMN BARS.PERSON_UPDATE.BDOV IS '';
-COMMENT ON COLUMN BARS.PERSON_UPDATE.EDOV IS '';
-COMMENT ON COLUMN BARS.PERSON_UPDATE.DATE_PHOTO IS 'Дата коли була вклеєна остання фотографія у паспорт';
-COMMENT ON COLUMN BARS.PERSON_UPDATE.ACTUAL_DATE IS 'Дійсний до';
-COMMENT ON COLUMN BARS.PERSON_UPDATE.EDDR_ID IS 'Унікальний номер запису в ЄДДР';
-
-
-
-
-PROMPT *** Create  constraint SYS_C006359 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PERSON_UPDATE MODIFY (RNK NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-/*
-
-PROMPT *** Create  constraint CC_PERSONUPDATE_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PERSON_UPDATE MODIFY (KF CONSTRAINT CC_PERSONUPDATE_KF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-*/
-
-
-PROMPT *** Create  constraint SYS_C0085166 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PERSON_UPDATE MODIFY (GLOBAL_BDATE NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
 
 
 
@@ -142,10 +104,34 @@ exception when others then
 
 
 
-PROMPT *** Create  index XAI_PERSON_UPDATEPK ***
+PROMPT *** Create  constraint SYS_C001955689 ***
 begin   
  execute immediate '
-  CREATE INDEX BARS.XAI_PERSON_UPDATEPK ON BARS.PERSON_UPDATE (RNK) 
+  ALTER TABLE BARS.PERSON_UPDATE MODIFY (RNK NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C003008346 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PERSON_UPDATE MODIFY (GLOBAL_BDATE NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  index PK_PERSON_UPDATE ***
+begin   
+ execute immediate '
+  CREATE UNIQUE INDEX BARS.PK_PERSON_UPDATE ON BARS.PERSON_UPDATE (IDUPD) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSMDLI ';
 exception when others then
@@ -170,10 +156,10 @@ exception when others then
 
 
 
-PROMPT *** Create  index PK_PERSON_UPDATE ***
+PROMPT *** Create  index XAI_PERSON_UPDATEPK ***
 begin   
  execute immediate '
-  CREATE UNIQUE INDEX BARS.PK_PERSON_UPDATE ON BARS.PERSON_UPDATE (IDUPD) 
+  CREATE INDEX BARS.XAI_PERSON_UPDATEPK ON BARS.PERSON_UPDATE (RNK) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSMDLI ';
 exception when others then
@@ -199,8 +185,8 @@ exception when others then
 
 PROMPT *** Create  grants  PERSON_UPDATE ***
 grant SELECT                                                                 on PERSON_UPDATE   to BARSUPL;
-grant SELECT                                                                 on PERSON_UPDATE   to BARS_DM;
-grant SELECT                                                                 on PERSON_UPDATE   to UPLD;
+grant ALTER,DEBUG,DELETE,FLASHBACK,INDEX,INSERT,ON COMMIT REFRESH,QUERY REWRITE,REFERENCES,SELECT,UPDATE on PERSON_UPDATE   to BARS_DM;
+grant SELECT                                                                 on PERSON_UPDATE   to BARS_SUP;
 
 
 
