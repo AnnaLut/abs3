@@ -4,9 +4,108 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_dpa.sql =========*** Run *** ==
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BODY BARS.BARS_DPA is
+  CREATE OR REPLACE PACKAGE BARS.BARS_DPA is
 
-g_body_version constant varchar2(64)  := 'Version 1.26 24/04/2018';
+g_head_version constant varchar2(64)  := 'Version 1.32 09/11/2017';
+g_head_defs    constant varchar2(512) := '';
+
+/** header_version - возвращает версию заголовка пакета */
+function header_version return varchar2;
+
+/** body_version - возвращает версию тела пакета */
+function body_version return varchar2;
+
+-------------------------------------------------------------------------------
+-- form_file
+--
+procedure form_file (
+  p_filetype  in varchar2,
+  p_filename out varchar2 );
+
+-------------------------------------------------------------------------------
+-- form_ticket
+-- процедура формирования квитанции на файлы @R/@D
+--
+procedure form_ticket (
+  p_filename  in varchar2,
+  p_fileerr   in varchar2,
+  p_tickname out varchar2 );
+
+-------------------------------------------------------------------------------
+-- import_ticket
+-- процедура импорта квитанций @R/@D
+--
+procedure import_ticket (
+  p_filename  in varchar2,
+  p_errcode  out varchar2 );
+
+-------------------------------------------------------------------------------
+-- check_files
+-- процедура автоматического контроля файлов
+-- для разблокировки счетов. отправленных в ДПА
+--
+procedure check_files (p_mode number);
+
+-------------------------------------------------------------------------------
+-- insert_to_temp
+-- вставка во временную таблицу
+--
+procedure insert_data_to_temp(p_mfo varchar2, p_okpo varchar2, p_rp number, p_ot varchar2, p_odat date, p_nls varchar2, p_kv number, p_c_ag number , p_nmk varchar2,
+                              p_adr varchar2, p_c_reg varchar2, p_c_dst varchar2, p_bic varchar2, p_country number);
+
+-------------------------------------------------------------------------------
+-- insert_to_temp
+-- вставка во временную таблицу (@K)
+--
+procedure insert_data_to_temp(p_bic varchar2, p_nmk varchar2,p_ot varchar2, p_odat date, p_nls varchar2,p_kv number, p_c_ag number, p_country number, p_c_reg varchar2,p_okpo varchar2);
+
+-------------------------------------------------------------------------------
+-- insert_to_temp
+-- вставка во временную таблицу
+--
+procedure insert_data_to_temp(p_ref number);
+
+-------------------------------------------------------------------------------
+-- get_cvk_file
+-- Получить количество сформированных файлов ЦВК по типу файла
+function get_cvk_file(p_filetype varchar2, p_file_number number, p_filename out varchar2) return clob;
+
+-------------------------------------------------------------------------------
+-- get_cvk_file_cont
+-- Получить количество сформированных файлов ЦВК по типу файла
+function get_cvk_file_count(p_filetype varchar2) return number;
+
+-------------------------------------------------------------------------------
+-- form_cvk_file
+-- сформировать файлы и поместить во временное хранилище dpa_lob
+-- в переменную p_file_count вернуть кол-во файлов
+
+procedure form_cvk_file(p_filetype varchar2, p_filedate date, p_file_count out number);
+
+procedure del_f_row(p_idrow varchar2);
+procedure ins_ticket(p_filename varchar2, p_filedata clob);
+
+procedure ins_r0(p_filename varchar2, p_filedata clob, p_tickname OUT varchar2);
+
+    -- процедура на для отправки данных в дпа по нотариусам COBUMMFO-4028
+  PROCEDURE accounts_tax(p_acc     accounts.acc%TYPE
+                        ,p_daos    accounts.daos%TYPE
+                        ,p_dazs    accounts.dazs%TYPE
+                        ,p_kv      accounts.kv%TYPE
+                        ,p_nbs     accounts.nbs%TYPE
+                        ,p_nls     accounts.nls%TYPE
+                        ,p_ob22    accounts.ob22%TYPE
+                        ,p_pos     accounts.pos%TYPE
+                        ,p_vid     accounts.vid%TYPE
+                        ,p_rnk     accounts.rnk%TYPE
+                        );
+  FUNCTION dpa_nbs(p_nbs  varchar2
+                 ,p_ob22 accounts.OB22%TYPE DEFAULT NULL) RETURN NUMBER;
+end;
+/
+CREATE OR REPLACE PACKAGE BODY BARS.BARS_DPA is
+
+g_body_version constant varchar2(64)  := 'Version 1.26 05/03/2018';
 g_body_defs    constant varchar2(512) := '';
 
 g_modcode      constant varchar2(3)   := 'DPA';
@@ -1027,9 +1126,11 @@ is
   l_f_name    varchar2(30);    -- Назва файла, що квитується
   l_err_code  varchar2(4);    -- Код помилки за файлом
   l_resp_text varchar2(254);    -- _нформац_йний текст квитанц_ї
+  l_tick_date date;
 
   c_declarbody  varchar2(100) := '/DECLAR/DECLARBODY/';
   l_tmp  varchar2(2000);
+  l_tmp2  varchar2(2000);
 
   p varchar2(100) := 'bars_dpa.iparse_ticket1. ';
 
@@ -1038,6 +1139,9 @@ begin
   bars_audit.info (p || 'Start. p_filename - ' || p_filename);
 
   -- declarbody
+        l_tmp := extract(p_xml, c_declarbody || 'C_DOC_CRTDATE/text()', null);
+        l_tmp2:= extract(p_xml, c_declarbody || 'C_DOC_CRTTIME/text()', null);
+  l_tick_date := to_date(substr(l_tmp,1,6) || substr(l_tmp2,1,4), 'yymmddhh24mi');
         l_tmp := extract(p_xml, c_declarbody || 'PROC_FILE_NAME/text()', null);
   l_f_name    := substr(l_tmp,1,30);
         l_tmp := extract(p_xml, c_declarbody || 'PROC_FILE_ERROR_CODE/text()', null);
@@ -1049,7 +1153,7 @@ begin
   update zag_f
      set otm  = 5,
          err  = l_err_code,
-         datk = sysdate,
+         datk = l_tick_date,
          fnk  = p_filename,
          txtk = l_resp_text
    where fn = l_f_name
@@ -1061,7 +1165,7 @@ begin
      update lines_f
         set err    = l_err_code,
             fn_r   = p_filename,
-            date_r = sysdate
+            date_r = l_tick_date
       where fn = l_f_name
         and dat > sysdate-30
         and fn_r is null;
@@ -1069,7 +1173,7 @@ begin
      update lines_p
         set err    = l_err_code,
             fn_r   = p_filename,
-            date_r = sysdate
+            date_r = l_tick_date
       where fn = l_f_name
         and dat > sysdate-30
         and fn_r is null;
@@ -1077,7 +1181,7 @@ begin
      update lines_k
         set err    = l_err_code,
             fn_r   = p_filename,
-            date_r = sysdate
+            date_r = l_tick_date
       where fn = l_f_name
         and dat > sysdate-30
         and fn_r is null;
@@ -1142,7 +1246,9 @@ begin
      set otm  = 5,
          err  = l_err_code,
          fnk  = p_filename,
-         datk = l_tick_date
+         datk = l_tick_date,
+         fnk1 = fnk,
+         datk1 = datk
    where fn = l_f_name
      and fnk like '@_1%'
      and dat > sysdate-30;
