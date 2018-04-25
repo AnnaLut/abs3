@@ -20,7 +20,7 @@ end;
 
 declare
     name_already_used exception;
-    pragma exception_init(name_already_used, -955);
+    pragma exception_init(name_already_used, -995);
 begin
     execute immediate 'create index barstrans.i_transp_send_resp_params on barstrans.transp_send_resp_params (req_id) tablespace brsmdli';
 exception

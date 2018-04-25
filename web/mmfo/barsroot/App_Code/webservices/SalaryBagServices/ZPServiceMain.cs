@@ -75,7 +75,6 @@ namespace Bars.SalaryBagSrv
         [WebMethod(EnableSession = true)]
         public Result UploadDictToCorp2(string url, string dictContent)
         {
-            dictContent = ZPSrvWorker.ToUtf8(dictContent);
             try
             {
                 Corp2Intr.ZPIntrWebService ws = new Corp2Intr.ZPIntrWebService()
@@ -125,7 +124,6 @@ namespace Bars.SalaryBagSrv
         [WebMethod(EnableSession = true)]
         public Result SendPayrollResultToCorp2(string url, string data)
         {
-            data = ZPSrvWorker.ToUtf8(data);
             Result res = new Result();
             try
             {

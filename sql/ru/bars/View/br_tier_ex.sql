@@ -1,3 +1,5 @@
+
+
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/View/BR_TIER_EX.sql =========*** Run *** ===
 PROMPT ===================================================================================== 
@@ -21,8 +23,7 @@ PROMPT *** Create  view BR_TIER_EX ***
     WHERE     dv.type_id = dbs.dpt_type
           AND Dv.BR_ID = BN.BR_ID
           AND bn.kv = dbs.kv
-          AND gl.bd between dbs.dat_begin and nvl(dbs.dat_end, to_date('31.12.4999','DD.MM.YYYY'))
-          AND dbs.bonus_id = bars.dpt_bonus.get_bonus_id('EXCL')
+          AND DBS.BONUS_ID = 4
           AND bn.bdate =
                  (SELECT MAX (bdate)
                     FROM br_normal
@@ -30,6 +31,8 @@ PROMPT *** Create  view BR_TIER_EX ***
 
 PROMPT *** Create  grants  BR_TIER_EX ***
 grant DEBUG,DELETE,FLASHBACK,INSERT,MERGE VIEW,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on BR_TIER_EX      to BARS_ACCESS_DEFROLE;
+
+
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/View/BR_TIER_EX.sql =========*** End *** ===

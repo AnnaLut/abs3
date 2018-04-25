@@ -650,6 +650,7 @@ function dateChangeFn() {
 };
 
 function deleteSelectedDrafts() {
+    debugger;
     var ids = [];
     var grid = $(formCfg.currentGridSelector).data("kendoGrid");
     var selectedItems = grid.select();

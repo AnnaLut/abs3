@@ -1,8 +1,10 @@
-PROMPT ===================================================================================== 
-PROMPT ===================== *** create package dpt_bonus *** ==============================
-PROMPT ===================================================================================== 
 
-CREATE OR REPLACE PACKAGE DPT_BONUS
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/dpt_bonus.sql =========*** Run *** =
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.DPT_BONUS 
 IS
 /****************************************************************************************
 
@@ -13,10 +15,9 @@ IS
  Дата      Автор Описание
  --------  ----- ------------------------------------------------------------------------
  31.07.07  Инна  Создание пакета
- 06.02.18  Геннадий Лившиц изменения в рамках задачи COBUMMFO-5176
 ****************************************************************************************/
 -- поддержка версионности пакета
-g_header_version  CONSTANT VARCHAR2(64)  := 'version 1.02 24/02/2018';
+g_header_version  CONSTANT VARCHAR2(64)  := 'version 1.00 31/07/2007';
 g_awk_header_defs CONSTANT VARCHAR2(512) := '';
 
 -- фиксация типа данных и маск.размерности для текстов сообщений
@@ -49,30 +50,6 @@ FUNCTION estimate_bonus
    p_typeid IN dpt_vidd.vidd%type)               -- код вида вклада
    RETURN number;
 
---
--- Визначення bonus_id по коду на дату
---
-FUNCTION get_bonus_id
-  (p_bonus_code  bars.dpt_bonuses.bonus_code%type, -- код бонуса
-   p_date date default null) 
-   RETURN number;
-
---
--- Визначення кількості ЗП-карт по всім МФО
---
-FUNCTION get_MMFO_ZPcard_count
-  (p_rnk IN customer.rnk%type,
-   p_dat IN date default null)
-   RETURN number;
---   
--- Вирахування бонуса 
---
-FUNCTION get_bonus_value
-  (p_bonusid     dpt_bonuses.bonus_id%type,
-   p_bonusquery  dpt_bonuses.bonus_query%type default null,
-   p_dat         date default null) -- если null, то на текущую дату
-   RETURN number;
-   
 --
 -- установка запросов на получение льготы по договору
 --
@@ -163,13 +140,9 @@ FUNCTION body_version RETURN VARCHAR2;
 END dpt_bonus;
 /
 
-PROMPT ===================================================================================== 
-PROMPT ===================== *** create package body dpt_bonus *** =========================
-PROMPT =====================================================================================
-
-CREATE OR REPLACE PACKAGE BODY dpt_bonus
+CREATE OR REPLACE PACKAGE BODY BARS.dpt_bonus
 IS
-g_body_version  CONSTANT varchar2(64)  := 'version 1.16 24/02/2018';
+g_body_version  CONSTANT varchar2(64)  := 'version 1.14 16/05/2017';
 g_awk_body_defs CONSTANT varchar2(512) := ' ';
 g_modcode       CONSTANT varchar2(3)   := 'DPT';
 g_reqtype       CONSTANT char(5)       := 'BONUS';
@@ -261,40 +234,17 @@ END check_bonus_condition;
 --
 FUNCTION get_bonus_value
   (p_bonusid     dpt_bonuses.bonus_id%type,
-   p_bonusquery  dpt_bonuses.bonus_query%type default null,
-   p_dat         date default null) -- если null, то на текущую дату
+   p_bonusquery  dpt_bonuses.bonus_query%type)
    RETURN number
 IS
   l_title    varchar2(60)    := 'dpt_bonus(get_bonus_value): ';
-  l_bonusquery dpt_bonuses.bonus_query%type;
   l_bonusval ratetype        := 0;
-  l_dat      date;
 BEGIN
 
-  if p_dat is null then
-    l_dat := trunc(sysdate);
-  else 
-    l_dat := trunc(p_dat);
-  end if;
-  
-  if p_bonusquery is null then
-    begin 
-     select bonus_query 
-     into l_bonusquery
-     from dpt_bonuses
-     where bonus_id = p_bonusid; 
-    exception when no_data_found then
-      -- Ошибка вычисления размера льготы
-     bars_error.raise_nerror(g_modcode, 'BONUS_CALC_ERROR', substr(SQLERRM,1,g_errmsg_dim));
-    end;
-  else 
-    l_bonusquery := p_bonusquery;
-  end if;    
-     
-  bars_audit.trace('%s льгота № %s, запрос для расчета = %s на дату %s' ,
-                   l_title, to_char(p_bonusid), l_bonusquery, to_char(l_dat,'DD.MM.YYYY'));
-      
-  EXECUTE IMMEDIATE l_bonusquery INTO l_bonusval USING l_dat;
+  bars_audit.trace('%s льгота № %s, запрос для расчета = %s',
+                   l_title, to_char(p_bonusid), p_bonusquery);
+
+  EXECUTE IMMEDIATE p_bonusquery INTO l_bonusval;
   bars_audit.trace('%s льгота = %s', l_title, l_bonusval);
 
   RETURN l_bonusval;
@@ -304,100 +254,6 @@ EXCEPTION
     -- Ошибка вычисления размера льготы
     bars_error.raise_nerror(g_modcode, 'BONUS_CALC_ERROR', substr(SQLERRM,1,g_errmsg_dim));
 END get_bonus_value;
---
---
---
-
---=== Визначення bonus_id по коду на дату
-FUNCTION get_bonus_id
-  (p_bonus_code  bars.dpt_bonuses.bonus_code%type,
-   p_date        date default null) -- если null , то возвращает ID действующего бонуса (с bonus_off is null)
-RETURN number
-IS
-  l_title    varchar2(60)    := 'dpt_bonus(get_bonus_id): ';
-  l_bonusid bars.dpt_bonuses.bonus_id%type;
-  l_date date;
-BEGIN
-  
-  begin
-  if p_date is null then
-
-    select bonus_id 
-    into l_bonusid
-    from bars.dpt_bonuses 
-    where bonus_code = p_bonus_code 
-      and bonus_activity = 'Y' 
-      and bonus_off is null;
-
-  else 
-
-    select bonus_id 
-    into l_bonusid
-    from bars.dpt_bonuses 
-    where bonus_code = p_bonus_code 
-      and bonus_activity = 'Y' 
-      and p_date between bonus_on and nvl(bonus_off, to_date('31.12.4999','DD.MM.YYYY'));
-
-  end if;    
-
-  exception when others then
-    bars_error.raise_nerror(g_modcode, 'BONUS_CHECK_ERROR', substr(SQLERRM,1,g_errmsg_dim));
-  end;      
-
-  bars_audit.trace('%s bonus_id = %s', l_title, l_bonusid);
-  RETURN l_bonusid;
-
-END get_bonus_id;
---
---
--- Визначення кількості ЗП-карт по всім МФО
-FUNCTION get_MMFO_ZPcard_count
-  (p_rnk IN customer.rnk%type,
-   p_dat IN date default null)
-   RETURN number
-IS
-  l_title      varchar2(60) := 'dpt_bonus(ZPcard_count): ';
-  l_ZPcard_count number(1)    := 0;
-  l_cnt          number       := 0;
-  l_dat date;
-  l_mfo mv_kf.kf%type;
-BEGIN
-  if p_dat is null then
-    l_dat := trunc(sysdate);
-  else
-    l_dat := trunc(p_dat);  
-  end if;
-  
-  bars_audit.trace('%s RNK клиента = %s дата %s', l_title, p_rnk, l_dat);
-  
-  /* --Пока в ВЕБе нельзя перескакивать на соседние МФО. После изменения барс-контекста, можно будет
-  l_mfo := nvl(gl.aMFO,'/');
-    
-  --необходимо учитывать ЗП-проекты по всем МФО
-  bc.go('/');
-  FOR cur IN (SELECT kf FROM bars.mv_kf) LOOP --cur
-    bc.go(cur.kf);
-    bars_audit.trace('%s MFO = %s', l_title, cur.kf);
-  */    
-    SELECT count(acc)
-    INTO l_cnt
-    FROM accounts
-    WHERE rnk = p_rnk
-      AND NBS = 2625
-      AND OB22 IN ('24', '27', '31')
-      AND l_dat between daos and nvl(dazs, to_date('31.12.4999','DD.MM.YYYY'));
-    
-    l_ZPcard_count := l_ZPcard_count + l_cnt;
-   /* bars_audit.trace('%s кол-во ЗП-карт = %s', l_title, to_char(l_cnt));
-  END LOOP;
-  bc.go(l_mfo);
-  */    
-  bars_audit.trace('%s Общее кол-во ЗП-карт = %s', l_title, to_char(l_ZPcard_count));
-
-  RETURN l_ZPcard_count;
-
-END get_MMFO_ZPcard_count;
-
 --
 --
 --
@@ -476,11 +332,11 @@ BEGIN
       l_processuser,
       p_branch,
       p_reqid);
-
+   
    bars_audit.trace('%s создан запрос на получение льготы № %s по договору № %s',l_title, to_char(p_bonusid), to_char(p_dptid));
 
-   exception when others then
-    bars_audit.error(l_title || dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace());
+   exception when others then 
+    bars_audit.error(l_title || dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace());                      
    end;
 
 EXCEPTION
@@ -688,7 +544,6 @@ IS
   l_reqid       dpt_requests.req_id%type;
   l_bonuscheck  char(1);
   l_bonusvalue  ratetype;
-  l_bonusdate   date;
 BEGIN
 
   bars_audit.trace('%s идентификатор договора = %s', l_title, to_char(p_dptid));
@@ -720,11 +575,10 @@ BEGIN
   -- отбор всех активных льгот для данного вида вклада
   <<bonus_loop>>
   FOR b IN
-     (SELECT b.bonus_id, b.bonus_name, b.bonus_code, b.bonus_query, b.bonus_multiply, b.bonus_confirm,
-             bv.rec_condition, bv.rec_rang, bv.rec_finally, dv.type_cod
-        FROM dpt_bonuses b, dpt_vidd_bonuses bv, dpt_vidd dv
+     (SELECT b.bonus_id, b.bonus_name, b.bonus_query, b.bonus_multiply, b.bonus_confirm,
+             bv.rec_condition, bv.rec_rang, bv.rec_finally
+        FROM dpt_bonuses b, dpt_vidd_bonuses bv
        WHERE b.bonus_id = bv.bonus_id
-         AND dv.vidd = bv.vidd
          AND bv.rec_activity  = 'Y'
          AND b.bonus_activity = 'Y'
          AND bv.vidd = l_dpt.vidd
@@ -752,22 +606,9 @@ BEGIN
 
     -- расчет значения льготы, если льгота разрешена
     IF l_bonuscheck = 'Y' THEN
+
        BEGIN
-         -- COBUMMFO-5176
-         if b.bonus_code = 'DPWB' or b.bonus_code = 'DPZP' then  -- для он-лайн бонуса берем дату открытия договора
-           if b.type_cod = 'MPRG' then -- но, если депозит прогрессивный, то берем дату открытия или каждой 12-й пролонгации
-              select nvl(max(dat_begin), l_dpt.dat_begin)
-              into l_bonusdate
-              from bars.dpt_deposit_clos
-              where deposit_id = l_dpt.deposit_id
-              and nvl(cnt_dubl,0) = trunc(nvl(l_dpt.cnt_dubl,0)/12) * 12;
-            else 
-              l_bonusdate := l_dpt.dat_begin;
-            end if;  
-          l_bonusvalue := get_bonus_value (b.bonus_id, b.bonus_query, l_bonusdate);
-         else 
-           l_bonusvalue := get_bonus_value (b.bonus_id, b.bonus_query);
-         end if;  
+         l_bonusvalue := get_bonus_value (b.bonus_id, b.bonus_query);
        EXCEPTION
          WHEN bars_error.err THEN
            IF bars_error.get_nerror_code(sqlerrm) = 'DPT-'||'BONUS_CALC_ERROR' THEN
@@ -1102,9 +943,6 @@ IS
   l_title      varchar2(60) := 'dpt_bonus(request_recalculation): ';
   l_custid     dpt_deposit.rnk%type;
   l_typeid     dpt_deposit.vidd%type;
-  l_datbegin   dpt_deposit.dat_begin%type;
-  l_cntdubl    dpt_deposit.cnt_dubl%type;
-  l_typecode   dpt_vidd.type_cod%type;
   l_bonusvalue ratetype;
 
 BEGIN
@@ -1113,12 +951,9 @@ BEGIN
 
   -- вычитка параметров договора
   BEGIN
-    SELECT dd.rnk, dd.vidd, dd.dat_begin, dd.cnt_dubl, dv.type_cod
-      INTO l_custid, l_typeid, l_datbegin, l_cntdubl, l_typecode
-      FROM dpt_deposit dd,
-           dpt_vidd dv
-     WHERE dd.deposit_id = p_dptid
-       and dd.vidd = dv.vidd;
+    SELECT rnk, vidd INTO l_custid, l_typeid
+      FROM dpt_deposit
+     WHERE deposit_id = p_dptid;
   EXCEPTION
     WHEN NO_DATA_FOUND THEN
       bars_error.raise_nerror(g_modcode, 'DPT_NOT_FOUND', to_char(p_dptid));
@@ -1134,7 +969,7 @@ BEGIN
   -- отбор всех запросов на перерасчет льгот для данного договора
   <<request_loop>>
   FOR b IN
-     (SELECT b.bonus_id, b.bonus_name, b.bonus_code, b.bonus_query, r.request_confirm, r.req_id
+     (SELECT b.bonus_id, b.bonus_name, b.bonus_query, r.request_confirm, r.req_id
         FROM dpt_bonus_requests r, dpt_bonuses b
        WHERE r.dpt_id = p_dptid
          AND r.request_recalc = 'Y'
@@ -1148,19 +983,7 @@ BEGIN
 
     -- расчет значения льготы
     BEGIN
-      --COBUMMFO-5176
-      if b.bonus_code = 'DPWB' or b.bonus_code = 'DPZP' then  -- для он-лайн бонуса берем дату открытия договора
-           if l_typecode = 'MPRG' then -- но, если депозит прогрессивный, то берем дату открытия или каждой 12-й пролонгации
-              select nvl(max(dat_begin), l_datbegin)
-              into l_datbegin
-              from bars.dpt_deposit_clos
-              where deposit_id = p_dptid
-              and nvl(cnt_dubl,0) = trunc(nvl(l_cntdubl,0)/12) * 12;
-            end if;  
-        l_bonusvalue := get_bonus_value (b.bonus_id, b.bonus_query, l_datbegin);
-      else 
-        l_bonusvalue := get_bonus_value (b.bonus_id, b.bonus_query);
-      end if;
+      l_bonusvalue := get_bonus_value (b.bonus_id, b.bonus_query);
     EXCEPTION
       WHEN bars_error.err THEN
         IF bars_error.get_nerror_code(sqlerrm) = 'DPT-'||'BONUS_CALC_ERROR' THEN
@@ -1279,7 +1102,7 @@ BEGIN
      RETURN;
   END IF;
 
-  SELECT nvl(sum(bonus_value_fact),0)
+  SELECT sum(bonus_value_fact)
     INTO l_totalbonus
     FROM dpt_bonus_requests
    WHERE dpt_id = p_dptid
@@ -1287,9 +1110,8 @@ BEGIN
      AND request_deleted = 'N';
   bars_audit.trace('%s суммарная льгота = %s', l_title, to_char(l_totalbonus));
 
-  --IF NVL(l_totalbonus, 0) != 0 THEN
-  -- 12/02/2018 закомментировано, т.к. если бонус уменьшился (стал равен 0), это также нужно записать
-  
+  IF NVL(l_totalbonus, 0) != 0 THEN
+
     BEGIN
       SELECT acc, limit, kv
         INTO l_dptaccid, l_dptlimit, l_dptcur
@@ -1378,16 +1200,15 @@ BEGIN
            -- невозможно установить льготную %-ную ставку по договору (размер, дата)
            bars_error.raise_nerror(g_modcode, 'SET_BONUS_RATE_FAILED',
                                    to_char(p_dptid), to_char(l_totalbonus), to_char(p_bdate,'DD/MM/YYYY'));
-          
        END;
        bars_audit.trace('%s добавление ставки выполнено', l_title);
 
     END IF;
 
- -- ELSE
- --  bars_audit.trace('%s льгот не будет, зафиксируем только доп.реквизит', l_title);
- --   l_totalbonus := 0;
- -- END IF;
+  ELSE
+    bars_audit.trace('%s льгот не будет, зафиксируем только доп.реквизит', l_title);
+    l_totalbonus := 0;
+  END IF;
 
   p_bonusval := l_totalbonus;
   begin
@@ -1523,14 +1344,17 @@ END body_version;
 
 END dpt_bonus;
 /
-show err;
-
+ show err;
+ 
 PROMPT *** Create  grants  DPT_BONUS ***
 grant EXECUTE                                                                on DPT_BONUS       to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on DPT_BONUS       to DPT_ADMIN;
 grant EXECUTE                                                                on DPT_BONUS       to DPT_ROLE;
 grant EXECUTE                                                                on DPT_BONUS       to WR_ALL_RIGHTS;
 
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/package/dpt_bonus.sql =========*** End *** =
-PROMPT ===================================================================================== 
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/dpt_bonus.sql =========*** End *** =
+ PROMPT ===================================================================================== 
+ 

@@ -1,104 +1,76 @@
 [
-  {
-    "FileName": "ny.jpg",
-    "FileDesc": "Новий рік",
-    "DayMonth": "01.01",
-    "Remind": 2
-  },
-  {
-    "FileName": "christmaso.jpg",
-    "FileDesc": "Різдво Христове",
-    "DayMonth": "07.01",
-    "Remind": 1
-  },
-  {
-    "FileName": "oldny.jpg",
-    "FileDesc": "Старий Новий рік",
-    "DayMonth": "13.01",
-    "Remind": 1
-  },
-  {
-    "FileName": "epiphany.jpg",
-    "FileDesc": "Водохреща",
-    "DayMonth": "19.01",
-    "Remind": 0
-  },
-  {
-    "FileName": "unity.jpg",
-    "FileDesc": "День Соборності України",
-    "DayMonth": "22.01",
-    "Remind": 0
-  },
-  {
-    "FileName": "masnicya.jpg",
-    "FileDesc": "Масляна",
-    "DayMonth": "",
-    "Remind": 7
-  },
-  {
-    "FileName": "8.jpg",
-    "FileDesc": "Міжнародний жіночий день",
-    "DayMonth": "08.03",
-    "Remind": 1
-  },
-  {
-    "FileName": "easter.jpg",
-    "FileDesc": "Великдень",
-    "DayMonth": "",
-    "Remind": 2
-  },
-  {
-    "FileName": "labor.jpg",
-    "FileDesc": "День міжнародної солідарності трудящих",
-    "DayMonth": "01.05",
-    "Remind": 1
-  },
-  {
-    "FileName": "victory.jpg",
-    "FileDesc": "День перемоги над нацизмом у Другій світовій війні",
-    "DayMonth": "09.05",
-    "Remind": 1
-  },
-  {
-    "FileName": "bank.jpg",
-    "FileDesc": "День банківського працівника",
-    "DayMonth": "20.05",
-    "Remind": 0
-  },
-  {
-    "FileName": "trinity.jpg",
-    "FileDesc": "Трійця",
-    "DayMonth": "",
-    "Remind": 2
-  },
-  {
-    "FileName": "constitution.jpg",
-    "FileDesc": "День Конституції України",
-    "DayMonth": "28.06",
-    "Remind": 1
-  },
-  {
-    "FileName": "independence.jpg",
-    "FileDesc": "День Незалежності України",
-    "DayMonth": "24.08",
-    "Remind": 1
-  },
-  {
-    "FileName": "defender.jpg",
-    "FileDesc": "День захисника України",
-    "DayMonth": "14.10",
-    "Remind": 1
-  },
-  {
-    "FileName": "stnicholas.jpg",
-    "FileDesc": "День Св. Миколая",
-    "DayMonth": "19.12",
-    "Remind": 0
-  },
-  {
-    "FileName": "christmasc.jpg",
-    "FileDesc": "Різдво Христове",
-    "DayMonth": "25.12",
-    "Remind": 1
-  }
+    {
+        "FileName": "01-07.jpg",
+        "FileDesc": "Різдво Христове",
+        "Remind": 1
+    },
+    {
+        "FileName": "01-19.jpg",
+        "FileDesc": "Водохреща",
+        "Remind": 0
+    },
+    {
+        "FileName": "02-14.jpg",
+        "FileDesc": "День Святого Валентина",
+        "Remind": 0
+    },{
+        "FileName": "03-08.jpg",
+        "FileDesc": "Міжнародний жіночий день",
+        "Remind": 1
+    },
+    {
+        "FileName": "04-01.jpg",
+        "FileDesc": "День сміху",
+        "Remind": 0
+    },
+    {
+        "FileName": "04-12.jpg",
+        "FileDesc": "День авіації та космонавтики",
+        "Remind": 0
+    },
+    {
+        "FileName": "05-20.jpg",
+        "FileDesc": "День банківського працівника",
+        "Remind": 1
+    },
+    {
+        "FileName": "06-28.jpg",
+        "FileDesc": "День Конституції України",
+        "Remind": 0
+    },
+    {
+        "FileName": "07-16.jpg",
+        "FileDesc": "День бухгалтера",
+        "Remind": 0
+    },
+    {
+        "FileName": "08-24.jpg",
+        "FileDesc": "День Незалежності України",
+        "Remind": 0
+    },
+    {
+        "FileName": "09-01.jpg",
+        "FileDesc": "День знань",
+        "Remind": 0
+    },
+    {
+        "FileName": "09-12.jpg",
+        "FileDesc": "День розробника програмного забезпечення",
+        "Remind": 0
+    },
+    {
+        "FileName": "12-06.jpg",
+        "FileDesc": "День Збройних Сил України",
+        "Remind": 0
+    },
+    {
+        "FileName": "12-19.jpg",
+        "FileDesc": "День Св. Миколая",
+        "Remind": 0
+    },
+    {
+        "FileName": "12-31.jpg",
+        "FileDesc": "Новий рік",
+        "Remind": 3
+    }
 ]

@@ -1,7 +1,9 @@
+
+
  
-PROMPT ============================================================================================= 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_stop_dpt_sep.sql =========*** Run *** ===
-PROMPT ============================================================================================= 
+ PROMPT ============================================================================================= 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_stop_dpt_sep.sql =========*** Run *** ===
+ PROMPT ============================================================================================= 
 
 create or replace function f_stop_dpt_sep(p_nlsb in varchar2,
                                           p_kv   in integer,
@@ -24,7 +26,6 @@ create or replace function f_stop_dpt_sep(p_nlsb in varchar2,
   l_sum_month oper.s%type;
   l_sum       dpt_deposit.limit%type;
   l_comproc   dpt_vidd.comproc%type;
-  l_is_bnal   dpt_depositw.value%type;
 begin
 
   begin
@@ -144,33 +145,16 @@ begin
     -- если общая сумма не превышает лимит = позволяем вставить документ, если нет = выдаем сообщение при вставке документа
      bars_audit.info(title || ' Загальна сума: ' || l_sum ||
                          ' Сумма депозиту: ' || l_limit);
-     
-     l_is_bnal := bars.dpt.f_dptw(l_deposit, 'NCASH');
-     
-     bars_audit.trace('1478 безнал: ' || l_is_bnal);
 
-      if (l_count_mm = 0) and (l_is_bnal = '1') then -- первый месяц и безнал
-       if kost(l_acc,trunc(sysdate - 1)) = 0 then -- первичный взнос
-        return 0;
-       else 
-        if l_sum > l_limit * 2 then
-           bars_audit.info(title || ' Перевищено суму ліміту ' ||
+    if l_sum > l_limit then
+       bars_audit.info(title || ' Перевищено суму ліміту ' ||
                            to_char(l_limit) || ' за місць з ' ||
                            to_char(l_dat_s) || ' по ' || to_char(l_dat_po));
-           return 1;
-        else
-           return 0;
-        end if;
-       end if; 
-      elsif l_sum > l_limit then
-         bars_audit.info(title || ' Перевищено суму ліміту ' ||
-                           to_char(l_limit) || ' за місць з ' ||
-                           to_char(l_dat_s) || ' по ' || to_char(l_dat_po));
-         return 1;
-      else
-         return 0;
-      end if;
-      
+      return 1;
+    else
+      return 0;
+    end if;
+
   exception
     when others then
        bars_audit.info(title || ' error: ' || sqlerrm);
@@ -180,7 +164,7 @@ begin
   return l_flag;
 end f_stop_dpt_sep;
 /
-show err;
+ show err;
  
 PROMPT *** Create  grants  f_stop_dpt_sep ***
 grant EXECUTE                                                                on f_stop_dpt_sep to BARS_ACCESS_DEFROLE;
@@ -191,8 +175,8 @@ grant EXECUTE                                                                on 
 
  
  
-PROMPT ============================================================================================= 
-PROMPT *** End *** ========== Scripts /Sql/BARS/function/f_stop_dpt_sep.sql =========*** End *** ===
-PROMPT ============================================================================================= 
+ PROMPT ============================================================================================= 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/function/f_stop_dpt_sep.sql =========*** End *** ===
+ PROMPT ============================================================================================= 
  
 

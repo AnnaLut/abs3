@@ -785,15 +785,11 @@ SELECT t.rowid AS idrow
         string sql = "";
         if (file_type == "F0List")
         {
-            sql = @"select fn, 
-                trunc(dat) as d_f0, 
-                case when substr(f.fnk,1,3) = '@F1' then datk else datk1 end as d_F1,
-                case when substr(f.fnk,1,3) = '@F2' then datk else null end as d_F2,
-                (select dat from zag_f l where l.fn = replace(f.fn,'@F0','@R0') and l.dat >= trunc(f.dat, 'year')) as d_R0,
-                nvl(err,' ') err, 
-                C.ERR_MSG
-                from zag_f f left join DPA_ERR_CODES c on C.ERR_CODE = f.err
-                where F.DAT > sysdate-364 and fn like '@F0%'";
+            sql = @"select fn, dat, nvl(err,' ') err
+                       from zag_f
+                       where fn like '@F0%' 
+                       and dat > sysdate-364
+                       order by dat desc";
         }
         else
             sql = @"select fn, dat, nvl(err,' ') err

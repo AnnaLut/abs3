@@ -55,7 +55,7 @@ IS
   -- пакет процедур для работы интеграции веб банкинга "Вклады населения-WEB"
   -- часть 1 продуктовый ряд депозитов
   --
-  g_body_version  CONSTANT VARCHAR2(64)  := 'version 1.32 23.02.2018';
+  g_body_version  CONSTANT VARCHAR2(64)  := 'version 1.31 02.08.2017';
   G_ERRMOD        CONSTANT VARCHAR2 (3) := 'BCK';
   g_is_error      CONSTANT BOOLEAN := FALSE;
   g_cur_rep_id    CONSTANT NUMBER := -1;
@@ -650,9 +650,7 @@ IS
 	  select nvl(val,0)
 	    into l_result
 	    from dpt_bonus_settings
-	   where dpt_vidd = p_vidd 
-		and bonus_id = dpt_bonus.get_bonus_id('DPWB')/*3*/
-	        and trunc(sysdate) between dat_begin and nvl(dat_end, to_date('31.12.4999','DD.MM.YYYY'))
+	   where dpt_vidd = p_vidd and bonus_id =3
 	     and kv = p_kv;
 	 exception when no_data_found then
 	   begin
@@ -665,10 +663,7 @@ IS
                          and (flag = 1 or g_prod_mode = 1)
                          --and flag = 1
                          )
-			 and kv = p_kv 
-			 and bonus_id = dpt_bonus.get_bonus_id('DPWB')/*3*/
-		         and trunc(sysdate) between dat_begin and nvl(dat_end, to_date('31.12.4999','DD.MM.YYYY'));
-
+			 and kv = p_kv and bonus_id = 3;
 	   exception when no_data_found then l_result := 0;
 	   end;
 	   when too_many_rows then
@@ -683,8 +678,7 @@ IS
                          --and flag = 1
                          )
 		     and dpt_vidd = p_vidd
-                         and bonus_id = dpt_bonus.get_bonus_id('DPWB')/*3*/
-		         and trunc(sysdate) between dat_begin and nvl(dat_end, to_date('31.12.4999','DD.MM.YYYY'))
+             and bonus_id = 3
 			 and kv = p_kv;
 	   exception when no_data_found then l_result := 0;
 	   end;

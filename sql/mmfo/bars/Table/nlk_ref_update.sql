@@ -102,8 +102,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  NLK_REF_UPDATE ***
+grant SELECT                                                                 on NLK_REF_UPDATE  to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NLK_REF_UPDATE  to BARS_ACCESS_DEFROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NLK_REF_UPDATE  to START1;
+grant SELECT                                                                 on NLK_REF_UPDATE  to UPLD;
 
 
 

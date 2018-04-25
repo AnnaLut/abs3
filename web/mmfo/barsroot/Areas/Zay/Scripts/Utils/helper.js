@@ -99,6 +99,7 @@ bars.helper = bars.helper || {
                 var code = country_name.match(/\d+/);
 
                 if (code != null) {
+                    debugger;
                     var dropdownlist5 = $("#bank_code").data("kendoDropDownList");
 
                     if (code[0].length === 3) {
@@ -180,7 +181,7 @@ bars.helper = bars.helper || {
                     read: {
                         type: "GET",
                         dataType: "json",
-                        url: bars.config.urlContent("/api/zay/F092/GetBuyingF092")
+                        url: bars.config.urlContent("api/zay/F092/GetBuyingF092")
                     }
                 },
                 schema: {
@@ -225,6 +226,7 @@ bars.helper = bars.helper || {
                 }
             },
             dataBound: function () {
+                debugger;
                 var dropdownlist = $("#benef_country").data("kendoDropDownList");
                 // selects item if its text is equal to "test" using predicate function
                 dropdownlist.select(function (dataItem) {
@@ -263,6 +265,7 @@ bars.helper = bars.helper || {
                 }
             },
             dataBound: function () {
+                debugger;
                 var dropdownlist = $("#bank_code").data("kendoDropDownList");
                 // selects item if its text is equal to "test" using predicate function
                 dropdownlist.select(function (dataItem) {
@@ -273,12 +276,14 @@ bars.helper = bars.helper || {
             },
             change: function (e) {
                 var ev = e;
+                debugger;
                 var bankName = this.dataItem().BANK_NAME;
                 // Use the value of the widget to update BANK_NAME:
                 $("#bank_name").val(bankName);
             },
             filter: "startswith",
             filtering: function (e) {
+                debugger;
                 //get filter descriptor
                 var filter = e.filter;
 
@@ -443,14 +448,12 @@ bars.helper = bars.helper || {
                     else {
                         bCode = '';
                     }
-                    if (bCode != "" && cCode !== bCode)
-                        bars.ui.error({ text: 'Код країни перерахування не відповідає коду індекса банка!' });
-                    else
-                        return true;
+                    return cCode === bCode;
                 }
-
+                
                 if ($('#checkRequiredField').is(":checked") && bars.helper.validateForm()) {
-                    if (codeValid(detailsModel)) {
+                    var res = codeValid(detailsModel);
+                    if (res && detailsModel.Basis) {
                         $.ajax({
                             type: "POST",
                             url: bars.config.urlContent("/api/zay/adddetails/post"),
@@ -467,6 +470,12 @@ bars.helper = bars.helper || {
                                 bars.ui.error({ text: result.Message });
                             }
                         });
+                    } else {
+                        if (!res) {
+                            bars.ui.error({ text: 'Код країни перерахування не відповідає коду індекса банка!' });
+                        } else if (!detailsModel.Basis) {
+                            bars.ui.error({ text: 'Не вказано причину купівлі валюти!' });
+                        }
                     }
                 }
                 else if (!$('#checkRequiredField').is(":checked")) {
@@ -507,37 +516,39 @@ bars.helper = bars.helper || {
         });
     },
     validateForm: function () {
+       
         var contract = $.trim($('#contract').val());
         var dat2_vmd = $.trim($('#dat2_vmd').val());
         var benef_country = $('#benef_country').val();
+        var benef_country = $('#benef_country').val();
+        var p12 = $('#p12').val();
 
-        var aim = $("#meta_aim_name").data("kendoDropDownList").dataItem().AIM_CODE;
-        if (aim != "") {
-            var dlCountryName = $("#country_name").data("kendoDropDownList").value(),
-                dlBenefCountry = $("#benef_country").data("kendoDropDownList").value(),
-                dlBasisText = $("#basis_txt").data("kendoDropDownList").value(),
-                dlBankCode = $("#bank_code").data("kendoDropDownList").value();
 
-            if (aim === 3) {
-                var aimValidCobdition = {
-                    countryCode: 804,
-                    basisText: '3.1.а.1',
-                    bankCode: '8040000000'
-                };
+        var aim = $("#meta_aim_name").data("kendoDropDownList").dataItem().AIM_CODE,
+            dlCountryName = $("#country_name").data("kendoDropDownList").value(),
+            dlBenefCountry = $("#benef_country").data("kendoDropDownList").value(),
+            dlBasisText = $("#basis_txt").data("kendoDropDownList").value(),
+            dlBankCode = $("#bank_code").data("kendoDropDownList").value();
 
-                if (dlCountryName!="" && parseInt(dlCountryName) !== aimValidCobdition.countryCode) {
-                    bars.ui.error({ text: "Ціль покупки не сумісна із обраним значенням країни перерахування валюти!(п.6)" });
-                    return false;
-                } else if (dlBenefCountry!="" && parseInt(dlBenefCountry) !== aimValidCobdition.countryCode) {
-                    bars.ui.error({ text: "Ціль покупки не сумісна із обраним значенням країни бенефеціара!(п.8)" });
-                    return false;
-                } else if (dlBasisText!="" && dlBasisText !== aimValidCobdition.basisText) {
-                    bars.ui.error({ text: "Ціль покупки не сумісна із обраним значенням причини покупки!(п.7)" });
-                    return false;
-                } else if (dlBankCode!="" && dlBankCode !== aimValidCobdition.bankCode) {
-                    bars.ui.error({ text: "Ціль покупки не сумісна із обраним значенням коду та назви банку!(п.9/10)" });
-                    return false;
-                }
+        var aimValidCobdition = {
+            countryCode: 804,
+            basisText: '3.1.а.1',
+            bankCode: '8040000000'
+        };
+
+        if (aim === 3) {
+            if (parseInt(dlCountryName) !== aimValidCobdition.countryCode) {
+                bars.ui.error({ text: "Ціль покупки не сумісна із обраним значенням країни перерахування валюти!(п.6)" });
+                return false;
+            } else if (parseInt(dlBenefCountry) !== aimValidCobdition.countryCode) {
+                bars.ui.error({ text: "Ціль покупки не сумісна із обраним значенням країни бенефеціара!(п.8)" });
+                return false;
+            } else if (dlBasisText !== aimValidCobdition.basisText) {
+                bars.ui.error({ text: "Ціль покупки не сумісна із обраним значенням причини покупки!(п.7)" });
+                return false;
+            } else if (dlBankCode !== aimValidCobdition.bankCode) {
+                bars.ui.error({ text: "Ціль покупки не сумісна із обраним значенням коду та назви банку!(п.9/10)" });
+                return false;
             }
         }
 
@@ -547,6 +558,18 @@ bars.helper = bars.helper || {
         }
         else if (dat2_vmd === "" || dat2_vmd === null) {
             bars.ui.error({ text: "Не вказано дату контракту " });
+            return false;
+        }
+        else if (benef_country === "") {
+            bars.ui.error({ text: "Не вказано країну бенефеціара " });
+            return false;
+        }
+        else if (code2c === "") {
+            bars.ui.error({ text: "Не вказано код купівлі за імпортом (\#2C)" });
+            return false;
+        }
+        else if (p12 === "") {
+            bars.ui.error({ text: "Не вказано ознаку операції (\#2C)" });
             return false;
         }
         else {

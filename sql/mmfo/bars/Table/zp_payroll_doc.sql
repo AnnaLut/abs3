@@ -3,9 +3,9 @@ PROMPT *** Run *** ========== Scripts /sql/bars/table/zp_payroll_doc.sql =======
 PROMPT ===================================================================================== 
 
 exec bars.bpa.alter_policy_info( 'ZP_PAYROLL_DOC', 'WHOLE' , null, null, null, null ); 
-
+/
 exec bars.bpa.alter_policy_info( 'ZP_PAYROLL_DOC', 'FILIAL', null, null, null, null );
-
+/
 begin execute immediate'create table bars.zp_payroll_doc  (
    id_pr         number                                              not null,
    id            number                                              not null,
@@ -121,39 +121,15 @@ begin
     end if; 
 end;
 /
--- Change type on column zp_payroll_doc.sign varchar2 -> clob
-declare
-  l_data_type varchar2(30);
-begin
-  select data_type 
-  into l_data_type 
-  from all_tab_columns 
-  where owner = 'BARS' and table_name = 'ZP_PAYROLL_DOC' and column_name = 'SIGN';
-  
-  if l_data_type in ('VARCHAR2') then
-    execute immediate 'alter table zp_payroll_doc add sign1 clob';
-    execute immediate 'update zp_payroll_doc set sign1 = sign';
-    execute immediate 'alter table zp_payroll_doc rename column sign to sign2';
-    execute immediate 'alter table zp_payroll_doc rename column sign1 to sign';
-    execute immediate 'alter table zp_payroll_doc drop column sign2';
-  end if;
-exception
-  when no_data_found then
-    null;
-  when others then
-    raise;
-end;
-/
 comment on column bars.zp_payroll_doc.passp_serial is 'Серія паспорту';
 comment on column bars.zp_payroll_doc.passp_num is 'Номер паспорту';
 exec  bars.bpa.alter_policies('ZP_PAYROLL_DOC'); 
-
+/
 comment on table  bars.ZP_PAYROLL_DOC is 'Документи  ЗП відомості';
 comment on column bars.ZP_PAYROLL_DOC.id_pr is 'id ЗП відомості';
-
+/
 grant select,delete,update,insert on bars.ZP_PAYROLL_DOC to bars_access_defrole;
-
+/
 PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /sql/bars/table/zp_payroll_doc.sql =========*** End *** ===
+PROMPT *** Run *** ========== Scripts /sql/bars/table/zp_payroll_doc.sql =========*** Run *** ===
 PROMPT ===================================================================================== 
-

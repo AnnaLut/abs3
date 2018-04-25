@@ -4,13 +4,13 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/cim_sync.sql =========*** Run *** ==
  PROMPT ===================================================================================== 
  
-CREATE OR REPLACE PACKAGE cim_sync
+  CREATE OR REPLACE PACKAGE BARS.CIM_SYNC 
 is
    --
    --  Пакет для синхронізації довідників по модулю Валютний Контроль (CIM)
    --
 
-   g_header_version    constant varchar2 (64) := 'version 1.00.02 19/03/2018';
+   g_header_version    constant varchar2 (64) := 'version 1.00.01 17/07/2015';
    g_awk_header_defs   constant varchar2 (512) := '';
 
    --------------------------------------------------------------------------------
@@ -38,7 +38,6 @@ is
    --
    function body_version return varchar2;
 
-   function clean_string (p_string in varchar2) return varchar2;
    --------------------------------------------------------------------------------
    -- f98_update - процедура оновлення таблиці санкцій мінекономіки
    --
@@ -51,12 +50,12 @@ is
 
 end cim_sync;
 /
-CREATE OR REPLACE PACKAGE BODY cim_sync is
+CREATE OR REPLACE PACKAGE BODY BARS.CIM_SYNC is
   --
   --  Пакет для синхронізації довідників по модулю Валютний Контроль (CIM)
   --
 
-  g_body_version  constant varchar2(64) := 'version 1.00.02 19/03/2018';
+  g_body_version  constant varchar2(64) := 'version 1.00.01 17/07/2015';
   g_awk_body_defs constant varchar2(512) := '';
 
   --------------------------------------------------------------------------------
@@ -89,27 +88,6 @@ CREATE OR REPLACE PACKAGE BODY cim_sync is
   begin
     return 'Package body cim_sync ' || g_body_version || '.' || CHR(10) || 'AWK definition: ' || CHR(10) || g_awk_body_defs;
   end body_version;
-
-  function clean_string (p_string in varchar2)
-  return varchar2
-  is
---  invalid_ascii constant varchar2(254) :=
---    chr(00)||chr(01)||chr(02)||chr(03)||chr(04)||chr(05)||chr(06)||chr(07)||
---    chr(08)||chr(09)||chr(10)||chr(11)||chr(12)||chr(13)||chr(14)||chr(15)||
---    chr(16)||chr(17)||chr(18)||chr(19)||chr(20)||chr(21)||chr(22)||chr(23)||
---    chr(24)||chr(25)||chr(26)||chr(27)||chr(28)||chr(29)||chr(30)||chr(31);
-  /*||chr(47)||chr(92)||chr(94)||chr(96)||'['||']'*/
-  begin
---  return translate(translate(p_string,invalid_ascii,chr(1)),chr(0)||chr(1),' ');
-    return replace(replace(replace(replace(replace(replace(replace(replace(replace(
-           replace(replace(replace(replace(replace(replace(replace(replace(replace(
-           replace(replace(replace(replace(replace(replace(replace(replace(replace(
-           replace(replace(replace(replace(replace(p_string,
-           chr(0)),  chr(1)),  chr(2)),  chr(3)),  chr(4)),  chr(5)),  chr(6)),  chr(7)),
-           chr(8)),  chr(9)),  chr(10)), chr(11)), chr(12)), chr(13)), chr(14)), chr(15)),
-           chr(16)), chr(17)), chr(18)), chr(19)), chr(20)), chr(21)), chr(22)), chr(23)),
-           chr(24)), chr(25)), chr(26)), chr(27)), chr(28)), chr(29)), chr(30)), chr(31));
-  end;
 
   --------------------------------------------------------------------------------
   -- extract_from_xml - отримати значення з xml
@@ -166,7 +144,7 @@ CREATE OR REPLACE PACKAGE BODY cim_sync is
   begin
     -- заливка усіх данниз з dbf файлу
     insert /*+ append */ into cim_f98_tmp(np,dt,ek_pok,ko,mfo,nkb,ku,prb,k030,v_sank,ko_1,r1_1,r2_1,k020,datapod,nompod,djerpod,nakaz,datanak,nomnak,datpodsk,nompodsk,djerpods,datnaksk,nomnaksk,sanksia1,srsank11,srsank12,r4,r030,t071,k040,bankin,adrin,data_m)
-    select np,dt,ek_pok,ko,mfo,nkb,ku,prb,k030,v_sank,ko_1,clean_string(r1_1),clean_string(r2_1),k020,datapod,nompod,djerpod,nakaz,datanak,nomnak,datpodsk,nompodsk,djerpods,datnaksk,nomnaksk,sanksia1,srsank11,srsank12,clean_string(r4),r030,t071,k040,clean_string(bankin),clean_string(adrin),data_m from cim_f98_load
+    select np,dt,ek_pok,ko,mfo,nkb,ku,prb,k030,v_sank,ko_1,r1_1,r2_1,k020,datapod,nompod,djerpod,nakaz,datanak,nomnak,datpodsk,nompodsk,djerpods,datnaksk,nomnaksk,sanksia1,srsank11,srsank12,r4,r030,t071,k040,bankin,adrin,data_m from cim_f98_load
     where dt is not null;
     p_total_count := sql%rowcount; -- всього стрічок на обробку
 

@@ -178,45 +178,6 @@ namespace BarsWeb.Areas.Mcp.Controllers.Api
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
-       
-        [HttpPut]
-        public HttpResponseMessage SetFileRecordsPayed(FileRecordsPayedVM fr)
-        {
-            try
-            {
-                if(fr.FileRecords == null) return Request.CreateResponse(HttpStatusCode.InternalServerError, "The list of rows to change the status is empty.");
-                for (int i = 0; i < fr.FileRecords.Length; i++)
-                {
-                    var sql = SqlCreator.SetFileRecordPayed(fr.FileRecords[i], fr.Date);
-                    _repo.ExecuteStoreCommand(sql.SqlText, sql.SqlParams);
-                }
-
-                return Request.CreateResponse(HttpStatusCode.OK);
-            }
-            catch (Exception ex)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
-            }
-        }
-        [HttpPut]
-        public HttpResponseMessage SetFileRecordsReverted(decimal[] fileRecordIds)
-        {
-            try
-            {
-                if (fileRecordIds == null || fileRecordIds.Length == 0) return Request.CreateResponse(HttpStatusCode.InternalServerError, "The list of rows to change the status is empty.");
-                for (int i = 0; i < fileRecordIds.Length; i++)
-                {
-                    var sql = SqlCreator.SetFileRecordsReverted(fileRecordIds[i]);
-                    _repo.ExecuteStoreCommand(sql.SqlText, sql.SqlParams);
-                }
-
-                return Request.CreateResponse(HttpStatusCode.OK);
-            }
-            catch (Exception ex)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
-            }
-        }
         [HttpPost]
         public HttpResponseMessage SetFileState(FileState o)
         {

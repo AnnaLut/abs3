@@ -4,9 +4,108 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_dpa.sql =========*** Run *** ==
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BODY BARS.BARS_DPA is
+  CREATE OR REPLACE PACKAGE BARS.BARS_DPA is
 
-g_body_version constant varchar2(64)  := 'Version 1.26 24/04/2018';
+g_head_version constant varchar2(64)  := 'Version 1.32 09/11/2017';
+g_head_defs    constant varchar2(512) := '';
+
+/** header_version - возвращает версию заголовка пакета */
+function header_version return varchar2;
+
+/** body_version - возвращает версию тела пакета */
+function body_version return varchar2;
+
+-------------------------------------------------------------------------------
+-- form_file
+--
+procedure form_file (
+  p_filetype  in varchar2,
+  p_filename out varchar2 );
+
+-------------------------------------------------------------------------------
+-- form_ticket
+-- процедура формирования квитанции на файлы @R/@D
+--
+procedure form_ticket (
+  p_filename  in varchar2,
+  p_fileerr   in varchar2,
+  p_tickname out varchar2 );
+
+-------------------------------------------------------------------------------
+-- import_ticket
+-- процедура импорта квитанций @R/@D
+--
+procedure import_ticket (
+  p_filename  in varchar2,
+  p_errcode  out varchar2 );
+
+-------------------------------------------------------------------------------
+-- check_files
+-- процедура автоматического контроля файлов
+-- для разблокировки счетов. отправленных в ДПА
+--
+procedure check_files (p_mode number);
+
+-------------------------------------------------------------------------------
+-- insert_to_temp
+-- вставка во временную таблицу
+--
+procedure insert_data_to_temp(p_mfo varchar2, p_okpo varchar2, p_rp number, p_ot varchar2, p_odat date, p_nls varchar2, p_kv number, p_c_ag number , p_nmk varchar2,
+                              p_adr varchar2, p_c_reg varchar2, p_c_dst varchar2, p_bic varchar2, p_country number);
+
+-------------------------------------------------------------------------------
+-- insert_to_temp
+-- вставка во временную таблицу (@K)
+--
+procedure insert_data_to_temp(p_bic varchar2, p_nmk varchar2,p_ot varchar2, p_odat date, p_nls varchar2,p_kv number, p_c_ag number, p_country number, p_c_reg varchar2,p_okpo varchar2);
+
+-------------------------------------------------------------------------------
+-- insert_to_temp
+-- вставка во временную таблицу
+--
+procedure insert_data_to_temp(p_ref number);
+
+-------------------------------------------------------------------------------
+-- get_cvk_file
+-- Получить количество сформированных файлов ЦВК по типу файла
+function get_cvk_file(p_filetype varchar2, p_file_number number, p_filename out varchar2) return clob;
+
+-------------------------------------------------------------------------------
+-- get_cvk_file_cont
+-- Получить количество сформированных файлов ЦВК по типу файла
+function get_cvk_file_count(p_filetype varchar2) return number;
+
+-------------------------------------------------------------------------------
+-- form_cvk_file
+-- сформировать файлы и поместить во временное хранилище dpa_lob
+-- в переменную p_file_count вернуть кол-во файлов
+
+procedure form_cvk_file(p_filetype varchar2, p_filedate date, p_file_count out number);
+
+procedure del_f_row(p_idrow varchar2);
+procedure ins_ticket(p_filename varchar2, p_filedata clob);
+
+procedure ins_r0(p_filename varchar2, p_filedata clob, p_tickname OUT varchar2);
+
+    -- процедура на для отправки данных в дпа по нотариусам COBUMMFO-4028
+  PROCEDURE accounts_tax(p_acc     accounts.acc%TYPE
+                        ,p_daos    accounts.daos%TYPE
+                        ,p_dazs    accounts.dazs%TYPE
+                        ,p_kv      accounts.kv%TYPE
+                        ,p_nbs     accounts.nbs%TYPE
+                        ,p_nls     accounts.nls%TYPE
+                        ,p_ob22    accounts.ob22%TYPE
+                        ,p_pos     accounts.pos%TYPE
+                        ,p_vid     accounts.vid%TYPE
+                        ,p_rnk     accounts.rnk%TYPE
+                        );
+  FUNCTION dpa_nbs(p_nbs  varchar2
+                 ,p_ob22 accounts.OB22%TYPE DEFAULT NULL) RETURN NUMBER;
+end;
+/
+CREATE OR REPLACE PACKAGE BODY BARS.BARS_DPA is
+
+g_body_version constant varchar2(64)  := 'Version 1.25 09/11/2017';
 g_body_defs    constant varchar2(512) := '';
 
 g_modcode      constant varchar2(3)   := 'DPA';
@@ -60,7 +159,7 @@ is
   l_kf varchar2(6) :=sys_context('bars_context','user_mfo');
 begin
 
-  bars_audit.info(p || 'Start.');
+  bars_audit.trace(p || 'Start.');
 
   l_dps := getglobaloption('DPA_REG');
   if l_dps is null then
@@ -139,7 +238,7 @@ begin
 
   p_filenum := l_filenum;
 
-  bars_audit.info(p || 'Finish. l_filename=>' || l_filename);
+  bars_audit.trace(p || 'Finish. l_filename=>' || l_filename);
 
   return l_filename;
 
@@ -183,11 +282,11 @@ is
   p varchar2(100) := 'bars_dpa.get_ffile_body. ';
 begin
 
-  bars_audit.info(p || 'Start.');
+  bars_audit.trace(p || 'Start.');
 
   l_mfo  := f_ourmfo;
 
-  for v in ( select DISTINCT * from DPA_ACC_USERID where userid = user_id )
+  for v in ( select DISTINCT * from DPA_ACC_USERID )
   loop
 
      l_rownum := l_rownum + 1;
@@ -228,7 +327,7 @@ begin
 
   p_count := l_rownum;
 
-  bars_audit.info(p || 'Finish. l_rownum=>' || to_char(l_rownum));
+  bars_audit.trace(p || 'Finish. l_rownum=>' || to_char(l_rownum));
 
   return l_data;
 
@@ -251,7 +350,7 @@ is
   p varchar2(100) := 'bars_dpa.get_pfile_body. ';
 begin
 
-  bars_audit.info(p || 'Start.');
+  bars_audit.trace(p || 'Start.');
 
   l_mfo  := f_ourmfo;
   l_okpo := f_ourokpo;
@@ -300,7 +399,7 @@ begin
 
   p_count := l_rownum;
 
-  bars_audit.info(p || 'Finish. l_rownum=>' || to_char(l_rownum));
+  bars_audit.trace(p || 'Finish. l_rownum=>' || to_char(l_rownum));
 
   return l_data;
 
@@ -321,7 +420,7 @@ is
   p varchar2(100) := 'bars_dpa.get_kfile_body. ';
 begin
 
-  bars_audit.info(p || 'Start.');
+  bars_audit.trace(p || 'Start.');
 
   l_okpo := f_ourokpo;
 
@@ -365,7 +464,7 @@ begin
 
   p_count := l_rownum;
 
-  bars_audit.info(p || 'Finish. l_rownum=>' || to_char(l_rownum));
+  bars_audit.trace(p || 'Finish. l_rownum=>' || to_char(l_rownum));
 
   return l_data;
 
@@ -392,14 +491,14 @@ is
   l_kf varchar2(6) :=sys_context('bars_context','user_mfo');
 begin
 
-  bars_audit.info(p || 'Start.');
-  bars_audit.info(p || 'p_filetype => ' || p_filetype);
+  bars_audit.trace(p || 'Start.');
+  bars_audit.trace(p || 'p_filetype => ' || p_filetype);
 
   delete from dpa_lob;
 
   -- FileName
   l_file_name := get_file_name(p_filetype, l_file_num);
-  bars_audit.info(p || 'File name formed with name - ' || l_file_name);
+  bars_audit.trace(p || 'File name formed');
 
   insert into zag_f (fn, dat)
   values (l_file_name, l_file_date);
@@ -418,7 +517,7 @@ begin
   else
      raise_application_error(-20000, 'Нев?домий тип файлу ' || p_filetype, true);
   end if;
-  bars_audit.info(p || 'File body formed. l_count=>' || to_char(l_count));
+  bars_audit.trace(p || 'File body formed. l_count=>' || to_char(l_count));
 
   if l_count = 0 then
 
@@ -487,7 +586,7 @@ begin
 
   delete from dpa_acc_userid  where userid = user_id;
 
-  bars_audit.info(p || 'Finish.');
+  bars_audit.trace(p || 'Finish.');
 
 end form_file;
 
@@ -508,8 +607,8 @@ is
   p varchar2(100) := 'bars_dpa.form_file. ';
 begin
 
-  bars_audit.info(p || 'Start.');
-  bars_audit.info(p || 'p_filetype => ' || p_filetype);
+  bars_audit.trace(p || 'Start.');
+  bars_audit.trace(p || 'p_filetype => ' || p_filetype);
 
   delete from dpa_lob;
 
@@ -549,7 +648,7 @@ order by d.nls;
 
   -- FileName
   l_file_name := get_file_name(p_filetype, l_file_num);
-  bars_audit.info(p || 'File name formed');
+  bars_audit.trace(p || 'File name formed');
 
 
   -- получим кол-во записей для файла
@@ -618,7 +717,7 @@ is
   p varchar2(100) := 'bars_dpa.get_tick_body. ';
 begin
 
-  bars_audit.info(p || 'Start. p_filename - ' || p_filename);
+  bars_audit.trace(p || 'Start.');
 
   for v in ( select n, err from lines_r where fn = p_filename and err is not null and err <> '0000' )
   loop
@@ -638,7 +737,7 @@ begin
 
   p_rows := l_rownum;
 
-  bars_audit.info(p || 'Finish. l_rownum=>' || to_char(l_rownum));
+  bars_audit.trace(p || 'Finish. l_rownum=>' || to_char(l_rownum));
 
   return l_data;
 
@@ -668,7 +767,7 @@ is
 
 begin
 
-  bars_audit.info(p || 'Start. p_filename - ' || p_filename);
+  bars_audit.trace(p || 'Start.');
 
   delete from dpa_lob;
 
@@ -684,11 +783,11 @@ begin
 
   -- FileHeader
   l_file_header := get_file_header;
-  bars_audit.info(p || 'File header formed');
+  bars_audit.trace(p || 'File header formed');
 
   -- FileBody
   l_file_body := get_tick_body(p_filename, l_rows);
-  bars_audit.info(p || 'File body formed.');
+  bars_audit.trace(p || 'File body formed.');
 
   -- компоновка всего отчета
   select XmlElement("DECLAR",
@@ -727,7 +826,7 @@ begin
 
   p_tickname := l_tick_name;
 
-  bars_audit.info(p || 'Finish.');
+  bars_audit.trace(p || 'Finish.');
 
 end form_ticket;
 
@@ -781,7 +880,7 @@ is
 
 begin
 
-  bars_audit.info(p || 'Start. p_filename - ' || p_filename);
+  bars_audit.trace(p || 'Start.');
 
         l_tmp := extract(p_xml, c_declarbody || 'C_DOC_FNAME/text()', null);
   l_tick_name := upper(l_tmp);
@@ -801,7 +900,7 @@ begin
   -- сохраняем информацию о файле
   insert into zag_f (fn, dat, n, otm, datk, err)
   values (p_filename, l_tick_date, l_tick_rec, null, sysdate, l_err_code);
-  bars_audit.info(p || 'ins - zag_f - ok');
+  bars_audit.trace(p || 'ins - zag_f - ok');
   if l_err_code = '0000' then
 
   l_dpablk := to_number(getglobaloption('DPA_BLK'));
@@ -812,7 +911,7 @@ begin
 
      -- счетчик строк
      i := i + 1;
-     bars_audit.info(p || 'i = ' || to_char(i));
+     bars_audit.trace(p || 'i = ' || to_char(i));
      c_row := c_declarbody || 'ROWS[' || i || ']';
 
      -- выход при отсутствии транзакций
@@ -862,12 +961,12 @@ begin
 
      -- код ошибки
      l_err := '0000';
-     bars_audit.info(p || 'l_f_rec = ' || to_char(l_f_rec));
+     bars_audit.trace(p || 'l_f_rec = ' || to_char(l_f_rec));
      -- проверки
      begin
         -- 2126 - имя файла @F
         select fn into l_tmp from zag_f where fn = l_f_name and dat > sysdate-30;
-        bars_audit.info(p || 'fn = ' || to_char(l_tmp));
+        bars_audit.trace(p || 'fn = ' || to_char(l_tmp));
         begin
            -- 2124 - имя файла @F для данного счета
            if substr(p_filename,1,2) = '@R' then
@@ -888,7 +987,7 @@ begin
                  and otype in (1,6);
 
            end if;
-            bars_audit.info(p || 'l_tmpn = ' || to_char(l_tmpn));
+            bars_audit.trace(p || 'l_tmpn = ' || to_char(l_tmpn));
            -- 2125 - номер строки в файле @F
            if l_f_rec <> l_tmpn then
               -- Помилка в рекв_зит_ "Порядковий номер Пов_домлення, на яке надається в_дпов_дь, у Файл_ пов_домлень F або P"
@@ -1010,7 +1109,7 @@ begin
 
   p_errcode := l_err_code;
 
-  bars_audit.info(p || 'Finish.');
+  bars_audit.trace(p || 'Finish.');
 
 end iparse_ticket;
 
@@ -1035,7 +1134,7 @@ is
 
 begin
 
-  bars_audit.info (p || 'Start. p_filename - ' || p_filename);
+  bars_audit.trace(p || 'Start.');
 
   -- declarbody
         l_tmp := extract(p_xml, c_declarbody || 'PROC_FILE_NAME/text()', null);
@@ -1085,7 +1184,7 @@ begin
 
   p_errcode := l_err_code;
 
-  bars_audit.info(p || 'Finish.');
+  bars_audit.trace(p || 'Finish.');
 
 end iparse_ticket1;
 
@@ -1118,7 +1217,7 @@ is
 
 begin
 
-  bars_audit.info(p || 'Start.');
+  bars_audit.trace(p || 'Start.');
 
         l_tmp := extract(p_xml, c_declarbody || 'C_DOC_CRTDATE/text()', null);
         l_tmp2:= extract(p_xml, c_declarbody || 'C_DOC_CRTTIME/text()', null);
@@ -1132,7 +1231,7 @@ begin
         l_tmp := extract(p_xml, c_declarbody || 'PROC_FILE_ERROR_CODE/text()', null);
   l_err_code  := substr(l_tmp,1,4);
 
-  bars_audit.info(p || 'l_tick_rec(C_DOC_QTREC)=>' || to_char(l_tick_rec) ||
+  bars_audit.trace(p || 'l_tick_rec(C_DOC_QTREC)=>' || to_char(l_tick_rec) ||
        ' l_f_name(PROC_FILE_NAME)=>' || l_f_name ||
        ' l_f_rec(PROC_FILE_QTREC)=>' || to_char(l_f_rec) ||
        ' l_err_code(PROC_FILE_ERROR_CODE)=>' || l_err_code);
@@ -1253,7 +1352,7 @@ begin
 
   p_errcode := l_err_code;
 
-  bars_audit.info(p || 'Finish.');
+  bars_audit.trace(p || 'Finish.');
 
 end iparse_ticket2;
 
@@ -1276,22 +1375,22 @@ is
   p varchar2(100) := 'bars_dpa.import_ticket. ';
 begin
 
-  bars_audit.info(p || 'Start. p_filename=>' || p_filename);
+  bars_audit.trace(p || 'Start. p_filename=>' || p_filename);
 
       l_filetype  := substr(p_filename,2,1);
   l_filedigit := substr(p_filename,3,1);
 
-  bars_audit.info(p || 'l_filetype=>' || l_filetype || ' l_filedigit=>' || l_filedigit);
+  bars_audit.trace(p || 'l_filetype=>' || l_filetype || ' l_filedigit=>' || l_filedigit);
 
   if l_filetype in ('R', 'D') then
      begin
         select fnk into l_filek from zag_f where fn = p_filename and dat > sysdate-30;
-        bars_audit.info(p ||'Квитанція вже приймалась!');
-        raise_application_error(-20000, 'Квитанція вже приймалась!', true);        
+        raise_application_error(-20000, 'Квитанція вже приймалась!', true);
+        bars_audit.trace(p ||'Квитанція вже приймалась!');
      exception when no_data_found then null;
      end;
   end if;
-  bars_audit.info(p ||'point 1');
+  bars_audit.trace(p ||'point 1');
   begin
      select fnk, err into l_filek, l_err
        from zag_f
@@ -1303,69 +1402,67 @@ begin
         and substr(fn,2,1) in ('F', 'P', 'K')
         and substr(fn,4) = substr(p_filename,4)
         and dat > sysdate-30;
-        bars_audit.info(p ||'point2  select fnk, err into l_filek, l_err');
+        bars_audit.trace(p ||'point2  select fnk, err into l_filek, l_err');
   exception when no_data_found then
-     bars_audit.info(p ||'Квитанція на неіснуючий файл!');
-     raise_application_error(-20000, 'Квитанція на неіснуючий файл', true);     
+     raise_application_error(-20000, 'Квитанція на неіснуючий файл', true);
+     bars_audit.trace(p ||'Квитанція на неіснуючий файл!');
   end;
- bars_audit.info(p ||' l_filedigit='||l_filedigit||', l_filek='||l_filek);
+ bars_audit.trace(p ||' l_filedigit='||l_filedigit||', l_filek='||l_filek);
   if l_filedigit = '0' and l_filek is null then
-     bars_audit.info(p ||'Квитанція першого типу ще не приймалася!');
-     raise_application_error(-20000, 'Квитанція першого типу ще не приймалася!', true);     
+     raise_application_error(-20000, 'Квитанція першого типу ще не приймалася!', true);
+     bars_audit.trace(p ||'Квитанція першого типу ще не приймалася!');
   elsif l_filedigit = '0' and substr(l_filek,3,1) = '1' then
-     bars_audit.info(p ||'Квитанція другого типу ще не приймалася!');
      raise_application_error(-20000, 'Квитанція другого типу ще не приймалася!', true);
+     bars_audit.trace(p ||'Квитанція другого типу ще не приймалася!');
   elsif l_filedigit = '0' and substr(l_filek,3,1) = '0' and l_err = '0000' then
-     bars_audit.info(p ||'Файл вже сквитовано!');
      raise_application_error(-20000, 'Файл вже сквитовано!', true);
+     bars_audit.trace(p ||'Файл вже сквитовано!');
   elsif l_filedigit = '1' and substr(l_filek,3,1) = '1' and l_err = '0000' then
-     bars_audit.info(p ||'Файл вже сквитовано квитанцією першого типу!');
      raise_application_error(-20000, 'Файл вже сквитовано квитанцією першого типу!', true);
+     bars_audit.trace(p ||'Файл вже сквитовано квитанцією першого типу!');
   elsif l_filedigit = '1' and substr(l_filek,3,1) = '2' and l_err = '0000' then
-     bars_audit.info(p ||'Файл вже сквитовано квитанцією другого типу!');
      raise_application_error(-20000, 'Файл вже сквитовано квитанцією другого типу!', true);
+     bars_audit.trace(p ||'Файл вже сквитовано квитанцією другого типу!');
   elsif l_filedigit = '1' and substr(l_filek,3,1) = '0' and l_err = '0000' then
-     bars_audit.info(p ||'Файл вже сквитовано!');
      raise_application_error(-20000, 'Файл вже сквитовано!', true);
+     bars_audit.trace(p ||'Файл вже сквитовано!');
   elsif l_filedigit = '2' and l_filek is null then
-     bars_audit.info(p ||'Квитанція першого типу ще не приймалася!');
      raise_application_error(-20000, 'Квитанція першого типу ще не приймалася!', true);
   elsif l_filedigit = '2' and substr(l_filek,3,1) = '2' and l_err = '0000' then
-     bars_audit.info(p ||'Файл вже сквитовано квитанцією другого типу!');
      raise_application_error(-20000, 'Файл вже сквитовано квитанцією другого типу!', true);
   elsif l_filedigit = '2' and substr(l_filek,3,1) = '0' and l_err = '0000' then
      raise_application_error(-20000, 'Файл вже сквитовано!', true);
   end if;
-  bars_audit.info(p ||'point 4');
+  bars_audit.trace(p ||'point 4');
 
   begin
   select file_data into l_clob from dpa_lob where file_name = p_filename;
   exception when no_data_found then
-   bars_audit.info(p ||'Файл для id= '|| to_char(user_id) || ' не знайдено!');
+   bars_audit.trace(p ||'Файл для id= '|| to_char(user_id) || ' не знайдено!');
    raise_application_error(-20000, 'Файл для id= '|| to_char(user_id) || ' не знайдено!', true);
   end;
 
   l_xml_full := xmltype(l_clob);
-  bars_audit.info(p ||'point 1');
+  bars_audit.trace(p ||'point 1');
   -- Файл-в_дпов_дь R / Файл-в_дпов_дь D
   if substr(p_filename,3,1) = '0' then
      iparse_ticket(p_filename, l_xml_full, l_err_code);
-      bars_audit.info(p ||'iparse_ticket');
+      bars_audit.trace(p ||'iparse_ticket');
   -- Квитанц_я про одержання файла (перша квитанц_я)
   elsif substr(p_filename,3,1) = '1' then
-     bars_audit.info(p ||'iparse_ticket1 start');
+     bars_audit.trace(p ||'iparse_ticket1 start');
      iparse_ticket1(p_filename, l_xml_full, l_err_code);
-     bars_audit.info(p ||'iparse_ticket1 end');
+     bars_audit.trace(p ||'iparse_ticket1 end');
   -- Квитанц_я про прийняття файла (друга квитанц_я)
   elsif substr(p_filename,3,1) = '2' then
      iparse_ticket2(p_filename, l_xml_full, l_err_code);
-     bars_audit.info(p ||'iparse_ticket2');
+     bars_audit.trace(p ||'iparse_ticket2');
   end if;
 
   p_errcode := l_err_code;
-  bars_audit.info(p ||p_errcode);
+  bars_audit.trace(p ||p_errcode);
 
-  bars_audit.info(p || 'Finish.');
+  bars_audit.trace(p || 'Finish.');
 
 exception when others then
   if ( sqlcode = -19202 or sqlcode = -31011 ) then
@@ -1463,7 +1560,7 @@ procedure insert_data_to_temp(p_mfo varchar2, p_okpo varchar2, p_rp number, p_ot
                               p_adr varchar2, p_c_reg varchar2, p_c_dst varchar2, p_bic varchar2, p_country number)
 is
 begin
- bars_audit.info('insert_data_to_temp starts');
+ bars_audit.trace('insert_data_to_temp starts');
 
      if LENGTH(p_nmk) > 38 then
         raise_application_error(-20000, 'Длина имени клиента должна быть в рамках 38-х символов');
@@ -1472,7 +1569,7 @@ begin
      insert into dpa_acc_userid (mfo, okpo, rt, ot, odat, nls, kv, c_ag, nmk, adr, c_reg, c_dst, bic, country, userid)
      values(p_mfo, p_okpo, p_rp, p_ot, p_odat, p_nls, p_kv, p_c_ag, p_nmk, p_adr, p_c_reg, p_c_dst, p_bic, p_country, user_id);
 
- bars_audit.info('insert_data_to_temp finised');
+ bars_audit.trace('insert_data_to_temp finised');
 end insert_data_to_temp;
 
 -------------------------------------------------------------------------------
@@ -1481,11 +1578,11 @@ end insert_data_to_temp;
 procedure insert_data_to_temp(p_bic varchar2, p_nmk varchar2,p_ot varchar2, p_odat date, p_nls varchar2,p_kv number, p_c_ag number, p_country number, p_c_reg varchar2,p_okpo varchar2)
 is
 begin
- bars_audit.info('insert_data_to_temp_k starts');
+ bars_audit.trace('insert_data_to_temp_k starts');
      insert into dpa_acc_userid (bic, nmk, ot, odat, nls, kv, c_ag, country, c_reg, okpo, userid)
      values(p_bic, p_nmk, p_ot, p_odat, p_nls, p_kv, p_c_ag, p_country, p_c_reg, p_okpo, user_id);
 
- bars_audit.info('insert_data_to_temp_k finised');
+ bars_audit.trace('insert_data_to_temp_k finised');
 end insert_data_to_temp;
 
 -------------------------------------------------------------------------------
@@ -1530,7 +1627,7 @@ is
    l_trace   varchar2(1000) := 'get_cvk_file';
 
 begin
-   bars_audit.info(l_trace||'старт формирования файлов');
+   bars_audit.trace(l_trace||'старт формирования файлов');
    delete from dpa_lob where userid = user_id;
 
    if p_filetype = 'CA'  then
@@ -1547,11 +1644,11 @@ begin
 
           --првая запись
           if c.rown = 1 then
-             bars_audit.info(l_trace||'старт формирования файла');
+             bars_audit.trace(l_trace||'старт формирования файла');
              l_file_name   := get_file_name(p_filetype, l_file_num);
              l_system_info  := lpad(' ', 100) || l_nl;
              l_header_info :=  substr(l_file_name,1,12)||to_char(sysdate,'yymmddhhmi')||lpadchr(c.cnt, '0', 6)||lpadchr('',' ', 166)||l_nl;
-             bars_audit.info(l_trace||'сформировано имя файла '||l_file_name);
+             bars_audit.trace(l_trace||'сформировано имя файла '||l_file_name);
              -- вставка записи в заголовок
              insert into zag_tb(fn, dat, n) values(l_file_name, sysdate,c.cnt);
              dbms_lob.createtemporary(l_clob,FALSE);
@@ -1571,7 +1668,7 @@ begin
                          rpad (c.inf_isp, 38)||l_nl;
 
            dbms_lob.append(l_clob, l_file_line);
-           bars_audit.info(l_trace||'строка:'||l_file_line);
+           bars_audit.trace(l_trace||'строка:'||l_file_line);
          end loop;
 
 
@@ -1601,11 +1698,11 @@ begin
 
           --новый вид счета, делаем новый файл
           if c.vid_rank = 1 then
-             bars_audit.info(l_trace||'старт формирования файлов для группы '||c.vid);
+             bars_audit.trace(l_trace||'старт формирования файлов для группы '||c.vid);
              l_file_name   := replace(get_file_name(p_filetype, l_file_num),'*',c.vid);
              l_system_info  := lpad(' ', 100) || l_nl;
              l_header_info :=  substr(l_file_name,1,12)||to_char(sysdate,'yymmddhhmi')||lpadchr(c.cnt_vid, '0', 6)||lpadchr('',' ', 166)||l_nl;
-             bars_audit.info(l_trace||'сформировано имя файла '||l_file_name);
+             bars_audit.trace(l_trace||'сформировано имя файла '||l_file_name);
              -- вставка записи в заголовок
              insert into zag_tb(fn, dat, n) values(l_file_name, sysdate,c.cnt_vid );
 
@@ -1656,7 +1753,7 @@ begin
          --if dbms_lob.isopen(l_clob) = 1 then dbms_lob.close(l_clob); end if;
 
          p_file_count := i;
-         bars_audit.info(l_trace||'на выходе процедуры возвращаем кол-во файлов::'||p_file_count);
+         bars_audit.trace(l_trace||'на выходе процедуры возвращаем кол-во файлов::'||p_file_count);
 
 
     end if;
@@ -1689,14 +1786,14 @@ procedure ins_ticket(p_filename varchar2, p_filedata clob)
 is
  p varchar2(100) := 'bars_dpa.';
 begin
- bars_audit.info(p|| 'ins_ticket start with parameters: p_filename = '||p_filename||', p_filedata='||p_filedata );
+ bars_audit.trace(p|| 'ins_ticket start with parameters: p_filename = '||p_filename||', p_filedata='||p_filedata );
  delete dpa_lob where file_name = p_filename;
  begin
   insert into dpa_lob (file_data, file_name, userid)
        values (p_filedata, p_filename, user_id);
  exception when dup_val_on_index then raise_application_error(-20000, 'Не вдалося імпортувати файл! (Повторний прийом?)', true);
  end;
- bars_audit.info(p|| 'ins_ticket finished with mess:' ||sqlcode);
+ bars_audit.trace(p|| 'ins_ticket finished with mess:' ||sqlcode);
 end;
 
 procedure ins_r0(p_filename varchar2, p_filedata clob, p_tickname OUT varchar2)
@@ -1705,7 +1802,7 @@ is
  l_filename  varchar2(100);
  p_ErrCode varchar2(500);
 begin
- bars_audit.info(p|| 'ins_ticket start with parameters: p_filename = '||p_filename||', p_filedata='||substrb(p_filedata, 1, 4000) );
+ bars_audit.trace(p|| 'ins_ticket start with parameters: p_filename = '||p_filename||', p_filedata='||substrb(p_filedata, 1, 4000) );
  -- проверка, не принимался ли файл ранее
  begin
  select max(fn)
@@ -1727,7 +1824,7 @@ begin
     and dat > sysdate-364;
  exception when no_data_found then null;
  end;
- bars_audit.info(p||'l_filename = '|| l_filename);
+ bars_audit.trace(p||'l_filename = '|| l_filename);
  if nvl(l_filename,'') != ''
  then
   raise_application_error(-20000, 'Не вдалося імпортувати файл! (Повторний прийом ' ||p_filename||')', true);
@@ -1742,12 +1839,9 @@ begin
 
      begin
       import_ticket(p_filename, p_ErrCode);
-      
-     exception when others then 
-         bars_audit.error( p || ': ' || p_ErrCode || chr(10)|| dbms_utility.format_error_stack() );
-         raise_application_error(-20000, p_ErrCode || chr(10)|| dbms_utility.format_error_stack() , true);
+     exception when others then  raise_application_error(-20000, p_ErrCode, true);
      end;
-     bars_audit.info(p||'p_ErrCode = '|| p_ErrCode);
+     bars_audit.trace(p||'p_ErrCode = '|| p_ErrCode);
      if (p_ErrCode = -1)
      then
       form_ticket (p_filename, '2103', p_tickname);
@@ -1757,7 +1851,7 @@ begin
 
 
  end if;
- bars_audit.info(p|| 'ins_ticket finished with mess:' ||sqlcode);
+ bars_audit.trace(p|| 'ins_ticket finished with mess:' ||sqlcode);
 end;
 
     -- процедура на для отправки данных в дпа по нотариусам COBUMMFO-4028

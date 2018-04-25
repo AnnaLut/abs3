@@ -1,6 +1,6 @@
 CREATE OR REPLACE PACKAGE GERC_PAYMENTS
 IS
-   G_HEADER_VERSION   CONSTANT VARCHAR2 (64) := 'v.3.63 31.01.2018';
+   G_HEADER_VERSION   CONSTANT VARCHAR2 (64) := 'v.3.62 22.01.2018';
 
    TYPE tBranchData IS RECORD
    (
@@ -221,7 +221,7 @@ END GERC_PAYMENTS;
 /
 CREATE OR REPLACE PACKAGE BODY GERC_PAYMENTS IS
 
-    G_BODY_VERSION      constant varchar2(64) := 'v.2.74 31.01.2018';
+    G_BODY_VERSION      constant varchar2(64) := 'v.2.72 22.01.2018';
     TYPE t_cursor   IS REF CURSOR;
     function header_version return varchar2
     is

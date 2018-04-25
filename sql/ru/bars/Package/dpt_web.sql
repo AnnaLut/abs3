@@ -2417,7 +2417,6 @@ create or replace package body dpt_web is
     l_ea_id          ead_docs.id%type;
     l_ea_blob        blob := utl_raw.cast_to_raw(''); -- пустой BLOB для отправки в ЕА (идет не скан-документ, а сообщение о его необходимости)
     l_archdocid      number;
-	l_typecod        dpt_vidd.type_cod%type;
   begin
     l_valid_mobphone := bars.verify_cellphone_byrnk(p_rnk);
     if (p_datbegin is null) then
@@ -2484,16 +2483,14 @@ create or replace package body dpt_web is
                nvl(duration_days_max, 0),
                term_type,
                decode(nvl(type_cod, '____'), 'COMB', 1, p_fl_perekr),
-               kv,
-               type_cod
+               kv
           into l_termm,
                l_termd,
                l_termm_max,
                l_termd_max,
                l_termtype,
                l_flp,
-               l_curcode,
-               l_typecod
+               l_curcode
           from dpt_vidd
          where vidd = p_vidd;
       exception
@@ -2641,9 +2638,9 @@ create or replace package body dpt_web is
       if ((branch_usr.get_branch_param2('DPT_WORKSCHEME', 1) = 'EBP') 
         and ((substr(l_nlsd, 1, 4) in ('2630', '2635') and newnbs.g_state = 0) or (substr(l_nlsd, 1, 4) = '2630' and newnbs.g_state = 1))
         and (l_migr is null)) then
-      if l_typecod <> 'CHIL' then   --COBUSUPABS-7074
+      
         ebp.set_archive_docid(l_dpt, 0);
-      end if;
+      
         -- для відправки SMS повідомленнь про рух коштів по рахунках депозитного договору
         for k in (select accid from dpt_accounts where dptid = l_dpt) loop
         

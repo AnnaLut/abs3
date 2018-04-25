@@ -14,7 +14,7 @@ CREATE OR REPLACE TRIGGER TBU_CCDEAL_EIB10
 declare
   l_cc_deal  cc_deal%rowtype;
   l_cprod    nd_txt.txt%type;
-  l_cig_d13  nd_txt.txt%type;
+  l_cig_d13  varchar2(250);
   l_eibis    fm_yesno.id%type;
   l_nd_txt   nd_txt.nd%type;
   l_tag      nd_txt.tag%type;
@@ -29,9 +29,9 @@ begin
   if (l_cusstype = 2 or (l_cusstype = 3 and l_sed = '910')) and
      :new.VIDD <> 26 then
     begin
-      select txt
+      select value
         into l_cig_d13
-        from nd_txt
+        from mos_operw
        where nd = :new.nd
          and tag = 'CIG_D13';
     exception
