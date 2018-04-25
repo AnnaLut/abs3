@@ -74,10 +74,11 @@ PROMPT *** Create  view V_CCK_RF ***
                    AND tag = 'PR_TR') pr_tr
                ,ia.s opl_day
                 ,ia.basem
-			   ,(select name from basey b where b.basey = ia.basem) basey_name
-                ,CASE WHEN ia.basey = 2 AND ia.basem = 1 AND ia.id = 0 THEN 'Старий ануїтет'
-                      WHEN ia.basey = 2 AND ia.basem = 0 AND ia.id = 0 THEN 'Новий ануїтет'
-                      ELSE 'Класичний'
+			   ,(select name from basey b where b.basey = ia.basey) basey_name
+                ,CASE WHEN a8.vid=4 and ia.basem<>1 and ia.id = 0 THEN 'Старий ануїтет'
+                      WHEN a8.vid=4 and ia.basem=1 and ia.id = 0 THEN 'Новий ануїтет'
+					  WHEN a8.vid=2 THEN 'Класичний'
+                      ELSE 'Невизначено'
                  END  annuitet
           FROM cc_deal d, customer c, accounts a8, nd_acc n, cc_sos cs,cc_vidd cv,INT_accn ia
          WHERE n.nd = d.nd
