@@ -19,6 +19,6 @@ namespace Areas.Mcp.Models
         public short? BLOCK_TYPE_ID { get; set; }
         public string BLOCK_COMMENT { get; set; }
         public decimal ENVELOPE_FILE_ID { get; set; }
-		public DateTime? FACT_PAY_DATE { get; set; }
+        public DateTime? FACT_PAY_DATE { get; set; }
     }
 }

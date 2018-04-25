@@ -351,7 +351,7 @@ grant SELECT                                                                 on 
 grant SELECT                                                                 on DPT_BONUS_REQUESTS to BARS_DM;
 grant SELECT                                                                 on DPT_BONUS_REQUESTS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_BONUS_REQUESTS to WR_ALL_RIGHTS;
-
+grant SELECT                                                                 on DPT_BONUS_REQUESTS to BARS_ACCESS_DEFROLE;
 
 
 PROMPT ===================================================================================== 

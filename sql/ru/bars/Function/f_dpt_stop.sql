@@ -515,7 +515,9 @@ BEGIN
       bars_audit.trace('1478 безнал: ' || l_is_bnal);
         
       if (l_count_mm = 0) and (l_is_bnal > 0) then -- первый мес€ц и безнал
-
+       if kost(l_acc,trunc(sysdate - 1)) = 0 then -- первичный взнос
+        null;
+       else 
         if l_sum > l_limit * 2 then
           bars_audit.info(c_modcode || ' ѕеревищено суму л≥м≥ту ' ||
                            to_char(l_limit) || ' за м≥сць з ' ||
@@ -526,6 +528,7 @@ BEGIN
          else
            return 0;                  
          end if;
+       end if;  
       elsif l_sum > l_limit then
         bars_audit.info(c_modcode || ' ѕеревищено суму л≥м≥ту ' ||
                            to_char(l_limit) || ' за м≥сць з ' ||
