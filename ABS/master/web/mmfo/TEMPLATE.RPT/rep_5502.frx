@@ -1,23 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="10/05/2017 15:02:25" ReportInfo.Modified="12/15/2017 16:42:59" ReportInfo.CreatorVersion="2014.3.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="10/05/2017 15:02:25" ReportInfo.Modified="11/14/2017 17:42:59" ReportInfo.CreatorVersion="2014.1.2.0">
   <Dictionary>
-    <OracleDataConnection Name="obmmfo6_dev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoWN0HWRv5NgSW2TEYI2W7WcdLDt2eS9wxfWq0I3YTWffQ==">
-      <TableDataSource Name="Table" Alias="Tab" DataType="System.Int32" Enabled="true" SelectCommand="select CHAR00 S_20, CHAR01 S_32A, CHAR02 S_33B, CHAR03 S_50F, CHAR04 S_52A, CHAR05 S_57A, CHAR06 S_59, CHAR07 S_70, CHAR08 S_71A, CHAR09 BRANCH, NUM00 REF, CHAR10 TT, CHAR11 ND, DAT00 PDAT, NUM01 KV, NUM02 S, NUM03 SQ, CHAR12 NLSA, CHAR13 NAM_A, CHAR14 MFOA, CHAR15 NLSB, CHAR16 NAM_B, CHAR17 MFOB, CHAR18 NAZN from rs_tmp_report_data where session_id=:session_id order by id">
-        <Column Name="S_20" DataType="System.String"/>
-        <Column Name="S_32A" DataType="System.String" PropName="S_32"/>
-        <Column Name="S_50F" DataType="System.String" PropName="S_50"/>
-        <Column Name="S_52A" DataType="System.String" PropName="S_52"/>
-        <Column Name="S_33B" DataType="System.String" PropName="S_53"/>
-        <Column Name="S_57A" DataType="System.String" PropName="S_54"/>
-        <Column Name="S_59" DataType="System.String"/>
-        <Column Name="S_70" DataType="System.String"/>
-        <Column Name="S_71A" DataType="System.String" PropName="S_71"/>
+    <OracleDataConnection Name="obmmfo6_dev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoVbyEZ3NRVsk2UxatND+WyU0ijNvM6/zJhj6NlBg4FuIQ==">
+      <TableDataSource Name="Table" Alias="Tab" DataType="System.Int32" Enabled="true" SelectCommand="select CHAR00 BRANCH, NUM00 REF, CHAR01 TT, CHAR02 ND, DAT00 PDAT, NUM01 KV, NUM02 S, NUM03 SQ, CHAR03 NLSA, CHAR04 NAM_A, CHAR05 MFOA, CHAR06 NLSB, CHAR07 NAM_B, CHAR08 MFOB, CHAR09 NAZN, CHAR10 KF,  bars.get_sw_mes_by_ref(NUM00) as all_mess&#13;&#10;from rs_tmp_report_data&#13;&#10; where session_id=:session_id">
         <Column Name="REF" DataType="System.Decimal"/>
         <Column Name="TT" DataType="System.String"/>
         <Column Name="ND" DataType="System.String"/>
         <Column Name="KV" DataType="System.Decimal"/>
         <Column Name="S" DataType="System.Decimal"/>
-        <Column Name="SQ" DataType="System.Decimal"/>
         <Column Name="NLSA" DataType="System.String"/>
         <Column Name="NAM_A" DataType="System.String"/>
         <Column Name="MFOA" DataType="System.String"/>
@@ -28,7 +18,9 @@
         <Column Name="BRANCH" DataType="System.String"/>
         <Column Name="PDAT" DataType="System.DateTime"/>
         <Column Name="SQ" DataType="System.Decimal"/>
-        <CommandParameter Name="session_id" DataType="112" Expression="[session_id]" DefaultValue="0"/>
+        <Column Name="KF" DataType="System.String"/>
+        <Column Name="ALL_MESS" DataType="System.String"/>
+        <CommandParameter Name="session_id" DataType="107" Expression="[session_id]" DefaultValue="0"/>
       </TableDataSource>
       <TableDataSource Name="Table4" Alias="Title" DataType="System.Int32" Enabled="true" SelectCommand="select name as BRANCH_NAME from banks_ru where mfo = f_ourmfo_g">
         <Column Name="BRANCH_NAME" DataType="System.String"/>
@@ -37,14 +29,13 @@
     <Parameter Name="session_id" DataType="System.Int32" Expression="874988"/>
     <Parameter Name="sFdat1" DataType="System.DateTime"/>
     <Parameter Name="sFdat2" DataType="System.DateTime"/>
-    <Parameter Name="branch" DataType="System.String"/>
   </Dictionary>
   <ReportPage Name="Page1" Landscape="true" PaperWidth="380" PaperHeight="210" FirstPageSource="15" OtherPagesSource="15">
     <ReportTitleBand Name="ReportTitle1" Width="1360.8" Height="47.25">
       <TextObject Name="Text1" Width="1360.8" Height="47.25" PrintOn="FirstPage" CanBreak="false" Text="Звіт по зарахованих переказах в іноземній валюті на РУ&#13;&#10;за період з [sFdat1] по [sFdat2]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 12pt, style=Bold"/>
     </ReportTitleBand>
-    <PageHeaderBand Name="PageHeader1" Top="60.7" Width="1341.9" Height="47.25" PrintOn="FirstPage">
-      <TableObject Name="Table2" Width="1341.9" Height="47.25">
+    <PageHeaderBand Name="PageHeader1" Top="50.05" Width="1360.8" Height="47.25">
+      <TableObject Name="Table2" Width="1360.8" Height="47.25" PrintOn="FirstPage" CanBreak="false" RepeatHeaders="false">
         <TableColumn Name="Column16" Width="94.5"/>
         <TableColumn Name="Column17" Width="47.25"/>
         <TableColumn Name="Column18" Width="85.05"/>
@@ -110,21 +101,8 @@
           <TableCell Name="Cell71" Border.Lines="All" Text="[Tab.BRANCH]" HorzAlign="Center" VertAlign="Center"/>
         </TableRow>
       </TableObject>
-      <ChildBand Name="Child1" Top="172.65" Width="1341.9" Height="141.75" CanGrow="true" CanShrink="true" CanBreak="true">
-        <TableObject Name="Table3" Width="1341.9" Height="141.75" Border.Lines="All">
-          <TableColumn Name="Column31" Width="268.38"/>
-          <TableColumn Name="Column32" Width="268.38"/>
-          <TableColumn Name="Column33" Width="268.38"/>
-          <TableColumn Name="Column34" Width="268.38"/>
-          <TableColumn Name="Column35" Width="268.38"/>
-          <TableRow Name="Row4" Height="141.75">
-            <TableCell Name="Cell102" Text="[Tab.S_20]&#13;&#10;[Tab.S_32A]&#13;&#10;[Tab.S_33B]&#13;&#10;[Tab.S_50F]&#13;&#10;[Tab.S_52A]&#13;&#10;[Tab.S_57A]&#13;&#10;[Tab.S_59]&#13;&#10;[Tab.S_70]&#13;&#10;[Tab.S_71A]" ColSpan="5"/>
-            <TableCell Name="Cell103"/>
-            <TableCell Name="Cell104"/>
-            <TableCell Name="Cell105"/>
-            <TableCell Name="Cell106"/>
-          </TableRow>
-        </TableObject>
+      <ChildBand Name="Child1" Top="159.59" Width="1360.8" Height="18.9" CanGrow="true" CanShrink="true" CanBreak="true">
+        <TextObject Name="Text4" Width="1360.8" Height="18.9" Border.Lines="All" CanGrow="true" CanShrink="true" Text="[Tab.all_mess]" Font="Arial, 9pt"/>
       </ChildBand>
     </DataBand>
   </ReportPage>

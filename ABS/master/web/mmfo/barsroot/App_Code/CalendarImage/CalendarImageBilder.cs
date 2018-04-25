@@ -44,7 +44,7 @@ public class CalendarImageBuilder
             Image = _img,
             FileName = holiday != null ? holiday.FileName : "calendar.jpg",
             ImageDescription = holiday != null
-                ? String.Format("{0} - {1}", GetFileDate(holiday).ToString("dd MMMMM, dddd", _cultureInfo),
+                ? String.Format("{0} - {1}", GetFileDate(holiday).ToString("dd MMMMM", _cultureInfo),
                     holiday.FileDesc)
                 : "ABC Bars-WEB",
             CultureInfo = _cultureInfo,
@@ -95,7 +95,25 @@ public class CalendarImageBuilder
             res.SingleOrDefault(s => _date >= GetFileDate(s).AddDays(- s.Remind) && _date <= GetFileDate(s).AddDays(1));
         return holiday;
     }
-
+    private DateTime GetEasterDate(int year)
+    {
+        int a = year % 19;
+        int b = year % 4;
+        int c = year % 7;
+        int d = (19 * a + 15) % 30;
+        int e = (2 * b + 4 * c + 6 * d + 6) % 7;
+        int f = d + e;
+        if (f <= 9) return new DateTime(year, 3, 22 + f).AddDays(13);
+        else return new DateTime(year, 4, f - 9).AddDays(13);
+    }
+    private DateTime GetMasnicyaDay(int year)
+    {
+        return GetEasterDate(year).AddDays(-49);
+    }
+    private DateTime GetTrinityDay(int year)
+    {
+        return GetEasterDate(year).AddDays(49);
+    }
     public void SetTransparentRect(int height, int alpha)
     {
         //var bmp = new Bitmap(image.Width, image.Height);
@@ -109,7 +127,31 @@ public class CalendarImageBuilder
 
     public DateTime GetFileDate(DayImageFile file)
     {
-        return DateTime.ParseExact(file.FileName.Substring(0, 5) + "-" + _date.Year, "MM-dd-yyyy", null);
+        var wrongDate = new DateTime(_date.Year - 1);
+        if (string.IsNullOrEmpty(file.DayMonth))
+        {
+            switch (file.FileDesc)
+            {
+                case "Масляна":
+                    return GetMasnicyaDay(_date.Year);
+                case "Великдень":
+                    return GetEasterDate(_date.Year);
+                case "Трійця":
+                    return GetTrinityDay(_date.Year);
+                default:
+                    return wrongDate;
+            }
+        }
+        else
+        {
+            var dayMonth = file.DayMonth.Split('.');
+            int day, month;
+            if (dayMonth.Length == 2 && int.TryParse(dayMonth[0], out day) && int.TryParse(dayMonth[1], out month))
+            {
+                return new DateTime(_date.Year, month, day);
+            }
+            else return wrongDate;
+        }
     }
 
 }
@@ -128,6 +170,8 @@ public class DayImageFile
 
     [DataMember]
     public String FileDesc { get; set; }
+    [DataMember]
+    public String DayMonth { get; set; }
 
     [DataMember]
     public int Remind { get; set; }

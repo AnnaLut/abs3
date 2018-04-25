@@ -67,6 +67,7 @@
 							"piece",
                             "print",
 							"reload_rotate",
+							"REPLY",
                             "report_open",
 							"report_open-import",
 							"table_column",

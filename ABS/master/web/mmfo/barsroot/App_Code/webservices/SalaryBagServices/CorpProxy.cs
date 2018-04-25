@@ -24,7 +24,7 @@ namespace Corp2Intr {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "4.6.1055.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Web.Services.WebServiceBindingAttribute(Name="ZPIntrWebServiceSoap", Namespace="http://unity-bars.com.ua/ws")]
+    [System.Web.Services.WebServiceBindingAttribute(Name="ZPIntrWebServiceSoap", Namespace="http://unity-bars.com.ua/ws/")]
     public partial class ZPIntrWebService : System.Web.Services.Protocols.SoapHttpClientProtocol {
         
         private System.Threading.SendOrPostCallback UploadCardsDictionaryOperationCompleted;
@@ -53,7 +53,7 @@ namespace Corp2Intr {
         public event SavePayrollInfoFromAbsCompletedEventHandler SavePayrollInfoFromAbsCompleted;
         
         /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://unity-bars.com.ua/ws/UploadCardsDictionary", RequestNamespace="http://unity-bars.com.ua/ws", ResponseNamespace="http://unity-bars.com.ua/ws", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://unity-bars.com.ua/ws/UploadCardsDictionary", RequestNamespace="http://unity-bars.com.ua/ws/", ResponseNamespace="http://unity-bars.com.ua/ws/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
         public SimpleResponse UploadCardsDictionary(string dictXml) {
             object[] results = this.Invoke("UploadCardsDictionary", new object[] {
                         dictXml});
@@ -94,7 +94,7 @@ namespace Corp2Intr {
         }
         
         /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://unity-bars.com.ua/ws/SendOpenCardsToAbs", RequestNamespace="http://unity-bars.com.ua/ws", ResponseNamespace="http://unity-bars.com.ua/ws", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://unity-bars.com.ua/ws/SendOpenCardsToAbs", RequestNamespace="http://unity-bars.com.ua/ws/", ResponseNamespace="http://unity-bars.com.ua/ws/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
         public void SendOpenCardsToAbs() {
             this.Invoke("SendOpenCardsToAbs", new object[0]);
         }
@@ -130,7 +130,7 @@ namespace Corp2Intr {
         }
         
         /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://unity-bars.com.ua/ws/SendPayrollToAbs", RequestNamespace="http://unity-bars.com.ua/ws", ResponseNamespace="http://unity-bars.com.ua/ws", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://unity-bars.com.ua/ws/SendPayrollToAbs", RequestNamespace="http://unity-bars.com.ua/ws/", ResponseNamespace="http://unity-bars.com.ua/ws/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
         public SimpleResponse SendPayrollToAbs(string mfo, string data) {
             object[] results = this.Invoke("SendPayrollToAbs", new object[] {
                         mfo,
@@ -174,7 +174,7 @@ namespace Corp2Intr {
         }
         
         /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://unity-bars.com.ua/ws/SavePayrollInfoFromAbs", RequestNamespace="http://unity-bars.com.ua/ws", ResponseNamespace="http://unity-bars.com.ua/ws", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://unity-bars.com.ua/ws/SavePayrollInfoFromAbs", RequestNamespace="http://unity-bars.com.ua/ws/", ResponseNamespace="http://unity-bars.com.ua/ws/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
         public SimpleResponse SavePayrollInfoFromAbs(string data) {
             object[] results = this.Invoke("SavePayrollInfoFromAbs", new object[] {
                         data});
@@ -225,7 +225,7 @@ namespace Corp2Intr {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://unity-bars.com.ua/ws")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://unity-bars.com.ua/ws/")]
     public partial class SimpleResponse {
         
         private string statusField;

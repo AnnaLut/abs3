@@ -1,7 +1,7 @@
 
  
  PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_rptlic.sql =========*** Run ***
+ PROMPT *** Run *** ========== Scripts \Sql\BARS\package\bars_rptlic.sql =========*** Run ***
  PROMPT ===================================================================================== 
  
   CREATE OR REPLACE PACKAGE BARS.BARS_RPTLIC 
@@ -1273,7 +1273,7 @@ is
                  end;
 
                  if l_value is not null then
-                     l_nazn := l_value;
+                     l_nazn := substr(l_value,1,160);
                      l_value := null;
                  end if;
                  --
@@ -2141,6 +2141,6 @@ grant EXECUTE                                                                on 
  
  
  PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_rptlic.sql =========*** End ***
+ PROMPT *** End *** ========== Scripts \Sql\BARS\package\bars_rptlic.sql =========*** End ***
  PROMPT ===================================================================================== 
  

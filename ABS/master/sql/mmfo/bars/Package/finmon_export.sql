@@ -224,7 +224,7 @@ BEGIN
   IF ISLICENSE THEN
      RETNAME := '';
      IF CUSTTYPE = 3 THEN
-        TMPNAME := ' ' || LTRIM( RTRIM( NMK ) ) || ' ';
+        TMPNAME := ' ' || LTRIM( RTRIM( regexp_replace(NMK, '\s{2,}', ' ') ) ) || ' ';
         BPOS := INSTR( TMPNAME, ' ', 1, NPOS );
         EPOS := INSTR( TMPNAME, ' ', 1, NPOS + 1 );
         RETNAME := SUBSTR( TMPNAME, BPOS + 1, EPOS - ( BPOS + 1 ) );

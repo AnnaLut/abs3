@@ -123,7 +123,7 @@ begin
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYND ';
 exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
+  if  sqlcode=-01408  then null; else raise; end if;
  end;
 /
 
@@ -138,6 +138,18 @@ grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT
 grant SELECT                                                                 on MBM_REL_CUSTOMERS to UPLD;
 
 
+-- Add/modify columns 
+begin
+    execute immediate 'alter table MBM_REL_CUSTOMERS add doc_date_to DATE';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+-- Add comments to the columns 
+comment on column MBM_REL_CUSTOMERS.doc_date_to
+  is 'дата до якої дійсносна ID-картка';
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/Table/MBM_REL_CUSTOMERS.sql =========*** End
