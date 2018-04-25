@@ -34,13 +34,17 @@ BEGIN
    end;   
    begin
      select min(nd) into nd_ from nd_acc n where acc=l_acc;
-     --bars_audit.info('V_CC_PENY_START ins ND = '||nd_); 
+
+     update cc_peny_start set ostc=:NEW.ostc*100, IR=cck_app.TO_number2 (l_IR) where acc=l_acc and nd = nd_;
+    IF SQL%ROWCOUNT = 0 THEN 
      insert into cc_peny_start (acc,ostc,branch,nd,ir)
                         values (l_acc,cck_app.to_number2(:NEW.OSTC)*100
                                ,:new.branch, nd_,l_IR);
+    END IF;
+      -- Если запись добавилась, еще раз проводим update так как Веб не воспринимает такие манипуляции с вьюшкой и возвращает ошибку.
+      update cc_peny_start set ostc=:NEW.ostc*100, IR=cck_app.TO_number2 (l_IR) where acc=l_acc and nd = nd_;
    exception when DUP_VAL_ON_INDEX then
-    --bars_audit.info('V_CC_PENY_START upd ND = '||nd_||' l_acc = '||l_acc);
-    update cc_peny_start set ostc=:NEW.ostc*100, IR=cck_app.TO_number2 (l_IR) where acc=l_acc and nd = nd_;
+    bars_audit.info('V_CC_PENY_START ins ND = '||nd_||' l_acc = '||l_acc||' Duplicate');
    end;
       begin
       select max(bdat) into gl_bd from int_ratn where id=2 and acc=l_acc;

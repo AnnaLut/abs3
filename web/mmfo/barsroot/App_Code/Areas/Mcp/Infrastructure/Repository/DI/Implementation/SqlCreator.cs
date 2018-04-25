@@ -322,5 +322,32 @@ namespace BarsWeb.Areas.Mcp.Infrastructure.DI.Implementation {
                 }
             };
         }
+        public static BarsSql SetFileRecordPayed(decimal fileRecordId, DateTime? date)
+        {
+            return new BarsSql()
+            {
+                SqlText = @"begin
+                                msp.msp_utl.set_file_record_payed(:p_file_record_id, :p_payed_date);
+                            end;",
+                SqlParams = new object[]
+                {
+                    new OracleParameter("p_file_record_id", OracleDbType.Decimal) { Value = fileRecordId },
+                    new OracleParameter("p_payed_date", OracleDbType.Date) { Value = date }
+                }
+            };
+        }
+        public static BarsSql SetFileRecordsReverted(decimal fileRecordId)
+        {
+            return new BarsSql()
+            {
+                SqlText = @"begin
+                                msp.msp_utl.set_file_record_error(:p_file_record_id);
+                            end;",
+                SqlParams = new object[]
+                {
+                    new OracleParameter("p_file_record_id", OracleDbType.Decimal) { Value = fileRecordId }
+                }
+            };
+        }
     }
 }

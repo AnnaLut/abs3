@@ -240,7 +240,7 @@ namespace BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation
                     cmd.ExecuteNonQuery();
 
                     string doc = (Convert.ToInt16(par.TYPE_INS.ToString()) == 1 ?
-                                               @"decode(p.passp, 1, 'PASSPORT', 'EXTERNAL_PASSPORT') as docType, --15
+                                               @"'PASSPORT' as docType, --15
                                                p.ser as docSeries, --16
                                                p.numdoc as docNumber, --17
                                                to_char(p.pdate, 'yyyy-mm-dd') as docDate, /*18*/" :
@@ -375,9 +375,21 @@ namespace BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation
                         customer.code = String.IsNullOrEmpty(reader.GetValue(6).ToString()) ? String.Empty : reader.GetString(6);
                         customer.dontHaveCode = reader.GetString(7) == "true" ? true : false;
                         customer.name = String.IsNullOrEmpty(reader.GetValue(8).ToString()) ? String.Empty : reader.GetString(8);
+                        //customer.nameLast = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? String.Empty : reader.GetString(9);
+                        //customer.nameFirst = String.IsNullOrEmpty(reader.GetValue(10).ToString()) ? String.Empty : reader.GetString(10);
+                        //customer.nameMiddle = String.IsNullOrEmpty(reader.GetValue(11).ToString()) ? String.Empty : reader.GetString(11);
+                        if (Convert.ToInt16(par.TYPE_INS.ToString()) == 1)
+                        {
                         customer.nameLast = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? String.Empty : reader.GetString(9);
                         customer.nameFirst = String.IsNullOrEmpty(reader.GetValue(10).ToString()) ? String.Empty : reader.GetString(10);
                         customer.nameMiddle = String.IsNullOrEmpty(reader.GetValue(11).ToString()) ? String.Empty : reader.GetString(11);
+                        }
+                        else
+                        {
+                            customer.nameLast = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? String.Empty : reader.GetString(27);
+                            customer.nameFirst = String.IsNullOrEmpty(reader.GetValue(10).ToString()) ? String.Empty : reader.GetString(28);
+                            customer.nameMiddle = String.Empty;
+                        }
                         customer.address = String.IsNullOrEmpty(reader.GetValue(12).ToString()) ? String.Empty : reader.GetString(12);
                         customer.phone = String.IsNullOrEmpty(reader.GetValue(13).ToString()) ? String.Empty : reader.GetString(13);
                         customer.birthDate = String.IsNullOrEmpty(reader.GetValue(14).ToString()) ? String.Empty : reader.GetString(14);
@@ -559,7 +571,7 @@ namespace BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation
             using (OracleCommand cmd = con.CreateCommand())
             {
                 string doc = (typeIns == 1 ?
-                                           @"decode(p.passp, 1, 'PASSPORT', 'EXTERNAL_PASSPORT') as docType, --15
+                                           @"'PASSPORT' as docType, --15
                                                p.ser as docSeries, --16
                                                p.numdoc as docNumber, --17
                                                to_char(p.pdate, 'yyyy-mm-dd') as docDate, /*18*/" :
@@ -666,9 +678,21 @@ namespace BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation
                         customer.code = String.IsNullOrEmpty(reader.GetValue(6).ToString()) ? String.Empty : reader.GetString(6);
                         customer.dontHaveCode = reader.GetString(7) == "true" ? true : false;
                         customer.name = String.IsNullOrEmpty(reader.GetValue(8).ToString()) ? String.Empty : reader.GetString(8);
-                        customer.nameLast = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? String.Empty : reader.GetString(9);
-                        customer.nameFirst = String.IsNullOrEmpty(reader.GetValue(10).ToString()) ? String.Empty : reader.GetString(10);
-                        customer.nameMiddle = String.IsNullOrEmpty(reader.GetValue(11).ToString()) ? String.Empty : reader.GetString(11);
+                        //customer.nameLast = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? String.Empty : reader.GetString(9);
+                        //customer.nameFirst = String.IsNullOrEmpty(reader.GetValue(10).ToString()) ? String.Empty : reader.GetString(10);
+                        //customer.nameMiddle = String.IsNullOrEmpty(reader.GetValue(11).ToString()) ? String.Empty : reader.GetString(11);
+                        if (typeIns == 1)
+                        {
+                           customer.nameLast = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? String.Empty : reader.GetString(9);
+                           customer.nameFirst = String.IsNullOrEmpty(reader.GetValue(10).ToString()) ? String.Empty : reader.GetString(10);
+                           customer.nameMiddle = String.IsNullOrEmpty(reader.GetValue(11).ToString()) ? String.Empty : reader.GetString(11);
+                        } 
+                        else
+                        {
+                           customer.nameLast = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? String.Empty : reader.GetString(27);
+                           customer.nameFirst = String.IsNullOrEmpty(reader.GetValue(10).ToString()) ? String.Empty : reader.GetString(28);
+                           customer.nameMiddle = String.Empty;
+                        }
                         customer.address = String.IsNullOrEmpty(reader.GetValue(12).ToString()) ? String.Empty : reader.GetString(12);
                         customer.phone = String.IsNullOrEmpty(reader.GetValue(13).ToString()) ? String.Empty : reader.GetString(13);
                         customer.birthDate = String.IsNullOrEmpty(reader.GetValue(14).ToString()) ? String.Empty : reader.GetString(14);

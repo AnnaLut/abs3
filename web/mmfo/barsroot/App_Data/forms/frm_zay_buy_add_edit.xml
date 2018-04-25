@@ -283,7 +283,7 @@
         <customfield name="P_KURS_Z" label="Курс заяви" datatype="Decimal" datasourcefield="KURS_Z" columnindex="2" index="4">
           <uicontrol type="DecimalInput" controlwidth="148" />
         </customfield>
-        <customfield name="P_META" label="Мета" datatype="Decimal" required="true" datasourcefield="META" columnindex="2" index="5">
+        <customfield name="P_META" label="Мета" datatype="Decimal" required="false" datasourcefield="META" columnindex="2" index="5">
           <uicontrol type="DropDownList"  addemptyitem="true" keyfield="AIM" valuefield="NAME" table="( select AIM, to_char(aim,'09')||' '||NAME name from ZAY_AIMS where type = 1)" controlwidth="153"></uicontrol>
         </customfield>
         <customfield name="P_CONTRACT" label="Контракт/кред.договор №" datatype="String" size="100" datasourcefield="CONTRACT" columnindex="2" index="6">

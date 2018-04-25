@@ -12,11 +12,11 @@
   20.06.2017 LSO acc_add добавлен OB22 если приходит из формы то проставляем с проверкой
 */
 
-  PROCEDURE pass_dop
-  (
-    p_tag VARCHAR2
-   ,p_txt VARCHAR2
-  );
+
+  PROCEDURE p_gpk_default(nd         CC_DEAL.ND%TYPE DEFAULT NULL,
+                          GPK_TYPE   NUMBER,
+                          ROUND_TYPE NUMBER);
+  PROCEDURE pass_dop(p_tag VARCHAR2, p_txt VARCHAR2);
   --------------------------------------------------------
  --Зміна призначення платежу при нарахуванні % в портфелі ССKF i CCKU
   PROCEDURE p_int_reckoning_nazn_edit
@@ -253,6 +253,13 @@
    ,p_nd   NUMBER
    ,p_dat  DATE
   ); ---- Розрахунок ЕПС
+
+	PROCEDURE p_repay_multi_ss --COBUMMFO-5666  погашення по мультивалютній лінії залишку в валюті
+  (p_nd in CC_DEAL.ND%TYPE);
+  PROCEDURE p_update_new_acc_zastav --COBUMMFO-4899 Оновлення даних нових рахунків застав даними старих рахунків
+  (p_nd_old IN cc_deal.nd%TYPE, p_nd_new IN cc_deal.nd%TYPE);
+  PROCEDURE p_change_responsible_executor --COBUMMFO-5524 зміна відповідального виконавця по договору КД ЮО
+  (p_nd in CC_DEAL.ND%TYPE, p_userid IN cc_deal.user_id%TYPE);
   ------------------
   FUNCTION header_version RETURN VARCHAR2;
   FUNCTION body_version RETURN VARCHAR2;
@@ -261,11 +268,13 @@ END cck_ui;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.CCK_UI AS
 
-  g_body_version CONSTANT VARCHAR2(64) := 'ver.3.3 PLAN 29.11.2017';
+  g_body_version CONSTANT VARCHAR2(64) := 'ver.3.5 PLAN 24.01.2018';
   g_errn NUMBER := -20203;
   g_errs VARCHAR2(16) := 'CCK_UI:';
 
 /*
+  LSO ver.3.3 10.10.2017 Функция на вычитку доступных типов счетов
+  LSO ver.3.2 04.10.2017 COBUPRVNIX-2 Зміна умов авторизації
   20.07.2016 Sta COBUMMFO-4088  розділення  PROCEDURE trs_upd   та об'єднання траншів  PROCEDURE trs_add
   LSO ver.2.1.8 19/03/2017 процедура   rel_nls реализовал проверку что счет принадлежит клиенту
   LSO ver.2.1.6 09/03/2017 Фикс Подбор счетов при ручніх операциях
@@ -1203,7 +1212,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_UI AS
 
     IF p_mode = 0 THEN
       -- Проста
-
+     /*
       BEGIN
         SELECT count(1)
           INTO L_ss_count
@@ -1211,16 +1220,17 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_UI AS
          WHERE nd = l_nd
            AND n.acc = a.acc
            AND a.tip = 'SS ';
-     /* EXCEPTION
-        WHEN no_data_found THEN
-          raise_application_error(g_errn
-                                 ,g_errs || 'Не відкрито рах.позики SS');*/
+     --EXCEPTION
+     --   WHEN no_data_found THEN
+     --    raise_application_error(g_errn
+     --                           ,g_errs || 'Не відкрито рах.позики SS');
       END;
+
   if L_ss_count=0 then
    raise_application_error(g_errn
                                  ,g_errs || 'Не відкрито рах.позики SS');
   end if;
-   /*   BEGIN
+      BEGIN
         SELECT 1
           INTO ntmp_
           FROM cc_accp z, nd_acc n
@@ -1549,9 +1559,18 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_UI AS
                                ,g_errs || '8999*:Не знайдено ');
     END;
 
-    cck.cc_lim_gpk(nd_ => l_nd, datn_ => p_fdat);
+    -- PROCEDURE cc_lim_gpk(nd_ INT, acc_ INT, datn_ DATE)
+    --cck.cc_lim_gpk(nd_ => l_nd, datn_ => p_fdat);
+    cck.cc_lim_gpk(nd_ => l_nd, acc_ => null, datn_ => p_fdat);
+    cck.cc_tmp_gpk(nd_      => l_nd,
+                   nvid_    => null,
+                   acc8_    => null,
+                   dat3_    => null,
+                   dat4_    => null,
+                   reserv_  => null,
+                   sumr_    => null,
+                   gl_bdate => gl.bdate);
 
-    cck.cc_tmp_gpk(nd_ => l_nd);
     cck.lim_bdate(p_nd => l_nd, p_dat => p_fdat);
   END glk_upd;
   ---
@@ -1988,15 +2007,15 @@ END p_cck_interest;
     l_mode INT := 1;
 
   BEGIN
-
-    IF p_type = 1 THEN
+null;
+   /* IF p_type = 1 THEN
 
       p_interest_cck1(11, NULL);
       cdb_mediator.pay_accrued_interest;
     ELSIF p_type = 2 THEN
       p_interest_cck1(1, NULL);
       cdb_mediator.pay_accrued_interest;
-    END IF;
+    END IF;*/
   END p_interest_cck;
   --Зміна призначення платежу при нарахуванні % в портфелі ССKF i CCKU
   PROCEDURE p_int_reckoning_nazn_edit
@@ -2060,7 +2079,27 @@ END p_cck_interest;
     END IF;
 
   END p_int_reckoning_summ_edit;
+  PROCEDURE p_gpk_default(nd         CC_DEAL.ND%TYPE DEFAULT NULL,
+                          GPK_TYPE   NUMBER,
+                          ROUND_TYPE NUMBER) IS
+    l_nd CC_DEAL.ND%TYPE;
+  begin
+    l_nd := nvl(nd, to_number(pul.get_mas_ini_val('ND')));
+    cck.cc_gpk(GPK_TYPE,
+               l_nd,
+               null,
+               null,
+               null,
+               null,
+               null,
+               null,
+               null,
+               ROUND_TYPE);
+    cck_ui.GPK_Bal(null, null, 0);
+
+  end p_gpk_default;
   -----------------------
+
   PROCEDURE gpk_bild
   (
     p_nd      NUMBER
@@ -2427,24 +2466,14 @@ END p_cck_interest;
          AND i.id = 0;
     EXCEPTION
       WHEN no_data_found THEN
-        raise_application_error(g_errn
-                               ,g_errs || '8999*:Не знайдено ');
+        raise_application_error(g_errn,
+                                g_errs || '8999*:Не знайдено ');
     END;
     cck.cc_lim_gpk(nd_ => l_nd, acc_ => l_acc, datn_ => gl.bd);
-
-    cck.cc_tmp_gpk(l_nd
-                  ,0
-                  ,l_acc
-                  ,to_date('31/05/2016', 'dd/mm/yyyy')
-                  ,to_date('31/05/2016', 'dd/mm/yyyy'));
     cck.lim_bdate(l_nd, gl.bdate);
   END glk_bal;
 
-  PROCEDURE gpk_prc
-  (
-    p_nd   NUMBER
-   ,p_mode NUMBER
-  ) IS --- пересчет процентов
+  PROCEDURE gpk_prc(p_nd NUMBER, p_mode NUMBER) IS --- пересчет процентов
   BEGIN
     NULL;
   END gpk_prc;
@@ -2826,6 +2855,327 @@ END p_cck_interest;
     --Call FunNSIEditF("PROT_IRR",2)
   END c_irr;
 
+
+  ------------------------------------
+    PROCEDURE p_check_userin_atrvalue
+    (p_attribute_code IN branch_attribute_value.attribute_code%TYPE)
+    IS
+    --перевірка юзера в branch_attribute_value
+    l_curr_branch     branch.branch%TYPE := sys_context('bars_context','user_branch');
+    l_userid          cc_deal.user_id%TYPE := sys_context('bars_global','user_id');
+    l_uservalue       BRANCH_ATTRIBUTE_VALUE.attribute_value%TYPE;
+
+    BEGIN
+
+    l_uservalue := branch_attribute_utl.get_attribute_value(l_curr_branch,
+                                                                p_attribute_code,
+                                                                p_raise_expt    => 1,
+                                                                p_parent_lookup => 1,
+                                                                p_check_exist   => 0);
+        IF to_number(l_uservalue) != l_userid THEN
+          raise_application_error(g_errn,
+                                  g_errs || 'p_repay_multi_ss-' ||
+                                  ' Не знайдено параметр користувача =' ||
+                                  l_userid || ' для регіону - ' ||
+                                  l_curr_branch || ' .');
+        END IF;
+
+  EXCEPTION
+    WHEN OTHERS THEN
+  bars_audit.error('cck_ui.p_check_userin_atrvalue' || chr(10) || sqlerrm ||
+                       chr(10) || dbms_utility.format_error_stack());
+  raise_application_error(-20203,'Не вдалося виконати пошук користувача в branch_attribute_value- '||
+  dbms_utility.format_error_stack());
+  END p_check_userin_atrvalue;
+
+  PROCEDURE p_repay_multi_ss --COBUMMFO-5666
+  (p_nd in CC_DEAL.ND%TYPE) IS
+    /*1.  Перевірити, що тип  КД – ЮО.
+    2.  По таблиці nd_acc (всі рахунки по КД) вибрати рахунок з типом SS (тіло кредиту).
+    3.  Зберегти з поля accc значення з рахунків SS. cc_tag –сюди додати теги з пустим полем code. Самі значення живуть в nd_txt.
+    4.  Скинути значення поля accc в null.
+    5.  Виконання лише на рівні 300465.
+    6.  Передбачити зворотню дію*/
+
+    l_nd CC_DEAL.ND%TYPE;
+    TYPE accc_col IS TABLE OF accounts.accc%TYPE;
+    CURSOR c1 IS SELECT accc, acc FROM accounts;
+    TYPE acc_cols IS TABLE OF c1%ROWTYPE;
+    v_accc_col        acc_cols;
+    v_accc_col_nd_txt accc_col;
+    l_curr_kf         cc_deal.kf%TYPE := sys_context('bars_context','user_mfo');
+  begin
+
+    --bars_audit.info('Start cck_ui.p_repay_multi_ss nd = ' || p_nd);
+
+    --перевірка юзера
+    p_check_userin_atrvalue(p_attribute_code => 'ACC_USER');
+
+    --1
+    BEGIN
+      SELECT d.nd
+        INTO l_nd
+        FROM cc_Deal d
+       WHERE d.vidd in (1, 2, 3)
+         AND d.nd = p_nd;
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        raise_application_error(g_errn,
+                                g_errs || 'p_repay_multi_ss -' ||
+                                'Тип КД =' || p_nd || ', не є ЮО або не заповнений !');
+      WHEN TOO_MANY_ROWS THEN
+        raise_application_error(g_errn,
+                                g_errs || 'p_repay_multi_ss -' || 'КД =' || p_nd ||
+                                ', має декілька записів');
+    END;
+
+    --2
+    SELECT a.accc, a.acc
+      BULK COLLECT
+      INTO v_accc_col
+      FROM cc_Deal d, nd_Acc na, accounts a
+     WHERE d.vidd IN (1, 2, 3)
+       AND d.nd = p_nd
+       AND d.nd = na.nd
+       AND a.acc = na.acc
+       AND a.tip = 'SS '
+       AND a.accc IS NOT NULL;
+
+    --6 read old accc
+    SELECT to_number(substr(nt.txt, 1, 38))
+      BULK COLLECT
+      INTO v_accc_col_nd_txt
+      FROM nd_txt nt
+     WHERE nt.nd = p_nd
+       AND nt.tag = 'ACCC_VAL'
+       AND nt.kf = l_curr_kf
+       AND nt.txt IS NOT NULL;
+
+    --bars_audit.info('l_curr_kf= ' || l_curr_kf);
+    --bars_audit.info('p_nd= ' || p_nd);
+    --bars_audit.info('v_accc_col_nd_txt.count= ' || v_accc_col_nd_txt.count);
+    --bars_audit.info('v_accc_col.count= ' || v_accc_col.count);
+
+    --3
+    IF  v_accc_col.count > 0 THEN
+        /* cc_tag script add
+         FORALL c_accc IN v_accc_col.FIRST..v_accc_col.LAST
+           insert into cc_tag t (tag, name, tagtype, table_name, type, nsisqlwhere, edit_in_form, not_to_edit, code)
+           values ('ACCC_VAL', 'Поле accc.accounts по вхідному нд', 'CCK', 'ACCOUNTS', 'N', v_accc_col(c_accc), 0, 1, null);
+        */
+
+        FOR c_accc IN v_accc_col.FIRST .. v_accc_col.LAST LOOP
+          cck_app.Set_ND_TXT(p_nd, 'ACCC_VAL', v_accc_col(c_accc).accc);
+        END LOOP;
+
+        --4
+        FOR c_accc2 IN v_accc_col.FIRST .. v_accc_col.LAST
+          LOOP
+            ---bars_audit.info('v_accc_col(c_accc2)= ' ||v_accc_col(c_accc2));
+          UPDATE accounts ac
+             SET ac.accc = NULL
+           WHERE ac.accc = v_accc_col(c_accc2).accc
+             AND ac.acc =  v_accc_col(c_accc2).acc;
+          END LOOP;
+
+      ELSIF v_accc_col_nd_txt.count > 0 THEN
+
+        --6
+        --bars_audit.info('before update p_nd= ' || p_nd);
+
+        FOR c_accc3 IN v_accc_col_nd_txt.FIRST .. v_accc_col_nd_txt.LAST
+          LOOP
+
+          --bars_audit.info(' v_accc_col_nd_txt(c_accc) = ' ||  v_accc_col_nd_txt(c_accc3));
+
+        FOR c_accc4 IN (    SELECT a.acc
+                                 FROM cc_Deal d, nd_Acc na, accounts a
+                               WHERE d.vidd IN (1, 2, 3)
+                                 AND d.nd = p_nd
+                                 AND d.nd = na.nd
+                                 AND a.acc = na.acc
+                                 AND a.tip = 'SS '
+                                 AND a.accc IS NULL )           LOOP
+          UPDATE accounts at
+             SET at.accc = v_accc_col_nd_txt(c_accc3)
+           WHERE at.acc IN (SELECT a.acc
+                              FROM cc_Deal d, nd_Acc na, accounts a
+                             WHERE d.vidd IN (1, 2, 3)
+                               AND d.nd = p_nd
+                               AND d.nd = na.nd
+                               AND a.acc = na.acc
+                               AND a.tip = 'SS '
+                               AND a.acc = c_accc4.acc);
+          END LOOP;
+        END LOOP;
+
+        FOR i IN v_accc_col_nd_txt.FIRST .. v_accc_col_nd_txt.LAST --deleting tags
+         LOOP
+           --bars_audit.info('cck_app.Set_ND_TXT del p_nd= ' || p_nd);
+          cck_app.Set_ND_TXT(p_nd, 'ACCC_VAL', p_txt => NULL); --without p_txt del
+        END LOOP;
+
+      ELSE
+
+        raise_application_error(-20203,
+                                'Не вдалося погасити по мультивалютній
+    лінії залишок в валюті, відмінної від базової (валюта рахунку LIM), не знайдено accc по nd - ' || p_nd ||
+                                dbms_utility.format_error_stack());
+    END IF;
+
+    --bars_audit.info('Finish cck_ui.p_repay_multi_ss  nd = ' || p_nd);
+
+  EXCEPTION
+    WHEN OTHERS THEN
+      bars_audit.error('cck_ui.p_repay_multi_ss' || chr(10) || sqlerrm ||
+                       chr(10) || dbms_utility.format_error_stack());
+      raise_application_error(-20203,
+                              'Не вдалося погасити по мультивалютній
+    лінії залишок в валюті, відмінної від базової (валюта рахунку LIM) - ' ||
+                              dbms_utility.format_error_stack());
+  end p_repay_multi_ss;
+
+  PROCEDURE p_update_new_acc_zastav --COBUMMFO-4899
+  (p_nd_old IN cc_deal.nd%TYPE, p_nd_new IN cc_deal.nd%TYPE)
+  IS
+
+  BEGIN
+    --bars_audit.info('Start cck_ui.p_update_new_acc_zastav p_nd = ' || p_nd||', p_userid = '||p_userid||';');
+
+    --перевірка юзера
+    p_check_userin_atrvalue(p_attribute_code => 'ACC_USER');
+
+  BEGIN
+
+     FOR i IN (SELECT UNIQUE p.acc, p.pr_12 --рахунки застав старого договору
+                    FROM bars.accounts az,
+                         bars.pawn_acc sz,
+                         bars.cc_accp  p,
+                         bars.customer t,
+                         bars.CC_PAWN  cp
+                   WHERE t.rnk = az.rnk
+                     AND cp.pawn = sz.pawn
+                     AND az.acc = sz.acc
+                     AND az.acc = p.acc
+                     AND p.accs IN
+                         (SELECT a.acc
+                            FROM bars.nd_acc t, bars.accounts a
+                           WHERE a.acc = t.acc
+                             AND t.nd = p_nd_old
+                             AND a.tip IN ('SS ', 'CR9', 'SP '))) LOOP
+          BEGIN
+            FOR j IN (SELECT n.acc --рахунки застав нового договору
+                        FROM bars.nd_acc n, bars.accounts a
+                       WHERE a.acc = n.acc
+                         AND a.tip = 'SS '
+                         AND n.nd = p_nd_new) LOOP
+
+              BEGIN
+                INSERT INTO cc_accp --дані рахунків застав старого договору зберігаємо для нового
+                  (ACC, ACCS, pr_12, nd)
+                VALUES
+                  (i.acc, j.acc, i.pr_12, p_nd_new);
+
+                /*  RETURNING j.acc INTO l_acc;
+                CASE WHEN l_acc IS NULL THEN
+                     -- bars_error.raise_error('CCK', 5); --KD_NOT_FOUND
+                     raise_application_error(g_errn, g_errs||'p_update_new_acc_zastav'||' Не знайдено новий КД =' || p_nd);
+                END CASE;
+                l_acc := NULL;*/
+
+                --bars.bars_audit.info('Finish CCK_UI.p_update_new_acc_zastav. Перенесення застав з КД ' || c.nd ||
+                --' в КД ' || c.nd_new ||' рах.застави ' || i.acc || ' рах.SS ' ||j.acc || ' Успішне.');
+              EXCEPTION
+                WHEN dup_val_on_index THEN
+                  bars.bars_audit.error('CCK_UI.p_update_new_acc_zastav. Перенесення застав з КД ' || p_nd_old ||
+                                        ' в КД ' || p_nd_new ||
+                                        ' рах.застави ' || i.acc ||
+                                        ' рах.SS ' || j.acc ||
+                                        ' неуспішне, такі дані вже існують');
+              END;
+            END LOOP;
+          EXCEPTION
+            WHEN NO_DATA_FOUND THEN
+              raise_application_error(g_errn,
+                                      g_errs || 'p_update_new_acc_zastav.' ||
+                                      ' Не знайдено новий КД =' || p_nd_new ||
+                                      dbms_utility.format_error_stack());
+          END;
+        END LOOP;
+
+  EXCEPTION
+     WHEN NO_DATA_FOUND THEN
+         raise_application_error(g_errn,
+                                 g_errs || 'p_update_new_acc_zastav.' ||
+                                 ' Не знайдено старий КД =' || p_nd_old ||
+                                 dbms_utility.format_error_stack());
+          END;
+
+  END p_update_new_acc_zastav;
+
+  PROCEDURE p_change_responsible_executor --COBUMMFO-5524
+  (p_nd in CC_DEAL.ND%TYPE, p_userid IN cc_deal.user_id%TYPE)
+  IS
+    /*Призначення -
+    Надати можливість змінювати відповідального виконавця
+    за договором КД ЮО*/
+
+    l_curr_kf      cc_deal.kf%TYPE := sys_context('bars_context','user_mfo');
+    l_userid       cc_deal.user_id%TYPE;
+  begin
+
+    --перевірка юзера
+    --p_check_userin_atrvalue(p_attribute_code => 'ACC_USER');
+	
+	 BEGIN 
+			
+	 SELECT c.user_id 
+	   INTO l_userid
+	   FROM cc_deal c	
+	  WHERE c.nd = p_nd
+      AND c.kf = l_curr_kf;
+		
+	 EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        NULL;
+      WHEN TOO_MANY_ROWS THEN
+        NULL;
+   END;
+    
+CASE WHEN (l_userid != p_userid)  THEN
+
+    UPDATE cc_deal d
+       SET d.user_id = p_userid --staff$base.id  id selected by user on form
+     WHERE d.nd = p_nd
+       AND d.kf = l_curr_kf;
+
+
+    CASE
+      WHEN (sql%rowcount = 0) THEN
+        raise_application_error(g_errn,
+                                g_errs || 'p_change_responsible_executor' ||
+                                'КД =' || p_nd ||
+                                ', не знайдено в таблиці договорів (cc_deal)');
+      ELSE
+        NULL;
+    END CASE;
+	
+ELSE 
+ NULL;
+END CASE;
+    --bars_audit.info('Finish cck_ui.p_change_responsible_executor  nd = ' || p_nd);
+
+  exception
+    when others then
+      bars_audit.error(g_errs || 'p_change_responsible_executor' ||
+                       chr(10) || sqlerrm || chr(10) ||
+                       dbms_utility.format_error_stack());
+      raise_application_error(g_errn,
+                              g_errs || 'p_change_responsible_executor' ||
+                              'Не вдалося  змінити відповідального виконавця
+                                             за договором КД ЮО.' ||
+                              dbms_utility.format_error_stack());
+  end p_change_responsible_executor;
   ------------------------------------------------------------------------------------------------
   FUNCTION header_version RETURN VARCHAR2 IS
   BEGIN
