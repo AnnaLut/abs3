@@ -1,4 +1,10 @@
-CREATE OR REPLACE PACKAGE BARS.MONEX_RU IS
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/monex_ru.sql =========*** Run *** ==
+ PROMPT ===================================================================================== 
+
+ CREATE OR REPLACE PACKAGE BARS.MONEX_RU IS
 
  -- Системы педеводов. Единое онко. Клиринг. Профикс.
  -- Уровень РУ (там, где есть точки обслуживания клиентов)
@@ -39,11 +45,7 @@ procedure OP_nls_MTI (b1_ varchar2, b2_ varchar2, b3_ varchar2, b4_ varchar2, b5
 
 end monex_RU;
 /
-
-GRANT execute ON BARS.monex_RU  TO BARS_ACCESS_DEFROLE;
-
-
-CREATE OR REPLACE PACKAGE BODY BARS.monex_RU IS
+CREATE OR REPLACE PACKAGE BODY BARS.MONEX_RU IS
 
  -- Системы педеводов. Единое онко. Клиринг. Профикс.
  -- Уровень РУ (там, где есть точки обслуживания клиентов)
@@ -52,8 +54,13 @@ CREATE OR REPLACE PACKAGE BODY BARS.monex_RU IS
    g_body_version   CONSTANT VARCHAR2 (64) := 'version 2  08.11.2017 ';
 
 /*
-15.11.2017 Sta Изменения, связанные с Трансф.БС 2017   6110.хх => 6510.хх
+01.02.2018 Sta COBUMMFO-6497   
+  1) функція «Відкриття рахунків для роботи Бр-3 в МТІ» відкриваються рахунки з некоректними спецпараметрами.
+     Просимо для рахунків 2809 спецпараметр R011=9 змінити на R011=6, а
+     для рахунків 2909 спецпараметр R011=2 змінити на R011=0
+  2) обхожу без "свала" попытки открыть счета для систем, у которых в настройках остались закрытые об22
 
+15.11.2017 Sta Изменения, связанные с Трансф.БС 2017   6110.хх => 6510.хх
 21.07.2017    Сухова  Реанимация существующего счета при открытии нового.
 12.06.2017    COBUSUPMMFO-851  Sta Авто-Спец парам для счетоа 2909 и 2809
           для 2809 R011=9, S180=3, S240=2
@@ -84,7 +91,7 @@ procedure op_NLSM ( p_nbs    accounts.nbs%type,    p_ob22   accounts.ob22%type, 
 begin
 
   begin select substr( P_ob22||' '|| replace (txt,'у','i'), 1,50), r020        into ra.nms, ra.nbs  from sb_ob22 where r020 = p_NBS   and ob22= P_OB22 and d_close is null;
-  EXCEPTION WHEN NO_DATA_FOUND THEN   
+  EXCEPTION WHEN NO_DATA_FOUND THEN 
      If p_NBS ='6110' then 
         begin select substr( P_ob22||' '|| replace (txt,'у','i'), 1,50), r020  into ra.nms, ra.nbs  from sb_ob22  where r020 = '6510' and ob22= P_OB22 and d_close is null;
         EXCEPTION WHEN NO_DATA_FOUND THEN   null ;
@@ -92,7 +99,7 @@ begin
      end if;
   end ;
 
-  If ra.NBS is null then raise_application_error(-20100, '     : Недопустима пара ' || p_NBS || '/' || P_OB22  ); end if;
+  If ra.NBS is null then RETURN ; end if ; ------------raise_application_error(-20100, '     : Недопустима пара ' || p_NBS || '/' || P_OB22  ); 
   --------------------------------------------------------------------------------------------------------------------------
   ra.nls := vkrzn( substr(p_branch,2,5),    ra.nbs || '00' || MONEX_RU.ob3(p_ob22) || '00' || substr( substr(p_branch,-4), 1,3)   ) ;
 
@@ -119,8 +126,12 @@ begin
    -- дополнительно к открытию счета + 12.06.2017    COBUSUPMMFO-851  Sta Авто-Спец парам для счетоа 2909 и 2809
    update accounts set tobo = p_branch where acc=ra.acc ;
    Accreg.setAccountSParam ( ra.acc, 'OB22', p_OB22 )   ;
-   If    ra.nbs='2809' then Accreg.setAccountSParam(ra.acc,'R011',9); Accreg.setAccountSParam(ra.acc,'S180',3); Accreg.setAccountSParam(ra.acc,'S240',2) ;
-   elsIf ra.nbs='2909' then Accreg.setAccountSParam(ra.acc,'R011',2); Accreg.setAccountSParam(ra.acc,'S180',3); Accreg.setAccountSParam(ra.acc,'S240',2) ;
+
+--для рахунків 2809 спецпараметр R011=9 змінити на R011=6
+--для рахунків 2909 спецпараметр R011=2 змінити на R011=0
+
+   If    ra.nbs='2809' then Accreg.setAccountSParam(ra.acc,'R011',6); Accreg.setAccountSParam(ra.acc,'S180',3); Accreg.setAccountSParam(ra.acc,'S240',2) ;
+   elsIf ra.nbs='2909' then Accreg.setAccountSParam(ra.acc,'R011',0); Accreg.setAccountSParam(ra.acc,'S180',3); Accreg.setAccountSParam(ra.acc,'S240',2) ;
    end if ;
 
    declare
@@ -222,3 +233,15 @@ end OP_nls_MTI ;
 
 end monex_RU;
 /
+ show err;
+ 
+PROMPT *** Create  grants  MONEX_RU ***
+grant EXECUTE                                                                on MONEX_RU        to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on MONEX_RU        to CUST001;
+
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/monex_ru.sql =========*** End *** ==
+ PROMPT ===================================================================================== 
+ 

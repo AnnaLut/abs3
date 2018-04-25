@@ -1,5 +1,3 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/DPT_PAYMENTS.sql =========*** Run *** 
 PROMPT ===================================================================================== 
@@ -201,7 +199,6 @@ grant SELECT                                                                 on 
 grant SELECT                                                                 on DPT_PAYMENTS    to BARS_SUP;
 grant SELECT                                                                 on DPT_PAYMENTS    to RPBN001;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_PAYMENTS    to WR_ALL_RIGHTS;
-
 
 
 PROMPT ===================================================================================== 

@@ -1,7 +1,7 @@
 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_dpt_stop.sql =========*** Run ***
- PROMPT ===================================================================================== 
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_dpt_stop.sql =========*** Run ***
+PROMPT ===================================================================================== 
 
 
 CREATE OR REPLACE FUNCTION f_dpt_stop
@@ -70,7 +70,7 @@ IS
   l_dat_po    date;
   l_sum_month oper.s%type;
   l_comproc   dpt_vidd.comproc%type;
-  l_is_bnal   number;
+  l_is_bnal   dpt_depositw.value%type;
   --------------------------------------
 BEGIN
 
@@ -505,17 +505,14 @@ BEGIN
        bars_audit.info(c_modcode || ' «агальна сума: ' || l_sum ||
                          ' —умма депозиту: ' || l_limit);
       
-      select count(*)
-      into l_is_bnal
-      from bars.dpt_depositw dw
-      where dw.dpt_id = l_dptid
-        and dw.tag = 'NCASH'
-        and dw.value = 1;
+      l_is_bnal := bars.dpt.f_dptw(l_dptid, 'NCASH');
         
       bars_audit.trace('1478 безнал: ' || l_is_bnal);
         
-      if (l_count_mm = 0) and (l_is_bnal > 0) then -- первый мес€ц и безнал
-
+      if (l_count_mm = 0) and (l_is_bnal ='1') then -- первый мес€ц и безнал
+       if kost(l_acc,trunc(sysdate - 1)) = 0 then -- первичный взнос
+        null;
+       else
         if l_sum > l_limit * 2 then
           bars_audit.info(c_modcode || ' ѕеревищено суму л≥м≥ту ' ||
                            to_char(l_limit) || ' за м≥сць з ' ||
@@ -526,6 +523,7 @@ BEGIN
          else
            return 0;                  
          end if;
+        end if; 
       elsif l_sum > l_limit then
         bars_audit.info(c_modcode || ' ѕеревищено суму л≥м≥ту ' ||
                            to_char(l_limit) || ' за м≥сць з ' ||
@@ -549,7 +547,7 @@ BEGIN
 END f_dpt_stop ;
 
 /
- show err;
+show err;
  
 PROMPT *** Create  grants  F_DPT_STOP ***
 grant EXECUTE                                                                on F_DPT_STOP      to BARS_ACCESS_DEFROLE;
@@ -558,6 +556,6 @@ grant EXECUTE                                                                on 
 
  
  
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/function/f_dpt_stop.sql =========*** End ***
- PROMPT =====================================================================================
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/function/f_dpt_stop.sql =========*** End ***
+PROMPT =====================================================================================

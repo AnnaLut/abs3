@@ -19,6 +19,7 @@ BEGIN
 END; 
 /
 
+
 PROMPT *** Create  table RKO_SIGNATORY ***
 begin 
   execute immediate '
@@ -45,7 +46,8 @@ begin
   TABLESPACE BRSSMLD ';
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 
-end; 
+end;
+ 
 /
 
 
@@ -112,7 +114,7 @@ exception when others then
  ALTER TABLE RKO_SIGNATORY
   MODIFY (DIVISION_PRSN_GEN      VARCHAR2(300),
           POSITION_PRSN_GEN      VARCHAR2(300),
-          POSITION_PRSN_NOM      VARCHAR2(300))
+          POSITION_PRSN_NOM      VARCHAR2(300));
 
 
 PROMPT *** Create  grants  RKO_SIGNATORY ***

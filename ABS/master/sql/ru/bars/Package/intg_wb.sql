@@ -55,7 +55,7 @@ IS
   -- пакет процедур для работы интеграции веб банкинга "Вклады населения-WEB"
   -- часть 1 продуктовый ряд депозитов
   --
-  g_body_version  CONSTANT VARCHAR2(64)  := 'version 1.27 02.08.2017';
+  g_body_version  CONSTANT VARCHAR2(64)  := 'version 1.28 23.02.2018';
   G_ERRMOD        CONSTANT VARCHAR2 (3) := 'BCK';
   g_is_error      CONSTANT BOOLEAN := FALSE;
   g_cur_rep_id    CONSTANT NUMBER := -1;
@@ -641,47 +641,57 @@ procedure header_mode (gmode in int) is
 
       pipe row (l_dptvidd);
     end;
+    
     function get_loyality_rate(p_vidd dpt_vidd.vidd%type, p_kv tabval.kv%type) return number
     is
     l_result number := 0;
     begin
      begin
+
+    select nvl(val,0)
+      into l_result
+      from dpt_bonus_settings
+     where dpt_vidd = p_vidd 
+       and bonus_id = dpt_bonus.get_bonus_id('DPWB')/*3*/
+       and kv = p_kv
+       and trunc(sysdate) between dat_begin and nvl(dat_end, to_date('31.12.4999','DD.MM.YYYY'));
+       
+   exception when no_data_found then
+     begin
       select nvl(val,0)
-        into l_result
-        from dpt_bonus_settings
-       where dpt_vidd = p_vidd and bonus_id =3
-         and kv = p_kv;
-     exception when no_data_found then
-       begin
-           select nvl(val,0)
-            into l_result
-            from dpt_bonus_settings
-           where dpt_type = (select type_id
-                             from dpt_vidd
-                             where vidd = p_vidd
-                             and (flag = 1 or g_prod_mode = 1)
-                             --and flag = 1
-                             )
-             and kv = p_kv and bonus_id = 3;
-       exception when no_data_found then l_result := 0;
-       end;
-       when too_many_rows then
-       begin
-           select nvl(val,0)
-            into l_result
-            from dpt_bonus_settings
-           where dpt_type = (select type_id
-                             from dpt_vidd
-                             where vidd = p_vidd
-                             and (flag = 1 or g_prod_mode = 1)
-                             --and flag = 1
-                             )
-             and dpt_vidd = p_vidd
-             and bonus_id = 3
-             and kv = p_kv;
-       exception when no_data_found then l_result := 0;
-       end;
+      into l_result
+      from dpt_bonus_settings
+       where dpt_type = (select type_id
+                         from dpt_vidd
+                         where vidd = p_vidd
+                         and (flag = 1 or g_prod_mode = 1)
+                         --and flag = 1
+                         )
+       and kv = p_kv 
+       and bonus_id = dpt_bonus.get_bonus_id('DPWB')/*3*/
+       and trunc(sysdate) between dat_begin and nvl(dat_end, to_date('31.12.4999','DD.MM.YYYY'));
+       
+     exception when no_data_found then l_result := 0;
      end;
+     
+     when too_many_rows then
+     begin
+      select nvl(val,0)
+      into l_result
+      from dpt_bonus_settings
+       where dpt_type = (select type_id
+                         from dpt_vidd
+                         where vidd = p_vidd
+                         and (flag = 1 or g_prod_mode = 1)
+                         --and flag = 1
+                         )
+         and dpt_vidd = p_vidd
+         and bonus_id = dpt_bonus.get_bonus_id('DPWB')/*3*/
+         and kv = p_kv
+         and trunc(sysdate) between dat_begin and nvl(dat_end, to_date('31.12.4999','DD.MM.YYYY'));
+     exception when no_data_found then l_result := 0;
+     end;
+   end;
 
     return l_result;
     end;
@@ -775,5 +785,6 @@ procedure header_mode (gmode in int) is
       bars_audit.info(title || ' l_result=>' ||l_result);
       return l_result;
     end;
+
 END INTG_WB;
 /

@@ -619,15 +619,79 @@
                         width: "200px"
                     },
                     {
-                        field: "DAT",
+                        field: "D_f0", //previous DAT
                         title: "Дата файлу",
-                        template: "#= kendo.toString(kendo.parseDate(DAT, 'yyyy-MM-dd'), 'dd/MM/yyyy') #",
+                        //template: "#= kendo.toString(kendo.parseDate(D_f0, 'yyyy-MM-dd'), 'dd/MM/yyyy') #",
+                        //template: "#= kendo.toString(D_f0, 'dd/MM/yyyy') #",
+                        format: "{0:dd/MM/yyyy}",
+                        filterable:
+                        {
+                            //ui: "datepicker"
+                            ui: function (element) {
+                                element.kendoDatePicker({
+                                    format: "dd/MM/yyyy"
+                                });
+                            }
+                        },
+                        width: "100px"
+                    },
+                    {
+                        field: "D_f1",
+                        title: "Дата та час надходження квитанції @F1",
+                        //template: "#= kendo.toString(D_f1, 'dd/MM/yyyy HH:mm:ss') #",
+                        format: "{0:dd/MM/yyyy HH:mm}",
+                        filterable:
+                        {
+                            //ui: "datetimepicker"
+                            ui: function (element) {
+                                element.kendoDateTimePicker({
+                                    format: "dd/MM/yyyy HH:mm"
+                                });
+                            }
+                        },
+                        width: "100px"
+                    },
+                    {
+                        field: "D_f2",
+                        title: "Дата та час надходження квитанції @F2",
+                        //template: "#= kendo.toString(D_f2, 'dd/MM/yyyy HH:mm:ss') #",
+                        format: "{0:dd/MM/yyyy HH:mm}",
+                        filterable:
+                        {
+                            //ui: "datetimepicker"
+                            ui: function (element) {
+                                element.kendoDateTimePicker({
+                                    format: "dd/MM/yyyy HH:mm"
+                                });
+                            }
+                        },
+                        width: "100px"
+                    },
+                    {
+                        field: "D_r0",
+                        title: "Дата та час надходження квитанції @R0",
+                        //template: "#= kendo.toString(D_r0,'dd/MM/yyyy HH:mm:ss') #",
+                        format: "{0:dd/MM/yyyy HH:mm}",
+                        filterable:
+                        {
+                            //ui: "datetimepicker"
+                            ui: function (element) {
+                                element.kendoDateTimePicker({
+                                    format: "dd/MM/yyyy HH:mm"
+                                });
+                            }
+                        },
                         width: "100px"
                     },
                     {
                         field: "ERR",
                         title: "Код помилки",
                         width: "100px"
+                    },
+                    {
+                        field: "ERR_MSG",
+                        title: "Найменування  помилки",
+                        width: "250px"
                     }
             ]
         }
@@ -1753,10 +1817,22 @@
                             FN: {
                                 type: 'string'
                             },
-                            DAT: {
+                            D_f0: {
+                                type: 'date'
+                            },
+                            D_f1: {
+                                type: 'date'
+                            },
+                            D_f2: {
+                                type: 'date'
+                            },
+                            D_r0: {
                                 type: 'date'
                             },
                             ERR: {
+                                type: 'string'
+                            },
+                            ERR_MSG: {
                                 type: 'string'
                             }
                         }

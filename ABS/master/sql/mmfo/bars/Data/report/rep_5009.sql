@@ -69,11 +69,11 @@ for c0 in (select  a.nls, a.kv
             where  a.nls like ~p_nls and a.nbs in (''2625'',''2605'') 
 			  and daos <= to_date(p_sFdat2,''dd-mm-yyyy'') 
               and nvl(dazs, to_date(p_sFdat2,''dd-mm-yyyy'')) between to_date(p_sFdat1,''dd-mm-yyyy'') and to_date(p_sFdat2,''dd-mm-yyyy'')
-			  and exists (select 1 from saldoa where acc = a.acc and fdat between to_date(p_sFdat1,''dd-mm-yyyy'')  and to_date(p_sFdat2,''dd-mm-yyyy'') and (dos+kos) != 0 )
+			  and acc in (select acc from saldoa where acc = a.acc and fdat between to_date(p_sFdat1,''dd-mm-yyyy'')  and to_date(p_sFdat2,''dd-mm-yyyy'') and (dos+kos) != 0 )
 			  )
 loop
 
- l_blob := f_rep_1009(to_date(p_sFdat1,''dd-mm-yyyy''), to_date(p_sFdat2,''dd-mm-yyyy'') , c0.nls, c0.kv);
+ l_blob := f_rep_5009(to_date(p_sFdat1,''dd-mm-yyyy''), to_date(p_sFdat2,''dd-mm-yyyy'') , c0.nls, c0.kv);
  l_file := c0.nls||''_''||c0.kv||''.csv'';
 
 If DBMS_LOB.GETLENGTH (l_blob) > 0 then

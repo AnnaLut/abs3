@@ -55,10 +55,11 @@ declare
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
   l_colname      meta_columns.colname%type;
+  l_reftype      typeref.type%type;
 
 begin
 
-  l_tabsemantic := 'Налаштування значень бонусів для депозитів ФО';
+  l_tabsemantic := 'Довідник значень бонусів до депозитних договорів ФО';
   l_tablinesdef := '';
   l_tabselect_statement := '';
   l_tabname     := 'DPT_BONUS_SETTINGS';
@@ -124,12 +125,52 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'BONUS_ID', 'N', 'Код бонусу', '', 22, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'DPT_TYPE', 'N', 'Тип депозитного договору', '', 22, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'DPT_VIDD', 'N', 'Вид депозитного договору', '', 22, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'KV', 'N', 'Валюта', '', 22, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'S', 'N', 'Гранична сума', '', 22, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'VAL', 'N', 'Значення бонуса', '', 22, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'BONUS_ID', 'N', 'Код бонусу', '', 22, null, 0, 0, 1, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'DAT_BEGIN', 'D', 'Початок дії', '', 10, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'DAT_END', 'D', 'Кінець дії', '', 10, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'DPT_TYPE', 'N', 'Тип депозитного договору', '', 22, null, 0, 0, 1, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'DPT_VIDD', 'N', 'Вид депозитного договору', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'KV', 'N', 'Валюта', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'S', 'N', 'Гранична сума', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'VAL', 'N', 'Значення бонуса', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+
+  -- добавляем описание сложного поля
+  l_newtabid := bars_metabase.get_tabid('DPT_BONUSES');
+  l_newcolid := bars_metabase.get_colid(l_newtabid, 'BONUS_ID');
+  if (l_newtabid is not null and l_newcolid is not null) then
+    bars_metabase.add_extrnval(l_tabid, 1, l_newtabid, l_newcolid, 'D', '', '', '');
+  else
+    dbms_output.put_line('В БМД не описана таблица DPT_BONUSES для описания сложного поля таблицы DPT_BONUS_SETTINGS.');
+  end if;
+
+  -- добавляем описание сложного поля
+  l_newtabid := bars_metabase.get_tabid('DPT_TYPES');
+  l_newcolid := bars_metabase.get_colid(l_newtabid, 'TYPE_ID');
+  if (l_newtabid is not null and l_newcolid is not null) then
+    bars_metabase.add_extrnval(l_tabid, 4, l_newtabid, l_newcolid, 'B', '', 'FL_ACTIVE=1', '');
+  else
+    dbms_output.put_line('В БМД не описана таблица DPT_TYPES для описания сложного поля таблицы DPT_BONUS_SETTINGS.');
+  end if;
+
+  -- добавляем описание для условий фильтра
+  l_newtabid := bars_metabase.get_tabid('DPT_BONUSES');
+  l_newcolid := bars_metabase.get_colid(l_newtabid, 'BONUS_ID');
+  l_varcolid := bars_metabase.get_colid(l_newtabid, 'BONUS_NAME');
+  if (l_newtabid is not null and l_newcolid is not null) then
+    bars_metabase.add_browsetbl(l_tabid, l_newtabid, '', '1', l_newcolid, l_varcolid, 'Назва пільги');
+  else
+    dbms_output.put_line('В БМД не описана таблица DPT_BONUSES для описания условий фильтра таблицы DPT_BONUS_SETTINGS.');
+  end if;
+
+  -- добавляем описание для условий фильтра
+  l_newtabid := bars_metabase.get_tabid('DPT_TYPES');
+  l_newcolid := bars_metabase.get_colid(l_newtabid, 'TYPE_ID');
+  l_varcolid := bars_metabase.get_colid(l_newtabid, 'TYPE_NAME');
+  if (l_newtabid is not null and l_newcolid is not null) then
+    bars_metabase.add_browsetbl(l_tabid, l_newtabid, '', '4', l_newcolid, l_varcolid, 'Назва типу');
+  else
+    dbms_output.put_line('В БМД не описана таблица DPT_TYPES для описания условий фильтра таблицы DPT_BONUS_SETTINGS.');
+  end if;
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);
@@ -191,7 +232,30 @@ begin
       l_dependency(i).condition );
   end loop;
 
+ -- добавляем справочник в папку
+ begin
+  select t.type
+  into l_reftype
+  from bars.TYPEREF t
+  where t.name = 'Вклади ФЛ';
+ exception when others then
+   l_reftype := null;
+ end;
+ 
+ if l_reftype is not null then
+   begin
+    insert into references values (l_tabid, l_reftype, null, 'DPT_ADMIN');
+   exception when dup_val_on_index then null;
+   end; 
+ end if;
+
+ -- добавляем справочник в АРМ
+     begin
+       insert into refapp (codeapp, tabid, acode, approve)
+        values ('$RM_DPTA', l_tabid, 'RW', 1);
+     exception when dup_val_on_index then null;
+     end;
+ 
 end;
 /
-
 commit;
