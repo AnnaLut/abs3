@@ -32,7 +32,9 @@ begin
 	ERR VARCHAR2(4), 
 	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo''), 
 	FNK VARCHAR2(30), 
-	TXTK VARCHAR2(254)
+	TXTK VARCHAR2(254),
+	fnk1 varchar2(30), 
+	datk1 date
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -42,7 +44,15 @@ exception when others then
 end; 
 /
 
-
+begin 
+  execute immediate '
+alter table bars.zag_f add (
+	fnk1 varchar2(30), 
+	datk1 date)';
+exception when others then       
+  if sqlcode = -1430 then null; else raise; end if; 
+end; 
+/
 
 
 PROMPT *** ALTER_POLICIES to ZAG_F ***
