@@ -645,13 +645,14 @@ IS
     function get_loyality_rate(p_vidd dpt_vidd.vidd%type, p_kv tabval.kv%type) return number
 	is
 	l_result number := 0;
+	l_bonus_id number := dpt_bonus.get_bonus_id('DPWB');
 	begin
 	 begin
 	  select nvl(val,0)
 	    into l_result
 	    from dpt_bonus_settings
 	   where dpt_vidd = p_vidd 
-		and bonus_id = dpt_bonus.get_bonus_id('DPWB')/*3*/
+		and bonus_id = l_bonus_id /*3*/
 	        and trunc(sysdate) between dat_begin and nvl(dat_end, to_date('31.12.4999','DD.MM.YYYY'))
 	     and kv = p_kv;
 	 exception when no_data_found then
@@ -666,7 +667,7 @@ IS
                          --and flag = 1
                          )
 			 and kv = p_kv 
-			 and bonus_id = dpt_bonus.get_bonus_id('DPWB')/*3*/
+			 and bonus_id = l_bonus_id /*3*/
 		         and trunc(sysdate) between dat_begin and nvl(dat_end, to_date('31.12.4999','DD.MM.YYYY'));
 
 	   exception when no_data_found then l_result := 0;
@@ -683,7 +684,7 @@ IS
                          --and flag = 1
                          )
 		     and dpt_vidd = p_vidd
-                         and bonus_id = dpt_bonus.get_bonus_id('DPWB')/*3*/
+                         and bonus_id = l_bonus_id /*3*/
 		         and trunc(sysdate) between dat_begin and nvl(dat_end, to_date('31.12.4999','DD.MM.YYYY'))
 			 and kv = p_kv;
 	   exception when no_data_found then l_result := 0;
