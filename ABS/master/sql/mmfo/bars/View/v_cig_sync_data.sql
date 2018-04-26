@@ -22,7 +22,6 @@ BEGIN
           '; 
 END; 
 /
-
 PROMPT *** Create  grants  V_CIG_SYNC_DATA ***
 grant SELECT,UPDATE                                                          on V_CIG_SYNC_DATA to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CIG_SYNC_DATA to BARS_DM;

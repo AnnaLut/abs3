@@ -34,6 +34,17 @@ AS
           evt_custtype
      FROM CIG_EVENTS -- Ќа саму таблицу накладывать политики нельз€. http://jira.unity-bars.com.ua:11000/browse/COBUMMFO-5354
 ;
+BEGIN 
+        execute immediate  
+          'begin  
+               bpa.alter_policy_info(''V_CIG_EVENTS_INS'', ''CENTER'' , null, null, null, null);
+               bpa.alter_policy_info(''V_CIG_EVENTS_INS'', ''FILIAL'' , ''B'', ''B'', ''B'', ''B'');
+               bpa.alter_policy_info(''V_CIG_EVENTS_INS'', ''WHOLE'' , null, null, null, null);
+               null;
+           end; 
+          '; 
+END; 
+/
 
 PROMPT *** Create  grants  V_CIG_EVENTS ***
 GRANT SELECT ON BARS.V_CIG_EVENTS_INS         TO BARSREADER_ROLE;
