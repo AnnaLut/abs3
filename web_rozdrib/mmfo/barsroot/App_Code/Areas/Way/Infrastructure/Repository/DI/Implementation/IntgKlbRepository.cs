@@ -12,70 +12,36 @@ using System.Threading.Tasks;
 using Oracle.DataAccess.Client;
 using Oracle.DataAccess.Types;
 using Bars.Classes;
+using Bars.WebServices;
+using System.Data;
+using barsroot.core;
 
 namespace BarsWeb.Areas.WayKlb.Infrastructure.DI.Implementation
 {
     public class IntgKlbRepository : IIntgKlbRepository
     {
-        public List<Product> GetProductList()
+        public List<Product> GetProductList(OracleConnection connection, decimal? id = null)
         {
             List<Product> pr = new List<Product>();
-            OracleConnection connection = OraConnector.Handler.UserConnection;
-            OracleCommand cmd = connection.CreateCommand();
-            try
+            using (OracleCommand cmd = connection.CreateCommand())
             {
-                cmd.CommandType = System.Data.CommandType.Text;
-                cmd.CommandText = "select id, sjson from table(bars.INTG_WB.get_dpt_products)";
-                /*OracleParameter oraP = new OracleParameter();
-                oraP.OracleDbType = OracleDbType.RefCursor;
-                oraP.Direction = System.Data.ParameterDirection.Output;
-                cmd.Parameters.Add(oraP); */
-                OracleDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
-                {
-                    Product p = new Product();
-                    p.ID = Convert.ToInt32(reader.GetValue(0).ToString());
-                    p.JSON = reader.GetValue(1).ToString();
-                    pr.Add(p);
-                }
-                reader.Close();
-            }
-            finally
-            {
-                cmd.Dispose();
-                connection.Dispose();
-                connection.Close();
-            }
-            return pr;
-        }
+                string methodName = null == id ? "get_dpt_products" : "get_dpt_product(:p_id)";
+                if (null != id)
+                    cmd.Parameters.Add(new OracleParameter("p_id", OracleDbType.Decimal, id, ParameterDirection.Input));
 
-        public Product GetProductById(decimal id)
-        {
-            Product pr = new Product();
-            OracleConnection connection = OraConnector.Handler.UserConnection;
-            OracleCommand cmd = connection.CreateCommand();
-            try
-            {
-                cmd.CommandType = System.Data.CommandType.Text;
-                cmd.CommandText = "select id, sjson from table(bars.INTG_WB.get_dpt_product(:p_id))";
-                cmd.Parameters.Add("p_id", OracleDbType.Decimal, id, System.Data.ParameterDirection.Input);
-                /*OracleParameter oraP = new OracleParameter();
-                oraP.OracleDbType = OracleDbType.RefCursor;
-                oraP.Direction = System.Data.ParameterDirection.Output;
-                cmd.Parameters.Add(oraP); */
-                OracleDataReader reader = cmd.ExecuteReader();
-                if (reader.Read())
+                cmd.CommandType = CommandType.Text;
+                cmd.CommandText = string.Format("select id, sjson from table(bars.INTG_WB.{0})", methodName);
+
+                using (OracleDataReader reader = cmd.ExecuteReader())
                 {
-                    pr.ID = Convert.ToInt32(reader.GetValue(0).ToString());
-                    pr.JSON = reader.GetValue(1).ToString();
+                    while (reader.Read())
+                    {
+                        Product p = new Product();
+                        p.ID = Convert.ToInt32(reader.GetValue(0).ToString());
+                        p.JSON = reader.GetValue(1).ToString();
+                        pr.Add(p);
+                    }
                 }
-                reader.Close();
-            }
-            finally
-            {
-                cmd.Dispose();
-                connection.Dispose();
-                connection.Close();
             }
             return pr;
         }
