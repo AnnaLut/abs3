@@ -270,9 +270,37 @@ begin
 	P_HOUSE_ID NUMBER(10,0), 
 	VIP_ACCOUNT_MANAGER VARCHAR2(4000)
    ) SEGMENT CREATION IMMEDIATE 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING
-  TABLESPACE BRSDYND ';
+tablespace BRSDMIMP
+PARTITION BY LIST (PER_ID) SUBPARTITION by list (KF)
+SUBPARTITION TEMPLATE
+         (SUBPARTITION KF_300465 VALUES (''300465''),
+            SUBPARTITION KF_302076 VALUES (''302076''),
+            SUBPARTITION KF_303398 VALUES (''303398''),
+            SUBPARTITION KF_304665 VALUES (''304665''),
+            SUBPARTITION KF_305482 VALUES (''305482''),
+            SUBPARTITION KF_311647 VALUES (''311647''),
+            SUBPARTITION KF_312356 VALUES (''312356''),
+            SUBPARTITION KF_313957 VALUES (''313957''),
+            SUBPARTITION KF_315784 VALUES (''315784''),
+            SUBPARTITION KF_322669 VALUES (''322669''),
+            SUBPARTITION KF_323475 VALUES (''323475''),
+            SUBPARTITION KF_324805 VALUES (''324805''),
+            SUBPARTITION KF_325796 VALUES (''325796''),
+            SUBPARTITION KF_326461 VALUES (''326461''),
+            SUBPARTITION KF_328845 VALUES (''328845''),
+            SUBPARTITION KF_331467 VALUES (''331467''),
+            SUBPARTITION KF_333368 VALUES (''333368''),
+            SUBPARTITION KF_335106 VALUES (''335106''),
+            SUBPARTITION KF_336503 VALUES (''336503''),
+            SUBPARTITION KF_337568 VALUES (''337568''),
+            SUBPARTITION KF_338545 VALUES (''338545''),
+            SUBPARTITION KF_351823 VALUES (''351823''),
+            SUBPARTITION KF_352457 VALUES (''352457''),
+            SUBPARTITION KF_353553 VALUES (''353553''),
+            SUBPARTITION KF_354507 VALUES (''354507''),
+            SUBPARTITION KF_356334 VALUES (''356334'')
+          )
+(PARTITION INITIAL_PARTITION VALUES (0)) ';
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 
 end; 
@@ -283,107 +311,6 @@ alter table bars_dm.customers_plt modify merried varchar2(500);
 
 prompt alter column adr_work_adr modify varchar2(100)
 alter table bars_dm.customers_plt modify ADR_WORK_ADR VARCHAR2(100);
-
-PROMPT *** Create  constraint SYS_C00120070 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS_DM.CUSTOMERS_PLT MODIFY (ID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERS_PLT_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS_DM.CUSTOMERS_PLT ADD CONSTRAINT CC_CUSTOMERS_PLT_BRANCH_NN CHECK (BRANCH IS NOT NULL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERS_PLT_MFO_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS_DM.CUSTOMERS_PLT ADD CONSTRAINT CC_CUSTOMERS_PLT_MFO_NN CHECK (KF IS NOT NULL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERS_PLT_PERID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS_DM.CUSTOMERS_PLT ADD CONSTRAINT CC_CUSTOMERS_PLT_PERID_NN CHECK (PER_ID IS NOT NULL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERS_PLT_RNK_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS_DM.CUSTOMERS_PLT ADD CONSTRAINT CC_CUSTOMERS_PLT_RNK_NN CHECK (RNK IS NOT NULL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint PK_CUSTOMERS_PLT ***
-begin   
- execute immediate '
-  ALTER TABLE BARS_DM.CUSTOMERS_PLT ADD CONSTRAINT PK_CUSTOMERS_PLT PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYNI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  index PK_CUSTOMERS_PLT ***
-begin   
- execute immediate '
-  CREATE UNIQUE INDEX BARS_DM.PK_CUSTOMERS_PLT ON BARS_DM.CUSTOMERS_PLT (ID) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYNI ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  index I_CUSTOMERS_PLT_PERID ***
-begin   
- execute immediate '
-  CREATE INDEX BARS_DM.I_CUSTOMERS_PLT_PERID ON BARS_DM.CUSTOMERS_PLT (PER_ID) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYNI ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
 
 PROMPT *** Create  grants  CUSTOMERS_PLT ***
 grant SELECT                                                                 on CUSTOMERS_PLT   to BARSREADER_ROLE;
