@@ -4,7 +4,7 @@ is
     --
     -- Наполнение витрин для файловых выгрузок в CRM
     --
-    g_header_version  constant varchar2(64)  := 'version 4.0.0 07/02/2018'; -- DIY-parallel
+    g_header_version  constant varchar2(64)  := 'version 4.0.1 27/03/2018 '; -- DIY-parallel
     g_header_defs     constant varchar2(512) := '';
 
     C_FULLIMP         constant period_type.id%TYPE  := 'MONTH';
@@ -17,7 +17,7 @@ is
 
     --
     -- body_version - возвращает версию тела пакета
-    --
+    -- 
     function body_version return varchar2;
 
     --
@@ -249,18 +249,14 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
     -- Очищаем существующую партицию или добавляем новую
     --
     procedure add_partition(p_table_name in varchar2, p_period_id in periods.id%type)
-        is
-        partition_doesnt_exist exception;
-        partition_invalid_number exception;
-        pragma exception_init (partition_doesnt_exist, -2149);
-        pragma exception_init (partition_invalid_number, -14702);
+    is
+    partition_exist exception;
+    pragma exception_init (partition_exist, -14312);
     begin
-        execute immediate 'alter table '||p_table_name||' truncate partition for ('||p_period_id||')';
-        bars_audit.info('Вивантаження даних для CRM - попередні дані з вітрини '|| p_table_name ||' за період з ідентифікатором {' || p_period_id || '} видалено');
+          execute immediate 'alter table '||p_table_name||' add partition P'||p_period_id||' values ('||p_period_id||')';
     exception
-        when partition_doesnt_exist or partition_invalid_number then
-            execute immediate 'alter table '||p_table_name||' add partition P'||p_period_id||' values ('||p_period_id||')';
-            bars_audit.info('Вивантаження даних для CRM - створена нова секція в вітрині '|| p_table_name ||' за період з ідентифікатором {' || p_period_id || '}');
+    when partition_exist then       
+        bars_audit.info('Вивантаження даних для CRM - така секція в вітрині вже існує '|| p_table_name ||' за період   з ідентифікатором {' || p_period_id || '}');
     end add_partition;
 
     --
@@ -272,7 +268,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
         pragma exception_init(subpartition_doesnt_exist, -14251);
     begin
         -- устанавливаем время ожидания ddl_lock, чтобы не получить -54 при одновременном truncate
-        execute immediate 'alter session set ddl_lock_timeout=30';
+        execute immediate 'alter session set ddl_lock_timeout=60';
         execute immediate 'alter table '||p_table_name||' truncate subpartition '||'P'||p_period_id||'_KF_'||p_kf; -- e.g. P995_KF_300465
     exception
         when subpartition_doesnt_exist then
@@ -4481,41 +4477,45 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                             p_rows       out number,
                             p_rows_err   out number,
                             p_state      out varchar2)
-    is
+    is    
         l_trace  varchar2(500) := G_TRACE || 'customers_plt_imp: ';
         l_per_id periods.id%type;
-        l_row    customers_plt%rowtype;
-        l_errmsg varchar2(512);
 
         l_rows     pls_integer := 0;
         l_rows_err pls_integer := 0;
 
-    begin
-        bars.bars_audit.info(l_trace||' start');
-        -- get period id
-        l_per_id := get_period_id (p_periodtype, p_dat);
-        --
-        if l_per_id is null then
-            return;
-        end if;
-
-        delete from customers_plt where per_id=l_per_id;
-        --
-        for c in (with  c1 as ((select distinct rnk from bars.customer_update cu where cu.custtype = 3 and cu.chgdate between trunc(p_dat) and trunc(p_dat)+0.99999)
+        l_insert_target varchar2(4000);
+        l_ourmfo       varchar2(6) := sys_context('bars_context', 'user_mfo');
+        
+        -- общий запрос
+        q_str          varchar2(32000);
+        -- цель для вставки
+        q_insert       varchar2(10000);
+        -- измененные записи (дельта)
+        q_str_inc_pre  varchar2(4000) :=
+        'with  c1 as (
+                      (select distinct rnk from bars.customer_update cu where cu.custtype = 3 and cu.chgdate between trunc(:p_dat) and trunc(:p_dat)+0.99999)
                    union
-                 (select distinct rnk from bars.customerw_update cwu where cwu.chgdate between trunc(p_dat) and trunc(p_dat)+0.99999)
+                      (select distinct rnk from bars.customerw_update cwu where cwu.chgdate between trunc(:p_dat) and trunc(:p_dat)+0.99999)
                    union
-                 (select distinct rnk from bars.customer_address_update cau where cau.effectdate between trunc(p_dat) and trunc(p_dat)+0.99999)
+                      (select distinct rnk from bars.customer_address_update cau where cau.effectdate between trunc(:p_dat) and trunc(:p_dat)+0.99999)
                    union
-                 (select distinct rnk from bars.person_update pu where  pu.chgdate between trunc(p_dat) and trunc(p_dat)+0.99999))
+                      (select distinct rnk from bars.person_update pu where  pu.chgdate between trunc(:p_dat) and trunc(:p_dat)+0.99999)
+                     )';
+        -- основной запрос
+        q_str_main  varchar2(32000) :=
+        '
                   select
-                       null as ID,
+              s_customers.nextval as ID,
+              :per_id,
+              c.kf kf,
+              c.kf ru,
                        c.rnk,--РНК
                        c.branch,--відділення
-                       c.kf,
                        bars.fio(c.nmk,1) as last_name,--прізвище
-                       bars.fio(c.nmk,2) as first_name,--ім'я
+              bars.fio(c.nmk,2) as first_name,--ім''я
                        bars.fio(c.nmk,3) as middle_name,--по-батькові
+              decode(to_number(p.sex),1,1,2,2,0) as sex,--стать
                        substr(trim(gr),1,30) as gr,--громадянство
                        p.bday,--дата народження
                        p.passp,--тип документу
@@ -4523,57 +4523,61 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                        p.numdoc as numdoc,--номер документу
                        p.pdate  as pdate,--дата видачі
                        p.organ,--орган видачі
+              p.actual_date as passp_expire_to,
+              null as pass_to_bank,
                        c.okpo  as okpo,--ІНН
+              decode(c.date_off, null, ''1'', ''0'') as cust_status,--статус клієнта БАРС
+              (select max(rnkto) from bars.rnk2nls r2 where r2.rnkfrom=c.rnk and decode(c.date_off, null, ''1'', ''0'') = ''0'') as cust_active,--РНК активного клієнта
                        dm_import.add38phone(substr(mpno,1,20), c.kf) as telm,--мобільний
-                       dm_import.add38phone(p.teld, c.kf) teld,--домашній телефон
                        dm_import.add38phone(p.telw, c.kf) telw,--робочий телефон
+              dm_import.add38phone(p.teld, c.kf) teld,--домашній телефон
                        tel_d as teladd,--додатковий телефон
                        substr(email,1,30) as email,--електронна пошта
+              ap_contry,
+              ap_domain,
+              ap_region,
+              ap_locality,
+              ap_adress,
+              ap_zip, /* В adr_fact - адрес регистрации - выгружаем юридический адрес; Место работы - аналогично, т.е. дублируем */
                        au_contry,
                        au_domain,
                        au_region,
                        au_locality,
                        au_adress,
                        au_zip,
-                       ap_contry,
-                       ap_domain,
-                       ap_region,
-                       ap_locality,
-                       ap_adress,
-                       ap_zip,
-                       af_contry,
-                       af_domain,
-                       af_region,
-                       af_locality,
-                       af_adress,
-                       af_zip,
-                       decode(c.date_off, null, '1', '0') as cust_status,--статус клієнта БАРС
-                       (select max(rnkto) from bars.rnk2nls r2 where r2.rnkfrom=c.rnk and decode(c.date_off, null, '1', '0') = '0') as cust_active,--РНК активного клієнта
+              au_contry,
+              au_domain,
+              au_region,
+              au_locality,
+              au_adress,
+              au_zip,
+              null negativ_status,
+              null reestr_mob_bank,
+              null reestr_inet_bank,
+              null reestr_sms_bank,
+              null month_income,
+              null subject_role,
                        decode(c.codcagent,5,1,2) rezident,--резидент
-                       decode(to_number(nvl(c.sed, 0)),91,2,34,2,1) as subject_class,--класифікація суб'єкта
+              ww.PC_SS as merried, 
                        case
                             when length(trim(w.cigpo))=1
-                                and regexp_replace(trim(w.cigpo), '\D') = trim(w.cigpo)
-                                and trim(w.cigpo) != '0'
+                        and regexp_replace(trim(w.cigpo), ''\D'') = trim(w.cigpo)
+                        and trim(w.cigpo) != ''0''
                              then trim(w.cigpo)
                             when trim(w.cigpo) is null
-                             then ''
-                            else '9'
-                       end as emp_status,--статус зайнятості особи
-                       decode(to_number(p.sex),1,1,2,2,0) as sex,--стать
+                     then ''''
+                    else ''9''
+               end as emp_status,--статус зайнятості особи"
+              decode(to_number(nvl(c.sed, 0)),91,2,34,2,1) as subject_class,--класифікація суб''єкта
                        (select prinsiderlv1 from bars.prinsider where prinsider = nvl(c.prinsider,2)) as insider,--признак інсайдера
-                       decode(vipk,'1',1,0) vipk,--значення параметру
+              decode(vipk,''1'',1,0) vipk,--значення параметру
                        (select max(fio_manager) from bars.vip_flags where rnk=c.rnk) vip_fio_manager,--піб працівника по віп
                        (select max(phone_manager) from bars.vip_flags where rnk=c.rnk) vip_phone_manager,--телефон працівника по віп
-                       (select s.active_directory_name
-                        from bars.vip_flags v
-                        join bars.staff_ad_user s on v.account_manager = s.user_id
-                        where rnk=c.rnk) vip_account_manager,--аккаунт працівника по віп в форматі АД
                        date_on,--дата відкриття клієнта
                        date_off,--дата закриття
                        p.eddr_id,
-                       p.BPLACE,--місце народження
                        p.actual_date,
+              p.BPLACE,--місце народження
                        ww.SUBSD,
                        ww.SUBSN,
                        ww.ELT_N,
@@ -4584,7 +4588,6 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                        ww.SW_RN,
                        ww.Y_ELT,
                        c.ADM,           --Адм. орган регистрации
-                       ww.FADR,--адрес временного пребывания
                        rkv.ADR_ALT,
                        ww.BUSSS,
                        ww.PC_MF,
@@ -4595,8 +4598,8 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                        ww.PC_Z1,
                        ww.AGENT,
                        ww.PC_SS,
---                       ww.STMT, 06.12.2016 [COBUSUPABS-5030]  замена на c.STMT
-                       c.STMT,  --Формат выписки
+              --  ww.STMT, 06.12.2016 [COBUSUPABS-5030]  замена на c.STMT 
+              c.STMT,  --Формат выписки c.STMT,  --Формат выписки"
                        ww.VIDKL,
                        c.VED,--Вид экономической деятельности
                        ww.TIPA,
@@ -4621,7 +4624,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                        ww.DJ_FH,
                        ww.DJ_CP,
                        ww.CHORN,
-                       case c.CRISK when 1 then 'А' when 2 then 'Б' when 3 then 'В' when 4 then 'Г' end as CRISK_KL,
+              case c.CRISK when 1 then ''А'' when 2 then ''Б'' when 3 then ''В'' when 4 then ''Г'' end as CRISK_KL,
                        case c.BC when 0 then 1 when 1 then 0 end as BC,
                        ww.SPMRK,
                        ww.K013,
@@ -4640,7 +4643,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                        ww.SUBS,
                        c.K050,
                        ww.DEATH,
---                       case when p.CELLPHONE is null then 1 else 0 end as NO_PHONE,
+      --      case when p.CELLPHONE is null then 1 else 0 end as NO_PHONE, --mpno?
                        nvl2(w.mpno, 0, 1) as NO_PHONE,
                        ww.NSMCV,
                        ww.NSMCC,
@@ -4675,30 +4678,18 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                        ww.SN_GC,
                        c.NMKK,
                        c.PRINSIDER,
-                       c.NOTESEC,
                        c.MB,
                        ww.PUBLP,
                        ww.WORKB,
-                       c.C_REG,
-                       c.C_DST,
-                       c.RGADM,
-                       c.RGTAX,
-                       c.DATEA,
-                       c.DATET,
-                       c.RNKP,
                        ww.CIGPO,
                        cntr.NAME as COUNTRY_NAME,
                        ww.TARIF,
                        ww.AINAB,
                        c.TGR,
-                       c.CUSTTYPE,
-                       ww.RIZIK,
                        ww.SNSDR,
                        ww.IDPIB,
                        c.FS,
-                       c.SED,
                        ww.DJER,
-                       c.CODCAGENT,
                        ww.SUTD,
                        ww.RVDBC,
                        ww.RVIBA,
@@ -4727,18 +4718,12 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                        a.j_homepart,
                        a.j_room_type,
                        a.j_room,
-                       a.j_koatuu,
-                       a.j_region_id,
-                       a.j_area_id,
-                       a.j_settlement_id,
-                       a.j_street_id,
-                       a.j_house_id,
                        a.af_contry as f_country,
                        a.af_zip as f_zip,
                        a.af_domain as f_domain,
                        a.af_region as f_region,
                        a.af_locality as f_locality,
-                       a.af_adress as f_address,
+              ww.FADR,--адрес временного пребывания
                        a.f_territory_id,
                        a.f_locality_type,
                        a.f_street_type,
@@ -4749,12 +4734,6 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                        a.f_homepart,
                        a.f_room_type,
                        a.f_room,
-                       a.f_koatuu,
-                       a.f_region_id,
-                       a.f_area_id,
-                       a.f_settlement_id,
-                       a.f_street_id,
-                       a.f_house_id,
                        a.ap_contry as p_country,
                        a.ap_zip as p_zip,
                        a.ap_domain as p_domain,
@@ -4771,419 +4750,8 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                        a.p_homepart,
                        a.p_room_type,
                        a.p_room,
-                       a.p_koatuu,
-                       a.p_region_id,
-                       a.p_area_id,
-                       a.p_settlement_id,
-                       a.p_street_id,
-                       a.p_house_id
-                  from bars.customer c, bars.person p,
-                         ( select rnk,
-                                "'1'_C1" au_contry,
-                                "'1'_C2" au_zip,
-                                "'1'_C3" au_domain,
-                                "'1'_C4" au_region,
-                                "'1'_C5" au_locality,
-                                "'1'_C6" au_adress,
-                                "'1'_C7" j_territory_id,
-                                "'1'_C8" j_locality_type,
-                                "'1'_C9" j_street_type,
-                                "'1'_C10" j_street,
-                                "'1'_C11" j_home_type,
-                                "'1'_C12" j_home,
-                                "'1'_C13" j_homepart_type,
-                                "'1'_C14" j_homepart,
-                                "'1'_C15" j_room_type,
-                                "'1'_C16" j_room,
-                                "'1'_C17" j_koatuu,
-                                "'1'_C18" j_region_id,
-                                "'1'_C19" j_area_id,
-                                "'1'_C20" j_settlement_id,
-                                "'1'_C21" j_street_id,
-                                "'1'_C22" j_house_id,
-                                "'2'_C1" af_contry,
-                                "'2'_C2" af_zip,
-                                "'2'_C3" af_domain,
-                                "'2'_C4" af_region,
-                                "'2'_C5" af_locality,
-                                "'2'_C6" af_adress,
-                                "'2'_C7" f_territory_id,
-                                "'2'_C8" f_locality_type,
-                                "'2'_C9" f_street_type,
-                                "'2'_C10" f_street,
-                                "'2'_C11" f_home_type,
-                                "'2'_C12" f_home,
-                                "'2'_C13" f_homepart_type,
-                                "'2'_C14" f_homepart,
-                                "'2'_C15" f_room_type,
-                                "'2'_C16" f_room,
-                                "'2'_C17" f_koatuu,
-                                "'2'_C18" f_region_id,
-                                "'2'_C19" f_area_id,
-                                "'2'_C20" f_settlement_id,
-                                "'2'_C21" f_street_id,
-                                "'2'_C22" f_house_id,
-                                "'3'_C1" ap_contry,
-                                "'3'_C2" ap_zip,
-                                "'3'_C3" ap_domain,
-                                "'3'_C4" ap_region,
-                                "'3'_C5" ap_locality,
-                                "'3'_C6" ap_adress,
-                                "'3'_C7" p_territory_id,
-                                "'3'_C8" p_locality_type,
-                                "'3'_C9" p_street_type,
-                                "'3'_C10" p_street,
-                                "'3'_C11" p_home_type,
-                                "'3'_C12" p_home,
-                                "'3'_C13" p_homepart_type,
-                                "'3'_C14" p_homepart,
-                                "'3'_C15" p_room_type,
-                                "'3'_C16" p_room,
-                                "'3'_C17" p_koatuu,
-                                "'3'_C18" p_region_id,
-                                "'3'_C19" p_area_id,
-                                "'3'_C20" p_settlement_id,
-                                "'3'_C21" p_street_id,
-                                "'3'_C22" p_house_id
-                           from (select rnk, type_id, country,zip, domain, region, locality, address, territory_id, locality_type, street_type,
-                           street, home_type, home, homepart_type, homepart, room_type, room, koatuu, region_id, area_id, settlement_id, street_id, house_id from bars.customer_address)
-                          pivot (max(country) c1, max(zip) c2, max(domain) c3, max(region) c4, max(locality) c5, max(address) c6, max(territory_id) c7,
-                          max(locality_type) c8, max(street_type) c9, max(street) c10, max(home_type) c11, max(home) c12, max(homepart_type) c13,
-                          max(homepart) c14,max(room_type) c15, max(room) c16, max(koatuu) c17, max(region_id) c18, max(area_id) c19, max(settlement_id) c20,
-                          max(street_id) c21, max(house_id) c22
-                                   for type_id in ('1', '2', '3')
-                                )
-                          ) a,
-                             (select rnk,
-                                    "'CIGPO'_CC"  as cigpo,
-                                    "'EMAIL'_CC"  as email,
-                                    "'GR   '_CC"  as gr,
-                                    "'MPNO '_CC"  as mpno,
-                                    "'VIP_K'_CC"  as vipk,
-                                    "'TEL_D'_CC"  as tel_d,
-                                    "'UADR'_CC"   as UADR
-                               from (select w.rnk, tag, value
-                                       from bars.customerw w
-                                      where tag in ('CIGPO','EMAIL','GR   ','MPNO ','VIP_K', 'TEL_D', 'UADR')
-                                    )
-                             pivot ( max(value) cc for tag in ('CIGPO', 'EMAIL', 'GR   ', 'MPNO ', 'VIP_K', 'TEL_D', 'UADR'))
-                             ) w
-                              ,c1, bars.EBKC_GCIF gc, bars.RNK_REKV rkv, bars.country cntr,
-                              (select rnk,
-                                      "'SUBSD'_CC" as SUBSD,
-                                      "'SUBSN'_CC" as SUBSN,
-                                      "'ELT_N'_CC" as ELT_N,
-                                      "'ELT_D'_CC" as ELT_D,
-                                      "'SW_RN'_CC" as SW_RN,
-                                      "'Y_ELT'_CC" as Y_ELT,
-                                      "'BUSSS'_CC" as BUSSS,
-                                      "'PC_MF'_CC" as PC_MF,
-                                      "'PC_Z4'_CC" as PC_Z4,
-                                      "'PC_Z3'_CC" as PC_Z3,
-                                      "'PC_Z5'_CC" as PC_Z5,
-                                      "'PC_Z2'_CC" as PC_Z2,
-                                      "'PC_Z1'_CC" as PC_Z1,
-                                      "'AGENT'_CC" as AGENT,
-                                      "'PC_SS'_CC" as PC_SS,
-                                      "'STMT'_CC" as STMT,
-                                      "'VIDKL'_CC" as VIDKL,
-                                      "'TIPA'_CC" as TIPA,
-                                      "'PHKLI'_CC" as PHKLI,
-                                      "'AF1_9'_CC" as AF1_9,
-                                      "'IDDPD'_CC" as IDDPD,
-                                      "'DAIDI'_CC" as DAIDI,
-                                      "'DATVR'_CC" as DATVR,
-                                      "'DATZ'_CC" as DATZ,
-                                      "'IDDPL'_CC" as IDDPL,
-                                      "'IDDPR'_CC" as IDDPR,
-                                      "'OBSLU'_CC" as OBSLU,
-                                      "'CRSRC'_CC" as CRSRC,
-                                      "'DJOTH'_CC" as DJOTH,
-                                      "'DJAVI'_CC" as DJAVI,
-                                      "'DJ_TC'_CC" as DJ_TC,
-                                      "'DJOWF'_CC" as DJOWF,
-                                      "'DJCFI'_CC" as DJCFI,
-                                      "'DJ_LN'_CC" as DJ_LN,
-                                      "'DJ_FH'_CC" as DJ_FH,
-                                      "'DJ_CP'_CC" as DJ_CP,
-                                      "'CHORN'_CC" as CHORN,
-                                      "'SPMRK'_CC" as SPMRK,
-                                      "'K013'_CC" as K013,
-                                      "'KODID'_CC" as KODID,
-                                      "'MS_FS'_CC" as MS_FS,
-                                      "'MS_VD'_CC" as MS_VD,
-                                      "'MS_GR'_CC" as MS_GR,
-                                      "'LICO'_CC" as LICO,
-                                      "'MOB01'_CC" as MOB01,
-                                      "'MOB02'_CC" as MOB02,
-                                      "'MOB03'_CC" as MOB03,
-                                      "'SUBS'_CC" as SUBS,
-                                      "'DEATH'_CC" as DEATH,
-                                      "'NSMCV'_CC" as NSMCV,
-                                      "'NSMCC'_CC" as NSMCC,
-                                      "'NSMCT'_CC" as NSMCT,
-                                      "'SAMZ'_CC" as SAMZ,
-                                      "'O_REP'_CC" as OREP,
-                                      "'OVIFS'_CC" as OVIFS,
-                                      "'AF6'_CC" as AF6,
-                                      "'FSKRK'_CC" as FSKRK,
-                                      "'FSOMD'_CC" as FSOMD,
-                                      "'FSVED'_CC" as FSVED,
-                                      "'FSZPD'_CC" as FSZPD,
-                                      "'FSPOR'_CC" as FSPOR,
-                                      "'FSRKZ'_CC" as FSRKZ,
-                                      "'FSZOP'_CC" as FSZOP,
-                                      "'FSKPK'_CC" as FSKPK,
-                                      "'FSKPR'_CC" as FSKPR,
-                                      "'FSDIB'_CC" as FSDIB,
-                                      "'FSCP'_CC" as FSCP,
-                                      "'FSVLZ'_CC" as FSVLZ,
-                                      "'FSVLA'_CC" as FSVLA,
-                                      "'FSVLN'_CC" as FSVLN,
-                                      "'FSVLO'_CC" as FSVLO,
-                                      "'FSSST'_CC" as FSSST,
-                                      "'FSSOD'_CC" as FSSOD,
-                                      "'FSVSN'_CC" as FSVSN,
-                                      "'SN_GC'_CC" as SN_GC,
-                                      "'PUBLP'_CC" as PUBLP,
-                                      "'WORKB'_CC" as WORKB,
-                                      "'CIGPO'_CC" as CIGPO,
-                                      "'TARIF'_CC" as TARIF,
-                                      "'AINAB'_CC" as AINAB,
-                                      "'SNSDR'_CC" as SNSDR,
-                                      "'IDPIB'_CC" as IDPIB,
-                                      "'DJER'_CC" as DJER,
-                                      "'SUTD'_CC" as SUTD,
-                                      "'RVDBC'_CC" as RVDBC,
-                                      "'RVIBA'_CC" as RVIBA,
-                                      "'RVIDT'_CC" as RVIDT,
-                                      "'RV_XA'_CC" as RV_XA,
-                                      "'RVIBR'_CC" as RVIBR,
-                                      "'RVIBB'_CC" as RVIBB,
-                                      "'RVRNK'_CC" as RVRNK,
-                                      "'RVPH1'_CC" as RVPH1,
-                                      "'RVPH2'_CC" as RVPH2,
-                                      "'RVPH3'_CC" as RVPH3,
-                                      "'FADR'_CC" as FADR,
-                                      "'RIZIK'_CC" as RIZIK,
-                                      "'DOV_P'_CC" as DOV_P,
-                                      "'DOV_A'_CC" as DOV_A,
-                                      "'DOV_F'_CC" as DOV_F
-                               from (select w.rnk, tag, value
-                                       from bars.customerw w
-                                      where tag in ('SUBSD','SUBSN','ELT_N','ELT_D','SW_RN','Y_ELT','BUSSS','PC_MF',
-                                                    'PC_Z4','PC_Z3','PC_Z5','PC_Z2','PC_Z1','AGENT','PC_SS','STMT',
-                                                    'VIDKL','TIPA','PHKLI','AF1_9','IDDPD','DAIDI','DATVR','DATZ',
-                                                    'IDDPL','IDDPR','OBSLU','CRSRC','DJOTH','DJAVI','DJ_TC','DJOWF',
-                                                    'DJCFI','DJ_LN','DJ_FH','DJ_CP','CHORN','SPMRK','K013','KODID',
-                                                    'MS_FS','MS_VD','MS_GR','LICO','MOB01','MOB02','MOB03','SUBS',
-                                                    'DEATH','NSMCV','NSMCC','NSMCT','SAMZ','O_REP','OVIFS','AF6',
-                                                    'FSKRK','FSOMD','FSVED','FSZPD','FSPOR','FSRKZ','FSZOP','FSKPK',
-                                                    'FSKPR','FSDIB','FSCP','FSVLZ','FSVLA','FSVLN','FSVLO','FSSST',
-                                                    'FSSOD','FSVSN','SN_GC','PUBLP','WORKB','CIGPO','TARIF','AINAB',
-                                                    'SNSDR','IDPIB','DJER','SUTD','RVDBC','RVIBA','RVIDT','RV_XA',
-                                                    'RVIBR','RVIBB','RVRNK','RVPH1','RVPH2','RVPH3','FADR','RIZIK',
-                                                    'DOV_P', 'DOV_A', 'DOV_F')
-                                    )
-                             pivot ( max(value) cc for tag in ('SUBSD','SUBSN','ELT_N','ELT_D','SW_RN','Y_ELT','BUSSS','PC_MF',
-                                                              'PC_Z4','PC_Z3','PC_Z5','PC_Z2','PC_Z1','AGENT','PC_SS','STMT',
-                                                              'VIDKL','TIPA','PHKLI','AF1_9','IDDPD','DAIDI','DATVR','DATZ',
-                                                              'IDDPL','IDDPR','OBSLU','CRSRC','DJOTH','DJAVI','DJ_TC','DJOWF',
-                                                              'DJCFI','DJ_LN','DJ_FH','DJ_CP','CHORN','SPMRK','K013','KODID',
-                                                              'MS_FS','MS_VD','MS_GR','LICO','MOB01','MOB02','MOB03','SUBS',
-                                                              'DEATH','NSMCV','NSMCC','NSMCT','SAMZ','O_REP','OVIFS','AF6',
-                                                              'FSKRK','FSOMD','FSVED','FSZPD','FSPOR','FSRKZ','FSZOP','FSKPK',
-                                                              'FSKPR','FSDIB','FSCP','FSVLZ','FSVLA','FSVLN','FSVLO','FSSST',
-                                                              'FSSOD','FSVSN','SN_GC','PUBLP','WORKB','CIGPO','TARIF','AINAB',
-                                                              'SNSDR','IDPIB','DJER','SUTD','RVDBC','RVIBA','RVIDT','RV_XA',
-                                                              'RVIBR','RVIBB','RVRNK','RVPH1','RVPH2','RVPH3','FADR','RIZIK',
-                                                              'DOV_P', 'DOV_A', 'DOV_F'))
-                             ) ww
-              where c.custtype=3
-                and c.rnk=p.rnk
-                and c.COUNTRY = cntr.COUNTRY(+)
-                and c.rnk = rkv.RNK(+)
-                and c.rnk = gc.RNK(+)
-                and c.rnk = a.rnk(+)
-                and c.rnk = w.rnk(+)
-                and c.rnk = ww.rnk(+)
-                --and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов
-                and C.RNK = c1.rnk /*Только для ежедневных выгрузок */
-                and p_periodtype = 'DAY'
-
-                union all
-
-                select
-                       null as ID,
-                       c.rnk,--РНК
-                       c.branch,--відділення
-                       c.kf,
-                       bars.fio(c.nmk,1) as last_name,--прізвище
-                       bars.fio(c.nmk,2) as first_name,--ім'я
-                       bars.fio(c.nmk,3) as middle_name,--по-батькові
-                       substr(trim(gr),1,30) as gr,--громадянство
-                       p.bday,--дата народження
-                       p.passp,--тип документу
-                       p.ser as ser,--серія
-                       p.numdoc as numdoc,--номер документу
-                       p.pdate  as pdate,--дата видачі
-                       p.organ,--орган видачі
-                       c.okpo  as okpo,--ІНН
-                       dm_import.add38phone(substr(mpno,1,20), c.kf) as telm,--мобільний
-                       dm_import.add38phone(p.teld, c.kf) teld,--домашній телефон
-                       dm_import.add38phone(p.telw, c.kf) telw,--робочий телефон
-                       tel_d as teladd,--додатковий телефон
-                       substr(email,1,30) as email,--електронна пошта
-                       au_contry,
-                       au_domain,
-                       au_region,
-                       au_locality,
-                       au_adress,
-                       au_zip,
-                       ap_contry,
-                       ap_domain,
-                       ap_region,
-                       ap_locality,
-                       ap_adress,
-                       ap_zip,
-                       af_contry,
-                       af_domain,
-                       af_region,
-                       af_locality,
-                       af_adress,
-                       af_zip,
-                       decode(c.date_off, null, '1', '0') as cust_status,--статус клієнта БАРС
-                       (select max(rnkto) from bars.rnk2nls r2 where r2.rnkfrom=c.rnk and decode(c.date_off, null, '1', '0') = '0') as cust_active,--РНК активного клієнта
-                       decode(c.codcagent,5,1,2) rezident,--резидент
-                       decode(to_number(nvl(c.sed, 0)),91,2,34,2,1) as subject_class,--класифікація суб'єкта
-                       case
-                            when length(trim(w.cigpo))=1
-                                and regexp_replace(trim(w.cigpo), '\D') = trim(w.cigpo)
-                                and trim(w.cigpo) != '0'
-                             then trim(w.cigpo)
-                            when trim(w.cigpo) is null
-                             then ''
-                            else '9'
-                       end as emp_status,--статус зайнятості особи
-                       decode(to_number(p.sex),1,1,2,2,0) as sex,--стать
-                       (select prinsiderlv1 from bars.prinsider where prinsider = nvl(c.prinsider,2)) as insider,--признак інсайдера
-                       decode(vipk,'1',1,0) vipk,--значення параметру
-                       (select max(fio_manager) from bars.vip_flags where rnk=c.rnk) vip_fio_manager,--піб працівника по віп
-                       (select max(phone_manager) from bars.vip_flags where rnk=c.rnk) vip_phone_manager,--телефон працівника по віп
-                       (select s.active_directory_name
-                        from bars.vip_flags v
-                        join bars.staff_ad_user s on v.account_manager = s.user_id
-                        where rnk=c.rnk) vip_account_manager,--аккаунт працівника по віп в форматі АД
-                       date_on,--дата відкриття клієнта
-                       date_off,--дата закриття
-                       p.eddr_id,
-                       p.BPLACE,--місце народження
-                       p.actual_date,
-                       ww.SUBSD,
-                       ww.SUBSN,
-                       ww.ELT_N,
-                       ww.ELT_D,
-                       gc.GCIF,
-                       c.NOMPDV,
-                       rkv.NOM_DOG,
-                       ww.SW_RN,
-                       ww.Y_ELT,
-                       c.ADM,           --Адм. орган регистрации
-                       ww.FADR,--адрес временного пребывания
-                       rkv.ADR_ALT,
-                       ww.BUSSS,
-                       ww.PC_MF,
-                       ww.PC_Z4,
-                       ww.PC_Z3,
-                       ww.PC_Z5,
-                       ww.PC_Z2,
-                       ww.PC_Z1,
-                       ww.AGENT,
-                       ww.PC_SS,
---                       ww.STMT, 06.12.2016 [COBUSUPABS-5030]  замена на c.STMT
-                       c.STMT,  --Формат выписки
-                       ww.VIDKL,
-                       c.VED,--Вид экономической деятельности
-                       ww.TIPA,
-                       ww.PHKLI,
-                       ww.AF1_9,
-                       ww.IDDPD,
-                       ww.DAIDI,
-                       ww.DATVR,
-                       ww.DATZ,
-                       ww.IDDPL,
-                       p.DATE_PHOTO,
-                       ww.IDDPR,
-                       c.ISE,--Институционный сектор экономики (К070)
-                       ww.OBSLU,
-                       ww.CRSRC,
-                       ww.DJOTH,
-                       ww.DJAVI,
-                       ww.DJ_TC,
-                       ww.DJOWF,
-                       ww.DJCFI,
-                       ww.DJ_LN,
-                       ww.DJ_FH,
-                       ww.DJ_CP,
-                       ww.CHORN,
-                       case c.CRISK when 1 then 'А' when 2 then 'Б' when 3 then 'В' when 4 then 'Г' end as CRISK_KL,
-                       case c.BC when 0 then 1 when 1 then 0 end as BC,
-                       ww.SPMRK,
-                       ww.K013,
-                       ww.KODID,
-                       c.COUNTRY,
-                       ww.MS_FS,
-                       ww.MS_VD,
-                       ww.MS_GR,
-                       rkv.LIM_KASS,
-                       c.LIM,
-                       ww.LICO,
-                       UADR,
-                       ww.MOB01,
-                       ww.MOB02,
-                       ww.MOB03,
-                       ww.SUBS,
-                       c.K050,
-                       ww.DEATH,
---                       case when p.CELLPHONE is null then 1 else 0 end as NO_PHONE, --mpno?
-                       nvl2(w.mpno, 0, 1) as NO_PHONE,
-                       ww.NSMCV,
-                       ww.NSMCC,
-                       ww.NSMCT,
-                       c.NOTES,
-                       ww.SAMZ,
-                       ww.OREP,
-                       ww.OVIFS,
-                       ww.AF6,
-                       ww.FSKRK,
-                       ww.FSOMD,
-                       ww.FSVED,
-                       ww.FSZPD,
-                       ww.FSPOR,
-                       ww.FSRKZ,
-                       ww.FSZOP,
-                       ww.FSKPK,
-                       ww.FSKPR,
-                       ww.FSDIB,
-                       ww.FSCP,
-                       ww.FSVLZ,
-                       ww.FSVLA,
-                       ww.FSVLN,
-                       ww.FSVLO,
-                       ww.FSSST,
-                       ww.FSSOD,
-                       ww.FSVSN,
-                       ww.DOV_P,
-                       ww.DOV_A,
-                       ww.DOV_F,
-                       c.NMKV,
-                       ww.SN_GC,
-                       c.NMKK,
-                       c.PRINSIDER,
+              a.af_adress as f_address,
                        c.NOTESEC,
-                       c.MB,
-                       ww.PUBLP,
-                       ww.WORKB,
                        c.C_REG,
                        c.C_DST,
                        c.RGADM,
@@ -5191,319 +4759,259 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                        c.DATEA,
                        c.DATET,
                        c.RNKP,
-                       ww.CIGPO,
-                       cntr.NAME as COUNTRY_NAME,
-                       ww.TARIF,
-                       ww.AINAB,
-                       c.TGR,
                        c.CUSTTYPE,
                        ww.RIZIK,
-                       ww.SNSDR,
-                       ww.IDPIB,
-                       c.FS,
                        c.SED,
-                       ww.DJER,
                        c.CODCAGENT,
-                       ww.SUTD,
-                       ww.RVDBC,
-                       ww.RVIBA,
-                       ww.RVIDT,
-                       ww.RV_XA,
-                       ww.RVIBR,
-                       ww.RVIBB,
-                       ww.RVRNK,
-                       ww.RVPH1,
-                       ww.RVPH2,
-                       ww.RVPH3,
-                       c.SAB,
-                       a.au_contry as j_country,
-                       a.au_zip as j_zip,
-                       a.au_domain as j_domain,
-                       a.au_region as j_region,
-                       a.au_locality as j_locality,
-                       a.au_adress as j_address,
-                       a.j_territory_id,
-                       a.j_locality_type,
-                       a.j_street_type,
-                       a.j_street,
-                       a.j_home_type,
-                       a.j_home,
-                       a.j_homepart_type,
-                       a.j_homepart,
-                       a.j_room_type,
-                       a.j_room,
                        a.j_koatuu,
                        a.j_region_id,
                        a.j_area_id,
                        a.j_settlement_id,
                        a.j_street_id,
                        a.j_house_id,
-                       a.af_contry as f_country,
-                       a.af_zip as f_zip,
-                       a.af_domain as f_domain,
-                       a.af_region as f_region,
-                       a.af_locality as f_locality,
-                       a.af_adress as f_address,
-                       a.f_territory_id,
-                       a.f_locality_type,
-                       a.f_street_type,
-                       a.f_street,
-                       a.f_home_type,
-                       a.f_home,
-                       a.f_homepart_type,
-                       a.f_homepart,
-                       a.f_room_type,
-                       a.f_room,
                        a.f_koatuu,
                        a.f_region_id,
                        a.f_area_id,
                        a.f_settlement_id,
                        a.f_street_id,
                        a.f_house_id,
-                       a.ap_contry as p_country,
-                       a.ap_zip as p_zip,
-                       a.ap_domain as p_domain,
-                       a.ap_region as p_region,
-                       a.ap_locality as p_locality,
-                       a.ap_adress as p_address,
-                       a.p_territory_id,
-                       a.p_locality_type,
-                       a.p_street_type,
-                       a.p_street,
-                       a.p_home_type,
-                       a.p_home,
-                       a.p_homepart_type,
-                       a.p_homepart,
-                       a.p_room_type,
-                       a.p_room,
                        a.p_koatuu,
                        a.p_region_id,
                        a.p_area_id,
                        a.p_settlement_id,
                        a.p_street_id,
-                       a.p_house_id
+              a.p_house_id,
+              (select s.active_directory_name  
+                 from bars.vip_flags v  
+                 join bars.staff_ad_user s on v.account_manager = s.user_id  
+                where rnk=c.rnk) vip_account_manager--аккаунт працівника по віп в форматі АД 
                   from bars.customer c, bars.person p,
                          ( select rnk,
-                                "'1'_C1" au_contry,
-                                "'1'_C2" au_zip,
-                                "'1'_C3" au_domain,
-                                "'1'_C4" au_region,
-                                "'1'_C5" au_locality,
-                                "'1'_C6" au_adress,
-                                "'1'_C7" j_territory_id,
-                                "'1'_C8" j_locality_type,
-                                "'1'_C9" j_street_type,
-                                "'1'_C10" j_street,
-                                "'1'_C11" j_home_type,
-                                "'1'_C12" j_home,
-                                "'1'_C13" j_homepart_type,
-                                "'1'_C14" j_homepart,
-                                "'1'_C15" j_room_type,
-                                "'1'_C16" j_room,
-                                "'1'_C17" j_koatuu,
-                                "'1'_C18" j_region_id,
-                                "'1'_C19" j_area_id,
-                                "'1'_C20" j_settlement_id,
-                                "'1'_C21" j_street_id,
-                                "'1'_C22" j_house_id,
-                                "'2'_C1" af_contry,
-                                "'2'_C2" af_zip,
-                                "'2'_C3" af_domain,
-                                "'2'_C4" af_region,
-                                "'2'_C5" af_locality,
-                                "'2'_C6" af_adress,
-                                "'2'_C7" f_territory_id,
-                                "'2'_C8" f_locality_type,
-                                "'2'_C9" f_street_type,
-                                "'2'_C10" f_street,
-                                "'2'_C11" f_home_type,
-                                "'2'_C12" f_home,
-                                "'2'_C13" f_homepart_type,
-                                "'2'_C14" f_homepart,
-                                "'2'_C15" f_room_type,
-                                "'2'_C16" f_room,
-                                "'2'_C17" f_koatuu,
-                                "'2'_C18" f_region_id,
-                                "'2'_C19" f_area_id,
-                                "'2'_C20" f_settlement_id,
-                                "'2'_C21" f_street_id,
-                                "'2'_C22" f_house_id,
-                                "'3'_C1" ap_contry,
-                                "'3'_C2" ap_zip,
-                                "'3'_C3" ap_domain,
-                                "'3'_C4" ap_region,
-                                "'3'_C5" ap_locality,
-                                "'3'_C6" ap_adress,
-                                "'3'_C7" p_territory_id,
-                                "'3'_C8" p_locality_type,
-                                "'3'_C9" p_street_type,
-                                "'3'_C10" p_street,
-                                "'3'_C11" p_home_type,
-                                "'3'_C12" p_home,
-                                "'3'_C13" p_homepart_type,
-                                "'3'_C14" p_homepart,
-                                "'3'_C15" p_room_type,
-                                "'3'_C16" p_room,
-                                "'3'_C17" p_koatuu,
-                                "'3'_C18" p_region_id,
-                                "'3'_C19" p_area_id,
-                                "'3'_C20" p_settlement_id,
-                                "'3'_C21" p_street_id,
-                                "'3'_C22" p_house_id
+                                "''1''_C1" au_contry,
+                                "''1''_C2" au_zip,
+                                "''1''_C3" au_domain,
+                                "''1''_C4" au_region,
+                                "''1''_C5" au_locality,
+                                "''1''_C6" au_adress,
+                                "''1''_C7" j_territory_id,
+                                "''1''_C8" j_locality_type,
+                                "''1''_C9" j_street_type,
+                                "''1''_C10" j_street,
+                                "''1''_C11" j_home_type,
+                                "''1''_C12" j_home,
+                                "''1''_C13" j_homepart_type,
+                                "''1''_C14" j_homepart,
+                                "''1''_C15" j_room_type,
+                                "''1''_C16" j_room,
+                                "''1''_C17" j_koatuu,
+                                "''1''_C18" j_region_id,
+                                "''1''_C19" j_area_id,
+                                "''1''_C20" j_settlement_id,
+                                "''1''_C21" j_street_id,
+                                "''1''_C22" j_house_id,
+                                "''2''_C1" af_contry,
+                                "''2''_C2" af_zip,
+                                "''2''_C3" af_domain,
+                                "''2''_C4" af_region,
+                                "''2''_C5" af_locality,
+                                "''2''_C6" af_adress,
+                                "''2''_C7" f_territory_id,
+                                "''2''_C8" f_locality_type,
+                                "''2''_C9" f_street_type,
+                                "''2''_C10" f_street,
+                                "''2''_C11" f_home_type,
+                                "''2''_C12" f_home,
+                                "''2''_C13" f_homepart_type,
+                                "''2''_C14" f_homepart,
+                                "''2''_C15" f_room_type,
+                                "''2''_C16" f_room,
+                                "''2''_C17" f_koatuu,
+                                "''2''_C18" f_region_id,
+                                "''2''_C19" f_area_id,
+                                "''2''_C20" f_settlement_id,
+                                "''2''_C21" f_street_id,
+                                "''2''_C22" f_house_id,
+                                "''3''_C1" ap_contry,
+                                "''3''_C2" ap_zip,
+                                "''3''_C3" ap_domain,
+                                "''3''_C4" ap_region,
+                                "''3''_C5" ap_locality,
+                                "''3''_C6" ap_adress,
+                                "''3''_C7" p_territory_id,
+                                "''3''_C8" p_locality_type,
+                                "''3''_C9" p_street_type,
+                                "''3''_C10" p_street,
+                                "''3''_C11" p_home_type,
+                                "''3''_C12" p_home,
+                                "''3''_C13" p_homepart_type,
+                                "''3''_C14" p_homepart,
+                                "''3''_C15" p_room_type,
+                                "''3''_C16" p_room,
+                                "''3''_C17" p_koatuu,
+                                "''3''_C18" p_region_id,
+                                "''3''_C19" p_area_id,
+                                "''3''_C20" p_settlement_id,
+                                "''3''_C21" p_street_id,
+                                "''3''_C22" p_house_id
                            from (select rnk, type_id, country,zip, domain, region, locality, address, territory_id, locality_type, street_type,
                            street, home_type, home, homepart_type, homepart, room_type, room, koatuu, region_id, area_id, settlement_id, street_id, house_id from bars.customer_address)
                           pivot (max(country) c1, max(zip) c2, max(domain) c3, max(region) c4, max(locality) c5, max(address) c6, max(territory_id) c7,
                           max(locality_type) c8, max(street_type) c9, max(street) c10, max(home_type) c11, max(home) c12, max(homepart_type) c13,
                           max(homepart) c14,max(room_type) c15, max(room) c16, max(koatuu) c17, max(region_id) c18, max(area_id) c19, max(settlement_id) c20,
                           max(street_id) c21, max(house_id) c22
-                                   for type_id in ('1', '2', '3')
+                                   for type_id in (''1'', ''2'', ''3'')
                                 )
                           ) a,
                              (select rnk,
-                                    "'CIGPO'_CC"  as cigpo,
-                                    "'EMAIL'_CC"  as email,
-                                    "'GR   '_CC"  as gr,
-                                    "'MPNO '_CC"  as mpno,
-                                    "'VIP_K'_CC"  as vipk,
-                                    "'TEL_D'_CC"  as tel_d,
-                                    "'UADR'_CC"   as UADR
+                                    "''CIGPO''_CC"  as cigpo,
+                                    "''EMAIL''_CC"  as email,
+                                    "''GR   ''_CC"  as gr,
+                                    "''MPNO ''_CC"  as mpno,
+                                    "''VIP_K''_CC"  as vipk,
+                                    "''TEL_D''_CC"  as tel_d,
+                                    "''UADR''_CC"   as UADR
                                from (select w.rnk, tag, value
                                        from bars.customerw w
-                                      where tag in ('CIGPO','EMAIL','GR   ','MPNO ','VIP_K', 'TEL_D', 'UADR')
+                                      where tag in (''CIGPO'',''EMAIL'',''GR   '',''MPNO '',''VIP_K'', ''TEL_D'', ''UADR'')
                                     )
-                             pivot ( max(value) cc for tag in ('CIGPO', 'EMAIL', 'GR   ', 'MPNO ', 'VIP_K', 'TEL_D', 'UADR'))
+                             pivot ( max(value) cc for tag in (''CIGPO'', ''EMAIL'', ''GR   '', ''MPNO '', ''VIP_K'', ''TEL_D'', ''UADR''))
                              ) w
                               ,bars.EBKC_GCIF gc, bars.RNK_REKV rkv, bars.country cntr,
                               (select rnk,
-                                      "'SUBSD'_CC" as SUBSD,
-                                      "'SUBSN'_CC" as SUBSN,
-                                      "'ELT_N'_CC" as ELT_N,
-                                      "'ELT_D'_CC" as ELT_D,
-                                      "'SW_RN'_CC" as SW_RN,
-                                      "'Y_ELT'_CC" as Y_ELT,
-                                      "'BUSSS'_CC" as BUSSS,
-                                      "'PC_MF'_CC" as PC_MF,
-                                      "'PC_Z4'_CC" as PC_Z4,
-                                      "'PC_Z3'_CC" as PC_Z3,
-                                      "'PC_Z5'_CC" as PC_Z5,
-                                      "'PC_Z2'_CC" as PC_Z2,
-                                      "'PC_Z1'_CC" as PC_Z1,
-                                      "'AGENT'_CC" as AGENT,
-                                      "'PC_SS'_CC" as PC_SS,
-                                      "'STMT'_CC" as STMT,
-                                      "'VIDKL'_CC" as VIDKL,
-                                      "'TIPA'_CC" as TIPA,
-                                      "'PHKLI'_CC" as PHKLI,
-                                      "'AF1_9'_CC" as AF1_9,
-                                      "'IDDPD'_CC" as IDDPD,
-                                      "'DAIDI'_CC" as DAIDI,
-                                      "'DATVR'_CC" as DATVR,
-                                      "'DATZ'_CC" as DATZ,
-                                      "'IDDPL'_CC" as IDDPL,
-                                      "'IDDPR'_CC" as IDDPR,
-                                      "'OBSLU'_CC" as OBSLU,
-                                      "'CRSRC'_CC" as CRSRC,
-                                      "'DJOTH'_CC" as DJOTH,
-                                      "'DJAVI'_CC" as DJAVI,
-                                      "'DJ_TC'_CC" as DJ_TC,
-                                      "'DJOWF'_CC" as DJOWF,
-                                      "'DJCFI'_CC" as DJCFI,
-                                      "'DJ_LN'_CC" as DJ_LN,
-                                      "'DJ_FH'_CC" as DJ_FH,
-                                      "'DJ_CP'_CC" as DJ_CP,
-                                      "'CHORN'_CC" as CHORN,
-                                      "'SPMRK'_CC" as SPMRK,
-                                      "'K013'_CC" as K013,
-                                      "'KODID'_CC" as KODID,
-                                      "'MS_FS'_CC" as MS_FS,
-                                      "'MS_VD'_CC" as MS_VD,
-                                      "'MS_GR'_CC" as MS_GR,
-                                      "'LICO'_CC" as LICO,
-                                      "'MOB01'_CC" as MOB01,
-                                      "'MOB02'_CC" as MOB02,
-                                      "'MOB03'_CC" as MOB03,
-                                      "'SUBS'_CC" as SUBS,
-                                      "'DEATH'_CC" as DEATH,
-                                      "'NSMCV'_CC" as NSMCV,
-                                      "'NSMCC'_CC" as NSMCC,
-                                      "'NSMCT'_CC" as NSMCT,
-                                      "'SAMZ'_CC" as SAMZ,
-                                      "'O_REP'_CC" as OREP,
-                                      "'OVIFS'_CC" as OVIFS,
-                                      "'AF6'_CC" as AF6,
-                                      "'FSKRK'_CC" as FSKRK,
-                                      "'FSOMD'_CC" as FSOMD,
-                                      "'FSVED'_CC" as FSVED,
-                                      "'FSZPD'_CC" as FSZPD,
-                                      "'FSPOR'_CC" as FSPOR,
-                                      "'FSRKZ'_CC" as FSRKZ,
-                                      "'FSZOP'_CC" as FSZOP,
-                                      "'FSKPK'_CC" as FSKPK,
-                                      "'FSKPR'_CC" as FSKPR,
-                                      "'FSDIB'_CC" as FSDIB,
-                                      "'FSCP'_CC" as FSCP,
-                                      "'FSVLZ'_CC" as FSVLZ,
-                                      "'FSVLA'_CC" as FSVLA,
-                                      "'FSVLN'_CC" as FSVLN,
-                                      "'FSVLO'_CC" as FSVLO,
-                                      "'FSSST'_CC" as FSSST,
-                                      "'FSSOD'_CC" as FSSOD,
-                                      "'FSVSN'_CC" as FSVSN,
-                                      "'SN_GC'_CC" as SN_GC,
-                                      "'PUBLP'_CC" as PUBLP,
-                                      "'WORKB'_CC" as WORKB,
-                                      "'CIGPO'_CC" as CIGPO,
-                                      "'TARIF'_CC" as TARIF,
-                                      "'AINAB'_CC" as AINAB,
-                                      "'SNSDR'_CC" as SNSDR,
-                                      "'IDPIB'_CC" as IDPIB,
-                                      "'DJER'_CC" as DJER,
-                                      "'SUTD'_CC" as SUTD,
-                                      "'RVDBC'_CC" as RVDBC,
-                                      "'RVIBA'_CC" as RVIBA,
-                                      "'RVIDT'_CC" as RVIDT,
-                                      "'RV_XA'_CC" as RV_XA,
-                                      "'RVIBR'_CC" as RVIBR,
-                                      "'RVIBB'_CC" as RVIBB,
-                                      "'RVRNK'_CC" as RVRNK,
-                                      "'RVPH1'_CC" as RVPH1,
-                                      "'RVPH2'_CC" as RVPH2,
-                                      "'RVPH3'_CC" as RVPH3,
-                                      "'FADR'_CC" as FADR,
-                                      "'RIZIK'_CC" as RIZIK,
-                                      "'DOV_P'_CC" as DOV_P,
-                                      "'DOV_A'_CC" as DOV_A,
-                                      "'DOV_F'_CC" as DOV_F
+                                      "''SUBSD''_CC" as SUBSD,
+                                      "''SUBSN''_CC" as SUBSN,
+                                      "''ELT_N''_CC" as ELT_N,
+                                      "''ELT_D''_CC" as ELT_D,
+                                      "''SW_RN''_CC" as SW_RN,
+                                      "''Y_ELT''_CC" as Y_ELT,
+                                      "''BUSSS''_CC" as BUSSS,
+                                      "''PC_MF''_CC" as PC_MF,
+                                      "''PC_Z4''_CC" as PC_Z4,
+                                      "''PC_Z3''_CC" as PC_Z3,
+                                      "''PC_Z5''_CC" as PC_Z5,
+                                      "''PC_Z2''_CC" as PC_Z2,
+                                      "''PC_Z1''_CC" as PC_Z1,
+                                      "''AGENT''_CC" as AGENT,
+                                      "''PC_SS''_CC" as PC_SS,
+                                      "''STMT''_CC" as STMT,
+                                      "''VIDKL''_CC" as VIDKL,
+                                      "''TIPA''_CC" as TIPA,
+                                      "''PHKLI''_CC" as PHKLI,
+                                      "''AF1_9''_CC" as AF1_9,
+                                      "''IDDPD''_CC" as IDDPD,
+                                      "''DAIDI''_CC" as DAIDI,
+                                      "''DATVR''_CC" as DATVR,
+                                      "''DATZ''_CC" as DATZ,
+                                      "''IDDPL''_CC" as IDDPL,
+                                      "''IDDPR''_CC" as IDDPR,
+                                      "''OBSLU''_CC" as OBSLU,
+                                      "''CRSRC''_CC" as CRSRC,
+                                      "''DJOTH''_CC" as DJOTH,
+                                      "''DJAVI''_CC" as DJAVI,
+                                      "''DJ_TC''_CC" as DJ_TC,
+                                      "''DJOWF''_CC" as DJOWF,
+                                      "''DJCFI''_CC" as DJCFI,
+                                      "''DJ_LN''_CC" as DJ_LN,
+                                      "''DJ_FH''_CC" as DJ_FH,
+                                      "''DJ_CP''_CC" as DJ_CP,
+                                      "''CHORN''_CC" as CHORN,
+                                      "''SPMRK''_CC" as SPMRK,
+                                      "''K013''_CC" as K013,
+                                      "''KODID''_CC" as KODID,
+                                      "''MS_FS''_CC" as MS_FS,
+                                      "''MS_VD''_CC" as MS_VD,
+                                      "''MS_GR''_CC" as MS_GR,
+                                      "''LICO''_CC" as LICO,
+                                      "''MOB01''_CC" as MOB01,
+                                      "''MOB02''_CC" as MOB02,
+                                      "''MOB03''_CC" as MOB03,
+                                      "''SUBS''_CC" as SUBS,
+                                      "''DEATH''_CC" as DEATH,
+                                      "''NSMCV''_CC" as NSMCV,
+                                      "''NSMCC''_CC" as NSMCC,
+                                      "''NSMCT''_CC" as NSMCT,
+                                      "''SAMZ''_CC" as SAMZ,
+                                      "''O_REP''_CC" as OREP,
+                                      "''OVIFS''_CC" as OVIFS,
+                                      "''AF6''_CC" as AF6,
+                                      "''FSKRK''_CC" as FSKRK,
+                                      "''FSOMD''_CC" as FSOMD,
+                                      "''FSVED''_CC" as FSVED,
+                                      "''FSZPD''_CC" as FSZPD,
+                                      "''FSPOR''_CC" as FSPOR,
+                                      "''FSRKZ''_CC" as FSRKZ,
+                                      "''FSZOP''_CC" as FSZOP,
+                                      "''FSKPK''_CC" as FSKPK,
+                                      "''FSKPR''_CC" as FSKPR,
+                                      "''FSDIB''_CC" as FSDIB,
+                                      "''FSCP''_CC" as FSCP,
+                                      "''FSVLZ''_CC" as FSVLZ,
+                                      "''FSVLA''_CC" as FSVLA,
+                                      "''FSVLN''_CC" as FSVLN,
+                                      "''FSVLO''_CC" as FSVLO,
+                                      "''FSSST''_CC" as FSSST,
+                                      "''FSSOD''_CC" as FSSOD,
+                                      "''FSVSN''_CC" as FSVSN,
+                                      "''SN_GC''_CC" as SN_GC,
+                                      "''PUBLP''_CC" as PUBLP,
+                                      "''WORKB''_CC" as WORKB,
+                                      "''CIGPO''_CC" as CIGPO,
+                                      "''TARIF''_CC" as TARIF,
+                                      "''AINAB''_CC" as AINAB,
+                                      "''SNSDR''_CC" as SNSDR,
+                                      "''IDPIB''_CC" as IDPIB,
+                                      "''DJER''_CC" as DJER,
+                                      "''SUTD''_CC" as SUTD,
+                                      "''RVDBC''_CC" as RVDBC,
+                                      "''RVIBA''_CC" as RVIBA,
+                                      "''RVIDT''_CC" as RVIDT,
+                                      "''RV_XA''_CC" as RV_XA,
+                                      "''RVIBR''_CC" as RVIBR,
+                                      "''RVIBB''_CC" as RVIBB,
+                                      "''RVRNK''_CC" as RVRNK,
+                                      "''RVPH1''_CC" as RVPH1,
+                                      "''RVPH2''_CC" as RVPH2,
+                                      "''RVPH3''_CC" as RVPH3,
+                                      "''FADR''_CC" as FADR,
+                                      "''RIZIK''_CC" as RIZIK,
+                                      "''DOV_P''_CC" as DOV_P,
+                                      "''DOV_A''_CC" as DOV_A,
+                                      "''DOV_F''_CC" as DOV_F
                                from (select w.rnk, tag, value
                                        from bars.customerw w
-                                      where tag in ('SUBSD','SUBSN','ELT_N','ELT_D','SW_RN','Y_ELT','BUSSS','PC_MF',
-                                                    'PC_Z4','PC_Z3','PC_Z5','PC_Z2','PC_Z1','AGENT','PC_SS','STMT',
-                                                    'VIDKL','TIPA','PHKLI','AF1_9','IDDPD','DAIDI','DATVR','DATZ',
-                                                    'IDDPL','IDDPR','OBSLU','CRSRC','DJOTH','DJAVI','DJ_TC','DJOWF',
-                                                    'DJCFI','DJ_LN','DJ_FH','DJ_CP','CHORN','SPMRK','K013','KODID',
-                                                    'MS_FS','MS_VD','MS_GR','LICO','MOB01','MOB02','MOB03','SUBS',
-                                                    'DEATH','NSMCV','NSMCC','NSMCT','SAMZ','O_REP','OVIFS','AF6',
-                                                    'FSKRK','FSOMD','FSVED','FSZPD','FSPOR','FSRKZ','FSZOP','FSKPK',
-                                                    'FSKPR','FSDIB','FSCP','FSVLZ','FSVLA','FSVLN','FSVLO','FSSST',
-                                                    'FSSOD','FSVSN','SN_GC','PUBLP','WORKB','CIGPO','TARIF','AINAB',
-                                                    'SNSDR','IDPIB','DJER','SUTD','RVDBC','RVIBA','RVIDT','RV_XA',
-                                                    'RVIBR','RVIBB','RVRNK','RVPH1','RVPH2','RVPH3','FADR','RIZIK',
-                                                    'DOV_P', 'DOV_A', 'DOV_F')
+                                      where tag in (''SUBSD'',''SUBSN'',''ELT_N'',''ELT_D'',''SW_RN'',''Y_ELT'',''BUSSS'',''PC_MF'',
+                                                    ''PC_Z4'',''PC_Z3'',''PC_Z5'',''PC_Z2'',''PC_Z1'',''AGENT'',''PC_SS'',''STMT'',
+                                                    ''VIDKL'',''TIPA'',''PHKLI'',''AF1_9'',''IDDPD'',''DAIDI'',''DATVR'',''DATZ'',
+                                                    ''IDDPL'',''IDDPR'',''OBSLU'',''CRSRC'',''DJOTH'',''DJAVI'',''DJ_TC'',''DJOWF'',
+                                                    ''DJCFI'',''DJ_LN'',''DJ_FH'',''DJ_CP'',''CHORN'',''SPMRK'',''K013'',''KODID'',
+                                                    ''MS_FS'',''MS_VD'',''MS_GR'',''LICO'',''MOB01'',''MOB02'',''MOB03'',''SUBS'',
+                                                    ''DEATH'',''NSMCV'',''NSMCC'',''NSMCT'',''SAMZ'',''O_REP'',''OVIFS'',''AF6'',
+                                                    ''FSKRK'',''FSOMD'',''FSVED'',''FSZPD'',''FSPOR'',''FSRKZ'',''FSZOP'',''FSKPK'',
+                                                    ''FSKPR'',''FSDIB'',''FSCP'',''FSVLZ'',''FSVLA'',''FSVLN'',''FSVLO'',''FSSST'',
+                                                    ''FSSOD'',''FSVSN'',''SN_GC'',''PUBLP'',''WORKB'',''CIGPO'',''TARIF'',''AINAB'',
+                                                    ''SNSDR'',''IDPIB'',''DJER'',''SUTD'',''RVDBC'',''RVIBA'',''RVIDT'',''RV_XA'',
+                                                    ''RVIBR'',''RVIBB'',''RVRNK'',''RVPH1'',''RVPH2'',''RVPH3'',''FADR'',''RIZIK'',
+                                                    ''DOV_P'', ''DOV_A'', ''DOV_F'')
                                     )
-                             pivot ( max(value) cc for tag in ('SUBSD','SUBSN','ELT_N','ELT_D','SW_RN','Y_ELT','BUSSS','PC_MF',
-                                                              'PC_Z4','PC_Z3','PC_Z5','PC_Z2','PC_Z1','AGENT','PC_SS','STMT',
-                                                              'VIDKL','TIPA','PHKLI','AF1_9','IDDPD','DAIDI','DATVR','DATZ',
-                                                              'IDDPL','IDDPR','OBSLU','CRSRC','DJOTH','DJAVI','DJ_TC','DJOWF',
-                                                              'DJCFI','DJ_LN','DJ_FH','DJ_CP','CHORN','SPMRK','K013','KODID',
-                                                              'MS_FS','MS_VD','MS_GR','LICO','MOB01','MOB02','MOB03','SUBS',
-                                                              'DEATH','NSMCV','NSMCC','NSMCT','SAMZ','O_REP','OVIFS','AF6',
-                                                              'FSKRK','FSOMD','FSVED','FSZPD','FSPOR','FSRKZ','FSZOP','FSKPK',
-                                                              'FSKPR','FSDIB','FSCP','FSVLZ','FSVLA','FSVLN','FSVLO','FSSST',
-                                                              'FSSOD','FSVSN','SN_GC','PUBLP','WORKB','CIGPO','TARIF','AINAB',
-                                                              'SNSDR','IDPIB','DJER','SUTD','RVDBC','RVIBA','RVIDT','RV_XA',
-                                                              'RVIBR','RVIBB','RVRNK','RVPH1','RVPH2','RVPH3','FADR','RIZIK',
-                                                              'DOV_P', 'DOV_A', 'DOV_F'))
+                             pivot ( max(value) cc for tag in (''SUBSD'',''SUBSN'',''ELT_N'',''ELT_D'',''SW_RN'',''Y_ELT'',''BUSSS'',''PC_MF'',
+                                                              ''PC_Z4'',''PC_Z3'',''PC_Z5'',''PC_Z2'',''PC_Z1'',''AGENT'',''PC_SS'',''STMT'',
+                                                              ''VIDKL'',''TIPA'',''PHKLI'',''AF1_9'',''IDDPD'',''DAIDI'',''DATVR'',''DATZ'',
+                                                              ''IDDPL'',''IDDPR'',''OBSLU'',''CRSRC'',''DJOTH'',''DJAVI'',''DJ_TC'',''DJOWF'',
+                                                              ''DJCFI'',''DJ_LN'',''DJ_FH'',''DJ_CP'',''CHORN'',''SPMRK'',''K013'',''KODID'',
+                                                              ''MS_FS'',''MS_VD'',''MS_GR'',''LICO'',''MOB01'',''MOB02'',''MOB03'',''SUBS'',
+                                                              ''DEATH'',''NSMCV'',''NSMCC'',''NSMCT'',''SAMZ'',''O_REP'',''OVIFS'',''AF6'',
+                                                              ''FSKRK'',''FSOMD'',''FSVED'',''FSZPD'',''FSPOR'',''FSRKZ'',''FSZOP'',''FSKPK'',
+                                                              ''FSKPR'',''FSDIB'',''FSCP'',''FSVLZ'',''FSVLA'',''FSVLN'',''FSVLO'',''FSSST'',
+                                                              ''FSSOD'',''FSVSN'',''SN_GC'',''PUBLP'',''WORKB'',''CIGPO'',''TARIF'',''AINAB'',
+                                                              ''SNSDR'',''IDPIB'',''DJER'',''SUTD'',''RVDBC'',''RVIBA'',''RVIDT'',''RV_XA'',
+                                                              ''RVIBR'',''RVIBB'',''RVRNK'',''RVPH1'',''RVPH2'',''RVPH3'',''FADR'',''RIZIK'',
+                                                              ''DOV_P'', ''DOV_A'', ''DOV_F''))
                              ) ww
+                             ';
+                             
+    -- дельта
+    q_str_inc_suf  varchar2(4000) :=
+             ' ,c1
               where c.custtype=3
                 and c.rnk=p.rnk
                 and c.COUNTRY = cntr.COUNTRY(+)
@@ -5512,309 +5020,340 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                 and c.rnk = a.rnk(+)
                 and c.rnk = w.rnk(+)
                 and c.rnk = ww.rnk(+)
-                --and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов
-                and p_periodtype = 'MONTH'
-                )
-        loop
+                and C.RNK = c1.rnk --Только для ежедневных выгрузок 
+                 ';
+    -- полная выгрузка
+    q_str_full_suf  varchar2(4000) :=
+            ' where c.custtype=3
+                and c.rnk=p.rnk
+                and c.COUNTRY = cntr.COUNTRY(+)
+                and c.rnk = rkv.RNK(+)
+                and c.rnk = gc.RNK(+)
+                and c.rnk = a.rnk(+)
+                and c.rnk = w.rnk(+)
+                and c.rnk = ww.rnk(+)
+                 ';
+                
+    q_log_errors varchar2(4000) := q'[ LOG ERRORS into ERR$_CUSTOMERS_PLT ('INS') reject limit unlimited ]';
+    
           begin
-              l_row.per_id := l_per_id;
-              l_row.KF := c.KF;
-              l_row.ID := s_customers.nextval;
-              l_row.RU := c.KF;
-              l_row.RNK := c.RNK;
-              l_row.BRANCH := c.BRANCH;
-              l_row.LAST_NAME := c.LAST_NAME;
-              l_row.FIRST_NAME := c.FIRST_NAME;
-              l_row.MIDDLE_NAME := c.MIDDLE_NAME;
-              l_row.SEX := c.SEX;
-              l_row.GR := c.GR;
-              l_row.BDAY := c.BDAY;
-              l_row.PASSP := c.PASSP;
-              l_row.SER := c.SER;
-              l_row.NUMDOC := c.NUMDOC;
-              l_row.PDATE := c.PDATE;
-              l_row.ORGAN := c.ORGAN;
-              l_row.PASSP_EXPIRE_TO := c.ACTUAL_DATE;
-              l_row.PASSP_TO_BANK := null;
-              l_row.OKPO := c.OKPO;
-              l_row.CUST_STATUS := c.CUST_STATUS;
-              l_row.CUST_ACTIVE := c.CUST_ACTIVE;
-              l_row.TELM := c.TELM;
-              l_row.TELW := c.TELW;
-              l_row.TELD := c.TELD;
-              l_row.TELADD := c.TELADD;
-              l_row.EMAIL := c.EMAIL;
+          bars.bars_audit.info(l_trace||' start');
+          -- get period id
+          l_per_id := get_period_id (p_periodtype, p_dat);
 
-              l_row.ADR_POST_COUNTRY := c.ap_contry;
-              l_row.ADR_POST_DOMAIN := c.ap_domain;
-              l_row.ADR_POST_REGION := c.ap_region;
-              l_row.ADR_POST_LOC := c.ap_locality;
-              l_row.ADR_POST_ADR := c.ap_adress;
-              l_row.ADR_POST_ZIP := c.ap_zip;
-              /* В adr_fact - адрес регистрации - выгружаем юридический адрес; Место работы - аналогично, т.е. дублируем */
-              l_row.ADR_FACT_COUNTRY := c.au_contry;
-              l_row.ADR_FACT_DOMAIN := c.au_domain;
-              l_row.ADR_FACT_REGION := c.au_region;
-              l_row.ADR_FACT_LOC := c.au_locality;
-              l_row.ADR_FACT_ADR := c.au_adress;
-              l_row.ADR_FACT_ZIP := c.au_zip;
-              l_row.ADR_WORK_COUNTRY := c.au_contry;
-              l_row.ADR_WORK_DOMAIN := c.au_domain;
-              l_row.ADR_WORK_REGION := c.au_region;
-              l_row.ADR_WORK_LOC := c.au_locality;
-              l_row.ADR_WORK_ADR := c.au_adress;
-              l_row.ADR_WORK_ZIP := c.au_zip;
+          if l_per_id is null then
+            return;
+          end if;
 
-              l_row.NEGATIV_STATUS := null;
-              l_row.REESTR_MOB_BANK := null;
-              l_row.REESTR_INET_BANK := null;
-              l_row.REESTR_SMS_BANK := null;
-              l_row.MONTH_INCOME := null;
-              l_row.SUBJECT_ROLE := null;
-              l_row.REZIDENT := c.REZIDENT;
-              l_row.MERRIED := c.PC_SS; -- "сімейний стан" берем из рекв. БПК
-              l_row.EMP_STATUS := c.EMP_STATUS;
-              l_row.SUBJECT_CLASS := c.SUBJECT_CLASS;
-              l_row.INSIDER := c.INSIDER;
-              l_row.VIPK := c.VIPK;
-              l_row.VIP_FIO_MANAGER := c.VIP_FIO_MANAGER;
-              l_row.VIP_PHONE_MANAGER := c.VIP_PHONE_MANAGER;
-              l_row.DATE_ON := c.DATE_ON;
-              l_row.DATE_OFF := c.DATE_OFF;
-              l_row.EDDR_ID := c.EDDR_ID;
-              l_row.ACTUAL_DATE := c.ACTUAL_DATE;
-              l_row.BPLACE := c.BPLACE;
-              l_row.SUBSD := c.SUBSD;
-              l_row.SUBSN := c.SUBSN;
-              l_row.ELT_N := c.ELT_N;
-              l_row.ELT_D := c.ELT_D;
-              l_row.GCIF := c.GCIF;
-              l_row.NOMPDV := c.NOMPDV;
-              l_row.NOM_DOG := c.NOM_DOG;
-              l_row.SW_RN := c.SW_RN;
-              l_row.Y_ELT := c.Y_ELT;
-              l_row.ADM := c.ADM;
-              l_row.ADR_ALT := c.ADR_ALT;
-              l_row.BUSSS := c.BUSSS;
-              l_row.PC_MF := c.PC_MF;
-              l_row.PC_Z4 := c.PC_Z4;
-              l_row.PC_Z3 := c.PC_Z3;
-              l_row.PC_Z5 := c.PC_Z5;
-              l_row.PC_Z2 := c.PC_Z2;
-              l_row.PC_Z1 := c.PC_Z1;
-              l_row.AGENT := c.AGENT;
-              l_row.PC_SS := c.PC_SS;
-              l_row.STMT := c.STMT;
-              l_row.VIDKL := c.VIDKL;
-              l_row.VED := c.VED;
-              l_row.TIPA := c.TIPA;
-              l_row.PHKLI := c.PHKLI;
-              l_row.AF1_9 := c.AF1_9;
-              l_row.IDDPD := c.IDDPD;
-              l_row.DAIDI := c.DAIDI;
-              l_row.DATVR := c.DATVR;
-              l_row.DATZ := c.DATZ;
-              l_row.IDDPL := c.IDDPL;
-              l_row.DATE_PHOTO := c.DATE_PHOTO;
-              l_row.IDDPR := c.IDDPR;
-              l_row.ISE := c.ISE;
-              l_row.OBSLU := c.OBSLU;
-              l_row.CRSRC := c.CRSRC;
-              l_row.DJOTH := c.DJOTH;
-              l_row.DJAVI := c.DJAVI;
-              l_row.DJ_TC := c.DJ_TC;
-              l_row.DJOWF := c.DJOWF;
-              l_row.DJCFI := c.DJCFI;
-              l_row.DJ_LN := c.DJ_LN;
-              l_row.DJ_FH := c.DJ_FH;
-              l_row.DJ_CP := c.DJ_CP;
-              l_row.CHORN := c.CHORN;
-              l_row.CRISK_KL := c.CRISK_KL;
-              l_row.BC := c.BC;
-              l_row.SPMRK := c.SPMRK;
-              l_row.K013 := c.K013;
-              l_row.KODID := c.KODID;
-              l_row.COUNTRY := c.COUNTRY;
-              l_row.MS_FS := c.MS_FS;
-              l_row.MS_VD := c.MS_VD;
-              l_row.MS_GR := c.MS_GR;
-              l_row.LIM_KASS := c.LIM_KASS;
-              l_row.LIM := c.LIM;
-              l_row.LICO := c.LICO;
-              l_row.UADR := c.UADR;
-              l_row.MOB01 := c.MOB01;
-              l_row.MOB02 := c.MOB02;
-              l_row.MOB03 := c.MOB03;
-              l_row.SUBS := c.SUBS;
-              l_row.K050 := c.K050;
-              l_row.DEATH := c.DEATH;
-              l_row.NO_PHONE := c.NO_PHONE;
-              l_row.NSMCV := c.NSMCV;
-              l_row.NSMCC := c.NSMCC;
-              l_row.NSMCT := c.NSMCT;
-              l_row.NOTES := c.NOTES;
-              l_row.SAMZ := c.SAMZ;
-              l_row.OREP := c.OREP;
-              l_row.OVIFS := c.OVIFS;
-              l_row.AF6 := c.AF6;
-              l_row.FSKRK := c.FSKRK;
-              l_row.FSOMD := c.FSOMD;
-              l_row.FSVED := c.FSVED;
-              l_row.FSZPD := c.FSZPD;
-              l_row.FSPOR := c.FSPOR;
-              l_row.FSRKZ := c.FSRKZ;
-              l_row.FSZOP := c.FSZOP;
-              l_row.FSKPK := c.FSKPK;
-              l_row.FSKPR := c.FSKPR;
-              l_row.FSDIB := c.FSDIB;
-              l_row.FSCP := c.FSCP;
-              l_row.FSVLZ := c.FSVLZ;
-              l_row.FSVLA := c.FSVLA;
-              l_row.FSVLN := c.FSVLN;
-              l_row.FSVLO := c.FSVLO;
-              l_row.FSSST := c.FSSST;
-              l_row.FSSOD := c.FSSOD;
-              l_row.FSVSN := c.FSVSN;
-              l_row.DOV_P := c.DOV_P;
-              l_row.DOV_A := c.DOV_A;
-              l_row.DOV_F := c.DOV_F;
-              l_row.NMKV := c.NMKV;
-              l_row.SN_GC := c.SN_GC;
-              l_row.NMKK := c.NMKK;
-              l_row.PRINSIDER := c.PRINSIDER;
-              l_row.MB := c.MB;
-              l_row.PUBLP := c.PUBLP;
-              l_row.WORKB := c.WORKB;
-              l_row.CIGPO := c.CIGPO;
-              l_row.COUNTRY_NAME := c.COUNTRY_NAME;
-              l_row.TARIF := c.TARIF;
-              l_row.AINAB := c.AINAB;
-              l_row.TGR := c.TGR;
-              l_row.SNSDR := c.SNSDR;
-              l_row.IDPIB := c.IDPIB;
-              l_row.FS := c.FS;
-              l_row.DJER := c.DJER;
-              l_row.SUTD := c.SUTD;
-              l_row.RVDBC := c.RVDBC;
-              l_row.RVIBA := c.RVIBA;
-              l_row.RVIDT := c.RVIDT;
-              l_row.RV_XA := c.RV_XA;
-              l_row.RVIBR := c.RVIBR;
-              l_row.RVIBB := c.RVIBB;
-              l_row.RVRNK := c.RVRNK;
-              l_row.RVPH1 := c.RVPH1;
-              l_row.RVPH2 := c.RVPH2;
-              l_row.RVPH3 := c.RVPH3;
-              l_row.SAB := c.SAB;
-              l_row.J_COUNTRY := c.J_COUNTRY;
-              l_row.J_ZIP := c.J_ZIP;
-              l_row.J_DOMAIN := c.J_DOMAIN;
-              l_row.J_REGION := c.J_REGION;
-              l_row.J_LOCALITY := c.J_LOCALITY;
-              l_row.J_ADDRESS := c.J_ADDRESS;
-              l_row.J_TERRITORY_ID := c.J_TERRITORY_ID;
-              l_row.J_LOCALITY_TYPE := c.J_LOCALITY_TYPE;
-              l_row.J_STREET_TYPE := c.J_STREET_TYPE;
-              l_row.J_STREET := c.J_STREET;
-              l_row.J_HOME_TYPE := c.J_HOME_TYPE;
-              l_row.J_HOME := c.J_HOME;
-              l_row.J_HOMEPART_TYPE := c.J_HOMEPART_TYPE;
-              l_row.J_HOMEPART := c.J_HOMEPART;
-              l_row.J_ROOM_TYPE := c.J_ROOM_TYPE;
-              l_row.J_ROOM := c.J_ROOM;
-              l_row.F_COUNTRY := c.F_COUNTRY;
-              l_row.F_ZIP := c.F_ZIP;
-              l_row.F_DOMAIN := c.F_DOMAIN;
-              l_row.F_REGION := c.F_REGION;
-              l_row.F_LOCALITY := c.F_LOCALITY;
-              l_row.FADR := c.FADR;
-              l_row.F_TERRITORY_ID := c.F_TERRITORY_ID;
-              l_row.F_LOCALITY_TYPE := c.F_LOCALITY_TYPE;
-              l_row.F_STREET_TYPE := c.F_STREET_TYPE;
-              l_row.F_STREET := c.F_STREET;
-              l_row.F_HOME_TYPE := c.F_HOME_TYPE;
-              l_row.F_HOME := c.F_HOME;
-              l_row.F_HOMEPART_TYPE := c.F_HOMEPART_TYPE;
-              l_row.F_HOMEPART := c.F_HOMEPART;
-              l_row.F_ROOM_TYPE := c.F_ROOM_TYPE;
-              l_row.F_ROOM := c.F_ROOM;
-              l_row.P_COUNTRY := c.P_COUNTRY;
-              l_row.P_ZIP := c.P_ZIP;
-              l_row.P_DOMAIN := c.P_DOMAIN;
-              l_row.P_REGION := c.P_REGION;
-              l_row.P_LOCALITY := c.P_LOCALITY;
-              l_row.P_ADDRESS := c.P_ADDRESS;
-              l_row.P_TERRITORY_ID := c.P_TERRITORY_ID;
-              l_row.P_LOCALITY_TYPE := c.P_LOCALITY_TYPE;
-              l_row.P_STREET_TYPE := c.P_STREET_TYPE;
-              l_row.P_STREET := c.P_STREET;
-              l_row.P_HOME_TYPE := c.P_HOME_TYPE;
-              l_row.P_HOME := c.P_HOME;
-              l_row.P_HOMEPART_TYPE := c.P_HOMEPART_TYPE;
-              l_row.P_HOMEPART := c.P_HOMEPART;
-              l_row.P_ROOM_TYPE := c.P_ROOM_TYPE;
-              l_row.P_ROOM := c.P_ROOM;
-              l_row.F_ADDRESS := c.F_ADDRESS;
-              l_row.NOTESEC := c.NOTESEC;
-              l_row.C_REG := c.C_REG;
-              l_row.C_DST := c.C_DST;
-              l_row.RGADM := c.RGADM;
-              l_row.RGTAX := c.RGTAX;
-              l_row.DATEA := c.DATEA;
-              l_row.DATET := c.DATET;
-              l_row.RNKP := c.RNKP;
-              l_row.CUSTTYPE := c.CUSTTYPE;
-              l_row.RIZIK := c.RIZIK;
-              l_row.SED := c.SED;
-              l_row.CODCAGENT := c.CODCAGENT;
+          truncate_kf_subpartition('CUSTOMERS_PLT', l_per_id, l_ourmfo);
 
-              l_row.J_KOATUU := c.j_koatuu;
-              l_row.J_REGION_ID := c.j_region_id;
-              l_row.J_AREA_ID := c.j_area_id;
-              l_row.J_SETTLEMENT_ID := c.j_settlement_id;
-              l_row.J_STREET_ID := c.j_street_id;
-              l_row.J_HOUSE_ID := c.j_house_id;
+          -- удаляем данные о предыдущих ошибках периода
+          clear_err_log(p_table_name => 'CUSTOMERS_PLT', p_per_id => l_per_id);
 
-              l_row.F_KOATUU := c.f_koatuu;
-              l_row.F_REGION_ID := c.f_region_id;
-              l_row.F_AREA_ID := c.f_area_id;
-              l_row.F_SETTLEMENT_ID := c.f_settlement_id;
-              l_row.F_STREET_ID := c.f_street_id;
-              l_row.F_HOUSE_ID := c.f_house_id;
+          -- e.g. partition (P1164) or subpartition (P1164_KF_300465)
+          l_insert_target := case when l_ourmfo is null then 'partition (P'||l_per_id||')' else 'subpartition (P'||l_per_id||'_KF_'||l_ourmfo||')' end;
+          bars.bars_audit.info(l_trace||' insert target: '||l_insert_target);
 
-              l_row.P_KOATUU := c.p_koatuu;
-              l_row.P_REGION_ID := c.p_region_id;
-              l_row.P_AREA_ID := c.p_area_id;
-              l_row.P_SETTLEMENT_ID := c.p_settlement_id;
-              l_row.P_STREET_ID := c.p_street_id;
-              l_row.P_HOUSE_ID := c.p_house_id;
-
-              l_row.vip_account_manager := c.vip_account_manager;
-
-            insert into customers_plt values l_row;
-
-            l_rows:=l_rows + 1;
-            dbms_application_info.set_client_info(l_trace||to_char(l_rows)|| ' processed');
-            if mod(l_rows, 100000) = 0 then
-              commit;
+          dbms_application_info.set_client_info('BARS_DM: IMPORT_'||p_periodtype||': CUSTOMERS_PLT '||l_ourmfo); 
+     begin     
+          q_insert :=
+            q'[
+            insert /*+ APPEND */ into CUSTOMERS_PLT ]'||l_insert_target||q'[
+            (
+              ID,
+              PER_ID,
+              KF,
+              RU,
+              RNK,
+              BRANCH,
+              LAST_NAME,
+              FIRST_NAME,
+              MIDDLE_NAME,
+              SEX,
+              GR,
+              BDAY,
+              PASSP,
+              SER,
+              NUMDOC,
+              PDATE,
+              ORGAN,
+              PASSP_EXPIRE_TO,
+              PASSP_TO_BANK,
+              OKPO,
+              CUST_STATUS,
+              CUST_ACTIVE,
+              TELM,
+              TELW,
+              TELD,
+              TELADD,
+              EMAIL,
+              ADR_POST_COUNTRY,
+              ADR_POST_DOMAIN,
+              ADR_POST_REGION,
+              ADR_POST_LOC,
+              ADR_POST_ADR,
+              ADR_POST_ZIP,
+              ADR_FACT_COUNTRY,
+              ADR_FACT_DOMAIN,
+              ADR_FACT_REGION,
+              ADR_FACT_LOC,
+              ADR_FACT_ADR,
+              ADR_FACT_ZIP,
+              ADR_WORK_COUNTRY,
+              ADR_WORK_DOMAIN,
+              ADR_WORK_REGION,
+              ADR_WORK_LOC,
+              ADR_WORK_ADR,
+              ADR_WORK_ZIP,
+              NEGATIV_STATUS,
+              REESTR_MOB_BANK,
+              REESTR_INET_BANK,
+              REESTR_SMS_BANK,
+              MONTH_INCOME,
+              SUBJECT_ROLE,
+              REZIDENT,
+              MERRIED,
+              EMP_STATUS,
+              SUBJECT_CLASS,
+              INSIDER,
+              VIPK,
+              VIP_FIO_MANAGER,
+              VIP_PHONE_MANAGER,
+              DATE_ON,
+              DATE_OFF,
+              EDDR_ID,
+              ACTUAL_DATE,
+              BPLACE,
+              SUBSD,
+              SUBSN,
+              ELT_N,
+              ELT_D,
+              GCIF,
+              NOMPDV,
+              NOM_DOG,
+              SW_RN,
+              Y_ELT,
+              ADM,
+              ADR_ALT,
+              BUSSS,
+              PC_MF,
+              PC_Z4,
+              PC_Z3,
+              PC_Z5,
+              PC_Z2,
+              PC_Z1,
+              AGENT,
+              PC_SS,
+              STMT,
+              VIDKL,
+              VED,
+              TIPA,
+              PHKLI,
+              AF1_9,
+              IDDPD,
+              DAIDI,
+              DATVR,
+              DATZ,
+              IDDPL,
+              DATE_PHOTO,
+              IDDPR,
+              ISE,
+              OBSLU,
+              CRSRC,
+              DJOTH,
+              DJAVI,
+              DJ_TC,
+              DJOWF,
+              DJCFI,
+              DJ_LN,
+              DJ_FH,
+              DJ_CP,
+              CHORN,
+              CRISK_KL,
+              BC,
+              SPMRK,
+              K013,
+              KODID,
+              COUNTRY,
+              MS_FS,
+              MS_VD,
+              MS_GR,
+              LIM_KASS,
+              LIM,
+              LICO,
+              UADR,
+              MOB01,
+              MOB02,
+              MOB03,
+              SUBS,
+              K050,
+              DEATH,
+              NO_PHONE,
+              NSMCV,
+              NSMCC,
+              NSMCT,
+              NOTES,
+              SAMZ,
+              OREP,
+              OVIFS,
+              AF6,
+              FSKRK,
+              FSOMD,
+              FSVED,
+              FSZPD,
+              FSPOR,
+              FSRKZ,
+              FSZOP,
+              FSKPK,
+              FSKPR,
+              FSDIB,
+              FSCP,
+              FSVLZ,
+              FSVLA,
+              FSVLN,
+              FSVLO,
+              FSSST,
+              FSSOD,
+              FSVSN,
+              DOV_P,
+              DOV_A,
+              DOV_F,
+              NMKV,
+              SN_GC,
+              NMKK,
+              PRINSIDER,
+              MB,
+              PUBLP,
+              WORKB,
+              CIGPO,
+              COUNTRY_NAME,
+              TARIF,
+              AINAB,
+              TGR,
+              SNSDR,
+              IDPIB,
+              FS,
+              DJER,
+              SUTD,
+              RVDBC,
+              RVIBA,
+              RVIDT,
+              RV_XA,
+              RVIBR,
+              RVIBB,
+              RVRNK,
+              RVPH1,
+              RVPH2,
+              RVPH3,
+              SAB,
+              J_COUNTRY,
+              J_ZIP,
+              J_DOMAIN,
+              J_REGION,
+              J_LOCALITY,
+              J_ADDRESS,
+              J_TERRITORY_ID,
+              J_LOCALITY_TYPE,
+              J_STREET_TYPE,
+              J_STREET,
+              J_HOME_TYPE,
+              J_HOME,
+              J_HOMEPART_TYPE,
+              J_HOMEPART,
+              J_ROOM_TYPE,
+              J_ROOM,
+              F_COUNTRY,
+              F_ZIP,
+              F_DOMAIN,
+              F_REGION,
+              F_LOCALITY,
+              FADR,
+              F_TERRITORY_ID,
+              F_LOCALITY_TYPE,
+              F_STREET_TYPE,
+              F_STREET,
+              F_HOME_TYPE,
+              F_HOME,
+              F_HOMEPART_TYPE,
+              F_HOMEPART,
+              F_ROOM_TYPE,
+              F_ROOM,
+              P_COUNTRY,
+              P_ZIP,
+              P_DOMAIN,
+              P_REGION,
+              P_LOCALITY,
+              P_ADDRESS,
+              P_TERRITORY_ID,
+              P_LOCALITY_TYPE,
+              P_STREET_TYPE,
+              P_STREET,
+              P_HOME_TYPE,
+              P_HOME,
+              P_HOMEPART_TYPE,
+              P_HOMEPART,
+              P_ROOM_TYPE,
+              P_ROOM,
+              F_ADDRESS,
+              NOTESEC,
+              C_REG,
+              C_DST,
+              RGADM,
+              RGTAX,
+              DATEA,
+              DATET,
+              RNKP,
+              CUSTTYPE,
+              RIZIK,
+              SED,
+              CODCAGENT,
+              J_KOATUU,
+              J_REGION_ID,
+              J_AREA_ID,
+              J_SETTLEMENT_ID,
+              J_STREET_ID,
+              J_HOUSE_ID,
+              F_KOATUU,
+              F_REGION_ID,
+              F_AREA_ID,
+              F_SETTLEMENT_ID,
+              F_STREET_ID,
+              F_HOUSE_ID,
+              P_KOATUU,
+              P_REGION_ID,
+              P_AREA_ID,
+              P_SETTLEMENT_ID,
+              P_STREET_ID,
+              P_HOUSE_ID,
+              VIP_ACCOUNT_MANAGER
+            )
+            ]';
+    if (p_periodtype = C_INCRIMP) then
+        /* дельта */
+       q_str := q_insert || q_str_inc_pre || q_str_main || q_str_inc_suf || q_log_errors;
+       execute immediate q_str using p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, l_per_id; 
+    else
+        /* полная выгрузка */
+       q_str := q_insert || q_str_main || q_str_full_suf || q_log_errors;
+       execute immediate q_str using l_per_id;
             end if;
+    l_rows := l_rows + sql%rowcount;
+    commit;
           exception
             when others then
-              l_errmsg :=substr(l_trace||' Error: '
-                                       ||dbms_utility.format_error_stack()||chr(10)
-                                       ||dbms_utility.format_error_backtrace()
-                                       , 1, 512);
-              bars.bars_audit.error(l_errmsg);
-              l_rows_err:=l_rows_err + 1;
+            rollback;
+            raise; 
           end;
-        end loop;
+            -- считаем кол-во ошибочных строк
+        select count(*) into l_rows_err from ERR$_CUSTOMERS_PLT where PER_ID = l_per_id;
 
         p_rows := l_rows;
         p_rows_err := l_rows_err;
         p_state := 'SUCCESS';
 
-        bars.bars_audit.info(l_trace||' customers count='||l_rows||', errors='||l_rows_err);
+        dbms_application_info.set_client_info('');
         bars.bars_audit.info(l_trace||' finish');
+             
     end customers_plt_imp;
 
     --
