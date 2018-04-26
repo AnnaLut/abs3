@@ -1,8 +1,8 @@
 PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/_BRS_SBER_ZVT_2.sql =========*** Run **
-PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/_BRS_SBER_ZVT_5.sql =========*** Run **
+PROMPT =====================================================================================
 prompt ===================================== 
-prompt == 2.Бранч: Зведення документiв дня - РЕЄСТР проводок по папкам
+prompt == 5.МФО: Зведення документiв дня - РЕЄСТР проводок (Бранчi+,Папки)
 prompt ===================================== 
 
 set serveroutput on
@@ -19,8 +19,8 @@ declare
    l_message   varchar2(1000);    
 
 begin     
-   l_zpr.name := '2.Бранч: Зведення документiв дня - РЕЄСТР проводок по папкам';
-   l_zpr.pkey := '\BRS\SBER\ZVT\2';
+   l_zpr.name := '5.МФО: Зведення документiв дня - РЕЄСТР проводок (Бранчi+,Папки)';
+   l_zpr.pkey := '\BRS\SBER\ZVT\5';
 
    l_message  := 'Ключ запроса: '||l_zpr.pkey||'  '||nlchr;
 
@@ -42,23 +42,23 @@ begin
     ------------------------    
                                 
     l_zpr.id           := 1;
-    l_zpr.name         := '2.Бранч: Зведення документiв дня - РЕЄСТР проводок по папкам';
+    l_zpr.name         := '5.МФО: Зведення документiв дня - РЕЄСТР проводок (Бранчi+,Папки)';
     l_zpr.namef        := '';
-    l_zpr.bindvars     := ':sFdat1='''',:T=''Код папки (0-всі)'',:I=''Код викон(0=всi)'',:P=''Перегляд-0,Папки бух_облік-1,Папка(26,27)-2,Папка(38,39)-3,Папки бек-офіс-4''';
+    l_zpr.bindvars     := ':sFdat1='''',:B=''Відділення (%-всі)'',:T=''Код папки (0-всі)'',:I=''Код викон(0=всi)'',:P=''Перегляд-0, Друк-1, Папка(26,27)-2, Папка(38,39)-3,Папки бек-офіс-4''';
     l_zpr.create_stmt  := '';
     l_zpr.rpt_template := 'ZVT2n.qrp';
     l_zpr.form_proc    := '';
-    l_zpr.default_vars := ':T=''0'',:I=''0'',:P=''0''';
-    l_zpr.bind_sql     := ':T=''TEST_ZVT|TEMA|NAME|ORDER BY TEMA '',:P=''V_PAP_ZVT_REP|PRN|DESCRIPTION''';
+    l_zpr.default_vars := ':B=''%'',:T=''0'',:I=''0'',:P=''0''';
+    l_zpr.bind_sql     := ':B=''OUR_BRANCH|BRANCH|NAME|WHERE length(branch)<16 and length(branch)>7 ORDER BY BRANCH '',:T=''TEST_ZVT|TEMA|NAME|ORDER BY TEMA '',:P=''V_PAP_ZVT_REP|PRN|DESCRIPTION''';
     l_zpr.xml_encoding := 'CL8MSWIN1251';
-    l_zpr.txt          := 'select b.BRANCH, t.TEMA, d.ISP USERID, d.KV,  d.TT,  d.REF, d.NLSD, d.NLSK,  d.S  S, d.SQ ,  b.NAME, t.name NAMET
- from zvt_doc d, branch b, TEST_ZVT t
- where d.fdat = to_date( :sFdat1,''dd-mm-yyyy'')
-   and d.branch like sys_context(''bars_context'',''user_branch'') || decode (length(sys_context(''bars_context'',''user_branch'') ), 8, ''%'', '''' )
-   and b.branch = d.branch     and ( nvl(:P,''0'') = ''0'' or t.PRN =:P )
-   and t.tema =  abs( d.tema)  and t.tema = decode(:T,''0'', t.tema, to_number(:T))
+    l_zpr.txt          := 'select b.BRANCH, t.TEMA, d.isp USERID, d.KV, d.TT, d.REF, d.NLSD, d.NLSK, d.S  S, d.SQ, b.NAME,  t.name NAMET
+ from  BRANCH b, TEST_ZVT t, zvt_doc d
+ where  d.fdat = to_date( :sFdat1,''dd-mm-yyyy'')
+   and ( nvl(:P,''0'') = ''0'' or t.PRN =:P )   and b.branch = substr( d.branch,1,15)
+   and t.tema =abs(d.tema)  and t.tema = decode(:T,''0'', t.tema, to_number(:T))
+   and b.branch like :B || decode ( length(:B), 8, '''',''%'' )
    and d.ISP = decode(:I,''0'', d.ISP, to_number(:I))
- order by 1, 2, 3,  sign(d.tema),4, 5, 6';
+ order by 1, 2, 3, sign(d.tema ), 4, 5, 6';
     l_zpr.xsl_data     := '';
     l_zpr.xsd_data     := '';
 
@@ -89,21 +89,16 @@ begin
                                 
 
     l_rep.name        :='Empty';
-    l_rep.description :='2.Бранч: Зведення документiв дня - РЕЄСТР проводок по папкам';
+    l_rep.description :='5.МФО: Зведення документiв дня - РЕЄСТР проводок (Бранчi+,Папки)';
     l_rep.form        :='frm_UniReport';
     l_rep.param       :=l_zpr.kodz||',3,sFdat,sFdat,"",TRUE,FALSE';
     l_rep.ndat        :=1;
     l_rep.mask        :='';
     l_rep.usearc      :=0;
-    begin                                                                        
-        select idf into l_repfolder from reportsf where idf = 80; 
-    exception when no_data_found then                                            
-        l_repfolder := null;                                                     
-    end;                         
-    l_rep.idf := l_repfolder;    
+    l_rep.idf         :=null;    
 
     -- Фиксированный № печатного отчета   
-    l_rep.id          := 2;
+    l_rep.id          := 5;
 
 
     if l_isnew = 1 then                     
@@ -135,7 +130,7 @@ begin
 end;                                        
 /                                           
                                             
-commit;  
+commit;                                     
 PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/Bars/Data/_BRS_SBER_ZVT_2.sql =========*** End **
-PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/Bars/Data/_BRS_SBER_ZVT_5.sql =========*** End **
+PROMPT =====================================================================================
