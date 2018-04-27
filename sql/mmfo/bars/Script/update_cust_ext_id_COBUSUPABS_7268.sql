@@ -1,3 +1,5 @@
+set serveroutput on
+
 prompt Обновление customer_extern.id (и customer_rel соответственно)
 declare
 g_test constant boolean := false;
@@ -16,14 +18,14 @@ begin
             set rel_rnk = l_id
             where rel_rnk = rec.id /*and rel_intext?*/;
             dbms_output.put_line(kf.kf||': customer_extern id='||rec.id||' => '||l_id);
-            if g_test then 
-                dbms_output.put_line('Тестовый режим - откатываемся');
-                rollback;
-            else
-                dbms_output.put_line('Закрепляем изменения'); 
-                commit;
-            end if;
         end loop;
+        if g_test then 
+            dbms_output.put_line('Тестовый режим - откатываемся');
+            rollback;
+        else
+            dbms_output.put_line('Закрепляем изменения'); 
+            commit;
+        end if;
     end loop;
     bc.home;
 end;
