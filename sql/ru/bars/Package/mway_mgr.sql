@@ -2,8 +2,8 @@ PROMPT =========================================================================
 PROMPT *** Run *** ========== Scripts /Sql/BARS/package/mway_mgr.sql =========*** Run *** ==
 PROMPT ===================================================================================== 
 
-CREATE OR REPLACE PACKAGE BARS.MWAY_MGR is
-
+CREATE OR REPLACE PACKAGE BARS.MWAY_MGR
+is
   --
   -- Автор  : OLEG
   -- Создан : 04.06.2013
@@ -12,7 +12,7 @@ CREATE OR REPLACE PACKAGE BARS.MWAY_MGR is
   --
 
   -- Public constant declarations
-  g_header_version  constant varchar2(64)  := 'version 4.5 09/02/2017';
+  g_header_version  constant varchar2(64)  := 'version 4.6 13/02/2018';
   g_awk_header_defs constant varchar2(512) := '';
 
   --------------------------------------------------------------------------------
@@ -136,28 +136,30 @@ CREATE OR REPLACE PACKAGE BARS.MWAY_MGR is
     p_ref oper.ref%type
   ) return varchar2;
 
-    function get_response_int(
-    p_request_xml in clob) return clob;
+  function get_response_int
+  ( p_request_xml in clob
+  ) return clob;
 
-    procedure set_state_trans(p_id mway_match.id%type,
-                            p_state mway_match.state%type
-    );
-   /*
-  function get_destination_prop(p_xml xmltype,
-                               p_extra_type varchar2,
-                               p_property_code varchar2,
-                               p_extra_parm varchar2
-    ) return varchar2;*/
+  procedure set_state_trans(p_id mway_match.id%type,
+                          p_state mway_match.state%type
+  );
+
+  procedure PAY_REVERSAL;
+
+/*function get_destination_prop
+  ( p_xml xmltype,
+    p_extra_type varchar2,
+    p_property_code varchar2,
+    p_extra_parm varchar2
+  ) return varchar2;*/
 
 end mway_mgr;
 /
-show errors
 
+show errors;
 
-
-
-CREATE OR REPLACE PACKAGE BODY MWAY_MGR is
-
+CREATE OR REPLACE PACKAGE BODY MWAY_MGR
+is
   --
   -- Автор  : OLEG
   -- Создан : 04.06.2013
@@ -1363,7 +1365,7 @@ CREATE OR REPLACE PACKAGE BODY MWAY_MGR is
     return l_value;
   end get_docrefset_parm;
   --------------------------------------------------------------------------------
-  -- get_payord -  создание проводки
+  -- get_error - 
   --
   --
   procedure get_error(p_code mway_errors.err_code%type,
@@ -1381,15 +1383,14 @@ CREATE OR REPLACE PACKAGE BODY MWAY_MGR is
   -- get_payord -  создание проводки
   --
   --
-  procedure get_payord(
-    p_xml in xmltype,
+  procedure get_payord
+  ( p_xml in xmltype,
     p_rnk in customer.rnk%type,
     p_transcode in varchar2,
     p_mfo in varchar2,
     p_error_code out number,
     p_error_message out varchar2
-  )
-  is
+  ) is
     l_th constant varchar2(100) := g_dbgcode || 'get_payord';
     l_res xmltype;
     l_errcode decimal := null;
@@ -1453,6 +1454,40 @@ CREATE OR REPLACE PACKAGE BODY MWAY_MGR is
         end loop;
       return l_sum_ammount;
     end get_ammount_for_day;
+    ---
+    procedure REVERSALS
+    ( p_rrn   mway_match.rrn_tr%type
+    ) is
+      l_ref   mway_match.ref_tr%type;
+      l_par2  number;
+      l_par3  varchar2(40);
+    begin
+      begin
+
+        select REF_TR
+          into l_ref
+          from MWAY_MATCH
+         where RRN_TR = p_rrn;
+
+        P_BACK_DOK( l_ref, 5, null, l_par2, l_par3 );
+
+        p_error_code    := 0;
+        p_error_message := null;
+
+      exception
+        when NO_DATA_FOUND then
+          GET_ERROR(713,l_servicecode,p_error_code,p_error_message);
+          begin
+            insert
+              into MWAY_RVRS ( RRN_TR )
+            values ( p_rrn );
+          exception
+            when DUP_VAL_ON_INDEX then
+              null;
+          end;
+      end;
+    end REVERSALS;
+    ---
   begin
     savepoint sp_paystart;
     begin
@@ -1524,22 +1559,8 @@ CREATE OR REPLACE PACKAGE BODY MWAY_MGR is
               bc.subst_branch(l_accb.branch);
             end;
           else
-            declare
-              l_ref mway_match.ref_tr%type;
-              l_par2 number;
-              l_par3 varchar2(40);
-            begin
-              begin
-                select ref_tr into l_ref from mway_match where rrn_tr = l_rrn;
-              exception
-                when no_data_found then
-                  rollback to savepoint sp_paystart;
-                  get_error(713,l_servicecode,p_error_code,p_error_message);
-                  return;
-              end;
-              p_back_dok(l_ref,5,null,l_par2,l_par3);
-              p_error_code := 0;
-              p_error_message := null;
+             begin
+              REVERSALS( l_rrn );
               return;
             exception
               when others then
@@ -1604,22 +1625,8 @@ CREATE OR REPLACE PACKAGE BODY MWAY_MGR is
               bc.subst_branch(l_acca.branch);
             end;
           else
-            declare
-              l_ref mway_match.ref_tr%type;
-              l_par2 number;
-              l_par3 varchar2(40);
-            begin
-              begin
-                select ref_tr into l_ref from mway_match where rrn_tr = l_rrn;
-              exception
-                when no_data_found then
-                  rollback to savepoint sp_paystart;
-                  get_error(713,l_servicecode,p_error_code,p_error_message);
-                  return;
-              end;
-              p_back_dok(l_ref,5,null,l_par2,l_par3);
-              p_error_code := 0;
-              p_error_message := null;
+             begin
+              REVERSALS( l_rrn );
               return;
             exception
               when others then
@@ -1779,7 +1786,10 @@ CREATE OR REPLACE PACKAGE BODY MWAY_MGR is
                       l_summ := l_sum_month + l_sum;
                       
                       if l_count_mm = 0 then -- первый месяц
-                       
+                      
+                       if kost(l_deposit.dpt_accid,trunc(sysdate - 1)) = 0 then -- первичный взнос
+                          null;
+                        else
                          if l_summ > l_deposit.dpt_amount * 2 then
                             --731 Превышен лимит пополнения за период
                             rollback to savepoint sp_paystart;
@@ -1790,7 +1800,8 @@ CREATE OR REPLACE PACKAGE BODY MWAY_MGR is
                              return;
                          else
                             null;
-                         end if;    
+                         end if; 
+                        end if;    
                       else  -- не первый месяц
                         if l_summ > l_deposit.dpt_amount then
                             --731 Превышен лимит пополнения за период
@@ -1825,22 +1836,8 @@ CREATE OR REPLACE PACKAGE BODY MWAY_MGR is
               end if;
             end;
           else
-            declare
-              l_ref mway_match.ref_tr%type;
-              l_par2 number;
-              l_par3 varchar2(40);
             begin
-              begin
-                select ref_tr into l_ref from mway_match where rrn_tr = l_rrn;
-              exception
-                when no_data_found then
-                  rollback to savepoint sp_paystart;
-                  get_error(713,l_servicecode,p_error_code,p_error_message);
-                  return;
-              end;
-              p_back_dok(l_ref,5,null,l_par2,l_par3);
-              p_error_code := 0;
-              p_error_message := null;
+              REVERSALS( l_rrn );
               return;
             exception
               when others then
@@ -1985,7 +1982,9 @@ CREATE OR REPLACE PACKAGE BODY MWAY_MGR is
                       l_summ := l_sum_month + l_sum;
                       
                       if l_count_mm = 0 then -- первый месяц
-                       
+                       if kost(l_deposit.dpt_accid,trunc(sysdate - 1)) = 0 then -- первичный взнос
+                          null;
+                        else
                          if l_summ > l_deposit.dpt_amount * 2 then
                             --731 Превышен лимит пополнения за период
                             rollback to savepoint sp_paystart;
@@ -1996,7 +1995,8 @@ CREATE OR REPLACE PACKAGE BODY MWAY_MGR is
                              return;
                          else
                             null;
-                         end if;    
+                         end if;
+                       end if;
                       else  -- не первый месяц
                         if l_summ > l_deposit.dpt_amount then
                             --731 Превышен лимит пополнения за период
@@ -2008,9 +2008,8 @@ CREATE OR REPLACE PACKAGE BODY MWAY_MGR is
                              return;
                          else
                             null;
-                         end if;    
-                      end if;  
-                    
+                         end if;
+                      end if;
                     else
                       null;
                     end if;
@@ -2031,22 +2030,8 @@ CREATE OR REPLACE PACKAGE BODY MWAY_MGR is
               end if;
             end;
           else
-            declare
-              l_ref mway_match.ref_tr%type;
-              l_par2 number;
-              l_par3 varchar2(40);
-            begin
-              begin
-                select ref_tr into l_ref from mway_match where rrn_tr = l_rrn;
-              exception
-                when no_data_found then
-                  rollback to savepoint sp_paystart;
-                  get_error(713,l_servicecode,p_error_code,p_error_message);
-                  return;
-              end;
-              p_back_dok(l_ref,5,null,l_par2,l_par3);
-              p_error_code := 0;
-              p_error_message := null;
+             begin
+              REVERSALS( l_rrn );
               return;
             exception
               when others then
@@ -2109,22 +2094,8 @@ CREATE OR REPLACE PACKAGE BODY MWAY_MGR is
               select * into l_cusa from customer where rnk = l_acca.rnk;
             end;
           else
-            declare
-              l_ref mway_match.ref_tr%type;
-              l_par2 number;
-              l_par3 varchar2(40);
-            begin
-              begin
-                select ref_tr into l_ref from mway_match where rrn_tr = l_rrn;
-              exception
-                when no_data_found then
-                  rollback to savepoint sp_paystart;
-                  get_error(713,l_servicecode,p_error_code,p_error_message);
-                  return;
-              end;
-              p_back_dok(l_ref,5,null,l_par2,l_par3);
-              p_error_code := 0;
-              p_error_message := null;
+             begin
+              REVERSALS( l_rrn );
               return;
             exception
               when others then
@@ -2456,6 +2427,72 @@ CREATE OR REPLACE PACKAGE BODY MWAY_MGR is
       return;
     end;
   end get_payord;
+
+  --
+  --
+  --
+  procedure PAY_REVERSAL
+  is
+    title   constant varchar2(64) := $$PLSQL_UNIT||'.PAY_REVERSAL';
+    l_par2  number(1);
+    l_par3  varchar2(1);
+    l_kf    oper.kf%type;
+    l_sos   oper.sos%type;
+  begin
+
+    BARS_AUDIT.TRACE( '%s: Entry.', title );
+
+    for cur in ( select /*+ ORDERED FULL(r) */ 
+                        r.ROWID as REC_ID
+                      , m.REF_TR
+                   from MWAY_RVRS  r
+                   join MWAY_MATCH m
+                     on ( m.RRN_TR = r.RRN_TR )
+                  where m.REF_TR Is Not Null
+                    for update of r.RRN_TR
+               )
+    loop
+
+      begin
+
+        begin
+          select d.KF, d.SOS 
+            into l_kf, l_sos
+            from OPER d
+           where d.REF = cur.REF_TR;
+        exception
+          when NO_DATA_FOUND then
+           l_kf  := null;
+           l_sos := null;
+        end;
+
+        if ( l_sos >= 0 )
+        then
+
+          BARS_CONTEXT.SUBST_MFO( l_kf );
+
+          P_BACK_DOK( cur.REF_TR, 5, null, l_par2, l_par3 );
+
+          BARS_CONTEXT.SET_CONTEXT;
+
+        end if;
+
+        delete MWAY_RVRS
+         where ROWID = cur.REC_ID;
+
+      exception
+        when OTHERS then
+          bars_audit.error( title || ': REF_TR=' || to_char(cur.REF_TR)
+                                  || CHR(10) ||dbms_utility.format_error_stack()
+                                  || CHR(10) || dbms_utility.format_error_backtrace() );
+          BARS_CONTEXT.SET_CONTEXT;
+      end;
+
+    end loop;
+
+    BARS_AUDIT.TRACE( '%s: Exit.', title );
+
+  end PAY_REVERSAL;
 
   --------------------------------------------------------------------------------
   -- get_dpthtml -  возвращает HTML отчет по депозитному счету
@@ -3962,7 +3999,7 @@ l_xml xmltype;
   begin
     select id into l_tech_user from staff$base where logname = G_TECH_USER;
     execute immediate 'alter session set current_schema=BARS';
-    bars.bars_login.login_user('w4session', l_tech_user, null, null);
+    bars.bars_login.login_user(substr(sys_guid(), 1, 32), l_tech_user, null, null);
     --execute immediate 'alter session set current_schema=BARS';
     --bars.bars_login.login_user('w4session', 20094, null, null);
 
@@ -4005,13 +4042,13 @@ l_xml xmltype;
   end get_response_http;
 
 begin
-    select id into l_tech_user from staff$base where logname = G_TECH_USER;
-    execute immediate 'alter session set current_schema=BARS';
-    bars.bars_login.login_user('w4session', l_tech_user, null, null);
-   null;
+  select id into l_tech_user from staff$base where logname = G_TECH_USER;
+  execute immediate 'alter session set current_schema=BARS';
+  bars.bars_login.login_user(substr(sys_guid(), 1, 32), l_tech_user, null, null);
 end mway_mgr;
 /
-show errors
+
+show errors;
 
 exec sys.utl_recomp.recomp_serial('BARS');
 

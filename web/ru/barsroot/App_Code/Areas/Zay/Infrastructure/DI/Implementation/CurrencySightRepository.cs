@@ -46,7 +46,7 @@ namespace BarsWeb.Areas.Zay.Infrastructure.Repository.DI.Implementation
                 FROM bars.v_zay_queue v,
                      bars.country c,
                      bars.country bc, bars.v_kod_70_2 k7
-                WHERE v.sos = 0 AND v.dk = :p_dk AND v.viza <= 0 AND v.country = c.country(+) AND v.benefcountry = bc.country(+)
+                WHERE v.sos = 0 AND v.dk = :p_dk AND v.viza = 0 AND v.country = c.country(+) AND v.benefcountry = bc.country(+)
                       AND v.basis = k7.p63(+) and mfo = f_ourmfo
                 ORDER BY v.fdat desc, v.id desc
             ";

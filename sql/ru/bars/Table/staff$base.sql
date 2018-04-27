@@ -1,10 +1,3 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/STAFF$BASE.sql =========*** Run *** ==
-PROMPT ===================================================================================== 
-
-
 PROMPT *** ALTER_POLICY_INFO to STAFF$BASE ***
 
 
@@ -23,7 +16,7 @@ PROMPT *** Create  table STAFF$BASE ***
 begin 
   execute immediate '
   CREATE TABLE BARS.STAFF$BASE 
-   (	ID NUMBER(38,0), 
+   (ID NUMBER(38,0), 
 	FIO VARCHAR2(60), 
 	LOGNAME VARCHAR2(30), 
 	TYPE NUMBER(1,0), 
@@ -532,16 +525,20 @@ exception when others then
 
 
 PROMPT *** Create  constraint CC_STAFF_CSCHEMA ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF$BASE ADD CONSTRAINT CC_STAFF_CSCHEMA CHECK (cschema in (''BARS'', ''HIST'',''BARSAQ'',''FINMON'',''BARSUPL'',''BARS_DM'', ''SBON'')) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
+begin
+	execute immediate 'alter table bars.staff$base drop constraint CC_STAFF_CSCHEMA';
+exception
+	when others then
+		if sqlcode = -2443 then null; else raise; end if;
+end;
 /
-
-
-
+begin
+	execute immediate q'[alter table bars.staff$base add constraint CC_STAFF_CSCHEMA check (cschema in ('BARS', 'HIST','BARSAQ','FINMON','BARSUPL','BARS_DM', 'SBON', 'BARS_INTGR')) enable validate]';
+exception
+	when others then
+		if sqlcode = -2264 then null; else raise; end if;
+end;
+/
 
 PROMPT *** Create  index PK_STAFF ***
 begin   
@@ -613,9 +610,4 @@ grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on 
 
 PROMPT *** Create SYNONYM  to STAFF$BASE ***
 
-  CREATE OR REPLACE PUBLIC SYNONYM STAFF$BASE FOR BARS.STAFF$BASE;
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Table/STAFF$BASE.sql =========*** End *** ==
-PROMPT ===================================================================================== 
+CREATE OR REPLACE PUBLIC SYNONYM STAFF$BASE FOR BARS.STAFF$BASE;

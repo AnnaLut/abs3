@@ -265,7 +265,7 @@ is
   --***************************************************************************--
   g_modcode       constant varchar2(3) := 'CAC';
 
-  g_body_version  constant varchar2(64)  := 'version 3.0  26/03/2018';
+  g_body_version  constant varchar2(64)  := 'version 2.9  07/02/2018';
   g_body_defs     constant varchar2(512) := ''
 $if ACC_PARAMS.KOD_D6
 $then
@@ -2164,16 +2164,10 @@ $else
 $end
 
     exception
-      when DUP_VAL_ON_INDEX then
-        p_errmsg := 'Номер рахунку '||p_nls||' з кодом валюти '||p_kv||' вже зарезервовано!';
       when others then
         p_errmsg := sqlerrm;
+        bars_audit.error( title||': '||p_errmsg );
     end;
-
-    if ( p_errmsg Is Not Null )
-    then
-      bars_audit.error( title||': '||p_errmsg );
-    end if;
 
   end case;
 

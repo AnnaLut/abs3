@@ -122,7 +122,13 @@ function f_prot_kol(  p_okpo fin_forma3_dm.okpo%type
 					 ,p_fdat fin_forma3_dm.fdat%type  
 					 ,p_idf  fin_forma3_ref.idf%type )
                             RETURN number;
-				  
+
+function LOGK_read (
+                   DAT_ date,
+                   OKPO_ int,
+                   IDF_  int,
+				   mode_ int ) RETURN number;
+				   
 END fin_formaf3;
 /
 CREATE OR REPLACE PACKAGE BODY bars.fin_formaf3 
@@ -444,7 +450,7 @@ Begin
 	FOR i IN   l_forms.FIRST..l_forms.LAST 
 		LOOP 
 		   -- виходимо якщо немає формули в полі sql_text або idf  не відповідає типу протоколу
-		   continue when  l_forms(i).sql_text is null  or  l_forms(i).idf != p_idf or  p_idf  = 4;  -- відключили IDF = 4
+		   continue when  l_forms(i).sql_text is null  or  l_forms(i).idf != p_idf or  p_idf  = 4 or l_forms(i).kod in ('3405.3','3415.3','3405.4','3415.4');  -- відключили IDF = 4? Для Графи 3405 та 3415 Форми №3 Прямого методу відключити контролі (тимчасово)
 		  
 		    -- Формули з декількми строками розкладемо на строки   Formula
 			<<LIST_SQL_TEXT>>  
@@ -570,6 +576,53 @@ begin
                   ,p_err  => l_); 
   return l_;
 end f_prot_kol;  
+
+
+
+FUNCTION LOGK_read (
+                   DAT_ date,
+                   OKPO_ int,
+                   IDF_  int,
+				   mode_ int ) RETURN number
+  is
+coun_ number;
+sum_  number;
+kont_ number;
+ 
+ begin
+ 
+ 
+ select nvl(count(colum3),0), nvl(sum(abs(colum3+colum4)),0)
+   into     coun_, sum_
+   from FIN_FORMA3_DM a, FIN_FORMA3_REF r
+  where  okpo = okpo_
+    and idf = idf_
+    and fdat = dat_
+	and r.id = a.id;
+
+	 data_validation(  p_okpo => OKPO_
+					  ,p_fdat => DAT_
+					  ,p_idf  => IDF_
+					  ,p_err  => kont_); 
+	 
+	-- kont_:= sign(kont_);
+	  
+	if mode_ = 1 then
+	      if kont_ = 0  and coun_ !=0 and sum_ != 0 then return 0;           -- повністю заповненна форма та пройдена логіку
+	   elsif kont_ = 0  and coun_ !=0 and sum_  = 0 then return 1;           -- створена форма , клієгт ненадав даних
+	   elsif kont_ != 0 and coun_ !=0 and sum_ != 0 then return 2;         -- створена форма , набрана з помилками
+	   elsif kont_ != 0 and coun_ !=0               then return 2;         -- створена форма , набрана з помилками
+	   elsif kont_ = 0  and coun_ =0  and sum_  = 0 then RETURN 3;            ---ЗВІТНІСТЬ НЕ ВВОДИЛАСЬ
+	   end if;
+	elsif mode_ = 2 then 
+	   if kont_ = 0 and coun_ !=0 and sum_ != 0 
+	        then return 0;      -- заборонити редагування
+			else return 1;      -- дозволити редагування  
+	   end if;
+	else return -1;
+	end if;
+			return -1;	 
+end LOGK_read;
 
 
 END fin_formaf3;
