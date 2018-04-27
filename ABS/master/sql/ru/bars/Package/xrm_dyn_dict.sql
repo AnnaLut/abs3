@@ -60,4 +60,4 @@ end xrm_dyn_dict;
 /
 
 grant execute on xrm_dyn_dict to bars_access_defrole;
-/
+grant execute on xrm_dyn_dict to bars_intgr with grant option;

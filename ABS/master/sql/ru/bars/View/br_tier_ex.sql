@@ -1,5 +1,3 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/View/BR_TIER_EX.sql =========*** Run *** ===
 PROMPT ===================================================================================== 
@@ -8,7 +6,8 @@ PROMPT =========================================================================
 PROMPT *** Create  view BR_TIER_EX ***
 
   CREATE OR REPLACE FORCE VIEW BARS.BR_TIER_EX ("BR_ID", "BDATE", "KV", "S", "RATE") AS 
-  SELECT "BR_ID","BDATE","KV","S","RATE"
+   WITH sum_bonus as (select bars.dpt_bonus.get_bonus_id('EXCL') excl_bonus_id from dual)
+   SELECT "BR_ID","BDATE","KV","S","RATE"
      FROM br_tier t
     WHERE t.bdate = (SELECT MAX (bdate)
                        FROM br_tier
@@ -19,11 +18,12 @@ PROMPT *** Create  view BR_TIER_EX ***
                    bn.kv,
                    DBS.S,
                    BN.RATE + NVL (DBS.VAL, 0)
-     FROM br_normal bn, dpt_bonus_settings dbs, dpt_vidd dv
+     FROM br_normal bn, dpt_bonus_settings dbs, dpt_vidd dv, sum_bonus sb
     WHERE     dv.type_id = dbs.dpt_type
           AND Dv.BR_ID = BN.BR_ID
           AND bn.kv = dbs.kv
-          AND DBS.BONUS_ID = 4
+          AND gl.bd between dbs.dat_begin and nvl(dbs.dat_end, to_date('31.12.4999','DD.MM.YYYY'))
+          AND dbs.bonus_id = sb.excl_bonus_id
           AND bn.bdate =
                  (SELECT MAX (bdate)
                     FROM br_normal
@@ -31,8 +31,6 @@ PROMPT *** Create  view BR_TIER_EX ***
 
 PROMPT *** Create  grants  BR_TIER_EX ***
 grant DEBUG,DELETE,FLASHBACK,INSERT,MERGE VIEW,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on BR_TIER_EX      to BARS_ACCESS_DEFROLE;
-
-
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/View/BR_TIER_EX.sql =========*** End *** ===
