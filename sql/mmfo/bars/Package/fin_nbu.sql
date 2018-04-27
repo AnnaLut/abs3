@@ -6238,22 +6238,22 @@ begin
 
 
     -- «Контрагент має від'ємне значення капіталу на кінець року протягом трьох останніх років поспіль».
-	/*
 	case
-       when ZN_P_ND('RG1', 59, DAT_) = 1 then l_klass := greatest(l_klass, 8); -- не менше 8
+       when ZN_P_ND('RG1', 59, DAT_) = 1 and sysdate > to_date('01-01-2019','dd-mm-yyyy') then 
+         l_klass := greatest(l_klass, 9); -- не менше 8
 	   else null;
 	end case;
-	*/
+	
 
     -- Чиста кредитна заборгованість до чистої виручки від реалізації >2.5
 	case
-       when ZN_P_ND('RG2', 59, DAT_) = 1 then l_klass := greatest(l_klass, 8); -- не менше 8
+       when ZN_P_ND('RG2', 59, DAT_) = 1 then l_klass := greatest(l_klass, 9); -- не менше 8
 	   else null;
 	end case;
 
 	    -- Чиста кредитна заборгованість до значення EBITDA >5 or <=0
 	case
-       when ZN_P_ND('RG3', 59, DAT_) = 1 then l_klass := greatest(l_klass, 8); -- не менше 8
+       when ZN_P_ND('RG3', 59, DAT_) = 1 then l_klass := greatest(l_klass, 9); -- не менше 8
 	   else null;
 	end case;
 

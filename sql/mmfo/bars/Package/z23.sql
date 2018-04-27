@@ -1920,6 +1920,7 @@ begin
      delete from nd_val     where fdat = p_dat01;
      delete from errors_351 where fdat = p_dat01;
      delete from nd_kol;
+     p_nd_open  (p_dat01);
      -- Портфель БПК
      z23.to_log_rez (user_id , 351 , p_dat01 ,' реанимация BPK, если были реанимированы счета');
      -- реанимация BPK, если были реанимированы счета

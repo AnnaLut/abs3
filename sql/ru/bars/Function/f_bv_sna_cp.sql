@@ -6,8 +6,10 @@
  
   CREATE OR REPLACE FUNCTION BARS.F_BV_SNA_CP (p_dat01 date, p_nd integer, p_acc integer) RETURN number is
 
-/* Версия 2.0 22-02-2017  13-02-2017
+/* Версия 2.1   10-04-2018  22-02-2017  13-02-2017
    Залог по ACC
+
+10-04-2018(2.1) - убрала l_accunrec - счет SNA	
 22-02-2017 - Убрала  cp_accp_ счет премии ,
 13-02-2017 - Добавила рахунок l_accexpn
 */
@@ -29,7 +31,7 @@ begin
                     from ( select acc, nls, -ost_korr (acc,l_dat31,null,nbs) BA,
                                  (select  nvl(sum(ost_korr (acc,l_dat31,null,nbs)),0) from  accounts
                                   where acc in (cp_acc_,  cp_accp_, cp_accs_, cp_accr_, cp_accr2_, l_accr3 , l_accexpr,
-                                        l_accunrec, l_accexpn) and f_get_tip (substr(nls,1,4), tip) <> 'SPI' and nls not like '8%' and
+                                        l_accexpn) and f_get_tip (substr(nls,1,4), tip) <> 'SPI' and nls not like '8%' and
                                         ost_korr (acc,l_dat31,null,nbs)>0) ss
                            from  accounts where acc in (cp_acc_ , cp_accp_, cp_accs_, cp_accr_, cp_accr2_,l_accr3 ,
                                                 l_accexpr, l_accunrec, l_accexpn) and f_get_tip (substr(nls,1,4), tip) <> 'SPI'  and

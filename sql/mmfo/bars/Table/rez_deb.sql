@@ -101,6 +101,17 @@ exception when others then
  end;
 /
 
+PROMPT *** Create  index I2_REZ_DEB ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.I1_REZ_DEB ON BARS.REZ_DEB (GRUPA, DEB) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
 
 
 PROMPT *** Create  grants  REZ_DEB ***

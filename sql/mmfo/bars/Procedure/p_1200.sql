@@ -64,19 +64,16 @@ begin
           l_pd := fin_nbu.get_pd(k.rnk, k.acc, p_dat01, l_fin, l_VNCRR, l_idf);
       end if;
       */
-      if k.tipa in (30, 92, 93) THEN
-         if k.tipa in ( 92,93 ) THEN
-            l_CCF := 0; l_ead  := 0; l_eadq := 0;
-         else
-            l_CCF := 100;
-         end if;
-         begin
-            select * into par from rez_par_9200 where fdat = p_dat01 and rnk = k.rnk and nd = k.acc;
-         EXCEPTION  WHEN NO_DATA_FOUND  THEN par.VKR := null; par.pd := 0; par.fin := 1;
-         end;
-         l_fin := par.fin;
-         l_pd  := par.pd;
+      begin
+         select * into par from rez_par_9200 where fdat = p_dat01 and rnk = k.rnk and nd = k.acc;
+      EXCEPTION  WHEN NO_DATA_FOUND  THEN 
+         par.VKR := null; par.pd := 0; par.fin := 1; l_ead := l_bv; l_eadq := l_bvq; l_CCF := 100;
+      end;
+      if par.not_lim = 1 THEN l_ead := 0   ; l_eadq := 0    ; l_CCF := 0;
+      else                    l_ead := l_bv; l_eadq := l_bvq; l_CCF := 100;
       end if;
+      l_fin := par.fin;
+      l_pd  := par.pd;
       l_tip_fin:= f_pd ( p_dat01, k.rnk, k.acc, k.custtype, k.kv, k.nbs, 1, 1);
       l_s080   := f_get_s080 (p_dat01, l_tip_fin, l_fin);
       p_get_nd_val(p_dat01, k.acc, k.tipa, 0, k.rnk, l_tip_fin, nvl(k.fin,1), l_s080);
@@ -84,6 +81,7 @@ begin
       l_lgd    := 1;
       l_cr     := round(l_ead * l_lgd * l_pd,2);
       l_crq    := p_icurval(k.kv,l_cr*100,l_dat31)/100;
+      if k.tipa in (30,12) THEN  l_CCF := 100;  end if;
       INSERT INTO NBU23_REZ ( ob22   , tip  , acc   , FDAT   , branch    , nls       , nmk      , RNK   , NBS      , KV    , ND    , ID    ,
                               BV     , BVQ  , FIN   , KAT    , sdate     , custtype  , rez      , rezq  , REZ23    , REZQ23, cr    , crq   ,
                               vkr    , ead  , eadq  , fin_351, s080      , DDD_6B    , OKPO     , pd_0  , tipa     )

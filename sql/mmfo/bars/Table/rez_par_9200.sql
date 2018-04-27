@@ -41,8 +41,32 @@ end;
 /
 COMMENT ON COLUMN REZ_PAR_9200.COMM  IS 'Підстава';
 
+begin
+ execute immediate   'alter table REZ_PAR_9200 add (KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')) ';
+exception when others then
+  -- ORA-01430: column being added already exists in table
+  if SQLCODE = - 01430 then null;   else raise; end if; 
+end;
+/
+COMMENT ON COLUMN REZ_PAR_9200.FDAT  IS 'Звітна дата';
 
+begin
+ execute immediate   'alter table REZ_PAR_9200 add (fDAT  DATE) ';
+exception when others then
+  -- ORA-01430: column being added already exists in table
+  if SQLCODE = - 01430 then null;   else raise; end if; 
+end;
+/
+COMMENT ON COLUMN REZ_PAR_9200.FDAT  IS 'Звітна дата';
 
+begin
+ execute immediate   'alter table REZ_PAR_9200 add (NOT_LIM  number(1)) ';
+exception when others then
+  -- ORA-01430: column being added already exists in table
+  if SQLCODE = - 01430 then null;   else raise; end if; 
+end;
+/
+COMMENT ON COLUMN REZ_PAR_9200.NOT_LIM  IS 'Банк має право відмовитися від виконання зобов’язання';
 
 PROMPT *** Create  index PK_REZ_PAR_9200 ***
 begin   
@@ -52,7 +76,7 @@ begin
   TABLESPACE BRSDYND ';
 exception when others then
   -- ORA-02260: table can have only one primary key
-  if SQLCODE = -02260 then null;   else raise; end if; 
+  if sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 or sqlcode=-955 or sqlcode=-6512 then null;   else raise; end if; 
 end;
 /
 

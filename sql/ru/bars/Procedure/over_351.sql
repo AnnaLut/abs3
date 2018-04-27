@@ -38,7 +38,7 @@ PROMPT *** Create  procedure OVER_351 ***
  l_zalq    NUMBER ; l_zal_BV  NUMBER ; l_zal_BVq  NUMBER ; l_dv   NUMBER ; l_f      NUMBER ;  l_CR_LGD NUMBER ; l_s     NUMBER ;
  l_RZ      NUMBER ; l_zal_lgd NUMBER ; l_lgd_51   NUMBER := 0.3;
  l_kol     INTEGER; acc8_     INTEGER; l_idf      INTEGER; l_fin  INTEGER; l_tipa   INTEGER;  l_fin23  INTEGER; l_pd_0  INTEGER;
- L_tip_fin INTEGER;
+ L_tip_fin INTEGER; srok      INTEGER;
 
  VKR_      varchar2(3); l_txt  varchar2(1000); l_vkr  varchar2(50); l_dat31    date;
 
@@ -179,15 +179,16 @@ begin
             else                                                                 l_idf:=65; l_f := 60;
             end if;
             l_fin  := f_rnk_maxfin(p_dat01, s.rnk, l_tip_fin, d.nd, 1);
-            if s.nbs like '9%' THEN l_tipa := 90; end if;
-            if s.nbs = '9129' THEN
+            if s.nbs like '9%' THEN l_tipa := 90;
                if s.wdate is not null and s.sdate is not null THEN
-                  l_srok := s.wdate - s.sdate;
-                  if    l_srok <  365 THEN l_CCF :=  20;
-                  elsif l_srok < 1095 THEN l_CCF :=  50;
-                  else                     L_CCF := 100;
+                  l_srok := s.wdate-s.sdate;
+                  if    l_srok <  365 THEN srok := 1;
+                  elsif l_srok < 1095 THEN srok := 2;
+                  else                     srok := 3;
                   end if;
+               else                        srok := 3;
                end if;
+               l_CCF := F_GET_CCF (s.nbs, s.ob22, srok); 
             end if;
             --logger.info('REZ_351 4 : nd = ' || d.nd || ' s.rnk=' || s.rnk ||  ' l_fin=' || l_fin || ' VKR = ' || VKR_  ||' l_idf='|| l_idf ) ;
             l_pd      := fin_nbu.get_pd(s.rnk, d.nd, p_dat01,l_fin, VKR_,l_idf);
@@ -236,7 +237,6 @@ begin
             l_zal_bvq := p_icurval(s.kv,l_zal_bv*100,l_dat31)/100;
             l_CR_LGD  := l_ead*l_pd*l_lgd;
             if l_tipa  <> 90 THEN l_ccf := NULL; end if;
-
             begin
                select nd into l_nd from REZ_CR where fdat = p_dat01 and acc = s.acc and (pawn = z.pawn or pawn is null and z.pawn is null);
             EXCEPTION WHEN NO_DATA_FOUND THEN

@@ -9,10 +9,12 @@ PROMPT *** Create  procedure CCK_351 ***
 
   CREATE OR REPLACE PROCEDURE BARS.CCK_351 (p_dat01 date, p_nd integer, p_mode integer  default 0 ) IS
 
-/* Версия 14.6   26-03-2018  28-11-2017 16-11-2017  17-10-2017  03-10-2017  06-09-2017  30-08-2017  12-06-2017
+/* Версия 14.8   20-04-2018  10-04-2018  26-03-2018  28-11-2017 16-11-2017  17-10-2017  03-10-2017  06-09-2017  30-08-2017  12-06-2017
    Розрахунок кредитного ризику по кредитах + БПК
 
    ----------------------------------------------
+29) 20-04-2018(14.8) - По Крыму FIN = max, PD = 1 (COBUSUPABS-5846 (Крым), лист 18-04-2018 20:36, будет в COBUMMFO-7561)
+28) 10-04-2018(14.7) - по оверам исключить залоги - a.tip <> 'ZAL' + по БПК исключить 3570,3578 -  b.tip not in ('SK9','ODB','OFR')
 27) 26-03-2018(14.6) - По физикам при определении PD использ. l_idf вместо l_fp (не перехідні положення) + по оверам исключить 3570,3578
 26) 28-11-2017(14.5) - Новый план счетов по ОВЕРАМ холдинга берем все счета + 9003 вместо 9023
 25) 27-11-2017(14.4) - LGD 9129 для безризикових =1 , по ризиковим розраховується
@@ -67,7 +69,7 @@ PROMPT *** Create  procedure CCK_351 ***
  l_grp    rez_cr.grp%type      ;
 
  l_kol      INTEGER; acc8_     INTEGER; l_idf      INTEGER; l_fin     INTEGER; l_tipa     INTEGER; l_fin23     INTEGER; l_f      INTEGER;
- l_fp       INTEGER; l_pd_0    INTEGER; l_tip_fin  INTEGER; l_kz      INTEGER;
+ l_fp       INTEGER; l_pd_0    INTEGER; l_tip_fin  INTEGER; l_kz      INTEGER; srok       INTEGER;
  l_pd       NUMBER ; l_CRQ     NUMBER ; l_EAD      NUMBER ; l_zal     NUMBER ; l_EADQ     NUMBER ; l_LGD       NUMBER ; l_CR     NUMBER ;
  l_RC       NUMBER ; l_bv      NUMBER ; l_BVQ      NUMBER ; l_bv02    NUMBER ; l_BV02q    NUMBER ; l_ccf       NUMBER ; l_srok   NUMBER ;
  L_RCQ      NUMBER ; L_CR_LGD  NUMBER ; l_zalq     NUMBER ; l_zal_BV  NUMBER ; l_zal_BVq  NUMBER ; l_dv        NUMBER ; l_polis  NUMBER ;
@@ -144,7 +146,7 @@ begin
                       substr( decode(c.custtype,3, c.nmk, nvl(c.nmkk,c.nmk) ) , 1,35) NMK, decode(trim(c.sed),'91',3,c.custtype) custtype,
                       a.branch, DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ,trim(c.sed) sed         --, n.nd,a.*
                from   nd_acc n,accounts a , customer c
-               where  n.nd = d.nd and n.acc=a.acc and a.nbs not in ('3570','3578') --and a.nbs in ('2067','2069' ,'2600','2607','2608' ,'9129') Берем все счета 16-11-2017 кроме 3570,3578 14-03-2018
+               where  n.nd = d.nd and n.acc=a.acc and a.nbs not in ('3570','3578') and a.tip <> 'ZAL'  -- Берем все счета 16-11-2017, кроме 3570,3578 14-03-2018, кроме TIP <> 'ZAL' 10-04-2018
                  and  ost_korr(a.acc,l_dat31,null,a.nbs) <>0 and a.rnk = c.rnk;
          else
             OPEN c0 FOR
@@ -152,7 +154,7 @@ begin
                       substr( decode(c.custtype,3, c.nmk, nvl(c.nmkk,c.nmk) ) , 1,35) NMK, c.custtype,
                       a.branch, DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, '00' sed
                from   rez_w4_bpk b, accounts a, customer c
-               where  b.acc = a.acc  and a.rnk=c.rnk and b.nd=d.nd and b.tip not in ('SK9','ODB');
+               where  b.acc = a.acc  and a.rnk=c.rnk and b.nd=d.nd and b.tip not in ('SK9','ODB','OFR');
          end if;
          loop
             FETCH c0 INTO s;
@@ -270,10 +272,23 @@ begin
                else                                                                 l_idf:=65; l_f := 60; l_fp := 45;
                end if;
 
-               if    s.nbs like '9%' and d.tipa = 10 THEN l_tipa := 90;
-               elsif s.nbs like '9%'                 THEN l_tipa := 9;
-               else                                       l_tipa := d.tipa;
+               if s.nbs like '9%' THEN
+                  if d.tipa = 10 THEN l_tipa := 90;
+                  else                l_tipa :=  9;
+                  end if;
+                  if d.wdate is not null and d.sdate is not null THEN
+                     l_srok := d.wdate-d.sdate;
+                     if    l_srok <  365 THEN srok := 1;
+                     elsif l_srok < 1095 THEN srok := 2;
+                     else                     srok := 3;
+                     end if;
+                  else                        srok := 3;
+                  end if;
+                  l_CCF := F_GET_CCF (s.nbs, s.ob22, srok); 
+               else l_tipa := d.tipa;
                end if;
+
+/*
                if s.nbs in ('9129','9122') and l_r013 = '1' THEN  -- 351 (п.104)
                   if d.wdate is not null and d.sdate is not null THEN
                      l_srok := d.wdate-d.sdate;
@@ -285,7 +300,7 @@ begin
                elsif s.nbs in ('9000') and s.rnk = 274267401 and d.nd in (18023180901,18023181501,18023182001) THEN
                   l_CCF :=  50;
                end if;
-
+*/
                --logger.info('REZ_351 4 : nd = ' || d.nd || ' s.rnk=' || s.rnk ||  ' l_fin=' || l_fin || ' VKR = ' || VKR_  ||' l_idf='|| l_idf ) ;
                if l_real ='Ні' and z.kod_351 BETWEEN 11 AND 26 THEN  l_text := 'REAL = Ні, pawn = ' || z.pawn ;
                                                                      l_zal  :=  0; l_zal_lgd := 0 ; z.tip :=  0; z.kl_351 := 0;
@@ -346,7 +361,7 @@ begin
                end if;
 
                IF    l_S250  = 8 and d.vidd     in (1,2,3) THEN  l_lgd  := f_fin_pd_grupa_ul (l_tip_kv, l_fin, nvl(z.rpb,0));
-               elsif l_S250  = 8 and d.vidd not in (1,2,3) THEN  l_lgd  := 0.95;
+               elsif l_S250  = 8 and d.vidd not in (1,2,3) THEN  l_lgd  := 0.90;
                END IF;
 
                --logger.info('REZ_351 34 : nd = ' || d.nd || ' l_fp =' || l_fp || ' l_pd =' || l_pd  ) ;
@@ -358,6 +373,14 @@ begin
                IF l_dv >= 51 and  l_lgd >=l_lgd_51 then
                   if f_rnk_not_uudv(s.rnk) = 0 THEN l_LGD  := l_lgd_51; end if;
                end if;
+               if sys_context('bars_context','user_mfo') = '324805'  THEN -- COBUSUPABS-5846 (Крым), лист 18-04-2018 20:36
+                  if    l_tip_fin = 1 THEN l_fin :=  5;
+                  elsif l_tip_fin = 2 THEN l_fin := 10;
+                  else                     l_fin :=  2;
+                  end if;
+                  l_pd := 1;
+               end if;
+
                --logger.info('REZ_351 44: nd = ' || d.nd || ' l_EAD = '|| l_EAD || ' l_pd = ' || l_pd  || ' L_zal=' ||L_zal) ;
                --          l_CR   := round(greatest(l_pd * (l_EAD - l_zal),0),2);
                L_CR      := round(l_pd * L_LGD *l_EAD,2);
@@ -372,9 +395,9 @@ begin
                l_CR_LGD  := l_ead*l_pd*l_lgd;
                l_zal_bv  := z.sall/100;
                l_zal_bvq := p_icurval(s.kv,l_zal_bv*100,l_dat31)/100;
-               if (l_tipa in ( 9, 90) and  l_r013  = '9') or l_tipa not in (9,90) THEN l_ccf := NULL; end if;
-               if  l_tipa in ( 9, 90) THEN l_s250 := NULL; l_grp := NULL; end if;
-               --logger.info('REZ_351 4 : nd = ' || d.nd || ' l_fin = '|| l_fin || ' l_pd = ' || l_pd  ) ;
+               if  l_tipa not in ( 9, 90) THEN l_ccf  := NULL; end if;
+               if  l_tipa     in ( 9, 90) THEN l_s250 := NULL; l_grp := NULL; end if;
+               --logger.info('REZ_351 4 : acc = ' || s.acc || ' l_ccf = '|| l_ccf || ' l_tipa = ' || l_tipa  ) ;
                INSERT INTO REZ_CR (fdat   , RNK      , NMK    , ND     , KV     , NLS   , ACC       , EAD     , EADQ    , FIN     , PD       ,
                                    CR     , CRQ      , bv     , bvq    , VKR    , IDF   , KOL       , FIN23   , TEXT    , tipa    , pawn     ,
                                    zal    , zalq     , kpz    , vidd   , tip_zal, LGD   , CUSTTYPE  , CR_LGD  , nbs     , zal_bv  , zal_bvq  ,

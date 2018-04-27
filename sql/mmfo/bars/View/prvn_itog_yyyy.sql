@@ -1,9 +1,7 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/View/PRVN_ITOG_YYYY.sql =========*** Run ***
 PROMPT ===================================================================================== 
-
+--по SNA добавлена умова  and a.nbs is not null (дублювалися ЦП)
 
 PROMPT *** Create  view PRVN_ITOG_YYYY ***
 
@@ -31,15 +29,15 @@ FROM ( SELECT fdat, ADD_MONTHS (fdat, -1) FDAT1, KV, SUM (bv) bv, SUM (bvq) bvq,
        --------------
      ( SELECT ADD_MONTHS (m.fdat, 1) fdat, a.kv, SUM (m.ost + m.CRkos - m.CRdos) / 100 SNA, SUM (m.ostQ + m.CRkosQ - m.CRdosQ) / 100 SNAQ
        FROM   AGG_MONBALS m, accounts a
-       WHERE  a.tip = 'SNA' AND m.acc = a.acc AND fdat > ADD_MONTHS (TRUNC (SYSDATE, 'YYYY'), -2) GROUP BY m.fdat, a.kv UNION ALL
+       WHERE  a.tip = 'SNA' and a.nbs is not null AND m.acc = a.acc AND fdat > ADD_MONTHS (TRUNC (SYSDATE, 'YYYY'), -2) GROUP BY m.fdat, a.kv UNION ALL
        SELECT ADD_MONTHS (m.fdat, 1) fdat, 0, NULL, SUM (m.ostQ + m.CRkosQ - m.CRdosQ) / 100  FROM   AGG_MONBALS m, accounts a
-       WHERE  a.tip = 'SNA' AND m.acc = a.acc AND fdat > ADD_MONTHS (TRUNC (SYSDATE, 'YYYY'), -2) GROUP BY m.fdat) k,
+       WHERE  a.tip = 'SNA' and a.nbs is not null AND m.acc = a.acc AND fdat > ADD_MONTHS (TRUNC (SYSDATE, 'YYYY'), -2) GROUP BY m.fdat) k,
        --------------
      ( SELECT ADD_MONTHS (m.fdat, 1) fdat, a.kv, SUM (m.ost + m.CRkos - m.CRdos) / 100 SNA, SUM (m.ostQ + m.CRkosQ - m.CRdosQ) / 100 SNAQ
        FROM   AGG_MONBALS m, accounts a
-       WHERE  a.tip = 'SNA' AND m.acc = a.acc AND fdat > ADD_MONTHS (TRUNC (SYSDATE, 'YYYY'), -2) GROUP BY m.fdat, a.kv UNION ALL
+       WHERE  a.tip = 'SNA' and a.nbs is not null AND m.acc = a.acc AND fdat > ADD_MONTHS (TRUNC (SYSDATE, 'YYYY'), -2) GROUP BY m.fdat, a.kv UNION ALL
        SELECT ADD_MONTHS (m.fdat, 1) fdat, 0, NULL, SUM (m.ostQ + m.CRkosQ - m.CRdosQ) / 100  FROM   AGG_MONBALS m, accounts a
-       WHERE     a.tip = 'SNA' AND m.acc = a.acc AND fdat > ADD_MONTHS (TRUNC (SYSDATE, 'YYYY'), -2)  GROUP BY m.fdat) k1,
+       WHERE  a.tip = 'SNA' and a.nbs is not null AND m.acc = a.acc AND fdat > ADD_MONTHS (TRUNC (SYSDATE, 'YYYY'), -2)  GROUP BY m.fdat) k1,
        --------------
      ( SELECT ADD_MONTHS (m.fdat, 1) fdat, a.kv, nvl(SUM (m.ost + m.CRkos - m.CRdos) / 100,0) UCENKA, nvl(SUM (m.ostQ + m.CRkosQ - m.CRdosQ) / 100,0) UCENKAQ
        FROM   AGG_MONBALS m, accounts a
