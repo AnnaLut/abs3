@@ -915,10 +915,14 @@ create or replace package body cig_mgr is
 
     exception
       when no_data_found then
+      begin   
         insert into V_CIG_SYNC_DATA
           (data_id, data_type, branch)
         values
           (p_data_id, p_data_type, p_branch);
+      EXCEPTION WHEN OTHERS  THEN        
+         bars_audit.info ('cig_mgr.upd_syncdata insert: '||p_data_id||' p_branch: '||p_branch||' : '|| sqlerrm);
+      end;
     end;
 
     if p_data_type = G_CUSTDATA then
@@ -4041,6 +4045,7 @@ select     d.nd,
       end loop;
     end if;
 
+begin
     select s_cig_dog_credit.nextval into l_id from dual;
 
     insert into V_CIG_DOG_CREDIT
@@ -4067,6 +4072,10 @@ select     d.nd,
        p_rec.currency_id,
        abs(nvl(p_rec.overdue_sum, 0) / 100),
        p_rec.branch);
+   
+   EXCEPTION WHEN OTHERS  THEN        
+         bars_audit.info ('cig_mgr.prc_dog_bpk insrert \p_dog_id: '||p_dog_id||' p_oldbranch: '||p_oldbranch||'\p_rec.nd:'||p_rec.nd||' : '|| sqlerrm);
+      end;
 
     upd_syncdata(l_id, p_rec.branch, G_DOG_CREDITDATA);
 
@@ -4295,7 +4304,8 @@ select     d.nd,
            and csd.data_type = 4;
       end loop;
     end if;
-
+    
+begin
     select s_cig_dog_instalment.nextval into l_id from dual;
 
     insert into v_cig_dog_instalment
@@ -4331,7 +4341,9 @@ select     d.nd,
        l_rec.overdue_sum,
        l_rec.branch);
 
-    --end;
+   EXCEPTION WHEN OTHERS  THEN        
+         bars_audit.info ('cig_mgr.prc_dog_inst insrert \p_dog_id: '||p_dog_id||' p_oldbranch: '||p_oldbranch||'\p_nd:'||p_nd||' : '|| sqlerrm);
+      end;
 
     upd_syncdata(l_id, l_rec.branch, G_DOG_INSTDATA);
 
@@ -4525,7 +4537,8 @@ select     d.nd,
         end loop;
       end if;
     end if;
-
+    
+begin
     select s_cig_dog_credit.nextval into l_id from dual;
 
     insert into V_CIG_DOG_CREDIT
@@ -4553,7 +4566,9 @@ select     d.nd,
        nvl(l_rec.overdue_sum,0),
        l_rec.branch);
 
-    --end;
+  EXCEPTION WHEN OTHERS  THEN        
+         bars_audit.info ('cig_mgr.prc_dog_credit insert: '||p_dog_id||' p_branch: '||p_branch||'\p_nd:'||p_nd||' : '|| sqlerrm);
+      end;
 
     upd_syncdata(l_id, l_rec.branch, G_DOG_CREDITDATA);
 
@@ -4654,7 +4669,8 @@ select     d.nd,
            and csd.data_type = 5;
       end loop;
     end if;
-
+    
+begin 
     select s_cig_dog_noninstalment.nextval into l_id from dual;
 
     insert into v_cig_dog_noninstalment
@@ -4678,7 +4694,9 @@ select     d.nd,
        l_rec.used_sum,
        l_rec.branch);
 
-    --end;
+    EXCEPTION WHEN OTHERS  THEN        
+         bars_audit.info ('cig_mgr.prc_dog_noninst insert: '||p_dog_id||' p_branch: '||p_branch||'\p_nd:'||p_nd||' : '|| sqlerrm);
+      end;
 
     upd_syncdata(l_id, l_rec.branch, G_DOG_NONINSTDATA);
 
@@ -4859,6 +4877,7 @@ select     d.nd,
 
                 else
 
+begin
                   select s_cig_dog_general.nextval into l_id from dual;
 
                   -- если нечего апдейтить  - вставляем
@@ -4904,6 +4923,9 @@ select     d.nd,
                      sysdate,
                      l_row.branch,
                      l_row.branch_dog);
+      EXCEPTION WHEN OTHERS  THEN        
+         bars_audit.info ('cig_mgr.prc_dog_general insert: l_custid :'||l_custid||' l_row.branch: '||l_row.branch||'\l_row.nd:'||l_row.nd||' : '|| sqlerrm);
+      end;                
 
                   upd_syncdata(l_id, l_row.branch, G_DOGDATA);
 
