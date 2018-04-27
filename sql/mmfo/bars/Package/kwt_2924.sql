@@ -1,3 +1,4 @@
+
  
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/kwt_2924.sql =========*** Run *** ==
@@ -5,7 +6,7 @@
  
   CREATE OR REPLACE PACKAGE BARS.KWT_2924 IS
 
- G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :=  'ver.4.3 19.04.2018';
+ G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :=  'ver.4.2 13.02.2018';
 
 /*
  добавлено АТМ
@@ -19,7 +20,6 @@ procedure DEL_ATM2 ( p_REF1 number, p_REF2 number ) ;
 procedure DEL_ATM1 ( p_ACC  number, p_REF1 number ) ;
 procedure INS_ATM1 ( p_ACC  number, p_REF1 number ) ;
 procedure INS_ATM2 ( p_ACC  number, p_REF1 number , p_REF2 number) ;
-
 --------------------------------------------------
 procedure RR( p_mode int, p_acc number, p_s number, p_ref number ) ;
 PROCEDURE MAX_DAT  ; -- определение ьфлсимальной даты квитовки и установка  ее в пул
@@ -31,7 +31,6 @@ PROCEDURE KWT_aa   ( aa accounts%rowtype, p_DAT date) ; -- квитовка по строке
 PROCEDURE RKW1     ( p_RKW int, p_RI varchar2) ; -- отметка ручной квитовки
 PROCEDURE OK1      ( p_acc number ) ; -- Виконати ручну ЗБАЛАНСОВАНУ квитовку
 function DAT31(p_dat date) return int ;
-function NAZN7(p_acc accounts.acc%type, p_REF1 oper.ref%type, p_tt tts.tt%type, p_mode int, p_NMS varchar2)  return oper.NAZN%type ;
 
 function header_version return varchar2;
 function body_version   return varchar2;
@@ -40,10 +39,8 @@ function body_version   return varchar2;
 END KWT_2924;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.KWT_2924 IS
- G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=   'ver.4.3 19.04.2018';
+ G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=   'ver.4.2 13.02.2018';
 /*
- 19.04.2018 контроль рах.Б
- 04.04.2018 … просимо замінити  6399*01 на  6399*L9  7399*40 на  7399*53 
  13.02.2018 Sta -- План-Частка~суми заг.плат
  15.11.2017 Sta -- Трансфер 2017 6399.01 => 6340.01
  01.11.2017 Sta дох/расх за прошліе 180 дней
@@ -57,7 +54,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.KWT_2924 IS
 . . . . . . .
  Пакедж по квитовке счетов 2924
 */
- modcode  constant varchar2(3) := 'ATM';
 
  g_TAG ACCOUNTS_FIELD.tag%type := 'KWT_2924';
  n_err number      := -20203 ;
@@ -97,13 +93,13 @@ begin
         l_ost := fost ( k.acc, (l_dat-1) );
         l_dk1 := k.pap - 1 ;
         l_DK2 := 2 - k.pap ;
+        --
+        begin select r020||ob22 into BBBBOO from sb_ob22 where r020||ob22  in ('639901','634001') and d_close is null and rownum = 1 ;  -- Трансфер 2017
+        EXCEPTION WHEN NO_DATA_FOUND THEN raise_application_error( n_err, 'В довіднику SB_OB22 відсутня аналітика для 63**' )  ;
+        end;
 
-/* 04.04.2018 … просимо замінити  
-6399*01 на  6399*L9
-7399*40 на  7399*53
-*/
-        OP_BS_OB1( substr(k.branch,1,15), '6399L9' ) ;
-        OP_BS_OB1( substr(k.branch,1,15), '739953' ) ; 
+        OP_BS_OB1( substr(k.branch,1,15),  BBBBOO  ) ;
+        OP_BS_OB1( substr(k.branch,1,15), '739940' ) ;
         OP_BS_OB1( substr(k.branch,1,15), '961804' ) ;
 
         for x in (select * from atm_ref1 where acc = k.acc )
@@ -114,9 +110,8 @@ begin
                  If oo.s <> 0 then
                     If oo.s > 0 then oo.dk := l_dk1 ;         Else             oo.dk := l_dk2 ;           end if;
                     oo.s := LEAST ( ABS(oo.s), abs(k.Ostc) ) ;
-
-                    If oo.dk = 1 then oo.nlsb := nbs_ob22_null( '6399' , 'L9' , k.branch); oo.nam_b :=  'Надлишки грошових коштів,виявл. в АТМ' ;
-                    else              oo.nlsb := nbs_ob22_null( '7399' , '53' , k.branch); oo.nam_b :=  'Нестачі грошових коштів, виявл. в АТМ' ;
+                    If oo.dk = 1 then oo.nlsb := nbs_ob22_null( Substr( BBBBOO,1,4), Substr( BBBBOO,5,2), k.branch); oo.nam_b :=  'Надлишки грошових коштів,виявл. в АТМ' ;
+                    else              oo.nlsb := nbs_ob22_null(        '7399',                  '40'    , k.branch); oo.nam_b :=  'Нестачі грошових коштів, виявл. в АТМ' ;
                     end if ;
 /*
 А для переноса сумм на расходы нужно использовать D66 – Внутрішн МемОрд по Доходах/Витратах
@@ -175,65 +170,30 @@ begin l_ACC := NVL ( p_acc, to_number( pul.get('ATM_ACC')));
   insert into atm_ref1(acc,ref1) select a.acc,o.ref from accounts a, opldok o where a.acc = l_acc and a.acc=o.acc and o.ref=p_ref1 and o.dk=a.pap-1 and a.tip in ('AT7','AT8');
 end INS_ATM1;
 -------------------------------------
-
 procedure INS_ATM2 ( p_ACC number, p_REF1 number, p_REF2 number) is
                      l_acc number; l_ref1 number; l_REF2 number; l_dk1 int   ;  l_dk2 int ;
                      l_D1  number; l_D2   number; l_Del  number;
-  bb accounts%rowtype;
-  x_Ref number;
-  x_S   number;
-  x_Err varchar2(50) ;
-begin l_ACC  := NVL( p_acc, to_number( pul.get('ATM_ACC' ))) ;
+begin l_ACC  := NVL ( p_acc, to_number( pul.get('ATM_ACC' ))) ;
       l_REF1 := NVL( p_ref1, to_number (pul.get('ATM_R1'  ))) ;
       l_REF2 := NVL( p_ref2, gl.aRef ) ;
       l_DK1  :=              to_number (pul.get('ATM_DK'  ))  ; l_DK2 := 1- l_DK1;
 
-      If gl.doc.tt ='015' and gl.doc.nlsb NOT like '2924%'  and gl.doc.nlsb NOT like '2909%'  
-         OR     
-         gl.doc.tt ='013' and gl.doc.nlsb NOT like '2924%' then x_Err := 'ATM_ERR1'; goto ERR_; -- '1)Рах.'||gl.doc.nlsb|| ' не відповідає коду операції' ; 
-      end if ;
+      bars_audit.trace('KWT_2924_INS_ATM2('||' p_ACC=> '||p_ACC||',p_REF1=> '||p_REF1||',p_REF2=> '||p_REF2||',l_ACC=> '||l_ACC||',l_REF1=> '||l_REF1||',l_REF2=> '||l_REF2||',l_DK1   => '||l_DK1||')'  );
 
-
-      If gl.doc.nlsb like '2924%' or  gl.doc.nlsb like '2909%' then
-         begin select * into bb from accounts where kv= gl.doc.kv2 and nls = gl.doc.nlsb;   exception when no_data_found then bb.ob22 := '**' ;  end;  
-         If gl.doc.tt in ('015'      )  and bb.ob22 = '81'  and gl.doc.nlsb like '2909%'                      OR 
-            gl.doc.tt in ('015','013')  and bb.ob22 = '10'  and gl.doc.nazn like 'Спис.кошти по опрот.плат.%' OR
-            gl.doc.tt in ('015'      )  and bb.ob22 = '08'  and gl.doc.nazn like 'Взаємозак%'                 OR 
-            gl.doc.tt in ('015'      )  and bb.ob22 = '07'  and gl.doc.nazn like 'Перенесено%' then null;
-         else                                                   x_Err := 'ATM_ERR2'; goto ERR_ ; -- '2)Рах.'||gl.doc.nlsb|| ' не відповідає призначенню'; 
-         end if;
-      end if ;
-
-      If gl.doc.nlsb like '2924%'  and  gl.doc.tt in ('015' )  and gl.doc.nazn like 'Взаємозак%' and  l_Ref1 > 0 then -- "Кучку-> в -> ямку" только для один-в-один. не для нескольких кучек одновременноthen
-
-         begin select to_number(w.value) into x_Ref from operw  w where w.tag ='REFX' and w.ref = gl.aRef ;
-         exception when others then                             x_Err := 'ATM_ERR3'; goto ERR_ ; -- '3) Відсутній Дод.рекв.REFX = Реф."ямки "'; goto ERR_ ; 
-         end;
-         Select nvl(sum(s),0)      into x_S from atm_ref2           where ref1= x_Ref;
-         begin select o.S - x_S   into x_S   from oper o, atm_ref1 r where r.Ref1= x_Ref and r.acc= bb.acc and o.ref = x_Ref and o.S - x_S >= gl.doc.S;
-               insert into atm_ref2 (ref1, ref2) values (x_ref, l_ref2) ;
-         exception when others then                             x_Err := 'ATM_ERR4'; goto ERR_ ; -- '4) Не відповідає умовам ""ямки"'; goto ERR_ ; 
-         end;
-      end if;
-
-/*    При разборе кучек заг.суммою это не подходит
       select         s     into l_D1 from opldok where ref =        l_ref1                                     and acc = l_acc and dk =  l_dk1 ;
       select NVL(sum(s),0) into l_D2 from opldok where ref in (select ref2 from atm_ref2 where ref1 = l_ref1 ) and acc = l_acc and dk =  l_dk2 ;
       l_del  := l_D1 - l_D2 ;
-      If l_Del < 0 then           x_Err := 'ATM_ERR5'; goto ERR_ ; --'5)Сума док'; goto ERR_ ;       end if ;
-      begin   select ref into l_ref2 from opldok o where o.acc = l_acc and o.ref = L_ref2 and o.dk = l_DK2 and o.s <= l_Del;
+
+      If l_Del <= 0 then  raise_application_error(n_err,'Сума введеного доку HE може бути більшою, ніж '||l_Del/100  )  ;  end if ;
+
+      begin   select ref into l_ref2 from opldok o where o.acc = l_acc and o.ref = p_ref2 and o.dk = l_DK2 and o.s <= l_Del;
       exception when no_data_found then null;
       end;  
+
+      insert into atm_ref2 (ref1, ref2) values (l_ref1, l_ref2);
+
       --insert into atm_ref2 (ref1, ref2) select l_ref1, l_ref2 from opldok o where o.acc = l_acc and o.ref = p_ref2 and o.dk = l_DK2 and o.s <= l_Del;
-  */
-      <<ERR_>> NULL;      If x_Err is not null then   bars_error.raise_nerror( modcode, x_Err); end if;
-
-
-      If l_Ref1 > 0 then     insert into atm_ref2 (ref1, ref2, s ) values (l_ref1, l_ref2, null ) ;
-      else                   insert into atm_ref2 (ref1, ref2, s ) select    ref1, l_ref2, s from atm_ref3 where acc = l_ACC;  
-      end if ;
-
-      delete from atm_ref3 where acc = l_ACC;
+       bars_audit.trace('KWT_2924_INS_ATM2_atmref2('||',l_REF2  => '||l_REF2||',l_REF1  => '||l_REF1   ||')'  );
 
 end INS_ATM2;
 
@@ -473,32 +433,7 @@ end OK1;
 ---------------
 function DAT31(p_dat date) return int is
 begin  if to_char(p_dat,'YYYYMM') < to_char( DAT_NEXT_U(p_DAT,1), 'YYYYMM' ) then RETURN 1; else RETURN 0; end if;
-end DAT31;
-
-
-function NAZN7(p_acc accounts.acc%type, p_REF1 oper.ref%type, p_tt tts.tt%type, p_mode int, p_NMS varchar2)  return oper.NAZN%type is l_nazn oper.NAZN%type;
-begin
-
-  If    p_mode = 1 and p_tt = '013' then l_nazn := 'Спис.кошти по опрот.плат. АТМ А_______ тран. за __/__/__ (дата оскар. __/__/__ ) ';  ------реф. ___________ надл. __/__/__   411997******7295';                       
-  ElsIf p_mode = 2 and p_tt = '013' then l_nazn := 'Взаємозак. нестачі по АТМ/ІПТ А_______ зг. служб.записки №__ від __/__/__' ; --  реф. ___________ від __/__/__ за рах.надлишків реф. ___________ від __/__/__ зг. служб.записки №__ від __/__/__';
-  ElsIf p_mode = 3 and p_tt = '013' then l_nazn := 'Перенесено на відповідний аналітичний рахунок кошти  '; -- _________ від __/__/__  на реф.___________ від __/__/__';                                           
-  ElsIf p_mode = 1 then 
-     If    p_TT = 'PKR' then l_nazn := 'Зараховано на карт/рах. зг. звернення' ; 
-     ElsIf p_TT = '310' then l_nazn := 'Кошти для зарах на рах.2625 ПІБ, ІНН;' ; 
-     ElsIf p_tt = '015' then l_nazn := 'Кошти для виплати <ПІБ> зг. звернення' ; 
-     end if;
-     l_Nazn := l_Nazn ||' SC-...(надл. за ';   
-  else null ;
-  end if; 
-
-  for oo in (select to_char(o.vdat,'dd/mm/yyyy') || ',реф.'|| o.REF||', ' txt from oper o              where o.ref = p_REF1      union all 
-             select to_char(o.vdat,'dd/mm/yyyy') || ',реф.'|| o.REF||', ' txt from oper o, atm_ref3 x  where o.ref = x.ref1  and x.acc = p_acc 
-             )
-  loop   l_nazn := Substr(l_nazn || oo.txt, 1, 160) ; end loop;
-         l_nazn := Substr(l_nazn || p_NMS , 1, 160) ; 
-  RETURN l_NAZN;
-
-end NAZN7;
+end;
 
 
 function header_version return varchar2 is begin  return 'Package header KWT_2924 '||G_HEADER_VERSION; end header_version;
