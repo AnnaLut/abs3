@@ -11,10 +11,11 @@ PROMPT *** Create  procedure P_CH_SK_INT ***
 -- проверка допустимых символов по kl_d010
 n_ number:=0;
 begin
-
-
    delete from otcn_log where userid = userid_ and kodf = kodf_;
 
+   insert into otcn_log (kodf, userid, txt)
+   values (kodf_, userid_, 'Перевiрка файлу @12 за '||to_char(dat_, 'dd.mm.yyyy'));
+   
    insert into otcn_log (kodf,userid,txt)
    values(kodf_,userid_,'');
 
@@ -79,7 +80,7 @@ begin
 
    for k in ( select  s.acc,o.nlsa,o.nlsb, o.kv, p.fdat, p.ref,
               nvl(decode(p.tt, o.tt, o.sk, t.sk),0) sk, p.s
-              from oper o, opldok p, accounts s, tts t   --- kl_d010 k
+              from oper o, opldok p, accounts s, tts t   
               where p.acc=s.acc
 			    and s.tip='KAS'
 				and p.fdat between  dat1_ and  dat_
