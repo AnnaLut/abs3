@@ -12,7 +12,7 @@ PROMPT *** Create  procedure P_F12SB ***
 % FILE NAME   : otcn.sql
 % DESCRIPTION : Отчетность СберБанка: формирование файлов
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 2001.  All Rights Reserved.
-% VERSION     : 12/01/2017 (21/12/2013, 02/10/2013)
+% VERSION     : 21/02/2018 (12/01/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 12/01/2017 Будем изменять симв.кассплана для операций (027)
 %            c 30 на 32 и на 61 если код операции 'BAK'.
@@ -92,12 +92,11 @@ typ_     Number;
 nbuc1_   VARCHAR2(12);
 nbuc_    VARCHAR2(12);
 
-
 CURSOR OPERA IS
    SELECT  s.acc, s.nls, o.nlsa, o.kv, o.dk, p.fdat, p.ref, p.stmt,
            decode(p.tt, o.tt, o.sk, t.sk), p.s, o.tt, NVL(o.sk,0), p.dk,
            decode(p.tt, o.tt, 0, 1) pr -- признак дочерней операции
-   FROM OPER o, OPLDOK p, ACCOUNTS s, tts t   --- KL_D010 k
+   FROM OPER o, OPLDOK p, ACCOUNTS s, tts t  
    WHERE p.acc=s.acc             AND
          s.tip='KAS'             AND
          s.nbs in ('1001','1002','1003','1004') AND
@@ -109,21 +108,19 @@ CURSOR OPERA IS
 
 --Остатки
 CURSOR SALDO IS
-   SELECT  o.acc, o.nls, o.kv, sa.fdat, sa.ostf, sa.ostf+sa.kos-sa.dos,
+   SELECT  o.acc, o.nls, o.kv, sa.fdat, 
+           sa.ost-sa.kos+sa.dos ostf, sa.ost,
            o.tobo, o.nms
-   FROM saldoa sa, accounts o
+   FROM snap_balances sa, accounts o
    WHERE o.tip='KAS'
      and o.nbs in ('1001','1002','1003','1004')
      and o.kv=980
      and o.acc=sa.acc
-     and sa.fdat IN ( SELECT max ( bb.fdat )
-                      FROM  saldoa bb
-                      WHERE o.acc = bb.acc AND bb.fdat  <= Dat_) ;
+     and sa.fdat = Dat_ ;
 
 CURSOR BaseL IS
    SELECT kodp, nbuc, SUM (znap)
    FROM rnbu_trace
-   WHERE userid=userid_
    GROUP BY kodp, nbuc;
 
 BEGIN
@@ -324,8 +321,8 @@ CLOSE BaseL;
 ----------------------------------------
 -- перевiрка на допустимiсть символiв по KL_D010
 -- а також залишку бал.рах.1007 та символiв 39 i 66
---p_ch_sk_int('12',dat_,dat1_,userid_);
---p_ch_f12_int('12',dat_,userid_);
+p_ch_sk_int('12',dat_,dat1_,userid_);
+p_ch_f12_int('12',dat_,userid_);
 
 DELETE FROM OTCN_TRACE_12  WHERE datf= dat_ AND isp = userid_ ;
 

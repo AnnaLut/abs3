@@ -6,9 +6,54 @@ PROMPT =========================================================================
 
 
 PROMPT *** Create  view PROVODKI_OTC ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.PROVODKI_OTC ("ISP", "BRANCH", "MFOA", "MFOB", "NAM_A", "NAM_B", "SOSO", "NAZN", "TT", "REF", "KV", "S", "SQ", "FDAT", "STMT", "TXT", "ACCD", "NLSD", "NBSD", "BRANCH_A", "ACCK", "NLSK", "NBSK", "BRANCH_B", "RNKD", "RNKK", "OB22D", "OB22K", "VOB", "NLSA", "NLSB", "KV_O", "KV2_O", "DK_O", "PDAT", "PDATD", "PNAZN", "PTT", "PS", "VDAT", "ID_A", "ID_B") AS 
-  SELECT p.userid,
+CREATE OR REPLACE FORCE VIEW BARS.PROVODKI_OTC
+(
+   ISP,
+   BRANCH,
+   MFOA,
+   MFOB,
+   NAM_A,
+   NAM_B,   
+   SOSO,
+   NAZN,
+   TT,
+   REF,
+   KV,
+   S,
+   SQ,
+   FDAT,
+   STMT,
+   TXT,
+   ACCD,
+   NLSD,
+   NBSD,
+   BRANCH_A,
+   ACCK,
+   NLSK,
+   NBSK,
+   BRANCH_B,
+   RNKD,
+   RNKK,
+   OB22D,
+   OB22K,
+   VOB,
+   NLSA,
+   NLSB,
+   KV_O,
+   KV2_O,
+   DK_O,
+   PDAT,
+   PDATD,
+   PNAZN,
+   PTT,
+   PS,
+   VDAT,
+   ID_A,
+   ID_B,
+   SK
+)
+AS
+   SELECT p.userid,
           p.branch,
           p.mfoa,
           p.mfob,
@@ -49,7 +94,8 @@ PROMPT *** Create  view PROVODKI_OTC ***
           p.s,
           p.vdat,
           p.id_a,
-          p.id_b
+          p.id_b, 
+          p.sk
      FROM oper p,
           tts t,
           accounts ad,
