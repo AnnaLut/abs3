@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="11/19/2014 10:35:14" ReportInfo.Modified="04/05/2018 14:03:06" ReportInfo.CreatorVersion="2014.1.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="11/19/2014 10:35:14" ReportInfo.Modified="04/25/2018 15:04:14" ReportInfo.CreatorVersion="2014.1.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -18,13 +18,13 @@ namespace FastReport
 {
   public class ReportScript
   {
-   
+    
   }
 }
 </ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQN1JTZDBvQHDHVPy1jjodbg=">
-      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select r.char00 as branch,&#13;&#10;       r.char01 as cc_id,&#13;&#10;       r.char02 as nmk,&#13;&#10;       r.char03 as nd,&#13;&#10;       r.char04 as branch_kd,&#13;&#10;       abs(r.num00) as s_02,&#13;&#10;       abs(r.num01) as s_83,&#13;&#10;       abs(r.num02) as s_79,&#13;&#10;       abs(r.num03) as s_03,&#13;&#10;       abs(r.num04) as s_i3,&#13;&#10;       abs(r.num05) as s_b8,&#13;&#10;       abs(r.num06) as rnk,&#13;&#10;       abs(r.num07) as k_02,&#13;&#10;       abs(r.num08) as k_83,&#13;&#10;       abs(r.num09) as k_79,&#13;&#10;       abs(r.num10) as k_03,&#13;&#10;       abs(r.num11) as k_i3,&#13;&#10;       abs(r.num12) as k_b8,&#13;&#10;decode( abs(r.num07)+abs(r.num08)+abs(r.num09)+abs(r.num10)+abs(r.num11)+abs(r.num12),0,'Ні','Так') as have_items,&#13;&#10;       r.dat00 as sdate&#13;&#10;       &#13;&#10; from rs_tmp_report_data r where r.session_id= :session_id order by id">
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQHMcICYaC98v917DqTuGnj4=">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select r.char00 as branch,&#13;&#10;       r.char01 as cc_id,&#13;&#10;       r.char02 as nmk,&#13;&#10;       r.char03 as nd,&#13;&#10;       r.char04 as branch_kd,&#13;&#10;       r.num00 as s_02,&#13;&#10;       r.num01 as s_83,&#13;&#10;       r.num02 as s_79,&#13;&#10;       r.num03 as s_03,&#13;&#10;       r.num04 as s_i3,&#13;&#10;       r.num05 as s_b8,&#13;&#10;       r.num06 as rnk,&#13;&#10;       r.num07 as k_02,&#13;&#10;       r.num08 as k_83,&#13;&#10;       r.num09 as k_79,&#13;&#10;       r.num10 as k_03,&#13;&#10;       r.num11 as k_i3,&#13;&#10;       r.num12 as k_b8,&#13;&#10;decode( r.num07+r.num08+r.num09+r.num10+r.num11+r.num12,0,'Ні','Так') as have_items,&#13;&#10;       r.dat00 as sdate&#13;&#10;       &#13;&#10; from rs_tmp_report_data r where r.session_id= :session_id order by id">
         <Column Name="NMK" DataType="System.String"/>
         <Column Name="RNK" DataType="System.Decimal"/>
         <Column Name="BRANCH" DataType="System.String"/>
@@ -71,7 +71,7 @@ namespace FastReport
       <TextObject Name="Text3" Left="820.29" Width="342.1" Height="28.35" Text="Станом на [Date]" Format="Date" Format.Format="d" HorzAlign="Right" Font="Times New Roman, 11pt, style=Bold"/>
       <TextObject Name="Text5" Left="820.29" Top="75.6" Width="342.1" Height="18.9" Text="[Table.BRANCH]" Format="Date" Format.Format="d" HorzAlign="Right" Font="Times New Roman, 11pt, style=Bold"/>
     </ReportTitleBand>
-    <GroupHeaderBand Name="GroupHeader1" Top="97.32" Width="1171.8" Height="28.35" Condition="[Table.BRANCH]">
+    <GroupHeaderBand Name="GroupHeader1" Top="97.06" Width="1171.8" Height="28.35" Condition="[Table.BRANCH]">
       <TableObject Name="Table1" Width="1162.39" Height="28.35" GrowToBottom="true">
         <TableColumn Name="Column1" Width="83.64"/>
         <TableColumn Name="Column2" Width="83.64"/>
@@ -98,8 +98,8 @@ namespace FastReport
           <TableCell Name="Cell177" Border.Lines="All" Text="Позичальник" HorzAlign="Center" Font="Times New Roman, 9pt"/>
         </TableRow>
       </TableObject>
-      <GroupHeaderBand Name="GroupHeader2" Top="128.48" Width="1171.8" Condition="[Table.BRANCH_KD]">
-        <DataBand Name="Data1" Top="131.3" Width="1171.8" Height="18.9" DataSource="Table">
+      <GroupHeaderBand Name="GroupHeader2" Top="127.98" Width="1171.8" Condition="[Table.BRANCH_KD]">
+        <DataBand Name="Data1" Top="130.54" Width="1171.8" Height="18.9" DataSource="Table">
           <TableObject Name="Table1" Width="1162.39" Height="18.9" GrowToBottom="true">
             <TableColumn Name="Column12" Width="83.64"/>
             <TableColumn Name="Column13" Width="83.64"/>
@@ -127,7 +127,7 @@ namespace FastReport
             </TableRow>
           </TableObject>
         </DataBand>
-        <GroupFooterBand Name="GroupFooter2" Top="153.02" Width="1171.8" Height="18.9">
+        <GroupFooterBand Name="GroupFooter2" Top="152.01" Width="1171.8" Height="18.9">
           <TableObject Name="Table3" Width="1162.39" Height="18.9" GrowToBottom="true">
             <TableColumn Name="Column23" Width="83.64"/>
             <TableColumn Name="Column24" Width="83.64"/>
@@ -154,7 +154,7 @@ namespace FastReport
           </TableObject>
         </GroupFooterBand>
       </GroupHeaderBand>
-      <GroupFooterBand Name="GroupFooter1" Top="174.73" Width="1171.8" Height="56.7">
+      <GroupFooterBand Name="GroupFooter1" Top="173.47" Width="1171.8" Height="56.7">
         <TableObject Name="Table3" Width="1162.39" Height="56.7" GrowToBottom="true">
           <TableColumn Name="Column33" Width="83.64"/>
           <TableColumn Name="Column34" Width="83.64"/>
@@ -205,6 +205,6 @@ namespace FastReport
         </TableObject>
       </GroupFooterBand>
     </GroupHeaderBand>
-    <ReportSummaryBand Name="ReportSummary1" Top="234.25" Width="1171.8" Height="37.8"/>
+    <ReportSummaryBand Name="ReportSummary1" Top="232.73" Width="1171.8" Height="37.8"/>
   </ReportPage>
 </Report>
