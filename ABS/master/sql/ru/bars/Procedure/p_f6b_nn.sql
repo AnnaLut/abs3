@@ -12,7 +12,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  % DESCRIPTION : процедура #6B
  %
- % VERSION     :   v.18.002      03.04.2018
+ % VERSION     :   v.18.005      26.04.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 /*
    Структура показателя    GGG CC N H I OO R VVV
@@ -28,6 +28,9 @@ IS
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+26.04.2018  обработка счетов дисконтов с r013=1,2,3,4 из nbu23_rez  (CC=40)
+16.04.2018  отдельная обработка  SNA-счета  654602611
+11.04.2018  отдельная обработка  счетов 3-го класса и клиента  90593701
 03.04.2018  отдельная обработка счетов SNA из nbu23_rez  (CC=40)
 25.01.2018  изменение распределения счетов для сегмента GGG
 15.11.2017  переход на новый план счетов
@@ -233,7 +236,6 @@ BEGIN
              else    is_budg_ := 0;
              end if;
 
-             -- временно на 01.02.2017
              -- для контрагента Министерство финансов ........
              if    is_budg_ !=0  or
                    ( mfo_ = 300465 and k.rnk in (90092301, 94312801) ) then
@@ -361,6 +363,34 @@ BEGIN
 
               H_ := '1';
           end if;
+       end if;
+
+-- отдельная обработка  счетов 3-го класса -могут быть в ggg=130
+ 
+       if  ddd_ in('133','135','138') and k.nbs like '3%'   then
+                 
+          select count(*)  into pr_
+            from nbu23_rez
+           where fdat = z.fdat1
+             and nd = k.nd
+             and nbs = substr(k.nbs,1,3)||'0';
+
+          if pr_ !=0  then
+
+              ddd_ :='130';   
+              H_ := '0';
+          else
+
+              H_ := '1';
+          end if;
+       end if;
+                                     --  отдельная обработка клиента  90593701
+       if    mfo_ = 300465 and k.rnk in (90593701) and
+             k.nbs like '311%'
+       then  
+           ddd_ :='138';   
+           H_ := '1';
+
        end if;
 
        if k.nbs in ('3005','3007','3008')  then
@@ -571,11 +601,11 @@ BEGIN
 
     end loop;
 
+---------------------------------------------------------------    обработка счетов SNA
      for k in ( select /*+leading(nb) index(nb I3_NBU23REZ)*/
                        nb.acc, NVL(nb.rnk,0) RNK, nb.nbs, nb.nls, nb.kv,
-                       nb.nd, nb.id, NVL(trim(nb.kat),'0') kat,
+                       nb.nd, nb.id,
                        NVL(round(nb.bvq*100,0),0) BV,
-                       NVL(round(nb.pvzq*100,0),0) ZAL,
                        nb.s080 FIN, nvl(nb.pd_0,0) pd_0,
                        c.codcagent, c.custtype,
                        2-MOD(c.codcagent,2) REZ, NVL(trim(c.sed),'00') sed,
@@ -711,8 +741,180 @@ BEGIN
 
      end loop;
 
+---------------------------------------------------------------    обработка счетов дисконтов
+     for k in ( select /*+leading(nb) index(nb I3_NBU23REZ)*/
+                       nb.acc, NVL(nb.rnk,0) RNK, nb.nbs, nb.nls, nb.kv,
+                       nb.nd, nb.id, nvl(nb.r013,'0') r013,
+                       NVL(round(nb.bvq*100,0),0) BV,
+                       nb.s080 FIN, nvl(nb.pd_0,0) pd_0,
+                       c.codcagent, c.custtype,
+                       2-MOD(c.codcagent,2) REZ, NVL(trim(c.sed),'00') sed,
+                       NVL(nb.s250_23,'0') s250, nb.tip
+                  from nbu23_rez nb, customer c
+                 where nb.fdat = z.fdat1
+                   and nb.rnk = z.rnk1
+                   and nb.nd = z.nd1
+                   and nb.kat = z.kat1
+                   and nb.kv = z.kv1
+                   and nvl(nb.rz,0) = z.rz1
+                   and nb.rnk = c.rnk
+                   and nvl(nb.r013,'0') in ('1','2','3','4')
+                   and nb.nbs in ( select r020 from kl_r020
+                                    where txt like '%дисконт%'
+                                      and d_close is null
+                                       and trim(prem) ='КБ' )
+     ) loop
+
+         select max(ddd) into ddd_
+           from kl_f3_29
+          where kf='6B' and r020 like substr(k.nbs,1,3)||'%';
+
+         kv_ := lpad(to_char(k.kv),3,'0');
+
+         IF typ_>0 THEN
+            nbuc_ := NVL(F_Codobl_Tobo (k.acc, typ_), nbuc1_);
+         ELSE
+            nbuc_ := nbuc1_;
+         END IF;
+
+         comm_ := 'ID='||k.id||' RNK='||k.rnk||' ND='||k.nd||' DDD='||ddd_||' TIP='||k.tip||' R013='||k.r013;
+
+         CC_ := '40';
+
+       if k.codcagent in (1, 2)               -- банки
+       then
+           N_ := '3';                          
+       elsif k.codcagent in (3, 4)            -- юр.лица
+       then
+
+--   проверка наличия доп.параметра ISSPE
+          begin
+            select nvl(trim(value),'0')   into is_spe_
+              from customerw
+             where rnk =k.rnk
+               and tag ='ISSPE';
+          exception
+            when others
+               then is_spe_ :='0';
+          end;
+
+          if is_spe_ ='1'  then
+
+             N_ := '5';
+          else
+
+             if k.nls like '21%'    or
+                k.nls like '236%'   or
+                k.nls like '237%'   or
+                k.nls like '238%'   
+             then
+                     is_budg_ := 1;
+             else    is_budg_ := 0;
+             end if;
+
+             -- для контрагента Министерство финансов ........
+             if    is_budg_ !=0  or
+                   ( mfo_ = 300465 and k.rnk in (90092301, 94312801) ) then
+
+                  N_ := '4';                  --бюджет
+             elsif k.sed = '56'  then
+                  N_ := '6';                  --юр.лицо ОСББ
+             else
+                  N_ := '2';                  --юр.лицо
+             end if;
+
+          end if;
+
+       elsif k.codcagent in (5,6) and k.sed <> '91'
+       then
+          N_ := '1';                          --физ.лицо
+       elsif k.codcagent in (5,6) and k.sed = '91'
+       then
+          N_ := '1';                    --физ.лицо предприниматель (ранее =2)
+       else
+
+          if    k.custtype ='1'  then   N_ := '3';
+          elsif k.custtype ='2'  then   N_ := '2';
+          elsif k.custtype ='3'  then   N_ := '1';
+          else
+               N_ := 'X';
+          end if;
+
+       end if;
+
+       H_ := '0';
+
+       if k.pd_0 !=1 and k.s250 = '8' then
+          H_ := '2';
+       elsif k.pd_0 !=1  then
+          H_ := '1';
+       else
+          H_ := '0';
+       end if;
+
+       I_ := k.fin;
+       if ddd_ like '15%'  and  trim(I_) is null  then
+          I_ := 'K';
+       end if;
+       -- для контрагента Министерство финансов ........
+       if mfo_ = 300465 and k.rnk in (90092301, 94312801)
+       then
+          I_ := 'M';
+       end if;
+
+       if    k.pd_0 =1  and
+             k.nbs in ('1500','1502','1508','1600','1607') 
+       then  
+           ddd_ :='120';   
+           H_ := '0';
+
+       end if;
+
+          kodp_:= CC_|| N_|| H_|| I_||'00'|| to_char(k.rez) || kv_;
+          znap_:= TO_CHAR(ABS(k.bv));
+
+             INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, rnk, nd, comm, acc)
+             VALUES (k.nls, k.kv, dat_, ddd_||kodp_, znap_, nbuc_, k.rnk, k.nd, comm_, k.acc);
+
+     end loop;
+
    end loop;
 
+----  654602611       отдельная обработка
+   if dat_ =to_date('20180330','yyyymmdd')  and  mfo_=322669  then
+
+   for k in ( select  a.acc, a.nls, a.nbs, a.kv, a.rnk, a.tip, NVL(m.ostq,0) BV,
+                      2-MOD(c.codcagent,2) REZ, NVL(trim(c.sed),'00') sed,
+                      c.codcagent, c.custtype
+                from agg_monbals m, accounts a, customer c
+               where m.kf='322669' and m.fdat=to_date('20180301','yyyymmdd')
+                 and m.acc = a.acc  and  a.acc=654602611
+                 and a.rnk = c.rnk
+   ) loop
+         select max(ddd) into ddd_
+           from kl_f3_29
+          where kf='6B' and r020 like substr(k.nbs,1,3)||'%';
+
+         IF typ_>0 THEN
+            nbuc_ := NVL(F_Codobl_Tobo (k.acc, typ_), nbuc1_);
+         ELSE
+            nbuc_ := nbuc1_;
+         END IF;
+         comm_ := ' RNK='||k.rnk||' DDD='||ddd_||' TIP='||k.tip;
+         kv_ := lpad(to_char(k.kv),3,'0');
+
+         N_ := '1';                          --физ.лицо
+         I_ := 'M';
+         H_ := '2';
+
+         kodp_:= '40'|| N_|| H_|| I_||'00'|| to_char(k.rez) || kv_;
+         znap_:= TO_CHAR(ABS(k.bv));
+
+         INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, rnk, comm, acc)
+         VALUES (k.nls, k.kv, dat_, ddd_||kodp_, znap_, nbuc_, k.rnk, comm_, k.acc);
+
+   end loop;
+   end if;
    -- для балансовых рахунків з пасивними залишками
    --   змінюємо код CC  з 11 на 40
 
@@ -743,6 +945,14 @@ BEGIN
 
    end loop;
 
+       if dat_ =to_date('20180330','yyyymmdd')   then
+           update rnbu_trace
+              set kodp = substr(kodp, 1,3) || '40' || substr(kodp, 6),
+                  znap = (-1)* to_number(znap)
+            where acc = 1433732901 
+              and kodp like '13011%';
+
+       end if;
 -----------------------------------------------------------------------------
    DELETE FROM tmp_nbu
          WHERE kodf = kodf_ AND datf = dat_;
