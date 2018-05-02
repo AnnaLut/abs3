@@ -2693,6 +2693,13 @@ CREATE OR REPLACE PACKAGE BODY BARS.OW_FILES_PROC is
                              and o.sos between 0 and 4
                              --and o.mfoa <> o.mfob
                              and o.pdat >= trunc (sysdate) - 10
+--------------COBUMMFO-6753 (операції OW4 з КБ)
+                   union all
+                   select o.ref from MWAY_MATCH mm
+                       join oper o on mm.ref_tr = o.ref
+                                  and o.sos between 0 and 4
+                                  and o.pdat >= trunc (sysdate) - 10
+------------------------                           
                  where rownum <= 1000
                    )
           loop
