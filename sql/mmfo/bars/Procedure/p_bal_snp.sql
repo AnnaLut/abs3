@@ -15,6 +15,7 @@ PROMPT *** Create  procedure P_BAL_SNP ***
 , Param2  varchar2  -- Param2='БалРахунок_по (%-вс_)
 ) is
 /*
+  25/04/2018 Virko
   29/11/2017 Virko
   23.08.2017 BAA
   19.07.2012 Sta Рiвень користувача = 1 для синхр снапiв
@@ -267,39 +268,46 @@ begin
           select a.nbs,
                sum(b.dosq-b.cudosq+b.crdosq ) DOS,
                sum(b.kosq-b.cukosq+b.crkosq ) KOS ,
-               sum(decode( sign(b.ostq-b.crdosq+b.crkos),-1, -(b.ostq-b.crdosq+b.crkos), 0 )) OSTD,
-               sum(decode( sign(b.ostq-b.crdosq+b.crkos), 1,  b.ostq-b.crdosq+b.crkosq, 0 )) OSTK
+               sum(decode( sign(b.ostq-b.crdosq+b.crkosq),-1, -(b.ostq-b.crdosq+b.crkosq), 0 )) OSTD,  
+               sum(decode( sign(b.ostq-b.crdosq+b.crkosq), 1,  b.ostq-b.crdosq+b.crkosq, 0 )) OSTK
           from agg_monbals b, accounts a
           where   b.fdat  = :l_DAT1
              and b.acc = a.acc ' || l_Sql1 || l_Sql2 || '
-             and a.nbs not like ''8%''
-             and ( b.dosq > 0 or b.kosq > 0 or b.ostq <> 0 )
-             and trunc(nvl(a.dat_alt, :l_DAT1 - 1), ''mm'') <> trunc(:l_DAT1, ''mm'')
-             and a.BRANCH like sys_context(''bars_context'',''user_branch_mask'')
-          group by a.nbs
-           union all
+             and a.nbs not like ''8%'' '||
+           (case  when to_char(p_DAT, 'mmyyyy') = '122017' 
+                  then ' and a.dat_alt is null '
+                  else ''
+            end) || 
+            'and a.BRANCH like sys_context(''bars_context'',''user_branch_mask'')
+          group by a.nbs';
+       
+      if to_char(p_DAT, 'mmyyyy') = '122017' then 
+         l_Sql := l_Sql || ' union all
           select substr(d.acc_num, 1, 4) nbs,
-                   sum((case when d.acc_type = ''OLD'' then d.dosq_repm-b.cudosq+b.crdosq else b.dosq-d.dosq_repm-b.cudosq+b.crdosq end)) DOS,
-                   sum((case when d.acc_type = ''OLD'' then d.kosq_repm-b.cukosq+b.crkosq else b.kosq-d.kosq_repm-b.cukosq+b.crkosq end)) KOS ,
-                   sum((case when d.acc_type = ''OLD'' then 0 else decode( sign(b.ostq-b.crdosq+b.crkos),-1, -(b.ostq-b.crdosq+b.crkos), 0 ) end)) OSTD,
-                   sum((case when d.acc_type = ''OLD'' then 0 else decode( sign(b.ostq-b.crdosq+b.crkos), 1,  b.ostq-b.crdosq+b.crkosq, 0 ) end)) OSTK
+                   sum((case when d.acc_type = ''OLD'' then d.dosq_repm-b.cudosq else b.dosq-d.dosq_repd+b.crdosq end)) DOS,
+                   sum((case when d.acc_type = ''OLD'' then d.kosq_repm-b.cukosq else b.kosq-d.kosq_repd+b.crkosq end)) KOS ,
+                   sum((case when d.acc_type = ''OLD'' then 0 else decode( sign(b.ostq-b.crdosq+b.crkosq),-1, -(b.ostq-b.crdosq+b.crkosq), 0 ) end)) OSTD,
+                   sum((case when d.acc_type = ''OLD'' then 0 else decode( sign(b.ostq-b.crdosq+b.crkosq), 1,  b.ostq-b.crdosq+b.crkosq, 0 ) end)) OSTK
             from AGG_MONBALS b, nbur_kor_balances d, accounts a
             where   b.fdat  = :l_DAT1
                 and b.acc = a.acc ' || l_Sql1 || l_Sql2 || '
-                and d.report_date between trunc(:l_DAT1 , ''mm'') and :l_DAT1
+                and d.report_date = to_date(''18122017'', ''ddmmyyyy'') 
                 and b.acc = d.acc_id
                 and a.nbs not like ''8%''
-                and ( b.dosq > 0 or b.kosq > 0 or b.ostq <> 0 )
-                and trunc(nvl(a.dat_alt, :l_DAT1 - 1), ''mm'') <> trunc(:l_DAT1, ''mm'')
-                and a.BRANCH like sys_context(''bars_context'',''user_branch_mask'')
-            group by substr(d.acc_num, 1, 4)
-      )
-      group by nbs ';
-
+                and a.dat_alt = to_date(''18122017'', ''ddmmyyyy'') 
+                and a.BRANCH like sys_context(''bars_context'',''user_branch_mask'') 
+            group by substr(d.acc_num, 1, 4) ';
+      end if;
+      
+      l_Sql := l_Sql || ') group by nbs ';
   end if;
 
   if l_id1 = 0 and l_id2 = 1 then
-     execute immediate l_Sql using l_DAT1, l_DAT1, l_DAT1, l_DAT1, l_DAT1, l_DAT1, l_DAT1, l_DAT1 ;
+     if to_char(p_DAT, 'mmyyyy') = '122017' then
+        execute immediate l_Sql using l_DAT1, l_DAT1;
+     else
+        execute immediate l_Sql using l_DAT1;
+     end if;
   else
      execute immediate l_Sql using l_DAT1, l_DAT1, l_DAT1, l_DAT1, l_DAT1, l_DAT1 ;
   end if;
