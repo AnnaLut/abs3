@@ -1,10 +1,176 @@
-MERGE INTO TRANSP_RECEIVE_TYPE A USING
+SET DEFINE OFF;
+
+MERGE INTO BARSTRANS.TRANSP_RECEIVE_TYPE A USING
+ (SELECT
+  18 as ID,
+  'NBU_CREDIT_TRANCHE' as TYPE_NAME,
+  'qqq' as TYPE_DESC,
+  0 as SESS_TYPE,
+  'begin nbu_gateway.nbu_601_parse_xml.p_parse_credit_tranche(:id); end;' as ACT_TYPE,
+  1 as LOGING,
+  1 as S_PRIOR,
+  'XML' as DATA_TYPE,
+  'text/plain' as CONT_TYPE,
+  0 as CONV_2_JSON,
+  'GZIP' as COMPRESS_TYPE,
+  1 as BASE_64,
+  NULL as CHECK_SUM
+  FROM DUAL) B
+ON (A.ID = B.ID)
+WHEN NOT MATCHED THEN 
+INSERT (
+  ID, TYPE_NAME, TYPE_DESC, SESS_TYPE, ACT_TYPE, 
+  LOGING, S_PRIOR, DATA_TYPE, CONT_TYPE, CONV_2_JSON, 
+  COMPRESS_TYPE, BASE_64, CHECK_SUM)
+VALUES (
+  B.ID, B.TYPE_NAME, B.TYPE_DESC, B.SESS_TYPE, B.ACT_TYPE, 
+  B.LOGING, B.S_PRIOR, B.DATA_TYPE, B.CONT_TYPE, B.CONV_2_JSON, 
+  B.COMPRESS_TYPE, B.BASE_64, B.CHECK_SUM)
+WHEN MATCHED THEN
+UPDATE SET 
+  A.TYPE_NAME = B.TYPE_NAME,
+  A.TYPE_DESC = B.TYPE_DESC,
+  A.SESS_TYPE = B.SESS_TYPE,
+  A.ACT_TYPE = B.ACT_TYPE,
+  A.LOGING = B.LOGING,
+  A.S_PRIOR = B.S_PRIOR,
+  A.DATA_TYPE = B.DATA_TYPE,
+  A.CONT_TYPE = B.CONT_TYPE,
+  A.CONV_2_JSON = B.CONV_2_JSON,
+  A.COMPRESS_TYPE = B.COMPRESS_TYPE,
+  A.BASE_64 = B.BASE_64,
+  A.CHECK_SUM = B.CHECK_SUM;
+
+MERGE INTO BARSTRANS.TRANSP_RECEIVE_TYPE A USING
+ (SELECT
+  12 as ID,
+  'NBU_FINPERFORMANCEPR_UO' as TYPE_NAME,
+  'qqq' as TYPE_DESC,
+  0 as SESS_TYPE,
+  'begin nbu_gateway.nbu_601_parse_xml.p_parse_finperformancepr_uo(:id); end;' as ACT_TYPE,
+  1 as LOGING,
+  1 as S_PRIOR,
+  'XML' as DATA_TYPE,
+  'text/plain' as CONT_TYPE,
+  0 as CONV_2_JSON,
+  'GZIP' as COMPRESS_TYPE,
+  1 as BASE_64,
+  NULL as CHECK_SUM
+  FROM DUAL) B
+ON (A.ID = B.ID)
+WHEN NOT MATCHED THEN 
+INSERT (
+  ID, TYPE_NAME, TYPE_DESC, SESS_TYPE, ACT_TYPE, 
+  LOGING, S_PRIOR, DATA_TYPE, CONT_TYPE, CONV_2_JSON, 
+  COMPRESS_TYPE, BASE_64, CHECK_SUM)
+VALUES (
+  B.ID, B.TYPE_NAME, B.TYPE_DESC, B.SESS_TYPE, B.ACT_TYPE, 
+  B.LOGING, B.S_PRIOR, B.DATA_TYPE, B.CONT_TYPE, B.CONV_2_JSON, 
+  B.COMPRESS_TYPE, B.BASE_64, B.CHECK_SUM)
+WHEN MATCHED THEN
+UPDATE SET 
+  A.TYPE_NAME = B.TYPE_NAME,
+  A.TYPE_DESC = B.TYPE_DESC,
+  A.SESS_TYPE = B.SESS_TYPE,
+  A.ACT_TYPE = B.ACT_TYPE,
+  A.LOGING = B.LOGING,
+  A.S_PRIOR = B.S_PRIOR,
+  A.DATA_TYPE = B.DATA_TYPE,
+  A.CONT_TYPE = B.CONT_TYPE,
+  A.CONV_2_JSON = B.CONV_2_JSON,
+  A.COMPRESS_TYPE = B.COMPRESS_TYPE,
+  A.BASE_64 = B.BASE_64,
+  A.CHECK_SUM = B.CHECK_SUM;
+  
+MERGE INTO BARSTRANS.TRANSP_RECEIVE_TYPE A USING
+ (SELECT
+  9 as ID,
+  'NBU_GROUPUR_UO' as TYPE_NAME,
+  'qqq' as TYPE_DESC,
+  0 as SESS_TYPE,
+  'begin nbu_gateway.nbu_601_parse_xml.p_parse_groupur_uo(:id); end;' as ACT_TYPE,
+  1 as LOGING,
+  1 as S_PRIOR,
+  'XML' as DATA_TYPE,
+  'text/plain' as CONT_TYPE,
+  0 as CONV_2_JSON,
+  'GZIP' as COMPRESS_TYPE,
+  1 as BASE_64,
+  NULL as CHECK_SUM
+  FROM DUAL) B
+ON (A.ID = B.ID)
+WHEN NOT MATCHED THEN 
+INSERT (
+  ID, TYPE_NAME, TYPE_DESC, SESS_TYPE, ACT_TYPE, 
+  LOGING, S_PRIOR, DATA_TYPE, CONT_TYPE, CONV_2_JSON, 
+  COMPRESS_TYPE, BASE_64, CHECK_SUM)
+VALUES (
+  B.ID, B.TYPE_NAME, B.TYPE_DESC, B.SESS_TYPE, B.ACT_TYPE, 
+  B.LOGING, B.S_PRIOR, B.DATA_TYPE, B.CONT_TYPE, B.CONV_2_JSON, 
+  B.COMPRESS_TYPE, B.BASE_64, B.CHECK_SUM)
+WHEN MATCHED THEN
+UPDATE SET 
+  A.TYPE_NAME = B.TYPE_NAME,
+  A.TYPE_DESC = B.TYPE_DESC,
+  A.SESS_TYPE = B.SESS_TYPE,
+  A.ACT_TYPE = B.ACT_TYPE,
+  A.LOGING = B.LOGING,
+  A.S_PRIOR = B.S_PRIOR,
+  A.DATA_TYPE = B.DATA_TYPE,
+  A.CONT_TYPE = B.CONT_TYPE,
+  A.CONV_2_JSON = B.CONV_2_JSON,
+  A.COMPRESS_TYPE = B.COMPRESS_TYPE,
+  A.BASE_64 = B.BASE_64,
+  A.CHECK_SUM = B.CHECK_SUM;
+  
+MERGE INTO BARSTRANS.TRANSP_RECEIVE_TYPE A USING
+ (SELECT
+  15 as ID,
+  'NBU_PLEDGE_DEP' as TYPE_NAME,
+  'qqq' as TYPE_DESC,
+  0 as SESS_TYPE,
+  'begin nbu_gateway.nbu_601_parse_xml.p_parse_pledge_dep(:id); end;' as ACT_TYPE,
+  1 as LOGING,
+  1 as S_PRIOR,
+  'XML' as DATA_TYPE,
+  'text/plain' as CONT_TYPE,
+  0 as CONV_2_JSON,
+  'GZIP' as COMPRESS_TYPE,
+  1 as BASE_64,
+  NULL as CHECK_SUM
+  FROM DUAL) B
+ON (A.ID = B.ID)
+WHEN NOT MATCHED THEN 
+INSERT (
+  ID, TYPE_NAME, TYPE_DESC, SESS_TYPE, ACT_TYPE, 
+  LOGING, S_PRIOR, DATA_TYPE, CONT_TYPE, CONV_2_JSON, 
+  COMPRESS_TYPE, BASE_64, CHECK_SUM)
+VALUES (
+  B.ID, B.TYPE_NAME, B.TYPE_DESC, B.SESS_TYPE, B.ACT_TYPE, 
+  B.LOGING, B.S_PRIOR, B.DATA_TYPE, B.CONT_TYPE, B.CONV_2_JSON, 
+  B.COMPRESS_TYPE, B.BASE_64, B.CHECK_SUM)
+WHEN MATCHED THEN
+UPDATE SET 
+  A.TYPE_NAME = B.TYPE_NAME,
+  A.TYPE_DESC = B.TYPE_DESC,
+  A.SESS_TYPE = B.SESS_TYPE,
+  A.ACT_TYPE = B.ACT_TYPE,
+  A.LOGING = B.LOGING,
+  A.S_PRIOR = B.S_PRIOR,
+  A.DATA_TYPE = B.DATA_TYPE,
+  A.CONT_TYPE = B.CONT_TYPE,
+  A.CONV_2_JSON = B.CONV_2_JSON,
+  A.COMPRESS_TYPE = B.COMPRESS_TYPE,
+  A.BASE_64 = B.BASE_64,
+  A.CHECK_SUM = B.CHECK_SUM;
+
+MERGE INTO BARSTRANS.TRANSP_RECEIVE_TYPE A USING
  (SELECT
   2 as ID,
   'NBU_DOCUMENT_FO' as TYPE_NAME,
   'qqq' as TYPE_DESC,
   0 as SESS_TYPE,
-  'begin nbu_gateway.nbu_601_parse_xml.p_parse_document_fo('||chr(58)||'id); end;' as ACT_TYPE,
+  'begin nbu_gateway.nbu_601_parse_xml.p_parse_document_fo(:id); end;' as ACT_TYPE,
   1 as LOGING,
   1 as S_PRIOR,
   'XML' as DATA_TYPE,
@@ -39,13 +205,13 @@ UPDATE SET
   A.BASE_64 = B.BASE_64,
   A.CHECK_SUM = B.CHECK_SUM;
 
-MERGE INTO TRANSP_RECEIVE_TYPE A USING
+MERGE INTO BARSTRANS.TRANSP_RECEIVE_TYPE A USING
  (SELECT
   3 as ID,
   'NBU_ADDRESS_FO' as TYPE_NAME,
   'qqq' as TYPE_DESC,
   0 as SESS_TYPE,
-  'begin nbu_gateway.nbu_601_parse_xml.p_parse_address_fo('||chr(58)||'id); end;' as ACT_TYPE,
+  'begin nbu_gateway.nbu_601_parse_xml.p_parse_address_fo(:id); end;' as ACT_TYPE,
   1 as LOGING,
   1 as S_PRIOR,
   'XML' as DATA_TYPE,
@@ -80,13 +246,13 @@ UPDATE SET
   A.BASE_64 = B.BASE_64,
   A.CHECK_SUM = B.CHECK_SUM;
 
-MERGE INTO TRANSP_RECEIVE_TYPE A USING
+MERGE INTO BARSTRANS.TRANSP_RECEIVE_TYPE A USING
  (SELECT
   7 as ID,
   'NBU_PERSON_UO' as TYPE_NAME,
   'qqq' as TYPE_DESC,
   0 as SESS_TYPE,
-  'begin nbu_gateway.nbu_601_parse_xml.p_parse_person_uo('||chr(58)||'id); end;' as ACT_TYPE,
+  'begin nbu_gateway.nbu_601_parse_xml.p_parse_person_uo(:id); end;' as ACT_TYPE,
   1 as LOGING,
   1 as S_PRIOR,
   'XML' as DATA_TYPE,
@@ -121,13 +287,13 @@ UPDATE SET
   A.BASE_64 = B.BASE_64,
   A.CHECK_SUM = B.CHECK_SUM;
 
-MERGE INTO TRANSP_RECEIVE_TYPE A USING
+MERGE INTO BARSTRANS.TRANSP_RECEIVE_TYPE A USING
  (SELECT
   8 as ID,
   'NBU_FINPERFORMANCE_UO' as TYPE_NAME,
   'qqq' as TYPE_DESC,
   0 as SESS_TYPE,
-  'begin nbu_gateway.nbu_601_parse_xml.p_parse_finperformance_uo('||chr(58)||'id); end;' as ACT_TYPE,
+  'begin nbu_gateway.nbu_601_parse_xml.p_parse_finperformance_uo(:id); end;' as ACT_TYPE,
   1 as LOGING,
   1 as S_PRIOR,
   'XML' as DATA_TYPE,
@@ -162,13 +328,13 @@ UPDATE SET
   A.BASE_64 = B.BASE_64,
   A.CHECK_SUM = B.CHECK_SUM;
 
-MERGE INTO TRANSP_RECEIVE_TYPE A USING
+MERGE INTO BARSTRANS.TRANSP_RECEIVE_TYPE A USING
  (SELECT
   10 as ID,
   'NBU_FINPERFORMANCEGR_UO' as TYPE_NAME,
   'qqq' as TYPE_DESC,
   0 as SESS_TYPE,
-  'begin nbu_gateway.nbu_601_parse_xml.p_parse_finperformancegr_uo('||chr(58)||'id); end;' as ACT_TYPE,
+  'begin nbu_gateway.nbu_601_parse_xml.p_parse_finperformancegr_uo(:id); end;' as ACT_TYPE,
   1 as LOGING,
   1 as S_PRIOR,
   'XML' as DATA_TYPE,
@@ -203,13 +369,13 @@ UPDATE SET
   A.BASE_64 = B.BASE_64,
   A.CHECK_SUM = B.CHECK_SUM;
 
-MERGE INTO TRANSP_RECEIVE_TYPE A USING
+MERGE INTO BARSTRANS.TRANSP_RECEIVE_TYPE A USING
  (SELECT
   14 as ID,
   'NBU_OWNERJUR_UO' as TYPE_NAME,
   'qqq' as TYPE_DESC,
   0 as SESS_TYPE,
-  'begin nbu_gateway.nbu_601_parse_xml.p_parse_ownerjur_uo('||chr(58)||'id); end;' as ACT_TYPE,
+  'begin nbu_gateway.nbu_601_parse_xml.p_parse_ownerjur_uo(:id); end;' as ACT_TYPE,
   1 as LOGING,
   1 as S_PRIOR,
   'XML' as DATA_TYPE,
@@ -244,13 +410,13 @@ UPDATE SET
   A.BASE_64 = B.BASE_64,
   A.CHECK_SUM = B.CHECK_SUM;
 
-MERGE INTO TRANSP_RECEIVE_TYPE A USING
+MERGE INTO BARSTRANS.TRANSP_RECEIVE_TYPE A USING
  (SELECT
   13 as ID,
   'NBU_OWNERPP_UO' as TYPE_NAME,
   'qqq' as TYPE_DESC,
   0 as SESS_TYPE,
-  'begin nbu_gateway.nbu_601_parse_xml.p_parse_ownerpp_uo('||chr(58)||'id); end;' as ACT_TYPE,
+  'begin nbu_gateway.nbu_601_parse_xml.p_parse_ownerpp_uo(:id); end;' as ACT_TYPE,
   1 as LOGING,
   1 as S_PRIOR,
   'XML' as DATA_TYPE,
@@ -285,13 +451,13 @@ UPDATE SET
   A.BASE_64 = B.BASE_64,
   A.CHECK_SUM = B.CHECK_SUM;
 
-MERGE INTO TRANSP_RECEIVE_TYPE A USING
+MERGE INTO BARSTRANS.TRANSP_RECEIVE_TYPE A USING
  (SELECT
   11 as ID,
   'NBU_PARTNERS_UO' as TYPE_NAME,
   'qqq' as TYPE_DESC,
   0 as SESS_TYPE,
-  'begin nbu_gateway.nbu_601_parse_xml.p_parse_partners_uo('||chr(58)||'id); end;' as ACT_TYPE,
+  'begin nbu_gateway.nbu_601_parse_xml.p_parse_partners_uo(:id); end;' as ACT_TYPE,
   1 as LOGING,
   1 as S_PRIOR,
   'XML' as DATA_TYPE,
@@ -326,13 +492,13 @@ UPDATE SET
   A.BASE_64 = B.BASE_64,
   A.CHECK_SUM = B.CHECK_SUM;
 
-MERGE INTO TRANSP_RECEIVE_TYPE A USING
+MERGE INTO BARSTRANS.TRANSP_RECEIVE_TYPE A USING
  (SELECT
   16 as ID,
   'NBU_CREDIT' as TYPE_NAME,
   'qqq' as TYPE_DESC,
   0 as SESS_TYPE,
-  'begin nbu_gateway.nbu_601_parse_xml.p_parse_credit('||chr(58)||'id); end;' as ACT_TYPE,
+  'begin nbu_gateway.nbu_601_parse_xml.p_parse_credit(:id); end;' as ACT_TYPE,
   1 as LOGING,
   1 as S_PRIOR,
   'XML' as DATA_TYPE,
@@ -367,13 +533,13 @@ UPDATE SET
   A.BASE_64 = B.BASE_64,
   A.CHECK_SUM = B.CHECK_SUM;
 
-MERGE INTO TRANSP_RECEIVE_TYPE A USING
+MERGE INTO BARSTRANS.TRANSP_RECEIVE_TYPE A USING
  (SELECT
   17 as ID,
-  'NBU_CREDIT_PLADGE' as TYPE_NAME,
+  'NBU_CREDIT_PLEDGE' as TYPE_NAME,
   'qqq' as TYPE_DESC,
   0 as SESS_TYPE,
-  'begin nbu_gateway.nbu_601_parse_xml.p_parse_credit_pledge('||chr(58)||'id); end;' as ACT_TYPE,
+  'begin nbu_gateway.nbu_601_parse_xml.p_parse_credit_pledge(:id); end;' as ACT_TYPE,
   1 as LOGING,
   1 as S_PRIOR,
   'XML' as DATA_TYPE,
@@ -408,13 +574,13 @@ UPDATE SET
   A.BASE_64 = B.BASE_64,
   A.CHECK_SUM = B.CHECK_SUM;
 
-MERGE INTO TRANSP_RECEIVE_TYPE A USING
+MERGE INTO BARSTRANS.TRANSP_RECEIVE_TYPE A USING
  (SELECT
   1 as ID,
   'NBU_PERSON_FO' as TYPE_NAME,
   'qqq' as TYPE_DESC,
   0 as SESS_TYPE,
-  'begin nbu_gateway.nbu_601_parse_xml.p_parse_person_fo('||chr(58)||'id); end; ' as ACT_TYPE,
+  'begin nbu_gateway.nbu_601_parse_xml.p_parse_person_fo(:id); end; ' as ACT_TYPE,
   1 as LOGING,
   1 as S_PRIOR,
   'XML' as DATA_TYPE,

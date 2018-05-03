@@ -437,7 +437,7 @@ procedure run_all_data_requests(
            commit;
            exception
              when others then
-              set_data_request_state( l_request_id_fin_uo,10,sqlerrm ||'' || dbms_utility.format_error_backtrace());
+              set_data_request_state( l_request_id_fin_uo,10,sqlerrm ||' '|| dbms_utility.format_error_backtrace());
               commit;
       end;
       --
@@ -451,7 +451,7 @@ procedure run_all_data_requests(
            commit;
            exception
              when others then
-              set_data_request_state(l_request_id_fingr_uo,10,sqlerrm ||'' || dbms_utility.format_error_backtrace());
+              set_data_request_state(l_request_id_fingr_uo,10,sqlerrm ||' '|| dbms_utility.format_error_backtrace());
               commit;
       end;
 
@@ -533,6 +533,9 @@ procedure create_data_request(P_KF in varchar2)
     is
     l_request_id int;
     l_instance_id integer ;
+    job_is_runing exception;
+    pragma exception_init (job_is_runing,-27478);    
+    
    begin
       select nvl(max(report_instance_id),0)+1 into l_instance_id from nbu_data_request_601 where kf=p_kf;
 
@@ -553,8 +556,12 @@ procedure create_data_request(P_KF in varchar2)
                                          argument_position =>2,
                                          argument_value    => p_kf ) ;
 
+    begin
     dbms_scheduler.run_job(job_name =>'RUN_ALL_601', use_current_session => false);
-
+     exception when job_is_runing 
+               then null;
+    end;
+    
  end;
 end;
 /
