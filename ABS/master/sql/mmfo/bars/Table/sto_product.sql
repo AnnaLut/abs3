@@ -41,8 +41,10 @@ exception when others then
 end; 
 /
 
-
-
+begin
+   execute immediate 'alter table sto_product modify id number';
+end;
+/
 
 PROMPT *** ALTER_POLICIES to STO_PRODUCT ***
  exec bpa.alter_policies('STO_PRODUCT');
