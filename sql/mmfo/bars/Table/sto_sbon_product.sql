@@ -42,6 +42,16 @@ exception when others then
 end; 
 /
 
+begin
+   execute immediate 'alter table STO_SBON_PRODUCT  modify id number';
+end;
+/
+
+begin
+   execute immediate 'alter table STO_SBON_PRODUCT  modify contract_id number';
+end;
+/
+
 
 
 
