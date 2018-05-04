@@ -1989,7 +1989,7 @@ procedure p_parse_credit_tranche (p_id in  NUMBER)
             
              l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).PROCCREDITTR:=to_number(dbms_xslprocessor.valueOf(l_row,'PROCCREDITTR/text()'));
              
-             l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).PEPRIODBASETR:=to_number(dbms_xslprocessor.valueOf(l_row,'PEPRIODBASETR/text()'));
+             l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).PERIODBASETR:=to_number(dbms_xslprocessor.valueOf(l_row,'PERIODBASETR/text()'));
              
              l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).PERIODPROCTR:=to_number(dbms_xslprocessor.valueOf(l_row,'PERIODPROCTR/text()'));
              
