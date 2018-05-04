@@ -507,7 +507,7 @@ function get_xml_credit_tranche return clob
                                 xmlelement("SUMZAGALTR",t.sumzagaltr),
                                 xmlelement("R030TR",t.r030tr),
                                 xmlelement("PROCCREDITTR",t.proccredittr),
-                                xmlelement("PEPRIODBASETR",t.periodbasetr),
+                                xmlelement("PERIODBASETR",t.periodbasetr),
                                 xmlelement("PERIODPROCTR",t.periodproctr),
                                 xmlelement("SUMARREARSTR",t.sumarrearstr),
                                 xmlelement("ARREARBASETR",t.arrearbasetr ),
