@@ -25,8 +25,8 @@ namespace BarsWeb.Areas.Clients.Infrastructure
             }
             else if (!string.IsNullOrEmpty(parameters.Gcif))
             {
-                result.SqlText += @", ebk_gcif b 
-                                    where a.id=b.rnk 
+                result.SqlText += @", V_CUSTOMER_GCIF b 
+                                    where a.id=b.CUST_ID 
                                             and b.gcif = :p_gcif ";
                 result.SqlParams = new object[]
                 {
@@ -40,23 +40,23 @@ namespace BarsWeb.Areas.Clients.Infrastructure
 
                     if (!string.IsNullOrEmpty(parameters.DocumentSerial)
                 && !string.IsNullOrEmpty(parameters.DocumentNumber))
-            {
-                result.SqlText += @", person b 
+                    {
+                        result.SqlText += @", person b 
                                     where a.id=b.rnk 
                                             and b.ser = :p_ser
                                             and b.numdoc = :p_numdoc ";
-                result.SqlParams = new object[]
-                {
+                        result.SqlParams = new object[]
+                        {
                     parameters.DocumentSerial,
                     parameters.DocumentNumber
-                };
-            }
-            else if (!string.IsNullOrEmpty(parameters.FirstName)
-                && !string.IsNullOrEmpty(parameters.LastName)
-                && parameters.BirthDate != null)
-            {
-                result.SqlText =
-                @"select  s.* from
+                        };
+                    }
+                    else if (!string.IsNullOrEmpty(parameters.FirstName)
+                        && !string.IsNullOrEmpty(parameters.LastName)
+                        && parameters.BirthDate != null)
+                    {
+                        result.SqlText =
+                        @"select  s.* from
                     ( select a.*, 
                         (select d.value from customerw d where d.tag = 'SN_FN' and D.RNK = a.id) as firstName,
                         (select d.value from customerw d where d.tag = 'SN_LN' and D.RNK = a.id) as lastName,
@@ -70,28 +70,28 @@ namespace BarsWeb.Areas.Clients.Infrastructure
                     and upper(s.firstName) = upper(:p_first_name)
                     and upper(s.lastName) = upper(:p_last_name)";
 
-                result.SqlParams = new object[]
-                {
+                        result.SqlParams = new object[]
+                        {
                     parameters.BirthDate,
                     parameters.FirstName,
                     parameters.LastName
-                };
-            }
-            else if (!string.IsNullOrEmpty(parameters.FirstName)
-                && !string.IsNullOrEmpty(parameters.LastName))
-            {
-                result.SqlText += @" where 
+                        };
+                    }
+                    else if (!string.IsNullOrEmpty(parameters.FirstName)
+                        && !string.IsNullOrEmpty(parameters.LastName))
+                    {
+                        result.SqlText += @" where 
                                         upper(a.name) like upper('%'||:p_name1 ||'%')
                                         or upper(a.name) like upper('%'||:p_name2 ||'%') ";
 
-                var name1 = parameters.FirstName + " " + parameters.LastName;
-                var name2 = parameters.LastName + " " + parameters.FirstName;
-                result.SqlParams = new object[]
-                {
+                        var name1 = parameters.FirstName + " " + parameters.LastName;
+                        var name2 = parameters.LastName + " " + parameters.FirstName;
+                        result.SqlParams = new object[]
+                        {
                     name1,
                     name2
-                };
-            }
+                        };
+                    }
                 }
                 else if (parameters.CustomerType == CustomerType.Corp || parameters.CustomerType == CustomerType.PersonSpd)
                 {
@@ -131,7 +131,7 @@ namespace BarsWeb.Areas.Clients.Infrastructure
                         };
                     }
                 }
-            }           
+            }
             return result;
         }
     }

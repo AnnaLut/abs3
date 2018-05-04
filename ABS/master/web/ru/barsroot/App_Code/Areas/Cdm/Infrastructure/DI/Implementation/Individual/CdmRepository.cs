@@ -34,8 +34,9 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
         public IHomeRepository HomeRepo { get; set; }
         [Inject]
         public IDbLogger Logger { get; set; }
-        private readonly CdmModel _entities;
-        private const string _logMessagePrefix = "ЕБК.";
+        protected readonly CdmModel _entities;
+        protected const string _logMessagePrefix = "ЕБК.";
+
 
         public CdmRepository()
         {
@@ -43,31 +44,8 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
             _entities = new CdmModel(connectionStr);
         }
 
-        private void UserLogin()
-        {
-            if (HttpContext.Current.User == null || HttpContext.Current.User.Identity == null || !HttpContext.Current.User.Identity.IsAuthenticated)
-            {
-                var userName = ConfigurationManager.AppSettings["ebk.UserName"];
-                UserMap userMap = Bars.Configuration.ConfigurationSettings.GetUserInfo(userName);
-                var sqlParams = new object[]
-                {
-                    new OracleParameter("p_sessionid", OracleDbType.Varchar2)
-                    {
-                        Value = HttpContext.Current.Session.SessionID
-                    },
-                    new OracleParameter("p_userid", OracleDbType.Decimal) {Value = userMap.user_id},
-                    new OracleParameter("p_hostname", OracleDbType.Varchar2) {Value = "localhost"},
-                    new OracleParameter("p_appname", OracleDbType.Varchar2) {Value = "barsroot"}
-                };
-                _entities.ExecuteStoreCommand(
-                    "begin bars.bars_login.login_user(:p_sessionid, :p_userid, :p_hostname, :p_appname); end;",
-                    sqlParams);
 
-                HttpContext.Current.Session["UserLoggedIn"] = true;
-            }
-        }
-
-        public void SaveRequestToTempTable(string packName, string packBody)
+        public virtual void SaveRequestToTempTable(string packName, string packBody)
         {
             var sqlParams = new object[]
             {
@@ -77,6 +55,232 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
             _entities.ExecuteStoreCommand("insert into BARS.TMP_KLP_CLOB (NAMEF,  C) values (:p_Name, :p_Body)", sqlParams);
         }
 
+        public virtual decimal PackAndSendClientCards(int? cardsCount, int packSize, string kf)
+        {
+            UserLogin();
+            Logger.Info(string.Format("{0} Розпочато надсилання карток клієнтів. Розмір пакету - {1}, KF - {2}.", _logMessagePrefix, packSize, kf));
+            var apiUrl = ConfigurationManager.AppSettings["ebk.ApiUri"] +
+                ConfigurationManager.AppSettings["ebk.LoadCardsMethod"];
+            byte[] bytes = new byte[] { };
+
+            XmlWriterSettings settings = new XmlWriterSettings { OmitXmlDeclaration = true, CheckCharacters = false };
+            XmlSerializerNamespaces names = new XmlSerializerNamespaces();
+            names.Add("", "");
+            string xml = "";
+            try
+            {
+                var sqlParams = new object[]
+                {
+                        new OracleParameter("p_Size", OracleDbType.Int16)
+                        {
+                            Value = packSize
+                        },
+                        new OracleParameter("p_kf", OracleDbType.Varchar2)
+                        {
+                            Value = kf
+                        }
+                };
+
+
+                var packPlaneBody = _entities.ExecuteStoreQuery<PersonData>("select * from EBK_QUEUE_UPDATECARD_V where rownum <= :p_Size and kf = :p_kf", sqlParams).ToList();
+
+                // мапим плоский клас на иерархию              
+                var packBody = packPlaneBody.Select(MapPersonData).ToList();
+
+                //дополним каждую карточку информацие о привязанных особах
+                foreach (var lp in packBody)
+                {
+                    lp.RelatedPerson = ExtractRelatedPersonList(lp.Rnk);
+                }
+                //получаем параметры пакета
+                decimal packNum = GetNextPackNumber();
+                //string ourMfo = BanksRepository.GetOurMfo();
+
+                //строим пакет
+                //Card package = new Card(ourMfo, packNum.ToString(), HomeRepo.GetUserParam().USER_FULLNAME, packBody);
+                Card package = new Card(kf, packNum.ToString(), HomeRepo.GetUserParam().USER_FULLNAME, packBody);
+                XmlSerializer ser = new XmlSerializer(typeof(Card));
+
+                MemoryStream ms = new MemoryStream();
+                XmlWriter writer = XmlWriter.Create(ms, settings);
+                ser.Serialize(writer, package, names);
+                writer.Close();
+                ms.Flush();
+                ms.Seek(0, SeekOrigin.Begin);
+
+                StreamReader sr = new StreamReader(ms);
+                xml = sr.ReadToEnd();
+
+
+                //if (!Directory.Exists(@"C:\Windows\Temp\Cdm\"))
+                //    Directory.CreateDirectory(@"C:\Windows\Temp\Cdm\");
+                //File.WriteAllText(string.Format(@"C:\Windows\Temp\Cdm\individualPersons_{0}.xml", package.BatchId) , xml);
+
+                //отправляем данные в ЕБК
+                bytes = Encoding.UTF8.GetBytes(xml);
+
+                var request = WebRequest.Create(apiUrl);
+                request.Method = "POST";
+                request.ContentType = "application/xml;charset='utf-8'";
+                request.ContentLength = bytes.Length;
+                Stream requestStream = request.GetRequestStream();
+                requestStream.Write(bytes, 0, bytes.Length);
+                requestStream.Close();
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    Stream responseStream = response.GetResponseStream();
+                    string responseStr = new StreamReader(responseStream).ReadToEnd();
+                    Logger.Info(String.Format("{0} - {1}", _logMessagePrefix, xml));
+                    Logger.Info(string.Format("{0} Отримано відповідь від сервісу:: {1}", _logMessagePrefix,
+                        responseStr));
+                }
+                else
+                {
+                    Logger.Error(string.Format("{0} Отримано помилковий код: {1}", _logMessagePrefix, response.StatusCode));
+                    Logger.Error(String.Format("{0} - {1}", _logMessagePrefix, xml));
+                }
+
+                //записываем результаты отправки
+                foreach (var card in packBody)
+                {
+                    RemoveCardFromQueue(card.Rnk, card.Kf);
+                }
+                Logger.Info(string.Format("{0} Успішно надіслано пакет карток розміром {1} шт.", _logMessagePrefix, packSize));
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(string.Format(
+                    "{0} Помилка пакетної доставки. {1} --- {2}",
+                    _logMessagePrefix,
+                    (ex.InnerException != null ? ex.InnerException.Message : ex.Message),
+                    ex.StackTrace
+                    ));
+                Logger.Error(String.Format("{0} - {1}", _logMessagePrefix, xml));
+            }
+            return packSize;
+        }
+
+        public virtual decimal PackAndSendRcifs(int? rcifsCount, int packSize, string kf)
+        {
+            UserLogin();
+            decimal allCardsSended = 0;
+            Logger.Info(string.Format("{0} Розпочато надсилання RCIF клієнтів. Розмір пакету - {1}.", _logMessagePrefix, packSize));
+            var apiUrl = ConfigurationManager.AppSettings["ebk.ApiUri"] +
+                ConfigurationManager.AppSettings["ebk.RcifMethod"];
+
+            XmlWriterSettings settings = new XmlWriterSettings { OmitXmlDeclaration = true, CheckCharacters = false };
+            XmlSerializerNamespaces names = new XmlSerializerNamespaces();
+            names.Add("", "");
+            string xml = "";
+            try
+            {
+                while (rcifsCount == null || allCardsSended < rcifsCount)
+                {
+                    //посчитаем размер следующего пакета
+                    var currentPackSize = GetNextRcifCount(packSize, kf);
+                    if (currentPackSize == 0)
+                    {
+                        Logger.Info(string.Format("{0} Не знайдено Rcif.", _logMessagePrefix));
+                        break;
+                    }
+                    var sqlParams = new object[]
+                    {
+                        new OracleParameter("p_Size", OracleDbType.Int16)
+                        {
+                            Value = ((rcifsCount == null || rcifsCount > packSize) ? packSize : rcifsCount)
+                        },
+                        new OracleParameter("p_kf", OracleDbType.Varchar2)
+                        {
+                            Value = kf
+                        }
+                    };
+
+                    var packRcifs = _entities.ExecuteStoreQuery<decimal>(
+                        "select bars.ebk_wforms_utl.cut_rnk(RCIF) as RCIF from EBK_RCIF where rownum <= :p_Size and kf = :p_kf and send = 0", sqlParams).ToList();
+
+                    //получаем параметры пакета
+                    decimal packNum = GetNextPackNumber();
+                    //string ourMfo = BanksRepository.GetOurMfo();
+
+                    //строим пакет
+                    Rcif package = new Rcif()
+                    {
+                        BatchId = packNum.ToString(),
+                        Kf = kf,
+                        Maker = HomeRepo.GetUserParam().USER_FULLNAME,
+                        RcifClients = packRcifs.Select(r =>
+                            new RcifClientsContainer()
+                            {
+                                RcifClient = new RcifClient()
+                                {
+                                    Kf = kf,
+                                    Rcif = r.ToString(),
+                                    Rnk = r
+                                }
+                            }).ToArray()
+                    };
+                    XmlSerializer ser = new XmlSerializer(typeof(Rcif));
+
+                    MemoryStream ms = new MemoryStream();
+                    XmlWriter writer = XmlWriter.Create(ms, settings);
+                    ser.Serialize(writer, package, names);
+                    writer.Close();
+                    ms.Flush();
+                    ms.Seek(0, SeekOrigin.Begin);
+
+                    StreamReader sr = new StreamReader(ms);
+                    xml = sr.ReadToEnd();
+
+                    //отправляем данные в ЕБК
+                    var bytes = Encoding.UTF8.GetBytes(xml);
+
+                    var request = WebRequest.Create(apiUrl);
+                    request.Method = "POST";
+                    request.ContentType = "application/xml;charset='utf-8'";
+                    request.ContentLength = bytes.Length;
+                    Stream requestStream = request.GetRequestStream();
+                    requestStream.Write(bytes, 0, bytes.Length);
+                    requestStream.Close();
+                    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                    if (response.StatusCode == HttpStatusCode.OK)
+                    {
+                        Stream responseStream = response.GetResponseStream();
+                        string responseStr = new StreamReader(responseStream).ReadToEnd();
+                        Logger.Info(string.Format("{0} Отримано відповідь від сервісу:: {1}", _logMessagePrefix,
+                            responseStr));
+                    }
+                    else
+                    {
+                        Logger.Error(string.Format("{0} Отримано помилковий код: {1}", _logMessagePrefix, response.StatusCode));
+                        Logger.Error(String.Format("{0} - {1}", _logMessagePrefix, xml));
+                    }
+
+                    //записываем результаты отправки
+                    foreach (var rnk in packRcifs)
+                    {
+                        RemoveRcifFromQueue(rnk);
+                    }
+                    Logger.Info(string.Format("{0} Успішно надіслано пакет карток розміром {1} шт.", _logMessagePrefix, currentPackSize));
+
+                    allCardsSended = allCardsSended + currentPackSize;
+
+                }
+                Logger.Info(string.Format("{0} Успішно надіслано {1} Rcif.", _logMessagePrefix, allCardsSended));
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(string.Format(
+                    "{0} Помилка пакетної доставки. {1} --- {2}",
+                    _logMessagePrefix,
+                    (ex.InnerException != null ? ex.InnerException.Message : ex.Message),
+                    ex.StackTrace
+                    ));
+                Logger.Error(String.Format("{0} - {1}", _logMessagePrefix, xml));
+            }
+            return allCardsSended;
+        }
+        
         /// <summary>
         /// Отправляет карточку клиента по РНК на сервис ЕБК он-лайн с целью получения рекомендаций
         /// В случае успеха, записывает полученные рекомендации во временную табличку АРМа качества
@@ -84,7 +288,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
         /// Возвращает онлайн-статус карточки
         /// </summary>
         /// <param name="rnk">РНК клиента</param>
-        public ActionStatus PackAndSendSingleCard(decimal rnk)
+        public virtual ActionStatus PackAndSendSingleCard(decimal rnk)
         {
             var result = new ActionStatus(ActionStatusCode.Ok);
             List<Analytics> checks = new List<Analytics>();
@@ -124,7 +328,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
                 }
 
                 var card = MapPersonData(plainCard);
-              
+
                 var relatedPerson = ExtractRelatedPersonList(card.Rnk);
 
                 card.RelatedPerson = relatedPerson;
@@ -247,244 +451,229 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
             return result;
         }
 
-        public decimal PackAndSendRcifs(int? rcifsCount, int packSize, string kf)
+        public virtual int SaveCardsAdvisoryFast(AdvisoryCards advisory)
         {
             UserLogin();
-            decimal allCardsSended = 0;
-            Logger.Info(string.Format("{0} Розпочато надсилання RCIF клієнтів. Розмір пакету - {1}.", _logMessagePrefix, packSize));
-            var apiUrl = ConfigurationManager.AppSettings["ebk.ApiUri"] +
-                ConfigurationManager.AppSettings["ebk.RcifMethod"];
+            return InternalSaveAdvisory(advisory);
+        }
 
-            XmlWriterSettings settings = new XmlWriterSettings { OmitXmlDeclaration = true, CheckCharacters = false };
-            XmlSerializerNamespaces names = new XmlSerializerNamespaces();
-            names.Add("", "");
-            string xml = "";
-            try
+        public virtual int SaveCardChangesOnline(SimpleCard card)
+        {
+            //TODO реализовать если все-таки это нужно и банк не против писать карточку из ЕБК
+            return 0;
+        }
+
+        public virtual void SaveGcifs(ICard[] cards, string batchId)
+        {
+            UserLogin();
+            var masterCards = cards as MasterCard[];
+            if (masterCards != null)
             {
-                while (rcifsCount == null || allCardsSended < rcifsCount)
+                foreach (var card in masterCards)
                 {
-                    //посчитаем размер следующего пакета
-                    var currentPackSize = GetNextRcifCount(packSize, kf);
-                    if (currentPackSize == 0)
+                    if (card.Gcif != null)
                     {
-                        Logger.Info(string.Format("{0} Не знайдено Rcif.", _logMessagePrefix));
-                        break;
+                        SaveGcif(card, batchId);
                     }
-                    var sqlParams = new object[]
-                    {
-                        new OracleParameter("p_Size", OracleDbType.Int16)
-                        {
-                            Value = ((rcifsCount == null || rcifsCount > packSize) ? packSize : rcifsCount)
-                        },
-                        new OracleParameter("p_kf", OracleDbType.Varchar2)
-                        {
-                            Value = kf
-                        }
-                    };
-
-                    var packRcifs = _entities.ExecuteStoreQuery<decimal>(
-                        "select bars.ebk_wforms_utl.cut_rnk(RCIF) as RCIF from EBK_RCIF where rownum <= :p_Size and kf = :p_kf and send = 0", sqlParams).ToList();
-
-                    //получаем параметры пакета
-                    decimal packNum = GetNextPackNumber();
-                    //string ourMfo = BanksRepository.GetOurMfo();
-
-                    //строим пакет
-                    Rcif package = new Rcif()
-                    {
-                        BatchId = packNum.ToString(),
-                        Kf = kf,
-                        Maker = HomeRepo.GetUserParam().USER_FULLNAME,
-                        RcifClients = packRcifs.Select(r =>
-                            new RcifClientsContainer()
-                            {
-                                RcifClient = new RcifClient()
-                                {
-                                    Kf = kf,
-                                    Rcif = r.ToString(),
-                                    Rnk = r
-                                }
-                            }).ToArray()
-                    };
-                    XmlSerializer ser = new XmlSerializer(typeof(Rcif));
-
-                    MemoryStream ms = new MemoryStream();
-                    XmlWriter writer = XmlWriter.Create(ms, settings);
-                    ser.Serialize(writer, package, names);
-                    writer.Close();
-                    ms.Flush();
-                    ms.Seek(0, SeekOrigin.Begin);
-
-                    StreamReader sr = new StreamReader(ms);
-                    xml = sr.ReadToEnd();
-
-                    //отправляем данные в ЕБК
-                    var bytes = Encoding.UTF8.GetBytes(xml);
-
-                    var request = WebRequest.Create(apiUrl);
-                    request.Method = "POST";
-                    request.ContentType = "application/xml;charset='utf-8'";
-                    request.ContentLength = bytes.Length;
-                    Stream requestStream = request.GetRequestStream();
-                    requestStream.Write(bytes, 0, bytes.Length);
-                    requestStream.Close();
-                    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                    if (response.StatusCode == HttpStatusCode.OK)
-                    {
-                        Stream responseStream = response.GetResponseStream();
-                        string responseStr = new StreamReader(responseStream).ReadToEnd();
-                        Logger.Info(string.Format("{0} Отримано відповідь від сервісу:: {1}", _logMessagePrefix,
-                            responseStr));
-                    }
-                    else
-                    {
-                        Logger.Error(string.Format("{0} Отримано помилковий код: {1}", _logMessagePrefix, response.StatusCode));
-                        Logger.Error(String.Format("{0} - {1}", _logMessagePrefix, xml));
-                    }
-
-                    //записываем результаты отправки
-                    foreach (var rnk in packRcifs)
-                    {
-                        RemoveRcifFromQueue(rnk);
-                    }
-                    Logger.Info(string.Format("{0} Успішно надіслано пакет карток розміром {1} шт.", _logMessagePrefix, currentPackSize));
-
-                    allCardsSended = allCardsSended + currentPackSize;
-
                 }
-                Logger.Info(string.Format("{0} Успішно надіслано {1} Rcif.", _logMessagePrefix, allCardsSended));
             }
-            catch (Exception ex)
-            {
-                Logger.Error(string.Format(
-                    "{0} Помилка пакетної доставки. {1} --- {2}",
-                    _logMessagePrefix,
-                    (ex.InnerException != null ? ex.InnerException.Message : ex.Message),
-                    ex.StackTrace
-                    ));
-                Logger.Error(String.Format("{0} - {1}", _logMessagePrefix, xml));
-            }
-            return allCardsSended;
+            Logger.Info(string.Format("{0} GCIF-и з пакету {1} успішно збережено.", _logMessagePrefix, batchId));
         }
 
-        public decimal PackAndSendClientCards(int? cardsCount, int packSize, string kf)
+        public virtual void SaveGcif(ICard card, string batchId)
+        {
+            List<EbkSlaveClient> gcifs = new List<EbkSlaveClient>();
+            var masterCard = card as MasterCard;
+            if (null == masterCard) return;
+
+            if (masterCard.SlaveClients != null && masterCard.SlaveClients.Any())
+            {
+                gcifs = masterCard.SlaveClients.Select(c => new EbkSlaveClient()
+                {
+                    Kf = c.Kf,
+                    Rnk = decimal.Parse(c.Rnk)
+                }).ToList();
+            }
+            var sqlParams = new OracleParameter[]{
+                new OracleParameter("p_batchId", OracleDbType.Varchar2)
+                {
+                    Value = (batchId)
+                },
+                new OracleParameter("p_kf", OracleDbType.Varchar2)
+                {
+                    Value = (masterCard.Kf)
+                },
+                new OracleParameter("p_rnk", OracleDbType.Decimal)
+                {
+                    Value = (masterCard.Rnk)
+                },
+                new OracleParameter("p_gcif", OracleDbType.Varchar2)
+                {
+                    Value = (masterCard.Gcif)
+                },
+                 new OracleParameter("p_slave_client_ebk", OracleDbType.Array)
+                {
+                    UdtTypeName = "BARS.T_SLAVE_CLIENT_EBK",
+                    Value = gcifs.ToArray()
+                }
+            };
+            _entities.ExecuteStoreCommand(@"begin 
+                bars.ebk_dup_request_utl.request_gcif_mass(  
+                    :p_batchId,                  
+                    :p_kf,
+                    :p_rnk,
+                    :p_gcif,
+                    :p_slave_client_ebk);
+                end;", sqlParams);
+        }
+
+        public virtual void SaveDuplicates(DupPackage[] duplicates, string batchId)
         {
             UserLogin();
-            Logger.Info(string.Format("{0} Розпочато надсилання карток клієнтів. Розмір пакету - {1}, KF - {2}.", _logMessagePrefix, packSize, kf));
-            var apiUrl = ConfigurationManager.AppSettings["ebk.ApiUri"] +
-                ConfigurationManager.AppSettings["ebk.LoadCardsMethod"];
-            byte[] bytes = new byte[] { };
+            if (duplicates != null)
+            {
+                foreach (var duplicate in duplicates)
+                {
+                    if (duplicate.Duplicates != null && duplicate.Duplicates.Any())
+                    {
+                        SaveDuplicate(duplicate, batchId);
+                    }
+                }
+            }
+            Logger.Info(string.Format("{0} Дублікати з пакету {1} успішно збережено.", _logMessagePrefix, batchId));
+        }
 
-            XmlWriterSettings settings = new XmlWriterSettings { OmitXmlDeclaration = true, CheckCharacters = false };
-            XmlSerializerNamespaces names = new XmlSerializerNamespaces();
-            names.Add("", "");
-            string xml = "";
+        public virtual void SaveDuplicate(DupPackage duplicate, string batchId)
+        {
+            var duplicates = duplicate.Duplicates.Select(c => new EbkDupeClient()
+            {
+                Kf = c.Kf,
+                Rnk = decimal.Parse(c.Rnk)
+            });
+            var sqlParams = new OracleParameter[]
+            {
+                new OracleParameter("p_batchId", OracleDbType.Varchar2)
+                {
+                    Value = (batchId)
+                },
+                new OracleParameter("p_kf", OracleDbType.Varchar2)
+                {
+                    Value = (duplicate.Kf)
+                },
+                new OracleParameter("p_rnk", OracleDbType.Decimal)
+                {
+                    Value = (duplicate.Rnk)
+                },
+                 new OracleParameter("p_duplicate_ebk", OracleDbType.Array)
+                {
+                    UdtTypeName = "BARS.T_DUPLICATE_EBK",
+                    Value = duplicates.ToArray()
+                }
+            };
+            _entities.ExecuteStoreCommand(@"begin 
+                bars.ebk_dup_request_utl.request_duplicate_mass( 
+                    :p_batchId,                   
+                    :p_kf,
+                    :p_rnk,                    
+                    :p_duplicate_ebk);
+                end;", sqlParams);
+        }
+
+        public virtual string SendCloseCard(string kf, decimal rnk, string dateOff)
+        {
+            if (kf == null && dateOff == null)
+            {
+                kf = _entities.ExecuteStoreQuery<string>("SELECT kf FROM customer where rnk = " + Convert.ToString(rnk), null).FirstOrDefault().ToString();
+                dateOff = _entities.ExecuteStoreQuery<DateTime>("SELECT bankdate FROM dual", null).FirstOrDefault().ToString("yyyy-MM-dd");
+            }
+            UserLogin();
+            var Maker = ConfigurationManager.AppSettings["ebk.UserName"];
+            var serviceUrl = ConfigurationManager.AppSettings["ebk.ApiUri"] +
+                         ConfigurationManager.AppSettings["ebk.CloseMethod"] + "?kf=" + kf + "&rnk=" + rnk + "&dateOff=" + dateOff + "&maker=" + Maker;
+
+            var request = WebRequest.Create(serviceUrl);
+            request.Method = "PUT";
+            string status = "ERROR";
+            string err;
             try
             {
-                    var sqlParams = new object[]
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    Stream responseStream = response.GetResponseStream();
+                    string responseStr = new StreamReader(responseStream).ReadToEnd();
+
+                    var reader = new StringReader(responseStr);
+                    XmlSerializer ser = new XmlSerializer(typeof(Response));
+                    Response responce = (Response)ser.Deserialize(reader);
+                    reader.Close();
+
+                    if (responce.Status != "OK")
                     {
-                        new OracleParameter("p_Size", OracleDbType.Int16)
-                        {
-                            Value = packSize
-                        },
-                        new OracleParameter("p_kf", OracleDbType.Varchar2)
-                        {
-                            Value = kf
-                        }
-                    };
-
-
-                    var packPlaneBody = _entities.ExecuteStoreQuery<PersonData>("select * from EBK_QUEUE_UPDATECARD_V where rownum <= :p_Size and kf = :p_kf", sqlParams).ToList();
-                    
-                    // мапим плоский клас на иерархию              
-                    var packBody = packPlaneBody.Select(MapPersonData).ToList();
-
-                    //дополним каждую карточку информацие о привязанных особах
-                    foreach (var lp in packBody)
-                    {
-                        lp.RelatedPerson = ExtractRelatedPersonList(lp.Rnk);
-                    }
-                    //получаем параметры пакета
-                    decimal packNum = GetNextPackNumber();
-                    //string ourMfo = BanksRepository.GetOurMfo();
-
-                    //строим пакет
-                    //Card package = new Card(ourMfo, packNum.ToString(), HomeRepo.GetUserParam().USER_FULLNAME, packBody);
-                    Card package = new Card(kf, packNum.ToString(), HomeRepo.GetUserParam().USER_FULLNAME, packBody);
-                    XmlSerializer ser = new XmlSerializer(typeof(Card));
-
-                    MemoryStream ms = new MemoryStream();
-                    XmlWriter writer = XmlWriter.Create(ms, settings);
-                    ser.Serialize(writer, package, names);
-                    writer.Close();
-                    ms.Flush();
-                    ms.Seek(0, SeekOrigin.Begin);
-
-                    StreamReader sr = new StreamReader(ms);
-                    xml = sr.ReadToEnd();
-
-                    
-                    //if (!Directory.Exists(@"C:\Windows\Temp\Cdm\"))
-                    //    Directory.CreateDirectory(@"C:\Windows\Temp\Cdm\");
-                    //File.WriteAllText(string.Format(@"C:\Windows\Temp\Cdm\individualPersons_{0}.xml", package.BatchId) , xml);
-
-                    //отправляем данные в ЕБК
-                    bytes = Encoding.UTF8.GetBytes(xml);
-
-                    var request = WebRequest.Create(apiUrl);
-                    request.Method = "POST";
-                    request.ContentType = "application/xml;charset='utf-8'";
-                    request.ContentLength = bytes.Length;
-                    Stream requestStream = request.GetRequestStream();
-                    requestStream.Write(bytes, 0, bytes.Length);
-                    requestStream.Close();
-                    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                    if (response.StatusCode == HttpStatusCode.OK)
-                    {
-                        Stream responseStream = response.GetResponseStream();
-                        string responseStr = new StreamReader(responseStream).ReadToEnd();
-                        Logger.Info(String.Format("{0} - {1}", _logMessagePrefix, xml));
-                        Logger.Info(string.Format("{0} Отримано відповідь від сервісу:: {1}", _logMessagePrefix,
-                            responseStr));
-                    }
-                    else
-                    {
-                        Logger.Error(string.Format("{0} Отримано помилковий код: {1}", _logMessagePrefix, response.StatusCode));
-                        Logger.Error(String.Format("{0} - {1}", _logMessagePrefix, xml));
+                        err = string.Format("{0} Помилка закриття картки клієнта он-лайн. <br />Помилка: {1}",
+                            _logMessagePrefix, responce.Msg);
+                        Logger.Error(err);
+                        return status;
                     }
 
-                    //записываем результаты отправки
-                    foreach (var card in packBody)
-                    {
-                        RemoveCardFromQueue(card.Rnk,card.Kf);
-                    }
-                    Logger.Info(string.Format("{0} Успішно надіслано пакет карток розміром {1} шт.", _logMessagePrefix, packSize));
+                    Logger.Info(string.Format("{0} Віддалений сервіс успішно виконав команду закриття клієнта RNK={1}",
+                        _logMessagePrefix, rnk));
+
+                    return "OK";
+                }
             }
             catch (Exception ex)
             {
-                Logger.Error(string.Format(
-                    "{0} Помилка пакетної доставки. {1} --- {2}",
-                    _logMessagePrefix,
-                    (ex.InnerException != null ? ex.InnerException.Message : ex.Message),
-                    ex.StackTrace
-                    ));
-                Logger.Error(String.Format("{0} - {1}", _logMessagePrefix, xml));
+                err = string.Format("{0} Невідома помилка закриття картки РНК={2}  онлайн:  {1}", _logMessagePrefix, (ex.InnerException != null ? ex.InnerException.Message : ex.Message), rnk);
+                Logger.Error(err);
+                return status;
             }
-            return packSize;
+            return status;
         }
 
-        private List<RelatedPerson> ExtractRelatedPersonList(decimal? rnk)
+        public virtual void DeleteGcif(string gcif)
+        {
+            _entities.ExecuteStoreCommand(
+                "begin bars.ebk_dup_request_utl.request_del_gcif(p_gcif => :p_gcif); end; ",
+                new OracleParameter("p_gcif", OracleDbType.Varchar2)
+                {
+                    Value = (gcif)
+                }
+                );
+        }
+
+        public virtual void DeleteGcifs(string[] gcifs)
+        {
+            foreach (var gcif in gcifs)
+            {
+                DeleteGcif(gcif);
+            }
+        }
+
+        public virtual int SavePersonCardsFast(RequestFromEbkV2 request, int allowedCardsPerRequest)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual string SynchronizeCard(string kf, decimal rnk)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        protected List<RelatedPerson> ExtractRelatedPersonList(decimal? rnk)
         {
             var result = _entities.ExecuteStoreQuery<RelatedPerson>(
-                "select * from EBK_QUEUE_RELATEDPERSON_V where rnk = bars.ebk_wforms_utl.cut_rnk(:p_Rnk)", rnk).ToList();
+                "select * from EBK_QUEUE_RELATEDPERSON_V where CUST_ID = :p_Rnk", rnk).ToList();
             return result;
         }
-        private decimal GetNextPackNumber()
+
+        protected decimal GetNextPackNumber()
         {
             return _entities.ExecuteStoreQuery<decimal>("SELECT EBK_PACKAGE_NMBR.NEXTVAL FROM DUAL").SingleOrDefault();
         }
 
-        private void RemoveCardFromQueue(decimal? rnk, string kf)
+        protected void RemoveCardFromQueue(decimal? rnk, string kf)
         {
             var sqlUpdParams = new object[]
                         {
@@ -494,7 +683,8 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
             _entities.ExecuteStoreCommand("delete from EBK_QUEUE_UPDATECARD where RNK = bars.ebk_wforms_utl.get_rnk(:p_rnk,:p_kf)",
                 sqlUpdParams);
         }
-        private void RemoveRcifFromQueue(decimal rnk)
+
+        protected void RemoveRcifFromQueue(decimal rnk)
         {
             var sqlUpdParams = new object[]
                         {
@@ -504,7 +694,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
                 sqlUpdParams);
         }
 
-        private decimal GetNextCardsCount(int packSize, string kf)
+        protected decimal GetNextCardsCount(int packSize, string kf)
         {
             var sqlParams = new object[]
             {
@@ -513,9 +703,8 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
             };
             return _entities.ExecuteStoreQuery<decimal>("select count(*) from EBK_QUEUE_UPDATECARD_V where kf = :p_kf and rownum <= :p_Size", sqlParams).SingleOrDefault();
         }
-
-
-        private decimal GetNextRcifCount(int packSize, string kf)
+        
+        protected decimal GetNextRcifCount(int packSize, string kf)
         {
             var sqlParams = new object[]
             {
@@ -525,7 +714,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
             return _entities.ExecuteStoreQuery<decimal>("select count(*) from ebk_rcif where rownum <= :p_Size and kf = :p_kf and send = 0", sqlParams).SingleOrDefault();
         }
 
-        private AdvisoryCards ConvertOnlineAdvisoryToAdvisoryCards(OnlineAdvisory card)
+        protected AdvisoryCards ConvertOnlineAdvisoryToAdvisoryCards(OnlineAdvisory card)
         {
             return new AdvisoryCards()
             {
@@ -536,7 +725,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
             };
         }
 
-        private int InternalSaveAdvisory(AdvisoryCards advisory)
+        protected int InternalSaveAdvisory(AdvisoryCards advisory)
         {
             int requestCount = 0;
             foreach (var customer in advisory.ClientsAnalysis)
@@ -610,7 +799,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
             return requestCount;
         }
 
-        private BufClientData MapPersonData(PersonData planeBody)
+        protected BufClientData MapPersonData(PersonData planeBody)
         {
             var bodyItem = new BufClientData();
             bodyItem.Kf = planeBody.Kf;
@@ -668,7 +857,9 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
             {
                 Publp = planeBody.Publp,
                 Cigpo = planeBody.Cigpo,
-                Samz = planeBody.Samz,
+                Samz = (null == planeBody.Samz) ? null
+                    : planeBody.Samz.ToLower() == "так" ? "1"
+                    : planeBody.Samz.ToLower() == "ні" ? "0" : null,
                 Chorn = planeBody.Chorn,
                 Spmrk = planeBody.Spmrk,
                 VipK = planeBody.VipK,
@@ -710,201 +901,28 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
             return bodyItem;
         }
 
-        public int SaveCardsAdvisoryFast(AdvisoryCards advisory)
+        protected void UserLogin()
         {
-            UserLogin();
-            return InternalSaveAdvisory(advisory);
-        }
-
-
-        public int SaveCardChangesOnline(SimpleCard card)
-        {
-            //TODO реализовать если все-таки это нужно и банк не против писать карточку из ЕБК
-            return 0;
-        }
-
-        public void SaveGcifs(MasterCard[] masterCards, string batchId)
-        {
-            UserLogin();
-            if (masterCards != null)
+            if (HttpContext.Current.User == null || HttpContext.Current.User.Identity == null || !HttpContext.Current.User.Identity.IsAuthenticated)
             {
-                foreach (var card in masterCards)
+                var userName = ConfigurationManager.AppSettings["ebk.UserName"];
+                UserMap userMap = Bars.Configuration.ConfigurationSettings.GetUserInfo(userName);
+                var sqlParams = new object[]
                 {
-                    if (card.Gcif != null)
+                    new OracleParameter("p_sessionid", OracleDbType.Varchar2)
                     {
-                        SaveGcif(card, batchId);
-                    }
-                }
-            }
-            Logger.Info(string.Format("{0} GCIF-и з пакету {1} успішно збережено.", _logMessagePrefix, batchId));
-        }
+                        Value = HttpContext.Current.Session.SessionID
+                    },
+                    new OracleParameter("p_userid", OracleDbType.Decimal) {Value = userMap.user_id},
+                    new OracleParameter("p_hostname", OracleDbType.Varchar2) {Value = "localhost"},
+                    new OracleParameter("p_appname", OracleDbType.Varchar2) {Value = "barsroot"}
+                };
+                _entities.ExecuteStoreCommand(
+                    "begin bars.bars_login.login_user(:p_sessionid, :p_userid, :p_hostname, :p_appname); end;",
+                    sqlParams);
 
-        public void SaveGcif(MasterCard masterCard, string batchId)
-        {
-            List<EbkSlaveClient> gcifs = new List<EbkSlaveClient>();
-            if (masterCard.SlaveClients != null && masterCard.SlaveClients.Any())
-            {
-                gcifs = masterCard.SlaveClients.Select(c => new EbkSlaveClient()
-                {
-                    Kf = c.Kf,
-                    Rnk = decimal.Parse(c.Rnk)
-                }).ToList();
-            }
-            var sqlParams = new OracleParameter[]{
-                new OracleParameter("p_batchId", OracleDbType.Varchar2)
-                {
-                    Value = (batchId)
-                },
-                new OracleParameter("p_kf", OracleDbType.Varchar2)
-                {
-                    Value = (masterCard.Kf)
-                },
-                new OracleParameter("p_rnk", OracleDbType.Decimal)
-                {
-                    Value = (masterCard.Rnk)
-                },
-                new OracleParameter("p_gcif", OracleDbType.Varchar2)
-                {
-                    Value = (masterCard.Gcif)
-                },
-                 new OracleParameter("p_slave_client_ebk", OracleDbType.Array)
-                {
-                    UdtTypeName = "BARS.T_SLAVE_CLIENT_EBK",
-                    Value = gcifs.ToArray()
-                }
-            };
-            _entities.ExecuteStoreCommand(@"begin 
-                bars.ebk_dup_request_utl.request_gcif_mass(  
-                    :p_batchId,                  
-                    :p_kf,
-                    :p_rnk,
-                    :p_gcif,
-                    :p_slave_client_ebk);
-                end;", sqlParams);
-        }
-
-        public void SaveDuplicates(DupPackage[] duplicates, string batchId)
-        {
-            UserLogin();
-            if (duplicates != null)
-            {
-                foreach (var duplicate in duplicates)
-                {
-                    if (duplicate.Duplicates != null && duplicate.Duplicates.Any())
-                    {
-                        SaveDuplicate(duplicate, batchId);
-                    }
-                }
-            }
-            Logger.Info(string.Format("{0} Дублікати з пакету {1} успішно збережено.", _logMessagePrefix, batchId));
-        }
-
-        public void SaveDuplicate(DupPackage duplicate, string batchId)
-        {
-            var duplicates = duplicate.Duplicates.Select(c => new EbkDupeClient()
-            {
-                Kf = c.Kf,
-                Rnk = decimal.Parse(c.Rnk)
-            });
-            var sqlParams = new OracleParameter[]
-            {
-                new OracleParameter("p_batchId", OracleDbType.Varchar2)
-                {
-                    Value = (batchId)
-                },
-                new OracleParameter("p_kf", OracleDbType.Varchar2)
-                {
-                    Value = (duplicate.Kf)
-                },
-                new OracleParameter("p_rnk", OracleDbType.Decimal)
-                {
-                    Value = (duplicate.Rnk)
-                },
-                 new OracleParameter("p_duplicate_ebk", OracleDbType.Array)
-                {
-                    UdtTypeName = "BARS.T_DUPLICATE_EBK",
-                    Value = duplicates.ToArray()
-                }
-            };
-            _entities.ExecuteStoreCommand(@"begin 
-                bars.ebk_dup_request_utl.request_duplicate_mass( 
-                    :p_batchId,                   
-                    :p_kf,
-                    :p_rnk,                    
-                    :p_duplicate_ebk);
-                end;", sqlParams);
-        }
-
-        public string SendCloseCard(string kf, decimal rnk, string dateOff)
-        {
-            if (kf == null && dateOff == null)
-            {
-                kf = _entities.ExecuteStoreQuery<string>("SELECT kf FROM customer where rnk = " + Convert.ToString(rnk), null).FirstOrDefault().ToString();
-                dateOff = _entities.ExecuteStoreQuery<DateTime>("SELECT bankdate FROM dual", null).FirstOrDefault().ToString("yyyy-MM-dd");
-            }
-            UserLogin();
-            var Maker = ConfigurationManager.AppSettings["ebk.UserName"];
-            var serviceUrl = ConfigurationManager.AppSettings["ebk.ApiUri"] +
-                         ConfigurationManager.AppSettings["ebk.CloseMethod"] + "?kf=" + kf + "&rnk=" + rnk + "&dateOff=" + dateOff + "&maker=" + Maker;
-
-            var request = WebRequest.Create(serviceUrl);
-            request.Method = "PUT";
-            string status = "ERROR";
-            string err;
-            try
-            {
-                HttpWebResponse response = (HttpWebResponse) request.GetResponse();
-                if (response.StatusCode == HttpStatusCode.OK)
-                {
-                    Stream responseStream = response.GetResponseStream();
-                    string responseStr = new StreamReader(responseStream).ReadToEnd();
-
-                    var reader = new StringReader(responseStr);
-                    XmlSerializer ser = new XmlSerializer(typeof(Response));
-                    Response responce = (Response) ser.Deserialize(reader);
-                    reader.Close();
-
-                    if (responce.Status != "OK")
-                    {
-                        err = string.Format("{0} Помилка закриття картки клієнта он-лайн. <br />Помилка: {1}",
-                            _logMessagePrefix, responce.Msg);
-                        Logger.Error(err);
-                        return status;
-                    }
-
-                    Logger.Info(string.Format("{0} Віддалений сервіс успішно виконав команду закриття клієнта RNK={1}",
-                        _logMessagePrefix, rnk));
-
-                    return "OK";
-                }
-            }
-            catch (Exception ex)
-            {
-                err = string.Format("{0} Невідома помилка закриття картки РНК={2}  онлайн:  {1}", _logMessagePrefix, (ex.InnerException != null ? ex.InnerException.Message : ex.Message), rnk);
-                Logger.Error(err);
-                return status;
-            }
-            return status ;
-        }
-
-        public void DeleteGcif(string gcif)
-        {
-            _entities.ExecuteStoreCommand(
-                "begin bars.ebk_dup_request_utl.request_del_gcif(p_gcif => :p_gcif); end; ",
-                new OracleParameter("p_gcif", OracleDbType.Varchar2)
-                {
-                    Value = (gcif)
-                }
-                );
-        }
-
-        public void DeleteGcifs(string[] gcifs)
-        {
-            foreach (var gcif in gcifs)
-            {
-                DeleteGcif(gcif);
+                HttpContext.Current.Session["UserLoggedIn"] = true;
             }
         }
     }
-
 }

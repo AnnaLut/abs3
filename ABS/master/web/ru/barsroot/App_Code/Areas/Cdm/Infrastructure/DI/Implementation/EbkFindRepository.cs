@@ -1,30 +1,30 @@
-﻿using System;
-using System.Configuration;
-using System.IO;
-using System.Net;
-using System.Xml.Serialization;
-using Areas.Cdm.Models;
+﻿using Areas.Cdm.Models;
 using BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Abstract;
 using BarsWeb.Core.Logger;
 using BarsWeb.Models;
+using Ninject;
+using System;
+using System.Configuration;
+using System.IO;
 using System.Linq;
-using System.Text;
+using System.Net;
+using System.Xml.Serialization;
 
 namespace BarsWeb.Areas.Cdm.Models.Transport
 {
     public class EbkFindRepository : IEbkFindRepository
     {
-        private const string _logMessagePrefix = "ЕБК.";
-        private readonly IDbLogger _logger;
-        private readonly CdmModel _entities;
+        protected const string _logMessagePrefix = "ЕБК.";
+        [Inject]
+        public IDbLogger Logger { get; set; }
+        protected readonly CdmModel _entities;
 
-        public EbkFindRepository(IDbLogger logger)
+        public EbkFindRepository()
         {
-            _logger = logger;
             var connectionStr = EntitiesConnection.ConnectionString("CdmModel", "Cdm");
             _entities = new CdmModel(connectionStr);
         }
-        public QualityClientsContainer[] RequestEbkClient(ClientSearchParams searchParams, ErrorMessage errorMessage = null)
+        public virtual QualityClientsContainer[] RequestEbkClient(ClientSearchParams searchParams, ErrorMessage errorMessage = null)
         {
             var serviceUrl = string.Empty;
 
@@ -151,7 +151,7 @@ namespace BarsWeb.Areas.Cdm.Models.Transport
                     }
                     var err = string.Format("{0} Помилка пошуку картки клієнта он-лайн. <br />Помилка: {1}",
                         _logMessagePrefix, clients.Msg);
-                    _logger.Error(err);
+                    Logger.Error(err);
 
                     if(errorMessage != null)
                     {
@@ -165,7 +165,7 @@ namespace BarsWeb.Areas.Cdm.Models.Transport
                         string.Format("{0} Віддалений сервіс відхилив он-лайн запит на пошук картки. <br />СТАТУС: {1}",
                             _logMessagePrefix,
                             response.StatusDescription);
-                    _logger.Error(err);
+                    Logger.Error(err);
                     if (errorMessage != null)
                     {
                         errorMessage.Message = err;
@@ -176,7 +176,7 @@ namespace BarsWeb.Areas.Cdm.Models.Transport
             catch (Exception e)
             {
                 var err = string.Format("{0} Помилка роботи з віддаленим сервісом.", _logMessagePrefix);
-                _logger.Error(err + " :" + e.Message);
+                Logger.Error(err + " :" + e.Message);
                 if (errorMessage != null)
                 {
                     errorMessage.Message = err;
