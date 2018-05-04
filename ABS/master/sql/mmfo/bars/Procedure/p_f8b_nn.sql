@@ -14,7 +14,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :  Процедура формирование файла #8B для КБ      (Крым)
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :  03/01/2018 (26/10/2017)
+% VERSION     :  03/05/2018 (03/01/2018)
 %------------------------------------------------------------------------------
 % 16.05.2016 - будем включать и пассивные остатки для начисленных и 
 %              просроченных счетов процентов
@@ -172,93 +172,52 @@ IS
 
    ---Остатки код 01, 02, 03, 04, 06
    CURSOR saldo  IS
-    select ddd, rnk, prins, sum(znap) znap, sum(tp_1) tp_1, sum(tp_2) tp_2, 
-                            sum(tp_3) tp_3, sum(tp_4) tp_4, sum(tp_5) tp_5, 
-                            sum(tp_6) tp_6, sum(tp_7) tp_7,
-           sum(sum_proc) sum_proc, 
-           sum(sum_kor) sum_kor 
+   select ddd, rnk, prins, znap
+   from (select '001' ddd,
+                NVL(d.link_group, c.rnk) rnk,
+                DECODE (c.PRINSIDER, NULL, 2, 0, 2, 99, 2, 1) prins,
+                abs(sum(decode(substr(kodp, 1, 1), '1', -1, 1)*znap)) znap
+        from otc_c5_proc o
+        join customer c
+        on (c.rnk = o.rnk)
+        left outer join d8_cust_link_groups d
+
+        on (trim(c.okpo) = trim(d.okpo))
+        where o.datf = dat_
+        group by NVL(d.link_group, c.rnk), DECODE (c.PRINSIDER, NULL, 2, 0, 2, 99, 2, 1)
+        having sum(decode(substr(kodp, 1, 1), '1', -1, 1)*znap)<0
+        )
+    union all
+        select ddd, rnk, prins, sum(znap) znap
     from (
-        select a.ddd, a.rnk, a.prins, a.znap, a.tp_1, a.tp_2, a.tp_3, 
-               a.tp_4, a.tp_5, a.tp_6, a.tp_7, nvl(o.sum_proc, 0) sum_proc, 
-            znap - a.tp_7 - (case when tp_6 > 0 then tp_6 else 0 end) -
-            (case when a.prins = 1 then 0 else 
-                (case when tp_1 > 0 then tp_1 else 0 end) - 
-                (case when tp_2 > 0 then tp_2 else 0 end) - 
-                (case when tp_3 > 0 then tp_3 else 0 end) - 
-                (case when tp_4 > 0 then tp_4 else 0 end) -
-                (case when tp_5 > 0 then tp_5 else 0 end)
-             end) + 
-            nvl(o.sum_proc, 0) sum_kor
+        select a.ddd, a.rnk, a.prins, a.znap
         from (
-           SELECT  a.ddd, NVL(d.link_group, c.rnk) rnk,  
+           SELECT  a.ddd, NVL(d.link_group, c.rnk) rnk,
                    DECODE (c.PRINSIDER, NULL, 2, 0, 2, 99, 2, 1) prins,
-                   NVL(ABS (SUM (a.ost_eqv)), 0) znap,
-                   ABS (NVL (sum((case when a.r020 IN ('1502') and NVL (p.r013, '0') NOT IN ('1', '2', '9') or
-                                            a.r020 IN ('1524') and NVL (p.r013, '0') NOT IN ('1', '3') 
-                                    then a.ost_eqv
-                                    else 0
-                                   end)),0)) tp_1,
-                   ABS (NVL (sum((case when a.r020 IN ('3003', '3005', '3007', '3010', '3011', '3015') AND NVL (p.r013, '0' ) NOT IN ('9') or
-                                            a.r020 IN ('3006', '3106') AND NVL (p.r013, '0' ) NOT IN ('1') or
-                                            a.r020 IN ('3012', '3014', '3040') AND NVL (p.r013, '0' ) NOT IN ('7', '9') or
-                                            a.r020 IN ('3013') AND NVL (p.r013, '0') NOT IN ('5','6','9','A','B','C') or
-                                            a.r020 IN ('3103', '3105', '3107') AND NVL (p.r013, '0') NOT IN ('1', '9')
-                                    then a.ost_eqv
-                                    else 0
-                                  end)),0)) tp_2,
-                   ABS (NVL (sum((case when a.r020 = '3212' AND NVL (p.r013, '0') not in ('2', '3')
-                                    then a.ost_eqv
-                                    else 0
-                                  end)),0)) tp_3,
-                   ABS (NVL (sum((case when a.r020 = '3540' and NVL (p.r013, '0') not in ('4','5','6','7')
-                                    then a.ost_eqv
-                                    else 0
-                                  end)),0)) tp_4,
-                                    0 tp_5,
-                   ABS (NVL (sum((case when a.r020 IN ('9500') and NVL (p.r013, '0') = 3
-                                    then a.ost_eqv
-                                    else 0
-                                   end)),0)) tp_6,
-                   ABS (NVL (sum((case when a.r020 IN ('9129') and NVL (p.r013, '0') NOT IN ('0', '1')
-                                    then a.ost_eqv
-                                    else 0
-                                   end)),0)) tp_7
+                   NVL(ABS (SUM (a.ost_eqv)), 0) znap
            FROM OTCN_F42_TEMP a
            left outer join specparam p
            on (a.acc = p.acc)
            join CUSTOMER c
            on (a.rnk = c.rnk)
-           left outer join d8_cust_link_groups d  
-           on (trim(c.okpo) = trim(d.okpo))                     
+           left outer join d8_cust_link_groups d
+           on (trim(c.okpo) = trim(d.okpo))
            WHERE a.ap=a.r012 AND
                  NOT exists (SELECT 1
                              FROM OTCN_F42_TEMP b
                              WHERE  b.ap=b.r012        AND
                                     b.nbs IS NULL      AND
                                     b.ACCC = a.acc )   AND
-                 ( ((our_rnk_ = -1 or c.rnk <> our_rnk_) and mfo_ <> 344443) or 
+                 ( ((our_rnk_ = -1 or c.rnk <> our_rnk_) and mfo_ <> 344443) or
                             (c.rnk <> 0 and mfo_ = 344443) ) AND
                  (our_okpo_ = '0' or NVL(ltrim(c.okpo, '0'),'X') <> our_okpo_ or a.ddd='006' and (a.nls like '3%' or a.nls like '4%')) AND
-                 (prnk_ IS NULL OR c.rnk = prnk_) /*and
-                  (trim(c.okpo) in (select trim(okpo) from kl_f8b where trim(okpo) is not null) or
-                  a.ddd='006' and (nls like '3%' or nls like '4%')) */
-           GROUP BY a.ddd, NVL(d.link_group, c.rnk),  
+                 (prnk_ IS NULL OR c.rnk = prnk_) and
+                 a.ddd='006'
+           GROUP BY a.ddd, NVL(d.link_group, c.rnk),
                     DECODE (c.PRINSIDER, NULL, 2, 0, 2, 99, 2, 1)) a
-       left outer join
-       (select NVL(d.link_group, c.rnk) rnk, NVL(-1*sum(znap), 0) sum_proc
-          from otc_c5_proc o
-          join customer c
-          on (c.rnk = o.rnk)
-          left outer join d8_cust_link_groups d  
-          on (trim(c.okpo) = trim(d.okpo))                     
-          where o.datf = dat_
-            and o.nls not like '3570%' 
-          group by NVL(d.link_group, c.rnk)
-        ) o
-       on (a.rnk = o.rnk)
     ) s
     group by  s.ddd, s.rnk, s.prins
-    order by ddd, abs(to_number(sum_kor)) desc;
+    order by ddd, znap desc;
 
 ---Остатки  коды  "47-51"
    CURSOR saldoost3 IS
@@ -663,8 +622,7 @@ BEGIN
 
     LOOP
       FETCH saldo
-       INTO ddd_, rnk_, insider_, se_, fl_tp_1, fl_tp_2, fl_tp_3, fl_tp_4, 
-                           fl_tp_5, fl_tp_6, fl_tp_7, sum_proc_, sum_kor_ ;
+       INTO ddd_, rnk_, insider_, se_;
 
           EXIT WHEN saldo%NOTFOUND;
           
@@ -689,53 +647,6 @@ BEGIN
 
              IF se_ <> 0 AND f42_ = 0
              THEN
-                se_ := se_ - fl_tp_7;  -- вираховуємо 9129 (9)
-                
-                --- Максимальная сумма кредитов на одного заемщика (код 01)
-                --- вычитаем излишние суммы (параметр R013 только определенные значения)
-                if fl_tp_1 > 0 then
-                   s02_ := fl_tp_1;
-                end if;
-
-                if fl_tp_2 > 0 then
-                   s03_ := fl_tp_2;
-                end if;
-
-                --- вычитаем излишние суммы (параметр R013 только определенные значения)
-                if fl_tp_3 > 0 then
-                   s04_ := fl_tp_3;
-                end if;
-
-                --- вычитаем излишние суммы (параметр R013 только определенные значения) 3540 R013 in (4,5,6)'
-                if fl_tp_4 > 0 then
-                   s05_ := fl_tp_4;
-                end if;
-
-                if fl_tp_5 > 0 then
-                   s05_ := s05_ - fl_tp_5;
-                end if;
-
-                -- 01.07.2014 для інсайдерів не виконуємо коригування сумі залишку 
-                -- зауваження ГОУ
-                IF insider_ <> 1 
-                THEN
-                   se_ := se_ - s02_ - s03_ - s04_ - s05_;
-                end if;
-
-                --- вычитаем излишние суммы (параметр R013 только определенные значения) по 9500
-                if fl_tp_6 > 0 then
-                   se_ := se_ - fl_tp_6;
-                end if;
-                
-                --- резервы нужно отнимать только по определенному набору параметров R013
-                if sum_proc_ <> 0 then
-                   se_ := se_ + sum_proc_;
-                   
-                   if se_ < 0 then
-                      se_ := 0;
-                   end if;
-                end if;
-
                 nlsp_ := 'RNK =' || TO_CHAR (rnk_);
                 znap_ := TO_CHAR (ABS (se_));
                 s_zal_:= 0;
@@ -1244,73 +1155,43 @@ BEGIN
    END IF;
 
    ---------------------------------------------------------------------------
-   ------------------------------------------------------------------------------
-    nnnn01_ := 0;
-    rnk_ := 0;
-    ddd_ := '00';
+   insert into rnbu_trace (odate, nls, kv, kodp, znap, rnk, nd, ref, acc, comm)
+    select /*+ leading(o) */
+         dat_ odate, o.nls, o.kv, b.kodp,
+         decode(substr(o.kodp,1,1),'1', -1, 1) * o.znap znap,
+         o.rnk, o.nd, o.acc,b.group_num ref,
+         (case when (substr(o.kodp,2,4) like '___9' or
+                     substr(o.kodp,2,4) in ('1890','2890','3590','3690','3692')) and
+                     substr(o.kodp,1,1) = '2'
+                then '(резерв чи SNA з файлу #C5) '
+               else '(залишок з файлу #C5) '
+          end) || substr(o.kodp,2,4) ||
+          ' / R011=' || substr(o.kodp,6,1) ||
+          ' / R013=' || substr(o.kodp,7,1) ||
+          ' / S245=' || substr(o.kodp,16,1) comm
+    from otc_c5_proc o
+    join customer c
+    on (o.rnk = c.rnk)
+    left outer join d8_cust_link_groups d
+    on (trim(c.okpo) = trim(d.okpo))
+    left outer join otcn_f42_temp t
+    on (o.acc = t.acc)
+    join (select distinct k.rnk, (case when k.kodp like '01%' then 'R1'
+                             when k.kodp like '02%' then 'R2'
+                             else 'R4'
+                        end)||substr(k.kodp,3) kodp,
+                        to_number(substr(k.nls,6,9)) group_num
+        from rnbu_trace k
+        where (kodp like '01%' or kodp like '02%' or kodp like '04%')
+        order by substr(kodp,3,4), rnk) b
+    on (NVL(d.link_group, c.rnk) = b.rnk)
+    where o.datf = dat_ ;
 
-   for k in ( select * from rnbu_trace 
-              where (kodp like '01%' or kodp like '02%')
-              order by substr(kodp,3,4), substr(nls,6,9)
-            )
-   loop
-      kodp_ := (case when k.kodp like '01%' then 'R1' else 'R2' end)||substr(k.kodp,3);
-      kodp1_ := k.kodp;
+   delete  from rnbu_trace where kodp like '01%' or kodp like '02%' or kodp like '04%';
 
-      insert into rnbu_trace (odate, nls, kv, kodp, znap, rnk, nd, ref, acc, comm)
-      select dat_ odate, a.nls, a.kv, kodp_ kodp, 
-             a.ost_eqv znap, a.rnk, n.nd, a.acc,
-             to_number(substr(k.nls,6,9)), 'расшифровка из OTCN_F42_TEMP' comm
-      from otcn_f42_temp a
-      left outer join specparam p 
-      on (a.acc = p.acc)
-      join customer c
-      on (a.rnk = c.rnk)
-      left outer join d8_cust_link_groups d  
-      on (trim(c.okpo) = trim(d.okpo))   
-      left outer join (select n.acc, max(n.nd) nd
-                       from nd_acc n, cc_deal e
-                       WHERE e.sdate <= dat_
-                         AND e.nd = n.nd
-                       group by n.acc ) n
-      on (a.acc = n.acc)               
-      where NVL(d.link_group, c.rnk) = k.rnk
-          AND a.ap = a.r012
-          AND ((a.nbs = '9129' and NVL(p.r013,'9') = '1') or a.nbs <> '9129')
-          AND NOT exists (SELECT 1
-                          FROM OTCN_F42_TEMP b
-                          WHERE  b.ap=b.r012        AND
-                                 b.nbs IS NULL      AND
-                                 b.ACCC = a.acc );
-      
-      insert into rnbu_trace (odate, nls, kv, kodp, znap, rnk, nd, ref, acc, comm)
-      select dat_ odate, o.nls, o.kv, kodp_ kodp, 
-             (case when abs(NVL(o.znap, 0)) >= abs(t.ost_eqv) then 0 else NVL(o.znap, 0) end) znap, 
-             o.rnk, o.nd, o.acc,
-             to_number(substr(k.nls,6,9)) ref,  
-             decode( substr(o.kodp,2,4), '2400', '(резерв для группы из #C5) ',
-                                         '2401', '(резерв для группы из #C5) ',
-                                         '3590', '(резерв для группы из #C5) ',
-                                         '3599', '(резерв для группы из #C5) ',
-                                         '3690', '(резерв для группы из #C5) ',
-                                         '(счет из файла #C5) ' 
-                   ) || substr(o.kodp,2,4) || '/' || substr(o.kodp,6,1) comm 
-      from otc_c5_proc o
-      join customer c
-      on (o.rnk = c.rnk)
-      left outer join d8_cust_link_groups d  
-      on (trim(c.okpo) = trim(d.okpo))                     
-      left outer join otcn_f42_temp t
-      on (o.acc = t.acc)  
-      where o.datf = dat_ 
-        and o.nls not like '3570%'
-        and NVL(d.link_group, c.rnk) = k.rnk;
-   end loop;
-   
-   delete  from rnbu_trace where kodp like '01%' or kodp like '02%';
-   update rnbu_trace 
+   update rnbu_trace
    set kodp = replace(kodp, 'R', '0')
-   where kodp like 'R1%' or kodp like 'R2%';
+   where kodp like 'R1%' or kodp like 'R2%' or kodp like 'R4%';
 
    for k in (select a.kodp, a.rnk, b.nnnn
              from rnbu_trace a, kl_f8b b
@@ -1322,7 +1203,8 @@ BEGIN
       set kodp=substr(k.kodp,1,2) || k.nnnn
       where rnk=k.rnk and kodp=k.kodp;
    end loop;
-    
+   ---------------------------------------------------------------------------
+   
    IF type_ = 0
    THEN
 

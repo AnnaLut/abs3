@@ -14,7 +14,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :  Процедура формирование файла #42 для КБ
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :  18/04/2018 (17/04/2018)
+% VERSION     :  03/05/2018 (18/04/2018)
 %------------------------------------------------------------------------
 % 02/03/2017 - для МФО=380388 (Платинум банк) изменил признак PR_BANK
 %              со значения "T" (временнаяй адм.) на "Л" (ликвидация)
@@ -201,10 +201,11 @@ IS
         from otc_c5_proc o
         join customer c
         on (c.rnk = o.rnk)
-        left outer join d8_cust_link_groups d
+        left outer join d8_cust_link_groups d       
         on (trim(c.okpo) = trim(d.okpo))
         where o.datf = dat_
-        group by NVL(d.link_group, c.rnk), DECODE (c.PRINSIDER, NULL, 2, 0, 2, 99, 2, 1))
+        group by NVL(d.link_group, c.rnk), DECODE (c.PRINSIDER, NULL, 2, 0, 2, 99, 2, 1)
+        having sum(decode(substr(kodp, 1, 1), '1', -1, 1)*znap)<0)
     union all
         select ddd, rnk, prins, sum(znap) znap
     from (
@@ -558,7 +559,6 @@ BEGIN
            AND a.nbs || p.r013 <> '91299'
            and a.nbs not in (select r020 from otcn_fa7_temp)
            and a.ost < 0;
-       commit;
 
        ---- формирование кодов 47-51
        OPEN saldoost3;
@@ -1957,7 +1957,7 @@ BEGIN
          (case when (substr(o.kodp,2,4) like '___9' or
                      substr(o.kodp,2,4) in ('1890','2890','3590','3690','3692')) and
                      substr(o.kodp,1,1) = '2'
-                then '(резерв з файлу #C5) '
+                then '(резерв чи SNA з файлу #C5) '
                else '(залишок з файлу #C5) '
           end) || substr(o.kodp,2,4) ||
           ' / R011=' || substr(o.kodp,6,1) ||
@@ -1968,8 +1968,6 @@ BEGIN
     on (o.rnk = c.rnk)
     left outer join d8_cust_link_groups d
     on (trim(c.okpo) = trim(d.okpo))
-    left outer join otcn_f42_temp t
-    on (o.acc = t.acc)
     join (select distinct k.rnk, (case when k.kodp like '01%' then 'R1'
                              when k.kodp like '02%' then 'R2'
                              else 'R4'
@@ -1979,7 +1977,7 @@ BEGIN
         where (kodp like '01%' or kodp like '02%' or kodp like '04%')
         order by substr(kodp,3,4), rnk) b
     on (NVL(d.link_group, c.rnk) = b.rnk)
-    where o.datf = dat_ ;
+    where o.datf = dat_;
 
    delete  from rnbu_trace where kodp like '01%' or kodp like '02%' or kodp like '04%';
 
@@ -1996,7 +1994,7 @@ show err;
 PROMPT *** Create  grants  P_F42_NN ***
 grant EXECUTE                                                                on P_F42_NN        to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on P_F42_NN        to RPBN002;
-grant EXECUTE                                                                on P_F42_NN        to WR_ALL_RIGHTS;
+grant EXECUTE                                                                on P_F42_NN        to START1;
 
 
 
