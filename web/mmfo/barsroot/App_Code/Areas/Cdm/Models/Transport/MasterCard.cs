@@ -2,7 +2,7 @@
 
 namespace BarsWeb.Areas.Cdm.Models.Transport
 {
-    public class MasterCard
+    public class MasterCard : ICard
     {
         [XmlAttribute("kf")]
         public string Kf { get; set; }
@@ -16,5 +16,4 @@ namespace BarsWeb.Areas.Cdm.Models.Transport
         [XmlElement("slaveClient")]
         public SlaveClient[] SlaveClients { get; set; }
     }
-
 }

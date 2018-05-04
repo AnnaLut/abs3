@@ -33,7 +33,7 @@ namespace BarsWeb.Areas.Cdm.Controllers.Api
             ErrorMessage errorMessage = new ErrorMessage() { };
 
             var customers = _findRepo.RequestEbkClient(param, errorMessage);
-            if (customers.Any())
+            if (null != customers && customers.Any())
             {
                 var result = customers.Select(c => c.ClientCard);
                 return Request.CreateResponse(HttpStatusCode.OK, result);
