@@ -237,7 +237,7 @@ begin
       if(l_type_id = 1) then
       l_total_with_vat      := l_total_with_vat + (c.cnt * c.unit_price_vat);
       else
-        l_total_with_vat := l_total_with_vat + (c.cnt * c.unit_price);
+        l_total_with_vat := l_total_with_vat + (c.cnt * c.unit_price)+c.nominal_price;
       end if;                         
       l_total_without_vat   := l_total_without_vat + (c.cnt * c.unit_price);
     end loop;
