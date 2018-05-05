@@ -37,7 +37,7 @@ PROMPT *** Create  view V_NBU_FORM_601 ***
  from nbu_data_request_tracking_601
  where request_id = rt.request_id
  and trunc(sys_time) >= trunc(sysdate,'mm'))) r
- where t.id = r.data_type_id(+)
+ where t.id = r.data_type_id(+) and t.data_type_code not in('NBU_W4_BPK','NBU_PROFIT_FO','NBU_FAMILY_FO')
  order by t.id;
 
 PROMPT *** Create  grants  V_NBU_FORM_601 ***

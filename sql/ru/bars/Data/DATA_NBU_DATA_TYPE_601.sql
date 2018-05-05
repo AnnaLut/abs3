@@ -88,7 +88,7 @@ MERGE INTO BARS.NBU_DATA_TYPE_601 A USING
   'Розмір фінансових показників діяльності групи пов’язаних контрагентів' as DATA_TYPE_NAME,
   NULL as GATHERING_BLOCK,
   'begin
-null;
+  bars.nbu_601_request_data_ru.p_nbu_finperformancepr_uo(:l_kf);
 end; ' as TRANSFERING_BLOCK,
   1 as IS_ACTIVE
   FROM DUAL) B
@@ -168,8 +168,8 @@ MERGE INTO BARS.NBU_DATA_TYPE_601 A USING
   'NBU_CREDIT_TRANCHE' as DATA_TYPE_CODE,
   'Транші по кредитних договорах' as DATA_TYPE_NAME,
   NULL as GATHERING_BLOCK,
-  'begin
-null;
+    'begin
+nbu_601_request_data_ru.p_nbu_credit_tranche(:l_kf);
 end;' as TRANSFERING_BLOCK,
   1 as IS_ACTIVE
   FROM DUAL) B
@@ -386,8 +386,8 @@ MERGE INTO BARS.NBU_DATA_TYPE_601 A USING
   'Склад групи юридичних осіб' as DATA_TYPE_NAME,
   NULL as GATHERING_BLOCK,
   'begin
-null;
-end;' as TRANSFERING_BLOCK,
+	nbu_601_request_data_ru.p_nbu_groupur_uo(:l_kf);
+	end;' as TRANSFERING_BLOCK,
   1 as IS_ACTIVE
   FROM DUAL) B
 ON (A.ID = B.ID)
@@ -490,6 +490,3 @@ UPDATE SET
 COMMIT;
 end;
 /
-
-set define on
-

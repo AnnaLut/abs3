@@ -15,12 +15,12 @@ create or replace package nbu_601_formed_xml  as
  function get_xml_pledge_dep  return clob;
  function get_user_name  return varchar2;
  function get_xml_groupur_uo return clob;
- -- function get_xml_finperformancepr_uo return clob;
+ function get_xml_finperformancepr_uo return clob;
+ function get_xml_credit_tranche return clob; 
  procedure run_formated_xml_job (p_kf in varchar2, p_user_id in varchar2);
  procedure run_formated_xml;
 
 end nbu_601_formed_xml;
-
 /
 create or replace package body nbu_601_formed_xml as
 
@@ -247,6 +247,36 @@ function get_xml_finperformancegr_uo return clob
    return l_xml_finperformancegr_uo.getClobVal();
 end;
 
+
+function get_xml_finperformancepr_uo return clob
+  is
+  l_xml_finperformancepr_uo xmltype;
+  begin
+   select xmlelement("ROOT",
+          xmlelement("CURRENT_USER",get_user_name()) ,
+          xmlelement("REPORTING_TIME",to_char(sysdate,'dd.mm.yyyy hh24:mi:ss')),
+          xmlelement("REPORTING_DATE",to_char(trunc(sysdate,'mm'),'dd.mm.yyyy')),
+          xmlelement("USER_KF", sys_context('bars_context','user_mfo')),
+          XmlElement("FINPERFORMANCEPR_UO_FOS",
+          xmlagg(xmlelement("FINPERFORMANCEPR_UO",
+                               xmlelement("RNK", f.rnk),
+                               xmlelement("SALES", f.sales),
+                               xmlelement("EBIT", f.ebit),
+                               xmlelement("EBITDA",f.ebitda),
+                               xmlelement("TOTALDEBT", f.totaldebt),
+                               xmlelement("STATUS", f.status),
+                               xmlelement("KF", f.kf)
+                            )))
+                 )
+    into l_xml_finperformancepr_uo
+    from nbu_finperformancepr_uo f where kf=sys_context('bars_context','user_mfo');
+     if l_xml_finperformancepr_uo is null then
+       select XmlElement("FINPERFORMANCEPR_UO",'NO DATA') into l_xml_finperformancepr_uo from dual;
+     end if;
+   return l_xml_finperformancepr_uo.getClobVal();
+end;
+
+
 function get_xml_ownerjur_uo return clob
   is
   l_xml_ownerjur_uo xmltype;
@@ -429,7 +459,7 @@ function get_xml_pledge_dep return clob
                                 xmlelement("RNK",c.rnk),
                                 xmlelement("ACC",c.acc),
                                 xmlelement("ORDERNUM",c.ordernum),
-                                xmlelement("NUMBERPLEDGE",c.numberpledge),
+                                xmlelement("NUMBERPLEDGE",REGEXP_REPLACE(c.numberpledge,'[^[:print:]]', '')),
                                 xmlelement("PLEDGEDAY",to_char(c.pledgeday,'dd.mm.yyyy')),
                                 xmlelement("S031",c.s031),
                                 xmlelement("R030",c.r030),
@@ -458,7 +488,46 @@ function get_xml_pledge_dep return clob
     return l_xml_pledge_dep.getClobVal();
 end;
 
-
+function get_xml_credit_tranche return clob
+ is
+ l_xml_credit_tranche xmltype;
+ begin 
+    select xmlelement("ROOT",
+           xmlelement("CURRENT_USER",get_user_name()) ,
+           xmlelement("REPORTING_TIME",to_char(sysdate,'dd.mm.yyyy hh24:mi:ss')),
+           xmlelement("REPORTING_DATE",to_char(trunc(sysdate,'mm'),'dd.mm.yyyy')),
+           xmlelement("USER_KF", sys_context('bars_context','user_mfo')),
+           XmlElement("CREDIT_TRANCHE_FOS",
+          xmlagg( xmlelement("CREDIT_TRANCHE",
+                                xmlelement("RNK",t.rnk),
+                                xmlelement("ND",t.nd),
+                                xmlelement("NUMDOGTR",t.numdogtr),
+                                xmlelement("DOGDAYTR",to_char(t.dogdaytr,'dd.mm.yyyy')),
+                                xmlelement("ENDDAYTR",to_char(t.enddaytr,'dd.mm.yyyy')),
+                                xmlelement("SUMZAGALTR",t.sumzagaltr),
+                                xmlelement("R030TR",t.r030tr),
+                                xmlelement("PROCCREDITTR",t.proccredittr),
+                                xmlelement("PERIODBASETR",t.periodbasetr),
+                                xmlelement("PERIODPROCTR",t.periodproctr),
+                                xmlelement("SUMARREARSTR",t.sumarrearstr),
+                                xmlelement("ARREARBASETR",t.arrearbasetr ),
+                                xmlelement("ARREARPROCTR",t.arrearproctr ),
+                                xmlelement("DAYBASETR", t.daybasetr),
+                                xmlelement("DAYPROCTR",t.dayproctr),
+                                xmlelement("FACTENDDAYTR",to_char(t.factenddaytr,'dd.mm.yyyy')),
+                                xmlelement("KLASSTR",t.klasstr),
+                                xmlelement("RISKTR",t.risktr),
+                                xmlelement("STATUS",t.status),
+                                xmlelement("KF",t.kf)
+                              )))
+                 )
+    into l_xml_credit_tranche
+    from nbu_credit_tranche t where kf=sys_context('bars_context','user_mfo');
+     if l_xml_credit_tranche is null then
+       select XmlElement("CREDIT_TRANCHE",'NO DATA') into l_xml_credit_tranche from dual;
+    end if;
+    return l_xml_credit_tranche.getClobVal();
+ end; 
 
 procedure run_formated_xml_job (p_kf in varchar2, p_user_id in varchar2)
   is
@@ -477,6 +546,9 @@ procedure run_formated_xml_job (p_kf in varchar2, p_user_id in varchar2)
   l_request_id_credit number;
   l_request_id_credit_pledge number;
   l_request_id_pledge_dep number;
+  l_request_id_groupur_uo number;
+  l_request_id_finpr_uo number;
+  l_request_id_cred_tranch number;
   begin
      bars_login.login_user(p_sessionid =>sys_guid(),
                          p_userid    =>p_user_id ,
@@ -600,9 +672,9 @@ procedure run_formated_xml_job (p_kf in varchar2, p_user_id in varchar2)
 
      begin
       select id into l_request_id_pledge_dep  from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=15 and kf=p_kf) and
-           data_type_id=15 and kf=p_kf; 
+           data_type_id=15 and kf=p_kf;
     BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_pledge_dep(), params, 'NBU_PLEDGE_DEP', KF, id);
-    
+
        bars.nbu_601_migrate.set_data_request_state(l_request_id_pledge_dep,9,'Дані успішно передані до ЦА');
        commit;
      exception
@@ -635,7 +707,7 @@ procedure run_formated_xml_job (p_kf in varchar2, p_user_id in varchar2)
      commit;
     end;
 
-   /* begin
+    begin
     BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_groupur_uo(), params, 'NBU_GROUPUR_UO', KF, id);
      select id into l_request_id_groupur_uo from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=9 and kf=p_kf) and
            data_type_id=9 and kf=p_kf;
@@ -645,7 +717,31 @@ procedure run_formated_xml_job (p_kf in varchar2, p_user_id in varchar2)
        when others then
          bars.nbu_601_migrate.set_data_request_state(l_request_id_groupur_uo,10,sqlerrm || dbms_utility.format_error_backtrace());
      commit;
-    end; */
+    end; 
+    
+    begin
+    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_finperformancepr_uo(), params, 'NBU_FINPERFORMANCEPR_UO', KF, id);
+     select id into l_request_id_finpr_uo from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=12 and kf=p_kf) and
+           data_type_id=12 and kf=p_kf;
+       bars.nbu_601_migrate.set_data_request_state(l_request_id_finpr_uo,9,'Дані успішно передані до ЦА');
+       commit;
+     exception
+       when others then
+         bars.nbu_601_migrate.set_data_request_state(l_request_id_finpr_uo,10,sqlerrm || dbms_utility.format_error_backtrace());
+     commit;
+    end; 
+    
+    begin
+    BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_credit_tranche(), params, 'NBU_CREDIT_TRANCHE', KF, id);
+     select id into l_request_id_cred_tranch from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=18 and kf=p_kf) and
+           data_type_id=18 and kf=p_kf;
+       bars.nbu_601_migrate.set_data_request_state(l_request_id_cred_tranch,9,'Дані успішно передані до ЦА');
+       commit;
+     exception
+       when others then
+         bars.nbu_601_migrate.set_data_request_state(l_request_id_cred_tranch,10,sqlerrm || dbms_utility.format_error_backtrace());
+     commit;
+    end; 
 
  end;
 
@@ -653,6 +749,9 @@ procedure run_formated_xml
   is
  current_kf varchar2(50):=sys_context('bars_context','user_mfo');
  current_id number:=user_id ();
+ job_is_runing exception;
+ pragma exception_init (job_is_runing,-27478);   
+    
  begin
       dbms_scheduler.set_job_argument_value(job_name  =>'RUN_FORMATED_XML',
                                          argument_position =>1,
@@ -661,8 +760,11 @@ procedure run_formated_xml
       dbms_scheduler.set_job_argument_value(job_name  =>'RUN_FORMATED_XML',
                                          argument_position =>2,
                                          argument_value => current_id );
-
+   begin
    dbms_scheduler.run_job(job_name =>'RUN_FORMATED_XML', use_current_session => false);
+   exception when job_is_runing 
+             then null;
+   end;          
 end;
 
 end;
