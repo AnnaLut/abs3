@@ -23,13 +23,20 @@ PROMPT *** Create  view V_FM_OSC_RULE26 ***
           AND r.risk_id = 62
           AND r.dat_end IS NULL
           AND gl.p_icurval (NVL (o.kv, 980), NVL (o.s, 0), o.vdat) >= 15000000
+  union
+  select o.ref, o.vdat
+    from oper o
+    join operw ow on o.ref = ow.ref and o.kf = ow.kf and ow.tag = 'POKPO'
+    join customer c on ow.value = c.okpo and c.kf = ow.kf
+    join customer_risk r on r.rnk = c.rnk and r.dat_end is null
+   where gl.p_icurval(nvl(o.kv,980), nvl(o.s,0), o.vdat) >= 15000000 
+     and substr(o.nlsa,1,4) = '2902'
+     and r.risk_id = 62
 ;
 
 PROMPT *** Create  grants  V_FM_OSC_RULE26 ***
-grant SELECT                                                                 on V_FM_OSC_RULE26 to BARSREADER_ROLE;
 grant SELECT                                                                 on V_FM_OSC_RULE26 to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_FM_OSC_RULE26 to FINMON01;
-grant SELECT                                                                 on V_FM_OSC_RULE26 to UPLD;
 
 
 

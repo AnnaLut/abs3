@@ -308,7 +308,9 @@ namespace Bars.WebServices.XRM.Services.SKRN
             //}
             //else
             //{
-            cDocPrint ourTick = new cDocPrint(con, long.Parse(request.AdditionalData.Reference), FrxDoc.GetTemplatePathByFileName(""), true, false);
+            bool printBM = 1 == request.AdditionalData.PrintBuhModel;
+
+            cDocPrint ourTick = new cDocPrint(con, long.Parse(request.AdditionalData.Reference), FrxDoc.GetTemplatePathByFileName(""), printBM, false);
             response.Results.Content = Convert.ToBase64String(CreateHtmlF(ourTick.GetTicketFileName()));
             //}
 
@@ -324,7 +326,8 @@ namespace Bars.WebServices.XRM.Services.SKRN
             htmlContent.AppendLine("<DIV align=center class=screen_action>");
             htmlContent.AppendLine("<INPUT id=btPrint type=\"button\" value=\"Надрукувати\" style=\"FONT-SIZE:14px;font-weight:bold\" onclick=\"window.print()\"><BR>");
             htmlContent.AppendLine("</DIV>");
-            htmlContent.AppendLine("<PRE style=\"MARGIN-LEFT: 20pt; FONT-SIZE: 8pt; COLOR: black; FONT-FAMILY: 'Courier New'; WIDTH: 300pt; BACKGROUND-COLOR: gainsboro\">");
+            //htmlContent.AppendLine("<PRE style=\"MARGIN-LEFT: 20pt; FONT-SIZE: 8pt; COLOR: black; FONT-FAMILY: 'Courier New'; WIDTH: 300pt; BACKGROUND-COLOR: gainsboro\">");
+            htmlContent.AppendLine("<PRE style=\"MARGIN-LEFT: 20pt; FONT-SIZE: 8pt; COLOR: black; FONT-FAMILY: 'Courier New'; WIDTH: 300pt;\">");
             htmlContent.Append(txtContent);
             htmlContent.AppendLine("</PRE>");
 

@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/ebk_params.sql =========*** Run *** 
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.EBK_PARAMS 
+CREATE OR REPLACE PACKAGE BARS.EBK_PARAMS
 is
   /*
   A typical usage of these boolean constants is
@@ -15,15 +9,15 @@ is
     -- ...
     $end
   */
-
+  
   --
   -- constants
   --
   g_header_version  constant varchar2(64)  := 'version 1.03  2016.08.19';
-
+  
   VERSION           constant pls_integer := 1;
   CUT_RNK           constant boolean     := TRUE;  -- обрізка рнк (видалення коду РУ)
-
+  
   --
   -- IS_CUT_RNK (for SQL e.g. Views)
   --
@@ -31,17 +25,20 @@ is
     return signtype
   deterministic
   result_cache;
-
+  
 end EBK_PARAMS;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.EBK_PARAMS 
-is
 
+show err
+
+CREATE OR REPLACE PACKAGE BODY BARS.EBK_PARAMS
+is
+  
   --
   -- constants
   --
   g_body_version  constant varchar2(64)  := 'version 1.01  2016.08.20';
-
+  
   --
   -- IS_CUT_RNK
   --
@@ -67,11 +64,7 @@ begin
   null;
 end EBK_PARAMS;
 /
- show err;
- 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/ebk_params.sql =========*** End *** 
- PROMPT ===================================================================================== 
- 
+
+show err
+
+grant execute on EBK_PARAMS to BARS_ACCESS_DEFROLE;

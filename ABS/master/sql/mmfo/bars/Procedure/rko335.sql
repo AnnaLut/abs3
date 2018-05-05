@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/RKO335.sql =========*** Run *** ==
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure RKO335 ***
-
-  CREATE OR REPLACE PROCEDURE BARS.RKO335 (P_dat1 DATE,P_dat2 DATE, P_nls varchar2, p_branch varchar2, p_flag varchar2)
+CREATE OR REPLACE PROCEDURE BARS.RKO335(P_dat1 DATE,P_dat2 DATE, P_nls varchar2, p_branch varchar2, p_flag varchar2)
 IS
 DKON_KV     VARCHAR2(22):=f_DKON_KV(P_dat1,P_dat2);
 L_DOC_NOPAY NUMBER(5);
@@ -46,34 +37,34 @@ FOR k IN (SELECT ACC, BRANCH, NLS
  LOOP
 
 
-------   Определяем kkk_ - Kод Корп.Клиента
-   BEGIN
-     Select r.KODK  Into  kkk_
+------   Определяем kkk_ - Kод Корп.Клиента  
+   BEGIN  
+     Select r.KODK  Into  kkk_         
      From   RNKP_KOD r, Accounts a
-     Where  a.NLS=k.NLS and a.KV=980 and  a.RNK=r.RNK  and
+     Where  a.NLS=k.NLS and a.KV=980 and  a.RNK=r.RNK  and  
             r.RNK is not NULL and r.KODK is not NULL and rownum=1;
    EXCEPTION  WHEN NO_DATA_FOUND THEN
      kkk_:=0;
-   END;
+   END;  
 
 
-------   Определяем ОперВремя:
+------   Определяем ОперВремя: 
 
 
 
-IF      gl.amfo = '302076'  then   --  1. Винница
+IF      gl.amfo = '302076'  then   --  1. Винница 
 ----------------------------------------------------
 
    IF     kkk_=1     or
           substr(k.NLS,1,3)='256'  then   ---- 1) ПФУ  ------
 
           L_OPERTIME2:='1630';  --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';  --   Обычный день
+          L_OPERTIME :='1700';  --   Обычный день            
 
    ELSIF  kkk_=2                   then   ---- 2) Укрпошта ---
 
           L_OPERTIME2:='1600';  --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';  --   Обычный день
+          L_OPERTIME :='1700';  --   Обычный день             
 
    ELSE                                   ---- 3) Другие кл.
           L_OPERTIME2:='1600';  --   Пятница или ПредПразд.день
@@ -82,35 +73,35 @@ IF      gl.amfo = '302076'  then   --  1. Винница
    END IF;
 
 
-ElsIf   gl.amfo = '313957'  then   --  2. Запорожье
+ElsIf   gl.amfo = '313957'  then   --  2. Запорожье  
 ------------------------------------------------------
 
    IF     kkk_=1     or
           substr(k.NLS,1,3)='256'   then  --- 1) ПФУ
-
+   
           L_OPERTIME2:='1630';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+    
    ELSIF  kkk_=2                    then  --- 2) Укрпошта
-
+   
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    ELSIF  kkk_=5                    then  --- 3) ОблЕнерго
 
-          L_OPERTIME2:='1700';
-          L_OPERTIME :='1700';
-
+          L_OPERTIME2:='1700';  
+          L_OPERTIME :='1700';  
+   
           If k.NLS='26008301141401' then
-               L_OPERTIME2:='1630';
-               L_OPERTIME :='1630';
+               L_OPERTIME2:='1630';  
+               L_OPERTIME :='1630';  
           end if;
-
+   
    ELSE                                   --- 4) Другие кл.
 
           L_OPERTIME2:='1600';  --   Пятница или ПредПразд.день
           L_OPERTIME :='1600';  --<-  БАЗОВОЕ опер.время
-
+   
    END IF;
 
 
@@ -119,20 +110,20 @@ ElsIf   gl.amfo = '323475'  then   --  3. Кировоград
 
    IF     kkk_=1     or
           substr(k.NLS,1,3)='256'    then  --- 1) ПФУ
-
+      
           L_OPERTIME2:='1630';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+    
    ELSIF  kkk_=2                     then  --- 2) Укрпошта
-
+   
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    ELSE                                    --- 3) Другие кл.
-
+   
           L_OPERTIME2:='1500';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1600';   --   Обычный день
-
+          L_OPERTIME :='1600';   --   Обычный день            
+   
    END IF;
 
 
@@ -141,135 +132,135 @@ ElsIf   gl.amfo = '324805'  then   --  4. Крым
 
    IF     kkk_=1     or
           substr(k.NLS,1,3)='256'          then  --- 1) ПФУ
-
+   
           L_OPERTIME2:='1630';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+    
    ELSIF  kkk_=2                          then  --- 2) Укрпошта
-
+   
           L_OPERTIME2:='1630';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    ELSE                                         --- 3) Другие кл.
 
           L_OPERTIME2:='1530';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1600';   --   Обычный день
-
+          L_OPERTIME :='1600';   --   Обычный день            
+   
    END IF;
 
 
-ElsIf   gl.amfo = '325796'  then   --  5. Львов
+ElsIf   gl.amfo = '325796'  then   --  5. Львов    
 ----------------------------------------------------
 
    IF     kkk_=1     or
           substr(k.NLS,1,3)='256'    then  --- 1) ПФУ
-
+      
           L_OPERTIME2:='1630';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    ELSIF  kkk_=2                     then  --- 2) Укрпошта
-
+   
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    ELSIF  kkk_=17                    then  --- 3) Укрзалізниця
 
           L_OPERTIME2:='1645';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1745';   --   Обычный день
+          L_OPERTIME :='1745';   --   Обычный день            
 
    ELSE                                         --- 4) Другие кл.
 
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1600';   --   Обычный день
-
+          L_OPERTIME :='1600';   --   Обычный день            
+   
    END IF;
 
 
-ElsIf   gl.amfo = '326461'  then   --  6. Николаев
+ElsIf   gl.amfo = '326461'  then   --  6. Николаев    
 ----------------------------------------------------
 
    IF     kkk_=1     or
           substr(k.NLS,1,3)='256'     then  --- 1) ПФУ
-
+      
           L_OPERTIME2:='1630';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+    
    ELSIF  kkk_=2                      then  --- 2) Укрпошта
-
+   
           L_OPERTIME2:='1500';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1600';   --   Обычный день
-
+          L_OPERTIME :='1600';   --   Обычный день            
+   
    ELSE                                     --- 3) Другие кл.
 
           L_OPERTIME2:='1445';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1600';   --   Обычный день
+          L_OPERTIME :='1600';   --   Обычный день            
 
    END IF;
 
 
-ElsIf   gl.amfo = '328845'  then   --  7. Одесса
+ElsIf   gl.amfo = '328845'  then   --  7. Одесса    
 ----------------------------------------------------
 
    IF     kkk_=1     or
           substr(k.NLS,1,3)='256'     then  --- 1) ПФУ
-
+  
           L_OPERTIME2:='1630';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+    
    ELSIF  kkk_=2                      then  --- 2) Укрпошта
-
+  
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+  
    ELSE                                     --- 3) Другие кл.
 
           L_OPERTIME2:='1530';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1600';   --   Обычный день
+          L_OPERTIME :='1600';   --   Обычный день            
 
    END IF;
 
 
-ElsIf   gl.amfo = '331467'  then   --  8. Полтава
+ElsIf   gl.amfo = '331467'  then   --  8. Полтава  
 ----------------------------------------------------
 
    IF     kkk_=1     or
           substr(k.NLS,1,3)='256'     then  --- 1) ПФУ
-
+      
           L_OPERTIME2:='1630';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+    
    ELSIF  kkk_=2                      then  --- 2) Укрпошта
-
+  
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+  
    ELSE                                     --- 3) Другие кл.
 
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1600';   --<-  БАЗОВОЕ опер.время
-
+          L_OPERTIME :='1600';   --<-  БАЗОВОЕ опер.время              
+   
    END IF;
 
 
-ElsIf   gl.amfo = '337568'  then   --  9. Сумы
+ElsIf   gl.amfo = '337568'  then   --  9. Сумы      
 ----------------------------------------------------
 
    IF     kkk_=1     or
           substr(k.NLS,1,3)='256'     then  --- 1) ПФУ
-
+      
           L_OPERTIME2:='1630';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+    
    ELSIF  kkk_=2                      then  --- 2) Укрпошта
-
+   
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1600';   --   БАЗОВОЕ опер.время
-
+          L_OPERTIME :='1600';   --   БАЗОВОЕ опер.время              
+   
    ELSE                                     --- 3) Другие кл.
 
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1600';   --   БАЗОВОЕ опер.время
-
+          L_OPERTIME :='1600';   --   БАЗОВОЕ опер.время              
+   
    END IF;
 
 
@@ -278,20 +269,20 @@ ElsIf   gl.amfo = '351823'  then   -- 10. Харьков
 
    IF     kkk_=1     or
           substr(k.NLS,1,3)='256'     then  --- 1) ПФУ
-
+   
           L_OPERTIME2:='1630';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+    
    ELSIF  kkk_=2                      then  --- 2) Укрпошта
 
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+ 
    ELSE                                     --- 3) Другие кл.
 
          L_OPERTIME2:='1500';    --   Пятница или ПредПразд.день
-         L_OPERTIME :='1600';    --   Обычный день
-
+         L_OPERTIME :='1600';    --   Обычный день            
+   
    END IF;
 
 
@@ -300,178 +291,178 @@ ElsIf   gl.amfo = '353553'  then   -- 11. Чернигов
 
    IF     kkk_=1     or
           substr(k.NLS,1,3)='256'     then  --- 1) ПФУ
-
+      
           L_OPERTIME2:='1630';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+    
    ELSIF  kkk_=2                      then  --- 2) Укрпошта
-
+   
           L_OPERTIME2:='1630';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    ELSIF  kkk_=8                      then  --- 3) ОблГаз
-
+   
           L_OPERTIME2:='1700';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    ELSE                                     --- 4) Другие кл.
 
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
           L_OPERTIME :='1600';   --   БАЗОВОЕ опер.время
-
+   
    END IF;
 
-ElsIf   gl.amfo = '305482'  then   -- 12. Днепропетровск
+ElsIf   gl.amfo = '305482'  then   -- 12. Днепропетровск   
 ----------------------------------------------------
 
    IF     kkk_=1     or
           substr(k.NLS,1,3)='256'     then  --- 1) ПФУ
-
+   
           L_OPERTIME2:='1630';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+    
    ELSIF  kkk_=2                      then  --- 2) Укрпошта
-
+   
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    ELSE                                         --- 3) Другие кл.
-
+           
           L_OPERTIME2:='1700';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    END IF;
 
 
-ElsIf   gl.amfo = '335106'  then   -- 13. Донецк
+ElsIf   gl.amfo = '335106'  then   -- 13. Донецк      
 ----------------------------------------------------
 
    IF     kkk_=1     or
           substr(k.NLS,1,3)='256'     then  --- 1) ПФУ
-
+   
           L_OPERTIME2:='1630';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+    
    ELSIF  kkk_=2                      then  --- 2) Укрпошта
-
+   
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    ELSE                                     --- 3) Другие кл.
 
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    END IF;
 
 
-ElsIf   gl.amfo = '311647'  then   -- 14. Житомир
+ElsIf   gl.amfo = '311647'  then   -- 14. Житомир 
 ----------------------------------------------------
 
    IF     kkk_=1     or
           substr(k.NLS,1,3)='256'     then  --- 1) ПФУ
-
+   
           L_OPERTIME2:='1630';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+    
    ELSIF  kkk_=2                      then  --- 2) Укрпошта
-
+   
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    ELSE                                     --- 3) Другие кл.
 
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    END IF;
 
 
-ElsIf   gl.amfo = '336503'  then   -- 15. Ив-Франк
+ElsIf   gl.amfo = '336503'  then   -- 15. Ив-Франк 
 ----------------------------------------------------
 
    IF     kkk_=1     or
           substr(k.NLS,1,3)='256'     then  --- 1) ПФУ
-
+   
           L_OPERTIME2:='1630';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+    
    ELSIF  kkk_=2                      then  --- 2) Укрпошта
-
+   
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    ELSE                                     --- 3) Другие кл.
-
+           
           L_OPERTIME2:='1700';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    END IF;
 
 
-ElsIf   gl.amfo = '304665'  then   -- 16. Луганск
+ElsIf   gl.amfo = '304665'  then   -- 16. Луганск 
 ----------------------------------------------------
 
    IF     kkk_=1     or
           substr(k.NLS,1,3)='256'     then  --- 1) ПФУ
-
+      
           L_OPERTIME2:='1630';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+    
    ELSIF  kkk_=2                      then  --- 2) Укрпошта
-
+   
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    ELSE                                     --- 3) Другие кл.
 
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    END IF;
 
 
-ElsIf   gl.amfo = '303398'  then   -- 17. Луцк
+ElsIf   gl.amfo = '303398'  then   -- 17. Луцк 
 ----------------------------------------------------
 
    IF     kkk_=1     or
           substr(k.NLS,1,3)='256'     then  --- 1) ПФУ
-
+   
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+    
    ELSIF  kkk_=2                      then  --- 2) Укрпошта
-
+   
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
-   ELSE
+          L_OPERTIME :='1700';   --   Обычный день            
+   
+   ELSE    
                                             --- 3) Другие кл.
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    END IF;
 
 
-ElsIf   gl.amfo = '333368'  then   -- 18. Ровно
+ElsIf   gl.amfo = '333368'  then   -- 18. Ровно 
 ----------------------------------------------------
 
    IF     kkk_=1     or
           substr(k.NLS,1,3)='256'     then  --- 1) ПФУ
-
+      
           L_OPERTIME2:='1630';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+    
    ELSIF  kkk_=2                      then  --- 2) Укрпошта
-
+   
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    ELSE                                     --- 3) Другие кл.
 
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    END IF;
 
 
@@ -480,144 +471,144 @@ ElsIf   gl.amfo = '338545'  then   -- 19. Тернополь
 
    IF     kkk_=1     or
           substr(k.NLS,1,3)='256'     then  --- 1) ПФУ
-
+      
           L_OPERTIME2:='1630';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+    
    ELSIF  kkk_=2                      then  --- 2) Укрпошта
-
+   
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    ELSE                                     --- 3) Другие кл.
 
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    END IF;
 
 
-ElsIf   gl.amfo = '312356'  then   -- 20. Ужгород
+ElsIf   gl.amfo = '312356'  then   -- 20. Ужгород 
 ----------------------------------------------------
 
    IF     kkk_=1     or
           substr(k.NLS,1,3)='256'     then  --- 1) ПФУ
-
+   
           L_OPERTIME2:='1630';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+    
    ELSIF  kkk_=2                      then  --- 2) Укрпошта
-
+   
           L_OPERTIME2:='1545';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1645';   --   Обычный день
+          L_OPERTIME :='1645';   --   Обычный день            
 
    ELSIF  kkk_=5                      then  --- 3) ОблЕнерго
-
+   
           L_OPERTIME2:='1645';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
+          L_OPERTIME :='1700';   --   Обычный день            
 
    ELSIF  kkk_=8 or kkk_=11           then  --- 4) ОблГаз
                                                 --- 5) Тепловики
           L_OPERTIME2:='1700';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';
-
+          L_OPERTIME :='1700';               
+   
    ELSE                                     --- 6) Другие кл.
 
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    END IF;
 
 
-ElsIf   gl.amfo = '352457'  then   -- 21. Херсон
+ElsIf   gl.amfo = '352457'  then   -- 21. Херсон 
 ----------------------------------------------------
 
    IF     kkk_=1     or
           substr(k.NLS,1,3)='256'     then  --- 1) ПФУ
-
+   
           L_OPERTIME2:='1630';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+    
    ELSIF  kkk_=2                      then  --- 2) Укрпошта
-
+   
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    ELSE                                     --- 3) Другие кл.
 
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    END IF;
 
 
-ElsIf   gl.amfo = '315784'  then   -- 22. Хмельницкий
+ElsIf   gl.amfo = '315784'  then   -- 22. Хмельницкий 
 ----------------------------------------------------
 
    IF     kkk_=1     or
           substr(k.NLS,1,3)='256'     then  --- 1) ПФУ
-
+   
           L_OPERTIME2:='1630';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+    
    ELSIF  kkk_=2                      then  --- 2) Укрпошта
-
+   
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    ELSE                                     --- 3) Другие кл.
 
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    END IF;
 
 
-ElsIf   gl.amfo = '354507'  then   -- 23. Черкассы
+ElsIf   gl.amfo = '354507'  then   -- 23. Черкассы 
 ----------------------------------------------------
 
    IF     kkk_=1     or
           substr(k.NLS,1,3)='256'     then  --- 1) ПФУ
-
+      
           L_OPERTIME2:='1630';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+    
    ELSIF  kkk_=2                      then  --- 2) Укрпошта
-
+   
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    ELSE                                     --- 3) Другие кл.
-
+          
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    END IF;
 
 
-ElsIf   gl.amfo = '356334'  then   -- 24. Черновцы
+ElsIf   gl.amfo = '356334'  then   -- 24. Черновцы 
 ----------------------------------------------------
 
    IF     kkk_=1     or
           substr(k.NLS,1,3)='256'     then  --- 1) ПФУ
-
+      
           L_OPERTIME2:='1630';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+    
    ELSIF  kkk_=2                      then  --- 2) Укрпошта
-
+   
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    ELSE                                     --- 3) Другие кл.
-
+          
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
+          L_OPERTIME :='1700';   --   Обычный день            
 
    END IF;
 
 
-ElsIf   gl.amfo = '300465'  then   -- 25. ГОУ
+ElsIf   gl.amfo = '300465'  then   -- 25. ГОУ   
 ----------------------------------------------------
 
    ----  Определяем ОКПО Клиента:
@@ -632,35 +623,35 @@ ElsIf   gl.amfo = '300465'  then   -- 25. ГОУ
 
    IF     okpo_='00035323' or
           kkk_ = 1                 then  --- 1)  ПФУ
-
+   
           L_OPERTIME2:='1630';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    ELSIF  okpo_='21560766'         then  --- 2)  УКРТЕЛЕКОМ
 
           L_OPERTIME2:='1630';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1730';   --   Обычный день
-
+          L_OPERTIME :='1730';   --   Обычный день            
+   
    ELSIF  okpo_='00100227'         then  --- 3)  УКРЭНЕРГО
-
+   
           L_OPERTIME2:='1545';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
+          L_OPERTIME :='1700';   --   Обычный день            
 
    ELSIF  okpo_ in ('21560045',          --- 4)  Укрпошта
                     '01181736',
                     '36282474'
                     )        or
           kkk_ = 2                 then
-
+   
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
-   ELSIF  okpo_='20077720'         then  --- 5)  НАФТОГАЗ
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
+   ELSIF  okpo_='20077720'         then  --- 5)  НАФТОГАЗ  
+   
           L_OPERTIME2:='1630';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1730';   --   Обычный день
-
-   ELSIF  okpo_ in ('04737111',          --- 6)  МППЗТ
+          L_OPERTIME :='1730';   --   Обычный день            
+   
+   ELSIF  okpo_ in ('04737111',          --- 6)  МППЗТ 
                     '26008588',
                     '04736991',
                     '34292653',
@@ -690,63 +681,63 @@ ElsIf   gl.amfo = '300465'  then   -- 25. ГОУ
                     '34425507',
                     '34292721',
                     '34425491',
-                    '34292716'
+                    '34292716' 
                    )               then
-
+                    
 
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
+          L_OPERTIME :='1700';   --   Обычный день            
 
-
-   ELSIF  okpo_ in ( '00034045',           --- 7)  УкрЗалiзниця
+   
+   ELSIF  okpo_ in ( '00034045',           --- 7)  УкрЗалiзниця  
                      '20078961',
                      '01073828',
                      '01071315',
                      '01072609',
                      '01074957',
-                     '01059900'
+                     '01059900' 
                     )              then
-
+   
           L_OPERTIME2:='1645';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1745';   --   Обычный день
+          L_OPERTIME :='1745';   --   Обычный день            
 
-   ELSIF  okpo_='36425142'         then    --- 8)  ГЛОБАЛМАНІ
+   ELSIF  okpo_='36425142'         then    --- 8)  ГЛОБАЛМАНІ 
 
 
           L_OPERTIME2:='1630';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1730';   --   Обычный день
-
-   ELSIF  okpo_='31570412'         then    --- 9)  УКРТРАНСНАФТА
-
+          L_OPERTIME :='1730';   --   Обычный день            
+   
+   ELSIF  okpo_='31570412'         then    --- 9)  УКРТРАНСНАФТА 
+   
           L_OPERTIME2:='1700';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    ELSE                                    --- 10)  Все другие кл.
 
           L_OPERTIME2:='1530';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1630';   --   Обычный день
+          L_OPERTIME :='1630';   --   Обычный день            
 
    END IF;
 
 
-ElsIf   gl.amfo = '322669'  then   -- 26. Киев
+ElsIf   gl.amfo = '322669'  then   -- 26. Киев 
 ----------------------------------------------------
 
    IF     kkk_=1     or
           substr(k.NLS,1,3)='256'     then  --- 1) ПФУ
-
+      
           L_OPERTIME2:='1630';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+    
    ELSIF  kkk_=2                      then  --- 2) Укрпошта
-
+   
           L_OPERTIME2:='1600';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1700';   --   Обычный день
-
+          L_OPERTIME :='1700';   --   Обычный день            
+   
    ELSE                                     --- 3) Другие кл.
-
+          
           L_OPERTIME2:='1530';   --   Пятница или ПредПразд.день
-          L_OPERTIME :='1630';   --   Обычный день
+          L_OPERTIME :='1630';   --   Обычный день            
 
    END IF;
 
@@ -755,17 +746,17 @@ End If;
 
 --------------------------------------------------------------
 
----  Определяем НОМЕР ПАКЕТA:
+---  Определяем НОМЕР ПАКЕТA: 
 
   BEGIN
      SELECT to_number(VALUE)
      INTO   n_tarpak
-     FROM   AccountsW
+     FROM   AccountsW 
      WHERE  ACC = k.ACC
         and TAG = 'SHTAR';
 
-  EXCEPTION WHEN NO_DATA_FOUND THEN
-     n_tarpak := 0;
+  EXCEPTION WHEN OTHERS THEN
+     n_tarpak := 0; 
   END;
 
 ---------------------------------------------------------------
@@ -773,7 +764,7 @@ End If;
 ---      Поиск индивидуального опер.времени по счету
 ---      ---------------------------------------------
 
- BEGIN
+ BEGIN      
 
    SELECT trim(w.VALUE)
    INTO   OprTime1
@@ -782,19 +773,19 @@ End If;
       and w.TAG = 'OPTIME1'
       and a.ACC = k.ACC ;
 
-   if OprTime1 is not NULL     and
-      to_number(OprTime1)>=800 and to_number(OprTime1)<=2400 then
+   if OprTime1 is not NULL     and 
+      to_number(OprTime1)>=800 and to_number(OprTime1)<=2400 then 
 
          L_OPERTIME:=OprTime1;   --   Обычный день
 
    end if;
 
  EXCEPTION WHEN OTHERS THEN
-   null;
+   null; 
  END;
 
 
- BEGIN
+ BEGIN      
 
    SELECT trim(w.VALUE)
    INTO   OprTime2
@@ -803,15 +794,15 @@ End If;
       and w.TAG = 'OPTIME2'
       and a.ACC = k.ACC ;
 
-   if OprTime2 is not NULL     and
-      to_number(OprTime2)>=800 and to_number(OprTime2)<=2400 then
+   if OprTime2 is not NULL     and 
+      to_number(OprTime2)>=800 and to_number(OprTime2)<=2400 then 
 
          L_OPERTIME2:=OprTime2;  -- Пятница или ПредПразд.день
 
    end if;
 
  EXCEPTION WHEN OTHERS THEN
-   null;
+   null; 
  END;
 
 
@@ -826,15 +817,16 @@ BEGIN
         WHERE     w.tag = 'SHTAR'
               AND t.id  = w.VALUE
               AND w.acc = k.acc;
-    EXCEPTION WHEN NO_DATA_FOUND THEN
-        L_DOC_NOPAY:=0;
+    EXCEPTION WHEN OTHERS THEN
+        L_DOC_NOPAY:=0; 
     END;
 ----------------------------------------------------------
 
 
-If n_tarpak >= 38 then   ---  + + + + + + + + + + + + + + + + + + + + + + + + + +
 
-  BEGIN                  ---  Бесплатные - только IB1,IB2  !!!
+If n_tarpak >= 38 then   ------    Бесплатные набираются только из Клиент-Банк  ( IB% и CL% ) !!!
+                         ------------------------------------------------------------------------
+  BEGIN                  
   SELECT nls,
          SUM (bumdo16),
          SUM (s_bumdo16),
@@ -906,11 +898,7 @@ If n_tarpak >= 38 then   ---  + + + + + + + + + + + + + + + + + + + + + + + + + 
                                                               a.kv,
                                                               a.nls,
                                                               d.s,
-                                                              nvl((Select max(DAT)
-                                                                   from   OPER_VISA
-                                                                   where  REF=o.REF and GROUPID not in (30,80)),
-                                                                  o.PDAT
-                                                                 ),
+                                       nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),
                                                               TO_DATE (DKON_KV,'DD/MM/YYYY'),
                                                               o.NLSA,
                                                               o.NLSB,
@@ -923,29 +911,26 @@ If n_tarpak >= 38 then   ---  + + + + + + + + + + + + + + + + + + + + + + + + + 
                                                            opldok d,
                                                            accounts a,
                                                            RKO_TTS t,
-                                                           RKO_LST r
+                                                           RKO_LST r 
                                                      WHERE     a.acc = k.acc
                                                            AND a.acc = r.acc
                                                            AND a.acc = d.acc
                                                            and (t.TT like 'IB%' or t.TT like 'CL%')  ---- **************************
-                                                           AND d.REF = o.REF
-                                                           AND d.sos = 5
+                                                           AND d.REF = o.REF   
+                                                           AND d.sos = 5      
                                                            AND d.fdat >= P_dat1
                                                            AND d.fdat <= P_dat2
                                                            AND d.TT = t.TT
-                                                           ----AND d.TT IN ('001','002','I00','I01','PS1','PS2')  ---  Все Исходящие
                                                            AND t.DK=0
                                                            AND d.DK=0
-                                                           AND TO_CHAR (
-                                                                         nvl((Select max(DAT)
-                                                                              from   OPER_VISA
-                                                                              where  REF=o.REF and GROUPID not in (30,80)),
-                                                                              o.PDAT
-                                                                        ),
-                                                                        'HH24MI') <=
-   decode( (Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
-   -- L_OPERTIME
-                                                           AND d.s > 0
+                                                           AND (
+                TO_CHAR ( nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),'HH24MI' )
+                                                                   <=
+                decode( (Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
+                                                                   OR
+               ( o.TT in ('001','002')  and  exists ( Select 1 From OperW where TAG='VVOD' and VALUE='1' and REF=o.REF ) )
+                                                                )
+                                                           AND d.S > 0
                                                    UNION ALL
                                                    SELECT a.NLS nls,
                                                            a.branch BRANCH,
@@ -959,11 +944,7 @@ If n_tarpak >= 38 then   ---  + + + + + + + + + + + + + + + + + + + + + + + + + 
                                                               a.kv,
                                                               a.nls,
                                                               d.s,
-                                                              nvl((Select max(DAT)
-                                                                   from   OPER_VISA
-                                                                   where  REF=o.REF and GROUPID not in (30,80)),
-                                                                  o.PDAT
-                                                                 ),
+                                       nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),
                                                               TO_DATE (DKON_KV,'DD/MM/YYYY'),
                                                               o.NLSA,
                                                               o.NLSB,
@@ -977,31 +958,29 @@ If n_tarpak >= 38 then   ---  + + + + + + + + + + + + + + + + + + + + + + + + + 
                                                            accounts a,
                                                            RKO_TTS t,
                                                            RKO_LST r
-                                                     WHERE     a.acc = k.acc
+                                                      WHERE    a.acc = k.acc
                                                            AND a.acc = r.acc
                                                            AND a.acc = d.acc
                                                            and (t.TT like 'IB%' or t.TT like 'CL%')  ---- **************************
-                                                           AND d.REF = o.REF
-                                                           AND d.sos = 5
+                                                           AND d.REF = o.REF   
+                                                           AND d.sos = 5      
                                                            AND d.fdat >= P_dat1
                                                            AND d.fdat <= P_dat2
                                                            AND d.TT = t.TT
                                                            AND t.DK=0
                                                            AND d.DK=0
-                                                           AND TO_CHAR (
-                                                                         nvl((Select max(DAT)
-                                                                              from   OPER_VISA
-                                                                              where  REF=o.REF and GROUPID not in (30,80)),
-                                                                              o.PDAT
-                                                                            ),
-                                                                         'HH24MI') >
-   decode((Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
-   -- L_OPERTIME
-                                                           AND d.s > 0
-                                                    ORDER BY REF))
+                                                           AND (
+               TO_CHAR ( nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT), 'HH24MI' )
+                                                                    > 
+               decode((Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
+                                                                AND
+               not ( o.TT in ('001','002')  and  exists ( Select 1 From OperW where TAG='VVOD' and VALUE='1' and REF=o.REF ) )
+                                                                )
+                                                           AND d.S > 0
+                                                      ORDER BY REF))
                                      WHERE s > 0 )
                              WHERE r > L_DOC_NOPAY                 --- Oтбрасываем первых L_DOC_NOPAY платежей
-                                                                   --------------------------------------------
+                                                                   --------------------------------------------  
 --  ================================================================================================================
                                                            UNION ALL
                             SELECT nls,
@@ -1032,11 +1011,7 @@ If n_tarpak >= 38 then   ---  + + + + + + + + + + + + + + + + + + + + + + + + + 
                                                               a.kv,
                                                               a.nls,
                                                               d.s,
-                                                              nvl((Select max(DAT)
-                                                                   from   OPER_VISA
-                                                                   where  REF=o.REF and GROUPID not in (30,80)),
-                                                                  o.PDAT
-                                                                 ),
+                                       nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),
                                                               TO_DATE (DKON_KV,'DD/MM/YYYY'),
                                                               o.NLSA,
                                                               o.NLSB,
@@ -1054,23 +1029,20 @@ If n_tarpak >= 38 then   ---  + + + + + + + + + + + + + + + + + + + + + + + + + 
                                                            AND a.acc = r.acc
                                                            AND a.acc = d.acc
                                                            and t.TT not like 'IB%' and t.TT not like 'CL%'   ---- **************************
-                                                           AND d.REF = o.REF
-                                                           AND d.sos = 5
+                                                           AND d.REF = o.REF  
+                                                           AND d.sos = 5      
                                                            AND d.fdat >= P_dat1
                                                            AND d.fdat <= P_dat2
                                                            AND d.TT = t.TT
-                                                           ----AND d.TT IN ('001','002','I00','I01','PS1','PS2')  ---  Все Исходящие
                                                            AND t.DK=0
                                                            AND d.DK=0
-                                                           AND TO_CHAR (
-                                                                         nvl((Select max(DAT)
-                                                                              from   OPER_VISA
-                                                                              where  REF=o.REF and GROUPID not in (30,80)),
-                                                                              o.PDAT
-                                                                            ),
-                                                                         'HH24MI') <=
-   decode((Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
-   -- L_OPERTIME
+                                                           AND (
+                  TO_CHAR ( nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT), 'HH24MI' )
+                                                               <=
+                  decode((Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
+                                                                OR
+                  ( o.TT in ('001','002')  and  exists ( Select 1 From OperW where TAG='VVOD' and VALUE='1' and REF=o.REF ) )
+                                                               )
                                                            AND d.s > 0
                                                    UNION ALL
                                                    SELECT a.NLS nls,
@@ -1085,11 +1057,7 @@ If n_tarpak >= 38 then   ---  + + + + + + + + + + + + + + + + + + + + + + + + + 
                                                               a.kv,
                                                               a.nls,
                                                               d.s,
-                                                              nvl((Select max(DAT)
-                                                                   from   OPER_VISA
-                                                                   where  REF=o.REF and GROUPID not in (30,80)),
-                                                                  o.PDAT
-                                                                 ),
+                                       nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),
                                                               TO_DATE (DKON_KV,'DD/MM/YYYY'),
                                                               o.NLSA,
                                                               o.NLSB,
@@ -1107,27 +1075,25 @@ If n_tarpak >= 38 then   ---  + + + + + + + + + + + + + + + + + + + + + + + + + 
                                                            AND a.acc = r.acc
                                                            AND a.acc = d.acc
                                                            and t.TT not like 'IB%' and t.TT not like 'CL%'    ---- **************************
-                                                           AND d.REF = o.REF
-                                                           AND d.sos = 5
+                                                           AND d.REF = o.REF   
+                                                           AND d.sos = 5       
                                                            AND d.fdat >= P_dat1
                                                            AND d.fdat <= P_dat2
                                                            AND d.TT = t.TT
                                                            AND t.DK=0
                                                            AND d.DK=0
-                                                           AND TO_CHAR (
-                                                                         nvl((Select max(DAT)
-                                                                              from   OPER_VISA
-                                                                              where  REF=o.REF and GROUPID not in (30,80)),
-                                                                              o.PDAT
-                                                                            ),
-                                                                         'HH24MI') >
-   decode( (Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
-   -- L_OPERTIME
-                                                           AND d.s > 0
+                                                           AND (
+                    TO_CHAR ( nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),'HH24MI' )
+                                                                   > 
+                    decode( (Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
+                                                                  AND
+                    not ( o.TT in ('001','002')  and  exists ( Select 1 From OperW where TAG='VVOD' and VALUE='1' and REF=o.REF ) )
+                                                               )
+                                                           AND d.S > 0
                                                     ORDER BY REF))
                                      WHERE s > 0)
                            ----- WHERE r > L_DOC_NOPAY             --- Oтбрасываем первых L_DOC_NOPAY платежей
-                                                                   --------------------------------------------
+                                                                   --------------------------------------------  
 --  ================================================================================================================
                                                            UNION ALL
                                                     SELECT a.NLS nls,
@@ -1138,12 +1104,7 @@ If n_tarpak >= 38 then   ---  + + + + + + + + + + + + + + + + + + + + + + + + + 
                                                               a.kv,
                                                               a.nls,
                                                               d.s,
-                                                      ------- nvl(o.SOS_CHANGE_TIME,o.PDAT),
-                                                              nvl((Select max(DAT)
-                                                                   from   OPER_VISA
-                                                                   where  REF=o.REF and GROUPID not in (30,80)),
-                                                                  o.PDAT
-                                                                 ),
+                                       nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),
                                                               TO_DATE (DKON_KV,'DD/MM/YYYY'),
                                                               o.NLSA,
                                                               o.NLSB,
@@ -1167,7 +1128,7 @@ If n_tarpak >= 38 then   ---  + + + + + + + + + + + + + + + + + + + + + + + + + 
                                                            AND d.tt = t.tt
                                                            AND t.DK=1
                                                            AND d.DK=1
-                                                           AND d.s > 0)
+                                                           AND d.s > 0)     
                      WHERE s > 0
                   GROUP BY NLS, BRANCH, FL))
         GROUP BY nls;
@@ -1176,9 +1137,8 @@ If n_tarpak >= 38 then   ---  + + + + + + + + + + + + + + + + + + + + + + + + + 
   END;
 
 
-ELSE   ---+ + + + + + + + + + + + + + + + + + + + + + +
-
-                         ---  Бесплатные - ВСЕ  !!!
+ELSE            -----------    n_tarpak  <  38   -  Бесплатные набираются из ЛЮБЫХ платежей  !!!
+                -----------------------------------------------------------------------------------
   BEGIN
   SELECT nls,
          SUM (bumdo16),
@@ -1247,12 +1207,7 @@ ELSE   ---+ + + + + + + + + + + + + + + + + + + + + + +
                                                               a.kv,
                                                               a.nls,
                                                               d.s,
-                                                      ------  nvl(o.SOS_CHANGE_TIME,o.PDAT),
-                                                              nvl((Select max(DAT)
-                                                                   from   OPER_VISA
-                                                                   where  REF=o.REF and GROUPID not in (30,80)),
-                                                                  o.PDAT
-                                                                 ),
+                                       nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),
                                                               TO_DATE (DKON_KV,'DD/MM/YYYY'),
                                                               o.NLSA,
                                                               o.NLSB,
@@ -1269,29 +1224,21 @@ ELSE   ---+ + + + + + + + + + + + + + + + + + + + + + +
                                                      WHERE     a.acc = k.acc
                                                            AND a.acc = r.acc
                                                            AND a.acc = d.acc
-                                                           AND d.REF = o.REF
-                                                           AND d.sos = 5
+                                                           AND d.REF = o.REF  
+                                                           AND d.sos = 5      
                                                            AND d.fdat >= P_dat1
                                                            AND d.fdat <= P_dat2
                                                            AND d.TT = t.TT
-                                                      --     AND ( (t.dk = 0
-                                                      --            AND d.dk = 0)
-                                                      --          OR (t.dk = 1
-                                                      --              AND d.dk = 1))
-                                                           ----AND d.TT IN ('001','002','I00','I01','PS1','PS2')  ---  Все Исходящие
                                                            AND t.DK=0
                                                            AND d.DK=0
-                                                           AND TO_CHAR (
-                                                                  ------ nvl(o.SOS_CHANGE_TIME,o.PDAT),
-                                                                         nvl((Select max(DAT)
-                                                                              from   OPER_VISA
-                                                                              where  REF=o.REF and GROUPID not in (30,80)),
-                                                                              o.PDAT
-                                                                            ),
-                                                                         'HH24MI') <=
-   decode( (Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
-   -- L_OPERTIME
-                                                           AND d.s > 0
+                                                           AND (
+                      TO_CHAR ( nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT), 'HH24MI' )
+                                                                 <=
+                      decode( (Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
+                                                                 OR
+                      ( o.TT in ('001','002')  and  exists ( Select 1 From OperW where TAG='VVOD' and VALUE='1' and REF=o.REF ) )
+                                                                )
+                                                           AND d.S > 0
                                                     UNION ALL
                                                     SELECT a.NLS nls,
                                                            a.branch BRANCH,
@@ -1305,12 +1252,7 @@ ELSE   ---+ + + + + + + + + + + + + + + + + + + + + + +
                                                               a.kv,
                                                               a.nls,
                                                               d.s,
-                                                      ------  nvl(o.SOS_CHANGE_TIME,o.PDAT),
-                                                              nvl((Select max(DAT)
-                                                                   from   OPER_VISA
-                                                                   where  REF=o.REF and GROUPID not in (30,80)),
-                                                                  o.PDAT
-                                                                 ),
+                                       nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),
                                                               TO_DATE (DKON_KV,'DD/MM/YYYY'),
                                                               o.NLSA,
                                                               o.NLSB,
@@ -1327,31 +1269,25 @@ ELSE   ---+ + + + + + + + + + + + + + + + + + + + + + +
                                                      WHERE     a.acc = k.acc
                                                            AND a.acc = r.acc
                                                            AND a.acc = d.acc
-                                                           AND d.REF = o.REF
-                                                           AND d.sos = 5
+                                                           AND d.REF = o.REF  
+                                                           AND d.sos = 5      
                                                            AND d.fdat >= P_dat1
                                                            AND d.fdat <= P_dat2
                                                            AND d.TT = t.TT
-                                                      --     AND ((t.dk = 0 AND d.dk = 0)
-                                                      --      OR (t.dk = 1  AND d.dk = 1))
-                                                       ----AND d.TT IN ('001','002','I00', 'I01','PS1','PS2')  ----  Все Исходящие
                                                            AND t.DK=0
                                                            AND d.DK=0
-                                                           AND TO_CHAR (
-                                                                  -----  nvl(o.SOS_CHANGE_TIME,o.PDAT),
-                                                                         nvl((Select max(DAT)
-                                                                              from   OPER_VISA
-                                                                              where  REF=o.REF and GROUPID not in (30,80)),
-                                                                              o.PDAT
-                                                                            ),
-                                                                         'HH24MI') >
-   decode( (Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
-   -- L_OPERTIME
-                                                           AND d.s > 0
+                                                           AND (
+                  TO_CHAR ( nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT), 'HH24MI' )
+                                                                 > 
+                  decode( (Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
+                                                                AND
+                  not ( o.TT in ('001','002')  and  exists ( Select 1 From OperW where TAG='VVOD' and VALUE='1' and REF=o.REF ) )
+                                                                )
+                                                           AND d.S > 0
                                                     ORDER BY REF))
                                      WHERE s > 0)
                              WHERE r > L_DOC_NOPAY                 --- Oтбрасываем первых L_DOC_NOPAY платежей
-                                                                   --------------------------------------------
+                                                                   --------------------------------------------  
                                                            UNION ALL
                                                     SELECT a.NLS nls,
                                                            a.branch BRANCH,
@@ -1361,12 +1297,7 @@ ELSE   ---+ + + + + + + + + + + + + + + + + + + + + + +
                                                               a.kv,
                                                               a.nls,
                                                               d.s,
-                                                      ------- nvl(o.SOS_CHANGE_TIME,o.PDAT),
-                                                              nvl((Select max(DAT)
-                                                                   from   OPER_VISA
-                                                                   where  REF=o.REF and GROUPID not in (30,80)),
-                                                                  o.PDAT
-                                                                 ),
+                                       nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),
                                                               TO_DATE (DKON_KV,'DD/MM/YYYY'),
                                                               o.NLSA,
                                                               o.NLSB,
@@ -1390,9 +1321,7 @@ ELSE   ---+ + + + + + + + + + + + + + + + + + + + + + +
                                                            AND d.tt = t.tt
                                                            AND t.DK=1
                                                            AND d.DK=1
-                                                      --     AND ( (t.dk = 0 AND d.dk = 0)
-                                                      --      OR   (t.dk = 1 AND d.dk = 1) )
-                                                           AND d.s > 0)
+                                                           AND d.s > 0)     
                      WHERE s > 0
                   GROUP BY NLS, BRANCH, FL))
     GROUP BY nls;
@@ -1418,14 +1347,6 @@ END IF;        ---  END IF   Бесплатных !!!
 END LOOP;
 END;
 /
-show err;
 
-PROMPT *** Create  grants  RKO335 ***
-grant EXECUTE                                                                on RKO335          to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on RKO335          to START1;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/RKO335.sql =========*** End *** ==
-PROMPT ===================================================================================== 
+grant execute on RKO335 to start1;
+grant execute on RKO335 to bars_access_defrole;

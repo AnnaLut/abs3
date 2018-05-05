@@ -214,6 +214,21 @@ exception when others then
  end;
 /
 
+declare
+  e_idx_exists           exception;
+  pragma exception_init( e_idx_exists,      -00955 );
+  e_col_already_idx      exception;
+  pragma exception_init( e_col_already_idx, -01408 );
+begin
+  execute immediate 'create index IDX_CCDEAL_SDATE on CC_DEAL (SDATE) tablespace BRSMDLI';
+  dbms_output.put_line( 'Index created.' );
+exception
+  when e_idx_exists 
+  then dbms_output.put_line( 'Name is already used by an existing object.' );
+  when e_col_already_idx 
+  then dbms_output.put_line( 'Such column list already indexed.' );
+end;
+/
 
 
 

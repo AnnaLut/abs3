@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/rko.sql =========*** Run *** =======
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.RKO IS
+CREATE OR REPLACE PACKAGE rko IS
 /*
 --***************************************************************--
               Плата за расчетно-кассовое обслуживание
@@ -15,23 +9,6 @@
 
  Накопление идет по Opldok.FDAT !!!
  ------------------------------------
-
- 14.06.2007 SERG Адаптация к Мульти-МФО схеме.
- Что сделано:
- - изменены типы переменных *tobo* с varschar2(12) на tobo.tobo%type
- - при сравнении кода отделения с нулем(0), сам ноль пишем как строку '0'
- Требуются:
- patchm73.rko (для всех)
- patchm74.rko (только для Мульти-МФО)
-
-
- Банк с ТОБО. Взимание платы производится по всем счетам в Головном банке,
- ----------- но, при этом, счет 6110 у ГБ и у каждого ТОБО - свой.
-
- 6110 берется из TOBO_PARAMS по коду ТОБО счета 2600 и TAG='RKO6110'.
- Для счетов 2600, по которым 6110 не найдется в TOBO_PARAMS, он будет
- взят из операции BARS."RKO" ( конкретный или из INI-файла, если в операции
- счет-Б задан формулой типа #(tobopack.GetToboParam('RKO6110'))   ).
 
 --***************************************************************--
 */
@@ -59,7 +36,11 @@ PROCEDURE pay2(mode_ VARCHAR2, dat_ DATE,filt_ VARCHAR2 DEFAULT NULL, p_acc numb
 PROCEDURE er(acc_ NUMBER);
 END;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.RKO IS
+
+
+-----------------------------------------------------------------------------------------------
+
+CREATE OR REPLACE PACKAGE BODY BARS.rko IS
 
 /*
   
@@ -100,7 +81,7 @@ begin If p_mode not in (1,2) then RETURN; end if;
    If p_Mode = 1 then  --- = фініш
 
       If trunc( l_dat, 'MM' ) < trunc ( DAT_NEXT_U (l_dat,1), 'MM' ) then
-         -- Нарахування комісії за РКО 3570-6110,
+         -- Нарахування комісії за РКО 3570-6510,
          --регламентні роботи по закриттю місяця
          RKO.ACR( 1, l_dat, NULL ); -- розрахунок
          RKO.PAY( 1, l_dat, NULL ); -- проводки
@@ -294,11 +275,7 @@ IF  n_tarpak >= 38 THEN        ----     П А К Е Т Ы  >=  38    ----
           FROM (Select rnk, nls, acc, ref,s, pr , rownum R
                 From (SELECT a.rnk, a.NLS, a.acc, o.ref,
                              F_TARIF_RKO( t.NTAR,a.KV,a.NLS,d.S,
-                                          nvl((Select max(DAT)
-                                               from   OPER_VISA
-                                               where  REF=o.REF and GROUPID not in (30,80)),
-                                               o.PDAT
-                                              ),
+                                          nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),
                                           DKON_KV,
                                           o.NLSA,o.NLSB,o.MFOA,o.MFOB,t.TT,a.ACC,
                                           o.D_REC, o.REF
@@ -316,11 +293,7 @@ IF  n_tarpak >= 38 THEN        ----     П А К Е Т Ы  >=  38    ----
                          and (t.dk = 0 and d.dk = 0)          ---  за ДЕБЕТ (412)
                          and D.S > 0
                          and F_TARIF_RKO( t.NTAR,a.KV,a.NLS,d.S,
-                                          nvl((Select max(DAT)
-                                               from   OPER_VISA
-                                               where  REF=o.REF and GROUPID not in (30,80)),
-                                               o.PDAT
-                                              ),
+                                          nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),
                                           DKON_KV,
                                           o.NLSA,o.NLSB,o.MFOA,o.MFOB,t.TT,a.ACC,
                                           o.D_REC, o.REF
@@ -338,11 +311,7 @@ IF  n_tarpak >= 38 THEN        ----     П А К Е Т Ы  >=  38    ----
           FROM (Select rnk, nls, acc, ref,s, pr , rownum R
                 From (SELECT a.rnk, a.NLS, a.acc, o.ref,
                              F_TARIF_RKO( t.NTAR,a.KV,a.NLS,d.S,
-                                          nvl((Select max(DAT)
-                                               from   OPER_VISA
-                                               where  REF=o.REF and GROUPID not in (30,80)),
-                                               o.PDAT
-                                              ),
+                                          nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),
                                           DKON_KV,
                                           o.NLSA,o.NLSB,o.MFOA,o.MFOB,t.TT,a.ACC,
                                           o.D_REC, o.REF
@@ -360,11 +329,7 @@ IF  n_tarpak >= 38 THEN        ----     П А К Е Т Ы  >=  38    ----
                          and (t.dk = 0 and d.dk = 0)          ---  за ДЕБЕТ (412)
                          and D.S > 0
                          and F_TARIF_RKO( t.NTAR,a.KV,a.NLS,d.S,
-                                          nvl((Select max(DAT)
-                                               from   OPER_VISA
-                                               where  REF=o.REF and GROUPID not in (30,80)),
-                                               o.PDAT
-                                              ),
+                                          nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),
                                           DKON_KV,
                                           o.NLSA,o.NLSB,o.MFOA,o.MFOB,t.TT,a.ACC,
                                           o.D_REC, o.REF
@@ -382,11 +347,7 @@ IF  n_tarpak >= 38 THEN        ----     П А К Е Т Ы  >=  38    ----
           FROM (Select rnk, nls, acc, ref,s, pr , rownum R
                 From (SELECT a.rnk, a.NLS, a.acc, o.ref,
                              F_TARIF_RKO( t.NTAR,a.KV,a.NLS,d.S,
-                                          nvl((Select max(DAT)
-                                               from   OPER_VISA
-                                               where  REF=o.REF and GROUPID not in (30,80)),
-                                               o.PDAT
-                                              ),
+                                          nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),
                                           DKON_KV,
                                           o.NLSA,o.NLSB,o.MFOA,o.MFOB,t.TT,a.ACC,
                                           o.D_REC, o.REF
@@ -403,11 +364,7 @@ IF  n_tarpak >= 38 THEN        ----     П А К Е Т Ы  >=  38    ----
                          and (t.dk = 1 and d.dk = 1)         --- за КРЕДИТ (412)
                          and D.S > 0
                          and F_TARIF_RKO( t.NTAR,a.KV,a.NLS,d.S,
-                                          nvl((Select max(DAT)
-                                               from   OPER_VISA
-                                               where  REF=o.REF and GROUPID not in (30,80)),
-                                               o.PDAT
-                                              ),
+                                          nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),
                                           DKON_KV,
                                           o.NLSA,o.NLSB,o.MFOA,o.MFOB,t.TT,a.ACC,
                                           o.D_REC, o.REF
@@ -435,11 +392,7 @@ IF  n_tarpak >= 38 THEN        ----     П А К Е Т Ы  >=  38    ----
                (SELECT nls, S, SDOK, ref  FROM
                     (SELECT a.NLS nls,
                           F_TARIF_RKO( t.NTAR,a.KV,a.NLS,d.S,
-                                       nvl((Select max(DAT)
-                                            from   OPER_VISA
-                                            where  REF=o.REF and GROUPID not in (30,80)),
-                                            o.PDAT
-                                           ),
+                                       nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),
                                        DKON_KV,
                                        o.NLSA,o.NLSB,o.MFOA,o.MFOB,t.TT,a.ACC,
                                        o.D_REC, o.REF
@@ -472,11 +425,7 @@ IF  n_tarpak >= 38 THEN        ----     П А К Е Т Ы  >=  38    ----
                (SELECT nls, S, SDOK, ref  FROM
                     (SELECT a.NLS nls,
                           F_TARIF_RKO( t.NTAR,a.KV,a.NLS,d.S,
-                                       nvl((Select max(DAT)
-                                            from   OPER_VISA
-                                            where  REF=o.REF and GROUPID not in (30,80)),
-                                            o.PDAT
-                                           ),
+                                       nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),
                                        DKON_KV,
                                        o.NLSA,o.NLSB,o.MFOA,o.MFOB,t.TT,a.ACC,
                                        o.D_REC, o.REF
@@ -509,11 +458,7 @@ IF  n_tarpak >= 38 THEN        ----     П А К Е Т Ы  >=  38    ----
                (SELECT nls, S, SDOK, ref  FROM
                     (SELECT a.NLS nls,
                           F_TARIF_RKO( t.NTAR,a.KV,a.NLS,d.S,
-                                       nvl((Select max(DAT)
-                                            from   OPER_VISA
-                                            where  REF=o.REF and GROUPID not in (30,80)),
-                                            o.PDAT
-                                           ),
+                                       nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),
                                        DKON_KV,
                                        o.NLSA,o.NLSB,o.MFOA,o.MFOB,t.TT,a.ACC,
                                        o.D_REC, o.REF
@@ -555,11 +500,7 @@ ELSE       ---   По-старому:   ПАКЕТЫ  0 - 37                             n_tarp
           FROM (Select rnk, nls, acc, ref,s, pr , rownum R
                 From (SELECT a.rnk, a.NLS, a.acc, o.ref,
                              F_TARIF_RKO( t.NTAR,a.KV,a.NLS,d.S,
-                                          nvl((Select max(DAT)
-                                               from   OPER_VISA
-                                               where  REF=o.REF and GROUPID not in (30,80)),
-                                               o.PDAT
-                                              ),
+                                          nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),
                                           DKON_KV,
                                           o.NLSA,o.NLSB,o.MFOA,o.MFOB,t.TT,a.ACC,
                                           o.D_REC, o.REF
@@ -576,11 +517,7 @@ ELSE       ---   По-старому:   ПАКЕТЫ  0 - 37                             n_tarp
                          and (t.dk = 0 and d.dk = 0)          ---  за ДЕБЕТ (412)
                          and D.S > 0
                          and F_TARIF_RKO( t.NTAR,a.KV,a.NLS,d.S,
-                                          nvl((Select max(DAT)
-                                               from   OPER_VISA
-                                               where  REF=o.REF and GROUPID not in (30,80)),
-                                               o.PDAT
-                                              ),
+                                          nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),
                                           DKON_KV,
                                           o.NLSA,o.NLSB,o.MFOA,o.MFOB,t.TT,a.ACC,
                                           o.D_REC, o.REF
@@ -595,11 +532,7 @@ ELSE       ---   По-старому:   ПАКЕТЫ  0 - 37                             n_tarp
           FROM (Select rnk, nls, acc, ref,s, pr , rownum R
                 From (SELECT a.rnk, a.NLS, a.acc, o.ref,
                              F_TARIF_RKO( t.NTAR,a.KV,a.NLS,d.S,
-                                          nvl((Select max(DAT)
-                                               from   OPER_VISA
-                                               where  REF=o.REF and GROUPID not in (30,80)),
-                                               o.PDAT
-                                              ),
+                                          nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),
                                           DKON_KV,
                                           o.NLSA,o.NLSB,o.MFOA,o.MFOB,t.TT,a.ACC,
                                           o.D_REC, o.REF
@@ -616,11 +549,7 @@ ELSE       ---   По-старому:   ПАКЕТЫ  0 - 37                             n_tarp
                          and (t.dk = 1 and d.dk = 1)         --- за КРЕДИТ (412)
                          and D.S > 0
                          and F_TARIF_RKO( t.NTAR,a.KV,a.NLS,d.S,
-                                          nvl((Select max(DAT)
-                                               from   OPER_VISA
-                                               where  REF=o.REF and GROUPID not in (30,80)),
-                                               o.PDAT
-                                              ),
+                                          nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),
                                           DKON_KV,
                                           o.NLSA,o.NLSB,o.MFOA,o.MFOB,t.TT,a.ACC,
                                           o.D_REC, o.REF
@@ -645,11 +574,7 @@ ELSE       ---   По-старому:   ПАКЕТЫ  0 - 37                             n_tarp
                (SELECT nls, S, SDOK, ref  FROM
                     (SELECT a.NLS nls,
                           F_TARIF_RKO( t.NTAR,a.KV,a.NLS,d.S,
-                                       nvl((Select max(DAT)
-                                            from   OPER_VISA
-                                            where  REF=o.REF and GROUPID not in (30,80)),
-                                            o.PDAT
-                                           ),
+                                       nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),
                                        DKON_KV,
                                        o.NLSA,o.NLSB,o.MFOA,o.MFOB,t.TT,a.ACC,
                                        o.D_REC, o.REF
@@ -678,11 +603,7 @@ ELSE       ---   По-старому:   ПАКЕТЫ  0 - 37                             n_tarp
                (SELECT nls, S, SDOK, ref  FROM
                     (SELECT a.NLS nls,
                           F_TARIF_RKO( t.NTAR,a.KV,a.NLS,d.S,
-                                       nvl((Select max(DAT)
-                                            from   OPER_VISA
-                                            where  REF=o.REF and GROUPID not in (30,80)),
-                                            o.PDAT
-                                           ),
+                                       nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),
                                        DKON_KV,
                                        o.NLSA,o.NLSB,o.MFOA,o.MFOB,t.TT,a.ACC,
                                        o.D_REC, o.REF
@@ -813,7 +734,7 @@ nam_d_ VARCHAR2(38);
 okpo_  VARCHAR2(14);
 tobo_a     tobo.tobo%type;-- код ТОБО счета 2600
 mfo_a      VARCHAR2(12);-- "MFO процесс.рахунку" счета 2600, если он в BANK_ACC
-nlsb_tobo  VARCHAR2(15);-- счет 6110 из TOBO_PARAMS: TOBO=tobo_a, TAG='RKO6110'
+nlsb_tobo  VARCHAR2(15);-- счет 6510 из TOBO_PARAMS: TOBO=tobo_a, TAG='RKO6110'
 nam_b_tobo VARCHAR2(38);-- Accounts.NMS счета nlsb_tobo
 
 
@@ -851,9 +772,10 @@ err  EXCEPTION               ;
 
 BEGIN
 
-   ----------------------------------------------------------------
-   OP_BS_OB  (P_BBBOO => '651006');  ---   открытие 6510/06
-   ----------------------------------------------------------------
+
+  If INSTR(mode_,'1') > 0  THEN
+     OP_BS_OB (P_BBBOO => '651006');  ---   открытие 6510/06
+  End If;
 
 
 ----------  Проверяем:  насторена ли операция "RKO" ?  ------------
@@ -1041,11 +963,11 @@ BEGIN
 ---                  ПРОВОДКИ по кнопкам 0,1,2,3:
 ----================================================================
 
--- 0.  Взыскание платы за РКО  (кнопка "0"):     2600 ---> 6110
+-- 0.  Взыскание платы за РКО  (кнопка "0"):     2600 ---> 6510
 ---------------------------------------------------------------------
       IF INSTR(mode_,'0') > 0 AND s0_>0 AND ostc_>0 AND ostc_>=s0_ THEN  -- Попробуем начисленную плату взыскать
 
-         s0a_:= s0_;      --  cумма проводки 2600-6110
+         s0a_:= s0_;      --  cумма проводки 2600-6510
 
          BEGIN
             SAVEPOINT beforko2;
@@ -1502,16 +1424,3 @@ BEGIN
 END;
 END;
 /
- show err;
- 
-PROMPT *** Create  grants  RKO ***
-grant EXECUTE                                                                on RKO             to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on RKO             to RKO;
-grant EXECUTE                                                                on RKO             to WR_ALL_RIGHTS;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/rko.sql =========*** End *** =======
- PROMPT ===================================================================================== 
- 

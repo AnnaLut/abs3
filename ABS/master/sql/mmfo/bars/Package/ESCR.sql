@@ -61,11 +61,11 @@
 end ESCR;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.ESCR IS
-  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.1.6 20/12/2017';
-  nlchr CHAR(2) := chr(13) || chr(10);
+  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.1.8 26/01/2018';
+  --nlchr CHAR(2) := chr(13) || chr(10);
 
   /*
-
+  26/01/2018 Піванова додано установку статусу по КД одразу після оплати
   24/05/2017 Піванова додано формування копії ГПК до перебудови
   23/12/2016 Піванова виправлена помилка при парсінгу призначення платежу
   19.09.2016 Sta Заменила код оп 013 на PS1
@@ -191,6 +191,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ESCR IS
     p_R2                  number;
     p_P1                  number;
     p_P2                  number;
+    p_P3                  number;
     p_K2                  number;
     aa                    accounts%rowtype;
     kv_                   int := 980;
@@ -288,8 +289,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ESCR IS
                   p_Z5      => p_Z5, --OUT number, -- Плановый остаток по телу  z5 = (SS - z3)
                   p_R1      => p_R1, --OUT number, -- Общий ресурс (ост на SG(262*)
                   p_R2      => p_R2, --OUT number, --  Свободный ресурс R2 =  R1 - z4
-                  p_P1      => p_P1 --OUT number  --  Реф.платежа
-
+                  p_P1      => p_P1  --OUT number  --  Реф.платежа
                   );
       escr.p_cc_lim_count(deal_id      => i.nd,
                           cc_lim_count => l_lim_count_after);
@@ -380,7 +380,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ESCR IS
     escr.oplv(p_ref, null);
   END dop;
   ----------------------------------------------------------------------------------------------------------
-  PROCEDURE pay1(flg_   SMALLINT, -- флаг оплаты
+   PROCEDURE pay1(flg_   SMALLINT, -- флаг оплаты
                  ref_   INTEGER, -- референция
                  vdat_  DATE, -- дата валютировния
                  tt_    CHAR, -- тип транзакции
@@ -396,11 +396,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.ESCR IS
     dd       cc_deal%ROWTYPE;
     aa       accounts%ROWTYPE;
     oo       oper%ROWTYPE;
-    nls_2924 accounts.nls%TYPE;
+    --nls_2924 accounts.nls%TYPE;
     n_ss     NUMBER := 0;
     l_acc8   NUMBER;
     ntmp_    NUMBER;
-    stmp_    VARCHAR2(5);
+    --stmp_    VARCHAR2(5);
     nazn_    VARCHAR2(160);
     i_       INT;
     l_txt    VARCHAR2(70) := NULL;
@@ -439,6 +439,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ESCR IS
     p_r2    NUMBER;
     p_p1    NUMBER;
     p_p2    NUMBER;
+    p_p3    NUMBER;
     p_k2    NUMBER;
     phone_  acc_sms_phones.phone%TYPE;
     l_msgid INTEGER;
@@ -449,7 +450,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ESCR IS
     l_lim_count_after  NUMBER;
     l_lim_sumg         cc_lim.sumg%type;
     l_lim_diff         NUMBER;
-    l_sum_comp         NUMBER;
+    --l_sum_comp         NUMBER;
   BEGIN
 
     BEGIN
@@ -495,7 +496,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.ESCR IS
         set_operw(ref_, 'CC_ID', s_cd);
         set_operw(ref_, 'IDB  ', s_id);
       END IF;
-      IF l_nazn <> 0 THEN
+
+      IF l_nazn <> 0  or L_nazn=0 and l_count<>5  THEN
         i_    := instr(nazn_, ';', 1, 1);
         nazn_ := substr(nazn_, i_ + 1, 160);
 
@@ -625,8 +627,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.ESCR IS
       ----------------------------------------------------------------------- зачислить всю сумму на 2620
       l_txt := l_tx7;
 
+/* VPogoda 
+   -	Перевірку дати укладення кредитних договорів та суми залишку заборгованості – НЕ здійснювати  ( …If dd.sdate >= Dat20_);
+*/   
       -- 23.11.2017 Повернення надлишкових сум  COBUMMFO-5548  - ESCR.
-      If dd.sdate >= Dat20_ then
+--      If dd.sdate >= Dat20_ then
         -------- дати укладення Кредитних договорів – до 19/11/2017 ВКЛЮЧНО (<20),  та після 20.11.2017р ВКЛЮЧНО.(>=20)
         select LEAST(SA_, -a.ostc)
           into SA1_
@@ -635,9 +640,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.ESCR IS
            and n.acc = a.acc
            and a.tip = 'LIM';
         SA2_ := SA_ - SA1_;
-      end if;
+--      end if;
 
-      If SA2_ > 0 then
+/*      If SA2_ > 0 then
         oo.tt := case
                    when oo.mfoa = oo.mfob then
                     'PS1'
@@ -688,10 +693,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.ESCR IS
               oo.kv2,
               oo.nlsa,
               SA2_);
-      end if;
+      end if;*/
 
       --- Зарахувати на 2625 ---------------------------
-      If sa1_ > 0 then
+      If sa_ > 0 then
         gl.payv(flg_,
                 ref_,
                 vdat_,
@@ -699,13 +704,13 @@ CREATE OR REPLACE PACKAGE BODY BARS.ESCR IS
                 1,
                 kv_,
                 nlsm_,
-                sa1_,
+                sa_,
                 kv_,
                 aa.nls,
                 sa1_); -------------3739_05 ---> 2620
          gl.pay(2, ref_, vdat_);
-         bars_audit.info('ESCR PAY1 По КД '||dd.nd ||' ,сума компенсації рівна '|| sa1_);
-      elsif sa1_=0 then
+         bars_audit.info('ESCR PAY1 По КД '||dd.nd ||' ,сума компенсації рівна '|| sa_);
+      elsif sa_=0 then
          DELETE FROM nlk_ref WHERE ref1 = ref_;
          bars_audit.info('ESCR PAY1 По КД '||dd.nd ||' ,сума компенсації рівна 0. Запис з референсом '||ref_ ||' видалено з картотеки.');
       else
@@ -846,7 +851,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.ESCR IS
                       p_r1      => p_r1, --OUT number, -- Общий ресурс (ост на SG(262*)
                       p_r2      => p_r2, --OUT number, --  Свободный ресурс R2 =  R1 - z4
                       p_p1      => p_p1 --OUT number  --  Реф.платежа
-                     --OUT number  --  Реф.платежа
                       );
           escr.p_cc_lim_count(deal_id      => dd.nd,
                               cc_lim_count => l_lim_count_after);
@@ -909,15 +913,20 @@ CREATE OR REPLACE PACKAGE BODY BARS.ESCR IS
                                                  to_char(SYSDATE,
                                                          'DD.MM.YYYY') ||
                                                  '. Dovidka 0800210800',
-                           p_kf              =>sys_context('bars_context','user_mfo'));
-        l_msgid := NULL;
-        phone_  := NULL; -- освобождаем переменную
+																								  p_kf              =>sys_context('bars_context','user_mfo'));
+        --l_msgid := NULL;
+        --phone_  := NULL; -- освобождаем переменную
       EXCEPTION
         WHEN no_data_found THEN
           NULL;
       END;
-
+     -- По КД проставляємо статус "Оплачено"
+      cck_app.set_nd_txt(dd.nd, 'ES000', 11);
+      cck_app.set_nd_txt(dd.nd, 'ES005', 'Кошти зараховано');
+      cck_app.set_nd_txt(dd.nd, 'ES006', sysdate);
+      cck_app.set_nd_txt(dd.nd, 'ES007', 'Кошти зараховано по документу з реф = '||ref_);
     END IF;
+
     RETURN;
 
   END pay1;

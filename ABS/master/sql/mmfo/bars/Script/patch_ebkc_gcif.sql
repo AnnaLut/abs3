@@ -1,7 +1,7 @@
 -- ================================================================================
 -- Module : CDM (EBK)
 -- Author : BAA
--- Date   : 20.09.2017
+-- Date   : 21.11.2017
 -- ================================== <Comments> ==================================
 -- modify table EBKC_GCIF
 -- move data from EBK_GCIF to EBKC_GCIF
@@ -10,8 +10,17 @@
 -- create unique index UK_EBKCGCIF_GCIF
 -- create unique index UK_EBKCGCIF_RNK
 -- move table to correct tablespace
+-- add column MOD_TMS
 -- ================================================================================
 
+SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
+SET FEEDBACK     OFF
+SET DEFINE       OFF
+SET LINES        300
+SET PAGES        500
+SET TERMOUT      ON
+SET TIMING       OFF
+SET TRIMSPOOL    ON
 
 declare
   E_REF_CNSTRN_EXISTS exception;
@@ -58,6 +67,10 @@ end;
 /
 
 commit;
+
+prompt --
+prompt -- create unique index UK_EBKCGCIF_GCIF
+prompt --
 
 declare
   e_idx_not_exists       exception;
@@ -143,6 +156,8 @@ declare
   pragma exception_init( e_idx_exists,      -00955 );
   e_col_already_idx      exception;
   pragma exception_init( e_col_already_idx, -01408 );
+  e_dup_keys_found       exception;
+  pragma exception_init( e_dup_keys_found,  -01452 );
 begin
   execute immediate 'create unique index UK_EBKCGCIF_RNK on EBKC_GCIF ( RNK ) tablespace BRSMDLI';
   dbms_output.put_line( 'Index "UK_EBKCGCIF_RNK" created.' );
@@ -151,10 +166,8 @@ exception
   then dbms_output.put_line( 'Name is already used by an existing object.' );
   when e_col_already_idx 
   then dbms_output.put_line( 'Such column list already indexed.' );
-  -- ORA-01452: cannot CREATE UNIQUE INDEX; duplicate keys found
-  -- select rnk, max(rowid) 
-  --   from EBKC_GCIF
-  --  group by rnk having count(rnk) > 1;
+  when e_dup_keys_found
+  then dbms_output.put_line( 'Cannot create unique index: duplicate keys found' );
 end;
 /
 
@@ -186,3 +199,19 @@ begin
   
 end;
 /
+
+declare
+  e_col_exists           exception;
+  pragma exception_init( e_col_exists, -01430 );
+begin
+  execute immediate 'alter table EBKC_GCIF add ( MOD_TMS timestamp(3) WITH TIME ZONE )';
+  dbms_output.put_line( 'Table altered.' );
+exception
+  when e_col_exists then
+    dbms_output.put_line( 'Column "MOD_TMS" already exists in table.' );
+end;
+/
+
+SET FEEDBACK ON
+
+COMMENT ON COLUMN EBKC_GCIF.MOD_TMS IS 'Дата модифікації в ЄБК';

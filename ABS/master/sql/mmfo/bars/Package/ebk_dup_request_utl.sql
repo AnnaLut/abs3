@@ -27,7 +27,7 @@ is
   --
   -- constants
   --
-  g_body_version  constant   varchar2(64)  := 'version 1.06  2018.01.19';
+  g_body_version  constant   varchar2(64)  := 'version 1.07  2018.04.23';
   g_cust_tp       constant   ebkc_gcif.cust_type%type := 'I';
 
   --
@@ -75,7 +75,7 @@ $end
   end REQUEST_DUPLICATE_MASS;
   
   --
-  --
+  -- REQUEST_GCIF_MASS
   --
   procedure REQUEST_GCIF_MASS
   ( p_batchId          in     varchar2,
@@ -89,18 +89,13 @@ $end
   end REQUEST_GCIF_MASS;
 
   --
-  --
+  -- REQUEST_DEL_GCIF
   --
   procedure REQUEST_DEL_GCIF
-  ( /*p_kf in varchar2,
-    p_rnk in number,*/
-    p_gcif in varchar2
+  ( p_gcif in varchar2
   ) is
   begin
-
-    delete EBKC_GCIF
-     where GCIF = p_gcif;
-
+    EBK_REQUEST_UTL.REQUEST_DEL_GCIF( p_gcif );
   end REQUEST_DEL_GCIF;
 
 

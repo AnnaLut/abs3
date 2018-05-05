@@ -1,61 +1,55 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/ebk_wforms_utl.sql =========*** Run 
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.EBK_WFORMS_UTL 
+create or replace package EBK_WFORMS_UTL
 is
-
+  
   --
   -- constants
   --
   g_header_version  constant varchar2(64)  := 'version 1.03  2016.08.19';
-
-  function show_card_accord_quality( p_kf in varchar2,
-                                     p_rnk in number,
-                                     p_quality_group in varchar2,
-                                     p_percent in number) return number;
-  function show_card_accord_quality2( p_kf in varchar2,
-                                     p_rnk in number,
-                                     p_quality_group in varchar2,
+  
+  function show_card_accord_quality( p_kf in varchar2, 
+                                     p_rnk in number, 
+                                     p_quality_group in varchar2, 
+                                     p_percent in number) return number; 
+  function show_card_accord_quality2( p_kf in varchar2, 
+                                     p_rnk in number, 
+                                     p_quality_group in varchar2, 
                                      p_percent_from in number,
-                                     p_percent_to in number) return number;
+                                     p_percent_to in number) return number; 
   procedure add_card_qlt_log(p_rnk in number);
-
+  
   procedure del_subgr(p_group_id in number,
                       p_subgr_id in number
                      );
   procedure add_subgr(p_group_id in number,
-                      p_sign in varchar2,
-                      p_percent in integer);
-
+                      p_sign in varchar2, 
+                      p_percent in integer);                   
+   
   function get_cust_quantity_for_group(p_group_id in number ) return number;
-
+  
   function get_cust_quantity_for_subgr(p_group_id in number,
                                        p_subgr_id in number) return number;
   function get_cust_subgrp( p_group_id in number
-                           ,p_quality in number) return number DETERMINISTIC;
-
+                           ,p_quality in number) return number DETERMINISTIC; 
+                           
   procedure change_cust_attr (p_rnk in number,
                               p_attr_name in varchar2,
                               p_new_val in varchar2
                               );
-  procedure add_rnk_queue (p_rnk in number);
-
+  procedure add_rnk_queue (p_rnk in number);  
+  
   function get_db_value(p_rnk in number,p_attr_name in varchar2)  return varchar2;
-
+  
   -- на случай если бы была кнопка на случай сохранить все сделанные изменения
   procedure save_card_changes( p_kf in varchar2,
                                p_rnk in number);
-
+  
   --нажатии кнопки изменить атрибут,после изменения рекомендация должна быть стерта
   procedure dell_one_recomm (p_kf in varchar2,
-                             p_rnk in number,
+                             p_rnk in number, 
                              p_attr_name in varchar2
                              );
-
-  -- Возвращает колличество строк для фильтров "Арм Якості"
+   
+  -- Возвращает колличество строк для фильтров "Арм Якості"                             
   procedure get_cust_subgrp_count( p_group_id       in number default 1, /*БПК,Кредиты,Депозиты,,, */
                                    p_prc_quality_id in number default null, /* Подгруппы на первой стр.,null значит Все*/
                                    p_nmk            in varchar2 default null,
@@ -70,7 +64,7 @@ is
                                    p_count_row      out number);
 
   --
-  --
+  -- 
   --
   function GET_RNK
   ( p_rnk  customer.rnk%type
@@ -78,7 +72,7 @@ is
   ) return customer.rnk%type;
 
   --
-  --
+  -- 
   --
   function CUT_RNK
   ( p_rnk  customer.rnk%type
@@ -87,18 +81,24 @@ is
 
 end EBK_WFORMS_UTL;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.EBK_WFORMS_UTL 
-is
 
+show err
+
+----------------------------------------------------------------------------------------------------
+
+create or replace package body EBK_WFORMS_UTL
+is
+  
   --
   -- constants
   --
-  g_body_version  constant varchar2(64)  := 'version 1.04  2017.04.13';
-
+  g_body_version  constant varchar2(64) := 'version 1.06  2017.11.21';
+  g_cust_tp       constant varchar2(1)  := 'I';
+  
   --
   -- variables
   --
-
+  
   function show_card_accord_quality
   ( p_kf            in     varchar2,
     p_rnk           in     number,
@@ -107,18 +107,20 @@ is
   ) return number
   is
   begin
-   if  p_quality_group is null and p_percent is null then --показать все
-    return 1;
-   end if;
-   for x in ( select null from ebk_qualityattr_gourps
-              where kf = p_kf
-                and rnk = p_rnk
-                and name = NVL(p_quality_group, 'card')
-                and quality <= p_percent )
-   loop
-    return 1; --подходит по условию
-   end loop;
-   return  0;
+    if  p_quality_group is null and p_percent is null
+    then --показать все
+      return 1;
+    end if;
+    for x in ( select null 
+                 from ebk_qualityattr_gourps
+                where kf = p_kf
+                  and rnk = p_rnk
+                  and name = NVL(p_quality_group, 'card')
+                  and quality <= p_percent )
+    loop
+     return 1; --подходит по условию
+    end loop;
+    return  0;
   end show_card_accord_quality;
 
   function show_card_accord_quality2(p_kf in varchar2,
@@ -207,40 +209,51 @@ is
      rollback; raise;
   end;
 
- function get_cust_quantity_for_group(p_group_id in number ) return number is
- begin
-    for x in ( select count(1) as qty from tmp_ebk_req_updatecard t
-               where  t.group_id = p_group_id
-                 and  t.kf = gl.kf
-                 and  not exists (select null from customer where rnk = t.rnk and date_off is not null) )
+  function get_cust_quantity_for_group(p_group_id in number )
+    return number
+  is
+  begin
+    for x in ( select count(1) as qty 
+                from EBKC_REQ_UPDATECARD t
+               where t.GROUP_ID  = p_group_id
+                 and t.KF        = gl.kf()
+                 and t.CUST_TYPE = g_cust_tp
+                 and not exists (select null from customer where rnk = t.rnk and date_off is not null) )
     loop
-     return x.qty;
+      return x.qty;
     end loop;
- end get_cust_quantity_for_group;
+  end get_cust_quantity_for_group;
 
- function get_cust_quantity_for_subgr(p_group_id in number,
-                                      p_subgr_id in number) return number is
- l_sql ebk_prc_quality.name%type;
- l_qty number;
- begin
-   for x in (select name from ebk_prc_quality where id = p_subgr_id )
-   loop
-    l_sql := x.name;
-   end loop;
+  --
+  --
+  --
+  function get_cust_quantity_for_subgr(p_group_id in number,
+                                       p_subgr_id in number
+  ) return number
+  is
+    l_sql ebk_prc_quality.name%type;
+    l_qty number;
+  begin
+    for x in (select name from EBK_PRC_QUALITY where id = p_subgr_id )
+    loop
+      l_sql := x.name;
+    end loop;
 
-   if l_sql is not null then
-    execute immediate ' select count(1) as qty '||
-                      '   from tmp_ebk_req_updatecard teru '||
-                      '  where teru.group_id = :p_group_id '||
-                      '   and kf = gl.kf '||
-                      '   and  not exists (select null from customer where rnk = teru.rnk and date_off is not null)'||
-                      '   and teru.quality '||l_sql into l_qty
-                      using p_group_id;
-   end if;
+    if l_sql is not null then
+      execute immediate ' select count(1) as qty '||
+                        '   from EBKC_REQ_UPDATECARD teru '||
+                        '  where teru.group_id = :p_group_id '||
+                        '   and KF = gl.kf '||
+                        '   and CUST_TYPE = '''||g_cust_tp||''''||
+                        '   and not exists (select null from customer where rnk = teru.rnk and date_off is not null)'||
+                        '   and teru.quality '||l_sql 
+         into l_qty
+        using p_group_id;
+    end if;
 
-   return nvl(l_qty,0);
+    return nvl(l_qty,0);
 
- end get_cust_quantity_for_subgr;
+  end get_cust_quantity_for_subgr;
 
  --
  -- GET_CUST_SUBGRP
@@ -253,36 +266,36 @@ is
  is
    l_id_prc_q number;
  begin
-
+   
    bars_audit.trace( '%s.GET_CUST_SUBGRP: Entry with ( p_group_id=%s, p_quality=%s ).'
                    , $$PLSQL_UNIT, to_char(p_group_id), to_char(p_quality) );
-
+   
    for x in ( select esg.id_prc_quality,
                      ( select name  from ebk_prc_quality where id = id_prc_quality ) as prc_level
                 from EBK_SUB_GROUPS esg
                where id_grp = p_group_id
                order by esg.id_prc_quality desc )
    loop
-
+     
      bars_audit.trace( '%s.GET_CUST_SUBGRP: ( id_prc_quality=%s, p_quality=%s ).'
                      , $$PLSQL_UNIT, to_char(x.id_prc_quality), to_char(x.prc_level) );
-
+     
      execute immediate 'select nvl(max(:id_prc_quality),0) from dual where :p_quality '||x.prc_level
-                  into l_id_prc_q
+                  into l_id_prc_q 
                  using x.id_prc_quality, p_quality;
 
      bars_audit.trace( '%s.GET_CUST_SUBGRP: ( l_id_prc_q=%s ).'
                      , $$PLSQL_UNIT, to_char(l_id_prc_q) );
-
-     if l_id_prc_q <> 0
+     
+     if l_id_prc_q <> 0 
      then
        exit;
      end if;
-
+     
    end loop;
-
+   
    return nvl(l_id_prc_q,0);
-
+   
  end GET_CUST_SUBGRP;
 
  procedure change_cust_attr (p_rnk in number,
@@ -347,14 +360,18 @@ is
 
  procedure del_all_recomm(p_rnk in number, p_kf in varchar2 ) is
  begin
-   delete
-     from tmp_ebk_req_updatecard
-    where kf = p_kf
-     and rnk = p_rnk;
 
-   delete from  tmp_ebk_req_updcard_attr
-       where kf = p_kf
-         and rnk = p_rnk;
+   delete
+     from EBKC_REQ_UPDATECARD
+    where kf        = p_kf
+      and rnk       = p_rnk
+      and CUST_TYPE = g_cust_tp;
+
+   delete EBKC_REQ_UPDCARD_ATTR
+    where KF        = p_kf
+      and RNK       = p_rnk
+      and CUST_TYPE = g_cust_tp;
+
  end del_all_recomm;
 
  procedure save_card_changes( p_kf in varchar2,
@@ -380,25 +397,29 @@ is
      return null;
  end get_db_value;
 
- procedure dell_one_recomm (p_kf in varchar2,
-                            p_rnk in number,
-                            p_attr_name in varchar2
-                            ) is
- begin
- -- удаляем конкретную рекомендацию
-   delete from tmp_ebk_req_updcard_attr
-   where kf = p_kf
-     and rnk = p_rnk
-     and name = p_attr_name;
-  -- возможно мы удалили последнию рекомендацию, потому очищаем мастер запись
-  -- это нужно для корректоного подсчета лиц для корректировки
-    delete from tmp_ebk_req_updatecard
-    where kf = p_kf
-      and rnk = p_rnk
-      and not exists (select null from tmp_ebk_req_updcard_attr
-                      where kf = p_kf
-                        and rnk = p_rnk
-                        and quality <> ebk_request_utl.g_correct_quality);
+  procedure dell_one_recomm (p_kf in varchar2,
+                             p_rnk in number,
+                             p_attr_name in varchar2
+                             ) is
+  begin
+    -- удаляем конкретную рекомендацию
+    delete EBKC_REQ_UPDCARD_ATTR
+     where KF        = p_kf
+       and RNK       = p_rnk
+       and CUST_TYPE = g_cust_tp
+       and NAME      = p_attr_name;
+    -- возможно мы удалили последнию рекомендацию, потому очищаем мастер запись
+    -- это нужно для корректоного подсчета лиц для корректировки
+    delete EBKC_REQ_UPDATECARD
+     where KF        = p_kf
+       and RNK       = p_rnk
+       and CUST_TYPE = g_cust_tp
+       and not exists (select null 
+                         from EBKC_REQ_UPDCARD_ATTR
+                        where KF        = p_kf
+                          and RNK       = p_rnk
+                          and CUST_TYPE = g_cust_tp
+                          and quality  != ebk_request_utl.g_correct_quality);
 
    --отправляем rnk вновь в очередь проверок
    add_rnk_queue (p_rnk) ;
@@ -423,15 +444,14 @@ is
    select /*+ index(c PK_CUSTOMER) index(teru INDX_TERU_U1)*/
     count(*)
      into p_count_row
-     from tmp_ebk_req_updatecard teru, customer c,
-          (select gl.kf as kf from dual) ss_kf
+     from EBKC_REQ_UPDATECARD teru
+        , customer c
     where (p_rnk is null or p_rnk = c.rnk)
-      and teru.kf = ss_kf.kf
+      and c.kf  = teru.kf
       and c.rnk = teru.rnk
       and c.date_off is null
-      and group_id = p_group_id
-         --24.09.2015 Irina.Ivanova
-         --and ebk_wforms_utl.show_card_accord_quality(ss_kf.kf, teru.rnk, p_quality_group, p_percent) = 1
+      and teru.CUST_TYPE = g_cust_tp
+      and teru.GROUP_ID  = p_group_id
       and exists (select 1
              from ebk_qualityattr_gourps g
             where kf = teru.kf
@@ -447,22 +467,23 @@ is
              where (ser = p_ser or p_ser is null)
                and (numdoc = p_numdoc or p_numdoc is null)
                and rnk = c.rnk))
-      and (p_prc_quality_id is null or ebk_wforms_utl.get_cust_subgrp(teru.group_id,
-                                                                      teru.quality) =
-          p_prc_quality_id)
-      and (p_attr_qty is null or
-          (select count(a.name)
-              from tmp_ebk_req_updcard_attr a
-             where a.kf = teru.kf
-               and a.rnk = teru.rnk
-                  --24.09.2015 Irina Ivanova
-                  --and quality <> 'C'
-               and (a.recommendvalue is not null or
-                   a.descr is not null)) = p_attr_qty);
+      and ( p_prc_quality_id is null or
+            p_prc_quality_id = EBK_WFORMS_UTL.GET_CUST_SUBGRP(teru.group_id,teru.quality)
+          )
+      and ( p_attr_qty is null or
+            p_attr_qty = (select count(a.name)
+                            from EBKC_REQ_UPDCARD_ATTR a
+                           where a.kf = teru.kf
+                             and a.rnk = teru.rnk
+                             and a.CUST_TYPE = g_cust_tp
+                             and ( a.recommendvalue is not null or
+                                   a.descr is not null )
+                         )
+          );
   end;
-
+  
   --
-  --
+  -- 
   --
   function GET_RNK
   ( p_rnk  customer.rnk%type
@@ -508,9 +529,9 @@ $else
 $end
     return l_rnk;
   end GET_RNK;
-
+  
   --
-  --
+  -- 
   --
   function CUT_RNK
   ( p_rnk  customer.rnk%type
@@ -531,14 +552,7 @@ begin
   null;
 end EBK_WFORMS_UTL;
 /
- show err;
- 
-PROMPT *** Create  grants  EBK_WFORMS_UTL ***
-grant EXECUTE                                                                on EBK_WFORMS_UTL  to BARS_ACCESS_DEFROLE;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/ebk_wforms_utl.sql =========*** End 
- PROMPT ===================================================================================== 
- 
+show err
+
+grant execute on EBK_WFORMS_UTL to BARS_ACCESS_DEFROLE;

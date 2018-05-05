@@ -151,9 +151,9 @@ select v.kf,
        v.vip_Sign                  as vipSign,
        v.no_Taxpayer_Sign          as noTaxpayerSign,
        v.RNK                       as CUST_ID,
-       cast( null as number ) as GCIF, -- g.GCIF,
+       g.GCIF,
        cast( null as number ) as RCIF
-  from ( select RNK
+  from ( select KF, RNK
            from EBKC_QUEUE_UPDATECARD
           where CUST_TYPE = 'L'
             and STATUS    = 0
@@ -161,9 +161,9 @@ select v.kf,
        ) q
   join V_EBKC_LEGAL_PERSON v
     on ( v.RNK = q.RNK )
---left outer
---join EBKC_GCIF g
---  on ( g.RNK = q.RNK )
+  left outer
+  join EBKC_GCIF g
+    on ( g.RNK = q.RNK )
 ;
 
 show errors;

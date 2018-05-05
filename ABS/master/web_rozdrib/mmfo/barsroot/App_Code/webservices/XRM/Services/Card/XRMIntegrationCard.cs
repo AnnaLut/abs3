@@ -30,6 +30,38 @@ namespace Bars.WebServices.XRM.Services.Card
         private const int ErrorResCode = -1;
         public WsHeader WsHeaderValue;
         private IDbLogger _dbLogger;
+        static Dictionary<string, int> kfru;
+
+        public static int Kfru(string _mfo)
+        {
+            if (kfru == null)
+                kfru = new Dictionary<string, int>();
+
+            if (kfru.Count == 0)
+            {
+                using (OracleConnection con = Classes.OraConnector.Handler.IOraConnection.GetUserConnection())
+                using (OracleCommand command = con.CreateCommand())
+                {
+                    command.CommandText = "select kf, to_number(ru) ru from kf_ru";
+                    using (OracleDataReader reader = command.ExecuteReader())
+                    {
+                        int kf_index = reader.GetOrdinal("KF");
+                        int ru_index = reader.GetOrdinal("RU");
+                        if (!reader.HasRows) throw new System.Exception("Невдалося визначити код регіону");
+                        while (reader.Read())
+                        {
+                            kfru[reader.GetString(kf_index)] = reader.GetInt32(ru_index);
+                        }
+                    }
+                }
+            }
+
+            if (kfru.ContainsKey(_mfo))
+                return kfru[_mfo];
+
+            return 0;
+
+        }
         public XRMIntegrationCard()
         {
             moduleName = "XRMIntegrationCard";
@@ -214,6 +246,11 @@ namespace Bars.WebServices.XRM.Services.Card
                     TransSuccess = TransactionCheck(con, XRMCardCreditReq.TransactionId, out responseBytes);
                     if (TransSuccess == 0)
                     {
+                        int k_ru = Kfru(XRMCardCreditReq.KF.ToString());
+                        for (int i = 0; i < XRMCardCreditReq.acc.Length; i++)
+                        {
+                            XRMCardCreditReq.acc[i] = XRMCardCreditReq.acc[i] * 100 + k_ru;
+                        }
                         TransactionCreate(con, XRMCardCreditReq.TransactionId, XRMCardCreditReq.UserLogin, XRMCardCreditReq.OperationType);
                         XRMCardCreditRes = CardWorker.SetCardCredit(XRMCardCreditReq, con);
                     }

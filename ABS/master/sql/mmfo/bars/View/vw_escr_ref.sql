@@ -1,12 +1,9 @@
 
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/VW_ESCR_REF.sql =========*** Run *** ==
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view VW_ESCR_REF ***
-
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/view/vw_escr_ref.sql =========*** Run *** ==
+ PROMPT ===================================================================================== 
+ 
   CREATE OR REPLACE FORCE VIEW BARS.VW_ESCR_REF ("GOOD_ID", "GOOD_NAME", "EVENT_ID", "EVENT_NAME", "EVENT_DATE_FROM", "EVENT_DATE_TO", "EVENT_TYPE", "EVENT_TYPE_ID", "BUILD_TYPE", "BUILD_TYPE_ID", "OB22") AS 
   SELECT t.good_id,
           t.good_name,
@@ -75,16 +72,21 @@ PROMPT *** Create  view VW_ESCR_REF ***
                             AND eb.event_id = ev.id
                             AND eb.build_type_id = bt.id
                             AND ev.event_type = ob.id
-                            AND ev.date_to IS NULL) tt
-           ORDER BY tt.good_id, tt.event_id) t;
-
+                            AND ev.date_to IS NULL
+                            and nvl(bt.state,1) = 1
+                            ) tt
+           ORDER BY tt.good_id, tt.event_id) t
+;
+ show err;
+ 
 PROMPT *** Create  grants  VW_ESCR_REF ***
 grant SELECT                                                                 on VW_ESCR_REF     to BARSREADER_ROLE;
 grant SELECT                                                                 on VW_ESCR_REF     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on VW_ESCR_REF     to UPLD;
 
-
-
+ 
+ 
 PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/VW_ESCR_REF.sql =========*** End *** ==
+PROMPT *** End *** ========== Scripts /Sql/BARS/view/vw_escr_ref.sql =========*** End *** ==
 PROMPT ===================================================================================== 
+ 

@@ -1,13 +1,25 @@
+DROP VIEW BARS.V_OPER_TIMEOPL_KT;
 
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_OPER_TIMEOPL_KT.sql =========*** Run 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_OPER_TIMEOPL_KT ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_OPER_TIMEOPL_KT ("PL", "REF", "TT", "ND", "S", "NLSA", "NLSB", "NAM_A", "NAM_B", "ID_A", "ID_B", "MFOA", "MFOB", "BRANCH", "VDAT", "DAT") AS 
+CREATE OR REPLACE FORCE VIEW BARS.V_OPER_TIMEOPL_KT
+       (
+         PL    ,
+         REF   ,
+         TT    ,
+         ND    ,
+         S     ,
+         NLSA  ,
+         NLSB  ,
+         NAM_A ,
+         NAM_B ,
+         ID_A  ,
+         ID_B  ,
+         MFOA  ,
+         MFOB  ,
+         BRANCH,
+         VDAT  ,
+         DAT
+       )
+AS
   SELECT F_TARIF_RKO( t.NTAR,
                       980   ,
                       o.NLSB,
@@ -85,18 +97,12 @@ UNION ALL
     AND a.KV = 980
     AND a.NBS IN ('2560', '2565', '2600', '2603', '2604', '2650')
     AND o.REF = d.REF  AND  d.ACC = a.ACC  AND  d.DK = 1 AND  d.TT='R01'
-    AND o.PDAT >= SYSDATE - 50;
-
-PROMPT *** Create  grants  V_OPER_TIMEOPL_KT ***
-grant DELETE,INSERT,SELECT,UPDATE                                            on V_OPER_TIMEOPL_KT to ABS_ADMIN;
-grant SELECT                                                                 on V_OPER_TIMEOPL_KT to BARSREADER_ROLE;
-grant DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on V_OPER_TIMEOPL_KT to BARS_ACCESS_DEFROLE;
-grant DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on V_OPER_TIMEOPL_KT to START1;
-grant SELECT                                                                 on V_OPER_TIMEOPL_KT to UPLD;
-grant FLASHBACK,SELECT                                                       on V_OPER_TIMEOPL_KT to WR_REFREAD;
+    AND o.PDAT >= SYSDATE - 50;                               
 
 
 
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_OPER_TIMEOPL_KT.sql =========*** End 
-PROMPT ===================================================================================== 
+GRANT DELETE, INSERT, SELECT, UPDATE, ON COMMIT REFRESH, QUERY REWRITE, DEBUG, FLASHBACK ON BARS.V_OPER_TIMEOPL_KT TO START1;
+
+GRANT SELECT, FLASHBACK ON BARS.V_OPER_TIMEOPL_KT TO WR_REFREAD;
+
+

@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/function/xirr.sql =========*** Run *** =====
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE FUNCTION BARS.XIRR (r_ number) RETURN NUMBER IS
+CREATE OR REPLACE FUNCTION XIRR(r_ number, p_arr_tmp_irr t_tmp_irr default null) RETURN NUMBER IS
 
 /*
 
@@ -40,7 +40,8 @@ k= 3650 irr = 11.6123174034146
    Добавил переменную prec  (точность вычисления эфф ставки) иначе если кто изменит точность только в одном  месте процедура может зависнуть.
 
 -----------------------
-
+06.03.2018 Diver Доданий параметр p_arr_tmp_irr (для можливості використання в піпіленд функціях [value_paper])
+           Якщо він заданий то використовується nested table, а не темпова таблиця tmp_irr  
 30-04-2012 Добавлена обработка идеального потока когда npv=0
 03-09-2012 Sta Ош Не найд.
 04/12/2009 Nov  Расчет эф ставки. Отличительной особенностью от IRR
@@ -58,15 +59,26 @@ k= 3650 irr = 11.6123174034146
    l_ratn     number ;          -- предпологаемая ставка
    step       number := 0.1;    -- Шаг 10% смещения эф ставки
    prec       number := 100000; -- точность вычисления эфф ставки
-
+   k          pls_integer := 0;
 
 BEGIN
    l_ratn := r_/100;
 
-   begin
-     SELECT * BULK COLLECT INTO cf_ FROM TMP_IRR where s<>0 ORDER BY n;
-   EXCEPTION WHEN NO_DATA_FOUND THEN  RETURN 0;
-   end;
+   if p_arr_tmp_irr is not null then
+--     SELECT null, t.n, t.s BULK COLLECT INTO cf_ FROM table(p_arr_tmp_irr) t where t.s<>0 ORDER BY t.n;
+     for i in p_arr_tmp_irr.first..p_arr_tmp_irr.last loop
+       if p_arr_tmp_irr(i).s <> 0 then
+         k := k+1;
+         cf_(k).s := p_arr_tmp_irr(i).s;
+         cf_(k).n := p_arr_tmp_irr(i).n;       
+       end if;  
+     end loop;  
+     else
+     begin
+       SELECT * BULK COLLECT INTO cf_ FROM TMP_IRR where s<>0 ORDER BY n;
+     EXCEPTION WHEN NO_DATA_FOUND THEN  RETURN 0;
+     end;
+   end if;  
 
    loop
       begin

@@ -97,11 +97,11 @@ create or replace force view EBK_QUEUE_UPDATECARD_V
 , GCIF
 , RCIF
 ) as
-select eq.KF,                          -- Код РУ (код МФО)
+select q.KF,                          -- Код РУ (код МФО)
        case
          when ( EBK_PARAMS.IS_CUT_RNK = 1 )
-         then trunc(eq.RNK/100)
-         else eq.RNK
+         then trunc(q.RNK/100)
+         else q.RNK
        end as RNK,                      -- Реєстр. № (РНК)
        ecbi.date_ON  as dateON ,        -- Дата реєстрації
        ecbi.date_OFF as dateOFF,        -- Дата закриття
@@ -177,20 +177,20 @@ select eq.KF,                          -- Код РУ (код МФО)
        ecbi.deposit,
        ecbi.current_account as CurrentAccount,
        ecbi.other,
-       eq.INSERT_DATE as lastChangeDt,
-       eq.RNK as CUST_ID,
-       cast( null as number ) as GCIF, -- eg.GCIF,
+       q.INSERT_DATE as lastChangeDt,
+       q.RNK as CUST_ID,
+       g.GCIF,
        cast( null as number ) as RCIF
   from ( select KF, RNK, INSERT_DATE
            from EBK_QUEUE_UPDATECARD
           where STATUS = 0
           order by ROWID
-       ) eq
+       ) q
   join EBK_CUST_BD_INFO_V  ecbi
-    on ( ecbi.RNK = eq.RNK )
---left outer
---join EBKC_GCIF eg
---  on ( eg.RNK = eq.RNK )
+    on ( ecbi.RNK = q.RNK )
+  left outer
+  join EBKC_GCIF g
+    on ( g.RNK = q.RNK )
 ;
 
 show errors;

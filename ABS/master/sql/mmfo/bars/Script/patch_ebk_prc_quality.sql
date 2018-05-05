@@ -1,6 +1,6 @@
 SET DEFINE OFF;
 
-delete from BARS.EBK_PRC_QUALITY;
+delete from EBK_PRC_QUALITY;
 
 commit;
 

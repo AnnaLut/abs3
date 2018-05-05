@@ -656,6 +656,7 @@ namespace CustomerList
                     "a.acc ACC," +
                     "a.nls NLS," +
                     "a.nlsalt NLSALT," +
+                    "a.nbs NBS," +
                     "a.lcv LCV," +
                     "a.rnk RNK," +
                     "a.nms NMS," +
@@ -1105,6 +1106,7 @@ namespace CustomerList
         {
             string sqlStr = " a.tobo \"Відділення\", a.OB22 \"ОБ22\", a.nls || '(' || a.kv || ')' \"Номер рахунку\" ," +
 			        "a.nlsalt \"Альт. номер рахунку\"," +
+                    "a.nbs \"Баланс. рахунок\"," +
                     "a.lcv \"Валюта\"," +
                     "a.nms \"Найменування рах.\"," +
                     "a.daos \"Дата відкриття\"," +

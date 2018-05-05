@@ -8,6 +8,8 @@ select tag,
   from op_field
  where tag in (select tag
                  from op_rules
-                where tt in (select tt from staff_tts));
+                where (tt in (select tt from staff_tts)
+                      or
+                      exists (select null from dpt_tts_vidd d where d.tt = op_rules.tt )));
 
-grant select,delete,update,insert on bars.v_op_field_xrm to bars_access_defrole;             
+grant select,delete,update,insert on bars.v_op_field_xrm to bars_access_defrole;

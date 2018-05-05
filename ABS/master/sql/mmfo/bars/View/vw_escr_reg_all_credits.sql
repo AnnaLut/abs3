@@ -1,12 +1,9 @@
 
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/VW_ESCR_REG_ALL_CREDITS.sql =========**
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view VW_ESCR_REG_ALL_CREDITS ***
-
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/view/vw_escr_reg_all_credits.sql =========**
+ PROMPT ===================================================================================== 
+ 
   CREATE OR REPLACE FORCE VIEW BARS.VW_ESCR_REG_ALL_CREDITS ("CUSTOMER_ID", "CUSTOMER_NAME", "CUSTOMER_OKPO", "CUSTOMER_REGION", "CUSTOMER_FULL_ADDRESS", "CUSTOMER_TYPE", "SUBS_NUMB", "SUBS_DATE", "SUBS_DOC_TYPE", "DEAL_ID", "DEAL_NUMBER", "DEAL_DATE_FROM", "DEAL_DATE_TO", "DEAL_TERM", "DEAL_PRODUCT", "DEAL_STATE", "DEAL_TYPE_CODE", "DEAL_TYPE_NAME", "DEAL_SUM", "CREDIT_STATUS_ID", "CREDIT_STATUS_NAME", "CREDIT_STATUS_CODE", "CREDIT_COMMENT", "STATE_FOR_UI", "GOOD_COST", "NLS", "ACC", "DOC_DATE", "MONEY_DATE", "COMP_SUM", "VALID_STATUS", "BRANCH_CODE", "BRANCH_NAME", "MFO", "USER_ID", "USER_NAME", "REG_KIND_CODE", "REG_KIND_NAME", "REG_TYPE_CODE", "REG_TYPE_NAME", "CREDIT_STATUS_DATE", "OUTER_NUMBER", "NEW_DEAL_SUM", "NEW_COMP_SUM", "NEW_GOOD_COST", "REG_TYPE_ID", "REG_KIND_ID", "STATE_PRIORITY", "SUBS_AVAILABLE", "AVR_DATE") AS 
   SELECT rez.customer_id,
           rez.customer_name,
@@ -549,7 +546,8 @@ PROMPT *** Create  view VW_ESCR_REG_ALL_CREDITS ***
                   LEFT JOIN deal_atr da ON da.nd = t.nd
                   LEFT JOIN customer_subs cs ON cs.rnk = c.rnk
                   JOIN bars.person p ON p.rnk = c.rnk
-            WHERE     c.custtype = '3'
+            WHERE t.sdate >= to_date('01.04.2018','dd.mm.yyyy')
+                  and c.custtype = '3'
                   AND t.nd NOT IN (SELECT er.deal_numb
                                      FROM bars.vw_escr_errors er)
                   AND t.sos IN (10, 13, 15)
@@ -567,14 +565,16 @@ PROMPT *** Create  view VW_ESCR_REG_ALL_CREDITS ***
           JOIN bars.escr_reg_kind ek ON rez.reg_kind_id = ek.id
           JOIN bars.escr_reg_types et ON rez.reg_type_id = et.id
 ;
-
+ show err;
+ 
 PROMPT *** Create  grants  VW_ESCR_REG_ALL_CREDITS ***
 grant SELECT                                                                 on VW_ESCR_REG_ALL_CREDITS to BARSREADER_ROLE;
 grant SELECT                                                                 on VW_ESCR_REG_ALL_CREDITS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on VW_ESCR_REG_ALL_CREDITS to UPLD;
 
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/VW_ESCR_REG_ALL_CREDITS.sql =========**
-PROMPT ===================================================================================== 
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/view/vw_escr_reg_all_credits.sql =========**
+ PROMPT ===================================================================================== 
+ 
