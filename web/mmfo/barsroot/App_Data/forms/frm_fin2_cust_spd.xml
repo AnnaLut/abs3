@@ -29,7 +29,7 @@
           NVL(customer.crisk,0) = s.FIN (+) and
           customer.branch like  '/'||f_ourmfo||'%' and
           (customer.custtype =3 and NVL(customer.k050,0) = '910')
-          and exists (select 1 from v_fin_cc_deal where branch like  sys_context('bars_context','user_branch')||'%' and vidd between 1 and 3 and rnk = customer.rnk )
+          --and exists (select 1 from v_fin_cc_deal where branch like  sys_context('bars_context','user_branch')||'%' and vidd between 1 and 3 and rnk = customer.rnk )
           --and exists (select 1 from v_gl where dazs is null and rnk = customer.rnk and substr(nbs,1,1) in ('2', '3') )
           ORDER BY 1,2,3
         </sql>
