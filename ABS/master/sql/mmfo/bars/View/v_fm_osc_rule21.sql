@@ -11,10 +11,6 @@ PROMPT *** Create  view V_FM_OSC_RULE21 ***
   select o.ref, o.vdat
   from oper o, opldok p, accounts a, customerw w
  where o.ref = p.ref
-    and substr(decode(o.dk,1,o.nlsa,o.nlsb),1,4) in ('2560', '2570', '2600', '2601', '2602', '2603', '2604', 
-													 '2605', '2606', '2610', '2611', '2615', '2620', '2622', 
-													 '2625', '2630', '2635', '2640', '2641', '2642', '2643', 
-													 '2650', '2651', '2652', '2654', '2655')
    and p.acc = a.acc
    and a.rnk = w.rnk
    and w.tag = 'RIZIK'
