@@ -6432,7 +6432,7 @@ begin
                                xmlelement("insuranceObject",
                                           xmlelement("type", 'person'),
                                           xmlelement("document",
-                                                     xmlforest('EXTERNAL_PASSPORT' "type",
+                                                     xmlforest('PASSPORT' "type",
                                                                p_insurance.ser "series",
                                                                p_insurance.numdoc "number",
                                                                p_insurance.pdate "date"
@@ -15828,6 +15828,7 @@ is
   l_acc         number;
   i number;
   l_batch       number;
+  l_iscrm      varchar2(1) := nvl(sys_context('CLIENTCONTEXT','ISCRM'), '0');  
   h varchar2(100) := 'bars_ow.create_instant_cards. ';
 begin
 
@@ -15966,6 +15967,12 @@ begin
      select bars_sqnc.get_nextval('S_CMCLIENT') into l_cmclient.id from dual;
 
      insert into cm_client_que values l_cmclient;
+     if l_iscrm = '1' then
+        update cm_client t
+           set t.oper_status = 3,
+               t.resp_txt    = '≈мул€ц≥€ обробки за€вки по запитам в≥д CRM'
+         where t.id = l_cmclient.id;
+     end if;
 
   end loop;
 
@@ -15992,6 +15999,7 @@ is
   i             number;
   l_batch       number;
   l_opendate    date;
+  l_iscrm      varchar2(1) := nvl(sys_context('CLIENTCONTEXT','ISCRM'), '0');  
   h varchar2(100) := 'bars_ow.create_instant_cards. ';
 begin
 
@@ -16139,6 +16147,13 @@ begin
 
      insert into cm_client_que values l_cmclient;
 
+     if l_iscrm = '1' then
+        update cm_client t
+           set t.oper_status = 3,
+               t.resp_txt    = '≈мул€ц≥€ обробки за€вки по запитам в≥д CRM'
+         where t.id = l_cmclient.id;
+     end if;
+     
   end loop;
 
   bars_audit.info(h || 'Finish.');

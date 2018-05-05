@@ -1,9 +1,8 @@
-CREATE OR REPLACE PACKAGE BARS.OVRN IS  G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :='ver.2 13.11.2017';
-
+CREATE OR REPLACE PACKAGE OVRN IS  G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :='ver.3 06.04.2018';
+-- 06.04.2018  Нач %% через JOB
  g_TIP  tips.tip%type     := 'OVN';
  g_VIDD cc_vidd.vidd%type := 10   ;  -- <<Солsдарний>> Оверд
  g_VID1 cc_vidd.vidd%type := 110  ;  -- Суб.дог<<Сол?дарний>> Оверд
-
  g_TAG  char(8)   := 'TERM_OVR'; -- Термiн безперервного ОВР, кiл.днiв
  g_TAGD char(8)   := 'TERM_DAY'; -- Термiн(день мiс) для сплати %%
  g_TAGT char(8)   := 'TERM_TRZ'; -- Термiн для вiдсрочки винесення на просрочку кiл.днiв
@@ -70,7 +69,8 @@ procedure DEL_slave  (p_ND number, p_acc number, p_nls varchar2, p_kv int) ;
 procedure Set_ost8   ( p_acc8 number) ;
 procedure OPL1       ( oo IN OUT oper%rowtype); -- опрлата
 procedure background ( p_ini int, p_mode int, p_ND number, p_date date); -- БЭК-сопровождение договора
-procedure INTX       ( p_mode int ,p_dat1 date, p_dat2 date, p_acc8 number, p_acc2 number) ;  -- Протокол начисления %%
+procedure INTX               ( p_mode int ,p_dat1 date, p_dat2 date, p_acc8 number, p_acc2 number) ;  -- JOB-вызов расчет %%
+procedure INTXJ  ( p_User int, p_mode int ,p_dat1 date, p_dat2 date, p_acc8 number, p_acc2 number) ;  -- Собственно расчет  %%
 procedure INTB       ( p_mode int); --- Генерация проводок согласно итоговому протоколу
 procedure OP_3600    ( dd IN cc_deal%rowtype, a26 IN accounts%rowtype , a36 IN OUT accounts%rowtype) ;   -- откр дисконта  3600
 procedure OP_SP      ( dd IN cc_deal%rowtype, a26 IN accounts%rowtype , a67 IN OUT accounts%rowtype, a69 IN OUT accounts%rowtype) ;   -- откр просрочки 2067 + 2069
@@ -106,11 +106,19 @@ procedure repl_acc (p_nd number, p_old_acc number, p_new_kv int, p_new_nls varch
 -------------------
 END ;
 /
-
-CREATE OR REPLACE PACKAGE BODY BARS.OVRN IS
- G_BODY_VERSION  CONSTANT VARCHAR2(64)  :='ver.2 27.02.2018';
+CREATE OR REPLACE PACKAGE BODY OVRN IS
+ G_BODY_VERSION  CONSTANT VARCHAR2(64)  :='ver.2 06.04.2018';
 /*
-28.02.2018 Sta Разделение при начислении %%%
+06.04.2018  Нач %% через JOB
+06.04.2018 Sta Удаление ЧКО одного реф по 2- (и более) счетам
+
+04.04.2018 Sta При авторизации Овердрафта открываются 2 счета 2607 (COBUMMFO-5668).
+20.03.2018 Sta COBUMMFO-6154 дострокове закриття угоди
+               COBUMMFO-6843=автоматичне нарахування пені
+
+01.03.2018 Sta Принудительный выход из серой зоны
+28.02.2018 Sta COBUMMFO-5491=доначис % по просрочке, 
+               COBUMMFO-6917=проблеми при паралельному нарахуванні відсотків Разделение при начислении %%% ---- 
 27.02.2018 Sta Подбор 2608
 27.12.2017 Sta Безусловный вынос на просрочку пр завершении дог
                При закр.дог старый счет 2607 НЕ затирается, хотя он и закрывается. При открытии нового дог. Старый счет перекрывается новым.
@@ -275,19 +283,35 @@ begin
 
 end DEB_LIM;
 -------------
-procedure ins_TRZ
- (p_acc1 number, -- счет-нарушитель (виновник)
-  p_datVZ date, p_datSP date, p_trz int)  is
-  New_datVZ date ;  New_datSP date ;  Old_DatSP date ;
+procedure ins_TRZ -- помещение в серую зону
+ (p_acc1 number,  -- счет-нарушитель (виновник)
+  p_datVZ date ,  -- дата возникновения "плохого" события 
+  p_datSP date ,  -- Дата віноса на просрочку 
+  p_trz int       -- Код "плохого" события  = Код причины помещения в серую зону
+ )  
+is
+  New_datVZ date ;  
+  New_datSP date ;  
+  Old_DatSP date ;
 begin
   New_DatVZ := NVL( p_datVZ, gl.bDate     ) ;
 
-  If p_datSP is null then
+  If p_datSP is null then  -- расчетная по справочнику Причин "Серой зоны"  дата выноса на просрочку 
+
+/*
+1	Порушено дог.кіл.днів в ОВР	15
+2	Нов.ліміт<Деб.зал(Переліміт)	15
+3	НЕпогашення нарах.проц.+коміс.	15
+4	"Ручне" призупинення ОВР	30
+*/
+
      begin  select  New_DatVZ + z.CountD into  New_DatSP  from OVR_ZONE z  where p_trz = z.id;
      EXCEPTION WHEN NO_DATA_FOUND THEN   New_DatSP :=  New_DatVZ + ( CASE WHEN p_trz = 4 THEN 30  else 15 end ) ;
      end;
+
   else  New_DatSP := p_datSP ;
   end if;
+
   New_DatSP := GREATEST ( New_DatVZ,  New_DatSP ) ;
   --------------------------------------------------
   select max (datSP) into Old_datSP from OVR_TERM_TRZ where acc1 = p_acc1 and trz = p_trz ;
@@ -308,6 +332,7 @@ begin
   end if;
 
 end ins_TRZ;
+
 -------------------
 procedure UPD_SOS  (p_nd number ,p_sos int ) is -- Изменение и запоминание состояния дог
       gl_bdate date ;  n_sos int ;  dd cc_deal%rowtype;  a89 accounts%rowtype;   l_txt varchar2(250);  l_mdat date ;  nTmp_  int  ;
@@ -1137,7 +1162,8 @@ begin
             datm1_ :=  add_months( datm0_,  -1 ) ;
             datm2_ :=  add_months( datm0_,  -2 ) ;
             datm3_ :=  add_months( datm0_,  -3 ) ;
-            select datm into datmF_ from OVR_CHKO_DET  where ref = p_s;
+
+            select datm into datmF_ from OVR_CHKO_DET  where ref = p_s and acc = l_acc ;  -- 05.04.2018 Sta Удаление ЧКО одного реф по 2- (и более) счетам
             If datmF_ <  datm3_  then  raise_application_error(g_errn, ' Дата ЧКО > 3 міс'); end if;
             If datmF_ <> datm1_  then
                select trunc(sdate,'MM') into datmD_ from cc_deal where nd = l_nd;
@@ -1252,13 +1278,16 @@ begin
                   least (l_dat2, nvl(II.stp_dat, l_dat2) ) DAT2
             from accounts SN,  accounts SD , int_accn II , accounts aa
            where aa.acc = ii.acc and ii.acc = p_acc  and SN.acc = II.acra and SD.acc = II.acrb  and SN.dazs is null  and SD.dazs is null
-             and ii.id in (0,1)  and ii.acr_dat < least (l_dat2, nvl(II.stp_dat, l_dat2) )
+             and ii.id in (0,1,2)  and ii.acr_dat < least (l_dat2, nvl(II.stp_dat, l_dat2) )
             )
   loop
      acrn.p_int (p_Acc, x.id, x.dat1, x.dat2, oo.s, Null, 1 ) ; -- начисление банковское
      If abs(oo.s) >= 1 then
-        oo.nazn := substr( '%% по рах. '||x.nls||' з '||to_char(x.DAT1,'dd.mm.yyyy')||' по '||to_char (x.DAT2,'dd.mm.yyyy')||
-                                       ' вкл. Ставка '||to_char(acrn.FPROCN(p_acc,x.id,x.DAT2)) , 1, 160 ) ;
+        If x.id = 2 then oo.nazn := 'Пеня';
+        Else             oo.nazn := 'Вiдсотки' ;
+        end if; 
+        oo.nazn := substr( oo.nazn || ' по рах. '||x.nls||' з '||to_char(x.DAT1,'dd.mm.yyyy')||' по '||to_char (x.DAT2,'dd.mm.yyyy')||' вкл. Ставка '||to_char(acrn.FPROCN(p_acc,x.id,x.DAT2)) , 1, 160 ) ;
+
         If oo.s > 0 then oo.dk := 0 ;                  -- пассивы
         else             oo.dk := 1 ; oo.s := - oo.s ; -- актив
         end if;
@@ -1568,6 +1597,7 @@ begin
                   where acc = a8.acc;
 
   OVRN.INT_OLD (aa.acc, DD.SDATE-1 ); ---------- Доначислить проц по <вчера>
+
   -----------------------------------------------------------------
 
   begin insert into nd_acc (nd,acc) values ( dd.nd, aa.acc ); -- добавить 2600 в дог 10
@@ -1583,11 +1613,18 @@ begin
      OVRN.SetIR( dd.nd, aa, 1, (dd.wdate+1), acrn.fprocn(aa.acc,1, (dd.sdate-1) ) ) ; -- /Восстановить собств проц ставку на 26*
   end if;
   -----------------------------------------------------------------
-  --2607   -- Акт % ставка
-  sn.nls := OVRN.Get_Nls (p_R4 => substr(aa.nls,1,3) || '7' ) ; --sn.nls := vkrzn (substr(gl.aMfo,1,5), substr(aa.nls,1,3) || '70'|| substr(aa.nls,6,9) ) ;
-  sn.nms :=  'Нар.%% за ОВР до рах.'||aa.nls;
-  op_reg_ex(mod_=>1,p1_=>dd.nd,p2_=>0,p3_=>aa.grp,p4_=>p4_,rnk_=>aa.rnk,nls_=>sn.nls,kv_=>aa.kv,nms_=>sn.nms,tip_=>'SN ',isp_=>aa.isp, accR_=>sn.acc,tobo_ =>aa.branch);
-  Accreg.setAccountSParam(SN.Acc, 'OB22', '01');
+--04.04.2018 Sta При авторизации Овердрафта открываются 2 счета 2607 (COBUMMFO-5668).  
+  Begin select x.* into sn 
+        from (select * from accounts where tip ='SN ' and nbs = substr(aa.nls,1,3) || '7' and dazs is null ) x, 
+             (select * from int_accn where acc = aa.acc and id = 0) i, 
+             (select * from nd_acc   where nd = dd.nd             ) n 
+        where x.acc = n.acc and n.nd =  dd.nd and i.acra = x.acc ;
+  EXCEPTION WHEN NO_DATA_FOUND THEN --2607   -- Акт % ставка
+       sn.nls := OVRN.Get_Nls (p_R4 => substr(aa.nls,1,3) || '7' ) ; --sn.nls := vkrzn (substr(gl.aMfo,1,5), substr(aa.nls,1,3) || '70'|| substr(aa.nls,6,9) ) ;
+       sn.nms :=  'Нар.%% за ОВР до рах.'||aa.nls;
+       op_reg_ex(mod_=>1,p1_=> dd.nd,p2_=>0,p3_=>aa.grp,p4_=>p4_,rnk_=>aa.rnk,nls_=>sn.nls,kv_=>aa.kv,nms_=>sn.nms,tip_=>'SN ',isp_=>aa.isp, accR_=>sn.acc,tobo_ =>aa.branch);
+       Accreg.setAccountSParam(SN.Acc, 'OB22', '01');
+  end ;
 
   begin select acc into l_acc6 from accounts where nls = nbs_ob22_null( SB_6020.R020, SB_6020.OB22, substr(aa.branch,1,15) ) and kv = gl.baseval;  
   EXCEPTION WHEN NO_DATA_FOUND THEN l_acc6 := null;
@@ -1981,7 +2018,30 @@ begin
 
 end background ;
 ---------------------------------------------
-procedure INTX   ( p_mode int ,p_dat1 date, p_dat2 date, p_acc8 number, p_acc2 number) is  -- Протокол начисления %%
+procedure intX ( p_mode int ,p_dat1 date, p_dat2 date, p_acc8 number, p_acc2 number)  IS -- JOB-вызов расчет %%
+   l_job_id   number;
+   l_job_what varchar2(4000) ;
+   s_Dat1  varchar2(10);
+   s_Dat2  varchar2(10);
+
+begin
+   s_Dat1  := to_char(p_Dat1,'dd.mm.yyyy');
+   s_Dat2  := to_char(p_Dat2,'dd.mm.yyyy');
+
+   l_job_what :=  'OVRN.intXJ ('|| gl.aUid ||', '|| p_mode|| ', to_date ('''||s_Dat1||''',''dd.mm.yyyy''), to_date('''||s_Dat2||''',''dd.mm.yyyy''), ' || p_acc8 ||', '|| p_acc2 || ');';
+   bms.enqueue_msg( 'Розрах. %% по ОВР поставлено в чергу:' || l_job_what, dbms_aq.no_delay, dbms_aq.never, gl.aUid );
+
+    -- стартуем job
+   savepoint before_job_start;
+   dbms_job.submit(job       => l_job_id,
+                   what      => l_job_what,
+                   next_date => sysdate,
+                   interval  => null,
+                   no_parse  => true);
+exception when others then    rollback to savepoint before_job_start;   bars_audit.info('ERROR'||substr(sqlerrm || chr(10) ||    dbms_utility.format_call_stack(), 0,4000));    -- произошли ошибки
+end intx;
+
+procedure INTXJ  ( p_User int, p_mode int ,p_dat1 date, p_dat2 date, p_acc8 number, p_acc2 number) is   -- Собственно расчет  %%
 --  p_mode = 0   3.0) Нарахування дох та витрат (%%, комісія) за ДОВІЛЬНИЙ період
 --                    OVRN.INTX(0, :B, :D,0,0)                :B(SEM=Вкл_З_дати,TYPE=D),:D(SEM=Вкл_ПО_дату,TYPE=D)
 --                    если  p_dat1  = Null = прогноз-нарахування
@@ -2163,8 +2223,9 @@ begin
 
   end loop ; -- a8
   commit;
+   bms.enqueue_msg( 'Розрахунок %% по ОВР користувача '|| p_User|| ' ЗАВЕРШЕНО ! Перегляньте результат ' , dbms_aq.no_delay, dbms_aq.never, p_User );
 
-end intx;
+end intxJ ;
 -----------------
 procedure INTB  (p_mode int) is  --- Генерация проводок согласно итоговому протоколу
   dd cc_deal%rowtype;  oo oper%rowtype;
@@ -2207,11 +2268,9 @@ loop
         end if ;
      end if;
 
-     ---  доначис  %   по просрочке
-     For xx in (select * from accounts where tip ='SP ' and acc in (select acc from nd_acc where nd = dd.nd)   )
+     --COBUMMFO-5491  доначис  %   по просрочке+      -- COBUMMFO-6843=автоматичне нарахування пені
+     For xx in (select * from accounts where tip in  ('SP ','SPN')  and acc in (select acc from nd_acc where nd = dd.nd)   )
      loop OVRN.INT_OLD ( xx.acc, x.dat2 ) ; end loop;  
-
-
 
   EXCEPTION WHEN NO_DATA_FOUND THEN null;
   end ;
@@ -2804,15 +2863,21 @@ end rep_LIM ;
 
 procedure CLS (P_ND NUMBER) IS
   dd  cc_deal%rowtype;
-  AA accounts%rowtype;
-  A8 accounts%rowtype;
+  AA  accounts%rowtype;
+  A8  accounts%rowtype;
   l_bDat_Next date;
   l_Txt varchar2 (250);
   oo oper%rowtype ;
+
 BEGIN
   l_bDat_Next := Dat_Next_U ( gl.bdate, 1 ) ;
-  begin select * into dd from cc_deal where nd = p_nd and wdate < gl.bdate and sos < 15;
-  EXCEPTION  WHEN NO_DATA_FOUND THEN  raise_application_error(g_errn,'Дог '|| p_nd ||' Відсутній серед НЕзакритих з терміном менше '|| to_char(gl.bdate,'dd.mm.yyyy') );
+
+--begin select * into dd from cc_deal where nd = p_nd and wdate < gl.bdate and sos < 15;
+--EXCEPTION  WHEN NO_DATA_FOUND THEN  raise_application_error(g_errn,'Дог '|| p_nd ||' Відсутній серед НЕзакритих з терміном менше '|| to_char(gl.bdate,'dd.mm.yyyy') );
+--end;
+
+  begin select * into dd from cc_deal where nd = p_nd                      and sos < 15;
+  EXCEPTION  WHEN NO_DATA_FOUND THEN  raise_application_error(g_errn,'Дог '|| p_nd ||' Відсутній серед НЕзакритих ' );
   end;
 
 
@@ -2822,6 +2887,31 @@ BEGIN
 
   -- 1) доначислить проценты по дату завершения включительно
   ovrn.INTX (p_mode => 1, p_dat1 => null, p_dat2 => (GL.BDATE-1), p_acc8 =>A8.ACC, p_acc2 =>0) ;
+
+
+  -- 0) ДОПЛАТА ФОРВАРДНОЙ КОМИССИИ ПРИ ДОСРОЧНОМ ЗАКРЫТИИ
+  If DD.wdate >=  gl.bdate then
+     Declare Par2_  Number ;    Par3_   Varchar2 (200);
+     begin -- цикл по счетам 3600, их мюбю несколько = кол-ву участников
+         FOR a36 in (select a.* from accounts  a, nd_acc n where a.acc = n.acc and n.nd = dd.nd and a.NBS = '3600' and a.ostf <> 0 )
+         LOOP oo := null;
+            for k in (select o.ref from opldok o where o.sos=3 and o.fdat >= gl.bdate and o.acc=a36.ACC )
+            loop If oo.NLSA is Null then select * into oo from oper where ref = k.REF; end if;
+                 ful_bak( k.Ref); -- бекнем все форварды 
+            end loop;  -- k
+            -- и сегодня заплатим одной суммой
+            If oo.NLSA is not Null then 
+               oo.REF  := null     ;
+               oo.vdat := gl.bdate ; 
+               oo.dk   := 1 -oo.DK ;
+               oo.S    := -A36.OSTF;
+               oo.S2   := oo.S     ;      
+               oo.Nazn := Substr( 'Остаточна амортизацiя поч.комiсiї по Дог.№ '|| dd.cc_id ||' вiд ' || to_date( dd.sdate, 'dd.mm.yyyy') || ' в зв`язку з достроковим закриттям угоди' , 1, 160) ;
+               OVRN.OPL1 (oo)      ; -- опрлата
+            end if;
+         end loop;  -- a36 
+     end ;
+  end if ;
 
   -- 2) попытка погасить их ----- 1) Погашение всех плановых долгов :
   FOR A26 IN (SELECT * FROM ACCOUNTS WHERE ACCC = A8.ACC  AND ACC IN (SELECT ACC FROM ND_ACC WHERE ND = DD.ND) )

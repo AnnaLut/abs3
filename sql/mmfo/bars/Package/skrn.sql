@@ -1,10 +1,8 @@
-
+PROMPT =====================================================================================
+PROMPT *** Run *** ========== Scripts /Sql/BARS/package/skrn.sql =========*** Run *** ======
+PROMPT =====================================================================================
  
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/skrn.sql =========*** Run *** ======
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.SKRN 
+CREATE OR REPLACE PACKAGE SKRN
 IS
 /*
 
@@ -28,7 +26,7 @@ IS
   SKRNPAR2=1 - использовать индивидуальный счет просрочки
   SKRNPAR3=1 - все проводки в одном референсе документа
 */
-   header_version_        VARCHAR2 (30)            := 'version 6.2 24/05/2017';
+   header_version_        VARCHAR2 (30)            := 'version 6.3 08/02/2018';
 
    skrnpar1_   NUMBER := 0;
    skrnpar2_   NUMBER := 0;
@@ -109,6 +107,12 @@ IS
    -- инициализация переменных-параметров модуля
    PROCEDURE init (parn_ NUMBER);
 
+   -- Операція дострокового закриття договору оренди індивідуального сейфа (нал)
+  PROCEDURE P_ADVANCE_CLOSED_DEAL(DAT_  IN DATE,
+                                  DAT2_ IN DATE,
+                                  N_SK_ IN NUMBER,
+                                  MODE_ IN NUMBER,
+                                  PAR_  IN NUMBER DEFAULT NULL);
 ------------------------------------------------------------------------------------------------------------------------------
    -- НЕ ВИКОРИСТОВУЄТЬСЯ
    FUNCTION get_par (par_ NUMBER) RETURN VARCHAR2;
@@ -121,10 +125,10 @@ IS
 
 END skrn;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.SKRN 
+CREATE OR REPLACE PACKAGE BODY SKRN
 -- *******************************************************************************
 IS
-   version_   constant  varchar2(30)   := 'version 6.15 24/05/2017';
+   version_   constant  varchar2(30)   := 'version 6.17 15/03/2018';
    body_awk   constant  varchar2(512)  := ''
     ||'IND_ACC' ||chr(10)
     ||'M_AMORT' ||chr(10)
@@ -151,6 +155,7 @@ IS
    itemname_       skrynka_menu.NAME%TYPE;
    s_              NUMBER;
    sz_             NUMBER;
+   sa_             NUMBER;
    kv_             NUMBER                   := 980;
    userid_         NUMBER;
    okpok_          VARCHAR2 (14);
@@ -255,7 +260,6 @@ IS
    dni4_           NUMBER;                  -- количество дней периода оплаты
    sd1_            NUMBER;                                   -- дневной тариф
    datp1_          DATE;                       -- дата конца текущего периода
-
    datp2_          DATE;                      -- дата начала будущего периода
    sb1_            NUMBER;                          -- сумма аренды за период
    sb2_            NUMBER;                          -- сумма аренды за период
@@ -320,7 +324,7 @@ IS
          THEN
             INSERT INTO operw(REF, tag, VALUE)
                  VALUES (ref_, 'ATRT', skrnd_.issued);
-         ELSIF k.tag = 'ADRES' and  (l_s_ >= 150000 or l_dk_ = 1)
+         ELSIF k.tag = 'ADRES' and  (l_s_ >= 150000) -- or l_dk_ = 1) --COBUMMFO-5602
          THEN
             INSERT INTO operw(REF, tag, VALUE)
                  VALUES (ref_, 'ADRES', skrnd_.adres);
@@ -732,7 +736,7 @@ IS
                       (SELECT MAX (ss.tariff_date)
                          FROM skrynka_tariff2 ss
                         WHERE ss.tariff = tariff_code_
-        AND del_ >= daysfrom
+                          AND del_ >= daysfrom
                           AND del_ <= daysto
                      AND ss.tariff_date <= bdate_);
          EXCEPTION WHEN NO_DATA_FOUND
@@ -2750,15 +2754,35 @@ BEGIN
      then
         gl.ref (opr.REF);
 
-        gl.in_doc3( ref_   => opr.REF,                    tt_    => opr.tt ,    vob_   => opr.vob,     nd_    => substr(to_char(opr.REF),1,10),
-          pdat_  => SYSDATE ,                   vdat_  => gl.BDATE,   dk_    => 1,
-                kv_    => gl.baseval,   s_     => opr.s,      kv2_   => gl.baseval,  s2_    => opr.s,
-          sk_    =>  opr.sk  ,                  data_  => gl.bdate ,  datp_  => gl.bdate ,
-          nam_a_ => substr(opr.nam_a,1,38),     nlsa_  => opr.nlsa ,  mfoa_  => gl.aMfo  ,
-          nam_b_ => substr(opr.nam_b,1,38),     nlsb_  => opr.nlsb ,  mfob_  => gl.aMfo  ,
-                nazn_  => substr(opr.nazn,1,158),
-                d_rec_ => null,                        id_a_  => opr.id_b ,     id_b_  => opr.id_a ,          id_o_  => null,
-          sign_  => null,                       sos_   => opr.sos,          prty_  => null,        uid_   => null);
+        gl.in_doc3( ref_   => opr.REF,
+                    tt_    => opr.tt ,
+                    vob_   => opr.vob,
+                    nd_    => substr(to_char(opr.REF),1,10),
+                    pdat_  => SYSDATE ,
+                    vdat_  => gl.BDATE,
+                    dk_    => 1,
+                    kv_    => gl.baseval,
+                    s_     => opr.s,
+                    kv2_   => gl.baseval,
+                    s2_    => opr.s,
+                    sk_    =>  opr.sk  ,
+                    data_  => gl.bdate ,
+                    datp_  => gl.bdate ,
+                    nam_a_ => substr(opr.nam_a,1,38),
+                    nlsa_  => opr.nlsa ,
+                    mfoa_  => gl.aMfo  ,
+                    nam_b_ => substr(opr.nam_b,1,38),
+                    nlsb_  => opr.nlsb ,
+                    mfob_  => gl.aMfo  ,
+                    nazn_  => substr(opr.nazn,1,158),
+                    d_rec_ => null,
+                    id_a_  => opr.id_b ,
+                    id_b_  => opr.id_a ,
+                    id_o_  => null,
+                    sign_  => null,
+                    sos_   => opr.sos,
+                    prty_  => null,
+                    uid_   => null);
 
      else opr.ref  := ref_;
      end if;
@@ -2768,12 +2792,24 @@ BEGIN
 
          insert into operw (ref, tag, value)  values ( opr.REF, 'PDV', '1' );
 
-         GL.dyntt2(SOS_     => opr.sos,            MOD1_    => 1,            MOD2_    => 0,
-             REF_     => opr.REF,        VDAT1_   => gl.BDATE,     VDAT2_   => gl.BDATE,
-             TT0_     => opr.tt,         DK_      => 1,              SA_      => opr.s,
-             KVA_     => gl.baseval,       MFOA_    => gl.aMfo,      NLSA_    => opr.nlsa,
-             KVB_     => gl.baseval,       MFOB_    => gl.aMfo,      NLSB_    => opr.nlsb,
-             SB_      => opr.s,          SQ_      => opr.s,        NOM_     => null);
+         GL.dyntt2(SOS_     => opr.sos,            
+                   MOD1_    => 1,            
+                   MOD2_    => 0,
+                   REF_     => opr.REF,        
+                   VDAT1_   => gl.BDATE,     
+                   VDAT2_   => gl.BDATE,
+                   TT0_     => opr.tt,         
+                   DK_      => 1,              
+                   SA_      => opr.s,
+                   KVA_     => gl.baseval,       
+                   MFOA_    => gl.aMfo,      
+                   NLSA_    => opr.nlsa,
+                   KVB_     => gl.baseval,       
+                   MFOB_    => gl.aMfo,      
+                   NLSB_    => opr.nlsb,
+                   SB_      => opr.s,          
+                   SQ_      => opr.s,        
+                   NOM_     => null);
 
             INSERT INTO skrynka_nd_ref(REF, bdate,  nd)
                  VALUES (opr.REF,  gl.bdate,  skrnd_.nd);
@@ -3263,6 +3299,8 @@ end;
         26 -- Внесення до каси на зберігання місту ІБС, який було відкрито Банком без присутності клієнта
         27 -- Повернення клієнту цінностей, що були вилучені при відкритті сейфу без присутності клієнта
         28 -- Внесення коштів у разі недостатньої суми для покриття витрат банку
+        31 -- Дострокове закриття договору оренди індивідуального сейфа через касу
+        32 -- Дострокове закриття договору оренди індивідуального сейфа(безнал)
         */
   prolong_nd      skrynka_nd.nd%type;
   n_acc           accounts.acc%type;
@@ -3294,7 +3332,7 @@ end;
 
     end if;
       -- обязательно обнулить SK для не кассовых операций
-      IF mode_ NOT IN ('10', '12', '14', '15', '18', '19', '21','29')
+      IF mode_ NOT IN ('10', '12', '14', '15', '18', '19', '21','29', '31')
       THEN
          sk_ := NULL;
       END IF;
@@ -3547,13 +3585,368 @@ end;
     ELSIF mode_ = 30 -- Сплат комісії за оформлення довіреності в установі банку на право користування індивідуальним сейфом безготівково
       THEN             -- в таблиця skrynka_menu поле vob3 прописано код тарифу, або дать доступ до введення суми код операції K24 (з відокремленням ПДВ)
      p_commis_of_attorney(dat_, dat2_, n_sk_, mode_, p_sum);
-
-      ELSE
-            bars_error.raise_nerror(l_mod, 'MOD_NOT_FOUND', mode_);
-      END IF;
+    --COBUSUPABS-6272 (5602)
+    ELSIF MODE_ = 31 OR MODE_ = 32 -- Операція дострокового закриття договору оренди індивідуального сейфа
+     THEN
+      p_advance_closed_deal(dat_, dat2_, n_sk_, mode_, par_);
+    ELSE
+      bars_error.raise_nerror(l_mod, 'MOD_NOT_FOUND', mode_);
+    END IF;
 
       COMMIT;
    END;
+   
+ ---------------------------------------------------------------------------------------------------------
+  --       Операція дострокового закриття договору оренди індивідуального сейфа (нал)
+  ---------------------------------------------------------------------------------------------------------
+  PROCEDURE P_ADVANCE_CLOSED_DEAL(DAT_  IN DATE,
+                                  DAT2_ IN DATE,
+                                  N_SK_ IN NUMBER,
+                                  MODE_ IN NUMBER,
+                                  PAR_  IN NUMBER DEFAULT NULL) IS
+    SDOC_    NUMBER;
+    ACC_3600 ACCOUNTS.ACC%TYPE;
+    TYPE T_SKRN_AMORT IS RECORD(
+      N_SK       SKRYNKA_ND.N_SK%TYPE,
+      SNUM       SKRYNKA.SNUM%TYPE,
+      ND         SKRYNKA_ND.ND%TYPE,
+      NLS        ACCOUNTS.NLS%TYPE,
+      KV         ACCOUNTS.KV%TYPE,
+      DAT_BEGIN  SKRYNKA_ND.DAT_BEGIN%TYPE,
+      DAT_END    SKRYNKA_ND.DAT_END%TYPE,
+      OSTC       ACCOUNTS.OSTC%TYPE,
+      AMORT_DATE SKRYNKA_ND.AMORT_DATE%TYPE,
+      S1         NUMBER(30),
+      S2         NUMBER(30),
+      S3         NUMBER(30),
+      SP2        NUMBER(30),
+      SP3        NUMBER(30),
+      CUSTTYPE   SKRYNKA_ND.CUSTTYPE%TYPE,
+      BRANCH     ACCOUNTS.BRANCH%TYPE);
+    L_SKRN_AMORT T_SKRN_AMORT;
+    L_ERR_CHECK1 EXCEPTION;
+
+  BEGIN
+
+    IF PAR_ IS NOT NULL AND PAR_ <> 0 THEN
+
+      ---*************************** Доамортизируем по текущий банковский день включительно
+      BEGIN
+        SAVEPOINT SP1;
+        -- Вычисляем сумму которую надо доамортизировать по введенному договору
+        SELECT N.N_SK,
+               SK.SNUM,
+               N.ND,
+               A.NLS,
+               A.KV,
+               N.DAT_BEGIN,
+               N.DAT_END,
+               A.OSTC, --остаток фактический
+               N.AMORT_DATE,
+               ROUND(SKRN.F_GET_OPLPLAN_SUM(N.ND) * 5 / 6) S1, --Сума, яку треба було б амортизувати на поточну bankdate
+               SKRN.F_GET_CURDOH_SUM(N.ND) S2, --  Прибуток поточного періоду
+               SKRN.F_GET_3600_SUM(N.ND) S3, --  Прибуток майбутніх періодів
+               LEAST(ROUND(SKRN.F_GET_OPLPLAN_SUM_4DATE(N.ND, GL.BD) * 5 / 6) -
+                     SKRN.F_GET_CURDOH_SUM(N.ND),
+                     SKRN.F_GET_3600_SUM(N.ND)) SP2, --Сума, яку треба було б амортизувати на задану дату
+               LEAST(ROUND(SKRN.F_GET_OPLPLAN_SUM_4PERIOD(N.ND,
+                                                          N.AMORT_DATE + 1,
+                                                          LEAST(GL.BD,
+                                                                N.DAT_END)) * 5 / 6),
+                     SKRN.F_GET_3600_SUM(N.ND)) SP3, --  Сума, яку треба було б амортизувати за заданий проміжок часу
+               N.CUSTTYPE,
+               A.BRANCH
+          INTO L_SKRN_AMORT
+          FROM SKRYNKA_ND N, SKRYNKA_ACC S, ACCOUNTS A, SKRYNKA SK
+         WHERE N.N_SK = S.N_SK
+           AND S.ACC = A.ACC
+           AND S.TIP = 'M'
+           AND N.SOS <> 15
+           AND N.N_SK = SK.N_SK
+           AND N.ND = PAR_
+           AND ((SKRN.F_GET_OPL_SUM(N.ND) > 0 AND
+               ROUND(SKRN.F_GET_OPLPLAN_SUM_4DATE(N.ND, BANKDATE) * 5 / 6) <>
+               SKRN.F_GET_CURDOH_SUM(N.ND)) OR (N.AMORT_DATE IS NOT NULL))
+         ORDER BY N_SK;
+
+        DBMS_OUTPUT.PUT_LINE(L_SKRN_AMORT.N_SK || ' ' || L_SKRN_AMORT.SNUM || ' ' ||
+                             L_SKRN_AMORT.ND || ' ' || L_SKRN_AMORT.NLS || ' ' ||
+                             L_SKRN_AMORT.KV || ' ' ||
+                             L_SKRN_AMORT.DAT_BEGIN || ' ' ||
+                             L_SKRN_AMORT.DAT_END || ' ' ||
+                             L_SKRN_AMORT.OSTC || ' ' ||
+                             L_SKRN_AMORT.AMORT_DATE || ' ' ||
+                             L_SKRN_AMORT.S1 || ' ' || L_SKRN_AMORT.S2 || ' ' ||
+                             L_SKRN_AMORT.S3 || ' ' || L_SKRN_AMORT.SP2 || ' ' ||
+                             L_SKRN_AMORT.SP3 || ' ' ||
+                             L_SKRN_AMORT.CUSTTYPE || ' ' ||
+                             L_SKRN_AMORT.BRANCH);
+
+        -- визначаємо рахунок 6119 відповідно типу клієнта
+        P_NLS_6519(L_SKRN_AMORT.CUSTTYPE);
+        DBMS_OUTPUT.PUT_LINE('POSLE: ' || NLS6519_ || ' ' || NMS6519_);
+
+        IF L_SKRN_AMORT.AMORT_DATE IS NOT NULL THEN
+          SDOC_ := L_SKRN_AMORT.SP3;
+        ELSE
+          SDOC_ := L_SKRN_AMORT.SP2;
+        END IF;
+
+        -- определяем счет 3600
+        SELECT SUBSTR(A.NMS, 1, 38), A.NLS, A.ACC
+          INTO NMS3600_, NLS3600_, ACC_3600
+          FROM SKRYNKA_ND_ACC S, ACCOUNTS A, SKRYNKA_ND N
+         WHERE S.TIP = 'D'
+           AND S.ND = N.ND
+           AND S.ACC = A.ACC
+           AND N.ND = L_SKRN_AMORT.ND
+           AND N.SOS = 0;
+
+        DBMS_OUTPUT.PUT_LINE(NMS3600_ || ' ' || NLS3600_ || ' ' ||
+                             ACC_3600);
+
+        IF SDOC_ > 0 THEN
+          DBMS_OUTPUT.PUT_LINE('СОздаем документ 3600-6519');
+          -- Назначение платежа
+          NAZN_ := 'Доходи звітного періоду по сейфу № ' ||
+                   LPAD(TO_CHAR(L_SKRN_AMORT.SNUM), 3, '0') ||
+                   ' (відділення ' || L_SKRN_AMORT.BRANCH || ' )' ||
+                   ' реф.дог. ' || TO_CHAR(L_SKRN_AMORT.ND) || '. Без ПДВ.';
+
+          -- референс документа
+          GL.REF(REF_);
+          DBMS_OUTPUT.PUT_LINE('REF_1:' || REF_);
+
+          -- определяем переменные;
+          NLSA_  := NLS3600_;
+          NAM_A_ := SUBSTR(NMS3600_, 1, 38);
+          --okpoa_  := skrnd_.okpo1;
+          MFOA_  := GL.AMFO;
+          NLSB_  := NLS6519_;
+          NAM_B_ := SUBSTR(NMS6519_, 1, 38);
+          --okpob_  := skrnd_.okpo1;
+          OKPOB_ := F_OUROKPO;
+          MFOB_  := GL.AMFO;
+          DK_    := 1;
+          SK_    := NULL;
+          KV_    := 980;
+
+          -- Создаем новый документ в опере
+          GL.IN_DOC3(REF_,
+                     TT2_,
+                     VOB2_,
+                     SUBSTR(REF_, 4, 10),
+                     SYSDATE,
+                     BANKDATE_,
+                     DK_,
+                     KV_,
+                     SDOC_,
+                     KV_,
+                     SDOC_,
+                     SK_,
+                     BANKDATE_,
+                     BANKDATE_,
+                     NAM_A_,
+                     NLSA_,
+                     MFOA_,
+                     NAM_B_,
+                     NLSB_,
+                     MFOB_,
+                     NAZN_,
+                     NULL,
+                     OKPOA_,
+                     OKPOB_,
+                     NULL,
+                     NULL,
+                     0,
+                     NULL,
+                     NULL);
+
+          GL.PAYV(0,
+                  REF_,
+                  BANKDATE_,
+                  TT2_,
+                  DK_,
+                  KV_,
+                  NLSA_,
+                  SDOC_,
+                  KV_,
+                  NLSB_,
+                  SDOC_);
+
+          IF REF_ IS NOT NULL THEN
+            INSERT INTO SKRYNKA_ND_REF
+              (REF, BDATE, ND)
+            VALUES
+              (REF_, BANKDATE_, L_SKRN_AMORT.ND);
+          END IF;
+
+          -- Завжди проставляти дату останньої амортизації
+          UPDATE SKRYNKA_ND
+             SET AMORT_DATE = LEAST(LAST_DAY(BANKDATE), DAT_END)
+           WHERE ND = L_SKRN_AMORT.ND;
+        END IF;
+
+        --*****************************Возвращаем остаток с амортизации************************************
+        -- остаток на счете 3600
+        SA_ := NVL(FOST(ACC_3600, GL.BD), 0) - SDOC_;
+        DBMS_OUTPUT.PUT_LINE('SA_' || SA_);
+
+        IF SA_ > 0 THEN
+          IF MODE_ = 31 THEN
+            --определение параметров проводки
+            NAM_A_ := NMS3600_;
+            NLSA_  := SUBSTR(NLS3600_, 1, 38);
+            MFOA_  := GL.AMFO;
+
+            NAM_B_ := SUBSTR(COALESCE(SKRND_.FIO, SKRND_.NMK), 1, 38);
+            NLSB_  := NLSKAS_;
+            MFOB_  := GL.AMFO;
+            OKPOB_ := F_OUROKPO;
+
+            NAZN_ := 'Повернення неамортизованних коштів, сейф № ' ||
+                     TO_CHAR(SKR_.SNUM) ||
+                     ' в зв''язку з закінченням договору № ' ||
+                     TO_CHAR(SKRND_.NDOC) || ' від ' ||
+                     TO_CHAR(SKRND_.DOCDATE, 'dd.mm.yyyy') || ', без ПДВ.';
+            -- кредит реальный
+            DK_ := 1;
+
+          ELSIF MODE_ = 32 THEN
+            BEGIN
+              SELECT NMS
+                INTO NMSKAS_
+                FROM ACCOUNTS
+               WHERE NLS = SKRND_.NLSK
+                 AND KV = '980';
+            EXCEPTION
+              WHEN NO_DATA_FOUND THEN
+                RAISE L_ERR_CHECK1;
+                -- Рахунок клієнта не заповнено або заповнено не вірно
+            END;
+            --
+            NLSA_  := SUBSTR(NLS3600_, 1, 38);
+            NAM_A_ := NMS3600_;
+            MFOA_  := GL.AMFO;
+            NLSB_  := SKRND_.NLSK;
+            NAM_B_ := SUBSTR(SKRND_.NMK, 1, 38);
+            MFOB_  := GL.AMFO;
+            --okpob_ := skrnd_.okpo1;
+            OKPOB_ := F_OUROKPO;
+
+            NAZN_   := 'Повернення неамортизованних коштів, сейф № ' || -- було "Повернення застави за ключ"
+                       TO_CHAR(SKR_.SNUM) ||
+                       ' в зв''язку з закінченням терміну дії договору № ' ||
+                       TO_CHAR(SKRND_.NDOC) || ' від ' ||
+                       TO_CHAR(SKRND_.DOCDATE, 'dd.mm.yyyy') ||
+                       ', без ПДВ.';
+            NLSKAS_ := SKRND_.NLSK;
+            DK_     := 1;
+
+          END IF;
+
+          -- ДОКУМЕНТ 1 возврат амортизации
+          DBMS_OUTPUT.PUT_LINE('СОздаем документ 3600-1002');
+          GL.REF(REF_);
+          DBMS_OUTPUT.PUT_LINE('REF_2:' || REF_);
+
+          INSERT INTO OPER
+            (REF,
+             TT,
+             VOB,
+             ND,
+             DK,
+             PDAT,
+             VDAT,
+             DATD,
+             DATP,
+             NAM_A,
+             NLSA,
+             MFOA,
+             KV,
+             S,
+             NAM_B,
+             NLSB,
+             MFOB,
+             KV2,
+             S2,
+             NAZN,
+             USERID,
+             ID_A,
+             ID_B,
+             SK)
+          VALUES
+            (REF_,
+             TT_,
+             VOB_,
+             SUBSTR(REF_, 4, 10),
+             DK_,
+             SYSDATE,
+             BANKDATE_,
+             BANKDATE_,
+             BANKDATE_,
+             NAM_A_,
+             NLSA_,
+             MFOA_,
+             KV_,
+             SA_,
+             NAM_B_,
+             NLSB_,
+             MFOB_,
+             KV_,
+             SA_,
+             NAZN_,
+             USERID_,
+             OKPOA_,
+             OKPOB_,
+             SK_);
+
+          GL.PAYV(0,
+                  REF_,
+                  BANKDATE_,
+                  TT_,
+                  DK_,
+                  KV_,
+                  NLSA_,
+                  SA_,
+                  KV_,
+                  NLSB_,
+                  SA_);
+
+          IF REF_ IS NOT NULL THEN
+            INSERT INTO SKRYNKA_ND_REF
+              (REF, BDATE, ND)
+            VALUES
+              (REF_, BANKDATE_, SKRND_.ND);
+          END IF;
+
+          IF NVL(SKRND_.CUSTTYPE, 3) = 3 THEN
+            OPERW_FL(REF_);
+          ELSE
+            OPERW_UL(REF_);
+          END IF;
+        END IF;
+
+     EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+          ROLLBACK TO SP1;
+          BARS_ERROR.RAISE_NERROR(L_MOD, 'DEAL_CLOSED_ND', PAR_);
+
+        WHEN L_ERR_CHECK1 THEN
+          ROLLBACK TO SP1;
+          BARS_ERROR.RAISE_NERROR(L_MOD, 'NOT_NLK_CLIENT', N_SK_);
+
+        WHEN OTHERS THEN
+          ROLLBACK TO SP1;
+          BARS_ERROR.RAISE_NERROR(L_MOD, 'DEAL_CLOSED_ND', PAR_);
+          --RAISE_APPLICATION_ERROR(-20343, SQLCODE || ' ' || SQLERRM);
+          
+      END;
+
+    END IF;
+
+  END P_ADVANCE_CLOSED_DEAL;
+    
 ---------------------------------------------------------------------------------------------------------
 --        Закриття відпрацьованих 3600
 ---------------------------------------------------------------------------------------------------------
@@ -4567,7 +4960,7 @@ BEGIN
    init(NULL);
 END;
 /
- show err;
+show err;
  
 PROMPT *** Create  grants  SKRN ***
 grant EXECUTE                                                                on SKRN            to BARS_ACCESS_DEFROLE;
@@ -4576,7 +4969,6 @@ grant EXECUTE                                                                on 
 
  
  
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/skrn.sql =========*** End *** ======
- PROMPT ===================================================================================== 
- 
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/package/skrn.sql =========*** End *** ======
+PROMPT ===================================================================================== 

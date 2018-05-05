@@ -1,12 +1,9 @@
 
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/VW_ESCR_REF_CENTURA.sql =========*** Ru
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view VW_ESCR_REF_CENTURA ***
-
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/view/vw_escr_ref_centura.sql =========*** Ru
+ PROMPT ===================================================================================== 
+ 
   CREATE OR REPLACE FORCE VIEW BARS.VW_ESCR_REF_CENTURA ("GOOD_ID", "GOOD_NAME", "EVENT_ID", "EVENT_NAME", "EVENT_DATE_FROM", "EVENT_DATE_TO", "EVENT_TYPE", "EVENT_TYPE_ID", "BUILD_TYPE", "BUILD_TYPE_ID", "OB22") AS 
   SELECT t.good_id,
           t.good_name,
@@ -75,16 +72,20 @@ PROMPT *** Create  view VW_ESCR_REF_CENTURA ***
                             AND eb.event_id = ev.id
                             AND eb.build_type_id = bt.id
                             AND ev.event_type = ob.id
-                            AND ev.date_to IS NULL) tt
-           ORDER BY tt.good_id, tt.event_id) t;
-
+                            AND ev.date_to IS NULL
+                            and nvl(bt.state,1) = 1) tt
+           ORDER BY tt.good_id, tt.event_id) t
+;
+ show err;
+ 
 PROMPT *** Create  grants  VW_ESCR_REF_CENTURA ***
 grant SELECT                                                                 on VW_ESCR_REF_CENTURA to BARSREADER_ROLE;
 grant SELECT                                                                 on VW_ESCR_REF_CENTURA to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on VW_ESCR_REF_CENTURA to UPLD;
 
-
-
+ 
+ 
 PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/VW_ESCR_REF_CENTURA.sql =========*** En
+PROMPT *** End *** ========== Scripts /Sql/BARS/view/vw_escr_ref_centura.sql =========*** En
 PROMPT ===================================================================================== 
+ 

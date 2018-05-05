@@ -1,8 +1,4 @@
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/ebkc_wforms_utl.sql =========*** Run
- PROMPT ===================================================================================== 
- 
-CREATE OR REPLACE PACKAGE BARS.EBKC_WFORMS_UTL 
+create or replace package EBKC_WFORMS_UTL 
 is
 
   --
@@ -148,7 +144,7 @@ end EBKC_WFORMS_UTL;
 
 show errors;
 
-CREATE OR REPLACE PACKAGE BODY BARS.EBKC_WFORMS_UTL 
+create or replace package body EBKC_WFORMS_UTL 
 is
 
   --
@@ -1074,14 +1070,7 @@ begin
   null;
 end EBKC_WFORMS_UTL;
 /
- show err;
- 
-PROMPT *** Create  grants  EBKC_WFORMS_UTL ***
-grant EXECUTE                                                                on EBKC_WFORMS_UTL to BARS_ACCESS_DEFROLE;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/ebkc_wforms_utl.sql =========*** End
- PROMPT ===================================================================================== 
- 
+show err;
+
+grant EXECUTE on EBKC_WFORMS_UTL to BARS_ACCESS_DEFROLE;

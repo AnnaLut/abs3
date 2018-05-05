@@ -28,6 +28,12 @@
           </xsl:attribute>
           <xsl:text>Альт. номер рахунку</xsl:text>
         </TD>
+        <TD width="15%">
+          <xsl:attribute name="onclick">
+            <xsl:text>Sort('NBS')</xsl:text>
+          </xsl:attribute>
+          <xsl:text>Баланс. рахунок</xsl:text>
+        </TD>
         <TD>
           <xsl:attribute name="onclick">
             <xsl:text>Sort('LCV')</xsl:text>
@@ -207,6 +213,15 @@
               <xsl:value-of select="concat('NLSALT_',position())" />
             </xsl:attribute>
             <xsl:value-of select="NLSALT" />
+          </TD>
+          <TD>
+            <xsl:if test="$blk>0">
+              <xsl:attribute name="style">color:white;background-color:purple</xsl:attribute>
+            </xsl:if>
+            <xsl:attribute name="id">
+              <xsl:value-of select="concat('NBS_',position())" />
+            </xsl:attribute>
+            <xsl:value-of select="NBS" />
           </TD>
           <TD>
             <xsl:if test="$blk>0">

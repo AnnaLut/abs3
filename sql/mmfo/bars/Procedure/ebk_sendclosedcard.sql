@@ -125,10 +125,5 @@ begin
   
 end ebk_SendClosedCard;
 /
-show err;
 
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/EBK_SENDCLOSEDCARD.sql =========**
-PROMPT ===================================================================================== 
+show err

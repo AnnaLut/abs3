@@ -24,13 +24,13 @@ is
     -- Устанавливает максимальный idupd по таблицам-зависимостям объекта (в случае успешной выгрузки)
     --
     procedure reset_object_idupd(p_object_name varchar2, p_kf varchar2 default sys_context('bars_context', 'user_mfo'));
-    
+
     --
     -- Очистка витрины для дельты (ежедневная)
     -- p_kf - МФО, для которого очищаем данные; для слэша очищаем витрину полностью
     --
     procedure clear_datamart (p_datamart_name in varchar2, p_kf in varchar2 default sys_context('bars_context', 'user_mfo'));
-    
+
     --
     -- Очистка всех витрин для дельты (ежедневная)
     -- p_kf - МФО, для которого очищаем данные; для слэша очищаем витрины полностью
@@ -178,7 +178,7 @@ is
         for rec in (select table_name from imp_object_dependency where kf = p_kf)
         loop
             -- e.g. "select max(idupd) from bars.customer_update where kf = 300465"
-            execute immediate 'select max(idupd) from bars.'||rec.table_name||' where kf = '||p_kf into l_max_idupd;
+            execute immediate 'select max(idupd) from bars.'||rec.table_name||case when G_IS_MMFO = 1 then ' where kf = '||p_kf else '' end into l_max_idupd;
 
             update imp_object_dependency
             set idupd = l_max_idupd
@@ -187,7 +187,7 @@ is
             and kf = p_kf;
         end loop;
     end reset_object_idupd;
-    
+
     --
     -- Очистка витрины для дельты (ежедневная)
     -- p_kf - МФО, для которого очищаем данные; для слэша очищаем витрину полностью
@@ -207,7 +207,7 @@ is
         when resourse_busy then
             bars.bars_audit.error(l_trace || 'resourse busy; очистим в следующий раз');
     end clear_datamart;
-    
+
     --
     -- Очистка всех витрин для дельты (ежедневная)
     -- p_kf - МФО, для которого очищаем данные; для слэша очищаем витрины полностью
@@ -630,7 +630,7 @@ is
                                 "'3'_C22" p_house_id
                            from (select bars.customer_address.rnk, type_id, country,zip, domain, region, locality, address, territory_id, locality_type, street_type,
                                    street, home_type, home, homepart_type, homepart, room_type, room, koatuu, region_id, area_id, settlement_id, street_id, house_id 
-                                   from bars.customer_address 
+                                   from bars.customer_address
                                    join delta on bars.customer_address.rnk = delta.rnk)
                           pivot (max(country) c1, max(zip) c2, max(domain) c3, max(region) c4, max(locality) c5, max(address) c6, max(territory_id) c7,
                           max(locality_type) c8, max(street_type) c9, max(street) c10, max(home_type) c11, max(home) c12, max(homepart_type) c13,
@@ -648,7 +648,7 @@ is
                                     "'TEL_D'_CC"  as tel_d,
                                     "'UADR'_CC"   as UADR
                                from (select w.rnk, tag, value
-                                       from bars.customerw w 
+                                       from bars.customerw w
                                        join delta on w.rnk = delta.rnk
                                       where tag in ('CIGPO','EMAIL','GR   ','MPNO ','VIP_K', 'TEL_D', 'UADR')
                                     )
@@ -756,7 +756,7 @@ is
                                       "'DOV_A'_CC" as DOV_A,
                                       "'DOV_F'_CC" as DOV_F
                                from (select w.rnk, tag, value
-                                       from bars.customerw w 
+                                       from bars.customerw w
                                        join delta on w.rnk = delta.rnk
                                       where tag in ('SUBSD','SUBSN','ELT_N','ELT_D','SW_RN','Y_ELT','BUSSS','PC_MF',
                                                     'PC_Z4','PC_Z3','PC_Z5','PC_Z2','PC_Z1','AGENT','PC_SS','STMT',
@@ -1028,9 +1028,9 @@ is
 
         p_rows_ok := sql%rowcount;
         select count(*) into p_rows_err from ERR$_CLIENTFO2 where changenumber = l_changenumber;
-        
+
         reset_object_idupd(c_object_name);
-        
+
         p_status := 'SUCCESS';
 
         bars.bars_audit.info(g_trace||c_object_name||': finished');
@@ -1038,12 +1038,14 @@ is
         when others then
             rollback to imp_start;
             p_status := 'ERROR';
-            bars.bars_audit.error(g_trace||c_object_name||': '|| sqlerrm || ':' || dbms_utility.format_error_stack); /*test*/
+            bars.bars_audit.error(g_trace||c_object_name||': '|| dbms_utility.format_error_stack || chr(10) ||dbms_utility.format_error_backtrace);
             raise;
     end import_clientfo2;
 
     procedure import_client_address
         is
+
+	l_ourmfo varchar2(6) := sys_context('bars_context', 'user_mfo');
     begin
         null;
     end import_client_address;
@@ -1196,7 +1198,9 @@ is
     end imp_run;
 
 begin
-    null;
+    select case when count(*)>1 then 1 else 0 end
+    into G_IS_MMFO
+    from bars.mv_kf;
 end;
 /
 show errors;

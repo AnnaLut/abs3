@@ -2758,6 +2758,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.OW_FILES_PROC is
 
       l_rec_id    number;
 
+	  l_p1      number;
+      l_p2      number;
+	  
       h          varchar2(100) := 'ow_files_proc.put_doc_sign. ';
   begin
 
@@ -2810,7 +2813,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.OW_FILES_PROC is
                        NULL,NULL,datA_,d_rec_,0,p_ref,0);
 
 
-
+           if err_ <> 0 then
+              rollback to sp_pay;
+              p_back_dok(p_ref, 5, null, l_p1, l_p2);
+           end if;
         --уточнить, нужно ли
          --p_fm_extdoccheck(rec_);
          end if;

@@ -227,7 +227,7 @@ END CCK_APP;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.CCK_APP AS
 
- G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 7 25/10/2017';
+ G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 8 30/03/2018';
 
 --------------------------------------------------------------
 
@@ -647,6 +647,11 @@ begin
   if p_TAG is null then
     raise_application_error(-20203,'\    CCK_APP.Set_ND_TXT :Для договору Реф='||p_ND||' Значення='||p_txt||' Не вказан TAG' ,TRUE);
   end if;
+
+  if p_tag in ('ES084','ES236', 'ES374') and p_txt = '3' and gl.bDATE > to_date('01.04.2018','dd.mm.yyyy') then
+    raise_application_error(-20201,'\   CCK_APP.Set_ND_TXT : Відповідно до вимог з 01.04.2018 заборонено видавати енергокредити для багатоквартирних будинків',TRUE);
+  end if;
+
 
   if p_txt is null then
     delete from nd_txt where nd=p_nd and tag=p_tag;

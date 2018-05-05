@@ -6,10 +6,14 @@
 -- create view EBK_CUST_BD_INFO_V ( contains data for send to EBK )
 -- ======================================================================================
 
+SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
+SET ECHO         OFF
+SET LINES        500
+SET PAGES        500
 
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/EBK_CUST_BD_INFO_V.sql =========*** Run
-PROMPT ===================================================================================== 
+prompt -- ======================================================
+prompt -- create view EBK_CUST_BD_INFO_V
+prompt -- ======================================================
 
 create or replace view EBK_CUST_BD_INFO_V
 as
@@ -99,10 +103,11 @@ select c.KF as kf,
     on ( ad.RNK = c.RNK and ad.TYPE_ID = 1 )
 ;
 
-PROMPT *** Create  grants  EBK_CUST_BD_INFO_V ***
-grant SELECT                                                                 on EBK_CUST_BD_INFO_V to BARSREADER_ROLE;
-grant SELECT                                                                 on EBK_CUST_BD_INFO_V to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on EBK_CUST_BD_INFO_V to UPLD;
+show err
 
+prompt =========================================
+prompt Grants
+prompt ==========================================
 
-grant select on EBK_CUST_BD_INFO_V to BARS_ACCESS_DEFROLE;
+grant SELECT on EBK_CUST_BD_INFO_V to BARS_ACCESS_DEFROLE;
+grant SELECT on EBK_CUST_BD_INFO_V to BARSREADER_ROLE;

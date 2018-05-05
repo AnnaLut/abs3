@@ -154,25 +154,40 @@ end;
 /
 
 declare
-  e_tab_not_exists exception;
+  e_tab_not_exists       exception;
   pragma exception_init( e_tab_not_exists, -00942 );
 begin
   execute immediate 'drop table EBKC_RCIF';
   dbms_output.put_line( 'Table dropped.' );
 exception
-  when e_tab_not_exists then
-    dbms_output.put_line( 'Table "EBKC_RCIF" does not exist.' );
+  when e_tab_not_exists 
+  then null;
 end;
 /
 
 declare
-  e_tab_not_exists exception;
+  e_tab_not_exists       exception;
   pragma exception_init( e_tab_not_exists, -00942 );
 begin
   execute immediate 'drop table EBK_RCIF';
   dbms_output.put_line( 'Table dropped.' );
 exception
-  when e_tab_not_exists then
-    dbms_output.put_line( 'Table "EBK_RCIF" does not exist.' );
+  when e_tab_not_exists
+  then null;
 end;
 /
+
+declare
+  e_job_not_exists       exception;
+  pragma exception_init( e_job_not_exists, -27475 );
+begin
+  DBMS_SCHEDULER.DROP_JOB
+  ( job_name  => 'EBK_RCIF_PACAKGES_JOB'
+  , force     => TRUE );
+  dbms_output.put_line( 'Job dropped.' );
+exception
+  when e_job_not_exists 
+  then null;
+end;
+/
+

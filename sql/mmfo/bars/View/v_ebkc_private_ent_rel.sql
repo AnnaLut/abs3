@@ -1,13 +1,34 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_EBKC_PRIVATE_ENT_REL.sql =========***
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_EBKC_PRIVATE_ENT_REL ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_EBKC_PRIVATE_ENT_REL ("KF", "RNK", "REL_RNK", "NAME", "K014", "K040", "REGIONCODE", "K110", "K051", "K070", "OKPO", "ISOKPOEXCLUSION", "TELEPHONE", "EMAIL", "K080", "ADDRESS", "DOCTYPE", "DOCSER", "DOCNUMBER", "DOCISSUEDATE", "DOCORGAN", "ACTUALDATE", "EDDRID", "BIRTHDAY", "BIRTHPLACE", "SEX", "NOTES", "RELSIGN") AS 
+create or replace force view V_EBKC_PRIVATE_ENT_REL
+( KF
+, RNK
+, REL_RNK
+, NAME
+, K014
+, K040
+, REGIONCODE
+, K110
+, K051
+, K070
+, OKPO
+, ISOKPOEXCLUSION
+, TELEPHONE
+, EMAIL
+, K080
+, ADDRESS
+, DOCTYPE
+, DOCSER
+, DOCNUMBER
+, DOCISSUEDATE
+, DOCORGAN
+, ACTUALDATE
+, EDDRID
+, BIRTHDAY
+, BIRTHPLACE
+, SEX
+, NOTES
+, RELSIGN
+, CUST_ID
+) AS 
   select c.kf,                                                  --Код РУ (код МФО)
        case
          when ( EBK_PARAMS.IS_CUT_RNK = 1 )
@@ -44,7 +65,8 @@ PROMPT *** Create  view V_EBKC_PRIVATE_ENT_REL ***
        r.birthplace,                                          --Місце народження
        r.sex,                                                            --Стать
        '' as notes,                                        --Коментар (примітки)
-       r.rel_id as relSign                                 --Ознака пов’язаності
+       r.rel_id as relSign,                                --Ознака пов’язаності
+       c.RNK             as CUST_ID
  from CUSTOMER c
     , PERSON   p
     , V_CUSTOMER_REL r
@@ -53,13 +75,7 @@ where c.custtype = 3
   and c.rnk = r.rnk
   and c.rnk = p.rnk;
 
-PROMPT *** Create  grants  V_EBKC_PRIVATE_ENT_REL ***
-grant SELECT                                                                 on V_EBKC_PRIVATE_ENT_REL to BARSREADER_ROLE;
-grant SELECT                                                                 on V_EBKC_PRIVATE_ENT_REL to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_EBKC_PRIVATE_ENT_REL to UPLD;
+show errors;
 
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_EBKC_PRIVATE_ENT_REL.sql =========***
-PROMPT ===================================================================================== 
+grant SELECT on V_EBKC_PRIVATE_ENT_REL to BARS_ACCESS_DEFROLE;
+grant SELECT on V_EBKC_PRIVATE_ENT_REL to BARSREADER_ROLE;

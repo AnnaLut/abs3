@@ -6,7 +6,8 @@
  
 CREATE OR REPLACE PACKAGE VALUE_PAPER
 IS
-   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.17 16.02.2018';
+   
+   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.18 06.03.2018';
 
    FUNCTION header_version
       RETURN VARCHAR2;
@@ -393,25 +394,26 @@ TYPE r_cp_cprwnd
  procedure del_iir(p_REF in number);
 
  TYPE r_prepare_many_wnd is record(
-        IRR   number,
-        IRE   number,
-        NONIMAL number,
-        nAcc number,
-        nOst number,
-        nAccR2 number,
-        nFixed number,
-        DAT_EM date,
-        DATP date,
-        IR number,
-        nBasey number,
-        sBasey varchar2(50),
-        sBasey1 varchar2(50),
-        CENA number,
-        KOL number,
-        nAccS number,
-        DAT1 date,
-        DAT2 date,
-        DAT_ROZ date
+        IRR           number,
+        IRE           number,
+        NONIMAL       number,
+        nAcc          number,
+        nOst          number,
+        nAccR2        number,
+        nFixed        number,
+        DAT_EM        date,
+        DATP          date,
+        IR            number,
+        nBasey        number,
+        sBasey        varchar2(50),
+        sBasey1       varchar2(50),
+        CENA          number,
+        CENA_START    number,   
+        KOL           number,
+        nAccS         number,
+        DAT1          date,
+        DAT2          date,
+        DAT_ROZ       date
  );
  TYPE t_r_prepare_many_wnd IS TABLE OF r_prepare_many_wnd;
 
@@ -443,9 +445,10 @@ TYPE r_many_grid
              G14 number,
              color_id number);
  TYPE t_many_grid IS TABLE OF r_many_grid;
-
- function populate_many_row_wnd (p_ref IN NUMBER, rb1 in int, rb2 in int, DAT_ROZ in date)
+ 
+/* function populate_many_row_wnd (p_ref IN NUMBER, rb1 in int, rb2 in int, DAT_ROZ in date)
   return t_many_grid pipelined;
+*/  
 
  function populate_many_wnd (p_ref IN NUMBER, rb1 in int, rb2 in int, DAT_ROZ in date)
   return t_many_grid pipelined;
@@ -532,12 +535,15 @@ TYPE r_many_grid
 
   procedure change_int_dividends_prepare(p_ref cp_int_dividents.ref%type, p_sum cp_int_dividents.sum%type, p_nazn cp_int_dividents.nazn%type);
   procedure make_oper_cp_int_dividends (p_ref cp_int_dividents.ref%type, p_sum cp_int_dividents.sum%type, p_nazn cp_int_dividents.nazn%type, p_nlsrd_6 cp_int_dividents.nlsrd_6%type);
+  
+  function get_cena_voprosa(p_id cp_kod.id%type, p_date date, p_cena cp_kod.cena%type, p_cena_start cp_kod.cena_start%type)   return number;
+  function get_count_cp(p_id cp_kod.id%type, p_date date, p_cena cp_kod.cena%type, p_cena_start cp_kod.cena_start%type, p_acc cp_deal.acc%type) return number;
 
 END value_paper;
 /
 CREATE OR REPLACE PACKAGE BODY VALUE_PAPER
 IS
-   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.28 16.02.2018';
+   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.29 06.03.2018';
 
    g_newline constant varchar2(5) := CHR(10)||CHR(13);
    FUNCTION body_version
@@ -2337,8 +2343,8 @@ END;
        end;
 
        begin
-       SELECT nvl(cena_kup,0), dat_em, datp, ir , nvl(basey ,0), cena
-         INTO l_prepare_many_wnd.nFixed, l_prepare_many_wnd.DAT_EM, l_prepare_many_wnd.DATP, l_prepare_many_wnd.IR, l_prepare_many_wnd.nBasey, l_prepare_many_wnd.CENA
+       SELECT nvl(cena_kup,0), dat_em, datp, ir , nvl(basey ,0), cena, cena_start
+         INTO l_prepare_many_wnd.nFixed, l_prepare_many_wnd.DAT_EM, l_prepare_many_wnd.DATP, l_prepare_many_wnd.IR, l_prepare_many_wnd.nBasey, l_prepare_many_wnd.CENA, l_prepare_many_wnd.CENA_START
          FROM cp_kod
         WHERE id = l_id;
        exception when no_data_found then return;
@@ -2376,18 +2382,20 @@ END;
       PIPE ROW (l_prepare_many_wnd);
      end;
 
-     function populate_many_row_wnd (p_ref IN NUMBER, rb1 in int, rb2 in int, DAT_ROZ in date)
-      return t_many_grid pipelined
+     procedure populate_many_row_wnd (p_ref IN NUMBER, rb1 in int, rb2 in int, DAT_ROZ in date, p_t_many_grid out t_many_grid, p_t_tmp_irr out t_tmp_irr, p_nIrr0 out number)
+     -- return t_many_grid pipelined
      is
-     l_prepare_many_wnd r_prepare_many_wnd;
-     l_many_grid r_many_grid;
-     l_CP_MANY varchar2(4000);
-     l_CP_MANY30 varchar2(500);
-     v_stmt_str varchar2 (14000);
-     l_tmp number;
-     l_id number;
-     l_q number := 0;
-     l_sPereoc varchar2(500);
+     l_prepare_many_wnd         r_prepare_many_wnd;
+     l_many_grid                r_many_grid;
+     l_t_many_grid              t_many_grid := t_many_grid();
+     l_t_tmp_irr                t_tmp_irr   := t_tmp_irr();     
+     l_CP_MANY                  varchar2(4000);
+     l_CP_MANY30                varchar2(500);
+     v_stmt_str                 varchar2 (14000);
+     l_tmp                      number;
+     l_id                       number;
+     l_q                        number := 0;
+     l_sPereoc                  varchar2(500);
      TYPE ManyType IS REF CURSOR;
      v_many_cursor ManyType;
      begin
@@ -2445,27 +2453,31 @@ END;
                      || ' case when m.FDAT != to_date('''|| to_char(l_prepare_many_wnd.DATP,'dd/mm/yyyy')||''',''dd/mm/yyyy'')'
                      || ' then -cp.KUPON1 ('||to_char(l_ID)||', m.FDAT, to_date('''||to_char(l_prepare_many_wnd.DAT_EM,'dd/mm/yyyy')||''',''dd/mm/yyyy''), to_date('''|| to_char(l_prepare_many_wnd.DATP,'dd/mm/yyyy')||''',''dd/mm/yyyy''))/100  '
                      || ' else 0 end nInt, '
-                     || l_sPereoc || ' /100 g11'
+                     || l_sPereoc || ' /100 g11, '
+                     || ' value_paper.get_cena_voprosa('||l_ID||', m.FDAT, '||l_prepare_many_wnd.CENA||','||l_prepare_many_wnd.CENA_START||') CENA,' 
+                     || ' value_paper.get_count_cp('||l_ID||', m.FDAT, '||l_prepare_many_wnd.CENA||','||l_prepare_many_wnd.CENA_START||', '||l_prepare_many_wnd.nAcc||' ) KOL ' 
                      || ' FROM ( ' || l_CP_MANY || ') m '
                      || ' union ALL '
                      || ' SELECT distinct m.FDAT, m.SS1, m.SN2, m.SDP, '
                      || ' -(m.SS1+m.SN2+m.SDP) SR, '
                      || ' -(m.SS1+m.SN2      ) SE, '
                      || ' -cp.KUPON1 ('||to_char(l_ID)|| ', m.FDAT, to_date('''||to_char(l_prepare_many_wnd.DAT_EM,'dd/mm/yyyy')||''',''dd/mm/yyyy''), to_date('''||to_char(l_prepare_many_wnd.DATP,'dd/mm/yyyy')||''',''dd/mm/yyyy'')) /100, '
-                     || l_sPereoc || ' /100 g11 '
+                     || l_sPereoc || ' /100 g11, '
+                     || ' value_paper.get_cena_voprosa('||l_ID||', m.FDAT, '||l_prepare_many_wnd.CENA||','||l_prepare_many_wnd.CENA_START||') CENA,' 
+                     || ' value_paper.get_count_cp('||l_ID||', m.FDAT, '||l_prepare_many_wnd.CENA||','||l_prepare_many_wnd.CENA_START||', '||l_prepare_many_wnd.nAcc||' ) KOL ' 
                      || ' FROM cp_many m where ref = '||to_char(p_REF) ||' and fdat = to_date('''||to_char(l_prepare_many_wnd.DAT1,'dd/mm/yyyy')||''',''dd/mm/yyyy'') '
                      || ' ORDER BY 1';
 
         v_stmt_str := ' select distinct FDAT, NDD, DNEY, G1, G2, G3, G4, G5, G6, G7, G8, G9 '
-        ||' ,round(nvl(G9,0)/'||l_prepare_many_wnd.KOL||',4) as G9A '
-        ||' ,nvl(nint*(-first_value(g3) over (order by fdat))/'||l_prepare_many_wnd.CENA||',0) as G10 '
-        ||' ,nvl(round(nint*(-first_value(g3) over (order by fdat))/'||l_prepare_many_wnd.CENA*l_prepare_many_wnd.KOL||',4),0) as G10A '
+        ||' ,case when KOL = 0 then 0 else round(nvl(G9,0)/KOL,4) end as G9A '
+        ||' ,case when CENA = 0 then 0 else nvl(nint*(-first_value(g3) over (order by fdat))/CENA,0) end as G10 '
+        ||' ,case when CENA = 0 then 0 else nvl(round(nint*(-first_value(g3) over (order by fdat))/CENA*KOL,4),0) end as G10A '
         ||' ,G11 '
-        ||' ,round(nvl(G11,0)/'||l_prepare_many_wnd.KOL||',4) as G11A '
-        ||' ,(first_value(g3) over (order by fdat))+ case when NDD = 1 then 0 else G3 end as G12'
-        ||' ,((first_value(g3) over (order by fdat)+ case when NDD = 1 then 0 else G3 end)/'||l_prepare_many_wnd.KOL||') as G12A'
-        ||' ,((first_value(g3) over (order by fdat))+ case when NDD = 1 then 0 else G3 end + G8 + nvl(nint*(-first_value(g3) over (order by fdat))/'||l_prepare_many_wnd.CENA||',0) + G11) as G13'
-        ||' ,((first_value(g3) over (order by fdat))+ case when NDD = 1 then 0 else G3 end + G8 + nvl(nint*(-first_value(g3) over (order by fdat))/'||l_prepare_many_wnd.CENA||',0) + G11)/'||l_prepare_many_wnd.KOL ||' as G13A'
+        ||' ,case when KOL = 0 then 0 else round(nvl(G11,0)/KOL,4) end as G11A '
+        ||' ,sum(G3) over (order by fdat) as G12'
+        ||' ,case when KOL = 0 then 0 else (sum(G3) over (order by fdat))/KOL end as G12A'
+        ||' ,nvl(sum(G3) over (order by fdat),0) + G8 + case when CENA = 0 then 0 else nvl(nint*(-first_value(g3) over (order by fdat))/CENA,0) end + G11 as G13'
+        ||' ,case when KOL = 0 then 0 else ((first_value(g3) over (order by fdat))+ case when NDD = 1 then 0 else G3 end + G8 + case when CENA = 0 then 0 else nvl(nint*(-first_value(g3) over (order by fdat))/CENA,0) end + G11)/KOL end as G13A'
         ||' ,0 G14, 0 color_id '
         ||' from '
         ||' (select FDAT, '
@@ -2480,33 +2492,50 @@ END;
         ||' round(g7,2) as G7, '
         ||' round((G7-G6),2) G8, '
         ||' nvl((lag(round((G7-G6),2)) over (order by fdat)- round((G7-G6),2)),0) as G9, '
-        ||' nint, case when (FDAT - first_value( FDAT) OVER (ORDER BY FDAT))+1 = 1 then 0 else g11 end as G11 '
+        ||' nint, case when (FDAT - first_value( FDAT) OVER (ORDER BY FDAT))+1 = 1 then 0 else g11 end as G11, '
+        ||' CENA, KOL '
         ||' from ( '|| v_stmt_str
         ||' )) order by 2';
-        bars_audit.info(v_stmt_str);
+        bars_audit.info('value_paper.populate_many_row_wnd: '|| v_stmt_str);
         OPEN v_many_cursor FOR v_stmt_str;
           LOOP
              FETCH v_many_cursor INTO l_many_grid;
              EXIT WHEN v_many_cursor%NOTFOUND;
-             bars_audit.info(v_many_cursor%ROWCOUNT);
-             PIPE ROW (l_many_grid);
+             --bars_audit.info(v_many_cursor%ROWCOUNT);
+             
+             l_t_many_grid.extend;
+             l_t_many_grid(l_t_many_grid.last) := l_many_grid;
+             
+             if l_many_grid.NDD > 0 then --block G14
+               l_t_tmp_irr.extend;
+               l_t_tmp_irr(l_t_tmp_irr.last) := r_tmp_irr(l_many_grid.NDD, l_many_grid.g1);
+               --bars_audit.info('value_paper.populate_many_row_wnd: '||l_many_grid.NDD||'|'||l_many_grid.g1);
+             end if;                 --end block G14
+             
           END LOOP;
           CLOSE v_many_cursor;
+          p_t_many_grid := l_t_many_grid;
+          p_t_tmp_irr   := l_t_tmp_irr;
+          p_nIrr0       := l_prepare_many_wnd.IR;
   end;
 
   function populate_many_wnd (p_ref IN NUMBER, rb1 in int, rb2 in int, DAT_ROZ in date)
   return t_many_grid pipelined
   is
   --pragma autonomous_transaction;
-  l_prepare_many_wnd r_prepare_many_wnd;
-  l_many_grid r_many_grid;
-  l_nIrr0 number;
+  l_prepare_many_wnd         r_prepare_many_wnd;
+  l_many_grid                r_many_grid;
+  l_t_many_grid              t_many_grid;
+  l_t_tmp_irr                t_tmp_irr;
+  l_nIrr0                    number;
   begin
 
-   -- execute immediate 'delete from tmp_irr';
+  --  execute immediate 'delete from tmp_irr';
   --  commit;
      --   l_nIrr0 := l_prepare_many_wnd.IR/100;
-    for k in (select * from table(populate_many_row_wnd(p_ref, rb1, rb2, DAT_ROZ)))
+     
+    populate_many_row_wnd(p_ref, rb1, rb2, DAT_ROZ, l_t_many_grid, l_t_tmp_irr, l_nIrr0); 
+    for i in 1..l_t_many_grid.count
     loop
 --     insert into tmp_irr (n,s) values (k.NDD,k.G1*100);
 --     commit;
@@ -2521,35 +2550,53 @@ END;
 --
 --      delete tmp_irr where n <= k.NDD;
 --      commit;
-     l_many_grid.color_id := case when k.FDAT <= DAT_ROZ then 0
-                                   when k.FDAT <= gl.bd then 1
+     l_many_grid.color_id := case when l_t_many_grid(i).FDAT <= DAT_ROZ then 0
+                                   when l_t_many_grid(i).FDAT <= gl.bd then 1
                                   else 2
                              end;
-      l_many_grid.FDAT  := k.FDAT;
-      l_many_grid.NDD   := k.NDD;
-      l_many_grid.DNEY  := k.DNEY;
-      l_many_grid.G1    := k.G1;
-      l_many_grid.G2    := k.G2;
-      l_many_grid.G3    := k.G3;
-      l_many_grid.G4    := k.G4;
-      l_many_grid.G5    := k.G5;
-      l_many_grid.G6    := k.G6;
-      l_many_grid.G7    := k.G7;
-      l_many_grid.G8    := k.G8;
-      l_many_grid.G9    := k.G9;
-      l_many_grid.G9A   := k.G9A;
-      l_many_grid.G10   := k.G10;
-      l_many_grid.G10A  := k.G10A;
-      l_many_grid.G11   := k.G11;
-      l_many_grid.G11A  := k.G11A;
-      l_many_grid.G12   := k.G12;
-      l_many_grid.G12A  := k.G12A;
-      l_many_grid.g13   := k.g13;
-      l_many_grid.g13A  := k.g13A;
-      l_many_grid.G14   := k.G14;
+      l_many_grid.FDAT  := l_t_many_grid(i).FDAT;
+      l_many_grid.NDD   := l_t_many_grid(i).NDD;
+      l_many_grid.DNEY  := l_t_many_grid(i).DNEY;
+      l_many_grid.G1    := l_t_many_grid(i).G1;
+      l_many_grid.G2    := l_t_many_grid(i).G2;
+      l_many_grid.G3    := l_t_many_grid(i).G3;
+      l_many_grid.G4    := l_t_many_grid(i).G4;
+      l_many_grid.G5    := l_t_many_grid(i).G5;
+      l_many_grid.G6    := l_t_many_grid(i).G6;
+      l_many_grid.G7    := l_t_many_grid(i).G7;
+      l_many_grid.G8    := l_t_many_grid(i).G8;
+      l_many_grid.G9    := l_t_many_grid(i).G9;
+      l_many_grid.G9A   := l_t_many_grid(i).G9A;
+      l_many_grid.G10   := l_t_many_grid(i).G10;
+      l_many_grid.G10A  := l_t_many_grid(i).G10A;
+      l_many_grid.G11   := l_t_many_grid(i).G11;
+      l_many_grid.G11A  := l_t_many_grid(i).G11A;
+      l_many_grid.G12   := l_t_many_grid(i).G12;
+      l_many_grid.G12A  := l_t_many_grid(i).G12A;
+      l_many_grid.g13   := l_t_many_grid(i).g13;
+      l_many_grid.g13A  := l_t_many_grid(i).g13A;
+      
+--      bars_audit.info('value_paper.populate_many_wnd: i='||i||' count l_t_tmp_irr='||l_t_tmp_irr.count||' count l_t_many_grid='||l_t_many_grid.count||' l_t_tmp_irr.FIRST='||l_t_tmp_irr.FIRST||' l_t_tmp_irr.LAST='||l_t_tmp_irr.LAST);
+      for j in l_t_tmp_irr.FIRST..l_t_tmp_irr.LAST loop
+        if l_t_tmp_irr(j).n < l_t_many_grid(i).NDD then
+--          bars_audit.info('value_paper.populate_many_wnd: удаляю i='||i||'j='||j||'('||l_t_tmp_irr(j).n||'|'||l_t_tmp_irr(j).s||')');
+          l_t_tmp_irr.DELETE(j);
+        elsif l_t_tmp_irr(j).n = l_t_many_grid(i).NDD then
+--          bars_audit.info('value_paper.populate_many_wnd: змінюю i='||i||'j='||j||'('||l_t_tmp_irr(j).n||'|'||l_t_tmp_irr(j).s||')'||' на s '||l_t_many_grid(i).G13*100);
+          l_t_tmp_irr(j).s := l_t_many_grid(i).G13;
+        else
+          exit;
+        end if;
+      end loop;  
+      
+--      bars_audit.info('value_paper.populate_many_wnd: розраховую'||' l_t_tmp_irr.FIRST='||l_t_tmp_irr.FIRST||' l_t_tmp_irr..LAST='||l_t_tmp_irr.LAST);          
+      l_many_grid.G14   := round(xIRR (l_nIrr0/100, l_t_tmp_irr),4)*100;
+              
       PIPE ROW (l_many_grid);
     end loop;
-   -- rollback;
+    exception
+      when others then 
+        bars_audit.error('value_paper.populate_many_wnd: '||dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace());          
   end;
 
  function prepare_cpv_wnd(p_ID in number, nGRP in INT)
@@ -3118,6 +3165,48 @@ END;
     
     bars_audit.info('value_paper.make_oper_cp_int_dividends END');
 end;
+
+  --за основу функції взяті з нового пакету cp_rep_dgp
+  --після устаканювання звітів, та потоків потрібно зробити єдину точку визову цих функцій, наприклад з цього пакету.
+  function get_cena_voprosa(p_id cp_kod.id%type, p_date date, p_cena cp_kod.cena%type, p_cena_start cp_kod.cena_start%type)   return number is
+    l_cena     cp_kod.cena%type;
+  begin
+    bars_audit.info('value_paper.get_cena_voprosa: p_id='||p_id||' p_date='||p_date||' p_cena='||p_cena||' p_cena_start='||p_cena_start );
+    if p_cena != p_cena_start then
+      begin
+        select p_cena_start - nvl(sum(nvl(a.nom, 0)), 0)
+          into l_cena
+          from cp_dat a
+         where a.id = p_id
+           and a.DOK <= p_date;
+         exception
+           when NO_DATA_FOUND then l_cena := p_cena_start;
+      end;
+      else
+        l_cena := p_cena_start;
+    end if;
+    return  l_cena;
+  end;
+
+  --за основу функції взяті з нового пакету cp_rep_dgp
+  --після устаканювання звітів, та потоків потрібно зробити єдину точку визову цих функцій, наприклад з цього пакету.
+  function get_count_cp(p_id cp_kod.id%type, p_date date, p_cena cp_kod.cena%type, p_cena_start cp_kod.cena_start%type, p_acc cp_deal.acc%type) 
+  return number is
+    l_cena     cp_kod.cena%type;
+    l_cnt_cp   number :=0;
+    l_nom      number;
+  begin
+    bars_audit.info('value_paper.get_count_cp: p_id='||p_id||' p_date='||p_date||' p_cena='||p_cena||' p_cena_start='||p_cena_start||' p_acc='||p_acc );
+    l_cena := get_cena_voprosa(p_id, p_date + 1, p_cena, p_cena_start);
+
+    if l_cena != 0 then
+      select -rez.ostc96(p_acc, p_date) / 100 into l_nom from dual;
+
+      l_cnt_cp := round(l_nom / l_cena, 0);
+    end if;  
+
+    return l_cnt_cp;
+  end get_count_cp;
 
 END value_paper;
 /

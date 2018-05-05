@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Xml.Serialization;
 
 namespace Bars.WebServices.XRM.Services.SKRN.Models
 {
@@ -8,6 +9,7 @@ namespace Bars.WebServices.XRM.Services.SKRN.Models
         /// ref документу
         /// </summary>
         public string Reference { get; set; }
+        public int? PrintBuhModel { get; set; }
     }
 
     public class PrintDocByRefResponse

@@ -1,8 +1,4 @@
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/ebk_dup_wform_utl.sql =========*** R
- PROMPT ===================================================================================== 
- 
-CREATE OR REPLACE PACKAGE BARS.EBK_DUP_WFORM_UTL 
+create or replace package EBK_DUP_WFORM_UTL 
 is
 
   --
@@ -365,13 +361,6 @@ procedure change_cust_attr (p_rnk in number,
 end ebk_dup_wform_utl;
 /
 
-show err;
+show errors;
 
 grant EXECUTE on EBK_DUP_WFORM_UTL to BARS_ACCESS_DEFROLE;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/ebk_dup_wform_utl.sql =========*** E
- PROMPT ===================================================================================== 
- 

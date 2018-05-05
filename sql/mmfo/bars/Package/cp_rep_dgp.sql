@@ -15,7 +15,7 @@ end cp_rep_dgp;
 create or replace package body cp_rep_dgp is
   G_BODY_VERSION constant varchar2(64) := 'v.1.8  17.04.2018';
   G_TRACE        constant varchar2(20) := 'CP_REP_DGP.';
-  ---
+  -----
   cursor G_CUR (p_nlsb_arr string_list, p_date_from date, p_date_to date)
 
   is

@@ -20,6 +20,7 @@ RETURN NUMBER is
    l_exception_desc operw.value%type;
    l_res_nlsa       NUMBER;
    l_res_nlsb       NUMBER;
+   l_ob22           accounts.ob22%type;
 -------------------------------------------------------------------------------
 /*
 LitvinSO 13/10/2015
@@ -68,49 +69,20 @@ function Check_NLS(p_kv    oper.kv%type,
 RETURN NUMBER IS
     begin
         begin
-            select c.okpo into l_okpo_a from accounts a, customer c where a.nls = p_nlsa and a.kv = p_kv and a.rnk = c.rnk;
-            exception
+            select c.okpo, upper(p.ser)||upper(p.numdoc) into l_okpo_a, l_doca from accounts a, customer c, person p  where a.nls = p_nlsa and a.kv = p_kv and a.rnk = c.rnk and c.rnk = p.rnk;
+        exception
                         when no_data_found then
-                    begin
-                        select upper(p.ser)||upper(p.numdoc) into l_doca from accounts a, person p where a.nls = p_nlsa and a.kv = p_kv and a.rnk = p.rnk;
-                        exception
-                            when no_data_found then
                             bars_error.raise_error('DOC',47,'Не знайдено данних клієнта по рахунку А');
-                    end;
         end;
-
-        if l_okpo_a like '000000000%'  then
-                        begin
-                            select upper(p.ser)||upper(p.numdoc) into l_doca from accounts a, person p where a.nls = p_nlsa and a.kv = p_kv and a.rnk = p.rnk;
-                        exception
-                            when no_data_found then
-                            bars_error.raise_error('DOC',47,'Не знайдено данних клієнта по рахунку А');
-                        end;
-        end if;
 
         begin
-                select c.okpo into l_okpo_b from accounts a, customer c where a.nls = p_nlsb and a.kv = p_kv and a.rnk = c.rnk;
-                  exception
+            select c.okpo, upper(p.ser)||upper(p.numdoc) into l_okpo_b, l_docb from accounts a, customer c, person p where a.nls = p_nlsb and a.kv = p_kv and a.rnk = c.rnk and c.rnk = p.rnk;
+        exception
                         when no_data_found then
-                    begin
-                        select upper(p.ser)||upper(p.numdoc) into l_docb from accounts a, person p where a.nls = p_nlsb and a.kv = p_kv and a.rnk = p.rnk;
-                    exception
-                            when no_data_found then
                             bars_error.raise_error('DOC',47,'Не знайдено данних клієнта по рахунку Б');
-                    end;
         end;
 
-        if l_okpo_b like '000000000%' or l_okpo_b is null then
-                    begin
-                        select upper(p.ser)||upper(p.numdoc) into l_docb from accounts a, person p where a.nls = p_nlsb and a.kv = p_kv and a.rnk = p.rnk;
-                    exception
-                        when no_data_found then
-                        bars_error.raise_error('DOC',47,'Не знайдено данних клієнта по рахунку Б');
-                        end;
-        end if;
-
         if (l_okpo_a not like '000000000%') and  (l_okpo_b not like '000000000%') and (l_okpo_a = l_okpo_b)  then
-
                 return 0;
         elsif (l_okpo_a like '000000000%') and  (l_okpo_b like '000000000%') and (l_doca = l_docb) then
                 return 0;
@@ -139,43 +111,54 @@ begin
 end;
 BEGIN
     begin
-            select tt into l_tt from oper where ref = p_ref;
-            select id_a, id_b into l_okpo_a, l_okpo_b from oper where ref = p_ref;
-
+            select tt, id_a, id_b into l_tt, l_okpo_a, l_okpo_b from oper where ref = p_ref;
          if l_tt = 'PKD' and substr(p_nlsa,1,4) in('2625') and substr(p_nlsb,1,4) in('2630','2635','2620') and p_kv <> 980 then
-                begin
                 l_chk_res := Check_NLS(p_kv,p_nlsa,p_nlsb);
                 l_exception_flag := f_operw (p_ref, 'EXCFL');
                 l_exception_desc := f_operw (p_ref, 'EXCTN');
                -- l_res_nlsa       := f_is_resident(P_KV, P_NLSA, P_REF);
                -- l_res_nlsb       := f_is_resident(P_KV, P_NLSB, P_REF);
-                end;
         /* заявка COBUSUPABS-3825 звільнити від перевірки на збіг ІНН або реквізити клієнта, якщо має місце таке сполучення рахунків:
             PKR Дт 2630 2635 2638 Кт 2625*/
          elsif l_tt = 'PKR' and substr(p_nlsa,1,4) in('2620') and substr(p_nlsb,1,4) in('2625') and p_kv <> 980 then
-                begin
                 l_chk_res := Check_NLS(p_kv,p_nlsa,p_nlsb);
                 l_exception_flag := f_operw (p_ref, 'EXCFL');
                 l_exception_desc := f_operw (p_ref, 'EXCTN');
-                end;
          elsif l_tt = 'DPI' and substr(p_nlsa,1,4) in('2620','2638') and substr(p_nlsb,1,4) in('2620','2630','2635') and p_kv <> 980 then
-                begin
                 l_chk_res := Check_NLS(p_kv,p_nlsa,p_nlsb);
                 l_exception_flag := f_operw (p_ref, 'EXCFL');
                 l_exception_desc := f_operw (p_ref, 'EXCTN');
-                end;
          elsif l_tt = 'DPJ' and substr(p_nlsa,1,4) in('2620') and substr(p_nlsb,1,4) in('2620','2630','2635') and p_kv <> 980 then
-                begin
                 l_chk_res := Check_REKV(l_okpo_a,l_okpo_b);
                 l_exception_flag := f_operw (p_ref, 'EXCFL');
                 l_exception_desc := f_operw (p_ref, 'EXCTN');
-                end;
          elsif l_tt = 'OW4' and substr(p_nlsa,1,4) in('2625') and substr(p_nlsb,1,4) in('2630','2635','2620') and p_kv <> 980 then
-                begin
                 l_chk_res := Check_NLS(p_kv,p_nlsa,p_nlsb);
                 l_exception_flag := f_operw (p_ref, 'EXCFL');
                 l_exception_desc := f_operw (p_ref, 'EXCTN');
+         elsif l_tt = 'PKD' and substr(p_nlsa,1,4) in('2625','2620') and substr(p_nlsb,1,4) in('2625','2620') and p_kv = 980 then
+                l_exception_desc := f_operw (p_ref, 'EXCTN');
+                l_res_nlsa       := f_is_resident(P_KV, P_NLSA, P_REF);
+                l_res_nlsb       := f_is_resident(P_KV, P_NLSB, P_REF);
+                begin
+                 select a.ob22 into l_ob22 from accounts a where a.nls = p_nlsb and a.kv  =p_kv;
+                exception
+                        when no_data_found then
+                        l_ob22 := null;
                 end;
+                
+                if l_res_nlsa = 1 and l_res_nlsb  = 0 
+                  then
+                     if l_ob22 ='19' or 
+                        l_exception_desc = 'рішення суду або рішення інших органів (посадових осіб), яке підлягає примусовому виконанню'
+                        then
+                        return 0;
+                     else
+                      bars_error.raise_error('DOC',47,'Операція порушує вимоги р.7 постанови НБУ 492 від 12.11.2003р.');
+                     end if;
+                else
+                 return 0;
+                end if;
          else return 0;
          end if;
      end;
