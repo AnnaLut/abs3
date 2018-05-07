@@ -13,50 +13,51 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Процедура формирования файла 1P (ПБ-1)
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :    01/03/2018 (02/02/2018, 09/06/2017)
+% VERSION     :    03/05/2018 (01/03/2018, 02/02/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+03/05/20`8 - для проводок Дт 1811 Кт 3739 добавлено новое условие для отбора
 01/03/2018 - для проводок Дт 100* Кт 3800 будет формироваться код 2343001
 02/02/2018 - для проводок Дт 100 Кт 1811 будем изменять код банка (KOD_B)
-             заполняем по проводке Дт 1811 Кт 3739 
+             заполняем по проводке Дт 1811 Кт 3739
 08/06/2017 - добавил parallel (8) для блока заполнения доп.реквизитов
-06/06/2017 - изменил VIEW PROVODKI_OTC на OPLDOK для заполнения в OPERW 
+06/06/2017 - изменил VIEW PROVODKI_OTC на OPLDOK для заполнения в OPERW
              доп.параметров KOD_N, KOD_B, KOD_G
 25/04/2017 - добавлено обработку поля ID_B из VIEW PROVODKI_OTC
              (во VIEW PROVODKI_OTC добавлено поле ID_B из OPER)
 09/12/2016 - для бал.счета 1500 изменяем значение показателя 03 на значение
              показателя 07 (не обрабатываем значение 6, 777)
-             и значение 999 изменяем на 6 
+             и значение 999 изменяем на 6
 17/11/2016 - дополнительно выполняется перекодировка для полей NAM_A, NAM_B
 16/11/2016 - в наименовании контрагентов изменяем символ '<<' или  '>>'
              на символ '"' т.к. перекодировка в DOS непонятна
 22/09/2016 - при списании со счетов '2700','2701','2706','2708','3548',
-                                    '3660','3666','3668','1624','1626' 
-                                    '1628' ,'37397005523','3739401901' 
-             при дикларировании будут формироваться следующие значения для 
+                                    '3660','3666','3668','1624','1626'
+                                    '1628' ,'37397005523','3739401901'
+             при дикларировании будут формироваться следующие значения для
              кодов
              03=   6
              04=B
              05=0000032129
              06=АТ "Ощадбанк"
 06.09.2016 - убрал перекодировку кода банка из кода для 1-ПБ на код для 1P
-05.07.2016 - дополнительно будет выполняться перекодировка кода банка 
-             по табл. BOPBANK (поле REGNUM_N) для кода 03 и бал.счета 1600 
-17.06.2016 - для отбора сумм для декларирования расчет эквивалентов 
+05.07.2016 - дополнительно будет выполняться перекодировка кода банка
+             по табл. BOPBANK (поле REGNUM_N) для кода 03 и бал.счета 1600
+17.06.2016 - для отбора сумм для декларирования расчет эквивалентов
              выполняется по курсу последнего рабочего дня предыдущего мес.
-16.06.2016 - для кодов операций 1221,1251,1551,1721,1751 будем заполнять 
-             код "NNN" - умовний номер для формирования общей суммы по виду 
+16.06.2016 - для кодов операций 1221,1251,1551,1721,1751 будем заполнять
+             код "NNN" - умовний номер для формирования общей суммы по виду
              операции (есть различные коды 99)
-15.06.2016 - для суммы показателей 715, 716 будем учитівать 7-и значній 
-             код назначения из поля "COMM" табл. RNBU_TRACE 
+15.06.2016 - для суммы показателей 715, 716 будем учитівать 7-и значній
+             код назначения из поля "COMM" табл. RNBU_TRACE
 07.06.2016 - изменил коды 2312002,2312003 на 2311002,2311003
 26.05.2016 - для проводок Дт 1500 Кт 3739 которые декларируются будем
-             искать проводкb за этот же день и за следующий 
+             искать проводкb за этот же день и за следующий
              где Дт 3739 Кт 2600 (2603) - (предложение ГОУ)
 21.04.2016 - для коррсчетов будем отбирать банковские металлы
-             для бал.счета 1600 всегда формируем показатель 07 
+             для бал.счета 1600 всегда формируем показатель 07
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
    kodf_       VARCHAR2 (2) := '1P';
    kodp_       VARCHAR2 (33);
@@ -225,145 +226,154 @@ BEGIN
    IF mfou_ = 300465 AND mfou_ != mfo_g
    THEN
       FOR k
-         IN ( select /*+parallel(a)*/
-               p.ref ref
-              FROM opldok p, accounts a, oper o
-              WHERE p.fdat between Dat1_ and Dat_ 
-                and p.acc = a.acc 
-                and a.nbs like '100%' 
-                and a.kv NOT IN (959, 961, 962, 964, 980)
-                and p.sos >= 4 
-                and p.ref = o.ref 
-                and o.sos = 5
-            )
-
+         IN (SELECT /*+ leading(p.ad) */
+                      p.pdat pdat,
+                      p.fdat fdat,
+                      p.REF REF,
+                      p.tt tt,
+                      p.accd accd,
+                      p.nam_a name_a,
+                      p.nlsd nlsd,
+                      p.kv kv,
+                      p.acck acck,
+                      p.nam_b name_b,
+                      p.nlsk nlsk,
+                      p.nazn nazn,
+                      p.ptt tt1
+                 FROM provodki_otc p
+                WHERE     p.fdat = any(select fdat from fdat where fdat BETWEEN Dat1_ AND Dat_)
+                      AND p.kv <> 980
+                      AND (p.nlsd LIKE '100%' OR p.nlsk LIKE '100%')
+             ORDER BY 1, 2, 3)
       LOOP
-         BEGIN
-            INSERT INTO operw (REF, tag, VALUE)
+         if k.kv NOT IN (959, 961, 962, 964, 980) then
+             BEGIN
+                INSERT INTO operw (REF, tag, VALUE)
                  VALUES (k.REF, 'KOD_N', '0000000');
-         EXCEPTION
-            WHEN OTHERS
-            THEN
-               NULL;
-         END;
+             EXCEPTION
+                WHEN OTHERS
+                THEN
+                   NULL;
+             END;
 
-         kod_g_ := NULL;
-         kod_g_pb1 := NULL;
+             kod_g_ := NULL;
+             kod_g_pb1 := NULL;
 
-         FOR z IN (SELECT *
-                     FROM operw
-                    WHERE REF = k.REF)
-         LOOP
-            -- с 01.08.2012 добавляется код страны отправителя или получателя перевода
-            IF     z.tag LIKE 'n%'
-               AND SUBSTR (TRIM (z.VALUE), 1, 1) IN ('O', 'P', 'О', 'П')
-            THEN
-               kod_g_ := SUBSTR (TRIM (z.VALUE), 2, 3);
-            END IF;
+             FOR z IN (SELECT *
+                         FROM operw
+                        WHERE REF = k.REF)
+             LOOP
+                -- с 01.08.2012 добавляется код страны отправителя или получателя перевода
+                IF     z.tag LIKE 'n%'
+                   AND SUBSTR (TRIM (z.VALUE), 1, 1) IN ('O', 'P', 'О', 'П')
+                THEN
+                   kod_g_ := SUBSTR (TRIM (z.VALUE), 2, 3);
+                END IF;
 
-            IF     kod_g_ IS NULL
-               AND z.tag LIKE 'n%'
-               AND SUBSTR (TRIM (z.VALUE), 1, 1) NOT IN
-                      ('O', 'P', 'О', 'П')
-            THEN
-               kod_g_ := SUBSTR (TRIM (z.VALUE), 1, 3);
-            END IF;
+                IF     kod_g_ IS NULL
+                   AND z.tag LIKE 'n%'
+                   AND SUBSTR (TRIM (z.VALUE), 1, 1) NOT IN
+                          ('O', 'P', 'О', 'П')
+                THEN
+                   kod_g_ := SUBSTR (TRIM (z.VALUE), 1, 3);
+                END IF;
 
-            IF     kod_g_ IS NULL
-               AND z.tag LIKE 'D6#70%'
-               AND SUBSTR (TRIM (z.VALUE), 1, 1) IN ('O', 'P', 'О', 'П')
-            THEN
-               kod_g_ := SUBSTR (TRIM (z.VALUE), 2, 3);
-            END IF;
+                IF     kod_g_ IS NULL
+                   AND z.tag LIKE 'D6#70%'
+                   AND SUBSTR (TRIM (z.VALUE), 1, 1) IN ('O', 'P', 'О', 'П')
+                THEN
+                   kod_g_ := SUBSTR (TRIM (z.VALUE), 2, 3);
+                END IF;
 
-            IF     kod_g_ IS NULL
-               AND z.tag LIKE 'D6#70%'
-               AND SUBSTR (TRIM (z.VALUE), 1, 1) NOT IN
-                      ('O', 'P', 'О', 'П')
-            THEN
-               kod_g_ := SUBSTR (TRIM (z.VALUE), 1, 3);
-            END IF;
+                IF     kod_g_ IS NULL
+                   AND z.tag LIKE 'D6#70%'
+                   AND SUBSTR (TRIM (z.VALUE), 1, 1) NOT IN
+                          ('O', 'P', 'О', 'П')
+                THEN
+                   kod_g_ := SUBSTR (TRIM (z.VALUE), 1, 3);
+                END IF;
 
-            IF     kod_g_ IS NULL
-               AND z.tag LIKE 'D6#E2%'
-               AND SUBSTR (TRIM (z.VALUE), 1, 1) IN ('O', 'P', 'О', 'П')
-            THEN
-               kod_g_ := SUBSTR (TRIM (z.VALUE), 2, 3);
-            END IF;
+                IF     kod_g_ IS NULL
+                   AND z.tag LIKE 'D6#E2%'
+                   AND SUBSTR (TRIM (z.VALUE), 1, 1) IN ('O', 'P', 'О', 'П')
+                THEN
+                   kod_g_ := SUBSTR (TRIM (z.VALUE), 2, 3);
+                END IF;
 
-            IF     kod_g_ IS NULL
-               AND z.tag LIKE 'D6#E2%'
-               AND SUBSTR (TRIM (z.VALUE), 1, 1) NOT IN
-                      ('O', 'P', 'О', 'П')
-            THEN
-               kod_g_ := SUBSTR (TRIM (z.VALUE), 1, 3);
-            END IF;
+                IF     kod_g_ IS NULL
+                   AND z.tag LIKE 'D6#E2%'
+                   AND SUBSTR (TRIM (z.VALUE), 1, 1) NOT IN
+                          ('O', 'P', 'О', 'П')
+                THEN
+                   kod_g_ := SUBSTR (TRIM (z.VALUE), 1, 3);
+                END IF;
 
-            IF     kod_g_ IS NULL
-               AND z.tag LIKE 'D1#E9%'
-               AND SUBSTR (TRIM (z.VALUE), 1, 1) IN ('O', 'P', 'О', 'П')
-            THEN
-               kod_g_ := SUBSTR (TRIM (z.VALUE), 2, 3);
-            END IF;
+                IF     kod_g_ IS NULL
+                   AND z.tag LIKE 'D1#E9%'
+                   AND SUBSTR (TRIM (z.VALUE), 1, 1) IN ('O', 'P', 'О', 'П')
+                THEN
+                   kod_g_ := SUBSTR (TRIM (z.VALUE), 2, 3);
+                END IF;
 
-            IF     kod_g_ IS NULL
-               AND z.tag LIKE 'D1#E9%'
-               AND SUBSTR (TRIM (z.VALUE), 1, 1) NOT IN
-                      ('O', 'P', 'О', 'П')
-            THEN
-               kod_g_ := SUBSTR (TRIM (z.VALUE), 1, 3);
-            END IF;
+                IF     kod_g_ IS NULL
+                   AND z.tag LIKE 'D1#E9%'
+                   AND SUBSTR (TRIM (z.VALUE), 1, 1) NOT IN
+                          ('O', 'P', 'О', 'П')
+                THEN
+                   kod_g_ := SUBSTR (TRIM (z.VALUE), 1, 3);
+                END IF;
 
-            IF kod_g_ IS NULL AND z.tag LIKE 'F1%'
-            THEN
-               kod_g_ := SUBSTR (TRIM (z.VALUE), 8, 3);
-            END IF;
+                IF kod_g_ IS NULL AND z.tag LIKE 'F1%'
+                THEN
+                   kod_g_ := SUBSTR (TRIM (z.VALUE), 8, 3);
+                END IF;
 
-            IF kod_g_ IS NULL AND z.tag = 'KOD_G'
-            THEN
-               kod_g_pb1 := SUBSTR (TRIM (z.VALUE), 1, 3);
-            END IF;
-         END LOOP;
+                IF kod_g_ IS NULL AND z.tag = 'KOD_G'
+                THEN
+                   kod_g_pb1 := SUBSTR (TRIM (z.VALUE), 1, 3);
+                END IF;
+             END LOOP;
 
-         IF kod_g_ IS NULL AND kod_g_pb1 IS NOT NULL
-         THEN
-            kod_g_ := kod_g_pb1;
-         END IF;
+             IF kod_g_ IS NULL AND kod_g_pb1 IS NOT NULL
+             THEN
+                kod_g_ := kod_g_pb1;
+             END IF;
 
-         BEGIN
-            INSERT INTO operw (REF, tag, VALUE)
-                 VALUES (k.REF, 'KOD_G', kod_g_);
-         EXCEPTION
-            WHEN OTHERS
-            THEN
-               UPDATE operw a
-                  SET a.VALUE = kod_g_
-                WHERE a.tag = 'KOD_G' AND a.REF = k.REF;
-         END;
+             BEGIN
+                INSERT INTO operw (REF, tag, VALUE)
+                     VALUES (k.REF, 'KOD_G', kod_g_);
+             EXCEPTION
+                WHEN OTHERS
+                THEN
+                   UPDATE operw a
+                      SET a.VALUE = kod_g_
+                    WHERE a.tag = 'KOD_G' AND a.REF = k.REF;
+             END;
 
-         BEGIN
-            INSERT INTO operw (REF, tag, VALUE)
-                 VALUES (k.REF, 'KOD_B', '000');
-         EXCEPTION
-            WHEN OTHERS
-            THEN
-               NULL;
-         END;
+             BEGIN
+                INSERT INTO operw (REF, tag, VALUE)
+                     VALUES (k.REF, 'KOD_B', '000');
+             EXCEPTION
+                WHEN OTHERS
+                THEN
+                   NULL;
+             END;
 
-         UPDATE operw a
-            SET a.VALUE = '804'
-          WHERE     a.tag = 'KOD_G'
-                AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) = '000')
-                AND a.REF = k.REF;
+             UPDATE operw a
+                SET a.VALUE = '804'
+              WHERE     a.tag = 'KOD_G'
+                    AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) = '000')
+                    AND a.REF = k.REF;
 
-         UPDATE operw a
-            SET a.VALUE = '6'
-          WHERE     a.tag = 'KOD_B'
-                AND (   TRIM (a.VALUE) IS NULL
-                     OR TRIM (a.VALUE) = '000'
-                     OR TRIM (a.VALUE) = '4'
-                     OR TRIM (a.VALUE) = '25')
-                AND a.REF = k.REF;
+             UPDATE operw a
+                SET a.VALUE = '6'
+              WHERE     a.tag = 'KOD_B'
+                    AND (   TRIM (a.VALUE) IS NULL
+                         OR TRIM (a.VALUE) = '000'
+                         OR TRIM (a.VALUE) = '4'
+                         OR TRIM (a.VALUE) = '25')
+                    AND a.REF = k.REF;
+         end if;
       END LOOP;
 
       FOR k
@@ -380,13 +390,13 @@ BEGIN
                       p.nam_b name_b,
                       ak.nls nlsk,
                       p.nazn nazn,
-                      p.tt tt1, 
+                      p.tt tt1,
                       p.s s
                from opldok od, accounts ad, opldok ok, accounts ak, oper p
                where od.fdat between dat1_ and dat_ and
                      od.acc = ad.acc and
                      od.DK = 0 and
-                     ( regexp_like(ad.NLS,'^(100)') OR regexp_like(ak.NLS,'^(100)') ) and 
+                     ( regexp_like(ad.NLS,'^(100)') OR regexp_like(ak.NLS,'^(100)') ) and
                      --(ad.nls LIKE '100%' OR ak.nls LIKE '100%')and
                      ad.kv not like '980%' and
                      od.ref = ok.ref and
@@ -394,7 +404,7 @@ BEGIN
                      ok.fdat between dat1_ and dat_ and
                      ok.acc = ak.acc and
                      ok.DK = 1 and
-                     od.ref = p.ref and 
+                     od.ref = p.ref and
                      p.sos = 5
             )
 
@@ -1198,9 +1208,11 @@ BEGIN
                where o.fdat = k.fdat
                  and o.nlsd like k.nlsk || '%'
                  and o.nlsk like '3739%'
+                 and o.kv = k.kv 
                  and o.s*100 = k.s
                  and o.ref = w.ref(+)
-                 and w.tag(+) like 'KOD_B%';
+                 and w.tag(+) like 'KOD_B%'
+                 and instr(k.nazn, substr(o.nazn, instr(o.nazn, 'ТТ')+2,3)) > 0;
 
                UPDATE operw a
                   SET a.VALUE = bank_
@@ -1210,7 +1222,7 @@ BEGIN
             exception when no_data_found then
                null;
             end;
-            
+
          END IF;
 
          -- куплено IВ у iншого банку-резидента
@@ -1496,6 +1508,32 @@ BEGIN
                    AND a.REF = k.REF;
          END IF;
 
+         -- внутрiшньосистемнi операцii
+         IF k.nlsd LIKE '1007%' AND k.nlsk LIKE '1001%' and 
+            LOWER (k.nazn) like '%видача гот_вки%через представника%'    
+         THEN
+            -- заміна коду банка із проводки Дт 1911 Кт 1007
+            begin
+               select trim(w.value)
+                  into bank_
+               from provodki_otc o, operw w
+               where o.fdat = k.fdat
+                 and o.nlsd like '1911%' 
+                 and o.nlsk like k.nlsd || '%'
+                 and o.s*100 = k.s
+                 and o.ref = w.ref(+)
+                 and w.tag(+) like 'KOD_B%';
+
+               UPDATE operw a
+                  SET a.VALUE = bank_
+                WHERE  a.tag = 'KOD_B'
+                   AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) <> bank_)
+                   AND a.REF = k.REF;
+            exception when no_data_found then
+               null;
+            end;
+         END IF;
+
          -- прийнято за чеки
          IF k.nlsd LIKE '100%' AND k.nlsk LIKE '1919%' AND ob22_ = '01'
          THEN
@@ -1772,8 +1810,9 @@ BEGIN
                BEGIN
                   SELECT REF, fdat
                     INTO ref_mmv, dat_mmv
-                    FROM provodki
+                    FROM provodki_otc
                    WHERE     REF = ref_m37
+                         and fdat = any(select fdat from fdat where fdat BETWEEN Dat1_ AND Dat_+3) 
                          AND kv = k.kv
                          AND nlsd = k.nlsk
                          AND ROWNUM = 1;
@@ -1919,7 +1958,8 @@ BEGIN
       END IF;
 
       FOR k
-         IN (  SELECT o.REF,
+         IN (  SELECT /*+ index(o, IDX_OPLDOK_KF_FDAT_ACC) */
+                      o.REF,
                       o.TT TT,
                       o.FDAT,
                       o.DK,
@@ -1931,7 +1971,7 @@ BEGIN
                       P.MFOA,
                       P.MFOB,
                       DECODE (P.MFOA, gl.amfo, P.ID_B, p.ID_A) ASP_K,
-                      DECODE (P.MFOA, gl.amfo, replace(replace(p.nam_b, chr(171),'"'),chr(187),'"'), 
+                      DECODE (P.MFOA, gl.amfo, replace(replace(p.nam_b, chr(171),'"'),chr(187),'"'),
                                                replace(replace(p.nam_a, chr(171),'"'),chr(187),'"') ) ASP_N,
                       DECODE (o.dk, 0, '6', '5') kod_e,
                       p.kv,
@@ -2000,7 +2040,7 @@ BEGIN
             END;
          END IF;
 
-         if k.ptt = '045' then 
+         if k.ptt = '045' then
             if k.kv = 978 then
                coun_ := '000';
             else
@@ -2017,7 +2057,7 @@ BEGIN
                 end;
             end if;
          end if;
-         
+
          IF mfou_ = 300465 AND k.tt IN ('151') AND kod7_ <> '8446018'
          THEN
             kod7_ := '8446018';
@@ -2135,7 +2175,7 @@ BEGIN
          THEN
             nd_ := k.REF;
             nnn1_ := nnn1_ + 1;
-            if nnn1_  > 999 
+            if nnn1_  > 999
             then
                nnn1_ := 1;
             end if;
@@ -2165,7 +2205,7 @@ BEGIN
                                         FROM operw
                                        WHERE REF = k.REF AND tag = 'NOS_R')) c;
 
-               IF sNBSk_ = KL_ 
+               IF sNBSk_ = KL_
                THEN
                   -- клиент нашего банка
                   SELECT DECODE (c.custtype,
@@ -2268,7 +2308,7 @@ BEGIN
                      SELECT P.ID_B, replace(replace(c.nmkk, chr(171),'"'),chr(187),'"')
                        INTO ASP_K_, ASP_N_
                      from provodki_otc p, customer c
-                     where p.vdat between k.vdat and k.vdat + 3                      
+                     where p.vdat between k.vdat and k.vdat + 3
                        AND p.tt NOT IN ('BAK')
                        AND p.kv = k.kv
                        AND p.nlsd = k.nlsb
@@ -2276,8 +2316,8 @@ BEGIN
                        AND p.nlsk LIKE '260%'
                        and p.rnkk = c.rnk
                        AND ROWNUM = 1
-                       AND TRIM (p.id_b) = TRIM (c.okpo); 
-                       
+                       AND TRIM (p.id_b) = TRIM (c.okpo);
+
                      asp_S_ :=
                         IIF_S (TO_CHAR (LENGTH (asp_K_)),
                                '8',
@@ -2319,7 +2359,7 @@ BEGIN
                   EXCEPTION
                      WHEN NO_DATA_FOUND
                      THEN
-                  ASP_K_ := '0000000000'; 
+                  ASP_K_ := '0000000000';
                   ASP_N_ := 'XXXXXXXXXX';
                   asp_S_ := 'U';
                         --NULL;
@@ -2368,10 +2408,10 @@ BEGIN
                end if;
 
                if k.NLSA like '2700%' or k.NLSA like '2701%' or k.NLSA like '2706%' or
-                  k.NLSA like '2708%' or k.NLSA like '3548%' or k.NLSA like '3660%' or 
-                  k.NLSA like '3666%' or k.NLSA like '3668%' or k.NLSA like '1624%' or   
-                  k.NLSA like '1626%' or k.NLSA like '1628%' or 
-                  k.NLSA like '37397005523%' or k.NLSA like '3739401901%'              
+                  k.NLSA like '2708%' or k.NLSA like '3548%' or k.NLSA like '3660%' or
+                  k.NLSA like '3666%' or k.NLSA like '3668%' or k.NLSA like '1624%' or
+                  k.NLSA like '1626%' or k.NLSA like '1628%' or
+                  k.NLSA like '37397005523%' or k.NLSA like '3739401901%'
                then
                   asp_S_ := 'B';
                   asp_K_ := our_okpo_;
@@ -2379,9 +2419,9 @@ BEGIN
                end if;
 
                if k.NLSB like '2700%' or k.NLSB like '2701%' or k.NLSB like '2706%' or
-                  k.NLSB like '2708%' or k.NLSB like '3548%' or k.NLSB like '3660%' or 
-                  k.NLSB like '3666%' or k.NLSB like '3668%' or k.NLSB like '1624%' or   
-                  k.NLSB like '1626%' or k.NLSB like '1628%'  
+                  k.NLSB like '2708%' or k.NLSB like '3548%' or k.NLSB like '3660%' or
+                  k.NLSB like '3666%' or k.NLSB like '3668%' or k.NLSB like '1624%' or
+                  k.NLSB like '1626%' or k.NLSB like '1628%'
                then
                   asp_S_ := 'B';
                   asp_K_ := our_okpo_;
@@ -2399,11 +2439,11 @@ BEGIN
                   || LPAD (coun_, 3, '0')
                   || LPAD (TO_CHAR (nnn1_), 3, '0');
 
-               if g.nls like '1600%' 
+               if g.nls like '1600%'
                then
                   p_ins (kodp_, LPAD (TO_CHAR (bank_), 3, ' '));
-               else 
-                  p_ins (kodp_, LPAD (TO_CHAR (glb_), 3, ' '));      
+               else
+                  p_ins (kodp_, LPAD (TO_CHAR (glb_), 3, ' '));
                end if;
 
                -- код DD=04 код типу-клієнта
@@ -2418,7 +2458,7 @@ BEGIN
                   || LPAD (coun_, 3, '0')
                   || LPAD (TO_CHAR (nnn1_), 3, '0');
 
-               p_ins (kodp_, asp_S_);                                
+               p_ins (kodp_, asp_S_);
 
                -- код DD=05 код за ЄДРПОУ (ДРФО) умовний номер
                kodp_ :=
@@ -2432,10 +2472,10 @@ BEGIN
                   || LPAD (coun_, 3, '0')
                   || LPAD (TO_CHAR (nnn1_), 3, '0');
 
-               p_ins (kodp_, LPAD (TRIM (asp_K_), 10, '0'));       
-               
+               p_ins (kodp_, LPAD (TRIM (asp_K_), 10, '0'));
+
                -- код DD=06 назва клієнта
-               if asp_S_ in ('F','S') 
+               if asp_S_ in ('F','S')
                then
                   asp_N_ := '';
                end if;
@@ -2450,7 +2490,7 @@ BEGIN
                   || LPAD (coun_, 3, '0')
                   || LPAD (TO_CHAR (nnn1_), 3, '0');
 
-               p_ins (kodp_, asp_N_);                               
+               p_ins (kodp_, asp_N_);
             END IF;
 
             -- код DD=10 назва банка-кореспондента
@@ -2478,7 +2518,7 @@ BEGIN
                    '2625',
                    '2627',
                    '2673',
-                   '2853', 
+                   '2853',
                    '2869',
                    '2871',
                    '3461',
@@ -2496,7 +2536,7 @@ BEGIN
                    '8445',
                    '8446',
                    '8466') AND g.NLS not like '1600%'
-               ) OR g.NLS like '1600%'  
+               ) OR g.NLS like '1600%'
             THEN
                -- код DD=07 код банка-учасника
                kodp_ :=
@@ -2571,7 +2611,7 @@ BEGIN
                    '2625',
                    '2627',
                    '2673',
-                   '2853', 
+                   '2853',
                    '2869',
                    '2871',
                    '3461',
@@ -2666,7 +2706,7 @@ BEGIN
                     INTO ref_mmv, dat_mmv
                     FROM provodki_otc
                    WHERE     REF = ref_m37
-                         AND fdat BETWEEN Dat1_ AND Dat_+3
+                         AND fdat = any(select fdat from fdat where fdat BETWEEN Dat1_ AND Dat_+3) 
                          AND kv = g.kv
                          AND nlsd = g.nls
                          AND ROWNUM = 1;
@@ -2728,7 +2768,7 @@ BEGIN
             || LPAD (TO_CHAR (g.kv), 3, '0')
             || kod2_
             || LPAD (coun_, 3, '0')
-            || '000';                           
+            || '000';
 
          p_ins (kodp_, TO_CHAR (ABS (s2_)));
       ELSE
@@ -2744,7 +2784,7 @@ BEGIN
             || LPAD (TO_CHAR (g.kv), 3, '0')
             || kod2_
             || LPAD (coun_, 3, '0')
-            || '000';                           
+            || '000';
 
          p_ins (kodp_, TO_CHAR (s2_));
       END IF;
@@ -2759,7 +2799,7 @@ BEGIN
          || LPAD (TO_CHAR (g.kv), 3, '0')
          || kod2_
          || LPAD (coun_, 3, '0')
-         || '000';                              
+         || '000';
 
       p_ins (kodp_, g.nmk);
    END LOOP;
@@ -2773,13 +2813,13 @@ BEGIN
     WHERE a.kodp LIKE '07%' AND TRIM (a.znap) IS NULL;
 
 --------------------------------------------------------------------------
-   -- 08/12/2016 
+   -- 08/12/2016
    -- дополнительно для бал.счета 1500 в кода показателя 03 изменяем код банка
-   -- на такое значение как в показателе 07 (для значения 999 меняем на 6) 
+   -- на такое значение как в показателе 07 (для значения 999 меняем на 6)
    FOR k IN ( SELECT kodp, DECODE(TRIM(znap), '999', '6', trim(znap)) znap, REF
               FROM rnbu_trace
-              WHERE kodp LIKE '07%' 
-                AND SUBSTR (kodp, 17, 4) = '1500'  
+              WHERE kodp LIKE '07%'
+                AND SUBSTR (kodp, 17, 4) = '1500'
                 AND TRIM(znap) not in ('6', '777')
               ORDER BY 1, 2, 3
             )
@@ -2787,8 +2827,8 @@ BEGIN
 
          UPDATE rnbu_trace
             SET znap = k.znap
-          WHERE kodp like '03%' 
-            and substr(kodp,3) = substr(k.kodp,3)  
+          WHERE kodp like '03%'
+            and substr(kodp,3) = substr(k.kodp,3)
             and REF = k.REF;
    END LOOP;
 --------------------------------------------------------------------------
@@ -2807,7 +2847,7 @@ BEGIN
                       SUBSTR (comm, 1, 7) kod_n,
                       REF
                  FROM rnbu_trace
-                WHERE kodp LIKE '07%' AND SUBSTR (kodp, 31, 3) = '000'  
+                WHERE kodp LIKE '07%' AND SUBSTR (kodp, 31, 3) = '000'
              ORDER BY 1, 2, 3)
    LOOP
       IF bank_ IS NULL AND kod7_ IS NULL
@@ -2832,10 +2872,10 @@ BEGIN
        WHERE REF = k.REF;
    END LOOP;
 
-   delete from rnbu_trace 
+   delete from rnbu_trace
    where kodp like '07%'
      and substr(kodp, 24, 4) IN ('1221', '1251', '1551', '1721', '1751',
-                                 '2443', '2611', '2625', '2627', '2673', 
+                                 '2443', '2611', '2625', '2627', '2673',
                                  '2853', '2869', '2871', '3461', '3592'
                                 )
      and substr(kodp, 17, 4) <> '1600';
@@ -2897,7 +2937,7 @@ BEGIN
                       0)
                       p80
               FROM rnbu_trace
-             WHERE SUBSTR (kodp, 1, 2) IN ('99')  
+             WHERE SUBSTR (kodp, 1, 2) IN ('99')
           ORDER BY SUBSTR (kodp, 3, 28),
                    SUBSTR (kodp, 31),
                    SUBSTR (kodp, 1, 2))
@@ -2947,7 +2987,7 @@ BEGIN
                nbuc_
           FROM rnbu_trace
          WHERE SUBSTR (kodp, 1, 2) NOT IN
-                  ('03', '04', '05', '06', '07', '10', '80', '99') 
+                  ('03', '04', '05', '06', '07', '10', '80', '99')
       GROUP BY kodf_,
                dat_,
                kodp,
