@@ -305,7 +305,7 @@ is
     -- Константы                                                   --
     -----------------------------------------------------------------
 
-    VERSION_BODY      constant varchar2(64)  := 'version 5.7 20.11.2017';
+    VERSION_BODY      constant varchar2(64)  := 'version 5.8 15.03.2018';
     G_MODULE          constant varchar2(4)   := 'CSH';
     G_CASH_JOURNAL    constant varchar2(4)   := 'CJ';
     G_SVOD_DAY        constant varchar2(4)   := 'SD';
@@ -1043,8 +1043,7 @@ is
                       optype,
                       s, sq,
                       post_userid)
-                select /*+ LEADING(o) INDEX(l PK_OPLDOK) */
-                       0,
+                select '0',
                        sys_context('bars_context', 'user_branch'),
                        v.acc,
                        v.nls,
@@ -1057,17 +1056,11 @@ is
                               decode(v.kv, 980, l.s, gl.p_icurval(v.kv, l.s, pdat)),
                               o.s2) sq,
                        o.userid
-                  from oper o, opldok l, v_cashaccounts v
-                 where o.pdat between l_date - 2 and l_next_date + 2
+                  from oper o, opldok l, v_cashaccounts v,(select ref, dat, userid from oper_visa
+                        where groupid not in (77, 80, 81, 30) and status = 2)  ov
+                 where l.fdat  = trunc(l_date)
                    and o.sos = 5
-                   and exists
-                 (select /* + INDEX(ov) */ 1
-                          from oper_visa ov
-                         where o.ref = ov.ref
-                           and ov.groupid not in (77, 80, 81, 30)
-                           and ov.status = 2
-                           and ov.dat between l_date and l_next_date
-						   )
+                   and o.ref = ov.ref(+)
                    and o.ref = l.ref
                    and l.acc = v.acc;
 
@@ -1120,7 +1113,7 @@ is
                  and o.userid = sb.id
                  and o.branch  = sys_context('bars_context','user_branch')
                  and sb.branch = sys_context('bars_context','user_branch')
-                 and substr(v.nls,1,4) in ('2620','2628','2630','2638','9760');
+                 and substr(v.nls,1,4) in ('2620','2628','2630','2638','9760','2909','2902'); --COBUMMFO-6936 (добавлені бал рах '2909','2902')
 
 
            else
@@ -1163,6 +1156,7 @@ is
             and ks.fdat   = l_date
             and ( ((ks.ostf <>0 or v.sdb<>0 or v.skr<>0 or a.ostc<>0 ) and substr(a.nls,1,1) = '9') or
                   ( a.ostc<>0 and substr(a.nls,1,4) = '9812' )  or
+                  ( a.ostc<>0 and substr(a.nls,1,4) = '3400' ) or
                     substr(a.nls,1,1) = '1'
                 );
 
@@ -1323,7 +1317,7 @@ is
                                is_ourvisa, is_dptdoc)
                 select '0',
                        o.ref, v.acc, v.nls, v.kv, v.nms, decode(l.dk, 0, decode(v.pap, 1, 1,   0), decode(v.pap, 1, 0, 1) ),
-                       l.s, l.sq sq,
+                       l.s, decode(v.kv, 980, l.s, gl.p_icurval( v.kv, l.s, pdat)) sq,
                        nd, l.dk,
                        get_sk( v.nls, o.nlsa, o.nlsb, o.kv, o.kv2, o.sk, o.tt),
                        l.tt,
@@ -1568,7 +1562,7 @@ is
              and o.userid = sb.id
              and o.branch  = sys_context('bars_context','user_branch')
              and sb.branch = sys_context('bars_context','user_branch')
-             and substr(v.nls,1,4) in ('2620','2628','2630','2635','2638','9760');
+             and substr(v.nls,1,4) in ('2620','2628','2630','2635','2638','9760','2909','2902'); --COBUMMFO-6936 (добавлені бал рах '2909','2902')
 
         else
             bars_error.raise_nerror(G_MODULE, 'NOT_CASH_REPORT', p_type);
@@ -1619,6 +1613,7 @@ is
             and ks.opdate  =  l_shift_date
             and ks.branch  =  sys_context('bars_context','user_branch')
             and ( ((ks.ostf <>0 or v.sdb<>0 or v.skr<>0 or a.ostc<>0 ) and substr(a.nls,1,1) = '9') or
+            ( a.ostc<>0 and substr(a.nls,1,4) = '3400' )  or
                   ( a.ostc<>0 and substr(a.nls,1,4) = '9812' )  or
                     substr(a.nls,1,1) = '1'
                 );
