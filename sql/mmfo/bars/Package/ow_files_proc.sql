@@ -49,6 +49,19 @@
                          p_key       in varchar2,
                          p_int_sign  in varchar2,
                          p_sep_sign  in varchar2);
+
+  -- функция формирования дод. реквизита «Way4 Код транзакції» на основании привязки счетов к договору
+  function get_w4_msgcode(p_nls accounts.nls%type, p_kv accounts.kv%type)
+		return varchar2;
+
+   -- функция уточнения счета кредита для счето 6___, не привязанных к договору
+   function get_w4_nlsb(p_nls accounts.nls%type, p_ref oper.ref%type)
+   return varchar2;
+
+   function check_w4_form_sto_oper return T_ow_iicfiles_oper_lst;
+   function check_w4_form_oper return T_ow_iicfiles_oper_lst;
+   function w4_form_sto return T_ow_iicfiles_form_lst;
+   function w4_form return T_ow_iicfiles_form_lst;
 end;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.OW_FILES_PROC is
@@ -2832,6 +2845,410 @@ CREATE OR REPLACE PACKAGE BODY BARS.OW_FILES_PROC is
             l_info := 'Помилка при накладані візи '||substr(sqlerrm || ' - ' || dbms_utility.format_error_backtrace, 1, 1024);
             bars_audit.error('ow_files_proc.put_doc_sign: ref = '||p_ref||', error - '||l_info);
   end;
+
+	-- функция формирования дод. реквизита «Way4 Код транзакції» на основании привязки счетов к договору
+	function get_w4_msgcode(p_nls accounts.nls%type, p_kv accounts.kv%type)
+		return varchar2 as
+		l_w4_msgcode varchar2(220);
+	begin
+		select 'LOANPAY' || r.ord w4_msgcode
+		  into l_w4_msgcode
+		  from accounts a
+		  join nd_acc na
+			 on na.acc = a.acc
+		  join nd_txt nt
+			 on nt.nd = na.nd
+			and nt.tag = 'CCRNG'
+		  join cc_rang r
+			 on r.rang = nt.txt
+			and r.tip = a.tip
+		 where a.nls = p_nls
+			and a.kv = p_kv;
+	
+		return l_w4_msgcode;
+	exception
+		when others then
+			return l_w4_msgcode;
+	end get_w4_msgcode;
+
+	-- функция уточнения счета кредита для счето 6___, не привязанных к договору
+	function get_w4_nlsb(p_nls accounts.nls%type, p_ref oper.ref%type)
+	return varchar2 
+        as
+		l_nls accounts.nls%type;
+	begin
+	   if substr(p_nls, 1, 1) = '6' then
+              -- Для счета 6___ ищем среди документов операции дебетование счета 8008 (SN8)
+              -- и подставляем его номер вместо счета 6___
+              select a.nls
+              into l_nls
+              from opldok d 
+              join accounts a on a.acc = d.acc
+              where d.ref = p_ref and d.dk = 1 and a.tip = 'SN8' ;
+	   else
+              -- Если счет не 6___, возвращаем как есть
+              l_nls := p_nls;
+           end if;
+    	   return l_nls;
+	exception
+           when others then
+		return l_nls;
+	end get_w4_nlsb;
+
+	-- Отбор доступных операций для представления V_OW_IICFILES_STO
+	function check_w4_form_sto_oper return T_ow_iicfiles_oper_lst as
+		l_oper T_ow_iicfiles_oper_lst := T_ow_iicfiles_oper_lst();
+		l_tt   oper.tt%type;
+	begin
+		l_tt := NVL(getglobaloption('ASG_FOR_BPK'), 'W4Y');
+		-- документы на пополнение/списание
+		SELECT T_ow_iicfiles_oper(ref,
+										  dk,
+										  tt,
+										  mfoa,
+										  mfob,
+										  nlsa,
+										  nlsb,
+										  s,
+										  s2,
+										  vdat,
+										  nazn,
+										  kv,
+										  nextvisagrp,
+										  sos) BULK COLLECT
+		  INTO l_oper
+		  FROM oper
+		 WHERE (REF, nlsa) IN
+				 (SELECT MIN(REF), nlsa
+					 FROM oper o1
+					WHERE tt IN (SELECT tt FROM w4_sto_tts)
+					  AND NOT EXISTS (SELECT 1 -- не отправлять документы в ПЦ, пока не сквитованы предыдущие)
+								FROM oper
+							  WHERE nlsa = o1.nlsa
+								 AND pdat >= bankdate - 30
+								 AND tt != l_tt
+								 AND sos BETWEEN 2 AND 4)
+					  AND sos > 0
+					  AND pdat >= bankdate - 30
+					  AND tt != l_tt
+					  AND EXISTS
+					(SELECT 1 FROM ow_pkk_que WHERE REF = o1.REF)
+					  and not exists (select 1
+								from ow_pkk_que
+							  where ref = o1.ref
+								 and sos = 1
+								 and drn is not null)
+					GROUP BY nlsa);
+	
+		return l_oper;
+	exception
+		when others then
+			return l_oper;
+	end;
+
+	-- Отбор доступных операций для представления V_OW_IICFILES
+	function check_w4_form_oper return T_ow_iicfiles_oper_lst as
+		l_oper T_ow_iicfiles_oper_lst := T_ow_iicfiles_oper_lst();
+		l_tt   oper.tt%type;
+	begin
+		l_tt := NVL(getglobaloption('ASG_FOR_BPK'), 'W4Y');
+	
+		-- документы на пополнение/списание
+		SELECT T_ow_iicfiles_oper(ref,
+										  dk,
+										  tt,
+										  mfoa,
+										  mfob,
+										  nlsa,
+										  nlsb,
+										  s,
+										  s2,
+										  vdat,
+										  nazn,
+										  kv,
+										  nextvisagrp,
+										  sos) BULK COLLECT
+		  INTO l_oper
+		  FROM oper
+		 WHERE (REF, nlsa) IN
+				 (SELECT MIN(REF), nlsa
+					 FROM oper o1
+					WHERE tt NOT IN (SELECT tt FROM w4_sto_tts)
+					  AND dk = 1
+					  AND NOT EXISTS -- не отправлять документы в ПЦ, пока не сквитованы предыдущие)
+					(SELECT 1
+								FROM oper
+							  WHERE nlsa = o1.nlsa
+								 AND pdat >= bankdate - 30
+								 AND dk = 1
+								 AND tt NOT IN (SELECT tt FROM w4_sto_tts)
+								 and ref in (select ref from ow_pkk_que)
+								 AND tt != l_tt
+								 AND sos BETWEEN 2 AND 4)
+					  AND sos > 0
+					  AND tt != l_tt
+					  AND pdat >= bankdate - 30
+					  and ref in (select ref from ow_pkk_que)
+					  and not exists (select 1
+								from ow_pkk_que
+							  where ref = o1.ref
+								 and sos = 1
+								 and drn is not null)
+					GROUP BY nlsa
+				  UNION ALL
+				  SELECT REF, nlsa
+					 FROM oper o1
+					WHERE tt NOT IN (SELECT tt FROM w4_sto_tts)
+					  AND tt in (select t.tt
+										from obpc_trans_out t
+										join ow_msgcode o
+										  on t.w4_msgcode = o.msgcode
+										 and o.dk = 1)
+					  AND sos > 0
+					  AND pdat >= bankdate - 30
+					  and ref in (select ref from ow_pkk_que where sos = 0));
+		return l_oper;
+	exception
+		when others then
+			return l_oper;
+	end;
+
+	-- Подготовка данных для представления V_OW_IICFILES_FORM_STO
+	function w4_form_sto return T_ow_iicfiles_form_lst as
+		l_oper     T_ow_iicfiles_form_lst := T_ow_iicfiles_form_lst();
+		l_tt       oper.tt%type;
+		l_bpk_chk  oper.nextvisagrp%type;
+		l_bpk_chk2 oper.nextvisagrp%type;
+		l_mfo      oper.mfob%type;
+	begin
+		l_tt       := NVL(getglobaloption('ASG_FOR_BPK'), 'W4Y');
+		l_bpk_chk  := LPAD(chk.to_hex(TO_NUMBER(getglobaloption('BPK_CHK'))),
+								 2,
+								 '0');
+		l_bpk_chk2 := LPAD(chk.to_hex(TO_NUMBER(getglobaloption('BPK_CHK2'))),
+								 2,
+								 '0');
+		l_mfo      := getglobaloption('MFO');
+	
+		SELECT T_ow_iicfiles_form(p.acc,
+										  p.REF,
+										  p.dk,
+										  p.tt,
+										  p.mfoa,
+										  p.nlsa,
+										  OW_FILES_PROC.get_w4_nlsb(p.nlsb, p.ref),
+										  p.s,
+										  p.vdat,
+										  p.nazn,
+										  p.w4_msgcode,
+										  p.tt_asg,
+										  p.kv) BULK COLLECT 
+		  INTO l_oper 
+		  FROM (SELECT q.acc,
+							q.REF,
+							q.dk,
+							d.tt,
+							-- mfoa, nlsa - mfo mfo и счет отправителя
+							d.mfoa,
+							d.nlsa,
+							-- nlsb - счет-корреспондент к 2625
+							DECODE(q.dk, d.dk, d.nlsa, d.nlsb) nlsb,
+							DECODE(q.dk, d.dk, NVL(d.s2, d.s), d.s) s,
+							d.vdat,
+							d.nazn,
+							NVL(w.VALUE, t.w4_msgcode) w4_msgcode,
+							l_tt tt_asg,
+							d.kv
+					 FROM ow_pkk_que q,
+							table(OW_FILES_PROC.check_w4_form_sto_oper()) d,
+							obpc_trans_out t,
+							operw w
+					WHERE q.sos = 0
+					  AND q.f_n IS NULL
+					  AND q.REF = d.REF
+					  AND d.tt = t.tt
+					  AND q.dk = t.dk
+						  -- оплачен
+					  AND (d.sos = 5
+							-- по плану и след. виза = 30 Контролер БПК
+							OR d.sos = 1 AND d.nextvisagrp = l_bpk_chk)
+					  AND t.tt IN (SELECT tt
+										  FROM obpc_trans_out
+										HAVING COUNT(tt) = 1
+										 GROUP BY tt)
+					  AND d.REF = w.REF(+)
+					  AND w.tag(+) = 'W4MSG'
+				  UNION ALL
+				  -- документы на пополнение-списание (списание с карточки на карточку)
+				  SELECT q.acc,
+							q.REF,
+							q.dk,
+							d.tt,
+							-- mfoa, nlsa - mfo и счет отправителя
+							d.mfoa,
+							d.nlsa,
+							-- nlsb - счет-корреспондент к 2625
+							DECODE(q.dk, d.dk, d.nlsa, d.nlsb) nlsb,
+							DECODE(q.dk, d.dk, NVL(d.s2, d.s), d.s) s,
+							d.vdat,
+							d.nazn,
+							t.w4_msgcode,
+							l_tt tt_asg,
+							d.kv
+					 FROM ow_pkk_que q,
+							table(OW_FILES_PROC.check_w4_form_sto_oper()) d,
+							obpc_trans_out t
+					WHERE q.sos = 0
+					  AND q.f_n IS NULL
+					  AND q.REF = d.REF
+					  AND d.tt = t.tt
+					  AND q.dk = t.dk
+						  -- по плану
+					  AND d.sos = 1
+						  -- документы на списание, след. виза = 30 Контролер БПК
+					  AND (q.dk = 0 AND d.nextvisagrp = l_bpk_chk
+							-- документы на пополнение, след. виза = 31 Контролер БПК-2
+							OR q.dk = 1 AND d.nextvisagrp = l_bpk_chk2)
+						  -- внутрибанк/входяший или сквитованный межбанк
+					  AND (d.mfob = l_mfo OR d.mfob <> l_mfo AND EXISTS
+							 (SELECT 1
+								 FROM arc_rrp
+								WHERE REF = d.REF
+								  AND fn_b IS NOT NULL
+								  AND sos >= 7))
+					  AND t.tt IN (SELECT tt
+										  FROM obpc_trans_out
+										HAVING COUNT(tt) = 2
+										 GROUP BY tt)) p
+         where rownum <= g_iicnum;
+		return l_oper;
+	exception
+		when others then
+			return l_oper;
+	end;
+
+	-- Подготовка данных для представления V_OW_IICFILES_FORM
+	function w4_form return T_ow_iicfiles_form_lst as
+		l_oper     T_ow_iicfiles_form_lst := T_ow_iicfiles_form_lst();
+		l_tt       oper.tt%type;
+		l_bpk_chk  oper.nextvisagrp%type;
+		l_bpk_chk2 oper.nextvisagrp%type;
+		l_mfo      oper.mfob%type;
+	begin
+		l_tt       := NVL(getglobaloption('ASG_FOR_BPK'), 'W4Y');
+		l_bpk_chk  := LPAD(chk.to_hex(TO_NUMBER(getglobaloption('BPK_CHK'))),
+								 2,
+								 '0');
+		l_bpk_chk2 := LPAD(chk.to_hex(TO_NUMBER(getglobaloption('BPK_CHK2'))),
+								 2,
+								 '0');
+		l_mfo      := getglobaloption('MFO');
+	
+		SELECT T_ow_iicfiles_form(p.acc,
+										  p.REF,
+										  p.dk,
+										  p.tt,
+										  p.mfoa,
+ 										  OW_FILES_PROC.get_w4_nlsb(p.nlsb, p.ref),
+										  p.nlsb,
+										  p.s,
+										  p.vdat,
+										  p.nazn,
+										  p.w4_msgcode,
+										  p.tt_asg,
+										  p.kv) BULK COLLECT
+		  INTO l_oper 
+		  FROM (SELECT q.acc,
+							q.REF,
+							q.dk,
+							d.tt,
+							-- mfoa, nlsa - mfo и счет отправителя
+							d.mfoa,
+							d.nlsa,
+							-- nlsb - счет-корреспондент к 2625
+							DECODE(q.dk, d.dk, d.nlsa, d.nlsb) nlsb,
+							DECODE(q.dk, d.dk, NVL(d.s2, d.s), d.s) s,
+							d.vdat,
+							d.nazn,
+							NVL(w.VALUE, t.w4_msgcode) w4_msgcode,
+							l_tt tt_asg,
+							d.kv
+					 FROM ow_pkk_que q,
+							table(OW_FILES_PROC.check_w4_form_oper()) d,
+							obpc_trans_out t,
+							operw w
+					WHERE q.sos = 0
+					  AND q.f_n IS NULL
+					  AND q.REF = d.REF
+					  AND d.tt = t.tt
+					  AND q.dk = t.dk
+					  AND d.tt NOT IN (SELECT tt FROM w4_sto_tts)
+						  -- оплачен
+					  AND (d.sos = 5
+							-- по плану и след. виза = 30 Контролер БПК
+							OR d.sos = 1 AND d.nextvisagrp = l_bpk_chk)
+						  -- внутрибанк/входяший или сквитованный межбанк
+					  AND (d.mfob = l_mfo OR d.mfob <> l_mfo AND EXISTS
+							 (SELECT 1
+								 FROM arc_rrp
+								WHERE REF = d.REF
+								  AND fn_b IS NOT NULL
+								  AND sos >= 7))
+					  AND t.tt IN (SELECT tt
+										  FROM obpc_trans_out
+										HAVING COUNT(tt) = 1
+										 GROUP BY tt)
+					  AND d.REF = w.REF(+)
+					  AND w.tag(+) = 'W4MSG'
+				  UNION ALL
+				  -- документы на пополнение-списание (списание с карточки на карточку)
+				  SELECT q.acc,
+							q.REF,
+							q.dk,
+							d.tt,
+							-- mfoa, nlsa - mfo и счет отправителя
+							d.mfoa,
+							d.nlsa,
+							-- nlsb - счет-корреспондент к 2625
+							DECODE(q.dk, d.dk, d.nlsa, d.nlsb) nlsb,
+							DECODE(q.dk, d.dk, NVL(d.s2, d.s), d.s) s,
+							d.vdat,
+							d.nazn,
+							t.w4_msgcode,
+							l_tt tt_asg,
+							d.kv
+					 FROM ow_pkk_que q,
+							table(OW_FILES_PROC.check_w4_form_oper()) d,
+							obpc_trans_out t
+					WHERE q.sos = 0
+					  AND q.f_n IS NULL
+					  AND q.REF = d.REF
+					  AND d.tt = t.tt
+					  AND q.dk = t.dk
+						  -- по плану
+					  AND d.sos = 1
+					  AND d.tt NOT IN (SELECT tt FROM w4_sto_tts)
+						  -- документы на списание, след. виза = 30 Контролер БПК
+					  AND (q.dk = 0 AND d.nextvisagrp = l_bpk_chk
+							-- документы на пополнение, след. виза = 31 Контролер БПК-2
+							OR q.dk = 1 AND d.nextvisagrp = l_bpk_chk2)
+						  -- внутрибанк/входяший или сквитованный межбанк
+					  AND (d.mfob = l_mfo OR d.mfob <> l_mfo AND EXISTS
+							 (SELECT 1
+								 FROM arc_rrp
+								WHERE REF = d.REF
+								  AND fn_b IS NOT NULL
+								  AND sos >= 7))
+					  AND t.tt IN (SELECT tt
+										  FROM obpc_trans_out
+										HAVING COUNT(tt) = 2
+										 GROUP BY tt)) p
+			where rownum <= g_iicnum;
+		return l_oper;
+	exception
+		when others then
+			return l_oper;
+	end;
 
 begin
   init;

@@ -12,16 +12,7 @@ PROMPT *** Create  view V_OW_IICFILES_FORM_KD ***
           p.REF,
           p.dk,
           p.tt,
-          CASE
-             WHEN p.nlsb LIKE '2__9%' THEN 'LOANPAY1'
-             WHEN p.nlsb LIKE '3579%' THEN 'LOANPAY2'
-             WHEN p.nlsb LIKE '2__7%' THEN 'LOANPAY3'
-             WHEN p.nlsb LIKE '2__8%' THEN 'LOANPAY4'
-             WHEN p.nlsb LIKE '3578%' THEN 'LOANPAY5'
-             WHEN p.nlsb LIKE '6___%' THEN 'LOANPAY7'
-             ELSE 'LOANPAY6'
-          END
-             w4_msgcode,
+          OW_FILES_PROC.get_w4_msgcode(p.nlsb, p.kv) w4_msgcode,
           a.acc,
           a.nls,
           a.kv,
@@ -34,11 +25,12 @@ PROMPT *** Create  view V_OW_IICFILES_FORM_KD ***
                   q.REF,
                   q.dk,
                   d.tt,
-                  DECODE (q.dk, d.dk, d.nlsa, d.nlsb) nlsb,
+                  DECODE (q.dk, d.dk, d.nlsa, OW_FILES_PROC.get_w4_nlsb(d.nlsb, q.ref)) nlsb,
                   DECODE (q.dk, d.dk, NVL (d.s2, d.s), d.s) s,
                   d.vdat,
                   d.nazn,
-                  t.w4_msgcode
+                  t.w4_msgcode,
+						d.kv
              FROM ow_pkk_que q,
                   (SELECT *
                      FROM oper
