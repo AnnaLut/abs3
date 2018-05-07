@@ -3,13 +3,17 @@ CREATE OR REPLACE PROCEDURE BARS.p_fd9_NN (Dat_ DATE ,
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #D9 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 14/02/2018 (02/02/2018)
+% VERSION     : 04/05/2018 (16/04/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+04.05.2018 - не будут формироваться дубликати показателя 010
+16.04.2018 - изменено формирование кода ОКПО(K020) и кода K021
+01.03.2018 - для контрагента или учасника - Кабинет Министров Украины
+             параметр K021 будет формироваться как "9"
 02.02.2018 - для расшфровки участников ЮЛ убрано условие 
-             что только неинсайдеры  (  and NVL(c.prinsider,99) = 99  ) 
+             что только неинсайдеры  (  and NVL(c.prinsider,99) = 99  )
 31.01.2018 - змінено формування частини показника ЗЗЗЗЗЗЗЗЗЗ для 
              нерезидентів
 25.01.2018 - змінено формування кодів ZZZZZZZZZZ і ЗЗЗЗЗЗЗЗЗЗ а також
@@ -129,7 +133,7 @@ cust_type number;
 glb_      number;
 dat_izm1     date := to_date('31/08/2013','dd/mm/yyyy');
 is_foreign_bank     number;
-
+pr_kl_    number;
 -----------------------------------------------------------------------------
 BEGIN
 -------------------------------------------------------------------
@@ -184,7 +188,6 @@ BEGIN
                               where datf = Dat_
                                 and rnk is not null
                                 and p040 <> 0 )
-                --and NVL(c.prinsider,99) = 99
                 and b.region_u = to_char(k.C_REG(+))
                 and c.rnk = b.rnka
                 and c.rnk <> 94809201
@@ -246,6 +249,7 @@ BEGIN
        nmk_ := k.nmk;
        nmk_u_ := k.nmk_u;
        okpo_u := k.okpo_u;
+       okpo_ := '0000000000';
 
        rnka_ := k.rnka;
 
@@ -253,6 +257,16 @@ BEGIN
           rnka_k := rnka_k+1;
           rnka_ := rnka_k;
        end if;
+
+       -- визначаємо чи є учасник клієнтом банку
+       BEGIN
+          select 1
+             into pr_kl_
+          from customer 
+          where rnk = k.rnka;
+       EXCEPTION WHEN NO_DATA_FOUND THEN
+          pr_kl_ := 0;
+       END;
 
        BEGIN
           select NVL(k081,' ')
@@ -306,142 +320,214 @@ BEGIN
           k021_k := '4';
        END IF;
 
-       -- для ФО резидент?в
-       IF k.codc in (5,6) then
-          BEGIN
-             select NVL(replace(trim(ser),' ',''),''), NVL(numdoc,'000000')
-                into ser_k, numdoc_k
-             from person
-             where rnk = k.rnk;
-          EXCEPTION WHEN NO_DATA_FOUND THEN
-             ser_k := '';
-             numdoc_k := '000000';
-          END;
-       END IF;
-
-       if (nvl(ltrim(trim(k.okpo), '0'), 'Z') = 'Z' or
-           nvl(ltrim(trim(k.okpo), '9'), 'Z') = 'Z') and 
-           k.codc not in (1,2)
+       -- для ЮЛ резидентов
+       if k.codc = 3 
        then
-          -- для ЮЛ резидентов
-          if k.codc in (3) then
-             okpo_k := lpad(trim(k.rnk),10,'0');
+          -- наличие ИНН(ОКПО)
+          if nvl(ltrim(trim(k.okpo), '0'), 'Z') <> 'Z' AND 
+             nvl(ltrim(trim(k.okpo), '9'), 'Z') <> 'Z'  
+          then
+             okpo_k := LPAD (trim(k.okpo), 10, '0');
+             k021_k := '1';
+             if k.ise in ('13110','13120','13131','13132') then
+                k021_k := 'G';
+             end if;
+          end if;
+          -- отсутствие ИНН(ОКПО)
+          if nvl(ltrim(trim(k.okpo), '0'), 'Z') = 'Z' OR 
+             nvl(ltrim(trim(k.okpo), '9'), 'Z') = 'Z'  
+          then
+             okpo_k := LPAD (trim(k.rnk), 10, '0');
              k021_k := 'E';
           end if;
-          
-          if k.codc = 4 then
-             okpo_k := 'I' || lpad(to_char(k.rnk), 9, '0');
-             k021_k := '9';
+       end if;
+
+       -- для ЮЛ нерезидентов
+       if k.codc = 4 
+       then
+          -- наличие ИНН(ОКПО)
+          if nvl(ltrim(trim(k.okpo), '0'), 'Z') <> 'Z' AND 
+             nvl(ltrim(trim(k.okpo), '9'), 'Z') <> 'Z'  
+          then
+             okpo_k := LPAD (trim(k.okpo), 10, '0');
+             k021_k := '1';
           end if;
-                    
-          -- для ФЛ резидентов
-          if k.codc in (5) then
-             okpo_k := lpad(substr(ser_k||numdoc_k, 1, 10), 10, '0');
-             k021_k := '6';
-          end if;
-          
-          -- для ФЛ нерезидентов
-          if k.codc = 6 and ser_k not in ('','00') and numdoc_k <> '000000' then
-             okpo_k := 'I' || lpad(to_char(k.rnk), 9, '0');
-             k021_k := '9';
-          end if;
-          
-          if k.codc = 6 and ser_k in ('','00') and numdoc_k = '000000'then
-             kol_ := kol_+1;
-             okpo_k := 'I' || lpad(to_char(k.rnk), 9, '0');
+          -- отсутствие ИНН(ОКПО)
+          if nvl(ltrim(trim(k.okpo), '0'), 'Z') = 'Z' OR 
+             nvl(ltrim(trim(k.okpo), '9'), 'Z') = 'Z'  
+          then
+             okpo_k := 'I' || LPAD (trim(k.rnk), 9, '0');
              k021_k := '9';
           end if;
        end if;
-       
-       if  nvl(ltrim(trim(k.okpo), '0'), 'Z') <> 'Z' and
-           nvl(ltrim(trim(k.okpo), '9'), 'Z') <> 'Z' and 
-           k.codc not in (1,2)
+
+       -- для ФО резидент?в
+       IF k.codc = 5 
        then
-          if k.codc in (4,6) then
-             okpo_k := 'I' || lpad(to_char(k.rnk), 9, '0');
-             k021_k := '9';
-          else
-             if k.codc not in (1,2,4,6) then
-                okpo_k := substr(trim(k.okpo), 1, 10);
-             end if;
+          -- наличие ИНН(ОКПО)
+          if nvl(ltrim(trim(k.okpo), '0'), 'Z') <> 'Z' AND 
+             nvl(ltrim(trim(k.okpo), '9'), 'Z') <> 'Z'  
+          then
+             okpo_k := LPAD (trim(k.okpo), 10, '0');
+             k021_k := '2';
+          end if;
+
+          -- отсутствие ИНН(ОКПО)
+          if nvl(ltrim(trim(k.okpo), '0'), 'Z') = 'Z' OR 
+             nvl(ltrim(trim(k.okpo), '9'), 'Z') = 'Z'  
+          then
+             BEGIN
+                select NVL(replace(trim(ser),' ',''),''), NVL(numdoc,'000000')
+                   into ser_k, numdoc_k
+                from person
+                where rnk = k.rnk;
+
+                okpo_k := lpad(substr(ser_k||numdoc_k, 1, 10), 10, '0');
+                k021_k := '6';
+             EXCEPTION WHEN NO_DATA_FOUND THEN
+                okpo_k := lpad(k.rnk, 10, '0');
+                k021_k := '9';
+             END;
+          end if; 
+       end if;
+
+       -- для ФО нерезидент?в
+       IF k.codc = 6 
+       then
+          -- наличие ИНН(ОКПО)
+          if nvl(ltrim(trim(k.okpo), '0'), 'Z') <> 'Z' AND 
+             nvl(ltrim(trim(k.okpo), '9'), 'Z') <> 'Z'  
+          then
+             okpo_k := LPAD (trim(k.okpo), 10, '0');
+             k021_k := '2';
+          end if;
+
+          -- отсутствие ИНН(ОКПО)
+          if nvl(ltrim(trim(k.okpo), '0'), 'Z') = 'Z' OR 
+             nvl(ltrim(trim(k.okpo), '9'), 'Z') = 'Z'  
+          then
+             BEGIN
+                select NVL(replace(trim(ser),' ',''),''), NVL(numdoc,'000000')
+                   into ser_k, numdoc_k
+                from person
+                where rnk = k.rnk;
+
+                okpo_k := 'I' || lpad(substr(ser_k||numdoc_k, 1, 10), 9, '0');
+                k021_k := 'B';
+             EXCEPTION WHEN NO_DATA_FOUND THEN
+                okpo_k := 'I' || lpad(TO_CHAR(k.rnk), 9, '0');
+                k021_k := '9';
+             END;
+          end if; 
+       end if;
+
+       -- учасник ЮО
+       if k.tk in (1, 3) 
+       then
+          -- наличие ИНН(ОКПО)
+          if  nvl(ltrim(trim(k.okpo_u), '0'), 'Z') <> 'Z' and
+              nvl(ltrim(trim(k.okpo_u), '9'), 'Z') <> 'Z'
+          then
+             if k040_ <> '804' then
+                select count(*)
+                into is_foreign_bank
+                from rc_bnk
+                where b010 = trim(k.okpo_u);
              
-             if k.codc = 5 then
-                k021_k := '2';
-             else
-                k021_k := '1';
-                if k.ise in ('13110','13120','13131','13132') then
-                   k021_k := 'G';
+                if is_foreign_bank <> 0 then
+                   okpo_ := lpad(substr(NVL(trim(okpo_u),'0'), 1, 10), 10, '0');
+                   k021_u := '4';
+                else
+                   okpo_ := 'I' || lpad(substr(NVL(trim(okpo_u),'0'), 1, 8), 9, '0');
+                   k021_u := '8';
                 end if;
-             end if;
-          end if;
-       end if;
-
-       if  nvl(ltrim(trim(k.okpo_u), '0'), 'Z') = 'Z' or
-           nvl(ltrim(trim(k.okpo_u), '9'), 'Z') = 'Z'
-       then
-          if k040_ = '804' then
-             okpo_ := lpad(substr(ser_ || numdoc_, 1, 10), 10, '0');
-             okpo_u := ser_ || numdoc_;
-
-             if k.tk = 2 then
-                k021_u := '6';
              else
-                k021_u := 'E';
-             end if;
-
-             if k.tk = 1 then
-                kol1_ := kol1_+1;
-                okpo_ := lpad(to_char(kol1_), 10, '0');
-             end if;
-          else
-             if k.tk = 2  then  
-                okpo_ := 'I' || lpad(to_char(k.rnka), 9, '0');
-                k021_u := '9';
-             end if;
-             
-             if k.tk = 1 then
-                okpo_ := 'I' || lpad(to_char(k.rnka), 9, '0');
-
+                okpo_ := substr(lpad(trim(k.okpo_u), 10, '0'), 1, 10);
+                k021_u := '1';
                 -- органи державної влади
                 if k.ise_u in ('13110','13120','13131','13132') then
-                   kol3_ := kol3_ + 1;
-                   okpo_ := 'D' || lpad(to_char(kol3_), 9, '0');
+                   k021_u := 'G';
                 end if;
-                
-                k021_u := '9';
+             end if;
+          end if;
+
+          -- отсутствие ИНН(ОКПО)
+          if  nvl(ltrim(trim(k.okpo_u), '0'), 'Z') = 'Z' or
+              nvl(ltrim(trim(k.okpo_u), '9'), 'Z') = 'Z'
+          then
+             if k040_ = '804' then
+                if pr_kl_ = 1 
+                then
+                   okpo_ := lpad(to_char(k.rnka), 10, '0');
+                   k021_u := '9';
+                else
+                   okpo_ := lpad(to_char(k.rnka), 10, '0');
+                   k021_u := 'E';
+                end if;
+             else
+                if pr_kl_ = 1 
+                then
+                   okpo_ := 'I' || lpad(to_char(k.rnka), 9, '0');
+                   k021_u := 'C';
+                else
+                   okpo_ := 'I' || lpad(to_char(k.rnka), 9, '0');
+                   k021_u := '9';
+                end if;
+             end if;
+          end if; 
+       end if; 
+
+       -- учасник ФО
+       if k.tk = 2 
+       then
+          -- наличие ИНН(ОКПО) 
+          if  nvl(ltrim(trim(k.okpo_u), '0'), 'Z') <> 'Z' and
+              nvl(ltrim(trim(k.okpo_u), '9'), 'Z') <> 'Z'
+          then
+             if k040_ <> '804' then
+                okpo_ := 'I' || lpad(substr(NVL(trim(okpo_u),'0'), 1, 8), 9, '0');
+                k021_u := '7';
+             else
+                okpo_ := substr(lpad(trim(k.okpo_u), 10, '0'), 1, 10);
+                k021_u := '2';
+             end if;
+          end if;
+
+          -- отсутствие ИНН(ОКПО)
+          if  nvl(ltrim(trim(k.okpo_u), '0'), 'Z') = 'Z' or
+              nvl(ltrim(trim(k.okpo_u), '9'), 'Z') = 'Z'
+          then
+             if k040_ = '804' then
+                if pr_kl_ = 1 
+                then
+                   okpo_ := lpad(substr(ser_ || numdoc_, 1, 10), 10, '0');
+                   okpo_u := ser_ || numdoc_;
+                   k021_u := '6';
+                else              
+                   okpo_ := lpad(to_char(k.rnka), 10, '0');
+                   k021_u := 'E';
+                end if;
+             else
+                if pr_kl_ = 1 
+                then
+                   okpo_ := 'I' || lpad(to_char(k.rnka), 9, '0');
+                   k021_u := '8';
+                else
+                   okpo_ := 'I' || lpad(to_char(k.rnka), 9, '0');
+                   k021_u := '9';
+                end if;
              end if;
           end if;
        end if;
 
-       if  nvl(ltrim(trim(k.okpo_u), '0'), 'Z') <> 'Z' and
-           nvl(ltrim(trim(k.okpo_u), '9'), 'Z') <> 'Z'
+       if lower(k.nmk) like '%каб_нет%м_н_стр_в%'
        then
-          if k040_ <> '804' then
-             select count(*)
-             into is_foreign_bank
-             from rc_bnk
-             where b010 = trim(k.okpo_u);
-             
-             if is_foreign_bank <> 0 then
-                okpo_ := lpad(substr(NVL(trim(okpo_u),'0'), 1, 10), 10, '0');
-                k021_u := '4';
-             else
-                okpo_ := 'I' || lpad(substr(NVL(trim(okpo_u),'0'), 1, 8), 9, '0');
-                k021_u := '8';
-             end if;
-          else
-             okpo_ := substr(lpad(trim(k.okpo_u), 10, '0'), 1, 10);
-             if k.tk = 2 then
-                k021_u := '2';
-             else
-                k021_u := '1';
-             end if;
+          k021_k := 'E';
+       end if;
 
-             -- органи державної влади
-             if k.ise_u in ('13110','13120','13131','13132') then
-                k021_u := 'G';
-             end if;
-          end if;
+       if lower(k.nmk_u) like '%каб_нет%м_н_стр_в%'
+       then
+          k021_u := 'E';
        end if;
 
        if cust_type is not null then
@@ -599,7 +685,7 @@ BEGIN
        from tmp_nbu
        where kodf = kodf_ and
              datf = dat_ and
-             kodp = k.kodp ;
+            substr(kodp,1,25) = substr(k.kodp,1,25);
 
        if kol1_ = 0 then
           INSERT INTO tmp_nbu (kodp, datf, kodf, nbuc, znap) VALUES
