@@ -100,8 +100,15 @@ function Validate(form) {
         callObj.params.acc = nls;
         var result = webService.Doc.callService(callObj);
         if (result.error || result.value[0] == "1") {
-            alert(result.value[1] == "" || result.value[1] == null ? "Рахунок " + nls + " заблоковано" : result.value[1]);
-            return false;
+            if (result.value[1] == "" || result.value[1] == null) {
+                if (!confirm("Рахунок " + nls + " заблоковано. Бажаєте продовжити?")) {
+                    return false;
+                }
+            }
+            else {
+                alert(result.value[1]);
+                return false;
+            }
         }
     }
 
