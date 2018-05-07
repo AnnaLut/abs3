@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_sms.sql =========*** Run *** ==
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BARS.BARS_SMS is
+create or replace package bars_sms is
 ----
 --  Package BARS_SMS - пакет процедур для отправки SMS
 --
@@ -26,7 +26,7 @@
 
 */
 
-g_header_version  constant varchar2(64)  := 'version 2.1  10/08/2016';
+g_header_version  constant varchar2(64)  := 'version 2.11  25/04/2018';
 
 g_awk_header_defs constant varchar2(512) := '';
 
@@ -67,6 +67,7 @@ procedure submit_msg(p_msgid in msg_submit_data.msg_id%type);
 --
 procedure submit_messages;
 
+procedure submit_messages(p_start_id in number, p_end_id in number);
 ----
 -- query_status - выполняет проверку статуса
 --
@@ -79,7 +80,8 @@ procedure query_statuses;
 
 end bars_sms;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.BARS_SMS 
+
+create or replace package body bars_sms
 is
 ----
 --  Package BARS_SMS - пакет процедур для отправки SMS
@@ -102,7 +104,7 @@ is
 
 */
 
-g_body_version  constant varchar2(64)  := 'version 2.2 10/08/2016';
+g_body_version  constant varchar2(64)  := 'version 2.21 25/04/2018';
 
 g_awk_body_defs constant varchar2(512) := '';
 
@@ -195,11 +197,93 @@ end submit_msg;
 ----
 -- submit_messages - выполняет посылку сообщений
 --
-procedure submit_messages
+procedure submit_messages is
+  l_sql_chunk      varchar2(32000);
+  l_sql_stmt       varchar2(32000);
+  l_parallel_level number;
+  l_parallel_group number;
+  l_cnt            number;
+  l_task           varchar2(35) := 'PCD_SMS'||to_char(current_timestamp,'ddmmyyyyhh24missff');
+  l_useparallelexec params$global.val%type;  
+begin
+  logger.trace('bars_sms.submit_messages: start');
+  --
+  begin
+    l_useparallelexec := trim(get_global_param('USEPAREXECSMS'));
+  exception
+    when others then
+      l_useparallelexec := '0';
+  end;
+  if l_useparallelexec = '1' then
+     begin
+       l_parallel_level := to_number(trim(get_global_param('NUMPARLEVELSMS')));
+     exception
+       when others then
+         l_parallel_level := 5;
+     end;
+     begin
+       l_parallel_group := to_number(trim(get_global_param('NUMPARGROUPSMS')));
+     exception
+       when others then
+         l_parallel_group := 50;
+     end;
+  end if;
+
+  select count(*)
+    into l_cnt
+    from msg_submit_data
+   where status in ('NEW', 'ERROR')
+     and exists
+   (select 1
+            from dual
+           where to_number(to_char(sysdate, 'HH24MI')) between 600 and 2100);
+
+  if (l_cnt < 100 and l_useparallelexec = 1) or (l_useparallelexec = 0) then
+    for c in (select msg_id
+                from msg_submit_data
+               where status in ('NEW', 'ERROR')
+                 and exists
+               (select 1
+                        from dual
+                       where to_number(to_char(sysdate, 'HH24MI')) between 600 and 2100)
+               order by msg_id
+                 for update skip locked) loop
+      submit_msg(c.msg_id);
+    end loop;
+  else
+    l_sql_chunk := 'select * from (select unique decode(level, 1, min_id, (min_id + step * (level - 1))) start_id,
+                                           decode(level,' ||
+                   to_char(l_parallel_group) || ',
+                                                  max_id,
+                                                  decode(level, 1, min_id, (min_id + step * (level - 1))) + step - 1) end_id
+                                      from (select min(msg_id) min_id, max(msg_id) max_id,
+                                                   trunc((max(msg_id) - min(msg_id)) / ' ||
+                   to_char(l_parallel_group) ||
+                   ') step
+                                              from msg_submit_data t
+                                             where  status in (''NEW'', ''ERROR''))
+                                    connect by level <=' ||
+                   to_char(l_parallel_group) || ') where start_id <=end_id';
+      l_sql_stmt := 'begin bars_sms.submit_messages(:start_id, :end_id); end;';                   
+
+      dbms_parallel_execute.create_task(l_task);
+      dbms_parallel_execute.create_chunks_by_sql(l_task, l_sql_chunk, false);
+      dbms_parallel_execute.run_task(l_task,
+                                     l_sql_stmt,
+                                     dbms_sql.native,
+                                     parallel_level => l_parallel_level);
+      dbms_parallel_execute.drop_task(l_task);  
+  end if;
+  --
+  logger.trace('bars_sms.submit_messages: finish');
+  --
+end submit_messages;
+
+procedure submit_messages(p_start_id in number, p_end_id in number)
+
 is
 begin
-    logger.trace('bars_sms.submit_messages: start');
-    --
+    logger.trace('bars_sms.submit_messages: start. #p_start_id ='||p_start_id||' p_end_id ='||p_end_id);
     for c in (select msg_id
                 from msg_submit_data
                where status in ('NEW','ERROR')
@@ -209,15 +293,13 @@ begin
                     where
                     to_number(to_char(sysdate,'HH24MI')) between 600 and 2100
                )
+               and msg_id between p_start_id and p_end_id
                order by msg_id for update skip locked)
     loop
         submit_msg(c.msg_id);
     end loop;
-    --
-    logger.trace('bars_sms.submit_messages: finish');
-    --
-end submit_messages;
-
+    logger.trace('bars_sms.submit_messages: finish. #p_start_id ='||p_start_id||' p_end_id ='||p_end_id);   
+end;
 ----
 -- query_status - выполняет проверку статуса
 --
