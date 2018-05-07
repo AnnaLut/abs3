@@ -2,7 +2,7 @@ PROMPT =========================================================================
 PROMPT *** Run *** ========== Scripts /Sql/BARS/package/mway_mgr.sql =========*** Run *** ==
 PROMPT ===================================================================================== 
 
-CREATE OR REPLACE PACKAGE BARS.MWAY_MGR
+CREATE OR REPLACE PACKAGE MWAY_MGR
 is
   --
   -- Автор  : OLEG
@@ -140,8 +140,9 @@ is
   ( p_request_xml in clob
   ) return clob;
 
-  procedure set_state_trans(p_id mway_match.id%type,
-                          p_state mway_match.state%type
+  procedure set_state_trans
+  ( p_id    mway_match.id%type,
+    p_state mway_match.state%type
   );
 
   procedure PAY_REVERSAL;
@@ -168,7 +169,7 @@ is
   --
 
   -- Private constant declarations
-  g_body_version  constant varchar2(64)  := 'version 5.7 16/03/2018';
+  g_body_version  constant varchar2(64)  := 'version 5.7 07/05/2018';
   g_awk_body_defs constant varchar2(512) := '';
   g_dbgcode constant varchar2(12) := 'mway_mgr.';
 
@@ -2453,6 +2454,8 @@ is
                )
     loop
 
+      savepoint sp;
+
       begin
 
         begin
@@ -2483,9 +2486,10 @@ is
       exception
         when OTHERS then
           bars_audit.error( title || ': REF_TR=' || to_char(cur.REF_TR)
-                                  || CHR(10) ||dbms_utility.format_error_stack()
+                                  || CHR(10) || dbms_utility.format_error_stack()
                                   || CHR(10) || dbms_utility.format_error_backtrace() );
           BARS_CONTEXT.SET_CONTEXT;
+          rollback to sp;
       end;
 
     end loop;
