@@ -120,7 +120,35 @@ PROMPT *** Create  view V_CUST_RELATIONS ***
                f_get_custw_h(c.rnk, 'RCOMM', sysdate) as notes
           from customer c, corps cp
          where c.custtype = 2
-           and c.rnk = cp.rnk(+)) cd,
+           and c.rnk = cp.rnk(+)
+        union all
+        select c.rnk as relcust_code,
+               'C' as src,
+               c.nmk as name,
+               null as doc_type,
+               null as doc_serial,
+               null as doc_number,
+               null as doc_date,
+               null as doc_issuer,
+               null as birthday,
+               null as birthplace,
+               null as sex,
+               c.adr,
+               cb.telr as tel,
+               null as email,
+               1 as custtype,
+               c.okpo,
+               c.country,
+               to_char(c.c_reg) as region,
+               c.fs,
+               c.ved,
+               c.sed,
+               c.ise,
+               f_get_custw_h(c.rnk, 'RCOMM', sysdate) as notes
+          from customer c, custbank cb
+         where c.custtype = 1
+           and c.rnk = cb.rnk(+)
+       ) cd,
        country c,
        fs f,
        ise i,
