@@ -6,7 +6,7 @@ declare
   l_bonus_cnt number;
   l_bonusdate date;
   l_zp_count  number;
-  p_dat       DATE := trunc(sysdate+1);
+  p_dat       DATE := trunc(sysdate);
   l_brate     bars.int_ratn.br%type;
   l_irate     bars.int_ratn.ir%type;
   l_indrate   bars.Dpt_Vidd_Extdesc%rowtype;
