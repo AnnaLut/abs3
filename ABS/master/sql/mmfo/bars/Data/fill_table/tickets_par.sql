@@ -39,7 +39,9 @@ update tickets_par p
               ''DPJ'',
               ''ELT'',
               ''KK1'',
-              ''G02'')'
+              ''G02'',
+	      ''SN1'',
+	      ''SN3'')'
  where p.par = 'U_015_tts'
    and p.rep_prefix = 'DEFAULT';
    commit;
