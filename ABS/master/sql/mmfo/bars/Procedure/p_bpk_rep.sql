@@ -37,7 +37,7 @@ begin
         l_ost := abs(fost(z.acc, p_dat1));
         acrn.p_int(z.acc, 0, z.dat, p_dat1, l_int);
         insert into tmp_bpk_rep (acc, nmk, rnk, open_date, nls, kf, sum_borg, sum_int)
-        values (z.acc,z.nmk,z.rnk,z.dat,z.nls,z.kf,abs(l_ost/100),abs(round(l_int/100)));
+        values (z.acc,z.nmk,z.rnk,z.dat,z.nls,z.kf,abs(l_ost/100),abs(round(l_int/100,2)));
      end loop;
   end if;
 end p_bpk_rep;
