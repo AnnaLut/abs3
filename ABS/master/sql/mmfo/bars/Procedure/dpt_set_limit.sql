@@ -12,9 +12,10 @@ create or replace procedure dpt_set_limit is
   l_irate     bars.int_ratn.ir%type;
   l_brtype    varchar2(25);
   --===== процедура, обрабатывающая депозиты, открытые безналом, у которых был первичный взнос
-  --===== запускается с помощью джоба job_dpt_set_limit, который запускается в 6 утра и анализирует платежи ЗА ВЧЕРА
+  --===== запускается с помощью джоба job_dpt_set_limit, который запускается в 12 дня и анализирует платежи ЗА ВЧЕРА
   
   -- v 1.1 20.03.2018 - by Livshyts
+  -- v 1.2 05.05.2018 - by Livshyts
 BEGIN
   bc.go('/');
   FOR cur IN (SELECT kf FROM bars.mv_kf) LOOP --cur
@@ -22,7 +23,7 @@ BEGIN
     bars_audit.trace('%s МФО = %s', l_title, cur.kf);
 
     For i in (
-      with op as (select distinct dp.dpt_id  
+      with op as (select distinct dp.dpt_id, case when trunc(o.pdat) = o.bdat then o.bdat else trunc(o.pdat) end pdat  
                    from bars.dpt_payments dp,
                         bars.oper         o
                    where o.ref = dp.ref
@@ -32,7 +33,8 @@ BEGIN
                    SELECT dd.deposit_id,
                           dd.acc,
                           dv.duration,
-                          nvl(dv.term_add,0) term_add
+                          nvl(dv.term_add,0) term_add,
+                          op.pdat
                    FROM  bars.dpt_deposit dd,
                          bars.dpt_vidd dv,
                          bars.dpt_types dt,
@@ -64,7 +66,7 @@ BEGIN
         bars_audit.trace('%s устанавливаем limit = %s для deposit_id = %s  acc = %s', l_title, to_char(l_ost), to_char(i.deposit_id), to_char(i.acc));
       end if;
 
-     -- пересматриваем бонус после первого пополнения для всех 
+     -- пересматриваем бонус после первого пополнения для всех безлимитных
         begin
         SELECT nvl(ir.br,0),
              ir.ir
@@ -94,7 +96,7 @@ BEGIN
           delete from dpt_depositw
            where tag = 'BONUS'
              and DPT_ID = i.deposit_id;
-          DPT_BONUS.SET_BONUS_RATE(i.deposit_id, p_dat, l_bonusval);
+          DPT_BONUS.SET_BONUS_RATE(i.deposit_id, i.pdat + 1, l_bonusval);
           bars_audit.trace('%s встановлена бонусна ставка = %s',
                            l_title,
                            to_char(l_bonusval));
