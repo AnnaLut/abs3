@@ -169,7 +169,7 @@ is
   --
 
   -- Private constant declarations
-  g_body_version  constant varchar2(64)  := 'version 5.7 16/03/2018';
+  g_body_version  constant varchar2(64)  := 'version 5.7 07/05/2018';
   g_awk_body_defs constant varchar2(512) := '';
   g_dbgcode constant varchar2(12) := 'mway_mgr.';
 
@@ -2455,10 +2455,12 @@ is
                )
     loop
 
+      savepoint sp;
+
       begin
 
         begin
-          select d.KF, d.SOS 
+          select d.KF, d.SOS
             into l_kf, l_sos
             from OPER d
            where d.REF = cur.REF_TR;
@@ -2485,9 +2487,10 @@ is
       exception
         when OTHERS then
           bars_audit.error( title || ': REF_TR=' || to_char(cur.REF_TR)
-                                  || CHR(10) ||dbms_utility.format_error_stack()
+                                  || CHR(10) || dbms_utility.format_error_stack()
                                   || CHR(10) || dbms_utility.format_error_backtrace() );
           BARS_CONTEXT.SET_CONTEXT;
+          rollback to sp;
       end;
 
     end loop;
