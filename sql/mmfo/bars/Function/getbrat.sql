@@ -27,7 +27,7 @@ BEGIN
 /*3*/
          END LOOP;
    END;
-   deb.trace(111,'br_',br_);
+--   deb.trace(111,'br_',br_);
    RETURN br_;
 END getbrat;
 

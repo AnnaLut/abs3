@@ -106,53 +106,15 @@ SELECT NVL (MAX (CASE WHEN NVL (cnt, 0) = 0 THEN 0 ELSE val END), 0)
                AND ext_t.TYPE_ID(+) = DV.EXTENSION_ID)
  WHERE lim BETWEEN s0 AND s
 
-*/
-
---== DPZP
-l_sql := 'select nvl(MAX (CASE WHEN cnt = 0 THEN 0 ELSE val END), 0)  
-          from (
-          with cntrl_dat as (select :pDat pdat from dual)
-          select dbs.val, dpt_bonus.get_MMFO_ZPcard_count(SYS_CONTEXT (''bars_dpt_bonus'', ''cust_id''), cd.pdat) cnt
-          from dpt_deposit dd,
-               dpt_vidd dv,
-               dpt_bonus_settings dbs,
-               cntrl_dat cd
-          where dd.deposit_id = SYS_CONTEXT (''bars_dpt_bonus'', ''dpt_id'') 
-          and dd.vidd = dv.vidd
-          and dbs.dpt_type = dv.type_id
-          and dbs.bonus_id = dpt_bonus.get_bonus_id(''DPZP'')
-          and dbs.kv = dv.kv
-          and cd.pdat between dbs.dat_begin and nvl(dbs.dat_end, to_date(''31.12.4999'',''DD.MM.YYYY'')))';
-   
-update bars.dpt_bonuses db set db.bonus_query = l_sql where db.bonus_code = 'DPZP';
-
---== DPWB
-l_sql := 'SELECT NVL (MAX (CASE WHEN NVL (cnt, 0) = 0 THEN 0 ELSE val END), 0)
-         FROM (SELECT t.cnt, dbs.val
-          FROM dpt_bonus_settings dbs,
-               dpt_vidd dv,
-               dpt_deposit d,
-               (SELECT COUNT (wb) cnt
-                  FROM dpt_deposit
-                 WHERE deposit_id = SYS_CONTEXT (''bars_dpt_bonus'', ''dpt_id'') AND wb = ''Y'') t
-         WHERE     dv.vidd = d.vidd
-               AND d.deposit_id = SYS_CONTEXT (''bars_dpt_bonus'', ''dpt_id'')
-               AND dv.type_id = DBS.DPT_TYPE
-               AND dbs.kv = dv.kv
-               AND :pDat between dbs.dat_begin and nvl(dbs.dat_end, to_date(''31.12.4999'',''DD.MM.YYYY''))
-               AND dbs.bonus_id = bars.dpt_bonus.get_bonus_id(''DPWB''))';
-
-update bars.dpt_bonuses db set db.bonus_query = l_sql where db.bonus_code = 'DPWB';
-
---== EXCL
-l_sql := 'SELECT NVL (MAX (CASE WHEN NVL (cnt, 0) = 0 THEN 0 ELSE val END), 0)
+v2.0
+SELECT NVL (MAX (CASE WHEN NVL (cnt, 0) = 0 THEN 0 ELSE val END), 0)
         FROM (WITH dv
              AS (SELECT *
                    FROM dpt_vidd
                   WHERE vidd =
                            (SELECT vidd
                               FROM dpt_deposit
-                             WHERE deposit_id = SYS_CONTEXT (''bars_dpt_bonus'',''dpt_id''))),
+                             WHERE deposit_id = SYS_CONTEXT ('bars_dpt_bonus','dpt_id'))),
              ext_t
              AS (SELECT ext_num,
                         NVL (LEAD (ext_num) OVER (ORDER BY ext_num), 999999)
@@ -178,15 +140,113 @@ l_sql := 'SELECT NVL (MAX (CASE WHEN NVL (cnt, 0) = 0 THEN 0 ELSE val END), 0)
                dpt_deposit d,
                (SELECT COUNT (deposit_id) cnt
                   FROM dpt_deposit
-                 WHERE deposit_id = SYS_CONTEXT (''bars_dpt_bonus'', ''dpt_id'')) t,
+                 WHERE deposit_id = SYS_CONTEXT ('bars_dpt_bonus', 'dpt_id')) t,
                ext_t
+         WHERE     dv.vidd = d.vidd
+               AND d.deposit_id = SYS_CONTEXT ('bars_dpt_bonus', 'dpt_id')
+               AND dv.type_id = DBS.DPT_TYPE
+               AND dbs.kv = dv.kv
+               AND :pDat between dbs.dat_begin and nvl(dbs.dat_end, to_date('31.12.4999','DD.MM.YYYY'))
+               AND NVL (DBS.s, -1) != -1
+               AND dbs.bonus_id = bars.dpt_bonus.get_bonus_id('EXCL')
+               AND (   d.cnt_dubl+1 BETWEEN ext_num AND ext_num_next
+                    OR NVL (d.cnt_dubl, 0) = 0)
+               AND ext_t.TYPE_ID(+) = DV.EXTENSION_ID)
+ WHERE lim BETWEEN s0 AND s;
+*/
+
+--== DPZP
+l_sql := 'select nvl(MAX (CASE WHEN cnt = 0 THEN 0 ELSE val END), 0)  
+          from (
+          with cntrl_dat as (select :pDat pdat from dual),
+	       bonusid as (select bars.dpt_bonus.get_bonus_id(''DPZP'') b_id from dual)	
+          select dbs.val, dpt_bonus.get_MMFO_ZPcard_count(SYS_CONTEXT (''bars_dpt_bonus'', ''cust_id''), cd.pdat) cnt
+          from dpt_deposit dd,
+               dpt_vidd dv,
+               dpt_bonus_settings dbs,
+               cntrl_dat cd,
+	       bonusid bid
+          where dd.deposit_id = SYS_CONTEXT (''bars_dpt_bonus'', ''dpt_id'') 
+          and dd.vidd = dv.vidd
+          and dbs.dpt_type = dv.type_id
+          and dbs.bonus_id = bid.b_id 
+          and dbs.kv = dv.kv
+          and cd.pdat between dbs.dat_begin and nvl(dbs.dat_end, to_date(''31.12.4999'',''DD.MM.YYYY'')))';
+   
+update bars.dpt_bonuses db set db.bonus_query = l_sql where db.bonus_code = 'DPZP';
+
+--== DPWB
+l_sql := 'SELECT NVL (MAX (CASE WHEN NVL (cnt, 0) = 0 THEN 0 ELSE val END), 0)
+         FROM (
+	  with bonusid as (select bars.dpt_bonus.get_bonus_id(''DPWB'') b_id from dual)	
+	  SELECT t.cnt, dbs.val
+          FROM dpt_bonus_settings dbs,
+               dpt_vidd dv,
+               dpt_deposit d,
+	       bonusid bid,	
+               (SELECT COUNT (wb) cnt
+                  FROM dpt_deposit
+                 WHERE deposit_id = SYS_CONTEXT (''bars_dpt_bonus'', ''dpt_id'') AND wb = ''Y'') t
+         WHERE     dv.vidd = d.vidd
+               AND d.deposit_id = SYS_CONTEXT (''bars_dpt_bonus'', ''dpt_id'')
+               AND dv.type_id = DBS.DPT_TYPE
+               AND dbs.kv = dv.kv
+               AND :pDat between dbs.dat_begin and nvl(dbs.dat_end, to_date(''31.12.4999'',''DD.MM.YYYY''))
+               AND dbs.bonus_id = bid.b_id)';
+
+update bars.dpt_bonuses db set db.bonus_query = l_sql where db.bonus_code = 'DPWB';
+
+--== EXCL
+l_sql := 'SELECT NVL (MAX (CASE WHEN NVL (cnt, 0) = 0 THEN 0 ELSE val END), 0)
+        FROM (WITH dv
+             AS (SELECT *
+                   FROM dpt_vidd
+                  WHERE vidd =
+                           (SELECT vidd
+                              FROM dpt_deposit
+                             WHERE deposit_id = SYS_CONTEXT (''bars_dpt_bonus'',''dpt_id''))),
+             ext_t
+             AS (SELECT ext_num,
+                        NVL (LEAD (ext_num) OVER (ORDER BY ext_num), 999999)
+                           ext_num_next,
+                        dve.type_id
+                   FROM dpt_vidd_extdesc dve, dv
+                  WHERE     METHOD_ID IN (8, 9, 10)
+                        AND extension_id = dve.type_id),
+	    bonusid 
+	    AS (select bars.dpt_bonus.get_bonus_id(''EXCL'') b_id from dual),
+	    f_ost
+	    AS (select nvl(fost(dd.acc, gl.bd),0) fact_ost 
+		from bars.dpt_deposit dd
+		where dd.deposit_id = SYS_CONTEXT (''bars_dpt_bonus'', ''dpt_id''))
+        SELECT ost.fact_ost,
+               dv.kv,
+               d.cnt_dubl,
+               ext_num,
+               ext_num_next,
+               DV.EXTENSION_ID,
+               t.cnt,
+               dbs.val,
+               dbs.s s0,
+               NVL (LEAD (dbs.s) OVER (ORDER BY dbs.s), 9999999999999999) - 1
+                  s,
+               decode(ost.fact_ost, 0, d.LIMIT, ost.fact_ost) lim
+          FROM dpt_bonus_settings dbs,
+               dv,
+               dpt_deposit d,
+               (SELECT COUNT (deposit_id) cnt
+                  FROM dpt_deposit
+                 WHERE deposit_id = SYS_CONTEXT (''bars_dpt_bonus'', ''dpt_id'')) t,
+               ext_t,
+	       bonusid bid,
+	       f_ost ost
          WHERE     dv.vidd = d.vidd
                AND d.deposit_id = SYS_CONTEXT (''bars_dpt_bonus'', ''dpt_id'')
                AND dv.type_id = DBS.DPT_TYPE
                AND dbs.kv = dv.kv
                AND :pDat between dbs.dat_begin and nvl(dbs.dat_end, to_date(''31.12.4999'',''DD.MM.YYYY''))
                AND NVL (DBS.s, -1) != -1
-               AND dbs.bonus_id = bars.dpt_bonus.get_bonus_id(''EXCL'')
+               AND dbs.bonus_id = bid.b_id 
                AND (   d.cnt_dubl+1 BETWEEN ext_num AND ext_num_next
                     OR NVL (d.cnt_dubl, 0) = 0)
                AND ext_t.TYPE_ID(+) = DV.EXTENSION_ID)
