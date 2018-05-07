@@ -1280,7 +1280,7 @@ end get_purpose;
             p_ref        := -1;
             p_errcode    := sqlcode;
             p_errmessage := substr(sqlerrm, 1, 4000);
-            p_errmessage:=l_errmsg;
+            --p_errmessage:=l_errmsg;
             call_logger(l_paydat, l_errmsg||' Договір id: '||to_char(l_paydat.id)||' code: '||l_paydat.d_number||'.');
             bars_login.logout_user;
             rollback to savepoint sp_paystart;
