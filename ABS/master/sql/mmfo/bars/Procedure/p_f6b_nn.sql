@@ -12,7 +12,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  % DESCRIPTION : процедура #6B
  %
- % VERSION     :   v.18.005      26.04.2018
+ % VERSION     :   v.18.006      08.05.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 /*
    Структура показателя    GGG CC N H I OO R VVV
@@ -28,6 +28,7 @@ IS
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+08.05.2018  снято умолчание сегмента I(S080)  для  счетов 2805/2806
 26.04.2018  обработка счетов дисконтов с r013=1,2,3,4 из nbu23_rez  (CC=40)
 16.04.2018  отдельная обработка  SNA-счета  654602611
 11.04.2018  отдельная обработка  счетов 3-го класса и клиента  90593701
@@ -313,9 +314,9 @@ BEGIN
           I_ := 'K';
        end if;
 --                      умолчание для 2805,2806
-       if ddd_ = '150'  and  k.nbs in ('2805','2806')  then
-          I_ := 'A';
-       end if;
+--       if ddd_ = '150'  and  k.nbs in ('2805','2806')  then
+--          I_ := 'A';
+--       end if;
 
        if N_ ='X'  and ddd_ between '152' and '153'  then
           N_ :='3';
@@ -881,13 +882,13 @@ BEGIN
    end loop;
 
 ----  654602611       отдельная обработка
-   if dat_ =to_date('20180330','yyyymmdd')  and  mfo_=322669  then
+   if dat_ =to_date('20180427','yyyymmdd')  and  mfo_=322669  then
 
    for k in ( select  a.acc, a.nls, a.nbs, a.kv, a.rnk, a.tip, NVL(m.ostq,0) BV,
                       2-MOD(c.codcagent,2) REZ, NVL(trim(c.sed),'00') sed,
                       c.codcagent, c.custtype
                 from agg_monbals m, accounts a, customer c
-               where m.kf='322669' and m.fdat=to_date('20180301','yyyymmdd')
+               where m.kf='322669' and m.fdat=to_date('20180401','yyyymmdd')
                  and m.acc = a.acc  and  a.acc=654602611
                  and a.rnk = c.rnk
    ) loop
