@@ -6449,7 +6449,7 @@ begin
                                xmlelement("insuranceObject",
                                           xmlelement("type", 'person'),
                                           xmlelement("document",
-                                                     xmlforest('EXTERNAL_PASSPORT' "type",
+                                                     xmlforest('PASSPORT' "type",
                                                                p_insurance.ser "series",
                                                                p_insurance.numdoc "number",
                                                                p_insurance.pdate "date"
