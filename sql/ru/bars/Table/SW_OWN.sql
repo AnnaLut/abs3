@@ -221,8 +221,8 @@ end;
 
 begin
     execute immediate 'alter table SW_OWN
-  add constraint FK_SWOWN_PRNFILE foreign key (KF, PRN_FILE)
-  references SW_CA_FILES (KF, ID)';
+  add constraint FK_SWOWN_PRNFILE foreign key (PRN_FILE)
+  references SW_CA_FILES (ID)';
  exception when others then 
     if sqlcode = -2275 then null; else raise; 
     end if; 

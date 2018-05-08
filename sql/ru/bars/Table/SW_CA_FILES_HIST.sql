@@ -20,7 +20,8 @@ begin
   ddate     DATE not null,
   file_data CLOB,
   sdate     DATE,
-  chg_date  DATE
+  chg_date  DATE,
+  pid       NUMBER
 )
 tablespace BRSDYND
   pctfree 10
@@ -38,5 +39,18 @@ tablespace BRSDYND
     end if; 
 end;
 / 
+
+
+begin
+  execute immediate q'[ALTER TABLE BARS.SW_CA_FILES_HIST ADD pid NUMBER]';
+  dbms_output.put_line('Table altered.');
+exception
+  when OTHERS then
+    if ( sqlcode = -01430 )
+    then dbms_output.put_line('Column "pid" already exists in table.');
+    else raise;
+    end if;
+end;
+/
 
    exec bpa.alter_policies('SW_CA_FILES_HIST');

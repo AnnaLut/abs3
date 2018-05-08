@@ -20,7 +20,8 @@ begin
   sign      RAW(128),
   ddate     DATE not null,
   file_data CLOB,
-  sdate     DATE
+  sdate     DATE,
+  pid       NUMBER
 )
 tablespace BRSDYND
   pctfree 10
@@ -44,14 +45,14 @@ comment on table SW_CA_FILES
   is 'Файли єдиного вікна, прйняті від РУ';
 -- Add comments to the columns 
 comment on column SW_CA_FILES.id
-  is 'Ідентифікатор файла';
+  is 'Внутренний дентифікатор файла';
 comment on column SW_CA_FILES.state
   is 'Статус обробки файлу (
-0 - сбой при записи в SW_CA_FILES, 
-1 - успешно прошел только импорт, 
-2 - загрузка с ошибками, 
-3 - успешно, 
-4 - сбой при загрузке, 
+0 - сбой при записи в SW_CA_FILES,
+1 - успешно прошел только импорт,
+2 - загрузка с ошибками,
+3 - успешно,
+4 - сбой при загрузке,
 5 - принудительная перегрузка,
 10 - неопознанная ошибка в recive_data,
 -99 - ошибка на вебсервисе)';
@@ -65,13 +66,28 @@ comment on column SW_CA_FILES.file_data
   is 'дані';
 comment on column SW_CA_FILES.sdate
   is 'дата запису файлу';
+comment on column SW_CA_FILES.pid
+  is 'Внешний дентифікатор файла';
+
+
+begin
+  execute immediate q'[ALTER TABLE BARS.SW_CA_FILES ADD pid NUMBER]';
+  dbms_output.put_line('Table altered.');
+exception
+  when OTHERS then
+    if ( sqlcode = -01430 )
+    then dbms_output.put_line('Column "pid" already exists in table.');
+    else raise;
+    end if;
+end;
+/
 
 -- Create/Recreate primary, unique and foreign key constraints 
 begin
     execute immediate 'alter table SW_CA_FILES
-  add constraint PK_SW_CA_FILES primary key (KF, ID)
+  add constraint PK_SW_CA_FILES primary key (ID)
   using index 
-  tablespace BRSDYNI
+  tablespace BRSDYND
   pctfree 10
   initrans 2
   maxtrans 255
@@ -84,6 +100,28 @@ begin
   )';
  exception when others then 
     if sqlcode = -2261 or sqlcode = -2260 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
+    execute immediate 'alter table SW_CA_FILES
+  add constraint UK_SW_CA_FILES unique (KF, DDATE)
+  using index 
+  tablespace BRSDYND
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  )';
+ exception when others then 
+    if sqlcode = -2261 then null; else raise; 
     end if; 
 end;
 / 
