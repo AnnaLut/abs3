@@ -2,7 +2,7 @@ prompt package bars.dpt_pf
  
 CREATE OR REPLACE PACKAGE BARS.DPT_PF
 IS
-   G_HEADER_VERSION   CONSTANT VARCHAR2 (64) := ' version 1.07 09.02.2018';
+   G_HEADER_VERSION   CONSTANT VARCHAR2 (64) := ' version 1.08 08.05.2018';
 
    --
    --  службові функції
@@ -13,7 +13,7 @@ IS
    FUNCTION body_version
       RETURN VARCHAR2;
       
-   procedure start_fill_contracts;
+   procedure start_fill_contracts (mnth_cnt in number default 3);
 
    ----------------------------------------------------------------------------------------------------------
    -- П-ра аналізу депозитів на "Пенсійність" (нявність зарахувань від ПФ на протязі ост. 3-ох місяців
@@ -51,11 +51,12 @@ IS
 -- 12.04.2017 - добавлена обработка зачислений на депозит от ПФУ для всех операций #COBUSUPABS-5267
 -- 23.10.2017 - Переделана "домиграция" данных на обход по МФО - для обхода ora-600
 -- 22.11.2017 - добавлено логирование в start_fill_contracts. Добавлена процедура для накопления данных для отчета в ПФ по карточным счетам
+-- 08.05.2018 - в start_fill_contracts добавлен учет nbs = '3739' ob22 = '10' и параметр для учета разных периодов наполнения (COBUMMFO-6561)
 --=============================================================================
 
     --  / constants /
     --
-    g_body_version  CONSTANT VARCHAR2(64)  := 'version 1.20 09.02.2018';
+    g_body_version  CONSTANT VARCHAR2(64)  := 'version 1.21 08.05.2018';
     g_modcode       CONSTANT varchar2(6)   := 'DPT_PF';
     g_errmsg        VARCHAR2(4000);
 
@@ -74,17 +75,19 @@ IS
 
     -- донаповнення пенсійних договорів
     -- ( після міграції / відсуності зарахувань з дати відкриття )
-    procedure start_fill_contracts
-    is
+    procedure start_fill_contracts (mnth_cnt in number default 3)
+    is 
     l_ctx_mfo varchar2(30) := nvl(sys_context('bars_context', 'user_mfo'), '/');
     begin
         bars_audit.info('DPT_PF.start_fill_contracts: начало DPT');
+
+        if l_ctx_mfo = '/' then  bc.set_context; end if;
         
-        bc.set_context;
-        for rec in (select kf from mv_kf)
+        for rec in (select kf from mv_kf
+          where decode(l_ctx_mfo,'/', 1, kf) = decode(l_ctx_mfo, '/', 1, l_ctx_mfo))
         loop
             bc.go(rec.kf);
-                
+            bars_audit.info('DPT_PF.start_fill_contracts: MFO = '||l_ctx_mfo);    
             for d in (select d.deposit_id, a.dapp
                       from BARS.DPT_DEPOSIT d,
                            BARS.ACCOUNTS    a,
@@ -129,31 +132,36 @@ IS
             merge into bars.dpt_deposit_details ddd
             using (with acclist as (select acc --счета-пенсионники
                                        from bars.accounts
-                                       where nbs = '2909'
-                                       and ob22 in ('22', '25')
+                                       where ((nbs = '2909' and ob22 in ('22', '25')) or 
+                                       (nbs = '3739' and ob22 in ('10')))
                                        and (dazs is null or dazs > sysdate)),
                            saldolist as (select saldoa.acc, fdat  --дни, за которые были обороты за посл. месяц
                                          from bars.saldoa
                                          join acclist on saldoa.acc = acclist.acc
-                                         where saldoa.fdat >= add_months(bars.gl.bd, -1)),
+                                         where saldoa.fdat >= add_months(bars.gl.bd, -mnth_cnt)),
                            opldoklist as (select ref  --референсы, где было списание с пенсионников
                                           from bars.opldok o
                                           join saldolist on o.fdat = saldolist.fdat and o.acc = saldolist.acc
                                           where o.dk = 0  /*списание*/),
-                           deplist as (select d.deposit_id, max(o.fdat) vdat --депозиты, на которые были начисления по этим референсам
+                           deplist as (select d.deposit_id, d.acc, max(o.fdat) vdat --депозиты, на которые были начисления по этим референсам
                                        from bars.opldok o
                                        join opldoklist on o.ref = opldoklist.ref
                                        join bars.dpt_deposit d on o.acc = d.acc
                                        where o.dk = 1/*зачисление*/
                                        and o.sos = 5
-                                       group by d.deposit_id)
-                      select deposit_id, vdat from deplist) PF
+                                       group by d.deposit_id, d.acc)
+                      select deposit_id, vdat 
+                      ,case when vdat <= add_months(bars.gl.bd, - 3) then null
+                        else (select max(IDUPD) from bars.INT_RATN_ARC where ACC = deplist.acc and ID = 1)
+                        end new_rate_old_id
+                      from deplist) PF
             on (ddd.dpt_id = PF.deposit_id)
-            when matched then update set ddd.dat_transfer_pf = PF.vdat
-            when not matched then insert (ddd.dpt_id, ddd.dat_transfer_pf) values (PF.deposit_id, PF.vdat);
+            when matched then update set ddd.dat_transfer_pf = PF.vdat,
+                                         ddd.rate_old_id = case when ddd.rate_old_id <> pf.new_rate_old_id then pf.new_rate_old_id else ddd.rate_old_id end
+            when not matched then insert (ddd.dpt_id, ddd.dat_transfer_pf, ddd.rate_old_id) values (PF.deposit_id, PF.vdat, PF.new_rate_old_id);
         end loop;
         bc.go(l_ctx_mfo);
-        bc.set_policy_group('WHOLE');
+        if l_ctx_mfo = '/' then bc.set_policy_group('WHOLE'); end if;
         bars_audit.info('DPT_PF.start_fill_contracts: finish');
     end start_fill_contracts;
 
@@ -178,6 +186,7 @@ IS
       l_br                   int_ratn.br%type;
       title                  varchar(30)  := g_modcode||'.NO_TRANSFER_PF: ';
     BEGIN
+      bars_audit.info(title||'start. MFO = '||nvl(sys_context('bars_context', 'user_mfo'), '/'));
       -- донаповнення пенсійних договорів
       start_fill_contracts();
 
@@ -187,8 +196,8 @@ IS
           Заявка ГУ по Києву і обл. ID-3036.
           Постанова Кабінету Міністрів України №1596 від 30.08.1999 р.  “Про заходи щодо виконання ст.3 Указу Президента України № 734  від 04.07.1998р.  ” зі змінами внесеними Постановою КМУ № 1016 від  19.11.2008.
       */
-      l_limit_dat := add_months(l_bdate, -1);
-
+      l_limit_dat := add_months(l_bdate, -3);
+      bars_audit.info(title||' период проверки с '||to_char(l_bdate, 'DD.MM.YYYY')||' по '||to_char(l_limit_dat, 'DD.MM.YYYY'));
       -- зберігати в %-й карточці базову чи номінальну ставку
       --
       -- l_br := p_rate;
@@ -202,6 +211,7 @@ IS
       l_br := null;
       l_ir := 0;
 
+      begin
       select d.deposit_id,
              d.acc,
              decode(w.RATE_OLD_ID, null, (select max(IDUPD) from INT_RATN_ARC where ACC = d.acc and ID = 1), w.RATE_OLD_ID),
@@ -224,7 +234,13 @@ IS
                -- дог. по яких відновили зарахування і ставка "до запит."
                (w.DAT_TRANSFER_PF > l_limit_dat and w.RATE_OLD_ID is not null)
              );
-
+             
+      exception when others then 
+        bars_audit.info(title||'Ошибка подбора счетов - '||sqlerrm|| ' sqlcode = '|| sqlcode||', btrc= '||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE);
+        l_no_transfer_list := null;
+      end;
+      
+      if l_no_transfer_list.count > 0 then
       for a in l_no_transfer_list.first .. l_no_transfer_list.last
       loop
 
@@ -247,6 +263,9 @@ IS
 
             INSERT INTO INT_RATN (acc, id, bdat, ir, br)
                  VALUES (l_no_transfer_list (a).dpt_acc, 1, l_bdate, l_ir, l_br);
+
+            bars_audit.trace('%s по депозитній угоді N %s (АСС = %s) змінено ставку з %s на 0', title,
+                         to_char(l_no_transfer_list(a).dpt_id), to_char(l_no_transfer_list(a).dpt_acc), 'X');
 
           EXCEPTION WHEN OTHERS
                     THEN rollback to sp_before;
@@ -272,13 +291,13 @@ IS
                             and id = 1
                             and bdat = gl.bdate;
           end;
+          bars_audit.trace('%s по депозитній угоді N %s (АСС = %s) встановлено базову ставку %s', title,
+                          to_char(l_no_transfer_list(a).dpt_id), to_char(l_no_transfer_list(a).dpt_acc), to_char(l_no_transfer_list(a).br_id));
 
         end if;
-
-        bars_audit.trace('%s по депозитній угоді N %s (АСС = %s) змінено ставку з %s на 0', title,
-                          to_char(l_no_transfer_list(a).dpt_id), to_char(l_no_transfer_list(a).dpt_acc), 'X');
       end loop;
-
+     end if; 
+    bars_audit.info(title||'finish'); 
     exception
       when OTHERS then bars_audit.info(title|| sqlerrm|| 'sqlcode = '|| sqlcode||', btrc='||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE);
     end no_transfer_pf;
