@@ -533,7 +533,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
 --------------------------------------------------------------------------------
     $if $$debug_flag $then
     l_SW_branch_ws_parameters_row2.url :='http://10.10.10.44:19485/barsroot/webservices/';  --jeka тестовая строка
-    l_SW_branch_ws_parameters_row.url:='http://10.10.10.44:19483/barsroot/webservices/';  --OBMMFO6   --jeka тестовая строка
+    l_SW_branch_ws_parameters_row.url:='http://10.10.10.44:19485/barsroot/webservices/';  --OBMMFO6   --jeka тестовая строка
     $end
     --l_SW_branch_ws_parameters_row.url:='http://10.10.10.101:10080/barsroot/webservices/';   --TSTSUM   --jeka тестовая строка
 ---------------------------------------------------------------------------------------
@@ -898,6 +898,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
     l_com_id     SW_COMPARE.ID%TYPE;
     n_ex         number(1):=1;
     l_date       date;
+    l_id         number;
   begin
     bars_audit.info(title || 'Start. ');
     l_date:=to_date(p_date,'dd.mm.yyyy');
@@ -921,8 +922,8 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
           p_state:=-2;  -- найдены квитовки с операциями, перегрузки не будет, вернем статус = -2
         else
          begin
-           insert into SW_CA_FILES_HIST(ID,KF, STATE, MESSAGE,SIGN, DDATE,FILE_DATA,SDATE,CHG_DATE)
-                                 values(l_CF.ID, l_CF.KF, l_CF.STATE, l_CF.MESSAGE, l_CF.SIGN, l_CF.DDATE, l_CF.FILE_DATA, l_CF.SDATE, sysdate);
+           insert into SW_CA_FILES_HIST(ID,PID,KF, STATE, MESSAGE,SIGN, DDATE,FILE_DATA,SDATE,CHG_DATE)
+                                 values(l_CF.ID,l_CF.PID, l_CF.KF, l_CF.STATE, l_CF.MESSAGE, l_CF.SIGN, l_CF.DDATE, l_CF.FILE_DATA, l_CF.SDATE, sysdate);
            delete from SW_OWN o where o.prn_file =  l_CF.id;
            delete from SW_CA_FILES where ID = l_CF.id;
 
@@ -940,9 +941,10 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
           ---запись файла в таблицу
         begin
           insert into SW_CA_FILES
-            (id,kf, file_data , state,message ,sign, ddate , sdate )
+            (id,pid,kf, file_data , state,message ,sign, ddate , sdate )
           values
-            (p_id,p_mfo,p_clob, 1, null,null, l_date, sysdate);
+            (S_SW_CA_FILES.NEXTVAL,p_id,p_mfo,p_clob, 1, null,null, l_date, sysdate)
+          return id into l_id;  
           p_state :=1; --успешно прошел только импорт
         exception
               when others then
@@ -952,7 +954,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
           --парсим XML
         if  p_state <> 0 then
             begin
-             p_xml_parse(p_id, p_mfo, l_err, l_message);
+             p_xml_parse(l_id, p_mfo, l_err, l_message);
              if l_err> 0 then p_state := 2; --загрузка с ошибками
              else p_state :=3; --загрузка прошла успешно
              end if;
@@ -962,7 +964,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
                   p_state :=4; --сбой загрузки
             end;
 
-            update  SW_CA_FILES set state =  p_state, message  = p_message  where id = p_id and kf = p_mfo;
+            update  SW_CA_FILES set state =  p_state, message  = p_message  where id = l_id;
         end if;
       end if;
     exception when others then  p_message:= substr(title || ': ' || dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace(),1,4000);
@@ -976,7 +978,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
 
   --точечный запрос данных из ЦБД на РУ
   procedure request_data (p_date in varchar2, p_mfo in varchar2, p_message out varchar2) is
-    l_id            SW_RU_FILES.ID%type;
+    l_pid            SW_RU_FILES.ID%type;
     title           varchar2(100) := 'pkg_SW_COMPARE.request_data. ';
     l_response      bars.wsm_mgr.t_response;
     p_file_data     blob;
@@ -995,6 +997,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
     l_message       sw_ru_files.message%type;
     l_xdoc          xmltype;
     l_date          date;
+    l_id            SW_CA_FILES.ID%type;
   begin
       l_date:=to_date(p_date,'dd.mm.yyyy');
       begin  --ищем на наличие уже принятых файлов
@@ -1014,8 +1017,8 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
           raise_application_error(-20001,'Існують квитовки з операціями, перегрузка неможлива');
         else
          begin
-           insert into SW_CA_FILES_HIST(ID,KF, STATE, MESSAGE,SIGN, DDATE,FILE_DATA,SDATE,CHG_DATE)
-                                 values(l_CF.ID, l_CF.KF, l_CF.STATE, l_CF.MESSAGE, l_CF.SIGN, l_CF.DDATE, l_CF.FILE_DATA, l_CF.SDATE, sysdate);
+           insert into SW_CA_FILES_HIST(ID,PID,KF, STATE, MESSAGE,SIGN, DDATE,FILE_DATA,SDATE,CHG_DATE)
+                                 values(l_CF.ID,l_CF.PID, l_CF.KF, l_CF.STATE, l_CF.MESSAGE, l_CF.SIGN, l_CF.DDATE, l_CF.FILE_DATA, l_CF.SDATE, sysdate);
            delete from SW_OWN o where o.prn_file =  l_CF.id;
            delete from SW_CA_FILES where ID = l_CF.id;
 
@@ -1038,20 +1041,21 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
     --   dbms_output.put_line(l_response.cdoc);
        l_xdoc:=xmltype.createxml(l_response.cdoc);
        l_xml := l_xdoc.extract('/soap:Envelope/soap:Body/child::node()', 'xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"');
-       l_id := l_xml.extract('/RequestDataToRUResponse/RequestDataToRUResult/id/text()').GetStringVal();
+       l_pid := l_xml.extract('/RequestDataToRUResponse/RequestDataToRUResult/id/text()').GetStringVal();
        l_message := l_xml.extract('/RequestDataToRUResponse/RequestDataToRUResult/message/text()').GetStringVal();
 
-       if l_id <> -999 then
+       if l_pid <> -999 then
            l_file_data := l_xml.extract('/RequestDataToRUResponse/RequestDataToRUResult/clob/text()').getclobval();
           insert into SW_CA_FILES
-            (id,kf, file_data , state,message ,sign, ddate , sdate )
+            (id,pid,kf, file_data , state,message ,sign, ddate , sdate )
           values
-            (l_id,p_mfo,l_file_data, 1, l_message,null, l_date, sysdate);
+            (S_SW_CA_FILES.NEXTVAL,l_pid,p_mfo,l_file_data, 1, l_message,null, l_date, sysdate)
+          return id into l_id  ;
             --парсим XML
            p_xml_parse(l_id, p_mfo, l_err, l_message);
 /*           if l_err> 0 then raise_application_error(-20001,'Помилка при обробці даних!');
            end if;*/
-          update  SW_CA_FILES set state = 5, message = l_message where id = l_id and kf = p_mfo;
+          update  SW_CA_FILES set state = 5, message = l_message where id = l_id;
           if l_message is null then
             p_message:= 'Файл прийнято та оброблено без помилок!';
           else
