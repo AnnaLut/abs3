@@ -880,41 +880,6 @@ BEGIN
 
    end loop;
 
-----  654602611       отдельная обработка
-   if dat_ =to_date('20180330','yyyymmdd')  and  mfo_=322669  then
-
-   for k in ( select  a.acc, a.nls, a.nbs, a.kv, a.rnk, a.tip, NVL(m.ostq,0) BV,
-                      2-MOD(c.codcagent,2) REZ, NVL(trim(c.sed),'00') sed,
-                      c.codcagent, c.custtype
-                from agg_monbals m, accounts a, customer c
-               where m.kf='322669' and m.fdat=to_date('20180301','yyyymmdd')
-                 and m.acc = a.acc  and  a.acc=654602611
-                 and a.rnk = c.rnk
-   ) loop
-         select max(ddd) into ddd_
-           from kl_f3_29
-          where kf='6B' and r020 like substr(k.nbs,1,3)||'%';
-
-         IF typ_>0 THEN
-            nbuc_ := NVL(F_Codobl_Tobo (k.acc, typ_), nbuc1_);
-         ELSE
-            nbuc_ := nbuc1_;
-         END IF;
-         comm_ := ' RNK='||k.rnk||' DDD='||ddd_||' TIP='||k.tip;
-         kv_ := lpad(to_char(k.kv),3,'0');
-
-         N_ := '1';                          --физ.лицо
-         I_ := 'M';
-         H_ := '2';
-
-         kodp_:= '40'|| N_|| H_|| I_||'00'|| to_char(k.rez) || kv_;
-         znap_:= TO_CHAR(ABS(k.bv));
-
-         INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, rnk, comm, acc)
-         VALUES (k.nls, k.kv, dat_, ddd_||kodp_, znap_, nbuc_, k.rnk, comm_, k.acc);
-
-   end loop;
-   end if;
    -- для балансовых рахунків з пасивними залишками
    --   змінюємо код CC  з 11 на 40
 
