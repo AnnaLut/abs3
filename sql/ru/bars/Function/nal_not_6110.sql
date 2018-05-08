@@ -18,9 +18,9 @@
 Begin
 
   IF p_vidbiz ='3' then
-     l_nls2:=NBS_OB22('6110','F3');   --- тн
+     l_nls2:=NBS_OB22('6510','F3');   --- тн
   ELSE
-     l_nls2:=NBS_OB22('6110','F2');   --- чн:  лляа Х йа
+     l_nls2:=NBS_OB22('6510','F2');   --- чн:  лляа Х йа
   END IF;
 
   RETURN l_nls2;
@@ -31,6 +31,7 @@ End NAL_NOT_6110;
  
 PROMPT *** Create  grants  NAL_NOT_6110 ***
 grant EXECUTE                                                                on NAL_NOT_6110    to START1;
+grant EXECUTE                                                                on NAL_NOT_6110    to BARS_ACCESS_DEFROLE;
 
  
  
