@@ -6,8 +6,8 @@
  
 CREATE OR REPLACE PACKAGE VALUE_PAPER
 IS
-   
-   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.18 06.03.2018';
+
+   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.20 10.05.2018';
 
    FUNCTION header_version
       RETURN VARCHAR2;
@@ -276,6 +276,7 @@ PROCEDURE F_SAVE (p_fl_END      IN     INT,
                          p_COD_I      IN     VARCHAR2,
                          p_COD_M      IN     VARCHAR2,
                          p_COD_F      IN     VARCHAR2,
+                         p_COD_V      IN     VARCHAR2,                         
                          p_sErr          OUT VARCHAR2);
 
 
@@ -408,7 +409,7 @@ TYPE r_cp_cprwnd
         sBasey        varchar2(50),
         sBasey1       varchar2(50),
         CENA          number,
-        CENA_START    number,   
+        CENA_START    number,
         KOL           number,
         nAccS         number,
         DAT1          date,
@@ -445,10 +446,10 @@ TYPE r_many_grid
              G14 number,
              color_id number);
  TYPE t_many_grid IS TABLE OF r_many_grid;
- 
+
 /* function populate_many_row_wnd (p_ref IN NUMBER, rb1 in int, rb2 in int, DAT_ROZ in date)
   return t_many_grid pipelined;
-*/  
+*/
 
  function populate_many_wnd (p_ref IN NUMBER, rb1 in int, rb2 in int, DAT_ROZ in date)
   return t_many_grid pipelined;
@@ -532,10 +533,13 @@ TYPE r_many_grid
  --Ця ж функція для можливості нарахування дивідентів (інший рахунок чим звичайне нарахування, суму вкажуть вручну)
  --Ньюанс - якщо для угоди невідкритий внесистемний рахунок дивідентів, то відкрити його та підвязати до угоди.
   procedure make_int_dividends_prepare(p_ref cp_deal.ref%type default null);
+  
+  --виплата дивідентів -населення таблиці
+  procedure make_pay_dividends_prepare(p_ref cp_deal.ref%type default null);  
 
   procedure change_int_dividends_prepare(p_ref cp_int_dividents.ref%type, p_sum cp_int_dividents.sum%type, p_nazn cp_int_dividents.nazn%type);
   procedure make_oper_cp_int_dividends (p_ref cp_int_dividents.ref%type, p_sum cp_int_dividents.sum%type, p_nazn cp_int_dividents.nazn%type, p_nlsrd_6 cp_int_dividents.nlsrd_6%type);
-  
+
   function get_cena_voprosa(p_id cp_kod.id%type, p_date date, p_cena cp_kod.cena%type, p_cena_start cp_kod.cena_start%type)   return number;
   function get_count_cp(p_id cp_kod.id%type, p_date date, p_cena cp_kod.cena%type, p_cena_start cp_kod.cena_start%type, p_acc cp_deal.acc%type) return number;
 
@@ -543,7 +547,7 @@ END value_paper;
 /
 CREATE OR REPLACE PACKAGE BODY VALUE_PAPER
 IS
-   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.29 06.03.2018';
+   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.33 10.05.2018';
 
    g_newline constant varchar2(5) := CHR(10)||CHR(13);
    FUNCTION body_version
@@ -1899,6 +1903,7 @@ END;
                          p_COD_I      IN     VARCHAR2,
                          p_COD_M      IN     VARCHAR2,
                          p_COD_F      IN     VARCHAR2,
+                         p_COD_V      IN     VARCHAR2,                         
                          p_sErr          OUT VARCHAR2)
   is
   begin
@@ -1920,6 +1925,10 @@ END;
           insert into operw (ref, tag, value)
            values (p_REF_MAIN, 'CP_FC', p_COD_F);
         end if;
+        if  p_COD_V is not null then
+          insert into operw (ref, tag, value)
+           values (p_REF_MAIN, 'CP_VO', p_COD_V);
+        end if;        
   exception when others then   p_sErr := sqlerrm;
   end;
 
@@ -2388,7 +2397,7 @@ END;
      l_prepare_many_wnd         r_prepare_many_wnd;
      l_many_grid                r_many_grid;
      l_t_many_grid              t_many_grid := t_many_grid();
-     l_t_tmp_irr                t_tmp_irr   := t_tmp_irr();     
+     l_t_tmp_irr                t_tmp_irr   := t_tmp_irr();
      l_CP_MANY                  varchar2(4000);
      l_CP_MANY30                varchar2(500);
      v_stmt_str                 varchar2 (14000);
@@ -2454,8 +2463,8 @@ END;
                      || ' then -cp.KUPON1 ('||to_char(l_ID)||', m.FDAT, to_date('''||to_char(l_prepare_many_wnd.DAT_EM,'dd/mm/yyyy')||''',''dd/mm/yyyy''), to_date('''|| to_char(l_prepare_many_wnd.DATP,'dd/mm/yyyy')||''',''dd/mm/yyyy''))/100  '
                      || ' else 0 end nInt, '
                      || l_sPereoc || ' /100 g11, '
-                     || ' value_paper.get_cena_voprosa('||l_ID||', m.FDAT, '||l_prepare_many_wnd.CENA||','||l_prepare_many_wnd.CENA_START||') CENA,' 
-                     || ' value_paper.get_count_cp('||l_ID||', m.FDAT, '||l_prepare_many_wnd.CENA||','||l_prepare_many_wnd.CENA_START||', '||l_prepare_many_wnd.nAcc||' ) KOL ' 
+                     || ' value_paper.get_cena_voprosa('||l_ID||', m.FDAT, '||l_prepare_many_wnd.CENA||','||l_prepare_many_wnd.CENA_START||') CENA,'
+                     || ' value_paper.get_count_cp('||l_ID||', m.FDAT, '||l_prepare_many_wnd.CENA||','||l_prepare_many_wnd.CENA_START||', '||l_prepare_many_wnd.nAcc||' ) KOL '
                      || ' FROM ( ' || l_CP_MANY || ') m '
                      || ' union ALL '
                      || ' SELECT distinct m.FDAT, m.SS1, m.SN2, m.SDP, '
@@ -2463,8 +2472,8 @@ END;
                      || ' -(m.SS1+m.SN2      ) SE, '
                      || ' -cp.KUPON1 ('||to_char(l_ID)|| ', m.FDAT, to_date('''||to_char(l_prepare_many_wnd.DAT_EM,'dd/mm/yyyy')||''',''dd/mm/yyyy''), to_date('''||to_char(l_prepare_many_wnd.DATP,'dd/mm/yyyy')||''',''dd/mm/yyyy'')) /100, '
                      || l_sPereoc || ' /100 g11, '
-                     || ' value_paper.get_cena_voprosa('||l_ID||', m.FDAT, '||l_prepare_many_wnd.CENA||','||l_prepare_many_wnd.CENA_START||') CENA,' 
-                     || ' value_paper.get_count_cp('||l_ID||', m.FDAT, '||l_prepare_many_wnd.CENA||','||l_prepare_many_wnd.CENA_START||', '||l_prepare_many_wnd.nAcc||' ) KOL ' 
+                     || ' value_paper.get_cena_voprosa('||l_ID||', m.FDAT, '||l_prepare_many_wnd.CENA||','||l_prepare_many_wnd.CENA_START||') CENA,'
+                     || ' value_paper.get_count_cp('||l_ID||', m.FDAT, '||l_prepare_many_wnd.CENA||','||l_prepare_many_wnd.CENA_START||', '||l_prepare_many_wnd.nAcc||' ) KOL '
                      || ' FROM cp_many m where ref = '||to_char(p_REF) ||' and fdat = to_date('''||to_char(l_prepare_many_wnd.DAT1,'dd/mm/yyyy')||''',''dd/mm/yyyy'') '
                      || ' ORDER BY 1';
 
@@ -2502,16 +2511,16 @@ END;
              FETCH v_many_cursor INTO l_many_grid;
              EXIT WHEN v_many_cursor%NOTFOUND;
              --bars_audit.info(v_many_cursor%ROWCOUNT);
-             
+
              l_t_many_grid.extend;
              l_t_many_grid(l_t_many_grid.last) := l_many_grid;
-             
+
              if l_many_grid.NDD > 0 then --block G14
                l_t_tmp_irr.extend;
                l_t_tmp_irr(l_t_tmp_irr.last) := r_tmp_irr(l_many_grid.NDD, l_many_grid.g1);
                --bars_audit.info('value_paper.populate_many_row_wnd: '||l_many_grid.NDD||'|'||l_many_grid.g1);
              end if;                 --end block G14
-             
+
           END LOOP;
           CLOSE v_many_cursor;
           p_t_many_grid := l_t_many_grid;
@@ -2533,8 +2542,8 @@ END;
   --  execute immediate 'delete from tmp_irr';
   --  commit;
      --   l_nIrr0 := l_prepare_many_wnd.IR/100;
-     
-    populate_many_row_wnd(p_ref, rb1, rb2, DAT_ROZ, l_t_many_grid, l_t_tmp_irr, l_nIrr0); 
+
+    populate_many_row_wnd(p_ref, rb1, rb2, DAT_ROZ, l_t_many_grid, l_t_tmp_irr, l_nIrr0);
     for i in 1..l_t_many_grid.count
     loop
 --     insert into tmp_irr (n,s) values (k.NDD,k.G1*100);
@@ -2575,7 +2584,7 @@ END;
       l_many_grid.G12A  := l_t_many_grid(i).G12A;
       l_many_grid.g13   := l_t_many_grid(i).g13;
       l_many_grid.g13A  := l_t_many_grid(i).g13A;
-      
+
 --      bars_audit.info('value_paper.populate_many_wnd: i='||i||' count l_t_tmp_irr='||l_t_tmp_irr.count||' count l_t_many_grid='||l_t_many_grid.count||' l_t_tmp_irr.FIRST='||l_t_tmp_irr.FIRST||' l_t_tmp_irr.LAST='||l_t_tmp_irr.LAST);
       for j in l_t_tmp_irr.FIRST..l_t_tmp_irr.LAST loop
         if l_t_tmp_irr(j).n < l_t_many_grid(i).NDD then
@@ -2587,16 +2596,16 @@ END;
         else
           exit;
         end if;
-      end loop;  
-      
---      bars_audit.info('value_paper.populate_many_wnd: розраховую'||' l_t_tmp_irr.FIRST='||l_t_tmp_irr.FIRST||' l_t_tmp_irr..LAST='||l_t_tmp_irr.LAST);          
+      end loop;
+
+--      bars_audit.info('value_paper.populate_many_wnd: розраховую'||' l_t_tmp_irr.FIRST='||l_t_tmp_irr.FIRST||' l_t_tmp_irr..LAST='||l_t_tmp_irr.LAST);
       l_many_grid.G14   := round(xIRR (l_nIrr0/100, l_t_tmp_irr),4)*100;
-              
+
       PIPE ROW (l_many_grid);
     end loop;
     exception
-      when others then 
-        bars_audit.error('value_paper.populate_many_wnd: '||dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace());          
+      when others then
+        bars_audit.error('value_paper.populate_many_wnd: '||dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace());
   end;
 
  function prepare_cpv_wnd(p_ID in number, nGRP in INT)
@@ -2999,7 +3008,7 @@ END;
 
    l_grp           accounts.grp%type;
    l_nlsrd         cp_accc.nlsrd%type;
-   l_nlsrd_6       cp_accc.nlsrd_6%type;  
+   l_nlsrd_6       cp_accc.nlsrd_6%type;
    l_accrd_6       accounts.acc%type;
    l_kv            cp_kod.kv%type;
    l_rnk           cp_kod.rnk%type;
@@ -3028,18 +3037,20 @@ END;
    select a.nlsrd, k.kv, d.dazs,
           (select ac.cp_acc from cp_accounts ac where ac.cp_ref = l_ref and ac.cp_acctype = 'RD') as accrd,
           (select o.nd from oper o where o.ref = l_ref) as nd,
-          k.rnk, k.cp_id, a.nlsrd_6, 
-          (select acc from accounts where nls = a.nlsrd_6 and kv = 980), 
+          k.rnk, k.cp_id, a.nlsrd_6,
+          (select acc from accounts where nls = a.nlsrd_6 and kv = 980),
           k.basey
      into l_nlsrd, l_kv, l_dazs,
           l_accrd_vnesist,
           l_nd,
-          l_rnk, l_cp_id, l_nlsrd_6, 
+          l_rnk, l_cp_id, l_nlsrd_6,
           l_accrd_6,
           l_basey
    from cp_kod k
    join cp_deal d on (k.id = d.id)
-   left join cp_accc a on (d.ryn = a.ryn and nvl(d.pf, a.pf) = a.pf and k.emi = a.emi)
+   join accounts ac on (d.acc = ac.acc)
+   left join accounts acp on (d.accp = acp.acc)
+   left join cp_accc a on (d.ryn = a.ryn and nvl(d.pf, a.pf) = a.pf and k.emi = a.emi and (substr(ac.nls,1,4)=a.vidd or substr(acp.nls,1,4)=a.vidd))
    where d.ref = l_ref;
 
    if l_dazs is not null then
@@ -3051,7 +3062,7 @@ END;
    if l_nlsrd_6 is null then
      raise_application_error(-20001,  'Невказаний рахунок доходів по дивідентам 6 клас (в довіднику cp_accc)');
    end if;
-   
+
 
    if l_accrd_vnesist is null then --тоді відкрити по угоді внесистемний рахунок і підвязати до угоди
      begin
@@ -3080,9 +3091,9 @@ END;
      --підвязати
      insert into cp_accounts(cp_ref, cp_acctype, cp_acc)
      values(l_ref, 'RD', l_accrd_vnesist);
-     
+
      insert into int_accn (acc            ,id, acra           ,  acrb     ,   metr,   tt  ,    basey,      freq,   acr_dat   ,io)
-          values          (l_accrd_vnesist, 0, l_accrd_vnesist,  l_accrd_6,      4,  'FX%',  l_basey,         1,   gl.BDATE-1, 0);     
+          values          (l_accrd_vnesist, 0, l_accrd_vnesist,  l_accrd_6,      4,  'FX%',  l_basey,         1,   gl.BDATE-1, 0);
    end if;
 
    delete from cp_int_dividents where user_id = user_id();
@@ -3125,7 +3136,7 @@ END;
     end if;
     if p_nlsrd_6 is null then
       raise_application_error(-20001,  'Вкажіть рахунок доходів по дивідентам');
-    end if;    
+    end if;
 
     select a.nls, a.kv, substr(a.nms, 1, 38), c.okpo, a.acc
     into   oo.nlsa, oo.kv, oo.nam_a, oo.id_a,         l_acc
@@ -3133,12 +3144,12 @@ END;
     where ac.cp_ref = p_ref and ac.cp_acctype = 'RD'
       and ac.cp_acc = a.acc
       and a.rnk = c.rnk;
-      
+
     select substr(a.nms, 1, 38), c.okpo
     into   oo.nam_b, oo.id_b
     from accounts a, customer c
     where a.nls = p_nlsrd_6 and a.kv = 980
-      and a.rnk = c.rnk;     
+      and a.rnk = c.rnk;
 
     gl.ref (oo.REF);
 
@@ -3160,11 +3171,31 @@ END;
       --------------------
       -- Вставка записи-истории о начислении процентов, если, в будущем будет необходимость СТОРНО или персчета процентов.
     ACRN.acr_dati ( l_acc, 0, oo.REF, gl.bdate, 0);
-   
-    delete from cp_int_dividents where user_id = user_id(); 
-    
+
+    delete from cp_int_dividents where user_id = user_id();
+
     bars_audit.info('value_paper.make_oper_cp_int_dividends END');
 end;
+ 
+  --виплата дивідентів -населення таблиці
+  procedure make_pay_dividends_prepare(p_ref cp_deal.ref%type default null) as
+   l_ref           cp_deal.ref%type;    
+  begin
+     if p_ref is null then
+       l_ref := to_number(bars.pul.get('cp_ref_dividents'));
+       else
+         l_ref := p_ref;
+     end if;
+     bars_audit.info('value_paper.make_pay_dividends_prepare START: REF=' || l_ref);
+     if l_ref is null then
+       raise_application_error(-20001,  'Вкажіть REF угоди по якій необхідно виплатити дивіденти');
+     end if;
+     
+     
+     delete from cp_pay_dividents where user_id = user_id();
+     insert into cp_pay_dividents(ref) values(l_ref);
+     bars_audit.info('value_paper.make_pay_dividends_prepare END');     
+  end;    
 
   --за основу функції взяті з нового пакету cp_rep_dgp
   --після устаканювання звітів, та потоків потрібно зробити єдину точку визову цих функцій, наприклад з цього пакету.
@@ -3190,7 +3221,7 @@ end;
 
   --за основу функції взяті з нового пакету cp_rep_dgp
   --після устаканювання звітів, та потоків потрібно зробити єдину точку визову цих функцій, наприклад з цього пакету.
-  function get_count_cp(p_id cp_kod.id%type, p_date date, p_cena cp_kod.cena%type, p_cena_start cp_kod.cena_start%type, p_acc cp_deal.acc%type) 
+  function get_count_cp(p_id cp_kod.id%type, p_date date, p_cena cp_kod.cena%type, p_cena_start cp_kod.cena_start%type, p_acc cp_deal.acc%type)
   return number is
     l_cena     cp_kod.cena%type;
     l_cnt_cp   number :=0;
@@ -3203,7 +3234,7 @@ end;
       select -rez.ostc96(p_acc, p_date) / 100 into l_nom from dual;
 
       l_cnt_cp := round(l_nom / l_cena, 0);
-    end if;  
+    end if;
 
     return l_cnt_cp;
   end get_count_cp;

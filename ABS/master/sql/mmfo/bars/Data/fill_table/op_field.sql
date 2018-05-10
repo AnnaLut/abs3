@@ -40,6 +40,27 @@ exception when others then   if SQLCODE = - 00001 then null;   else raise; end i
 end;
 /
 
+begin
+Insert into BARS.OP_FIELD
+   (TAG, NAME, USE_IN_ARCH, BROWSER)
+ Values
+   ('CP_VO', 'Вид операції', 1, 'TagBrowse("SELECT code,txt FROM cp_voper")');
+exception when dup_val_on_index then
+      null;
+    end;
+/
+
+begin
+Insert into BARS.OP_FIELD
+   (TAG, NAME, USE_IN_ARCH, BROWSER)
+ Values
+   ('CP_VD', 'Вид договору', 1, 'TagBrowse("SELECT code,txt FROM cp_vdogo")');
+exception when dup_val_on_index then
+      null;
+    end;
+/
+
+
 COMMIT;
 
 

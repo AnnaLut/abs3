@@ -45,6 +45,41 @@ begin
       else raise;
       end if;
   end;
+  begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('CP_FC', 'FX7', 'O', 1, null, null, null);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''CP_FC'', ''FX7'', ''O'', 1, null, null, null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('CP_VO', 'FX7', 'O', 1, null, null, null);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''CP_VO'', ''FX7'', ''O'', 1, null, null, null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('CP_VD', 'FX7', 'O', 1, null, null, null);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''CP_VD'', ''FX7'', ''O'', 1, null, null, null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+
+
   --------------------------------
   ------ Связанные операции ------
   --------------------------------
