@@ -355,10 +355,12 @@ namespace Areas.Cdnt.Models
         /// Create a new NOTARY object.
         /// </summary>
         /// <param name="id">Initial value of the ID property.</param>
-        public static NOTARY CreateNOTARY(global::System.Int64 id)
+        /// <param name="dOCUMENT_TYPE">Initial value of the DOCUMENT_TYPE property.</param>
+        public static NOTARY CreateNOTARY(global::System.Int64 id, global::System.Int32 dOCUMENT_TYPE)
         {
             NOTARY nOTARY = new NOTARY();
             nOTARY.ID = id;
+            nOTARY.DOCUMENT_TYPE = dOCUMENT_TYPE;
             return nOTARY;
         }
 
@@ -800,6 +802,102 @@ namespace Areas.Cdnt.Models
         private Nullable<global::System.DateTime> _CERTIFICATE_CANCELATION_DATE;
         partial void OnCERTIFICATE_CANCELATION_DATEChanging(Nullable<global::System.DateTime> value);
         partial void OnCERTIFICATE_CANCELATION_DATEChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Int32 DOCUMENT_TYPE
+        {
+            get
+            {
+                return _DOCUMENT_TYPE;
+            }
+            set
+            {
+                OnDOCUMENT_TYPEChanging(value);
+                ReportPropertyChanging("DOCUMENT_TYPE");
+                _DOCUMENT_TYPE = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("DOCUMENT_TYPE");
+                OnDOCUMENT_TYPEChanged();
+            }
+        }
+        private global::System.Int32 _DOCUMENT_TYPE;
+        partial void OnDOCUMENT_TYPEChanging(global::System.Int32 value);
+        partial void OnDOCUMENT_TYPEChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Int64> IDCARD_DOCUMENT_NUMBER
+        {
+            get
+            {
+                return _IDCARD_DOCUMENT_NUMBER;
+            }
+            set
+            {
+                OnIDCARD_DOCUMENT_NUMBERChanging(value);
+                ReportPropertyChanging("IDCARD_DOCUMENT_NUMBER");
+                _IDCARD_DOCUMENT_NUMBER = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("IDCARD_DOCUMENT_NUMBER");
+                OnIDCARD_DOCUMENT_NUMBERChanged();
+            }
+        }
+        private Nullable<global::System.Int64> _IDCARD_DOCUMENT_NUMBER;
+        partial void OnIDCARD_DOCUMENT_NUMBERChanging(Nullable<global::System.Int64> value);
+        partial void OnIDCARD_DOCUMENT_NUMBERChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public global::System.String IDCARD_NOTATION_NUMBER
+        {
+            get
+            {
+                return _IDCARD_NOTATION_NUMBER;
+            }
+            set
+            {
+                OnIDCARD_NOTATION_NUMBERChanging(value);
+                ReportPropertyChanging("IDCARD_NOTATION_NUMBER");
+                _IDCARD_NOTATION_NUMBER = StructuralObject.SetValidValue(value, true);
+                ReportPropertyChanged("IDCARD_NOTATION_NUMBER");
+                OnIDCARD_NOTATION_NUMBERChanged();
+            }
+        }
+        private global::System.String _IDCARD_NOTATION_NUMBER;
+        partial void OnIDCARD_NOTATION_NUMBERChanging(global::System.String value);
+        partial void OnIDCARD_NOTATION_NUMBERChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.DateTime> PASSPORT_EXPIRY
+        {
+            get
+            {
+                return _PASSPORT_EXPIRY;
+            }
+            set
+            {
+                OnPASSPORT_EXPIRYChanging(value);
+                ReportPropertyChanging("PASSPORT_EXPIRY");
+                _PASSPORT_EXPIRY = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("PASSPORT_EXPIRY");
+                OnPASSPORT_EXPIRYChanged();
+            }
+        }
+        private Nullable<global::System.DateTime> _PASSPORT_EXPIRY;
+        partial void OnPASSPORT_EXPIRYChanging(Nullable<global::System.DateTime> value);
+        partial void OnPASSPORT_EXPIRYChanged();
 
         #endregion
 
@@ -1879,10 +1977,12 @@ namespace Areas.Cdnt.Models
         /// Create a new V_NOTARY object.
         /// </summary>
         /// <param name="id">Initial value of the ID property.</param>
-        public static V_NOTARY CreateV_NOTARY(global::System.Int64 id)
+        /// <param name="dOCUMENT_TYPE">Initial value of the DOCUMENT_TYPE property.</param>
+        public static V_NOTARY CreateV_NOTARY(global::System.Int64 id, global::System.Int32 dOCUMENT_TYPE)
         {
             V_NOTARY v_NOTARY = new V_NOTARY();
             v_NOTARY.ID = id;
+            v_NOTARY.DOCUMENT_TYPE = dOCUMENT_TYPE;
             return v_NOTARY;
         }
 
@@ -2444,6 +2544,198 @@ namespace Areas.Cdnt.Models
         private global::System.String _PASSPORT;
         partial void OnPASSPORTChanging(global::System.String value);
         partial void OnPASSPORTChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Int32 DOCUMENT_TYPE
+        {
+            get
+            {
+                return _DOCUMENT_TYPE;
+            }
+            set
+            {
+                OnDOCUMENT_TYPEChanging(value);
+                ReportPropertyChanging("DOCUMENT_TYPE");
+                _DOCUMENT_TYPE = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("DOCUMENT_TYPE");
+                OnDOCUMENT_TYPEChanged();
+            }
+        }
+        private global::System.Int32 _DOCUMENT_TYPE;
+        partial void OnDOCUMENT_TYPEChanging(global::System.Int32 value);
+        partial void OnDOCUMENT_TYPEChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Int64> IDCARD_DOCUMENT_NUMBER
+        {
+            get
+            {
+                return _IDCARD_DOCUMENT_NUMBER;
+            }
+            set
+            {
+                OnIDCARD_DOCUMENT_NUMBERChanging(value);
+                ReportPropertyChanging("IDCARD_DOCUMENT_NUMBER");
+                _IDCARD_DOCUMENT_NUMBER = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("IDCARD_DOCUMENT_NUMBER");
+                OnIDCARD_DOCUMENT_NUMBERChanged();
+            }
+        }
+        private Nullable<global::System.Int64> _IDCARD_DOCUMENT_NUMBER;
+        partial void OnIDCARD_DOCUMENT_NUMBERChanging(Nullable<global::System.Int64> value);
+        partial void OnIDCARD_DOCUMENT_NUMBERChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public global::System.String IDCARD_NOTATION_NUMBER
+        {
+            get
+            {
+                return _IDCARD_NOTATION_NUMBER;
+            }
+            set
+            {
+                OnIDCARD_NOTATION_NUMBERChanging(value);
+                ReportPropertyChanging("IDCARD_NOTATION_NUMBER");
+                _IDCARD_NOTATION_NUMBER = StructuralObject.SetValidValue(value, true);
+                ReportPropertyChanged("IDCARD_NOTATION_NUMBER");
+                OnIDCARD_NOTATION_NUMBERChanged();
+            }
+        }
+        private global::System.String _IDCARD_NOTATION_NUMBER;
+        partial void OnIDCARD_NOTATION_NUMBERChanging(global::System.String value);
+        partial void OnIDCARD_NOTATION_NUMBERChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.DateTime> PASSPORT_EXPIRY
+        {
+            get
+            {
+                return _PASSPORT_EXPIRY;
+            }
+            set
+            {
+                OnPASSPORT_EXPIRYChanging(value);
+                ReportPropertyChanging("PASSPORT_EXPIRY");
+                _PASSPORT_EXPIRY = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("PASSPORT_EXPIRY");
+                OnPASSPORT_EXPIRYChanged();
+            }
+        }
+        private Nullable<global::System.DateTime> _PASSPORT_EXPIRY;
+        partial void OnPASSPORT_EXPIRYChanging(Nullable<global::System.DateTime> value);
+        partial void OnPASSPORT_EXPIRYChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public global::System.String ACCR_BRANCHES
+        {
+            get
+            {
+                return _ACCR_BRANCHES;
+            }
+            set
+            {
+                OnACCR_BRANCHESChanging(value);
+                ReportPropertyChanging("ACCR_BRANCHES");
+                _ACCR_BRANCHES = StructuralObject.SetValidValue(value, true);
+                ReportPropertyChanged("ACCR_BRANCHES");
+                OnACCR_BRANCHESChanged();
+            }
+        }
+        private global::System.String _ACCR_BRANCHES;
+        partial void OnACCR_BRANCHESChanging(global::System.String value);
+        partial void OnACCR_BRANCHESChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public global::System.String ACCR_BRANCHNAMES
+        {
+            get
+            {
+                return _ACCR_BRANCHNAMES;
+            }
+            set
+            {
+                OnACCR_BRANCHNAMESChanging(value);
+                ReportPropertyChanging("ACCR_BRANCHNAMES");
+                _ACCR_BRANCHNAMES = StructuralObject.SetValidValue(value, true);
+                ReportPropertyChanged("ACCR_BRANCHNAMES");
+                OnACCR_BRANCHNAMESChanged();
+            }
+        }
+        private global::System.String _ACCR_BRANCHNAMES;
+        partial void OnACCR_BRANCHNAMESChanging(global::System.String value);
+        partial void OnACCR_BRANCHNAMESChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public global::System.String ACCR_SEG_OF_BUSINESS
+        {
+            get
+            {
+                return _ACCR_SEG_OF_BUSINESS;
+            }
+            set
+            {
+                OnACCR_SEG_OF_BUSINESSChanging(value);
+                ReportPropertyChanging("ACCR_SEG_OF_BUSINESS");
+                _ACCR_SEG_OF_BUSINESS = StructuralObject.SetValidValue(value, true);
+                ReportPropertyChanged("ACCR_SEG_OF_BUSINESS");
+                OnACCR_SEG_OF_BUSINESSChanged();
+            }
+        }
+        private global::System.String _ACCR_SEG_OF_BUSINESS;
+        partial void OnACCR_SEG_OF_BUSINESSChanging(global::System.String value);
+        partial void OnACCR_SEG_OF_BUSINESSChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public global::System.String ACCREDITATION_TYPE
+        {
+            get
+            {
+                return _ACCREDITATION_TYPE;
+            }
+            set
+            {
+                OnACCREDITATION_TYPEChanging(value);
+                ReportPropertyChanging("ACCREDITATION_TYPE");
+                _ACCREDITATION_TYPE = StructuralObject.SetValidValue(value, true);
+                ReportPropertyChanged("ACCREDITATION_TYPE");
+                OnACCREDITATION_TYPEChanged();
+            }
+        }
+        private global::System.String _ACCREDITATION_TYPE;
+        partial void OnACCREDITATION_TYPEChanging(global::System.String value);
+        partial void OnACCREDITATION_TYPEChanged();
 
         #endregion
 

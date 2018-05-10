@@ -381,15 +381,30 @@ public partial class DepositAgreement2 : Bars.BarsPage
                                        v.fl_activity as status,
                                        V.DPT_ID AS dpt_id,
                                        EBP.GET_TEMPLATE(V.DPT_ID,V.agrmnt_type,1) AS template_id,
-                                       (CASE(V.agrmnt_type)
-                                            WHEN 7 THEN 222
-                                            WHEN 8 THEN 223
-                                            WHEN 9 THEN 226
-                                            WHEN 12 THEN 222
-                                            WHEN 13 THEN 225
-                                            WHEN 18 THEN 211
-                                            ELSE 213
-                                       END)  AS eastructID,
+                                       (CASE
+                                           WHEN v.wb = 'Y'
+                                           THEN
+                                           CASE
+                                               WHEN V.agrmnt_type IN (17, 40) THEN 542
+                                               WHEN V.agrmnt_type IN (11, 39) THEN 543
+                                               WHEN V.agrmnt_type = 38        THEN 541
+                                               ELSE 54
+                                           END
+                                           WHEN v.wb = 'N'
+                                           THEN
+                                           CASE
+                                               WHEN V.agrmnt_type = 17 THEN 2110
+                                               WHEN V.agrmnt_type = 7  THEN 222
+                                               WHEN V.agrmnt_type = 8  THEN 223
+                                               WHEN V.agrmnt_type = 9  THEN 226
+                                               WHEN V.agrmnt_type = 12 THEN 222
+                                               WHEN V.agrmnt_type = 13 THEN 225
+                                               WHEN V.agrmnt_type = 18 THEN 211
+                                               WHEN V.agrmnt_type = 11 THEN 219
+                                               ELSE 213
+                                           END
+                                       END)
+                                       AS eastructID,
                                        V.OWNER_ID  as rnk 
                                   from v_dpt_agreements v, cc_docs c
                                  where v.dpt_id = :p_dpt_id

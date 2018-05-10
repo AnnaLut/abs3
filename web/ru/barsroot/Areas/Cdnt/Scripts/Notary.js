@@ -10,6 +10,152 @@
         currAccrId: null
     });
 
+    function NotaryForm() {
+        if (NotaryForm.instance) return NotaryForm.instance;//singleton
+
+        this.id = $("input[name=\"notary_id\"]");
+
+        // При додаванні поля в цей масив починайте назву з 'kendo_' для кендо-полів (типу kendoDropDownList, kendoDatePicker).
+        var defaultProps = { 
+            kendo_notary_type: 2, tin: null, last_name: null, first_name: null, middle_name: null, kendo_date_of_birth: null, kendo_document_type: 1,
+            idcard_document_number: null, idcard_notation_number: null, passport_series: null, passport_number: null, kendo_passport_issued: null,
+            kendo_passport_expiry: null, passport_issuer: null, address: null, phone_number: '+380', mobile_phone_number: '+380', email: null, certificate_number: null
+        };
+
+        var processRequiredInputs = function (inputs, isRequired) {
+            if (isRequired == null) return;
+            for (var i = 0; i < inputs.length; i++) {
+                if (isRequired === true) {
+                    inputs[i].prop('required', isRequired);
+                }
+                else {
+                    inputs[i].removeAttr('required');
+                }
+                var star = inputs[i].siblings('.k-required')[0];
+                if (!star) star = $(inputs[i].data('for'))[0];
+                star.style.display = !isRequired ? 'none' : 'inline';
+            }
+        }
+
+        this.processInputs = function (inputsTypeString, isRequired, isHide) {
+            var inputs;
+            switch (inputsTypeString) {
+                case 'all': inputs = [
+                    $("input[name=\"tin\"]"),
+                    $("input[name=\"date_of_birth\"]"),
+                    $("input[name=\"idcard_document_number\"]"),
+                    $("input[name=\"idcard_notation_number\"]"),
+                    $("input[name=\"passport_series\"]"),
+                    $("input[name=\"passport_number\"]"),
+                    $("input[name=\"passport_issued\"]"),
+                    $("input[name=\"passport_expiry\"]"),
+                    $("input[name=\"passport_issuer\"]"),
+                    $("input[name=\"address\"]"),
+                    $("input[name=\"mobile_phone_number\"]")
+                ]; break;
+                case 'passport': inputs = [
+                    $("input[name=\"passport_series\"]"),
+                    $("input[name=\"passport_number\"]")
+                ]; break;
+                case 'idcard': inputs = [
+                    $("input[name=\"idcard_document_number\"]"),
+                    $("input[name=\"idcard_notation_number\"]"),
+                    $("input[name=\"passport_expiry\"]")
+                ]; break;
+                default: return;
+            }
+
+            processRequiredInputs(inputs, isRequired);
+
+            if (isHide != null) {
+                for (var i = 0; i < inputs.length; i++) {
+                    inputs[i].closest('label')[0].style.display = isHide ? 'none' : 'block';
+                }
+            }
+        }
+
+        this.reset = function () {
+            this.id.val(null);
+
+            $.each(defaultProps, function (key, val) {
+                if (key.indexOf('kendo') == 0) {
+                    var input = $("input[name=\"" + key.substring(6) + "\"]");
+                    var inp = input.data("kendoDropDownList");
+                    if (!inp) inp = input.data("kendoDatePicker");
+                    if (inp) inp.value(val);
+                }
+                else {
+                    var input = $("input[name=\"" + key + "\"]");
+                    if (input) input.val(val);
+                }
+            });
+
+            this.processInputs('all', true);
+            this.processInputs('idcard', false, true);
+            this.processInputs('passport', null, false);
+        }
+        this.initInputs = function () {
+            var grid = $(mainGrid).data("kendoGrid");
+            var currentRowData = null;
+            if (grid.select().length > 0) {
+                currentRowData = grid.dataItem(grid.select());
+
+                this.id.val(currentRowData.ID);
+
+                $.each(defaultProps, function (key) {
+                    if (key.indexOf('kendo') == 0) {
+                        key = key.substring(6);
+                        var input = $("input[name=\"" + key + "\"]");
+                        var inp = input.data("kendoDropDownList");
+                        if (!inp) inp = input.data("kendoDatePicker");
+                        if (inp) inp.value(currentRowData[key.toUpperCase()]);
+                    }
+                    else {
+                        var input = $("input[name=\"" + key + "\"]");
+                        if (input) input.val(currentRowData[key.toUpperCase()]);
+                    }
+                });
+            }
+
+            this.processInputs('all', true); // Спочатку необхідно скинути в true, бо можливі помилки
+
+            if (this.isIDCard()) {//ID-картка
+                this.processInputs('idcard', null, false);
+                this.processInputs('passport', false, true);
+            }
+            else {
+                this.processInputs('passport', null, false);
+                this.processInputs('idcard', false, true);
+            }
+            if (this.isStateNotary()) { //для государственного нотариуса отключаем обязательность большинства полей
+                this.processInputs('all', false);
+            }
+        }
+        this.enable = function (isEnable) {
+            if (isEnable == null) isEnable = true;
+
+            $.each(defaultProps, function (key, val) {
+                if (key.indexOf('kendo') == 0) {
+                    var input = $("input[name=\"" + key.substring(6) + "\"]");
+                    var inp = input.data("kendoDropDownList");
+                    if (!inp) inp = input.data("kendoDatePicker");
+                    if (inp) inp.enable(isEnable);
+                }
+                else {
+                    var input = $("input[name=\"" + key + "\"]");
+                    if (input) input.prop("disabled", !isEnable);
+                }
+            });
+        }
+        this.isStateNotary = function () {
+            return $("input[name=\"notary_type\"]").data("kendoDropDownList").value() === "1";
+        }
+        this.isIDCard = function () {
+            return $("input[name=\"document_type\"]").data("kendoDropDownList").value() === "7";
+        }
+        NotaryForm.instance = this;
+    }
+
     //функция обновления тулбара
     var toolbarRefresh = function () {
         var grid = $(mainGrid).data("kendoGrid");
@@ -80,10 +226,12 @@
             total: "Total",
             errors: "Errors",
             model: {
+                id: 'ID',
                 fields: {
                     ID: { type: "number" },
                     DATE_OF_BIRTH: { type: "date" },
                     PASSPORT_ISSUED: { type: "date" },
+                    PASSPORT_EXPIRY: { type: "date" },
                     NOTARY_TYPE: { type: "number" },
                     CERTIFICATE_ISSUE_DATE: { type: "date" },
                     CERTIFICATE_CANCELATION_DATE: { type: "date" }
@@ -109,7 +257,6 @@
             }
         }
     });
-
 
     //акредитации
     var accrGridDs = new kendo.data.DataSource({
@@ -140,10 +287,6 @@
                     var currentRowData;
                     if (grid.select().length > 0) {
                         currentRowData = grid.dataItem(grid.select());
-                        debugger;
-                        if (currentRowData.NOTARY_TYPE_NAME === "державний") {
-                            $('#businesses').removeAttr('required')
-                        }
                         return { notaryId: currentRowData.ID }
                     }
                     return { notaryId: null }
@@ -215,6 +358,15 @@
             }
         }
     });
+    //Типи паспортів
+    var documentTypeDs = new kendo.data.DataSource({
+        type: "aspnetmvc-ajax",
+        transport: {
+            read: {
+                url: bars.config.urlContent("/Cdnt/Notary/GetDocumentTypes")
+            }
+        }
+    });
 
     //список мфо
     var mfoListDs = new kendo.data.DataSource({
@@ -241,9 +393,6 @@
         $(".k-invalid-msg").hide();
     }
 
-    var isStateNotary = function () {
-        return $("input[name=\"notary_type\"]").data("kendoDropDownList").value() === "1";
-    }
     //валидаторы форм
     var notaryValidator = $(notaryEditDialog).kendoValidator({
         messages: {
@@ -251,49 +400,68 @@
             invalid_date_format: "Невірний формат дати!"
         },
         rules: {
-            passpseriescheck: function (input) {
-                if (isStateNotary()) {
-                    return true;
-                }
-                if (input.is("[name=passport_series]")) {
+            issuercheck: function (input) {
+                if (input.is("[name=passport_issuer]") && new NotaryForm().isIDCard()) {
                     var val = input.val();
-                    return val && /^[а-яА-Я]{2}$/.test(val);
+                    if (input[0].required) return /^\d+$/.test(val);
+                    else return /^\d+$/.test(val) || !val;
+                }
+                return true;
+            },
+            passpseriescheck: function (input) {
+                if (input.is("[name=passport_series]")) {
+                    if (new NotaryForm().isIDCard()) return true;
+                    var val = input.val();
+                    if (input[0].required) return /^[a-zA-Zа-яА-ЯіІїЇєЄґҐ]{2}$/.test(val);
+                    else return /^[a-zA-Zа-яА-ЯіІїЇєЄґҐ]{2}$/.test(val) || !val;
                 }
                 return true;
             },
             tincheck: function (input) {
-                if (isStateNotary()) {
-                    return true;
-                }
                 if (input.is("[name=tin]")) {
                     var val = input.val();
-                    return (/^[0-9]{10}$/.test(val));
+                    if (input[0].required) return /^[0-9]{10}$/.test(val);
+                    else return /^[0-9]{10}$/.test(val) || !val;
                 }
                 return true;
             },
             mobphonecheck: function (input) {
-                if (isStateNotary()) {
-                    return true;
-                }
                 if (input.is("[name=mobile_phone_number]")) {
                     var number = input.val();
-                    return number && /^[+0-9]{13}$/.test(number);
-                    //return number.substring(0, 4) === "+380" && number.length > 11;
+                    if (input[0].required) return /^[+0-9]{13}$/.test(number);
+                    else return /^([+0-9]{13})|(\+380)$/.test(number) || !number;
                 }
                 return true;
             },
             passnumcheck: function (input) {
-                if (isStateNotary()) {
-                    return true;
-                }
                 if (input.is("[name=passport_number]")) {
+                    if (new NotaryForm().isIDCard()) return true;
                     var val = input.val();
-                    return (/^[0-9]{6}$/.test(val));
+                    if (input[0].required) return /^[0-9]{6}$/.test(val);
+                    else return /^[0-9]{6}$/.test(val) || !val;
+                }
+                return true;
+            },
+            idcardnumcheck: function (input) {
+                if (input.is("[name=idcard_document_number]")) {
+                    if (!new NotaryForm().isIDCard()) return true;
+                    var val = input.val();
+                    if (input[0].required) return /^[0-9]{9}$/.test(val);
+                    else return /^[0-9]{9}$/.test(val) || !val;
+                }
+                return true;
+            },
+            idcardnotationnumcheck: function (input) {
+                if (input.is("[name=idcard_notation_number]")) {
+                    if (!new NotaryForm().isIDCard()) return true;
+                    var val = input.val();
+                    if (input[0].required) return /^[0-9]{8}-[0-9]{5}$/.test(val);
+                    else return /^[0-9]{8}-[0-9]{5}$/.test(val) || !val;
                 }
                 return true;
             },
             invalid_date_format: function (input) {
-                if ((input.is("[name=date_of_birth]") || input.is("[name=passport_issued]")) && input.val()) {
+                if ((input.is("[name=date_of_birth]") || input.is("[name=passport_issued]") || input.is("[name=passport_expiry]")) && input.val()) {
                     return kendo.parseDate(input.val()) instanceof Date;
                 }
                 return true;
@@ -308,7 +476,6 @@
         rules: {}
     }).data("kendoValidator");
 
-
     var prepareAccrDialog = function (mode) {
         var dialog = $(accreditationDlg).data("kendoWindow");
 
@@ -319,8 +486,8 @@
         clearValidationMarks();
         if (mode === "add") {
             dialog.title("Акредитація [Додавання нової]");
-            $("input[name=\"id\"]").val(null);
-            $("input[name=\"notary_id\"]").val(bodyModel.currNotaryId); //привяжем до поточного нотаріуса
+            $("input[name=\"accreditation_id\"]").val(null);
+            $("input[name=\"accreditation_notary_id\"]").val(bodyModel.currNotaryId); //привяжем до поточного нотаріуса
             $("input[name=\"accreditation_type_id\"]").data("kendoDropDownList").value(1); //постійна акредитація
             $("input[name=\"start_date\"]").data("kendoDatePicker").value(null);
             $("input[name=\"close_date\"]").data("kendoDatePicker").value(null);
@@ -333,7 +500,8 @@
                 .unbind("click")
                 .on("click", function () {
                     if (validForm()) {
-                        var newAccreditation = $('#accreditation').serializeObject(true);
+                        var newAccreditation = $('#accreditation').serializeObject(true);    
+                        newAccreditation.NOTARY_ID = newAccreditation.ACCREDITATION_NOTARY_ID;
                         $.ajax({
                             type: "POST",
                             url: bars.config.urlContent("/Cdnt/Notary/CreateAccreditation"),
@@ -371,8 +539,8 @@
             if (grid.select().length > 0) {
                 currentRowData = grid.dataItem(grid.select());
                 dialog.title("Акредитація [редагування]");
-                $("input[name=\"id\"]").val(currentRowData.ID);
-                $("input[name=\"notary_id\"]").val(currentRowData.NOTARY_ID);
+                $("input[name=\"accreditation_id\"]").val(currentRowData.ID);
+                $("input[name=\"accreditation_notary_id\"]").val(currentRowData.NOTARY_ID);
                 $("input[name=\"accreditation_type_id\"]").data("kendoDropDownList").value(currentRowData.ACCREDITATION_TYPE_ID);
                 $("input[name=\"start_date\"]").data("kendoDatePicker").value(currentRowData.START_DATE);
                 $("input[name=\"close_date\"]").data("kendoDatePicker").value(currentRowData.CLOSE_DATE);
@@ -380,36 +548,38 @@
                 $("input[name=\"account_mfo\"]").val(currentRowData.ACCOUNT_MFO);
                 $("input[name=\"state_id\"]").data("kendoDropDownList").value(currentRowData.STATE_ID);
                 $("#saveAccreditation")
-                .unbind("click")
-                .on("click", function () {
-                    if (validForm()) {
-                        var newAccreditation = $('#accreditation').serializeObject(true);
-                        $.ajax({
-                            type: "POST",
-                            url: bars.config.urlContent("/Cdnt/Notary/EditAccreditation"),
-                            data: JSON.stringify(newAccreditation),
-                            dataType: "json",
-                            contentType: "application/json; charset=utf-8",
-                            success: function (data) {
-                                if (data.status === "ok") {
-                                    //найти акредитацию и заменить новой
-                                    var accr = accrGridDs.data();
-                                    for (var i = 0; i < accr.length; i++) {
-                                        if (accr[i].ID == newAccreditation.ID) {
-                                            $.each(newAccreditation, function (key, value) {
-                                                accr[i].set(key, value);
-                                            });
-                                            break;
+                    .unbind("click")
+                    .on("click", function () {
+                        if (validForm()) {
+                            var newAccreditation = $('#accreditation').serializeObject(true);
+                            newAccreditation.ID = newAccreditation.ACCREDITATION_ID;
+                            newAccreditation.NOTARY_ID = newAccreditation.ACCREDITATION_NOTARY_ID;
+                            $.ajax({
+                                type: "POST",
+                                url: bars.config.urlContent("/Cdnt/Notary/EditAccreditation"),
+                                data: JSON.stringify(newAccreditation),
+                                dataType: "json",
+                                contentType: "application/json; charset=utf-8",
+                                success: function (data) {
+                                    if (data.status === "ok") {
+                                        //найти акредитацию и заменить новой
+                                        var accr = accrGridDs.data();
+                                        for (var i = 0; i < accr.length; i++) {
+                                            if (accr[i].ID == newAccreditation.ID) {
+                                                $.each(newAccreditation, function (key, value) {
+                                                    accr[i].set(key, value);
+                                                });
+                                                break;
+                                            }
                                         }
+                                        dialog.close();
+                                    } else {
+                                        bars.ui.error({ text: data.message });
                                     }
-                                    dialog.close();
-                                } else {
-                                    bars.ui.error({ text: data.message });
                                 }
-                            }
-                        });
-                    }
-                });
+                            });
+                        }
+                    });
 
                 //заполнение бранчей и бизнесов
                 var fillBranches = function () {
@@ -432,32 +602,20 @@
 
     var prepareNotaryDialog = function (mode) {
         var dialog = $(notaryEditDialog).data("kendoWindow");
-        clearValidationMarks();
 
         var validForm = function () {
             return notaryValidator.validate();
         }
 
-        var phonePrefix = "+380";
-
+        clearValidationMarks();
+        var notaryForm = new NotaryForm();
         if (mode === "add") {
             dialog.title("Нотаріус [Додавання нового]");
             //очистка формы
-            $("input[name=\"notary_type\"]").data("kendoDropDownList").value(2);//приватний нотаріус
-            $("input[name=\"tin\"]").val(null);
-            $("input[name=\"last_name\"]").val(null);
-            $("input[name=\"first_name\"]").val(null);
-            $("input[name=\"middle_name\"]").val(null);
-            $("input[name=\"date_of_birth\"]").data("kendoDatePicker").value(null);
-            $("input[name=\"passport_series\"]").val(null);
-            $("input[name=\"passport_number\"]").val(null);
-            $("input[name=\"passport_issued\"]").data("kendoDatePicker").value(null);
-            $("input[name=\"passport_issuer\"]").val(null);
-            $("input[name=\"address\"]").val(null);
-            $("input[name=\"phone_number\"]").val(phonePrefix);
-            $("input[name=\"mobile_phone_number\"]").val(phonePrefix);
-            $("input[name=\"email\"]").val(null);
-            $("input[name=\"certificate_number\"]").val(null);
+            notaryForm.reset();
+            notaryForm.enable(true);
+
+            $("#saveNotary").text('Зберегти');
             $("#saveNotary")
                 .unbind("click")
                 .on("click", function () {
@@ -468,7 +626,9 @@
                                 newNotarius.ID = data.data;
                                 newNotarius.CNT_ACCR = 0;
                                 newNotarius.CNT_REQACCR = 0;
-                                mainGridDs.add(newNotarius);
+                                newNotarius.NOTARY_TYPE_NAME = newNotarius.NOTARY_TYPE == 1 ? 'державний' : 'приватний';
+                                mainGridDs.read();
+                                //mainGridDs.add(newNotarius);
                                 dialog.close();
                             } else {
                                 bars.ui.error({ text: data.message });
@@ -476,124 +636,63 @@
                         });
                     }
                 });
-        } else if (mode === "edit") {
+        }
+        else if (mode === "edit") {
+            notaryForm.initInputs();
+            notaryForm.enable(true);
             var grid = $(mainGrid).data("kendoGrid");
-            var currentRowData = null;
-            if (grid.select().length > 0) {
-                currentRowData = grid.dataItem(grid.select());
-                dialog.title("Нотаріус - редагування [ID=<strong>" + currentRowData.ID + "</strong>]");
-                //заполнение формы
-                $("input[name=\"notary_type\"]").data("kendoDropDownList").value(currentRowData.NOTARY_TYPE);
-                $("input[name=\"id\"]").val(currentRowData.ID);
-                $("input[name=\"tin\"]").val(currentRowData.TIN);
-                $("input[name=\"last_name\"]").val(currentRowData.LAST_NAME);
-                $("input[name=\"first_name\"]").val(currentRowData.FIRST_NAME);
-                $("input[name=\"middle_name\"]").val(currentRowData.MIDDLE_NAME);
-                $("input[name=\"date_of_birth\"]").data("kendoDatePicker").value(currentRowData.DATE_OF_BIRTH);
-                $("input[name=\"passport_series\"]").val(currentRowData.PASSPORT_SERIES);
-                $("input[name=\"passport_number\"]").val(currentRowData.PASSPORT_NUMBER);
-                $("input[name=\"passport_issued\"]").data("kendoDatePicker").value(currentRowData.PASSPORT_ISSUED);
-                $("input[name=\"passport_issuer\"]").val(currentRowData.PASSPORT_ISSUER);
-                $("input[name=\"address\"]").val(currentRowData.ADDRESS);
-                $("input[name=\"phone_number\"]").val(currentRowData.PHONE_NUMBER);
-                $("input[name=\"mobile_phone_number\"]").val(currentRowData.MOBILE_PHONE_NUMBER);
-                $("input[name=\"email\"]").val(currentRowData.EMAIL);
-                $("input[name=\"certificate_number\"]").val(currentRowData.CERTIFICATE_NUMBER);
-                $("#saveNotary")
-                    .unbind("click")
-                    .on("click", function () {
-                        if (validForm()) {
-                            var newNotarius = $("#notary").serializeObject(true);
-                            $.post(bars.config.urlContent("/Cdnt/Notary/EditNotary"), newNotarius, function (data) {
-                                if (data.status === "ok") {
-                                    //ищем запись в гриде и обновляем ее
-                                    var notary = mainGridDs.data();
-                                    for (var i = 0; i < notary.length; i++) {
-                                        if (notary[i].ID == newNotarius.ID) {
-                                            $.each(newNotarius, function (key, value) {
-                                                notary[i].set(key, value);
-                                            });
-                                            break;
-                                        }
+
+            dialog.title("Нотаріус - редагування [ID=<strong>" + notaryForm.id.val() + "</strong>]");
+
+            $("#saveNotary").text('Оновити');
+            $("#saveNotary")
+                .unbind("click")
+                .on("click", function () {
+                    if (validForm()) {
+                        var newNotarius = $("#notary").serializeObject(true);
+                        newNotarius.ID = newNotarius.NOTARY_ID;
+
+                        $.post(bars.config.urlContent("/Cdnt/Notary/EditNotary"), newNotarius, function (data) {
+                            if (data.status === "ok") {
+                                //ищем запись в гриде и обновляем ее
+                                var notary = mainGridDs.data();
+                                for (var i = 0; i < notary.length; i++) {
+                                    if (notary[i].ID == newNotarius.ID) {
+                                        $.each(newNotarius, function (key, value) {
+                                            notary[i].set(key, value);
+                                        });
+                                        notary[i].set('NOTARY_TYPE_NAME', newNotarius.NOTARY_TYPE == 1 ? 'державний' : 'приватний');
+                                        break;
                                     }
-                                    dialog.close();
-                                } else {
-                                    bars.ui.error({ text: data.message });
-                                }
-                            });
-                        }
-                    });
-            } else {
-                bars.ui.error({ text: "Не обрано жодного нотаріуса!" });
-            }
+                                }                               
+                                dialog.close();
+                            } else {
+                                bars.ui.error({ text: data.message });
+                            }
+                        });
+                    }
+                });
         }
         else if (mode == "delete") {
-            var grid = $(mainGrid).data("kendoGrid");
-            var currentRowData = null;
-            if (grid.select().length > 0) {
-                currentRowData = grid.dataItem(grid.select());
-                dialog.title("Нотаріус - Вилучення [ID=<strong>" + currentRowData.ID + "</strong>]");
-                //заполнение формы
-                $("input[name=\"notary_type\"]").data("kendoDropDownList").value(currentRowData.NOTARY_TYPE);
-                $("input[name=\"id\"]").val(currentRowData.ID);
-                $("input[name=\"tin\"]").val(currentRowData.TIN);
-                $("input[name=\"last_name\"]").val(currentRowData.LAST_NAME);
-                $("input[name=\"first_name\"]").val(currentRowData.FIRST_NAME);
-                $("input[name=\"middle_name\"]").val(currentRowData.MIDDLE_NAME);
-                $("input[name=\"date_of_birth\"]").data("kendoDatePicker").value(currentRowData.DATE_OF_BIRTH);
-                $("input[name=\"passport_series\"]").val(currentRowData.PASSPORT_SERIES);
-                $("input[name=\"passport_number\"]").val(currentRowData.PASSPORT_NUMBER);
-                $("input[name=\"passport_issued\"]").data("kendoDatePicker").value(currentRowData.PASSPORT_ISSUED);
-                $("input[name=\"passport_issuer\"]").val(currentRowData.PASSPORT_ISSUER);
-                $("input[name=\"address\"]").val(currentRowData.ADDRESS);
-                $("input[name=\"phone_number\"]").val(currentRowData.PHONE_NUMBER);
-                $("input[name=\"mobile_phone_number\"]").val(currentRowData.MOBILE_PHONE_NUMBER);
-                $("input[name=\"email\"]").val(currentRowData.EMAIL);
-                $("input[name=\"certificate_number\"]").val(currentRowData.CERTIFICATE_NUMBER);
+            notaryForm.initInputs();
+            notaryForm.enable(false);
+            var notaryId = notaryForm.id.val();
+            dialog.title("Нотаріус - Вилучення [ID=<strong>" + notaryId + "</strong>]");
 
-                $("input[name=\"notary_type\"]").prop("disabled", true);
-                $("input[name=\"tin\"]").prop("disabled", true);
-                $("input[name=\"last_name\"]").prop("disabled", true);
-                $("input[name=\"first_name\"]").prop("disabled", true);
-                $("input[name=\"middle_name\"]").prop("disabled", true);
-                $("input[name=\"date_of_birth\"]").prop("disabled", true);
-                $("input[name=\"passport_series\"]").prop("disabled", true);
-                $("input[name=\"passport_number\"]").prop("disabled", true);
-                $("input[name=\"passport_issued\"]").prop("disabled", true);
-                $("input[name=\"passport_issuer\"]").prop("disabled", true);
-                $("input[name=\"address\"]").prop("disabled", true);
-                $("input[name=\"phone_number\"]").prop("disabled", true);
-                $("input[name=\"mobile_phone_number\"]").prop("disabled", true);
-                $("input[name=\"email\"]").prop("disabled", true);
-                $("input[name=\"certificate_number\"]").prop("disabled", true);
-                
-                $("#saveNotary")
-                    .unbind("click")
-                    .on("click", function () {
-                        if (1 == 1) {
-                            var newNotarius = $("#notary").serializeObject(true);
-                            $.post(bars.config.urlContent("/Cdnt/Notary/DeleteNotary"), newNotarius, function (data) {
-                                                   if (data.status === "ok") {
-                                    //ищем запись в гриде и обновляем ее
-                                    var notary = mainGridDs.data();
-                                    for (var i = 0; i < notary.length; i++) {
-                                        if (notary[i].ID == newNotarius.ID) {
-                                            $.each(newNotarius, function (key, value) {
-                                                notary[i].set(key, value);
-                                            });
-                                            break;
-                                        }
-                                    }
-                                    dialog.close();
-                                } else {
-                                    bars.ui.error({ text: data.message });
-                                }
-                            });
+            $("#saveNotary").text('Видалити');
+            $("#saveNotary")
+                .unbind("click")
+                .on("click", function () {
+                    $.post(bars.config.urlContent("/Cdnt/Notary/DeleteNotary"), { ID: notaryId }, function (data) {
+                        if (data.status === "ok") {
+                            var dataRow = mainGridDs.get(parseInt(notaryId));
+                            mainGridDs.remove(dataRow);
+                            dialog.close();
+                        } else {
+                            bars.ui.error({ text: data.message });
                         }
                     });
-            } else {
-                bars.ui.error({ text: "Не обрано жодного нотаріуса!" });
-            }
+                });
         }
         else {
             bars.ui.error({ text: "Не визначений тип дії!" });
@@ -626,12 +725,29 @@
         columns: [
             {
                 field: "ID",
-                title: "Ідентифікатор",
-                width: 80,
+                title: "Іден</br>тифі</br>катор",
+                width: 67,
                 headerAttributes: {
                     style: "white-space: normal;"
                 },
                 template: "<div style='text-align:right;'>#=ID#</div>"
+            },
+            {
+                field: "ACCR_BRANCHES",
+                title: "Номер</br>заявника",
+                width: 90,
+                template: "#=ACCR_BRANCHES == null ? '' : ACCR_BRANCHES.replace(/;/g, '; ')#",
+                headerAttributes: {
+                    style: "white-space: normal;"
+                }
+            },
+            {
+                field: "ACCR_BRANCHNAMES",
+                title: "Назва</br>заявника",
+                width: 150,
+                headerAttributes: {
+                    style: "white-space: normal;"
+                }
             },
             {
                 field: "NOTARY_TYPE_NAME",
@@ -655,43 +771,63 @@
             },
             {
                 field: "MIDDLE_NAME",
-                title: "По-батькові",
-                width: 100
+                title: "По-бать</br>кові",
+                width: 105
             },
             {
                 field: "DATE_OF_BIRTH",
-                title: "Дата народження",
+                title: "Дата</br>народ</br>ження",
                 headerAttributes: {
                     style: "white-space: normal;"
                 },
                 template: "<div style='text-align:right;'>#=DATE_OF_BIRTH == null ? '' :kendo.toString(DATE_OF_BIRTH,'dd/MM/yyyy')#</div>",
-                width: 110
+                width: 90
             },
             {
                 field: "PASSPORT",
-                title: "Паспорт",
-                template: "#=PASSPORT_SERIES == null ? '' : PASSPORT_SERIES + ' '##= PASSPORT_NUMBER == null ? '' : PASSPORT_NUMBER#",
+                title: "Паспорт /</br>ID-картка",
+                template: "#=DOCUMENT_TYPE == 1 ? PASSPORT_SERIES + ' ' + PASSPORT_NUMBER : IDCARD_DOCUMENT_NUMBER + ' </br> ' + IDCARD_NOTATION_NUMBER#",
+                //temlate: function (data) {
+                //    var html = '<div>';
+                //    if (data.DOCUMENT_TYPE == 1) {
+                //        html += data.PASSPORT_SERIES + ' ' + data.PASSPORT_NUMBER;
+                //    }
+                //    else {
+                //        html += data.IDCARD_DOCUMENT_NUMBER + ' </br> ' + data.IDCARD_NOTATION_NUMBER;
+                //    }
+                //    html =+ '</div>';
+                //    return html;
+                //},
                 headerAttributes: {
                     style: "white-space: normal;"
                 },
-                width: 100
+                width: 120
             },
             {
                 field: "PASSPORT_ISSUED",
-                title: "Дата видачі паспорту",
+                title: "Дата видачі паспорту / ID-картки",
                 headerAttributes: {
                     style: "white-space: normal;"
                 },
                 template: "<div style='text-align:right;'>#=PASSPORT_ISSUED == null ? '' :kendo.toString(PASSPORT_ISSUED,'dd/MM/yyyy')#</div>",
-                width: 140
+                width: 100
             },
             {
-                field: "PASSPORT_ISSUER",
-                title: "Орган, що видав паспорт",
+                field: "PASSPORT_EXPIRY",
+                title: "Дійсний до</br>(для ID-картки)",
                 headerAttributes: {
                     style: "white-space: normal;"
                 },
-                width: 160
+                template: "<div style='text-align:right;'>#=PASSPORT_EXPIRY == null ? '' :kendo.toString(PASSPORT_EXPIRY,'dd/MM/yyyy')#</div>",
+                width: 90
+            },
+            {
+                field: "PASSPORT_ISSUER",
+                title: "Орган, що видав паспорт /</br>ID-картку",
+                headerAttributes: {
+                    style: "white-space: normal;"
+                },
+                width: 200
             },
             {
                 field: "ADDRESS",
@@ -706,8 +842,8 @@
                 headerAttributes: {
                     style: "white-space: normal;"
                 },
-                title: "Номер телефону/факс",
-                width: 180
+                title: "Номер телефону / факсу",
+                width: 110
             },
             {
                 field: "MOBILE_PHONE_NUMBER",
@@ -715,7 +851,7 @@
                 headerAttributes: {
                     style: "white-space: normal;"
                 },
-                width: 120
+                width: 110
             },
             {
                 field: "EMAIL",
@@ -728,9 +864,26 @@
             },
             {
                 field: "IS_APPROVED",
-                title: "Акредитовано",
-                width: 90,
+                title: "Акре</br>дито</br>вано",
+                width: 70,
                 template: "#=((CNT_ACCR ? CNT_ACCR : 0) - (CNT_REQACCR ? CNT_REQACCR : 0) > 0) ? '<div style=\"text-align:center;\"><span class=\"pf-icon pf-16 pf-ok\"></span></div>' : '&nbsp;' #",
+                headerAttributes: {
+                    style: "white-space: normal;"
+                }
+            },
+            {
+                field: "ACCREDITATION_TYPE",
+                title: "Тип</br>акредита-</br>ції</br>нотаріуса",
+                width: 95,
+                headerAttributes: {
+                    style: "white-space: normal;"
+                }
+            },
+            {
+                field: "ACCR_SEG_OF_BUSINESS",
+                title: "Акредитовані</br>бізнеси",
+                width: 150,
+                template: "#=ACCR_SEG_OF_BUSINESS == null ? '' : ACCR_SEG_OF_BUSINESS.replace(/;/g, '; ')#",
                 headerAttributes: {
                     style: "white-space: normal;"
                 }
@@ -738,7 +891,7 @@
             {
                 title: "№ Свідоцтва нотаріуса",
                 field: "CERTIFICATE_NUMBER",
-                width: 150,
+                width: 95,
                 headerAttributes: {
                     style: "white-space: normal;"
                 }
@@ -755,7 +908,6 @@
         change: toolbarRefresh,
         dataBound: toolbarRefresh
     });
-
 
     $(accreditationGrid).kendoGrid({
         resizable: true,
@@ -812,7 +964,6 @@
         change: toolbarRefresh,
         dataBound: toolbarRefresh
     });
-
 
     $('#tran_grid').kendoGrid({
         resizable: true,
@@ -875,7 +1026,6 @@
         title: "Акредитація",
         width: "680px"
     });
-
 
     //инициализация тулбара
     var toolButtons;
@@ -1003,6 +1153,9 @@
     $("input[name=\"passport_issued\"]").kendoDatePicker({
         culture: "uk-UA"
     });
+    $("input[name=\"passport_expiry\"]").kendoDatePicker({
+        culture: "uk-UA"
+    });
 
     $("input[name=\"close_date\"]").data("kendoDatePicker").enable(false);
 
@@ -1025,26 +1178,42 @@
             dataValueField: "LIST_ITEM_ID",
             change: function () {
                 var value = this.value();
+                var notaryForm = new NotaryForm();
+                clearValidationMarks();
                 if (value === "1") { //для государственного нотариуса отключаем обязательность большинства полей
-                    $("input[name=\"tin\"]").removeAttr('required');
-                    $("input[name=\"date_of_birth\"]").removeAttr('required');
-                    $("input[name=\"passport_series\"]").removeAttr('required');
-                    $("input[name=\"passport_number\"]").removeAttr('required');
-                    $("input[name=\"passport_issued\"]").removeAttr('required');
-                    $("input[name=\"passport_issuer\"]").removeAttr('required');
-                    $("input[name=\"address\"]").removeAttr('required');
+                    notaryForm.processInputs('all', false);
                 } else {
-                    $("input[name=\"tin\"]").prop('required', true);
-                    $("input[name=\"date_of_birth\"]").prop('required', true);
-                    $("input[name=\"passport_series\"]").prop('required', true);
-                    $("input[name=\"passport_number\"]").prop('required', true);
-                    $("input[name=\"passport_issued\"]").prop('required', true);
-                    $("input[name=\"passport_issuer\"]").prop('required', true);
-                    $("input[name=\"address\"]").prop('required', true);
+                    notaryForm.processInputs('all', true);
+                    
+                    if (notaryForm.isIDCard()) {
+                        notaryForm.processInputs('passport', false);
+                    }
+                    else {
+                        notaryForm.processInputs('idcard', false);
+                    }
                 }
             }
         });
 
+        $("input[name=\"document_type\"]").kendoDropDownList({
+            dataSource: documentTypeDs,
+            dataTextField: "LIST_ITEM_NAME",
+            dataValueField: "LIST_ITEM_ID",
+            change: function () {
+                var value = this.value();
+                var notaryForm = new NotaryForm();
+                clearValidationMarks();
+                if (value === "1") { //паспорт
+                    notaryForm.processInputs('idcard', false, true);
+                    var isRequired = notaryForm.isStateNotary() ? null : true;
+                    notaryForm.processInputs('passport', isRequired, false);
+                } else {
+                    notaryForm.processInputs('passport', false, true);
+                    var isRequired = notaryForm.isStateNotary() ? null : true;
+                    notaryForm.processInputs('idcard', isRequired, false);
+                }
+            }
+        });
 
         $("select[name=\"branches\"]").kendoMultiSelect({
             dataSource: mfoListDs

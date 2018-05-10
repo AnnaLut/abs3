@@ -81,6 +81,7 @@ namespace BarsWeb.Models
         public string TOBO { get; set; }
         public string TOBONAME { get; set; }
         public string IDOPER { get; set; }
+        public string ROLES { get; set; }
     }
     public class BP_REASON
     {
@@ -259,6 +260,12 @@ namespace BarsWeb.Models
     {
         public string Id { get; set; }
         public string Name { get; set; }
+
+        public decimal? State { get; set; }
+        public decimal? Struct_Code { get; set; }
+
+        public string DKBO_NUMBER { get; set; }
+        public decimal RNK { get; set; }
     }
 
     public static class Function

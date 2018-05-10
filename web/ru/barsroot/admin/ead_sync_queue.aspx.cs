@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-
+using System.Data;
 using Bars.UserControls;
 
 using Oracle.DataAccess.Client;
@@ -126,6 +126,12 @@ public partial class admin_ead_sync_queue : System.Web.UI.Page
         // обрабатываем полученный масив и считаем кол-во отработаных рядков
         Bars.EAD.EadPack ep = new Bars.EAD.EadPack(new ibank.core.BbConnection());
         Int32 MsgCount = 0;
+		OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
+        OracleCommand cmd = con.CreateCommand();
+        cmd.Parameters.Clear();
+        cmd.CommandText = "SELECT  sys_context('bars_context','user_mfo')  FROM dual";
+        cmd.CommandType = CommandType.Text;
+        string KF = Convert.ToString(cmd.ExecuteScalar());
         switch (rblObject2Apply.SelectedValue)
         {
             case "ALL":
@@ -135,10 +141,10 @@ public partial class admin_ead_sync_queue : System.Web.UI.Page
                     switch (rblAction.SelectedValue)
                     {
                         case "PROC":
-                            ep.MSG_PROCESS(ID);
+                            ep.MSG_PROCESS(ID,KF);
                             break;
                         case "DEL":
-                            ep.MSG_DELETE(ID);
+                            ep.MSG_DELETE(ID,KF);
                             break;
                     }
                 }
@@ -148,7 +154,7 @@ public partial class admin_ead_sync_queue : System.Web.UI.Page
                 switch (rblAction.SelectedValue)
                 {
                     case "DEL":
-                        MsgCount = Convert.ToInt32(ep.MSG_DELETE_OLDER(CutoffDate));
+                        MsgCount = Convert.ToInt32(ep.MSG_DELETE_OLDER(CutoffDate,KF));
                         break;
                     default:
                         break;
@@ -165,8 +171,14 @@ public partial class admin_ead_sync_queue : System.Web.UI.Page
         Bars.EAD.EadPack ep = new Bars.EAD.EadPack(new ibank.core.BbConnection());
         Decimal? ID;
 
-        ID = ep.MSG_CREATE("DICT", "EA-UB", null);
-        ep.MSG_PROCESS(ID);
+        OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
+        OracleCommand cmd = con.CreateCommand();
+        cmd.Parameters.Clear();
+        cmd.CommandText = "SELECT  sys_context('bars_context','user_mfo')  FROM dual";
+        cmd.CommandType = CommandType.Text;
+        string  KF = Convert.ToString(cmd.ExecuteScalar());
+        ID = ep.MSG_CREATE("DICT", "EA-UB",null, KF);
+        ep.MSG_PROCESS(ID, KF);
 
     }
     protected void gv_RowCommand(object sender, GridViewCommandEventArgs e)

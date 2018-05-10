@@ -713,6 +713,7 @@ public partial class DepositContractInfo : Page
 
         if (dpt.IsCashSum == false)
             btFirstPayment.Enabled = false;
+        eadPrintContract.Enabled = dpt.wb == 'N';
     }
 
     /// <summary>

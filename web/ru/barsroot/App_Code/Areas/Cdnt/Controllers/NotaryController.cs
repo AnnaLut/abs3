@@ -38,7 +38,7 @@ namespace BarsWeb.Areas.Cdnt.Controllers
             }
             else
             { 
-              result = result.Where(n => n.CNT_REQACCR == 0);
+                result = result.Where(n => n.CNT_REQACCR == 0);
             }
             
             return Json(result.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
@@ -75,12 +75,12 @@ namespace BarsWeb.Areas.Cdnt.Controllers
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult DeleteNotary(NOTARY data)
+        public ActionResult DeleteNotary(NOTARY notary)
         {
             var result = new JsonResponse(JsonResponseStatus.Ok);
             try
             {
-                _repo.DeleteNotary(data);
+                _repo.DeleteNotary(notary.ID);
             }
             catch (Exception e)
             {
@@ -154,6 +154,10 @@ namespace BarsWeb.Areas.Cdnt.Controllers
         public ActionResult GetNotaryTypes()
         {
             return Json(_repo.GetNotaryTypes(), JsonRequestBehavior.AllowGet);
+        }
+        public ActionResult GetDocumentTypes()
+        {
+            return Json(_repo.GetDocumentTypes(), JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult EditAccreditation(NOTARY_ACCREDITATION accr)

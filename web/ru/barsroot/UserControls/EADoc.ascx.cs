@@ -1,14 +1,401 @@
 ﻿using System;
 using System.Web.UI;
+using Bars.Classes;
 using System.Data;
 using Bars.EAD;
 using ibank.core;
 using Bars.Exception;
 using BarsWeb.Core.Logger;
+using FastReport;
+using FastReport.Data;
+using FastReport.Export;
+using FastReport.Export.Csv;
+using FastReport.Export.Dbf;
+using FastReport.Export.Html;
+using FastReport.Export.Mht;
+using FastReport.Export.Odf;
+using FastReport.Export.OoXML;
+using FastReport.Export.Pdf;
+using FastReport.Export.RichText;
+using FastReport.Export.Text;
+using FastReport.Export.Xml;
+using FastReport.Web;
+using ibank.core;
 using Oracle.DataAccess.Client;
+using System;
+using System.Data;
+using System.IO;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.HtmlControls;
 
 namespace Bars.UserControls
 {
+    public class FrxDocLocal
+    {
+        #region Приватные свойства
+        private String _templatePath;
+        private FrxParameters _frxParameters;
+        private Page _page;
+        private Stream _stream;
+
+        private readonly BarsWeb.Core.Logger.IDbLogger _dbLogger;
+
+        #endregion
+
+        #region Публичные свойства
+        public String TemplatePath
+        {
+            get { return _templatePath; }
+            set { _templatePath = value; }
+        }
+        #endregion
+
+        #region Конструктор
+        public FrxDocLocal(String templatePath, FrxParameters parameters, Page page)
+        {
+            ValidateTemplatePath(templatePath);
+
+            _templatePath = templatePath;
+            _frxParameters = parameters;
+            _page = page;
+            _dbLogger = DbLoggerConstruct.NewDbLogger();
+            FastReport.Utils.RegisteredObjects.AddConnection(typeof(OracleDataConnection));
+        }
+
+        public FrxDocLocal(Stream stream, Page page)
+        {
+            ValidateStream(stream);
+            _stream = stream;
+            _page = page;
+            _dbLogger = DbLoggerConstruct.NewDbLogger();
+            FastReport.Utils.RegisteredObjects.AddConnection(typeof(OracleDataConnection));
+        }
+        #endregion
+
+        #region Приватные методы
+        public void ValidateTemplatePath(String templatePath)
+        {
+            if (!File.Exists(templatePath))
+                throw new Bars.Exception.BarsException(String.Format("Файл шаблону {0} не знайдено", templatePath));
+        }
+        public void ValidateStream(Stream stream)
+        {
+            if (stream.Length == 0)
+                throw new Bars.Exception.BarsException("Не можливо побудувати звіт з пустого файлу (параметр: stream)");
+        }
+        #endregion
+
+        #region Статические методы
+        public static String GetTemplatePathByFileName(String fileName)
+        {
+            return HttpContext.Current.Server.MapPath("/TEMPLATE.RPT/" + fileName);
+        }
+        public static String GetTemplateFileNameByID(String templateId)
+        {
+            String res;
+            OracleConnection con = OraConnector.Handler.IOraConnection.GetUserConnection();
+            try
+            {
+                OracleCommand cmd = new OracleCommand("select ds.file_name from doc_scheme ds where lower(ds.id) = :p_id", con);
+                cmd.Parameters.Add("p_id", OracleDbType.Varchar2, templateId.ToLower(), ParameterDirection.Input);
+
+                res = Convert.ToString(cmd.ExecuteScalar());
+            }
+            finally
+            {
+                con.Close();
+                con.Dispose();
+            }
+
+            return res;
+        }
+        #endregion
+
+        #region Публичные методы
+
+        public WebReport GetWebReport()
+        {
+            WebReport webReport = new WebReport();
+            Report rpt = new Report();
+            webReport.Report = rpt;
+            SetupReport(rpt);
+            webReport.State = ReportState.Done;
+            return webReport;
+        }
+
+        public void Print(FrxExportTypes exportType)
+        {
+            WebReport wrpt = new WebReport();
+
+            //на страницу данный объект добавить нужно обязательно 
+            HtmlGenericControl div = new HtmlGenericControl("div");
+            div.Visible = false;
+            div.Style.Add("visibility", "hidden");
+            div.Controls.Add(wrpt);
+            if (_page != null)
+            {
+                _page.Controls.Add(div);
+            }
+            wrpt.Visible = false;
+
+            //шаблон отчета
+            Report rpt = new Report();
+            wrpt.Report = rpt;
+
+            try
+            {
+                //настройка шаблона
+                SetupReport(rpt);
+                //wrpt.ReportDone = true;
+                //это или баг или фича, если стейт не установить - работать не будет
+                wrpt.State = ReportState.Done;
+                
+                // экспорт в нужный формат
+                switch (exportType)
+                {
+                    case FrxExportTypes.Csv:
+                        wrpt.ExportCsv(HttpContext.Current);
+                        break;
+                    case FrxExportTypes.Dbf:
+                        wrpt.ExportDbf(HttpContext.Current);
+                        break;
+                    case FrxExportTypes.Excel2007:
+                        wrpt.ExportExcel2007(HttpContext.Current);
+                        break;
+                    case FrxExportTypes.Html:
+                        wrpt.ExportHtml(HttpContext.Current, false);
+                        break;
+                    case FrxExportTypes.Mht:
+                        wrpt.ExportMht(HttpContext.Current);
+                        break;
+                    case FrxExportTypes.Ods:
+                        wrpt.ExportOds(HttpContext.Current);
+                        break;
+                    case FrxExportTypes.Odt:
+                        wrpt.ExportOdt(HttpContext.Current);
+                        break;
+                    case FrxExportTypes.Pdf:
+                        wrpt.ExportPdf(HttpContext.Current);
+                        break;
+                    case FrxExportTypes.PowerPoint2007:
+                        wrpt.ExportPowerPoint2007(HttpContext.Current);
+                        break;
+                    case FrxExportTypes.Rtf:
+                        wrpt.ExportRtf(HttpContext.Current);
+                        break;
+                    case FrxExportTypes.Text:
+                        wrpt.ExportText(HttpContext.Current);
+                        break;
+                    case FrxExportTypes.Word2007:
+                        wrpt.ExportWord2007(HttpContext.Current);
+                        break;
+                    case FrxExportTypes.XmlExcel:
+                        wrpt.ExportXmlExcel(HttpContext.Current);
+                        break;
+                    case FrxExportTypes.Xps:
+                        wrpt.ExportXps(HttpContext.Current);
+                        break;
+                }
+
+            }
+
+            catch (System.Exception e)
+            {
+                string m = e.InnerException != null ? e.InnerException.Message : e.Message;
+                _dbLogger.Error(string.Format("FrxDocLocal:Print Message={0}, TemplatePath={1}, StackTrace={2}, ", m, TemplatePath,  e.StackTrace), "FrxDocLocal");
+                throw e;
+                //HttpContext.Current.Response.Write(e.Message); :-)
+            }
+            finally
+            {
+                wrpt.Dispose();
+            }
+        }
+        public String Export(FrxExportTypes exportType)
+        {
+            String res = Path.GetTempPath() + Path.GetFileNameWithoutExtension(Path.GetTempFileName());
+            string ext = ".tmp";
+
+            ExportBase export = null;
+
+            // объект отчета
+            Report rpt = new Report();
+
+            try
+            {
+                SetupReport(rpt);
+
+                // выгрузка на диск
+                switch (exportType)
+                {
+                    case FrxExportTypes.Csv:
+                        export = new CSVExport();
+                        ext = ".csv";
+                        break;
+                    case FrxExportTypes.Dbf:
+                        export = new DBFExport();
+                        break;
+                    case FrxExportTypes.Excel2007:
+                        export = new Excel2007Export();
+                        ext = ".xls";
+                        break;
+                    case FrxExportTypes.Html:
+                        export = new HTMLExport();
+                        ext = ".html";
+                        break;
+                    case FrxExportTypes.Mht:
+                        export = new MHTExport();
+                        break;
+                    case FrxExportTypes.Ods:
+                        export = new ODSExport();
+                        break;
+                    case FrxExportTypes.Odt:
+                        export = new ODTExport();
+                        break;
+                    case FrxExportTypes.Pdf:
+                        export = new PDFExport();
+                        ext = ".pdf";
+                        break;
+                    case FrxExportTypes.PowerPoint2007:
+                        export = new PowerPoint2007Export();
+                        ext = ".pptx";
+                        break;
+                    case FrxExportTypes.Rtf:
+                        export = new RTFExport();
+                        ext = ".rtf";
+                        break;
+                    case FrxExportTypes.Text:
+                        export = new TextExport();
+                        ext = ".txt";
+                        break;
+                    case FrxExportTypes.Word2007:
+                        export = new Word2007Export();
+                        ext = ".doc";
+                        break;
+                    case FrxExportTypes.XmlExcel:
+                        export = new XMLExport();
+                        break;
+                    case FrxExportTypes.Xps:
+                        export = new XPSExport();
+                        break;
+                    default:
+                        throw new System.Exception(String.Format("Формат экспорту {0} не підтримується", exportType.ToString()));
+                }
+
+                res = res + ext;
+                rpt.Export(export, res);
+            }
+            finally
+            {
+                rpt.Dispose();
+                if (export != null) export.Dispose();
+            }
+
+            return res;
+        }
+        /// <summary>
+        /// єкспорт в поток в пам"яті
+        /// </summary>
+        /// <param name="exportType">тип файлу експорту</param>
+        /// <param name="stream">поток в який буде проведено експорт</param>
+        public void ExportToMemoryStream(FrxExportTypes exportType, MemoryStream stream)
+        {
+            ExportBase export = null;
+            Report rpt = new Report();
+            try
+            {
+                SetupReport(rpt);
+                switch (exportType)
+                {
+                    case FrxExportTypes.Csv:
+                        export = new CSVExport();
+                        break;
+                    case FrxExportTypes.Dbf:
+                        export = new DBFExport();
+                        break;
+                    case FrxExportTypes.Excel2007:
+                        export = new Excel2007Export();
+                        break;
+                    case FrxExportTypes.Html:
+                        export = new HTMLExport();
+                        break;
+                    case FrxExportTypes.Mht:
+                        export = new MHTExport();
+                        break;
+                    case FrxExportTypes.Ods:
+                        export = new ODSExport();
+                        break;
+                    case FrxExportTypes.Odt:
+                        export = new ODTExport();
+                        break;
+                    case FrxExportTypes.Pdf:
+                        export = new PDFExport();
+                        break;
+                    case FrxExportTypes.PowerPoint2007:
+                        export = new PowerPoint2007Export();
+                        break;
+                    case FrxExportTypes.Rtf:
+                        export = new RTFExport();
+                        break;
+                    case FrxExportTypes.Text:
+                        export = new TextExport();
+                        break;
+                    case FrxExportTypes.Word2007:
+                        export = new Word2007Export();
+                        break;
+                    case FrxExportTypes.XmlExcel:
+                        export = new XMLExport();
+                        break;
+                    case FrxExportTypes.Xps:
+                        export = new XPSExport();
+                        break;
+                    default:
+                        throw new System.Exception(String.Format("Формат экспорту {0} не підтримується", exportType));
+                }
+
+                rpt.Export(export, stream);
+            }
+            finally
+            {
+                rpt.Dispose();
+                if (export != null) export.Dispose();
+            }
+        }
+        private void SetupReport(Report rpt)
+        {
+            if (_stream != null)
+            {
+                _stream.Position = 0;
+                //завантаження готового збереженого шаблону
+                rpt.LoadPrepared(_stream);
+            }
+            else
+            {
+                // загрузка шаблона
+                rpt.Load(_templatePath);
+                // соединение
+                rpt.Report.Dictionary.Connections[0].ConnectionString =
+                    OraConnector.Handler.IOraConnection.GetUserConnectionString();
+
+                // параметры
+                if (null != _frxParameters)
+                {
+                    foreach (FrxParameter p in _frxParameters)
+                    {
+                        rpt.Report.SetParameterValue(p.Name, p.Value);
+                    }
+                }
+                rpt.Prepare();
+            }
+
+        }
+        #endregion
+
+        #region Приватные события
+
+        #endregion
+    }
     public class DOCSchemeRecord
     {
         public String TemplateID
@@ -422,8 +809,8 @@ namespace Bars.UserControls
 
                 // делаем запись об отпечатке
                 EadPack ep = new EadPack(new BbConnection());
-                _dbLogger.Info("TemplateID = "+ TemplateID, "deposit");
-                _dbLogger.Info("EAStructID = "+ EAStructID.ToString(), "deposit" );
+                _dbLogger.Info("FrxDocLocal:  TemplateID = " + TemplateID, "deposit");
+                //_dbLogger.Info("EAStructID = "+ EAStructID.ToString(), "deposit" );
 
                 if ( EAStructID.HasValue)
                     this._DocID = ep.DOC_CREATE("DOC", TemplateID, null, EAStructID, RNK, AgrID);
@@ -434,23 +821,23 @@ namespace Bars.UserControls
                 if (DocID.HasValue)
                 {
                     pars.Add(new FrxParameter("p_doc_id", TypeCode.Int64, Convert.ToInt64(DocID.Value)));
-                    _dbLogger.Info("p_doc_id = " + DocID.Value.ToString(), "deposit");
+                    //_dbLogger.Info("p_doc_id = " + DocID.Value.ToString(), "deposit");
                 }
 
                 if (RNK.HasValue)
                 {
                     pars.Add(new FrxParameter("p_rnk", TypeCode.Decimal, RNK));
-                    _dbLogger.Info("p_rnk = " + RNK.ToString(), "deposit");
+                    //_dbLogger.Info("p_rnk = " + RNK.ToString(), "deposit");
                 }
                 if (AgrID.HasValue)
                 {
                     pars.Add(new FrxParameter("p_agr_id", TypeCode.Int64, AgrID));
-                    _dbLogger.Info("p_agr_id = " + AgrID.ToString(), "deposit");
+                    //_dbLogger.Info("p_agr_id = " + AgrID.ToString(), "deposit");
                 }
                 if (AgrUID.HasValue)
                 {
                     pars.Add(new FrxParameter("p_agrmnt_id", TypeCode.Int32, AgrUID));
-                    _dbLogger.Info("p_agrmnt_id = " + AgrUID.ToString(), "deposit");
+                    //_dbLogger.Info("p_agrmnt_id = " + AgrUID.ToString(), "deposit");
                 }
 
 
@@ -458,20 +845,35 @@ namespace Bars.UserControls
                 foreach (FrxParameter par in this.AddParams)
                     pars.Add(par);
 
-                FrxDoc doc = new FrxDoc(
-                    FrxDoc.GetTemplatePathByFileName(FrxDoc.GetTemplateFileNameByID(TemplateID)),
+                FrxDocLocal doc = new FrxDocLocal(
+                    FrxDocLocal.GetTemplatePathByFileName(FrxDocLocal.GetTemplateFileNameByID(TemplateID)),
                     pars,
                     this.Page);
 
-                _dbLogger.Info("doc.TemplatePath = " + doc.TemplatePath, "deposit");
+                //_dbLogger.Info("doc.TemplatePath = " + doc.TemplatePath, "deposit");
 
                 // открываем контрол подписи
                 cbSigned.Checked = false;
                 cbSigned.Enabled = true;
                 // выбрасываем в поток в формате PDF
-
-                doc.Print(FrxExportTypes.Pdf);
-
+                try
+                {
+                    doc.Print(FrxExportTypes.Pdf);
+                }
+                catch (System.Exception ex) {
+                    _dbLogger.Info("FrxDocLocal:try alt template");
+                    doc = new FrxDocLocal(
+                    FrxDocLocal.GetTemplatePathByFileName(FrxDocLocal.GetTemplateFileNameByID(TemplateID).Replace(".frx", "_alt.frx")),
+                    pars,
+                    this.Page);
+                    try
+                    {
+                        doc.Print(FrxExportTypes.Pdf);
+                    }
+                    catch(System.Exception ex2) {
+                        HttpContext.Current.Response.Write(ex2.Message);
+                    }
+                }
                 //// открываем контрол подписи
                 //cbSigned.Checked = false;
                 //cbSigned.Enabled = true;

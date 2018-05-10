@@ -13,10 +13,14 @@ namespace BarsWeb.Areas.Cdnt.Models.Transport
         public DateTime? DateOfBirth { get; set; }
         public decimal? AccreditationType { get; set; }
         public string Tin { get; set; }
+        public int DocumentType { get; set; }
         public string PassportSeries { get; set; }
         public string PassportNumber { get; set; }
         public string PassportIssuer { get; set; }
         public DateTime? PassportIssued { get; set; }
+        public decimal? IdcardDocumentNumber { get; set; }
+        public string IdcardNotationNumber { get; set; }
+        public DateTime? PassportExpiry { get; set; }
         public string Address { get; set; }
         public string PhoneNumber { get; set; }
         public string MobilePhoneNumber { get; set; }

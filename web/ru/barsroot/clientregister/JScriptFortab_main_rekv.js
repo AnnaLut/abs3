@@ -1,3 +1,43 @@
+function openWindowAddress() {
+
+    var win;
+
+    if (window.parent && window.parent.parent) {
+        win = window.parent.parent;
+    } else {
+        win = window.parent;
+    }
+
+    if (!win.bars.ui) {
+        win = window;
+    }
+
+    win.customerAddress = parent.obj_Parameters['fullADR'];
+
+    win.bars.ui.dialog({
+        //bars.ui.dialog({
+        iframe: true,
+        actions: ["Close"],
+        width: '850px',
+        height: '590px',
+        id: 'winClientAddress',
+        title: 'Повна адреса клієнта',
+        content: {
+            url: bars.config.urlContent('/clients/ClientAddress/ClientAddress'),
+            modal: true
+        },
+        close: function () {
+            if (win.customerAddress.type1.filled == true) {
+                window.parent.$('#bt_reg').prop("disabled", false);
+                $('#ed_ADR')
+                    .val(parent.obj_Parameters['fullADR'].type1.locality +
+                    ', ' +
+                    parent.obj_Parameters['fullADR'].type1.address);
+            }
+        }
+    });
+}
+
 $(document).ready(function () {
     $('#ed_NMK').change(function () { $(this).removeClass('err').attr('title', ''); });
     $('#ed_NMKK').change(function () { $(this).removeClass('err').attr('title', ''); });

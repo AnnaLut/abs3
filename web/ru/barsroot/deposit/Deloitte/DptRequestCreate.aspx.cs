@@ -606,7 +606,7 @@ public partial class DptClientRequestCreate : Bars.BarsPage
             Bars.EAD.EadPack ep = new Bars.EAD.EadPack(new ibank.core.BbConnection());
 
             // Страховочна синхронізація клієнта в ЕАД
-            Decimal? ClientApplicationID = ep.MSG_CREATE("CLIENT", cust_id.ToString(), (UInt64?)cust_id);
+            Decimal? ClientApplicationID = ep.MSG_CREATE("CLIENT", cust_id.ToString(), (UInt64)cust_id, KF);
 
             if (req_type == 0)
             {
@@ -618,21 +618,21 @@ public partial class DptClientRequestCreate : Bars.BarsPage
                 for (int i = 0; i < AccessList.Count; i++)
                 {
                     // Страховочна синхронізація договору в ЕАД
-                    Decimal? DealApplicationID = ep.MSG_CREATE("AGR", "DPT;" + AccessList[i].DPT_ID.ToString(), (UInt64?)cust_id);
+                    Decimal? DealApplicationID = ep.MSG_CREATE("AGR", "DPT;" + AccessList[i].DPT_ID.ToString(), (UInt64)cust_id, KF);
 
                     // Заява на доступ до вкладного рахунку
-                    Decimal? AccessApplicationID = ep.DOC_CREATE("SCAN", null, scAccessApplication.Value, 224, cust_id, AccessList[i].DPT_ID);
+                    Decimal? AccessApplicationID = ep.DOC_CREATE("SCAN", null, scAccessApplication.Value, 224, cust_id, AccessList[i].DPT_ID, null);
 
                     if (scWarrant.Visible)
                     {
                         // Нот. док.
-                        Decimal? WarrantID = ep.DOC_CREATE("SCAN", null, scWarrant.Value, (TrusteeType == "T" ? 222 : 223), cust_id, AccessList[i].DPT_ID);
+                        Decimal? WarrantID = ep.DOC_CREATE("SCAN", null, scWarrant.Value, (TrusteeType == "T" ? 222 : 223), cust_id, AccessList[i].DPT_ID, null);
                     }
 
                     if (scSignsCard.Visible)
                     {
                         // Зразки підпису
-                        Decimal? SignsCardID = ep.DOC_CREATE("SCAN", null, scSignsCard.Value, 221, cust_id, AccessList[i].DPT_ID);
+                        Decimal? SignsCardID = ep.DOC_CREATE("SCAN", null, scSignsCard.Value, 221, cust_id, AccessList[i].DPT_ID, null);
                     }
                 }
                 try

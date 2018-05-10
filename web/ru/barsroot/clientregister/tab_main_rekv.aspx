@@ -22,6 +22,8 @@
     <script type="text/javascript" src="../Scripts/jquery/jquery-ui.min.js"></script>
     <script type="text/javascript" src="../Scripts/jquery/jquery.bars.ui.js"></script>
     <script type="text/javascript" src="../Content/Themes/ModernUI/scripts/jquery.tiptip.js"></script>
+    <script type="text/javascript" src="../Scripts/Bars/bars.ui.js"></script>
+    <script type="text/javascript" src="../Scripts/Bars/bars.config.js"></script>
 
     <script type="text/javascript"src="typingCheckerCtrl.js"></script>
 
@@ -246,11 +248,11 @@
             </td>
             <td>
                 <input class="edit long" id="ed_ADR" tabindex="20" type="text" maxlength="70" />
-                <input id="bt_fullADR" 
-                        style="height: 24px"
+                <input id="btnOpenWindowAddress" 
+                        style="height: 24px;"
                         title="Режим ввода полного адреса" 
                         class="ref" 
-                        onclick="ShowfullADR();ToDoOnChange();"
+                        onclick="openWindowAddress()"
                         type="button" 
                         value="..." tabindex="8" />
                 <div class="required">*</div>

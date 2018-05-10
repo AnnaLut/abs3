@@ -77,6 +77,11 @@ namespace BarsWeb.Areas.Cdnt.Infrastructure.DI.Implementation
                 new OracleParameter("p_CERTIFICATE_CANCELATION_DATE", OracleDbType.Date) {Value = notary.CERTIFICATE_CANCELATION_DATE},
                 new OracleParameter("p_RNK", OracleDbType.Varchar2) {Value = null},
                 new OracleParameter("p_MFORNK", OracleDbType.Varchar2) {Value = null},
+                new OracleParameter("p_DOCUMENT_TYPE", OracleDbType.Int32) {Value = notary.DOCUMENT_TYPE},
+                new OracleParameter("p_IDCARD_DOCUMENT_NUMBER", OracleDbType.Decimal) {Value = notary.IDCARD_DOCUMENT_NUMBER},
+                new OracleParameter("p_IDCARD_NOTATION_NUMBER", OracleDbType.Varchar2) {Value = notary.IDCARD_NOTATION_NUMBER},
+                new OracleParameter("p_PASSPORT_EXPIRY", OracleDbType.Date) {Value = notary.PASSPORT_EXPIRY},
+
                 new OracleParameter("p_RET", OracleDbType.Decimal) {Direction = ParameterDirection.Output},
                 new OracleParameter("p_ERR", OracleDbType.Varchar2) {Direction = ParameterDirection.Output, Size = 4000}
             };
@@ -88,10 +93,10 @@ namespace BarsWeb.Areas.Cdnt.Infrastructure.DI.Implementation
                     BARS.nota.create_nota(:p_TIN, :p_adr, :p_datp, :p_email, :p_last_name, :p_first_name, :p_middle_name, 
                             :p_phone_number, :p_MOBILE_PHONE_NUMBER, :p_PASSPORT_SERIES, :p_PASSPORT_NUMBER,  :PASSPORT_ISSUER, :PASSPORT_ISSUED, 
                             :p_NOTARY_TYPE, :p_CERTIFICATE_NUMBER, :p_CERTIFICATE_ISSUE_DATE, :p_CERTIFICATE_CANCELATION_DATE,
-                            :p_RNK, :p_MFORNK, :p_ret, :p_err);
+                            :p_RNK, :p_MFORNK, :p_DOCUMENT_TYPE, :p_IDCARD_DOCUMENT_NUMBER, :p_IDCARD_NOTATION_NUMBER, :p_PASSPORT_EXPIRY, :p_ret, :p_err);
                     end;", sqlParams);
 
-                OracleString errMsg = ((OracleString)((OracleParameter)sqlParams[20]).Value);
+                OracleString errMsg = ((OracleString)((OracleParameter)sqlParams[24]).Value);
                 if (!errMsg.IsNull)
                 {
                     throw new Exception(errMsg.Value);
@@ -107,7 +112,7 @@ namespace BarsWeb.Areas.Cdnt.Infrastructure.DI.Implementation
             {
                 _entities.Connection.Close();
             }
-            return decimal.Parse(((OracleParameter)sqlParams[19]).Value.ToString());
+            return decimal.Parse(((OracleParameter)sqlParams[23]).Value.ToString());
         }
 
         public void EditNotary(NOTARY notary)
@@ -134,6 +139,11 @@ namespace BarsWeb.Areas.Cdnt.Infrastructure.DI.Implementation
                 new OracleParameter("p_CERTIFICATE_CANCELATION_DATE", OracleDbType.Date) {Value = notary.CERTIFICATE_CANCELATION_DATE},
                 new OracleParameter("p_RNK", OracleDbType.Varchar2) {Value = null},
                 new OracleParameter("p_MFORNK", OracleDbType.Varchar2) {Value = null},
+                new OracleParameter("p_DOCUMENT_TYPE", OracleDbType.Int32) {Value = notary.DOCUMENT_TYPE},
+                new OracleParameter("p_IDCARD_DOCUMENT_NUMBER", OracleDbType.Decimal) {Value = notary.IDCARD_DOCUMENT_NUMBER},
+                new OracleParameter("p_IDCARD_NOTATION_NUMBER", OracleDbType.Varchar2) {Value = notary.IDCARD_NOTATION_NUMBER},
+                new OracleParameter("p_PASSPORT_EXPIRY", OracleDbType.Date) {Value = notary.PASSPORT_EXPIRY},
+
                 new OracleParameter("p_ERR", OracleDbType.Varchar2) {Direction = ParameterDirection.Output, Size = 4000}
             };
             _entities.Connection.Open();
@@ -144,10 +154,10 @@ namespace BarsWeb.Areas.Cdnt.Infrastructure.DI.Implementation
                     BARS.nota.edit_nota(:p_ID, :p_TIN, :p_adr, :p_datp, :p_email, :p_last_name, :p_first_name, :p_middle_name, 
                             :p_phone_number, :p_MOBILE_PHONE_NUMBER, :p_PASSPORT_SERIES, :p_PASSPORT_NUMBER, :PASSPORT_ISSUER, :PASSPORT_ISSUED,
                             :p_NOTARY_TYPE, :p_CERTIFICATE_NUMBER, :p_CERTIFICATE_ISSUE_DATE, :p_CERTIFICATE_CANCELATION_DATE,
-                            :p_RNK, :p_MFORNK, :p_err);
+                            :p_RNK, :p_MFORNK,  :p_DOCUMENT_TYPE, :p_IDCARD_DOCUMENT_NUMBER, :p_IDCARD_NOTATION_NUMBER, :p_PASSPORT_EXPIRY, :p_err);
                     end;", sqlParams);
 
-                OracleString errMsg = ((OracleString)((OracleParameter)sqlParams[20]).Value);
+                OracleString errMsg = ((OracleString)((OracleParameter)sqlParams[24]).Value);
                 if (!errMsg.IsNull)
                 {
                     throw new Exception(errMsg.Value);
@@ -161,11 +171,11 @@ namespace BarsWeb.Areas.Cdnt.Infrastructure.DI.Implementation
             t.Commit();
         }
 
-        public void DeleteNotary(NOTARY notary)
+        public void DeleteNotary(long id)
         {
             var sqlParams = new object[]
             {
-                 new OracleParameter("p_ID", OracleDbType.Decimal) {Value = notary.ID}
+                 new OracleParameter("p_ID", OracleDbType.Decimal) {Value = id}
             };
             _entities.Connection.Open();
             var t = _entities.Connection.BeginTransaction();
@@ -196,7 +206,6 @@ namespace BarsWeb.Areas.Cdnt.Infrastructure.DI.Implementation
 
         private string parseAccreditationCollections(NOTARY_ACCREDITATION accreditation)
         {
-
             StringBuilder par = new StringBuilder();
             par.Append("VARCHAR2_LIST(");
             if (accreditation.Branches != null && accreditation.Branches.Count > 0)
@@ -205,7 +214,7 @@ namespace BarsWeb.Areas.Cdnt.Infrastructure.DI.Implementation
             }
             else
             {
-                par.Append("");
+                par.Append("null");
             }
             par.Append("), NUMBER_LIST(");
             if (accreditation.Businesses != null && accreditation.Businesses.Count > 0)
@@ -214,11 +223,10 @@ namespace BarsWeb.Areas.Cdnt.Infrastructure.DI.Implementation
             }
             else
             {
-                par.Append("");
+                par.Append("null");
             }
             par.Append(")");
             return par.ToString();
-
         }
 
         public decimal AddAcreditation(NOTARY_ACCREDITATION accreditation)
@@ -304,7 +312,12 @@ namespace BarsWeb.Areas.Cdnt.Infrastructure.DI.Implementation
         {
             return _entities.ExecuteStoreQuery<BarsListItem>(GetListItemSql, "NOTARY_TYPE");
         }
-
+        public IEnumerable<BarsListItem> GetDocumentTypes()
+        {
+            var sql= "SELECT PASSP as list_item_id, (case when PASSP = 7 then 'ID-картка' else NAME end) as list_item_name FROM PASSP WHERE PSPTYP = '01'";
+            //var sql = "SELECT PASSP as list_item_id, NAME as list_item_name FROM PASSP WHERE PSPTYP = '01'";
+            return _entities.ExecuteStoreQuery<BarsListItem>(sql);
+        }
         public IEnumerable<BarsListItem> GetAccreditationTypes()
         {
             return _entities.ExecuteStoreQuery<BarsListItem>(GetListItemSql, "NOTARY_ACCREDITATION_TYPE");
@@ -470,13 +483,18 @@ namespace BarsWeb.Areas.Cdnt.Infrastructure.DI.Implementation
                 new OracleParameter("p_mobile_phone_number", OracleDbType.Varchar2) {Value = query.MobilePhoneNumber},
                 new OracleParameter("p_email", OracleDbType.Varchar2) {Value = query.Email},
                 new OracleParameter("p_rnk", OracleDbType.Decimal) {Value = query.Rnk},
-                new OracleParameter("p_account_number", OracleDbType.Varchar2) {Value = query.AccountNumber}
+                new OracleParameter("p_account_number", OracleDbType.Varchar2) {Value = query.AccountNumber},
+                new OracleParameter("p_DOCUMENT_TYPE", OracleDbType.Int32) {Value = query.DocumentType},
+                new OracleParameter("p_IDCARD_DOCUMENT_NUMBER", OracleDbType.Decimal) {Value = query.IdcardDocumentNumber},
+                new OracleParameter("p_IDCARD_NOTATION_NUMBER", OracleDbType.Varchar2) {Value = query.IdcardNotationNumber},
+                new OracleParameter("p_PASSPORT_EXPIRY", OracleDbType.Date) {Value = query.PassportExpiry}
             };
 
             _entities.ExecuteStoreCommand(
                 @"begin BARS.nota.process_accreditation_request(:p_sender_mfo, :p_notary_type, :p_certificate_number,
                 :p_first_name, :p_middle_name, :p_last_name, :p_date_of_birth, :p_accreditation_type, :p_tin, :p_passport_series, :p_passport_number,
-                :p_passport_issuer, :p_passport_issued, :p_address, :p_phone_number, :p_mobile_phone_number, :p_email, :p_rnk, :p_account_number); end;",
+                :p_passport_issuer, :p_passport_issued, :p_address, :p_phone_number, :p_mobile_phone_number, :p_email, :p_rnk, :p_account_number,
+                :p_DOCUMENT_TYPE, :p_IDCARD_DOCUMENT_NUMBER, :p_IDCARD_NOTATION_NUMBER, :p_PASSPORT_EXPIRY); end;",
                 sqlParams);
         }
 

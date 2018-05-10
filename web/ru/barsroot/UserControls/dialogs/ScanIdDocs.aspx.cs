@@ -6,6 +6,8 @@ using System.Web.UI.WebControls;
 using Oracle.DataAccess.Client;
 using Bars.UserControls;
 using BarsWeb.Core.Logger;
+using System.Data;
+using Oracle.DataAccess.Types;
 
 public partial class UserControls_dialogs_ScanIdDocs : System.Web.UI.Page
 {
@@ -25,6 +27,7 @@ public partial class UserControls_dialogs_ScanIdDocs : System.Web.UI.Page
     private IDDocScheme _DocScheme;
     private readonly IDbLogger _dbLogger;
     readonly string _dbPrefix;
+    int prevStepIndex = 0;
 
     public UserControls_dialogs_ScanIdDocs()
     {
@@ -183,8 +186,7 @@ public partial class UserControls_dialogs_ScanIdDocs : System.Web.UI.Page
                 }
                 else
                 {
-                    byte[] scannedDoc = GetDataFromEA(new[] {EAStructID_Doc});
-                    scDoc.Value = scannedDoc;
+                    scDoc.Value = GetDataFromEA(new[] { EAStructID_Doc.ToString() });
                 }
                 break;
             case "cut_photo":
@@ -220,8 +222,8 @@ public partial class UserControls_dialogs_ScanIdDocs : System.Web.UI.Page
                     return;
                 }
                 else
-                {   byte[] scannedInn = GetDataFromEA(new[] {EAStructID_Inn});
-                    scInn.Value = scannedInn;
+                {   
+                    scInn.Value = GetDataFromEA(new[] { EAStructID_Inn.ToString() });
                 }
                 break;
             case "scan_SpecialDoc":
@@ -233,7 +235,7 @@ public partial class UserControls_dialogs_ScanIdDocs : System.Web.UI.Page
                 }
                 else
                 {
-                    byte[] scannedSpecialDoc = GetDataFromEA(new[] { EAStructID_SpecialDoc });
+                    byte[] scannedSpecialDoc = GetDataFromEA(new[] { EAStructID_SpecialDoc.ToString() });
                     scSpecialDoc.Value = scannedSpecialDoc;
                 }
                 break;
@@ -357,10 +359,6 @@ public partial class UserControls_dialogs_ScanIdDocs : System.Web.UI.Page
             throw ex;
         }         
 
-        OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
-        OracleCommand cmd = con.CreateCommand();
-        try
-        {
             switch (CurrentStepID)
             {
                 case "cut_photo":
@@ -375,12 +373,6 @@ public partial class UserControls_dialogs_ScanIdDocs : System.Web.UI.Page
                     // сохраняем то что вырезали
                     SaveImage("SIGN", bicCutSign.Value);
                     break;
-            }
-        }
-        finally
-        {
-            con.Close();
-            con.Dispose();
         }
     }
     protected void bicCutPhoto_DocumentSaved(object sender, EventArgs e)
@@ -426,6 +418,16 @@ public partial class UserControls_dialogs_ScanIdDocs : System.Web.UI.Page
 
     protected void wzd_FinishButtonClick(object sender, WizardNavigationEventArgs e)
     {
+        try
+        {
+            string[] ps = { scDoc.ImageDataSessionID, scInn.ImageDataSessionID };
+            foreach (var p in ps)
+            {
+                string path = System.IO.Path.Combine(System.IO.Path.GetTempPath(), p);
+                if (System.IO.File.Exists(path)) { System.IO.File.Delete(path); }
+            }
+        }
+        catch (Exception ex) { }
         // чистим сессию печати
         OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
         try
@@ -476,17 +478,21 @@ public partial class UserControls_dialogs_ScanIdDocs : System.Web.UI.Page
         HasInn = true;
 
         OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
-        OracleCommand cmd = con.CreateCommand();
         try
         {
+            using (OracleCommand cmd = con.CreateCommand())
+            {
             cmd.CommandText = "select c.okpo, p.passp from customer c, person p where c.rnk = :p_rnk and c.rnk = p.rnk";
             cmd.Parameters.Add("p_rnk", OracleDbType.Decimal, this.RNK, System.Data.ParameterDirection.Input);
 
-            OracleDataReader rdr = cmd.ExecuteReader();
+                using (OracleDataReader rdr = cmd.ExecuteReader())
+                {
             if (rdr.Read())
             {
                 DocType = Convert.ToInt16(rdr["passp"]);
                 HasInn = rdr["okpo"] != DBNull.Value && (String)rdr["okpo"] != "0000000000";
+                    }
+                }
             }
         }
         finally
@@ -506,21 +512,22 @@ public partial class UserControls_dialogs_ScanIdDocs : System.Web.UI.Page
 
         OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
 
-        OracleCommand cmd = con.CreateCommand();
 
         try
         {
+            using (OracleCommand cmd = con.CreateCommand())
+            {
             cmd.CommandText = "select VALUE from customerW where rnk = :p_rnk and tag = 'SPMRK' ";
 
-            cmd.Parameters.Add("p_rnk", OracleDbType.Int64, this.RNK, System.Data.ParameterDirection.Input);
+                cmd.Parameters.Add("p_rnk", OracleDbType.Int64, this.RNK, ParameterDirection.Input);
 
-            OracleDataReader rdr = cmd.ExecuteReader();
+                using (OracleDataReader rdr = cmd.ExecuteReader())
 
-            if (rdr.Read())
             {
-                if (!rdr.IsDBNull(0))
+                    if (rdr.Read() && !rdr.IsDBNull(0))
                 {
                     SpecialMark = Convert.ToInt16(rdr.GetOracleString(0).Value);
+                    }
                 }
             }
         }
@@ -545,21 +552,22 @@ public partial class UserControls_dialogs_ScanIdDocs : System.Web.UI.Page
         {
             OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
 
-            OracleCommand cmd = con.CreateCommand();
 
             try
             {
+                using (OracleCommand cmd = con.CreateCommand())
+                {
                 cmd.CommandText = "select NEED_DOCS from CUST_MARK_TYPES where MARK_CODE = :p_code";
 
-                cmd.Parameters.Add("p_code", OracleDbType.Int64, SpecialMark.Value, System.Data.ParameterDirection.Input);
+                    cmd.Parameters.Add("p_code", OracleDbType.Int64, SpecialMark.Value, ParameterDirection.Input);
 
-                OracleDataReader rdr = cmd.ExecuteReader();
+                    using (OracleDataReader rdr = cmd.ExecuteReader())
 
-                if (rdr.Read())
                 {
-                    if (!rdr.IsDBNull(0))
+                        if (rdr.Read() && !rdr.IsDBNull(0))
                     {
                         NeedScan = rdr.GetOracleDecimal(0).Value.Equals(1);
+                        }
                     }
                 }
             }
@@ -697,19 +705,23 @@ public partial class UserControls_dialogs_ScanIdDocs : System.Web.UI.Page
         ClearPrintSession(PrintSessionID, con);
 
         // записываем новые данные
-        OracleCommand cmd = con.CreateCommand();
+        using (OracleCommand cmd = con.CreateCommand())
+        {
         cmd.CommandText = "insert into wcs_print_scans (print_session_id, ord, scan_data) values (:p_ps_id, :p_ord, :p_scan_data)";
         cmd.Parameters.Add("p_ps_id", OracleDbType.Varchar2, PrintSessionID, System.Data.ParameterDirection.Input);
         cmd.Parameters.Add("p_ord", OracleDbType.Int16, System.Data.ParameterDirection.Input);
         cmd.Parameters.Add("p_scan_data", OracleDbType.Blob, System.Data.ParameterDirection.Input);
 
         // сохраняем страницы отдельно
-        ByteData imageData = new ByteData(Image);
+            using (ByteData imageData = new ByteData(Image))
+            {
         for (Int32 i = 0; i < imageData.PageCount; i++)
         {
             cmd.Parameters["p_ord"].Value = i;
             cmd.Parameters["p_scan_data"].Value = imageData.GetPage(i).MainData;
             cmd.ExecuteNonQuery();
+                }
+            }
         }
     }
     private void CreateBlankPrintSession(String PrintSessionID, Int16 PageCount, OracleConnection con)
@@ -718,7 +730,8 @@ public partial class UserControls_dialogs_ScanIdDocs : System.Web.UI.Page
         ClearPrintSession(PrintSessionID, con);
 
         // записываем новые данные
-        OracleCommand cmd = con.CreateCommand();
+        using (OracleCommand cmd = con.CreateCommand())
+        {
         cmd.CommandText = "insert into wcs_print_scans (print_session_id, ord, scan_data) values (:p_ps_id, :p_ord, :p_scan_data)";
         cmd.Parameters.Add("p_ps_id", OracleDbType.Varchar2, PrintSessionID, System.Data.ParameterDirection.Input);
         cmd.Parameters.Add("p_ord", OracleDbType.Int16, System.Data.ParameterDirection.Input);
@@ -730,14 +743,17 @@ public partial class UserControls_dialogs_ScanIdDocs : System.Web.UI.Page
             cmd.Parameters["p_ord"].Value = i;
             cmd.Parameters["p_scan_data"].Value = null;
             cmd.ExecuteNonQuery();
+            }
         }
     }
     private void ClearPrintSession(String PrintSessionID, OracleConnection con)
     {
-        OracleCommand cmd = con.CreateCommand();
+        using (OracleCommand cmd = con.CreateCommand())
+        {
         cmd.CommandText = "delete from wcs_print_scans ps where ps.print_session_id = :p_ps_id";
         cmd.Parameters.Add("p_ps_id", OracleDbType.Varchar2, PrintSessionID, System.Data.ParameterDirection.Input);
         cmd.ExecuteNonQuery();
+        }
     }
     private void WizardMoveNext()
     {
@@ -746,6 +762,7 @@ public partial class UserControls_dialogs_ScanIdDocs : System.Web.UI.Page
             // если шаг последний то завершаем визард
             if (wzd.ActiveStepIndex < wzd.WizardSteps.Count - 1)
             {
+                prevStepIndex = wzd.ActiveStepIndex;    //save prev step index
                 wzd.ActiveStepIndex++;
                 wzd.MoveTo(wzd.ActiveStep);
             }
@@ -758,27 +775,40 @@ public partial class UserControls_dialogs_ScanIdDocs : System.Web.UI.Page
         {
             decimal RecID = _dbLogger.Error(string.Format("WizardMoveNext ActiveStepIndex={0} len={1}", wzd.ActiveStepIndex, wzd.WizardSteps.Count), _dbPrefix);
             ScriptManager.RegisterStartupScript(this, GetType(), "ead_errors", string.Format("alert('Виникли помилки WizardMoveNext. Номер запису в журналі аудиту {0}'); ", RecID), true);
+            if (ex.Message.Contains("OutOfMemoryException"))
+            {
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
+                wzd.ActiveStepIndex = prevStepIndex;
+                WizardMoveNext();       // call recursive
+            }
+            else
+            {
             throw ex;
+            }
         }        
     }
     private void SaveImage(String ImgType, Byte[] ImgData)
     {
         // !!! переделать на процедуру
         OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
-        OracleCommand cmdInsert = con.CreateCommand();
-        OracleCommand cmdDelete = con.CreateCommand();
         try
         {
-            cmdDelete.CommandText = "delete from customer_images ci where ci.rnk = :p_rnk and ci.type_img = :p_type";
-            cmdDelete.Parameters.Add("p_rnk", OracleDbType.Int64, this.RNK, System.Data.ParameterDirection.Input);
-            cmdDelete.Parameters.Add("p_type", OracleDbType.Varchar2, ImgType, System.Data.ParameterDirection.Input);
-            cmdDelete.ExecuteNonQuery();
+            using (OracleCommand cmd = con.CreateCommand())
+            {
+                cmd.CommandText = "delete from customer_images ci where ci.rnk = :p_rnk and ci.type_img = :p_type";
+                cmd.Parameters.Add("p_rnk", OracleDbType.Int64, this.RNK, ParameterDirection.Input);
+                cmd.Parameters.Add("p_type", OracleDbType.Varchar2, ImgType, ParameterDirection.Input);
+                cmd.ExecuteNonQuery();
 
-            cmdInsert.CommandText = "insert into customer_images (rnk, type_img, date_img, image) values (:p_rnk, :p_type, sysdate, :p_image)";
-            cmdInsert.Parameters.Add("p_rnk", OracleDbType.Int64, this.RNK, System.Data.ParameterDirection.Input);
-            cmdInsert.Parameters.Add("p_type", OracleDbType.Varchar2, ImgType, System.Data.ParameterDirection.Input);
-            cmdInsert.Parameters.Add("p_image", OracleDbType.Blob, ImgData, System.Data.ParameterDirection.Input);
-            cmdInsert.ExecuteNonQuery();
+                cmd.Parameters.Clear();
+                cmd.CommandText = "insert into customer_images (rnk, type_img, date_img, image) values (:p_rnk, :p_type, sysdate, :p_image)";
+                cmd.Parameters.Add("p_rnk", OracleDbType.Int64, this.RNK, ParameterDirection.Input);
+                cmd.Parameters.Add("p_type", OracleDbType.Varchar2, ImgType, ParameterDirection.Input);
+                cmd.Parameters.Add("p_image", OracleDbType.Blob, ImgData, ParameterDirection.Input);
+                cmd.ExecuteNonQuery();
+            }
         }
         finally
         {
@@ -786,13 +816,23 @@ public partial class UserControls_dialogs_ScanIdDocs : System.Web.UI.Page
             con.Dispose();
         }
     }
-    private Byte[] GetDataFromEA(Int16[] DocCodes)
+    private Byte[] GetDataFromEA(string[] DocCodes)
     {
+        OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
         Byte[] DocData = null;
         try
         {
+            string KF = string.Empty;
+            using (OracleCommand cmd = con.CreateCommand())
+            {
+                cmd.Parameters.Clear();
+                cmd.CommandText = "SELECT  sys_context('bars_context','user_mfo')  FROM dual";
+                cmd.CommandType = CommandType.Text;
+                KF = Convert.ToString(cmd.ExecuteScalar());
+            }
             // Получаем перечень документов из ЕА
-            List<Bars.EAD.Structs.Result.DocumentData> docs = Bars.EAD.EADService.GetDocumentData(null, this.RNK, (Int64?)null, 1, null);
+            List<Bars.EAD.Structs.Result.DocumentData> docs = //Bars.EAD.EADService.GetDocumentData(null, this.RNK, null, 1, null, null);
+                Bars.EAD.EADService.GetDocumentData(null, RNK, null, "1", null, null, null, null, null, null);
 
             // смотрим есть ли тут паспорт
             String DocUrl = String.Empty;
@@ -810,13 +850,17 @@ public partial class UserControls_dialogs_ScanIdDocs : System.Web.UI.Page
                     DocData = wc.DownloadData(DocUrl);
                 }
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             String ErrorText = "Виникли помилки при отриманні відповіді від ЕА: Message = " + ex.Message + "; StackTrace = " + ex.StackTrace;
             Decimal RecID = _dbLogger.Error(ErrorText.Length > 3000 ? ErrorText.Substring(0, 3000) : ErrorText);
 
-            //ScriptManager.RegisterStartupScript(this, this.GetType(), "ead_errors", String.Format("alert('Виникли помилки при отриманні відповіді від ЕА. Номер запису в журналі аудиту {0}'); ", RecID), true);
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "ead_errors", String.Format("core$ErrorBox('{0}.  Номер запису в журналі аудиту {1}', 'Помилка отримання документів з ЕА')", ex.Message.Replace("'", null).Replace("\r\n", null), RecID), true);  // alert не показывалсо с '  \r\n
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ead_errors", String.Format("alert('Виникли помилки при отриманні відповіді від ЕА. Номер запису в журналі аудиту {0}'); ", RecID), true);
+        }
+        finally
+        {
+            con.Close();
+            con.Dispose();
         }
 
         return DocData;
@@ -824,13 +868,13 @@ public partial class UserControls_dialogs_ScanIdDocs : System.Web.UI.Page
     private Byte[] GetDocFromEA()
     {
         // Паспорт и прочее
-        Int16[] DocCodes = new Int16[8] { 111, 1111, 113, 114, 119, 112, 118, 148 };
+        string[] DocCodes = new string[8] { "111", "1111", "113", "114", "119", "112", "118", "148" };
         return GetDataFromEA(DocCodes);
     }
     private Byte[] GetInnFromEA()
     {
         // ИНН и прочее
-        Int16[] InnCodes = new Int16[2] { 121, 122 };
+        string[] InnCodes = new string[2] { "121", "122" };
         return GetDataFromEA(InnCodes);
     }
     # endregion

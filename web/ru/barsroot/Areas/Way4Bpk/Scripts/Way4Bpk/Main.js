@@ -445,8 +445,12 @@ function onClickBtn(btn) {
                 complete: function(jqXHR, textStatus){ Waiting(false); },
                 data: JSON.stringify( [
                     { Key: "multiprint_id", Value: row.ACC_ACC },
-                    { Key: "multiprint_filter", Value: row.DOC_ID }])
-            } });
+                        { Key: "multiprint_filter", Value: row.DOC_ID },
+                        { Key: "multiprint_rnk", Value: row.CUST_RNK },
+                        { Key: "multiprint_isdkbo", Value: row.ISDKBO },
+                        { Key: "docNumberKK", Value: row.ND }])
+                }
+            });
             break;
 
         case "btnPrintOrders2":
