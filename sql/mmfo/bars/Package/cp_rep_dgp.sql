@@ -13,9 +13,9 @@ create or replace package cp_rep_dgp is
 end cp_rep_dgp;
 /
 create or replace package body cp_rep_dgp is
-  G_BODY_VERSION constant varchar2(64) := 'v.1.8  17.04.2018';
+  G_BODY_VERSION constant varchar2(64) := 'v.1.9  10.05.2018';
   G_TRACE        constant varchar2(20) := 'CP_REP_DGP.';
-  -----
+  ---
   cursor G_CUR (p_nlsb_arr string_list, p_date_from date, p_date_to date)
 
   is
@@ -950,8 +950,14 @@ create or replace package body cp_rep_dgp is
                                              'д контрагенту'));                              --Назва покупця
 
         l_cp_dgp_zv_row.g048 := substr(get_cp_kodw(k.id, 'VYDCP'), 1, 255);                 --тест--уточнення --Вид цінного паперу
-        l_cp_dgp_zv_row.g049 := get_cp_refw(p.ref, 'VDOGO');                                --тест--уточнення --Вид договору/контракту
-        l_cp_dgp_zv_row.g050 := get_cp_refw(p.ref, 'VOPER');                                --тест--уточнення --Вид операції
+        l_cp_dgp_zv_row.g049 := f_operw(p.ref, 'CP_VD');                                    --тест--уточнення --Вид договору/контракту
+        if l_cp_dgp_zv_row.g049 is null then
+           l_cp_dgp_zv_row.g049 := get_cp_refw(p.ref, 'VDOGO');                                
+        end if;  
+        l_cp_dgp_zv_row.g050 := f_operw(p.ref, 'CP_VO');                                    --тест--уточнення --Вид операції
+        if l_cp_dgp_zv_row.g050 is null then
+           l_cp_dgp_zv_row.g050 := get_cp_refw(p.ref, 'VOPER');                                
+        end if;   
 
         /*Показники групи: Доходи за цінними паперами, отримані протягом звітного періоду*/
 
@@ -1601,8 +1607,15 @@ create or replace package body cp_rep_dgp is
                                              'д контрагенту'));                              --!Назва покупця
 
         l_cp_dgp_zv_row.g046 := substr(get_cp_kodw(k.id, 'VYDCP'), 1, 255);                 --!тест--уточнення --Вид цінного паперу
-        l_cp_dgp_zv_row.g047 := get_cp_refw(p.ref, 'VDOGO');                                --!тест--уточнення --Вид договору/контракту
-        l_cp_dgp_zv_row.g048 := get_cp_refw(p.ref, 'VOPER');                                --!тест--уточнення --Вид операції
+        l_cp_dgp_zv_row.g047 := f_operw(p.ref, 'CP_VD');                                    --!тест--уточнення --Вид договору/контракту
+        if l_cp_dgp_zv_row.g047 is null then
+           l_cp_dgp_zv_row.g047 := get_cp_refw(p.ref, 'VDOGO');                                
+        end if;  
+        l_cp_dgp_zv_row.g048 := f_operw(p.ref, 'CP_VO');                                    --!тест--уточнення --Вид операції
+        if l_cp_dgp_zv_row.g048 is null then
+           l_cp_dgp_zv_row.g048 := get_cp_refw(p.ref, 'VOPER');                                
+        end if;   
+
 
         /*Показники групи: Доходи за цінними паперами, отримані протягом звітного періоду*/
 
