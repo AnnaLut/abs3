@@ -13,7 +13,7 @@ create or replace package cp_rep_dgp is
 end cp_rep_dgp;
 /
 create or replace package body cp_rep_dgp is
-  G_BODY_VERSION constant varchar2(64) := 'v.1.9  10.05.2018';
+  G_BODY_VERSION constant varchar2(64) := 'v.1.10  10.05.2018';
   G_TRACE        constant varchar2(20) := 'CP_REP_DGP.';
   ---
   cursor G_CUR (p_nlsb_arr string_list, p_date_from date, p_date_to date)
@@ -91,7 +91,9 @@ create or replace package body cp_rep_dgp is
                      ks.title,
                      nvl(c.prinsider, 99) prinsider,
                      e.accunrec,
-                     e.accexpr
+                     e.accexpr,
+                     k.vydcp_id,
+                     k.klcpe_id
                 from cp_deal  e,
                      cp_kod   k,
                      cp_spec_cond ks,
@@ -493,7 +495,19 @@ create or replace package body cp_rep_dgp is
       l_cp_dgp_zv_row.g007 := nvl(k.nmk, '***');                                            --Назва емітента
       l_cp_dgp_zv_row.g008 := k.okpo;                                                        --Код ЄДРПОУ
       l_cp_dgp_zv_row.g009 := case when k.prinsider = 99 then 'ні' else 'так' end;           --на тест--на уточнені у Овчарука-Квашук--Пов'язана сторона (так/ні)
-      l_cp_dgp_zv_row.g010 := get_cp_kodw(k.id, 'KLCPE');                                   --на тест--на уточнені--Класифікація цінних паперів в залежності від емітента
+      if k.klcpe_id is null then
+         l_cp_dgp_zv_row.g010 := get_cp_kodw(k.id, 'KLCPE');                                   --на тест--на уточнені--Класифікація цінних паперів в залежності від емітента
+         else
+           begin
+             select title
+             into l_cp_dgp_zv_row.g010 
+             from cp_klcpe 
+             where id = k.klcpe_id;
+           exception 
+             when NO_DATA_FOUND then
+               l_cp_dgp_zv_row.g010 := 'Не знайдено назву по коду '||k.klcpe_id;
+           end;
+      end if;   
 --      raise_application_error(-20001, 'k.ryn='||k.ryn||' k.ref='||k.ref);
       select series
       into l_cp_dgp_zv_row.g011                                                             --на тест--переуточнити--Серія облігацій
@@ -948,8 +962,19 @@ create or replace package body cp_rep_dgp is
 
         l_cp_dgp_zv_row.g047 := trim(get_kontragent(p.ref,
                                              'д контрагенту'));                              --Назва покупця
-
-        l_cp_dgp_zv_row.g048 := substr(get_cp_kodw(k.id, 'VYDCP'), 1, 255);                 --тест--уточнення --Вид цінного паперу
+        if k.vydcp_id is null then
+           l_cp_dgp_zv_row.g048 := substr(get_cp_kodw(k.id, 'VYDCP'), 1, 255);                 --тест--уточнення --Вид цінного паперу
+           else 
+             begin
+               select title
+               into l_cp_dgp_zv_row.g048
+               from cp_vydcp
+               where id = k.vydcp_id;
+             exception 
+               when NO_DATA_FOUND then
+                    l_cp_dgp_zv_row.g048 := 'Не знайдено назву по коду '||k.vydcp_id;
+             end;               
+        end if;   
         l_cp_dgp_zv_row.g049 := f_operw(p.ref, 'CP_VD');                                    --тест--уточнення --Вид договору/контракту
         if l_cp_dgp_zv_row.g049 is null then
            l_cp_dgp_zv_row.g049 := get_cp_refw(p.ref, 'VDOGO');                                
@@ -1606,7 +1631,19 @@ create or replace package body cp_rep_dgp is
         l_cp_dgp_zv_row.g045 := trim(get_kontragent(p.ref,
                                              'д контрагенту'));                              --!Назва покупця
 
-        l_cp_dgp_zv_row.g046 := substr(get_cp_kodw(k.id, 'VYDCP'), 1, 255);                 --!тест--уточнення --Вид цінного паперу
+        if k.vydcp_id is null then
+           l_cp_dgp_zv_row.g046 := substr(get_cp_kodw(k.id, 'VYDCP'), 1, 255);                 --!тест--уточнення --Вид цінного паперу
+           else 
+             begin
+               select title
+               into l_cp_dgp_zv_row.g046
+               from cp_vydcp
+               where id = k.vydcp_id;
+             exception 
+               when NO_DATA_FOUND then
+                    l_cp_dgp_zv_row.g046 := 'Не знайдено назву по коду '||k.vydcp_id;
+             end;               
+        end if;  
         l_cp_dgp_zv_row.g047 := f_operw(p.ref, 'CP_VD');                                    --!тест--уточнення --Вид договору/контракту
         if l_cp_dgp_zv_row.g047 is null then
            l_cp_dgp_zv_row.g047 := get_cp_refw(p.ref, 'VDOGO');                                

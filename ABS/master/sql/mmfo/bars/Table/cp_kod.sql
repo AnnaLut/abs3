@@ -489,6 +489,55 @@ exception when others then
  end;
 /
 
+begin
+    execute immediate 'alter table CP_KOD add vydcp_id varchar2(8)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+COMMENT ON COLUMN BARS.CP_KOD.vydcp_id IS 'Вид цінного паперу';
+
+
+begin   
+ execute immediate 'alter table CP_KOD
+  add constraint FK_CP_VYDCP foreign key (vydcp_id)
+  references cp_vydcp (ID)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+begin   
+ execute immediate 'alter table CP_KOD
+  add constraint FK_CP_SPEC_COND foreign key (SPEC_COND_ID)
+  references cp_spec_cond (ID)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+begin
+    execute immediate 'alter table CP_KOD add klcpe_id number(2)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+COMMENT ON COLUMN BARS.CP_KOD.klcpe_id IS 'Класифікація ЦП по типу емітента';
+
+
+begin   
+ execute immediate 'alter table CP_KOD
+  add constraint FK_CP_KLCPE foreign key (klcpe_id)
+  references cp_klcpe (ID)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
 
 PROMPT *** Create  grants  CP_KOD ***
 grant SELECT                                                                 on CP_KOD          to BARSUPL;
