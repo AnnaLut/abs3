@@ -1,4 +1,4 @@
-CREATE OR REPLACE PACKAGE OVRN IS  G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :='ver.3 06.04.2018';
+CREATE OR REPLACE PACKAGE OVRN IS  G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :='ver.3 10.04.2018';
 -- 06.04.2018  Нач %% через JOB
  g_TIP  tips.tip%type     := 'OVN';
  g_VIDD cc_vidd.vidd%type := 10   ;  -- <<Солsдарний>> Оверд
@@ -107,7 +107,7 @@ procedure repl_acc (p_nd number, p_old_acc number, p_new_kv int, p_new_nls varch
 END ;
 /
 CREATE OR REPLACE PACKAGE BODY OVRN IS
- G_BODY_VERSION  CONSTANT VARCHAR2(64)  :='ver.2 06.04.2018';
+ G_BODY_VERSION  CONSTANT VARCHAR2(64)  :='ver.3 10.04.2018';
 /*
 06.04.2018  Нач %% через JOB
 06.04.2018 Sta Удаление ЧКО одного реф по 2- (и более) счетам
@@ -2069,6 +2069,7 @@ procedure INTXJ  ( p_User int, p_mode int ,p_dat1 date, p_dat2 date, p_acc8 numb
   l_BAZP  int  := 36500;
 
 begin
+  bars.bars_login.login_user(sys_guid,p_User,null,null);
   If p_mode not in (0,1) then RETURN; end if;
 
   If p_mode = 0  and ( p_dat2 is null  or p_dat1 > p_dat2 ) then
@@ -2223,8 +2224,12 @@ begin
 
   end loop ; -- a8
   commit;
-   bms.enqueue_msg( 'Розрахунок %% по ОВР користувача '|| p_User|| ' ЗАВЕРШЕНО ! Перегляньте результат ' , dbms_aq.no_delay, dbms_aq.never, p_User );
-
+   bms.enqueue_msg( 'Розрахунок %% по ОВР користувача '|| p_User|| ' ЗАВЕРШЕНО ! Перегляньте результат ' , dbms_aq.no_delay, dbms_aq.never, p_User );   
+   bars.bars_login.logout_user;  
+exception when others
+  then  
+   bms.enqueue_msg( 'Розрахунок %% по ОВР користувача '|| p_User|| ' ЗАВЕРШЕНО З ПОМИЛКОЮ! -'||SQLERRM , dbms_aq.no_delay, dbms_aq.never, p_User );   
+   bars.bars_login.logout_user; 
 end intxJ ;
 -----------------
 procedure INTB  (p_mode int) is  --- Генерация проводок согласно итоговому протоколу
