@@ -793,7 +793,8 @@ SELECT t.rowid AS idrow
                 nvl(err,' ') err, 
                 C.ERR_MSG
                 from zag_f f left join DPA_ERR_CODES c on C.ERR_CODE = f.err
-                where F.DAT > sysdate-364 and fn like '@F0%'";
+                where F.DAT > sysdate-364 and fn like '@F0%'
+                order by dat desc, fn desc";
         }
         else
             sql = @"select fn, dat, nvl(err,' ') err
