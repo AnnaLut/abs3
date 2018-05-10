@@ -345,6 +345,22 @@ begin
 end;
 / 
 
+begin
+    execute immediate 'alter table CP_KOD_UPDATE add vydcp_id varchar2(8)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+begin
+    execute immediate 'alter table CP_KOD_UPDATE add klcpe_id number(2)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
 
 PROMPT *** Create  grants  CP_KOD_UPDATE ***
 grant SELECT                                                                 on CP_KOD_UPDATE   to BARSUPL;

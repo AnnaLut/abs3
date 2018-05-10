@@ -165,6 +165,8 @@ begin
   bars_metabase.add_column(l_tabid, 43, 'FIN_351', 'N', 'Клас~боржника~(пост.351)', '', null, 28, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 44, 'FAIR_METHOD_ID', 'N', 'Метод~розрахунку~справедливої~вартості', '', null, 46, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 45, 'SPEC_COND_ID', 'N', 'Наявність особливих умов', null, null, 47, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 46, 'VYDCP_ID', 'C', 'Вид цінного паперу', null, null, 48, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 47, 'KLCPE_ID', 'N', 'Класифікація ЦП по типу емітента', null, null, 49, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CP_DOX');
@@ -263,6 +265,22 @@ begin
     bars_metabase.add_extrnval(l_tabid, 45, l_newtabid, l_newcolid, '', '', '', '');
   else
     dbms_output.put_line('В БМД не описана таблица CP_SPEC_COND для описания сложного поля таблицы CP_KOD.');
+  end if;
+  -- добавляем описание сложного поля
+  l_newtabid := bars_metabase.get_tabid('CP_VYDCP');
+  l_newcolid := bars_metabase.get_colid(l_newtabid, 'ID');
+  if (l_newtabid is not null and l_newcolid is not null) then
+    bars_metabase.add_extrnval(l_tabid, 46, l_newtabid, l_newcolid, '', '', '', '');
+  else
+    dbms_output.put_line('В БМД не описана таблица CP_VYDCP для описания сложного поля таблицы CP_KOD.');
+  end if;
+  -- добавляем описание сложного поля
+  l_newtabid := bars_metabase.get_tabid('CP_KLCPE');
+  l_newcolid := bars_metabase.get_colid(l_newtabid, 'ID');
+  if (l_newtabid is not null and l_newcolid is not null) then
+    bars_metabase.add_extrnval(l_tabid, 47, l_newtabid, l_newcolid, '', '', '', '');
+  else
+    dbms_output.put_line('В БМД не описана таблица CP_KLCPE для описания сложного поля таблицы CP_KOD.');
   end if;
 
 
