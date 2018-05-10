@@ -1,0 +1,1 @@
+grant select on SYS.V_$SESSION to bars with grant option;
