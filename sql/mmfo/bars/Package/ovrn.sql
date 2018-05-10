@@ -1,4 +1,4 @@
-CREATE OR REPLACE PACKAGE OVRN IS  G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :='ver.3 10.04.2018';
+CREATE OR REPLACE PACKAGE OVRN IS  G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :='ver.3 10.05.2018';
 -- 06.04.2018  Нач %% через JOB
  g_TIP  tips.tip%type     := 'OVN';
  g_VIDD cc_vidd.vidd%type := 10   ;  -- <<Солsдарний>> Оверд
@@ -107,7 +107,7 @@ procedure repl_acc (p_nd number, p_old_acc number, p_new_kv int, p_new_nls varch
 END ;
 /
 CREATE OR REPLACE PACKAGE BODY OVRN IS
- G_BODY_VERSION  CONSTANT VARCHAR2(64)  :='ver.3 10.04.2018';
+ G_BODY_VERSION  CONSTANT VARCHAR2(64)  :='ver.3 10.05.2018';
 /*
 06.04.2018  Нач %% через JOB
 06.04.2018 Sta Удаление ЧКО одного реф по 2- (и более) счетам
@@ -792,6 +792,7 @@ begin
 
   l_TERM_LIM := NVL( to_number(OVRN.GetW( acc8_, 'TERM_LIM') ), 20) ;              -- 09                   --20(null)
   dat21_ :=  dat_  +  l_TERM_LIM ;                                                 -- dat21_ = 10.05.2017.  21.05.2017
+  dat21_ := Dat_Next_U ( dat21_, 0 ) ;
 
   --Расчет ЛКн
   delete from OVR_LIM where ND = l_nd and fdat =  dat21_  and  PR = 1;  -- удаление только авторасчетных
