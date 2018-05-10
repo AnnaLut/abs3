@@ -11,9 +11,8 @@ PROMPT *** ALTER_POLICY_INFO to INV_CCK_FL_23 ***
 BEGIN 
         execute immediate  
           'begin  
-               bpa.alter_policy_info(''INV_CCK_FL_23'', ''FILIAL'' , ''F'', ''F'', ''F'', null);
-               bpa.alter_policy_info(''INV_CCK_FL_23'', ''WHOLE'' , ''C'', ''C'', ''C'', null);
-               null;
+               bpa.alter_policy_info(''INV_CCK_FL_23'', ''FILIAL'' , null, null, null, null);
+               bpa.alter_policy_info(''INV_CCK_FL_23'', ''WHOLE''  , null, null, null, null);
            end; 
           '; 
 END; 
@@ -208,6 +207,12 @@ COMMENT ON COLUMN BARS.INV_CCK_FL_23.G05I IS '05I Iдентифiкацiйний код ФО';
 COMMENT ON COLUMN BARS.INV_CCK_FL_23.G06 IS '06 Сума кредиту за угодою в валютi угоди';
 
 
+begin 
+  execute immediate 'alter table INV_CCK_FL_23 add kf VARCHAR2(6) default sys_context(''bars_context'',''user_mfo'')';
+exception when others then 
+  if SQLCODE = - 01430 then null;   else raise; end if; 
+end;
+/
 
 
 PROMPT *** Create  constraint PK_INVCCKFL23 ***
@@ -221,6 +226,37 @@ exception when others then
  end;
 /
 
+PROMPT *** Create  index I1_INVCCKFL23 ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.I1_INVCCKFL23 ON BARS.INV_CCK_FL_23 (G00, GT, ACC2208) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+PROMPT *** Create  index I2_INVCCKFL23 ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.I2_INVCCKFL23 ON BARS.INV_CCK_FL_23 (G00, GT, ACC2209) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+PROMPT *** Create  index I3_INVCCKFL23 ***
+begin   
+ execute immediate '
+  CREATE  INDEX BARS.I3_INVCCKFL23 ON BARS.INV_CCK_FL_23 (G00, GT, ACC9129) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
 
 
 

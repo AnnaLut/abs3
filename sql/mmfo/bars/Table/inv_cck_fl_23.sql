@@ -210,9 +210,6 @@ COMMENT ON COLUMN BARS.INV_CCK_FL_23.ACC2209 IS '';
 COMMENT ON COLUMN BARS.INV_CCK_FL_23.ACC9129 IS '';
 COMMENT ON COLUMN BARS.INV_CCK_FL_23.KF IS '';
 
-
-
-
 PROMPT *** Create  constraint PK_INVCCKFL23 ***
 begin   
  execute immediate '
@@ -224,9 +221,6 @@ exception when others then
  end;
 /
 
-
-
-
 PROMPT *** Create  constraint CC_INVCCKFL23_GR_NN ***
 begin   
  execute immediate '
@@ -236,8 +230,37 @@ exception when others then
  end;
 /
 
+PROMPT *** Create  index I1_INVCCKFL23 ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.I1_INVCCKFL23 ON BARS.INV_CCK_FL_23 (G00, GT, ACC2208) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
 
-
+PROMPT *** Create  index I2_INVCCKFL23 ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.I2_INVCCKFL23 ON BARS.INV_CCK_FL_23 (G00, GT, ACC2209) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+PROMPT *** Create  index I3_INVCCKFL23 ***
+begin   
+ execute immediate '
+  CREATE  INDEX BARS.I3_INVCCKFL23 ON BARS.INV_CCK_FL_23 (G00, GT, ACC9129) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
 
 PROMPT *** Create  constraint CC_INVCCKFL23_G00_NN ***
 begin   
@@ -248,9 +271,6 @@ exception when others then
  end;
 /
 
-
-
-
 PROMPT *** Create  constraint CC_INVCCKFL23_GT_NN ***
 begin   
  execute immediate '
@@ -259,9 +279,6 @@ exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
-
-
-
 
 PROMPT *** Create  constraint CC_INVCCKFL23_ACC_NN ***
 begin   
@@ -272,9 +289,6 @@ exception when others then
  end;
 /
 
-
-
-
 PROMPT *** Create  constraint CC_INVCCKFL23_KF_NN ***
 begin   
  execute immediate '
@@ -283,9 +297,6 @@ exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
-
-
-
 
 PROMPT *** Create  index PK_INVCCKFL23 ***
 begin   

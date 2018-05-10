@@ -7,15 +7,16 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_INV_CCK_FL_23 ***
 
-  CREATE OR REPLACE PROCEDURE BARS.P_INV_CCK_FL_23 (p_dat date, p_frm int) is
+  CREATE OR REPLACE PROCEDURE BARS.P_INV_CCK_FL_23 (p_dat date, p_frm int, p_mode int default 0) is
 -- ============================================================================
 --                    Инвентаризационная ведомость - 23 постанова
 --                          VERSION 7.1 (04/12/2017)
 -- ============================================================================
 /*
  Даные про классификацию кредитных операций и расчет сумы резерва по физ.лицам - 23 постанова
- p_dat  -- на дату  (ПОСЛЕДНЯЯ ДАТА МЕСЯЦА!!!!!!)
- p_frm  -- с(1)/без(0) переформирования
+ p_dat   -- на дату  (ПОСЛЕДНЯЯ ДАТА МЕСЯЦА!!!!!!)
+ p_frm   -- с(1)/без(0) переформирования
+ p_mode  -- 1 - JOB, 0 - без JOB
 */
 
   Di_       number    ;   -- accm_calendar.caldt_id%type
@@ -25,7 +26,7 @@ PROMPT *** Create  procedure P_INV_CCK_FL_23 ***
   l_title   varchar2(20) := 'CCK P_INV_CCK_FL_23:'; -- для трассировки
   fd_       varchar2(10) := 'DD.MM.YYYY';  -- формат дат
 
-  GG   INV_CCK_FL_23%rowtype;
+  GG   INV_CCK_FL_23%rowtype; l_code  regions.code%type;      l_kf      varchar2(6) ;
 
   dTmp_     date;
   nTmp_     int;
@@ -44,6 +45,8 @@ PROMPT *** Create  procedure P_INV_CCK_FL_23 ***
   l_count_s031   number;
   l_time_start   varchar2(20);
   l_time_finish  varchar2(20);
+  L_MES          varchar2(100) := 'Сообщение';
+  L_MES_err      varchar2(100) := 'Ошибка';
 
   l_usedwh    char(1);        -- использование загрузки в ЦАС
   l_errmsg    varchar2(500);  -- сообщение
@@ -71,7 +74,10 @@ begin
       end if;
    exception when no_data_found then l_usedwh := '0';
    end;   */
+if p_mode = 0 THEN
 
+  GG.kf := sys_context('bars_context','user_mfo');
+  z23.to_log_rez (user_id , 77 , l_dat ,'INV:1. Инвентаризация ФО-23 - початок');
   select to_char(sysdate, 'dd/mm/yyyy hh24:mi:ss') into l_time_start from dual;
   bars_audit.trace('%s TIME_Start: l_time_start=%s',l_title, l_time_start);
   bars_audit.trace('%s 0.Старт инвентаризации КП ФЛ. Вх.пар-ры:l_dat=%s, p_frm=%s',l_title, to_char(l_dat), to_char(p_frm));
@@ -86,7 +92,7 @@ begin
 
  -- Id отч.даты
   if getglobaloption('HAVETOBO') = 2 then
-    execute immediate 'select caldt_ID from accm_calendar where caldt_DATE = add_months( (last_day(:l_dat)+1), -1)' into Di_ using l_dat;
+    execute immediate 'select  to_char ( add_months( (last_day(:l_dat)+1), -1), ''J'' ) - 2447892 from dual' into Di_ using l_dat;
   else Di_ := to_number(to_char(l_dat,'DDMMYYYY'));
   end if;
 
@@ -99,15 +105,20 @@ begin
   if nvl(p_frm,0) = 0  then
      begin
        select 1 into nTmp_ from INV_CCK_FL_23 where G00 = l_dat and GT = 1 and rownum = 1;
+       z23.to_log_rez (user_id , 77 , l_dat ,'INV:1. Инвентаризация ФО-23 - фініш (без розрахунку)');
        return;
      exception when no_data_found then null;
      end;
   end if;
-
+  dbms_application_info.set_client_info('INV_FL_JOB:'|| GG.kf ||': Інвентаризація КП ФО - Підготовка');
   -- почистим все за выбранную дату
+  z23.to_log_rez (user_id , 77 , l_dat ,'INV:2. Удаление INV_CCK_FL_23 ');
   delete from INV_CCK_FL_23 where G00 = l_dat and GT = 1;
+  z23.to_log_rez (user_id , 77 , l_dat ,'INV:3. Удаление INV_CCK_FL_BPKK_23 ');
   delete from INV_CCK_FL_BPKK_23 where G00 = l_dat and GT = 1;
-
+  z23.to_log_rez (user_id , 77 , l_dat ,'INV:4. Інвентаризація КП ФО - КП ');
+  commit;
+  dbms_application_info.set_client_info('INV_FL_JOB:'|| GG.kf ||':1-4. Інвентаризація КП ФО - КП');
   --курсор по КП
 for k in
      ( select d.nd,c.OKPO, d.wdate, d.obs, d.cc_id, a.kv, c.NMK,
@@ -799,7 +810,8 @@ END LOOP;
 
 --------------------------!!!!!!!!!!!!!!!!! БПК расширенные!!!!!!!!!!!!!!!!!--------------------------
 bars_audit.trace('%s 17-1.Вставляем данные по БПК ФЛ расширенные.',l_title);
-
+   dbms_application_info.set_client_info('INV_FL_JOB:'|| GG.kf ||': 5.Інвентаризація КП ФО-БПК 2203');
+   z23.to_log_rez (user_id , 77 , l_dat ,'INV:5. Інвентаризація КП ФО-БПК 2203');
    -- для отслеживания ошибок при ексепшине
    l_err := 'БПК: ';
 
@@ -812,9 +824,9 @@ bars_audit.trace('%s 17-1.Вставляем данные по БПК ФЛ расширенные.',l_title);
    G00 , GT, GR, ACC, RNK, ACC2208, ACC2209, ACC9129)
   (
 -- БПК 2202, 2203, у которых остаток в принципе существует (может 0)
-  select b.name G01, a.kf G02, a.branch G03, substr('БПК '||c.nmk,1,70) G04, c.nompdv G05, c.okpo G05I, 0 G06,
+  select (select name from branch where branch = nvl(a.branch,'/')) G01, a.kf G02, a.branch G03, substr('БПК '||c.nmk,1,70) G04, c.nompdv G05, c.okpo G05I, 0 G06,
        a.kv G07, ba.nd G08, to_char(get_dat_first_turn(ba.acc_ovr),fd_) G09,
-       null G10, null G11, null G12, 0 G13, null G14, null G15, null G16, p.prinsiderlv1 G17, null G18, a.nbs G19, a.ob22 G20,
+       null G10, null G11, null G12, 0 G13, null G14, null G15, null G16, (select prinsiderlv1  from prinsider where prinsider = c.prinsider) G17, null G18, a.nbs G19, a.ob22 G20,
        -f_get_ost(a.acc,DI_,1,7)/100 G21,
        -f_get_ost(a.acc,DI_,1,8)/100 G22, 0 G23, null G24,
        decode(s.r013,'9',-(nvl(f_get_ost(ba.acc_9129,DI_,1,8)/100,0)), 0) G25,
@@ -831,39 +843,41 @@ bars_audit.trace('%s 17-1.Вставляем данные по БПК ФЛ расширенные.',l_title);
        null G58,  null G59,null G60, null G61,  null G62,null G63,  null G64,
        decode (sign(nvl(f_get_ost(ba.acc_pk,DI_,1,7)/100,0)),-1,-f_get_ost(ba.acc_pk,DI_,1,8)/100,0) G65,
        l_dat G00, 1 GT, 'R' GR, a.acc ACC, a.rnk RNK, ba.acc_2208 ACC2208, ba.acc_2209 ACC2209, ba.acc_9129  ACC9129
-   from bpk_all_accounts ba, customer c, accounts a, branch b, prinsider p, accounts aa,
-        (select acc, r013
-           from nbu23_rez
-          where fdat = trunc(last_day(l_dat)+1,'MM') and substr(id,1,2) in ('BP','W4')) s,
+   from bpk_all_accounts ba, customer c, accounts a, 
+        (select acc, r013 from nbu23_rez where fdat = trunc(last_day(l_dat)+1,'MM') and substr(id,1,2) in ('BP','W4')) s,
         (select distinct nd, fin, kat, obs, pawn, k
            from nbu23_rez
           where fdat = trunc(last_day(l_dat)+1,'MM') and substr(id,1,2) in ('BP','W4') and rownum = 1) n,
-        (select nd, sum(rezq) rezq, sum(reznq) reznq, sum(rezq-reznq) r_rez, sum(bvq) bvq, sum(gl.p_icurval(kv,pv,l_dat)) pvq
+        (select nd, sum(rezq) rezq, sum(reznq) reznq, sum(rezq-reznq) r_rez, sum(bvq) bvq, sum(pvq) pvq
            from nbu23_rez
           where fdat = trunc(last_day(l_dat)+1,'MM') and substr(id,1,2) in ('BP','W4') group by nd) n1,
-	(select acc, t.rezq rezq
-           from nbu23_rez t
-          where substr(nls,1,4)  in (select nbs from srezerv_ob22 where nbs_rez = '3690')
-            and fdat = trunc(last_day(l_dat)+1,'MM')  and substr(id,1,2) in ('BP','W4') ) t36
+	(select acc, t.rezq rezq  from nbu23_rez t where t.nbs='9129' and fdat = trunc(last_day(l_dat)+1,'MM')  and substr(id,1,2) in ('BP','W4') ) t36
   where ba.acc_ovr is not null
     and ba.acc_ovr = a.acc
-    and a.nbs in ('2202','2203')
     and a.daos <= l_dat
-    and nvl(a.branch,'/') = b.branch
     and a.rnk      = c.rnk
     and c.custtype = 3 and nvl(trim(c.sed),'00')<>'91'
-    and ba.acc_pk = aa.acc and aa.nbs = '2625'
-    and p.prinsider= c.prinsider
     and ba.acc_9129= s.acc(+)
-   -- and ba.nd      = t.nd(+)
     and ba.nd      = n.nd(+)
     and ba.nd      = n1.nd(+)
-    and ba.acc_9129= t36.acc(+)
-  UNION ALL
--- БПК, по которым 2202, 2203 еще не открыт, но есть 9129
-  select b.name G01, a.kf G02, a.branch G03,  substr('БПК '||c.nmk,1,70) G04, c.nompdv G05, c.okpo G05I, 0,
+    and ba.acc_9129= t36.acc(+));
+
+   dbms_application_info.set_client_info('INV_FL_JOB:'|| GG.kf ||':6.Інвентаризація КП ФО-БПК,нет 2203,есть 9129');
+   z23.to_log_rez (user_id , 77 , l_dat ,'INV:6. Інвентаризація КП ФО - БПК,нет 2203,есть 9129');
+
+  insert into INV_CCK_FL_23
+  (G01 , G02 , G03 , G04 , G05 , G05I, G06 , G07 , G08 , G09 , G10 , G11 , G12 ,
+   G13 , G14 , G15 , G16 , G17 , G18 , G19 , G20 , G21 , G22 , G23 , G24 ,
+   G25 , G26 , G27 , G28 , G29 , G30 , G31 , G32 , G33 , G34 , G35 , G36 ,
+   G37 , G38 , G39 , G40 , G41 , G42 , G43 , G44 , G45 , G46 , G47 , G48 ,
+   G49 , G50 , G51 , G52 , G53 , G54 , G55 , G56 , G57 , G58 , G59 , G60 , G61 , G62 , G63 , G64 , G65 ,
+   G00 , GT, GR, ACC, RNK, ACC2208, ACC2209, ACC9129)
+  (
+  --UNION ALL
+  -- БПК, по которым 2202, 2203 еще не открыт, но есть 9129
+  select (select name from branch where branch = nvl(a.branch,'/')) G01, a.kf G02, a.branch G03,  substr('БПК '||c.nmk,1,70) G04, c.nompdv G05, c.okpo G05I, 0,
        a.kv G07, ba.nd G08,  null G09,
-       null, null, null, 0, null, 0, null, p.prinsiderlv1 G17, null, a.nbs G19, null G20,
+       null, null, null, 0, null, 0, null, (select prinsiderlv1  from prinsider where prinsider = c.prinsider) G17, null, a.nbs G19, null G20,
        0 G21,
        0 G22, 0 G23, null,
        decode(s.r013,'9',-(nvl(f_get_ost(ba.acc_9129,DI_,1,8)/100,0)), 0) G25,
@@ -880,39 +894,42 @@ bars_audit.trace('%s 17-1.Вставляем данные по БПК ФЛ расширенные.',l_title);
        null G58,  null G59,null G60, null G61,  null G62,null G63,  null G64,
        decode (sign(nvl(f_get_ost(ba.acc_pk,DI_,1,7)/100,0)),-1,-f_get_ost(ba.acc_pk,DI_,1,8)/100,0) G65,
        l_dat G00, 1 GT, 'R' GR, a.acc ACC, a.rnk RNK, ba.acc_2208 ACC2208, ba.acc_2209 ACC2209, ba.acc_9129  ACC9129
-   from bpk_all_accounts ba, customer c, accounts a, branch b, prinsider p, accounts aa,
-        (select acc, r013
-           from nbu23_rez
-          where fdat = trunc(last_day(l_dat)+1,'MM') and substr(id,1,2) in ('BP','W4')) s,
-        (select distinct nd, fin, kat, obs, pawn, k
-           from nbu23_rez
-          where fdat = trunc(last_day(l_dat)+1,'MM') and substr(id,1,2) in ('BP','W4') and rownum = 1) n,
-        (select nd, sum(rezq) rezq, sum(reznq) reznq, sum(rezq-reznq) r_rez, sum(bvq) bvq, sum(gl.p_icurval(kv,pv,l_dat)) pvq
+   from bpk_all_accounts ba, customer c, accounts a, 
+        (select acc, r013 from nbu23_rez  where fdat = trunc(last_day(l_dat)+1,'MM') and substr(id,1,2) in ('BP','W4')) s,
+        (select distinct nd, fin, kat, obs, pawn, k from nbu23_rez  where fdat = trunc(last_day(l_dat)+1,'MM') and substr(id,1,2) in ('BP','W4') and rownum = 1) n,
+        (select nd, sum(rezq) rezq, sum(reznq) reznq, sum(rezq-reznq) r_rez, sum(bvq) bvq, sum(pvq) pvq
            from nbu23_rez
           where fdat = trunc(last_day(l_dat)+1,'MM') and substr(id,1,2) in ('BP','W4') group by nd) n1,
 	(select acc, t.rezq rezq
            from nbu23_rez t
-          where substr(nls,1,4)  in (select nbs from srezerv_ob22 where nbs_rez = '3690')
-            and fdat = trunc(last_day(l_dat)+1,'MM')  and substr(id,1,2) in ('BP','W4') ) t36
+          where t.nbs='9129' and fdat = trunc(last_day(l_dat)+1,'MM')  and substr(id,1,2) in ('BP','W4') ) t36
   where ba.acc_ovr is null and ba.acc_2207 is null
     and ba.acc_9129 is not null
     and ba.acc_9129 = a.acc
     and a.daos <= l_dat
-    and nvl(a.branch,'/') = b.branch
     and a.rnk      = c.rnk
     and c.custtype = 3 and nvl(trim(c.sed),'00')<>'91'
-    and ba.acc_pk  = aa.acc and aa.nbs = '2625'
-    and p.prinsider= c.prinsider
-    and ba.acc_9129= s.acc(+)
     and ba.acc_9129= t36.acc(+)
     and ba.acc_9129= s.acc(+)
     and ba.nd      = n.nd(+)
-    and ba.nd      = n1.nd(+)
-  UNION ALL
--- БПК, по которым есть 9129, а 2202, 2203 открыт позже даты формирования
-  select b.name G01, a.kf G02, a.branch G03,  substr('БПК '||c.nmk,1,70) G04, c.nompdv G05, c.okpo G05I, 0,
+    and ba.nd      = n1.nd(+));
+
+   dbms_application_info.set_client_info('INV_FL_JOB:'|| GG.kf ||': 7.Інвентаризація КП ФО-БПК,есть 9129,2203');
+   z23.to_log_rez (user_id , 77 , l_dat ,'INV:7. Інвент.КП ФО-БПК,есть 9129,2203');
+
+  insert into INV_CCK_FL_23
+  (G01 , G02 , G03 , G04 , G05 , G05I, G06 , G07 , G08 , G09 , G10 , G11 , G12 ,
+   G13 , G14 , G15 , G16 , G17 , G18 , G19 , G20 , G21 , G22 , G23 , G24 ,
+   G25 , G26 , G27 , G28 , G29 , G30 , G31 , G32 , G33 , G34 , G35 , G36 ,
+   G37 , G38 , G39 , G40 , G41 , G42 , G43 , G44 , G45 , G46 , G47 , G48 ,
+   G49 , G50 , G51 , G52 , G53 , G54 , G55 , G56 , G57 , G58 , G59 , G60 , G61 , G62 , G63 , G64 , G65 ,
+   G00 , GT, GR, ACC, RNK, ACC2208, ACC2209, ACC9129)
+  (
+  --UNION ALL
+  -- БПК, по которым есть 9129, а 2202, 2203 открыт позже даты формирования
+  select (select name from branch where branch = nvl(a.branch,'/')) G01, a.kf G02, a.branch G03,  substr('БПК '||c.nmk,1,70) G04, c.nompdv G05, c.okpo G05I, 0,
        a.kv G07, ba.nd G08,  null G09,
-       null, null, null, 0, null, 0, null, p.prinsiderlv1 G17, null, a.nbs G19, null G20,
+       null, null, null, 0, null, 0, null, (select prinsiderlv1  from prinsider where prinsider = c.prinsider) G17, null, a.nbs G19, null G20,
        0 G21,
        0 G22, 0 G23, null,
        decode(s.r013,'9',-(nvl(f_get_ost(ba.acc_9129,DI_,1,8)/100,0)), 0) G25,
@@ -929,39 +946,46 @@ bars_audit.trace('%s 17-1.Вставляем данные по БПК ФЛ расширенные.',l_title);
        null G58,  null G59,null G60, null G61,  null G62,null G63,  null G64,
        decode (sign(nvl(f_get_ost(ba.acc_pk,DI_,1,7)/100,0)),-1,-f_get_ost(ba.acc_pk,DI_,1,8)/100,0) G65,
        l_dat G00, 1 GT, 'R' GR, a.acc ACC, a.rnk RNK, ba.acc_2208 ACC2208,  ba.acc_2209 ACC2209, ba.acc_9129  ACC9129
-   from bpk_all_accounts ba, customer c, accounts a, branch b, prinsider p, accounts aa,   accounts a2,
+   from bpk_all_accounts ba, customer c, accounts a, accounts a2,
         (select acc, r013
            from nbu23_rez
           where fdat = trunc(last_day(l_dat)+1,'MM') and substr(id,1,2) in ('BP','W4')) s,
         (select distinct nd, fin, kat, obs, pawn, k
            from nbu23_rez
           where fdat = trunc(last_day(l_dat)+1,'MM') and substr(id,1,2) in ('BP','W4') and rownum = 1) n,
-        (select nd, sum(rezq) rezq, sum(reznq) reznq, sum(rezq-reznq) r_rez, sum(bvq) bvq, sum(gl.p_icurval(kv,pv,l_dat)) pvq
+        (select nd, sum(rezq) rezq, sum(reznq) reznq, sum(rezq-reznq) r_rez, sum(bvq) bvq, sum(pvq) pvq
            from nbu23_rez
           where fdat = trunc(last_day(l_dat)+1,'MM') and substr(id,1,2) in ('BP','W4') group by nd) n1,
 	(select acc, t.rezq rezq
            from nbu23_rez t
-          where substr(nls,1,4)  in (select nbs from srezerv_ob22 where nbs_rez = '3690')
-            and fdat = trunc(last_day(l_dat)+1,'MM')  and substr(id,1,2) in ('BP','W4') ) t36
+          where t.nbs='9129' and fdat = trunc(last_day(l_dat)+1,'MM')  and substr(id,1,2) in ('BP','W4') ) t36
   where ba.acc_ovr = a2.acc and a2.daos > l_dat
     and ba.acc_9129 is not null
     and ba.acc_9129 = a.acc
     and a.daos <= l_dat
-    and nvl(a.branch,'/') = b.branch
     and a.rnk      = c.rnk
     and c.custtype = 3 and nvl(trim(c.sed),'00')<>'91'
-    and ba.acc_pk  = aa.acc and aa.nbs = '2625'
-    and p.prinsider= c.prinsider
-    and ba.acc_9129= s.acc(+)
     and ba.acc_9129= t36.acc(+)
     and ba.acc_9129= s.acc(+)
     and ba.nd      = n.nd(+)
-    and ba.nd      = n1.nd(+)
-  UNION ALL
--- БПК, по которым нет ни 2202, 2203, ни 9129, но есть 2208
-  select b.name G01, a.kf G02, a.branch G03,  substr('БПК '||c.nmk,1,70) G04, c.nompdv G05, c.okpo G05I, 0,
+    and ba.nd      = n1.nd(+));
+
+   dbms_application_info.set_client_info('INV_FL_JOB:'|| GG.kf ||': 8.Інвентаризація КП ФО-БПК,нет 2203,9129,есть 2208');
+   z23.to_log_rez (user_id , 77 , l_dat ,'INV:8. Інвентаризація КП ФО-БПК,нет 2203,9129,есть 2208');
+
+  insert into INV_CCK_FL_23
+  (G01 , G02 , G03 , G04 , G05 , G05I, G06 , G07 , G08 , G09 , G10 , G11 , G12 ,
+   G13 , G14 , G15 , G16 , G17 , G18 , G19 , G20 , G21 , G22 , G23 , G24 ,
+   G25 , G26 , G27 , G28 , G29 , G30 , G31 , G32 , G33 , G34 , G35 , G36 ,
+   G37 , G38 , G39 , G40 , G41 , G42 , G43 , G44 , G45 , G46 , G47 , G48 ,
+   G49 , G50 , G51 , G52 , G53 , G54 , G55 , G56 , G57 , G58 , G59 , G60 , G61 , G62 , G63 , G64 , G65 ,
+   G00 , GT, GR, ACC, RNK, ACC2208, ACC2209, ACC9129)
+  (
+  --UNION ALL
+  -- БПК, по которым нет ни 2202, 2203, ни 9129, но есть 2208
+  select (select name from branch where branch = nvl(a.branch,'/')) G01, a.kf G02, a.branch G03,  substr('БПК '||c.nmk,1,70) G04, c.nompdv G05, c.okpo G05I, 0,
        a.kv G07, ba.nd G08,  null G09,
-       null, null, null, 0, null, 0, null, p.prinsiderlv1 G17, null, a.nbs G19, null G20,
+       null, null, null, 0, null, 0, null, (select prinsiderlv1  from prinsider where prinsider = c.prinsider) G17, null, a.nbs G19, null G20,
        0 G21,
        0 G22, 0 G23, null,
        0 G25,
@@ -978,76 +1002,37 @@ bars_audit.trace('%s 17-1.Вставляем данные по БПК ФЛ расширенные.',l_title);
        null G58,  null G59,null G60, null G61,  null G62,null G63,  null G64,
        decode (sign(nvl(f_get_ost(ba.acc_pk,DI_,1,7)/100,0)),-1,-f_get_ost(ba.acc_pk,DI_,1,8)/100,0) G65,
        l_dat G00, 1 GT, 'R' GR, a.acc ACC, a.rnk RNK, ba.acc_2208 ACC2208,  ba.acc_2209 ACC2209, ba.acc_9129  ACC9129
-   from bpk_all_accounts ba, customer c, accounts a, branch b,  prinsider p, accounts aa,
+   from bpk_all_accounts ba, customer c, accounts a, 
         (select distinct nd, fin, kat, obs, pawn, k
            from nbu23_rez
           where fdat = trunc(last_day(l_dat)+1,'MM') and substr(id,1,2) in ('BP','W4') and rownum = 1) n,
-        (select nd, sum(rezq) rezq, sum(reznq) reznq, sum(rezq-reznq) r_rez, sum(bvq) bvq, sum(gl.p_icurval(kv,pv,l_dat)) pvq
+        (select nd, sum(rezq) rezq, sum(reznq) reznq, sum(rezq-reznq) r_rez, sum(bvq) bvq, sum(pvq) pvq
            from nbu23_rez
           where fdat = trunc(last_day(l_dat)+1,'MM') and substr(id,1,2) in ('BP','W4') group by nd) n1
   where (ba.acc_ovr is null or (ba.acc_ovr is not null and exists (select 1 from accounts where acc = ba.acc_ovr and daos > l_dat)) )
     and (ba.acc_9129 is null or (ba.acc_9129 is not null and exists (select 1 from accounts where acc = ba.acc_9129 and daos > l_dat)) )
     and ba.acc_2208 = a.acc
     and a.daos <= l_dat
-    and nvl(a.branch,'/') = b.branch
     and a.rnk      = c.rnk
     and c.custtype = 3 and nvl(trim(c.sed),'00')<>'91'
-    and ba.acc_pk  = aa.acc and aa.nbs = '2625'
-    and p.prinsider= c.prinsider
     and ba.nd      = n.nd(+)
-    and ba.nd      = n1.nd(+)
-  UNION ALL
-/*-- БПК 2625
-    select b.name G01, a.kf G02, a.branch G03,  substr('БПК '||c.nmk,1,70) G04,  c.nompdv G05, c.okpo G05I, 0,
-       a.kv G07, ba.nd G08,  null G09,
-       null, null, null, 0, null, 0, null, p.prinsiderlv1 G17, null, a.nbs G19, a.ob22 G20,
-       -f_get_ost(ba.acc_pk,DI_,1,7)/100 G21,
-       -f_get_ost(ba.acc_pk,DI_,1,8)/100 G22,
-       0 G23, null,
-       0 G25, 0 G26,
-       nvl(acrn.fprocn(ba.acc_ovr,0,l_dat),0) G27,
-       null G28,
-       decode(ba.acc_ovr, null, -f_get_ost(ba.acc_2208,DI_,1,8)/100, -f_get_ost(ba.acc_2627,DI_,1,8)/100) G29,
-       decode(ba.acc_ovr, null, -f_get_ost(ba.acc_2209,DI_,1,8)/100, 0) G30,
-       null G31, n.fin G32, F_GET_CUSTW_H(c.rnk,'VNCRR',l_dat) G33, null G34, n.kat G35, n.obs G36, n.pawn G37, null G38,
-       --t.s1 G39, t.s2 G40,
-       0 G39, 0 G40,
-       n.k G41, 0 G42, 0 G43, 0 G44, 0 G45, null G46, null G47,
-       --n1.rezq G42, n1.reznq G43, n1.r_rez G44,
-       null G48, null G49, null G50, 0 G51, ba.nd G52,
-       0 G53,  0 G54, null G55,
-       --n1.bvq G56, n1.pvq G57,
-       0 G56, 0 G57,
-       null G58,  null G59,null G60, null G61,  null G62,null G63,  null G64,
-       l_dat G00, 1 GT, 'R' GR, a.acc ACC, a.rnk RNK, ba.acc_2208 ACC2208, ba.acc_2209 ACC2209, ba.acc_9129  ACC9129
-   from bpk_all_accounts ba, customer c, accounts a, branch b, prinsider p,
-        (select distinct nd, fin, kat, obs, pawn, k
-           from nbu23_rez
-          where fdat = trunc(last_day(l_dat)+1,'MM') and substr(id,1,2) in ('BP','W4')) n,
-        (select nd, sum(rezq) rezq, sum(reznq) reznq, sum(rezq-reznq) r_rez, sum(bvq) bvq, sum(gl.p_icurval(kv,pv,l_dat)) pvq
-           from nbu23_rez
-          where fdat = trunc(last_day(l_dat)+1,'MM') and substr(id,1,2) in ('BP','W4') group by nd) n1
-        --(select nd, sum(gl.p_icurval(kv,sall,l_dat)/100) s1, sum(gl.p_icurval(kv,s,l_dat)/100) s2
-        --   from tmp_rez_obesp23
-        --  where dat = trunc(last_day(l_dat)+1,'MM')
-        --    and kv is not null
-        --    and not exists (select 1 from nd_acc where acc = t.accs)
-        --  group by nd) t
-  where ba.acc_pk = a.acc
-    and a.daos <= l_dat
-    and nvl(a.branch,'/') = b.branch
-    and a.rnk      = c.rnk
-    and c.custtype = 3 and nvl(trim(c.sed),'00')<>'91'
-    and a.nbs = '2625'
-    and p.prinsider= c.prinsider
-  --  and ba.nd      = t.nd(+)
-    and ba.nd      = n.nd(+)
-    and ba.nd      = n1.nd(+)
-    and nvl(f_get_ost(ba.acc_pk,DI_,1,7)/100,0) <0   */
+    and ba.nd      = n1.nd(+));
+
+   dbms_application_info.set_client_info('INV_FL_JOB:'|| GG.kf ||': 9.Інвентаризація КП ФО-БПК,есть только 2625');
+   z23.to_log_rez (user_id , 77 , l_dat ,'INV:9. Інвентаризація КП ФО-БПК,есть только 2625');
+
+  insert into INV_CCK_FL_23
+  (G01 , G02 , G03 , G04 , G05 , G05I, G06 , G07 , G08 , G09 , G10 , G11 , G12 ,
+   G13 , G14 , G15 , G16 , G17 , G18 , G19 , G20 , G21 , G22 , G23 , G24 ,
+   G25 , G26 , G27 , G28 , G29 , G30 , G31 , G32 , G33 , G34 , G35 , G36 ,
+   G37 , G38 , G39 , G40 , G41 , G42 , G43 , G44 , G45 , G46 , G47 , G48 ,
+   G49 , G50 , G51 , G52 , G53 , G54 , G55 , G56 , G57 , G58 , G59 , G60 , G61 , G62 , G63 , G64 , G65 ,
+   G00 , GT, GR, ACC, RNK, ACC2208, ACC2209, ACC9129) 
+  (
 -- БПК, по которым нет ни 2202, 2203, ни 9129, ни 2207, 2208, 2209, но есть 2625
-  select b.name G01, a.kf G02, a.branch G03,  substr('БПК '||c.nmk,1,70) G04, c.nompdv G05, c.okpo G05I, 0,
+  select (select name from branch where branch = nvl(a.branch,'/')) G01, a.kf G02, a.branch G03,  substr('БПК '||c.nmk,1,70) G04, c.nompdv G05, c.okpo G05I, 0,
        a.kv G07, ba.nd G08,  null G09,
-       null, null, null, 0, null, 0, null, p.prinsiderlv1 G17, null, a.nbs G19, null G20,
+       null, null, null, 0, null, 0, null, (select prinsiderlv1  from prinsider where prinsider = c.prinsider) G17, null, a.nbs G19, null G20,
        0 G21,
        0 G22, 0 G23, null,
        0 G25,
@@ -1064,11 +1049,11 @@ bars_audit.trace('%s 17-1.Вставляем данные по БПК ФЛ расширенные.',l_title);
        null G58,  null G59,null G60, null G61,  null G62,null G63,  null G64,
        decode (sign(nvl(f_get_ost(ba.acc_pk,DI_,1,7)/100,0)),-1,-f_get_ost(ba.acc_pk,DI_,1,8)/100,0) G65,
        l_dat G00, 1 GT, 'R' GR, a.acc ACC, a.rnk RNK, null ACC2208,  null ACC2209, null  ACC9129
-   from bpk_all_accounts ba, customer c, accounts a, branch b,  prinsider p,
+   from bpk_all_accounts ba, customer c, accounts a, 
         (select distinct nd, fin, kat, obs, pawn, k
            from nbu23_rez
           where fdat = trunc(last_day(l_dat)+1,'MM') and substr(id,1,2) in ('BP','W4') and rownum = 1) n,
-        (select nd, sum(rezq) rezq, sum(reznq) reznq, sum(rezq-reznq) r_rez, sum(bvq) bvq, sum(gl.p_icurval(kv,pv,l_dat)) pvq
+        (select nd, sum(rezq) rezq, sum(reznq) reznq, sum(rezq-reznq) r_rez, sum(bvq) bvq, sum(pvq) pvq
            from nbu23_rez
           where fdat = trunc(last_day(l_dat)+1,'MM') and substr(id,1,2) in ('BP','W4') group by nd) n1
   where (ba.acc_ovr is null or (ba.acc_ovr is not null and exists (select 1 from accounts where acc = ba.acc_ovr and daos > l_dat)) )
@@ -1076,21 +1061,30 @@ bars_audit.trace('%s 17-1.Вставляем данные по БПК ФЛ расширенные.',l_title);
     and (ba.acc_2207 is null or (ba.acc_2207 is not null and exists (select 1 from accounts where acc = ba.acc_2207 and daos > l_dat)) )
     and (ba.acc_2208 is null or (ba.acc_2208 is not null and exists (select 1 from accounts where acc = ba.acc_2208 and daos > l_dat)) )
     and (ba.acc_2209 is null or (ba.acc_2209 is not null and exists (select 1 from accounts where acc = ba.acc_2208 and daos > l_dat)) )
-    and ba.acc_pk = a.acc
-    and a.daos <= l_dat
-    and nvl(a.branch,'/') = b.branch
+    and ba.acc_pk  = a.acc
+    and a.daos    <= l_dat
     and a.rnk      = c.rnk
     and c.custtype = 3 and nvl(trim(c.sed),'00')<>'91'
-    and a.nbs = '2625'
-    and p.prinsider= c.prinsider
     and ba.nd      = n.nd(+)
     and ba.nd      = n1.nd(+)
-    and ( nvl(f_get_ost(ba.acc_pk,DI_,1,7)/100,0) < 0  or  ( nvl(f_get_ost(ba.acc_pk,DI_,1,7)/100,0) = 0   and ba.acc_2627 is not null ) )
-    UNION ALL
+    and ( nvl(f_get_ost(ba.acc_pk,DI_,1,7)/100,0) < 0  or  ( nvl(f_get_ost(ba.acc_pk,DI_,1,7)/100,0) = 0   and ba.acc_2627 is not null ) ));
+
+   dbms_application_info.set_client_info('INV_FL_JOB:'|| GG.kf ||': 10.Інвентаризація КП ФО-БПК, 2207 остаток существует(может 0)');
+   z23.to_log_rez (user_id , 77 , l_dat ,'INV:10. Інвентаризація КП ФО-БПК, 2207 остаток существует(может 0)');
+
+  insert into INV_CCK_FL_23
+  (G01 , G02 , G03 , G04 , G05 , G05I, G06 , G07 , G08 , G09 , G10 , G11 , G12 ,
+   G13 , G14 , G15 , G16 , G17 , G18 , G19 , G20 , G21 , G22 , G23 , G24 ,
+   G25 , G26 , G27 , G28 , G29 , G30 , G31 , G32 , G33 , G34 , G35 , G36 ,
+   G37 , G38 , G39 , G40 , G41 , G42 , G43 , G44 , G45 , G46 , G47 , G48 ,
+   G49 , G50 , G51 , G52 , G53 , G54 , G55 , G56 , G57 , G58 , G59 , G60 , G61 , G62 , G63 , G64 , G65 ,
+   G00 , GT, GR, ACC, RNK, ACC2208, ACC2209, ACC9129) 
+  (
+
 -- БПК 2207, у которых остаток в принципе существует (может 0)
-  select b.name G01, a.kf G02, a.branch G03, substr('БПК '||c.nmk,1,70) G04, c.nompdv G05, c.okpo G05I, 0 G06,
+  select (select name from branch where branch = nvl(a.branch,'/')) G01, a.kf G02, a.branch G03, substr('БПК '||c.nmk,1,70) G04, c.nompdv G05, c.okpo G05I, 0 G06,
        a.kv G07, ba.nd G08, to_char(get_dat_first_turn(ba.acc_2207),fd_) G09,
-       null G10, null G11, null G12, 0 G13, null G14, null G15, null G16, p.prinsiderlv1 G17, null G18, a.nbs G19, a.ob22 G20,
+       null G10, null G11, null G12, 0 G13, null G14, null G15, null G16, (select prinsiderlv1  from prinsider where prinsider = c.prinsider) G17, null G18, a.nbs G19, a.ob22 G20,
        -f_get_ost(a.acc,DI_,1,7)/100 G21,
        -f_get_ost(a.acc,DI_,1,8)/100 G22, 0 G23, null G24,
        decode(ba.acc_ovr, null, decode(s.r013,'9',-(nvl(f_get_ost(ba.acc_9129,DI_,1,8)/100,0)), 0), 0) G25,
@@ -1107,40 +1101,46 @@ bars_audit.trace('%s 17-1.Вставляем данные по БПК ФЛ расширенные.',l_title);
        null G58,  null G59,null G60, null G61,  null G62,null G63,  null G64,
        decode (sign(nvl(f_get_ost(ba.acc_pk,DI_,1,7)/100,0)),-1,-f_get_ost(ba.acc_pk,DI_,1,8)/100,0) G65,
        l_dat G00, 1 GT, 'R' GR, a.acc ACC, a.rnk RNK, null ACC2208, decode(ba.acc_ovr, null, ba.acc_2209, null) ACC2209, decode(ba.acc_ovr, null, ba.acc_9129, null)  ACC9129
-   from bpk_all_accounts ba, customer c, accounts a, branch b, prinsider p, accounts aa,
+   from bpk_all_accounts ba, customer c, accounts a, 
         (select acc, r013
            from nbu23_rez
           where fdat = trunc(last_day(l_dat)+1,'MM') and substr(id,1,2) in ('BP','W4')) s,
         (select distinct nd, fin, kat, obs, pawn, k
            from nbu23_rez
           where fdat = trunc(last_day(l_dat)+1,'MM') and substr(id,1,2) in ('BP','W4') and rownum = 1) n,
-        (select nd, sum(rezq) rezq, sum(reznq) reznq, sum(rezq-reznq) r_rez, sum(bvq) bvq, sum(gl.p_icurval(kv,pv,l_dat)) pvq
+        (select nd, sum(rezq) rezq, sum(reznq) reznq, sum(rezq-reznq) r_rez, sum(bvq) bvq, sum(pvq) pvq
            from nbu23_rez
           where fdat = trunc(last_day(l_dat)+1,'MM') and substr(id,1,2) in ('BP','W4') group by nd) n1,
 	(select acc, t.rezq rezq
            from nbu23_rez t
-          where substr(nls,1,4)  in (select nbs from srezerv_ob22 where nbs_rez = '3690')
-            and fdat = trunc(last_day(l_dat)+1,'MM')  and substr(id,1,2) in ('BP','W4') ) t36
+          where t.nbs='9129' and fdat = trunc(last_day(l_dat)+1,'MM')  and substr(id,1,2) in ('BP','W4') ) t36
   where (ba.acc_ovr is null or (ba.acc_ovr is not null and exists (select 1 from accounts where acc = ba.acc_ovr and daos > l_dat)) )
     and (ba.acc_9129 is null or (ba.acc_9129 is not null and exists (select 1 from accounts where acc = ba.acc_9129 and daos > l_dat)) )
     and ba.acc_2207 is not null
     and ba.acc_2207 = a.acc
-    and a.nbs = '2207'
     and a.daos <= l_dat
-    and nvl(a.branch,'/') = b.branch
     and a.rnk      = c.rnk
     and c.custtype = 3 and nvl(trim(c.sed),'00')<>'91'
-    and ba.acc_pk = aa.acc and aa.nbs = '2625'
-    and p.prinsider= c.prinsider
     and ba.acc_9129= s.acc(+)
     and ba.nd      = n.nd(+)
     and ba.nd      = n1.nd(+)
-    and ba.acc_9129= t36.acc(+)
-  UNION ALL
+    and ba.acc_9129= t36.acc(+));
+
+   dbms_application_info.set_client_info('INV_FL_JOB:'|| GG.kf ||': 11.Інвентаризація КП ФО - БПК, нет ни 2203, 2207, 2208, ни 9129, но есть 2209');
+   z23.to_log_rez (user_id , 77 , l_dat ,'INV:11. Інвентаризація КП ФО - БПК, нет ни 2203, 2207, 2208, ни 9129, но есть 2209');
+
+  insert into INV_CCK_FL_23
+  (G01 , G02 , G03 , G04 , G05 , G05I, G06 , G07 , G08 , G09 , G10 , G11 , G12 ,
+   G13 , G14 , G15 , G16 , G17 , G18 , G19 , G20 , G21 , G22 , G23 , G24 ,
+   G25 , G26 , G27 , G28 , G29 , G30 , G31 , G32 , G33 , G34 , G35 , G36 ,
+   G37 , G38 , G39 , G40 , G41 , G42 , G43 , G44 , G45 , G46 , G47 , G48 ,
+   G49 , G50 , G51 , G52 , G53 , G54 , G55 , G56 , G57 , G58 , G59 , G60 , G61 , G62 , G63 , G64 , G65 ,
+   G00 , GT, GR, ACC, RNK, ACC2208, ACC2209, ACC9129) 
+  (
 -- БПК, по которым нет ни 2202, 2203, 2207, 2208, ни 9129, но есть 2209
-  select b.name G01, a.kf G02, a.branch G03,  substr('БПК '||c.nmk,1,70) G04, c.nompdv G05, c.okpo G05I, 0,
+  select (select name from branch where branch = nvl(a.branch,'/')) G01, a.kf G02, a.branch G03,  substr('БПК '||c.nmk,1,70) G04, c.nompdv G05, c.okpo G05I, 0,
        a.kv G07, ba.nd G08,  null G09,
-       null, null, null, 0, null, 0, null, p.prinsiderlv1 G17, null, a.nbs G19, null G20,
+       null, null, null, 0, null, 0, null, (select prinsiderlv1  from prinsider where prinsider = c.prinsider) G17, null, a.nbs G19, null G20,
        0 G21,
        0 G22, 0 G23, null,
        0 G25,
@@ -1157,11 +1157,11 @@ bars_audit.trace('%s 17-1.Вставляем данные по БПК ФЛ расширенные.',l_title);
        null G58,  null G59,null G60, null G61,  null G62,null G63,  null G64,
        decode (sign(nvl(f_get_ost(ba.acc_pk,DI_,1,7)/100,0)),-1,-f_get_ost(ba.acc_pk,DI_,1,8)/100,0) G65,
        l_dat G00, 1 GT, 'R' GR, a.acc ACC, a.rnk RNK, null ACC2208,  ba.acc_2209 ACC2209, null  ACC9129
-   from bpk_all_accounts ba, customer c, accounts a, branch b,  prinsider p, accounts aa,
+   from bpk_all_accounts ba, customer c, accounts a, 
         (select distinct nd, fin, kat, obs, pawn, k
            from nbu23_rez
           where fdat = trunc(last_day(l_dat)+1,'MM') and substr(id,1,2) in ('BP','W4') and rownum = 1) n,
-        (select nd, sum(rezq) rezq, sum(reznq) reznq, sum(rezq-reznq) r_rez, sum(bvq) bvq, sum(gl.p_icurval(kv,pv,l_dat)) pvq
+        (select nd, sum(rezq) rezq, sum(reznq) reznq, sum(rezq-reznq) r_rez, sum(bvq) bvq, sum(pvq) pvq
            from nbu23_rez
           where fdat = trunc(last_day(l_dat)+1,'MM') and substr(id,1,2) in ('BP','W4') group by nd) n1
   where (ba.acc_ovr is null or (ba.acc_ovr is not null and exists (select 1 from accounts where acc = ba.acc_ovr and daos > l_dat)) )
@@ -1170,20 +1170,16 @@ bars_audit.trace('%s 17-1.Вставляем данные по БПК ФЛ расширенные.',l_title);
     and (ba.acc_2208 is null or (ba.acc_2208 is not null and exists (select 1 from accounts where acc = ba.acc_2208 and daos > l_dat)) )
     and ba.acc_2209 = a.acc
     and a.daos <= l_dat
-    and nvl(a.branch,'/') = b.branch
     and a.rnk      = c.rnk
     and c.custtype = 3 and nvl(trim(c.sed),'00')<>'91'
-    and ba.acc_pk  = aa.acc and aa.nbs = '2625'
-    and p.prinsider= c.prinsider
-  --  and ba.nd      = t.nd(+)
     and ba.nd      = n.nd(+)
     and ba.nd      = n1.nd(+)
 	  );
 
 --------------------------!! БПК консолидированные !!-------------------------
-bars_audit.trace('%s 18-2.Вставляем данные по БПК ФЛ консолидированные.',l_title);
-
-
+  bars_audit.trace('%s 18-2.Вставляем данные по БПК ФЛ консолидированные.',l_title);
+  dbms_application_info.set_client_info('INV_FL_JOB:'|| GG.kf ||': 12.Інвентаризація БПК ФО консолидированные');
+  z23.to_log_rez (user_id , 77 , l_dat ,'INV:12. Інвентаризація БПК ФО консолидированные');
   insert into INV_CCK_FL_BPKK_23
   (G01 , G02 , G03 , G04 , G05 , G05I, G06 , G07 , G08 , G09 , G10 , G11 , G12 ,
    G13 , G14 , G15 , G16 , G17 , G18 , G19 , G20 , G21 , G22 , G23 , G24 ,
@@ -1209,6 +1205,8 @@ select G01, G02, G03, 'БПК' G04, null, null, 0, G07, null, null, null, null, nul
 
 --------------------------!!!!!!!!!!!!!!!!! Другие !!!!!!!!!!!!!!!!!--------------------------
 bars_audit.trace('%s 19.Вставляем то, что никуда не вошло',l_title);
+dbms_application_info.set_client_info('INV_FL_JOB:'|| GG.kf ||':13.Інвентаризація - то, что никуда не вошло');
+z23.to_log_rez (user_id , 77 , l_dat ,'INV:13.Інвентаризація - то, что никуда не вошло');
 
   if getglobaloption('HAVETOBO') = 2 then
 execute immediate
@@ -1222,32 +1220,21 @@ execute immediate
     -- кред.счета, которые не попали в ведомость, но есть в снапах
        (select b.name G01, a.kf G02, a.branch G03,  substr(''Iншi ''||c.nmk,1,70) G04, a.kv G07,
                a.nbs G19, a.ob22 G20,
-               decode (a.nbs, ''2202'', -f_get_ost(a.acc,di_,1,7),
-                              ''2203'', -f_get_ost(a.acc,di_,1,7),
-                      	      ''2207'', -f_get_ost(a.acc,di_,1,7),
-                      	      ''2232'', -f_get_ost(a.acc,di_,1,7),
+               decode (a.nbs, ''2203'', -f_get_ost(a.acc,di_,1,7),
                       	      ''2233'', -f_get_ost(a.acc,di_,1,7),
-                      	      ''2237'', -f_get_ost(a.acc,di_,1,7),
-        	      0 )/100 G21,
-               decode (a.nbs, ''2202'', -f_get_ost(a.acc,di_,1,8),
-                      	      ''2203'', -f_get_ost(a.acc,di_,1,8),
-                      	      ''2207'', -f_get_ost(a.acc,di_,1,8),
-                      	      ''2232'', -f_get_ost(a.acc,di_,1,8),
+               	       0 )/100 G21,
+               decode (a.nbs, ''2203'', -f_get_ost(a.acc,di_,1,8),
                       	      ''2233'', -f_get_ost(a.acc,di_,1,8),
-                      	      ''2237'', -f_get_ost(a.acc,di_,1,8),
                        0 )/100 G22,
                decode (a.nbs, ''9129'', -f_get_ost(a.acc,di_,1,8),
                        0 )/100 G25,
                decode (a.nbs, ''2208'', -f_get_ost(a.acc,di_,1,8),
                               ''2238'', -f_get_ost(a.acc,di_,1,8),
-                       0 )/100 G29,
-               decode (a.nbs, ''2209'', -f_get_ost(a.acc,di_,1,8),
-                              ''2239'', -f_get_ost(a.acc,di_,1,8),
-                       0 )/100 G30,
+                       0 )/100 G29,  0 G30,
 	       a.acc acc, a.rnk rnk
           from ACCM_AGG_MONBALS bb, accounts a, customer c, branch b
          where bb.acc = a.acc
-           and (   a.nbs in (''2202'',''2203'',''2207'',''2208'',''2209'',''2232'',''2233'',''2237'',''2238'',''2239'')
+           and (   a.nbs in (''2203'',''2208'',''2233'',''2238'')
 	        or (a.nbs = ''9129'' and c.custtype = 3 and nvl(trim(c.sed),''00'')<>''91'') )
            and caldt_ID = di_
            -- смотрим, что счета нет среди INV_CCK_FL_23.ACC
@@ -1291,17 +1278,50 @@ end if;
    end if;
 
 */
-
-  commit;
-
+  
+  z23.to_log_rez (user_id , 77 , l_dat ,'INV:1. Инвентаризация ФО-23 - фініш');
   bars_audit.trace('%s 20.Финиш инвентаризации КП ФЛ.',l_title);
+  l_mes := 'Формування інвернтарізації КП ФО по філії ' || GG.kf || ' ЗАВЕРШЕНО!';
+  --PRVN_FLOW.SeND_MSG (p_txt => 'END:'||l_msg )
+  bms.send_message(p_receiver_id     => user_id,
+     p_message_type_id => 1,
+     p_message_text    => l_mes,
+     p_delay           => 0,
+     p_expiration      => 0);
+  commit;
+ else
 
-
-
+    begin
+       l_kf      := sys_context('bars_context','user_mfo');
+       BEGIN
+          SYS.DBMS_SCHEDULER.DROP_JOB (job_name  => 'INV_'|| l_kf);
+       exception when others then  if sqlcode = -27475 then null; else raise; end if;
+       end;    
+       EXECUTE IMMEDIATE  'begin
+                           BARS.bars_login.set_long_session;
+                           end;';
+       SYS.DBMS_SCHEDULER.CREATE_JOB
+          (job_name         => 'INV_'|| l_kf,
+           job_type         => 'PLSQL_BLOCK',
+           job_action       => 'declare 
+                                   dat_   DATE   := TO_DATE('''||TO_CHAR(p_dat,'ddmmyyyy')||''',''ddmmyyyy'');
+                                   l_frm  int    :=' || p_frm  ||';
+                                begin 
+                                   bc.go(' || l_kf || '); 
+                                   P_INV_CCK_FL_23(dat_, l_frm, 0 ); 
+                                   commit;
+                                end;',
+           enabled         => true,
+           --repeat_interval => 'FREQ=DAILY;BYDAY=SUN,MON,SAT,TUE,WED,THU,FRI;BYHOUR=12;BYMINUTE=58;BYSECOND=0',
+           comments => 'INV: Інвентарізація КП ФО за ' || p_dat
+          );
+    END;
+ end if;
 
 exception when others then
     bars_audit.error (dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace());
     raise_application_error(-20000, l_err||dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace());
+
 
 end P_INV_CCK_FL_23 ;
 /
