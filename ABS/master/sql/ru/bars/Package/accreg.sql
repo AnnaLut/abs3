@@ -265,7 +265,7 @@ is
   --***************************************************************************--
   g_modcode       constant varchar2(3) := 'CAC';
 
-  g_body_version  constant varchar2(64)  := 'version 2.9  07/02/2018';
+  g_body_version  constant varchar2(64)  := 'version 2.91  02/05/2018';
   g_body_defs     constant varchar2(512) := ''
 $if ACC_PARAMS.KOD_D6
 $then
@@ -2139,7 +2139,7 @@ $if ACC_PARAMS.MMFO
 $then
         EAD_PACK.MSG_CREATE( 'UAGR', 'ACC;'||to_char(l_rsrv_id)||';RSRV', p_rnk, GL.KF() );
 $else
-        EAD_PACK.MSG_CREATE( 'UAGR', 'ACC;'||to_char(l_rsrv_id)||';RSRV' );
+        EAD_PACK.MSG_CREATE( 'UAGR', 'ACC;'||to_char(l_rsrv_id)||';RSRV', p_rnk );
 $end
       end if;
     end if;
@@ -2160,7 +2160,7 @@ $if ACC_PARAMS.MMFO
 $then
       EAD_PACK.MSG_CREATE( 'UACC', 'ACC;'||to_char(l_rsrv_id)||';RSRV', p_rnk, GL.KF() );
 $else
-      EAD_PACK.MSG_CREATE( 'ACC', 'ACC;'||to_char(l_rsrv_id)||';RSRV' );
+      EAD_PACK.MSG_CREATE( 'UACC', 'ACC;'||to_char(l_rsrv_id)||';RSRV', p_rnk );
 $end
 
     exception

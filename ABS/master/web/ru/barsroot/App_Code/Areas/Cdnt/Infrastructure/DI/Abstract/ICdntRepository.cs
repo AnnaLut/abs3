@@ -13,7 +13,7 @@ namespace BarsWeb.Areas.Cdnt.Infrastructure.DI.Abstract
         IQueryable<V_NOTARY> GetNotaries();
         decimal AddNotary(NOTARY notary);
         void EditNotary(NOTARY notary);
-        void DeleteNotary(NOTARY notary);
+        void DeleteNotary(long id);
         IQueryable<V_NOTARY_ACCREDITATION> GetNotaryAccreditations(decimal notaryId);
         V_NOTARY_ACCREDITATION GetAccreditation(decimal accreditationId);
         decimal AddAcreditation(NOTARY_ACCREDITATION accreditation);
@@ -33,6 +33,7 @@ namespace BarsWeb.Areas.Cdnt.Infrastructure.DI.Abstract
         void AddAccreditationQuery(AccreditationQuery query);
         void AlterAccreditationQuery(AccreditationQuery query);
         IEnumerable<BarsListItem> GetNotaryTypes();
+        IEnumerable<BarsListItem> GetDocumentTypes();
         void AddProfit(V_NOTARY_PROFIT profit);
     }
 }

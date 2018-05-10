@@ -4,6 +4,8 @@ using System.Linq;
 using System.Web.UI;
 using BarsWeb.Core.Logger;
 using System.Data;
+using Oracle.DataAccess.Client;
+using Oracle.DataAccess.Types;
 public partial class UserControls_dialogs_EADocsView : System.Web.UI.Page
 {
     private readonly IDbLogger _dbLogger;
@@ -15,11 +17,12 @@ public partial class UserControls_dialogs_EADocsView : System.Web.UI.Page
     /// <summary>
     /// Код структуры документа
     /// </summary>
-    public Int16 EAStructID
+    public String EAStructID
     {
         get
         {
-            return Convert.ToInt16(Request.Params.Get("eas_id"));
+            var a = Request.Params.Get("eas_id");
+            return string.IsNullOrWhiteSpace(a) ? "" : a.ToString();
         }
     }
     /// <summary>
@@ -59,15 +62,30 @@ public partial class UserControls_dialogs_EADocsView : System.Web.UI.Page
         }
     }
 
+    public String DocId
+    {
+        get
+        {
+            if (String.IsNullOrEmpty(Request.Params.Get("doc_id")))
+                return String.Empty;
+            return Convert.ToString(Request.Params.Get("doc_id"));
+        }
+    }
     # region События
     protected void Page_Load(object sender, EventArgs e)
     {
         try
         {
-            if (this.EAStructID == 1)
+            OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
+            OracleCommand cmd = con.CreateCommand();
+            cmd.Parameters.Clear();
+            cmd.CommandText = "SELECT  sys_context('bars_context','user_mfo')  FROM dual";
+            cmd.CommandType = CommandType.Text;
+            string KF = Convert.ToString(cmd.ExecuteScalar());
+            if (this.EAStructID == "1" && string.IsNullOrWhiteSpace(DocId))
             {
-                short[] do_list = new short[] { 111, 112, 113, 114, 115, 116, 117, 118, 119, 1110, 1111, 121, 122, 13, 142, 145, 147, 401, 148, 1319, 1115 };
-                List<Bars.EAD.Structs.Result.DocumentData> docs_ea = Bars.EAD.EADService.GetDocumentData(null, this.RNK, this.AgrID, this.EAStructID, this.ReqID);
+                string[] do_list = new string[] { "111", "112", "113", "114", "115", "116", "117", "118", "119", "1110", "1111", "121", "122", "13", "142", "145", "147", "401", "148", "1319", "1115" };
+                List<Bars.EAD.Structs.Result.DocumentData> docs_ea = Bars.EAD.EADService.GetDocumentData(null, this.RNK, this.AgrID, this.EAStructID, this.ReqID, null, null, null, null, null);
                 List<Bars.EAD.Structs.Result.DocumentData> docs = new List<Bars.EAD.Structs.Result.DocumentData>();
                 
                 foreach (Bars.EAD.Structs.Result.DocumentData a in docs_ea )
@@ -81,7 +99,8 @@ public partial class UserControls_dialogs_EADocsView : System.Web.UI.Page
             }
             else
             {
-               List<Bars.EAD.Structs.Result.DocumentData> docs = Bars.EAD.EADService.GetDocumentData(null, this.RNK, this.AgrID, this.EAStructID, this.ReqID);
+                String _docId = string.IsNullOrWhiteSpace(DocId) ? null : DocId;
+                List<Bars.EAD.Structs.Result.DocumentData> docs = Bars.EAD.EADService.GetDocumentData(_docId, this.RNK, this.AgrID, this.EAStructID, this.ReqID, null, null, null, null, null);
                lvDocs.DataSource = docs;
                lvDocs.DataBind();
             }
@@ -92,9 +111,10 @@ public partial class UserControls_dialogs_EADocsView : System.Web.UI.Page
             String ErrorText = "Виникли помилки при отриманні відповіді від ЕА: Message = " + ex.Message + "; StackTrace = " + ex.StackTrace;
             Decimal RecID = _dbLogger.Error(ErrorText.Length > 3000 ? ErrorText.Substring(0, 3000) : ErrorText);
 
-            //ScriptManager.RegisterStartupScript(this, this.GetType(), "ead_errors", String.Format("alert('Виникли помилки при отриманні відповіді від ЕА. Номер запису в журналі аудиту {0}'); ", RecID), true);
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ead_errors", String.Format("alert('Виникли помилки при отриманні відповіді від ЕА. Номер запису в журналі аудиту {0}'); ", RecID), true);
+			//ScriptManager.RegisterStartupScript(this, this.GetType(), "ead_errors", String.Format("alert('Виникли помилки при отриманні відповіді від ЕА. Номер запису в журналі аудиту {0}'); ", RecID), true);
             //ScriptManager.RegisterStartupScript(this, this.GetType(), "ead_errors", String.Format("window.alert('{0}.  Номер запису в журналі аудиту {1}'); ", ex.Message.Replace("'", null).Replace("\r\n", null), RecID), true);  // alert не показывалсо с '  \r\n
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "ead_errors", String.Format("core$ErrorBox('{0}.  Номер запису в журналі аудиту {1}', 'Помилка отримання документів з ЕА')", ex.Message.Replace("'", null).Replace("\r\n", null), RecID), true);  // alert не показывалсо с '  \r\n
+            //ScriptManager.RegisterStartupScript(this, this.GetType(), "ead_errors", String.Format("core$ErrorBox('{0}.  Номер запису в журналі аудиту {1}', 'Помилка отримання документів з ЕА')", ex.Message.Replace("'", null).Replace("\r\n", null), RecID), true);  // alert не показывалсо с '  \r\n
 
 
         }

@@ -28,7 +28,11 @@ warning 6002: The table/view 'BARS.NOTARY' does not have a primary key defined. 
           <Property Name="NOTARY_TYPE" Type="number" Precision="5" Scale="0" />
           <Property Name="CERTIFICATE_NUMBER" Type="varchar2" MaxLength="30" />
           <Property Name="CERTIFICATE_ISSUE_DATE" Type="date" />
-          <Property Name="CERTIFICATE_CANCELATION_DATE" Type="date" />
+          <Property Name="CERTIFICATE_CANCELATION_DATE" Type="date" />		  
+		  <Property Name="DOCUMENT_TYPE" Type="number" Nullable="false"/>
+		  <Property Name="IDCARD_DOCUMENT_NUMBER" Type="number" />
+		  <Property Name="IDCARD_NOTATION_NUMBER" Type="varchar2" MaxLength="14" />
+		  <Property Name="PASSPORT_EXPIRY" Type="date" />
         </EntityType>
         <!--Errors Found During Generation:
 warning 6002: The table/view 'BARS.NOTARY_ACCREDITATION' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
@@ -148,6 +152,14 @@ warning 6002: The table/view 'BARS.V_NOTARY' does not have a primary key defined
           <Property Name="CNT_REQACCR" Type="number" Precision="38" Scale="0" />
 		  <Property Name="IS_APPROVED" Type="varchar2" MaxLength="30" />
 		  <Property Name="PASSPORT" Type="varchar2" MaxLength="30" />
+		  <Property Name="DOCUMENT_TYPE" Type="number" Nullable="false"/>
+		  <Property Name="IDCARD_DOCUMENT_NUMBER" Type="number" />
+		  <Property Name="IDCARD_NOTATION_NUMBER" Type="varchar2" MaxLength="14" />
+		  <Property Name="PASSPORT_EXPIRY" Type="date" />
+          <Property Name="ACCR_BRANCHES" Type="varchar2" />
+          <Property Name="ACCR_BRANCHNAMES" Type="varchar2" />
+          <Property Name="ACCR_SEG_OF_BUSINESS" Type="varchar2" />
+          <Property Name="ACCREDITATION_TYPE" Type="varchar2" MaxLength="64" />
         </EntityType>
         <!--Errors Found During Generation:
 warning 6002: The table/view 'BARS.V_NOTARY_ACCREDITATION' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
@@ -207,7 +219,11 @@ warning 6002: The table/view 'BARS.V_NOTARY_TRANSACTION' does not have a primary
 "NOTARY"."NOTARY_TYPE" AS "NOTARY_TYPE", 
 "NOTARY"."CERTIFICATE_NUMBER" AS "CERTIFICATE_NUMBER", 
 "NOTARY"."CERTIFICATE_ISSUE_DATE" AS "CERTIFICATE_ISSUE_DATE", 
-"NOTARY"."CERTIFICATE_CANCELATION_DATE" AS "CERTIFICATE_CANCELATION_DATE"
+"NOTARY"."CERTIFICATE_CANCELATION_DATE" AS "CERTIFICATE_CANCELATION_DATE",
+"NOTARY"."DOCUMENT_TYPE" AS "DOCUMENT_TYPE",
+"NOTARY"."IDCARD_DOCUMENT_NUMBER" AS "IDCARD_DOCUMENT_NUMBER",
+"NOTARY"."IDCARD_NOTATION_NUMBER" AS "IDCARD_NOTATION_NUMBER",
+"NOTARY"."PASSPORT_EXPIRY" AS "PASSPORT_EXPIRY"
 FROM "BARS"."NOTARY" "NOTARY"</DefiningQuery>
           </EntitySet>
           <EntitySet Name="NOTARY_ACCREDITATION" EntityType="Self.NOTARY_ACCREDITATION" store:Type="Tables" store:Schema="BARS">
@@ -283,7 +299,15 @@ FROM "BARS"."NOTARY_TRANSACTION_TYPES" "NOTARY_TRANSACTION_TYPES"</DefiningQuery
 "V_NOTARY"."CNT_ACCR" AS "CNT_ACCR", 
 "V_NOTARY"."CNT_REQACCR" AS "CNT_REQACCR",
 "V_NOTARY"."IS_APPROVED" AS "IS_APPROVED",
-"V_NOTARY"."PASSPORT" AS "PASSPORT"
+"V_NOTARY"."PASSPORT" AS "PASSPORT",
+"V_NOTARY"."DOCUMENT_TYPE" AS "DOCUMENT_TYPE",
+"V_NOTARY"."IDCARD_DOCUMENT_NUMBER" AS "IDCARD_DOCUMENT_NUMBER",
+"V_NOTARY"."IDCARD_NOTATION_NUMBER" AS "IDCARD_NOTATION_NUMBER",
+"V_NOTARY"."PASSPORT_EXPIRY" AS "PASSPORT_EXPIRY",
+"V_NOTARY"."ACCR_BRANCHES" AS "ACCR_BRANCHES",
+"V_NOTARY"."ACCR_BRANCHNAMES" AS ACCR_BRANCHNAMES,
+"V_NOTARY"."ACCR_SEG_OF_BUSINESS" AS ACCR_SEG_OF_BUSINESS,
+"V_NOTARY"."ACCREDITATION_TYPE" AS ACCREDITATION_TYPE 
 FROM "BARS"."V_NOTARY" "V_NOTARY"</DefiningQuery>
           </EntitySet>
           <EntitySet Name="V_NOTARY_ACCREDITATION" EntityType="Self.V_NOTARY_ACCREDITATION" store:Type="Views" store:Schema="BARS">
@@ -444,6 +468,10 @@ FROM "BARS"."V_NOTARY_TRANSACTION" "V_NOTARY_TRANSACTION"</DefiningQuery>
           <Property Name="CERTIFICATE_NUMBER" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
           <Property Name="CERTIFICATE_ISSUE_DATE" Type="DateTime" />
           <Property Name="CERTIFICATE_CANCELATION_DATE" Type="DateTime" />
+          <Property Name="DOCUMENT_TYPE" Type="Int32" Nullable="false" />
+          <Property Name="IDCARD_DOCUMENT_NUMBER" Type="Int64" Nullable="true" />
+          <Property Name="IDCARD_NOTATION_NUMBER" Type="String" Nullable="true" FixedLength="false" Unicode="false" MaxLength="14" />
+          <Property Name="PASSPORT_EXPIRY" Type="DateTime" Nullable="true" />
         </EntityType>
         <EntityType Name="NOTARY_PROFIT">
           <Key>
@@ -490,6 +518,14 @@ FROM "BARS"."V_NOTARY_TRANSACTION" "V_NOTARY_TRANSACTION"</DefiningQuery>
           <Property Name="CNT_REQACCR" Type="Decimal" Precision="38" Scale="0" />
 		  <Property Name="IS_APPROVED" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
 		  <Property Name="PASSPORT" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="DOCUMENT_TYPE" Type="Int32" Nullable="false" />
+          <Property Name="IDCARD_DOCUMENT_NUMBER" Type="Int64" Nullable="true" />
+          <Property Name="IDCARD_NOTATION_NUMBER" Type="String" Nullable="true" FixedLength="false" Unicode="false" MaxLength="14" />
+          <Property Name="PASSPORT_EXPIRY" Type="DateTime" Nullable="true" />
+          <Property Name="ACCR_BRANCHES" Type="String" Nullable="true" FixedLength="false" Unicode="false" />
+          <Property Name="ACCR_BRANCHNAMES" Type="String" Nullable="true" FixedLength="false" Unicode="false" />
+          <Property Name="ACCR_SEG_OF_BUSINESS" Type="String" Nullable="true" FixedLength="false" Unicode="false" />
+          <Property Name="ACCREDITATION_TYPE" Type="String" MaxLength="64" Nullable="true" FixedLength="false" Unicode="false" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -591,6 +627,10 @@ FROM "BARS"."V_NOTARY_TRANSACTION" "V_NOTARY_TRANSACTION"</DefiningQuery>
           <EntitySetMapping Name="NOTARY">
             <EntityTypeMapping TypeName="Barsweb.Areas.Cdnt.Models.NOTARY">
               <MappingFragment StoreEntitySet="NOTARY">
+                <ScalarProperty Name="PASSPORT_EXPIRY" ColumnName="PASSPORT_EXPIRY" />
+                <ScalarProperty Name="IDCARD_NOTATION_NUMBER" ColumnName="IDCARD_NOTATION_NUMBER" />
+                <ScalarProperty Name="IDCARD_DOCUMENT_NUMBER" ColumnName="IDCARD_DOCUMENT_NUMBER" />
+                <ScalarProperty Name="DOCUMENT_TYPE" ColumnName="DOCUMENT_TYPE" />
                 <ScalarProperty Name="CERTIFICATE_CANCELATION_DATE" ColumnName="CERTIFICATE_CANCELATION_DATE" />
                 <ScalarProperty Name="CERTIFICATE_ISSUE_DATE" ColumnName="CERTIFICATE_ISSUE_DATE" />
                 <ScalarProperty Name="CERTIFICATE_NUMBER" ColumnName="CERTIFICATE_NUMBER" />
@@ -628,6 +668,14 @@ FROM "BARS"."V_NOTARY_TRANSACTION" "V_NOTARY_TRANSACTION"</DefiningQuery>
           <EntitySetMapping Name="V_NOTARY">
             <EntityTypeMapping TypeName="Barsweb.Areas.Cdnt.Models.V_NOTARY">
               <MappingFragment StoreEntitySet="V_NOTARY">
+                <ScalarProperty Name="ACCR_BRANCHES" ColumnName="ACCR_BRANCHES" />
+                <ScalarProperty Name="ACCR_BRANCHNAMES" ColumnName="ACCR_BRANCHNAMES" />
+                <ScalarProperty Name="ACCR_SEG_OF_BUSINESS" ColumnName="ACCR_SEG_OF_BUSINESS" />
+                <ScalarProperty Name="ACCREDITATION_TYPE" ColumnName="ACCREDITATION_TYPE" />
+                <ScalarProperty Name="PASSPORT_EXPIRY" ColumnName="PASSPORT_EXPIRY" />
+                <ScalarProperty Name="IDCARD_NOTATION_NUMBER" ColumnName="IDCARD_NOTATION_NUMBER" />
+                <ScalarProperty Name="IDCARD_DOCUMENT_NUMBER" ColumnName="IDCARD_DOCUMENT_NUMBER" />
+                <ScalarProperty Name="DOCUMENT_TYPE" ColumnName="DOCUMENT_TYPE" />
                 <ScalarProperty Name="CNT_REQACCR" ColumnName="CNT_REQACCR" />
                 <ScalarProperty Name="CNT_ACCR" ColumnName="CNT_ACCR" />
                 <ScalarProperty Name="CERTIFICATE_CANCELATION_DATE" ColumnName="CERTIFICATE_CANCELATION_DATE" />

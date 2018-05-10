@@ -265,7 +265,7 @@ function CheckChange() {
 var _templateId = "";
 function Print() {
     var data = acc_obj.value;
-    var result = window.showModalDialog(url_dlg_mod + 'DOC_SCHEME&tail="nvl(d_close, sysdate)>=sysdate and id like \'ACC%\'"', "", "dialogWidth:600px;center:yes;edge:sunken;help:no;status:no;");
+    var result = window.showModalDialog(url_dlg_mod + 'DOC_SCHEME&tail="nvl(d_close, sysdate)>=sysdate and id like \'ACC%\' and id not like \'%ZAYAVA%\'"', "", "dialogWidth:600px;center:yes;edge:sunken;help:no;status:no;");
     if (result) {
         _templateId = result[0];
         AskParamsAndShowDialog(onGetMaxSum, "ReadCreditOptions", [acc], result[0]);

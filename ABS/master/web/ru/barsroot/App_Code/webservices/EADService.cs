@@ -7,6 +7,7 @@ using System.Net;
 using System.Text;
 using System.IO;
 using System.Security.Cryptography;
+using System.Linq;
 
 using Bars.Application;
 using Bars.Classes;
@@ -18,7 +19,6 @@ using Newtonsoft.Json;
 using System.Data;
 using Oracle.DataAccess.Client;
 using Oracle.DataAccess.Types;
-using System.Linq;
 
 
 namespace Bars.EAD.Structs.Params.Dicts
@@ -71,64 +71,73 @@ namespace Bars.EAD.Structs.Params
     /// <summary>
     /// Параметри - Надрукований документ
     /// </summary>
-    public struct Doc
+    public struct Document
     {
-        [JsonProperty("ID")]
-        public UInt64 ID;
         [JsonProperty("RNK")]
-        public UInt64? Rnk;
-        [JsonProperty("agreement_id")]
-        public Int64? Agreement_ID;
+        public UInt64 RNK;
         [JsonProperty("doc_type")]
-        public String Doc_Type;
-        [JsonProperty("user_login")]
-        public String User_Login;
-        [JsonProperty("user_fio")]
-        public String User_Fio;
-        [JsonProperty("branch_id")]
-        public String Branch_ID;
-        [JsonProperty("struct_code")]
-        public Int16 Struct_Code;
-        [JsonProperty("changed")]
-        public DateTime Changed;
-        [JsonProperty("created")]
-        public DateTime Created;
-        [JsonProperty("pages_count")]
-        public Int64? Pages_Count;
-        [JsonProperty("binary_data")]
-        public String Binary_Data;
-        [JsonProperty("linkedrnk")]
-        public Int64? LinkedRnk;
+        public String doc_type;
+        [JsonProperty("doc_id")]
+        public String doc_id;
+        [JsonProperty("doc_pages_count")]
+        public UInt16? doc_pages_count;
+        [JsonProperty("doc_binary_data")]
+        public String doc_binary_data;
         [JsonProperty("doc_request_number")]
-        public String Doc_Request_Number;
+        public String doc_request_number;
+        [JsonProperty("agr_code")]
+        public UInt64? agr_code;
+        [JsonProperty("agr_type")]
+        public String agr_type;
+        [JsonProperty("account_type")]
+        public String account_type;
+        [JsonProperty("account_number")]
+        public String account_number;
+        [JsonProperty("account_currency")]
+        public String account_currency;
+        [JsonProperty("created")]
+        public DateTime created;
+        [JsonProperty("changed")]
+        public DateTime changed;
+        [JsonProperty("user_login")]
+        public String user_login;
+        [JsonProperty("user_fio")]
+        public String user_fio;
+        [JsonProperty("branch_id")]
+        public String branch_id;
+        //[JsonProperty("linkedrnk")]
+        //public Int64? LinkedRnk;
 
-
-        public static Doc GetInstance(String ObjID, OracleConnection con)
+        public static Document GetInstance(String ObjID, OracleConnection con)
         {
             OracleCommand cmd = con.CreateCommand();
-            cmd.CommandText = @"select id, agreement_id, doc_type, user_login, user_fio, branch_id, struct_code, changed, created, pages_count, binary_data, rnk, linkedrnk, doc_request_number
+            cmd.CommandText = @"select rnk, doc_type, doc_id, doc_pages_count, doc_binary_data, doc_request_number, agr_code, 
+                                agr_type, account_type, account_number, account_currency, created, changed, user_login, user_fio, branch_id
                                 from table(ead_integration.get_Doc_Instance(:p_doc_id))";
             cmd.Parameters.Add("p_doc_id", OracleDbType.Int64, Convert.ToInt64(ObjID), ParameterDirection.Input);
 
-            Doc res = new Doc();
+            Document res = new Document();
             using (OracleDataReader rdr = cmd.ExecuteReader())
             {
                 if (rdr.Read())
                 {
-                    res.ID = Convert.ToUInt64(rdr["id"]);
-                    res.Agreement_ID = rdr["agreement_id"] == DBNull.Value ? (Int64?)null : Convert.ToInt64(rdr["agreement_id"]);
-                    res.Doc_Type = Convert.ToString(rdr["doc_type"]);
-                    res.User_Login = Convert.ToString(rdr["user_login"]);
-                    res.User_Fio = Convert.ToString(rdr["user_fio"]);
-                    res.Branch_ID = Convert.ToString(rdr["branch_id"]);
-                    res.Struct_Code = Convert.ToInt16(rdr["struct_code"]);
-                    res.Changed = Convert.ToDateTime(rdr["changed"]);
-                    res.Created = Convert.ToDateTime(rdr["created"]);
-                    res.Pages_Count = Convert.ToInt64(rdr["pages_count"]);
-                    res.Binary_Data = rdr["binary_data"] == DBNull.Value ? String.Empty : Convert.ToBase64String((Byte[])rdr["binary_data"]);
-                    res.Rnk = rdr["rnk"] == DBNull.Value ? (UInt64?)null : Convert.ToUInt64(rdr["rnk"]);
-                    res.LinkedRnk = rdr["linkedrnk"] == DBNull.Value ? (Int64?)null : Convert.ToInt64(rdr["linkedrnk"]);
-                    res.Doc_Request_Number = Convert.ToString(rdr["doc_request_number"]);
+                    res.RNK = Convert.ToUInt64(rdr["rnk"]);
+                    res.doc_type = Convert.ToString(rdr["doc_type"]);
+                    res.doc_id = Convert.ToString(rdr["doc_id"]);
+                    res.doc_pages_count = rdr["doc_pages_count"] == DBNull.Value ? (UInt16?)null : Convert.ToUInt16(rdr["doc_pages_count"]);
+                    res.doc_binary_data = rdr["doc_binary_data"] == DBNull.Value ? String.Empty : Convert.ToBase64String((Byte[])rdr["doc_binary_data"]);
+                    res.doc_request_number = Convert.ToString(rdr["doc_request_number"]);
+                    res.agr_code = rdr["agr_code"] == DBNull.Value ? (UInt64?)null : Convert.ToUInt64(rdr["agr_code"]);
+                    res.agr_type = Convert.ToString(rdr["agr_type"]);
+                    res.account_type = Convert.ToString(rdr["account_type"]);
+                    res.account_number = Convert.ToString(rdr["account_number"]);
+                    res.account_currency = Convert.ToString(rdr["account_currency"]);
+                    res.created = Convert.ToDateTime(rdr["created"]);
+                    res.changed = Convert.ToDateTime(rdr["changed"]);
+                    res.user_login = Convert.ToString(rdr["user_login"]);
+                    res.user_fio = Convert.ToString(rdr["user_fio"]);
+                    res.branch_id = Convert.ToString(rdr["branch_id"]);
+                    //res.LinkedRnk = rdr["linkedrnk"] == DBNull.Value ? (Int64?)null : Convert.ToInt64(rdr["linkedrnk"]);
                 }
                 rdr.Close();
             }
@@ -143,41 +152,39 @@ namespace Bars.EAD.Structs.Params
     public struct Client
     {
         [JsonProperty("branch_id")]
-        public String Branch_ID;
-        [JsonProperty("RNK")]
-        public UInt64 Rnk;
+        public String branch_id;
+        [JsonProperty("rnk")]
+        public UInt64 rnk;
         [JsonProperty("changed")]
-        public DateTime Changed;
+        public DateTime changed;
         [JsonProperty("created")]
-        public DateTime Created;
+        public DateTime created;
         [JsonProperty("fio")]
-        public String Fio;
+        public String fio;
         [JsonProperty("client_type")]
-        public String Client_Type;
+        public Byte client_type;
         [JsonProperty("inn")]
-        public String Inn;
+        public String inn;
         [JsonProperty("birth_date")]
-        public DateTime? Birth_Date;
+        public DateTime birth_date;
         [JsonProperty("document_series")]
-        public String Document_Series;
+        public String document_series;
         [JsonProperty("document_number")]
-        public String Document_Number;
-        [JsonProperty("client_data")]
-        public String Client_Data;
+        public String document_number;
         [JsonProperty("mergedRNK")]
-        public List<Int64> MergedRNK;
+        public List<Int64> mergedRNK;
         [JsonProperty("user_login")]
-        public String User_Login;
+        public String user_login;
         [JsonProperty("user_fio")]
-        public String User_Fio;
+        public String user_fio;
         [JsonIgnoreAttribute]
-        public String Document_Type;
+        public String document_type;
 
         public static Client GetInstance(String ObjID, OracleConnection con)
         {
             OracleCommand cmd = con.CreateCommand();
             cmd.CommandText = @"SELECT rnk, changed, created, branch_id, user_login, user_fio, client_type,
-                                       fio, inn, birth_date, document_type, document_series, document_number, client_data
+                                       fio, inn, birth_date, document_type, document_series, document_number
                                   FROM TABLE (ead_integration.get_Client_Instance(:p_rnk))";
             cmd.Parameters.Clear();
             cmd.Parameters.Add("p_rnk", OracleDbType.Int64, Convert.ToInt64(ObjID), ParameterDirection.Input);
@@ -187,27 +194,26 @@ namespace Bars.EAD.Structs.Params
             {
                 if (rdr.Read())
                 {
-                    res.Rnk = Convert.ToUInt64(rdr["rnk"]);
-                    res.Changed = Convert.ToDateTime(rdr["changed"]);
-                    res.Created = Convert.ToDateTime(rdr["created"]);
-                    res.Branch_ID = Convert.ToString(rdr["branch_id"]);
-                    res.User_Login = Convert.ToString(rdr["user_login"]);
-                    res.User_Fio = Convert.ToString(rdr["user_fio"]);
-                    res.Client_Type = Convert.ToString(rdr["client_type"]);
-                    res.Fio = Convert.ToString(rdr["fio"]);
-                    res.Inn = Convert.ToString(rdr["inn"]);
-                    res.Birth_Date = rdr["birth_date"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(rdr["birth_date"]);
-                    res.Document_Type = Convert.ToString(rdr["document_type"]);
-                    res.Document_Series = Convert.ToString(rdr["document_series"]);
-                    res.Document_Number = Convert.ToString(rdr["document_number"]);
-                    res.Client_Data = Convert.ToString(rdr["client_data"]);
+                    res.branch_id = Convert.ToString(rdr["branch_id"]);
+                    res.rnk = Convert.ToUInt64(rdr["rnk"]);
+                    res.changed = Convert.ToDateTime(rdr["changed"]);
+                    res.created = Convert.ToDateTime(rdr["created"]);
+                    res.fio = Convert.ToString(rdr["fio"]);
+                    res.client_type = Convert.ToByte(rdr["client_type"]);
+                    res.inn = Convert.ToString(rdr["inn"]);
+                    res.birth_date = Convert.ToDateTime(rdr["birth_date"]);
+                    res.document_series = Convert.ToString(rdr["document_series"]);
+                    res.document_number = Convert.ToString(rdr["document_number"]);
+                    res.user_login = Convert.ToString(rdr["user_login"]);
+                    res.user_fio = Convert.ToString(rdr["user_fio"]);
+                    res.document_type = Convert.ToString(rdr["document_type"]);
 
                 }
                 rdr.Close();
             }
 
             // влитые РНК
-            res.MergedRNK = new List<Int64>();
+            res.mergedRNK = new List<Int64>();
 
             cmd.CommandText = @"select mrg_rnk from TABLE (ead_integration.get_MergedRNK(:p_rnk))";
             cmd.Parameters.Clear();
@@ -217,7 +223,7 @@ namespace Bars.EAD.Structs.Params
             {
                 while (rdr.Read())
                 {
-                    res.MergedRNK.Add(Convert.ToInt64(rdr["mrg_rnk"]));
+                    res.mergedRNK.Add(Convert.ToInt64(rdr["mrg_rnk"]));
                 }
 
                 rdr.Close();
@@ -232,29 +238,33 @@ namespace Bars.EAD.Structs.Params
     public struct UClient
     {
         [JsonProperty("branch_id")]
-        public String Branch_ID;
+        public String branch_id;
         [JsonProperty("rnk")]
-        public UInt64 Rnk;
-        [JsonProperty("changed")]
-        public DateTime Changed;
-        [JsonProperty("created")]
-        public DateTime Created;
-        [JsonProperty("client_type")]
-        public String Client_Type;
-        [JsonProperty("client_name")]
-        public String Client_Name;
-        [JsonProperty("inn_edrpou")]
-        public String Inn_edrpou;
-        [JsonProperty("user_login")]
-        public String User_Login;
-        [JsonProperty("user_fio")]
-        public String User_Fio;
-        [JsonProperty("actualized_date")]
-        public DateTime Actualized_Date;
-        [JsonProperty("actualized_by")]
-        public String Actualized_By;
+        public UInt64 rnk;
         [JsonProperty("mergedRNK")]
         public List<UInt64> MergedRNK;
+        [JsonProperty("changed")]
+        public DateTime changed;
+        [JsonProperty("created")]
+        public DateTime created;
+        [JsonProperty("client_name")]
+        public String client_name;
+        [JsonProperty("client_type")]
+        public Byte client_type;
+        [JsonProperty("inn_edrpou")]
+        public String inn_edrpou;
+        [JsonProperty("user_login")]
+        public String user_login;
+        [JsonProperty("user_fio")]
+        public String user_fio;
+        [JsonProperty("actualized_by_user_fio")]
+        public String actualized_by_user_fio;
+        [JsonProperty("actualized_by_user_login")]
+        public String actualized_by_user_login;
+        [JsonProperty("actualized_by_branch_id")]
+        public String actualized_by_branch_id;
+        [JsonProperty("actualized_date")]
+        public DateTime actualized_date;
         [JsonProperty("third_persons_clients")]
         public List<Third_Persons_Clients> Third_Persons_Clients;
         [JsonProperty("third_persons_non_clients")]
@@ -267,7 +277,8 @@ namespace Bars.EAD.Structs.Params
             //DBLogger.Debug("UCLIENT rnk = " + ObjID);
 
             OracleCommand cmd = con.CreateCommand();
-            cmd.CommandText = @"select branch_id,rnk,changed,created,client_type,client_name,inn_edrpou,user_login,user_fio,actualized_date,actualized_by
+            cmd.CommandText = @"select branch_id,rnk,changed,created,client_type,client_name,inn_edrpou,user_login,user_fio,
+                                       actualized_by_user_fio, actualized_by_user_login, actualized_by_branch_id, actualized_date
                                   from TABLE (ead_integration.get_UClient_Instance(:p_rnk))";
             cmd.Parameters.Clear();
             cmd.Parameters.Add("p_rnk", OracleDbType.Int64, Convert.ToInt64(ObjID), ParameterDirection.Input);
@@ -277,17 +288,19 @@ namespace Bars.EAD.Structs.Params
                 if (rdr.Read())
                 {
                     // DBLogger.Debug("Uclient:  res.Rnk = " + res.Rnk.ToString());
-                    res.Branch_ID = Convert.ToString(rdr["branch_id"]);
-                    res.Rnk = Convert.ToUInt64(rdr["rnk"]);
-                    res.Changed = Convert.ToDateTime(rdr["changed"]);
-                    res.Created = Convert.ToDateTime(rdr["created"]);
-                    res.Client_Type = Convert.ToString(rdr["client_type"]);
-                    res.Client_Name = Convert.ToString(rdr["client_name"]);
-                    res.Inn_edrpou = Convert.ToString(rdr["inn_edrpou"]);
-                    res.User_Login = Convert.ToString(rdr["user_login"]);
-                    res.User_Fio = Convert.ToString(rdr["user_fio"]);
-                    res.Actualized_Date = Convert.ToDateTime(rdr["actualized_date"]);
-                    res.Actualized_By = Convert.ToString(rdr["actualized_by"]);
+                    res.branch_id = Convert.ToString(rdr["branch_id"]);
+                    res.rnk = Convert.ToUInt64(rdr["rnk"]);
+                    res.changed = Convert.ToDateTime(rdr["changed"]);
+                    res.created = Convert.ToDateTime(rdr["created"]);
+                    res.client_name = Convert.ToString(rdr["client_name"]);
+                    res.client_type = Convert.ToByte(rdr["client_type"]);
+                    res.inn_edrpou = Convert.ToString(rdr["inn_edrpou"]);
+                    res.user_login = Convert.ToString(rdr["user_login"]);
+                    res.user_fio = Convert.ToString(rdr["user_fio"]);
+                    res.actualized_by_user_fio = Convert.ToString(rdr["actualized_by_user_fio"]);
+                    res.actualized_by_user_login = Convert.ToString(rdr["actualized_by_user_login"]);
+                    res.actualized_by_branch_id = Convert.ToString(rdr["actualized_by_branch_id"]);
+                    res.actualized_date = Convert.ToDateTime(rdr["actualized_date"]);
                 }
                 rdr.Close();
             }
@@ -322,7 +335,7 @@ namespace Bars.EAD.Structs.Params
             {
                 while (rdr.Read())
                 {
-                    res.Third_Persons_Non_Clients.Add(new Third_Persons_Non_Clients(Convert.ToUInt64(rdr["id"]), Convert.ToInt16(rdr["personstateid"]), Convert.ToString(rdr["name"]), Convert.ToInt16(rdr["client_type"]), Convert.ToString(rdr["inn_edrpou"])
+                    res.Third_Persons_Non_Clients.Add(new Third_Persons_Non_Clients(Convert.ToString(rdr["id"]), Convert.ToInt16(rdr["personstateid"]), Convert.ToString(rdr["name"]), Convert.ToByte(rdr["client_type"]), Convert.ToString(rdr["inn_edrpou"])
                         , (rdr["date_begin_powers"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(rdr["date_begin_powers"]))
                         , (rdr["date_end_powers"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(rdr["date_end_powers"]))));
                 }
@@ -355,21 +368,21 @@ namespace Bars.EAD.Structs.Params
     public struct Third_Persons_Clients
     {
         [JsonProperty("rnk")]
-        public UInt64 Rnk;
+        public UInt64 rnk;
         [JsonProperty("personStateID")]
         public Int16 PersonStateID;
         [JsonProperty("date_begin_powers")]
-        public DateTime? BDate;
+        public DateTime? date_begin_powers;
         [JsonProperty("date_end_powers")]
-        public DateTime? EDate;
+        public DateTime? date_end_powers;
 
 
-        public Third_Persons_Clients(UInt64 Rnk, Int16 PersonStateID, DateTime? BDate, DateTime? EDate)
+        public Third_Persons_Clients(UInt64 rnk, Int16 PersonStateID, DateTime? date_begin_powers, DateTime? date_end_powers)
         {
-            this.Rnk = Rnk;
+            this.rnk = rnk;
             this.PersonStateID = PersonStateID;
-            this.BDate = BDate;
-            this.EDate = EDate;
+            this.date_begin_powers = date_begin_powers;
+            this.date_end_powers = date_end_powers;
         }
     }
     /// <summary>
@@ -378,168 +391,228 @@ namespace Bars.EAD.Structs.Params
     public struct Third_Persons_Non_Clients
     {
         [JsonProperty("ID")]
-        public UInt64 ID;
+        public String ID;
         [JsonProperty("personStateID")]
         public Int16 PersonStateID;
-        [JsonProperty("Name")]
-        public String Name;
+        [JsonProperty("name")]
+        public String name;
         [JsonProperty("client_type")]
-        public Int16 Client_Type;
+        public Byte client_type;
         [JsonProperty("inn_edrpou")]
-        public String Inn_Edrpou;
+        public String inn_edrpou;
         [JsonProperty("date_begin_powers")]
-        public DateTime? BDate;
+        public DateTime? date_begin_powers;
         [JsonProperty("date_end_powers")]
-        public DateTime? EDate;
+        public DateTime? date_end_powers;
 
-        public Third_Persons_Non_Clients(UInt64 ID, Int16 PersonStateID, String Name, Int16 Client_Type, String Inn_Edrpou, DateTime? BDate, DateTime? EDate)
+        public Third_Persons_Non_Clients(String ID, Int16 PersonStateID, String name, Byte client_type, String inn_edrpou, DateTime? date_begin_powers, DateTime? date_end_powers)
         {
             this.ID = ID;
             this.PersonStateID = PersonStateID;
-            this.Client_Type = Client_Type;
-            this.Name = Name;
-            this.Inn_Edrpou = Inn_Edrpou;
-            this.BDate = BDate;
-            this.EDate = EDate;
+            this.client_type = client_type;
+            this.name = name;
+            this.inn_edrpou = inn_edrpou;
+            this.date_begin_powers = date_begin_powers;
+            this.date_end_powers = date_end_powers;
 
         }
     }
     /// <summary>
     /// Параметри - Угода - Связанное лицо
     /// </summary>
-    public struct LinkedRNK
+    public struct Third_Persons
     {
         [JsonProperty("RNK")]
-        public UInt64 Rnk;
-        [JsonProperty("LinkPersonStateID")]
-        public Int64 LinkPersonStateID;
+        public UInt64 rnk;
+        [JsonProperty("third_person_state")]
+        public Byte third_person_state;
 
-        public LinkedRNK(UInt64 Rnk, Int16 LinkPersonStateID)
+        public Third_Persons(UInt64 rnk, Byte third_person_state)
         {
-            this.Rnk = Rnk;
-            this.LinkPersonStateID = LinkPersonStateID;
+            this.rnk = rnk;
+            this.third_person_state = third_person_state;
         }
     }
     /// <summary>
     /// Параметри - Угода
     /// </summary>
-    public struct Agr
+    public struct Agreement
     {
-        [JsonProperty("agr_code")]
-        public UInt64 Agr_code;
         [JsonProperty("RNK")]
-        public UInt64 Rnk;
-        [JsonProperty("changed")]
-        public DateTime Changed;
-        [JsonProperty("created")]
-        public DateTime Created;
-        [JsonProperty("branch_id")]
-        public String Branch_ID;
-        [JsonProperty("user_login")]
-        public String User_Login;
-        [JsonProperty("user_fio")]
-        public String User_Fio;
+        public UInt64 rnk;
+        [JsonProperty("parent_agr_type")]
+        public String parent_agr_type;
+        [JsonProperty("parent_agr_code")]
+        public String parent_agr_code;
         [JsonProperty("agr_type")]
-        public String Agr_Type;
-        [JsonProperty("agr_status")]
-        public String Agr_Status;
+        public String agr_type;
+        [JsonProperty("agr_code")]
+        public String agr_code;
         [JsonProperty("agr_number")]
-        public String Agr_Number;
+        public String agr_number;
+        [JsonProperty("agr_status")]
+        public Byte agr_status;
         [JsonProperty("agr_date_open")]
-        public DateTime Agr_date_open;
-        [JsonProperty("account_number")]
-        public String Account_Number;
+        public DateTime agr_date_open;
         [JsonProperty("agr_date_close")]
-        public DateTime? Agr_date_close;
-        [JsonProperty("linkedRNK")]
-        public List<LinkedRNK> LinkedRNK;
+        public DateTime? agr_date_close;
+        [JsonProperty("third_persons")]
+        public List<Third_Persons> third_persons;
+        [JsonProperty("created")]
+        public DateTime created;
+        [JsonProperty("changed")]
+        public DateTime changed;
+        [JsonProperty("user_login")]
+        public String user_login;
+        [JsonProperty("user_fio")]
+        public String user_fio;
+        [JsonProperty("branch_id")]
+        public String branch_id;
+        [JsonProperty("agr_bpk_codes")]
+        public List<UInt64> agr_bpk_codes;
 
-        public static Agr GetInstance(String ObjID, OracleConnection con)
+        public static Agreement GetInstance(String ObjID, OracleConnection con)
         {
 
             String AgrType = ObjID.Split(';')[0];
             OracleCommand cmd = con.CreateCommand();
-            Agr res = new Agr();
+            Agreement res = new Agreement();
 
             switch (AgrType)
             {
                 case "DPT":
                     Decimal DptID = Convert.ToDecimal(ObjID.Split(';')[1]);
-                    cmd.CommandText = @"select agr_code, rnk, changed, created, branch_id, user_login, user_fio, agr_type, 
-                                               agr_status, agr_number, agr_date_open, agr_date_close, account_number
+                    cmd.CommandText = @"select rnk, parent_agr_type, parent_agr_code,
+                                               agr_type, agr_code, agr_number, agr_status, agr_date_open, agr_date_close, created, changed, user_login, user_fio, branch_id
                                           from TABLE (ead_integration.get_AgrDPT_Instance_Set(:p_agr_id))";
                     cmd.Parameters.Clear();
-                    cmd.Parameters.Add("p_agr_id", OracleDbType.Int64, Convert.ToInt64(DptID), ParameterDirection.Input);
+                    cmd.Parameters.Add("p_agr_id", OracleDbType.Decimal, DptID, ParameterDirection.Input);
 
                     using (OracleDataReader rdr = cmd.ExecuteReader())
                     {
                         if (rdr.Read())
                         {
-                            res.Agr_code = Convert.ToUInt64(rdr["agr_code"]);
-                            res.Rnk = Convert.ToUInt64(rdr["rnk"]);
-                            res.Changed = Convert.ToDateTime(rdr["changed"]);
-                            res.Created = Convert.ToDateTime(rdr["created"]);
-                            res.Branch_ID = Convert.ToString(rdr["branch_id"]);
-                            res.User_Login = Convert.ToString(rdr["user_login"]);
-                            res.User_Fio = Convert.ToString(rdr["user_fio"]);
-                            res.Agr_Type = Convert.ToString(rdr["agr_type"]);
-                            res.Agr_Status = Convert.ToString(rdr["agr_status"]);
-                            res.Agr_Number = Convert.ToString(rdr["agr_number"]);
-                            res.Agr_date_open = Convert.ToDateTime(rdr["agr_date_open"]);
-                            res.Account_Number = Convert.ToString(rdr["account_number"]);
-                            res.Agr_date_close = rdr["agr_date_close"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(rdr["agr_date_close"]);
+                            res.rnk = Convert.ToUInt64(rdr["rnk"]);
+                            res.parent_agr_type = Convert.ToString(rdr["parent_agr_type"]);
+                            res.parent_agr_code = Convert.ToString(rdr["parent_agr_code"]);
+                            res.agr_type = Convert.ToString(rdr["agr_type"]);
+                            //res.agr_code = rdr["agr_code"] == DBNull.Value ? (Int32?)null : Convert.ToInt32(rdr["agr_code"]);
+                            res.agr_code = Convert.ToString(rdr["agr_code"]);
+                            res.agr_number = Convert.ToString(rdr["agr_number"]);
+                            res.agr_status = Convert.ToByte(rdr["agr_status"]);
+                            res.agr_date_open = Convert.ToDateTime(rdr["agr_date_open"]);
+                            res.agr_date_close = rdr["agr_date_close"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(rdr["agr_date_close"]);
+                            res.created = Convert.ToDateTime(rdr["created"]);
+                            res.changed = Convert.ToDateTime(rdr["changed"]);
+                            res.user_login = Convert.ToString(rdr["user_login"]);
+                            res.user_fio = Convert.ToString(rdr["user_fio"]);
+                            res.branch_id = Convert.ToString(rdr["branch_id"]);
                         }
-
                         rdr.Close();
                     }
 
                     // связанные РНК
-                    res.LinkedRNK = new List<LinkedRNK>();
+                    res.third_persons = new List<Third_Persons>();
 
                     cmd.CommandText = @"select rnk, linkpersonstateid from TABLE (ead_integration.get_AgrDPT_LinkedRnk_Set(:p_agr_id))";//в выборку не должны попадать дублирующие записи.
                     //Union - в выборку должен попасть вноситель вклада(ACTION_ID = 0) если на данный момент он не владелец счета (t1.rnk <> t2.rnk)
                     cmd.Parameters.Clear();
-                    cmd.Parameters.Add("p_agr_id", OracleDbType.Int64, Convert.ToUInt64(DptID), ParameterDirection.Input);
+                    cmd.Parameters.Add("p_agr_id", OracleDbType.Decimal, DptID, ParameterDirection.Input);
 
                     using (OracleDataReader rdr = cmd.ExecuteReader())
                     {
                         while (rdr.Read())
                         {
-                            res.LinkedRNK.Add(new LinkedRNK(Convert.ToUInt64(rdr["rnk"]), Convert.ToInt16(rdr["linkpersonstateid"])));
+                            res.third_persons.Add(new Third_Persons(Convert.ToUInt64(rdr["rnk"]), Convert.ToByte(rdr["linkpersonstateid"])));
                         }
 
                         rdr.Close();
                     }
+
                     break;
 
                 case "WAY":
                     Decimal ND = Convert.ToDecimal(ObjID.Split(';')[1]);
-                    cmd.CommandText = @"select agr_code, rnk, changed, created, branch_id, user_login, user_fio, agr_type, 
-                                               agr_status, agr_number, agr_date_open, agr_date_close, account_number
+                    cmd.CommandText = @"select rnk, parent_agr_type, parent_agr_code,
+                                               agr_type, agr_code, agr_number, agr_status, agr_date_open, agr_date_close, created, changed, user_login, user_fio, branch_id                                                 
                                           from TABLE (ead_integration.get_AgrBPK_Instance_Set(:p_agr_id))";
                     cmd.Parameters.Clear();
-                    cmd.Parameters.Add("p_agr_id", OracleDbType.Int64, Convert.ToInt64(ND), ParameterDirection.Input);
+                    cmd.Parameters.Add("p_agr_id", OracleDbType.Decimal, ND, ParameterDirection.Input);
 
                     using (OracleDataReader rdr = cmd.ExecuteReader())
                     {
                         if (rdr.Read())
                         {
-                            res.Agr_code = Convert.ToUInt64(rdr["agr_code"]);
-                            res.Rnk = Convert.ToUInt64(rdr["rnk"]);
-                            res.Changed = Convert.ToDateTime(rdr["changed"]);
-                            res.Created = Convert.ToDateTime(rdr["created"]);
-                            res.Branch_ID = Convert.ToString(rdr["branch_id"]);
-                            res.User_Login = Convert.ToString(rdr["user_login"]);
-                            res.User_Fio = Convert.ToString(rdr["user_fio"]);
-                            res.Agr_Type = Convert.ToString(rdr["agr_type"]);
-                            res.Agr_Status = Convert.ToString(rdr["agr_status"]);
-                            res.Agr_Number = Convert.ToString(rdr["agr_number"]);
-                            res.Agr_date_open = Convert.ToDateTime(rdr["agr_date_open"]);
-                            res.Account_Number = Convert.ToString(rdr["account_number"]);
-                            res.Agr_date_close = rdr["agr_date_close"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(rdr["agr_date_close"]);
+                            res.rnk = Convert.ToUInt64(rdr["rnk"]);
+                            res.parent_agr_type = Convert.ToString(rdr["parent_agr_type"]);
+                            res.parent_agr_code = Convert.ToString(rdr["parent_agr_code"]);
+                            res.agr_type = Convert.ToString(rdr["agr_type"]);
+                            //res.agr_code = rdr["agr_code"] == DBNull.Value ? (Int32?)null : Convert.ToInt32(rdr["agr_code"]);
+                            res.agr_code = Convert.ToString(rdr["agr_code"]);
+                            res.agr_number = Convert.ToString(rdr["agr_number"]);
+                            res.agr_status = Convert.ToByte(rdr["agr_status"]);
+                            res.agr_date_open = Convert.ToDateTime(rdr["agr_date_open"]);
+                            res.agr_date_close = rdr["agr_date_close"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(rdr["agr_date_close"]);
+                            res.created = Convert.ToDateTime(rdr["created"]);
+                            res.changed = Convert.ToDateTime(rdr["changed"]);
+                            res.user_login = Convert.ToString(rdr["user_login"]);
+                            res.user_fio = Convert.ToString(rdr["user_fio"]);
+                            res.branch_id = Convert.ToString(rdr["branch_id"]);
                         }
 
                         rdr.Close();
+                    }
+                    break;
+                case "DKBO":
+                    Decimal DKBOND = Convert.ToDecimal(ObjID.Split(';')[1]);
+                    cmd.CommandText = @"select rnk, parent_agr_type, parent_agr_code,
+                                               agr_type, agr_code, agr_number, agr_status, agr_date_open, agr_date_close, created, changed, user_login, user_fio, branch_id    
+                                          from TABLE (ead_integration.get_AgrDKBO_Instance_Set(:p_agr_id))";
+                    cmd.Parameters.Clear();
+                    cmd.Parameters.Add("p_agr_id", OracleDbType.Decimal, DKBOND, ParameterDirection.Input);
+
+                    using (OracleDataReader rdr = cmd.ExecuteReader())
+                    {
+                        if (rdr.Read())
+                        {
+                            res.rnk = Convert.ToUInt64(rdr["rnk"]);
+                            res.parent_agr_type = Convert.ToString(rdr["parent_agr_type"]);
+                            res.parent_agr_code = Convert.ToString(rdr["parent_agr_code"]);
+                            res.agr_type = Convert.ToString(rdr["agr_type"]);
+                            //res.agr_code = rdr["agr_code"] == DBNull.Value ? (Int32?)null : Convert.ToInt32(rdr["agr_code"]);
+                            res.agr_code = Convert.ToString(rdr["agr_code"]);
+                            res.agr_number = Convert.ToString(rdr["agr_number"]);
+                            res.agr_status = Convert.ToByte(rdr["agr_status"]);
+                            res.agr_date_open = Convert.ToDateTime(rdr["agr_date_open"]);
+                            res.agr_date_close = rdr["agr_date_close"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(rdr["agr_date_close"]);
+                            res.created = Convert.ToDateTime(rdr["created"]);
+                            res.changed = Convert.ToDateTime(rdr["changed"]);
+                            res.user_login = Convert.ToString(rdr["user_login"]);
+                            res.user_fio = Convert.ToString(rdr["user_fio"]);
+                            res.branch_id = Convert.ToString(rdr["branch_id"]);
+                        }
+
+                        rdr.Close();
+                    }
+
+                    // Параметр на період завершення впровадження ДКБО. Массив кодів угод БПК, створених після появи ДКБО. для депозитів не заповнюємо
+                    res.agr_bpk_codes = new List<UInt64>();
+
+                    cmd.CommandText = @"select column_value as ND from TABLE (ead_integration.get_AgrBPKcodes_Set(:p_agr_id, :p_acc_list))";
+                    cmd.Parameters.Clear();
+                    cmd.Parameters.Add("p_agr_id", OracleDbType.Decimal, DKBOND, ParameterDirection.Input);
+                    if (ObjID.Split(';').Length == 3)
+                    {
+                        cmd.Parameters.Add("p_acc_list", OracleDbType.Varchar2, Convert.ToString(ObjID.Split(';')[2]), ParameterDirection.Input);
+
+                        using (OracleDataReader rdr = cmd.ExecuteReader())
+                        {
+                            while (rdr.Read())
+                            {
+                                res.agr_bpk_codes.Add(Convert.ToUInt64(rdr["ND"]));
+                            }
+                            rdr.Close();
+                        }
                     }
                     break;
                 default:
@@ -551,68 +624,68 @@ namespace Bars.EAD.Structs.Params
     /// <summary>
     /// Параметри - Угода Юр.лица
     /// </summary>
-    public struct UAgr
+    public struct UAgreement
     {
-        [JsonProperty("agr_code")]
-        public String Agr_code;
         [JsonProperty("RNK")]
-        public UInt64 Rnk;
+        public UInt64 rnk;
         [JsonProperty("changed")]
-        public DateTime Changed;
+        public DateTime changed;
         [JsonProperty("created")]
-        public DateTime Created;
-        [JsonProperty("client_type")]
-        public Int64 Client_type;
-        [JsonProperty("branch_id")]
-        public String Branch_ID;
+        public DateTime created;
         [JsonProperty("user_login")]
-        public String User_Login;
+        public String user_login;
         [JsonProperty("user_fio")]
-        public String User_Fio;
+        public String user_fio;
+        [JsonProperty("branch_id")]
+        public String branch_id;
+        [JsonProperty("agr_code")]
+        public String agr_code;
         [JsonProperty("agr_type")]
-        public String Agr_Type;
+        public String agr_type;
         [JsonProperty("agr_status")]
-        public String Agr_Status;
+        public Byte agr_status;
         [JsonProperty("agr_number")]
-        public String Agr_Number;
+        public String agr_number;
         [JsonProperty("agr_date_open")]
-        public DateTime Agr_Date_open;
+        public DateTime agr_date_open;
         [JsonProperty("agr_date_close")]
-        public DateTime? Agr_date_close;
+        public DateTime? agr_date_close;
 
-        public static UAgr GetInstance(String ObjID, OracleConnection con)
+        public static UAgreement GetInstance(String ObjID, OracleConnection con)
         {
             //dbLogger.Info("UAGR obj_id = " + ObjID);
             String AgrType = ObjID.Split(';')[0];
             OracleCommand cmd = con.CreateCommand();
+            cmd.Parameters.Clear();
+            cmd.BindByName = true;
             switch (AgrType)
             {
                 case "DPT":
                     Decimal DpuID = Convert.ToDecimal(ObjID.Split(';')[1]);
-                    cmd.CommandText = @"select agr_code, rnk, changed, created, client_type, branch_id, user_login, user_fio, agr_type, 
+                    cmd.CommandText = @"select agr_code, rnk, changed, created, branch_id, user_login, user_fio, agr_type, 
                                                agr_status, agr_number, agr_date_open, agr_date_close
                                           from TABLE (ead_integration.get_UAgrDPU_Instance_Set(:p_dpu_id))";
-                    //DBLogger.Info("p_dpu_id = " + DpuID.ToString());
-
-                    cmd.Parameters.Clear();
                     cmd.Parameters.Add("p_dpu_id", OracleDbType.Decimal, DpuID, ParameterDirection.Input);
 
                     break;
                 case "ACC":
-                    Decimal ACC = Convert.ToDecimal(ObjID.Split(';')[1].Split('|')[0]);
-                    //DateTime Daos = DateTime.ParseExact(ObjID.Split(';')[1].Split('|')[1], "yyyyMMdd", null);
-                    //Decimal RNK = Convert.ToDecimal(ObjID.Split(';')[1].Split('|')[2]);
+                    Decimal ACC = Convert.ToDecimal(ObjID.Split(';')[1]);
+                    bool ReservedAcc = ObjID.Split(';').ElementAtOrDefault(2) == "RSRV";
 
-                    cmd.CommandText = @"select agr_code, rnk, changed, created, client_type, branch_id, user_login, user_fio, agr_type, 
+                    if (ReservedAcc)
+                    {
+                        cmd.CommandText = @"select agr_code, rnk, changed, created, branch_id, user_login, user_fio, agr_type, 
+                                               agr_status, agr_number, agr_date_open, agr_date_close
+                                          from TABLE (ead_integration.get_UAgrACCRsrv_Instance_Set(:p_rsrv_id))";
+                        cmd.Parameters.Add("p_rsrv_id", OracleDbType.Int64, ACC, ParameterDirection.Input);
+                    }
+                    else
+                    {
+                        cmd.CommandText = @"select agr_code, rnk, changed, created, branch_id, user_login, user_fio, agr_type, 
                                                agr_status, agr_number, agr_date_open, agr_date_close
                                           from TABLE (ead_integration.get_UAgrACC_Instance_Set(:p_acc))";
-                    //DBLogger.Info("p_branch = " + Branch + " p_daos = " + Daos + " p_rnk = " + RNK);
-
-                    cmd.Parameters.Clear();
-                    //cmd.Parameters.Add("p_branch", OracleDbType.Varchar2, Branch, ParameterDirection.Input);
-                    //cmd.Parameters.Add("p_daos", OracleDbType.Date, Daos, ParameterDirection.Input);
-                    //cmd.Parameters.Add("p_rnk", OracleDbType.Decimal, RNK, ParameterDirection.Input);
-                    cmd.Parameters.Add("p_acc", OracleDbType.Decimal, ACC, ParameterDirection.Input);
+                        cmd.Parameters.Add("p_acc", OracleDbType.Int64, ACC, ParameterDirection.Input);
+                    }
 
                     break;
                 case "DPT_OLD":
@@ -620,12 +693,11 @@ namespace Bars.EAD.Structs.Params
                     DateTime Daos = DateTime.ParseExact(ObjID.Split(';')[1].Split('|')[1], "yyyyMMdd", null);
                     ACC = Convert.ToDecimal(ObjID.Split(';')[1].Split('|')[2]);
 
-                    cmd.CommandText = @"select agr_code, rnk, changed, created, client_type, branch_id, user_login, user_fio, agr_type, 
+                    cmd.CommandText = @"select agr_code, rnk, changed, created, branch_id, user_login, user_fio, agr_type, 
                                                agr_status, agr_number, agr_date_open, agr_date_close
                                           from TABLE (ead_integration.get_UAgrDPTOLD_Instance_Set(:p_nls, :p_daos, :p_acc))";
                     //DBLogger.Info("p_nls = " + NLS + " p_daos = " + Daos + " p_acc = " + ACC);
 
-                    cmd.Parameters.Clear();
                     cmd.Parameters.Add("p_nls", OracleDbType.Varchar2, NLS, ParameterDirection.Input);
                     cmd.Parameters.Add("p_daos", OracleDbType.Date, Daos, ParameterDirection.Input);
                     cmd.Parameters.Add("p_acc", OracleDbType.Decimal, ACC, ParameterDirection.Input);
@@ -634,13 +706,23 @@ namespace Bars.EAD.Structs.Params
                 case "DBO":
                     Decimal DBO = Convert.ToDecimal(ObjID.Split(';')[1].Split('|')[0]);
                     //dbLogger.Info("UAGR DBO(RNK) = " + DBO);
-                    cmd.CommandText = @"select agr_code, rnk, changed, created, client_type, branch_id, user_login, user_fio, agr_type, 
+                    cmd.CommandText = @"select agr_code, rnk, changed, created, branch_id, user_login, user_fio, agr_type, 
                                                agr_status, agr_number, agr_date_open, agr_date_close
                                           from TABLE (ead_integration.get_UAgrDBO_Instance_Set(:p_rnk))";
 
-                    cmd.Parameters.Clear();
                     cmd.Parameters.Add("p_rnk", OracleDbType.Int64, DBO, ParameterDirection.Input);
-                    
+
+                    break;
+
+                case "SALARY":
+                    decimal pId = Convert.ToDecimal(ObjID.Split(';')[1]);
+                    string pStatus = Convert.ToString(ObjID.Split(';')[2]);
+                    cmd.CommandText = @"select agr_code, rnk, changed, created, branch_id, user_login, user_fio, agr_type,
+                                             agr_status, agr_number, agr_date_open, agr_date_close
+                                        from TABLE (ead_integration.get_UAgrSalary_Instance_Set(:p_id,:p_status))";
+                    cmd.Parameters.Add("p_id", OracleDbType.Decimal, pId, ParameterDirection.Input);
+                    cmd.Parameters.Add("p_status", OracleDbType.Varchar2, pStatus, ParameterDirection.Input);
+
                     break;
                 default:
                     throw new Bars.Exception.BarsException("Попытка создать объект сделка UAgr неизвестного типа " + AgrType);
@@ -648,26 +730,25 @@ namespace Bars.EAD.Structs.Params
 
             //dbLogger.Info("cmd.CommandText = " + cmd.CommandText);
 
-            UAgr res = new UAgr();
+            UAgreement res = new UAgreement();
             using (OracleDataReader rdr = cmd.ExecuteReader())
             {
                 if (rdr.Read())
                 {
                     //   DBLogger.Info("Convert.ToString(rdr[agr_code]) = " + Convert.ToString(rdr["agr_code"]));
 
-                    res.Agr_code = Convert.ToString(rdr["agr_code"]);
-                    res.Rnk = Convert.ToUInt64(rdr["rnk"]);
-                    res.Changed = Convert.ToDateTime(rdr["changed"]);
-                    res.Created = Convert.ToDateTime(rdr["created"]);
-                    res.Client_type = Convert.ToInt64(rdr["client_type"]);
-                    res.Branch_ID = Convert.ToString(rdr["branch_id"]);
-                    res.User_Login = Convert.ToString(rdr["user_login"]);
-                    res.User_Fio = Convert.ToString(rdr["user_fio"]);
-                    res.Agr_Type = Convert.ToString(rdr["agr_type"]);
-                    res.Agr_Status = Convert.ToString(rdr["agr_status"]);
-                    res.Agr_Number = Convert.ToString(rdr["agr_number"]);
-                    res.Agr_Date_open = Convert.ToDateTime(rdr["agr_date_open"]);
-                    res.Agr_date_close = rdr["agr_date_close"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(rdr["agr_date_close"]);
+                    res.rnk = Convert.ToUInt64(rdr["rnk"]);
+                    res.changed = Convert.ToDateTime(rdr["changed"]);
+                    res.created = Convert.ToDateTime(rdr["created"]);
+                    res.user_login = Convert.ToString(rdr["user_login"]);
+                    res.user_fio = Convert.ToString(rdr["user_fio"]);
+                    res.branch_id = Convert.ToString(rdr["branch_id"]);
+                    res.agr_code = Convert.ToString(rdr["agr_code"]);
+                    res.agr_type = Convert.ToString(rdr["agr_type"]);
+                    res.agr_status = Convert.ToByte(rdr["agr_status"]);
+                    res.agr_number = Convert.ToString(rdr["agr_number"]);
+                    res.agr_date_open = Convert.ToDateTime(rdr["agr_date_open"]);
+                    res.agr_date_close = rdr["agr_date_close"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(rdr["agr_date_close"]);
                 }
 
                 //  DBLogger.Info("res_id = " + res.Agr_code);
@@ -678,20 +759,107 @@ namespace Bars.EAD.Structs.Params
         }
     }
     /// <summary>
-    /// Метод «SetAccountDataU» призначено для актуалізації інформації про рахунки корпоративного клієнта в рамках визначеної угоди клієнта
+    /// Метод «SetAccountData»  призначено для актуалізації інформації про рахунки клієнта фізичної особи в рамках визначеної угоди клієнта
     /// </summary>
     public struct Account
     {
         [JsonProperty("RNK")]
-        public UInt64 RNK;
-        [JsonProperty("agr_number")]
+        public UInt64 rnk;
+        [JsonProperty("agr_type")]
+        public String agr_type;
+        [JsonProperty("agr_code")]
+        public String agr_code;
+//        [JsonProperty("agr_number")]
+        [JsonIgnoreAttribute]
         public String agr_number;
+        [JsonProperty("account_type")]
+        public String account_type;
+        [JsonProperty("account_number")]
+        public String account_number;
+        [JsonProperty("account_currency")]
+        public String account_currency;
+        [JsonProperty("account_mfo")]
+        public UInt32 account_mfo;
+        [JsonProperty("account_open_date")]
+        public DateTime account_open_date;
+        [JsonProperty("account_close_date")]
+        public DateTime? account_close_date;
+        [JsonProperty("account_status")]
+        public Byte account_status;
+//        [JsonProperty("account_is_remote_control")]
+        [JsonIgnoreAttribute]
+        public bool? account_is_remote_control;
+        [JsonProperty("created")]
+        public DateTime created;
+        [JsonProperty("changed")]
+        public DateTime changed;
+        [JsonProperty("user_login")]
+        public String user_login;
+        [JsonProperty("user_fio")]
+        public String user_fio;
+        [JsonProperty("branch_id")]
+        public String branch_id;
+
+        public static Account GetInstance(String ObjID, OracleConnection con)
+        {
+            //   DBLogger.Debug("ACC");
+
+            String AgrType = ObjID.Split(';')[0];
+            UInt64 ACC = Convert.ToUInt64(ObjID.Split(';')[1]);
+
+            OracleCommand cmd = con.CreateCommand();
+            cmd.CommandText = @"select rnk, agr_type, agr_code, agr_number, account_type, account_number, account_currency, account_mfo, account_open_date, account_close_date, account_status, account_is_remote_control, created, changed, user_login, user_fio, branch_id
+                                  from TABLE (ead_integration.get_ACC_Instance_Set(:p_agr_type, :p_acc))";
+            cmd.Parameters.Clear();
+            cmd.BindByName = true;
+            cmd.Parameters.Add("p_agr_type", OracleDbType.Varchar2, AgrType, ParameterDirection.Input);
+            cmd.Parameters.Add("p_acc", OracleDbType.Int64, ACC, ParameterDirection.Input);
+
+            Account res = new Account();
+            using (OracleDataReader rdr = cmd.ExecuteReader())
+            {
+                if (rdr.Read())
+                {
+                    res.rnk = Convert.ToUInt64(rdr["rnk"]);
+                    res.agr_type = Convert.ToString(rdr["agr_type"]);
+                    res.agr_code = Convert.ToString(rdr["agr_code"]);
+                    res.agr_number = Convert.ToString(rdr["agr_number"]);
+                    res.account_type = Convert.ToString(rdr["account_type"]);
+                    res.account_number = Convert.ToString(rdr["account_number"]);
+                    res.account_currency = Convert.ToString(rdr["account_currency"]);
+                    res.account_mfo = Convert.ToUInt32(rdr["account_mfo"]);
+                    res.account_open_date = Convert.ToDateTime(rdr["account_open_date"]);
+                    res.account_close_date = rdr["account_close_date"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(rdr["account_close_date"]);
+                    res.account_status = Convert.ToByte(rdr["account_status"]);
+                    res.account_is_remote_control = rdr["account_is_remote_control"] == DBNull.Value ? (Boolean?)null : Convert.ToBoolean(rdr["account_is_remote_control"]);
+                    res.created = Convert.ToDateTime(rdr["created"]);
+                    res.changed = Convert.ToDateTime(rdr["changed"]);
+                    res.user_login = Convert.ToString(rdr["user_login"]);
+                    res.user_fio = Convert.ToString(rdr["user_fio"]);
+                    res.branch_id = Convert.ToString(rdr["branch_id"]);
+                }
+                rdr.Close();
+            }
+            //  DBLogger.Debug("ACC ok");
+            return res;
+        }
+    }
+
+    /// <summary>
+    /// Метод «SetAccountDataU» призначено для актуалізації інформації про рахунки корпоративного клієнта в рамках визначеної угоди клієнта
+    /// </summary>
+    public struct UAccount
+    {
+        [JsonProperty("RNK")]
+        public UInt64 rnk;
         [JsonProperty("agr_code")]
         public String agr_code;
         [JsonProperty("agr_type")]
         public String agr_type;
+        [JsonIgnoreAttribute]
+        public String agr_number;
         [JsonProperty("changed")]
-        public DateTime Changed;
+        public DateTime changed;
         [JsonProperty("account_number")]
         public String account_number;
         [JsonProperty("currency_code")]
@@ -711,25 +879,25 @@ namespace Bars.EAD.Structs.Params
         [JsonProperty("user_fio")]
         public String user_fio;
         [JsonProperty("account_status")]
-        public byte account_status;
+        public Byte account_status;
         [JsonProperty("remote_controled")]
         public bool remote_controled;
         //[JsonProperty("created")]
         //public DateTime Created;
 
-        public static Account GetInstance(String ObjID, OracleConnection con)
+        public static UAccount GetInstance(String ObjID, OracleConnection con)
         {
-            //   DBLogger.Debug("ACC");
+            //   DBLogger.Debug("UACC");
 
             String AgrType = ObjID.Split(';')[0];
             UInt64 ACC = Convert.ToUInt64(ObjID.Split(';')[1]);
-			bool ReservedAcc = ObjID.Split(';').ElementAtOrDefault(2) == "RSRV";
+            bool ReservedAcc = ObjID.Split(';').ElementAtOrDefault(2) == "RSRV";
 
             OracleCommand cmd = con.CreateCommand();
-			cmd.Parameters.Clear();
+            cmd.Parameters.Clear();
             cmd.BindByName = true;
             cmd.Parameters.Add("p_agr_type", OracleDbType.Varchar2, AgrType, ParameterDirection.Input);
-			if(ReservedAcc)
+            if(ReservedAcc)
             {
                 cmd.CommandText = @"select rnk, changed, created, user_login, user_fio, account_number, currency_code, mfo, branch_id, open_date, close_date, account_status, agr_number, agr_code, account_type, agr_type, remote_controled
                                  from TABLE (ead_integration.get_UACCRsrv_Instance_Set(:p_agr_type, :p_rsrv_id))";
@@ -737,21 +905,21 @@ namespace Bars.EAD.Structs.Params
             }
             else
             {
-				cmd.CommandText = @"select rnk, changed, created, user_login, user_fio, account_number, currency_code, mfo, branch_id, open_date, close_date, account_status, agr_number, agr_code, account_type, agr_type, remote_controled
-                                  from TABLE (ead_integration.get_ACC_Instance_Set(:p_agr_type, :p_acc))";            
-				cmd.Parameters.Add("p_acc", OracleDbType.Int64, ACC, ParameterDirection.Input);
-			}
+                cmd.CommandText = @"select rnk, changed, created, user_login, user_fio, account_number, currency_code, mfo, branch_id, open_date, close_date, account_status, agr_number, agr_code, account_type, agr_type, remote_controled
+                                 from TABLE (ead_integration.get_UACC_Instance_Set(:p_agr_type, :p_acc))";
+                cmd.Parameters.Add("p_acc", OracleDbType.Int64, ACC, ParameterDirection.Input);
+            }
 
-            Account res = new Account();
+            UAccount res = new UAccount();
             using (OracleDataReader rdr = cmd.ExecuteReader())
             {
                 if (rdr.Read())
                 {
-                    res.RNK = Convert.ToUInt64(rdr["rnk"]);
-                    res.agr_number = Convert.ToString(rdr["agr_number"]);
+                    res.rnk = Convert.ToUInt64(rdr["rnk"]);
                     res.agr_code = Convert.ToString(rdr["agr_code"]);
                     res.agr_type = Convert.ToString(rdr["agr_type"]);
-                    res.Changed = Convert.ToDateTime(rdr["changed"]);
+                    res.agr_number = Convert.ToString(rdr["agr_number"]);
+                    res.changed = Convert.ToDateTime(rdr["changed"]);
                     res.account_number = Convert.ToString(rdr["account_number"]);
                     res.currency_code = Convert.ToString(rdr["currency_code"]);
                     res.account_type = Convert.ToString(rdr["account_type"]);
@@ -775,36 +943,36 @@ namespace Bars.EAD.Structs.Params
     /// <summary>
     /// Параметри - Актуалізація ідент. документів
     /// </summary>
-    public struct Act
+    public struct Actualization
     {
         [JsonProperty("RNK")]
-        public UInt64 Rnk;
+        public UInt64 rnk;
         [JsonProperty("branch_id")]
-        public String Branch_ID;
-        [JsonProperty("user_login")]
-        public String User_Login;
-        [JsonProperty("user_fio")]
-        public String User_Fio;
+        public String branch_id;
         [JsonProperty("actual_date")]
-        public DateTime Actual_Date;
+        public DateTime actual_date;
+        [JsonProperty("user_login")]
+        public String user_login;
+        [JsonProperty("user_fio")]
+        public String user_fio;
 
-        public static Act GetInstance(String ObjID, OracleConnection con)
+        public static Actualization GetInstance(String ObjID, OracleConnection con)
         {
             OracleCommand cmd = con.CreateCommand();
             cmd.CommandText = @"select rnk, branch_id, user_login, user_fio,actual_date from TABLE (ead_integration.get_Act_Instance_Rec(:p_rnk))";
             cmd.Parameters.Clear();
             cmd.Parameters.Add("p_rnk", OracleDbType.Int64, Convert.ToUInt64(ObjID), ParameterDirection.Input);
 
-            Act res = new Act();
+            Actualization res = new Actualization();
             using (OracleDataReader rdr = cmd.ExecuteReader())
             {
                 if (rdr.Read())
                 {
-                    res.Rnk = Convert.ToUInt64(rdr["rnk"]);
-                    res.Branch_ID = Convert.ToString(rdr["branch_id"]);
-                    res.User_Login = Convert.ToString(rdr["user_login"]);
-                    res.User_Fio = Convert.ToString(rdr["user_fio"]);
-                    res.Actual_Date = Convert.ToDateTime(rdr["actual_date"]);
+                    res.rnk = Convert.ToUInt64(rdr["rnk"]);
+                    res.branch_id = Convert.ToString(rdr["branch_id"]);
+                    res.actual_date = Convert.ToDateTime(rdr["actual_date"]);
+                    res.user_login = Convert.ToString(rdr["user_login"]);
+                    res.user_fio = Convert.ToString(rdr["user_fio"]);
                 }
 
                 rdr.Close();
@@ -816,7 +984,7 @@ namespace Bars.EAD.Structs.Params
     /// <summary>
     /// Параметри - Довідник
     /// </summary>
-    public struct Dict
+    public struct Dictionary
     {
         public static Object[] GetData(String ObjID, OracleConnection con)
         {
@@ -841,15 +1009,25 @@ namespace Bars.EAD.Structs.Params
         public String User_Login;
         public String User_Fio;
         public String User_Password;
+        public String EA_ServiceUrl;
 
-        public static StartSession GetInstance()
+        public static StartSession GetInstance(String kf)
         {
             StartSession res = new StartSession();
+            IDbLogger _dbLogger;
+            _dbLogger = DbLoggerConstruct.NewDbLogger();
 
-            res.User_Login = Bars.Configuration.ConfigurationSettings.AppSettings["ead.User_Login"];
-            res.User_Fio = Bars.Configuration.ConfigurationSettings.AppSettings["ead.User_Fio"];
+            String EadParLogin = "ead.User_Login" + kf;
+            String EadParUserFio = "ead.User_Fio" + kf;
+            String EadParUserPassword = "ead.User_Password" + kf;
+            String EAdServiceUrl = "ead.ServiceUrl" + kf;
 
-            String PasswordClear = Bars.Configuration.ConfigurationSettings.AppSettings["ead.User_Password"];
+            _dbLogger.Info(String.Format("EadParLogin= {0}, EadParUserFio= {1}, EadParUserPassword= {2} ", EadParLogin, EadParUserFio, EadParUserPassword));
+            res.User_Login = Bars.Configuration.ConfigurationSettings.AppSettings[EadParLogin];
+            res.User_Fio = Bars.Configuration.ConfigurationSettings.AppSettings[EadParUserFio];
+            res.EA_ServiceUrl = Bars.Configuration.ConfigurationSettings.AppSettings[EAdServiceUrl];
+
+            String PasswordClear = Bars.Configuration.ConfigurationSettings.AppSettings[EadParUserPassword];
             using (MD5 MD5Hash = MD5.Create())
             {
                 String PasswordHash = StartSession.GetMd5Hash(MD5Hash, PasswordClear);
@@ -875,17 +1053,16 @@ namespace Bars.EAD.Structs.Params
     /// </summary>
     public class DocumentData
     {
-        [JsonProperty("ID")]
-        public Int64? ID;
         [JsonProperty("RNK")]
-        public UInt64? Rnk;
-        [JsonProperty("struct_code")]
-        public Int16? Struct_Code;
-        [JsonProperty("agreement_id")]
-        public Double? Agreement_ID;
+        public UInt64? rnk;
+        [JsonProperty("doc_id")]
+        public String ID;
+        [JsonProperty("doc_type")]
+        public String Struct_Code;
         [JsonProperty("doc_request_number")]
         public String Doc_Request_Number;
-/*
+        [JsonProperty("agr_code")]
+        public Double? Agreement_ID;
         [JsonProperty("agr_type")]
         public String agr_type;
         [JsonProperty("account_type")]
@@ -894,30 +1071,28 @@ namespace Bars.EAD.Structs.Params
         public String account_number;
         [JsonProperty("account_currency")]
         public String account_currency;
-*/
 
-        public DocumentData(Int64? ID)
+
+        public DocumentData(String ID)
         {
             this.ID = ID;
         }
-        public DocumentData(Decimal Rnk, Double? Agreement_ID, Int16? Struct_Code)
+        public DocumentData(Decimal rnk, Double? Agreement_ID, String Struct_Code)
         {
-            this.Rnk = Convert.ToUInt64(Rnk);
+            this.rnk = Convert.ToUInt64(rnk);
             this.Agreement_ID = Agreement_ID;
             this.Struct_Code = Struct_Code;
         }
-        public DocumentData(Decimal Rnk, Double? Agreement_ID, Int16? Struct_Code, String Doc_Request_Number, String agr_type, String account_type, String account_number, String account_currency)
+        public DocumentData(Decimal rnk, Double? Agreement_ID, String Struct_Code, String Doc_Request_Number, String agr_type, String account_type, String account_number, String account_currency)
         {
-            this.Rnk = Convert.ToUInt64(Rnk);
+            this.rnk = Convert.ToUInt64(rnk);
             this.Agreement_ID = Agreement_ID;
             this.Struct_Code = Struct_Code;
             this.Doc_Request_Number = Doc_Request_Number;
-/*
             this.agr_type = agr_type;
             this.account_type = account_type;
             this.account_number = account_number;
             this.account_currency = account_currency;
-*/
         }
     }
 }
@@ -1072,7 +1247,7 @@ namespace Bars.EAD.Structs.Result
         [JsonProperty("doc_link")]
         public String DocLink { get; set; }
         [JsonProperty("struct_code")]
-        public Int16 Struct_Code { get; set; }
+        public String Struct_Code { get; set; }
         [JsonProperty("struct_name")]
         public String Struct_Name { get; set; }
 
@@ -1232,23 +1407,25 @@ namespace Bars.EAD
         # endregion
 
         # region Конструктор
-        public SyncMessage(Int64 ID, String SessionID, OracleConnection con)
+        public SyncMessage(Int64 ID, String SessionID, OracleConnection con, String kf)
             : base(SessionID, SyncMessage.GetMethodByID(ID, con), ID)
         {
-            Init(con);
+            Init(con, kf);
             InitParams(con);
         }
         # endregion
 
         # region Приватные методы
-        private void Init(OracleConnection con)
+        private void Init(OracleConnection con, String kf)
         {
             OracleCommand cmd = con.CreateCommand();
             cmd.CommandText = @"select sq.crt_date, sq.type_id, sq.obj_id
                                   from ead_sync_queue sq, ead_types t
                                  where sq.id = :p_sync_id
                                    and sq.type_id = t.id";
+                                   //and sq.kf = :p_kf";
             cmd.Parameters.Add("p_sync_id", OracleDbType.Int64, this._ID, ParameterDirection.Input);
+            //cmd.Parameters.Add("p_kf", OracleDbType.Varchar2, string.IsNullOrWhiteSpace(kf) ? null : kf, ParameterDirection.Input);
 
             using (OracleDataReader rdr = cmd.ExecuteReader())
             {
@@ -1267,25 +1444,28 @@ namespace Bars.EAD
             switch (this.TypeID)
             {
                 case "DOC":
-                    this._Params = new Object[1] { Structs.Params.Doc.GetInstance(this._ObjID, con) };
+                    this._Params = new Object[1] { Structs.Params.Document.GetInstance(this._ObjID, con) };
                     break;
                 case "CLIENT":
                     this._Params = new Object[1] { Structs.Params.Client.GetInstance(this._ObjID, con) };
                     break;
                 case "AGR":
-                    this._Params = new Object[1] { Structs.Params.Agr.GetInstance(this._ObjID, con) };
+                    this._Params = new Object[1] { Structs.Params.Agreement.GetInstance(this._ObjID, con) };
                     break;
                 case "UAGR":
-                    this._Params = new Object[1] { Structs.Params.UAgr.GetInstance(this._ObjID, con) };
+                    this._Params = new Object[1] { Structs.Params.UAgreement.GetInstance(this._ObjID, con) };
                     break;
                 case "ACT":
-                    this._Params = new Object[1] { Structs.Params.Act.GetInstance(this._ObjID, con) };
+                    this._Params = new Object[1] { Structs.Params.Actualization.GetInstance(this._ObjID, con) };
                     break;
                 case "ACC":
-                    this._Params = new Object[1] { Structs.Params.Account.GetInstance(this._ObjID, con) };//счета клиента-юр.лица
+                    this._Params = new Object[1] { Structs.Params.Account.GetInstance(this._ObjID, con) };//счета клиента-физ.лица
+                    break;
+                case "UACC":
+                    this._Params = new Object[1] { Structs.Params.UAccount.GetInstance(this._ObjID, con) };//счета клиента-юр.лица
                     break;
                 case "DICT":
-                    this._Params = Structs.Params.Dict.GetData(this._ObjID, con);
+                    this._Params = Structs.Params.Dictionary.GetData(this._ObjID, con);
                     break;
                 case "UCLIENT":
                     this._Params = new Object[1] { Structs.Params.UClient.GetInstance(this._ObjID, con) };//Отдельный класс для клиентов юр.лиц в связи с разным подходом к формированию сообщения.
@@ -1330,8 +1510,8 @@ namespace Bars.EAD
         # endregion
 
         # region Конструктор
-        public DictMessage(Int64 ID, String SessionID, OracleConnection con)
-            : base(ID, SessionID, con)
+        public DictMessage(Int64 ID, String SessionID, OracleConnection con, string kf)
+            : base(ID, SessionID, con, kf)
         {
             InitParams(con);
         }
@@ -1367,24 +1547,26 @@ namespace Bars.EAD
         public String User_Fio;
         [JsonProperty("user_password")]
         public String User_Password;
+        public String EADServiceUrl;
         # endregion
 
         # region Конструктор
-        public StartSessionMessage(OracleConnection con)
+        public StartSessionMessage(OracleConnection con, String kf)
             : base("StartSession", con)
         {
-            InitParams(con);
+            InitParams(con, kf);
         }
         # endregion
 
         # region Приватные методы
-        private void InitParams(OracleConnection con)
+        private void InitParams(OracleConnection con, String kf)
         {
-            Structs.Params.StartSession per = Structs.Params.StartSession.GetInstance();
+            Structs.Params.StartSession per = Structs.Params.StartSession.GetInstance(kf);
 
             this.User_Login = per.User_Login;
             this.User_Fio = per.User_Fio;
             this.User_Password = per.User_Password;
+            this.EADServiceUrl = per.EA_ServiceUrl;
         }
         # endregion
 
@@ -1468,7 +1650,7 @@ namespace Bars.EAD
 
     /// <summary>
     /// Сервис для интеграции с ЕА
-    /// version 3.1   01/01/2018
+    /// version 3.2   01/02/2018
     /// </summary>
     [WebService(Namespace = "http://ws.unity-bars.com.ua/")]
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
@@ -1566,7 +1748,7 @@ namespace Bars.EAD
 
         # region Веб-методы
         [WebMethod(EnableSession = true)]
-        public void MsgProcess(Int64 ID, String WSProxyUserName, String WSProxyPassword)
+        public void MsgProcess(Int64 ID, String WSProxyUserName, String WSProxyPassword, String kf)
         {
             // авторизация пользователя, в случае ошибки она полетит к вызывающей стороне
             Boolean isAuthenticated = CustomAuthentication.AuthenticateUser(WSProxyUserName, WSProxyPassword, true);
@@ -1588,23 +1770,23 @@ namespace Bars.EAD
                 con.Open();
             try
             {
-                SessionID = StartSession(con);
+                SessionID = StartSession(con, kf);
 
                 // если синхронизация справочников то используем другой класс
                 if (SyncMessage.GetMethodByID(ID, con) == "SetDictionaryData")
                 {
-                    msg = new DictMessage(ID, SessionID, con);
+                    msg = new DictMessage(ID, SessionID, con, kf);
                 }
                 else
                 {
-                    msg = new SyncMessage(ID, SessionID, con);
+                    msg = new SyncMessage(ID, SessionID, con, kf);
                 }
             }
             finally
             {
                 con.Close();
             }
-
+            String _EAServiceUrl = Convert.ToString(Bars.Configuration.ConfigurationSettings.AppSettings["ead.ServiceUrl" + kf]);
             // Формируем сообщение
             String MessageID = msg.Message_ID;
             DateTime MessageDate = DateTime.Now;
@@ -1615,19 +1797,19 @@ namespace Bars.EAD
             EadPack ep = new EadPack(bb_con);
 
             // устанавлдиваем статус
-            ep.MSG_SET_STATUS_SEND(ID, MessageID, MessageDate, Message);
+            ep.MSG_SET_STATUS_SEND(ID, MessageID, MessageDate, Message, kf);
 
             // отправляем запрос по Http
             Response rsp;
             try
             {
-                String ResponseText = GetEAResponseText(Message);
+                String ResponseText = GetEAResponseText(Message, _EAServiceUrl);
                 // сохраняем ответ
-                ep.MSG_SET_STATUS_RECEIVED(ID, ResponseText);
+                ep.MSG_SET_STATUS_RECEIVED(ID, ResponseText, kf);
 
                 // парсим ответ
                 rsp = Response.CreateFromJSONString(msg.Method, ResponseText);
-                ep.MSG_SET_STATUS_PARSED(ID, rsp.Responce_ID, rsp.Current_Timestamp);
+                ep.MSG_SET_STATUS_PARSED(ID, rsp.Responce_ID, rsp.Current_Timestamp, kf);
 
                 // Анализируем ответ
                 if (rsp.Status == "ERROR" || String.IsNullOrEmpty(rsp.Status))
@@ -1636,12 +1818,12 @@ namespace Bars.EAD
                     if (rsp.Result != null)
                     {
                         Structs.Result.Error err = (rsp.Result as Newtonsoft.Json.Linq.JToken).ToObject<Structs.Result.Error>();
-                        ep.MSG_SET_STATUS_ERROR(ID, String.Format("Помилка на статусі RECEIVED: {0}, {1}", err.Error_Code, err.Error_Text));
+                        ep.MSG_SET_STATUS_ERROR(ID, String.Format("Помилка на статусі RECEIVED: {0}, {1}", err.Error_Code, err.Error_Text), kf);
                     }
                     else
                     {
                         // Structs.Result.Error2 err2 = (rsp.error as Newtonsoft.Json.Linq.JToken).ToObject<Structs.Result.Error2>();
-                        ep.MSG_SET_STATUS_ERROR(ID, String.Format("Помилка на статусі RECEIVED: {0}, {1}", rsp.error.Error_Code, rsp.error.Error_Text));
+                        ep.MSG_SET_STATUS_ERROR(ID, String.Format("Помилка на статусі RECEIVED: {0}, {1}", rsp.error.Error_Code, rsp.error.Error_Text), kf);
                     }
                 }
                 else
@@ -1654,7 +1836,7 @@ namespace Bars.EAD
                         if (!String.IsNullOrEmpty(res.Error))
                         {
                             // устанавлдиваем статус "Помилка"
-                            ep.MSG_SET_STATUS_ERROR(ID, String.Format("Помилка на статусі RECEIVED: {0}", res.Error));
+                            ep.MSG_SET_STATUS_ERROR(ID, String.Format("Помилка на статусі RECEIVED: {0}", res.Error), kf);
                             HasErrors = true;
                             break;
                         }
@@ -1662,19 +1844,19 @@ namespace Bars.EAD
 
                     if (!HasErrors)
                         // устанавлдиваем статус "Виконано"
-                        ep.MSG_SET_STATUS_DONE(ID);
+                        ep.MSG_SET_STATUS_DONE(ID, kf);
                 }
             }
             catch (System.Exception e)
             {  // устанавливаем статус "Помилка" и выходим
-                ep.MSG_SET_STATUS_ERROR(ID, String.Format("Помилка на статусі SEND: {0}, {1}", e.Message, e.StackTrace));
+                ep.MSG_SET_STATUS_ERROR(ID, String.Format("Помилка на статусі SEND: {0}, {1}", e.Message, e.StackTrace), kf);
             }
 
             // Заканчиваем сессию взаимодействия
             if (con.State != ConnectionState.Open) con.Open();
             try
             {
-                CloseSession(SessionID, con);
+                CloseSession(SessionID, con, _EAServiceUrl);
             }
             finally
             {
@@ -1697,13 +1879,13 @@ namespace Bars.EAD
         }
         # region Статические методы
         // Получить ответ по заданому запросу
-        public static String GetEAResponseText(String Message)
+        public static String GetEAResponseText(String Message, String _EAServiceUrl)
         {
             Byte[] MessageBytes = Encoding.UTF8.GetBytes(Message);
             String ResponseText;
 
             //создаем соединение WebRequest Request = WebRequest.Create(EA_ServiceUrl);
-            HttpWebRequest Request = (HttpWebRequest)WebRequest.Create(EA_ServiceUrl);
+            HttpWebRequest Request = (HttpWebRequest)WebRequest.Create(_EAServiceUrl);
             if (EA_UsingSSL)//для SSL соединянния добавляем сертификат клиента
             {
                 //добавляем сертификат клиента
@@ -1767,16 +1949,17 @@ namespace Bars.EAD
             }
         }
         // Начать сессию взаимодействия с ЕА
-        public static String StartSession(OracleConnection con)
+        public static String StartSession(OracleConnection con, String kf)
         {
+            String _EAServiceUrl = Convert.ToString(Bars.Configuration.ConfigurationSettings.AppSettings["ead.ServiceUrl" + kf]);
             String res = String.Empty;
 
             // Формируем сообщение
-            StartSessionMessage msg = new StartSessionMessage(con);
+            StartSessionMessage msg = new StartSessionMessage(con, kf);
             String Message = msg.GetJSONString();
 
             // отправляем запрос по Http
-            String ResponseText = GetEAResponseText(Message);
+            String ResponseText = GetEAResponseText(Message, _EAServiceUrl);
 
             Response rsp = Response.CreateFromJSONString("StartSession", ResponseText);
 
@@ -1795,14 +1978,14 @@ namespace Bars.EAD
             return res;
         }
         // Закрыть сессию взаимодействия с ЕА
-        public static void CloseSession(String SessionID, OracleConnection con)
+        public static void CloseSession(String SessionID, OracleConnection con, String _EA_ServiceUrl)
         {
             // Формируем сообщение
             CloseSessionMessage msg = new CloseSessionMessage(SessionID, con);
             String Message = msg.GetJSONString();
 
             // отправляем запрос по Http
-            String ResponseText = GetEAResponseText(Message);
+            String ResponseText = GetEAResponseText(Message, _EA_ServiceUrl);
 
             Response rsp = Response.CreateFromJSONString("CloseSession", ResponseText);
 
@@ -1819,12 +2002,13 @@ namespace Bars.EAD
         /// <summary>
         /// GetDocumentData(Int64? ID ... String Doc_Request_Number)) - obsolete
         /// </summary>
-        public static List<Structs.Result.DocumentData> GetDocumentData(Int64? ID, Decimal? Rnk, Double? Agreement_ID, Int16? Struct_Code, String Doc_Request_Number)
+        public static List<Structs.Result.DocumentData> GetDocumentData(Int64? ID, Decimal? Rnk, Double? Agreement_ID, Int16? Struct_Code, String Doc_Request_Number, String kf)
         {
-            return GetDocumentData(ID, Rnk, Agreement_ID, Struct_Code, Doc_Request_Number, null, null, null, null);
+            return GetDocumentData(ID.ToString(), Rnk, Agreement_ID, Struct_Code.ToString(), Doc_Request_Number, null, null, null, null, kf);
         }
-        public static List<Structs.Result.DocumentData> GetDocumentData(Int64? ID, Decimal? Rnk, Double? Agreement_ID, Int16? Struct_Code, String Doc_Request_Number, String agr_type, String account_type, String account_number, String account_currency)
+        public static List<Structs.Result.DocumentData> GetDocumentData(String ID, Decimal? Rnk, Double? Agreement_ID, String Struct_Code, String Doc_Request_Number, String agr_type, String account_type, String account_number, String account_currency, String kf)
         {
+            String _EAServiceUrl = Convert.ToString(Bars.Configuration.ConfigurationSettings.AppSettings["ead.ServiceUrl" + kf]);
             List<Structs.Result.DocumentData> res = new List<Structs.Result.DocumentData>();
 
             // считаем что пользователь авторизирован
@@ -1836,7 +2020,7 @@ namespace Bars.EAD
             if (con.State != ConnectionState.Open) con.Open();
             try
             {
-                SessionID = StartSession(con);
+                SessionID = StartSession(con, kf);
                 msg = new SessionMessage(SessionID, "GetDocumentData", con);
             }
             finally
@@ -1845,17 +2029,17 @@ namespace Bars.EAD
             }
 
             // формируем параметры запроса
-            if (ID.HasValue)
-                msg.Params = new Structs.Params.DocumentData(ID.Value);
+            if (!String.IsNullOrWhiteSpace(ID))
+                msg.Params = new Structs.Params.DocumentData(ID);
             else
             {
                 if (String.IsNullOrEmpty(Doc_Request_Number))
                 {
-                    msg.Params = new Structs.Params.DocumentData(Rnk.Value, Agreement_ID, Struct_Code.Value);
+                    msg.Params = new Structs.Params.DocumentData(Rnk.Value, Agreement_ID, Struct_Code);
                 }
                 else
                 {
-                    msg.Params = new Structs.Params.DocumentData(Rnk.Value, Agreement_ID, Struct_Code.Value, Doc_Request_Number, agr_type, account_type, account_number, account_currency);
+                    msg.Params = new Structs.Params.DocumentData(Rnk.Value, Agreement_ID, Struct_Code, Doc_Request_Number, agr_type, account_type, account_number, account_currency);
 
                 }
             }
@@ -1864,7 +2048,7 @@ namespace Bars.EAD
             String Message = msg.GetJSONString();
 
             // отправляем запрос по Http
-            String ResponseText = GetEAResponseText(Message);
+            String ResponseText = GetEAResponseText(Message, _EAServiceUrl);
 
             // парсим ответ
             Response rsp = Response.CreateFromJSONString(msg.Method, ResponseText);
@@ -1894,7 +2078,7 @@ namespace Bars.EAD
                 {
                     OracleCommand cmd = con.CreateCommand();
                     cmd.CommandText = "select name from ead_struct_codes where id = :p_id";
-                    cmd.Parameters.Add("p_id", OracleDbType.Int16, ParameterDirection.Input);
+                    cmd.Parameters.Add("p_id", OracleDbType.Varchar2, ParameterDirection.Input);
 
                     foreach (Newtonsoft.Json.Linq.JToken obj in (rsp.Result as Newtonsoft.Json.Linq.JArray))
                     {
@@ -1917,7 +2101,7 @@ namespace Bars.EAD
             if (con.State != ConnectionState.Open) con.Open();
             try
             {
-                CloseSession(SessionID, con);
+                CloseSession(SessionID, con, _EAServiceUrl);
             }
             finally
             {
