@@ -13,6 +13,9 @@
     <link href="../Content/Themes/ModernUI/css/buttons.css" rel="stylesheet" />
     <link href="../content/themes/modernui/css/tiptip.css" rel="stylesheet" />
     
+    <link href="/barsroot/Content/Themes/Kendo/kendo.common.min.css" rel="stylesheet" />
+    <link href="/barsroot/Content/Themes/Kendo/kendo.bootstrap.min.css" rel="stylesheet" />
+ 
     <script type="text/javascript" src="../Scripts/html5shiv.js"></script>
     
     <script type="text/javascript" src="../Scripts/jquery/jquery.min.js"></script>
@@ -22,12 +25,14 @@
     <script type="text/javascript" src="../Scripts/jquery/jquery-ui.min.js"></script>
     <script type="text/javascript" src="../Scripts/jquery/jquery.bars.ui.js"></script>
     <script type="text/javascript" src="../Content/Themes/ModernUI/scripts/jquery.tiptip.js"></script>
+    <script type="text/javascript" src="../Scripts/kendo/kendo.all.min.js"></script>
+    <script type="text/javascript" src="../Scripts/kendo/kendo.aspnetmvc.min.js"></script>
     <script type="text/javascript" src="../Scripts/Bars/bars.ui.js"></script>
     <script type="text/javascript" src="../Scripts/Bars/bars.config.js"></script>
 
     <script type="text/javascript"src="typingCheckerCtrl.js"></script>
 
-    <script language="javascript" type="text/javascript" src="JScriptFortab_main_rekv.js?v=<%= barsroot.ServicesClass.GetVersionWeb() %>.t002"></script>
+    <script language="javascript" type="text/javascript" src="JScriptFortab_main_rekv.js?v=<%= barsroot.ServicesClass.GetVersionWeb() %>.t003"></script>
     <script language="javascript" type="text/javascript" src="JScriptFortab_main_rekv_person.js?v=<%= barsroot.ServicesClass.GetVersionWeb() %>.t001"></script>
 
  
