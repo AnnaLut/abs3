@@ -1,16 +1,14 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_EBKC_LEGAL_PERSON_REL.sql =========**
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_EBKC_LEGAL_PERSON_REL ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_EBKC_LEGAL_PERSON_REL ("KF", "RNK", "REL_RNK", "NAME", "K014", "K040", "REGIONCODE", "K110", "K051", "K070", "OKPO", "ISOKPOEXCLUSION", "TELEPHONE", "EMAIL", "K080", "ADDRESS", "DOCTYPE", "DOCSER", "DOCNUMBER", "DOCISSUEDATE", "DOCORGAN", "ACTUALDATE", "EDDRID", "BIRTHDAY", "BIRTHPLACE", "SEX", "NOTES", "RELSIGN") AS 
-  select -- Пов’язані особи для юриків
-       f_ourmfo_g as kf,                                      --Код РУ (код МФО)
-       c.rnk,                                                        --Реєстр. №
+create or replace force view V_EBKC_LEGAL_PERSON_REL
+( KF, RNK, REL_RNK, NAME, K014, K040, REGIONCODE, K110, K051, K070, OKPO, ISOKPOEXCLUSION, TELEPHONE
+, EMAIL, K080, ADDRESS, DOCTYPE, DOCSER, DOCNUMBER, DOCISSUEDATE, DOCORGAN, ACTUALDATE, EDDRID, BIRTHDAY
+, BIRTHPLACE, SEX, NOTES, RELSIGN, CUST_ID
+) AS 
+  select c.KF,                                                 -- Код РУ (код МФО)
+       case
+         when ( EBK_PARAMS.IS_CUT_RNK = 1 )
+         then trunc(c.RNK/100)
+         else c.RNK
+       end as RNK,                                                   --Реєстр. №
        decode(r.rel_intext, 1, r.rel_rnk, to_number(null))
          as rel_rnk,                                       --РНК повязаної особи
        r.name,                                   --Назва або ПІБ повязаної особи
@@ -21,9 +19,9 @@ PROMPT *** Create  view V_EBKC_LEGAL_PERSON_REL ***
        r.sed  as k051,                             --Форма господарювання (К051)
        r.ise  as k070,                           --Інст. сектор економіки (К070)
        r.okpo,                                      --Ідент. Код / Код за ЕДРПОУ
-       (SELECT cw.VALUE FROM customerw cw
-        WHERE cw.tag = 'EOKPO' AND r.rel_rnk = cw.rnk)
-        as isOkpoExclusion,                 --Ознака виключення Ідент. Код
+       ( SELECT cw.VALUE FROM customerw cw
+          WHERE cw.tag = 'EOKPO' AND r.rel_rnk = cw.rnk
+       ) as isOkpoExclusion,                     -- Ознака виключення Ідент. Код
        r.tel  as telephone,                                            --Телефон
        r.email,                                                         --e-mail
        r.fs  as k080,                                   --Форма власності (K080)
@@ -41,17 +39,15 @@ PROMPT *** Create  view V_EBKC_LEGAL_PERSON_REL ***
        r.birthplace,                                          --Місце народження
        r.sex,                                                            --Стать
        '' as notes,                                        --Коментар (примітки)
-       r.rel_id as relSign                                 --Ознака пов’язаності
- from customer c, corps p, V_CUSTOMER_REL r
+       r.rel_id as relSign,                                --Ознака пов’язаності
+       c.RNK as CUST_ID
+ from CUSTOMER c
+    , CORPS p
+    , V_CUSTOMER_REL r
 where c.custtype = 2
   and c.rnk = r.rnk
   and c.rnk = p.rnk;
 
-PROMPT *** Create  grants  V_EBKC_LEGAL_PERSON_REL ***
-grant SELECT                                                                 on V_EBKC_LEGAL_PERSON_REL to BARS_ACCESS_DEFROLE;
+show errors;
 
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_EBKC_LEGAL_PERSON_REL.sql =========**
-PROMPT ===================================================================================== 
+grant SELECT on V_EBKC_LEGAL_PERSON_REL to BARS_ACCESS_DEFROLE;

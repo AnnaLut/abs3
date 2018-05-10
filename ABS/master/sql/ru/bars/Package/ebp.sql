@@ -9,7 +9,7 @@ IS
   --
   -- пакет процедур для роботи Еталонного Бізнес Процесу (ЕБП) Ощадбанк
   --
-  g_header_version  CONSTANT  VARCHAR2(64)  := 'version 1.13  15.08.2016';
+  g_header_version  CONSTANT  VARCHAR2(64)  := 'version 1.14  02.05.2018';
   g_awk_header_defs CONSTANT  VARCHAR2(512) := '';
 
   REQUEST_ALLOWED   CONSTANT  number(1)     :=  1;
@@ -97,7 +97,16 @@ IS
   ( p_dptid        in  dpt_deposit.deposit_id%type
   ) return dpt_deposit.archdoc_id%type
     result_cache;
-
+  --
+  -- Повертає ідентифікатор друкованого документа ДКБО в ЕА
+  --
+  function GET_ARCHIVE_DKBO_DOCID
+  ( p_acc                in w4_acc.acc_pk%type,
+    p_rnk                in deal.customer_id%type,
+    p_struct_code        in ead_struct_codes.id%type,
+    p_template           in ead_docs.template_id%type
+  ) return number
+    result_cache;
   --
   -- Встановлення ознаки перевірки реквізитів документу, що посвідчує особу
   --
@@ -225,7 +234,7 @@ END EBP;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.EBP 
 IS
-  g_body_version  CONSTANT VARCHAR2(64)  := 'version 1.28  31.08.2016';
+  g_body_version  CONSTANT VARCHAR2(64)  := 'version 1.27  02.05.2018';
   g_awk_body_defs CONSTANT VARCHAR2(512) := '';
 
   g_modcode       CONSTANT VARCHAR2(3)   := 'DPT';
@@ -1251,13 +1260,72 @@ IS
      end;
      return l_payval;
  end;
+
+  --
+  -- Повертає ідентифікатор друкованого документа ДКБО в ЕА
+  --
+  function GET_ARCHIVE_DKBO_DOCID
+  ( p_acc                in w4_acc.acc_pk%type,
+    p_rnk                in deal.customer_id%type,
+    p_struct_code        in ead_struct_codes.id%type,
+    p_template           in ead_docs.template_id%type
+  ) return number
+    result_cache
+  is
+   l_res number := null;
+   l_type_id number;
+   l_state_id number;
+   p_id number;
+  begin
+
+    ead_integration.get_dkbo_settings(l_type_id, l_state_id);
+    if (l_type_id is null and l_state_id is null)
+     then return null;
+    else
+        begin
+      SELECT d.id  into p_id
+        FROM attribute_number_value a
+        JOIN deal d
+          ON d.id = a.object_id
+         AND a.value = p_acc
+        JOIN attribute_kind k
+          ON k.id = a.attribute_id
+         AND k.attribute_code = 'DKBO_ACC_LIST'
+        JOIN object_type t
+          ON t.id = d.deal_type_id
+         AND t.type_code = 'DKBO';  
+
+        exception when no_data_found then p_id := null; return null;
+        end;
+
+        begin
+         select case when SIGN_DATE is not null then id
+                          else -id
+                     end
+                  into l_res
+               from
+               (select ed.sign_date, ed.id, ed.crt_date, max(ed.crt_date) over (partition by template_id order by crt_date desc) max_crt_date
+                from ead_docs ed
+               where ed.AGR_ID = p_id
+                 and ED.EA_STRUCT_ID = p_struct_code
+                 and ED.RNK = p_rnk
+                 and ed.template_id = p_template)
+               where crt_date = max_crt_date;
+        exception
+          when NO_DATA_FOUND then
+            bars_audit.error('EBP.GET_ARCHIVE_DKBO_DOCID : не знайдено жодного друку документу для РНК = '|| to_char(p_rnk) || ' угоди ДКБО = ' || to_char(p_id) || ' з кодом ЕА = ' || p_struct_code || ' і шаблоном ' || p_template);
+            l_res := null;
+        end;
+       end if;
+   return l_res;
+  end;
 END EBP;
 /
  show err;
  
 PROMPT *** Create  grants  EBP ***
-grant EXECUTE                                                                on EBP             to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on EBP             to DPT_ROLE;
+grant EXECUTE on EBP to BARS_ACCESS_DEFROLE;
+grant EXECUTE on EBP to DPT_ROLE;
 
  
  

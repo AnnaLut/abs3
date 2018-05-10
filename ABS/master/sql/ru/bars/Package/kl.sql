@@ -1,5 +1,5 @@
-create or replace package KL
-is
+CREATE OR REPLACE PACKAGE KL IS
+
 --***************************************************************************--
 -- (C) BARS. Contragents
 --***************************************************************************--
@@ -371,6 +371,40 @@ procedure setFullCustomerAddress (
 	p_comment		customer_address.comm%type default null,
 	p_flag_visa  number default 0 );
 
+
+--***************************************************************************--
+-- PROCEDURE  : setFullCustomerAddress
+-- DESCRIPTION  : процедура обновлени€ адресов клиента с новой структурой
+-- передаетс€ и »ƒ и наименование, все равно оно уже есть не вебе
+--***************************************************************************--
+procedure setFullCustomerAddress (
+  p_rnk           customer_address.rnk%type,
+  p_typeId      customer_address.type_id%type,
+  p_country     customer_address.country%type,
+  p_zip           customer_address.zip%type,
+  p_domain      customer_address.domain%type,
+  p_region      customer_address.region%type,
+  p_locality    customer_address.locality%type,
+  p_address     customer_address.address%type,
+  p_territoryId   customer_address.territory_id%type,
+  p_locality_type customer_address.locality_type%type,
+  p_street_type   customer_address.street_type%type,
+  p_street        customer_address.street%type,
+  p_home_type     customer_address.home_type%type,
+  p_home          customer_address.home%type,
+  p_homepart_type customer_address.homepart_type%type,
+  p_homepart      customer_address.homepart%type,
+  p_room_type     customer_address.room_type%type,
+  p_room          customer_address.room%type,
+  p_comment       customer_address.comm%type default null,
+  p_region_id     customer_address.region_id%type,
+  p_area_id       customer_address.area_id%type,
+  p_settlement_id customer_address.settlement_id%type,
+  p_street_id     customer_address.street_id%type,
+  p_house_id      customer_address.house_id%type,
+  p_flag_visa     number default 0 );
+
+
 $if KL_PARAMS.TREASURY $then
 $else
 --***************************************************************************--
@@ -542,11 +576,8 @@ procedure check_attr_foropenacc (p_rnk in number, p_msg out varchar2);
 
 END KL;
 /
-
-show errors;
-
-create or replace package body KL
-is
+CREATE OR REPLACE PACKAGE BODY KL
+IS
 --***************************************************************************--
 -- (C) BARS. Contragents
 --***************************************************************************--
@@ -708,7 +739,7 @@ $end
 
 ---------------------------------------------------
 --
--- get_customer_field_access(p_field_code varchar2) 
+-- get_customer_field_access(p_field_code varchar2)
 --
 -- получить тип доступа к полю карточки клиента
 ---------------------------------------------------
@@ -717,8 +748,8 @@ is
    l_access_type_code cust_access_userid.access_type_code%type;
 begin
    begin
-      select access_type_code into l_access_type_code 
-       from cust_access_userid where field_code = p_field_code and userid = user_id;	   
+      select access_type_code into l_access_type_code
+       from cust_access_userid where field_code = p_field_code and userid = user_id;
    exception when no_data_found then l_access_type_code := 'NA'; -- доступа нету
    end;
    return l_access_type_code;
@@ -2341,6 +2372,201 @@ $end
   end if;
 
 END;
+
+--***************************************************************************--
+-- PROCEDURE  : setFullCustomerAddress
+-- DESCRIPTION  : процедура обновлени€ адресов клиента с новой структурой
+-- передаетс€ и »ƒ и наименование, все равно оно уже есть не вебе
+--***************************************************************************--
+procedure setFullCustomerAddress (
+  p_rnk           customer_address.rnk%type,
+  p_typeId      customer_address.type_id%type,
+  p_country     customer_address.country%type,
+  p_zip           customer_address.zip%type,
+  p_domain      customer_address.domain%type,
+  p_region      customer_address.region%type,
+  p_locality    customer_address.locality%type,
+  p_address     customer_address.address%type,
+  p_territoryId   customer_address.territory_id%type,
+  p_locality_type customer_address.locality_type%type,
+  p_street_type   customer_address.street_type%type,
+  p_street        customer_address.street%type,
+  p_home_type     customer_address.home_type%type,
+  p_home          customer_address.home%type,
+  p_homepart_type customer_address.homepart_type%type,
+  p_homepart      customer_address.homepart%type,
+  p_room_type     customer_address.room_type%type,
+  p_room          customer_address.room%type,
+  p_comment       customer_address.comm%type default null,
+  p_region_id     customer_address.region_id%type,
+  p_area_id       customer_address.area_id%type,
+  p_settlement_id customer_address.settlement_id%type,
+  p_street_id     customer_address.street_id%type,
+  p_house_id      customer_address.house_id%type,
+  p_flag_visa     number default 0 )
+IS
+  NewId_ number;
+  l_title varchar2(40) := 'kl.setFullCustomerAddress: ';
+BEGIN
+  bars_audit.trace('%s 1.params:'
+       || ' p_Rnk=>%s,'
+       || ' p_TypeId=>%s,'
+       || ' p_Country=>%s,'
+       || ' p_Zip=>%s,'
+       || ' p_Domain=>%s,'
+       || ' p_Region=>%s,'
+       || ' p_Locality=>%s,'
+       || ' p_Address=>%s,'
+       || ' p_TerritoryId=>' || to_char(p_TerritoryId),
+       l_title, to_char(p_Rnk), to_char(p_TypeId), to_char(p_Country),
+       p_Zip, p_Domain, p_Region, p_Locality, p_Address);
+
+  if p_flag_visa = 0
+  or p_flag_visa = 1 and not is_customer_visa(p_Rnk) then
+     -- ”даление
+     if     p_Country     is null
+        and p_Zip         is null
+        and p_Domain      is null
+        and p_Region      is null
+        and p_Locality    is null
+        and p_Address     is null
+        and p_TerritoryId is null
+     then
+        bars_audit.trace('%s 2. удаление данных об адресе клиента %s (тип=%s)', l_title, to_char(p_Rnk), to_char(p_TypeId));
+        delete from customer_address where rnk=p_Rnk and type_id=p_TypeId;
+        bars_audit.trace('%s 3. завершено удаление данных об адресе клиента %s (тип=%s)', l_title, to_char(p_Rnk), to_char(p_TypeId));
+     else
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        -- ќбновление
+    -- дл€ сум≥сност≥ з≥ старою верс≥Їю
+    if (p_locality_type is null
+        and p_street_type is null
+        and p_street is null
+        and p_home_type is null
+        and p_home is null
+        and p_homepart_type is null
+        and p_homepart is null
+        and p_room_type is null
+        and p_room is null
+      and p_comment is null ) then
+
+        update customer_address
+        set country       = p_Country,
+          zip            = p_Zip,
+          domain         = p_Domain,
+          region        = p_Region,
+          locality      = p_Locality,
+          address       = p_Address,
+          territory_id  = p_TerritoryId
+        where rnk = p_Rnk and type_id = p_TypeId;
+
+    else
+
+      update customer_address
+        set country       = p_Country,
+          zip            = p_Zip,
+          domain         = p_Domain,
+          region        = p_Region,
+          locality      = p_Locality,
+          address       = p_Address,
+          territory_id  = p_TerritoryId,
+          --locality_type = p_locality_type,
+          --street_type   = p_street_type,
+          street        = p_street,
+          home_type     = p_home_type,
+          home          = p_home,
+          homepart_type = p_homepart_type,
+          homepart      = p_homepart,
+          room_type     = p_room_type,
+          room          = p_room,
+          comm          = p_comment,
+          region_id     = p_region_id,
+          area_id       = p_area_id,
+          settlement_id = p_settlement_id,
+          street_id     = p_street_id,
+          house_id      = p_house_id,
+          locality_type_n = p_locality_type,
+          street_type_n   = p_street_type
+        where rnk = p_Rnk and type_id = p_TypeId;
+
+    end if;
+
+        if sql%rowcount = 0 then
+           bars_audit.trace('%s 4. регистраци€ данных об адресе клиента %s (тип=%s)', l_title, to_char(p_Rnk), to_char(p_TypeId));
+           -- ƒобавление
+           insert into customer_address (rnk, type_id, country, zip, domain, region, locality, address, territory_id,
+              locality_type, street_type, street, home_type, home, homepart_type, homepart, room_type, room, comm,
+              region_id, area_id, settlement_id, street_id, house_id)
+           values ( p_Rnk, p_TypeId, p_Country, p_Zip, p_Domain, p_Region, p_Locality, p_Address, p_TerritoryId,
+              p_locality_type, p_street_type, p_street, p_home_type, p_home, p_homepart_type, p_homepart,p_room_type, p_room, p_comment,
+              p_region_id, p_area_id, p_settlement_id, p_street_id,p_house_id);
+           bars_audit.trace('%s 5. завершена регистраци€ данных об адресе клиента %s (тип=%s)', l_title, to_char(p_Rnk), to_char(p_TypeId));
+        else
+           bars_audit.trace('%s 6. завершено обновление данных об адресе клиента %s (тип=%s)', l_title, to_char(p_Rnk), to_char(p_TypeId));
+        end if;
+
+$if KL_PARAMS.SBER $then
+        ADD_EBK_QUEUE(p_rnk);
+
+$end
+     end if;
+$if KL_PARAMS.CLV $then
+  else
+     declare
+        l_clv clv_customer_address%rowtype;
+     begin
+        l_clv.rnk           := p_Rnk;
+        l_clv.type_id       := p_TypeId;
+        l_clv.country       := p_Country;
+        l_clv.zip           := p_Zip;
+        l_clv.domain        := p_Domain;
+        l_clv.region        := p_Region;
+        l_clv.locality      := p_Locality;
+        l_clv.address       := p_Address;
+        l_clv.territory_id  := p_TerritoryId;
+        l_clv.locality_type := p_locality_type;
+        l_clv.street_type   := p_street_type;
+        l_clv.street        := p_street;
+        l_clv.home_type     := p_home_type;
+        l_clv.home          := p_home;
+        l_clv.homepart_type := p_homepart_type;
+        l_clv.homepart      := p_homepart;
+        l_clv.room_type     := p_room_type;
+        l_clv.room          := p_room;
+        l_clv.comm          := p_comment;
+        bars_clv.set_req_customeraddress(l_clv);
+     end;
+$end
+  end if;
+
+END;
+
 
 $if KL_PARAMS.TREASURY $then
 $else

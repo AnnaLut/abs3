@@ -12,3 +12,4 @@ grant execute on bars.number_list to bars_intgr;
 grant execute on bars.varchar2_list to bars_intgr;
 grant execute on bars.acrn to bars_intgr;
 grant execute on bars.gl to bars_intgr;
+grant execute on bars.xrm_dyn_dict to bars_intgr with grant option;

@@ -1,10 +1,11 @@
-CREATE OR REPLACE PACKAGE INTG_WB
+Prompt Package INTG_WB;
+CREATE OR REPLACE PACKAGE BARS.INTG_WB
 IS
   --
   -- пакет процедур для работы интеграции веб банкинга "Вклады населения-WEB"
   -- часть 1 продуктовый ряд депозитов
   --
-  g_header_version  CONSTANT VARCHAR2(64)  := 'version 1.06 07.02.2017';
+  g_header_version  CONSTANT VARCHAR2(64)  := 'version 1.07 05.04.2017';
   
   procedure header_mode (gmode in int);
   
@@ -45,11 +46,14 @@ IS
   function get_dpt_products return t_dpttype pipelined;
   --procedure ins_json(id in int, sjson1 in clob, sjson2 in clob);
   function get_loyality_rate(p_vidd dpt_vidd.vidd%type, p_kv tabval.kv%type) return number;
-  function frx2ea(p_deposit_id in dpt_deposit.deposit_id%type, p_rnk in customer.rnk%type) return ead_docs.id%type;
+  procedure frx2ea(p_deposit_id in dpt_deposit.deposit_id%type, p_rnk in customer.rnk%type, p_flags in dpt_vidd_flags.id%type);
+  procedure makeblob(dpt_id in dpt_deposit.deposit_id%type, report in blob, flags in dpt_vidd_flags.id%type);
 END INTG_WB;
+
 /
 
-CREATE OR REPLACE PACKAGE BODY INTG_WB
+Prompt Package Body INTG_WB;
+CREATE OR REPLACE PACKAGE BODY BARS.INTG_WB
 IS
   --
   -- пакет процедур для работы интеграции веб банкинга "Вклады населения-WEB"
@@ -733,7 +737,7 @@ procedure header_mode (gmode in int) is
       END;
    END;
 
-   function frx2ea(p_deposit_id in dpt_deposit.deposit_id%type, p_rnk in customer.rnk%type) return ead_docs.id%type
+   procedure frx2ea(p_deposit_id in dpt_deposit.deposit_id%type, p_rnk in customer.rnk%type, p_flags in dpt_vidd_flags.id%type)
    is
       l_result     ead_docs.id%type;
       l_request    soap_rpc.t_request;
@@ -742,8 +746,48 @@ procedure header_mode (gmode in int) is
       l_tmp        XMLTYPE;
       l_message    VARCHAR2 (4000);
       l_clob       CLOB;
+      l_web_usermap_row web_usermap%rowtype;
       title        constant varchar2(14) := 'intg_wb.frx2ea';
+      l_TECH_USER  varchar2(20) := 'TECH_W4';
+      l_kf         varchar2(6);
+
+   FUNCTION g_wsproxy_username RETURN string
+   IS
+      l_wsproxy_username   VARCHAR2 (100);
    BEGIN
+      SELECT MIN (b.val)
+        INTO l_wsproxy_username
+        FROM web_barsconfig b
+       WHERE b.key = 'ead.WSProxy.UserName';
+
+      RETURN l_wsproxy_username;
+   END g_wsproxy_username;
+
+   FUNCTION g_wsproxy_password
+      RETURN VARCHAR2
+   IS
+      l_wsproxy_password   VARCHAR2 (100);
+   BEGIN
+      SELECT MIN (b.val)
+        INTO l_wsproxy_password
+        FROM web_barsconfig b
+       WHERE b.key = 'ead.WSProxy.Password';
+
+      RETURN l_wsproxy_password;
+   END g_wsproxy_password;
+
+   BEGIN
+     /*begin
+         select kf
+           into l_kf
+           from mv_kf
+          where rownum = 1;
+           ikf(l_kf);
+           l_TECH_USER := rukey(l_TECH_USER);
+     exception when no_data_found then null;
+     end;
+	*/
+     l_TECH_USER := g_wsproxy_username(); -- 25.06.2017
     bars_audit.info(title || 'started p_deposit_id=>' || to_char(p_deposit_id) ||', p_rnk=>' || to_char(p_rnk));
     if (p_rnk is null) then
        begin
@@ -758,7 +802,7 @@ procedure header_mode (gmode in int) is
             from dpt_deposit_clos
            where deposit_id = p_deposit_id
              and action_id = 0;
-         exception when no_data_found then return -1;
+         exception when no_data_found then return;
          end;
         end;
     else l_rnk := p_rnk;
@@ -771,21 +815,63 @@ procedure header_mode (gmode in int) is
             p_method        => 'MakeFRX_Blob',
             p_wallet_dir    => get_param_webconfig('WB_EADDOC_WALLETDIR'),
             p_wallet_pass   => get_param_webconfig('WB_EADDOC_WALLETPASS'));
+       begin
+            select *
+            into   l_web_usermap_row
+            from   web_usermap t
+            where  t.webuser = lower(l_TECH_USER);
+       exception
+        when no_data_found then  raise_application_error(-20000, 'Користувач з ідентифікатором {' || to_char(l_TECH_USER) || '} не знайдений');
 
+       end;
       --добавить параметры
       soap_rpc.ADD_PARAMETER (l_request, 'dpt_id', TO_CHAR (p_deposit_id));
       soap_rpc.ADD_PARAMETER (l_request, 'rnk', TO_CHAR (l_rnk));
+      soap_rpc.ADD_PARAMETER (l_request, 'flags', TO_CHAR (p_flags));
+      soap_rpc.ADD_PARAMETER (l_request, 'userName', l_TECH_USER);
+--      soap_rpc.ADD_PARAMETER (l_request, 'password', coalesce(l_web_usermap_row.webpass, l_web_usermap_row.adminpass));
+      soap_rpc.ADD_PARAMETER (l_request, 'password', g_wsproxy_password());
       bars_audit.info(title || ' l_request.body=>' ||l_request.body);
 
       --позвать метод веб-сервиса
       l_response := soap_rpc.invoke (l_request);
-      l_clob := REPLACE (l_response.doc.getClobVal (), 'xmlns', 'mlns');
-      l_tmp := xmltype (l_clob);
+      
       bars_audit.info(title || ' l_response=>' ||l_clob);
-      l_result := EXTRACT (l_tmp, '/MakeFRX_BlobResponse/MakeFRX_BlobResult/text()', NULL);
-      bars_audit.info(title || ' l_result=>' ||l_result);
-      return l_result;
+    end;
+    procedure makeblob(dpt_id in dpt_deposit.deposit_id%type, report in blob, flags in dpt_vidd_flags.id%type)
+    is
+    l_archdoc_id dpt_deposit.archdoc_id%type;
+    l_kf         varchar2(6);
+    begin 
+      --костыль для представления надо норм механизм    
+      /*select substr(branch,2,6) into l_kf from dpt_deposit
+          where deposit_id = dpt_id;          
+          
+      bc.go(l_kf);
+      */
+         begin
+         select archdoc_id
+           into l_archdoc_id
+           from dpt_deposit
+          where deposit_id = dpt_id and wb='Y';
+         exception when no_data_found then bars_audit.error('intg_wb:makeblob failed deposit is not web-online'); return;
+         end;
+
+         update ead_docs
+            set scan_data = report, type_id='SCAN', ea_struct_id = case when flags =38 then 541 when flags = 39 then 543 when flags = 40 then 542 end,
+            template_id = null,
+            sign_date = sysdate,
+            page_count = 1
+          where id = l_archdoc_id
+            and (ea_struct_id = case when flags =38 then 212 when flags in(39,40) then 213 end or ea_struct_id in (541,542,543))
+            and agr_id = dpt_id;
+      bc.home();
     end;
 
 END INTG_WB;
+/
+
+
+Prompt Grants on PACKAGE INTG_WB TO BARS_ACCESS_DEFROLE to BARS_ACCESS_DEFROLE;
+GRANT EXECUTE ON BARS.INTG_WB TO BARS_ACCESS_DEFROLE
 /

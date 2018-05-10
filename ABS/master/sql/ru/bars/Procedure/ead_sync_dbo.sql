@@ -5,7 +5,7 @@ is
 begin
    bc.go(sys_context('bars_context','user_branch'));
  
-  l_sync_queue_id := ead_pack.msg_create('UAGR', 'DBO;'||to_char(p_rnk));
+  l_sync_queue_id := ead_pack.msg_create('UAGR', 'DBO;'||to_char(p_rnk), p_rnk);
 
   bars_audit.info('sync_queue_id:' || to_char(l_sync_queue_id));
  

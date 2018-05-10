@@ -1,183 +1,190 @@
+-- ======================================================================================
+-- Module : ADR
+-- Author : BAA
+-- Date   : 22.01.2016
+-- ======================================================================================
+-- create table ADR_STREETS
+-- ======================================================================================
 
+SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
+SET ECHO         OFF
+SET LINES        500
+SET PAGES        500
+SET FEEDBACK     OFF
 
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/ADR_STREETS.sql =========*** Run *** =
-PROMPT ===================================================================================== 
+prompt -- ======================================================
+prompt -- create Table ADR_STREETS
+prompt -- ======================================================
 
-
-PROMPT *** ALTER_POLICY_INFO to ADR_STREETS ***
-
-
-BEGIN 
-        execute immediate  
-          'begin  
-               bpa.alter_policy_info(''ADR_STREETS'', ''FILIAL'' , null, null, null, null);
-               bpa.alter_policy_info(''ADR_STREETS'', ''WHOLE'' , null, null, null, null);
-               null;
-           end; 
-          '; 
-END; 
+begin
+  BPA.ALTER_POLICY_INFO( 'ADR_STREETS', 'WHOLE' , NULL, NULL, NULL, NULL );
+  BPA.ALTER_POLICY_INFO( 'ADR_STREETS', 'FILIAL', null, null, null, null );
+end;
 /
 
-PROMPT *** Create  table ADR_STREETS ***
-begin 
-  execute immediate '
-  CREATE TABLE BARS.ADR_STREETS 
-   (	STREET_ID NUMBER(10,0), 
-	STREET_NAME VARCHAR2(50), 
-	STREET_NAME_RU VARCHAR2(50), 
-	STREET_TYPE NUMBER(3,0), 
-	SETTLEMENT_ID NUMBER(10,0), 
-	EFF_DT DATE, 
-	END_DT DATE
-   ) SEGMENT CREATION IMMEDIATE 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING
-  TABLESPACE BRSMDLD ';
-exception when others then       
-  if sqlcode=-955 then null; else raise; end if; 
-end; 
-/
+prompt ... 
+
+-- Create table
+create table BARS.ADR_STREETS
+(
+  street_id      NUMBER(10),
+  street_name    VARCHAR2(50),
+  street_name_ru VARCHAR2(50),
+  street_type    NUMBER(3),
+  settlement_id  NUMBER(10),
+  eff_dt         DATE,
+  end_dt         DATE
+)
+tablespace BRSMDLD
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 128K
+    next 128K
+    minextents 1
+    maxextents unlimited
+    pctincrease 0
+  );
+-- Add comments to the table 
+comment on table BARS.ADR_STREETS
+  is 'Довідник вулиць';
+-- Add comments to the columns 
+comment on column BARS.ADR_STREETS.street_id
+  is 'Ідентифікатор вулиці';
+comment on column BARS.ADR_STREETS.street_name
+  is 'Назва вулиці';
+comment on column BARS.ADR_STREETS.street_name_ru
+  is 'Назва вулиці (RUS)';
+comment on column BARS.ADR_STREETS.street_type
+  is 'Ідентифікатор типу вулиці';
+comment on column BARS.ADR_STREETS.settlement_id
+  is 'Ідентифікатор населеного пункту';
+
+-- Create/Rebegin
+begin
+    execute immediate 'create index BARS.I_ADRSTREETS_SETTLEMENTID on BARS.ADR_STREETS (SETTLEMENT_ID)
+  tablespace BRSSMLI
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 64K
+    minextents 1
+    maxextents unlimited
+    pctincrease 0
+  )';
+ exception when others then 
+    if sqlcode = -955 or sqlcode = -1408 then null; else raise; 
+    end if; 
+end;
+/ 
 
 
+begin
+    execute immediate 'create index BARS.I_ADRSTREETS_UNAME on BARS.ADR_STREETS (UPPER(STREET_NAME))
+  tablespace BRSSMLI
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 64K
+    minextents 1
+    maxextents unlimited
+    pctincrease 0
+  )';
+ exception when others then 
+    if sqlcode = -955 or sqlcode = -1408 then null; else raise; 
+    end if; 
+end;
+/ 
 
 
-PROMPT *** ALTER_POLICIES to ADR_STREETS ***
- exec bpa.alter_policies('ADR_STREETS');
+begin
+    execute immediate 'create index BARS.I_ADRSTREETS_UNAMERU on BARS.ADR_STREETS (UPPER(STREET_NAME_RU))
+  tablespace BRSSMLI
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 64K
+    minextents 1
+    maxextents unlimited
+    pctincrease 0
+  )';
+ exception when others then 
+    if sqlcode = -955 or sqlcode = -1408 then null; else raise; 
+    end if; 
+end;
+/ 
+
+-- Create/Recreate primary, unique and foreign key constraints 
+alter table BARS.ADR_STREETS
+  add constraint PK_STREETS primary key (STREET_ID)
+  using index 
+  tablespace BRSMDLI
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 64K
+    minextents 1
+    maxextents unlimited
+    pctincrease 0
+  );
+alter table BARS.ADR_STREETS
+  add constraint FK_STREETS_SETTLEMENTS foreign key (SETTLEMENT_ID)
+  references BARS.ADR_SETTLEMENTS (SETTLEMENT_ID);
+alter table BARS.ADR_STREETS
+  add constraint FK_STREETS_STREETTYPES foreign key (STREET_TYPE)
+  references BARS.ADR_STREET_TYPES (STR_TP_ID);
+-- Create/Recreate check constraints 
+alter table BARS.ADR_STREETS
+  add constraint CC_STREETS_EFFDT_NN
+  check ("EFF_DT" IS NOT NULL);
+alter table BARS.ADR_STREETS
+  add constraint CC_STREETS_SETTLEMENTID_NN
+  check ("SETTLEMENT_ID" IS NOT NULL);
+alter table BARS.ADR_STREETS
+  add constraint CC_STREETS_STREETID_NN
+  check ("STREET_ID" IS NOT NULL);
+alter table BARS.ADR_STREETS
+  add constraint CC_STREETS_STREETNAME_NN
+  check ("STREET_NAME" IS NOT NULL);
+-- Grant/Revoke object privileges 
+grant select on BARS.ADR_STREETS to BARSUPL;
+grant select on BARS.ADR_STREETS to FINMON01;
+grant select on BARS.ADR_STREETS to START1;
+grant select on BARS.ADR_STREETS to UPLD;
 
 
-COMMENT ON TABLE BARS.ADR_STREETS IS 'Довідник вулиць';
-COMMENT ON COLUMN BARS.ADR_STREETS.STREET_ID IS 'Ідентифікатор вулиці';
-COMMENT ON COLUMN BARS.ADR_STREETS.STREET_NAME IS 'Назва вулиці';
+SET FEEDBACK ON
+
+prompt -- ======================================================
+prompt -- Table comments
+prompt -- ======================================================
+
+comment on Table  BARS.ADR_STREETS is 'Довідник вулиць';
+
+COMMENT ON COLUMN BARS.ADR_STREETS.STREET_ID      IS 'Ідентифікатор вулиці';
+COMMENT ON COLUMN BARS.ADR_STREETS.STREET_NAME    IS 'Назва вулиці';
 COMMENT ON COLUMN BARS.ADR_STREETS.STREET_NAME_RU IS 'Назва вулиці (RUS)';
-COMMENT ON COLUMN BARS.ADR_STREETS.STREET_TYPE IS 'Ідентифікатор типу вулиці';
-COMMENT ON COLUMN BARS.ADR_STREETS.SETTLEMENT_ID IS 'Ідентифікатор населеного пункту';
-COMMENT ON COLUMN BARS.ADR_STREETS.EFF_DT IS '';
-COMMENT ON COLUMN BARS.ADR_STREETS.END_DT IS '';
+COMMENT ON COLUMN BARS.ADR_STREETS.STREET_TYPE    IS 'Ідентифікатор типу вулиці';
+COMMENT ON COLUMN BARS.ADR_STREETS.SETTLEMENT_ID  IS 'Ідентифікатор населеного пункту';
+COMMENT ON COLUMN BARS.ADR_STREETS.EFF_DT         IS 'The date from which an instance of the entity is valid.';
+COMMENT ON COLUMN BARS.ADR_STREETS.END_DT         IS 'The date after which an instance of the entity is no longer valid.';
 
+prompt -- ======================================================
+prompt -- Table grants
+prompt -- ======================================================
 
-
-
-PROMPT *** Create  constraint FK_STREETS_SETTLEMENTS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ADR_STREETS ADD CONSTRAINT FK_STREETS_SETTLEMENTS FOREIGN KEY (SETTLEMENT_ID)
-	  REFERENCES BARS.ADR_SETTLEMENTS (SETTLEMENT_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_STREETS_STREETTYPES ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ADR_STREETS ADD CONSTRAINT FK_STREETS_STREETTYPES FOREIGN KEY (STREET_TYPE)
-	  REFERENCES BARS.ADR_STREET_TYPES (STR_TP_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint PK_STREETS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ADR_STREETS ADD CONSTRAINT PK_STREETS PRIMARY KEY (STREET_ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STREETS_EFFDT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ADR_STREETS MODIFY (EFF_DT CONSTRAINT CC_STREETS_EFFDT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STREETS_SETTLEMENTID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ADR_STREETS MODIFY (SETTLEMENT_ID CONSTRAINT CC_STREETS_SETTLEMENTID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STREETS_STREETTYPE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ADR_STREETS MODIFY (STREET_TYPE CONSTRAINT CC_STREETS_STREETTYPE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STREETS_STREETNAME_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ADR_STREETS MODIFY (STREET_NAME CONSTRAINT CC_STREETS_STREETNAME_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STREETS_STREETID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ADR_STREETS MODIFY (STREET_ID CONSTRAINT CC_STREETS_STREETID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  index PK_STREETS ***
-begin   
- execute immediate '
-  CREATE UNIQUE INDEX BARS.PK_STREETS ON BARS.ADR_STREETS (STREET_ID) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
-PROMPT *** Create  grants  ADR_STREETS ***
-grant SELECT                                                                 on ADR_STREETS     to BARSUPL;
-grant SELECT                                                                 on ADR_STREETS     to START1;
-grant SELECT                                                                 on ADR_STREETS     to UPLD;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Table/ADR_STREETS.sql =========*** End *** =
-PROMPT ===================================================================================== 
+GRANT SELECT ON BARS.ADR_STREETS TO START1, BARSUPL, UPLD;

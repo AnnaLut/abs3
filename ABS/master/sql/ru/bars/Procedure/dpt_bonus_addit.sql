@@ -1,5 +1,4 @@
 
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ====== Scripts /Sql/BARS/Procedure/dpt_bonus_addit.sql =======*** Run ***
 PROMPT ===================================================================================== 
@@ -86,7 +85,7 @@ BEGIN
         INTO l_brate, l_irate, l_brtype
         FROM bars.int_ratn ir, bars.brates br
        WHERE br.br_id = ir.br
-         and br.br_type = 1 -- убрать, когда ступенчатую ставку переведут на плоскую
+         --and br.br_type = 1 -- убрать, когда ступенчатую ставку переведут на плоскую
          AND ir.acc = i.acc
          AND ir.bdat = (SELECT max(r.bdat)
                           FROM bars.int_ratn r
@@ -100,11 +99,11 @@ BEGIN
                     to_char(l_brate), to_char(l_irate), to_char(l_brtype));
 
     if l_brate > 0 then      -- #1 исключаем индивидуальные ставки
-      if (l_brtype = 'TIER' /* and l_irate > 0.5*/) then        --#2 должно быть: если ступенчатая и бонус больше 0.5 , то пропускаем. Сейчас: пропускаем любые ступенчатые
+      if (l_brtype = 'TIER' and l_irate > 0.5) then        --#2 должно быть: если ступенчатая и бонус больше 0.5 , то пропускаем. 
         null;
       elsif l_brtype = 'FORMULA' then        --#2
         null;
-      else --#2 плоские ставки (после реализации 6487 будут еще ступенчатые (с бонусом 0.5 и меньше)) 
+      else --#2 плоские ставки и ступенчатые с бонусом 0.5 и меньше 
 
         l_bonusval := 0;
         bc.go(i.kf);

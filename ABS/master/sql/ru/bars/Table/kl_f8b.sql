@@ -56,6 +56,15 @@ COMMENT ON COLUMN BARS.KL_F8B.LINK_GROUP IS 'Код групи контрагентів';
 
 
 
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KL_F8B add LINK_GROUP NUMBER ';
+exception when others then
+  if  sqlcode=-1430 then null; else raise; end if;
+ end;
+/
+
+
 PROMPT *** Create  constraint SYS_C00119250 ***
 begin   
  execute immediate '
