@@ -5,6 +5,9 @@ PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/EAD_SYNC_SESSIONS.sql ====
 PROMPT ===================================================================================== 
 
 
+PROMPT *** Drop table EAD_SYNC_SESSIONS ***
+drop table BARS.EAD_SYNC_SESSIONS;
+
 PROMPT *** ALTER_POLICY_INFO to EAD_SYNC_SESSIONS ***
 
 
@@ -22,17 +25,16 @@ END;
 PROMPT *** Create  table EAD_SYNC_SESSIONS ***
 begin 
   execute immediate '
-  CREATE TABLE BARS.EAD_SYNC_SESSIONS 
-   (	TYPE_ID VARCHAR2(100), 
-	CDC_LASTKEY VARCHAR2(300), 
-	SYNC_START DATE, 
-	SYNC_END DATE, 
-	MSG_COUNT NUMBER, 
-	ERROR_COUNT NUMBER
-   ) SEGMENT CREATION IMMEDIATE 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING
-  TABLESPACE BRSSMLD ';
+create table BARS.EAD_SYNC_SESSIONS
+(
+  type_id     VARCHAR2(100) not null,
+  cdc_lastkey VARCHAR2(300) not null,
+  sync_start  DATE,
+  sync_end    DATE,
+  msg_count   NUMBER,
+  error_count NUMBER
+)
+tablespace BRSSMLD';
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 
 end; 
@@ -56,67 +58,36 @@ COMMENT ON COLUMN BARS.EAD_SYNC_SESSIONS.ERROR_COUNT IS 'Кіл-ть повідомлень обро
 
 
 
-PROMPT *** Create  constraint FK_EADSYNCSNS_TID_EADTYPES_ID ***
+PROMPT *** Create  index PK_EADSYNCSNS ***
 begin   
- execute immediate '
-  ALTER TABLE BARS.EAD_SYNC_SESSIONS ADD CONSTRAINT FK_EADSYNCSNS_TID_EADTYPES_ID FOREIGN KEY (TYPE_ID)
-	  REFERENCES BARS.EAD_TYPES (ID) ENABLE';
+ execute immediate ' CREATE UNIQUE INDEX BARS.PK_EADSYNCSNS ON BARS.EAD_SYNC_SESSIONS (TYPE_ID) TABLESPACE BRSSMLI ';
 exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
+  if  sqlcode=-955  then null; else raise; end if;
+end;
 /
-
-
 
 
 PROMPT *** Create  constraint PK_EADSYNCSNS ***
 begin   
  execute immediate '
   ALTER TABLE BARS.EAD_SYNC_SESSIONS ADD CONSTRAINT PK_EADSYNCSNS PRIMARY KEY (TYPE_ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI  ENABLE';
+  USING INDEX BARS.PK_EADSYNCSNS ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
+end;
 /
 
 
-
-
-PROMPT *** Create  constraint CC_EADSYNCSNS_CLK_NN ***
+PROMPT *** Create  constraint FK_EADSYNCSNS_TID_EADTYPES_ID ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.EAD_SYNC_SESSIONS MODIFY (CDC_LASTKEY CONSTRAINT CC_EADSYNCSNS_CLK_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.EAD_SYNC_SESSIONS ADD CONSTRAINT FK_EADSYNCSNS_TID_EADTYPES_ID FOREIGN KEY (TYPE_ID)
+	  REFERENCES BARS.EAD_TYPES (ID) DEFERRABLE INITIALLY DEFERRED ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
+end;
 /
 
-
-
-
-PROMPT *** Create  constraint CC_EADSYNCSNS_TID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.EAD_SYNC_SESSIONS MODIFY (TYPE_ID CONSTRAINT CC_EADSYNCSNS_TID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  index PK_EADSYNCSNS ***
-begin   
- execute immediate '
-  CREATE UNIQUE INDEX BARS.PK_EADSYNCSNS ON BARS.EAD_SYNC_SESSIONS (TYPE_ID) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
 
 
 

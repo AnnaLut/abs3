@@ -2,12 +2,12 @@ prompt create view bars_intgr.vw_ref_accounts_xrm
 
 create or replace force view vw_ref_accounts_xrm as
 select  v.KF, 
-		acc,
-		v.rnk,
+        acc,
+        v.rnk,
         c.nmk,
         c.okpo,
         nls,
-		kv,
+        kv,
         v.branch,
         nms,
         ob22 

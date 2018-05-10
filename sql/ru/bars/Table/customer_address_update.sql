@@ -57,7 +57,6 @@ end;
 
 
 
-
 PROMPT *** ALTER_POLICIES to CUSTOMER_ADDRESS_UPDATE ***
  exec bpa.alter_policies('CUSTOMER_ADDRESS_UPDATE');
 
@@ -90,6 +89,7 @@ COMMENT ON COLUMN BARS.CUSTOMER_ADDRESS_UPDATE.ROOM IS '';
 
 
 
+
 PROMPT *** Create  constraint PK_CUSTADDRUPD ***
 begin   
  execute immediate '
@@ -97,77 +97,18 @@ begin
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSBIGI  ENABLE';
 exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 or sqlcode=-955 then null; else raise; end if;
  end;
 /
 
 
 
 
-PROMPT *** Create  constraint CC_CUSTADDRUPD_COUNTRY_NN ***
+
+PROMPT *** Create  constraint CC_CUSTADDRUPD_IDUPD_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTOMER_ADDRESS_UPDATE MODIFY (COUNTRY CONSTRAINT CC_CUSTADDRUPD_COUNTRY_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTADDRUPD_TYPEID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_ADDRESS_UPDATE MODIFY (TYPE_ID CONSTRAINT CC_CUSTADDRUPD_TYPEID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTADDRUPD_RNK_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_ADDRESS_UPDATE MODIFY (RNK CONSTRAINT CC_CUSTADDRUPD_RNK_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTADDRUPD_DONEBY_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_ADDRESS_UPDATE MODIFY (DONEBY CONSTRAINT CC_CUSTADDRUPD_DONEBY_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTADDRUPD_CHGDATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_ADDRESS_UPDATE MODIFY (CHGDATE CONSTRAINT CC_CUSTADDRUPD_CHGDATE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTADDRUPD_EFFECTDATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_ADDRESS_UPDATE MODIFY (EFFECTDATE CONSTRAINT CC_CUSTADDRUPD_EFFECTDATE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CUSTOMER_ADDRESS_UPDATE MODIFY (IDUPD CONSTRAINT CC_CUSTADDRUPD_IDUPD_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -188,10 +129,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CUSTADDRUPD_IDUPD_NN ***
+PROMPT *** Create  constraint CC_CUSTADDRUPD_COUNTRY_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTOMER_ADDRESS_UPDATE MODIFY (IDUPD CONSTRAINT CC_CUSTADDRUPD_IDUPD_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CUSTOMER_ADDRESS_UPDATE MODIFY (COUNTRY CONSTRAINT CC_CUSTADDRUPD_COUNTRY_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -200,10 +141,70 @@ exception when others then
 
 
 
-PROMPT *** Create  index PK_CUSTADDRUPD ***
+PROMPT *** Create  constraint CC_CUSTADDRUPD_CHGDATE_NN ***
 begin   
  execute immediate '
-  CREATE UNIQUE INDEX BARS.PK_CUSTADDRUPD ON BARS.CUSTOMER_ADDRESS_UPDATE (IDUPD) 
+  ALTER TABLE BARS.CUSTOMER_ADDRESS_UPDATE MODIFY (CHGDATE CONSTRAINT CC_CUSTADDRUPD_CHGDATE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CUSTADDRUPD_DONEBY_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER_ADDRESS_UPDATE MODIFY (DONEBY CONSTRAINT CC_CUSTADDRUPD_DONEBY_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CUSTADDRUPD_RNK_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER_ADDRESS_UPDATE MODIFY (RNK CONSTRAINT CC_CUSTADDRUPD_RNK_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CUSTADDRUPD_TYPEID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER_ADDRESS_UPDATE MODIFY (TYPE_ID CONSTRAINT CC_CUSTADDRUPD_TYPEID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CUSTADDRUPD_EFFECTDATE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER_ADDRESS_UPDATE MODIFY (EFFECTDATE CONSTRAINT CC_CUSTADDRUPD_EFFECTDATE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  index IDX_CUSTADDRUPD_RNK_TYPEID ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IDX_CUSTADDRUPD_RNK_TYPEID ON BARS.CUSTOMER_ADDRESS_UPDATE (RNK, TYPE_ID) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSBIGI ';
 exception when others then
@@ -228,10 +229,10 @@ exception when others then
 
 
 
-PROMPT *** Create  index IDX_CUSTADDRUPD_RNK_TYPEID ***
+PROMPT *** Create  index PK_CUSTADDRUPD ***
 begin   
  execute immediate '
-  CREATE INDEX BARS.IDX_CUSTADDRUPD_RNK_TYPEID ON BARS.CUSTOMER_ADDRESS_UPDATE (RNK, TYPE_ID) 
+  CREATE UNIQUE INDEX BARS.PK_CUSTADDRUPD ON BARS.CUSTOMER_ADDRESS_UPDATE (IDUPD) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSBIGI ';
 exception when others then
@@ -244,13 +245,77 @@ exception when others then
 PROMPT *** Create  grants  CUSTOMER_ADDRESS_UPDATE ***
 grant SELECT                                                                 on CUSTOMER_ADDRESS_UPDATE to BARSUPL;
 grant SELECT                                                                 on CUSTOMER_ADDRESS_UPDATE to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on CUSTOMER_ADDRESS_UPDATE to BARS_SUP;
+grant SELECT                                                                 on CUSTOMER_ADDRESS_UPDATE to BARS_DM;
 grant SELECT                                                                 on CUSTOMER_ADDRESS_UPDATE to START1;
 grant SELECT                                                                 on CUSTOMER_ADDRESS_UPDATE to UPLD;
-grant SELECT                                                                 on CUSTOMER_ADDRESS_UPDATE to BARS_DM;
 
 
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/Table/CUSTOMER_ADDRESS_UPDATE.sql =========*
 PROMPT ===================================================================================== 
+
+prompt ... 
+
+begin
+    execute immediate 'alter table CUSTOMER_ADDRESS_UPDATE add  region_id  NUMBER(10)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/
+
+begin
+    execute immediate 'alter table CUSTOMER_ADDRESS_UPDATE add  area_id  NUMBER(10)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
+    execute immediate 'alter table CUSTOMER_ADDRESS_UPDATE add  settlement_id  NUMBER(10)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
+    execute immediate 'alter table CUSTOMER_ADDRESS_UPDATE add  street_id  NUMBER(10)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
+    execute immediate 'alter table CUSTOMER_ADDRESS_UPDATE add  house_id  NUMBER(10)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
+    execute immediate 'alter table CUSTOMER_ADDRESS_UPDATE add  LOCALITY_TYPE_N NUMBER(10)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
+    execute immediate 'alter table CUSTOMER_ADDRESS_UPDATE add  STREET_TYPE_N NUMBER(10)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+

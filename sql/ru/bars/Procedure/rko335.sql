@@ -755,7 +755,7 @@ End If;
      WHERE  ACC = k.ACC
         and TAG = 'SHTAR';
 
-  EXCEPTION WHEN NO_DATA_FOUND THEN
+  EXCEPTION WHEN OTHERS THEN
      n_tarpak := 0; 
   END;
 
@@ -817,16 +817,16 @@ BEGIN
         WHERE     w.tag = 'SHTAR'
               AND t.id  = w.VALUE
               AND w.acc = k.acc;
-    EXCEPTION WHEN NO_DATA_FOUND THEN
+    EXCEPTION WHEN OTHERS THEN
         L_DOC_NOPAY:=0; 
     END;
 ----------------------------------------------------------
 
 
 
-If n_tarpak >= 38 then   ---  + + + + + + + + + + + + + + + + + + + + + + + + + +
-                         
-  BEGIN                  ---  Бесплатные - только IB1,IB2  !!!
+If n_tarpak >= 38 then   ------    Бесплатные набираются только из Клиент-Банк  ( IB% и CL% ) !!!
+                         ------------------------------------------------------------------------
+  BEGIN                  
   SELECT nls,
          SUM (bumdo16),
          SUM (s_bumdo16),
@@ -911,25 +911,26 @@ If n_tarpak >= 38 then   ---  + + + + + + + + + + + + + + + + + + + + + + + + + 
                                                            opldok d,
                                                            accounts a,
                                                            RKO_TTS t,
-                                                           RKO_LST r
+                                                           RKO_LST r 
                                                      WHERE     a.acc = k.acc
                                                            AND a.acc = r.acc
                                                            AND a.acc = d.acc
                                                            and (t.TT like 'IB%' or t.TT like 'CL%')  ---- **************************
-                                                           AND d.REF = o.REF
-                                                           AND d.sos = 5
+                                                           AND d.REF = o.REF   
+                                                           AND d.sos = 5      
                                                            AND d.fdat >= P_dat1
                                                            AND d.fdat <= P_dat2
                                                            AND d.TT = t.TT
                                                            AND t.DK=0
                                                            AND d.DK=0
-                                                           AND TO_CHAR (
-                                       nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),
-                                                                        'HH24MI'
-                                                                       ) <=
-   decode( (Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
-   -- L_OPERTIME
-                                                           AND d.s > 0
+                                                           AND (
+                TO_CHAR ( nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),'HH24MI' )
+                                                                   <=
+                decode( (Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
+                                                                   OR
+               ( o.TT in ('001','002')  and  exists ( Select 1 From OperW where TAG='VVOD' and VALUE='1' and REF=o.REF ) )
+                                                                )
+                                                           AND d.S > 0
                                                    UNION ALL
                                                    SELECT a.NLS nls,
                                                            a.branch BRANCH,
@@ -957,25 +958,26 @@ If n_tarpak >= 38 then   ---  + + + + + + + + + + + + + + + + + + + + + + + + + 
                                                            accounts a,
                                                            RKO_TTS t,
                                                            RKO_LST r
-                                                     WHERE     a.acc = k.acc
+                                                      WHERE    a.acc = k.acc
                                                            AND a.acc = r.acc
                                                            AND a.acc = d.acc
                                                            and (t.TT like 'IB%' or t.TT like 'CL%')  ---- **************************
-                                                           AND d.REF = o.REF
-                                                           AND d.sos = 5
+                                                           AND d.REF = o.REF   
+                                                           AND d.sos = 5      
                                                            AND d.fdat >= P_dat1
                                                            AND d.fdat <= P_dat2
                                                            AND d.TT = t.TT
                                                            AND t.DK=0
                                                            AND d.DK=0
-                                                           AND TO_CHAR (
-                                       nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),
-                                                                         'HH24MI'
-                                                                        ) > 
-   decode((Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
-   -- L_OPERTIME
-                                                           AND d.s > 0
-                                                    ORDER BY REF))
+                                                           AND (
+               TO_CHAR ( nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT), 'HH24MI' )
+                                                                    > 
+               decode((Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
+                                                                AND
+               not ( o.TT in ('001','002')  and  exists ( Select 1 From OperW where TAG='VVOD' and VALUE='1' and REF=o.REF ) )
+                                                                )
+                                                           AND d.S > 0
+                                                      ORDER BY REF))
                                      WHERE s > 0 )
                              WHERE r > L_DOC_NOPAY                 --- Oтбрасываем первых L_DOC_NOPAY платежей
                                                                    --------------------------------------------  
@@ -1027,19 +1029,20 @@ If n_tarpak >= 38 then   ---  + + + + + + + + + + + + + + + + + + + + + + + + + 
                                                            AND a.acc = r.acc
                                                            AND a.acc = d.acc
                                                            and t.TT not like 'IB%' and t.TT not like 'CL%'   ---- **************************
-                                                           AND d.REF = o.REF
-                                                           AND d.sos = 5
+                                                           AND d.REF = o.REF  
+                                                           AND d.sos = 5      
                                                            AND d.fdat >= P_dat1
                                                            AND d.fdat <= P_dat2
                                                            AND d.TT = t.TT
                                                            AND t.DK=0
                                                            AND d.DK=0
-                                                           AND TO_CHAR ( 
-                                       nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),
-                                                                         'HH24MI'
-                                                                        ) <=
-   decode((Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
-   -- L_OPERTIME
+                                                           AND (
+                  TO_CHAR ( nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT), 'HH24MI' )
+                                                               <=
+                  decode((Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
+                                                                OR
+                  ( o.TT in ('001','002')  and  exists ( Select 1 From OperW where TAG='VVOD' and VALUE='1' and REF=o.REF ) )
+                                                               )
                                                            AND d.s > 0
                                                    UNION ALL
                                                    SELECT a.NLS nls,
@@ -1072,20 +1075,21 @@ If n_tarpak >= 38 then   ---  + + + + + + + + + + + + + + + + + + + + + + + + + 
                                                            AND a.acc = r.acc
                                                            AND a.acc = d.acc
                                                            and t.TT not like 'IB%' and t.TT not like 'CL%'    ---- **************************
-                                                           AND d.REF = o.REF
-                                                           AND d.sos = 5
+                                                           AND d.REF = o.REF   
+                                                           AND d.sos = 5       
                                                            AND d.fdat >= P_dat1
                                                            AND d.fdat <= P_dat2
                                                            AND d.TT = t.TT
                                                            AND t.DK=0
                                                            AND d.DK=0
-                                                           AND TO_CHAR (
-                                       nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),
-                                                                         'HH24MI'
-                                                                        ) > 
-   decode( (Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
-   -- L_OPERTIME
-                                                           AND d.s > 0
+                                                           AND (
+                    TO_CHAR ( nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),'HH24MI' )
+                                                                   > 
+                    decode( (Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
+                                                                  AND
+                    not ( o.TT in ('001','002')  and  exists ( Select 1 From OperW where TAG='VVOD' and VALUE='1' and REF=o.REF ) )
+                                                               )
+                                                           AND d.S > 0
                                                     ORDER BY REF))
                                      WHERE s > 0)
                            ----- WHERE r > L_DOC_NOPAY             --- Oтбрасываем первых L_DOC_NOPAY платежей
@@ -1133,9 +1137,8 @@ If n_tarpak >= 38 then   ---  + + + + + + + + + + + + + + + + + + + + + + + + + 
   END;
 
 
-ELSE   ---+ + + + + + + + + + + + + + + + + + + + + + +
-
-                         ---  Бесплатные - ВСЕ  !!!
+ELSE            -----------    n_tarpak  <  38   -  Бесплатные набираются из ЛЮБЫХ платежей  !!!
+                -----------------------------------------------------------------------------------
   BEGIN
   SELECT nls,
          SUM (bumdo16),
@@ -1221,20 +1224,21 @@ ELSE   ---+ + + + + + + + + + + + + + + + + + + + + + +
                                                      WHERE     a.acc = k.acc
                                                            AND a.acc = r.acc
                                                            AND a.acc = d.acc
-                                                           AND d.REF = o.REF
-                                                           AND d.sos = 5
+                                                           AND d.REF = o.REF  
+                                                           AND d.sos = 5      
                                                            AND d.fdat >= P_dat1
                                                            AND d.fdat <= P_dat2
                                                            AND d.TT = t.TT
                                                            AND t.DK=0
                                                            AND d.DK=0
-                                                           AND TO_CHAR ( 
-                                       nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),
-                                                                         'HH24MI'
-                                                                        ) <=
-   decode( (Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
-   -- L_OPERTIME
-                                                           AND d.s > 0
+                                                           AND (
+                      TO_CHAR ( nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT), 'HH24MI' )
+                                                                 <=
+                      decode( (Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
+                                                                 OR
+                      ( o.TT in ('001','002')  and  exists ( Select 1 From OperW where TAG='VVOD' and VALUE='1' and REF=o.REF ) )
+                                                                )
+                                                           AND d.S > 0
                                                     UNION ALL
                                                     SELECT a.NLS nls,
                                                            a.branch BRANCH,
@@ -1265,20 +1269,21 @@ ELSE   ---+ + + + + + + + + + + + + + + + + + + + + + +
                                                      WHERE     a.acc = k.acc
                                                            AND a.acc = r.acc
                                                            AND a.acc = d.acc
-                                                           AND d.REF = o.REF
-                                                           AND d.sos = 5
+                                                           AND d.REF = o.REF  
+                                                           AND d.sos = 5      
                                                            AND d.fdat >= P_dat1
                                                            AND d.fdat <= P_dat2
                                                            AND d.TT = t.TT
                                                            AND t.DK=0
                                                            AND d.DK=0
-                                                           AND TO_CHAR (
-                                       nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),
-                                                                         'HH24MI'
-                                                                        ) > 
-   decode( (Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
-   -- L_OPERTIME
-                                                           AND d.s > 0
+                                                           AND (
+                  TO_CHAR ( nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT), 'HH24MI' )
+                                                                 > 
+                  decode( (Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
+                                                                AND
+                  not ( o.TT in ('001','002')  and  exists ( Select 1 From OperW where TAG='VVOD' and VALUE='1' and REF=o.REF ) )
+                                                                )
+                                                           AND d.S > 0
                                                     ORDER BY REF))
                                      WHERE s > 0)
                              WHERE r > L_DOC_NOPAY                 --- Oтбрасываем первых L_DOC_NOPAY платежей

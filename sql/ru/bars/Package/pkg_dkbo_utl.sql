@@ -1,4 +1,10 @@
-create or replace package pkg_dkbo_utl is
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/pkg_dkbo_utl.sql =========*** Run *** ==
+ PROMPT ===================================================================================== 
+ 
+create or replace package bars.pkg_dkbo_utl is
+
+  g_header_version   CONSTANT VARCHAR2(64) := 'version 6.0 01/12/2018';
 
   FUNCTION header_version RETURN VARCHAR2;
   FUNCTION body_version RETURN VARCHAR2;
@@ -35,12 +41,20 @@ create or replace package pkg_dkbo_utl is
     p_acc  accounts.acc%TYPE
    ,p_attr attribute_kind.attribute_code%TYPE
   ) RETURN VARCHAR2;
+  /*******************************************************************************
+      function        f_get_DKBO_cust_acc
+      DESCRIPTION     Визначаємо всі відкриті рахунки клієнта, які включені в ДКБО
+  *******************************************************************************/
+  function f_get_all_cust_acc(p_customer_id IN deal.customer_id%TYPE, p_deal_id IN deal.id%TYPE default null) return number_list;
+
 end pkg_dkbo_utl;
 /
+show errors
 
-CREATE OR REPLACE PACKAGE BODY pkg_dkbo_utl IS
-  g_body_version     CONSTANT VARCHAR2(64) := 'version 5.9 08/06/2017';
-  g_header_version   CONSTANT VARCHAR2(64) := 'version 5.9 08/06/2017';
+
+
+CREATE OR REPLACE PACKAGE BODY BARS.pkg_dkbo_utl IS
+  g_body_version     CONSTANT VARCHAR2(64) := 'version 6.0 01/12/2018';
   lc_new_line        CONSTANT VARCHAR2(5) := chr(13) || chr(10);
   lc_acc_list        CONSTANT attribute_kind.attribute_code%TYPE := 'DKBO_ACC_LIST';
   lc_date_format     CONSTANT VARCHAR2(10) := 'dd/mm/yyyy';
@@ -233,35 +247,27 @@ CREATE OR REPLACE PACKAGE BODY pkg_dkbo_utl IS
       NULL;
   END p_get_all_cust_acc;
   /*******************************************************************************
-      PROCEDURE       p_get_DKBO_cust_acc
+      function        f_get_DKBO_cust_acc
       DESCRIPTION     Визначаємо всі відкриті рахунки клієнта, які включені в ДКБО
   *******************************************************************************/
-  PROCEDURE p_get_all_cust_acc
-  (
-    p_customer_id IN customer.rnk%TYPE
-   ,out_acc_list  OUT number_list
-  ) IS
+  function f_get_all_cust_acc(p_customer_id IN deal.customer_id%TYPE, p_deal_id IN deal.id%TYPE default null) return number_list IS
+    l_acc_list number_list;
   BEGIN
-    BEGIN
-      SELECT a.value BULK COLLECT
-        INTO out_acc_list
-        FROM attribute_number_value a
-        JOIN deal d
-          ON d.id = a.object_id
-         AND d.customer_id = p_customer_id
-        JOIN attribute_kind k
-          ON k.id = a.attribute_id
-         AND k.attribute_code = lc_acc_list
-        JOIN object_type t
-          ON t.id = d.deal_type_id
-         AND t.type_code = lc_deal_type_code;
-    EXCEPTION
-      WHEN no_data_found THEN
-        NULL;
-      WHEN too_many_rows THEN
-        NULL;
-    END;
-  END p_get_all_cust_acc;
+    SELECT a.value BULK COLLECT INTO l_acc_list
+      FROM attribute_number_value a
+      JOIN deal d
+        ON d.id = a.object_id
+       AND d.customer_id = p_customer_id
+       AND d.id = nvl(p_deal_id, d.id)
+      JOIN attribute_kind k
+        ON k.id = a.attribute_id
+       AND k.attribute_code = lc_acc_list
+      JOIN object_type t
+        ON t.id = d.deal_type_id
+       AND t.type_code = lc_deal_type_code;
+
+    return l_acc_list;
+  END f_get_all_cust_acc;
   /*****************************************************************************
     PROCEDURE        p_get_deal_id
     DESCRIPTION      Визначаємо ID ДКБО по його номеру
@@ -395,6 +401,15 @@ CREATE OR REPLACE PACKAGE BODY pkg_dkbo_utl IS
       bars.attribute_utl.set_value(p_object_id      => deal_id
                                   ,p_attribute_code => lc_acc_list
                                   ,p_values         => l_acc_list_union);
+      
+      -- Обновляем договор к которому присоединили счета и отправляем сами счета
+      for i in (select rownum as rn, acc, rnk from accounts where acc in (select column_value from table(p_acc_list)))
+      loop
+        if i.rn = 1 then
+          ead_pack.msg_create('AGR', 'DKBO;' || TO_CHAR(deal_id) || ';' || tools.number_list_to_string(p_number_list => p_acc_list, p_splitting_symbol => ','), i.rnk);
+        end if;
+        bars.ead_pack.msg_create('ACC', 'ACC;' || i.acc, i.rnk);
+      end loop;
     END IF;
   END p_acc_ins;
 
@@ -614,5 +629,10 @@ CREATE OR REPLACE PACKAGE BODY pkg_dkbo_utl IS
 
     RETURN TRIM(l_str);
   END f_dkbo_list_print;
-END;
+END pkg_dkbo_utl;
 /
+show errors
+
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/pkg_dkbo_utl.sql =========*** End *** ==
+ PROMPT ===================================================================================== 

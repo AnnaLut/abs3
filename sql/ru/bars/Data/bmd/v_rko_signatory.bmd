@@ -33,7 +33,8 @@ declare
   type t_tab_filtertbl is table of t_rec_filtertbl;
   l_filtertbl    t_tab_filtertbl := t_tab_filtertbl();
 
-  type t_rec_dependency is record (
+
+  type t_rec_dependency is record  (
     id               meta_dependency_cols.id%type,
     tabid            meta_dependency_cols.tabid%type,
     colid            meta_dependency_cols.colid%type,
@@ -129,13 +130,13 @@ begin
   bars_metabase.add_column(l_tabid, 7, 'ACTIVE_F', 'N', 'Використовувати для друку ~0-Ні,1-Так', '', 22, 14, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
   bars_metabase.add_column(l_tabid, 8, 'ATTORNEY_DT', 'C', 'Дата ~довіреності', '3', 20, 11, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 9, 'ATTORNEY_NUM', 'N', '№ довіреності', '2', 22, 12, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'DIVISION_PRSN_GEN', 'C', 'Підрозділ уповноваженої~особи від Банку (Р.В.)', '6.5', 60, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'DIVISION_PRSN_GEN', 'C', 'Підрозділ уповноваженої~особи від Банку (Р.В.)', '6.5', 300, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 11, 'DOC_NM_GEN', 'C', 'Назва док., на підставі~ якого діє уповн. ос (Р.В)', '4', 100, 7, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 12, 'FULL_NM_GEN', 'C', 'ПІБ уповноваженої особи~від Банку повністю (Р.В.)', '4', 60, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 13, 'NOTARY_NM_GEN', 'C', 'ПІБ нотаріуса, який~посвідчив довіреність (Р.В.)', '4', 60, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 14, 'NOTARY_TP_GEN', 'C', 'Вид нотаріуса~ (приватний / державний) (Р.В.)', '2.5', 60, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'POSITION_PRSN_GEN', 'C', 'Посада уповноваженої~особи від Банку (Р.В.)', '6.5', 60, 5, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'POSITION_PRSN_NOM', 'C', 'Посада уповноваженої~ особи від Банку (Н.В.)', '6.5', 60, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'POSITION_PRSN_GEN', 'C', 'Посада уповноваженої~особи від Банку (Р.В.)', '6.5', 300, 5, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'POSITION_PRSN_NOM', 'C', 'Посада уповноваженої~ особи від Банку (Н.В.)', '6.5', 300, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 17, 'SHORT_NM_NOM', 'C', 'ПІБ уповноваж.~ особи від Банку скорочено (Н.В.)', '4', 60, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
   bars_metabase.add_column(l_tabid, 18, 'NOTARIAL_DISTRICT_GEN', 'C', 'Нотаріальний~округ (Р.В.)', '2', 60, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 20, 'FULL_NM_NOM', 'C', 'ПІБ уповноваженої особи~від Банку повністю (Н.В.)', '4', 60, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
@@ -220,5 +221,6 @@ begin
 
 end;
 /
+
 
 commit;

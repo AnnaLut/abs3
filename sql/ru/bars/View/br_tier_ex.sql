@@ -7,7 +7,7 @@ PROMPT *** Create  view BR_TIER_EX ***
 
   CREATE OR REPLACE FORCE VIEW BARS.BR_TIER_EX ("BR_ID", "BDATE", "KV", "S", "RATE") AS 
    WITH sum_bonus as (select bars.dpt_bonus.get_bonus_id('EXCL') excl_bonus_id from dual)
-   SELECT "BR_ID","BDATE","KV","S","RATE"
+  SELECT "BR_ID","BDATE","KV","S","RATE"
      FROM br_tier t
     WHERE t.bdate = (SELECT MAX (bdate)
                        FROM br_tier

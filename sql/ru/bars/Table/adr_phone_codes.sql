@@ -1,113 +1,60 @@
+-- ======================================================================================
+-- Module : ADR
+-- Author : BAA
+-- Date   : 22.01.2016
+-- ======================================================================================
+-- create table ADR_PHONE_CODES
+-- ======================================================================================
 
+SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
+SET ECHO         OFF
+SET LINES        500
+SET PAGES        500
+SET FEEDBACK     OFF
 
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/ADR_PHONE_CODES.sql =========*** Run *
-PROMPT ===================================================================================== 
+prompt -- ======================================================
+prompt -- create table ADR_PHONE_CODES
+prompt -- ======================================================
 
-
-PROMPT *** ALTER_POLICY_INFO to ADR_PHONE_CODES ***
-
-
-BEGIN 
-        execute immediate  
-          'begin  
-               bpa.alter_policy_info(''ADR_PHONE_CODES'', ''FILIAL'' , null, null, null, null);
-               bpa.alter_policy_info(''ADR_PHONE_CODES'', ''WHOLE'' , null, null, null, null);
-               null;
-           end; 
-          '; 
-END; 
+begin
+  BPA.ALTER_POLICY_INFO( 'ADR_PHONE_CODES', 'WHOLE' , NULL, NULL, NULL, NULL );
+  BPA.ALTER_POLICY_INFO( 'ADR_PHONE_CODES', 'FILIAL', null, null, null, null );
+end;
 /
 
-PROMPT *** Create  table ADR_PHONE_CODES ***
-begin 
-  execute immediate '
-  CREATE TABLE BARS.ADR_PHONE_CODES 
-   (	PHONE_CODE_ID NUMBER(10,0), 
-	PHONE_CODE VARCHAR2(10), 
-	PHONE_ADD_NUM VARCHAR2(10)
-   ) SEGMENT CREATION IMMEDIATE 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING
-  TABLESPACE BRSSMLD ';
-exception when others then       
-  if sqlcode=-955 then null; else raise; end if; 
-end; 
+begin
+  execute immediate 'CREATE TABLE BARS.ADR_PHONE_CODES
+( PHONE_CODE_ID      number(10)    NOT NULL
+, PHONE_CODE         varchar2(10)  NOT NULL
+, PHONE_ADD_NUM      varchar2(10)
+, CONSTRAINT PK_PHONECODES PRIMARY KEY (PHONE_CODE_ID) USING INDEX TABLESPACE BRSSMLI
+) TABLESPACE BRSSMLD';
+  
+  dbms_output.put_line('Table BARS.ADR_PHONE_CODES created.');
+  
+exception
+  when OTHERS then 
+    if (sqlcode = -00955)
+    then dbms_output.put_line('Table BARS.ADR_PHONE_CODES already exists.');
+    else raise;
+    end if;  
+end;
 /
 
+SET FEEDBACK ON
 
+prompt -- ======================================================
+prompt -- Table comments
+prompt -- ======================================================
 
+comment on Table  BARS.ADR_PHONE_CODES                is 'Довідник телефонних кодів';
 
-PROMPT *** ALTER_POLICIES to ADR_PHONE_CODES ***
- exec bpa.alter_policies('ADR_PHONE_CODES');
+COMMENT ON COLUMN BARS.ADR_PHONE_CODES.PHONE_CODE_ID  is 'Ід. телефонного коду';
+COMMENT ON COLUMN BARS.ADR_PHONE_CODES.PHONE_CODE     is 'Телефонний код';
+COMMENT ON COLUMN BARS.ADR_PHONE_CODES.PHONE_ADD_NUM  is 'Додатковий номер';
 
+prompt -- ======================================================
+prompt -- Table grants
+prompt -- ======================================================
 
-COMMENT ON TABLE BARS.ADR_PHONE_CODES IS 'Довідник телефонних кодів';
-COMMENT ON COLUMN BARS.ADR_PHONE_CODES.PHONE_CODE_ID IS 'Ід. телефонного коду';
-COMMENT ON COLUMN BARS.ADR_PHONE_CODES.PHONE_CODE IS 'Телефонний код';
-COMMENT ON COLUMN BARS.ADR_PHONE_CODES.PHONE_ADD_NUM IS 'Додатковий номер';
-
-
-
-
-PROMPT *** Create  constraint PK_PHONECODES ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ADR_PHONE_CODES ADD CONSTRAINT PK_PHONECODES PRIMARY KEY (PHONE_CODE_ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C003090357 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ADR_PHONE_CODES MODIFY (PHONE_CODE NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C003090356 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ADR_PHONE_CODES MODIFY (PHONE_CODE_ID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  index PK_PHONECODES ***
-begin   
- execute immediate '
-  CREATE UNIQUE INDEX BARS.PK_PHONECODES ON BARS.ADR_PHONE_CODES (PHONE_CODE_ID) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
-PROMPT *** Create  grants  ADR_PHONE_CODES ***
-grant SELECT                                                                 on ADR_PHONE_CODES to BARSUPL;
-grant SELECT                                                                 on ADR_PHONE_CODES to START1;
-grant SELECT                                                                 on ADR_PHONE_CODES to UPLD;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Table/ADR_PHONE_CODES.sql =========*** End *
-PROMPT ===================================================================================== 
+GRANT SELECT ON ADR_PHONE_CODES TO START1, BARSUPL, UPLD;

@@ -1,149 +1,102 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/ADR_HOUSES.sql =========*** Run *** ==
-PROMPT ===================================================================================== 
-
-
-PROMPT *** ALTER_POLICY_INFO to ADR_HOUSES ***
-
-
-BEGIN 
-        execute immediate  
-          'begin  
-               bpa.alter_policy_info(''ADR_HOUSES'', ''FILIAL'' , null, null, null, null);
-               bpa.alter_policy_info(''ADR_HOUSES'', ''WHOLE'' , null, null, null, null);
-               null;
-           end; 
-          '; 
-END; 
+begin
+  BPA.ALTER_POLICY_INFO( 'ADR_HOUSES', 'WHOLE' , NULL, NULL, NULL, NULL );
+  BPA.ALTER_POLICY_INFO( 'ADR_HOUSES', 'FILIAL', null, null, null, null );
+end;
 /
 
-PROMPT *** Create  table ADR_HOUSES ***
-begin 
-  execute immediate '
-  CREATE TABLE BARS.ADR_HOUSES 
-   (	HOUSE_ID NUMBER(10,0), 
-	STREET_ID NUMBER(10,0), 
-	DISTRICT_ID NUMBER(10,0), 
-	HOUSE_NUM VARCHAR2(5), 
-	HOUSE_NUM_ADD VARCHAR2(15), 
-	POSTAL_CODE VARCHAR2(5), 
-	LATITUDE VARCHAR2(15), 
-	LONGITUDE VARCHAR2(15)
-   ) SEGMENT CREATION IMMEDIATE 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING
-  TABLESPACE BRSMDLD ';
-exception when others then       
-  if sqlcode=-955 then null; else raise; end if; 
-end; 
-/
+prompt ... 
 
+-- Create table
+create table BARS.ADR_HOUSES
+(
+  house_id      NUMBER(10) not null,
+  street_id     NUMBER(10) not null,
+  district_id   NUMBER(10),
+  house_num     VARCHAR2(5),
+  house_num_add VARCHAR2(15),
+  postal_code   VARCHAR2(5),
+  latitude      VARCHAR2(15),
+  longitude     VARCHAR2(15)
+)
+tablespace BRSMDLD
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 128K
+    next 128K
+    minextents 1
+    maxextents unlimited
+    pctincrease 0
+  );
+-- Add comments to the table 
+comment on table BARS.ADR_HOUSES
+  is 'Довідник номерів будинків';
+-- Add comments to the columns 
+comment on column BARS.ADR_HOUSES.house_id
+  is 'Ід. будинку';
+comment on column BARS.ADR_HOUSES.street_id
+  is 'Ід. вулиці (в населеному пункті)';
+comment on column BARS.ADR_HOUSES.district_id
+  is 'Ід. району в місті';
+comment on column BARS.ADR_HOUSES.house_num
+  is 'Номер будинку';
+comment on column BARS.ADR_HOUSES.house_num_add
+  is 'дополнительная часть номера дома (содержит дробную или буквенную часть)';
+comment on column BARS.ADR_HOUSES.postal_code
+  is 'Поштовий індекс будинку';
+comment on column BARS.ADR_HOUSES.latitude
+  is 'Географічні координати будинку (широта)';
+comment on column BARS.ADR_HOUSES.longitude
+  is 'Географічні координати будинку (довгота)';
 
+-- Create/Rebegin
+begin
+    execute immediate 'create index BARS.I_ADRHOUSES_STREETID on BARS.ADR_HOUSES (STREET_ID)
+  tablespace BRSMDLI
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 64K
+    minextents 1
+    maxextents unlimited
+    pctincrease 0
+  )';
+ exception when others then 
+    if sqlcode = -955 or sqlcode = -1408 then null; else raise; 
+    end if; 
+end;
+/ 
 
-
-PROMPT *** ALTER_POLICIES to ADR_HOUSES ***
- exec bpa.alter_policies('ADR_HOUSES');
-
-
-COMMENT ON TABLE BARS.ADR_HOUSES IS 'Довідник номерів будинків';
-COMMENT ON COLUMN BARS.ADR_HOUSES.HOUSE_ID IS 'Ід. будинку';
-COMMENT ON COLUMN BARS.ADR_HOUSES.STREET_ID IS 'Ід. вулиці (в населеному пункті)';
-COMMENT ON COLUMN BARS.ADR_HOUSES.DISTRICT_ID IS 'Ід. району в місті';
-COMMENT ON COLUMN BARS.ADR_HOUSES.HOUSE_NUM IS 'Номер будинку';
-COMMENT ON COLUMN BARS.ADR_HOUSES.HOUSE_NUM_ADD IS 'дополнительная часть номера дома (содержит дробную или буквенную часть)';
-COMMENT ON COLUMN BARS.ADR_HOUSES.POSTAL_CODE IS 'Поштовий індекс будинку';
-COMMENT ON COLUMN BARS.ADR_HOUSES.LATITUDE IS 'Географічні координати будинку (широта)';
-COMMENT ON COLUMN BARS.ADR_HOUSES.LONGITUDE IS 'Географічні координати будинку (довгота)';
-
-
-
-
-PROMPT *** Create  constraint FK_HOUSENUMS_STREETS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ADR_HOUSES ADD CONSTRAINT FK_HOUSENUMS_STREETS FOREIGN KEY (STREET_ID)
-	  REFERENCES BARS.ADR_STREETS (STREET_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_HOUSENUMS_CITYDISTRICTS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ADR_HOUSES ADD CONSTRAINT FK_HOUSENUMS_CITYDISTRICTS FOREIGN KEY (DISTRICT_ID)
-	  REFERENCES BARS.ADR_CITY_DISTRICTS (DISTRICT_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint PK_HOUSENUMS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ADR_HOUSES ADD CONSTRAINT PK_HOUSENUMS PRIMARY KEY (HOUSE_ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C003090397 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ADR_HOUSES MODIFY (STREET_ID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C003090396 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ADR_HOUSES MODIFY (HOUSE_ID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  index PK_HOUSENUMS ***
-begin   
- execute immediate '
-  CREATE UNIQUE INDEX BARS.PK_HOUSENUMS ON BARS.ADR_HOUSES (HOUSE_ID) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
-PROMPT *** Create  grants  ADR_HOUSES ***
-grant SELECT                                                                 on ADR_HOUSES      to BARSUPL;
-grant SELECT                                                                 on ADR_HOUSES      to START1;
-grant SELECT                                                                 on ADR_HOUSES      to UPLD;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Table/ADR_HOUSES.sql =========*** End *** ==
-PROMPT ===================================================================================== 
+-- Create/Recreate primary, unique and foreign key constraints 
+alter table BARS.ADR_HOUSES
+  add constraint PK_HOUSENUMS primary key (HOUSE_ID)
+  using index 
+  tablespace BRSMDLI
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 64K
+    minextents 1
+    maxextents unlimited
+    pctincrease 0
+  );
+alter table BARS.ADR_HOUSES
+  add constraint FK_HOUSENUMS_CITYDISTRICTS foreign key (DISTRICT_ID)
+  references BARS.ADR_CITY_DISTRICTS (DISTRICT_ID);
+alter table BARS.ADR_HOUSES
+  add constraint FK_HOUSENUMS_STREETS foreign key (STREET_ID)
+  references BARS.ADR_STREETS (STREET_ID);
+-- Grant/Revoke object privileges 
+grant select on BARS.ADR_HOUSES to BARSUPL;
+grant select on BARS.ADR_HOUSES to FINMON01;
+grant select on BARS.ADR_HOUSES to START1;
+grant select on BARS.ADR_HOUSES to UPLD;
+/;

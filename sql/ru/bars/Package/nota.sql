@@ -1,12 +1,10 @@
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/package/nota.sql =========*** Run *** ======
+PROMPT ===================================================================================== 
 
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/nota.sql =========*** Run *** ======
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.NOTA is
+CREATE OR REPLACE PACKAGE BARS.NOTA is
 
-  G_HEADER_VERSION constant varchar2(64) := 'version 1.11 12.03.2016';
+  G_HEADER_VERSION constant varchar2(64) := 'version 1.12 16.01.2018';
   --------------------------------------------------------------------
 
   ATTR_CODE_TIN                  constant varchar2(30 char) := 'NOTARY_TIN';
@@ -28,6 +26,11 @@
   ATTR_CODE_CERT_CANCEL_DATE     constant varchar2(30 char) := 'NOTARY_CERT_CANCEL_DATE';
   ATTR_CODE_STATE                constant varchar2(30 char) := 'NOTARY_STATE';
 
+  ATTR_CODE_DOCUMENT_TYPE             constant varchar2(30 char) := 'NOTARY_DOCUMENT_TYPE';
+  ATTR_CODE_IDCARD_DOCUMENT_NUM    constant varchar2(30 char) := 'NOTARY_IDCARD_DOCUMENT_NUMBER';
+  ATTR_CODE_IDCARD_NOTATION_NUM    constant varchar2(30 char) := 'NOTARY_IDCARD_NOTATION_NUMBER';
+  ATTR_CODE_PASSPORT_EXPIRY           constant varchar2(30 char) := 'NOTARY_PASSPORT_EXPIRY';
+  
   ATTR_CODE_ACCR_START_DATE      constant varchar2(30 char) := 'NOTARY_ACCR_START_DATE';
   ATTR_CODE_ACCR_EXPIRY_DATE     constant varchar2(30 char) := 'NOTARY_ACCR_EXPIRY_DATE';
   ATTR_CODE_ACCR_CLOSE_DATE      constant varchar2(30 char) := 'NOTARY_ACCR_CLOSE_DATE';
@@ -38,6 +41,10 @@
   ATTR_CODE_ACCR_BRANCH_TREES    constant varchar2(30 char) := 'NOTARY_ACCR_BRANCH_TREES';
   ATTR_CODE_ACCR_SEG_OF_BUSINESS constant varchar2(30 char) := 'NOTARY_ACCR_SEG_OF_BUSINESS';
 
+  LT_NOTARY_DOCUMENT_TYPE        constant varchar2(30 char) := 'NOTARY_DOCUMENT_TYPE';
+  NOTARY_DOCUMENT_TYPE_PASSPORT          constant integer           := 1; 
+  NOTARY_DOCUMENT_TYPE_IDCARD            constant integer           := 7; 
+  
   LT_NOTARY_TYPE                 constant varchar2(30 char) := 'NOTARY_TYPE';
   NOTARY_TYPE_STATE              constant integer           := 1; -- державний нотаріус
   NOTARY_TYPE_PRIVATE            constant integer           := 2; -- приватний нотаріус
@@ -82,6 +89,10 @@
                              p_CERTIFICATE_CANCELATION_DATE  date    ,
                              p_RNK                           number  ,
                              p_MFORNK                        varchar2,
+               p_DOCUMENT_TYPE                 number,
+                             p_IDCARD_DOCUMENT_NUMBER        number,
+                             p_IDCARD_NOTATION_NUMBER        varchar2,
+                             p_PASSPORT_EXPIRY               date,
                              p_ret                       out number  ,
                              p_err                       out varchar2);
 
@@ -105,6 +116,10 @@
                              p_CERTIFICATE_CANCELATION_DATE  date    ,
                              p_RNK                           number  ,
                              p_MFORNK                        varchar2,
+               p_DOCUMENT_TYPE                 number,
+                             p_IDCARD_DOCUMENT_NUMBER        number,
+                             p_IDCARD_NOTATION_NUMBER        varchar2,
+                             p_PASSPORT_EXPIRY               date,
                              p_err                       out varchar2);
 
   procedure add_accr        (p_notary_id                     number       ,
@@ -169,7 +184,11 @@
         p_mobile_phone_number varchar2,
         p_email               varchar2,
         p_rnk                 integer ,
-        p_account_number      varchar2);
+        p_account_number      varchar2,
+        p_DOCUMENT_TYPE                 number,
+        p_IDCARD_DOCUMENT_NUMBER        number,
+        p_IDCARD_NOTATION_NUMBER        varchar2,
+        p_PASSPORT_EXPIRY                 date);
 
     procedure process_alter_request(
         p_sender_mfo          varchar2,
@@ -180,12 +199,16 @@
   function  header_version return varchar2;
 
   function  body_version return varchar2;
+  
+  function Get_Accr_Branches(p_accr_id notary_accreditation.id%type) return string;
+  function Get_Accr_BranchNames(p_accr_id notary_accreditation.id%type) return string;
+  function Get_Accr_Seg_of_Business(p_accr_id notary_accreditation.id%type) return string;
 
 END nota;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.NOTA AS
 
-  G_BODY_VERSION constant varchar2(64) := 'version 1.19 12.03.2016';
+  G_BODY_VERSION constant varchar2(64) := 'version 1.21 26.02.2018';
   ------------------------------------------------------------------
 
     function read_notary(
@@ -321,8 +344,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.NOTA AS
              end if;
         end if;
     end;
-
-    procedure check_notary_uniqueness(
+    
+  procedure check_notary_uniqueness(
         p_exclude_notary_id in integer,
         p_tin in varchar2,
         p_certificate_number in varchar2,
@@ -383,153 +406,214 @@ CREATE OR REPLACE PACKAGE BODY BARS.NOTA AS
              rollback;
              raise;
     end;
+    
+  procedure create_nota     (p_TIN                           varchar2,
+                             p_adr                           varchar2,
+                             p_datp                          date    ,  -- дата рождения
+                             p_email                         varchar2,
+                             p_last_name                     varchar2,  -- фамилия
+                             p_first_name                    varchar2,  -- имя
+                             p_middle_name                   varchar2,  -- отчество
+                             p_phone_number                  varchar2,
+                             p_MOBILE_PHONE_NUMBER           varchar2,
+                             p_PASSPORT_SERIES               varchar2,
+                             p_PASSPORT_NUMBER               varchar2,
+                             p_PASSPORT_ISSUER               varchar2,
+                             p_PASSPORT_ISSUED               date    ,
+                             p_NOTARY_TYPE                   number  ,
+                             p_CERTIFICATE_NUMBER            varchar2,
+                             p_CERTIFICATE_ISSUE_DATE        date    ,
+                             p_CERTIFICATE_CANCELATION_DATE  date    ,
+                             p_RNK                           number  ,
+                             p_MFORNK                        varchar2,
+               p_DOCUMENT_TYPE                 number,
+                             p_IDCARD_DOCUMENT_NUMBER        number,
+                             p_IDCARD_NOTATION_NUMBER        varchar2,
+                             p_PASSPORT_EXPIRY               date,
+                             p_ret                       out number  ,
+                             p_err                       out varchar2)
+  IS
+    l_serd  varchar2(64);
+    l_nid   number;
+    l_1     int;
+  begin --#main
 
-    procedure create_nota(
-        p_tin                           varchar2,
-        p_adr                           varchar2,
-        p_datp                          date    ,  -- дата рождения
-        p_email                         varchar2,
-        p_last_name                     varchar2,  -- фамилия
-        p_first_name                    varchar2,  -- имя
-        p_middle_name                   varchar2,  -- отчество
-        p_phone_number                  varchar2,
-        p_mobile_phone_number           varchar2,
-        p_passport_series               varchar2,
-        p_passport_number               varchar2,
-        p_passport_issuer               varchar2,
-        p_passport_issued               date    ,
-        p_notary_type                   number  ,
-        p_certificate_number            varchar2,
-        p_certificate_issue_date        date    ,
-        p_certificate_cancelation_date  date    ,
-        p_rnk                           number  ,
-        p_mfornk                        varchar2,
-        p_ret                       out number  ,
-        p_err                       out varchar2)
-    is
-        l_notary_id number;
-    begin
-        bars_audit.trace('NOTA: p_TIN='||p_TIN);
+    bars_audit.trace('NOTA: p_TIN='||p_TIN);
 
-        p_ret := null;
-        p_err := null;
+    l_serd := replace(upper(p_PASSPORT_SERIES),'A','А');
+    l_serd := replace(l_serd,'B','В');
+    l_serd := replace(l_serd,'C','С');
+    l_serd := replace(l_serd,'E','Е');
+    l_serd := replace(l_serd,'H','Н');
+    l_serd := replace(l_serd,'I','І');
+    l_serd := replace(l_serd,'K','К');
+    l_serd := replace(l_serd,'M','М');
+    l_serd := replace(l_serd,'O','О');
+    l_serd := replace(l_serd,'P','Р');
+    l_serd := replace(l_serd,'T','Т');
+    l_serd := replace(l_serd,'X','Х');
 
-        check_notary_uniqueness(null, p_tin, p_certificate_number, p_ret, p_err);
+    begin --#1
+      p_ret := null;
+      p_err := null;
+      
+    check_notary_uniqueness(null, p_tin, p_certificate_number, p_ret, p_err);  
+     
+    if (p_ret is null) then
+      begin --#2
+         insert into notary (id)
+         values (s_notary.nextval)
+         returning id
+         into l_nid; 
+      
+         begin --#3
+          attribute_utl.set_value(l_nid,ATTR_CODE_TIN,                p_TIN);
+          attribute_utl.set_value(l_nid,ATTR_CODE_FIRST_NAME,         p_first_name);
+          attribute_utl.set_value(l_nid,ATTR_CODE_MIDDLE_NAME,        p_middle_name);
+          attribute_utl.set_value(l_nid,ATTR_CODE_LAST_NAME,          p_last_name);
+          attribute_utl.set_value(l_nid,ATTR_CODE_DATE_OF_BIRTH,      p_datp);
+          attribute_utl.set_value(l_nid,ATTR_CODE_PASSPORT_SERIES,    p_PASSPORT_SERIES);
+          attribute_utl.set_value(l_nid,ATTR_CODE_PASSPORT_NUMBER,    p_PASSPORT_NUMBER);
+          attribute_utl.set_value(l_nid,ATTR_CODE_ADDRESS,            p_adr);
+          attribute_utl.set_value(l_nid,ATTR_CODE_PASSPORT_ISSUER,    p_PASSPORT_ISSUER);
+          attribute_utl.set_value(l_nid,ATTR_CODE_PASSPORT_ISSUED,    p_PASSPORT_ISSUED);
+          attribute_utl.set_value(l_nid,ATTR_CODE_PHONE_NUMBER,       p_phone_number);
+          attribute_utl.set_value(l_nid,ATTR_CODE_MOBILE_PHONE_NUMBER,p_MOBILE_PHONE_NUMBER);
+          attribute_utl.set_value(l_nid,ATTR_CODE_EMAIL,              p_email);
+          attribute_utl.set_value(l_nid,ATTR_CODE_NOTARY_TYPE,        p_NOTARY_TYPE);
+          attribute_utl.set_value(l_nid,ATTR_CODE_CERT_NUMBER,        p_CERTIFICATE_NUMBER);
+          attribute_utl.set_value(l_nid,ATTR_CODE_CERT_ISSUE_DATE,    p_CERTIFICATE_ISSUE_DATE);
+          attribute_utl.set_value(l_nid,ATTR_CODE_CERT_CANCEL_DATE,   p_CERTIFICATE_CANCELATION_DATE);
+          attribute_utl.set_value(l_nid,ATTR_CODE_DOCUMENT_TYPE,         p_DOCUMENT_TYPE);
+          attribute_utl.set_value(l_nid,ATTR_CODE_IDCARD_DOCUMENT_NUM,   p_IDCARD_DOCUMENT_NUMBER);
+          attribute_utl.set_value(l_nid,ATTR_CODE_IDCARD_NOTATION_NUM,   p_IDCARD_NOTATION_NUMBER);
+          attribute_utl.set_value(l_nid,ATTR_CODE_PASSPORT_EXPIRY,       p_PASSPORT_EXPIRY);
+          attribute_utl.set_value(l_nid,ATTR_CODE_STATE,              nota.NOTARY_STATE_ACTIVE);
 
-        if (p_ret is null) then
-
-            insert into notary (id)
-            values (s_notary.nextval)
-            returning id
-            into l_notary_id;
-
-            attribute_utl.set_value(l_notary_id, ATTR_CODE_TIN                 , p_tin);
-            attribute_utl.set_value(l_notary_id, ATTR_CODE_FIRST_NAME          , p_first_name);
-            attribute_utl.set_value(l_notary_id, ATTR_CODE_MIDDLE_NAME         , p_middle_name);
-            attribute_utl.set_value(l_notary_id, ATTR_CODE_LAST_NAME           , p_last_name);
-            attribute_utl.set_value(l_notary_id, ATTR_CODE_DATE_OF_BIRTH       , p_datp);
-            attribute_utl.set_value(l_notary_id, ATTR_CODE_PASSPORT_SERIES     , p_passport_series);
-            attribute_utl.set_value(l_notary_id, ATTR_CODE_PASSPORT_NUMBER     , p_passport_number);
-            attribute_utl.set_value(l_notary_id, ATTR_CODE_ADDRESS             , p_adr);
-            attribute_utl.set_value(l_notary_id, ATTR_CODE_PASSPORT_ISSUER     , p_passport_issuer);
-            attribute_utl.set_value(l_notary_id, ATTR_CODE_PASSPORT_ISSUED     , p_passport_issued);
-            attribute_utl.set_value(l_notary_id, ATTR_CODE_PHONE_NUMBER        , p_phone_number);
-            attribute_utl.set_value(l_notary_id, ATTR_CODE_MOBILE_PHONE_NUMBER , p_mobile_phone_number);
-            attribute_utl.set_value(l_notary_id, ATTR_CODE_EMAIL               , p_email);
-            attribute_utl.set_value(l_notary_id, ATTR_CODE_NOTARY_TYPE         , p_notary_type);
-            attribute_utl.set_value(l_notary_id, ATTR_CODE_CERT_NUMBER         , p_certificate_number);
-            attribute_utl.set_value(l_notary_id, ATTR_CODE_CERT_ISSUE_DATE     , p_certificate_issue_date);
-            attribute_utl.set_value(l_notary_id, ATTR_CODE_CERT_CANCEL_DATE    , p_certificate_cancelation_date);
-            attribute_utl.set_value(l_notary_id, ATTR_CODE_STATE               , nota.NOTARY_STATE_ACTIVE);
-
-            -- region
-            if (p_mfornk is not null and p_rnk is not null) then
-                insert into notary_region (notary_id, kf, rnk)
-                values (l_notary_id, p_mfornk, p_rnk);
-            end if;
-
-            p_ret := l_notary_id;
-        end if;
-    exception
-        when OTHERS then
-            rollback;
+        exception when OTHERS then --#3
+          rollback to notary_id;
+          p_ret := -4;
+          p_err := sqlerrm||' '||dbms_utility.format_error_backtrace;
+        end; --#3
+        
+        if p_mfornk is not null and p_rnk is not null then
+          begin -- region
+            insert
+            into   notary_region (NOTARY_ID,KF,RNK)
+                          values (l_nid,p_mfornk,p_rnk);
+          exception when dup_val_on_index then
+            update notary_region
+            set    rnk=p_rnk
+            where  NOTARY_ID=l_nid and
+                   kf=p_mfornk;
+                    when others then
+--          raise_application_error(-30000,sqlerrm);
+            rollback to notary_id;
             p_ret := -1;
-            p_err := sqlerrm || chr(10) || dbms_utility.format_error_backtrace;
-    end;
-
-    procedure edit_nota(
-        p_id                            number  ,
-        p_tin                           varchar2,
-        p_adr                           varchar2,
-        p_datp                          date    ,  -- дата рождения
-        p_email                         varchar2,
-        p_last_name                     varchar2,  -- фамилия
-        p_first_name                    varchar2,  -- имя
-        p_middle_name                   varchar2,  -- отчество
-        p_phone_number                  varchar2,
-        p_mobile_phone_number           varchar2,
-        p_passport_series               varchar2,
-        p_passport_number               varchar2,
-        p_passport_issuer               varchar2,
-        p_passport_issued               date    ,
-        p_notary_type                   number  ,
-        p_certificate_number            varchar2,
-        p_certificate_issue_date        date,
-        p_certificate_cancelation_date  date,
-        p_rnk                           number  ,
-        p_mfornk                        varchar2,
-        p_err                       out varchar2)
-    is
-        l_error_code integer;
-        l_notary_row notary%rowtype;
-    begin
-        p_err := null;
-
-        l_notary_row := read_notary(p_id, p_lock => true, p_raise_ndf => false);
-
-        if (l_notary_row.id is null) then
-            p_err := 'Нотаріус з ідентифікатором {' || p_id || '} не знайдений';
-
-            return;
+            p_err := sqlerrm||' '||dbms_utility.format_error_backtrace;
+          end;
         end if;
+        p_ret := l_nid;
+      end; --#2
+     end if;
+    exception when OTHERS then --#1
+--    raise_application_error(-30000,sqlerrm);
+      rollback to notary_id;
+      p_ret := -2;
+      p_err := sqlerrm||' '||dbms_utility.format_error_backtrace;
+    end; --#1
+  end; --#main;
 
-        check_notary_uniqueness(p_id, p_tin, p_certificate_number, l_error_code, p_err);
+--
 
-        if (l_error_code is null) then
-            attribute_utl.set_value(p_id, ATTR_CODE_TIN,                 p_tin);
-            attribute_utl.set_value(p_id, ATTR_CODE_FIRST_NAME,          p_first_name);
-            attribute_utl.set_value(p_id, ATTR_CODE_MIDDLE_NAME,         p_middle_name);
-            attribute_utl.set_value(p_id, ATTR_CODE_LAST_NAME,           p_last_name);
-            attribute_utl.set_value(p_id, ATTR_CODE_DATE_OF_BIRTH,       p_datp);
-            attribute_utl.set_value(p_id, ATTR_CODE_PASSPORT_SERIES,     p_passport_series);
-            attribute_utl.set_value(p_id, ATTR_CODE_PASSPORT_NUMBER,     p_passport_number);
-            attribute_utl.set_value(p_id, ATTR_CODE_ADDRESS,             p_adr);
-            attribute_utl.set_value(p_id, ATTR_CODE_PASSPORT_ISSUER,     p_passport_issuer);
-            attribute_utl.set_value(p_id, ATTR_CODE_PASSPORT_ISSUED,     p_passport_issued);
-            attribute_utl.set_value(p_id, ATTR_CODE_PHONE_NUMBER,        p_phone_number);
-            attribute_utl.set_value(p_id, ATTR_CODE_MOBILE_PHONE_NUMBER, p_mobile_phone_number);
-            attribute_utl.set_value(p_id, ATTR_CODE_EMAIL,               p_email);
-            attribute_utl.set_value(p_id, ATTR_CODE_NOTARY_TYPE,         p_notary_type);
-            attribute_utl.set_value(p_id, ATTR_CODE_CERT_NUMBER,         p_certificate_number);
-            attribute_utl.set_value(p_id, ATTR_CODE_CERT_ISSUE_DATE,     p_certificate_issue_date);
-            attribute_utl.set_value(p_id, ATTR_CODE_CERT_CANCEL_DATE,    p_certificate_cancelation_date);
-
-            if (p_rnk is not null and p_mfornk is not null) then
-                merge into notary_region a
-                using dual
-                on (a.notary_id = p_id and
-                    a.kf = p_mfornk)
-                when matched then update
-                     set a.rnk = p_rnk
-                when not matched then insert (NOTARY_ID, KF, RNK)
-                     values (p_id, p_mfornk, p_rnk);
-            end if;
+  procedure edit_nota       (p_id                            number  ,
+                             p_TIN                           varchar2,
+                             p_adr                           varchar2,
+                             p_datp                          date    ,  -- дата рождения
+                             p_email                         varchar2,
+                             p_last_name                     varchar2,  -- фамилия
+                             p_first_name                    varchar2,  -- имя
+                             p_middle_name                   varchar2,  -- отчество
+                             p_phone_number                  varchar2,
+                             p_MOBILE_PHONE_NUMBER           varchar2,
+                             p_PASSPORT_SERIES               varchar2,
+                             p_PASSPORT_NUMBER               varchar2,
+                             p_PASSPORT_ISSUER               varchar2,
+                             p_PASSPORT_ISSUED               date    ,
+                             p_NOTARY_TYPE                   number  ,
+                             p_CERTIFICATE_NUMBER            varchar2,
+                             p_CERTIFICATE_ISSUE_DATE        date,
+                             p_CERTIFICATE_CANCELATION_DATE  date,
+                             p_RNK                           number  ,
+                             p_MFORNK                        varchar2,
+               p_DOCUMENT_TYPE                 number,
+                             p_IDCARD_DOCUMENT_NUMBER        number,
+                             p_IDCARD_NOTATION_NUMBER        varchar2,
+                             p_PASSPORT_EXPIRY               date,
+                             p_err                       out varchar2)
+  is
+    l_1    int;
+  begin
+    p_err := null;
+    if p_id is not null then
+--    begin
+--      select id
+--      into   l_1
+--      from   notary
+--      where  p_TIN<>'0000000000' and
+--             tin=p_TIN           and
+--             rownum<2;
+--      if l_1<>p_id then
+--        p_err := 'TIN '||p_TIN||' not unique';
+--      end if;
+--    exception when no_data_found then
+--      null;
+--    end;
+--    if p_err is null then
+      begin
+        attribute_utl.set_value(p_id,ATTR_CODE_TIN,                p_TIN);
+        attribute_utl.set_value(p_id,ATTR_CODE_FIRST_NAME,         p_first_name);
+        attribute_utl.set_value(p_id,ATTR_CODE_MIDDLE_NAME,        p_middle_name);
+        attribute_utl.set_value(p_id,ATTR_CODE_LAST_NAME,          p_last_name);
+        attribute_utl.set_value(p_id,ATTR_CODE_DATE_OF_BIRTH,      p_datp);
+        attribute_utl.set_value(p_id,ATTR_CODE_PASSPORT_SERIES,    p_PASSPORT_SERIES);
+        attribute_utl.set_value(p_id,ATTR_CODE_PASSPORT_NUMBER,    p_PASSPORT_NUMBER);
+        attribute_utl.set_value(p_id,ATTR_CODE_ADDRESS,            p_adr);
+        attribute_utl.set_value(p_id,ATTR_CODE_PASSPORT_ISSUER,    p_PASSPORT_ISSUER);
+        attribute_utl.set_value(p_id,ATTR_CODE_PASSPORT_ISSUED,    p_PASSPORT_ISSUED);
+        attribute_utl.set_value(p_id,ATTR_CODE_PHONE_NUMBER,       p_phone_number);
+        attribute_utl.set_value(p_id,ATTR_CODE_MOBILE_PHONE_NUMBER,p_MOBILE_PHONE_NUMBER);
+        attribute_utl.set_value(p_id,ATTR_CODE_EMAIL,              p_email);
+        attribute_utl.set_value(p_id,ATTR_CODE_NOTARY_TYPE,        p_NOTARY_TYPE);
+        attribute_utl.set_value(p_id,ATTR_CODE_CERT_NUMBER,        p_CERTIFICATE_NUMBER);
+        attribute_utl.set_value(p_id,ATTR_CODE_CERT_ISSUE_DATE,    p_CERTIFICATE_ISSUE_DATE);
+        attribute_utl.set_value(p_id,ATTR_CODE_CERT_CANCEL_DATE,   p_CERTIFICATE_CANCELATION_DATE);
+    attribute_utl.set_value(p_id,ATTR_CODE_DOCUMENT_TYPE,         p_DOCUMENT_TYPE);
+        attribute_utl.set_value(p_id,ATTR_CODE_IDCARD_DOCUMENT_NUM,   p_IDCARD_DOCUMENT_NUMBER);
+        attribute_utl.set_value(p_id,ATTR_CODE_IDCARD_NOTATION_NUM,   p_IDCARD_NOTATION_NUMBER);
+        attribute_utl.set_value(p_id,ATTR_CODE_PASSPORT_EXPIRY,       p_PASSPORT_EXPIRY);
+        if p_rnk is not null and p_mfornk is not null then
+          begin -- region
+            insert
+            into   notary_region (NOTARY_ID,KF,RNK)
+                          values (p_id,p_mfornk,p_rnk);
+          exception when dup_val_on_index then
+            update notary_region
+            set    rnk=p_rnk
+            where  NOTARY_ID=p_id and
+                   kf=p_mfornk;
+                    when others then
+            p_err := sqlerrm||' '||dbms_utility.format_error_backtrace;
+          end;
         end if;
-    exception
-        when others then
-             rollback;
-             p_err := sqlerrm || chr(10) || dbms_utility.format_error_backtrace();
-    end;
+      exception when no_data_found then
+        p_err := sqlerrm||' '||dbms_utility.format_error_backtrace;
+      end;
+--    end if;
+    end if;
+  end;
+
+--
 
   procedure add_accr        (p_notary_id                     number       ,
                              p_accreditation_type_id         number       ,
@@ -562,7 +646,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.NOTA AS
       attribute_utl.set_value(l_accr_id,ATTR_CODE_ACCR_ACCOUNT_NUMBER, p_account_number);
       attribute_utl.set_value(l_accr_id,ATTR_CODE_ACCR_ACCOUNT_MFO,    p_account_mfo);
       attribute_utl.set_value(l_accr_id,ATTR_CODE_ACCR_STATE,          nvl(p_state_id,ACCR_STATE_NEW_REQUEST));
-      attribute_utl.set_value(l_accr_id,ATTR_CODE_ACCR_BRANCHES,       p_branches);
+--    attribute_utl.set_value(l_accr_id,ATTR_CODE_ACCR_BRANCHES,       tools.varchar2_list_to_string_list(p_branches));
+      attribute_utl.set_value(l_accr_id,ATTR_CODE_ACCR_BRANCHES,       p_branches );
       attribute_utl.set_value(l_accr_id,ATTR_CODE_ACCR_SEG_OF_BUSINESS,p_segments_of_business);
       p_ret := l_accr_id;
     exception when OTHERS then
@@ -596,7 +681,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.NOTA AS
       attribute_utl.set_value(p_accr_id,ATTR_CODE_ACCR_ACCOUNT_NUMBER, p_account_number);
       attribute_utl.set_value(p_accr_id,ATTR_CODE_ACCR_ACCOUNT_MFO,    p_account_mfo);
       attribute_utl.set_value(p_accr_id,ATTR_CODE_ACCR_STATE,          nvl(p_state_id,ACCR_STATE_NEW_REQUEST));
-      attribute_utl.set_value(p_accr_id,ATTR_CODE_ACCR_BRANCHES,       p_branches);
+--    attribute_utl.set_value(p_accr_id,ATTR_CODE_ACCR_BRANCHES,       tools.varchar2_list_to_string_list(p_branches));
+      attribute_utl.set_value(p_accr_id,ATTR_CODE_ACCR_BRANCHES,       p_branches );
       attribute_utl.set_value(p_accr_id,ATTR_CODE_ACCR_SEG_OF_BUSINESS,p_segments_of_business);
       p_ret := null;
     exception when no_data_found then
@@ -728,7 +814,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.NOTA AS
         p_mobile_phone_number varchar2,
         p_email               varchar2,
         p_rnk                 integer ,
-        p_account_number      varchar2)
+        p_account_number      varchar2,
+        p_DOCUMENT_TYPE                 number,
+        p_IDCARD_DOCUMENT_NUMBER        number,
+        p_IDCARD_NOTATION_NUMBER        varchar2,
+        p_PASSPORT_EXPIRY               date)
     is
         l_notary_row notary%rowtype;
         l_accreditation_row notary_accreditation%rowtype;
@@ -757,7 +847,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.NOTA AS
                      'p_mobile_phone_number : ' || p_mobile_phone_number || chr(10) ||
                      'p_email               : ' || p_email               || chr(10) ||
                      'p_rnk                 : ' || p_rnk                 || chr(10) ||
-                     'p_account_number      : ' || p_account_number);
+                     'p_account_number      : ' || p_account_number      || chr(10) ||
+                     'p_DOCUMENT_TYPE       : ' || p_DOCUMENT_TYPE       || chr(10) ||
+                     'p_IDCARD_DOCUMENT_NUMBER      : ' || p_IDCARD_DOCUMENT_NUMBER      || chr(10) ||
+                     'p_IDCARD_NOTATION_NUMBER      : ' || p_IDCARD_NOTATION_NUMBER      || chr(10) ||
+                     'p_PASSPORT_EXPIRY     : ' || p_PASSPORT_EXPIRY);
         end;
     begin
         l_notary_row := read_notary(p_certificate_number, p_lock => true, p_raise_ndf => false);
@@ -784,6 +878,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.NOTA AS
                         null,
                         p_rnk,
                         p_sender_mfo,
+            p_DOCUMENT_TYPE,
+                        p_IDCARD_DOCUMENT_NUMBER,
+                        p_IDCARD_NOTATION_NUMBER,
+                        p_PASSPORT_EXPIRY,
                         l_notary_row.id,
                         l_error_message);
 
@@ -801,6 +899,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.NOTA AS
             if (l_notary_row.notary_type <> p_notary_type) then
                 raise_application_error(-20000, 'Тип нотаріуса в ЦА {' || list_utl.get_item_name(nota.LT_NOTARY_TYPE, l_notary_row.notary_type) ||
                                                 '} не відповідає типу нотаріуса РУ {' || list_utl.get_item_name(nota.LT_NOTARY_TYPE, p_notary_type) || '}');
+            end if;
+
+            if (l_notary_row.DOCUMENT_TYPE <> p_DOCUMENT_TYPE) then
+                raise_application_error(-20000, 'Тип документу {' || list_utl.get_item_name(nota.LT_NOTARY_DOCUMENT_TYPE, l_notary_row.DOCUMENT_TYPE) ||
+                                                '} не відповідає типу документа {' || list_utl.get_item_name(nota.LT_NOTARY_DOCUMENT_TYPE, p_DOCUMENT_TYPE) || '}');
             end if;
 
             l_accreditation_row := get_last_accreditation(l_notary_row.id,
@@ -886,16 +989,38 @@ CREATE OR REPLACE PACKAGE BODY BARS.NOTA AS
     return G_BODY_VERSION;
   end;
 
+  function Get_Accr_Branches(p_accr_id notary_accreditation.id%type) return string is
+  begin
+--  return tools.words_to_string(attribute_utl.get_string_values(p_accr_id, ATTR_CODE_ACCR_BRANCHES));
+    return tools.words_to_string(tools.varchar2_list_to_string_list(attribute_utl.get_string_values(p_accr_id, ATTR_CODE_ACCR_BRANCHES)));
+  end Get_Accr_Branches;
+
+  function Get_Accr_BranchNames(p_accr_id notary_accreditation.id%type) return string is
+    result string_list;
+  begin
+    select trim(nb) bulk collect into result from banks
+     inner join table(attribute_utl.get_string_values(p_accr_id, ATTR_CODE_ACCR_BRANCHES)) on mfo = column_value;
+    return tools.words_to_string(result);
+  end Get_Accr_BranchNames;
+
+  function Get_Accr_Seg_of_Business(p_accr_id notary_accreditation.id%type) return string is
+    result string_list;
+  begin
+    select list_item_name bulk collect into result from v_list_items
+     inner join table(attribute_utl.get_number_values(p_accr_id, ATTR_CODE_ACCR_SEG_OF_BUSINESS)) on list_item_id = column_value
+    where list_code = 'NOTARY_SEGMENT_OF_BUSINESS';
+    return tools.words_to_string(result);
+  end Get_Accr_Seg_of_Business;
+  
+  
 END nota;
 /
- show err;
- 
+
+show err;
+
 PROMPT *** Create  grants  NOTA ***
 grant EXECUTE                                                                on NOTA            to BARS_ACCESS_DEFROLE;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/nota.sql =========*** End *** ======
- PROMPT ===================================================================================== 
- 
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/package/nota.sql =========*** End *** ======
+PROMPT ===================================================================================== 

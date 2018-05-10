@@ -1051,7 +1051,7 @@ create or replace package dpt_web is
 end dpt_web;
 /
 create or replace package body dpt_web is
-  g_body_version  constant varchar2(64) := 'version 48.055 05.04.2018 - not mmfo';
+  g_body_version  constant varchar2(64) := 'version 48.056 02.05.2018 - not mmfo';
   g_awk_body_defs constant varchar2(512) := '' || 'Сбербанк' || chr(10) ||
                                             'KF - мульти-МФО схема с доступом по филиалам' ||
                                             chr(10) ||
@@ -2687,11 +2687,11 @@ create or replace package body dpt_web is
          ead_pack.doc_create(p_type_id      => 'DOC',
                                            p_template_id  => 'WB_CREATE_DEPOSIT',
                                            p_scan_data    => null,
-                                           p_ea_struct_id => 212,
+                                           p_ea_struct_id => 541,
                                            p_rnk          => p_rnk,
                                            p_agr_id       => l_dpt);
         ebp.set_archive_docid(l_dpt, l_archdocid);
-        ead_pack.doc_sign(l_archdocid);
+        --ead_pack.doc_sign(l_archdocid);
       exception
         when others then
           bars_audit.trace(dbms_utility.format_error_stack() || chr(10) ||
@@ -4124,6 +4124,8 @@ create or replace package body dpt_web is
     l_transferdptacc    dpt_deposit.nls_d%type;
     l_transferdptmfo    dpt_deposit.mfo_d%type;
     l_transferdptcardn  varchar2(16);
+    l_wb                dpt_deposit.wb%type;
+    l_archdocid         number;								 
     ----------------------------------
     function get_data_from_xml(p_dataxml xmltype, p_param varchar2)
       return varchar2 is
@@ -4172,14 +4174,15 @@ create or replace package body dpt_web is
   
     -- вид вклада и рег.№ клиента-владельца вклада
     begin
-      select rnk, vidd, kv, limit, acc, datz, dat_begin
+      select rnk, vidd, kv, limit, acc, datz, dat_begin, wb
         into l_dptowner,
              l_vidd,
              l_currency,
              l_dptamount,
              l_accd,
              l_datz,
-             l_datb
+             l_datb,
+             l_wb							  
         from dpt_deposit
        where deposit_id = p_dptid;
     exception
@@ -4627,6 +4630,23 @@ create or replace package body dpt_web is
         bars_audit.trace('%s ДС о перечислении вклада и %% на текущий счет',
                          l_title);
       elsif p_agrmnttype = 11 then
+         if (l_wb = 'Y') then
+          begin
+            l_archdocid :=
+             ead_pack.doc_create(p_type_id      => 'DOC',
+                                               p_template_id  => 'WB_CHANGE_ACCOUNT',
+                                               p_scan_data    => null,
+                                               p_ea_struct_id => 543,
+                                               p_rnk          => l_dptowner,
+                                               p_agr_id       => p_dptid);
+            ebp.set_archive_docid(p_dptid, l_archdocid);
+--            ead_pack.doc_sign(l_archdocid);
+          exception
+            when others then
+              bars_audit.trace(dbms_utility.format_error_stack() || chr(10) ||
+                               dbms_utility.format_error_backtrace());
+          end;
+        end if;
         bars_audit.trace('%s ДС о перечислении вклада и %% на карточный счет',
                          l_title);
       elsif p_agrmnttype = 20 then
@@ -4862,6 +4882,23 @@ create or replace package body dpt_web is
       -- відмова від автопролонгації договору
     elsif (p_agrmnttype = 17) then
     
+	if (l_wb = 'Y') then
+      begin
+        l_archdocid :=  
+           ead_pack.doc_create(p_type_id      => 'DOC',
+                               p_template_id  => 'WB_DENY_AUTOLONGATION',
+                               p_scan_data    => null,
+                               p_ea_struct_id => 542,
+                               p_rnk          => l_dptowner,
+                               p_agr_id       => p_dptid);
+            ebp.set_archive_docid(p_dptid, l_archdocid);
+--            ead_pack.doc_sign(l_archdocid);
+      exception
+        when others then
+          bars_audit.trace(dbms_utility.format_error_stack() || chr(10) ||
+                           dbms_utility.format_error_backtrace());
+      end;
+    end if;
       bars_audit.trace('%s відмова від автопролонгації договору # %s',
                        l_title,
                        to_char(p_dptid));

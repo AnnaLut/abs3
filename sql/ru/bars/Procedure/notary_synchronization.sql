@@ -246,6 +246,10 @@ begin
                      extractValue(value(dtl),'Notary/CertCancDate'     )              CertCancDate            ,
                      extractValue(value(dtl),'Notary/RNK'              )              RNK                     ,
                      extractValue(value(dtl),'Notary/MFORNK'           )              MFORNK                  ,
+                     extractValue(value(dtl),'Notary/DOCUMENT_TYPE'    )              DOCUMENT_TYPE           ,
+                     extractValue(value(dtl),'Notary/IDCARD_DOCUMENT_NUMBER')         IDCARD_DOCUMENT_NUMBER  ,
+                     extractValue(value(dtl),'Notary/IDCARD_NOTATION_NUMBER')         IDCARD_NOTATION_NUMBER  ,
+                     extractValue(value(dtl),'Notary/PASSPORT_EXPIRY'  )              PASSPORT_EXPIRY         ,
                      extractValue(value(subdtl),'Accreditation/Id'                  ) Accr_Id                 ,
                      extractValue(value(subdtl),'Accreditation/AccreditationTypeId' ) Accr_AccreditationTypeId,
                      extractValue(value(subdtl),'Accreditation/StartDate'           ) Accr_StartDate          ,
@@ -341,6 +345,10 @@ begin
                        l_CertCancDate         ,
                        k.RNK                  ,
                        k.MFORNK               ,
+                       k.DOCUMENT_TYPE        ,
+                       k.IDCARD_DOCUMENT_NUMBER, 
+                       k.IDCARD_NOTATION_NUMBER, 
+                       k.PASSPORT_EXPIRY,
                        l_err);
         if l_err is not null then
           bars_audit.error('notary_synchronization: (0) ошибка - id = '||k.Id||', '||l_err);

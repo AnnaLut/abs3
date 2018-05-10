@@ -1,11 +1,9 @@
-CREATE OR REPLACE VIEW BARS.V_EBKC_QUEUE_UPDCARD_PRIVATE
+PROMPT *** Create  view V_EBKC_QUEUE_UPDCARD_PRIVATE ***
+
+create or replace view V_EBKC_QUEUE_UPDCARD_PRIVATE
 as
 select v.kf,
-       case
-         when ( EBK_PARAMS.IS_CUT_RNK = 1 )
-         then trunc(v.RNK/100)
-         else v.RNK
-       end as RNK,
+       v.RNK,
        v.lastchangedt,
        v.date_off        as dateOff,
        v.date_on         as dateOn,
@@ -69,13 +67,22 @@ select v.kf,
        v.ms_gr           as groupAffiliation,
        v.email,
        v.cigpo           as employmentStatus,
-       v.RNK             as CUST_ID
-  from V_EBKC_PRIVATE_ENT v
- where exists ( select null from ebkc_queue_updatecard lp 
-                 where lp.rnk = v.rnk
-                   and lp.cust_type = 'P'
-                   and lp.status=0 );
+       eq.RNK            as CUST_ID,
+       eg.GCIF,
+       cast( null as number ) as RCIF
+  from ( select KF, RNK
+           from EBKC_QUEUE_UPDATECARD
+          where CUST_TYPE = 'P'
+            and STATUS    = 0
+          order by ROWID
+       ) eq
+  left
+  join EBKC_GCIF eg
+    on ( eg.RNK = eq.RNK )
+  join V_EBKC_PRIVATE_ENT v
+    on ( v.RNK  = eq.RNK )
+;
 
-show err
+show errors;
 
-grant select on BARS.V_EBKC_QUEUE_UPDCARD_PRIVATE to BARS_ACCESS_DEFROLE;
+grant select on V_EBKC_QUEUE_UPDCARD_PRIVATE to BARS_ACCESS_DEFROLE;

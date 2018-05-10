@@ -66,7 +66,7 @@ PROMPT *** Create  view W4_DEAL_WEB ***
                   c.custtype,
                      'id in (select doc_id from w4_product_doc where grp_code='''
                   || wp.grp_code
-                  || ''' and doc_id not like ''%MIGR%'')'
+                  || ''' and doc_id not like ''%MIGR%'' and type is null)'
                      doc_id,
                   cw.value workb,
                   wc.date_open,

@@ -283,7 +283,6 @@ CREATE OR REPLACE PACKAGE BODY escr IS
                   p_R1      => p_R1, --OUT number, -- Общий ресурс (ост на SG(262*)
                   p_R2      => p_R2, --OUT number, --  Свободный ресурс R2 =  R1 - z4
                   p_P1      => p_P1 --OUT number  --  Реф.платежа
-
                   );
       escr.p_cc_lim_count(deal_id      => i.nd,
                           cc_lim_count => l_lim_count_after);
@@ -620,8 +619,11 @@ CREATE OR REPLACE PACKAGE BODY escr IS
       ----------------------------------------------------------------------- зачислить всю сумму на 2620
       l_txt := l_tx7;
 
+/* VPogoda 
+   -	Перевірку дати укладення кредитних договорів та суми залишку заборгованості – НЕ здійснювати  ( …If dd.sdate >= Dat20_);
+*/   
       -- 23.11.2017 Повернення надлишкових сум  COBUMMFO-5548  - ESCR.
-      If dd.sdate >= Dat20_ then
+--      If dd.sdate >= Dat20_ then
         -------- дати укладення Кредитних договорів – до 19/11/2017 ВКЛЮЧНО (<20),  та після 20.11.2017р ВКЛЮЧНО.(>=20)
         select LEAST(SA_, -a.ostc)
           into SA1_
@@ -630,9 +632,9 @@ CREATE OR REPLACE PACKAGE BODY escr IS
            and n.acc = a.acc
            and a.tip = 'LIM';
         SA2_ := SA_ - SA1_;
-      end if;
+--      end if;
 
-      If SA2_ > 0 then
+/*      If SA2_ > 0 then
         oo.tt := case
                    when oo.mfoa = oo.mfob then
                     'PS1'
@@ -684,9 +686,9 @@ CREATE OR REPLACE PACKAGE BODY escr IS
               oo.nlsa,
               SA2_);
       end if;
-
+*/
       --- Зарахувати на 2625 ---------------------------
-      If sa1_ > 0 then
+      If sa_ > 0 then
         gl.payv(flg_,
                 ref_,
                 vdat_,
@@ -697,10 +699,10 @@ CREATE OR REPLACE PACKAGE BODY escr IS
                 sa1_,
                 kv_,
                 aa.nls,
-                sa1_); -------------3739_05 ---> 2620
+                sa_); -------------3739_05 ---> 2620
          gl.pay(2, ref_, vdat_);
-         bars_audit.info('ESCR PAY1 По КД '||dd.nd ||' ,сума компенсації рівна '|| sa1_);
-      elsif sa1_=0 then
+         bars_audit.info('ESCR PAY1 По КД '||dd.nd ||' ,сума компенсації рівна '|| sa_);
+      elsif sa_=0 then
          DELETE FROM nlk_ref WHERE ref1 = ref_;
          bars_audit.info('ESCR PAY1 По КД '||dd.nd ||' ,сума компенсації рівна 0. Запис з референсом '||ref_ ||' видалено з картотеки.');
       else
