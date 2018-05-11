@@ -651,14 +651,14 @@ BEGIN
 
       case
           when dc_ <= 10
-          then 
+          then
                datp_ := trunc(dat_,'MM');
                datn_ := trunc(dat_,'MM') + 9;
           when dc_ <= 20
-          then 
+          then
                datp_ := trunc(dat_,'MM') + 10;
                datn_ := trunc(dat_,'MM') + 19;
-          else 
+          else
                datp_ := trunc(dat_,'MM') + 20;
                datn_ := last_day(dat_);
       end case;
@@ -671,7 +671,7 @@ BEGIN
    then
       datn_ := LAST_DAY (dat_);
    end if;
-   
+
    if pmode_ = 2 then -- для файлу @77
       p_arc_otcn (dat_, 0);
    else
@@ -1629,7 +1629,7 @@ BEGIN
                 then
                    s242_ := 'B';
                 end if;
-                
+
                 if tips_ in ('SK9','SP','SPN','OFR','KSP','KK9','KPN', 'SNA') then
                    s242_ :='Z';
                 end if;
@@ -4330,7 +4330,7 @@ BEGIN
                                             t020||'0'||nbs||lpad(kv, 3, '0'), nbuc, typ_)
                              end) ostq
                        from (
-                           select nbuc, decode(t020, -1, '1', '2') t020, rez, 
+                           select nbuc, decode(t020, -1, '1', '2') t020, rez,
                                 replace(nbs, '86','26') nbs, kv, abs(ostq) ostq
                            from (
                              select  /*+ parallel(8) */
@@ -4349,7 +4349,7 @@ BEGIN
                                            '2400','2401','2890','3190','3290','3590','3599','3690','3692',
                                            '9010','9015','9030','9031','9036','9500',
                                           '1419','1429','1509','1519','1529','2039','2069','2089','2109','2119','2129',
-                                          '2139','2209','2239','2609','2629','2659','3119','3219') 
+                                          '2139','2209','2239','2609','2629','2659','3119','3219')
                                 and tip <> 'NL8'
                                 and a.acc = s.acc
                                 and a.rnk = c.rnk
@@ -4383,7 +4383,7 @@ BEGIN
                  order by 1, 2 )
         loop
             begin
-               begin
+                begin
                   select recid
                    into recid_
                   from rnbu_trace
@@ -4393,21 +4393,21 @@ BEGIN
                         (sign(k.rizn) = -1 and to_number(znap) >= abs(k.rizn) or
                         sign(k.rizn) = 1 and to_number(znap) > 0) and
                         rownum = 1;
-            exception
-              when no_data_found then
-                   begin
-                      select recid
-                       into recid_
-                      from rnbu_trace
-                      where nbuc = k.nbuc and
-                            kodp like k.t020||k.nbs||'____'||k.rez||'_'||lpad(k.kv, 3,'0')||'%' and
-                                substr(kodp, 6,2) = substr(k.R013_s580_A,2,2) and
-                                (sign(k.rizn) = -1 and to_number(znap) >= abs(k.rizn) or
-                                sign(k.rizn) = 1 and to_number(znap) > 0) and
-                                rownum = 1;
+                exception
+                  when no_data_found then
+                       begin
+                          select recid
+                           into recid_
+                          from rnbu_trace
+                          where nbuc = k.nbuc and
+                                kodp like k.t020||k.nbs||'____'||k.rez||'_'||lpad(k.kv, 3,'0')||'%' and
+                                    substr(kodp, 6,2) = substr(k.R013_s580_A,2,2) and
+                                    (sign(k.rizn) = -1 and to_number(znap) >= abs(k.rizn) or
+                                    sign(k.rizn) = 1 and to_number(znap) > 0) and
+                                    rownum = 1;
                        exception
                           when no_data_found then
-                              begin
+                            begin
                                  select recid
                                   into recid_
                                  from rnbu_trace
@@ -4420,9 +4420,9 @@ BEGIN
                             exception
                                when no_data_found then
                                   recid_ := null;
+                            end;
                        end;
-                   end;
-            end;
+                end;
             exception
                when no_data_found then
                   recid_ := null;
@@ -4437,15 +4437,15 @@ BEGIN
                             '2319','2329','2339','2349','2359','2369','2379',
                             '2409','2419','2429','2439','2609','2629','2659',
                             '2890','3119','3219','3569','3590','3599','3690','3692') and
-                  k.t020 = '2' and 
-                  k.rizn > 0  
-               then 
-                   insert into rnbu_trace(recid, userid, nls, kv, odate, kodp, znap, nbuc, 
+                  k.t020 = '2' and
+                  k.rizn > 0
+               then
+                   insert into rnbu_trace(recid, userid, nls, kv, odate, kodp, znap, nbuc,
                         isp, rnk, acc, ref, comm, nd, mdate, tobo)
-                   select s_rnbu_record.nextval, userid, nls, kv, odate, 
-                        substr(kodp, 1, 8)||'Z'||substr(kodp, 10), 
-                        to_char(k.rizn) znap, nbuc, 
-                        isp, rnk, acc, ref, 'Вирів-ня з балансом на '||to_char(k.rizn) comm, 
+                   select s_rnbu_record.nextval, userid, nls, kv, odate,
+                        substr(kodp, 1, 8)||'Z'||substr(kodp, 10),
+                        to_char(k.rizn) znap, nbuc,
+                        isp, rnk, acc, ref, 'Вирів-ня з балансом на '||to_char(k.rizn) comm,
                         nd, mdate, tobo
                    from rnbu_trace
                    where recid = recid_;
@@ -4458,7 +4458,7 @@ BEGIN
             end if;
         end loop;
     end;
-                      
+
     if pmode_ = 0 then
         declare
            recid_    number;
@@ -4470,7 +4470,7 @@ BEGIN
                              R013_s580, R013_s580_A
                      from (select nbuc, rez, t020, nbs, kv, ostq
                            from (
-                               select nbuc, decode(t020, -1, '1', '2') t020, rez, 
+                               select nbuc, decode(t020, -1, '1', '2') t020, rez,
                                     nbs, kv, abs(ostq) ostq
                                from (
                                  select (case when typ_ > 0
@@ -4481,8 +4481,8 @@ BEGIN
                                      s.nbs, s.kv,
                                      sum(decode(s.kv, 980, a.ost, a.ostq)) ostq
                                  from snap_balances a, accounts s, customer c
-                                 where  a.fdat = dat_ 
-                                    and s.nbs in ('2610','2615','2651','2652') 
+                                 where  a.fdat = dat_
+                                    and s.nbs in ('2610','2615','2651','2652')
                                     and a.acc = s.acc
                                     and s.rnk = c.rnk
                                  group by (case when typ_ > 0
