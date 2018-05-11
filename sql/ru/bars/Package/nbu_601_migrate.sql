@@ -1,3 +1,7 @@
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/PACKAGE/nbu_601_migrate.sql =========*** Run *** 
+PROMPT ===================================================================================== 
+
 create or replace package nbu_601_migrate as
 
     REQ_STATE_NEW                  constant integer := 1;
@@ -366,104 +370,237 @@ procedure run_all_data_requests(
     l_request_id_person_uo int;
     l_request_id_fin_uo int;
     l_request_id_fingr_uo int;
+    l_request_id_groupur_uo int;
+    l_request_id_partners_uo int;
+    l_request_id_ownerpp_uo int;
+    l_request_id_ownerjur_uo int;
+    l_request_id_pledge_dep int;
+    l_request_id_credit int;
+    l_request_id_credit_pledge int;
+    l_request_id_credit_tranche int;
     begin
      begin
-     bars.nbu_601_request_data_ru.p_nbu_w4_bpk(P_KF);
        select id into l_request_id_w4_bpk from nbu_data_request_601 t where  t.report_instance_id= (select max(report_instance_id) from nbu_data_request_601 where data_type_id=19 and kf=p_kf) and
            data_type_id=19 and kf=p_kf;
+         bars.nbu_601_request_data_ru.p_nbu_w4_bpk(P_KF);
          set_data_request_state(l_request_id_w4_bpk,nbu_601_migrate.REQ_STATE_DATA_DELIVERED, 'Дані отримано');
          commit;
-         exception
-         when others then
-         set_data_request_state(l_request_id_w4_bpk,10,sqlerrm ||' '||dbms_utility.format_error_backtrace());
+    exception
+        when others then
+         set_data_request_state(l_request_id_w4_bpk,8,sqlerrm ||' '||dbms_utility.format_error_backtrace());
          commit;
       end;
       ---
       begin
-      bars.nbu_601_request_data_ru.p_nbu_person_fo(P_KF);
-       select id into l_request_id_person_fo from nbu_data_request_601 t where  t.report_instance_id= (select max(report_instance_id) from nbu_data_request_601 where data_type_id=1 and kf=p_kf) and
+        select id into l_request_id_person_fo from nbu_data_request_601 t where  t.report_instance_id= (select max(report_instance_id) from nbu_data_request_601 where data_type_id=1 and kf=p_kf) and
            data_type_id=1 and kf=p_kf;
-             set_data_request_state(l_request_id_person_fo,nbu_601_migrate.REQ_STATE_DATA_DELIVERED, 'Дані отримано');
-             commit;
-             exception
-             when others then
-             set_data_request_state(l_request_id_person_fo,10,sqlerrm ||' '||dbms_utility.format_error_backtrace());
-             commit;
+          bars.nbu_601_request_data_ru.p_nbu_person_fo(P_KF);
+          set_data_request_state(l_request_id_person_fo,nbu_601_migrate.REQ_STATE_DATA_DELIVERED, 'Дані отримано');
+          commit;
+      exception
+        when others then
+          set_data_request_state(l_request_id_person_fo,8,sqlerrm ||' '||dbms_utility.format_error_backtrace());
+          commit;
       end;
       ---
       begin
-      bars.nbu_601_request_data_ru.p_nbu_document_fo(P_KF);
         select id into l_request_id_document_fo from nbu_data_request_601 t where  t.report_instance_id= (select max(report_instance_id) from nbu_data_request_601 where data_type_id=2 and kf=p_kf) and
            data_type_id=2 and kf=p_kf;
-            set_data_request_state(l_request_id_document_fo,nbu_601_migrate.REQ_STATE_DATA_DELIVERED, 'Дані отримано');
+           bars.nbu_601_request_data_ru.p_nbu_document_fo(P_KF);
+           set_data_request_state(l_request_id_document_fo,nbu_601_migrate.REQ_STATE_DATA_DELIVERED, 'Дані отримано');
             commit;
-             exception
-             when others then
-             set_data_request_state(l_request_id_document_fo,10,sqlerrm ||' '||dbms_utility.format_error_backtrace());
+      exception
+       when others then
+             set_data_request_state(l_request_id_document_fo,8,sqlerrm ||' '||dbms_utility.format_error_backtrace());
              commit;
       end;
       ---
       begin
-      bars.nbu_601_request_data_ru.p_nbu_address_fo(P_KF);
          select id into l_request_id_address_fo from nbu_data_request_601 t where  t.report_instance_id= (select max(report_instance_id) from nbu_data_request_601 where data_type_id=3 and kf=p_kf) and
            data_type_id=3 and kf=p_kf;
+           bars.nbu_601_request_data_ru.p_nbu_address_fo(P_KF);
            set_data_request_state(l_request_id_address_fo,nbu_601_migrate.REQ_STATE_DATA_DELIVERED, 'Дані отримано');
            commit;
-            exception
-            when others then
-            set_data_request_state(l_request_id_address_fo,10,sqlerrm ||' '||dbms_utility.format_error_backtrace());
+      exception when others then
+            set_data_request_state(l_request_id_address_fo,8,sqlerrm ||' '||dbms_utility.format_error_backtrace());
             commit;
       end;
       ----
       begin
-      bars.nbu_601_request_data_ru.p_nbu_person_uo(P_KF);
-       select id into l_request_id_person_uo from nbu_data_request_601 t where  t.report_instance_id= (select max(report_instance_id) from nbu_data_request_601 where data_type_id=7 and kf=p_kf) and
+        select id into l_request_id_person_uo from nbu_data_request_601 t where  t.report_instance_id= (select max(report_instance_id) from nbu_data_request_601 where data_type_id=7 and kf=p_kf) and
            data_type_id=7 and kf=p_kf;
+           bars.nbu_601_request_data_ru.p_nbu_person_uo(P_KF);
            set_data_request_state(l_request_id_person_uo,nbu_601_migrate.REQ_STATE_DATA_DELIVERED, 'Дані отримано');
            commit;
-            exception
-            when others then
-            set_data_request_state(l_request_id_person_uo,10,sqlerrm ||' '||dbms_utility.format_error_backtrace());
+       exception
+          when others then
+            set_data_request_state(l_request_id_person_uo,8,sqlerrm ||' '||dbms_utility.format_error_backtrace());
             commit;
       end;
       --
       begin
-      bars.nbu_601_request_data_ru.p_nbu_finperformance_uo(P_KF);
-      select id
-      into   l_request_id_fin_uo
-      from   nbu_data_request_601 t
-      where  t.report_instance_id= (select max(report_instance_id)from nbu_data_request_601 where data_type_id=8 and kf=p_kf) and data_type_id=8 and kf=p_kf;
-             set_data_request_state( l_request_id_fin_uo,nbu_601_migrate.REQ_STATE_DATA_DELIVERED, 'Дані отримано');
+       select id into l_request_id_fin_uo
+           from nbu_data_request_601 t
+           where t.report_instance_id= (select max(report_instance_id)from nbu_data_request_601 where data_type_id=8 and kf=p_kf) and data_type_id=8 and kf=p_kf;
+           bars.nbu_601_request_data_ru.p_nbu_finperformance_uo(P_KF);
+           set_data_request_state( l_request_id_fin_uo,nbu_601_migrate.REQ_STATE_DATA_DELIVERED, 'Дані отримано');
            commit;
-           exception
+      exception
              when others then
-              set_data_request_state( l_request_id_fin_uo,10,sqlerrm ||' '|| dbms_utility.format_error_backtrace());
+              set_data_request_state( l_request_id_fin_uo,8,sqlerrm ||' '|| dbms_utility.format_error_backtrace());
               commit;
       end;
       --
       begin
-      bars.nbu_601_request_data_ru.p_nbu_finperformancegr_uo(P_KF);
-      select id
-      into   l_request_id_fingr_uo
-      from   nbu_data_request_601 t
-      where  t.report_instance_id= (select max(report_instance_id)from nbu_data_request_601 where data_type_id=10 and kf=p_kf) and data_type_id=10 and kf=p_kf;
+        select id into l_request_id_fingr_uo from nbu_data_request_601 t
+            where  t.report_instance_id= (select max(report_instance_id)from nbu_data_request_601 where data_type_id=10 and kf=p_kf) and data_type_id=10 and kf=p_kf;
+             bars.nbu_601_request_data_ru.p_nbu_finperformancegr_uo(P_KF);
              set_data_request_state(l_request_id_fingr_uo,nbu_601_migrate.REQ_STATE_DATA_DELIVERED, 'Дані отримано');
+             commit;
+      exception
+        when others then
+              set_data_request_state(l_request_id_fingr_uo,8,sqlerrm ||' '|| dbms_utility.format_error_backtrace());
+              commit;
+      end;
+      
+      begin 
+       select id
+       into   l_request_id_groupur_uo
+       from   nbu_data_request_601 t
+       where  t.report_instance_id= (select max(report_instance_id)from nbu_data_request_601 where data_type_id=9 and kf=p_kf) and data_type_id=9 and kf=p_kf;
+             bars.nbu_601_request_data_ru.p_nbu_groupur_uo(P_KF);
+             set_data_request_state(l_request_id_groupur_uo,nbu_601_migrate.REQ_STATE_DATA_DELIVERED, 'Дані отримано');
+             commit;
+      exception
+        when others then
+              set_data_request_state(l_request_id_groupur_uo,8,sqlerrm ||' '|| dbms_utility.format_error_backtrace());
+              commit;
+      end;
+      
+      begin   
+       select id
+       into   l_request_id_partners_uo
+       from   nbu_data_request_601 t
+       where  t.report_instance_id= (select max(report_instance_id)from nbu_data_request_601 where data_type_id=11 and kf=p_kf) and data_type_id=11 and kf=p_kf;
+             bars.nbu_601_request_data_ru.p_nbu_partners_uo(P_KF);
+             set_data_request_state(l_request_id_partners_uo,nbu_601_migrate.REQ_STATE_DATA_DELIVERED, 'Дані отримано');
            commit;
-           exception
+      exception
+         when others then
+              set_data_request_state(l_request_id_partners_uo,8,sqlerrm ||' '|| dbms_utility.format_error_backtrace());
+              commit;
+      end;
+      
+      
+      begin 
+       select id
+       into   l_request_id_fingr_uo
+       from   nbu_data_request_601 t
+       where  t.report_instance_id= (select max(report_instance_id)from nbu_data_request_601 where data_type_id=12 and kf=p_kf) and data_type_id=12 and kf=p_kf;
+             bars.nbu_601_request_data_ru.p_nbu_finperformancepr_uo(P_KF);
+             set_data_request_state(l_request_id_fingr_uo,nbu_601_migrate.REQ_STATE_DATA_DELIVERED, 'Дані отримано'); 
+           commit;
+      exception
+           when others then
+              set_data_request_state(l_request_id_fingr_uo,8,sqlerrm ||' '|| dbms_utility.format_error_backtrace());
+              commit;
+      end;
+      
+      begin 
+       select id
+       into   l_request_id_ownerpp_uo
+       from   nbu_data_request_601 t
+       where  t.report_instance_id= (select max(report_instance_id)from nbu_data_request_601 where data_type_id=13 and kf=p_kf) and data_type_id=13 and kf=p_kf;
+             bars.nbu_601_request_data_ru.p_nbu_ownerpp_uo(P_KF);
+             set_data_request_state(l_request_id_ownerpp_uo,nbu_601_migrate.REQ_STATE_DATA_DELIVERED, 'Дані отримано'); 
+           commit;
+      exception
              when others then
-              set_data_request_state(l_request_id_fingr_uo,10,sqlerrm ||' '|| dbms_utility.format_error_backtrace());
+              set_data_request_state(l_request_id_ownerpp_uo,8,sqlerrm ||' '|| dbms_utility.format_error_backtrace());
+              commit;
+      end;
+      
+      begin 
+       select id
+       into  l_request_id_ownerjur_uo
+       from  nbu_data_request_601 t
+       where t.report_instance_id= (select max(report_instance_id)from nbu_data_request_601 where data_type_id=14 and kf=p_kf) and data_type_id=14 and kf=p_kf;
+             bars.nbu_601_request_data_ru.p_nbu_ownerjur_uo(P_KF);
+             set_data_request_state(l_request_id_ownerjur_uo,nbu_601_migrate.REQ_STATE_DATA_DELIVERED, 'Дані отримано');
+             commit;
+      exception
+             when others then
+              set_data_request_state(l_request_id_ownerjur_uo,8,sqlerrm ||' '|| dbms_utility.format_error_backtrace());
+              commit;
+      end;
+      
+      begin 
+       select id
+       into   l_request_id_pledge_dep
+       from   nbu_data_request_601 t
+       where  t.report_instance_id= (select max(report_instance_id)from nbu_data_request_601 where data_type_id=15 and kf=p_kf) and data_type_id=15 and kf=p_kf;
+             bars.nbu_601_request_data_ru.p_nbu_pledge_dep (P_KF);
+             set_data_request_state(l_request_id_pledge_dep,nbu_601_migrate.REQ_STATE_DATA_DELIVERED, 'Дані отримано');
+             commit;
+      exception
+         when others then
+              set_data_request_state(l_request_id_pledge_dep,8,sqlerrm ||' '|| dbms_utility.format_error_backtrace());
               commit;
       end;
 
- for i in (select * from nbu_data_request_601 t
+      begin 
+       select id
+       into   l_request_id_credit
+       from   nbu_data_request_601 t
+       where  t.report_instance_id= (select max(report_instance_id)from nbu_data_request_601 where data_type_id=16 and kf=p_kf) and data_type_id=16 and kf=p_kf;
+             bars.nbu_601_request_data_ru.p_nbu_credit(P_KF);
+             set_data_request_state(l_request_id_credit,nbu_601_migrate.REQ_STATE_DATA_DELIVERED, 'Дані отримано');
+             commit;
+      exception
+        when others then
+              set_data_request_state(l_request_id_credit,8,sqlerrm ||' '|| dbms_utility.format_error_backtrace());
+              commit;
+      end;
+      
+      begin 
+       select id
+       into   l_request_id_credit_pledge
+       from   nbu_data_request_601 t
+       where  t.report_instance_id= (select max(report_instance_id)from nbu_data_request_601 where data_type_id=17 and kf=p_kf) and data_type_id=17 and kf=p_kf;
+             bars.nbu_601_request_data_ru.p_nbu_credit_pledge(P_KF);
+             set_data_request_state(l_request_id_credit_pledge,nbu_601_migrate.REQ_STATE_DATA_DELIVERED, 'Дані отримано');
+             commit;
+      exception
+         when others then
+              set_data_request_state(l_request_id_credit_pledge,8,sqlerrm ||' '|| dbms_utility.format_error_backtrace());
+              commit;
+      end;
+      
+      
+      begin 
+       select id
+       into   l_request_id_credit_tranche
+       from   nbu_data_request_601 t
+       where  t.report_instance_id= (select max(report_instance_id)from nbu_data_request_601 where data_type_id=18 and kf=p_kf) and data_type_id=18 and kf=p_kf;
+             bars.nbu_601_request_data_ru.p_nbu_credit_tranche(P_KF);
+             set_data_request_state(l_request_id_credit_tranche,nbu_601_migrate.REQ_STATE_DATA_DELIVERED, 'Дані отримано');
+           commit;
+      exception
+        when others then
+              set_data_request_state(l_request_id_credit_tranche,8,sqlerrm ||' '|| dbms_utility.format_error_backtrace());
+              commit;
+      end;    
+
+/* for i in (select * from nbu_data_request_601 t
                   where  t.report_instance_id = p_report_id and
                          t.state_id = nbu_601_migrate.REQ_STATE_NEW and
-                         t.kf=p_kf  and
-                         t.id not in (l_request_id_w4_bpk,l_request_id_person_fo,l_request_id_document_fo,l_request_id_address_fo,l_request_id_person_uo,l_request_id_fingr_uo, l_request_id_fin_uo)
+                         t.kf=p_kf 
+                          and
+                         t.id not in (l_request_id_w4_bpk,l_request_id_person_fo,l_request_id_document_fo,l_request_id_address_fo,l_request_id_person_uo,l_request_id_fingr_uo,l_request_id_fin_uo)
                          ) loop
             run_data_request(i.id);
         end loop;
-      commit;
+      commit;*/
 end;
 
 procedure handle_data_request(
@@ -565,5 +702,10 @@ procedure create_data_request(P_KF in varchar2)
  end;
 end;
 /
+
 grant execute on nbu_601_request_data_ru to barstrans;
 grant execute on nbu_601_request_data_ru to bars_access_defrole;
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/PACKAGE/nbu_601_migrate.sql =========*** End *** 
+PROMPT ===================================================================================== 
