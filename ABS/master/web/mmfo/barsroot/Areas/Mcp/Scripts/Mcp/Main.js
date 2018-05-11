@@ -74,7 +74,7 @@ mainApp.controller("McpCtrl", function ($controller, $scope, $http, $timeout, ke
                 });
         }
     };
-    var allowedForSelectStatuses = [17, 19, 20];
+    var allowedForSelectStatuses = [1, 2, 3, 4, 5, 14, 17, 19, 20, 99];
     $scope.disabledToolbarGrid = function (id, op){
         var grid = id === "files" ? $scope.filesGrid : $scope.infoLinesGrid;
         var row = grid.dataItem(grid.select());
