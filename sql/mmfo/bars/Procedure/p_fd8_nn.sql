@@ -7,7 +7,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #D8 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 19/04/2018 (17/04/2018, 16/04/2018)
+% VERSION     : 11/05/2018 (19/04/2018, 17/04/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                sheme_ - схема формирования
@@ -18,6 +18,10 @@ IS
     содержиться в поле RNKA (в RNKB участвующие клиенты нашего банка или
     пустое значение для не клиентов банка)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%11/05/2018 - для счетов дисконта 14_6,15_6,20_6,21_6,22_6,23_6,24_6,
+              31_6,32_6,35_6 
+              и параметра R013 in ('1','2','3','4')
+              будет формироваться код "DDD"='125' вместо "122"
 %19/04/2018 - удалил закоментаренные блоки
 %17/04/2018 - изменено формирование показателя 085 для нерезидентов и 
               наличием кода ИНН 
@@ -502,6 +506,7 @@ IS
    dat_izm4     date := to_date('31/10/2016','dd/mm/yyyy');
    dat_izm5     date := to_date('30/12/2016','dd/mm/yyyy');
    dat_izm6     date := to_date('29/12/2017','dd/mm/yyyy');
+   dat_izm7     date := to_date('27/04/2018','dd/mm/yyyy');
    n_trans      number;
    kod_mm       Varchar2(2);
    nls_9129_9   VARCHAR2 (15);
@@ -2666,7 +2671,7 @@ BEGIN
         FROM (SELECT   /*+ ordered  */
                        d.link_group,
                        d.link_name,
-                       u.prins,
+                       max(u.prins) prins,
                        SUM (decode(s.kv, 980, s.ost - s.dos96 + s.kos96,
                                               s.ostq -s.dosq96 + s.kosq96)
                            ) ost
@@ -2722,7 +2727,7 @@ BEGIN
                    AND (prnk_ IS NULL OR s.rnk = prnk_)
                    AND ( ((our_rnk_ = -1 or s.rnk <> our_rnk_) and mfo_ <> 300465) or
                          (s.rnk <> 0 and mfo_ = 300465) )
-              GROUP BY d.link_group, d.link_name, u.prins
+              GROUP BY d.link_group, d.link_name
               having  SUM (decode(s.kv, 980, s.ost - s.dos96 + s.kos96,
                                              s.ostq -s.dosq96 + s.kosq96)
                            ) < 0
@@ -5890,6 +5895,35 @@ if mfo_ = 324805 and dat_ >= to_date('31122014','ddmmyyyy') then
             null;
          end ;
       end;
+
+   end loop;
+
+end if;
+
+-- блок для заміни кода 122 на код 125 для рахунків дисконту   
+-- бал.рахунки ***6 для яких параметр  R013 in ('1','2','3','4')
+if Dat_ >= dat_izm7
+then
+
+   for k in ( select r.kodp, r.nls, r.acc, sp.r013 
+              from rnbu_trace r, specparam sp
+              where substr(r.kodp, 1, 3) = '122'
+                and substr(r.kodp,18,4) in ('1416','1426','1516','1526','1546',
+                                            '2016','2026','2036','2046','2066',
+                                            '2076','2086','2106','2116','2126',
+                                            '2136','2146','2206','2216','2226',
+                                            '2236','2246','2306','2316','2326',
+                                            '2336','2346','2356','2366','2376',
+                                            '2406','2416','2426','2436','3116',
+                                            '3216','3566')
+                and r.acc = sp.acc (+)
+                and NVL(sp.r013, '0') in ('1','2','3','4')
+            ) 
+
+      loop 
+
+         update rnbu_trace r1 set r1.kodp = '125' || substr(k.kodp,4)      
+         where r1.acc= k.acc;
 
    end loop;
 
