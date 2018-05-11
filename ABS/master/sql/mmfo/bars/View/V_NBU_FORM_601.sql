@@ -14,7 +14,7 @@ PROMPT *** Create  view V_NBU_FORM_601 ***
  when r.state_id = 3 then 'Збір даних'
  when r.state_id = 4 then 'Помилка при зборі даних'
  when r.state_id = 5 then 'Відправка даних'
- when r.state_id = 6 or t.id in (12,18,5,6,9) then 'Даних не отримано!'
+ when r.state_id = 6 then 'Даних не отримано!'
  when r.state_id = 7 then 'Дані сформовано на відправку до ЦА'
  when r.state_id = 8 then 'Дані не отримані'
  when r.state_id = 9 then 'Дані успішно передані до ЦА'

@@ -76,8 +76,6 @@ create or replace package nbu_601_request_data_ru is
     ----заполнение залогов
     procedure  p_nbu_pledge_dep  (kf_ in varchar2);
 end;
-
-
 /
 create or replace package body nbu_601_request_data_ru is
 
@@ -94,12 +92,12 @@ create or replace package body nbu_601_request_data_ru is
         p_ec_year out date)
     is
     begin
-        select min(f.ved) keep (dense_rank last order by f.fdat),
-               trunc(max(f.fdat) - 1, 'YEAR')
+        select min(f.ved) keep (dense_rank last order by f.fdat) ,
+               trunc(max(f.fdat) - 1, 'YEAR') 
         into   p_k110, p_ec_year
         from   fin_fm f
         where  f.okpo = p_okpo and
-               f.ved is not null;
+               f.ved is not null ;
     end;
 
     ----------------------------
@@ -168,7 +166,7 @@ create or replace package body nbu_601_request_data_ru is
                            c.okpo,
                            p.bday,
                            decode(c.codcagent, 6, c.country, null) countrycodnerez,
-                           c.prinsider
+                           case when length(c.prinsider)=1 then  to_char(0||c.prinsider) else to_char(c.prinsider) end prinsider
                     from   customer c
                     join   person p on p.rnk = c.rnk
                     where  c.sed <> 91 and
@@ -281,7 +279,7 @@ create or replace package body nbu_601_request_data_ru is
 
         execute immediate 'alter table nbu_person_uo truncate partition for (''' || kf_ || ''') reuse storage';
 
-        for ur in (select c.rnk,
+        for ur in (select distinct c.rnk,
                           c.nmk,
                           decode(c.codcagent,3,'true',5,'true','false') isrez,
                           c.okpo,
@@ -306,7 +304,7 @@ create or replace package body nbu_601_request_data_ru is
                           nvl((select 'true'
                                from   d8_cust_link_groups d8
                                where  d8.okpo = c.okpo and
-                                      rownum = 1), 'false') as ispartner,       
+                                      rownum = 1), 'false') as ispartner,
                           case when length(c.prinsider)=1 then  to_char(0||c.prinsider) else to_char(c.prinsider) end k060
                    from   customer c
                    where  c.rnk in (select a.rnk
@@ -318,12 +316,18 @@ create or replace package body nbu_601_request_data_ru is
                                                      select b.acc from nbu_w4_bpk b where b.kf = kf_)) and
                            (c.custtype = 2 or (c.custtype = 3 and c.sed = 91))) loop
 
-            fill_company_k110(ur.okpo, l_k110, l_ec_year);
-            
-           if l_k110 is null then 
-              select ved  into  l_ved from customer where okpo=ur.okpo;
-              end if;
-                     
+           fill_company_k110(ur.okpo, l_k110, l_ec_year);
+
+         
+          if l_k110 is null then
+            begin
+              select distinct c.ved into l_ved from customer c,cc_deal d  where c.okpo=ur.okpo and c.rnk=ur.rnk and ur.rnk=d.rnk;
+              exception 
+                when others then
+                  bars.logger.info('nbu_person_uo='||l_ved||' ' ||l_k110||' '||ur.okpo||' '||ur.rnk);
+              end;
+             end if;
+        
 
             insert into bars.nbu_person_uo
             values (ur.rnk,               -- rnk             number(38),
@@ -606,7 +610,7 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
         begin
         execute immediate 'alter table NBU_OWNERJUR_UO truncate partition for (''' || kf_ || ''') reuse storage';
         end;
-        for n in (select b.rnka as rnk,b.rnkb,b.name,decode (b.country_u,804,'true','false') isrezoj,b.okpo_u, 
+        for n in (select b.rnka as rnk,b.rnkb,b.name,decode (b.country_u,804,'true','false') isrezoj,b.okpo_u,
           case when  c.datea is null then to_date('01.01.1990','dd.mm.yyyy') else c.datea end registrydayoj,
            case when c.rgadm is null then '0' else c.rgadm end numberregistryoj
              ,b.country_u,min(b.vaga1) as vaga1,' ' status
@@ -1054,13 +1058,13 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                (select decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6)  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=kf_ and dt.tag='FREQP' and regexp_like(dt.txt, '^\d{1,}$')) as periodproctr,
                                 sumarrears.sum_ost as  sumArrearsTr,
                                  nbu23_rez.daybase as  dayBaseTr,
-                                 nbu23_rez.daybase as dayProcTr,                    
+                                 nbu23_rez.daybase as dayProcTr,
                                  tr.d_fakt as factEndDayTr,
                                  nbu23_rez.fin as klasstr,
                                  nbu23_rez.cr as risktr,
-                                 person.kf     
+                                 person.kf
                               from (select rnk,kf from nbu_person_fo
-                              union 
+                              union
                               select rnk, kf from  nbu_person_uo) person,
                               (select t.acc, max(t.ir) keep(dense_rank last order by bdat) as proccredit
                                                  from int_ratn t,
@@ -1077,10 +1081,10 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                   sum(cr)*100 as cr
                            from   nbu23_rez
                            where  fdat = trunc(sysdate,'mm')
-                           group by nd) nbu23_rez on nbu23_rez.nd = d.nd     
-                             
+                           group by nd) nbu23_rez on nbu23_rez.nd = d.nd
+
                               ,nd_acc na, cc_trans tr,accounts a, nd_txt nt, cc_add ad
-             
+
                 --Залишок заборгованості за траншем
                 left join (select nd ,kv, sum (sum_ost) as sum_ost
                             from (select n.nd, a2.kv,(ag.ost + ag.crkos - ag.crdos) sum_ost
@@ -1092,9 +1096,9 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                         n.acc = a2.acc and
                                         n.acc = ag.acc)
                             group by nd, kv) sumarrears on ad.nd = sumarrears.nd and ad.kv = sumarrears.kv
-                                  
+
                    where person.rnk=d.rnk and person.kf=d.kf and d.nd=na.nd  and d.nd=ad.nd  and proc.acc = ad.accs
-                         and na.acc=a.acc and na.acc=tr.acc and nt.nd=d.nd and nt.tag ='PR_TR' and nt.txt=1 and tr.fdat>=add_months(trunc(sysdate,'mm'),-1) and tr.fdat<trunc(sysdate,'mm') ) 
+                         and na.acc=a.acc and na.acc=tr.acc and nt.nd=d.nd and nt.tag ='PR_TR' and nt.txt=1 and tr.fdat>=add_months(trunc(sysdate,'mm'),-1) and tr.fdat<trunc(sysdate,'mm') )
               loop
                        insert into nbu_credit_tranche(rnk,
                                                       nd,
@@ -1113,26 +1117,26 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                                       klasstr,
                                                       risktr,
                                                       kf)
-                                     values   (tranche.rnk, 
+                                     values   (tranche.rnk,
                                                tranche.nd,
-                                               tranche.numdogtr, 
+                                               tranche.numdogtr,
                                                tranche.dogdaytr,
-                                               tranche.enddaytr, 
+                                               tranche.enddaytr,
                                                tranche.sumzagaltr,
-                                               tranche.r030tr, 
+                                               tranche.r030tr,
                                                '',
-                                               tranche.periodbasetr, 
+                                               tranche.periodbasetr,
                                                tranche.periodproctr,
-                                               tranche.sumarrearstr, 
+                                               tranche.sumarrearstr,
                                                tranche.daybasetr,
-                                               tranche.dayproctr, 
+                                               tranche.dayproctr,
                                                tranche.factenddaytr,
-                                               tranche.klasstr, 
+                                               tranche.klasstr,
                                                tranche.risktr,
                                                tranche.kf);
-                                                                                     
-           
-           
+
+
+
            ----- проверка на наличия sp
            begin
              select count(*) into l_in_sp from accounts ca,nd_acc n where n.nd=tranche.nd  and ca.kv=tranche.r030Tr and n.acc=ca.acc and ca.tip='SP ';
@@ -1170,9 +1174,9 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
               end if;
         end loop;
      commit;
-     
+
 end;
-           
+
 
 
  --------------------
