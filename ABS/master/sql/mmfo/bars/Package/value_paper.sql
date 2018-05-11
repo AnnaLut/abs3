@@ -276,7 +276,8 @@ PROCEDURE F_SAVE (p_fl_END      IN     INT,
                          p_COD_I      IN     VARCHAR2,
                          p_COD_M      IN     VARCHAR2,
                          p_COD_F      IN     VARCHAR2,
-                         p_COD_V      IN     VARCHAR2,                         
+                         p_COD_V      IN     VARCHAR2, 
+                         p_COD_O      IN     VARCHAR2,                                                                          
                          p_sErr          OUT VARCHAR2);
 
 
@@ -547,7 +548,7 @@ END value_paper;
 /
 CREATE OR REPLACE PACKAGE BODY VALUE_PAPER
 IS
-   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.33 10.05.2018';
+   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.34 11.05.2018';
 
    g_newline constant varchar2(5) := CHR(10)||CHR(13);
    FUNCTION body_version
@@ -1900,10 +1901,11 @@ END;
   end;
 
   procedure setSpecparam(p_REF_MAIN   IN     VARCHAR2,
-                         p_COD_I      IN     VARCHAR2,
-                         p_COD_M      IN     VARCHAR2,
-                         p_COD_F      IN     VARCHAR2,
-                         p_COD_V      IN     VARCHAR2,                         
+                         p_COD_I      IN     VARCHAR2,  --ІНІЦІАТОР
+                         p_COD_M      IN     VARCHAR2,  --РИНОК
+                         p_COD_F      IN     VARCHAR2,  --Форма проведення розрахунку
+                         p_COD_V      IN     VARCHAR2,  --Вид операції
+                         p_COD_O      IN     VARCHAR2,  --Вид договору                                                
                          p_sErr          OUT VARCHAR2)
   is
   begin
@@ -1928,7 +1930,11 @@ END;
         if  p_COD_V is not null then
           insert into operw (ref, tag, value)
            values (p_REF_MAIN, 'CP_VO', p_COD_V);
-        end if;        
+        end if;      
+        if  p_COD_O is not null then
+          insert into operw (ref, tag, value)
+           values (p_REF_MAIN, 'CP_VD', p_COD_V);
+        end if;           
   exception when others then   p_sErr := sqlerrm;
   end;
 
