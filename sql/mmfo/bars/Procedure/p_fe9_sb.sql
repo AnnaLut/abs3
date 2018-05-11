@@ -12,7 +12,7 @@ CREATE OR REPLACE PROCEDURE BARS.P_FE9_SB ( dat_     DATE,
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #E9 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 22/04/2018 (05/04/2018)
+% VERSION     : 10/05/2018 (22/04/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -776,7 +776,7 @@ BEGIN
               lpad(nvl(ctkod_ku_1, '0'), 3, '0')||
               lpad(nvl(ctkod_k040_2, '0'), 3, '0')||
               lpad(nvl(ctkod_ku_2, '0'), 3, '0'),
-              ctkod_t071, ctkod_ku_1, 'З XML по ШК'
+              ctkod_t071, nbuc1_, 'З XML по ШК'
           from NBUR_TMP_E9_SK
           where report_date = dat_rep_ and
                 kf = mfo_ and
@@ -790,7 +790,7 @@ BEGIN
               lpad(nvl(ctkod_ku_1, '0'), 3, '0')||
               lpad(nvl(ctkod_k040_2, '0'), 3, '0')||
               lpad(nvl(ctkod_ku_2, '0'), 3, '0'),
-              ctkod_t080, ctkod_ku_1, 'З XML по ШК'
+              ctkod_t080, nbuc1_, 'З XML по ШК'
           from NBUR_TMP_E9_SK
           where report_date = dat_rep_ and
                 kf = mfo_ and
