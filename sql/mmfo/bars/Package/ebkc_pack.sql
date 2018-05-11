@@ -3,7 +3,7 @@ is
   --
   -- Customer Data Management (CDM)
   --
-  g_header_version constant varchar2(64) := 'version 1.01 13/03/2018';
+  g_header_version constant varchar2(64) := 'version 1.02 11/05/2018';
 
   -- типи клієнтів, що використовуються в ЕБК Корп
   LEGAL_ENTITY      constant varchar2(1) := 'L';   -- ЮО
@@ -12,6 +12,7 @@ is
 
   -- header_version - возвращает версию заголовка пакета
   function header_version return varchar2;
+
   -- body_version - возвращает версию тела пакета
   function body_version return varchar2;
 
@@ -30,11 +31,11 @@ is
 
   function get_last_modifc_date(p_rnk in number) return date;
 
-  procedure send_request(
-      p_action     in varchar2,
-      p_session_id in integer,
-      p_parameters in varchar2_list,
-      p_values     in varchar2_list);
+  procedure SEND_REQUEST
+  ( p_action              in varchar2
+  , p_session_id          in integer
+  , p_parameters          in varchar2_list
+  , p_values              in varchar2_list );
 
 
   procedure REQUEST_LEGAL_DUP_MASS
@@ -87,15 +88,25 @@ is
   , p_tab_attr            in t_rec_ebk
   , p_rec_qlt_grp         in t_rec_qlt_grp);
 
-  procedure request_private_updcard_mass(p_batchId in varchar2,
-                             p_kf in varchar2,
-                             p_rnk in number,
-                             p_anls_quality in number,
-                             p_defaultGroupQuality in number,
-                             p_tab_attr  t_rec_ebk,
-                             p_rec_qlt_grp t_rec_qlt_grp);
+  procedure REQUEST_PRIVATE_UPDCARD_MASS
+  ( p_batchId             in varchar2
+  , p_kf                  in varchar2
+  , p_rnk                 in number
+  , p_anls_quality        in number
+  , p_defaultGroupQuality in number
+  , p_tab_attr            in t_rec_ebk
+  , p_rec_qlt_grp         in t_rec_qlt_grp );
 
-  procedure create_group_duplicate;
+  procedure REQUEST_INDIVIDUAL_UPDATECARD
+  ( p_batchId             in  varchar2
+  , p_kf                  in  varchar2
+  , p_rnk                 in  number
+  , p_anls_quality        in  number
+  , p_defaultGroupQuality in  number
+  , p_tab_attr            in  t_rec_ebk
+  , p_rec_qlt_grp         in  t_rec_qlt_grp );
+
+  procedure CREATE_GROUP_DUPLICATE;
 
 end EBKC_PACK;
 /
@@ -106,7 +117,7 @@ create or replace package body EBKC_PACK
 is
 
   -- Версія пакету
-  g_body_version constant varchar2(64) := 'version 1.03 13/03/2018';
+  g_body_version constant varchar2(64) := 'version 1.04 11/05/2018';
 
   -- header_version - возвращает версию заголовка пакета
   function header_version return varchar2 is
@@ -526,10 +537,15 @@ $end
     p_tab_attr            in     t_rec_ebk,
     p_rec_qlt_grp         in     t_rec_qlt_grp
   ) is
+    title           constant     varchar2(64) := $$PLSQL_UNIT||'.REQUEST_UPDATECARD_MASS';
     l_rnk               customer.rnk%type;
   begin
 
+    bars_audit.trace( '%s: Entry with ( p_kf=%s, p_rnk=%s, p_custtype=%s, p_anls_quality=%s, p_defaultGroupQuality=%s ).'
+                    , title, p_kf, to_char(p_rnk), p_custtype, to_char(p_anls_quality), to_char(p_defaultGroupQuality) );
+
 $if EBK_PARAMS.CUT_RNK $then
+    bc.set_policy_group('WHOLE');
     l_rnk := EBKC_WFORMS_UTL.GET_RNK(p_rnk,p_kf);
 $else
     l_rnk := p_rnk;
@@ -537,11 +553,11 @@ $end
 
     -- не храним предыдущие рекомендации по конкретному kf, rnk,
     -- новый пакет рекомендаций стирает старые рекомендации по
-    bars_audit.info('process recommendation for rnk='||l_rnk);
+    bars_audit.info( title||': process recommendation for rnk='||l_rnk );
 
-    --удаление неактуальных более рекомендаций
-    delete from ebkc_req_updcard_attr
-     where kf = p_kf
+    -- удаление неактуальных более рекомендаций
+    delete EBKC_REQ_UPDCARD_ATTR
+     where kf  = p_kf
        and rnk = l_rnk
        and cust_type = p_custtype
        and name in (select name
@@ -549,75 +565,105 @@ $end
                      where b.quality = 'C'
                         or b.name is not null);
 
-    if sql%rowcount > 0 then
-       delete
-         from ebkc_req_updatecard u
-        where u.kf = p_kf
-          and u.rnk = l_rnk
-          and not exists (select 1
-                            from ebkc_req_updcard_attr a
-                           where a.kf = u.kf
-                             and a.rnk = u.rnk);
+    if ( sql%rowcount > 0 )
+    then
+
+      delete EBKC_REQ_UPDATECARD u
+       where u.kf  = p_kf
+         and u.rnk = l_rnk
+         and not exists (select 1
+                           from EBKC_REQ_UPDCARD_ATTR a
+                          where a.kf  = u.kf
+                            and a.rnk = u.rnk );
     end if;
 
     -- сохраняем только ошибки и предупреждения
     -- только одна рекомендация может быть у реквизита
-        insert into ebkc_req_updcard_attr( kf, rnk, quality, name, value, recommendValue, descr, cust_type)
-                                    select p_kf, l_rnk, ms.quality, ms.name, ms.value, ms.recommendvalue, ms.descr, p_custtype
-                                    from table(p_tab_attr) ms
-                                    where --ms.quality <> 'C'
-                                      (ms.recommendvalue is not null or ms.descr is not null)
-                                      and not exists ( select null from ebkc_req_updcard_attr
-                                                        where kf = p_kf
-                                                          and rnk = l_rnk
-                                                          and name = ms.name
-                                                     )
+    insert
+      into EBKC_REQ_UPDCARD_ATTR
+         ( KF, RNK, QUALITY, NAME, VALUE, RECOMMENDVALUE, DESCR, CUST_TYPE )
+    select p_kf, l_rnk, ms.quality, ms.name, ms.value, ms.recommendvalue, ms.descr, p_custtype
+      from table(p_tab_attr) ms
+     where ( ms.recommendvalue is not null or ms.descr is not null )
+       and not exists ( select null 
+                          from EBKC_REQ_UPDCARD_ATTR
+                         where kf   = p_kf
+                           and rnk  = l_rnk
+                           and name = ms.name )
                                       -- !!! для теста - приймаємо все!
                                       --and exists -- не грузим рекомендации по которым не прописаны действия  в EBKC_CARD_ATTRIBUTES.ACTION
                                       --        ( select null from ebkc_card_attributes where name = ms.name and action is not null and cust_type = p_custtype)
-                                              ;
-       -- создаем мастер запись если заполнился выше детаил
-       if sql%rowcount > 0 then
+    ;
+    
+    -- создаем мастер запись если заполнился выше детаил
+    if ( sql%rowcount > 0 )
+    then
 
-        insert into ebkc_req_updatecard( batchId, kf , rnk, quality, defaultGroupQuality, group_id )
-                                   select p_batchId, p_kf, l_rnk,  p_anls_quality, p_defaultGroupQuality
-                                          ,get_group_id(l_rnk,p_kf) as group_id
-                                     from dual where not exists (select null from ebkc_req_updatecard
-                                                                  where kf = p_kf
-                                                                    and rnk = l_rnk
-                                                                );
-        end if;
+      insert
+        into EBKC_REQ_UPDATECARD
+           ( BATCHID, KF , RNK, QUALITY, DEFAULTGROUPQUALITY, GROUP_ID )
+      select p_batchId, p_kf, l_rnk,  p_anls_quality, p_defaultGroupQuality
+           , get_group_id(l_rnk,p_kf) as group_id
+        from dual
+       where not exists ( select null
+                            from ebkc_req_updatecard
+                           where kf  = p_kf
+                             and rnk = l_rnk );
+    end if;
+
     -- удаляем ранее загруженные проценты качества
-    delete from ebkc_qualityattr_groups
-     where kf = p_kf and rnk = l_rnk;
+    delete EBKC_QUALITYATTR_GROUPS
+     where KF  = p_kf
+       and RNK = l_rnk;
+
     -- сохраняем отдельно проценты качества в любом случае, т.к. далее понадобятся в дедубликации
     -- качества приходят по всей карточке, по основной группе или по умолчанию обязательно ,
     -- а также динамически созд-ым группам
-    insert into ebkc_qualityattr_groups( batchid ,kf ,rnk , name , quality, cust_type )
-     select p_batchId, p_kf, l_rnk , 'card', p_anls_quality, p_custtype  from dual
+    insert
+      into EBKC_QUALITYATTR_GROUPS
+         ( BATCHID ,KF ,RNK , NAME , QUALITY, CUST_TYPE )
+    select p_batchId, p_kf, l_rnk , 'card', p_anls_quality, p_custtype
+      from DUAL
      union all
-     select p_batchId, p_kf, l_rnk, 'default', p_defaultGroupQuality, p_custtype  from dual
+    select p_batchId, p_kf, l_rnk, 'default', p_defaultGroupQuality, p_custtype
+      from DUAL
      union all
-     select p_batchId, p_kf ,l_rnk ,gr.name, gr.quality, p_custtype from table(p_rec_qlt_grp) gr
+    select p_batchId, p_kf ,l_rnk ,gr.name, gr.quality, p_custtype
+      from table(p_rec_qlt_grp) gr
      where gr.name is not null;
 
     --Заполняем таблицу-справочник групп
-    insert into  ebkc_quality_groups
+    insert into ebkc_quality_groups
     select s_ebk_quality_groups.nextval, g.name, p_custtype
       from table(p_rec_qlt_grp) g
      where not exists (select 1
                          from ebkc_quality_groups qg
                         where qg.qg_name = g.name and cust_type= p_custtype);
 
-    --commit;
-   exception
-     when others then rollback; raise;
-  end request_updatecard_mass;
+--  commit;
+
+$if EBK_PARAMS.CUT_RNK $then
+    bc.set_context;
+$end
+
+    bars_audit.trace( '%s: Exit.', title );
+
+  exception
+    when others then
+      ROLLBACK;
+$if EBK_PARAMS.CUT_RNK $then
+      bc.set_context;
+$end
+      bars_audit.error( title || ': p_batch='||p_batchid||', p_kf='||p_kf||', p_rnk='||to_char(p_rnk)
+                              || ', p_tab_attr.count='||to_char(p_tab_attr.count) );
+      bars_audit.error( title || ': ' || dbms_utility.format_error_stack() || dbms_utility.format_error_backtrace() );
+      raise_application_error( -20666, title || ': ' || SQLERRM, true );
+  end REQUEST_UPDATECARD_MASS;
 
   --
   --
   --
-  procedure request_legal_updatecard_mass
+  procedure REQUEST_LEGAL_UPDATECARD_MASS
   ( p_batchId in varchar2,
     p_kf in varchar2,
     p_rnk in number,
@@ -627,13 +673,13 @@ $end
     p_rec_qlt_grp t_rec_qlt_grp
   ) is
   begin
-    request_updatecard_mass(p_batchId, p_kf, p_rnk, p_anls_quality, p_defaultGroupQuality,  'L', p_tab_attr,p_rec_qlt_grp);
-  end request_legal_updatecard_mass;
+    REQUEST_UPDATECARD_MASS( p_batchId, p_kf, p_rnk, p_anls_quality, p_defaultGroupQuality, LEGAL_ENTITY, p_tab_attr,p_rec_qlt_grp );
+  end REQUEST_LEGAL_UPDATECARD_MASS;
 
   --
   --
   --
-  procedure request_private_updcard_mass
+  procedure REQUEST_PRIVATE_UPDCARD_MASS
   ( p_batchId in varchar2,
     p_kf in varchar2,
     p_rnk in number,
@@ -643,8 +689,24 @@ $end
     p_rec_qlt_grp t_rec_qlt_grp
   ) is
   begin
-    request_updatecard_mass(p_batchId, p_kf, p_rnk, p_anls_quality, p_defaultGroupQuality,  'P', p_tab_attr,p_rec_qlt_grp);
-  end request_private_updcard_mass;
+    REQUEST_UPDATECARD_MASS( p_batchId, p_kf, p_rnk, p_anls_quality, p_defaultGroupQuality, PRIVATE_ENT, p_tab_attr,p_rec_qlt_grp );
+  end REQUEST_PRIVATE_UPDCARD_MASS;
+
+  --
+  --
+  --
+  procedure REQUEST_INDIVIDUAL_UPDATECARD
+  ( p_batchId              in  varchar2
+  , p_kf                   in  varchar2
+  , p_rnk                  in  number
+  , p_anls_quality         in  number
+  , p_defaultGroupQuality  in  number
+  , p_tab_attr             in  t_rec_ebk
+  , p_rec_qlt_grp          in  t_rec_qlt_grp
+  ) is
+  begin
+    REQUEST_UPDATECARD_MASS( p_batchId, p_kf, p_rnk, p_anls_quality, p_defaultGroupQuality, INDIVIDUAL, p_tab_attr,p_rec_qlt_grp );
+  end REQUEST_INDIVIDUAL_UPDATECARD;
 
   --
   -- run from JOB
@@ -770,9 +832,10 @@ $end
    bars_audit.info( title||': Finished.');
    exception
      when others then
-       rollback;
-       raise;
-  end create_group_duplicate;
+       ROLLBACK;
+       bars_audit.error( title || ': ' || dbms_utility.format_error_stack() || dbms_utility.format_error_backtrace() );
+       raise_application_error( -20666, title || ': ' || SQLERRM, true );
+  end CREATE_GROUP_DUPLICATE;
 
 
 
