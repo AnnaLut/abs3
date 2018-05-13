@@ -2927,6 +2927,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.OW_FILES_PROC is
 							  WHERE nlsa = o1.nlsa
 								 AND pdat >= bankdate - 30
 								 AND tt != l_tt
+								 and ref in (select ref from ow_pkk_que)								 
 								 AND sos BETWEEN 2 AND 4)
 					  AND sos > 0
 					  AND pdat >= bankdate - 30
