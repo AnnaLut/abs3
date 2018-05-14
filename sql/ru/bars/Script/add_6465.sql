@@ -18,11 +18,9 @@ Begin
       ( 'S_MIN', 'Але не менше',  
         NULL, NULL, NULL, NULL, NULL, NULL, 'N', 0 
       ); 
-EXCEPTION WHEN OTHERS THEN 
-  null;
-END;
+   exception when dup_val_on_index then  null;
+end;
 /
-
 Begin
   INSERT INTO OP_FIELD 
       ( TAG, NAME, 
@@ -32,17 +30,15 @@ Begin
       ( 'S_MAX', 'Але не більше',  
         NULL, NULL, NULL, NULL, NULL, NULL, 'N', 0 
       ); 
-EXCEPTION WHEN OTHERS THEN 
-  null;
-END;
+   exception when dup_val_on_index then  null;
+end;
 /
+
 COMMIT;
 
 -----------------------------------------------------------------------------------------------
 
-SET DEFINE OFF;
 PROMPT  ---- Создание шаблона №147 для операции 470,471,472!!!
-exec bc.go('/');
 begin
 Insert into BARS.VOB
    (VOB, NAME, FLV, REP_PREFIX)
@@ -51,8 +47,13 @@ Insert into BARS.VOB
    exception when dup_val_on_index then  null;
 end;
 /
+delete from TTS_VOB where tt in('470','471','472');
+commit;  
 begin
-delete from TTS_VOB where tt in('470','471','472') 
+Insert into BARS.TICKETS_PAR
+   (REP_PREFIX, PAR, TXT, COMM, MOD_CODE)
+ Values
+   ('DEFAULT', 'TT_470', 'select tt from oper where ref=:nRecID and tt=''470''', 'Для друкування 470', 'TIC');
    exception when dup_val_on_index then  null;
 end;
 /
@@ -60,19 +61,27 @@ begin
 Insert into BARS.TICKETS_PAR
    (REP_PREFIX, PAR, TXT, COMM, MOD_CODE)
  Values
-   ('DEFAULT', 'TT_470', 'select tt from oper where ref=:nRecID and tt=''470''', 'Для друкування 470', 'TIC');
-Insert into BARS.TICKETS_PAR
-   (REP_PREFIX, PAR, TXT, COMM, MOD_CODE)
- Values
    ('DEFAULT', 'TT_471', 'select tt from oper where ref=:nRecID and tt=''471''', 'Для друкування 471', 'TIC');
+   exception when dup_val_on_index then  null;
+end;
+/
+begin
 Insert into BARS.TICKETS_PAR
    (REP_PREFIX, PAR, TXT, COMM, MOD_CODE)
  Values
    ('DEFAULT', 'TT_472','select tt from oper where ref=:nRecID and tt=''472''', 'Для друкування 472', 'TIC');
+   exception when dup_val_on_index then  null;
+end;
+/
+begin
    Insert into BARS.TICKETS_PAR
    (REP_PREFIX, PAR, TXT, COMM, MOD_CODE)
  Values
    ('DEFAULT', 'NLS_470','select substr(a.nls,1,14) from opldok o, accounts a where o.ref=:nRecID and o.acc=a.acc and o.tt in(''470'',''471'',''472'') order by a.nls desc', 'Рахунок Б для TT 470,471,472', 'TIC');
+   exception when dup_val_on_index then  null;
+end;
+/
+begin
    Insert into BARS.TICKETS_PAR
    (REP_PREFIX, PAR, TXT, MOD_CODE)
  Values
