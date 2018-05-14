@@ -583,6 +583,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
         FROM attribute_number_value a
         JOIN deal d
           ON d.id = a.object_id
+         and d.close_date is null
          AND a.value = p_acc
         JOIN attribute_kind k
           ON k.id = a.attribute_id
