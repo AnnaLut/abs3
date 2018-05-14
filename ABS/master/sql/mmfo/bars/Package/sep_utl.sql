@@ -42,10 +42,11 @@ procedure unlock_by_sum_blk(p_sum number,
                             p_kv  number,
                             p_blk number,
                             p_msg out varchar2);
--- копирование  operw                            
-procedure  copy_operw ( p_ref_new operw.ref%TYPE,p_ref_old operw.ref%TYPE);                            
+-- копирование  operw
+procedure  copy_operw ( p_ref_new operw.ref%TYPE,p_ref_old operw.ref%TYPE);
 end;
 /
+
 
 CREATE OR REPLACE PACKAGE BODY BARS."SEP_UTL" is
 --***************************************************************--
@@ -56,7 +57,7 @@ CREATE OR REPLACE PACKAGE BODY BARS."SEP_UTL" is
 --
 -- constants
 --
-g_body_version    constant varchar2(64)  := 'version 1.03 19/04/2018';
+g_body_version    constant varchar2(64)  := 'version 1.04 14/05/2018';
 g_body_defs       constant varchar2(512) := '';
 
 g_modcode         constant varchar2(3)   := 'SEP';
@@ -573,16 +574,18 @@ begin
 end;
 ---------
 procedure copy_operw(p_ref_new operw.ref%TYPE, p_ref_old operw.ref%TYPE) is
+l_mfoa_new  oper.mfoa%TYPE;
 l_mfob_new  oper.mfob%TYPE;
 begin
   insert into operw
     select p_ref_new, w.tag, w.value, w.kf
       from operw w
      where w.ref = p_ref_old;
-begin 
-select mfob into l_mfob_new from oper where ref= p_ref_new;
+begin
+select mfoa,mfob into l_mfoa_new,l_mfob_new from oper where ref= p_ref_new;
 exception
       when no_data_found then
+        l_mfoa_new:=null;
         l_mfob_new:=null;
 end;
   for i in (select *
@@ -592,7 +595,7 @@ end;
              where o.ref = p_ref_old
                and o.d_rec like ('%#fMT%')
                and t.otm = 0) loop
-   if l_mfob_new ='300465' then
+   if l_mfob_new ='300465' and l_mfoa_new ='300465' then
     begin
           insert into operw
         (ref, tag, value)
