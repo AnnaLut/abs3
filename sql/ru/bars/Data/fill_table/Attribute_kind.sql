@@ -10,9 +10,7 @@ begin
                                                          attribute_utl.VALUE_TYPE_NUMBER,
                                                          p_value_table_name => 'NOTARY',
                                                          p_key_column_name => 'ID',
-                                                         p_value_column_name => 'DOCUMENT_TYPE', 
-                                                         p_multi_values_flag => 'N',
-                                                         p_save_history_flag => 'Y');
+                                                         p_value_column_name => 'DOCUMENT_TYPE');
     end if;
 
     l_attribute_id := attribute_utl.get_attribute_id(nota.ATTR_CODE_IDCARD_DOCUMENT_NUM);
@@ -23,8 +21,7 @@ begin
                                                          attribute_utl.VALUE_TYPE_NUMBER,
                                                          p_value_table_name => 'NOTARY',
                                                          p_key_column_name => 'ID',
-                                                         p_value_column_name => 'IDCARD_DOCUMENT_NUMBER',
-                                                         p_save_history_flag => 'Y');
+                                                         p_value_column_name => 'IDCARD_DOCUMENT_NUMBER');
     end if;
 
     l_attribute_id := attribute_utl.get_attribute_id(nota.ATTR_CODE_IDCARD_NOTATION_NUM);
@@ -35,8 +32,7 @@ begin
                                                          attribute_utl.VALUE_TYPE_STRING,
                                                          p_value_table_name => 'NOTARY',
                                                          p_key_column_name => 'ID',
-                                                         p_value_column_name => 'IDCARD_NOTATION_NUMBER',
-                                                         p_save_history_flag => 'Y');
+                                                         p_value_column_name => 'IDCARD_NOTATION_NUMBER');
     end if;
 
     l_attribute_id := attribute_utl.get_attribute_id(nota.ATTR_CODE_PASSPORT_EXPIRY);
@@ -47,8 +43,7 @@ begin
                                                          attribute_utl.VALUE_TYPE_DATE,
                                                          p_value_table_name => 'NOTARY',
                                                          p_key_column_name => 'ID',
-                                                         p_value_column_name => 'PASSPORT_EXPIRY',
-                                                         p_save_history_flag => 'Y');
+                                                         p_value_column_name => 'PASSPORT_EXPIRY');
     end if;
     
     commit;
