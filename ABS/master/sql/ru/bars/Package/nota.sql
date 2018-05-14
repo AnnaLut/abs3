@@ -89,7 +89,7 @@ CREATE OR REPLACE PACKAGE BARS.NOTA is
                              p_CERTIFICATE_CANCELATION_DATE  date    ,
                              p_RNK                           number  ,
                              p_MFORNK                        varchar2,
-               p_DOCUMENT_TYPE                 number,
+               		     p_DOCUMENT_TYPE                 number,
                              p_IDCARD_DOCUMENT_NUMBER        number,
                              p_IDCARD_NOTATION_NUMBER        varchar2,
                              p_PASSPORT_EXPIRY               date,
@@ -116,7 +116,7 @@ CREATE OR REPLACE PACKAGE BARS.NOTA is
                              p_CERTIFICATE_CANCELATION_DATE  date    ,
                              p_RNK                           number  ,
                              p_MFORNK                        varchar2,
-               p_DOCUMENT_TYPE                 number,
+               		     p_DOCUMENT_TYPE                 number,
                              p_IDCARD_DOCUMENT_NUMBER        number,
                              p_IDCARD_NOTATION_NUMBER        varchar2,
                              p_PASSPORT_EXPIRY               date,
@@ -426,7 +426,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.NOTA AS
                              p_CERTIFICATE_CANCELATION_DATE  date    ,
                              p_RNK                           number  ,
                              p_MFORNK                        varchar2,
-               p_DOCUMENT_TYPE                 number,
+               		     p_DOCUMENT_TYPE                 number,
                              p_IDCARD_DOCUMENT_NUMBER        number,
                              p_IDCARD_NOTATION_NUMBER        varchar2,
                              p_PASSPORT_EXPIRY               date,
@@ -546,7 +546,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.NOTA AS
                              p_CERTIFICATE_CANCELATION_DATE  date,
                              p_RNK                           number  ,
                              p_MFORNK                        varchar2,
-               p_DOCUMENT_TYPE                 number,
+               		     p_DOCUMENT_TYPE                 number,
                              p_IDCARD_DOCUMENT_NUMBER        number,
                              p_IDCARD_NOTATION_NUMBER        varchar2,
                              p_PASSPORT_EXPIRY               date,
@@ -588,7 +588,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.NOTA AS
         attribute_utl.set_value(p_id,ATTR_CODE_CERT_NUMBER,        p_CERTIFICATE_NUMBER);
         attribute_utl.set_value(p_id,ATTR_CODE_CERT_ISSUE_DATE,    p_CERTIFICATE_ISSUE_DATE);
         attribute_utl.set_value(p_id,ATTR_CODE_CERT_CANCEL_DATE,   p_CERTIFICATE_CANCELATION_DATE);
-    attribute_utl.set_value(p_id,ATTR_CODE_DOCUMENT_TYPE,         p_DOCUMENT_TYPE);
+    	attribute_utl.set_value(p_id,ATTR_CODE_DOCUMENT_TYPE,         p_DOCUMENT_TYPE);
         attribute_utl.set_value(p_id,ATTR_CODE_IDCARD_DOCUMENT_NUM,   p_IDCARD_DOCUMENT_NUMBER);
         attribute_utl.set_value(p_id,ATTR_CODE_IDCARD_NOTATION_NUM,   p_IDCARD_NOTATION_NUMBER);
         attribute_utl.set_value(p_id,ATTR_CODE_PASSPORT_EXPIRY,       p_PASSPORT_EXPIRY);
@@ -878,7 +878,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.NOTA AS
                         null,
                         p_rnk,
                         p_sender_mfo,
-            p_DOCUMENT_TYPE,
+            		p_DOCUMENT_TYPE,
                         p_IDCARD_DOCUMENT_NUMBER,
                         p_IDCARD_NOTATION_NUMBER,
                         p_PASSPORT_EXPIRY,
