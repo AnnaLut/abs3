@@ -1,13 +1,7 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_release_mgr.sql =========*** Ru
- PROMPT ===================================================================================== 
- 
   CREATE OR REPLACE PACKAGE BARS.BARS_RELEASE_MGR 
 is
 
-g_version varchar2(50) := '4.0.0';
+g_version varchar2(50) := '4.0.1';
 
 
 type t_row is record(rec_id number, rec_date date, inst_type varchar2(10), inst_name varchar2(50), rec_message varchar2(250));
@@ -185,7 +179,7 @@ begin
             l_dbname,
             f_ourmfo_g,
             getglobaloption('GLB-NAME'),
-            user_name,
+            '-',
             sys_context('userenv', 'terminal'),
             sys_context('userenv', 'ip_address'));
 
