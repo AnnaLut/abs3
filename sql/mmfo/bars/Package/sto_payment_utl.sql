@@ -95,7 +95,7 @@ end;
 /
 create or replace package body sto_payment_utl as
 
-    G_VERSION constant varchar2(64) := 'version 2.3 20.11.2017';
+    G_VERSION constant varchar2(64) := 'version 2.4 15.05.2018';
 
     function get_version
     return varchar2
@@ -994,7 +994,7 @@ create or replace package body sto_payment_utl as
 
     procedure pay_off_order_amounts
     is
-        l_bank_date date := gl.bDATE;
+        l_bank_date date;
 		l_sbon_user_id staff$base.id%type;
     begin
         bars_audit.trace('sto_payment_utl.pay_off_order_amounts' || chr(10) ||
@@ -1017,7 +1017,7 @@ create or replace package body sto_payment_utl as
 			bars_audit.info('sto_payment_utl.pay_off_order_amounts' || chr(10) ||
 							 'user_id      : ' || user_id || chr(10) ||
 							 'session_user : ' || sys_context('USERENV', 'SESSION_USER'));			
-		
+            l_bank_date := gl.bDATE;
 			for i in (select * from sto_payment p
 					  where  p.state = sto_payment_utl.STO_PM_STATE_READY_TO_WITHDRAW and
 							 p.value_date <= l_bank_date and
